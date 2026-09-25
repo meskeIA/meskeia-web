@@ -3315,7 +3315,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // BIOMEDICINA Y CIENCIAS DE LA SALUD
   'simulador-genetica': [
-    { url: '/simulador-punnett/', icon: '🧬', name: 'Cuadro de Punnett', description: 'La versión enfocada de los cruces mono y dihíbridos (EBAU/Bachillerato)' },
+    { url: '/simulador-punnett/', icon: '🧬', name: 'Cuadro de Punnett', description: 'La versión enfocada de los cruces mono y dihíbridos (educación media y examen de admisión universitaria)' },
     { url: '/simulador-deriva-genetica/', icon: '🧬', name: 'Deriva Genética', description: 'Cambios aleatorios en frecuencias alélicas por azar' },
     { url: '/visualizador-seleccion-natural/', icon: '🦎', name: 'Selección Natural', description: 'Evolución y adaptación de poblaciones' },
     { url: '/visualizador-evolucion-molecular/', icon: '🔬', name: 'Evolución Molecular', description: 'Mutaciones y árboles filogenéticos' },
@@ -6240,7 +6240,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'simulador-fluidos-bernoulli': [
     { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'Bernoulli es conservación de energía en fluidos' },
-    { url: '/simulador-cinetica-arrhenius/', icon: '⚗️', name: 'Cinética Arrhenius', description: 'Otro pilar de Química/Física Bachillerato' },
+    { url: '/simulador-cinetica-arrhenius/', icon: '⚗️', name: 'Cinética Arrhenius', description: 'Otro pilar de la química y la física de educación media' },
     { url: '/visualizador-corazon-ciclo-cardiaco/', icon: '❤️', name: 'Ciclo cardíaco', description: 'Bernoulli aplicada a la circulación humana' },
     { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'Sangre humana', description: 'El fluido más característico que estudia Bernoulli' },
   ],
@@ -6275,7 +6275,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-punnett/', icon: '🧬', name: 'Cuadro de Punnett', description: 'La meiosis genera la variabilidad que Mendel estudió con el cuadro de Punnett' },
     { url: '/visualizador-celula/', icon: '🔬', name: 'Célula animal y vegetal', description: 'Dónde ocurre la división: núcleo, centriolos, huso acromático' },
     { url: '/visualizador-adn-codigo-genetico/', icon: '🧬', name: 'ADN y Código Genético', description: 'El ADN que se replica y divide en mitosis y meiosis' },
-    { url: '/simulador-potencial-accion/', icon: '⚡', name: 'Potencial de Acción', description: 'Otro simulador de Biología EBAU con animación celular' },
+    { url: '/simulador-potencial-accion/', icon: '⚡', name: 'Potencial de Acción', description: 'Otro simulador de biología de educación media con animación celular' },
   ],
   'simulador-fotosintesis-factores': [
     { url: '/simulador-ecosistema-trofico/', icon: '🌍', name: 'Ecosistema Trófico', description: 'Los productores que aquí simulamos son la base de la pirámide trófica' },
@@ -6358,7 +6358,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-teorema-bayes/', icon: '🎲', name: 'Teorema de Bayes', description: 'La probabilidad condicional detrás del problema' },
     { url: '/simulador-distribucion-normal/', icon: '📊', name: 'Distribución Normal', description: 'Otra pieza clave del razonamiento probabilístico' },
     { url: '/visualizador-probabilidad/', icon: '🎰', name: 'Probabilidad visual', description: 'Conceptos fundamentales con ejemplos interactivos' },
-    { url: '/simulador-trigonometria-circulo-unitario/', icon: '⭕', name: 'Círculo Trigonométrico', description: 'Otro simulador visual de Matemáticas Bachillerato' },
+    { url: '/simulador-trigonometria-circulo-unitario/', icon: '⭕', name: 'Círculo Trigonométrico', description: 'Otro simulador visual de matemáticas de educación media' },
   ],
   'simulador-trigonometria-circulo-unitario': [
     { url: '/simulador-funciones-transformaciones/', icon: '📉', name: 'Transformaciones de Funciones', description: 'Cómo a, b, c, d modifican sin, cos y otras bases' },
