@@ -170,6 +170,37 @@ test.describe('Exenciones del vendedor', () => {
     expect(g.cuotaIRPF).toBe(0);
   });
 
+  /**
+   * Hallazgo 1797 (25/09/2026). Con el principal pendiente igual o mayor que el valor de
+   * transmisión, el importe total obtenido del art. 41.1 RIRPF es 0 y cualquier reinversión lo
+   * cubre: el art. 41.4 solo prorratea si la reinversión es INFERIOR al total obtenido. La guarda
+   * `importeTotalObtenido > 0` perdía la exención entera justo ahí: con 1 € menos de hipoteca
+   * salía exenta y con 1 € más, la cuota completa.
+   */
+  test('hipoteca igual o mayor que el valor de transmisión: cualquier reinversión exime del todo', () => {
+    for (const principalPendiente of [199999, 200000, 200001, 250000]) {
+      const g = calcularGananciaInmueble({
+        precioVenta: 200000,
+        precioCompra: 100000,
+        reinversion: { importeReinvertido: 1000, principalPendiente },
+      });
+      expect(g.proporcionReinvertida, `principal ${principalPendiente}`).toBe(1);
+      expect(g.cuotaIRPF, `principal ${principalPendiente}`).toBe(0);
+      expect(r2(g.exentaPorReinversion)).toBe(100000);
+    }
+  });
+
+  test('sin reinvertir nada no hay exención aunque la hipoteca supere el valor (art. 41.1 RIRPF)', () => {
+    // Ganancia 100.000 sin exención: 1.140 + 9.240 + 23 % × 50.000 = 21.880
+    const g = calcularGananciaInmueble({
+      precioVenta: 200000,
+      precioCompra: 100000,
+      reinversion: { importeReinvertido: 0, principalPendiente: 250000 },
+    });
+    expect(g.proporcionReinvertida).toBe(0);
+    expect(r2(g.cuotaIRPF)).toBe(21880);
+  });
+
   test('la exención por edad prevalece sobre la reinversión parcial', () => {
     const g = calcularGananciaInmueble({
       precioVenta: 200000,
