@@ -12,158 +12,58 @@ import {
   DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatCurrency, formatNumber } from '@/lib';
+import { formatCurrency, formatNumber, formatPercentage } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_IRPF_META,
-  desglosarEscalaGeneral,
-  cuotaEscalaGeneral,
-  calcularCuotaIntegraGeneral,
+  FISCAL_SS_CUENTA_AJENA_META,
   COTIZACIONES_SS_2026,
   BASES_SS_2026,
-  MINIMOS_IRPF_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
-  calcularRendimientoNetoTrabajo,
-  calcularDeduccionRentasBajas,
-  limitarDeduccionRendimientosTrabajo,
 } from '@/data/fiscal';
+import {
+  calcularSueldo,
+  brutoDondeIrpfSuperaSS,
+  BRUTO_TOPE_SS,
+  TIPO_SS_TRABAJADOR,
+  type TramoDesglose,
+} from './motor';
 import Chart from 'chart.js/auto';
 
-// ─────────────────────────────────────────────
-// Lógica de cálculo
-// ─────────────────────────────────────────────
+/** Ejercicio de los datos que se aplican (hallazgo 1895: se anunciaba 2025 y se calculaba 2026). */
+const EJERCICIO = FISCAL_IRPF_META.vigencia;
 
-interface DesgloseSueldo {
-  brutoAnual: number;
-  brutoMensual: number;
-  // Cotizaciones SS
-  ssContingencias: number;
-  ssDesempleo: number;
-  ssFormacion: number;
-  ssMEI: number;
-  totalSS: number;
-  // IRPF
-  baseImponible: number;
-  /** Mínimo personal (art. 57 LIRPF). NO reduce la base: se grava a tipo cero. */
-  minimoPersonal: number;
-  /** Escala aplicada a la base liquidable entera (primera aplicación, art. 63.1.2.º). */
-  cuotaEscalaIRPF: number;
-  /** Escala aplicada al mínimo (segunda aplicación), que se resta de la anterior. */
-  cuotaMinimoIRPF: number;
-  /** Cuota íntegra = cuotaEscalaIRPF − cuotaMinimoIRPF. */
-  cuotaIntegraIRPF: number;
-  retencionIRPF: number;
-  tipoEfectivoIRPF: number;
-  desgloseTramosIRPF: { tramo: string; base: number; tipo: number; cuota: number }[];
-  // Resultado
-  netoAnual: number;
-  netoMensual: number;
-  // Para visualización
-  pctSS: number;
-  pctIRPF: number;
-  pctNeto: number;
-}
+/** Porcentaje en escala 0-100, con espacio duro antes del % (CLAUDE.md global §2). */
+const pct = (n: number, decimales = 1) => formatPercentage(n / 100, decimales);
 
-/**
- * Liquidaciones de cotización al año. Son DOCE, tenga la nómina 12 pagas o 14: el art. 147
- * LGSS obliga a incluir en la base mensual «la parte proporcional de las pagas
- * extraordinarias», de modo que las extras se prorratean dentro de los doce meses en vez de
- * cotizar aparte. El tope máximo (5.101,20 €/mes en 2026) se aplica a esa base mensual.
- *
- * ⚠️ CORREGIDO EL 12/09/2026. Aquí ponía 14, y con él se dividía el bruto y se multiplicaba
- * la cuota. Por debajo del tope da lo mismo —bruto/14 × 14 es bruto—, así que el defecto
- * estuvo invisible; por encima, no: la app topaba la cotización en 71.416,80 € de bruto en
- * vez de en 61.214,40 €, y cobraba hasta 663,16 €/año de más (4.642,09 € donde corresponden
- * 3.978,94 €). Eso rebajaba además la base del IRPF, y el neto publicado salía unos 365 €
- * por debajo del real. Era el único sitio del catálogo que dividía entre 14: las otras cinco
- * apps de nómina y `lib/calculadoras/sueldoNeto.ts` ya usaban 12.
- *
- * Fuente: art. 147 LGSS + Orden PJC/297/2026 (Seguridad Social, «Bases y tipos de
- * cotización»). Verificado en sesión el 12/09/2026.
- */
-const LIQUIDACIONES_SS_ANUALES = 12;
+const rangoTramo = (t: TramoDesglose) =>
+  t.hasta === null
+    ? `Más de ${formatCurrency(t.desde)}`
+    : `${formatCurrency(t.desde)} → ${formatCurrency(t.hasta)}`;
 
-function calcularSueldo(brutoAnual: number): DesgloseSueldo {
-  const brutoMensual = brutoAnual / LIQUIDACIONES_SS_ANUALES;
+// Cifras de la guía, calculadas con el MISMO motor que la cascada (hallazgo 1896: la guía daba
+// un tipo efectivo «~15%» para 35.000 € que salía del modelo anterior a las reparaciones).
+const BRUTO_EJEMPLO_GUIA = 35000;
+const EJEMPLO_GUIA = calcularSueldo(BRUTO_EJEMPLO_GUIA);
+const BRUTO_CRUCE_SS_IRPF = brutoDondeIrpfSuperaSS();
+/** Cuánto mayor es cada mensualidad en 12 pagas que en 14 (sospecha del 25/09: decía «~16%»). */
+const AUMENTO_12_PAGAS = (14 / 12 - 1) * 100;
 
-  // 1. Cotizaciones SS (sobre base mensual prorrateada, limitada a topes)
-  const pagas = LIQUIDACIONES_SS_ANUALES;
-  // Sin suelo en la base MÍNIMA: esa base es la de jornada completa, y coincide con el SMI, así
-  // que un bruto anual por debajo solo puede ser jornada parcial o parte del año — y entonces
-  // se cotiza por lo cobrado. Hasta el 24/09/2026 se subía a la mínima: 14.000 € a media
-  // jornada cotizaban sobre 17.092,80 € (1.111 € en vez de 910 €).
-  const baseSS = Math.min(brutoMensual, BASES_SS_2026.maxima);
-  const ssContingencias = baseSS * (COTIZACIONES_SS_2026.contingenciasComunes / 100) * pagas;
-  const ssDesempleo = baseSS * (COTIZACIONES_SS_2026.desempleo / 100) * pagas;
-  const ssFormacion = baseSS * (COTIZACIONES_SS_2026.formacionProfesional / 100) * pagas;
-  const ssMEI = baseSS * (COTIZACIONES_SS_2026.mef / 100) * pagas;
-  const totalSS = ssContingencias + ssDesempleo + ssFormacion + ssMEI;
+const SUELDOS_COMPARAR = [20000, 30000, 45000, 60000, 80000, 120000];
+const COMPARATIVA = SUELDOS_COMPARAR.map((b) => calcularSueldo(b));
 
-  // 2. Base imponible IRPF
-  // Gastos del art. 19 y reducción del art. 20, medida sobre bruto − SS ANTES de restar los
-  // 2.000 € de la letra f) (hallazgo 1687 de estimador-sueldo-neto, mismo defecto: hasta el
-  // 25/09/2026 se medía después).
-  const baseImponible = calcularRendimientoNetoTrabajo({
-    integros: brutoAnual,
-    gastosAaE: totalSS,
-  }).rendimientoNetoReducido;
-
-  // Minimo personal. NO reduce la base (art. 63.1.2 LIRPF): la base liquidable general lo
-  // lleva dentro y se grava a tipo cero restando de la cuota la escala aplicada a el.
-  //
-  // ATENCION 12/09/2026: hasta esta fecha esta app restaba el minimo de la base antes de
-  // aplicar la escala, que lo valora al tipo marginal y subestima la cuota: 610,50 EUR con
-  // 30.000 EUR de bruto y 1.443 EUR de 80.000 en adelante.
-  const minimoPersonal = MINIMOS_IRPF_2025.personal;
-
-  // 3. IRPF por tramos, sobre la base liquidable ENTERA
-  const baseGravable = Math.max(0, baseImponible);
-  const { cuota: cuotaEscalaIRPF, tramos } = desglosarEscalaGeneral(baseGravable);
-
-  const desgloseTramosIRPF = tramos.map((t) => ({
-    tramo: t.hasta === null
-      ? `Más de ${formatCurrency(t.desde)}`
-      : `${formatCurrency(t.desde)} → ${formatCurrency(t.hasta)}`,
-    base: t.base,
-    tipo: t.tipo,
-    cuota: t.cuota,
-  }));
-
-  // Segunda aplicacion de la escala: la cuota del minimo, que se resta de la anterior.
-  const cuotaMinimoIRPF = cuotaEscalaGeneral(Math.min(minimoPersonal, baseGravable));
-  const cuotaIntegraIRPF = calcularCuotaIntegraGeneral(baseGravable, minimoPersonal);
-
-  // Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF, cuantías de 2026):
-  // sobre el bruto, con tope en la cuota íntegra, que aquí es toda del trabajo.
-  const deduccionRentasBajas = limitarDeduccionRendimientosTrabajo(
-    calcularDeduccionRentasBajas(brutoAnual, 0, 2026),
-    cuotaIntegraIRPF,
-  );
-  const retencionIRPF = Math.max(0, cuotaIntegraIRPF - deduccionRentasBajas);
-  const tipoEfectivoIRPF = brutoAnual > 0 ? (retencionIRPF / brutoAnual) * 100 : 0;
-
-  // 4. Neto
-  const netoAnual = brutoAnual - totalSS - retencionIRPF;
-  const netoMensual = netoAnual / 12;
-
-  // Porcentajes
-  const pctSS = brutoAnual > 0 ? (totalSS / brutoAnual) * 100 : 0;
-  const pctIRPF = brutoAnual > 0 ? (retencionIRPF / brutoAnual) * 100 : 0;
-  const pctNeto = brutoAnual > 0 ? (netoAnual / brutoAnual) * 100 : 0;
-
+/** Colores del gráfico, leídos de los tokens del módulo para que sigan al tema. */
+function coloresGrafico(el: HTMLElement) {
+  const css = getComputedStyle(el);
+  const v = (nombre: string, respaldo: string) => css.getPropertyValue(nombre).trim() || respaldo;
   return {
-    brutoAnual, brutoMensual,
-    ssContingencias, ssDesempleo, ssFormacion, ssMEI, totalSS,
-    baseImponible, minimoPersonal, cuotaEscalaIRPF, cuotaMinimoIRPF, cuotaIntegraIRPF,
-    retencionIRPF, tipoEfectivoIRPF, desgloseTramosIRPF,
-    netoAnual, netoMensual,
-    pctSS, pctIRPF, pctNeto,
+    texto: v('--text-secondary', '#666666'),
+    rejilla: v('--border', '#E5E5E5'),
+    neto: v('--primary-boton', '#26718F'),
+    irpf: v('--rojo-fondo', '#C0392B'),
+    ss: v('--naranja-fondo', '#A84300'),
   };
 }
-
-// ─────────────────────────────────────────────
-// Componente principal
-// ─────────────────────────────────────────────
 
 export default function VisualizadorSueldoNetoPage() {
   const [brutoAnual, setBrutoAnual] = useState(30000);
@@ -173,71 +73,122 @@ export default function VisualizadorSueldoNetoPage() {
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
 
-  const sueldosComparar = [20000, 30000, 45000, 60000, 80000, 120000];
-
   useEffect(() => {
-    if (!chartRef.current) return;
+    const lienzo = chartRef.current;
+    if (!lienzo) return;
     if (chartInstanceRef.current) chartInstanceRef.current.destroy();
 
-    const ctx = chartRef.current.getContext('2d');
+    const ctx = lienzo.getContext('2d');
     if (!ctx) return;
 
-    const datosComparativa = sueldosComparar.map(b => calcularSueldo(b));
-
-    chartInstanceRef.current = new Chart(ctx, {
+    const c = coloresGrafico(lienzo);
+    const grafico = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: sueldosComparar.map(b => formatCurrency(b)),
+        labels: SUELDOS_COMPARAR.map(b => formatCurrency(b)),
         datasets: [
-          {
-            label: 'Neto',
-            data: datosComparativa.map(d => d.pctNeto),
-            backgroundColor: '#2E86AB',
-            borderRadius: 2,
-          },
-          {
-            label: 'IRPF',
-            data: datosComparativa.map(d => d.pctIRPF),
-            backgroundColor: '#e74c3c',
-            borderRadius: 2,
-          },
-          {
-            label: 'Seguridad Social',
-            data: datosComparativa.map(d => d.pctSS),
-            backgroundColor: '#e67e22',
-            borderRadius: 2,
-          },
+          { label: 'Neto', data: COMPARATIVA.map(d => d.pctNeto), backgroundColor: c.neto, borderRadius: 2 },
+          { label: 'IRPF', data: COMPARATIVA.map(d => d.pctIRPF), backgroundColor: c.irpf, borderRadius: 2 },
+          { label: 'Seguridad Social', data: COMPARATIVA.map(d => d.pctSS), backgroundColor: c.ss, borderRadius: 2 },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        color: c.texto,
         plugins: {
-          legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12 } },
+          legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12, color: c.texto } },
           tooltip: {
             callbacks: {
               label: (ctx: { dataset: { label?: string }; parsed: { y: number | null } }) =>
-                `${ctx.dataset.label}: ${formatNumber(ctx.parsed.y ?? 0, 1)}%`,
+                `${ctx.dataset.label}: ${pct(ctx.parsed.y ?? 0)}`,
             },
           },
         },
         scales: {
-          x: { stacked: true, title: { display: true, text: 'Sueldo bruto anual' } },
+          x: {
+            stacked: true,
+            ticks: { color: c.texto },
+            grid: { color: c.rejilla },
+            title: { display: true, text: 'Sueldo bruto anual', color: c.texto },
+          },
           y: {
             stacked: true,
             max: 100,
-            ticks: { callback: (v: string | number) => `${v}%` },
-            title: { display: true, text: '% del bruto' },
+            ticks: { color: c.texto, callback: (v: string | number) => pct(Number(v), 0) },
+            grid: { color: c.rejilla },
+            title: { display: true, text: '% del bruto', color: c.texto },
           },
         },
       },
     } as never);
+    chartInstanceRef.current = grafico;
 
-    return () => { chartInstanceRef.current?.destroy(); chartInstanceRef.current = null; };
+    // Hallazgo 1903: Chart.js escribía ejes y leyenda en su #666 por defecto, también en oscuro.
+    // Al cambiar de tema se releen los tokens y se repinta.
+    const repintar = () => {
+      const n = coloresGrafico(lienzo);
+      const o = grafico.options as unknown as {
+        color: string;
+        plugins: { legend: { labels: { color: string } } };
+        scales: Record<'x' | 'y', { ticks: { color: string }; grid: { color: string }; title: { color: string } }>;
+      };
+      o.color = n.texto;
+      o.plugins.legend.labels.color = n.texto;
+      for (const eje of ['x', 'y'] as const) {
+        o.scales[eje].ticks.color = n.texto;
+        o.scales[eje].grid.color = n.rejilla;
+        o.scales[eje].title.color = n.texto;
+      }
+      grafico.update('none');
+    };
+    const observador = new MutationObserver(repintar);
+    observador.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    return () => {
+      observador.disconnect();
+      chartInstanceRef.current?.destroy();
+      chartInstanceRef.current = null;
+    };
   }, []);
 
-  // Colores para tramos IRPF
+  // Colores para tramos IRPF (marca de color junto al texto, no texto)
   const coloresTramos = ['#27ae60', '#48A9A6', '#2E86AB', '#e67e22', '#e74c3c', '#8e44ad'];
+
+  // Recuadro de conclusión (hallazgos 1896 y 1897): sale de las cifras de la cascada, no de
+  // rangos de bruto escritos a mano, que se quedaron con el modelo anterior a las reparaciones.
+  const conclusion = (() => {
+    if (datos.irpfAnual === 0) {
+      return (
+        <p>
+          Con {formatCurrency(brutoAnual)} de bruto, <strong>el IRPF del año queda en cero</strong>:
+          la deducción por obtención de rendimientos del trabajo ({formatCurrency(datos.deduccionDA61)})
+          cubre toda la cuota. Lo único que se descuenta es la Seguridad Social.
+        </p>
+      );
+    }
+    if (datos.totalSS >= datos.irpfAnual) {
+      return (
+        <p>
+          Con {formatCurrency(brutoAnual)} de bruto, <strong>la Seguridad Social ({formatCurrency(datos.totalSS)})
+          pesa más que el IRPF ({formatCurrency(datos.irpfAnual)})</strong>. La cotización es un
+          porcentaje de la base desde el primer euro, mientras que el IRPF todavía queda rebajado por
+          el mínimo personal, la reducción del art. 20 y la deducción de la DA 61.ª.
+        </p>
+      );
+    }
+    return (
+      <p>
+        Con {formatCurrency(brutoAnual)} de bruto, <strong>el IRPF ({formatCurrency(datos.irpfAnual)})
+        pesa {formatNumber(datos.irpfAnual / datos.totalSS, 1)} veces lo que la Seguridad Social
+        ({formatCurrency(datos.totalSS)})</strong>. La última parte de tu base tributa al{' '}
+        {pct(datos.tipoMarginal, 0)} (tipo marginal), aunque sobre el total pagas un{' '}
+        {pct(datos.tipoEfectivoIRPF)} (tipo efectivo).
+      </p>
+    );
+  })();
+
+  const minimoCapado = datos.minimoAplicado < datos.minimoPersonal;
 
   return (
     <div className={styles.container}>
@@ -253,33 +204,58 @@ export default function VisualizadorSueldoNetoPage() {
 
         <LegalNotice />
         <DisclaimerCard variant="financial" severity="critical" />
+        {/* Hallazgo 1895: dos fuentes, como la hermana estimador-sueldo-neto — el IRPF (con la
+            DA 61.ª de 2026) y la cotización de la Seguridad Social (Orden PJC/297/2026). */}
         <DataReference
-          normativa="IRPF + Seguridad Social 2025"
+          normativa={`IRPF ${EJERCICIO}`}
           fuente={FISCAL_IRPF_META.fuente}
           verificado={FISCAL_IRPF_META.verificado}
           urlOficial={FISCAL_IRPF_META.urlOficial}
+          nota={`La deducción por obtención de rendimientos del trabajo sigue la DA 61.ª LIRPF en la redacción del art. 28 del Real Decreto-ley 5/2026 (cuantías de ${EJERCICIO}). ${FISCAL_IRPF_META.nota}`}
+        />
+        <DataReference
+          normativa={`Cotizaciones del trabajador ${FISCAL_SS_CUENTA_AJENA_META.vigencia}`}
+          fuente={FISCAL_SS_CUENTA_AJENA_META.fuente}
+          verificado={FISCAL_SS_CUENTA_AJENA_META.verificado}
+          urlOficial={FISCAL_SS_CUENTA_AJENA_META.urlOficial}
+          nota={FISCAL_SS_CUENTA_AJENA_META.nota}
         />
 
         {/* Slider de sueldo */}
         <div className={styles.sliderZona}>
           <div className={styles.sliderHeader}>
-            <label className={styles.sliderLabel}>Sueldo bruto anual</label>
+            <label className={styles.sliderLabel} htmlFor="bruto-anual">Sueldo bruto anual</label>
             <span className={styles.sliderValor}>{formatCurrency(brutoAnual)}</span>
           </div>
           <input
+            id="bruto-anual"
             type="range"
             className={styles.slider}
             min={15000}
             max={150000}
             step={1000}
             value={brutoAnual}
-            onChange={(e) => setBrutoAnual(parseInt(e.target.value))}
-            aria-label={`Sueldo bruto anual: ${formatCurrency(brutoAnual)}`}
+            onChange={(e) => setBrutoAnual(parseInt(e.target.value, 10))}
+            aria-valuetext={formatCurrency(brutoAnual)}
           />
           <div className={styles.sliderExtremos}>
-            <span>15.000 €</span>
-            <span>150.000 €</span>
+            <span>{formatCurrency(15000)}</span>
+            <span>{formatCurrency(150000)}</span>
           </div>
+        </div>
+
+        {/* Hallazgo 1899: el supuesto del cálculo, a la vista y junto al resultado. Es un
+            visualizador de un solo mando; la situación familiar la pregunta la hermana. */}
+        <div className={styles.supuesto}>
+          <p>
+            <strong>Para quién vale este neto:</strong> contribuyente soltero/a, sin hijos ni
+            ascendientes a cargo, menor de 65 años y sin discapacidad (mínimo personal de{' '}
+            {formatCurrency(datos.minimoPersonal)}), con un solo pagador y contrato indefinido, y la
+            escala general del IRPF con un tipo autonómico medio. Si tienes hijos, estás casado/a o
+            quieres elegir 12 o 14 pagas, usa la{' '}
+            <a href="/estimador-sueldo-neto/">calculadora de sueldo neto</a>, que pregunta tu situación
+            familiar.
+          </p>
         </div>
 
         {/* Cascada visual */}
@@ -289,7 +265,7 @@ export default function VisualizadorSueldoNetoPage() {
             <div className={styles.cascadaInfo}>
               <span className={styles.cascadaLabel}>Sueldo bruto anual</span>
               <span className={styles.cascadaValorPrincipal}>{formatCurrency(datos.brutoAnual)}</span>
-              <span className={styles.cascadaPct}>100%</span>
+              <span className={styles.cascadaPct}>{pct(100, 0)}</span>
             </div>
           </div>
 
@@ -300,28 +276,34 @@ export default function VisualizadorSueldoNetoPage() {
             <div className={styles.cascadaInfo}>
               <span className={styles.cascadaLabel}>Seguridad Social</span>
               <span className={styles.cascadaValor}>− {formatCurrency(datos.totalSS)}</span>
-              <span className={styles.cascadaPct}>{formatNumber(datos.pctSS, 1)}% del bruto</span>
+              <span className={styles.cascadaPct}>{pct(datos.pctSS)} del bruto</span>
             </div>
           </div>
 
           {/* Desglose SS */}
           <div className={styles.desgloseSS}>
             <div className={styles.desgloseItem}>
-              <span>Contingencias comunes ({formatNumber(COTIZACIONES_SS_2026.contingenciasComunes, 2)}%)</span>
+              <span>Contingencias comunes ({pct(COTIZACIONES_SS_2026.contingenciasComunes, 2)})</span>
               <span>− {formatCurrency(datos.ssContingencias)}</span>
             </div>
             <div className={styles.desgloseItem}>
-              <span>Desempleo ({formatNumber(COTIZACIONES_SS_2026.desempleo, 2)}%)</span>
+              <span>Desempleo ({pct(COTIZACIONES_SS_2026.desempleo, 2)})</span>
               <span>− {formatCurrency(datos.ssDesempleo)}</span>
             </div>
             <div className={styles.desgloseItem}>
-              <span>Formación profesional ({formatNumber(COTIZACIONES_SS_2026.formacionProfesional, 2)}%)</span>
+              <span>Formación profesional ({pct(COTIZACIONES_SS_2026.formacionProfesional, 2)})</span>
               <span>− {formatCurrency(datos.ssFormacion)}</span>
             </div>
             <div className={styles.desgloseItem}>
-              <span>MEI ({formatNumber(COTIZACIONES_SS_2026.mef, 2)}%)</span>
+              <span>MEI ({pct(COTIZACIONES_SS_2026.mef, 2)})</span>
               <span>− {formatCurrency(datos.ssMEI)}</span>
             </div>
+            {datos.baseSSTopada && (
+              <p className={styles.desgloseNotaSS}>
+                Tu base mensual ({formatCurrency(datos.brutoMensual)}) pasa del tope de{' '}
+                {formatCurrency(BASES_SS_2026.maxima)}: se cotiza solo por el tope.
+              </p>
+            )}
           </div>
 
           <div className={styles.cascadaFlecha} aria-hidden="true">▼</div>
@@ -329,13 +311,40 @@ export default function VisualizadorSueldoNetoPage() {
           <div className={`${styles.cascadaItem} ${styles.cascadaResta}`}>
             <div className={styles.cascadaIcono} aria-hidden="true">🏛️</div>
             <div className={styles.cascadaInfo}>
-              <span className={styles.cascadaLabel}>Retención IRPF</span>
-              <span className={styles.cascadaValor}>− {formatCurrency(datos.retencionIRPF)}</span>
-              <span className={styles.cascadaPct}>Tipo efectivo: {formatNumber(datos.tipoEfectivoIRPF, 1)}%</span>
+              <span className={styles.cascadaLabel}>IRPF anual (cuota estimada)</span>
+              <span className={styles.cascadaValor}>− {formatCurrency(datos.irpfAnual)}</span>
+              <span className={styles.cascadaPct}>Tipo efectivo: {pct(datos.tipoEfectivoIRPF)}</span>
             </div>
           </div>
 
-          {/* Desglose tramos IRPF */}
+          {/* Hallazgo 1898: el paso a paso del IRPF entero, para poder seguirlo a mano —
+              base (arts. 19 y 20), escala y mínimo (art. 63.1.2.º), y deducción (DA 61.ª). */}
+          <div className={styles.desgloseTramos}>
+            <p className={styles.desgloseTramTitulo}>De tu bruto a la base del IRPF</p>
+            <div className={styles.pasoFila}>
+              <span>Bruto − Seguridad Social</span>
+              <span>{formatCurrency(datos.rendimientoPrevio)}</span>
+            </div>
+            <div className={styles.pasoFila}>
+              <span>− Gastos generales (art. 19.2.f LIRPF)</span>
+              <span>− {formatCurrency(datos.gastosGenerales)}</span>
+            </div>
+            <div className={styles.pasoFila}>
+              <span>− Reducción por rendimientos del trabajo (art. 20 LIRPF)</span>
+              <span>− {formatCurrency(datos.reduccionArt20)}</span>
+            </div>
+            <div className={`${styles.pasoFila} ${styles.pasoTotal}`}>
+              <span>= Base liquidable</span>
+              <span>{formatCurrency(datos.baseLiquidable)}</span>
+            </div>
+            <p className={styles.desgloseTramNota}>
+              La reducción del art. 20 se mide sobre bruto − Seguridad Social (
+              {formatCurrency(datos.rendimientoPrevio)}), antes de restar los gastos generales, y se
+              agota cuando esa cifra llega a{' '}
+              {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}.
+            </p>
+          </div>
+
           {datos.desgloseTramosIRPF.length > 0 && (
             <div className={styles.desgloseTramos}>
               <p className={styles.desgloseTramTitulo}>Desglose por tramos IRPF</p>
@@ -346,8 +355,8 @@ export default function VisualizadorSueldoNetoPage() {
                     style={{ backgroundColor: coloresTramos[i] || '#999' }}
                   />
                   <div className={styles.tramoInfo}>
-                    <span className={styles.tramoRango}>{t.tramo}</span>
-                    <span className={styles.tramoPct}>al {formatNumber(t.tipo, 0)}%</span>
+                    <span className={styles.tramoRango}>{rangoTramo(t)}</span>
+                    <span className={styles.tramoPct}>al {pct(t.tipo, 0)}</span>
                   </div>
                   <div className={styles.tramoValores}>
                     <span className={styles.tramoBase}>{formatCurrency(t.base)}</span>
@@ -356,15 +365,39 @@ export default function VisualizadorSueldoNetoPage() {
                 </div>
               ))}
               <p className={styles.desgloseTramNota}>
-                Los tramos se aplican a la base <strong>entera</strong> y suman{' '}
-                {formatCurrency(datos.cuotaEscalaIRPF)}. De ahí se resta la misma escala aplicada
-                al mínimo personal de {formatCurrency(datos.minimoPersonal)} —
-                {formatCurrency(datos.cuotaMinimoIRPF)}—, que es la forma en que la ley lo grava
+                Los tramos se aplican a la base <strong>entera</strong> ({formatCurrency(datos.baseLiquidable)})
+                y suman {formatCurrency(datos.cuotaEscalaIRPF)}. De ahí se resta la misma escala aplicada
+                al mínimo personal de {formatCurrency(datos.minimoPersonal)}
+                {minimoCapado && (
+                  <>, que no puede superar la base y aquí se limita a {formatCurrency(datos.minimoAplicado)}</>
+                )}{' '}—{formatCurrency(datos.cuotaMinimoIRPF)}—, que es la forma en que la ley lo grava
                 a tipo cero (art. 63.1.2.º LIRPF). Cuota íntegra:{' '}
                 {formatCurrency(datos.cuotaIntegraIRPF)}.
               </p>
             </div>
           )}
+
+          <div className={styles.desgloseTramos}>
+            <p className={styles.desgloseTramTitulo}>De la cuota íntegra al IRPF del año</p>
+            <div className={styles.pasoFila}>
+              <span>Cuota íntegra</span>
+              <span>{formatCurrency(datos.cuotaIntegraIRPF)}</span>
+            </div>
+            <div className={styles.pasoFila}>
+              <span>− Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF)</span>
+              <span>− {formatCurrency(datos.deduccionDA61)}</span>
+            </div>
+            <div className={`${styles.pasoFila} ${styles.pasoTotal}`}>
+              <span>= IRPF anual</span>
+              <span>{formatCurrency(datos.irpfAnual)}</span>
+            </div>
+            <p className={styles.desgloseTramNota}>
+              Es el IRPF que corresponde en el año, el que saldría en la declaración de la renta. La
+              retención de cada nómina la calcula la empresa con el procedimiento del Reglamento del
+              IRPF (arts. 80 a 86) y puede ser algo distinta: la diferencia se regulariza al presentar
+              la declaración.
+            </p>
+          </div>
 
           <div className={styles.cascadaFlecha} aria-hidden="true">▼</div>
 
@@ -373,54 +406,51 @@ export default function VisualizadorSueldoNetoPage() {
             <div className={styles.cascadaInfo}>
               <span className={styles.cascadaLabel}>Tu sueldo neto anual</span>
               <span className={styles.cascadaValorPrincipal}>{formatCurrency(datos.netoAnual)}</span>
-              <span className={styles.cascadaPct}>{formatNumber(datos.pctNeto, 1)}% del bruto → {formatCurrency(datos.netoMensual)}/mes (12 pagas)</span>
+              <span className={styles.cascadaPct}>{pct(datos.pctNeto)} del bruto → {formatCurrency(datos.netoMensual)}/mes (12 pagas)</span>
             </div>
           </div>
         </div>
 
-        {/* Barra de reparto */}
+        {/* Barra de reparto (los anchos CSS no son texto: van sin espacio) */}
         <div className={styles.barraReparto}>
           <div
             className={styles.barraNeto}
             style={{ width: `${datos.pctNeto}%` }}
           >
-            <span className={styles.barraTexto}>Neto {formatNumber(datos.pctNeto, 0)}%</span>
+            <span className={styles.barraTexto}>Neto {pct(datos.pctNeto, 0)}</span>
           </div>
           <div
             className={styles.barraIRPF}
             style={{ width: `${datos.pctIRPF}%` }}
           >
-            <span className={styles.barraTexto}>IRPF {formatNumber(datos.pctIRPF, 0)}%</span>
+            <span className={styles.barraTexto}>IRPF {pct(datos.pctIRPF, 0)}</span>
           </div>
           <div
             className={styles.barraSS}
             style={{ width: `${datos.pctSS}%` }}
           >
-            <span className={styles.barraTexto}>SS {formatNumber(datos.pctSS, 0)}%</span>
+            <span className={styles.barraTexto}>SS {pct(datos.pctSS, 0)}</span>
           </div>
         </div>
 
         {/* Insight contextual */}
         <div className={styles.insight}>
-          {brutoAnual <= 22000 && (
-            <p>Con un sueldo de {formatCurrency(brutoAnual)}, <strong>la Seguridad Social pesa más que el IRPF</strong>. Las cotizaciones son un porcentaje fijo, mientras que el IRPF es muy bajo en estos tramos gracias al mínimo personal y la reducción por rendimientos del trabajo.</p>
-          )}
-          {brutoAnual > 22000 && brutoAnual <= 40000 && (
-            <p>En el rango de {formatCurrency(brutoAnual)}, <strong>IRPF y Seguridad Social se reparten el peso casi a partes iguales</strong>. Cada euro extra de sueldo tributa al {formatNumber(datos.desgloseTramosIRPF[datos.desgloseTramosIRPF.length - 1]?.tipo ?? 0, 0)}% marginal.</p>
-          )}
-          {brutoAnual > 40000 && brutoAnual <= 80000 && (
-            <p>A partir de {formatCurrency(brutoAnual)}, <strong>el IRPF ya pesa significativamente más que la SS</strong>. Tu tipo marginal es del {formatNumber(datos.desgloseTramosIRPF[datos.desgloseTramosIRPF.length - 1]?.tipo ?? 0, 0)}% — cada euro extra de subida solo te llega parcialmente.</p>
-          )}
-          {brutoAnual > 80000 && (
-            <p>Con {formatCurrency(brutoAnual)} de bruto, <strong>te llevas menos del {formatNumber(datos.pctNeto, 0)}% a casa</strong>. La SS <strong>deja de crecer</strong> a partir de {formatCurrency(BASES_SS_2026.maxima * LIQUIDACIONES_SS_ANUALES)} de bruto anual, porque la base mensual se topa en {formatCurrency(BASES_SS_2026.maxima)}; el IRPF, en cambio, sigue creciendo con cada tramo.</p>
+          {conclusion}
+          {datos.baseSSTopada && (
+            <p>
+              Te llevas a casa el {pct(datos.pctNeto)} del bruto. La SS <strong>deja de crecer</strong> a
+              partir de {formatCurrency(BRUTO_TOPE_SS)} de bruto anual, porque la base mensual se topa en{' '}
+              {formatCurrency(BASES_SS_2026.maxima)}; el IRPF, en cambio, sigue creciendo con cada tramo.
+            </p>
           )}
         </div>
 
+        {/* Hallazgo 1905: el destino, sin valorar la carga fiscal (§1.quinquies). */}
         <div className={styles.insight}>
           <p>
             Las cotizaciones a la Seguridad Social financian pensiones, prestaciones por desempleo, baja por
             enfermedad y formación profesional. El IRPF financia sanidad, educación, infraestructuras y el
-            resto de servicios públicos. No es dinero perdido — es contribución al sistema.
+            resto de servicios públicos.
           </p>
         </div>
 
@@ -428,8 +458,36 @@ export default function VisualizadorSueldoNetoPage() {
         <div className={styles.chartContainer}>
           <h3 className={styles.chartTitulo}>Comparativa: ¿cómo cambia el reparto según el sueldo?</h3>
           <div className={styles.chartWrap}>
-            <canvas ref={chartRef} aria-label="Gráfico de barras apiladas: neto, IRPF y SS por nivel salarial" />
+            <canvas
+              ref={chartRef}
+              role="img"
+              aria-label="Gráfico de barras apiladas: neto, IRPF y SS por nivel salarial. Los datos están en la tabla que sigue."
+            />
           </div>
+          <details className={styles.chartDatos}>
+            <summary>Ver los datos del gráfico</summary>
+            <table className={styles.tablaDatos}>
+              <caption>Reparto del bruto por nivel salarial (mismo supuesto que la cascada)</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Bruto anual</th>
+                  <th scope="col">Neto</th>
+                  <th scope="col">IRPF</th>
+                  <th scope="col">Seguridad Social</th>
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARATIVA.map((d) => (
+                  <tr key={d.brutoAnual}>
+                    <th scope="row">{formatCurrency(d.brutoAnual)}</th>
+                    <td>{pct(d.pctNeto)}</td>
+                    <td>{pct(d.pctIRPF)}</td>
+                    <td>{pct(d.pctSS)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </details>
         </div>
 
         <div className={styles.enlaceApp}>
@@ -443,38 +501,53 @@ export default function VisualizadorSueldoNetoPage() {
         >
           <h3>Tipo marginal vs tipo efectivo</h3>
           <p>
-            El tipo marginal es lo que pagas por el <strong>último euro</strong> que ganas. El tipo efectivo
-            es el porcentaje real que pagas sobre el total. Un sueldo de 35.000 € tiene un tipo marginal del
-            30%, pero un tipo efectivo mucho menor (~15%), porque los primeros euros tributan al 19%.
+            El tipo marginal es lo que pagas por el <strong>último euro</strong> de tu base. El tipo efectivo
+            es el porcentaje real que pagas sobre el total. Con este visualizador, un sueldo de{' '}
+            {formatCurrency(BRUTO_EJEMPLO_GUIA)} tiene un tipo marginal del{' '}
+            {pct(EJEMPLO_GUIA.tipoMarginal, 0)}, pero un tipo efectivo del{' '}
+            {pct(EJEMPLO_GUIA.tipoEfectivoIRPF)} sobre el bruto, porque los primeros euros de la base
+            tributan al {pct(EJEMPLO_GUIA.desgloseTramosIRPF[0]?.tipo ?? 0, 0)} y el mínimo personal
+            se grava a tipo cero.
           </p>
 
           <h3>¿Por qué la SS pesa tanto en sueldos bajos?</h3>
           <p>
-            Las cotizaciones a la Seguridad Social son un <strong>porcentaje fijo</strong> (6,50% del trabajador),
-            sin tramos ni mínimos exentos. Por eso, en sueldos bajos, la SS puede superar al IRPF. Además,
-            tu empresa paga otro ~30% adicional que no aparece en tu nómina.
+            Las cotizaciones a la Seguridad Social son un <strong>porcentaje de la base de cotización</strong>{' '}
+            ({pct(TIPO_SS_TRABAJADOR, 2)} a cargo del trabajador) desde el primer euro, sin mínimo exento.
+            Solo tienen techo: la base mensual se topa en {formatCurrency(BASES_SS_2026.maxima)}, así que
+            a partir de {formatCurrency(BRUTO_TOPE_SS)} de bruto anual la cotización deja de crecer. El
+            IRPF, en cambio, queda muy rebajado en sueldos bajos por el mínimo personal, la reducción
+            del art. 20 y la deducción de la DA 61.ª
+            {BRUTO_CRUCE_SS_IRPF !== null && (
+              <>: con el supuesto de esta página, la SS pesa más que el IRPF por debajo de unos{' '}
+              {formatCurrency(BRUTO_CRUCE_SS_IRPF)} de bruto</>
+            )}
+            .
           </p>
 
           <h3>Lo que tu empresa paga y tú no ves</h3>
           <p>
-            Por cada 100 € de sueldo bruto que recibes, tu empresa paga aproximadamente 130 €. Esos 30 €
-            extra cubren la cotización empresarial a la Seguridad Social: contingencias comunes (23,6%),
-            desempleo (5,5%), formación (0,6%), FOGASA (0,2%) y accidentes de trabajo (variable). Esta
-            cotización forma parte del coste laboral total y financia las prestaciones que recibirás en el
-            futuro (pensión, paro, baja por enfermedad).
+            Además de tu bruto, la empresa ingresa en la Seguridad Social su propia cotización por ti:
+            contingencias comunes, desempleo, formación profesional, FOGASA, su parte del Mecanismo de
+            Equidad Intergeneracional (MEI) y la de accidentes de trabajo y enfermedades profesionales,
+            cuyo tipo depende de la actividad. En un contrato indefinido, la suma pasa del 30{' '}%
+            de la base de cotización. Esta cotización forma parte del coste laboral total y no aparece
+            como descuento en tu nómina.
           </p>
 
           <h3>Las pagas extras: ¿mejor prorrateadas?</h3>
           <p>
-            A efectos fiscales, da igual: el IRPF se calcula sobre el total anual. Pero psicológicamente,
-            cobrar 14 pagas te da dos &quot;extras&quot; al año. En 12 pagas, cada mensualidad es ~16% mayor.
-            La elección no afecta a cuánto pagas de impuestos.
+            A efectos fiscales, da igual: el IRPF se calcula sobre el total anual, y la cotización
+            también, porque la base mensual ya incluye la parte proporcional de las extras. En 12
+            pagas, cada mensualidad es un {pct(AUMENTO_12_PAGAS)} mayor que en 14 (14 ÷ 12); en 14,
+            cobras dos pagas extra al año. La elección no afecta a cuánto pagas de impuestos.
           </p>
 
           <div className={styles.warningBox}>
-            <strong>Nota:</strong> este visualizador usa datos normativos 2025 y supone un contribuyente
-            soltero sin hijos, con un solo pagador y sin deducciones adicionales. Tu caso real puede variar
-            significativamente según CCAA, situación familiar y otras circunstancias.
+            <strong>Nota:</strong> este visualizador usa datos normativos de {EJERCICIO} y supone un
+            contribuyente soltero sin hijos, con un solo pagador y sin deducciones adicionales. Tu caso
+            real puede variar significativamente según tu comunidad autónoma, tu situación familiar y
+            otras circunstancias.
           </div>
         </EducationalSection>
 

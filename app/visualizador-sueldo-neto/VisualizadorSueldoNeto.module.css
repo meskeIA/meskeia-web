@@ -1,7 +1,6 @@
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
-  --accent: #7FB3D3;
+  /* --primary, --secondary y --accent vienen de globals.css, con su variante oscura (hallazgo
+     1903: redeclarar aquí --primary tapaba el #3FA5D1 que globals da en oscuro). */
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
@@ -12,6 +11,12 @@
   --rojo: #e74c3c;
   --naranja: #e67e22;
   --verde: #27ae60;
+  /* Hallazgo 1902: el rojo como TEXTO pequeño y los fondos de la barra con texto blanco
+     encima, a 4,5:1 o más. #C0392B sobre blanco 5,44:1 (4,99 sobre #F5F5F5); en oscuro,
+     #FF8A80 sobre #2A2A2A 6,29:1. Blanco sobre #C0392B 5,44:1 y sobre #A84300 6,06:1. */
+  --rojo-texto: #C0392B;
+  --rojo-fondo: #C0392B;
+  --naranja-fondo: #A84300;
   --radius: 12px;
   --radius-large: 16px;
   --spacing-sm: 0.5rem;
@@ -35,6 +40,9 @@
   --text-muted: #9B9B9B;
   --border: #404040;
   --hover: #333333;
+  --rojo-texto: #FF8A80;
+  --rojo-fondo: #C0392B;
+  --naranja-fondo: #A84300;
 }
 
 /* ─── Hero ─── */
@@ -188,7 +196,7 @@
 .cascadaValor {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--rojo);
+  color: var(--rojo-texto);
 }
 
 .cascadaPct {
@@ -226,9 +234,62 @@
 }
 
 .desgloseItem span:last-child {
-  color: var(--rojo);
+  color: var(--rojo-texto);
   font-weight: 600;
   white-space: nowrap;
+}
+
+/* Nota del tope de cotización, bajo el desglose de la SS */
+.desgloseNotaSS {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: var(--spacing-sm) 0 0;
+}
+
+/* ─── Supuesto del cálculo (hallazgo 1899), visible junto al resultado ─── */
+.supuesto {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--secondary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+
+.supuesto p {
+  margin: 0;
+}
+
+.supuesto a {
+  color: var(--primary-texto);
+  font-weight: 600;
+}
+
+/* ─── Paso a paso del IRPF (hallazgo 1898) ─── */
+.pasoFila {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: 0.35rem 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  border-bottom: 1px dotted var(--border);
+}
+
+.pasoFila span:last-child {
+  white-space: nowrap;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.pasoTotal {
+  border-bottom: none;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 /* ─── Desglose tramos IRPF ─── */
@@ -309,7 +370,7 @@
 .tramoCuota {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--rojo);
+  color: var(--rojo-texto);
   white-space: nowrap;
 }
 
@@ -324,7 +385,7 @@
 }
 
 .barraNeto {
-  background: var(--primary);
+  background: var(--primary-boton);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -332,7 +393,7 @@
 }
 
 .barraIRPF {
-  background: var(--rojo);
+  background: var(--rojo-fondo);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -340,7 +401,7 @@
 }
 
 .barraSS {
-  background: var(--naranja);
+  background: var(--naranja-fondo);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -394,6 +455,55 @@
   height: 320px;
 }
 
+/* Datos del gráfico en tabla (alternativa textual, hallazgo 1904) */
+.chartDatos {
+  margin-top: var(--spacing-md);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.chartDatos summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--primary-texto);
+}
+
+.chartDatos summary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tablaDatos {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing-sm);
+}
+
+.tablaDatos caption {
+  text-align: left;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  padding-bottom: 0.3rem;
+}
+
+.tablaDatos th,
+.tablaDatos td {
+  padding: 0.35rem 0.5rem;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.tablaDatos thead th {
+  background: var(--hover);
+  font-weight: 600;
+}
+
+.tablaDatos th[scope='row'] {
+  text-align: left;
+  font-weight: 600;
+}
+
 /* ─── Enlace ─── */
 .enlaceApp {
   text-align: center;
@@ -406,7 +516,7 @@
 }
 
 .enlaceApp a {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   text-decoration: none;
 }

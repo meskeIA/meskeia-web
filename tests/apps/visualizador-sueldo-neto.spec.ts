@@ -47,6 +47,13 @@ import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliar
 
 const RUTA = '/visualizador-sueldo-neto/';
 
+/**
+ * Rótulo del IRPF en la cascada. Hasta el 25/09/2026 decía «Retención IRPF», pero la cifra es la
+ * cuota anual de la LIRPF (con la deducción de la DA 61.ª), no la retención del procedimiento de
+ * los arts. 80-86 RIRPF (hallazgo 1898 y sospecha anotada; la hermana ya lo rotulaba así).
+ */
+const ETIQUETA_IRPF = 'IRPF anual (cuota estimada)';
+
 const ESPACIO_DURO = new RegExp(String.fromCharCode(160), 'g');
 const limpiar = (s: string) => s.replace(ESPACIO_DURO, ' ').replace(/\s+/g, ' ').trim();
 
@@ -88,7 +95,7 @@ test('CASO 0 · DA 61.ª de 2026: con 19.000 € la deducción es 209,69 € y e
   // 25/09/2026, con la reducción medida sobre 15.765 € (5.704,25 €): 647,35 € de IRPF.
   await ponerBruto(page, 19000);
   await expect(page.locator('css=div:has(> span:text-is("Sueldo bruto anual"))').first()).toContainText('19.000,00');
-  expect(await cascada(page, 'Retención IRPF')).toBe('− 1354,50 €');
+  expect(await cascada(page, ETIQUETA_IRPF)).toBe('− 1354,50 €');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -106,7 +113,7 @@ test('CASO 1 · 30.000 € brutos (valor por defecto)', async ({ page }) => {
   // de 23.734,50 € que la app publicaba como el sueldo que se cobra.
   expect(await cascada(page, 'Sueldo bruto anual')).toBe('30.000,00 €');
   expect(await cascada(page, 'Seguridad Social')).toBe('− 1950,00 €');
-  expect(await cascada(page, 'Retención IRPF')).toBe('− 4926,00 €');
+  expect(await cascada(page, ETIQUETA_IRPF)).toBe('− 4926,00 €');
   expect(await cascada(page, 'Tu sueldo neto anual')).toBe('23.124,00 €');
 
   // El desglose por tramos es el de la PRIMERA aplicación de la escala, sobre la base entera,
@@ -131,7 +138,7 @@ test('CASO 2 · el tramo del 30 % aparece porque la base lleva el mínimo dentro
   await expect(filas).toHaveCount(3);
   await expect(filas.nth(0)).toContainText('12.450,00');
   await expect(filas.nth(1)).toContainText('7750,00');
-  await expect(filas.nth(2)).toContainText('al 30%');
+  await expect(filas.nth(2)).toContainText(/al 30\s?%/);
   await expect(filas.nth(2)).toContainText('5850,00');
   await expect(filas.nth(2)).toContainText('1755,00');   // 5.850 × 30 %
 });
@@ -155,7 +162,7 @@ test('CASO 3 · 71.000 € brutos: el mínimo cae entero en el tramo del 45 % y 
 
   expect(await cascada(page, 'Sueldo bruto anual')).toBe('71.000,00 €');
   expect(await cascada(page, 'Seguridad Social')).toBe('− 3978,94 €');
-  expect(await cascada(page, 'Retención IRPF')).toBe('− 19.106,48 €');
+  expect(await cascada(page, ETIQUETA_IRPF)).toBe('− 19.106,48 €');
   expect(await cascada(page, 'Tu sueldo neto anual')).toBe('47.914,59 €');
 
   // Y la nota deja a la vista la diferencia entre los dos métodos del mínimo: los tramos suman
@@ -180,7 +187,7 @@ test('CASO 4 (límite) · 150.000 €: la SS no crece, el IRPF sí', async ({ pa
 
   expect(await cascada(page, 'Sueldo bruto anual')).toBe('150.000,00 €');
   expect(await cascada(page, 'Seguridad Social')).toBe('− 3978,94 €');   // la misma que con 71.000 €
-  expect(await cascada(page, 'Retención IRPF')).toBe('− 54.656,48 €');
+  expect(await cascada(page, ETIQUETA_IRPF)).toBe('− 54.656,48 €');
   expect(await cascada(page, 'Tu sueldo neto anual')).toBe('91.364,59 €');
 
   // Y el texto que acompaña a los sueldos altos nombra el tope ANUAL correcto: 61.214,40 €,
@@ -282,8 +289,8 @@ test.describe('Inspector 25/09/2026', () => {
     await expect(filasSS.nth(2)).toContainText('45,00');
     await expect(filasSS.nth(3)).toContainText('67,50');
 
-    expect(await cascada(page, 'Retención IRPF')).toBe('− 9474,75 €');
-    expect(await pieCascada(page, 'Retención IRPF')).toMatch(/^Tipo efectivo: 21,1\s?%$/);
+    expect(await cascada(page, ETIQUETA_IRPF)).toBe('− 9474,75 €');
+    expect(await pieCascada(page, ETIQUETA_IRPF)).toMatch(/^Tipo efectivo: 21,1\s?%$/);
     expect(await cascada(page, 'Tu sueldo neto anual')).toBe('32.600,25 €');
     expect(await pieCascada(page, 'Tu sueldo neto anual')).toMatch(/^72,4\s?% del bruto → 2716,69 €\/mes/);
 
@@ -334,8 +341,8 @@ test.describe('Inspector 25/09/2026', () => {
     const nota = page.locator('css=p:has-text("art. 63.1.2.º LIRPF")').first();
     await expect(nota).toContainText('544,97');
 
-    expect(await cascada(page, 'Retención IRPF')).toBe('− 0,00 €');
-    expect(await pieCascada(page, 'Retención IRPF')).toMatch(/^Tipo efectivo: 0,0\s?%$/);
+    expect(await cascada(page, ETIQUETA_IRPF)).toBe('− 0,00 €');
+    expect(await pieCascada(page, ETIQUETA_IRPF)).toMatch(/^Tipo efectivo: 0,0\s?%$/);
     expect(await cascada(page, 'Tu sueldo neto anual')).toBe('15.895,00 €');
     expect(await pieCascada(page, 'Tu sueldo neto anual')).toMatch(/^93,5\s?% del bruto → 1324,58 €\/mes/);
   });
@@ -361,14 +368,14 @@ test.describe('Inspector 25/09/2026', () => {
     await expect(slider).toHaveValue('15000');
 
     expect(await cascada(page, 'Seguridad Social')).toBe('− 975,00 €');
-    expect(await cascada(page, 'Retención IRPF')).toBe('− 0,00 €');
+    expect(await cascada(page, ETIQUETA_IRPF)).toBe('− 0,00 €');
     expect(await cascada(page, 'Tu sueldo neto anual')).toBe('14.025,00 €');
     expect(await page.locator('body').innerText()).not.toContain('NaN');
   });
 
   // ───────────────────────────────────────────────────────────────────────────
   test('HALLAZGO · el FAQPage da la cotización del trabajador «entre un 6,35 % y 6,50 %»', async ({ page }) => {
-    test.fail(); // HALLAZGO medio (Inspector 25/09/2026) — la forma del 1655 de estimador-sueldo-neto
+    // REPARADO 25/09/2026 · HALLAZGO medio (Inspector 25/09/2026) — la forma del 1655 de estimador-sueldo-neto
     // La app aplica COTIZACIONES_SS_2026 = 6,50 % a todo bruto por debajo del tope: con 30.000 €,
     // 1.950,00 €. El 6,35 % es la suma SIN el MEI (4,70 + 1,55 + 0,10), que no paga nadie en
     // 2026; y por encima del tope la cotización ni siquiera cae en esa horquilla (85.000 € →
@@ -378,11 +385,16 @@ test.describe('Inspector 25/09/2026', () => {
     const faq = await faqJsonLd(page);
     expect(faq).toContain('Qué diferencia hay entre sueldo bruto y sueldo neto');
     expect(faq).not.toMatch(/6,35/);
+    // Reparado: la cifra sale de COTIZACIONES_SS_2026 y el FAQPage nombra el tope que la limita
+    // (5.101,20 €/mes → 61.214,40 € de bruto → 3.978,94 € al año).
+    expect(faq).toMatch(/el 6,50\s?% de la base de cotización/);
+    expect(faq).toContain('61.214,40');
+    expect(faq).toContain('3978,94');
   });
 
   // ───────────────────────────────────────────────────────────────────────────
   test('HALLAZGO · la app declara datos de 2025 y calcula con los de 2026, citando solo la LIRPF', async ({ page }) => {
-    test.fail(); // HALLAZGO medio (Inspector 25/09/2026) — la forma del 1653 de estimador-sueldo-neto
+    // REPARADO 25/09/2026 · HALLAZGO medio (Inspector 25/09/2026) — la forma del 1653 de estimador-sueldo-neto
     // Lo que se aplica es de 2026: MEI 0,15 % (COTIZACIONES_SS_2026; el de 2025 es 0,12 %), tope
     // de 5.101,20 €/mes (BASES_SS_2026; el de 2025 es 4.909,50 €) y la DA 61.ª de 2026. El
     // DataReference dice «IRPF + Seguridad Social 2025» y solo cita la Ley 35/2006, arts. 57 a 66.
@@ -398,14 +410,16 @@ test.describe('Inspector 25/09/2026', () => {
 
   // ───────────────────────────────────────────────────────────────────────────
   test('HALLAZGO · la prosa compara SS e IRPF con cifras de antes de las reparaciones', async ({ page }) => {
-    test.fail(); // HALLAZGO medio (Inspector 25/09/2026)
+    // REPARADO 25/09/2026 · HALLAZGO medio (Inspector 25/09/2026)
     const insight = page.locator('css=div[class*="insight"]').first();
 
     // 30.000 € (valor por defecto): SS 1.950,00 € frente a IRPF 4.926,00 € (2,5 veces más);
     // el texto dice que «se reparten el peso casi a partes iguales».
     expect(await cascada(page, 'Seguridad Social')).toBe('− 1950,00 €');
-    expect(await cascada(page, 'Retención IRPF')).toBe('− 4926,00 €');
+    expect(await cascada(page, ETIQUETA_IRPF)).toBe('− 4926,00 €');
     expect(limpiar(await insight.innerText())).not.toContain('partes iguales');
+    // Reparado: el recuadro sale de las cifras de la cascada. 4.926 / 1.950 = 2,526 → «2,5 veces».
+    expect(limpiar(await insight.innerText())).toContain('pesa 2,5 veces lo que la Seguridad Social');
 
     // 20.000 €: SS = 1.300,00 €. IRPF: bruto − SS = 18.700 → reducción 2.364,34 − 1,14 ×
     // (18.700 − 17.673,52) = 1.194,15 €; base = 16.700 − 1.194,15 = 15.505,85 € → escala
@@ -413,35 +427,68 @@ test.describe('Inspector 25/09/2026', () => {
     // 2.906 = 9,69 → IRPF 2.034,71 €, MAYOR que la SS. El texto dice lo contrario.
     expect(await sembrarValorAcotado(page, SLIDER, 20000)).toBe('20000');
     expect(await cascada(page, 'Seguridad Social')).toBe('− 1300,00 €');
-    expect(await cascada(page, 'Retención IRPF')).toBe('− 2034,71 €');
+    expect(await cascada(page, ETIQUETA_IRPF)).toBe('− 2034,71 €');
     expect(limpiar(await insight.innerText())).not.toContain('la Seguridad Social pesa más que el IRPF');
+    // 2.034,71 / 1.300 = 1,565 → «1,6 veces»
+    expect(limpiar(await insight.innerText())).toContain('pesa 1,6 veces lo que la Seguridad Social');
+
+    // Y donde la SS SÍ pesa más, lo dice. 18.000 €: SS = 1.170,00 €; bruto − SS = 16.830 →
+    // reducción 7.302 − 1,75 × (16.830 − 14.852) = 3.840,50 €; base = 16.830 − 2.000 − 3.840,50
+    // = 10.989,50 € → escala 2.088,005 − 1.054,50 = 1.033,505 €; DA 61.ª: 590,89 − 0,2 × 906 =
+    // 409,69 € → IRPF 623,815 → 623,82 € < 1.170,00 €.
+    expect(await sembrarValorAcotado(page, SLIDER, 18000)).toBe('18000');
+    expect(await cascada(page, 'Seguridad Social')).toBe('− 1170,00 €');
+    expect(await cascada(page, ETIQUETA_IRPF)).toBe('− 623,82 €');
+    expect(limpiar(await insight.innerText())).toContain('pesa más que el IRPF');
 
     // 35.000 €: la app da un tipo efectivo del 18,1 % (IRPF 6.328,50 €); la guía dice «~15%».
     expect(await sembrarValorAcotado(page, SLIDER, 35000)).toBe('35000');
-    expect(await pieCascada(page, 'Retención IRPF')).toMatch(/^Tipo efectivo: 18,1\s?%$/);
+    expect(await pieCascada(page, ETIQUETA_IRPF)).toMatch(/^Tipo efectivo: 18,1\s?%$/);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    const guia = page.locator('css=p:has-text("tipo efectivo")').first();
+    // El párrafo de la guía (no el recuadro de conclusión, que también dice «tipo efectivo»).
+    const guia = page.locator('css=p:has-text("El tipo marginal es lo que pagas")').first();
     await expect(guia).toContainText('35.000');
     expect(limpiar(await guia.innerText())).not.toMatch(/~\s?15\s?%/);
+    // Reparado: la guía da las cifras del mismo motor — marginal 30 %, efectivo 18,1 %.
+    expect(limpiar(await guia.innerText())).toMatch(/tipo marginal del 30\s?%/);
+    expect(limpiar(await guia.innerText())).toMatch(/tipo efectivo del 18,1\s?%/);
+    // Sospechas del 25/09 en la misma guía: el «~16%» de las 12 pagas (14/12 = 1,1667 → 16,7 %),
+    // la cotización «fija, sin tramos» que ignoraba el tope y los tipos de la empresa escritos a
+    // mano sin el MEI.
+    const textoGuia = limpiar(await guia.locator('xpath=..').innerText());
+    expect(textoGuia).toMatch(/16,7\s?% mayor/);
+    expect(textoGuia).not.toMatch(/~\s?16\s?%/);
+    expect(textoGuia).toContain('5101,20');
+    expect(textoGuia).toContain('61.214,40');
+    expect(textoGuia).not.toMatch(/23,6\s?%/);
+    expect(textoGuia).toContain('Mecanismo de Equidad Intergeneracional');
   });
 
   // ───────────────────────────────────────────────────────────────────────────
   test('HALLAZGO · «te llevas menos del X %» redondea X y lo contradice', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    // REPARADO 25/09/2026 · HALLAZGO bajo (Inspector 25/09/2026)
     // 85.000 €: SS topada = 5.101,20 × 6,50 % × 12 = 3.978,936 €; base = 85.000 − 3.978,936 −
     // 2.000 = 79.021,064 € → escala 17.901,50 + 19.021,064 × 45 % = 26.460,9788 − 1.054,50 =
     // 25.406,4788 €; neto = 55.614,5852 € = 65,43 % del bruto. El texto dice «menos del 65 %»
     // porque redondea 65,43 a 65 con formatNumber(…, 0).
+    //
+    // Reparado sin «menos del»: el recuadro da la misma cifra que la cascada, con un decimal
+    // («te llevas a casa el 65,4 % del bruto»). La aserción original exigía conservar la
+    // fórmula «menos del X», que es la que inducía el redondeo; se sustituye por la igualdad
+    // con la cascada. Y 94.000 € (el otro caso del acta, 64,4 %), por si el redondeo vuelve.
     expect(await sembrarValorAcotado(page, SLIDER, 85000)).toBe('85000');
     expect(await pieCascada(page, 'Tu sueldo neto anual')).toMatch(/^65,4\s?% del bruto/);
     const insight = page.locator('css=div[class*="insight"]').first();
-    await expect(insight).toContainText('menos del');
+    expect(limpiar(await insight.innerText())).toMatch(/te llevas a casa el 65,4\s?% del bruto/i);
     expect(limpiar(await insight.innerText())).not.toMatch(/menos del 65\s?%/);
+    expect(await sembrarValorAcotado(page, SLIDER, 94000)).toBe('94000');
+    expect(await pieCascada(page, 'Tu sueldo neto anual')).toMatch(/^64,4\s?% del bruto/);
+    expect(limpiar(await insight.innerText())).toMatch(/te llevas a casa el 64,4\s?% del bruto/i);
   });
 
   // ───────────────────────────────────────────────────────────────────────────
   test('HALLAZGO · el «paso a paso» se salta los gastos, la reducción del art. 20 y la DA 61.ª', async ({ page }) => {
-    test.fail(); // HALLAZGO medio (Inspector 25/09/2026)
+    // REPARADO 25/09/2026 · HALLAZGO medio (Inspector 25/09/2026)
     // 19.000 €: la cascada enseña SS 1.235,00 € y unos tramos sobre una base de 13.504,95 €,
     // pero bruto − SS son 17.765 €. Faltan los 2.000 € del art. 19.2.f y la reducción del
     // art. 20 (2.364,34 − 1,14 × (17.765 − 17.673,52) = 2.260,05 €). Y de la cuota íntegra
@@ -449,18 +496,37 @@ test.describe('Inspector 25/09/2026', () => {
     // (590,89 − 0,2 × (19.000 − 17.094)) que la página no nombra. La hermana los enseña.
     expect(await sembrarValorAcotado(page, SLIDER, 19000)).toBe('19000');
     expect(await cascada(page, 'Seguridad Social')).toBe('− 1235,00 €');
-    expect(await cascada(page, 'Retención IRPF')).toBe('− 1354,50 €');
+    expect(await cascada(page, ETIQUETA_IRPF)).toBe('− 1354,50 €');
     const nota = page.locator('css=p:has-text("art. 63.1.2.º LIRPF")').first();
     await expect(nota).toContainText('1564,19');
     const cascadaTexto = limpiar(await page.locator('css=div[class*="cascada"]').first().innerText());
     expect(cascadaTexto).toContain('209,69');
     expect(cascadaTexto).toContain('2260,05');
     expect(cascadaTexto).toContain('2000,00');
+    // Reparado: la cadena entera se sigue a mano — 17.765,00 − 2.000,00 − 2.260,05 = 13.504,95;
+    // cuota 1.564,19 − 209,69 = 1.354,50.
+    expect(cascadaTexto).toContain('17.765,00');
+    expect(cascadaTexto).toContain('13.504,95');
+    expect(cascadaTexto).toMatch(/Deducción por obtención de rendimientos del trabajo \(DA 61\.ª LIRPF\) − 209,69 €/);
+    expect(cascadaTexto).toMatch(/= IRPF anual 1354,50 €/);
+
+    // 17.000 €: la deducción (590,89 €) se topa en la cuota (544,97 €) y el IRPF queda en 0;
+    // la deducción se nombra con la cifra topada, como en la hermana.
+    expect(await sembrarValorAcotado(page, SLIDER, 17000)).toBe('17000');
+    const t17 = limpiar(await page.locator('css=div[class*="cascada"]').first().innerText());
+    expect(t17).toMatch(/\(DA 61\.ª LIRPF\) − 544,97 €/);
+
+    // 15.000 €: base 4.723 € < mínimo 5.550 €. La escala se aplica al mínimo LIMITADO a la base:
+    // escala(4.723) = 897,37 € (y no escala(5.550) = 1.054,50 €). La nota lo tiene que decir.
+    expect(await sembrarValorAcotado(page, SLIDER, 15000)).toBe('15000');
+    const nota15 = limpiar(await page.locator('css=p:has-text("art. 63.1.2.º LIRPF")').first().innerText());
+    expect(nota15).toContain('5550,00');
+    expect(nota15).toMatch(/se limita a 4723,00 € —897,37 €—/);
   });
 
   // ───────────────────────────────────────────────────────────────────────────
   test('HALLAZGO · el supuesto «soltero sin hijos, un pagador» solo vive en la guía colapsada', async ({ page }) => {
-    test.fail(); // HALLAZGO medio (Inspector 25/09/2026)
+    // REPARADO 25/09/2026 · HALLAZGO medio (Inspector 25/09/2026)
     // La app no pregunta la situación familiar: aplica siempre MINIMOS_IRPF_2025.personal
     // (5.550 €) y la escala combinada estatal + autonómica media. Lo avisa solo el warningBox
     // de dentro de <EducationalSection>, que nace colapsada (display: none).
@@ -470,11 +536,19 @@ test.describe('Inspector 25/09/2026', () => {
     await expect(nota).toContainText('5550,00');
     const visible = limpiar(await page.locator('body').innerText());
     expect(visible).toMatch(/soltero|sin hijos/i);
+    // Reparado: el supuesto está fuera de la guía, antes de la cascada, y remite a la hermana que
+    // sí pregunta la situación familiar.
+    const supuesto = page.locator('css=div[class*="supuesto"]').first();
+    await expect(supuesto).toBeVisible();
+    await expect(supuesto).toContainText(/soltero\/a, sin hijos/);
+    await expect(supuesto).toContainText('un solo pagador');
+    await expect(supuesto).toContainText('autonómico');
+    await expect(supuesto.locator('a[href="/estimador-sueldo-neto/"]')).toHaveCount(1);
   });
 
   // ───────────────────────────────────────────────────────────────────────────
   test('HALLAZGO · el FAQPage pone el tipo estatal máximo «a partir de 60.000 €»', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    // REPARADO 25/09/2026 · HALLAZGO bajo (Inspector 25/09/2026)
     // TRAMOS_IRPF_2025 tiene un tramo de 60.000 a 300.000 € (45 %) y otro desde 300.000 € (47 %),
     // el que añadió la Ley 11/2020 (cabecera de data/fiscal/irpf.ts). La app lo enseña: con
     // 85.000 € el último tramo del desglose es «60.000,00 € → 300.000,00 €». El FAQPage dice que
@@ -484,15 +558,21 @@ test.describe('Inspector 25/09/2026', () => {
     await expect(filas).toHaveCount(5);
     await expect(filas.nth(4)).toContainText('60.000,00 € → 300.000,00 €');
     const faq = await faqJsonLd(page);
-    expect(faq).toContain('9,5');
     expect(faq).not.toMatch(/24,5\s?%\s?\(a partir de 60\.000/);
+    // Reparado con la escala que la app APLICA (combinada, TRAMOS_IRPF_2025), no con la mitad
+    // estatal: del 19 % al 47 %, que empieza en 300.000 €. La aserción original exigía «9,5»
+    // (el tipo estatal, que data/fiscal no modela); se sustituye por los extremos de la escala.
+    expect(faq).toMatch(/del 19\s?% \(hasta 12\.450,00\s?€\) al 47\s?% \(a partir de 300\.000,00\s?€\)/);
+    // Sospecha (a): la retención no es «el impuesto anual dividido entre 12 pagas».
+    expect(faq).not.toContain('dividiéndolo entre 12');
+    expect(faq).toContain('artículos 80 a 86 del Reglamento');
   });
 
   // ───────────────────────────────────────────────────────────────────────────
   test('HALLAZGO · el % va pegado a la cifra (desde el 25/09/2026, con espacio duro)', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    // REPARADO 25/09/2026 · HALLAZGO bajo (Inspector 25/09/2026)
     // Sin `limpiar`: aquí importa justo el carácter entre la cifra y el %. 30.000 € → 16,4 %.
-    const info = page.locator('css=div:has(> span:text-is("Retención IRPF"))').first();
+    const info = page.locator(`css=div:has(> span:text-is("${ETIQUETA_IRPF}"))`).first();
     const crudo = await info.locator('span').nth(2).innerText();
     expect(crudo).toContain('16,4');
     expect(crudo).toMatch(/16,4 %/);
@@ -500,7 +580,7 @@ test.describe('Inspector 25/09/2026', () => {
 
   // ───────────────────────────────────────────────────────────────────────────
   test('HALLAZGO · importes en rojo y rótulos de la barra por debajo de 4,5:1', async ({ page }) => {
-    test.fail(); // HALLAZGO medio (Inspector 25/09/2026)
+    // REPARADO 25/09/2026 · HALLAZGO medio (Inspector 25/09/2026)
     // Texto pequeño (13,6 px y 12,5 px, peso 600): WCAG AA pide 4,5:1. Medido: #e74c3c sobre
     // blanco 3,82:1 (3,76:1 en oscuro); blanco sobre el naranja #e67e22 de la barra 2,85:1.
     await prepararParaMedir(page);
@@ -512,11 +592,21 @@ test.describe('Inspector 25/09/2026', () => {
     expect(barraSS.ratio).toBeGreaterThanOrEqual(4.5);
     const enlace = await contraste(page.locator('css=div[class*="enlaceApp"] a').first());
     expect(enlace.ratio).toBeGreaterThanOrEqual(4.5);
+    // Los otros dos rótulos de la barra y la cuota de un tramo, que el acta también midió.
+    for (const sel of ['css=div[class*="barraIRPF"] span', 'css=div[class*="barraNeto"] span', 'css=span[class*="tramoCuota"]']) {
+      expect((await contraste(page.locator(sel).first())).ratio).toBeGreaterThanOrEqual(4.5);
+    }
+    // Y el otro tema (el acta medía 3,76:1 en oscuro sobre #2A2A2A).
+    await activarTema(page, 'dark');
+    const importeOscuro = await contraste(page.locator('css=div[class*="desgloseItem"]').first().locator('span').last());
+    expect(importeOscuro.ratio).toBeGreaterThanOrEqual(4.5);
+    expect((await contraste(page.locator('css=span[class*="tramoCuota"]').first())).ratio).toBeGreaterThanOrEqual(4.5);
+    expect((await contraste(page.locator('css=div[class*="barraSS"] span').first())).ratio).toBeGreaterThanOrEqual(4.5);
   });
 
   // ───────────────────────────────────────────────────────────────────────────
   test('HALLAZGO · en oscuro, el gráfico escribe en #666 y el módulo fija --primary sin variante', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    // REPARADO 25/09/2026 · HALLAZGO bajo (Inspector 25/09/2026)
     // Chart.js pinta ejes y leyenda con su color por defecto (#666) sobre la tarjeta #2A2A2A:
     // 2,50:1. Y `.container` redeclara --primary: #2E86AB sin variante oscura, tapando el
     // #3FA5D1 de globals: el enlace a las apps hermanas queda en 3,08:1 sobre #333.
@@ -541,18 +631,22 @@ test.describe('Inspector 25/09/2026', () => {
 
   // ───────────────────────────────────────────────────────────────────────────
   test('HALLAZGO · el deslizador se anuncia como «30000» y el gráfico no tiene nombre accesible', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    // REPARADO 25/09/2026 · HALLAZGO bajo (Inspector 25/09/2026)
     // Sin aria-valuetext, un lector de pantalla lee el valor crudo del range («30000»), y el
     // <canvas> lleva aria-label sin role, así que no se expone (su ariaSnapshot sale vacío).
     const slider = page.getByRole('slider').first();
     await expect(slider).toHaveValue('30000');
     expect(await slider.getAttribute('aria-valuetext')).toMatch(/30\.000/);
     await expect(page.getByRole('img', { name: /Gráfico/ })).toHaveCount(1);
+    // Reparado también: el <label> visible nombra el deslizador, y los datos del gráfico existen
+    // como texto (tabla dentro de un <details>).
+    await expect(page.getByRole('slider', { name: 'Sueldo bruto anual', exact: true })).toHaveCount(1);
+    await expect(page.locator('table caption')).toContainText('Reparto del bruto por nivel salarial');
   });
 
   // ───────────────────────────────────────────────────────────────────────────
   test('HALLAZGO · «No es dinero perdido — es contribución al sistema»', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026) — neutralidad editorial (§1.quinquies)
+    // REPARADO 25/09/2026 · HALLAZGO bajo (Inspector 25/09/2026) — neutralidad editorial (§1.quinquies)
     // Describir a qué se destinan cotizaciones e impuestos es informativo; valorar si son
     // «dinero perdido» es una opinión sobre la carga fiscal que la herramienta no necesita.
     const visible = limpiar(await page.locator('body').innerText());
