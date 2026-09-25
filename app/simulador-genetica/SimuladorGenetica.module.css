@@ -627,28 +627,56 @@
   margin-top: var(--spacing-sm);
 }
 
+/* Aviso de esperanzas menores que 5 (hallazgo 1696): en el color del texto principal, sin
+   color propio que medir en cada tema. */
+.chiSquareNoFiable {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 /* Árbol Genealógico (Pedigree) */
 .pedigreeContainer {
   padding: var(--spacing-lg);
   overflow-x: auto;
 }
 
+/* La etiqueta de la generación va EN EL FLUJO, encima de su fila. Estaba en position:
+   absolute; left: 0, y en cuanto la fila llegaba al borde —un móvil de 375 px, o los rótulos
+   largos de un dihíbrido— «Padres» e «Hijos» se montaban sobre el primer símbolo
+   (hallazgo 1695). */
 .pedigreeGeneration {
   display: flex;
-  justify-content: center;
-  gap: var(--spacing-xl);
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-xl);
-  position: relative;
 }
 
 .pedigreeGenerationLabel {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
   font-size: 0.8rem;
   color: var(--text-muted);
   font-weight: 600;
+}
+
+.pedigreeHijos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-lg);
+}
+
+.pedigreeRasgo {
+  margin: 0 0 var(--spacing-lg);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.pedigreeNota {
+  margin: var(--spacing-md) 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
 }
 
 .pedigreeCouple {
@@ -668,6 +696,9 @@
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-xs);
+  /* «Negro / Alas vestigiales» en un dihíbrido: el rótulo parte línea en vez de ensanchar. */
+  max-width: 7.5rem;
+  text-align: center;
 }
 
 .pedigreeSymbol {

@@ -458,8 +458,11 @@ export function generateSexLinkedPunnett(
   };
 }
 
-// Determinar fenotipo para herencia ligada al sexo
-function determineSexLinkedPhenotype(
+/**
+ * Fenotipo en herencia ligada al sexo. Es la ÚNICA fuente de ese fenotipo: la usan el cuadro
+ * de Punnett, los progenitores y el árbol genealógico (hallazgo 1693, ver pedigree.ts).
+ */
+export function determineSexLinkedPhenotype(
   genotype: string,
   trait: Trait,
   sex: Sex

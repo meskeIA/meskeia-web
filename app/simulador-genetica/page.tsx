@@ -499,7 +499,7 @@ export default function SimuladorGeneticaPage() {
               )}
 
               {activeTab === 'pedigree' && pedigreeChart && (
-                <PedigreeChart pedigree={pedigreeChart} rasgo={selectedTrait1} />
+                <PedigreeChart pedigree={pedigreeChart} rasgos={rasgosDelCruce} />
               )}
 
               {activeTab === 'pedigree' && !pedigreeChart && (
@@ -710,7 +710,10 @@ export default function SimuladorGeneticaPage() {
                 <tr>
                   <td><strong>Portadores detectables</strong></td>
                   <td>❌ No (igual que dominante)</td>
-                  <td>✅ Sí (fenotipo intermedio)</td>
+                  {/* ⚠️ 25/09/2026 (hallazgo 1697) — decía «✅ Sí (fenotipo intermedio)», que
+                      contradice la definición de portador de la FAQ (igual en fenotipo al
+                      homocigoto dominante). El Rr rosa no es un portador oculto. */}
+                  <td>No hay portadores: el heterocigoto (Rr, rosa) se distingue a simple vista</td>
                   {/* ⚠️ 24/09/2026 (hallazgo 1590) — decía «✅ Sí (ambos rasgos visibles)», que
                       vale para IᴬIᴮ; el portador de i (Iᴬi, Iᴮi) es de grupo A o B como el
                       homocigoto, y por eso el árbol lo marca como portador. */}
@@ -994,9 +997,10 @@ Hija portadora (XD Xd) × marido sano (XD Y):
                 que acepta un nivel de significación del 5 %.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Regla práctica:</strong> Con muestras pequeñas (&lt;30 individuos)
-                el χ² es poco fiable. Aumenta la población a 200-500 individuos para
-                resultados más robustos.
+                💡 <strong>Regla práctica:</strong> el χ² solo es fiable si cada frecuencia
+                esperada es al menos 5; cuando no lo es, el panel lo avisa en lugar de dar un
+                veredicto. En un 3:1 eso pide al menos 20 individuos, y en un 9:3:3:1, 80.
+                Aumenta la población a 200-500 individuos para resultados más robustos.
               </p>
             </div>
 

@@ -4,7 +4,13 @@ import { useState } from 'react';
 import styles from '../SimuladorGenetica.module.css';
 import { formatNumber } from '@/lib';
 import { PopulationSimulation, PunnettResult, Trait } from './types';
-import { interpretChiSquare, notacionGenotipo, ALFA_CHI_CUADRADO } from './genetics';
+import {
+  interpretChiSquare,
+  notacionGenotipo,
+  ALFA_CHI_CUADRADO,
+  ESPERANZA_MINIMA_CHI_CUADRADO,
+  clasesConEsperanzaPequena,
+} from './genetics';
 
 const TAMANO_MINIMO = 10;
 const TAMANO_MAXIMO = 500;
@@ -102,6 +108,23 @@ export default function PopulationSimulator({
   const chiSquareResult =
     simulation != null && simulation.chiSquare != null
       ? interpretChiSquare(simulation.chiSquare, degreesOfFreedom)
+      : null;
+
+  /**
+   * Con alguna esperanza por debajo de 5 el contraste no es fiable (hallazgo 1696): se deja el
+   * χ² y su p a la vista, pero el veredicto se sustituye por el aviso. Publicar «Ajuste
+   * aceptable» con 2,5 individuos esperados en una clase era dar por bueno un número que no
+   * sigue la distribución con que se juzga.
+   */
+  const esperanzasPequenas = simulation ? clasesConEsperanzaPequena(simulation.expectedRatios) : [];
+  const avisoNoFiable =
+    chiSquareResult && chiSquareResult.pValue !== 'no procede' && esperanzasPequenas.length > 0
+      ? `El contraste no es fiable con esta muestra: ${esperanzasPequenas
+          .map(
+            ({ clase, esperada }) =>
+              `se esperan ${formatNumber(esperada, Number.isInteger(esperada) ? 0 : 1)} de ${clase}`,
+          )
+          .join(', ')}, y el χ² exige que cada frecuencia esperada sea al menos ${ESPERANZA_MINIMA_CHI_CUADRADO}. Aumenta el tamaño de la población.`
       : null;
 
   return (
@@ -230,7 +253,13 @@ export default function PopulationSimulator({
                     <br />
                   </>
                 )}
-                {chiSquareResult.interpretation}
+                {avisoNoFiable ? (
+                  <span className={styles.chiSquareNoFiable}>
+                    <span aria-hidden="true">⚠️</span> {avisoNoFiable}
+                  </span>
+                ) : (
+                  chiSquareResult.interpretation
+                )}
               </div>
             </div>
           )}

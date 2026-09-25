@@ -23,6 +23,7 @@ import {
   generateSexLinkedPunnett,
   simulatePopulation,
   generateSimplePedigree,
+  generateDihybridPedigree,
 } from './genetics';
 
 interface UseGeneticSimulationState {
@@ -49,6 +50,8 @@ interface UseGeneticSimulationState {
   /** De qué cruce es la población simulada: la firma del cuadro del que se sorteó. */
   firmaPoblacion: string | null;
   pedigreeChart: PedigreeChart | null;
+  /** De qué cruce es el árbol genealógico: la `firmaDelCruce` con que se dibujó. */
+  firmaPedigree: string | null;
 
   // Animación
   animationState: PunnettAnimationState;
@@ -141,6 +144,7 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
     populationSimulation: null,
     firmaPoblacion: null,
     pedigreeChart: null,
+    firmaPedigree: null,
 
     animationState: 'idle',
     animationStep: 0,
@@ -366,44 +370,62 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
   }, []);
 
   // Simulación de población
-  const runPopulationSimulation = useCallback((size?: number) => {
-    setState((prev) => {
-      if (!prev.punnettResult) return prev;
+  /**
+   * ⚠️ 25/09/2026 — el sorteo (`Math.random`) se hacía DENTRO del actualizador de `setState`, que
+   * debe ser puro: en desarrollo (Strict Mode) React lo ejecuta dos veces, así que se sorteaban
+   * dos poblaciones por pulsación y la que se veía no era la primera. En producción no
+   * cambiaba nada, pero el spec que fuerza el azar (CASO 2b) no podía pasar contra `next dev`.
+   * El sorteo va ahora fuera, sobre el cuadro de este render, y el actualizador solo lo guarda.
+   */
+  const { punnettResult, firmaPunnett, populationSize, selectedTrait1 } = state;
+  const runPopulationSimulation = useCallback(
+    (size?: number) => {
+      if (!punnettResult) return;
 
-      const simSize = size || prev.populationSize;
-      const simulation = simulatePopulation(
-        prev.punnettResult,
-        simSize,
-        prev.selectedTrait1
-      );
+      const simSize = size || populationSize;
+      const simulation = simulatePopulation(punnettResult, simSize, selectedTrait1);
 
-      return {
+      setState((prev) => ({
         ...prev,
         populationSimulation: simulation,
         // La firma del CUADRO del que se sortea, no la de los controles: si alguna vez se
         // simulara antes de que el efecto rehaga el cuadro, la población quedaría marcada como
         // de su cruce de verdad y no se enseñaría con el nuevo.
-        firmaPoblacion: prev.firmaPunnett,
+        firmaPoblacion: firmaPunnett,
         populationSize: simSize,
-      };
-    });
-  }, []);
+      }));
+    },
+    [punnettResult, firmaPunnett, populationSize, selectedTrait1]
+  );
 
   const setPopulationSize = useCallback((size: number) => {
     setState((prev) => ({ ...prev, populationSize: size }));
   }, []);
 
-  // Generar pedigree
+  /**
+   * Generar el árbol genealógico del cruce en pantalla.
+   *
+   * ⚠️ 25/09/2026 (hallazgo 1694) — se construía siempre con el rasgo 1, también en un
+   * dihíbrido. Ahora, con dos rasgos, cada individuo lleva los dos genotipos y fenotipos.
+   * Y como pasa a depender del segundo rasgo, cuyos setters no anulaban el árbol, el árbol lleva
+   * la firma del cruce igual que la población (hallazgo 1587): solo se enseña si es la del cruce
+   * actual, y el efecto de page.tsx lo rehace en cuanto deja de serlo.
+   */
   const generatePedigreeChart = useCallback(() => {
     setState((prev) => {
-      const pedigree = generateSimplePedigree(
-        prev.parent1Genotype,
-        prev.parent2Genotype,
-        prev.selectedTrait1,
-        4
-      );
+      const dihibrido = prev.crossType === 'dihybrid' && prev.selectedTrait2 !== null;
+      const pedigree =
+        dihibrido && prev.selectedTrait2
+          ? generateDihybridPedigree(
+              [prev.parent1Genotype, prev.parent1Genotype2],
+              [prev.parent2Genotype, prev.parent2Genotype2],
+              prev.selectedTrait1,
+              prev.selectedTrait2,
+              4
+            )
+          : generateSimplePedigree(prev.parent1Genotype, prev.parent2Genotype, prev.selectedTrait1, 4);
 
-      return { ...prev, pedigreeChart: pedigree };
+      return { ...prev, pedigreeChart: pedigree, firmaPedigree: firmaDelCruce(prev) };
     });
   }, []);
 
@@ -472,6 +494,7 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
       populationSimulation: null,
       firmaPoblacion: null,
       pedigreeChart: null,
+      firmaPedigree: null,
       animationState: 'idle',
       animationStep: 0,
       populationSize: 100,
@@ -486,9 +509,14 @@ export function useGeneticSimulation(): UseGeneticSimulationReturn {
   const poblacionDelCruceActual =
     state.firmaPoblacion === firmaDelCruce(state) ? state.populationSimulation : null;
 
+  /** El árbol, lo mismo: solo si se dibujó con el cruce actual (hallazgo 1694). */
+  const arbolDelCruceActual =
+    state.firmaPedigree === firmaDelCruce(state) ? state.pedigreeChart : null;
+
   return {
     ...state,
     populationSimulation: poblacionDelCruceActual,
+    pedigreeChart: arbolDelCruceActual,
     setSelectedOrganism,
     setSelectedTrait1,
     setSelectedTrait2,

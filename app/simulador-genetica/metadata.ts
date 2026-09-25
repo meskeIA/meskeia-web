@@ -123,7 +123,7 @@ export const faqJsonLd = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Cruces Genéticos y Leyes de Mendel',
-  description: 'Simulador interactivo de cruces genéticos y herencia mendeliana en español. Genera el cuadro de Punnett del cruce monohíbrido (proporción fenotípica 3:1) y dihíbrido (9:3:3:1), muestra genotipo y fenotipo, alelos dominante y recesivo, herencia ligada al sexo, codominancia con los grupos sanguíneos ABO y el factor Rh, árboles genealógicos y simulación de poblaciones. Alternativa interactiva para practicar las leyes de Mendel y los patrones mendelianos de la herencia.',
+  description: 'Simulador interactivo de cruces genéticos y herencia mendeliana en español. Genera el cuadro de Punnett del cruce monohíbrido (proporción fenotípica 3:1) y dihíbrido (9:3:3:1), muestra genotipo y fenotipo, alelos dominante y recesivo, herencia ligada al sexo, codominancia con los grupos sanguíneos ABO y el factor Rh, árboles genealógicos y simulación de la descendencia con prueba χ².Alternativa interactiva para practicar las leyes de Mendel y los patrones mendelianos de la herencia.',
   url: 'https://meskeia.com/simulador-genetica/',
   category: 'EducationalApplication',
   features: [
@@ -134,7 +134,7 @@ export const jsonLd = generateWebAppSchema({
     'Herencia ligada al sexo y autosómica',
     'Codominancia y alelos múltiples: herencia de los grupos sanguíneos ABO y del factor Rh',
     'Árboles genealógicos (pedigrees)',
-    'Simulación de frecuencias alélicas en poblaciones',
+    'Simulación de la descendencia de un cruce con prueba chi-cuadrado (χ²)',
     'En español, alternativa interactiva a las prácticas de las leyes de Mendel',
   ],
   keywords: ['cruces genéticos', 'leyes de Mendel', 'herencia mendeliana', 'patrones mendelianos', 'cruce monohíbrido', 'cruce dihíbrido', 'proporciones fenotípicas', 'cuadro de Punnett', 'genotipo', 'fenotipo', 'alelo dominante', 'alelo recesivo', 'grupos sanguíneos', 'codominancia', 'biología'],

@@ -2332,7 +2332,7 @@ test.describe('Hallazgo 1614 · móvil 375 × 812', () => {
  *      exactamente ese número (esperado 7,5 : 2,5 y 375 : 125).
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
-import { DROSOPHILA } from '../../app/simulador-genetica/components/genetics';
+import { DROSOPHILA, FLORES, generateDihybridPedigree } from '../../app/simulador-genetica/components/genetics';
 
 /** Drosophila → Color de cuerpo en dihíbrido con Forma de alas, madre bb vv (cruce prueba). */
 async function abreCrucePruebaDrosophila(page: Page): Promise<void> {
@@ -2416,7 +2416,7 @@ test.describe('Re-inspección 25/09/2026 · los tres casos', () => {
     expect(sinIcono(fenotipos.filas)).toEqual(['Ojos rojos (♀) 50%', 'Ojos blancos (♂) 50%']);
     expect(fenotipos.ratio).toBe('Ratio: 1:1 (Ojos rojos (♀) · Ojos blancos (♂))');
 
-    // El árbol: los SÍMBOLOS sí siguen el cruce (el rótulo de fenotipo no: hallazgo abierto abajo).
+    // El árbol: símbolos Y rótulos siguen al cruce (el rótulo se reparó con el hallazgo 1693).
     await pestana(page, 'Pedigree').click();
     const individuos = page.locator('[class*="pedigreeIndividual"]');
     await expect(individuos).toHaveCount(6);
@@ -2434,6 +2434,14 @@ test.describe('Re-inspección 25/09/2026 · los tres casos', () => {
     await expect(conGenotipo(/^Xw Xw$/).locator('[class*="affected"]')).toHaveCount(1);
     await expect(conGenotipo(/^XW Xw$/).locator('[class*="carrier"]')).toHaveCount(2);
     await expect(conGenotipo(/^XW Y$/).locator('[class*="affected"], [class*="carrier"]')).toHaveCount(0);
+    await expect(page.locator('[class*="pedigreePhenotype"]')).toHaveText([
+      'Ojos rojos',
+      'Ojos blancos',
+      'Ojos rojos',
+      'Ojos blancos',
+      'Ojos rojos',
+      'Ojos blancos',
+    ]);
   });
 
   test('CASO 2b (límite) · χ² con gl = 1 a ambos lados de 0,455 y de 3,841: las franjas salen del p', async ({
@@ -2510,9 +2518,10 @@ test.describe('Re-inspección 25/09/2026 · los tres casos', () => {
 });
 
 /*
- * HALLAZGOS ABIERTOS de la re-inspección del 25/09/2026. Afirman lo que DEBERÍA pasar y hoy
- * fallan a propósito (`test.fail()`). El día que se reparen se ponen en verde: quitar entonces
- * la línea `test.fail()` y quedan como regresión.
+ * HALLAZGOS de la re-inspección del 25/09/2026. REPARADOS el mismo día 1693, 1694, 1695, 1696,
+ * 1697 y 1699: eran `test.fail()` y quedan como regresión. Sigue ABIERTO el 1698 (espacio antes
+ * de %), que es decisión de catálogo: el formateador compartido `formatPercentage` lo pega y su
+ * test lo fija; esta app no se desmarca sola del resto del catálogo.
  */
 test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
   test('ligado al X: en el árbol, el afectado lleva el fenotipo recesivo (Xd Y es «Daltónico»)', async ({
@@ -2522,7 +2531,8 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     // fenotipo recesivo con el primer fenotipo que tenga un genotipo con «Xd» — y «Visión
     // normal» lo tiene (XD Xd, la portadora). Todo afectado sale rotulado con el fenotipo
     // DOMINANTE bajo el símbolo relleno de «Afectado», contra lo que dice el cuadro de Punnett.
-    test.fail();
+    // REPARADO (1693): el árbol toma el fenotipo de `determineSexLinkedPhenotype`, la función
+    // del cuadro. XD Y × XD Xd → XD XD, XD Y, XD Xd, Xd Y: solo el último es daltónico.
 
     // En el motor: XD Y × XD Xd → hijos de las casillas XD XD, XD Y, XD Xd, Xd Y (sin azar).
     const daltonismo = rasgoHumano('daltonismo');
@@ -2530,6 +2540,20 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     const hijoXdY = arbol.individuals.find((ind) => ind.genotype === 'Xd Y');
     expect(hijoXdY?.isAffected).toBe(true);
     expect(hijoXdY?.phenotype).toBe('Daltónico');
+    expect(arbol.individuals.map((ind) => `${ind.genotype}: ${ind.phenotype}`)).toEqual([
+      'XD Y: Visión normal',
+      'XD Xd: Visión normal',
+      'XD XD: Visión normal',
+      'XD Y: Visión normal',
+      'XD Xd: Visión normal',
+      'Xd Y: Daltónico',
+    ]);
+    // La portadora, con medio relleno y fenotipo normal; el afectado, relleno.
+    expect(arbol.individuals.filter((ind) => ind.isCarrier).map((ind) => ind.genotype)).toEqual([
+      'XD Xd',
+      'XD Xd',
+    ]);
+    expect(arbol.individuals.filter((ind) => ind.isAffected).map((ind) => ind.genotype)).toEqual(['Xd Y']);
     // Drosophila: la madre Xw Xw tiene los ojos blancos.
     const ojos = DROSOPHILA.traits.find((t) => t.id === 'color-ojos')!;
     const moscas = generateSimplePedigree('XW Y', 'Xw Xw', ojos, 4);
@@ -2554,10 +2578,65 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     // con `parent1Genotype`, `parent2Genotype` y `selectedTrait1`, y `PedigreeChart` no nombra el
     // rasgo. En un dihíbrido BbVv × bbvv el árbol enseña Bb × bb, «Gris»/«Negro», sin rastro de
     // la forma de las alas ni aviso de que la ha dejado fuera.
-    test.fail();
+    // REPARADO (1694): con dos rasgos, cada individuo lleva los dos genotipos y fenotipos, y el
+    // árbol dice que el símbolo sigue al rasgo 1. BbVv × bbvv, a mano: los gametos del padre son
+    // BV, Bv, bV y bv, la madre solo da bv → un hijo de cada una de las cuatro clases.
+    // En el motor, AaRr × AaRr: la primera fila del cuadro serían cuatro amarillos lisos; los
+    // hijos de ejemplo son uno de cada clase del 9:3:3:1.
+    const [semilla, forma] = [GUISANTES.traits[0], GUISANTES.traits[1]];
+    const f2 = generateDihybridPedigree(['Aa', 'Rr'], ['Aa', 'Rr'], semilla, forma, 4);
+    expect(f2.individuals.map((i) => `${i.genotype}: ${i.phenotype}`)).toEqual([
+      'Aa Rr: Amarillo / Lisa',
+      'Aa Rr: Amarillo / Lisa',
+      'AA RR: Amarillo / Lisa',
+      'AA rr: Amarillo / Rugosa',
+      'aa RR: Verde / Lisa',
+      'aa rr: Verde / Rugosa',
+    ]);
     await abreCrucePruebaDrosophila(page);
     await pestana(page, 'Pedigree').click();
     await expect(page.locator('[class*="pedigreeIndividual"]')).toHaveCount(6);
+    await expect(page.locator('[class*="pedigreeGenotype"]')).toHaveText([
+      'Bb Vv',
+      'bb vv',
+      'Bb Vv',
+      'Bb vv',
+      'bb Vv',
+      'bb vv',
+    ]);
+    await expect(page.locator('[class*="pedigreePhenotype"]')).toHaveText([
+      'Gris / Alas normales',
+      'Negro / Alas vestigiales',
+      'Gris / Alas normales',
+      'Gris / Alas vestigiales',
+      'Negro / Alas normales',
+      'Negro / Alas vestigiales',
+    ]);
+    await expect(page.locator('[class*="pedigreeRasgo"]')).toContainText(
+      'El símbolo (afectado, portador) sigue solo a Color de cuerpo',
+    );
+    // El símbolo, del rasgo 1: Bb portador, bb afectado (padre, madre, hijos 1-4).
+    const simbolos = await page
+      .locator('[class*="pedigreeSymbol"]')
+      .evaluateAll((els) =>
+        els.map((el) =>
+          /affected/.test(el.className) ? 'afectado' : /carrier/.test(el.className) ? 'portador' : '-',
+        ),
+      );
+    expect(simbolos).toEqual(['portador', 'afectado', 'portador', 'portador', 'afectado', 'afectado']);
+
+    // Cambiar el genotipo del rasgo 2 con el árbol a la vista lo rehace con el cruce nuevo:
+    // padre Bb VV → todos los hijos con alas normales (Vv), grises y negros 1:1; con dos
+    // combinaciones posibles, los cuatro hijos las alternan.
+    await selectorGenotipo(page, 2).selectOption('VV');
+    await expect(page.locator('[class*="pedigreeGenotype"]')).toHaveText([
+      'Bb VV',
+      'bb vv',
+      'Bb Vv',
+      'bb Vv',
+      'Bb Vv',
+      'bb Vv',
+    ]);
     const panel = page.locator('[class*="panel"]').filter({ has: page.getByRole('tablist') });
     const texto = (await panel.innerText()).replace(/\s+/g, ' ');
     // Correcto: o los genotipos/fenotipos del rasgo 2 están en el árbol, o el panel dice qué
@@ -2569,7 +2648,7 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     // HALLAZGO (bajo): la FAQ de la app define al portador como «fenotípicamente igual al
     // homocigoto dominante». En Flores Rr × Rr el árbol marca con el símbolo de portador a los
     // cuatro Rr, que son ROSAS (fenotipo propio, distinto del rojo RR).
-    test.fail();
+    // REPARADO (1697): en dominancia incompleta no hay portadores ni afectados en el árbol.
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await page.getByRole('button', { name: /Flores/ }).click();
@@ -2584,6 +2663,28 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     const rosas = individuos.filter({ has: page.locator('[class*="pedigreePhenotype"]', { hasText: /^Rosa$/ }) });
     await expect(rosas).toHaveCount(4);
     expect(await rosas.locator('[class*="carrier"]').count()).toBe(0);
+    // Ni la flor blanca es un «afectado», ni la leyenda los ofrece.
+    await expect(page.locator('[class*="pedigreeSymbol"][class*="affected"]')).toHaveCount(0);
+    await expect(page.locator('[class*="pedigreeSymbol"][class*="carrier"]')).toHaveCount(0);
+    const leyenda = page.locator('[class*="pedigreeLegend"]');
+    await expect(leyenda).not.toContainText('Afectado');
+    await expect(leyenda).not.toContainText('Portador');
+    await expect(page.locator('[class*="pedigreeNota"]')).toContainText('no hay portadores');
+    // Y la tabla comparativa ya no dice que en la incompleta los portadores se detectan.
+    const celda = page.locator('table tr', { hasText: 'Portadores detectables' }).locator('td').nth(2);
+    await expect(celda).toHaveText('No hay portadores: el heterocigoto (Rr, rosa) se distingue a simple vista');
+
+    // En el motor, con los tres genotipos.
+    const flor = FLORES.traits[0];
+    const arbol = generateSimplePedigree('Rr', 'Rr', flor, 4);
+    expect(arbol.individuals.map((i) => `${i.genotype}:${i.phenotype}:${i.isAffected}:${i.isCarrier}`)).toEqual([
+      'Rr:Rosa:false:false',
+      'Rr:Rosa:false:false',
+      'RR:Rojo:false:false',
+      'Rr:Rosa:false:false',
+      'Rr:Rosa:false:false',
+      'rr:Blanco:false:false',
+    ]);
   });
 
   test('χ² con frecuencias esperadas menores que 5: el panel avisa de que el contraste no es fiable', async ({
@@ -2592,7 +2693,7 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     // HALLAZGO (bajo): con N = 10 en Aa × Aa la esperanza de «Verde» es 10 × 1/4 = 2,5 < 5, la
     // condición habitual del χ² (Cochran). La propia FAQ dice que con menos de 30 individuos «el
     // χ² es poco fiable», pero el panel publica p y veredicto como con 500.
-    test.fail();
+    // REPARADO (1696): con alguna esperanza < 5 el veredicto se sustituye por el aviso.
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await pestana(page, 'Población').click();
@@ -2608,6 +2709,17 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     ]);
     const panelChi = (await page.locator('[class*="chiSquare"]').first().innerText()).replace(/\s+/g, ' ');
     expect(panelChi).toMatch(/menor(es)? (de|que) 5|inferior(es)? a 5|menos de 5|poco fiable|no es fiable|no fiable/i);
+    const interpretacion = page.locator('[class*="chiSquareInterpretation"]');
+    await expect(interpretacion).toContainText('El contraste no es fiable con esta muestra: se esperan 2,5 de Verde');
+    await expect(interpretacion).not.toContainText(/Ajuste|Diferencia significativa/);
+
+    // El borde: con N = 20 se esperan 15 y 5 → ya es fiable y hay veredicto.
+    await campo.fill('20');
+    await esperarValorEnReact(page, campo, '20');
+    await page.getByRole('button', { name: /Simular/ }).click();
+    await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(20);
+    await expect(interpretacion).not.toContainText('no es fiable');
+    await expect(interpretacion).toContainText(/Ajuste|Diferencia significativa/);
   });
 
   test('el porcentaje se escribe con espacio antes de %, como en el resto de la página', async ({ page }) => {
@@ -2615,6 +2727,7 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     // StatisticsPanel, PopulationSimulator) mientras la FAQ del χ² escribe «del 5 %». Ojo: el
     // formateador compartido `formatPercentage` también lo pega («15,00%», fijado en
     // tests/formatters.spec.ts), así que la decisión es de catálogo antes que de esta app.
+    // SIGUE ABIERTO (25/09/2026): no se repara en una sola app para no desmarcarla del catálogo.
     test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
@@ -2633,7 +2746,7 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     // HALLAZGO (bajo): el WebApplication de metadata.ts anuncia «Simulación de frecuencias
     // alélicas en poblaciones»; la pestaña cuenta FENOTIPOS de la descendencia de un cruce y la
     // propia FAQ dice que no modela genética de poblaciones (Hardy-Weinberg).
-    test.fail();
+    // REPARADO (1699): el WebApplication dice ahora lo que hace la pestaña.
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     const webApp = await page.evaluate(
@@ -2651,6 +2764,7 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     const prometeAlelicas = webApp.includes('frecuencias alélicas');
     const ensenaAlelicas = /frecuencias? alélicas?/i.test(panel);
     expect(prometeAlelicas && !ensenaAlelicas, 'promete frecuencias alélicas y no las enseña').toBe(false);
+    expect(webApp).toContain('Simulación de la descendencia de un cruce con prueba chi-cuadrado');
   });
 });
 
@@ -2692,7 +2806,7 @@ test.describe('Re-inspección 25/09/2026 · móvil 375 × 812', () => {
     // HALLAZGO (bajo): `.pedigreeGenerationLabel` va en `position: absolute; left: 0` y a 375 px
     // la fila de cuatro hijos llega hasta el borde: «Padres» cae encima del cuadrado del padre e
     // «Hijos» encima del primer hijo y de su genotipo (medido: 13×13 y 21×13 px).
-    test.fail();
+    // REPARADO (1695): la etiqueta va en el flujo, encima de su fila.
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await pestana(page, 'Pedigree').click();

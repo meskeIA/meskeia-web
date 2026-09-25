@@ -102,3 +102,26 @@ export function valorCriticoChiCuadrado(gl: number, alfa: number = 0.05): number
   }
   return (bajo + alto) / 2;
 }
+
+/** La esperanza mínima por clase con la que se da por buena la aproximación χ². */
+export const ESPERANZA_MINIMA_CHI_CUADRADO = 5;
+
+/**
+ * Las clases cuya frecuencia ESPERADA queda por debajo de 5, en el orden en que llegan.
+ *
+ * ⚠️ 25/09/2026 (hallazgo 1696) — el panel publicaba p y veredicto con N = 10, donde en Aa × Aa
+ * se esperan 2,5 verdes. El estadístico solo sigue la distribución χ² cuando las esperanzas no
+ * son pequeñas; por debajo, el p que se imprime no es el de verdad y el veredicto tampoco.
+ *
+ * Se aplica la versión ESTRICTA de la regla, la que se enseña en secundaria y bachillerato: toda
+ * esperanza ≥ 5. La de Cochran (1954) tolera hasta un 20 % de clases por debajo de 5 en tablas
+ * grandes, pero en gl = 1 exige 5 en todas —y hay quien pide 10—, que es el caso de la mayoría de
+ * cruces de la app (https://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test, «Assumptions»).
+ */
+export function clasesConEsperanzaPequena(
+  esperadas: Record<string, { count: number }>
+): Array<{ clase: string; esperada: number }> {
+  return Object.entries(esperadas)
+    .filter(([, datos]) => datos.count < ESPERANZA_MINIMA_CHI_CUADRADO)
+    .map(([clase, datos]) => ({ clase, esperada: datos.count }));
+}
