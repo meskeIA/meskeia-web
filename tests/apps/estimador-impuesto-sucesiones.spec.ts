@@ -21,6 +21,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { BONIFICACIONES_CCAA_IS, FISCAL_SUCESIONES_META } from '../../data/fiscal/sucesiones';
 
 const RUTA = '/estimador-impuesto-sucesiones/';
 
@@ -1698,5 +1699,466 @@ test.describe('1196 — valoración del usufructo vitalicio (art. 26.a LISD)', (
     expect(helper).toContain('art. 26.a) de la Ley 29/1987 del ISD');
     expect(helper).toContain('70% hasta los 20 años');
     expect(helper).toContain('mínimo del 10%');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Inspector 25/09/2026 — re-inspección: tres casos propios y un testigo por hallazgo
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// Los tres casos estrenan comunidad: Región de Murcia (la bonificación del 50 % al Grupo III,
+// que ningún test ejecutaba), Extremadura (el Grupo I con la reducción por edad a CERO años,
+// la discapacidad del 65 % y el tramo del 34 %, todo a la vez) y Galicia con el Grupo III, sin
+// bonificación. Cada cifra esperada sale de `data/fiscal/sucesiones.ts`, con la constante y el
+// tramo citados en el desarrollo, y se resolvió a mano ANTES de abrir la app.
+//
+// Lo que esta re-inspección encontró roto va con `test.fail()` y afirma lo CORRECTO: cuando se
+// repare, Playwright avisará «expected to fail, but passed» y habrá que venir a quitar la marca.
+test.describe('Inspector 25/09/2026', () => {
+  /** SOLO la columna de resultados, con los espacios duros normalizados a espacio. */
+  const panel = async (page: Page): Promise<string> =>
+    (await page.locator('[class*="resultsPanel"]').innerText()).split(' ').join(' ');
+
+  /** El importe destacado: «Impuesto estimado en …». */
+  const cuotaDestacada = async (page: Page): Promise<string> =>
+    (
+      await page
+        .getByText(/^Impuesto estimado en/)
+        .locator('xpath=following-sibling::span[1]')
+        .innerText()
+    )
+      .split(' ')
+      .join(' ');
+
+  /** El importe (columna derecha) de la línea del desglose cuyo concepto casa con `concepto`. */
+  const importeDeLinea = async (page: Page, concepto: RegExp): Promise<string> =>
+    (
+      await page
+        .locator('[class*="resultsPanel"] div[class*="linea"]')
+        .filter({ hasText: concepto })
+        .first()
+        .locator('span')
+        .last()
+        .innerText()
+    )
+      .split(' ')
+      .join(' ');
+
+  /** «18.437,27 €» → 18437.27, para comparar magnitudes y no cadenas. */
+  const aNumero = (texto: string): number =>
+    Number(texto.replace(/[^\d.,-]/g, '').split('.').join('').replace(',', '.'));
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#saldos-cuentas', '#porcentaje-herencia']);
+  });
+
+  /**
+   * CASO NORMAL — sobrino (Grupo III) en la REGIÓN DE MURCIA, 100.000 € en cuentas,
+   * patrimonio preexistente < 402.678 €. Murcia es, con Madrid, la única del régimen común
+   * que bonifica al Grupo III en cuota: `BONIFICACIONES_CCAA_IS['murcia']…['III'] = 0,50`.
+   *
+   *   Activos            100.000,00
+   *   + ajuar 3 %          3000,00   PORC_AJUAR_DOMESTICO_IS (art. 15 LISD)
+   *   = base imponible   103.000,00
+   *   − parentesco         7993,46   REDUCCIONES_PARENTESCO_IS['III'] (art. 20.2.a LISD)
+   *   = base liquidable   95.006,54
+   *   cuota íntegra       11.608,91  TARIFA_ESTATAL_IS, tramo «hasta 119.757,67»:
+   *                                  9.166,06 + 16,15 % × (95.006,54 − 79.880,52) = 11.608,91223
+   *   × 1,5882                       COEFICIENTES_IS['III'][0]
+   *   = cuota tributaria  18.437,27  (11.608,91 × 1,5882 = 18.437,270862)
+   *   − bonificación 50 %  9218,64   (9218,635431, se publica redondeada)
+   *   = cuota final       9218,63 €  (18.437,27 − 9218,64), que es lo que da `calcularSucesion`
+   *
+   * La cuota final se compara con precisión de 0,05 €: lo que este caso vigila —el tramo, el
+   * coeficiente del Grupo III, el 50 % de Murcia— mueve cientos de euros, y el céntimo de
+   * diferencia que hoy da la app (9218,64 €) es un hallazgo aparte con su propio testigo.
+   */
+  test('caso normal: sobrino en Murcia con 100.000 € paga 9218,63 € tras la bonificación del 50 %', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('murcia');
+    await page.locator('#parentesco').selectOption('III');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+
+    const texto = await panel(page);
+    expect(texto).toContain('103.000,00 €');   // base imponible con el ajuar
+    expect(texto).toContain('7993,46 €');      // reducción del Grupo III
+    expect(texto).toContain('95.006,54 €');    // base liquidable
+    expect(texto).toContain('11.608,91 €');    // cuota íntegra, tramo del 16,15 %
+    expect(texto).toContain('×1,5882');        // coeficiente del Grupo III
+    expect(texto).toContain('18.437,27 €');    // cuota tributaria
+    expect(texto).toContain('Bonificación 50,0 % (Región de Murcia)');
+    expect(texto).toMatch(/Tipo efectivo: 8,95 ?%/); // 9218,64 / 103.000
+    expect(aNumero(await cuotaDestacada(page))).toBeCloseTo(9218.63, 1);
+  });
+
+  /**
+   * CASO LÍMITE — EXTREMADURA, descendiente de CERO años (Grupo I) con discapacidad del 65 % o
+   * más, que hereda 2.000.000 € en cuentas: el límite inferior de la edad, el tope del art.
+   * 20.2.a y el tramo más alto de la tarifa, a la vez.
+   *
+   *   Activos          2.000.000,00
+   *   + ajuar 3 %         60.000,00
+   *   = base imponible 2.060.000,00
+   *   − parentesco        15.956,87   REDUCCIONES_PARENTESCO_IS['I-descendiente']
+   *   − edad              31.901,72   min(15.956,87 + 21 × 3990,72 ; 47.858,59) − 15.956,87
+   *                                   REDUCCION_EDAD_MENOR_21_IS / …_MAX_IS (el tope es del TOTAL)
+   *   − discapacidad     150.253,03   REDUCCION_DISCAPACIDAD_65_IS
+   *   = base liquidable 1.861.888,38
+   *   cuota íntegra     561.164,72   TARIFA_ESTATAL_IS, último tramo:
+   *                                   199.291,40 + 34 % × (1.861.888,38 − 797.555,08)
+   *   × 1,0000                        COEFICIENTES_IS['I'][0]
+   *   − bonificación 99 % 555.553,07  BONIFICACIONES_CCAA_IS['extremadura']…['I-descendiente']
+   *   = cuota final        5611,65 €  (561.164,72 × 1 %, = 561.164,72 − 555.553,07)
+   */
+  test('caso límite: en Extremadura un heredero de 0 años con discapacidad ≥65 % y 2 M€ paga 5611,65 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('extremadura');
+    await page.locator('#parentesco').selectOption('I-descendiente');
+    await sembrarValor(page, page.locator('#edad-heredero'), '0');
+    await page.getByRole('radio', { name: /≥\s*65\s*%/ }).check();
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '2000000');
+
+    expect(await cuotaDestacada(page)).toBe('5611,65 €');
+    const texto = await panel(page);
+    expect(texto).toContain('2.060.000,00 €');   // base imponible con ajuar
+    expect(texto).toContain('31.901,72 €');      // edad, ya topada en el total de 47.858,59 €
+    expect(texto).toContain('150.253,03 €');     // discapacidad del 65 % o más
+    expect(texto).toContain('1.861.888,38 €');   // base liquidable
+    expect(texto).toContain('561.164,72 €');     // cuota íntegra, tramo del 34 %
+    expect(texto).toContain('555.553,07 €');     // bonificación del 99 %
+    expect(texto).toContain('Bonificación 99,0 % (Extremadura)');
+  });
+
+  /**
+   * CASO A RECHAZAR — un porcentaje de herencia NEGATIVO.
+   *
+   * Galicia no bonifica al Grupo III (`BONIFICACIONES_CCAA_IS['galicia']…['III'] = 0`), así que
+   * con el 100 % un hermano que hereda 100.000 € en cuentas paga la cuota tributaria entera:
+   *   103.000,00 − 7993,46 = 95.006,54 → 11.608,91 × 1,5882 = 18.437,27 €
+   * Con «-50» el campo no dice nada legible: la app debe abstenerse y nombrar el campo, como hace
+   * con los importes negativos desde el hallazgo 740 («o se lee el importe, o no se da número»).
+   *
+   * HALLAZGO medio (Inspector 25/09/2026): hoy lo capa a 0 en silencio, enseña «Porcentaje de
+   * herencia 0,00 %», base ajustada 0,00 € y publica «Impuesto estimado en Galicia 0,00 €».
+   */
+  test.fail('caso a rechazar: un porcentaje de herencia negativo no da cuota cero, da un aviso', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('galicia');
+    await page.locator('#parentesco').selectOption('III');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+    // Con el 100 % del campo (su valor inicial) sí hay cifra, y es la cuota tributaria entera
+    expect(await cuotaDestacada(page)).toBe('18.437,27 €');
+
+    await sembrarValor(page, page.locator('#porcentaje-herencia'), '-50');
+    const aviso = page.getByRole('alert').filter({ hasText: /porcentaje/i });
+    await expect(aviso).toBeVisible();
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+  });
+
+  /**
+   * SOSPECHA CONFIRMADA — HALLAZGO bajo (Inspector 25/09/2026): la fecha del hero va en ISO.
+   *
+   * page.tsx pinta `FISCAL_SUCESIONES_META.verificado` tal cual —«Datos verificados:
+   * 2025-01-01»—, mientras el <DataReference> de la MISMA página formatea el mismo campo y dice
+   * «Última verificación: 01/01/2025». Es la forma del hallazgo 1657 de estimador-sueldo-neto.
+   * Lo esperado se deriva del sello (hoy '2025-01-01' → '01/01/2025') para que re-sellar el
+   * módulo no rompa el testigo.
+   */
+  test.fail('la fecha de verificación del hero va en DD/MM/AAAA, como la del DataReference', async ({ page }) => {
+    const [anio, mes, dia] = FISCAL_SUCESIONES_META.verificado.split('-');
+    const esperada = `${dia}/${mes}/${anio}`;
+
+    const referencia = await page.getByRole('note', { name: 'Datos de referencia normativos' }).innerText();
+    expect(referencia, 'el DataReference ya la formatea bien').toContain(esperada);
+
+    const hero = await page.locator('[class*="metaVerificado"]').innerText();
+    expect(hero).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+    expect(hero).toContain(`Datos verificados: ${esperada}`);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) — el desglose no cuadra consigo mismo por un céntimo.
+   *
+   * El 1195 hizo que el coeficiente se aplicara a la cuota íntegra REDONDEADA, pero la
+   * bonificación sigue restándose sin redondear: con el caso normal de Murcia el panel imprime
+   * «Cuota tributaria 18.437,27 €», «– Bonificación 9218,64 €» y «CUOTA A INGRESAR 9218,64 €»,
+   * y 18.437,27 − 9218,64 = 9218,63. `calcularSucesion` —el que escribe las tarjetas de esta
+   * misma página y la tool del MCP— resta la bonificación publicada y da 9218,63 €.
+   */
+  test.fail('la cuota final es la cuota tributaria menos la bonificación que se publica, al céntimo', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('murcia');
+    await page.locator('#parentesco').selectOption('III');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+
+    const tributaria = aNumero(await importeDeLinea(page, /^Cuota tributaria/));
+    const bonificacion = aNumero(await importeDeLinea(page, /Bonificación 50/));
+    const final = aNumero(await importeDeLinea(page, /^CUOTA A INGRESAR/));
+    expect(tributaria).toBe(18437.27);
+    expect(bonificacion).toBe(9218.64);
+    expect(Math.round((tributaria - bonificacion) * 100), 'tributaria − bonificación = final').toBe(
+      Math.round(final * 100),
+    );
+    expect(await cuotaDestacada(page)).toBe('9218,63 €');
+  });
+
+  /**
+   * HALLAZGO alto (Inspector 25/09/2026) — en NUDA PROPIEDAD la reducción por vivienda habitual
+   * se calcula sobre el valor PLENO de la vivienda, no sobre el de la nuda propiedad adquirida.
+   *
+   * Art. 20.2.c LISD (BOE, texto consolidado): «Del mismo porcentaje de reducción [95 %], con el
+   * límite de 122.606,47 euros para cada sujeto pasivo […], gozarán las adquisiciones "mortis
+   * causa" de la vivienda habitual». Lo adquirido es la nuda propiedad, y la propia app la valora
+   * al 81 % (art. 26.a, usufructuario de 70 años): 120.000 × 81 % = 97.200 €. Pero le reduce
+   * 95 % × 120.000 = 114.000 €, un 117 % de la vivienda por la que le hace tributar. Es la forma
+   * de los hallazgos 796 (seguro) y 1193 (tope catalán): la reducción supera la parte gravada.
+   *
+   * Castilla y León · hermano de 70 años que convivió (Grupo III, art. 20.2.c) · nuda propiedad,
+   * usufructuario de 70 años (el valor por defecto del campo) · 100.000 € en cuentas +
+   * 120.000 € de vivienda habitual · patrimonio < 402.678 €:
+   *   base imponible  226.600,00 (220.000 + ajuar 6600) × 81 % = 183.546,00 de base ajustada
+   *   − parentesco      7993,46   REDUCCIONES_PARENTESCO_IS['III']
+   *   − vivienda       92.340,00   95 % × 97.200 (la app: 114.000,00)
+   *   = base liquid.   83.212,54   (la app: 61.552,54)
+   *   cuota íntegra     9704,18    9.166,06 + 16,15 % × (83.212,54 − 79.880,52)
+   *   × 1,5882, sin bonificación en CyL para el Grupo III → 15.412,18 €   (la app: 10.275,29 €)
+   *
+   * La app se queda 5136,89 € por debajo, un 33 %. Tolerancia de medio euro.
+   */
+  test.fail('en nuda propiedad la reducción por vivienda va sobre el valor de la nuda propiedad', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('castilla-leon');
+    await page.locator('#parentesco').selectOption('III');
+    await sembrarValor(page, page.locator('#edad-heredero'), '70');
+    await page.getByLabel('Conviví con el fallecido los 2 años anteriores').check();
+    await page.getByRole('radio', { name: 'Nuda propiedad' }).check();
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+    await sembrarValor(page, page.locator('#vivienda-habitual'), '120000');
+
+    const texto = await panel(page);
+    expect(texto).toMatch(/Tipo adquisición \(nuda\)\s*81,0 ?%/); // 1 − (89 − 70) / 100
+    expect(texto).toContain('183.546,00 €');                      // base ajustada
+
+    expect(await importeDeLinea(page, /Vivienda habitual/)).toBe('92.340,00 €');
+    expect(aNumero(await cuotaDestacada(page))).toBeCloseTo(15412.18, 0);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) — el concepto de la reducción por edad parece la edad.
+   *
+   * Imprime `${21 - edad} años < 21`: a un heredero de 15 años le pone «Por edad (6 años < 21)»,
+   * que se lee como que tiene 6 años; con 0 años, «(21 años < 21)», que es falso literalmente.
+   * El importe sí es correcto: 6 × 3990,72 = 23.944,32 € (REDUCCION_EDAD_MENOR_21_IS; con los
+   * 15.956,87 del parentesco suman 39.901,19, por debajo del tope de 47.858,59).
+   */
+  test.fail('el concepto de la reducción por edad no presenta los años que faltan como la edad', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('extremadura');
+    await page.locator('#parentesco').selectOption('I-descendiente');
+    await sembrarValor(page, page.locator('#edad-heredero'), '15');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '50000');
+
+    expect(await importeDeLinea(page, /Por edad/)).toBe('23.944,32 €');
+    const concepto = await page
+      .locator('[class*="resultsPanel"] div[class*="linea"]')
+      .filter({ hasText: /Por edad/ })
+      .first()
+      .locator('span')
+      .first()
+      .innerText();
+    expect(concepto).not.toMatch(/\(\d+ años < 21\)/);
+  });
+
+  /**
+   * Contraste (pasa hoy): con la MISMA herencia —hijo de 21 o más, 300.000 € en cuentas—
+   *   Asturias:  309.000 − 15.956,87 − 300.000 (reducción propia en base) < 0 → 0,00 €
+   *   Andalucía: base liquidable 293.043,13 < 1.000.000 → exención total    → 0,00 €
+   *   Canarias:  40.011,04 + 25,50 % × (293.043,13 − 239.389,13) = 53.692,81 × 0,1 % = 53,69 €
+   * Es el caso que desmiente las dos notas del hallazgo de abajo.
+   */
+  test('contraste: 300.000 € de un hijo liquidan 0,00 € en Asturias y Andalucía y 53,69 € en Canarias', async ({ page }) => {
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '300000');
+    for (const [ccaa, esperado] of [
+      ['asturias', '0,00 €'],
+      ['andalucia', '0,00 €'],
+      ['canarias', '53,69 €'],
+    ] as const) {
+      await page.locator('#ccaa-causante').selectOption(ccaa);
+      expect(await cuotaDestacada(page), ccaa).toBe(esperado);
+    }
+  });
+
+  /**
+   * HALLAZGO medio (Inspector 25/09/2026) — la ficha de la comunidad sigue calificándolas.
+   *
+   * El 738 quitó de la prosa «la de mayor recaudación efectiva», pero la caja informativa que
+   * aparece al elegir la comunidad imprime `BONIFICACIONES_CCAA_IS[…].notas` y dice de Asturias
+   * «Tributación más alta del régimen común» y de Canarias «La más favorable del régimen
+   * común». El contraste de arriba, calculado por la propia app, desmiente las dos: Asturias sale
+   * a 0,00 € y Canarias a 53,69 €, por encima de Andalucía. Es la asimetría territorial
+   * valorativa del §1.quinquies.6 del CLAUDE.md del proyecto, y contradice al faqJsonLd de la
+   * app («conviene calcular el caso concreto en vez de guiarse por la fama de cada comunidad»).
+   */
+  test.fail('la ficha de Asturias y la de Canarias no las califican de más cara o más favorable', async ({ page }) => {
+    const info = page.locator('[class*="infoCcaa"]');
+    await page.locator('#ccaa-causante').selectOption('asturias');
+    await expect(info).toContainText('Principado de Asturias');
+    expect(await info.innerText()).not.toContain('Tributación más alta');
+
+    await page.locator('#ccaa-causante').selectOption('canarias');
+    await expect(info).toContainText('Canarias');
+    expect(await info.innerText()).not.toContain('La más favorable');
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) — cifras tecleadas donde hay constante, y una ya diverge.
+   *
+   * El consejo de la tarjeta del sobrino dice «doce comunidades del régimen común no le dan nada»
+   * al Grupo III. En `BONIFICACIONES_CCAA_IS` son DIEZ: de las catorce de régimen común, Madrid y
+   * Murcia bonifican el 50 %, Canarias el 99,9 % y Asturias reduce 50.000 € en base. La misma
+   * frase teclea esas otras tres cifras, y la tabla comparativa teclea «1,0000», «2,0000» y
+   * «0 €» mientras su fila del Grupo III sí lee `COEFICIENTES_IS` y `REDUCCIONES_PARENTESCO_IS`.
+   */
+  test.fail('el consejo del Grupo III cuenta las comunidades con data/fiscal, y la tabla no teclea', async ({ page }) => {
+    const sinNada = Object.values(BONIFICACIONES_CCAA_IS).filter((c) => {
+      const iii = c.bonificaciones['III'];
+      return c.regimen === 'comun' && !(iii?.porcentaje ?? 0) && !(iii?.reduccionBase ?? 0);
+    }).length;
+    expect(sinNada, 'comunidades de régimen común sin nada para el Grupo III').toBe(10);
+
+    const texto = await textoCompleto(page);
+    expect(texto).toContain('Lo que cambia mucho de una comunidad a otra es qué recibe');
+    expect(texto).not.toContain('doce comunidades del régimen común');
+
+    const jsx = readFileSync(join(process.cwd(), 'app/estimador-impuesto-sucesiones/page.tsx'), 'utf8');
+    for (const tecleada of ['<td>1,0000 (patrimonio', '<td>2,0000 (patrimonio', '<td>0 €</td>']) {
+      expect(jsx, `sigue tecleada en la tabla: ${tecleada}`).not.toContain(tecleada);
+    }
+  });
+
+  /**
+   * HALLAZGO medio (Inspector 25/09/2026) — la tarjeta del hijo con discapacidad empareja mal la
+   * cifra estatal: «más generosas que la estatal (47.858,59 € al 65%)». 47.858,59 € es la del
+   * 33 % al 64 % (`REDUCCION_DISCAPACIDAD_33_IS`); la del 65 % o más son 150.253,03 €
+   * (`REDUCCION_DISCAPACIDAD_65_IS`), como dice bien la FAQ de la misma página y como aplica el
+   * propio panel en el caso límite de arriba. La tarjeta rebaja a un tercio la estatal justo
+   * donde la compara con las forales.
+   */
+  test.fail('la tarjeta del hijo con discapacidad no atribuye 47.858,59 € al grado del 65 %', async ({ page }) => {
+    const texto = await textoCompleto(page);
+    const desde = texto.indexOf('Hijo menor con discapacidad');
+    const hasta = texto.indexOf('Preguntas frecuentes sobre el Impuesto');
+    const tarjeta = texto.slice(desde, hasta);
+    expect(tarjeta).toContain('reducciones por discapacidad');
+    expect(tarjeta).not.toMatch(/47\.858,59\s*€\s*al\s*65/);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) — el selector de comunidad, dos restos.
+   *
+   *  · La opción vacía dice «— Selecciona tu CCAA —» debajo de una etiqueta que pide la del
+   *    FALLECIDO y encima de un helper que dice «No es donde vives tú»: es el residuo del 736.
+   *  · Con País Vasco o Navarra la misma nota se imprime DOS veces seguidas: en la alerta foral
+   *    y en la caja informativa, las dos con `ccaaInfo.notas`.
+   */
+  test.fail('el selector de comunidad no pide «tu» CCAA y la nota foral sale una vez', async ({ page }) => {
+    const vacia = await page.locator('#ccaa-causante option').first().innerText();
+    expect(vacia).not.toMatch(/tu CCAA/i);
+
+    await page.locator('#ccaa-causante').selectOption('pais-vasco');
+    const columna = await page.locator('[class*="inputsPanel"]').innerText();
+    expect(columna.split('Las 3 Haciendas Forales').length - 1, 'veces que sale la nota foral').toBe(1);
+  });
+
+  /**
+   * HALLAZGO medio (Inspector 25/09/2026) — el faqJsonLd da la reducción del Grupo I SIN su tope.
+   *
+   * «15.956,87 € más 3.990,72 € por cada año por debajo de 21», sin «sin que la reducción pueda
+   * exceder de 47.858,59 euros» (art. 20.2.a LISD, `REDUCCION_EDAD_MENOR_21_MAX_IS`). Leída así,
+   * un recién nacido reduciría 15.956,87 + 21 × 3990,72 = 99.761,99 €, el doble del máximo: es
+   * el defecto que se reparó en el cálculo el 08/09/2026, vivo en el canal que leen las IAs. Las
+   * cifras van tecleadas en metadata.ts, que ya importa `PLAZO_ISD` de data/fiscal.
+   */
+  test.fail('el faqJsonLd da el tope de 47.858,59 € de la reducción del Grupo I', async ({ page }) => {
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
+    const pregunta = (faq.mainEntity as Array<{ name: string; acceptedAnswer: { text: string } }>).find((q) =>
+      /reducciones existen por parentesco/.test(q.name),
+    );
+    expect(pregunta, 'la pregunta de las reducciones por parentesco').toBeTruthy();
+    expect(pregunta!.acceptedAnswer.text).toContain('3.990,72');
+    expect(pregunta!.acceptedAnswer.text).toContain('47.858,59');
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) — el % va pegado a la cifra (CLAUDE.md global §2, desde
+   * el 25/09/2026: separado con espacio duro). En el panel: «Bonificación autonómica: 50,0%»,
+   * «Tipo efectivo: 8,95%», «Ajuar doméstico (3%)», «Porcentaje de herencia …%», «Tipo
+   * adquisición …%», «Vivienda habitual (95%)», «Discapacidad ≥65%», «Bonificación 56,00% por
+   * escala del art. 58 bis». En el formulario: «33%–64%», «≥65%», «100% si eres el único
+   * heredero», el helper del usufructo («70% … 10% → 19%»), y las notas de cada comunidad. En la
+   * guía, unas cuarenta más. En metadata, la característica «vivienda habitual (95%)».
+   */
+  test.fail('ningún porcentaje del formulario ni del panel va pegado a su cifra', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('murcia');
+    await page.locator('#parentesco').selectOption('III');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+
+    expect(await panel(page)).not.toMatch(/\d%/);
+    expect(await page.locator('[class*="inputsPanel"]').innerText()).not.toMatch(/\d%/);
+  });
+
+  /**
+   * HALLAZGO medio (Inspector 25/09/2026, accesibilidad / modo oscuro) — las líneas de
+   * reducciones y de bonificación usan `--bonif: #1A7A3E`, que el módulo no redeclara en oscuro:
+   * sobre el #2A2A2A de la tarjeta dan 2,66:1, por debajo del 4,5:1 del texto de 0,85rem (y del
+   * 3:1 del texto grande). En claro, sobre blanco, 5,39:1. El candado check:token-oscuro no lo
+   * ve porque `--bonif` no es un token de globals.css.
+   */
+  test.fail('en oscuro las líneas de reducción y bonificación llegan a 4,5:1', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('murcia');
+    await page.locator('#parentesco').selectOption('III');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await page.waitForTimeout(700); // transición de 0,3 s de globals.css
+
+    const ratios = await page.locator('[class*="resultsPanel"] [class*="lineaBonif"]').evaluateAll((nodos) => {
+      const rgb = (s: string) => (s.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+      const lum = (c: number[]) => {
+        const [r, g, b] = c.map((v) => {
+          const x = v / 255;
+          return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      return nodos.map((n) => {
+        const tarjeta = n.closest('[class*="desglose"]') as HTMLElement;
+        const a = lum(rgb(getComputedStyle(n).color));
+        const b = lum(rgb(getComputedStyle(tarjeta).backgroundColor));
+        return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+      });
+    });
+    expect(ratios.length, 'hay líneas de reducción y de bonificación').toBeGreaterThanOrEqual(2);
+    for (const r of ratios) expect(r).toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) — el ajuar se calcula también sobre el SEGURO DE VIDA.
+   *
+   * Art. 15 LISD (BOE): el ajuar «se valorará en el tres por ciento del importe del caudal
+   * relicto del causante». El seguro de vida no es caudal relicto —la propia página lo dice: «no
+   * forman parte de la herencia civil»—, pero la app lo suma a la masa y le añade su 3 %.
+   *
+   * Galicia · amigo (Grupo IV, sin reducción de parentesco ni de seguro) · solo un seguro de
+   * vida de 100.000 € · patrimonio < 402.678 €:
+   *   base imponible 100.000,00 (ajuar 0: no hay caudal relicto)   — la app: 103.000,00
+   *   cuota íntegra   12.415,36  9.166,06 + 16,15 % × (100.000 − 79.880,52)
+   *   × 2,0000, sin bonificación para el Grupo IV en Galicia → 24.830,72 €   — la app: 25.799,72 €
+   * La app cobra 969,00 € de más (12.899,86 × 2 = 25.799,72).
+   */
+  test.fail('el ajuar doméstico no se calcula sobre el seguro de vida', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('galicia');
+    await page.locator('#parentesco').selectOption('IV');
+    await sembrarValor(page, page.locator('#seguros-vida'), '100000');
+
+    expect(await importeDeLinea(page, /^Base imponible total/)).toBe('100.000,00 €');
+    expect(await cuotaDestacada(page)).toBe('24.830,72 €');
   });
 });

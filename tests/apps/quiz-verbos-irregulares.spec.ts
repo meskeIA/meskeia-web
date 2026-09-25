@@ -1,5 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { verbosIrregulares } from '../../data/verbos-irregulares';
+import type { Locator } from '@playwright/test';
+import { esperarPaginaAsentada } from './_hidratacion';
 
 /**
  * Quiz Verbos Irregulares — test de regresión del Inspector (25/08/2026)
@@ -694,5 +696,690 @@ test.describe('Quiz Verbos Irregulares', () => {
       if (/Ver resultados/.test((await boton.textContent()) ?? '')) { await boton.click(); break; }
       await boton.click();
     }
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Inspector 25/09/2026 — re-inspección (la anterior, 25/08/2026: hallazgos 311-317)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// DE DÓNDE SALEN LOS VALORES ESPERADOS DE ESTA SECCIÓN
+// · Las formas verbales: el CANON de arriba, que el 25/09/2026 se volvió a cotejar verbo a
+//   verbo contra la tabla «Verb Forms» de Oxford Learner's Dictionaries (75 de 75 coinciden en
+//   past simple y past participle) y contra Cambridge Dictionary en los que tienen variante:
+//   get «got or US usually gotten», wake «woke or waked / woken or waked», shine «shone or
+//   shined», lie (yacer) «lay / lain».
+// · La puntuación: calcularPuntuacion() de page.tsx, resuelta a mano en cada caso.
+// · La precisión del HUD: round(correctas / respondidas · 100), la fórmula reparada en el 311.
+// · Los porcentajes se comprueban por su CIFRA con `pct()`, que admite «80%», «80 %» y
+//   «80 %»: el formato del % tiene su propio caso (hallazgo de formato, abajo), y así estos
+//   casos no se rompen el día que se repare.
+//
+// Los casos que expresan lo CORRECTO y hoy fallan por un hallazgo llevan test.fail() y un
+// comentario «HALLAZGO [severidad] (Inspector 25/09/2026)»; se comprobó que cada uno falla en
+// la aserción que vigila y no en el montaje.
+
+/** Normaliza espacios (incluido el duro) para comparar textos. */
+const norm = (s: string | null | undefined): string => (s ?? '').replace(/\s+/g, ' ').trim();
+
+/** Casa una cifra de porcentaje con el % pegado, con espacio o con espacio duro. */
+const pct = (n: number): RegExp => new RegExp(`^${n}[  ]?%$`);
+
+/** Primer grupo de `re` en `texto`, o cadena vacía. */
+const grupo = (texto: string, re: RegExp): string => texto.match(re)?.[1] ?? '';
+
+/** Past simples que el quiz PREGUNTA en un nivel (show sale del sorteo, hallazgo 316). */
+function pasadosDelNivel(nivel: string): string[] {
+  return Object.entries(CANON)
+    .filter(([inf, c]) => c.nivel === nivel && inf !== 'show')
+    .map(([inf]) => respuestaQueSePregunta(inf));
+}
+
+/** Abre la app sin el aviso fijo de transparencia, con el tema pedido y ya hidratada. */
+async function abrirHidratada(page: Page, tema?: 'light' | 'dark'): Promise<void> {
+  await page.addInitScript((t) => {
+    try {
+      localStorage.setItem('meskeia_transparency_banner_dismissed', 'true');
+      if (t) localStorage.setItem('meskeia-theme', t);
+    } catch {
+      /* sin almacenamiento: saldrá el aviso y el tema del sistema */
+    }
+  }, tema ?? null);
+  await page.goto(RUTA);
+  await expect(page.locator('h1')).toContainText('Quiz Verbos Irregulares');
+  // La app no tiene inputs (solo botones): la espera que vale es la de la página confirmada.
+  await esperarPaginaAsentada(page);
+  if (tema) await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
+}
+
+/** Botón de la opción cuyo texto es `texto` (se lee del aria-label, «Opción X: texto»). */
+async function botonDeOpcion(page: Page, texto: string): Promise<Locator> {
+  const i = (await opcionesVisibles(page)).indexOf(texto);
+  expect(i, `no hay ninguna opción «${texto}»`).toBeGreaterThanOrEqual(0);
+  return page.locator('[class*="opcionesGrid"] button').nth(i);
+}
+
+/** Contesta bien todas las preguntas que queden y pulsa «Ver resultados». */
+async function acertarHastaElFinal(page: Page): Promise<void> {
+  for (let i = 0; i < 25; i++) {
+    const inf = norm(await verboEnPantalla(page).textContent());
+    await pulsarOpcion(page, respuestaQueSePregunta(inf));
+    const boton = botonSiguiente(page);
+    const ultima = /Ver resultados/.test((await boton.textContent()) ?? '');
+    await boton.click();
+    if (ultima) break;
+  }
+  await expect(page.locator('[class*="resultadoPanel"]')).toBeVisible();
+}
+
+/**
+ * Contraste WCAG del texto de `loc` contra su fondo REAL: compone los fondos
+ * semitransparentes de los antecesores hasta dar con uno opaco. (Mismo cálculo que
+ * quiz-biologia-molecular.spec.ts; no vale para fondos con degradado.)
+ */
+async function contraste(loc: Locator): Promise<number> {
+  return loc.evaluate((el) => {
+    const leer = (c: string): number[] => {
+      const m = c.match(/rgba?\(([^)]+)\)/);
+      if (!m) return [0, 0, 0, 0];
+      const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+      return [p[0], p[1], p[2], p[3] ?? 1];
+    };
+    const sobre = (f: number[], b: number[]): number[] => [0, 1, 2].map((i) => f[i] * f[3] + b[i] * (1 - f[3])).concat(1);
+    const capas: number[][] = [];
+    for (let n: Element | null = el; n; n = n.parentElement) {
+      const c = leer(getComputedStyle(n).backgroundColor);
+      if (c[3] > 0) capas.push(c);
+      if (c[3] >= 1) break;
+    }
+    let fondo = [255, 255, 255, 1];
+    for (let i = capas.length - 1; i >= 0; i--) fondo = sobre(capas[i], fondo);
+    const texto = sobre(leer(getComputedStyle(el).color), fondo);
+    const lum = (c: number[]): number => {
+      const f = (v: number): number => {
+        const x = v / 255;
+        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+    };
+    const a = lum(texto);
+    const b = lum(fondo);
+    return Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100;
+  });
+}
+
+test.describe('Inspector 25/09/2026', () => {
+  /**
+   * CASO NORMAL — B2 con 10 preguntas: las 8 primeras bien y las 2 últimas mal.
+   *
+   * Resuelto a mano ANTES de ejecutar:
+   *   · B2 tiene 20 verbos, todos preguntables → la partida es de 10, sin aviso, y el botón
+   *     dice «Empezar Quiz — 10 preguntas · Nivel B2».
+   *   · Los 10 infinitivos son de B2 (CANON) y distintos; las 4 opciones de cada pregunta son
+   *     past simples de B2: los distractores salen del mismo nivel (poolRespuestas).
+   *   · Precisión tras cada respuesta: 1-8 → 100 % · tras la 9.ª (8 de 9) → round(88,89) = 89 %
+   *     · tras la 10.ª (8 de 10) → 80 %.
+   *   · 8/10 = 0,8 → rama «≥ 0,7» de calcularPuntuacion: 60 + (0,8 − 0,7)/0,2 · 40 = 60 + 20 =
+   *     80 pts · getResultadoTexto(0,8) → «¡Muy buena puntuación!» · «8 de 10 respuestas
+   *     correctas» · «8/10» · acierto round(80) = 80 %.
+   */
+  test('caso normal · B2, 8 bien y 2 mal: HUD 89 % y 80 %, 80 pts y distractores del mismo nivel', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.locator('[class*="nivelBtn"]').filter({ hasText: 'B2 Avanzado' }).click();
+    await page.getByRole('button', { name: '10 preguntas', exact: true }).click();
+    await expect(page.locator('[class*="btnIniciar"]')).toHaveText('Empezar Quiz — 10 preguntas · Nivel B2');
+    await expect(page.locator('[class*="avisoNivel"]')).toHaveCount(0);
+    await page.locator('[class*="btnIniciar"]').click();
+
+    const pasadosB2 = new Set(pasadosDelNivel('B2'));
+    const precisionTras = [100, 100, 100, 100, 100, 100, 100, 100, 89, 80];
+    const vistos: string[] = [];
+
+    for (let i = 1; i <= 10; i++) {
+      const inf = norm(await verboEnPantalla(page).textContent());
+      vistos.push(inf);
+      expect(CANON[inf]?.nivel, `«${inf}» ha salido en una partida de B2`).toBe('B2');
+
+      const ops = await opcionesVisibles(page);
+      expect(new Set(ops).size, `Q${i}: ${ops.join(', ')}`).toBe(4);
+      const buena = respuestaQueSePregunta(inf);
+      expect(ops).toContain(buena);
+      for (const o of ops) expect(pasadosB2.has(o), `Q${i} (${inf}): «${o}» no es un past simple de B2`).toBe(true);
+
+      const acierta = i <= 8;
+      await pulsarOpcion(page, acierta ? buena : ops.find((o) => o !== buena)!);
+      await expect(feedback(page)).toContainText(acierta ? '¡Correcto!' : 'Incorrecto');
+
+      const canon = CANON[inf];
+      const pp = canon.ppAlt ? `${canon.pp} / ${canon.ppAlt}` : canon.pp;
+      expect(norm(await page.locator('[class*="conjugacion"]').textContent())).toBe(`${inf}→${canon.ps}→${pp}`);
+
+      const h = await hud(page);
+      expect(h.progreso).toBe(`${i}/10`);
+      expect(h.correctas).toBe(String(Math.min(i, 8)));
+      expect(h.precision, `precisión tras la ${i}.ª`).toMatch(pct(precisionTras[i - 1]));
+      await botonSiguiente(page).click();
+    }
+
+    expect(new Set(vistos).size, `verbo repetido: ${vistos.join(', ')}`).toBe(10);
+    await expect(page.locator('[class*="resultadoPuntos"]')).toHaveText('80 pts');
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('¡Muy buena puntuación!');
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText('8 de 10 respuestas correctas');
+    const valores = (await page.locator('[class*="statRValor"]').allTextContents()).map(norm);
+    expect(valores[0]).toBe('8/10');
+    expect(valores[1]).toMatch(pct(80));
+  });
+
+  /**
+   * CASO LÍMITE — el único nivel cuyo banco preguntable es MENOR que su tamaño: B1 tiene 20
+   * verbos, pero `show` sale del sorteo (hallazgo 316), así que quedan 19. Se piden 20.
+   *
+   * Resuelto a mano ANTES de ejecutar:
+   *   · min(20, 19) = 19 → botón «Empezar Quiz — 19 preguntas · Nivel B1» y aviso que habla
+   *     de 19 preguntas; el HUD arranca en «1/19».
+   *   · Las 19 preguntas son los 20 de B1 menos show, cada uno una vez; «showed» no sale nunca.
+   *   · Acertándolas todas: precisión 100 % en cada una · 19/19 = 1 ≥ 0,9 → 100 pts ·
+   *     «¡Dominas el inglés!» · «19 de 19 respuestas correctas» · «19/19» · 100 %.
+   */
+  test('caso límite · B1 pidiendo 20 sirve 19 (show fuera) y 19 de 19 dan 100 pts', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrirHidratada(page);
+    await page.locator('[class*="nivelBtn"]').filter({ hasText: 'B1 Intermedio' }).click();
+    await page.getByRole('button', { name: '20 preguntas', exact: true }).click();
+    await expect(page.locator('[class*="btnIniciar"]')).toHaveText('Empezar Quiz — 19 preguntas · Nivel B1');
+    await expect(page.locator('[class*="avisoNivel"]')).toContainText('la partida será de 19 preguntas');
+    await page.locator('[class*="btnIniciar"]').click();
+
+    const vistos: string[] = [];
+    for (let i = 1; i <= 19; i++) {
+      const inf = norm(await verboEnPantalla(page).textContent());
+      vistos.push(inf);
+      const ops = await opcionesVisibles(page);
+      expect(ops, `Q${i}: «showed» ha salido de opción`).not.toContain('showed');
+      await pulsarOpcion(page, respuestaQueSePregunta(inf));
+      await expect(feedback(page)).toContainText('¡Correcto!');
+      const h = await hud(page);
+      expect(h.progreso).toBe(`${i}/19`);
+      expect(h.correctas).toBe(String(i));
+      expect(h.precision).toMatch(pct(100));
+      await expect(botonSiguiente(page)).toHaveText(i < 19 ? 'Siguiente pregunta →' : 'Ver resultados');
+      await botonSiguiente(page).click();
+    }
+
+    const b1SinShow = Object.entries(CANON).filter(([inf, c]) => c.nivel === 'B1' && inf !== 'show').map(([inf]) => inf).sort();
+    expect(b1SinShow).toHaveLength(19);
+    expect(vistos.slice().sort()).toEqual(b1SinShow);
+
+    await expect(page.locator('[class*="resultadoPuntos"]')).toHaveText('100 pts');
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('¡Dominas el inglés!');
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText('19 de 19 respuestas correctas');
+    const valores = (await page.locator('[class*="statRValor"]').allTextContents()).map(norm);
+    expect(valores[0]).toBe('19/19');
+    expect(valores[1]).toMatch(pct(100));
+  });
+
+  /**
+   * CASO DE RECHAZO — el doble clic, que es lo que hace mucha gente en un botón.
+   *
+   * Resuelto a mano ANTES de ejecutar (guardián `if (seleccionada !== null) return` en
+   * responder() y `disabled` en las opciones; «Siguiente» se desmonta al primer clic):
+   *   · doble clic en la opción BUENA de la 1.ª → cuenta una vez: 1 acierto, 1/10, 100 %.
+   *   · doble clic en «Siguiente pregunta →» → avanza UNA pregunta: «2/10», no «3/10», y el
+   *     segundo clic no contesta la pregunta nueva (sin veredicto, 4 opciones habilitadas).
+   *   · fallar la 2.ª → 1 acierto de 2 respondidas → precisión round(50) = 50 %.
+   */
+  test('caso de rechazo · un doble clic en la opción cuenta una vez y uno en «Siguiente» avanza una sola pregunta', async ({ page }) => {
+    await abrirHidratada(page);
+    await arrancarPartida(page, 'A2 Elemental', 10);
+
+    const inf1 = norm(await verboEnPantalla(page).textContent());
+    await (await botonDeOpcion(page, respuestaQueSePregunta(inf1))).dblclick();
+    await expect(feedback(page)).toContainText('¡Correcto!');
+    let h = await hud(page);
+    expect(h.progreso).toBe('1/10');
+    expect(h.correctas, 'el doble clic ha sumado dos aciertos').toBe('1');
+    expect(h.precision).toMatch(pct(100));
+
+    await botonSiguiente(page).dblclick();
+    await expect(page.getByText('Pregunta 2 de 10', { exact: true })).toBeVisible();
+    h = await hud(page);
+    expect(h.progreso, 'el doble clic en «Siguiente» se ha saltado una pregunta').toBe('2/10');
+    expect(h.correctas).toBe('1');
+    await expect(feedback(page), 'el segundo clic ha contestado la pregunta nueva').toHaveCount(0);
+    const opciones = page.locator('[class*="opcionesGrid"] button');
+    for (let i = 0; i < 4; i++) await expect(opciones.nth(i)).toBeEnabled();
+
+    const inf2 = norm(await verboEnPantalla(page).textContent());
+    await pulsarOpcion(page, (await opcionesVisibles(page)).find((o) => o !== respuestaQueSePregunta(inf2))!);
+    await expect(feedback(page)).toContainText('Incorrecto');
+    h = await hud(page);
+    expect(h.correctas).toBe('1');
+    expect(h.precision, '1 de 2 respondidas').toMatch(pct(50));
+  });
+
+  /**
+   * SOSPECHA (c) DESCARTADA — ¿se barajan las opciones? En quiz-biologia-molecular la correcta
+   * caía en la C 19 de cada 30. Aquí generarOpciones() pasa la correcta y 3 distractores por
+   * el Fisher-Yates de mezclar(): medido el 25/09/2026 en 100 preguntas, A 21 · B 22 · C 28 ·
+   * D 29 (χ² = 2,0 con 3 g.l., p ≈ 0,57: compatible con el reparto uniforme).
+   *
+   * Umbral, no aleatorio-frágil: 60 preguntas (3 partidas de 20 en «Todos»). Con reparto
+   * uniforme cada letra es Binomial(60, 1/4), media 15 y desviación 3,35. Se exige que cada
+   * letra quede entre 3 y 30: P(X ≥ 31) = 8,4·10⁻⁶ y P(X ≤ 2) = 6,9·10⁻⁶ por letra, así que la
+   * probabilidad de un falso rojo es < 6,2·10⁻⁵ por corrida (1 de cada ~16.000). Y si la
+   * correcta cayera en una letra el 63 % de las veces, como en biología, el caso lo vería en
+   * el 97 % de las corridas.
+   */
+  test('sospecha (c) descartada · la correcta no se concentra en una letra (60 preguntas, cada letra entre 3 y 30)', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrirHidratada(page);
+    const cuenta = [0, 0, 0, 0];
+    for (let partida = 0; partida < 3; partida++) {
+      if (partida === 0) await arrancarPartida(page, 'Todos los niveles', 20);
+      else await page.getByRole('button', { name: /Jugar de nuevo/ }).click();
+      for (let i = 1; i <= 20; i++) {
+        await expect(page.getByText(`Pregunta ${i} de 20`, { exact: true })).toBeVisible();
+        const inf = norm(await verboEnPantalla(page).textContent());
+        const ops = await opcionesVisibles(page);
+        const pos = ops.indexOf(respuestaQueSePregunta(inf));
+        expect(pos, `«${inf}»: la buena no está entre ${ops.join(', ')}`).toBeGreaterThanOrEqual(0);
+        cuenta[pos]++;
+        await page.locator('[class*="opcionesGrid"] button').nth(pos).click();
+        await botonSiguiente(page).click();
+      }
+    }
+    expect(cuenta.reduce((a, b) => a + b)).toBe(60);
+    for (let l = 0; l < 4; l++) {
+      expect(cuenta[l], `la correcta cae en la ${'ABCD'[l]} ${cuenta[l]} de 60 veces (A-D: ${cuenta.join('/')})`).toBeGreaterThanOrEqual(3);
+      expect(cuenta[l], `la correcta cae en la ${'ABCD'[l]} ${cuenta[l]} de 60 veces (A-D: ${cuenta.join('/')})`).toBeLessThanOrEqual(30);
+    }
+  });
+
+  /**
+   * SOSPECHA (e) DESCARTADA — ¿una regla oscura genérica pisa el verde/rojo de la correcta y
+   * la fallada (el hallazgo 1674 de quiz-biologia-molecular)? Aquí no hay regla oscura sobre
+   * `.opcion`; `.opcionCorrecta` y `.opcionIncorrecta` llevan !important y su variante oscura.
+   * Medido el 25/09/2026 en oscuro: correcta borde rgb(72,187,120) y texto rgb(104,211,145);
+   * fallada borde y texto rgb(252,129,129); neutras con opacidad 0,4. Se afirma sin fijar los
+   * valores (una reparación de contraste puede moverlos): verde en la correcta, rojo en la
+   * fallada, distintas entre sí y de una neutra.
+   */
+  test('sospecha (e) descartada · en oscuro la correcta y la fallada se distinguen entre sí y de una neutra', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await abrirHidratada(page, 'dark');
+    await arrancarPartida(page, 'A1 Básico', 10);
+    const inf = norm(await verboEnPantalla(page).textContent());
+    const ops = await opcionesVisibles(page);
+    const iBuena = ops.indexOf(respuestaQueSePregunta(inf));
+    const iMala = iBuena === 0 ? 1 : 0;
+    const iNeutra = [0, 1, 2, 3].find((i) => i !== iBuena && i !== iMala)!;
+    await page.locator('[class*="opcionesGrid"] button').nth(iMala).click();
+    await expect(feedback(page)).toContainText('Incorrecto');
+    await page.mouse.move(0, 0);
+
+    const pintura = (i: number) =>
+      page.locator('[class*="opcionesGrid"] button').nth(i).evaluate((b) => {
+        const cs = getComputedStyle(b);
+        const rgb = (c: string): number[] => (c.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
+        return { borde: rgb(cs.borderTopColor), fondo: cs.backgroundColor, texto: rgb(cs.color), opacidad: cs.opacity };
+      });
+    // globals.css anima colores: se sondea hasta que la correcta tenga ya su borde verde.
+    await expect.poll(async () => { const p = await pintura(iBuena); return p.borde[1] > p.borde[0]; }).toBe(true);
+    const buena = await pintura(iBuena);
+    const mala = await pintura(iMala);
+    const neutra = await pintura(iNeutra);
+    expect(buena.borde[1], 'borde de la correcta: verde').toBeGreaterThan(buena.borde[0]);
+    expect(buena.texto[1], 'texto de la correcta: verde').toBeGreaterThan(buena.texto[0]);
+    expect(mala.borde[0], 'borde de la fallada: rojo').toBeGreaterThan(mala.borde[1]);
+    expect(mala.texto[0], 'texto de la fallada: rojo').toBeGreaterThan(mala.texto[1]);
+    expect(buena.fondo).not.toBe(mala.fondo);
+    expect(buena.borde).not.toEqual(neutra.borde);
+    expect(mala.borde).not.toEqual(neutra.borde);
+    expect(buena.opacidad).toBe('1');
+    expect(mala.opacidad).toBe('1');
+  });
+
+  // ───────────────────────────── HALLAZGOS ─────────────────────────────
+
+  /**
+   * HALLAZGO medio (Inspector 25/09/2026) · accesibilidad — sospecha (a) CONFIRMADA.
+   * Con el teclado: se contesta con Enter, un Tab lleva a «Siguiente pregunta →» y Enter.
+   * El botón se desmonta y el foco cae a <body>; el primer Tab va a «⬇️ Ver Guía Completa»,
+   * DEBAJO del quiz, y hacen falta cuatro Shift+Tab para volver a la opción A. En cada
+   * transición. (Tras «Ver resultados» el foco también cae a <body> y la nota no se anuncia.)
+   * DEBERÍA: tras avanzar, el foco no está en <body> y el primer Tab cae en la pregunta nueva
+   * (el patrón reparado hoy en quiz-literatura-universal y quiz-biologia-molecular).
+   */
+  test('hallazgo · tras «Siguiente pregunta» con el teclado el foco no cae a <body> y el Tab entra en la pregunta nueva', async ({ page }) => {
+    test.fail(); // HALLAZGO medio (Inspector 25/09/2026): foco en BODY y el Tab va a «Ver Guía Completa»
+    await abrirHidratada(page);
+    await arrancarPartida(page, 'A1 Básico', 10);
+    const inf = norm(await verboEnPantalla(page).textContent());
+    await (await botonDeOpcion(page, respuestaQueSePregunta(inf))).focus();
+    await page.keyboard.press('Enter');
+    await expect(feedback(page)).toContainText('¡Correcto!');
+    // Hoy hace falta un Tab para llegar a «Siguiente»; si la reparación lleva el foco allí sola,
+    // no se pulsa (lo pasaría de largo).
+    if (!(await botonSiguiente(page).evaluate((b) => b === document.activeElement))) await page.keyboard.press('Tab');
+    await expect(botonSiguiente(page)).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Pregunta 2 de 10', { exact: true })).toBeVisible();
+
+    const activo = await page.evaluate(() => document.activeElement?.tagName ?? 'ninguno');
+    expect(activo, 'tras avanzar, el foco ha caído a <body>').not.toBe('BODY');
+    await page.keyboard.press('Tab');
+    const dentro = await page.evaluate(() => Boolean(document.activeElement?.closest('[class*="preguntaCard"], [class*="opcionesGrid"]')));
+    expect(dentro, 'el primer Tab tras avanzar no cae en la pregunta nueva').toBe(true);
+  });
+
+  /**
+   * HALLAZGO medio (Inspector 25/09/2026) · accesibilidad — sospecha (d) CONFIRMADA.
+   * El módulo redefine `--primary: #2E86AB` en `.container` para los DOS temas, y los botones
+   * de acción ponen blanco encima: 4,11:1 (< 4,5:1 de WCAG 1.4.3 para texto de 14-17,6 px).
+   * Medido el 25/09/2026, igual en claro y en oscuro: «Empezar Quiz» (17,6 px 700), nivel
+   * activo (15,2 px 700), «N preguntas» activo (14,4 px 600), «Siguiente pregunta →» (16 px
+   * 600), «Jugar de nuevo» (16 px 600) y los números de paso del plan (14,4 px 700).
+   * Existe --primary-boton (#26718F): 5,47:1 con blanco en los dos temas.
+   */
+  test('hallazgo · el texto blanco de los botones de acción llega a 4,5:1 en los dos temas', async ({ page }) => {
+    test.fail(); // HALLAZGO medio (Inspector 25/09/2026): 4,11:1 en los seis, en claro y en oscuro
+    test.setTimeout(90_000);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const medidas: Record<string, number> = {};
+    for (const tema of ['light', 'dark'] as const) {
+      await abrirHidratada(page, tema);
+      await page.locator('[class*="nivelBtn"]').filter({ hasText: 'A1 Básico' }).click();
+      await page.getByRole('button', { name: '10 preguntas', exact: true }).click();
+      await page.mouse.move(0, 0);
+      // `.nivelBtn` y `.pregBtn` animan `all 0.2s`: medir en el acto daba el color de partida
+      // (5,74:1, gris sobre blanco) en una de dos corridas.
+      await page.waitForTimeout(400);
+      medidas[`${tema} · nivel activo`] = await contraste(page.locator('[class*="nivelBtn"][aria-pressed="true"] [class*="nivelLabel"]'));
+      medidas[`${tema} · preguntas activo`] = await contraste(page.locator('[class*="pregBtn"][aria-pressed="true"]'));
+      medidas[`${tema} · Empezar Quiz`] = await contraste(page.locator('[class*="btnIniciar"]'));
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      medidas[`${tema} · número de paso`] = await contraste(page.locator('[class*="stepNumber"]').first());
+      await page.locator('[class*="btnIniciar"]').click();
+      const inf = norm(await verboEnPantalla(page).textContent());
+      await pulsarOpcion(page, respuestaQueSePregunta(inf));
+      await page.mouse.move(0, 0);
+      medidas[`${tema} · Siguiente`] = await contraste(botonSiguiente(page));
+      await botonSiguiente(page).click();
+      await acertarHastaElFinal(page);
+      await page.mouse.move(0, 0);
+      medidas[`${tema} · Jugar de nuevo`] = await contraste(page.locator('[class*="btnRejugar"]'));
+    }
+    const bajos = Object.entries(medidas).filter(([, r]) => r < 4.5);
+    expect(bajos, JSON.stringify(medidas)).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) · accesibilidad / dark mode.
+   * El texto en color de marca de la guía no llega a 4,5:1 (texto de 13-16 px): en claro
+   * #2E86AB da 4,11:1 sobre blanco, 3,77 en la tabla y 3,59 en la caja de errores, y el título
+   * de esa caja (#C05621, 16 px 700) 3,99:1. En OSCURO es peor porque `.container` fija
+   * `--primary: #2E86AB` también en ese tema y pisa el #3FA5D1 oscuro de globals.css: 3,50:1
+   * en consejos, FAQ, plan y técnicas, 3,21 en la tabla y 2,74 en la caja de errores. Medido el
+   * 25/09/2026. (El verbo grande, el HUD y la puntuación son texto grande: ≥ 3:1, pasan.)
+   */
+  test('hallazgo · el texto en color de marca de la guía llega a 4,5:1 en los dos temas', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): 3,59-4,11 en claro, 2,74-3,50 en oscuro
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const medidas: Record<string, number> = {};
+    for (const tema of ['light', 'dark'] as const) {
+      await abrirHidratada(page, tema);
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      await page.mouse.move(0, 0);
+      medidas[`${tema} · consejo de escenario`] = await contraste(page.locator('[class*="escenarioTip"]').first());
+      medidas[`${tema} · verbo en la tabla`] = await contraste(page.locator('[class*="comparativaTable"] td em').first());
+      medidas[`${tema} · verbo en la FAQ`] = await contraste(page.locator('[class*="faqItem"] em').first());
+      medidas[`${tema} · verbo en el plan`] = await contraste(page.locator('[class*="stepContent"] em').first());
+      medidas[`${tema} · verbo en errores típicos`] = await contraste(page.locator('[class*="warningList"] em').first());
+      medidas[`${tema} · título de errores típicos`] = await contraste(page.locator('[class*="warningHeader"] strong'));
+    }
+    const bajos = Object.entries(medidas).filter(([, r]) => r < 4.5);
+    expect(bajos, JSON.stringify(medidas)).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) · accesibilidad — la forma del 317, que se reparó en
+   * NIVEL_CONFIG y no aquí: el veredicto es una cadena JS «✅ ¡Correcto!» / «❌ Incorrecto», el
+   * candado check:a11y-jsx no la ve y el lector anuncia el nombre del emoji dentro de la
+   * alerta («alert: ❌ Incorrecto»). Además la barra de progreso (role="progressbar") no tiene
+   * nombre accesible. Medido con ariaSnapshot el 25/09/2026.
+   */
+  test('hallazgo · el veredicto no anuncia emojis y la barra de progreso tiene nombre', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): «❌ Incorrecto» / «✅ ¡Correcto!» en la alerta
+    const EMOJI = /\p{Extended_Pictographic}/u;
+    await abrirHidratada(page);
+    await arrancarPartida(page, 'A1 Básico', 10);
+    const inf = norm(await verboEnPantalla(page).textContent());
+    await pulsarOpcion(page, (await opcionesVisibles(page)).find((o) => o !== respuestaQueSePregunta(inf))!);
+    await expect(feedback(page)).toContainText('Incorrecto');
+    expect(await feedback(page).ariaSnapshot(), 'el veredicto «Incorrecto» se anuncia con su emoji').not.toMatch(EMOJI);
+    await botonSiguiente(page).click();
+    const inf2 = norm(await verboEnPantalla(page).textContent());
+    await pulsarOpcion(page, respuestaQueSePregunta(inf2));
+    await expect(feedback(page)).toContainText('¡Correcto!');
+    expect(await feedback(page).ariaSnapshot(), 'el veredicto «¡Correcto!» se anuncia con su emoji').not.toMatch(EMOJI);
+    expect(await page.locator('[role="progressbar"]').ariaSnapshot(), 'la barra de progreso no tiene nombre').toMatch(/progressbar "[^"]+"/);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) · contenido — formato español del porcentaje
+   * (CLAUDE.md global §2, desde el 25/09/2026: «15 %» con espacio duro U+00A0).
+   * Dónde: el HUD «Precisión» (`{…}%`, pegado: «100%») · la ficha final «Acierto» («70%»,
+   * pegado) · la guía, «hasta 95 % de acierto» y «superar el 85 %», con espacio NORMAL (el % puede
+   * saltar solo de línea). Metadata y JSON-LD no llevan %.
+   * Ojo al repararlo: los casos antiguos de arriba (caso normal, límite, 311, 311b, rechazo)
+   * fijan «70%», «0%», «100%» y «50%» pegados y habrá que actualizarlos a la vez.
+   */
+  test('hallazgo · los porcentajes llevan espacio duro antes del %', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): «100%» en el HUD, «100%» en la ficha, «95 %» con espacio normal
+    await abrirHidratada(page);
+    await arrancarPartida(page, 'A1 Básico', 10);
+    const inf = norm(await verboEnPantalla(page).textContent());
+    await pulsarOpcion(page, respuestaQueSePregunta(inf));
+    expect((await page.locator('[class*="hudValor"]').allTextContents())[2]).toBe('100 %');
+    await botonSiguiente(page).click();
+    await acertarHastaElFinal(page);
+    expect((await page.locator('[class*="statRValor"]').allTextContents())[1]).toBe('100 %');
+    const guia = (await page.locator('[class*="stepGuide"]').textContent()) ?? '';
+    expect(guia).toContain('95 %');
+    expect(guia).toContain('85 %');
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) · contenido — dos tamaños del nivel B1 en la misma
+   * pantalla. Con B1 y «20 preguntas», la tarjeta sigue diciendo «20 verbos habituales» y el
+   * aviso justo debajo, «El nivel B1 tiene 19 verbos». Los dos tienen parte de razón (el banco
+   * tiene 20; `show` no se pregunta desde el 316), pero el aviso no dice por qué y parece un
+   * error. Lo mismo, sin aviso, en «Todos los niveles — 75 verbos completos», el «Plan de 30
+   * días» («activa el quiz con los 75 verbos») y la metadata: se preguntan 74.
+   */
+  test('hallazgo · la tarjeta de B1 y el aviso no dan dos tamaños distintos del nivel', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): «20 verbos habituales» frente a «tiene 19 verbos»
+    await abrirHidratada(page);
+    const tarjeta = page.locator('[class*="nivelBtn"]').filter({ hasText: 'B1 Intermedio' });
+    await tarjeta.click();
+    await page.getByRole('button', { name: '20 preguntas', exact: true }).click();
+    const textos = `${norm(await tarjeta.textContent())} · ${norm(await page.locator('[class*="avisoNivel"]').textContent())}`;
+    const cifras = [...new Set([...textos.matchAll(/(\d+) verbos/g)].map((m) => m[1]))];
+    expect(cifras, `la pantalla da dos tamaños de B1: ${textos}`).toHaveLength(1);
+  });
+
+  /**
+   * HALLAZGO medio (Inspector 25/09/2026) · contenido — la guía llama REGULAR a «lie».
+   * · Escenario «Adulto preparando el B2 o C1»: «sus parejas regulares (lie, raise) no entran».
+   * · FAQ «¿Cuáles son los más confundidos en el B2?»: «sus parejas regulares (lie, raise, found)
+   *   no entran, porque no son irregulares» — la misma respuesta acaba de escribir «lie/lay/lain».
+   * · Caja «6 errores típicos»: «Confundir lay/lie/lain vs. lay/laid/laid»; la conjugación de
+   *   lie es lie/lay/lain.
+   * Fuente: Oxford Learner's Dictionaries, lie¹ (estar tumbado), Verb Forms «past simple lay ·
+   * past participle lain»; Cambridge Dictionary, lie «past tense lay, past participle lain».
+   * Solo lie «mentir» es regular (lied), y no es la pareja de lay. (Ojo: el caso 314b de arriba
+   * y su constante PAREJAS_REGULARES_QUE_LA_FAQ_NOMBRA dan por buena la misma premisa; lo que
+   * comprueban —que lie, raise y found no están en el banco— sigue siendo cierto.)
+   */
+  test('hallazgo · la guía no presenta «lie» como verbo regular ni lo conjuga «lay/lie/lain»', async ({ page }) => {
+    test.fail(); // HALLAZGO medio (Inspector 25/09/2026): «parejas regulares (lie, raise…)» y «lay/lie/lain»
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const LIE_REGULAR = /regulares\s*\([^)]*\blie\b/;
+    const escenario = norm(await page.locator('[class*="escenarioCard"]').filter({ hasText: 'Adulto preparando' }).textContent());
+    expect(escenario, 'el escenario de examen llama regular a «lie»').not.toMatch(LIE_REGULAR);
+    const faq = norm(await page.locator('[class*="faqItem"]').filter({ hasText: 'más confundidos en el B2' }).textContent());
+    expect(faq, 'la FAQ llama regular a «lie»').not.toMatch(LIE_REGULAR);
+    const errores = norm(await page.locator('[class*="warningList"]').textContent());
+    expect(errores, 'la caja de errores conjuga «lay/lie/lain»').not.toContain('lay/lie/lain');
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) · contenido — la FAQ «¿Qué verbos son irregulares en
+   * inglés pero no en español?» pone de ejemplo hear (oír), sleep (dormir) y feel (sentir). Los
+   * tres son irregulares en español: el Diccionario panhispánico de dudas (RAE-ASALE) marca
+   * «Verbo irregular» en dormir, sentir y oír (rae.es/dpd/dormir, /sentir, /oír; consultado el
+   * 25/09/2026). La matización de hear («regular en muchos tiempos») no salva la pregunta, y
+   * sleep y feel no llevan ninguna.
+   */
+  test('hallazgo · la FAQ no pone como «regulares en español» verbos que la RAE da por irregulares', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): sleep (dormir), feel (sentir) y hear (oír)
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const item = page.locator('[class*="faqItem"]').filter({ hasText: 'pero no en español' });
+    if ((await item.count()) > 0) {
+      expect(norm(await item.textContent())).not.toMatch(/sleep\/slept|feel\/felt|hear\/heard/);
+    }
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) · contenido — dos «10 verbos irregulares más
+   * frecuentes» distintos, y ninguno cuadra con los corpus.
+   * · Página (FAQ y nota «Los 10 más usados»): be, have, do, go, get, make, say, see, come, take.
+   * · FAQPage del JSON-LD: be, have, do, go, say, get, make, know, think, come.
+   * Oxford English Corpus (top 100, rangos en Wikipedia «Most common words in English»): be 2 ·
+   * have 9 · do 19 · say 28 · get 47 · go 49 · make 52 · know 59 · take 60 · see 69 · come 76 ·
+   * think 79. COCA: be 2 · have 8 · do 18 · say 19 · go 35 · get 39 · make 45 · know 47 · think 56 ·
+   * take 63 · see 67 · come 70. Los dos corpus coinciden en nueve: be, have, do, say, get, go,
+   * make, know, take. La página deja fuera «know» (8.º en los dos) y mete «come» (11.º-12.º).
+   */
+  test('hallazgo · la lista de los 10 más frecuentes es la misma en la página y en el JSON-LD, y contiene los 9 en que coinciden OEC y COCA', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): la página omite «know»; el JSON-LD da otra lista
+    const NUCLEO = ['be', 'have', 'do', 'say', 'get', 'go', 'make', 'know', 'take'];
+    const lista = (s: string): string[] => s.split(/,\s*|\s+y\s+/).map((v) => v.trim()).filter(Boolean).sort();
+    await abrirHidratada(page);
+    const faq = norm(await page.locator('[class*="faqItem"]').filter({ hasText: 'más usados en la práctica' }).textContent());
+    const enPagina = lista(grupo(faq, /escrito y oral son: ([^.]+)\./));
+    const nota = norm(await page.locator('[class*="eduNota"]').filter({ hasText: 'Los 10 más usados' }).textContent());
+    const enNota = nota.split(':')[1].split('·').map((t) => t.split('/')[0].trim()).sort();
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faqLd = bloques.find((b) => b.includes('FAQPage')) ?? '';
+    const enJsonLd = lista(grupo(faqLd, /frecuencia de uso son: ([^.]+)\./));
+
+    expect(enPagina).toHaveLength(10);
+    expect(enNota).toEqual(enPagina);
+    expect(enPagina, 'la lista de la página no contiene los 9 en que coinciden OEC y COCA').toEqual(expect.arrayContaining(NUCLEO));
+    expect(enJsonLd, 'el FAQPage da otra lista de los 10 más frecuentes').toEqual(enPagina);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 25/09/2026) · contenido — lenguaje Latam-friendly (CLAUDE.md del
+   * proyecto §1.bis). El quiz traduce «take» como «tomar / coger», y lo enseña en la pregunta y
+   * en el veredicto: «coger» es malsonante en México, Argentina y buena parte de Latinoamérica,
+   * que es la mitad del público. En la misma línea, sin caso propio: «conducir» por drive
+   * (en América, «manejar»), «quedar» por meet y los escenarios «EOI» y «Opositor». Ojo al
+   * repararlo: el caso «el banco dice la verdad» de arriba fija `es: 'tomar / coger'` en CANON.
+   */
+  test('hallazgo · el significado que el quiz enseña para «take» no usa «coger»', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): «"tomar / coger"»
+    await abrirHidratada(page);
+    // A1 con 15 preguntas recorre los 15 verbos del nivel, «take» incluido.
+    await arrancarPartida(page, 'A1 Básico', 15);
+    let significado: string | null = null;
+    for (let i = 1; i <= 15; i++) {
+      const inf = norm(await verboEnPantalla(page).textContent());
+      if (inf === 'take') {
+        significado = norm(await page.locator('[class*="verboSignificado"]').textContent());
+        break;
+      }
+      await pulsarOpcion(page, respuestaQueSePregunta(inf));
+      await botonSiguiente(page).click();
+    }
+    expect(significado, 'la partida de A1 con 15 preguntas no ha preguntado «take»').not.toBeNull();
+    expect(significado).not.toMatch(/coger/);
+  });
+});
+
+/**
+ * HALLAZGO bajo (Inspector 25/09/2026) · operativa — sospecha (b) CONFIRMADA.
+ * En un móvil de 360 × 740, con el desplazamiento mínimo que haría un dedo (subir lo justo para
+ * leer el enunciado bajo el logo, bajar lo justo para ver «Siguiente» entero), al tocar
+ * «Siguiente pregunta →» el feedback y el botón desaparecen y nadie devuelve la vista: medido el
+ * 25/09/2026 en 14 de 14 transiciones de una partida de 15, «Pregunta N de 15» queda en
+ * y = −10…7 (fuera y bajo la barra) y «¿Cuál es el Past Simple de...?» en y = 20…41, debajo del
+ * logo fijo (15-141 × 10-52); el HUD (pregunta, aciertos, precisión) en y = −193…−106. Con «be»
+ * lo tapado es justo el matiz «(con I, he, she, it)». Al empezar, el verbo mismo sale en
+ * y = −1…63, medio bajo el logo; y en el resultado, el título en y = −42…−4.
+ */
+test.describe('Inspector 25/09/2026 · móvil 360 × 740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('hallazgo · tras «Siguiente pregunta» el enunciado nuevo no queda bajo la barra fija del logo', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026): «Pregunta 2 de 10» y el enunciado, bajo el logo
+    const tocar = async (loc: Locator): Promise<void> => {
+      const b = await loc.boundingBox();
+      if (!b) throw new Error('el elemento no tiene caja');
+      await page.touchscreen.tap(b.x + Math.min(20, b.width / 2), b.y + b.height / 2);
+    };
+    await abrirHidratada(page);
+    await arrancarPartida(page, 'A1 Básico', 10);
+    await expect(page.getByText('Pregunta 1 de 10', { exact: true })).toBeAttached();
+
+    // Sube lo justo para leer el enunciado bajo el logo, o baja para ver la D…
+    await page.evaluate(() => {
+      const barra = document.querySelector('[class*="headerBar"]');
+      const bajoBarra = barra ? Math.max(0, ...[...barra.children].map((c) => c.getBoundingClientRect().bottom)) : 0;
+      const e = (document.querySelector('[class*="preguntaEtiqueta"]') as Element).getBoundingClientRect();
+      const d = [...document.querySelectorAll('[class*="opcionesGrid"] button')][3].getBoundingClientRect();
+      if (e.top < bajoBarra + 8) scrollBy(0, e.top - bajoBarra - 8);
+      else if (d.bottom > innerHeight) scrollBy(0, d.bottom - innerHeight + 10);
+    });
+    const inf = norm(await verboEnPantalla(page).textContent());
+    await tocar(await botonDeOpcion(page, respuestaQueSePregunta(inf)));
+    await expect(feedback(page)).toContainText('¡Correcto!');
+    // …baja lo justo para ver «Siguiente» entero y lo toca.
+    await page.evaluate(() => {
+      const r = (document.querySelector('[class*="btnSiguiente"]') as Element).getBoundingClientRect();
+      if (r.bottom > innerHeight - 10) scrollBy(0, r.bottom - innerHeight + 10);
+    });
+    await tocar(botonSiguiente(page));
+    await expect(page.getByText('Pregunta 2 de 10', { exact: true })).toBeAttached();
+
+    const tapadas = (): Promise<string[]> =>
+      page.evaluate(() => {
+        const barra = document.querySelector('[class*="headerBar"]');
+        const tapas = barra ? [...barra.children].map((c) => c.getBoundingClientRect()) : [];
+        const cruza = (a: DOMRect, b: DOMRect): boolean => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+        const fuera: string[] = [];
+        for (const clase of ['preguntaNumero', 'preguntaEtiqueta', 'verboPrincipal']) {
+          const el = document.querySelector(`[class*="${clase}"]`);
+          if (!el) continue;
+          const rango = document.createRange();
+          rango.selectNodeContents(el);
+          for (const l of rango.getClientRects()) {
+            if (l.top < 0 || tapas.some((t) => cruza(t, l))) fuera.push(`${clase} ${Math.round(l.top)}…${Math.round(l.bottom)}`);
+          }
+        }
+        return [...new Set(fuera)];
+      });
+    // Se sondea: una reparación con scroll suave tarda unos fotogramas en llevar la vista.
+    await expect.poll(tapadas, { message: 'líneas de la pregunta nueva fuera de pantalla o bajo el logo', timeout: 3000 }).toEqual([]);
   });
 });

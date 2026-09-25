@@ -5832,3 +5832,456 @@ test.describe('Inspección 24/09/2026 — el tipo de inmueble en el vendedor y l
     );
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Inspector 25/09/2026 — re-inspección de la app de referencia de la familia de compraventa.
+//
+// Viene por la SOSPECHA que dejó la del 24/09 sin caso reproducible, y la convierte en caso:
+//  (a) «Estimar por mí» rellena los gastos de aquella compra con ITP de SEGUNDA MANO a los tipos
+//      de HOY, y la pantalla no lo dice ni pregunta nada que permita saberlo (hallazgos A1 y A2).
+//  (b) La comisión lleva `max={10}`: con el foco, «15» calcula el 15 %; al salir del campo se
+//      reescribe a 10 sin una palabra y el neto sube (hallazgo B).
+// Y la inspección normal: CASOS 58-60 más cinco hallazgos nuevos (reinversión con la hipoteca que
+// agota el importe obtenido, su sondeo de ilegibles, el precio de compra 0, el % pegado, el
+// contraste de la marca y el ejemplo de Ana).
+//
+// Todos los importes están resueltos a mano ANTES de ejecutar, con: ITP_CCAA y los aranceles de
+// data/itp-ccaa.ts (RD 1426/1989 notaría, factura ×1,75; RD 1427/1989 registro),
+// IVA_INMUEBLES_2025, COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META.tipoOrientativo (25 %) y
+// TRAMOS_GANANCIAS_PATRIMONIALES_2025 (19/21/23/27/30 %) de data/fiscal, y el art. 41 del RIRPF
+// (RD 439/2007, texto consolidado del BOE consultado el 25/09/2026) que cita
+// data/fiscal/ganancia-inmueble.ts.
+//
+// Los porcentajes se buscan con « ?%» a propósito: el hallazgo del % pegado se va a reparar, y
+// estos casos no tienen que ponerse rojos por el espacio (valorTarjeta ya normaliza el duro).
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('Inspector 25/09/2026 — «Estimar por mí», el tope de la comisión y la reinversión', () => {
+  /** Escribe como el usuario y comprueba que el ESTADO de React lo recogió; después sale del campo. */
+  async function sembrar25(page: Page, etiqueta: string, valor: string, salir = true): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+    if (salir) await campo.blur();
+  }
+
+  async function abrir25(page: Page): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio de la vivienda"]']);
+  }
+
+  /** Pestaña Vendedor con el precio de venta y los campos indicados, en orden. */
+  async function vendedor25(
+    page: Page,
+    precio: string,
+    campos: ReadonlyArray<readonly [string, string]>,
+    ccaa?: string,
+  ): Promise<void> {
+    await abrir25(page);
+    if (ccaa) await page.locator('#ccaa-inmueble').selectOption(ccaa);
+    await sembrar25(page, 'Precio de la vivienda', precio);
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+    for (const [etiqueta, valor] of campos) await sembrar25(page, etiqueta, valor);
+  }
+
+  const formVendedor = (page: Page) => page.locator('div[class*="formVendedor"]');
+  const campoGastosCompra = (page: Page) =>
+    page.locator('input[aria-label="Impuestos y gastos que pagaste al comprar"]');
+
+  // ─── Montajes (los usan el CONTROL y cada `test.fail()`) ───────────────────────────────
+
+  /** A1 · Madrid · venta 300.000 · compra 200.000 (obra nueva en 2010) · 16 años · suelo 60.000. */
+  const montarObraNueva = (page: Page) =>
+    vendedor25(page, '300000', [
+      ['Precio de compra original', '200000'],
+      ['Años de propiedad', '16'],
+      ['Valor catastral del suelo', '60000'],
+    ]);
+
+  /** A2 · Valencia · venta 300.000 · compra 200.000 (de segunda mano, en 2025). */
+  const montarValencia = (page: Page) =>
+    vendedor25(page, '300000', [['Precio de compra original', '200000']], 'valencia');
+
+  /** B · BASE B (200.000 · compra 150.000 · 10 años · suelo 50.000) con «15» en la comisión, SIN salir. */
+  const montarComision15 = async (page: Page) => {
+    await vendedor25(page, '200000', [
+      ['Precio de compra original', '150000'],
+      ['Años de propiedad', '10'],
+      ['Valor catastral del suelo', '50000'],
+    ]);
+    await sembrar25(page, 'Comisión inmobiliaria (%)', '15', false);
+  };
+
+  /** R · 200.000 · compra 100.000 · 10 años · suelo 50.000 · 3 % · habitual · reinvierte `importe`. */
+  const montarReinversion = async (page: Page, importe: string) => {
+    await vendedor25(page, '200000', [
+      ['Precio de compra original', '100000'],
+      ['Años de propiedad', '10'],
+      ['Valor catastral del suelo', '50000'],
+    ]);
+    await page.getByRole('checkbox', { name: /Voy a reinvertir/ }).check();
+    await esperarHidratacion(page, ['input[aria-label="Importe que reinviertes en la nueva vivienda"]']);
+    await sembrar25(page, 'Importe que reinviertes en la nueva vivienda', importe);
+  };
+
+  /**
+   * CASO 58 (normal) — Asturias, segunda mano, vivienda de 350.000 €, perfil General. Asturias
+   * solo había pasado una vez, y nunca por su escala progresiva (ITP_CCAA.asturias.tramosProgresivos:
+   * 8 % hasta 300.000 · 9 % hasta 500.000 · 10 % el resto).
+   *   ITP      = 300.000 × 8 % + 50.000 × 9 % = 24.000 + 4.500                    =  28.500,00 €
+   *              efectivo 28.500 / 350.000 = 8,142857 %                           → «ITP (8,14 %)»
+   *   Notaría  = arancel 90,15 + 24.040,49 × 0,45 % + 30.050,60 × 0,15 % + 90.151,82 × 0,10 %
+   *              + 199.746,97 × 0,05 % = 433,43341 × 1,21 = 524,454426
+   *              × 1,75 = 917,80 € (horquilla × 1,5 = 786,68 € · × 2 = 1048,91 €)
+   *   Registro = 24,04 + 42,0708575 + 37,56325 + 67,613865 + 199.746,97 × 0,03 % (59,924091)
+   *              + 6,010121 + 3,005061 = 240,2272455 × 1,21                        =     290,67 €
+   *   Gestoría (GESTORIA_TIPICA)                                                   =     300,00 €
+   *   Total = 28.500 + 917,80 + 290,67 + 300 = 30.008,47 € → 8,5738 % → «8,57 %»
+   *   COSTE TOTAL = 380.008,47 €
+   */
+  test('CASO 58 (normal) — Asturias, 350.000 €: la escala progresiva cobra cada tramo a su tipo', async ({ page }) => {
+    expect(ITP_CCAA['asturias'].tipoGeneral).toBe(8);
+    expect(ITP_CCAA['asturias'].tramosProgresivos).toEqual([
+      { hasta: 300000, tipo: 8 },
+      { hasta: 500000, tipo: 9 },
+      { hasta: Infinity, tipo: 10 },
+    ]);
+
+    await abrir25(page);
+    await page.locator('#ccaa-inmueble').selectOption('asturias');
+    await sembrar25(page, 'Precio de la vivienda', '350000');
+
+    expect(await valorTarjeta(page, /ITP \(8,14\s?%\)/)).toBe('28.500,00 €');
+    expect(await valorTarjeta(page, /^Gastos de notaría/)).toBe('917,80 €');
+    expect(await descripcionTarjeta(page, /^Gastos de notaría/)).toContain('entre 786,68 € y 1048,91 €');
+    expect(await valorTarjeta(page, /^Registro de la Propiedad/)).toBe('290,67 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+    expect(await valorTarjeta(page, /^Total gastos adicionales/)).toBe('30.008,47 €');
+    expect(await descripcionTarjeta(page, /^Total gastos adicionales/)).toMatch(/^8,57\s?% sobre el precio$/);
+    expect(await valorTarjeta(page, /^COSTE TOTAL/)).toBe('380.008,47 €');
+    // La escala se nombra con sus tres tipos, que es lo que describe el cálculo de arriba
+    await expect(page.locator('div[class*="infoCcaa"]').first()).toContainText('escala progresiva');
+  });
+
+  /**
+   * CASO 59 (límite) — el tramo MÁS ALTO de la base del ahorro (30 % por encima de 300.000) con la
+   * comisión en su máximo admitido (10: el blur no la toca). Madrid · venta 1.000.000 · compra
+   * 400.000 · 17 años · suelo 300.000 · sin valor catastral total.
+   *   Plusvalía = 300.000 × 0,13 (17 años) × 25 %                                 =   9750,00 €
+   *   Comisión  = 1.000.000 × 10 %                                                 = 100.000,00 €
+   *   Transmisión = 1.000.000 − 100.000 − 9.750                                   = 890.250,00 €
+   *   Ganancia  = 890.250 − 400.000                                                = 490.250,00 €
+   *   IRPF = 6.000 × 19 % + 44.000 × 21 % + 150.000 × 23 % + 100.000 × 27 % + 190.250 × 30 %
+   *        = 1.140 + 9.240 + 34.500 + 27.000 + 57.075                             = 128.955,00 €
+   *   Total = 9.750 + 100.000 + 128.955 = 238.705,00 € · Neto = 761.295,00 €
+   */
+  test('CASO 59 (límite) — tramo del 30 % de la base del ahorro y la comisión en su tope de 10', async ({ page }) => {
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 17)?.coeficiente).toBe(0.13);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.map((t) => t.tipo)).toEqual([19, 21, 23, 27, 30]);
+
+    await vendedor25(page, '1000000', [
+      ['Precio de compra original', '400000'],
+      ['Años de propiedad', '17'],
+      ['Valor catastral del suelo', '300000'],
+      ['Comisión inmobiliaria (%)', '10'],
+    ]);
+    await expect(page.locator('input[aria-label="Comisión inmobiliaria (%)"]')).toHaveValue('10');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('9750,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método objetivo (falta el valor catastral total para comparar)',
+    );
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('890.250,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('490.250,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('128.955,00 €');
+    expect(await valorTarjeta(page, /Comisión inmobiliaria \(10\s?%\)/)).toBe('100.000,00 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('238.705,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('761.295,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
+  });
+
+  /**
+   * CASO 60 (debe rechazarse) — precio de compra «0». Una compraventa a 0 € no existe: no puede
+   * liquidar plusvalía (sin incremento calculable) ni ganancia, ni «Estimar por mí» puede estimar.
+   * Venta 200.000 · 10 años · suelo 50.000 · comisión 3 %: el neto queda en 200.000 − 6.000 =
+   * 194.000,00 € y se rotula PARCIAL.
+   */
+  test('CASO 60 (debe rechazarse) — un precio de compra 0 no liquida plusvalía ni IRPF', async ({ page }) => {
+    await vendedor25(page, '200000', [
+      ['Precio de compra original', '0'],
+      ['Años de propiedad', '10'],
+      ['Valor catastral del suelo', '50000'],
+    ]);
+    await expect(page.getByRole('button', { name: /Estimar por mí/ })).toBeDisabled();
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('Sin calcular');
+    expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('6000,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('194.000,00 €');
+    expect(await page.locator('h3', { hasText: /^IMPORTE NETO VENDEDOR/ }).first().innerText()).toBe(
+      'IMPORTE NETO VENDEDOR (PARCIAL)',
+    );
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toContain('el neto real puede ser menor que este');
+  });
+
+  /**
+   * CONTROL de montaje — repite la preparación de cada hallazgo y exige lo que la app publica hoy,
+   * calculado a mano. Si esto se pone rojo, el que falla es el montaje, no el hallazgo.
+   */
+  test('CONTROL de montaje — las preparaciones de los hallazgos del 25/09 publican las cifras del motor', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    expect(ITP_CCAA['madrid'].tipoGeneral).toBe(6);
+    expect(ITP_CCAA['madrid'].ajd).toBe(0.75);
+    expect(IVA_INMUEBLES_2025.obraNueva).toBe(10);
+    expect(ITP_CCAA['valencia'].tipoGeneral).toBe(9);
+
+    // A1 · «Estimar por mí» en Madrid para 200.000: ITP 6 % = 12.000 + notaría 758,98 + registro
+    // 236,22 + gestoría 300 = 13.295,20 → «13.295». Plusvalía 60.000 × 0,10 (16 años) × 25 % =
+    // 1.500 · comisión 9.000 · ganancia 289.500 − 213.295 = 76.205 → IRPF 1.140 + 9.240 + 26.205 ×
+    // 23 % = 16.407,15 · neto 300.000 − 1.500 − 9.000 − 16.407,15 = 273.092,85.
+    await montarObraNueva(page);
+    await page.getByRole('button', { name: /Estimar por mí/ }).click();
+    await esperarValorEnReact(page, campoGastosCompra(page), '13.295');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('213.295,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('16.407,15 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('273.092,85 €');
+    // Con lo que pagó de verdad una obra nueva, aun a los tipos de HOY: IVA 10 % (20.000) + AJD de
+    // Madrid 0,75 % (1.500) + los mismos 1.295,20 = 22.795,20 → ganancia 66.705 → IRPF 1.140 +
+    // 9.240 + 16.705 × 23 % = 14.222,15 · neto 275.277,85 (2.185 € más).
+    await sembrar25(page, 'Impuestos y gastos que pagaste al comprar', '22795');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('14.222,15 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('275.277,85 €');
+
+    // A2 · Valencia, 200.000: ITP 9 % = 18.000 + 1.295,20 = 19.295,20 → «19.295» (con el 10 % que
+    // regía antes del 01/06/2026, según data/fiscal/inmuebles.ts, serían 21.295).
+    await montarValencia(page);
+    await page.getByRole('button', { name: /Estimar por mí/ }).click();
+    await esperarValorEnReact(page, campoGastosCompra(page), '19.295');
+
+    // B · con el foco en la comisión, «15» se calcula al 15 %: comisión 30.000 · transmisión
+    // 200.000 − 30.000 − 1.500 = 168.500 · ganancia 18.500 → IRPF 1.140 + 12.500 × 21 % = 3.765 ·
+    // neto 200.000 − 1.500 − 30.000 − 3.765 = 164.735,00.
+    await montarComision15(page);
+    expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('30.000,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('164.735,00 €');
+
+    // R · reinvierte 250.000 con 192.499 de hipoteca: transmisión 200.000 − 6.000 − 1.500 = 192.500
+    // → importe total obtenido 1 € (art. 41.1 RIRPF) → reinvierte más → EXENTO.
+    await montarReinversion(page, '250000');
+    await sembrar25(page, 'Hipoteca pendiente de la vivienda que vendes', '192499');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('EXENTO');
+
+    // R · reinvierte 100.000 con 2.000,50 de hipoteca, LEGIBLE: importe total obtenido 190.499,50
+    // → exento 100.000 / 190.499,50 = 52,49 % de 92.500 → base 43.943,44 → IRPF 1.140 + 37.943,44
+    // × 21 % = 9108,12 · neto 200.000 − 1.500 − 6.000 − 9.108,12 = 183.391,88. Sin hipoteca: 9214,09.
+    await montarReinversion(page, '100000');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('9214,09 €');
+    await sembrar25(page, 'Hipoteca pendiente de la vivienda que vendes', '2000,50');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('9108,12 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('183.391,88 €');
+  });
+
+  /**
+   * HALLAZGO A1 [medio] (Inspector 25/09/2026) — «Estimar por mí» supone que aquella compra fue de
+   * SEGUNDA MANO. Quien compró obra nueva pagó IVA (10 %, IVA_INMUEBLES_2025.obraNueva) + AJD
+   * (Madrid 0,75 %), no ITP (6 %): en 200.000 € el botón escribe 13.295 cuando, aun a los tipos de
+   * hoy, fueron 22.795 — 9.500 € de menos en el valor de adquisición, que inflan la ganancia y el
+   * IRPF en 2.185,00 € (CONTROL). La pantalla no lo dice ni pregunta nada que permita saberlo: el
+   * rótulo del campo promete «ITP o IVA». Afirma lo correcto —que el formulario del vendedor
+   * nombre el caso de la obra nueva, sea preguntándolo o avisando de que el botón no lo cubre—.
+   */
+  test.fail('HALLAZGO A1 — «Estimar por mí» no dice que supone ITP de segunda mano (la obra nueva pagó IVA + AJD)', async ({
+    page,
+  }) => {
+    await montarObraNueva(page);
+    await page.getByRole('button', { name: /Estimar por mí/ }).click();
+    await esperarValorEnReact(page, campoGastosCompra(page), '13.295');
+    await expect(formVendedor(page)).toContainText(/obra nueva/i, { timeout: 2000 });
+  });
+
+  /**
+   * HALLAZGO A2 [bajo] (Inspector 25/09/2026) — el botón estima con los tipos de HOY de la
+   * comunidad, sea cual sea el año de aquella compra, y tampoco lo dice. Caso anclado en la propia
+   * ficha: data/fiscal/inmuebles.ts documenta que Valencia cobraba el 10 % hasta el 01/06/2026.
+   * Compra de 200.000 en 2025 → pagó 20.000 de ITP; el botón escribe 19.295 (ITP al 9 %), 2.000 €
+   * de menos (IRPF inflado en 2.000 × el tipo marginal). Afirma lo correcto: que el formulario diga
+   * que la estimación usa los tipos actuales (o pregunte el año).
+   */
+  test.fail('HALLAZGO A2 — «Estimar por mí» no dice que usa los tipos de hoy', async ({ page }) => {
+    await montarValencia(page);
+    await page.getByRole('button', { name: /Estimar por mí/ }).click();
+    await esperarValorEnReact(page, campoGastosCompra(page), '19.295');
+    await expect(formVendedor(page)).toContainText(/\bhoy\b|actuales|vigentes?|año de (la|aquella) compra/i, {
+      timeout: 2000,
+    });
+  });
+
+  /**
+   * HALLAZGO B [medio] (Inspector 25/09/2026) — la comisión lleva `max={10}` y el blur del
+   * NumberInput reescribe «15» a «10» sin decirlo: con el foco dentro la app publica el neto del
+   * 15 % (164.735,00 €, CONTROL) y al salir del campo el del 10 % (20.000 de comisión, IRPF
+   * 5865,00, neto 172.635,00 €: 7.900 € más), con el «Típico: 3-5%» como único texto del campo.
+   * La comisión es libre; una tarifa mínima sobre un inmueble barato la sube de 10.
+   * Afirma lo correcto: o se calcula lo escrito, o el campo dice su tope.
+   */
+  test.fail('HALLAZGO B — una comisión del 15 % no se reescribe a 10 en silencio al salir del campo', async ({
+    page,
+  }) => {
+    await montarComision15(page);
+    const campo = page.locator('input[aria-label="Comisión inmobiliaria (%)"]');
+    await campo.blur();
+    // Lo que el control ACEPTE (15 o 10) tiene que haber llegado a React antes de leer las tarjetas
+    await esperarValorEnReact(page, campo, await campo.inputValue());
+    const neto = await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/);
+    const textoDelCampo = await campo.evaluate((el) => (el as HTMLElement).parentElement?.innerText ?? '');
+    const diceElTope = /10\s?%|máximo|tope/i.test(textoDelCampo);
+    expect(neto === '164.735,00 €' || diceElTope).toBe(true);
+  });
+
+  /**
+   * HALLAZGO R1 [medio] (Inspector 25/09/2026) — la exención por reinversión DESAPARECE cuando la
+   * hipoteca pendiente iguala o supera el valor de transmisión. Art. 41.1 RIRPF: importe total
+   * obtenido = valor de transmisión − principal pendiente = 192.500 − 192.500 = 0; art. 41.4: la
+   * exención solo es proporcional «en el caso de que el importe de la reinversión fuera inferior al
+   * total obtenido», y 250.000 no lo es → exención total. El motor (`importeTotalObtenido > 0` en
+   * data/fiscal/ganancia-inmueble.ts) la descarta: IRPF 20.155,00 € (1.140 + 9.240 + 42.500 × 23 %),
+   * «Tributación en base del ahorro», sin nombrar la reinversión. Con 1 € MENOS de hipoteca, EXENTO.
+   */
+  test.fail('HALLAZGO R1 — con la hipoteca igual al valor de transmisión, reinvertir sigue eximiendo', async ({
+    page,
+  }) => {
+    await montarReinversion(page, '250000');
+    await sembrar25(page, 'Hipoteca pendiente de la vivienda que vendes', '192500');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('EXENTO');
+  });
+
+  /**
+   * HALLAZGO R2 [medio] (Inspector 25/09/2026) — invariante de la familia: con la hipoteca ILEGIBLE
+   * («2.000.50») y reinversión parcial, la app dice «no se puede saber» y nombra el campo DOS
+   * veces («no se han podido leer el principal pendiente de la hipoteca y el principal pendiente
+   * de la hipoteca … (… lo bajaría; … lo subiría)»). La dirección es segura: más principal
+   * pendiente → menos importe obtenido → más proporción exenta (art. 41.1 y 41.4 RIRPF), así que el
+   * neto real es MAYOR (con 2.000,50 legible, 183.391,88 € frente a 183.285,91 €, CONTROL). El
+   * sondeo «grande» (principal = precio de venta) cae en el agujero de R1 y sale al revés.
+   */
+  test.fail('HALLAZGO R2 — una hipoteca ilegible dice hacia dónde queda el neto, y la nombra una vez', async ({
+    page,
+  }) => {
+    await montarReinversion(page, '100000');
+    await sembrar25(page, 'Hipoteca pendiente de la vivienda que vendes', '2.000.50');
+    const neto = await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/);
+    expect(neto).not.toContain('el principal pendiente de la hipoteca y el principal pendiente de la hipoteca');
+    expect(neto).toContain('el neto real es MAYOR que este');
+  });
+
+  /**
+   * HALLAZGO P0 [bajo] (Inspector 25/09/2026) — patrón 5 de la familia con el precio de compra: un
+   * «0» escrito y a la vista (o un negativo, que el blur reescribe a 0) no «falta», y la app dice
+   * «Falta el precio de compra original» y «Rellena el precio de compra original» (CASO 60).
+   */
+  test.fail('HALLAZGO P0 — un precio de compra 0 no «falta»: está escrito y no vale', async ({ page }) => {
+    await vendedor25(page, '200000', [
+      ['Precio de compra original', '0'],
+      ['Años de propiedad', '10'],
+      ['Valor catastral del suelo', '50000'],
+    ]);
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).not.toContain('Falta el precio de compra original');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).not.toContain('Rellena el precio de compra original');
+  });
+
+  /**
+   * HALLAZGO % [bajo] (Inspector 25/09/2026) — desde el 25/09/2026 el % va separado de la cifra con
+   * espacio duro (CLAUDE.md global §2). La página lo pega en decenas de sitios: títulos «ITP
+   * (6,00%)», «AJD (0,75%)», «IVA (10,00%)», «Comisión inmobiliaria (3%)», «6,65% sobre el
+   * precio», el recuadro de la comunidad, los avisos de reducidos, la ayuda «Típico: 3-5%», las
+   * derivaciones y todo el bloque educativo; y el JSON-LD («IVA al 10%», «del 19% al 30%», «≥33%»).
+   */
+  test.fail('HALLAZGO % — ningún porcentaje visible ni del JSON-LD va pegado a la cifra', async ({ page }) => {
+    await abrir25(page);
+    await sembrar25(page, 'Precio de la vivienda', '200000');
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const visible = await page.locator('body').innerText();
+    const schemas = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    const pegados = `${visible} ${schemas}`.match(/\S{0,12}\d%/g) ?? [];
+    expect(pegados).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO C [bajo] (Inspector 25/09/2026, accesibilidad) — el módulo redeclara `--primary:
+   * #2E86AB` en `.container` y no en su variante oscura, y lo usa como color de TEXTO pequeño:
+   * «Estimar por mí» (13,6 px, 600) da 3,93:1 sobre #FAFAFA; la pestaña activa, blanco sobre
+   * #2E86AB (16 px, 600), 4,11:1; y en oscuro el tipo de inmueble activo (14,4 px, 600) 3,13:1.
+   * WCAG 1.4.3 pide 4,5:1. Medido en el navegador, no por regex.
+   */
+  test.fail('HALLAZGO C — el texto de marca de los controles llega a 4,5:1 en los dos temas', async ({ page }) => {
+    await abrir25(page);
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+    // Con precio de compra, para medir «Estimar por mí» HABILITADO (deshabilitado está exento)
+    await sembrar25(page, 'Precio de compra original', '150000');
+    // Sin transiciones: al cambiar de tema, getComputedStyle devolvería el color a medio camino
+    await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
+    const medir = (tema: string) =>
+      page.evaluate((t) => {
+        document.documentElement.setAttribute('data-theme', t);
+        const rgb = (s: string) => (s.match(/[\d.]+/g) ?? []).map(Number);
+        const lum = ([r, g, b]: number[]) => {
+          const f = (v: number) => {
+            const c = v / 255;
+            return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+          };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        const fondo = (el: Element) => {
+          const capas: number[][] = [];
+          for (let n: Element | null = el; n; n = n.parentElement) {
+            const c = rgb(getComputedStyle(n).backgroundColor);
+            const a = c.length > 3 ? c[3] : 1;
+            if (c.length >= 3 && a > 0) {
+              capas.push([c[0], c[1], c[2], a]);
+              if (a >= 1) break;
+            }
+          }
+          let res = [255, 255, 255];
+          for (const c of capas.reverse()) res = res.map((v, i) => v * (1 - c[3]) + c[i] * c[3]);
+          return res;
+        };
+        const ratio = (el: Element | undefined) => {
+          if (!el) return 0;
+          const a = lum(rgb(getComputedStyle(el).color));
+          const b = lum(fondo(el));
+          return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+        };
+        const botones = Array.from(document.querySelectorAll('button'));
+        return {
+          estimar: ratio(botones.find((b) => b.textContent?.includes('Estimar por mí'))),
+          pestana: ratio(botones.find((b) => b.getAttribute('aria-pressed') === 'true' && b.textContent?.includes('Vendedor'))),
+          tipo: ratio(botones.find((b) => b.getAttribute('aria-pressed') === 'true' && b.textContent?.includes('Vivienda (piso'))),
+        };
+      }, tema);
+    const claro = await medir('light');
+    const oscuro = await medir('dark');
+    for (const [nombre, valor] of Object.entries({ ...claro, tipoOscuro: oscuro.tipo })) {
+      expect(valor, `${nombre}: ${valor.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  /**
+   * HALLAZGO ANA [bajo] (Inspector 25/09/2026, contenido) — el ejemplo del bloque educativo afirma
+   * «su ganancia patrimonial es de 62.500 €» y dos frases después que Ana «además paga la plusvalía
+   * municipal …, que también minora el valor de transmisión»: la ganancia es 62.500 − plusvalía, y
+   * con esos datos la propia calculadora rotula 62.500 «Ganancia patrimonial (máximo)» (patrón 2 de
+   * la familia, 24/09/2026). Con un suelo de 60.000 € (CASO 47) la ganancia es 59.650 €.
+   */
+  test.fail('HALLAZGO ANA — el ejemplo no publica como ganancia la cifra antes de restar la plusvalía que cita', async ({
+    page,
+  }) => {
+    await abrir25(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const ana = await page.locator('p', { hasText: 'Ana vende su piso' }).first().innerText();
+    const contradice =
+      /ganancia patrimonial es de 62\.500/.test(ana) && /también minora el valor de transmisión/.test(ana);
+    expect(contradice).toBe(false);
+  });
+});

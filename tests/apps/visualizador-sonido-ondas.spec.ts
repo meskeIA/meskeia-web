@@ -601,3 +601,755 @@ test.describe('visualizador-sonido-ondas · lo reparado el 20/09/2026', () => {
     expect(texto).not.toContain('Es el volumen de un tráfico denso o un restaurante ruidoso');
   });
 });
+
+/**
+ * ════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR · 25/09/2026 — re-inspección, y la sospecha del 1757 de generador-ondas
+ * ════════════════════════════════════════════════════════════════════════════════════════
+ *
+ * LA SOSPECHA, MEDIDA (forma del hallazgo 1757 de generador-ondas, vista por lectura de código)
+ *   (a) Al desmontarse, la página llama a stopTone(), que hace osc.stop() SIN rampa de ganancia
+ *       (page.tsx 274-284 y 296-298). CONFIRMADA: al salir a «Óptica» con un tono de 1.000 Hz
+ *       sonando, la única llamada es stop() sin argumento; lo emitido cae de ≈ 0,097 a 0 en una
+ *       muestra — caída en 3 ms del 89 % del nivel (con una rampa lineal de 10 ms sería el 27 %,
+ *       de 50 ms el 9 %). stopTone es la misma función con la que cada nota corta a la anterior,
+ *       así que el chasquido también suena al encadenar notas o timbres.
+ *   (b) AudioContext de MÓDULO que no se cierra nunca. DESCARTADA como defecto audible: tras
+ *       salir con un tono (o con el timbre de piano, 6 osciladores) sonando, a los 0,7 s de reloj
+ *       de audio lo que llega a los altavoces es 0; y tres idas y vueltas crean UN solo contexto
+ *       (el módulo no se reevalúa en la navegación de cliente), así que no se acumulan. Lo que
+ *       queda es un contexto «running» y mudo en la app de destino: sin caso audible.
+ *
+ * LOS TRES CASOS, RESUELTOS A MANO ANTES DE ABRIR LA APP
+ *   normal   686 Hz, amplitud 70 %:
+ *              λ = 343/686 = 0,5 m → «λ = 0,50 m»      T = 1/686 s = 1,457726 ms → «T = 1,46 ms»
+ *              v = 343 m/s: aire a 20 °C, 331,3·√(1 + 20/273,15) = 343,2 m/s (gas ideal), que es
+ *              además la velocidad que la app declara en su tabla de medios.
+ *              Tono: 686 Hz, pico 70/100 · 0,5 = 0,35 (page.tsx: amplitud/100 · 0,5).
+ *              Notas: temperamento igual con La4 = 440 Hz (ISO 16:1975), f = 440·2^(n/12):
+ *              Do3 130,81 · Re3 146,83 · Mi3 164,81 · Fa3 174,61 · Sol3 196,00 · La3 220,00 ·
+ *              Si3 246,94 · Do4 261,63 (440·2^(−9/12) = 261,6256) · La4 440,00 · Do5 523,25.
+ *   límite   (Pixel 7) amplitud 150 → el control capa a 100 → pico 1 · 0,5 = 0,5; amplitud 0 →
+ *              capa a 5 → pico 0,05 · 0,5 = 0,025. Primera fila de la tabla de exposición:
+ *              85 dB · 8 horas = NIOSH REL (DHHS/NIOSH 98-126, 1998): 85 dBA durante 8 h.
+ *   rechazo  caso 10 (70 dB + una máquina igual): L = 70 + 10·log₁₀(2) = 73,0103 → 73,01 dB.
+ *              «140» (sumar decibelios) se rechaza: |140 − 73,01| = 66,99. Tolerancia
+ *              max(0,01; 1 % · 73,01) = 0,7301: «73,75» se rechaza (0,74) y «73,74» y «73.01»
+ *              se aceptan.
+ *
+ * LOS DATOS DE LOS HALLAZGOS, DE SU FUENTE
+ *   · NIOSH 98-126, Tabla 1-1 y tasa de intercambio de 3 dB: T = 480 / 2^((L − 85)/3) min.
+ *     A 120 dBA: 480 / 2^(35/3) = 0,1476 min = 8,9 s (la tabla de NIOSH: 118 dBA 14 s, 121 dBA 7 s).
+ *   · Velocidad del sonido: v = √(E/ρ) (sólidos) y √(K/ρ) (fluidos), Newton-Laplace: depende
+ *     de la RIGIDEZ entre la densidad. Densidades: agua 998 kg/m³ (20 °C), madera de pino
+ *     ≈ 500 kg/m³ (flota), diamante 3.510 kg/m³, acero 7.850 kg/m³.
+ *   · Ortografía de la RAE (2010): «15 %» separado; con cuatro cifras no se agrupa (1760);
+ *     el ordinal abreviado es «2.º» (letra volada), no el signo de grado «°» (U+00B0).
+ */
+import { devices, type Locator, type Page } from '@playwright/test';
+import { sembrarValor } from './_hidratacion';
+
+interface LlamadaSal {
+  quien: string;
+  metodo: string;
+  args: number[];
+  /** Reloj de audio (ctx.currentTime) en el instante de la llamada. */
+  ct: number;
+}
+
+interface VentanaSal {
+  __salLlamadas: LlamadaSal[];
+  __salBuses: { ctx: AudioContext; g: GainNode; an: AnalyserNode }[];
+  __salContextos: AudioContext[];
+}
+
+/**
+ * El modelo es el de generador-ondas y generador-tonos («HALLAZGO — al salir a otra app…»):
+ * anota cada automatización de las ganancias, start()/stop() con su argumento y cada close(),
+ * con el reloj de AUDIO; cuenta los AudioContext que se crean, y desvía todo lo que la app
+ * conecta a `ctx.destination` por un bus con un AnalyserNode: lo que mide ese bus es
+ * exactamente lo que llega a los altavoces. Si el contexto se cierra, su analizador conserva
+ * las últimas 32.768 muestras (0,68 s a 48 kHz).
+ */
+function INSTRUMENTAR_SALIDA(): void {
+  const w = window as unknown as VentanaSal;
+  w.__salLlamadas = [];
+  w.__salBuses = [];
+  w.__salContextos = [];
+  const Original = window.AudioContext;
+  class Contado extends Original {
+    constructor(opciones?: AudioContextOptions) {
+      super(opciones);
+      w.__salContextos.push(this);
+    }
+  }
+  window.AudioContext = Contado;
+
+  const dueno = new WeakMap<object, { id: string; ctx: BaseAudioContext }>();
+  const proto = BaseAudioContext.prototype;
+  const crearOsc = proto.createOscillator;
+  const crearGan = proto.createGain;
+  const crearAn = proto.createAnalyser;
+  let nOsc = 0;
+  let nGan = 0;
+  proto.createOscillator = function (this: BaseAudioContext): OscillatorNode {
+    const nodo = crearOsc.call(this);
+    const id = `osc${nOsc++}`;
+    dueno.set(nodo, { id, ctx: this });
+    dueno.set(nodo.frequency, { id: `${id}.frequency`, ctx: this });
+    return nodo;
+  };
+  proto.createGain = function (this: BaseAudioContext): GainNode {
+    const nodo = crearGan.call(this);
+    dueno.set(nodo.gain, { id: `gain${nGan++}.gain`, ctx: this });
+    return nodo;
+  };
+  const anotar = (obj: object, metodo: string, args: unknown[]): void => {
+    const d = dueno.get(obj);
+    if (!d) return;
+    w.__salLlamadas.push({
+      quien: d.id,
+      metodo,
+      args: args.filter((a): a is number => typeof a === 'number'),
+      ct: d.ctx.currentTime,
+    });
+  };
+  const param = AudioParam.prototype as unknown as Record<string, (...a: number[]) => AudioParam>;
+  for (const metodo of [
+    'setValueAtTime',
+    'linearRampToValueAtTime',
+    'exponentialRampToValueAtTime',
+    'setTargetAtTime',
+    'cancelScheduledValues',
+    'cancelAndHoldAtTime',
+  ]) {
+    const original = param[metodo];
+    param[metodo] = function (this: AudioParam, ...args: number[]): AudioParam {
+      anotar(this, metodo, args);
+      return original.apply(this, args);
+    };
+  }
+  const osc = OscillatorNode.prototype;
+  const arrancar = osc.start;
+  const parar = osc.stop;
+  osc.start = function (this: OscillatorNode, cuando?: number): void {
+    anotar(this, 'start', cuando === undefined ? [] : [cuando]);
+    return arrancar.call(this, cuando);
+  };
+  osc.stop = function (this: OscillatorNode, cuando?: number): void {
+    anotar(this, 'stop', cuando === undefined ? [] : [cuando]);
+    return parar.call(this, cuando);
+  };
+  const cerrar = Original.prototype.close;
+  Original.prototype.close = function (this: AudioContext): Promise<void> {
+    w.__salLlamadas.push({ quien: 'ctx', metodo: 'close', args: [], ct: this.currentTime });
+    return cerrar.call(this);
+  };
+  const nodo = AudioNode.prototype as unknown as { connect: (...a: unknown[]) => unknown };
+  const conectar = nodo.connect;
+  nodo.connect = function (this: AudioNode, destino: unknown, ...resto: unknown[]): unknown {
+    if (destino instanceof AudioDestinationNode) {
+      const ctx = this.context as AudioContext;
+      let bus = w.__salBuses.find((b) => b.ctx === ctx);
+      if (!bus) {
+        const g = crearGan.call(ctx);
+        const an = crearAn.call(ctx);
+        an.fftSize = 32768;
+        an.smoothingTimeConstant = 0;
+        conectar.call(g, ctx.destination);
+        conectar.call(g, an);
+        bus = { ctx, g, an };
+        w.__salBuses.push(bus);
+      }
+      return conectar.call(this, bus.g, ...resto);
+    }
+    return conectar.call(this, destino, ...resto);
+  };
+}
+
+const SEL_FREQ_25 = 'input[aria-label="Frecuencia en hercios"]';
+const SEL_AMP_25 = 'input[aria-label="Amplitud en porcentaje"]';
+const SEL_INST_25 = 'input[aria-label="Seleccionar instrumento"]';
+const RAMPAS = ['linearRampToValueAtTime', 'exponentialRampToValueAtTime', 'setTargetAtTime'];
+
+async function abrirInstrumentada(page: Page): Promise<void> {
+  await page.addInitScript(INSTRUMENTAR_SALIDA);
+  await page.goto(URL_APP);
+  await esperarHidratacion(page, [SEL_FREQ_25, SEL_AMP_25, SEL_INST_25]);
+}
+
+const llamadasSal = (page: Page): Promise<LlamadaSal[]> =>
+  page.evaluate(() => (window as unknown as VentanaSal).__salLlamadas);
+
+/** Reloj de audio del ÚLTIMO contexto que ha sonado (si la app cerrase y recrease, el vigente). */
+const relojSal = (page: Page): Promise<number> =>
+  page.evaluate(() => (window as unknown as VentanaSal).__salBuses.at(-1)?.ctx.currentTime ?? -1);
+
+/** Pulsa y espera, en el reloj de AUDIO, a que lo que ha empezado a sonar lleve `segundos`. */
+async function escuchar(
+  page: Page,
+  boton: Locator,
+  segundos: number,
+  pulsar: (b: Locator) => Promise<void> = (b) => b.click(),
+): Promise<number> {
+  const desde = (await llamadasSal(page)).length;
+  await pulsar(boton);
+  await expect.poll(async () => (await llamadasSal(page)).slice(desde).some((l) => l.metodo === 'start')).toBe(true);
+  const inicio = (await llamadasSal(page)).slice(desde).find((l) => l.metodo === 'start')?.ct ?? 0;
+  await expect
+    .poll(() => relojSal(page), { intervals: [20], timeout: 10000, message: 'el reloj de audio no avanza' })
+    .toBeGreaterThanOrEqual(inicio + segundos);
+  return inicio;
+}
+
+interface CapturaSal {
+  sr: number;
+  x: number[];
+  estado: string;
+}
+
+const capturarSal = (page: Page): Promise<CapturaSal> =>
+  page.evaluate(() => {
+    const b = (window as unknown as VentanaSal).__salBuses.at(-1);
+    if (!b) return { sr: 0, x: [], estado: 'sin-bus' };
+    const x = new Float32Array(b.an.fftSize);
+    b.an.getFloatTimeDomainData(x);
+    return { sr: b.ctx.sampleRate, x: Array.from(x), estado: b.ctx.state };
+  });
+
+/** Pico de |x| en el búfer (0,68 s) del último contexto: el nivel que llega a los altavoces. */
+const picoSal = async (page: Page): Promise<number> => {
+  const c = await capturarSal(page);
+  return c.x.reduce((m, v) => Math.max(m, Math.abs(v)), 0);
+};
+
+/** Frecuencia del pico del espectro que llega a los altavoces, con la anchura de su bin. */
+const espectroSal = (page: Page): Promise<{ hz: number; anchoBin: number }> =>
+  page.evaluate(() => {
+    const b = (window as unknown as VentanaSal).__salBuses.at(-1);
+    if (!b) return { hz: Number.NaN, anchoBin: Number.NaN };
+    const d = new Float32Array(b.an.frequencyBinCount);
+    b.an.getFloatFrequencyData(d);
+    const anchoBin = b.ctx.sampleRate / b.an.fftSize;
+    let pico = -Infinity;
+    let k = -1;
+    for (let i = 1; i < d.length; i++) {
+      if (d[i] > pico) {
+        pico = d[i];
+        k = i;
+      }
+    }
+    return { hz: k * anchoBin, anchoBin };
+  });
+
+/**
+ * La mayor CAÍDA de la envolvente en 3 ms, relativa al nivel de los 30 ms anteriores.
+ * Envolvente = máximo de |x| en ±0,75 ms (a 1.000 Hz, un periodo y medio), en pasos de 0,25 ms.
+ * Validada sobre señales sintéticas del mismo tono con su decaimiento de 1,5 s: corte en seco
+ * 0,889 · rampa lineal de 5 ms 0,537 · de 10 ms 0,274 · de 50 ms 0,090 · setTargetAtTime con
+ * τ = 5 ms 0,395 · sin corte 0,010. Umbral 0,45: el corte en seco (medido 0,889 en la app) queda
+ * al doble, y cualquier rampa de 10 ms o más, o τ ≥ 5 ms, por debajo.
+ */
+function caidaMaxima3ms(c: CapturaSal): { caida: number; nivel: number } {
+  const ms = (m: number): number => Math.round((m / 1000) * c.sr);
+  const w = ms(0.75);
+  const paso = Math.max(1, ms(0.25));
+  const env: number[] = [];
+  for (let i = 0; i < c.x.length; i += paso) {
+    let m = 0;
+    for (let k = Math.max(0, i - w); k <= Math.min(c.x.length - 1, i + w); k++) m = Math.max(m, Math.abs(c.x[k]));
+    env.push(m);
+  }
+  const d3 = Math.round(ms(3) / paso);
+  const d30 = Math.round(ms(30) / paso);
+  let caida = 0;
+  let nivel = 0;
+  for (let j = d30; j + d3 < env.length; j++) {
+    let ref = 0;
+    for (let k = j - d30; k <= j; k++) ref = Math.max(ref, env[k]);
+    nivel = Math.max(nivel, ref);
+    if (ref < 0.02) continue;
+    caida = Math.max(caida, (env[j] - env[j + d3]) / ref);
+  }
+  return { caida, nivel };
+}
+
+/** Sale por la tarjeta de RelatedApps: navegación de cliente, que DESMONTA la página. */
+async function salirAOptica(page: Page): Promise<void> {
+  await page.locator('a[href*="/visualizador-optica/"]').first().click();
+  await page.waitForURL(/visualizador-optica/);
+}
+
+/** Contraste texto/fondo del primer elemento; para texto SVG, el color es el `fill`. */
+const contrasteDe = (loc: Locator): Promise<number> =>
+  loc.first().evaluate((el) => {
+    interface C {
+      r: number;
+      g: number;
+      b: number;
+      a: number;
+    }
+    const leer = (s: string): C => {
+      const m = s.match(/rgba?\(([^)]+)\)/);
+      if (!m) return { r: 0, g: 0, b: 0, a: 0 };
+      const p = m[1].split(/[\s,/]+/).filter(Boolean).map(Number);
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+    const mezcla = (a: C, b: C): C => ({
+      r: a.r * a.a + b.r * (1 - a.a),
+      g: a.g * a.a + b.g * (1 - a.a),
+      b: a.b * a.a + b.b * (1 - a.a),
+      a: 1,
+    });
+    const lum = ({ r, g, b }: C): number => {
+      const f = (v: number): number => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+    };
+    const capas: C[] = [];
+    for (let e: Element | null = el; e; e = e.parentElement) {
+      const c = leer(getComputedStyle(e).backgroundColor);
+      if (c.a > 0) {
+        capas.push(c);
+        if (c.a === 1) break;
+      }
+    }
+    let fondo: C = { r: 255, g: 255, b: 255, a: 1 };
+    for (let i = capas.length - 1; i >= 0; i--) fondo = mezcla(capas[i], fondo);
+    const estilo = getComputedStyle(el);
+    const texto = mezcla(leer(el instanceof SVGElement ? estilo.fill : estilo.color), fondo);
+    const [l1, l2] = [lum(texto), lum(fondo)];
+    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+  });
+
+/** Tamaño de letra con el que se PINTA: en SVG, el `font-size` por la escala del viewBox. */
+const letraPintada = (loc: Locator): Promise<number> =>
+  loc.first().evaluate((el) => {
+    const base = parseFloat(getComputedStyle(el).fontSize);
+    if (el instanceof SVGGraphicsElement) {
+      const m = el.getScreenCTM();
+      return m ? base * Math.hypot(m.a, m.b) : base;
+    }
+    return base;
+  });
+
+test.describe('visualizador-sonido-ondas · Inspector 25/09/2026', () => {
+  test('CASO NORMAL · 686 Hz: λ = 0,50 m, T = 1,46 ms, suena a 686 Hz con pico 0,35, y las diez notas en temperamento igual', async ({
+    page,
+  }) => {
+    await abrirInstrumentada(page);
+    // Arranca en 200 Hz: pedir 686 MUEVE el estado de verdad.
+    await sembrarValor(page, SEL_FREQ_25, 686);
+
+    const panel = page.locator('svg[aria-label^="Onda sinusoidal"] text');
+    await expect(panel.nth(0)).toHaveText('λ = 0,50 m'); // 343/686 = 0,5 m
+    await expect(panel.nth(1)).toHaveText('T = 1,46 ms'); // 1/686 s = 1,457726 ms
+    await expect(page.locator('svg[aria-label^="Onda sinusoidal"]')).toHaveAttribute(
+      'aria-label',
+      /^Onda sinusoidal a 686 Hz con amplitud 70/,
+    );
+
+    await escuchar(page, page.getByRole('button', { name: 'Escuchar tono a 686 hercios' }), 0.25);
+    const log = await llamadasSal(page);
+    expect(
+      log.filter((l) => l.quien.endsWith('.frequency') && l.metodo === 'setValueAtTime').map((l) => l.args[0]),
+    ).toEqual([686]);
+    // Lo que SALE: pico del espectro dentro del bin de 686 Hz (1,46 Hz a 48 kHz)…
+    const pico = await espectroSal(page);
+    expect(Math.abs(pico.hz - 686), `pico en ${pico.hz} Hz`).toBeLessThanOrEqual(pico.anchoBin);
+    // …y a 70/100 · 0,5 = 0,35 de pico. El primer máximo del seno llega a 0,36 ms, con la
+    // rampa exponencial apenas empezada (0,3495): el intervalo caza un 0,5 o un 0,7.
+    const nivel = await picoSal(page);
+    expect(nivel).toBeGreaterThan(0.33);
+    expect(nivel).toBeLessThanOrEqual(0.3505);
+
+    // Las diez notas: 440·2^(n/12), redondeadas a 2 decimales (ISO 16:1975, La4 = 440 Hz).
+    const filas = await page
+      .locator('[role="button"][aria-label^="Escuchar "][aria-label$=" hercios"]')
+      .evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')));
+    expect(filas).toEqual([
+      'Escuchar Do3 (C3) a 130,81 hercios',
+      'Escuchar Re3 (D3) a 146,83 hercios',
+      'Escuchar Mi3 (E3) a 164,81 hercios',
+      'Escuchar Fa3 (F3) a 174,61 hercios',
+      'Escuchar Sol3 (G3) a 196,00 hercios',
+      'Escuchar La3 (A3) a 220,00 hercios',
+      'Escuchar Si3 (B3) a 246,94 hercios',
+      'Escuchar Do4 (C4) a 261,63 hercios',
+      'Escuchar La4 (A4) a 440,00 hercios',
+      'Escuchar Do5 (C5) a 523,25 hercios',
+    ]);
+    // Y la nota suena a lo que rotula, también con la barra espaciadora (reparación 1058).
+    const desde = (await llamadasSal(page)).length;
+    await page.getByRole('button', { name: 'Escuchar Do4 (C4) a 261,63 hercios' }).focus();
+    await page.keyboard.press(' ');
+    await expect
+      .poll(async () =>
+        (await llamadasSal(page))
+          .slice(desde)
+          .filter((l) => l.quien.endsWith('.frequency') && l.metodo === 'setValueAtTime')
+          .map((l) => l.args[0]),
+      )
+      .toEqual([261.63]);
+  });
+
+  test('CASO RECHAZO · caso 10: sumar decibelios (140) se rechaza con la desviación exacta; 73,01 se acepta', async ({
+    page,
+  }) => {
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    const seccion = page.locator('#casos-aula');
+    await seccion.getByRole('button', { name: 'Caso 10: Dos máquinas iguales a la vez' }).click();
+    await expect(seccion.getByRole('heading', { level: 3 })).toContainText('Caso 10');
+    const casilla = seccion.locator('#casos-respuesta');
+    // Acotado a la sección: getByRole('alert') casaría también con #__next-route-announcer__.
+    const veredicto = seccion.getByRole('alert');
+    const responder = async (texto: string): Promise<void> => {
+      await casilla.fill(texto);
+      await esperarValorEnReact(page, '#casos-respuesta', texto);
+      await seccion.getByRole('button', { name: 'Comprobar' }).click();
+    };
+
+    // 70 + 70 = 140 es el error que el caso existe para corregir: |140 − 73,01| = 66,99.
+    await responder('140');
+    await expect(veredicto).toContainText('No es correcto. Te has desviado 66,99 de la respuesta.');
+    // Justo fuera de la tolerancia (0,7301): 73,75 − 73,01 = 0,74.
+    await responder('73,75');
+    await expect(veredicto).toContainText('Te has desviado 0,74');
+    // Justo dentro (0,73) y el valor exacto, con coma y con punto decimal.
+    for (const bueno of ['73,74', '73,01', '73.01']) {
+      await responder(bueno);
+      await expect(veredicto).toContainText('¡Correcto!');
+    }
+  });
+
+  test('SOSPECHA (b) descartada · al salir con un tono o un timbre sonando no queda nada sonando, y volver no acumula contextos', async ({
+    page,
+  }) => {
+    await abrirInstrumentada(page);
+    for (const sonido of ['tono', 'timbre', 'tono'] as const) {
+      let boton = page.getByRole('button', { name: /^Escuchar tono a / });
+      if (sonido === 'timbre') {
+        await sembrarValor(page, SEL_INST_25, 2); // Piano: 6 osciladores
+        boton = page.getByRole('button', { name: 'Escuchar La4 con timbre de Piano' });
+      }
+      await escuchar(page, boton, 0.3);
+      await salirAOptica(page);
+      // En la app de destino: cada contexto, o cerrado, o mudo en todo su búfer de 0,68 s.
+      await expect
+        .poll(
+          async () =>
+            page.evaluate(() =>
+              (window as unknown as VentanaSal).__salBuses.every((b) => {
+                if (b.ctx.state === 'closed') return true;
+                const x = new Float32Array(b.an.fftSize);
+                b.an.getFloatTimeDomainData(x);
+                return x.every((v) => Math.abs(v) < 1e-3);
+              }),
+            ),
+          { timeout: 5000, message: `el ${sonido} sigue sonando en la app de destino` },
+        )
+        .toBe(true);
+      await page.goBack();
+      await page.waitForURL(/visualizador-sonido-ondas/);
+      await esperarHidratacion(page, [SEL_FREQ_25, SEL_INST_25]);
+    }
+    // Medido hoy: UN contexto en las tres vueltas. Si la reparación cerrase al salir y
+    // crease otro al volver, lo que importa es que nunca haya más de uno vivo.
+    const vivos = await page.evaluate(
+      () => (window as unknown as VentanaSal).__salContextos.filter((c) => c.state !== 'closed').length,
+    );
+    expect(vivos).toBeLessThanOrEqual(1);
+  });
+
+  /**
+   * HALLAZGO [bajo, operativa] (Inspector 25/09/2026) — SOSPECHA (a) confirmada, forma del
+   * 1757/1637 de generador-ondas y generador-tonos. Al desmontarse, stopTone() hace osc.stop()
+   * sin rampa (page.tsx 274-284, llamada desde el efecto de 296-298).
+   * Medido (1.000 Hz, amplitud 70 %, 48 kHz, clic en «Óptica» a los 0,3 s de reloj de audio):
+   *   llamadas tras el clic: stop() sin argumento — ninguna sobre la ganancia;
+   *   lo emitido: de ≈ 0,097 a 0 en una muestra → caída en 3 ms del 89 % del nivel.
+   * Esperado con el patrón reparado (apagarConRampa de diapason, 50 ms): 9 %. Umbral 45 %.
+   */
+  test('HALLAZGO — al salir a otra app con un tono sonando, la ganancia baja en rampa y no se corta en seco', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    await abrirInstrumentada(page);
+    await sembrarValor(page, SEL_FREQ_25, 1000); // un periodo de 1 ms: la envolvente se mide fina
+    await escuchar(page, page.getByRole('button', { name: 'Escuchar tono a 1000 hercios' }), 0.3);
+    const desde = (await llamadasSal(page)).length;
+    await salirAOptica(page);
+
+    // Se espera a que el sonido haya terminado: o el contexto está cerrado, o los últimos 10 ms
+    // de su búfer ya son silencio (el final del tono sigue dentro de los 0,68 s capturados).
+    await expect
+      .poll(
+        async () => {
+          const c = await capturarSal(page);
+          const cola = c.x.slice(c.x.length - Math.round(0.01 * c.sr));
+          return c.estado === 'closed' || cola.every((v) => Math.abs(v) < 1e-4);
+        },
+        { intervals: [20], timeout: 5000, message: 'el tono no termina al salir de la página' },
+      )
+      .toBe(true);
+    const { caida, nivel } = caidaMaxima3ms(await capturarSal(page));
+    const log = (await llamadasSal(page)).slice(desde);
+    expect(nivel, 'la captura contiene el tono que sonaba al salir').toBeGreaterThan(0.03);
+    expect(caida, `caída de la envolvente en 3 ms · llamadas tras salir: ${JSON.stringify(log)}`).toBeLessThan(0.45);
+  });
+
+  /**
+   * Mismo HALLAZGO, el camino más transitado: stopTone() es también la función con la que cada
+   * nota corta a la anterior (playTone la llama antes de arrancar), así que encadenar notas en la
+   * lista de «Notas musicales» chasquea igual. Medido: clic en Do4 y, a los 0,2 s, en La4 →
+   * stop() sin argumento sobre el oscilador de Do4 y ninguna automatización de su ganancia.
+   */
+  test('HALLAZGO — encadenar dos notas: la que sonaba sale con rampa, no con stop() en seco', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    await abrirInstrumentada(page);
+    await escuchar(page, page.getByRole('button', { name: 'Escuchar Do4 (C4) a 261,63 hercios' }), 0.2);
+    const antes = await llamadasSal(page);
+    const oscDo = antes
+      .find((l) => l.quien.endsWith('.frequency') && l.metodo === 'setValueAtTime' && l.args[0] === 261.63)
+      ?.quien.replace('.frequency', '');
+    expect(oscDo, 'el oscilador de Do4').toBeTruthy();
+    const gananciasPrevias = new Set(antes.filter((l) => l.quien.endsWith('.gain')).map((l) => l.quien));
+    const desde = antes.length;
+    await page.getByRole('button', { name: 'Escuchar La4 (A4) a 440,00 hercios' }).click();
+    await expect.poll(async () => (await llamadasSal(page)).slice(desde).some((l) => l.metodo === 'start')).toBe(true);
+
+    const log = (await llamadasSal(page)).slice(desde);
+    const rampa = log.find(
+      (l) => gananciasPrevias.has(l.quien) && RAMPAS.includes(l.metodo) && Number(l.args[0]) <= 1e-3,
+    );
+    expect(rampa, `llamadas al pulsar La4: ${JSON.stringify(log)}`).toBeDefined();
+    const stop = log.find((l) => l.quien === oscDo && l.metodo === 'stop');
+    if (stop) {
+      expect(stop.args.length, 'stop() sin argumento corta en el acto').toBe(1);
+      expect(stop.args[0]).toBeGreaterThanOrEqual(Number(rampa?.args[1]) - 1e-6);
+    }
+  });
+
+  /**
+   * HALLAZGO [medio, contenido] (Inspector 25/09/2026). La tarjeta «Velocidad del sonido en
+   * diferentes medios» lleva por subtítulo «Cuanto más denso el medio, más rápido viaja», y su
+   * propia tabla lo desmiente dos veces: la madera (≈ 500 kg/m³, flota) transmite a 3.300 m/s y
+   * el agua (998 kg/m³) a 1.480; el diamante (3.510 kg/m³) a 12.000 y el acero (7.850 kg/m³) a
+   * 5.100. v = √(E/ρ): a igual rigidez, MÁS densidad es MÁS lento. Es la idea errónea más
+   * extendida sobre este tema, en una app cuyo 68 % de visitas llega de aulas.
+   */
+  test('HALLAZGO — la velocidad del sonido no se atribuye a la densidad: la propia tabla lo desmiente', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO medio (Inspector 25/09/2026)
+    // Las dos premisas salen de la tabla que la app pinta, no de fuera.
+    expect(velocidadEn('Madera')).toBeGreaterThan(velocidadEn('Agua'));
+    expect(velocidadEn('Diamante')).toBeGreaterThan(velocidadEn('Acero'));
+    await page.goto(URL_APP);
+    const texto = (await page.locator('section#anatomia').innerText()).replace(/\s+/g, ' ');
+    expect(texto).not.toMatch(/más denso[^.]*más rápido/i);
+  });
+
+  /**
+   * HALLAZGO [bajo, dato] (Inspector 25/09/2026). La tabla «Tiempo de exposición segura» se
+   * atribuye a NIOSH («cada +3 dB reduce el tiempo a la mitad») y en su última fila da
+   * «120 dB · 0 seg» (minutos: 0, sin barra). Con la regla que ella misma enuncia:
+   * 480 / 2^((120 − 85)/3) = 0,1476 min = 8,9 s (NIOSH 98-126, Tabla 1-1: 118 dBA 14 s, 121 dBA 7 s).
+   * Si la fila se retira, el caso pasa.
+   */
+  test('HALLAZGO — a 120 dB la tabla NIOSH no da «0 seg», sino unos 9 s', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    const fila = EXPOSICION.find((e) => e.db === 120);
+    if (!fila) return;
+    // 0,1476 min; precisión 1 (±0,05 min = ±3 s): el defecto es de 0,15 min, un orden más.
+    expect(fila.minutos, 'minutos tabulados a 120 dB').toBeCloseTo(0.1476, 1);
+    await page.goto(URL_APP);
+    await expect(page.locator('[class*="exposicionRow"]', { hasText: '120 dB' })).not.toContainText('0 seg');
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] (Inspector 25/09/2026) — el % pegado a la cifra (regla del
+   * 25/09/2026: «15 %», con espacio duro). Dónde: lectura del deslizador de amplitud («70%»),
+   * sus extremos («5%», «100%»), los seis porcentajes de «Armónicos por instrumento» («100%»,
+   * «30%»…), el aviso «auriculares al 60% del volumen máximo» y el aria-label del SVG
+   * («… con amplitud 70%»).
+   */
+  test('HALLAZGO — el % va separado de la cifra, en el texto y en los nombres accesibles', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    await page.goto(URL_APP);
+    for (const id of ['anatomia', 'frecuencia', 'decibelios', 'timbre']) {
+      const texto = await page.locator(`section#${id}`).innerText();
+      expect(texto.match(/[^\n]{0,20}\d%/g) ?? [], `sección #${id}`).toEqual([]);
+    }
+    const nombres = await page
+      .locator('section [aria-label]')
+      .evaluateAll((els) => els.map((e) => e.getAttribute('aria-label') ?? '').filter((a) => /\d%/.test(a)));
+    expect(nombres).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] (Inspector 25/09/2026) — cifras de cuatro dígitos con punto de
+   * millar, y el mismo número en dos formatos (la forma del 1063): «La6 = 1.760 Hz» y
+   * «(880, 1.320, 1.760 Hz...)» junto a «3° armónico (3f): 1320 Hz → 4° (4f): 1760 Hz» del
+   * formateador; el caso 5 dice «1.700 Hz» y su solución «5100 / 1700»; el caso 8, «1.100 Hz» y
+   * «1100 / 5». Además «4.000-6.000 Hz», «1.100 millones», «Un segundo son 1.000 milisegundos»,
+   * «× 1.000» en las soluciones de los casos 2 y 12, y «hace 2.500 años» (bloque educativo).
+   */
+  test('HALLAZGO — las cifras de cuatro dígitos no se agrupan, y un número no sale en dos formatos', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    const seccion = page.locator('#casos-aula');
+    const textos: string[] = [];
+    // Todo el contenedor de la app, incluido el bloque educativo plegado (está en el DOM).
+    textos.push(await page.locator('h1').evaluate((h) => h.closest('header')?.parentElement?.textContent ?? ''));
+    for (const n of [2, 5, 8, 12]) {
+      await seccion.getByRole('button', { name: new RegExp(`^Caso ${n}:`) }).click();
+      await expect(seccion.getByRole('heading', { level: 3 })).toContainText(`Caso ${n} `);
+      await seccion.getByRole('button', { name: /Ver pista/ }).click();
+      await seccion.getByRole('button', { name: /Ver solución/ }).click();
+      textos.push(await seccion.innerText());
+    }
+    // «1.320, 1.760»: la coma que sigue a un número es de enumeración, no decimal, y cuenta.
+    const agrupadas = textos.join('\n').match(/(?<![\d.,])\d\.\d{3}(?!\d|[.,]\d)[^\n]{0,8}/g) ?? [];
+    expect(agrupadas).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] (Inspector 25/09/2026). Los ordinales de «Armónicos por
+   * instrumento» se escriben con el signo de GRADO (U+00B0): «2° arm.» … «6° arm.», «2° armónico
+   * (2f)», «3° armónico (3f)», «4° (4f)». La abreviatura es «2.º» (punto y o volada, U+00BA);
+   * con «°» un lector de pantalla en español lee «2 grados».
+   */
+  test('HALLAZGO — los ordinales se abrevian «2.º», no con el signo de grado', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    await page.goto(URL_APP);
+    const texto = await page.locator('section#timbre').innerText();
+    expect(texto.match(/\d°[^\n]{0,10}/g) ?? []).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO [bajo, accesibilidad] (Inspector 25/09/2026). El deslizador «Seleccionar
+   * instrumento» elige entre seis timbres con un índice 0-5 y no lleva aria-valuetext: el lector
+   * de pantalla anuncia «Seleccionar instrumento, 2» en lugar de «Piano». El nombre visible está
+   * en un <label> que no está asociado al control.
+   */
+  test('HALLAZGO — el deslizador de instrumento anuncia el instrumento, no su índice', async ({ page }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, [SEL_INST_25]);
+    await sembrarValor(page, SEL_INST_25, 2); // índice 2 = «Piano» en INSTRUMENTOS
+    await expect(page.getByText('Piano', { exact: true }).first()).toBeVisible();
+    await expect(page.locator(SEL_INST_25)).toHaveAttribute('aria-valuetext', /Piano/);
+  });
+
+  /**
+   * HALLAZGO [bajo, accesibilidad] (Inspector 25/09/2026). Texto por debajo de 4,5:1 (todo por
+   * debajo de 18,66 px en negrita). Medido en claro: λ del panel #48A9A6 sobre blanco 2,80:1 ·
+   * lectura del deslizador y frecuencias de notas/medios/animales/armónicos en #2E86AB 3,77-4,11:1
+   * · niveles en dB de las zonas segura y de precaución 2,87:1 · etiquetas «Seguro»/«Precaución»
+   * 2,55-2,65:1 · unidad del dato destacado 2,68:1 · título del caso («Caso 1 · …») 2,68:1.
+   * En oscuro, `.container` fija --primary: #2E86AB sin variante: T del panel 3,50:1, cifras de
+   * medios, notas, animales y armónicos 3,08:1.
+   */
+  test('HALLAZGO — las cifras en color de marca y las etiquetas de zona pasan de 4,5:1 en claro y en oscuro', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, [SEL_FREQ_25]);
+    await page.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}' });
+    const medidas: Record<string, number> = {
+      'λ del panel (claro)': await contrasteDe(page.getByText(/^λ = [\d,]+ m$/)),
+      'frecuencia de las notas (claro)': await contrasteDe(page.locator('[class*="notaFreq"]')),
+      'nivel en dB, zona segura (claro)': await contrasteDe(page.locator('[class*="dbValor"]')),
+      'etiqueta «Seguro» (claro)': await contrasteDe(page.locator('[class*="dbTag"]')),
+      'unidad del dato destacado (claro)': await contrasteDe(page.locator('[class*="datoUnidad"]')),
+      'título del caso (claro)': await contrasteDe(page.locator('[class*="casoTitulo"]')),
+    };
+    await page.getByRole('button', { name: /Cambiar a modo oscuro/ }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    medidas['velocidad por medio (oscuro)'] = await contrasteDe(page.locator('[class*="velocidadValor"]'));
+    medidas['T del panel (oscuro)'] = await contrasteDe(page.getByText(/^T = [\d,]+ (ms|μs)$/));
+    for (const [donde, ratio] of Object.entries(medidas)) {
+      expect(ratio, `${donde}: la medida tiene que existir`).toBeGreaterThan(1);
+      expect(ratio, donde).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+});
+
+test.describe('visualizador-sonido-ondas · Inspector 25/09/2026 · en móvil (Pixel 7)', () => {
+  // Se enumeran las opciones en vez de esparcir `...devices['Pixel 7']` porque el device trae
+  // `defaultBrowserType` y Playwright no lo admite dentro de un describe.
+  const PIXEL_7 = devices['Pixel 7'];
+  test.use({
+    viewport: PIXEL_7.viewport,
+    userAgent: PIXEL_7.userAgent,
+    deviceScaleFactor: PIXEL_7.deviceScaleFactor,
+    isMobile: PIXEL_7.isMobile,
+    hasTouch: PIXEL_7.hasTouch,
+  });
+
+  test('CASO LÍMITE · amplitud 150 → 100 (pico 0,5) y 0 → 5 (pico 0,025); la tabla empieza en 85 dB · 8 horas', async ({
+    page,
+  }) => {
+    await abrirInstrumentada(page);
+    expect(page.viewportSize()).toEqual({ width: 412, height: 839 }); // devices['Pixel 7']
+    const anchos = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollWidth,
+      cliente: document.documentElement.clientWidth,
+    }));
+    expect(anchos.scroll).toBeLessThanOrEqual(anchos.cliente);
+
+    const tocar = (b: Locator): Promise<void> => b.tap();
+    const boton = page.getByRole('button', { name: 'Escuchar tono a 200 hercios' });
+
+    // Techo: el control capa 150 a 100 → 100/100 · 0,5 = 0,5. El primer máximo del seno
+    // (1,25 ms a 200 Hz) llega con la rampa apenas empezada: 0,4974. Nunca por encima de 0,5.
+    expect(await sembrarValorAcotado(page, SEL_AMP_25, 150)).toBe('100');
+    const inicio = await escuchar(page, boton, 0.2, tocar);
+    const alto = await picoSal(page);
+    expect(alto).toBeGreaterThan(0.45);
+    expect(alto).toBeLessThanOrEqual(0.5005);
+    // Se deja acabar el tono (1,5 s) y vaciarse el búfer del bus (0,68 s), en reloj de AUDIO.
+    await expect
+      .poll(() => relojSal(page), { intervals: [50], timeout: 10000 })
+      .toBeGreaterThanOrEqual(inicio + 1.5 + 0.75);
+
+    // Suelo: el control sube 0 a 5 → 5/100 · 0,5 = 0,025 (primer máximo: 0,02493).
+    expect(await sembrarValorAcotado(page, SEL_AMP_25, 0)).toBe('5');
+    await escuchar(page, boton, 0.2, tocar);
+    const bajo = await picoSal(page);
+    expect(bajo).toBeGreaterThan(0.02);
+    expect(bajo).toBeLessThanOrEqual(0.0251);
+
+    // NIOSH REL: 85 dBA durante 8 h es la primera fila, y +3 dB la parte por dos.
+    const filas = page.locator('[class*="exposicionRow"]');
+    await expect(filas.nth(0)).toContainText('85 dB');
+    await expect(filas.nth(0)).toContainText('8 horas');
+    await expect(filas.nth(1)).toContainText('88 dB');
+    await expect(filas.nth(1)).toContainText('4 horas');
+  });
+
+  /**
+   * HALLAZGO [medio, accesibilidad] (Inspector 25/09/2026). λ y T —las dos cifras que la app
+   * calcula— solo existen como <text font-size="12"> DENTRO del SVG de viewBox 800 × 200, que se
+   * escala al ancho del contenedor. En un Pixel 7 el SVG mide 362 px: 12 · 362/800 = 5,43 px de
+   * letra (caja de 7 px de alto). No hay otra lectura de λ ni de T en la página. Umbral 11 px:
+   * el texto más pequeño que la app usa fuera del SVG es de 10,88-11,2 px.
+   */
+  test('HALLAZGO — en el móvil λ y T se pintan a un tamaño legible, no a 5 px', async ({ page }) => {
+    test.fail(); // HALLAZGO medio (Inspector 25/09/2026)
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, [SEL_FREQ_25]);
+    for (const patron of [/^λ = [\d,]+ m$/, /^T = [\d,]+ (ms|μs)$/]) {
+      expect(await letraPintada(page.getByText(patron)), String(patron)).toBeGreaterThanOrEqual(11);
+    }
+  });
+});
