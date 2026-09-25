@@ -193,6 +193,13 @@ const RUTA = '/simulador-heredar-vivienda/';
 /** El año que la app usa para la tenencia del causante: el del reloj, ya no una constante. */
 const ANIO = new Date().getFullYear();
 
+/** Año y mes (1-12) de hace `n` meses completos: la app cuenta meses desde el 25/09/2026. */
+function haceMeses(n: number): { anio: number; mes: number } {
+  const hoy = new Date();
+  const total = hoy.getFullYear() * 12 + hoy.getMonth() - n; // getMonth() va de 0 a 11
+  return { anio: Math.floor(total / 12), mes: (total % 12) + 1 };
+}
+
 /**
  * Abre el simulador y espera a que la app esté VIVA. El `goto` solo garantiza que los chunks
  * se han descargado, no que React los haya ejecutado: hasta entonces los deslizadores y las
@@ -647,14 +654,19 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    *   17.187,50 de la línea de abajo. Se deja la aserción literal de lo que se pinta y se
    *   reporta aparte; no es un dato de este test decidir cómo debe rotularlo la app.
    */
-  test('GUARDA — tramo del 34 %, coeficiente 2,0000 y 0 años de tenencia (Grupo IV, 2.000.000 € en Asturias)', async ({
+  test('GUARDA — tramo del 34 %, coeficiente 2,0000 y 11 meses de tenencia (Grupo IV, 2.000.000 € en Asturias)', async ({
     page,
   }) => {
     await abrir(page);
 
     await page.selectOption('#parentescoSel', 'sin_parentesco');
     await page.selectOption('#ccaaSel', 'asturias');
-    await mover(page, 'anioAdq', ANIO); // 0 años de tenencia
+    // Once meses completos exactos, sea cual sea el día en que corra el test. Hasta el 25/09/2026
+    // la app no preguntaba el mes y rotulaba aquí el TECHO de 11 meses; desde el hallazgo 1615
+    // los cuenta, así que se siembran 11 para que las cifras de abajo sigan siendo las mismas.
+    const adq = haceMeses(11);
+    await mover(page, 'anioAdq', adq.anio);
+    await page.selectOption('#mesAdq', String(adq.mes));
     await mover(page, 'valorAdq', 30000);
     await mover(page, 'valorRef', 2000000); // tope del deslizador
     await mover(page, 'valorSuelo', 500000);
@@ -677,10 +689,10 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
     expect(COEFICIENTES_IIVTNU_2025[0].coeficiente).toBe(0.15);
     expect(coeficienteIIVTNU(0)).toMatchObject({ prorrateado: true, meses: 11, cotaSuperior: true });
 
-    expect(await panel(page, IIVTNU)).toContain('0 años de tenencia');
-    // 0,15 × 11/12 = 0,1375: es un TECHO (la app no pregunta los meses) y se rotula como tal, con
-    // cuatro decimales para que cuadre con la cuota de abajo (con dos se leía «0,14»).
-    expect(await linea(page, IIVTNU, 'Coeficiente, menos de 1 año (máximo: prorrateado a 11 meses)')).toBe('0,1375');
+    expect(await panel(page, IIVTNU)).toContain('11 meses de tenencia');
+    // 0,15 × 11/12 = 0,1375, con cuatro decimales para que cuadre con la cuota de abajo (con
+    // dos se leía «0,14»). Ya no es un techo: son los 11 meses completos sembrados.
+    expect(await linea(page, IIVTNU, 'Coeficiente, menos de 1 año (prorrateado a 11 meses)')).toBe('0,1375');
     // 500.000 × 0,1375 × 25 % (hallazgo 1559)
     expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('17.187,50 €');
     expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('246.250,00 €');
@@ -688,7 +700,7 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
 
     // 1.257.045,34 + 17.187,50 (hallazgo 1559)
     expect(await bloqueTotal(page)).toContain('1.274.232,84');
-    expect(await page.locator('label[for="anioAdq"]').innerText()).toContain('(0 años hasta hoy)');
+    expect(await page.locator('label[for="anioAdq"]').innerText()).toContain('(11 meses hasta hoy)');
   });
 
   /**
@@ -5238,6 +5250,50 @@ test.describe('Simulador de heredar vivienda — re-inspección 21/09/2026', () 
       new RegExp(
         `prorrogable otros ${PLAZO_ISD.mesesProrroga} meses[\\s\\S]*prorrogable hasta ${PLAZO_IIVTNU.mesesMaximoConProrroga} meses`
       )
+    );
+  });
+});
+
+/* ────────────────────────────────────────────────────────────────────────────────────────────
+ * REPARADO el 25/09/2026 (hallazgo 1615). La tenencia del IIVTNU se calculaba como «año actual
+ * − año de adquisición», pero el art. 107.4 TRLRHL toma AÑOS COMPLETOS y, por debajo del año,
+ * prorratea por MESES completos. Visto el 24/09/2026: compra en diciembre de 2016 → «10 años» y
+ * 0,12 cuando eran 9 años completos y 0,15; compra en diciembre de 2025 → «1 año» y 0,15 entero
+ * cuando eran 9 meses y 0,15 × 9/12 = 0,1125. La app pregunta ahora el mes.
+ * Los casos se siembran en meses RELATIVOS a hoy para que no dependan del día de la ejecución.
+ * ──────────────────────────────────────────────────────────────────────────────────────────── */
+test.describe('Hallazgo 1615 · años completos y prorrateo por meses', () => {
+  test('9 años y 11 meses cuentan como 9 años: coeficiente de 9, no de 10', async ({ page }) => {
+    await abrir(page);
+    const adq = haceMeses(9 * 12 + 11);
+    await mover(page, 'anioAdq', adq.anio);
+    await page.selectOption('#mesAdq', String(adq.mes));
+    // Con el año solo, salvo en diciembre, «año actual − año» daba 10 (el defecto).
+    const coef9 = COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 9)!.coeficiente;
+    expect(coef9).toBe(0.15); // tabla del art. 107.4 (RDL 8/2023)
+    expect(await panel(page, IIVTNU)).toContain('9 años de tenencia');
+    expect(await linea(page, IIVTNU, 'Coeficiente 9 años')).toBe('0,15');
+    expect(await page.locator('label[for="anioAdq"]').innerText()).toContain('(9 años hasta hoy)');
+  });
+
+  test('9 meses completos prorratean: 0,15 × 9/12 = 0,1125', async ({ page }) => {
+    await abrir(page);
+    const adq = haceMeses(9);
+    await mover(page, 'anioAdq', adq.anio);
+    await page.selectOption('#mesAdq', String(adq.mes));
+    expect(await panel(page, IIVTNU)).toContain('9 meses de tenencia');
+    expect(await linea(page, IIVTNU, 'Coeficiente, menos de 1 año (prorrateado a 9 meses)')).toBe('0,1125');
+  });
+
+  test('con el mes de hoy y el año pasado son 12 meses: «1 año» y el coeficiente de 1 año entero', async ({ page }) => {
+    await abrir(page);
+    const adq = haceMeses(12);
+    await mover(page, 'anioAdq', adq.anio);
+    await page.selectOption('#mesAdq', String(adq.mes));
+    const coef1 = COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 1)!.coeficiente;
+    expect(await panel(page, IIVTNU)).toContain('1 año de tenencia');
+    expect(await linea(page, IIVTNU, 'Coeficiente 1 año')).toBe(
+      new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(coef1)
     );
   });
 });

@@ -114,6 +114,8 @@ interface ResultadoPlusvalia {
   metodoElegido: 'objetivo' | 'real' | 'exenta';
   cuotaFinal: number;
   aniosTenencia: number;
+  /** Meses completos de tenencia en total; decide el prorrateo por debajo del año */
+  mesesTenencia: number;
   coeficiente: number;
 }
 
@@ -298,6 +300,37 @@ const TIPO_MUNICIPAL_PLUSVALIA = PLUSVALIA_MUNICIPAL_META.tipoOrientativo / 100;
  * coeficiente del IIVTNU) y el tope del deslizador de año de adquisición.
  */
 const ANIO_REFERENCIA = 2026;
+/** Mes (1-12) con el que se pinta el HTML del servidor; el real lo pone el mismo useEffect. */
+const MES_REFERENCIA = 1;
+
+const MESES = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+];
+
+/**
+ * Meses completos entre la adquisición y hoy (hallazgo 1615, 25/09/2026).
+ *
+ * El art. 107.4 TRLRHL manda tomar «años completos» y, por debajo del año, prorratear el
+ * coeficiente por «meses completos». Con solo el año, «año actual − año de adquisición»
+ * contaba un año de más a quien compró en un mes posterior al de hoy (diciembre de 2016,
+ * visto en septiembre de 2026: 10 años y coeficiente 0,12 en vez de 9 y 0,15) y aplicaba el
+ * coeficiente entero con «1 año» sin haberlo cumplido. El día no se pregunta: se supone que
+ * no es posterior al de hoy, que es lo que el propio mes ya dice en todos los demás casos.
+ */
+function mesesCompletosDesde(anio: number, mes: number, anioHoy: number, mesHoy: number): number {
+  return Math.max(0, anioHoy * 12 + mesHoy - (anio * 12 + mes));
+}
+
+/** «9 años», «1 año y 3 meses», «8 meses»: la tenencia tal como decide el coeficiente. */
+function textoTenencia(meses: number): string {
+  const anios = Math.floor(meses / 12);
+  const resto = meses % 12;
+  const a = `${anios} ${anios === 1 ? 'año' : 'años'}`;
+  const m = `${resto} ${resto === 1 ? 'mes' : 'meses'}`;
+  if (anios === 0) return m;
+  return a;
+}
 
 /**
  * La cuota íntegra la calcula `calcularCuotaIntegraIS`, el mismo helper que usan
@@ -537,14 +570,16 @@ function calcularPlusvaliaMunicipal(
   valorCatastralSuelo: number,
   valorAdquisicionOriginal: number,
   valorReferenciaActual: number,
-  aniosTenencia: number,
+  mesesTenencia: number,
   valorCatastralTotal: number
 ): ResultadoPlusvalia {
   // Coeficiente según años (max 20). Desde el 24/09/2026 sale de `coeficienteIIVTNU`, que lee
   // la tabla vigente del art. 107.4 (RDL 8/2023) y prorratea por meses por debajo del año;
   // antes se consultaba aquí la del RDL 26/2021, caducada desde 2023 (hallazgos 1559 y 1560).
-  const aniosClamp = Math.min(20, Math.max(0, aniosTenencia));
-  const coeficiente = coeficienteIIVTNU(aniosClamp).coeficiente;
+  // Años COMPLETOS (art. 107.4); por debajo del año, los meses completos prorratean (hallazgo 1615).
+  const meses = Math.max(0, Math.floor(mesesTenencia));
+  const aniosClamp = Math.min(20, Math.floor(meses / 12));
+  const coeficiente = coeficienteIIVTNU(aniosClamp, aniosClamp < 1 ? meses : undefined).coeficiente;
 
   // Método objetivo: valor catastral del suelo × coef × tipo municipal (art. 107.4 TRLHL)
   const baseObjetiva = valorCatastralSuelo * coeficiente;
@@ -568,6 +603,7 @@ function calcularPlusvaliaMunicipal(
       metodoElegido: 'exenta',
       cuotaFinal: 0,
       aniosTenencia: aniosClamp,
+      mesesTenencia: meses,
       coeficiente,
     };
   }
@@ -582,6 +618,7 @@ function calcularPlusvaliaMunicipal(
     metodoElegido,
     cuotaFinal,
     aniosTenencia: aniosClamp,
+    mesesTenencia: meses,
     coeficiente,
   };
 }
@@ -650,6 +687,8 @@ export default function SimuladorHeredarViviendaPage() {
   const [edad, setEdad] = useState<number>(45);
   const [ccaa, setCcaa] = useState<string>('madrid');
   const [anioAdquisicion, setAnioAdquisicion] = useState<number>(1995);
+  // Enero por defecto: con él, «año actual − año» sigue siendo la tenencia de quien no lo toca.
+  const [mesAdquisicion, setMesAdquisicion] = useState<number>(1);
   const [valorAdquisicion, setValorAdquisicion] = useState<number>(80000);
   const [valorReferencia, setValorReferencia] = useState<number>(200000);
   const [valorCatastralSuelo, setValorCatastralSuelo] = useState<number>(60000);
@@ -665,8 +704,11 @@ export default function SimuladorHeredarViviendaPage() {
   // El año real solo se conoce en el navegador: en el primer render (y en el HTML que se
   // sirve) vale ANIO_REFERENCIA, para que servidor y cliente pinten lo mismo
   const [anioActual, setAnioActual] = useState<number>(ANIO_REFERENCIA);
+  const [mesActual, setMesActual] = useState<number>(MES_REFERENCIA);
   useEffect(() => {
-    setAnioActual(new Date().getFullYear());
+    const hoy = new Date();
+    setAnioActual(hoy.getFullYear());
+    setMesActual(hoy.getMonth() + 1);
   }, []);
 
   const aplicarCaso = useCallback((caso: CasoPreconfigurado) => {
@@ -674,6 +716,7 @@ export default function SimuladorHeredarViviendaPage() {
     setEdad(caso.edad);
     setCcaa(caso.ccaa);
     setAnioAdquisicion(caso.anioAdquisicion);
+    setMesAdquisicion(1);
     setValorAdquisicion(caso.valorAdquisicion);
     setValorReferencia(caso.valorReferencia);
     setValorCatastralSuelo(caso.valorCatastralSuelo);
@@ -685,7 +728,8 @@ export default function SimuladorHeredarViviendaPage() {
   }, []);
 
   // Cálculos
-  const aniosTenenciaCausante = anioActual - anioAdquisicion;
+  // Un mes de adquisición posterior al actual en el año en curso no ha llegado: se topa en hoy.
+  const mesesTenenciaCausante = mesesCompletosDesde(anioAdquisicion, mesAdquisicion, anioActual, mesActual);
 
   const isd = useMemo(
     () => calcularISD(valorReferencia, parentesco, ccaa, viviendaHabitual, edad, convivioDosAnios),
@@ -698,10 +742,10 @@ export default function SimuladorHeredarViviendaPage() {
         valorCatastralSuelo,
         valorAdquisicion,
         valorReferencia,
-        aniosTenenciaCausante,
+        mesesTenenciaCausante,
         valorCatastralTotal
       ),
-    [valorCatastralSuelo, valorAdquisicion, valorReferencia, aniosTenenciaCausante, valorCatastralTotal]
+    [valorCatastralSuelo, valorAdquisicion, valorReferencia, mesesTenenciaCausante, valorCatastralTotal]
   );
 
   /**
@@ -723,7 +767,7 @@ export default function SimuladorHeredarViviendaPage() {
             valorCatastralSuelo,
             valorReferencia,
             valorVenta,
-            aniosHastaVenta,
+            aniosHastaVenta * 12,
             valorCatastralTotal
           )
         : null,
@@ -915,7 +959,7 @@ export default function SimuladorHeredarViviendaPage() {
               Año de adquisición de la vivienda:{' '}
               <span className={styles.sliderValue}>{anioAdquisicion}</span>
               <span className={styles.muted}>
-                {' '}({aniosTenenciaCausante} años hasta hoy)
+                {' '}({textoTenencia(mesesTenenciaCausante)} hasta hoy)
               </span>
             </label>
             <input
@@ -932,6 +976,23 @@ export default function SimuladorHeredarViviendaPage() {
               <span>1985</span>
               <span>{anioActual}</span>
             </div>
+            {/* El IIVTNU cuenta años COMPLETOS y, por debajo del año, meses (art. 107.4 TRLRHL):
+                con solo el año se contaba uno de más según el mes de la compra (hallazgo 1615). */}
+            <label className={styles.selectLabel} htmlFor="mesAdq">
+              Mes de adquisición (escritura):
+            </label>
+            <select
+              id="mesAdq"
+              value={mesAdquisicion}
+              onChange={e => setMesAdquisicion(Number(e.target.value))}
+              className={styles.select}
+            >
+              {MESES.map((nombre, i) => (
+                <option key={nombre} value={i + 1}>
+                  {nombre}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className={styles.sliderGroup}>
@@ -1348,7 +1409,7 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.panelPlusvalia}>
             <h3 className={styles.panelHeaderTitle}>2. Plusvalía municipal (herencia)</h3>
             <p className={styles.panelHeaderSub}>
-              IIVTNU — {plusvalia.aniosTenencia} años de tenencia
+              IIVTNU — {textoTenencia(Math.min(plusvalia.mesesTenencia, 240))} de tenencia
             </p>
 
             <div className={styles.panelLine}>
@@ -1356,13 +1417,13 @@ export default function SimuladorHeredarViviendaPage() {
               <strong>{formatCurrency(valorCatastralSuelo)}</strong>
             </div>
             <div className={styles.panelLine}>
-              {/* Por debajo del año el coeficiente se prorratea por meses y la app no los pregunta:
-                  es el TECHO con 11 meses (coeficienteIIVTNU), y con dos decimales 0,1375 se leía
-                  «0,14» junto a una cuota calculada con 0,1375 (24/09/2026, hallazgo 1560). */}
+              {/* Por debajo del año el coeficiente se prorratea por los meses completos, que desde
+                  el hallazgo 1615 se preguntan; con dos decimales 0,1375 se leía «0,14» junto a una
+                  cuota calculada con 0,1375 (hallazgo 1560), de ahí los cuatro. */}
               <span>
                 {plusvalia.aniosTenencia < 1
-                  ? 'Coeficiente, menos de 1 año (máximo: prorrateado a 11 meses)'
-                  : `Coeficiente ${plusvalia.aniosTenencia} años`}
+                  ? `Coeficiente, menos de 1 año (prorrateado a ${textoTenencia(plusvalia.mesesTenencia)})`
+                  : `Coeficiente ${plusvalia.aniosTenencia} ${plusvalia.aniosTenencia === 1 ? 'año' : 'años'}`}
               </span>
               <strong>{formatNumber(plusvalia.coeficiente, plusvalia.aniosTenencia < 1 ? 4 : 2)}</strong>
             </div>
