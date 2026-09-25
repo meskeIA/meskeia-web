@@ -254,13 +254,27 @@ test.describe('visualizador-sonido-ondas · casos para clase', () => {
   test('10 · la tabla de exposición que corrige es la misma que la app pinta', async () => {
     // `minutos` y `tiempo` son el mismo dato en dos formatos: si divergieran, el caso 6
     // corregiría con un número que la pantalla no dice en ninguna parte.
+    // Hasta el 25/09/2026 la lista incluía «'0 seg': 0» para 120 dB, que consagraba el
+    // hallazgo 1850: con la regla de NIOSH son 8,86 s. Las filas exactas siguen siendo exactas.
     const equivalencias: Record<string, number> = {
       '8 horas': 480, '4 horas': 240, '2 horas': 120, '1 hora': 60,
-      '30 min': 30, '15 min': 15, '0 seg': 0,
+      '30 min': 30, '15 min': 15,
     };
     for (const fila of EXPOSICION) {
       const esperado = equivalencias[fila.tiempo];
       if (esperado !== undefined) expect(fila.minutos, `${fila.db} dB`).toBe(esperado);
+    }
+    // Y las que no son redondas: el texto, releído en segundos, dista menos de medio segundo
+    // de `minutos` (NIOSH 98-126, Tabla 1-1: 110 dBA → 1 min 29 s).
+    const aSegundos = (t: string): number => {
+      const m = t.match(/^(?:(\d+) min)?\s*(?:(\d+) s)?$/);
+      return m ? Number(m[1] ?? 0) * 60 + Number(m[2] ?? 0) : Number.NaN;
+    };
+    const porDb = (db: number) => EXPOSICION.find((e) => e.db === db)!;
+    expect(porDb(110).tiempo).toBe('1 min 29 s');
+    expect(porDb(120).tiempo).toBe('9 s');
+    for (const db of [110, 120]) {
+      expect(Math.abs(aSegundos(porDb(db).tiempo) - porDb(db).minutos * 60), `${db} dB`).toBeLessThan(0.5);
     }
   });
 });
@@ -282,7 +296,8 @@ test.describe('visualizador-sonido-ondas · los casos, en la página', () => {
     const casilla = seccion.locator('#casos-respuesta');
     await casilla.fill('0,5');
     await seccion.getByRole('button', { name: 'Comprobar' }).click();
-    // Acotado a la sección: la app ya tiene otro role="alert" (el aviso de seguridad auditiva).
+    // Acotado a la sección: fuera de ella, getByRole('alert') casaría también con el anunciador
+    // de rutas de Next (#__next-route-announcer__). El aviso de seguridad auditiva ya no es un alert.
     await expect(seccion.getByRole('alert')).toContainText('Correcto');
 
     // Y una respuesta equivocada no se da por buena.
@@ -429,6 +444,9 @@ function INSTRUMENTAR_AUDIO(): void {
 test.describe('visualizador-sonido-ondas · el panel de onda (Inspector 20/09/2026)', () => {
   const SEL_FRECUENCIA = 'input[aria-label="Frecuencia en hercios"]';
   const SVG_ONDA = 'svg[aria-label^="Onda sinusoidal"]';
+  // λ y T se leían como `${SVG_ONDA} text`: era justo el defecto 1847 (texto de 5 px en móvil).
+  // Desde el 25/09/2026 viven en HTML, fuera del SVG; las cifras esperadas no cambian.
+  const LECTURAS = '[class*="lecturaValor"]';
 
   test('caso normal · 440 Hz: λ = 0,78 m, T = 2,27 ms y el tono sale a 440 Hz', async ({ page }) => {
     await page.addInitScript(INSTRUMENTAR_AUDIO);
@@ -440,14 +458,15 @@ test.describe('visualizador-sonido-ondas · el panel de onda (Inspector 20/09/20
     const aceptado = await sembrarValorAcotado(page, SEL_FRECUENCIA, 440);
     expect(aceptado).toBe('440');
 
-    const panel = page.locator(`${SVG_ONDA} text`);
+    const panel = page.locator(LECTURAS);
     // λ = 343/440 = 0,779545… m, a dos decimales.
     await expect(panel.nth(0)).toHaveText('λ = 0,78 m');
     // T = 1/440 = 0,00227272… s = 2,27272… ms. Por encima de 1 ms la app rotula en ms.
     await expect(panel.nth(1)).toHaveText('T = 2,27 ms');
     await expect(page.locator(SVG_ONDA)).toHaveAttribute(
       'aria-label',
-      'Onda sinusoidal a 440 Hz con amplitud 70%',
+      // % separado con espacio duro (regla del 25/09/2026, hallazgo 1851).
+      'Onda sinusoidal a 440 Hz con amplitud 70\u00A0%',
     );
 
     const boton = page.getByRole('button', { name: 'Escuchar tono a 440 hercios' });
@@ -489,7 +508,7 @@ test.describe('visualizador-sonido-ondas · el panel de onda (Inspector 20/09/20
     const tope = await sembrarValorAcotado(page, SEL_FRECUENCIA, 5000);
     expect(tope).toBe('2000');
 
-    const panel = page.locator(`${SVG_ONDA} text`);
+    const panel = page.locator(LECTURAS);
     // λ = 343/2000 = 0,1715 m → 0,17 m a dos decimales.
     await expect(panel.nth(0)).toHaveText('λ = 0,17 m');
     // T = 1/2000 = 0,0005 s: por debajo de 1 ms la app cambia de unidad a microsegundos.
@@ -566,8 +585,11 @@ test.describe('visualizador-sonido-ondas · lo reparado el 20/09/2026', () => {
         6,
       );
     }
-    // Y con cero minutos no hay barra que pintar.
-    expect(anchoBarraExposicion(porDb(120).minutos)).toBe(0);
+    // Y con cero minutos no hay barra que pintar. (Hasta el 25/09/2026 esto se comprobaba con la
+    // fila de 120 dB, que decía «0 seg»: era el hallazgo 1850. A 120 dB NIOSH admite 8,86 s, así
+    // que su barra es la mínima visible, no ninguna.)
+    expect(anchoBarraExposicion(0)).toBe(0);
+    expect(anchoBarraExposicion(porDb(120).minutos)).toBe(0.6);
   });
 
   test('el ejercicio de práctica trae pista, y es la del mecanismo que toca', () => {
@@ -943,7 +965,8 @@ test.describe('visualizador-sonido-ondas · Inspector 25/09/2026', () => {
     // Arranca en 200 Hz: pedir 686 MUEVE el estado de verdad.
     await sembrarValor(page, SEL_FREQ_25, 686);
 
-    const panel = page.locator('svg[aria-label^="Onda sinusoidal"] text');
+    // Lecturas en HTML desde la reparación del 1847 (antes, `svg … text`).
+    const panel = page.locator('[class*="lecturaValor"]');
     await expect(panel.nth(0)).toHaveText('λ = 0,50 m'); // 343/686 = 0,5 m
     await expect(panel.nth(1)).toHaveText('T = 1,46 ms'); // 1/686 s = 1,457726 ms
     await expect(page.locator('svg[aria-label^="Onda sinusoidal"]')).toHaveAttribute(
@@ -1076,7 +1099,6 @@ test.describe('visualizador-sonido-ondas · Inspector 25/09/2026', () => {
   test('HALLAZGO — al salir a otra app con un tono sonando, la ganancia baja en rampa y no se corta en seco', async ({
     page,
   }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
     await abrirInstrumentada(page);
     await sembrarValor(page, SEL_FREQ_25, 1000); // un periodo de 1 ms: la envolvente se mide fina
     await escuchar(page, page.getByRole('button', { name: 'Escuchar tono a 1000 hercios' }), 0.3);
@@ -1108,7 +1130,6 @@ test.describe('visualizador-sonido-ondas · Inspector 25/09/2026', () => {
    * stop() sin argumento sobre el oscilador de Do4 y ninguna automatización de su ganancia.
    */
   test('HALLAZGO — encadenar dos notas: la que sonaba sale con rampa, no con stop() en seco', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
     await abrirInstrumentada(page);
     await escuchar(page, page.getByRole('button', { name: 'Escuchar Do4 (C4) a 261,63 hercios' }), 0.2);
     const antes = await llamadasSal(page);
@@ -1144,7 +1165,6 @@ test.describe('visualizador-sonido-ondas · Inspector 25/09/2026', () => {
   test('HALLAZGO — la velocidad del sonido no se atribuye a la densidad: la propia tabla lo desmiente', async ({
     page,
   }) => {
-    test.fail(); // HALLAZGO medio (Inspector 25/09/2026)
     // Las dos premisas salen de la tabla que la app pinta, no de fuera.
     expect(velocidadEn('Madera')).toBeGreaterThan(velocidadEn('Agua'));
     expect(velocidadEn('Diamante')).toBeGreaterThan(velocidadEn('Acero'));
@@ -1161,7 +1181,6 @@ test.describe('visualizador-sonido-ondas · Inspector 25/09/2026', () => {
    * Si la fila se retira, el caso pasa.
    */
   test('HALLAZGO — a 120 dB la tabla NIOSH no da «0 seg», sino unos 9 s', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
     const fila = EXPOSICION.find((e) => e.db === 120);
     if (!fila) return;
     // 0,1476 min; precisión 1 (±0,05 min = ±3 s): el defecto es de 0,15 min, un orden más.
@@ -1178,7 +1197,6 @@ test.describe('visualizador-sonido-ondas · Inspector 25/09/2026', () => {
    * («… con amplitud 70%»).
    */
   test('HALLAZGO — el % va separado de la cifra, en el texto y en los nombres accesibles', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
     await page.goto(URL_APP);
     for (const id of ['anatomia', 'frecuencia', 'decibelios', 'timbre']) {
       const texto = await page.locator(`section#${id}`).innerText();
@@ -1201,7 +1219,6 @@ test.describe('visualizador-sonido-ondas · Inspector 25/09/2026', () => {
   test('HALLAZGO — las cifras de cuatro dígitos no se agrupan, y un número no sale en dos formatos', async ({
     page,
   }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
     await page.goto(URL_APP);
     await esperarHidratacion(page, ['#casos-respuesta']);
     const seccion = page.locator('#casos-aula');
@@ -1227,7 +1244,6 @@ test.describe('visualizador-sonido-ondas · Inspector 25/09/2026', () => {
    * con «°» un lector de pantalla en español lee «2 grados».
    */
   test('HALLAZGO — los ordinales se abrevian «2.º», no con el signo de grado', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
     await page.goto(URL_APP);
     const texto = await page.locator('section#timbre').innerText();
     expect(texto.match(/\d°[^\n]{0,10}/g) ?? []).toEqual([]);
@@ -1240,7 +1256,6 @@ test.describe('visualizador-sonido-ondas · Inspector 25/09/2026', () => {
    * en un <label> que no está asociado al control.
    */
   test('HALLAZGO — el deslizador de instrumento anuncia el instrumento, no su índice', async ({ page }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
     await page.goto(URL_APP);
     await esperarHidratacion(page, [SEL_INST_25]);
     await sembrarValor(page, SEL_INST_25, 2); // índice 2 = «Piano» en INSTRUMENTOS
@@ -1260,7 +1275,6 @@ test.describe('visualizador-sonido-ondas · Inspector 25/09/2026', () => {
   test('HALLAZGO — las cifras en color de marca y las etiquetas de zona pasan de 4,5:1 en claro y en oscuro', async ({
     page,
   }) => {
-    test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
     await page.emulateMedia({ colorScheme: 'light' });
     await page.goto(URL_APP);
     await esperarHidratacion(page, [SEL_FREQ_25]);
@@ -1272,11 +1286,24 @@ test.describe('visualizador-sonido-ondas · Inspector 25/09/2026', () => {
       'etiqueta «Seguro» (claro)': await contrasteDe(page.locator('[class*="dbTag"]')),
       'unidad del dato destacado (claro)': await contrasteDe(page.locator('[class*="datoUnidad"]')),
       'título del caso (claro)': await contrasteDe(page.locator('[class*="casoTitulo"]')),
+      // Añadidos con la reparación (25/09/2026): el resto de lo que el acta midió por debajo.
+      'lectura del deslizador (claro)': await contrasteDe(page.locator('[class*="sliderValue"]')),
+      'porcentaje de armónico (claro)': await contrasteDe(page.locator('[class*="armonicoPct"]')),
+      'nivel en dB, precaución (claro)': await contrasteDe(page.locator('[class*="dbValorPrecaucion"]')),
+      'etiqueta «Precaución» (claro)': await contrasteDe(page.locator('[class*="dbPrecaucion"]')),
+      '«Ver pista» (claro)': await contrasteDe(page.locator('#casos-aula').getByRole('button', { name: /Ver pista/ })),
     };
     await page.getByRole('button', { name: /Cambiar a modo oscuro/ }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     medidas['velocidad por medio (oscuro)'] = await contrasteDe(page.locator('[class*="velocidadValor"]'));
     medidas['T del panel (oscuro)'] = await contrasteDe(page.getByText(/^T = [\d,]+ (ms|μs)$/));
+    medidas['λ del panel (oscuro)'] = await contrasteDe(page.getByText(/^λ = [\d,]+ m$/));
+    medidas['frecuencia de las notas (oscuro)'] = await contrasteDe(page.locator('[class*="notaFreq"]'));
+    medidas['frecuencia de los animales (oscuro)'] = await contrasteDe(page.locator('[class*="animalFreq"]'));
+    medidas['porcentaje de armónico (oscuro)'] = await contrasteDe(page.locator('[class*="armonicoPct"]'));
+    medidas['nivel en dB, zona segura (oscuro)'] = await contrasteDe(page.locator('[class*="dbValor"]'));
+    medidas['etiqueta «Seguro» (oscuro)'] = await contrasteDe(page.locator('[class*="dbTag"]'));
+    medidas['etiqueta «Peligro» (oscuro)'] = await contrasteDe(page.locator('[class*="dbPeligro"]'));
     for (const [donde, ratio] of Object.entries(medidas)) {
       expect(ratio, `${donde}: la medida tiene que existir`).toBeGreaterThan(1);
       expect(ratio, donde).toBeGreaterThanOrEqual(4.5);
@@ -1345,7 +1372,6 @@ test.describe('visualizador-sonido-ondas · Inspector 25/09/2026 · en móvil (P
    * el texto más pequeño que la app usa fuera del SVG es de 10,88-11,2 px.
    */
   test('HALLAZGO — en el móvil λ y T se pintan a un tamaño legible, no a 5 px', async ({ page }) => {
-    test.fail(); // HALLAZGO medio (Inspector 25/09/2026)
     await page.goto(URL_APP);
     await esperarHidratacion(page, [SEL_FREQ_25]);
     for (const patron of [/^λ = [\d,]+ m$/, /^T = [\d,]+ (ms|μs)$/]) {

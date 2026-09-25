@@ -62,22 +62,63 @@ export interface ExposicionSegura {
 }
 
 /**
+ * Límite de exposición recomendado de NIOSH (DHHS/NIOSH 98-126, 1998): 85 dBA durante una
+ * jornada de 8 horas, con una tasa de intercambio de 3 dB — cada +3 dB, la mitad de tiempo:
+ *
+ *     T (min) = 480 / 2^((L − 85) / 3)
+ *
+ * Su Tabla 1-1 da, por ejemplo, 100 dBA → 15 min, 110 dBA → 1 min 29 s, 118 dBA → 14 s y
+ * 121 dBA → 7 s, que es exactamente lo que devuelve la fórmula.
+ */
+export const NIOSH_REL_DB = 85;
+export const NIOSH_REL_MINUTOS = 480;
+export const NIOSH_INTERCAMBIO_DB = 3;
+
+/** Minutos de exposición diaria que el REL de NIOSH admite a un nivel dado. */
+export function minutosNiosh(db: number): number {
+  return NIOSH_REL_MINUTOS / 2 ** ((db - NIOSH_REL_DB) / NIOSH_INTERCAMBIO_DB);
+}
+
+/**
+ * Una duración en minutos, con la unidad que la hace legible: «8 horas», «15 min»,
+ * «1 min 29 s», «9 s». Los segundos se redondean al entero, como en la Tabla 1-1 de NIOSH.
+ */
+export function textoDuracion(minutos: number): string {
+  if (!(minutos > 0)) return '0 s';
+  const horas = minutos / 60;
+  if (horas >= 1 && Number.isInteger(horas)) return `${horas} ${horas === 1 ? 'hora' : 'horas'}`;
+  const segundosTotales = Math.round(minutos * 60);
+  if (segundosTotales < 60) return `${segundosTotales} s`;
+  const min = Math.floor(segundosTotales / 60);
+  const seg = segundosTotales % 60;
+  return seg === 0 ? `${min} min` : `${min} min ${seg} s`;
+}
+
+/** Una fila de la tabla: el tiempo SALE de la fórmula de NIOSH, no se escribe a mano. */
+function filaExposicion(db: number, color: string): ExposicionSegura {
+  const minutos = minutosNiosh(db);
+  return { db, tiempo: textoDuracion(minutos), minutos, color };
+}
+
+/**
  * Tiempo de exposición sin protección auditiva. `minutos` es el mismo dato que `tiempo`, en
  * forma numérica, para que el caso 6 se pueda corregir: la app lo pinta como texto y el motor
  * lo compara como número, pero la tabla es UNA.
  *
- * Los 110 dB se declaran como 2 minutos aunque el texto diga «< 2 min»: el caso 6 no los usa
- * precisamente por eso, porque un «menos de» no tiene respuesta única.
+ * ⚠️ 25/09/2026 (hallazgo 1850) — hasta hoy las filas se escribían a mano y las dos últimas
+ * no seguían la regla que la tarjeta enuncia encima: 110 dB «< 2 min» (minutos: 2) y 120 dB
+ * «0 seg» (minutos: 0, sin barra). Con la fórmula de NIOSH son 1 min 29 s y 8,86 s → «9 s».
+ * Ahora las ocho filas salen de `minutosNiosh`, y no pueden volver a divergir.
  */
 export const EXPOSICION: readonly ExposicionSegura[] = [
-  { db: 85, tiempo: '8 horas', minutos: 480, color: '#27ae60' },
-  { db: 88, tiempo: '4 horas', minutos: 240, color: '#2ecc71' },
-  { db: 91, tiempo: '2 horas', minutos: 120, color: '#f1c40f' },
-  { db: 94, tiempo: '1 hora', minutos: 60, color: '#e67e22' },
-  { db: 97, tiempo: '30 min', minutos: 30, color: '#e74c3c' },
-  { db: 100, tiempo: '15 min', minutos: 15, color: '#c0392b' },
-  { db: 110, tiempo: '< 2 min', minutos: 2, color: '#8e44ad' },
-  { db: 120, tiempo: '0 seg', minutos: 0, color: '#6c3483' },
+  filaExposicion(85, '#27ae60'),
+  filaExposicion(88, '#2ecc71'),
+  filaExposicion(91, '#f1c40f'),
+  filaExposicion(94, '#e67e22'),
+  filaExposicion(97, '#e74c3c'),
+  filaExposicion(100, '#c0392b'),
+  filaExposicion(110, '#8e44ad'),
+  filaExposicion(120, '#6c3483'),
 ];
 
 /** Minutos de la primera fila: la barra al 100 %. */
@@ -222,7 +263,7 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
         `λ = ${numero(v, 0)} / ${numero(e.frecuencia, 2)} = ${numero(metros, 6)} m.`,
       ];
       if (e.enMilimetros) {
-        pasos.push(`En milímetros: ${numero(metros, 6)} × 1.000 = ${numero(metros * 1000, 2)} mm.`);
+        pasos.push(`En milímetros: ${numero(metros, 6)} × 1000 = ${numero(metros * 1000, 2)} mm.`);
         return { ok: true, valor: metros * 1000, pasos };
       }
       return { ok: true, valor: metros, pasos };
@@ -240,7 +281,7 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
         pasos: [
           'El periodo es el tiempo de UN ciclo completo: T = 1 / f.',
           `T = 1 / ${numero(e.frecuencia, 2)} = ${numero(segundos, 6)} s.`,
-          `En milisegundos: ${numero(segundos, 6)} × 1.000 = ${numero(ms, 4)} ms.`,
+          `En milisegundos: ${numero(segundos, 6)} × 1000 = ${numero(ms, 4)} ms.`,
         ],
       };
     }
@@ -318,7 +359,7 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
         pasos: [
           `Busca ${e.db} dB en la tabla de exposición segura de la sección «Decibelios».`,
           `La fila dice: ${EXPOSICION.find((x) => x.db === e.db)?.tiempo}.`,
-          `En minutos, ${numero(valor, 0)}.`,
+          `En minutos, ${numero(valor, 2)}.`,
         ],
       };
     }
@@ -427,7 +468,7 @@ const DEFINICIONES: readonly Definicion[] = [
       + 'UN ciclo? Da el resultado en milisegundos.',
     datos: { entrada: { via: 'periodo', frecuencia: 250 } },
     etiquetaRespuesta: 'Periodo en milisegundos (ms)',
-    pista: 'T = 1 / f da segundos. Un segundo son 1.000 milisegundos.',
+    pista: 'T = 1 / f da segundos. Un segundo son 1000 milisegundos.',
   },
   {
     id: 3,
@@ -457,7 +498,7 @@ const DEFINICIONES: readonly Definicion[] = [
     categoria: 'aplicado',
     enunciado:
       'Al golpear un raíl, el sonido viaja por el acero en vez de por el aire. Si la vibración '
-      + 'es de 1.700 Hz y usas la velocidad del acero de la tabla, ¿cuál es la longitud de onda?',
+      + 'es de 1700 Hz y usas la velocidad del acero de la tabla, ¿cuál es la longitud de onda?',
     datos: { entrada: { via: 'longitud', frecuencia: 1700, medio: 'Acero' } },
     etiquetaRespuesta: 'Longitud de onda en metros (m)',
     pista: 'El acero es el tercer medio más rápido de la tabla. Compara el resultado con el del caso 1.',
@@ -489,7 +530,7 @@ const DEFINICIONES: readonly Definicion[] = [
     titulo: 'De vuelta a la fundamental',
     categoria: 'abstracto',
     enunciado:
-      'En el espectro de un tubo sonoro se mide que su QUINTO armónico está en 1.100 Hz. '
+      'En el espectro de un tubo sonoro se mide que su QUINTO armónico está en 1100 Hz. '
       + '¿Cuál es su frecuencia fundamental?',
     datos: { entrada: { via: 'fundamental', frecuenciaArmonico: 1100, n: 5 } },
     etiquetaRespuesta: 'Frecuencia en hercios (Hz)',

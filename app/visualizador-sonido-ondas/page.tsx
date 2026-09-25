@@ -11,13 +11,21 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, formatPercentage } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import CasosAula from './CasosAula';
 // La longitud de onda y el periodo NO se calculan aquí: vienen del mismo módulo con el que se
 // corrigen los casos para clase, para que la app no pueda suspender una respuesta que ella
 // misma acaba de enseñar. Las dos tablas de datos físicos viven allí por la misma razón.
-import { VELOCIDADES, EXPOSICION, anchoBarraExposicion, longitudDeOnda, periodoDe } from './casos';
+import {
+  VELOCIDADES,
+  EXPOSICION,
+  anchoBarraExposicion,
+  longitudDeOnda,
+  periodoDe,
+  minutosNiosh,
+  textoDuracion,
+} from './casos';
 
 /** Extremos del deslizador de frecuencia. Los rótulos salen de aquí, no escritos a mano. */
 const FREQ_MIN = 20;
@@ -134,8 +142,10 @@ const NIVELES_DB: NivelDb[] = [
   { db: 70, nombre: 'Aspiradora', icono: '🧹', desc: 'Ruido molesto', zona: 'precaucion' },
   { db: 80, nombre: 'Tráfico denso', icono: '🚗', desc: 'Daño con exposición prolongada', zona: 'precaucion' },
   { db: 90, nombre: 'Cortacésped', icono: '🌿', desc: 'Protección recomendada', zona: 'precaucion' },
-  { db: 100, nombre: 'Moto sin silenciador', icono: '🏍️', desc: 'Daño en 15 min', zona: 'peligro' },
-  { db: 110, nombre: 'Concierto rock', icono: '🎸', desc: 'Daño en 2 min', zona: 'peligro' },
+  // Los dos «Daño en N min» decían otra cosa que la tabla de NIOSH de abajo (110 dB «2 min»
+  // frente a 1 min 29 s): el tiempo sale ahora de la misma fórmula que esa tabla.
+  { db: 100, nombre: 'Moto sin silenciador', icono: '🏍️', desc: `Máx. ${textoDuracion(minutosNiosh(100))} al día (NIOSH)`, zona: 'peligro' },
+  { db: 110, nombre: 'Concierto rock', icono: '🎸', desc: `Máx. ${textoDuracion(minutosNiosh(110))} al día (NIOSH)`, zona: 'peligro' },
   { db: 120, nombre: 'Sirena ambulancia', icono: '🚑', desc: 'Dolor inmediato', zona: 'dolor' },
   { db: 130, nombre: 'Umbral del dolor', icono: '⚠️', desc: 'Daño instantáneo', zona: 'dolor' },
   { db: 180, nombre: 'Despegue de cohete', icono: '🚀', desc: 'Destrucción auditiva', zona: 'dolor' },
@@ -271,16 +281,50 @@ function playToneWithHarmonics(frequency: number, harmonics: number[], duration:
   currentGain = masterGain;
 }
 
+/**
+ * Rampa de ganancia con la que se apaga un tono, en segundos.
+ *
+ * ── De dónde sale (Inspector, 25/09/2026, hallazgo 1845) ──
+ * `stopTone` hacía `osc.stop()` en el acto: la señal pasaba de ≈ 0,1 a 0 en una muestra, un
+ * escalón que se oye como chasquido — al salir a otra app con un tono sonando y, sobre todo,
+ * cada vez que una nota o un timbre corta al anterior (playTone y playToneWithHarmonics
+ * llaman a stopTone antes de arrancar). Es el mismo arreglo que `apagarConRampa` de
+ * app/diapason y `apagarTono` de app/generador-ondas.
+ */
+const RAMPA_APAGADO_S = 0.05;
+
+/**
+ * Apaga lo que esté sonando: lleva la ganancia a 0 con una rampa ANCLADA en el valor en curso
+ * (sin el `setValueAtTime`, la rampa arrancaría en el evento anterior y la bajada sería un
+ * escalón) y para los osciladores al final de esa rampa, en el reloj de audio. Los nodos se
+ * desconectan cuando callan de verdad (`onended`): desconectarlos ya cortaría la rampa.
+ */
 function stopTone() {
-  for (const osc of osciladoresActivos) {
+  const ctx = audioCtx;
+  const osciladores = osciladoresActivos;
+  const gain = currentGain;
+  osciladoresActivos = [];
+  currentGain = null;
+  if (!ctx || osciladores.length === 0) return;
+
+  const ahora = ctx.currentTime;
+  const fin = ahora + RAMPA_APAGADO_S;
+  if (gain) {
+    gain.gain.cancelScheduledValues(ahora);
+    gain.gain.setValueAtTime(gain.gain.value, ahora);
+    gain.gain.linearRampToValueAtTime(0, fin);
+  }
+  osciladores.forEach((osc, i) => {
+    osc.onended = () => {
+      osc.disconnect();
+      if (i === 0) gain?.disconnect();
+    };
     try {
-      osc.stop();
+      osc.stop(fin);
     } catch {
       /* ya estaba parado: su `stop(t)` programado pudo vencer antes */
     }
-  }
-  osciladoresActivos = [];
-  currentGain = null;
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -326,20 +370,35 @@ export default function SonidoOndasPage() {
           <p className={styles.seccionSubtitulo}>Mueve los sliders para ver cómo cambia la onda</p>
         </div>
 
+        {/*
+          λ y T, en HTML y no dentro del SVG.
+          ⚠️ 25/09/2026 (hallazgo 1847) — eran dos <text font-size="12"> dentro de un viewBox de
+          800 × 200 que se escala al ancho: en un Pixel 7 (SVG de 362 px) se pintaban a 5,4 px, y
+          son las dos únicas cifras que la app calcula. Fuera del SVG tienen tamaño de letra real
+          y el contraste de los tokens -texto en los dos temas.
+        */}
+        <dl className={styles.lecturasOnda}>
+          <div className={styles.lectura}>
+            <dt className={styles.lecturaNombre}>Longitud de onda (en el aire)</dt>
+            <dd className={`${styles.lecturaValor} ${styles.lecturaLambda}`}>
+              λ = {formatNumber(longitudOnda, 2)} m
+            </dd>
+          </div>
+          <div className={styles.lectura}>
+            <dt className={styles.lecturaNombre}>Período</dt>
+            <dd className={`${styles.lecturaValor} ${styles.lecturaPeriodo}`}>
+              T = {periodo >= 0.001 ? `${formatNumber(periodo * 1000, 2)} ms` : `${formatNumber(periodo * 1000000, 1)} μs`}
+            </dd>
+          </div>
+        </dl>
+
         {/* SVG onda interactiva */}
         <div className={styles.svgContainer}>
-          <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} aria-label={`Onda sinusoidal a ${frecuencia} Hz con amplitud ${amplitud}%`}>
+          <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} aria-label={`Onda sinusoidal a ${frecuencia} Hz con amplitud ${formatPercentage(amplitud / 100, 0)}`}>
             {/* Línea central */}
             <line x1="0" y1={SVG_H / 2} x2={SVG_W} y2={SVG_H / 2} stroke="#ccc" strokeWidth="1" strokeDasharray="4 4" />
             {/* Onda */}
             <path d={pathOnda} fill="none" stroke="#2E86AB" strokeWidth="3" strokeLinecap="round" />
-            {/* Etiquetas */}
-            <text x="20" y="20" fill="#48A9A6" fontSize="12" fontWeight="700">
-              λ = {formatNumber(longitudOnda, 2)} m
-            </text>
-            <text x="20" y="38" fill="#2E86AB" fontSize="12" fontWeight="700">
-              T = {periodo >= 0.001 ? `${formatNumber(periodo * 1000, 2)} ms` : `${formatNumber(periodo * 1000000, 1)} μs`}
-            </text>
             {/* Flecha amplitud */}
             <line x1={SVG_W - 60} y1={SVG_H / 2} x2={SVG_W - 60} y2={SVG_H / 2 - amplitud * (SVG_H * 0.4) / 100} stroke="#e74c3c" strokeWidth="2" markerEnd="url(#arrowRed)" />
             <text x={SVG_W - 50} y={SVG_H / 2 - 10} fill="#e74c3c" fontSize="11" fontWeight="600">A</text>
@@ -354,11 +413,12 @@ export default function SonidoOndasPage() {
         {/* Sliders */}
         <div className={styles.slidersGrid}>
           <div className={styles.sliderGroup}>
-            <label className={styles.sliderLabel}>
+            <label className={styles.sliderLabel} htmlFor="onda-frecuencia">
               <span>Frecuencia</span>
               <span className={styles.sliderValue}>{formatNumber(frecuencia, 0)} Hz</span>
             </label>
             <input
+              id="onda-frecuencia"
               type="range"
               min={FREQ_MIN}
               max={FREQ_MAX}
@@ -375,11 +435,12 @@ export default function SonidoOndasPage() {
             </div>
           </div>
           <div className={styles.sliderGroup}>
-            <label className={styles.sliderLabel}>
+            <label className={styles.sliderLabel} htmlFor="onda-amplitud">
               <span>Amplitud</span>
-              <span className={styles.sliderValue}>{amplitud}%</span>
+              <span className={styles.sliderValue}>{formatPercentage(amplitud / 100, 0)}</span>
             </label>
             <input
+              id="onda-amplitud"
               type="range"
               min="5"
               max="100"
@@ -387,10 +448,11 @@ export default function SonidoOndasPage() {
               onChange={e => setAmplitud(Number(e.target.value))}
               className={styles.sliderInput}
               aria-label="Amplitud en porcentaje"
+              aria-valuetext={formatPercentage(amplitud / 100, 0)}
             />
             <div className={styles.sliderRange}>
-              <span>5%</span>
-              <span>100%</span>
+              <span>{formatPercentage(0.05, 0)}</span>
+              <span>{formatPercentage(1, 0)}</span>
             </div>
           </div>
         </div>
@@ -436,7 +498,15 @@ export default function SonidoOndasPage() {
         {/* Velocidad del sonido */}
         <div className={styles.card}>
           <h3 className={styles.cardTitulo}>Velocidad del sonido en diferentes medios</h3>
-          <p className={styles.cardSubtitulo}>Cuanto más denso el medio, más rápido viaja</p>
+          {/*
+            ⚠️ 25/09/2026 (hallazgo 1846) — decía «Cuanto más denso el medio, más rápido viaja»,
+            la idea errónea clásica, y la tabla de debajo la desmentía dos veces. La velocidad
+            sale de la rigidez ENTRE la densidad (Newton-Laplace): a igual rigidez, más denso
+            es más lento.
+          */}
+          <p className={styles.cardSubtitulo}>
+            Depende de lo rígido que es el medio frente a lo denso que es: v = √(rigidez / densidad)
+          </p>
           <div className={styles.velocidadGrid}>
             {VELOCIDADES.map(v => (
               <div key={v.medio} className={styles.velocidadRow}>
@@ -450,6 +520,18 @@ export default function SonidoOndasPage() {
                 <span className={styles.velocidadValor}>{formatNumber(v.velocidad, 0)} {v.unidad}</span>
               </div>
             ))}
+          </div>
+          <div className={styles.insight}>
+            <p>
+              <strong>No manda la densidad, manda la rigidez.</strong> La rigidez es lo que el medio
+              se resiste a ser comprimido o deformado (el módulo de compresibilidad en líquidos y
+              gases, el de elasticidad en sólidos). A igual rigidez, un medio más denso es más
+              LENTO: sus partículas pesan más y cuesta más ponerlas en marcha. Los sólidos suelen
+              ganar porque son muchísimo más rígidos, no porque pesen más. La tabla lo muestra:
+              la madera, que flota en el agua, transmite el sonido más del doble de rápido que
+              ella, y el diamante, con menos de la mitad de densidad que el acero, lo transmite
+              más del doble de rápido.
+            </p>
           </div>
         </div>
 
@@ -501,7 +583,7 @@ export default function SonidoOndasPage() {
         {/* Octavas */}
         <div className={styles.insight}>
           <p>
-            <strong>Octavas:</strong> cada octava duplica la frecuencia. La4 = 440 Hz → La5 = 880 Hz → La6 = 1.760 Hz.
+            <strong>Octavas:</strong> cada octava duplica la frecuencia. La4 = 440 Hz → La5 = 880 Hz → La6 = 1760 Hz.
             Por eso La3 (220 Hz) y La4 (440 Hz) suenan &quot;igual&quot; pero uno más agudo.
           </p>
         </div>
@@ -590,7 +672,7 @@ export default function SonidoOndasPage() {
             <span className={styles.datoUnidad}> Hz</span>
           </div>
           <p className={styles.datoTexto}>
-            Frecuencia de referencia universal. En 1939, la conferencia internacional fijó La4 = 440 Hz como estándar de afinación para todas las orquestas del mundo.
+            Frecuencia de referencia. Una conferencia internacional la recomendó en Londres en 1939 y hoy la fija la norma ISO 16:1975. Es la referencia, no una obligación: muchas orquestas afinan algo más alto, a 442-443 Hz.
           </p>
         </div>
       </>
@@ -610,11 +692,13 @@ export default function SonidoOndasPage() {
       peligro: 'Peligro',
       dolor: 'Dolor',
     };
-    const zonaColores: Record<string, string> = {
-      seguro: '#27ae60',
-      precaucion: '#b7950b',
-      peligro: '#e74c3c',
-      dolor: '#8e44ad',
+    // El color del nivel sale de una clase y no de un `style` en línea: el inline no admite
+    // variante oscura, y en claro los verdes y amarillos se quedaban en 2,6-2,9:1 (hallazgo 1848).
+    const zonaValor: Record<string, string> = {
+      seguro: styles.dbValorSeguro,
+      precaucion: styles.dbValorPrecaucion,
+      peligro: styles.dbValorPeligro,
+      dolor: styles.dbValorDolor,
     };
 
     return (
@@ -646,7 +730,7 @@ export default function SonidoOndasPage() {
           <div className={styles.dbScale}>
             {NIVELES_DB.map(nivel => (
               <div key={nivel.db} className={styles.dbRow}>
-                <span className={styles.dbValor} style={{ color: zonaColores[nivel.zona] }}>
+                <span className={`${styles.dbValor} ${zonaValor[nivel.zona]}`}>
                   {nivel.db}
                 </span>
                 <span className={styles.dbIcono} aria-hidden="true">{nivel.icono}</span>
@@ -665,7 +749,9 @@ export default function SonidoOndasPage() {
         {/* Tiempo de exposición */}
         <div className={styles.card}>
           <h3 className={styles.cardTitulo}>Tiempo de exposición segura</h3>
-          <p className={styles.cardSubtitulo}>Cada +3 dB reduce el tiempo a la mitad (NIOSH)</p>
+          <p className={styles.cardSubtitulo}>
+            Límite de NIOSH: 85 dB durante 8 horas, y cada +3 dB reduce el tiempo a la mitad
+          </p>
           <div className={styles.exposicionGrid}>
             {EXPOSICION.map(e => (
               <div key={e.db} className={styles.exposicionRow}>
@@ -688,12 +774,12 @@ export default function SonidoOndasPage() {
           <div className={styles.insight}>
             <p>
               La pérdida auditiva por ruido es <strong>acumulativa e irreversible</strong>. Las células ciliadas del oído interno no se regeneran.
-              Se pierden primero las frecuencias altas (4.000-6.000 Hz), dificultando entender consonantes como &quot;s&quot;, &quot;f&quot;, &quot;t&quot;.
+              Se pierden primero las frecuencias altas (4000-6000 Hz), dificultando entender consonantes como &quot;s&quot;, &quot;f&quot;, &quot;t&quot;.
             </p>
           </div>
           <div className={styles.warningBox}>
-            <span aria-hidden="true">⚠️</span> La OMS estima que 1.100 millones de jóvenes están en riesgo de pérdida auditiva por exposición a música alta.
-            Usar auriculares al 60% del volumen máximo durante no más de 60 minutos seguidos (regla 60/60).
+            <span aria-hidden="true">⚠️</span> La OMS estimó en 2015 que 1100 millones de adolescentes y jóvenes (12 a 35 años) están en riesgo de pérdida auditiva por el uso de reproductores y el ruido de los locales de ocio.
+            Una pauta práctica muy difundida, la «regla 60/60», aconseja no pasar del {formatPercentage(0.6, 0)} del volumen máximo ni de 60 minutos seguidos con auriculares. Es orientativa y no procede de la OMS: el nivel que llega al oído depende del reproductor y de los auriculares.
           </div>
         </div>
 
@@ -722,7 +808,7 @@ export default function SonidoOndasPage() {
 
         <div className={styles.contexto}>
           Cuando una guitarra y un piano tocan la misma nota (ej. La4 = 440 Hz), la frecuencia fundamental es idéntica.
-          Lo que cambia es la <strong>mezcla de armónicos</strong>: las frecuencias múltiplas (880, 1.320, 1.760 Hz...) que acompañan a la fundamental.
+          Lo que cambia es la <strong>mezcla de armónicos</strong>: las frecuencias múltiplas ({formatNumber(880, 0)}, {formatNumber(1320, 0)}, {formatNumber(1760, 0)} Hz...) que acompañan a la fundamental.
         </div>
 
         {/* Selector de instrumento */}
@@ -731,11 +817,12 @@ export default function SonidoOndasPage() {
           <p className={styles.cardSubtitulo}>Selecciona un instrumento para ver su mezcla de armónicos</p>
           <div className={styles.slidersGrid}>
             <div className={styles.sliderGroup}>
-              <label className={styles.sliderLabel}>
+              <label className={styles.sliderLabel} htmlFor="onda-instrumento">
                 <span>Instrumento</span>
                 <span className={styles.sliderValue}>{instrActual.nombre}</span>
               </label>
               <input
+                id="onda-instrumento"
                 type="range"
                 min="0"
                 max={INSTRUMENTOS.length - 1}
@@ -743,6 +830,8 @@ export default function SonidoOndasPage() {
                 onChange={e => setInstrumentoIdx(Number(e.target.value))}
                 className={styles.sliderInput}
                 aria-label="Seleccionar instrumento"
+                // Sin esto el lector anunciaba el índice («2») en vez del timbre (hallazgo 1849).
+                aria-valuetext={instrActual.nombre}
               />
             </div>
           </div>
@@ -757,20 +846,20 @@ export default function SonidoOndasPage() {
           <div className={styles.armonicosVisual}>
             {instrActual.armonicos.map((pct, idx) => (
               <div key={idx} className={styles.armonicoRow}>
-                <span className={styles.armonicoNombre}>{idx === 0 ? 'Fund.' : `${idx + 1}° arm.`}</span>
+                <span className={styles.armonicoNombre}>{idx === 0 ? 'Fund.' : `${idx + 1}.º arm.`}</span>
                 <div className={styles.armonicoBarContainer}>
                   <div className={styles.armonicoBar} style={{ width: `${pct}%` }} />
                 </div>
-                <span className={styles.armonicoPct}>{pct}%</span>
+                <span className={styles.armonicoPct}>{formatPercentage(pct / 100, 0)}</span>
               </div>
             ))}
           </div>
           <div className={styles.insight}>
             <p>
               <strong>Fundamental (f):</strong> 440 Hz →{' '}
-              <strong>2° armónico (2f):</strong> 880 Hz →{' '}
-              <strong>3° armónico (3f):</strong> {formatNumber(1320, 0)} Hz →{' '}
-              <strong>4° (4f):</strong> {formatNumber(1760, 0)} Hz...
+              <strong>2.º armónico (2f):</strong> 880 Hz →{' '}
+              <strong>3.º armónico (3f):</strong> {formatNumber(1320, 0)} Hz →{' '}
+              <strong>4.º (4f):</strong> {formatNumber(1760, 0)} Hz...
             </p>
           </div>
         </div>
@@ -805,12 +894,13 @@ export default function SonidoOndasPage() {
           </h3>
           <p className={styles.fenomenoDesc}>
             Cuando una fuerza externa vibra a la frecuencia natural de un objeto, la amplitud se amplifica enormemente.
-            Un cantante puede romper una copa si sostiene la nota de su frecuencia natural: la copa absorbe
-            energía en cada ciclo hasta que el vidrio no aguanta. Es el mismo principio por el que una radio
+            Un cantante puede romper una copa si sostiene, con mucha potencia, la nota de su frecuencia natural:
+            la copa absorbe energía en cada ciclo hasta que el vidrio no aguanta. Es posible, pero raro. Es el mismo principio por el que una radio
             sintoniza una emisora y no las demás. (El puente de Tacoma Narrows, que se cita mucho aquí, NO es
             un caso de resonancia: fue flameo aeroelástico, una oscilación que la propia estructura alimenta
             de un viento estacionario, sin ninguna fuerza periódica externa que la empuje.)
-            Una copa de cristal se rompe cuando una voz alcanza exactamente su frecuencia de resonancia (~550 Hz).
+            Esa frecuencia no es una cifra fija: depende de la forma, el tamaño y el grosor de cada copa, y se
+            oye al golpearla suavemente con una uña.
           </p>
         </div>
 
@@ -904,15 +994,15 @@ export default function SonidoOndasPage() {
             <h2>¿Por qué se eligió 440 Hz?</h2>
             <p>
               Antes de 1939, cada orquesta usaba su propia referencia: algunas a 415 Hz (barroco), otras a 435 Hz o incluso 450 Hz.
-              La conferencia internacional de Londres (1939) estableció La4 = 440 Hz como estándar, confirmado por la ISO en 1955.
-              Sin embargo, algunos músicos modernos defienden afinaciones alternativas (432 Hz, 444 Hz) por razones estéticas.
+              La conferencia internacional de Londres (1939) recomendó La4 = 440 Hz, que la ISO adoptó en 1955 y fijó como norma ISO 16 en 1975.
+              Aun así, muchas orquestas afinan a 442-443 Hz, y algunos músicos defienden otras referencias (432 Hz, 444 Hz) por razones estéticas.
             </p>
 
             <h2>La serie armónica y las matemáticas del sonido</h2>
             <p>
               Los armónicos siguen una serie matemática exacta: si la fundamental es f, los armónicos son 2f, 3f, 4f, 5f...
               Esta serie genera los intervalos musicales naturales: la octava (2:1), la quinta (3:2), la cuarta (4:3),
-              la tercera mayor (5:4). Pitágoras descubrió esta relación hace 2.500 años.
+              la tercera mayor (5:4). Pitágoras descubrió esta relación hace unos 2500 años.
             </p>
 
             <h2>Acústica arquitectónica</h2>

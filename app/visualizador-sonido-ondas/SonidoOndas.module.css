@@ -1,5 +1,9 @@
+/* --primary y --secondary NO se redeclaran aquí (hallazgo 1848, 25/09/2026): el #2E86AB fijo
+   no tenía variante oscura (3,08:1 sobre la tarjeta oscura) y además tapaba la paleta de Stemum,
+   que reviste la app desde globals.css. Se heredan de globals, igual que --primary-texto,
+   --secondary-texto, --primary-boton y --secondary-boton, que son los que lleva el TEXTO. */
 .container {
-  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
   --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #6E6E6E;
   --border: #E5E5E5; --hover: #F5F5F5;
   --radius: 12px; --radius-large: 16px;
@@ -17,7 +21,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); text-decoration: none; }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
@@ -39,13 +43,20 @@
 .contexto { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; color: var(--text-primary); font-size: 1rem; line-height: 1.5; }
 
 /* ─── Sección 1: Anatomía de onda ─── */
+/* λ y T en HTML, fuera del SVG escalado (hallazgo 1847): en móvil el <text> del SVG se pintaba a 5 px. */
+.lecturasOnda { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); margin: 0 0 var(--spacing-sm); }
+.lectura { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-sm) var(--spacing-md); }
+.lecturaNombre { font-size: 0.78rem; color: var(--text-secondary); margin: 0 0 0.15rem; }
+.lecturaValor { font-size: 1.15rem; font-weight: 700; font-family: monospace; margin: 0; }
+.lecturaLambda { color: var(--secondary-texto); }
+.lecturaPeriodo { color: var(--primary-texto); }
 .svgContainer { width: 100%; overflow: hidden; border-radius: var(--radius); background: var(--bg-card); border: 1px solid var(--border); margin-bottom: var(--spacing-md); }
 .svgContainer svg { display: block; width: 100%; height: auto; }
 
 .slidersGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 .sliderGroup { display: flex; flex-direction: column; gap: 0.3rem; }
 .sliderLabel { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); display: flex; justify-content: space-between; }
-.sliderValue { font-weight: 700; color: var(--primary); font-family: monospace; }
+.sliderValue { font-weight: 700; color: var(--primary-texto); font-family: monospace; }
 .sliderInput { width: 100%; accent-color: var(--primary); cursor: pointer; height: 6px; }
 .sliderRange { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); }
 
@@ -61,13 +72,13 @@
 .velocidadMedio { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
 .velocidadBarContainer { height: 14px; background: var(--border); border-radius: 7px; overflow: hidden; }
 .velocidadBar { height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
-.velocidadValor { font-size: 0.82rem; font-weight: 700; color: var(--primary); text-align: right; font-family: monospace; }
+.velocidadValor { font-size: 0.82rem; font-weight: 700; color: var(--primary-texto); text-align: right; font-family: monospace; }
 
 /* ─── Sección 2: Frecuencia y tono ─── */
 .rangoBar { display: flex; border-radius: var(--radius); overflow: hidden; height: 56px; margin-bottom: var(--spacing-sm); }
 .rangoInfra { flex: 1; background: #e0e0e0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; }
 [data-theme='dark'] .rangoInfra { background: #3a3a3a; }
-.rangoAudible { flex: 4; background: linear-gradient(90deg, var(--primary), var(--secondary)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; color: white; }
+.rangoAudible { flex: 4; background: linear-gradient(90deg, var(--primary-boton), var(--secondary-boton)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; color: white; }
 .rangoUltra { flex: 1; background: #e0e0e0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; }
 [data-theme='dark'] .rangoUltra { background: #3a3a3a; }
 .rangoLabel { font-size: 0.75rem; font-weight: 700; }
@@ -81,7 +92,7 @@
 .notaNombre { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
 .notaBarContainer { height: 14px; background: var(--border); border-radius: 7px; overflow: hidden; }
 .notaBar { height: 100%; border-radius: 7px; }
-.notaFreq { font-size: 0.82rem; font-weight: 700; color: var(--primary); text-align: right; font-family: monospace; }
+.notaFreq { font-size: 0.82rem; font-weight: 700; color: var(--primary-texto); text-align: right; font-family: monospace; }
 
 .vocalesGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); }
 .vocalRow { display: grid; grid-template-columns: 110px 1fr 90px; gap: var(--spacing-sm); align-items: center; padding: var(--spacing-sm) var(--spacing-md); background: var(--hover); border-radius: 8px; }
@@ -94,7 +105,7 @@
 .animalRow { display: grid; grid-template-columns: 36px 1fr 90px; gap: var(--spacing-sm); align-items: center; padding: var(--spacing-sm) var(--spacing-md); background: var(--hover); border-radius: 8px; }
 .animalIcono { font-size: 1.3rem; text-align: center; }
 .animalNombre { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
-.animalFreq { font-size: 0.78rem; font-weight: 700; color: var(--primary); text-align: right; font-family: monospace; }
+.animalFreq { font-size: 0.78rem; font-weight: 700; color: var(--primary-texto); text-align: right; font-family: monospace; }
 
 /* ─── Sección 3: Decibelios ─── */
 .dbScale { display: flex; flex-direction: column; gap: 0; margin-bottom: var(--spacing-lg); }
@@ -106,11 +117,25 @@
 .dbNombre { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
 .dbDesc { font-size: 0.75rem; color: var(--text-muted); }
 .dbTag { font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 10px; white-space: nowrap; }
-.dbSeguro { background: rgba(39,174,96,0.12); color: #27ae60; }
-.dbPrecaucion { background: rgba(241,196,15,0.15); color: #b7950b; }
+/* Colores de zona medidos (hallazgo 1848): ≥ 4,5:1 sobre la tarjeta y sobre el fondo teñido de
+   la etiqueta, en claro (tonos oscuros) y en oscuro (tonos claros). Antes el verde y el amarillo
+   daban 2,55-2,87:1 en claro, y en oscuro solo el amarillo tenía variante. */
+.dbSeguro { background: rgba(39,174,96,0.12); color: #1B6E3E; }
+.dbPrecaucion { background: rgba(241,196,15,0.15); color: #7D6608; }
+.dbPeligro { background: rgba(231,76,60,0.12); color: #B03A2E; }
+.dbDolor { background: rgba(142,68,173,0.12); color: #7D3C98; }
+[data-theme='dark'] .dbSeguro { color: #58D68D; }
 [data-theme='dark'] .dbPrecaucion { background: rgba(241,196,15,0.1); color: #f1c40f; }
-.dbPeligro { background: rgba(231,76,60,0.12); color: #e74c3c; }
-.dbDolor { background: rgba(142,68,173,0.12); color: #8e44ad; }
+[data-theme='dark'] .dbPeligro { color: #FF8A7A; }
+[data-theme='dark'] .dbDolor { color: #C39BD3; }
+.dbValorSeguro { color: #1B6E3E; }
+.dbValorPrecaucion { color: #7D6608; }
+.dbValorPeligro { color: #B03A2E; }
+.dbValorDolor { color: #7D3C98; }
+[data-theme='dark'] .dbValorSeguro { color: #58D68D; }
+[data-theme='dark'] .dbValorPrecaucion { color: #f1c40f; }
+[data-theme='dark'] .dbValorPeligro { color: #FF8A7A; }
+[data-theme='dark'] .dbValorDolor { color: #C39BD3; }
 
 .dbBarVertical { width: 100%; height: 20px; border-radius: 10px; background: linear-gradient(90deg, #27ae60 0%, #27ae60 30%, #f1c40f 50%, #e74c3c 75%, #8e44ad 100%); margin-bottom: var(--spacing-sm); }
 .dbBarLabels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text-muted); margin-bottom: var(--spacing-lg); }
@@ -128,7 +153,7 @@
 .armonicoNombre { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
 .armonicoBarContainer { height: 14px; background: var(--border); border-radius: 7px; overflow: hidden; }
 .armonicoBar { height: 100%; border-radius: 7px; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
-.armonicoPct { font-size: 0.78rem; font-weight: 700; color: var(--primary); text-align: right; font-family: monospace; }
+.armonicoPct { font-size: 0.78rem; font-weight: 700; color: var(--primary-texto); text-align: right; font-family: monospace; }
 
 .formasGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
 .formaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
@@ -143,7 +168,7 @@
 /* ─── Dato destacado ─── */
 .datoDestacado { display: flex; align-items: center; gap: var(--spacing-md); background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 .datoNumero { font-size: 2.5rem; font-weight: 800; color: var(--primary); line-height: 1; }
-.datoUnidad { font-size: 1.1rem; font-weight: 600; color: var(--secondary); }
+.datoUnidad { font-size: 1.1rem; font-weight: 600; color: var(--secondary-texto); }
 .datoTexto { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; }
 
 /* ─── Insight ─── */
@@ -155,7 +180,7 @@
 [data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
 
 /* ─── Botón escuchar audio ─── */
-.btnEscuchar { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.4rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: var(--radius); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin: var(--spacing-sm) 0; }
+.btnEscuchar { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.4rem; background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); color: white; border: none; border-radius: var(--radius); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin: var(--spacing-sm) 0; }
 .btnEscuchar:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(46,134,171,0.3); }
 .btnEscuchar:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btnEscuchar:active { transform: translateY(0); }
@@ -179,6 +204,7 @@
   .dbRow { grid-template-columns: 40px 1fr; gap: 0.3rem; }
   .dbIcono { display: none; }
   .dbTag { display: none; }
+  .lecturasOnda { grid-template-columns: 1fr; }
   .animalRow { grid-template-columns: 28px 1fr 70px; }
 }
 
@@ -209,7 +235,7 @@
 .casosTitulo {
   margin: 0 0 var(--spacing-sm);
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .casosIntro {
@@ -241,7 +267,7 @@
 
 .casoBoton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .casoBoton:focus-visible {
@@ -251,8 +277,8 @@
 
 .casoBotonActivo,
 .casoBotonActivo:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -270,7 +296,7 @@
 .casoTitulo {
   margin: 0 0 var(--spacing-sm);
   font-size: 1.1rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .casoEnunciado {
@@ -319,7 +345,7 @@
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
-  background: var(--primary);
+  background: var(--primary-boton);
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
@@ -361,15 +387,15 @@
   min-height: 44px;
   padding: var(--spacing-xs) var(--spacing-md);
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: transparent;
-  border: 1px solid var(--primary);
+  border: 1px solid var(--primary-texto);
   border-radius: var(--radius);
   cursor: pointer;
 }
 
 .casoAyudaBoton:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -417,8 +443,8 @@
 
 [data-theme='dark'] .casoBotonActivo,
 [data-theme='dark'] .casoBotonActivo:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
