@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorTonos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber, parseSpanishNumber } from '@/lib';
+import { formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
 import {
   frecuenciasDeMedida,
   nivelPico,
@@ -47,6 +47,46 @@ const textoFrecuencia = (n: number) => String(n).replace('.', ',');
  * parar un tono agudo lo pone en 1-8 kHz, donde el oído es más sensible.
  */
 const RAMPA_GANANCIA_S = 0.05;
+
+/**
+ * Lleva la ganancia a 0 con una rampa ANCLADA en el valor en curso y programa el stop() del
+ * oscilador al final de la rampa, en el reloj de audio (el patrón de `apagarConRampa` de
+ * app/diapason y de `apagarTono` de app/generador-ondas). Sin el setValueAtTime, una rampa de Web
+ * Audio arranca en el evento anterior y la bajada sería un escalón. `alAcabar` se llama cuando el
+ * oscilador ha callado de verdad (onended): es donde se puede cerrar el contexto sin cortar la
+ * rampa. Si la ganancia ya no está (la soltó `detenerAudio`, que ya programó su rampa y su stop),
+ * no se vuelve a parar: solo se espera a que termine.
+ */
+function apagarConRampa(
+  ctx: AudioContext,
+  osc: OscillatorNode,
+  gain: GainNode | null,
+  alAcabar?: () => void,
+): void {
+  osc.onended = () => {
+    osc.disconnect();
+    gain?.disconnect();
+    alAcabar?.();
+  };
+  if (!gain) return;
+  const ahora = ctx.currentTime;
+  const fin = ahora + RAMPA_GANANCIA_S;
+  gain.gain.cancelScheduledValues(ahora);
+  gain.gain.setValueAtTime(gain.gain.value, ahora);
+  gain.gain.linearRampToValueAtTime(0, fin);
+  try {
+    osc.stop(fin);
+  } catch {
+    // El oscilador ya estaba detenido
+  }
+}
+
+/**
+ * Cifra con los decimales que de verdad tiene (hasta 3), en formato español y con millares:
+ * «261,63», «440», «20.000». Es lo que anuncia el deslizador de frecuencia (hallazgo 1807):
+ * `formatNumber` a secas fija los decimales, y redondear a 0 decía «262» mientras sonaba 261,63.
+ */
+const cifraExacta = (n: number) => formatNumber(n, Math.min(3, (String(n).split('.')[1] ?? '').length));
 
 /** Duración del barrido, en segundos. Los mismos límites que declara su campo. */
 const DUR_MIN = 1;
@@ -104,6 +144,43 @@ const MS_ENTRE_LECTURAS = 35;
 const VOLUMEN_MEDIDA = 0.35;
 
 type Ranura = 'A' | 'B';
+
+type CampoBarrido = 'min' | 'max' | 'dur';
+
+/** Solo lo que puede formar parte de un número: el filtro de components/NumberInput.tsx. */
+const PUEDE_SER_NUMERO = /^-?[\d.,]*$/;
+
+/**
+ * Lee un campo del barrido al salir de él (hallazgo 1804). Antes eran type="number" leídos con
+ * parseInt: «2,5 s» se truncaba a 2 (el barrido iba un 25 % más rápido), «0,5 s» daba 0 y el
+ * `|| 5` lo convertía en 5 s, y «Desde 261,63» pasaba a 261. Ahora son campos de texto leídos
+ * con `parseSpanishNumber` —el mismo parser que el campo de frecuencia desde el hallazgo 691—, y
+ * lo que se corrige se dice: si no es un número se usa `porDefecto`; si se sale del rango, se
+ * acota al borde más cercano (un 0 en «Hasta» es 20 Hz, el suelo, no el techo).
+ */
+function leerCampoBarrido(
+  texto: string,
+  nombre: string,
+  unidad: string,
+  min: number,
+  max: number,
+  porDefecto: number,
+): { valor: number; aviso: string | null } {
+  const n = parseSpanishNumber(texto);
+  const cifra = (v: number) => `${cifraExacta(v)} ${unidad}`;
+  if (!Number.isFinite(n)) {
+    const motivo = texto.trim() === '' ? 'estaba vacío' : `«${texto}» no es un número`;
+    return { valor: porDefecto, aviso: `«${nombre}» ${motivo}: se usa ${cifra(porDefecto)}.` };
+  }
+  if (n < min || n > max) {
+    const valor = Math.max(min, Math.min(max, n));
+    return {
+      valor,
+      aviso: `«${nombre}»: ${cifra(n)} queda fuera del rango de ${cifraExacta(min)} a ${cifra(max)}; se ajusta a ${cifra(valor)}.`,
+    };
+  }
+  return { valor: n, aviso: null };
+}
 
 const esperar = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
@@ -247,6 +324,15 @@ export default function GeneradorTonosPage() {
   const [sweepMaxTexto, setSweepMaxTexto] = useState('2000');
   const [sweepDuracion, setSweepDuracion] = useState(DUR_DEFECTO);
   const [sweepDuracionTexto, setSweepDuracionTexto] = useState(String(DUR_DEFECTO));
+  /**
+   * Lo que se ha corregido al salir de un campo del barrido, dicho en pantalla (hallazgo 1804).
+   * Antes el acotado era mudo: «0,5 s» pasaba a 5 s y «Hasta 0» al techo sin que nada lo dijera.
+   */
+  const [avisosBarrido, setAvisosBarrido] = useState<Record<CampoBarrido, string | null>>({
+    min: null,
+    max: null,
+    dur: null,
+  });
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const oscillatorRef = useRef<OscillatorNode | null>(null);
@@ -261,6 +347,8 @@ export default function GeneradorTonosPage() {
   const [frecuenciaEnCurso, setFrecuenciaEnCurso] = useState<number | null>(null);
   const [avisoMedida, setAvisoMedida] = useState<string | null>(null);
   const streamMicroRef = useRef<MediaStream | null>(null);
+  /** Oscilador y ganancia de la medida en curso: el desmontaje también los apaga con rampa. */
+  const medidaNodosRef = useRef<{ oscilador: OscillatorNode; ganancia: GainNode } | null>(null);
 
   const cerrarMicrofono = useCallback(() => {
     streamMicroRef.current?.getTracks().forEach((t) => t.stop());
@@ -286,19 +374,46 @@ export default function GeneradorTonosPage() {
     wakeLockRef.current = null;
   }, []);
 
+  /*
+   * Al desmontar (navegar a otra app con el tono sonando, o midiendo): rampa corta a 0 y el
+   * contexto se cierra cuando los osciladores ya han callado, con un temporizador de respaldo por
+   * si el reloj de audio no llega a avanzar. Antes hacía stop() y close() en el mismo instante,
+   * sin rampa: el tono se cortaba en seco desde el volumen en curso (hallazgo 1803, el 1730 de
+   * diapason). Los refs se sueltan en el acto, para que un remontaje (StrictMode en desarrollo)
+   * cree un contexto nuevo en vez de reutilizar uno cerrado.
+   */
   useEffect(() => {
     return () => {
-      if (oscillatorRef.current) {
-        try {
-          oscillatorRef.current.stop();
-        } catch {
-          // El oscilador ya estaba detenido
+      const ctx = audioContextRef.current;
+      const sonando: [OscillatorNode, GainNode | null][] = [];
+      if (oscillatorRef.current) sonando.push([oscillatorRef.current, gainNodeRef.current]);
+      if (medidaNodosRef.current) sonando.push([medidaNodosRef.current.oscilador, medidaNodosRef.current.ganancia]);
+      audioContextRef.current = null;
+      oscillatorRef.current = null;
+      gainNodeRef.current = null;
+      medidaNodosRef.current = null;
+      if (ctx) {
+        let cerrado = false;
+        const cerrar = () => {
+          if (cerrado) return;
+          cerrado = true;
+          ctx.close().catch(() => {
+            // El contexto ya estaba cerrado
+          });
+        };
+        if (sonando.length > 0 && ctx.state === 'running') {
+          let pendientes = sonando.length;
+          for (const [osc, gain] of sonando) {
+            apagarConRampa(ctx, osc, gain, () => {
+              pendientes--;
+              if (pendientes === 0) cerrar();
+            });
+          }
+          window.setTimeout(cerrar, RAMPA_GANANCIA_S * 1000 + 500);
+        } else {
+          // Sin tono o con el contexto suspendido (no suena nada): no hay chasquido que evitar.
+          cerrar();
         }
-      }
-      if (audioContextRef.current) {
-        audioContextRef.current.close().catch(() => {
-          // El contexto ya estaba cerrado
-        });
       }
       if (sweepIntervalRef.current) {
         clearInterval(sweepIntervalRef.current);
@@ -451,6 +566,7 @@ export default function GeneradorTonosPage() {
 
     let ctx: AudioContext | null = null;
     let oscilador: OscillatorNode | null = null;
+    let ganancia: GainNode | null = null;
     try {
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
@@ -494,7 +610,7 @@ export default function GeneradorTonosPage() {
 
       // 2) Un tono por cada tercio de octava.
       oscilador = ctx.createOscillator();
-      const ganancia = ctx.createGain();
+      ganancia = ctx.createGain();
       oscilador.type = 'sine';
       oscilador.frequency.setValueAtTime(frecuencias[0], ctx.currentTime);
       ganancia.gain.setValueAtTime(0, ctx.currentTime);
@@ -502,6 +618,7 @@ export default function GeneradorTonosPage() {
       oscilador.connect(ganancia);
       ganancia.connect(ctx.destination);
       oscilador.start();
+      medidaNodosRef.current = { oscilador, ganancia };
 
       const puntos: PuntoMedida[] = [];
       for (const f of frecuencias) {
@@ -512,12 +629,9 @@ export default function GeneradorTonosPage() {
         puntos.push({ frecuencia: f, db: restarRuido(senal, ruido.get(f) ?? -Infinity) });
       }
 
-      // Rampa de salida anclada en el valor en curso: sin el setValueAtTime arrancaría en el
-      // evento anterior y la ganancia caería de golpe (mismo defecto que el hallazgo 1638).
-      const finMedida = ctx.currentTime;
-      ganancia.gain.cancelScheduledValues(finMedida);
-      ganancia.gain.setValueAtTime(ganancia.gain.value, finMedida);
-      ganancia.gain.linearRampToValueAtTime(0, finMedida + RAMPA_GANANCIA_S);
+      // La rampa de salida se programa en el `finally`, para TODOS los caminos: antes solo la
+      // llevaba el camino feliz, y si la medida se interrumpía (el catch) el oscilador se paraba
+      // con stop(currentTime + 0,1) desde 0,35 de ganancia, en seco.
       const curva = normalizarCurva(puntos);
 
       if (resumirCurva(curva).medidos === 0) {
@@ -545,12 +659,10 @@ export default function GeneradorTonosPage() {
     } catch {
       setAvisoMedida('La medida se ha interrumpido. Se puede volver a intentar.');
     } finally {
-      if (oscilador) {
-        try {
-          oscilador.stop(ctx ? ctx.currentTime + 0.1 : undefined);
-        } catch {
-          // El oscilador de medida ya estaba parado
-        }
+      // Si el desmontaje ya se ha llevado los nodos (medidaNodosRef a null), ya los apagó él.
+      if (oscilador && ctx && medidaNodosRef.current?.oscilador === oscilador) {
+        medidaNodosRef.current = null;
+        if (ctx.state !== 'closed') apagarConRampa(ctx, oscilador, ganancia);
       }
       cerrarMicrofono();
       liberarWakeLock();
@@ -676,6 +788,8 @@ export default function GeneradorTonosPage() {
   };
 
   const frecuenciasMedidas = frecuenciasDeMedida(MEDIDA_MIN, MEDIDA_MAX);
+  /** «30 %», con espacio duro: el rótulo y el aria-valuetext del deslizador (hallazgos 1805 y 1807). */
+  const textoVolumen = formatPercentage(volumen, 0);
   const dbEn = (curva: PuntoMedida[] | null, f: number) => curva?.find((p) => p.frecuencia === f)?.db ?? null;
 
   return (
@@ -685,7 +799,7 @@ export default function GeneradorTonosPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Generador de Tonos</h1>
         <p className={styles.subtitle}>
-          Frecuencias de audio de 20Hz a 20kHz
+          Frecuencias de audio de 20&nbsp;Hz a 20&nbsp;kHz
         </p>
       </header>
 
@@ -762,6 +876,7 @@ export default function GeneradorTonosPage() {
             onChange={(e) => aplicarFrecuencia(parseInt(e.target.value, 10))}
             className={styles.frecuenciaSlider}
             aria-label="Seleccionar frecuencia"
+            aria-valuetext={`${cifraExacta(frecuencia)} Hz`}
           />
           <span className={styles.sliderLabel}>20 kHz</span>
         </div>
@@ -785,13 +900,13 @@ export default function GeneradorTonosPage() {
             onClick={toggleAudio}
             aria-pressed={reproduciendo}
           >
-            {reproduciendo ? '⏹️ Detener' : '▶️ Reproducir'}
+            <span aria-hidden="true">{reproduciendo ? '⏹️' : '▶️'}</span> {reproduciendo ? 'Detener' : 'Reproducir'}
           </button>
         </div>
 
         {/* Volumen */}
         <div className={styles.volumenControl}>
-          <span className={styles.volumenIcon}>🔉</span>
+          <span className={styles.volumenIcon} aria-hidden="true">🔉</span>
           <input
             type="range"
             min="0"
@@ -801,9 +916,29 @@ export default function GeneradorTonosPage() {
             onChange={(e) => setVolumen(parseFloat(e.target.value))}
             className={styles.volumenSlider}
             aria-label="Volumen"
+            aria-valuetext={textoVolumen}
           />
-          <span className={styles.volumenIcon}>🔊</span>
-          <span className={styles.volumenValor}>{Math.round(volumen * 100)}%</span>
+          <span className={styles.volumenIcon} aria-hidden="true">🔊</span>
+          <span className={styles.volumenValor}>{textoVolumen}</span>
+        </div>
+      </div>
+
+      {/*
+        Advertencias de seguridad y de responsabilidad FUERA de la EducationalSection, que nace
+        colapsada (hallazgo 1808): la app se presenta para test de oído y el volumen llega al
+        100 %, así que el riesgo auditivo y el «no es un diagnóstico» se ven sin abrir nada.
+      */}
+      <div className={`${styles.warningBox} ${styles.avisoSeguridad}`} role="note" aria-label="Advertencias de seguridad">
+        <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
+        <div>
+          <strong>Advertencias importantes sobre el uso del generador de tonos</strong>
+          <ul>
+            <li><strong>Riesgo de daño auditivo:</strong> El uso prolongado a volumen alto puede dañar permanentemente el oído. Las células ciliares cocleares no se regeneran. Mantén siempre el volumen por debajo del 50&nbsp;% y no uses la herramienta durante más de 15-20 minutos seguidos con auriculares.</li>
+            <li><strong>No es un diagnóstico médico:</strong> Los resultados de un test de audición casero con esta herramienta son orientativos y no sustituyen a una audiometría clínica realizada por un audiólogo o médico ORL con equipamiento calibrado en cámara silente.</li>
+            <li><strong>Cuidado con mascotas y niños pequeños:</strong> Frecuencias superiores a 15 kHz pueden ser audibles y molestas para mascotas (perros, gatos, roedores) aunque tú no las escuches. Los niños también tienen umbrales de agudos más altos. No uses la herramienta a volumen alto sin asegurarte de que no hay personas sensibles o animales cerca.</li>
+            <li><strong>Frecuencias muy bajas a volumen alto:</strong> Los tonos entre 18-20 Hz reproducidos a niveles muy altos a través de sistemas de audio potentes pueden causar sensaciones físicas incómodas (mareo, presión en el pecho, náuseas). A nivel del ordenador personal esto no es un riesgo real, pero en sistemas de sonido profesionales con subwoofers sí puede serlo.</li>
+            <li><strong>No usar con implantes cocleares o audífonos:</strong> Si usas audífonos o llevas implantes auditivos, consulta a tu audiólogo antes de hacer tests de frecuencias. Algunos dispositivos pueden responder de forma no lineal a tonos puros de alta intensidad.</li>
+          </ul>
         </div>
       </div>
 
@@ -841,78 +976,54 @@ export default function GeneradorTonosPage() {
         <h3 className={styles.sectionTitle}>Barrido de frecuencias (Sweep)</h3>
         <div className={styles.sweepControles}>
           <div className={styles.sweepInputs}>
-            <div className={styles.sweepInput}>
-              <label htmlFor="sweep-min">Desde</label>
-              <input
-                id="sweep-min"
-                type="number"
-                value={sweepMinTexto}
-                onChange={(e) => {
-                  setSweepMinTexto(e.target.value);
-                  const n = parseInt(e.target.value, 10);
-                  if (Number.isFinite(n) && n >= FREC_MIN && n <= FREC_MAX) setSweepMin(n);
-                }}
-                onBlur={() => {
-                  const n = acotarFrecuencia(parseInt(sweepMinTexto, 10) || FREC_MIN);
-                  setSweepMin(n);
-                  setSweepMinTexto(String(n));
-                }}
-                min={FREC_MIN}
-                max={FREC_MAX}
-              />
-              <span>Hz</span>
-            </div>
-            <div className={styles.sweepInput}>
-              <label htmlFor="sweep-max">Hasta</label>
-              <input
-                id="sweep-max"
-                type="number"
-                value={sweepMaxTexto}
-                onChange={(e) => {
-                  setSweepMaxTexto(e.target.value);
-                  const n = parseInt(e.target.value, 10);
-                  if (Number.isFinite(n) && n >= FREC_MIN && n <= FREC_MAX) setSweepMax(n);
-                }}
-                onBlur={() => {
-                  const n = acotarFrecuencia(parseInt(sweepMaxTexto, 10) || FREC_MAX);
-                  setSweepMax(n);
-                  setSweepMaxTexto(String(n));
-                }}
-                min={FREC_MIN}
-                max={FREC_MAX}
-              />
-              <span>Hz</span>
-            </div>
-            <div className={styles.sweepInput}>
-              <label htmlFor="sweep-dur">Duración</label>
-              {/* Texto espejo, como los otros tres campos desde el hallazgo 127. Este se
-                  quedó fuera: su onChange hacía `parseInt(v) || 5` y REESCRIBÍA el valor,
-                  así que el campo no se podía vaciar para teclear otro número —borrarlo
-                  ponía «5», y teclear «3» daba «53», un barrido de 53 s con el incremento 18
-                  veces menor y sin aviso (hallazgo 689)—. Y no acotaba lo que recibía pese a
-                  declarar min="1": con una duración negativa el incremento salía negativo,
-                  la frecuencia se clavaba en el suelo y el barrido no avanzaba nunca
-                  mientras el botón anunciaba que estaba barriendo (hallazgo 690, residuo del
-                  128). El acotado se hace en el blur, igual que en «Desde» y «Hasta». */}
-              <input
-                id="sweep-dur"
-                type="number"
-                value={sweepDuracionTexto}
-                onChange={(e) => {
-                  setSweepDuracionTexto(e.target.value);
-                  const n = parseInt(e.target.value, 10);
-                  if (Number.isFinite(n) && n >= DUR_MIN && n <= DUR_MAX) setSweepDuracion(n);
-                }}
-                onBlur={() => {
-                  const n = acotarDuracion(parseInt(sweepDuracionTexto, 10) || DUR_DEFECTO);
-                  setSweepDuracion(n);
-                  setSweepDuracionTexto(String(n));
-                }}
-                min={DUR_MIN}
-                max={DUR_MAX}
-              />
-              <span>seg</span>
-            </div>
+            {/*
+              Los tres campos son type="text" + inputMode="decimal" y se leen con
+              parseSpanishNumber (hallazgo 1804), por la misma razón que el campo de frecuencia
+              desde el 873/691: en un type="number" el navegador entrega «2,5» como «2.5» y
+              parseInt se quedaba con el 2. Cada uno lleva texto espejo (hallazgos 127 y 689: se
+              deja vaciar y reteclear) y se acota al SALIR, no mientras se escribe; lo que se
+              corrige se dice debajo, con aria-describedby para el lector de pantalla. El acotado
+              del número en uso se repite en `iniciarSweep` (hallazgo 690).
+            */}
+            {([
+              {
+                campo: 'min', id: 'sweep-min', etiqueta: 'Desde', unidad: 'Hz', texto: sweepMinTexto,
+                setTexto: setSweepMinTexto, setValor: setSweepMin, min: FREC_MIN, max: FREC_MAX, porDefecto: FREC_MIN,
+              },
+              {
+                campo: 'max', id: 'sweep-max', etiqueta: 'Hasta', unidad: 'Hz', texto: sweepMaxTexto,
+                setTexto: setSweepMaxTexto, setValor: setSweepMax, min: FREC_MIN, max: FREC_MAX, porDefecto: FREC_MAX,
+              },
+              {
+                campo: 'dur', id: 'sweep-dur', etiqueta: 'Duración', unidad: 's', texto: sweepDuracionTexto,
+                setTexto: setSweepDuracionTexto, setValor: setSweepDuracion, min: DUR_MIN, max: DUR_MAX, porDefecto: DUR_DEFECTO,
+              },
+            ] as const).map((c) => (
+              <div key={c.id} className={styles.sweepInput}>
+                <label htmlFor={c.id}>{c.etiqueta}</label>
+                <input
+                  id={c.id}
+                  type="text"
+                  inputMode="decimal"
+                  value={c.texto}
+                  aria-describedby={avisosBarrido[c.campo] ? `${c.id}-aviso` : undefined}
+                  aria-invalid={avisosBarrido[c.campo] ? true : undefined}
+                  onChange={(e) => {
+                    if (!PUEDE_SER_NUMERO.test(e.target.value)) return;
+                    c.setTexto(e.target.value);
+                    const n = parseSpanishNumber(e.target.value);
+                    if (Number.isFinite(n) && n >= c.min && n <= c.max) c.setValor(n);
+                  }}
+                  onBlur={() => {
+                    const { valor, aviso } = leerCampoBarrido(c.texto, c.etiqueta, c.unidad, c.min, c.max, c.porDefecto);
+                    c.setValor(valor);
+                    c.setTexto(textoFrecuencia(valor));
+                    setAvisosBarrido((previos) => ({ ...previos, [c.campo]: aviso }));
+                  }}
+                />
+                <span>{c.unidad}</span>
+              </div>
+            ))}
           </div>
           <button
             type="button"
@@ -920,8 +1031,24 @@ export default function GeneradorTonosPage() {
             onClick={sweep ? detenerSweep : iniciarSweep}
             aria-pressed={sweep}
           >
-            {sweep ? '⏹️ Detener barrido' : '🔄 Iniciar barrido'}
+            <span aria-hidden="true">{sweep ? '⏹️' : '🔄'}</span> {sweep ? 'Detener barrido' : 'Iniciar barrido'}
           </button>
+          {/* Debajo del botón y no encima: al salir de un campo con un clic en «Iniciar barrido», el
+              aviso aparece en el blur (antes del click) y, si empujara el botón, el clic caería fuera. */}
+          {/* La región viva existe siempre: una que nace con el texto dentro no siempre se anuncia. */}
+          <div role="status" aria-live="polite">
+            {(avisosBarrido.min || avisosBarrido.max || avisosBarrido.dur) && (
+              <div className={styles.barridoAvisos}>
+                {(['min', 'max', 'dur'] as const).map((campo) =>
+                  avisosBarrido[campo] ? (
+                    <p key={campo} id={`sweep-${campo}-aviso`}>
+                      <span aria-hidden="true">⚠️</span> {avisosBarrido[campo]}
+                    </p>
+                  ) : null,
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -1131,17 +1258,17 @@ export default function GeneradorTonosPage() {
         <h3 className={styles.infoTitle}>Usos comunes</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🔊</span>
+            <span className={styles.infoIcon} aria-hidden="true">🔊</span>
             <h4>Test de altavoces</h4>
             <p>Comprueba la respuesta de frecuencia de tus altavoces o auriculares.</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>👂</span>
+            <span className={styles.infoIcon} aria-hidden="true">👂</span>
             <h4>Test de audición</h4>
-            <p>Descubre hasta qué frecuencia puedes oír (normalmente hasta 15-20kHz).</p>
+            <p>Descubre hasta qué frecuencia puedes oír (normalmente hasta 15-20&nbsp;kHz).</p>
           </div>
           <div className={styles.infoCard}>
-            <span className={styles.infoIcon}>🎵</span>
+            <span className={styles.infoIcon} aria-hidden="true">🎵</span>
             <h4>Afinación</h4>
             <p>Usa las notas musicales para afinar instrumentos.</p>
           </div>
@@ -1232,22 +1359,22 @@ export default function GeneradorTonosPage() {
           <h3><span aria-hidden="true">🎯</span> Casos de Uso: Para Qué Sirve un Generador de Tonos</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>👂</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">👂</span>
               <h4>Test de Audición Personal</h4>
               <p>Sube progresivamente la frecuencia desde 8.000 Hz hasta 20.000 Hz para descubrir tu límite auditivo superior. A los 20 años el límite suele ser ~20 kHz; a los 40 años baja a ~14-16 kHz; a los 60 años puede estar en ~8-10 kHz. Un resultado muy distinto al esperado para tu edad puede justificar una audiometría profesional.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🎵</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🎵</span>
               <h4>Afinación de Instrumentos</h4>
               <p>La nota La4 estándar es 440 Hz (ISO 16:1975). La interpretación históricamente informada del barroco suele afinar en 415 Hz, un semitono por debajo, y las orquestas europeas modernas tiran de 442-443 Hz. En el barroco no había un estándar único: los órganos del norte de Alemania llegaban a 466 Hz y los instrumentos franceses bajaban hasta 392 Hz. Reproduce el tono y afina tu instrumento por referencia auditiva. Para instrumentos de cuerda: Do (261,63 Hz), Re (293,66 Hz), Mi (329,63 Hz), Fa (349,23 Hz), Sol (392 Hz), La (440 Hz), Si (493,88 Hz).</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🔊</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🔊</span>
               <h4>Calibración de Sistemas de Audio</h4>
               <p>Usa el barrido (sweep) de 20 Hz a 20 kHz para detectar resonancias o "huecos" en la respuesta de frecuencia de altavoces, auriculares o una sala. Si un rango se escucha mucho más fuerte o más débil que el resto, tu sistema tiene una coloración no lineal. Los tonos de prueba individuales identifican la frecuencia exacta del problema.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🏫</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🏫</span>
               <h4>Educación y Física Acústica</h4>
               <p>Ideal para clases de física: demuestra en tiempo real la diferencia entre onda senoidal (tono puro), cuadrada (rica en armónicos impares), sierra (todos los armónicos) y triangular (armónicos impares con caída rápida). El barrido de frecuencias ilustra visualmente el espectro audible y permite que los estudiantes experimenten las diferencias perceptivas entre rangos.</p>
             </div>
@@ -1259,7 +1386,7 @@ export default function GeneradorTonosPage() {
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Qué es la frecuencia y por qué se mide en Hz?</summary>
-              <p className={styles.eduFaqRespuesta}>La frecuencia es el número de oscilaciones completas por segundo de una onda sonora. El hercio (Hz), llamado así en honor al físico Heinrich Hertz, equivale a 1 ciclo por segundo. 440 Hz significa que el aire oscila 440 veces por segundo. A mayor frecuencia, más agudo es el sonido; a menor frecuencia, más grave. La velocidad del sonido en el aire (~343 m/s a 20°C) divide entre la frecuencia da la longitud de onda: a 440 Hz, λ ≈ 78 cm; a 20 Hz, λ ≈ 17 metros.</p>
+              <p className={styles.eduFaqRespuesta}>La frecuencia es el número de oscilaciones completas por segundo de una onda sonora. El hercio (Hz), llamado así en honor al físico Heinrich Hertz, equivale a 1 ciclo por segundo. 440 Hz significa que el aire oscila 440 veces por segundo. A mayor frecuencia, más agudo es el sonido; a menor frecuencia, más grave. La velocidad del sonido en el aire (~343 m/s a 20&nbsp;°C) divide entre la frecuencia da la longitud de onda: a 440 Hz, λ ≈ 78 cm; a 20 Hz, λ ≈ 17 metros.</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Por qué el oído humano oye exactamente de 20 Hz a 20 kHz?</summary>
@@ -1279,7 +1406,7 @@ export default function GeneradorTonosPage() {
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Qué es el decibelio y cuál es un volumen seguro?</summary>
-              <p className={styles.eduFaqRespuesta}>El decibelio (dB) mide la intensidad sonora en escala logarítmica: 0 dB es el umbral de audición, 60 dB es una conversación normal, 85 dB es el límite de exposición laboral (8h/día según la OIT), 110 dB es un concierto de rock. La exposición a &gt;85 dB durante períodos prolongados daña permanentemente las células ciliares. La regla del 3 dB: cada 3 dB adicionales se duplica la energía sonora, por lo que el tiempo de exposición segura se reduce a la mitad. Con auriculares al máximo volumen (~110 dB), el daño auditivo puede ocurrir en menos de 5 minutos.</p>
+              <p className={styles.eduFaqRespuesta}>El decibelio (dB) mide la intensidad sonora en escala logarítmica: 0 dB es el umbral de audición, 60 dB es una conversación normal, 85 dB es el límite de exposición laboral (8&nbsp;h/día según la OIT), 110 dB es un concierto de rock. La exposición a &gt;85 dB durante períodos prolongados daña permanentemente las células ciliares. La regla del 3 dB: cada 3 dB adicionales se duplica la energía sonora, por lo que el tiempo de exposición segura se reduce a la mitad. Con auriculares al máximo volumen (~110 dB), el daño auditivo puede ocurrir en menos de 5 minutos.</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿A qué frecuencia vibra la voz humana?</summary>
@@ -1299,7 +1426,7 @@ export default function GeneradorTonosPage() {
               <span className={styles.eduPasoNum}>1</span>
               <div>
                 <strong>Prepara el entorno</strong>
-                <p>Elige un lugar silencioso sin ruido de fondo. Usa auriculares de buena calidad (preferiblemente circumaurales cerrados) y ajusta el volumen al 30-50%. El ruido ambiente contamina el test: incluso 40 dB de fondo pueden enmascarar tonos débiles en los agudos.</p>
+                <p>Elige un lugar silencioso sin ruido de fondo. Usa auriculares de buena calidad (preferiblemente circumaurales cerrados) y ajusta el volumen al 30-50&nbsp;%. El ruido ambiente contamina el test: incluso 40 dB de fondo pueden enmascarar tonos débiles en los agudos.</p>
               </div>
             </li>
             <li className={styles.eduPaso}>
@@ -1344,50 +1471,34 @@ export default function GeneradorTonosPage() {
           <h3><span aria-hidden="true">💡</span> Consejos para Sacar el Máximo al Generador de Tonos</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🎧</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🎧</span>
               <h4>Usa auriculares para los agudos</h4>
               <p>Los altavoces del ordenador o smartphone raramente reproducen bien por encima de 12-14 kHz. Para testar frecuencias superiores a 10 kHz necesitas auriculares de calidad. Las frecuencias &lt;60 Hz tampoco se escuchan bien sin altavoces con woofer o subwoofer.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>📉</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">📉</span>
               <h4>Baja el volumen antes de subir la frecuencia</h4>
-              <p>Los agudos intensos son los más dañinos para el oído. Al explorar frecuencias &gt;8 kHz, reduce el volumen al 20-30%. Lo que falta de volumen puedes compensarlo con atención; lo que dañas en las células ciliares no se recupera.</p>
+              <p>Los agudos intensos son los más dañinos para el oído. Al explorar frecuencias &gt;8 kHz, reduce el volumen al 20-30&nbsp;%. Lo que falta de volumen puedes compensarlo con atención; lo que dañas en las células ciliares no se recupera.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🔁</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🔁</span>
               <h4>El sweep revela la respuesta de frecuencia</h4>
               <p>Un barrido lento de 20 Hz a 20 kHz con volumen constante te muestra qué frecuencias suenan más alto o más bajo en tu sistema. Las "montañas" son resonancias del altavoz o la sala; los "valles" son cancelaciones de fase o deficiencias del driver.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🎼</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🎼</span>
               <h4>La onda senoidal es la más pura para afinar</h4>
               <p>Para afinar instrumentos, usa siempre onda senoidal. Las ondas cuadrada y sierra tienen armónicos que pueden confundir el oído al comparar con el timbre del instrumento. La senoidal da un único punto de referencia sin coloración tonal.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🐕</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🐕</span>
               <h4>Las mascotas oyen más que tú</h4>
-              <p>Los perros oyen hasta ~65 kHz y los gatos hasta ~79 kHz. Si tienes mascotas en casa, evita reproducir frecuencias &gt;15 kHz a volumen alto: aunque tú no lo escuches, ellas sí lo oyen y puede causarles estrés o malestar.</p>
+              <p>Los perros oyen hasta ~45 kHz y los gatos hasta ~79 kHz (medidas de laboratorio de Heffner, con tonos de 60 dB). Si tienes mascotas en casa, evita reproducir frecuencias &gt;15 kHz a volumen alto: aunque tú no lo escuches, ellas sí lo oyen y puede causarles estrés o malestar.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🏠</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🏠</span>
               <h4>Los graves &lt;100 Hz dependen de la sala</h4>
               <p>Las frecuencias muy graves se amplifican o cancelan drásticamente según las dimensiones de la habitación (modos de sala). Un tono de 80 Hz puede sonar 20 dB más alto en una esquina de tu cuarto que en el centro. Para tests precisos de graves, necesitas una sala anecoica o análisis con micrófono de medición.</p>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <div className={styles.warningBox}>
-            <span className={styles.warningIcono}>⚠️</span>
-            <div>
-              <strong>Advertencias importantes sobre el uso del generador de tonos</strong>
-              <ul>
-                <li><strong>Riesgo de daño auditivo:</strong> El uso prolongado a volumen alto puede dañar permanentemente el oído. Las células ciliares cocleares no se regeneran. Mantén siempre el volumen por debajo del 50% y no uses la herramienta durante más de 15-20 minutos seguidos con auriculares.</li>
-                <li><strong>No es un diagnóstico médico:</strong> Los resultados de un test de audición casero con esta herramienta son orientativos y no sustituyen a una audiometría clínica realizada por un audiólogo o médico ORL con equipamiento calibrado en cámara silente.</li>
-                <li><strong>Cuidado con mascotas y niños pequeños:</strong> Frecuencias superiores a 15 kHz pueden ser audibles y molestas para mascotas (perros, gatos, roedores) aunque tú no las escuches. Los niños también tienen umbrales de agudos más altos. No uses la herramienta a volumen alto sin asegurarte de que no hay personas sensibles o animales cerca.</li>
-                <li><strong>Frecuencias muy bajas a volumen alto:</strong> Los tonos entre 18-20 Hz reproducidos a niveles muy altos a través de sistemas de audio potentes pueden causar sensaciones físicas incómodas (mareo, presión en el pecho, náuseas). A nivel del ordenador personal esto no es un riesgo real, pero en sistemas de sonido profesionales con subwoofers sí puede serlo.</li>
-                <li><strong>No usar con implantes cocleares o audífonos:</strong> Si usas audífonos o llevas implantes auditivos, consulta a tu audiólogo antes de hacer tests de frecuencias. Algunos dispositivos pueden responder de forma no lineal a tonos puros de alta intensidad.</li>
-              </ul>
             </div>
           </div>
         </section>

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Generador de Frecuencias Hz y Tonos Online (20-20000 Hz)',
+  title: 'Generador de Frecuencias Hz y Tonos Online (20-20.000 Hz)',
   description: 'Genera tonos puros y frecuencias de audio entre 20 Hz y 20.000 Hz. Ondas senoidal, cuadrada, triangular y sierra. Para test de oído, tinnitus y calibrar altavoces.',
   keywords: 'generador de tonos, generador de frecuencias, test de audio, frecuencia Hz, onda senoidal, calibración altavoces, tono puro, audio test',
   authors: [{ name: 'meskeIA' }],
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Generador de Frecuencias Hz y Tonos Online (20-20000 Hz)',
+    title: 'Generador de Frecuencias Hz y Tonos Online (20-20.000 Hz)',
     description: 'Tonos puros entre 20 Hz y 20.000 Hz. Ondas senoidal, cuadrada, triangular y sierra. Test de oído, tinnitus, calibrar altavoces.',
     url: 'https://meskeia.com/generador-tonos/',
     siteName: 'meskeIA',
@@ -59,7 +59,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve un generador de tonos online?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un generador de tonos produce frecuencias de audio puras que puedes usar para varias pruebas: comprobar el rango de frecuencias que escuchas, detectar pérdida auditiva en frecuencias concretas, calibrar altavoces y auriculares, o explorar fenómenos acústicos como los tonos binaurales. También se usa en audioterapia y para generar ruido blanco o tonos de referencia en producción musical.',
+        text: 'Un generador de tonos produce frecuencias de audio puras, con la misma señal en los dos oídos, que puedes usar para varias pruebas: comprobar de forma orientativa hasta qué frecuencia escuchas, calibrar altavoces y auriculares con tonos sueltos o con un barrido, afinar un instrumento con una nota de referencia o enseñar en clase cómo suenan las ondas senoidal, cuadrada, triangular y sierra. También permite medir, con el micrófono del propio aparato, cómo cambia la respuesta de un altavoz entre dos posiciones.',
       },
     },
     {
@@ -83,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Cómo uso el generador de tonos para hacer un test de audición básico?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Selecciona la onda senoidal, ajusta el volumen a un nivel moderado con auriculares y barre las frecuencias desde 20 Hz hasta 20.000 Hz. Anota la frecuencia más alta que puedes escuchar claramente. Si no percibes tonos por encima de 8.000-10.000 Hz, puede indicar pérdida auditiva en agudos. Este test es orientativo; para un diagnóstico auditivo profesional consulta a un audioprotesista.',
+        text: 'Selecciona la onda senoidal, ajusta el volumen a un nivel moderado con auriculares y barre las frecuencias desde 20 Hz hasta 20.000 Hz. Anota la frecuencia más alta que puedes escuchar claramente. Si no percibes tonos por encima de 8.000-10.000 Hz, puede indicar pérdida auditiva en agudos. Este test es orientativo y no sustituye a una audiometría clínica: para un diagnóstico, consulta a un audiólogo o a un médico otorrinolaringólogo (ORL).',
       },
     },
     {

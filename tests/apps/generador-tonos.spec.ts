@@ -58,6 +58,9 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *      barrido que truncan con parseInt (las dos vistas al reparar diapason), tres casos nuevos
  *      —timbre triangular y sierra, barrido desde el móvil, formato español en el campo— y un
  *      test por hallazgo. Los abiertos, con `test.fail()`.
+ *      REPARADOS el mismo 25/09/2026 (hallazgos 1803-1811): los H1-H9 dejan de ser `test.fail()` y
+ *      quedan como regresión; el H2 suma el caso «0,5 s» del acta, y el CASO 6 deja de exigir que
+ *      un 0 en «Hasta» salte al techo (ver su comentario).
  */
 
 test.use({
@@ -302,7 +305,8 @@ async function frecuenciasAplicadas(page: Page): Promise<number[]> {
 
 const campoFrecuencia = (page: Page) => page.getByLabel('Frecuencia en Hz');
 const botonReproducir = (page: Page) => page.getByRole('button', { name: /Reproducir/ });
-const botonDetener = (page: Page) => page.getByRole('button', { name: /⏹️ Detener$/ });
+// El emoji va con aria-hidden desde el hallazgo 1806: el nombre accesible es «Detener» a secas.
+const botonDetener = (page: Page) => page.getByRole('button', { name: /^Detener$/ });
 
 // ============================================================
 // CASO 1 — NORMAL: 440 Hz (La4) suena de verdad, y a 440 Hz
@@ -713,12 +717,21 @@ test('CASO 6 — ninguna entrada inválida saca al oscilador del rango 20–20.0
   await desde.fill('-100');
   await desde.blur();
   await expect(desde).toHaveValue('20');
-  // Los dos extremos NO caen en el mismo sitio, y está bien que no lo hagan: cada campo usa
-  // su propio borde como respaldo (`parseInt(t) || FREC_MIN` en «Desde», `|| FREC_MAX` en
-  // «Hasta»), así que un 0 —que es falsy— manda a «Desde» al suelo y a «Hasta» al techo.
+  await expect(page.locator('#sweep-min-aviso')).toContainText('se ajusta a 20');
+  // Hasta el 25/09/2026 (hallazgo 1804) este caso esperaba que un 0 en «Hasta» saltara al
+  // TECHO (20.000): era el `parseInt(t) || FREC_MAX` de entonces, que trataba el 0 —falsy— como
+  // un campo vacío. Consagraba ese atajo: 0 Hz es un número, está por debajo del suelo y lo
+  // coherente es acotarlo al suelo, como «Desde» con −100, y decirlo en pantalla. El fondo del
+  // caso no cambia: nada de lo que se escriba saca al oscilador del rango ni produce NaN.
   await hasta.fill('0');
   await hasta.blur();
-  await expect(hasta).toHaveValue('20000'); // techo, no NaN ni 0
+  await expect(hasta).toHaveValue('20'); // suelo, no NaN ni 0
+  await expect(page.locator('#sweep-max-aviso')).toContainText('se ajusta a 20');
+  // Y vuelta al techo escribiéndolo con punto de millares, que es un número español válido.
+  await hasta.fill('20.000');
+  await hasta.blur();
+  await expect(hasta).toHaveValue('20000');
+  await expect(page.locator('#sweep-max-aviso')).toHaveCount(0);
 
   // Barrido con los límites ya saneados, 20 → 20.000 Hz en 2 s: incremento = 499,5 Hz. Lo que
   // NO puede pasar es que emita NaN ni que se salga del rango prometido.
@@ -1239,7 +1252,8 @@ test('HALLAZGO E — bajar el volumen con el tono sonando es una rampa, no un es
   await esperarAudio(page, 0.2); // pasada la rampa de entrada: suena al 30 %
   const antes = await segundosDeAudio(page);
   await page.getByRole('slider', { name: 'Volumen' }).press('Home'); // 30 % → 0 %
-  await expect(page.locator('[class*="volumenValor"]')).toHaveText('0%');
+  // «0 %» con espacio duro desde el hallazgo 1805 (antes esperaba «0%» pegado).
+  await expect(page.locator('[class*="volumenValor"]')).toHaveText('0 %');
   await esperarAudio(page, antes + 0.15);
 
   const b = bajada(await capturarSalida(page));
@@ -1821,7 +1835,6 @@ test('SOSPECHA (a) — salir a otra app con el tono sonando lo deja en silencio'
 test('HALLAZGO H1 — al salir a otra app, la ganancia baja con rampa antes de stop()/close()', async ({
   page,
 }) => {
-  test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
   await abrirDesmontaje(page);
   await reproducirDs(page, 1.0);
   const desde = (await llamadasDs(page)).length;
@@ -1876,7 +1889,6 @@ test('HALLAZGO H1 — al salir a otra app, la ganancia baja con rampa antes de s
  * Tolerancia: cada peldaño emitido a ≤ 1 Hz de la escalera de 39,6 (la app redondea cada paso).
  */
 test('HALLAZGO H2 — «Duración» 2,5 s barre con el paso de 2,5 s, no con el de 2 s', async ({ page }) => {
-  test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
   await abrir(page);
   await esperarHidratacion(page, ['#sweep-dur']);
   const duracion = page.locator('#sweep-dur');
@@ -1902,6 +1914,37 @@ test('HALLAZGO H2 — «Duración» 2,5 s barre con el paso de 2,5 s, no con el 
 });
 
 /**
+ * HALLAZGO H2 (tercer caso, el del acta). «Duración» 0,5 s:
+ *   esperado  0,5 está por debajo del mínimo de 1 s → al salir, 1 s (acotarDuracion), y se dice
+ *   obtenido  (antes) parseInt('0.5') = 0, falsy, `|| DUR_DEFECTO` → 5 s, diez veces lo pedido,
+ *             sin ningún aviso.
+ * Con 1 s, Desde 20 y Hasta 2.000: incremento (2000 − 20) / (1 · 20) = 99 Hz → 119, 218, 317…
+ */
+test('HALLAZGO H2 — «Duración» 0,5 s se acota al mínimo de 1 s y lo dice, no salta a 5 s', async ({ page }) => {
+  await abrir(page);
+  await esperarHidratacion(page, ['#sweep-dur']);
+  const duracion = page.locator('#sweep-dur');
+  await duracion.click();
+  await duracion.press('Control+a');
+  await duracion.pressSequentially('0,5', { delay: 40 });
+  await duracion.blur();
+  await expect(duracion).toHaveValue('1');
+  await expect(page.locator('#sweep-dur-aviso')).toBeVisible();
+  await expect(page.locator('#sweep-dur-aviso')).toContainText('se ajusta a 1');
+  await expect(duracion).toHaveAttribute('aria-describedby', 'sweep-dur-aviso');
+
+  await page.getByRole('button', { name: /Iniciar barrido/ }).click();
+  await expect
+    .poll(async () => (await frecuenciasAplicadas(page)).length, { timeout: 10000 })
+    .toBeGreaterThanOrEqual(6);
+  await page.getByRole('button', { name: /Detener barrido/ }).click();
+  const escalera = Array.from({ length: 21 }, (_, k) => 20 + 99 * k);
+  for (const f of (await frecuenciasAplicadas(page)).slice(1)) {
+    expect(escalera, `${f} Hz no está en la escalera de 99 Hz de un barrido de 1 s`).toContain(f);
+  }
+});
+
+/**
  * HALLAZGO H2 (segundo caso, mismo defecto). «Desde» 261,63 Hz (Do4, 440·2^(−9/12) = 261,6256),
  * «Hasta» 300, «Duración» 1:
  *   esperado  el suelo del barrido es 261,63: la app redondea cada paso, así que lo más bajo que
@@ -1910,7 +1953,6 @@ test('HALLAZGO H2 — «Duración» 2,5 s barre con el paso de 2,5 s, no con el 
  *             (medido: [440, 263, 265, … 298, 300, 261, 263, …]).
  */
 test('HALLAZGO H2 — «Desde» 261,63 Hz no se trunca a 261 en el barrido', async ({ page }) => {
-  test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
   await abrir(page);
   await esperarHidratacion(page, ['#sweep-min', '#sweep-max', '#sweep-dur']);
   for (const [campo, texto] of [
@@ -1949,7 +1991,6 @@ test('HALLAZGO H2 — «Desde» 261,63 Hz no se trunca a 261 en el barrido', asy
  * Ojo al repararlo: el HALLAZGO E de más arriba espera «0%» en el rótulo y habrá que pasarlo a «0 %».
  */
 test('HALLAZGO H3 — el % va separado de la cifra con espacio duro', async ({ page }) => {
-  test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
   await abrir(page);
   await esperarHidratacion(page, [CAMPO_FRECUENCIA]);
   await expect(page.locator('[class*="volumenValor"]')).toHaveText('30 %');
@@ -1970,7 +2011,6 @@ test('HALLAZGO H3 — el % va separado de la cifra con espacio duro', async ({ p
 test('HALLAZGO H4 — los emojis decorativos no forman parte de lo que anuncia el lector de pantalla', async ({
   page,
 }) => {
-  test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
   await abrir(page);
   await esperarHidratacion(page, [CAMPO_FRECUENCIA]);
   await expect(page.getByRole('button', { name: 'Reproducir', exact: true })).toHaveCount(1);
@@ -1989,7 +2029,6 @@ test('HALLAZGO H4 — los emojis decorativos no forman parte de lo que anuncia e
  * Esperado: aria-valuetext «30 %» y uno que diga «261,63 Hz».
  */
 test('HALLAZGO H5 — los deslizadores anuncian el volumen en % y la frecuencia que suena', async ({ page }) => {
-  test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
   await abrir(page);
   await esperarHidratacion(page, [CAMPO_FRECUENCIA, DESLIZADOR_VOLUMEN]);
   await expect(page.getByRole('slider', { name: 'Volumen' })).toHaveAttribute('aria-valuetext', /^30\s%$/);
@@ -2014,7 +2053,6 @@ test('HALLAZGO H5 — los deslizadores anuncian el volumen en % y la frecuencia 
 test('HALLAZGO H6 — la advertencia de daño auditivo y de «no es un diagnóstico» se ve sin abrir la guía', async ({
   page,
 }) => {
-  test.fail(); // HALLAZGO medio (Inspector 25/09/2026)
   await abrir(page);
   await esperarHidratacion(page, [CAMPO_FRECUENCIA]);
   await expect(page.getByText('Riesgo de daño auditivo', { exact: false })).toBeVisible();
@@ -2034,7 +2072,6 @@ test('HALLAZGO H6 — la advertencia de daño auditivo y de «no es un diagnóst
 test('HALLAZGO H7 — la FAQ estructurada no promete binaurales, ruido blanco ni diagnóstico que la app no da', async ({
   page,
 }) => {
-  test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
   await abrir(page);
   await esperarHidratacion(page, [CAMPO_FRECUENCIA]);
   const faq = (await page.locator('script[type="application/ld+json"]').allTextContents())
@@ -2060,7 +2097,6 @@ test('HALLAZGO H7 — la FAQ estructurada no promete binaurales, ruido blanco ni
  * que quede escrito como excepción.
  */
 test('HALLAZGO H8 — el title agrupa los millares y el hero separa el símbolo de la unidad', async ({ page }) => {
-  test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
   await abrir(page);
   expect(await page.title(), 'title').not.toMatch(/\d{5}/);
   expect(await page.locator('meta[property="og:title"]').getAttribute('content'), 'og:title').not.toMatch(/\d{5}/);
@@ -2077,7 +2113,6 @@ test('HALLAZGO H8 — el title agrupa los millares y el hero separa el símbolo 
  * Consultado el 25/09/2026. Tolerancia ±5 kHz (`toBeCloseTo(45, -1)`): el defecto está a 20.
  */
 test('HALLAZGO H9 — el techo de audición del perro es el medido (~45 kHz), no ~65 kHz', async ({ page }) => {
-  test.fail(); // HALLAZGO bajo (Inspector 25/09/2026)
   await abrir(page);
   await esperarHidratacion(page, [CAMPO_FRECUENCIA]);
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();

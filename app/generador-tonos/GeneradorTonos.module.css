@@ -662,6 +662,34 @@
   gap: 14px;
 }
 
+/* Las advertencias viven fuera de la guía desde el hallazgo 1808: separación entre secciones. */
+.avisoSeguridad {
+  margin: 0 0 20px;
+}
+
+/* Lo que se corrige al salir de un campo del barrido (hallazgo 1804). */
+.barridoAvisos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.barridoAvisos p {
+  margin: 0;
+}
+
+[data-theme='dark'] .barridoAvisos {
+  background: rgba(245, 158, 11, 0.16);
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
 .warningIcono {
   font-size: 1.5rem;
   flex-shrink: 0;
