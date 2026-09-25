@@ -1,7 +1,7 @@
 'use client';
 
 import styles from '../SimuladorGenetica.module.css';
-import { formatNumber } from '@/lib';
+import { formatPercentage } from '@/lib';
 
 /**
  * Un porcentaje fenotípico, con los decimales que tenga y sin ninguno si no los tiene.
@@ -19,7 +19,8 @@ import { formatNumber } from '@/lib';
  * corrector ya admite 0,01 de desvío, que cubre de sobra lo que aquí se publica.
  */
 const porcentajeExacto = (valor: number): string =>
-  formatNumber(valor, Number.isInteger(valor) ? 0 : 2);
+  // Con el % separado por espacio duro (formatPercentage, hallazgo 1698 del 25/09/2026).
+  formatPercentage(valor / 100, Number.isInteger(valor) ? 0 : 2);
 import { PunnettResult, Trait } from './types';
 import { notacionGenotipo } from './genetics';
 
@@ -92,7 +93,7 @@ export default function StatisticsPanel({ punnett, rasgos }: StatisticsPanelProp
                   }}
                 />
               </div>
-              <span className={styles.ratioValue}>{porcentajeExacto(ratio * 100)}%</span>
+              <span className={styles.ratioValue}>{porcentajeExacto(ratio * 100)}</span>
             </div>
           ))}
         {genotypeRatioStr && (
@@ -122,7 +123,7 @@ export default function StatisticsPanel({ punnett, rasgos }: StatisticsPanelProp
                   }}
                 />
               </div>
-              <span className={styles.ratioValue}>{porcentajeExacto(data.count * 100)}%</span>
+              <span className={styles.ratioValue}>{porcentajeExacto(data.count * 100)}</span>
             </div>
           ))}
         {phenotypeRatioStr && (

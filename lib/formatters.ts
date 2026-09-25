@@ -326,20 +326,28 @@ export function parseSpanishNumber(input: string): number {
   return Number.isFinite(n) ? partes.signo * n : NaN;
 }
 
+/** Espacio duro (U+00A0) entre la cifra y el `%`: separa sin dejar el signo solo en otra línea. */
+const ESPACIO_PORCENTAJE = '\u00A0';
+
 /**
  * Formatea porcentaje a formato español
- * @param num - Número decimal (0.15 = 15%)
+ * @param num - Número decimal (0.15 = 15 %)
  * @param decimals - Número de decimales (por defecto 2)
- * @returns String formateado (ej: "15,00%")
+ * @returns String formateado (ej: "15,00 %", con espacio duro)
+ *
+ * El `%` va SEPARADO de la cifra, como el `€`: lo manda la Ortografía de la RAE (2010).
+ * Hasta el 25/09/2026 lo pegaba («15,00%»); se cambió al decidir la regla (hallazgo 1698,
+ * CLAUDE.md global §2), cuando no la usaba ningún fichero. El catálogo pega aún el `%` a mano
+ * tras `formatNumber` en unos cientos de sitios: se corrigen app a app, usando esta función.
  */
 export function formatPercentage(num: number, decimals: number = 2): string {
   if (isNaN(num)) return 'No definido';
-  if (!isFinite(num)) return num > 0 ? '∞%' : '-∞%';
+  if (!isFinite(num)) return (num > 0 ? '∞' : '-∞') + ESPACIO_PORCENTAJE + '%';
 
   return (num * 100).toLocaleString('es-ES', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
-  }) + '%';
+  }) + ESPACIO_PORCENTAJE + '%';
 }
 
 /**

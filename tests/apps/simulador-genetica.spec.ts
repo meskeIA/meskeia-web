@@ -119,17 +119,17 @@ test.describe('Caso 1 — Aa × Aa, el cruce que da 3:1', () => {
     await expect(fenotiposDeCelda(page)).toHaveText(['Amarillo', 'Amarillo', 'Amarillo', 'Verde']);
     // Los gametos y su frecuencia: cada progenitor heterocigoto da A y a al 50 %.
     const [columnas, filas] = await cabeceras(page);
-    expect(columnas).toEqual(['A (50%)', 'a (50%)']);
-    expect(filas).toEqual(['A (50%)', 'a (50%)']);
+    expect(columnas).toEqual(['A (50 %)', 'a (50 %)']);
+    expect(filas).toEqual(['A (50 %)', 'a (50 %)']);
   });
 
   test('las proporciones son 1:2:1 genotípica y 3:1 fenotípica', async ({ page }) => {
     const { genotipos, fenotipos } = await estadisticas(page);
     // 1 AA : 2 Aa : 1 aa sobre 4 celdas → 25 %, 50 %, 25 % (la app ordena de mayor a menor).
-    expect(genotipos.filas).toEqual(['Aa 50%', 'AA 25%', 'aa 25%']);
+    expect(genotipos.filas).toEqual(['Aa 50\u00A0%', 'AA 25\u00A0%', 'aa 25\u00A0%']);
     expect(genotipos.ratio).toContain('Ratio: 1:2:1');
     // Amarillo agrupa AA y Aa (3 de 4 celdas) → 75 % · Verde solo aa → 25 %.
-    expect(fenotipos.filas).toEqual(['🟡 Amarillo 75%', '🟢 Verde 25%']);
+    expect(fenotipos.filas).toEqual(['🟡 Amarillo 75\u00A0%', '🟢 Verde 25\u00A0%']);
     expect(fenotipos.ratio).toContain('Ratio: 3:1');
   });
 
@@ -148,10 +148,10 @@ test.describe('Caso 1 — Aa × Aa, el cruce que da 3:1', () => {
     // da 56,25 · 18,75 · 18,75 · 6,25, y redondearlo a entero era perder justo la precisión que
     // la sección «Casos para clase» de la misma página pide calcular.
     expect(fenotipos.filas).toEqual([
-      '🟡⚪ Amarillo / Lisa 56,25%',
-      '🟡🔘 Amarillo / Rugosa 18,75%',
-      '🟢⚪ Verde / Lisa 18,75%',
-      '🟢🔘 Verde / Rugosa 6,25%',
+      '🟡⚪ Amarillo / Lisa 56,25\u00A0%',
+      '🟡🔘 Amarillo / Rugosa 18,75\u00A0%',
+      '🟢⚪ Verde / Lisa 18,75\u00A0%',
+      '🟢🔘 Verde / Rugosa 6,25\u00A0%',
     ]);
     expect(fenotipos.ratio).toContain('Ratio: 9:3:3:1');
   });
@@ -170,8 +170,8 @@ test.describe('Caso 2 — límites', () => {
     // El cuadro se dibuja 2×2 (cabeceras A|A y a|a), así que las cuatro celdas son Aa.
     await expect(genotiposDeCelda(page)).toHaveText(['Aa', 'Aa', 'Aa', 'Aa']);
     const { genotipos, fenotipos } = await estadisticas(page);
-    expect(genotipos.filas).toEqual(['Aa 100%']);
-    expect(fenotipos.filas).toEqual(['🟡 Amarillo 100%']);
+    expect(genotipos.filas).toEqual(['Aa 100\u00A0%']);
+    expect(fenotipos.filas).toEqual(['🟡 Amarillo 100\u00A0%']);
   });
 
   test('AA × aa: los cuatro hijos del árbol genealógico son Aa', async ({ page }) => {
@@ -202,7 +202,7 @@ test.describe('Caso 2 — límites', () => {
     // La regla que la propia app enseña: el padre pasa su X solo a las hijas, nunca a los hijos.
     // Por eso el único afectado posible aquí es un varón, y hereda el Xd de su MADRE.
     const { genotipos } = await estadisticas(page);
-    expect(genotipos.filas).toContain('Xd Y 25%');
+    expect(genotipos.filas).toContain('Xd Y 25\u00A0%');
   });
 
   test('daltonismo: padre daltónico × madre portadora da una hija daltónica al 25 %', async ({
@@ -223,7 +223,7 @@ test.describe('Caso 2 — límites', () => {
     ]);
     const { genotipos } = await estadisticas(page);
     // La hija afectada necesita DOS Xd, uno de cada progenitor: 1 de las 4 celdas.
-    expect(genotipos.filas).toContain('Xd Xd 25%');
+    expect(genotipos.filas).toContain('Xd Xd 25\u00A0%');
   });
 
   test('dominancia incompleta: el heterocigoto tiene fenotipo propio y el ratio pasa a 1:2:1', async ({
@@ -237,7 +237,7 @@ test.describe('Caso 2 — límites', () => {
     // Mismo cuadro que Aa × Aa, pero Rr ya no se parece a RR: rojo, rosa, rosa, blanco.
     await expect(fenotiposDeCelda(page)).toHaveText(['Rojo', 'Rosa', 'Rosa', 'Blanco']);
     const { fenotipos } = await estadisticas(page);
-    expect(fenotipos.filas).toEqual(['🩷 Rosa 50%', '🔴 Rojo 25%', '⚪ Blanco 25%']);
+    expect(fenotipos.filas).toEqual(['🩷 Rosa 50\u00A0%', '🔴 Rojo 25\u00A0%', '⚪ Blanco 25\u00A0%']);
     // Aquí el fenotípico coincide con el genotípico: 1:2:1, no 3:1.
     expect(fenotipos.ratio).toContain('Ratio: 1:2:1');
   });
@@ -348,11 +348,11 @@ test.describe('Simulador de genética — regresiones de los hallazgos reparados
     expect(filas).toHaveLength(2);
 
     const probabilidades = await probabilidadesDeCelda(page).allInnerTexts();
-    expect(probabilidades).toEqual(['25,0%', '25,0%', '25,0%', '25,0%']);
+    expect(probabilidades).toEqual(['25,0\u00A0%', '25,0\u00A0%', '25,0\u00A0%', '25,0\u00A0%']);
     await expect(genotiposDeCelda(page)).toHaveText(['Aa', 'Aa', 'Aa', 'Aa']);
 
     // Las cuatro celdas son el mismo genotipo: Estadísticas dice «Aa 100%», sin contradicción.
-    expect((await estadisticas(page)).genotipos.filas).toEqual(['Aa 100%']);
+    expect((await estadisticas(page)).genotipos.filas).toEqual(['Aa 100\u00A0%']);
   });
 
   test('el cuadro no se rehace al pasar a dihíbrido ni al cambiar el segundo rasgo', async ({
@@ -383,7 +383,7 @@ test.describe('Simulador de genética — regresiones de los hallazgos reparados
     // sexo, así que salen DOS filas «👁️ Visión normal» (50 % y 25 %) imposibles de distinguir,
     // y un «Ratio: 2:1:1» que no se puede leer sin el sexo que se acaba de borrar.
     const { fenotipos } = await estadisticas(page);
-    expect(new Set(fenotipos.filas.map((f) => f.replace(/ \d+%$/, ''))).size).toBe(
+    expect(new Set(fenotipos.filas.map((f) => f.replace(/ \d+\s?%$/, ''))).size).toBe(
       fenotipos.filas.length
     );
   });
@@ -393,7 +393,7 @@ test.describe('Simulador de genética — regresiones de los hallazgos reparados
     // Formato español obligatorio: antes se usaba toFixed(1) directamente y salía «25.0%».
     await expect(probabilidadesDeCelda(page)).toHaveCount(4);
     const probabilidades = await probabilidadesDeCelda(page).allInnerTexts();
-    expect(probabilidades).toEqual(['25,0%', '25,0%', '25,0%', '25,0%']);
+    expect(probabilidades).toEqual(['25,0\u00A0%', '25,0\u00A0%', '25,0\u00A0%', '25,0\u00A0%']);
   });
 
   test('los botones de selección no llevan type ni anuncian qué está activo', async ({ page }) => {
@@ -856,19 +856,19 @@ test.describe('Re-inspección 14/09/2026 · los tres casos', () => {
     ]);
     // Las cuatro casillas son igual de probables: 1/4 = 25,0 % (coma decimal española).
     expect(await probabilidadesDeCelda(page).allInnerTexts()).toEqual([
-      '25,0%',
-      '25,0%',
-      '25,0%',
-      '25,0%',
+      '25,0\u00A0%',
+      '25,0\u00A0%',
+      '25,0\u00A0%',
+      '25,0\u00A0%',
     ]);
     const [columnas, filas] = await cabeceras(page);
-    expect(columnas).toEqual(['A (50%)', 'a (50%)']);
-    expect(filas).toEqual(['A (50%)', 'a (50%)']);
+    expect(columnas).toEqual(['A (50 %)', 'a (50 %)']);
+    expect(filas).toEqual(['A (50 %)', 'a (50 %)']);
 
     // Proporciones: 25/50/25 y 75/25, calculadas arriba.
     const { genotipos, fenotipos } = await estadisticas(page);
-    expect(genotipos.filas).toEqual(['Aa 50%', 'AA 25%', 'aa 25%']);
-    expect(sinIcono(fenotipos.filas)).toEqual(['Amarillo 75%', 'Verde 25%']);
+    expect(genotipos.filas).toEqual(['Aa 50\u00A0%', 'AA 25\u00A0%', 'aa 25\u00A0%']);
+    expect(sinIcono(fenotipos.filas)).toEqual(['Amarillo 75\u00A0%', 'Verde 25\u00A0%']);
     expect(fenotipos.ratio).toContain('Ratio: 3:1');
 
     // Y el caso de aula 1 pregunta ese mismo 25 % de semillas verdes.
@@ -897,8 +897,8 @@ test.describe('Re-inspección 14/09/2026 · los tres casos', () => {
 
     // Sin pulsar «Realizar Cruce»: el recálculo automático es la reparación (c) del 21/08.
     const [columnas, filas] = await cabeceras(page);
-    expect(columnas).toEqual(['AR (25%)', 'AR (25%)', 'Ar (25%)', 'Ar (25%)']);
-    expect(filas).toEqual(['aR (25%)', 'aR (25%)', 'ar (25%)', 'ar (25%)']);
+    expect(columnas).toEqual(['AR (25 %)', 'AR (25 %)', 'Ar (25 %)', 'Ar (25 %)']);
+    expect(filas).toEqual(['aR (25 %)', 'aR (25 %)', 'ar (25 %)', 'ar (25 %)']);
     // Rasgo 1 invariable (Aa en las 16) y rasgo 2 con el 1:2:1 de un Rr × Rr, leído por filas.
     await expect(genotiposDeCelda(page)).toHaveText([
       'Aa RR', 'Aa RR', 'Aa Rr', 'Aa Rr',
@@ -906,14 +906,14 @@ test.describe('Re-inspección 14/09/2026 · los tres casos', () => {
       'Aa Rr', 'Aa Rr', 'Aa rr', 'Aa rr',
       'Aa Rr', 'Aa Rr', 'Aa rr', 'Aa rr',
     ]);
-    expect(await probabilidadesDeCelda(page).allInnerTexts()).toEqual(Array(16).fill('6,3%'));
+    expect(await probabilidadesDeCelda(page).allInnerTexts()).toEqual(Array(16).fill('6,3\u00A0%'));
 
     const dihibrido = await estadisticas(page);
-    expect(dihibrido.genotipos.filas).toEqual(['Aa Rr 50%', 'Aa RR 25%', 'Aa rr 25%']);
+    expect(dihibrido.genotipos.filas).toEqual(['Aa Rr 50\u00A0%', 'Aa RR 25\u00A0%', 'Aa rr 25\u00A0%']);
     // 12/16 lisas y 4/16 rugosas: el 3:1 del rasgo 2, con el rasgo 1 fijado en amarillo.
     expect(sinIcono(dihibrido.fenotipos.filas)).toEqual([
-      'Amarillo / Lisa 75%',
-      'Amarillo / Rugosa 25%',
+      'Amarillo / Lisa 75\u00A0%',
+      'Amarillo / Rugosa 25\u00A0%',
     ]);
     expect(dihibrido.fenotipos.ratio).toContain('Ratio: 3:1');
 
@@ -933,10 +933,10 @@ test.describe('Re-inspección 14/09/2026 · los tres casos', () => {
       'Daltónico (♂)',
     ]);
     const ligado = await estadisticas(page);
-    expect(ligado.genotipos.filas).toEqual(['XD Xd 50%', 'Xd Y 50%']);
+    expect(ligado.genotipos.filas).toEqual(['XD Xd 50\u00A0%', 'Xd Y 50\u00A0%']);
     expect(sinIcono(ligado.fenotipos.filas)).toEqual([
-      'Visión normal (♀) 50%',
-      'Daltónico (♂) 50%',
+      'Visión normal (♀) 50\u00A0%',
+      'Daltónico (♂) 50\u00A0%',
     ]);
 
     // Y el caso de aula 12 pregunta ese 50 % de hijos varones daltónicos sobre el TOTAL.
@@ -1082,7 +1082,7 @@ test.describe('Re-inspección 14/09/2026 · hallazgos abiertos', () => {
   test('la línea «Ratio:» dice a qué genotipo corresponde cada número', async ({ page }) => {
     await page.goto(RUTA);
     const { genotipos } = await estadisticas(page);
-    expect(genotipos.filas).toEqual(['Aa 50%', 'AA 25%', 'aa 25%']);
+    expect(genotipos.filas).toEqual(['Aa 50\u00A0%', 'AA 25\u00A0%', 'aa 25\u00A0%']);
 
     // La cifra canónica, en el orden del motor (AA : Aa : aa)
     expect(genotipos.ratio).toContain('Ratio: 1:2:1');
@@ -1144,7 +1144,7 @@ test.describe('Re-inspección 14/09/2026 · hallazgos abiertos', () => {
     // varones daltónicos, porque la mitad de la descendencia son varones.
     await abreDaltonismo(page);
     const { fenotipos } = await estadisticas(page);
-    expect(sinIcono(fenotipos.filas)).toContain('Daltónico (♂) 25%');
+    expect(sinIcono(fenotipos.filas)).toContain('Daltónico (♂) 25\u00A0%');
 
     // La tarjeta «Asesoramiento genético familiar» promete 50 % para ese mismo cruce (cuenta
     // sobre los varones, no sobre el total), mientras la primera tarjeta del mismo bloque usa
@@ -1161,8 +1161,8 @@ test.describe('Re-inspección 14/09/2026 · hallazgos abiertos', () => {
     // filas: `gametesColumna = punnett.gametes1` en PunnettSquare.tsx.
     await selectorGenotipo(page, 0).selectOption('AA');
     const [columnas, filas] = await cabeceras(page);
-    expect(columnas).toEqual(['A (50%)', 'A (50%)']);
-    expect(filas).toEqual(['A (50%)', 'a (50%)']);
+    expect(columnas).toEqual(['A (50 %)', 'A (50 %)']);
+    expect(filas).toEqual(['A (50 %)', 'a (50 %)']);
 
     // Y el paso 4 de la guía dice lo contrario, rematando con «El simulador hace esto
     // automáticamente en la pestaña Punnett».
@@ -1234,25 +1234,25 @@ test.describe('Re-inspección 22/09/2026 · los tres casos', () => {
     await expect(genotiposDeCelda(page)).toHaveText(['Tt', 'tt', 'Tt', 'tt']);
     await expect(fenotiposDeCelda(page)).toHaveText(['Alta', 'Enana', 'Alta', 'Enana']);
     expect(await probabilidadesDeCelda(page).allInnerTexts()).toEqual([
-      '25,0%',
-      '25,0%',
-      '25,0%',
-      '25,0%',
+      '25,0\u00A0%',
+      '25,0\u00A0%',
+      '25,0\u00A0%',
+      '25,0\u00A0%',
     ]);
     // La madre homocigota aporta el MISMO gameto en las dos filas: la rejilla no se colapsa.
     const [columnas, filas] = await cabeceras(page);
-    expect(columnas).toEqual(['T (50%)', 't (50%)']);
-    expect(filas).toEqual(['t (50%)', 't (50%)']);
+    expect(columnas).toEqual(['T (50 %)', 't (50 %)']);
+    expect(filas).toEqual(['t (50 %)', 't (50 %)']);
 
     const { genotipos, fenotipos } = await estadisticas(page);
-    expect(genotipos.filas).toEqual(['Tt 50%', 'tt 50%']);
+    expect(genotipos.filas).toEqual(['Tt 50\u00A0%', 'tt 50\u00A0%']);
     expect(genotipos.ratio).toContain('Ratio: 1:1');
     expect(genotipos.ratio).toContain('Tt · tt');
-    expect(sinIcono(fenotipos.filas)).toEqual(['Alta 50%', 'Enana 50%']);
+    expect(sinIcono(fenotipos.filas)).toEqual(['Alta 50\u00A0%', 'Enana 50\u00A0%']);
     expect(fenotipos.ratio).toContain('Ratio: 1:1');
     // Y las dos proporciones suman 100 %, que es lo que hace legible un cuadro de Punnett.
     const porcentajes = (f: string[]) =>
-      f.reduce((s, x) => s + Number(x.match(/(\d+)%$/)?.[1] ?? 0), 0);
+      f.reduce((s, x) => s + Number(x.match(/(\d+)\s?%$/)?.[1] ?? 0), 0);
     expect(porcentajes(genotipos.filas)).toBe(100);
     expect(porcentajes(fenotipos.filas)).toBe(100);
   });
@@ -1305,8 +1305,8 @@ test.describe('Re-inspección 22/09/2026 · los tres casos', () => {
     await expect(fenotiposDeCelda(page)).toHaveText(['Verde', 'Verde', 'Verde', 'Verde']);
 
     const { genotipos, fenotipos } = await estadisticas(page);
-    expect(genotipos.filas).toEqual(['aa 100%']);
-    expect(sinIcono(fenotipos.filas)).toEqual(['Verde 100%']);
+    expect(genotipos.filas).toEqual(['aa 100\u00A0%']);
+    expect(sinIcono(fenotipos.filas)).toEqual(['Verde 100\u00A0%']);
     // Con una sola categoría el ratio es «1», no «1:0»: el amarillo no es una casilla vacía.
     expect(genotipos.ratio).toContain('Ratio: 1 (aa)');
     expect(fenotipos.ratio).not.toContain('Amarillo');
@@ -1469,12 +1469,12 @@ test.describe('Re-inspección 22/09/2026 · hallazgos abiertos', () => {
     await page.getByRole('button', { name: /Realizar Cruce/ }).click();
     const { fenotipos } = await estadisticas(page);
     const filas = sinIcono(fenotipos.filas);
-    expect(filas).toContain('Verde / Rugosa 6,25%');
-    expect(filas).toContain('Amarillo / Lisa 56,25%');
+    expect(filas).toContain('Verde / Rugosa 6,25\u00A0%');
+    expect(filas).toContain('Amarillo / Lisa 56,25\u00A0%');
     // Y un porcentaje sin decimales sigue saliendo sin ellos: 25 %, no «25,00 %».
     await page.getByRole('button', { name: 'Monohíbrido', exact: true }).click();
     await page.getByRole('button', { name: /Realizar Cruce/ }).click();
-    expect(sinIcono((await estadisticas(page)).fenotipos.filas).join(' ')).toContain('75%');
+    expect(sinIcono((await estadisticas(page)).fenotipos.filas).join(' ')).toContain('75\u00A0%');
 
     // La sección dice «Resuélvelos con el cuadro de Punnett de arriba», y ahora lo que pone
     // arriba es exactamente lo que el corrector espera, en los dos casos del acta.
@@ -1670,7 +1670,7 @@ test.describe('simulador-genetica · grupo sanguíneo ABO en el navegador', () =
 
     const { genotipos, fenotipos } = await estadisticas(page);
     expect(fenotipos.filas).toHaveLength(4);
-    for (const fila of fenotipos.filas) expect(fila).toMatch(/Grupo (A|B|AB|O) 25%$/);
+    for (const fila of fenotipos.filas) expect(fila).toMatch(/Grupo (A|B|AB|O) 25\u00A0%$/);
     expect(genotipos.ratio).toContain('Iᴬi');
     expect(genotipos.ratio).not.toMatch(/\bAO\b/);
   });
@@ -1686,8 +1686,8 @@ test.describe('simulador-genetica · grupo sanguíneo ABO en el navegador', () =
     // Con el ABO como primer rasgo del dihíbrido el enlace sigue a la vista.
     await expect(page.locator('a[href="/visualizador-sangre-componentes/"]')).toHaveCount(1);
     const { fenotipos } = await estadisticas(page);
-    expect(fenotipos.filas.some((f) => f.includes('Grupo O / Rh negativo') && f.endsWith('6,25%'))).toBe(true);
-    expect(fenotipos.filas.some((f) => f.includes('Grupo AB / Rh positivo') && f.endsWith('18,75%'))).toBe(true);
+    expect(fenotipos.filas.some((f) => f.includes('Grupo O / Rh negativo') && f.endsWith('6,25\u00A0%'))).toBe(true);
+    expect(fenotipos.filas.some((f) => f.includes('Grupo AB / Rh positivo') && f.endsWith('18,75\u00A0%'))).toBe(true);
   });
 
   test('el árbol no pinta a nadie como «afectado» por ser del grupo O', async ({ page }) => {
@@ -1780,17 +1780,17 @@ test.describe('Inspección 24/09/2026 — ABO y Rh: los casos resueltos a mano',
     await selectorGenotipo(page, 1).selectOption('OO');
 
     const [columnas, filas] = await cabeceras(page);
-    expect(columnas).toEqual(['Iᴬ (50%)', 'Iᴮ (50%)']);
-    expect(filas).toEqual(['i (50%)', 'i (50%)']);
+    expect(columnas).toEqual(['Iᴬ (50 %)', 'Iᴮ (50 %)']);
+    expect(filas).toEqual(['i (50 %)', 'i (50 %)']);
     await expect(genotiposDeCelda(page)).toHaveText(['Iᴬi', 'Iᴮi', 'Iᴬi', 'Iᴮi']);
     await expect(fenotiposDeCelda(page)).toHaveText(['Grupo A', 'Grupo B', 'Grupo A', 'Grupo B']);
     // 1/4 por casilla: las cuatro suman 100 % (la forma del hallazgo 90).
-    await expect(probabilidadesDeCelda(page)).toHaveText(['25,0%', '25,0%', '25,0%', '25,0%']);
+    await expect(probabilidadesDeCelda(page)).toHaveText(['25,0\u00A0%', '25,0\u00A0%', '25,0\u00A0%', '25,0\u00A0%']);
 
     const ab = await estadisticas(page);
-    expect(sinIcono(ab.fenotipos.filas)).toEqual(['Grupo A 50%', 'Grupo B 50%']);
+    expect(sinIcono(ab.fenotipos.filas)).toEqual(['Grupo A 50\u00A0%', 'Grupo B 50\u00A0%']);
     expect(ab.fenotipos.ratio).toBe('Ratio: 1:1 (Grupo A · Grupo B)');
-    expect(ab.genotipos.filas).toEqual(['Iᴬi 50%', 'Iᴮi 50%']);
+    expect(ab.genotipos.filas).toEqual(['Iᴬi 50\u00A0%', 'Iᴮi 50\u00A0%']);
     // Ningún hijo con el grupo de sus padres: ni AB ni O.
     expect(ab.fenotipos.filas.join(' ')).not.toMatch(/Grupo (AB|O)\b/);
 
@@ -1799,7 +1799,7 @@ test.describe('Inspección 24/09/2026 — ABO y Rh: los casos resueltos a mano',
     await selectorGenotipo(page, 1).selectOption('BO');
     await expect(genotiposDeCelda(page)).toHaveText(['IᴬIᴮ', 'IᴬIᴮ', 'Iᴬi', 'Iᴬi']);
     const aa = await estadisticas(page);
-    expect(sinIcono(aa.fenotipos.filas).sort()).toEqual(['Grupo A 50%', 'Grupo AB 50%']);
+    expect(sinIcono(aa.fenotipos.filas).sort()).toEqual(['Grupo A 50\u00A0%', 'Grupo AB 50\u00A0%']);
   });
 
   test('CASO B · Rh Dd × Dd da 3:1 y no ofrece el enlace de la sangre (no hay ABO en el cruce)', async ({
@@ -1813,7 +1813,7 @@ test.describe('Inspección 24/09/2026 — ABO y Rh: los casos resueltos a mano',
     await expect(genotiposDeCelda(page)).toHaveText(['DD', 'Dd', 'Dd', 'dd']);
 
     const { genotipos, fenotipos } = await estadisticas(page);
-    expect(sinIcono(fenotipos.filas)).toEqual(['Rh positivo 75%', 'Rh negativo 25%']);
+    expect(sinIcono(fenotipos.filas)).toEqual(['Rh positivo 75\u00A0%', 'Rh negativo 25\u00A0%']);
     expect(fenotipos.ratio).toBe('Ratio: 3:1 (Rh positivo · Rh negativo)');
     expect(genotipos.ratio).toBe('Ratio: 1:2:1 (DD · Dd · dd)');
     await expect(page.locator('a[href="/visualizador-sangre-componentes/"]')).toHaveCount(0);
@@ -1823,9 +1823,9 @@ test.describe('Inspección 24/09/2026 — ABO y Rh: los casos resueltos a mano',
     await abreABOxRhOchoFenotipos(page);
 
     const [columnas, filas] = await cabeceras(page);
-    expect(columnas).toEqual(['IᴬD (25%)', 'Iᴬd (25%)', 'iD (25%)', 'id (25%)']);
-    expect(filas).toEqual(['Iᴮd (25%)', 'Iᴮd (25%)', 'id (25%)', 'id (25%)']);
-    await expect(probabilidadesDeCelda(page)).toHaveText(Array.from({ length: 16 }, () => '6,3%'));
+    expect(columnas).toEqual(['IᴬD (25 %)', 'Iᴬd (25 %)', 'iD (25 %)', 'id (25 %)']);
+    expect(filas).toEqual(['Iᴮd (25 %)', 'Iᴮd (25 %)', 'id (25 %)', 'id (25 %)']);
+    await expect(probabilidadesDeCelda(page)).toHaveText(Array.from({ length: 16 }, () => '6,3\u00A0%'));
     // La fila «id» de la madre: Iᴬi Dd, Iᴬi dd, ii Dd, ii dd.
     await expect(genotiposDeCelda(page).nth(8)).toHaveText('Iᴬi Dd');
     await expect(genotiposDeCelda(page).nth(11)).toHaveText('ii dd');
@@ -1833,14 +1833,14 @@ test.describe('Inspección 24/09/2026 — ABO y Rh: los casos resueltos a mano',
     const { fenotipos } = await estadisticas(page);
     expect(sinIcono(fenotipos.filas).sort()).toEqual(
       [
-        'Grupo A / Rh negativo 12,50%',
-        'Grupo A / Rh positivo 12,50%',
-        'Grupo AB / Rh negativo 12,50%',
-        'Grupo AB / Rh positivo 12,50%',
-        'Grupo B / Rh negativo 12,50%',
-        'Grupo B / Rh positivo 12,50%',
-        'Grupo O / Rh negativo 12,50%',
-        'Grupo O / Rh positivo 12,50%',
+        'Grupo A / Rh negativo 12,50\u00A0%',
+        'Grupo A / Rh positivo 12,50\u00A0%',
+        'Grupo AB / Rh negativo 12,50\u00A0%',
+        'Grupo AB / Rh positivo 12,50\u00A0%',
+        'Grupo B / Rh negativo 12,50\u00A0%',
+        'Grupo B / Rh positivo 12,50\u00A0%',
+        'Grupo O / Rh negativo 12,50\u00A0%',
+        'Grupo O / Rh positivo 12,50\u00A0%',
       ].sort(),
     );
     expect(fenotipos.ratio.startsWith('Ratio: 1:1:1:1:1:1:1:1 (')).toBe(true);
@@ -1861,7 +1861,7 @@ test.describe('Inspección 24/09/2026 — ABO y Rh: los casos resueltos a mano',
     // 1205: las dos columnas en el mismo orden, fila a fila.
     expect(columnasPob[0].map((f) => f.nombre)).toEqual(columnasPob[1].map((f) => f.nombre));
     // 1204: 500 × 1/8 = 62,5 en cada fila, que suman los 500 simulados.
-    expect(columnasPob[1].map((f) => f.cifra.replace(/\s+/g, ' '))).toEqual(Array.from({ length: 8 }, () => '62,5 (12,5%)'));
+    expect(columnasPob[1].map((f) => f.cifra.replace(/\s+/g, ' '))).toEqual(Array.from({ length: 8 }, () => '62,5 (12,5 %)'));
   });
 
   test('CASO D · al combinar y cambiar rasgos con el ABO nunca queda un cuadro imposible', async ({
@@ -2074,8 +2074,8 @@ test.describe('Inspección 24/09/2026 — ABO y Rh: hallazgos reparados', () => 
     const [observado, esperado] = await leerPoblacion(page);
     expect(observado.map((f) => f.nombre)).toEqual(['Grupo A', 'Grupo O']);
     expect(esperado).toEqual([
-      { nombre: 'Grupo A', cifra: '50 (50,0%)' },
-      { nombre: 'Grupo O', cifra: '50 (50,0%)' },
+      { nombre: 'Grupo A', cifra: '50 (50,0 %)' },
+      { nombre: 'Grupo O', cifra: '50 (50,0 %)' },
     ]);
     // «Observado» vuelve a sumar N (antes sumaba 63 de 100).
     expect(observado.reduce((suma, f) => suma + Number(f.cifra.split(' ')[0]), 0)).toBe(100);
@@ -2366,8 +2366,8 @@ async function simularForzado(page: Page, dominantes: number, recesivos: number)
   await page.getByRole('button', { name: /Simular/ }).click();
   // Espera al render de ESTA simulación, no al de la anterior (mismo N, otras cifras).
   await expect(page.locator('[class*="resultColumn"]').first().locator('[class*="resultRow"]')).toHaveText([
-    `Amarillo${dominantes} (${dominantes},0%)`,
-    `Verde${recesivos} (${recesivos},0%)`,
+    `Amarillo${dominantes} (${dominantes},0 %)`,
+    `Verde${recesivos} (${recesivos},0 %)`,
   ]);
 }
 
@@ -2376,19 +2376,19 @@ test.describe('Re-inspección 25/09/2026 · los tres casos', () => {
     await abreCrucePruebaDrosophila(page);
 
     const [columnas, filas] = await cabeceras(page);
-    expect(columnas).toEqual(['BV (25%)', 'Bv (25%)', 'bV (25%)', 'bv (25%)']);
-    expect(filas).toEqual(['bv (25%)', 'bv (25%)', 'bv (25%)', 'bv (25%)']);
+    expect(columnas).toEqual(['BV (25 %)', 'Bv (25 %)', 'bV (25 %)', 'bv (25 %)']);
+    expect(filas).toEqual(['bv (25 %)', 'bv (25 %)', 'bv (25 %)', 'bv (25 %)']);
     const fila = ['Bb Vv', 'Bb vv', 'bb Vv', 'bb vv'];
     await expect(genotiposDeCelda(page)).toHaveText([...fila, ...fila, ...fila, ...fila]);
 
     const { genotipos, fenotipos } = await estadisticas(page);
-    expect(genotipos.filas).toEqual(['Bb Vv 25%', 'Bb vv 25%', 'bb Vv 25%', 'bb vv 25%']);
+    expect(genotipos.filas).toEqual(['Bb Vv 25\u00A0%', 'Bb vv 25\u00A0%', 'bb Vv 25\u00A0%', 'bb vv 25\u00A0%']);
     expect(genotipos.ratio).toBe('Ratio: 1:1:1:1 (Bb Vv · Bb vv · bb Vv · bb vv)');
     expect(sinIcono(fenotipos.filas)).toEqual([
-      'Gris / Alas normales 25%',
-      'Gris / Alas vestigiales 25%',
-      'Negro / Alas normales 25%',
-      'Negro / Alas vestigiales 25%',
+      'Gris / Alas normales 25\u00A0%',
+      'Gris / Alas vestigiales 25\u00A0%',
+      'Negro / Alas normales 25\u00A0%',
+      'Negro / Alas vestigiales 25\u00A0%',
     ]);
     expect(fenotipos.ratio).toBe(
       'Ratio: 1:1:1:1 (Gris / Alas normales · Gris / Alas vestigiales · Negro / Alas normales · Negro / Alas vestigiales)',
@@ -2412,8 +2412,8 @@ test.describe('Re-inspección 25/09/2026 · los tres casos', () => {
       'Ojos blancos (♂)',
     ]);
     const { genotipos, fenotipos } = await estadisticas(page);
-    expect(genotipos.filas).toEqual(['XW Xw 50%', 'Xw Y 50%']);
-    expect(sinIcono(fenotipos.filas)).toEqual(['Ojos rojos (♀) 50%', 'Ojos blancos (♂) 50%']);
+    expect(genotipos.filas).toEqual(['XW Xw 50\u00A0%', 'Xw Y 50\u00A0%']);
+    expect(sinIcono(fenotipos.filas)).toEqual(['Ojos rojos (♀) 50\u00A0%', 'Ojos blancos (♂) 50\u00A0%']);
     expect(fenotipos.ratio).toBe('Ratio: 1:1 (Ojos rojos (♀) · Ojos blancos (♂))');
 
     // El árbol: símbolos Y rótulos siguen al cruce (el rótulo se reparó con el hallazgo 1693).
@@ -2498,8 +2498,8 @@ test.describe('Re-inspección 25/09/2026 · los tres casos', () => {
 
     // Los bordes: esperado Aa × Aa = N × 3/4 y N × 1/4.
     const bordes: Array<[string, number, string, string]> = [
-      ['10', 10, '7,5 (75,0%)', '2,5 (25,0%)'],
-      ['500', 500, '375 (75,0%)', '125 (25,0%)'],
+      ['10', 10, '7,5 (75,0 %)', '2,5 (25,0 %)'],
+      ['500', 500, '375 (75,0 %)', '125 (25,0 %)'],
     ];
     for (const [valor, n, amarillas, verdes] of bordes) {
       await campo.fill(valor);
@@ -2519,9 +2519,8 @@ test.describe('Re-inspección 25/09/2026 · los tres casos', () => {
 
 /*
  * HALLAZGOS de la re-inspección del 25/09/2026. REPARADOS el mismo día 1693, 1694, 1695, 1696,
- * 1697 y 1699: eran `test.fail()` y quedan como regresión. Sigue ABIERTO el 1698 (espacio antes
- * de %), que es decisión de catálogo: el formateador compartido `formatPercentage` lo pega y su
- * test lo fija; esta app no se desmarca sola del resto del catálogo.
+ * 1697 y 1699: eran `test.fail()` y quedan como regresión. El 1698 (espacio antes de %) se
+ * reparó después, el mismo día, al fijar el usuario la regla de catálogo.
  */
 test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
   test('ligado al X: en el árbol, el afectado lleva el fenotipo recesivo (Xd Y es «Daltónico»)', async ({
@@ -2704,14 +2703,14 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(10);
     const [, esperado] = await leerPoblacion(page);
     expect(esperado).toEqual([
-      { nombre: 'Amarillo', cifra: '7,5 (75,0%)' },
-      { nombre: 'Verde', cifra: '2,5 (25,0%)' },
+      { nombre: 'Amarillo', cifra: '7,5 (75,0 %)' },
+      { nombre: 'Verde', cifra: '2,5 (25,0 %)' },
     ]);
     const panelChi = (await page.locator('[class*="chiSquare"]').first().innerText()).replace(/\s+/g, ' ');
     expect(panelChi).toMatch(/menor(es)? (de|que) 5|inferior(es)? a 5|menos de 5|poco fiable|no es fiable|no fiable/i);
     const interpretacion = page.locator('[class*="chiSquareInterpretation"]');
     await expect(interpretacion).toContainText('El contraste no es fiable con esta muestra: se esperan 2,5 de Verde');
-    await expect(interpretacion).not.toContainText(/Ajuste|Diferencia significativa/);
+    await expect(interpretacion).not.toContainText(/ajuste|diferencia significativa/i);
 
     // El borde: con N = 20 se esperan 15 y 5 → ya es fiable y hay veredicto.
     await campo.fill('20');
@@ -2719,16 +2718,19 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     await page.getByRole('button', { name: /Simular/ }).click();
     await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(20);
     await expect(interpretacion).not.toContainText('no es fiable');
-    await expect(interpretacion).toContainText(/Ajuste|Diferencia significativa/);
+    // Sin distinguir mayúsculas: la muestra es aleatoria y el veredicto puede ser «Buen ajuste…»
+    // (hasta el 25/09/2026 la regex exigía «Ajuste» y fallaba según el sorteo).
+    await expect(interpretacion).toContainText(/ajuste|diferencia significativa/i);
   });
 
-  test('el porcentaje se escribe con espacio antes de %, como en el resto de la página', async ({ page }) => {
+  test('REPARADO 1698 · el porcentaje se escribe con espacio antes de %, como en el resto de la página', async ({ page }) => {
     // HALLAZGO (bajo): las cifras se escriben a mano como `${formatNumber(x)}%` (PunnettSquare,
     // StatisticsPanel, PopulationSimulator) mientras la FAQ del χ² escribe «del 5 %». Ojo: el
     // formateador compartido `formatPercentage` también lo pega («15,00%», fijado en
     // tests/formatters.spec.ts), así que la decisión es de catálogo antes que de esta app.
-    // SIGUE ABIERTO (25/09/2026): no se repara en una sola app para no desmarcarla del catálogo.
-    test.fail();
+    // REPARADO (1698, 25/09/2026): el usuario fijó la regla de catálogo —«%» separado con
+    // espacio duro, como el «€» (RAE 2010; CLAUDE.md global §2)—, formatPercentage la aplica y
+    // esta app la usa en los tres componentes. El resto del catálogo se corrige app a app.
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -2738,6 +2740,8 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     expect((await probabilidadesDeCelda(page).first().innerText()).trim()).toMatch(/^25,0[\s  ]%$/);
     const { genotipos } = await estadisticas(page);
     expect(genotipos.filas[0]).toMatch(/^Aa 50[\s  ]%$/);
+    // Y ninguna cifra de la página, guía incluida, queda con el «%» pegado.
+    expect(guia).not.toMatch(/\d%/);
   });
 
   test('los datos estructurados no prometen frecuencias alélicas que la pestaña Población no enseña', async ({

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from '../SimuladorGenetica.module.css';
-import { formatNumber } from '@/lib';
+import { formatNumber, formatPercentage } from '@/lib';
 import { PopulationSimulation, PunnettResult, Trait } from './types';
 import {
   interpretChiSquare,
@@ -200,7 +200,7 @@ export default function PopulationSimulator({
                   <div key={phenotype} className={styles.resultRow}>
                     <span>{phenotype}</span>
                     <span>
-                      {data?.count ?? 0} ({formatNumber(data?.percentage ?? 0, 1)}%)
+                      {data?.count ?? 0} ({formatPercentage((data?.percentage ?? 0) / 100, 1)})
                     </span>
                   </div>
                 );
@@ -218,7 +218,7 @@ export default function PopulationSimulator({
                       {/* La esperanza lleva decimal cuando lo tiene: son 112,5 plantas de 200,
                           no 113 (hallazgo 1204). */}
                       {formatNumber(data?.count ?? 0, Number.isInteger(data?.count ?? 0) ? 0 : 1)} (
-                      {formatNumber(data?.percentage ?? 0, 1)}%)
+                      {formatPercentage((data?.percentage ?? 0) / 100, 1)})
                     </span>
                   </div>
                 );

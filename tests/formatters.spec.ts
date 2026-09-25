@@ -358,10 +358,10 @@ test.describe('formatTipoNominal', () => {
 });
 
 test.describe('formatPercentage', () => {
-  test('formatea porcentaje correctamente', () => {
-    expect(formatPercentage(0.15, 2)).toBe('15,00%');
-    expect(formatPercentage(1, 0)).toBe('100%');
-    expect(formatPercentage(0.5, 1)).toBe('50,0%');
+  test('formatea porcentaje correctamente, con el % separado por espacio duro (RAE 2010; hallazgo 1698)', () => {
+    expect(formatPercentage(0.15, 2)).toBe('15,00\u00A0%');
+    expect(formatPercentage(1, 0)).toBe('100\u00A0%');
+    expect(formatPercentage(0.5, 1)).toBe('50,0\u00A0%');
   });
 
   test('maneja NaN', () => {
@@ -369,7 +369,7 @@ test.describe('formatPercentage', () => {
   });
 
   test('maneja Infinity', () => {
-    expect(formatPercentage(Infinity, 2)).toBe('∞%');
+    expect(formatPercentage(Infinity, 2)).toBe('∞\u00A0%');
   });
 });
 

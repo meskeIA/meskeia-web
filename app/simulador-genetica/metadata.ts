@@ -43,7 +43,7 @@ export const faqJsonLd = {
       name: '¿Qué es un cuadro de Punnett?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El cuadro de Punnett es una tabla que muestra todas las combinaciones posibles de alelos entre dos progenitores. Permite calcular la probabilidad de que la descendencia presente un determinado genotipo o fenotipo. Por ejemplo, al cruzar dos heterocigotos (Aa × Aa), el cuadro muestra que el 25% de la descendencia será AA, el 50% Aa y el 25% aa.',
+        text: 'El cuadro de Punnett es una tabla que muestra todas las combinaciones posibles de alelos entre dos progenitores. Permite calcular la probabilidad de que la descendencia presente un determinado genotipo o fenotipo. Por ejemplo, al cruzar dos heterocigotos (Aa × Aa), el cuadro muestra que el 25 % de la descendencia será AA, el 50 % Aa y el 25 % aa.',
       },
     },
     {

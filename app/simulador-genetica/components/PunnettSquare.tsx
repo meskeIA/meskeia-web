@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import styles from '../SimuladorGenetica.module.css';
-import { formatNumber } from '@/lib';
+import { formatPercentage } from '@/lib';
 import { PunnettResult, PunnettAnimationState, Trait } from './types';
 import { notacionGenotipo } from './genetics';
 
@@ -109,7 +109,7 @@ export default function PunnettSquare({
               >
                 {notacionGenotipo(gamete, rasgos)}
                 <br />
-                <small>({formatNumber((1 / gametesColumna.length) * 100, 0)}%)</small>
+                <small>({formatPercentage(1 / gametesColumna.length, 0)})</small>
               </th>
             ))}
           </tr>
@@ -125,7 +125,7 @@ export default function PunnettSquare({
               >
                 {notacionGenotipo(gamete2, rasgos)}
                 <br />
-                <small>({formatNumber((1 / gametesFila.length) * 100, 0)}%)</small>
+                <small>({formatPercentage(1 / gametesFila.length, 0)})</small>
               </th>
               {gametesColumna.map((_, colIndex) => {
                 // Mismo orden en el que el motor rellena `cells`: for (row) { for (col) }
@@ -150,7 +150,7 @@ export default function PunnettSquare({
                     <div className={styles.cellIcon}>{cell.phenotypeIcon}</div>
                     <div className={styles.cellPhenotype}>{cell.phenotype}</div>
                     <div className={styles.cellProbability}>
-                      {formatNumber(cell.probability * 100, 1)}%
+                      {formatPercentage(cell.probability, 1)}
                     </div>
                   </td>
                 );

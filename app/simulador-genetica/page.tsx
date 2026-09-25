@@ -759,7 +759,7 @@ export default function SimuladorGeneticaPage() {
                 <code>
                   {`Mujer portadora (X^R X^r) × hombre daltónico (X^r Y)
 → ¿Probabilidad de hija daltónica?
-→ Respuesta: 25% del total (1 de cada 4 descendientes)`}
+→ Respuesta: 25 % del total (1 de cada 4 descendientes)`}
                 </code>
               </div>
               <p className={styles.escenarioTip}>
@@ -779,7 +779,7 @@ export default function SimuladorGeneticaPage() {
                 <p>Ejemplo de análisis clínico:</p>
                 <code>
                   {`Padres portadores de fibrosis quística (Aa × Aa)
-→ 25% afectados, 50% portadores, 25% libres
+→ 25 % afectados, 50 % portadores, 25 % libres
 → Árbol genealógico de padres e hijos`}
                 </code>
               </div>
@@ -800,7 +800,7 @@ export default function SimuladorGeneticaPage() {
                 <code>
                   {`Objetivo: maximizar descendencia de pelo liso
 Cruce AA (liso) × aa (rizado) → todos Aa (liso)
-Cruce Aa × Aa → 75% liso, 25% rizado
+Cruce Aa × Aa → 75 % liso, 25 % rizado
 → Simular 100 individuos en pestaña Población`}
                 </code>
               </div>
@@ -823,7 +823,7 @@ Cruce Aa × Aa → 75% liso, 25% rizado
                   la herramienta y como lo dice cada enunciado de los casos de aula.
 
                   ⚠️ 14/09/2026 (hallazgo 829) — esta tarjeta contaba sobre los VARONES
-                  («50% hijos varones daltónicos») mientras la app imprime 25 % en
+                  («50 % hijos varones daltónicos») mientras la app imprime 25 % en
                   Estadísticas, y el mismo bloque usaba los dos convenios a la vez: la
                   primera tarjeta sí contaba sobre el total. Es justo la ambigüedad que
                   `casos.ts` documenta y resuelve; el bloque educativo se quedó fuera de esa
@@ -832,8 +832,8 @@ Cruce Aa × Aa → 75% liso, 25% rizado
                 <code>
                   {`Abuelo daltónico → hija portadora (no afectada)
 Hija portadora (XD Xd) × marido sano (XD Y):
-→ 25% del total: varones daltónicos (la mitad de los varones)
-→ 25% del total: hijas portadoras (la mitad de las hijas)`}
+→ 25 % del total: varones daltónicos (la mitad de los varones)
+→ 25 % del total: hijas portadoras (la mitad de las hijas)`}
                 </code>
               </div>
               <p className={styles.escenarioTip}>
@@ -925,7 +925,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
                 Un portador es un individuo heterocigoto (Aa) que <strong>no muestra</strong> el
                 fenotipo recesivo pero puede transmitirlo a su descendencia. En herencia autosómica,
                 el portador es fenotípicamente igual al homocigoto dominante. En herencia ligada
-                al sexo, las mujeres X^R X^r son portadoras: no están afectadas pero el 50% de
+                al sexo, las mujeres X^R X^r son portadoras: no están afectadas pero el 50 % de
                 sus hijos varones lo estarán.
               </p>
               <p className={styles.faqTip}>
@@ -941,7 +941,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
                 El cruce prueba consiste en cruzar un individuo de fenotipo dominante
                 con genotipo desconocido (A?) con un homocigoto recesivo (aa). Si toda
                 la descendencia muestra fenotipo dominante → el individuo era AA. Si
-                aparece un 50% de recesivos → era Aa (portador). Es la herramienta
+                aparece un 50 % de recesivos → era Aa (portador). Es la herramienta
                 clásica de Mendel para determinar genotipos ocultos.
               </p>
               <p className={styles.faqTip}>
@@ -967,9 +967,9 @@ Hija portadora (XD Xd) × marido sano (XD Y):
               <p>
                 El gen del daltonismo está en el cromosoma X. Los hombres (XY) solo
                 tienen un cromosoma X, por lo que un único alelo recesivo (X^r Y) es
-                suficiente para ser daltónico (prevalencia: ~8% de hombres). Las mujeres
+                suficiente para ser daltónico (prevalencia: ~8 % de hombres). Las mujeres
                 (XX) necesitan dos alelos recesivos (X^r X^r) para ser daltónicas, algo
-                mucho menos frecuente (en torno al 0,5% de los casos, aunque la cifra
+                mucho menos frecuente (en torno al 0,5 % de los casos, aunque la cifra
                 exacta varía según la población). Las mujeres con un solo alelo
                 recesivo (X^R X^r) son portadoras sanas.
               </p>
@@ -1101,7 +1101,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
               <div className={styles.stepContent}>
                 <h4>Responde la pregunta concreta del enunciado</h4>
                 <p>
-                  Si pide probabilidad, expresa en fracción o porcentaje (1/4 = 25%). Si pide
+                  Si pide probabilidad, expresa en fracción o porcentaje (1/4 = 25 %). Si pide
                   &quot;¿cuántos de 80 hijos?&quot;, multiplica la probabilidad por el total
                   (0,25 × 80 = 20 individuos afectados). Si pide el fenotipo, nombra el rasgo
                   observado, no el genotipo.
