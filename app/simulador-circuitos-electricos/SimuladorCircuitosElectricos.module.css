@@ -5,11 +5,27 @@
   font-family: system-ui, -apple-system, sans-serif;
 }
 
+/* 96px arriba: por encima de 768px el logo fijo de MeskeiaLogo recupera su tamaño de
+   escritorio (hasta ~77px de alto y ~232px de ancho con la píldora de Stemum) y, con los 40px
+   de antes, tapaba el principio del título entre 772 y 1048px (hallazgo 1662). Se aplica a
+   todos los anchos: el título centrado solo se libra del logo por anchura en pantallas grandes,
+   y eso depende de lo largo que sea. Hasta 768px manda el bloque responsive de abajo (80px). */
 .hero {
   background: var(--hero-bg);
   color: white;
-  padding: 2.5rem 1.5rem;
+  padding: 96px 1.5rem 2.5rem;
   text-align: center;
+}
+
+/* Aviso de error (hallazgo 1665): #dc2626 da 4,83:1 sobre el panel claro, pero 2,85:1 sobre el
+   panel oscuro (#2D2D2D). En oscuro, #fca5a5 da ~8:1. */
+.avisoError {
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+[data-theme='dark'] .avisoError {
+  color: #fca5a5;
 }
 
 .hero h1 {
