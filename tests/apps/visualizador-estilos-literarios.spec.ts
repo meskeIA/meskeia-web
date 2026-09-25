@@ -54,6 +54,20 @@ import { activarTema } from '../contraste-text-muted-auxiliares';
  * Los casos 1-3 afirman lo que la app hace bien. Los marcados con test.fail() afirman lo
  * CORRECTO y hoy fallan por un hallazgo: cuando se repare, Playwright avisará para quitarles
  * la marca.
+ *
+ * REPARACIÓN (25/09/2026, hallazgos 1880-1893): se retiran todas las marcas test.fail().
+ * · La tarjeta deja de ser un <button> con h2 y párrafos dentro (HTML no válido): ahora es un
+ *   <li> y el botón «Ver X» vive dentro de su h2. Los selectores que buscaban
+ *   `button[aria-label^="Ver "] h2` pasan a `[class*="movimientoCard"] h2`; lo que miden no cambia.
+ * · El filtro de región «Universal» desaparece: solo lo llevaba Literatura Posmoderna, que
+ *   ahora se rotula y se filtra por las regiones de sus autores (Europa, América Latina, EEUU).
+ *   El caso 3 recorre las cuatro regiones que quedan.
+ * · Bécquer: el esperado del acta («…la llama de tu amor») era el texto real de «Podrá
+ *   nublarse el sol eternamente», pero ese poema NO está en las Rimas de 1871 que cita la
+ *   atribución: es «Amor eterno», que Rodríguez Correa publicó en la 4.ª ed. de las Obras
+ *   (1885), fuera de las Rimas (es.wikipedia «Rimas (Bécquer)», apéndices de la ed. de
+ *   Montesinos). La app pasa a la rima XXI («¿Qué es poesía?…»), que sí es de las Rimas;
+ *   texto en es.wikisource, Obras, t. III (1885), p. 159.
  */
 
 const RUTA = '/visualizador-estilos-literarios/';
@@ -92,8 +106,12 @@ async function abrir(page: Page): Promise<void> {
 const tarjeta = (page: Page, nombre: string) =>
   page.getByRole('button', { name: `Ver ${nombre}`, exact: true });
 
+/** Tarjeta entera (el <li>), para leer lo que rotula además del nombre. */
+const tarjetaEntera = (page: Page, nombre: string) =>
+  page.locator('[class*="movimientoCard"]').filter({ has: tarjeta(page, nombre) });
+
 async function nombresEnParrilla(page: Page): Promise<string[]> {
-  return page.locator('button[aria-label^="Ver "] h2').allTextContents();
+  return page.locator('[class*="movimientoCard"] h2').allTextContents();
 }
 
 async function filtrar(page: Page, periodo: string, region: string): Promise<void> {
@@ -103,12 +121,16 @@ async function filtrar(page: Page, periodo: string, region: string): Promise<voi
 
 async function volverAlListado(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Volver al listado', exact: true }).click();
-  await expect(page.locator('button[aria-label^="Ver "] h2').first()).toBeVisible();
+  await expect(page.locator('[class*="movimientoCard"] h2').first()).toBeVisible();
 }
 
 async function abrirGuia(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   await expect(page.getByRole('heading', { name: 'Preguntas frecuentes sobre movimientos literarios' })).toBeVisible();
+  // El contenido de <EducationalSection> entra con un fadeIn de 0,5 s que no se acorta con
+  // reduced-motion: medido al vuelo, el texto sale con opacidad 0 y contraste 1:1. Se espera
+  // a que acabe antes de medir (lo destapó la reparación del 25/09/2026: número de paso = 1).
+  await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
 }
 
 /** Texto de las secciones PROPIAS de la guía (sin RelatedApps, ShareCard ni Footer). */
@@ -330,7 +352,7 @@ test.describe('Caso 3 · teclado y cambios de filtro seguidos no rompen nada', (
     expect((await leerDetalle(page)).nombre).toBe('Realismo');
     await page.getByRole('button', { name: 'Volver al listado', exact: true }).focus();
     await page.keyboard.press('Enter');
-    await expect(page.locator('button[aria-label^="Ver "] h2')).toHaveCount(10);
+    await expect(page.locator('[class*="movimientoCard"] h2')).toHaveCount(10);
     expect(await nombresEnParrilla(page)).toEqual(MOVIMIENTOS);
 
     // Espacio sobre un filtro lo activa y mueve aria-pressed
@@ -343,7 +365,8 @@ test.describe('Caso 3 · teclado y cambios de filtro seguidos no rompen nada', (
     ).toHaveAttribute('aria-pressed', 'false');
 
     for (const p of ['Todos', 'S.XVII–XVIII', 'S.XIX', 'S.XX', 'Contemporáneo']) {
-      for (const r of ['Todas las regiones', 'Europa', 'América Latina', 'EEUU', 'Universal']) {
+      // Sin «Universal»: se retiró en la reparación del 1881 (ver cabecera)
+      for (const r of ['Todas las regiones', 'Europa', 'América Latina', 'EEUU']) {
         await filtrar(page, p, r);
         const n = (await nombresEnParrilla(page)).length;
         const vacio = await page.getByText('No hay movimientos para esta combinación de filtros.').count();
@@ -356,7 +379,7 @@ test.describe('Caso 3 · teclado y cambios de filtro seguidos no rompen nada', (
 });
 
 // ════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS — afirman lo correcto; hoy fallan (test.fail)
+// HALLAZGOS — afirman lo correcto; reparados el 25/09/2026 (sin test.fail)
 // ════════════════════════════════════════════════════════════════════════════
 test.describe('Hallazgos del Inspector (25/09/2026)', () => {
   test.beforeEach(async ({ page }) => {
@@ -364,35 +387,76 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
   });
 
   // HALLAZGO [medio] (Inspector 25/09/2026): 3 de los 10 «fragmentos representativos», entre
-  // comillas y con autor, obra y año, NO son el texto de la obra.
+  // comillas y con autor, obra y año, NO son el texto de la obra. REPARADO: los tres son ahora
+  // texto real (o traducción fiel, declarada bajo la cita) y dicen dónde están en la obra.
   test('los fragmentos entre comillas son el texto de la obra (Bécquer, Zola, Voltaire)', async ({ page }) => {
-    test.fail();
     await tarjeta(page, 'Romanticismo').click();
     const becquer = await leerDetalle(page);
-    // Cierre real de la rima (BVMC, LXXXIV): «…pero jamás en mí podrá apagarse / la llama de tu amor»
-    expect(becquer.fragmento).toContain('la llama de tu amor');
+    // Ni el final inventado ni el poema que no es de las Rimas de 1871 (ver cabecera)
     expect(becquer.fragmento).not.toContain('nunca te olvidaré');
+    expect(becquer.fragmento).not.toContain('Podrá nublarse');
+    // Rima XXI (es.wikisource, Obras t. III, 1885, p. 159): «¿Qué es poesía? dices mientras
+    // clavas / En mi pupila tu pupila azul; / ¿Qué es poesía? ¿Y tú me lo preguntas? / Poesía... eres tú.»
+    expect(becquer.fragmento).toBe(
+      '«¿Qué es poesía?, dices mientras clavas / en mi pupila tu pupila azul; / ¿Qué es poesía? ¿Y tú me lo preguntas? / Poesía… eres tú.»',
+    );
+    expect(becquer.atribucion).toBe('— Gustavo Adolfo Bécquer, Rimas (1871)');
+    await expect(page.locator('[class*="fragmentoNota"]')).toHaveText('Rima XXI.');
     await volverAlListado(page);
 
     await tarjeta(page, 'Naturalismo').click();
-    // «Germinal brotaba» no está en la novela: el final es «Des hommes poussaient…»
-    expect((await leerDetalle(page)).fragmento).not.toContain('Germinal brotaba');
+    // «Germinal brotaba» no está en la novela: el final es «Des hommes poussaient, une armée
+    // noire, vengeresse, qui germait lentement dans les sillons…» (fr.wikisource, VII, 6)
+    const zola = (await leerDetalle(page)).fragmento;
+    expect(zola).not.toContain('Germinal brotaba');
+    expect(zola).toContain('Brotaban hombres, un ejército negro, vengador, que germinaba lentamente en los surcos');
+    await expect(page.locator('[class*="fragmentoNota"]')).toContainText('original en francés');
     await volverAlListado(page);
 
     await tarjeta(page, 'Neoclasicismo').click();
-    // Cap. 1: «Candide écoutait attentivement, et croyait innocemment»
-    expect((await leerDetalle(page)).fragmento).not.toContain('con la fe sencilla');
+    // Cap. 1 (fr.wikisource, Garnier 1877): «…dans ce meilleur des mondes possibles, le château
+    // de monseigneur le baron était le plus beau des châteaux…»
+    const voltaire = (await leerDetalle(page)).fragmento;
+    expect(voltaire).not.toContain('con la fe sencilla');
+    expect(voltaire).toContain('en este mejor de los mundos posibles, el castillo del señor barón era el más bello de los castillos');
   });
 
   // HALLAZGO [medio] (Inspector 25/09/2026): cada movimiento tiene UNA región y UN periodo de
   // filtro, pero la tarjeta enseña varios: el filtro esconde lo que la propia tarjeta rotula.
   test('el filtro de región incluye los movimientos cuya tarjeta lleva esa región', async ({ page }) => {
-    test.fail();
-    // Premisa (pasa hoy): la tarjeta de Naturalismo lleva la insignia «EEUU»
-    await expect(tarjeta(page, 'Naturalismo').locator('[class*="regionBadge"]', { hasText: 'EEUU' })).toHaveCount(1);
+    // Premisa: la tarjeta de Naturalismo lleva la insignia «EEUU»
+    await expect(tarjetaEntera(page, 'Naturalismo').locator('[class*="regionBadge"]', { hasText: 'EEUU' })).toHaveCount(1);
     await filtrar(page, 'Todos', 'EEUU');
-    // Esperado: Naturalismo y Generación Beat · obtenido: solo Generación Beat
+    // Esperado: Naturalismo y Generación Beat · antes: solo Generación Beat
     expect(await nombresEnParrilla(page)).toContain('Naturalismo');
+    expect(await nombresEnParrilla(page)).toContain('Generación Beat');
+    // Modernismo rotula «España» → sale con Europa; Vanguardias (Huidobro, Neruda) → América Latina
+    await filtrar(page, 'Todos', 'Europa');
+    expect(await nombresEnParrilla(page)).toContain('Modernismo');
+    await filtrar(page, 'Todos', 'América Latina');
+    expect(await nombresEnParrilla(page)).toContain('Vanguardias');
+    // Modernismo (s.XIX–XX) sale con S.XIX; Posmoderna (s.XX–XXI) sale con S.XX
+    await filtrar(page, 'S.XIX', 'Todas las regiones');
+    expect(await nombresEnParrilla(page)).toContain('Modernismo');
+    await filtrar(page, 'S.XX', 'Todas las regiones');
+    expect(await nombresEnParrilla(page)).toContain('Literatura Posmoderna');
+
+    // Invariante general: cada insignia de región de cada tarjeta sobrevive a su propio filtro
+    await filtrar(page, 'Todos', 'Todas las regiones');
+    const rotulos = await page.locator('[class*="movimientoCard"]').evaluateAll((cards) =>
+      cards.map((c) => ({
+        nombre: (c.querySelector('h2')?.textContent ?? '').trim(),
+        regiones: Array.from(c.querySelectorAll('[class*="regionBadge"]')).map((b) => (b.textContent ?? '').trim()),
+      })),
+    );
+    const filtroDe: Record<string, string> = { Europa: 'Europa', España: 'Europa', 'América Latina': 'América Latina', EEUU: 'EEUU' };
+    for (const { nombre, regiones } of rotulos) {
+      for (const r of regiones) {
+        expect(filtroDe[r], `insignia sin filtro: ${r}`).toBeDefined();
+        await filtrar(page, 'Todos', filtroDe[r]);
+        expect(await nombresEnParrilla(page), `${nombre} con ${r}`).toContain(nombre);
+      }
+    }
   });
 
   test.describe('en un móvil de 360 px', () => {
@@ -401,7 +465,6 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
     // HALLAZGO [medio] (Inspector 25/09/2026): al elegir un movimiento de la parte baja de la
     // parrilla, la página conserva el desplazamiento y se aterriza a mitad del detalle.
     test('al elegir el último movimiento, su cabecera queda a la vista', async ({ page }) => {
-      test.fail();
       await tarjeta(page, 'Literatura Posmoderna').click();
       await expect(page.locator('[class*="detalleNombre"]')).toHaveText('Literatura Posmoderna');
       // Hoy: scrollY 1681 y la cabecera 1165 px por encima del borde; se ve «El nombre de la rosa»
@@ -412,7 +475,6 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
     // `.main` —max-width 1200 px, padding 1,25-2 rem— está definida y no se aplica) y el botón
     // inferior «← Volver al listado» sale sin estilo (lleva el modificador sin la base).
     test('el listado deja margen lateral y los dos botones de volver comparten estilo', async ({ page }) => {
-      test.fail();
       await tarjeta(page, 'Realismo').click();
       await leerDetalle(page);
       const radio = await page.locator('[class*="btnVolverBottom"]').evaluate((b) => getComputedStyle(b).borderTopLeftRadius);
@@ -427,7 +489,6 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
   // HALLAZGO [bajo] (Inspector 25/09/2026): el foco se pierde en <body> al abrir y al cerrar
   // un movimiento, y el aviso de «sin resultados» no se anuncia (sin role="status").
   test('el foco acompaña al cambio de vista y el vacío se anuncia', async ({ page }) => {
-    test.fail();
     await tarjeta(page, 'Realismo').focus();
     await page.keyboard.press('Enter');
     await leerDetalle(page);
@@ -443,17 +504,32 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
   // --text-secondary sobre el azul --primary: 1,29:1. `[data-theme='dark'] .filtroBtn`
   // (0,2,0) gana al `color: white` de `.filtroBtnActivo` (0,1,0).
   test('en tema oscuro el filtro activo se lee (≥ 4,5:1)', async ({ page }) => {
-    test.fail();
     await activarTema(page, 'dark');
     const c = await peorContraste(page, '[class*="filtroBtnActivo"]');
     expect(c?.ratio ?? 0).toBeGreaterThanOrEqual(4.5);
+    // Reparación (25/09/2026): lo que se cambió en claro se mide también en oscuro
+    const fallos: string[] = [];
+    const anotar = (donde: string, r: { ratio: number } | null): void => {
+      if (!r || r.ratio < 4.5) fallos.push(`${donde} ${r?.ratio ?? 'sin medir'}`);
+    };
+    anotar('insignia de región', await peorContraste(page, '[class*="regionBadge"]'));
+    for (const m of ['Neoclasicismo', 'Vanguardias', 'Literatura Posmoderna']) {
+      await tarjeta(page, m).click();
+      await leerDetalle(page);
+      anotar(`${m} · periodo`, await peorContraste(page, '[class*="detallePeriodo"]'));
+      anotar(`${m} · región`, await peorContraste(page, '[class*="detalleRegion"]'));
+      anotar(`${m} · etiqueta de obra`, await peorContraste(page, '[class*="obraTag"]'));
+      await volverAlListado(page);
+    }
+    await abrirGuia(page);
+    anotar('número de paso', await peorContraste(page, '[class*="stepNumber"]'));
+    expect(fallos).toEqual([]);
   });
 
   // HALLAZGO [medio] (Inspector 25/09/2026): texto pequeño por debajo de 4,5:1 en claro. Lo
   // peor es el periodo y la región de la cabecera del detalle sobre el color del movimiento
   // (8 de 10), justo el dato de fechas: Vanguardias y Posmoderna 2,94:1 / 2,41-2,44:1.
   test('el texto pequeño cumple 4,5:1 en tema claro', async ({ page }) => {
-    test.fail();
     await activarTema(page, 'light');
     const fallos: string[] = [];
     const anotar = (donde: string, c: { ratio: number } | null): void => {
@@ -477,7 +553,6 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
   // HALLAZGO [bajo] (Inspector 25/09/2026): 24 emojis junto a texto sin aria-hidden en la
   // guía (10 en la tabla, 8 «💡», 6 «❌»), más el «📖» del título de la sección educativa.
   test('los emojis decorativos de la guía llevan aria-hidden', async ({ page }) => {
-    test.fail();
     await abrirGuia(page);
     const sueltos = await page.evaluate(() => {
       const re = /\p{Extended_Pictographic}/u;
@@ -498,7 +573,6 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
   // HALLAZGO [bajo] (Inspector 25/09/2026): décadas calcadas del inglés en el texto visible.
   // RAE: «los años cuarenta» o «la década de 1940»; «1940s» y «los 1940» no son españoles.
   test('las décadas se escriben a la española (texto visible y JSON-LD)', async ({ page }) => {
-    test.fail();
     const calco = /\b\d{4}s\b|\blos \d{4}\b/g;
     // JSON-LD: pasa hoy («los años 60-70» es forma admitida por la RAE)
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
@@ -512,7 +586,6 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
   // Faulkner, justo la confusión contra la que advierte la FAQ de la página; y la página
   // describe el Modernism anglosajón como «concienciación social» (es monólogo interior).
   test('Modernismo y Modernism no se confunden entre la página y el JSON-LD', async ({ page }) => {
-    test.fail();
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
     expect(ld).not.toContain('Modernismo (Joyce');
     await abrirGuia(page);
@@ -521,7 +594,6 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
 
   // HALLAZGO [bajo] (Inspector 25/09/2026): dos datos falsos en la guía.
   test('la guía no sitúa El coronel (1961) en el XIX ni a Darío en París en 1890', async ({ page }) => {
-    test.fail();
     await abrirGuia(page);
     const texto = await textoGuia(page);
     expect(texto).not.toMatch(/Para el XIX:\s*El coronel no tiene quien le escriba/);
@@ -532,7 +604,6 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
   // HALLAZGO [bajo] (Inspector 25/09/2026): Ferlinghetti no tiene ningún «Un jardín de luz
   // solar»; su libro de 1958 es «Un Coney Island de la mente»; y «El «prosa espontánea»».
   test('Generación Beat: obras de Ferlinghetti reales y concordancia del rasgo de Kerouac', async ({ page }) => {
-    test.fail();
     await tarjeta(page, 'Generación Beat').click();
     const f = await leerDetalle(page);
     const ferlinghetti = f.autores.find((a) => a.nombre === 'Lawrence Ferlinghetti');
@@ -545,7 +616,6 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
   // selectividad», «selectividad española» (con una afirmación sin fuente), «exámenes
   // españoles» y «conformidad americana» por estadounidense.
   test('la guía no da por hecho que el lector es de España', async ({ page }) => {
-    test.fail();
     await abrirGuia(page);
     const texto = await textoGuia(page);
     expect(texto).not.toContain('selectividad');
@@ -556,7 +626,6 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
   // HALLAZGO [bajo] (Inspector 25/09/2026): §1.quinquies — comparar a los hippies con el
   // nazismo como recurso decorativo en una guía de literatura.
   test('la guía no usa el nazismo como analogía decorativa', async ({ page }) => {
-    test.fail();
     await abrirGuia(page);
     expect(await textoGuia(page)).not.toContain('nazismo');
   });

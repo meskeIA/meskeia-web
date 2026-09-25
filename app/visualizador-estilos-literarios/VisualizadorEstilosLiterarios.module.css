@@ -80,27 +80,61 @@
   color: var(--primary);
 }
 
-.filtroBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+.filtroBtnActivo,
+.filtroBtnActivo:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
 
 /* Grid de movimientos */
 .movimientosGrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.25rem;
 }
 
 .movimientoCard {
+  position: relative;
   background: var(--bg-card);
   border-radius: 14px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* El botón vive en el título; su ::after cubre la tarjeta entera para que se pueda pulsar
+   en cualquier parte, como cuando la tarjeta era el propio botón. */
+.cardBoton {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cardBoton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+}
+
+.cardBoton:focus-visible {
+  outline: none;
+}
+
+.cardBoton:focus-visible::after {
+  outline: 3px solid var(--primary);
+  outline-offset: -3px;
 }
 
 .movimientoCard:hover {
@@ -161,7 +195,7 @@
   padding: 0.2rem 0.55rem;
   border-radius: 10px;
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
 }
 
@@ -206,6 +240,11 @@
   margin-bottom: 0;
 }
 
+.detalle {
+  /* Deja sitio al logo fijo de arriba a la izquierda: si no, tapa «← Todos los movimientos» */
+  scroll-margin-top: 6rem;
+}
+
 .detalleHeader {
   border-radius: 16px;
   padding: 2rem;
@@ -227,6 +266,10 @@
   margin: 0 0 0.5rem;
 }
 
+.detalleNombre:focus:not(:focus-visible) {
+  outline: none;
+}
+
 .detalleMeta {
   display: flex;
   flex-wrap: wrap;
@@ -236,13 +279,15 @@
 
 .detallePeriodo {
   font-size: 0.9rem;
-  opacity: 0.9;
 }
 
+/* Blanco sobre el color del movimiento oscurecido un 20 %: ≥ 6,9:1 en los 10 movimientos.
+   Antes aclaraba (blanco al 25 %) y bajaba de 4,5:1 en 7 de 10. */
 .detalleRegion {
   font-size: 0.8rem;
   padding: 0.2rem 0.6rem;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.45);
   border-radius: 10px;
 }
 
@@ -289,16 +334,8 @@
 .caracteristicaItem {
   font-size: 0.88rem;
   color: var(--text-primary);
-  padding-left: 1.1rem;
-  position: relative;
-}
-
-.caracteristicaItem::before {
-  content: '▸';
-  position: absolute;
-  left: 0;
-  color: var(--primary);
-  font-size: 0.75rem;
+  display: flex;
+  gap: 0.45rem;
 }
 
 /* Fragmento */
@@ -323,6 +360,12 @@
   font-size: 0.82rem;
   color: var(--text-secondary);
   text-align: right;
+}
+
+.fragmentoNota {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: -0.75rem 0 0;
 }
 
 /* Autores */
@@ -378,8 +421,8 @@
 .obraTag {
   font-size: 0.75rem;
   padding: 0.18rem 0.5rem;
-  background: rgba(72, 169, 166, 0.12);
-  color: var(--secondary);
+  background: rgba(72, 169, 166, 0.08);
+  color: var(--secondary-texto);
   border-radius: 8px;
 }
 
@@ -466,7 +509,7 @@
   font-size: 1.5rem;
 }
 
-.escenarioHeader h4 {
+.escenarioHeader h3 {
   font-size: 0.95rem;
   font-weight: 700;
   margin: 0;
@@ -544,7 +587,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.85rem;
   font-weight: 700;
@@ -624,7 +667,7 @@
   font-size: 1.2rem;
 }
 
-.warningHeader h4 {
+.warningHeader h3 {
   font-size: 0.92rem;
   font-weight: 700;
   color: #c0392b;
@@ -667,6 +710,19 @@
 [data-theme='dark'] .filtroBtn {
   border-color: rgba(255, 255, 255, 0.15);
   color: var(--text-secondary);
+}
+
+[data-theme='dark'] .filtroBtnActivo,
+[data-theme='dark'] .filtroBtnActivo:hover {
+  border-color: var(--primary-boton);
+  color: white;
+}
+
+/* En oscuro el tinte azul oscurece el fondo lo justo para dejar --primary-texto en 4,42:1:
+   se cambia por un borde y el texto queda sobre la tarjeta (4,93:1). */
+[data-theme='dark'] .regionBadge {
+  background: transparent;
+  border: 1px solid rgba(63, 165, 209, 0.45);
 }
 
 [data-theme='dark'] .movimientoCard {

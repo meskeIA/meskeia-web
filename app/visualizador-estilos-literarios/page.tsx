@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import styles from './VisualizadorEstilosLiterarios.module.css';
 import {
   MeskeiaLogo,
@@ -22,29 +22,55 @@ interface Autor {
   rasgo: string;
 }
 
+type RegionId = 'europa' | 'latam' | 'eeuu';
+type PeriodoId = 'clasico' | 'sxix' | 'sxx' | 'contemporaneo';
+
+/**
+ * Una región tal como se ROTULA en la tarjeta y el filtro al que pertenece. Cada insignia
+ * lleva su filtro para que lo que la tarjeta enseña y lo que el filtro deja ver no puedan
+ * divergir (hallazgo 1881: «España» no salía con Europa, «EEUU» no salía con EEUU).
+ */
+interface Region {
+  etiqueta: string;
+  filtro: RegionId;
+}
+
 interface Movimiento {
   id: string;
   nombre: string;
   icono: string;
   periodo: string;
   siglos: string;
-  regiones: string[];
-  filtroRegion: 'europa' | 'latam' | 'eeuu' | 'universal';
-  filtroPeriodo: 'clasico' | 'sxix' | 'sxx' | 'contemporaneo';
+  regiones: Region[];
+  /** Todos los periodos del filtro que abarca el movimiento: los que rotula `siglos`. */
+  periodos: PeriodoId[];
+  /** Fondo de la cabecera del detalle, con texto blanco encima: ≥ 4,5:1 (medido). */
   color: string;
   descripcion: string;
   caracteristicas: string[];
   autores: Autor[];
+  /**
+   * Texto LITERAL de la obra (o traducción fiel del original, que se declara). Cada uno está
+   * cotejado en una edición fiable; la fuente, en el comentario de cada fragmento.
+   */
   fragmento: {
     texto: string;
     obra: string;
     autor: string;
     anio: string;
+    /** Dónde está en la obra, para que el lector pueda buscarlo. */
+    referencia?: string;
+    /** Lengua original, si el texto es una traducción. */
+    idiomaOriginal?: 'francés' | 'inglés' | 'italiano';
   };
 }
 
-type FiltroPeriodo = 'todos' | 'clasico' | 'sxix' | 'sxx' | 'contemporaneo';
-type FiltroRegion = 'todas' | 'europa' | 'latam' | 'eeuu' | 'universal';
+type FiltroPeriodo = 'todos' | PeriodoId;
+type FiltroRegion = 'todas' | RegionId;
+
+const EUROPA: Region = { etiqueta: 'Europa', filtro: 'europa' };
+const AMERICA_LATINA: Region = { etiqueta: 'América Latina', filtro: 'latam' };
+const EEUU: Region = { etiqueta: 'EEUU', filtro: 'eeuu' };
 
 // ── Datos ──────────────────────────────────────────────────────────────────
 
@@ -55,11 +81,10 @@ const movimientos: Movimiento[] = [
     icono: '🏛️',
     periodo: 'Siglos XVII–XVIII',
     siglos: 's.XVII–XVIII',
-    regiones: ['Europa'],
-    filtroRegion: 'europa',
-    filtroPeriodo: 'clasico',
-    color: '#8B7355',
-    descripcion: 'Movimiento que recupera los ideales estéticos de la Antigüedad greco-latina: orden, razón, equilibrio y propósito moral. La literatura debe enseñar deleitando.',
+    regiones: [EUROPA],
+    periodos: ['clasico'],
+    color: '#836C50',
+    descripcion: 'Movimiento que recupera los ideales estéticos de la Antigüedad greco-latina: orden, razón, equilibrio y propósito moral. La literatura debe enseñar deleitando. Aquí se agrupan el clasicismo francés del siglo XVII (Molière, Racine) y su prolongación ilustrada del XVIII; en la historiografía hispánica, «Neoclasicismo» designa sobre todo el siglo XVIII (Moratín, Jovellanos).',
     caracteristicas: [
       'Predominio de la razón sobre la pasión',
       'Imitación de modelos clásicos grecolatinos',
@@ -74,11 +99,18 @@ const movimientos: Movimiento[] = [
       { nombre: 'Jean Racine', pais: 'Francia', obras: ['Fedra', 'Andrómaca', 'Británico'], rasgo: 'Tragedia clásica con psicología apasionada' },
       { nombre: 'Jonathan Swift', pais: 'Irlanda/Gran Bretaña', obras: ['Los viajes de Gulliver', 'Una modesta proposición'], rasgo: 'Sátira política y social de filo cortante' },
     ],
+    // Candide, cap. I (fr.wikisource, ed. Garnier 1877): «Pangloss enseignait la
+    // métaphysico-théologo-cosmolo-nigologie. Il prouvait admirablement qu'il n'y a point
+    // d'effet sans cause, et que, dans ce meilleur des mondes possibles, le château de
+    // monseigneur le baron était le plus beau des châteaux, et madame la meilleure des
+    // baronnes possibles.» Traducción fiel.
     fragmento: {
-      texto: '«Todo va bien en el mejor de los mundos posibles», decía el doctor Pangloss, y Cándido lo escuchaba con la fe sencilla de quien aún no ha visto demasiado del mundo.',
+      texto: '«Pangloss enseñaba la metafísico-teólogo-cosmolonigología. Probaba admirablemente que no hay efecto sin causa y que, en este mejor de los mundos posibles, el castillo del señor barón era el más bello de los castillos, y la señora, la mejor de las baronesas posibles.»',
       obra: 'Cándido',
       autor: 'Voltaire',
       anio: '1759',
+      referencia: 'Capítulo I.',
+      idiomaOriginal: 'francés',
     },
   },
   {
@@ -87,9 +119,9 @@ const movimientos: Movimiento[] = [
     icono: '🌹',
     periodo: 'Finales XVIII – mediados XIX',
     siglos: 's.XVIII–XIX',
-    regiones: ['Europa', 'América'],
-    filtroRegion: 'europa',
-    filtroPeriodo: 'sxix',
+    // «América» era ambiguo: el único autor americano de la ficha es Poe (EEUU)
+    regiones: [EUROPA, EEUU],
+    periodos: ['clasico', 'sxix'],
     color: '#8B2635',
     descripcion: 'Reacción contra el racionalismo ilustrado. Prima el sentimiento individual, la naturaleza como espejo del alma, la melancolía, el héroe rebelde y el interés por lo medieval y lo exótico.',
     caracteristicas: [
@@ -106,11 +138,17 @@ const movimientos: Movimiento[] = [
       { nombre: 'G.A. Bécquer', pais: 'España', obras: ['Rimas y Leyendas', 'Cartas desde mi celda'], rasgo: 'Lirismo íntimo y espiritual en verso y prosa' },
       { nombre: 'Edgar Allan Poe', pais: 'EEUU', obras: ['El cuervo', 'El pozo y el péndulo', 'Berenice'], rasgo: 'Gótico psicológico, terror y lo sublime oscuro' },
     ],
+    // Rima XXI, en las Rimas de la edición de 1871. Texto: es.wikisource, «Obras de Gustavo
+    // A. Bécquer», t. III (1885), p. 159, con ortografía actual. Sustituye a «Podrá nublarse
+    // el sol eternamente», que además de llevar un final inventado NO está en las Rimas de
+    // 1871: es «Amor eterno», publicado por Rodríguez Correa en la 4.ª ed. de las Obras
+    // (1885), fuera de las Rimas (es.wikipedia, «Rimas (Bécquer)», apéndices de Montesinos).
     fragmento: {
-      texto: '«Podrá nublarse el sol eternamente; podrá secarse en un instante el mar; podrá romperse el eje de la tierra como un débil cristal. ¡Todo sucederá! Pero yo… ¡yo nunca te olvidaré!»',
+      texto: '«¿Qué es poesía?, dices mientras clavas / en mi pupila tu pupila azul; / ¿Qué es poesía? ¿Y tú me lo preguntas? / Poesía… eres tú.»',
       obra: 'Rimas',
       autor: 'Gustavo Adolfo Bécquer',
       anio: '1871',
+      referencia: 'Rima XXI.',
     },
   },
   {
@@ -119,9 +157,8 @@ const movimientos: Movimiento[] = [
     icono: '🔭',
     periodo: 'Mediados – finales del XIX',
     siglos: 's.XIX',
-    regiones: ['Europa'],
-    filtroRegion: 'europa',
-    filtroPeriodo: 'sxix',
+    regiones: [EUROPA],
+    periodos: ['sxix'],
     color: '#4A6741',
     descripcion: 'Observación minuciosa y fiel de la realidad social. Retrato de todas las clases sociales, psicología de los personajes y crítica implícita de las convenciones burguesas.',
     caracteristicas: [
@@ -143,6 +180,8 @@ const movimientos: Movimiento[] = [
       obra: 'Madame Bovary',
       autor: 'Gustave Flaubert',
       anio: '1857',
+      referencia: 'Tercera parte, capítulo VI.',
+      idiomaOriginal: 'francés',
     },
   },
   {
@@ -151,9 +190,8 @@ const movimientos: Movimiento[] = [
     icono: '🔬',
     periodo: 'Últimas décadas del XIX',
     siglos: 's.XIX',
-    regiones: ['Europa', 'EEUU'],
-    filtroRegion: 'europa',
-    filtroPeriodo: 'sxix',
+    regiones: [EUROPA, EEUU],
+    periodos: ['sxix'],
     color: '#5D5C5C',
     descripcion: 'Radicalización del Realismo aplicando el método científico a la literatura. El ser humano está determinado por la herencia genética y el entorno social. Temas antes tabú: pobreza extrema, enfermedad, alcoholismo.',
     caracteristicas: [
@@ -170,11 +208,17 @@ const movimientos: Movimiento[] = [
       { nombre: 'Thomas Hardy', pais: 'Gran Bretaña', obras: ['Tess de los d\'Urberville', 'Jude el Oscuro'], rasgo: 'El fatalismo rural en la Inglaterra victoriana' },
       { nombre: 'Guy de Maupassant', pais: 'Francia', obras: ['Bola de sebo', 'Una vida', 'El Horla'], rasgo: 'Maestro del cuento con visión desesperanzada' },
     ],
+    // Germinal, VII, 6, última frase (fr.wikisource, «Germinal/Partie VII/Chapitre 6»):
+    // «Des hommes poussaient, une armée noire, vengeresse, qui germait lentement dans les
+    // sillons, grandissant pour les récoltes du siècle futur, et dont la germination allait
+    // faire bientôt éclater la terre.» Traducción fiel.
     fragmento: {
-      texto: '«Germinal brotaba, como si la tierra entera hubiera sido fecundada por esa semilla de hombres aplastados, y que un día, tal vez, haría reventar la tierra.»',
+      texto: '«Brotaban hombres, un ejército negro, vengador, que germinaba lentamente en los surcos, creciendo para las cosechas del siglo futuro, y cuya germinación iba a hacer estallar pronto la tierra.»',
       obra: 'Germinal',
       autor: 'Émile Zola',
       anio: '1885',
+      referencia: 'Última frase de la novela.',
+      idiomaOriginal: 'francés',
     },
   },
   {
@@ -183,9 +227,8 @@ const movimientos: Movimiento[] = [
     icono: '✨',
     periodo: '1880–1920',
     siglos: 's.XIX–XX',
-    regiones: ['América Latina', 'España'],
-    filtroRegion: 'latam',
-    filtroPeriodo: 'sxx',
+    regiones: [AMERICA_LATINA, { etiqueta: 'España', filtro: 'europa' }],
+    periodos: ['sxix', 'sxx'],
     color: '#7B5EA7',
     descripcion: 'Movimiento de renovación estética nacido en Hispanoamérica. Prioriza la musicalidad, el simbolismo, la belleza formal y el cosmopolitismo como reacción contra el prosaísmo burgués.',
     caracteristicas: [
@@ -215,10 +258,10 @@ const movimientos: Movimiento[] = [
     icono: '🎨',
     periodo: '1910–1940',
     siglos: 's.XX',
-    regiones: ['Europa', 'América'],
-    filtroRegion: 'europa',
-    filtroPeriodo: 'sxx',
-    color: '#E8663D',
+    // «América» era ambiguo: los americanos de la ficha (Huidobro, Neruda) son chilenos
+    regiones: [EUROPA, AMERICA_LATINA],
+    periodos: ['sxx'],
+    color: '#B75130',
     descripcion: 'Conjunto de movimientos rupturistas que cuestionan toda tradición literaria y artística. Múltiples «ismos»: Surrealismo, Futurismo, Dadaísmo, Ultraísmo, Creacionismo.',
     caracteristicas: [
       'Ruptura radical con la tradición y el pasado',
@@ -247,9 +290,8 @@ const movimientos: Movimiento[] = [
     icono: '🌑',
     periodo: '1930–1960',
     siglos: 's.XX',
-    regiones: ['Europa'],
-    filtroRegion: 'europa',
-    filtroPeriodo: 'sxx',
+    regiones: [EUROPA],
+    periodos: ['sxx'],
     color: '#2C3E50',
     descripcion: 'La existencia precede a la esencia: el ser humano no nace con un propósito dado, debe crearlo. Temas centrales: libertad, angustia, responsabilidad, lo absurdo y la autenticidad.',
     caracteristicas: [
@@ -271,6 +313,8 @@ const movimientos: Movimiento[] = [
       obra: 'El extranjero',
       autor: 'Albert Camus',
       anio: '1942',
+      referencia: 'Comienzo de la novela.',
+      idiomaOriginal: 'francés',
     },
   },
   {
@@ -279,9 +323,8 @@ const movimientos: Movimiento[] = [
     icono: '🌿',
     periodo: '1960–1975',
     siglos: 's.XX',
-    regiones: ['América Latina'],
-    filtroRegion: 'latam',
-    filtroPeriodo: 'sxx',
+    regiones: [AMERICA_LATINA],
+    periodos: ['sxx'],
     color: '#C0392B',
     descripcion: 'Explosión narrativa de la literatura latinoamericana que conquistó el mundo. Renovación radical de la novela: tiempo no lineal, múltiples narradores, realismo mágico, crítica política.',
     caracteristicas: [
@@ -303,6 +346,7 @@ const movimientos: Movimiento[] = [
       obra: 'Cien años de soledad',
       autor: 'Gabriel García Márquez',
       anio: '1967',
+      referencia: 'Comienzo de la novela.',
     },
   },
   {
@@ -311,9 +355,8 @@ const movimientos: Movimiento[] = [
     icono: '🎷',
     periodo: '1950–1960',
     siglos: 's.XX',
-    regiones: ['EEUU'],
-    filtroRegion: 'eeuu',
-    filtroPeriodo: 'sxx',
+    regiones: [EEUU],
+    periodos: ['sxx'],
     color: '#1A3A4A',
     descripcion: 'Movimiento contracultural estadounidense que rechaza los valores burgueses de posguerra. Itinerancia, jazz, espiritualidad oriental, drogas y una prosa urgente como extensión del ritmo musical.',
     caracteristicas: [
@@ -325,16 +368,18 @@ const movimientos: Movimiento[] = [
       'Comunidad de amigos que se leen, critican y publican',
     ],
     autores: [
-      { nombre: 'Jack Kerouac', pais: 'EEUU', obras: ['En el camino', 'Los subterráneos', 'El dharma de los vagabundos'], rasgo: 'El «prosa espontánea»: rollo de papel y escritura sin parar' },
+      { nombre: 'Jack Kerouac', pais: 'EEUU', obras: ['En el camino', 'Los subterráneos', 'El dharma de los vagabundos'], rasgo: 'La «prosa espontánea»: rollo de papel y escritura sin parar' },
       { nombre: 'Allen Ginsberg', pais: 'EEUU', obras: ['Aullido', 'Kaddish', 'América'], rasgo: 'Largo aliento whitmaniano contra la hipocresía de la sociedad' },
       { nombre: 'William S. Burroughs', pais: 'EEUU', obras: ['El almuerzo desnudo', 'Nova Express', 'Queer'], rasgo: 'Cut-up: texto fragmentado que desintegra la narrativa lineal' },
-      { nombre: 'Lawrence Ferlinghetti', pais: 'EEUU', obras: ['Un jardín de luz solar', 'Una mirada coney island de la mente'], rasgo: 'Editor, poeta y motor del movimiento desde la City Lights' },
+      { nombre: 'Lawrence Ferlinghetti', pais: 'EEUU', obras: ['Pictures of the Gone World', 'Un Coney Island de la mente'], rasgo: 'Editor, poeta y motor del movimiento desde la librería y editorial City Lights' },
     ],
     fragmento: {
       texto: '«Vi las mejores mentes de mi generación destruidas por la locura, hambrientas histéricas desnudas, arrastrándose por las calles de los negros al amanecer buscando una dosis furiosa.»',
       obra: 'Aullido',
       autor: 'Allen Ginsberg',
       anio: '1956',
+      referencia: 'Primer verso del poema.',
+      idiomaOriginal: 'inglés',
     },
   },
   {
@@ -343,10 +388,11 @@ const movimientos: Movimiento[] = [
     icono: '🪞',
     periodo: '1970–presente',
     siglos: 's.XX–XXI',
-    regiones: ['Universal'],
-    filtroRegion: 'universal',
-    filtroPeriodo: 'contemporaneo',
-    color: '#16A085',
+    // Antes «Universal», una región que ningún otro movimiento usaba y que escondía esta
+    // tarjeta al filtrar por Europa (Calvino, Eco), América Latina (Borges) o EEUU (Auster)
+    regiones: [EUROPA, AMERICA_LATINA, EEUU],
+    periodos: ['sxx', 'contemporaneo'],
+    color: '#117E69',
     descripcion: 'La literatura como juego de espejos: metaficción, intertextualidad, ironía y relativismo. Cuestiona la autoría, el canon y las grandes narrativas. Mezcla géneros y niveles de cultura.',
     caracteristicas: [
       'Metaficción: la obra habla de sí misma como construcción',
@@ -367,6 +413,8 @@ const movimientos: Movimiento[] = [
       obra: 'Si una noche de invierno un viajero',
       autor: 'Italo Calvino',
       anio: '1979',
+      referencia: 'Comienzo de la novela.',
+      idiomaOriginal: 'italiano',
     },
   },
 ];
@@ -384,7 +432,6 @@ const FILTROS_REGION: { id: FiltroRegion; label: string }[] = [
   { id: 'europa', label: 'Europa' },
   { id: 'latam', label: 'América Latina' },
   { id: 'eeuu', label: 'EEUU' },
-  { id: 'universal', label: 'Universal' },
 ];
 
 // ── Componente ─────────────────────────────────────────────────────────────
@@ -396,8 +443,8 @@ export default function VisualizadorEstilosLiterariosPage() {
 
   const movimientosFiltrados = useMemo(() => {
     return movimientos.filter(m => {
-      const okPeriodo = filtroPeriodo === 'todos' || m.filtroPeriodo === filtroPeriodo;
-      const okRegion = filtroRegion === 'todas' || m.filtroRegion === filtroRegion;
+      const okPeriodo = filtroPeriodo === 'todos' || m.periodos.includes(filtroPeriodo);
+      const okRegion = filtroRegion === 'todas' || m.regiones.some(r => r.filtro === filtroRegion);
       return okPeriodo && okRegion;
     });
   }, [filtroPeriodo, filtroRegion]);
@@ -406,6 +453,29 @@ export default function VisualizadorEstilosLiterariosPage() {
     ? movimientos.find(m => m.id === seleccionado) ?? null
     : null;
 
+  // Foco y desplazamiento al cambiar de vista (hallazgos 1882 y 1885): al abrir, la vista
+  // salta al principio del detalle y el foco va a su título; al volver, el foco regresa a
+  // la tarjeta de la que se salió (y el navegador la desplaza a la vista).
+  const detalleRef = useRef<HTMLDivElement>(null);
+  const detalleTituloRef = useRef<HTMLHeadingElement>(null);
+  const tarjetasRef = useRef<Record<string, HTMLButtonElement | null>>({});
+  const tarjetaOrigen = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (seleccionado) {
+      detalleRef.current?.scrollIntoView({ block: 'start' });
+      detalleTituloRef.current?.focus({ preventScroll: true });
+    } else if (tarjetaOrigen.current) {
+      tarjetasRef.current[tarjetaOrigen.current]?.focus();
+      tarjetaOrigen.current = null;
+    }
+  }, [seleccionado]);
+
+  const handleAbrir = (id: string) => {
+    tarjetaOrigen.current = id;
+    setSeleccionado(id);
+  };
+
   const handleVolver = () => setSeleccionado(null);
 
   return (
@@ -413,15 +483,16 @@ export default function VisualizadorEstilosLiterariosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}><span aria-hidden="true">📚</span> Estilos y Movimientos Literarios</h1>
-        <p className={styles.subtitle}>De la Ilustración al Posmodernismo — autores, obras y fragmentos</p>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">📚</span> Estilos y Movimientos Literarios</h1>
+        <p className={styles.heroSubtitle}>Del Neoclasicismo a la literatura posmoderna — autores, obras y fragmentos</p>
       </header>
 
       <LegalNotice />
 
+      <div className={styles.main}>
       {/* ── Vista detalle ── */}
       {movimientoActual && (
-        <div className={styles.detalle}>
+        <div className={styles.detalle} ref={detalleRef}>
           <button className={styles.btnVolver} onClick={handleVolver} type="button" aria-label="Volver al listado">
             ← Todos los movimientos
           </button>
@@ -429,11 +500,11 @@ export default function VisualizadorEstilosLiterariosPage() {
           <div className={styles.detalleHeader} style={{ background: movimientoActual.color }}>
             <span className={styles.detalleIcono} aria-hidden="true">{movimientoActual.icono}</span>
             <div>
-              <h2 className={styles.detalleNombre}>{movimientoActual.nombre}</h2>
+              <h2 className={styles.detalleNombre} ref={detalleTituloRef} tabIndex={-1}>{movimientoActual.nombre}</h2>
               <div className={styles.detalleMeta}>
                 <span className={styles.detallePeriodo}><span aria-hidden="true">🕰️</span> {movimientoActual.periodo}</span>
                 {movimientoActual.regiones.map(r => (
-                  <span key={r} className={styles.detalleRegion}><span aria-hidden="true">🌍</span> {r}</span>
+                  <span key={r.etiqueta} className={styles.detalleRegion}><span aria-hidden="true">🌍</span> {r.etiqueta}</span>
                 ))}
               </div>
             </div>
@@ -466,6 +537,16 @@ export default function VisualizadorEstilosLiterariosPage() {
                   ({movimientoActual.fragmento.anio})
                 </footer>
               </blockquote>
+              {(movimientoActual.fragmento.referencia || movimientoActual.fragmento.idiomaOriginal) && (
+                <p className={styles.fragmentoNota}>
+                  {[
+                    movimientoActual.fragmento.referencia,
+                    movimientoActual.fragmento.idiomaOriginal
+                      ? `Traducción al español del original en ${movimientoActual.fragmento.idiomaOriginal}.`
+                      : null,
+                  ].filter(Boolean).join(' ')}
+                </p>
+              )}
             </div>
           </div>
 
@@ -490,7 +571,7 @@ export default function VisualizadorEstilosLiterariosPage() {
             </div>
           </div>
 
-          <button className={styles.btnVolverBottom} onClick={handleVolver} type="button">
+          <button className={`${styles.btnVolver} ${styles.btnVolverBottom}`} onClick={handleVolver} type="button">
             ← Volver al listado
           </button>
         </div>
@@ -535,25 +616,33 @@ export default function VisualizadorEstilosLiterariosPage() {
             </div>
           </div>
 
-          {movimientosFiltrados.length === 0 && (
-            <p className={styles.sinResultados}>No hay movimientos para esta combinación de filtros.</p>
-          )}
+          {/* Región viva siempre montada: así el lector de pantalla anuncia el vacío al aparecer */}
+          <div role="status" aria-live="polite">
+            {movimientosFiltrados.length === 0 && (
+              <p className={styles.sinResultados}>No hay movimientos para esta combinación de filtros.</p>
+            )}
+          </div>
 
-          {/* Grid de tarjetas */}
-          <div className={styles.movimientosGrid}>
+          {/* Grid de tarjetas. La tarjeta es un <li> y el botón vive dentro del título: un
+              <button> no puede contener encabezados ni párrafos (HTML válido). El ::after del
+              botón cubre la tarjeta entera, así que sigue pudiéndose pulsar en cualquier parte. */}
+          <ul className={styles.movimientosGrid}>
             {movimientosFiltrados.map(m => (
-              <button
-                key={m.id}
-                className={styles.movimientoCard}
-                onClick={() => setSeleccionado(m.id)}
-                type="button"
-                style={{ borderTopColor: m.color }}
-                aria-label={`Ver ${m.nombre}`}
-              >
+              <li key={m.id} className={styles.movimientoCard} style={{ borderTopColor: m.color }}>
                 <div className={styles.cardHeader}>
                   <span className={styles.cardIcono} aria-hidden="true">{m.icono}</span>
                   <div>
-                    <h2 className={styles.cardNombre}>{m.nombre}</h2>
+                    <h2 className={styles.cardNombre}>
+                      <button
+                        ref={el => { tarjetasRef.current[m.id] = el; }}
+                        className={styles.cardBoton}
+                        onClick={() => handleAbrir(m.id)}
+                        type="button"
+                        aria-label={`Ver ${m.nombre}`}
+                      >
+                        {m.nombre}
+                      </button>
+                    </h2>
                     <p className={styles.cardPeriodo}>{m.siglos}</p>
                   </div>
                 </div>
@@ -561,20 +650,22 @@ export default function VisualizadorEstilosLiterariosPage() {
                 <div className={styles.cardFooter}>
                   <div className={styles.cardRegiones}>
                     {m.regiones.map(r => (
-                      <span key={r} className={styles.regionBadge}>{r}</span>
+                      <span key={r.etiqueta} className={styles.regionBadge}>{r.etiqueta}</span>
                     ))}
                   </div>
                   <span className={styles.cardAutores}>{m.autores.length} autores →</span>
                 </div>
-              </button>
+              </li>
             ))}
-          </div>
+          </ul>
         </>
       )}
+      </div>
 
       {/* ── Sección educativa v2.0 ── */}
       <EducationalSection
-        title="📖 Guía completa de la literatura universal"
+        title="Guía completa de la literatura universal"
+        icon="📖"
         subtitle="Todo lo que necesitas saber para acercarte a los grandes movimientos"
       >
         {/* 1. Tabla comparativa */}
@@ -593,72 +684,72 @@ export default function VisualizadorEstilosLiterariosPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>🏛️ Neoclasicismo</strong></td>
+                  <td><strong><span aria-hidden="true">🏛️</span> Neoclasicismo</strong></td>
                   <td>S.XVII–XVIII</td>
                   <td>Europa</td>
                   <td>Razón, orden, didáctica</td>
                   <td><em>Cándido</em> — Voltaire</td>
                 </tr>
                 <tr>
-                  <td><strong>🌹 Romanticismo</strong></td>
+                  <td><strong><span aria-hidden="true">🌹</span> Romanticismo</strong></td>
                   <td>S.XVIII–XIX</td>
                   <td>Europa</td>
                   <td>Emoción, naturaleza, rebeldía</td>
                   <td><em>Rimas y Leyendas</em> — Bécquer</td>
                 </tr>
                 <tr>
-                  <td><strong>🔭 Realismo</strong></td>
+                  <td><strong><span aria-hidden="true">🔭</span> Realismo</strong></td>
                   <td>S.XIX</td>
                   <td>Europa</td>
                   <td>Observación, crítica social</td>
                   <td><em>Madame Bovary</em> — Flaubert</td>
                 </tr>
                 <tr>
-                  <td><strong>🔬 Naturalismo</strong></td>
+                  <td><strong><span aria-hidden="true">🔬</span> Naturalismo</strong></td>
                   <td>S.XIX</td>
                   <td>Europa</td>
                   <td>Determinismo, tabú, método científico</td>
                   <td><em>Germinal</em> — Zola</td>
                 </tr>
                 <tr>
-                  <td><strong>✨ Modernismo</strong></td>
+                  <td><strong><span aria-hidden="true">✨</span> Modernismo</strong></td>
                   <td>1880–1920</td>
                   <td>Hispanoamérica</td>
                   <td>Musicalidad, simbolismo, belleza</td>
                   <td><em>Versos Sencillos</em> — Martí</td>
                 </tr>
                 <tr>
-                  <td><strong>🎨 Vanguardias</strong></td>
+                  <td><strong><span aria-hidden="true">🎨</span> Vanguardias</strong></td>
                   <td>1910–1940</td>
                   <td>Europa/América</td>
                   <td>Ruptura, experimento, inconsciente</td>
                   <td><em>Poeta en Nueva York</em> — Lorca</td>
                 </tr>
                 <tr>
-                  <td><strong>🌑 Existencialismo</strong></td>
+                  <td><strong><span aria-hidden="true">🌑</span> Existencialismo</strong></td>
                   <td>1930–1960</td>
                   <td>Europa</td>
                   <td>Absurdo, libertad, angustia</td>
                   <td><em>El extranjero</em> — Camus</td>
                 </tr>
                 <tr>
-                  <td><strong>🌿 Boom Latinoam.</strong></td>
+                  <td><strong><span aria-hidden="true">🌿</span> Boom Latinoam.</strong></td>
                   <td>1960–1975</td>
                   <td>América Latina</td>
                   <td>Realismo mágico, innovación total</td>
                   <td><em>El coronel no tiene quien le escriba</em> — García Márquez</td>
                 </tr>
                 <tr>
-                  <td><strong>🎷 Generación Beat</strong></td>
+                  <td><strong><span aria-hidden="true">🎷</span> Generación Beat</strong></td>
                   <td>1950–1960</td>
                   <td>EEUU</td>
                   <td>Espontaneidad, jazz, contracultura</td>
                   <td><em>En el camino</em> — Kerouac</td>
                 </tr>
                 <tr>
-                  <td><strong>🪞 Posmodernismo</strong></td>
+                  <td><strong><span aria-hidden="true">🪞</span> Literatura posmoderna</strong></td>
                   <td>1970–hoy</td>
-                  <td>Universal</td>
+                  <td>Europa y América</td>
                   <td>Metaficción, ironía, intertextualidad</td>
                   <td><em>El nombre de la rosa</em> — Eco</td>
                 </tr>
@@ -674,12 +765,12 @@ export default function VisualizadorEstilosLiterariosPage() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcono} aria-hidden="true">🎓</span>
-                <h3>Estudiante de bachillerato o selectividad</h3>
+                <h3>Estudiante de secundaria o preuniversitario</h3>
               </div>
               <div className={styles.escenarioExample}>
-                <p><strong>Necesidad:</strong> entender el contexto de un texto de comentario antes del examen.</p>
+                <p><strong>Necesidad:</strong> situar un texto en su contexto antes de un comentario o un examen.</p>
               </div>
-              <p className={styles.escenarioTip}><strong>Cómo usar esta guía:</strong> identifica el movimiento por fecha y región, lee las características y comprueba que el texto encaja. Realismo (segunda mitad del XIX, Europa, crítica social) suele ser el más frecuente en selectividad española.</p>
+              <p className={styles.escenarioTip}><strong>Cómo usar esta guía:</strong> identifica el movimiento por fecha y región, lee las características y comprueba que el texto encaja. Si dudas entre dos, compara sus fichas: las diferencias suelen estar en el narrador y en la actitud ante la realidad.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -720,43 +811,43 @@ export default function VisualizadorEstilosLiterariosPage() {
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿El «Modernismo» en español es lo mismo que el «Modernism» en inglés?</h4>
-              <p>No, y es una de las confusiones más frecuentes. El <strong>Modernismo hispanoamericano</strong> (Rubén Darío, 1888–1920) es un movimiento de refinamiento estético que nace en América Latina y se centra en la musicalidad y el simbolismo. El <strong>Modernism anglosajón</strong> (Joyce, Woolf, Eliot, 1910–1940) es una corriente de experimentación narrativa y concienciación social. Son contemporáneos, comparten algunas influencias simbolistas, pero son movimientos distintos con estéticas muy diferentes.</p>
-              <p className={styles.faqTip}>💡 En exámenes españoles, «Modernismo» siempre se refiere al hispanoamericano de Darío. En bibliografía anglosajona, «Modernism» es Joyce y Woolf.</p>
+              <p>No, y es una de las confusiones más frecuentes. El <strong>Modernismo hispanoamericano</strong> (Rubén Darío, 1888–1920) es un movimiento de refinamiento estético que nace en América Latina y se centra en la musicalidad y el simbolismo. El <strong>Modernism anglosajón</strong> (Joyce, Woolf, Eliot, 1910–1940) es una corriente de experimentación narrativa: monólogo interior o flujo de conciencia, fragmentación y ruptura de la cronología. Son contemporáneos, comparten algunas influencias simbolistas, pero son movimientos distintos con estéticas muy diferentes.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En los programas de literatura en español, «Modernismo» se refiere al movimiento hispánico de Darío. En bibliografía anglosajona, «Modernism» es Joyce y Woolf. Pasa lo mismo con «Posmodernismo»: en la crítica hispánica también nombra la reacción que siguió al Modernismo (Federico de Onís la fechó en 1905–1914), distinta de la literatura posmoderna de finales del siglo XX que recoge esta guía.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuál es la diferencia entre Realismo y Naturalismo?</h4>
               <p>El Naturalismo es una radicalización del Realismo. Comparten la observación minuciosa de la realidad y la crítica social, pero el Naturalismo añade el <strong>determinismo</strong>: los personajes no tienen libre albedrío, están atrapados por su herencia genética y su entorno. Mientras Flaubert observa a Emma Bovary con distancia irónica (Realismo), Zola convierte a sus personajes en casos científicos que no pueden escapar de sus condiciones (Naturalismo). El tono también cambia: el Realismo puede ser mordaz pero esperanzador; el Naturalismo tiende al pesimismo sin salida.</p>
-              <p className={styles.faqTip}>💡 Pregunta clave: ¿puede el protagonista cambiar su destino? Sí → probablemente Realismo. No → probablemente Naturalismo.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Pregunta clave: ¿puede el protagonista cambiar su destino? Sí → probablemente Realismo. No → probablemente Naturalismo.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Borges es posmoderno, surrealista o un movimiento aparte?</h4>
-              <p>Borges es un caso único que no encaja perfectamente en ninguna etiqueta. Escribió su obra central (Ficciones, El Aleph) entre los 1940 y 1960, antes de que el Posmodernismo se definiera como movimiento. Sin embargo, sus temas — metaficción, laberintos de sentido, intertextualidad, cuestionamiento de la autoría — son tan fundacionales del Posmodernismo que se le considera su principal precursor. Al mismo tiempo, su dominio del lenguaje y su clasicismo formal lo alejan del Surrealismo. Lo más honesto es considerarlo una categoría en sí mismo: borgesiano.</p>
-              <p className={styles.faqTip}>💡 Regla práctica: si un texto trata el universo como biblioteca o el tiempo como laberinto, Borges está en el árbol genealógico.</p>
+              <p>Borges es un caso único que no encaja perfectamente en ninguna etiqueta. Escribió su obra central (Ficciones, El Aleph) en los años cuarenta, antes de que el Posmodernismo se definiera como movimiento. Sin embargo, sus temas — metaficción, laberintos de sentido, intertextualidad, cuestionamiento de la autoría — son tan fundacionales del Posmodernismo que se le considera su principal precursor. Al mismo tiempo, su dominio del lenguaje y su clasicismo formal lo alejan del Surrealismo. Lo más honesto es considerarlo una categoría en sí mismo: borgesiano.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Regla práctica: si un texto trata el universo como biblioteca o el tiempo como laberinto, Borges está en el árbol genealógico.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿El Realismo Mágico es solo latinoamericano?</h4>
               <p>El término fue acuñado por el crítico alemán Franz Roh (1925) para describir la pintura europea, y el escritor venezolano Arturo Uslar Pietri lo aplicó a la literatura latinoamericana en 1948. Aunque García Márquez, Carpentier y Asturias son sus exponentes más conocidos, hay tradiciones similares en la literatura africana (Amos Tutuola), india (Salman Rushdie), checa (Milan Kundera) y japonesa (Haruki Murakami). Lo que hace específico el Realismo Mágico latinoamericano es que lo sobrenatural no se explica ni se justifica — simplemente sucede, integrado en la realidad cotidiana de los personajes.</p>
-              <p className={styles.faqTip}>💡 Diferencia clave con la fantasía: en la fantasía existe un mundo alternativo; en el Realismo Mágico, lo maravilloso convive sin tensión con lo cotidiano.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Diferencia clave con la fantasía: en la fantasía existe un mundo alternativo; en el Realismo Mágico, lo maravilloso convive sin tensión con lo cotidiano.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Kafka es existencialista?</h4>
-              <p>Kafka (1883–1924) murió antes de que el Existencialismo se definiera como movimiento filosófico (Sartre publica <em>El ser y la nada</em> en 1943). Sin embargo, sus temas — el individuo atrapado en sistemas incomprensibles, la culpa sin causa, la alienación — anticipan tan perfectamente las preocupaciones existencialistas que Sartre y Camus lo reivindicaron como precursor. Lo más preciso es decir que Kafka es un autor proto-existencialista o que pertenece al expresionismo alemán — y que su influencia sobre el Existencialismo literario fue determinante.</p>
-              <p className={styles.faqTip}>💡 Si quieres entender el Existencialismo, lee primero <em>La metamorfosis</em> de Kafka (40 páginas). Funciona como portal perfecto.</p>
+              <p>Kafka (1883–1924) murió antes de que el Existencialismo se definiera como movimiento filosófico (Sartre publica <em>El ser y la nada</em> en 1943). Sin embargo, sus temas — el individuo atrapado en sistemas incomprensibles, la culpa sin causa, la alienación — anticipan tan perfectamente las preocupaciones existencialistas que Sartre y Camus lo reivindicaron como precursor. Lo más preciso es decir que Kafka es un autor proto-existencialista o vincularlo con el expresionismo de lengua alemana — y que su influencia sobre el Existencialismo literario fue determinante.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Si quieres entender el Existencialismo, lee primero <em>La metamorfosis</em> de Kafka (40 páginas). Funciona como portal perfecto.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Los movimientos literarios tienen fechas de inicio y fin precisas?</h4>
-              <p>No. Las fechas que usamos son convenciones académicas, no fronteras reales. Los movimientos se solapan, conviven y evolucionan. Flaubert (Realismo) se publicó al mismo tiempo que los últimos románticos. El Boom Latinoamericano tiene raíces en Borges (1940s) y sigue influyendo hoy. Muchos autores pertenecen a varios movimientos según la época de su obra (el Neruda surrealista de <em>Residencia en la Tierra</em> es muy diferente al Neruda popular de <em>Odas Elementales</em>). Las etiquetas son herramientas para orientarse, no jaulas.</p>
-              <p className={styles.faqTip}>💡 Mejor pregunta que «¿de qué movimiento es este libro?»: «¿qué características de este movimiento reconozco en este texto?»</p>
+              <p>No. Las fechas que usamos son convenciones académicas, no fronteras reales. Los movimientos se solapan, conviven y evolucionan. Flaubert (Realismo) se publicó al mismo tiempo que los últimos románticos. El Boom Latinoamericano tiene raíces en el Borges de los años cuarenta y sigue influyendo hoy. Muchos autores pertenecen a varios movimientos según la época de su obra (el Neruda surrealista de <em>Residencia en la Tierra</em> es muy diferente al Neruda popular de <em>Odas Elementales</em>). Las etiquetas son herramientas para orientarse, no jaulas.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Mejor pregunta que «¿de qué movimiento es este libro?»: «¿qué características de este movimiento reconozco en este texto?»</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Por dónde empezar si nunca he leído literatura «clásica»?</h4>
-              <p>La entrada más accesible depende de lo que te interese. Para el XIX: <em>El coronel no tiene quien le escriba</em> (García Márquez, 100 páginas, perfección narrativa). Para el XIX europeo: <em>Madame Bovary</em> o <em>La muerte de Iván Ilich</em> (Tolstói, 80 páginas). Para el siglo XX europeo: <em>El extranjero</em> (Camus, 130 páginas). Para la poesía: los <em>Veinte poemas de amor</em> (Neruda) o las <em>Rimas</em> (Bécquer). La clave es empezar con obras cortas de autores reconocidos — la extensión no es virtud literaria.</p>
-              <p className={styles.faqTip}>💡 Regla: si tras 50 páginas un libro no te engancha, no es obligatorio terminarlo. Hay miles de libros excelentes; la vida es corta.</p>
+              <p>La entrada más accesible depende de lo que te interese. Para el XIX europeo: <em>Madame Bovary</em> o <em>La muerte de Iván Ilich</em> (Tolstói, unas 80 páginas). Para el XX latinoamericano: <em>El coronel no tiene quien le escriba</em> (García Márquez, 1961, unas 100 páginas). Para el XX europeo: <em>El extranjero</em> (Camus, unas 130 páginas). Para la poesía: los <em>Veinte poemas de amor</em> (Neruda) o las <em>Rimas</em> (Bécquer). La clave es empezar con obras cortas de autores reconocidos — la extensión no es virtud literaria.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Regla: si tras 50 páginas un libro no te engancha, no es obligatorio terminarlo. Hay miles de libros excelentes; la vida es corta.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué diferencia a la Generación Beat del hippismo?</h4>
-              <p>La Generación Beat (1950s) es un fenómeno literario e intelectual de escritores con formación universitaria (Kerouac estudió en Columbia, Ginsberg también) que rechazaban la conformidad americana de posguerra. El hippismo (1960s) fue un movimiento social masivo y de masas que bebió de los Beat pero los transformó en cultura popular. Los Beat eran escritores que vivían en los márgenes; los hippies fueron un fenómeno político y contracultural más amplio. Kerouac, paradójicamente, era políticamente conservador y rechazó ser considerado padre del movimiento hippie.</p>
-              <p className={styles.faqTip}>💡 Los Beat son a los hippies lo que Nietzsche al nazismo: una influencia que los sucesores malinterpretaron o simplificaron.</p>
+              <p>La Generación Beat (años cincuenta) es un fenómeno literario e intelectual de escritores con formación universitaria (Kerouac estudió en Columbia, Ginsberg también) que rechazaban el conformismo de la sociedad estadounidense de posguerra. El hippismo (años sesenta) fue un movimiento social de masas que bebió de los Beat pero los transformó en cultura popular. Los Beat eran escritores que vivían en los márgenes; los hippies fueron un fenómeno político y contracultural más amplio. Kerouac, paradójicamente, era políticamente conservador y rechazó ser considerado padre del movimiento hippie.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Pista para clasificar: si hablas de libros y de autores concretos (<em>En el camino</em>, <em>Aullido</em>), es la Generación Beat; si hablas de un movimiento social con música, estética y movilizaciones propias, es el hippismo.</p>
             </div>
           </div>
         </section>
@@ -776,14 +867,14 @@ export default function VisualizadorEstilosLiterariosPage() {
               <div className={styles.stepNumber} aria-hidden="true">2</div>
               <div className={styles.stepContent}>
                 <h4>Empieza por la obra más corta o accesible del movimiento</h4>
-                <p>No empieces el Realismo por <em>Guerra y Paz</em> (1.200 páginas). Empieza por <em>La muerte de Iván Ilich</em> (80 páginas, Tolstói) o <em>Boule de Suif</em> (Maupassant, cuento). La extensión no es profundidad — las obras breves suelen condensar el estilo con más precisión.</p>
+                <p>No empieces el Realismo por <em>Guerra y Paz</em> (1.200 páginas). Empieza por <em>La muerte de Iván Ilich</em> (unas 80 páginas, Tolstói) o <em>Un corazón sencillo</em> (Flaubert, relato de <em>Tres cuentos</em>). La extensión no es profundidad — las obras breves suelen condensar el estilo con más precisión.</p>
               </div>
             </div>
             <div className={styles.step}>
               <div className={styles.stepNumber} aria-hidden="true">3</div>
               <div className={styles.stepContent}>
                 <h4>Lee activamente: anota lo que reconoces</h4>
-                <p>Mientras lees, subraya o anota frases que encajen con las características del movimiento. «Esta descripción de la miseria es determinista» (Naturalismo). «Este narrador no sabe lo que piensan otros personajes» (3.ª limitada, Realismo). La lectura analítica acelera la comprensión del estilo.</p>
+                <p>Mientras lees, subraya o anota frases que encajen con las características del movimiento. «Esta descripción de la miseria es determinista» (Naturalismo). «Este narrador lo sabe todo de sus personajes y los mira con distancia irónica» (omnisciente, Realismo). La lectura analítica acelera la comprensión del estilo.</p>
               </div>
             </div>
             <div className={styles.step}>
@@ -855,22 +946,22 @@ export default function VisualizadorEstilosLiterariosPage() {
           </div>
           <ul className={styles.warningList}>
             <li>
-              <strong>❌ Confundir al autor con el narrador:</strong> Flaubert no es Emma Bovary, y Camus no es Meursault. El autor construye el narrador; el narrador no habla por el autor. Interpretarlo literalmente lleva a errores de análisis graves.
+              <strong><span aria-hidden="true">❌</span> Confundir al autor con el narrador:</strong> Flaubert no es Emma Bovary, y Camus no es Meursault. El autor construye el narrador; el narrador no habla por el autor. Interpretarlo literalmente lleva a errores de análisis graves.
             </li>
             <li>
-              <strong>❌ Memorizar fechas y no leer los textos:</strong> saber que el Realismo es 1850–1900 sin haber leído una página de Flaubert o Galdós es conocimiento decorativo. Las fechas son esqueleto; los textos son la carne.
+              <strong><span aria-hidden="true">❌</span> Memorizar fechas y no leer los textos:</strong> saber que el Realismo es 1850–1900 sin haber leído una página de Flaubert o Galdós es conocimiento decorativo. Las fechas son esqueleto; los textos son la carne.
             </li>
             <li>
-              <strong>❌ Asumir que «difícil» significa «mejor»:</strong> Proust es más difícil que Hemingway, pero no es mejor. La dificultad es una característica estilística, no un criterio de valor. Grandes obras de la literatura universal son de lectura fluida.
+              <strong><span aria-hidden="true">❌</span> Asumir que «difícil» significa «mejor»:</strong> Proust es más difícil que Hemingway, pero no es mejor. La dificultad es una característica estilística, no un criterio de valor. Grandes obras de la literatura universal son de lectura fluida.
             </li>
             <li>
-              <strong>❌ Ignorar la literatura en español por el sesgo anglosajón:</strong> García Márquez, Borges, Lorca, Cervantes y Sor Juana Inés de la Cruz son literatura universal de primer nivel. El canon anglófono no es el único canon.
+              <strong><span aria-hidden="true">❌</span> Ignorar la literatura en español por el sesgo anglosajón:</strong> García Márquez, Borges, Lorca, Cervantes y Sor Juana Inés de la Cruz son literatura universal de primer nivel. El canon anglófono no es el único canon.
             </li>
             <li>
-              <strong>❌ Leer el resumen en lugar del libro:</strong> los resúmenes destruyen el ritmo, la voz y el estilo — que son la literatura. Un resumen de <em>Madame Bovary</em> es «mujer infeliz se suicida». El libro es otra cosa completamente.
+              <strong><span aria-hidden="true">❌</span> Leer el resumen en lugar del libro:</strong> los resúmenes destruyen el ritmo, la voz y el estilo — que son la literatura. Un resumen de <em>Madame Bovary</em> es «mujer infeliz se suicida». El libro es otra cosa completamente.
             </li>
             <li>
-              <strong>❌ Creer que los movimientos son estancos y sucesivos:</strong> en 1890 coexistían en París: naturalistas (Zola), simbolistas (Mallarmé), modernistas hispanoamericanos (Darío) e impresionistas. La historia literaria no es lineal, es simultánea y geográficamente diversa.
+              <strong><span aria-hidden="true">❌</span> Creer que los movimientos son estancos y sucesivos:</strong> hacia 1890 coexistían en París naturalistas (Zola) y simbolistas (Mallarmé), mientras en Hispanoamérica despegaba el Modernismo, que bebía de ambos (<em>Azul…</em>, de Darío, se publicó en Valparaíso en 1888). La historia literaria no es lineal, es simultánea y geográficamente diversa.
             </li>
           </ul>
         </div>

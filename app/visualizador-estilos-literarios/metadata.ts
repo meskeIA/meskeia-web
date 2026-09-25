@@ -38,14 +38,14 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Visualizador de Estilos y Movimientos Literarios',
-  description: 'Guía visual interactiva de los grandes movimientos literarios de la historia. Explora 10 corrientes desde el Clasicismo hasta el Posmodernismo con autores representativos, obras clave y fragmentos ilustrativos.',
+  description: 'Guía visual interactiva de los grandes movimientos literarios de la historia. Explora 10 corrientes desde el Neoclasicismo hasta la literatura posmoderna con autores representativos, obras clave y fragmentos de las obras.',
   url: 'https://meskeia.com/visualizador-estilos-literarios/',
   category: 'EducationalApplication',
   features: [
     '10 movimientos literarios con descripción detallada',
     'Filtros por período histórico y región geográfica',
     'Autores representativos con obras clave de cada corriente',
-    'Fragmentos literarios ilustrativos atribuidos',
+    'Fragmentos literales de las obras, con autor, obra y año',
     'Características definitorias de cada estilo',
     'Cobertura desde el s.XVII hasta la literatura contemporánea',
   ],
@@ -68,7 +68,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son los principales movimientos literarios del siglo XX?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los más influyentes del siglo XX son el Modernismo (Joyce, Woolf, Faulkner), las Vanguardias (surrealismo, dadaísmo, futurismo), el Existencialismo (Sartre, Camus, Kafka), el Boom Latinoamericano (García Márquez, Vargas Llosa, Cortázar) y el Posmodernismo (Borges, Pynchon, DeLillo). Cada uno transformó el lenguaje y la estructura narrativa de formas distintas.',
+        text: 'Entre los más influyentes del siglo XX están el Modernism anglosajón (Joyce, Woolf, Faulkner), que no hay que confundir con el Modernismo hispánico de Rubén Darío; las Vanguardias (surrealismo, dadaísmo, futurismo); el Existencialismo (Sartre, Camus, con Kafka como precursor); el Boom Latinoamericano (García Márquez, Vargas Llosa, Cortázar) y la literatura posmoderna (Calvino, Pynchon, DeLillo), con Borges como precursor. Cada uno transformó el lenguaje y la estructura narrativa de formas distintas.',
       },
     },
     {
@@ -92,7 +92,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve conocer los movimientos literarios si quiero escribir ficción?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Conocer los movimientos literarios te da un mapa de recursos estilísticos disponibles: puedes adoptar la ambigüedad del Modernismo, la fragmentación de las Vanguardias o la voz íntima del Realismo según lo que necesite tu historia. También te ayuda a identificar tus influencias y a situar conscientemente tu escritura en una tradición, lo que suele enriquecer el resultado final.',
+        text: 'Conocer los movimientos literarios te da un mapa de recursos estilísticos disponibles: puedes adoptar el monólogo interior del Modernism anglosajón, la fragmentación de las Vanguardias o la voz íntima del Realismo según lo que necesite tu historia. También te ayuda a identificar tus influencias y a situar conscientemente tu escritura en una tradición, lo que suele enriquecer el resultado final.',
       },
     },
   ],
