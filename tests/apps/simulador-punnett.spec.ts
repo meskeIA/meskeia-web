@@ -638,11 +638,12 @@ test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
       'Grupo O',
     ]);
     // 1/4 cada celda. El formato del % es cosa de simulador-genetica; aquí se mide el valor.
+    // `\s` y no ` `: desde 75d5db87 (25/09/2026) el % va separado con espacio duro U+00A0.
     await expect(page.locator('[class*="cellProbability"]')).toHaveText([
-      /^25(,0)? ?%$/,
-      /^25(,0)? ?%$/,
-      /^25(,0)? ?%$/,
-      /^25(,0)? ?%$/,
+      /^25(,0)?\s?%$/,
+      /^25(,0)?\s?%$/,
+      /^25(,0)?\s?%$/,
+      /^25(,0)?\s?%$/,
     ]);
     await page.getByRole('tab', { name: 'Estadísticas', exact: true }).click();
     await expect(
