@@ -134,7 +134,7 @@ const COMPONENTES: ComponenteSmartphone[] = [
     // la tabla de reservas; en «World Resources» (medidos e indicados, ~150 Mt): Argentina 28,
     // Bolivia 23, Chile 13 → 64 / 150 = 42,7 % ≈ 43 %.
     curioso:
-      'Chile y Argentina, dos de los tres países del llamado Triángulo del Litio, reúnen el 37 % de las reservas mundiales: 9,2 y 4,4 de 37 millones de toneladas de litio contenido (USGS, Mineral Commodity Summaries 2026). Bolivia, el tercero, no tiene reservas declaradas, pero sí 23 millones de toneladas de recursos; contando los recursos, los tres países suman 64 de unos 150 millones de toneladas, en torno al 43 %. Sin embargo, el 75 % de la producción de celdas de batería ocurre en China.',
+      'Chile y Argentina, dos de los tres países del llamado Triángulo del Litio, reúnen el 37 % de las reservas mundiales: 9,2 y 4,4 de 37 millones de toneladas de litio contenido (USGS, Mineral Commodity Summaries 2026). Bolivia, el tercero, no tiene reservas declaradas, pero sí 23 millones de toneladas de recursos; contando los recursos, los tres países suman 64 de unos 150 millones de toneladas, en torno al 43 %. Sin embargo, las celdas se fabrican lejos de allí: China produjo el 80 % de las celdas de batería del mundo en 2024 (IEA, Global EV Outlook 2025).',
   },
   {
     id: 'camaras',
@@ -142,11 +142,16 @@ const COMPONENTES: ComponenteSmartphone[] = [
     rotulo: 'Cámaras',
     origen: 'Japón / China',
     icono: '📷',
-    pais: 'Japón / China / Suecia',
+    // Hallazgo 1728: decía «Japón / China / Suecia». Largan Precision tiene sede en Taichung
+    // (Taiwán, largan.com.tw) y ningún fabricante nombrado es sueco.
+    pais: 'Japón / Taiwán / China',
     empresa: 'Sony Semiconductor (sensores), Largan Precision (lentes), Sunny Optical',
     coste: { partida: 'Cámaras', dolares: 44 },
+    // Hallazgo 1725: «~45 %» era la cuota de ingresos de 2021 (Strategy Analytics) en presente.
+    // TechInsights, «Smartphone Image Sensor Market Share Q4 2024»: «Sony Semiconductor ranked top
+    // with over 55% share».
     curioso:
-      'El sensor de imagen Sony IMX es tan dominante que incluso los iPhone y Galaxy usan sensores Sony. Sony controla ~45 % del mercado mundial de sensores CMOS para smartphones.',
+      'El sensor de imagen Sony IMX es tan dominante que incluso los iPhone y Galaxy usan sensores Sony. En el 4.º trimestre de 2024, Sony Semiconductor encabezaba el mercado mundial de sensores de imagen para smartphones con más del 55 % (TechInsights).',
   },
   {
     id: 'memoria',
@@ -161,16 +166,22 @@ const COMPONENTES: ComponenteSmartphone[] = [
       dolares: 64.5,
       nota: 'La fuente da una sola partida de memoria, sin separar la flash del resto.',
     },
+    // Hallazgo 1726: «hasta 232 capas» era el récord de Micron (volumen desde el 26/07/2022).
+    // SK hynix: 321 capas en producción en masa desde el 21/11/2024 y UFS 4.1 móvil sobre 321
+    // capas anunciado el 21/05/2025 (news.skhynix.com).
     curioso:
-      'Un smartphone de 256 GB contiene capas de memoria apiladas verticalmente (3D NAND) con hasta 232 capas de células de memoria. En febrero de 2022, una contaminación de materiales de fabricación paró parte de la producción de las plantas que Kioxia y Western Digital comparten en Yokkaichi y Kitakami (Japón): se echaron a perder al menos 6,5 exabytes de memoria flash (Western Digital, 2022). Entre las dos empresas fabricaban cerca de un tercio de la NAND mundial (32,5 % en el 3.er trimestre de 2021, según TrendForce).',
+      'La memoria flash de un smartphone apila sus células en capas verticales (3D NAND). En 2022 el récord eran 232 capas (Micron); SK hynix fabrica en serie chips de 321 capas desde noviembre de 2024 y en mayo de 2025 presentó sobre ellos su memoria para móviles UFS 4.1. En febrero de 2022, una contaminación de materiales de fabricación paró parte de la producción de las plantas que Kioxia y Western Digital comparten en Yokkaichi y Kitakami (Japón): se echaron a perder al menos 6,5 exabytes de memoria flash (Western Digital, 2022). Entre las dos empresas fabricaban cerca de un tercio de la NAND mundial (32,5 % en el 3.er trimestre de 2021, según TrendForce).',
   },
   {
     id: 'antenas',
     nombre: 'Antenas 5G',
     rotulo: 'Antenas 5G',
-    origen: 'Finlandia / Suecia',
+    // Hallazgo 1728: el país no incluía Japón con Murata (Nagaokakyo, Kioto) en la ficha. Los
+    // componentes vienen de Qualcomm (EEUU) y Murata (Japón); Ericsson y Nokia aportan la
+    // tecnología base (patentes y estándares), no piezas del teléfono.
+    origen: 'EEUU / Japón',
     icono: '📡',
-    pais: 'Finlandia / Suecia / EEUU',
+    pais: 'EEUU / Japón (componentes) — Finlandia / Suecia (tecnología base)',
     empresa: 'Qualcomm (módems), Ericsson, Nokia (tecnología base), Murata (componentes RF)',
     // TechInsights identifica el módem del modelo desmontado como un 4G LTE (XMM7560): no hay
     // partida 5G, y la de radiofrecuencia es la más cercana a las antenas.
@@ -794,8 +805,8 @@ export default function VisualizadorCadenasSuministro() {
             </p>
             <p>
               Una cadena de suministro moderna no es lineal sino una red compleja de nodos
-              interdependientes. Una empresa como Apple tiene más de 200 proveedores directos
-              y miles de proveedores de segundo y tercer nivel distribuidos por 43 países.
+              interdependientes. Apple, por ejemplo, declara que su cadena de suministro reúne
+              miles de instalaciones de proveedores en más de 60&nbsp;países (apple.com/supply-chain).
             </p>
           </div>
 

@@ -841,6 +841,10 @@ test.describe('Inspección 24/09/2026 — re-inspección tras 95060386 y 0d54c8f
 //     (largan.com.tw): falta Taiwán, y ningún fabricante nombrado es sueco. Antenas: Murata
 //     (componentes RF) tiene su sede en «Nagaokakyo-shi, Kyoto 617-8555, Japan»
 //     (corporate.murata.com) y Japón no está en el país. → hallazgo, dato bajo.
+//
+// REPARADOS el 25/09/2026 (Ronda 15, hallazgos 1724-1728): los cinco test.fail pasan a regresión.
+// En antenas el diagrama rotula ahora «EEUU / Japón» (Qualcomm y Murata fabrican las piezas) y la
+// ficha deja Finlandia y Suecia como «tecnología base» (Nokia, Ericsson: patentes y estándares).
 // ─────────────────────────────────────────────────────────────────────────────────────────────
 
 test.describe('Inspección 25/09/2026 — re-inspección tras 20901bec', () => {
@@ -855,9 +859,9 @@ test.describe('Inspección 25/09/2026 — re-inspección tras 20901bec', () => {
       ['Pantalla OLED', '20,0', 'Corea del Sur', 'Corea del Sur / China'],
       ['Procesador (SoC)', '15,9', 'EEUU → Taiwán', 'Diseñado en EEUU/UK — Fabricado en Taiwán/Corea'],
       ['Batería de litio', '2,0', 'Chile → China', 'Litio de Chile/Australia — Celdas en China'],
-      ['Módulo de cámaras', '9,7', 'Japón / China', 'Japón / China / Suecia'],
+      ['Módulo de cámaras', '9,7', 'Japón / China', 'Japón / Taiwán / China'],
       ['Memoria flash (NAND)', '14,2', 'Japón / Corea', 'Japón / Corea del Sur / China'],
-      ['Antenas 5G', '5,1', 'Finlandia / Suecia', 'Finlandia / Suecia / EEUU'],
+      ['Antenas 5G', '5,1', 'EEUU / Japón', 'EEUU / Japón (componentes) — Finlandia / Suecia (tecnología base)'],
       ['Chasis de aluminio', '12,8', 'China', 'China (fabricación) — Bauxita de Guinea/Australia'],
       ['Ensamblaje final', '5,4', 'China / India', 'China / India / Vietnam'],
     ];
@@ -962,7 +966,6 @@ test.describe('Inspección 25/09/2026 — re-inspección tras 20901bec', () => {
   // responsible for 80% of global battery cell production in 2024». Hoy la ficha dice «el 75 %
   // […] ocurre en China», en presente, sin año ni fuente. Lo correcto: la cifra de la IEA con su año.
   test('dato — la cuota china de celdas de batería lleva la cifra de la IEA y su año, no un 75 % sin fecha', async ({ page }) => {
-    test.fail(true, 'Hallazgo del 25/09/2026: «el 75 % de la producción de celdas» sin año; IEA 2024: 80 %');
     await componente(page, 'Batería de litio').click();
     const texto = (await panel(page).textContent()) ?? '';
     expect(texto).not.toMatch(/75\s?% de la producción de celdas/);
@@ -973,7 +976,6 @@ test.describe('Inspección 25/09/2026 — re-inspección tras 20901bec', () => {
   // HALLAZGO (25/09/2026, dato bajo) — cámaras. «~45 %» es Strategy Analytics para 2021;
   // TechInsights, Q4 2024: «Sony Semiconductor ranked top with over 55% share».
   test('dato — la cuota de Sony en sensores de smartphone no es un «~45 %» sin año', async ({ page }) => {
-    test.fail(true, 'Hallazgo del 25/09/2026: «Sony controla ~45 %» (2021) presentado en presente; TechInsights Q4 2024: >55 %');
     await componente(page, 'Módulo de cámaras').click();
     const texto = (await panel(page).textContent()) ?? '';
     expect(texto).not.toMatch(/~45\s?%/);
@@ -983,7 +985,6 @@ test.describe('Inspección 25/09/2026 — re-inspección tras 20901bec', () => {
   // HALLAZGO (25/09/2026, dato bajo) — memoria. «Hasta 232 capas» fue el récord de Micron en julio
   // de 2022; SK hynix produce 321 capas desde el 21/11/2024 y su UFS 4.1 móvil es de 321 capas.
   test('dato — la ficha de la NAND no da «hasta 232 capas» como techo actual', async ({ page }) => {
-    test.fail(true, 'Hallazgo del 25/09/2026: «hasta 232 capas» (récord de 2022) en presente; SK hynix, 321 capas desde 11/2024');
     await componente(page, 'Memoria flash (NAND)').click();
     await expect(panel(page)).not.toContainText('hasta 232 capas');
   });
@@ -991,7 +992,6 @@ test.describe('Inspección 25/09/2026 — re-inspección tras 20901bec', () => {
   // HALLAZGO (25/09/2026, dato bajo) — guía. «Distribuidos por 43 países»; Apple
   // (apple.com/supply-chain): «thousands of supplier facilities in over 60 countries».
   test('dato — la red de proveedores de Apple no se reparte por «43 países» sino por más de 60', async ({ page }) => {
-    test.fail(true, 'Hallazgo del 25/09/2026: «43 países»; Apple, apple.com/supply-chain: «over 60 countries»');
     const guia = (await page.locator('div[class*="eduCard"]').first().textContent()) ?? '';
     expect(guia).not.toContain('43 países');
     expect(guia).toMatch(/60\s+países/);
@@ -1001,7 +1001,6 @@ test.describe('Inspección 25/09/2026 — re-inspección tras 20901bec', () => {
   // Largan Precision: Taichung, Taiwán (largan.com.tw); Murata: Nagaokakyo, Kioto, Japón
   // (corporate.murata.com). Ningún fabricante de cámaras nombrado es sueco.
   test('dato — el país de cámaras y antenas incluye el de sus fabricantes (Taiwán, Japón) y no uno sin fabricante', async ({ page }) => {
-    test.fail(true, 'Hallazgo del 25/09/2026: cámaras «Japón / China / Suecia» sin Taiwán (Largan); antenas sin Japón (Murata)');
     const fichaPais = page.locator('p[class*="componentePais"]');
     await componente(page, 'Módulo de cámaras').click();
     await expect(panel(page)).toContainText('Largan Precision');
