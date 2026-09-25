@@ -38,8 +38,8 @@ import {
  *   «Necesitas al menos 20 letras para un análisis de frecuencias fiable.»; con 19 letras,
  *   lo mismo; con 20 ya ataca.
  *
- * HALLAZGOS ABIERTOS — marcados con `test.fail()`. Cada uno afirma lo que DEBERÍA pasar;
- * cuando se reparen, pasarán a verde y Playwright avisará para retirar la marca:
+ * HALLAZGOS 1620-1628 (A = 1620, B = 1621 … I = 1628), REPARADOS el 25/09/2026: sus tests
+ * quedan como regresión. Lo que describía cada uno:
  *   A. La rueda del alfabeto enseña la IDENTIDAD para toda k: las letras del anillo exterior
  *      se desplazan k en el índice (`ALFABETO[(i + k) % 26]`) Y además el anillo gira k
  *      posiciones (`anguloBase`), y los dos desplazamientos se anulan. En reposo, frente a la
@@ -281,7 +281,7 @@ test.describe('Cifrado César — la rueda del alfabeto', () => {
 
   // HALLAZGO A: con k = 3, frente a la A interior (arriba, en la línea amarilla) debe quedar
   // la D exterior, y frente a cada letra X, la X + 3. HOY queda cada letra frente a sí misma.
-  test.fail('HALLAZGO A — con k = 3 la rueda empareja A↔D, B↔E … Z↔C', async ({ page }) => {
+  test('HALLAZGO A — con k = 3 la rueda empareja A↔D, B↔E … Z↔C', async ({ page }) => {
     const rueda = await ruedaAsentada(page);
     expect(rueda.exterior[0]).toBe('D');
     expect(rueda.exterior.join('')).toBe('DEFGHIJKLMNOPQRSTUVWXYZABC');
@@ -296,7 +296,7 @@ test.describe('Cifrado César — ataque automático', () => {
   // HALLAZGO C: con el criptograma en modo Descifrar, el ataque debe dejar a la vista el
   // texto en claro. HOY detecta k = 3, pasa a Cifrar y muestra el criptograma cifrado otra
   // vez: «KR KTKSOMU KYVKXG KT KR VAKTZK JKYJK KYZK SKY» (clave total 6).
-  test.fail('HALLAZGO C — en modo Descifrar, el ataque descifra el criptograma', async ({ page }) => {
+  test('HALLAZGO C — en modo Descifrar, el ataque descifra el criptograma', async ({ page }) => {
     await sembrarValor(page, DESLIZADOR, 0); // «no conozco la clave»
     await botonDescifrar(page).click();
     await escribir(page, 'HO HQHPLJR HVSHUD HQ HO SXHQWH GHVGH HVWH PHV');
@@ -311,12 +311,30 @@ test.describe('Cifrado César — ataque automático', () => {
   // HALLAZGO D: el preset «Párrafo largo» (256 letras A-Z: A 39, E 31) cifrado con k = 3.
   // Comparando con la distribución del español, como promete la guía, sale k = 3 (χ² contra
   // la propia tabla FREQS_ES). HOY toma la D (= A + 3) por E y anuncia 25.
-  test.fail('HALLAZGO D — el ataque recupera k = 3 en el preset «Párrafo largo»', async ({ page }) => {
+  test('HALLAZGO D — el ataque recupera k = 3 en el preset «Párrafo largo»', async ({ page }) => {
     await page.getByRole('button', { name: 'Párrafo largo' }).click();
     await expect(page.locator(DESLIZADOR)).toHaveValue('3');
     await botonAtaque(page).click();
     await expect(avisoAtaque(page)).toContainText('Desplazamiento detectado: 3.');
     await expect(page.locator(DESLIZADOR)).toHaveValue('3');
+
+    // El mismo ataque desde el otro lado: el criptograma del párrafo con k = 3 como entrada en
+    // Descifrar, clave desconocida (k = 0) → detecta 3 y deja el texto en claro.
+    const claro = await page.locator(ENTRADA).inputValue();
+    const cripto = await resultado(page).inputValue();
+    await sembrarValor(page, DESLIZADOR, 0);
+    await botonDescifrar(page).click();
+    await escribir(page, cripto);
+    await botonAtaque(page).click();
+    await expect(avisoAtaque(page)).toContainText('Desplazamiento detectado: 3.');
+    await expect(resultado(page)).toHaveValue(claro);
+  });
+
+  // HALLAZGO D, segundo preset: «En un lugar de la Mancha…» (A 9, E 6) con k = 3.
+  test('HALLAZGO D — el ataque recupera k = 3 en el preset «Quijote»', async ({ page }) => {
+    await page.getByRole('button', { name: 'Quijote' }).click();
+    await botonAtaque(page).click();
+    await expect(avisoAtaque(page)).toContainText('Desplazamiento detectado: 3.');
   });
 });
 
@@ -354,7 +372,7 @@ test.describe('Cifrado César — el lienzo sin tamaño (sospecha del 25/09)', (
 
   // HALLAZGO B: con el contenedor del lienzo oculto al montar, la app debe verse igual (el
   // lienzo, simplemente, sin dibujar). HOY arc() recibe radio −4 y todo cae a «Algo salió mal».
-  test.fail('HALLAZGO B — contenedor del lienzo en display:none antes de hidratar: la página no cae', async ({ page }) => {
+  test('HALLAZGO B — contenedor del lienzo en display:none antes de hidratar: la página no cae', async ({ page }) => {
     const errores = vigilarRadio(page);
     await page.addInitScript(() => {
       const css = document.createElement('style');
@@ -380,7 +398,7 @@ test.describe('Cifrado César — el lienzo sin tamaño (sospecha del 25/09)', (
   // HALLAZGO B, sin tocar el DOM: una ventana de 100 px deja el contenedor en 12 px
   // (100 − 40 de márgenes de <main> − 48 del panel) → radio exterior 6 − 16 = −10.
   // Medido: 119 px cae, 120 px no.
-  test.fail('HALLAZGO B — ventana de 100 px de ancho: la página no cae', async ({ page }) => {
+  test('HALLAZGO B — ventana de 100 px de ancho: la página no cae', async ({ page }) => {
     const errores = vigilarRadio(page);
     await page.setViewportSize({ width: 100, height: 700 });
     await page.goto(RUTA);
@@ -398,29 +416,31 @@ test.describe('Cifrado César — contenido y formato', () => {
 
   // HALLAZGO E: el porcentaje de la E debe salir de una fuente citada (Pratt 1939: 13,68 %).
   // HOY «~14,7 %», sin fuente, cuatro veces.
-  test.fail('HALLAZGO E — la frecuencia de la E en español no es un 14,7 % sin fuente', async ({ page }) => {
+  test('HALLAZGO E — la frecuencia de la E en español no es un 14,7 % sin fuente', async ({ page }) => {
     await expect(page.locator('main')).not.toContainText('14,7');
+    // Y la cifra que queda, junto al histograma, lleva su fuente: Pratt 1939, E = 13,68 %.
+    await expect(page.locator('p[class*="histoHint"]').last()).toContainText(/13,7 %.*Pratt.*1939/);
   });
 
   // HALLAZGO F: ROT-13 es una involución (f∘f = identidad), no idempotente (f∘f = f).
-  test.fail('HALLAZGO F — la guía no llama «idempotente» a ROT-13', async ({ page }) => {
+  test('HALLAZGO F — la guía no llama «idempotente» a ROT-13', async ({ page }) => {
     await expect(page.locator('main')).not.toContainText('idempotente');
   });
 
   // HALLAZGO G: el atbash de Jeremías (s. VI a. C.) es anterior al César (s. I a. C.).
-  test.fail('HALLAZGO G — la FAQ no presenta el César como el cifrado de sustitución más antiguo', async ({ page }) => {
+  test('HALLAZGO G — la FAQ no presenta el César como el cifrado de sustitución más antiguo', async ({ page }) => {
     await expect(page.locator('main')).not.toContainText('registro histórico más antiguo');
   });
 
   // HALLAZGO H: la app debe decir qué hace con la Ñ y las tildes, que deja en claro (lo mide
   // el CASO 2 bis). HOY solo avisa de los espacios; su preset «Mensaje técnico» enseña
   // «Uhxqlóq» (Reunión) y «qúphur» (número) con la ó y la ú a la vista.
-  test.fail('HALLAZGO H — la app declara qué hace con la Ñ y las vocales con tilde', async ({ page }) => {
+  test('HALLAZGO H — la app declara qué hace con la Ñ y las vocales con tilde', async ({ page }) => {
     await expect(page.locator('main')).toContainText(/tilde|acentuad|la Ñ|la eñe/i);
   });
 
   // HALLAZGO I: «Yhql, ylgl, ylfl» tiene 12 letras y 5 L → 5/12 = 41,67 % → «41,7 %».
-  test.fail('HALLAZGO I — el porcentaje de la barra L va en formato español', async ({ page }) => {
+  test('HALLAZGO I — el porcentaje de la barra L va en formato español', async ({ page }) => {
     await expect(resultado(page)).toHaveValue('Yhql, ylgl, ylfl');
     await expect(page.locator('[class*="histoBarInner"]').nth(11)).toHaveAttribute('title', 'L: 41,7 %');
   });

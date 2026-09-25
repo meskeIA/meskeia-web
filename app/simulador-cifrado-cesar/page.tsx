@@ -10,6 +10,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorCifradoCesar.module.css';
 
@@ -18,13 +19,18 @@ import styles from './SimuladorCifradoCesar.module.css';
 // ============================================================
 const ALFABETO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-// Frecuencias relativas del español (%)
+// Frecuencias relativas de las letras en español (%), según Fletcher Pratt, «Secret and
+// Urgent: the Story of Codes and Ciphers» (Blue Ribbon Books, 1939), pp. 254-255: la tabla
+// que recoge Wikipedia en «Frecuencia de aparición de letras». La Ñ (0,31 %) no entra: está
+// fuera del alfabeto de 26 que cifra la app. Antes había aquí una tabla sin fuente, con la E
+// al 14,7 %, que sumaba 102 % y que el ataque ni siquiera usaba (hallazgos 1623 y 1624).
 const FREQS_ES: Record<string, number> = {
-  A: 12.5, B: 1.4, C: 4.7, D: 5.9, E: 14.7, F: 0.7, G: 1.0, H: 1.2,
-  I: 6.2, J: 0.5, K: 0.1, L: 5.0, M: 3.1, N: 7.0, O: 8.7, P: 2.5,
-  Q: 0.9, R: 6.9, S: 7.9, T: 4.6, U: 3.9, V: 0.9, W: 0.1, X: 0.2,
-  Y: 0.9, Z: 0.5,
+  A: 12.53, B: 1.42, C: 4.68, D: 5.86, E: 13.68, F: 0.69, G: 1.01, H: 0.7,
+  I: 6.25, J: 0.44, K: 0.02, L: 4.97, M: 3.15, N: 6.71, O: 8.68, P: 2.51,
+  Q: 0.88, R: 6.87, S: 7.98, T: 4.63, U: 3.93, V: 0.9, W: 0.01, X: 0.22,
+  Y: 0.9, Z: 0.52,
 };
+const SUMA_FREQS_ES = Object.values(FREQS_ES).reduce((a, b) => a + b, 0);
 
 const TEXTOS_PREDEFINIDOS = [
   { id: 'cesar', label: 'Julio César', texto: 'Veni, vidi, vici' },
@@ -86,20 +92,37 @@ function calcularFrecuencias(texto: string): Record<string, number> {
   return freqs;
 }
 
+/**
+ * Detecta la clave comparando el histograma del criptograma con la distribución del español:
+ * para cada k posible se «descifra» el recuento y se mide su distancia χ² a FREQS_ES; gana la
+ * k con menor χ². Suponer que la letra más frecuente es la E falla en cuanto la A la supera,
+ * como en el preset «Párrafo largo» (39 A frente a 31 E: daba k = 25 en vez de 3, hallazgo 1623).
+ */
 function detectarDesplazamiento(textoCifrado: string): number {
-  const freqs = calcularFrecuencias(textoCifrado);
-  let maxFreq = 0;
-  let letraMasFrecuente = 'E';
-  for (const [letra, freq] of Object.entries(freqs)) {
-    if (freq > maxFreq) {
-      maxFreq = freq;
-      letraMasFrecuente = letra;
+  const counts = Array<number>(26).fill(0);
+  let total = 0;
+  for (const ch of textoCifrado.toUpperCase()) {
+    if (ch >= 'A' && ch <= 'Z') {
+      counts[ch.charCodeAt(0) - 65]++;
+      total++;
     }
   }
-  // Asumimos que la letra más frecuente es 'E'
-  const codE = 'E'.charCodeAt(0) - 65;
-  const codLetra = letraMasFrecuente.charCodeAt(0) - 65;
-  return ((codLetra - codE) + 26) % 26;
+  if (total === 0) return 0;
+  let mejorK = 0;
+  let mejorChi = Infinity;
+  for (let k = 0; k < 26; k++) {
+    let chi = 0;
+    for (let i = 0; i < 26; i++) {
+      const esperado = (total * FREQS_ES[ALFABETO[i]]) / SUMA_FREQS_ES;
+      const observado = counts[(i + k) % 26];
+      chi += ((observado - esperado) ** 2) / esperado;
+    }
+    if (chi < mejorChi) {
+      mejorChi = chi;
+      mejorK = k;
+    }
+  }
+  return mejorK;
 }
 
 // ============================================================
@@ -130,6 +153,11 @@ export default function SimuladorCifradoCesar() {
     (best, l) => (frecuencias[l] > frecuencias[best] ? l : best),
     'A'
   );
+  // Letras que aparecen, de más a menos frecuente (resumen visible y lector de pantalla)
+  const letrasPresentes = ALFABETO.split('')
+    .filter((l) => frecuencias[l] > 0)
+    .sort((a, b) => frecuencias[b] - frecuencias[a]);
+  const porcentaje = (l: string): string => `${l} ${formatNumber(frecuencias[l], 1)} %`;
 
   // ============================================================
   // Canvas — rueda del alfabeto
@@ -151,6 +179,12 @@ export default function SimuladorCifradoCesar() {
       document.documentElement.getAttribute('data-theme') === 'dark';
 
     ctx.clearRect(0, 0, W * dpr, H * dpr);
+
+    // Con el contenedor por debajo de 32 px (oculto al montar, ventana muy estrecha) los radios
+    // salen negativos y arc() lanza IndexSizeError, que tiraba la app entera (hallazgo 1621).
+    // Sin sitio no se dibuja; se repinta en el siguiente redimensionado.
+    if (Math.min(W, H) / 2 - 16 <= 0) return;
+
     ctx.save();
     ctx.scale(dpr, dpr);
 
@@ -173,17 +207,19 @@ export default function SimuladorCifradoCesar() {
     ctx.arc(cx, cy, radioExt, 0, Math.PI * 2);
     ctx.stroke();
 
+    // El anillo exterior lleva el alfabeto en orden y GIRA k posiciones en sentido antihorario,
+    // así que frente a la letra interior X queda la X + k. Antes, además de girar, desplazaba
+    // el índice de cada letra, y los dos desplazamientos se anulaban: en reposo la rueda
+    // enseñaba la identidad para toda k (hallazgo 1620).
     for (let i = 0; i < 26; i++) {
-      const ang = (2 * Math.PI * i) / 26 + anguloBase - Math.PI / 2;
+      const ang = (2 * Math.PI * i) / 26 - anguloBase - Math.PI / 2;
       const x = cx + radioExt * Math.cos(ang);
       const y = cy + radioExt * Math.sin(ang);
 
-      // Letra en el círculo exterior
-      const indexCifrado = (i + desplazamiento) % 26;
-      const letraCifrada = ALFABETO[indexCifrado];
+      const letraCifrada = ALFABETO[i];
 
-      // Resaltar la letra que mapea con A (posición 0)
-      const esActiva = i === 0;
+      // Resaltar la letra que queda frente a la A (posición 0, línea amarilla)
+      const esActiva = i === desplazamiento;
       ctx.font = `${esActiva ? 700 : 500} ${esActiva ? 13 : 11}px system-ui, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -336,11 +372,12 @@ export default function SimuladorCifradoCesar() {
       setAttackMsg('Necesitas al menos 20 letras para un análisis de frecuencias fiable.');
       return;
     }
+    // Se conserva el modo: en Descifrar, aplicar la clave detectada deja a la vista el texto en
+    // claro. Antes pasaba a Cifrar y volvía a cifrar el criptograma (clave total 2k, hallazgo 1622).
     const desp = detectarDesplazamiento(textoCifrado);
     setDesplazamiento(desp);
-    setModoDescifrar(false);
     setAttackMsg(
-      `Ataque completado. Letra más frecuente: "${letraMasFrecuenteCifrado}" → asumiendo E. Desplazamiento detectado: ${desp}.`
+      `Ataque completado. Comparando el histograma con la distribución del español, la clave más probable es ${desp}. Desplazamiento detectado: ${desp}.`
     );
   }
 
@@ -482,6 +519,11 @@ export default function SimuladorCifradoCesar() {
               </button>
             </div>
           </div>
+          <p className={styles.histoHint}>
+            Se cifran las 26 letras del alfabeto latino (A-Z). La Ñ y las vocales con tilde o
+            diéresis (á, é, í, ó, ú, ü) quedan fuera: pasan sin cifrar, igual que los espacios,
+            los números y los signos, y el histograma y el ataque no las cuentan.
+          </p>
         </section>
 
         {/* Panel: Histograma de frecuencias */}
@@ -507,7 +549,13 @@ export default function SimuladorCifradoCesar() {
           )}
 
           <div className={styles.histoWrap}>
-            <div className={styles.histoBars} role="img" aria-label="Histograma de frecuencias de letras en el texto cifrado">
+            <div
+              className={styles.histoBars}
+              role="img"
+              aria-label={`Histograma de frecuencias de letras en el texto cifrado: ${
+                letrasPresentes.length > 0 ? letrasPresentes.map(porcentaje).join(', ') : 'sin letras'
+              }`}
+            >
               {ALFABETO.split('').map((letra) => {
                 const pct = frecuencias[letra] ?? 0;
                 const altoPx = maxFreq > 0 ? Math.round((pct / maxFreq) * 96) : 0;
@@ -517,7 +565,7 @@ export default function SimuladorCifradoCesar() {
                     <div
                       className={`${styles.histoBarInner} ${esMayorFreq ? styles.histoBarMax : ''}`}
                       style={{ height: `${altoPx}px` }}
-                      title={`${letra}: ${pct.toFixed(1)}%`}
+                      title={`${letra}: ${formatNumber(pct, 1)} %`}
                     />
                     <span className={styles.histoBarLetter}>{letra}</span>
                   </div>
@@ -526,9 +574,16 @@ export default function SimuladorCifradoCesar() {
             </div>
           </div>
 
+          {letrasPresentes.length > 0 && (
+            <p className={styles.histoHint}>
+              Más frecuentes: {letrasPresentes.slice(0, 3).map(porcentaje).join(' · ')}
+            </p>
+          )}
+
           <p className={styles.histoHint}>
             Barra azul = letra más frecuente en el texto{modoDescifrar ? ' cifrado' : ' procesado'}.
-            En español, la E tiene ~14,7% de frecuencia.
+            En español, la E ronda el 13,7 % de las letras y la A el 12,5 % (Fletcher Pratt,{' '}
+            <em>Secret and Urgent</em>, 1939).
           </p>
         </section>
 
@@ -541,7 +596,8 @@ export default function SimuladorCifradoCesar() {
             El cifrado César, usado por Julio César para comunicaciones militares, sustituye cada
             letra por otra desplazada k posiciones en el alfabeto. Con solo 25 claves posibles es
             trivialmente rompible por fuerza bruta o análisis de frecuencias: en cualquier idioma,
-            la distribución de letras es característica (E domina en español con ~14,7%).
+            la distribución de letras es característica (en español, la E y la A suman más de
+            una de cada cuatro letras: 13,7 % y 12,5 % según Fletcher Pratt, 1939).
             Comprender el César es el primer paso hacia criptografía moderna.
           </p>
 
@@ -630,8 +686,9 @@ export default function SimuladorCifradoCesar() {
             <div className={styles.escenarioCard}>
               <h4>Análisis de frecuencias en español</h4>
               <p>
-                Con un texto largo, la letra más frecuente en el cifrado probablemente sea E
-                desplazada. El botón &quot;Ataque automático&quot; usa esta heurística.
+                Con un texto largo, el histograma del cifrado es el del español desplazado k
+                posiciones. El botón &quot;Ataque automático&quot; prueba las 26 claves y se queda
+                con la que mejor encaja con la distribución del español (prueba χ²).
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -662,17 +719,20 @@ export default function SimuladorCifradoCesar() {
             <div className={styles.faqItem}>
               <strong>¿Cómo funciona el análisis de frecuencias?</strong>
               <p>
-                La distribución de letras de un idioma es constante: en español, la E aparece
-                ~14,7% de las veces. La letra más frecuente en el texto cifrado probablemente
-                sea E desplazada, revelando k.
+                La distribución de letras de un idioma es bastante estable en textos largos: en
+                español, la E ronda el 13,7 % y la A el 12,5 % (Fletcher Pratt, 1939). Se compara
+                el histograma del cifrado con esa distribución en cada desplazamiento posible, y el
+                que mejor encaja revela k. Mirar solo la letra más frecuente falla a menudo, porque
+                en muchos textos la A supera a la E.
               </p>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Por qué el cifrado César se llama así?</strong>
               <p>
                 Suetonio describe que Julio César lo usaba desplazando 3 posiciones en latín
-                para comunicaciones militares. Es el registro histórico más antiguo de un cifrado
-                de sustitución documentado.
+                para comunicaciones militares. Es uno de los cifrados de sustitución mejor
+                documentados de la Antigüedad, aunque no el primero: el atbash hebreo, que aparece
+                en el libro de Jeremías (siglo VI a. C.), es varios siglos anterior.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -730,7 +790,7 @@ export default function SimuladorCifradoCesar() {
                 <strong>Prueba ROT-13 (k=13)</strong>
                 <p>
                   Cifra cualquier texto con k=13 y luego vuélvelo a cifrar con k=13: recuperas
-                  el original. Es una operación idempotente de orden 2.
+                  el original. Es una involución: aplicada dos veces da la identidad.
                 </p>
               </div>
             </div>
@@ -743,8 +803,8 @@ export default function SimuladorCifradoCesar() {
               <div>
                 <strong>La E domina en español</strong>
                 <p>
-                  ~14,7% de frecuencia: es la guía del análisis de frecuencias. En inglés, también
-                  es la letra más común (~12,7%).
+                  Ronda el 13,7 % de las letras (Fletcher Pratt, 1939), seguida muy de cerca por la
+                  A (12,5 %). En inglés también es la más común (~12,7 %).
                 </p>
               </div>
             </div>
@@ -773,7 +833,8 @@ export default function SimuladorCifradoCesar() {
               <div>
                 <strong>Los espacios no se cifran</strong>
                 <p>
-                  En criptografía real, el padding oculta la longitud del mensaje. Sin padding,
+                  Tampoco la Ñ ni las vocales con tilde, que no están en el alfabeto de 26. En
+                  criptografía real, el padding oculta la longitud del mensaje. Sin padding,
                   la estructura del texto da información al atacante.
                 </p>
               </div>
