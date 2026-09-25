@@ -1,12 +1,11 @@
 // AUTO-GENERADO por scripts/generate-delegum-es.mjs — NO editar a mano.
-// Apps que se autodeclaran "fiscal-España" mediante <RegionBadge es-only|es-data>.
 // Se regenera en cada build. Lo consume DescubreVertical para mostrar la banda
 // de descubrimiento de Delegum en apps ES que NO están en la curaduría de
 // Soluciones (enlace a soluciones home). Ver _private/archivo/DELEGUM-SOLUCIONES.md.
+
+/** Apps fiscal-España: <RegionBadge variant="es-only">. */
 export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'asistente-alta-autonomo',
-  'calculadora-amortizacion-inmovilizado',
-  'calculadora-iban',
   'calendario-fiscal-emprendedor',
   'checklist-cambio-regimen-autonomo',
   'checklist-preparar-verifactu',
@@ -55,29 +54,18 @@ export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'orientador-tipos-renta-irpf',
   'orientador-tramites-jubilacion',
   'planificador-ahorro-jubilacion',
-  'planificador-gastos-bebe',
   'planificador-trimestres-freelance',
   'planificador-turnos-cuidadores',
   'planificador-vacaciones-autonomo',
   'requisitos-nomada-digital',
   'residencia-vs-cuidado-en-casa',
-  'selector-alquiler-vs-compra',
-  'selector-calefaccion',
-  'selector-ejercicio',
-  'selector-formacion-postgrado',
-  'selector-mascota',
-  'selector-movilidad-urbana',
   'selector-plan-pensiones',
-  'selector-portatil',
   'selector-regimen-fiscal-autonomo',
-  'selector-seguro-coche',
   'selector-seguro-hogar',
   'selector-seguro-salud',
-  'selector-smartphone',
   'simulador-bono-joven-alquiler',
   'simulador-colchon-emergencia-freelance',
   'simulador-desglose-nomina',
-  'simulador-financiacion-empresarial',
   'simulador-gastos-compraventa-garaje',
   'simulador-gastos-compraventa-local-comercial',
   'simulador-gastos-compraventa-nave-industrial',
@@ -91,19 +79,32 @@ export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'simulador-modulos-vs-directa',
   'simulador-renta-plan-pensiones',
   'simulador-subvenciones-rehabilitacion',
-  'test-estilo-parental',
   'test-obligado-declarar-renta',
-  'test-perfil-inversor',
-  'test-zarit-cuidador',
   'validador-dni-nif-cif',
   'verificador-complemento-brecha-genero',
   'visualizador-anatomia-nomina',
-  'visualizador-ciclo-vida-freelance',
   'visualizador-coste-sanidad',
   'visualizador-estructura-costes-autonomo',
   'visualizador-jubilacion-perspectiva',
-  'visualizador-peso-numeros',
   'visualizador-sueldo-neto',
-  'visualizador-tipos-cliente-freelance',
   'visualizador-viaje-impuestos',
+]);
+
+/**
+ * Apps con datos de referencia de España (<RegionBadge variant="es-data">) en
+ * una suite de Delegum (finanzas, freelance, legal-fiscal). Su metodología es
+ * universal: la banda no declara ámbito.
+ */
+export const APPS_REGION_ES_DATOS: ReadonlySet<string> = new Set([
+  'calculadora-amortizacion-inmovilizado',
+  'calculadora-iban',
+  'planificador-gastos-bebe',
+  'selector-alquiler-vs-compra',
+  'selector-calefaccion',
+  'selector-seguro-coche',
+  'simulador-financiacion-empresarial',
+  'test-perfil-inversor',
+  'visualizador-ciclo-vida-freelance',
+  'visualizador-peso-numeros',
+  'visualizador-tipos-cliente-freelance',
 ]);

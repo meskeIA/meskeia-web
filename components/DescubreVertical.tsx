@@ -54,7 +54,7 @@ import {
 import { COQUINUM_ADYACENTES } from '@/data/coquinum-adyacentes';
 import { getPuertaDeCronologia } from '@/data/cronicum/puertas';
 import { getPuertaDeApp } from '@/data/delegum/soluciones';
-import { APPS_REGION_ES } from '@/data/delegum/apps-region-es';
+import { APPS_REGION_ES, APPS_REGION_ES_DATOS } from '@/data/delegum/apps-region-es';
 import { STEMUM_ADYACENTES } from '@/data/stemum-adyacentes';
 import styles from './DescubreVertical.module.css';
 
@@ -224,6 +224,21 @@ function resolverBanda(pathname: string, isStemum: boolean, isCoquinum: boolean)
       intro: 'Esta herramienta aplica a España.',
       marca: 'Delegum',
       descripcion: ' reúne más herramientas de fiscalidad, derecho laboral y finanzas.',
+      href: 'https://delegum.com/soluciones/?from=meskeia',
+      cta: 'Descubre el catálogo →',
+    };
+  }
+
+  // Apps con datos de referencia de España en una suite de Delegum. Su badge ya
+  // dice «La metodología es universal», así que la banda invita sin declarar
+  // ámbito (hallazgo 1685: decir aquí «aplica a España» contradecía al badge).
+  if (APPS_REGION_ES_DATOS.has(segs[0] ?? '')) {
+    return {
+      vertical: 'delegum',
+      icono: '⚖️',
+      intro: 'Más herramientas de fiscalidad, derecho laboral y finanzas para España en',
+      marca: 'Delegum',
+      descripcion: '.',
       href: 'https://delegum.com/soluciones/?from=meskeia',
       cta: 'Descubre el catálogo →',
     };
