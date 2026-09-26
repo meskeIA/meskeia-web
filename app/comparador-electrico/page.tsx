@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import styles from './ComparadorElectrico.module.css';
 import {
@@ -10,127 +10,266 @@ import {
   RelatedApps,
   ShareCard,
   DisclaimerCard,
+  DataReference,
+  RegionBadge,
   EducationalSection,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatCurrency, formatNumber } from '@/lib';
+import {
+  AYUDA_AUTO_PLUS_2026,
+  FISCAL_AYUDAS_VEHICULO_META,
+  MOVES_III_HISTORICO,
+} from '@/data/fiscal';
+import {
+  formatCurrency,
+  formatDate,
+  formatNumber,
+  formatPercentage,
+  parseISODateLocal,
+  parseSpanishNumber,
+} from '@/lib';
+import {
+  calcularComparador,
+  type DatosComparador,
+  type ResultadoComparador,
+} from './motor';
 
 // ─────────────────────────────────────────────
-// Tipos
+// Formulario: lo tecleado se guarda como TEXTO y se lee con parseSpanishNumber
 // ─────────────────────────────────────────────
+//
+// Hallazgo 2000 (26/09/2026): con inputs type="number", un parseo casero (cambiar la coma por
+// punto y pasar a parseFloat) y NaN → 0, en es-ES el punto de millar dejaba el valor vacío, la app escribía «0» y lo que
+// se seguía tecleando iba detrás: «1.500» acababa en 500. Ahora el campo guarda lo que el
+// usuario escribe y la cifra se lee con el parser canónico, que entiende «1.500» y «0,18».
 
-interface FormData {
-  precioElectrico: number;      // Precio del EV (€)
-  precioGasolina: number;       // Precio del gasolina equivalente (€)
-  moves: number;                // Subsidio MOVES III: 0 / 4500 / 7000
-  kmAnuales: number;            // Km anuales
-  consumoElectrico: number;     // kWh/100km
-  consumoGasolina: number;      // L/100km
-  precioLuz: number;            // €/kWh
-  precioGasolinaLitro: number;  // €/L
-  cargador: number;             // Coste cargador doméstico
-  anios: number;                // Horizonte temporal
-}
+type CampoNumerico = Exclude<keyof DatosComparador, 'anios'>;
 
-interface FilaAnual {
-  anio: number;
-  costeAcumEV: number;
-  costeAcumGas: number;
-  diferenciaAcum: number;  // positivo = EV ha ahorrado X€
-}
+type Formulario = Record<CampoNumerico, string> & { anios: number };
 
-interface Resultado {
-  costePorKmEV: number;
-  costePorKmGas: number;
-  ahorroAnual: number;
-  breakEvenAnio: number | null;  // null si no hay break-even en el horizonte
-  tabla: FilaAnual[];
-  inversionNetaEV: number;       // precioElectrico - precioGasolina - moves
-}
-
-// ─────────────────────────────────────────────
-// Valores por defecto
-// ─────────────────────────────────────────────
-
-const FORM_INICIAL: FormData = {
-  precioElectrico: 35000,
-  precioGasolina: 25000,
-  moves: 4500,
-  kmAnuales: 15000,
-  consumoElectrico: 16,
-  consumoGasolina: 7,
-  precioLuz: 0.18,
-  precioGasolinaLitro: 1.65,
-  cargador: 800,
+const FORM_INICIAL: Formulario = {
+  precioElectrico: '35.000',
+  precioGasolina: '25.000',
+  ayuda: '0',
+  kmAnuales: '15.000',
+  consumoElectrico: '16',
+  consumoGasolina: '7',
+  precioLuz: '0,18',
+  precioGasolinaLitro: '1,65',
+  cargador: '800',
+  mantElectrico: '800',
+  mantGasolina: '1.000',
   anios: 10,
 };
 
-// ─────────────────────────────────────────────
-// Lógica de cálculo
-// ─────────────────────────────────────────────
+const HORIZONTES = [5, 8, 10, 15] as const;
 
-function calcular(form: FormData): Resultado {
-  const {
-    precioElectrico,
-    precioGasolina,
-    moves,
-    kmAnuales,
-    consumoElectrico,
-    consumoGasolina,
-    precioLuz,
-    precioGasolinaLitro,
-    cargador,
-    anios,
-  } = form;
+interface Lectura {
+  datos: DatosComparador;
+  errores: Partial<Record<CampoNumerico, string>>;
+}
 
-  // Costes anuales de energía
-  const costeEnergiaEV = (kmAnuales / 100) * consumoElectrico * precioLuz;
-  const costeEnergiaGas = (kmAnuales / 100) * consumoGasolina * precioGasolinaLitro;
+const NOMBRE_CAMPO: Record<CampoNumerico, string> = {
+  precioElectrico: 'Precio del eléctrico',
+  precioGasolina: 'Precio del gasolina equivalente',
+  ayuda: 'Ayuda pública a la compra',
+  kmAnuales: 'Kilómetros anuales',
+  consumoElectrico: 'Consumo eléctrico',
+  consumoGasolina: 'Consumo gasolina',
+  precioLuz: 'Precio de la electricidad',
+  precioGasolinaLitro: 'Precio gasolina',
+  cargador: 'Cargador doméstico',
+  mantElectrico: 'Mantenimiento del eléctrico',
+  mantGasolina: 'Mantenimiento del gasolina',
+};
 
-  // Ahorro de mantenimiento EV vs gasolina (~200€/año)
-  const ahorroMantEV = 200;
+/** Campos que deben ser mayores que 0; el resto admite 0 pero no negativos. */
+const POSITIVOS: readonly CampoNumerico[] = [
+  'precioElectrico',
+  'precioGasolina',
+  'kmAnuales',
+  'consumoElectrico',
+  'consumoGasolina',
+  'precioLuz',
+  'precioGasolinaLitro',
+];
 
-  // Ahorro anual total
-  const ahorroAnual = (costeEnergiaGas - costeEnergiaEV) + ahorroMantEV;
+function leerFormulario(form: Formulario): Lectura {
+  const errores: Partial<Record<CampoNumerico, string>> = {};
+  const valores = {} as Record<CampoNumerico, number>;
 
-  // Inversión neta extra del EV (lo que cuesta más el EV tras subsidio)
-  const inversionNetaEV = (precioElectrico - moves) - precioGasolina;
-
-  // Coste cargador anualizado (amortizado en 10 años)
-  const cargadorAnual = cargador / 10;
-
-  // Mantenimiento anual estimado por tipo
-  const mantEV = 800;         // €/año mantenimiento EV
-  const mantGasolina = 1000;  // €/año mantenimiento gasolina
-
-  // Tabla año a año
-  const tabla: FilaAnual[] = [];
-  let breakEvenAnio: number | null = null;
-
-  for (let anio = 1; anio <= anios; anio++) {
-    const costeAcumEV = inversionNetaEV + (costeEnergiaEV + cargadorAnual + mantEV) * anio;
-    const costeAcumGas = (costeEnergiaGas + mantGasolina) * anio;
-    const diferenciaAcum = costeAcumGas - costeAcumEV;
-
-    tabla.push({ anio, costeAcumEV, costeAcumGas, diferenciaAcum });
-
-    if (breakEvenAnio === null && diferenciaAcum >= 0) {
-      breakEvenAnio = anio;
+  (Object.keys(NOMBRE_CAMPO) as CampoNumerico[]).forEach((campo) => {
+    const n = parseSpanishNumber(form[campo]);
+    valores[campo] = n;
+    if (Number.isNaN(n)) {
+      errores[campo] = 'Escribe un número (por ejemplo, 1.500 o 0,18).';
+    } else if (POSITIVOS.includes(campo) && n <= 0) {
+      errores[campo] =
+        campo === 'kmAnuales'
+          ? 'Sin kilómetros no hay ahorro de uso que recupere la diferencia de precio: pon los que recorres al año.'
+          : 'Tiene que ser mayor que 0.';
+    } else if (n < 0) {
+      errores[campo] = 'No puede ser negativo.';
     }
+  });
+
+  if (!errores.ayuda && !errores.precioElectrico && valores.ayuda > valores.precioElectrico) {
+    errores.ayuda = 'La ayuda no puede ser mayor que el precio del eléctrico.';
   }
 
-  // Coste por km
-  const costePorKmEV = (costeEnergiaEV + cargadorAnual + mantEV) / kmAnuales;
-  const costePorKmGas = (costeEnergiaGas + mantGasolina) / kmAnuales;
+  return { datos: { ...valores, anios: form.anios }, errores };
+}
 
-  return {
-    costePorKmEV,
-    costePorKmGas,
-    ahorroAnual,
-    breakEvenAnio,
-    tabla,
-    inversionNetaEV,
-  };
+// ─────────────────────────────────────────────
+// Ejemplos que se citan en el texto: salen del propio motor, no se escriben a mano
+// ─────────────────────────────────────────────
+
+const DATOS_EJEMPLO = leerFormulario(FORM_INICIAL).datos;
+const EJEMPLO_KM = [8000, 15000, 25000].map((km) => ({
+  km,
+  resultado: calcularComparador({ ...DATOS_EJEMPLO, kmAnuales: km, anios: 50 }),
+}));
+
+const AUTO_PLUS = AYUDA_AUTO_PLUS_2026;
+const pct = (x: number): string => formatPercentage(x, 0);
+/** Importe entero en euros («4500 €», «35.000 €»): la ayuda y los topes no llevan céntimos. */
+const euros = (x: number): string => `${formatNumber(x, 0)} €`;
+const fechaISO = (iso: string): string => formatDate(parseISODateLocal(iso));
+
+// ─────────────────────────────────────────────
+// Campo numérico con su etiqueta visible como nombre accesible (WCAG 2.5.3)
+// ─────────────────────────────────────────────
+
+interface CampoProps {
+  campo: CampoNumerico;
+  etiqueta: string;
+  pista: React.ReactNode;
+  valor: string;
+  error?: string;
+  onChange: (campo: CampoNumerico, valor: string) => void;
+  completo?: boolean;
+}
+
+function Campo({ campo, etiqueta, pista, valor, error, onChange, completo = false }: CampoProps) {
+  const idPista = `${campo}-pista`;
+  const idError = `${campo}-error`;
+  return (
+    <div className={completo ? styles.formGroupFull : styles.formGroup}>
+      <label htmlFor={campo} className={styles.label}>
+        {etiqueta}
+      </label>
+      <input
+        id={campo}
+        type="text"
+        inputMode="decimal"
+        autoComplete="off"
+        className={`${styles.input} ${error ? styles.inputError : ''}`}
+        value={valor}
+        onChange={(e) => onChange(campo, e.target.value)}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${idError} ${idPista}` : idPista}
+      />
+      {error && (
+        <span id={idError} className={styles.inputErrorText}>
+          {error}
+        </span>
+      )}
+      <span id={idPista} className={styles.inputHint}>
+        {pista}
+      </span>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Veredicto
+// ─────────────────────────────────────────────
+
+function Veredicto({ r }: { r: ResultadoComparador }) {
+  const ahorro = formatCurrency(Math.abs(r.ahorroAnual));
+
+  if (r.tipo === 'equilibrio' && r.anioEquilibrio !== null) {
+    return (
+      <>
+        <div className={styles.breakEvenAnio}>Año {r.anioEquilibrio}</div>
+        <p className={styles.breakEvenLabel}>
+          El eléctrico empieza a ser más barato en el año {r.anioEquilibrio}
+        </p>
+        <p className={styles.breakEvenSubLabel}>
+          Desde ahí la ventaja crece cada año, porque su uso cuesta {ahorro} menos al año.
+        </p>
+      </>
+    );
+  }
+
+  if (r.tipo === 'fuera-horizonte' && r.anioEquilibrio !== null) {
+    return (
+      <>
+        <div className={styles.breakEvenNunca}>
+          No se alcanza el punto de equilibrio en {r.anios} años
+        </div>
+        <p className={styles.breakEvenLabel}>
+          Con estos datos, el eléctrico recuperaría la diferencia en el año {r.anioEquilibrio}
+        </p>
+        <p className={styles.breakEvenSubLabel}>
+          {r.energiaMasBarataEV
+            ? 'Cuantos más kilómetros recorras al año, antes llega; también lo adelantan una ayuda o un precio de compra más bajos.'
+            : 'Su energía por kilómetro no es más barata que la gasolina: recorrer más kilómetros no adelanta el equilibrio. Revisa los precios de compra y de la energía.'}
+        </p>
+      </>
+    );
+  }
+
+  if (r.tipo === 'desde-compra') {
+    return (
+      <>
+        <div className={styles.breakEvenAnio}>Desde la compra</div>
+        <p className={styles.breakEvenLabel}>
+          {r.inversionInicialExtra < 0
+            ? `El eléctrico cuesta ${formatCurrency(-r.inversionInicialExtra)} menos al comprarlo`
+            : 'Los dos cuestan lo mismo al comprarlos'}
+        </p>
+        <p className={styles.breakEvenSubLabel}>
+          {r.ahorroAnual > 0
+            ? `Y su uso es ${ahorro} más barato al año: la ventaja crece cada año.`
+            : 'Y su uso cuesta lo mismo: la ventaja se mantiene.'}
+        </p>
+      </>
+    );
+  }
+
+  if (r.tipo === 'ventaja-se-agota' && r.anioCruce !== null) {
+    const dentro = r.anioCruce <= r.anios;
+    return (
+      <>
+        <div className={styles.breakEvenNunca}>
+          {dentro ? `Más caro desde el año ${r.anioCruce}` : `Por delante a los ${r.anios} años`}
+        </div>
+        <p className={styles.breakEvenLabel}>
+          El eléctrico es más barato de comprar, pero su uso cuesta {ahorro} más al año: su
+          ventaja se reduce cada año
+          {dentro
+            ? ` y desde el año ${r.anioCruce} sale más caro que la gasolina.`
+            : ` y se agotaría en el año ${r.anioCruce}.`}
+        </p>
+        <p className={styles.breakEvenSubLabel}>
+          Cuantos más kilómetros recorras, antes se agota. Si cargas fuera de casa, el precio del
+          kWh es lo que más pesa.
+        </p>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className={styles.breakEvenNunca}>El eléctrico no compensa con estos datos</div>
+      <p className={styles.breakEvenLabel}>
+        Cuesta más de comprar y su uso no es más barato que el de la gasolina: la diferencia no se
+        recupera con ningún kilometraje.
+      </p>
+      <p className={styles.breakEvenSubLabel}>Revisa los precios de compra y de la energía.</p>
+    </>
+  );
 }
 
 // ─────────────────────────────────────────────
@@ -138,32 +277,36 @@ function calcular(form: FormData): Resultado {
 // ─────────────────────────────────────────────
 
 export default function ComparadorElectrico() {
-  const [form, setForm] = useState<FormData>(FORM_INICIAL);
-  const [resultado, setResultado] = useState<Resultado | null>(null);
+  const [form, setForm] = useState<Formulario>(FORM_INICIAL);
+  // Tras el primer «Calcular», el resultado sigue al formulario: se recalcula con cada cambio
+  // y desaparece si un dato deja de ser válido (hallazgos 1999 y 2002: antes quedaba en
+  // pantalla un veredicto que ya no correspondía a lo escrito).
+  const [calculado, setCalculado] = useState(false);
 
-  // ── Actualizar campos del formulario
-  function actualizarCampo(campo: keyof FormData, valor: string) {
-    const num = parseFloat(valor.replace(',', '.'));
-    setForm((prev) => ({
-      ...prev,
-      [campo]: isNaN(num) ? 0 : num,
-    }));
+  const lectura = useMemo<Lectura>(() => leerFormulario(form), [form]);
+  const listaErrores = (Object.keys(lectura.errores) as CampoNumerico[]).map((campo) => ({
+    campo,
+    texto: lectura.errores[campo] ?? '',
+  }));
+  const formularioValido = listaErrores.length === 0;
+
+  const resultado = useMemo<ResultadoComparador | null>(
+    () => (formularioValido ? calcularComparador(lectura.datos) : null),
+    [formularioValido, lectura],
+  );
+
+  function actualizarCampo(campo: CampoNumerico, valor: string) {
+    setForm((prev) => ({ ...prev, [campo]: valor }));
   }
 
-  // ── Calcular
-  function handleCalcular() {
-    setResultado(calcular(form));
-  }
+  const campo = (c: CampoNumerico) => ({
+    campo: c,
+    valor: form[c],
+    error: lectura.errores[c],
+    onChange: actualizarCampo,
+  });
 
-  // ── Verificar si el formulario tiene datos mínimos válidos
-  const formularioValido =
-    form.precioElectrico > 0 &&
-    form.precioGasolina > 0 &&
-    form.kmAnuales > 0 &&
-    form.consumoElectrico > 0 &&
-    form.consumoGasolina > 0 &&
-    form.precioLuz > 0 &&
-    form.precioGasolinaLitro > 0;
+  const ejemploMedio = EJEMPLO_KM[1].resultado;
 
   return (
     <div className={styles.container}>
@@ -175,14 +318,23 @@ export default function ComparadorElectrico() {
         </h1>
         <p className={styles.heroSubtitle}>
           Calcula el punto de equilibrio entre un coche (carro o auto) eléctrico y su equivalente
-          de gasolina, incluyendo el subsidio MOVES III y el cargador doméstico.
+          de gasolina, con la ayuda pública a la compra que te corresponda y el cargador doméstico.
         </p>
       </header>
 
       <main className={styles.main}>
+        <RegionBadge variant="es-data" />
+
         <LegalNotice />
 
         <DisclaimerCard variant="financial" severity="critical" />
+        <DataReference
+          normativa="Programa Auto+ (ayuda a la compra en España)"
+          fuente={FISCAL_AYUDAS_VEHICULO_META.fuente}
+          verificado={FISCAL_AYUDAS_VEHICULO_META.verificado}
+          urlOficial={FISCAL_AYUDAS_VEHICULO_META.urlOficial}
+          nota="La app no calcula la ayuda: la escribes tú."
+        />
 
         {/* ── Formulario ── */}
         <section className={styles.formSection} aria-label="Datos del comparador">
@@ -190,172 +342,86 @@ export default function ComparadorElectrico() {
           {/* Grupo 1: Precios de compra */}
           <h2 className={styles.sectionDivider}>Precios de compra</h2>
           <div className={styles.formGrid}>
-            <div className={styles.formGroup}>
-              <label htmlFor="precioElectrico" className={styles.label}>
-                Precio del eléctrico (€)
-              </label>
-              <input
-                id="precioElectrico"
-                type="number"
-                className={styles.input}
-                value={form.precioElectrico}
-                min={0}
-                step={500}
-                onChange={(e) => actualizarCampo('precioElectrico', e.target.value)}
-                aria-label="Precio de compra del vehículo eléctrico en euros"
-              />
-              <span className={styles.inputHint}>Precio de venta al público (PVP)</span>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="precioGasolina" className={styles.label}>
-                Precio del gasolina equivalente (€)
-              </label>
-              <input
-                id="precioGasolina"
-                type="number"
-                className={styles.input}
-                value={form.precioGasolina}
-                min={0}
-                step={500}
-                onChange={(e) => actualizarCampo('precioGasolina', e.target.value)}
-                aria-label="Precio de compra del vehículo de gasolina equivalente en euros"
-              />
-              <span className={styles.inputHint}>Modelo comparable de gasolina</span>
-            </div>
-
-            <div className={styles.formGroupFull}>
-              <label htmlFor="moves" className={styles.label}>
-                Subsidio MOVES III
-              </label>
-              <select
-                id="moves"
-                className={styles.select}
-                value={form.moves}
-                onChange={(e) => actualizarCampo('moves', e.target.value)}
-                aria-label="Selecciona el nivel de subsidio MOVES III"
-              >
-                <option value={0}>Sin subsidio (0 €)</option>
-                <option value={4500}>Con MOVES III sin achatarramiento (4.500 €)</option>
-                <option value={7000}>Con MOVES III + achatarramiento (7.000 €)</option>
-              </select>
-              <span className={styles.inputHint}>
-                MOVES III: 4.500 € sin achatarramiento, 7.000 € con achatarramiento de vehículo antiguo
-              </span>
+            <Campo
+              {...campo('precioElectrico')}
+              etiqueta="Precio del eléctrico (€)"
+              pista="Precio final que pagarías, antes de restar ninguna ayuda"
+            />
+            <Campo
+              {...campo('precioGasolina')}
+              etiqueta="Precio del gasolina equivalente (€)"
+              pista="Modelo comparable de gasolina"
+            />
+            <Campo
+              {...campo('ayuda')}
+              completo
+              etiqueta="Ayuda pública a la compra que te corresponda (€)"
+              pista="La app no la calcula: escribe la que te hayan concedido o te correspondería. Pon 0 si no hay."
+            />
+            <div className={styles.notaAyuda}>
+              <p>
+                <strong>En España</strong>, el {AUTO_PLUS.nombre} (RD 609/2026) da a un turismo como
+                máximo <strong>{euros(AUTO_PLUS.maximo.turismo)}</strong>. No es una cantidad
+                fija: se suman criterios. Ser eléctrico puro aporta el{' '}
+                {pct(AUTO_PLUS.criterioElectrico.puro)} del máximo (híbrido enchufable o de
+                autonomía extendida, el {pct(AUTO_PLUS.criterioElectrico.electrificado)}); un
+                precio sin impuestos de hasta{' '}
+                {euros(AUTO_PLUS.criterioEconomicoTurismo[0].precioMaxSinImpuestos)}, el{' '}
+                {pct(AUTO_PLUS.criterioEconomicoTurismo[0].porcentaje)}, o de hasta{' '}
+                {euros(AUTO_PLUS.criterioEconomicoTurismo[1].precioMaxSinImpuestos)}, el{' '}
+                {pct(AUTO_PLUS.criterioEconomicoTurismo[1].porcentaje)} (por encima, no hay ayuda);
+                y la fabricación europea, el {pct(AUTO_PLUS.criterioEuropeo.montajeUE)} por montaje
+                en la UE y un {pct(AUTO_PLUS.criterioEuropeo.adicionalPuroBateriaUE)} más para
+                eléctricos puros que cumplan otras condiciones, como la batería europea. No hay
+                tramo por achatarramiento.
+              </p>
+              <p>
+                Cubre vehículos matriculados desde el {fechaISO(AUTO_PLUS.matriculadosDesde)} y se
+                solicita cada año hasta el {AUTO_PLUS.solicitudAnualHasta}. El{' '}
+                {MOVES_III_HISTORICO.nombre} terminó el {fechaISO(MOVES_III_HISTORICO.finalizado)}.
+                En otros países hay otras ayudas: consulta las del tuyo.
+              </p>
             </div>
           </div>
 
           {/* Grupo 2: Consumos y energía */}
           <h2 className={styles.sectionDivider}>Consumos y energía</h2>
           <div className={styles.formGrid}>
-            <div className={styles.formGroup}>
-              <label htmlFor="kmAnuales" className={styles.label}>
-                Kilómetros anuales
-              </label>
-              <input
-                id="kmAnuales"
-                type="number"
-                className={styles.input}
-                value={form.kmAnuales}
-                min={1000}
-                step={1000}
-                onChange={(e) => actualizarCampo('kmAnuales', e.target.value)}
-                aria-label="Kilómetros que recorres al año"
-              />
-              <span className={styles.inputHint}>Media española: ~12.000 km/año</span>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="consumoElectrico" className={styles.label}>
-                Consumo eléctrico (kWh/100km)
-              </label>
-              <input
-                id="consumoElectrico"
-                type="number"
-                className={styles.input}
-                value={form.consumoElectrico}
-                min={5}
-                step={0.5}
-                onChange={(e) => actualizarCampo('consumoElectrico', e.target.value)}
-                aria-label="Consumo del vehículo eléctrico en kWh por cada 100 kilómetros"
-              />
-              <span className={styles.inputHint}>Consumo real (no WLTP). Típico: 14-20 kWh/100km</span>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="consumoGasolina" className={styles.label}>
-                Consumo gasolina (L/100km)
-              </label>
-              <input
-                id="consumoGasolina"
-                type="number"
-                className={styles.input}
-                value={form.consumoGasolina}
-                min={3}
-                step={0.5}
-                onChange={(e) => actualizarCampo('consumoGasolina', e.target.value)}
-                aria-label="Consumo del vehículo de gasolina en litros por cada 100 kilómetros"
-              />
-              <span className={styles.inputHint}>Consumo real en ciudad+carretera</span>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="precioLuz" className={styles.label}>
-                Precio electricidad doméstica (€/kWh)
-              </label>
-              <input
-                id="precioLuz"
-                type="number"
-                className={styles.input}
-                value={form.precioLuz}
-                min={0.05}
-                step={0.01}
-                onChange={(e) => actualizarCampo('precioLuz', e.target.value)}
-                aria-label="Precio del kilovatio-hora de electricidad en tu tarifa doméstica"
-              />
-              <span className={styles.inputHint}>Solo si cargas en casa. Tarifa media: ~0.18 €/kWh</span>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="precioGasolinaLitro" className={styles.label}>
-                Precio gasolina (€/L)
-              </label>
-              <input
-                id="precioGasolinaLitro"
-                type="number"
-                className={styles.input}
-                value={form.precioGasolinaLitro}
-                min={0.5}
-                step={0.05}
-                onChange={(e) => actualizarCampo('precioGasolinaLitro', e.target.value)}
-                aria-label="Precio del litro de gasolina"
-              />
-              <span className={styles.inputHint}>Precio medio de gasolina 95 en España</span>
-            </div>
+            <Campo
+              {...campo('kmAnuales')}
+              etiqueta="Kilómetros anuales"
+              pista="Mira el cuentakilómetros o compara dos revisiones"
+            />
+            <Campo
+              {...campo('consumoElectrico')}
+              etiqueta="Consumo eléctrico (kWh/100 km)"
+              pista="Consumo real, no el homologado WLTP"
+            />
+            <Campo
+              {...campo('consumoGasolina')}
+              etiqueta="Consumo gasolina (l/100 km)"
+              pista="Consumo real en ciudad y carretera"
+            />
+            <Campo
+              {...campo('precioLuz')}
+              etiqueta="Precio de la electricidad (€/kWh)"
+              pista="Mira tu factura, con impuestos. Si cargas también fuera de casa, pon la media de lo que pagas"
+            />
+            <Campo
+              {...campo('precioGasolinaLitro')}
+              etiqueta="Precio gasolina (€/l)"
+              pista="Lo que pagas por litro en tu gasolinera habitual"
+            />
           </div>
 
           {/* Grupo 3: Otros costes */}
           <h2 className={styles.sectionDivider}>Otros costes</h2>
           <div className={styles.formGrid}>
-            <div className={styles.formGroup}>
-              <label htmlFor="cargador" className={styles.label}>
-                Cargador doméstico (€)
-              </label>
-              <input
-                id="cargador"
-                type="number"
-                className={styles.input}
-                value={form.cargador}
-                min={0}
-                step={100}
-                onChange={(e) => actualizarCampo('cargador', e.target.value)}
-                aria-label="Coste de instalación del cargador doméstico en euros"
-              />
-              <span className={styles.inputHint}>
-                Instalación de wallbox en garaje. Rango habitual: 600-1.200 €. Pon 0 si no lo instalas.
-              </span>
-            </div>
-
+            <Campo
+              {...campo('cargador')}
+              etiqueta="Cargador doméstico (€)"
+              pista="Se paga al comprar: pide presupuesto de instalación. Pon 0 si no lo instalas."
+            />
             <div className={styles.formGroup}>
               <label htmlFor="anios" className={styles.label}>
                 Horizonte de análisis
@@ -364,77 +430,84 @@ export default function ComparadorElectrico() {
                 id="anios"
                 className={styles.select}
                 value={form.anios}
-                onChange={(e) => actualizarCampo('anios', e.target.value)}
-                aria-label="Número de años para el análisis comparativo"
+                onChange={(e) => setForm((prev) => ({ ...prev, anios: Number(e.target.value) }))}
+                aria-describedby="anios-pista"
               >
-                <option value={5}>5 años</option>
-                <option value={8}>8 años</option>
-                <option value={10}>10 años</option>
-                <option value={15}>15 años</option>
+                {HORIZONTES.map((h) => (
+                  <option key={h} value={h}>
+                    {h} años
+                  </option>
+                ))}
               </select>
-              <span className={styles.inputHint}>Cuántos años planeas quedarte el coche</span>
+              <span id="anios-pista" className={styles.inputHint}>
+                Cuántos años planeas quedarte el coche
+              </span>
             </div>
+            <Campo
+              {...campo('mantElectrico')}
+              etiqueta="Mantenimiento del eléctrico (€/año)"
+              pista="Revisiones, neumáticos, frenos… Estimación tuya: ajústala con tus presupuestos de taller"
+            />
+            <Campo
+              {...campo('mantGasolina')}
+              etiqueta="Mantenimiento del gasolina (€/año)"
+              pista="Suma además aceite, filtros y embrague. También es una estimación tuya"
+            />
           </div>
 
           <button
             type="button"
             className={styles.btnCalcular}
-            onClick={handleCalcular}
+            onClick={() => setCalculado(true)}
             disabled={!formularioValido}
-            aria-label="Calcular el punto de equilibrio entre el vehículo eléctrico y el de gasolina"
+            aria-describedby={formularioValido ? undefined : 'aviso-formulario'}
           >
             Calcular punto de equilibrio
           </button>
+          <div id="aviso-formulario" className={styles.avisoFormulario} role="status">
+            {!formularioValido && (
+              <>
+                <p>Para calcular, corrige estos datos:</p>
+                <ul>
+                  {listaErrores.map((e) => (
+                    <li key={e.campo}>
+                      <strong>{NOMBRE_CAMPO[e.campo]}</strong>: {e.texto}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
         </section>
 
         {/* ── Resultados ── */}
-        {resultado !== null && (
+        {calculado && resultado !== null && (
           <section className={styles.resultadosSection} aria-label="Resultados del comparador">
 
-            {/* Tarjeta principal: break-even */}
+            {/* Tarjeta principal: punto de equilibrio */}
             <div className={styles.breakEvenCard} role="status" aria-live="polite">
-              {resultado.breakEvenAnio !== null ? (
-                <>
-                  <div className={styles.breakEvenAnio} aria-label={`El eléctrico compensa en el año ${resultado.breakEvenAnio}`}>
-                    Año {resultado.breakEvenAnio}
-                  </div>
-                  <p className={styles.breakEvenLabel}>
-                    El eléctrico empieza a ser más barato en el año {resultado.breakEvenAnio}
-                  </p>
-                  <p className={styles.breakEvenSubLabel}>
-                    A partir de ese punto, cada año adicional supone un ahorro neto acumulado mayor
-                  </p>
-                </>
-              ) : (
-                <>
-                  <div className={styles.breakEvenNunca}>
-                    No se alcanza el break-even en {form.anios} años
-                  </div>
-                  <p className={styles.breakEvenLabel}>
-                    Con estos datos, el eléctrico no compensa en el horizonte analizado
-                  </p>
-                  <p className={styles.breakEvenSubLabel}>
-                    Prueba a aumentar los km anuales o ajustar los precios de compra
-                  </p>
-                </>
-              )}
+              <Veredicto r={resultado} />
             </div>
 
             {/* Métricas secundarias */}
-            <div className={styles.statsGrid} aria-label="Resumen de métricas clave">
+            <div className={styles.statsGrid} role="group" aria-label="Resumen de métricas clave">
               <div className={styles.statCard}>
                 <span className={styles.statValor}>
-                  {formatCurrency(resultado.ahorroAnual)}
+                  {formatCurrency(Math.abs(resultado.ahorroAnual))}
                 </span>
-                <span className={styles.statLabel}>Ahorro anual estimado*</span>
+                <span className={styles.statLabel}>
+                  {resultado.ahorroAnual >= 0
+                    ? 'Ahorro de uso al año con el eléctrico (energía y mantenimiento)'
+                    : 'Sobrecoste de uso al año del eléctrico (energía y mantenimiento)'}
+                </span>
               </div>
               <div className={styles.statCard}>
                 <span className={styles.statValor}>
-                  {formatCurrency(resultado.inversionNetaEV)}
+                  {formatCurrency(resultado.inversionInicialExtra)}
                 </span>
                 <span className={styles.statLabel}>
-                  Inversión neta extra del EV
-                  {resultado.inversionNetaEV <= 0 ? ' (ya es más barato)' : ''}
+                  Diferencia al comprar: eléctrico con cargador y tras la ayuda, menos gasolina
+                  {resultado.inversionInicialExtra <= 0 ? ' (el eléctrico ya es más barato)' : ''}
                 </span>
               </div>
               <div className={styles.statCard}>
@@ -442,22 +515,26 @@ export default function ComparadorElectrico() {
                   {formatNumber(resultado.costePorKmEV * 100, 1)} ct/km
                 </span>
                 <span className={styles.statLabel}>
-                  Coste por km: EV vs {formatNumber(resultado.costePorKmGas * 100, 1)} ct/km gasolina
+                  Coste de uso por km del eléctrico, frente a{' '}
+                  {formatNumber(resultado.costePorKmGas * 100, 1)} ct/km del gasolina
                 </span>
               </div>
             </div>
 
             {/* Tabla año a año */}
             <div className={styles.tablaSection}>
-              <h3 className={styles.tablaTitle}>Evolución del coste acumulado año a año</h3>
+              <h3 className={styles.tablaTitle}>Coste total acumulado año a año</h3>
               <div className={styles.tablaResponsive}>
-                <table className={styles.tabla} aria-label="Tabla comparativa de costes acumulados por año">
+                <table className={styles.tabla}>
+                  <caption className={styles.srOnly}>
+                    Coste total acumulado de cada coche (compra más uso) y ventaja del eléctrico, por año
+                  </caption>
                   <thead>
                     <tr>
                       <th scope="col">Año</th>
-                      <th scope="col">Coste acum. EV</th>
-                      <th scope="col">Coste acum. Gasolina</th>
-                      <th scope="col">Diferencia</th>
+                      <th scope="col">Coste total eléctrico</th>
+                      <th scope="col">Coste total gasolina</th>
+                      <th scope="col">Ventaja del eléctrico</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -465,26 +542,17 @@ export default function ComparadorElectrico() {
                       <tr
                         key={fila.anio}
                         className={
-                          fila.anio === resultado.breakEvenAnio
+                          resultado.tipo === 'equilibrio' && fila.anio === resultado.anioEquilibrio
                             ? styles.filaBreakEven
                             : styles.tablaFila
                         }
                       >
                         <td>{fila.anio}</td>
-                        <td className={styles.celCosteEV}>
-                          {formatCurrency(fila.costeAcumEV)}
-                        </td>
-                        <td>{formatCurrency(fila.costeAcumGas)}</td>
-                        <td
-                          className={fila.diferenciaAcum >= 0 ? styles.celAhorro : undefined}
-                          aria-label={
-                            fila.diferenciaAcum >= 0
-                              ? `Ahorro de ${formatCurrency(fila.diferenciaAcum)}`
-                              : `Coste adicional de ${formatCurrency(Math.abs(fila.diferenciaAcum))}`
-                          }
-                        >
-                          {fila.diferenciaAcum >= 0 ? '+' : ''}
-                          {formatCurrency(fila.diferenciaAcum)}
+                        <td className={styles.celCosteEV}>{formatCurrency(fila.costeTotalEV)}</td>
+                        <td>{formatCurrency(fila.costeTotalGas)}</td>
+                        <td className={fila.ventajaEV >= 0 ? styles.celAhorro : undefined}>
+                          {fila.ventajaEV >= 0 ? '+' : ''}
+                          {formatCurrency(fila.ventajaEV)}
                         </td>
                       </tr>
                     ))}
@@ -492,15 +560,17 @@ export default function ComparadorElectrico() {
                 </table>
               </div>
               <p className={styles.celNota}>
-                * No incluye depreciación diferencial ni seguro. El mantenimiento EV estimado es 200 €/año menos que el de gasolina.
-                El coste de carga en puntos públicos (0,45-0,65 €/kWh) elevaría significativamente el coste del EV.
+                Coste total = compra (el eléctrico, con el cargador y tras la ayuda) + energía y
+                mantenimiento de cada año. Una ventaja negativa significa que, hasta ese año, el
+                eléctrico ha costado más. No incluye depreciación, valor de reventa, seguro ni
+                financiación.
               </p>
             </div>
 
-            {/* CTA a asesor-vehiculo */}
-            <div className={styles.ctaBox} role="complementary" aria-label="Herramienta relacionada">
+            {/* CTA a selector-vehiculo */}
+            <div className={styles.ctaBox}>
               <p className={styles.ctaText}>
-                ¿Aún no tienes claro qué tipo de coche te conviene? El Asesor de Vehículo te
+                ¿Aún no tienes claro qué tipo de coche te conviene? El Selector de Vehículo te
                 orienta según tus necesidades reales antes de comparar precios.
               </p>
               <Link href="/selector-vehiculo/" className={styles.ctaLink}>
@@ -517,45 +587,53 @@ export default function ComparadorElectrico() {
         >
           <h3>La trampa del precio de lista</h3>
           <p>
-            El precio de compra es solo el punto de partida. Lo que realmente importa es la
-            <strong> diferencia neta</strong> entre ambos vehículos una vez descontado el subsidio MOVES III.
-            Un EV que cuesta 12.000 € más que su equivalente de gasolina, con MOVES III máximo (7.000 €),
-            solo supone 5.000 € de inversión extra a recuperar vía ahorro en combustible y mantenimiento.
-            Además, el valor residual del EV a 5-8 años puede ser inferior al de gasolina en muchas marcas,
-            lo que no aparece en este cálculo de flujos.
+            El precio de compra es solo el punto de partida. Lo que importa es la
+            <strong> diferencia al comprar</strong>: el eléctrico con su cargador y tras la ayuda que
+            te corresponda, frente al de gasolina. Esa diferencia es la que se recupera, año a año,
+            con lo que el eléctrico ahorra en energía y mantenimiento. Además, el valor de reventa
+            de uno y otro a 5-8 años puede ser muy distinto, y no aparece en este cálculo.
           </p>
 
-          <h3>El kWh doméstico vs público</h3>
+          <h3>Dónde cargas cambia el resultado</h3>
           <p>
-            Cargar en casa a 0,18 €/kWh es radicalmente distinto a hacerlo en un punto de carga rápida
-            en autopista (0,45-0,65 €/kWh). Un conductor que realiza muchos desplazamientos largos sin
-            cargador propio puede acabar pagando <strong>3 veces más por kilómetro</strong> que si cargara
-            en casa. La calculadora asume carga doméstica: si tu caso es mayoritariamente carga pública,
-            el break-even se alargará varios años respecto a lo mostrado.
+            El kWh de casa y el de un punto de carga rápida en carretera pueden costar muy distinto:
+            consulta la tarifa del operador que vayas a usar. Si cargas a menudo fuera de casa, pon
+            en «Precio de la electricidad» la media de lo que pagas. Con un kWh caro, el eléctrico
+            puede ser más barato de comprar y aun así más caro de usar: entonces su ventaja se reduce
+            cada año y la app te dice en qué año se agota.
           </p>
 
-          <h3>MOVES III y el calendario de incentivos</h3>
+          <h3>La ayuda a la compra</h3>
           <p>
-            El programa MOVES III sigue activo en 2025, pero los presupuestos son limitados y las
-            convocatorias autonómicas pueden agotarse. La diferencia entre comprar con o sin MOVES III
-            puede ser de hasta <strong>7.000 €</strong>, lo que representa entre 1 y 3 años adicionales
-            de break-even. Si estás considerando la compra, revisar el estado de la convocatoria en tu
-            comunidad autónoma puede marcar la diferencia.
+            En España, el {MOVES_III_HISTORICO.nombre} estuvo vigente entre {MOVES_III_HISTORICO.vigencia.replace('-', ' y ')} y
+            terminó el {fechaISO(MOVES_III_HISTORICO.finalizado)}. Hoy rige el {AUTO_PLUS.nombre}{' '}
+            (RD 609/2026), con un máximo de {euros(AUTO_PLUS.maximo.turismo)} por turismo
+            que se alcanza sumando criterios: tipo de vehículo, precio sin impuestos y fabricación
+            europea. La app no calcula la ayuda, porque algunas condiciones —como el origen de la
+            batería— no caben en un formulario: comprueba la tuya en la fuente oficial y escríbela
+            en su campo. En otros países hay programas distintos.
           </p>
 
           <h3>Los km anuales son decisivos</h3>
           <p>
-            El ahorro en energía es directamente proporcional a los kilómetros recorridos. Con
-            <strong> menos de 8.000 km/año</strong>, raramente se alcanza el punto de equilibrio en 10 años,
-            porque el ahorro acumulado no llega a cubrir la sobrecarga inicial del EV. Con
-            <strong> más de 20.000 km/año</strong>, el eléctrico casi siempre compensa antes del año 6.
-            Este es el factor más determinante: no el precio del coche (carro o auto), sino los kilómetros que vas a recorrer.
+            Cuando el eléctrico gasta menos energía por kilómetro, el ahorro crece con los
+            kilómetros recorridos. Con los datos de ejemplo de la app (diferencia al comprar de{' '}
+            {formatCurrency(ejemploMedio.inversionInicialExtra)}), el equilibrio llega{' '}
+            {EJEMPLO_KM.map(({ km, resultado: r }, i) => (
+              <React.Fragment key={km}>
+                {i > 0 && (i === EJEMPLO_KM.length - 1 ? ' y ' : ', ')}
+                {r.anioEquilibrio !== null ? `en el año ${r.anioEquilibrio}` : 'nunca'} con{' '}
+                {formatNumber(km, 0)} km/año
+              </React.Fragment>
+            ))}
+            . Si tus precios son otros, el resultado cambia: por eso conviene hacer el cálculo con
+            los tuyos.
           </p>
 
           <div className={styles.warningBox} role="note">
-            Este cálculo es orientativo. No incluye el coste del dinero (financiación), la depreciación
-            diferencial entre modelos ni el coste de carga en puntos públicos. Los datos de consumo
-            real pueden diferir significativamente del consumo WLTP. Consulta un asesor financiero
+            Este cálculo es orientativo. No incluye el coste del dinero (financiación), la
+            depreciación ni el valor de reventa, el seguro ni los impuestos de circulación. El
+            consumo real puede diferir mucho del homologado WLTP. Consulta a un asesor financiero
             para decisiones de compra relevantes.
           </div>
         </EducationalSection>

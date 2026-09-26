@@ -1,9 +1,18 @@
 import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { AYUDA_AUTO_PLUS_2026, MOVES_III_HISTORICO } from '@/data/fiscal';
+import { formatDate, formatNumber, parseISODateLocal } from '@/lib';
+
+// Cifras de la ayuda: del módulo de data/fiscal, nunca escritas a mano (hallazgos 1996 y 1997).
+const euros = (x: number): string => `${formatNumber(x, 0)} €`;
+const MAXIMO_TURISMO = euros(AYUDA_AUTO_PLUS_2026.maximo.turismo);
+const FIN_MOVES = formatDate(parseISODateLocal(MOVES_III_HISTORICO.finalizado));
+const DESDE_AUTO_PLUS = formatDate(parseISODateLocal(AYUDA_AUTO_PLUS_2026.matriculadosDesde));
+const TOPE_PRECIO = euros(AYUDA_AUTO_PLUS_2026.precioMaxTurismoSinImpuestos);
 
 export const metadata: Metadata = {
   title: 'Coche, Carro o Auto Eléctrico vs Gasolina: ¿Cuándo Compensa? Calculadora | meskeIA',
-  description: 'Calcula el punto de equilibrio entre un coche (carro o auto) eléctrico y uno de gasolina. Introduce los precios, km anuales, consumos y subsidio MOVES III. Muestra el año en que el eléctrico empieza a ser más barato.',
+  description: 'Calcula el punto de equilibrio entre un coche (carro o auto) eléctrico y uno de gasolina. Introduce los precios, km anuales, consumos, la ayuda a la compra que te corresponda y el cargador. Muestra el año en que el eléctrico empieza a ser más barato.',
   keywords: [
     'eléctrico vs gasolina',
     'cuando compensa el eléctrico',
@@ -12,7 +21,8 @@ export const metadata: Metadata = {
     'auto eléctrico vs gasolina',
     'cuando compensa el carro eléctrico',
     'cuando compensa el auto eléctrico',
-    'MOVES III subsidio',
+    'ayuda compra coche eléctrico',
+    'Programa Auto+',
     'ahorro coche eléctrico',
     'comparador eléctrico gasolina diesel',
     'coste eléctrico por kilómetro',
@@ -20,7 +30,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: '¿Cuándo compensa el eléctrico? Calculadora de break-even | meskeIA',
-    description: 'Compara el coste total de un eléctrico vs gasolina en tu situación real. Incluye MOVES III, cargador doméstico y proyección a 10 años.',
+    description: 'Compara el coste total de un eléctrico vs gasolina en tu situación real. Incluye la ayuda a la compra, el cargador doméstico y una proyección de hasta 15 años.',
     type: 'website',
     locale: 'es_ES',
     url: 'https://meskeia.com/comparador-electrico/',
@@ -45,16 +55,16 @@ export const metadata: Metadata = {
     'schema:WebApplication': JSON.stringify(
       generateWebAppSchema({
         name: 'Comparador Eléctrico vs Combustión',
-        description: 'Calculadora de punto de equilibrio entre un vehículo (coche, carro o auto) eléctrico y de combustión. Compara costes reales incluyendo precio de compra, subsidios MOVES III, consumo eléctrico, precio de gasolina, cargador doméstico y proyección a N años.',
+        description: 'Calculadora de punto de equilibrio entre un vehículo (coche, carro o auto) eléctrico y de combustión. Compara costes reales incluyendo precio de compra, ayuda pública a la compra, consumo eléctrico, precio de gasolina, cargador doméstico y proyección a N años.',
         url: 'https://meskeia.com/comparador-electrico/',
         features: [
           'Cálculo del año de break-even (punto de equilibrio)',
           'Proyección de ahorro acumulado a 5, 8, 10 y 15 años',
-          'Integración del subsidio MOVES III (0 / 4.500 € / 7.000 €)',
+          'Campo para la ayuda pública a la compra que te corresponda',
           'Coste de instalación de cargador doméstico',
           'Tabla comparativa año a año',
           'Coste por kilómetro de cada opción',
-          '100% en el navegador, sin registro',
+          '100 % en el navegador, sin registro',
           'Gratuito y en español',
         ],
       })
@@ -64,7 +74,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Comparador Eléctrico vs Combustión",
-  description: "Calcula el punto de equilibrio entre un coche (carro o auto) eléctrico y uno de gasolina. Introduce los precios, km anuales, consumos y subsidio MOVES III. Muestra el año en que el eléctrico empieza a ser más barato",
+  description: "Calcula el punto de equilibrio entre un coche (carro o auto) eléctrico y uno de gasolina. Introduce los precios, km anuales, consumos, la ayuda a la compra que te corresponda y el cargador. Muestra el año en que el eléctrico empieza a ser más barato",
   url: "https://meskeia.com/comparador-electrico/",
   category: 'FinanceApplication',
   features: [],
@@ -79,15 +89,15 @@ export const faqJsonLd = {
       name: '¿Cuándo es más barato un coche (carro o auto) eléctrico que uno de gasolina en total?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El punto de equilibrio (break-even) entre un eléctrico y un equivalente de gasolina depende fundamentalmente de tres variables: la diferencia de precio de compra, los kilómetros anuales recorridos y el coste de la electricidad doméstica frente al precio de la gasolina. En condiciones típicas españolas (precio eléctrico nocturno ~0,10-0,12 €/kWh, gasolina ~1,60 €/litro, 15.000 km anuales), el break-even suele producirse entre los 5 y 9 años si se aplica el subsidio MOVES III. Con más kilómetros anuales o precios de combustible altos, el plazo se acorta significativamente.',
+        text: 'El punto de equilibrio entre un eléctrico y un equivalente de gasolina depende de la diferencia al comprar (con el cargador doméstico y tras la ayuda que corresponda), de los kilómetros anuales y de lo que cuesta cada kilómetro en energía y mantenimiento. Con los datos de ejemplo de la calculadora (35.000 € frente a 25.000 €, 15.000 km al año, 16 kWh/100 km a 0,18 €/kWh, 7 l/100 km a 1,65 €/l, cargador de 800 €, mantenimiento de 800 € y 1.000 € al año, y sin ayuda), el eléctrico ahorra 1.500,50 € al año y recupera los 10.800 € de diferencia en el año 8. Con más kilómetros o una ayuda a la compra, el plazo se acorta; con electricidad cara, se alarga o no llega.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Qué es el plan MOVES III y cuánto subsidio ofrece al comprar un eléctrico?',
+      name: '¿Qué ayuda hay en España para comprar un coche eléctrico?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'MOVES III es el programa de ayudas del Gobierno de España para la adquisición de vehículos de energías alternativas. En su última convocatoria, ofrece hasta 4.500 € para personas físicas que compren un vehículo eléctrico de batería (BEV) o de pila de combustible, y hasta 7.000 € si se achata un vehículo con más de 7 años de antigüedad. Las ayudas pueden ampliarse con bonificaciones adicionales de comunidades autónomas. El subsidio reduce directamente el precio de adquisición y, por tanto, acorta el tiempo de amortización frente a un vehículo de combustión.',
+        text: `El programa MOVES III terminó el ${FIN_MOVES}. Desde entonces rige el Programa Auto+ (Real Decreto 609/2026), para vehículos matriculados desde el ${DESDE_AUTO_PLUS}. A un turismo le da como máximo ${MAXIMO_TURISMO}, y la cuantía se forma sumando criterios: que sea eléctrico puro o electrificado, su precio sin impuestos (por encima de ${TOPE_PRECIO} no hay ayuda) y su fabricación europea. No tiene tramo por achatarramiento. La calculadora no la estima: pide la ayuda que te corresponda, con 0 por defecto, porque algunas condiciones no caben en un formulario y en otros países los programas son distintos.`,
       },
     },
     {
@@ -95,7 +105,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta recargar un coche eléctrico en casa comparado con repostar gasolina?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un coche eléctrico con una autonomía de 400 km y un consumo de 15 kWh/100 km necesita unos 60 kWh para una carga completa. Recargando en tarifa nocturna (0,10 €/kWh), el coste es de 6 € por cada 400 km, lo que equivale a 1,5 €/100 km. Un vehículo de gasolina que consume 6 litros/100 km a 1,60 €/litro supone un coste de 9,60 €/100 km. El ahorro en combustible ronda los 8 €/100 km, lo que para 15.000 km anuales se traduce en unos 1.200 € de ahorro al año solo en energía.',
+        text: 'Depende sobre todo del precio del kWh que pagues. Un coche eléctrico que consume 15 kWh/100 km, cargado a 0,18 €/kWh, gasta 2,70 € cada 100 km. Un gasolina que consume 6 l/100 km a 1,60 €/l gasta 9,60 €. La diferencia, 6,90 € cada 100 km, supone unos 1.035 € al año para 15.000 km, solo en energía. En un punto de carga rápida el kWh puede costar varias veces más que en casa, y esa ventaja se reduce o desaparece: conviene hacer la cuenta con tu precio real.',
       },
     },
     {
@@ -103,7 +113,7 @@ export const faqJsonLd = {
       name: '¿Los coches eléctricos tienen menos gastos de mantenimiento que los de gasolina?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, de forma significativa. Los vehículos eléctricos no requieren cambios de aceite, filtros de aceite ni de combustible, correa de distribución, embrague ni catalizador. Los frenos también duran más tiempo gracias al frenado regenerativo, que recupera energía y reduce el desgaste de pastillas. Según estimaciones del sector, el coste de mantenimiento de un eléctrico es entre un 30% y un 40% inferior al de un equivalente de combustión a lo largo de 10 años, lo que contribuye adicionalmente a su ventaja económica total.',
+        text: 'Sí, de forma significativa. Los vehículos eléctricos no requieren cambios de aceite, filtros de aceite ni de combustible, correa de distribución, embrague ni catalizador. Los frenos también duran más tiempo gracias al frenado regenerativo, que recupera energía y reduce el desgaste de pastillas. Cuánto se ahorra depende del modelo y del uso, así que la calculadora no lo da por hecho: pide el mantenimiento anual de cada coche para que pongas tus propias cifras o los presupuestos de tu taller.',
       },
     },
     {
@@ -111,7 +121,7 @@ export const faqJsonLd = {
       name: '¿Merece la pena instalar un cargador doméstico para el coche eléctrico?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En la mayoría de casos sí. Un cargador doméstico de Nivel 2 (7,4 kW) cuesta entre 600 y 1.200 € instalado, incluyendo el Wallbox y la instalación eléctrica. Permite cargar un vehículo eléctrico medio en 6-8 horas aprovechando las tarifas nocturnas más baratas, frente a los 20-40 horas de una toma de corriente convencional. La amortización frente al uso exclusivo de cargadores públicos (0,35-0,65 €/kWh) se consigue habitualmente en 2-4 años para un conductor que realiza 15.000 km anuales. Sin plaza de garaje propia, la viabilidad depende del acceso a carga en el trabajo o en la vía pública.',
+        text: 'Depende de dónde vayas a cargar si no lo instalas. Un cargador doméstico de 7,4 kW permite una carga completa durante la noche, frente a las muchas horas que necesita un enchufe convencional. Su coste de instalación se paga al comprar y varía con la distancia al cuadro eléctrico y el tipo de garaje, así que conviene pedir presupuesto. En la calculadora cuenta entero desde el primer año, y puedes comparar dos escenarios: con cargador y electricidad de tarifa doméstica, o sin él y el precio del kWh de la carga pública. Sin plaza de garaje propia, la viabilidad depende del acceso a carga en el trabajo o en la vía pública.',
       },
     },
   ],
