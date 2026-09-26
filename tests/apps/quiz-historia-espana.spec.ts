@@ -3,18 +3,21 @@ import { PREGUNTAS_HISTORIA, type PreguntaHistoria } from '../../data/preguntas-
 import { esperarPaginaAsentada } from './_hidratacion';
 
 /**
- * Quiz Historia de España — test de regresión del Inspector (1.ª pasada 25/09/2026)
+ * Quiz Historia de España — test de regresión del Inspector (1.ª pasada 25/09/2026;
+ * reparación de los hallazgos 2101-2124 el 26/09/2026)
  *
  * QUÉ PROMETE LA APP
  * ──────────────────
- * · <h1> «Quiz Historia de España» · subtítulo «Desde los íberos hasta la Constitución de 1978»
- *   · insignias «81 preguntas», «3 niveles de dificultad», «9 épocas históricas».
+ * · <h1> «Quiz Historia de España» · subtítulo «Desde los íberos hasta la Constitución de 1978 y
+ *   la democracia» · insignias con el total del banco (81), «3 niveles de dificultad» y el número
+ *   de épocas que usa el banco (11): ambas cifras salen de los datos, no escritas a mano.
  * · Tres niveles: Fácil (10 preguntas, «Hechos clave y fechas principales»), Medio (15,
- *   «Personajes, causas y consecuencias») y Difícil (20, «Detalles, política y cultura»).
- * · metadata.ts: «81 preguntas verificables desde la época romana hasta la Constitución de
- *   1978»; faqJsonLd: «Puedes seleccionar el nivel y la época histórica que quieras repasar».
- * · Aviso del bloque educativo (page.tsx:500): «El período cubierto llega hasta 1978 […] La
- *   historia más reciente (democracia, integración europea, etc.) no está incluida».
+ *   «Personajes, causas y consecuencias») y Difícil (20, «Detalles, política y cultura»), cada uno
+ *   con preguntas SOLO de su nivel.
+ * · metadata.ts/faqJsonLd: sin filtro por época («Dentro de cada nivel las épocas se mezclan al
+ *   azar»); ya no promete elegir época.
+ * · Aviso del bloque educativo: «El grueso del quiz llega hasta 1978» y un bloque breve
+ *   «Democracia (desde 1978)» con el 23-F, la CEE, 1992 y el euro.
  *
  * DE DÓNDE SALEN LOS VALORES ESPERADOS
  * ────────────────────────────────────
@@ -126,7 +129,9 @@ async function jugar(page: Page, aciertos: number): Promise<{ fichas: PreguntaHi
 async function resultado(page: Page) {
   await expect(page.locator('[class*="finTitulo"]')).toBeVisible();
   return page.evaluate(() => {
-    const t = (s: string): string => (document.querySelector(s)?.textContent ?? '').replace(/\s+/g, ' ').trim();
+    // Se colapsan solo los blancos ASCII: `\s` incluye U+00A0 y borraba el espacio duro del «70 %»
+    // que vigila el caso del porcentaje (26/09/2026).
+    const t = (s: string): string => (document.querySelector(s)?.textContent ?? '').replace(/[ \t\n\r]+/g, ' ').trim();
     return {
       titulo: t('[class*="finTitulo"]'),
       subtitulo: t('[class*="finSubtitulo"]'),
@@ -134,7 +139,7 @@ async function resultado(page: Page) {
       stats: Object.fromEntries(
         [...document.querySelectorAll('[class*="statCard"]')].map((c) => [
           (c.querySelector('[class*="statLabel"]')?.textContent ?? '').trim(),
-          (c.querySelector('[class*="statValor"]')?.textContent ?? '').replace(/\s+/g, ' ').trim(),
+          (c.querySelector('[class*="statValor"]')?.textContent ?? '').replace(/[ \t\n\r]+/g, ' ').trim(),
         ]),
       ),
       errores: document.querySelectorAll('[class*="errorItem"]').length,
@@ -308,12 +313,12 @@ test.describe('Quiz Historia de España · partida', () => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-test.describe('Inspector 25/09/2026 · hallazgos abiertos en la partida', () => {
+// Hallazgos del 25/09/2026, reparados el 26/09/2026: cada caso afirma ya el comportamiento correcto.
+test.describe('Inspector 25/09/2026 · hallazgos de la partida (reparados)', () => {
   test('hallazgo · «Difícil» saca sus 20 preguntas del nivel difícil', async ({ page }) => {
     // page.tsx:59 — el nivel Difícil baraja el banco ENTERO (29 fácil + 31 medio + 21 difícil) aunque
     // CONFIG_DIFICULTAD.dificil.pool = 'dificil' y la tarjeta promete «Detalles, política y cultura».
     // Medido: 747 difíciles de 3.000 (24,9 %; 20·21/81 = 5,2 por partida) y 1.053 fáciles (35,1 %).
-    test.fail();
     await abrir(page);
     await arrancar(page, 'Difícil');
     const { fichas } = await jugar(page, 99);
@@ -324,7 +329,6 @@ test.describe('Inspector 25/09/2026 · hallazgos abiertos en la partida', () => 
 
   test('hallazgo · el marcador dice «1 correcta», no «1 correctas»', async ({ page }) => {
     // page.tsx:217 — `{aciertos} correctas` sin singular.
-    test.fail();
     await abrir(page);
     await arrancar(page, 'Fácil');
     await responder(page, 'bien');
@@ -334,7 +338,6 @@ test.describe('Inspector 25/09/2026 · hallazgos abiertos en la partida', () => 
 
   test('hallazgo · el porcentaje va separado con espacio duro («70 %»)', async ({ page }) => {
     // Regla de formato del 25/09/2026 (Ortografía RAE 2010): page.tsx:280 y :292 pegan el «%».
-    test.fail();
     await abrir(page);
     await arrancar(page, 'Fácil');
     await jugar(page, 7);
@@ -346,7 +349,6 @@ test.describe('Inspector 25/09/2026 · hallazgos abiertos en la partida', () => 
   test('hallazgo · el foco no cae a <body> al empezar, al responder ni al pasar de pregunta', async ({ page }) => {
     // page.tsx:203/248/267 — «Comenzar quiz» se desmonta, la opción pulsada queda disabled y
     // «Siguiente» se desmonta: en los tres casos el foco va a <body> y el teclado vuelve al principio.
-    test.fail();
     const enBody = () => page.evaluate(() => document.activeElement === document.body || document.activeElement === null);
     await abrir(page);
     await page.getByRole('button', { name: /^Fácil/ }).click();
@@ -370,7 +372,6 @@ test.describe('Inspector 25/09/2026 · hallazgos abiertos en la partida', () => 
   test('hallazgo · la región viva no anuncia los emojis ✅/❌', async ({ page }) => {
     // page.tsx:258-262 — «✅ ¡Correcto!» y «❌ Incorrecto…» son CADENAS dentro de un role="alert":
     // el lector de pantalla lee el nombre del emoji. check:a11y-jsx no lo ve (solo mira JSX).
-    test.fail();
     await abrir(page);
     await arrancar(page, 'Fácil');
     await responder(page, 'bien');
@@ -389,7 +390,6 @@ test.describe('Inspector 25/09/2026 · hallazgos abiertos en la partida', () => 
 
   test('hallazgo · «Comenzar quiz» no lleva el ▶ en su nombre accesible', async ({ page }) => {
     // page.tsx:204 — «Comenzar quiz ▶» sin aria-hidden (lo marca check:a11y-jsx sobre el fichero).
-    test.fail();
     await abrir(page);
     await expect(page.getByRole('button', { name: 'Comenzar quiz', exact: true })).toHaveCount(1, { timeout: 2000 });
   });
@@ -397,7 +397,6 @@ test.describe('Inspector 25/09/2026 · hallazgos abiertos en la partida', () => 
   test('hallazgo · la promesa de elegir época del FAQ tiene un control detrás', async ({ page }) => {
     // metadata.ts:63 — «Puedes seleccionar el nivel y la época histórica que quieras repasar»; la
     // pantalla de inicio solo tiene los tres niveles y una tarjeta fija de «Modo Aprendizaje».
-    test.fail();
     await abrir(page);
     const faq = await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join(' '));
     const promete = /época histórica que quieras repasar/.test(faq);
@@ -407,15 +406,20 @@ test.describe('Inspector 25/09/2026 · hallazgos abiertos en la partida', () => 
   });
 
   test('hallazgo · el aviso «llega hasta 1978» no convive con preguntas de 1981-2002', async ({ page }) => {
-    // page.tsx:500 frente a las preguntas del 23-F (1981), la CEE (1986), Barcelona 92 y el euro.
-    test.fail();
+    // Antes el aviso decía «El período cubierto llega hasta 1978 […] no está incluida» frente a las
+    // preguntas del 23-F (1981), la CEE (1986), Barcelona 92 y el euro. Reparación: esas preguntas
+    // se quedan, con su época propia «Democracia (desde 1978)», y el aviso lo dice.
     await abrir(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const aviso = await page.getByText('El período cubierto llega hasta 1978').count();
     const posteriores = PREGUNTAS_HISTORIA.filter((p) =>
       [...`${p.pregunta} ${p.correcta}`.matchAll(/\b(1[0-9]{3}|20[0-9]{2})\b/g)].some((m) => Number(m[1]) > 1978),
-    ).map((p) => p.id);
-    expect(aviso > 0 && posteriores.length > 0, `aviso visible y preguntas posteriores a 1978: ${posteriores.join(', ')}`).toBe(false);
+    );
+    expect(aviso > 0 && posteriores.length > 0, `aviso visible y preguntas posteriores a 1978: ${posteriores.map((p) => p.id).join(', ')}`).toBe(false);
+    if (posteriores.length > 0) {
+      await expect(page.locator('[class*="warningBox"]')).toContainText('Democracia (desde 1978)');
+      expect(posteriores.filter((p) => p.epoca !== 'democracia').map((p) => p.id), 'posteriores a 1978 fuera de «Democracia»').toEqual([]);
+    }
   });
 });
 
@@ -428,7 +432,6 @@ test.describe('Inspector 25/09/2026 · contraste', () => {
       // Claro: insignia de época 3,56 · letra blanca sobre verde 2,54 / rojo 3,76 · lista de fallos
       // 3,30 / 2,22 · «Preguntas que has fallado» 3,61 · h2 del aviso 1,88 · h3 del FAQ 4,11.
       // Oscuro: insignia 3,06 · letra sobre verde 1,92 / rojo 2,77 · h3 del FAQ 3,50.
-      test.fail();
       test.setTimeout(90_000);
       await abrir(page, tema);
       const fallos: string[] = [];
@@ -493,7 +496,6 @@ test.describe('Inspector 25/09/2026 · móvil 360 × 740', () => {
   });
 
   test('hallazgo · tras «Comenzar» y tras «Siguiente» el enunciado no queda fuera ni bajo la barra fija', async ({ page }) => {
-    test.fail();
     test.setTimeout(60_000);
     const tocar = async (loc: Locator): Promise<void> => {
       await loc.scrollIntoViewIfNeeded();
@@ -558,23 +560,32 @@ test.describe('Inspector 25/09/2026 · contenido del banco', () => {
   test('hallazgo · euro: la moneda oficial de España lo es desde 1999, no desde 2002', () => {
     // Ley 46/1998, de 17 de diciembre (BOE-A-1998-29216), art. 3.1: «Desde el 1 de enero de 1999,
     // inclusive, la moneda del sistema monetario nacional es el euro». 2002 es la circulación de
-    // billetes y monedas. La app marca 2002 y da por mala 1999.
-    test.fail();
-    const p = pregunta(/el euro/);
-    expect(/moneda oficial/i.test(p.pregunta) ? p.correcta : '1999').toBe('1999');
+    // billetes y monedas. Antes la app preguntaba por la «moneda oficial», marcaba 2002 y daba por
+    // mala 1999. Reparación: el enunciado pregunta por la circulación (una sola respuesta, 2002) y
+    // la explicación da las dos fechas.
+    const p = pregunta(/euro/);
+    if (/moneda oficial/i.test(p.pregunta)) expect(p.correcta).toBe('1999');
+    else {
+      expect(p.pregunta).toMatch(/billetes y monedas/);
+      expect(p.correcta).toBe('2002');
+    }
+    expect(p.explicacion).toMatch(/1 de enero de 1999/);
+    expect(p.explicacion).toMatch(/1 de enero de 2002/);
   });
 
   test('hallazgo · Armada de 1588: «La Gran Armada» no puede ser una opción incorrecta', () => {
     // es.wikipedia «Armada Invencible»: «La Grande y Felicísima Armada o Gran Armada de 1588
-    // (apodada posteriormente Armada Invencible)». Dos opciones correctas.
-    test.fail();
-    expect(incorrectas(pregunta(/flota enviada por Felipe II/))).not.toContain('La Gran Armada');
+    // (apodada posteriormente Armada Invencible)». Dos opciones correctas. Reparación: se pregunta
+    // por el SOBRENOMBRE posterior, y ninguna opción errónea es un nombre de esa flota.
+    const p = pregunta(/Felipe II envió contra Inglaterra en 1588/);
+    expect(p.pregunta).toMatch(/sobrenombre/);
+    expect(p.correcta).toBe('La Armada Invencible');
+    for (const o of incorrectas(p)) expect(o).not.toMatch(/Gran(de)? (y Felicísima )?Armada/);
   });
 
   test('hallazgo · primer Habsburgo: Felipe I el Hermoso reinó en Castilla (1506) y se da por malo sin matiz', () => {
     // es.wikipedia «Felipe I de Castilla»: rey de Castilla del 12/07 al 25/09/1506, «quien introdujo
     // la casa de los Habsburgo en territorios de la actual España».
-    test.fail();
     const p = pregunta(/primer rey de la dinastía Habsburgo/);
     const lista = incorrectas(p).some((o) => /Felipe I\b.*Hermoso/.test(o));
     expect(!lista || /Felipe I\b/.test(p.explicacion)).toBe(true);
@@ -583,14 +594,15 @@ test.describe('Inspector 25/09/2026 · contenido del banco', () => {
   test('hallazgo · Viriato fue lusitano, no celtíbero', () => {
     // RAH, Historia Hispánica «Viriato»: caudillo lusitano (Guerras Lusitanas, 147-139 a. C.). La
     // propia explicación de la app dice «el líder lusitano»: contradice al enunciado.
-    test.fail();
-    expect(pregunta(/terror de los romanos/).pregunta).not.toMatch(/celt[ií]bero/i);
+    const p = PREGUNTAS_HISTORIA.find((q) => q.correcta === 'Viriato');
+    expect(p, 'no hay pregunta cuya respuesta sea Viriato').toBeTruthy();
+    expect(p?.pregunta).not.toMatch(/celt[ií]bero/i);
+    expect(p?.pregunta).toMatch(/lusitano/);
   });
 
   test('hallazgo · la Constitución de 1978 no establece cuántas provincias hay', () => {
     // CE arts. 137 y 141.1 (BOE-A-1978-31229): la provincia es entidad local; ningún artículo fija
     // el número ni las enumera. La explicación dice «Esta estructura fue consagrada en la Constitución».
-    test.fail();
     const p = pregunta(/provincias/);
     expect(p.pregunta).not.toMatch(/establece la Constituci[oó]n/i);
     expect(p.explicacion).not.toMatch(/consagrada en la Constituci[oó]n/i);
@@ -600,7 +612,6 @@ test.describe('Inspector 25/09/2026 · contenido del banco', () => {
     // Tratado de París (10/12/1898), art. I: «España renuncia a todo derecho de soberanía y propiedad
     // sobre Cuba» (art. II cede Puerto Rico y Guam). Carolinas, Marianas y Palaos se vendieron a
     // Alemania en 1899 (tratado germano-español) y Guinea siguió siendo española hasta 1968.
-    test.fail();
     const p = pregunta(/Cuba, Puerto Rico y Filipinas/);
     expect(p.pregunta).not.toMatch(/últimas colonias/);
     expect(p.explicacion).not.toMatch(/cedió Cuba/);
@@ -608,23 +619,30 @@ test.describe('Inspector 25/09/2026 · contenido del banco', () => {
 
   test('hallazgo · la expulsión de los judíos no fue «antes de 1492»', () => {
     // Edicto de Granada: 31 de marzo de 1492 (la propia explicación lo fecha en 1492).
-    test.fail();
-    const p = pregunta(/reformas religiosas/);
-    expect(/antes de 1492/.test(p.pregunta) && /judíos/.test(p.correcta)).toBe(false);
+    const p = PREGUNTAS_HISTORIA.find((q) => /judíos/.test(q.correcta));
+    expect(p).toBeTruthy();
+    expect(p?.pregunta).not.toMatch(/antes de 1492/);
+    expect(p?.pregunta).toMatch(/en 1492/);
   });
 
   test('hallazgo · la expedición de Magallanes-Elcano no «demostró que la Tierra era redonda»', () => {
     // La esfericidad se conocía desde la Antigüedad: Eratóstenes midió la circunferencia en el s. III a. C.
-    test.fail();
-    expect(pregunta(/circunnavegando el globo/).explicacion).not.toMatch(/Tierra era redonda/);
+    const p = PREGUNTAS_HISTORIA.find((q) => q.correcta === 'La expedición de Magallanes-Elcano');
+    expect(p).toBeTruthy();
+    expect(p?.explicacion).not.toMatch(/Tierra era redonda/);
+    expect(p?.pregunta).not.toMatch(/demostró/);
   });
 
   test('hallazgo · el Estatuto catalán de 1932 no fue «recuperado en la Transición»', () => {
     // es.wikipedia «Estatuto de autonomía de Cataluña de 1932»: el de Núria (1931) era el proyecto; las
     // Cortes aprobaron otro texto (52 → 18 artículos) el 9/9/1932; suspendido en 1934 y derogado por
     // Franco el 5/4/1938. En la Transición se aprobó uno nuevo (Estatuto de Sau, 1979).
-    test.fail();
-    expect(pregunta(/Estatuto de Autonomía catalán/).explicacion).not.toMatch(/recuperado en la Transición/);
+    // Reparación: el enunciado pregunta por el PROYECTO refrendado en 1931, que es lo que fue Núria.
+    const p = pregunta(/Estatuto de Autonomía de Cataluña/);
+    expect(p.correcta).toBe('Estatuto de Núria');
+    expect(p.pregunta).toMatch(/proyecto/);
+    expect(p.explicacion).not.toMatch(/recuperado en la Transición/);
+    expect(p.explicacion).toMatch(/5 de abril de 1938/);
   });
 
   test('hallazgo · fechas y datos menores en las explicaciones', () => {
@@ -633,7 +651,6 @@ test.describe('Inspector 25/09/2026 · contenido del banco', () => {
     // PCE: abandonó el leninismo en su IX Congreso (abril de 1978), después de legalizarse.
     // Utrecht (1713): Sicilia pasó a Saboya, no «los territorios italianos a Austria».
     // Referéndum de 1978: 87,87 % de síes → «87,9 %» (así lo dice la propia guía), no «87,8 %».
-    test.fail();
     const fallos: string[] = [];
     if (/Nueva Planta \(1714\)/.test(pregunta(/Mancomunitat/).explicacion)) fallos.push('Mancomunitat: Nueva Planta (1714)');
     if (/siglos IX y X/.test(pregunta(/capital del Califato de Córdoba/).explicacion)) fallos.push('Califato: siglos IX y X');
@@ -644,15 +661,31 @@ test.describe('Inspector 25/09/2026 · contenido del banco', () => {
   });
 
   test('hallazgo · erratas: «Spain» y «Al-Magrreb»', () => {
-    test.fail();
     expect(pregunta(/Desarrollismo|crecimiento económico español en los años 60/).explicacion).not.toMatch(/\bSpain\b/);
     expect(pregunta(/España árabe/).opciones).not.toContain('Al-Magrreb');
+  });
+
+  test('sano · otras preguntas con dos respuestas defendibles, reformuladas en la misma pasada (26/09/2026)', () => {
+    // Misma forma de defecto que 2102, hallada al revisar el banco entero:
+    // · reino germánico peninsular: los SUEVOS tuvieron reino en Gallaecia (409-585);
+    // · 1.ª constitución: el Estatuto de Bayona (1808) se cita como primer texto constitucional;
+    // · período 1874-1931 «basado en la alternancia»: «El Turno Pacífico» ES la alternancia;
+    // · cuadro de Goya «relacionado con la resistencia»: también lo es «El dos de mayo de 1808»;
+    // · «el rey en cuyos dominios nunca se ponía el sol»: la frase se aplicó también a Carlos I;
+    // · «matrimonio que unió ambas coronas» (1469) con 1479, año de la unión, como errónea.
+    const opcionesDe = (id: number): string[] => incorrectas(PREGUNTAS_HISTORIA.find((q) => q.id === id) as PreguntaHistoria);
+    expect(opcionesDe(6)).not.toContain('Los suevos');
+    expect(pregunta(/Cortes de Cádiz en 1812/).correcta).toBe('La Pepa');
+    expect(opcionesDe(37)).not.toContain('El Estatuto de Bayona');
+    expect(opcionesDe(42)).not.toContain('El Turno Pacífico');
+    expect(pregunta(/cuadro de Goya/).pregunta).toMatch(/ejecución/);
+    expect(pregunta(/corona de Portugal/).pregunta).not.toMatch(/nunca se ponía el sol/);
+    expect(pregunta(/se casaron Fernando de Aragón e Isabel de Castilla/).pregunta).not.toMatch(/unió ambas coronas/);
   });
 
   test('hallazgo · la insignia «Siglo XIX» no cae sobre hechos de 1909-1931', () => {
     // La tabla de la propia app fecha «Siglo XIX» en 1808-1902; las preguntas de 1909, 1914,
     // 1921, 1923 y la Restauración hasta 1931 llevan epoca 'siglo-xix'.
-    test.fail();
     const mal = PREGUNTAS_HISTORIA.filter(
       (p) => p.epoca === 'siglo-xix' && [...`${p.pregunta} ${p.correcta}`.matchAll(/\b(1[89][0-9]{2})\b/g)].some((m) => Number(m[1]) > 1902),
     ).map((p) => p.id);
@@ -662,7 +695,6 @@ test.describe('Inspector 25/09/2026 · contenido del banco', () => {
   test('hallazgo · 12 de octubre: la explicación da algo de contexto más allá del «Día de la Hispanidad en España»', () => {
     // Antipatrón 8 del CLAUDE.md y §1.bis (Latam): en Argentina la fecha es «Día del Respeto a la
     // Diversidad Cultural» (Decreto 1584/2010) y en Venezuela «Día de la Resistencia Indígena» (2002).
-    test.fail();
     expect(pregunta(/llegó Cristóbal Colón a América/).explicacion).toMatch(
       /Diversidad Cultural|Resistencia Indígena|pueblos originarios|indígenas|conquista|coloniza/i,
     );

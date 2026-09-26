@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import styles from './QuizHistoriaEspana.module.css';
 import {
   MeskeiaLogo,
@@ -11,6 +11,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { formatPercentage } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   PREGUNTAS_HISTORIA,
@@ -19,6 +20,7 @@ import {
   PREGUNTAS_DIFICIL,
   CONFIG_DIFICULTAD,
   type DificultadHistoria,
+  type EpocaHistoria,
   type PreguntaHistoria,
 } from '@/data/preguntas-historia-espana';
 
@@ -30,17 +32,46 @@ const DISPLAY_DIFICULTAD: Record<DificultadHistoria, { emoji: string; nombre: st
   dificil: { emoji: '🏆', nombre: 'Difícil', descripcion: 'Detalles, política y cultura' },
 };
 
-const ETIQUETA_EPOCA: Record<string, string> = {
+// Record<EpocaHistoria, …>: una época nueva en el banco sin etiqueta aquí no compila.
+// «Llegada a América» en vez de «Descubrimiento» a secas (hallazgo 2121, antipatrón 8 de
+// neutralidad): la explicación del 12 de octubre da el contexto de conquista y colonización.
+const ETIQUETA_EPOCA: Record<EpocaHistoria, string> = {
   'prerromana-romana': 'Épocas Prerromana y Romana',
   'visigoda': 'Época Visigoda',
   'al-andalus-reconquista': 'Al-Ándalus y Reconquista',
-  'reyes-catolicos-descubrimiento': 'Reyes Católicos y Descubrimiento',
+  'reyes-catolicos-descubrimiento': 'Reyes Católicos y llegada a América',
   'habsburgos': 'Siglo XVI-XVII (Habsburgos)',
   'borbones-siglo-xviii': 'Siglo XVIII (Borbones)',
   'siglo-xix': 'Siglo XIX',
+  'alfonso-xiii': 'Reinado de Alfonso XIII',
   'republica-guerra-civil': 'República y Guerra Civil',
   'franquismo-transicion': 'Franquismo y Transición',
+  'democracia': 'Democracia (desde 1978)',
 };
+
+const TOTAL_EPOCAS = new Set(PREGUNTAS_HISTORIA.map(p => p.epoca)).size;
+
+const BANCO_POR_NIVEL: Record<DificultadHistoria, PreguntaHistoria[]> = {
+  facil: PREGUNTAS_FACIL,
+  medio: PREGUNTAS_MEDIO,
+  dificil: PREGUNTAS_DIFICIL,
+};
+
+/** Hueco que deja arriba la barra fija del logo; igual que el scroll-margin-top del CSS. */
+const MARGEN_LOGO = 88;
+
+/**
+ * Lleva `bloque` al principio de la pantalla (respetando su scroll-margin-top) solo si su
+ * cabecera queda tapada por la barra del logo o por encima del borde, o si `clave` no cabe
+ * por abajo. Patrón de quiz-literatura-universal (hallazgo 1716).
+ */
+function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
+  if (!bloque || !clave) return;
+  const arriba = bloque.getBoundingClientRect().top;
+  const abajo = clave.getBoundingClientRect().bottom;
+  if (arriba >= MARGEN_LOGO && abajo <= window.innerHeight) return;
+  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
+}
 
 function mezclar<T>(arr: T[]): T[] {
   const copia = [...arr];
@@ -51,13 +82,13 @@ function mezclar<T>(arr: T[]): T[] {
   return copia;
 }
 
+/**
+ * Cada nivel saca sus preguntas de SU banco (CONFIG_DIFICULTAD[n].pool). Antes «Difícil»
+ * barajaba el banco entero y de media solo 5 de sus 20 preguntas eran difíciles (hallazgo 2103).
+ */
 function seleccionarPreguntas(dificultad: DificultadHistoria): PreguntaHistoria[] {
   const cfg = CONFIG_DIFICULTAD[dificultad];
-  let pool: PreguntaHistoria[];
-  if (dificultad === 'facil') pool = PREGUNTAS_FACIL;
-  else if (dificultad === 'medio') pool = PREGUNTAS_MEDIO;
-  else pool = [...PREGUNTAS_FACIL, ...PREGUNTAS_MEDIO, ...PREGUNTAS_DIFICIL];
-  return mezclar(pool).slice(0, cfg.preguntas);
+  return mezclar(BANCO_POR_NIVEL[cfg.pool]).slice(0, cfg.preguntas);
 }
 
 function calcularMedalla(porcentaje: number): string {
@@ -87,6 +118,36 @@ export default function QuizHistoriaEspanaPage() {
   const [errores, setErrores] = useState<Array<{ pregunta: string; correcta: string }>>([]);
 
   const preguntaActual = preguntas[indice];
+
+  /**
+   * Foco y vista (hallazgos 2104 y 2105). En los tres pasos de la partida el control pulsado
+   * desaparece o queda disabled y el navegador soltaba el foco al <body>:
+   * · al empezar y al pasar de pregunta → al enunciado nuevo (lo lee el lector de pantalla) y,
+   *   si la cabecera de la pregunta queda bajo la barra fija del logo o fuera, la vista sube;
+   * · al responder → a «Siguiente pregunta», la única acción que queda;
+   * · al ver el resultado → al título; al volver a elegir dificultad → a «Comenzar quiz».
+   */
+  const quizPanelRef = useRef<HTMLDivElement>(null);
+  const enunciadoRef = useRef<HTMLHeadingElement>(null);
+  const botonSiguienteRef = useRef<HTMLButtonElement>(null);
+  const finPanelRef = useRef<HTMLDivElement>(null);
+  const finTituloRef = useRef<HTMLHeadingElement>(null);
+  const botonComenzarRef = useRef<HTMLButtonElement>(null);
+  const huboPartida = useRef(false);
+  useEffect(() => {
+    if (fase === 'jugando') {
+      huboPartida.current = true;
+      traerALaVista(quizPanelRef.current, enunciadoRef.current);
+      enunciadoRef.current?.focus({ preventScroll: true });
+    } else if (fase === 'respondida') {
+      botonSiguienteRef.current?.focus({ preventScroll: true });
+    } else if (fase === 'fin') {
+      traerALaVista(finPanelRef.current, finTituloRef.current);
+      finTituloRef.current?.focus({ preventScroll: true });
+    } else if (fase === 'inicio' && huboPartida.current) {
+      botonComenzarRef.current?.focus();
+    }
+  }, [fase, indice]);
 
   const iniciarQuiz = useCallback(() => {
     const seleccionadas = seleccionarPreguntas(dificultad);
@@ -136,6 +197,9 @@ export default function QuizHistoriaEspanaPage() {
     if (preguntas.length === 0) return 0;
     return Math.round((aciertos / preguntas.length) * 100);
   }, [aciertos, preguntas.length]);
+  /** «70 %» con espacio duro (regla del 25/09/2026, hallazgo 2123). */
+  const porcentajeTexto = formatPercentage(porcentaje / 100, 0);
+  const acierto = fase === 'respondida' && seleccionada === preguntaActual?.correcta;
 
   const claseOpcion = (opcion: string) => {
     if (fase !== 'respondida') return '';
@@ -151,11 +215,11 @@ export default function QuizHistoriaEspanaPage() {
       <header className={styles.hero}>
         <div className={styles.heroIcon} aria-hidden="true">🏛️</div>
         <h1 className={styles.title}>Quiz Historia de España</h1>
-        <p className={styles.subtitle}>Desde los íberos hasta la Constitución de 1978</p>
+        <p className={styles.subtitle}>Desde los íberos hasta la Constitución de 1978 y la democracia</p>
         <div className={styles.heroBadges}>
-          <span>81 preguntas</span>
+          <span>{PREGUNTAS_HISTORIA.length} preguntas</span>
           <span>3 niveles de dificultad</span>
-          <span>9 épocas históricas</span>
+          <span>{TOTAL_EPOCAS} épocas históricas</span>
         </div>
       </header>
 
@@ -200,8 +264,8 @@ export default function QuizHistoriaEspanaPage() {
               </div>
             </div>
 
-            <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
-              Comenzar quiz ▶
+            <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz} ref={botonComenzarRef}>
+              Comenzar quiz <span aria-hidden="true">▶</span>
             </button>
           </section>
         </div>
@@ -209,12 +273,12 @@ export default function QuizHistoriaEspanaPage() {
 
       {/* FASE JUGANDO / RESPONDIDA */}
       {(fase === 'jugando' || fase === 'respondida') && preguntaActual && (
-        <div className={styles.quizPanel}>
+        <div className={styles.quizPanel} ref={quizPanelRef}>
           {/* Progreso */}
           <div className={styles.progresoBarra}>
             <div className={styles.progresoInfo}>
               <span>Pregunta {indice + 1} de {preguntas.length}</span>
-              <span>{aciertos} correctas</span>
+              <span>{aciertos} {aciertos === 1 ? 'correcta' : 'correctas'}</span>
             </div>
             <div
               className={styles.progresoTrack}
@@ -234,7 +298,8 @@ export default function QuizHistoriaEspanaPage() {
           {/* Pregunta */}
           <div className={styles.preguntaCard}>
             <span className={styles.epocaBadge}>{ETIQUETA_EPOCA[preguntaActual.epoca] ?? preguntaActual.epoca}</span>
-            <p className={styles.preguntaTexto}>{preguntaActual.pregunta}</p>
+            {/* Recibe el foco por programa al empezar y al pasar de pregunta (tabIndex=-1). */}
+            <h2 className={styles.preguntaTexto} ref={enunciadoRef} tabIndex={-1}>{preguntaActual.pregunta}</h2>
           </div>
 
           {/* Opciones */}
@@ -253,31 +318,39 @@ export default function QuizHistoriaEspanaPage() {
             ))}
           </div>
 
-          {/* Feedback */}
+          {/* Feedback — la región viva existe desde el principio (una región que nace ya con
+              contenido no siempre se anuncia) y abarca solo el veredicto y la explicación: el
+              botón queda fuera y los emojis van aria-hidden (hallazgo 2108). */}
+          <div className={styles.feedbackPanel} role="status" aria-live="polite" aria-atomic="true">
+            {fase === 'respondida' && (
+              <>
+                <div className={`${styles.feedbackMensaje} ${acierto ? styles.feedbackOk : styles.feedbackFail}`}>
+                  {acierto ? (
+                    <><span aria-hidden="true">✅</span> ¡Correcto!</>
+                  ) : (
+                    <><span aria-hidden="true">❌</span> Incorrecto. La respuesta correcta es: «{preguntaActual.correcta}»</>
+                  )}
+                </div>
+                {preguntaActual.explicacion && (
+                  <p className={styles.explicacionTexto}>{preguntaActual.explicacion}</p>
+                )}
+              </>
+            )}
+          </div>
           {fase === 'respondida' && (
-            <div className={styles.feedbackPanel} role="alert" aria-live="polite">
-              <div className={`${styles.feedbackMensaje} ${seleccionada === preguntaActual.correcta ? styles.feedbackOk : styles.feedbackFail}`}>
-                {seleccionada === preguntaActual.correcta
-                  ? '✅ ¡Correcto!'
-                  : `❌ Incorrecto. La respuesta correcta es: "${preguntaActual.correcta}"`}
-              </div>
-              {preguntaActual.explicacion && (
-                <p className={styles.explicacionTexto}>{preguntaActual.explicacion}</p>
-              )}
-              <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
-                {indice + 1 < preguntas.length ? 'Siguiente pregunta →' : 'Ver resultado'}
-              </button>
-            </div>
+            <button type="button" className={styles.btnSiguiente} onClick={siguiente} ref={botonSiguienteRef}>
+              {indice + 1 < preguntas.length ? 'Siguiente pregunta →' : 'Ver resultado'}
+            </button>
           )}
         </div>
       )}
 
       {/* FASE FIN */}
       {fase === 'fin' && (
-        <div className={styles.finPanel}>
+        <div className={styles.finPanel} ref={finPanelRef}>
           <div className={styles.medallaIcon} aria-hidden="true">{calcularMedalla(porcentaje)}</div>
-          <h2 className={styles.finTitulo}>{calcularTextoMedalla(porcentaje)}</h2>
-          <p className={styles.finSubtitulo}>{aciertos} de {preguntas.length} preguntas correctas ({porcentaje}%)</p>
+          <h2 className={styles.finTitulo} ref={finTituloRef} tabIndex={-1}>{calcularTextoMedalla(porcentaje)}</h2>
+          <p className={styles.finSubtitulo}>{aciertos} de {preguntas.length} preguntas correctas ({porcentajeTexto})</p>
 
           <div className={styles.statsGrid}>
             <div className={styles.statCard}>
@@ -289,7 +362,7 @@ export default function QuizHistoriaEspanaPage() {
               <span className={styles.statLabel}>Errores</span>
             </div>
             <div className={styles.statCard}>
-              <span className={styles.statValor}>{porcentaje}%</span>
+              <span className={styles.statValor}>{porcentajeTexto}</span>
               <span className={styles.statLabel}>Puntuación</span>
             </div>
             <div className={styles.statCard}>
@@ -356,14 +429,14 @@ export default function QuizHistoriaEspanaPage() {
                   <td>Invasión árabe. Califato de Córdoba. Reconquista cristiana. Batalla de las Navas (1212).</td>
                 </tr>
                 <tr>
-                  <td>Reyes Católicos y Descubrimiento</td>
+                  <td>Reyes Católicos y llegada a América</td>
                   <td>1469 – 1516</td>
-                  <td>Unión de Castilla y Aragón. Expulsión judíos (1492). Descubrimiento de América (1492).</td>
+                  <td>Unión dinástica de Castilla y Aragón. Toma de Granada y expulsión de los judíos (1492). Llegada de Colón a América (1492) e inicio de la conquista y colonización.</td>
                 </tr>
                 <tr>
                   <td>Habsburgos (siglos XVI-XVII)</td>
                   <td>1516 – 1700</td>
-                  <td>Imperio español en su apogeo. Felipe II. Armada Invencible (1588). Siglo de Oro.</td>
+                  <td>Carlos I y Felipe II. Conquista de los imperios azteca e inca. Primera vuelta al mundo (1519-1522). Gran Armada, la «Invencible» (1588). Siglo de Oro.</td>
                 </tr>
                 <tr>
                   <td>Borbones (siglo XVIII)</td>
@@ -373,7 +446,12 @@ export default function QuizHistoriaEspanaPage() {
                 <tr>
                   <td>Siglo XIX</td>
                   <td>1808 – 1902</td>
-                  <td>Guerra de Independencia. Constitución de 1812. Carlismo. Pérdida de colonias (1898).</td>
+                  <td>Guerra de la Independencia. Constitución de 1812. Carlismo. Restauración (1874). Pérdida de Cuba, Puerto Rico y Filipinas (1898).</td>
+                </tr>
+                <tr>
+                  <td>Reinado de Alfonso XIII</td>
+                  <td>1902 – 1931</td>
+                  <td>Semana Trágica (1909). Mancomunitat de Catalunya (1914). Desastre de Annual (1921). Dictadura de Primo de Rivera (1923-1930).</td>
                 </tr>
                 <tr>
                   <td>República y Guerra Civil</td>
@@ -384,6 +462,11 @@ export default function QuizHistoriaEspanaPage() {
                   <td>Franquismo y Transición</td>
                   <td>1939 – 1978</td>
                   <td>Dictadura de Franco. Tecnocracia y desarrollo económico. Transición democrática. Constitución (1978).</td>
+                </tr>
+                <tr>
+                  <td>Democracia</td>
+                  <td>desde 1978</td>
+                  <td>Intento de golpe del 23-F (1981). Ingreso en la CEE (1986). Juegos de Barcelona y Expo de Sevilla (1992). El euro (1999; billetes y monedas en 2002).</td>
                 </tr>
               </tbody>
             </table>
@@ -430,8 +513,8 @@ export default function QuizHistoriaEspanaPage() {
               <p>Período de máximo esplendor cultural y literario de España, aproximadamente entre 1492 y 1681. Abarca desde los Reyes Católicos hasta la muerte de Calderón de la Barca. Cervantes, Lope de Vega, Velázquez y Quevedo son sus máximos representantes.</p>
             </div>
             <div className={styles.faqItem}>
-              <h3>¿Por qué España perdió sus colonias en 1898?</h3>
-              <p>La guerra hispano-estadounidense (1898) culminó con el Tratado de París, por el que España cedió Cuba, Puerto Rico, Guam y Filipinas a EEUU. El desastre del 98 marcó el fin del Imperio español y generó una profunda crisis de identidad nacional.</p>
+              <h3>¿Qué perdió España en 1898?</h3>
+              <p>Tras la guerra de independencia cubana (desde 1895) y la intervención de Estados Unidos, el Tratado de París (10/12/1898) obligó a España a renunciar a la soberanía sobre Cuba y a ceder a Estados Unidos Puerto Rico, Guam y Filipinas. Al año siguiente vendió a Alemania las Carolinas, las Marianas y Palaos, y conservó territorios en África hasta el siglo XX. El «Desastre del 98» abrió una profunda crisis política e intelectual.</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué fue la Transición española?</h3>
@@ -458,7 +541,7 @@ export default function QuizHistoriaEspanaPage() {
               { n: '3', titulo: 'Usa mapas históricos', desc: 'Los mapas de la Reconquista, el Imperio español o la Guerra Civil ayudan a visualizar procesos que son difíciles de entender solo con texto.' },
               { n: '4', titulo: 'Repasa con preguntas tipo test', desc: 'El test es la forma más eficiente de detectar lagunas. Haz tests como este después de estudiar cada época para afianzar lo aprendido.' },
               { n: '5', titulo: 'Lee comentarios de textos históricos', desc: 'Para Selectividad y oposiciones, practica el comentario de fuentes primarias (discursos, leyes, proclamas). Es una habilidad diferente a memorizar.' },
-              { n: '6', titulo: 'Relaciona épocas entre sí', desc: 'La historia no son compartimentos estancos. Entender cómo el Siglo de Oro alimenta la decadencia posterior o cómo el 98 lleva a la II República te da una visión global.' },
+              { n: '6', titulo: 'Relaciona épocas entre sí', desc: 'La historia no son compartimentos estancos. Ver cómo la crisis del 98 alimenta el regeneracionismo, o cómo la crisis de la Restauración desemboca en la dictadura de Primo de Rivera y la II República, te da una visión global.' },
             ].map(s => (
               <div key={s.n} className={styles.stepCard}>
                 <div className={styles.stepNum} aria-hidden="true">{s.n}</div>
@@ -475,11 +558,11 @@ export default function QuizHistoriaEspanaPage() {
           <div className={styles.tipsGrid}>
             {[
               { icon: '🏺', titulo: 'Los íberos no eran un pueblo único', desc: 'Los "íberos" era el nombre que los griegos y romanos daban a los pueblos de la costa mediterránea. En realidad eran grupos distintos con lenguas y culturas propias.' },
-              { icon: '🕌', titulo: 'Córdoba, la ciudad más grande de Europa', desc: 'En el siglo X, el Califato de Córdoba era una de las ciudades más populosas y avanzadas del mundo, con alumbrado público y más de 70 bibliotecas.' },
-              { icon: '⛵', titulo: 'La Armada Invencible nunca fue llamada así', desc: 'El nombre "Invencible" fue una ironía posterior a su derrota. Oficialmente se llamaba "Grande y Felicísima Armada". Su fracaso en 1588 aceleró el declive español.' },
+              { icon: '🕌', titulo: 'Córdoba, una de las grandes ciudades de Europa', desc: 'En el siglo X, Córdoba, capital del Califato, fue una de las ciudades más populosas del mundo. Las crónicas de la época le atribuyen calles iluminadas y numerosas bibliotecas, aunque sus cifras exactas se discuten.' },
+              { icon: '⛵', titulo: 'La Armada «Invencible» no se llamaba así', desc: 'Su nombre oficial era "Grande y Felicísima Armada" y los historiadores suelen llamarla Gran Armada. El sobrenombre de "Invencible" se popularizó después, con ironía, tras su fracaso en 1588.' },
               { icon: '📜', titulo: 'La Constitución de Cádiz (1812)', desc: 'Conocida como "La Pepa" (promulgada el 19 de marzo, día de San José), fue una de las más liberales de su tiempo. Sin embargo, Fernando VII la abolió en 1814.' },
               { icon: '🎭', titulo: 'Picasso pintó el Guernica pensando en España', desc: 'Picasso pintó el Guernica en 1937 como respuesta al bombardeo de la ciudad vasca durante la Guerra Civil. La obra permaneció fuera de España hasta 1981.' },
-              { icon: '🗳️', titulo: 'El referéndum de 1978', desc: 'La Constitución de 1978 fue aprobada en referéndum con el 87,9% de votos afirmativos y una participación del 67,1%. Fue el acto fundacional de la democracia española moderna.' },
+              { icon: '🗳️', titulo: 'El referéndum de 1978', desc: `La Constitución de 1978 fue aprobada en referéndum el 6 de diciembre con el ${formatPercentage(0.879, 1)} de votos afirmativos y una participación del ${formatPercentage(0.671, 1)}. Es la norma fundamental de la democracia española actual.` },
             ].map(t => (
               <div key={t.icon} className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">{t.icon}</span>
@@ -497,7 +580,7 @@ export default function QuizHistoriaEspanaPage() {
             {[
               { titulo: 'Las preguntas cubren hechos históricos verificables', desc: 'Todas las preguntas están basadas en hechos históricos contrastados y fuentes académicas. Se han evitado preguntas de interpretación o valoración ideológica.' },
               { titulo: 'La historia es compleja y tiene matices', desc: 'Por razones de formato (test de 4 opciones), las respuestas son simplificaciones. La historia real tiene más matices, causas múltiples y debates historiográficos.' },
-              { titulo: 'El período cubierto llega hasta 1978', desc: 'Este quiz cubre desde la época prerromana hasta la Constitución de 1978. La historia más reciente (democracia, integración europea, etc.) no está incluida.' },
+              { titulo: 'El grueso del quiz llega hasta 1978', desc: 'La mayoría de las preguntas cubren desde la época prerromana hasta la Constitución de 1978. Un bloque breve, «Democracia (desde 1978)», repasa algunos hitos posteriores (23-F, ingreso en la CEE, 1992, el euro), pero no es un repaso completo de la historia reciente.' },
               { titulo: 'Para estudio oficial, consulta fuentes académicas', desc: 'Para oposiciones o Selectividad, complementa este quiz con los temarios oficiales y libros de texto aprobados por las autoridades educativas.' },
             ].map(w => (
               <div key={w.titulo} className={styles.warningItem}>
