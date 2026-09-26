@@ -54,7 +54,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son los componentes principales de la sangre?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La sangre humana se compone de cuatro elementos principales: plasma (55% del volumen, líquido amarillento con agua, proteínas, glucosa, hormonas y electrolitos), glóbulos rojos o eritrocitos (el 45% restante, transportan oxígeno mediante hemoglobina), glóbulos blancos o leucocitos (defienden el organismo frente a infecciones, representan menos del 1%) y plaquetas o trombocitos (fragmentos celulares esenciales para la coagulación). Si se centrifuga una muestra, estas capas quedan visibles en el tubo.',
+        text: 'La sangre humana se compone de cuatro elementos principales: plasma (5 % del volumen, líquido amarillento con agua, proteínas, glucosa, hormonas y electrolitos), glóbulos rojos o eritrocitos (el 4 % restante, transportan oxígeno mediante hemoglobina), glóbulos blancos o leucocitos (defienden el organismo frente a infecciones, representan menos del  %) y plaquetas o trombocitos (fragmentos celulares esenciales para la coagulación). Si se centrifuga una muestra, estas capas quedan visibles en el tubo.',
       },
     },
     {
@@ -62,7 +62,7 @@ export const faqJsonLd = {
       name: '¿Cómo funciona el sistema de grupos sanguíneos ABO y Rh?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El sistema ABO clasifica la sangre según los antígenos presentes en la superficie de los glóbulos rojos: tipo A (antígeno A), tipo B (antígeno B), tipo AB (ambos antígenos, receptor universal) y tipo O (ninguno, donante universal de eritrocitos). El factor Rh añade una segunda capa: si se tiene el antígeno D eres Rh positivo; si no, Rh negativo. Recibir sangre de un grupo incompatible puede desencadenar una reacción hemolítica potencialmente mortal, de ahí la importancia del tipaje antes de una transfusión.',
+        text: 'El sistema ABO clasifica la sangre según los antígenos presentes en la superficie de los glóbulos rojos: tipo A (antígeno A), tipo B (antígeno B), tipo AB (ambos antígenos, receptor universal de glóbulos rojos) y tipo O (ninguno, donante universal de glóbulos rojos). Con el plasma ocurre al revés: el donante universal de plasma es el AB. El factor Rh añade una segunda capa: si se tiene el antígeno D eres Rh positivo; si no, Rh negativo. Recibir sangre de un grupo incompatible puede desencadenar una reacción hemolítica potencialmente mortal, de ahí la importancia del tipaje antes de una transfusión.',
       },
     },
     {
@@ -78,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Qué valores de un análisis de sangre se consideran normales?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los valores de referencia habituales en adultos son: hemoglobina 12-16 g/dL (mujeres) y 13,5-17,5 g/dL (hombres), hematocrito 36-46% (mujeres) y 41-53% (hombres), leucocitos 4.500-11.000/µL, plaquetas 150.000-400.000/µL y glucosa en ayunas 70-100 mg/dL. Estos rangos varían según el laboratorio, la edad y otros factores; un resultado fuera de rango requiere valoración médica contextualizada, no interpretación aislada.',
+        text: 'Cada laboratorio fija sus propios intervalos, pero hay límites de referencia publicados. La OMS (2024) habla de anemia con una hemoglobina por debajo de 12 g/dL en mujeres no embarazadas y de 13 g/dL en hombres. Como orientación, los leucocitos suelen estar entre 4.500 y 11.000/µL y las plaquetas entre 150.000 y 400.000/µL, y la American Diabetes Association considera normal una glucosa en ayunas por debajo de 100 mg/dL (de 100 a 125, prediabetes; desde 126, confirmado, diabetes). Un resultado fuera de rango lo interpreta un profesional sanitario en su contexto, no de forma aislada.',
       },
     },
     {

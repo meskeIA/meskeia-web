@@ -67,8 +67,9 @@ import { test, expect, Page, Locator } from '@playwright/test';
  *     h) «España necesita unas 9.000 donaciones diarias»: Ministerio de Sanidad (nota del
  *        14/06/2026): 1.662.035 donaciones de sangre y componentes en 2025, ≈ 4.550 al día.
  *
- *   Los hallazgos abiertos van con test.fail(): el fichero pasa en verde hoy y avisa cuando se
- *   reparen. Cada uno se comprobó, sin la marca, fallando por el motivo que describe.
+ *   Los hallazgos 1964-1977 se repararon el 26/09/2026 y se les retiró el test.fail(). Donde el
+ *   caso comprobaba además «lo que había» (la cifra o el texto defectuosos), esa línea se quitó:
+ *   consagraba el defecto.
  */
 
 const RUTA = '/visualizador-sangre-componentes/';
@@ -214,106 +215,111 @@ test('CASO 3a: ninguna combinación incompatible sale como compatible', async ({
   await expect(celda('AB-', 'A-')).toHaveText('❌');
 });
 
-test.describe('CASO 3 · hallazgos de contenido abiertos', () => {
+test.describe('CASO 3 · hallazgos de contenido (reparados el 26/09/2026)', () => {
   test('b) «donante universal» sin decir que es de hematíes (sospecha confirmada)', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:480-481 y 487-488 (destacados), :262 («O- es oro líquido… el
-    // único grupo compatible con TODOS») y :452 (título de la cuadrícula). Para plasma el
-    // donante universal es AB y el plasma O solo sirve a receptores O (NHS Blood and Transplant).
-    // ENTRADA pestaña Grupos → ESPERADO el destacado de O- y el título de la cuadrícula acotan a
-    // hematíes / glóbulos rojos · OBTENIDO «Compatible con TODOS los grupos» sin acotar.
-    test.fail();
+    // HALLAZGO 1964 (reparado): los destacados, el dato «O- es oro líquido» y el título de la
+    // cuadrícula no decían que valen para hematíes. Para plasma el donante universal es AB y el
+    // plasma O solo sirve a receptores O (NHS Blood and Transplant).
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await irASeccion(page, 'Grupos sanguíneos');
     const destacadoO = page.locator('[class*="destacadoCard"]').filter({ hasText: 'Donante universal' });
     await expect(destacadoO).toContainText(/hemat|glóbulos rojos|eritrocitos/i);
     await expect(page.getByRole('heading', { name: /Compatibilidad/ })).toContainText(/hemat|glóbulos rojos|eritrocitos/i);
+    // Y el plasma, dicho al revés: AB es el donante universal de plasma.
+    await expect(page.getByText('Con el plasma es al revés.')).toBeVisible();
+    await expect(page.locator('[class*="insight"]').filter({ hasText: 'plasma' }).first()).toContainText('donante universal de plasma es el AB');
   });
 
   test('c) la hemoglobina de referencia distingue hombres y mujeres', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:236-238. «12-16 g/dL» es el rango de la mujer; OMS 2024: anemia
-    // en hombres por debajo de 13 g/dL. ENTRADA hombre con Hb 12,5 g/dL → ESPERADO fuera de
-    // rango (anemia) · OBTENIDO dentro de «12-16 g/dL», presentado como «valores normales … en
-    // adultos».
-    test.fail();
+    // HALLAZGO 1965 (reparado): «12-16 g/dL» era el rango de la mujer; OMS 2024: anemia en
+    // hombres por debajo de 13 g/dL. Un hombre con Hb 12,5 g/dL ya no cae dentro de la
+    // referencia: la de hombres empieza en 13. Lo mismo para hematocrito y eritrocitos.
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await irASeccion(page, 'Datos y análisis');
-    const fila = page.locator('table[class*="tablaValores"] tbody tr').filter({ hasText: 'Hemoglobina' });
-    await expect(fila.locator('td').nth(1)).toHaveText('12-16 g/dL'); // lo que hay hoy
-    await expect(fila).toContainText(/hombre|varón|mujer/i);
+    const filas = page.locator('table[class*="tablaValores"] tbody tr');
+    const hb = filas.filter({ hasText: 'Hemoglobina' }).locator('td').nth(1);
+    await expect(hb).toContainText('Mujeres: 12 g/dL o más');
+    await expect(hb).toContainText('Hombres: 13 g/dL o más');
+    await expect(hb).toContainText('OMS');
+    for (const parametro of ['Hematocrito', 'Eritrocitos']) {
+      // Se filtra por la PRIMERA celda: «eritrocitos» sale también en «Qué mide» de otras filas.
+      const fila = filas.filter({ has: page.locator('td:first-child', { hasText: parametro }) });
+      await expect(fila).toContainText(/Mujeres.*Hombres/);
+    }
   });
 
   test('d) glucosa en ayunas de 126 mg/dL cae en el tramo de diabetes', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:241 y :683. ADA 2026: diabetes ≥ 126 mg/dL, prediabetes
-    // 100-125. ENTRADA 126 mg/dL → ESPERADO «diabetes» · OBTENIDO fuera de los dos tramos
-    // («prediabetes (100-125) o diabetes (>126 …)»).
-    test.fail();
+    // HALLAZGO 1969 (reparado): ADA 2026, diabetes ≥ 126 mg/dL y prediabetes 100-125. Decía
+    // «diabetes (>126 …)», y 126 no caía en ningún tramo; la tabla daba «70-100» como normal.
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await irASeccion(page, 'Datos y análisis');
     const tarjeta = page.locator('[class*="condicionCard"]').filter({ hasText: 'Hiperglucemia' });
-    await expect(tarjeta).toContainText('>126'); // lo que hay hoy
+    await expect(tarjeta).not.toContainText('>126');
     await expect(tarjeta).toContainText(/≥\s?126|126 o más|126 mg\/dL o más/);
+    const fila = page.locator('table[class*="tablaValores"] tbody tr').filter({ hasText: 'Glucosa' });
+    await expect(fila.locator('td').nth(1)).toContainText('70-99 mg/dL');
   });
 
   test('e) Sintrom es acenocumarol, no warfarina', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:219. CIMA-AEMPS: SINTROM 1 mg y 4 mg, principio activo
-    // acenocumarol; la warfarina es ALDOCUMAR. ENTRADA pestaña Coagulación → ESPERADO «Sintrom»
-    // junto a «acenocumarol» · OBTENIDO «Warfarina (Sintrom)».
-    test.fail();
+    // HALLAZGO 1966 (reparado): CIMA-AEMPS, SINTROM 1 mg y 4 mg, principio activo
+    // acenocumarol; la warfarina es ALDOCUMAR. Ponía «Warfarina (Sintrom)».
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await irASeccion(page, 'Coagulación');
     const tarjeta = page.locator('[class*="anticoagCard"]').filter({ hasText: 'Sintrom' });
-    await expect(tarjeta).toContainText(/acenocumarol/i);
+    await expect(tarjeta).toContainText(/acenocumarol \(Sintrom\)/i);
+    await expect(tarjeta).toContainText(/warfarina \(Aldocumar\)/i);
+    await expect(page.getByText('Warfarina (Sintrom)')).toHaveCount(0);
   });
 
   test('f) la aspirina no se presenta como anticoagulante de la cascada', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:220 y :604. ATC B01AC06 «Platelet aggregation inhibitors excl.
-    // heparin». ENTRADA pestaña Coagulación → ESPERADO la tarjeta de la aspirina la llama
-    // antiagregante · OBTENIDO bajo «Anticoagulantes: frenando la cascada», sin esa palabra.
-    test.fail();
+    // HALLAZGO 1970 (reparado): ATC B01AC06 «Platelet aggregation inhibitors excl. heparin».
+    // La aspirina estaba bajo «Anticoagulantes: frenando la cascada»; ahora tiene su propio
+    // bloque de antiagregantes, y el de anticoagulantes ya no la incluye.
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await irASeccion(page, 'Coagulación');
-    await expect(page.getByRole('heading', { name: 'Anticoagulantes: frenando la cascada' })).toBeVisible();
-    const tarjeta = page.locator('[class*="anticoagCard"]').filter({ hasText: 'Aspirina' });
+    const tarjeta = page.locator('[class*="anticoagCard"]').filter({ hasText: /aspirina/i });
     await expect(tarjeta).toContainText(/antiagregante/i);
+    const bloqueAnticoag = page
+      .getByRole('heading', { name: 'Anticoagulantes: frenando la cascada' })
+      .locator('xpath=following-sibling::div[1]');
+    await expect(bloqueAnticoag).not.toContainText(/aspirina/i);
+    await expect(page.getByRole('heading', { name: /Antiagregantes/ })).toBeVisible();
   });
 
   test('g) la médula produce más de 50.000 millones de leucocitos al día', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:702. Summers et al. 2010: solo de neutrófilos, 5 × 10¹⁰ a
-    // 10 × 10¹⁰ al día. ENTRADA pestaña Datos → ESPERADO ≥ 50.000 millones · OBTENIDO 10.000.
-    test.fail();
+    // HALLAZGO 1971 (reparado): Summers et al. 2010, solo de neutrófilos 5 × 10¹⁰ a 10 × 10¹⁰
+    // al día. Decía «10.000 millones de leucocitos»; ahora da el intervalo de neutrófilos.
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await irASeccion(page, 'Datos y análisis');
     const texto = await page.locator('[class*="insight"]').last().innerText();
-    const m = texto.match(/([\d.]+)(?:,\d+)? millones de leucocitos/);
-    const millones = Number((m?.[1] ?? '0').replace(/\./g, ''));
-    expect(millones).toBe(10000); // lo que hay hoy (sin los «,00»)
-    expect(millones).toBeGreaterThanOrEqual(50000);
+    const m = texto.match(/entre ([\d.]+) y ([\d.]+) millones de neutrófilos/);
+    expect(m, texto).not.toBeNull();
+    const desde = Number((m?.[1] ?? '0').replace(/\./g, ''));
+    expect(desde).toBeGreaterThanOrEqual(50000);
+    expect(texto).not.toContain('10.000 millones de leucocitos');
   });
 
   test('h) las donaciones diarias en España rondan 4.550, no 9.000', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:773 (bloque educativo). Ministerio de Sanidad, nota del
-    // 14/06/2026: 1.662.035 donaciones en 2025 → 1.662.035 / 365 ≈ 4.553 al día.
-    // ENTRADA desplegar la guía → ESPERADO del orden de 4.500 al día · OBTENIDO «9.000».
-    test.fail();
+    // HALLAZGO 1972 (reparado): Ministerio de Sanidad, nota del 14/06/2026: 1.662.035
+    // donaciones en 2025 → 1.662.035 / 365 ≈ 4.553 al día. Decía «unas 9.000 diarias».
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    const parrafo = page.locator('[class*="guideSection"] p').filter({ hasText: 'donaciones diarias' });
-    await expect(parrafo).toContainText('unas 9.000 donaciones diarias'); // lo que hay hoy
-    await expect(parrafo).not.toContainText('9.000 donaciones diarias');
+    const parrafo = page.locator('[class*="guideSection"] p').filter({ hasText: 'donaciones de sangre y componentes' });
+    await expect(parrafo).toContainText('1.662.035');
+    await expect(parrafo).toContainText('unas 4550 al día'); // 4 cifras: sin punto (RAE, §2)
+    await expect(page.locator('[class*="guideSection"]')).not.toContainText('9.000');
   });
 
   test('i) un recuento de células no lleva decimales', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:673, :678 y :702 llaman a formatNumber() con su valor por
-    // defecto de 2 decimales. ENTRADA pestaña Datos → ESPERADO «11.000», «150.000»,
-    // «200.000 millones» · OBTENIDO «11.000,00», «150.000,00», «200.000,00 millones».
-    test.fail();
+    // HALLAZGO 1973 (reparado): formatNumber() con su valor por defecto de 2 decimales daba
+    // «11.000,00», «150.000,00» y «200.000,00 millones». Ahora se le pasan 0 decimales.
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await irASeccion(page, 'Datos y análisis');
@@ -323,31 +329,34 @@ test.describe('CASO 3 · hallazgos de contenido abiertos', () => {
   });
 
   test('j) el porcentaje va separado con espacio duro', async ({ page }) => {
-    // HALLAZGO ABIERTO: regla del CLAUDE.md global §2 (25/09/2026): «15 %» con U+00A0.
-    // page.tsx:58 y :360 («55%» pegado) y :653 («36-48 %» con espacio normal U+0020).
-    // ENTRADA pestañas Composición y Datos → ESPERADO «55 %» y «36-48 %» con U+00A0 ·
-    // OBTENIDO «55%» y «36-48 %» con U+0020.
-    test.fail();
+    // HALLAZGO 1974 (reparado): regla del CLAUDE.md global §2 (25/09/2026): «15 %» con U+00A0.
+    // El hematocrito ya no es «36-48 %» (hallazgo 1965: va por sexo), así que se mira su
+    // porcentaje nuevo, y además que no quede ningún «%» pegado ni con espacio normal.
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     const pctPlasma = await page.locator('span[class*="componentePct"]').first().textContent();
-    expect(pctPlasma).toBe('55 %');
+    expect(pctPlasma).toBe('55\u00a0%');
+    const pegados = async () =>
+      // innerText: solo el texto visible (textContent traería también los <script> de Next).
+      page.evaluate(() => document.body.innerText.match(/\d[ ]?%/g) ?? []);
+    expect(await pegados()).toEqual([]);
     await irASeccion(page, 'Datos y análisis');
     const hto = await page.locator('table[class*="tablaValores"] tbody tr').filter({ hasText: 'Hematocrito' }).locator('td').nth(1).textContent();
-    expect(hto).toBe('36-48 %');
+    expect(hto).toContain('37\u00a0%');
+    expect(await pegados()).toEqual([]);
   });
 
   test('k) riesgo 2: aviso sanitario visible y no colapsable sin desplegar nada', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:2 `// @disclaimer: exempt` en una app de la suite salud que
-    // enseña los «valores normales» de un análisis con su columna «Alerta» («Alta → diabetes»).
+    // HALLAZGO 1967 (reparado): la app iba `// @disclaimer: exempt` en la suite salud.
     // _private/DISCLAIMER-POLICY.md: salud → nivel 2, DisclaimerCard severity="high" no
-    // colapsable (precedente: hallazgo 1358 de visualizador-ciclo-viral). ENTRADA cargar la
-    // página → ESPERADO un DisclaimerCard visible · OBTENIDO 0.
-    test.fail();
+    // colapsable (precedente: hallazgo 1358 de visualizador-ciclo-viral).
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     const aviso = page.locator('[class*="disclaimerCard"]').first();
     await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('profesional sanitario');
+    // No colapsable: no hay botón que lo pliegue.
+    await expect(aviso.locator('button[aria-expanded]')).toHaveCount(0);
   });
 });
 
@@ -357,14 +366,14 @@ test.describe('CASO 3 · hallazgos de contenido abiertos', () => {
 
 test.describe('Accesibilidad y presentación', () => {
   test('l) contraste ≥ 4,5:1 del texto propio de la app, en claro y en oscuro', async ({ page }) => {
-    // HALLAZGO ABIERTO. Medido con getComputedStyle sobre el fondo real (25/09/2026), claro/oscuro:
+    // HALLAZGO 1968 (reparado). Medido con getComputedStyle sobre el fondo real (25/09/2026), claro/oscuro:
     //   «55%» #f0c040 sobre blanco 1,70 · «<1%» #95a5a6 2,56 · «<1%» #e67e22 2,85 · «~45%» #e74c3c
     //   3,82/3,76 (page.tsx:360, color en línea) · «Paso N» blanco sobre el color del paso
     //   2,19-4,11 (:574) · % de leucocitos y de la distribución, y nombres de los fármacos, en
     //   #2E86AB 4,11/3,50 (.barraPct, .distPct, .anticoagNombre) · pestaña activa y grupo
     //   activo blanco sobre #2E86AB 4,11 · títulos de los avisos rojos #e74c3c 3,40/4,31.
-    // ESPERADO ninguno por debajo de 4,5 · OBTENIDO la lista de arriba.
-    test.fail();
+    // ESPERADO ninguno por debajo de 4,5. Reparado con --primary-texto / --primary-boton, el
+    // porcentaje de las tarjetas en --text-primary y los avisos en --rojo-texto.
     test.setTimeout(90_000);
     await irAlVisualizador(page);
     await page.addStyleTag({ content: '*,*::before,*::after{transition:none!important}' });
@@ -428,37 +437,41 @@ test.describe('Accesibilidad y presentación', () => {
   });
 
   test('m) las capas del tubo y los pasos de la cascada responden a Enter', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:287-318 y :539-549. <rect>/<circle> con role="button" y
-    // tabIndex={0} pero sin onKeyDown: se enfocan con Tab y Enter no hace nada.
-    // ENTRADA foco en «Plasma: 55% del volumen» + Enter → ESPERADO la tarjeta Plasma
-    // desplegada · OBTENIDO aria-expanded="false" (con el ratón sí se despliega).
-    test.fail();
+    // HALLAZGO 1975 (reparado): <rect>/<circle> con role="button" y tabIndex={0} pero sin
+    // onKeyDown: se enfocaban con Tab y Enter no hacía nada.
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     const tarjetaPlasma = page.locator('button[class*="componenteCard"]').first();
     await page.locator('rect[role="button"][aria-label^="Plasma"]').focus();
     await page.keyboard.press('Enter');
     await expect(tarjetaPlasma).toHaveAttribute('aria-expanded', 'true');
+    await page.keyboard.press('Space');
+    await expect(tarjetaPlasma).toHaveAttribute('aria-expanded', 'false');
+    // El círculo del paso 4 + Enter lleva a «4 / 7».
+    await irASeccion(page, 'Coagulación');
+    await page.locator('circle[role="button"][aria-label^="Paso 4"]').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[class*="pasoIndicador"]')).toHaveText('4 / 7');
   });
 
   test('n) la cuadrícula de compatibilidad se expone como tabla', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:453-474. <div>s sin role: el árbol de accesibilidad la da como
-    // UN solo texto «D↓ / R→ O- O+ … ✅ ✅ …» y los aria-label de las celdas (div genérico) no
-    // llegan. ENTRADA ariaSnapshot de la cuadrícula → ESPERADO table/grid con celdas ·
-    // OBTENIDO un único nodo «text».
-    test.fail();
+    // HALLAZGO 1976 (reparado): <div>s sin role, que el árbol de accesibilidad daba como UN
+    // solo texto. Ahora son una tabla ARIA con cabeceras de fila (donante) y columna (receptor).
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await irASeccion(page, 'Grupos sanguíneos');
     const snap = await page.locator('[class*="compatGrid"]').ariaSnapshot();
-    expect(snap).toMatch(/- (table|grid)\b/);
+    // La raíz sale entre comillas simples porque su nombre lleva «:» («- 'table "…"':»).
+    expect(snap).toMatch(/^- '?(table|grid)\b/);
+    const tabla = page.getByRole('table', { name: /Compatibilidad de glóbulos rojos/ });
+    await expect(tabla.getByRole('row')).toHaveCount(9);
+    await expect(tabla.getByRole('rowheader', { name: 'Donante A+' })).toBeVisible();
+    await expect(tabla.getByRole('cell', { name: 'O- dona a A+: sí' })).toBeVisible();
   });
 
   test('ñ) la etiqueta «Buffy coat <1%» cabe dentro del dibujo del tubo', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:325. El <text> empieza en x = 168 de un viewBox de 200 de
-    // ancho y mide ~54: el SVG recorta lo que pasa de 200. ENTRADA pestaña Composición →
-    // ESPERADO el final del texto ≤ 200 · OBTENIDO ≈ 222 (se lee «Buffy co…»).
-    test.fail();
+    // HALLAZGO 1977 (reparado): el <text> empezaba en x = 168 de un viewBox de 200 de ancho y
+    // medía ~54, así que el SVG recortaba «<1 %». Ahora va en dos líneas desde x = 153.
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     const medida = await page

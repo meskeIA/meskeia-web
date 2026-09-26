@@ -1,14 +1,16 @@
+/* La marca NO se redeclara aquí: el texto de marca usa --primary-texto y los fondos con texto
+   blanco --primary-boton, de globals.css, que valen en los dos temas (hallazgo 1968). */
 .container {
-  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
   --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #6E6E6E;
-  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --verde: #27ae60;
+  --border: #E5E5E5; --hover: #F5F5F5; --rojo: #e74c3c; --rojo-texto: #B03A2E; --verde: #27ae60;
   --radius: 12px; --radius-large: 16px;
   --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
   max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
   background: var(--bg-primary); min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
-[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #9B9B9B; --border: #404040; --hover: #333333; }
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #9B9B9B; --border: #404040; --hover: #333333; --rojo-texto: #F1948A; }
 .hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: var(--hero-bg); border-radius: var(--radius-large); color: white; }
 .title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
 .subtitle { font-size: 1.1rem; opacity: 0.92; }
@@ -16,10 +18,10 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -54,7 +56,7 @@
 .componenteIcono { font-size: 1.5rem; }
 .componenteNombre { font-size: 1rem; font-weight: 700; display: block; }
 .componenteCientifico { font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
-.componentePct { margin-left: auto; font-size: 1.1rem; font-weight: 800; }
+.componentePct { margin-left: auto; font-size: 1.1rem; font-weight: 800; color: var(--text-primary); }
 
 .componenteDetalle { margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border); }
 .componenteMeta { display: flex; gap: var(--spacing-lg); font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--spacing-sm); flex-wrap: wrap; }
@@ -67,7 +69,7 @@
 .barraGrupo { display: flex; flex-direction: column; gap: 0.2rem; }
 .barraLabelZona { display: flex; justify-content: space-between; align-items: center; }
 .barraLabel { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); }
-.barraPct { font-size: 0.82rem; font-weight: 600; color: var(--primary); }
+.barraPct { font-size: 0.82rem; font-weight: 600; color: var(--primary-texto); }
 .barraTrack { width: 100%; height: 22px; background: var(--border); border-radius: 6px; overflow: hidden; }
 .barraFill { height: 100%; border-radius: 6px; transition: width 0.4s; }
 .barraDesc { font-size: 0.78rem; color: var(--text-muted); margin: 0; line-height: 1.3; }
@@ -81,9 +83,9 @@
 .filaActiva td { background: rgba(46, 134, 171, 0.08); }
 
 .grupoBtn { background: var(--bg-primary); border: 2px solid var(--border); border-radius: 8px; padding: 0.3rem 0.6rem; font-weight: 800; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; color: var(--text-primary); }
-.grupoBtn:hover { border-color: var(--primary); color: var(--primary); }
+.grupoBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .grupoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.grupoBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.grupoBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 
 /* ─── Grid de compatibilidad ─── */
 .compatGrid { display: flex; flex-direction: column; margin-bottom: var(--spacing-xl); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg-card); font-size: 0.78rem; }
@@ -108,7 +110,7 @@
 .distGrupo { display: flex; flex-direction: column; gap: 0.15rem; }
 .distLabel { display: flex; justify-content: space-between; align-items: center; }
 .distGrupoNombre { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
-.distPct { font-size: 0.82rem; font-weight: 600; color: var(--primary); }
+.distPct { font-size: 0.82rem; font-weight: 600; color: var(--primary-texto); }
 
 /* ─── Cascada de coagulación SVG ─── */
 .cascadaZona { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg) var(--spacing-sm); margin-bottom: var(--spacing-lg); overflow-x: auto; }
@@ -120,21 +122,21 @@
 /* ─── Detalle paso coagulación ─── */
 .pasoDetalle { background: var(--bg-card); border: 1px solid var(--border); border-left: 5px solid; border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md); }
 .pasoHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); flex-wrap: wrap; }
-.pasoNumero { background: var(--primary); color: white; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 20px; white-space: nowrap; }
+.pasoNumero { background: var(--primary-boton); color: white; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 20px; white-space: nowrap; }
 .pasoTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 .pasoDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
 .pasoNav { display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
 .pasoIndicador { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
 
 .btnSecondary { background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; padding: 0.4rem 1rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; color: var(--text-primary); }
-.btnSecondary:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.btnSecondary:hover:not(:disabled) { border-color: var(--primary); color: var(--primary-texto); }
 .btnSecondary:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btnSecondary:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ─── Anticoagulantes ─── */
 .anticoagGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .anticoagCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); }
-.anticoagNombre { font-size: 0.9rem; color: var(--primary); display: block; margin-bottom: 0.3rem; }
+.anticoagNombre { font-size: 0.9rem; color: var(--primary-texto); display: block; margin-bottom: 0.3rem; }
 .anticoagMecanismo { font-size: 0.82rem; color: var(--text-primary); line-height: 1.4; margin: 0 0 0.3rem 0; }
 .anticoagUso { font-size: 0.78rem; color: var(--text-muted); margin: 0; line-height: 1.3; }
 
@@ -144,7 +146,8 @@
 .tablaValores th { background: var(--primary-boton); color: white; padding: var(--spacing-sm) var(--spacing-md); text-align: left; font-weight: 600; white-space: nowrap; }
 .tablaValores td { padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--border); color: var(--text-primary); }
 .tablaValores tr:last-child td { border-bottom: none; }
-.valorRango { font-weight: 700; color: var(--primary); white-space: nowrap; }
+.valorRango { font-weight: 700; color: var(--primary-texto); }
+.fuenteNota { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin: calc(-1 * var(--spacing-lg)) 0 var(--spacing-xl) 0; }
 .valorAlerta { font-size: 0.8rem; color: var(--text-secondary); }
 
 /* ─── Condiciones comunes ─── */
@@ -166,7 +169,7 @@
 .insight p { margin: 0; }
 
 .warningBox { background: rgba(231, 76, 60, 0.06); border: 1px solid rgba(231, 76, 60, 0.2); border-left: 4px solid var(--rojo); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-xl); color: var(--text-primary); font-size: 0.88rem; line-height: 1.5; }
-.warningBox strong { display: block; color: var(--rojo); margin-bottom: 0.3rem; }
+.warningBox strong { display: block; color: var(--rojo-texto); margin-bottom: 0.3rem; }
 .warningBox p { margin: 0; }
 
 /* ─── Educativo ─── */
@@ -200,6 +203,7 @@
 }
 
 /* ─── Accesibilidad ─── */
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @media (prefers-reduced-motion: reduce) {
   .barraFill, .cascadaCircle, .componenteCard, .navBtn, .grupoBtn, .btnSecondary, .tuboCapaClick {
     transition: none;
