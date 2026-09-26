@@ -160,7 +160,10 @@ function construirResultado(estimacion: EstimacionBVD): Resultado {
   }
 
   if (gradoMaximo === 3) {
-    descripcion += ` El Grado III no es ya el último escalón: el RDL 17/2026 creó el ${GRADO_III_PLUS.nombre}, cuyos criterios de valoración están pendientes de desarrollo reglamentario, así que este orientador no puede estimarlo.`;
+    // DA 17.ª de la Ley 39/2006, añadida por el RDL 11/2025 (BOE-A-2025-21205), en vigor desde
+    // el 23/10/2025. El III+ no sale del baremo: se reconoce a quien YA tiene el Grado III y un
+    // diagnóstico de ELA avanzada u otra enfermedad de alta complejidad y curso irreversible.
+    descripcion += ` El Grado III no es ya el último escalón: existe el ${GRADO_III_PLUS.nombre}, que no se obtiene con la puntuación del baremo sino que se reconoce a personas con Grado III diagnosticadas de ELA en fase avanzada u otras enfermedades de alta complejidad y curso irreversible (disposición adicional 17.ª de la Ley 39/2006). Este orientador no puede estimarlo.`;
   }
 
   return { estimacion, gradoContenido: gradoMaximo, enLimite, titulo, puntuacionTexto, descripcion };
@@ -389,7 +392,7 @@ export default function OrientadorGradoDependencia() {
           <li><strong>Grado I — Dependencia moderada</strong> (25 a 49 puntos BVD): la persona necesita ayuda para realizar varias actividades básicas al menos una vez al día, o tiene necesidades de apoyo intermitente o limitado.</li>
           <li><strong>Grado II — Dependencia severa</strong> (50 a 74 puntos): la persona necesita ayuda 2-3 veces al día para varias actividades básicas, aunque no requiere presencia permanente de un cuidador.</li>
           <li><strong>Grado III — Gran dependencia</strong> (75 a 100 puntos): la persona necesita ayuda varias veces al día para las actividades básicas y requiere presencia y supervisión continua de otra persona.</li>
-          <li><strong>{GRADO_III_PLUS.nombre}</strong>: {GRADO_III_PLUS.descripcion} Creado por el RDL 17/2026 y en vigor desde el 25/06/2026.</li>
+          <li><strong>{GRADO_III_PLUS.nombre}</strong>: {GRADO_III_PLUS.descripcion} Lo creó el RDL 11/2025, que añadió la disposición adicional 17.ª a la Ley 39/2006, en vigor desde el 23/10/2025; el RDL 17/2026 le fijó después su nivel mínimo de protección.</li>
         </ul>
         <h3>Cómo se calcula la puntuación del baremo</h3>
         <p>El BVD (RD 174/2011) reparte 100 puntos entre diez actividades: comer y beber pesa 16,8; la higiene relacionada con la micción y la defecación, 14,8; desplazarse dentro del hogar, 12,3, y así hasta las tareas domésticas (8,0) o los otros cuidados corporales (2,9). Cada actividad se divide en tareas con su propio peso. Por cada tarea que la persona no puede hacer sin el apoyo indispensable de otra persona se suma <em>peso de la tarea × peso de la actividad × coeficiente de apoyo</em> (0,90 supervisión o ayuda física parcial, 0,95 sustitución máxima, 1,00 apoyo especial), y el total se redondea al entero.</p>
@@ -404,7 +407,11 @@ export default function OrientadorGradoDependencia() {
         <h3>¿Qué diferencia hay entre prestaciones y servicios?</h3>
         <p>Los <strong>servicios</strong> (SAD, centros de día, plazas residenciales) se prestan directamente. Las <strong>prestaciones económicas</strong> son pagos mensuales: la PECEF (para cuidadores familiares), la PEVS (para contratar servicios privados) y la de asistencia personal (para personas activas). La cuantía depende del grado y de la renta.</p>
         <h3>¿Cuánto tarda el proceso?</h3>
-        <p>El plazo legal máximo es de 6 meses, pero en la práctica varía mucho por comunidad autónoma (de 3 a más de 18 meses). Por eso es importante solicitarlo cuanto antes: las prestaciones se cobran desde la fecha de solicitud, no desde la resolución.</p>
+        {/* Ley 39/2006, disposición final primera, apdos. 2 y 3 (redacción del RDL 20/2012, vigente
+            en el texto consolidado del BOE, BOE-A-2006-21990, consultado el 26/09/2026). Hallazgo 2145:
+            la app decía lo contrario, que se cobraba desde la solicitud. */}
+        <p>El plazo máximo entre la solicitud y la resolución que reconoce la prestación es de 6 meses (Ley 39/2006, disposición final primera, apartado 2), pero en la práctica varía mucho por comunidad autónoma.</p>
+        <p>Según la norma estatal (apartado 3 de esa disposición), el derecho a las prestaciones se genera <strong>desde la fecha de la resolución</strong> que las reconoce o, si pasan seis meses desde la solicitud sin resolución dictada y notificada, desde ese momento. Las prestaciones económicas para cuidados en el entorno familiar (art. 18) quedan además sujetas a un <strong>plazo suspensivo de hasta dos años</strong> desde esas fechas, que se interrumpe cuando se empieza a cobrar. Las comunidades autónomas pueden tener normas propias más favorables: pregunta en Servicios Sociales cómo se aplica en la tuya. Solicitarlo cuanto antes importa porque el plazo de seis meses empieza a contar con la solicitud.</p>
 
       {/* === SECCIONES PROFESIONALES v2.0 === */}
 
@@ -440,7 +447,7 @@ export default function OrientadorGradoDependencia() {
           </tbody>
         </table>
         <p className={styles.notaTabla}>
-          Cuantías máximas estatales: cada comunidad autónoma puede complementarlas y el copago las reduce según la capacidad económica. El {GRADO_III_PLUS.nombre} (RDL 17/2026) todavía no tiene cuantías de prestación directa ni baremo propio.
+          Cuantías máximas estatales: cada comunidad autónoma puede complementarlas y el copago las reduce según la capacidad económica. El {GRADO_III_PLUS.nombre} no tiene baremo propio: se reconoce a personas con Grado III y un diagnóstico de ELA avanzada u otra enfermedad de alta complejidad y curso irreversible, y da acceso a la prestación vinculada al servicio de ayuda a domicilio o a la de asistencia personal, con cuantías máximas propias que esta tabla no recoge (disposición adicional 17.ª de la Ley 39/2006, añadida por el RDL 11/2025).
         </p>
       </div>
 
@@ -451,9 +458,11 @@ export default function OrientadorGradoDependencia() {
             <span className={styles.escenarioIcon} aria-hidden="true">🧓</span>
             <strong>Persona mayor con movilidad limitada</strong>
           </div>
-          <p>75 años, necesita ayuda para ducharse y vestirse pero puede comer sola y moverse por casa. Probable Grado I o II. La solicitud permite acceder a SAD y teleasistencia.</p>
-          <div className={styles.escenarioExample}>Grado I → SAD 3h/día + teleasistencia gratuita o de bajo coste</div>
-          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Solicitar la valoración cuanto antes: los plazos son largos (3-12 meses) y los derechos son desde la solicitud.</div>
+          {/* Hallazgo 2146: decía «Probable Grado I o II» y «SAD 3h/día». Con los pesos del BVD que
+              usa la propia app, lavarse (8,8) + vestirse (11,9) = 20,7 → entre 19 y 21: sin grado. */}
+          <p>75 años, necesita ayuda para ducharse y vestirse pero puede comer sola y moverse por casa. Con el baremo, lavarse (8,8) y vestirse (11,9) suman como mucho unos 21 puntos: por debajo del Grado I, que empieza en 25. Si necesita también ayuda para salir a la calle o para las tareas domésticas, puede llegar al Grado I.</p>
+          <div className={styles.escenarioExample}>Sin grado → recursos de Servicios Sociales municipales (ayuda a domicilio, teleasistencia) según cada ayuntamiento</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Si la situación empeora, solicitar la valoración cuanto antes: el plazo de resolución empieza a contar con la solicitud.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -493,7 +502,7 @@ export default function OrientadorGradoDependencia() {
         </div>
         <div className={styles.faqItem}>
           <strong>¿Cuánto tiempo tarda el reconocimiento?</strong>
-          <p>El plazo legal es 6 meses, pero en la práctica puede ser de 6 a 18 meses según la CCAA. Los derechos económicos se cuentan desde la fecha de solicitud, no de resolución.</p>
+          <p>El plazo legal es 6 meses, pero en la práctica puede ser más largo según la comunidad autónoma. Por la norma estatal, el derecho a las prestaciones se genera desde la resolución que las reconoce, o desde que pasan seis meses de la solicitud sin resolución; la prestación para cuidados en el entorno familiar puede tener además un plazo suspensivo de hasta dos años (Ley 39/2006, disposición final primera, apartado 3).</p>
         </div>
         <div className={styles.faqItem}>
           <strong>¿Qué baremo se usa para valorar la dependencia?</strong>
@@ -536,7 +545,7 @@ export default function OrientadorGradoDependencia() {
           <div className={styles.stepNumber}>2</div>
           <div className={styles.stepContent}>
             <strong>Presenta la solicitud cuanto antes</strong>
-            <p>Los efectos económicos son desde la fecha de solicitud, no de la resolución. Presentarla antes, incluso si el expediente tarda, te protege económicamente.</p>
+            <p>El plazo máximo de seis meses para resolver empieza a contar con la solicitud, y si se agota sin resolución el derecho a las prestaciones se genera igualmente desde ese momento (Ley 39/2006, disposición final primera, apartado 3). Presentarla antes adelanta ese reloj.</p>
           </div>
         </div>
         <div className={styles.step}>
@@ -564,7 +573,7 @@ export default function OrientadorGradoDependencia() {
           <div className={styles.stepNumber}>6</div>
           <div className={styles.stepContent}>
             <strong>Inicia el cobro o el servicio</strong>
-            <p>Una vez aprobado el PIA, comienza la prestación. Las retroactivas (desde la solicitud) se abonan habitualmente en un único pago. Guarda toda la documentación.</p>
+            <p>Una vez aprobado el PIA, comienza la prestación. Si se reconocen importes con efectos anteriores al primer pago, pregunta en Servicios Sociales cómo y cuándo los abona tu comunidad autónoma. Guarda toda la documentación.</p>
           </div>
         </div>
       </div>
@@ -613,7 +622,7 @@ export default function OrientadorGradoDependencia() {
           <li><strong>Esperar a que la situación sea crítica para solicitar</strong>: Los plazos son largos. Solicitar tarde puede suponer meses sin prestación cuando más se necesita.</li>
           <li><strong>No presentar recursos ante grados bajos</strong>: El sistema tiene una tasa de recurso con éxito considerable. Aceptar sin más un grado que no refleja la realidad supone perder prestaciones.</li>
           <li><strong>No acudir a la valoración en condiciones habituales</strong>: Si el día de la visita la persona está especialmente bien (por medicación, acompañamiento...), el valorador puede asignar un grado inferior al real.</li>
-          <li><strong>Desconocer que los derechos son desde la solicitud</strong>: Muchas familias creen que los derechos empiezan con la resolución. Las retroactivas pueden ser de meses o años de prestación acumulada.</li>
+          <li><strong>Contar con atrasos desde el día de la solicitud</strong>: Por la norma estatal, el derecho a las prestaciones se genera desde la resolución que las reconoce (o a los seis meses de la solicitud si no hay resolución), y la prestación para cuidados en el entorno familiar puede tener un plazo suspensivo de hasta dos años (Ley 39/2006, disposición final primera, apartado 3). Consulta qué aplica tu comunidad autónoma antes de hacer cuentas.</li>
           <li><strong>No comunicar cambios de situación</strong>: Si la persona se muda de CCAA, mejora significativamente o su situación empeora, hay obligación de comunicarlo. No hacerlo puede generar reclamaciones.</li>
           <li><strong>Confundir prestaciones con servicios</strong>: Las prestaciones económicas son dinero. Los servicios (SAD, residencia) son atención directa. No son incompatibles en todos los casos: consultar en cada situación.</li>
         </ul>

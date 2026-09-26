@@ -180,9 +180,11 @@ test.describe('orientador-grado-dependencia', () => {
 
   /*
    * HALLAZGO 1326 — todas las tareas: 100 → 90 … 100 → Grado III. No puede decir que el III es
-   * el grado máximo: el RDL 17/2026 creó el Grado III+ (GRADO_III_PLUS en data/fiscal).
+   * el grado máximo: existe el Grado III+ (GRADO_III_PLUS en data/fiscal). Ojo: lo CREÓ el
+   * RDL 11/2025 (DA 17.ª de la Ley 39/2006, en vigor desde el 23/10/2025, BOE-A-2006-21990
+   * consultado el 26/09/2026); el RDL 17/2026 solo le fijó el nivel mínimo de protección.
    */
-  test('todas las tareas → Grado III (90-100) y menciona el Grado III+ del RDL 17/2026', async ({ page }) => {
+  test('todas las tareas → Grado III (90-100) y menciona el Grado III+', async ({ page }) => {
     await abrir(page);
     for (const a of TODAS_GENERALES) await marcarActividad(page, a);
     await estimar(page);
@@ -568,9 +570,10 @@ test.describe('orientador-grado-dependencia', () => {
    * «Probable Grado I o II» y «Grado I → SAD 3h/día». Con los pesos del BVD que usa la propia app,
    * lavarse (8,8) + vestirse (11,9) = 20,7 → 18,63 → 19 … 21: SIN GRADO. Y el SAD del Grado I es
    * de 20 a 37 horas MENSUALES (RD 1051/2013, anexo II, redacción del RD 675/2023,
-   * BOE-A-2013-13811), no 3 h al día. Se marca test.fail() hasta que se repare.
+   * BOE-A-2013-13811), no 3 h al día. REPARADO (hallazgo 2146, 26/09/2026): el escenario dice
+   * ahora que lavarse y vestirse suman como mucho unos 21 puntos, sin grado, y ya no cita horas.
    */
-  test.fail('el escenario «ducharse y vestirse» no promete un grado que el baremo de la app no da', async ({ page }) => {
+  test('el escenario «ducharse y vestirse» no promete un grado que el baremo de la app no da', async ({ page }) => {
     await abrir(page);
     await marcarActividad(page, 'Lavarse');
     await marcarActividad(page, 'Vestirse');
@@ -591,23 +594,28 @@ test.describe('orientador-grado-dependencia', () => {
    * BOE-A-2006-21990), dice lo contrario: el derecho «se generará desde la fecha de la resolución
    * de reconocimiento de las prestaciones o, en su caso, desde el transcurso del plazo de seis
    * meses desde la presentación de la solicitud» sin resolución, y la PECEF queda sujeta a un
-   * plazo suspensivo de hasta dos años. Se marca test.fail() hasta que se repare.
+   * plazo suspensivo de hasta dos años. REPARADO (hallazgo 2145, 26/09/2026): los seis sitios
+   * citan ahora la DF 1.ª.3. Además de no decir lo falso, el bloque debe decir lo verdadero.
    */
-  test.fail('el bloque educativo no dice que las prestaciones se cobran desde la solicitud', async ({ page }) => {
+  test('el bloque educativo no dice que las prestaciones se cobran desde la solicitud', async ({ page }) => {
     await abrir(page);
     const falsas = page.getByText(
       /(cobran|cuentan|son) desde la (fecha de )?solicitud|derechos son desde la solicitud|retroactivas \(desde la solicitud\)/,
     );
     await expect(falsas).toHaveCount(0);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.getByText(/se genera desde la resolución|desde la fecha de la resolución/).first()).toBeVisible();
+    await expect(page.getByText(/plazo suspensivo de hasta dos años/).first()).toBeVisible();
   });
 
   /*
    * REPARACIÓN INCOMPLETA DEL 1326 — el FAQPage del JSON-LD (el que leen los buscadores con IA)
    * sigue respondiendo «Existen tres grados» a «¿cuántos niveles existen?», sin el Grado III+
-   * que data/fiscal/dependencia.ts recoge (GRADO_III_PLUS, en vigor desde el 25/06/2026) y que la
-   * app ya menciona en el resultado, la tabla y el bloque educativo. Se marca test.fail().
+   * que data/fiscal/dependencia.ts recoge (GRADO_III_PLUS, en vigor desde el 23/10/2025) y que la
+   * app ya menciona en el resultado, la tabla y el bloque educativo. REPARADO (hallazgo 2148):
+   * la respuesta nombra el Grado III+ y su origen (DA 17.ª Ley 39/2006, RDL 11/2025).
    */
-  test.fail('el FAQPage del JSON-LD no dice que solo existen tres grados', async ({ page }) => {
+  test('el FAQPage del JSON-LD no dice que solo existen tres grados', async ({ page }) => {
     await abrir(page);
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents())
       .map((t) => JSON.parse(t) as Record<string, unknown>);
@@ -615,15 +623,16 @@ test.describe('orientador-grado-dependencia', () => {
     expect(faq, 'hay JSON-LD FAQPage').toBeTruthy();
     const texto = JSON.stringify(faq);
     expect(texto).not.toContain('Existen tres grados');
+    expect(texto).toContain('Grado III+');
   });
 
   /*
    * HALLAZGO NUEVO (reinspección 25/09/2026) — las preguntas del FAQ visible (`.faqItem strong`,
    * OrientadorGradoDependencia.module.css:403-407) usan `var(--primary)` como color de TEXTO:
    * #2E86AB sobre el fondo del bloque educativo da 3,77:1 en claro y 3,21:1 en oscuro, por debajo
-   * de 4,5:1 (texto normal en negrita, < 18,66 px). Se marca test.fail() hasta que se repare.
+   * de 4,5:1 (texto normal en negrita, < 18,66 px). REPARADO (hallazgo 2147): --primary-texto.
    */
-  test.fail('las preguntas del FAQ visible tienen contraste AA en los dos temas', async ({ page }) => {
+  test('las preguntas del FAQ visible tienen contraste AA en los dos temas', async ({ page }) => {
     await abrir(page);
     await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();

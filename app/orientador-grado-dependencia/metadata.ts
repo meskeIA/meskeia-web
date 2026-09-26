@@ -60,7 +60,7 @@ export const faqJsonLd = {
       name: '¿Qué es el grado de dependencia y cuántos niveles existen?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El grado de dependencia es la clasificación oficial del Sistema para la Autonomía y Atención a la Dependencia (SAAD) que determina el nivel de apoyo que necesita una persona. Existen tres grados: Grado I (dependencia moderada), Grado II (dependencia severa) y Grado III (gran dependencia). El grado condiciona las prestaciones y servicios a los que puede acceder la persona.',
+        text: 'El grado de dependencia es la clasificación oficial del Sistema para la Autonomía y Atención a la Dependencia (SAAD) que determina el nivel de apoyo que necesita una persona. El baremo clasifica la dependencia en tres grados: Grado I (dependencia moderada, de 25 a 49 puntos), Grado II (dependencia severa, de 50 a 74) y Grado III (gran dependencia, de 75 a 100). Desde el 23/10/2025 existe además el Grado III+ (dependencia extrema), que no sale de la puntuación del baremo: se reconoce a personas con Grado III diagnosticadas de ELA en fase avanzada u otras enfermedades de alta complejidad y curso irreversible (disposición adicional 17.ª de la Ley 39/2006, añadida por el Real Decreto-ley 11/2025). El grado condiciona las prestaciones y servicios a los que puede acceder la persona.',
       },
     },
     {

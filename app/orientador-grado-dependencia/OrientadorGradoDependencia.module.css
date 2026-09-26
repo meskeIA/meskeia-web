@@ -403,7 +403,9 @@
 .faqItem strong {
   display: block;
   margin-bottom: 0.4rem;
-  color: var(--primary);
+  /* Texto de 16 px en negrita: exige 4,5:1. --primary daba 3,77:1 en claro y 3,21:1 en oscuro
+     (hallazgo 2147); --primary-texto es el token de marca para TEXTO, con variante oscura en globals */
+  color: var(--primary-texto);
 }
 
 .faqTip {
@@ -435,7 +437,8 @@
 }
 
 .stepNumber {
-  background: var(--primary);
+  /* Número blanco sobre fondo de marca: --primary-boton (5,47:1 en los dos temas), no --primary (4,11:1) */
+  background: var(--primary-boton);
   color: white;
   width: 2rem;
   height: 2rem;

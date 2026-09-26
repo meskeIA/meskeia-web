@@ -65,10 +65,16 @@ export const GRADOS_DEPENDENCIA: GradoDependencia[] = [
 // reglamentario), por lo que NO se integra en GRADOS_DEPENDENCIA: no hay
 // puntuación BVD oficial que asignarle todavía.
 
+// ⚠️ 26/09/2026: el origen estaba mal. Lo crea el RDL 11/2025, de 21 de octubre, que añade la
+// disposición adicional 17.ª a la Ley 39/2006 (BOE-A-2025-21205, leído en sesión); el RDL
+// 17/2026 solo le fijó después el nivel mínimo de protección. Las cuantías de
+// PRESTACIONES_DEPENDENCIA_2025 están pendientes de cotejo con el anexo IV vigente (Inspector).
 export const GRADO_III_PLUS = {
   nombre: 'Grado III+ — Dependencia Extrema',
-  baseNormativa: 'RDL 17/2026, de 23 de junio (BOE-A-2026-13643), art. primero',
-  enVigorDesde: '2026-06-25',
+  baseNormativa: 'RDL 11/2025, de 21 de octubre (BOE-A-2025-21205), que añade la disposición adicional 17.ª a la Ley 39/2006',
+  enVigorDesde: '2025-10-23',
+  /** Cuantía máxima estatal de la prestación vinculada al servicio de ayuda a domicilio y de la de asistencia personal (RDL 11/2025). */
+  cuantiaMaximaMensual: 9859,
   descripcion:
     'Categoría adicional a los Grados I-III para situaciones de dependencia extrema (p. ej. ELA y enfermedades de alta complejidad). Criterios de valoración pendientes de desarrollo reglamentario.',
   nota: 'Algunas CCAA lo despliegan en paralelo con prestación directa propia (p. ej. Extremadura, DL 2/2026: 3.200-9.859 €/mes para ELA y alta complejidad, con procedimiento acelerado de 2 meses).',
