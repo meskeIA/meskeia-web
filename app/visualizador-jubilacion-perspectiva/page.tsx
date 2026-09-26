@@ -12,57 +12,89 @@ import {
   DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_PENSIONES_META, COTIZACION_MINIMA } from '@/data/fiscal';
+import { FISCAL_PENSIONES_META } from '@/data/fiscal';
 import Chart from 'chart.js/auto';
+import {
+  calcularPorcentajePension,
+  pct,
+  pctCompacto,
+  aniosYMeses,
+  MESES_ACCESO,
+  ANIOS_ACCESO,
+  MESES_PARA_CIEN,
+  PCT_ACCESO,
+  EDAD_ORDINARIA,
+  EDAD_CON_CARRERA_LARGA,
+  MESES_PARA_65,
+  ANIOS_ANTICIPO_VOLUNTARIA,
+  ANIOS_ANTICIPO_INVOLUNTARIA,
+  COEF_TRIMESTRE_MIN,
+  COEF_TRIMESTRE_MAX,
+  EJEMPLO_ANTICIPADA,
+  ejemploInicio,
+} from './escala';
+
+// El porcentaje de la pensión sale SIEMPRE del motor compartido (calcularPorcentajePension,
+// lib/calculadoras/pensionPublica.ts), que lee TRAMOS_PORCENTAJE_PENSION_2025. Hasta el
+// 26/09/2026 aquí había una copia de la escala con el tramo del 0,21 % hasta el mes 276
+// (hallazgo 2229): inflaba hasta 0,94 puntos las carreras de 20 a 36 años.
 
 // ─────────────────────────────────────────────
-// Lógica de porcentaje de pensión
-// ─────────────────────────────────────────────
-
-function calcularPorcentajePension(anosCotizados: number): number {
-  if (anosCotizados < 15) return 0;
-  const meses = Math.round(anosCotizados * 12);
-  if (meses <= 180) return 50;
-  let pct = 50;
-  const mesesExtra = meses - 180;
-  // Tramo 1: meses 181-276 → +0.21%/mes
-  const mesesTramo1 = Math.min(mesesExtra, 96);
-  pct += mesesTramo1 * 0.21;
-  // Tramo 2: meses 277+ → +0.19%/mes
-  if (mesesExtra > 96) {
-    const mesesTramo2 = mesesExtra - 96;
-    pct += mesesTramo2 * 0.19;
-  }
-  return Math.min(pct, 100);
-}
-
-// ───────────────────────────��─────────────────
-// Hitos de la vida laboral
+// Hitos de la vida laboral (edades en meses, para no redondear los 36 años y 6 meses)
 // ─────────────────────────────────────────────
 
 interface Hito {
-  edad: number;
+  edadMeses: number;
   icono: string;
   titulo: string;
   descripcion: string;
 }
 
 function getHitos(edadInicio: number): Hito[] {
+  const inicioMeses = edadInicio * 12;
+  const finMeses = EDAD_ORDINARIA * 12;
   const hitos: Hito[] = [];
-  hitos.push({ edad: edadInicio, icono: '🎯', titulo: 'Inicio cotización', descripcion: 'Tu primer empleo que cotiza a la SS' });
-  if (edadInicio + 15 <= 67) {
-    hitos.push({ edad: edadInicio + 15, icono: '🔓', titulo: '15 años cotizados', descripcion: 'Mínimo para tener derecho a pensión (50%)' });
+  hitos.push({ edadMeses: inicioMeses, icono: '🎯', titulo: 'Inicio cotización', descripcion: 'Tu primer empleo que cotiza a la SS' });
+  if (inicioMeses + MESES_ACCESO <= finMeses) {
+    hitos.push({
+      edadMeses: inicioMeses + MESES_ACCESO,
+      icono: '🔓',
+      titulo: `${aniosYMeses(MESES_ACCESO)} cotizados`,
+      descripcion: `Mínimo para tener derecho a pensión (${pct(PCT_ACCESO, 0)})`,
+    });
   }
-  const edadCompleto = edadInicio + Math.ceil(COTIZACION_MINIMA.anosParaCien);
-  if (edadCompleto <= 67) {
-    hitos.push({ edad: edadCompleto, icono: '💯', titulo: `${formatNumber(COTIZACION_MINIMA.anosParaCien, 0)} años cotizados`, descripcion: 'Alcanzas el 100% de la base reguladora' });
+  if (inicioMeses + MESES_PARA_CIEN <= finMeses) {
+    hitos.push({
+      edadMeses: inicioMeses + MESES_PARA_CIEN,
+      icono: '💯',
+      titulo: `${aniosYMeses(MESES_PARA_CIEN)} cotizados`,
+      descripcion: `Alcanzas el ${pct(100, 0)} de la base reguladora`,
+    });
   }
-  hitos.push({ edad: 65, icono: '🎂', titulo: '65 años', descripcion: 'Jubilación si tienes +38 años cotizados' });
-  hitos.push({ edad: 67, icono: '🏁', titulo: '67 años', descripcion: 'Edad ordinaria de jubilación (definitiva desde 2027)' });
-  return hitos.sort((a, b) => a.edad - b.edad);
+  hitos.push({
+    edadMeses: EDAD_CON_CARRERA_LARGA * 12,
+    icono: '🎂',
+    titulo: 'Carrera larga',
+    descripcion: `Jubilación si tienes ${aniosYMeses(MESES_PARA_65)} cotizados`,
+  });
+  hitos.push({ edadMeses: finMeses, icono: '🏁', titulo: 'Jubilación ordinaria', descripcion: 'Edad ordinaria de jubilación (definitiva desde 2027)' });
+  return hitos.sort((a, b) => a.edadMeses - b.edadMeses);
 }
+
+/** Colores del gráfico, leídos de los tokens para que sigan al tema (hallazgo 2238). */
+function coloresGrafico(el: HTMLElement) {
+  const css = getComputedStyle(el);
+  const v = (nombre: string, respaldo: string) => css.getPropertyValue(nombre).trim() || respaldo;
+  return {
+    texto: v('--text-secondary', '#666666'),
+    rejilla: v('--border', '#E5E5E5'),
+    linea: v('--primary-texto', '#26718F'),
+  };
+}
+
+const EJEMPLO_30 = ejemploInicio(30);
+const EJEMPLO_35 = ejemploInicio(35);
 
 // ─────────────────────────────────────────────
 // Componente principal
@@ -70,10 +102,11 @@ function getHitos(edadInicio: number): Hito[] {
 
 export default function VisualizadorJubilacionPerspectivaPage() {
   const [edadInicio, setEdadInicio] = useState(23);
-  const edadJubilacion = 67;
+  const edadJubilacion = EDAD_ORDINARIA;
 
   const anosCotizados = Math.max(0, edadJubilacion - edadInicio);
-  const pctPension = useMemo(() => calcularPorcentajePension(anosCotizados), [anosCotizados]);
+  const mesesCotizados = anosCotizados * 12;
+  const pctPension = useMemo(() => calcularPorcentajePension(mesesCotizados), [mesesCotizados]);
   const hitos = useMemo(() => getHitos(edadInicio), [edadInicio]);
 
   // Gráfico: porcentaje de pensión según años cotizados
@@ -81,23 +114,25 @@ export default function VisualizadorJubilacionPerspectivaPage() {
   const chartInstanceRef = useRef<Chart | null>(null);
 
   useEffect(() => {
-    if (!chartRef.current) return;
+    const lienzo = chartRef.current;
+    if (!lienzo) return;
     if (chartInstanceRef.current) chartInstanceRef.current.destroy();
 
-    const ctx = chartRef.current.getContext('2d');
+    const ctx = lienzo.getContext('2d');
     if (!ctx) return;
 
     const anos = Array.from({ length: 46 }, (_, i) => i);
-    const porcentajes = anos.map(a => calcularPorcentajePension(a));
+    const porcentajes = anos.map(a => calcularPorcentajePension(a * 12));
+    const c = coloresGrafico(lienzo);
 
-    chartInstanceRef.current = new Chart(ctx, {
+    const grafico = new Chart(ctx, {
       type: 'line',
       data: {
         labels: anos.map(a => `${a}`),
         datasets: [{
           label: '% de pensión',
           data: porcentajes,
-          borderColor: '#2E86AB',
+          borderColor: c.linea,
           backgroundColor: 'rgba(46, 134, 171, 0.1)',
           fill: true,
           tension: 0.2,
@@ -108,33 +143,64 @@ export default function VisualizadorJubilacionPerspectivaPage() {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        color: c.texto,
         plugins: {
           legend: { display: false },
           tooltip: {
             callbacks: {
               label: (ctx: { parsed: { x: number; y: number | null } }) =>
-                `${ctx.parsed.x} años → ${formatNumber(ctx.parsed.y ?? 0, 1)}%`,
+                `${ctx.parsed.x} años → ${pct(ctx.parsed.y ?? 0, 2)}`,
             },
           },
         },
         scales: {
-          x: { title: { display: true, text: 'Años cotizados' } },
+          x: {
+            ticks: { color: c.texto },
+            grid: { color: c.rejilla },
+            title: { display: true, text: 'Años cotizados', color: c.texto },
+          },
           y: {
             min: 0, max: 105,
-            ticks: { callback: (v: string | number) => `${v}%` },
-            title: { display: true, text: '% de la base reguladora' },
+            ticks: { color: c.texto, callback: (v: string | number) => pct(Number(v), 0) },
+            grid: { color: c.rejilla },
+            title: { display: true, text: '% de la base reguladora', color: c.texto },
           },
         },
       },
     } as never);
+    chartInstanceRef.current = grafico;
 
-    return () => { chartInstanceRef.current?.destroy(); chartInstanceRef.current = null; };
+    // Al cambiar de tema se releen los tokens y se repinta (mismo patrón que visualizador-sueldo-neto).
+    const repintar = () => {
+      const n = coloresGrafico(lienzo);
+      const o = grafico.options as unknown as {
+        color: string;
+        scales: Record<'x' | 'y', { ticks: { color: string }; grid: { color: string }; title: { color: string } }>;
+      };
+      o.color = n.texto;
+      for (const eje of ['x', 'y'] as const) {
+        o.scales[eje].ticks.color = n.texto;
+        o.scales[eje].grid.color = n.rejilla;
+        o.scales[eje].title.color = n.texto;
+      }
+      const serie = grafico.data.datasets[0] as unknown as { borderColor: string };
+      serie.borderColor = n.linea;
+      grafico.update('none');
+    };
+    const observador = new MutationObserver(repintar);
+    observador.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    return () => {
+      observador.disconnect();
+      chartInstanceRef.current?.destroy();
+      chartInstanceRef.current = null;
+    };
   }, []);
 
   // Datos clave
-  const tieneDerechoPension = anosCotizados >= 15;
-  const tieneCompleto = pctPension >= 100;
-  const anosParaCompleto = Math.ceil(COTIZACION_MINIMA.anosParaCien);
+  const tieneDerechoPension = mesesCotizados >= MESES_ACCESO;
+  const tieneCompleto = mesesCotizados >= MESES_PARA_CIEN;
+  const mesesQueFaltan = Math.max(0, MESES_PARA_CIEN - mesesCotizados);
 
   return (
     <div className={styles.container}>
@@ -181,12 +247,12 @@ export default function VisualizadorJubilacionPerspectivaPage() {
         {/* Timeline visual */}
         <div className={styles.timeline}>
           <div className={styles.timelineBarraFondo}>
-            {/* Barra de vida total (16 a 67) */}
+            {/* Barra de vida total (16 a la edad ordinaria) */}
             <div
               className={styles.timelineBarraCotizacion}
               style={{
-                left: `${((edadInicio - 16) / (67 - 16)) * 100}%`,
-                width: `${(anosCotizados / (67 - 16)) * 100}%`,
+                left: `${((edadInicio - 16) / (EDAD_ORDINARIA - 16)) * 100}%`,
+                width: `${(anosCotizados / (EDAD_ORDINARIA - 16)) * 100}%`,
               }}
             />
           </div>
@@ -196,7 +262,7 @@ export default function VisualizadorJubilacionPerspectivaPage() {
             <span>35</span>
             <span>45</span>
             <span>55</span>
-            <span>67</span>
+            <span>{EDAD_ORDINARIA}</span>
           </div>
           <p className={styles.timelineResumen}>
             <strong>{anosCotizados} años cotizando</strong> (de {edadInicio} a {edadJubilacion} años)
@@ -206,23 +272,23 @@ export default function VisualizadorJubilacionPerspectivaPage() {
         {/* Resultado principal */}
         <div className={styles.resultadoPrincipal}>
           <div className={styles.resultadoCirculo}>
-            <span className={styles.resultadoPct}>{formatNumber(pctPension, 1)}%</span>
+            <span className={styles.resultadoPct}>{pct(pctPension, 1)}</span>
             <span className={styles.resultadoLabel}>de tu base reguladora</span>
           </div>
           <div className={styles.resultadoInfo}>
             {!tieneDerechoPension && (
               <p className={styles.resultadoAlerta}>
-                Con {anosCotizados} años cotizados <strong>no tendrías derecho a pensión contributiva</strong>. Necesitas al menos 15 años.
+                Con {anosCotizados} años cotizados <strong>no tendrías derecho a pensión contributiva</strong>. Necesitas al menos {ANIOS_ACCESO} años.
               </p>
             )}
             {tieneDerechoPension && !tieneCompleto && (
               <p className={styles.resultadoTexto}>
-                Con {anosCotizados} años, recibirías el <strong>{formatNumber(pctPension, 1)}%</strong> de tu base reguladora. Te faltan <strong>{anosParaCompleto - anosCotizados} años</strong> más para el 100%.
+                Con {anosCotizados} años, recibirías el <strong>{pct(pctPension, 2)}</strong> de tu base reguladora. Te faltan <strong>{aniosYMeses(mesesQueFaltan)}</strong> más para el {pct(100, 0)}.
               </p>
             )}
             {tieneCompleto && (
               <p className={styles.resultadoTexto}>
-                Con {anosCotizados} años, alcanzas el <strong>100%</strong> de tu base reguladora. Empezar pronto te ha dado margen.
+                Con {anosCotizados} años, alcanzas el <strong>{pct(100, 0)}</strong> de tu base reguladora. Empezar pronto te ha dado margen.
               </p>
             )}
           </div>
@@ -231,9 +297,9 @@ export default function VisualizadorJubilacionPerspectivaPage() {
         {/* Hitos de la vida laboral */}
         <div className={styles.hitosGrid}>
           {hitos.map((h, i) => (
-            <div key={i} className={`${styles.hitoCard} ${h.edad <= edadInicio || h.edad > edadJubilacion ? styles.hitoFuturo : ''}`}>
+            <div key={i} className={styles.hitoCard}>
               <span className={styles.hitoIcono} aria-hidden="true">{h.icono}</span>
-              <span className={styles.hitoEdad}>{h.edad} años</span>
+              <span className={styles.hitoEdad}>{aniosYMeses(h.edadMeses)}</span>
               <span className={styles.hitoTitulo}>{h.titulo}</span>
               <span className={styles.hitoDesc}>{h.descripcion}</span>
             </div>
@@ -246,14 +312,17 @@ export default function VisualizadorJubilacionPerspectivaPage() {
           <div className={styles.chartWrap}>
             <canvas ref={chartRef} aria-label="Gráfico: porcentaje de pensión según años cotizados a la Seguridad Social" />
           </div>
-          <p className={styles.chartNota}>El salto de 0% a 50% ocurre al cumplir 15 años. Después sube gradualmente hasta el 100% a los ~37 años.</p>
+          <p className={styles.chartNota}>
+            El salto de {pct(0, 0)} a {pct(PCT_ACCESO, 0)} ocurre al cumplir {ANIOS_ACCESO} años. Después sube
+            gradualmente hasta el {pct(100, 0)} a los {aniosYMeses(MESES_PARA_CIEN)}.
+          </p>
         </div>
 
         <div className={styles.insight}>
           <p>
-            El sistema de pensiones español tiene un diseño claro: <strong>los primeros 15 años te dan acceso</strong> (50%),
-            y los siguientes ~22 años te llevan del 50% al 100%. Cada año extra después de los 15 cuenta — pero
-            los primeros 15 son todo o nada.
+            El sistema de pensiones español tiene un diseño claro: <strong>los primeros {ANIOS_ACCESO} años te dan acceso</strong> ({pct(PCT_ACCESO, 0)}),
+            y los siguientes {aniosYMeses(MESES_PARA_CIEN - MESES_ACCESO)} te llevan del {pct(PCT_ACCESO, 0)} al {pct(100, 0)}. Cada mes extra después de los {ANIOS_ACCESO} años
+            cuenta — pero los primeros {ANIOS_ACCESO} son todo o nada.
           </p>
         </div>
 
@@ -273,25 +342,31 @@ export default function VisualizadorJubilacionPerspectivaPage() {
             ingresos, bajan la media. Los periodos sin cotizar (lagunas) se rellenan con la base mínima.
           </p>
 
-          <h3>El truco de los 15 años mínimos</h3>
+          <h3>El truco de los {ANIOS_ACCESO} años mínimos</h3>
           <p>
-            Con menos de 15 años cotizados no tienes pensión contributiva (aunque sí podrías optar a
-            la no contributiva, mucho más baja). Al cumplir 15 años, saltas directamente al 50%.
-            Esto significa que <strong>cada mes cuenta si estás cerca de los 15 años</strong>.
+            Con menos de {ANIOS_ACCESO} años cotizados no tienes pensión contributiva (aunque sí podrías optar a
+            la no contributiva, mucho más baja). Al cumplir {ANIOS_ACCESO} años, saltas directamente al {pct(PCT_ACCESO, 0)}.
+            Esto significa que <strong>cada mes cuenta si estás cerca de los {ANIOS_ACCESO} años</strong>.
           </p>
 
           <h3>Jubilación anticipada: puedes, pero con penalización</h3>
           <p>
-            Puedes jubilarte hasta 2 años antes de la edad ordinaria (voluntaria) o 4 años antes
-            si te despiden (forzosa). Pero cada trimestre de anticipación reduce tu pensión entre
-            un 1,5% y un 2%. A los 63 años con 38 años cotizados, la penalización puede ser del 12-16%.
+            Puedes jubilarte hasta {ANIOS_ANTICIPO_VOLUNTARIA} años antes de la edad ordinaria por voluntad propia, o
+            hasta {ANIOS_ANTICIPO_INVOLUNTARIA} años antes si la jubilación es involuntaria (por ejemplo, tras un despido
+            colectivo o un cierre de empresa). Cada trimestre de anticipación reduce la pensión entre
+            un {pctCompacto(COEF_TRIMESTRE_MIN)} y un {pctCompacto(COEF_TRIMESTRE_MAX)}, según los años cotizados y el tipo de jubilación.
+            A los {EJEMPLO_ANTICIPADA.edad} años con {EJEMPLO_ANTICIPADA.aniosCotizados} años cotizados la edad ordinaria
+            es {EJEMPLO_ANTICIPADA.edadOrdinaria}: son {EJEMPLO_ANTICIPADA.mesesAnticipo} meses de anticipo, más de los que
+            admite la voluntaria, así que solo cabe la involuntaria, con una reducción
+            de {EJEMPLO_ANTICIPADA.trimestres} trimestres × {pctCompacto(EJEMPLO_ANTICIPADA.coeficiente)} = {pctCompacto(EJEMPLO_ANTICIPADA.reduccion)}.
           </p>
 
           <h3>¿Y si empiezo tarde?</h3>
           <p>
-            Si empiezas a cotizar a los 30, llegarás a los 67 con 37 años — justo para el 100%.
-            Si empiezas a los 35, llegarás con 32 años — aproximadamente un 88%. Cada año que
-            retrasas el inicio se nota en la pensión final.
+            Si empiezas a cotizar a los 30, llegarás a los {EDAD_ORDINARIA} con {EJEMPLO_30.anios} años, más de
+            los {aniosYMeses(MESES_PARA_CIEN)} que dan el {pct(EJEMPLO_30.porcentaje, 0)}.
+            Si empiezas a los 35, llegarás con {EJEMPLO_35.anios} años cotizados, que dan el {pct(EJEMPLO_35.porcentaje, 2)}.
+            Cada año que retrasas el inicio se nota en la pensión final.
           </p>
 
           <div className={styles.warningBox}>

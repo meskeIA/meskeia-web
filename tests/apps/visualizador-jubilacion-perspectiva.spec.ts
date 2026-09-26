@@ -49,12 +49,14 @@ import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliar
  *     40 → 27 años → 78,34 % → «78,3 %»   (app: «79,3%»)
  *     31 → 36 años → 98,86 % → «98,9 %»   (app: «99,8%»); faltan 438 − 432 = 6 MESES
  *                    (app: «Te faltan 1 años más»)
- *     30 → 37 años → 100 %; hito 💯 a los 30 + ⌈36,5⌉ = 67 años
+ *     30 → 37 años → 100 %; hito 💯 a los 30 + 36 años y 6 meses = 66 años y 6 meses
  *     16 → 51 años → 100 %
  *     10 (imposible) → el control lo capa a 16 · 99 → lo capa a 40
  *
- * Los `test.fail()` documentan hallazgos ABIERTOS del acta del 26/09/2026; cada uno dice
- * qué afirma y de qué fuente sale. Al repararse, pasan a rojo inesperado: quitar la marca.
+ * Los casos que llevaban marca de fallo esperado documentaban los hallazgos 2229-2238 del
+ * acta del 26/09/2026. REPARADOS el 26/09/2026: la app llama al motor compartido y deriva de
+ * data/fiscal todas sus cifras (app/visualizador-jubilacion-perspectiva/escala.ts); las
+ * marcas se retiraron y cada caso afirma ya el comportamiento correcto.
  */
 
 const RUTA = '/visualizador-jubilacion-perspectiva/';
@@ -81,7 +83,7 @@ const textoResultado = (page: Page): Locator => page.locator('[class*="resultado
  * vive en un `useRef` del componente, así que se sube por la fibra de React del <canvas>
  * hasta el gancho cuyo `.current` es un Chart dibujado en ESE canvas.
  */
-async function leerGrafico(page: Page): Promise<{ datos: number[]; colorEjes: string } | null> {
+async function leerGrafico(page: Page): Promise<{ datos: number[]; colorEjes: string; colorRejilla: string; etiquetasY: string[] } | null> {
   return page.evaluate(() => {
     const canvas = document.querySelector('canvas');
     if (!canvas) return null;
@@ -92,7 +94,10 @@ async function leerGrafico(page: Page): Promise<{ datos: number[]; colorEjes: st
     interface Grafico {
       canvas?: unknown;
       data?: { datasets: { data: number[] }[] };
-      scales?: { x: { options: { ticks: { color: string } } } };
+      scales?: {
+        x: { options: { ticks: { color: string }; grid: { color: string } } };
+        y: { ticks: { label: string }[] };
+      };
     }
     let fibra = (clave ? bruto[clave] : null) as Fibra | null;
     while (fibra) {
@@ -101,7 +106,12 @@ async function leerGrafico(page: Page): Promise<{ datos: number[]; colorEjes: st
         const ref = gancho.memoizedState as { current?: Grafico } | null;
         const inst = ref && typeof ref === 'object' ? ref.current : undefined;
         if (inst && inst.canvas === canvas && inst.data && inst.scales) {
-          return { datos: [...inst.data.datasets[0].data], colorEjes: String(inst.scales.x.options.ticks.color) };
+          return {
+            datos: [...inst.data.datasets[0].data],
+            colorEjes: String(inst.scales.x.options.ticks.color),
+            colorRejilla: String(inst.scales.x.options.grid.color),
+            etiquetasY: inst.scales.y.ticks.map((t) => String(t.label)),
+          };
         }
         gancho = gancho.next;
       }
@@ -183,22 +193,22 @@ test.describe('visualizador-jubilacion-perspectiva — escala del porcentaje (DT
   });
 
   test('gráfico: 25 años cotizados = 73,78 % (el caso de la sospecha)', async ({ page }) => {
-    // HALLAZGO ABIERTO (26/09/2026): page.tsx:24 reimplementa la escala con el tramo del
-    // 0,21 % hasta el mes 276 (96 meses) en vez de hasta el 229 (49 meses), la forma del
+    // Hallazgo 2229 (REPARADO 26/09/2026): page.tsx:24 reimplementaba la escala con el tramo
+    // del 0,21 % hasta el mes 276 (96 meses) en vez de hasta el 229 (49 meses), la forma del
     // hallazgo 1093 ya reparada en data/fiscal. 300 meses → 60,29 + 71 × 0,19 = 73,78 %;
-    // la app dibuja 74,72.
-    test.fail();
+    // la app dibujaba 74,72. Ahora llama a calcularPorcentajePension(meses).
     await abrir(page);
     const s = await serie(page);
     expect(s[25]).toBeCloseTo(73.78, 1);
     expect(s[20]).toBeCloseTo(62.38, 1); // 240 meses: 60,29 + 11 × 0,19
     expect(s[36]).toBeCloseTo(98.86, 1); // 432 meses: 60,29 + 203 × 0,19
+    expect(s[27]).toBeCloseTo(78.34, 1); // 324 meses: 60,29 + 95 × 0,19
+    expect(s[32]).toBeCloseTo(89.74, 1); // 384 meses: 60,29 + 155 × 0,19
   });
 
   test('deslizador 40 años → 27 cotizados → 78,3 %', async ({ page }) => {
-    // HALLAZGO ABIERTO (26/09/2026), el mismo de la escala copiada: 324 meses →
-    // 60,29 + 95 × 0,19 = 78,34 % (pensiones.ts l. 97); la app publica «79,3%».
-    test.fail();
+    // Hallazgo 2229 (REPARADO 26/09/2026), el de la escala copiada: 324 meses →
+    // 60,29 + 95 × 0,19 = 78,34 % (pensiones.ts l. 97); la app publicaba «79,3%».
     await abrir(page);
     await sembrarValor(page, DESLIZADOR, 40);
     await expect(page.locator('[class*="timelineResumen"]')).toContainText('27 años cotizando');
@@ -206,8 +216,7 @@ test.describe('visualizador-jubilacion-perspectiva — escala del porcentaje (DT
   });
 
   test('deslizador 31 años → 36 cotizados → 98,9 %', async ({ page }) => {
-    // HALLAZGO ABIERTO (26/09/2026), escala copiada: 432 meses → 98,86 %; la app, «99,8%».
-    test.fail();
+    // Hallazgo 2229 (REPARADO 26/09/2026), escala copiada: 432 meses → 98,86 %; la app daba «99,8%».
     await abrir(page);
     await sembrarValor(page, DESLIZADOR, 31);
     await expect(page.locator('[class*="timelineResumen"]')).toContainText('36 años cotizando');
@@ -223,16 +232,19 @@ test.describe('visualizador-jubilacion-perspectiva — escala del porcentaje (DT
     // 612 meses > 438 → 100 % (TRAMOS_PORCENTAJE_PENSION_2025, tope)
     expect(aNumero(await pctPrincipal(page).innerText())).toBeCloseTo(100, 1);
 
-    // 30 → 37 años = 444 meses > 438 → 100 %, y el hito 💯 cae en 30 + ⌈36,5⌉ = 67
+    // 30 → 37 años = 444 meses > 438 → 100 %, y el hito 💯 cae en 30 años + 438 meses =
+    // 66 años y 6 meses. Hasta el 26/09/2026 este caso afirmaba «67 años»: consagraba el
+    // redondeo ⌈36,5⌉ = 37 del hallazgo 2232, que la ficha pide quitar (el 100 % llega con
+    // 36 años y 6 meses cotizados, COTIZACION_MINIMA.mesesParaCien).
     await sembrarValor(page, DESLIZADOR, 30);
     await expect(page.locator('[class*="timelineResumen"]')).toContainText('37 años cotizando');
     expect(aNumero(await pctPrincipal(page).innerText())).toBeCloseTo(100, 1);
     await expect(textoResultado(page)).toContainText('alcanzas el 100');
-    await expect(
-      page.locator('[class*="hitoCard"]').filter({ hasText: 'Alcanzas el 100' }),
-    ).toContainText('67 años');
+    const hitoCien = page.locator('[class*="hitoCard"]').filter({ hasText: 'Alcanzas el 100' });
+    await expect(hitoCien).toContainText('66 años y 6 meses');
+    await expect(hitoCien).toContainText('36 años y 6 meses cotizados');
 
-    // 31 → 36 años: 31 + 36,5 = 67,5 > 67, así que NO debe haber hito del 100 %
+    // 31 → 36 años: 31 + 36 años y 6 meses = 67 años y 6 meses > 67: NO debe haber hito del 100 %
     await sembrarValor(page, DESLIZADOR, 31);
     await expect(page.locator('[class*="hitoCard"]').filter({ hasText: 'Alcanzas el 100' })).toHaveCount(0);
 
@@ -242,23 +254,24 @@ test.describe('visualizador-jubilacion-perspectiva — escala del porcentaje (DT
   });
 
   test('«Te faltan…» para el 100 %: 36 años cotizados → faltan 6 meses, no «1 años»', async ({ page }) => {
-    // HALLAZGO ABIERTO (26/09/2026): la app resta de ⌈COTIZACION_MINIMA.anosParaCien⌉ = 37
-    // y escribe «Te faltan 1 años más». Según COTIZACION_MINIMA.mesesParaCien (l. 66) faltan
-    // 438 − 432 = 6 meses.
-    test.fail();
+    // Hallazgo 2232 (REPARADO 26/09/2026): la app restaba de ⌈COTIZACION_MINIMA.anosParaCien⌉
+    // = 37 y escribía «Te faltan 1 años más». Según COTIZACION_MINIMA.mesesParaCien (l. 66)
+    // faltan 438 − 432 = 6 meses.
     await abrir(page);
     await sembrarValor(page, DESLIZADOR, 31);
-    await expect(textoResultado(page)).toContainText('Te faltan');
+    await expect(textoResultado(page)).toContainText('Te faltan 6 meses más');
     await expect(textoResultado(page)).not.toContainText('1 años');
+    // 40 → 27 años = 324 meses → faltan 438 − 324 = 114 meses = 9 años y 6 meses (la app decía «10 años»)
+    await sembrarValor(page, DESLIZADOR, 40);
+    await expect(textoResultado(page)).toContainText('Te faltan 9 años y 6 meses más');
   });
 });
 
 test.describe('visualizador-jubilacion-perspectiva — datos y textos', () => {
   test('hito de los 65: exige 38 años y 6 meses cotizados', async ({ page }) => {
-    // HALLAZGO ABIERTO (26/09/2026): el hito dice «Jubilación si tienes +38 años cotizados»,
-    // escrito a mano. TABLA_EDAD_JUBILACION fila 2027 (pensiones.ts l. 43), la que usa la
-    // propia app para su edad de 67: cotizacionPara65 = 38 años y 6 meses.
-    test.fail();
+    // Hallazgo 2233 (REPARADO 26/09/2026): el hito decía «Jubilación si tienes +38 años
+    // cotizados», escrito a mano. TABLA_EDAD_JUBILACION fila 2027 (pensiones.ts l. 43), la que
+    // usa la propia app para su edad de 67: cotizacionPara65 = 38 años y 6 meses.
     await abrir(page);
     await expect(
       page.locator('[class*="hitoCard"]').filter({ hasText: 'Jubilación si tienes' }),
@@ -266,75 +279,117 @@ test.describe('visualizador-jubilacion-perspectiva — datos y textos', () => {
   });
 
   test('FAQ (JSON-LD): 25 años cotizados no son «aproximadamente el 80%»', async ({ page }) => {
-    // HALLAZGO ABIERTO (26/09/2026): dos respuestas de la FAQPage dicen que con 25 años se
-    // cobra «aproximadamente el 80%» y que de 15 a 25 años cada año suma «un 3%»: es la
+    // Hallazgo 2230 (REPARADO 26/09/2026): dos respuestas de la FAQPage decían que con 25 años
+    // se cobra «aproximadamente el 80%» y que de 15 a 25 años cada año suma «un 3%»: es la
     // escala anterior a la Ley 27/2011. Con TRAMOS_PORCENTAJE_PENSION_2025: 300 meses → 73,78 %,
     // y un año suma 12 × 0,21 = 2,52 o 12 × 0,19 = 2,28 puntos.
-    test.fail();
     await abrir(page);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.find((b) => b.includes('FAQPage')) ?? '';
     expect(faq).toContain('FAQPage');
     expect(faq).not.toMatch(/25 años[^.]*80\s?%/);
+    expect(faq).not.toMatch(/un [23]\s?%/);
+    expect(faq).toContain(`73,78${ESPACIO_DURO}%`);
+    expect(faq).toContain('2,52 puntos por año');
+    expect(faq).toContain('2,28 puntos por año');
+    expect(faq).toContain('36 años y 6 meses');
   });
 
   test('texto educativo: anticipada a los 63 con 38 años cotizados', async ({ page }) => {
-    // HALLAZGO ABIERTO (26/09/2026): dice «la penalización puede ser del 12-16%». Con 38 años
-    // (< 38a6m) la edad ordinaria es 67 (TABLA_EDAD_JUBILACION 2027, l. 43): a los 63 son 48
-    // meses, fuera de la voluntaria (máx. 24, l. 214) y dentro de la involuntaria (máx. 48,
-    // l. 199) → 16 trimestres × 1,875 % (l. 191) = 30 %.
-    test.fail();
+    // Hallazgo 2231 (REPARADO 26/09/2026): decía «la penalización puede ser del 12-16%». Con
+    // 38 años (< 38a6m) la edad ordinaria es 67 (TABLA_EDAD_JUBILACION 2027, l. 43): a los 63
+    // son 48 meses, fuera de la voluntaria (máx. 24, l. 214) y dentro de la involuntaria (máx.
+    // 48, l. 199) → 16 trimestres × 1,875 % (l. 191) = 30 %.
     await abrir(page);
     const parrafo = page.locator('h3', { hasText: 'Jubilación anticipada' }).locator('xpath=following-sibling::p[1]');
-    const texto = (await parrafo.textContent()) ?? '';
+    // Se colapsan los saltos de línea del JSX, pero NO el espacio duro (que \s también atraparía)
+    const texto = ((await parrafo.textContent()) ?? '').replace(/[ \n\t]+/g, ' ');
     expect(texto).toContain('63 años');
     expect(texto).not.toMatch(/12-16\s?%/);
+    expect(texto).toContain('48 meses');
+    expect(texto).toContain(`16 trimestres × 1,875${ESPACIO_DURO}% = 30${ESPACIO_DURO}%`);
   });
 
   test('texto educativo: empezar a los 35 → 32 años → 89,74 %', async ({ page }) => {
-    // HALLAZGO ABIERTO (26/09/2026): «Si empiezas a los 35, llegarás con 32 años —
+    // Hallazgo 2234 (REPARADO 26/09/2026): «Si empiezas a los 35, llegarás con 32 años —
     // aproximadamente un 88%». 384 meses → 60,29 + 155 × 0,19 = 89,74 % (pensiones.ts l. 97);
-    // y el deslizador de la misma página, en 35, publica «90,7%». Tolerancia ± 0,5: la del
-    // «aproximadamente» de una cifra entera.
-    test.fail();
+    // y el deslizador de la misma página, en 35, publicaba «90,7%». Tolerancia ± 0,5.
     await abrir(page);
     const parrafo = page.locator('h3', { hasText: 'empiezo tarde' }).locator('xpath=following-sibling::p[1]');
     const texto = (await parrafo.textContent()) ?? '';
     const m = texto.match(/empiezas a los 35[^.]*?(\d+(?:,\d+)?)\s?%/);
     expect(m).not.toBeNull();
     expect(aNumero(m ? m[1] : 'NaN')).toBeCloseTo(89.74, 0);
+    // Y el deslizador en 35 dice lo mismo que el texto (la app daba «90,7%»)
+    await sembrarValor(page, DESLIZADOR, 35);
+    expect(aNumero(await pctPrincipal(page).innerText())).toBeCloseTo(89.74, 1);
   });
 
   test('formato: el porcentaje va separado del % con espacio duro', async ({ page }) => {
-    // HALLAZGO ABIERTO (26/09/2026): `${formatNumber(pctPension, 1)}%` lo pega («100,0%»).
-    // Regla del CLAUDE.md global §2, vigente desde el 25/09/2026.
-    test.fail();
+    // Hallazgo 2235 (REPARADO 26/09/2026): `${formatNumber(pctPension, 1)}%` lo pegaba
+    // («100,0%»), y también las marcas del eje Y. Regla del CLAUDE.md global §2 (25/09/2026).
     await abrir(page);
-    await expect(pctPrincipal(page)).toHaveText(new RegExp(`\\d${ESPACIO_DURO}%$`));
+    await expect(pctPrincipal(page)).toHaveText(`100,0${ESPACIO_DURO}%`);
+    await sembrarValor(page, DESLIZADOR, 40);
+    await expect(pctPrincipal(page)).toHaveText(`78,3${ESPACIO_DURO}%`);
+    await expect(textoResultado(page)).toContainText(`78,34${ESPACIO_DURO}%`);
+    const g = await leerGrafico(page);
+    const etiquetas = g ? g.etiquetasY : [];
+    expect(etiquetas.length).toBeGreaterThan(0);
+    for (const e of etiquetas) expect(e).toMatch(new RegExp(`^\\d+${ESPACIO_DURO}%$`));
   });
 });
 
 test.describe('visualizador-jubilacion-perspectiva — accesibilidad', () => {
-  test('tarjeta «Inicio cotización» legible (≥ 4,5:1)', async ({ page }) => {
-    // HALLAZGO ABIERTO (26/09/2026): la primera tarjeta cumple SIEMPRE `h.edad <= edadInicio`
-    // y recibe `.hitoFuturo { opacity: 0.5 }`: su descripción queda a 2,02:1 en claro.
-    test.fail();
-    await abrir(page);
-    await prepararParaMedir(page);
-    await activarTema(page, 'light');
-    const tarjeta = page.locator('[class*="hitoCard"]').filter({ hasText: 'Inicio cotización' });
-    expect(await contrasteEfectivo(tarjeta.locator('[class*="hitoDesc"]'))).toBeGreaterThanOrEqual(4.5);
-  });
+  for (const tema of ['light', 'dark'] as const) {
+    test(`tarjeta «Inicio cotización» legible (≥ 4,5:1) — tema ${tema}`, async ({ page }) => {
+      // Hallazgo 2236 (REPARADO 26/09/2026): la primera tarjeta cumplía SIEMPRE
+      // `h.edad <= edadInicio` y recibía `.hitoFuturo { opacity: 0.5 }`: su descripción quedaba
+      // a 2,02:1 en claro y 2,37:1 en oscuro. Se retiró la atenuación.
+      await abrir(page);
+      await prepararParaMedir(page);
+      await activarTema(page, tema);
+      const tarjeta = page.locator('[class*="hitoCard"]').filter({ hasText: 'Inicio cotización' });
+      for (const parte of ['hitoDesc', 'hitoEdad', 'hitoTitulo']) {
+        expect(await contrasteEfectivo(tarjeta.locator(`[class*="${parte}"]`)), parte).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+
+    test(`texto de marca legible (≥ 4,5:1) — tema ${tema}`, async ({ page }) => {
+      // Hallazgo 2237 (REPARADO 26/09/2026): --primary como color de texto pequeño daba
+      // .hitoEdad 4,11:1 y .enlaceApp 3,77:1 en claro (3,50 y 3,08 en oscuro). Ahora --primary-texto.
+      await abrir(page);
+      await prepararParaMedir(page);
+      await activarTema(page, tema);
+      const edades = page.locator('[class*="hitoEdad"]');
+      const n = await edades.count();
+      expect(n).toBeGreaterThan(0);
+      for (let i = 0; i < n; i++) {
+        expect(await contrasteEfectivo(edades.nth(i)), `hitoEdad ${i}`).toBeGreaterThanOrEqual(4.5);
+      }
+      const enlaces = page.locator('[class*="enlaceApp"] a');
+      expect(await enlaces.count()).toBe(2);
+      for (let i = 0; i < 2; i++) {
+        expect(await contrasteEfectivo(enlaces.nth(i)), `enlaceApp ${i}`).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+  }
 
   test('gráfico en oscuro: los ejes se leen (≥ 4,5:1)', async ({ page }) => {
-    // HALLAZGO ABIERTO (26/09/2026): el gráfico se crea una vez con los colores por defecto de
-    // Chart.js (#666) y no tiene variante oscura: sobre la tarjeta oscura (#2A2A2A), 2,50:1.
-    test.fail();
+    // Hallazgo 2238 (REPARADO 26/09/2026): el gráfico se creaba una vez con los colores por
+    // defecto de Chart.js (#666) y no tenía variante oscura: sobre la tarjeta oscura (#2A2A2A),
+    // 2,50:1. Ahora lee los tokens y un MutationObserver sobre `data-theme` lo repinta.
     await abrir(page);
     await prepararParaMedir(page); // sin transiciones: el fondo se mediría a medio camino
+    await activarTema(page, 'light');
+    await expect.poll(async () => (await leerGrafico(page))?.colorEjes ?? '').not.toBe('');
+    const claro = await leerGrafico(page);
     await activarTema(page, 'dark');
+    await expect.poll(async () => (await leerGrafico(page))?.colorEjes).not.toBe(claro?.colorEjes);
     const g = await leerGrafico(page);
     const fondo = await page.locator('[class*="chartContainer"]').evaluate((el) => getComputedStyle(el).backgroundColor);
     expect(contraste(aRgb(g ? g.colorEjes : '#666'), aRgb(fondo))).toBeGreaterThanOrEqual(4.5);
+    // La rejilla también sigue al tema (la de claro, #E5E5E5, sería una línea blanca en oscuro)
+    expect(g?.colorRejilla).not.toBe(claro?.colorRejilla);
   });
 });
