@@ -1,5 +1,10 @@
 import { Metadata } from 'next';
-import { FISCAL_CNAE_IAE_META } from '@/data/fiscal';
+import { FISCAL_CNAE_IAE_META, SECCIONES_IAE } from '@/data/fiscal';
+import { formatPercentage } from '@/lib';
+
+// La retención de la sección 2ª sale del módulo, no tecleada (residuo del hallazgo 2227).
+const SECCION_PROFESIONAL = SECCIONES_IAE.find((s) => s.tipoRetencion !== null);
+const pctRetencion = (t: number | null | undefined) => formatPercentage((t ?? 0) / 100, 0);
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/cnae-iae/';
 
@@ -116,7 +121,7 @@ export const faqJsonLd = {
       name: '¿Cuándo llevan retención de IRPF mis facturas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Depende de la sección del IAE en la que esté el epígrafe. Las actividades empresariales (sección 1ª) no llevan retención con carácter general. Las profesionales (sección 2ª) sí la llevan cuando se factura a empresas y a otros profesionales: 15% con carácter general y 7% durante el año de inicio de la actividad y los dos siguientes. Las artísticas (sección 3ª) reciben un tratamiento análogo al profesional.',
+        text: 'Depende de la sección del IAE en la que esté el epígrafe. Las actividades empresariales (sección 1ª) no llevan retención con carácter general. Las profesionales (sección 2ª) sí la llevan cuando se factura a empresas y a otros profesionales: ' + pctRetencion(SECCION_PROFESIONAL?.tipoRetencion) + ' con carácter general y ' + pctRetencion(SECCION_PROFESIONAL?.tipoRetencionInicio) + ' durante el año de inicio de la actividad y los dos siguientes. Las artísticas (sección 3ª) reciben un tratamiento análogo al profesional.',
       },
     },
     {

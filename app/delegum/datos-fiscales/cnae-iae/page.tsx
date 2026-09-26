@@ -11,10 +11,14 @@ import {
   CNAE_VIGENCIA,
   FISCAL_CNAE_IAE_META,
 } from '@/data/fiscal';
-import { formatNumber, formatDate } from '@/lib';
+import { formatNumber, formatDate, formatPercentage } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
+
+// La retención de la sección 2ª sale del módulo, no tecleada (residuo del hallazgo 2227).
+const SECCION_PROFESIONAL = SECCIONES_IAE.find((s) => s.tipoRetencion !== null);
+const pctRetencion = (t: number | null | undefined) => formatPercentage((t ?? 0) / 100, 0);
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/cnae-iae/';
 const URL_BUSCADOR = 'https://meskeia.com/conversor-cnae-iae/';
@@ -198,8 +202,9 @@ export default function CnaeIaePage() {
               </table>
             </div>
             <p className={styles.tableFoot}>
-              El tipo reducido del 7% durante el año de alta y los dos siguientes es opcional: el
-              profesional puede renunciar a él y retener directamente el 15%. La retención no es un
+              El tipo reducido del {pctRetencion(SECCION_PROFESIONAL?.tipoRetencionInicio)} durante el
+              año de alta y los dos siguientes es opcional: el profesional puede renunciar a él y
+              retener directamente el {pctRetencion(SECCION_PROFESIONAL?.tipoRetencion)}. La retención no es un
               coste añadido, sino un pago a cuenta del IRPF del propio profesional.
             </p>
           </section>

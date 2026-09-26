@@ -664,7 +664,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-compraventa-inmueble/', icon: '🏠', name: 'Gastos Compraventa Vivienda', description: 'ITP/IVA, notaría, plusvalía e IRPF del vendedor' },
     { url: '/simulador-gastos-compraventa-local-comercial/', icon: '🏪', name: 'Gastos Local Comercial', description: 'IVA, ITP y renuncia a la exención' },
     { url: '/simulador-gastos-compraventa-trastero/', icon: '📦', name: 'Gastos Trastero', description: 'Calcula los gastos de tu trastero' },
-    { url: '/simulador-gastos-compraventa-nave-industrial/', icon: '🏭', name: 'Gastos Nave Industrial', description: 'IVA 21% y gastos de compra' },
+    { url: '/simulador-gastos-compraventa-nave-industrial/', icon: '🏭', name: 'Gastos Nave Industrial', description: 'IVA 21 % y gastos de compra' },
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
     { url: '/estimador-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Calcula el impuesto del vendedor' },
   ],
@@ -679,7 +679,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-gastos-compraventa-trastero': [
     { url: '/estimador-compraventa-inmueble/', icon: '🏠', name: 'Gastos Compraventa Vivienda', description: 'ITP/IVA, notaría, plusvalía e IRPF del vendedor' },
     { url: '/simulador-gastos-compraventa-garaje/', icon: '🚗', name: 'Gastos Garaje', description: 'Calcula los gastos de tu garaje' },
-    { url: '/simulador-gastos-compraventa-nave-industrial/', icon: '🏭', name: 'Gastos Nave Industrial', description: 'IVA 21% y gastos de compra' },
+    { url: '/simulador-gastos-compraventa-nave-industrial/', icon: '🏭', name: 'Gastos Nave Industrial', description: 'IVA 21 % y gastos de compra' },
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
     { url: '/estimador-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Calcula el impuesto del vendedor' },
   ],
@@ -695,7 +695,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-gastos-compraventa-solar/', icon: '🏗️', name: 'Gastos Solar', description: 'Terreno edificable: IVA o ITP' },
     { url: '/simulador-gastos-compraventa-local-comercial/', icon: '🏪', name: 'Gastos Local Comercial', description: 'IVA, ITP y renuncia a la exención' },
     { url: '/estimador-compraventa-inmueble/', icon: '🏠', name: 'Gastos Compraventa Vivienda', description: 'ITP/IVA, notaría, plusvalía e IRPF del vendedor' },
-    { url: '/simulador-gastos-compraventa-nave-industrial/', icon: '🏭', name: 'Gastos Nave Industrial', description: 'IVA 21% y gastos de compra' },
+    { url: '/simulador-gastos-compraventa-nave-industrial/', icon: '🏭', name: 'Gastos Nave Industrial', description: 'IVA 21 % y gastos de compra' },
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
   ],
   'simulador-gastos-compraventa-solar': [
