@@ -41,7 +41,9 @@
  * No se puede impedir que el auditado se salte a su auditor: los commits los teclea Claude,
  * y todo escape que exista es un escape que Claude puede teclear. Lo que sí se garantiza es
  * que no lo haga en SILENCIO: el toast sale antes del bloqueo, y `--sesion` reconcilia al
- * cerrar (hallazgo vivo sin acta que lo cubra = alguien pasó por encima del pre-commit).
+ * cerrar (sorpresa commiteada que ninguna sesión autorizó = alguien pasó por encima del
+ * pre-commit). Hasta el 26/09/2026 se infería de que la sesión no tuviera actas, y con dos
+ * sesiones abiertas daba puenteo sobre commits autorizados: `reconciliar` en el motor.
  *
  * EL PRECIO ACEPTADO (15/09/2026)
  * ───────────────────────────────
@@ -57,7 +59,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { contar, autoverificar, dentroDe } from './cuadre-motor.mjs';
+import {
+  contar,
+  autoverificar,
+  dentroDe,
+  elegirSesion,
+  autorizadosVigentes,
+  reconciliar,
+} from './cuadre-motor.mjs';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIR_ESTADO = path.join(RAIZ, 'scratch', 'cuadre');
@@ -193,19 +202,27 @@ function escribirJson(ruta, datos) {
   fs.renameSync(temporal, ruta);
 }
 
-/** La sesión viva: la más recientemente tocada de las últimas 24 h. */
-export function sesionActual() {
-  if (!fs.existsSync(DIR_ESTADO)) return null;
-  const limite = Date.now() - 24 * 60 * 60 * 1000;
-  const candidatas = fs
+/** Todos los ficheros de sesión, con su contenido y cuándo se escribieron por última vez. */
+function sesionesEnDisco() {
+  if (!fs.existsSync(DIR_ESTADO)) return [];
+  return fs
     .readdirSync(DIR_ESTADO)
     .filter((n) => n.startsWith('sesion-') && n.endsWith('.json'))
-    .map((n) => ({ ruta: path.join(DIR_ESTADO, n), mtime: fs.statSync(path.join(DIR_ESTADO, n)).mtimeMs }))
-    .filter((s) => s.mtime > limite)
-    .sort((a, b) => b.mtime - a.mtime);
-  if (candidatas.length === 0) return null;
-  const datos = leerJson(candidatas[0].ruta, null);
-  return datos ? { ...datos, _ruta: candidatas[0].ruta } : null;
+    .map((n) => {
+      const ruta = path.join(DIR_ESTADO, n);
+      return { ruta, mtime: fs.statSync(ruta).mtimeMs, datos: leerJson(ruta, null) };
+    })
+    .filter((s) => s.datos);
+}
+
+/**
+ * La sesión de este proceso. El id llega por argumento en el cierre y por el entorno en el
+ * pre-commit (git lo hereda de la orden de Claude Code); sin él, la más recientemente tocada.
+ * Por qué ya no basta con la más reciente: cabecera de «Varias sesiones» en `cuadre-motor.mjs`.
+ */
+export function sesionActual(id = process.env.CLAUDE_CODE_SESSION_ID) {
+  const elegida = elegirSesion(id, sesionesEnDisco());
+  return elegida ? { ...elegida.datos, _ruta: elegida.ruta } : null;
 }
 
 export function guardarSesion(sesion) {
@@ -463,7 +480,10 @@ function modoPreCommit() {
   avisarSiNoLleganLosEventos(sesion);
   const base = sesion?.base && gitSilencioso('cat-file', '-e', `${sesion.base}^{commit}`) !== null ? sesion.base : 'HEAD';
   const peticiones = sesion?.peticiones || [];
-  const autorizados = new Set(sesion?.autorizados || []);
+  // Las de TODAS las sesiones abiertas desde que empezó esta: la base de una sesión larga
+  // abarca los commits de las demás, y sin ellas un CUADRE_OK ajeno volvería a bloquear aquí.
+  const propios = new Set(sesion?.autorizados || []);
+  const autorizados = autorizadosVigentes(sesion, sesionesEnDisco());
 
   const ficheros = ficherosDe(gitSilencioso('diff', '--cached', '--name-status', base));
   if (ficheros.length === 0) return 0;
@@ -489,7 +509,9 @@ function modoPreCommit() {
     // se sigue nombrando en cada commit que lo lleve encima. Lo descubrió la prueba del
     // 16/09/2026: autorizado un borrado de test, el segundo intento pasó en SILENCIO ABSOLUTO,
     // que es exactamente lo que este candado existe para que no ocurra.
-    for (const h of repetidos) console.log(`· Cuadre: ${h.texto} — ya autorizado en esta sesión`);
+    for (const h of repetidos) {
+      console.log(`· Cuadre: ${h.texto} — ya autorizado ${propios.has(h.huella) ? 'en esta sesión' : 'en otra sesión'}`);
+    }
     return 0; // el silencio es el estado normal cuando no queda nada que contar
   }
 
@@ -510,7 +532,7 @@ function modoPreCommit() {
 
   if (sesion) {
     sesion.actas = [...(sesion.actas || []), acta];
-    if (razon) sesion.autorizados = [...autorizados, ...nuevos.map((h) => h.huella)];
+    if (razon) sesion.autorizados = [...propios, ...nuevos.map((h) => h.huella)];
     guardarSesion(sesion);
   }
 
@@ -541,9 +563,9 @@ function modoPreCommit() {
 // Modo: --sesion  (cierre de sesión: no bloquea, reconcilia)
 // ---------------------------------------------------------------------------
 
-function modoSesion({ silencioSiNada = true } = {}) {
+function modoSesion({ silencioSiNada = true, id } = {}) {
   if (!autoverificarOMorir()) return 1;
-  const sesion = sesionActual();
+  const sesion = sesionActual(id);
   if (!sesion?.base) return 0;
   if (gitSilencioso('cat-file', '-e', `${sesion.base}^{commit}`) === null) return 0;
 
@@ -562,13 +584,19 @@ function modoSesion({ silencioSiNada = true } = {}) {
     ficherosFuera: escriturasFuera(sesion.transcript),
   });
 
-  const autorizados = new Set(sesion.autorizados || []);
-  const vivos = resultado.hallazgos.filter((h) => !autorizados.has(h.huella));
-
-  // Reconciliación: un hallazgo vivo al cerrar, sin acta que lo cubra, significa que el
-  // pre-commit no llegó a correr. Detecta el puenteo incluso por una vía no prevista.
-  const commits = (gitSilencioso('log', '--format=%h', `${sesion.base}..HEAD`) || '').trim().split('\n').filter(Boolean);
-  const puenteado = vivos.length > 0 && commits.length > 0 && (sesion.actas || []).length === 0;
+  // Reconciliación: una sorpresa YA COMMITEADA que ninguna sesión autorizó solo puede haber
+  // llegado por encima del pre-commit. Se cuenta también base → HEAD para separarla de lo que
+  // aún no se ha commiteado; solo hace falta si queda algo vivo, que es lo raro.
+  const autorizados = autorizadosVigentes(sesion, sesionesEnDisco());
+  let huellasCommiteadas = new Set();
+  if (resultado.hallazgos.some((h) => !autorizados.has(h.huella))) {
+    const ficherosCommit = ficherosDe(gitSilencioso('diff', '--name-status', sesion.base, 'HEAD'));
+    const diffCommit = gitSilencioso('diff', '--unified=0', '--no-color', sesion.base, 'HEAD') || '';
+    const enCommits = cuadrarRevisiones({ base: sesion.base, destino: 'HEAD', ficheros: ficherosCommit, diff: diffCommit });
+    huellasCommiteadas = new Set(enCommits.hallazgos.map((h) => h.huella));
+  }
+  const { vivos, commiteados } = reconciliar({ hallazgos: resultado.hallazgos, huellasCommiteadas, autorizados });
+  const puenteado = commiteados.length > 0;
 
   if (vivos.length === 0) {
     if (!silencioSiNada) {
@@ -578,19 +606,27 @@ function modoSesion({ silencioSiNada = true } = {}) {
   }
 
   const soloVivos = { ...resultado, hallazgos: vivos };
+  const sinCommitear = vivos.length - commiteados.length;
   const acta = escribirActa({
     resultado: soloVivos,
     peticiones: sesion.peticiones || [],
-    motivo: puenteado ? 'cierre de sesión · HAY COMMITS SIN PASAR POR EL PRE-COMMIT' : 'cierre de sesión · sin commitear',
+    motivo: puenteado
+      ? `cierre de sesión ${sesion.sesion} · HAY COMMITS SIN PASAR POR EL PRE-COMMIT`
+      : `cierre de sesión ${sesion.sesion} · sin commitear`,
   });
   sesion.actas = [...(sesion.actas || []), acta];
   guardarSesion(sesion);
 
   const cabecera = puenteado
-    ? `✖ CUADRE — ${vivos.length} sorpresa(s) YA COMMITEADAS sin pasar por el pre-commit`
+    ? `✖ CUADRE — ${commiteados.length} sorpresa(s) YA COMMITEADAS que ninguna sesión autorizó${sinCommitear ? ` (y ${sinCommitear} sin commitear)` : ''}`
     : `⚠ CUADRE — ${vivos.length} sorpresa(s) al cerrar la sesión`;
-  toast(puenteado ? `Cuadre: ${vivos.length} sorpresa(s) commiteadas sin pasar el candado` : `Cuadre: ${vivos.length} sorpresa(s) sin commitear`);
-  console.log(`\n${informe({ resultado: soloVivos, peticiones: sesion.peticiones || [], titulo: cabecera, mudos: registro().commitsMudos })}`);
+  toast(
+    puenteado
+      ? `Cuadre: ${commiteados.length} sorpresa(s) commiteadas sin pasar el candado`
+      : `Cuadre: ${vivos.length} sorpresa(s) sin commitear`,
+  );
+  console.log(`
+${informe({ resultado: soloVivos, peticiones: sesion.peticiones || [], titulo: cabecera, mudos: registro().commitsMudos })}`);
   console.log(`  Acta: ${acta}`);
   return 0;
 }
@@ -607,7 +643,9 @@ if (modo === '--simular') {
 } else if (modo === '--sesion') {
   process.exit(modoSesion({ silencioSiNada: false }));
 } else if (modo === '--cierre') {
-  process.exit(modoSesion({ silencioSiNada: true }));
+  // El hook de cierre pasa el id de la sesión que se cierra: sin él se evaluaba la última
+  // tocada, que al cerrar varias seguidas es la que se cerró ANTES (26/09/2026).
+  process.exit(modoSesion({ silencioSiNada: true, id: args[1] || undefined }));
 } else {
   console.log('Uso: node scripts/cuadre.mjs [--sesion | --pre-commit | --cierre | --simular N]');
   process.exit(1);

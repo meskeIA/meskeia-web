@@ -130,11 +130,18 @@ automático y otro no:
 1. **No se puede impedir que el auditado se salte a su auditor.** Los commits los teclea Claude,
    y todo escape que exista es un escape que Claude puede teclear. Lo que sí se garantiza es que
    no lo haga en silencio: el toast sale antes del bloqueo, y el cierre de sesión reconcilia
-   —hallazgo vivo sin acta que lo cubra significa que alguien pasó por encima del pre-commit—.
-2. **Dos sesiones a la vez sobre el mismo repositorio** comparten repositorio pero no estado: el
-   pre-commit toma el fichero de sesión tocado más recientemente, que es casi siempre el correcto
-   —quien acaba de escribirte es quien va a commitear— pero no siempre. Si el acta cita una
+   —una sorpresa **commiteada** que **ninguna** sesión autorizó significa que alguien pasó por
+   encima del pre-commit—.
+2. **Dos sesiones a la vez sobre el mismo repositorio.** Cada evento sabe ya de qué sesión es: el
+   cierre recibe el id del hook y el pre-commit lo hereda en `CLAUDE_CODE_SESSION_ID`. Y un
+   `CUADRE_OK` vale para toda sesión abierta antes de darse, porque autoriza un cambio del
+   repositorio, no una conversación. Lo que queda de aproximación: un commit tecleado **fuera**
+   de Claude Code no trae id y toma la sesión tocada más recientemente; si su acta cita una
    petición que no viene a cuento, es esto.
+   > Hasta el 26/09/2026 todo iba por «la más reciente». Al cerrar cinco sesiones en treinta
+   > segundos, cada cierre juzgó a la anterior, y la ronda —abierta desde la víspera— dio dos
+   > toasts de «commiteadas sin pasar el candado» sobre dos `role="alert"` que la sesión de
+   > reparaciones había autorizado con su razón. Trampas `S1`-`S6` de `cuadre:probar-candado`.
 
 ## Dónde vive cada pieza
 

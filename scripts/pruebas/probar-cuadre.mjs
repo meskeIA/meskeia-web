@@ -26,7 +26,15 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { contar, REGLAS_QUE_BLOQUEAN, dentroDe } from '../cuadre-motor.mjs';
+import {
+  contar,
+  REGLAS_QUE_BLOQUEAN,
+  dentroDe,
+  elegirSesion,
+  autorizadosVigentes,
+  reconciliar,
+  esPeticionDelUsuario,
+} from '../cuadre-motor.mjs';
 
 const RAIZ = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const UMBRAL_ESPECIFICIDAD = 10;
@@ -291,6 +299,86 @@ if (marcador) {
   }
   const desconocidas = [...todas].filter((r) => !REGLAS_QUE_BLOQUEAN.includes(r));
   anotar('N7 · toda regla que dispara está declarada', desconocidas.length === 0, desconocidas.join(', '));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VARIAS SESIONES · el falso puenteo del 26/09/2026
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// Reinyecta el caso real: cinco sesiones cerradas entre las 11:20:38 y las 11:21:08, y dos
+// toasts de «commiteadas sin pasar el candado» sobre dos `role="alert"` que la sesión de
+// reparaciones había retirado con CUADRE_OK (actas 09:22 y 09:32). Huellas, ids y horas son
+// los de los ficheros de `scratch/cuadre/` de ese día.
+
+{
+  const t = (iso) => Date.parse(iso);
+  const sesion = (id, inicio, mtime, autorizados = []) => ({
+    datos: { sesion: id, inicio, base: 'b', autorizados, actas: [] },
+    mtime: t(mtime),
+  });
+  const RONDA = sesion('86f60fed', '2026-09-25T18:26:34Z', '2026-09-26T09:20:30Z');
+  const REPARACION = sesion('bafa8229', '2026-09-26T06:23:29Z', '2026-09-26T09:20:46Z', ['30348d6d', '451a9fba']);
+  const OTRA_RONDA = sesion('2f316489', '2026-09-26T05:52:27Z', '2026-09-26T09:20:54Z');
+  const VIEJA = sesion('1c187c00', '2026-09-24T15:53:05Z', '2026-09-25T05:56:44Z', ['0badc0de']);
+  const todas = [RONDA, REPARACION, OTRA_RONDA, VIEJA];
+  const ahora = t('2026-09-26T09:21:00Z');
+
+  // S1 · El cierre evalúa la sesión que se cierra, no la última tocada.
+  const elegida = elegirSesion('86f60fed', todas, ahora);
+  anotar('S1 · el cierre juzga a la sesión que se cierra', elegida?.datos.sesion === '86f60fed', `eligió ${elegida?.datos.sesion}`);
+  const sinId = elegirSesion(undefined, todas, ahora);
+  anotar('S1 · sin id se queda la más reciente (commit fuera de Claude Code)', sinId?.datos.sesion === '2f316489', `eligió ${sinId?.datos.sesion}`);
+  anotar(
+    'S1 · con id se encuentra aunque pase de 24 h sin tocarse',
+    elegirSesion('1c187c00', todas, ahora)?.datos.sesion === '1c187c00',
+  );
+
+  // S2 · Lo que sonó: las dos sorpresas, commiteadas y autorizadas por OTRA sesión.
+  const alertas = [
+    { regla: 'guardia-a-cero', huella: '451a9fba', texto: 'role="alert" desapareció de app/diccionario-rimas/page.tsx' },
+    { regla: 'guardia-a-cero', huella: '30348d6d', texto: 'role="alert" desapareció de app/quiz-historia-espana/page.tsx' },
+  ];
+  const commiteadas = new Set(alertas.map((h) => h.huella));
+  const hoy = reconciliar({ hallazgos: alertas, huellasCommiteadas: commiteadas, autorizados: autorizadosVigentes(RONDA.datos, todas) });
+  anotar('S2 · un CUADRE_OK de otra sesión cubre la ventana de esta', hoy.vivos.length === 0, `${hoy.vivos.length} vivas`);
+
+  // Y que la trampa no es vacua: con solo las autorizaciones propias —lo de antes— sale el aviso.
+  const antes = reconciliar({ hallazgos: alertas, huellasCommiteadas: commiteadas, autorizados: new Set(RONDA.datos.autorizados) });
+  anotar(
+    'S2 · la trampa caza el fallo (con solo las propias vuelve el aviso)',
+    antes.commiteados.length === 2,
+    'si esto falla, el caso ya no distingue el bug y hay que rehacerlo',
+  );
+
+  // S3 · Un puenteo de verdad sigue sonando: commiteada y sin autorizar en NINGUNA sesión.
+  const ajena = [{ regla: 'test-borrado', huella: 'deadbeef', texto: 'desaparece tests/apps/x.spec.ts' }];
+  const puenteo = reconciliar({ hallazgos: ajena, huellasCommiteadas: new Set(['deadbeef']), autorizados: autorizadosVigentes(RONDA.datos, todas) });
+  anotar('S3 · una sorpresa commiteada sin autorizar SÍ es puenteo', puenteo.commiteados.length === 1, `${puenteo.commiteados.length}`);
+
+  // S4 · Sin commitear no es puenteo: se avisa, pero como pendiente.
+  const pendiente = reconciliar({ hallazgos: ajena, huellasCommiteadas: new Set(), autorizados: new Set() });
+  anotar(
+    'S4 · una sorpresa sin commitear se avisa pero NO como puenteo',
+    pendiente.vivos.length === 1 && pendiente.commiteados.length === 0,
+  );
+
+  // S5 · Un visto bueno anterior a la ventana no silencia nada: la sesión VIEJA se cerró antes
+  //      de que la ronda empezara, así que su autorización no puede cubrir un commit de aquí.
+  const reaparece = [{ regla: 'guardia-a-cero', huella: '0badc0de', texto: 'role="alert" desapareció otra vez' }];
+  const viejo = reconciliar({ hallazgos: reaparece, huellasCommiteadas: new Set(['0badc0de']), autorizados: autorizadosVigentes(RONDA.datos, todas) });
+  anotar('S5 · una autorización anterior a la ventana NO cubre', viejo.commiteados.length === 1, `${viejo.commiteados.length}`);
+
+  // S6 · Lo que pediste es lo que escribió el usuario, no los avisos del harness.
+  anotar(
+    'S6 · los avisos de subagentes y tareas NO son peticiones',
+    !esPeticionDelUsuario('<agent-message from="ae5eb2430d23bcfd4"> [Subagent hand-back] …') &&
+      !esPeticionDelUsuario('<task-notification> <task-id>b0fm9wh6k</task-id> …') &&
+      !esPeticionDelUsuario('   '),
+  );
+  anotar(
+    'S6 · lo que escribe el usuario SÍ lo es',
+    esPeticionDelUsuario('/ronda') && esPeticionDelUsuario('Reparar los últimos hallazgos <b>ya</b>'),
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

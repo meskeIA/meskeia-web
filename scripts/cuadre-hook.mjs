@@ -169,7 +169,10 @@ if (evento === 'peticion') {
     actas: [],
   };
   const texto = String(datos.prompt || '').trim();
-  if (texto) estado.peticiones = [...(estado.peticiones || []), texto].slice(-40);
+  // Import dinámico a propósito: este fichero lo cargan hooks GLOBALES, y un fallo al importar
+  // el motor tumbaría también la puerta del --no-verify en todos los proyectos.
+  const { esPeticionDelUsuario } = await import('./cuadre-motor.mjs');
+  if (esPeticionDelUsuario(texto)) estado.peticiones = [...(estado.peticiones || []), texto].slice(-40);
   if (datos.transcript_path) estado.transcript = datos.transcript_path;
   escribir(ruta, estado);
   process.exit(0);
@@ -178,7 +181,9 @@ if (evento === 'peticion') {
 // ── SessionEnd · contar al cerrar, sin bloquear ──────────────────────────────
 if (evento === 'cierre') {
   const { spawnSync } = await import('node:child_process');
-  const r = spawnSync(process.execPath, [path.join(RAIZ, 'scripts', 'cuadre.mjs'), '--cierre'], {
+  // Con el id de ESTA sesión: sin él, cuadre.mjs evaluaba la última tocada, y al cerrar varias
+  // seguidas cada una juzgaba a la anterior (26/09/2026).
+  const r = spawnSync(process.execPath, [path.join(RAIZ, 'scripts', 'cuadre.mjs'), '--cierre', datos.session_id || ''], {
     cwd: RAIZ,
     stdio: 'ignore',
     timeout: 25000,

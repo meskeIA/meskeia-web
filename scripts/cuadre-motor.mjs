@@ -412,3 +412,95 @@ export const REGLAS_QUE_BLOQUEAN = [
   'registro-encoge',
   'fuera-del-repositorio',
 ];
+
+// ---------------------------------------------------------------------------
+// Varias sesiones sobre el mismo repositorio
+// ---------------------------------------------------------------------------
+//
+// Lo que sigue decide QUIÉN es la sesión y QUÉ autorizaciones valen. Vive aquí, sin disco,
+// por la misma razón que las reglas: el 26/09/2026 falló justo esta parte y ninguna trampa
+// la tocaba, porque todas recibían el antes y el después ya decididos.
+//
+// El caso: cinco sesiones cerradas en treinta segundos. El cierre no sabía cuál se cerraba
+// —tomaba la última tocada—, así que cada una evaluó a la ANTERIOR. Y la de la ronda, abierta
+// desde la víspera, llevaba en su ventana dos `role="alert"` que la sesión de reparaciones
+// había retirado con CUADRE_OK y su razón escrita (actas 09:22 y 09:32). Como la autorización
+// vivía en el fichero de la otra sesión y la evaluada no tenía actas propias, salieron dos
+// toasts de «commiteadas sin pasar el candado» sobre commits que sí lo habían pasado.
+
+const UN_DIA = 24 * 60 * 60 * 1000;
+
+/**
+ * La sesión a la que pertenece un evento.
+ *
+ * Con el identificador —que el hook de cierre recibe de Claude Code y el pre-commit hereda en
+ * `CLAUDE_CODE_SESSION_ID`— es esa y ninguna otra, tenga la edad que tenga. Sin él queda la
+ * aproximación de siempre, la más recientemente tocada de las últimas 24 h, que acierta cuando
+ * hay una sola sesión abierta y es lo que queda para un commit tecleado fuera de Claude Code.
+ *
+ * @param {string|null|undefined} id
+ * @param {{datos: object, mtime: number}[]} candidatas  todos los ficheros de sesión
+ */
+export function elegirSesion(id, candidatas, ahora = Date.now()) {
+  if (id) {
+    const propia = candidatas.find((c) => c.datos?.sesion === id);
+    if (propia) return propia;
+  }
+  const recientes = candidatas.filter((c) => c.mtime > ahora - UN_DIA).sort((a, b) => b.mtime - a.mtime);
+  return recientes[0] ?? null;
+}
+
+/**
+ * Las autorizaciones que cubren la ventana de una sesión: las suyas y las de cualquier sesión
+ * que haya escrito algo desde que esta empezó.
+ *
+ * Un CUADRE_OK autoriza un cambio del repositorio, no una conversación: el commit que la
+ * sesión B autoriza también cae en la ventana de la sesión A si A se abrió antes. El corte por
+ * fecha es lo que impide que un visto bueno de hace semanas silencie hoy un hallazgo con la
+ * misma huella —una autorización que cubre un commit de esta ventana se escribió, a la fuerza,
+ * después de que la ventana se abriera—.
+ */
+export function autorizadosVigentes(propia, candidatas) {
+  const desde = Date.parse(propia?.inicio || '') || 0;
+  const vigentes = new Set(propia?.autorizados || []);
+  for (const c of candidatas) {
+    if (c.mtime < desde) continue;
+    for (const h of c.datos?.autorizados || []) vigentes.add(h);
+  }
+  return vigentes;
+}
+
+/**
+ * Reconciliación al cerrar: qué sorpresas siguen vivas y cuáles de ellas ya están commiteadas.
+ *
+ * Una sorpresa COMMITEADA que ninguna sesión autorizó solo puede haber llegado por encima del
+ * pre-commit —que la habría bloqueado—, y esa es la señal de puenteo. Antes se infería de que
+ * la sesión no tuviera actas propias, pero un commit que pasa limpio no deja acta: la ausencia
+ * de actas no demuestra nada.
+ *
+ * @param {object} entrada
+ * @param {object[]} entrada.hallazgos            base → árbol de trabajo
+ * @param {Set<string>} entrada.huellasCommiteadas huellas de base → HEAD
+ * @param {Set<string>} entrada.autorizados        las de `autorizadosVigentes`
+ */
+export function reconciliar({ hallazgos, huellasCommiteadas, autorizados }) {
+  const vivos = hallazgos.filter((h) => !autorizados.has(h.huella));
+  const commiteados = vivos.filter((h) => huellasCommiteadas.has(h.huella));
+  return { vivos, commiteados };
+}
+
+/**
+ * Qué cuenta como «lo que pediste».
+ *
+ * El hook `UserPromptSubmit` recibe también los avisos que el harness inyecta cuando termina un
+ * subagente o una tarea en segundo plano. No los escribió el usuario, y en una tanda del
+ * Inspector son cuarenta: el 26/09/2026 la sesión de la ronda llegó al cierre con 40
+ * «peticiones» y ninguna era suya —el recorte a las 40 últimas había expulsado el «/ronda»—.
+ * La columna izquierda del Cuadre tiene que venir del usuario, literal, o no sirve.
+ */
+const AVISO_DEL_HARNESS = /^<(agent-message|task-notification)\b/;
+
+export function esPeticionDelUsuario(texto) {
+  const t = String(texto || '').trim();
+  return t.length > 0 && !AVISO_DEL_HARNESS.test(t);
+}
