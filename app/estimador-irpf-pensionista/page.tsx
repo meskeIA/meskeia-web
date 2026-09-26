@@ -5,7 +5,7 @@ import styles from './EstimadorIrpfPensionista.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_IRPF_META,
@@ -17,6 +17,9 @@ import {
   REDUCCION_TRIBUTACION_CONJUNTA_2025,
   OBLIGACION_DECLARAR_2025,
   calcularRendimientoNetoTrabajo,
+  calcularCuotaBaseAhorro,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  DEDUCCIONES_IRPF_DISCAPACIDAD_2025,
 } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -28,9 +31,14 @@ interface ResultadoIrpfPensionista {
   rendimientosIntegrosTrabajo: number;
   /** Rescate del plan de pensiones declarado, ya incluido en el íntegro del trabajo. */
   rescatePP: number;
-  /** Rentas de la base general distintas del trabajo (alquileres, intereses…). */
+  /** Rentas de la base GENERAL distintas del trabajo: alquileres, por su rendimiento neto. */
   otrasRentas: number;
-  /** Suma de las dos anteriores. Es la que gradúa el tipo efectivo. */
+  /**
+   * Rendimientos del capital mobiliario del art. 25.1 a 25.3 (intereses, dividendos), que el
+   * art. 46.a LIRPF lleva a la base del AHORRO, con su propia escala (art. 66).
+   */
+  rentasAhorro: number;
+  /** Suma de todo lo anterior. Es la que gradúa el tipo efectivo. */
   ingresosTotales: number;
   gastosDeducibles: number;
   rendimientosNetos: number;
@@ -39,18 +47,26 @@ interface ResultadoIrpfPensionista {
   reduccionBloqueadaPorOtrasRentas: boolean;
   rendimientosNetosReducidos: number;
   minimoPersonal: number;
+  /** Base liquidable general, con el mínimo dentro (art. 63.1.2.º). */
   baseImponible: number;
-  cuotaBase: number;
-  cuotaMinimo: number;
+  /** Base liquidable del ahorro (aquí, los intereses y dividendos declarados). */
+  baseAhorro: number;
+  /**
+   * Parte del mínimo que la base general no agota y pasa a la del ahorro (art. 56.2 LIRPF):
+   * «formará parte de la base liquidable general por el importe de esta última y de la base
+   * liquidable del ahorro por el resto». Acotada a la base del ahorro.
+   */
+  minimoEnAhorro: number;
+  /** Cuota de la base general: escala del art. 63 menos la misma escala sobre el mínimo. */
+  cuotaGeneral: number;
+  /** Cuota de la base del ahorro: escala del art. 66 menos esa escala sobre `minimoEnAhorro`. */
+  cuotaAhorro: number;
   cuotaIRPF: number;
   tipoEfectivo: number;
   pensionNetaMensual: number;
 }
 
 // ─── Lógica ───────────────────────────────────────────────────────────────────
-
-/** Escala del art. 63 LIRPF. La cuota integra la pone `calcularCuotaIntegraGeneral`. */
-const calcularCuotaIRPF = cuotaEscalaGeneral;
 
 /**
  * Techo de rentas DISTINTAS de las del trabajo por encima del cual la reducción del art. 20
@@ -83,11 +99,24 @@ const ADICIONAL_MINIMO_65 = MINIMOS_IRPF_2025.personal_65 - MINIMOS_IRPF_2025.pe
 /** minimo-ok: ídem para el tramo de 75 años o más (art. 57.3 LIRPF). */
 const ADICIONAL_MINIMO_75 = MINIMOS_IRPF_2025.personal_75 - MINIMOS_IRPF_2025.personal;  // minimo-ok: ídem, art. 57.3 LIRPF
 
+/** Requisitos del ascendiente del art. 59 LIRPF (edad y techo de rentas), desde `data/fiscal`. */
+const REQUISITOS_ASCENDIENTE = DEDUCCIONES_IRPF_DISCAPACIDAD_2025.requisitosAscendiente;
+
+/** Primer y último tipo de la escala del ahorro (art. 66), para el texto de ayuda del campo. */
+const TIPO_AHORRO_MIN = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
+const TIPO_AHORRO_MAX = TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo;
+
+/** «11,7 %» con espacio duro (U+00A0), como exige el formato español. Recibe puntos porcentuales. */
+function formatPorcentaje(valor: number, decimales = 0): string {
+  return formatPercentage(valor / 100, decimales);
+}
+
 /** Rango admisible de cada campo. Lo usan la guarda y el texto del aviso, para que no divirjan. */
 const LIMITES = {
   pension: { min: 100, max: 10000 },
   rescate: { min: 0, max: 500000 },
   otrasRentas: { min: 0, max: 100000 },
+  rentasAhorro: { min: 0, max: 500000 },
 } as const;
 
 /** «entre 100 y 10.000 €», con los mismos números que aplica la guarda. */
@@ -101,10 +130,15 @@ function minimoPersonalPorEdad(tramo: TramoEdad): number {
   return MINIMOS_IRPF_2025.personal;
 }
 
+/**
+ * @param otrasRentas  Rentas de la base GENERAL distintas del trabajo (alquileres).
+ * @param rentasAhorro Intereses y dividendos: base del AHORRO (art. 46.a LIRPF).
+ */
 function estimarIrpfPensionista(
   pensionMensual: number,
   rescatePP: number,
   otrasRentas: number,
+  rentasAhorro: number,
   tramo: TramoEdad
 ): ResultadoIrpfPensionista {
   // Pensión con 14 pagas para cálculo anual IRPF
@@ -117,16 +151,18 @@ function estimarIrpfPensionista(
   // NETO del trabajo rebajaban la reducción del art. 20, que se gradúa justo por ese
   // rendimiento. Un alquiler hacía así de menos una reducción que la ley calcula sin él.
   const rendimientosIntegrosTrabajo = pensionAnual + rescatePP;
-  const ingresosTotales = rendimientosIntegrosTrabajo + otrasRentas;
+  const ingresosTotales = rendimientosIntegrosTrabajo + otrasRentas + rentasAhorro;
 
   // Arts. 19 y 20 LIRPF. La reducción del art. 20 se mide sobre los íntegros (una pensión no
   // tiene gastos de las letras a) a e)), ANTES de restar los 2.000 € de la letra f): hasta el
   // 25/09/2026 se medía después (hallazgo 1687 de estimador-sueldo-neto, mismo defecto). Y se
-  // pierde con más de LIMITE_OTRAS_RENTAS_ART_20 de rentas ajenas al trabajo.
+  // pierde con más de LIMITE_OTRAS_RENTAS_ART_20 de rentas ajenas al trabajo. Ese límite
+  // cuenta TODAS las rentas distintas del trabajo, «excluidas las exentas» (art. 20): las de la
+  // base general y también los intereses y dividendos de la del ahorro.
   const rendimientoTrabajo = calcularRendimientoNetoTrabajo({
     integros: rendimientosIntegrosTrabajo,
     gastosAaE: 0,
-    otrasRentas,
+    otrasRentas: otrasRentas + rentasAhorro,
   });
   const gastosDeducibles = rendimientoTrabajo.otrosGastos;
   const rendimientosNetos = rendimientoTrabajo.rendimientoNeto;
@@ -137,17 +173,31 @@ function estimarIrpfPensionista(
   // Mínimo personal según edad
   const minimoPersonal = minimoPersonalPorEdad(tramo);
 
-  // Base imponible general: el rendimiento del trabajo ya reducido MÁS las otras rentas, que
+  // Base imponible general: el rendimiento del trabajo ya reducido MÁS los alquileres, que
   // se integran en la base general por su importe neto pero nunca en el RNT.
+  //
+  // Los intereses y dividendos NO entran aquí. Son rendimientos del capital mobiliario del
+  // art. 25.1-3, y el art. 46.a los lleva a la base del AHORRO, que se grava con la escala del
+  // art. 66 (19 % a 30 %) y no con la general. Hasta el 26/09/2026 un único campo mezclaba
+  // alquileres con intereses y dividendos y lo sumaba todo aquí: 5.000 € de dividendos sobre
+  // una pensión de 1.500 €/mes salían al 24-30 % de la escala general, 478 € de cuota de más
+  // (hallazgo 2131).
   const baseImponible = rendimientosNetosReducidos + otrasRentas;
+  const baseAhorro = rentasAhorro;
 
-  // Cuota integra (art. 63.1.2 LIRPF): escala sobre la base completa menos escala sobre el
-  // minimo. Desde el 12/09/2026 la resta la hace data/fiscal/irpf.ts, que ademas acota el
-  // minimo a la base: con una pension por debajo del minimo, la escala aplicada al minimo
-  // entero devolvia mas cuota de la que hay que gravar, y solo el Math.max(0) lo tapaba.
-  const cuotaBase = calcularCuotaIRPF(baseImponible);
-  const cuotaMinimo = calcularCuotaIRPF(Math.min(minimoPersonal, baseImponible));
-  const cuotaIRPF = calcularCuotaIntegraGeneral(baseImponible, minimoPersonal);
+  // Cuota íntegra general (art. 63.1.2.º LIRPF): escala sobre la base completa menos escala
+  // sobre el mínimo. La resta la hace data/fiscal/irpf.ts, que además acota el mínimo a la base.
+  const cuotaGeneral = calcularCuotaIntegraGeneral(baseImponible, minimoPersonal);
+
+  // Art. 56.2 LIRPF: si la base general no agota el mínimo, el resto forma parte de la base del
+  // ahorro, y el art. 66.1.2.º lo grava allí a tipo cero por el mismo método (escala sobre la
+  // base menos escala sobre esa parte del mínimo). Sin esto, un pensionista cuya pensión queda
+  // bajo el mínimo pagaría por sus intereses aunque la ley los deje a cubierto.
+  const minimoSobrante = Math.max(0, minimoPersonal - baseImponible);
+  const minimoEnAhorro = Math.min(minimoSobrante, baseAhorro);
+  const cuotaAhorro = Math.max(0, calcularCuotaBaseAhorro(baseAhorro) - calcularCuotaBaseAhorro(minimoEnAhorro));
+
+  const cuotaIRPF = cuotaGeneral + cuotaAhorro;
 
   const tipoEfectivo = ingresosTotales > 0 ? (cuotaIRPF / ingresosTotales) * 100 : 0;
 
@@ -159,6 +209,7 @@ function estimarIrpfPensionista(
     rendimientosIntegrosTrabajo,
     rescatePP,
     otrasRentas,
+    rentasAhorro,
     ingresosTotales,
     gastosDeducibles,
     rendimientosNetos,
@@ -167,8 +218,10 @@ function estimarIrpfPensionista(
     rendimientosNetosReducidos,
     minimoPersonal,
     baseImponible,
-    cuotaBase,
-    cuotaMinimo,
+    baseAhorro,
+    minimoEnAhorro,
+    cuotaGeneral,
+    cuotaAhorro,
     cuotaIRPF,
     tipoEfectivo,
     pensionNetaMensual,
@@ -189,13 +242,13 @@ function escenarioAnual(
   otrasRentas: number,
   tramo: TramoEdad
 ): ResultadoIrpfPensionista {
-  return estimarIrpfPensionista(integrosTrabajoAnuales / 14, 0, otrasRentas, tramo);
+  return estimarIrpfPensionista(integrosTrabajoAnuales / 14, 0, otrasRentas, 0, tramo);
 }
 
 /** Escenarios del bloque educativo. Los importes de ejemplo son del ejemplo; el cálculo, de la norma. */
 const ESC_PENSION_UNICA = escenarioAnual(19000, 0, '65_74');
 const ESC_PENSION_ALQUILER = escenarioAnual(14000, 6000, '65_74');
-const ESC_RESCATE_PP = estimarIrpfPensionista(15000 / 14, 30000, 0, '65_74');
+const ESC_RESCATE_PP = estimarIrpfPensionista(15000 / 14, 30000, 0, 0, '65_74');
 
 // ─── Componente ───────────────────────────────────────────────────────────────
 
@@ -203,6 +256,7 @@ export default function EstimadorIrpfPensionista() {
   const [pensionMensual, setPensionMensual] = useState('');
   const [rescatePP, setRescatePP] = useState('0');
   const [otrasRentasAnuales, setOtrasRentasAnuales] = useState('0');
+  const [rentasAhorroAnuales, setRentasAhorroAnuales] = useState('0');
   const [tramo, setTramo] = useState<TramoEdad>('65_74');
   const [resultado, setResultado] = useState<ResultadoIrpfPensionista | null>(null);
   const [error, setError] = useState('');
@@ -229,6 +283,7 @@ export default function EstimadorIrpfPensionista() {
     const pension = parseSpanishNumber(pensionMensual);
     const rescate = leerCampoOpcional(rescatePP);
     const otrasRentas = leerCampoOpcional(otrasRentasAnuales);
+    const rentasAhorro = leerCampoOpcional(rentasAhorroAnuales);
 
     // `parseSpanishNumber` devuelve NaN con lo que no es un número («1.2.3», «12abc»). Un NaN
     // NO puede colarse como 0: en una app fiscal eso es publicar un supuesto que nadie escribió.
@@ -241,11 +296,15 @@ export default function EstimadorIrpfPensionista() {
       return;
     }
     if (Number.isNaN(otrasRentas) || otrasRentas < LIMITES.otrasRentas.min || otrasRentas > LIMITES.otrasRentas.max) {
-      rechazar(`Las otras rentas anuales deben ser un importe ${textoRango(LIMITES.otrasRentas)}.`);
+      rechazar(`Los alquileres y otras rentas de la base general deben ser un importe ${textoRango(LIMITES.otrasRentas)}.`);
+      return;
+    }
+    if (Number.isNaN(rentasAhorro) || rentasAhorro < LIMITES.rentasAhorro.min || rentasAhorro > LIMITES.rentasAhorro.max) {
+      rechazar(`Los intereses y dividendos deben ser un importe ${textoRango(LIMITES.rentasAhorro)}.`);
       return;
     }
 
-    setResultado(estimarIrpfPensionista(pension, rescate, otrasRentas, tramo));
+    setResultado(estimarIrpfPensionista(pension, rescate, otrasRentas, rentasAhorro, tramo));
   }
 
   return (
@@ -341,13 +400,29 @@ export default function EstimadorIrpfPensionista() {
           <NumberInput
             value={otrasRentasAnuales}
             onChange={setOtrasRentasAnuales}
-            label="Otras rentas anuales distintas del trabajo (€/año)"
+            label="Alquileres y otras rentas de la base general (€/año)"
             placeholder="0"
-            helperText={`Alquileres, intereses o dividendos, por su importe neto anual. NO pongas aquí pensiones ni sueldos: esos son rendimientos del trabajo. Por encima de ${formatCurrency(LIMITE_OTRAS_RENTAS_ART_20)} decae la reducción del art. 20. Pon 0 si no aplica.`}
+            helperText="Rendimiento neto anual de alquileres y demás rentas que tributan con la escala general. NO pongas aquí pensiones ni sueldos: esos son rendimientos del trabajo. Pon 0 si no aplica."
             min={LIMITES.otrasRentas.min}
             max={LIMITES.otrasRentas.max}
             acotarAlSalir={false}
           />
+
+          <NumberInput
+            value={rentasAhorroAnuales}
+            onChange={setRentasAhorroAnuales}
+            label="Intereses y dividendos (€/año)"
+            placeholder="0"
+            helperText={`Intereses de cuentas y depósitos y dividendos, por su importe neto anual. Tributan en la base del ahorro, con su propia escala (del ${formatPorcentaje(TIPO_AHORRO_MIN)} al ${formatPorcentaje(TIPO_AHORRO_MAX)}). Pon 0 si no aplica.`}
+            min={LIMITES.rentasAhorro.min}
+            max={LIMITES.rentasAhorro.max}
+            acotarAlSalir={false}
+          />
+
+          <p className={styles.hint}>
+            Si alquileres, intereses y dividendos suman más de {formatCurrency(LIMITE_OTRAS_RENTAS_ART_20)},
+            decae la reducción del art. 20.
+          </p>
 
           {error && (
             <div role="alert" aria-live="polite" className={styles.errorMsg}>
@@ -394,22 +469,49 @@ export default function EstimadorIrpfPensionista() {
 
               {resultado.otrasRentas > 0 && (
                 <div className={styles.resultItem}>
-                  <span className={styles.resultLabel}>Otras rentas distintas del trabajo</span>
+                  <span className={styles.resultLabel}>Alquileres y otras rentas de la base general</span>
                   <span className={styles.resultValue}>{formatCurrency(resultado.otrasRentas)}</span>
                 </div>
               )}
 
               <div className={`${styles.resultItem} ${styles.resultItemHighlight}`}>
-                <span className={styles.resultLabel}>Base imponible estimada</span>
+                <span className={styles.resultLabel}>Base imponible general</span>
                 <span className={styles.resultValue}>{formatCurrency(resultado.baseImponible)}</span>
               </div>
+
+              {resultado.baseAhorro > 0 && (
+                <div className={`${styles.resultItem} ${styles.resultItemHighlight}`}>
+                  <span className={styles.resultLabel}>Base imponible del ahorro</span>
+                  <span className={styles.resultValue}>{formatCurrency(resultado.baseAhorro)}</span>
+                </div>
+              )}
 
               <div className={styles.resultItem}>
                 <span className={styles.resultLabel}>Mínimo personal (edad)</span>
                 <span className={styles.resultValue}>{formatCurrency(resultado.minimoPersonal)}</span>
               </div>
 
+              {resultado.minimoEnAhorro > 0 && (
+                <p className={styles.resultNota}>
+                  Tu base general no agota el mínimo: {formatCurrency(resultado.minimoEnAhorro)} de él
+                  se aplican a la base del ahorro, donde también se gravan a tipo cero (arts. 56.2 y 66 LIRPF).
+                </p>
+              )}
+
               <div className={styles.divider} />
+
+              {resultado.baseAhorro > 0 && (
+                <>
+                  <div className={styles.resultItem}>
+                    <span className={styles.resultLabel}>Cuota de la base general</span>
+                    <span className={styles.resultValue}>{formatCurrency(resultado.cuotaGeneral)}</span>
+                  </div>
+                  <div className={styles.resultItem}>
+                    <span className={styles.resultLabel}>Cuota de la base del ahorro</span>
+                    <span className={styles.resultValue}>{formatCurrency(resultado.cuotaAhorro)}</span>
+                  </div>
+                </>
+              )}
 
               <div className={styles.resultItem}>
                 <span className={styles.resultLabel}>Cuota IRPF estimada anual</span>
@@ -418,7 +520,7 @@ export default function EstimadorIrpfPensionista() {
 
               <div className={styles.resultItem}>
                 <span className={styles.resultLabel}>Tipo efectivo estimado</span>
-                <span className={styles.resultValue}>{formatNumber(resultado.tipoEfectivo, 1)}%</span>
+                <span className={styles.resultValue}>{formatPorcentaje(resultado.tipoEfectivo, 1)}</span>
               </div>
 
               <div className={`${styles.resultItem} ${styles.resultItemSolution}`}>
@@ -426,11 +528,11 @@ export default function EstimadorIrpfPensionista() {
                 <span className={styles.resultValueBig}>{formatCurrency(resultado.pensionNetaMensual)}/mes</span>
               </div>
 
-              {(resultado.otrasRentas > 0 || resultado.rescatePP > 0) && (
+              {(resultado.otrasRentas > 0 || resultado.rentasAhorro > 0 || resultado.rescatePP > 0) && (
                 <p className={styles.resultNota}>
                   La cuota es la de TODAS las rentas declaradas ({formatCurrency(resultado.ingresosTotales)} en
                   total), no solo la de la pensión: la pensión neta de arriba les carga también su
-                  parte del impuesto, así que en un año con rescate o con alquileres es un suelo,
+                  parte del impuesto, así que en un año con rescate, alquileres o dividendos es un suelo,
                   no lo que cobrarás cada mes.
                 </p>
               )}
@@ -482,18 +584,18 @@ export default function EstimadorIrpfPensionista() {
           <tbody>
             <tr>
               <td>Reducción rendimientos trabajo (art. 20, máxima)</td>
-              <td>{formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion1)} (RNT ≤ {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)})</td>
-              <td>Rentas ajenas al trabajo ≤ {formatCurrency(LIMITE_OTRAS_RENTAS_ART_20)}</td>
+              <td>{formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion1)}</td>
+              <td>Pensión anual íntegra (sin restar los {formatCurrency(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral)} de gastos) ≤ {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)}, y rentas ajenas al trabajo ≤ {formatCurrency(LIMITE_OTRAS_RENTAS_ART_20)}</td>
             </tr>
             <tr>
               <td>Reducción rendimientos trabajo (art. 20, decreciente)</td>
               <td>De {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion1)} a {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion2)}</td>
-              <td>RNT entre {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)} y {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}</td>
+              <td>Pensión anual íntegra (sin restar los {formatCurrency(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral)}) entre {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)} y {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}</td>
             </tr>
             <tr>
               <td>Reducción rendimientos trabajo (art. 20, agotada)</td>
               <td>{formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion2)} — no deja importe residual</td>
-              <td>RNT ≥ {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}</td>
+              <td>Pensión anual íntegra (sin restar los {formatCurrency(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral)}) ≥ {formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}</td>
             </tr>
             <tr>
               <td>Gastos deducibles generales (art. 19.2.f)</td>
@@ -625,8 +727,8 @@ export default function EstimadorIrpfPensionista() {
           <strong>¿Cómo afecta la discapacidad al IRPF del pensionista?</strong>
           <p>
             Lo que la discapacidad añade a un pensionista son MÍNIMOS adicionales: {formatCurrency(MINIMOS_IRPF_2025.discapacidad_33_65)} con
-            grado entre el 33 % y el 65 %, y {formatCurrency(MINIMOS_IRPF_2025.discapacidad_65_mas)} desde
-            el 65 %. Este estimador no los modela, así que con discapacidad reconocida su cuota es un
+            grado entre el {formatPorcentaje(33)} y el {formatPorcentaje(65)}, y {formatCurrency(MINIMOS_IRPF_2025.discapacidad_65_mas)} desde
+            el {formatPorcentaje(65)}. Este estimador no los modela, así que con discapacidad reconocida su cuota es un
             techo, no la cifra definitiva.
           </p>
           <p>
@@ -638,7 +740,12 @@ export default function EstimadorIrpfPensionista() {
         </div>
         <div className={styles.faqItem}>
           <strong>¿Pueden los hijos incluirme como ascendiente a cargo?</strong>
-          <p>Sí, si convives con ellos, tienes más de 65 años (o cualquier edad con discapacidad ≥33%), y no obtienes rentas superiores a 8.000 € anuales, tus hijos pueden aplicar el mínimo por ascendientes.</p>
+          <p>
+            Sí, si convives con ellos, tienes más de {REQUISITOS_ASCENDIENTE.edadMinima} años (o cualquier
+            edad con una discapacidad reconocida de al menos el {formatPorcentaje(33)}) y no obtienes rentas
+            anuales, excluidas las exentas, superiores a {formatCurrency(REQUISITOS_ASCENDIENTE.rentaMaxima)}:
+            tus hijos pueden aplicar el mínimo por ascendientes (art. 59 LIRPF).
+          </p>
           <div className={styles.faqTip}><span aria-hidden="true">💡</span> En este caso tú no puedes presentar declaración conjunta con tus hijos, pero ellos sí pueden aplicar ese mínimo.</div>
         </div>
       </div>
@@ -657,7 +764,7 @@ export default function EstimadorIrpfPensionista() {
           <div className={styles.stepNumber}>2</div>
           <div className={styles.stepContent}>
             <strong>Identifica todos tus ingresos</strong>
-            <p>Pensión pública, pensión complementaria, rentas de alquiler, dividendos, intereses, rescate de planes de pensiones. Cada uno tributa según su categoría.</p>
+            <p>Pensión pública, pensión complementaria, rentas de alquiler, dividendos, intereses, rescate de planes de pensiones. Cada uno tributa según su categoría: los intereses y los dividendos, en la base del ahorro.</p>
           </div>
         </div>
         <div className={styles.step}>

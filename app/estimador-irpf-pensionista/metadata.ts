@@ -78,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Qué es la reducción por rendimientos del trabajo para pensionistas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Es una minoración del rendimiento neto del trabajo (art. 20 LIRPF) que beneficia a trabajadores y pensionistas con ingresos del trabajo bajos. Vale ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion1)} mientras el rendimiento neto no pase de ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)} (medido, según el propio art. 20, sin restar los ${formatCurrency(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral)} de gastos generales: en una pensión, su importe íntegro); después decrece en dos tramos y desde ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)} vale ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion2)}: se agota del todo y no deja ningún importe residual. Exige además no tener rentas distintas de las del trabajo superiores a ${formatCurrency(LIMITE_OTRAS_RENTAS_ART_20)}, así que un pensionista con alquileres por encima de esa cifra no la aplica.`,
+        text: `Es una minoración del rendimiento neto del trabajo (art. 20 LIRPF) que beneficia a trabajadores y pensionistas con ingresos del trabajo bajos. Vale ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion1)} mientras el rendimiento neto no pase de ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)} (medido, según el propio art. 20, sin restar los ${formatCurrency(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral)} de gastos generales: en una pensión, su importe íntegro); después decrece en dos tramos y desde ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)} vale ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion2)}: se agota del todo y no deja ningún importe residual. Exige además no tener rentas distintas de las del trabajo superiores a ${formatCurrency(LIMITE_OTRAS_RENTAS_ART_20)}, y cuentan todas: un pensionista cuyos alquileres, intereses y dividendos sumen más de esa cifra no la aplica.`,
       },
     },
     {
@@ -94,7 +94,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la pensión neta mensual de un jubilado?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La pensión neta mensual se obtiene restando a la pensión bruta las retenciones de IRPF que aplica la Seguridad Social. Esas retenciones dependen de la pensión anual y de las circunstancias personales (edad, discapacidad, etc.). A diferencia de los trabajadores, los pensionistas no pagan cotizaciones a la Seguridad Social, salvo la aportación de asistencia sanitaria del 1,59 % en algunos casos.',
+        text: 'La pensión neta mensual se obtiene restando a la pensión bruta las retenciones de IRPF que aplica la Seguridad Social. Esas retenciones dependen de la pensión anual y de las circunstancias personales (edad, discapacidad, etc.). A diferencia de los trabajadores, a los pensionistas no se les descuentan cotizaciones a la Seguridad Social de la pensión. Si además cobra intereses o dividendos, esas rentas tributan aparte, en la base del ahorro, con su propia escala.',
       },
     },
     {

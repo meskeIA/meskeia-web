@@ -56,16 +56,22 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 const RUTA = '/estimador-irpf-pensionista/';
 
-/** Los tres campos numéricos. Sin ellos hidratados, escribir no llegaría al estado de React. */
+/**
+ * Los cuatro campos numéricos. Sin ellos hidratados, escribir no llegaría al estado de React.
+ * Hasta el 26/09/2026 eran tres: «Otras rentas anuales distintas del trabajo» mezclaba los
+ * alquileres (base general) con intereses y dividendos (base del ahorro). Hallazgo 2131.
+ */
 const CAMPOS = [
   'input[aria-label="Pensión mensual bruta (€/mes)"]',
   'input[aria-label="Rescate de plan de pensiones este año (€)"]',
-  'input[aria-label="Otras rentas anuales distintas del trabajo (€/año)"]',
+  'input[aria-label="Alquileres y otras rentas de la base general (€/año)"]',
+  'input[aria-label="Intereses y dividendos (€/año)"]',
 ] as const;
 
 const SEL_PENSION = CAMPOS[0];
 const SEL_RESCATE = CAMPOS[1];
 const SEL_OTRAS = CAMPOS[2];
+const SEL_AHORRO = CAMPOS[3];
 
 const ESPACIO_DURO = new RegExp(String.fromCharCode(160), 'g');
 const limpiar = (s: string) => s.replace(ESPACIO_DURO, ' ').replace(/\s+/g, ' ').trim();
@@ -79,6 +85,8 @@ async function fila(page: Page, etiqueta: string): Promise<string> {
 interface Extras {
   rescate?: string;
   otrasRentas?: string;
+  /** Intereses y dividendos: base del ahorro. */
+  ahorro?: string;
 }
 
 async function estimar(page: Page, pension: string, edad: string, extras: Extras = {}): Promise<void> {
@@ -95,6 +103,10 @@ async function estimar(page: Page, pension: string, edad: string, extras: Extras
   if (extras.otrasRentas !== undefined) {
     await page.locator(SEL_OTRAS).fill(extras.otrasRentas);
     await esperarValorEnReact(page, SEL_OTRAS, extras.otrasRentas);
+  }
+  if (extras.ahorro !== undefined) {
+    await page.locator(SEL_AHORRO).fill(extras.ahorro);
+    await esperarValorEnReact(page, SEL_AHORRO, extras.ahorro);
   }
 
   await page.getByRole('button', { name: 'Estimar IRPF pensionista' }).click();
@@ -125,7 +137,7 @@ test('CASO 1 · 1.500 €/mes, 67 años — el mínimo de 6.700 € a tipo cero'
 
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('21.000,00 €');
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-0,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('19.000,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('19.000,00 €');
   expect(await fila(page, 'Mínimo personal (edad)')).toBe('6700,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2664,50 €');
   expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1309,68 €/mes');
@@ -142,7 +154,7 @@ test('CASO 2 (borde) · pensión por debajo del mínimo: cuota cero, nunca negat
   // resta negativa, que es justo lo que la función canónica evita acotando el mínimo a la base.
   await estimar(page, '400', '75_mas');
 
-  expect(await fila(page, 'Base imponible estimada')).toBe('0,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('0,00 €');
   expect(await fila(page, 'Mínimo personal (edad)')).toBe('8100,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('0,00 €');
   expect(await fila(page, 'Pensión neta mensual estimada')).toBe('400,00 €/mes');
@@ -199,7 +211,7 @@ test('CASO 4 (normal) · 1.400 €/mes, 68 años — la cadena completa art. 19 
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('19.600,00 €');
   expect(await fila(page, 'Gastos deducibles generales')).toBe('-2000,00 €');
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-168,15 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('17.431,85 €');
+  expect(await fila(page, 'Base imponible general')).toBe('17.431,85 €');
   expect(await fila(page, 'Mínimo personal (edad)')).toBe('6700,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2288,14 €');
   // El espacio antes del % se admite con o sin él: su forma correcta (espacio duro, regla del
@@ -225,7 +237,7 @@ test('CASO 5 (borde) · 75 años: el euro mensual en que la base cruza el mínim
   await estimar(page, '1127', '75_mas');
 
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-5681,50 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('8096,50 €');
+  expect(await fila(page, 'Base imponible general')).toBe('8096,50 €');
   expect(await fila(page, 'Mínimo personal (edad)')).toBe('8100,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('0,00 €');
   expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1127,00 €/mes');
@@ -236,7 +248,7 @@ test('CASO 5 (borde) · 75 años: el euro mensual en que la base cruza el mínim
   // Se comprueba que el borde es ese y no otro: si la app acotara mal el mínimo, o si lo
   // restara de la base, este euro no produciría exactamente 6,65 €.
   await estimar(page, '1128', '75_mas');
-  expect(await fila(page, 'Base imponible estimada')).toBe('8135,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('8135,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('6,65 €');
 });
 
@@ -308,7 +320,7 @@ test('CASO 7 (crítico) · el millar español NO es un decimal: rescate «30.000
 
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('46.800,00 €');
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-0,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('44.800,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('44.800,00 €');
   expect(await fila(page, 'Mínimo personal (edad)')).toBe('8100,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('10.738,50 €');
 
@@ -326,7 +338,7 @@ test('CASO 8 (alto) · «1.400» en la pensión es 1.400 €/mes, que es lo que 
   await estimar(page, '1.400', '65_74');
 
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('19.600,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('17.431,85 €');
+  expect(await fila(page, 'Base imponible general')).toBe('17.431,85 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2288,14 €');
   expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1236,56 €/mes');
 
@@ -357,8 +369,8 @@ test('CASO 9 (alto) · el límite de 6.500 € de rentas ajenas al trabajo apaga
 
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('11.200,00 €');
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-0,00 €');
-  expect(await fila(page, 'Otras rentas distintas del trabajo')).toBe('7000,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('16.200,00 €');
+  expect(await fila(page, 'Alquileres y otras rentas de la base general')).toBe('7000,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('16.200,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1992,50 €');
 
   // Y se DICE por qué la reducción vale cero, en vez de dejar un 0 inexplicado.
@@ -378,12 +390,12 @@ test('CASO 9.bis (borde) · el filo está en 6.500 €: con eso aplica, con un e
   // el sitio exacto y no «por ahí».
   await estimar(page, '800', '65_74', { otrasRentas: '6500' });
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-7302,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('8398,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('8398,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('322,62 €');
 
   await estimar(page, '800', '65_74', { otrasRentas: '6501' });
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-0,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('15.701,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('15.701,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1872,74 €');
 });
 
@@ -528,7 +540,7 @@ test('CASO 12 · art. 20, primer tramo decreciente: lo decide el íntegro, no el
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('16.100,00 €');
   expect(await fila(page, 'Gastos deducibles generales')).toBe('-2000,00 €');
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-5118,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('8982,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('8982,00 €');
   expect(await fila(page, 'Mínimo personal (edad)')).toBe('5550,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('652,08 €');
   expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1103,42 €/mes');
@@ -545,13 +557,13 @@ test('CASO 13 (borde) · el umbral de 14.852 € del art. 20 se cruza con el ín
   await estimar(page, '1000', 'menos65', { rescate: '852' });
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('14.852,00 €');
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-7302,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('5550,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('5550,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('0,00 €');
 
   await estimar(page, '1000', 'menos65', { rescate: '853' });
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('14.853,00 €');
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-7300,25 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('5552,75 €');
+  expect(await fila(page, 'Base imponible general')).toBe('5552,75 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('0,52 €');
 });
 
@@ -569,7 +581,7 @@ test('CASO 14 · art. 20, segundo tramo decreciente, con 75 años', async ({ pag
 
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('18.900,00 €');
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-966,15 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('15.933,85 €');
+  expect(await fila(page, 'Base imponible general')).toBe('15.933,85 €');
   expect(await fila(page, 'Mínimo personal (edad)')).toBe('8100,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1662,62 €');
   expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1231,24 €/mes');
@@ -587,7 +599,7 @@ test('CASO 15 · la reducción se agota con el íntegro en 19.747,5 €, aunque 
 
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('20.300,00 €');
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-0,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('18.300,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('18.300,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2496,50 €');
   expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1271,68 €/mes');
 });
@@ -603,8 +615,8 @@ test('CASO 16 · pensión + alquiler bajo 6.500 €: la reducción la gradúa so
   await estimar(page, '1150', '65_74', { otrasRentas: '6000' });
 
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-5118,00 €');
-  expect(await fila(page, 'Otras rentas distintas del trabajo')).toBe('6000,00 €');
-  expect(await fila(page, 'Base imponible estimada')).toBe('14.982,00 €');
+  expect(await fila(page, 'Alquileres y otras rentas de la base general')).toBe('6000,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('14.982,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1700,18 €');
   expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1028,56 €/mes');
   await expect(page.getByText('la reducción del art. 20 LIRPF no procede')).toHaveCount(0);
@@ -617,33 +629,121 @@ test('CASO 17 · un alquiler va a la base GENERAL: con 5.000 € la escala gener
   //   escala(24.000) = 12.450 × 19 % + 7.750 × 24 % + 3.800 × 30 %
   //                  = 2.365,50 + 1.860,00 + 1.140,00 = 5.365,50 €
   //   cuota = 5.365,50 − 1.273,00 = 4.092,50 €
-  // Es la cifra correcta SI esos 5.000 € son alquiler. Si son dividendos o intereses —que el
-  // texto de ayuda del campo también invita a poner— no lo es: ver CASO 18.
+  // Es la cifra correcta porque esos 5.000 € son alquiler. Los dividendos o intereses tienen su
+  // propio campo desde el 26/09/2026 y van a la base del ahorro: ver CASO 18.
   await estimar(page, '1500', '65_74', { otrasRentas: '5000' });
 
-  expect(await fila(page, 'Base imponible estimada')).toBe('24.000,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('24.000,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('4092,50 €');
 });
 
-test.fail('CASO 18 (hallazgo abierto) · el campo que tributa a la escala general no invita a poner intereses ni dividendos', async ({ page }) => {
-  // HALLAZGO (reinspección 25/09/2026). El texto de ayuda de «Otras rentas anuales distintas del
-  // trabajo» (page.tsx L346) dice «Alquileres, intereses o dividendos», y la app suma ese campo a
-  // la base GENERAL (page.tsx L142). Intereses y dividendos son rendimientos del capital
-  // mobiliario, que tributan en la base del AHORRO con su propia escala (data/fiscal/irpf.ts
-  // L51-54 → TRAMOS_GANANCIAS_PATRIMONIALES_2025 de inmuebles.ts: 19 % hasta 6.000 €).
-  //   1.500 €/mes, 65-74 años, 5.000 € de dividendos:
-  //     esperado  cuota general escala(19.000) − escala(6.700) = 3.937,50 − 1.273,00 = 2.664,50 €
-  //               + cuota del ahorro 5.000 × 19 % = 950,00 € → 3.614,50 €
-  //     obtenido  4.092,50 € (CASO 17): los dividendos al 24-30 % de la escala general, 478,00 € de más.
-  // Se vigila la CONTRADICCIÓN y no la cifra: las dos reparaciones naturales —un campo aparte para
-  // el ahorro, o sacar intereses y dividendos de este texto— la hacen desaparecer, y en ninguna de
-  // las dos este campo deja de ir a la base general. Si se repara de otra forma, adaptar el caso.
+test('CASO 18 (hallazgo 2131, reparado) · intereses y dividendos van a la base del AHORRO, con su escala', async ({ page }) => {
+  // HALLAZGO 2131 (reinspección 25/09/2026). Un único campo, «Otras rentas anuales distintas del
+  // trabajo», invitaba a poner «Alquileres, intereses o dividendos» y lo sumaba todo a la base
+  // GENERAL. Intereses y dividendos son rendimientos del capital mobiliario (art. 25.1-3) y el
+  // art. 46.a LIRPF los lleva a la base del AHORRO, gravada con la escala del art. 66 (combinada
+  // estatal + autonómica: 19 % hasta 6.000 €, 21 % hasta 50.000 €… —
+  // TRAMOS_GANANCIAS_PATRIMONIALES_2025 de data/fiscal/inmuebles.ts).
+  //
+  // Reparado el 26/09/2026 con un campo aparte, «Intereses y dividendos», que va a la base del
+  // ahorro. El de alquileres sigue en la base general (CASO 17) y ya no invita a mezclarlos.
   const ayudaId = await page.locator(SEL_OTRAS).getAttribute('aria-describedby');
   const ayuda = ayudaId ? ((await page.locator(`[id="${ayudaId}"]`).textContent()) ?? '') : '';
   expect(ayuda).not.toMatch(/intereses|dividendos/i);
+
+  // El caso del acta. 1.500 €/mes, 65-74 años, 5.000 € de dividendos:
+  //   base general = 21.000 − 2.000 − 0 (reducción agotada: 21.000 ≥ 19.747,5) = 19.000,00 €
+  //   cuota general = escala(19.000) − escala(6.700) = 3.937,50 − 1.273,00 = 2.664,50 €
+  //   cuota del ahorro = 5.000 × 19 % = 950,00 € (la base general agota el mínimo: nada pasa
+  //     al ahorro por el art. 56.2)
+  //   cuota = 3.614,50 € · tipo efectivo 3.614,50 / 26.000 = 13,90 % → «13,9 %»
+  //   neta = 1.500 − 3.614,50 / 14 = 1.500 − 258,18 = 1.241,82 €/mes
+  // Con el defecto: base 24.000 €, cuota 4.092,50 € (478,00 € de más) y 1.207,68 €/mes.
+  await estimar(page, '1500', '65_74', { ahorro: '5000' });
+  expect(await fila(page, 'Base imponible general')).toBe('19.000,00 €');
+  expect(await fila(page, 'Base imponible del ahorro')).toBe('5000,00 €');
+  expect(await fila(page, 'Cuota de la base general')).toBe('2664,50 €');
+  expect(await fila(page, 'Cuota de la base del ahorro')).toBe('950,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('3614,50 €');
+  expect(await fila(page, 'Tipo efectivo estimado')).toBe('13,9 %');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1241,82 €/mes');
+
+  // Con 20.000 € de dividendos se ve el segundo tramo del ahorro:
+  //   ahorro = 6.000 × 19 % + 14.000 × 21 % = 1.140,00 + 2.940,00 = 4.080,00 €
+  //   cuota = 2.664,50 + 4.080,00 = 6.744,50 € (con el defecto, 8.858,50 €)
+  //   neta = 1.500 − 6.744,50 / 14 = 1.500 − 481,75 = 1.018,25 €/mes
+  await estimar(page, '1500', '65_74', { ahorro: '20000' });
+  expect(await fila(page, 'Cuota de la base del ahorro')).toBe('4080,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('6744,50 €');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1018,25 €/mes');
 });
 
-test.fail('CASO 19 (hallazgo abierto) · los porcentajes llevan espacio duro antes del %', async ({ page }) => {
+test('CASO 18.bis (hallazgo 2131) · el límite de 6.500 € del art. 20 cuenta alquileres Y dividendos', async ({ page }) => {
+  // El art. 20 exige no tener «rentas, excluidas las exentas, distintas de las del trabajo
+  // superiores a 6.500 euros»: todas, también las del ahorro. Separar el campo no puede sacar
+  // los dividendos de ese límite.
+  //   800 €/mes (11.200 €), 65-74, alquiler 5.000 € + dividendos 2.000 € = 7.000 € > 6.500
+  //     → reducción del art. 20 = 0
+  //   base general = 11.200 − 2.000 + 5.000 = 14.200,00 €
+  //   cuota general = escala(14.200) − escala(6.700) = 2.365,50 + 1.750 × 24 % − 1.273,00
+  //                 = 2.365,50 + 420,00 − 1.273,00 = 1.512,50 €
+  //   cuota del ahorro = 2.000 × 19 % = 380,00 € → total 1.892,50 €
+  // Si solo contara el alquiler (5.000 ≤ 6.500) la reducción valdría 7.302 € y la cuota caería a
+  // (6.898 − 6.700) × 19 % + 380 = 417,62 €.
+  await estimar(page, '800', '65_74', { otrasRentas: '5000', ahorro: '2000' });
+  expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-0,00 €');
+  await expect(page.getByText('la reducción del art. 20 LIRPF no procede')).toBeVisible();
+  expect(await fila(page, 'Base imponible general')).toBe('14.200,00 €');
+  expect(await fila(page, 'Cuota de la base general')).toBe('1512,50 €');
+  expect(await fila(page, 'Cuota de la base del ahorro')).toBe('380,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1892,50 €');
+});
+
+test('CASO 18.ter (hallazgo 2131) · el mínimo que la base general no agota pasa a la del ahorro (art. 56.2)', async ({ page }) => {
+  // Art. 56.2 LIRPF: «Cuando la base liquidable general sea inferior al importe del mínimo
+  // personal y familiar, éste formará parte de la base liquidable general por el importe de esta
+  // última y de la base liquidable del ahorro por el resto». El art. 66.1.2.º grava entonces la
+  // base del ahorro con su escala y resta la misma escala aplicada a esa parte del mínimo.
+  //
+  //   700 €/mes (9.800 €), 75 años o más (mínimo 8.100 €), 10.000 € de intereses
+  //     10.000 > 6.500 → sin reducción del art. 20
+  //     base general = 9.800 − 2.000 = 7.800,00 € < 8.100 → cuota general 0,00 €
+  //     mínimo sobrante = 8.100 − 7.800 = 300,00 € → a la base del ahorro
+  //     cuota del ahorro = escala(10.000) − escala(300)
+  //                      = (1.140,00 + 4.000 × 21 %) − 300 × 19 % = 1.980,00 − 57,00 = 1.923,00 €
+  //     neta = 700 − 1.923 / 14 = 700 − 137,36 = 562,64 €/mes
+  // Sin el art. 56.2 la cuota del ahorro sería 1.980,00 €: 57,00 € de más.
+  await estimar(page, '700', '75_mas', { ahorro: '10000' });
+  expect(await fila(page, 'Base imponible general')).toBe('7800,00 €');
+  expect(await fila(page, 'Cuota de la base general')).toBe('0,00 €');
+  expect(await fila(page, 'Cuota de la base del ahorro')).toBe('1923,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1923,00 €');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('562,64 €/mes');
+  await expect(page.getByText(/300,00\s€ de él se aplican a la base del ahorro/)).toBeVisible();
+
+  // Borde: pensión que la reducción deja en base general 0 y unos intereses por debajo del
+  // mínimo entero. 400 €/mes (5.600 €), 75+, 3.000 € de intereses (≤ 6.500: la reducción
+  // procede y se come los 3.600 € de rendimiento neto). Todo el mínimo pasa al ahorro y cubre
+  // los 3.000 €: cuota 0,00 €. Sin el art. 56.2 serían 3.000 × 19 % = 570,00 €.
+  await estimar(page, '400', '75_mas', { ahorro: '3000' });
+  expect(await fila(page, 'Base imponible general')).toBe('0,00 €');
+  expect(await fila(page, 'Cuota de la base del ahorro')).toBe('0,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('0,00 €');
+});
+
+test('CASO 24 (hallazgo 2133, reparado) · la FAQ de ascendientes toma el límite de rentas de data/fiscal', async ({ page }) => {
+  // HALLAZGO 2133: la FAQ escribía a mano «8.000 € anuales» y «65 años», que data/fiscal publica
+  // en DEDUCCIONES_IRPF_DISCAPACIDAD_2025.requisitosAscendiente (art. 59 LIRPF: mayor de 65 años o
+  // con discapacidad, y rentas, excluidas las exentas, no superiores a 8.000 €). Ahora sale de
+  // allí, con formatCurrency como el resto de cifras de la página: «8000,00 €».
+  const faq = page.locator(`${MOD}[class$="__faqItem"]`).filter({ hasText: 'ascendiente a cargo' });
+  const texto = limpiar((await faq.textContent()) ?? '');
+  expect(texto).toContain('superiores a 8000,00 €');
+  expect(texto).toContain('más de 65 años');
+  expect(texto).not.toContain('8.000 €');
+});
+
+test('CASO 19 (hallazgo 2134, reparado) · los porcentajes llevan espacio duro antes del %', async ({ page }) => {
   // HALLAZGO (25/09/2026). Formato español del CLAUDE.md global §2 (regla del 25/09/2026): «15 %»
   // separado con espacio duro U+00A0. El tipo efectivo sale pegado (page.tsx L421:
   // `{formatNumber(resultado.tipoEfectivo, 1)}%`); la FAQ de ascendientes escribe «≥33%» (L641) y
@@ -659,7 +759,7 @@ test.fail('CASO 19 (hallazgo abierto) · los porcentajes llevan espacio duro ant
   expect(faqs, 'ningún porcentaje con espacio normal').not.toMatch(/\d %/);
 });
 
-test.fail('CASO 20 (hallazgo abierto) · la tabla mide los umbrales del art. 20 con la misma vara que el motor', async ({ page }) => {
+test('CASO 20 (hallazgo 2132, reparado) · la tabla mide los umbrales del art. 20 con la misma vara que el motor', async ({ page }) => {
   // HALLAZGO (25/09/2026), reparación incompleta de 8a6fb75b en esta app: la lista del bloque
   // educativo y el FAQPage pasaron a decir que los umbrales se miden sobre la pensión «sin restar
   // los 2.000 €», pero la tabla comparativa (page.tsx L485, L491 y L496) sigue con «RNT ≤
@@ -673,7 +773,7 @@ test.fail('CASO 20 (hallazgo abierto) · la tabla mide los umbrales del art. 20 
   expect(rntSinDefinir, 'la tabla usa «RNT» sin decir que se mide sin restar los 2.000 €').toBe(false);
 });
 
-test.fail('CASO 21 (hallazgo abierto) · las cifras del resultado se leen con contraste suficiente, en claro y en oscuro', async ({ page }) => {
+test('CASO 21 (hallazgo 2135, reparado) · las cifras del resultado se leen con contraste suficiente, en claro y en oscuro', async ({ page }) => {
   // HALLAZGO (25/09/2026). El módulo redeclara `--primary: #2E86AB` y `--success: #27AE60` en
   // `.container` (EstimadorIrpfPensionista.module.css L2 y L10), sin variante oscura, y pinta con
   // ellos las cifras (L129 `.resultValue`, L132 `.resultValueBig`). Medido en Chromium:
@@ -699,7 +799,7 @@ test.fail('CASO 21 (hallazgo abierto) · las cifras del resultado se leen con co
   expect(netaOscuro.ratio, 'pensión neta, tema oscuro').toBeGreaterThanOrEqual(3);
 });
 
-test.fail('CASO 22 (hallazgo abierto) · botón, preguntas y pasos del bloque educativo con contraste suficiente', async ({ page }) => {
+test('CASO 22 (hallazgo 2136, reparado) · botón, preguntas y pasos del bloque educativo con contraste suficiente', async ({ page }) => {
   // HALLAZGO (25/09/2026), mismo origen que el CASO 21 (tokens de marca redeclarados en el
   // módulo). Medido en Chromium:
   //   botón «Estimar mi IRPF…» (L98-102): blanco sobre degradado #2E86AB → #48A9A6, 17,6 px en

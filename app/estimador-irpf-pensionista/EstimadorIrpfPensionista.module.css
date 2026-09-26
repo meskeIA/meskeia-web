@@ -1,6 +1,7 @@
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
+  /* --primary y --secondary NO se redeclaran aquí: el texto de marca va con --primary-texto y
+     los fondos con texto blanco con --primary-boton / --secondary-boton de globals.css, que
+     cumplen 4,5:1 en los dos temas (hallazgos 2135 y 2136, 26/09/2026). */
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
@@ -8,6 +9,8 @@
   --border: #E5E5E5;
   --warning: #E67E22;
   --success: #27AE60;
+  /* Verde de TEXTO para la pensión neta: #27AE60 daba 2,69:1 sobre #F0FAF0. */
+  --exito-texto: #1B6E3C;
   --danger: #E74C3C;
   --radius: 12px;
   --radius-large: 16px;
@@ -30,6 +33,7 @@
   --text-primary: #E5E5E5;
   --text-secondary: #B0B0B0;
   --border: #404040;
+  --exito-texto: #7BD89C;
 }
 
 .hero {
@@ -67,7 +71,7 @@
 .cardTitle {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-lg);
   padding-bottom: var(--spacing-md);
   border-bottom: 2px solid var(--border);
@@ -98,7 +102,7 @@
 .btn {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -126,10 +130,10 @@
 }
 
 .resultLabel { color: var(--text-secondary); font-size: 0.9rem; }
-.resultValue { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
+.resultValue { font-weight: 700; color: var(--primary-texto); font-size: 1.1rem; }
 .resultValueDanger { font-weight: 700; color: var(--danger); font-size: 1.1rem; }
 .resultValuePositive { font-weight: 700; color: var(--success); font-size: 1.1rem; }
-.resultValueBig { font-weight: 700; color: var(--success); font-size: 1.4rem; }
+.resultValueBig { font-weight: 700; color: var(--exito-texto); font-size: 1.4rem; }
 .resultValueSmall { font-weight: 600; color: var(--text-secondary); font-size: 0.85rem; }
 
 .resultItemHighlight {
@@ -291,7 +295,7 @@
 .faqItem strong {
   display: block;
   margin-bottom: 0.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqTip {
@@ -323,7 +327,7 @@
 }
 
 .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 2rem;
   height: 2rem;
