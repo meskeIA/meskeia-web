@@ -44,36 +44,41 @@ import { esperarHidratacion, esperarPaginaAsentada, sembrarValor, sembrarValorAc
  *     estructurada no baja de ~√N consultas en un ordenador cuántico.
  *   · RSA-155 (512 bits) factorizado con ordenadores clásicos el 22/08/1999.
  *
- * HALLAZGOS ABIERTOS (test.fail: el fichero pasa en verde hoy y avisa cuando se reparen)
- *   CASO 10 alto   · 2⁵⁰ se da como «~1.125 billones de billones» (1,1·10²⁷): son ~1.126 billones.
- *   CASO 11 medio  · las barras de la comparativa miden todas lo mismo (flex: 1 pisa el width).
- *   CASO 12 medio  · tras medir, P(|0⟩) y P(|1⟩) siguen en 50/50 junto a «Colapsado a |k⟩».
+ * HALLAZGOS REPARADOS el 26/09/2026 (fichas 2083-2100; antes con test.fail)
+ *   CASO 10 alto   · 2⁵⁰ se daba como «~1.125 billones de billones» (1,1·10²⁷): son ~1.126 billones.
+ *   CASO 11 medio  · las barras de la comparativa medían todas lo mismo (flex: 1 pisaba el width).
+ *   CASO 12 medio  · tras medir, P(|0⟩) y P(|1⟩) seguían en 50/50 junto a «Colapsado a |k⟩».
  *   CASO 13 medio  · formato: «50.0%» (toFixed) en vez de «50,0 %».
  *   CASO 14 bajo   · «1 bits clásicos», «1 qubits → 2 estados».
- *   CASO 15 medio  · #dc2626 en línea («No», «En riesgo:») y en .riesgoChip sin variante oscura.
- *   CASO 16 medio  · #16a34a («~8 horas», «Seguros / post-cuánticos:», chips) < 4,5:1.
- *   CASO 17 medio  · texto en var(--secondary) (estado de la medición, analogía, título PQC) < 3:1.
- *   CASO 18 bajo   · botón «Medir qubit» en oscuro 2,79:1 y kets P(|0⟩) en claro 3,59:1.
+ *   CASO 15 medio  · #dc2626 en línea y sin variante oscura.
+ *   CASO 16 medio  · #16a34a por debajo de 4,5:1.
+ *   CASO 17 medio  · texto en var(--secondary) por debajo de 3:1.
+ *   CASO 18 bajo   · botón «Medir qubit» sobre var(--primary) y kets en var(--primary).
  *   CASO 19 medio  · «probando TODOS los caminos a la vez»: el mito que el propio campo desmiente.
- *   CASO 20 medio  · «4.000 qubits lógicos → ~8 horas» no sale de ninguna fuente única.
+ *   CASO 20 medio  · «4.000 qubits lógicos → ~8 horas» no salía de ninguna fuente única.
  *   CASO 21 bajo   · FALCON como «estandarizada por NIST 2024».
  *   CASO 22 bajo   · «Sycamore … demostró supremacía cuántica en 2019».
  *   CASO 23 bajo   · «Claves RSA-512» en riesgo cuántico a partir de 2029 (rotas en 1999).
- *   CASO 24 bajo   · la bombilla (role="button") no responde a la barra espaciadora.
+ *   CASO 24 bajo   · la bombilla (role="button") no respondía a la barra espaciadora.
  *   CASO 25 bajo   · emoji ⚛️ del hero sin aria-hidden.
  *   CASO 26 bajo   · «el único generador de aleatoriedad perfecta del universo» con Math.random.
  *   CASO 27 bajo   · «El error de corrección cuántica (QEC)».
+ *
+ * La reparación de 2093 retiró la tabla de «qubits lógicos estimados» por año (sin fuente): el
+ * deslizador del año muestra ahora el calendario del borrador NIST IR 8547 (12/11/2024, tablas 2 y 4):
+ * 112 bits de seguridad (RSA-2048, ECC de 224 bits) «deprecated after 2030», todo RSA/ECC
+ * «disallowed after 2035». Por eso los casos 15, 16 y 23 buscan esas etiquetas y no «En riesgo:».
  */
 
 const RUTA = '/visualizador-computacion-cuantica/';
 
 const THETA = 'input[aria-label="Ángulo de superposición del qubit en grados"]';
-const QUBITS = 'input[aria-label="Número de qubits para calcular estados simultáneos"]';
-const ANO = 'input[aria-label="Selecciona el año para ver predicciones de riesgo cuántico"]';
+const QUBITS = 'input[aria-label="Número de qubits para calcular los estados de la superposición"]';
+const ANO = 'input[aria-label="Selecciona el año para ver el calendario de retirada de RSA y ECC"]';
 
 const MEDIR = 'button[aria-label="Medir el qubit y colapsar su estado"]';
 const RESTAURAR = 'button[aria-label="Restaurar el qubit a superposición"]';
-const BYTE = 'button[aria-label="Generar un byte cuántico aleatorio"]';
+const BYTE = 'button[aria-label="Simular un byte cuántico aleatorio"]';
 
 async function abrir(page: Page): Promise<void> {
   await page.goto(RUTA);
@@ -95,13 +100,17 @@ async function probabilidades(page: Page): Promise<[number, number]> {
 
 const estadoMedicion = (page: Page): Locator => page.locator('p[class*="colapsado"]');
 
-/** Filas de la comparativa: etiqueta, valor y la anchura PINTADA de la barra. */
+/**
+ * Filas de la comparativa: etiqueta, valor y la anchura PINTADA de la barra. Desde la reparación de
+ * 2084 la barra vive dentro de una pista (`pistaBarra`) que ocupa el hueco de la fila: se mide la
+ * barra, no la pista.
+ */
 async function filasComparativa(page: Page): Promise<{ etiqueta: string; valor: string; ancho: number }[]> {
   return page.locator('[class*="comparativaQubits"] > div').evaluateAll((filas) =>
     filas.map((f) => ({
-      etiqueta: (f.children[0].textContent ?? '').trim(),
-      valor: (f.children[2].textContent ?? '').trim(),
-      ancho: f.children[1].getBoundingClientRect().width,
+      etiqueta: (f.querySelector('[class*="filaQubitsEtiqueta"]')?.textContent ?? '').trim(),
+      valor: (f.querySelector('[class*="filaQubitsValor"]')?.textContent ?? '').trim(),
+      ancho: f.querySelector('[class*="barraQubits"]')?.getBoundingClientRect().width ?? -1,
     })),
   );
 }
@@ -284,12 +293,13 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * 1.125·10²⁴ = 1,125·10²⁷: un billón de veces más (probable traducción de «1.125 quadrillion»).
    */
   test('CASO 10 · 50 qubits → ~1.126 billones de estados (2⁵⁰ ≈ 1,126·10¹⁵), no «billones de billones»', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: 2⁵⁰ dado como «~1.125 billones de billones» (page.tsx:435, 442)');
     const filas = await filasComparativa(page);
     const cincuenta = filas.find((f) => f.etiqueta === '50 qubits');
     expect(cincuenta).toBeDefined();
     expect(cincuenta!.valor).not.toMatch(/billones de billones/);
-    expect(cincuenta!.valor).toMatch(/1\.12[56] billones/);
+    // «1126 billones»: con cuatro cifras enteras el español no agrupa (RAE 2010; Intl es-ES),
+    // así que no se exige el punto de «1.126» que proponía el acta.
+    expect(cincuenta!.valor).toMatch(/~112[56] billones/);
     await expect(page.locator('[class*="analogia"]')).not.toContainText('billones de billones');
   });
 
@@ -300,13 +310,27 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * para 1 estado, n/20 lineal para 2ⁿ y 100 % para 20 y para 50 qubits.
    */
   test('CASO 11 · la barra de 1 estado es más corta que la de 1.048.576, y la de 20 qubits que la de 50', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: barras de la comparativa todas iguales (CSS:335-342, page.tsx:245-249)');
     await sembrarValor(page, QUBITS, 1);
     await expect(page.locator('[class*="estadosNumero"]')).toHaveText('2');
     const filas = await filasComparativa(page);
     // filas: [1 bit clásico → 1 estado, 1 qubit → 2, 20 qubits → 1.048.576, 50 qubits → 2⁵⁰]
     expect(filas[0].ancho).toBeLessThan(filas[2].ancho);
     expect(filas[2].ancho).toBeLessThan(filas[3].ancho);
+    // Escala logarítmica: 20 qubits = 20/50 de la barra de 50 (±2 px de redondeo y del mínimo de 4 px)
+    expect(Math.abs(filas[2].ancho - 0.4 * filas[3].ancho)).toBeLessThanOrEqual(2);
+  });
+
+  test('CASO 11b · a 360 px las barras también se distinguen (antes, 4 px las cuatro)', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await sembrarValor(page, QUBITS, 10);
+    const filas = await filasComparativa(page);
+    expect(filas[3].ancho).toBeGreaterThan(150);
+    expect(filas[1].ancho).toBeGreaterThan(filas[0].ancho);
+    expect(filas[2].ancho).toBeGreaterThan(filas[1].ancho);
+    expect(filas[3].ancho).toBeGreaterThan(filas[2].ancho);
+    // Y sin desbordar la página
+    const desborde = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(desborde).toBeLessThanOrEqual(0);
   });
 
   /**
@@ -315,7 +339,6 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * |k⟩», pero las probabilidades siguen en 50/50. Después de medir, el estado ES |k⟩: P(|k⟩) = 100 %.
    */
   test('CASO 12 · tras medir a θ = 90° y colapsar a |k⟩, P(|k⟩) = 100 %', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: probabilidades previas a la medición tras el colapso (page.tsx:240-242, 323-329)');
     await page.locator(MEDIR).click();
     const t = (await estadoMedicion(page).textContent()) ?? '';
     const k = t.includes('|0⟩') ? 0 : 1;
@@ -330,14 +353,12 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * page.tsx:588-589 escribe «4000» (toLocaleString) al lado de «~4.000».
    */
   test('CASO 13 · θ = 60° → «75,0 %» y «25,0 %» (coma decimal y espacio duro)', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: toFixed y % pegado (page.tsx:241-242, 324, 328)');
     await sembrarValor(page, THETA, 60);
     expect(await probabilidadesTexto(page)).toEqual(['75,0 %', '25,0 %']);
   });
 
   /** CASO 14 (bajo, contenido) — page.tsx:246-247 y 396 no concuerdan el plural con n = 1. */
   test('CASO 14 · n = 1 → «1 bit clásico» y «1 qubit», no «1 bits» ni «1 qubits»', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: plural fijo con n = 1 (page.tsx:246-247, 396)');
     await sembrarValor(page, QUBITS, 1);
     const filas = await filasComparativa(page);
     expect(filas[0].etiqueta).toBe('1 bit clásico');
@@ -346,18 +367,18 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
   });
 
   /**
-   * CASO 15 (medio, accesibilidad) — la sospecha de partida, confirmada: no es un role="alert", pero
-   * sí #dc2626 en línea sin variante oscura en «No» (page.tsx:312) y en «En riesgo:» (page.tsx:593),
-   * más .riesgoChip (CSS:622-630). Texto de 12,8-13,6 px: exige 4,5:1.
-   * Medido: claro «No» 4,22 · «En riesgo:» 4,08 · chip 3,52; oscuro 2,33 · 3,03 · 2,90.
+   * CASO 15 (medio, accesibilidad) — #dc2626 en línea sin variante oscura en «No» y en la etiqueta de
+   * riesgo, más .riesgoChip y .timelineTiempoRojo. Texto de 12,8-17,6 px: exige 4,5:1.
+   * Medido antes: claro «No» 4,22 · «En riesgo:» 4,08 · chip 3,52; oscuro 2,33 · 3,03 · 2,90.
+   * Tras la reparación de 2093 la etiqueta roja es «Desaconsejados desde 2031:» (año 2033).
    */
-  test('CASO 15 · «No», «En riesgo:» y sus chips alcanzan 4,5:1 en claro y en oscuro', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: #dc2626 en línea sin variante oscura (page.tsx:312, 593; CSS:622-630)');
-    await sembrarValor(page, ANO, 2030);
+  test('CASO 15 · «No», la etiqueta de retirada, sus chips y el récord clásico alcanzan 4,5:1 en ambos temas', async ({ page }) => {
+    await sembrarValor(page, ANO, 2033);
     const rojos = [
       page.locator('[class*="probFila"] span', { hasText: /^No$/ }),
-      page.locator('p', { hasText: /^En riesgo:$/ }),
-      page.locator('[class*="riesgoChip"]:not([class*="riesgoChipOk"])').first(),
+      page.locator('p', { hasText: /^Desaconsejados desde 2031:$/ }),
+      page.locator('[class*="riesgoChip"]:not([class*="riesgoChipOk"]):not([class*="riesgoChipNeutro"])').first(),
+      page.locator('[class*="timelineTiempoRojo"]'),
     ];
     await esperarPaginaAsentada(page);
     expect(await peorContraste(rojos), 'en claro').toBeGreaterThanOrEqual(4.5);
@@ -370,12 +391,11 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * llega a texto grande), «Seguros / post-cuánticos:» (page.tsx:605) y .riesgoChipOk (CSS:632-640).
    * Medido en claro: 3,16 · 2,79 · 2,52; en oscuro: 4,44 · 4,44 · 3,89.
    */
-  test('CASO 16 · los verdes («~8 horas», «Seguros / post-cuánticos:», chips) alcanzan 4,5:1', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: #16a34a por debajo de 4,5:1 (page.tsx:605; CSS:588-590, 632-640)');
+  test('CASO 16 · los verdes (estimaciones cuánticas, «Estándares post-cuánticos…», chips) alcanzan 4,5:1', async ({ page }) => {
     await sembrarValor(page, ANO, 2030);
     const verdes = [
-      page.locator('[class*="timelineTiempoVerde"]'),
-      page.locator('p', { hasText: /^Seguros \/ post-cuánticos:$/ }),
+      page.locator('[class*="timelineTiempoVerde"]').first(),
+      page.locator('p', { hasText: /^Estándares post-cuánticos ya publicados:$/ }),
       page.locator('[class*="riesgoChipOk"]').first(),
     ];
     await esperarPaginaAsentada(page);
@@ -389,15 +409,16 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * medición (.colapsado, CSS:275-281, role="status"), la analogía de la puerta (CSS:462-466) y el
    * título de la criptografía post-cuántica (CSS:650-657). Medido: 2,68 · 2,61 · 2,39.
    */
-  test('CASO 17 · el estado de la medición y los textos en teal alcanzan 4,5:1 en claro', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: var(--secondary) como texto (CSS:275-281, 462-466, 650-657)');
-    const teal = [
-      estadoMedicion(page),
-      page.locator('p[class*="puertaAnalogia"]'),
-      page.locator('p[class*="postQuantumTitle"]'),
+  test('CASO 17 · el estado de la medición y los textos en teal alcanzan 4,5:1 en claro y en oscuro', async ({ page }) => {
+    const teal: [string, Locator][] = [
+      ['estado de la medición', estadoMedicion(page)],
+      ['analogía de la puerta', page.locator('p[class*="puertaAnalogia"]')],
+      ['título post-cuántico', page.locator('p[class*="postQuantumTitle"]')],
     ];
     await esperarPaginaAsentada(page);
-    expect(await peorContraste(teal)).toBeGreaterThanOrEqual(4.5);
+    for (const [nombre, el] of teal) expect(await peorContraste([el]), `${nombre}, en claro`).toBeGreaterThanOrEqual(4.5);
+    await pasarAOscuro(page);
+    for (const [nombre, el] of teal) expect(await peorContraste([el]), `${nombre}, en oscuro`).toBeGreaterThanOrEqual(4.5);
   });
 
   /**
@@ -406,7 +427,6 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * en claro. Es el pasivo conocido del color de marca: existe --primary-boton para los fondos.
    */
   test('CASO 18 · «Medir qubit» en oscuro y los kets en claro alcanzan 4,5:1', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: color de marca como fondo de botón y como texto (CSS:112-125, 264-268)');
     await esperarPaginaAsentada(page);
     expect(await peorContraste([page.locator('[class*="probKet"]').first()]), 'ket en claro').toBeGreaterThanOrEqual(4.5);
     await pasarAOscuro(page);
@@ -420,7 +440,6 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * la ventaja sale de la interferencia, no de probar las rutas en paralelo.
    */
   test('CASO 19 · la analogía no dice que 50 qubits prueban todas las rutas a la vez', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: mito del paralelismo «todos los caminos a la vez» (page.tsx:440-442)');
     const analogia = page.locator('[class*="analogia"]');
     await expect(analogia).not.toContainText('TODOS los caminos a la vez');
     await expect(analogia).not.toContainText('rutas simultáneamente');
@@ -434,21 +453,30 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * fuente los «~300 billones de años» (l. 551) ni la tabla de qubits lógicos por año (l. 92-140).
    */
   test('CASO 20 · la fila cuántica de RSA-2048 no empareja «4.000 qubits lógicos» con «~8 horas»', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: cifras de Shor mezcladas y sin fuente (page.tsx:551-558, 589, 92-140)');
     const linea = page.locator('[class*="timelineRSA"]');
     await expect(linea).toContainText('RSA-2048');
-    expect((await linea.textContent()) ?? '').not.toMatch(/4\.000 qubits lógicos[\s\S]*~8 horas/);
+    const texto = (await linea.textContent()) ?? '';
+    expect(texto).not.toMatch(/4\.000 qubits lógicos[\s\S]*~8 horas/);
+    expect(texto).not.toContain('300 billones de años');
+    // Cada cifra, con su fuente: 8 h con 20 millones (Gidney y Ekerå 2019); < 1 semana con < 1 millón (Gidney 2025)
+    expect(texto).toMatch(/20 millones de qubits físicos[\s\S]*8 horas[\s\S]*Gidney y Ekerå \(2019\)/);
+    expect(texto).toMatch(/Menos de 1 millón[\s\S]*menos de una semana[\s\S]*Gidney \(21\/05\/2025\)/);
+    // La tabla de «qubits lógicos estimados» por año (sin fuente) ya no existe
+    await expect(page.locator('main')).not.toContainText('Qubits lógicos estimados');
   });
 
   /**
    * CASO 21 (bajo, dato) — page.tsx:618-623: el NIST publicó el 13/08/2024 FIPS 203, 204 y 205 (Kyber,
    * Dilithium, SPHINCS+); FALCON (FIPS 206, FN-DSA) quedó como borrador pendiente.
    */
-  test('CASO 21 · la lista «estandarizada por NIST 2024» no incluye FALCON', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: FALCON presentado como estándar de 2024 (page.tsx:618-623)');
+  test('CASO 21 · la lista de estándares del NIST del 13/08/2024 no incluye FALCON (sigue en proceso)', async ({ page }) => {
     const bloque = page.locator('[class*="postQuantum"]').filter({ has: page.locator('ul') });
-    await expect(bloque).toContainText('estandarizada por NIST 2024');
-    expect(await bloque.locator('li').allTextContents()).not.toContain('FALCON');
+    await expect(bloque).toContainText('13/08/2024');
+    const items = await bloque.locator('li').allTextContents();
+    expect(items).toHaveLength(3);
+    expect(items.join(' ')).not.toContain('FALCON');
+    expect(items.join(' ')).toMatch(/FIPS 203[\s\S]*FIPS 204[\s\S]*FIPS 205/);
+    await expect(bloque).toContainText('En proceso de estandarización: FN-DSA (FALCON)');
   });
 
   /**
@@ -457,7 +485,6 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * lo simularon en ~15 h con 512 GPU. Antipatrón 3 de neutralidad: «anunció», «afirmó».
    */
   test('CASO 22 · la guía no dice que Sycamore «demostró» la supremacía cuántica', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: «demostró supremacía cuántica» (page.tsx:663)');
     const texto = (await page.locator('main').textContent()) ?? '';
     expect(texto).toContain('Sycamore');
     expect(texto).not.toMatch(/demostró supremacía cuántica/);
@@ -467,11 +494,21 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * CASO 23 (bajo, dato) — page.tsx:117 pone «Claves RSA-512» en riesgo a partir de 2029, como amenaza
    * cuántica futura; RSA-155 (512 bits) se factorizó con ordenadores clásicos el 22/08/1999.
    */
-  test('CASO 23 · en 2029 «RSA-512» no aparece como riesgo cuántico nuevo (roto en 1999)', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: RSA-512 como riesgo futuro (page.tsx:117)');
+  test('CASO 23 · en 2029 «RSA-512» no aparece como riesgo cuántico nuevo; el calendario sigue al NIST IR 8547', async ({ page }) => {
+    const chipsRojos = page.locator('[class*="riesgoChip"]:not([class*="riesgoChipOk"]):not([class*="riesgoChipNeutro"])');
     await sembrarValor(page, ANO, 2029);
-    await expect(page.getByRole('region', { name: 'Predicción para el año 2029' })).toContainText('En riesgo:');
-    expect(await page.locator('[class*="riesgoChip"]:not([class*="riesgoChipOk"])').allTextContents()).not.toContain('Claves RSA-512');
+    const region = page.getByRole('region', { name: 'Calendario para el año 2029' });
+    await expect(region).toContainText('NIST IR 8547');
+    await expect(region).not.toContainText('RSA-512');
+    expect(await chipsRojos.count()).toBe(0);
+    // 2030 todavía admitido («deprecated after 2030»); 2031, desaconsejado; 2036, no admitido
+    await sembrarValor(page, ANO, 2030);
+    expect(await chipsRojos.count()).toBe(0);
+    await sembrarValor(page, ANO, 2031);
+    expect(await chipsRojos.allTextContents()).toEqual(['RSA-2048', 'ECC de 224 bits']);
+    await sembrarValor(page, ANO, 2036);
+    await expect(page.getByRole('region', { name: 'Calendario para el año 2036' })).toContainText('No admitidos desde 2036:');
+    expect(await chipsRojos.allTextContents()).toContain('RSA-3072 o mayor');
   });
 
   /**
@@ -479,7 +516,6 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * escucha Enter; con la barra espaciadora no cambia y la página se desplaza.
    */
   test('CASO 24 · la barra espaciadora conmuta el bit clásico', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: role="button" sin Espacio (page.tsx:291-298)');
     const bombilla = page.locator('[aria-label^="Bit clásico:"]');
     await expect(bombilla).toHaveAttribute('aria-label', 'Bit clásico: 0. Haz clic para cambiar');
     await bombilla.focus();
@@ -489,7 +525,6 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
 
   /** CASO 25 (bajo, accesibilidad) — page.tsx:261, lo señala `node scripts/check-a11y-jsx.mjs`. */
   test('CASO 25 · el emoji ⚛️ del hero va en un aria-hidden', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: emoji junto a texto sin aria-hidden (page.tsx:261)');
     const oculto = await page.locator('[class*="heroBadge"]').evaluate((badge) => {
       const nodos: Node[] = [];
       const w = document.createTreeWalker(badge, NodeFilter.SHOW_TEXT);
@@ -505,13 +540,13 @@ test.describe('visualizador-computacion-cuantica — lo que calcula', () => {
    * generador pseudoaleatorio del navegador: con Math.random fijado a 0,9 el byte es 0b11111111 = 255.
    */
   test('CASO 26 · no presenta el byte de Math.random como aleatoriedad perfecta y única del universo', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: afirmación absoluta sobre un byte pseudoaleatorio (page.tsx:235-238, 508-509)');
-    await expect(page.locator('[class*="circuitoResultado"]')).not.toContainText('único generador de aleatoriedad perfecta del universo');
+    const bloque = page.locator('[class*="circuitoResultado"]');
+    await expect(bloque).not.toContainText('único generador de aleatoriedad perfecta del universo');
+    await expect(bloque).toContainText('Aquí se simula');
   });
 
   /** CASO 27 (bajo, contenido) — page.tsx:656: es «la corrección de errores cuánticos (QEC)». */
   test('CASO 27 · la guía nombra bien la corrección de errores cuánticos (QEC)', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: «El error de corrección cuántica (QEC)» (page.tsx:656)');
     const texto = (await page.locator('main').textContent()) ?? '';
     expect(texto).not.toContain('error de corrección cuántica');
   });

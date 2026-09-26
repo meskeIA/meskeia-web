@@ -10,6 +10,21 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatPercentage } from '@/lib';
+import {
+  probabilidades,
+  numeroEstados,
+  formatearEstados,
+  leerEnEscalaLarga,
+  fraccionBarra,
+  etiquetaQubits,
+  etiquetaBits,
+  estadoCalendario,
+  NIST_IR_8547,
+  PQC_PUBLICADOS,
+  PQC_EN_PROCESO,
+  QUBITS_REFERENCIA,
+} from './motor';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -24,12 +39,6 @@ interface PuertaCuantica {
   descripcion: string;
   tabla: { entrada: string; salida: string }[];
   analogia: string;
-}
-
-interface PrediccionAno {
-  qubitsLogicos: number;
-  enRiesgo: string[];
-  seguro: string[];
 }
 
 // ─────────────────────────────────────────────
@@ -59,7 +68,8 @@ const PUERTAS: PuertaCuantica[] = [
       { entrada: '|0⟩', salida: '(|0⟩+|1⟩)/√2' },
       { entrada: '|1⟩', salida: '(|0⟩−|1⟩)/√2' },
     ],
-    analogia: 'Como lanzar una moneda al aire: antes de caer, está en superposición de cara y cruz.',
+    analogia:
+      'Se suele comparar con una moneda en el aire, pero con una diferencia clave: aplicar H dos veces devuelve el estado de partida (H·H = I), algo que ninguna moneda lanzada dos veces hace. La superposición no es no saber cómo caerá la moneda.',
   },
   {
     id: 'CNOT',
@@ -85,67 +95,10 @@ const PUERTAS: PuertaCuantica[] = [
       { entrada: '|0⟩', salida: '|0⟩' },
       { entrada: '|1⟩', salida: '−|1⟩' },
     ],
-    analogia: 'Como girar un reloj 180°: la apariencia del reloj es la misma, pero su mecánica interna cambia.',
+    analogia:
+      'Como retrasar media vuelta una de dos ondas: cada una por separado suena igual, pero al sumarlas pasan de reforzarse a anularse. Por eso la fase importa en la interferencia.',
   },
 ];
-
-function getPrediccion(ano: number): PrediccionAno {
-  if (ano <= 2024) {
-    return {
-      qubitsLogicos: 5,
-      enRiesgo: [],
-      seguro: ['RSA-2048', 'AES-256', 'ECC', 'HTTPS'],
-    };
-  }
-  if (ano <= 2026) {
-    return {
-      qubitsLogicos: 20,
-      enRiesgo: [],
-      seguro: ['RSA-2048', 'AES-256', 'ECC', 'HTTPS'],
-    };
-  }
-  if (ano <= 2028) {
-    return {
-      qubitsLogicos: 100,
-      enRiesgo: [],
-      seguro: ['RSA-2048', 'AES-256', 'ECC', 'HTTPS'],
-    };
-  }
-  if (ano <= 2030) {
-    return {
-      qubitsLogicos: 500,
-      enRiesgo: ['Claves RSA-512'],
-      seguro: ['RSA-2048', 'AES-256', 'CRYSTALS-Kyber'],
-    };
-  }
-  if (ano <= 2033) {
-    return {
-      qubitsLogicos: 1_500,
-      enRiesgo: ['Claves RSA-1024', 'ECC-256'],
-      seguro: ['RSA-4096', 'CRYSTALS-Kyber', 'CRYSTALS-Dilithium'],
-    };
-  }
-  if (ano <= 2036) {
-    return {
-      qubitsLogicos: 4_000,
-      enRiesgo: ['RSA-2048', 'RSA-1024', 'ECC-256', 'ECC-384'],
-      seguro: ['CRYSTALS-Kyber', 'CRYSTALS-Dilithium', 'FALCON'],
-    };
-  }
-  return {
-    qubitsLogicos: 10_000,
-    enRiesgo: ['RSA-2048', 'RSA-4096', 'ECC-384', 'HTTPS clásico'],
-    seguro: ['CRYSTALS-Kyber', 'CRYSTALS-Dilithium', 'FALCON', 'SPHINCS+'],
-  };
-}
-
-function formatearEstados(n: number): string {
-  const val = Math.pow(2, n);
-  if (val >= 1e15) {
-    return val.toLocaleString('es-ES', { notation: 'scientific', maximumFractionDigits: 2 });
-  }
-  return val.toLocaleString('es-ES');
-}
 
 // ─────────────────────────────────────────────
 // Esfera de Bloch simplificada (SVG)
@@ -168,22 +121,22 @@ function EsferaBloch({ angulo, colapsado }: { angulo: number; colapsado: number 
       aria-label={`Esfera de Bloch con ángulo θ = ${angulo}°`}
       role="img"
     >
-      {/* Esfera */}
-      <circle cx={cx} cy={cy} r={r} fill="rgba(46,134,171,0.08)" stroke="#2E86AB" strokeWidth="1.5" />
+      {/* Esfera (los colores van en el CSS para tener variante oscura) */}
+      <circle cx={cx} cy={cy} r={r} className={styles.esferaContorno} strokeWidth="1.5" />
       {/* Ecuador (línea horizontal) */}
-      <ellipse cx={cx} cy={cy} rx={r} ry={r * 0.25} fill="none" stroke="#2E86AB" strokeWidth="0.8" strokeDasharray="3 2" opacity="0.4" />
+      <ellipse cx={cx} cy={cy} rx={r} ry={r * 0.25} className={styles.esferaGuia} strokeWidth="0.8" strokeDasharray="3 2" />
       {/* Eje vertical */}
-      <line x1={cx} y1={cy - r} x2={cx} y2={cy + r} stroke="#2E86AB" strokeWidth="0.8" strokeDasharray="3 2" opacity="0.4" />
+      <line x1={cx} y1={cy - r} x2={cx} y2={cy + r} className={styles.esferaGuia} strokeWidth="0.8" strokeDasharray="3 2" />
       {/* |0⟩ arriba, |1⟩ abajo */}
-      <text x={cx} y={cy - r - 6} textAnchor="middle" fontSize="10" fill="#2E86AB" fontWeight="700">|0⟩</text>
-      <text x={cx} y={cy + r + 14} textAnchor="middle" fontSize="10" fill="#2E86AB" fontWeight="700">|1⟩</text>
+      <text x={cx} y={cy - r - 6} textAnchor="middle" fontSize="10" className={styles.esferaTexto} fontWeight="700">|0⟩</text>
+      <text x={cx} y={cy + r + 14} textAnchor="middle" fontSize="10" className={styles.esferaTexto} fontWeight="700">|1⟩</text>
       {/* Aguja del estado */}
       <line
         x1={cx}
         y1={cy}
         x2={nx}
         y2={ny}
-        stroke={colapsado !== null ? '#16a34a' : '#2E86AB'}
+        className={colapsado !== null ? styles.esferaAgujaColapsada : styles.esferaAguja}
         strokeWidth="2.5"
         strokeLinecap="round"
       />
@@ -192,10 +145,10 @@ function EsferaBloch({ angulo, colapsado }: { angulo: number; colapsado: number 
         cx={nx}
         cy={ny}
         r={5}
-        fill={colapsado !== null ? '#16a34a' : '#2E86AB'}
+        className={colapsado !== null ? styles.esferaPuntoColapsado : styles.esferaPunto}
       />
       {/* Punto central */}
-      <circle cx={cx} cy={cy} r={3} fill="#48A9A6" />
+      <circle cx={cx} cy={cy} r={3} className={styles.esferaCentro} />
     </svg>
   );
 }
@@ -208,7 +161,7 @@ export default function VisualizadorComputacionCuantica() {
   // Sección 1: Bit vs Qubit
   const [bitClasico, setBitClasico] = useState(0);
   const [anguloQubit, setAnguloQubit] = useState(90);
-  const [resultadoMedicion, setResultadoMedicion] = useState<number | null>(null);
+  const [resultadoMedicion, setResultadoMedicion] = useState<0 | 1 | null>(null);
 
   // Sección 2: Paralelismo
   const [numQubits, setNumQubits] = useState(10);
@@ -222,10 +175,9 @@ export default function VisualizadorComputacionCuantica() {
 
   // Callbacks
   const medir = useCallback(() => {
-    const rad = (anguloQubit * Math.PI) / 180;
-    const p0 = Math.cos(rad / 2) ** 2;
-    const r = Math.random() < p0 ? 0 : 1;
-    setResultadoMedicion(r);
+    // Se mide sobre el estado previo a la medición (regla de Born).
+    const { p0 } = probabilidades(anguloQubit, null);
+    setResultadoMedicion(Math.random() < p0 ? 0 : 1);
   }, [anguloQubit]);
 
   const resetQubit = useCallback(() => {
@@ -237,19 +189,24 @@ export default function VisualizadorComputacionCuantica() {
     setNumeroAleatorio(`0b${bits} = ${parseInt(bits, 2)}`);
   }, []);
 
-  const rad = (anguloQubit * Math.PI) / 180;
-  const p0 = (Math.cos(rad / 2) ** 2 * 100).toFixed(1);
-  const p1 = (Math.sin(rad / 2) ** 2 * 100).toFixed(1);
+  // Tras medir, el estado ES |k⟩: P(|k⟩) = 100 % (motor.ts).
+  const prob = probabilidades(anguloQubit, resultadoMedicion);
+  const p0 = formatPercentage(prob.p0, 1);
+  const p1 = formatPercentage(prob.p1, 1);
 
-  const estadosSimultaneos = formatearEstados(numQubits);
+  const estadosN = formatearEstados(numQubits);
+  const estadosReferencia = leerEnEscalaLarga(numeroEstados(QUBITS_REFERENCIA));
+  // Barras en escala logarítmica (longitud ∝ número de qubits): en lineal, todas salvo la de
+  // 50 qubits medirían menos de una milmillonésima de ella.
   const filas = [
-    { label: `${numQubits} bits clásicos`, qubits: numQubits, porcentaje: 0.5, valor: '1 estado (de ' + formatearEstados(numQubits) + ')' },
-    { label: `${numQubits} qubits`, qubits: numQubits, porcentaje: numQubits / 20, valor: formatearEstados(numQubits) + ' estados' },
-    { label: '20 qubits', qubits: 20, porcentaje: 1, valor: '1.048.576 estados' },
+    { label: etiquetaBits(numQubits), fraccion: fraccionBarra(1), valor: `1 estado (de ${estadosN} posibles)` },
+    { label: etiquetaQubits(numQubits), fraccion: fraccionBarra(numeroEstados(numQubits)), valor: `${estadosN} estados` },
+    { label: etiquetaQubits(20), fraccion: fraccionBarra(numeroEstados(20)), valor: `${formatearEstados(20)} estados` },
+    { label: etiquetaQubits(QUBITS_REFERENCIA), fraccion: fraccionBarra(numeroEstados(QUBITS_REFERENCIA)), valor: `${estadosReferencia} de estados` },
   ];
 
   const puertaActual = PUERTAS.find((p) => p.id === puertaSeleccionada) ?? null;
-  const prediccion = getPrediccion(anoSlider);
+  const calendario = estadoCalendario(anoSlider);
 
   return (
     <div className={styles.container}>
@@ -258,7 +215,7 @@ export default function VisualizadorComputacionCuantica() {
       {/* Hero */}
       <header className={styles.hero}>
         <div className={styles.heroContent}>
-          <span className={styles.heroBadge}>⚛️ Visualizador Interactivo</span>
+          <span className={styles.heroBadge}><span aria-hidden="true">⚛️</span> Visualizador Interactivo</span>
           <h1 className={styles.heroTitle}>Computación Cuántica</h1>
           <p className={styles.heroSubtitle}>Qubits, superposición y la amenaza al cifrado RSA</p>
           <p className={styles.heroDesc}>
@@ -288,16 +245,16 @@ export default function VisualizadorComputacionCuantica() {
             {/* Bit clásico */}
             <div className={styles.columnaComparativa}>
               <p className={styles.columnaComparativaTitulo}>Bit Clásico</p>
-              <span
+              {/* Un <button> de verdad: responde a Enter y a Espacio sin código extra */}
+              <button
+                type="button"
                 className={`${styles.bombilla} ${bitClasico === 0 ? styles.bombillaApagada : styles.bombillaEncendida}`}
                 onClick={() => setBitClasico(bitClasico === 0 ? 1 : 0)}
-                role="button"
-                tabIndex={0}
                 aria-label={`Bit clásico: ${bitClasico}. Haz clic para cambiar`}
-                onKeyDown={(e) => e.key === 'Enter' && setBitClasico(bitClasico === 0 ? 1 : 0)}
+                aria-pressed={bitClasico === 1}
               >
                 {bitClasico === 0 ? '🔌' : '💡'}
-              </span>
+              </button>
               <span className={styles.valorBit}>{bitClasico}</span>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: 0 }}>
                 Haz clic para alternar
@@ -309,7 +266,7 @@ export default function VisualizadorComputacionCuantica() {
                 </div>
                 <div className={styles.probFila}>
                   <span>Simultaneidad</span>
-                  <span style={{ fontWeight: 700, color: '#dc2626' }}>No</span>
+                  <span className={styles.textoRojo}>No</span>
                 </div>
               </div>
             </div>
@@ -321,11 +278,11 @@ export default function VisualizadorComputacionCuantica() {
               <div className={styles.probabilidades}>
                 <div className={styles.probFila}>
                   <span className={styles.probKet}>P(|0⟩)</span>
-                  <span className={styles.probValor}>{p0}%</span>
+                  <span className={styles.probValor}>{p0}</span>
                 </div>
                 <div className={styles.probFila}>
                   <span className={styles.probKet}>P(|1⟩)</span>
-                  <span className={styles.probValor}>{p1}%</span>
+                  <span className={styles.probValor}>{p1}</span>
                 </div>
               </div>
               <p className={styles.colapsado} role="status" aria-live="polite">
@@ -373,8 +330,9 @@ export default function VisualizadorComputacionCuantica() {
           <div className={styles.warningBox} style={{ marginTop: '1rem' }}>
             <span className={styles.warningBoxIcono} aria-hidden="true">⚛️</span>
             <span>
-              La medición destruye la superposición. Esto es la <strong>decoherencia</strong>: el mayor obstáculo
-              en la construcción de ordenadores cuánticos útiles.
+              La medición destruye la superposición: tras medir, el qubit queda en |0⟩ o en |1⟩ con
+              probabilidad 100&nbsp;%. Cuando es el entorno el que «mide» al qubit sin que nadie lo pida, se habla
+              de <strong>decoherencia</strong>: el mayor obstáculo en la construcción de ordenadores cuánticos útiles.
             </span>
           </div>
         </section>
@@ -386,14 +344,15 @@ export default function VisualizadorComputacionCuantica() {
             <div>
               <h2 className={styles.sectionTitle}>Paralelismo cuántico</h2>
               <p className={styles.sectionSubtitle}>
-                Con n qubits puedes procesar 2ⁿ estados simultáneamente. El crecimiento es exponencial.
+                Describir n qubits exige 2ⁿ amplitudes a la vez: el crecimiento es exponencial. Pero al medirlos
+                se obtiene un solo resultado de n bits.
               </p>
             </div>
           </div>
 
           <div className={styles.sliderLabel}>
             <span>Número de qubits</span>
-            <strong>{numQubits} qubits → {estadosSimultaneos} estados simultáneos</strong>
+            <strong>{etiquetaQubits(numQubits)} → {estadosN} estados en superposición</strong>
           </div>
           <input
             type="range"
@@ -403,7 +362,7 @@ export default function VisualizadorComputacionCuantica() {
             value={numQubits}
             onChange={(e) => setNumQubits(Number(e.target.value))}
             className={styles.slider}
-            aria-label="Número de qubits para calcular estados simultáneos"
+            aria-label="Número de qubits para calcular los estados de la superposición"
           />
           <div className={styles.sliderValores}>
             <span>1 qubit</span>
@@ -412,34 +371,36 @@ export default function VisualizadorComputacionCuantica() {
           </div>
 
           <div className={styles.qubitsDisplay}>
-            <span className={styles.estadosNumero} aria-live="polite">{estadosSimultaneos}</span>
-            <span className={styles.estadosLabel}>estados simultáneos con {numQubits} qubit{numQubits !== 1 ? 's' : ''}</span>
+            <span className={styles.estadosNumero} aria-live="polite">{estadosN}</span>
+            <span className={styles.estadosLabel}>estados de base en la superposición de {etiquetaQubits(numQubits)}</span>
           </div>
 
           <div className={styles.comparativaQubits}>
-            {filas.map((fila) => (
-              <div key={fila.label} className={styles.filaQubits}>
+            {filas.map((fila, i) => (
+              <div key={i} className={styles.filaQubits}>
                 <span className={styles.filaQubitsEtiqueta}>{fila.label}</span>
-                <div
-                  className={styles.barraQubits}
-                  style={{ width: `${Math.max(fila.porcentaje * 100, 2)}%` }}
-                  role="img"
-                  aria-label={`Barra de comparativa para ${fila.label}`}
-                />
+                {/* La pista ocupa el hueco libre; la barra, una fracción de ella (escala logarítmica) */}
+                <div className={styles.pistaBarra} aria-hidden="true">
+                  <div className={styles.barraQubits} style={{ width: `${fila.fraccion * 100}%` }} />
+                </div>
                 <span className={styles.filaQubitsValor}>{fila.valor}</span>
               </div>
             ))}
-            <div className={styles.filaQubits}>
-              <span className={styles.filaQubitsEtiqueta}>50 qubits</span>
-              <div className={styles.barraQubits} style={{ width: '100%' }} />
-              <span className={styles.filaQubitsValor}>~1.125 billones de billones</span>
-            </div>
           </div>
+          <p className={styles.notaEscala}>
+            Barras en escala logarítmica: su longitud es proporcional al número de qubits. En escala lineal, la
+            barra de 20 qubits no llegaría a una milmillonésima de la de {QUBITS_REFERENCIA}.
+          </p>
 
           <div className={styles.analogia}>
-            <strong>Analogía:</strong> Es como buscar en un laberinto probando TODOS los caminos a la vez,
-            en lugar de intentarlos uno por uno. Un ordenador clásico con 50 bits prueba 1 ruta cada vez.
-            50 qubits exploran 1.125 billones de billones de rutas simultáneamente.
+            <strong>Analogía (y su límite):</strong> se suele decir que un ordenador cuántico recorre a la vez
+            todos los caminos de un laberinto. No es así. {QUBITS_REFERENCIA} qubits se describen con{' '}
+            {estadosReferencia} de amplitudes, pero al medir se obtiene <strong>un solo</strong> camino, al azar
+            según esas amplitudes. La ventaja aparece cuando un algoritmo consigue que las amplitudes de las
+            respuestas erróneas se cancelen entre sí (interferencia). En una búsqueda sin ninguna estructura, como
+            un laberinto a ciegas, lo mejor posible es el algoritmo de Grover: del orden de √N consultas en vez de N
+            (Bennett, Bernstein, Brassard y Vazirani, 1997). Con N = 2⁵⁰ son unos 33,5 millones de consultas
+            (2²⁵) frente a hasta {estadosReferencia}: una ganancia cuadrática, no exponencial.
           </div>
         </section>
 
@@ -497,7 +458,7 @@ export default function VisualizadorComputacionCuantica() {
 
           {/* Circuito mínimo */}
           <div className={styles.circuito}>
-            <p className={styles.circuitoTitle}>Circuito mínimo — Generador de números aleatorios perfecto</p>
+            <p className={styles.circuitoTitle}>Circuito mínimo — Generador de números aleatorios</p>
             <div className={styles.circuitoLinea}>
               <span className={styles.circuitoQubit}>|0⟩ ——</span>
               <span className={styles.circuitoPuerta}>H</span>
@@ -505,17 +466,19 @@ export default function VisualizadorComputacionCuantica() {
               <span className={styles.circuitoMedicion}>M</span>
             </div>
             <div className={styles.circuitoResultado}>
-              Resultado: Hadamard crea superposición 50/50 → la medición colapsa aleatoriamente.
-              Es el único generador de aleatoriedad perfecta del universo.
+              Resultado: Hadamard crea una superposición 50/50 → cada medición da 0 o 1 con probabilidad ½.
+              En un ordenador cuántico real es una fuente física de azar, como lo son también la desintegración
+              radiactiva o el ruido de los fotones. <strong>Aquí se simula</strong>: el byte sale del generador
+              pseudoaleatorio del navegador, no de un qubit.
               <br />
               <button
                 type="button"
                 className={styles.btnPrimario}
                 style={{ marginTop: '0.75rem', fontSize: '0.85rem' }}
                 onClick={generarBit}
-                aria-label="Generar un byte cuántico aleatorio"
+                aria-label="Simular un byte cuántico aleatorio"
               >
-                <span aria-hidden="true">▶</span> Generar byte cuántico
+                <span aria-hidden="true">▶</span> Simular byte cuántico
               </button>
               {numeroAleatorio !== '—' && (
                 <span
@@ -538,7 +501,8 @@ export default function VisualizadorComputacionCuantica() {
             <div>
               <h2 className={styles.sectionTitle}>La amenaza al cifrado RSA — Algoritmo de Shor</h2>
               <p className={styles.sectionSubtitle}>
-                RSA se basa en que factorizar números muy grandes es computacionalmente imposible. Los ordenadores cuánticos cambian esto.
+                RSA se basa en que factorizar números muy grandes es inviable en la práctica con ordenadores clásicos.
+                Un ordenador cuántico lo bastante grande y fiable lo cambiaría: aún no existe.
               </p>
             </div>
           </div>
@@ -547,22 +511,46 @@ export default function VisualizadorComputacionCuantica() {
             <div className={styles.timelineFila}>
               <span className={styles.timelineIcono} aria-hidden="true">🖥️</span>
               <div className={styles.timelineInfo}>
-                <p className={styles.timelineEtiqueta}>Mejor superordenador clásico (2024)</p>
-                <p className={`${styles.timelineTiempo} ${styles.timelineTiempoRojo}`}>~300 billones de años para romper RSA-2048</p>
+                <p className={styles.timelineEtiqueta}>Récord clásico de factorización (28/02/2020)</p>
+                <p className={`${styles.timelineTiempo} ${styles.timelineTiempoRojo}`}>
+                  RSA-250 (829 bits): unos 2.700 años-núcleo de cálculo. RSA-2048 sigue fuera de alcance.
+                </p>
+                <p className={styles.timelineFuente}>Boudot, Gaudry, Guillevic, Heninger, Thomé y Zimmermann (2020)</p>
               </div>
             </div>
             <div className={styles.timelineFila}>
               <span className={styles.timelineIcono} aria-hidden="true">⚛️</span>
               <div className={styles.timelineInfo}>
-                <p className={styles.timelineEtiqueta}>Ordenador cuántico con 4.000 qubits lógicos (futuro)</p>
-                <p className={`${styles.timelineTiempo} ${styles.timelineTiempoVerde}`}>~8 horas para romper RSA-2048</p>
+                <p className={styles.timelineEtiqueta}>Estimación cuántica de 2019 para RSA-2048</p>
+                <p className={`${styles.timelineTiempo} ${styles.timelineTiempoVerde}`}>
+                  20 millones de qubits físicos ruidosos → unas 8 horas
+                </p>
+                <p className={styles.timelineFuente}>Gidney y Ekerå (2019), arXiv:1905.09749</p>
+              </div>
+            </div>
+            <div className={styles.timelineFila}>
+              <span className={styles.timelineIcono} aria-hidden="true">⚛️</span>
+              <div className={styles.timelineInfo}>
+                <p className={styles.timelineEtiqueta}>Estimación cuántica de 2025 para RSA-2048</p>
+                <p className={`${styles.timelineTiempo} ${styles.timelineTiempoVerde}`}>
+                  Menos de 1 millón de qubits físicos ruidosos → menos de una semana
+                </p>
+                <p className={styles.timelineFuente}>
+                  Gidney (21/05/2025), arXiv:2505.15917: unos 1.400 qubits lógicos y 6.500 millones de puertas Toffoli
+                </p>
               </div>
             </div>
           </div>
+          <p className={styles.notaEscala}>
+            Las dos estimaciones cuánticas suponen una tasa de error física del 0,1&nbsp;% por operación. Para
+            situarlas: IBM anunció el 10/06/2025 su plan de tener en 2029 «Starling», con 200 qubits lógicos y
+            100 millones de puertas. Una hoja de ruta es un anuncio de empresa, no un hecho. Las demostraciones
+            del algoritmo de Shor en hardware real se han limitado a números muy pequeños, como 15 o 21.
+          </p>
 
           <div className={styles.sliderAno}>
             <div className={styles.sliderLabel}>
-              <span>Año de predicción</span>
+              <span>Año</span>
               <strong>{anoSlider}</strong>
             </div>
             <input
@@ -573,7 +561,7 @@ export default function VisualizadorComputacionCuantica() {
               value={anoSlider}
               onChange={(e) => setAnoSlider(Number(e.target.value))}
               className={styles.slider}
-              aria-label="Selecciona el año para ver predicciones de riesgo cuántico"
+              aria-label="Selecciona el año para ver el calendario de retirada de RSA y ECC"
             />
             <div className={styles.sliderValores}>
               <span>2024</span>
@@ -582,46 +570,63 @@ export default function VisualizadorComputacionCuantica() {
             </div>
           </div>
 
-          <div className={styles.prediccionCard} role="region" aria-label={`Predicción para el año ${anoSlider}`}>
+          <div className={styles.prediccionCard} role="region" aria-label={`Calendario para el año ${anoSlider}`}>
             <p className={styles.prediccionAno}>{anoSlider}</p>
             <p className={styles.prediccionQubits}>
-              Qubits lógicos estimados: <strong>{prediccion.qubitsLogicos.toLocaleString('es-ES')}</strong>
-              {' '}(se necesitan ~4.000 para romper RSA-2048)
+              Calendario propuesto por el NIST de EE. UU. para sus sistemas federales ({NIST_IR_8547.documento}).
+              Nadie sabe cuándo habrá un ordenador cuántico capaz de romper RSA-2048: las fechas responden a que
+              migrar lleva años y a que lo que se cifra hoy puede guardarse y descifrarse más adelante.
             </p>
-            {prediccion.enRiesgo.length > 0 && (
+            {calendario.noAdmitidos.length > 0 && (
               <>
-                <p style={{ fontSize: '0.82rem', fontWeight: 700, color: '#dc2626', marginBottom: '0.4rem' }}>
-                  En riesgo:
-                </p>
+                <p className={styles.etiquetaRiesgo}>No admitidos desde {NIST_IR_8547.noAdmitidoDesde}:</p>
                 <div className={styles.riesgosList}>
-                  {prediccion.enRiesgo.map((r) => (
+                  {calendario.noAdmitidos.map((r) => (
                     <span key={r} className={styles.riesgoChip}>{r}</span>
                   ))}
                 </div>
               </>
             )}
-            {prediccion.seguro.length > 0 && (
+            {calendario.desaconsejados.length > 0 && (
               <>
-                <p style={{ fontSize: '0.82rem', fontWeight: 700, color: '#16a34a', marginBottom: '0.4rem', marginTop: '0.75rem' }}>
-                  Seguros / post-cuánticos:
-                </p>
+                <p className={styles.etiquetaRiesgo}>Desaconsejados desde {NIST_IR_8547.desaconsejadoDesde}:</p>
                 <div className={styles.riesgosList}>
-                  {prediccion.seguro.map((r) => (
-                    <span key={r} className={styles.riesgoChipOk}>{r}</span>
+                  {calendario.desaconsejados.map((r) => (
+                    <span key={r} className={styles.riesgoChip}>{r}</span>
                   ))}
                 </div>
               </>
             )}
+            {calendario.admitidos.length > 0 && (
+              <>
+                <p className={styles.etiquetaNeutra}>Aún admitidos (vulnerables al algoritmo de Shor):</p>
+                <div className={styles.riesgosList}>
+                  {calendario.admitidos.map((r) => (
+                    <span key={r} className={styles.riesgoChipNeutro}>{r}</span>
+                  ))}
+                </div>
+              </>
+            )}
+            <p className={styles.etiquetaSeguro}>Estándares post-cuánticos ya publicados:</p>
+            <div className={styles.riesgosList}>
+              {PQC_PUBLICADOS.map((a) => (
+                <span key={a.nombre} className={styles.riesgoChipOk}>{a.nombre}</span>
+              ))}
+            </div>
+            <p className={styles.notaEscala}>
+              La Unión Europea, en su hoja de ruta coordinada del 23/06/2025, pide empezar la transición antes de
+              que acabe 2026 y haberla completado en las infraestructuras críticas antes de que acabe 2030.
+            </p>
           </div>
 
           <div className={styles.postQuantum}>
-            <p className={styles.postQuantumTitle}>Criptografía post-cuántica (estandarizada por NIST 2024)</p>
+            <p className={styles.postQuantumTitle}>Criptografía post-cuántica (estándares del NIST del 13/08/2024)</p>
             <ul className={styles.postQuantumList}>
-              <li>CRYSTALS-Kyber</li>
-              <li>CRYSTALS-Dilithium</li>
-              <li>FALCON</li>
-              <li>SPHINCS+</li>
+              {PQC_PUBLICADOS.map((a) => (
+                <li key={a.nombre}>{a.nombre} · {a.norma}</li>
+              ))}
             </ul>
+            <p className={styles.postQuantumNota}>En proceso de estandarización: {PQC_EN_PROCESO.join(' y ')}.</p>
           </div>
         </section>
 
@@ -635,9 +640,9 @@ export default function VisualizadorComputacionCuantica() {
           <h3>¿Qué es un ordenador cuántico?</h3>
           <p>
             Un ordenador cuántico es una máquina que aprovecha las leyes de la mecánica cuántica —superposición,
-            entrelazamiento e interferencia— para resolver ciertos problemas de forma exponencialmente más rápida que
-            los ordenadores clásicos. No sustituye al ordenador clásico: es complementario. Es mejor en problemas
-            específicos como factorización, simulación molecular y optimización combinatoria.
+            entrelazamiento e interferencia— para resolver ciertos problemas mucho más deprisa que los ordenadores
+            clásicos; en algunos, como la factorización, con una ventaja enorme según los algoritmos conocidos. No sustituye al ordenador clásico: es complementario. Sus candidatos más
+            claros son la factorización y la simulación de moléculas; en optimización, la ventaja sigue en estudio.
           </p>
 
           <h3>¿Por qué los qubits necesitan temperaturas cercanas al cero absoluto?</h3>
@@ -652,25 +657,26 @@ export default function VisualizadorComputacionCuantica() {
           <p>
             La decoherencia ocurre cuando un qubit pierde su estado cuántico por interacción con el entorno externo.
             Es como si alguien encendiera la luz mientras lanzas una moneda al aire: la observación destruye la
-            superposición. Los qubits actuales mantienen coherencia durante microsegundos. Los investigadores
-            necesitan alcanzar segundos o más. El error de corrección cuántica (QEC) permite crear qubits lógicos
-            más estables usando decenas de qubits físicos por cada qubit lógico.
+            superposición. Los qubits superconductores mantienen la coherencia del orden de decenas a cientos de
+            microsegundos; los de iones atrapados, bastante más. Como ningún qubit físico es perfecto, la corrección
+            de errores cuánticos (QEC) crea qubits lógicos más estables repartiendo cada uno entre decenas o cientos
+            de qubits físicos.
           </p>
 
           <h3>Empresas líderes en computación cuántica</h3>
           <ul>
             <li><strong>IBM Quantum</strong>: Eagle (127Q), Osprey (433Q), Condor (1.121Q). Acceso cloud gratuito para investigadores.</li>
-            <li><strong>Google</strong>: Sycamore (53Q), demostró supremacía cuántica en 2019 para un problema específico.</li>
+            <li><strong>Google</strong>: Sycamore (53Q). En 2019 anunció la «supremacía cuántica» en un problema de muestreo que, según Google, a un superordenador le llevaría 10.000 años. Es un resultado discutido: IBM estimó ese mismo mes unos 2,5 días, y Pan, Chen y Zhang lo simularon en unas 15 horas con 512 GPU (Physical Review Letters, 2022).</li>
             <li><strong>IonQ</strong>: Usa trampas de iones (más estables que superconductores).</li>
-            <li><strong>Quantinuum</strong>: H-Series con record en fidelidad de puertas.</li>
+            <li><strong>Quantinuum</strong>: H-Series, de iones atrapados, con fidelidades de puerta entre las más altas publicadas.</li>
             <li><strong>D-Wave</strong>: Annealing cuántico, especializado en optimización.</li>
           </ul>
 
           <h3>Casos de uso reales (no ciencia ficción)</h3>
           <ul>
-            <li><strong>Simulación molecular</strong>: Diseño de fármacos y materiales. Un ordenador cuántico podría simular moléculas complejas como la penicilina con precisión atómica.</li>
+            <li><strong>Simulación molecular</strong>: Diseño de fármacos y materiales. Se investiga si un ordenador cuántico podrá simular con precisión moléculas que hoy solo se aproximan.</li>
             <li><strong>Optimización logística</strong>: Rutas de entrega, distribución energética, diseño de chips.</li>
-            <li><strong>Machine Learning</strong>: Acelerar el entrenamiento de ciertos modelos.</li>
+            <li><strong>Aprendizaje automático</strong>: se investiga si puede acelerar ciertos modelos; por ahora, sin ventaja demostrada en problemas prácticos.</li>
             <li><strong>Criptografía</strong>: Romper (o crear) cifrados. La carrera entre ataque y defensa ya está en marcha.</li>
           </ul>
 
