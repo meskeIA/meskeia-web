@@ -5,6 +5,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorTermodinamicaCarnot.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatNumber, formatPercentage } from '@/lib';
 
 // ============================================
 // CONSTANTES
@@ -13,24 +14,23 @@ const R_GAS = 8.314; // J/(mol·K)
 const GAMMA = 5 / 3; // gas monoatómico ideal (cp/cv = 5/3)
 const N_MOLES = 1; // 1 mol de gas
 
-// ============================================
-// UTILIDADES
-// ============================================
-function fmt(n: number, decimales = 2): string {
-  if (!isFinite(n)) return '∞';
-  return n.toFixed(decimales).replace('.', ',');
-}
+// Rangos de los deslizadores de temperatura (K) y su paso
+const PASO_T = 5;
+const TC_MIN = 400;
+const TC_MAX = 1200;
+const TF_MIN = 250;
+const TF_MAX = 500;
 
-function fmtSci(n: number, decimales = 2): string {
-  if (!isFinite(n)) return '∞';
-  if (n === 0) return '0';
-  if (Math.abs(n) >= 0.1 && Math.abs(n) < 100000) {
-    return fmt(n, decimales);
-  }
-  const exp = Math.floor(Math.log10(Math.abs(n)));
-  const mantisa = n / Math.pow(10, exp);
-  return `${fmt(mantisa, decimales)} × 10^${exp}`;
-}
+/** Espacio duro (U+00A0) para unir una cifra con su unidad o con el signo %. */
+const NBSP = '\u00A0';
+
+/** Etiquetas de cada etapa en el canvas: completa y corta (para anchos de móvil). */
+const ETAPAS: Record<number, { larga: string; corta: string }> = {
+  1: { larga: '1→2 Isoterma Tc (absorbe Q)', corta: '1→2 Isoterma Tc' },
+  2: { larga: '2→3 Adiabática (expande)', corta: '2→3 Adiabática' },
+  3: { larga: '3→4 Isoterma Tf (cede Q)', corta: '3→4 Isoterma Tf' },
+  4: { larga: '4→1 Adiabática (comprime)', corta: '4→1 Adiabática' },
+};
 
 // ============================================
 // COMPONENTE
@@ -48,8 +48,12 @@ export default function SimuladorTermodinamicaCarnotPage() {
 
   const [, setTick] = useState(0);
 
-  // Garantizar Tc > Tf
-  const TcEff = Math.max(Tc, Tf + 1);
+  // Tc siempre por encima de Tf, sin cambiar nunca un valor que el usuario no ha tocado:
+  // cada deslizador se acota al otro (Tc ≥ Tf + 5 K y Tf ≤ Tc − 5 K). Con Tc ≤ Tf no hay
+  // motor térmico (η ≤ 0), así que el control no deja llegar ahí y el rótulo lo dice.
+  // Los dos extremos caen en múltiplos de 5, así que el pulgar siempre marca lo que se calcula.
+  const tcMin = Math.max(TC_MIN, Tf + PASO_T);
+  const tfMax = Math.min(TF_MAX, Tc - PASO_T);
 
   // ============================================
   // CÁLCULO DE LOS 4 ESTADOS DEL CICLO
@@ -62,33 +66,33 @@ export default function SimuladorTermodinamicaCarnotPage() {
 
     const V1m = V1 / 1000; // m³
     const V2m = V1m * ratioComp;
-    const expFactor = Math.pow(TcEff / Tf, 1 / (GAMMA - 1));
+    const expFactor = Math.pow(Tc / Tf, 1 / (GAMMA - 1));
     const V3m = V2m * expFactor;
     const V4m = V1m * expFactor;
 
     // Presiones (gas ideal: PV = nRT)
-    const P1 = (N_MOLES * R_GAS * TcEff) / V1m;
-    const P2 = (N_MOLES * R_GAS * TcEff) / V2m;
+    const P1 = (N_MOLES * R_GAS * Tc) / V1m;
+    const P2 = (N_MOLES * R_GAS * Tc) / V2m;
     const P3 = (N_MOLES * R_GAS * Tf) / V3m;
     const P4 = (N_MOLES * R_GAS * Tf) / V4m;
 
     return {
-      e1: { V: V1m, P: P1, T: TcEff },
-      e2: { V: V2m, P: P2, T: TcEff },
+      e1: { V: V1m, P: P1, T: Tc },
+      e2: { V: V2m, P: P2, T: Tc },
       e3: { V: V3m, P: P3, T: Tf },
       e4: { V: V4m, P: P4, T: Tf },
     };
-  }, [V1, ratioComp, TcEff, Tf]);
+  }, [V1, ratioComp, Tc, Tf]);
 
   // Calores y trabajos
   const ciclo = useMemo(() => {
-    const Q12 = N_MOLES * R_GAS * TcEff * Math.log(estados.e2.V / estados.e1.V); // calor absorbido (>0)
+    const Q12 = N_MOLES * R_GAS * Tc * Math.log(estados.e2.V / estados.e1.V); // calor absorbido (>0)
     const Q34 = N_MOLES * R_GAS * Tf * Math.log(estados.e4.V / estados.e3.V); // calor cedido (<0)
     const Wnet = Q12 + Q34; // trabajo neto = calor neto (1.ª ley en ciclo)
-    const eta = 1 - Tf / TcEff; // eficiencia ideal de Carnot
-    const etaReal = Wnet / Q12; // verificación
-    return { Q12, Q34, Wnet, eta, etaReal };
-  }, [estados, TcEff, Tf]);
+    const eta = 1 - Tf / Tc; // eficiencia ideal de Carnot
+    const wSobreQc = Wnet / Q12; // comprobación de la 1.ª ley: en el ciclo ideal coincide con η
+    return { Q12, Q34, Wnet, eta, wSobreQc };
+  }, [estados, Tc, Tf]);
 
   // ============================================
   // ANIMACIÓN
@@ -147,7 +151,7 @@ export default function SimuladorTermodinamicaCarnotPage() {
       // Isoterma Tc: e1 → e2
       const u = t / 0.25;
       const V = estados.e1.V + (estados.e2.V - estados.e1.V) * u;
-      const P = (N_MOLES * R_GAS * TcEff) / V;
+      const P = (N_MOLES * R_GAS * Tc) / V;
       return { V, P, etapa: 1 };
     }
     if (t < 0.5) {
@@ -171,7 +175,7 @@ export default function SimuladorTermodinamicaCarnotPage() {
     const P = estados.e4.P * Math.pow(estados.e4.V / V, GAMMA);
     return { V, P, etapa: 4 };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [estados, TcEff, Tf, tCicloRef.current]);
+  }, [estados, Tc, Tf, tCicloRef.current]);
 
   // ============================================
   // DIBUJO
@@ -190,18 +194,26 @@ export default function SimuladorTermodinamicaCarnotPage() {
 
     const W = rect.width;
     const H = rect.height;
-    const pad = { top: 30, right: 30, bottom: 50, left: 60 };
+    // La banda superior (pad.top) lleva los rótulos Tc/Tf y la etapa, FUERA del área del
+    // diagrama: dentro tapaban el punto 1 y se pisaban entre sí (hallazgo 2261).
+    const estrecho = W < 420;
+    const pad = { top: 46, right: estrecho ? 12 : 30, bottom: 50, left: 64 };
     const plotW = W - pad.left - pad.right;
     const plotH = H - pad.top - pad.bottom;
 
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const colorAxis = isDark ? '#999' : '#666';
-    const colorGrid = isDark ? '#333' : '#EEE';
-    const colorText = isDark ? '#E5E5E5' : '#333';
-    const colorIso1 = '#A82E68'; // isoterma Tc (calor absorbido) - rojo
-    const colorIso2 = '#7FB3D3'; // isoterma Tf (calor cedido) - azul claro
-    const colorAdi = '#E07A1F'; // adiabáticas - naranja
-    const colorPunto = '#48A9A6';
+    // Colores desde los tokens del módulo: cada uno tiene su variante oscura en el CSS.
+    const estilo = getComputedStyle(canvas);
+    const token = (nombre: string, respaldo: string): string =>
+      estilo.getPropertyValue(nombre).trim() || respaldo;
+    const colorAxis = token('--text-secondary', '#666');
+    const colorGrid = token('--border', '#E5E5E5');
+    const colorText = token('--text-primary', '#1A1A1A');
+    const colorIso1 = token('--carnot-caliente', '#A82E68'); // isoterma Tc (calor absorbido)
+    const colorIso2 = token('--carnot-frio', '#2A6A99'); // isoterma Tf (calor cedido)
+    const colorAdi = token('--carnot-adiabatica', '#A65600'); // adiabáticas
+    const colorPunto = token('--carnot-trabajo', '#2F7470');
+    const colorMarcador = token('--primary-boton', '#26718F');
+    const colorBorde = token('--bg-primary', '#FAFAFA');
     const colorArea = 'rgba(46, 134, 171, 0.15)';
 
     ctx.clearRect(0, 0, W, H);
@@ -242,23 +254,24 @@ export default function SimuladorTermodinamicaCarnotPage() {
     ctx.lineTo(pad.left + plotW, pad.top + plotH);
     ctx.stroke();
 
-    // Etiquetas ejes
+    // Etiquetas ejes (en móvil, una marca de cada dos en V para que no se pisen)
     ctx.fillStyle = colorText;
     ctx.font = '11px system-ui';
     ctx.textAlign = 'center';
     for (let i = 0; i <= 5; i++) {
+      if (estrecho && i % 2 === 1) continue;
       const v = Vmin + (Vmax - Vmin) * (i / 5);
-      ctx.fillText(`${fmt(v * 1000, 1)}`, xToPx(v), pad.top + plotH + 14);
+      ctx.fillText(formatNumber(v * 1000, 1), xToPx(v), pad.top + plotH + 14);
     }
-    ctx.fillText('Volumen V (L)', pad.left + plotW / 2, pad.top + plotH + 30);
+    ctx.fillText('Volumen V (L)', pad.left + plotW / 2, pad.top + plotH + 32);
 
     ctx.textAlign = 'right';
     for (let i = 0; i <= 5; i++) {
       const p = Pmin + (Pmax - Pmin) * (i / 5);
-      ctx.fillText(`${fmt(p / 1000, 1)}`, pad.left - 4, yToPx(p) + 4);
+      ctx.fillText(formatNumber(p / 1000, 1), pad.left - 4, yToPx(p) + 4);
     }
     ctx.save();
-    ctx.translate(pad.left - 45, pad.top + plotH / 2);
+    ctx.translate(10, pad.top + plotH / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.textAlign = 'center';
     ctx.fillText('Presión P (kPa)', 0, 0);
@@ -273,7 +286,7 @@ export default function SimuladorTermodinamicaCarnotPage() {
     for (let i = 0; i <= N; i++) {
       const u = i / N;
       const V = estados.e1.V + (estados.e2.V - estados.e1.V) * u;
-      const P = (N_MOLES * R_GAS * TcEff) / V;
+      const P = (N_MOLES * R_GAS * Tc) / V;
       const px = xToPx(V);
       const py = yToPx(P);
       if (primero) { ctx.moveTo(px, py); primero = false; }
@@ -325,7 +338,7 @@ export default function SimuladorTermodinamicaCarnotPage() {
     };
 
     // Isoterma Tc (e1 → e2)
-    dibujarCurva(estados.e1.V, estados.e2.V, V => (N_MOLES * R_GAS * TcEff) / V, colorIso1);
+    dibujarCurva(estados.e1.V, estados.e2.V, V => (N_MOLES * R_GAS * Tc) / V, colorIso1);
     // Adiabática (e2 → e3)
     dibujarCurva(estados.e2.V, estados.e3.V, V => estados.e2.P * Math.pow(estados.e2.V / V, GAMMA), colorAdi);
     // Isoterma Tf (e3 → e4)
@@ -335,14 +348,14 @@ export default function SimuladorTermodinamicaCarnotPage() {
 
     // Puntos numerados
     const dibujarPunto = (V: number, P: number, n: string) => {
-      ctx.fillStyle = '#2E86AB';
-      ctx.strokeStyle = 'white';
+      ctx.fillStyle = colorMarcador;
+      ctx.strokeStyle = colorBorde;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(xToPx(V), yToPx(P), 8, 0, 2 * Math.PI);
       ctx.fill();
       ctx.stroke();
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = '#FFFFFF';
       ctx.font = 'bold 12px system-ui';
       ctx.textAlign = 'center';
       ctx.fillText(n, xToPx(V), yToPx(P) + 4);
@@ -355,32 +368,33 @@ export default function SimuladorTermodinamicaCarnotPage() {
     // Punto animado
     if (puntoActual) {
       ctx.fillStyle = colorPunto;
-      ctx.strokeStyle = 'white';
+      ctx.strokeStyle = colorBorde;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(xToPx(puntoActual.V), yToPx(puntoActual.P), 10, 0, 2 * Math.PI);
       ctx.fill();
       ctx.stroke();
-
-      // Etiqueta etapa
-      ctx.fillStyle = colorPunto;
-      ctx.font = 'bold 11px system-ui';
-      ctx.textAlign = 'left';
-      const etapaTexto = puntoActual.etapa === 1 ? '1→2 Isoterma Tc (absorbe Q)' :
-                        puntoActual.etapa === 2 ? '2→3 Adiabática (expande)' :
-                        puntoActual.etapa === 3 ? '3→4 Isoterma Tf (cede Q)' :
-                        '4→1 Adiabática (comprime)';
-      ctx.fillText(etapaTexto, xToPx(puntoActual.V) + 14, yToPx(puntoActual.P) + 4);
     }
 
-    // Etiquetas Tc, Tf
-    ctx.fillStyle = colorIso1;
+    // Banda superior, fuera del diagrama: línea 1 «Tc = … K   Tf = … K», línea 2 la etapa.
     ctx.font = 'bold 11px system-ui';
     ctx.textAlign = 'left';
-    ctx.fillText(`Tc = ${TcEff} K`, pad.left + 8, pad.top + 14);
+    const xBanda = 8;
+    const textoTc = `Tc = ${Tc} K`;
+    ctx.fillStyle = colorIso1;
+    ctx.fillText(textoTc, xBanda, 14);
     ctx.fillStyle = colorIso2;
-    ctx.fillText(`Tf = ${Tf} K`, pad.left + 8, pad.top + 28);
-  }, [estados, TcEff, Tf, puntoActual]);
+    ctx.fillText(`Tf = ${Tf} K`, xBanda + ctx.measureText(textoTc).width + 16, 14);
+
+    if (puntoActual) {
+      const etiquetas = ETAPAS[puntoActual.etapa];
+      const colorEtapa = puntoActual.etapa === 1 ? colorIso1 : puntoActual.etapa === 3 ? colorIso2 : colorAdi;
+      const disponible = W - xBanda - 4;
+      const etapaTexto = ctx.measureText(etiquetas.larga).width <= disponible ? etiquetas.larga : etiquetas.corta;
+      ctx.fillStyle = colorEtapa;
+      ctx.fillText(etapaTexto, xBanda, 30);
+    }
+  }, [estados, Tc, Tf, puntoActual]);
 
   useEffect(() => { dibujar(); }, [dibujar]);
   useEffect(() => {
@@ -390,9 +404,25 @@ export default function SimuladorTermodinamicaCarnotPage() {
   }, [dibujar]);
   useEffect(() => {
     const observer = new MutationObserver(dibujar);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-brand'] });
     return () => observer.disconnect();
   }, [dibujar]);
+
+  // Alternativa textual del canvas y tabla de estados (V, P, T de los cuatro vértices)
+  const tcCelsius = formatNumber(Tc - 273.15, 0);
+  const tfCelsius = formatNumber(Tf - 273.15, 0);
+  const listaEstados = [
+    { n: '1', e: estados.e1 },
+    { n: '2', e: estados.e2 },
+    { n: '3', e: estados.e3 },
+    { n: '4', e: estados.e4 },
+  ];
+  const descripcionDiagrama =
+    `Diagrama PV del ciclo de Carnot entre Tc = ${Tc} K y Tf = ${Tf} K. ` +
+    listaEstados
+      .map(({ n, e }) => `Estado ${n}: V = ${formatNumber(e.V * 1000, 2)} L, P = ${formatNumber(e.P / 1000, 1)} kPa`)
+      .join('; ') +
+    '.';
 
   return (
     <div className={styles.container}>
@@ -418,73 +448,91 @@ export default function SimuladorTermodinamicaCarnotPage() {
         <div className={styles.controls}>
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
-                Temperatura foco caliente (Tc = <strong>{TcEff} K</strong>) — {fmt(TcEff - 273.15, 0)} °C
+              <label className={styles.controlLabel} htmlFor="carnot-tc">
+                Temperatura foco caliente (Tc = <strong>{Tc} K</strong>) — {tcCelsius} °C
               </label>
               <input
+                id="carnot-tc"
                 type="range"
-                min={400}
-                max={1200}
-                step={5}
-                value={TcEff}
-                onChange={e => setTc(parseFloat(e.target.value))}
+                min={tcMin}
+                max={TC_MAX}
+                step={PASO_T}
+                value={Tc}
+                onChange={e => setTc(Math.min(TC_MAX, Math.max(tcMin, Number(e.target.value))))}
                 className={styles.slider}
                 aria-label="Temperatura foco caliente Tc"
+                aria-valuetext={`${Tc} K (${tcCelsius} °C)`}
+                aria-describedby="carnot-tc-rango"
               />
+              <span id="carnot-tc-rango" className={styles.controlHint}>
+                De {tcMin} a {TC_MAX} K: Tc queda siempre al menos {PASO_T} K por encima de Tf, porque
+                con Tc ≤ Tf no hay motor térmico (η ≤ 0).
+              </span>
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
-                Temperatura foco frío (Tf = <strong>{Tf} K</strong>) — {fmt(Tf - 273.15, 0)} °C
+              <label className={styles.controlLabel} htmlFor="carnot-tf">
+                Temperatura foco frío (Tf = <strong>{Tf} K</strong>) — {tfCelsius} °C
               </label>
               <input
+                id="carnot-tf"
                 type="range"
-                min={250}
-                max={500}
-                step={5}
+                min={TF_MIN}
+                max={tfMax}
+                step={PASO_T}
                 value={Tf}
-                onChange={e => setTf(parseFloat(e.target.value))}
+                onChange={e => setTf(Math.max(TF_MIN, Math.min(tfMax, Number(e.target.value))))}
                 className={styles.slider}
                 aria-label="Temperatura foco frío Tf"
+                aria-valuetext={`${Tf} K (${tfCelsius} °C)`}
+                aria-describedby="carnot-tf-rango"
               />
+              <span id="carnot-tf-rango" className={styles.controlHint}>
+                De {TF_MIN} a {tfMax} K: siempre por debajo de Tc.
+              </span>
             </div>
           </div>
 
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
-                Volumen inicial (V₁ = <strong>{fmt(V1, 2)} L</strong>)
+              <label className={styles.controlLabel} htmlFor="carnot-v1">
+                Volumen inicial (V₁ = <strong>{formatNumber(V1, 2)} L</strong>)
               </label>
               <input
+                id="carnot-v1"
                 type="range"
                 min={0.5}
                 max={5}
                 step={0.1}
                 value={V1}
-                onChange={e => setV1(parseFloat(e.target.value))}
+                onChange={e => setV1(Number(e.target.value))}
                 className={styles.slider}
                 aria-label="Volumen inicial"
+                aria-valuetext={`${formatNumber(V1, 2)} litros`}
               />
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
-                Ratio expansión isoterma (V₂/V₁ = <strong>{fmt(ratioComp, 1)}</strong>)
+              <label className={styles.controlLabel} htmlFor="carnot-ratio">
+                Ratio expansión isoterma (V₂/V₁ = <strong>{formatNumber(ratioComp, 1)}</strong>)
               </label>
               <input
+                id="carnot-ratio"
                 type="range"
                 min={1.5}
                 max={4}
                 step={0.1}
                 value={ratioComp}
-                onChange={e => setRatioComp(parseFloat(e.target.value))}
+                onChange={e => setRatioComp(Number(e.target.value))}
                 className={styles.slider}
                 aria-label="Ratio de expansión"
+                aria-valuetext={`V₂ igual a ${formatNumber(ratioComp, 1)} veces V₁`}
               />
             </div>
           </div>
 
           <div className={styles.actions}>
-            <button type="button" className={styles.actionBtn} onClick={togglePlay} aria-pressed={running}>
-              {running ? '⏸ Pausa' : '▶ Animar ciclo'}
+            {/* Rótulo que cambia (Animar ciclo ↔ Pausa): por eso sin aria-pressed, que anunciaría «Pausa, pulsado». */}
+            <button type="button" className={styles.actionBtn} onClick={togglePlay}>
+              <span aria-hidden="true">{running ? '⏸' : '▶'}</span> {running ? 'Pausa' : 'Animar ciclo'}
             </button>
             <button type="button" className={`${styles.actionBtn} ${styles.actionBtnSecondary}`} onClick={reset}>
               <span aria-hidden="true">🔄</span> Reiniciar
@@ -494,20 +542,50 @@ export default function SimuladorTermodinamicaCarnotPage() {
 
         {/* CANVAS */}
         <div className={styles.canvasWrapper}>
-          <canvas ref={canvasRef} className={styles.canvas} aria-label="Diagrama PV del ciclo de Carnot" />
+          <canvas
+            ref={canvasRef}
+            className={styles.canvas}
+            role="img"
+            aria-label={descripcionDiagrama}
+          >
+            {descripcionDiagrama}
+          </canvas>
           <div className={styles.legendRow}>
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: '#A82E68' }} />
+              <span className={`${styles.legendDot} ${styles.legendCaliente}`} />
               1→2 Isoterma Tc (absorbe Q de la fuente caliente)
             </span>
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: '#E07A1F' }} />
+              <span className={`${styles.legendDot} ${styles.legendAdiabatica}`} />
               2→3 y 4→1 Adiabáticas (sin intercambio de calor)
             </span>
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: '#7FB3D3' }} />
+              <span className={`${styles.legendDot} ${styles.legendFrio}`} />
               3→4 Isoterma Tf (cede Q al foco frío)
             </span>
+          </div>
+          <div className={styles.tablaWrapper}>
+            <table className={`${styles.tabla} ${styles.tablaEstados}`}>
+              <caption className={styles.tablaCaption}>Los 4 estados del ciclo</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Estado</th>
+                  <th scope="col">V (L)</th>
+                  <th scope="col">P (kPa)</th>
+                  <th scope="col">T (K)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {listaEstados.map(({ n, e }) => (
+                  <tr key={n}>
+                    <th scope="row">{n}</th>
+                    <td>{formatNumber(e.V * 1000, 2)}</td>
+                    <td>{formatNumber(e.P / 1000, 1)}</td>
+                    <td>{e.T}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -515,37 +593,44 @@ export default function SimuladorTermodinamicaCarnotPage() {
         <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           <div className={styles.resultCardMain}>
             <span className={styles.resultLabel}>Eficiencia η = 1 − Tf/Tc</span>
-            <span className={styles.resultValueLarge}>{fmt(ciclo.eta * 100, 2)} %</span>
+            <span className={styles.resultValueLarge}>{formatPercentage(ciclo.eta, 2)}</span>
             <span className={styles.resultRange}>
               Trabajo extraído por unidad de calor absorbido — máximo teórico posible entre Tc y Tf
             </span>
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Calor absorbido (Tc)</span>
-            <span className={styles.resultValue} style={{ color: '#A82E68' }}>+{fmtSci(ciclo.Q12, 1)} J</span>
+            <span className={`${styles.resultValue} ${styles.valorCaliente}`}>+{formatNumber(ciclo.Q12, 1)} J</span>
             <span className={styles.resultRange}>= n·R·Tc·ln(V₂/V₁)</span>
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Calor cedido (Tf)</span>
-            <span className={styles.resultValue} style={{ color: '#7FB3D3' }}>{fmtSci(ciclo.Q34, 1)} J</span>
+            <span className={`${styles.resultValue} ${styles.valorFrio}`}>{formatNumber(ciclo.Q34, 1)} J</span>
             <span className={styles.resultRange}>= n·R·Tf·ln(V₄/V₃)</span>
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Trabajo neto (Wnet)</span>
-            <span className={styles.resultValue} style={{ color: '#48A9A6' }}>{fmtSci(ciclo.Wnet, 1)} J</span>
+            <span className={`${styles.resultValue} ${styles.valorTrabajo}`}>{formatNumber(ciclo.Wnet, 1)} J</span>
             <span className={styles.resultRange}>Q absorbido + Q cedido</span>
           </div>
           <div className={styles.resultCard}>
-            <span className={styles.resultLabel}>η real (verificación)</span>
-            <span className={styles.resultValue}>{fmt(ciclo.etaReal * 100, 2)} %</span>
-            <span className={styles.resultRange}>= W/Qc — debe coincidir con η</span>
+            <span className={styles.resultLabel}>W/Qc (comprobación)</span>
+            <span className={styles.resultValue}>{formatPercentage(ciclo.wSobreQc, 2)}</span>
+            <span className={styles.resultRange}>1.ª ley: en el ciclo ideal coincide siempre con η</span>
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>P₁ (estado inicial)</span>
-            <span className={styles.resultValue}>{fmt(estados.e1.P / 1000, 1)} kPa</span>
-            <span className={styles.resultRange}>{fmt(estados.e1.P / 101325, 2)} atm</span>
+            <span className={styles.resultValue}>{formatNumber(estados.e1.P / 1000, 1)} kPa</span>
+            <span className={styles.resultRange}>{formatNumber(estados.e1.P / 101325, 2)} atm</span>
           </div>
         </div>
+
+        <p className={styles.supuestos}>
+          <strong>Datos del cálculo:</strong> gas ideal monoatómico, n = {N_MOLES} mol,
+          R = {formatNumber(R_GAS, 3)} J/(mol·K) y γ = c<sub>p</sub>/c<sub>v</sub> = 5/3, que da la
+          forma de las adiabáticas (P·V<sup>γ</sup> = cte). Con ellos, Qc = n·R·Tc·ln(V₂/V₁),
+          Qf = n·R·Tf·ln(V₄/V₃) y P₁ = n·R·Tc/V₁ se pueden rehacer a mano.
+        </p>
       </div>
 
       {/* ============================================
@@ -553,7 +638,7 @@ export default function SimuladorTermodinamicaCarnotPage() {
           ============================================ */}
       <EducationalSection
         title="Aprende termodinámica con Carnot"
-        subtitle="Por qué ningún motor convierte el 100% del calor en trabajo"
+        subtitle={`Por qué ningún motor convierte el 100${NBSP}% del calor en trabajo`}
       >
         <section>
           <h3>¿Qué es el ciclo de Carnot?</h3>
@@ -598,43 +683,43 @@ export default function SimuladorTermodinamicaCarnotPage() {
                   <td>Motor de gasolina (Otto)</td>
                   <td>~1500 K</td>
                   <td>~500 K</td>
-                  <td>67 %</td>
-                  <td>25-30 %</td>
+                  <td>67 %</td>
+                  <td>25-30 %</td>
                 </tr>
                 <tr>
                   <td>Motor diésel</td>
                   <td>~2000 K</td>
                   <td>~500 K</td>
-                  <td>75 %</td>
-                  <td>35-45 %</td>
+                  <td>75 %</td>
+                  <td>35-45 %</td>
                 </tr>
                 <tr>
                   <td>Central térmica de carbón</td>
                   <td>~810 K</td>
                   <td>~310 K</td>
-                  <td>62 %</td>
-                  <td>33-40 %</td>
+                  <td>62 %</td>
+                  <td>33-40 %</td>
                 </tr>
                 <tr>
                   <td>Central de ciclo combinado (gas)</td>
                   <td>~1700 K</td>
                   <td>~310 K</td>
-                  <td>82 %</td>
-                  <td>55-60 %</td>
+                  <td>82 %</td>
+                  <td>55-60 %</td>
                 </tr>
                 <tr>
                   <td>Reactor nuclear (PWR)</td>
                   <td>~600 K</td>
                   <td>~310 K</td>
-                  <td>48 %</td>
-                  <td>32-37 %</td>
+                  <td>48 %</td>
+                  <td>32-37 %</td>
                 </tr>
                 <tr>
                   <td>Cuerpo humano (metabolismo)</td>
                   <td>~310 K</td>
                   <td>~293 K</td>
-                  <td>5 %</td>
-                  <td>~25 %</td>
+                  <td>5 %</td>
+                  <td>~25 %</td>
                 </tr>
               </tbody>
             </table>
@@ -649,24 +734,24 @@ export default function SimuladorTermodinamicaCarnotPage() {
           <h3>4 escenarios donde Carnot manda</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🏭</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🏭</span>
               <strong>Centrales eléctricas térmicas</strong>
               <p>Carbón, gas, nuclear: todas convierten calor en trabajo. Su eficiencia está limitada por Carnot. Por eso buscan Tc altísimas y Tf bajas (refrigeración con agua de río o mar).</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🚗</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🚗</span>
               <strong>Motores de combustión</strong>
-              <p>Otto, diésel, Wankel: todos son motores térmicos. Su η está limitada por la T máxima (limitada por materiales del cilindro) y la T del aire ambiente. Por eso los motores en climas fríos son más eficientes.</p>
+              <p>Otto, diésel, Wankel: todos son motores térmicos, y Carnot les pone un techo según la T máxima de la combustión (que acotan los materiales del cilindro) y la del escape. Pero su rendimiento ideal sale de su propio ciclo: en el Otto depende de la relación de compresión, no de la temperatura ambiente. En la práctica, con frío el consumo de un coche suele empeorar (motor y aceite fríos tardan más en llegar a su temperatura de trabajo).</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>❄️</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">❄️</span>
               <strong>Frigoríficos y aires acondicionados</strong>
-              <p>Son ciclos de Carnot invertidos: el trabajo se introduce para sacar calor de Tf y cederlo a Tc. Su COP máximo también está limitado: COP = Tf / (Tc − Tf). Por eso los AC son menos eficientes en días muy calurosos.</p>
+              <p>Casi todos funcionan con un ciclo de compresión de vapor, y su límite ideal es el ciclo de Carnot invertido: se introduce trabajo para sacar calor de Tf y cederlo a Tc. Ese límite fija el COP máximo de refrigeración: COP = Tf / (Tc − Tf). Por eso los aires acondicionados rinden menos en días muy calurosos.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🌍</span>
-              <strong>Cambio climático</strong>
-              <p>La Tierra es una máquina térmica gigante: absorbe calor del Sol (Tc ≈ 5800 K en superficie del Sol), cede al espacio frío (Tf ≈ 3 K). η Carnot teórica casi 100 %. Las corrientes atmosféricas y oceánicas son la &quot;turbina&quot; planetaria.</p>
+              <span className={styles.scenarioIcon} aria-hidden="true">🌍</span>
+              <strong>La Tierra como máquina térmica</strong>
+              <p>La Tierra recibe la radiación del Sol, que emite como un cuerpo a unos 5800 K, y la devuelve al espacio emitiendo como un cuerpo a unos 255 K (su temperatura efectiva de emisión, no los 3 K del fondo cósmico). Por el camino, las diferencias de temperatura entre trópicos y polos, y entre la superficie y las capas altas, mueven vientos y corrientes oceánicas: la &quot;turbina&quot; planetaria. Como motor rinde muy poco: casi todo el calor absorbido se reemite sin convertirse en movimiento.</p>
             </div>
           </div>
         </section>
@@ -675,33 +760,33 @@ export default function SimuladorTermodinamicaCarnotPage() {
           <h3>Preguntas frecuentes sobre Carnot y la 2.ª ley</h3>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>¿Por qué η nunca puede ser 100 %?</h4>
-              <p>Por la <strong>2.ª ley de la termodinámica</strong>. Para que un motor funcione cíclicamente, el calor absorbido del foco caliente debe llegar de algún sitio. Si convirtieras 100 % en trabajo, no quedaría calor para el foco frío y el ciclo no se cerraría. Cualquier motor cíclico debe ceder algo a Tf.</p>
-              <p className={styles.faqTip}>💡 La única forma de η = 100 % sería Tf = 0 K (cero absoluto), físicamente imposible (3.ª ley termodinámica).</p>
+              <h4>¿Por qué η nunca puede ser 100 %?</h4>
+              <p>Por la <strong>2.ª ley de la termodinámica</strong>. Para que un motor funcione cíclicamente, el calor absorbido del foco caliente debe llegar de algún sitio. Si convirtieras 100 % en trabajo, no quedaría calor para el foco frío y el ciclo no se cerraría. Cualquier motor cíclico debe ceder algo a Tf.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> La única forma de η = 100 % sería Tf = 0 K (cero absoluto), físicamente imposible (3.ª ley termodinámica).</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Por qué Carnot es el ciclo más eficiente posible?</h4>
               <p>Porque es <strong>reversible</strong>: en cada paso, se intercambia calor con el foco solo cuando ambos están a la misma T (sin diferencia de T finita = sin pérdidas por irreversibilidad). Cualquier ciclo con etapas irreversibles (combustión, fricción, transferencia con ΔT) genera entropía y reduce η.</p>
-              <p className={styles.faqTip}>💡 Es físicamente irrealizable: tardaría tiempo infinito por etapa para ser exactamente reversible. Sirve como cota superior teórica.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Es físicamente irrealizable: tardaría tiempo infinito por etapa para ser exactamente reversible. Sirve como cota superior teórica. No es el único ciclo reversible: los ciclos Stirling y Ericsson con regeneración ideal también lo son y alcanzan el mismo η = 1 − Tf/Tc, porque todos los ciclos reversibles entre los mismos dos focos tienen igual rendimiento (teorema de Carnot).</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué relación hay entre η y la entropía?</h4>
               <p>En un ciclo de Carnot, el cambio de entropía es CERO (es reversible y cíclico). El calor absorbido a Tc transfiere entropía Qc/Tc al sistema; el cedido a Tf devuelve Qf/Tf. Como ambos deben sumar 0: Qf/Tf = Qc/Tc, de donde sale η = 1 − Tf/Tc directamente.</p>
-              <p className={styles.faqTip}>💡 Si el ciclo NO es reversible, ΔS &gt; 0 y la eficiencia siempre baja. La entropía generada cuesta trabajo perdido.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Si el ciclo NO es reversible, ΔS &gt; 0 y la eficiencia siempre baja. La entropía generada cuesta trabajo perdido.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Para qué sirve si no es realizable?</h4>
-              <p>Como <strong>referencia teórica</strong> y benchmark. Si un fabricante anuncia un motor con η = 70 % entre Tc = 800 K y Tf = 400 K, sabes que está mintiendo: el límite Carnot ahí es 50 %. Sirve para evaluar progreso técnico: una central con η = 60 % entre Tc = 1000 K y Tf = 300 K (η Carnot = 70 %) está aprovechando el 86 % del máximo teórico, una muy buena cifra.</p>
-              <p className={styles.faqTip}>💡 La &quot;eficiencia exergética&quot; mide exactamente esto: η real / η Carnot. Un valor cercano a 1 indica un sistema muy bien diseñado.</p>
+              <p>Como <strong>referencia teórica</strong> y benchmark. Si un fabricante anuncia un motor con η = 70 % entre Tc = 800 K y Tf = 400 K, sabes que está mintiendo: el límite Carnot ahí es 50 %. Sirve para evaluar progreso técnico: una central con η = 60 % entre Tc = 1000 K y Tf = 300 K (η Carnot = 70 %) está aprovechando el 86 % del máximo teórico, una muy buena cifra.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> La &quot;eficiencia exergética&quot; mide exactamente esto: η real / η Carnot. Un valor cercano a 1 indica un sistema muy bien diseñado.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿La 2.ª ley dice que el universo &quot;morirá&quot;?</h4>
               <p>Sí, según la interpretación tradicional. La entropía total del universo solo crece (o se mantiene); cuando alcance su máximo, no habrá más diferencias de T y ningún motor podrá funcionar. Es la &quot;muerte térmica&quot; del universo. Pero ocurriría en escalas de tiempo &gt;&gt; 10⁴⁰ años, así que no es preocupación inmediata.</p>
-              <p className={styles.faqTip}>💡 Con cosmología moderna (universo en expansión acelerada) hay debate filosófico abierto sobre esto, pero la 2.ª ley termodinámica clásica predice exactamente eso.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Con cosmología moderna (universo en expansión acelerada) hay debate filosófico abierto sobre esto, pero la 2.ª ley termodinámica clásica predice exactamente eso.</p>
             </div>
           </div>
         </section>
@@ -756,36 +841,36 @@ export default function SimuladorTermodinamicaCarnotPage() {
           <h3>4 buenas prácticas con problemas de Carnot</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Distingue motor térmico de bomba/frigorífico</strong>
               <p>Motor: Tc → Tf, extrae trabajo, η = W/Qc. Frigorífico: Tf → Tc, consume trabajo, COP = Qf/W. Las fórmulas son distintas: confundirlos da resultados absurdos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <strong>Recuerda: η solo depende de Tc y Tf</strong>
               <p>NO depende del fluido (gas, vapor, hidrógeno), de la presión ni del volumen. Cambiar fluido NO mejora η Carnot. Solo subir Tc o bajar Tf lo mejora.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>Calcula la entropía como check</strong>
               <p>En Carnot reversible: Qc/Tc + Qf/Tf = 0 (cero generación de entropía). Si esa suma no da 0, hay un error en algún Q. Es la mejor verificación rápida.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Para ciclos reales (Otto, diésel) hay otras fórmulas</strong>
-              <p>Otto: η = 1 − 1/r^(γ−1), donde r es la relación de compresión. Diésel: η = 1 − [r^(γ−1) (β−1)] / [γ(β−1)·r^(γ−1)·(rb−1)]. NO confundas con Carnot, son distintos.</p>
+              <p>Otto: η = 1 − 1/r^(γ−1), donde r es la relación de compresión. Diésel: η = 1 − (1/r^(γ−1))·(β^γ − 1)/[γ(β − 1)], donde β es la relación de corte (volumen al final de la combustión entre volumen al inicio); con r = 18, β = 2 y γ = 1,4 da η ≈ 63,16 %. NO confundas con Carnot, son distintos.</p>
             </div>
           </div>
         </section>
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes con Carnot</strong>
           </div>
           <ul className={styles.warningList}>
             <li><strong>Trabajar con T en Celsius</strong> — η = 1 − Tf/Tc requiere kelvin. Si pones 27 (°C) en vez de 300 (K), la fórmula explota. Convierte SIEMPRE antes.</li>
-            <li><strong>Pensar que η solo depende de la diferencia Tc − Tf</strong> — Es el cociente Tf/Tc lo que importa. (1000 K, 600 K) da η = 40 %; (700 K, 300 K) da η = 57 %. Misma diferencia (400 K), η muy distintas.</li>
+            <li><strong>Pensar que η solo depende de la diferencia Tc − Tf</strong> — Es el cociente Tf/Tc lo que importa. (1000 K, 600 K) da η = 40 %; (700 K, 300 K) da η = 57 %. Misma diferencia (400 K), η muy distintas.</li>
             <li><strong>Olvidar que el calor cedido tiene signo negativo</strong> — Por convención IUPAC: Q absorbido por el sistema es +, Q cedido es −. Si trabajas con valores absolutos, mantente consistente: |Q_cedido| = |Q_abs| − |W|.</li>
             <li><strong>Aplicar Carnot a un proceso no cíclico</strong> — Carnot se refiere a un MOTOR funcionando cíclicamente. Una expansión isoterma sola no es Carnot, es solo un proceso. La eficiencia η solo tiene sentido para ciclos completos.</li>
             <li><strong>Confundir &quot;eficiencia&quot; con &quot;rendimiento&quot;</strong> — En español ambos términos se usan con distintos sentidos según el autor. En termodinámica, &quot;eficiencia&quot; = W/Qc (siempre 0 a 1). &quot;Rendimiento&quot; a veces se usa igual, a veces como W/Q_total. Aclara el contexto.</li>

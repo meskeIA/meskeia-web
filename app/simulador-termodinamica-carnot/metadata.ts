@@ -68,7 +68,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la eficiencia del ciclo de Carnot?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La eficiencia del ciclo de Carnot es η = 1 − Tf/Tc, donde Tc es la temperatura del foco caliente y Tf la del foco frío, ambas en kelvin (K = °C + 273,15). Por ejemplo, un motor entre 500 K (227 °C) y 300 K (27 °C) tiene una eficiencia máxima de 1 − 300/500 = 40 %. Para aumentar la eficiencia se puede elevar Tc o reducir Tf, pero en la práctica los materiales y el entorno ponen límites. Los motores de gasolina reales alcanzan un 25-35 %, mucho menos que el límite teórico.',
+        text: 'La eficiencia del ciclo de Carnot es η = 1 − Tf/Tc, donde Tc es la temperatura del foco caliente y Tf la del foco frío, ambas en kelvin (K = °C + 273,15). Por ejemplo, un motor entre 500 K (227 °C) y 300 K (27 °C) tiene una eficiencia máxima de 1 − 300/500 = 40\u00A0%. Para aumentar la eficiencia se puede elevar Tc o reducir Tf, pero en la práctica los materiales y el entorno ponen límites. Los motores de gasolina reales alcanzan un 25-35\u00A0%, mucho menos que el límite teórico.',
       },
     },
     {
@@ -76,7 +76,7 @@ export const faqJsonLd = {
       name: '¿Qué relación tiene el ciclo de Carnot con la segunda ley de la termodinámica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El ciclo de Carnot es la demostración más clara de la segunda ley de la termodinámica, que establece que es imposible construir un motor que convierta completamente el calor en trabajo (eficiencia 100 %). La eficiencia de Carnot siempre es inferior a 1 siempre que Tf > 0 K (temperatura absoluta nula), lo que implicaría un foco frío a −273,15 °C, físicamente inalcanzable. En términos de entropía, el ciclo de Carnot es el único ciclo reversible: la entropía del universo no cambia durante su funcionamiento ideal.',
+        text: 'El ciclo de Carnot es la demostración más clara de la segunda ley de la termodinámica, que establece que es imposible construir un motor que convierta completamente el calor en trabajo (eficiencia 100\u00A0%). La eficiencia de Carnot es siempre inferior a 1 mientras Tf > 0 K: solo valdría 1 con un foco frío en el cero absoluto (0 K = −273,15 °C), que es físicamente inalcanzable. En términos de entropía, el ciclo de Carnot es reversible: la entropía del universo no cambia durante su funcionamiento ideal. No es el único: los ciclos Stirling y Ericsson con regeneración ideal también son reversibles y alcanzan el mismo rendimiento, porque todos los ciclos reversibles que trabajan entre los mismos dos focos tienen η = 1 − Tf/Tc (teorema de Carnot).',
       },
     },
     {
@@ -84,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre el ciclo de Carnot y un motor de gasolina o diesel real?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un motor real se diferencia en tres aspectos clave. Primero, los procesos reales son irreversibles (fricción, turbulencias, pérdidas de calor), por lo que la eficiencia real siempre es menor que la de Carnot. Segundo, los motores de gasolina siguen el ciclo Otto (combustión a volumen constante, eficiencia teórica ~57 % para relación de compresión 10:1) y los diesel el ciclo Diesel, distintos del ciclo de Carnot. Tercero, los materiales limitan la temperatura máxima alcanzable. La eficiencia real de un motor de gasolina moderno ronda el 25-35 %.',
+        text: 'Un motor real se diferencia en tres aspectos clave. Primero, los procesos reales son irreversibles (fricción, turbulencias, pérdidas de calor), por lo que la eficiencia real siempre es menor que la de Carnot. Segundo, los motores de gasolina siguen el ciclo Otto (combustión a volumen constante, eficiencia teórica ~57\u00A0% para relación de compresión 10:1) y los diesel el ciclo Diesel, distintos del ciclo de Carnot. Tercero, los materiales limitan la temperatura máxima alcanzable. La eficiencia real de un motor de gasolina moderno ronda el 25-35\u00A0%.',
       },
     },
     {

@@ -5,6 +5,26 @@
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
   min-height: 100vh;
+  /* Un color por magnitud (cifras del panel, curvas y rótulos del canvas, leyenda).
+     Medidos como texto pequeño (4,5:1): claro sobre #FAFAFA · #FFFFFF, oscuro sobre
+     #1A1A1A · #2D2D2D. No dependen de la marca: valen igual en meskeia.com y stemum.com. */
+  --carnot-caliente: #A82E68;   /* 6,18 · 6,45 */
+  --carnot-frio: #2A6A99;       /* 5,56 · 5,80 */
+  --carnot-trabajo: #2F7470;    /* 5,22 · 5,45 */
+  --carnot-adiabatica: #A65600; /* 5,09 · 5,31 · 4,70 sobre el tinte del aviso */
+}
+
+[data-theme='dark'] .container {
+  --carnot-caliente: #F27BB0;   /* 6,83 · 5,40 */
+  --carnot-frio: #8CC4E6;       /* 9,24 · 7,31 */
+  --carnot-trabajo: #5ABDB9;    /* 7,80 · 6,17 */
+  --carnot-adiabatica: #F0A050; /* 8,16 · 6,46 */
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
 }
 
 .hero {
@@ -43,6 +63,12 @@
   box-shadow: var(--shadow-md);
   margin-bottom: var(--spacing-xl);
   margin-top: var(--spacing-xl);
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding: var(--spacing-md);
+  }
 }
 
 .descriptionCard {
@@ -87,9 +113,15 @@
 }
 
 .controlLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
   font-family: var(--font-mono, monospace);
+}
+
+.controlHint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
 }
 
 .slider {
@@ -141,18 +173,19 @@
   flex: 1;
   min-width: 120px;
   padding: var(--spacing-md) var(--spacing-lg);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
-  transition: background 0.2s;
+  transition: background 0.2s, filter 0.2s;
 }
 
+/* Oscurecer al pasar: el contraste con el blanco solo puede subir */
 .actionBtn:hover {
-  background: #226d8f;
+  filter: brightness(0.88);
 }
 
 .actionBtn:focus-visible {
@@ -167,6 +200,7 @@
 }
 
 .actionBtnSecondary:hover {
+  filter: none;
   background: var(--bg-card);
   border-color: var(--primary);
 }
@@ -179,6 +213,12 @@
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-md);
   border: 1px solid var(--border);
+}
+
+@media (max-width: 480px) {
+  .canvasWrapper {
+    padding: var(--spacing-sm);
+  }
 }
 
 .canvas {
@@ -214,6 +254,43 @@
   height: 14px;
   border-radius: 3px;
   display: inline-block;
+  flex-shrink: 0;
+}
+
+.legendCaliente {
+  background: var(--carnot-caliente);
+}
+
+.legendFrio {
+  background: var(--carnot-frio);
+}
+
+.legendAdiabatica {
+  background: var(--carnot-adiabatica);
+}
+
+.tablaEstados {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85rem;
+}
+
+.tablaEstados td,
+.tablaEstados th {
+  text-align: right;
+}
+
+.tablaEstados th:first-child {
+  text-align: center;
+}
+
+.tablaCaption {
+  caption-side: top;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding-bottom: var(--spacing-xs);
+  font-family: inherit;
 }
 
 /* RESULTS */
@@ -261,14 +338,26 @@
 .resultValue {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
+}
+
+.valorCaliente {
+  color: var(--carnot-caliente);
+}
+
+.valorFrio {
+  color: var(--carnot-frio);
+}
+
+.valorTrabajo {
+  color: var(--carnot-trabajo);
 }
 
 .resultValueLarge {
   font-size: 2.2rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
   line-height: 1;
   margin: var(--spacing-xs) 0;
@@ -278,6 +367,22 @@
   font-size: 0.78rem;
   color: var(--text-muted);
   font-family: var(--font-mono, monospace);
+}
+
+/* Sobre el tinte de la tarjeta principal, --text-muted cae a 4,06:1 en oscuro */
+.resultCardMain .resultRange {
+  color: var(--text-secondary);
+}
+
+.supuestos {
+  margin: var(--spacing-md) 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.supuestos strong {
+  color: var(--text-primary);
 }
 
 /* FORMULA BOX */
@@ -357,7 +462,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -384,7 +489,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -423,7 +528,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -436,7 +541,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -469,7 +574,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -482,7 +587,7 @@
 
 .warningBox {
   background: rgba(224, 122, 31, 0.08);
-  border-left: 4px solid #E07A1F;
+  border-left: 4px solid var(--carnot-adiabatica);
   border-radius: var(--radius);
   padding: var(--spacing-lg);
   margin: var(--spacing-lg) 0;
@@ -493,7 +598,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
-  color: #E07A1F;
+  color: var(--carnot-adiabatica);
   font-size: 1.1rem;
 }
 
@@ -513,7 +618,7 @@
 }
 
 .warningList li strong {
-  color: #E07A1F;
+  color: var(--carnot-adiabatica);
 }
 
 [data-theme='dark'] .descriptionCard {
