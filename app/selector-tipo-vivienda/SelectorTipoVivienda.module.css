@@ -81,7 +81,7 @@
 .preguntaNumero {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto); /* 2076: --primary daba 4,11:1 */
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 0.5rem;
@@ -93,6 +93,15 @@
   color: var(--text-primary);
   margin: 0 0 1.25rem;
   line-height: 1.4;
+  /* Recibe el foco al avanzar (2073): que no quede bajo una barra fija en móvil. */
+  scroll-margin-top: 5rem;
+}
+
+.preguntaTexto:focus-visible,
+.recomendacionTitulo:focus-visible {
+  outline: 2px solid var(--primary-texto);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 /* ── Opciones de respuesta ── */
@@ -129,7 +138,7 @@
 .opcionBtn.selected {
   border-color: var(--primary);
   background-color: rgba(46, 134, 171, 0.12);
-  color: var(--primary);
+  color: var(--primary-texto); /* 2076: --primary daba 3,56:1 sobre el tinte */
   font-weight: 600;
 }
 
@@ -145,8 +154,9 @@
 
 [data-theme='dark'] .opcionBtn.selected {
   border-color: var(--secondary);
-  background-color: rgba(72, 169, 166, 0.2);
-  color: var(--secondary);
+  /* 2076: con el tinte al 0,2 el texto daba 4,49:1; al 0,1 el fondo queda más oscuro. */
+  background-color: rgba(72, 169, 166, 0.1);
+  color: var(--secondary-texto);
 }
 
 /* ── Navegación ── */
@@ -196,13 +206,13 @@
 }
 
 .btnSiguiente {
-  background-color: var(--primary);
+  background-color: var(--primary-boton); /* 2076: --primary daba 4,11:1 en claro y 2,79:1 en oscuro */
   color: #ffffff;
   margin-left: auto;
 }
 
 .btnSiguiente:hover:not(:disabled) {
-  background-color: #2575a0;
+  background-color: var(--hero-bg);
 }
 
 .btnSiguiente:disabled {
@@ -211,13 +221,13 @@
 }
 
 .btnResultado {
-  background-color: var(--secondary);
+  background-color: var(--secondary-boton); /* 2076: --secondary daba 2,80:1 y 2,23:1 */
   color: #ffffff;
   margin-left: auto;
 }
 
 .btnResultado:hover:not(:disabled) {
-  background-color: #3d9a97;
+  background-color: #265c59;
 }
 
 .btnResultado:disabled {
@@ -227,8 +237,8 @@
 
 .btnReiniciar {
   background-color: transparent;
-  color: var(--primary);
-  border-color: var(--primary);
+  color: var(--primary-texto); /* 2076: --primary daba 4,11:1 */
+  border-color: var(--primary-texto);
   margin-top: 1rem;
 }
 
@@ -287,6 +297,36 @@
   font-weight: 700;
   margin: 0 0 0.3rem;
   color: var(--text-primary);
+  scroll-margin-top: 5rem;
+}
+
+/* ── Avisos del resultado: empate (2070) y presupuesto (2069) ── */
+.avisoResultado {
+  background-color: var(--bg-primary);
+  border-left: 4px solid var(--primary-texto);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0 1rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .avisoResultado {
+  background-color: #2a2a2a;
+}
+
+.detalleEmpatado {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.detalleTitulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem;
+  color: var(--text-primary);
 }
 
 .recomendacionSubtitulo {
@@ -323,17 +363,19 @@
   padding: 1rem;
 }
 
+/* 2076: sobre #333 el título en --primary-texto quedaba en 4,52:1, al filo. */
 [data-theme='dark'] .ventajaCard {
-  background-color: #333;
+  background-color: #2a2a2a;
 }
 
+.ventajaCard h3,
 .ventajaCard h4 {
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin: 0 0 0.6rem;
-  color: var(--primary);
+  color: var(--primary-texto); /* 2076: --primary daba 3,93:1 */
 }
 
 .ventajaCard ul {
@@ -357,14 +399,15 @@
   margin-top: 0.5rem;
 }
 
+/* 2076: con el tinte al 0,12 el título daba 4,33:1 en oscuro. */
 [data-theme='dark'] .consejosSection {
-  background-color: rgba(46, 134, 171, 0.12);
+  background-color: rgba(46, 134, 171, 0.06);
 }
 
 .consejosSection h3 {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto); /* 2076: --primary daba 3,83:1 en claro y 4,33:1 en oscuro */
   margin: 0 0 0.6rem;
 }
 
@@ -378,6 +421,11 @@
   color: var(--text-secondary);
   margin-bottom: 0.3rem;
   line-height: 1.45;
+}
+
+.consejosSection a {
+  color: var(--primary-texto);
+  font-weight: 600;
 }
 
 /* ── Warning box ── */

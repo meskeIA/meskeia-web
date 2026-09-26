@@ -1,9 +1,26 @@
 import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
+/**
+ * Una sola lista alimenta la meta y el JSON-LD que inyecta layout.tsx. El JSON-LD salía con
+ * `features: []` y la descripción cortada a media palabra (hallazgo 2077).
+ */
+const FEATURES = [
+  'Test de 10 preguntas sobre familia, presupuesto y estilo de vida',
+  'Cinco tipos: piso estándar, casa unifamiliar, ático o dúplex, estudio y piso compartido',
+  'Descarta los tipos que tus respuestas hacen incompatibles, como el compartido para una familia con hijos',
+  'El presupuesto acota el resultado y avisa si choca con lo que necesitas',
+  'Dice los empates en vez de resolverlos en silencio',
+  'Ventajas y cautelas de cada tipo, para compra y para alquiler',
+  'Funciona en el navegador, gratis y sin registro',
+];
+
+const DESCRIPCION =
+  'Test de 10 preguntas para saber qué tipo de vivienda se adapta mejor a tu situación: piso estándar, casa unifamiliar, ático/dúplex, estudio/apartamento o piso compartido. Análisis según familia, presupuesto y estilo de vida, tanto si vas a comprar como a alquilar (arrendar).';
+
 export const metadata: Metadata = {
   title: 'Selector de Tipo de Vivienda — ¿Piso, casa, ático o estudio? | meskeIA',
-  description: 'Test de 10 preguntas para saber qué tipo de vivienda se adapta mejor a tu situación: piso estándar, casa unifamiliar, ático/dúplex, estudio/apartamento o piso compartido. Análisis según familia, presupuesto y estilo de vida, tanto si vas a comprar como a alquilar (arrendar).',
+  description: DESCRIPCION,
   keywords: ['qué tipo de vivienda comprar', 'piso o casa unifamiliar', 'ático o piso estándar', 'estudio o piso', 'vivienda para familia España', 'piso compartido o propio', 'casa con jardín o piso', 'tipo de vivienda según presupuesto', 'dónde vivir con hijos España', 'comprar o alquilar qué tipo', 'qué tipo de vivienda arrendar', 'piso o casa en arriendo'],
   openGraph: {
     title: '¿Piso, casa o ático? Test de tipo de vivienda | meskeIA',
@@ -31,23 +48,17 @@ export const metadata: Metadata = {
       name: 'Selector de Tipo de Vivienda',
       description: 'Test orientativo para saber qué tipo de vivienda (piso, casa unifamiliar, ático/dúplex, estudio o compartido) se adapta mejor al perfil familiar, presupuesto y estilo de vida.',
       url: 'https://meskeia.com/selector-tipo-vivienda/',
-      features: [
-        'Test de 10 preguntas sobre familia y estilo de vida',
-        '5 tipos: piso estándar, casa unifamiliar, ático/dúplex, estudio, compartido',
-        'Análisis de presupuesto, tamaño familiar y preferencias',
-        'Orientación sobre ventajas e inconvenientes',
-        '100% en el navegador, gratuito, en español',
-      ],
+      features: FEATURES,
     })),
   },
 };
 
 export const jsonLd = generateWebAppSchema({
   name: "Selector de Tipo de Vivienda",
-  description: "Test de 10 preguntas para saber qué tipo de vivienda se adapta mejor a tu situación: piso estándar, casa unifamiliar, ático/dúplex, estudio/apartamento o piso compartido. Análisis según familia, presu",
+  description: DESCRIPCION,
   url: "https://meskeia.com/selector-tipo-vivienda/",
   category: 'FinanceApplication',
-  features: [],
+  features: FEATURES,
 });
 
 export const faqJsonLd = {
@@ -59,7 +70,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre un piso estándar y un ático?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un piso estándar es una vivienda en planta intermedia de un edificio, generalmente más económica y con menor exposición solar directa en la terraza. Un ático se encuentra en la última planta y suele incluir terraza privada o azotea, mayor luminosidad y mejores vistas. El precio de un ático puede ser entre un 20% y un 40% superior al de un piso equivalente en la misma zona, y los gastos de climatización también suelen ser más elevados.',
+        text: 'Un piso estándar es una vivienda en planta intermedia de un edificio, generalmente más económica y con menor exposición solar directa en la terraza. Un ático se encuentra en la última planta y suele incluir terraza privada o azotea, mayor luminosidad y mejores vistas. Su precio suele ser superior al de un piso equivalente en la misma zona, aunque la diferencia depende mucho del mercado local, y los gastos de climatización también suelen ser más elevados.',
       },
     },
     {
@@ -72,7 +83,7 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Para quién es adecuado un estudio o apartamento de menos de 40 m²?',
+      name: '¿Para quién es adecuado un estudio o apartamento pequeño?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Un estudio es adecuado para personas que viven solas, estudiantes, jóvenes profesionales o personas que pasan poco tiempo en casa. Son más asequibles en compra y alquiler, y los gastos de comunidad y suministros son menores. Sin embargo, resultan incómodos para parejas con teletrabajo o para quien necesite separación entre zonas de descanso y trabajo. La organización del espacio es clave para que sean habitables a largo plazo.',
