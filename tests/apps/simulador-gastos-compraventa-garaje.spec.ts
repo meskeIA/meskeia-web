@@ -85,7 +85,7 @@ import {
 } from '../../data/fiscal/inmuebles';
 // Siembra con testigo: ver la cabecera de `_hidratacion.ts`. El `rellenar` de este fichero
 // es anterior (fill() a secas) y se conserva para no reescribir 2.900 líneas de casos válidos.
-import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 
 const RUTA = '/simulador-gastos-compraventa-garaje/';
 
@@ -98,13 +98,33 @@ async function valorTarjeta(page: Page, titulo: string): Promise<string> {
   return (await valor.innerText()).replace(/\s+/g, ' ').trim();
 }
 
+/**
+ * La salvedad del art. 30.1 TRLITPAJD (hallazgo 2209 de la hermana solar, llevado aquí el
+ * 26/09/2026): la app la añade a la tarjeta del AJD y al total cuando hay AJD. Los casos
+ * anteriores miden otra cosa en esas descripciones (la bonificación, el tipo de la renuncia, la
+ * dirección del aviso), así que el lector de descripciones la aparta; su presencia —y su
+ * ausencia sin AJD— la mide el caso «Hallazgo 2209» del final de este fichero, en crudo.
+ */
+const AVISO_BASE_AJD =
+  'El AJD va calculado sobre el precio escrito, pero su base no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD): si ese valor es mayor, el AJD se liquida sobre él';
+/**
+ * La app une la salvedad con «. » si el texto no acababa en punto, y con un espacio si ya
+ * acababa (las frases completas de esta familia: la nota de los honorarios, «…se muestra.», y la
+ * rebaja del AJD de la vivienda habitual, «…lo preguntamos.»). Aquí se deshace igual.
+ */
+const sinAvisoBaseAjd = (s: string): string => {
+  if (!s.endsWith(AVISO_BASE_AJD)) return s;
+  const resto = s.slice(0, -AVISO_BASE_AJD.length).trimEnd();
+  return /(?:se muestra|lo preguntamos)\.$/.test(resto) ? resto : resto.replace(/\.$/, '');
+};
+
 /** Texto descriptivo bajo el valor de una ResultCard. */
 async function descripcionTarjeta(page: Page, titulo: string): Promise<string> {
   const desc = page
     .locator('h3', { hasText: titulo })
     .first()
     .locator('xpath=../following-sibling::p[1]');
-  return (await desc.innerText()).replace(/\s+/g, ' ').trim();
+  return sinAvisoBaseAjd((await desc.innerText()).replace(/\s+/g, ' ').trim());
 }
 
 async function rellenar(page: Page, etiqueta: string, valor: string): Promise<void> {
@@ -5449,7 +5469,7 @@ async function i24Valor(page: Page, titulo: RegExp): Promise<string> {
   );
 }
 async function i24Desc(page: Page, titulo: RegExp): Promise<string> {
-  return i24Normaliza(await i24Rotulo(page, titulo).locator('xpath=../following-sibling::p[1]').innerText());
+  return sinAvisoBaseAjd(i24Normaliza(await i24Rotulo(page, titulo).locator('xpath=../following-sibling::p[1]').innerText()));
 }
 async function i24Titulo(page: Page, titulo: RegExp): Promise<string> {
   return i24Normaliza(await i24Rotulo(page, titulo).innerText());
@@ -6388,5 +6408,39 @@ test.describe('Hallazgos de la re-inspección del 26/09/2026 — REPARADOS (2187
     expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('237,50 €');
     expect(await i24Valor(page, /^Pérdida patrimonial/)).toBe('2287,50 €');
     expect(await i24Desc(page, /^Pérdida patrimonial/)).not.toContain('o puede haber ganancia');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Hallazgo 2209 (26/09/2026) — anotado en la hermana solar y llevado a las siete apps de la
+// familia: la base del AJD no puede ser inferior al valor de referencia (art. 30.1 TRLITPAJD,
+// redacción de la Ley 11/2021), aunque la del IVA sea la contraprestación pactada. La app tiene
+// un solo precio: lo dice en la tarjeta del AJD, al final del total y en la ayuda del precio con
+// IVA, y en ningún sitio cuando no hay AJD.
+// ═══════════════════════════════════════════════════════════════════════════════
+test.describe('Hallazgo 2209 — la base mínima del AJD (art. 30.1 TRLITPAJD)', () => {
+  test('con AJD, la tarjeta, el total y la ayuda lo dicen; sin AJD, no', async ({ page }) => {
+    const CAMPO = 'input[aria-label="Precio del garaje / plaza de parking"]';
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+    await sembrarValor(page, CAMPO, '200000');
+    const crudo = async (titulo: RegExp): Promise<string> =>
+      (await page.locator('h3', { hasText: titulo }).first().locator('xpath=../following-sibling::p[1]').innerText())
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    // Segunda mano: ITP y ningún AJD, así que ninguna salvedad.
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    expect(await crudo(/^COSTE TOTAL/)).not.toContain('art. 30.1');
+
+    // Primera mano en Madrid: IVA + AJD, y la salvedad en la tarjeta y al final del total.
+    await page.getByRole('button', { name: /Primera mano/ }).first().click();
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(1);
+    expect(await crudo(/^AJD/)).toContain(AVISO_BASE_AJD);
+    expect((await crudo(/^COSTE TOTAL/)).endsWith(AVISO_BASE_AJD)).toBe(true);
+    const idAyuda = await page.locator(CAMPO).getAttribute('aria-describedby');
+    const ayuda = (await page.locator(`[id="${idAyuda}"]`).innerText()).replace(/\s+/g, ' ');
+    expect(ayuda).toContain('La base del AJD no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD)');
   });
 });

@@ -89,6 +89,19 @@ const eurosOrientativos = (n: number) => eurosEnteros(Math.round(n / 10) * 10);
 const separarPorcentajes = (texto: string): string => texto.replace(/(\d)[ \u00A0]?%/g, '$1\u00A0%');
 
 /**
+ * La base del AJD no puede ser inferior al valor de referencia (art. 30.1 TRLITPAJD, redacción de
+ * la Ley 11/2021), aunque la del IVA sea la contraprestación pactada (art. 78 Ley 37/1992). La app
+ * tiene un solo precio y calcula los dos sobre él, así que lo dice allí donde publica el AJD: la
+ * tarjeta, el total, la ayuda del precio y el texto sobre el valor de referencia (hallazgo 2209
+ * de la hermana solar, llevado a las siete; misma frase en todas).
+ */
+const AVISO_BASE_AJD =
+  'El AJD va calculado sobre el precio escrito, pero su base no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD): si ese valor es mayor, el AJD se liquida sobre él';
+/** La salvedad del AJD detrás de un texto, con o sin punto final, solo si hay AJD. */
+const conAvisoBaseAjd = (texto: string, ajd: number): string =>
+  ajd > 0 ? `${texto}${texto.endsWith('.') ? '' : '.'} ${AVISO_BASE_AJD}` : texto;
+
+/**
  * Ejemplo «Carlos» del bloque educativo (obra nueva). Su IVA y su AJD salen del mismo
  * motor que la calculadora, no de la memoria: el AJD iba tecleado —«1,5% de AJD
  * (2.700 €)»— pudiendo derivarse de `ITP_CCAA.valencia.ajd`, que esta misma página usa
@@ -1655,7 +1668,7 @@ export default function SimuladorCompraventaPage() {
             // hallazgo 1273 de solar: esta app también tiene régimen de IVA en primera mano.
             helperText={
               tipoTransmision === 'primera-mano' && !TERRITORIOS_SIN_IVA[ccaa]
-                ? 'Precio pactado en la escritura (la base del IVA es la contraprestación, art. 78 Ley 37/1992)'
+                ? 'Precio pactado en la escritura (la base del IVA es la contraprestación, art. 78 Ley 37/1992). La base del AJD no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD)'
                 : 'Precio escriturado o valor de referencia catastral (el mayor)'
             }
             min={0}
@@ -1834,11 +1847,12 @@ export default function SimuladorCompraventaPage() {
                       description={(() => {
                         // Donde la vivienda habitual tiene un AJD propio (Valencia, 0,1 %, Ley
                         // 13/1997 art. 14), se cobra el general —la app no pregunta si lo será— y
-                        // se enseña la rebaja, como los tipos reducidos del ITP (24/09/2026).
-                        if (tipoInmueble !== 'vivienda') return undefined;
+                        // se enseña la rebaja, como los tipos reducidos del ITP (24/09/2026). Y
+                        // siempre, la base mínima del AJD (art. 30.1 TRLITPAJD, hallazgo 2209).
+                        if (tipoInmueble !== 'vivienda') return AVISO_BASE_AJD;
                         const habitual = tipoAJD(ccaa, { objeto: 'vivienda', viviendaHabitual: true });
-                        if (habitual.motivo !== 'vivienda-habitual') return undefined;
-                        return `Si va a ser tu vivienda habitual, en ${datosCcaaActual.nombre} el AJD baja al ${formatTipoNominal(habitual.tipo)}\u00A0%: serían ${formatCurrency(calcularAJD(resultadosComprador.precioInmueble, ccaa, { objeto: 'vivienda', viviendaHabitual: true }))}. No lo aplicamos porque no lo preguntamos.`;
+                        if (habitual.motivo !== 'vivienda-habitual') return AVISO_BASE_AJD;
+                        return `Si va a ser tu vivienda habitual, en ${datosCcaaActual.nombre} el AJD baja al ${formatTipoNominal(habitual.tipo)}\u00A0%: serían ${formatCurrency(calcularAJD(resultadosComprador.precioInmueble, ccaa, { objeto: 'vivienda', viviendaHabitual: true }))}. No lo aplicamos porque no lo preguntamos. ${AVISO_BASE_AJD}`;
                       })()}
                     />
                   )}
@@ -1929,6 +1943,8 @@ export default function SimuladorCompraventaPage() {
                     variant="highlight"
                     icon="💳"
                     description={
+                      // Con AJD, su base mínima (art. 30.1 TRLITPAJD, hallazgo 2209).
+                      conAvisoBaseAjd(
                       // Solo falta el IGIC/IPSI de los honorarios (segunda mano en Canarias, Ceuta
                       // o Melilla): lo explica la nota de debajo, que dice en qué dirección.
                       costeCompradorParcial && !faltaEnCosteSinHonorarios
@@ -1947,7 +1963,9 @@ export default function SimuladorCompraventaPage() {
                           ]
                             .filter((x): x is string => x !== null)
                             .join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}`
-                        : 'Precio + todos los gastos'
+                        : 'Precio + todos los gastos',
+                        resultadosComprador.ajd,
+                      )
                     }
                   />
                   {/*
@@ -2696,7 +2714,7 @@ export default function SimuladorCompraventaPage() {
           Esta calculadora proporciona <strong>estimaciones orientativas</strong>. Los importes reales pueden variar según:
         </p>
         <ul>
-          <li>El <strong>valor de referencia catastral</strong> (base mínima imponible desde 2022)</li>
+          <li>El <strong>valor de referencia catastral</strong> (base mínima imponible desde 2022, del ITP y también del AJD de la obra nueva: art. 30.1 TRLITPAJD)</li>
           <li>Condiciones específicas de tu situación personal</li>
           <li>Coeficientes de plusvalía de cada municipio</li>
           <li>Aranceles notariales que pueden variar según la complejidad</li>
@@ -3000,7 +3018,9 @@ export default function SimuladorCompraventaPage() {
               <h4>¿Qué es el valor de referencia catastral y cómo afecta al ITP?</h4>
               <p>Desde 2022, la base imponible del ITP es el mayor valor entre el precio escriturado y el valor
               de referencia catastral (publicado por el Catastro). Si el valor de referencia supera el precio
-              de compra, deberás pagar ITP sobre ese valor mayor, aunque hayas comprado más barato.</p>
+              de compra, deberás pagar ITP sobre ese valor mayor, aunque hayas comprado más barato. En la
+              obra nueva el IVA va sobre el precio pactado, pero el AJD de la escritura tampoco puede
+              calcularse sobre menos que el valor de referencia (art. 30.1 TRLITPAJD).</p>
             </div>
             <div className={styles.faqItem}>
               {/* «Quedar exento» era falso: el art. 104.5 TRLRHL (redacción del RDL 26/2021) articula

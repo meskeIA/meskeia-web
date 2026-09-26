@@ -190,6 +190,15 @@ const sinAvisoBaseAjd = (s: string): string =>
 const MARCADOR_SIN_CIFRA =
   /Introduce el precio de la nave industrial para ver el desglose de gastos|tiene que ser mayor que 0: corrígelo para ver el desglose de gastos de la nave industrial/;
 const PRECIO_NO_VALE = 'tiene que ser mayor que 0: corrígelo para ver el desglose de gastos de la nave industrial';
+/**
+ * Desde el 26/09/2026 (tarde) el cierre es PARCIAL en Canarias, Ceuta y Melilla aunque la
+ * operación pague ITP: a la notaría y el registro les falta su IGIC o IPSI (criterio del
+ * estimador, el garaje y el trastero). El total lo dice con esta línea.
+ */
+const sinHonorarios = (imp: 'IGIC' | 'IPSI') =>
+  ` — SIN el ${imp} de las facturas de notaría y registro, que tampoco se calcula`;
+const SOLO_HONORARIOS = (imp: 'IGIC' | 'IPSI') =>
+  `Precio + los gastos calculados, sin el ${imp} de las facturas de notaría y registro (ver la nota de abajo)`;
 
 /** Valor de una ResultCard, con el espacio duro del formato español normalizado. */
 async function valorTarjeta(page: Page, titulo: string): Promise<string> {
@@ -566,7 +575,9 @@ test.describe('Regresión — reparación del 23/08/2026', () => {
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('225,23 €');
     // Total = 9.000 + 714,76 + 225,23 + 500 = 10.439,99
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('10.439,99 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('310.439,99 €');
+    // Parcial: a los honorarios les falta el IPSI (26/09/2026).
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('310.439,99 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(SOLO_HONORARIOS('IPSI'));
   });
 
   /**
@@ -1035,13 +1046,18 @@ test.describe('Cierre y casos nuevos — 28/08/2026', () => {
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('889,76 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('285,23 €');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('34.174,99 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('534.174,99 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('534.174,99 €');
     // Y lo que falta se dice junto al total, fuera de su tarjeta (hallazgo 2214).
     await expect(page.locator('[class*="avisoHonorarios"]')).toContainText(
       'Las facturas de notaría y registro llevan además IGIC, que esta herramienta no calcula',
     );
-    // Nada de «parcial»: el IGIC solo entra en juego cuando hay IVA que sustituir.
-    await expect(page.locator('body')).not.toContainText('COSTE TOTAL (PARCIAL)');
+    // ⚠️ 26/09/2026 (tarde): hasta ese día aquí se exigía «nada de parcial», porque el IGIC de
+    // la operación solo entra con IVA que sustituir. Pero a la notaría y el registro les falta
+    // SU IGIC (hallazgo 2214), así que el cierre es parcial por eso, y lo dice sin «coste real»:
+    // el impuesto de la operación (ITP) sí está.
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(`6,83% sobre el precio de compra${sinHonorarios('IGIC')}`);
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(SOLO_HONORARIOS('IGIC'));
     // Ninguna tarjeta del desglose se queda «No calculado» (el recuadro de la comunidad sí
     // rotula «IGIC (obra nueva) · No calculado», y eso es correcto: describe la obra nueva).
     await expect(page.locator('[class*="resultados"]').getByText('No calculado')).toHaveCount(0);
@@ -1745,7 +1761,7 @@ test.describe('Inspección 07/09/2026 — tres casos nuevos', () => {
 
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('186.018,91 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('3,10% sobre el precio');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('6.196.139,95 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('6.196.139,95 €');
   });
 
   /**
@@ -1798,10 +1814,11 @@ test.describe('Inspección 07/09/2026 — tres casos nuevos', () => {
     //   total 13.500 + 846,01 + 270,23 + 500 = 15.116,24 → 3,3592 % → 3,36 % · coste 465.116,24
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('846,01 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('270,23 €');
-    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    // Parcial: a los honorarios les falta el IPSI (26/09/2026, tarde).
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('15.116,24 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('3,36% sobre el precio');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('465.116,24 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(`3,36% sobre el precio de compra${sinHonorarios('IPSI')}`);
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('465.116,24 €');
 
     // De vuelta en Madrid la elección del usuario se conserva: la renuncia vuelve a calcularse.
     // 450.000 × 21 % = 94.500 · AJD 450.000 × 0,75 % = 3.375
@@ -3786,7 +3803,7 @@ test.describe('Re-inspección 23/09/2026 — familia y tres casos nuevos', () =>
     expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3363,49 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
-      '1,05% sobre el precio de compra — SIN el IGIC, que no está incluido — SIN la gestoría, que no se ha podido leer',
+      `1,05% sobre el precio de compra — SIN el IGIC, que no está incluido — SIN la gestoría, que no se ha podido leer${sinHonorarios('IGIC')}`,
     );
     const sinDato = await valorTarjeta(page, 'COSTE TOTAL');
     expect(sinDato).toBe('323.363,49 €');
@@ -3811,7 +3828,7 @@ test.describe('Re-inspección 23/09/2026 — familia y tres casos nuevos', () =>
     expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('21.763,49 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
-      '6,80% sobre el precio de compra — SIN la gestoría, que no se ha podido leer',
+      `6,80% sobre el precio de compra — SIN la gestoría, que no se ha podido leer${sinHonorarios('IGIC')}`,
     );
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('341.763,49 €');
     expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
@@ -4310,9 +4327,11 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, IPSI con renun
     //   b) obra nueva: 1.600 + 998,61 + 323,33 + 500 = 3.421,94 → 0,5347 % → 0,53 % · 643.421,94
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('998,61 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('323,33 €');
-    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    // Parcial: a los honorarios les falta el IPSI (26/09/2026, tarde).
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('21.021,94 €');
-    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(SOLO_HONORARIOS('IPSI'));
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('661.021,94 €');
     // Una sola versión en pantalla: ningún aviso afirma una renuncia que la app no calcula.
     const avisos = (await page.locator('[role="note"]').allInnerTexts()).join(' ').replace(/\s+/g, ' ');
@@ -4340,7 +4359,7 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, IPSI con renun
     expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3421,94 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
-      '0,53% sobre el precio de compra — SIN el IPSI, que no está incluido',
+      `0,53% sobre el precio de compra — SIN el IPSI, que no está incluido${sinHonorarios('IPSI')}`,
     );
     expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('643.421,94 €');

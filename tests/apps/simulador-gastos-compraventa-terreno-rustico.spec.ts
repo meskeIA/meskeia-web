@@ -102,6 +102,15 @@ const admiteAvisoAjd = (texto: string): RegExp =>
 const MARCADOR_SIN_CIFRA =
   /Introduce el precio de la finca rústica para ver el desglose de gastos|tiene que ser mayor que 0: corrígelo para ver el desglose de gastos de la finca rústica/;
 const PRECIO_NO_VALE = 'tiene que ser mayor que 0: corrígelo para ver el desglose de gastos de la finca rústica';
+/**
+ * Desde el 26/09/2026 (tarde) el cierre es PARCIAL en Canarias, Ceuta y Melilla aunque la
+ * operación pague ITP: a la notaría y el registro les falta su IGIC o IPSI (criterio del
+ * estimador, el garaje y el trastero). El total lo dice con esta línea.
+ */
+const sinHonorarios = (imp: string) =>
+  ` — SIN el ${imp} de las facturas de notaría y registro, que tampoco se calcula`;
+const SOLO_HONORARIOS = (imp: string) =>
+  `Precio + los gastos calculados, sin el ${imp} de las facturas de notaría y registro (ver la nota de abajo)`;
 
 /** Valor de una ResultCard, con el espacio duro del formato español normalizado. */
 async function valorTarjeta(page: Page, titulo: string): Promise<string> {
@@ -239,7 +248,9 @@ test.describe('Simulador de gastos de compra de finca rústica — inspección 2
     // 7.222,49 / 200.000 = 3,611245 % → «3,61%»
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('3,61%');
     // Coste total = 200.000 + 7.222,49 = 207.222,49
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('207.222,49 €');
+    // Parcial: a los honorarios les falta el IPSI (26/09/2026, tarde).
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('207.222,49 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(SOLO_HONORARIOS('IPSI'));
   });
 
   /**
@@ -925,8 +936,11 @@ test.describe('Re-inspección 12/09/2026 — Murcia al 7,75 % y Melilla sin IVA'
 
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('10.339,99 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('3,45%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('310.339,99 €');
-    await expect(page.locator('h3', { hasText: 'COSTE TOTAL (PARCIAL)' })).toHaveCount(0);
+    // ⚠️ 26/09/2026 (tarde): hasta ese día aquí se exigía que el cierre NO fuera parcial. El ITP
+    // de la operación está entero, pero a la notaría y el registro les falta su IPSI (hallazgo
+    // 2214), así que es parcial por eso y lo dice sin «coste real».
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('310.339,99 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(SOLO_HONORARIOS('IPSI'));
   });
 
   /**
@@ -1371,7 +1385,12 @@ test.describe('Re-inspección 23/09/2026 — Castilla y León, Baleares en su tr
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
     // Total = 9.750 + 583,29 + 180,11 = 10.513,40 (sin IVA en honorarios, hallazgo 2214)
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('10.513,40 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).not.toContain('IGIC');
+    // El IGIC de la OPERACIÓN sale del total; el de las facturas de notaría y registro, no
+    // (26/09/2026, tarde). 10.513,40 / 150.000 = 7,0089 % → 7,01 %.
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).not.toContain('SIN el IGIC, que no está incluido');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      `7,01% sobre el precio de compra — SIN la gestoría, que no se ha podido leer${sinHonorarios('IGIC')}`,
+    );
     // 24/09/2026 (hallazgo 1604): sin el IGIC el cierre sigue siendo PARCIAL por la gestoría
     // ilegible; hasta ese día se esperaba aquí el título definitivo, que era el defecto.
     expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
@@ -1851,10 +1870,11 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, la Comunitat V
     //   con la gestoría ilegible: 3.313,40 · coste 93.313,40
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('478,29 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('135,11 €');
-    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    // Parcial: a los honorarios les falta el IPSI (26/09/2026, tarde).
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3713,40 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('4,13% sobre el precio de compra');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('93.713,40 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(`4,13% sobre el precio de compra${sinHonorarios('IPSI')}`);
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('93.713,40 €');
     const panel = await lineasPanelCcaa(page);
     expect(panel).toContain('IPSI (renuncia) No existe');
     expect(panel).toContain('AJD (renuncia) No aplica');
@@ -2053,11 +2073,16 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, la Comunitat V
         const coste = card(/^COSTE/)!;
         expect(euros(total.v), donde).toBeCloseTo(impuesto + ajdImporte + fijos(ccaa), 2);
         expect(euros(coste.v), donde).toBeCloseTo(400000 + impuesto + ajdImporte + fijos(ccaa), 2);
-        const parcial = regimen === 'renuncia' && !!sinIva;
+        // 26/09/2026 (tarde): donde no rige el IVA el cierre es parcial en los DOS regímenes (a
+        // los honorarios les falta su IGIC o IPSI); el aviso del impuesto de la operación, solo
+        // con la renuncia.
+        const parcial = !!sinIva;
         expect(total.t, donde).toBe(parcial ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales');
         expect(coste.t, donde).toBe(parcial ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN');
         expect(coste.d, donde).toBe(
-          (parcial
+          (parcial && regimen === 'itp'
+            ? SOLO_HONORARIOS(sinIva)
+            : parcial
             ? `No incluye el ${sinIva}: el coste real puede ser mayor`
             : regimen === 'renuncia'
               ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
@@ -2321,7 +2346,7 @@ test.describe('Re-inspección 26/09/2026 — familia grupo B: casos nuevos y el 
     expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('9482,94 €');
     expect(sinEspacioPct(await descripcionTarjeta(page, 'Total gastos adicionales'))).toBe(
-      '0,95% sobre el precio de compra — SIN el IGIC, que no está incluido',
+      `0,95% sobre el precio de compra — SIN el IGIC, que no está incluido${sinHonorarios('IGIC')}`,
     );
     expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('1.009.482,95 €');
@@ -2528,8 +2553,11 @@ test.describe('Reparación 26/09/2026 — hallazgos 2214-2220 y la receta de la 
     expect(await rotuloTarjeta(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (sin IGIC)');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('180,11 €');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('10.913,40 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('7,28% sobre el precio de compra');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(`7,28% sobre el precio de compra${sinHonorarios('IGIC')}`);
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('160.913,40 €');
+    // El cierre no se presenta como definitivo (26/09/2026, tarde), y no habla del «coste real».
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(SOLO_HONORARIOS('IGIC'));
     const nota = page.locator('[class*="avisoHonorarios"]');
     await expect(nota).toHaveText(
       'ℹ️ Las facturas de notaría y registro llevan además IGIC, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',

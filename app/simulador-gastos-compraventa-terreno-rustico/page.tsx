@@ -319,7 +319,7 @@ export default function SimuladorTerrenoRusticoPage() {
    * (hallazgo 1604) o la parte de la notaría de libre acuerdo (1599). Un solo criterio para los
    * dos títulos, con las mismas palabras que el caso del IGIC/IPSI (1277).
    */
-  const cierreParcial =
+  const faltaEnCosteSinHonorarios =
     resultadosComprador !== null &&
     (resultadosComprador.impuestoNoCalculado ||
       !resultadosComprador.gestoriaLegible ||
@@ -333,6 +333,15 @@ export default function SimuladorTerrenoRusticoPage() {
    */
   const territorioHonorarios = honorariosLlevanIVA(ccaa) ? undefined : TERRITORIOS_SIN_IVA[ccaa];
   const rotuloHonorarios = territorioHonorarios ? `(sin ${territorioHonorarios.impuesto})` : '(IVA incluido)';
+  /**
+   * El cierre es parcial también cuando SOLO faltan esos honorarios (una compra por ITP en
+   * Canarias, Ceuta o Melilla): la cifra lleva la notaría y el registro sin su IGIC o IPSI, y
+   * se rotulaba «COSTE TOTAL DE ADQUISICIÓN» con la nota de debajo diciendo que cuestan más. Es
+   * el criterio del estimador, el garaje y el trastero. El aviso del impuesto de la OPERACIÓN no
+   * cambia: con IGIC/IPSI sin calcular sigue diciendo «puede ser mayor» (testigo de familia).
+   */
+  const cierreParcial =
+    faltaEnCosteSinHonorarios || (resultadosComprador !== null && territorioHonorarios !== undefined);
 
   /**
    * Un precio ESCRITO, legible e imposible —un 0, un negativo mientras el campo tiene el foco o
@@ -777,6 +786,9 @@ export default function SimuladorTerrenoRusticoPage() {
                     resultadosComprador.notariaLibre
                       ? `SIN la parte de la notaría de libre acuerdo (el valor que excede de ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)})`
                       : null,
+                    territorioHonorarios
+                      ? `SIN el ${territorioHonorarios.impuesto} de las facturas de notaría y registro, que tampoco se calcula`
+                      : null,
                   ]
                     .filter((x): x is string => x !== null)
                     .join(' — ')
@@ -790,7 +802,7 @@ export default function SimuladorTerrenoRusticoPage() {
                 icon="💳"
                 description={
                   `${
-                  cierreParcial
+                  faltaEnCosteSinHonorarios
                     ? `No incluye ${[
                         resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
                         resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
@@ -805,6 +817,9 @@ export default function SimuladorTerrenoRusticoPage() {
                           ? ' (precio + gastos antes de deducir el IVA si tienes derecho)'
                           : ''
                       }`
+                    : territorioHonorarios
+                      // Solo faltan los honorarios: lo explica la nota de debajo (forma del estimador).
+                      ? `Precio + los gastos calculados, sin el ${territorioHonorarios.impuesto} de las facturas de notaría y registro (ver la nota de abajo)`
                     : resultadosComprador.ivaRecuperable
                       ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
                       : 'Precio + todos los gastos de la operación'

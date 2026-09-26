@@ -2,7 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 // Los casos del 12/09/2026 siembran con estos helpers: `page.goto()` espera al evento
 // `load`, que no garantiza que React haya ejecutado los chunks, y sembrar en esa ventana
 // mueve el DOM sin que el estado se entere (candado `check:hidratacion`).
-import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 // Re-inspección del 23/09/2026: las escalas y los coeficientes con los que se resuelven sus
 // casos a mano se LEEN de la misma ficha que compone la página, y se comprueban antes de
 // usarlos, para que el ancla no sea una copia (como en la hermana garaje, hallazgo 625).
@@ -64,13 +64,33 @@ async function valorTarjeta(page: Page, titulo: string | RegExp): Promise<string
   return (await valor.innerText()).replace(ESPACIO_DURO, ' ').trim();
 }
 
+/**
+ * La salvedad del art. 30.1 TRLITPAJD (hallazgo 2209 de la hermana solar, llevado aquí el
+ * 26/09/2026): la app la añade a la tarjeta del AJD y al total cuando hay AJD. Los casos
+ * anteriores miden otra cosa en esas descripciones (la bonificación, el tipo de la renuncia, la
+ * dirección del aviso), así que el lector de descripciones la aparta; su presencia —y su
+ * ausencia sin AJD— la mide el caso «Hallazgo 2209» del final de este fichero, en crudo.
+ */
+const AVISO_BASE_AJD =
+  'El AJD va calculado sobre el precio escrito, pero su base no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD): si ese valor es mayor, el AJD se liquida sobre él';
+/**
+ * La app une la salvedad con «. » si el texto no acababa en punto, y con un espacio si ya
+ * acababa (las frases completas de esta familia: la nota de los honorarios, «…se muestra.», y la
+ * rebaja del AJD de la vivienda habitual, «…lo preguntamos.»). Aquí se deshace igual.
+ */
+const sinAvisoBaseAjd = (s: string): string => {
+  if (!s.endsWith(AVISO_BASE_AJD)) return s;
+  const resto = s.slice(0, -AVISO_BASE_AJD.length).trimEnd();
+  return /(?:se muestra|lo preguntamos)\.$/.test(resto) ? resto : resto.replace(/\.$/, '');
+};
+
 /** Texto descriptivo bajo el valor de una ResultCard. */
 async function descripcionTarjeta(page: Page, titulo: string | RegExp): Promise<string> {
   const desc = page
     .locator('h3', { hasText: titulo })
     .first()
     .locator('xpath=../following-sibling::p[1]');
-  return (await desc.innerText()).replace(ESPACIO_DURO, ' ').trim();
+  return sinAvisoBaseAjd((await desc.innerText()).replace(ESPACIO_DURO, ' ').trim());
 }
 
 async function rellenar(page: Page, etiqueta: string, valor: string): Promise<void> {
@@ -209,7 +229,8 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     expect(await tituloTarjeta24(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
     expect(await valorTarjeta(page, /^COSTE TOTAL/)).toBe('207.322,49 €');
     expect(await descripcionTarjeta(page, /^COSTE TOTAL/)).toBe(
-      'No incluye el IPSI de las facturas de notaría y registro, que esta herramienta no calcula: el coste real es mayor que este',
+      // 26/09/2026: la frase común de las siete para los honorarios, sin «coste real».
+      'Las facturas de notaría y registro llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
     );
 
     // En Ceuta no rige el IVA sino el IPSI (TERRITORIOS_SIN_IVA): al pasar a obra nueva,
@@ -517,7 +538,7 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('303.689,99 €');
     // El IGIC de la compra puede ser cero (dirección «puede ser»); el de las facturas, no.
     expect(await descripcionTarjeta(page, /^COSTE TOTAL/)).toBe(
-      'No incluye el IGIC: el coste real puede ser mayor. Las facturas de notaría y registro llevan además IGIC, que esta herramienta no calcula, así que cuestan más de lo que se muestra',
+      'No incluye el IGIC: el coste real puede ser mayor. Las facturas de notaría y registro llevan además IGIC, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
     );
   });
 
@@ -586,7 +607,10 @@ test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
 
     await page.getByRole('button', { name: /Obra nueva/ }).click();
     const enIva = (await ayuda.innerText()).replace(/\s+/g, ' ');
-    expect(enIva).not.toContain('valor de referencia catastral');
+    // 26/09/2026 (hallazgo 2209): con IVA la ayuda sigue sin decir «el mayor de ambos» para el
+    // precio, pero nombra el valor de referencia como SUELO DEL AJD (art. 30.1 TRLITPAJD).
+    expect(enIva).not.toContain('el mayor de ambos');
+    expect(enIva).toContain('La base del AJD no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD)');
     expect(enIva).toContain('Contraprestación pactada');
 
     await page.getByRole('button', { name: /renuncia IVA/ }).click();
@@ -1543,7 +1567,7 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — Galicia, Melilla y la comisión del
     expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toContain('3,39 %');
     await expect(page.locator('h3', { hasText: /COSTE TOTAL/ })).toHaveText('COSTE TOTAL (PARCIAL)');
     expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('413.557,49 €');
-    expect(await descripcionTarjeta(page, /COSTE TOTAL/)).toContain('el coste real es mayor que este');
+    expect(await descripcionTarjeta(page, /COSTE TOTAL/)).toContain('llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra');
 
     // ── Renuncia: ⚠️ REESCRITO el 24/09/2026. El caso la calculaba en Melilla como una
     // operación sin impuesto principal más AJD. En el IPSI la renuncia NO existe: la Ley
@@ -3171,12 +3195,12 @@ test.describe('Inspección 24/09/2026 — Castilla y León, amortizaciones frent
       expect(await tituloTarjeta24(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
       expect(await valorTarjeta(page, /^COSTE TOTAL/)).toBe('352.373,74 €');
       expect(await descripcionTarjeta(page, /^COSTE TOTAL/)).toBe(
-        'No incluye el IPSI: el coste real puede ser mayor. Las facturas de notaría y registro llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra',
+        'No incluye el IPSI: el coste real puede ser mayor. Las facturas de notaría y registro llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
       );
       await sembrarImporte12(page, 'Gastos de gestoría del comprador (€)', '5.0.0');
       expect(await valorTarjeta(page, /^COSTE TOTAL/)).toBe('351.873,74 €');
       expect(await descripcionTarjeta(page, /^COSTE TOTAL/)).toBe(
-        'No incluye el IPSI ni la gestoría, que no se ha podido leer: el coste real será mayor. Las facturas de notaría y registro llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra',
+        'No incluye el IPSI ni la gestoría, que no se ha podido leer: el coste real será mayor. Las facturas de notaría y registro llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
       );
     }
   });
@@ -3958,7 +3982,42 @@ test.describe('RE-INSPECCIÓN 26/09/2026 — Castilla-La Mancha, el umbral de Va
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('583,29 €');
     expect(await tituloTarjeta24(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
     expect(await descripcionTarjeta(page, /^COSTE TOTAL/)).toBe(
-      'No incluye el IGIC de las facturas de notaría y registro, que esta herramienta no calcula: el coste real es mayor que este',
+      // 26/09/2026: la frase común de las siete para los honorarios, sin «coste real».
+      'Las facturas de notaría y registro llevan además IGIC, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
     );
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Hallazgo 2209 (26/09/2026) — anotado en la hermana solar y llevado a las siete apps de la
+// familia: la base del AJD no puede ser inferior al valor de referencia (art. 30.1 TRLITPAJD,
+// redacción de la Ley 11/2021), aunque la del IVA sea la contraprestación pactada. La app tiene
+// un solo precio: lo dice en la tarjeta del AJD, al final del total y en la ayuda del precio con
+// IVA, y en ningún sitio cuando no hay AJD.
+// ═══════════════════════════════════════════════════════════════════════════════
+test.describe('Hallazgo 2209 — la base mínima del AJD (art. 30.1 TRLITPAJD)', () => {
+  test('con AJD, la tarjeta, el total y la ayuda lo dicen; sin AJD, no', async ({ page }) => {
+    const CAMPO = 'input[aria-label="Precio del local comercial"]';
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+    await sembrarValor(page, CAMPO, '200000');
+    const crudo = async (titulo: RegExp): Promise<string> =>
+      (await page.locator('h3', { hasText: titulo }).first().locator('xpath=../following-sibling::p[1]').innerText())
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    // Segunda mano: ITP y ningún AJD, así que ninguna salvedad.
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    expect(await crudo(/^COSTE TOTAL/)).not.toContain('art. 30.1');
+
+    // Primera mano en Madrid: IVA + AJD, y la salvedad en la tarjeta y al final del total.
+    await page.getByRole('button', { name: /Obra nueva/ }).first().click();
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(1);
+    expect(await crudo(/^AJD/)).toContain(AVISO_BASE_AJD);
+    expect((await crudo(/^COSTE TOTAL/)).endsWith(AVISO_BASE_AJD)).toBe(true);
+    const idAyuda = await page.locator(CAMPO).getAttribute('aria-describedby');
+    const ayuda = (await page.locator(`[id="${idAyuda}"]`).innerText()).replace(/\s+/g, ' ');
+    expect(ayuda).toContain('La base del AJD no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD)');
   });
 });

@@ -31,6 +31,19 @@ const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
  * de la referencia). Se corrige al pintarlos, sin tocar los datos, que comparten otras apps.
  */
 const separarPorcentajes = (texto: string): string => texto.replace(/(\d)[ \u00A0]?%/g, '$1\u00A0%');
+
+/**
+ * La base del AJD no puede ser inferior al valor de referencia (art. 30.1 TRLITPAJD, redacción de
+ * la Ley 11/2021), aunque la del IVA sea la contraprestación pactada (art. 78 Ley 37/1992). La app
+ * tiene un solo precio y calcula los dos sobre él, así que lo dice allí donde publica el AJD: la
+ * tarjeta, el total, la ayuda del precio y el texto sobre el valor de referencia (hallazgo 2209
+ * de la hermana solar, llevado a las siete; misma frase en todas).
+ */
+const AVISO_BASE_AJD =
+  'El AJD va calculado sobre el precio escrito, pero su base no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD): si ese valor es mayor, el AJD se liquida sobre él';
+/** La salvedad del AJD detrás de un texto, con o sin punto final, solo si hay AJD. */
+const conAvisoBaseAjd = (texto: string, ajd: number): string =>
+  ajd > 0 ? `${texto}${texto.endsWith('.') ? '' : '.'} ${AVISO_BASE_AJD}` : texto;
 import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, PLAZO_ITP, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble } from '@/data/fiscal';
 import {
   ITP_CCAA,
@@ -1109,7 +1122,7 @@ export default function SimuladorGarajeCompraventaPage() {
             // hallazgo 1273 de solar: esta app también tiene régimen de IVA en primera mano.
             helperText={
               tipoTransmision === 'primera-mano' && !TERRITORIOS_SIN_IVA[ccaa]
-                ? 'Precio pactado en la escritura (la base del IVA es la contraprestación, art. 78 Ley 37/1992)'
+                ? 'Precio pactado en la escritura (la base del IVA es la contraprestación, art. 78 Ley 37/1992). La base del AJD no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD)'
                 : 'Precio escriturado o valor de referencia catastral (el mayor)'
             }
             min={0}
@@ -1322,6 +1335,7 @@ export default function SimuladorGarajeCompraventaPage() {
                       value={formatCurrency(resultadosComprador.ajd)}
                       variant="warning"
                       icon="📄"
+                      description={AVISO_BASE_AJD}
                     />
                   )}
                   <ResultCard
@@ -1404,7 +1418,8 @@ export default function SimuladorGarajeCompraventaPage() {
                     value={formatCurrency(resultadosComprador.totalOperacion)}
                     variant="highlight"
                     icon="💳"
-                    description={avisoCosteComprador}
+                    // Con AJD, su base mínima (art. 30.1 TRLITPAJD, hallazgo 2209).
+                    description={conAvisoBaseAjd(avisoCosteComprador, resultadosComprador.ajd)}
                   />
                   {/*
                     Tipos reducidos que encajan con el perfil pero exigen requisitos que
@@ -2023,7 +2038,7 @@ export default function SimuladorGarajeCompraventaPage() {
             <div className={styles.tipCard}>
               <span aria-hidden="true" className={styles.tipIcon}>🔍</span>
               <strong>Consulta el valor catastral antes de negociar</strong>
-              <p>La base del ITP es el mayor entre el precio escriturado y el valor de referencia catastral. Si el catastral supera el precio de mercado, puedes pagar más ITP del esperado. Consulta en la Sede Electrónica del Catastro antes de firmar.</p>
+              <p>La base del ITP es el mayor entre el precio escriturado y el valor de referencia catastral. Si el catastral supera el precio de mercado, puedes pagar más ITP del esperado. Si compras al promotor, el IVA va sobre el precio pactado, pero el AJD tampoco puede calcularse sobre menos que el valor de referencia (art. 30.1 TRLITPAJD). Consulta en la Sede Electrónica del Catastro antes de firmar.</p>
             </div>
             <div className={styles.tipCard}>
               <span aria-hidden="true" className={styles.tipIcon}>📋</span>
@@ -2061,7 +2076,7 @@ export default function SimuladorGarajeCompraventaPage() {
             <strong>Limitaciones de esta calculadora</strong>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>Estimaciones orientativas:</strong> Los importes reales pueden diferir según el valor de referencia catastral del inmueble, los coeficientes de plusvalía de cada municipio y los aranceles notariales concretos aplicados.</li>
+            <li><strong>Estimaciones orientativas:</strong> Los importes reales pueden diferir según el valor de referencia catastral del inmueble (base mínima del ITP y, en la compra al promotor, también del AJD: art. 30.1 TRLITPAJD; aquí el AJD se calcula sobre el precio escrito), los coeficientes de plusvalía de cada municipio y los aranceles notariales concretos aplicados.</li>
             <li><strong>Sin exención IRPF por vivienda habitual:</strong> Esta calculadora no aplica la exención por reinversión en vivienda habitual ni la exención para mayores de 65 años, ya que estas exenciones aplican a vivienda, no a garajes independientes.</li>
             <li><strong>Tipos fiscales pueden cambiar:</strong> Los tipos de ITP, AJD e IVA corresponden a la normativa vigente indicada en el aviso de fuentes al inicio de la página. Verifica con tu comunidad autónoma antes de tomar decisiones.</li>
           </ul>

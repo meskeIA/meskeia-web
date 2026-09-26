@@ -38,6 +38,19 @@ const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
  * de la referencia). Se corrige al pintarlos, sin tocar los datos, que comparten otras apps.
  */
 const separarPorcentajes = (texto: string): string => texto.replace(/(\d)[ \u00A0]?%/g, '$1\u00A0%');
+
+/**
+ * La base del AJD no puede ser inferior al valor de referencia (art. 30.1 TRLITPAJD, redacción de
+ * la Ley 11/2021), aunque la del IVA sea la contraprestación pactada (art. 78 Ley 37/1992). La app
+ * tiene un solo precio y calcula los dos sobre él, así que lo dice allí donde publica el AJD: la
+ * tarjeta, el total, la ayuda del precio y el texto sobre el valor de referencia (hallazgo 2209
+ * de la hermana solar, llevado a las siete; misma frase en todas).
+ */
+const AVISO_BASE_AJD =
+  'El AJD va calculado sobre el precio escrito, pero su base no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD): si ese valor es mayor, el AJD se liquida sobre él';
+/** La salvedad del AJD detrás de un texto, con o sin punto final, solo si hay AJD. */
+const conAvisoBaseAjd = (texto: string, ajd: number): string =>
+  ajd > 0 ? `${texto}${texto.endsWith('.') ? '' : '.'} ${AVISO_BASE_AJD}` : texto;
 import { PLAZO_ITP, IVA_INMUEBLES_2025, calcularGananciaInmueble, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 import {
   ITP_CCAA,
@@ -1186,7 +1199,7 @@ export default function SimuladorTrasteroCompraventaPage() {
             // hallazgo 1273 de solar: esta app también tiene régimen de IVA en primera mano.
             helperText={
               tipoTransmision === 'primera-mano' && !TERRITORIOS_SIN_IVA[ccaa]
-                ? 'Precio pactado en la escritura (la base del IVA es la contraprestación, art. 78 Ley 37/1992)'
+                ? 'Precio pactado en la escritura (la base del IVA es la contraprestación, art. 78 Ley 37/1992). La base del AJD no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD)'
                 : 'Precio escriturado o valor de referencia catastral (el mayor)'
             }
             min={0}
@@ -1346,6 +1359,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                       value={formatCurrency(resultadosComprador.ajd)}
                       variant="warning"
                       icon="📄"
+                      description={AVISO_BASE_AJD}
                     />
                   )}
 
@@ -1426,7 +1440,8 @@ export default function SimuladorTrasteroCompraventaPage() {
                     value={formatCurrency(resultadosComprador.totalOperacion)}
                     variant="highlight"
                     icon="💳"
-                    description={avisoCosteComprador}
+                    // Con AJD, su base mínima (art. 30.1 TRLITPAJD, hallazgo 2209).
+                    description={conAvisoBaseAjd(avisoCosteComprador, resultadosComprador.ajd)}
                   />
                   {resultadosComprador.tipoElegido && resultadosComprador.tipoElegido.noComprobables.length > 0 && (
                     <div className={styles.avisoReducidos} role="note">
@@ -2066,7 +2081,9 @@ export default function SimuladorTrasteroCompraventaPage() {
               <span className={styles.tipIcon} aria-hidden="true">🏛️</span>
               <strong>Consulta el valor catastral</strong>
               <p>El ITP se calcula sobre el mayor valor entre el precio escriturado y el valor de referencia
-              catastral. Compruébalo en la Sede Electrónica del Catastro antes de acordar el precio.</p>
+              catastral. Si compras al promotor, el IVA va sobre el precio pactado, pero el AJD tampoco puede
+              calcularse sobre menos que el valor de referencia (art. 30.1 TRLITPAJD). Compruébalo en la Sede
+              Electrónica del Catastro antes de acordar el precio.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📅</span>
@@ -2102,6 +2119,7 @@ export default function SimuladorTrasteroCompraventaPage() {
             <li><strong>La vinculación a la vivienda puede cambiar la fiscalidad:</strong> Si el trastero se vende vinculado a la vivienda en una misma operación, la operación conjunta puede tributar de forma distinta. Consulta con un notario o asesor fiscal.</li>
             <li><strong>Los tipos reducidos de ITP no están garantizados para trasteros:</strong> Muchas bonificaciones autonómicas aplican solo a vivienda habitual. Para trasteros, verifica la normativa específica de tu comunidad.</li>
             <li><strong>La plusvalía municipal varía por municipio:</strong> Los coeficientes reales de cada municipio pueden diferir de los estimados en esta calculadora. El resultado es orientativo.</li>
+            <li><strong>El AJD se calcula sobre el precio escrito:</strong> en la compra al promotor, la base del AJD no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD, redacción de la Ley 11/2021); si ese valor es mayor, el AJD real también lo es.</li>
             <li><strong>Los aranceles de notaría y registro son orientativos:</strong> Pueden variar según la complejidad de la operación, el número de folios o copias adicionales.</li>
             <li><strong>Esta herramienta no sustituye el asesoramiento profesional:</strong> Consulta con un notario, abogado o asesor fiscal antes de tomar decisiones en una operación inmobiliaria.</li>
           </ul>

@@ -103,6 +103,15 @@ const admiteAvisoAjd = (texto: string): RegExp =>
 const MARCADOR_SIN_CIFRA =
   /Introduce el precio del solar para ver el desglose de gastos|tiene que ser mayor que 0: corrígelo para ver el desglose de gastos del solar/;
 const PRECIO_NO_VALE = 'tiene que ser mayor que 0: corrígelo para ver el desglose de gastos del solar';
+/**
+ * Desde el 26/09/2026 (tarde) el cierre es PARCIAL en Canarias, Ceuta y Melilla aunque la
+ * operación pague ITP: a la notaría y el registro les falta su IGIC o IPSI (criterio del
+ * estimador, el garaje y el trastero). El total lo dice con esta línea.
+ */
+const sinHonorarios = (imp: 'IGIC' | 'IPSI') =>
+  ` — SIN el ${imp} de las facturas de notaría y registro, que tampoco se calcula`;
+const SOLO_HONORARIOS = (imp: 'IGIC' | 'IPSI') =>
+  `Precio + los gastos calculados, sin el ${imp} de las facturas de notaría y registro (ver la nota de abajo)`;
 
 /** Valor de una ResultCard, con el espacio duro del formato español normalizado. */
 async function valorTarjeta(page: Page, titulo: string): Promise<string> {
@@ -353,7 +362,9 @@ test.describe('Simulador de gastos de compra de solar — inspección 26/08/2026
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('627,26 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('195,23 €');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7322,49 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('207.322,49 €');
+    // Parcial: a los honorarios les falta el IPSI (26/09/2026, tarde).
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('207.322,49 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(SOLO_HONORARIOS('IPSI'));
   });
 
   /**
@@ -1529,7 +1540,7 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
     await expect(rotulo(page, /^Total gastos adicionales/)).toHaveText('Total gastos adicionales (parcial)');
     await expect(valor(page, 'Total gastos adicionales')).toHaveText('1689,99 €');
     await expect(descripcion(page, 'Total gastos adicionales')).toHaveText(
-      '0,56\u00A0% sobre el precio de compra — SIN el IPSI, que no está incluido — SIN la gestoría, que no se ha podido leer',
+      `0,56\u00A0% sobre el precio de compra — SIN el IPSI, que no está incluido — SIN la gestoría, que no se ha podido leer${sinHonorarios('IPSI')}`,
     );
     await expect(rotulo(page, /^COSTE TOTAL/)).toHaveText('COSTE TOTAL (PARCIAL)');
     await expect(valor(page, /^COSTE TOTAL/)).toHaveText('301.689,99 €');
@@ -1566,8 +1577,11 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
     await expect(valor(page, 'ITP (')).toHaveText('9750,00 €');
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
     await expect(valor(page, 'Total gastos adicionales')).toHaveText('11.013,40 €');
-    await expect(valor(page, 'COSTE TOTAL DE ADQUISICIÓN')).toHaveText('161.013,40 €');
-    await expect(descripcion(page, 'COSTE TOTAL DE ADQUISICIÓN')).toHaveText(admiteAvisoAjd('Precio + todos los gastos de la operación'));
+    // ⚠️ 26/09/2026 (tarde): parcial también con particular, porque a la notaría y el registro
+    // les falta su IGIC; el aviso no habla del «coste real» (el ITP de la operación sí está).
+    await expect(rotulo(page, /^COSTE TOTAL/)).toHaveText('COSTE TOTAL (PARCIAL)');
+    await expect(valor(page, /^COSTE TOTAL/)).toHaveText('161.013,40 €');
+    await expect(descripcion(page, /^COSTE TOTAL/)).toHaveText(SOLO_HONORARIOS('IGIC'));
 
     await page.getByRole('button', { name: /Promotor \/ Empresa/ }).click();
     await expect(page.getByText('no se aplica el IVA')).toBeVisible();
@@ -1581,7 +1595,8 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
     await page.getByRole('button', { name: /Un particular/ }).click();
     await expect(page.getByText('no se aplica el IVA')).toHaveCount(0);
     await expect(valor(page, 'ITP (')).toHaveText('9750,00 €');
-    await expect(rotulo(page, /^COSTE TOTAL/)).toHaveText('COSTE TOTAL DE ADQUISICIÓN');
+    await expect(rotulo(page, /^COSTE TOTAL/)).toHaveText('COSTE TOTAL (PARCIAL)');
+    await expect(descripcion(page, /^COSTE TOTAL/)).toHaveText(SOLO_HONORARIOS('IGIC'));
   });
 
   /**

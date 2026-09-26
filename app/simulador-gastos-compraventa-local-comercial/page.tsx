@@ -401,6 +401,19 @@ const conPct = (cifra: string): string => `${cifra}${PCT}`;
  */
 const separarPorcentajes = (texto: string): string => texto.replace(/(\d)[ \u00A0]?%/g, `$1${PCT}`);
 
+/**
+ * La base del AJD no puede ser inferior al valor de referencia (art. 30.1 TRLITPAJD, redacción de
+ * la Ley 11/2021), aunque la del IVA sea la contraprestación pactada (art. 78 Ley 37/1992). La app
+ * tiene un solo precio y calcula los dos sobre él, así que lo dice allí donde publica el AJD: la
+ * tarjeta, el total, la ayuda del precio y el texto sobre el valor de referencia (hallazgo 2209
+ * de la hermana solar, llevado a las siete; misma frase en todas).
+ */
+const AVISO_BASE_AJD =
+  'El AJD va calculado sobre el precio escrito, pero su base no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD): si ese valor es mayor, el AJD se liquida sobre él';
+/** La salvedad del AJD detrás de un texto, con o sin punto final, solo si hay AJD. */
+const conAvisoBaseAjd = (texto: string, ajd: number): string =>
+  ajd > 0 ? `${texto}${texto.endsWith('.') ? '' : '.'} ${AVISO_BASE_AJD}` : texto;
+
 const NOTA_DATOS = `El ITP de un local comercial va del ${conPct(formatTipoNominal(RANGO_ITP_OTROS.min))} al ${conPct(formatTipoNominal(RANGO_ITP_OTROS.max))} según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota se bonifica un ${conPct(formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100))} (art. 57 bis TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
 
 export default function SimuladorLocalComercialPage() {
@@ -923,8 +936,10 @@ export default function SimuladorLocalComercialPage() {
   /**
    * El aviso del COSTE TOTAL parcial. Lo que falta por el IGIC/IPSI de la COMPRA puede ser cero
    * (tipo cero del IGIC), así que ahí la dirección es «puede ser mayor», y la gestoría ilegible
-   * suma seguro («será mayor»). El IGIC/IPSI de las facturas de notaría y registro no puede ser
-   * cero: se dice aparte, y con dirección segura (hallazgo 2214).
+   * suma seguro («será mayor»). El IGIC/IPSI de las facturas de notaría y registro se dice con la
+   * frase común de las siete hermanas, sin «coste real» (26/09/2026), también cuando es lo ÚNICO
+   * que falta (compra por ITP en Canarias, Ceuta o Melilla): hasta entonces aquí decía «el coste
+   * real es mayor que este», una tercera redacción que no tenía ninguna hermana (hallazgo 2214).
    */
   const avisoCosteComprador = (() => {
     if (!resultadosComprador) return '';
@@ -939,12 +954,12 @@ export default function SimuladorLocalComercialPage() {
       !resultadosComprador.honorariosConIVA && territorioActualSinIva ? territorioActualSinIva.impuesto : null;
     if (faltan.length === 0) {
       return impuestoHonorarios
-        ? `No incluye el ${impuestoHonorarios} de las facturas de notaría y registro, que esta herramienta no calcula: el coste real es mayor que este`
+        ? `Las facturas de notaría y registro llevan además ${impuestoHonorarios}, que esta herramienta no calcula, así que cuestan más de lo que se muestra.`
         : '';
     }
     const principal = `No incluye ${faltan.join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}`;
     return impuestoHonorarios
-      ? `${principal}. Las facturas de notaría y registro llevan además ${impuestoHonorarios}, que esta herramienta no calcula, así que cuestan más de lo que se muestra`
+      ? `${principal}. Las facturas de notaría y registro llevan además ${impuestoHonorarios}, que esta herramienta no calcula, así que cuestan más de lo que se muestra.`
       : principal;
   })();
   /** Años escritos que se leen como 0 (reventa antes del año): hay que preguntar los meses. */
@@ -1322,7 +1337,7 @@ export default function SimuladorLocalComercialPage() {
             placeholder="200000"
             helperText={
               conIvaEnPantalla
-                ? 'Contraprestación pactada en la escritura (base del IVA, art. 78 LIVA)'
+                ? 'Contraprestación pactada en la escritura (base del IVA, art. 78 LIVA). La base del AJD no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD)'
                 : 'Precio escriturado o valor de referencia catastral (el mayor de ambos)'
             }
             min={0}
@@ -1508,15 +1523,19 @@ export default function SimuladorLocalComercialPage() {
                   value={formatCurrency(resultadosComprador.ajd)}
                   variant="warning"
                   icon="📄"
-                  description={
+                  description={[
                     resultadosComprador.bonificado
                       ? `Con la bonificación del ${conPct(formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100))} de Ceuta y Melilla aplicada`
                       : esRenuncia
                         ? ajdRenunciaPropio
                           ? `Tipo propio de la renuncia a la exención del IVA en ${datosCcaaActual.nombre}`
                           : `AJD general de ${datosCcaaActual.nombre}: algunas comunidades aplican un tipo incrementado en la renuncia`
-                        : undefined
-                  }
+                        : null,
+                    // La base mínima del AJD (art. 30.1 TRLITPAJD, hallazgo 2209).
+                    AVISO_BASE_AJD,
+                  ]
+                    .filter((x): x is string => x !== null)
+                    .join('. ')}
                 />
               )}
 
@@ -1597,13 +1616,15 @@ export default function SimuladorLocalComercialPage() {
                 value={formatCurrency(resultadosComprador.totalOperacion)}
                 variant="highlight"
                 icon="💳"
-                description={
+                description={conAvisoBaseAjd(
                   costeCompradorParcial
                     ? avisoCosteComprador
                     : resultadosComprador.ivaRecuperable
                       ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
-                      : 'Precio + todos los gastos de la operación'
-                }
+                      : 'Precio + todos los gastos de la operación',
+                  // Con AJD, su base mínima (art. 30.1 TRLITPAJD, hallazgo 2209).
+                  resultadosComprador.ajd,
+                )}
               />
             </div>
           ) : (
@@ -2283,7 +2304,7 @@ export default function SimuladorLocalComercialPage() {
             <li>La renuncia a la exención de IVA solo es válida entre empresarios o profesionales con derecho a deducción; no todos los compradores pueden acogerse.</li>
             <li>En la renuncia, algunas comunidades aplican un tipo de AJD incrementado; este simulador solo lo aplica donde está verificado (Comunitat Valenciana) y en el resto usa el AJD general, así que el coste real de AJD puede ser mayor.</li>
             <li>El IVA solo es deducible si el comprador es sujeto pasivo de IVA con actividad sujeta y no exenta.</li>
-            <li>El valor de referencia catastral puede ser la base imponible real del ITP si supera el precio escriturado.</li>
+            <li>El valor de referencia catastral puede ser la base imponible real del ITP si supera el precio escriturado, y también la del AJD de la obra nueva o de la renuncia: aunque el IVA se calcula sobre la contraprestación pactada, la base del AJD no puede ser inferior a ese valor (art. 30.1 TRLITPAJD, redacción de la Ley 11/2021). Aquí el AJD se calcula sobre el precio escrito.</li>
             <li>En la pestaña de vendedor, el tipo municipal del IIVTNU se estima con un valor orientativo: cada ayuntamiento fija el suyo, así que confirma el de tu municipio.</li>
             <li>Si el local estuvo afecto a una actividad o alquilado, la amortización que debe restarse es la deducida o la mínima, aunque no se hubiera deducido; el simulador usa la cifra que introduzcas.</li>
             <li>Los tipos de ITP y AJD pueden variar; verifica la normativa vigente de tu comunidad autónoma y consulta con tu asesor fiscal antes de cerrar la operación.</li>

@@ -292,7 +292,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Qué es el valor de referencia catastral y cómo afecta al ITP?',
-      answer: 'Desde 2022, la base imponible del ITP es el mayor valor entre el precio escriturado y el valor de referencia catastral (publicado por el Catastro). Si el valor de referencia supera el precio de compra, deberás pagar ITP sobre ese valor mayor, aunque hayas comprado más barato.',
+      answer: 'Desde 2022, la base imponible del ITP es el mayor valor entre el precio escriturado y el valor de referencia catastral (publicado por el Catastro). Si el valor de referencia supera el precio de compra, deberás pagar ITP sobre ese valor mayor, aunque hayas comprado más barato. En la obra nueva el IVA va sobre el precio pactado, pero el AJD de la escritura tampoco puede calcularse sobre menos que el valor de referencia (art. 30.1 TRLITPAJD).',
     },
     {
       question: PREGUNTA_NO_SUJECION,
