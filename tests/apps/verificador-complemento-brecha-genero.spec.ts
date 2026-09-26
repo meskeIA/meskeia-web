@@ -13,6 +13,10 @@ import {
 // El recuento de requisitos del art. 60 que evalúa el verificador vive en el motor del MCP,
 // que es de donde lo leen la página y su faqJsonLd desde la reparación del hallazgo 654.
 import { NUM_REQUISITOS_ART60 } from '../../lib/calculadoras/complementoBrechaGenero';
+// Re-inspección 26/09/2026: el campo de hijos se siembra con los helpers de hidratación
+// (nunca con el setter nativo, que lo prohíbe `check:hidratacion`), y el contraste se mide
+// con la página asentada.
+import { sembrarValor, leerValorEnReact, esperarPaginaAsentada } from './_hidratacion';
 
 /**
  * Inspector — verificador-complemento-brecha-genero (segmento FISCAL / Seguridad Social,
@@ -2151,5 +2155,571 @@ test.describe('Re-inspección 21/09/2026', () => {
     expect(guia, 'la tabla no cita la norma del régimen derogado').toContain(
       COMPLEMENTO_MATERNIDAD_DEROGADO.norma,
     );
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 26/09/2026 — la reparación del 21/09 (d225dd3a) y la del contraste de
+// las cabeceras (b7733c6d, 22/09) no se habían re-inspeccionado nunca.
+//
+// Por qué volvió a la cola: la invalidó el barril `data/fiscal/index.ts` (c7af89ec, 26/09,
+// RETA). `git log` comprobado: `data/fiscal/pensiones.ts` no cambia desde 546c3b11
+// (21/09, 14:37, anterior a aquella inspección) y el motor
+// `lib/calculadoras/complementoBrechaGenero.ts` solo cambia en d225dd3a, que ES la
+// reparación. Nada de lo que decide el importe se ha movido.
+//
+// Estado de las reparaciones, reproducido en navegador:
+//   · 1171 CIERRA — vacío, «2.5», «-1» y «21» dan «Sin calcular / Falta un dato: esto NO es
+//     una respuesta sobre tu derecho», con su icono y su estilo, y «0» sigue siendo la
+//     denegación de fondo («No procede ahora»).
+//   · 1172 CIERRA — la rama anterior al corte cita «la STJUE de 12 de diciembre de 2019
+//     (C-450/18, caso WA)» leída de COMPLEMENTO_MATERNIDAD_DEROGADO.doctrinaAcceso.
+//   · 1173 CIERRA — la rama general de hombre cita META.doctrina entera.
+//   · 1174 CIERRA — la tabla cita `.norma` y «vigente hasta el 3 de febrero de 2021».
+//   · b7733c6d CIERRA — <th> blanco sobre --primary-boton, 5,47:1 en los dos temas.
+//
+// Casos RESUELTOS A MANO contra COMPLEMENTO_BRECHA_GENERO_2026 (cuantiaPorHijoMensual
+// 36,90 · maxHijos 4 · pagasAnuales 14 · fechaMinimaHechoCausante '2021-02-04') antes de
+// abrir el navegador; los doce coincidieron con lo obtenido, en 1280 y en 360 px.
+//
+// Debajo, los hallazgos nuevos con `test.fail()`. El de la concurrencia se ancla en el
+// texto consolidado del art. 60 LGSS (BOE-A-2015-11724, versión vigente desde el
+// 18/03/2023, consultado por la API de datos abiertos del BOE el 26/09/2026), que es la
+// fuente que declara COMPLEMENTO_BRECHA_GENERO_META.fuente.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Espacio duro (U+00A0): el que manda la RAE entre la cifra y el %. */
+const NBSP = String.fromCharCode(160);
+
+/**
+ * Siembra el campo de hijos con el helper de hidratación. Si React ya tiene ese valor, antes
+ * siembra otro: sembrar el valor que el campo YA tiene no prueba nada (cabecera de
+ * `_hidratacion.ts`), y el valor por defecto del campo es «2», que es el del caso normal.
+ */
+async function sembrarHijos(page: Page, valor: string): Promise<void> {
+  const previo = await leerValorEnReact(page, '#hijos');
+  if (previo === valor) await sembrarValor(page, '#hijos', valor === '7' ? '8' : '7');
+  await sembrarValor(page, '#hijos', valor);
+}
+
+interface Respuestas26 {
+  pension: string;
+  fecha: string;
+  hijos: string;
+  sexo: string;
+  otroProgenitor: string;
+  denegacionPropia?: boolean;
+}
+
+/** Como `responderYVerificar`, pero el campo de hijos se escribe con `sembrarValor`. */
+async function responderConSiembra(page: Page, r: Respuestas26): Promise<void> {
+  await page.getByRole('button', { name: r.pension, exact: true }).click();
+  await page.getByRole('button', { name: r.fecha, exact: true }).click();
+  await sembrarHijos(page, r.hijos);
+  await page.getByRole('button', { name: r.sexo, exact: true }).click();
+  await page.getByRole('button', { name: r.otroProgenitor, exact: true }).click();
+  await page
+    .getByRole('button', {
+      name: r.denegacionPropia ? 'Sí, tengo una resolución denegatoria' : 'No',
+      exact: true,
+    })
+    .click();
+  await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+}
+
+/**
+ * Contraste WCAG MÍNIMO del texto del primer elemento visible que case con `selector`,
+ * contra su fondo REAL: compone las capas con alfa de los ancestros y, si hay un degradado,
+ * devuelve el peor de sus extremos. Se mide con las transiciones congeladas y el ratón fuera
+ * (el :hover de las opciones cambia el color).
+ */
+async function contrasteMinimo(page: Page, selector: string): Promise<number> {
+  return page.evaluate((sel: string): number => {
+    interface Rgba { r: number; g: number; b: number; a: number }
+    const parse = (s: string): Rgba | null => {
+      const m = s.match(/rgba?\(([^)]+)\)/);
+      if (!m) return null;
+      const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+    const sobre = (arriba: Rgba, abajo: Rgba): Rgba => ({
+      r: arriba.r * arriba.a + abajo.r * (1 - arriba.a),
+      g: arriba.g * arriba.a + abajo.g * (1 - arriba.a),
+      b: arriba.b * arriba.a + abajo.b * (1 - arriba.a),
+      a: 1,
+    });
+    const lum = (c: Rgba): number => {
+      const f = (v: number): number => {
+        const x = v / 255;
+        return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+      };
+      return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+    };
+    const el = Array.from(document.querySelectorAll(sel)).find((e) => e.getClientRects().length > 0);
+    if (!el) throw new Error(`Ningún elemento visible para ${sel}`);
+    const capas: Array<{ color?: Rgba; degradado?: Rgba[] }> = [];
+    let n: Element | null = el;
+    while (n) {
+      const cs = getComputedStyle(n);
+      if (cs.backgroundImage.includes('gradient')) {
+        const paradas = Array.from(cs.backgroundImage.matchAll(/rgba?\([^)]+\)/g))
+          .map((m) => parse(m[0]))
+          .filter((c): c is Rgba => c !== null);
+        capas.push({ degradado: paradas });
+        break;
+      }
+      const c = parse(cs.backgroundColor);
+      if (c && c.a > 0) {
+        capas.push({ color: c });
+        if (c.a >= 1) break;
+      }
+      n = n.parentElement;
+    }
+    let fondos: Rgba[] = [{ r: 255, g: 255, b: 255, a: 1 }];
+    for (let i = capas.length - 1; i >= 0; i--) {
+      const capa = capas[i];
+      if (capa.degradado) fondos = capa.degradado.map((s) => sobre(s, fondos[0]));
+      else if (capa.color) fondos = fondos.map((f) => sobre(capa.color as Rgba, f));
+    }
+    const cs = getComputedStyle(el);
+    const texto = parse(cs.color) as Rgba;
+    return Math.min(
+      ...fondos.map((f) => {
+        const t = sobre({ ...texto, a: texto.a * Number(cs.opacity) }, f);
+        const l1 = lum(t);
+        const l2 = lum(f);
+        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+      }),
+    );
+  }, selector);
+}
+
+/** Congela transiciones y aparta el ratón antes de medir color. */
+async function prepararMedicion(page: Page): Promise<void> {
+  await page.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}' });
+  await page.mouse.move(0, 0);
+  await esperarPaginaAsentada(page);
+}
+
+test.describe('Re-inspección 26/09/2026', () => {
+  /**
+   * CASO N1 (NORMAL) — mujer · jubilación · hecho causante desde el 4-feb-2021 · 2 hijos ·
+   * el otro progenitor no lo percibe · sin denegación propia.
+   *
+   *   hijosComputables = mín(2, maxHijos 4) = 2
+   *   mensual = 2 × 36,90 = 73,80 €          ← esperado literal
+   *   anual   = 73,80 × pagasAnuales 14 = 1033,20 € (es-ES no agrupa cuatro cifras)
+   *
+   * OBTENIDO el 26/09/2026: exactamente eso, en escritorio y en 360 × 740.
+   */
+  test('caso N1 (26/09): mujer, jubilación y 2 hijos → 73,80 €/mes y 1033,20 €/año', async ({ page }) => {
+    const { cuantiaPorHijoMensual, pagasAnuales } = COMPLEMENTO_BRECHA_GENERO_2026;
+    expect(2 * cuantiaPorHijoMensual).toBeCloseTo(73.8, 2);
+    expect(2 * cuantiaPorHijoMensual * pagasAnuales).toBeCloseTo(1033.2, 2);
+
+    await responderConSiembra(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '2',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+73,80 €/mes');
+    expect(resultado).toContain('Cumples los requisitos básicos');
+    expect(resultado).toContain('Hijos computables 2 (máx. 4)');
+    expect(resultado).toContain('Mensual estimado 73,80 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 1033,20 €/año');
+    expect(resultado).not.toContain('Sin calcular');
+    expect(resultado).not.toContain('Posible reclamación retroactiva');
+  });
+
+  /**
+   * CASO L1 (LÍMITE) — el tope de hijos por sus dos lados, con una combinación que ningún
+   * test recorría: incapacidad permanente y P5 = «Lo solicitó y se lo denegaron» (la
+   * denegación al OTRO progenitor, que no abre ninguna reclamación propia).
+   *
+   *   4 hijos → mín(4, 4) = 4 → 4 × 36,90 = 147,60 €/mes (= maxMensual) · × 14 = 2066,40 €/año
+   *   5 hijos → mín(5, 4) = 4 → lo MISMO; nunca 5 × 36,90 = 184,50 €/mes
+   *
+   * OBTENIDO el 26/09/2026: exactamente eso, con «Hijos computables 4 (máx. 4)» en los dos.
+   */
+  test('caso L1 (26/09, límite): 4 y 5 hijos dan 147,60 €/mes, y la denegación del OTRO no abre reclamación', async ({
+    page,
+  }) => {
+    const { maxMensual, maxAnual } = COMPLEMENTO_BRECHA_GENERO_2026;
+    expect(maxMensual).toBeCloseTo(147.6, 2);
+    expect(maxAnual).toBeCloseTo(2066.4, 2);
+
+    for (const hijos of ['4', '5']) {
+      await responderConSiembra(page, {
+        pension: 'Incapacidad permanente',
+        fecha: 'El 4-feb-2021 o después',
+        hijos,
+        sexo: 'Mujer',
+        otroProgenitor: 'Lo solicitó y se lo denegaron',
+      });
+      const resultado = await textoResultado(page);
+      expect(resultado, `${hijos} hijos`).toContain('+147,60 €/mes');
+      expect(resultado, `${hijos} hijos`).toContain('Hijos computables 4 (máx. 4)');
+      expect(resultado, `${hijos} hijos`).toContain('Anual (14 pagas) 2066,40 €/año');
+      expect(resultado, `${hijos} hijos`).toContain('Cumples los requisitos básicos');
+      expect(resultado, `${hijos} hijos`).not.toContain('184,50');
+      expect(resultado, `${hijos} hijos`).not.toContain('Posible reclamación retroactiva');
+    }
+  });
+
+  /**
+   * CASO L2 (LÍMITE) — el corte temporal por sus dos lados.
+   *
+   * El formulario no pide una fecha, sino dos opciones que salen de
+   * `fechaMinimaHechoCausante` ('2021-02-04'). Una pensión causada EXACTAMENTE el 04/02/2021
+   * cae en «El 4-feb-2021 o después» (la opción es inclusiva, como el «≥» de la norma); una
+   * causada el día antes (03/02/2021), en «Antes del 4-feb-2021». Y el régimen derogado dice
+   * «vigente hasta el 3 de febrero de 2021» (COMPLEMENTO_MATERNIDAD_DEROGADO.vigenteHasta):
+   * los dos lados se tocan sin hueco ni solape.
+   *
+   *   04/02/2021 · viudedad · 1 hijo → 1 × 36,90 = 36,90 €/mes · × 14 = 516,60 €/año
+   *   03/02/2021 · jubilación · 2 hijos → no procede, sin importe, y el paso siguiente cita
+   *   la doctrina WA ENTERA del módulo (regresión del 1172)
+   *
+   * OBTENIDO el 26/09/2026: exactamente eso.
+   */
+  test('caso L2 (26/09, límite): el 4-feb-2021 entra y el día antes no, con la doctrina WA del módulo', async ({
+    page,
+  }) => {
+    expect(COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante).toBe('2021-02-04');
+    expect(COMPLEMENTO_MATERNIDAD_DEROGADO.vigenteHasta).toBe('2021-02-03');
+
+    await responderConSiembra(page, {
+      pension: 'Viudedad',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '1',
+      sexo: 'Mujer',
+      otroProgenitor: 'No procede (sin otro progenitor)',
+    });
+    const elDia = await textoResultado(page);
+    expect(elDia).toContain('+36,90 €/mes');
+    expect(elDia).toContain('Anual (14 pagas) 516,60 €/año');
+
+    await responderConSiembra(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'Antes del 4-feb-2021',
+      hijos: '2',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    const elDiaAntes = await textoResultado(page);
+    expect(elDiaAntes).toContain('No procede ahora');
+    expect(elDiaAntes).toContain('antes del 4 de febrero de 2021');
+    expect(elDiaAntes).not.toContain('73,80');
+    expect(elDiaAntes).not.toContain('Desglose económico');
+    expect(elDiaAntes).toContain(`la ${COMPLEMENTO_MATERNIDAD_DEROGADO.doctrinaAcceso} también afectó`);
+    expect(elDiaAntes).not.toContain('doctrina TJUE 2019');
+
+    // Los dos lados del corte, en la guía: sin hueco ni solape
+    await abrirGuia(page);
+    const guia = normalizar(await page.locator('body').innerText());
+    expect(guia).toContain('vigente hasta el 3 de febrero de 2021');
+  });
+
+  /**
+   * CASO L3 (LÍMITE de sexo) — hombre · jubilación · 3 hijos · sin otro progenitor. Con la
+   * doctrina de 2025 ya no se le exige la carrera perjudicada: los mismos requisitos que a
+   * una mujer (regresión del 1173 en una combinación nueva).
+   *
+   *   3 × 36,90 = 110,70 €/mes · × 14 = 1549,80 €/año
+   *
+   * OBTENIDO el 26/09/2026: exactamente eso, con la cita completa de META.doctrina.
+   */
+  test('caso L3 (26/09): hombre sin otro progenitor y 3 hijos → 110,70 €/mes con la doctrina del módulo', async ({
+    page,
+  }) => {
+    const { stjue, ts } = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
+    await responderConSiembra(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '3',
+      sexo: 'Hombre',
+      otroProgenitor: 'No procede (sin otro progenitor)',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+110,70 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 1549,80 €/año');
+    expect(resultado).toContain(
+      `Tras la STJUE de ${stjue.fecha} (${stjue.asunto}) y la doctrina del Tribunal Supremo (${ts.fecha}), los hombres tienen derecho`,
+    );
+    expect(resultado).not.toContain('TJUE 2025 y TS 2025');
+    expect(resultado).not.toContain('Posible reclamación retroactiva');
+  });
+
+  /**
+   * CASO R (RECHAZO / SIN CALCULAR) — regresión del 1171 con entradas que el 21/09 no se
+   * probaron: «-1» (un entero, pero negativo) y «21» (supera el tope del campo), además del
+   * vacío y «2.5». Ninguna es una respuesta sobre el derecho; «0» sí lo es.
+   *
+   * OBTENIDO el 26/09/2026: los cuatro dan «Sin calcular», y «0», «No procede ahora».
+   */
+  test('caso R (26/09, rechazo): vacío, «2.5», «-1» y «21» → «Sin calcular»; «0» → «No procede ahora»', async ({
+    page,
+  }) => {
+    const base = {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    };
+    for (const hijos of ['', '2.5', '-1', '21']) {
+      await responderConSiembra(page, { ...base, hijos });
+      const resultado = await textoResultado(page);
+      expect(resultado, `«${hijos}»`).toContain('Sin calcular');
+      expect(resultado, `«${hijos}»`).toContain('Falta un dato: esto NO es una respuesta sobre tu derecho');
+      expect(resultado, `«${hijos}»`).not.toContain('No procede ahora');
+      expect(resultado, `«${hijos}»`).not.toContain('Desglose económico');
+      expect(resultado, `«${hijos}»`).not.toContain('al menos un hijo');
+    }
+    await responderConSiembra(page, { ...base, hijos: '0' });
+    const conCero = await textoResultado(page);
+    expect(conCero).toContain('No procede ahora');
+    expect(conCero).toContain('al menos un hijo');
+    expect(conCero).not.toContain('Sin calcular');
+  });
+
+  /**
+   * ⚠️ HALLAZGO 26/09/2026 — MEDIO (cálculo del veredicto). «El otro progenitor ya lo
+   * percibe» se contesta con una denegación cerrada, y el art. 60 LGSS prevé justo lo
+   * contrario: el complemento puede PASAR al segundo progenitor.
+   *
+   * Art. 60.2 LGSS (texto consolidado, BOE-A-2015-11724): «El reconocimiento del
+   * complemento al segundo progenitor supondrá la extinción del complemento ya reconocido
+   * al primer progenitor». Y el 60.1 decide a cuál: al titular de «pensiones públicas cuya
+   * suma sea de menor cuantía». La propia página lo dice en el paso siguiente («la SS lo
+   * reconoce al progenitor con la pensión pública de menor cuantía. Si tu pensión es
+   * inferior, conviene revisar la asignación»), pero no pregunta qué pensión es menor y
+   * abre con «No procede ahora» + «no puede reconocerse de nuevo a ti».
+   *
+   * Esperado (quien tenga la suma de pensiones menor): un veredicto condicionado —depende de
+   * qué progenitor tenga la suma menor; si es la tuya, se te reconoce y se extingue el del
+   * otro—, no una denegación. Obtenido: «No procede ahora / Revisa el motivo abajo».
+   * El motor del MCP (`calcularComplementoBrechaGenero`, caso 4) repite la rama, y
+   * REQUISITOS_ART60 la cuenta como requisito en el FAQPage.
+   */
+  test.fail('HALLAZGO (26/09) concurrencia: «Ya lo percibe» no puede ser una denegación cerrada (art. 60.2 LGSS)', async ({
+    page,
+  }) => {
+    await responderConSiembra(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '2',
+      sexo: 'Mujer',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).not.toContain('no puede reconocerse de nuevo a ti');
+    expect(resultado).not.toContain('No procede ahora');
+  });
+
+  /**
+   * ⚠️ HALLAZGO 26/09/2026 — BAJO (dato). La regla de concurrencia compara «la pensión
+   * pública» y el art. 60.1 LGSS compara la SUMA de pensiones públicas («se reconocerá a
+   * aquella que sea titular de pensiones públicas cuya suma sea de menor cuantía»). El
+   * módulo la simplifica en COMPLEMENTO_BRECHA_GENERO_META.nota y la página la repite en
+   * cinco sitios. Con dos pensiones la respuesta se invierte: A con jubilación 900 € +
+   * viudedad 600 € (suma 1.500 €) frente a B con jubilación 1.200 € → por la regla de la
+   * página, A (900 < 1.200); por el art. 60.1, B (1.200 < 1.500).
+   */
+  test.fail('HALLAZGO (26/09) concurrencia: el art. 60.1 compara la SUMA de pensiones, no «la pensión»', async ({
+    page,
+  }) => {
+    await abrirGuia(page);
+    const guia = normalizar(await page.locator('body').innerText());
+    expect(guia).not.toContain('pensión pública de menor cuantía');
+    expect(guia).not.toContain('pensión pública menor');
+    expect(guia).toMatch(/suma sea de menor cuantía|suma de pensiones/);
+  });
+
+  /**
+   * ⚠️ HALLAZGO 26/09/2026 — MEDIO (accesibilidad). El VEREDICTO positivo —el producto de
+   * la app— es texto blanco sobre el degradado verde #27AE60 → #2ECC71
+   * (`.resultHeroPositivo`), igual en los dos temas. Medido en el navegador: el importe
+   * (32 px, 800, texto grande, exige 3:1) da 2,10–2,87:1, y «Cumples los requisitos
+   * básicos» / «Posible reclamación retroactiva» (14,7 px, 400, exige 4,5:1) 2,02–2,73:1.
+   */
+  test.fail('HALLAZGO (26/09) contraste: el veredicto positivo es blanco sobre verde por debajo del mínimo', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+    await expect(page.locator('[class*="resultHeroPositivo"]')).toBeVisible();
+    await prepararMedicion(page);
+    expect(await contrasteMinimo(page, '[class*="resultHeroPositivo"] [class*="resultImporte"]')).toBeGreaterThanOrEqual(3);
+    expect(await contrasteMinimo(page, '[class*="resultHeroPositivo"] [class*="resultLabel"]')).toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * ⚠️ HALLAZGO 26/09/2026 — MEDIO (accesibilidad). El módulo redeclara --primary
+   * (#2E86AB) y --secondary en `.container`, sin variante oscura, y los usa como color de
+   * TEXTO pequeño y como fondo de texto blanco. Medido en el navegador (claro / oscuro):
+   *   · respuesta seleccionada `.optionActivo` (14 px, 700): 3,78 / 2,95:1
+   *   · «Paso siguiente» en --secondary (14 px, 700): 2,60:1 en claro
+   *   · «Aviso:» en --warning #E67E22 (12,8 px, 700): 2,73:1 en claro
+   *   · título de cada consejo `.tipCard h3` (15,7 px, 700): 4,11 / 3,50:1
+   *   · número de paso `.stepNumber`, blanco sobre --primary (15,2 px, 700): 4,11:1
+   *   · botón «Verificar mi derecho», blanco sobre --primary → --secondary (17,6 px, 700):
+   *     2,80–4,11:1
+   *   · «Errores frecuentes» #E65100 sobre #FFF8E1 (16,8 px, 700): 3,57:1 en claro
+   * Existen --primary-texto, --secondary-texto y --primary-boton para esto.
+   */
+  test.fail('HALLAZGO (26/09) contraste: color de marca como texto pequeño y blanco sobre marca', async ({ page }) => {
+    await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+    await abrirGuia(page);
+    await prepararMedicion(page);
+    const selectores = [
+      '[class*="optionActivo"]',
+      '[class*="siguienteCard"] strong',
+      '[class*="notaFinal"] strong',
+      '[class*="tipCard"] h3',
+      '[class*="stepNumber"]',
+    ];
+    for (const sel of selectores) {
+      expect.soft(await contrasteMinimo(page, sel), sel).toBeGreaterThanOrEqual(4.5);
+    }
+    // En oscuro, la opción seleccionada baja todavía más
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+    await page.mouse.move(0, 0);
+    expect.soft(await contrasteMinimo(page, '[class*="optionActivo"]'), 'optionActivo oscuro').toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * ⚠️ HALLAZGO 26/09/2026 — BAJO (accesibilidad). Las cinco preguntas de elección única
+   * (P1, P2, P4, P5 y P6) son `<button aria-pressed>` dentro de `role="group"`: un lector
+   * anuncia conmutadores independientes («botón de alternancia, presionado») donde la
+   * semántica es un grupo de radio, y al elegir otra opción la anterior se despulsa sin
+   * anuncio. Es el patrón de los hallazgos 950, 1341 y 2074 de la familia de selectores.
+   */
+  test.fail('HALLAZGO (26/09) elección única anunciada como conmutadores (aria-pressed) y no como radios', async ({
+    page,
+  }) => {
+    const grupo = page.locator('[aria-labelledby="p1-titulo"]');
+    await expect(grupo).toHaveAttribute('role', 'radiogroup');
+    const opcion = grupo.getByRole('radio', { name: /Jubilación \(ordinaria/ });
+    await expect(opcion).toHaveAttribute('aria-checked', /true|false/);
+  });
+
+  /**
+   * ⚠️ HALLAZGO 26/09/2026 — BAJO (formato). El % va pegado a la cifra en la tabla
+   * comparativa («5%, 10%, 15%» y «15% (4 o más hijos)», `ESCALA_MATERNIDAD` y
+   * `MAXIMO_MATERNIDAD` en page.tsx) y en el `featureList` del JSON-LD («100% en el
+   * navegador»). Desde el 25/09/2026 va separado con espacio duro (U+00A0).
+   * Al repararlo, la aserción `${tramo.porcentaje}%` del test de 1174 (arriba) tendrá que
+   * seguir a la nueva forma.
+   */
+  test.fail('HALLAZGO (26/09) el % de la tabla comparativa va pegado a la cifra', async ({ page }) => {
+    await abrirGuia(page);
+    const bruto = await page.locator('table').first().innerText();
+    for (const tramo of COMPLEMENTO_MATERNIDAD_DEROGADO.escala) {
+      expect(bruto).toContain(`${tramo.porcentaje}${NBSP}%`);
+    }
+  });
+
+  /**
+   * ⚠️ HALLAZGO 26/09/2026 — BAJO (dato). «14 pagas» va tecleado en el desglose del
+   * veredicto («Anual (14 pagas)») y en la guía («se abona junto con la pensión en 14
+   * pagas»), mientras el importe anual que está al lado se calcula con
+   * `COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales` y la tarjeta de casos típicos ya lo
+   * interpola. Residuo del 226.
+   */
+  test.fail('HALLAZGO (26/09) «14 pagas» tecleado junto a una cifra que se calcula con pagasAnuales', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const pagina = readFileSync(
+      join(process.cwd(), 'app', 'verificador-complemento-brecha-genero', 'page.tsx'),
+      'utf8',
+    );
+    expect(pagina).not.toMatch(/\b14\s+pagas/);
+  });
+
+  /**
+   * ⚠️ HALLAZGO 26/09/2026 — BAJO (dato). Residuo de 606/1173 en la guía y en metadata: la
+   * cita degradada de la doctrina de igualdad de trato sigue tecleada con el año —«la
+   * doctrina TJUE/TS de 2025» (caso típico), «(doctrina TJUE/TS 2025)» (paso 6), «previas
+   * a 2025 … tras la doctrina TJUE/TS» (errores frecuentes), «hasta 2025» (tabla),
+   * «anteriores a 2025» (P6), y en metadata «sentencia TJUE 2025» (description) y
+   * «doctrina TJUE 2025» (featureList)—, mientras el tip «Aporta jurisprudencia», en la
+   * MISMA guía, cita META.doctrina entera.
+   */
+  test.fail('HALLAZGO (26/09) la guía teclea «doctrina TJUE/TS 2025» en vez de citar META.doctrina', async ({ page }) => {
+    await abrirGuia(page);
+    const guia = normalizar(await page.locator('body').innerText());
+    expect(guia).not.toContain('TJUE/TS');
+  });
+
+  /**
+   * ⚠️ HALLAZGO 26/09/2026 — BAJO (operativa). En móvil (360 × 740) el veredicto nace fuera
+   * de pantalla: con el botón «Verificar mi derecho» abajo, como queda tras contestar la P6,
+   * el importe aparece ~230 px por debajo del borde inferior (top 968 px en un visor de
+   * 740), y ni el scroll ni el foco lo acompañan (el foco se queda en el botón). A la vista
+   * no pasa nada al pulsar. Es el patrón de 1222 y 2105.
+   */
+  test.fail('HALLAZGO (26/09) en móvil el veredicto aparece fuera de pantalla al pulsar «Verificar mi derecho»', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    const boton = page.getByRole('button', { name: 'Verificar mi derecho' });
+    await boton.scrollIntoViewIfNeeded();
+    await page.evaluate(() => {
+      const b = Array.from(document.querySelectorAll('button')).find(
+        (x) => x.getRootNode() === document && (x.textContent ?? '').includes('Verificar mi derecho'),
+      );
+      if (!b) throw new Error('Sin botón «Verificar mi derecho»');
+      window.scrollBy(0, b.getBoundingClientRect().bottom - window.innerHeight + 20);
+    });
+    await boton.click();
+    const importe = page.locator('[class*="resultImporte"]');
+    await expect(importe).toHaveText('+73,80 €/mes');
+    await page.waitForTimeout(600); // margen para un scroll suave, si lo hubiera
+    const caja = await importe.boundingBox();
+    expect(caja).not.toBeNull();
+    const { y, height } = caja as { y: number; height: number };
+    expect(y + height).toBeLessThanOrEqual(740);
+  });
+});
+
+// Re-inspección 26/09/2026 (continuación): dos defectos de redacción de la guía, vistos al
+// leer el texto servido de los tests de arriba.
+test.describe('Re-inspección 26/09/2026 — redacción de la guía', () => {
+  /**
+   * ⚠️ HALLAZGO 26/09/2026 — BAJO (contenido). El paso 1 de la guía enuncia el requisito
+   * temporal como «hecho causante POSTERIOR al 4-feb-2021», que deja fuera el propio día del
+   * corte. El módulo (`fechaMinimaHechoCausante` '2021-02-04'), el formulario («El 4-feb-2021
+   * o después»), REQUISITOS_ART60 («sea el 4 de febrero de 2021 o posterior») y el art. 60 en
+   * la redacción del RDL 3/2021 (vigente desde el 04/02/2021, según el BOE) lo incluyen.
+   * Quien causó la pensión justo el 04/02/2021 lee en la guía que no cumple el requisito.
+   */
+  test.fail('HALLAZGO (26/09) el paso 1 de la guía deja fuera el día del corte («posterior al 4-feb-2021»)', async ({
+    page,
+  }) => {
+    await abrirGuia(page);
+    const paso1 = normalizar(
+      await page.locator('li', { hasText: 'Verifica los requisitos básicos' }).innerText(),
+    );
+    expect(paso1).toContain('4-feb-2021');
+    expect(paso1).not.toContain('posterior al 4-feb-2021');
+  });
+
+  /**
+   * ⚠️ HALLAZGO 26/09/2026 — BAJO (contenido). Tres palabras pegadas en la guía por saltos de
+   * línea del JSX (una línea que acaba en `</strong>` o en `{…}` y la siguiente empieza con
+   * texto pierde el espacio): «Resultado:no aplica» (caso «Pensión anterior a feb-2021»),
+   * «(C-450/18, caso WA)con un profesional» (misma tarjeta) y «STJUE C-623/23(15 de mayo de
+   * 2025)» (tip «Aporta jurisprudencia»). Las dos citas pegadas nacieron de la reparación
+   * del 02/09 (4dcd32ea), al interpolar la doctrina del módulo.
+   */
+  test.fail('HALLAZGO (26/09) palabras pegadas en la guía por saltos de línea del JSX', async ({ page }) => {
+    await abrirGuia(page);
+    const guia = normalizar(await page.locator('body').innerText());
+    expect.soft(guia).not.toContain('Resultado:no aplica');
+    expect.soft(guia).not.toContain('caso WA)con un profesional');
+    expect.soft(guia).not.toContain('C-623/23(15 de mayo');
   });
 });

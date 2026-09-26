@@ -80,6 +80,8 @@ import {
   PLUSVALIA_MUNICIPAL_META,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   IVA_INMUEBLES_2025,
+  // El sello propio de la escala del ahorro (hallazgo 1579 de local-comercial, sección 22).
+  GANANCIAS_PATRIMONIALES_META,
 } from '../../data/fiscal/inmuebles';
 // Siembra con testigo: ver la cabecera de `_hidratacion.ts`. El `rellenar` de este fichero
 // es anterior (fill() a secas) y se conserva para no reescribir 2.900 líneas de casos válidos.
@@ -5898,5 +5900,402 @@ test.describe('Hallazgos de la inspección del 24/09/2026 — REPARADOS el mismo
     expect(aviso).not.toContain('el neto real es MAYOR');
     expect(aviso).toContain('Sin cerrar');
     expect(aviso).toContain('pero falta la plusvalía municipal, que lo bajaría');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 22. RE-INSPECCIÓN 26/09/2026 — la hermana de la familia «Compraventa inmobiliaria» tras
+//     8bdf3446 (motor nuevo y patrones de familia), 238aff76 (comisión sin tope mudo),
+//     1c83ff86 (ITP/AJD de Valencia y del País Vasco) y los coeficientes del IIVTNU vigentes
+//     con prorrateo por meses (art. 107.4 TRLRHL).
+//
+// Las reparaciones 1545-1552 (y el 1561) se verifican con sus casos de la sección 21, que
+// siguen en verde. Aquí van tres casos NUEVOS, resueltos a mano ANTES de ejecutar (scratch
+// del Inspector), y los hallazgos de esta vuelta con `test.fail()`: afirman lo que DEBERÍA
+// pasar, así que hoy fallan a propósito; al repararlos se les quita la marca.
+//
+// De dónde sale cada cifra esperada:
+//   · IVA → `IVA_INMUEBLES_2025` (data/fiscal/inmuebles.ts l. 95-111): anejoVinculado 10,
+//     garaje 21 (art. 91.Uno.1.7º LIVA).
+//   · AJD → `ITP_CCAA.valencia.ajd` 1,4 (data/itp-ccaa.ts l. 608; Ley 13/1997, art. 14.Cuatro)
+//     y `ITP_CCAA['pais-vasco']` ajd 0,5 / ajdVivienda 0 (l. 790-791; NF 1/2011 de Bizkaia,
+//     arts. 44.1 y 58.35).
+//   · Notaría y registro → `ARANCELES_NOTARIO` + `FACTURA_NOTARIAL` (×1,75) y
+//     `ARANCELES_REGISTRO` + `REGISTRO_CONCEPTOS`, con el 21 % de IVA dentro.
+//   · Escala del ahorro → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (l. 150-156, art. 66 LIRPF).
+//   · Plusvalía → `COEFICIENTES_IIVTNU_2025` (l. 364-386, RDL 8/2023) y el 25 % orientativo de
+//     `PLUSVALIA_MUNICIPAL_META`; no sujeción del art. 104.5 TRLRHL.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Contraste WCAG de los textos de marca de esta app contra su fondo efectivo; < 4,5:1 = fallo. */
+async function i26ContrastesBajos(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    type Rgba = { r: number; g: number; b: number; a: number };
+    const leer = (c: string): Rgba | null => {
+      const m = c.match(/rgba?\(([^)]+)\)/);
+      if (!m) return null;
+      const p = m[1].split(/[\s,/]+/).filter(Boolean).map(Number);
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+    const lum = ({ r, g, b }: Rgba): number => {
+      const f = (v: number): number => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+    };
+    const fondo = (el: Element): Rgba => {
+      const capas: Rgba[] = [];
+      for (let e: Element | null = el; e; e = e.parentElement) {
+        const c = leer(getComputedStyle(e).backgroundColor);
+        if (c && c.a > 0) {
+          capas.push(c);
+          if (c.a >= 1) break;
+        }
+      }
+      let res: Rgba = { r: 255, g: 255, b: 255, a: 1 };
+      for (const c of capas.reverse()) {
+        res = { r: c.r * c.a + res.r * (1 - c.a), g: c.g * c.a + res.g * (1 - c.a), b: c.b * c.a + res.b * (1 - c.a), a: 1 };
+      }
+      return res;
+    };
+    const vigilados = ['tab', 'transmisionBtn', 'infoCcaaNombre', 'catastroLink', 'casoTag', 'casoResultado'];
+    const fallos: string[] = [];
+    for (const el of Array.from(document.querySelectorAll('[class]'))) {
+      const clases = Array.from(el.classList);
+      const cual = vigilados.find((v) => clases.some((c) => c.endsWith(`__${v}`)));
+      if (!cual) continue;
+      // Las pestañas y los botones de transmisión, solo el ACTIVO (el que lleva el color de marca).
+      if ((cual === 'tab' || cual === 'transmisionBtn') && !clases.some((c) => c.endsWith('__active'))) continue;
+      const fg = leer(getComputedStyle(el).color);
+      if (!fg) continue;
+      const l1 = lum(fg);
+      const l2 = lum(fondo(el));
+      const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+      if (ratio < 4.5) fallos.push(`${cual} ${ratio.toFixed(2)}:1 «${(el.textContent ?? '').trim().slice(0, 30)}»`);
+    }
+    return Array.from(new Set(fallos));
+  });
+}
+
+test.describe('Re-inspección 26/09/2026 — la hermana tras 8bdf3446, 238aff76 y 1c83ff86', () => {
+  /**
+   * CASO BA (NORMAL, obra nueva) — COMUNIDAD VALENCIANA y PAÍS VASCO · primera mano · 30.000 € ·
+   * gestoría 300, con los dos tipos de garaje (el selector vinculado/independiente solo existe
+   * en esta app de la familia). Es el AJD que movió 1c83ff86 y que ninguna sección recorría en
+   * obra nueva: Valencia al 1,4 % y el País Vasco al 0,5 % con el vinculado exento.
+   *
+   * Notaría: 90,15 + (30.000 − 6.010,12) × 0,45 % = 198,10446 × 1,21 = 239,7063966
+   *   → ×1,75 = 419,49 (horquilla 359,56-479,41)
+   * Registro: 24,04 + 23.989,88 × 0,175 % + 6,010121 + 3,005061 = 75,037472 × 1,21 = 90,80
+   * Valencia (el vinculado también al 1,4 %: no hay ajdVivienda y la app no pregunta la vivienda
+   * habitual del 0,1 %, que es el error por exceso, el recuperable):
+   *   vinculado      IVA 3.000,00 + AJD 420,00 + 419,49 + 90,80 + 300 = 4.230,29 (14,10 %) · 34.230,29
+   *   independiente  IVA 6.300,00 + AJD 420,00 + 419,49 + 90,80 + 300 = 7.530,29 (25,10 %) · 37.530,29
+   * País Vasco:
+   *   independiente  IVA 6.300,00 + AJD 150,00 + 419,49 + 90,80 + 300 = 7.260,29 (24,20 %) · 37.260,29
+   *   vinculado      IVA 3.000,00 + sin AJD   + 419,49 + 90,80 + 300 = 3.810,29 (12,70 %) · 33.810,29
+   */
+  test('CASO BA (normal) — obra nueva en Valencia (AJD 1,4 %) y en el País Vasco (0,5 % el independiente, exento el vinculado)', async ({
+    page,
+  }) => {
+    expect(ITP_CCAA.valencia.ajd).toBe(1.4);
+    expect(ITP_CCAA['pais-vasco'].ajd).toBe(0.5);
+    expect(ITP_CCAA['pais-vasco'].ajdVivienda).toBe(0);
+    expect(IVA_INMUEBLES_2025.anejoVinculado).toBe(10);
+    expect(IVA_INMUEBLES_2025.garaje).toBe(21);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'valencia');
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');
+    await sembrarImporte(page, 'Gastos de gestoría del comprador (€)', '300');
+
+    // Vinculado es el que viene pulsado
+    await expect(page.getByRole('button', { name: /Vinculado a vivienda/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(await i24Valor(page, /^IVA/)).toBe('3000,00 €');
+    // El % del título, con o sin espacio: el formato lo vigila el hallazgo H4 de abajo
+    expect(await i24Titulo(page, /^AJD/)).toMatch(/^AJD \(1,40 ?%\)$/);
+    expect(await i24Valor(page, /^AJD/)).toBe('420,00 €');
+    expect(await i24Valor(page, /^Gastos de notaría/)).toBe('419,49 €');
+    expect(await i24Desc(page, /^Gastos de notaría/)).toContain('entre 359,56 € y 479,41 €');
+    expect(await i24Valor(page, /^Registro de la Propiedad/)).toBe('90,80 €');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('4230,29 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toMatch(/^14,10 ?% sobre el precio$/);
+    expect(await i24Titulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('34.230,29 €');
+
+    await page.getByRole('button', { name: /Independiente/ }).click();
+    expect(await i24Valor(page, /^IVA/)).toBe('6300,00 €');
+    expect(await i24Valor(page, /^AJD/)).toBe('420,00 €');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('7530,29 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toMatch(/^25,10 ?% sobre el precio$/);
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('37.530,29 €');
+
+    await page.selectOption('#select-ccaa', 'pais-vasco');
+    expect(await i24Titulo(page, /^AJD/)).toMatch(/^AJD \(0,50 ?%\)$/);
+    expect(await i24Valor(page, /^AJD/)).toBe('150,00 €');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('7260,29 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toMatch(/^24,20 ?% sobre el precio$/);
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('37.260,29 €');
+
+    // El vinculado sigue a la vivienda: exento de AJD, y la tarjeta ni se pinta
+    await page.getByRole('button', { name: /Vinculado a vivienda/ }).click();
+    await expect(page.locator('[role="tabpanel"] h3').filter({ hasText: /^AJD/ })).toHaveCount(0);
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('3810,29 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toMatch(/^12,70 ?% sobre el precio$/);
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('33.810,29 €');
+  });
+
+  /**
+   * CASO BB (LÍMITE) — la FRONTERA del segundo tramo del ahorro (21 % hasta 50.000 €, 23 % desde
+   * ahí), que ninguna sección pisaba al euro: el CASO E cruzó el 23 % holgado y el CASO AC es la
+   * frontera de 6.000 €. Compra 25.000 · gastos vacío · 20 años (coeficiente 0,40, el tope del
+   * art. 107.4) · suelo 4.000 · total 10.000 · comisión 0 (escrita: no hay tarjeta) · gestoría vacía.
+   *
+   * Plusvalía: objetivo 4.000 × 0,40 × 25 % = 400,00 ; real (V − 25.000) × 0,4 × 25 % ≫ 400
+   *   → gana el objetivo: 400,00
+   * Venta 75.400: transmisión 75.000 · ganancia 50.000,00
+   *   IRPF 6.000 × 19 % + 44.000 × 21 % = 1.140 + 9.240 = 10.380,00 · total 10.780,00 · neto 64.620,00
+   * Venta 75.401: ganancia 50.001,00 · IRPF 10.380,00 + 1 × 23 % = 10.380,23 · neto 64.620,77
+   */
+  test('CASO BB (límite) — ganancia de 50.000,00 € exactos: 10.380,00 € de IRPF, y el euro 50.001 ya tributa al 23 %', async ({
+    page,
+  }) => {
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.slice(0, 3)).toEqual([
+      { hasta: 6000, tipo: 19 },
+      { hasta: 50000, tipo: 21 },
+      { hasta: 200000, tipo: 23 },
+    ]);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 20)?.coeficiente).toBe(0.4);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+
+    await i24Vendedor(page, {
+      venta: '75400',
+      compra: '25000',
+      gastos: '',
+      anios: '20',
+      suelo: '4000',
+      total: '10000',
+      comision: '0',
+      gestoria: '',
+    });
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('400,00 €');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('Método objetivo (más favorable)');
+    await expect(page.locator('[role="tabpanel"] h3').filter({ hasText: /^Comisión inmobiliaria/ })).toHaveCount(0);
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('50.000,00 €');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('10.380,00 €');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('10.780,00 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('64.620,00 €');
+
+    // Un euro más de venta: la ganancia entra en el tercer tramo
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '75401');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('50.001,00 €');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('10.380,23 €');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('64.620,77 €');
+  });
+
+  /**
+   * CASO BC (RECHAZO) — la comisión «3.5.0» (ilegible) en una venta con PÉRDIDA, combinación que
+   * el testigo de familia no recorre (sus filas de comisión van sobre la base con ganancia).
+   * Venta 25.000 · compra 30.000 · gastos 1.800 · 8 años · suelo 5.000 · total 12.000 · gestoría 500.
+   *   No sujeta (25.000 ≤ 30.000, art. 104.5 TRLRHL) · comisión leída 0 · transmisión 24.500 ·
+   *   adquisición 31.800 · pérdida 7.300,00 · IRPF SIN CUOTA · total 500,00 · neto 24.500,00.
+   * Con la comisión legible (3 %): neto 23.750,00 y pérdida 8.050,00. El ilegible mueve el neto
+   * −750 € y la pérdida +750 €: el aviso tiene que nombrarlo y decir «menor» y «mayor» (SEGURO:
+   * un euro ya los mueve, y sin IRPF que rebajar no hay contrapeso).
+   */
+  test('CASO BC (rechazo) — la comisión «3.5.0» con pérdida: se nombra, el neto real es menor y la pérdida real mayor', async ({
+    page,
+  }) => {
+    await i24Vendedor(page, {
+      venta: '25000',
+      compra: '30000',
+      gastos: '1800',
+      anios: '8',
+      suelo: '5000',
+      total: '12000',
+      comision: '3.5.0',
+      gestoria: '500',
+    });
+    // El blur no reescribe un texto ilegible: se queda a la vista
+    await expect(page.locator('input[aria-label="Comisión inmobiliaria del vendedor (%)"]')).toHaveValue('3.5.0');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('NO SUJETA');
+    expect(await i24Valor(page, /^Comisión inmobiliaria/)).toBe('Sin leer');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('24.500,00 €');
+    expect(await i24Valor(page, /^Pérdida patrimonial/)).toBe('7300,00 €');
+    expect(await i24Desc(page, /^Pérdida patrimonial/)).toBe(
+      'La comisión inmobiliaria no se ha podido leer: la pérdida real es mayor que esta. Escríbelo con coma decimal (1.234,56).',
+    );
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('SIN CUOTA');
+    expect(await i24Titulo(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('500,00 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('24.500,00 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).toBe(
+      'No descuenta la comisión inmobiliaria, que no se ha podido leer: el neto real es menor que este. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtenerlo.',
+    );
+
+    // Y la dirección era la buena: legible, el neto baja y la pérdida sube
+    await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', '3');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('23.750,00 €');
+    expect(await i24Valor(page, /^Pérdida patrimonial/)).toBe('8050,00 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+  });
+});
+
+test.describe('Hallazgos de la re-inspección del 26/09/2026 — ABIERTOS (test.fail)', () => {
+  /**
+   * H1 (contenido, medio) — EFECTO FAMILIA del 1579 de local-comercial (24/09/2026): el IRPF de
+   * la ganancia se sella bajo la plusvalía municipal, con la fuente del TRLRHL y la fecha del
+   * 24/09/2026 que ganó la revisión de los coeficientes del IIVTNU. Su sello propio es
+   * `GANANCIAS_PATRIMONIALES_META` (art. 66 LIRPF, verificado el 12/08/2026), como ya hacen
+   * local-comercial y simulador-heredar-vivienda (hallazgo 781).
+   */
+  test('[H1] el IRPF de la ganancia lleva su propio sello (art. 66 LIRPF, 12/08/2026), no el del IIVTNU', async ({ page }) => {
+    test.fail(); // ABIERTO 26/09/2026
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    expect(GANANCIAS_PATRIMONIALES_META.fuente).toContain('art. 66');
+    const sellos = page.locator('[class*="dataReference"]');
+    expect(await sellos.count()).toBe(3);
+    expect(i24Normaliza(await sellos.nth(1).innerText())).not.toContain('IRPF');
+    const irpf = i24Normaliza(await sellos.nth(2).innerText());
+    expect(irpf).toContain('art. 66');
+    expect(irpf).toContain(GANANCIAS_PATRIMONIALES_META.verificado.split('-').reverse().join('/'));
+  });
+
+  /**
+   * H2 (accesibilidad, medio) — EFECTO FAMILIA del 1801 del estimador (238aff76): el módulo
+   * redeclara `--primary: #2E86AB` en `.container` sin variante oscura y pinta con él (y con
+   * `--secondary`) texto pequeño. Medido el 26/09/2026:
+   *   claro  · pestaña activa blanco/#2E86AB 4,11:1 (16 px/600) · botón de transmisión activo
+   *            3,65:1 · nombre de la comunidad 3,74:1 · enlace al Catastro 4,11:1 · etiquetas de
+   *            los casos 3,65:1 · resultado de los casos (--secondary) 2,80:1
+   *   oscuro · pestaña 4,11:1 · botón 3,13:1 · comunidad 3,21:1 · Catastro 3,50:1 · etiquetas 3,13:1
+   * La referencia usa `--primary-texto` para el texto y `--primary-boton` para el fondo.
+   */
+  test('[H2] los textos de marca llegan a 4,5:1 en los dos temas', async ({ page }) => {
+    test.fail(); // ABIERTO 26/09/2026
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i }).first().click();
+    // Sin transiciones: con ellas, getComputedStyle lee el color del tema ANTERIOR a mitad de
+    // cambio y el oscuro se mide con los fondos del claro (visto al escribir este caso).
+    await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
+    const fallos: string[] = [];
+    for (const tema of ['light', 'dark']) {
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
+      fallos.push(...(await i26ContrastesBajos(page)).map((f) => `${tema}: ${f}`));
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  /**
+   * H3 (contenido, bajo) — EFECTO FAMILIA del 1799 del estimador (238aff76, patrón 5): un precio
+   * de compra ESCRITO como 0 no «falta», no vale. La app dice «Falta el precio de compra original»
+   * en la tarjeta del IRPF y «Rellena el precio de compra original» en el neto, con el «0» a la
+   * vista (y lo mismo con «-5000» mientras el campo tiene el foco, que el blur deja en 0). La
+   * referencia dice «corrige el precio de compra original (tiene que ser mayor que 0)».
+   */
+  test('[H3] un precio de compra «0» escrito no se anuncia como que falta', async ({ page }) => {
+    test.fail(); // ABIERTO 26/09/2026
+    await i24Vendedor(page, {
+      venta: '25000',
+      compra: '0',
+      gastos: '1800',
+      anios: '8',
+      suelo: '5000',
+      total: '12000',
+      comision: '3',
+      gestoria: '500',
+    });
+    await expect(page.locator('input[aria-label="Precio de compra original del garaje"]')).toHaveValue('0');
+    expect(await i24Desc(page, /^IRPF sobre ganancia/)).not.toContain('Falta el precio de compra original');
+    const neto = await i24Desc(page, /^IMPORTE NETO VENDEDOR/);
+    expect(neto).not.toContain('Rellena el precio de compra original');
+    expect(neto).toContain('mayor que 0');
+  });
+
+  /**
+   * H4 (contenido, bajo) — EFECTO FAMILIA del 1800 del estimador (238aff76): el % va pegado a la
+   * cifra (regla del 25/09/2026, 75d5db87: «15 %» con U+00A0). Medido el 26/09/2026: 24 en el
+   * texto visible (títulos «Comisión inmobiliaria (3,5%)», «ITP (7,00%)», «AJD (0,50%)», «x% sobre
+   * el precio», «Tributación en base del ahorro (19%-30%)», la nota del sello «del 6% al 13%», la
+   * FAQ, la tabla y los casos) y 16 en el JSON-LD; además 4 con espacio normal en vez del duro.
+   */
+  test('[H4] el % va separado de la cifra con espacio duro, también en el título de la comisión y en el JSON-LD', async ({
+    page,
+  }) => {
+    test.fail(); // ABIERTO 26/09/2026
+    await i24Vendedor(page, {
+      venta: '25000',
+      compra: '18000',
+      gastos: '1800',
+      anios: '8',
+      suelo: '5000',
+      total: '12000',
+      comision: '3,5',
+      gestoria: '500',
+    });
+    expect(await i24Rotulo(page, /^Comisión inmobiliaria/).innerText()).toBe('Comisión inmobiliaria (3,5 %)');
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(ld.match(/\d%/g) ?? []).toEqual([]);
+  });
+
+  /**
+   * H5 (operativa, bajo) — NUEVO. Con la comisión por encima del 100 % el propio campo dice «La
+   * comisión no puede superar el 100 % del precio de venta», y aun así la app liquida con ella y
+   * publica un neto DEFINITIVO. Base del testigo con comisión 150: comisión 37.500 · transmisión
+   * max(0, 25.000 − 37.500 − 500 − 237,50) = 0 · «Pérdida patrimonial 19.800,00 €» con «Vendes por
+   * debajo del valor de adquisición» (falso: 25.000 > 19.800) · «IMPORTE NETO VENDEDOR
+   * −13.237,50 €» con «Lo que realmente recibes tras gastos e impuestos». Es el patrón 5 de la
+   * familia (un dato escrito, legible e imposible no se liquida como definitivo: años negativos,
+   * hallazgo 1552) sin llegar a la comisión que 238aff76 dejó sin tope.
+   */
+  test('[H5] una comisión que el propio campo declara imposible (> 100 %) no produce un neto definitivo', async ({ page }) => {
+    test.fail(); // ABIERTO 26/09/2026
+    await i24Vendedor(page, {
+      venta: '25000',
+      compra: '18000',
+      gastos: '1800',
+      anios: '8',
+      suelo: '5000',
+      total: '12000',
+      comision: '150',
+      gestoria: '500',
+    });
+    await expect(page.getByText('La comisión no puede superar el 100')).toBeVisible();
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).not.toBe('Lo que realmente recibes tras gastos e impuestos');
+  });
+
+  /**
+   * H6 (contenido, bajo) — NUEVO, y de la familia entera (la misma frase está en la referencia,
+   * trastero y local-comercial). Con el valor catastral total ilegible, la pérdida dice «puede
+   * ser menor que esta (o puede haber ganancia)». El total solo puede ABARATAR la plusvalía, y
+   * aquí la plusvalía entera (237,50 €) es mucho menor que la pérdida (2.287,50 €): ni con
+   * plusvalía cero habría ganancia (transmisión 23.750 < adquisición 25.800). El sondeo ya lo
+   * sabe —su valor «grande» sigue dando pérdida— y la frase promete una posibilidad imposible.
+   * BASE R del testigo (compra 24.000) con el total «12.000.00».
+   */
+  test('[H6] el total ilegible no promete «o puede haber ganancia» cuando ni con plusvalía cero la habría', async ({
+    page,
+  }) => {
+    test.fail(); // ABIERTO 26/09/2026
+    await i24Vendedor(page, {
+      venta: '25000',
+      compra: '24000',
+      gastos: '1800',
+      anios: '8',
+      suelo: '5000',
+      total: '12.000.00',
+      comision: '3',
+      gestoria: '500',
+    });
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('237,50 €');
+    expect(await i24Valor(page, /^Pérdida patrimonial/)).toBe('2287,50 €');
+    expect(await i24Desc(page, /^Pérdida patrimonial/)).not.toContain('o puede haber ganancia');
   });
 });

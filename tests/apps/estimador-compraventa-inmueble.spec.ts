@@ -27,6 +27,8 @@ import { PLAZO_ITP } from '../../data/fiscal/inmuebles';
 import { PORCENTAJES_IVA } from '../../data/fiscal/iva';
 // ── Añadido por la re-inspección del 22/09/2026 (describe del final del fichero) ──
 import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '../../data/fiscal/inmuebles';
+// ── Añadido por la re-inspección del 26/09/2026 (describe del final del fichero) ──
+import { GANANCIAS_PATRIMONIALES_META, FISCAL_INMUEBLES_META } from '../../data/fiscal/inmuebles';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
@@ -6386,5 +6388,509 @@ test.describe('Inspector 25/09/2026 — «Estimar por mí», el tope de la comis
     expect(ana).toContain('ganancia patrimonial es de 59.650 €');
     expect(ana).toContain('2850 €');
     expect(ana).toMatch(/12\.599,50\s€/);
+  });
+});
+
+// ════════════════════════════════════════════════════════════════════════════════════════
+// Inspector 26/09/2026 — re-inspección de la REFERENCIA de la familia de compraventa
+// ════════════════════════════════════════════════════════════════════════════════════════
+/**
+ * Re-inspección tras las reparaciones del 25/09 (hallazgos 1794-1802) y los cambios de datos del
+ * 24/09 (ITP/AJD de Valencia y País Vasco en data/itp-ccaa.ts; coeficientes del IIVTNU y su
+ * prorrateo en data/fiscal/inmuebles.ts) y del 25/09 (el % con espacio duro). Las nueve
+ * reparaciones las vigila la sección del 25/09, que sigue en verde; aquí van tres casos propios,
+ * un control de contraste de lo que añadió la reparación de 1794/1795 y los hallazgos NUEVOS,
+ * todos en lo que SOLO tiene esta app de la familia (reinversión, hipoteca pendiente, «Estimar
+ * por mí» con régimen, exención de mayores de 65 y los sellos de la mitad del vendedor): el punto
+ * ciego del testigo tests/familias/compraventa.spec.ts.
+ *
+ * Fuentes: data/itp-ccaa.ts (ITP_CCAA y aranceles de los RD 1426/1989 y 1427/1989),
+ * data/fiscal/inmuebles.ts (TIPOS_ITP_CCAA_2025, IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_
+ * PATRIMONIALES_2025, COEFICIENTES_IIVTNU_2025 y coeficienteIIVTNU, PLUSVALIA_MUNICIPAL_META) y
+ * data/fiscal/ganancia-inmueble.ts (art. 35 LIRPF y art. 41 RIRPF). Normas leídas en sesión en el
+ * BOE (API de legislación consolidada): LIRPF art. 33.4.b (BOE-A-2006-20764, bloque a33), RIRPF
+ * art. 41 bis.1 (BOE-A-2007-6820, bloque a41bis) y Código Civil art. 1455 (BOE-A-1889-4763,
+ * bloque art1455).
+ */
+test.describe('Inspector 26/09/2026 — la referencia de la familia: reinversión, exenciones y sellos', () => {
+  /** Escribe como el usuario, comprueba que el ESTADO de React lo recogió y sale del campo. */
+  async function sembrar26(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+    await campo.blur();
+  }
+
+  async function abrir26(page: Page, ccaa?: string): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio de la vivienda"]']);
+    if (ccaa) await page.locator('#ccaa-inmueble').selectOption(ccaa);
+  }
+
+  async function aVendedor26(page: Page): Promise<void> {
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+  }
+
+  const formVendedor = (page: Page) => page.locator('div[class*="formVendedor"]');
+  const campoGastosCompra = (page: Page) =>
+    page.locator('input[aria-label="Impuestos y gastos que pagaste al comprar"]');
+  /** «2026-09-24» → «24/09/2026», como pinta la fecha DataReference. */
+  const fechaES = (iso: string) => iso.split('-').reverse().join('/');
+
+  /**
+   * Vendedor del CASO 61 hasta la hipoteca: Andalucía · venta 250.000 · compra 150.000 de OBRA
+   * NUEVA estimada con el botón (18.024) · 12 años · suelo 50.000 · total 125.000 · 3 % ·
+   * vivienda habitual · reinvierte `reinvierte` · hipoteca pendiente 40.000.
+   */
+  async function montarVendedor61(page: Page, reinvierte: string): Promise<void> {
+    await abrir26(page, 'andalucia');
+    await sembrar26(page, 'Precio de la vivienda', '250000');
+    await aVendedor26(page);
+    await sembrar26(page, 'Precio de compra original', '150000');
+    await page.locator('#regimen-compra-original').selectOption('primera-mano');
+    await page.getByRole('button', { name: /Estimar por mí/ }).click();
+    await esperarValorEnReact(page, campoGastosCompra(page), '18.024');
+    await sembrar26(page, 'Años de propiedad', '12');
+    await sembrar26(page, 'Valor catastral del suelo', '50000');
+    await sembrar26(page, 'Valor catastral total (suelo + construcción)', '125000');
+    await page.getByRole('checkbox', { name: /Voy a reinvertir/ }).check();
+    await esperarHidratacion(page, ['input[aria-label="Hipoteca pendiente de la vivienda que vendes"]']);
+    await sembrar26(page, 'Hipoteca pendiente de la vivienda que vendes', '40000');
+    await sembrar26(page, 'Importe que reinviertes en la nueva vivienda', reinvierte);
+  }
+
+  /** Montaje del art. 41 bis: Madrid · venta 300.000 · compra 200.000 · `anios` · suelo 60.000 · 3 %. */
+  async function montar41bis(page: Page, anios: string): Promise<void> {
+    await abrir26(page);
+    await sembrar26(page, 'Precio de la vivienda', '300000');
+    await aVendedor26(page);
+    await sembrar26(page, 'Precio de compra original', '200000');
+    await sembrar26(page, 'Años de propiedad', anios);
+    await sembrar26(page, 'Valor catastral del suelo', '60000');
+  }
+
+  /**
+   * CASO 61 (normal) — Andalucía, las dos pestañas de la misma operación, y en el vendedor los
+   * tres campos que solo tiene esta app de la familia: «Estimar por mí» con la compra de OBRA
+   * NUEVA (reparación de 1794, fuera de Madrid), la reinversión PARCIAL y la hipoteca pendiente.
+   *
+   * Comprador — vivienda de segunda mano de 250.000 €, perfil General:
+   *   ITP 7 % (TIPOS_ITP_CCAA_2025 'Andalucía')                       = 17.500,00 € «ITP (7,00 %)»
+   *   Notaría  = arancel 90,15 + 24.040,49 × 0,45 % + 30.050,60 × 0,15 % + 90.151,82 × 0,10 %
+   *              + 99.746,97 × 0,05 % = 383,43341 × 1,21 = 463,954426 → × 1,75 =   811,92 €
+   *              (× 1,5 = 695,93 € · × 2 = 927,91 €)
+   *   Registro = 24,04 + 42,0708575 + 37,56325 + 67,613865 + 99.746,97 × 0,03 % (29,924091)
+   *              + 6,010121 + 3,005061 = 210,2272455 × 1,21                 =   254,37 €
+   *   Gestoría (GESTORIA_TIPICA)                                           =   300,00 €
+   *   Total 18.866,29 € → 7,5465 % → «7,55 %» · COSTE TOTAL 268.866,29 €
+   *   «Municipios despoblados» (3,5 %, sin tope de valor) se ENSEÑA, no se cobra (elegirTipoITP).
+   *
+   * Vendedor — compra 150.000 · 12 años · suelo 50.000 · total 125.000 · 3 % · habitual ·
+   * reinvierte 150.000 · hipoteca pendiente 40.000:
+   *   «Estimar por mí» de segunda mano: ITP 7 % 10.500 + notaría(150.000) 705,78 + registro
+   *     217,94 + gestoría 300 = 11.723,71 → «11.724»
+   *   «Estimar por mí» de obra nueva: IVA 10 % (IVA_INMUEBLES_2025.obraNueva) 15.000 + AJD 1,2 %
+   *     (ITP_CCAA.andalucia.ajd) 1.800 + 705,78 + 217,94 + 300 = 18.023,71 → «18.024»
+   *     (notaría 150.000: 333,306895 × 1,21 × 1,75 = 705,777 · registro: 180,113382 × 1,21 = 217,937)
+   *   Plusvalía: objetivo 50.000 × 0,09 (12 años) × 25 % = 1125,00; real 100.000 × 50.000/125.000
+   *     × 25 % = 10.000 → «Método objetivo (más favorable)»
+   *   Transmisión 250.000 − 7.500 − 1.125 = 241.375 · Adquisición 150.000 + 18.024 = 168.024
+   *   Ganancia 73.351 · importe obtenido 241.375 − 40.000 = 201.375 (art. 41.1 RIRPF)
+   *   Exento 150.000 / 201.375 = 74,4879 % → «74,5 %» (art. 41.4 RIRPF)
+   *   Base 73.351 × 51.375 / 201.375 = 18.713,38 · IRPF 6.000 × 19 % + 12.713,38 × 21 %
+   *     = 1.140 + 2.669,81 = 3809,81 €
+   *   Total 1.125 + 7.500 + 3.809,81 = 12.434,81 · Neto 250.000 − 12.434,81 = 237.565,19 €
+   */
+  test('CASO 61 (normal) — Andalucía: las dos pestañas, «Estimar por mí» de obra nueva y reinversión parcial con hipoteca', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    expect(ITP_CCAA['andalucia'].tipoGeneral).toBe(7);
+    expect(ITP_CCAA['andalucia'].ajd).toBe(1.2);
+    expect(IVA_INMUEBLES_2025.obraNueva).toBe(10);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 12)?.coeficiente).toBe(0.09);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+
+    // Comprador
+    await abrir26(page, 'andalucia');
+    await sembrar26(page, 'Precio de la vivienda', '250000');
+    expect(await valorTarjeta(page, /ITP \(7,00\s?%\)/)).toBe('17.500,00 €');
+    expect(await valorTarjeta(page, /^Gastos de notaría/)).toBe('811,92 €');
+    expect(await descripcionTarjeta(page, /^Gastos de notaría/)).toContain('entre 695,93 € y 927,91 €');
+    expect(await valorTarjeta(page, /^Registro de la Propiedad/)).toBe('254,37 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+    expect(await valorTarjeta(page, /^Total gastos adicionales/)).toBe('18.866,29 €');
+    expect(await descripcionTarjeta(page, /^Total gastos adicionales/)).toMatch(/^7,55\s?% sobre el precio$/);
+    expect(await valorTarjeta(page, /^COSTE TOTAL/)).toBe('268.866,29 €');
+    await expect(page.locator('div[class*="avisoReducidos"]').first()).toContainText('Municipios despoblados');
+
+    // Vendedor: el botón, primero de segunda mano y luego de obra nueva
+    await aVendedor26(page);
+    await sembrar26(page, 'Precio de compra original', '150000');
+    await page.getByRole('button', { name: /Estimar por mí/ }).click();
+    await esperarValorEnReact(page, campoGastosCompra(page), '11.724');
+    await page.locator('#regimen-compra-original').selectOption('primera-mano');
+    await page.getByRole('button', { name: /Estimar por mí/ }).click();
+    await esperarValorEnReact(page, campoGastosCompra(page), '18.024');
+
+    await sembrar26(page, 'Años de propiedad', '12');
+    await sembrar26(page, 'Valor catastral del suelo', '50000');
+    await sembrar26(page, 'Valor catastral total (suelo + construcción)', '125000');
+    await page.getByRole('checkbox', { name: /Voy a reinvertir/ }).check();
+    await esperarHidratacion(page, ['input[aria-label="Hipoteca pendiente de la vivienda que vendes"]']);
+    await sembrar26(page, 'Hipoteca pendiente de la vivienda que vendes', '40000');
+    await sembrar26(page, 'Importe que reinviertes en la nueva vivienda', '150000');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1125,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('168.024,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('241.375,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('73.351,00 €');
+    expect(await descripcionTarjeta(page, /^Ganancia patrimonial/)).toBe('Tributa 18.713,38 € tras aplicar la exención');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('3809,81 €');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'Reinversión parcial: exento el 74,5 % de la ganancia (art. 41 RIRPF)',
+    );
+    expect(await valorTarjeta(page, /Comisión inmobiliaria \(3\s?%\)/)).toBe('7500,00 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('12.434,81 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('237.565,19 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
+  });
+
+  /**
+   * CASO 61 bis (invariante de la familia, en un campo EXCLUSIVO) — la misma operación con el
+   * importe que se reinvierte ILEGIBLE («150.000.00»). Sin él no hay exención y el motor cobra la
+   * cuota entera: base 73.351 → IRPF 1.140 + 44.000 × 21 % + 23.351 × 23 % = 1.140 + 9.240 +
+   * 5.370,73 = 15.750,73 € · neto 250.000 − 1.125 − 7.500 − 15.750,73 = 225.624,27 € (PARCIAL).
+   * Cualquier importe reinvertido > 0 exime algo, así que la dirección es SEGURA: la cuota real es
+   * menor y el neto real MAYOR. La app lo dice, y cita el art. 38 LIRPF.
+   */
+  test('CASO 61 bis (invariante) — con la reinversión ilegible, la cuota real es menor y el neto MAYOR, y lo dice', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await montarVendedor61(page, '150.000.00');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('15.750,73 €');
+    const irpf = await descripcionTarjeta(page, /^IRPF sobre ganancia/);
+    expect(irpf).toContain('El importe que reinviertes no se ha podido leer, así que la cuota real es menor');
+    expect(irpf).toContain('art. 38 LIRPF');
+    expect(await page.locator('h3', { hasText: /^IMPORTE NETO VENDEDOR/ }).first().innerText()).toBe(
+      'IMPORTE NETO VENDEDOR (PARCIAL)',
+    );
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('225.624,27 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toContain('el neto real es MAYOR que este');
+    // Y con el importe legible vuelve a la cifra del CASO 61
+    await sembrar26(page, 'Importe que reinviertes en la nueva vivienda', '150000');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('237.565,19 €');
+  });
+
+  /**
+   * CASO 62 (límite) — tres cantos que nada pisaba:
+   *  (a) La frontera de 200.000 € de la base del ahorro (23 % → 27 %, TRAMOS_GANANCIAS_
+   *      PATRIMONIALES_2025). Madrid · venta 500.000 · compra 280.000 · 10 años · suelo 40.000 · 3 %.
+   *      Plusvalía 40.000 × 0,12 × 25 % = 1200,00 · comisión 15.000 · transmisión 483.800.
+   *      Gastos de aquella compra 3.800 → adquisición 283.800 → ganancia 200.000 →
+   *      IRPF 1.140 + 9.240 + 150.000 × 23 % = 44.880,00 · neto 500.000 − 1.200 − 15.000 − 44.880
+   *      = 438.920,00. Con 3.799 → ganancia 200.001 → IRPF 44.880,27 (el euro al 27 %) ·
+   *      neto 438.919,73.
+   *  (b) Reventa antes del año con 0 meses completos: coeficienteIIVTNU(0, 0) prorratea 0,15 × 0/12
+   *      = 0 (art. 107.4 TRLRHL, «meses completos») → plusvalía 0,00 €.
+   *  (c) Valencia a 1.000.000,01 €: el umbral (ITP_CCAA.valencia.umbralTipoUnico, 11 % sobre TODO el
+   *      valor por encima del millón) → 1.000.000,01 × 11 % = 110.000,0011 → 110.000,00 €.
+   */
+  test('CASO 62 (límite) — la frontera de 200.000 € del ahorro, 0 meses de tenencia y el umbral valenciano', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025[2]).toEqual({ hasta: 200000, tipo: 23 });
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025[3]).toEqual({ hasta: 300000, tipo: 27 });
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 10)?.coeficiente).toBe(0.12);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)?.coeficiente).toBe(0.15);
+    expect(ITP_CCAA['valencia'].umbralTipoUnico).toEqual({ superiorA: 1000000, tipo: 11 });
+
+    // (a)
+    await abrir26(page);
+    await sembrar26(page, 'Precio de la vivienda', '500000');
+    await aVendedor26(page);
+    await sembrar26(page, 'Precio de compra original', '280000');
+    await sembrar26(page, 'Años de propiedad', '10');
+    await sembrar26(page, 'Valor catastral del suelo', '40000');
+    await sembrar26(page, 'Impuestos y gastos que pagaste al comprar', '3800');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1200,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('483.800,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('200.000,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('44.880,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('438.920,00 €');
+    await sembrar26(page, 'Impuestos y gastos que pagaste al comprar', '3799');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('200.001,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('44.880,27 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('438.919,73 €');
+
+    // (b)
+    await sembrar26(page, 'Años de propiedad', '0');
+    await page.locator('#meses-completos').selectOption('0');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('0,00 €');
+
+    // (c)
+    await abrir26(page, 'valencia');
+    await sembrar26(page, 'Precio de la vivienda', '1000000,01');
+    expect(await valorTarjeta(page, /ITP \(11,00\s?%\)/)).toBe('110.000,00 €');
+  });
+
+  /**
+   * CASO 63 (debe rechazarse) · HALLAZGO [bajo, cálculo] — una comisión del 150 %.
+   *
+   * Desde el 25/09 (hallazgo 1796) el campo no lleva max y avisa por encima del 100 %: «La
+   * comisión no puede superar el 100 % del precio de venta: revisa el porcentaje». Pero el
+   * cálculo sigue con lo escrito y publica como DEFINITIVAS cifras que salen de un dato que la
+   * propia app declara imposible. Madrid · venta 200.000 · compra 150.000 · 10 años · suelo
+   * 50.000 · comisión «150»: comisión 300.000,00 € · transmisión max(0, 200.000 − 300.000 − 1.500)
+   * = 0 · «Pérdida patrimonial 150.000,00 €» con «la pérdida se puede compensar en la
+   * declaración» · total 301.500,00 € · «IMPORTE NETO VENDEDOR −101.500,00 €» rotulado «Lo que
+   * realmente recibes». Es el patrón 5 de la familia (escrito, legible e imposible): los años
+   * negativos y el precio de compra 0 no liquidan y lo dicen; esta comisión sí liquida.
+   *
+   * Afirma lo correcto: con el aviso del campo en pantalla (que sí está), el neto no se rotula
+   * «Lo que realmente recibes» ni se ofrece compensar una pérdida fabricada por ese dato.
+   */
+  test('CASO 63 (debe rechazarse) — una comisión del 150 % no produce un neto «que realmente recibes»', async ({
+    page,
+  }) => {
+    test.fail(true, 'HALLAZGO 26/09 — la comisión > 100 % se avisa en el campo pero se liquida como definitiva');
+    await abrir26(page);
+    await sembrar26(page, 'Precio de la vivienda', '200000');
+    await aVendedor26(page);
+    await sembrar26(page, 'Precio de compra original', '150000');
+    await sembrar26(page, 'Años de propiedad', '10');
+    await sembrar26(page, 'Valor catastral del suelo', '50000');
+    await sembrar26(page, 'Comisión inmobiliaria (%)', '150');
+    // El campo lo rechaza por escrito (esto ya pasa)
+    await expect(formVendedor(page)).toContainText(/La comisión no puede superar el 100\s%/);
+    // Lo que falla: las cifras de abajo lo dan por bueno
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).not.toBe('Lo que realmente recibes');
+    await expect(page.locator('h3', { hasText: /^Pérdida patrimonial/ })).toHaveCount(0);
+  });
+
+  /**
+   * CONTROL de montaje de los hallazgos de abajo — lo que la app publica hoy, calculado a mano. Si
+   * esto se pone rojo, el que falla es el montaje, no el hallazgo.
+   *  · 41 bis, 1 año, SIN exención: plusvalía 60.000 × 0,15 × 25 % = 2250,00 · comisión 9.000 ·
+   *    transmisión 288.750 · ganancia 88.750 → IRPF 1.140 + 9.240 + 38.750 × 23 % = 19.292,50 ·
+   *    neto 269.457,50. «Es mi vivienda habitual» viene MARCADA por defecto.
+   *  · 41 bis, 3 años + mayor de 65 (legítimo: 3 años de propiedad caben en 3 de residencia):
+   *    plusvalía 60.000 × 0,14 × 25 % = 2100,00 → neto 300.000 − 9.000 − 2.100 = 288.900,00, EXENTO.
+   *  · 33.4.b, BASE B (200.000 · compra 150.000 · 10 años · suelo 50.000 · 3 %): plusvalía 1.500 ·
+   *    transmisión 192.500 · ganancia 42.500 → IRPF 1.140 + 36.500 × 21 % = 8805,00 · neto
+   *    183.695,00. Con la exención del art. 33.4.b sería 0 y 192.500,00.
+   */
+  test('CONTROL de montaje — las preparaciones de los hallazgos del 26/09 publican las cifras del motor', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 1)?.coeficiente).toBe(0.15);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 3)?.coeficiente).toBe(0.14);
+
+    await montar41bis(page, '1');
+    await expect(page.getByRole('checkbox', { name: /Es mi vivienda habitual/ })).toBeChecked();
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('2250,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.292,50 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('269.457,50 €');
+
+    await montar41bis(page, '3');
+    await page.getByRole('checkbox', { name: /Soy mayor de 65 años/ }).check();
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('EXENTO');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('288.900,00 €');
+
+    await abrir26(page);
+    await sembrar26(page, 'Precio de la vivienda', '200000');
+    await aVendedor26(page);
+    await sembrar26(page, 'Precio de compra original', '150000');
+    await sembrar26(page, 'Años de propiedad', '10');
+    await sembrar26(page, 'Valor catastral del suelo', '50000');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('8805,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('183.695,00 €');
+  });
+
+  /**
+   * HALLAZGO 41 bis [alto, cálculo] — las dos exenciones de la vivienda habitual se aplican con
+   * 1 año de propiedad. Art. 41 bis.1 RIRPF (BOE-A-2007-6820, leído en sesión): «A los efectos
+   * previstos en los artículos 7.t), 33.4.b), y 38 de la Ley del Impuesto se considera vivienda
+   * habitual del contribuyente la edificación que constituya su residencia durante un plazo
+   * continuado de, al menos, tres años», salvo fallecimiento, matrimonio, separación, traslado
+   * laboral, primer empleo, cambio de empleo u otras análogas, que la app no pregunta. La app SÍ
+   * sabe los años (el campo «Años de propiedad») y con «1» —menos de tres años de propiedad no
+   * caben en tres de residencia— da EXENTO en cuanto se marca «Soy mayor de 65 años» (y «Es mi
+   * vivienda habitual» viene marcada por defecto), o se reinvierte todo: IRPF 0 en vez de
+   * 19.292,50 € y neto 288.750,00 € «Lo que realmente recibes» en vez de 269.457,50 € (CONTROL).
+   * Es el error en la dirección que el propio motor llama irrecuperable (contrato de elegirTipoITP:
+   * «quien presupuesta 0 y paga 12.000 tiene un problema»), y nada en la página nombra el plazo.
+   *
+   * Afirma lo correcto: con menos de 3 años, o no se exime, o la tarjeta del IRPF dice que la
+   * exención exige 3 años de residencia (art. 41 bis RIRPF) salvo esas circunstancias.
+   */
+  test('HALLAZGO 41 bis — con 1 año de propiedad, la exención de vivienda habitual no se da por hecha', async ({
+    page,
+  }) => {
+    test.fail(true, 'HALLAZGO 26/09 (alto) — art. 41 bis.1 RIRPF: vivienda habitual = 3 años de residencia');
+    test.setTimeout(60_000);
+    const exigeElPlazo = (texto: string) => /tres años|3 años|41 bis/i.test(texto);
+
+    // Mayor de 65 que vende su «vivienda habitual» de hace 1 año
+    await montar41bis(page, '1');
+    await page.getByRole('checkbox', { name: /Soy mayor de 65 años/ }).check();
+    const irpfEdad = await valorTarjeta(page, /^IRPF sobre ganancia/);
+    const descEdad = await descripcionTarjeta(page, /^IRPF sobre ganancia/);
+    expect(irpfEdad === '19.292,50 €' || exigeElPlazo(descEdad), `${irpfEdad} · ${descEdad}`).toBe(true);
+
+    // Y la reinversión total, que el art. 41 bis.1 somete al mismo requisito
+    await page.getByRole('checkbox', { name: /Soy mayor de 65 años/ }).uncheck();
+    await page.getByRole('checkbox', { name: /Voy a reinvertir/ }).check();
+    await esperarHidratacion(page, ['input[aria-label="Importe que reinviertes en la nueva vivienda"]']);
+    await sembrar26(page, 'Importe que reinviertes en la nueva vivienda', '300000');
+    const irpfReinv = await valorTarjeta(page, /^IRPF sobre ganancia/);
+    const descReinv = await descripcionTarjeta(page, /^IRPF sobre ganancia/);
+    expect(irpfReinv === '19.292,50 €' || exigeElPlazo(descReinv), `${irpfReinv} · ${descReinv}`).toBe(true);
+  });
+
+  /**
+   * HALLAZGO 33.4.b [medio, contenido] — la exención de la vivienda habitual del art. 33.4.b LIRPF
+   * no es solo de los mayores de 65. Texto consolidado (BOE-A-2006-20764, bloque a33, leído en
+   * sesión): «b) Con ocasión de la transmisión de su vivienda habitual por mayores de 65 años o
+   * por personas en situación de dependencia severa o de gran dependencia de conformidad con la
+   * Ley de promoción de la autonomía personal…». La app solo ofrece «Soy mayor de 65 años», el
+   * motor lo rotula «Mayor de 65 años que transmite su vivienda habitual (art. 33.4.b LIRPF)» y el
+   * FAQPage responde «Existen dos exenciones … la reinversión … y la de los mayores de 65 años (art.
+   * 33.4.b LIRPF)»: cita el artículo y se deja la mitad. Una persona con gran dependencia de 50
+   * años que vende su vivienda habitual (BASE B del CONTROL) lee IRPF 8805,00 € y neto 183.695,00 €
+   * «Lo que realmente recibes», cuando su ganancia está exenta (IRPF 0, neto 192.500,00 €), y no
+   * tiene casilla ni aviso. Es campo exclusivo de esta app en la familia.
+   *
+   * Afirma lo correcto: el formulario del vendedor y el FAQPage nombran la dependencia.
+   */
+  test('HALLAZGO 33.4.b — la exención de la vivienda habitual alcanza a la dependencia severa o gran dependencia', async ({
+    page,
+  }) => {
+    test.fail(true, 'HALLAZGO 26/09 (medio) — art. 33.4.b LIRPF: mayores de 65 O dependencia severa/gran dependencia');
+    await abrir26(page);
+    await sembrar26(page, 'Precio de la vivienda', '200000');
+    await aVendedor26(page);
+    await expect(formVendedor(page)).toContainText(/dependencia/i, { timeout: 2000 });
+    const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(jsonLd).toMatch(/dependencia/i);
+  });
+
+  /**
+   * HALLAZGO SELLOS [medio, dato] — la app de referencia tiene UN sello y la familia ya lleva dos
+   * o tres. El único DataReference dice «ITP/AJD 2026» verificado el 17/06/2026
+   * (FISCAL_INMUEBLES_META), y la pestaña Vendedor calcula además con los coeficientes del IIVTNU
+   * (PLUSVALIA_MUNICIPAL_META, verificado 24/09/2026: justo los que estuvieron caducados hasta ese
+   * día, hallazgo 1559) y con la escala del ahorro (GANANCIAS_PATRIMONIALES_META, verificado
+   * 12/08/2026), sin enseñar la fuente ni la fecha de ninguno de los dos. Es la reparación de los
+   * hallazgos 35 (garaje), 332 y 1579 (local-comercial) y 695/781 (heredar-vivienda), que no llegó
+   * a la referencia: local-comercial pinta tres sellos, garaje y trastero dos.
+   *
+   * Afirma lo correcto: hay un sello de la plusvalía con su fecha y uno del IRPF con la suya.
+   */
+  test('HALLAZGO SELLOS — la mitad del vendedor enseña la fuente y la fecha de la plusvalía y del IRPF', async ({
+    page,
+  }) => {
+    test.fail(true, 'HALLAZGO 26/09 (medio) — un solo DataReference (ITP/AJD) para tres tributos');
+    await abrir26(page);
+    const sellos = (await page.locator('[aria-label="Datos de referencia normativos"]').allInnerTexts()).map((s) =>
+      s.replace(ESPACIO_DURO, ' '),
+    );
+    expect(sellos.length).toBeGreaterThanOrEqual(1);
+    expect(sellos.some((s) => s.includes(fechaES(FISCAL_INMUEBLES_META.verificado)))).toBe(true);
+    expect(
+      sellos.some((s) => /plusval[ií]a|IIVTNU/i.test(s) && s.includes(fechaES(PLUSVALIA_MUNICIPAL_META.verificado))),
+      sellos.join(' || '),
+    ).toBe(true);
+    expect(
+      sellos.some((s) => /IRPF|ahorro/i.test(s) && s.includes(fechaES(GANANCIAS_PATRIMONIALES_META.verificado))),
+      sellos.join(' || '),
+    ).toBe(true);
+  });
+
+  /**
+   * HALLAZGO 1455 [medio, contenido] — la FAQ visible y el FAQPage del JSON-LD («¿Puedo negociar
+   * quién paga cada gasto?») afirman: «salvo los gastos del vendedor (plusvalía municipal, IRPF),
+   * el resto son del comprador por ley». Código Civil, art. 1455 (BOE-A-1889-4763, leído en
+   * sesión): «Los gastos de otorgamiento de escrituras serán de cuenta del vendedor, y los de la
+   * primera copia y los demás posteriores a la venta serán de cuenta del comprador, salvo pacto en
+   * contrario». Por ley la matriz de la escritura es del VENDEDOR; que lo pague todo el comprador
+   * es un pacto habitual, no la ley. El paso 3 de la guía («sí puedes acordar que el vendedor
+   * asuma ciertos gastos notariales») y la fila «Notaría · ¿Quién paga? Comprador» de la tabla
+   * repiten la misma idea. Es la boca que leen los asistentes de IA sin el disclaimer al lado.
+   *
+   * Afirma lo correcto: ni la FAQ visible ni el JSON-LD dicen que el resto sea del comprador «por ley».
+   */
+  test('HALLAZGO 1455 — la FAQ no atribuye al comprador «por ley» los gastos de otorgamiento de la escritura', async ({
+    page,
+  }) => {
+    test.fail(true, 'HALLAZGO 26/09 (medio) — art. 1455 CC: el otorgamiento es del vendedor salvo pacto');
+    await abrir26(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const faq = await page.locator('div[class*="faqItem"]', { hasText: '¿Puedo negociar quién paga' }).first().innerText();
+    const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(faq).not.toContain('el resto son del comprador por ley');
+    expect(jsonLd).not.toContain('el resto son del comprador por ley');
+  });
+
+  /**
+   * CONTROL (accesibilidad) — lo que añadió la reparación de 1794/1795 (la pregunta del régimen,
+   * su <select> y la nota de los tipos de hoy) llega a 4,5:1 en los dos temas, como el resto de
+   * controles que midió el hallazgo 1801. Medido: claro 16,67 / 16,67 / 5,50; oscuro 13,82 /
+   * 11,39 / 8,03.
+   */
+  test('CONTROL (contraste) — la pregunta del régimen, su desplegable y la nota de «Estimar por mí» en los dos temas', async ({
+    page,
+  }) => {
+    await abrir26(page);
+    await aVendedor26(page);
+    await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
+    const medir = (tema: string) =>
+      page.evaluate((t) => {
+        document.documentElement.setAttribute('data-theme', t);
+        const rgb = (s: string) => (s.match(/[\d.]+/g) ?? []).map(Number);
+        const lum = ([r, g, b]: number[]) => {
+          const f = (v: number) => {
+            const c = v / 255;
+            return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+          };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        const fondo = (el: Element) => {
+          const capas: number[][] = [];
+          for (let n: Element | null = el; n; n = n.parentElement) {
+            const c = rgb(getComputedStyle(n).backgroundColor);
+            const a = c.length > 3 ? c[3] : 1;
+            if (c.length >= 3 && a > 0) {
+              capas.push([c[0], c[1], c[2], a]);
+              if (a >= 1) break;
+            }
+          }
+          let res = [255, 255, 255];
+          for (const c of capas.reverse()) res = res.map((v, i) => v * (1 - c[3]) + c[i] * c[3]);
+          return res;
+        };
+        const ratio = (el: Element | null) => {
+          if (!el) return 0;
+          const a = lum(rgb(getComputedStyle(el).color));
+          const b = lum(fondo(el));
+          return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+        };
+        return {
+          pregunta: ratio(document.querySelector('label[for="regimen-compra-original"]')),
+          desplegable: ratio(document.getElementById('regimen-compra-original')),
+          nota: ratio(document.getElementById('nota-estimar-gastos')),
+        };
+      }, tema);
+    for (const tema of ['light', 'dark']) {
+      const r = await medir(tema);
+      for (const [nombre, valor] of Object.entries(r)) {
+        expect(valor, `${tema} · ${nombre}: ${valor.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
   });
 });

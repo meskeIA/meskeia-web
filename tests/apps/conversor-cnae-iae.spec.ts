@@ -70,6 +70,13 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     «69.30»/«731.3». Y 2 hallazgos BAJOS en «hallazgos abiertos del 22/09/2026», con
  *     `test.fail()`. Ninguno de los dos es el mecanismo del 423: el diccionario de
  *     sinónimos aguantó el barrido de esta vuelta.
+ *   · RE-inspección  26/09/2026 → por dependencia invalidada (el barril data/fiscal/index.ts),
+ *     sin cambios en nada de lo que la app importa desde af499cc2. La batería (82) pasa en
+ *     verde: 1188 y 1189 siguen cerrados. Tres casos nuevos en «re-inspección del 26/09/2026»
+ *     y 8 hallazgos en «hallazgos abiertos del 26/09/2026», con `test.fail()`. Entre ellos, la
+ *     asimetría de género SÍ existe en el IAE (el acta del 22/09 la descartó midiendo con un
+ *     oficio que no está en las Tarifas), y la reparación del 1188 deriva también palabras
+ *     que no son oficios («plata» → «plato»).
  *
  * POR QUÉ ESTA APP ES DELICADA
  *   No existe ninguna tabla oficial de correspondencia CNAE ⇄ IAE: el INE publica la
@@ -2704,5 +2711,412 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 22/09/2026', () => {
     await page.getByRole('tab', { name: 'Epígrafes del IAE' }).click();
     await expect(page.locator('#panel-iae')).toBeVisible();
     expect(await colgando()).toEqual([]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 26/09/2026 — por dependencia invalidada, no por cambio de la app
+//
+// Vuelve a la cola porque cambió el barril `data/fiscal/index.ts` (c7af89ec, 26/09: exporta
+// el módulo nuevo `ayudas-vehiculo`, sin ningún nombre en común con `cnae-iae`). Desde la
+// reparación af499cc2 (22/09) no se ha movido NADA de lo que la app importa: ni
+// `data/fiscal/cnae-iae.ts`, ni `data/cnae-sinonimos.json`, ni el catálogo servido
+// (`meta.generado` = 2026-09-14), ni su generador, ni la propia app.
+//
+// La batería entera (82) pasa en verde antes de tocar nada: 1188 (femenino del oficio en la
+// CNAE) y 1189 (`aria-controls` que resuelve) siguen cerrados. Mismo método que las
+// anteriores: cada valor esperado sale del catálogo sellado o de `data/fiscal/cnae-iae.ts`,
+// y se resolvió ANTES de abrir el navegador con una réplica en Node del índice de la app.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — re-inspección del 26/09/2026', () => {
+  test('CASO 1 (normal) — «odontólogo» en la CNAE (86.23) y en la Sección 2ª del IAE (grupo 834), que retiene', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // ── CNAE-2025, resuelto sobre el catálogo sellado ─────────────────────
+    // «odontólogo» está en el diccionario de 86.23 «Actividades odontológicas» (junto a
+    // «dentista», «estomatólogo», «clínica dental»…) y no aparece en ningún otro texto de
+    // búsqueda. Camino: Sección R «ACTIVIDADES SANITARIAS Y DE SERVICIOS SOCIALES» →
+    // División 86 «Actividades sanitarias» → Grupo 86.2 «Actividades médicas y
+    // odontológicas». `correspondenciaInversa['8623'] = ['86.23']` → nota «8623».
+    await buscarCnaeVerificado(page, 'odontólogo');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(fichas(page)).toHaveCount(1);
+    const clase = fichas(page).first();
+    await expect(clase).toContainText('86.23');
+    await expect(clase).toContainText('Actividades odontológicas');
+    await expect(clase).toContainText('Sección R: ACTIVIDADES SANITARIAS Y DE SERVICIOS SOCIALES');
+    await expect(clase).toContainText('División 86: Actividades sanitarias');
+    await expect(clase).toContainText('Grupo 86.2: Actividades médicas y odontológicas');
+    await expect(clase).toContainText('En la CNAE-2009 esto correspondía a 8623.');
+
+    // ── Tarifas del IAE (RD Leg. 1175/1990), Sección 2ª ───────────────────
+    // Dos entradas contienen «odontologo»: el grupo 834 «Odontólogos» (el título EMPIEZA por
+    // la consulta: relevancia 2) y el grupo 832 «Médicos Especialistas (excluidos
+    // Estomatólogos y Odontólogos)» (solo la contiene: relevancia 4). Las dos cuelgan de la
+    // División 8 «PROFESIONALES RELACIONADOS CON OTROS SERVICIOS», Agrupación 83
+    // «Profesionales de la Sanidad», y las dos son de la Sección 2ª: el texto de retención
+    // se le pregunta a SECCIONES_IAE, no se transcribe.
+    //
+    // Ojo al número: «834» es también un grupo de la Sección 1ª («Servicios relativos a la
+    // propiedad inmobiliaria y a la propiedad industrial»). Por eso se busca por palabra.
+    await buscarIaeVerificado(page, 'odontólogo');
+    await expect(contador(page)).toHaveText(/^2 resultados/);
+    await expect(fichas(page)).toHaveCount(2);
+    const grupo = fichas(page).first();
+    await expect(grupo).toContainText('834');
+    await expect(grupo).toContainText('Odontólogos');
+    await expect(grupo).toContainText('Sección 2ª');
+    await expect(grupo).toContainText('División 8: PROFESIONALES RELACIONADOS CON OTROS SERVICIOS');
+    await expect(grupo).toContainText('Agrupación 83: Profesionales de la Sanidad');
+    await expect(grupo).toContainText(SECCION_2.retencion);
+    expect(SECCION_2.retencionIrpf).toBe(true);
+    await expect(fichas(page).nth(1)).toContainText('832');
+    await expect(fichas(page).nth(1)).toContainText('Médicos Especialistas');
+    await expect(fichas(page).nth(1)).toContainText('Sección 2ª');
+  });
+
+  test('CASO 2 (límite) — «5210» se reparte entre TRES secciones de la CNAE-2025; «52.10» con punto es la clase vigente; mayúsculas, tilde y femenino a la vez', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // ── Resuelto sobre el catálogo sellado ────────────────────────────────
+    // `correspondencia['5210'] = ['35.24', '52.10', '63.10']`: la clase 5210 de la CNAE-2009
+    // («Depósito y almacenamiento») se reparte hoy entre las secciones D, H y K. Existe
+    // clase vigente homónima (52.10) y ES una de sus equivalencias, así que el aviso tiene
+    // que decir que conserva el número —no que es «otra actividad»— y la fecha y la norma
+    // salen de CNAE_VIGENCIA. Orden: 52.10 (mismos dígitos, relevancia 0) y luego 35.24 y
+    // 63.10 por código. Notas de procedencia (`correspondenciaInversa`): 3524 → 5210,
+    // 5210 → 5210, 6310 → 5210 y 6311.
+    await buscarCnaeVerificado(page, '5210');
+    await expect(contador(page)).toHaveText(/^3 resultados/);
+    await expect(avisoAntiguo(page)).toContainText(`5210 existe en la ${CNAE_VIGENCIA.anterior}`);
+    await expect(avisoAntiguo(page)).toContainText(`rige la ${CNAE_VIGENCIA.vigente} (${CNAE_VIGENCIA.normaVigente})`);
+    await expect(avisoAntiguo(page)).toContainText(
+      `${CNAE_VIGENCIA.desde.split('-').reverse().join('/')}`,
+    );
+    await expect(avisoAntiguo(page)).toContainText(
+      'entre ellas 52.10 Depósito y almacenamiento, que conserva el mismo número',
+    );
+    await expect(avisoAntiguo(page)).not.toContainText('VIGENTE distinta');
+    await expect(fichas(page).nth(0)).toContainText('52.10');
+    await expect(fichas(page).nth(0)).toContainText('Sección H: TRANSPORTE Y ALMACENAMIENTO');
+    await expect(fichas(page).nth(0)).toContainText('En la CNAE-2009 esto correspondía a 5210.');
+    await expect(fichas(page).nth(1)).toContainText('35.24');
+    await expect(fichas(page).nth(1)).toContainText(
+      'Almacenamiento de gas como parte de los servicios de suministro de la red',
+    );
+    await expect(fichas(page).nth(1)).toContainText('Sección D');
+    await expect(fichas(page).nth(2)).toContainText('63.10');
+    await expect(fichas(page).nth(2)).toContainText('Sección K');
+    await expect(fichas(page).nth(2)).toContainText('En la CNAE-2009 esto correspondía a 5210, 6311.');
+
+    // Con el formato de la CNAE-2025 es la clase vigente y nada más: sin aviso de código
+    // antiguo, porque su homónima sí está entre sus equivalencias (hallazgos 424/481/678).
+    await buscarCnaeVerificado(page, '52.10');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(avisoAntiguo(page)).toHaveCount(0);
+    await expect(fichas(page).first()).toContainText('Depósito y almacenamiento');
+
+    // Mayúsculas + tilde + femenino en la misma consulta: la normalización y la derivación
+    // del género (reparación del 1188) tienen que componerse y llevar a 86.23.
+    await buscarCnaeVerificado(page, 'ODONTÓLOGA');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(fichas(page).first()).toContainText('86.23');
+  });
+
+  test('CASO 3 (debe rechazarse) — «86.24», «834.1», «%&» y una consulta de solo espacios', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // El grupo 86.2 de la CNAE-2025 se agota en 86.21, 86.22 y 86.23; «8624» tampoco es
+    // clave de la tabla de correspondencia. Cero, con su mensaje, y SIN aviso de código
+    // antiguo: inventar una equivalencia sería peor que no dar ninguna.
+    await buscarCnaeVerificado(page, '86.24');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(avisoAntiguo(page)).toHaveCount(0);
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
+      'No hay ninguna entrada que encaje con lo que has escrito.',
+    );
+
+    // Caracteres que no están en ningún literal: cero y el mismo mensaje, sin romper nada
+    // (la consulta pasa por una expresión regular: tiene que llegar escapada).
+    await buscarCnaeVerificado(page, '%&');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
+      'No hay ninguna entrada que encaje',
+    );
+
+    // Solo espacios: no es una búsqueda. Sin contador y con la pista de partida.
+    await buscarCnaeVerificado(page, '   ');
+    await expect(contador(page)).toHaveCount(0);
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
+      'Escribe arriba a qué te dedicas',
+    );
+
+    // IAE: el grupo 834 no tiene epígrafes en ninguna de sus dos secciones, así que nada
+    // empieza por 8341.
+    await buscarIaeVerificado(page, '834.1');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
+      'Ningún epígrafe coincide con esa búsqueda.',
+    );
+    // Contraprueba: «834» a secas sí devuelve sus dos grupos, primero el de la Sección 1ª.
+    await buscarIaeVerificado(page, '834');
+    await expect(contador(page)).toHaveText(/^2 resultados/);
+    await expect(fichas(page).nth(0)).toContainText('Sección 1ª');
+    await expect(fichas(page).nth(1)).toContainText('Odontólogos');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS del 26/09/2026 — escritos con `test.fail()` afirmando lo que DEBERÍA
+// ocurrir. El día que se reparen pasarán a ROJO («expected to fail, but passed»): entonces
+// se les quita la marca y se quedan como regresión, SIN tocar el valor esperado.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Espera a que el catálogo esté cargado y a que los efectos del montaje hayan corrido. */
+async function catalogoListo(page: Page) {
+  await expect(page.locator('#panel-cnae')).toBeAttached();
+  await page.waitForTimeout(400);
+}
+
+/** Relación de contraste WCAG entre el color del texto y el primer fondo opaco de sus ancestros. */
+async function contraste(page: Page, selector: string): Promise<number> {
+  return page.locator(selector).first().evaluate((el) => {
+    const rgb = (c: string) => (c.match(/\d+(\.\d+)?/g) ?? []).map(Number);
+    const lum = ([r, g, b]: number[]) => {
+      const f = (v: number) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+    };
+    let fondo = [255, 255, 255];
+    for (let n: Element | null = el; n; n = n.parentElement) {
+      const c = rgb(getComputedStyle(n).backgroundColor);
+      if (c.length >= 3 && (c.length < 4 || c[3] > 0.5)) {
+        fondo = c;
+        break;
+      }
+    }
+    const a = lum(rgb(getComputedStyle(el).color));
+    const b = lum(fondo);
+    return Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100;
+  });
+}
+
+test.describe('Buscador CNAE-IAE — hallazgos abiertos del 26/09/2026', () => {
+  test('MEDIO — el femenino de una profesión de la Sección 2ª encuentra su grupo del IAE, como el masculino', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // La reparación del 1188 (22/09) derivó el otro género en el índice de la CNAE, y el
+    // acta de aquel día dejó escrito que en el IAE «NO hay asimetría de género», porque lo
+    // midió con «peluquero», que no está en ningún título de las Tarifas. Con las
+    // profesiones de la Sección 2ª la asimetría sí existe: sus títulos van en masculino
+    // plural («Abogados», «Odontólogos», «Médicos…», «Arquitectos», «Ingenieros…»), la
+    // búsqueda es por subcadena y «abogado» está dentro de «abogados», pero «abogada» no.
+    // Medido sobre el catálogo sellado: 60 términos con resultado en masculino y CERO en
+    // femenino, entre ellos abogada, arquitecta, ingeniera (30 → 0), odontóloga, psicóloga,
+    // notaria, podóloga, maestra o licenciada. Y es la sección que RETIENE.
+    //
+    // Esperado: lo que da el masculino (CASO 1 de este bloque y CASO 1 del 22/09).
+    await buscarIaeVerificado(page, 'odontóloga');
+    await expect(fichas(page).first()).toContainText('Odontólogos');
+    await expect(fichas(page).first()).toContainText('Sección 2ª');
+
+    await buscarIaeVerificado(page, 'abogada');
+    await expect(fichas(page).first()).toContainText('731');
+    await expect(fichas(page).first()).toContainText('Abogados');
+
+    // Y «médica» no da cero: da 7 entradas, TODAS de la Sección 1ª (farmacias, comercio de
+    // medicamentos, investigación en ciencias médicas…), y ninguno de los grupos 831/832
+    // «Médicos…» de la Sección 2ª que sí da «médico».
+    await buscarIaeVerificado(page, 'médica');
+    await expect(fichas(page).filter({ hasText: 'Médicos de Medicina General' })).toHaveCount(1);
+  });
+
+  test('BAJO — la derivación del género no inventa palabras de otra actividad: «plato» encabeza con 10.85, no con joyería', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // Efecto lateral de la reparación del 1188. `otroGenero()` se aplica a TODOS los
+    // sinónimos de una palabra, no solo a los oficios: 223 formas derivadas, casi todas
+    // inofensivas porque no existen («peluquerío», «ferreterío», «agriculturo»), pero alguna
+    // es OTRA palabra. «plata», sinónimo de 32.12 (joyería), deriva «plato», que entra en el
+    // índice como palabra completa (relevancia 3) y adelanta a 10.85 «Elaboración de platos y
+    // comidas preparados», cuyo título solo la contiene como subcadena de «platos»
+    // (relevancia 4). Antes de la reparación, «plato» daba 1 resultado: 10.85.
+    await buscarCnaeVerificado(page, 'plato');
+    await expect(fichas(page).first()).toContainText('10.85');
+    await expect(fichas(page).first()).toContainText('Elaboración de platos y comidas preparados');
+  });
+
+  test('MEDIO — al cargar, la página no salta por encima del aviso legal, del disclaimer crítico y del aviso de que no hay tabla CNAE ⇄ IAE', async ({
+    page,
+  }) => {
+    test.fail();
+
+    // El efecto que da el foco al buscador «una vez cargado el catálogo» (page.tsx, desde la
+    // creación de la app el 20/07) llama a `focus()` sin `preventScroll`, y el buscador está
+    // muy por debajo del pliegue. Medido el 26/09/2026: la página se abre desplazada 1.516 px
+    // a 1280×800 y 2.806 px a 360×740, con el h1, el DisclaimerCard crítico (que la política
+    // prohíbe colapsar precisamente para que se lea) y el h2 «Aquí no hay conversión
+    // automática…» por encima del borde de la pantalla. Quien usa lector de pantalla empieza
+    // también en el campo, no en el h1.
+    const medida: Record<string, number> = {};
+    for (const [nombre, vp] of [
+      ['escritorio', { width: 1280, height: 800 }],
+      ['movil', { width: 360, height: 740 }],
+    ] as const) {
+      await page.setViewportSize(vp);
+      await abrirHidratado(page);
+      await catalogoListo(page);
+      medida[nombre] = await page.evaluate(() => Math.round(window.scrollY));
+    }
+    expect(medida).toEqual({ escritorio: 0, movil: 0 });
+    await expect(page.locator('h1')).toBeInViewport();
+  });
+
+  test('BAJO — con el foco en una pestaña, las flechas mueven el foco a la otra pestaña y no al buscador', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+    await catalogoListo(page);
+
+    // La reparación del 1189 añadió ← → Inicio Fin al tablist y su comentario dice que «el
+    // foco va a la pestaña destino». Lo lleva, pero el mismo efecto del foco automático
+    // (depende de `pestana`) se dispara con el cambio y se lo lleva al buscador del panel
+    // nuevo: medido, tras → el foco está en #buscador-iae, y un ← posterior mueve el cursor
+    // dentro del campo en vez de volver a la CNAE. La navegación por flechas es de un solo uso.
+    await page.focus('#tab-cnae');
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('#tab-iae')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('#tab-iae')).toBeFocused({ timeout: 2000 });
+    await page.keyboard.press('ArrowLeft');
+    await expect(page.locator('#tab-cnae')).toHaveAttribute('aria-selected', 'true');
+  });
+
+  test('MEDIO — el código de cada ficha, la insignia de la Sección 2ª y los ejemplos alcanzan 4,5:1', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+    await catalogoListo(page);
+    await page.mouse.move(1, 1);
+
+    // Medido en los dos temas el 26/09/2026 (texto pequeño: umbral 4,5:1):
+    //   · insignia «Sección 2ª» — blanco sobre #48A9A6 (--secondary), 12,5 px: 2,80:1
+    //   · ejemplos «Prueba con:» — #48A9A6 sobre blanco, 14 px (tema claro): 2,80:1
+    //   · código de cada ficha (47.11, 731…) — blanco sobre #2E86AB, 14,4 px: 4,11:1
+    //   · insignia «Sección 1ª», pestaña activa y filtro activo — blanco sobre #2E86AB: 4,11:1
+    //   · «Ver los N» (claro) y los h4 de la FAQ — #2E86AB como texto: 4,11:1 (3,50:1 en oscuro)
+    //   · «A tener en cuenta:» y «Dato útil:» del bloque educativo — #48A9A6: 2,80:1 (claro)
+    // globals.css ya tiene --primary-boton / --secondary-boton (blanco encima ≥ 5,15:1) y
+    // --primary-texto / --secondary-texto para el color de marca como texto.
+    await buscarIaeVerificado(page, 'abogado');
+    await page.mouse.move(1, 1);
+    const medidas = {
+      insigniaSeccion2: await contraste(page, '#panel-iae li[class*="ficha"] [class*="badgeSeccion"]'),
+      codigoFicha: await contraste(page, '#panel-iae li[class*="ficha"] [class*="codigoCnae"]'),
+      ejemplo: await contraste(page, '#panel-iae [class*="ejemploBtn"]'),
+    };
+    const bajoUmbral = Object.entries(medidas).filter(([, r]) => r < 4.5);
+    expect(bajoUmbral).toEqual([]);
+  });
+
+  test('BAJO — la pestaña activa y el filtro activo no pierden la etiqueta con el puntero encima (ni tras un toque en móvil)', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirHidratado(page);
+    await catalogoListo(page);
+
+    // `.tab:hover` y `.filtroBtn:hover` (especificidad 0,2,0) pisan el `color: #FFFFFF` de
+    // `.tabActiva` y `.filtroActivo` (0,1,0) y le ponen `var(--primary)`, que es el mismo
+    // color del fondo: 1:1, la etiqueta desaparece. En móvil el :hover se queda pegado tras
+    // el toque, así que la pestaña o la sección que se acaba de elegir queda como una
+    // píldora azul en blanco hasta tocar en otro sitio (medido a 360×740 con toque real).
+    //
+    // Se compara con el propio control SIN puntero, no con 4,5:1: así este test mide solo la
+    // pérdida de la etiqueta y no se confunde con el hallazgo de contraste de arriba.
+    //
+    // Las dos reglas llevan `transition: color 0.2s`: se mide cuando la transición ha acabado,
+    // porque un sondeo inmediato lee todavía el blanco y daría verde en falso.
+    const TRAS_TRANSICION_MS = 500;
+    await page.mouse.move(1, 1);
+    await page.waitForTimeout(TRAS_TRANSICION_MS);
+    const pestanaEnReposo = await contraste(page, '#tab-cnae');
+    await page.hover('#tab-cnae');
+    await page.waitForTimeout(TRAS_TRANSICION_MS);
+    const pestanaConPuntero = await contraste(page, '#tab-cnae');
+
+    const todas = '#panel-cnae [role="group"] button[aria-pressed="true"]';
+    await page.mouse.move(1, 1);
+    await page.waitForTimeout(TRAS_TRANSICION_MS);
+    const filtroEnReposo = await contraste(page, todas);
+    await page.hover(todas);
+    await page.waitForTimeout(TRAS_TRANSICION_MS);
+    const filtroConPuntero = await contraste(page, todas);
+
+    // Medido el 26/09/2026: 4,11 en reposo y 1,00 con el puntero, en los dos controles.
+    expect({ pestana: pestanaConPuntero, filtro: filtroConPuntero }).toEqual({
+      pestana: pestanaEnReposo,
+      filtro: filtroEnReposo,
+    });
+  });
+
+  test('BAJO — el % de la retención va con espacio duro y no salta solo de línea', async ({ page }) => {
+    test.fail();
+    await page.setViewportSize({ width: 360, height: 740 });
+    await abrirHidratado(page);
+
+    // El texto de retención de la Sección 2ª/3ª sale de SECCIONES_IAE (`data/fiscal/cnae-iae.ts`)
+    // con U+0020 entre la cifra y el signo, igual que la FAQ de `page.tsx` («… % con carácter
+    // general y … % el año de inicio»). A 360 px, en la ficha de «abogado» y en la tarjeta de la
+    // Sección 2ª, la línea se parte entre «7» y «%»: el signo abre la línea siguiente él solo.
+    // La norma (CLAUDE.md §2, desde el 25/09/2026) es U+00A0.
+    await buscarIaeVerificado(page, 'abogado');
+    const texto =
+      (await fichas(page).first().locator('[class*="epigrafeImplicacion"]').textContent()) ?? '';
+    // El espacio duro se construye por su código para que no quede invisible en el fuente.
+    const ESPACIO_DURO = String.fromCharCode(0x00a0);
+    const ESPACIO_NORMAL = String.fromCharCode(0x0020);
+    expect(texto).toMatch(new RegExp(`[0-9]${ESPACIO_DURO}%`));
+    expect(texto).not.toMatch(new RegExp(`[0-9]${ESPACIO_NORMAL}%`));
+  });
+
+  test('BAJO — la fecha de entrada en vigor de la CNAE-2025 y el artículo de la exención salen de data/fiscal', async () => {
+    test.fail();
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const pagina = readFileSync(join(process.cwd(), 'app', 'conversor-cnae-iae', 'page.tsx'), 'utf8');
+    const metadatos = readFileSync(
+      join(process.cwd(), 'app', 'conversor-cnae-iae', 'metadata.ts'),
+      'utf8',
+    );
+
+    // Residuo de los hallazgos 586, 636, 681 y 843, con la misma forma: el dato existe en el
+    // módulo y la propia app lo deriva en otros sitios, pero aquí sigue tecleado y coincide
+    // por casualidad, no por construcción.
+    //   · page.tsx, hero: «(la que sustituyó a la CNAE-2009 en enero de 2026)», y en «Errores
+    //     frecuentes»: «Desde enero de 2026 la clasificación aplicable es la CNAE-2025». La
+    //     misma página deriva esa fecha de CNAE_VIGENCIA.desde en el aviso, en la intro del
+    //     bloque educativo y en la FAQ.
+    //   · metadata.ts, FAQPage (el texto que citan las IAs): «(art. 82.1.c RDL 2/2004)», con
+    //     IAE_EXENCION.normativa en el módulo; el umbral de la misma frase sí se deriva.
+    expect(CNAE_VIGENCIA.desde).toBe('2026-01-01');
+    expect(pagina).not.toMatch(/enero\s+de\s+2026/);
+    expect(metadatos).not.toContain('82.1.c RDL 2/2004');
   });
 });

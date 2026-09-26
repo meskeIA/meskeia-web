@@ -1,4 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, Locator } from '@playwright/test';
+import { esperarPaginaAsentada } from './_hidratacion';
 
 /**
  * Inspector — test-perfil-inversor (segmento interactiva, riesgo 2, 524 usos reales)
@@ -665,5 +666,324 @@ test.describe('re-inspección 22/09/2026', () => {
     await expect(page.getByRole('button', { name: /Comenzar Test|Repetir Test|empezar/i })).toHaveCount(
       1,
     );
+  });
+});
+
+// ============================================================
+// RE-INSPECCIÓN 26/09/2026 — con FIRMA DE ROTURA (nivel)
+//
+// Analytics marcaba 82,1 % de visitas cortas (catálogo 62,7 %) y 50 % de RECARGAS tras visita
+// corta (catálogo 3,1 %) en 78 visitas de 30 días. Los nueve hallazgos del 22/09 siguen
+// reparados (los casos de arriba, en verde), y la firma NO es de rotura: es de INSTRUMENTACIÓN.
+//
+// Cada fase de la app (portada, cuestionario, resultado) es un `return` distinto con su propio
+// `<Footer appName="test-perfil-inversor" />`, y en cada uno el Footer cae en otra posición del
+// árbol (índice 9, 7 y 5 dentro del `.container`). React no lo reconcilia: lo DESMONTA y lo
+// vuelve a montar, y con él el `AnalyticsTracker`, cuyo efecto de montaje hace un
+// POST /api/analytics/track/ — una VISITA nueva, en la misma sesión y sin otra app en medio.
+// Medido con el navegador creyendo estar en meskeia.com (host-resolver-rules; todas las
+// peticiones de analytics contestadas en el propio navegador, ninguna salió):
+//   carga → 1 registro · «Comenzar» → 2 · «Ver Resultado» → 3 · «Revisar» → 4 · otra vez
+//   «Ver Resultado» → 5 · «Repetir Test» → 6. Igual en escritorio que en móvil. Un F5 con el
+//   test a medias → 2 registros en esa sola carga (portada + la recuperación de la sesión).
+//   `/calculadora-porcentajes/`: 1 registro por carga y ninguno más al usarla.
+// En el dump del 26/09: 36 sesiones con 78 filas, y en 21 de ellas la app aparece 2-4 veces
+// seguidas con un hueco entre filas igual a la duración de la anterior (2-33 s = lo que se
+// tarda en pulsar «Comenzar»; 54-462 s = lo que se tarda en contestar las diez).
+//
+// En localhost el tracker no envía nada, pero cada montaje escribe en consola
+// «[Analytics] Desactivado en entorno de desarrollo»: eso es lo que cuentan los casos de abajo.
+// Se compara siempre contra la carga limpia de la misma página, así que vale también contra
+// `next dev` (donde el modo estricto duplica los montajes).
+// ============================================================
+test.describe('re-inspección 26/09/2026', () => {
+  const puntuacion = (page: Page) => page.locator('p[class*="resultScore"]');
+  const avisoDeBorde = (page: Page) => page.locator('[class*="resultScoreBorde"]');
+  const izquierdaDeLaFlecha = (page: Page) =>
+    flecha(page).evaluate((el) => parseFloat((el as HTMLElement).style.left));
+
+  /** Carga la app con el almacenamiento de sesión vacío y ESPERA A QUE REACT HAYA HIDRATADO. */
+  async function cargarLimpia(page: Page): Promise<void> {
+    await page.goto(RUTA);
+    await page.evaluate(() => {
+      try {
+        sessionStorage.clear();
+      } catch {
+        /* ventana privada */
+      }
+    });
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+  }
+
+  /** Montajes del AnalyticsTracker del Footer (en producción, uno = un registro de visita). */
+  function contarMontajesDelTracker(page: Page): () => number {
+    let n = 0;
+    page.on('console', (m) => {
+      if (m.text().includes('[Analytics] Desactivado en entorno de desarrollo')) n++;
+    });
+    return () => n;
+  }
+
+  /** Contraste WCAG entre el color del texto y el primer fondo opaco de sus ancestros. */
+  async function contrasteDe(loc: Locator): Promise<number> {
+    return loc.evaluate((el) => {
+      const rgb = (c: string) => (c.match(/[\d.]+/g) ?? []).map(Number);
+      const lum = ([r, g, b]: number[]) => {
+        const f = (v: number) => {
+          const s = v / 255;
+          return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        };
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+      };
+      let fondo = [255, 255, 255];
+      for (let e: Element | null = el; e; e = e.parentElement) {
+        const c = rgb(getComputedStyle(e).backgroundColor);
+        if (c.length >= 3 && (c.length < 4 || c[3] === 1)) {
+          fondo = c.slice(0, 3);
+          break;
+        }
+      }
+      const l1 = lum(rgb(getComputedStyle(el).color));
+      const l2 = lum(fondo);
+      return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    });
+  }
+
+  // ---------- CASO 2 (límite), en escritorio ----------
+  test('caso límite: 23 es el primer punto de Equilibrado (con aviso de borde) y 40 el techo (sin él)', async ({
+    page,
+  }) => {
+    // Resuelto a mano con A=1 B=2 C=3 D=4:
+    //   23 → B×7 + C×3 = 14 + 9. `score <= 22` es Moderado, así que 23 ya es Equilibrado, y es
+    //        el SUELO de su tramo (23 = range[0] y 23 > 10, el mínimo de la escala): aviso de
+    //        borde SÍ. Flecha = 2·20 + 2 + (23−23)/(28−23)·16 = 42 %.
+    //   40 → D×10. Techo de la escala: no existe un 41, así que el aviso de borde NO sale
+    //        (el 1220 solo probaba el suelo, 10). Flecha = 4·20 + 2 + (40−35)/(40−35)·16 = 98 %.
+    await cargarLimpia(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [1, 1, 1, 1, 1, 1, 1, 2, 2, 2]);
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await expect(puntuacion(page)).toContainText('23 puntos · tramo 23–28');
+    await expect(avisoDeBorde(page)).toHaveCount(1);
+    expect(await izquierdaDeLaFlecha(page)).toBeCloseTo(42, 1);
+
+    await page.getByRole('button', { name: /Repetir Test/ }).click();
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    await expect(perfilMostrado(page)).toHaveText('Agresivo');
+    await expect(puntuacion(page)).toContainText('40 puntos · tramo 35–40');
+    await expect(avisoDeBorde(page)).toHaveCount(0);
+    expect(await izquierdaDeLaFlecha(page)).toBeCloseTo(98, 1);
+  });
+
+  // ---------- CASO 3 (operativa / firma) ----------
+  test('ningún botón del recorrido recarga ni navega: la URL no cambia y no hay navegación de documento', async ({
+    page,
+  }) => {
+    // Descarta la hipótesis de «un Repetir que recarga la página»: todo es estado de React.
+    await cargarLimpia(page);
+    let navegaciones = 0;
+    page.on('framenavigated', (f) => {
+      if (f === page.mainFrame()) navegaciones++;
+    });
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [2, 1, 2, 0, 3, 1, 2, 2, 1, 2]); // 26 → Equilibrado
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).click();
+    await botonSiguiente(page).click(); // «Ver Resultado» otra vez
+    await page.getByRole('button', { name: /Repetir Test/ }).click();
+    await expect(page.getByRole('button', { name: /Comenzar Test/ })).toBeVisible();
+    expect(navegaciones).toBe(0);
+    expect(new URL(page.url()).pathname).toBe(RUTA);
+  });
+
+  test('HALLAZGO firma — una carga registra UNA visita aunque pase por portada, cuestionario y resultado', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'Hallazgo 26/09/2026: cada fase remonta el Footer y su AnalyticsTracker → un registro de visita por fase',
+    );
+    // Esperado: 0 montajes nuevos del tracker al pasar de fase (la página es la misma carga).
+    // Obtenido hoy: 2 — uno al pulsar «Comenzar Test» y otro al pulsar «Ver Resultado».
+    const montajes = contarMontajesDelTracker(page);
+    await cargarLimpia(page);
+    const trasLaCarga = montajes();
+    expect(trasLaCarga).toBeGreaterThan(0); // el testigo existe: la carga sí se cuenta
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [2, 1, 2, 0, 3, 1, 2, 2, 1, 2]); // 26 → Equilibrado
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await esperarPaginaAsentada(page);
+    expect(montajes() - trasLaCarga).toBe(0);
+  });
+
+  test('HALLAZGO firma — recuperar un test a medias tras un F5 no registra DOS visitas en esa carga', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'Hallazgo 26/09/2026: la recuperación de la sesión cambia de fase en el primer efecto y remonta el tracker',
+    );
+    // Esperado: una carga con la sesión recuperada monta el tracker las MISMAS veces que una
+    // carga limpia. Obtenido hoy: el doble (portada y, al restaurar, cuestionario).
+    const montajes = contarMontajesDelTracker(page);
+    await cargarLimpia(page);
+    const porCargaLimpia = montajes();
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [1, 1]); // dos respuestas guardadas en sessionStorage
+    await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
+
+    const antesDelF5 = montajes();
+    await page.reload();
+    await esperarPaginaAsentada(page);
+    await expect(page.getByText(/Hemos recuperado el test/)).toBeVisible(); // 1221 sigue reparado
+    await esperarPaginaAsentada(page);
+    expect(montajes() - antesDelF5).toBe(porCargaLimpia);
+  });
+
+  // ---------- Contenido y accesibilidad ----------
+  test('HALLAZGO contraste — las cifras blancas de la barra de distribución se leen (≥ 4,5:1)', async ({
+    page,
+  }) => {
+    test.fail(true, 'Hallazgo 26/09/2026: blanco sobre #48A9A6 / #7FB3D3 / #95C8DE → 2,80 / 2,26 / 1,81:1');
+    // Todo B = 20 puntos → Moderado, el perfil con los cuatro segmentos: 30/50/15/5.
+    // Medido: «30%» 4,11:1 (#2E86AB) · «50%» 2,80:1 (#48A9A6) · «15%» 2,26:1 (#7FB3D3) ·
+    // «5%» 1,81:1 (#95C8DE). Texto de 14,4 px: exige 4,5:1. En los dos temas.
+    await cargarLimpia(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    const segmentos = page.locator('[class*="allocationSegment"]');
+    await expect(segmentos).toHaveCount(4);
+    for (let i = 0; i < 4; i++) {
+      expect(await contrasteDe(segmentos.nth(i))).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  test('HALLAZGO contraste — los títulos de la guía en color de marca cumplen 4,5:1 en los dos temas', async ({
+    page,
+  }) => {
+    test.fail(true, 'Hallazgo 26/09/2026: #2E86AB como TEXTO → 4,11:1 en claro y 3,50:1 en oscuro');
+    // `.contentCard h4` (17,6 px, peso 600: no llega a «texto grande») usa var(--primary) como
+    // color de TEXTO. CLAUDE.md: para eso está --primary-texto (5,47:1 sobre blanco).
+    await cargarLimpia(page);
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const titulo = page.locator('[class*="contentCard"] h4').first();
+    await expect(titulo).toContainText('¿Qué es el perfil inversor?');
+    for (const tema of ['light', 'dark']) {
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
+      expect(await contrasteDe(titulo)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  test('HALLAZGO formato — el % va separado de la cifra con espacio duro', async ({ page }) => {
+    test.fail(true, 'Hallazgo 26/09/2026: «20%», «Renta Variable (30%)»… pegados (norma del 25/09/2026)');
+    await cargarLimpia(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await opcion(page, 1).click();
+    await botonSiguiente(page).click();
+    // Pregunta 2, tal cual la escribe QUESTIONS[1].text: «…perdiera un 20% de su valor…»
+    await expect(enunciado(page)).toContainText('un 20 % de su valor');
+  });
+
+  test('HALLAZGO formato — los importes de la guía llevan espacio antes del €', async ({ page }) => {
+    test.fail(true, 'Hallazgo 26/09/2026: «10.000€», «6.000€», «1.000€/mes», «100.000€», «200.000€» pegados');
+    await cargarLimpia(page);
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    // Paso 4 de la guía: «Imagina que tu cartera de 10.000€ vale 6.000€ mañana».
+    await expect(page.locator('[class*="stepGuideSection"]')).toContainText(
+      /10\.000[  ]€ vale 6\.000[  ]€/,
+    );
+  });
+});
+
+// ============================================================
+// RE-INSPECCIÓN 26/09/2026 — MÓVIL (360×740, táctil)
+// ============================================================
+test.describe('re-inspección 26/09/2026 · móvil', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  async function cargarLimpia(page: Page): Promise<void> {
+    await page.goto(RUTA);
+    await page.evaluate(() => {
+      try {
+        sessionStorage.clear();
+      } catch {
+        /* ventana privada */
+      }
+    });
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+  }
+
+  async function responderTocando(page: Page, indices: number[]): Promise<void> {
+    for (const i of indices) {
+      await opcion(page, i).tap();
+      await botonSiguiente(page).tap();
+    }
+  }
+
+  // ---------- CASO 1 (normal), tocando ----------
+  test('caso normal tocando: B,C,B,C,D,B,C,A,C,D suma 27 y da Equilibrado, sin aviso de borde', async ({
+    page,
+  }) => {
+    // 2 + 3 + 2 + 3 + 4 + 2 + 3 + 1 + 3 + 4 = 27 → tramo 23–28 → Equilibrado. No es extremo
+    // de tramo (23 ni 28): sin aviso. Flecha = 2·20 + 2 + (27−23)/(28−23)·16 = 54,8 %.
+    await cargarLimpia(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await responderTocando(page, [1, 2, 1, 2, 3, 1, 2, 0, 2, 3]);
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await expect(page.locator('p[class*="resultScore"]')).toContainText('27 puntos · tramo 23–28');
+    await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(0);
+    expect(
+      await flecha(page).evaluate((el) => parseFloat((el as HTMLElement).style.left)),
+    ).toBeCloseTo(54.8, 1);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=equilibrado',
+    );
+    // Nada se sale por la derecha a 360 px
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+  });
+
+  test('HALLAZGO móvil — tras tocar «Comenzar Test» se ve la pregunta, no el pie de la tarjeta', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'Hallazgo 26/09/2026: el cambio de fase conserva el scroll de la portada (enunciado en top −351 px)',
+    );
+    // «Comenzar Test» está a 1.343 px del principio de la portada (casi dos pantallas abajo).
+    // Al tocarlo, la fase de preguntas es mucho más corta y el scroll se queda donde estaba:
+    // en pantalla quedan la opción D, «Anterior» y «Siguiente» deshabilitados y el pie; el
+    // enunciado, «Pregunta 1 de 10» y las opciones A-B, por encima.
+    await cargarLimpia(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await expect(enunciado(page)).toBeInViewport({ timeout: 2000 });
+  });
+
+  test('HALLAZGO móvil — «Revisar mis respuestas» y «Repetir Test» dejan a la vista lo que abren', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'Hallazgo 26/09/2026: «Revisar» → enunciado en top −644 px; «Repetir» → «Comenzar Test» en top −948 px',
+    );
+    await cargarLimpia(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await responderTocando(page, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]); // 20 → Moderado
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).tap();
+    await expect(enunciado(page)).toBeInViewport({ timeout: 2000 });
+    await botonSiguiente(page).tap();
+    await page.getByRole('button', { name: /Repetir Test/ }).tap();
+    await expect(page.getByRole('button', { name: /Comenzar Test/ })).toBeInViewport({ timeout: 2000 });
   });
 });
