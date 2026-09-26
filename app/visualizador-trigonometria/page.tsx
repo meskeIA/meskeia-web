@@ -5,6 +5,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from './Trigonometria.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { razones, formatear, anguloDoble, sumaResta, fraccionEjeX, ANGULO_B } from './motor';
 
 // ======== TIPOS ========
 type FuncionTrig = 'sin' | 'cos' | 'tan';
@@ -29,7 +30,7 @@ const VALORES_EXACTOS: Record<number, { sin: string; cos: string; tan: string }>
   30:  { sin: '1/2',     cos: '√3/2',    tan: '√3/3' },
   45:  { sin: '√2/2',    cos: '√2/2',    tan: '1' },
   60:  { sin: '√3/2',    cos: '1/2',     tan: '√3' },
-  90:  { sin: '1',       cos: '0',       tan: '∞' },
+  90:  { sin: '1',       cos: '0',       tan: 'no definida' },
   120: { sin: '√3/2',    cos: '−1/2',    tan: '−√3' },
   135: { sin: '√2/2',    cos: '−√2/2',   tan: '−1' },
   150: { sin: '1/2',     cos: '−√3/2',   tan: '−√3/3' },
@@ -37,7 +38,7 @@ const VALORES_EXACTOS: Record<number, { sin: string; cos: string; tan: string }>
   210: { sin: '−1/2',    cos: '−√3/2',   tan: '√3/3' },
   225: { sin: '−√2/2',   cos: '−√2/2',   tan: '1' },
   240: { sin: '−√3/2',   cos: '−1/2',    tan: '√3' },
-  270: { sin: '−1',      cos: '0',       tan: '∞' },
+  270: { sin: '−1',      cos: '0',       tan: 'no definida' },
   300: { sin: '−√3/2',   cos: '1/2',     tan: '−√3' },
   315: { sin: '−√2/2',   cos: '√2/2',    tan: '−1' },
   330: { sin: '−1/2',    cos: '√3/2',    tan: '−√3/3' },
@@ -49,27 +50,25 @@ function degToRad(deg: number): number {
   return (deg * Math.PI) / 180;
 }
 
-function formatNum(n: number): string {
-  if (!isFinite(n)) return '∞';
-  const abs = Math.abs(n);
-  if (abs < 1e-10) return '0,000';
-  return n.toFixed(3).replace('.', ',');
+/** Cifra con 3 decimales en formato español (coma decimal, miles agrupados, signo −). */
+function formatNum(n: number | null): string {
+  return formatear(n, 3);
 }
 
 // ======== COMPONENTE: CÍRCULO UNITARIO ========
 function CirculoUnitario({ angulo, mostrarIdentidades }: { angulo: number; mostrarIdentidades: boolean }) {
-  const rad = degToRad(angulo);
   const cx = 150;
   const cy = 150;
   const r = 100;
 
-  const px = cx + r * Math.cos(rad);
-  const py = cy - r * Math.sin(rad); // SVG invierte Y
+  // Razones exactas en los ejes y sin ruido de coma flotante (motor.ts).
+  const { sen: sinVal, cos: cosVal, tan: tanRazon } = razones(angulo);
+  const px = cx + r * cosVal;
+  const py = cy - r * sinVal; // SVG invierte Y
 
-  const sinVal = Math.sin(rad);
-  const cosVal = Math.cos(rad);
-  const tanVal = Math.tan(rad);
-  const tanFinito = isFinite(tanVal) && Math.abs(tanVal) < 5;
+  // La tangente solo se dibuja si está definida y cabe en el lienzo.
+  const tanFinito = tanRazon !== null && Math.abs(tanRazon) < 5;
+  const tanVal = tanRazon ?? 0;
 
   // Punto de proyección en X (para cos)
   const projX = { x: px, y: cy };
@@ -123,7 +122,7 @@ function CirculoUnitario({ angulo, mostrarIdentidades }: { angulo: number; mostr
         x={(cx + projX.x) / 2}
         y={cy + 14}
         fontSize="11"
-        fill="#48A9A6"
+        fill="var(--trig-cos)"
         fontWeight="bold"
         textAnchor="middle"
         fontFamily="sans-serif"
@@ -137,12 +136,12 @@ function CirculoUnitario({ angulo, mostrarIdentidades }: { angulo: number; mostr
         x={px + (cosVal >= 0 ? 8 : -8)}
         y={(py + cy) / 2}
         fontSize="11"
-        fill="#2E86AB"
+        fill="var(--trig-sen)"
         fontWeight="bold"
         textAnchor={cosVal >= 0 ? 'start' : 'end'}
         fontFamily="sans-serif"
       >
-        sin={formatNum(sinVal)}
+        sen={formatNum(sinVal)}
       </text>
 
       {/* Línea radio */}
@@ -165,7 +164,7 @@ function CirculoUnitario({ angulo, mostrarIdentidades }: { angulo: number; mostr
           x={tanPx + 6}
           y={(cy + tanY) / 2}
           fontSize="10"
-          fill="#E8A838"
+          fill="var(--trig-tan)"
           fontWeight="bold"
           textAnchor="start"
           fontFamily="sans-serif"
@@ -190,7 +189,7 @@ function CirculoUnitario({ angulo, mostrarIdentidades }: { angulo: number; mostr
         x={cx + 36}
         y={cy - 6}
         fontSize="12"
-        fill="#7FB3D3"
+        fill="var(--trig-acento)"
         fontWeight="bold"
         fontFamily="sans-serif"
       >
@@ -267,8 +266,9 @@ function GraficaFunciones({ angulo, config }: { angulo: number; config: EstadoGr
   if (segActual) segmentos.push(segActual);
 
   // Marcador del ángulo actual en la gráfica
+  // El eje X dibuja [0, 2π] y θ va de 0° a 360°: 360° es el extremo derecho (hallazgo 1909).
   const t0 = degToRad(angulo);
-  const xMark = padX + ((t0 % (2 * Math.PI)) / xRange) * plotW;
+  const xMark = padX + fraccionEjeX(angulo) * plotW;
   let yMarkVal: number;
   if (funcion === 'sin') yMarkVal = amplitud * Math.sin(frecuencia * t0 + fase);
   else if (funcion === 'cos') yMarkVal = amplitud * Math.cos(frecuencia * t0 + fase);
@@ -307,21 +307,21 @@ function GraficaFunciones({ angulo, config }: { angulo: number; config: EstadoGr
         const yPx = padY + plotH - ((val - yMin) / yRange) * plotH;
         return (
           <text key={val} x={padX - 4} y={yPx + 4} fontSize="9" fill="var(--text-secondary)" textAnchor="end" fontFamily="sans-serif">
-            {val === 0 ? '0' : val.toFixed(1)}
+            {val === 0 ? '0' : formatear(val, 1)}
           </text>
         );
       })}
 
       {/* Curva */}
       {segmentos.map((d, i) => (
-        <path key={i} d={d} fill="none" stroke="#2E86AB" strokeWidth="2" />
+        <path key={i} d={d} fill="none" stroke="var(--trig-sen)" strokeWidth="2" />
       ))}
 
       {/* Marcador ángulo actual */}
       {yMarkPx !== null && (
         <>
-          <line x1={xMark} y1={padY} x2={xMark} y2={padY + plotH} stroke="#48A9A6" strokeWidth="1" strokeDasharray="3 2" opacity="0.7" />
-          <circle cx={xMark} cy={yMarkPx} r={5} fill="#48A9A6" stroke="white" strokeWidth="1.5" />
+          <line x1={xMark} y1={padY} x2={xMark} y2={padY + plotH} stroke="var(--trig-cos)" strokeWidth="1" strokeDasharray="3 2" opacity="0.7" />
+          <circle cx={xMark} cy={yMarkPx} r={5} fill="var(--trig-cos)" stroke="white" strokeWidth="1.5" />
         </>
       )}
     </svg>
@@ -369,12 +369,12 @@ function TablaValores() {
 
 // ======== COMPONENTE: PANEL IDENTIDADES ========
 function PanelIdentidades({ angulo }: { angulo: number }) {
-  const rad = degToRad(angulo);
-  const sinVal = Math.sin(rad);
-  const cosVal = Math.cos(rad);
+  const { sen: sinVal, cos: cosVal, tan: tanVal } = razones(angulo);
   const sin2 = sinVal * sinVal;
   const cos2 = cosVal * cosVal;
   const suma = sin2 + cos2;
+  const doble = anguloDoble(angulo);
+  const suRe = sumaResta(angulo);
 
   return (
     <div className={styles.identidadesGrid}>
@@ -389,8 +389,8 @@ function PanelIdentidades({ angulo }: { angulo: number }) {
           <strong>{formatNum(suma)}</strong>
         </div>
         <div className={styles.identidadBarra}>
-          <div className={styles.barraSin} style={{ width: `${sin2 * 100}%` }} title={`sen²(θ) = ${sin2.toFixed(4)}`} />
-          <div className={styles.barraCos} style={{ width: `${cos2 * 100}%` }} title={`cos²(θ) = ${cos2.toFixed(4)}`} />
+          <div className={styles.barraSin} style={{ width: `${sin2 * 100}%` }} title={`sen²(θ) = ${formatear(sin2, 4)}`} />
+          <div className={styles.barraCos} style={{ width: `${cos2 * 100}%` }} title={`cos²(θ) = ${formatear(cos2, 4)}`} />
         </div>
         <div className={styles.identidadLeyenda}>
           <span className={styles.dotSin} /> sen²(θ) = {formatNum(sin2)}
@@ -404,7 +404,7 @@ function PanelIdentidades({ angulo }: { angulo: number }) {
           <div className={styles.identidadItem}>
             <span className={styles.identidadLabel}>tan(θ) = sen(θ)/cos(θ)</span>
             <span className={styles.identidadValor}>
-              {Math.abs(cosVal) > 0.001 ? formatNum(sinVal / cosVal) : '∞'}
+              {formatNum(tanVal)}
             </span>
           </div>
           <div className={styles.identidadItem}>
@@ -422,8 +422,39 @@ function PanelIdentidades({ angulo }: { angulo: number }) {
           <div className={styles.identidadItem}>
             <span className={styles.identidadLabel}>1 + tan²(θ) = sec²(θ)</span>
             <span className={styles.identidadValor}>
-              {Math.abs(cosVal) > 0.001 ? formatNum(1 + Math.tan(rad) ** 2) : '∞'}
+              {tanVal === null ? formatNum(null) : formatNum(1 + tanVal ** 2)}
             </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Ángulo doble y suma/resta (hallazgo 1907: la description las prometía y no estaban).
+          Cada valor se calcula por el DESARROLLO de la fórmula; que coincida con sen(2θ) o
+          sen(θ + 30°) medidos directamente es lo que la identidad afirma. */}
+      <div className={styles.identidadCard}>
+        <div className={styles.identidadTitulo}>Ángulo doble</div>
+        <div className={styles.identidadLista}>
+          <div className={styles.identidadItem}>
+            <span className={styles.identidadLabel}>sen(2θ) = 2·sen(θ)·cos(θ)</span>
+            <span className={styles.identidadValor}>{formatNum(doble.sen2)}</span>
+          </div>
+          <div className={styles.identidadItem}>
+            <span className={styles.identidadLabel}>cos(2θ) = cos²(θ) − sen²(θ)</span>
+            <span className={styles.identidadValor}>{formatNum(doble.cos2)}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.identidadCard}>
+        <div className={styles.identidadTitulo}>Suma y resta de ángulos (A = θ, B = {ANGULO_B}°)</div>
+        <div className={styles.identidadLista}>
+          <div className={styles.identidadItem}>
+            <span className={styles.identidadLabel}>sen(A+B) = sen A·cos B + cos A·sen B</span>
+            <span className={styles.identidadValor}>{formatNum(suRe.senSuma)}</span>
+          </div>
+          <div className={styles.identidadItem}>
+            <span className={styles.identidadLabel}>cos(A−B) = cos A·cos B + sen A·sen B</span>
+            <span className={styles.identidadValor}>{formatNum(suRe.cosResta)}</span>
           </div>
         </div>
       </div>
@@ -465,16 +496,13 @@ export default function VisualizadorTrigonometria() {
     };
   }, []);
 
-  const rad = degToRad(estadoCirculo.angulo);
-  const sinActual = Math.sin(rad);
-  const cosActual = Math.cos(rad);
-  const tanActual = Math.tan(rad);
+  const { sen: sinActual, cos: cosActual, tan: tanActual } = razones(estadoCirculo.angulo);
 
-  const TABS: { id: TabActiva; label: string }[] = [
-    { id: 'identidades', label: '🔗 Identidades' },
-    { id: 'tabla', label: '📋 Tabla de Valores' },
-    { id: 'grafica', label: '📈 Gráficas' },
-    { id: 'circulo', label: '📐 Círculo Unitario' },
+  const TABS: { id: TabActiva; icono: string; label: string }[] = [
+    { id: 'identidades', icono: '🔗', label: 'Identidades' },
+    { id: 'tabla', icono: '📋', label: 'Tabla de Valores' },
+    { id: 'grafica', icono: '📈', label: 'Gráficas' },
+    { id: 'circulo', icono: '📐', label: 'Círculo Unitario' },
   ];
 
   return (
@@ -500,14 +528,13 @@ export default function VisualizadorTrigonometria() {
             onClick={() => setTabActiva(tab.id)}
             aria-pressed={tabActiva === tab.id}
           >
-            {tab.label}
+            <span aria-hidden="true">{tab.icono}</span> {tab.label}
           </button>
         ))}
       </nav>
 
       {/* ===== TAB: CÍRCULO UNITARIO ===== */}
-      {tabActiva === 'circulo' && (
-        <section className={styles.seccion}>
+      <section className={styles.seccion} hidden={tabActiva !== 'circulo'}>
           <h2 className={styles.seccionTitulo}>Círculo Unitario</h2>
           <div className={styles.circuloLayout}>
             <div className={styles.circuloPanel}>
@@ -520,7 +547,7 @@ export default function VisualizadorTrigonometria() {
               <div className={styles.sliderGroup}>
                 <label className={styles.sliderLabel} htmlFor="slider-angulo">
                   Ángulo θ: <strong>{estadoCirculo.angulo}°</strong>
-                  <span className={styles.radLabel}> ({(degToRad(estadoCirculo.angulo)).toFixed(3)} rad)</span>
+                  <span className={styles.radLabel}> ({formatear(degToRad(estadoCirculo.angulo), 3)} rad)</span>
                 </label>
                 <input
                   id="slider-angulo"
@@ -553,7 +580,7 @@ export default function VisualizadorTrigonometria() {
                 onClick={toggleAnimacion}
                 aria-pressed={animando}
               >
-                {animando ? '⏸ Pausar' : '▶ Animar'}
+                <span aria-hidden="true">{animando ? '⏸' : '▶'}</span> {animando ? 'Pausar' : 'Animar'}
               </button>
             </div>
 
@@ -561,23 +588,22 @@ export default function VisualizadorTrigonometria() {
             <div className={styles.valoresPanel} role="status" aria-live="polite" aria-atomic="true">
               <h3 className={styles.valoresTitulo}>Valores en θ = {estadoCirculo.angulo}°</h3>
               <div className={styles.valoresGrid}>
-                <div className={styles.valorCard} style={{ borderColor: '#2E86AB' }}>
+                <div className={`${styles.valorCard} ${styles.valorSen}`}>
                   <div className={styles.valorNombre}>sen(θ)</div>
-                  <div className={styles.valorNumero} style={{ color: '#2E86AB' }}>{formatNum(sinActual)}</div>
+                  <div className={styles.valorNumero}>{formatNum(sinActual)}</div>
                 </div>
-                <div className={styles.valorCard} style={{ borderColor: '#48A9A6' }}>
+                <div className={`${styles.valorCard} ${styles.valorCos}`}>
                   <div className={styles.valorNombre}>cos(θ)</div>
-                  <div className={styles.valorNumero} style={{ color: '#48A9A6' }}>{formatNum(cosActual)}</div>
+                  <div className={styles.valorNumero}>{formatNum(cosActual)}</div>
                 </div>
-                <div className={styles.valorCard} style={{ borderColor: '#E8A838' }}>
+                <div className={`${styles.valorCard} ${styles.valorTan}`}>
                   <div className={styles.valorNombre}>tan(θ)</div>
-                  <div className={styles.valorNumero} style={{ color: '#E8A838' }}>
-                    {isFinite(tanActual) ? formatNum(tanActual) : '∞'}
-                  </div>
+                  {/* En 90° y 270° cos θ = 0: la tangente NO está definida (ni es «∞»). */}
+                  <div className={styles.valorNumero}>{formatNum(tanActual)}</div>
                 </div>
-                <div className={styles.valorCard} style={{ borderColor: '#7FB3D3' }}>
+                <div className={`${styles.valorCard} ${styles.valorSuma}`}>
                   <div className={styles.valorNombre}>sen²+cos²</div>
-                  <div className={styles.valorNumero} style={{ color: '#7FB3D3' }}>
+                  <div className={styles.valorNumero}>
                     {formatNum(sinActual ** 2 + cosActual ** 2)}
                   </div>
                 </div>
@@ -618,11 +644,9 @@ export default function VisualizadorTrigonometria() {
             </div>
           </div>
         </section>
-      )}
 
       {/* ===== TAB: GRÁFICA ===== */}
-      {tabActiva === 'grafica' && (
-        <section className={styles.seccion}>
+      <section className={styles.seccion} hidden={tabActiva !== 'grafica'}>
           <h2 className={styles.seccionTitulo}>Gráficas Trigonométricas</h2>
           <div className={styles.graficaLayout}>
             <div className={styles.graficaPanel}>
@@ -649,7 +673,7 @@ export default function VisualizadorTrigonometria() {
             <div className={styles.slidersPanel}>
               <div className={styles.sliderGroup}>
                 <label className={styles.sliderLabel} htmlFor="slider-amplitud">
-                  Amplitud (A): <strong>{estadoGrafica.amplitud.toFixed(1)}</strong>
+                  Amplitud (A): <strong>{formatear(estadoGrafica.amplitud, 1)}</strong>
                 </label>
                 <input
                   id="slider-amplitud"
@@ -665,7 +689,7 @@ export default function VisualizadorTrigonometria() {
 
               <div className={styles.sliderGroup}>
                 <label className={styles.sliderLabel} htmlFor="slider-frecuencia">
-                  Frecuencia (ω): <strong>{estadoGrafica.frecuencia.toFixed(1)}</strong>
+                  Frecuencia (ω): <strong>{formatear(estadoGrafica.frecuencia, 1)}</strong>
                 </label>
                 <input
                   id="slider-frecuencia"
@@ -681,7 +705,7 @@ export default function VisualizadorTrigonometria() {
 
               <div className={styles.sliderGroup}>
                 <label className={styles.sliderLabel} htmlFor="slider-fase">
-                  Fase (φ): <strong>{estadoGrafica.fase.toFixed(2)} rad</strong>
+                  Fase (φ): <strong>{formatear(estadoGrafica.fase, 2)} rad</strong>
                 </label>
                 <input
                   id="slider-fase"
@@ -713,7 +737,7 @@ export default function VisualizadorTrigonometria() {
 
               <div className={styles.formulaBox} role="status" aria-live="polite" aria-atomic="true">
                 <span className={styles.formulaText}>
-                  f(x) = {estadoGrafica.amplitud.toFixed(1)} · {estadoGrafica.funcion === 'sin' ? 'sen' : estadoGrafica.funcion}({estadoGrafica.frecuencia.toFixed(1)}x + {estadoGrafica.fase.toFixed(2)})
+                  f(x) = {formatear(estadoGrafica.amplitud, 1)} · {estadoGrafica.funcion === 'sin' ? 'sen' : estadoGrafica.funcion}({formatear(estadoGrafica.frecuencia, 1)}x + {formatear(estadoGrafica.fase, 2)})
                 </span>
               </div>
 
@@ -723,16 +747,14 @@ export default function VisualizadorTrigonometria() {
                 onClick={toggleAnimacion}
                 aria-pressed={animando}
               >
-                {animando ? '⏸ Pausar θ' : '▶ Animar θ'}
+                <span aria-hidden="true">{animando ? '⏸' : '▶'}</span> {animando ? 'Pausar θ' : 'Animar θ'}
               </button>
             </div>
           </div>
         </section>
-      )}
 
       {/* ===== TAB: TABLA ===== */}
-      {tabActiva === 'tabla' && (
-        <section className={styles.seccion}>
+      <section className={styles.seccion} hidden={tabActiva !== 'tabla'}>
           <h2 className={styles.seccionTitulo}>Tabla de Valores Exactos</h2>
           <p className={styles.tablaDesc}>
             Valores exactos en ángulos notables — expresados con radicales.
@@ -744,11 +766,9 @@ export default function VisualizadorTrigonometria() {
             <div className={styles.leyendaItem}><span className={styles.dotTan} /> Tangente</div>
           </div>
         </section>
-      )}
 
       {/* ===== TAB: IDENTIDADES ===== */}
-      {tabActiva === 'identidades' && (
-        <section className={styles.seccion}>
+      <section className={styles.seccion} hidden={tabActiva !== 'identidades'}>
           <h2 className={styles.seccionTitulo}>Identidades Trigonométricas</h2>
           <p className={styles.tablaDesc}>
             Observa cómo sen²(θ) + cos²(θ) = 1 siempre se cumple — mueve el ángulo para verlo.
@@ -776,7 +796,7 @@ export default function VisualizadorTrigonometria() {
                 />
               </div>
               <button type="button" className={styles.btnAnimacion} onClick={toggleAnimacion} aria-pressed={animando}>
-                {animando ? '⏸ Pausar' : '▶ Animar'}
+                <span aria-hidden="true">{animando ? '⏸' : '▶'}</span> {animando ? 'Pausar' : 'Animar'}
               </button>
             </div>
 
@@ -785,7 +805,6 @@ export default function VisualizadorTrigonometria() {
             </div>
           </div>
         </section>
-      )}
 
       {/* ===== SECCIÓN EDUCATIVA ===== */}
       <EducationalSection title="¿Qué es la trigonometría y por qué importa?" subtitle="Del círculo unitario a las ondas, la arquitectura y la navegación">
@@ -839,42 +858,42 @@ export default function VisualizadorTrigonometria() {
               <tr>
                 <td><strong>sen(θ)</strong></td>
                 <td>Proyección vertical en el círculo unitario</td>
-                <td>[-1, 1]</td>
+                <td>[−1, 1]</td>
                 <td>2π</td>
                 <td>Ninguna</td>
               </tr>
               <tr>
                 <td><strong>cos(θ)</strong></td>
                 <td>Proyección horizontal en el círculo unitario</td>
-                <td>[-1, 1]</td>
+                <td>[−1, 1]</td>
                 <td>2π</td>
                 <td>Ninguna</td>
               </tr>
               <tr>
                 <td><strong>tan(θ)</strong></td>
                 <td>sen(θ)/cos(θ) — pendiente de la línea</td>
-                <td>(-∞, +∞)</td>
+                <td>(−∞, +∞)</td>
                 <td>π</td>
                 <td>θ = π/2 + nπ</td>
               </tr>
               <tr>
                 <td><strong>csc(θ)</strong></td>
                 <td>1/sen(θ)</td>
-                <td>(-∞,-1]∪[1,+∞)</td>
+                <td>(−∞, −1] ∪ [1, +∞)</td>
                 <td>2π</td>
                 <td>θ = nπ</td>
               </tr>
               <tr>
                 <td><strong>sec(θ)</strong></td>
                 <td>1/cos(θ)</td>
-                <td>(-∞,-1]∪[1,+∞)</td>
+                <td>(−∞, −1] ∪ [1, +∞)</td>
                 <td>2π</td>
                 <td>θ = π/2 + nπ</td>
               </tr>
               <tr>
                 <td><strong>cot(θ)</strong></td>
                 <td>cos(θ)/sen(θ)</td>
-                <td>(-∞, +∞)</td>
+                <td>(−∞, +∞)</td>
                 <td>π</td>
                 <td>θ = nπ</td>
               </tr>
@@ -945,7 +964,7 @@ export default function VisualizadorTrigonometria() {
           <div className={styles.faqItem}>
             <h4>¿Por qué la tangente no está definida en 90° y 270°?</h4>
             <p>La tangente es sen(θ)/cos(θ). En 90° y 270°, el coseno es exactamente 0, lo que haría una división por cero. Por eso la tangente tiene asíntotas verticales en esos puntos.</p>
-            <p className={styles.faqTip}>En la pestaña Círculo Unitario, arrastra el ángulo a 90°: verás que la tangente muestra "∞".</p>
+            <p className={styles.faqTip}>En la pestaña Círculo Unitario, arrastra el ángulo a 90°: verás que la tarjeta de la tangente dice «no definida»: no es un número, tampoco infinito.</p>
           </div>
           <div className={styles.faqItem}>
             <h4>¿Para qué sirve el ángulo de fase en una onda?</h4>
@@ -1031,11 +1050,11 @@ export default function VisualizadorTrigonometria() {
             <h3>Errores Comunes en Trigonometría</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ Confundir grados con radianes:</strong> sin(90) ≠ sin(π/2) en la mayoría de calculadoras. Verifica siempre el modo antes de calcular.</li>
-            <li><strong>❌ Pensar que tan(90°) = infinito exacto:</strong> La tangente no está definida en 90°, no es un número real. Es una asíntota vertical.</li>
-            <li><strong>❌ Memorizar sin entender:</strong> Los ángulos notables se derivan del triángulo equilátero (60°) y el isósceles rectángulo (45°). No hace falta memorización bruta.</li>
-            <li><strong>❌ Olvidar el signo según el cuadrante:</strong> En el tercer cuadrante, seno y coseno son negativos, pero tangente es positiva. Usa la regla CAST (o ASCT).</li>
-            <li><strong>❌ Confundir amplitud con frecuencia:</strong> La amplitud cambia la altura de la onda; la frecuencia cambia cuántas "crestas" hay por unidad. Son independientes.</li>
+            <li><strong><span aria-hidden="true">❌</span> Confundir grados con radianes:</strong> sin(90) ≠ sin(π/2) en la mayoría de calculadoras. Verifica siempre el modo antes de calcular.</li>
+            <li><strong><span aria-hidden="true">❌</span> Pensar que tan(90°) = infinito exacto:</strong> La tangente no está definida en 90°, no es un número real. Es una asíntota vertical.</li>
+            <li><strong><span aria-hidden="true">❌</span> Memorizar sin entender:</strong> Los ángulos notables se derivan del triángulo equilátero (60°) y el isósceles rectángulo (45°). No hace falta memorización bruta.</li>
+            <li><strong><span aria-hidden="true">❌</span> Olvidar el signo según el cuadrante:</strong> En el tercer cuadrante, seno y coseno son negativos, pero tangente es positiva. Usa la regla CAST (o ASCT).</li>
+            <li><strong><span aria-hidden="true">❌</span> Confundir amplitud con frecuencia:</strong> La amplitud cambia la altura de la onda; la frecuencia cambia cuántas "crestas" hay por unidad. Son independientes.</li>
           </ul>
         </div>
       </EducationalSection>

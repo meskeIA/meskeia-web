@@ -5,6 +5,14 @@
 
 /* ── Contenedor principal ── */
 .container {
+  /* Colores de cada razón como TEXTO (hallazgo 1908): los literales #48A9A6, #E8A838 y
+     #7FB3D3 daban 2,80, 2,08 y 2,26:1 sobre blanco. Medidos: tan #8F5600 6,00:1 sobre
+     blanco; en oscuro #F0B45A 7,46:1 sobre la tarjeta #2D2D2D; acento #3D6A87 5,82:1 y
+     #9CC6E0 7,59:1. Seno y coseno usan los tokens -texto de la marca. */
+  --trig-sen: var(--primary-texto);
+  --trig-cos: var(--secondary-texto);
+  --trig-tan: #8F5600;
+  --trig-acento: #3D6A87;
   min-height: 100vh;
   background-color: var(--bg-primary);
   color: var(--text-primary);
@@ -57,19 +65,18 @@
 }
 
 .tab:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--primary-texto);
+  color: var(--primary-texto);
 }
 
-.tabActiva {
-  border-color: var(--primary);
-  background: var(--primary);
+/* El hover no puede ganar a la pestaña activa: la selectora doble tiene más especificidad
+   que .tab:hover y que su variante oscura (hallazgo 1912). */
+.tabActiva,
+.tab.tabActiva:hover {
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #ffffff;
   font-weight: 600;
-}
-
-.tabActiva:hover {
-  color: #ffffff;
 }
 
 /* ── Sección general ── */
@@ -159,6 +166,15 @@
   font-family: 'Courier New', monospace;
 }
 
+.valorSen { border-color: var(--trig-sen); }
+.valorSen .valorNumero { color: var(--trig-sen); }
+.valorCos { border-color: var(--trig-cos); }
+.valorCos .valorNumero { color: var(--trig-cos); }
+.valorTan { border-color: var(--trig-tan); }
+.valorTan .valorNumero { color: var(--trig-tan); }
+.valorSuma { border-color: var(--trig-acento); }
+.valorSuma .valorNumero { color: var(--trig-acento); }
+
 /* ── Cuadrante y notables ── */
 .cuadranteInfo {
   background: var(--bg-card);
@@ -203,14 +219,15 @@
 }
 
 .notableBtn:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--primary-texto);
+  color: var(--primary-texto);
 }
 
-.notableBtnActivo {
-  background: var(--primary);
+.notableBtnActivo,
+.notableBtn.notableBtnActivo:hover {
+  background: var(--primary-boton);
   color: #ffffff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* ── Sliders ── */
@@ -257,13 +274,13 @@
 }
 
 .markBtn:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ── Botón animación ── */
 .btnAnimacion {
   padding: 0.6rem 1.5rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -275,7 +292,7 @@
 }
 
 .btnAnimacion:hover {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .btnAnimacion:focus-visible {
@@ -347,7 +364,7 @@
 .formulaText {
   font-family: 'Courier New', monospace;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -397,23 +414,23 @@
 
 .tdDestacado {
   font-weight: 700;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
 }
 
 .tdSin {
-  color: #2E86AB;
+  color: var(--trig-sen);
   font-weight: 600;
   font-family: 'Courier New', monospace;
 }
 
 .tdCos {
-  color: #48A9A6;
+  color: var(--trig-cos);
   font-weight: 600;
   font-family: 'Courier New', monospace;
 }
 
 .tdTan {
-  color: #E8A838;
+  color: var(--trig-tan);
   font-weight: 600;
   font-family: 'Courier New', monospace;
 }
@@ -478,7 +495,7 @@
 .identidadFormula {
   font-family: 'Courier New', monospace;
   font-size: 1.15rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   margin-bottom: 0.75rem;
 }
@@ -544,7 +561,7 @@
 .identidadValor {
   font-family: 'Courier New', monospace;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Rectángulo identidad en SVG */
@@ -581,12 +598,12 @@
 }
 
 .valSin {
-  color: #2E86AB;
+  color: var(--trig-sen);
   font-weight: 600;
 }
 
 .valCos {
-  color: #48A9A6;
+  color: var(--trig-cos);
   font-weight: 600;
 }
 
@@ -678,7 +695,7 @@
 
 .escenarioTip {
   font-size: 0.875rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-top: 0.5rem;
 }
 
@@ -702,7 +719,7 @@
 }
 
 .faqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   margin: 0 0 0.5rem;
 }
@@ -716,7 +733,7 @@
 
 .faqTip {
   font-size: 0.8rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72,169,166,0.08);
   border-radius: 6px;
   padding: 0.5rem 0.75rem;
@@ -745,7 +762,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-weight: 700;
   display: flex;
@@ -861,6 +878,8 @@
    DARK MODE
    ====================================================== */
 [data-theme='dark'] .container {
+  --trig-tan: #F0B45A;
+  --trig-acento: #9CC6E0;
   background-color: var(--bg-primary);
   color: var(--text-primary);
 }
@@ -876,14 +895,15 @@
 }
 
 [data-theme='dark'] .tab:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--primary-texto);
+  color: var(--primary-texto);
 }
 
-[data-theme='dark'] .tabActiva {
-  background: var(--primary);
+[data-theme='dark'] .tabActiva,
+[data-theme='dark'] .tab.tabActiva:hover {
+  background: var(--primary-boton);
   color: #ffffff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 [data-theme='dark'] .svgCirculo {
@@ -911,10 +931,11 @@
   color: var(--text-secondary);
 }
 
-[data-theme='dark'] .notableBtnActivo {
-  background: var(--primary);
+[data-theme='dark'] .notableBtnActivo,
+[data-theme='dark'] .notableBtn.notableBtnActivo:hover {
+  background: var(--primary-boton);
   color: #ffffff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 [data-theme='dark'] .tablaWrapper {

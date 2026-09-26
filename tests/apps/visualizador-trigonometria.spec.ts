@@ -90,21 +90,37 @@ test.describe('Círculo unitario — razones en ángulos notables', () => {
   });
 
   test('90°: la tangente no está definida', async ({ page }) => {
-    // HALLAZGO ABIERTO (Inspector 25/09/2026, forma del 1778 de calculadora-trigonometria):
-    // page.tsx:471 publica Math.tan(π/2) = 16331239353195370 porque solo trata como
-    // indefinido lo que no es finito (l. 575). Hoy sale «16331239353195370,000».
-    // Quitar test.fail() cuando se repare.
-    test.fail();
+    // Hallazgo 1906 (REPARADO 26/09/2026): Math.tan(π/2) = 16331239353195370 salía como
+    // resultado. motor.ts reconoce los ángulos cuadrantales en GRADOS y devuelve tan = null.
+    // Se exige «no definida» y ya NO se admite «∞»: la propia página enseña que tan 90° no
+    // es infinito (hallazgo 1911).
     await sembrarValor(page, '#slider-angulo', 90);
-    await expect(tarjeta(page, 'tan(θ)')).toHaveText(/no definida|∞/i);
+    await expect(tarjeta(page, 'tan(θ)')).toHaveText('no definida');
   });
 
   test('270°: la tangente no está definida', async ({ page }) => {
-    // HALLAZGO ABIERTO (el mismo que el de 90°): Math.tan(3π/2) = 5443746451065123.
-    // Hoy sale «5443746451065123,000». Quitar test.fail() cuando se repare.
-    test.fail();
+    // Hallazgo 1906: Math.tan(3π/2) = 5443746451065123 salía como resultado.
     await sembrarValor(page, '#slider-angulo', 270);
-    await expect(tarjeta(page, 'tan(θ)')).toHaveText(/no definida|∞/i);
+    await expect(tarjeta(page, 'tan(θ)')).toHaveText('no definida');
+  });
+
+  test('los notables no arrastran ruido: 45° tan 1,000 · 135° tan −1,000 · 150° sen 0,500', async ({ page }) => {
+    // Math.tan(π/4) = 0,9999999999999999 y Math.sin(5π/6) = 0,49999999999999994: el motor
+    // los ajusta a 1 y ½. El signo es el menos tipográfico (U+2212).
+    await sembrarValor(page, '#slider-angulo', 135);
+    await expect(tarjeta(page, 'tan(θ)')).toHaveText('−1,000');
+    await sembrarValor(page, '#slider-angulo', 45);
+    await expect(tarjeta(page, 'tan(θ)')).toHaveText('1,000');
+    await sembrarValor(page, '#slider-angulo', 150);
+    await expect(tarjeta(page, 'sen(θ)')).toHaveText('0,500');
+    await expect(tarjeta(page, 'cos(θ)')).toHaveText('−0,866');
+  });
+
+  test('89°: tan 57,290, muy grande pero definida', async ({ page }) => {
+    // tan 89° = 57,28996 → 57,290. El criterio de «no definida» no se come los ángulos
+    // vecinos de la asíntota.
+    await sembrarValor(page, '#slider-angulo', 89);
+    await expect(tarjeta(page, 'tan(θ)')).toHaveText('57,290');
   });
 
   test('fuera de rango: el deslizador capa −30 a 0° y 400 a 360°', async ({ page }) => {
@@ -138,9 +154,7 @@ test.describe('Círculo unitario — razones en ángulos notables', () => {
   });
 
   test('los radianes se escriben con coma decimal', async ({ page }) => {
-    // HALLAZGO ABIERTO (Inspector 25/09/2026): page.tsx:523 presenta con toFixed(3) y sale
-    // «(0.524 rad)» con punto. Formato español obligatorio. Quitar test.fail() al repararlo.
-    test.fail();
+    // Hallazgo 1910 (REPARADO): salía «(0.524 rad)» con punto.
     await sembrarValor(page, '#slider-angulo', 30);
     await expect(page.locator('label[for="slider-angulo"]')).toContainText('0,524 rad');
   });
@@ -156,9 +170,10 @@ test.describe('Identidades — tan 90° no publica un número', () => {
         .locator('[class*="identidadItem"]')
         .filter({ has: page.getByText(rotulo, { exact: true }) })
         .locator('[class*="identidadValor"]');
-    // Aquí la vista sí se protege (|cos| > 0,001 → «∞», page.tsx:407 y :425).
-    await expect(valorDe('tan(θ) = sen(θ)/cos(θ)')).toHaveText(/∞|no definida/i);
-    await expect(valorDe('1 + tan²(θ) = sec²(θ)')).toHaveText(/∞|no definida/i);
+    // Hallazgo 1911 (REPARADO): aquí salía «∞», justo lo que el recuadro de errores comunes
+    // enseña a no pensar. sec 90° = 1/cos 90° tampoco está definida.
+    await expect(valorDe('tan(θ) = sen(θ)/cos(θ)')).toHaveText('no definida');
+    await expect(valorDe('1 + tan²(θ) = sec²(θ)')).toHaveText('no definida');
     // sen²(90°) + cos²(90°) = 1 + 0 = 1
     await expect(page.locator('[class*="identidadCalculo"] strong')).toHaveText('1,000');
   });
@@ -188,12 +203,8 @@ test.describe('Gráficas — marcador del ángulo θ sobre la curva', () => {
   });
 
   test('θ = 360°: el marcador va al extremo derecho (x = 2π), no al izquierdo', async ({ page }) => {
-    // HALLAZGO ABIERTO (Inspector 25/09/2026): page.tsx:271 coloca el marcador en
-    // θ mod 2π, así que 360° cae en x = 0 (cx 36) mientras su altura se calcula con
-    // cos(π) = −1: el punto queda en (36, 180) y la curva en x = 0 vale +1 (y = 20).
-    // Esperado cx 524. El defecto es de 488 px: la precisión 0 (±0,5 px) lo separa de sobra.
-    // Quitar test.fail() cuando se repare.
-    test.fail();
+    // Hallazgo 1909 (REPARADO): el marcador iba a θ mod 2π, así que 360° caía en x = 0
+    // (cx 36) con la altura de cos(π) = −1. Esperado cx 524: el defecto era de 488 px.
     const marcador = await prepararCoseno(page);
     await sembrarValor(page, '#slider-angulo-g', 360);
     expect(Number(await marcador.getAttribute('cy'))).toBeCloseTo(180, 1);
@@ -201,10 +212,7 @@ test.describe('Gráficas — marcador del ángulo θ sobre la curva', () => {
   });
 
   test('los parámetros y la fórmula se escriben con coma decimal', async ({ page }) => {
-    // HALLAZGO ABIERTO (Inspector 25/09/2026): page.tsx:652, 668, 684 y 716 usan toFixed y
-    // hoy se lee «Amplitud (A): 1.0» y «f(x) = 1.0 · sen(1.0x + 0.00)». Quitar test.fail()
-    // cuando se repare.
-    test.fail();
+    // Hallazgo 1910 (REPARADO): se leía «Amplitud (A): 1.0» y «f(x) = 1.0 · sen(1.0x + 0.00)».
     await page.goto(URL_APP);
     await esperarHidratacion(page, ['#slider-angulo-i']);
     await page.getByRole('button', { name: /Gráficas/ }).click();
@@ -216,5 +224,145 @@ test.describe('Gráficas — marcador del ángulo θ sobre la curva', () => {
       (await page.locator('[class*="formulaText"]').textContent()) ?? '',
     ];
     for (const t of textos) expect(t, `punto decimal en «${t}»`).not.toMatch(/\d\.\d/);
+    await expect(page.locator('[class*="formulaText"]')).toHaveText('f(x) = 1,0 · sen(1,0x + 0,00)');
+    // Eje Y: «1,0» y «−1,0» con el signo menos tipográfico, no «-1.0».
+    const ejeY = await page.locator('svg[aria-label^="Gráfica"] text').allTextContents();
+    expect(ejeY).toContain('1,0');
+    expect(ejeY).toContain('−1,0');
   });
+});
+
+test.describe('Identidades — ángulo doble y suma/resta (hallazgo 1907)', () => {
+  // La description prometía «ángulo doble, suma y resta» y la página no tenía ninguna.
+  // A mano, con B = 30°:
+  //   θ = 30° → sen 60° = 2·½·√3/2 = 0,866 · cos 60° = ¾ − ¼ = 0,500
+  //             sen(30° + 30°) = sen 60° = 0,866 · cos(30° − 30°) = cos 0° = 1,000
+  //   θ = 90° → sen 180° = 2·1·0 = 0,000 · cos 180° = 0 − 1 = −1,000
+  //             sen 120° = 1·√3/2 + 0·½ = 0,866 · cos 60° = 0·√3/2 + 1·½ = 0,500
+  const valorDe = (page: Page, rotulo: string): Locator =>
+    page
+      .locator('[class*="identidadItem"]')
+      .filter({ has: page.getByText(rotulo, { exact: true }) })
+      .locator('[class*="identidadValor"]');
+
+  test('θ = 30° y θ = 90°: valores resueltos a mano', async ({ page }) => {
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, ['#slider-angulo-i']);
+    await sembrarValor(page, '#slider-angulo-i', 30);
+    await expect(valorDe(page, 'sen(2θ) = 2·sen(θ)·cos(θ)')).toHaveText('0,866');
+    await expect(valorDe(page, 'cos(2θ) = cos²(θ) − sen²(θ)')).toHaveText('0,500');
+    await expect(valorDe(page, 'sen(A+B) = sen A·cos B + cos A·sen B')).toHaveText('0,866');
+    await expect(valorDe(page, 'cos(A−B) = cos A·cos B + sen A·sen B')).toHaveText('1,000');
+    await sembrarValor(page, '#slider-angulo-i', 90);
+    await expect(valorDe(page, 'sen(2θ) = 2·sen(θ)·cos(θ)')).toHaveText('0,000');
+    await expect(valorDe(page, 'cos(2θ) = cos²(θ) − sen²(θ)')).toHaveText('−1,000');
+    await expect(valorDe(page, 'sen(A+B) = sen A·cos B + cos A·sen B')).toHaveText('0,866');
+    await expect(valorDe(page, 'cos(A−B) = cos A·cos B + sen A·sen B')).toHaveText('0,500');
+  });
+});
+
+test.describe('Coherencia y contenido servido', () => {
+  test('la tabla dice «no definida» en tan 90°, como el recuadro de errores (hallazgo 1911)', async ({ page }) => {
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, ['#slider-angulo-i']);
+    await page.getByRole('button', { name: /Tabla de Valores/ }).click();
+    const fila = page.locator('table tr').filter({ has: page.getByRole('cell', { name: '90°', exact: true }) });
+    await expect(fila.locator('td').nth(4)).toHaveText('no definida');
+  });
+
+  test('el HTML servido ya trae la tabla de valores exactos (hallazgo 1915)', async ({ request }) => {
+    // Antes solo la pestaña activa llegaba al DOM; ahora las cuatro se sirven y las
+    // inactivas van con `hidden`.
+    const html = await (await request.get(URL_APP)).text();
+    expect(html).toContain('√3/3');
+    expect(html).toContain('π/6');
+    expect(html).toContain('Tabla de Valores Exactos');
+  });
+
+  test('el dibujo del círculo escribe «sen=», no «sin=» (hallazgo 1914)', async ({ page }) => {
+    await abrirCirculo(page);
+    await sembrarValor(page, '#slider-angulo', 30);
+    const rotulos = await page
+      .locator('svg[aria-label="Círculo unitario interactivo"]')
+      .first()
+      .locator('text')
+      .allTextContents();
+    expect(rotulos.some((t) => t.startsWith('sin='))).toBe(false);
+    expect(rotulos).toContain('sen=0,500');
+  });
+
+  test('los emojis de pestañas y botones no forman parte del nombre accesible (hallazgo 1913)', async ({ page }) => {
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, ['#slider-angulo-i']);
+    await expect(page.getByRole('button', { name: 'Identidades', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Animar', exact: true })).toBeVisible();
+  });
+});
+
+test.describe('Contraste (hallazgos 1908 y 1912)', () => {
+  /** Contraste WCAG de `propiedad` (color o fill) sobre el fondo real compuesto. */
+  async function contrasteDe(elemento: Locator, propiedad: 'color' | 'fill' = 'color'): Promise<number> {
+    return elemento.evaluate((el, prop) => {
+      const aRgba = (c: string): number[] => {
+        const m = c.match(/rgba?\(([^)]+)\)/);
+        if (!m) return [255, 255, 255, 1];
+        const v = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+        return [v[0], v[1], v[2], v.length > 3 ? v[3] : 1];
+      };
+      const mezclar = (arriba: number[], abajo: number[]): number[] => [
+        arriba[0] * arriba[3] + abajo[0] * (1 - arriba[3]),
+        arriba[1] * arriba[3] + abajo[1] * (1 - arriba[3]),
+        arriba[2] * arriba[3] + abajo[2] * (1 - arriba[3]),
+        1,
+      ];
+      const capas: number[][] = [];
+      for (let n: Element | null = el; n; n = n.parentElement) {
+        const c = aRgba(getComputedStyle(n).backgroundColor);
+        if (c[3] > 0) {
+          capas.push(c);
+          if (c[3] >= 1) break;
+        }
+      }
+      let fondo = [255, 255, 255, 1];
+      for (let i = capas.length - 1; i >= 0; i--) fondo = mezclar(capas[i], fondo);
+      const estilo = getComputedStyle(el);
+      const texto = mezclar(aRgba(prop === 'fill' ? estilo.fill : estilo.color), fondo);
+      const lum = (c: number[]): number => {
+        const f = (x: number): number => {
+          const s = x / 255;
+          return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        };
+        return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+      };
+      const [a, b] = [lum(texto), lum(fondo)].sort((x, y) => y - x);
+      return (a + 0.05) / (b + 0.05);
+    }, propiedad);
+  }
+
+  // Se mide con expect.poll: el cambio de tema lleva una transición de color y la primera
+  // lectura puede caer a mitad de ella.
+  for (const tema of ['light', 'dark'] as const) {
+    test(`tema ${tema}: tarjetas, rótulos del dibujo y botones ≥ 4,5:1`, async ({ page }) => {
+      await abrirCirculo(page);
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
+      await sembrarValor(page, '#slider-angulo', 30);
+      for (const nombre of ['sen(θ)', 'cos(θ)', 'tan(θ)', 'sen²+cos²']) {
+        await expect.poll(() => contrasteDe(tarjeta(page, nombre)), { message: nombre }).toBeGreaterThanOrEqual(4.5);
+      }
+      const svg = page.locator('svg[aria-label="Círculo unitario interactivo"]').first();
+      for (const prefijo of ['sen=', 'cos=', 'tan=', '30°']) {
+        const rotulo = svg.locator('text').filter({ hasText: prefijo }).first();
+        await expect.poll(() => contrasteDe(rotulo, 'fill'), { message: prefijo }).toBeGreaterThanOrEqual(4.5);
+      }
+      await expect.poll(() => contrasteDe(page.getByRole('button', { name: 'Animar', exact: true }))).toBeGreaterThanOrEqual(4.5);
+      // Hallazgo 1912: el botón recién pulsado, con el puntero encima, sigue en blanco.
+      const boton30 = page.getByRole('button', { name: '30°', exact: true });
+      await boton30.click();
+      await boton30.hover();
+      await expect.poll(() => contrasteDe(boton30), { message: 'notable activo con hover' }).toBeGreaterThanOrEqual(4.5);
+      const pestana = page.getByRole('button', { name: 'Círculo Unitario', exact: true });
+      await pestana.hover();
+      await expect.poll(() => contrasteDe(pestana), { message: 'pestaña activa con hover' }).toBeGreaterThanOrEqual(4.5);
+    });
+  }
 });
