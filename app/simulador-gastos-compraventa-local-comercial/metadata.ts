@@ -4,12 +4,20 @@ import {
   ITP_CCAA,
   RANGO_AJD_OTROS,
   RANGO_ITP_OTROS,
+  BONIFICACION_CUOTA_CEUTA_MELILLA,
   CASOS_ESCRITURAR,
   preguntaEscriturar,
   respuestaEscriturar,
 } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
+
+/**
+ * El `%` separado de la cifra por un espacio DURO (CLAUDE.md global §2, desde el 25/09/2026):
+ * en la meta description y el JSON-LD iba pegado en 17 sitios (hallazgo 2202). El JSON-LD es lo
+ * que leen los asistentes de IA, y ahí la cifra se cita tal cual.
+ */
+const PCT = '\u00A0%';
 
 /** Los rangos que cita el JSON-LD se DERIVAN de la tabla: escritos a mano contradecían al
  *  panel, que muestra «AJD 0 %» en el País Vasco y el 0,25 % efectivo de Ceuta y Melilla
@@ -38,7 +46,7 @@ const AHORRO_MAX = formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANAN
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compraventa Local Comercial - IVA, ITP, Plusvalía e IRPF | meskeIA',
-  description: `Calcula los gastos de compra y venta de un local comercial en España. Si compras: IVA ${IVA_INMUEBLES_2025.local}% en obra nueva, ITP en segunda mano, renuncia a la exención de IVA (inversión del sujeto pasivo), AJD, notaría y registro. Si vendes: plusvalía municipal, IRPF de la ganancia y neto que recibes. Gratis y sin registro.`,
+  description: `Calcula los gastos de compra y venta de un local comercial en España. Si compras: IVA ${IVA_INMUEBLES_2025.local}${PCT} en obra nueva, ITP en segunda mano, renuncia a la exención de IVA (inversión del sujeto pasivo), AJD, notaría y registro. Si vendes: plusvalía municipal, IRPF de la ganancia y neto que recibes. Gratis y sin registro.`,
   keywords: 'simulador gastos compra local comercial, simulador gastos venta local comercial, calculadora gastos venta local comercial, gastos compraventa local, IVA local comercial, ITP local comercial, renuncia exencion IVA local, inversion sujeto pasivo local, plusvalia venta local comercial, irpf venta local, calculadora local comercial españa, escriturar local, cuanto cuesta escriturar',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -66,11 +74,11 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador Gastos Compraventa Local Comercial',
-  description: `Calculadora de gastos de compra y venta de local comercial en España. Para el comprador: IVA ${IVA_INMUEBLES_2025.local}% en obra nueva, ITP por comunidad autónoma en segunda mano, renuncia a la exención de IVA con inversión del sujeto pasivo, AJD, notaría y registro. Para el vendedor: plusvalía municipal, IRPF sobre la ganancia patrimonial (con corrección por amortizaciones si el local estuvo afecto a una actividad) y neto resultante.`,
+  description: `Calculadora de gastos de compra y venta de local comercial en España. Para el comprador: IVA ${IVA_INMUEBLES_2025.local}${PCT} en obra nueva, ITP por comunidad autónoma en segunda mano, renuncia a la exención de IVA con inversión del sujeto pasivo, AJD, notaría y registro. Para el vendedor: plusvalía municipal, IRPF sobre la ganancia patrimonial (con corrección por amortizaciones si el local estuvo afecto a una actividad o alquilado) y neto resultante.`,
   url: 'https://meskeia.com/simulador-gastos-compraventa-local-comercial/',
   category: 'FinanceApplication',
   features: [
-    `IVA ${IVA_INMUEBLES_2025.local}% en local comercial de nueva construcción`,
+    `IVA ${IVA_INMUEBLES_2025.local}${PCT} en local comercial de nueva construcción`,
     'ITP por comunidad autónoma en segunda mano',
     'Renuncia a la exención de IVA (inversión del sujeto pasivo)',
     'AJD (Actos Jurídicos Documentados)',
@@ -78,7 +86,7 @@ export const jsonLd = generateWebAppSchema({
     'Nota sobre deducibilidad del IVA para empresas y autónomos',
     'Vendedor: plusvalía municipal (IIVTNU) por método objetivo y real',
     'Vendedor: IRPF de la ganancia patrimonial y neto tras impuestos',
-    'Corrección del valor de adquisición por amortizaciones (local afecto a actividad)',
+    'Corrección del valor de adquisición por amortizaciones (local afecto a actividad o alquilado)',
     'Gratuito, sin registro, en español',
   ],
   keywords: ['gastos local comercial', 'IVA local comercial', 'ITP local comercial', 'renuncia exención IVA', 'gastos venta local comercial', 'plusvalía venta local', 'compraventa local', 'España'],
@@ -101,7 +109,7 @@ export const faqJsonLd = {
       name: '¿Qué impuesto se paga al comprar un local comercial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Depende del tipo de transmisión. Si el local es de nueva construcción y lo vende el promotor (primera entrega), se paga IVA al ${IVA_INMUEBLES_2025.local}% más AJD (del ${AJD_MIN}% al ${AJD_MAX}% según la comunidad autónoma). Si es una segunda transmisión, por regla general está exenta de IVA y se paga ITP al tipo general de la comunidad, que va del ${ITP_MIN}% al ${ITP_MAX}%. No coinciden IVA e ITP en la misma operación.`,
+        text: `Depende del tipo de transmisión. Si el local es de nueva construcción y lo vende el promotor (primera entrega), se paga IVA al ${IVA_INMUEBLES_2025.local}${PCT} más AJD (del ${AJD_MIN}${PCT} al ${AJD_MAX}${PCT} según la comunidad autónoma; en Ceuta y Melilla se paga la mitad, por la bonificación del ${formatNumber(BONIFICACION_CUOTA_CEUTA_MELILLA * 100, 0)}${PCT} de la cuota del art. 57 bis.1 TRLITPAJD). Si es una segunda transmisión, por regla general está exenta de IVA y se paga ITP al tipo general de la comunidad, que va del ${ITP_MIN}${PCT} al ${ITP_MAX}${PCT}. No coinciden IVA e ITP en la misma operación.`,
       },
     },
     {
@@ -109,7 +117,7 @@ export const faqJsonLd = {
       name: '¿Qué es la renuncia a la exención de IVA en la compra de un local?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `La segunda transmisión de un inmueble está exenta de IVA (artículo 20.Uno.22º de la Ley del IVA), por lo que tributa por ITP. Sin embargo, si comprador y vendedor son empresarios o profesionales con derecho a deducir el IVA, el vendedor puede renunciar a esa exención (artículo 20.Dos). Entonces la operación pasa a tributar por IVA al ${IVA_INMUEBLES_2025.local}% en lugar de ITP, con inversión del sujeto pasivo: es el comprador quien autoliquida y, si tiene derecho, deduce el IVA.`,
+        text: `La segunda transmisión de un inmueble está exenta de IVA (artículo 20.Uno.22º de la Ley del IVA), por lo que tributa por ITP. Sin embargo, si comprador y vendedor son empresarios o profesionales con derecho a deducir el IVA, el vendedor puede renunciar a esa exención (artículo 20.Dos). Entonces la operación pasa a tributar por IVA al ${IVA_INMUEBLES_2025.local}${PCT} en lugar de ITP, con inversión del sujeto pasivo: es el comprador quien autoliquida y, si tiene derecho, deduce el IVA.`,
       },
     },
     {
@@ -117,7 +125,7 @@ export const faqJsonLd = {
       name: '¿Cuándo conviene renunciar a la exención de IVA al comprar un local?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Interesa cuando el comprador es empresario o autónomo con derecho a deducir el IVA. El ITP es un coste no recuperable, mientras que el IVA autoliquidado por inversión del sujeto pasivo se deduce en la declaración trimestral (modelo 303), con un coste financiero cercano a cero. A cambio, la escritura tributa por AJD, que algunas comunidades aplican a un tipo incrementado cuando existe renuncia a la exención (en la Comunitat Valenciana, el ${AJD_RENUNCIA_VALENCIA}%).`,
+        text: `Interesa cuando el comprador es empresario o autónomo con derecho a deducir el IVA. El ITP es un coste no recuperable, mientras que el IVA autoliquidado por inversión del sujeto pasivo se deduce en la declaración trimestral (modelo 303), con un coste financiero cercano a cero. A cambio, la escritura tributa por AJD, que algunas comunidades aplican a un tipo incrementado cuando existe renuncia a la exención (en la Comunitat Valenciana, el ${AJD_RENUNCIA_VALENCIA}${PCT}).`,
       },
     },
     {
@@ -133,7 +141,7 @@ export const faqJsonLd = {
       name: '¿Qué gastos e impuestos paga el vendedor de un local comercial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El vendedor paga la plusvalía municipal (IIVTNU), porque el local está sobre suelo urbano, y tributa en el IRPF por la ganancia patrimonial en la base del ahorro (tipos del ${AHORRO_MIN}% al ${AHORRO_MAX}% en 2025). A diferencia de la vivienda habitual, no existe exención por reinversión ni por tener más de 65 años. Si el local estuvo afecto a una actividad económica, el valor de adquisición se minora en las amortizaciones deducidas, lo que aumenta la ganancia. A esto se suman la comisión de la inmobiliaria y la gestoría.`,
+        text: `El vendedor paga la plusvalía municipal (IIVTNU), porque el local está sobre suelo urbano, y tributa en el IRPF por la ganancia patrimonial en la base del ahorro (tipos del ${AHORRO_MIN}${PCT} al ${AHORRO_MAX}${PCT} en 2025). A diferencia de la vivienda habitual, no existe exención por reinversión ni por tener más de 65 años. Si el local estuvo afecto a una actividad económica o alquilado, el valor de adquisición se minora en las amortizaciones deducidas, o al menos en la mínima (art. 35.2 LIRPF y art. 40 de su Reglamento), lo que aumenta la ganancia. A esto se suman la comisión de la inmobiliaria y la gestoría.`,
       },
     },
     {
@@ -141,7 +149,7 @@ export const faqJsonLd = {
       name: '¿Qué tipo de ITP aplica a un local comercial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Los tipos reducidos de ITP por perfil del comprador (jóvenes, familias numerosas, discapacidad) son exclusivos de la vivienda habitual, así que un local comercial tributa por el tipo general de su comunidad autónoma, que va del ${ITP_MIN}% al ${ITP_MAX}%. Conviene mirar además la normativa autonómica: hay comunidades con tipos propios ligados a la ACTIVIDAD y no a la vivienda —Aragón, por ejemplo, aplica el 1% (0,75% en medio rural) a la adquisición de un inmueble para iniciar una actividad económica, art. 121-11—, que esta calculadora no aplica por depender de requisitos que no pregunta. Sobre el tipo general: el extremo alto no es un tipo plano, sino el último tramo de las comunidades que aplican una escala progresiva por valor del inmueble. Estos tipos pueden variar, por lo que conviene consultar la normativa vigente de cada comunidad.`,
+        text: `Los tipos reducidos de ITP por perfil del comprador (jóvenes, familias numerosas, discapacidad) son exclusivos de la vivienda habitual, así que un local comercial tributa por el tipo general de su comunidad autónoma, que va del ${ITP_MIN}${PCT} al ${ITP_MAX}${PCT}. Conviene mirar además la normativa autonómica: hay comunidades con tipos propios ligados a la ACTIVIDAD y no a la vivienda —Aragón, por ejemplo, aplica el 1${PCT} (0,75${PCT} en medio rural) a la adquisición de un inmueble para iniciar una actividad económica, art. 121-11—, que esta calculadora no aplica por depender de requisitos que no pregunta. Sobre el tipo general: el extremo alto no es un tipo plano, sino el último tramo de las comunidades que aplican una escala progresiva por valor del inmueble. Estos tipos pueden variar, por lo que conviene consultar la normativa vigente de cada comunidad.`,
       },
     },
   ],

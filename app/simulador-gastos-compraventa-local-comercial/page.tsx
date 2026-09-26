@@ -37,6 +37,7 @@ import {
   calcularNotario,
   estimarFacturaNotarial,
   calcularRegistro,
+  honorariosLlevanIVA,
   calcularPlusvaliaMunicipal,
   ENLACE_CATASTRO,
   TERRITORIOS_SIN_IVA,
@@ -87,6 +88,11 @@ interface ResultadosComprador {
    * el notario (RD 1426/1989, nº 2.1; hallazgo 1599), y la estimación solo cubre la parte reglada.
    */
   notariaLibre: boolean;
+  /**
+   * false en Canarias, Ceuta y Melilla: allí la factura de notaría y la de registro no llevan
+   * IVA sino IGIC o IPSI, que esta app no calcula (hallazgo 2214, motor reparado en 242fffcd).
+   */
+  honorariosConIVA: boolean;
   totalGastos: number;
   totalOperacion: number;
   ivaRecuperable: boolean; // true si el impuesto principal es IVA (deducible si el comprador es sujeto pasivo)
@@ -155,12 +161,35 @@ interface ResultadosVendedor {
   gestoriaLegible: boolean;
   gastosAdquisicionLegible: boolean;
   /**
-   * false cuando las amortizaciones no se pueden leer, y solo con el perfil «Local afecto a
-   * actividad», que es el único en el que el campo existe. Es el campo EXCLUSIVO de esta app
-   * y por eso la reparación en lote del clúster (`cfe091a7`) no lo vio: las otras seis
-   * hermanas no lo tienen (hueco A2 del testigo de familia).
+   * false cuando las amortizaciones no se pueden leer. Es el campo EXCLUSIVO de esta app y por
+   * eso la reparación en lote del clúster (`cfe091a7`) no lo vio: las otras seis hermanas no lo
+   * tienen (hueco A2 del testigo de familia). Desde el 26/09/2026 (hallazgo 2199) el campo
+   * existe en los dos perfiles: el local ALQUILADO por un particular también minora su valor de
+   * adquisición en las amortizaciones (art. 35.2 LIRPF; art. 40 RIRPF, al menos la mínima).
    */
   amortizacionesLegible: boolean;
+  /**
+   * El precio de compra original está escrito, se lee y es 0 (o negativo mientras el campo
+   * tiene el foco): no «falta», no vale, y se pide corregirlo (patrón 5, hallazgo 2200; es el
+   * 1799 de la referencia).
+   */
+  precioCompraNoValido: boolean;
+  /**
+   * Los gastos de la venta escritos, legibles e imposibles: una comisión por encima del 100 %
+   * del precio, una gestoría de la venta mayor que él, o las dos juntas por encima. El motor
+   * acotaba el valor de transmisión a 0 y fabricaba una pérdida compensable igual a todo el
+   * valor de adquisición, con el neto negativo como definitivo (patrón 5, hallazgo 2198). Cada
+   * entrada es el motivo, en minúscula; vacío si no es el caso.
+   */
+  gastosVentaImposibles: string[];
+  /** Lo que hay que corregir por esos gastos imposibles («corrige la comisión»…). */
+  corregirGastosVenta: string | null;
+  /**
+   * Con PÉRDIDA e importes ilegibles: ¿podría haber ganancia con algún valor de ellos? Se
+   * CALCULA (sondeo y, con el total catastral, la plusvalía a cero): la tarjeta prometía
+   * «(o puede haber ganancia)» aunque ni con plusvalía 0 la hubiera (hallazgo 2201).
+   */
+  puedeHaberGanancia: boolean;
   /**
    * false cuando el valor catastral total no se puede leer y hay plusvalía que comparar.
    * Sin él la plusvalía se liquida por el método objetivo aunque el real sea más barato, y
@@ -194,8 +223,13 @@ interface EntradaVendedor {
   comisionPct: number;
   gestoria: number;
   gastosAdquisicion: number;
-  /** 0 fuera del perfil «Local afecto a actividad» */
+  /** Las deducidas, con cualquiera de los dos perfiles (hallazgo 2199) */
   amortizaciones: number;
+  /**
+   * Solo para medir: la plusvalía que se da por buena en lugar de liquidarla. Con 0 dice si
+   * habría ganancia en el mejor caso del total catastral ilegible (hallazgo 2201).
+   */
+  plusvaliaForzada?: number;
 }
 
 /**
@@ -227,7 +261,7 @@ function calcularVendedor(e: EntradaVendedor) {
         valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
       })
     : null;
-  const plusvalia = resultadoPlusvalia ? resultadoPlusvalia.recomendado : 0;
+  const plusvalia = e.plusvaliaForzada ?? (resultadoPlusvalia ? resultadoPlusvalia.recomendado : 0);
 
   // Si el local estuvo afecto a actividad, la amortización deducida MINORA el valor de
   // adquisición (art. 40 RIRPF) y aumenta la ganancia; los impuestos y gastos de la
@@ -352,7 +386,22 @@ function enumerarEnEspanol(partes: string[]): string {
  * el País Vasco cobra el 7 % (hallazgo 1582); la bonificación de Ceuta y Melilla sale del motor.
  * Decisión común de la familia con nave, solar y terreno (24/09/2026).
  */
-const NOTA_DATOS = `El ITP de un local comercial va del ${formatTipoNominal(RANGO_ITP_OTROS.min)}% al ${formatTipoNominal(RANGO_ITP_OTROS.max)}% según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota se bonifica un ${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)} % (art. 57 bis TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
+/**
+ * El `%` va separado de la cifra por un espacio DURO (CLAUDE.md global §2, desde el 25/09/2026),
+ * para que no salte solo a la línea siguiente. Estaba pegado en 28 sitios del texto visible y en
+ * 17 del JSON-LD (hallazgo 2202, eco del 1800 de la referencia).
+ */
+const PCT = '\u00A0%';
+/** Un tipo o un porcentaje ya formateado, con su `%` separado por el espacio duro. */
+const conPct = (cifra: string): string => `${cifra}${PCT}`;
+/**
+ * Los textos que llegan escritos de data/ (la nota de cada comunidad, las de los sellos) traen el
+ * `%` pegado o con un espacio normal: se corrige al pintarlos, sin tocar los datos, que comparten
+ * otras apps. Es la misma función que la referencia (hallazgo 1800).
+ */
+const separarPorcentajes = (texto: string): string => texto.replace(/(\d)[ \u00A0]?%/g, `$1${PCT}`);
+
+const NOTA_DATOS = `El ITP de un local comercial va del ${conPct(formatTipoNominal(RANGO_ITP_OTROS.min))} al ${conPct(formatTipoNominal(RANGO_ITP_OTROS.max))} según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota se bonifica un ${conPct(formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100))} (art. 57 bis TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
 
 export default function SimuladorLocalComercialPage() {
   const [precioVenta, setPrecioVenta] = useState('');
@@ -464,10 +513,13 @@ export default function SimuladorLocalComercialPage() {
       ajd = 0;
     }
 
-    const notaria = estimarFacturaNotarial(precio);
+    // Con la comunidad: en Canarias, Ceuta y Melilla la factura va sin IVA (hallazgo 2214). Sin
+    // ella, el motor sumaba un 21 % de IVA que allí no existe: 150.000 € daban 217,94 € de
+    // registro «(IVA incluido)» en Canarias, en lugar de 180,11 € más un IGIC sin calcular.
+    const notaria = estimarFacturaNotarial(precio, ccaa);
 
     const notario = notaria.medio;
-    const registro = calcularRegistro(precio);
+    const registro = calcularRegistro(precio, ccaa);
 
     // Se suman las líneas YA redondeadas al céntimo, que es como las ve el usuario: el
     // total redondeaba la suma exacta y no cuadraba con el desglose de encima por un
@@ -488,6 +540,7 @@ export default function SimuladorLocalComercialPage() {
       gastosGestoria: gestoria,
       gestoriaLegible,
       notariaLibre: notariaDeLibreAcuerdo(precio),
+      honorariosConIVA: honorariosLlevanIVA(ccaa),
       totalGastos,
       totalOperacion: sumarLineasVisibles(precio, totalGastos),
       ivaRecuperable,
@@ -564,10 +617,13 @@ export default function SimuladorLocalComercialPage() {
     const gestoriaLegible = esLegible(gastosGestoriaVenta);
     const gastosAdquisicionLegible = esLegible(gastosAdquisicion);
     const valorTotalLegible = esLegible(valorCatastralTotal);
-    const afecto = perfilVendedor === 'afecto-actividad';
     // Ilegibles valían 0, y con ellas a 0 el valor de adquisición sube, la ganancia baja y el
     // neto se publicaba +4.200,00 € por encima del real como si fuera definitivo (hueco A2).
-    const amortizacionesLegible = !afecto || esLegible(amortizacionesAcumuladas);
+    // Con los dos perfiles: el local alquilado por un particular (perfil «no afecto», art. 27.2
+    // LIRPF) también las resta, art. 35.2 LIRPF (hallazgo 2199).
+    const amortizacionesLegible = esLegible(amortizacionesAcumuladas);
+    /** Escrito, legible y 0 o negativo: no falta, no vale (patrón 5, hallazgo 2200). */
+    const precioCompraNoValido = precioCompraOriginal.trim() !== '' && Number.isFinite(precioC) && precioC <= 0;
 
     const entrada: EntradaVendedor = {
       precioV,
@@ -579,8 +635,36 @@ export default function SimuladorLocalComercialPage() {
       comisionPct: Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100,
       gestoria: Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta)),
       gastosAdquisicion: Math.max(0, parseSpanishNumberOr(gastosAdquisicion)),
-      amortizaciones: afecto ? Math.max(0, parseSpanishNumberOr(amortizacionesAcumuladas)) : 0,
+      amortizaciones: Math.max(0, parseSpanishNumberOr(amortizacionesAcumuladas)),
     };
+
+    /**
+     * Patrón 5 en los gastos de la venta (hallazgo 2198, eco del 2186 de la referencia): una
+     * comisión por encima del 100 % o una gestoría mayor que el precio no se liquidan. El motor
+     * acota el valor de transmisión a 0 y fabricaba una «Pérdida patrimonial» igual a todo el
+     * valor de adquisición, «compensable», y «Vendes por debajo del valor de adquisición» con la
+     * venta por ENCIMA de ella. Juntas tampoco pueden pasar del precio: es el mismo recorte.
+     */
+    const comisionLeida = parseSpanishNumber(comisionInmobiliaria);
+    const comisionImposible = Number.isFinite(comisionLeida) && comisionLeida > 100;
+    const gestoriaImposible = entrada.gestoria > precioV;
+    const sumaImposible =
+      !comisionImposible && !gestoriaImposible && precioV * entrada.comisionPct + entrada.gestoria > precioV;
+    const gastosVentaImposibles = [
+      comisionImposible ? `la comisión no puede superar el 100${PCT} del precio de venta` : null,
+      gestoriaImposible ? 'la gestoría de la venta no puede superar el precio de venta' : null,
+      sumaImposible ? 'la comisión y la gestoría de la venta, juntas, no pueden superar el precio de venta' : null,
+    ].filter((x): x is string => x !== null);
+    const corregirGastosVenta =
+      comisionImposible && gestoriaImposible
+        ? 'corrige la comisión y la gestoría de la venta'
+        : comisionImposible
+          ? 'corrige la comisión'
+          : gestoriaImposible
+            ? 'corrige la gestoría de la venta'
+            : sumaImposible
+              ? 'corrige la comisión o la gestoría de la venta'
+              : null;
 
     /**
      * CASO 28 (hallazgo 1261): unas amortizaciones MAYORES que todo el coste de adquisición no
@@ -605,7 +689,9 @@ export default function SimuladorLocalComercialPage() {
         ? entrada.amortizaciones - precioC
         : 0;
     const r = calcularVendedor(entrada);
-    const irpfPublicable = r.hayDatosGanancia && !amortizacionesImposibles;
+    const irpfPublicable = r.hayDatosGanancia && !amortizacionesImposibles && gastosVentaImposibles.length === 0;
+    /** El IRPF no se liquida por un dato imposible (no porque falte): el neto que se mide es sin él. */
+    const irpfBloqueado = amortizacionesImposibles || gastosVentaImposibles.length > 0;
     const irpf = irpfPublicable ? r.irpf : 0;
     const totalGastos = irpfPublicable ? r.totalGastos : sumarLineasVisibles(r.plusvalia, r.comision, entrada.gestoria);
 
@@ -625,7 +711,7 @@ export default function SimuladorLocalComercialPage() {
       plusvaliaResuelta || valorSuelo > 0 || ilegibleTexto(valorCatastralSuelo) ? null : 'el valor catastral del suelo',
       plusvaliaResuelta || aniosDisponibles || aniosNegativo || ilegibleTexto(aniosPropiedad) ? null : 'los años de propiedad',
       faltanMeses ? 'los meses completos desde la compra' : null,
-      precioC > 0 || ilegibleTexto(precioCompraOriginal) ? null : 'el precio de compra original',
+      precioC > 0 || precioCompraNoValido || ilegibleTexto(precioCompraOriginal) ? null : 'el precio de compra original',
     ].filter((x): x is string => x !== null);
     const faltanIlegibles = [
       !plusvaliaResuelta && ilegibleTexto(valorCatastralSuelo) ? 'el valor catastral del suelo' : null,
@@ -637,6 +723,7 @@ export default function SimuladorLocalComercialPage() {
       faltanVacios.length > 0 ? faltaOFaltan(faltanVacios) : null,
       faltanIlegibles.length > 0 ? noSePudoLeer(faltanIlegibles) : null,
       aniosNegativos ? 'los años de propiedad no pueden ser negativos' : null,
+      precioCompraNoValido ? 'el precio de compra original tiene que ser mayor que 0' : null,
     ].filter((x): x is string => x !== null).join('; ');
 
     let metodoPlusvalia = `No calculada (${porQueNoSeCalcula})`;
@@ -650,7 +737,7 @@ export default function SimuladorLocalComercialPage() {
       const tipoMunicipal = `tipo municipal orientativo del ${formatNumber(
         PLUSVALIA_MUNICIPAL_META.tipoOrientativo,
         0
-      )} %`;
+      )}${PCT}`;
       metodoPlusvalia = rp.exento
         ? 'No sujeta (sin incremento de valor)'
         : rp.parCatastralImposible
@@ -721,6 +808,14 @@ export default function SimuladorLocalComercialPage() {
       pequeno: calcularVendedor(sd.pequeno),
       grande: calcularVendedor(sd.grande),
     }));
+    /**
+     * ¿Hay algún valor de los ilegibles con el que saldría ganancia? Los extremos del sondeo lo
+     * dicen para los importes; para el total catastral, el mejor caso es la plusvalía a cero,
+     * porque el total solo puede abaratarla (hallazgo 2201). Se calcula, no se razona.
+     */
+    const puedeHaberGanancia =
+      sondeadas.some((sd) => sd.pequeno.ganancia > 0 || sd.grande.ganancia > 0) ||
+      (!valorTotalLegible && valorSuelo > 0 && calcularVendedor({ ...entrada, plusvaliaForzada: 0 }).ganancia > 0);
     const veredictoDe = (cifra: (x: ReturnType<typeof calcularVendedor>) => number): Veredicto =>
       veredictoIlegibles(
         cifra(r),
@@ -764,9 +859,13 @@ export default function SimuladorLocalComercialPage() {
       netoVendedor: precioV - totalGastos,
       // Sin IRPF publicable (amortizaciones imposibles) el neto publicado es el que no lo lleva,
       // y la cuota y la ganancia no se enseñan: nada que sondear en ellas (hallazgo 1574).
-      veredictoNeto: veredictoDe((x) => (amortizacionesImposibles ? x.netoSinIrpf : x.neto)),
-      veredictoIrpf: amortizacionesImposibles ? { tipo: 'ninguno' } : veredictoDe((x) => x.irpf),
-      veredictoGanancia: amortizacionesImposibles ? { tipo: 'ninguno' } : veredictoDe((x) => x.ganancia),
+      veredictoNeto: veredictoDe((x) => (irpfBloqueado ? x.netoSinIrpf : x.neto)),
+      veredictoIrpf: irpfBloqueado ? { tipo: 'ninguno' } : veredictoDe((x) => x.irpf),
+      veredictoGanancia: irpfBloqueado ? { tipo: 'ninguno' } : veredictoDe((x) => x.ganancia),
+      precioCompraNoValido,
+      gastosVentaImposibles,
+      corregirGastosVenta,
+      puedeHaberGanancia,
     };
   }, [
     precioVenta, precioCompraOriginal, gastosAdquisicion, aniosPropiedad, mesesCompletos,
@@ -775,7 +874,9 @@ export default function SimuladorLocalComercialPage() {
     // vendedor (art. 35.1 LIRPF). El campo se separó el 20/08/2026 pero solo en el valor,
     // así que lo que el vendedor escribía no se recalculaba hasta tocar otro campo, y el
     // que lo despertaba era justo la gestoría del comprador (hallazgo 330, ALTO).
-    comisionInmobiliaria, gastosGestoriaVenta, perfilVendedor, amortizacionesAcumuladas,
+    // Sin perfilVendedor: desde el 26/09/2026 los dos perfiles restan las amortizaciones
+    // (hallazgo 2199), así que el perfil ya no mueve ninguna cifra.
+    comisionInmobiliaria, gastosGestoriaVenta, amortizacionesAcumuladas,
   ]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
@@ -808,7 +909,44 @@ export default function SimuladorLocalComercialPage() {
     !!resultadosComprador &&
     (resultadosComprador.impuestoNoCalculado ||
       !resultadosComprador.gestoriaLegible ||
-      resultadosComprador.notariaLibre);
+      resultadosComprador.notariaLibre ||
+      !resultadosComprador.honorariosConIVA);
+  /**
+   * «(IVA incluido)» en península y Baleares; donde rige el IGIC o el IPSI, «(sin IGIC)» o
+   * «(sin IPSI)», porque ese impuesto de la factura no se calcula (hallazgo 2214).
+   */
+  const rotuloHonorarios =
+    resultadosComprador && !resultadosComprador.honorariosConIVA && territorioActualSinIva
+      ? `(sin ${territorioActualSinIva.impuesto})`
+      : '(IVA incluido)';
+
+  /**
+   * El aviso del COSTE TOTAL parcial. Lo que falta por el IGIC/IPSI de la COMPRA puede ser cero
+   * (tipo cero del IGIC), así que ahí la dirección es «puede ser mayor», y la gestoría ilegible
+   * suma seguro («será mayor»). El IGIC/IPSI de las facturas de notaría y registro no puede ser
+   * cero: se dice aparte, y con dirección segura (hallazgo 2214).
+   */
+  const avisoCosteComprador = (() => {
+    if (!resultadosComprador) return '';
+    const faltan = [
+      resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
+      resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
+      resultadosComprador.notariaLibre
+        ? `la parte de la notaría que excede de ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)}, que es de libre acuerdo`
+        : null,
+    ].filter((x): x is string => x !== null);
+    const impuestoHonorarios =
+      !resultadosComprador.honorariosConIVA && territorioActualSinIva ? territorioActualSinIva.impuesto : null;
+    if (faltan.length === 0) {
+      return impuestoHonorarios
+        ? `No incluye el ${impuestoHonorarios} de las facturas de notaría y registro, que esta herramienta no calcula: el coste real es mayor que este`
+        : '';
+    }
+    const principal = `No incluye ${faltan.join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}`;
+    return impuestoHonorarios
+      ? `${principal}. Las facturas de notaría y registro llevan además ${impuestoHonorarios}, que esta herramienta no calcula, así que cuestan más de lo que se muestra`
+      : principal;
+  })();
   /** Años escritos que se leen como 0 (reventa antes del año): hay que preguntar los meses. */
   const aniosEnCero = (() => {
     const t = aniosPropiedad.trim();
@@ -826,7 +964,11 @@ export default function SimuladorLocalComercialPage() {
   const faltanEnElNeto = resultadosVendedor
     ? [
         resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
-        resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
+        // Con unos gastos de la venta imposibles el IRPF no «falta»: no se liquida con un dato
+        // que no vale, y el aviso lo dice aparte (hallazgo 2198).
+        resultadosVendedor.irpfCalculado || resultadosVendedor.gastosVentaImposibles.length > 0
+          ? null
+          : 'el IRPF de la ganancia',
       ].filter((x): x is string => x !== null)
     : [];
 
@@ -862,7 +1004,7 @@ export default function SimuladorLocalComercialPage() {
       const matiz =
         deducibles.length === 0 || tipoMarginalAhorro === null
           ? ''
-          : ` (${enumerar(deducibles)} ${deducibles.length > 1 ? 'rebajan' : 'rebaja'} también el IRPF al descontar${deducibles.length > 1 ? 'las' : 'la'}, hasta un ${formatNumber(tipoMarginalAhorro, 0)} % de su importe)`;
+          : ` (${enumerar(deducibles)} ${deducibles.length > 1 ? 'rebajan' : 'rebaja'} también el IRPF al descontar${deducibles.length > 1 ? 'las' : 'la'}, hasta un ${conPct(formatNumber(tipoMarginalAhorro, 0))} de su importe)`;
       const nombres = v.campos.map((c) =>
         c === 'las amortizaciones deducidas' ? 'el IRPF que añaden las amortizaciones deducidas' : c,
       );
@@ -888,6 +1030,8 @@ export default function SimuladorLocalComercialPage() {
           ...resultadosVendedor.camposVacios.filter((c) => c !== 'los meses completos desde la compra'),
           ...(resultadosVendedor.irpfCalculado ||
           resultadosVendedor.amortizacionesImposibles ||
+          resultadosVendedor.gastosVentaImposibles.length > 0 ||
+          resultadosVendedor.precioCompraNoValido ||
           resultadosVendedor.camposIlegibles.includes('el precio de compra original')
             ? []
             : ['el precio de compra original']),
@@ -906,7 +1050,14 @@ export default function SimuladorLocalComercialPage() {
     faltanEnElNeto.length > 0 ||
     avisoIlegiblesNeto !== null ||
     (resultadosVendedor?.camposIlegibles.length ?? 0) > 0 ||
-    (resultadosVendedor?.parCatastralImposible ?? false);
+    (resultadosVendedor?.parCatastralImposible ?? false) ||
+    (resultadosVendedor?.gastosVentaImposibles.length ?? 0) > 0;
+
+  /** Los motivos de unos gastos de la venta imposibles, en una frase («La comisión no puede…»). */
+  const motivoGastosVenta =
+    resultadosVendedor && resultadosVendedor.gastosVentaImposibles.length > 0
+      ? mayuscula(enumerar(resultadosVendedor.gastosVentaImposibles))
+      : null;
 
   /**
    * ¿La plusvalía FALTA mientras la ganancia sí se calcula? Al calcularse restará del valor de
@@ -949,7 +1100,7 @@ export default function SimuladorLocalComercialPage() {
       return `Sin cerrar: ${plusvaliaPendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y mueven la pérdida en sentidos contrarios. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
     }
     const mayorPerdida = v.tipo === 'menor';
-    const ilegible = `${mayuscula(noSePudoLeer(v.campos))}: la pérdida real ${v.seguro ? 'es' : 'puede ser'} ${mayorPerdida ? 'mayor' : 'menor'} que esta${mayorPerdida ? '' : ' (o puede haber ganancia)'}. ${escribelo(v.campos)} con coma decimal (1.234,56).`;
+    const ilegible = `${mayuscula(noSePudoLeer(v.campos))}: la pérdida real ${v.seguro ? 'es' : 'puede ser'} ${mayorPerdida ? 'mayor' : 'menor'} que esta${!mayorPerdida && resultadosVendedor?.puedeHaberGanancia ? ' (o puede haber ganancia)' : ''}. ${escribelo(v.campos)} con coma decimal (1.234,56).`;
     return plusvaliaPendiente ? `${frasePlusvalia}. ${ilegible}` : ilegible;
   };
 
@@ -1018,14 +1169,14 @@ export default function SimuladorLocalComercialPage() {
         fuente={PLUSVALIA_MUNICIPAL_META.baseNormativa}
         verificado={PLUSVALIA_MUNICIPAL_META.verificado}
         urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
-        nota={`${PLUSVALIA_MUNICIPAL_META.aviso} ${PLUSVALIA_MUNICIPAL_META.nota}`}
+        nota={separarPorcentajes(`${PLUSVALIA_MUNICIPAL_META.aviso} ${PLUSVALIA_MUNICIPAL_META.nota}`)}
       />
       <DataReference
         normativa={`IRPF de la ganancia ${GANANCIAS_PATRIMONIALES_META.vigencia} · lo que paga quien vende`}
         fuente={GANANCIAS_PATRIMONIALES_META.fuente}
         verificado={GANANCIAS_PATRIMONIALES_META.verificado}
         urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
-        nota={GANANCIAS_PATRIMONIALES_META.nota}
+        nota={separarPorcentajes(GANANCIAS_PATRIMONIALES_META.nota)}
       />
 
       {/* Aviso IVA deducible */}
@@ -1102,7 +1253,7 @@ export default function SimuladorLocalComercialPage() {
                     ? `No existe en el ${territorioActualSinIva?.impuesto ?? 'IPSI'}: paga ITP`
                     : territorioActualSinIva
                       ? `Paga ${territorioActualSinIva.impuesto} (ISP) + AJD`
-                      : `IVA ${formatNumber(IVA_LOCAL_COMERCIAL, 0)}% (ISP) + AJD`}
+                      : `IVA ${conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} (ISP) + AJD`}
                 </span>
               </button>
               <button
@@ -1116,7 +1267,7 @@ export default function SimuladorLocalComercialPage() {
                 <span className={styles.transmisionSub}>
                   {territorioActualSinIva
                     ? `Paga ${territorioActualSinIva.impuesto} + AJD`
-                    : `Paga IVA ${formatNumber(IVA_LOCAL_COMERCIAL, 0)}% + AJD`}
+                    : `Paga IVA ${conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} + AJD`}
                 </span>
               </button>
             </div>
@@ -1153,7 +1304,7 @@ export default function SimuladorLocalComercialPage() {
                       solo está verificado en Valencia (Ley 13/1997, art. 14.Dos: 2 %, hallazgo 1603),
                       y ahí el simulador lo aplica; en el resto usa el general y lo dice. */}
                   {ajdRenunciaPropio
-                    ? <>En {datosCcaaActual.nombre} es del {formatTipoNominal(ajdRenuncia.tipo)}%, y es el que aplica este simulador.</>
+                    ? <>En {datosCcaaActual.nombre} es del {conPct(formatTipoNominal(ajdRenuncia.tipo))}, y es el que aplica este simulador.</>
                     : <>Este simulador usa el AJD general de {datosCcaaActual.nombre}: si tu comunidad tiene un tipo propio para la renuncia, el coste real de AJD puede ser mayor.</>}
                 </>
               )}
@@ -1208,13 +1359,13 @@ export default function SimuladorLocalComercialPage() {
                 {/* Del motor, para un local y con el precio escrito: el País Vasco grava al 7 % lo
                     que no es vivienda, y Valencia pasa al 11 % por encima del millón (hallazgos
                     1581 y 1582). `datosCcaaActual.tipoGeneral` es el de la vivienda. */}
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(tipoGeneralITP(ccaa, OBJETO, precioLeido))}%</span>
+                <span className={styles.infoCcaaValue}>{conPct(formatTipoNominal(tipoGeneralITP(ccaa, OBJETO, precioLeido)))}</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
                 {/* El de un local (el País Vasco ya no sale a 0 %) y, con renuncia, el de la
                     renuncia donde está verificado (hallazgos 1583 y 1603). */}
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(ajdRenuncia.tipo)}%</span>
+                <span className={styles.infoCcaaValue}>{conPct(formatTipoNominal(ajdRenuncia.tipo))}</span>
               </div>
               <div className={styles.infoCcaaItem}>
 {/*
@@ -1232,7 +1383,7 @@ export default function SimuladorLocalComercialPage() {
                   {/* El sufijo «%» se quedó fuera del ternario al condicionar la línea por
                       territorio, y la casilla publicaba un «21» desnudo entre dos porcentajes
                       —«ITP General 9%» y «AJD 1,5%»— desde el 11/09 (hallazgo 1161). */}
-                  {TERRITORIOS_SIN_IVA[ccaa] ? 'No calculado' : `${formatTipoNominal(IVA_LOCAL_COMERCIAL)}%`}
+                  {TERRITORIOS_SIN_IVA[ccaa] ? 'No calculado' : conPct(formatTipoNominal(IVA_LOCAL_COMERCIAL))}
                 </span>
               </div>
             </div>
@@ -1258,7 +1409,7 @@ export default function SimuladorLocalComercialPage() {
             */}
             {datosCcaaActual.notas && (
               <p className={styles.infoCcaaNote}>
-                <strong>{datosCcaaActual.nombre}:</strong> {datosCcaaActual.notas}
+                <strong>{datosCcaaActual.nombre}:</strong> {separarPorcentajes(datosCcaaActual.notas)}
               </p>
             )}
           </div>
@@ -1323,7 +1474,7 @@ export default function SimuladorLocalComercialPage() {
                 title={
                   resultadosComprador.impuestoNoCalculado
                     ? resultadosComprador.tipoImpuesto
-                    : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`
+                    : `${resultadosComprador.tipoImpuesto} (${conPct(formatNumber(resultadosComprador.porcentajeImpuesto, 2))})`
                 }
                 value={
                   resultadosComprador.impuestoNoCalculado
@@ -1342,7 +1493,7 @@ export default function SimuladorLocalComercialPage() {
                       : resultadosComprador.ivaRecuperable
                         ? 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
                         : resultadosComprador.bonificado
-                          ? 'Tipo general con la bonificación del 50 % de la cuota ya aplicada (art. 57 bis.3.a TRLITPAJD)'
+                          ? `Tipo general con la bonificación del ${conPct(formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100))} de la cuota ya aplicada (art. 57 bis.3.a TRLITPAJD)`
                           : 'Tipo general — los locales no tienen los reducidos de vivienda, pero alguna comunidad sí tiene tipos ligados a la ACTIVIDAD'
                 }
               />
@@ -1353,13 +1504,13 @@ export default function SimuladorLocalComercialPage() {
                   // gradual se bonifica al 50 % (art. 57 bis.1 TRLITPAJD), así que el nominal
                   // se desmentía con el importe de al lado (hallazgo 619, ya reparado en la
                   // app hermana de la nave industrial como hallazgo 447).
-                  title={`AJD (${formatNumber((resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100, 2)}%)`}
+                  title={`AJD (${conPct(formatNumber((resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100, 2))})`}
                   value={formatCurrency(resultadosComprador.ajd)}
                   variant="warning"
                   icon="📄"
                   description={
                     resultadosComprador.bonificado
-                      ? 'Con la bonificación del 50 % de Ceuta y Melilla aplicada'
+                      ? `Con la bonificación del ${conPct(formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100))} de Ceuta y Melilla aplicada`
                       : esRenuncia
                         ? ajdRenunciaPropio
                           ? `Tipo propio de la renuncia a la exención del IVA en ${datosCcaaActual.nombre}`
@@ -1370,7 +1521,7 @@ export default function SimuladorLocalComercialPage() {
               )}
 
               <ResultCard
-                title="Gastos de notaría (IVA incluido)"
+                title={`Gastos de notaría ${rotuloHonorarios}`}
                 value={formatCurrency(resultadosComprador.gastosNotario)}
                 description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.${
                   resultadosComprador.notariaLibre
@@ -1382,7 +1533,7 @@ export default function SimuladorLocalComercialPage() {
               />
 
               <ResultCard
-                title="Registro de la Propiedad (IVA incluido)"
+                title={`Registro de la Propiedad ${rotuloHonorarios}`}
                 value={formatCurrency(resultadosComprador.gastosRegistro)}
                 variant="default"
                 icon="🏛️"
@@ -1424,7 +1575,7 @@ export default function SimuladorLocalComercialPage() {
                 icon="➕"
                 description={
                   [
-                    `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio de compra`,
+                    `${conPct(formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2))} sobre el precio de compra`,
                     resultadosComprador.impuestoNoCalculado
                       ? `SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
                       : null,
@@ -1432,6 +1583,9 @@ export default function SimuladorLocalComercialPage() {
                     // sin calcular, y en la misma dirección (hallazgo 1199).
                     resultadosComprador.gestoriaLegible ? null : 'SIN la gestoría, que no se ha podido leer',
                     resultadosComprador.notariaLibre ? 'SIN la parte de la notaría que es de libre acuerdo' : null,
+                    resultadosComprador.honorariosConIVA || !territorioActualSinIva
+                      ? null
+                      : `SIN el ${territorioActualSinIva.impuesto} de las facturas de notaría y registro`,
                   ]
                     .filter((x): x is string => x !== null)
                     .join(' — ')
@@ -1445,15 +1599,7 @@ export default function SimuladorLocalComercialPage() {
                 icon="💳"
                 description={
                   costeCompradorParcial
-                    ? `No incluye ${[
-                        resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
-                        resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
-                        resultadosComprador.notariaLibre
-                          ? `la parte de la notaría que excede de ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)}, que es de libre acuerdo`
-                          : null,
-                      ]
-                        .filter((x): x is string => x !== null)
-                        .join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}`
+                    ? avisoCosteComprador
                     : resultadosComprador.ivaRecuperable
                       ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
                       : 'Precio + todos los gastos de la operación'
@@ -1486,7 +1632,7 @@ export default function SimuladorLocalComercialPage() {
                   >
                     <span className={styles.transmisionIcon} aria-hidden="true">🙋</span>
                     <span>Local no afecto</span>
-                    <span className={styles.transmisionSub}>Patrimonio particular</span>
+                    <span className={styles.transmisionSub}>Patrimonio particular, vacío o alquilado</span>
                   </button>
                   <button
                     type="button"
@@ -1496,7 +1642,7 @@ export default function SimuladorLocalComercialPage() {
                   >
                     <span className={styles.transmisionIcon} aria-hidden="true">🏪</span>
                     <span>Local afecto a actividad</span>
-                    <span className={styles.transmisionSub}>Con amortizaciones</span>
+                    <span className={styles.transmisionSub}>Usado en tu negocio</span>
                   </button>
                 </div>
 
@@ -1518,16 +1664,23 @@ export default function SimuladorLocalComercialPage() {
                   min={0}
                 />
 
-                {perfilVendedor === 'afecto-actividad' && (
-                  <NumberInput
-                    value={amortizacionesAcumuladas}
-                    onChange={setAmortizacionesAcumuladas}
-                    label="Amortizaciones acumuladas deducidas (€)"
-                    placeholder="20000"
-                    helperText="Suma de la amortización deducida en tu actividad. Se resta del valor de adquisición y aumenta la ganancia."
-                    min={0}
-                  />
-                )}
+                {/* En los dos perfiles (hallazgo 2199): el local ALQUILADO por un particular no es
+                    actividad económica (art. 27.2 LIRPF) y cae en «no afecto», pero su valor de
+                    adquisición también se minora en las amortizaciones (art. 35.2 LIRPF; art. 40
+                    RIRPF, al menos la mínima). Solo lo mostraba el perfil «afecto», y el caso de
+                    uso más común de un local de inversión salía con el IRPF por debajo. */}
+                <NumberInput
+                  value={amortizacionesAcumuladas}
+                  onChange={setAmortizacionesAcumuladas}
+                  label="Amortizaciones acumuladas deducidas (€)"
+                  placeholder={perfilVendedor === 'afecto-actividad' ? '20000' : '0'}
+                  helperText={
+                    perfilVendedor === 'afecto-actividad'
+                      ? 'Suma de la amortización deducida en tu actividad (al menos la mínima, art. 40 RIRPF). Se resta del valor de adquisición y aumenta la ganancia.'
+                      : 'Si lo tuviste alquilado: la amortización que dedujiste de los alquileres (al menos la mínima, art. 40 RIRPF). Se resta del valor de adquisición (art. 35.2 LIRPF). Déjalo vacío si no lo alquilaste.'
+                  }
+                  min={0}
+                />
 
                 <NumberInput
                   value={aniosPropiedad}
@@ -1593,7 +1746,14 @@ export default function SimuladorLocalComercialPage() {
                   onChange={setComisionInmobiliaria}
                   label="Comisión de la inmobiliaria (%)"
                   placeholder="3"
-                  helperText="Habitual en locales: 3-5% del precio de venta"
+                  helperText={`Habitual en locales: del 3${PCT} al 5${PCT} del precio de venta`}
+                  // Por encima del 100 % no es una comisión: se avisa en el campo, sin reescribirlo
+                  // (el testigo exige que lo escrito sea lo que se calcula; hallazgo 2198).
+                  error={
+                    parseSpanishNumber(comisionInmobiliaria) > 100
+                      ? `La comisión no puede superar el 100${PCT} del precio de venta: revisa el porcentaje`
+                      : undefined
+                  }
                   min={0}
                 />
 
@@ -1603,6 +1763,11 @@ export default function SimuladorLocalComercialPage() {
                   label="Gestoría y certificados del vendedor (€)"
                   placeholder="0"
                   helperText="Solo lo que pagas TÚ al vender (certificado energético, gestoría propia). La gestoría del comprador no reduce tu ganancia: art. 35.1 LIRPF"
+                  error={
+                    resultadosVendedor && resultadosVendedor.gastosGestoria > resultadosVendedor.precioVenta
+                      ? 'La gestoría de la venta no puede superar el precio de venta: revisa el importe'
+                      : undefined
+                  }
                   min={0}
                 />
 
@@ -1689,20 +1854,25 @@ export default function SimuladorLocalComercialPage() {
                         // Sin la plusvalía calculada no puede decir que la resta: el motor la tomó
                         // como 0, y la ganancia y el IRPF de abajo son un máximo (patrón 2, 1570).
                         description={
-                          resultadosVendedor.comisionLegible && resultadosVendedor.gestoriaLegible
+                          (resultadosVendedor.comisionLegible && resultadosVendedor.gestoriaLegible
                             ? resultadosVendedor.plusvaliaCalculada
                               ? 'Precio de venta − comisión, gestoría y plusvalía municipal'
                               : 'Precio de venta − comisión y gestoría, sin la plusvalía municipal, que falta'
                             : `Precio de venta − ${resultadosVendedor.plusvaliaCalculada ? 'plusvalía municipal y ' : ''}los gastos que se leen${resultadosVendedor.plusvaliaCalculada ? '' : ' (sin la plusvalía municipal, que falta)'}: ${noSePudoLeer([
                                 ...(resultadosVendedor.comisionLegible ? [] : ['la comisión']),
                                 ...(resultadosVendedor.gestoriaLegible ? [] : ['la gestoría de la venta']),
-                              ])}`
+                              ])}`) +
+                          (motivoGastosVenta
+                            ? `. ${motivoGastosVenta}: con ese dato saldría negativo, y no se usa para calcular la ganancia`
+                            : '')
                         }
                       />
                     </>
                   ) : null}
 
-                  {resultadosVendedor.amortizacionesImposibles ? null : resultadosVendedor.sinGananciaNiPerdida ? (
+                  {/* Con unos gastos de la venta imposibles tampoco: el motor recorta el valor de
+                      transmisión a 0 y la «pérdida» saldría del recorte (hallazgo 2198). */}
+                  {resultadosVendedor.amortizacionesImposibles || motivoGastosVenta ? null : resultadosVendedor.sinGananciaNiPerdida ? (
                     /*
                       Ni ganancia ni pérdida: se vende EXACTAMENTE por el valor de adquisición.
                       Antes caía por la rama de la pérdida —`esPerdida` es `ganancia <= 0`— y la
@@ -1781,8 +1951,12 @@ export default function SimuladorLocalComercialPage() {
                     description={
                       resultadosVendedor.amortizacionesImposibles
                         ? `Sin calcular: las amortizaciones deducidas superan todo el coste de adquisición (${formatCurrency(resultadosVendedor.costeAdquisicion)}), y eso no puede ser porque solo se amortiza la construcción. Revisa el dato. Este impuesto NO está incluido en el neto de abajo.`
+                        : motivoGastosVenta
+                          ? `Sin calcular: ${motivoGastosVenta.charAt(0).toLowerCase()}${motivoGastosVenta.slice(1)}, y con ese dato el valor de transmisión saldría negativo. ${mayuscula(resultadosVendedor.corregirGastosVenta ?? '')}. Este impuesto NO está incluido en el neto de abajo.`
                         : !resultadosVendedor.irpfCalculado
-                          ? resultadosVendedor.camposIlegibles.includes('el precio de compra original')
+                          ? resultadosVendedor.precioCompraNoValido
+                            ? 'El precio de compra original tiene que ser mayor que 0: corrígelo. Este impuesto NO está incluido en el neto de abajo.'
+                            : resultadosVendedor.camposIlegibles.includes('el precio de compra original')
                             ? 'El precio de compra original no se ha podido leer: escríbelo con coma decimal (1.234,56). Este impuesto NO está incluido en el neto de abajo.'
                             : 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
                           : // Se dice aquí, donde se lee la cuota, y no solo en el neto; la
@@ -1793,7 +1967,7 @@ export default function SimuladorLocalComercialPage() {
                               ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
                               : resultadosVendedor.gananciaPatrimonial === 0
                                 ? 'No hay ganancia que gravar, así que esta venta no tiene IRPF'
-                                : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${formatNumber(TIPO_AHORRO_MAX, 0)} %). Un local no tiene exención por reinversión ni por edad.`))
+                                : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${conPct(formatNumber(TIPO_AHORRO_MAX, 0))}). Un local no tiene exención por reinversión ni por edad.`))
                     }
                   />
 
@@ -1810,9 +1984,11 @@ export default function SimuladorLocalComercialPage() {
                     variant="default"
                     icon="🤝"
                     description={
-                      resultadosVendedor.comisionLegible
-                        ? undefined
-                        : 'El porcentaje escrito no se ha podido leer, así que NO está descontado del neto. Escríbelo con coma decimal (3,5).'
+                      !resultadosVendedor.comisionLegible
+                        ? 'El porcentaje escrito no se ha podido leer, así que NO está descontado del neto. Escríbelo con coma decimal (3,5).'
+                        : motivoGastosVenta
+                          ? `${motivoGastosVenta}: revisa el dato`
+                          : undefined
                     }
                   />
 
@@ -1826,11 +2002,12 @@ export default function SimuladorLocalComercialPage() {
                     variant="info"
                     icon="➖"
                     description={
-                      `${formatNumber((resultadosVendedor.totalGastos / resultadosVendedor.precioVenta) * 100, 2)}% sobre el precio de venta` +
+                      `${conPct(formatNumber((resultadosVendedor.totalGastos / resultadosVendedor.precioVenta) * 100, 2))} sobre el precio de venta` +
                       (faltanEnElNeto.length > 0
                         ? ` — SIN ${enumerarNi(faltanEnElNeto)}, que no se ${faltanEnElNeto.length > 1 ? 'incluyen' : 'incluye'}`
                         : '') +
-                      (avisoIlegiblesNeto ? ' — con importes que no se han podido leer (ver el neto de abajo)' : '')
+                      (avisoIlegiblesNeto ? ' — con importes que no se han podido leer (ver el neto de abajo)' : '') +
+                      (motivoGastosVenta ? ` — ${motivoGastosVenta.charAt(0).toLowerCase()}${motivoGastosVenta.slice(1)}` : '')
                     }
                   />
 
@@ -1858,6 +2035,13 @@ export default function SimuladorLocalComercialPage() {
                         // El par catastral imposible: la plusvalía se liquidó por el objetivo sin
                         // compararla con el real, que puede salir más barato. `netoParcial` no lo
                         // miraba (patrón 3, hallazgo 1571, lo que la referencia hace desde 85c9c9fe).
+                        // Un gasto de la venta imposible no se liquida (patrón 5, hallazgo 2198): el
+                        // neto lo descuenta tal cual y no vale, sin dirección que prometer.
+                        if (motivoGastosVenta) {
+                          avisos.push(
+                            `${motivoGastosVenta}, así que no se calculan la ganancia ni el IRPF, y este neto no vale`,
+                          );
+                        }
                         if (resultadosVendedor.parCatastralImposible) {
                           avisos.push(
                             'El valor catastral del suelo supera al total, y con el recibo del IBI bien leído la plusvalía puede salir más barata por el método real: el neto real puede ser MAYOR que este',
@@ -1869,6 +2053,9 @@ export default function SimuladorLocalComercialPage() {
                           resultadosVendedor.faltanMeses ? 'elige los meses completos desde la compra' : null,
                           // Un año negativo no «falta»: se corrige (patrón 5, hallazgo 1578).
                           resultadosVendedor.aniosNegativos ? 'corrige los años de propiedad (no pueden ser negativos)' : null,
+                          // Ni un precio de compra 0: está escrito y no vale (hallazgo 2200).
+                          resultadosVendedor.precioCompraNoValido ? 'corrige el precio de compra original (tiene que ser mayor que 0)' : null,
+                          resultadosVendedor.corregirGastosVenta,
                           hayIlegiblesQueCorregir ? 'escribe con coma decimal (1.234,56) lo que no se ha podido leer' : null,
                           resultadosVendedor.amortizacionesImposibles ? 'revisa las amortizaciones deducidas' : null,
                           resultadosVendedor.parCatastralImposible ? 'revisa los dos valores catastrales del recibo del IBI' : null,
@@ -1923,7 +2110,7 @@ export default function SimuladorLocalComercialPage() {
               <tbody>
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>Obra nueva (promotor)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary)' }}>IVA {formatNumber(IVA_LOCAL_COMERCIAL, 0)}%</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)', fontWeight: 700, color: 'var(--primary-texto)' }}>IVA {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))}</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí</td>
                   {/* Colores de la tabla con variante oscura (hallazgo 1580): el #27ae60 literal
                       daba 2,64:1 en claro, y el #c0392b de abajo 3,20:1 en oscuro. */}
@@ -1937,7 +2124,7 @@ export default function SimuladorLocalComercialPage() {
                 </tr>
                 <tr>
                   <td style={{ padding: '8px 10px' }}>Segunda mano con renuncia a la exención</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', fontWeight: 700, color: 'var(--primary)' }}>IVA {formatNumber(IVA_LOCAL_COMERCIAL, 0)}% (ISP)</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', fontWeight: 700, color: 'var(--primary-texto)' }}>IVA {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} (ISP)</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (incrementado en algunas comunidades)</td>
                   <td className={styles.celdaFavorable} style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (si sujeto pasivo)</td>
                 </tr>
@@ -1953,7 +2140,7 @@ export default function SimuladorLocalComercialPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🆕</span> Autónomo compra local nuevo al promotor</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Paga IVA {formatNumber(IVA_LOCAL_COMERCIAL, 0)}% + AJD. Si está dado de alta en una actividad sujeta a IVA, deduce el IVA
+                Paga IVA {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} + AJD. Si está dado de alta en una actividad sujeta a IVA, deduce el IVA
                 soportado en la declaración trimestral (modelo 303).
               </p>
             </div>
@@ -1968,7 +2155,7 @@ export default function SimuladorLocalComercialPage() {
               <strong><span aria-hidden="true">🤝</span> Empresa compra local usado a otra empresa</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Si ambas partes tienen derecho a deducción, el vendedor puede renunciar a la exención de IVA.
-                La operación pasa a IVA {formatNumber(IVA_LOCAL_COMERCIAL, 0)}% con inversión del sujeto pasivo: el comprador lo autoliquida y
+                La operación pasa a IVA {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} con inversión del sujeto pasivo: el comprador lo autoliquida y
                 deduce, evitando un ITP que no recuperaría.
               </p>
             </div>
@@ -1976,7 +2163,7 @@ export default function SimuladorLocalComercialPage() {
               <strong><span aria-hidden="true">📈</span> Vender el local con ganancia</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Si vendes como persona física, la ganancia tributa en el IRPF del ahorro
-                ({formatNumber(TIPO_AHORRO_MIN, 0)}%-{formatNumber(TIPO_AHORRO_MAX, 0)}%). Si vendes
+                ({conPct(formatNumber(TIPO_AHORRO_MIN, 0))}-{conPct(formatNumber(TIPO_AHORRO_MAX, 0))}). Si vendes
                 como empresa, tributa en el Impuesto de Sociedades. En ambos casos hay plusvalía municipal.
               </p>
             </div>
@@ -1998,7 +2185,7 @@ export default function SimuladorLocalComercialPage() {
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
               <strong>¿Se paga IVA o ITP al comprar un local comercial?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
-                En obra nueva (primera entrega del promotor) se paga IVA al {formatNumber(IVA_LOCAL_COMERCIAL, 0)}% más AJD. En segunda mano, por
+                En obra nueva (primera entrega del promotor) se paga IVA al {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} más AJD. En segunda mano, por
                 regla general la operación está exenta de IVA y se paga ITP al tipo general de la comunidad
                 autónoma. La excepción es la renuncia a la exención de IVA entre empresarios. Nunca se pagan
                 IVA e ITP a la vez.
@@ -2009,7 +2196,7 @@ export default function SimuladorLocalComercialPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 La segunda transmisión de un inmueble está exenta de IVA (Art. 20.Uno.22º LIVA). Si comprador y
                 vendedor son empresarios con derecho a deducción, el vendedor puede renunciar a esa exención
-                (Art. 20.Dos): la compra tributa por IVA {formatNumber(IVA_LOCAL_COMERCIAL, 0)}% con inversión del sujeto pasivo en lugar de ITP.
+                (Art. 20.Dos): la compra tributa por IVA {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} con inversión del sujeto pasivo en lugar de ITP.
                 Interesa al comprador que puede deducir el IVA, porque el ITP es un coste no recuperable.
               </p>
             </div>
@@ -2028,9 +2215,9 @@ export default function SimuladorLocalComercialPage() {
                     sin «el País Vasco no lo cobra»: allí un local paga el 0,5 % (hallazgos 1583 y
                     1603). El tipo de la renuncia de Valencia sale de la tabla. */}
                 La escritura tributa por AJD, y algunas comunidades aplican un tipo incrementado cuando existe
-                renuncia a la exención de IVA —la Comunitat Valenciana, el {formatTipoNominal(ITP_CCAA.valencia.ajdRenuncia ?? ITP_CCAA.valencia.ajd)}% (Ley 13/1997, art. 14)—,
-                frente al tipo general, que para un local va del {formatNumber(RANGO_AJD_OTROS.min, 1)}% al {formatNumber(RANGO_AJD_OTROS.max, 1)}% según la
-                comunidad; en Ceuta y Melilla se descuenta el 50% de la cuota. Este simulador aplica el tipo de la
+                renuncia a la exención de IVA —la Comunitat Valenciana, el {conPct(formatTipoNominal(ITP_CCAA.valencia.ajdRenuncia ?? ITP_CCAA.valencia.ajd))} (Ley 13/1997, art. 14)—,
+                frente al tipo general, que para un local va del {conPct(formatNumber(RANGO_AJD_OTROS.min, 1))} al {conPct(formatNumber(RANGO_AJD_OTROS.max, 1))} según la
+                comunidad; en Ceuta y Melilla se paga la mitad (bonificación del {conPct(formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100))} de la cuota, art. 57 bis.1 TRLITPAJD). Este simulador aplica el tipo de la
                 renuncia donde está verificado y el AJD general en el resto; confirma el de tu comunidad antes de firmar.
               </p>
             </div>
@@ -2062,15 +2249,17 @@ export default function SimuladorLocalComercialPage() {
             </li>
             <li>
               <strong>IRPF de la ganancia patrimonial.</strong> Tributa en la base del ahorro con los
-              tramos del {formatNumber(TIPO_AHORRO_MIN, 0)}% al {formatNumber(TIPO_AHORRO_MAX, 0)}% de 2025.{' '}
+              tramos del {conPct(formatNumber(TIPO_AHORRO_MIN, 0))} al {conPct(formatNumber(TIPO_AHORRO_MAX, 0))} de 2025.{' '}
               <strong>No hay exención por reinversión ni por tener más
               de 65 años</strong>: esas dos ventajas son exclusivas de la vivienda habitual.
             </li>
             <li>
-              <strong>Amortizaciones si el local estuvo afecto a una actividad.</strong> Si lo usaste en
+              <strong>Amortizaciones si el local estuvo afecto a una actividad o alquilado.</strong> Si lo usaste en
               tu negocio o lo tuviste alquilado y deduciste amortización, el valor de adquisición se
               minora en la amortización deducida —o en la mínima, aunque no la dedujeras— según el
-              artículo 40 del Reglamento del IRPF. La ganancia sube, y con ella el impuesto.
+              artículo 40 del Reglamento del IRPF (art. 35.2 de la Ley). La ganancia sube, y con ella el
+              impuesto. En el simulador van en «Amortizaciones acumuladas deducidas», con cualquiera de
+              los dos perfiles: el local alquilado por un particular es «no afecto».
             </li>
             <li>
               <strong>Si el vendedor es una sociedad</strong>, la ganancia no va al IRPF sino al
@@ -2096,7 +2285,7 @@ export default function SimuladorLocalComercialPage() {
             <li>El IVA solo es deducible si el comprador es sujeto pasivo de IVA con actividad sujeta y no exenta.</li>
             <li>El valor de referencia catastral puede ser la base imponible real del ITP si supera el precio escriturado.</li>
             <li>En la pestaña de vendedor, el tipo municipal del IIVTNU se estima con un valor orientativo: cada ayuntamiento fija el suyo, así que confirma el de tu municipio.</li>
-            <li>Si el local estuvo afecto a una actividad, la amortización que debe restarse es la deducida o la mínima, aunque no se hubiera deducido; el simulador usa la cifra que introduzcas.</li>
+            <li>Si el local estuvo afecto a una actividad o alquilado, la amortización que debe restarse es la deducida o la mínima, aunque no se hubiera deducido; el simulador usa la cifra que introduzcas.</li>
             <li>Los tipos de ITP y AJD pueden variar; verifica la normativa vigente de tu comunidad autónoma y consulta con tu asesor fiscal antes de cerrar la operación.</li>
           </ul>
         </div>
