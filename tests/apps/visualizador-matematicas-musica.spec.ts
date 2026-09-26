@@ -37,8 +37,8 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *   aunque otra empiece en el mismo instante. Los tiempos se esperan en el reloj de audio con
  *   expect.poll, nunca con esperas de pared.
  *
- * ORDEN: CASOS 1-3 (en verde, red de regresión) · HALLAZGOS abiertos, con `test.fail()`: afirman
- * lo que la app DEBERÍA hacer; cuando se reparen, se les quita la marca y quedan como candado.
+ * ORDEN: CASOS 1-3 (en verde, red de regresión) · HALLAZGOS del 25/09/2026 (1935-1952),
+ * reparados el 26/09/2026: ya sin `test.fail()`, quedan como candado de lo que la app debe hacer.
  */
 
 // Sin gesto de usuario el AudioContext podría quedarse «suspended». A nivel de fichero: dentro
@@ -377,7 +377,7 @@ test.describe('En móvil (360 px)', () => {
    * Medido a 360 px: «880 Hz» en x = 334-399 y el botón «Escuchar Aguda (880 Hz)» en x = 415-441;
    * a 412 px (Pixel 7), el botón sigue en 415-441. El tono agudo no se puede tocar en el móvil.
    */
-  test.fail('HALLAZGO — el botón «Escuchar Aguda (880 Hz)» y su cifra caben en la pantalla', async ({ page }) => {
+  test('HALLAZGO — el botón «Escuchar Aguda (880 Hz)» y su cifra caben en la pantalla', async ({ page }) => {
     await abrir(page);
     const caja = await page.evaluate(() => {
       const fila = Array.from(document.querySelectorAll('[class*="ondaRow"]')).find((f) =>
@@ -397,7 +397,7 @@ test.describe('En móvil (360 px)', () => {
    * siguiente entre 1,7 y 5,4 px («Do (C4)» acaba en x = 83,0 y «Re (D4)» empieza en 77,9), y se
    * leen «Do (C4Re (D4Mi (E4)…». A 412 px ya no se tocan.
    */
-  test.fail('HALLAZGO — los nombres de las notas de la octava no se pisan a 360 px', async ({ page }) => {
+  test('HALLAZGO — los nombres de las notas de la octava no se pisan a 360 px', async ({ page }) => {
     await abrir(page);
     await irASeccion(page, 'La escala musical');
     const solapes = await page
@@ -408,6 +408,31 @@ test.describe('En móvil (360 px)', () => {
       });
     expect(solapes).toHaveLength(7);
     for (const s of solapes) expect(s, 'px que un nombre pisa al siguiente').toBeLessThanOrEqual(0);
+  });
+
+  /**
+   * REPARACIÓN del 1941 en móvil (26/09/2026): la pista de BPM baja a su propia línea y la regla
+   * vive en la misma columna, así que cada marca sigue sobre su tempo (bpm/190 de la pista) y
+   * las cinco no se pisan entre sí.
+   */
+  test('REPARACIÓN — a 360 px la escala de BPM cuadra con las barras y sus marcas no se pisan', async ({ page }) => {
+    await abrir(page);
+    await irASeccion(page, 'Ritmo y matemáticas');
+    const medida = await page.evaluate(() => {
+      const pista = document.querySelector('[class*="bpmBarContainer"]')!.getBoundingClientRect();
+      const marcas = Array.from(document.querySelectorAll('[class*="bpmEscala"] span')).map((s) => {
+        const r = s.getBoundingClientRect();
+        return { bpm: Number(s.textContent), izq: r.left, der: r.right, centro: r.left + r.width / 2 };
+      });
+      return { pista: { left: pista.left, width: pista.width }, marcas };
+    });
+    expect(medida.marcas.map((m) => m.bpm)).toEqual([60, 90, 120, 150, 180]);
+    for (const m of medida.marcas) {
+      expect(Math.abs(m.centro - (medida.pista.left + (m.bpm / 190) * medida.pista.width)), `marca ${m.bpm}`).toBeLessThanOrEqual(3);
+    }
+    for (let i = 1; i < medida.marcas.length; i++) {
+      expect(medida.marcas[i].izq, `la marca ${medida.marcas[i].bpm} empieza tras la anterior`).toBeGreaterThan(medida.marcas[i - 1].der);
+    }
   });
 });
 
@@ -428,9 +453,9 @@ test('CASO 3 — nada suena sin pulsar, y un sonido nuevo corta la progresión q
   const { inicio } = await escuchar(page, page.getByRole('button', { name: 'Escuchar Canon de Pachelbel' }), 0.3);
   const starts = (await llamadas(page)).filter((l) => l.metodo === 'start');
   expect(starts).toHaveLength(24);
-  // Un acorde cada 0,7 s (idx·0,7). La app relee ctx.currentTime en cada vuelta del bucle
-  // (page.tsx 88) y, con el contexto recién creado, el reloj echa a andar a mitad: medido
-  // 0 · 0,70 · 1,41 · 2,12 · 2,82… Por eso se miden los saltos entre acordes, con ±0,03 s.
+  // Un acorde cada 0,7 s (idx·0,7). Antes la app releía ctx.currentTime en cada vuelta del bucle
+  // y, con el contexto recién creado, los acordes derivaban (0 · 0,70 · 1,41 · 2,12…); desde el
+  // 26/09/2026 todos cuelgan de un único origen. Se miden los saltos entre acordes, con ±0,03 s.
   const acordes = starts.filter((_, i) => i % 3 === 0).map((l) => l.args[0] - inicio);
   expect(acordes).toHaveLength(8);
   expect(acordes[0]).toBeCloseTo(0, 1);
@@ -445,7 +470,7 @@ test('CASO 3 — nada suena sin pulsar, y un sonido nuevo corta la progresión q
 });
 
 // ============================================================
-// HALLAZGOS ABIERTOS (Inspector 25/09/2026) — `test.fail()`
+// HALLAZGOS del Inspector (25/09/2026), reparados el 26/09/2026
 // ============================================================
 
 /**
@@ -459,7 +484,7 @@ test('CASO 3 — nada suena sin pulsar, y un sonido nuevo corta la progresión q
  * acaba lo programado. El ritmo «Ambient» (70 BPM, 8 golpes) alarga lo mismo a 6,0 s. La app de
  * destino no tiene forma de pararlo. Correcto: al salir de la página, silencio.
  */
-test.fail('HALLAZGO — salir a otra app con la progresión sonando la detiene', async ({ page }) => {
+test('HALLAZGO — salir a otra app con la progresión sonando la detiene', async ({ page }) => {
   await abrir(page);
   await irASeccion(page, 'Acordes y armonía');
   await escuchar(page, page.getByRole('button', { name: 'Escuchar Canon de Pachelbel' }), 0.3);
@@ -484,6 +509,10 @@ test.fail('HALLAZGO — salir a otra app con la progresión sonando la detiene',
     .toBe(true);
   const estado = await page.evaluate(() => (window as unknown as VentanaMusica).__mmBuses[0].ctx.state);
   if (estado !== 'closed') expect(await picoBus(page), 'lo que llega a los altavoces en la app de destino').toBeLessThan(1e-3);
+  // Reparado (26/09/2026) con el patrón de conversor-morse y generador-ondas: al desmontar, las
+  // voces bajan en rampa y el contexto se cierra al acabarla.
+  await expect.poll(() => page.evaluate(() => (window as unknown as VentanaMusica).__mmBuses[0].ctx.state)).toBe('closed');
+  expect((await llamadas(page)).filter((l) => l.metodo === 'close')).toHaveLength(1);
 });
 
 /**
@@ -492,7 +521,7 @@ test.fail('HALLAZGO — salir a otra app con la progresión sonando la detiene',
  * recoge: siguen «running», mudos, con su hilo de audio. Medido: sonar La4 y salir, cuatro veces
  * → 4 contextos «running», 0 close(). Correcto: nunca más de uno vivo.
  */
-test.fail('HALLAZGO — ir y volver sonando no acumula AudioContext vivos', async ({ page }) => {
+test('HALLAZGO — ir y volver sonando no acumula AudioContext vivos', async ({ page }) => {
   test.setTimeout(60000);
   await abrir(page);
   for (let vuelta = 0; vuelta < 3; vuelta++) {
@@ -519,7 +548,7 @@ test.fail('HALLAZGO — ir y volver sonando no acumula AudioContext vivos', asyn
  * sobre osc0, ninguna automatización nueva de gain0; su voz pasa de ≈ 0,077 a 0 en una muestra
  * (caída en 3 ms del 84-86 % del nivel; umbral 45 %, una rampa de 10 ms daría ≈ 27 %).
  */
-test.fail('HALLAZGO — encadenar dos sonidos: el que sonaba sale con rampa, no con stop() en seco', async ({ page }) => {
+test('HALLAZGO — encadenar dos sonidos: el que sonaba sale con rampa, no con stop() en seco', async ({ page }) => {
   await abrir(page);
   await escuchar(page, page.getByRole('button', { name: 'Escuchar La4 a 440 Hz' }), 0.2);
   const segundo = await escuchar(page, page.getByRole('button', { name: 'Escuchar Grave (110 Hz)' }), 0.15);
@@ -537,7 +566,7 @@ test.fail('HALLAZGO — encadenar dos sonidos: el que sonaba sale con rampa, no 
  * 96,90 % → 135,7 px, justo el doble (la octava 2:1 que rotula debajo). Obtenido: 67,8 y 113,8 px
  * (1,68:1), y Si4 (494 Hz) tan alta como La4 (440 Hz). Igual a 1.280, 412 y 360 px.
  */
-test.fail('HALLAZGO — en la octava, la barra de Do5 dobla a la de Do4 y La4 < Si4 < Do5', async ({ page }) => {
+test('HALLAZGO — en la octava, la barra de Do5 dobla a la de Do4 y La4 < Si4 < Do5', async ({ page }) => {
   await abrir(page);
   await irASeccion(page, 'La escala musical');
   const alturas = await page
@@ -550,27 +579,39 @@ test.fail('HALLAZGO — en la octava, la barra de Do5 dobla a la de Do4 y La4 < 
 });
 
 /**
- * HALLAZGO [bajo, dato]. «Ondas sonoras: la frecuencia cambia el tono» dibuja 2, 4 y 8 ciclos para
- * 110, 440 y 880 Hz (4, 8 y 16 barras; page.tsx 304-308) y cada ciclo mide 22 px en las tres
- * filas. Las frecuencias van 1:4:8, no 1:2:4, y con el mismo periodo en las tres el dibujo no
- * enseña lo que dice el subtítulo («Más ciclos por segundo»): en una ventana común, 440 Hz tiene
- * 4 veces los ciclos de 110 Hz, no 2.
+ * HALLAZGO [bajo, dato]. «Ondas sonoras: la frecuencia cambia el tono» dibujaba 2, 4 y 8 ciclos para
+ * 110, 440 y 880 Hz con el mismo periodo en las tres filas: la proporción 1:2:4 no era la de las
+ * frecuencias (1:4:8), y el dibujo no enseñaba lo que dice el subtítulo.
+ *
+ * Reparado (26/09/2026): cada onda es una senoide SVG dibujada en la MISMA ventana de tiempo,
+ * T = 2/110 s = 18,18 ms, así que los ciclos son f·T: 110·T = 2 · 440·T = 8 · 880·T = 16. El caso
+ * ya no cuenta barras (la forma antigua): cuenta las crestas del TRAZO que se ve, comprueba que
+ * las tres ondas miden lo mismo de ancho (ventana común) y que el rótulo dice la ventana.
  */
-test.fail('HALLAZGO — las ondas dibujan ciclos proporcionales a la frecuencia (110 : 440 : 880 = 1 : 4 : 8)', async ({
+test('HALLAZGO — las ondas dibujan ciclos proporcionales a la frecuencia (110 : 440 : 880 = 1 : 4 : 8)', async ({
   page,
 }) => {
   await abrir(page);
   const filas = await page.locator('[class*="ondaRow"]').evaluateAll((els) =>
     els.map((f) => {
-      const b = Array.from(f.querySelectorAll('[class*="ondaVisual"] > div')).map((d) => d.getBoundingClientRect().left);
-      return { barras: b.length, pxCiclo: b.length > 2 ? b[2] - b[0] : 0 };
+      const svg = f.querySelector('svg');
+      const d = svg?.querySelector('path')?.getAttribute('d') ?? '';
+      // Coordenadas y del trazo: una cresta es un mínimo local de y (el eje y del SVG va hacia abajo).
+      const ys = Array.from(d.matchAll(/[ML]([\d.]+),([\d.]+)/g)).map((m) => Number(m[2]));
+      let crestas = 0;
+      for (let i = 1; i < ys.length - 1; i++) if (ys[i] < ys[i - 1] && ys[i] <= ys[i + 1]) crestas++;
+      return { crestas, ancho: svg?.getBoundingClientRect().width ?? 0, ciclos: Number(svg?.getAttribute('data-ciclos')) };
     }),
   );
   expect(filas).toHaveLength(3);
-  const [grave, media] = filas;
-  // O más ciclos en la misma ventana (×4), o el periodo 4 veces más corto.
-  const proporcional = media.barras / grave.barras === 4 || Math.abs(grave.pxCiclo / media.pxCiclo - 4) < 0.2;
-  expect(proporcional, JSON.stringify(filas)).toBe(true);
+  // f·T con T = 2/110 s, calculado a mano: 2, 8 y 16.
+  expect(filas.map((f) => f.ciclos)).toEqual([2, 8, 16]);
+  expect(filas.map((f) => f.crestas)).toEqual([2, 8, 16]);
+  // Misma ventana de tiempo = mismo ancho dibujado.
+  expect(Math.abs(filas[0].ancho - filas[2].ancho)).toBeLessThanOrEqual(1);
+  expect(filas[0].ancho).toBeGreaterThan(100);
+  // 2/110 s = 18,18 ms → «18,2 milisegundos».
+  await expect(page.locator('[class*="ondasSubtitulo"]')).toContainText('18,2 milisegundos');
 });
 
 /**
@@ -581,7 +622,7 @@ test.fail('HALLAZGO — las ondas dibujan ciclos proporcionales a la frecuencia 
  * frente a 742; «180» en 1.032 frente a 940. Leída con su escala, «Ambient 60-80» cae entre 100 y
  * 115 BPM.
  */
-test.fail('HALLAZGO — la escala de BPM está alineada con las barras', async ({ page }) => {
+test('HALLAZGO — la escala de BPM está alineada con las barras', async ({ page }) => {
   await abrir(page);
   await irASeccion(page, 'Ritmo y matemáticas');
   const desvios = await page.evaluate(() => {
@@ -603,11 +644,53 @@ test.fail('HALLAZGO — la escala de BPM está alineada con las barras', async (
  * «Si (B4) · 494 Hz · 15:8» (490,56 Hz; 11,7 cents). La propia sección explica dos tarjetas más
  * arriba que el temperamento igual NO da esas razones.
  */
-test.fail('HALLAZGO — la octava no rotula 5:3 bajo La4 = 440 Hz como si fuera exacto', async ({ page }) => {
+test('HALLAZGO — la octava no rotula 5:3 bajo La4 = 440 Hz como si fuera exacto', async ({ page }) => {
   await abrir(page);
   await irASeccion(page, 'La escala musical');
-  const la = page.locator('[class*="notaBarra"]').filter({ hasText: 'La (A4)' }).locator('[class*="notaBarraRatio"]');
-  await expect(la).not.toHaveText('5:3', { timeout: 1000 });
+  // Reparado (26/09/2026): la razón justa se rotula exacta solo si la nota temperada la da (a
+  // menos de 0,5 cents). A mano, temperada menos justa en cents: Re 199,9 − 203,9 = −4,0 ·
+  // Mi 400,0 − 386,3 = 13,7 · Fa 500,0 − 498,0 = 1,9 · Sol 700,0 − 702,0 = −2,0 · La 900,0 − 884,4 = 15,6 ·
+  // Si 1100,0 − 1088,3 = 11,7; Do4 1:1 y Do5 2:1, 0,0.
+  await expect(page.locator('[class*="notaBarraRatio"]')).toHaveText([
+    '1:1',
+    '≈ 9:8',
+    '≈ 5:4',
+    '≈ 4:3',
+    '≈ 3:2',
+    '≈ 5:3',
+    '≈ 15:8',
+    '2:1',
+  ]);
+  // El desvío de La4 que da el título, con el Do4 = 261,63 que rotula la tabla:
+  // 1200·log₂(440/261,63) − 1200·log₂(5/3) = 899,96 − 884,36 = 15,60 → «15,6».
+  const la = page.locator('[class*="notaBarraRatio"]').nth(5);
+  await expect(la).toHaveAttribute('title', /15,6 cents/);
+});
+
+/**
+ * REPARACIÓN (26/09/2026, sin hallazgo propio). Los intervalos «justos» sonaban con la razón
+ * truncada: cuarta 1,333 (en vez de 4/3: −0,43 cents), sexta 1,667 y tritono 1,406. Y la
+ * clasificación ponía la sexta mayor (consonancia imperfecta, como las terceras) junto a la
+ * segunda mayor (disonancia). A mano sobre Do4 = 261,63: cuarta 348,84 · sexta 436,05 ·
+ * tritono 367,917 Hz.
+ */
+test('REPARACIÓN — los intervalos suenan con su razón exacta y se clasifican como en la teoría tradicional', async ({ page }) => {
+  await abrir(page);
+  await irASeccion(page, 'La escala musical');
+  for (const [nombre, esperado] of [
+    ['Cuarta justa', 348.84],
+    ['Sexta mayor', 436.05],
+    ['Tritono', 367.917],
+  ] as const) {
+    const { desde } = await escuchar(page, page.getByRole('button', { name: `Escuchar ${nombre}` }), 0.02);
+    const f = frecuenciasPedidas((await llamadas(page)).slice(desde));
+    expect(f[0]).toBe(261.63);
+    expect(f[1], nombre).toBeCloseTo(esperado, 2);
+  }
+  const fila = (n: string): Locator => page.locator('[class*="intervaloRow"]').filter({ hasText: n });
+  await expect(fila('Sexta mayor').locator('[class*="consonanciaTag"]')).toHaveText('Consonancia imperfecta');
+  await expect(fila('Segunda mayor').locator('[class*="consonanciaTag"]')).toHaveText('Disonancia suave');
+  await expect(fila('Tritono').locator('[class*="consonanciaTag"]')).toHaveText('Disonancia');
 });
 
 /** Contraste del texto de `selector` contra su fondo real; con degradado, el PEOR extremo. */
@@ -681,7 +764,7 @@ async function contraste(page: Page, selector: string): Promise<number> {
  * Fibonacci (blanco sobre el degradado) 2,80. En oscuro: cifras de las ondas 3,50 · razones 3,08 ·
  * consonancia 2,72-3,77 · «Mayor»/«Menor» 3,06/2,73 · grados 3,50 · Fibonacci 3,08.
  */
-test.fail('HALLAZGO — el texto en color de marca y el de las etiquetas pasa de 4,5:1 en claro y en oscuro', async ({
+test('HALLAZGO — el texto en color de marca y el de las etiquetas pasa de 4,5:1 en claro y en oscuro', async ({
   page,
 }) => {
   await page.emulateMedia({ colorScheme: 'light' });
@@ -698,8 +781,9 @@ test.fail('HALLAZGO — el texto en color de marca y el de las etiquetas pasa de
     },
     'La escala musical': {
       'razón del intervalo': '[class*="intervaloRatio"]',
-      '«Consonante»': '[class*="consonancia_alta"]',
-      '«Medio»': '[class*="consonancia_media"]',
+      '«Consonancia imperfecta»': '[class*="consonancia_alta"]',
+      '«Disonancia suave»': '[class*="consonancia_media"]',
+      '«Disonancia»': '[class*="consonancia_baja"]',
       'número del paso': '[class*="pasoNumero"]',
     },
     'Acordes y armonía': {
@@ -736,13 +820,15 @@ test.fail('HALLAZGO — el texto en color de marca y el de las etiquetas pasa de
  * («Qué es el sonido»), 1.657 («La escala musical»), 2.047 («Acordes y armonía») y 2.038
  * («Ritmo y matemáticas»). Basta con anunciar el título (aria-pressed ya dice cuál está activa).
  */
-test.fail('HALLAZGO — cambiar de sección no anuncia la sección entera por una región viva atómica', async ({ page }) => {
+test('HALLAZGO — cambiar de sección no anuncia la sección entera por una región viva atómica', async ({ page }) => {
   await abrir(page);
   await irASeccion(page, 'Acordes y armonía');
   const anunciado = await page.evaluate(() =>
     Math.max(0, ...Array.from(document.querySelectorAll('[aria-live][aria-atomic="true"]')).map((r) => r.textContent?.length ?? 0)),
   );
   expect(anunciado, 'caracteres de la región viva atómica').toBeLessThan(200);
+  // Y lo que se anuncia es el título de la sección nueva (la región viva envuelve solo la cabecera).
+  await expect(page.locator('[aria-live="polite"][aria-atomic="true"]').filter({ hasText: 'Acordes y armonía' })).toHaveCount(1);
 });
 
 // ------------------------------------------------------------
@@ -757,7 +843,7 @@ test.fail('HALLAZGO — cambiar de sección no anuncia la sección entera por un
  * «Indifference to dissonance in native Amazonians…»); la preferencia crece con la exposición a
  * la música occidental.
  */
-test.fail('HALLAZGO — no se afirma una «preferencia natural» por la consonancia en pueblos aislados', async ({ page }) => {
+test('HALLAZGO — no se afirma una «preferencia natural» por la consonancia en pueblos aislados', async ({ page }) => {
   await abrir(page);
   await irASeccion(page, 'Acordes y armonía');
   await expect(page.getByText(/preferencia natural por consonancias/)).toHaveCount(0, { timeout: 1000 });
@@ -771,7 +857,7 @@ test.fail('HALLAZGO — no se afirma una «preferencia natural» por la consonan
  * y 1955 la ISO/R 16). Y no todos: muchas orquestas afinan a 442-443 Hz y la música barroca a
  * 415, como dice el propio FAQ.
  */
-test.fail('HALLAZGO — el año del La 440 no se contradice y no se dice que afinen así «todos los instrumentos»', async ({
+test('HALLAZGO — el año del La 440 no se contradice y no se dice que afinen así «todos los instrumentos»', async ({
   page,
 }) => {
   await abrir(page);
@@ -788,7 +874,7 @@ test.fail('HALLAZGO — el año del La 440 no se contradice y no se dice que afi
  * temperamento (desigual) que permite las 24 tonalidades, y cuál usaba Bach sigue discutido; el
  * temperamento igual no se generaliza en los teclados hasta el siglo XIX.
  */
-test.fail('HALLAZGO — no se presenta a Bach como defensor del temperamento igual', async ({ page }) => {
+test('HALLAZGO — no se presenta a Bach como defensor del temperamento igual', async ({ page }) => {
   await abrir(page);
   await expect(page.getByText(/Bach fue uno de sus mayores defensores/)).toHaveCount(0, { timeout: 1000 });
 });
@@ -800,7 +886,7 @@ test.fail('HALLAZGO — no se presenta a Bach como defensor del temperamento igu
  * esa transferencia es pequeña y desaparece en los estudios con grupo de control activo y buen
  * diseño.
  */
-test.fail('HALLAZGO — la transferencia de la música a las matemáticas no se da por «confirmada»', async ({ page }) => {
+test('HALLAZGO — la transferencia de la música a las matemáticas no se da por «confirmada»', async ({ page }) => {
   await abrir(page);
   await expect(page.getByText(/la ciencia ha confirmado es que/)).toHaveCount(0, { timeout: 1000 });
 });
@@ -813,7 +899,7 @@ test.fail('HALLAZGO — la transferencia de la música a las matemáticas no se 
  * estudio de Putz (Mathematics Magazine 68(4), 1995) concluye que no hay indicio de que lo
  * buscara. El subtítulo lo presenta como hecho («aparecen en la estructura de obras maestras»).
  */
-test.fail('HALLAZGO — Bartók: la partitura no tiene 89 compases ni la proporción áurea la divide «exactamente»', async ({
+test('HALLAZGO — Bartók: la partitura no tiene 89 compases ni la proporción áurea la divide «exactamente»', async ({
   page,
 }) => {
   await abrir(page);
@@ -826,7 +912,7 @@ test.fail('HALLAZGO — Bartók: la partitura no tiene 89 compases ni la proporc
  * HALLAZGO [bajo, dato]. Compases: el ejemplo del 7/8 «asimétrico» es «Money (Pink Floyd)», que
  * está en 7/4 (salvo el solo de guitarra, en 4/4).
  */
-test.fail('HALLAZGO — «Money» de Pink Floyd no es el ejemplo del 7/8 (está en 7/4)', async ({ page }) => {
+test('HALLAZGO — «Money» de Pink Floyd no es el ejemplo del 7/8 (está en 7/4)', async ({ page }) => {
   await abrir(page);
   await irASeccion(page, 'Ritmo y matemáticas');
   const fila = page.locator('[class*="compasItem"]').filter({ hasText: '7/8' });
@@ -839,7 +925,7 @@ test.fail('HALLAZGO — «Money» de Pink Floyd no es el ejemplo del 7/8 (está 
  * humana: 80 - 1.100 Hz» y «Hace 2.500 años, Pitágoras…» deberían ser 4186, 1100 y 2500
  * («20.000 Hz», de cinco cifras, sí va agrupado).
  */
-test.fail('HALLAZGO — las cifras de cuatro dígitos no se agrupan', async ({ page }) => {
+test('HALLAZGO — las cifras de cuatro dígitos no se agrupan', async ({ page }) => {
   await abrir(page);
   const textos: string[] = [];
   for (const seccion of ['Qué es el sonido', 'La escala musical']) {

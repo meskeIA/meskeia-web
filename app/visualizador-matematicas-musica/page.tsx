@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './VisualizadorMatematicasMusica.module.css';
 import {
   MeskeiaLogo,
@@ -13,6 +13,14 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  VENTANA_ONDAS_S,
+  ciclosEnVentana,
+  cents,
+  razonANumero,
+  razonEsExacta,
+  trazoSenoide,
+} from './motor';
 
 // ─────────────────────────────────────────────
 // Web Audio API — generador de sonido
@@ -20,59 +28,131 @@ import { getRelatedApps } from '@/data/app-relations';
 
 type WaveType = 'sine' | 'triangle' | 'square' | 'sawtooth';
 
+/**
+ * Rampa de entrada y de salida de cada voz. Un cambio de ganancia en seco es un escalón en la
+ * onda y se oye como un chasquido (hallazgo 1937): 20 ms bastan para que no se oiga y no se
+ * perciben como retraso.
+ */
+const RAMPA_S = 0.02;
+/** Antelación con que se programa lo que empieza «ya», para que el reloj de audio no lo pase. */
+const ANTELACION_S = 0.01;
+
+interface Voz {
+  osc: OscillatorNode;
+  gain: GainNode;
+  /** Instante (reloj de audio) en que empieza a sonar. */
+  inicio: number;
+}
+
+/** Programa una voz con rampa de entrada y caída exponencial hasta el silencio. */
+function programarVoz(
+  ctx: AudioContext,
+  freq: number,
+  wave: WaveType,
+  volumen: number,
+  inicio: number,
+  duracion: number,
+): Voz {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = wave;
+  osc.frequency.value = freq;
+  const ataque = Math.min(RAMPA_S, duracion / 4);
+  gain.gain.setValueAtTime(0, inicio);
+  gain.gain.linearRampToValueAtTime(volumen, inicio + ataque);
+  gain.gain.exponentialRampToValueAtTime(0.001, inicio + duracion);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(inicio);
+  osc.stop(inicio + duracion);
+  return { osc, gain, inicio };
+}
+
+/**
+ * Silencia las voces: la que ya suena baja en rampa desde su valor en curso y se para al final
+ * de la rampa; la que estaba programada para más tarde no llega a empezar.
+ */
+function silenciarVoces(ctx: AudioContext, voces: Voz[]): void {
+  const ahora = ctx.currentTime;
+  voces.forEach(({ osc, gain, inicio }) => {
+    try {
+      if (inicio > ahora) {
+        gain.gain.cancelScheduledValues(0);
+        gain.gain.setValueAtTime(0, ahora);
+        osc.stop(ahora);
+        return;
+      }
+      const g = gain.gain;
+      g.cancelScheduledValues(ahora);
+      g.setValueAtTime(g.value, ahora);
+      g.linearRampToValueAtTime(0, ahora + RAMPA_S);
+      osc.stop(ahora + RAMPA_S);
+    } catch {
+      // La voz ya había terminado
+    }
+  });
+}
+
 function useAudio() {
   const ctxRef = useRef<AudioContext | null>(null);
-  const activeRef = useRef<OscillatorNode[]>([]);
+  const activeRef = useRef<Voz[]>([]);
 
   const getCtx = useCallback(() => {
     if (!ctxRef.current || ctxRef.current.state === 'closed') {
       ctxRef.current = new AudioContext();
     }
     if (ctxRef.current.state === 'suspended') {
-      ctxRef.current.resume();
+      ctxRef.current.resume().catch(() => {
+        // Sin gesto del usuario el navegador puede negarse; el siguiente clic lo reanuda
+      });
     }
     return ctxRef.current;
   }, []);
 
   const stopAll = useCallback(() => {
-    activeRef.current.forEach(osc => {
-      try { osc.stop(); } catch { /* ya parado */ }
-    });
+    const ctx = ctxRef.current;
+    if (ctx && ctx.state !== 'closed') silenciarVoces(ctx, activeRef.current);
     activeRef.current = [];
+  }, []);
+
+  /**
+   * Limpieza al desmontar (hallazgos 1935 y 1936, la forma del 1757 de generador-ondas). Las
+   * progresiones y los ritmos se programan enteros por adelantado en el reloj de audio: sin esta
+   * limpieza, al salir con un <Link> seguían sonando en la app de destino (hasta 5,6 s el Canon
+   * de Pachelbel) y cada visita dejaba su AudioContext abierto. Ahora se silencian todas las
+   * voces con su rampa y el contexto se cierra al acabarla. El ref se suelta en el acto, para
+   * que un remontaje (StrictMode en desarrollo) cree un contexto nuevo.
+   */
+  useEffect(() => {
+    return () => {
+      const ctx = ctxRef.current;
+      const voces = activeRef.current;
+      ctxRef.current = null;
+      activeRef.current = [];
+      if (!ctx || ctx.state === 'closed') return;
+      silenciarVoces(ctx, voces);
+      window.setTimeout(() => {
+        ctx.close().catch(() => {
+          // El contexto ya estaba cerrado
+        });
+      }, RAMPA_S * 1000 + 50);
+    };
   }, []);
 
   const playTone = useCallback((freq: number, duration = 0.6, wave: WaveType = 'sine', volume = 0.3) => {
     stopAll();
     const ctx = getCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = wave;
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(volume, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + duration);
-    activeRef.current.push(osc);
+    const t0 = ctx.currentTime + ANTELACION_S;
+    activeRef.current.push(programarVoz(ctx, freq, wave, volume, t0, duration));
   }, [getCtx, stopAll]);
 
   const playChord = useCallback((freqs: number[], duration = 1.2, wave: WaveType = 'sine') => {
     stopAll();
     const ctx = getCtx();
+    const t0 = ctx.currentTime + ANTELACION_S;
     const vol = 0.2 / Math.max(freqs.length, 1);
     freqs.forEach(freq => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = wave;
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(vol, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + duration);
-      activeRef.current.push(osc);
+      activeRef.current.push(programarVoz(ctx, freq, wave, vol, t0, duration));
     });
   }, [getCtx, stopAll]);
 
@@ -83,21 +163,14 @@ function useAudio() {
   const playProgression = useCallback((chords: number[][], tempo = 0.7) => {
     stopAll();
     const ctx = getCtx();
+    // Un solo origen de tiempos: releer ctx.currentTime en cada vuelta hacía que los acordes
+    // derivaran cuando el reloj echa a andar a mitad del bucle.
+    const t0 = ctx.currentTime + ANTELACION_S;
     chords.forEach((freqs, idx) => {
       const vol = 0.15 / Math.max(freqs.length, 1);
-      const t = ctx.currentTime + idx * tempo;
+      const t = t0 + idx * tempo;
       freqs.forEach(freq => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(vol, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + tempo * 0.95);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(t);
-        osc.stop(t + tempo);
-        activeRef.current.push(osc);
+        activeRef.current.push(programarVoz(ctx, freq, 'triangle', vol, t, tempo * 0.95));
       });
     });
   }, [getCtx, stopAll]);
@@ -106,20 +179,13 @@ function useAudio() {
     stopAll();
     const ctx = getCtx();
     const interval = 60 / bpm;
+    const t0 = ctx.currentTime + ANTELACION_S;
     for (let i = 0; i < beats; i++) {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
       const isStrong = i % 4 === 0;
-      osc.type = 'sine';
-      osc.frequency.value = isStrong ? 880 : 660;
-      const t = ctx.currentTime + i * interval;
-      gain.gain.setValueAtTime(isStrong ? 0.4 : 0.2, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(t);
-      osc.stop(t + 0.1);
-      activeRef.current.push(osc);
+      const t = t0 + i * interval;
+      activeRef.current.push(
+        programarVoz(ctx, isStrong ? 880 : 660, 'sine', isStrong ? 0.4 : 0.2, t, 0.08),
+      );
     }
   }, [getCtx, stopAll]);
 
@@ -187,12 +253,12 @@ const INTERVALOS: Intervalo[] = [
   { nombre: 'Unísono', ratio: '1:1', ratioDecimal: 1, consonancia: 'perfecta', ejemplo: 'Misma nota' },
   { nombre: 'Octava', ratio: '2:1', ratioDecimal: 2, consonancia: 'perfecta', ejemplo: 'Do-Do alto' },
   { nombre: 'Quinta justa', ratio: '3:2', ratioDecimal: 1.5, consonancia: 'perfecta', ejemplo: 'Do-Sol' },
-  { nombre: 'Cuarta justa', ratio: '4:3', ratioDecimal: 1.333, consonancia: 'perfecta', ejemplo: 'Do-Fa' },
+  { nombre: 'Cuarta justa', ratio: '4:3', ratioDecimal: 4 / 3, consonancia: 'perfecta', ejemplo: 'Do-Fa' },
   { nombre: 'Tercera mayor', ratio: '5:4', ratioDecimal: 1.25, consonancia: 'alta', ejemplo: 'Do-Mi' },
   { nombre: 'Tercera menor', ratio: '6:5', ratioDecimal: 1.2, consonancia: 'alta', ejemplo: 'Do-Mi♭' },
-  { nombre: 'Sexta mayor', ratio: '5:3', ratioDecimal: 1.667, consonancia: 'media', ejemplo: 'Do-La' },
+  { nombre: 'Sexta mayor', ratio: '5:3', ratioDecimal: 5 / 3, consonancia: 'alta', ejemplo: 'Do-La' },
   { nombre: 'Segunda mayor', ratio: '9:8', ratioDecimal: 1.125, consonancia: 'media', ejemplo: 'Do-Re' },
-  { nombre: 'Tritono', ratio: '45:32', ratioDecimal: 1.406, consonancia: 'baja', ejemplo: 'Do-Fa♯' },
+  { nombre: 'Tritono', ratio: '45:32', ratioDecimal: 45 / 32, consonancia: 'baja', ejemplo: 'Do-Fa♯' },
 ];
 
 interface AcordeInfo {
@@ -209,7 +275,7 @@ const ACORDES: AcordeInfo[] = [
   { nombre: 'Do Mayor', tipo: 'mayor', notas: 'Do - Mi - Sol', ratios: '4:5:6', emocion: 'Alegre, brillante, estable', ejemplos: ['Let It Be (Beatles)', 'Imagine (Lennon)'], frecuencias: [261.63, 329.63, 392.00] },
   { nombre: 'La menor', tipo: 'menor', notas: 'La - Do - Mi', ratios: '10:12:15', emocion: 'Triste, melancólico, introspectivo', ejemplos: ['Stairway to Heaven (Led Zeppelin)', 'Losing My Religion (R.E.M.)'], frecuencias: [220.00, 261.63, 329.63] },
   { nombre: 'Sol Mayor', tipo: 'mayor', notas: 'Sol - Si - Re', ratios: '4:5:6', emocion: 'Optimista, enérgico', ejemplos: ['Sweet Home Alabama', 'Knockin\' on Heaven\'s Door'], frecuencias: [392.00, 493.88, 587.33] },
-  { nombre: 'Mi menor', tipo: 'menor', notas: 'Mi - Sol - Si', ratios: '10:12:15', emocion: 'Oscuro, emotivo, profundo', ejemplos: ['Nothing Else Matters (Metallica)', 'The House of the Rising Sun'], frecuencias: [329.63, 392.00, 493.88] },
+  { nombre: 'Mi menor', tipo: 'menor', notas: 'Mi - Sol - Si', ratios: '10:12:15', emocion: 'Oscuro, emotivo, profundo', ejemplos: ['Nothing Else Matters (Metallica)', 'Zombie (The Cranberries)'], frecuencias: [329.63, 392.00, 493.88] },
 ];
 
 interface Progresion {
@@ -254,8 +320,8 @@ const COMPASES: CompasInfo[] = [
   { compas: '4/4', nombre: 'Cuaternario', patron: [1, 0, 1, 0], genero: 'Pop, rock, electrónica', ejemplo: 'La inmensa mayoría de canciones' },
   { compas: '3/4', nombre: 'Ternario (vals)', patron: [1, 0, 0], genero: 'Vals, minueto', ejemplo: 'El Danubio Azul (Strauss)' },
   { compas: '6/8', nombre: 'Compuesto', patron: [1, 0, 0, 1, 0, 0], genero: 'Baladas, jigs', ejemplo: 'Nothing Else Matters (Metallica)' },
-  { compas: '5/4', nombre: 'Irregular', patron: [1, 0, 1, 0, 0], genero: 'Jazz, progresivo', ejemplo: 'Take Five (Dave Brubeck)' },
-  { compas: '7/8', nombre: 'Asimétrico', patron: [1, 0, 1, 0, 1, 0, 0], genero: 'Progresivo, balcánico', ejemplo: 'Money (Pink Floyd)' },
+  { compas: '5/4', nombre: 'Irregular', patron: [1, 0, 0, 1, 0], genero: 'Jazz, progresivo', ejemplo: 'Take Five (Dave Brubeck Quartet), agrupado 3 + 2' },
+  { compas: '7/8', nombre: 'Asimétrico', patron: [1, 0, 1, 0, 1, 0, 0], genero: 'Folclore balcánico, progresivo', ejemplo: 'Rachenitsa (danza búlgara), agrupado 2 + 2 + 3' },
 ];
 
 interface BpmGenero {
@@ -276,6 +342,9 @@ const BPM_GENEROS: BpmGenero[] = [
   { genero: 'Drum & Bass', min: 160, max: 180, color: '#e74c3c' },
 ];
 
+/** Marcas de la escala de BPM. */
+const MARCAS_BPM = [60, 90, 120, 150, 180];
+
 interface FibonacciMusica {
   compositor: string;
   obra: string;
@@ -284,11 +353,19 @@ interface FibonacciMusica {
 }
 
 const FIBONACCI_MUSICA: FibonacciMusica[] = [
-  { compositor: 'Béla Bartók', obra: 'Música para cuerdas, percusión y celesta', detalle: 'El primer movimiento tiene 89 compases (F11). El clímax está en el compás 55 (F10). La proporción áurea divide la pieza exactamente.', dato: '89 = F₁₁, clímax en 55 = F₁₀' },
-  { compositor: 'Claude Debussy', obra: 'La Mer', detalle: 'La estructura de los tres movimientos sigue proporciones áureas. Las secciones principales caen en puntos de proporción dorada.', dato: 'Estructuras en ratio φ ≈ 1,618' },
-  { compositor: 'Tool', obra: 'Lateralus', detalle: 'Las sílabas del verso siguen la secuencia de Fibonacci: 1, 1, 2, 3, 5, 8, 5, 3, 2, 1, 1. El compás alterna entre 9/8, 8/8 y 7/8.', dato: 'Sílabas: 1,1,2,3,5,8,5,3,2,1,1' },
-  { compositor: 'Mozart', obra: 'Sonatas para piano', detalle: 'Múltiples sonatas dividen la exposición y el desarrollo en proporciones que se acercan notablemente a φ (proporción áurea).', dato: 'Exposición/desarrollo ≈ φ' },
+  { compositor: 'Béla Bartók', obra: 'Música para cuerdas, percusión y celesta', detalle: 'Ernő Lendvai propuso que el clímax del primer movimiento, hacia el compás 55, lo divide en proporción áurea. La partitura tiene 88 compases; la cuenta de 89 (un número de Fibonacci) añade un compás de silencio final, y analistas como Roy Howat discuten el recuento. Es una interpretación analítica, no una intención documentada.', dato: 'Clímax ≈ compás 55 de 88 · 55/88 ≈ 0,625 (1/φ ≈ 0,618)' },
+  { compositor: 'Claude Debussy', obra: 'La Mer', detalle: 'Roy Howat propuso (Debussy in Proportion, 1983) que las secciones principales caen cerca de puntos de proporción áurea. Es una lectura analítica: no hay constancia de que Debussy la buscara.', dato: 'Análisis de Howat (1983) · φ ≈ 1,618' },
+  { compositor: 'Tool', obra: 'Lateralus', detalle: 'Las sílabas de los primeros versos siguen la secuencia de Fibonacci: 1, 1, 2, 3, 5, 8, 5, 3, 2, 1, 1. El estribillo encadena compases de 9/8, 8/8 y 7/8 (987 es un número de Fibonacci). La banda lo ha comentado: aquí sí es intencionado.', dato: 'Sílabas: 1,1,2,3,5,8,5,3,2,1,1' },
+  { compositor: 'Mozart', obra: 'Sonatas para piano', detalle: 'Se ha propuesto que la división entre la exposición y el desarrollo con la reexposición se acerca a φ. John Putz midió las sonatas (Mathematics Magazine, 1995) y concluyó que no hay indicios de que Mozart buscara esa proporción.', dato: 'Hipótesis discutida (Putz, 1995)' },
 ];
+
+/** Do4 temperado: la nota de referencia de la octava y de los intervalos. */
+const FRECUENCIA_DO4 = NOTAS_FRECUENCIAS[0].freq;
+/** La barra más alta de la octava (Do5) ocupa toda la pista. */
+const FRECUENCIA_MAXIMA_OCTAVA = Math.max(...NOTAS_FRECUENCIAS.map((n) => n.freq));
+/** Lienzo de las ondas (unidades del viewBox; el SVG se estira al ancho disponible). */
+const ANCHO_ONDA = 240;
+const ALTO_ONDA = 40;
 
 // ─────────────────────────────────────────────
 // Sección 1: Qué es el sonido
@@ -301,11 +378,14 @@ function SeccionSonido({ audio }: { audio: ReturnType<typeof useAudio> }) {
     { icono: '🎻', titulo: 'Forma de onda (timbre)', desc: 'La "forma" de la vibración. Es lo que distingue un piano de una guitarra tocando la misma nota.', ejemplo: 'Misma nota, diferente instrumento = diferente timbre', color: '#e67e22' },
   ];
 
+  // Las tres ondas se dibujan en la MISMA ventana de tiempo (hallazgo 1940): los ciclos que
+  // caben son f·T, así que guardan la proporción de las frecuencias, 110 : 440 : 880 = 1 : 4 : 8.
   const ondas = [
-    { nombre: 'Grave (110 Hz)', freq: 110, periodos: 2 },
-    { nombre: 'Media (440 Hz)', freq: 440, periodos: 4 },
-    { nombre: 'Aguda (880 Hz)', freq: 880, periodos: 8 },
+    { nombre: 'Grave (110 Hz)', freq: 110 },
+    { nombre: 'Media (440 Hz)', freq: 440 },
+    { nombre: 'Aguda (880 Hz)', freq: 880 },
   ];
+  const ventanaMs = VENTANA_ONDAS_S * 1000;
 
   return (
     <div className={styles.seccionContent}>
@@ -330,28 +410,36 @@ function SeccionSonido({ audio }: { audio: ReturnType<typeof useAudio> }) {
       {/* Visualización de ondas */}
       <div className={styles.ondasCard}>
         <h3 className={styles.ondasTitulo}>Ondas sonoras: la frecuencia cambia el tono</h3>
-        <p className={styles.ondasSubtitulo}>Más ciclos por segundo = sonido más agudo</p>
+        <p className={styles.ondasSubtitulo}>
+          Más ciclos por segundo = sonido más agudo. Las tres ondas ocupan el mismo tiempo:{' '}
+          {formatNumber(ventanaMs, 1)} milisegundos.
+        </p>
         <div className={styles.ondasGrid}>
-          {ondas.map((o, i) => (
-            <div key={i} className={styles.ondaRow}>
-              <span className={styles.ondaLabel}>{o.nombre}</span>
-              <div className={styles.ondaVisual}>
-                {Array.from({ length: o.periodos * 2 }, (_, j) => (
-                  <div
-                    key={j}
-                    className={styles.ondaBarra}
-                    style={{
-                      height: j % 2 === 0 ? '100%' : '20%',
-                      opacity: 0.5 + (j % 2 === 0 ? 0.5 : 0),
-                      background: `hsl(${200 - i * 30}, 70%, ${45 + (j % 2) * 20}%)`,
-                    }}
+          {ondas.map((o, i) => {
+            const ciclos = ciclosEnVentana(o.freq);
+            return (
+              <div key={i} className={styles.ondaRow}>
+                <span className={styles.ondaLabel}>{o.nombre}</span>
+                <svg
+                  className={styles.ondaVisual}
+                  viewBox={`0 0 ${ANCHO_ONDA} ${ALTO_ONDA}`}
+                  preserveAspectRatio="none"
+                  role="img"
+                  aria-label={`${formatNumber(ciclos, 0)} ciclos en ${formatNumber(ventanaMs, 1)} milisegundos`}
+                  data-ciclos={Math.round(ciclos * 1e6) / 1e6}
+                >
+                  <line x1="0" y1={ALTO_ONDA / 2} x2={ANCHO_ONDA} y2={ALTO_ONDA / 2} className={styles.ondaEje} />
+                  <path
+                    d={trazoSenoide(ciclos, ANCHO_ONDA, ALTO_ONDA)}
+                    className={styles.ondaTrazo}
+                    style={{ stroke: `hsl(${200 - i * 30}, 70%, 45%)` }}
                   />
-                ))}
+                </svg>
+                <span className={styles.ondaFreq}>{formatNumber(o.freq, 0)} Hz</span>
+                <PlayButton onClick={() => audio.playTone(o.freq, 0.8)} label={`Escuchar ${o.nombre}`} small />
               </div>
-              <span className={styles.ondaFreq}>{formatNumber(o.freq, 0)} Hz</span>
-              <PlayButton onClick={() => audio.playTone(o.freq, 0.8)} label={`Escuchar ${o.nombre}`} small />
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -373,15 +461,15 @@ function SeccionSonido({ audio }: { audio: ReturnType<typeof useAudio> }) {
           </div>
         </div>
         <div className={styles.rangoNotas}>
-          <span>Piano: 27,5 Hz (La0) → 4.186 Hz (Do8)</span>
-          <span>Voz humana: 80 - 1.100 Hz</span>
+          <span>Piano: 27,5 Hz (La0) → 4186 Hz (Do8)</span>
+          <span>Voz humana (fundamental): 80 - 1100 Hz</span>
         </div>
       </div>
 
       <div className={styles.datoDestacado}>
         <span className={styles.datoNumero}>440</span>
         <span className={styles.datoUnidad}>Hz</span>
-        <span className={styles.datoTexto}>La nota La4 (A4) — el estándar de afinación universal desde 1955. Todos los instrumentos del mundo se afinan a partir de esta frecuencia.</span>
+        <span className={styles.datoTexto}>La nota La4 (A4): la referencia de afinación más extendida. Se acordó en una conferencia internacional en Londres en 1939 y la ISO la adoptó en 1955 (hoy, norma ISO 16:1975). No es universal: muchas orquestas afinan a 442-443 Hz y la música barroca se interpreta a menudo a 415 Hz.</span>
         <PlayButton onClick={() => audio.playTone(440, 1.0)} label="Escuchar La4 a 440 Hz" />
       </div>
 
@@ -402,13 +490,17 @@ function SeccionEscala({ audio }: { audio: ReturnType<typeof useAudio> }) {
   return (
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
-        <p>Hace 2.500 años, <strong>Pitágoras</strong> descubrió que las notas que suenan bien juntas tienen relaciones matemáticas simples. Ese descubrimiento sigue siendo la base de toda la música occidental.</p>
+        <p>Hace unos 2500 años, según la tradición griega, <strong>Pitágoras</strong> y su escuela observaron que las notas que suenan bien juntas guardan razones de números enteros pequeños. Esa idea sigue en la base de la teoría musical occidental.</p>
       </div>
 
       {/* Ratios pitagóricos */}
       <div className={styles.ratiosCard}>
-        <h3 className={styles.ratiosTitulo}>Los intervalos de Pitágoras</h3>
-        <p className={styles.ratiosSubtitulo}>Cuanto más simple es la relación entre frecuencias, más &ldquo;agradable&rdquo; suena al oído</p>
+        <h3 className={styles.ratiosTitulo}>Los intervalos y sus razones</h3>
+        <p className={styles.ratiosSubtitulo}>
+          En la tradición occidental, cuanto más simple es la razón entre frecuencias, más consonante se considera el
+          intervalo. Pitágoras trabajó con razones de 2 y 3 (octava, quinta, cuarta, 9:8); las terceras y sextas de 5:4, 6:5
+          y 5:3 son de la afinación justa posterior (Ptolomeo, Zarlino). Suenan sobre Do4 con la razón exacta.
+        </p>
         <div className={styles.ratiosGrid}>
           {INTERVALOS.map((intv, i) => (
             <div key={i} className={styles.intervaloRow}>
@@ -431,8 +523,8 @@ function SeccionEscala({ audio }: { audio: ReturnType<typeof useAudio> }) {
               </div>
               <span className={`${styles.consonanciaTag} ${styles[`consonancia_${intv.consonancia}`]}`}>
                 {intv.consonancia === 'perfecta' ? 'Consonancia perfecta' :
-                 intv.consonancia === 'alta' ? 'Consonante' :
-                 intv.consonancia === 'media' ? 'Medio' : 'Disonante'}
+                 intv.consonancia === 'alta' ? 'Consonancia imperfecta' :
+                 intv.consonancia === 'media' ? 'Disonancia suave' : 'Disonancia'}
               </span>
               <PlayButton onClick={() => audio.playInterval(261.63, intv.ratioDecimal)} label={`Escuchar ${intv.nombre}`} small />
             </div>
@@ -448,21 +540,21 @@ function SeccionEscala({ audio }: { audio: ReturnType<typeof useAudio> }) {
             <span className={styles.pasoNumero}>1</span>
             <div>
               <strong>El problema de Pitágoras</strong>
-              <p>Si apilamos quintas perfectas (3:2) desde Do, al dar 12 pasos volvemos &ldquo;casi&rdquo; a Do — pero no exactamente. La diferencia se llama <em>coma pitagórica</em>.</p>
+              <p>Si apilamos quintas justas (3:2) desde Do, al dar 12 pasos volvemos &ldquo;casi&rdquo; a Do, siete octavas más arriba, pero no exactamente: (3/2)¹² ÷ 2⁷ ≈ 1,0136. Esa diferencia, unos 23,5 cents (casi un cuarto de semitono), se llama <em>coma pitagórica</em>.</p>
             </div>
           </div>
           <div className={styles.doceNotasPaso}>
             <span className={styles.pasoNumero}>2</span>
             <div>
               <strong>La solución: temperamento igual</strong>
-              <p>En el siglo XVIII se decidió dividir la octava en 12 partes iguales. Cada semitono es exactamente ¹²√2 ≈ 1,0595. Los intervalos ya no son &ldquo;puros&rdquo;, pero permiten tocar en cualquier tonalidad.</p>
+              <p>La solución que acabó imponiéndose, sobre todo a partir del siglo XIX, fue dividir la octava en 12 partes iguales. Cada semitono es exactamente ¹²√2 ≈ 1,0595. Los intervalos ya no son &ldquo;puros&rdquo;, pero todas las tonalidades suenan igual de afinadas.</p>
             </div>
           </div>
           <div className={styles.doceNotasPaso}>
             <span className={styles.pasoNumero}>3</span>
             <div>
               <strong>12 es el &ldquo;mejor compromiso&rdquo;</strong>
-              <p>12 divisiones logran que las quintas (1,4983 vs 1,5 puro) y las terceras (1,2599 vs 1,25 puro) estén muy cerca de los ratios naturales. Otros números (19, 31, 53) también funcionan, pero 12 es el más práctico.</p>
+              <p>12 divisiones logran que las quintas (1,4983 vs 1,5 puro) y las terceras (1,2599 vs 1,25 puro) estén cerca de las razones justas: la quinta, casi exacta; la tercera, más alejada. Otros números (19, 31, 53) aproximan mejor algunos intervalos, pero 12 es el más práctico.</p>
             </div>
           </div>
         </div>
@@ -471,28 +563,43 @@ function SeccionEscala({ audio }: { audio: ReturnType<typeof useAudio> }) {
       {/* Notas y frecuencias */}
       <div className={styles.notasFreqCard}>
         <h3 className={styles.notasFreqTitulo}>La octava central: frecuencias de cada nota</h3>
+        <p className={styles.notasFreqSubtitulo}>
+          Alto de cada barra proporcional a su frecuencia. Debajo, la razón justa con Do4: el
+          temperamento igual solo la da exacta en la octava; en las demás notas es una aproximación (≈).
+        </p>
         <div className={styles.notasBarras}>
-          {NOTAS_FRECUENCIAS.map((n, i) => (
-            <div key={i} className={styles.notaBarra}>
-              <div
-                className={styles.notaBarraFill}
-                style={{
-                  height: `${(n.freq / 540) * 100}%`,
-                  background: n.color,
-                }}
-              />
-              <span className={styles.notaBarraNombre}>{n.nota}</span>
-              <span className={styles.notaBarraFreq}>{formatNumber(n.freq, 0)} Hz</span>
-              <span className={styles.notaBarraRatio}>{n.ratio}</span>
-              <PlayButton onClick={() => audio.playTone(n.freq, 0.6)} label={`Escuchar ${n.nota}`} small />
-            </div>
-          ))}
+          {NOTAS_FRECUENCIAS.map((n, i) => {
+            const exacta = razonEsExacta(n.ratio, n.freq, FRECUENCIA_DO4);
+            const desvio = cents(n.freq, FRECUENCIA_DO4) - cents(razonANumero(n.ratio));
+            return (
+              <div key={i} className={styles.notaBarra}>
+                <div className={styles.notaBarraPista}>
+                  <div
+                    className={styles.notaBarraFill}
+                    style={{
+                      height: `${(n.freq / FRECUENCIA_MAXIMA_OCTAVA) * 100}%`,
+                      background: n.color,
+                    }}
+                  />
+                </div>
+                <span className={styles.notaBarraNombre}>{n.nota}</span>
+                <span className={styles.notaBarraFreq}>{formatNumber(n.freq, 0)} Hz</span>
+                <span
+                  className={styles.notaBarraRatio}
+                  title={exacta ? 'Razón exacta' : `La nota temperada se aparta ${formatNumber(Math.abs(desvio), 1)} cents de la razón justa`}
+                >
+                  {exacta ? n.ratio : `≈ ${n.ratio}`}
+                </span>
+                <PlayButton onClick={() => audio.playTone(n.freq, 0.6)} label={`Escuchar ${n.nota}`} small />
+              </div>
+            );
+          })}
         </div>
       </div>
 
       <div className={styles.insight}>
         <p>
-          La escala de 12 notas no es arbitraria — es la <strong>mejor aproximación práctica</strong> a las proporciones matemáticas que el oído humano percibe como consonantes. Pitágoras lo intuyó con una cuerda; hoy lo confirmamos con Fourier.
+          La escala de 12 notas no es arbitraria: es un <strong>compromiso práctico</strong> para acercarse a las razones simples que la tradición occidental considera consonantes. Pitágoras las midió con una cuerda; el análisis de Fourier ayuda a explicarlas, porque en esas razones coinciden muchos armónicos de las dos notas.
         </p>
       </div>
     </div>
@@ -555,18 +662,18 @@ function SeccionAcordes({ audio }: { audio: ReturnType<typeof useAudio> }) {
         <div className={styles.explicacionGrid}>
           <div className={styles.explicacionItem}>
             <span className={styles.explicacionIcono} aria-hidden="true">📐</span>
-            <strong>Ratios más simples = más consonante</strong>
-            <p>El acorde mayor (4:5:6) tiene ratios más simples que el menor (10:12:15). Las ondas se alinean mejor, creando un sonido más &ldquo;limpio&rdquo;.</p>
+            <strong>Razones más simples = más consonante</strong>
+            <p>En afinación justa, el acorde mayor (4:5:6) tiene razones más simples que el menor (10:12:15): las ondas coinciden antes y el sonido resulta más &ldquo;limpio&rdquo;.</p>
           </div>
           <div className={styles.explicacionItem}>
             <span className={styles.explicacionIcono} aria-hidden="true">🧠</span>
-            <strong>El cerebro lo procesa más fácil</strong>
-            <p>Ratios simples generan patrones de vibración más predecibles. El cerebro los interpreta como estables y &ldquo;alegres&rdquo;. Los complejos generan tensión emocional.</p>
+            <strong>Una hipótesis: patrones más regulares</strong>
+            <p>Algunas teorías proponen que las razones simples dan patrones de vibración más regulares, que se oyen como estables, y que las complejas se oyen como tensión. Es una propuesta, no una explicación cerrada.</p>
           </div>
           <div className={styles.explicacionItem}>
             <span className={styles.explicacionIcono} aria-hidden="true">🌍</span>
             <strong>¿Universal o cultural?</strong>
-            <p>Estudios con tribus aisladas muestran preferencia natural por consonancias simples, pero la asociación &ldquo;alegre/triste&rdquo; tiene un fuerte componente cultural occidental.</p>
+            <p>Un estudio con los tsimane&apos;, de la Amazonía boliviana y con poco contacto con la música occidental, no halló preferencia por los acordes consonantes frente a los disonantes (McDermott y otros, <em>Nature</em>, 2016). La preferencia por la consonancia, y la asociación mayor-alegre, menor-triste, dependen en buena parte de la cultura musical de cada oyente.</p>
           </div>
         </div>
       </div>
@@ -594,7 +701,7 @@ function SeccionAcordes({ audio }: { audio: ReturnType<typeof useAudio> }) {
 
       <div className={styles.insight}>
         <p>
-          La progresión <strong>I-V-vi-IV</strong> aparece en cientos de éxitos porque combina la estabilidad de los acordes mayores con la tensión emocional del menor. Es la &ldquo;fórmula&rdquo; matemática del pop.
+          La progresión <strong>I-V-vi-IV</strong> aparece en cientos de éxitos: combina tres acordes mayores con uno menor, y sus grados son números que valen en cualquier tonalidad. En Do es Do - Sol - Lam - Fa; en Sol, Sol - Re - Mim - Do.
         </p>
       </div>
     </div>
@@ -617,7 +724,7 @@ function SeccionRitmo({ audio }: { audio: ReturnType<typeof useAudio> }) {
       {/* Compases */}
       <div className={styles.compasesCard}>
         <h3 className={styles.compasesTitulo}>Compases: cómo se divide el tiempo</h3>
-        <p className={styles.compasesSubtitulo}>El numerador indica cuántos pulsos hay; el denominador, qué figura vale un pulso</p>
+        <p className={styles.compasesSubtitulo}>El numerador indica cuántas figuras caben en cada compás; el denominador, qué figura es (4 = negra, 8 = corchea)</p>
         <div className={styles.compasesGrid}>
           {COMPASES.map((c, i) => (
             <div key={i} className={styles.compasItem}>
@@ -641,7 +748,7 @@ function SeccionRitmo({ audio }: { audio: ReturnType<typeof useAudio> }) {
       {/* BPM por género */}
       <div className={styles.bpmCard}>
         <h3 className={styles.bpmTitulo}>BPM por género musical</h3>
-        <p className={styles.bpmSubtitulo}>Pulsaciones por minuto: la velocidad de cada estilo</p>
+        <p className={styles.bpmSubtitulo}>Pulsaciones por minuto: rangos orientativos de la velocidad de cada estilo</p>
         <div className={styles.bpmGrid}>
           {BPM_GENEROS.map((g, i) => (
             <div key={i} className={styles.bpmRow}>
@@ -660,12 +767,17 @@ function SeccionRitmo({ audio }: { audio: ReturnType<typeof useAudio> }) {
               <PlayButton onClick={() => audio.playBeat(Math.round((g.min + g.max) / 2))} label={`Escuchar ritmo ${g.genero}`} small />
             </div>
           ))}
-          <div className={styles.bpmEscala}>
-            <span>60</span>
-            <span>90</span>
-            <span>120</span>
-            <span>150</span>
-            <span>180</span>
+          {/* La escala vive en la MISMA columna que las pistas y cada marca se coloca a bpm/190,
+              igual que las barras (hallazgo 1941). */}
+          <div className={`${styles.bpmRow} ${styles.bpmReglaFila}`} aria-hidden="true">
+            <div />
+            <div className={styles.bpmEscala}>
+              {MARCAS_BPM.map((bpm) => (
+                <span key={bpm} style={{ left: `${(bpm / maxBpm) * 100}%` }}>{bpm}</span>
+              ))}
+            </div>
+            <div />
+            <div />
           </div>
         </div>
       </div>
@@ -698,7 +810,7 @@ function SeccionRitmo({ audio }: { audio: ReturnType<typeof useAudio> }) {
       {/* Fibonacci en la música */}
       <div className={styles.fibonacciCard}>
         <h3 className={styles.fibonacciTitulo}>La proporción áurea en la música</h3>
-        <p className={styles.fibonacciSubtitulo}>Fibonacci y φ (1,618...) aparecen en la estructura de obras maestras</p>
+        <p className={styles.fibonacciSubtitulo}>Análisis que buscan Fibonacci y φ (≈ 1,618) en la estructura de algunas obras: unas veces es intención del autor; otras, una lectura discutida</p>
         <div className={styles.fibonacciGrid}>
           {FIBONACCI_MUSICA.map((f, i) => (
             <div key={i} className={styles.fibonacciItem}>
@@ -776,7 +888,9 @@ export default function VisualizadorMatematicasMusicaPage() {
         </nav>
 
         {/* Cabecera sección */}
-        <div className={styles.seccionHeader}>
+        {/* Al cambiar de sección se anuncia solo el título (hallazgo 1944): antes la región viva
+            envolvía la sección entera y el lector la leía de un tirón. */}
+        <div className={styles.seccionHeader} aria-live="polite" aria-atomic="true">
           <h2 className={styles.seccionTitulo}>
             <span aria-hidden="true">{SECCIONES.find(s => s.id === seccionActiva)?.icono}</span>{' '}
             {SECCIONES.find(s => s.id === seccionActiva)?.titulo}
@@ -784,9 +898,7 @@ export default function VisualizadorMatematicasMusicaPage() {
           <p className={styles.seccionSubtitulo}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
         </div>
 
-        <div aria-live="polite" aria-atomic="true">
-          {renderSeccion()}
-        </div>
+        {renderSeccion()}
 
         <EducationalSection
           title="Más sobre matemáticas y música"
@@ -795,33 +907,36 @@ export default function VisualizadorMatematicasMusicaPage() {
         >
           <h3>¿Por qué la música nos emociona?</h3>
           <p>
-            Las ondas sonoras activan directamente el sistema límbico (emocional) del cerebro.
-            Cuando un acorde &ldquo;resuelve&rdquo; una tensión armónica, el cerebro libera <strong>dopamina</strong> —
-            el mismo neurotransmisor que se activa con la comida o el amor. Las matemáticas de la consonancia
-            son literalmente la base de la emoción musical.
+            La música activa regiones del cerebro ligadas a la emoción y la recompensa. Estudios de neuroimagen
+            (Salimpoor y otros, 2011) midieron liberación de <strong>dopamina</strong> en los momentos de más
+            emoción de piezas elegidas por los propios oyentes. La consonancia es solo una parte: cuentan
+            también las expectativas, el recuerdo y la cultura musical de quien escucha.
           </p>
 
           <h3>¿Todas las culturas usan 12 notas?</h3>
           <p>
             No. La música árabe divide la octava en 24 cuartos de tono. La música india usa 22 <em>shrutis</em>.
             La música indonesia (gamelan) utiliza escalas de 5 y 7 notas con afinaciones únicas. Sin embargo,
-            la octava (2:1) y la quinta (3:2) aparecen en prácticamente todas las tradiciones musicales del mundo,
-            lo que sugiere una base matemática universal.
+            la octava (2:1) y la quinta (3:2) aparecen en muchas tradiciones musicales del mundo, aunque no en
+            todas se perciben igual: se discute cuánto hay de base acústica y cuánto de aprendizaje.
           </p>
 
           <h3>¿Es cierto que Mozart te hace más inteligente?</h3>
           <p>
-            El &ldquo;efecto Mozart&rdquo; fue un estudio de 1993 muy exagerado por los medios.
-            Lo que la ciencia ha confirmado es que <strong>estudiar música</strong> mejora habilidades
-            matemáticas, espaciales y de lenguaje, gracias a que el cerebro procesa simultáneamente
-            múltiples dimensiones (ritmo, melodía, armonía, lectura de partitura).
+            El &ldquo;efecto Mozart&rdquo; (Rauscher y otros, 1993) midió una mejora pequeña y pasajera en una
+            tarea espacial tras escuchar una sonata, y los medios lo exageraron. Si <strong>estudiar música</strong>
+            mejora las matemáticas o el lenguaje sigue discutido: los metaanálisis de Sala y Gobet (2017 y 2020)
+            hallan una transferencia pequeña que desaparece en los estudios mejor diseñados. Aprender música
+            tiene valor por sí mismo, sin necesidad de ese argumento.
           </p>
 
           <h3>¿Qué es el temperamento igual?</h3>
           <p>
             Es el sistema de afinación que usamos hoy: la octava se divide en 12 semitonos exactamente iguales,
-            cada uno multiplicando la frecuencia por ¹²√2 ≈ 1,0595. Bach fue uno de sus mayores defensores,
-            componiendo <em>El clave bien temperado</em> para demostrar que se podía tocar en las 24 tonalidades.
+            cada uno multiplicando la frecuencia por ¹²√2 ≈ 1,0595. Suele relacionarse con <em>El clave bien
+            temperado</em> de Bach (1722), pero &ldquo;bien temperado&rdquo; no es lo mismo que &ldquo;igual&rdquo;:
+            la obra pide un temperamento que permita tocar en las 24 tonalidades, y cuál usaba Bach sigue
+            discutido. El temperamento igual no se generalizó en los instrumentos de teclado hasta el siglo XIX.
           </p>
 
           <div className={styles.warningBox}>

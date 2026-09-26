@@ -63,7 +63,7 @@ export const faqJsonLd = {
       name: '¿Por qué el La estándar está afinado a 440 Hz?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El La4 a 440 Hz fue adoptado como estándar internacional en 1939 por la ISO para facilitar la afinación común entre músicos y fabricantes de instrumentos de todo el mundo. Antes de ese acuerdo, el La variaba entre 415 Hz y 466 Hz según la época y el país. Algunos intérpretes de música barroca usan aún 415 Hz como referencia histórica.',
+        text: 'El La4 a 440 Hz se acordó como referencia en una conferencia internacional celebrada en Londres en 1939, y la ISO lo adoptó en 1955 y lo reafirmó en la norma ISO 16:1975, para facilitar una afinación común entre músicos y fabricantes de instrumentos. Antes, el La de referencia variaba mucho según la época y el país. Hoy no es universal: muchas orquestas afinan a 442-443 Hz y la interpretación historicista de música barroca suele usar 415 Hz.',
       },
     },
     {
@@ -79,7 +79,7 @@ export const faqJsonLd = {
       name: '¿Qué es la proporción áurea en música?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La proporción áurea (φ ≈ 1,618) aparece en la estructura de algunas composiciones: el clímax de varias obras de Debussy o Bartók se sitúa aproximadamente en el punto que divide la pieza según esta razón. También los números de Fibonacci (1, 1, 2, 3, 5, 8, 13…) aparecen en patrones rítmicos y en la disposición de secciones de ciertas composiciones del siglo XX.',
+        text: 'Algunos análisis proponen que la proporción áurea (φ ≈ 1,618) organiza la estructura de ciertas obras: Ernő Lendvai la vio en Bartók y Roy Howat en Debussy, situando el clímax cerca del punto que divide la pieza según esa razón. Son lecturas analíticas discutidas, no intenciones documentadas de los compositores. En otros casos sí es deliberado, como en Lateralus de Tool, cuyas sílabas siguen la secuencia de Fibonacci (1, 1, 2, 3, 5, 8…).',
       },
     },
     {

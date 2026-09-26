@@ -1,5 +1,7 @@
 .container {
-  --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
+  /* --primary y --secondary NO se redeclaran: vienen de globals.css con su variante oscura, y
+     como texto se usan --primary-texto / --secondary-texto (hallazgo 1943). */
+  --bg-primary: #FAFAFA; --bg-card: #FFFFFF;
   --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #6E6E6E;
   --border: #E5E5E5; --hover: #F5F5F5;
   --radius: 12px; --radius-large: 16px;
@@ -16,9 +18,9 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -40,8 +42,8 @@
 .propiedadEjemplo { font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
 
 /* Botones de sonido */
-.playBtn { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: var(--primary); color: white; border: none; border-radius: 20px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; }
-.playBtn:hover { background: var(--secondary); transform: scale(1.05); }
+.playBtn { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: var(--primary-boton); color: white; border: none; border-radius: 20px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; }
+.playBtn:hover { background: var(--secondary-boton); transform: scale(1.05); }
 .playBtn:active { transform: scale(0.95); }
 .playBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .playBtnSmall { padding: 0.25rem 0.5rem; font-size: 0.7rem; }
@@ -52,11 +54,15 @@
 .ondasTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.2rem 0; }
 .ondasSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
 .ondasGrid { display: flex; flex-direction: column; gap: var(--spacing-md); }
-.ondaRow { display: flex; align-items: center; gap: var(--spacing-md); }
-.ondaLabel { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); width: 100px; flex-shrink: 0; }
-.ondaVisual { display: flex; align-items: center; gap: 3px; height: 40px; flex: 1; }
-.ondaBarra { width: 8px; border-radius: 4px; transition: height 0.3s; min-height: 4px; }
-.ondaFreq { font-size: 0.82rem; font-weight: 700; color: var(--primary); width: 65px; text-align: right; flex-shrink: 0; }
+/* Rejilla: etiqueta | onda | cifra | botón. La onda es un SVG que se estira al ancho que quede
+   (min-width: 0), así que la fila nunca empuja la cifra ni el botón fuera de la tarjeta. */
+.ondaRow { display: grid; grid-template-columns: 100px minmax(0, 1fr) auto auto; grid-template-areas: "label visual freq boton"; align-items: center; gap: var(--spacing-md); }
+.ondaRow > button { grid-area: boton; }
+.ondaLabel { grid-area: label; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
+.ondaVisual { grid-area: visual; display: block; width: 100%; min-width: 0; height: 40px; }
+.ondaEje { stroke: var(--border); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.ondaTrazo { fill: none; stroke-width: 2; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.ondaFreq { grid-area: freq; font-size: 0.82rem; font-weight: 700; color: var(--primary-texto); text-align: right; white-space: nowrap; }
 
 /* Rango auditivo */
 .rangoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
@@ -64,7 +70,7 @@
 .rangoBar { display: flex; border-radius: var(--radius); overflow: hidden; height: 60px; margin-bottom: var(--spacing-sm); }
 .rangoInfra { flex: 1; background: #e0e0e0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; }
 [data-theme='dark'] .rangoInfra { background: #3a3a3a; }
-.rangoAudible { flex: 4; background: linear-gradient(90deg, var(--primary), var(--secondary)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; color: white; }
+.rangoAudible { flex: 4; background: linear-gradient(90deg, var(--primary-boton), var(--secondary-boton)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; color: white; }
 .rangoUltra { flex: 1; background: #e0e0e0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; }
 [data-theme='dark'] .rangoUltra { background: #3a3a3a; }
 .rangoLabel { font-size: 0.75rem; font-weight: 700; }
@@ -73,8 +79,9 @@
 
 /* Dato destacado */
 .datoDestacado { display: flex; align-items: center; gap: var(--spacing-md); background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
-.datoNumero { font-size: 2.5rem; font-weight: 800; color: var(--primary); line-height: 1; }
-.datoUnidad { font-size: 1.1rem; font-weight: 600; color: var(--secondary); margin-right: var(--spacing-sm); }
+.datoNumero { font-size: 2.5rem; font-weight: 800; color: var(--primary-texto); line-height: 1; }
+.datoUnidad { font-size: 1.1rem; font-weight: 600; color: #2C6E6A; margin-right: var(--spacing-sm); }
+[data-theme='dark'] .datoUnidad { color: var(--secondary-texto); }
 .datoTexto { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; }
 
 /* ─── Sección 2: Escala ─── */
@@ -88,33 +95,44 @@
 .intervaloInfo { display: flex; flex-direction: column; gap: 0.1rem; }
 .intervaloNombre { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
 .intervaloEjemplo { font-size: 0.72rem; color: var(--text-muted); }
-.intervaloRatio { font-size: 0.95rem; font-weight: 700; color: var(--primary); font-family: monospace; text-align: center; min-width: 50px; }
+.intervaloRatio { font-size: 0.95rem; font-weight: 700; color: var(--primary-texto); font-family: monospace; text-align: center; min-width: 50px; }
 .intervaloBarContainer { height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
 .intervaloBar { height: 100%; border-radius: 5px; transition: width 0.3s; }
 .consonanciaTag { font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 10px; white-space: nowrap; text-align: center; }
-.consonancia_perfecta { background: rgba(46,134,171,0.12); color: #2E86AB; }
-.consonancia_alta { background: rgba(72,169,166,0.12); color: #48A9A6; }
-.consonancia_media { background: rgba(230,126,34,0.12); color: #e67e22; }
-.consonancia_baja { background: rgba(231,76,60,0.12); color: #e74c3c; }
+/* Texto de las etiquetas: el mismo tono, lo bastante oscuro (claro) o claro (oscuro) para 4,5:1
+   sobre su fondo teñido (hallazgo 1943). */
+.consonancia_perfecta { background: rgba(46,134,171,0.12); color: var(--primary-texto); }
+.consonancia_alta { background: rgba(72,169,166,0.12); color: #2C6E6A; }
+[data-theme='dark'] .consonancia_alta { color: #5ABDB9; }
+.consonancia_media { background: rgba(230,126,34,0.12); color: #9A4A08; }
+.consonancia_baja { background: rgba(231,76,60,0.12); color: #B0302A; }
+[data-theme='dark'] .consonancia_media { color: #F5A962; }
+[data-theme='dark'] .consonancia_baja { color: #F59184; }
 
 /* 12 notas */
 .doceNotasCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
 .doceNotasTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
 .doceNotasExplicacion { display: flex; flex-direction: column; gap: var(--spacing-md); }
 .doceNotasPaso { display: flex; gap: var(--spacing-md); align-items: flex-start; }
-.pasoNumero { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+.pasoNumero { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--primary-boton); color: white; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
 .doceNotasPaso p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin: 0.3rem 0 0 0; }
 .doceNotasPaso strong { color: var(--text-primary); font-size: 0.95rem; }
 
 /* Notas y frecuencias */
 .notasFreqCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
-.notasFreqTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
-.notasBarras { display: flex; justify-content: center; align-items: flex-end; gap: var(--spacing-sm); height: 200px; padding-bottom: 60px; position: relative; }
-.notaBarra { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; flex: 1; max-width: 60px; height: 100%; position: relative; justify-content: flex-end; }
-.notaBarraFill { width: 100%; border-radius: 6px 6px 0 0; min-height: 10px; transition: height 0.3s; }
-.notaBarraNombre { font-size: 0.68rem; font-weight: 700; color: var(--text-primary); position: absolute; bottom: -22px; white-space: nowrap; }
-.notaBarraFreq { font-size: 0.62rem; color: var(--text-muted); position: absolute; bottom: -36px; white-space: nowrap; }
-.notaBarraRatio { font-size: 0.6rem; color: var(--text-secondary); position: absolute; bottom: -48px; font-family: monospace; }
+.notasFreqTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.2rem 0; }
+.notasFreqSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; line-height: 1.4; }
+/* Cada columna: pista de alto fijo con la barra (su alto es proporcional a la frecuencia y nada
+   la encoge) y, debajo, en flujo normal, nombre, cifra, razón y botón. Los rótulos envuelven en
+   vez de desbordar y pisarse con la columna vecina. */
+.notasBarras { display: flex; justify-content: center; align-items: stretch; gap: var(--spacing-sm); }
+.notaBarra > button { margin-top: auto; }
+.notaBarra { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; flex: 1 1 0; min-width: 0; max-width: 60px; text-align: center; }
+.notaBarraPista { width: 100%; height: 140px; display: flex; align-items: flex-end; flex-shrink: 0; }
+.notaBarraFill { width: 100%; border-radius: 6px 6px 0 0; transition: height 0.3s; }
+.notaBarraNombre { font-size: 0.68rem; font-weight: 700; color: var(--text-primary); line-height: 1.2; overflow-wrap: anywhere; margin-top: 0.2rem; }
+.notaBarraFreq { font-size: 0.62rem; color: var(--text-muted); line-height: 1.2; }
+.notaBarraRatio { font-size: 0.62rem; color: var(--text-secondary); font-family: monospace; line-height: 1.2; }
 
 /* ─── Sección 3: Acordes ─── */
 
@@ -126,8 +144,10 @@
 .acordeHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm); flex-wrap: wrap; gap: 0.3rem; }
 .acordeNombre { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 .acordeTipo { font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 10px; }
-.tipoMayor { background: rgba(46,134,171,0.12); color: #2E86AB; }
-.tipoMenor { background: rgba(155,89,182,0.12); color: #9b59b6; }
+.tipoMayor { background: rgba(46,134,171,0.12); color: var(--primary-texto); }
+.tipoMenor { background: rgba(155,89,182,0.12); color: #7D3C98; }
+[data-theme='dark'] .tipoMayor { color: #6BBCE0; }
+[data-theme='dark'] .tipoMenor { color: #CDA6E0; }
 .acordeNotas { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-sm); font-weight: 500; }
 .acordeRatioVisual { margin-bottom: var(--spacing-sm); }
 .acordeRatioLabel { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; display: block; margin-bottom: 0.3rem; }
@@ -154,7 +174,7 @@
 .progresionItem:last-child { border-bottom: none; padding-bottom: 0; }
 .progresionHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; flex-wrap: wrap; gap: 0.3rem; }
 .progresionNombre { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
-.progresionGrados { font-size: 0.82rem; font-weight: 600; color: var(--primary); font-family: monospace; }
+.progresionGrados { font-size: 0.82rem; font-weight: 600; color: var(--primary-texto); font-family: monospace; }
 .progresionAcordes { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--spacing-sm); font-weight: 500; }
 .progresionCanciones { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); }
 .progresionCancion { font-size: 0.75rem; color: var(--text-muted); background: var(--hover); padding: 0.15rem 0.5rem; border-radius: 8px; }
@@ -167,7 +187,7 @@
 .compasesSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
 .compasesGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); }
 .compasItem { display: grid; grid-template-columns: 50px 1fr auto; gap: var(--spacing-sm); align-items: center; padding: var(--spacing-sm) var(--spacing-md); background: var(--hover); border-radius: 8px; }
-.compasNumero { font-size: 1.3rem; font-weight: 800; color: var(--primary); font-family: monospace; text-align: center; }
+.compasNumero { font-size: 1.3rem; font-weight: 800; color: var(--primary-texto); font-family: monospace; text-align: center; }
 .compasNombre { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
 .compasPatron { display: flex; gap: 4px; align-items: center; }
 .compassPulso { width: 14px; height: 14px; border-radius: 50%; transition: all 0.2s; }
@@ -181,13 +201,17 @@
 .bpmTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin: 0 0 0.2rem 0; }
 .bpmSubtitulo { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0 0 var(--spacing-lg) 0; }
 .bpmGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); }
-.bpmRow { display: grid; grid-template-columns: 100px 1fr 60px; gap: var(--spacing-sm); align-items: center; }
+/* Columnas FIJAS (también la del botón): la regla de BPM es otra fila y sus pistas tienen que
+   medir lo mismo que las de las barras. */
+.bpmRow { display: grid; grid-template-columns: 100px minmax(0, 1fr) 60px 32px; gap: var(--spacing-sm); align-items: center; }
 .bpmGenero { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
 .bpmBarContainer { height: 18px; background: var(--hover); border-radius: 9px; position: relative; overflow: hidden; }
 .bpmBar { position: absolute; top: 0; height: 100%; border-radius: 9px; opacity: 0.8; }
 .bpmRango { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); text-align: right; font-family: monospace; }
-.bpmEscala { display: flex; justify-content: space-between; padding-top: var(--spacing-sm); border-top: 1px solid var(--border); margin-top: var(--spacing-sm); }
-.bpmEscala span { font-size: 0.68rem; color: var(--text-muted); }
+.bpmReglaFila { margin-top: 0.2rem; }
+.bpmEscala { position: relative; height: 1.4rem; border-top: 1px solid var(--border); }
+.bpmEscala span { position: absolute; top: 0.25rem; transform: translateX(-50%); font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; }
+.bpmEscala span::before { content: ''; position: absolute; left: 50%; top: -0.3rem; width: 1px; height: 0.25rem; background: var(--border); }
 
 /* Polirritmias */
 .polirritmiaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
@@ -210,13 +234,13 @@
 .fibonacciItem { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
 .fibonacciHeader { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); align-items: baseline; margin-bottom: 0.3rem; }
 .fibonacciCompositor { font-size: 0.95rem; color: var(--text-primary); }
-.fibonacciObra { font-size: 0.82rem; color: var(--primary); }
+.fibonacciObra { font-size: 0.82rem; color: var(--primary-texto); }
 .fibonacciDetalle { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 0.3rem 0; }
-.fibonacciDato { font-size: 0.75rem; font-weight: 600; color: var(--primary); font-family: monospace; }
+.fibonacciDato { font-size: 0.75rem; font-weight: 600; color: var(--primary-texto); font-family: monospace; }
 .fibonacciSecuencia { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); }
 .fibonacciSecLabel { font-size: 0.82rem; color: var(--text-secondary); font-weight: 600; }
 .fibonacciNumeros { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); justify-content: center; }
-.fibonacciNum { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; font-weight: 700; font-size: 0.82rem; }
+.fibonacciNum { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); color: white; font-weight: 700; font-size: 0.82rem; }
 .fibonacciEllipsis { display: flex; align-items: center; font-size: 1.2rem; color: var(--text-muted); font-weight: 700; }
 
 /* ─── Compartidos ─── */
@@ -237,16 +261,31 @@
   .intervaloRow { grid-template-columns: 1fr auto; gap: 0.3rem; }
   .intervaloBarContainer { display: none; }
   .consonanciaTag { grid-column: 1 / -1; text-align: left; }
-  .bpmRow { grid-template-columns: 80px 1fr 50px; }
+  /* En móvil la pista baja a su propia línea, a todo el ancho: con la regla en la misma
+     columna, las marcas de 60 a 180 BPM no se pisan. */
+  .bpmRow { grid-template-columns: minmax(0, 1fr) 60px 32px; grid-template-areas: "genero rango boton" "pista pista pista"; row-gap: 0.25rem; }
+  .bpmGenero { grid-area: genero; }
+  .bpmRango { grid-area: rango; }
+  .bpmRow > button { grid-area: boton; }
+  .bpmBarContainer, .bpmEscala { grid-area: pista; }
+  .bpmReglaFila > div:not(.bpmEscala) { display: none; }
   .datoDestacado { flex-direction: column; text-align: center; }
-  .ondaLabel { width: 80px; font-size: 0.72rem; }
+  /* En móvil la onda baja a su propia línea, a todo el ancho (hallazgo 1938). */
+  .ondaRow { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "label freq boton" "visual visual visual"; gap: 0.3rem var(--spacing-sm); }
+  .ondaLabel { font-size: 0.78rem; }
   .compasItem { grid-template-columns: 40px 1fr; }
   .compasPatron { grid-column: 1 / -1; }
   .notasBarras { gap: 0.25rem; }
+  .notaBarraPista { height: 120px; }
   .polirritmiaRow { flex-direction: column; align-items: stretch; }
   .polirritmiaLabel { width: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .acordeCard, .intervaloBar, .ondaBarra, .compassPulso { transition-duration: 0.01ms !important; }
+  .acordeCard, .intervaloBar, .notaBarraFill, .compassPulso { transition-duration: 0.01ms !important; }
 }
+
+/* Texto azul sobre --hover (#333333) en oscuro: #3FA5D1 se queda en 4,52:1, sin margen. */
+[data-theme='dark'] .intervaloRatio,
+[data-theme='dark'] .fibonacciDato,
+[data-theme='dark'] .fibonacciObra { color: #6BBCE0; }
