@@ -31,6 +31,9 @@ const TAMANO_BLOQUE = 8000;
 /** Resultados que se pintan de golpe; el resto, bajo petición */
 const LIMITE_VISIBLE = 300;
 
+/** Pausa de tecleo tras la que la consulta se da por escrita */
+const ESPERA_ASENTADA_MS = 800;
+
 const EJEMPLOS = ['corazón', 'cielo', 'vida', 'camino', 'silencio', 'mar'];
 
 const ETIQUETA_ACENTUACION: Record<Acentuacion, string> = {
@@ -49,6 +52,9 @@ export default function DiccionarioRimasPage() {
   const [filtroAcentuacion, setFiltroAcentuacion] = useState<Acentuacion | null>(null);
   const [verTodas, setVerTodas] = useState(false);
   const [copiado, setCopiado] = useState(false);
+  // La consulta cuando se deja de teclear: los avisos y el anuncio del recuento
+  // esperan a ella (hallazgos 2163 y 2164 del Inspector, 25/09/2026)
+  const [consultaAsentada, setConsultaAsentada] = useState('');
 
   const [indice, setIndice] = useState<IndiceRimas | null>(null);
   const [estado, setEstado] = useState<EstadoCarga>('cargando');
@@ -112,6 +118,15 @@ export default function DiccionarioRimasPage() {
     };
   }, []);
 
+  // Una palabra a medio escribir no es una entrada inválida: «t» y «tr» no
+  // tienen vocal todavía cuando se teclea «tren». Se espera a que la consulta
+  // lleve un momento quieta antes de avisar o de anunciar nada.
+  useEffect(() => {
+    const t = setTimeout(() => setConsultaAsentada(consulta), ESPERA_ASENTADA_MS);
+    return () => clearTimeout(t);
+  }, [consulta]);
+  const asentada = consulta === consultaAsentada;
+
   // ── Búsqueda ──────────────────────────────────────────────────────────────
   const resultado = useMemo(() => {
     if (!indice || !consulta.trim()) return null;
@@ -168,10 +183,27 @@ export default function DiccionarioRimasPage() {
   // que antes de escribir (hallazgo 1309 del Inspector, 24/09/2026).
   // Lo mismo con letras pero sin vocal («prr», «DVD»): no hay sílaba ni núcleo
   // de rima, y antes se escandía la palabra entera como si lo fuera.
+  // Solo con la consulta asentada: antes saltaba con la primera letra de casi
+  // cualquier palabra (hallazgo 2163 del Inspector, 25/09/2026).
   const motivoAviso =
-    indice !== null && consulta.trim() !== '' && resultado === null
+    asentada && indice !== null && consulta.trim() !== '' && resultado === null
       ? motivoSinEscansion(consulta)
       : null;
+
+  // Lo que se anuncia del resultado es el recuento, no la lista: la región viva
+  // envolvía cientos de palabras que se reemplazaban a cada tecla (hallazgo 2164).
+  let anuncioResultado = '';
+  if (asentada && resultado) {
+    const palabra = resultado.consulta.palabra;
+    if (resultado.palabras.length > 0) {
+      const n = resultado.palabras.length;
+      anuncioResultado = `${formatNumber(n, 0)} ${n === 1 ? 'palabra' : 'palabras'} que riman en ${tipo} con ${palabra}`;
+    } else if (resultado.totalSinFiltrar === 0) {
+      anuncioResultado = `Ninguna palabra rima en ${tipo} con ${palabra}`;
+    } else {
+      anuncioResultado = `Los filtros dejan fuera las ${formatNumber(resultado.totalSinFiltrar, 0)} palabras encontradas`;
+    }
+  }
 
   const relatedApps = getRelatedApps('diccionario-rimas');
   const truncado = resultado ? resultado.palabras.length > LIMITE_VISIBLE && !verTodas : false;
@@ -295,8 +327,10 @@ export default function DiccionarioRimasPage() {
 
       {/* Región viva siempre montada: así el lector de pantalla anuncia el aviso
           en cuanto aparece, y se vacía sola cuando la entrada vuelve a ser válida.
-          Vacía no ocupa sitio: no lleva margen ni relleno propios */}
-      <div role="alert">
+          Vacía no ocupa sitio: no lleva margen ni relleno propios. Es cortés
+          (status), no asertiva: es una pista sobre lo escrito, no una urgencia
+          que deba cortar el eco del tecleo */}
+      <div id="aviso-entrada" role="status">
         {motivoAviso === 'sin-letras' && (
           <p className={styles.avisoEntrada}>
             «{consulta.trim()}» no contiene ninguna letra. Escribe una palabra para buscar con qué
@@ -312,9 +346,14 @@ export default function DiccionarioRimasPage() {
         )}
       </div>
 
+      {/* Anuncio del recuento para lectores de pantalla, siempre montado */}
+      <p id="anuncio-resultado" className={styles.visualmenteOculto} role="status">
+        {anuncioResultado}
+      </p>
+
       {/* ── Resultado ───────────────────────────────────────────────────── */}
       {resultado && (
-        <section className={styles.resultado} aria-live="polite">
+        <section id="resultado-rimas" className={styles.resultado} aria-label="Rimas encontradas">
           <div className={styles.fichaConsulta}>
             <div className={styles.fichaPalabra}>
               {resultado.consulta.silabas.map((s, i) => (

@@ -89,7 +89,11 @@ async function pestana(page: Page, tipo: 'consonante' | 'asonante'): Promise<voi
   await expect(tab).toHaveAttribute('aria-selected', 'true');
 }
 
-const resultado = (page: Page) => page.locator('section[aria-live="polite"]');
+// Desde la reparación de 2164 la sección del resultado ya no es región viva (anunciaba la
+// lista entera): se localiza por su id, y el anuncio del recuento vive en #anuncio-resultado.
+const resultado = (page: Page) => page.locator('#resultado-rimas');
+// Desde la reparación de 2163 el aviso de entrada es cortés (role="status") y no asertivo.
+const avisoEntrada = (page: Page) => page.locator('#aviso-entrada');
 
 /** Las palabras pintadas en la lista (inicio + núcleo resaltado, sin el contador de sílabas). */
 async function palabrasVisibles(page: Page): Promise<string[]> {
@@ -206,7 +210,7 @@ test.describe('diccionario-rimas — caso 3: entrada sucia o sin letras', () => 
     await abrir(page);
     await buscar(page, '123');
     const aviso = page
-      .locator('#estado-diccionario, [role="alert"]:not(#__next-route-announcer__), section[aria-live="polite"]')
+      .locator('#estado-diccionario, #aviso-entrada, #resultado-rimas')
       .filter({ hasText: /letra|palabra v[aá]lida|no (es|contiene) una palabra/i });
     await expect(aviso.first()).toBeVisible();
   });
@@ -215,8 +219,7 @@ test.describe('diccionario-rimas — caso 3: entrada sucia o sin letras', () => 
 test.describe('diccionario-rimas — regresión 1309: el aviso limpia el resultado anterior', () => {
   test('«camino» → «!!!»: desaparece la lista y sale el aviso; «camino» otra vez: vuelve y el aviso se va', async ({ page }) => {
     await abrir(page);
-    const aviso = page
-      .locator('[role="alert"]:not(#__next-route-announcer__)')
+    const aviso = avisoEntrada(page)
       .filter({ hasText: 'ninguna letra' });
 
     await buscar(page, 'camino');
@@ -337,8 +340,7 @@ test.describe('diccionario-rimas — sospecha: entrada con letras y sin vocales'
 
   test('app: «prr» avisa de que no tiene vocal y no pinta resultado; «rey» vuelve a rimar', async ({ page }) => {
     await abrir(page);
-    const aviso = page
-      .locator('[role="alert"]:not(#__next-route-announcer__)')
+    const aviso = avisoEntrada(page)
       .filter({ hasText: 'ninguna vocal' });
 
     await buscar(page, 'prr');
@@ -357,8 +359,7 @@ test.describe('diccionario-rimas — sospecha: entrada con letras y sin vocales'
   test('app: una sigla sin vocales («DVD») sugiere escribirla como suena', async ({ page }) => {
     await abrir(page);
     await buscar(page, 'DVD');
-    const aviso = page
-      .locator('[role="alert"]:not(#__next-route-announcer__)')
+    const aviso = avisoEntrada(page)
       .filter({ hasText: 'ninguna vocal' });
     await expect(aviso).toContainText('«DVD» no tiene ninguna vocal');
     await expect(aviso).toContainText('escríbela como suena');
@@ -546,7 +547,7 @@ test.describe('diccionario-rimas — reinspección 25/09/2026: gu, qu, k, x, h, 
 test.describe('diccionario-rimas — reinspección 25/09/2026: rechazo y rendimiento', () => {
   test('«psst» y «brr» (sin vocal) y «3,14» y «¿?» (sin letras) avisan y no pintan resultado', async ({ page }) => {
     await abrir(page);
-    const aviso = page.locator('[role="alert"]:not(#__next-route-announcer__)');
+    const aviso = avisoEntrada(page);
     for (const [entrada, motivo] of [
       ['psst', 'no tiene ninguna vocal'],
       ['brr', 'no tiene ninguna vocal'],
@@ -594,32 +595,53 @@ test.describe('diccionario-rimas — reinspección 25/09/2026: rechazo y rendimi
  *      caracteres con «camino»; 10.114 <li> tras «Ver las» con «cantar»), y se reemplaza a
  *      cada tecla. Lo que hay que anunciar es el recuento, no cientos de palabras.
  */
-test.describe('diccionario-rimas — hallazgos abiertos de la reinspección 25/09/2026', () => {
-  test('tecleando «tren», la región role="alert" no interrumpe con «no tiene ninguna vocal»', async ({ page }) => {
-    test.fail(); // Hallazgo C del acta 25/09/2026 (introducido por 3de61f3c)
+/*
+ * REPARACIÓN (26/09/2026, hallazgos 2163 y 2164)
+ *   C. Los avisos de entrada esperan a que la consulta lleve 800 ms quieta, y su región pasa a
+ *      role="status" (cortés): una pista sobre lo escrito no debe cortar el eco del tecleo. El
+ *      caso original escuchaba la región role="alert"; como ya no existe, escucha la región
+ *      del aviso (#aviso-entrada), que es lo que el lector de pantalla leería. Se añade la
+ *      otra mitad: si el usuario SE PARA en «tr», el aviso sí llega.
+ *   D. La sección del resultado deja de ser aria-live; un <p role="status"> oculto a la vista
+ *      (#anuncio-resultado) anuncia solo el recuento, también con la consulta asentada.
+ */
+test.describe('diccionario-rimas — reparación de la reinspección 25/09/2026 (2163 y 2164)', () => {
+  test('tecleando «tren», la región del aviso no recibe «no tiene ninguna vocal»', async ({ page }) => {
     await abrir(page);
     await page.evaluate(() => {
       const w = window as unknown as { __alertas: string[] };
       w.__alertas = [];
-      const region = document.querySelector('[role="alert"]:not(#__next-route-announcer__)');
-      if (!region) throw new Error('no está la región role="alert" de la app');
-      new MutationObserver(() => {
-        const t = region.textContent?.trim();
-        if (t) w.__alertas.push(t);
-      }).observe(region, { childList: true, subtree: true, characterData: true });
+      const regiones = document.querySelectorAll(
+        '#aviso-entrada, [role="alert"]:not(#__next-route-announcer__)',
+      );
+      if (!regiones.length) throw new Error('no está la región del aviso de la app');
+      for (const region of regiones) {
+        new MutationObserver(() => {
+          const t = region.textContent?.trim();
+          if (t) w.__alertas.push(t);
+        }).observe(region, { childList: true, subtree: true, characterData: true });
+      }
     });
-    await page.locator('#palabra').pressSequentially('tren');
+    // 150 ms entre teclas: un tecleo normal, por debajo de la pausa de 800 ms
+    await page.locator('#palabra').pressSequentially('tren', { delay: 150 });
     await esperarValorEnReact(page, '#palabra', 'tren');
     await expect(resultado(page)).toContainText('rima desde -en');
     const alertas = await page.evaluate(() => (window as unknown as { __alertas: string[] }).__alertas);
-    expect(alertas, 'alertas asertivas mientras se teclea una palabra válida').toEqual([]);
+    expect(alertas, 'avisos mientras se teclea una palabra válida').toEqual([]);
+    await expect(page.locator('[role="alert"]:not(#__next-route-announcer__)')).toHaveCount(0);
+  });
+
+  test('si se detiene en «tr», el aviso sí llega (cortés, no asertivo)', async ({ page }) => {
+    await abrir(page);
+    await page.locator('#palabra').pressSequentially('tr', { delay: 100 });
+    await expect(avisoEntrada(page)).toContainText('«tr» no tiene ninguna vocal');
+    await expect(avisoEntrada(page)).toHaveAttribute('role', 'status');
   });
 
   test('la región viva del resultado anuncia el recuento, no la lista de palabras', async ({ page }) => {
-    test.fail(); // Hallazgo D del acta 25/09/2026
     await abrir(page);
     await buscar(page, 'camino');
-    await expect(page.getByText('que riman en consonante con camino')).toBeVisible();
+    await expect(page.getByText('que riman en consonante con camino').first()).toBeVisible();
     // Fuera el contenido de <EducationalSection>: es un componente compartido (también lleva
     // aria-live, con sus 17 <li>) y no se imputa a la app.
     const enRegionViva = await page.evaluate(
@@ -630,5 +652,8 @@ test.describe('diccionario-rimas — hallazgos abiertos de la reinspección 25/0
           .reduce((a, b) => a + b, 0),
     );
     expect(enRegionViva, 'palabras de la lista dentro de una región aria-live').toBe(0);
+    await expect(page.locator('#anuncio-resultado')).toHaveText(
+      /^\d[\d.]* palabras que riman en consonante con camino$/,
+    );
   });
 });
