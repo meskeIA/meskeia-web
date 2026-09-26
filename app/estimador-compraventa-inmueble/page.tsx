@@ -8,7 +8,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, Resu
 import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -38,6 +38,9 @@ import {
   notariaDeLibreAcuerdo,
   LIMITE_ARANCEL_NOTARIAL,
   TERRITORIOS_SIN_IVA,
+  honorariosLlevanIVA,
+  FACTURA_NOTARIAL,
+  REGISTRO_CONCEPTOS,
   sumarLineasVisibles, superaElTope } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import {
@@ -46,6 +49,8 @@ import {
   HORQUILLA_GESTORIA,
   PREGUNTA_NO_SUJECION,
   RESPUESTA_NO_SUJECION,
+  PREGUNTA_QUIEN_PAGA,
+  RESPUESTA_QUIEN_PAGA,
 } from './metadata';
 
 /**
@@ -256,6 +261,12 @@ interface ResultadosComprador {
    * parte reglada, así que el coste total no es definitivo.
    */
   notariaLibre: boolean;
+  /**
+   * En Canarias, Ceuta y Melilla las facturas de notaría y registro no llevan IVA sino IGIC o
+   * IPSI, que esta app no calcula: el motor las devuelve SIN impuesto indirecto (hallazgo 2214,
+   * commit 242fffcd) y aquí se guarda el nombre del impuesto que falta. null donde rige el IVA.
+   */
+  honorariosSinImpuesto: string | null;
   totalGastos: number;
   totalOperacion: number;
   /** null en primera mano (allí es IVA, no ITP) */
@@ -292,6 +303,23 @@ interface ResultadosVendedor {
   /** false mientras falte el precio de compra: entonces el 0 no es una exención */
   irpfCalculado: boolean;
   exentoIRPF: boolean;
+  /** La exención del art. 33.4.b LIRPF es por dependencia severa o gran dependencia, no por edad */
+  exentoPorDependencia: boolean;
+  /**
+   * Art. 41 bis.1 RIRPF (BOE-A-2007-6820): a efectos de los arts. 33.4.b y 38 LIRPF, vivienda
+   * habitual es la residencia «durante un plazo continuado de, al menos, tres años», salvo
+   * fallecimiento u otras circunstancias que «necesariamente exijan el cambio de domicilio»
+   * (matrimonio, separación, traslado laboral, primer empleo, cambio de empleo u otras análogas
+   * justificadas). Con menos de 3 años de propiedad no caben 3 de residencia: sin la excepción
+   * declarada, la exención no se aplica (hallazgo 2182, ALTO).
+   */
+  exencionBloqueada41bis: boolean;
+  /** Menos de 3 años, pero el vendedor declara una de las excepciones del art. 41 bis.1 */
+  exencionPorExcepcion41bis: boolean;
+  /** Se pide una exención y los años no se conocen (vacíos, ilegibles o negativos) */
+  plazoResidenciaDesconocido: boolean;
+  /** Años de tenencia leídos (para nombrarlos en el aviso del art. 41 bis); NaN si no se conocen */
+  aniosTenencia: number;
   motivoExencion: string | null;
   /** Campos concretos sin rellenar, para no confundir «falta este dato» con «este cálculo no se hizo» */
   faltaPrecioCompra: boolean;
@@ -350,6 +378,18 @@ interface ResultadosVendedor {
   parCatastralImposible: boolean;
   /** La reinversión deja exenta PARTE de la ganancia (art. 41 RIRPF, proporcional) */
   exencionParcial: boolean;
+  /**
+   * La comisión escrita supera el 100 % del precio de venta: escrita, legible e imposible
+   * (patrón 5 de la familia, hallazgo 2186). No entra en el cálculo —liquidar con ella fabricaba
+   * una pérdida «compensable» y un neto negativo «que realmente recibes»— y se pide corregirla.
+   */
+  comisionImposible: boolean;
+  /**
+   * Con PÉRDIDA y el valor catastral total ilegible: ¿habría ganancia con la plusvalía a 0? Solo
+   * entonces el aviso puede prometer «(o puede haber ganancia)» (receta 6, hallazgo 2192). Se
+   * CALCULA con el valor de transmisión sin restar la plusvalía, no se razona.
+   */
+  gananciaSinPlusvaliaPositiva: boolean;
   /** Hacia dónde queda cada cifra real con los importes ilegibles, CALCULADO por sondeo */
   veredictoNeto: Veredicto;
   veredictoIrpf: Veredicto;
@@ -432,8 +472,13 @@ function calcularVendedor(e: EntradaVendedor) {
   const hayDatosGanancia = e.precioC > 0;
   const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
   const totalGastos = sumarLineasVisibles(plusvalia, comision, e.otrosVenta, irpf);
+  /** El valor de transmisión SIN restar la plusvalía, contra el de adquisición (receta 6). */
+  const gananciaSinPlusvalia = hayDatosGanancia
+    ? Math.max(0, e.precioV - comision - e.otrosVenta) - g.valorAdquisicion
+    : 0;
   return {
     comision,
+    gananciaSinPlusvalia,
     resultadoPlusvalia,
     plusvalia,
     g,
@@ -586,7 +631,14 @@ export default function SimuladorCompraventaPage() {
   const [valorCatastralSuelo, setValorCatastralSuelo] = useState('');
   const [valorCatastralTotal, setValorCatastralTotal] = useState('');
   const [vendedorMayor65, setVendedorMayor65] = useState(false);
+  /** Art. 33.4.b LIRPF: mayores de 65 O personas en dependencia severa o gran dependencia (2183). */
+  const [vendedorDependencia, setVendedorDependencia] = useState(false);
   const [esViviendaHabitual, setEsViviendaHabitual] = useState(true);
+  /**
+   * Menos de 3 años en la vivienda por una causa que obligó a cambiar de domicilio (art. 41 bis.1
+   * RIRPF). Sin ella, con menos de 3 años las exenciones de la vivienda habitual no se aplican.
+   */
+  const [excepcionPlazoResidencia, setExcepcionPlazoResidencia] = useState(false);
 
   // Datos del vendedor que corrigen el valor de adquisición (art. 35.1 LIRPF)
   const [gastosAdquisicion, setGastosAdquisicion] = useState('');
@@ -723,10 +775,13 @@ export default function SimuladorCompraventaPage() {
     const ajd =
       tipoTransmision === 'primera-mano' ? calcularAJD(precio, ccaa, { objeto: objetoAJDDe(tipoInmueble) }) : 0;
 
-    const notaria = estimarFacturaNotarial(precio);
+    // Con la comunidad: en Canarias, Ceuta y Melilla el arancel se devuelve sin el 21 % de IVA,
+    // que allí no existe (hallazgo 2214). Caso de origen: Canarias · 150.000 € → registro
+    // 180,11 € y no 217,94 € «IVA incluido», 37,82 € de ellos un IVA inventado.
+    const notaria = estimarFacturaNotarial(precio, ccaa);
 
     const notario = notaria.medio;
-    const registro = calcularRegistro(precio);
+    const registro = calcularRegistro(precio, ccaa);
     // Nota: La comisión inmobiliaria la paga el vendedor, no el comprador
 
     // Se suman las líneas YA redondeadas al céntimo, que es como las ve el usuario: el
@@ -748,6 +803,7 @@ export default function SimuladorCompraventaPage() {
       gastosGestoria: gestoria,
       gestoriaLegible,
       notariaLibre: notariaDeLibreAcuerdo(precio),
+      honorariosSinImpuesto: honorariosLlevanIVA(ccaa) ? null : (territorioSinIva?.impuesto ?? null),
       totalGastos,
       totalOperacion: sumarLineasVisibles(precio, totalGastos),
       tipoElegido,
@@ -799,7 +855,16 @@ export default function SimuladorCompraventaPage() {
     // así que el neto del vendedor subía por encima del real sin ninguna línea que lo
     // explicara. Mismo defecto que d787b81b ya acotó en la gestoría del comprador arriba,
     // sin propagarlo a la partida gemela (hallazgos 476, 477).
-    const comisionPct = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
+    const comisionEscrita = Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100;
+    /**
+     * Por encima del 100 % no es una comisión (patrón 5 de la familia, hallazgo 2186): con «150»
+     * la app publicaba «Pérdida patrimonial 150.000,00 € … se puede compensar en la declaración» y
+     * un neto de −101.500,00 € «Lo que realmente recibes». Como los años negativos (1552), no se
+     * liquida con el dato imposible: la comisión queda FUERA del cálculo, el neto se rotula
+     * «(PARCIAL)» y se pide corregirla. Sin ella el neto real solo puede ser igual o MENOR.
+     */
+    const comisionImposible = comisionEscrita > 1;
+    const comisionPct = comisionImposible ? 0 : comisionEscrita;
     // Aquí se leía `const gestoria = parseSpanishNumberOr(gastosGestoria)` y no se usaba en
     // ningún punto: la gestoría de ese campo la paga el COMPRADOR y el art. 35.1 LIRPF no la
     // admite en la ganancia del vendedor (ver la llamada al motor). Se retiró el 23/09/2026
@@ -830,8 +895,25 @@ export default function SimuladorCompraventaPage() {
      * JSON-LD de esta página afirma. Las casillas ya solo se pintan con «Vivienda».
      */
     const puedeSerViviendaHabitual = tipoInmueble === 'vivienda';
-    const exentoIRPF = puedeSerViviendaHabitual && vendedorMayor65 && esViviendaHabitual;
-    const puedeReinvertir = puedeSerViviendaHabitual && esViviendaHabitual && reinvierte && !exentoIRPF;
+    /** Art. 33.4.b LIRPF: «por mayores de 65 años o por personas en situación de dependencia
+     *  severa o de gran dependencia» (BOE-A-2006-20764, hallazgo 2183). */
+    const exencionPersonal = vendedorMayor65 || vendedorDependencia;
+    /**
+     * Art. 41 bis.1 RIRPF (hallazgo 2182, ALTO). Los años de PROPIEDAD acotan los de residencia:
+     * con menos de 3 no caben 3 de residencia, y la exención —la de edad o dependencia y la de
+     * reinversión— solo procede si el vendedor declara una de las excepciones del reglamento.
+     * Hasta el 26/09/2026 se aplicaban con 1 año: IRPF «EXENTO» y 288.750,00 € «Lo que realmente
+     * recibes» en el caso del acta, en vez de 19.292,50 € de IRPF y 269.457,50 € de neto. Con los
+     * años sin conocer (vacíos, ilegibles o negativos) la exención se sigue aplicando, porque el
+     * plazo puede cumplirse, y el texto de la tarjeta lo pone como condición.
+     */
+    const menosDeTresAnios = aniosDisponibles && anios < 3;
+    const plazoResidenciaCumplido = !menosDeTresAnios || excepcionPlazoResidencia;
+    const pideExencion = puedeSerViviendaHabitual && esViviendaHabitual && (exencionPersonal || reinvierte);
+    const exentoIRPF =
+      puedeSerViviendaHabitual && exencionPersonal && esViviendaHabitual && plazoResidenciaCumplido;
+    const puedeReinvertir =
+      puedeSerViviendaHabitual && esViviendaHabitual && reinvierte && !exencionPersonal && plazoResidenciaCumplido;
     const entrada: EntradaVendedor = {
       precioV,
       precioC,
@@ -979,6 +1061,11 @@ export default function SimuladorCompraventaPage() {
       irpfGanancia: r.irpf,
       irpfCalculado: hayDatosGanancia,
       exentoIRPF,
+      exentoPorDependencia: exentoIRPF && !vendedorMayor65,
+      exencionBloqueada41bis: pideExencion && !plazoResidenciaCumplido,
+      exencionPorExcepcion41bis: pideExencion && menosDeTresAnios && excepcionPlazoResidencia,
+      plazoResidenciaDesconocido: pideExencion && !aniosDisponibles,
+      aniosTenencia: aniosDisponibles ? anios : NaN,
       motivoExencion: hayDatosGanancia ? g.motivoExencion : null,
       // !(x > 0) y no «x <= 0»: con el campo vacío, parseSpanishNumber devuelve NaN, y
       // NaN <= 0 es false — el mismo bug que el propio hallazgo 512 venía a cerrar.
@@ -1004,11 +1091,13 @@ export default function SimuladorCompraventaPage() {
       parCatastralImposible: rp !== null && !rp.exento && rp.parCatastralImposible,
       exencionParcial:
         hayDatosGanancia && g.ganancia > 0 && g.baseImponible > 0 && g.baseImponible < g.ganancia,
+      comisionImposible,
+      gananciaSinPlusvaliaPositiva: r.gananciaSinPlusvalia > 0,
       veredictoNeto: veredictoDe((x) => x.neto),
       veredictoIrpf: veredictoDe((x) => x.irpf),
       veredictoGanancia: veredictoDe((x) => x.ganancia),
     };
-  }, [precioVenta, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, esViviendaHabitual, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble]);
+  }, [precioVenta, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, vendedorDependencia, esViviendaHabitual, excepcionPlazoResidencia, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble]);
 
   /**
    * En Canarias, Ceuta y Melilla la obra nueva no pagó IVA sino IGIC o IPSI, que esta app no
@@ -1058,7 +1147,9 @@ export default function SimuladorCompraventaPage() {
     // el botón se quedaba corto en el valor de ADQUISICIÓN, y quedarse corto ahí infla la
     // ganancia y el IRPF — la dirección contra la que avisa la cabecera de
     // data/fiscal/ganancia-inmueble.ts (hallazgo 673 del Inspector).
-    const estimado = impuestos + calcularNotario(precioC) + calcularRegistro(precioC) + GESTORIA_TIPICA;
+    // Con la comunidad (hallazgo 2214): en Canarias, Ceuta y Melilla aquellas facturas no
+    // llevaron IVA sino IGIC o IPSI, y la nota de debajo del botón lo dice.
+    const estimado = impuestos + calcularNotario(precioC, ccaa) + calcularRegistro(precioC, ccaa) + GESTORIA_TIPICA;
     setGastosAdquisicion(formatNumber(estimado, 0));
   };
 
@@ -1086,12 +1177,31 @@ export default function SimuladorCompraventaPage() {
     const n = parseSpanishNumber(t);
     return Number.isFinite(n) && n >= 0 && !Object.is(n, -0) && Math.trunc(n) === 0;
   })();
+  /** Años escritos, legibles y por debajo de 3: el plazo del art. 41 bis.1 RIRPF no se cumple (2182). */
+  const aniosMenosDeTres = (() => {
+    const t = aniosPropiedad.trim();
+    if (t === '') return false;
+    const n = parseSpanishNumber(t);
+    return Number.isFinite(n) && n >= 0 && !Object.is(n, -0) && Math.trunc(n) < 3;
+  })();
   /** Al coste del comprador le falta algo: el IGIC/IPSI, la gestoría ilegible o la notaría libre. */
-  const costeCompradorParcial =
+  /** Lo que falta en el coste del comprador SIN contar el IGIC/IPSI de notaría y registro. */
+  const faltaEnCosteSinHonorarios =
     !!resultadosComprador &&
     (resultadosComprador.impuestoNoCalculado ||
       !resultadosComprador.gestoriaLegible ||
       resultadosComprador.notariaLibre);
+  /**
+   * Y el coste es parcial también donde las facturas de notaría y registro llevan IGIC o IPSI
+   * (hallazgo 2214): en segunda mano en Canarias se rotulaba «COSTE TOTAL DE ADQUISICIÓN ·
+   * Precio + todos los gastos» con esos honorarios sin impuesto.
+   */
+  const costeCompradorParcial =
+    faltaEnCosteSinHonorarios || (!!resultadosComprador && resultadosComprador.honorariosSinImpuesto !== null);
+  /** «IVA incluido» donde rige el IVA; «sin IGIC» o «sin IPSI» donde no (hallazgo 2214). */
+  const rotuloHonorarios = honorariosLlevanIVA(ccaa)
+    ? 'IVA incluido'
+    : `sin ${TERRITORIOS_SIN_IVA[ccaa]?.impuesto ?? 'IVA'}`;
 
   /**
    * Las partidas que el neto del vendedor NO está descontando porque faltan datos.
@@ -1103,6 +1213,9 @@ export default function SimuladorCompraventaPage() {
     ? [
         resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
         resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
+        // Escrita por encima del 100 %: fuera del cálculo, así que el neto no la descuenta
+        // (patrón 5 de la familia, hallazgo 2186).
+        resultadosVendedor.comisionImposible ? 'la comisión inmobiliaria' : null,
       ].filter((x): x is string => x !== null)
     : [];
 
@@ -1194,6 +1307,27 @@ export default function SimuladorCompraventaPage() {
    * un mínimo (patrón de familia 2, hallazgos 1546, 1562 y 1570).
    */
   const plusvaliaPendiente = resultadosVendedor?.plusvaliaPendiente ?? false;
+  /**
+   * La comisión escrita por encima del 100 % tampoco resta del valor de transmisión (queda fuera
+   * del cálculo, hallazgo 2186), así que la ganancia y el IRPF son un MÁXIMO por el mismo motivo
+   * que con la plusvalía que falta. Las frases se componen para los dos casos, y con solo la
+   * plusvalía dicen exactamente lo de antes.
+   */
+  const comisionPendiente =
+    !!resultadosVendedor && resultadosVendedor.comisionImposible && resultadosVendedor.irpfCalculado;
+  const restaPendiente = plusvaliaPendiente || comisionPendiente;
+  const noRestaQue = [
+    plusvaliaPendiente ? 'la plusvalía municipal, que falta' : null,
+    comisionPendiente ? 'la comisión inmobiliaria, que no es válida' : null,
+  ].filter((x): x is string => x !== null);
+  /** «No resta la plusvalía municipal, que falta, ni la comisión inmobiliaria, que no es válida» */
+  const fraseNoResta = `No resta ${noRestaQue.join(', ni ')}`;
+  const conEllas = noRestaQue.length > 1 ? 'con ellas' : 'con ella';
+  /** Prefijo de los «Sin cerrar: …» — «falta la plusvalía municipal, » */
+  const sinCerrarPendiente = [
+    plusvaliaPendiente ? 'falta la plusvalía municipal, ' : '',
+    comisionPendiente ? 'la comisión inmobiliaria no es válida, ' : '',
+  ].join('');
 
   /**
    * Texto de una tarjeta intermedia (IRPF, ganancia) cuando un ilegible la mueve, o cuando falta
@@ -1201,8 +1335,8 @@ export default function SimuladorCompraventaPage() {
    * puede saber hacia dónde queda la cifra real, y lo dice.
    */
   const avisoTarjeta = (v: Veredicto, que: string, cuentaPlusvalia = true): string | null => {
-    const pendiente = cuentaPlusvalia && plusvaliaPendiente;
-    const frasePlusvalia = `No resta la plusvalía municipal, que falta, así que ${que} real puede ser menor`;
+    const pendiente = cuentaPlusvalia && restaPendiente;
+    const frasePlusvalia = `${fraseNoResta}, así que ${que} real puede ser menor`;
     if (v.tipo === 'ninguno') return pendiente ? `${frasePlusvalia}.` : null;
     // El caso caro es la reinversión: sin leerla, el motor no aplica la exención del art. 38
     // LIRPF y cobra el IRPF entero de una ganancia que puede estar exenta al 100 % (1190).
@@ -1214,7 +1348,7 @@ export default function SimuladorCompraventaPage() {
       : '';
     if (v.tipo === 'mixto' || (pendiente && v.tipo === 'mayor')) {
       const ilegibles = v.tipo === 'mixto' ? sinRepetir([...v.menor, ...v.mayor]) : v.campos;
-      return `Sin cerrar: ${pendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y mueven ${que} en sentidos contrarios. ${escribelo(ilegibles)} con coma decimal (1.234,56).${art38}`;
+      return `Sin cerrar: ${pendiente ? sinCerrarPendiente : ''}${noSePudoLeer(ilegibles)} y mueven ${que} en sentidos contrarios. ${escribelo(ilegibles)} con coma decimal (1.234,56).${art38}`;
     }
     // «Escríbelos» detrás de dos importes (hallazgo 1555).
     const ilegible = `${mayuscula(noSePudoLeer(v.campos))}, así que ${que} real ${v.seguro ? 'es' : 'puede ser'} ${v.tipo === 'menor' ? 'menor' : 'mayor'}. ${escribelo(v.campos)} con coma decimal (1.234,56).${v.tipo === 'menor' ? art38 : ''}`;
@@ -1223,22 +1357,28 @@ export default function SimuladorCompraventaPage() {
 
   /** La cifra es un MÁXIMO por la plusvalía que falta y ningún ilegible tira en contra. */
   const esMaximoPorPlusvalia = (v: Veredicto): boolean =>
-    plusvaliaPendiente && (v.tipo === 'ninguno' || v.tipo === 'menor');
+    restaPendiente && (v.tipo === 'ninguno' || v.tipo === 'menor');
 
   /**
    * La pérdida es la ganancia con el signo cambiado: su dirección es la contraria. Abre en
    * mayúscula, como los demás avisos de la redacción común (hallazgo 1555).
    */
   const avisoPerdida = (v: Veredicto): string | null => {
-    const frasePlusvalia = 'No resta la plusvalía municipal, que falta, así que la pérdida real puede ser mayor que esta';
-    if (v.tipo === 'ninguno') return plusvaliaPendiente ? `${frasePlusvalia}.` : null;
-    if (v.tipo === 'mixto' || (plusvaliaPendiente && v.tipo === 'mayor')) {
+    const frasePlusvalia = `${fraseNoResta}, así que la pérdida real puede ser mayor que esta`;
+    if (v.tipo === 'ninguno') return restaPendiente ? `${frasePlusvalia}.` : null;
+    if (v.tipo === 'mixto' || (restaPendiente && v.tipo === 'mayor')) {
       const ilegibles = v.tipo === 'mixto' ? sinRepetir([...v.menor, ...v.mayor]) : v.campos;
-      return `Sin cerrar: ${plusvaliaPendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y mueven la pérdida en sentidos contrarios. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
+      return `Sin cerrar: ${sinCerrarPendiente}${noSePudoLeer(ilegibles)} y mueven la pérdida en sentidos contrarios. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
     }
     const mayorPerdida = v.tipo === 'menor';
-    const ilegible = `${mayuscula(noSePudoLeer(v.campos))}: la pérdida real ${v.seguro ? 'es' : 'puede ser'} ${mayorPerdida ? 'mayor' : 'menor'} que esta${mayorPerdida ? '' : ' (o puede haber ganancia)'}. ${escribelo(v.campos)} con coma decimal (1.234,56).`;
-    return plusvaliaPendiente ? `${frasePlusvalia}. ${ilegible}` : ilegible;
+    /**
+     * «(o puede haber ganancia)» solo si, con la plusvalía a 0 —lo más que puede abaratarla el
+     * valor catastral total ilegible—, el valor de transmisión superaría al de adquisición: se
+     * CALCULA (receta 6 de la familia, hallazgo 2192). Si no, la promesa es falsa.
+     */
+    const puedeHaberGanancia = !mayorPerdida && (resultadosVendedor?.gananciaSinPlusvaliaPositiva ?? false);
+    const ilegible = `${mayuscula(noSePudoLeer(v.campos))}: la pérdida real ${v.seguro ? 'es' : 'puede ser'} ${mayorPerdida ? 'mayor' : 'menor'} que esta${puedeHaberGanancia ? ' (o puede haber ganancia)' : ''}. ${escribelo(v.campos)} con coma decimal (1.234,56).`;
+    return restaPendiente ? `${frasePlusvalia}. ${ilegible}` : ilegible;
   };
 
   /**
@@ -1247,17 +1387,17 @@ export default function SimuladorCompraventaPage() {
    * haber. Tenía texto fijo y no miraba el sondeo (patrón 6, hallazgos 1549, 1565 y 1575).
    */
   const avisoCero = (v: Veredicto): string | null => {
-    const frasePlusvalia = 'No resta la plusvalía municipal, que falta: con ella puede haber una pérdida que se compensaría en la declaración';
-    if (v.tipo === 'ninguno') return plusvaliaPendiente ? `${frasePlusvalia}.` : null;
-    if (v.tipo === 'mixto' || (plusvaliaPendiente && v.tipo === 'mayor')) {
+    const frasePlusvalia = `${fraseNoResta}: ${conEllas} puede haber una pérdida que se compensaría en la declaración`;
+    if (v.tipo === 'ninguno') return restaPendiente ? `${frasePlusvalia}.` : null;
+    if (v.tipo === 'mixto' || (restaPendiente && v.tipo === 'mayor')) {
       const ilegibles = v.tipo === 'mixto' ? sinRepetir([...v.menor, ...v.mayor]) : v.campos;
-      return `Sin cerrar: ${plusvaliaPendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y tiran en sentidos contrarios: puede haber ganancia o pérdida. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
+      return `Sin cerrar: ${sinCerrarPendiente}${noSePudoLeer(ilegibles)} y tiran en sentidos contrarios: puede haber ganancia o pérdida. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
     }
     const ilegible =
       v.tipo === 'menor'
         ? `${mayuscula(noSePudoLeer(v.campos))}, así que ${v.seguro ? 'hay' : 'puede haber'} una pérdida que se compensaría en la declaración. ${escribelo(v.campos)} con coma decimal (1.234,56).`
         : `${mayuscula(noSePudoLeer(v.campos))}, así que ${v.seguro ? 'hay' : 'puede haber'} una ganancia, y con ella IRPF. ${escribelo(v.campos)} con coma decimal (1.234,56).`;
-    return plusvaliaPendiente ? `${frasePlusvalia}. ${ilegible}` : ilegible;
+    return restaPendiente ? `${frasePlusvalia}. ${ilegible}` : ilegible;
   };
 
   /**
@@ -1291,6 +1431,27 @@ export default function SimuladorCompraventaPage() {
     resultadosVendedor.irpfCalculado &&
     resultadosVendedor.gananciaPatrimonial > 0 &&
     (resultadosVendedor.exentoIRPF || resultadosVendedor.baseImponibleIRPF === 0);
+
+  /**
+   * El plazo de residencia del art. 41 bis.1 RIRPF (BOE-A-2007-6820), en la tarjeta del IRPF
+   * (hallazgo 2182, ALTO). Tres situaciones:
+   *  · menos de 3 años sin excepción declarada → no se exime, y se dice por qué y cómo declararla;
+   *  · menos de 3 años CON la excepción → se exime, y el motivo lo nombra;
+   *  · años sin conocer → se exime (el plazo puede cumplirse), y el motivo lo pone como condición.
+   */
+  const sufijo41bis = !resultadosVendedor
+    ? ''
+    : resultadosVendedor.exencionPorExcepcion41bis
+      ? ' (con menos de 3 años de residencia, por la causa que declaras: art. 41 bis.1 RIRPF)'
+      : resultadosVendedor.plazoResidenciaDesconocido
+        ? ', si ha sido tu residencia al menos 3 años seguidos (art. 41 bis.1 RIRPF)'
+        : '';
+  const aviso41bis = (() => {
+    if (!resultadosVendedor?.exencionBloqueada41bis) return null;
+    const n = resultadosVendedor.aniosTenencia;
+    const tenencia = n === 0 ? 'menos de 1 año' : n === 1 ? '1 año' : `${n} años`;
+    return `Sin la exención de la vivienda habitual: con ${tenencia} de propiedad no llega a los 3 años seguidos de residencia que exige el art. 41 bis.1 RIRPF. Si cambiaste de domicilio antes por matrimonio, separación, traslado laboral, primer empleo, cambio de empleo u otra causa análoga justificada, márcalo en el formulario.`;
+  })();
 
   /** Los años escritos en negativo: no faltan, son imposibles (patrón 5, hallazgo 1552). */
   const AVISO_ANIOS_NEGATIVOS = 'los años de tenencia no pueden ser negativos';
@@ -1332,12 +1493,55 @@ export default function SimuladorCompraventaPage() {
         context="estimador-compraventa-inmueble"
         collapsible={false}
       />
+      {/*
+        Un sello por cada módulo cuyos datos PUBLICA la página, con su fuente y su fecha (receta 2
+        de la familia, hallazgo 2184). Había uno solo, el del ITP/AJD verificado el 17/06/2026,
+        mientras la pestaña Vendedor calcula con los coeficientes del IIVTNU —los que estuvieron
+        caducados hasta el 24/09/2026, hallazgo 1559— y con la escala del ahorro sin enseñar la
+        fecha de ninguno. Es la reparación de los hallazgos 35, 332/1579 y 695/781 en las hermanas.
+        Cada sello cita solo lo que su módulo respalda: el de ITP/AJD ya no nombra la Ley del IRPF
+        ni el RDL 26/2021 de la plusvalía, que tienen sello propio.
+      */}
       <DataReference
-        normativa={`ITP/AJD ${FISCAL_INMUEBLES_META.vigencia}`}
-        fuente={FISCAL_INMUEBLES_META.fuente}
+        normativa={`ITP, AJD e IVA de la vivienda ${FISCAL_INMUEBLES_META.vigencia} · lo que paga quien compra`}
+        fuente="Real Decreto Legislativo 1/1993 (ITP y AJD) + Ley 37/1992 del IVA (tipos de la vivienda y sus anejos)"
         verificado={FISCAL_INMUEBLES_META.verificado}
         urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
         nota={separarPorcentajes(FISCAL_INMUEBLES_META.nota)}
+      />
+      <DataReference
+        normativa={`IVA general (${formatNumber(PORCENTAJES_IVA.general, 0)}\u00A0%) ${FISCAL_IVA_META.vigencia} · suelo edificable, anejos sueltos y honorarios de notaría y registro`}
+        fuente={FISCAL_IVA_META.fuente}
+        verificado={FISCAL_IVA_META.verificado}
+        urlOficial={FISCAL_IVA_META.urlOficial}
+        nota={FISCAL_IVA_META.nota}
+      />
+      <DataReference
+        normativa="Arancel de los notarios · notaría"
+        fuente={FACTURA_NOTARIAL.baseNormativa}
+        verificado={FACTURA_NOTARIAL.verificado}
+        urlOficial={FACTURA_NOTARIAL.urlOficial}
+        nota={FACTURA_NOTARIAL.nota}
+      />
+      <DataReference
+        normativa="Arancel de los registradores · registro de la propiedad"
+        fuente={REGISTRO_CONCEPTOS.baseNormativa}
+        verificado={REGISTRO_CONCEPTOS.verificado}
+        urlOficial={REGISTRO_CONCEPTOS.urlOficial}
+      />
+      <DataReference
+        normativa={`Plusvalía municipal (IIVTNU) ${PLUSVALIA_MUNICIPAL_META.vigencia} · lo que paga quien vende`}
+        fuente={PLUSVALIA_MUNICIPAL_META.baseNormativa}
+        verificado={PLUSVALIA_MUNICIPAL_META.verificado}
+        urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
+        nota={separarPorcentajes(`${PLUSVALIA_MUNICIPAL_META.aviso} ${PLUSVALIA_MUNICIPAL_META.nota}`)}
+      />
+      <DataReference
+        normativa={`IRPF de la ganancia ${GANANCIAS_PATRIMONIALES_META.vigencia} · lo que paga quien vende`}
+        fuente={GANANCIAS_PATRIMONIALES_META.fuente}
+        verificado={GANANCIAS_PATRIMONIALES_META.verificado}
+        urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
+        nota={GANANCIAS_PATRIMONIALES_META.nota}
       />
 
       {/* Formulario principal */}
@@ -1639,8 +1843,11 @@ export default function SimuladorCompraventaPage() {
                     />
                   )}
 
+                  {/* «(IVA incluido)» solo donde rige el IVA: en Canarias, Ceuta y Melilla el motor
+                      devuelve el arancel sin impuesto indirecto y el rótulo nombra el que falta
+                      (hallazgo 2214). */}
                   <ResultCard
-                    title="Gastos de notaría (IVA incluido)"
+                    title={`Gastos de notaría (${rotuloHonorarios})`}
                     value={formatCurrency(resultadosComprador.gastosNotario)}
                     description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.${
                       resultadosComprador.notariaLibre
@@ -1652,7 +1859,7 @@ export default function SimuladorCompraventaPage() {
                   />
 
                   <ResultCard
-                    title="Registro de la Propiedad (IVA incluido)"
+                    title={`Registro de la Propiedad (${rotuloHonorarios})`}
                     value={formatCurrency(resultadosComprador.gastosRegistro)}
                     variant="default"
                     icon="🏛️"
@@ -1707,6 +1914,9 @@ export default function SimuladorCompraventaPage() {
                         resultadosComprador.notariaLibre
                           ? 'SIN la parte de la notaría que es de libre acuerdo'
                           : null,
+                        resultadosComprador.honorariosSinImpuesto
+                          ? `SIN el ${resultadosComprador.honorariosSinImpuesto} de las facturas de notaría y registro, que tampoco se calcula`
+                          : null,
                       ]
                         .filter((x): x is string => x !== null)
                         .join(' — ')
@@ -1719,7 +1929,11 @@ export default function SimuladorCompraventaPage() {
                     variant="highlight"
                     icon="💳"
                     description={
-                      costeCompradorParcial
+                      // Solo falta el IGIC/IPSI de los honorarios (segunda mano en Canarias, Ceuta
+                      // o Melilla): lo explica la nota de debajo, que dice en qué dirección.
+                      costeCompradorParcial && !faltaEnCosteSinHonorarios
+                        ? `Precio + los gastos calculados, sin el ${resultadosComprador.honorariosSinImpuesto} de las facturas de notaría y registro (ver la nota de abajo)`
+                        : costeCompradorParcial
                         ? `No incluye ${[
                             resultadosComprador.impuestoNoCalculado
                               ? `el ${resultadosComprador.tipoImpuesto}`
@@ -1736,6 +1950,22 @@ export default function SimuladorCompraventaPage() {
                         : 'Precio + todos los gastos'
                     }
                   />
+                  {/*
+                    Receta 1 de la familia (hallazgo 2214): las facturas de notaría y registro
+                    llevan IGIC o IPSI, que el catálogo no calcula. Va en una nota aparte, junto al
+                    total, sin las palabras «coste real» y con la redacción común de las siete: en la
+                    descripción del total manda el invariante del testigo de familia para el impuesto
+                    de la OPERACIÓN, que puede ser cero («el coste real puede ser mayor»).
+                  */}
+                  {resultadosComprador.honorariosSinImpuesto && (
+                    <div className={styles.avisoReducidos} role="note">
+                      <p className={styles.avisoReducidosTexto}>
+                        Las facturas de notaría y registro llevan además{' '}
+                        {resultadosComprador.honorariosSinImpuesto}, que esta herramienta no calcula, así
+                        que cuestan más de lo que se muestra.
+                      </p>
+                    </div>
+                  )}
                   {/*
                     En primera mano el selector de perfil no se pinta —el IVA no tiene tipos por
                     perfil del comprador— y con él desaparecía el ÚNICO mecanismo que la app tiene
@@ -1947,7 +2177,11 @@ export default function SimuladorCompraventaPage() {
                   <p id="nota-estimar-gastos" className={styles.notaEstimar}>
                     {sinIvaCompraOriginal
                       ? `En ${datosCcaaActual.nombre} la obra nueva no paga IVA sino ${sinIvaCompraOriginal.impuesto} (${sinIvaCompraOriginal.nombre}), que esta app no calcula: escribe lo que pagaste, que figura en tu escritura.`
-                      : 'La estimación aplica los tipos generales vigentes hoy en la comunidad elegida, sin tipos reducidos: si aquella compra pagó otro tipo (el que regía en su año, o uno reducido por edad, familia numerosa o vivienda protegida), escribe lo que figura en tu escritura o en la autoliquidación del impuesto.'}
+                      : `La estimación aplica los tipos generales vigentes hoy en la comunidad elegida, sin tipos reducidos: si aquella compra pagó otro tipo (el que regía en su año, o uno reducido por edad, familia numerosa o vivienda protegida), escribe lo que figura en tu escritura o en la autoliquidación del impuesto.${
+                          TERRITORIOS_SIN_IVA[ccaa]
+                            ? ` En ${datosCcaaActual.nombre} la notaría y el registro se estiman sin el ${TERRITORIOS_SIN_IVA[ccaa]?.impuesto} que llevaron sus facturas, que esta app no calcula: súmalo si lo tienes, porque también forma parte del valor de adquisición.`
+                            : ''
+                        }`}
                   </p>
                 </div>
 
@@ -2030,7 +2264,18 @@ export default function SimuladorCompraventaPage() {
                       />
                       <span>Soy mayor de 65 años</span>
                     </label>
-                    {esViviendaHabitual && !vendedorMayor65 && (
+                    {/* La otra mitad del art. 33.4.b LIRPF (hallazgo 2183): la exención es «por
+                        mayores de 65 años o por personas en situación de dependencia severa o de
+                        gran dependencia», reconocida conforme a la Ley 39/2006. */}
+                    <label className={styles.checkbox}>
+                      <input
+                        type="checkbox"
+                        checked={vendedorDependencia}
+                        onChange={(e) => setVendedorDependencia(e.target.checked)}
+                      />
+                      <span>Tengo reconocida una dependencia severa o una gran dependencia (Ley 39/2006)</span>
+                    </label>
+                    {esViviendaHabitual && !vendedorMayor65 && !vendedorDependencia && (
                       <label className={styles.checkbox}>
                         <input
                           type="checkbox"
@@ -2040,16 +2285,44 @@ export default function SimuladorCompraventaPage() {
                         <span>Voy a reinvertir en otra vivienda habitual</span>
                       </label>
                     )}
+                    {/* Art. 41 bis.1 RIRPF (hallazgo 2182): con menos de 3 años de propiedad no
+                        caben 3 de residencia, y la exención solo procede por una de las causas
+                        del reglamento, que la app no puede deducir: se pregunta. */}
+                    {aniosMenosDeTres &&
+                      esViviendaHabitual &&
+                      (vendedorMayor65 || vendedorDependencia || reinvierte) && (
+                        <label className={styles.checkbox}>
+                          <input
+                            type="checkbox"
+                            checked={excepcionPlazoResidencia}
+                            onChange={(e) => setExcepcionPlazoResidencia(e.target.checked)}
+                          />
+                          <span>
+                            Vivo en ella menos de 3 años por una causa que me obligó a cambiar de
+                            domicilio (matrimonio, separación, traslado laboral, primer empleo, cambio
+                            de empleo u otra análoga justificada)
+                          </span>
+                        </label>
+                      )}
+                    {esViviendaHabitual && (
+                      <p className={styles.derivacionPie}>
+                        Para estas exenciones, vivienda habitual es la que ha sido tu residencia
+                        durante al menos 3 años seguidos, salvo fallecimiento o una causa que obligue
+                        a cambiar de domicilio (art. 41 bis.1 RIRPF). Basta con que lo fuera hasta
+                        algún día de los 2 años anteriores a la venta (art. 41 bis.3).
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <p className={styles.derivacionPie} role="note">
-                    La exención de los mayores de 65 años (art. 33.4.b LIRPF) y la de reinversión
+                    La exención de los mayores de 65 años y de las personas con dependencia severa o
+                    gran dependencia (art. 33.4.b LIRPF) y la de reinversión
                     (art. 38 LIRPF) son de la <strong>vivienda habitual</strong>: no se aplican a
                     la venta de {CON_ARTICULO[tipoInmueble]}, así que la ganancia tributa entera.
                   </p>
                 )}
 
-                {tipoInmueble === 'vivienda' && esViviendaHabitual && reinvierte && !vendedorMayor65 && (
+                {tipoInmueble === 'vivienda' && esViviendaHabitual && reinvierte && !vendedorMayor65 && !vendedorDependencia && (
                   <>
                     <NumberInput
                       value={importeReinversion}
@@ -2149,7 +2422,10 @@ export default function SimuladorCompraventaPage() {
                       // Sin la plusvalía calculada no puede decir que la resta: el motor la tomó
                       // como 0 y la ganancia y el IRPF de abajo son un máximo (patrón 2).
                       description={
-                        resultadosVendedor.comisionLegible && resultadosVendedor.otrosVentaLegible
+                        resultadosVendedor.comisionImposible
+                          ? // La comisión por encima del 100 % no entra (hallazgo 2186): no se resta.
+                            `Precio de venta − otros gastos de la venta${resultadosVendedor.plusvaliaCalculada ? ' y plusvalía municipal' : ' (sin la plusvalía municipal, que falta)'}, sin la comisión, que no es válida${resultadosVendedor.otrosVentaLegible ? '' : `: ${noSePudoLeer(['los otros gastos de la venta'])}`}`
+                          : resultadosVendedor.comisionLegible && resultadosVendedor.otrosVentaLegible
                           ? resultadosVendedor.plusvaliaCalculada
                             ? 'Precio de venta − comisión, otros gastos de la venta y plusvalía municipal'
                             : 'Precio de venta − comisión y otros gastos de la venta, sin la plusvalía municipal, que falta'
@@ -2251,24 +2527,34 @@ export default function SimuladorCompraventaPage() {
                           // no puede moverse y ya no se rotula «TECHO» borrando el motivo de la
                           // exención (1227); el total catastral la SUBE, no la baja (1228). La
                           // plusvalía que falta solo cuenta si hay cuota que bajar (patrón 2).
-                          (avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', resultadosVendedor.irpfGanancia > 0) ??
-                          (irpfExento
-                            ? resultadosVendedor.exentoIRPF
-                              ? 'Mayor de 65 años + vivienda habitual'
-                              : separarPorcentajes(resultadosVendedor.motivoExencion ?? 'Ganancia exenta')
-                            : resultadosVendedor.gananciaPatrimonial < 0
-                              // No es una exención, es ausencia de ganancia — y la diferencia importa:
-                              // una pérdida se compensa en la declaración y una exención no (724).
-                              ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
-                              : resultadosVendedor.gananciaPatrimonial === 0
-                                ? 'No hay ganancia que gravar, así que esta venta no tiene IRPF'
-                                : separarPorcentajes(resultadosVendedor.motivoExencion ?? 'Tributación en base del ahorro')))
+                          [
+                            avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', resultadosVendedor.irpfGanancia > 0) ??
+                              (irpfExento
+                                ? resultadosVendedor.exentoIRPF
+                                  ? `${resultadosVendedor.exentoPorDependencia ? 'Dependencia severa o gran dependencia + vivienda habitual (art. 33.4.b LIRPF)' : 'Mayor de 65 años + vivienda habitual'}${sufijo41bis}`
+                                  : `${separarPorcentajes(resultadosVendedor.motivoExencion ?? 'Ganancia exenta')}${sufijo41bis}`
+                                : resultadosVendedor.gananciaPatrimonial < 0
+                                  // No es una exención, es ausencia de ganancia — y la diferencia importa:
+                                  // una pérdida se compensa en la declaración y una exención no (724).
+                                  ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
+                                  : resultadosVendedor.gananciaPatrimonial === 0
+                                    ? 'No hay ganancia que gravar, así que esta venta no tiene IRPF'
+                                    : resultadosVendedor.motivoExencion
+                                      ? `${separarPorcentajes(resultadosVendedor.motivoExencion)}${sufijo41bis}`
+                                      : 'Tributación en base del ahorro'),
+                            // El plazo del art. 41 bis.1 RIRPF, dicho junto a la cuota que lo aplica (2182).
+                            resultadosVendedor.gananciaPatrimonial > 0 ? aviso41bis : null,
+                          ]
+                            .filter((x): x is string => !!x)
+                            .reduce((texto, frase) => (texto ? `${texto}${texto.endsWith('.') ? '' : '.'} ${frase}` : frase), '')
                     }
                   />
 
                   {/* Un porcentaje ilegible no hace desaparecer su línea (hallazgo 1230, el 1191 de
                       la gestoría del comprador de esta misma app). */}
-                  {(resultadosVendedor.comisionInmobiliaria > 0 || !resultadosVendedor.comisionLegible) && (
+                  {(resultadosVendedor.comisionInmobiliaria > 0 ||
+                    !resultadosVendedor.comisionLegible ||
+                    resultadosVendedor.comisionImposible) && (
                     <ResultCard
                       title={
                         resultadosVendedor.comisionLegible
@@ -2277,13 +2563,22 @@ export default function SimuladorCompraventaPage() {
                             `Comisión inmobiliaria (${formatTipoNominal(parseSpanishNumberOr(comisionInmobiliaria))}\u00A0%)`
                           : 'Comisión inmobiliaria'
                       }
-                      value={resultadosVendedor.comisionLegible ? formatCurrency(resultadosVendedor.comisionInmobiliaria) : 'Sin leer'}
+                      value={
+                        resultadosVendedor.comisionImposible
+                          ? 'No válida'
+                          : resultadosVendedor.comisionLegible
+                            ? formatCurrency(resultadosVendedor.comisionInmobiliaria)
+                            : 'Sin leer'
+                      }
                       variant="default"
                       icon="🏪"
                       description={
-                        resultadosVendedor.comisionLegible
-                          ? undefined
-                          : 'El porcentaje no se ha podido leer: escríbelo con coma decimal (3,5)'
+                        // Escrita, legible e imposible (patrón 5, hallazgo 2186): no se liquida.
+                        resultadosVendedor.comisionImposible
+                          ? 'Corrige la comisión: no puede superar el 100\u00A0% del precio de venta. No se descuenta del neto ni de la ganancia hasta que lo hagas.'
+                          : resultadosVendedor.comisionLegible
+                            ? undefined
+                            : 'El porcentaje no se ha podido leer: escríbelo con coma decimal (3,5)'
                       }
                     />
                   )}
@@ -2364,6 +2659,10 @@ export default function SimuladorCompraventaPage() {
                           resultadosVendedor.aniosNegativos ? 'corrige los años de tenencia (no pueden ser negativos)' : null,
                           // Ni un precio de compra 0: está escrito y no vale (hallazgo 1799).
                           resultadosVendedor.precioCompraNoValido ? 'corrige el precio de compra original (tiene que ser mayor que 0)' : null,
+                          // Ni una comisión por encima del 100 %: escrita y legible, pero imposible (2186).
+                          resultadosVendedor.comisionImposible
+                            ? 'corrige la comisión: no puede superar el 100\u00A0% del precio de venta'
+                            : null,
                           resultadosVendedor.camposIlegibles.length > 0 || avisoIlegiblesNeto
                             ? 'escribe con coma decimal (1.234,56) lo que no se ha podido leer'
                             : null,
@@ -2427,8 +2726,11 @@ export default function SimuladorCompraventaPage() {
 
         <h4><span aria-hidden="true">💡</span> Exenciones y Bonificaciones</h4>
         <p>
-          <strong>Plusvalía en IRPF:</strong> Los mayores de 65 años que venden su vivienda habitual
-          están exentos de tributar por la ganancia patrimonial en IRPF. Existen otras bonificaciones
+          <strong>Plusvalía en IRPF:</strong> Los mayores de 65 años y las personas en situación de
+          dependencia severa o gran dependencia que venden su vivienda habitual están exentos de
+          tributar por la ganancia patrimonial en IRPF (art. 33.4.b LIRPF), siempre que haya sido su
+          residencia al menos 3 años seguidos, salvo causas que obliguen a cambiar de domicilio (art. 41
+          bis RIRPF). Existen otras bonificaciones
           autonómicas según perfil (jóvenes, familias numerosas, discapacidad). <strong>Consulta con tu asesor fiscal.</strong>
         </p>
       </div>
@@ -2504,9 +2806,19 @@ export default function SimuladorCompraventaPage() {
                 <strong> plusvalía municipal</strong>. Declararlos puede rebajar la factura varios miles de euros.
               </p>
               <p>
-                <strong>Exención total</strong> para mayores de 65 años que venden su vivienda habitual, y
+                <strong>Exención total</strong> para mayores de 65 años y para personas en situación de
+                dependencia severa o gran dependencia que venden su vivienda habitual (art. 33.4.b LIRPF), y
                 <strong> exención por reinversión</strong> —total o proporcional a lo reinvertido— para quien
-                vende su vivienda habitual y compra otra en los 2 años siguientes.
+                vende su vivienda habitual y compra otra en los 2 años siguientes (art. 38.1 LIRPF). Las dos
+                exigen que haya sido tu residencia al menos 3 años seguidos, salvo fallecimiento o una causa
+                que obligue a cambiar de domicilio, como matrimonio, separación, traslado laboral o cambio de
+                empleo (art. 41 bis.1 RIRPF).
+              </p>
+              <p>
+                Los mayores de 65 años tienen además otra vía, que esta calculadora no aplica: excluir la
+                ganancia de cualquier elemento patrimonial, no solo de la vivienda, si destinan lo obtenido en
+                un plazo de seis meses a constituir una renta vitalicia asegurada a su favor, con un máximo de
+                240.000 € (art. 38.3 LIRPF).
               </p>
             </div>
           </div>
@@ -2585,11 +2897,13 @@ export default function SimuladorCompraventaPage() {
                   <td>{formatNumber(TIPO_AHORRO_MIN, 0)}&nbsp;% – {formatNumber(TIPO_AHORRO_MAX, 0)}&nbsp;%</td>
                   <td>Vendedor</td>
                 </tr>
+                {/* Por ley la matriz es del vendedor y la primera copia del comprador, salvo pacto
+                    (art. 1455 CC, hallazgo 2185): «Comprador» a secas lo daba por obligación legal. */}
                 <tr>
                   <td>Notaría</td>
                   <td>{eurosOrientativos(HORQUILLA_FEDATARIOS.notaria.min)} – {eurosOrientativos(HORQUILLA_FEDATARIOS.notaria.max)}</td>
                   <td>{eurosOrientativos(HORQUILLA_FEDATARIOS.notaria.min)} – {eurosOrientativos(HORQUILLA_FEDATARIOS.notaria.max)}</td>
-                  <td>Comprador</td>
+                  <td>Por ley, la escritura matriz el vendedor y la primera copia el comprador, salvo pacto (art. 1455 CC); es habitual pactar que la pague entera el comprador</td>
                 </tr>
                 <tr>
                   <td>Registro de la propiedad</td>
@@ -2656,9 +2970,10 @@ export default function SimuladorCompraventaPage() {
                 <span className={styles.casoEmoji} aria-hidden="true">👴</span>
                 <span className={styles.casoTag}>Vendedor mayor de 65 años</span>
               </div>
-              <p>Pedro, 67 años, vende su vivienda habitual por 300.000 €. Al ser mayor de 65 años
-              y tratarse de la residencia habitual, está exento de tributar la ganancia patrimonial
-              en IRPF. Solo debe abonar la plusvalía municipal.</p>
+              <p>Pedro, 67 años, vende por 300.000 € su vivienda habitual, en la que vive desde hace
+              más de 3 años. Al ser mayor de 65 años y tratarse de su residencia habitual, está exento
+              de tributar la ganancia patrimonial en IRPF (art. 33.4.b LIRPF). Solo debe abonar la
+              plusvalía municipal.</p>
               <div className={styles.casoResultado}>Exención total de IRPF por edad y vivienda habitual</div>
             </div>
           </div>
@@ -2675,10 +2990,11 @@ export default function SimuladorCompraventaPage() {
               en la misma operación: o se paga uno u otro, nunca ambos.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Puedo negociar quién paga cada gasto?</h4>
-              <p>En principio, salvo los gastos del vendedor (plusvalía municipal, IRPF), el resto son del comprador
-              por ley. Sin embargo, es posible pactar condiciones distintas en el contrato privado. Lo que no puede
-              modificarse es la obligación tributaria frente a Hacienda.</p>
+              {/* Decía «el resto son del comprador por ley»: el art. 1455 CC pone el otorgamiento de
+                  la escritura a cargo del vendedor (hallazgo 2185). Una sola constante para la FAQ
+                  visible y el FAQPage de metadata.ts. */}
+              <h4>{PREGUNTA_QUIEN_PAGA}</h4>
+              <p>{RESPUESTA_QUIEN_PAGA}</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué es el valor de referencia catastral y cómo afecta al ITP?</h4>
@@ -2742,8 +3058,11 @@ export default function SimuladorCompraventaPage() {
               <span className={styles.stepNumber}>3</span>
               <div className={styles.stepContent}>
                 <strong>Firma el contrato de arras con condiciones claras</strong>
-                <p>En el contrato de arras, especifica quién asume cada gasto. Aunque los impuestos del comprador
-                no son negociables frente a Hacienda, sí puedes acordar que el vendedor asuma ciertos gastos notariales.</p>
+                <p>En el contrato de arras, especifica quién asume cada gasto. Por ley, la escritura matriz
+                corre a cargo del vendedor y la primera copia del comprador (art. 1455 del Código Civil), salvo
+                que pactéis otra cosa, y es habitual pactar que el comprador pague toda la notaría: si no lo
+                acordáis, rige el reparto legal. Lo que el contrato no cambia es quién responde de cada
+                impuesto ante la Administración (art. 17.5 de la Ley General Tributaria).</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -2818,9 +3137,11 @@ export default function SimuladorCompraventaPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">👨‍💼</span>
               <strong>Consulta a un asesor fiscal</strong>
-              <p>Este simulador aplica la exención por reinversión en vivienda habitual y la de mayores de 65 años,
-              pero hay situaciones que no cubre: herencias, divorcios, no residentes, varios titulares y los
-              coeficientes de abatimiento de las compras anteriores a 1995. Ahí un asesor fiscal sí marca la diferencia.</p>
+              <p>Este simulador aplica la exención por reinversión en vivienda habitual y la del art. 33.4.b
+              (mayores de 65 años o dependencia severa o gran dependencia), pero hay situaciones que no cubre:
+              herencias, divorcios, no residentes, varios titulares, la renta vitalicia de los mayores de 65
+              (art. 38.3 LIRPF) y los coeficientes de abatimiento de las compras anteriores a 1995. Ahí un
+              asesor fiscal sí marca la diferencia.</p>
             </div>
           </div>
         </section>
@@ -2832,7 +3153,7 @@ export default function SimuladorCompraventaPage() {
             <strong>Errores comunes al calcular los gastos de compraventa</strong>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>No incluir el IVA de notaría y registro:</strong> Los honorarios de notaría y registro llevan IVA al {formatNumber(PORCENTAJES_IVA.general, 0)}&nbsp;%, que a menudo se olvida en el presupuesto inicial.</li>
+            <li><strong>No incluir el IVA de notaría y registro:</strong> Los honorarios de notaría y registro llevan IVA al {formatNumber(PORCENTAJES_IVA.general, 0)}&nbsp;% (en Canarias, IGIC, y en Ceuta y Melilla, IPSI, que esta calculadora no suma), que a menudo se olvida en el presupuesto inicial.</li>
             <li><strong>Ignorar el valor de referencia catastral:</strong> Si supera el precio escriturado, Hacienda aplicará ITP sobre ese valor mayor y podrás recibir una comprobación de valores.</li>
             <li><strong>Confundir ITP con AJD en segunda mano:</strong> En segunda mano solo se paga ITP; el AJD solo aplica en escrituras con hipoteca. No se duplican.</li>
             <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final.</li>

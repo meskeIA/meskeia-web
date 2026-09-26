@@ -29,6 +29,8 @@ import { PORCENTAJES_IVA } from '../../data/fiscal/iva';
 import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '../../data/fiscal/inmuebles';
 // ── Añadido por la re-inspección del 26/09/2026 (describe del final del fichero) ──
 import { GANANCIAS_PATRIMONIALES_META, FISCAL_INMUEBLES_META } from '../../data/fiscal/inmuebles';
+// ── Añadido por la reparación del 26/09/2026 (hallazgos 2182-2186 y receta 1 de la familia) ──
+import { FACTURA_NOTARIAL, REGISTRO_CONCEPTOS } from '../../data/itp-ccaa';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
@@ -977,8 +979,10 @@ test.describe('Inspector 27/08/2026 — caminos nuevos', () => {
 
     // 200.000 × 3 % = 6.000 (el 6 % general bonificado al 50 %), NO 12.000
     expect(await valorTarjeta(page, /^ITP/)).toBe('6000,00 €');
-    // Total = 6.000 + 758,9827 + 236,2250 + 300 = 7.295,2077
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7295,20 €');
+    // Total = 6.000 + notaría 358,43341 × 1,75 = 627,2585 (SIN el 1,21: en Ceuta no rige el IVA,
+    // hallazgo 2214; antes 758,98) + registro 195,22725 (antes 236,22) + 300 = 7.122,4858
+    // → las líneas redondeadas 6.000 + 627,26 + 195,23 + 300 = 7.122,49
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7122,49 €');
   });
 
   // Caso que DEBE rechazarse: texto que no es un número. `parseSpanishNumber` devuelve NaN
@@ -1219,13 +1223,14 @@ test.describe('Inspector 28/08/2026 — cierre del IVA en territorios sin IVA', 
   //   AJD .......... 200.000 × 0,75 % = 1.500 (ITP_CCAA.canarias.ajd = 0,75; Canarias NO
   //                  está en CIUDADES_CON_BONIFICACION, así que el efectivo es el nominal)
   //   Notaría ...... arancel RD 1426/1989 = 90,15 + 24.040,49×0,45 % + 30.050,60×0,15 %
-  //                  + 90.151,82×0,10 % + 49.746,97×0,05 % = 358,43341 ; ×1,21 de IVA
-  //                  = 433,70443 ; ×1,75 (punto medio de FACTURA_NOTARIAL) = 758,98275
+  //                  + 90.151,82×0,10 % + 49.746,97×0,05 % = 358,43341 ; ×1,75 (punto medio
+  //                  de FACTURA_NOTARIAL) = 627,25847, SIN IVA: en Canarias no rige (hallazgo
+  //                  2214, 26/09/2026; antes ×1,21 = 758,98275)
   //   Registro ..... arancel RD 1427/1989 = 24,04 + 24.040,49×0,175 % + 30.050,60×0,125 %
   //                  + 90.151,82×0,075 % + 49.746,97×0,030 % = 186,21206 ; + 6,010121 de
-  //                  presentación + 3,005061 de nota simple = 195,22725 ; ×1,21 = 236,22497
-  //   Total gastos . 0 + 1.500 + 758,98275 + 236,22497 + 300 = 2.795,20771 → 1,40 % del precio
-  //   Coste total .. 200.000 + 2.795,20771 = 202.795,20771
+  //                  presentación + 3,005061 de nota simple = 195,22725, sin IVA (antes 236,22497)
+  //   Total gastos . líneas redondeadas 0 + 1.500 + 627,26 + 195,23 + 300 = 2.622,49
+  //   Coste total .. 200.000 + 2.622,49 = 202.622,49
   // Antes de d787b81b ese total era 222.795,21 € (20.000 € de IVA inexistente dentro).
   test('CIERRE A — Canarias, primera mano: el total ya NO lleva el IVA inventado', async ({
     page,
@@ -1239,16 +1244,16 @@ test.describe('Inspector 28/08/2026 — cierre del IVA en territorios sin IVA', 
     await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
     expect(await valorTarjeta(page, /^IGIC/)).toBe('No calculado');
     expect(await valorTarjeta(page, /^AJD/)).toBe('1500,00 €');
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('758,98 €');
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('236,22 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('627,26 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('195,23 €');
 
     await expect(page.locator('h3', { hasText: /Total gastos adicionales/ }).first()).toHaveText('Total gastos adicionales (parcial)');
-    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('2795,20 €');
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('2622,49 €');
     expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toContain(
       'SIN el IGIC, que no está incluido',
     );
     await expect(page.locator('h3', { hasText: /COSTE TOTAL/ }).first()).toHaveText('COSTE TOTAL (PARCIAL)');
-    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('202.795,20 €');
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('202.622,49 €');
 
     // El aviso del IVA del 4 % de VPO no puede salir donde no hay IVA que rebajar
     await expect(page.getByText(/protección oficial de régimen especial/)).toHaveCount(0);
@@ -1292,11 +1297,12 @@ test.describe('Inspector 28/08/2026 — cierre del IVA en territorios sin IVA', 
   //   AJD .......... 400.000 × 0,5 % = 2.000 ; × (1 − 0,5) de bonificación = 1.000
   //                  → tipo EFECTIVO 1.000 / 400.000 = 0,25 %
   //   Notaría ...... arancel = 90,15 + 108,182205 + 45,0759 + 90,15182 + 249.746,97×0,05 %
-  //                  (=124,873485) = 458,43341 ; ×1,21 = 554,70443 ; ×1,75 = 970,73275
+  //                  (=124,873485) = 458,43341 ; ×1,75 = 802,25847, SIN IVA: en Ceuta no rige
+  //                  (hallazgo 2214, 26/09/2026; antes ×1,21 = 970,73275)
   //   Registro ..... 24,04 + 42,0708575 + 37,56325 + 67,613865 + 249.746,97×0,030 %
-  //                  (=74,924091) = 246,21206 ; + 9,015182 = 255,22725 ; ×1,21 = 308,82497
-  //   Total gastos . 0 + 1.000 + 970,73275 + 308,82497 + 300 = 2.579,55771 → 0,64 % del precio
-  //   Coste total .. 402.579,55771
+  //                  (=74,924091) = 246,21206 ; + 9,015182 = 255,22725, sin IVA (antes 308,82497)
+  //   Total gastos . líneas redondeadas 0 + 1.000 + 802,26 + 255,23 + 300 = 2.357,49
+  //   Coste total .. 402.357,49
   test('CASO 18 (límite: territorio sin IVA + inmueble no residencial) — Ceuta, primera mano, local de 400.000 €', async ({
     page,
   }) => {
@@ -1311,13 +1317,13 @@ test.describe('Inspector 28/08/2026 — cierre del IVA en territorios sin IVA', 
     expect(await valorTarjeta(page, /^IPSI/)).toBe('No calculado');
     await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (0,25 %)');
     expect(await valorTarjeta(page, /^AJD/)).toBe('1000,00 €');
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('970,73 €');
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('308,82 €');
-    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('2579,55 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('802,26 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('255,23 €');
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('2357,49 €');
     expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toContain(
       'SIN el IPSI, que no está incluido',
     );
-    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('402.579,55 €');
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('402.357,49 €');
     // Un local no es vivienda: el aviso del IVA del 4 % de VPO no le corresponde
     await expect(page.getByText(/protección oficial de régimen especial/)).toHaveCount(0);
   });
@@ -1533,25 +1539,27 @@ test.describe('Inspector 30/08/2026 — re-verificación de la tanda 2', () => {
     expect(await valorTarjeta(page, /^AJD/)).toBe('450,00 €');
 
     // Arancel notarial sobre 180.000 €: 90,15 + 108,182205 + 45,0759 + 90,15182
-    //   + 29.746,97×0,05 % (=14,873485) = 348,43341 ; ×1,21 = 421,6044261 ; ×1,75 = 737,807746
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('737,81 €');
+    //   + 29.746,97×0,05 % (=14,873485) = 348,43341 ; ×1,75 = 609,758468, SIN IVA: en Melilla no
+    //   rige (hallazgo 2214, 26/09/2026; antes ×1,21 = 737,807746)
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('609,76 €');
     // Registro: 24,04 + 42,0708575 + 37,56325 + 67,613865 + 29.746,97×0,030 % (=8,924091)
-    //   = 180,2120635 ; + 9,015182 = 189,2272455 ; ×1,21 = 228,9649671
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('228,96 €');
+    //   = 180,2120635 ; + 9,015182 = 189,2272455, sin IVA (antes ×1,21 = 228,9649671)
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('189,23 €');
 
-    // Total = 0 + 450 + 737,807746 + 228,964967 + 300 = 1.716,772713 → 0,9538 % del precio.
+    // Total = líneas redondeadas 0 + 450 + 609,76 + 189,23 + 300 = 1.548,99 (sin el IVA de los
+    // honorarios, hallazgo 2214; antes 1.716,77).
     // Los rótulos tienen que decir que es PARCIAL: falta el IPSI, que la app no calcula.
     await expect(page.locator('h3', { hasText: /Total gastos adicionales/ }).first()).toHaveText(
       'Total gastos adicionales (parcial)',
     );
-    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('1716,77 €');
+    expect(await valorTarjeta(page, /Total gastos adicionales/)).toBe('1548,99 €');
     expect(await descripcionTarjeta(page, /Total gastos adicionales/)).toContain(
       'SIN el IPSI, que no está incluido',
     );
     await expect(page.locator('h3', { hasText: /COSTE TOTAL/ }).first()).toHaveText(
       'COSTE TOTAL (PARCIAL)',
     );
-    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('181.716,77 €');
+    expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('181.548,99 €');
   });
 
   test('CASO 23 (límite: sin precio de compra) — el IRPF no está exento, está sin calcular', async ({
@@ -6437,6 +6445,8 @@ test.describe('Inspector 26/09/2026 — la referencia de la familia: reinversió
     page.locator('input[aria-label="Impuestos y gastos que pagaste al comprar"]');
   /** «2026-09-24» → «24/09/2026», como pinta la fecha DataReference. */
   const fechaES = (iso: string) => iso.split('-').reverse().join('/');
+  /** El rótulo entero de una tarjeta, para ver su «(máximo)» o su «(PARCIAL)». */
+  const titulo26 = (page: Page, titulo: RegExp) => page.locator('h3', { hasText: titulo }).first().innerText();
 
   /**
    * Vendedor del CASO 61 hasta la hipoteca: Andalucía · venta 250.000 · compra 150.000 de OBRA
@@ -6654,10 +6664,18 @@ test.describe('Inspector 26/09/2026 — la referencia de la familia: reinversió
    * Afirma lo correcto: con el aviso del campo en pantalla (que sí está), el neto no se rotula
    * «Lo que realmente recibes» ni se ofrece compensar una pérdida fabricada por ese dato.
    */
+  /*
+   * REPARADO el 26/09/2026 (hallazgo 2186, receta 5 de la familia). La comisión imposible queda
+   * FUERA del cálculo, como los años negativos: su tarjeta dice «No válida», el neto se rotula
+   * «(PARCIAL)» y pide corregirla. Cifras a mano sin la comisión (BASE B del CONTROL de abajo):
+   *   plusvalía 50.000 × 0,12 × 25 % = 1.500 · transmisión 200.000 − 1.500 = 198.500 ·
+   *   ganancia 198.500 − 150.000 = 48.500 → IRPF 6.000 × 19 % + 42.500 × 21 % = 1.140 + 8.925
+   *   = 10.065,00 · total 1.500 + 10.065 = 11.565,00 · neto 200.000 − 11.565 = 188.435,00 (PARCIAL:
+   *   con una comisión válida, que es ≥ 0, el neto real solo puede ser igual o menor).
+   */
   test('CASO 63 (debe rechazarse) — una comisión del 150 % no produce un neto «que realmente recibes»', async ({
     page,
   }) => {
-    test.fail(true, 'HALLAZGO 26/09 — la comisión > 100 % se avisa en el campo pero se liquida como definitiva');
     await abrir26(page);
     await sembrar26(page, 'Precio de la vivienda', '200000');
     await aVendedor26(page);
@@ -6667,9 +6685,28 @@ test.describe('Inspector 26/09/2026 — la referencia de la familia: reinversió
     await sembrar26(page, 'Comisión inmobiliaria (%)', '150');
     // El campo lo rechaza por escrito (esto ya pasa)
     await expect(formVendedor(page)).toContainText(/La comisión no puede superar el 100\s%/);
-    // Lo que falla: las cifras de abajo lo dan por bueno
+    // Y las cifras de abajo ya no lo dan por bueno
     expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).not.toBe('Lo que realmente recibes');
     await expect(page.locator('h3', { hasText: /^Pérdida patrimonial/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('No válida');
+    expect((await descripcionTarjeta(page, /^Comisión inmobiliaria/)).replace(ESPACIO_DURO, ' ')).toContain(
+      'Corrige la comisión: no puede superar el 100 % del precio de venta',
+    );
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('48.500,00 €');
+    expect(await titulo26(page, /^Ganancia patrimonial/)).toBe('Ganancia patrimonial (máximo)');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('10.065,00 €');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toContain(
+      'No resta la comisión inmobiliaria, que no es válida, así que la cuota real puede ser menor',
+    );
+    expect(await titulo26(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('188.435,00 €');
+    const neto = (await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).replace(ESPACIO_DURO, ' ');
+    expect(neto).toContain('No descuenta la comisión inmobiliaria: el neto real puede ser menor que este');
+    expect(neto).toContain('Corrige la comisión: no puede superar el 100 % del precio de venta para obtenerlo');
+    // Con la comisión corregida vuelve la BASE B del CONTROL, definitiva
+    await sembrar26(page, 'Comisión inmobiliaria (%)', '3');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('183.695,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
   });
 
   /**
@@ -6729,10 +6766,16 @@ test.describe('Inspector 26/09/2026 — la referencia de la familia: reinversió
    * Afirma lo correcto: con menos de 3 años, o no se exime, o la tarjeta del IRPF dice que la
    * exención exige 3 años de residencia (art. 41 bis RIRPF) salvo esas circunstancias.
    */
+  /*
+   * REPARADO el 26/09/2026. Con menos de 3 años de propiedad la exención no se aplica (IRPF y neto
+   * del CONTROL) y la tarjeta del IRPF nombra el art. 41 bis.1; una casilla deja declarar la
+   * excepción del reglamento (causa que obliga a cambiar de domicilio), y entonces sí se exime:
+   *   · edad + excepción: transmisión 300.000 − 9.000 − 2.250 = 288.750 → IRPF 0 · neto 288.750,00;
+   *   · reinversión de 300.000 ≥ importe obtenido 288.750 (sin hipoteca) → exención total, mismo neto.
+   */
   test('HALLAZGO 41 bis — con 1 año de propiedad, la exención de vivienda habitual no se da por hecha', async ({
     page,
   }) => {
-    test.fail(true, 'HALLAZGO 26/09 (alto) — art. 41 bis.1 RIRPF: vivienda habitual = 3 años de residencia');
     test.setTimeout(60_000);
     const exigeElPlazo = (texto: string) => /tres años|3 años|41 bis/i.test(texto);
 
@@ -6751,6 +6794,27 @@ test.describe('Inspector 26/09/2026 — la referencia de la familia: reinversió
     const irpfReinv = await valorTarjeta(page, /^IRPF sobre ganancia/);
     const descReinv = await descripcionTarjeta(page, /^IRPF sobre ganancia/);
     expect(irpfReinv === '19.292,50 €' || exigeElPlazo(descReinv), `${irpfReinv} · ${descReinv}`).toBe(true);
+
+    // Lo que hace la reparación, exacto: no exime, y lo dice con el artículo
+    expect(irpfReinv).toBe('19.292,50 €');
+    expect(descReinv).toContain('art. 41 bis.1 RIRPF');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('269.457,50 €');
+
+    // Declarada la excepción del reglamento, la reinversión total sí exime
+    const excepcion = page.getByRole('checkbox', { name: /causa que me obligó a cambiar de domicilio/ });
+    await excepcion.check();
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('EXENTO');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toContain('art. 41 bis.1 RIRPF');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('288.750,00 €');
+
+    // Y la de edad también, con la excepción declarada
+    await page.getByRole('checkbox', { name: /Voy a reinvertir/ }).uncheck();
+    await page.getByRole('checkbox', { name: /Soy mayor de 65 años/ }).check();
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('EXENTO');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'Mayor de 65 años + vivienda habitual (con menos de 3 años de residencia, por la causa que declaras: art. 41 bis.1 RIRPF)',
+    );
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('288.750,00 €');
   });
 
   /**
@@ -6768,16 +6832,35 @@ test.describe('Inspector 26/09/2026 — la referencia de la familia: reinversió
    *
    * Afirma lo correcto: el formulario del vendedor y el FAQPage nombran la dependencia.
    */
+  /*
+   * REPARADO el 26/09/2026: casilla propia, motivo propio en la tarjeta del IRPF y las dos FAQ del
+   * vendedor en el JSON-LD. El caso del acta (BASE B del CONTROL, 10 años de propiedad, vendedor de
+   * 50 años con gran dependencia): transmisión 192.500 → ganancia 42.500 EXENTA → neto 192.500,00.
+   */
   test('HALLAZGO 33.4.b — la exención de la vivienda habitual alcanza a la dependencia severa o gran dependencia', async ({
     page,
   }) => {
-    test.fail(true, 'HALLAZGO 26/09 (medio) — art. 33.4.b LIRPF: mayores de 65 O dependencia severa/gran dependencia');
     await abrir26(page);
     await sembrar26(page, 'Precio de la vivienda', '200000');
     await aVendedor26(page);
     await expect(formVendedor(page)).toContainText(/dependencia/i, { timeout: 2000 });
     const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
     expect(jsonLd).toMatch(/dependencia/i);
+
+    // Y la exención se aplica de verdad
+    await sembrar26(page, 'Precio de compra original', '150000');
+    await sembrar26(page, 'Años de propiedad', '10');
+    await sembrar26(page, 'Valor catastral del suelo', '50000');
+    await page.getByRole('checkbox', { name: /dependencia severa o una gran dependencia/ }).check();
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('EXENTO');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'Dependencia severa o gran dependencia + vivienda habitual (art. 33.4.b LIRPF)',
+    );
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('192.500,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
+    // Sin vivienda habitual no procede (art. 33.4.b: «transmisión de su vivienda habitual»)
+    await page.getByRole('checkbox', { name: 'Es mi vivienda habitual' }).uncheck();
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('8805,00 €');
   });
 
   /**
@@ -6792,10 +6875,10 @@ test.describe('Inspector 26/09/2026 — la referencia de la familia: reinversió
    *
    * Afirma lo correcto: hay un sello de la plusvalía con su fecha y uno del IRPF con la suya.
    */
+  // REPARADO el 26/09/2026 (receta 2 de la familia): un sello por módulo publicado.
   test('HALLAZGO SELLOS — la mitad del vendedor enseña la fuente y la fecha de la plusvalía y del IRPF', async ({
     page,
   }) => {
-    test.fail(true, 'HALLAZGO 26/09 (medio) — un solo DataReference (ITP/AJD) para tres tributos');
     await abrir26(page);
     const sellos = (await page.locator('[aria-label="Datos de referencia normativos"]').allInnerTexts()).map((s) =>
       s.replace(ESPACIO_DURO, ' '),
@@ -6810,6 +6893,18 @@ test.describe('Inspector 26/09/2026 — la referencia de la familia: reinversió
       sellos.some((s) => /IRPF|ahorro/i.test(s) && s.includes(fechaES(GANANCIAS_PATRIMONIALES_META.verificado))),
       sellos.join(' || '),
     ).toBe(true);
+    // Y los aranceles de notaría y registro, que la página también publica (receta 2)
+    expect(
+      sellos.some((s) => s.includes('RD 1426/1989') && s.includes(fechaES(FACTURA_NOTARIAL.verificado))),
+      sellos.join(' || '),
+    ).toBe(true);
+    expect(
+      sellos.some((s) => s.includes('RD 1427/1989') && s.includes(fechaES(REGISTRO_CONCEPTOS.verificado))),
+      sellos.join(' || '),
+    ).toBe(true);
+    // Un sello no cita normas de otro: el de ITP/AJD ya no nombra el RDL 26/2021 de la plusvalía
+    const selloItp = sellos.find((s) => /ITP, AJD/.test(s)) ?? '';
+    expect(selloItp).not.toContain('RDL 26/2021');
   });
 
   /**
@@ -6825,16 +6920,27 @@ test.describe('Inspector 26/09/2026 — la referencia de la familia: reinversió
    *
    * Afirma lo correcto: ni la FAQ visible ni el JSON-LD dicen que el resto sea del comprador «por ley».
    */
+  // REPARADO el 26/09/2026: una constante para las dos bocas, el paso 3 y la fila de la tabla.
   test('HALLAZGO 1455 — la FAQ no atribuye al comprador «por ley» los gastos de otorgamiento de la escritura', async ({
     page,
   }) => {
-    test.fail(true, 'HALLAZGO 26/09 (medio) — art. 1455 CC: el otorgamiento es del vendedor salvo pacto');
     await abrir26(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const faq = await page.locator('div[class*="faqItem"]', { hasText: '¿Puedo negociar quién paga' }).first().innerText();
     const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
     expect(faq).not.toContain('el resto son del comprador por ley');
     expect(jsonLd).not.toContain('el resto son del comprador por ley');
+    // Y dice lo que dice la ley, en las dos bocas
+    expect(faq).toContain('art. 1455 del Código Civil');
+    expect(jsonLd).toContain('art. 1455 del Código Civil');
+    expect(faq).toMatch(/otorgamiento de la escritura[^.]*son del vendedor/);
+    // El paso 3 de la guía y la fila «Notaría» de la tabla
+    await expect(page.locator('li', { hasText: 'Firma el contrato de arras' }).first()).toContainText(
+      'la escritura matriz corre a cargo del vendedor',
+    );
+    const filaNotaria = page.locator('tr', { has: page.locator('td', { hasText: /^Notaría$/ }) }).first();
+    await expect(filaNotaria).toContainText('art. 1455 CC');
+    await expect(filaNotaria.locator('td').last()).not.toHaveText('Comprador');
   });
 
   /**
@@ -6892,5 +6998,70 @@ test.describe('Inspector 26/09/2026 — la referencia de la familia: reinversió
         expect(valor, `${tema} · ${nombre}: ${valor.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
       }
     }
+  });
+
+  /**
+   * RECETA 1 de la familia (hallazgo 2214, motor reparado en 242fffcd) — notaría y registro SIN IVA
+   * donde no rige. Canarias · vivienda de segunda mano · 150.000 €, a mano:
+   *   Registro = 24,04 + 42,0708575 + 37,56325 + 67,613865 (tramos) + 6,010121 (presentación)
+   *              + 3,005061 (nota simple) = 180,113382 € SIN el 1,21 → 180,11 € (antes 217,94 € «IVA
+   *              incluido», con 37,82 € de un IVA que allí no existe).
+   *   Notaría  = arancel 333,306895 (CASO 61) sin IVA × 1,5 = 499,96 · × 2 = 666,61 · medio × 1,75
+   *              = 583,287 → 583,29 €.
+   * Los rótulos dicen «(sin IGIC)», el coste total sale «(PARCIAL)» y una nota junto al total dice,
+   * con la redacción común de la familia, que esas facturas llevan además IGIC, que no se calcula,
+   * así que cuestan más de lo que se muestra. En Madrid, el mismo
+   * precio sigue «(IVA incluido)» con 217,94 € (180,113382 × 1,21).
+   */
+  test('RECETA 1 — en Canarias la notaría y el registro van sin IVA y el coste total lo dice', async ({ page }) => {
+    await abrir26(page, 'canarias');
+    await sembrar26(page, 'Precio de la vivienda', '150000');
+    expect(await titulo26(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (sin IGIC)');
+    expect(await valorTarjeta(page, /^Registro de la Propiedad/)).toBe('180,11 €');
+    expect(await titulo26(page, /^Gastos de notaría/)).toBe('Gastos de notaría (sin IGIC)');
+    expect(await valorTarjeta(page, /^Gastos de notaría/)).toBe('583,29 €');
+    expect(await descripcionTarjeta(page, /^Gastos de notaría/)).toContain('entre 499,96 € y 666,61 €');
+    expect(await titulo26(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    await expect(page.getByRole('note').filter({ hasText: 'Las facturas de notaría y registro llevan además' })).toHaveText(
+      'Las facturas de notaría y registro llevan además IGIC, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
+    );
+
+    // Control: la península no cambia
+    await abrir26(page, 'madrid');
+    await sembrar26(page, 'Precio de la vivienda', '150000');
+    expect(await titulo26(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (IVA incluido)');
+    expect(await valorTarjeta(page, /^Registro de la Propiedad/)).toBe('217,94 €');
+    await expect(page.getByRole('note').filter({ hasText: 'Las facturas de notaría y registro llevan' })).toHaveCount(0);
+  });
+
+  /**
+   * RECETA 6 de la familia (hallazgo 2192 en las hermanas) — «(o puede haber ganancia)» solo si,
+   * con la plusvalía a 0, habría ganancia. Madrid · venta 200.000 · compra 190.000 · 10 años ·
+   * suelo 50.000 · comisión 3 % · valor catastral total ILEGIBLE («700.000.00»):
+   *   plusvalía objetivo 50.000 × 0,12 × 25 % = 1.500 · transmisión 200.000 − 6.000 − 1.500 = 192.500
+   *   (a) gastos de aquella compra 5.000 → adquisición 195.000 → pérdida 2.500. Sin plusvalía,
+   *       194.000 − 195.000 = −1.000: sigue siendo pérdida → NO se promete ganancia.
+   *   (b) gastos 3.000 → adquisición 193.000 → pérdida 500. Sin plusvalía, 194.000 − 193.000 =
+   *       +1.000 → SÍ puede haber ganancia.
+   */
+  test('RECETA 6 — «(o puede haber ganancia)» solo cuando, sin plusvalía, la habría', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrir26(page);
+    await sembrar26(page, 'Precio de la vivienda', '200000');
+    await aVendedor26(page);
+    await sembrar26(page, 'Precio de compra original', '190000');
+    await sembrar26(page, 'Años de propiedad', '10');
+    await sembrar26(page, 'Valor catastral del suelo', '50000');
+    await sembrar26(page, 'Valor catastral total (suelo + construcción)', '700.000.00');
+    await sembrar26(page, 'Impuestos y gastos que pagaste al comprar', '5000');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1500,00 €');
+    expect(await valorTarjeta(page, /^Pérdida patrimonial/)).toBe('2500,00 €');
+    const a = await descripcionTarjeta(page, /^Pérdida patrimonial/);
+    expect(a).toMatch(/la pérdida real (?:es|puede ser) menor que esta/);
+    expect(a).not.toContain('(o puede haber ganancia)');
+
+    await sembrar26(page, 'Impuestos y gastos que pagaste al comprar', '3000');
+    expect(await valorTarjeta(page, /^Pérdida patrimonial/)).toBe('500,00 €');
+    expect(await descripcionTarjeta(page, /^Pérdida patrimonial/)).toContain('(o puede haber ganancia)');
   });
 });

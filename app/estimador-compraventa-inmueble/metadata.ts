@@ -258,6 +258,19 @@ export const PREGUNTA_NO_SUJECION = '¿Cuándo no se paga plusvalía municipal?'
 export const RESPUESTA_NO_SUJECION =
   'Cuando no hay incremento de valor del terreno —por ejemplo, si vendes por lo mismo que pagaste o por menos—, la transmisión no está sujeta al impuesto (art. 104.5 del texto refundido de la Ley de Haciendas Locales, en la redacción del RDL 26/2021, tras la sentencia del Tribunal Constitucional de 26 de octubre de 2021). No es una exención: el impuesto no llega a devengarse. Aun así hay que declarar la transmisión y aportar las escrituras de compra y de venta para acreditarlo. Si hay incremento, el vendedor puede elegir el método de cálculo más favorable: objetivo o real.';
 
+/**
+ * «¿Puedo negociar quién paga cada gasto?», en UNA constante para la FAQ visible y el FAQPage.
+ * Decía «salvo los gastos del vendedor (plusvalía municipal, IRPF), el resto son del comprador por
+ * ley», y el Código Civil dice otra cosa (art. 1455, BOE-A-1889-4763, verificado el 26/09/2026):
+ * «Los gastos de otorgamiento de escrituras serán de cuenta del vendedor, y los de la primera copia
+ * y los demás posteriores a la venta serán de cuenta del comprador, salvo pacto en contrario». Que
+ * el comprador pague toda la notaría es un pacto habitual, no la ley (hallazgo 2185). Y el pacto no
+ * mueve al obligado tributario: art. 17.5 de la Ley General Tributaria (BOE-A-2003-23186).
+ */
+export const PREGUNTA_QUIEN_PAGA = '¿Puedo negociar quién paga cada gasto?';
+export const RESPUESTA_QUIEN_PAGA =
+  'Sí, dentro de un límite. Por ley, los gastos de otorgamiento de la escritura —la matriz que autoriza el notario— son del vendedor, y los de la primera copia y los posteriores a la venta, del comprador, salvo pacto en contrario (art. 1455 del Código Civil). En la práctica es habitual pactar que el comprador pague toda la notaría y el registro, pero es un acuerdo que se escribe en las arras o en el contrato privado, no una obligación legal. Lo que el pacto no cambia es quién responde de cada impuesto ante la Administración (art. 17.5 de la Ley General Tributaria): el comprador del ITP o del IVA y el AJD, y el vendedor de la plusvalía municipal y del IRPF de la ganancia.';
+
 const faqSchema = generateFAQSchema({
   url: 'https://meskeia.com/estimador-compraventa-inmueble/',
   mainEntity: [
@@ -271,11 +284,11 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Qué paga el vendedor de una vivienda?',
-      answer: `El vendedor asume la plusvalía municipal (IIVTNU), el IRPF sobre la ganancia patrimonial (del ${TIPO_AHORRO_MIN}\u00A0% al ${TIPO_AHORRO_MAX}\u00A0% en la base del ahorro) y, si la hubo, la comisión de la inmobiliaria. Existen dos exenciones importantes en el IRPF que no se aplican a otros inmuebles: la reinversión del importe en otra vivienda habitual y la de los mayores de 65 años que venden su vivienda habitual.`,
+      answer: `El vendedor asume la plusvalía municipal (IIVTNU), el IRPF sobre la ganancia patrimonial (del ${TIPO_AHORRO_MIN}\u00A0% al ${TIPO_AHORRO_MAX}\u00A0% en la base del ahorro) y, si la hubo, la comisión de la inmobiliaria. Existen dos exenciones importantes en el IRPF que no se aplican a otros inmuebles: la reinversión del importe en otra vivienda habitual y la de los mayores de 65 años o personas en situación de dependencia severa o gran dependencia que venden su vivienda habitual. Las dos exigen que haya sido su residencia al menos 3 años seguidos, salvo fallecimiento o una causa que obligue a cambiar de domicilio (art. 41 bis.1 RIRPF).`,
     },
     {
-      question: '¿Puedo negociar quién paga cada gasto?',
-      answer: 'En principio, salvo los gastos del vendedor (plusvalía municipal, IRPF), el resto son del comprador por ley. Sin embargo, es posible pactar condiciones distintas en el contrato privado. Lo que no puede modificarse es la obligación tributaria frente a Hacienda.',
+      question: PREGUNTA_QUIEN_PAGA,
+      answer: RESPUESTA_QUIEN_PAGA,
     },
     {
       question: '¿Qué es el valor de referencia catastral y cómo afecta al ITP?',
@@ -327,7 +340,7 @@ export const faqJsonLd = {
       name: '¿Qué impuestos paga el vendedor al vender un inmueble?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el ${TIPO_AHORRO_MIN}\u00A0% y el ${TIPO_AHORRO_MAX}\u00A0% según el importe. Existen dos exenciones en el IRPF, y las dos exigen que lo vendido sea la vivienda habitual: la reinversión del importe obtenido en otra vivienda habitual (art. 38 LIRPF) y la de los mayores de 65 años (art. 33.4.b LIRPF). Tener hipoteca pendiente no exime de nada: el principal que se cancela solo minora el importe obtenido a efectos de la reinversión (art. 41 RIRPF).`,
+        text: `El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el ${TIPO_AHORRO_MIN}\u00A0% y el ${TIPO_AHORRO_MAX}\u00A0% según el importe. Existen dos exenciones en el IRPF, y las dos exigen que lo vendido sea la vivienda habitual, es decir, la residencia durante al menos 3 años seguidos salvo fallecimiento o una causa que obligue a cambiar de domicilio (art. 41 bis.1 RIRPF): la reinversión del importe obtenido en otra vivienda habitual (art. 38.1 LIRPF) y la de los mayores de 65 años o personas en situación de dependencia severa o gran dependencia (art. 33.4.b LIRPF). Los mayores de 65 años pueden además excluir la ganancia de cualquier elemento patrimonial si destinan lo obtenido, en seis meses, a una renta vitalicia asegurada a su favor, hasta 240.000 € (art. 38.3 LIRPF). Tener hipoteca pendiente no exime de nada: el principal que se cancela solo minora el importe obtenido a efectos de la reinversión (art. 41 RIRPF).`,
       },
     },
     {
