@@ -64,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Es diferente el IMC saludable según la edad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los rangos estándar de la OMS aplican a adultos de 20 a 65 años. En personas mayores de 65 años, algunos estudios apuntan a que un IMC de 25-27 puede asociarse a menor mortalidad que el rango normal estricto. En menores de 18 años no se usan los rangos adultos: se utilizan tablas percentiladas específicas por edad y sexo conocidas como curvas de crecimiento.',
+        text: 'Los cortes de adulto de la OMS se aplican desde los 20 años, sin límite superior de edad. De 5 a 19 años no se usan: la OMS emplea el IMC para la edad y el sexo, con sus propias curvas de referencia. En personas mayores la OMS no fija cortes distintos, pero la pérdida de masa muscular hace que el mismo IMC diga menos sobre la composición corporal, y algunos estudios observacionales asocian en ellas la menor mortalidad a IMC algo más altos que en adultos jóvenes.',
       },
     },
     {
@@ -72,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Cuánto debería pesar según mi altura?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para calcular un rango de peso saludable, se usa el IMC: peso mínimo saludable = 18,5 × altura²; peso máximo saludable = 24,9 × altura². Para una persona de 1,70 m, el rango es entre 53,5 kg y 71,9 kg. Este cálculo es orientativo; el peso saludable real depende también de la composición corporal, edad, sexo y contexto de salud individual.',
+        text: 'El rango de peso que corresponde al IMC estándar de la OMS se calcula así: peso mínimo = 18,5 × altura²; peso máximo = 24,9 × altura² (altura en metros). Para una persona de 1,70 m, el rango es entre 53,5 kg y 72,0 kg (24,9 × 2,89 = 71,96). Este cálculo es orientativo; el peso saludable real depende también de la composición corporal, edad, sexo y contexto de salud individual.',
       },
     },
   ],

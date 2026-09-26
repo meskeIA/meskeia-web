@@ -153,9 +153,28 @@
 .formulaText {
   font-family: 'Courier New', monospace;
   font-size: 1.1rem;
-  color: var(--primary);
+  /* 17,6 px en negrita no es texto grande: --primary daba 3,77:1 sobre --hover */
+  color: var(--primary-texto);
   margin: 0;
   font-weight: 600;
+}
+
+.formulaNota {
+  margin: var(--spacing-sm) 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Aviso de entrada imposible o de perfil omitido (hallazgos 2024 y 2025) */
+.avisoEntrada {
+  margin: var(--spacing-md) 0 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 4px solid #b3470a;
+  background: var(--hover);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 /* Results Panel */
@@ -192,6 +211,9 @@
   font-weight: 700;
   line-height: 1;
   margin-bottom: var(--spacing-md);
+  /* Color del texto del tema, no el de la categoría: con él la cifra caía a 2,1:1 (hallazgo 2027).
+     La categoría la dicen la pastilla y el borde de la tarjeta. */
+  color: var(--text-primary);
 }
 
 .imcClasificacion {
@@ -267,8 +289,14 @@
 }
 
 .tablaIMC tr.activo td {
-  font-weight: 600;
-  color: var(--primary);
+  /* var(--primary) sobre su propio velo daba 3,17:1 en claro y 2,63:1 en oscuro (hallazgo 2028):
+     el texto va en el color del tema y la fila se distingue por el velo, el filete y el peso */
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tablaIMC tr.activo td:first-child {
+  box-shadow: inset 4px 0 0 var(--primary-boton);
 }
 
 /* Placeholder */
@@ -728,7 +756,7 @@
 }
 
 .cardSaludable {
-  border-color: #27ae60;
+  border-color: #1e7a44;
   background: rgba(39, 174, 96, 0.05);
 }
 
@@ -737,7 +765,8 @@
   top: -10px;
   left: 50%;
   transform: translateX(-50%);
-  background: #27ae60;
+  /* Blanco sobre #1e7a44 = 5,35:1 (con #27ae60 daba 2,87:1, hallazgo 2027) */
+  background: #1e7a44;
   color: white;
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: 50px;
@@ -764,6 +793,7 @@
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
 }
 
 .resumenClasificacion {
@@ -846,6 +876,11 @@
   background: rgba(39, 174, 96, 0.08);
 }
 
+.celdaIMC {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .tagClasificacion {
   display: inline-block;
   padding: 2px 10px;
@@ -883,7 +918,7 @@
 
 [data-theme='dark'] .cardSaludable {
   background: rgba(39, 174, 96, 0.1);
-  border-color: #27ae60;
+  border-color: #2e9e5b;
 }
 
 [data-theme='dark'] .pesoIdealInfo {

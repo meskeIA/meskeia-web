@@ -32,7 +32,12 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *       convertirse en una etiqueta clínica. Ídem un peso de −70 kg.
  *
  * ─────────────────────────────────────────────────────────────────────────────────────────
- * HALLAZGOS ABIERTOS (test.fail — pasan en verde hoy y avisarán al repararse)
+ * HALLAZGOS REPARADOS el 26/09/2026 (2024-2033). Cómo, en ./motor.ts de la app:
+ *   · se VALIDA antes de clasificar (los campos ya no acotan al salir: acotarAlSalir={false});
+ *   · el IMC se redondea a un decimal UNA vez y ese valor se pinta y se clasifica (la OMS da los
+ *     cortes con un decimal), así que cifra, etiqueta, fila activa y diferencia no se contradicen;
+ *   · colores de categoría con ≥ 5,3:1 con blanco; la cifra va en el color del texto del tema.
+ * Lo que describía cada hallazgo, tal como lo dejó el Inspector:
  *   A · Entradas imposibles reescritas al límite en silencio (NumberInput acota al salir,
  *       page.tsx:337-355, y `calcular` no valida): «1,75» → 50 cm → IMC 280,0 «Obesidad grado
  *       III»; −70 kg → 1 kg → IMC 0,3 «Bajo peso».
@@ -169,44 +174,56 @@ test.describe('Orientador IMC · cálculo y clasificación OMS', () => {
 
   // ─── Hallazgo A: entradas imposibles reescritas al límite y clasificadas ────────────────
   test('HALLAZGO A · «1,75» en la altura (metros) no puede acabar en «Obesidad grado III»', async ({ page }) => {
-    test.fail(true, 'Hallazgo A abierto: el blur acota 1,75 a 50 cm y la app da IMC 280,0 · Obesidad grado III');
     await calcular(page, '70', '1,75');
+    // Reparado: el campo conserva «1,75» (ya no acota a 50) y la app avisa de la unidad
+    await expect(campo(page, 'Altura')).toHaveValue('1,75');
+    await expect(page.getByRole('alert').filter({ hasText: 'centímetros' })).toBeVisible();
     // 70 kg con 1,75 m es un IMC 22,9: lo que no puede salir es la etiqueta de 50 cm. Se mira
     // la ETIQUETA, no el panel: la tabla OMS del panel lista siempre «Obesidad grado III». El
     // clic es un evento discreto y React confirma el render antes de devolverlo; tras una
     // reparación que rechace la entrada, la etiqueta no existe y la lista queda vacía.
     const etiquetas = (await etiqueta(page).allInnerTexts()).join(' ');
     expect(etiquetas).not.toContain('Obesidad grado III');
+    await expect(etiqueta(page)).toHaveCount(0);
   });
 
   test('HALLAZGO A · un peso de −70 kg no puede acabar en «Bajo peso» con IMC 0,3', async ({ page }) => {
-    test.fail(true, 'Hallazgo A abierto: el blur acota −70 a 1 kg y la app da IMC 0,3 · Bajo peso');
     await calcular(page, '-70', '175');
+    await expect(page.getByRole('alert').filter({ hasText: 'El peso debe estar entre' })).toBeVisible();
     // Misma razón que el anterior: la tabla OMS del panel siempre dice «Bajo peso»
     const etiquetas = (await etiqueta(page).allInnerTexts()).join(' ');
     expect(etiquetas).not.toContain('Bajo peso');
+    await expect(etiqueta(page)).toHaveCount(0);
+  });
+
+  test('HALLAZGO A · peso y altura intercambiados (175 kg y 70 cm, IMC 357) → aviso, no «Obesidad grado III»', async ({ page }) => {
+    // Los dos valores caben en sus campos por separado; juntos no describen a nadie
+    await calcular(page, '175', '70');
+    await expect(page.getByRole('alert').filter({ hasText: 'intercambiados' })).toBeVisible();
+    await expect(etiqueta(page)).toHaveCount(0);
   });
 
   // ─── Hallazgo B: campos vacíos → NaN clasificado como obesidad III ──────────────────────
   test('HALLAZGO B · «Calcular IMC» con los campos vacíos no da ninguna clasificación', async ({ page }) => {
-    test.fail(true, 'Hallazgo B abierto: sale «No definido» con «🚨 Obesidad grado III»');
     await page.getByRole('button', { name: 'Calcular IMC' }).click();
     await expect(etiqueta(page)).toHaveCount(0);
+    await expect(page.getByRole('alert').filter({ hasText: 'Escribe el peso' })).toBeVisible();
   });
 
   test('HALLAZGO B · comparador: vaciar el peso del perfil 3 no lo clasifica como obesidad III', async ({ page }) => {
-    test.fail(true, 'Hallazgo B abierto: el perfil vacío sale «No definido · Obesidad grado III · ✅ Ideal»');
     await page.getByRole('button', { name: /Comparador/ }).click();
     await campo(page, 'Perfil 3').fill('');
     await esperarValorEnReact(page, campo(page, 'Perfil 3'), '');
     // Perfiles 1 y 2 quedan en 60 y 75 kg (peso normal): en todo el comparador (que siempre
     // existe; la leyenda dice solo «Obesidad») no debe aparecer «Obesidad grado III».
     await expect(page.locator('[class*="comparadorContent"]')).not.toContainText('Obesidad grado III');
+    // Reparado: el perfil vacío se omite y se dice cuál
+    await expect(page.locator('[class*="tablaComparativa"] tbody tr')).toHaveCount(2);
+    await expect(page.locator('[class*="comparadorContent"]')).toContainText('Perfil 3: se omite');
   });
 
   // ─── Hallazgo C: franja 24,9 ≤ IMC < 25 ─────────────────────────────────────────────────
   test('HALLAZGO C · 72 kg y 170 cm (IMC 24,91, peso normal) no muestra «0,0 kg sobre el rango»', async ({ page }) => {
-    test.fail(true, 'Hallazgo C abierto: «Peso normal» junto a «Diferencia sobre rango IMC estándar OMS 0,0 kg»');
     await calcular(page, '72', '170');
     // 72 / 2,89 = 24,913 → peso normal (< 25). 72 − 71,961 = 0,039 → la tarjeta dice «0,0 kg»
     await expect(etiqueta(page)).toContainText('Peso normal');
@@ -214,17 +231,22 @@ test.describe('Orientador IMC · cálculo y clasificación OMS', () => {
   });
 
   test('HALLAZGO C · 72,2 kg y 170 cm: la cifra mostrada y la etiqueta no se contradicen', async ({ page }) => {
-    test.fail(true, 'Hallazgo C abierto: muestra «25,0» con la etiqueta «Peso normal»');
     await calcular(page, '72,2', '170');
     // 72,2 / 2,89 = 24,983 → a un decimal «25,0», que la tabla de la app llama sobrepeso
     await expect(valorIMC(page)).toBeVisible();
     const mostrado = `${await valorIMC(page).innerText()} · ${await etiqueta(page).innerText()}`;
     expect(mostrado).not.toMatch(/^25,0 · .*Peso normal/);
+    // Reparación elegida: se clasifica la cifra MOSTRADA (25,0 → sobrepeso, como en la tabla OMS
+    // con un decimal). Coherente con ella: fila activa «25 - 29,9» y 72,2 − 71,961 = 0,239 → «0,2 kg».
+    await expect(valorIMC(page)).toHaveText('25,0');
+    await expect(etiqueta(page)).toContainText('Sobrepeso');
+    await expect(panel(page).locator('tr[class*="activo"]')).toContainText('25 - 29,9');
+    const exceso = panel(page).locator('[class*="resultCards"] > *', { hasText: 'Diferencia sobre rango IMC estándar OMS' });
+    await expect(exceso).toContainText('0,2');
   });
 
   // ─── Hallazgo D: contraste del color de categoría ───────────────────────────────────────
   test('HALLAZGO D · calculadora: la etiqueta (≥ 4,5:1) y la cifra grande (≥ 3:1) en las 6 categorías y 2 temas', async ({ page }) => {
-    test.fail(true, 'Hallazgo D abierto: blanco sobre #f39c12 = 2,19:1; cifra #f39c12 sobre #fafafa = 2,10:1');
     // 170 cm: 50 → 17,3 · 65 → 22,5 · 78 → 27,0 · 95 → 32,9 · 110 → 38,1 · 125 → 43,3
     const casos: Array<[string, string]> = [
       ['50', 'Bajo peso'], ['65', 'Peso normal'], ['78', 'Sobrepeso'],
@@ -247,7 +269,6 @@ test.describe('Orientador IMC · cálculo y clasificación OMS', () => {
   });
 
   test('HALLAZGO D · comparador: pastillas, «IMC en rango» y cifra de la tabla cumplen AA en los 2 temas', async ({ page }) => {
-    test.fail(true, 'Hallazgo D abierto: pastilla «Sobrepeso» 2,19:1; «IMC en rango estándar OMS» 2,87:1');
     await page.getByRole('button', { name: /Comparador/ }).click();
     const fallos: string[] = [];
     for (const tema of ['light', 'dark'] as const) {
@@ -271,7 +292,6 @@ test.describe('Orientador IMC · cálculo y clasificación OMS', () => {
 
   // ─── Hallazgo E: fila activa de la tabla OMS ────────────────────────────────────────────
   test('HALLAZGO E · la fila activa de la tabla OMS cumple 4,5:1 en claro y en oscuro', async ({ page }) => {
-    test.fail(true, 'Hallazgo E abierto: var(--primary) sobre su velo = 3,17:1 en claro y 2,63:1 en oscuro');
     await calcular(page, '70', '175');
     const celda = panel(page).locator('tr[class*="activo"] td').first();
     for (const tema of ['light', 'dark'] as const) {
@@ -283,13 +303,11 @@ test.describe('Orientador IMC · cálculo y clasificación OMS', () => {
 
   // ─── Hallazgo F: contenido ──────────────────────────────────────────────────────────────
   test('HALLAZGO F · la FAQ da para 1,70 m el mismo techo que la app (24,9 × 2,89 = 71,961 → 72,0)', async ({ page }) => {
-    test.fail(true, 'Hallazgo F abierto: la FAQ (metadata.ts) dice 71,9 kg; la app muestra 72,0');
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
     expect(ld).toContain('entre 53,5 kg y 72,0 kg');
   });
 
   test('HALLAZGO F · los puntos 23/27,5 de la OMS no se presentan como «sobrepeso/obesidad» asiáticos', async ({ page }) => {
-    test.fail(true, 'Hallazgo F abierto: page.tsx:800 dice «sobrepeso desde IMC 23, obesidad desde IMC 27,5»');
     // OMS 2004 (Lancet 363:157): se MANTIENEN los cortes internacionales; 23 y 27,5 son puntos
     // de acción de salud pública, y el riesgo empieza entre 22 y 25 según la población.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -299,11 +317,33 @@ test.describe('Orientador IMC · cálculo y clasificación OMS', () => {
   });
 
   test('HALLAZGO F · el lector de pantalla no lee el emoji de la etiqueta del resultado', async ({ page }) => {
-    test.fail(true, 'Hallazgo F abierto: el nombre accesible es «✅ Peso normal» (page.tsx:392, 571)');
     await calcular(page, '70', '175');
     await expect(etiqueta(page)).toContainText('Peso normal');
     const arbol = await page.locator('[class*="imcDisplay"]').ariaSnapshot();
     expect(arbol).not.toContain('✅');
+  });
+
+  // ─── Hallazgos 2031 y 2032: edades de validez y lenguaje neutro ─────────────────────────
+  test('HALLAZGO 2031 · la edad de validez sigue a la OMS (adultos desde 20 años; 5-19, IMC para la edad)', async ({ page }) => {
+    // OMS: cortes de adulto desde los 20 años, sin techo; de 5 a 19 años, IMC para la edad.
+    // Antes: «menores de 18 años, mayores de 65 años» en el aviso y «23-27 en mayores» sin fuente.
+    const aviso = page.locator('li', { hasText: 'NO es aplicable a todos por igual' });
+    await expect(aviso).toContainText('desde los 20 años');
+    await expect(aviso).not.toContainText('menores de 18 años');
+    await expect(aviso).not.toContainText('mayores de 65 años');
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+    expect(ld).not.toContain('de 20 a 65 años');
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.getByText('Rango óptimo: 23-27 en mayores')).toHaveCount(0);
+  });
+
+  test('HALLAZGO 2032 · el comparador no habla de «ideal»', async ({ page }) => {
+    await page.getByRole('button', { name: /Comparador/ }).click();
+    const comparador = page.locator('[class*="comparadorContent"]');
+    await expect(page.locator('[class*="tablaComparativa"] tbody tr')).toHaveCount(3);
+    await expect(comparador).not.toContainText('Ideal');
+    await expect(comparador).not.toContainText('ideal');
+    await expect(comparador).toContainText('+13,7 kg sobre el rango');
   });
 });
 

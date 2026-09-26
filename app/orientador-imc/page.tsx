@@ -5,7 +5,16 @@ import Chart from 'chart.js/auto';
 import styles from './OrientadorIMC.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps, getRelatedAppsTitle } from '@/data/app-relations';
-import { formatNumber, parseSpanishNumber } from '@/lib';
+import { formatNumber } from '@/lib';
+import {
+  evaluarEntrada,
+  evaluarIMC,
+  validarAltura,
+  validarPeso,
+  LIMITES,
+  type ClaveCategoria,
+  type ErroresEntrada,
+} from './motor';
 
 type ModoApp = 'calculadora' | 'comparador';
 
@@ -16,61 +25,48 @@ type Clasificacion = {
   icono: string;
 };
 
-const clasificaciones: Record<string, Clasificacion> = {
+// Colores de categoría: texto BLANCO encima (pastillas), así que cada uno da ≥ 5,3:1 con blanco
+// en los dos temas (hallazgo 2027: los anteriores —#27ae60, #f39c12, #e67e22…— daban 2,2-3,8:1).
+// La cifra grande y la columna IMC del comparador ya no se pintan en este color: van en el color
+// de texto del tema, y la categoría la dicen la pastilla y el borde.
+const clasificaciones: Record<ClaveCategoria, Clasificacion> = {
   bajo: {
     texto: 'Bajo peso',
-    color: '#3498db',
+    color: '#1a6aa3',
     descripcion: 'IMC inferior a 18,5. Puede indicar desnutrición o problemas de salud.',
     icono: '⚠️',
   },
   normal: {
     texto: 'Peso normal',
-    color: '#27ae60',
+    color: '#1e7a44',
     descripcion: 'IMC entre 18,5 y 24,9. Rango IMC estándar según OMS. La salud no se determina por el IMC aisladamente: composición corporal, perímetro abdominal y analíticas son indicadores complementarios imprescindibles.',
     icono: '✅',
   },
   sobrepeso: {
     texto: 'Sobrepeso',
-    color: '#f39c12',
+    color: '#9a5800',
     descripcion: 'IMC entre 25 y 29,9. Riesgo aumentado de enfermedades.',
     icono: '⚡',
   },
   obesidad1: {
     texto: 'Obesidad grado I',
-    color: '#e67e22',
+    color: '#b3470a',
     descripcion: 'IMC entre 30 y 34,9. Se recomienda consultar con un profesional.',
     icono: '🔶',
   },
   obesidad2: {
     texto: 'Obesidad grado II',
-    color: '#e74c3c',
+    color: '#c0392b',
     descripcion: 'IMC entre 35 y 39,9. Riesgo alto de complicaciones de salud.',
     icono: '🔴',
   },
   obesidad3: {
     texto: 'Obesidad grado III',
-    color: '#c0392b',
+    color: '#8e1f14',
     descripcion: 'IMC igual o superior a 40. Requiere atención médica especializada.',
     icono: '🚨',
   },
 };
-
-function obtenerClasificacion(imc: number): Clasificacion {
-  if (imc < 18.5) return clasificaciones.bajo;
-  if (imc < 25) return clasificaciones.normal;
-  if (imc < 30) return clasificaciones.sobrepeso;
-  if (imc < 35) return clasificaciones.obesidad1;
-  if (imc < 40) return clasificaciones.obesidad2;
-  return clasificaciones.obesidad3;
-}
-
-function calcularPesoIdeal(alturaCm: number): { min: number; max: number } {
-  const alturaM = alturaCm / 100;
-  return {
-    min: 18.5 * alturaM * alturaM,
-    max: 24.9 * alturaM * alturaM,
-  };
-}
 
 type DatoPerfil = {
   nombre: string;
@@ -82,16 +78,28 @@ type DatoPerfil = {
   esSaludable: boolean;
 };
 
+/** Filas de la tabla OMS del resultado: la activa es la de la categoría calculada */
+const FILAS_OMS: { clave: ClaveCategoria; rango: string; texto: string }[] = [
+  { clave: 'bajo', rango: '< 18,5', texto: 'Bajo peso' },
+  { clave: 'normal', rango: '18,5 - 24,9', texto: 'Peso normal' },
+  { clave: 'sobrepeso', rango: '25 - 29,9', texto: 'Sobrepeso' },
+  { clave: 'obesidad1', rango: '30 - 34,9', texto: 'Obesidad grado I' },
+  { clave: 'obesidad2', rango: '35 - 39,9', texto: 'Obesidad grado II' },
+  { clave: 'obesidad3', rango: '≥ 40', texto: 'Obesidad grado III' },
+];
+
 export default function CalculadoraIMCPage() {
   // Estados modo calculadora
   const [peso, setPeso] = useState('');
   const [altura, setAltura] = useState('');
   const [resultado, setResultado] = useState<{
     imc: number;
+    categoria: ClaveCategoria;
     clasificacion: Clasificacion;
     pesoIdeal: { min: number; max: number };
     diferencia: number;
   } | null>(null);
+  const [errores, setErrores] = useState<ErroresEntrada>({});
 
   // Estados modo comparador
   const [modo, setModo] = useState<ModoApp>('calculadora');
@@ -104,79 +112,78 @@ export default function CalculadoraIMCPage() {
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
 
+  // Se valida ANTES de clasificar: una entrada vacía, imposible o intercambiada da un aviso,
+  // nunca una etiqueta clínica (hallazgos 2024 y 2025). Ver ./motor.ts.
   const calcular = () => {
-    const pesoNum = parseSpanishNumber(peso);
-    const alturaNum = parseSpanishNumber(altura);
-
-    if (pesoNum <= 0 || alturaNum <= 0) {
+    const entrada = evaluarEntrada(peso, altura);
+    if (!entrada.ok) {
+      setErrores(entrada.errores);
+      setResultado(null);
       return;
     }
+    setErrores({});
+    const { imc, categoria, rango, diferencia } = entrada.evaluacion;
+    setResultado({ imc, categoria, clasificacion: clasificaciones[categoria], pesoIdeal: rango, diferencia });
+  };
 
-    const alturaM = alturaNum / 100;
-    const imc = pesoNum / (alturaM * alturaM);
-    const clasificacion = obtenerClasificacion(imc);
-    const pesoIdeal = calcularPesoIdeal(alturaNum);
+  const cambiarPeso = (v: string) => {
+    setPeso(v);
+    setErrores((e) => ({ ...e, peso: undefined, conjunto: undefined }));
+  };
 
-    // Diferencia respecto al peso ideal más cercano
-    let diferencia = 0;
-    if (pesoNum < pesoIdeal.min) {
-      diferencia = pesoNum - pesoIdeal.min;
-    } else if (pesoNum > pesoIdeal.max) {
-      diferencia = pesoNum - pesoIdeal.max;
-    }
-
-    setResultado({ imc, clasificacion, pesoIdeal, diferencia });
+  const cambiarAltura = (v: string) => {
+    setAltura(v);
+    setErrores((e) => ({ ...e, altura: undefined, conjunto: undefined }));
   };
 
   const limpiar = () => {
     setPeso('');
     setAltura('');
+    setErrores({});
     setResultado(null);
   };
 
   // Cálculo de datos para comparador
+  // Un perfil vacío o con un peso imposible se OMITE (y se dice cuál), en vez de clasificarse
+  // como obesidad III con «Ideal» al lado (hallazgo 2025). Sin altura válida no hay comparación.
+  const validacionAlturaComparador = validarAltura(alturaComparador);
   const datosComparador = useMemo(() => {
-    const alturaNum = parseSpanishNumber(alturaComparador);
-    const pesos = [
-      { nombre: 'Perfil 1', valor: parseSpanishNumber(peso1) },
-      { nombre: 'Perfil 2', valor: parseSpanishNumber(peso2) },
-      { nombre: 'Perfil 3', valor: parseSpanishNumber(peso3) },
+    const alturaValida = validarAltura(alturaComparador);
+    if (!alturaValida.ok) return null;
+    const alturaNum = alturaValida.valor;
+    const entradas = [
+      { nombre: 'Perfil 1', texto: peso1 },
+      { nombre: 'Perfil 2', texto: peso2 },
+      { nombre: 'Perfil 3', texto: peso3 },
     ];
 
-    if (alturaNum <= 0) return null;
-
-    const perfiles: DatoPerfil[] = pesos.map(({ nombre, valor }) => {
-      if (valor <= 0) {
-        return null;
+    const perfiles: DatoPerfil[] = [];
+    const omitidos: string[] = [];
+    for (const { nombre, texto } of entradas) {
+      const pesoValidado = validarPeso(texto);
+      if (!pesoValidado.ok) {
+        omitidos.push(nombre);
+        continue;
       }
-      const alturaM = alturaNum / 100;
-      const imc = valor / (alturaM * alturaM);
-      const clasificacion = obtenerClasificacion(imc);
-      const pesoIdeal = calcularPesoIdeal(alturaNum);
-
-      let diferencia = 0;
-      if (valor < pesoIdeal.min) {
-        diferencia = valor - pesoIdeal.min;
-      } else if (valor > pesoIdeal.max) {
-        diferencia = valor - pesoIdeal.max;
-      }
-
-      return {
+      const { imc, categoria, rango, diferencia } = evaluarIMC(pesoValidado.valor, alturaNum);
+      perfiles.push({
         nombre,
-        peso: valor,
+        peso: pesoValidado.valor,
         imc,
-        clasificacion,
-        pesoIdeal,
+        clasificacion: clasificaciones[categoria],
+        pesoIdeal: rango,
         diferencia,
-        esSaludable: imc >= 18.5 && imc < 25,
-      };
-    }).filter((p): p is DatoPerfil => p !== null);
+        esSaludable: categoria === 'normal',
+      });
+    }
 
     if (perfiles.length === 0) return null;
 
     return {
       perfiles,
-      pesoIdealRango: calcularPesoIdeal(alturaNum),
+      omitidos,
+      alturaCm: alturaNum,
+      pesoIdealRango: perfiles[0].pesoIdeal,
     };
   }, [alturaComparador, peso1, peso2, peso3]);
 
@@ -334,25 +341,35 @@ export default function CalculadoraIMCPage() {
         <div className={styles.inputPanel}>
           <h2 className={styles.panelTitle}>Tus datos</h2>
 
+          {/* acotarAlSalir={false}: el campo NO reescribe un valor imposible al límite (1,75 → 50 cm);
+              lo valida `calcular` y avisa (hallazgo 2024) */}
           <NumberInput
             value={peso}
-            onChange={setPeso}
+            onChange={cambiarPeso}
             label="Peso"
             placeholder="70"
             helperText="Tu peso en kilogramos"
-            min={1}
-            max={500}
+            min={LIMITES.pesoMinKg}
+            max={LIMITES.pesoMaxKg}
+            acotarAlSalir={false}
+            error={errores.peso}
           />
 
           <NumberInput
             value={altura}
-            onChange={setAltura}
+            onChange={cambiarAltura}
             label="Altura"
             placeholder="175"
             helperText="Tu altura en centímetros"
-            min={50}
-            max={250}
+            min={LIMITES.alturaMinCm}
+            max={LIMITES.alturaMaxCm}
+            acotarAlSalir={false}
+            error={errores.altura}
           />
+
+          {errores.conjunto && (
+            <p className={styles.avisoEntrada} role="alert">{errores.conjunto}</p>
+          )}
 
           <div className={styles.buttonGroup}>
             <button type="button" onClick={calcular} className={styles.btnPrimary}>
@@ -366,8 +383,9 @@ export default function CalculadoraIMCPage() {
           <div className={styles.formula}>
             <h3><span aria-hidden="true">📐</span> Fórmula del IMC</h3>
             <p className={styles.formulaText}>
-              IMC = Peso (kg) ÷ Altura² (m)
+              IMC = Peso (kg) ÷ Altura (m)²
             </p>
+            <p className={styles.formulaNota}>La altura se escribe en centímetros; la app la pasa a metros.</p>
           </div>
         </div>
 
@@ -379,17 +397,14 @@ export default function CalculadoraIMCPage() {
                 style={{ borderColor: resultado.clasificacion.color }}
               >
                 <span className={styles.imcLabel}>Tu IMC</span>
-                <span
-                  className={styles.imcValue}
-                  style={{ color: resultado.clasificacion.color }}
-                >
+                <span className={styles.imcValue}>
                   {formatNumber(resultado.imc, 1)}
                 </span>
                 <span
                   className={styles.imcClasificacion}
                   style={{ backgroundColor: resultado.clasificacion.color }}
                 >
-                  {resultado.clasificacion.icono} {resultado.clasificacion.texto}
+                  <span aria-hidden="true">{resultado.clasificacion.icono}</span> {resultado.clasificacion.texto}
                 </span>
               </div>
 
@@ -433,30 +448,12 @@ export default function CalculadoraIMCPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className={resultado.imc < 18.5 ? styles.activo : ''}>
-                      <td>&lt; 18,5</td>
-                      <td>Bajo peso</td>
-                    </tr>
-                    <tr className={resultado.imc >= 18.5 && resultado.imc < 25 ? styles.activo : ''}>
-                      <td>18,5 - 24,9</td>
-                      <td>Peso normal</td>
-                    </tr>
-                    <tr className={resultado.imc >= 25 && resultado.imc < 30 ? styles.activo : ''}>
-                      <td>25 - 29,9</td>
-                      <td>Sobrepeso</td>
-                    </tr>
-                    <tr className={resultado.imc >= 30 && resultado.imc < 35 ? styles.activo : ''}>
-                      <td>30 - 34,9</td>
-                      <td>Obesidad grado I</td>
-                    </tr>
-                    <tr className={resultado.imc >= 35 && resultado.imc < 40 ? styles.activo : ''}>
-                      <td>35 - 39,9</td>
-                      <td>Obesidad grado II</td>
-                    </tr>
-                    <tr className={resultado.imc >= 40 ? styles.activo : ''}>
-                      <td>≥ 40</td>
-                      <td>Obesidad grado III</td>
-                    </tr>
+                    {FILAS_OMS.map((fila) => (
+                      <tr key={fila.clave} className={resultado.categoria === fila.clave ? styles.activo : ''}>
+                        <td>{fila.rango}</td>
+                        <td>{fila.texto}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -464,7 +461,7 @@ export default function CalculadoraIMCPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>⚖️</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">⚖️</span>
               <p>Introduce tu peso y altura para calcular tu IMC</p>
             </div>
           )}
@@ -488,8 +485,10 @@ export default function CalculadoraIMCPage() {
                 label="Altura (común para los 3 perfiles)"
                 placeholder="175"
                 helperText="cm"
-                min={50}
-                max={250}
+                min={LIMITES.alturaMinCm}
+                max={LIMITES.alturaMaxCm}
+                acotarAlSalir={false}
+                error={alturaComparador.trim() !== '' && !validacionAlturaComparador.ok ? validacionAlturaComparador.error : undefined}
               />
             </div>
 
@@ -501,8 +500,9 @@ export default function CalculadoraIMCPage() {
                   label="Perfil 1"
                   placeholder="60"
                   helperText="kg"
-                  min={1}
-                  max={500}
+                  min={LIMITES.pesoMinKg}
+                  max={LIMITES.pesoMaxKg}
+                  acotarAlSalir={false}
                 />
               </div>
               <div className={styles.pesoInput}>
@@ -512,8 +512,9 @@ export default function CalculadoraIMCPage() {
                   label="Perfil 2"
                   placeholder="75"
                   helperText="kg"
-                  min={1}
-                  max={500}
+                  min={LIMITES.pesoMinKg}
+                  max={LIMITES.pesoMaxKg}
+                  acotarAlSalir={false}
                 />
               </div>
               <div className={styles.pesoInput}>
@@ -523,8 +524,9 @@ export default function CalculadoraIMCPage() {
                   label="Perfil 3"
                   placeholder="90"
                   helperText="kg"
-                  min={1}
-                  max={500}
+                  min={LIMITES.pesoMinKg}
+                  max={LIMITES.pesoMaxKg}
+                  acotarAlSalir={false}
                 />
               </div>
             </div>
@@ -558,23 +560,20 @@ export default function CalculadoraIMCPage() {
                     )}
                     <h4>{perfil.nombre}</h4>
                     <div className={styles.resumenPeso}>{formatNumber(perfil.peso, 0)} kg</div>
-                    <div
-                      className={styles.resumenIMC}
-                      style={{ color: perfil.clasificacion.color }}
-                    >
+                    <div className={styles.resumenIMC}>
                       IMC: {formatNumber(perfil.imc, 1)}
                     </div>
                     <div
                       className={styles.resumenClasificacion}
                       style={{ backgroundColor: perfil.clasificacion.color }}
                     >
-                      {perfil.clasificacion.icono} {perfil.clasificacion.texto}
+                      <span aria-hidden="true">{perfil.clasificacion.icono}</span> {perfil.clasificacion.texto}
                     </div>
                     {perfil.diferencia !== 0 && (
                       <div className={styles.resumenDiferencia}>
                         {perfil.diferencia > 0
-                          ? `+${formatNumber(perfil.diferencia, 1)} kg sobre ideal`
-                          : `${formatNumber(perfil.diferencia, 1)} kg bajo ideal`
+                          ? `+${formatNumber(perfil.diferencia, 1)} kg sobre el rango`
+                          : `${formatNumber(perfil.diferencia, 1)} kg bajo el rango`
                         }
                       </div>
                     )}
@@ -582,10 +581,16 @@ export default function CalculadoraIMCPage() {
                 ))}
               </div>
 
+              {datosComparador.omitidos.length > 0 && (
+                <p className={styles.avisoEntrada}>
+                  {datosComparador.omitidos.join(', ')}: {datosComparador.omitidos.length === 1 ? 'se omite' : 'se omiten'} porque el peso está vacío o fuera de {LIMITES.pesoMinKg}-{LIMITES.pesoMaxKg} kg.
+                </p>
+              )}
+
               {/* Info peso ideal */}
               <div className={styles.pesoIdealInfo}>
                 <p>
-                  <span aria-hidden="true">🎯</span> <strong>Rango IMC estándar OMS para {formatNumber(parseSpanishNumber(alturaComparador), 0)} cm:</strong>{' '}
+                  <span aria-hidden="true">🎯</span> <strong>Rango IMC estándar OMS para {formatNumber(datosComparador.alturaCm, 0)} cm:</strong>{' '}
                   {formatNumber(datosComparador.pesoIdealRango.min, 1)} - {formatNumber(datosComparador.pesoIdealRango.max, 1)} kg
                 </p>
               </div>
@@ -608,7 +613,7 @@ export default function CalculadoraIMCPage() {
                       <tr key={idx} className={perfil.esSaludable ? styles.filaSaludable : ''}>
                         <td>{perfil.nombre}</td>
                         <td>{formatNumber(perfil.peso, 0)} kg</td>
-                        <td style={{ color: perfil.clasificacion.color, fontWeight: 600 }}>
+                        <td className={styles.celdaIMC}>
                           {formatNumber(perfil.imc, 1)}
                         </td>
                         <td>
@@ -621,7 +626,7 @@ export default function CalculadoraIMCPage() {
                         </td>
                         <td>
                           {perfil.diferencia === 0
-                            ? '✅ Ideal'
+                            ? 'En rango'
                             : perfil.diferencia > 0
                               ? `+${formatNumber(perfil.diferencia, 1)} kg`
                               : `${formatNumber(perfil.diferencia, 1)} kg`
@@ -637,8 +642,12 @@ export default function CalculadoraIMCPage() {
 
           {!datosComparador && (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>📊</span>
-              <p>Introduce una altura y al menos un peso para ver la comparación</p>
+              <span className={styles.placeholderIcon} aria-hidden="true">📊</span>
+              <p>
+                {!validacionAlturaComparador.ok && alturaComparador.trim() !== ''
+                  ? validacionAlturaComparador.error
+                  : `Introduce una altura en centímetros y al menos un peso entre ${LIMITES.pesoMinKg} y ${LIMITES.pesoMaxKg} kg para ver la comparación`}
+              </p>
             </div>
           )}
         </div>
@@ -660,7 +669,7 @@ export default function CalculadoraIMCPage() {
         <ul className={styles.disclaimerList}>
           <li><strong>NO distingue entre masa muscular y grasa</strong>: Deportistas con alta musculatura pueden clasificar como "sobrepeso" siendo saludables</li>
           <li><strong>NO considera la distribución de grasa</strong>: La grasa abdominal (visceral) es más peligrosa que la subcutánea</li>
-          <li><strong>NO es aplicable a todos por igual</strong>: No válido para embarazadas, menores de 18 años, mayores de 65 años, ni personas con condiciones médicas específicas</li>
+          <li><strong>NO es aplicable a todos por igual</strong>: Los cortes de adulto de la OMS valen desde los 20 años; de 5 a 19 años se usa el IMC para la edad. No es válido en el embarazo, y en personas mayores o con condiciones médicas específicas se interpreta con más matices</li>
           <li><strong>NO reemplaza evaluación médica</strong>: Tu médico debe considerar analíticas, tensión arterial, historial clínico y otros factores</li>
         </ul>
 
@@ -719,14 +728,14 @@ export default function CalculadoraIMCPage() {
                 <tr>
                   <td><strong>Peso normal</strong></td>
                   <td>18,5 – 24,9</td>
-                  <td>Rango saludable</td>
+                  <td>Rango estándar OMS</td>
                   <td>Mínimos</td>
                   <td>Mantener hábitos actuales</td>
                 </tr>
                 <tr>
                   <td><strong>Sobrepeso</strong></td>
                   <td>25,0 – 29,9</td>
-                  <td>Por encima del rango ideal</td>
+                  <td>Por encima del rango estándar</td>
                   <td>Hipertensión, diabetes tipo 2 incipiente</td>
                   <td>Ajustar dieta y aumentar actividad</td>
                 </tr>
@@ -762,23 +771,23 @@ export default function CalculadoraIMCPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏋️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏋️</span>
                 <strong>Deportista con mucha masa muscular</strong>
               </div>
-              <p className={styles.escenarioExample}>Un culturista puede tener IMC 28 (sobrepeso) pero con 8% de grasa corporal. El músculo pesa más que la grasa. El IMC le clasifica mal.</p>
+              <p className={styles.escenarioExample}>Un culturista puede tener IMC 28 (sobrepeso) pero con 8% de grasa corporal. El músculo es más denso que la grasa: a igual volumen, pesa más. El IMC le clasifica mal.</p>
               <span className={styles.escenarioTip}>IMC no es válido: mide % grasa</span>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👵</span>
-                <strong>Persona mayor de 65 años</strong>
+                <span className={styles.escenarioIcon} aria-hidden="true">👵</span>
+                <strong>Persona mayor</strong>
               </div>
-              <p className={styles.escenarioExample}>Con la edad se pierde masa muscular (sarcopenia). Un IMC de 24 puede ocultar poca musculatura y exceso de grasa visceral. Los criterios OMS son menos precisos.</p>
-              <span className={styles.escenarioTip}>Rango óptimo: 23-27 en mayores</span>
+              <p className={styles.escenarioExample}>Con la edad se pierde masa muscular (sarcopenia). Un IMC de 24 puede ocultar poca musculatura y exceso de grasa visceral. La OMS no fija cortes distintos para mayores, pero el mismo IMC dice menos sobre la composición corporal.</p>
+              <span className={styles.escenarioTip}>Valorar junto a músculo y cintura</span>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🤰</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🤰</span>
                 <strong>Mujer embarazada</strong>
               </div>
               <p className={styles.escenarioExample}>Durante el embarazo, el IMC no es aplicable para evaluar peso saludable. El aumento de peso depende del IMC previo al embarazo.</p>
@@ -786,23 +795,26 @@ export default function CalculadoraIMCPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧒</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧒</span>
                 <strong>Niños y adolescentes</strong>
               </div>
-              <p className={styles.escenarioExample}>Para menores de 18 años se usan percentiles de IMC por edad y sexo, no los rangos estándar. Un IMC de 22 puede ser sobrepeso en un niño de 10 años.</p>
+              <p className={styles.escenarioExample}>De 5 a 19 años la OMS usa el IMC para la edad y el sexo, no los cortes de adulto. Un IMC de 22, normal en un adulto, puede indicar exceso de peso en un niño de 10 años.</p>
               <span className={styles.escenarioTip}>Usar IMC-por-edad pediátrico</span>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌍</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌍</span>
                 <strong>Personas de origen asiático</strong>
               </div>
-              <p className={styles.escenarioExample}>La OMS recomienda umbrales más bajos para población asiática: sobrepeso desde IMC 23, obesidad desde IMC 27,5. El riesgo metabólico aparece antes.</p>
-              <span className={styles.escenarioTip}>Sobrepeso asiático: IMC 23+</span>
+              {/* Consulta de expertos de la OMS, Lancet 2004;363:157-163 (hallazgo 2030): mantuvo los
+                  cortes internacionales y propuso 23 y 27,5 como puntos de acción, no como nuevas
+                  definiciones de sobrepeso u obesidad. */}
+              <p className={styles.escenarioExample}>En muchas poblaciones asiáticas el riesgo metabólico aumenta con IMC más bajos, entre 22 y 25 según la población. Una consulta de expertos de la OMS (2004) mantuvo los cortes internacionales y propuso 23 y 27,5 como puntos de acción de salud pública.</p>
+              <span className={styles.escenarioTip}>Puntos de acción OMS: IMC 23 y 27,5</span>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧬</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧬</span>
                 <strong>Persona con IMC normal pero grasa visceral alta</strong>
               </div>
               <p className={styles.escenarioExample}>El "obeso delgado": IMC 22 pero alto porcentaje de grasa abdominal. El perímetro de cintura (hombres &gt;102 cm, mujeres &gt;88 cm) es un indicador complementario clave.</p>
@@ -858,7 +870,7 @@ export default function CalculadoraIMCPage() {
               <span className={styles.eduStepNumber}>1</span>
               <div className={styles.eduStepContent}>
                 <strong>Calcula tu IMC con datos precisos</strong>
-                <p>Usa tu altura en metros y tu peso en kilogramos en ayunas, a la misma hora del día. Las variaciones de 1-2 kg durante el día son normales (hidratación, comida). Repite la medición mensualmente para ver tendencias.</p>
+                <p>Mide la altura descalzo (en la calculadora se escribe en centímetros) y el peso en kilogramos en ayunas, a la misma hora del día. Las variaciones de 1-2 kg durante el día son normales (hidratación, comida). Repite la medición mensualmente para ver tendencias.</p>
               </div>
             </div>
             <div className={styles.step}>
@@ -911,32 +923,32 @@ export default function CalculadoraIMCPage() {
           <h2>Tips para interpretar y mejorar tu IMC correctamente</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <strong>Mide la cintura, no solo el peso</strong>
               <p>El perímetro abdominal es mejor predictor cardiovascular que el IMC solo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💪</span>
-              <strong>El músculo pesa más que la grasa</strong>
+              <span className={styles.tipIcon} aria-hidden="true">💪</span>
+              <strong>El músculo es más denso que la grasa</strong>
               <p>Si entrenas con pesas, tu IMC puede subir aunque tu composición corporal mejore.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Sigue tendencias, no números fijos</strong>
               <p>Una reducción de 1-2 puntos de IMC en 6 meses es un logro significativo y sostenible.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🥗</span>
+              <span className={styles.tipIcon} aria-hidden="true">🥗</span>
               <strong>Prioriza calidad nutricional</strong>
               <p>Puedes tener IMC normal comiendo mal. La densidad nutricional importa tanto como las calorías.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>😴</span>
+              <span className={styles.tipIcon} aria-hidden="true">😴</span>
               <strong>El sueño afecta al peso</strong>
               <p>Dormir menos de 7 horas aumenta el apetito y favorece la acumulación de grasa abdominal.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏥</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏥</span>
               <strong>Consulta siempre a un profesional</strong>
               <p>Antes de iniciar cualquier plan de pérdida de peso significativa, habla con tu médico o dietista-nutricionista.</p>
             </div>
@@ -954,8 +966,8 @@ export default function CalculadoraIMCPage() {
             <li>Aplicar los rangos estándar OMS a deportistas con alta masa muscular (sobreestima el riesgo)</li>
             <li>Ignorar la distribución de grasa: IMC "normal" con mucha grasa abdominal es igual de peligroso</li>
             <li>Obsesionarse con un número de IMC concreto en lugar de mejorar hábitos y bienestar general</li>
-            <li>Hacer dietas muy restrictivas para bajar el IMC rápido (pierdes músculo, efecto rebote garantizado)</li>
-            <li>No considerar que los niños, embarazadas y mayores de 65 tienen criterios propios de evaluación</li>
+            <li>Hacer dietas muy restrictivas para bajar el IMC rápido (se pierde también músculo y es más fácil recuperar el peso perdido)</li>
+            <li>No considerar que en la infancia y la adolescencia (hasta los 19 años) y en el embarazo se usan criterios propios, y que en personas mayores el IMC se interpreta con más matices</li>
             <li>Comparar tu IMC con el de personas de distinta etnia (los umbrales de riesgo varían)</li>
           </ul>
         </div>
