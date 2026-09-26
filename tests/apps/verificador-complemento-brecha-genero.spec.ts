@@ -96,23 +96,33 @@ interface Situacion {
   hijos: number;
   sexo: string;
   otroProgenitor: string;
+  /**
+   * P5 bis — solo aparece si el otro progenitor «Ya lo percibe»: qué suma de pensiones
+   * públicas es menor (hallazgo 2239). Si se omite, se queda en su valor por defecto,
+   * «No lo sé», que da el veredicto condicionado.
+   */
+  sumaMenor?: string;
   /** P6 — denegación PROPIA del solicitante. Por defecto, no la hay. */
   denegacionPropia?: boolean;
 }
 
+/**
+ * Elige una opción de una pregunta de elección única. Desde el hallazgo 2243 (26/09/2026)
+ * son `role="radio"` con `aria-checked`, no botones con `aria-pressed`.
+ */
+async function elegir(page: Page, nombre: string): Promise<void> {
+  await page.getByRole('radio', { name: nombre, exact: true }).click();
+}
+
 /** Responde las 6 preguntas y pulsa «Verificar mi derecho». */
 async function responderYVerificar(page: Page, s: Situacion): Promise<void> {
-  await page.getByRole('button', { name: s.pension, exact: true }).click();
-  await page.getByRole('button', { name: s.fecha, exact: true }).click();
+  await elegir(page, s.pension);
+  await elegir(page, s.fecha);
   await page.locator('#hijos').fill(String(s.hijos));
-  await page.getByRole('button', { name: s.sexo, exact: true }).click();
-  await page.getByRole('button', { name: s.otroProgenitor, exact: true }).click();
-  await page
-    .getByRole('button', {
-      name: s.denegacionPropia ? 'Sí, tengo una resolución denegatoria' : 'No',
-      exact: true,
-    })
-    .click();
+  await elegir(page, s.sexo);
+  await elegir(page, s.otroProgenitor);
+  if (s.sumaMenor) await elegir(page, s.sumaMenor);
+  await elegir(page, s.denegacionPropia ? 'Sí, tengo una resolución denegatoria' : 'No');
   await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
 }
 
@@ -134,9 +144,9 @@ test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   // La página es un client component: sin hidratación los botones no responden y todo
   // lo demás sería un falso verde. Se comprueba que el estado reacciona al clic.
-  await page.getByRole('button', { name: 'Viudedad', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Viudedad', exact: true })).toHaveAttribute(
-    'aria-pressed',
+  await page.getByRole('radio', { name: 'Viudedad', exact: true }).click();
+  await expect(page.getByRole('radio', { name: 'Viudedad', exact: true })).toHaveAttribute(
+    'aria-checked',
     'true',
   );
 });
@@ -333,18 +343,23 @@ test.describe('Verificador del complemento por brecha de género', () => {
   test('caso 3 (denegado): concurrencia y pensión no contributiva → sin derecho y sin importe', async ({
     page,
   }) => {
-    // 3a — el otro progenitor ya lo percibe
+    // 3a — el otro progenitor ya lo percibe Y su suma de pensiones públicas es la menor.
+    // Hasta el 26/09/2026 bastaba «ya lo percibe» para el «no», y este caso lo consagraba
+    // con «pensión pública de menor cuantía». El art. 60.1 LGSS compara la SUMA y el 60.2
+    // permite que pase al segundo progenitor (hallazgos 2239 y 2240): el «no» solo es
+    // correcto cuando la suma menor es la del otro.
     await responderYVerificar(page, {
       pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
       hijos: 2,
       sexo: 'Mujer',
       otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      sumaMenor: 'La del otro progenitor es menor',
     });
     let resultado = await textoResultado(page);
     expect(resultado).toContain('No procede ahora');
-    expect(resultado).toContain('solo genera el complemento para uno de los progenitores');
-    expect(resultado).toContain('pensión pública de menor cuantía'); // regla de asignación
+    expect(resultado).toContain('Cada hijo o hija da derecho a un solo complemento');
+    expect(resultado).toContain('pensiones públicas cuya suma sea de menor cuantía'); // art. 60.1
     expect(resultado).not.toContain('Desglose económico');
     expect(resultado).not.toContain('€/mes');
 
@@ -426,19 +441,37 @@ test.describe('Verificador del complemento por brecha de género', () => {
     expect(resultado).toContain('Posible reclamación retroactiva');
     expect(resultado).toContain('revisar por qué se te denegó');
 
-    // 225d — precedencia: si el otro progenitor YA lo percibe, la denegación propia fue
-    // conforme a derecho. La app no puede mandar a reclamar sobre una denegación válida.
+    // 225d — precedencia: si el otro progenitor YA lo percibe y su suma de pensiones
+    // públicas es la menor, la denegación propia fue conforme a derecho (art. 60.1 LGSS). La
+    // app no puede mandar a reclamar sobre una denegación válida.
+    // Actualizado el 26/09/2026 (hallazgo 2239): antes bastaba «ya lo percibe» para el «no»,
+    // y el caso lo consagraba; ahora el rechazo exige que la suma menor sea la del otro.
     await responderYVerificar(page, {
       pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
       hijos: 2,
       sexo: 'Hombre',
       otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      sumaMenor: 'La del otro progenitor es menor',
       denegacionPropia: true,
     });
     resultado = await textoResultado(page);
     expect(resultado).toContain('No procede ahora');
-    expect(resultado).toContain('solo genera el complemento para uno de los progenitores');
+    expect(resultado).toContain('Cada hijo o hija da derecho a un solo complemento');
+    expect(resultado).not.toContain('Posible reclamación retroactiva');
+
+    // 225e — sin saber qué suma es menor: condicionado, y tampoco manda a reclamar
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Hombre',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      sumaMenor: 'No lo sé',
+      denegacionPropia: true,
+    });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('Depende de la suma de pensiones');
     expect(resultado).not.toContain('Posible reclamación retroactiva');
   });
 
@@ -610,7 +643,9 @@ test.describe('Verificador del complemento por brecha de género', () => {
   test('casos 229 y 230: cada pregunta nombra su grupo y el veredicto se anuncia', async ({
     page,
   }) => {
-    const grupos = page.locator('[role="group"]');
+    // Desde el hallazgo 2243 son grupos de RADIO: la semántica de elección única. La P5 bis
+    // solo aparece si el otro progenitor ya lo percibe, así que por defecto son cinco.
+    const grupos = page.locator('[role="radiogroup"]');
     await expect(grupos).toHaveCount(5); // P1, P2, P4, P5 y P6 (P3 es un input con label)
 
     for (const nombre of [
@@ -620,7 +655,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
       '5. Estado del otro progenitor respecto al complemento',
       '6. ¿Solicitaste tú el complemento y te lo denegaron?',
     ]) {
-      await expect(page.getByRole('group', { name: nombre })).toBeVisible();
+      await expect(page.getByRole('radiogroup', { name: nombre })).toBeVisible();
     }
 
     // El único label con control asociado sigue siendo el de la P3
@@ -669,7 +704,7 @@ test.describe('Verificador del complemento por brecha de género', () => {
     expect(resultado).toContain('+147,60 €/mes'); // 4 × 36,90 = maxMensual
 
     // Cambiar la fecha del hecho causante también lo invalida
-    await page.getByRole('button', { name: 'Antes del 4-feb-2021', exact: true }).click();
+    await page.getByRole('radio', { name: 'Antes del 4-feb-2021', exact: true }).click();
     expect(await textoResultado(page)).toContain('Completa las 6 preguntas');
   });
 
@@ -1388,13 +1423,14 @@ test.describe('Regresión — hallazgos 607 y 608, reparados', () => {
     await abrirGuia(page);
     const fila = page.getByRole('row', { name: /Naturaleza del cálculo/ });
     const texto = normalizar(await fila.innerText());
+    // Desde el hallazgo 2244 el % va separado con U+00A0, que normalizar() deja en espacio
     for (const tramo of COMPLEMENTO_MATERNIDAD_DEROGADO.escala) {
-      expect(texto).toContain(`${tramo.porcentaje}%`);
+      expect(texto).toContain(`${tramo.porcentaje} %`);
     }
     // Y el máximo se construye con el último tramo del módulo, no a mano.
     const maximo = COMPLEMENTO_MATERNIDAD_DEROGADO.escala[COMPLEMENTO_MATERNIDAD_DEROGADO.escala.length - 1];
     const filaMax = normalizar(await page.getByRole('row', { name: /^Máximo/ }).innerText());
-    expect(filaMax).toContain(`${maximo.porcentaje}% (${maximo.hijos} o más hijos)`);
+    expect(filaMax).toContain(`${maximo.porcentaje} % (${maximo.hijos} o más hijos)`);
   });
 
   // 608 — con el campo de hijos vacío, el error citaba la cadena vacía entre comillas:
@@ -1561,19 +1597,23 @@ test.describe('Inspección 07/09/2026', () => {
       hijos: 3,
       sexo: 'Hombre',
       otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      // Desde el 26/09/2026 (hallazgo 2239) «ya lo percibe» ya no deniega por sí solo: el
+      // rechazo limpio exige que la suma de pensiones menor sea la del otro progenitor.
+      sumaMenor: 'La del otro progenitor es menor',
       denegacionPropia: true,
     });
 
     const resultado = await textoResultado(page);
     expect(resultado).toContain('No procede ahora');
-    expect(resultado).toContain('solo genera el complemento para uno de los progenitores');
+    expect(resultado).toContain('Cada hijo o hija da derecho a un solo complemento');
     // Lo que NO puede salir: la denegación propia no resucita un derecho ya asignado
     expect(resultado).not.toContain('Posible reclamación retroactiva');
     expect(resultado).not.toContain('110,70'); // 3 × cuantiaPorHijoMensual 36,90
     expect(resultado).not.toContain('Desglose económico');
     expect(resultado).not.toContain('C-623/23');
-    // Y el paso siguiente es la regla de asignación, no una impugnación
-    expect(resultado).toContain('pensión pública de menor cuantía');
+    // Y el motivo es la regla de asignación (la SUMA, art. 60.1), no una impugnación
+    expect(resultado).toContain('pensiones públicas cuya suma sea de menor cuantía');
+    expect(resultado).not.toContain('pensión pública de menor cuantía');
   });
 
   /**
@@ -1607,9 +1647,11 @@ test.describe('Inspección 07/09/2026', () => {
       expect(resultado, `P5 = «${estado}» sin denegación propia`).not.toContain(
         'Posible reclamación retroactiva',
       );
-      // «Ya lo percibe» es el único de los cuatro que bloquea el derecho
+      // «Ya lo percibe» es el único de los cuatro que no concede sin más: sin saber qué
+      // suma de pensiones es menor, el veredicto es CONDICIONADO, no un «no» (hallazgo 2239)
       if (estado === 'Ya lo percibe por los mismos hijos') {
-        expect(resultado).toContain('No procede ahora');
+        expect(resultado).toContain('Depende de la suma de pensiones');
+        expect(resultado).not.toContain('No procede ahora');
       } else {
         expect(resultado).toContain('+73,80 €/mes'); // 2 × 36,90
       }
@@ -2149,7 +2191,7 @@ test.describe('Re-inspección 21/09/2026', () => {
 
     // Las cifras del régimen derogado siguen ahí, derivadas del módulo (hallazgo 607)
     for (const tramo of COMPLEMENTO_MATERNIDAD_DEROGADO.escala) {
-      expect(guia).toContain(`${tramo.porcentaje}%`);
+      expect(guia).toContain(`${tramo.porcentaje} %`); // U+00A0 normalizado (2244)
     }
     // …y ahora dicen de dónde salen
     expect(guia, 'la tabla no cita la norma del régimen derogado').toContain(
@@ -2182,7 +2224,8 @@ test.describe('Re-inspección 21/09/2026', () => {
 // 36,90 · maxHijos 4 · pagasAnuales 14 · fechaMinimaHechoCausante '2021-02-04') antes de
 // abrir el navegador; los doce coincidieron con lo obtenido, en 1280 y en 360 px.
 //
-// Debajo, los hallazgos nuevos con `test.fail()`. El de la concurrencia se ancla en el
+// Debajo, los once hallazgos de esta vuelta (2239-2249), REPARADOS el 26/09/2026 y ya sin
+// `test.fail()`. El de la concurrencia se ancla en el
 // texto consolidado del art. 60 LGSS (BOE-A-2015-11724, versión vigente desde el
 // 18/03/2023, consultado por la API de datos abiertos del BOE el 26/09/2026), que es la
 // fuente que declara COMPLEMENTO_BRECHA_GENERO_META.fuente.
@@ -2208,22 +2251,20 @@ interface Respuestas26 {
   hijos: string;
   sexo: string;
   otroProgenitor: string;
+  /** P5 bis (hallazgo 2239): solo si el otro progenitor ya lo percibe */
+  sumaMenor?: string;
   denegacionPropia?: boolean;
 }
 
 /** Como `responderYVerificar`, pero el campo de hijos se escribe con `sembrarValor`. */
 async function responderConSiembra(page: Page, r: Respuestas26): Promise<void> {
-  await page.getByRole('button', { name: r.pension, exact: true }).click();
-  await page.getByRole('button', { name: r.fecha, exact: true }).click();
+  await elegir(page, r.pension);
+  await elegir(page, r.fecha);
   await sembrarHijos(page, r.hijos);
-  await page.getByRole('button', { name: r.sexo, exact: true }).click();
-  await page.getByRole('button', { name: r.otroProgenitor, exact: true }).click();
-  await page
-    .getByRole('button', {
-      name: r.denegacionPropia ? 'Sí, tengo una resolución denegatoria' : 'No',
-      exact: true,
-    })
-    .click();
+  await elegir(page, r.sexo);
+  await elegir(page, r.otroProgenitor);
+  if (r.sumaMenor) await elegir(page, r.sumaMenor);
+  await elegir(page, r.denegacionPropia ? 'Sí, tengo una resolución denegatoria' : 'No');
   await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
 }
 
@@ -2503,20 +2544,89 @@ test.describe('Re-inspección 26/09/2026', () => {
    * otro—, no una denegación. Obtenido: «No procede ahora / Revisa el motivo abajo».
    * El motor del MCP (`calcularComplementoBrechaGenero`, caso 4) repite la rama, y
    * REQUISITOS_ART60 la cuenta como requisito en el FAQPage.
+   *
+   * ✅ REPARADO el 26/09/2026 (hallazgo 2239). Con «Ya lo percibe» aparece la P5 bis
+   * («¿Qué progenitor tiene la suma de pensiones públicas menor?») y el veredicto sigue a
+   * la norma. Resuelto a mano, 2 hijos → 2 × 36,90 = 73,80 €/mes · × 14 = 1033,20 €/año:
+   *   · «La mía es menor» → PROCEDE: +73,80 €/mes, «se extingue el del otro progenitor»
+   *     y el paso siguiente cita el art. 60.2 LGSS;
+   *   · «No lo sé» (por defecto) → CONDICIONADO: «Depende de la suma de pensiones», con
+   *     el importe que correspondería (73,80 €) y sin «No procede ahora»;
+   *   · «La del otro progenitor es menor» → NO PROCEDE, por la suma (art. 60.1).
+   * Y la tool del MCP da lo mismo por las tres vías (`suma_pensiones_menor`).
    */
-  test.fail('HALLAZGO (26/09) concurrencia: «Ya lo percibe» no puede ser una denegación cerrada (art. 60.2 LGSS)', async ({
+  test('REPARADO 2239: «Ya lo percibe» ya no es una denegación cerrada; decide la suma (art. 60.1 y 60.2 LGSS)', async ({
     page,
+    request,
   }) => {
-    await responderConSiembra(page, {
+    const base = {
       pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
       hijos: '2',
       sexo: 'Mujer',
       otroProgenitor: 'Ya lo percibe por los mismos hijos',
-    });
-    const resultado = await textoResultado(page);
+    };
+
+    // El CASO de la ficha: la suma propia es la menor → procede, y se extingue el del otro
+    await responderConSiembra(page, { ...base, sumaMenor: 'La mía es menor' });
+    let resultado = await textoResultado(page);
     expect(resultado).not.toContain('no puede reconocerse de nuevo a ti');
     expect(resultado).not.toContain('No procede ahora');
+    expect(resultado).toContain('+73,80 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 1033,20 €/año');
+    expect(resultado).toContain('se extingue el del otro progenitor');
+    expect(resultado).toContain('art. 60.2 LGSS');
+
+    // Sin saber qué suma es menor → condicionado, no un «no»
+    await responderConSiembra(page, { ...base, sumaMenor: 'No lo sé' });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('Depende de la suma de pensiones');
+    expect(resultado).toContain('73,80 €/mes');
+    expect(resultado).toContain('pensiones públicas cuya suma sea de menor cuantía');
+    expect(resultado).not.toContain('No procede ahora');
+    expect(resultado).not.toContain('Cumples los requisitos básicos');
+
+    // La suma menor es la del otro → ahora sí, no procede (y por la SUMA)
+    await responderConSiembra(page, { ...base, sumaMenor: 'La del otro progenitor es menor' });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).toContain('su suma de pensiones públicas es menor que la tuya');
+    expect(resultado).not.toContain('73,80');
+
+    // Paridad con la tool del MCP de Delegum por las tres vías
+    const porMcp = async (suma: string): Promise<string> => {
+      const r = await request.post('/api/mcp/delegum/', {
+        headers: { Accept: 'application/json, text/event-stream' },
+        data: {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/call',
+          params: {
+            name: 'calcular_complemento_brecha_genero',
+            arguments: {
+              sexo: 'mujer',
+              num_hijos: 2,
+              tipo_pension: 'jubilacion',
+              fecha_hecho_causante: 'desde_2021',
+              otro_progenitor: 'percibe',
+              suma_pensiones_menor: suma,
+            },
+          },
+        },
+      });
+      expect(r.ok()).toBeTruthy();
+      return normalizar((await r.json()).result.content[0].text);
+    };
+    const mcpPropia = await porMcp('propia');
+    expect(mcpPropia).toContain('Tiene derecho al complemento');
+    expect(mcpPropia).toContain('73,80 €/mes');
+    expect(mcpPropia).toContain('art. 60.2 LGSS');
+    const mcpDesconocida = await porMcp('desconocida');
+    expect(mcpDesconocida).toContain('Depende de la suma de pensiones');
+    expect(mcpDesconocida).not.toContain('No procede ahora');
+    const mcpOtro = await porMcp('otro_progenitor');
+    expect(mcpOtro).toContain('No procede ahora');
+    expect(mcpOtro).not.toContain('incompatible');
   });
 
   /**
@@ -2527,15 +2637,27 @@ test.describe('Re-inspección 26/09/2026', () => {
    * cinco sitios. Con dos pensiones la respuesta se invierte: A con jubilación 900 € +
    * viudedad 600 € (suma 1.500 €) frente a B con jubilación 1.200 € → por la regla de la
    * página, A (900 < 1.200); por el art. 60.1, B (1.200 < 1.500).
+   *
+   * ✅ REPARADO el 26/09/2026 (hallazgo 2240): la nota del META y los cinco sitios de la
+   * página dicen «suma de pensiones públicas de menor cuantía», y el caso típico usa el
+   * ejemplo A/B de la ficha: le corresponde a quien cobra 1.200 €.
    */
-  test.fail('HALLAZGO (26/09) concurrencia: el art. 60.1 compara la SUMA de pensiones, no «la pensión»', async ({
+  test('REPARADO 2240: el art. 60.1 compara la SUMA de pensiones, no «la pensión»', async ({
     page,
   }) => {
+    expect(COMPLEMENTO_BRECHA_GENERO_META.nota).toContain('suma sea de menor cuantía');
+    expect(COMPLEMENTO_BRECHA_GENERO_META.nota).not.toContain('incompatible');
     await abrirGuia(page);
     const guia = normalizar(await page.locator('body').innerText());
     expect(guia).not.toContain('pensión pública de menor cuantía');
     expect(guia).not.toContain('pensión pública menor');
+    expect(guia).not.toContain('pensión menor');
     expect(guia).toMatch(/suma sea de menor cuantía|suma de pensiones/);
+    // El ejemplo de la ficha, resuelto a mano: 900 + 600 = 1.500 > 1.200 → B
+    expect(guia).toContain('le corresponde a quien cobra 1.200 €');
+    // Y la ayuda de la P5, fuera de la guía, dice lo mismo
+    const p5 = normalizar(await page.locator('#p5-ayuda').innerText());
+    expect(p5).toContain('suma de pensiones públicas de menor');
   });
 
   /**
@@ -2545,14 +2667,19 @@ test.describe('Re-inspección 26/09/2026', () => {
    * (32 px, 800, texto grande, exige 3:1) da 2,10–2,87:1, y «Cumples los requisitos
    * básicos» / «Posible reclamación retroactiva» (14,7 px, 400, exige 4,5:1) 2,02–2,73:1.
    */
-  test.fail('HALLAZGO (26/09) contraste: el veredicto positivo es blanco sobre verde por debajo del mínimo', async ({
+  // ✅ REPARADO el 26/09/2026 (hallazgo 2241): degradado #1D6B3A → #237B45, 6,5 y 5,3:1 con
+  // blanco. Se exige 4,5:1 también al importe (el acta pedía 3:1 por ser texto grande) y en
+  // los dos temas, porque el fondo es el mismo en ambos.
+  test('REPARADO 2241: el veredicto positivo es blanco sobre verde con contraste suficiente', async ({
     page,
   }) => {
     await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
     await expect(page.locator('[class*="resultHeroPositivo"]')).toBeVisible();
     await prepararMedicion(page);
-    expect(await contrasteMinimo(page, '[class*="resultHeroPositivo"] [class*="resultImporte"]')).toBeGreaterThanOrEqual(3);
+    expect(await contrasteMinimo(page, '[class*="resultHeroPositivo"] [class*="resultImporte"]')).toBeGreaterThanOrEqual(4.5);
     expect(await contrasteMinimo(page, '[class*="resultHeroPositivo"] [class*="resultLabel"]')).toBeGreaterThanOrEqual(4.5);
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+    expect(await contrasteMinimo(page, '[class*="resultHeroPositivo"] [class*="resultLabel"]'), 'oscuro').toBeGreaterThanOrEqual(4.5);
   });
 
   /**
@@ -2569,7 +2696,11 @@ test.describe('Re-inspección 26/09/2026', () => {
    *   · «Errores frecuentes» #E65100 sobre #FFF8E1 (16,8 px, 700): 3,57:1 en claro
    * Existen --primary-texto, --secondary-texto y --primary-boton para esto.
    */
-  test.fail('HALLAZGO (26/09) contraste: color de marca como texto pequeño y blanco sobre marca', async ({ page }) => {
+  // ✅ REPARADO el 26/09/2026 (hallazgo 2242): el módulo ya no redeclara --primary,
+  // --secondary ni --warning; texto con --primary-texto / --secondary-texto, fondos con
+  // blanco encima con --primary-boton / --secondary-boton. Se añaden el botón y el título
+  // de «Errores frecuentes», que el acta midió y el test original no recorría.
+  test('REPARADO 2242: color de marca como texto pequeño y blanco sobre marca, con contraste', async ({ page }) => {
     await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
     await abrirGuia(page);
     await prepararMedicion(page);
@@ -2579,6 +2710,8 @@ test.describe('Re-inspección 26/09/2026', () => {
       '[class*="notaFinal"] strong',
       '[class*="tipCard"] h3',
       '[class*="stepNumber"]',
+      '[class*="warningHeader"] h3',
+      'button[class*="VerificadorComplementoBrechaGenero"][class*="__btn"]',
     ];
     for (const sel of selectores) {
       expect.soft(await contrasteMinimo(page, sel), sel).toBeGreaterThanOrEqual(4.5);
@@ -2597,13 +2730,34 @@ test.describe('Re-inspección 26/09/2026', () => {
    * semántica es un grupo de radio, y al elegir otra opción la anterior se despulsa sin
    * anuncio. Es el patrón de los hallazgos 950, 1341 y 2074 de la familia de selectores.
    */
-  test.fail('HALLAZGO (26/09) elección única anunciada como conmutadores (aria-pressed) y no como radios', async ({
+  // ✅ REPARADO el 26/09/2026 (hallazgo 2243): radiogroup + radio + aria-checked, sin
+  // aria-pressed, con foco itinerante (solo la marcada en el orden de tabulación) y flechas
+  // que mueven selección y foco, como en el patrón WAI-ARIA «Radio Group».
+  test('REPARADO 2243: elección única anunciada como grupo de radio, con flechas y foco itinerante', async ({
     page,
   }) => {
     const grupo = page.locator('[aria-labelledby="p1-titulo"]');
     await expect(grupo).toHaveAttribute('role', 'radiogroup');
     const opcion = grupo.getByRole('radio', { name: /Jubilación \(ordinaria/ });
     await expect(opcion).toHaveAttribute('aria-checked', /true|false/);
+    // Ninguna opción de las seis preguntas lleva ya aria-pressed
+    expect(await page.locator('[role="radio"][aria-pressed]').count()).toBe(0);
+    expect(await page.locator('[class*="optionBtn"][aria-pressed]').count()).toBe(0);
+
+    // Foco itinerante: en cada grupo, un solo radio con tabindex 0, y es el marcado
+    const p4 = page.getByRole('radiogroup', { name: '4. Sexo administrativo del solicitante' });
+    await expect(p4.locator('[tabindex="0"]')).toHaveCount(1);
+    await expect(p4.getByRole('radio', { name: 'Mujer' })).toHaveAttribute('tabindex', '0');
+
+    // Flecha abajo: marca «Hombre», le da el foco y desmarca «Mujer»
+    await p4.getByRole('radio', { name: 'Mujer' }).focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(p4.getByRole('radio', { name: 'Hombre' })).toHaveAttribute('aria-checked', 'true');
+    await expect(p4.getByRole('radio', { name: 'Mujer' })).toHaveAttribute('aria-checked', 'false');
+    await expect(p4.getByRole('radio', { name: 'Hombre' })).toBeFocused();
+    // Y da la vuelta: desde el último, abajo vuelve al primero
+    await page.keyboard.press('ArrowDown');
+    await expect(p4.getByRole('radio', { name: 'Mujer' })).toHaveAttribute('aria-checked', 'true');
   });
 
   /**
@@ -2614,12 +2768,19 @@ test.describe('Re-inspección 26/09/2026', () => {
    * Al repararlo, la aserción `${tramo.porcentaje}%` del test de 1174 (arriba) tendrá que
    * seguir a la nueva forma.
    */
-  test.fail('HALLAZGO (26/09) el % de la tabla comparativa va pegado a la cifra', async ({ page }) => {
+  // ✅ REPARADO el 26/09/2026 (hallazgo 2244): la tabla y el featureList del JSON-LD.
+  test('REPARADO 2244: el % de la tabla comparativa y del JSON-LD va con espacio duro', async ({ page }) => {
     await abrirGuia(page);
     const bruto = await page.locator('table').first().innerText();
     for (const tramo of COMPLEMENTO_MATERNIDAD_DEROGADO.escala) {
       expect(bruto).toContain(`${tramo.porcentaje}${NBSP}%`);
     }
+    const maximo = COMPLEMENTO_MATERNIDAD_DEROGADO.escala[COMPLEMENTO_MATERNIDAD_DEROGADO.escala.length - 1];
+    expect(bruto).toContain(`${maximo.porcentaje}${NBSP}% (${maximo.hijos} o más hijos)`);
+    expect(bruto).not.toMatch(/\d%/);
+    const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+    expect(jsonLd).toContain(`100${NBSP}% en el navegador`);
+    expect(jsonLd).not.toMatch(/\d%/);
   });
 
   /**
@@ -2629,7 +2790,8 @@ test.describe('Re-inspección 26/09/2026', () => {
    * `COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales` y la tarjeta de casos típicos ya lo
    * interpola. Residuo del 226.
    */
-  test.fail('HALLAZGO (26/09) «14 pagas» tecleado junto a una cifra que se calcula con pagasAnuales', async () => {
+  // ✅ REPARADO el 26/09/2026 (hallazgo 2245): las dos etiquetas interpolan `pagasAnuales`.
+  test('REPARADO 2245: «14 pagas» ya no va tecleado junto a una cifra que se calcula con pagasAnuales', async () => {
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const pagina = readFileSync(
@@ -2648,10 +2810,31 @@ test.describe('Re-inspección 26/09/2026', () => {
    * «doctrina TJUE 2025» (featureList)—, mientras el tip «Aporta jurisprudencia», en la
    * MISMA guía, cita META.doctrina entera.
    */
-  test.fail('HALLAZGO (26/09) la guía teclea «doctrina TJUE/TS 2025» en vez de citar META.doctrina', async ({ page }) => {
+  // ✅ REPARADO el 26/09/2026 (hallazgo 2246): los cinco sitios de la página y los dos de
+  // metadata.ts citan META.doctrina.
+  test('REPARADO 2246: la guía y el metadata citan META.doctrina, no «doctrina TJUE/TS 2025»', async ({ page }) => {
+    const { stjue, ts } = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
     await abrirGuia(page);
     const guia = normalizar(await page.locator('body').innerText());
     expect(guia).not.toContain('TJUE/TS');
+    expect(guia).not.toContain('hasta 2025');
+    expect(guia).not.toContain('anteriores a 2025');
+    expect(guia).not.toContain('previas a 2025');
+    // Caso típico y tabla, con la cita entera del módulo
+    expect(guia).toContain(`la ${stjue.corto} (${stjue.fecha}) y la STS de ${ts.fecha} abren la vía`);
+    expect(guia).toContain(`hasta la ${stjue.corto} (${stjue.fecha})`);
+    expect(guia).toContain(`(${stjue.corto} y ${ts.corto})`);
+
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const meta = readFileSync(
+      join(process.cwd(), 'app', 'verificador-complemento-brecha-genero', 'metadata.ts'),
+      'utf8',
+    );
+    expect(meta).not.toContain('TJUE 2025');
+    expect(meta).not.toContain('antes de 2025');
+    const descripcion = await page.locator('meta[name="description"]').getAttribute('content');
+    expect(descripcion).toContain(stjue.corto);
   });
 
   /**
@@ -2661,7 +2844,9 @@ test.describe('Re-inspección 26/09/2026', () => {
    * 740), y ni el scroll ni el foco lo acompañan (el foco se queda en el botón). A la vista
    * no pasa nada al pulsar. Es el patrón de 1222 y 2105.
    */
-  test.fail('HALLAZGO (26/09) en móvil el veredicto aparece fuera de pantalla al pulsar «Verificar mi derecho»', async ({
+  // ✅ REPARADO el 26/09/2026 (hallazgo 2247): al pulsar, el veredicto se lleva a la vista
+  // si no lo está y recibe el foco (tabIndex -1), cada vez que se pulsa.
+  test('REPARADO 2247: en móvil el veredicto se lleva a la vista y recibe el foco al verificar', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 360, height: 740 });
@@ -2681,7 +2866,12 @@ test.describe('Re-inspección 26/09/2026', () => {
     const caja = await importe.boundingBox();
     expect(caja).not.toBeNull();
     const { y, height } = caja as { y: number; height: number };
+    expect(y).toBeGreaterThanOrEqual(0);
     expect(y + height).toBeLessThanOrEqual(740);
+    // El foco sigue al veredicto: ya no se queda en el botón
+    const enfocado = await page.evaluate(() => (document.activeElement?.className ?? '').toString());
+    expect(enfocado).toContain('resultHero');
+    expect(normalizar(await page.evaluate(() => (document.activeElement as HTMLElement).innerText))).toContain('+73,80 €/mes');
   });
 });
 
@@ -2696,7 +2886,8 @@ test.describe('Re-inspección 26/09/2026 — redacción de la guía', () => {
    * la redacción del RDL 3/2021 (vigente desde el 04/02/2021, según el BOE) lo incluyen.
    * Quien causó la pensión justo el 04/02/2021 lee en la guía que no cumple el requisito.
    */
-  test.fail('HALLAZGO (26/09) el paso 1 de la guía deja fuera el día del corte («posterior al 4-feb-2021»)', async ({
+  // ✅ REPARADO el 26/09/2026 (hallazgo 2248): «el 4-feb-2021 o después», como el formulario.
+  test('REPARADO 2248: el paso 1 de la guía incluye el día del corte', async ({
     page,
   }) => {
     await abrirGuia(page);
@@ -2705,6 +2896,7 @@ test.describe('Re-inspección 26/09/2026 — redacción de la guía', () => {
     );
     expect(paso1).toContain('4-feb-2021');
     expect(paso1).not.toContain('posterior al 4-feb-2021');
+    expect(paso1).toContain('el 4-feb-2021 o después');
   });
 
   /**
@@ -2715,11 +2907,17 @@ test.describe('Re-inspección 26/09/2026 — redacción de la guía', () => {
    * 2025)» (tip «Aporta jurisprudencia»). Las dos citas pegadas nacieron de la reparación
    * del 02/09 (4dcd32ea), al interpolar la doctrina del módulo.
    */
-  test.fail('HALLAZGO (26/09) palabras pegadas en la guía por saltos de línea del JSX', async ({ page }) => {
+  // ✅ REPARADO el 26/09/2026 (hallazgo 2249): {' '} explícito en los tres saltos.
+  test('REPARADO 2249: sin palabras pegadas en la guía por saltos de línea del JSX', async ({ page }) => {
     await abrirGuia(page);
     const guia = normalizar(await page.locator('body').innerText());
     expect.soft(guia).not.toContain('Resultado:no aplica');
     expect.soft(guia).not.toContain('caso WA)con un profesional');
     expect.soft(guia).not.toContain('C-623/23(15 de mayo');
+    expect.soft(guia).toContain('Resultado: no aplica');
+    expect.soft(guia).toContain('caso WA) con un profesional');
+    expect.soft(guia).toContain('C-623/23 (15 de mayo');
+    // Barrido general: ninguna letra pegada a un paréntesis de apertura ni a «:»
+    expect.soft(guia).not.toMatch(/[a-záéíóú]\((?!s\))/);
   });
 });

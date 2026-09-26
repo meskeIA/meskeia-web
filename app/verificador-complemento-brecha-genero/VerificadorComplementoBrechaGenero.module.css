@@ -1,15 +1,20 @@
+/*
+  Los tokens de MARCA (--primary, --secondary, --hero-bg) y los semánticos (--warning,
+  --success, --danger) ya no se redeclaran aquí: el módulo los fijaba sin variante oscura y
+  los usaba como texto pequeño o como fondo de texto blanco, por debajo de 4,5:1 (hallazgo
+  2242). Se heredan de globals.css, y el texto de marca usa --primary-texto /
+  --secondary-texto y los fondos con blanco encima --primary-boton / --secondary-boton.
+*/
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
-  --hero-bg: #1a5278;
+  /* Fondo del veredicto positivo, con texto blanco encima: 6,5:1 y 5,3:1 en sus dos
+     extremos. El degradado #27AE60 → #2ECC71 daba 2,0–2,9:1 (hallazgo 2241). */
+  --veredicto-si-desde: #1D6B3A;
+  --veredicto-si-hasta: #237B45;
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
   --text-secondary: #666666;
   --border: #E5E5E5;
-  --warning: #E67E22;
-  --success: #27AE60;
-  --danger: #E74C3C;
   --radius: 12px;
   --radius-large: 16px;
   --spacing-md: 1rem;
@@ -26,6 +31,9 @@
 }
 
 [data-theme='dark'] .container {
+  /* Blanco sobre verde oscuro funciona igual en los dos temas: mismo valor, declarado */
+  --veredicto-si-desde: #1D6B3A;
+  --veredicto-si-hasta: #237B45;
   --bg-primary: #1A1A1A;
   --bg-card: #2A2A2A;
   --text-primary: #E5E5E5;
@@ -67,7 +75,7 @@
 .cardTitle {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-lg);
   padding-bottom: var(--spacing-md);
   border-bottom: 2px solid var(--border);
@@ -138,15 +146,16 @@
 .optionActivo {
   border-color: var(--primary);
   background: rgba(46, 134, 171, 0.07);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
-[data-theme='dark'] .optionActivo { background: rgba(46, 134, 171, 0.15); }
+/* En oscuro el velo va más tenue: con 0,15 el texto de marca se quedaba en 2,95:1 (2242) */
+[data-theme='dark'] .optionActivo { background: rgba(46, 134, 171, 0.08); }
 
 .btn {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -175,11 +184,34 @@
   gap: var(--spacing-md);
 }
 
-.resultHeroPositivo, .resultHeroNegativo, .resultHeroSinCalcular {
+.resultHeroPositivo, .resultHeroNegativo, .resultHeroSinCalcular, .resultHeroCondicionado {
   border-radius: var(--radius-large);
   padding: 1.5rem;
   text-align: center;
+  /* Al verificar, el veredicto se lleva a la vista y recibe el foco (hallazgo 2247):
+     el margen evita que quede bajo el logo fijo. */
+  scroll-margin-top: 90px;
 }
+.resultHeroPositivo:focus, .resultHeroNegativo:focus,
+.resultHeroSinCalcular:focus, .resultHeroCondicionado:focus { outline: none; }
+.resultHeroPositivo:focus-visible, .resultHeroNegativo:focus-visible,
+.resultHeroSinCalcular:focus-visible, .resultHeroCondicionado:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/*
+  El cuarto estado: DEPENDE. El otro progenitor ya lo percibe y no se sabe qué suma de
+  pensiones públicas es menor (hallazgo 2239). No es un «no», así que no lleva el gris
+  del veredicto negativo, sino el borde de marca de una respuesta abierta.
+*/
+.resultHeroCondicionado {
+  background: var(--bg-primary);
+  border: 2px solid var(--primary);
+  color: var(--text-primary);
+}
+.resultHeroCondicionado .resultImporte { font-size: 1.4rem; }
+.resultHeroCondicionado .resultLabel { font-weight: 600; opacity: 1; }
 
 /*
   El tercer estado: la entrada que NO se ha podido evaluar. Llevaba el mismo estilo que la
@@ -197,7 +229,7 @@
 .resultHeroSinCalcular .resultLabel { font-weight: 600; }
 
 .resultHeroPositivo {
-  background: linear-gradient(135deg, var(--success) 0%, #2ecc71 100%);
+  background: linear-gradient(135deg, var(--veredicto-si-desde) 0%, var(--veredicto-si-hasta) 100%);
   color: white;
 }
 
@@ -279,7 +311,7 @@
   border: 1px solid rgba(72, 169, 166, 0.2);
   font-size: 0.88rem;
 }
-.siguienteCard strong { display: block; color: var(--secondary); margin-bottom: 0.2rem; }
+.siguienteCard strong { display: block; color: var(--secondary-texto); margin-bottom: 0.2rem; }
 .siguienteCard p { margin: 0; color: var(--text-secondary); line-height: 1.5; }
 
 .notaFinal {
@@ -293,14 +325,15 @@
   border-left: 3px solid var(--warning);
   border-radius: 0 var(--radius) var(--radius) 0;
 }
-.notaFinal strong { color: var(--warning); font-style: normal; }
+/* «Aviso:» en naranja daba 2,73:1 (hallazgo 2242): el naranja se queda en el borde */
+.notaFinal strong { color: var(--text-primary); font-style: normal; }
 
 /* ===== PROFESIONALIZACIÓN v2.0 ===== */
 
 .guideSection h2 {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 2rem 0 0.85rem;
 }
 .guideSection h2:first-child { margin-top: 0; }
@@ -441,7 +474,7 @@
 }
 
 .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 2.1rem;
   height: 2.1rem;
@@ -491,7 +524,7 @@
 .tipCard h3 {
   font-size: 0.98rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 .tipCard p {
@@ -524,7 +557,8 @@
 .warningHeader h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #e65100;
+  /* #E65100 sobre #FFF8E1 daba 3,57:1 (hallazgo 2242); este, 5,2:1 */
+  color: #B34700;
   margin: 0;
 }
 [data-theme='dark'] .warningHeader h3 { color: #ffb74d; }

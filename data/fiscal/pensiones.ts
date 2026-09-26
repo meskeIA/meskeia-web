@@ -543,7 +543,24 @@ export const COMPLEMENTO_BRECHA_GENERO_META = {
     resumen:
       'STJUE C-623/23 (15 de mayo de 2025) y STS de 9 de julio de 2025: igualdad de trato hombre/mujer',
   },
-  nota: 'El complemento es incompatible con que lo perciba el otro progenitor por los mismos hijos. En caso de concurrencia, se reconoce al progenitor con pensión pública de menor cuantía.',
+  /**
+   * La regla de concurrencia entre progenitores, en una frase.
+   *
+   * ⚠️ Corregida el 26/09/2026 (hallazgos 2239 y 2240 del Inspector) contra el texto
+   * consolidado del art. 60 LGSS (BOE-A-2015-11724, versión vigente desde el 18/03/2023,
+   * consultado por la API de datos abiertos del BOE ese día). Decía dos cosas que la norma
+   * no dice:
+   *   · «incompatible con que lo perciba el otro progenitor»: el 60.2 prevé justo lo
+   *     contrario, que el complemento PASE al segundo progenitor («El reconocimiento del
+   *     complemento al segundo progenitor supondrá la extinción del complemento ya
+   *     reconocido al primer progenitor»);
+   *   · «pensión pública de menor cuantía»: el 60.1 compara la SUMA («titular de pensiones
+   *     públicas cuya suma sea de menor cuantía»). Con jubilación + viudedad, lo habitual,
+   *     la respuesta se invierte.
+   * Las piezas (normas y criterio) viven en `COMPLEMENTO_BRECHA_GENERO_2026.concurrencia
+   * .entreProgenitores`, que es lo que interpolan la app y el motor del MCP.
+   */
+  nota: 'Cada hijo o hija da derecho a un solo complemento (art. 60.3.a) LGSS). Si los dos progenitores lo piden por los mismos hijos, se reconoce al que sea titular de pensiones públicas cuya suma sea de menor cuantía (art. 60.1 LGSS), y reconocérselo al segundo extingue el ya reconocido al primero (art. 60.2 LGSS).',
 };
 
 /**
@@ -633,6 +650,27 @@ export const COMPLEMENTO_BRECHA_GENERO_2026 = {
     noComputaAlLimiteMaximo: { norma: 'art. 60.3.d) LGSS' },
     /** Compatible con el complemento a mínimos (art. 60.3.e LGSS) */
     compatibleConComplementoAMinimos: { norma: 'art. 60.3.e) LGSS' },
+    /**
+     * Concurrencia de los DOS progenitores por los mismos hijos (hallazgos 2239 y 2240).
+     * Que el otro progenitor ya lo perciba no deniega el derecho: decide la SUMA de
+     * pensiones públicas de cada uno, y el reconocimiento al segundo extingue el del
+     * primero. Citas literales del texto consolidado (BOE-A-2015-11724, consultado el
+     * 26/09/2026) en la cabecera de `COMPLEMENTO_BRECHA_GENERO_META.nota`.
+     */
+    entreProgenitores: {
+      /** Cada hijo o hija da derecho a un solo complemento */
+      unComplementoPorHijo: { norma: 'art. 60.3.a) LGSS' },
+      /** A cuál de los dos se reconoce */
+      norma: 'art. 60.1 LGSS',
+      criterio: 'que sea titular de pensiones públicas cuya suma sea de menor cuantía',
+      /** Qué pasa con el complemento del que ya lo cobraba */
+      extincion: {
+        norma: 'art. 60.2 LGSS',
+        detalle:
+          'Reconocérselo al segundo progenitor extingue el complemento ya reconocido al primero, ' +
+          'a quien el INSS da audiencia antes de resolver.',
+      },
+    },
   },
   /**
    * Plazos del procedimiento. El de la reclamación previa aparecía TRES veces en el JSX y

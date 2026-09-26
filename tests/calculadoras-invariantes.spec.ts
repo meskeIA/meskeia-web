@@ -2893,6 +2893,65 @@ test.describe('Golden — calcularComplementoBrechaGenero (Capa 1 · art. 60 LGS
     expect(cb.complementoAnual).toBe(0);
   });
 
+  /**
+   * Concurrencia de los dos progenitores (hallazgo 2239, 26/09/2026). Hasta esa fecha
+   * `otroProgenitor: 'percibe'` devolvía una denegación cerrada y la tool la llamaba
+   * «incompatible». Art. 60.1 LGSS: se reconoce al progenitor titular de pensiones públicas
+   * cuya SUMA sea de menor cuantía; art. 60.2: reconocerlo al segundo extingue el del
+   * primero (texto consolidado BOE-A-2015-11724, consultado el 26/09/2026). Ningún golden
+   * anterior cubría esta rama, así que no se ha cambiado ninguno: son tres nuevos.
+   *
+   * Resuelto a mano, 2 hijos: 2 × 36,90 = 73,80 €/mes · × 14 = 1.033,20 €/año.
+   */
+  test('GOLDEN-CC1: el otro progenitor lo percibe y la suma propia es la menor → procede 73,80 €/mes [sin contraste oficial]', () => {
+    const cb = calcularComplementoBrechaGenero({
+      sexo: 'mujer',
+      numHijos: 2,
+      tipoPension: 'jubilacion',
+      otroProgenitor: 'percibe',
+      sumaPensionesMenor: 'propia',
+    });
+    expect(cb.tieneDerechoComplemento).toBe(true);
+    expect(cb.condicionado).toBe(false);
+    expect(cb.complementoMensual).toBeCloseTo(73.80, 2);
+    expect(cb.complementoAnual).toBeCloseTo(1033.20, 2);
+    expect(cb.motivo).toContain('suma sea de menor cuantía');
+    expect(cb.pasoSiguiente).toContain('60.2');
+  });
+
+  test('GOLDEN-CC2: el otro progenitor lo percibe y no se sabe qué suma es menor → condicionado, no denegado [sin contraste oficial]', () => {
+    const cb = calcularComplementoBrechaGenero({
+      sexo: 'hombre',
+      numHijos: 2,
+      tipoPension: 'viudedad',
+      otroProgenitor: 'percibe',
+    });
+    expect(cb.tieneDerechoComplemento).toBe(false);
+    expect(cb.condicionado).toBe(true);
+    // El importe que correspondería si la suma propia es la menor
+    expect(cb.hijosComputables).toBe(2);
+    expect(cb.complementoMensual).toBeCloseTo(73.80, 2);
+    expect(cb.complementoAnual).toBeCloseTo(1033.20, 2);
+    expect(cb.motivo).toContain('Depende');
+    expect(cb.motivo).not.toContain('no puede reconocerse');
+  });
+
+  test('GOLDEN-CC3: el otro progenitor lo percibe y su suma es la menor → no procede, por la suma [sin contraste oficial]', () => {
+    const cb = calcularComplementoBrechaGenero({
+      sexo: 'mujer',
+      numHijos: 3,
+      tipoPension: 'incapacidad_permanente',
+      otroProgenitor: 'percibe',
+      sumaPensionesMenor: 'otro_progenitor',
+      denegacionPropia: true,
+    });
+    expect(cb.tieneDerechoComplemento).toBe(false);
+    expect(cb.condicionado).toBe(false);
+    expect(cb.esReclamacion).toBe(false);
+    expect(cb.complementoMensual).toBe(0);
+    expect(cb.motivo).toContain('suma sea de menor cuantía');
+  });
+
 });
 
 

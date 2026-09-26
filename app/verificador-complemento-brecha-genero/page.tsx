@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import type { KeyboardEvent } from 'react';
 import styles from './VerificadorComplementoBrechaGenero.module.css';
 import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
@@ -31,8 +32,28 @@ const DOCTRINA = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
 
 /** Escala del complemento de maternidad derogado, leída del módulo (hallazgo 607) */
 const MATERNIDAD = COMPLEMENTO_MATERNIDAD_DEROGADO;
-const ESCALA_MATERNIDAD = MATERNIDAD.escala.map((t) => `${t.porcentaje}%`).join(', ');
+// El % va separado de la cifra con espacio duro U+00A0 (RAE 2010; norma del 25/09/2026,
+// hallazgo 2244): así no salta solo a la línea siguiente.
+const PORCENTAJE = (n: number) => `${n} %`;
+const ESCALA_MATERNIDAD = MATERNIDAD.escala.map((t) => PORCENTAJE(t.porcentaje)).join(', ');
 const MAXIMO_MATERNIDAD = MATERNIDAD.escala[MATERNIDAD.escala.length - 1];
+
+/** Pagas en que se abona el complemento, leídas del módulo (hallazgo 2245) */
+const PAGAS = COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales;
+
+/**
+ * Concurrencia de los dos progenitores (art. 60.1 y 60.2 LGSS), leída del módulo fiscal.
+ *
+ * Hasta el 26/09/2026 «el otro progenitor ya lo percibe» se contestaba con una denegación
+ * cerrada, y la regla se enunciaba con «la pensión pública de menor cuantía». La norma
+ * compara la SUMA de pensiones públicas de cada progenitor y prevé que reconocérselo al
+ * segundo extinga el del primero: el veredicto depende de qué suma es menor, y eso es lo
+ * que pregunta ahora la P5 bis (hallazgos 2239 y 2240).
+ */
+const CONCURRENCIA = COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.entreProgenitores;
+const REGLA_CONCURRENCIA =
+  `Cada hijo o hija da derecho a un solo complemento (${CONCURRENCIA.unComplementoPorHijo.norma}), ` +
+  `y el ${CONCURRENCIA.norma} lo asigna al progenitor ${CONCURRENCIA.criterio}.`;
 
 /**
  * Las cifras del complemento se escriben UNA vez, aquí, y se interpolan en toda la página.
@@ -70,6 +91,79 @@ type TipoPension = 'jubilacion' | 'jubilacion_parcial' | 'incapacidad' | 'viuded
 type Genero = 'mujer' | 'hombre';
 type EstadoOtroProgenitor = 'no_aplica' | 'no_percibe' | 'percibe' | 'denegado';
 type FechaCausante = 'antes_2021' | 'desde_2021' | 'sin_iniciar';
+/** P5 bis: de quién es la SUMA de pensiones públicas menor (solo si el otro ya lo percibe) */
+type SumaMenor = 'propia' | 'otro_progenitor' | 'desconocida';
+
+interface OpcionRadio<T> {
+  id: T;
+  label: string;
+  icon?: string;
+}
+
+interface GrupoRadioProps<T> {
+  /** id del enunciado que nombra el grupo */
+  idTitulo: string;
+  /** id de la ayuda que lo describe, si la hay */
+  idAyuda?: string;
+  opciones: readonly OpcionRadio<T>[];
+  valor: T;
+  onElegir: (v: T) => void;
+  apilado?: boolean;
+}
+
+/**
+ * Pregunta de elección única como grupo de radio (patrón WAI-ARIA «Radio Group»).
+ *
+ * Hasta el 26/09/2026 eran `<button aria-pressed>` dentro de `role="group"`: un lector de
+ * pantalla anunciaba conmutadores independientes, y al elegir otra opción la anterior se
+ * desmarcaba sin anuncio (hallazgo 2243, el patrón de 950, 1341 y 2074). Ahora cada
+ * opción es `role="radio"` con `aria-checked`, y el foco es itinerante: solo la opción
+ * marcada entra en el orden de tabulación y las flechas mueven la selección y el foco.
+ */
+function GrupoRadio<T extends string | boolean>({
+  idTitulo, idAyuda, opciones, valor, onElegir, apilado = false,
+}: GrupoRadioProps<T>) {
+  const tecla = (e: KeyboardEvent<HTMLButtonElement>, indice: number) => {
+    const n = opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % n;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + n) % n;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = n - 1;
+    else return;
+    e.preventDefault();
+    onElegir(opciones[destino].id);
+    const radios = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    radios?.[destino]?.focus();
+  };
+
+  return (
+    <div
+      className={apilado ? styles.optionGridStack : styles.optionGrid}
+      role="radiogroup"
+      aria-labelledby={idTitulo}
+      aria-describedby={idAyuda}
+    >
+      {opciones.map((opt, i) => {
+        const marcada = valor === opt.id;
+        return (
+          <button
+            key={String(opt.id)}
+            type="button"
+            role="radio"
+            aria-checked={marcada}
+            tabIndex={marcada ? 0 : -1}
+            className={`${styles.optionBtn} ${marcada ? styles.optionActivo : ''}`}
+            onClick={() => onElegir(opt.id)}
+            onKeyDown={(e) => tecla(e, i)}
+          >
+            {opt.icon && <span aria-hidden="true">{opt.icon}</span>} {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 interface Resultado {
   procede: boolean;
@@ -84,6 +178,14 @@ interface Resultado {
    * pedir un complemento que corresponde (hallazgo 1171).
    */
   sinCalcular?: boolean;
+  /**
+   * true cuando el derecho DEPENDE de un dato que falta: el otro progenitor ya lo percibe y
+   * no se sabe qué suma de pensiones públicas es menor (hallazgo 2239). No es un «no»:
+   * los importes son los que corresponderían si la suma propia es la menor.
+   */
+  condicionado?: boolean;
+  /** true cuando procede porque la suma propia es la menor: se extingue el del otro */
+  concurrenciaAFavor?: boolean;
   hijosComputables: number;
   importeMensual: number;
   importeAnual: number;
@@ -100,6 +202,7 @@ function evaluar(
   numHijos: number,
   genero: Genero,
   otroProgenitor: EstadoOtroProgenitor,
+  sumaMenor: SumaMenor,
   denegacionPropia: boolean,
 ): Resultado {
   const { cuantiaPorHijoMensual, maxHijos, pagasAnuales } = COMPLEMENTO_BRECHA_GENERO_2026;
@@ -201,22 +304,57 @@ function evaluar(
     };
   }
 
-  // Caso 4: el otro progenitor ya percibe el complemento → incompatible
-  if (otroProgenitor === 'percibe') {
+  /**
+   * Caso 4: el otro progenitor ya percibe el complemento por los mismos hijos.
+   *
+   * NO es una incompatibilidad (hallazgo 2239). Hasta el 26/09/2026 esta rama contestaba
+   * «No procede ahora» y «no puede reconocerse de nuevo a ti», cuando el art. 60.1 LGSS lo
+   * asigna al progenitor titular de pensiones públicas cuya SUMA sea de menor cuantía y el
+   * 60.2 prevé que reconocérselo al segundo extinga el del primero. En una app de riesgo 1
+   * cuyo titular es el producto, aquel «no» llevaba a no pedir un complemento que
+   * corresponde. Ahora decide la P5 bis; si no se sabe qué suma es menor, el veredicto es
+   * condicionado. Mismo árbol que el motor del MCP (`calcularComplementoBrechaGenero`).
+   */
+  const concurrenciaAFavor = otroProgenitor === 'percibe' && sumaMenor === 'propia';
+  if (otroProgenitor === 'percibe' && sumaMenor === 'otro_progenitor') {
     return {
       procede: false,
       hijosComputables,
       importeMensual: 0,
       importeAnual: 0,
       motivo:
-        'Cada hijo o hija solo genera el complemento para uno de los progenitores. Si el otro ' +
-        'progenitor ya lo percibe por los mismos hijos, no puede reconocerse de nuevo a ti.',
+        `${REGLA_CONCURRENCIA} El otro progenitor ya lo percibe por los mismos hijos y su suma de ` +
+        'pensiones públicas es menor que la tuya, así que le corresponde a él o a ella.',
       esReclamacion: false,
       pasoSiguiente:
-        'En caso de concurrencia, la SS lo reconoce al progenitor con la pensión pública de menor ' +
-        'cuantía. Si tu pensión es inferior, conviene revisar la asignación con un asesor.',
+        'Comprueba la comparación con TODAS las pensiones públicas de cada uno (jubilación, ' +
+        'viudedad, incapacidad…), no solo con la que da derecho al complemento: si en realidad tu ' +
+        'suma es la menor, puedes solicitarlo.',
     };
   }
+  if (otroProgenitor === 'percibe' && sumaMenor === 'desconocida') {
+    return {
+      procede: false,
+      condicionado: true,
+      hijosComputables,
+      importeMensual,
+      importeAnual,
+      motivo:
+        `${REGLA_CONCURRENCIA} Que el otro progenitor ya lo perciba no te lo cierra: si tu suma ` +
+        `es la menor, se te reconoce a ti y se extingue el suyo (${CONCURRENCIA.extincion.norma}); ` +
+        'si es la suya, lo conserva él o ella.',
+      esReclamacion: false,
+      pasoSiguiente:
+        'Suma todas las pensiones públicas de cada progenitor (no solo la que da derecho al ' +
+        'complemento), compáralas y contesta la pregunta 5 bis. Si la tuya es la menor, ' +
+        'solicítalo ante el INSS citando el art. 60 LGSS.',
+    };
+  }
+  /** Lo que se antepone al motivo y se añade al paso siguiente si la suma propia es la menor */
+  const MOTIVO_A_FAVOR =
+    `${REGLA_CONCURRENCIA} El otro progenitor ya lo percibe por los mismos hijos, pero tu suma de ` +
+    'pensiones públicas es la menor, así que te corresponde a ti. ';
+  const PASO_A_FAVOR = ` ${CONCURRENCIA.extincion.detalle} (${CONCURRENCIA.extincion.norma})`;
 
   /**
    * Caso 5: al SOLICITANTE le denegaron el complemento en su día.
@@ -228,8 +366,13 @@ function evaluar(
    * abogado a impugnar una resolución denegatoria que el usuario no tenía—. Ahora lo
    * pregunta la P6, y la respuesta de la P5 sobre el otro progenitor no dispara nada.
    */
+  const conConcurrencia = (r: Resultado): Resultado =>
+    concurrenciaAFavor
+      ? { ...r, concurrenciaAFavor: true, motivo: MOTIVO_A_FAVOR + r.motivo, pasoSiguiente: r.pasoSiguiente + PASO_A_FAVOR }
+      : r;
+
   if (denegacionPropia) {
-    return {
+    return conConcurrencia({
       procede: true,
       hijosComputables,
       importeMensual,
@@ -249,11 +392,11 @@ function evaluar(
             'laboralista o al sindicato.'
           : 'Recupera la resolución denegatoria y revisa su motivo con un abogado laboralista o con tu ' +
             'sindicato antes de volver a solicitarlo.',
-    };
+    });
   }
 
   // Caso general: procede
-  return {
+  return conConcurrencia({
     procede: true,
     hijosComputables,
     importeMensual,
@@ -271,7 +414,7 @@ function evaluar(
     pasoSiguiente:
       'Si ya cobras la pensión y no aparece el complemento en tu nómina, presenta una solicitud ' +
       'expresa ante el INSS (Sede Electrónica de la SS) citando el art. 60 LGSS.',
-  };
+  });
 }
 
 // ─── Componente ───────────────────────────────────────────────────────────────
@@ -303,8 +446,31 @@ export default function VerificadorComplementoBrechaGeneroPage() {
   const hijos = hijosEsValido ? Number(hijosTexto) : 0;
   const [genero, setGenero] = useState<Genero>('mujer');
   const [otroProgenitor, setOtroProgenitor] = useState<EstadoOtroProgenitor>('no_percibe');
+  const [sumaMenor, setSumaMenor] = useState<SumaMenor>('desconocida');
   const [denegacionPropia, setDenegacionPropia] = useState<boolean>(false);
   const [evaluado, setEvaluado] = useState(false);
+  /**
+   * Cuántas veces se ha pulsado «Verificar mi derecho». Es la señal para llevar el
+   * veredicto a la vista: en móvil nace unos 230 px por debajo del borde inferior y ni el
+   * scroll ni el foco lo seguían, así que a la vista no pasaba nada (hallazgo 2247). Un
+   * contador y no `evaluado`, porque volver a pulsar con el veredicto ya pintado no cambia
+   * `evaluado` y también tiene que llevarlo a la vista.
+   */
+  const [verificaciones, setVerificaciones] = useState(0);
+  const veredictoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (verificaciones === 0) return;
+    const el = veredictoRef.current;
+    if (!el) return;
+    const caja = el.getBoundingClientRect();
+    // Salto directo y no suave: el veredicto tiene que estar a la vista al soltar el dedo,
+    // y así tampoco hay animación que respetar para prefers-reduced-motion.
+    if (caja.top < 0 || caja.bottom > window.innerHeight) {
+      el.scrollIntoView({ block: 'start', behavior: 'auto' });
+    }
+    el.focus({ preventScroll: true });
+  }, [verificaciones]);
 
   const resultado = useMemo(
     (): Resultado => {
@@ -329,9 +495,9 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           pasoSiguiente: `Escribe en la pregunta 3 un número entero de 0 a ${LIMITE_HIJOS_CAMPO} y vuelve a verificar.`,
         };
       }
-      return evaluar(tipo, fecha, hijos, genero, otroProgenitor, denegacionPropia);
+      return evaluar(tipo, fecha, hijos, genero, otroProgenitor, sumaMenor, denegacionPropia);
     },
-    [tipo, fecha, hijos, hijosEsValido, hijosSuperaLimite, hijosTexto, genero, otroProgenitor, denegacionPropia],
+    [tipo, fecha, hijos, hijosEsValido, hijosSuperaLimite, hijosTexto, genero, otroProgenitor, sumaMenor, denegacionPropia],
   );
 
   const reset = () => {
@@ -405,58 +571,46 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           <h2 className={styles.cardTitle}>Tu situación</h2>
 
           {/* P1: tipo de pensión */}
-          {/* Los grupos de botones no son un control con label: sin role="group" +
-              aria-labelledby, un lector de pantalla anuncia «Jubilación, botón» sin decir a
-              qué pregunta responde. El único <label> con control asociado es el de P3. */}
-          <div className={styles.formGroup} role="group" aria-labelledby="p1-titulo">
+          {/* Los grupos de opciones no son un control con label: sin aria-labelledby, un
+              lector de pantalla anuncia «Jubilación» sin decir a qué pregunta responde. Desde
+              el 26/09/2026 son grupos de radio (hallazgo 2243, ver `GrupoRadio`). El único
+              <label> con control asociado es el de P3. */}
+          <div className={styles.formGroup}>
             <p className={styles.label} id="p1-titulo">
               1. ¿Qué pensión percibes (o vas a percibir)?
             </p>
-            <div className={styles.optionGrid}>
-              {([
-                { id: 'jubilacion' as const, icon: '🌅', label: 'Jubilación (ordinaria o anticipada)' },
-                { id: 'jubilacion_parcial' as const, icon: '🕐', label: 'Jubilación parcial' },
-                { id: 'incapacidad' as const, icon: '♿', label: 'Incapacidad permanente' },
-                { id: 'viudedad' as const, icon: '💍', label: 'Viudedad' },
-                { id: 'no_contributiva' as const, icon: '🚫', label: 'No contributiva' },
-                { id: 'ninguna' as const, icon: '❓', label: 'Ninguna aún' },
-              ] as const).map(opt => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  className={`${styles.optionBtn} ${tipo === opt.id ? styles.optionActivo : ''}`}
-                  onClick={() => { setTipo(opt.id); reset(); }}
-                  aria-pressed={tipo === opt.id}
-                >
-                  <span aria-hidden="true">{opt.icon}</span> {opt.label}
-                </button>
-              ))}
-            </div>
+            <GrupoRadio<TipoPension>
+              idTitulo="p1-titulo"
+              opciones={[
+                { id: 'jubilacion', icon: '🌅', label: 'Jubilación (ordinaria o anticipada)' },
+                { id: 'jubilacion_parcial', icon: '🕐', label: 'Jubilación parcial' },
+                { id: 'incapacidad', icon: '♿', label: 'Incapacidad permanente' },
+                { id: 'viudedad', icon: '💍', label: 'Viudedad' },
+                { id: 'no_contributiva', icon: '🚫', label: 'No contributiva' },
+                { id: 'ninguna', icon: '❓', label: 'Ninguna aún' },
+              ]}
+              valor={tipo}
+              onElegir={(v) => { setTipo(v); reset(); }}
+            />
           </div>
 
           {/* P2: fecha del hecho causante */}
-          <div className={styles.formGroup} role="group" aria-labelledby="p2-titulo">
+          <div className={styles.formGroup}>
             <p className={styles.label} id="p2-titulo">
               2. ¿Cuándo se causó (o se causará) tu pensión?
             </p>
-            <div className={styles.optionGrid}>
-              {([
-                { id: 'antes_2021' as const, label: `Antes del ${FECHA_MINIMA_CORTA}` },
-                { id: 'desde_2021' as const, label: `El ${FECHA_MINIMA_CORTA} o después` },
-                { id: 'sin_iniciar' as const, label: 'Aún sin solicitar' },
-              ] as const).map(opt => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  className={`${styles.optionBtn} ${fecha === opt.id ? styles.optionActivo : ''}`}
-                  onClick={() => { setFecha(opt.id); reset(); }}
-                  aria-pressed={fecha === opt.id}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-            <p className={styles.hint}>
+            <GrupoRadio<FechaCausante>
+              idTitulo="p2-titulo"
+              idAyuda="p2-ayuda"
+              opciones={[
+                { id: 'antes_2021', label: `Antes del ${FECHA_MINIMA_CORTA}` },
+                { id: 'desde_2021', label: `El ${FECHA_MINIMA_CORTA} o después` },
+                { id: 'sin_iniciar', label: 'Aún sin solicitar' },
+              ]}
+              valor={fecha}
+              onElegir={(v) => { setFecha(v); reset(); }}
+            />
+            <p className={styles.hint} id="p2-ayuda">
               El {FECHA_MINIMA} es la fecha de entrada en vigor del complemento (RDL 3/2021).
             </p>
           </div>
@@ -493,91 +647,103 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           </div>
 
           {/* P4: género */}
-          <div className={styles.formGroup} role="group" aria-labelledby="p4-titulo">
+          <div className={styles.formGroup}>
             <p className={styles.label} id="p4-titulo">4. Sexo administrativo del solicitante</p>
-            <div className={styles.optionGrid}>
-              {([
-                { id: 'mujer' as const, label: 'Mujer' },
-                { id: 'hombre' as const, label: 'Hombre' },
-              ] as const).map(opt => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  className={`${styles.optionBtn} ${genero === opt.id ? styles.optionActivo : ''}`}
-                  onClick={() => { setGenero(opt.id); reset(); }}
-                  aria-pressed={genero === opt.id}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-            <p className={styles.hint}>
+            <GrupoRadio<Genero>
+              idTitulo="p4-titulo"
+              idAyuda="p4-ayuda"
+              opciones={[
+                { id: 'mujer', label: 'Mujer' },
+                { id: 'hombre', label: 'Hombre' },
+              ]}
+              valor={genero}
+              onElegir={(v) => { setGenero(v); reset(); }}
+            />
+            <p className={styles.hint} id="p4-ayuda">
               Desde la STJUE de {DOCTRINA.stjue.fecha} y la doctrina del TS, hombres y mujeres tienen derecho en
               igualdad de condiciones.
             </p>
           </div>
 
           {/* P5: estado del otro progenitor */}
-          <div className={styles.formGroup} role="group" aria-labelledby="p5-titulo">
+          <div className={styles.formGroup}>
             <p className={styles.label} id="p5-titulo">
               5. Estado del otro progenitor respecto al complemento
             </p>
-            <div className={styles.optionGridStack}>
-              {([
-                { id: 'no_percibe' as const, label: 'No lo percibe ni lo ha solicitado' },
-                { id: 'percibe' as const, label: 'Ya lo percibe por los mismos hijos' },
-                { id: 'denegado' as const, label: 'Lo solicitó y se lo denegaron' },
-                { id: 'no_aplica' as const, label: 'No procede (sin otro progenitor)' },
-              ] as const).map(opt => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  className={`${styles.optionBtn} ${otroProgenitor === opt.id ? styles.optionActivo : ''}`}
-                  onClick={() => { setOtroProgenitor(opt.id); reset(); }}
-                  aria-pressed={otroProgenitor === opt.id}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-            <p className={styles.hint}>
-              Cada hijo/a solo puede generar un complemento para uno de los progenitores. Si hay
-              concurrencia, la SS lo asigna al de pensión pública menor.
+            <GrupoRadio<EstadoOtroProgenitor>
+              idTitulo="p5-titulo"
+              idAyuda="p5-ayuda"
+              apilado
+              opciones={[
+                { id: 'no_percibe', label: 'No lo percibe ni lo ha solicitado' },
+                { id: 'percibe', label: 'Ya lo percibe por los mismos hijos' },
+                { id: 'denegado', label: 'Lo solicitó y se lo denegaron' },
+                { id: 'no_aplica', label: 'No procede (sin otro progenitor)' },
+              ]}
+              valor={otroProgenitor}
+              onElegir={(v) => { setOtroProgenitor(v); reset(); }}
+            />
+            <p className={styles.hint} id="p5-ayuda">
+              Cada hijo/a solo puede generar un complemento para uno de los progenitores. Si los
+              dos lo piden, la SS lo asigna al titular de la suma de pensiones públicas de menor
+              cuantía ({CONCURRENCIA.norma}), aunque el otro ya lo cobre.
             </p>
           </div>
 
+          {/* P5 bis: solo si el otro progenitor ya lo percibe. Decide el veredicto (art. 60.1
+              y 60.2 LGSS, hallazgo 2239): sin ella, «ya lo percibe» era un «no» cerrado. */}
+          {otroProgenitor === 'percibe' && (
+            <div className={styles.formGroup}>
+              <p className={styles.label} id="p5bis-titulo">
+                5 bis. ¿Qué progenitor tiene la suma de pensiones públicas menor?
+              </p>
+              <GrupoRadio<SumaMenor>
+                idTitulo="p5bis-titulo"
+                idAyuda="p5bis-ayuda"
+                apilado
+                opciones={[
+                  { id: 'propia', label: 'La mía es menor' },
+                  { id: 'otro_progenitor', label: 'La del otro progenitor es menor' },
+                  { id: 'desconocida', label: 'No lo sé' },
+                ]}
+                valor={sumaMenor}
+                onElegir={(v) => { setSumaMenor(v); reset(); }}
+              />
+              <p className={styles.hint} id="p5bis-ayuda">
+                Suma TODAS las pensiones públicas de cada uno, no solo la que da derecho al
+                complemento: con jubilación de 900 € más viudedad de 600 € (1.500 €) frente a una
+                jubilación de 1.200 €, la suma menor es la segunda.
+              </p>
+            </div>
+          )}
+
           {/* P6: denegación PROPIA — la que decide si procede reclamar. La P5 pregunta por la
               otra persona, así que no puede usarse para esto (ver `evaluar`, caso 5). */}
-          <div className={styles.formGroup} role="group" aria-labelledby="p6-titulo">
+          <div className={styles.formGroup}>
             <p className={styles.label} id="p6-titulo">
               6. ¿Solicitaste tú el complemento y te lo denegaron?
             </p>
-            <div className={styles.optionGrid}>
-              {([
+            <GrupoRadio<boolean>
+              idTitulo="p6-titulo"
+              idAyuda="p6-ayuda"
+              opciones={[
                 { id: false, label: 'No' },
                 { id: true, label: 'Sí, tengo una resolución denegatoria' },
-              ] as const).map(opt => (
-                <button
-                  key={String(opt.id)}
-                  type="button"
-                  className={`${styles.optionBtn} ${denegacionPropia === opt.id ? styles.optionActivo : ''}`}
-                  onClick={() => { setDenegacionPropia(opt.id); reset(); }}
-                  aria-pressed={denegacionPropia === opt.id}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-            <p className={styles.hint}>
+              ]}
+              valor={denegacionPropia}
+              onElegir={(v) => { setDenegacionPropia(v); reset(); }}
+            />
+            <p className={styles.hint} id="p6-ayuda">
               Se refiere a una denegación a TI, no al otro progenitor. Las denegaciones a hombres
-              anteriores a 2025 por «requisitos adicionales» son revisables tras la {DOCTRINA.stjue.corto}.
+              por «requisitos adicionales» anteriores a la {DOCTRINA.stjue.corto} ({DOCTRINA.stjue.fecha}) son
+              revisables.
             </p>
           </div>
 
           <button
             type="button"
             className={styles.btn}
-            onClick={() => setEvaluado(true)}
+            onClick={() => { setEvaluado(true); setVerificaciones((n) => n + 1); }}
           >
             Verificar mi derecho
           </button>
@@ -596,43 +762,58 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             </p>
           ) : (
             <div className={styles.resultados}>
-              {/* Tres titulares, no dos: procede, no procede y SIN CALCULAR. El tercero es el
+              {/* Cuatro titulares: procede, no procede, SIN CALCULAR y DEPENDE. El tercero es el
                   hallazgo 1171 — una entrada que no se puede evaluar recibía el mismo titular,
-                  el mismo icono y el mismo estilo que una denegación del derecho, y solo el
-                  párrafo «¿Por qué?», en cuerpo menor, los distinguía. */}
+                  el mismo icono y el mismo estilo que una denegación del derecho. El cuarto, el
+                  2239: la concurrencia sin saber qué suma de pensiones es menor no es un «no».
+                  El bloque recibe el foco al verificar (tabIndex -1, hallazgo 2247). */}
               <div
+                ref={veredictoRef}
+                tabIndex={-1}
                 className={
                   resultado.procede
                     ? styles.resultHeroPositivo
                     : resultado.sinCalcular
                       ? styles.resultHeroSinCalcular
-                      : styles.resultHeroNegativo
+                      : resultado.condicionado
+                        ? styles.resultHeroCondicionado
+                        : styles.resultHeroNegativo
                 }
               >
                 <div className={styles.resultIcon} aria-hidden="true">
-                  {resultado.procede ? (resultado.esReclamacion ? '🔄' : '✅') : resultado.sinCalcular ? '✏️' : 'ℹ️'}
+                  {resultado.procede
+                    ? (resultado.esReclamacion ? '🔄' : '✅')
+                    : resultado.sinCalcular ? '✏️' : resultado.condicionado ? '⚖️' : 'ℹ️'}
                 </div>
                 <div className={styles.resultImporte}>
                   {resultado.procede
                     ? `+${formatCurrency(resultado.importeMensual)}/mes`
                     : resultado.sinCalcular
                       ? 'Sin calcular'
-                      : 'No procede ahora'}
+                      : resultado.condicionado
+                        ? 'Depende de la suma de pensiones'
+                        : 'No procede ahora'}
                 </div>
                 <p className={styles.resultLabel}>
                   {resultado.procede
                     ? resultado.esReclamacion
                       ? 'Posible reclamación retroactiva'
-                      : 'Cumples los requisitos básicos'
+                      : resultado.concurrenciaAFavor
+                        ? 'Te corresponde a ti: se extingue el del otro progenitor'
+                        : 'Cumples los requisitos básicos'
                     : resultado.sinCalcular
                       ? 'Falta un dato: esto NO es una respuesta sobre tu derecho'
-                      : 'Revisa el motivo abajo'}
+                      : resultado.condicionado
+                        ? `Si tu suma de pensiones públicas es la menor, te corresponde: +${formatCurrency(resultado.importeMensual)}/mes`
+                        : 'Revisa el motivo abajo'}
                 </p>
               </div>
 
-              {resultado.procede && (
+              {(resultado.procede || resultado.condicionado) && (
                 <div className={styles.desgloseCard}>
-                  <h3 className={styles.desgloseTitle}>Desglose económico</h3>
+                  <h3 className={styles.desgloseTitle}>
+                    {resultado.condicionado ? 'Desglose, si te corresponde' : 'Desglose económico'}
+                  </h3>
                   <div className={styles.desgloseItem}>
                     <span>Hijos computables</span>
                     <strong>{resultado.hijosComputables} (máx. {COMPLEMENTO_BRECHA_GENERO_2026.maxHijos})</strong>
@@ -646,7 +827,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                     <strong>{formatCurrency(resultado.importeMensual)}/mes</strong>
                   </div>
                   <div className={`${styles.desgloseItem} ${styles.desgloseFinal}`}>
-                    <span>Anual (14 pagas)</span>
+                    <span>Anual ({PAGAS} pagas)</span>
                     <strong>{formatCurrency(resultado.importeAnual)}/año</strong>
                   </div>
                 </div>
@@ -690,8 +871,8 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             de la Ley General de la Seguridad Social (LGSS), tras su reforma por el RDL 3/2021.
           </p>
           <p>
-            Su naturaleza es la de pensión pública contributiva: se abona junto con la pensión en 14
-            pagas y <strong>no computa</strong> a efectos del límite máximo de pensiones públicas
+            Su naturaleza es la de pensión pública contributiva: se abona junto con la pensión en{' '}
+            {PAGAS} pagas y <strong>no computa</strong> a efectos del límite máximo de pensiones públicas
             ({PENSION_MAXIMA_MES}/mes), por el {COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.noComputaAlLimiteMaximo.norma}.
           </p>
 
@@ -733,13 +914,15 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 </tr>
                 <tr>
                   <td>Máximo</td>
-                  <td>{MAXIMO_MATERNIDAD.porcentaje}% ({MAXIMO_MATERNIDAD.hijos} o más hijos)</td>
+                  <td>{PORCENTAJE(MAXIMO_MATERNIDAD.porcentaje)} ({MAXIMO_MATERNIDAD.hijos} o más hijos)</td>
                   <td>{MAX_HIJOS} hijos × {CUANTIA_MES} = {MAX_MES}/mes</td>
                 </tr>
                 <tr>
                   <td>Acceso de hombres</td>
                   <td>Posible tras la {MATERNIDAD.doctrinaAcceso}</td>
-                  <td>Posible con requisitos adicionales hasta 2025</td>
+                  <td>
+                    Posible con requisitos adicionales hasta la {DOCTRINA.stjue.corto} ({DOCTRINA.stjue.fecha})
+                  </td>
                 </tr>
                 <tr>
                   <td>Tras la STJUE de {DOCTRINA.stjue.fecha}</td>
@@ -777,9 +960,10 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <h3><span aria-hidden="true">👨</span> Hombre con denegación previa</h3>
               <p>
                 <strong>Situación:</strong> solicitó el complemento en 2022 y se lo denegaron por no
-                acreditar &laquo;requisitos adicionales&raquo;. <strong>Resultado:</strong> la doctrina
-                TJUE/TS de 2025 abre la vía a reclamar. Conviene revisar la resolución con un asesor
-                laboralista y plantear nueva solicitud o reclamación previa.
+                acreditar &laquo;requisitos adicionales&raquo;. <strong>Resultado:</strong> la{' '}
+                {DOCTRINA.stjue.corto} ({DOCTRINA.stjue.fecha}) y la STS de {DOCTRINA.ts.fecha} abren la
+                vía a reclamar. Conviene revisar la resolución con un asesor laboralista y plantear
+                nueva solicitud o reclamación previa.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -787,16 +971,19 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <p>
                 <strong>Situación:</strong> ambos progenitores cobran pensión contributiva y ambos
                 tienen 2 hijos comunes. <strong>Resultado:</strong> solo uno puede percibir el
-                complemento por esos hijos. La SS lo reconoce al progenitor con pensión pública de
-                menor cuantía.
+                complemento por esos hijos: el que sea titular de pensiones públicas cuya suma sea
+                de menor cuantía ({CONCURRENCIA.norma}). Cuenta la suma, no una sola pensión: con
+                jubilación de 900 € más viudedad de 600 € (1.500 €) frente a una jubilación de
+                1.200 €, le corresponde a quien cobra 1.200 €. Y que el otro ya lo perciba no cierra
+                nada: reconocérselo al segundo extingue el del primero ({CONCURRENCIA.extincion.norma}).
               </p>
             </div>
             <div className={styles.escenarioCard}>
               <h3><span aria-hidden="true">🧓</span> Pensión anterior a feb-2021</h3>
               <p>
-                <strong>Situación:</strong> jubilación causada en 2019. <strong>Resultado:</strong>
+                <strong>Situación:</strong> jubilación causada en 2019. <strong>Resultado:</strong>{' '}
                 no aplica el complemento actual. Si entonces percibía o se le denegó el antiguo
-                complemento de maternidad, conviene revisar la doctrina de la {MATERNIDAD.doctrinaAcceso}
+                complemento de maternidad, conviene revisar la doctrina de la {MATERNIDAD.doctrinaAcceso}{' '}
                 con un profesional.
               </p>
             </div>
@@ -891,8 +1078,8 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <div className={styles.stepContent}>
                 <h3>Verifica los requisitos básicos</h3>
                 <p>
-                  Pensión contributiva, hecho causante posterior al {FECHA_MINIMA_CORTA} y al menos un hijo/a
-                  computable. Esta herramienta te orienta sobre los {NUM_REQUISITOS_ART60} puntos clave.
+                  Pensión contributiva, hecho causante el {FECHA_MINIMA_CORTA} o después y al menos un
+                  hijo/a computable. Esta herramienta te orienta sobre los {NUM_REQUISITOS_ART60} puntos clave.
                 </p>
               </div>
             </li>
@@ -950,7 +1137,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                   {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaResolucion.detalle}{' '}
                   ({COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaResolucion.norma}). Es
                   momento de contar con un abogado laboralista, especialmente en casos de
-                  denegación previa a hombres (doctrina TJUE/TS 2025).
+                  denegación previa a hombres ({DOCTRINA.stjue.corto} y {DOCTRINA.ts.corto}).
                 </p>
               </div>
             </li>
@@ -980,14 +1167,15 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <h3>Documenta la concurrencia familiar</h3>
               <p>
                 Si el otro progenitor también solicita el complemento, ten claras las cuantías de
-                ambas pensiones: la SS reconoce el complemento al de pensión menor.
+                todas las pensiones públicas de cada uno: la SS lo reconoce al titular de la suma de
+                pensiones públicas de menor cuantía ({CONCURRENCIA.norma}).
               </p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <h3>Aporta jurisprudencia si reclamas</h3>
               <p>
-                En reclamaciones de hombres con denegaciones previas, citar la {DOCTRINA.stjue.corto}
+                En reclamaciones de hombres con denegaciones previas, citar la {DOCTRINA.stjue.corto}{' '}
                 ({DOCTRINA.stjue.fecha}) y la doctrina del TS de {DOCTRINA.ts.fecha} refuerza la solicitud.
               </p>
             </div>
@@ -1034,15 +1222,16 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 antes del {FECHA_MINIMA_CORTA}.
               </li>
               <li>
-                <strong>Olvidar la incompatibilidad entre progenitores.</strong> Si ambos lo
-                solicitan por los mismos hijos, solo lo cobrará uno. No es un reparto que se
-                pacte entre ellos: en caso de concurrencia, la SS lo asigna de oficio al
-                progenitor con la pensión pública de menor cuantía.
+                <strong>Dar por perdido el complemento porque el otro progenitor ya lo cobra.</strong>{' '}
+                Si ambos lo solicitan por los mismos hijos, solo lo cobrará uno, y no es un reparto
+                que se pacte entre ellos: la SS lo asigna al titular de pensiones públicas cuya
+                suma sea de menor cuantía ({CONCURRENCIA.norma}). Si esa suma es la tuya, reconocértelo
+                extingue el del otro progenitor ({CONCURRENCIA.extincion.norma}).
               </li>
               <li>
                 <strong>No reclamar tras una denegación previa (hombres).</strong> Las denegaciones
-                previas a 2025 que aplicaban requisitos adicionales son cuestionables tras la
-                doctrina TJUE/TS.
+                que aplicaban requisitos adicionales a los hombres son cuestionables tras la{' '}
+                {DOCTRINA.stjue.corto} ({DOCTRINA.stjue.fecha}) y la STS de {DOCTRINA.ts.fecha}.
               </li>
               <li>
                 <strong>Contar el plazo en días naturales.</strong> La reclamación previa tiene{' '}

@@ -30,7 +30,8 @@ const REQUISITOS_EN_PROSA = REQUISITOS_ART60.map(r => r.detalle);
 const LISTA_REQUISITOS = `${REQUISITOS_EN_PROSA.slice(0, -1).join('; ')}; y ${REQUISITOS_EN_PROSA[REQUISITOS_EN_PROSA.length - 1]}`;
 
 const title = 'Verificador del Complemento por Brecha de Género 2026 — ¿Te corresponde? | meskeIA';
-const description = `Comprueba si tienes derecho al complemento por brecha de género en tu pensión: ${CUANTIA}/mes por hijo (máximo ${MAX_HIJOS}). Incluye los cambios tras la sentencia TJUE 2025 que iguala el trato a hombres y mujeres.`;
+// La sentencia se cita desde META.doctrina y no con el año tecleado (hallazgo 2246).
+const description = `Comprueba si tienes derecho al complemento por brecha de género en tu pensión: ${CUANTIA}/mes por hijo (máximo ${MAX_HIJOS}). Incluye los cambios tras la ${DOCTRINA.stjue.corto}, que iguala el trato a hombres y mujeres.`;
 
 export const metadata: Metadata = {
   title,
@@ -79,10 +80,12 @@ export const jsonLd = {
   featureList: [
     'Checklist de 6 preguntas alineadas con el art. 60 LGSS',
     `Cálculo del importe mensual y anual (${CUANTIA}/hijo, máx. ${MAX_HIJOS})`,
-    'Considera la doctrina TJUE 2025 e igualdad de trato H/M',
+    `Aplica la ${DOCTRINA.stjue.corto} y la ${DOCTRINA.ts.corto}: igualdad de trato H/M`,
+    'Resuelve la concurrencia entre progenitores por la suma de pensiones públicas (art. 60.1 LGSS)',
     'Detecta casos de reclamación retroactiva (denegaciones previas)',
     'Datos normativos 2026 verificados con fuente oficial',
-    'Sin registro, gratuito y 100% en el navegador',
+    // % con espacio duro U+00A0 (hallazgo 2244)
+    'Sin registro, gratuito y 100 % en el navegador',
   ],
 };
 
@@ -103,7 +106,7 @@ export const faqJsonLd = {
       name: '¿Pueden los hombres cobrar el complemento por brecha de género?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí. Tras la STJUE ${DOCTRINA.stjue.asunto} (${DOCTRINA.stjue.fecha}) y la doctrina del Tribunal Supremo (${DOCTRINA.ts.fecha}), los ${NUM_REQUISITOS_ART60} requisitos son idénticos para hombres y mujeres: ${LISTA_REQUISITOS}. Ya no se exige a los hombres ninguna condición adicional. Si a un hombre se le denegó el complemento antes de 2025 por no cumplir esos requisitos adicionales hoy eliminados, puede reclamarlo de forma retroactiva ante el Instituto Nacional de la Seguridad Social.`,
+        text: `Sí. Tras la STJUE ${DOCTRINA.stjue.asunto} (${DOCTRINA.stjue.fecha}) y la doctrina del Tribunal Supremo (${DOCTRINA.ts.fecha}), los ${NUM_REQUISITOS_ART60} requisitos son idénticos para hombres y mujeres: ${LISTA_REQUISITOS}. Ya no se exige a los hombres ninguna condición adicional. Si a un hombre se le denegó el complemento antes de esas resoluciones por no cumplir esos requisitos adicionales hoy eliminados, puede reclamarlo de forma retroactiva ante el Instituto Nacional de la Seguridad Social.`,
       },
     },
     {

@@ -35,7 +35,7 @@
  *
  * ── Cuantía y cómputo ────────────────────────────────────────────────────────────
  *   - Importe FIJO por hijo/a (no porcentaje), con un máximo de 4 hijos computables.
- *   - Se abona en 14 pagas.
+ *   - Se abona en las pagas de `COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales` (art. 60.3.c LGSS).
  *   - NO computa a efectos del límite máximo de pensiones públicas.
  *   - Tributa en IRPF como rendimiento del trabajo.
  *   - Histórico de cuantías mensuales por hijo: 27,00 € (2021), 30,40 € (2023),
@@ -80,12 +80,28 @@ export const FECHA_MINIMA_HECHO_CAUSANTE = formatFechaLarga(COMPLEMENTO_BRECHA_G
 const DOCTRINA = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
 
 /**
+ * Concurrencia de los dos progenitores por los mismos hijos, leída del módulo fiscal.
+ *
+ * Hasta el 26/09/2026 el caso 4 contestaba «el otro progenitor ya lo percibe» con una
+ * denegación cerrada, y la descripción de la tool lo llamaba «incompatible». El art. 60
+ * LGSS dice lo contrario: el 60.1 asigna el complemento al progenitor titular de pensiones
+ * públicas cuya SUMA sea de menor cuantía, y el 60.2 prevé que reconocérselo al segundo
+ * extinga el del primero (hallazgos 2239 y 2240). El veredicto depende, pues, de qué suma
+ * es menor, y eso es lo que ahora se pregunta (`sumaPensionesMenor`).
+ */
+const CONCURRENCIA = COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.entreProgenitores;
+const REGLA_CONCURRENCIA =
+  `Cada hijo o hija da derecho a un solo complemento (${CONCURRENCIA.unComplementoPorHijo.norma}), ` +
+  `y el ${CONCURRENCIA.norma} lo asigna al progenitor ${CONCURRENCIA.criterio}.`;
+
+/**
  * Los requisitos del art. 60 LGSS que esta calculadora evalúa DE VERDAD, enumerados una
  * sola vez para todo el conjunto app + MCP.
  *
  * Cada uno se corresponde con una rama de denegación de `calcularComplementoBrechaGenero`:
  * pensión elegible (casos 1 y 1.bis), corte temporal (caso 2), hijos computables (caso 3) y
- * concurrencia con el otro progenitor (caso 4). Ni el sexo ni la denegación propia están
+ * concurrencia con el otro progenitor (caso 4), que NO es una incompatibilidad sino una
+ * regla de asignación por la suma de pensiones (hallazgo 2239). Ni el sexo ni la denegación propia están
  * aquí: el primero dejó de condicionar el derecho con la doctrina de 2025 y la segunda no
  * es un requisito, sino la vía de reclamación.
  *
@@ -109,8 +125,11 @@ export const REQUISITOS_ART60 = [
       'tener al menos un hijo o hija nacido con vida o adoptado antes del hecho causante',
   },
   {
-    corto: 'que el otro progenitor no lo perciba',
-    detalle: 'que el otro progenitor no perciba ya el complemento por los mismos hijos',
+    corto: 'si los dos progenitores lo piden, tener la suma de pensiones menor',
+    detalle:
+      'que, si el otro progenitor también lo percibe o lo solicita por los mismos hijos, la suma ' +
+      'de tus pensiones públicas sea la de menor cuantía (reconocérselo al segundo progenitor ' +
+      'extingue el del primero)',
   },
 ] as const;
 
@@ -123,6 +142,12 @@ export type SexoBeneficiario = 'mujer' | 'hombre';
 export type TipoPensionBG = 'jubilacion' | 'jubilacion_parcial' | 'incapacidad_permanente' | 'viudedad' | 'no_contributiva' | 'ninguna';
 export type FechaHechoCausante = 'antes_2021' | 'desde_2021' | 'sin_iniciar';
 export type EstadoOtroProgenitor = 'no_percibe' | 'percibe' | 'denegado' | 'no_aplica';
+/**
+ * Solo cuenta cuando el otro progenitor ya lo percibe: qué progenitor es titular de
+ * pensiones públicas cuya SUMA es menor (art. 60.1 LGSS). 'desconocida' da un veredicto
+ * condicionado, no una denegación.
+ */
+export type SumaPensionesMenor = 'propia' | 'otro_progenitor' | 'desconocida';
 
 export interface ParametrosComplementoBrechaGenero {
   /** Sexo del beneficiario (informativo: desde la doctrina 2025 no afecta al derecho) */
@@ -135,6 +160,12 @@ export interface ParametrosComplementoBrechaGenero {
   fechaHechoCausante?: FechaHechoCausante;
   /** Situación del OTRO progenitor respecto al complemento. Por defecto 'no_percibe'. */
   otroProgenitor?: EstadoOtroProgenitor;
+  /**
+   * Si el otro progenitor ya lo percibe, ¿de quién es la SUMA de pensiones públicas menor?
+   * Por defecto 'desconocida' (veredicto condicionado). Se ignora con cualquier otro
+   * valor de `otroProgenitor`.
+   */
+  sumaPensionesMenor?: SumaPensionesMenor;
   /**
    * ¿Al PROPIO beneficiario le denegaron el complemento en su día? Es lo que decide si
    * procede reclamar. Antes se deducía de `otroProgenitor === 'denegado'`, que es una
@@ -153,6 +184,12 @@ export interface ResultadoComplementoBrechaGenero {
   tipoPension: TipoPensionBG;
   /** ¿Procede el complemento? */
   tieneDerechoComplemento: boolean;
+  /**
+   * true cuando el derecho DEPENDE de un dato que falta: el otro progenitor ya lo percibe y
+   * no se sabe qué suma de pensiones públicas es menor. Entonces `tieneDerechoComplemento`
+   * es false, pero los importes son los que corresponderían si la suma propia es la menor.
+   */
+  condicionado: boolean;
   /** Nº de hijos computables (mínimo derecho, máximo 4) */
   hijosComputables: number;
   /** Cuantía mensual por hijo aplicada (€/mes, año vigente) */
@@ -191,6 +228,7 @@ export function calcularComplementoBrechaGenero(
   const { cuantiaPorHijoMensual, maxHijos, pagasAnuales } = COMPLEMENTO_BRECHA_GENERO_2026;
   const fecha = p.fechaHechoCausante ?? 'desde_2021';
   const otroProgenitor = p.otroProgenitor ?? 'no_percibe';
+  const sumaPensionesMenor = p.sumaPensionesMenor ?? 'desconocida';
 
   const hijosComputables = Math.min(p.numHijos, maxHijos);
   const complementoMensual = r2(hijosComputables * cuantiaPorHijoMensual);
@@ -198,7 +236,7 @@ export function calcularComplementoBrechaGenero(
 
   const fuenteDatos = COMPLEMENTO_BRECHA_GENERO_META.fuente;
   const advertenciasBase = [
-    'El complemento se abona en 14 pagas y NO computa a efectos del límite máximo de pensiones públicas: se suma aunque ya se perciba la pensión máxima.',
+    `El complemento se abona en ${pagasAnuales} pagas y NO computa a efectos del límite máximo de pensiones públicas: se suma aunque ya se perciba la pensión máxima.`,
     'El complemento tributa en IRPF como rendimiento del trabajo.',
     `Desde la STJUE ${DOCTRINA.stjue.asunto} (${DOCTRINA.stjue.fecha}) y la STS de ${DOCTRINA.ts.fecha}, hombres y mujeres tienen derecho en igualdad de condiciones: ya no se exigen requisitos adicionales a los hombres.`,
   ];
@@ -209,6 +247,7 @@ export function calcularComplementoBrechaGenero(
     numHijos: p.numHijos,
     tipoPension: p.tipoPension,
     tieneDerechoComplemento: false,
+    condicionado: false,
     hijosComputables: 0,
     cuantiaPorHijoMensual,
     complementoMensual: 0,
@@ -277,13 +316,28 @@ export function calcularComplementoBrechaGenero(
     );
   }
 
-  // Caso 4: el otro progenitor ya percibe el complemento → incompatible
-  if (otroProgenitor === 'percibe') {
+  // Caso 4: el otro progenitor ya percibe el complemento por los mismos hijos. NO es una
+  // incompatibilidad (hallazgo 2239): decide qué suma de pensiones públicas es menor.
+  const concurrePropia = otroProgenitor === 'percibe' && sumaPensionesMenor === 'propia';
+  if (otroProgenitor === 'percibe' && sumaPensionesMenor === 'otro_progenitor') {
     return noProcede(
-      'Cada hijo o hija solo genera el complemento para uno de los progenitores. Si el otro progenitor ya lo percibe por los mismos hijos, no puede reconocerse de nuevo.',
-      'En caso de concurrencia, la SS lo reconoce al progenitor con la pensión pública de menor cuantía. Si tu pensión es inferior, conviene revisar la asignación con un asesor.',
+      `${REGLA_CONCURRENCIA} El otro progenitor ya lo percibe por los mismos hijos y su suma de pensiones públicas es menor que la tuya, así que le corresponde a él o a ella.`,
+      'Comprueba la comparación con TODAS las pensiones públicas de cada uno (jubilación, viudedad, incapacidad…), no solo con la que da derecho al complemento: si en realidad tu suma es la menor, puedes solicitarlo.',
       [COMPLEMENTO_BRECHA_GENERO_META.nota],
     );
+  }
+  if (otroProgenitor === 'percibe' && sumaPensionesMenor === 'desconocida') {
+    return {
+      ...noProcede(
+        `Depende de qué progenitor tenga la suma de pensiones públicas menor. ${REGLA_CONCURRENCIA} Que el otro progenitor ya lo perciba no te lo cierra: si tu suma es la menor, se te reconoce a ti y se extingue el suyo (${CONCURRENCIA.extincion.norma}); si es la suya, lo conserva él o ella.`,
+        'Suma todas las pensiones públicas de cada progenitor (no solo la que da derecho al complemento) y compáralas. Si la tuya es la menor, solicítalo ante el INSS citando el art. 60 LGSS.',
+        [COMPLEMENTO_BRECHA_GENERO_META.nota],
+      ),
+      condicionado: true,
+      hijosComputables,
+      complementoMensual,
+      complementoAnual,
+    };
   }
 
   // Caso 5: al PROPIO beneficiario le denegaron el complemento → procede valorar reclamación.
@@ -302,11 +356,20 @@ export function calcularComplementoBrechaGenero(
         ? `Tras la STJUE de ${DOCTRINA.stjue.fecha} (${DOCTRINA.stjue.asunto}) y la doctrina del Tribunal Supremo (${DOCTRINA.ts.fecha}), los hombres tienen derecho al complemento en las mismas condiciones que las mujeres. Se cumplen los requisitos básicos del art. 60 LGSS.`
         : 'Se cumplen los requisitos básicos del art. 60 LGSS para el reconocimiento del complemento.');
 
-  const pasoSiguiente = esReclamacion
+  const pasoSiguienteBase = esReclamacion
     ? (p.sexo === 'hombre'
         ? `Procede valorar reclamación: nueva solicitud o reclamación previa contra la resolución denegatoria, citando la ${DOCTRINA.stjue.corto} y la doctrina del TS. Recomendable acudir a un abogado laboralista o al sindicato.`
         : 'Recupera la resolución denegatoria y revisa su motivo con un abogado laboralista o con tu sindicato antes de volver a solicitarlo.')
     : 'Si ya cobras la pensión y el complemento no aparece en tu nómina, presenta una solicitud expresa ante el INSS (Sede Electrónica de la SS) citando el art. 60 LGSS.';
+
+  // Concurrencia resuelta a favor del solicitante: se reconoce a él o a ella y se extingue
+  // el del otro progenitor (art. 60.2 LGSS). El resto del veredicto no cambia.
+  const motivoFinal = concurrePropia
+    ? `${REGLA_CONCURRENCIA} El otro progenitor ya lo percibe por los mismos hijos, pero tu suma de pensiones públicas es la menor, así que te corresponde a ti. ${motivo}`
+    : motivo;
+  const pasoSiguiente = concurrePropia
+    ? `${pasoSiguienteBase} ${CONCURRENCIA.extincion.detalle} (${CONCURRENCIA.extincion.norma})`
+    : pasoSiguienteBase;
 
   const advertencias = [...advertenciasBase];
   advertencias.push(
@@ -324,11 +387,12 @@ export function calcularComplementoBrechaGenero(
     numHijos: p.numHijos,
     tipoPension: p.tipoPension,
     tieneDerechoComplemento: true,
+    condicionado: false,
     hijosComputables,
     cuantiaPorHijoMensual,
     complementoMensual,
     complementoAnual,
-    motivo,
+    motivo: motivoFinal,
     esReclamacion,
     pasoSiguiente,
     cuantiaPensionBeneficiario: p.cuantiaPensionBeneficiario,
