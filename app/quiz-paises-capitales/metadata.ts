@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Quiz Países y Capitales del Mundo - Adivina la Capital | meskeIA',
-  description: 'Pon a prueba tus conocimientos de geografía: adivina las capitales del mundo, identifica países por su bandera y mucho más. 195 países, 3 modos de juego, 5 dificultades.',
+  description: 'Pon a prueba tus conocimientos de geografía: adivina las capitales del mundo, identifica países por su bandera y mucho más. Los 195 Estados de la ONU y Taiwán, 3 modos de juego, 5 dificultades.',
   keywords: 'quiz paises capitales, adivinar capital, quiz geografia, capitales mundo, banderas paises, quiz banderas, juego geografia, aprender capitales',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Quiz Países y Capitales del Mundo | meskeIA',
-    description: 'Adivina capitales, identifica banderas y demuestra tus conocimientos de geografía. 195 países, sin registro.',
+    description: 'Adivina capitales, identifica banderas y demuestra tus conocimientos de geografía. Los 195 Estados de la ONU y Taiwán, sin registro.',
     url: 'https://meskeia.com/quiz-paises-capitales/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Quiz Países y Capitales del Mundo | meskeIA',
-    description: 'Pon a prueba tu geografía: capitales, banderas y más. 195 países, sin publicidad.',
+    description: 'Pon a prueba tu geografía: capitales, banderas y más. Los 195 Estados de la ONU y Taiwán, sin publicidad.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Quiz Países y Capitales",
-  description: "Pon a prueba tus conocimientos de geografía: adivina las capitales del mundo, identifica países por su bandera y mucho más. 195 países, 3 modos de juego, 5 dificultades.",
+  description: "Pon a prueba tus conocimientos de geografía: adivina las capitales del mundo, identifica países por su bandera y mucho más. Los 195 Estados de la ONU y Taiwán, 3 modos de juego, 5 dificultades.",
   url: "https://meskeia.com/quiz-paises-capitales/",
   category: 'EducationalApplication',
   features: [],
@@ -51,7 +51,7 @@ export const faqJsonLd = {
       name: '¿Cuántos países y capitales hay que aprender en el mundo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Hay 195 países reconocidos internacionalmente, cada uno con su capital. Algunas capitales pueden resultar sorprendentes: por ejemplo, la capital de Australia es Canberra (no Sídney), la de Brasil es Brasilia (no Río de Janeiro) y la de Sudáfrica está dividida entre tres ciudades: Pretoria, Ciudad del Cabo y Bloemfontein.',
+        text: 'La ONU cuenta 193 Estados miembros y 2 observadores (Ciudad del Vaticano y Palestina): 195 países, cada uno con su capital; otras fuentes dan cifras distintas según qué territorios incluyan. Algunas capitales pueden resultar sorprendentes: por ejemplo, la capital de Australia es Camberra (no Sídney), la de Brasil es Brasilia (no Río de Janeiro) y la de Sudáfrica está dividida entre tres ciudades: Pretoria, Ciudad del Cabo y Bloemfontein.',
       },
     },
     {
@@ -83,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son las capitales más difíciles de recordar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las capitales consideradas más difíciles son las de países poco conocidos o con nombres complejos: Nur-Sultán (Kazajistán), Naypyidaw (Myanmar), Yamoussoukro (Costa de Marfil) o Malabo (Guinea Ecuatorial). También confunden las capitales que no coinciden con la ciudad más grande o famosa del país, como Canberra, Brasilia o Astana.',
+        text: 'Las capitales consideradas más difíciles son las de países poco conocidos o con nombres complejos: Naipyidó (Myanmar), Yamusukro (Costa de Marfil), Uagadugú (Burkina Faso) o Malabo (Guinea Ecuatorial). También confunden las capitales que no coinciden con la ciudad más grande o famosa del país, como Camberra, Brasilia o Astaná.',
       },
     },
   ],

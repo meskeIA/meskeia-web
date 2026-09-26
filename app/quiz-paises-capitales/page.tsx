@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import 'flag-icons/css/flag-icons.min.css';
 import styles from './QuizPaisesCapitales.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
@@ -10,6 +10,7 @@ import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { countries, Country } from '@/data/countries';
 import EducationalSection from '@/components/EducationalSection';
+import { formatPercentage } from '@/lib';
 
 type ModoJuego = 'capital' | 'pais' | 'bandera';
 type Dificultad = 'facil' | 'normal' | 'dificil' | 'experto' | 'maestro';
@@ -20,12 +21,45 @@ interface PreguntaQuiz {
   respuestaCorrecta: string;
 }
 
-const DIFICULTAD_CONFIG: Record<Dificultad, { label: string; preguntas: number; continentes: string[] }> = {
-  facil:   { label: '🟢 Fácil',   preguntas: 10, continentes: ['Europa'] },
-  normal:  { label: '🟡 Normal',  preguntas: 15, continentes: ['Europa', 'América'] },
-  dificil: { label: '🟠 Difícil', preguntas: 20, continentes: ['Europa', 'América', 'Asia'] },
-  experto: { label: '🔴 Experto', preguntas: 25, continentes: ['Europa', 'América', 'Asia', 'África'] },
-  maestro: { label: '⭐ Maestro', preguntas: 30, continentes: [] }, // todos los continentes
+// El emoji va aparte de la etiqueta y se pinta oculto al lector: dentro de la cadena formaba el
+// nombre accesible del botón («círculo verde, Fácil») (hallazgo 2267).
+const DIFICULTAD_CONFIG: Record<Dificultad, { emoji: string; label: string; preguntas: number; continentes: string[] }> = {
+  facil:   { emoji: '🟢', label: 'Fácil',   preguntas: 10, continentes: ['Europa'] },
+  normal:  { emoji: '🟡', label: 'Normal',  preguntas: 15, continentes: ['Europa', 'América'] },
+  dificil: { emoji: '🟠', label: 'Difícil', preguntas: 20, continentes: ['Europa', 'América', 'Asia'] },
+  experto: { emoji: '🔴', label: 'Experto', preguntas: 25, continentes: ['Europa', 'América', 'Asia', 'África'] },
+  maestro: { emoji: '⭐', label: 'Maestro', preguntas: 30, continentes: [] }, // todos los continentes
+};
+
+/**
+ * ¿Pertenece `continente` (el de data/countries.ts) a la región `region` del nivel?
+ * El banco no tiene un continente «América»: reparte los 35 países americanos entre «América del
+ * Norte», «América Central» y «América del Sur». Comparar con === dejaba América fuera de Normal,
+ * Difícil y Experto, y solo salía en Maestro (hallazgo 2262). Reparto resultante del banco:
+ * Fácil 45 (Europa) · Normal 80 · Difícil 128 · Experto 182 · Maestro 196.
+ */
+function enRegion(continente: string, region: string): boolean {
+  return continente === region || continente.startsWith(`${region} `);
+}
+
+/**
+ * Banderas que flag-icons dibuja iguales (o casi) al tamaño de la pregunta: si una es la que se
+ * pregunta, la otra no puede salir de distractor (hallazgo 2268). Indonesia y Mónaco: franja roja
+ * sobre blanca, misma geometría a 4:3, solo cambia un matiz de rojo. Chad y Rumanía: tricolor
+ * vertical azul-amarillo-rojo, solo cambia el tono del azul. Países Bajos/Luxemburgo, Irlanda/Costa
+ * de Marfil o Guinea/Malí se distinguen a simple vista (otro azul, otro orden de colores): no entran.
+ */
+const BANDERAS_GEMELAS: Record<string, string> = { id: 'mc', mc: 'id', td: 'ro', ro: 'td' };
+
+/**
+ * Capitales discutidas (hallazgo 2273). La RAE (Ortografía 2010, lista de países y capitales)
+ * escribe para Israel «CAP. (no reconocida por la ONU). Jerusalén» y para Palestina lo mismo; el
+ * banco da Jerusalén a Israel y Ramala (sede de la Autoridad Nacional Palestina) a Palestina. El
+ * aviso de respuesta lo matiza, y las opciones evitan la pregunta con dos respuestas defendibles.
+ */
+const NOTA_CAPITAL: Record<string, string> = {
+  Israel: 'Israel designa Jerusalén como su capital; la ONU no reconoce ese estatus.',
+  Palestina: 'Ramala es la sede de la Autoridad Nacional Palestina; Palestina proclama Jerusalén como su capital, estatus que la ONU no reconoce.',
 };
 
 const MODO_CONFIG: Record<ModoJuego, { label: string; icon: string; desc: string }> = {
@@ -45,15 +79,29 @@ function mezclar<T>(arr: T[]): T[] {
   return a;
 }
 
-function generarOpciones(correcto: string, pool: string[], total = 4): string[] {
-  const incorrectos = mezclar(pool.filter(o => o !== correcto)).slice(0, total - 1);
+function generarOpciones(correcto: string, pool: string[], excluir: string[] = [], total = 4): string[] {
+  const incorrectos = mezclar(pool.filter(o => o !== correcto && !excluir.includes(o))).slice(0, total - 1);
   return mezclar([correcto, ...incorrectos]);
+}
+
+/** Distractores que harían la pregunta indecidible o con dos respuestas defendibles. */
+function excluidosDe(pais: Country, modo: ModoJuego): string[] {
+  if (modo === 'bandera') {
+    const gemela = BANDERAS_GEMELAS[pais.code];
+    const otra = gemela ? countries.find(c => c.code === gemela) : undefined;
+    return otra ? [otra.name] : [];
+  }
+  // Palestina también proclama Jerusalén: ni «Jerusalén» de opción a la capital de Palestina, ni
+  // «Palestina» de opción al país cuya capital es Jerusalén.
+  if (modo === 'capital' && pais.name === 'Palestina') return ['Jerusalén'];
+  if (modo === 'pais' && pais.name === 'Israel') return ['Palestina'];
+  return [];
 }
 
 function generarPreguntas(modo: ModoJuego, dificultad: Dificultad): PreguntaQuiz[] {
   const cfg = DIFICULTAD_CONFIG[dificultad];
   const pool = cfg.continentes.length > 0
-    ? countries.filter(c => cfg.continentes.includes(c.continent))
+    ? countries.filter(c => cfg.continentes.some(region => enRegion(c.continent, region)))
     : countries;
 
   const seleccionados = mezclar(pool).slice(0, cfg.preguntas);
@@ -71,9 +119,34 @@ function generarPreguntas(modo: ModoJuego, dificultad: Dificultad): PreguntaQuiz
       poolRespuestas = pool.map(c => c.name);
     }
 
-    const opciones = generarOpciones(respuestaCorrecta, poolRespuestas);
+    const opciones = generarOpciones(respuestaCorrecta, poolRespuestas, excluidosDe(pais, modo));
     return { pais, opciones, respuestaCorrecta };
   });
+}
+
+/** Hueco que deja arriba la barra fija del logo; igual que el scroll-margin-top del CSS. */
+const MARGEN_LOGO = 88;
+
+/**
+ * Lleva `bloque` al principio de la pantalla (respetando su scroll-margin-top) solo si alguna de
+ * las `claves` no se ve entera: tapada por el logo fijo, por encima del borde o por debajo del
+ * final. Mismo patrón que quiz-historia-espana y quiz-verbos-irregulares.
+ */
+function traerALaVista(bloque: HTMLElement | null, claves: (HTMLElement | null)[]) {
+  if (!bloque) return;
+  const tapada = claves.some(clave => {
+    if (!clave) return false;
+    const r = clave.getBoundingClientRect();
+    return r.top < MARGEN_LOGO || r.bottom > window.innerHeight;
+  });
+  if (tapada) bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
+}
+
+/** «5 s» · «1 min 5 s»: «m» es el símbolo del metro, el del minuto es «min» (hallazgo 2270). */
+function formatTiempo(seg: number): string {
+  const m = Math.floor(seg / 60);
+  const s = seg % 60;
+  return m > 0 ? `${m} min ${s} s` : `${s} s`;
 }
 
 function calcularPuntuacion(correctas: number, total: number): number {
@@ -107,6 +180,44 @@ export default function QuizPaisesCapitalesPage() {
   const pregunta = preguntas[preguntaActual];
   const totalPreguntas = preguntas.length;
   const esUltima = preguntaActual === totalPreguntas - 1;
+  /** Preguntas ya contestadas, contando la actual en cuanto se responde. */
+  const respondidas = preguntaActual + (seleccionada !== null ? 1 : 0);
+
+  /**
+   * Foco y vista (hallazgos 2264, 2269 y 2277; la forma de quiz-verbos-irregulares).
+   * · Al empezar y al pasar de pregunta, el botón pulsado se desmontaba y el foco caía al <body>,
+   *   por detrás del quiz: ahora va a la tarjeta de la pregunta, y el Tab siguiente, a la opción A.
+   * · Al responder, la opción pulsada queda `disabled`: el foco va a «Siguiente», la única acción
+   *   que queda (y el navegador lo trae a la vista junto al aviso).
+   * · En móvil, la pregunta nueva heredaba el desplazamiento que hizo falta para llegar a
+   *   «Siguiente» y se pintaba por encima de la vista: si el marcador o la tarjeta no se ven
+   *   enteros, la vista sube al principio del quiz (marcador incluido), por debajo del logo fijo.
+   * · El resultado recibe el foco para que el lector lo lea; al volver a configurar, su título.
+   */
+  const quizPanelRef = useRef<HTMLDivElement>(null);
+  const hudRef = useRef<HTMLDivElement>(null);
+  const preguntaRef = useRef<HTMLDivElement>(null);
+  const botonSiguienteRef = useRef<HTMLButtonElement>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
+  const tituloConfigRef = useRef<HTMLHeadingElement>(null);
+  const vieneDelResultado = useRef(false);
+
+  useEffect(() => {
+    if (pantalla === 'quiz') {
+      if (seleccionada !== null) {
+        botonSiguienteRef.current?.focus();
+      } else {
+        traerALaVista(quizPanelRef.current, [hudRef.current, preguntaRef.current]);
+        preguntaRef.current?.focus({ preventScroll: true });
+      }
+    } else if (pantalla === 'resultado') {
+      traerALaVista(resultadoRef.current, [resultadoRef.current]);
+      resultadoRef.current?.focus({ preventScroll: true });
+    } else if (pantalla === 'config' && vieneDelResultado.current) {
+      vieneDelResultado.current = false;
+      tituloConfigRef.current?.focus();
+    }
+  }, [pantalla, preguntaActual, seleccionada]);
 
   const iniciarQuiz = useCallback(() => {
     const nuevasPreguntas = generarPreguntas(modo, dificultad);
@@ -141,6 +252,7 @@ export default function QuizPaisesCapitalesPage() {
   }, [iniciarQuiz]);
 
   const volverConfig = useCallback(() => {
+    vieneDelResultado.current = true;
     setPantalla('config');
   }, []);
 
@@ -153,12 +265,6 @@ export default function QuizPaisesCapitalesPage() {
     () => getResultadoTexto(totalPreguntas > 0 ? correctas / totalPreguntas : 0),
     [correctas, totalPreguntas]
   );
-
-  const formatTiempo = (seg: number): string => {
-    const m = Math.floor(seg / 60);
-    const s = seg % 60;
-    return m > 0 ? `${m}m ${s}s` : `${s}s`;
-  };
 
   return (
     <div className={styles.container}>
@@ -176,7 +282,7 @@ export default function QuizPaisesCapitalesPage() {
       {/* ── PANTALLA CONFIGURACIÓN ── */}
       {pantalla === 'config' && (
         <div className={styles.configPanel}>
-          <h2 className={styles.configTitle}>Elige tu modo de juego</h2>
+          <h2 className={styles.configTitle} ref={tituloConfigRef} tabIndex={-1}>Elige tu modo de juego</h2>
 
           <div className={styles.modoGrid}>
             {(Object.entries(MODO_CONFIG) as [ModoJuego, typeof MODO_CONFIG[ModoJuego]][]).map(([key, cfg]) => (
@@ -203,7 +309,7 @@ export default function QuizPaisesCapitalesPage() {
                 onClick={() => setDificultad(key)}
                 aria-pressed={dificultad === key}
               >
-                {cfg.label}
+                <span aria-hidden="true">{cfg.emoji}</span> {cfg.label}
               </button>
             ))}
           </div>
@@ -216,9 +322,9 @@ export default function QuizPaisesCapitalesPage() {
 
       {/* ── PANTALLA QUIZ ── */}
       {pantalla === 'quiz' && pregunta && (
-        <>
+        <div className={styles.quizPanel} ref={quizPanelRef}>
           {/* HUD */}
-          <div className={styles.hudBar}>
+          <div className={styles.hudBar} ref={hudRef}>
             <div className={styles.hudItem}>
               <span className={styles.hudValor}>{preguntaActual + 1}/{totalPreguntas}</span>
               <span className={styles.hudLabel}>Pregunta</span>
@@ -229,7 +335,10 @@ export default function QuizPaisesCapitalesPage() {
             </div>
             <div className={styles.hudItem}>
               <span className={styles.hudValor}>
-                {totalPreguntas > 0 ? Math.round((correctas / Math.max(preguntaActual, 1)) * 100) : 0}%
+                {/* Aciertos entre RESPONDIDAS, no entre el índice de la pregunta: con este último,
+                    dos aciertos seguidos daban «200%» y un pleno de 15 terminaba en «107%»
+                    (hallazgo 2263). Antes de responder la primera no hay precisión que dar. */}
+                {respondidas > 0 ? formatPercentage(correctas / respondidas, 0) : '—'}
               </span>
               <span className={styles.hudLabel}>Precisión</span>
             </div>
@@ -240,6 +349,8 @@ export default function QuizPaisesCapitalesPage() {
               className={styles.progresoFill}
               style={{ width: `${((preguntaActual) / totalPreguntas) * 100}%` }}
               role="progressbar"
+              aria-label="Preguntas respondidas"
+              aria-valuetext={`${preguntaActual} de ${totalPreguntas}`}
               aria-valuenow={preguntaActual}
               aria-valuemin={0}
               aria-valuemax={totalPreguntas}
@@ -247,14 +358,16 @@ export default function QuizPaisesCapitalesPage() {
           </div>
 
           {/* Pregunta */}
-          <div className={styles.preguntaCard}>
+          <div className={styles.preguntaCard} ref={preguntaRef} tabIndex={-1}>
             <p className={styles.preguntaNumero}>Pregunta {preguntaActual + 1} de {totalPreguntas}</p>
 
+            {/* La alternativa textual no puede dar la respuesta: con «Bandera de <país>» el
+                lector de pantalla leía la solución (hallazgo 2266). */}
             {modo === 'bandera' && (
               <span
                 className={`fi fi-${pregunta.pais.code} ${styles.preguntaBandera}`}
                 role="img"
-                aria-label={`Bandera de ${pregunta.pais.name}`}
+                aria-label="Bandera a identificar"
               />
             )}
 
@@ -310,21 +423,26 @@ export default function QuizPaisesCapitalesPage() {
                 role="alert"
                 aria-live="polite"
               >
+                {/* El emoji en su nodo y oculto: dentro de la cadena, el lector anunciaba «marca
+                    de verificación, ¡Correcto!» en la alerta (hallazgo 2267). */}
                 {seleccionada === pregunta.respuestaCorrecta
-                  ? `✅ ¡Correcto! La respuesta es ${pregunta.respuestaCorrecta}.`
-                  : `❌ Incorrecto. La respuesta correcta es ${pregunta.respuestaCorrecta}.`}
+                  ? <><span aria-hidden="true">✅</span> ¡Correcto! La respuesta es {pregunta.respuestaCorrecta}.</>
+                  : <><span aria-hidden="true">❌</span> Incorrecto. La respuesta correcta es {pregunta.respuestaCorrecta}.</>}
+                {modo !== 'bandera' && NOTA_CAPITAL[pregunta.pais.name] && (
+                  <span className={styles.feedbackNota}>{NOTA_CAPITAL[pregunta.pais.name]}</span>
+                )}
               </div>
-              <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
-                {esUltima ? 'Ver resultados' : 'Siguiente pregunta →'}
+              <button type="button" ref={botonSiguienteRef} className={styles.btnSiguiente} onClick={siguiente}>
+                {esUltima ? 'Ver resultados' : <>Siguiente pregunta <span aria-hidden="true">→</span></>}
               </button>
             </>
           )}
-        </>
+        </div>
       )}
 
       {/* ── PANTALLA RESULTADO ── */}
       {pantalla === 'resultado' && (
-        <div className={styles.resultadoPanel}>
+        <div className={styles.resultadoPanel} ref={resultadoRef} tabIndex={-1}>
           <span className={styles.resultadoEmoji} aria-hidden="true">{resultadoTexto.emoji}</span>
           <h2 className={styles.resultadoTitulo}>{resultadoTexto.titulo}</h2>
           <p className={styles.resultadoPuntos}>{puntuacion} pts</p>
@@ -339,7 +457,7 @@ export default function QuizPaisesCapitalesPage() {
             </div>
             <div className={styles.statR}>
               <span className={styles.statRValor}>
-                {Math.round((correctas / totalPreguntas) * 100)}%
+                {formatPercentage(totalPreguntas > 0 ? correctas / totalPreguntas : 0, 0)}
               </span>
               <p className={styles.statRLabel}>Acierto</p>
             </div>
@@ -370,7 +488,7 @@ export default function QuizPaisesCapitalesPage() {
         <section aria-labelledby="edu-tabla">
           <h4 id="edu-tabla">Capitales que más se confunden por región</h4>
           <p style={{ marginBottom: '1rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            Existen 195 países reconocidos por la ONU. Estas son las capitales que más fallos generan en los quizzes de geografía:
+            La ONU cuenta 193 Estados miembros y 2 observadores (Ciudad del Vaticano y Palestina). Estas son las capitales que más fallos generan en los quizzes de geografía:
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -383,7 +501,7 @@ export default function QuizPaisesCapitalesPage() {
                 </tr>
               </thead>
               <tbody>
-                <tr><td colSpan={4} className={styles.tableRegion}>🇪🇺 Europa</td></tr>
+                <tr><td colSpan={4} className={styles.tableRegion}><span aria-hidden="true">🇪🇺</span> Europa</td></tr>
                 <tr>
                   <td>Países Bajos</td>
                   <td><strong>Ámsterdam</strong></td>
@@ -402,12 +520,12 @@ export default function QuizPaisesCapitalesPage() {
                   <td>Monte Carlo</td>
                   <td>Monte Carlo es un barrio famoso, no la capital</td>
                 </tr>
-                <tr><td colSpan={4} className={styles.tableRegion}>🌏 Asia</td></tr>
+                <tr><td colSpan={4} className={styles.tableRegion}><span aria-hidden="true">🌏</span> Asia</td></tr>
                 <tr>
                   <td>India</td>
-                  <td><strong>Nueva Delhi</strong></td>
+                  <td><strong>Nueva Deli</strong></td>
                   <td>Bombay (Mumbai)</td>
-                  <td>Mumbai es la ciudad más poblada y el centro financiero del país</td>
+                  <td>Mumbai es el centro financiero del país y una de sus dos mayores ciudades</td>
                 </tr>
                 <tr>
                   <td>China</td>
@@ -417,11 +535,11 @@ export default function QuizPaisesCapitalesPage() {
                 </tr>
                 <tr>
                   <td>Kazajistán</td>
-                  <td><strong>Astana</strong></td>
+                  <td><strong>Astaná</strong></td>
                   <td>Almatý</td>
-                  <td>Almatý fue la capital hasta 1997; Astana se llamó Nursultán entre 2019-2022</td>
+                  <td>Almatý fue la capital hasta 1997; Astaná se llamó Nursultán entre 2019 y 2022</td>
                 </tr>
-                <tr><td colSpan={4} className={styles.tableRegion}>🌍 África</td></tr>
+                <tr><td colSpan={4} className={styles.tableRegion}><span aria-hidden="true">🌍</span> África</td></tr>
                 <tr>
                   <td>Sudáfrica</td>
                   <td><strong>Pretoria (ejecutiva)</strong></td>
@@ -434,7 +552,7 @@ export default function QuizPaisesCapitalesPage() {
                   <td>Abiyán</td>
                   <td>Abiyán es la ciudad más grande y sede real del gobierno; Yamusukro es capital oficial desde 1983</td>
                 </tr>
-                <tr><td colSpan={4} className={styles.tableRegion}>🌎 América</td></tr>
+                <tr><td colSpan={4} className={styles.tableRegion}><span aria-hidden="true">🌎</span> América</td></tr>
                 <tr>
                   <td>Canadá</td>
                   <td><strong>Ottawa</strong></td>
@@ -449,9 +567,9 @@ export default function QuizPaisesCapitalesPage() {
                 </tr>
                 <tr>
                   <td>Australia</td>
-                  <td><strong>Canberra</strong></td>
+                  <td><strong>Camberra</strong></td>
                   <td>Sídney / Melbourne</td>
-                  <td>Sídney y Melbourne rivalizaban; Canberra fue elegida en 1913 como capital de compromiso</td>
+                  <td>Sídney y Melbourne rivalizaban; Camberra fue elegida en 1913 como capital de compromiso</td>
                 </tr>
               </tbody>
             </table>
@@ -492,7 +610,7 @@ export default function QuizPaisesCapitalesPage() {
                 <strong>Opositor / Preparador de pruebas</strong>
               </div>
               <p className={styles.escenarioExample}>
-                <em>Situación:</em> Necesita memorizar todas las capitales del mundo para una oposición de diplomatía, Cuerpo de Estado o similar.
+                <em>Situación:</em> Necesita memorizar todas las capitales del mundo para una oposición a la carrera diplomática, un cuerpo de la Administración o similar.
               </p>
               <p className={styles.escenarioTip}>
                 Trabaja directamente en <strong>Experto</strong> y <strong>Maestro</strong>. Enfócate en África y Asia, las regiones con mayor tasa de error.
@@ -520,19 +638,19 @@ export default function QuizPaisesCapitalesPage() {
             <div className={styles.faqItem}>
               <dt>¿Cuántos países hay en el mundo?</dt>
               <dd>
-                La ONU reconoce <strong>193 estados miembros</strong> más 2 estados observadores (Ciudad del Vaticano y Palestina), lo que da un total de 195 países ampliamente reconocidos. Otros organismos y fuentes pueden ofrecer cifras ligeramente distintas según qué territorios consideren.
+                La ONU tiene <strong>193 Estados miembros</strong> y 2 Estados observadores no miembros (Ciudad del Vaticano y Palestina): 195 en total. Otros organismos y fuentes ofrecen cifras distintas según qué territorios consideren. Este quiz incluye esos 195 y, además, Taiwán, que no es miembro ni observador de la ONU: {countries.length} entradas en total.
               </dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Por qué la capital no siempre es la ciudad más grande?</dt>
               <dd>
-                Las capitales se eligen por razones políticas, históricas o geográficas. Muchos países han creado capitales nuevas en zonas menos pobladas para equilibrar el desarrollo regional (Brasil → Brasilia), evitar rivalidades entre ciudades (Canadá → Ottawa) o por decisión de un nuevo gobierno (Kazajistán → Astana).
+                Las capitales se eligen por razones políticas, históricas o geográficas. Muchos países han creado capitales nuevas en zonas menos pobladas para equilibrar el desarrollo regional (Brasil → Brasilia), evitar rivalidades entre ciudades (Canadá → Ottawa) o por decisión de un nuevo gobierno (Kazajistán → Astaná).
               </dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Cuáles son las capitales más recientes que han cambiado?</dt>
               <dd>
-                Las más recientes: <strong>Naipyidó</strong> (Birmania/Myanmar, 2006), <strong>Astana</strong> (Kazajistán, recuperó el nombre original en 2022 tras llamarse Nursultán desde 2019), y <strong>Dodoma</strong> (Tanzania, traslado progresivo desde Dar es Salaam que sigue en proceso). Indonesia está construyendo <strong>Nusantara</strong> para sustituir a Yakarta.
+                Las más recientes: <strong>Naipyidó</strong> (Birmania/Myanmar, 2006), <strong>Astaná</strong> (Kazajistán, recuperó el nombre original en 2022 tras llamarse Nursultán desde 2019), y <strong>Dodoma</strong> (Tanzania, traslado progresivo desde Dar es Salaam que sigue en proceso). Indonesia está construyendo <strong>Nusantara</strong> para sustituir a Yakarta.
               </dd>
             </div>
             <div className={styles.faqItem}>
@@ -550,13 +668,13 @@ export default function QuizPaisesCapitalesPage() {
             <div className={styles.faqItem}>
               <dt>¿Cuál es la capital más fría del mundo?</dt>
               <dd>
-                <strong>Astana (Kazajistán)</strong> es la capital más fría del mundo, con temperaturas medias de −14 °C en enero y mínimas que pueden llegar a −35 °C. Le sigue <strong>Ulán Bator (Mongolia)</strong>, con medias de −22 °C en enero. Reykiavik (Islandia) es la capital más fría del hemisferio occidental.
+                <strong>Ulán Bator (Mongolia)</strong> es la capital nacional más fría del mundo, con una media de enero en torno a −21 °C. Le sigue <strong>Astaná (Kazajistán)</strong>, con medias de enero en torno a −14 °C y mínimas que pueden llegar a −35 °C. Reikiavik (Islandia) es la capital más septentrional de un Estado soberano.
               </dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Hay países sin capital oficial reconocida?</dt>
               <dd>
-                <strong>Nauru</strong> (Oceanía) no tiene una capital legalmente designada, aunque Yaren actúa como ciudad principal donde se ubican las instituciones. <strong>Kosovo</strong> y algunos territorios en disputa tienen reconocimiento internacional limitado. <strong>Gibraltar, Puerto Rico y otros territorios</strong> tampoco son países independientes con capital.
+                <strong>Nauru</strong> (Oceanía) no tiene una capital legalmente designada, aunque Yaren actúa como ciudad principal donde se ubican las instituciones. <strong>Kosovo</strong> y algunos territorios en disputa tienen reconocimiento internacional limitado. Hay además capitales discutidas: <strong>Israel</strong> designa Jerusalén como su capital y <strong>Palestina</strong> también la proclama como suya, y la ONU no reconoce ninguna de las dos designaciones. En este quiz figuran Jerusalén para Israel y Ramala, sede de la Autoridad Nacional Palestina, para Palestina. <strong>Gibraltar, Puerto Rico y otros territorios</strong> tampoco son países independientes con capital.
               </dd>
             </div>
             <div className={styles.faqItem}>
@@ -573,13 +691,13 @@ export default function QuizPaisesCapitalesPage() {
 
         {/* 4. GUÍA PASO A PASO */}
         <section aria-labelledby="edu-guia">
-          <h4 id="edu-guia">Cómo memorizar 195 capitales: método paso a paso</h4>
+          <h4 id="edu-guia">Cómo memorizar las capitales del mundo: método paso a paso</h4>
           <ol className={styles.stepGuide}>
             <li className={styles.step}>
               <span className={styles.stepNumber} aria-hidden="true">1</span>
               <div className={styles.stepContent}>
                 <strong>Empieza por tu continente (Europa o América)</strong>
-                <p>No intentes aprender todo a la vez. Dedica la primera semana solo a Europa (44 países). La familiaridad con los nombres acelera la memorización inicial y te da confianza.</p>
+                <p>No intentes aprender todo a la vez. Dedica la primera semana solo a Europa (el nivel Fácil). La familiaridad con los nombres acelera la memorización inicial y te da confianza.</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -621,7 +739,7 @@ export default function QuizPaisesCapitalesPage() {
               <span className={styles.stepNumber} aria-hidden="true">7</span>
               <div className={styles.stepContent}>
                 <strong>Enfrenta tus puntos débiles con el nivel Maestro</strong>
-                <p>El nivel Maestro mezcla los 195 países. Anota los errores recurrentes (suelen ser siempre los mismos) y dedícales una sesión específica con el método de asociación del paso 3. Tres fallos en la misma capital = crear una historia más exagerada.</p>
+                <p>El nivel Maestro mezcla las {countries.length} entradas del quiz: los 195 Estados de la ONU (miembros y observadores) y Taiwán. Anota los errores recurrentes (suelen ser siempre los mismos) y dedícales una sesión específica con el método de asociación del paso 3. Tres fallos en la misma capital = crear una historia más exagerada.</p>
               </div>
             </li>
           </ol>
@@ -639,7 +757,7 @@ export default function QuizPaisesCapitalesPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🔗</span>
               <strong>Asocia capital con una característica memorable</strong>
-              <p>Para cada capital difícil, encuentra un dato curioso: &quot;Naipyidó tiene más carriles de autopista que coches&quot; o &quot;Astana tiene una pirámide de cristal de 77 metros&quot;. El detalle insólito ancla el nombre.</p>
+              <p>Para cada capital difícil, encuentra un dato curioso: &quot;Naipyidó tiene más carriles de autopista que coches&quot; o &quot;Astaná tiene una pirámide de cristal de 77 metros&quot;. El detalle insólito ancla el nombre.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📝</span>
@@ -677,12 +795,12 @@ export default function QuizPaisesCapitalesPage() {
                 Auckland es casi 3 veces más grande, pero Wellington es la capital desde 1865 por su posición central en el país.
               </li>
               <li>
-                <strong>Australia → Canberra</strong> (no Sídney ni Melbourne).
+                <strong>Australia → Camberra</strong> (no Sídney ni Melbourne).
                 La rivalidad entre Sídney y Melbourne hizo elegir una ciudad neutral intermedia en 1913.
               </li>
               <li>
-                <strong>India → Nueva Delhi</strong> (no Mumbai).
-                Mumbai supera los 20 millones de habitantes frente a los ~4 millones de la capital. El gobierno está en Delhi desde 1912.
+                <strong>India → Nueva Deli</strong> (no Mumbai).
+                Mumbai es el centro financiero, pero el gobierno está en Deli desde 1912. Nueva Deli es un distrito de unos 250.000 habitantes (censo de 2011) dentro del área metropolitana de Deli, que con unos 28 millones (2018) supera ya a la de Mumbai.
               </li>
               <li>
                 <strong>Brasil → Brasilia</strong> (no Río de Janeiro ni São Paulo).

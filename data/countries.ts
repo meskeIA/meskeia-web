@@ -22,7 +22,7 @@ export const countries: Country[] = [
   // EUROPA (45 países)
   { name: "Alemania", code: "de", capital: "Berlín", continent: "Europa", population: 83.2, area: 357386, currency: "Euro", currencySymbol: "€", language: "Alemán", phoneCode: "+49", timezone: "UTC+1", tld: ".de" },
   { name: "Albania", code: "al", capital: "Tirana", continent: "Europa", population: 2.8, area: 28748, currency: "Lek", currencySymbol: "L", language: "Albanés", phoneCode: "+355", timezone: "UTC+1", tld: ".al" },
-  { name: "Andorra", code: "ad", capital: "Andorra la Vella", continent: "Europa", population: 0.08, area: 468, currency: "Euro", currencySymbol: "€", language: "Catalán", phoneCode: "+376", timezone: "UTC+1", tld: ".ad" },
+  { name: "Andorra", code: "ad", capital: "Andorra la Vieja", continent: "Europa", population: 0.08, area: 468, currency: "Euro", currencySymbol: "€", language: "Catalán", phoneCode: "+376", timezone: "UTC+1", tld: ".ad" },
   { name: "Austria", code: "at", capital: "Viena", continent: "Europa", population: 9.0, area: 83879, currency: "Euro", currencySymbol: "€", language: "Alemán", phoneCode: "+43", timezone: "UTC+1", tld: ".at" },
   { name: "Bélgica", code: "be", capital: "Bruselas", continent: "Europa", population: 11.5, area: 30528, currency: "Euro", currencySymbol: "€", language: "Neerlandés/Francés", phoneCode: "+32", timezone: "UTC+1", tld: ".be" },
   { name: "Bielorrusia", code: "by", capital: "Minsk", continent: "Europa", population: 9.4, area: 207600, currency: "Rublo bielorruso", currencySymbol: "Br", language: "Bielorruso/Ruso", phoneCode: "+375", timezone: "UTC+3", tld: ".by" },
@@ -83,13 +83,13 @@ export const countries: Country[] = [
   { name: "Emiratos Árabes Unidos", code: "ae", capital: "Abu Dabi", continent: "Asia", population: 9.9, area: 83600, currency: "Dírham", currencySymbol: "د.إ", language: "Árabe", phoneCode: "+971", timezone: "UTC+4", tld: ".ae" },
   { name: "Filipinas", code: "ph", capital: "Manila", continent: "Asia", population: 111.0, area: 300000, currency: "Peso filipino", currencySymbol: "₱", language: "Filipino/Inglés", phoneCode: "+63", timezone: "UTC+8", tld: ".ph" },
   { name: "Georgia", code: "ge", capital: "Tiflis", continent: "Asia", population: 3.7, area: 69700, currency: "Lari", currencySymbol: "₾", language: "Georgiano", phoneCode: "+995", timezone: "UTC+4", tld: ".ge" },
-  { name: "India", code: "in", capital: "Nueva Delhi", continent: "Asia", population: 1450.0, area: 3287263, currency: "Rupia india", currencySymbol: "₹", language: "Hindi/Inglés", phoneCode: "+91", timezone: "UTC+5:30", tld: ".in" },
+  { name: "India", code: "in", capital: "Nueva Deli", continent: "Asia", population: 1450.0, area: 3287263, currency: "Rupia india", currencySymbol: "₹", language: "Hindi/Inglés", phoneCode: "+91", timezone: "UTC+5:30", tld: ".in" },
   { name: "Indonesia", code: "id", capital: "Yakarta", continent: "Asia", population: 273.8, area: 1904569, currency: "Rupia indonesia", currencySymbol: "Rp", language: "Indonesio", phoneCode: "+62", timezone: "UTC+7", tld: ".id" },
   { name: "Irak", code: "iq", capital: "Bagdad", continent: "Asia", population: 41.2, area: 438317, currency: "Dinar iraquí", currencySymbol: "ع.د", language: "Árabe/Kurdo", phoneCode: "+964", timezone: "UTC+3", tld: ".iq" },
   { name: "Irán", code: "ir", capital: "Teherán", continent: "Asia", population: 86.8, area: 1648195, currency: "Rial iraní", currencySymbol: "﷼", language: "Persa", phoneCode: "+98", timezone: "UTC+3:30", tld: ".ir" },
   { name: "Israel", code: "il", capital: "Jerusalén", continent: "Asia", population: 9.4, area: 20770, currency: "Nuevo séquel", currencySymbol: "₪", language: "Hebreo/Árabe", phoneCode: "+972", timezone: "UTC+2", tld: ".il" },
   { name: "Japón", code: "jp", capital: "Tokio", continent: "Asia", population: 125.7, area: 377975, currency: "Yen", currencySymbol: "¥", language: "Japonés", phoneCode: "+81", timezone: "UTC+9", tld: ".jp" },
-  { name: "Jordania", code: "jo", capital: "Ammán", continent: "Asia", population: 10.3, area: 89342, currency: "Dinar jordano", currencySymbol: "JD", language: "Árabe", phoneCode: "+962", timezone: "UTC+3", tld: ".jo" },
+  { name: "Jordania", code: "jo", capital: "Amán", continent: "Asia", population: 10.3, area: 89342, currency: "Dinar jordano", currencySymbol: "JD", language: "Árabe", phoneCode: "+962", timezone: "UTC+3", tld: ".jo" },
   { name: "Kazajistán", code: "kz", capital: "Astaná", continent: "Asia", population: 19.0, area: 2724900, currency: "Tenge", currencySymbol: "₸", language: "Kazajo/Ruso", phoneCode: "+7", timezone: "UTC+5", tld: ".kz" },
   { name: "Kirguistán", code: "kg", capital: "Biskek", continent: "Asia", population: 6.7, area: 199951, currency: "Som", currencySymbol: "с", language: "Kirguís/Ruso", phoneCode: "+996", timezone: "UTC+6", tld: ".kg" },
   { name: "Kuwait", code: "kw", capital: "Kuwait", continent: "Asia", population: 4.3, area: 17818, currency: "Dinar kuwaití", currencySymbol: "KD", language: "Árabe", phoneCode: "+965", timezone: "UTC+3", tld: ".kw" },
@@ -130,7 +130,7 @@ export const countries: Country[] = [
   { name: "Costa de Marfil", code: "ci", capital: "Yamusukro", continent: "África", population: 27.5, area: 322463, currency: "Franco CFA", currencySymbol: "CFA", language: "Francés", phoneCode: "+225", timezone: "UTC+0", tld: ".ci" },
   { name: "Egipto", code: "eg", capital: "El Cairo", continent: "África", population: 104.3, area: 1001449, currency: "Libra egipcia", currencySymbol: "E£", language: "Árabe", phoneCode: "+20", timezone: "UTC+2", tld: ".eg" },
   { name: "Eritrea", code: "er", capital: "Asmara", continent: "África", population: 3.6, area: 117600, currency: "Nakfa", currencySymbol: "Nfk", language: "Tigriña/Árabe", phoneCode: "+291", timezone: "UTC+3", tld: ".er" },
-  { name: "Esuatini", code: "sz", capital: "Mbabane", continent: "África", population: 1.2, area: 17364, currency: "Lilangeni", currencySymbol: "L", language: "Suazi/Inglés", phoneCode: "+268", timezone: "UTC+2", tld: ".sz" },
+  { name: "Esuatini", code: "sz", capital: "Babane", continent: "África", population: 1.2, area: 17364, currency: "Lilangeni", currencySymbol: "L", language: "Suazi/Inglés", phoneCode: "+268", timezone: "UTC+2", tld: ".sz" },
   { name: "Etiopía", code: "et", capital: "Adís Abeba", continent: "África", population: 120.3, area: 1104300, currency: "Birr", currencySymbol: "Br", language: "Amárico", phoneCode: "+251", timezone: "UTC+3", tld: ".et" },
   { name: "Gabón", code: "ga", capital: "Libreville", continent: "África", population: 2.3, area: 267668, currency: "Franco CFA", currencySymbol: "CFA", language: "Francés", phoneCode: "+241", timezone: "UTC+1", tld: ".ga" },
   { name: "Gambia", code: "gm", capital: "Banjul", continent: "África", population: 2.5, area: 11295, currency: "Dalasi", currencySymbol: "D", language: "Inglés", phoneCode: "+220", timezone: "UTC+0", tld: ".gm" },
@@ -146,7 +146,7 @@ export const countries: Country[] = [
   { name: "Malaui", code: "mw", capital: "Lilongüe", continent: "África", population: 19.6, area: 118484, currency: "Kwacha malauí", currencySymbol: "MK", language: "Inglés/Chichewa", phoneCode: "+265", timezone: "UTC+2", tld: ".mw" },
   { name: "Malí", code: "ml", capital: "Bamako", continent: "África", population: 21.4, area: 1240192, currency: "Franco CFA", currencySymbol: "CFA", language: "Francés", phoneCode: "+223", timezone: "UTC+0", tld: ".ml" },
   { name: "Marruecos", code: "ma", capital: "Rabat", continent: "África", population: 37.5, area: 446550, currency: "Dírham marroquí", currencySymbol: "DH", language: "Árabe/Bereber", phoneCode: "+212", timezone: "UTC+1", tld: ".ma" },
-  { name: "Mauricio", code: "mu", capital: "Port Louis", continent: "África", population: 1.3, area: 2040, currency: "Rupia mauriciana", currencySymbol: "Rs", language: "Inglés", phoneCode: "+230", timezone: "UTC+4", tld: ".mu" },
+  { name: "Mauricio", code: "mu", capital: "Port-Louis", continent: "África", population: 1.3, area: 2040, currency: "Rupia mauriciana", currencySymbol: "Rs", language: "Inglés", phoneCode: "+230", timezone: "UTC+4", tld: ".mu" },
   { name: "Mauritania", code: "mr", capital: "Nuakchot", continent: "África", population: 4.8, area: 1030700, currency: "Uguiya", currencySymbol: "UM", language: "Árabe", phoneCode: "+222", timezone: "UTC+0", tld: ".mr" },
   { name: "Mozambique", code: "mz", capital: "Maputo", continent: "África", population: 32.1, area: 801590, currency: "Metical", currencySymbol: "MT", language: "Portugués", phoneCode: "+258", timezone: "UTC+2", tld: ".mz" },
   { name: "Namibia", code: "na", capital: "Windhoek", continent: "África", population: 2.6, area: 824292, currency: "Dólar namibio", currencySymbol: "N$", language: "Inglés", phoneCode: "+264", timezone: "UTC+2", tld: ".na" },
@@ -174,11 +174,11 @@ export const countries: Country[] = [
 
   // AMÉRICA DEL NORTE (3 países)
   { name: "Canadá", code: "ca", capital: "Ottawa", continent: "América del Norte", population: 38.2, area: 9984670, currency: "Dólar canadiense", currencySymbol: "C$", language: "Inglés/Francés", phoneCode: "+1", timezone: "UTC-5", tld: ".ca" },
-  { name: "Estados Unidos", code: "us", capital: "Washington D.C.", continent: "América del Norte", population: 331.9, area: 9833517, currency: "Dólar estadounidense", currencySymbol: "$", language: "Inglés", phoneCode: "+1", timezone: "UTC-5", tld: ".us" },
+  { name: "Estados Unidos", code: "us", capital: "Washington D. C.", continent: "América del Norte", population: 331.9, area: 9833517, currency: "Dólar estadounidense", currencySymbol: "$", language: "Inglés", phoneCode: "+1", timezone: "UTC-5", tld: ".us" },
   { name: "México", code: "mx", capital: "Ciudad de México", continent: "América del Norte", population: 128.9, area: 1964375, currency: "Peso mexicano", currencySymbol: "$", language: "Español", phoneCode: "+52", timezone: "UTC-6", tld: ".mx" },
 
   // AMÉRICA CENTRAL Y CARIBE (20 países)
-  { name: "Antigua y Barbuda", code: "ag", capital: "Saint John", continent: "América Central", population: 0.1, area: 442, currency: "Dólar del Caribe Oriental", currencySymbol: "EC$", language: "Inglés", phoneCode: "+1268", timezone: "UTC-4", tld: ".ag" },
+  { name: "Antigua y Barbuda", code: "ag", capital: "Saint John’s", continent: "América Central", population: 0.1, area: 442, currency: "Dólar del Caribe Oriental", currencySymbol: "EC$", language: "Inglés", phoneCode: "+1268", timezone: "UTC-4", tld: ".ag" },
   { name: "Bahamas", code: "bs", capital: "Nasáu", continent: "América Central", population: 0.4, area: 13943, currency: "Dólar bahameño", currencySymbol: "B$", language: "Inglés", phoneCode: "+1242", timezone: "UTC-5", tld: ".bs" },
   { name: "Barbados", code: "bb", capital: "Bridgetown", continent: "América Central", population: 0.29, area: 430, currency: "Dólar de Barbados", currencySymbol: "Bds$", language: "Inglés", phoneCode: "+1246", timezone: "UTC-4", tld: ".bb" },
   { name: "Belice", code: "bz", capital: "Belmopán", continent: "América Central", population: 0.4, area: 22966, currency: "Dólar beliceño", currencySymbol: "BZ$", language: "Inglés", phoneCode: "+501", timezone: "UTC-6", tld: ".bz" },
@@ -214,7 +214,7 @@ export const countries: Country[] = [
   { name: "Venezuela", code: "ve", capital: "Caracas", continent: "América del Sur", population: 28.4, area: 916445, currency: "Bolívar", currencySymbol: "Bs", language: "Español", phoneCode: "+58", timezone: "UTC-4", tld: ".ve" },
 
   // OCEANÍA (14 países)
-  { name: "Australia", code: "au", capital: "Canberra", continent: "Oceanía", population: 25.7, area: 7692024, currency: "Dólar australiano", currencySymbol: "A$", language: "Inglés", phoneCode: "+61", timezone: "UTC+10", tld: ".au" },
+  { name: "Australia", code: "au", capital: "Camberra", continent: "Oceanía", population: 25.7, area: 7692024, currency: "Dólar australiano", currencySymbol: "A$", language: "Inglés", phoneCode: "+61", timezone: "UTC+10", tld: ".au" },
   { name: "Fiyi", code: "fj", capital: "Suva", continent: "Oceanía", population: 0.9, area: 18274, currency: "Dólar fiyiano", currencySymbol: "FJ$", language: "Inglés/Fiyiano/Hindi", phoneCode: "+679", timezone: "UTC+12", tld: ".fj" },
   { name: "Islas Marshall", code: "mh", capital: "Majuro", continent: "Oceanía", population: 0.06, area: 181, currency: "Dólar estadounidense", currencySymbol: "$", language: "Marshalés/Inglés", phoneCode: "+692", timezone: "UTC+12", tld: ".mh" },
   { name: "Islas Salomón", code: "sb", capital: "Honiara", continent: "Oceanía", population: 0.7, area: 28896, currency: "Dólar de las Islas Salomón", currencySymbol: "SI$", language: "Inglés", phoneCode: "+677", timezone: "UTC+11", tld: ".sb" },

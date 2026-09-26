@@ -594,7 +594,7 @@ export default function PaisesDelMundoPage() {
             <div>
               <strong>Errores comunes al estudiar geografía política</strong>
               <ul>
-                <li><strong>Confundir capital con ciudad más grande</strong>: La capital no siempre es la ciudad más poblada. En Australia, la capital es Canberra (no Sídney ni Melbourne). En EE.UU., Washington D.C. (no Nueva York). En Brasil, Brasilia (no São Paulo ni Río).</li>
+                <li><strong>Confundir capital con ciudad más grande</strong>: La capital no siempre es la ciudad más poblada. En Australia, la capital es Camberra (no Sídney ni Melbourne). En EE.UU., Washington D. C. (no Nueva York). En Brasil, Brasilia (no São Paulo ni Río).</li>
                 <li><strong>Creer que todos los países tienen fronteras definidas</strong>: Varios países tienen disputas territoriales activas: India-Pakistán (Cachemira), Israel-Palestina, China-India (Aksai Chin), Marruecos-España (Ceuta y Melilla). Las fronteras «oficiales» dependen de qué mapa uses.</li>
                 <li><strong>Mezclar reconocimiento de iure con de facto</strong>: Kosovo es reconocido por más de 100 países pero no por la ONU. Taiwán funciona como estado independiente pero solo es reconocido formalmente por 12 países. El reconocimiento diplomático y la realidad práctica pueden ser muy diferentes.</li>
                 <li><strong>Asumir que el idioma oficial es el más hablado</strong>: En Suiza hay 4 idiomas oficiales. En Bolivia, 37. En Paraguay, el guaraní lo habla más gente que el español pese a ser ambos co-oficiales. El multilingüismo es la norma global, no la excepción.</li>
@@ -848,7 +848,7 @@ export default function PaisesDelMundoPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🏛️</span>
               <h4>Asocia capitales con características únicas</h4>
-              <p>Nairobi (Kenia) = «La ciudad safari de África». Reikiavik (Islandia) = «La capital más septentrional del mundo». Canberra (Australia) = «No es ni Sídney ni Melbourne, es la capital de compromiso». Las historias y anécdotas fijan los datos mejor que la repetición pura.</p>
+              <p>Nairobi (Kenia) = «La ciudad safari de África». Reikiavik (Islandia) = «La capital más septentrional del mundo». Camberra (Australia) = «No es ni Sídney ni Melbourne, es la capital de compromiso». Las historias y anécdotas fijan los datos mejor que la repetición pura.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>✏️</span>
@@ -876,10 +876,10 @@ export default function PaisesDelMundoPage() {
               <strong>6 Confusiones Geográficas Muy Frecuentes</strong>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>Austria ≠ Australia</strong>: Austria (Österreich) es un país sin litoral en el centro de Europa (capital: Viena). Australia es un continente-país en Oceanía (capital: Canberra). El error es tan común en inglés que existe el término «Kangaroo Office» para cuando correos de uno llegan al otro por confusión.</li>
+              <li><strong>Austria ≠ Australia</strong>: Austria (Österreich) es un país sin litoral en el centro de Europa (capital: Viena). Australia es un continente-país en Oceanía (capital: Camberra). El error es tan común en inglés que existe el término «Kangaroo Office» para cuando correos de uno llegan al otro por confusión.</li>
               <li><strong>República Checa ≠ Eslovaquia</strong>: Fueron un único país (Checoslovaquia) hasta 1993, cuando se separaron pacíficamente. República Checa (capital: Praga) está al oeste; Eslovaquia (capital: Bratislava) al este. Ambas son miembros de la UE pero Eslovaquia usa el euro y República Checa, la corona checa.</li>
               <li><strong>Nicaragua ≠ Honduras</strong>: Dos países vecinos de Centroamérica con nombre y geografía que se confunden fácilmente. Nicaragua (capital: Managua) es el mayor de Centroamérica. Honduras (capital: Tegucigalpa) limita al norte con Guatemala y Belice. Un truco: Tegucigalpa es una de las capitales más difíciles de pronunciar del mundo, lo que la hace memorable.</li>
-              <li><strong>La capital no siempre es la ciudad más grande</strong>: En Australia, la capital es Canberra (no Sídney, no Melbourne). En EE.UU., Washington D.C. (no Nueva York). En Brasil, Brasilia (no São Paulo ni Río de Janeiro). En Sudáfrica hay tres capitales distintas según la función. Las capitales «diseñadas» suelen ser más pequeñas que las ciudades históricamente dominantes.</li>
+              <li><strong>La capital no siempre es la ciudad más grande</strong>: En Australia, la capital es Camberra (no Sídney, no Melbourne). En EE.UU., Washington D. C. (no Nueva York). En Brasil, Brasilia (no São Paulo ni Río de Janeiro). En Sudáfrica hay tres capitales distintas según la función. Las capitales «diseñadas» suelen ser más pequeñas que las ciudades históricamente dominantes.</li>
               <li><strong>Irlanda ≠ Irlanda del Norte</strong>: Irlanda (Éire) es un estado independiente y miembro de la UE (capital: Dublín). Irlanda del Norte es una de las cuatro naciones constituyentes del Reino Unido (capital administrativa: Belfast). Son vecinas en la misma isla pero pertenecen a países diferentes.</li>
               <li><strong>Guinea, Guinea-Bisáu, Guinea Ecuatorial y Papua Nueva Guinea</strong>: Cuatro países distintos en diferentes partes del mundo. Guinea y Guinea-Bisáu están en África Occidental. Guinea Ecuatorial está en África Central (a pesar de su nombre, no toca el ecuador). Papua Nueva Guinea está en Oceanía, a miles de kilómetros. El nombre «Guinea» viene de la palabra bereber para designar el territorio «de los hombres negros» y fue adoptado de forma independiente en distintas regiones.</li>
             </ul>

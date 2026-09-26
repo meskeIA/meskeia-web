@@ -12,7 +12,8 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *   25, Maestro 30 preguntas). DIFICULTAD_CONFIG (page.tsx:23-29) reparte por continente: Fácil =
  *   Europa · Normal = Europa + América · Difícil = + Asia · Experto = + África · Maestro = todos.
  *   La guía lo repite: «Usa el modo Fácil para repasar Europa; después Normal para añadir América».
- * · metadata.ts: «195 países, 3 modos de juego, 5 dificultades».
+ * · metadata.ts: «Los 195 Estados de la ONU y Taiwán, 3 modos de juego, 5 dificultades» (hasta el
+ *   26/09/2026 decía «195 países» con un banco de 196: hallazgo 2276).
  *
  * DE DÓNDE SALEN LOS VALORES ESPERADOS
  * ────────────────────────────────────
@@ -37,6 +38,9 @@ import { esperarPaginaAsentada } from './_hidratacion';
 const RUTA = '/quiz-paises-capitales/';
 const POR_NOMBRE = new Map(countries.map((c) => [c.name, c]));
 const POR_CAPITAL = new Map(countries.map((c) => [c.capital, c]));
+const POR_CODIGO = new Map(countries.map((c) => [c.code, c]));
+/** Código ISO de la bandera que se pregunta, leído de su clase `fi-xx` (el aria-label ya no lo da). */
+const codigoBandera = (clase: string | null): string => (clase ?? '').match(/\bfi-([a-z]{2})\b/)?.[1] ?? '';
 const norm = (s: string | null | undefined): string => (s ?? '').replace(/[ \t\n\r]+/g, ' ').trim();
 /** Espacio duro U+00A0: se construye con su código para que se vea en el fuente. */
 const DURO = String.fromCharCode(0xa0);
@@ -82,6 +86,33 @@ async function arrancar(page: Page, modo: Modo, nivel: Nivel): Promise<void> {
   await expect(page.locator('[class*="preguntaTexto"]')).toBeVisible();
 }
 
+/**
+ * Como `arrancar`, pero con Math.random = mulberry32(semilla) solo durante el clic en «Empezar
+ * Quiz» (generarPreguntas() reparte ahí las preguntas y sus opciones).
+ */
+async function arrancarConSemilla(page: Page, modo: Modo, nivel: Nivel, semilla: number): Promise<void> {
+  await configurar(page, modo, nivel);
+  await page.evaluate((s) => {
+    let a = s;
+    (window as unknown as { __azar: () => number }).__azar = Math.random;
+    Math.random = (): number => {
+      a |= 0;
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }, semilla);
+  try {
+    await page.getByRole('button', { name: /Empezar Quiz/ }).click();
+    await expect(page.locator('[class*="preguntaTexto"]')).toBeVisible();
+  } finally {
+    await page.evaluate(() => {
+      Math.random = (window as unknown as { __azar: () => number }).__azar;
+    });
+  }
+}
+
 const opciones = (page: Page): Locator => page.locator('[class*="opcionesGrid"] button');
 const aviso = (page: Page): Locator => page.locator('[class*="feedbackBanner"]');
 
@@ -94,8 +125,8 @@ async function textosOpcion(page: Page): Promise<string[]> {
 async function fichaVisible(page: Page, modo: Modo): Promise<{ pais: Country; correcta: string }> {
   let pais: Country | undefined;
   if (modo === 'Bandera') {
-    const etiqueta = (await page.locator('[class*="preguntaBandera"]').getAttribute('aria-label')) ?? '';
-    pais = POR_NOMBRE.get(etiqueta.replace(/^Bandera de /, ''));
+    // Desde el hallazgo 2266 el aria-label no nombra el país: se lee el código de la clase fi-xx.
+    pais = POR_CODIGO.get(codigoBandera(await page.locator('[class*="preguntaBandera"]').getAttribute('class')));
   } else {
     const destacado = norm(await page.locator('[class*="preguntaTexto"] strong').innerText());
     pais = modo === 'Capital' ? POR_NOMBRE.get(destacado) : POR_CAPITAL.get(destacado);
@@ -191,6 +222,7 @@ async function barrer(page: Page, modo: Modo, nivel: Nivel, partidas: number, se
     async ({ modo, partidas, banco, semilla }) => {
       const porNombre = new Map(banco.map((p) => [p.name, p]));
       const porCapital = new Map(banco.map((p) => [p.capital, p]));
+      const porCodigo = new Map(banco.map((p) => [p.code, p]));
       const esperar = async (fn: () => unknown, max = 4000): Promise<void> => {
         const t0 = performance.now();
         while (performance.now() - t0 < max) {
@@ -225,8 +257,8 @@ async function barrer(page: Page, modo: Modo, nivel: Nivel, partidas: number, se
         for (;;) {
           const num = document.querySelector('[class*="preguntaNumero"]')?.textContent ?? '';
           const destacado = document.querySelector('[class*="preguntaTexto"] strong')?.textContent ?? '';
-          const bandera = (document.querySelector('[class*="preguntaBandera"]')?.getAttribute('aria-label') ?? '').replace(/^Bandera de /, '');
-          const pais = modo === 'Capital' ? porNombre.get(destacado) : modo === 'País' ? porCapital.get(destacado) : porNombre.get(bandera);
+          const bandera = (document.querySelector('[class*="preguntaBandera"]')?.getAttribute('class') ?? '').match(/\bfi-([a-z]{2})\b/)?.[1] ?? '';
+          const pais = modo === 'Capital' ? porNombre.get(destacado) : modo === 'País' ? porCapital.get(destacado) : porCodigo.get(bandera);
           if (!pais) throw new Error(`enunciado fuera del banco en ${num}`);
           const correcta = modo === 'Capital' ? pais.capital : pais.name;
           const ops = [...document.querySelectorAll<HTMLButtonElement>('[class*="opcionesGrid"] button')];
@@ -427,7 +459,7 @@ test.describe('Inspector 26/09/2026 · hallazgos de la partida', () => {
     // 12 partidas por modo: Normal 540 de 540 europeos, Difícil solo Europa + Asia, Experto solo
     // Europa + Asia + África. América (35 países) solo sale en Maestro. Con Europa + América (80),
     // P(0 americanos en 15) = C(45,15)/C(80,15) ≈ 3·10⁻⁵.
-    test.fail();
+    // REPARADO (hallazgo 2262): page.tsx compara con enRegion(), que acepta «América» + « del Norte»…
     test.setTimeout(60_000);
     await abrir(page);
     const { continentes } = await barrer(page, 'Capital', 'Normal', 1);
@@ -435,24 +467,51 @@ test.describe('Inspector 26/09/2026 · hallazgos de la partida', () => {
     expect(americanos, `continentes de una partida Normal: ${JSON.stringify(continentes)}`).toBeGreaterThan(0);
   });
 
+  test('reparto de cada nivel: solo sus regiones, y todas ellas salen', async ({ page }) => {
+    // Reparto del banco (contado en data/countries.ts): Europa 45 · América 35 (Norte 3, Central 20,
+    // Sur 12) · Asia 48 · África 54 · Oceanía 14. Pools: Fácil 45 · Normal 80 · Difícil 128 · Experto
+    // 182. Con 4 partidas por nivel, que una región del pool no salga nunca es improbable: la peor,
+    // América en Difícil (35 de 128, 80 preguntas), P ≈ (93/128)^80 ≈ 10⁻¹¹.
+    test.setTimeout(180_000);
+    const REGIONES: Record<Exclude<Nivel, 'Maestro'>, string[]> = {
+      Fácil: ['Europa'],
+      Normal: ['Europa', 'América'],
+      Difícil: ['Europa', 'América', 'Asia'],
+      Experto: ['Europa', 'América', 'Asia', 'África'],
+    };
+    const region = (c: string): string => (AMERICA.test(c) ? 'América' : c);
+    for (const [nivel, esperadas] of Object.entries(REGIONES) as [Exclude<Nivel, 'Maestro'>, string[]][]) {
+      await abrir(page);
+      const { continentes } = await barrer(page, 'Capital', nivel, 4);
+      const vistas = [...new Set(Object.keys(continentes).map(region))].sort();
+      expect(vistas, `${nivel}: ${JSON.stringify(continentes)}`).toEqual([...esperadas].sort());
+    }
+  });
+
   test('hallazgo · la Precisión del marcador no pasa del 100 %', async ({ page }) => {
     // page.tsx:232 — `correctas / Math.max(preguntaActual, 1)`: el denominador es el ÍNDICE de la
     // pregunta, no las respondidas. Dos aciertos seguidos → 2/1 = «200%»; luego 150, 133… y 15 de 15
     // en Normal termina en «107%».
-    test.fail();
+    // REPARADO (hallazgo 2263): aciertos / respondidas. Antes de responder la primera, «—».
     await abrir(page);
     await arrancar(page, 'Capital', 'Fácil');
+    expect((await hud(page)).Precisión, 'sin respuestas no hay precisión').toBe('—');
     await responder(page, 'Capital', true);
     expect((await hud(page)).Precisión).toMatch(porcentaje(100));
     await avanzar(page);
+    expect((await hud(page)).Precisión, '1 de 1 respondida, con la 2 aún sin contestar').toMatch(porcentaje(100));
     await responder(page, 'Capital', true);
     expect((await hud(page)).Precisión, '2 aciertos de 2 respondidas').toMatch(porcentaje(100));
+    await avanzar(page);
+    await responder(page, 'Capital', false);
+    // 2 / 3 = 0,666… → 67 %
+    expect((await hud(page)).Precisión, '2 aciertos de 3 respondidas').toMatch(porcentaje(67));
   });
 
   test('hallazgo · el porcentaje va separado con espacio duro y el tiempo con unidades («70 %», «5 s»)', async ({ page }) => {
     // Ortografía RAE 2010 y regla de formato del 25/09/2026: page.tsx:232 y :342 pegan el «%».
     // page.tsx:160 escribe «1m 5s»: «m» es el metro; el minuto es «min» y va separado.
-    test.fail();
+    // REPARADO (hallazgo 2270): formatPercentage de @/lib y formatTiempo con «min» y «s».
     test.setTimeout(60_000);
     await abrir(page);
     await arrancar(page, 'Capital', 'Fácil');
@@ -472,7 +531,8 @@ test.describe('Inspector 26/09/2026 · hallazgos de la partida', () => {
     // page.tsx:177/295/306 — «Empezar Quiz» se desmonta, la opción pulsada queda disabled y
     // «Siguiente» se desmonta. Medido: tras «Siguiente» el primer Tab cae en «Ver guía educativa» y
     // hacen falta 18 Tab para volver a la opción A.
-    test.fail();
+    // REPARADO (hallazgo 2264): el foco va a la tarjeta de la pregunta (tabIndex −1) al empezar y
+    // al avanzar, y a «Siguiente» al responder. Se comprueba además DÓNDE cae, no solo que no sea <body>.
     const enBody = () => page.evaluate(() => document.activeElement === document.body || document.activeElement === null);
     await abrir(page);
     await page.getByRole('button', { name: /Empezar Quiz/ }).focus();
@@ -480,15 +540,21 @@ test.describe('Inspector 26/09/2026 · hallazgos de la partida', () => {
     await expect(page.locator('[class*="preguntaTexto"]')).toBeVisible();
     const tras: string[] = [];
     if (await enBody()) tras.push('Empezar');
+    await expect(page.locator('[class*="preguntaCard"]')).toBeFocused();
     const { correcta } = await fichaVisible(page, 'Capital');
     await opciones(page).nth((await textosOpcion(page)).indexOf(correcta)).focus();
     await page.keyboard.press('Enter');
     await expect(aviso(page)).toBeVisible();
     if (await enBody()) tras.push('responder');
-    await page.locator('[class*="btnSiguiente"]').focus();
+    await expect(page.locator('[class*="btnSiguiente"]')).toBeFocused();
+    // Enter directamente sobre el foco que dejó la app, sin volver a enfocarlo a mano.
     await page.keyboard.press('Enter');
     await expect(page.locator('[class*="preguntaNumero"]')).toHaveText('Pregunta 2 de 15');
     if (await enBody()) tras.push('Siguiente');
+    await expect(page.locator('[class*="preguntaCard"]')).toBeFocused();
+    // Un solo Tab desde la tarjeta lleva a la opción A (antes hacían falta 18).
+    await page.keyboard.press('Tab');
+    await expect(opciones(page).nth(0)).toBeFocused();
     expect(tras, 'acciones tras las que el foco acaba en <body>').toEqual([]);
   });
 
@@ -496,9 +562,20 @@ test.describe('Inspector 26/09/2026 · hallazgos de la partida', () => {
     // page.tsx:314-315 — «✅ ¡Correcto!…» / «❌ Incorrecto…» son CADENAS dentro de role="alert" (con
     // aria-live="polite" en el mismo nodo). page.tsx:24-28 — «🟢 Fácil», «🟡 Normal»… van en la
     // etiqueta del nivel y forman su nombre accesible. check:a11y-jsx no ve ninguno (solo mira JSX).
-    test.fail();
+    // REPARADO (hallazgo 2267): el emoji va en su <span aria-hidden="true">, en el aviso y en el
+    // nivel. El nombre accesible del botón se mide igual que la región viva, sin los nodos ocultos
+    // (la primera versión leía textContent, que incluye lo aria-hidden y no es lo que oye el lector).
+    // Se comprueba además que el nombre accesible es exactamente la etiqueta.
     await abrir(page);
-    const nombres = await page.locator('[class*="difBtn"]').evaluateAll((bs) => bs.map((b) => (b.textContent ?? '').trim()));
+    const nombres = await page.locator('[class*="difBtn"]').evaluateAll((bs) =>
+      bs.map((b) => {
+        const clon = b.cloneNode(true) as HTMLElement;
+        clon.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove());
+        return (clon.textContent ?? '').replace(/\s+/g, ' ').trim();
+      }),
+    );
+    expect(nombres).toEqual(['Fácil', 'Normal', 'Difícil', 'Experto', 'Maestro']);
+    for (const nivel of nombres) await expect(page.getByRole('button', { name: nivel, exact: true })).toHaveCount(1);
     await arrancar(page, 'Capital', 'Fácil');
     await responder(page, 'Capital', true);
     const vivas = await page.evaluate(() =>
@@ -519,12 +596,24 @@ test.describe('Inspector 26/09/2026 · hallazgos de la partida', () => {
     // page.tsx:254-258 — role="img" aria-label={`Bandera de ${pais.name}`}: el lector de pantalla lee
     // la respuesta. WCAG 1.1.1 admite que un ejercicio no dé la alternativa equivalente, pero no que
     // la dé resuelta: lo coherente es describir la bandera («franja roja sobre franja blanca»).
-    test.fail();
+    // REPARADO (hallazgo 2266): aria-label «Bandera a identificar», sin nombre. Se recorre la
+    // partida entera y se mira que ninguna opción ofrecida aparezca en el nombre accesible.
+    test.setTimeout(60_000);
     await abrir(page);
     await arrancar(page, 'Bandera', 'Fácil');
-    const { pais } = await fichaVisible(page, 'Bandera');
-    const nombre = (await page.locator('[class*="preguntaBandera"]').getAttribute('aria-label')) ?? '';
-    expect(nombre).not.toContain(pais.name);
+    const numero = page.locator('[class*="preguntaNumero"]');
+    for (let n = 1; n <= 10; n++) {
+      const { pais } = await fichaVisible(page, 'Bandera');
+      const nombre = (await page.locator('[class*="preguntaBandera"]').getAttribute('aria-label')) ?? '';
+      expect(nombre).toBe('Bandera a identificar');
+      for (const op of await textosOpcion(page)) expect(nombre, `pregunta ${n}`).not.toContain(op);
+      expect(nombre).not.toContain(pais.name);
+      await responder(page, 'Bandera', true);
+      const antes = norm(await numero.innerText());
+      const rotulo = await avanzar(page);
+      if (/Ver resultados/.test(rotulo)) break;
+      await expect(numero).not.toHaveText(antes);
+    }
   });
 
   test('hallazgo · en modo Bandera no salen juntas dos banderas gemelas (Indonesia / Mónaco)', async ({ page }) => {
@@ -533,11 +622,29 @@ test.describe('Inspector 26/09/2026 · hallazgos de la partida', () => {
     // distractores del pool sin excluirlas. Medido 26/09/2026: 2 preguntas indecidibles en 96 partidas
     // Bandera/Difícil. Con la semilla 158 la pregunta 2 es la bandera de Indonesia con «Mónaco» de
     // opción. El invariante se comprueba en la partida entera, para que siga valiendo tras reparar.
-    test.fail();
+    // REPARADO (hallazgo 2268): BANDERAS_GEMELAS en page.tsx saca a la gemela de los distractores.
+    // Con la reparación de América (2262) el pool de Difícil cambió y la semilla 158 ya no lleva a la
+    // pregunta indecidible. El caso que sigue reproduce el defecto con el pool nuevo: simulado el
+    // 26/09/2026 con el algoritmo SIN exclusión, la semilla 307 da en la pregunta 7 la bandera de
+    // Indonesia con «Indonesia / Afganistán / Mónaco / Irlanda». La exclusión no cambia cuántos
+    // números aleatorios se consumen antes de esa pregunta (ninguna anterior tiene gemela), así que
+    // tras reparar la pregunta 7 sigue siendo Indonesia y «Mónaco» no puede estar entre las opciones.
     test.setTimeout(60_000);
     await abrir(page);
-    const { gemelas } = await barrer(page, 'Bandera', 'Difícil', 1, 158);
+    const { gemelas } = await barrer(page, 'Bandera', 'Difícil', 1, 307);
     expect(gemelas).toEqual([]);
+    await page.getByRole('button', { name: /Cambiar modo/ }).click();
+    await arrancarConSemilla(page, 'Bandera', 'Difícil', 307);
+    for (let n = 1; n < 7; n++) {
+      await responder(page, 'Bandera', true);
+      await avanzar(page);
+      await expect(page.locator('[class*="preguntaNumero"]')).toHaveText(`Pregunta ${n + 1} de 20`);
+    }
+    const { pais } = await fichaVisible(page, 'Bandera');
+    expect(pais.name, 'la semilla 307 ya no lleva a Indonesia en la pregunta 7: el caso no mide lo que dice').toBe('Indonesia');
+    const ops = await textosOpcion(page);
+    expect(ops).toContain('Indonesia');
+    expect(ops).not.toContain('Mónaco');
   });
 });
 
@@ -551,7 +658,9 @@ test.describe('Inspector 26/09/2026 · contraste', () => {
       // el #3FA5D1 oscuro de globals (existe --primary-boton, 5,47:1). Letra blanca sobre el verde
       // #48BB78 2,43:1 y sobre el rojo #FC8181 2,44:1. Texto de marca pequeño: pregunta del FAQ
       // 3,77 / 3,21 (oscuro) y fila de región de la tabla 3,74 / 2,95 (oscuro).
-      test.fail();
+      // REPARADO (hallazgo 2265): .container ya no redeclara la marca; fondos con --primary-boton,
+      // texto de marca con --primary-texto, letra oscura sobre verde y rojo, franja de región oscura
+      // al 0,08.
       test.setTimeout(90_000);
       await abrir(page, tema);
       const fallos: string[] = [];
@@ -701,14 +810,15 @@ test.describe('Inspector 26/09/2026 · móvil 360 × 740', () => {
 
   test('hallazgo · fallando la pregunta 1 (semilla 1, Rusia → Bucarest), la pregunta 2 se pinta por encima de la vista', async ({ page }) => {
     // Medido el 26/09/2026: scrollY 824 y enunciado en y = −217…−129; solo se ven las opciones.
-    test.fail();
+    // REPARADO (hallazgo 2277): si el marcador o la tarjeta no se ven enteros, la vista sube al
+    // principio del quiz, con scroll-margin-top de 88 px bajo la barra fija (forma de quiz-verbos).
     await hastaSegunda(page, 1, { pais: 'Rusia', a: 'Bucarest' });
     await page.waitForTimeout(300);
     expect(await tapadas(page, ['preguntaNumero', 'preguntaTexto'])).toEqual([]);
   });
 
   test('hallazgo · tras «Siguiente» el marcador (Pregunta, Correctas, Precisión) no queda bajo la barra fija', async ({ page }) => {
-    test.fail();
+    // REPARADO (hallazgo 2269): el marcador es una de las claves que decide si la vista sube.
     await hastaSegunda(page, 1, { pais: 'Rusia', a: 'Bucarest' });
     await page.waitForTimeout(300);
     expect(await tapadas(page, ['hudValor'])).toEqual([]);
@@ -770,15 +880,15 @@ test.describe('Inspector 26/09/2026 · contenido del banco', () => {
 
   test('hallazgo · Antigua y Barbuda: la capital es Saint John’s, no «Saint John»', () => {
     // RAE, apéndice 8: «Antigua y Barbuda. […] CAP. Saint John’s». «Saint John» es otra ciudad (en
-    // Nuevo Brunswick, Canadá). data/countries.ts escribe «Saint John».
-    test.fail();
+    // Nuevo Brunswick, Canadá). data/countries.ts escribía «Saint John».
+    // REPARADO (hallazgo 2271): «Saint John’s», con el apóstrofo tipográfico de la RAE.
     expect(capitalDe('Antigua y Barbuda')).toMatch(/^Saint John[’']s$/);
   });
 
   test('hallazgo · grafía de las capitales según la RAE', () => {
     // RAE, apéndice 8: Andorra la Vieja · Nueva Deli · Amán · Camberra · Babane (y Lobamba) ·
-    // Port-Louis · Washington D. C. El banco trae la forma local o inglesa.
-    test.fail();
+    // Port-Louis · Washington D. C. El banco traía la forma local o inglesa.
+    // REPARADO (hallazgo 2272): cotejado de nuevo contra la página de la RAE el 26/09/2026.
     const RAE: Record<string, string> = {
       Andorra: 'Andorra la Vieja',
       India: 'Nueva Deli',
@@ -800,7 +910,7 @@ test.describe('Inspector 26/09/2026 · contenido del banco', () => {
     // facto). El banco da «Jerusalén» a Israel y «Ramala» a Palestina como única respuesta, y ni el
     // aviso ni la guía lo matizan (antipatrón 6 de neutralidad).
     // Pasa si el banco deja de dar «Jerusalén» a secas o si la guía lo matiza.
-    test.fail();
+    // REPARADO (hallazgo 2273): la FAQ de la guía lo matiza; el aviso de respuesta, en el test siguiente.
     await abrir(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const texto = norm(await page.locator('body').innerText());
@@ -813,7 +923,7 @@ test.describe('Inspector 26/09/2026 · contenido del banco', () => {
     // metadata.ts:86 — «Nur-Sultán (Kazajistán), Naypyidaw (Myanmar), Yamoussoukro (Costa de Marfil)»
     // y, en la misma respuesta, «Astana». Wikipedia: «Astana was named Nur-Sultan from 2019 to 2022».
     // El banco (y la RAE) dicen Astaná, Naipyidó y Yamusukro. Es el FAQPage que leen los asistentes.
-    test.fail();
+    // REPARADO (hallazgo 2274).
     await abrir(page);
     const faq = await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join(' '));
     expect(faq).toContain('FAQPage');
@@ -828,7 +938,7 @@ test.describe('Inspector 26/09/2026 · contenido del banco', () => {
     //   Delhi»: NDMC 249.998 hab. (2011); área metropolitana de Delhi 28.514.000 (2018).
     // Grafía distinta de la del banco (y de la RAE): «Astana» (banco: Astaná), «Reykiavik» (Reikiavik).
     // Errata: «oposición de diplomatía».
-    test.fail();
+    // REPARADO (hallazgo 2275): Ulán Bator es la más fría; Nueva Deli con sus cifras y su fuente.
     await abrir(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const texto = norm(await page.locator('body').innerText());
@@ -845,10 +955,52 @@ test.describe('Inspector 26/09/2026 · contenido del banco', () => {
     // metadata.ts:6 «195 países» y la guía «El nivel Maestro mezcla los 195 países»; el banco tiene 196
     // porque añade Taiwán (data/countries.ts:3), que no es miembro ni observador de la ONU —el criterio
     // que la propia FAQ usa para contar 195— y no figura en la lista de la RAE.
-    test.fail();
+    // REPARADO (hallazgo 2276) sin tocar el banco (lo comparte paises-del-mundo): la app anuncia
+    // «los 195 Estados de la ONU y Taiwán», que cuenta lo que hay sin llamar «país» a Taiwán ni
+    // retirarlo. El «esperado» de la ficha (countries.length = 195) exigía quitar Taiwán; el test
+    // afirma en su lugar que lo anunciado SUMA lo que hay en el banco, y que ningún texto de la app
+    // habla ya de «195 países» a secas.
+    const ONU = countries.filter((c) => c.name !== 'Taiwán');
+    expect(ONU, 'el banco son los 195 de la ONU más Taiwán').toHaveLength(195);
+    expect(countries).toHaveLength(196);
     await abrir(page);
-    const descripcion = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
-    const anunciado = Number(descripcion.match(/(\d+) países/)?.[1]);
-    expect(anunciado, descripcion).toBe(countries.length);
+    const metas = await page.evaluate(() =>
+      ['meta[name="description"]', 'meta[property="og:description"]', 'meta[name="twitter:description"]'].map(
+        (s) => document.querySelector(s)?.getAttribute('content') ?? '',
+      ),
+    );
+    for (const d of metas) {
+      expect(d, 'descripción vacía').not.toBe('');
+      expect(d).toContain('Los 195 Estados de la ONU y Taiwán');
+      expect(d).not.toMatch(/\d+ países/);
+    }
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const texto = norm(await page.locator('body').innerText());
+    expect(texto).toContain(`El nivel Maestro mezcla las ${countries.length} entradas del quiz: los 195 Estados de la ONU (miembros y observadores) y Taiwán.`);
+    expect(texto).not.toMatch(/195 (países|capitales)/);
+  });
+
+  test('capitales discutidas: el aviso de respuesta matiza Jerusalén y Ramala, y ninguna pregunta tiene dos respuestas', async ({ page }) => {
+    // Hallazgo 2273. Semillas halladas simulando generarPreguntas() con mulberry32 (26/09/2026):
+    //   · 221 en Difícil → pregunta 1 = Israel (Capital: Lima / Skopie / Kuwait / Jerusalén;
+    //     País: Estonia / Guatemala / Israel / Canadá).
+    //   · 8 en Difícil → pregunta 1 = Palestina (Capital: Ramala / Puerto España / La Habana / Reikiavik).
+    // Esperado: el aviso lleva el matiz de la ONU; en Capital/Palestina «Jerusalén» no es opción y en
+    // País/Israel («¿A qué país pertenece la capital Jerusalén?») «Palestina» no es opción.
+    test.setTimeout(60_000);
+    const casos: { modo: Modo; semilla: number; enunciado: string; vetada?: string; nota: RegExp }[] = [
+      { modo: 'Capital', semilla: 221, enunciado: 'Israel', nota: /Israel designa Jerusalén como su capital; la ONU no reconoce ese estatus\./ },
+      { modo: 'Capital', semilla: 8, enunciado: 'Palestina', vetada: 'Jerusalén', nota: /Ramala es la sede de la Autoridad Nacional Palestina; Palestina proclama Jerusalén como su capital, estatus que la ONU no reconoce\./ },
+      { modo: 'País', semilla: 221, enunciado: 'Jerusalén', vetada: 'Palestina', nota: /Israel designa Jerusalén como su capital; la ONU no reconoce ese estatus\./ },
+    ];
+    for (const c of casos) {
+      await abrir(page);
+      await arrancarConSemilla(page, c.modo, 'Difícil', c.semilla);
+      await expect(page.locator('[class*="preguntaTexto"] strong'), `semilla ${c.semilla}: el caso ya no mide lo que dice`).toHaveText(c.enunciado);
+      if (c.vetada) expect(await textosOpcion(page)).not.toContain(c.vetada);
+      await responder(page, c.modo, true);
+      await expect(aviso(page)).toContainText('¡Correcto!');
+      await expect(aviso(page)).toContainText(c.nota);
+    }
   });
 });
