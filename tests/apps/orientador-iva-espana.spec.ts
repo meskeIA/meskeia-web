@@ -459,27 +459,39 @@ test('servicio recibido de empresa de Canarias al 10 %: inversión del sujeto pa
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGO ABIERTO (25/09/2026): pct() (page.tsx:71) y los literales «Exenta (0 %)» separan el
+// HALLAZGO 2129 (25/09/2026), REPARADO el 26/09/2026: pct() (page.tsx:71) y los literales «Exenta (0 %)» separan el
 // % con un espacio NORMAL (U+0020). La regla del 25/09/2026 (CLAUDE.md global §2) pide espacio
 // duro U+00A0 para que el % no salte solo de línea; a 360 px ya salta en la comparativa.
 // Se compara el carácter crudo con textContent: limpiar() y toContainText normalizarían el espacio.
-test.fail('formato: el % de la factura va separado con espacio duro U+00A0', async ({ page }) => {
+// Reparación: pct() usa U+00A0 y los «Exenta (0 %)» pasan por pct(). Además de la etiqueta,
+// ningún «N %» del texto de la página (ni «N%» pegado) queda con espacio normal.
+test('formato: el % de la factura va separado con espacio duro U+00A0', async ({ page }) => {
   await elegir(page, ACCION, 'Emito la factura');
   await elegir(page, LUGAR, 'España');
   await elegir(page, TIPO, '10 %');
   await elegir(page, TIPO, '21 %');
   const etiqueta = await resultado(page).locator('strong').first().textContent();
   expect(etiqueta).toBe(`${PORCENTAJES_IVA.general} %`);
+  // Fuera las tarjetas de <RelatedApps>: sus textos vienen de data/applications.ts, compartido
+  // (la de calculadora-iva dice «21/10/4 %» con espacio normal) y no se imputan a esta app.
+  const texto = await page.evaluate(() => {
+    const copia = document.body.cloneNode(true) as HTMLElement;
+    copia.querySelectorAll('[class*="RelatedApps"]').forEach((n) => n.remove());
+    return copia.textContent ?? '';
+  });
+  expect(texto.match(/\d(?: |)%/g) ?? [], '«N %» con espacio normal o pegado').toEqual([]);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGO ABIERTO (25/09/2026): ce66bcd1 añadió al resultado «servicios a particular de
+// HALLAZGO 2130 (25/09/2026), REPARADO el 26/09/2026: ce66bcd1 añadió al resultado «servicios a particular de
 // Canarias» el aviso de que los servicios electrónicos tributan por IGIC (art. 17.Tres.Uno.4
 // Ley 20/1991; art. 70.Uno.4.º LIVA solo los pone en el TAI si el particular reside en él),
 // pero el pie de la comparativa (page.tsx:842-844) —y la FAQ, page.tsx:941-943, y el faqJsonLd,
 // metadata.ts:89— siguen diciendo sin salvedad que a un particular de allí se le factura con
 // IVA español. Pasa cuando el pie deja de afirmarlo o nombra la salvedad de los electrónicos.
-test.fail('pie de la comparativa: «a un particular, con IVA español» salva los servicios electrónicos', async ({ page }) => {
+// Reparación: el pie, la FAQ y el faqJsonLd dicen «en general, con IVA español» y nombran la
+// excepción de los servicios electrónicos (art. 70.Uno.4.º LIVA; IGIC en Canarias).
+test('pie de la comparativa: «a un particular, con IVA español» salva los servicios electrónicos', async ({ page }) => {
   await elegir(page, ACCION, 'Emito la factura');
   await elegir(page, LUGAR, 'Canarias');
   await elegir(page, NATURALEZA, 'Servicios');
@@ -489,4 +501,14 @@ test.fail('pie de la comparativa: «a un particular, con IVA español» salva lo
   const afirmaIvaParticular = /particular, con IVA español/.test(pie);
   const salvaElectronicos = /electr[óo]nic/i.test(pie);
   expect(afirmaIvaParticular && !salvaElectronicos).toBe(false);
+  expect(pie).toMatch(/electr[óo]nic/i);
+
+  // La FAQ (en el DOM aunque la sección esté plegada) y el faqJsonLd, el mismo matiz
+  const faq = limpiar(
+    (await page.locator('dt', { hasText: '¿Las exportaciones llevan IVA?' }).locator('xpath=..').textContent()) ?? '',
+  );
+  expect(faq).toMatch(/electr[óo]nic/i);
+  const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+  expect(jsonLd).toContain('IVA español');
+  expect(jsonLd).toMatch(/servicios electr[óo]nicos/);
 });

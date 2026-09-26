@@ -54,8 +54,8 @@ export const jsonLd = generateWebAppSchema({
     'Operaciones nacionales, intracomunitarias, exportaciones e importaciones',
     'Comparativa del mismo importe en distintos ámbitos',
     'Indica los modelos tributarios aplicables (303, 349, 369)',
-    `Tipos de IVA español ${PORCENTAJES_IVA.general} %, ${PORCENTAJES_IVA.reducido} % y ${PORCENTAJES_IVA.superreducido} % con ejemplos`,
-    'Funciona 100% en el navegador, sin registro ni instalación',
+    `Tipos de IVA español ${PORCENTAJES_IVA.general} %, ${PORCENTAJES_IVA.reducido} % y ${PORCENTAJES_IVA.superreducido} % con ejemplos`,
+    'Funciona 100 % en el navegador, sin registro ni instalación',
     'Gratuito y sin publicidad',
   ],
 });
@@ -86,7 +86,7 @@ export const faqJsonLd = {
       name: '¿Las exportaciones llevan IVA?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. Las exportaciones de bienes fuera de la Unión Europea están exentas de IVA (art. 21 de la Ley del IVA). Es una exención plena: facturas sin IVA pero conservas el derecho a deducir el IVA soportado. Necesitas el DUA o documento aduanero que pruebe la salida de la mercancía. Enviar bienes a Canarias, Ceuta o Melilla también se considera exportación; los servicios, en cambio, siguen las reglas de localización y, prestados a un particular de esos territorios, llevan IVA español (art. 69 de la Ley del IVA).',
+        text: 'No. Las exportaciones de bienes fuera de la Unión Europea están exentas de IVA (art. 21 de la Ley del IVA). Es una exención plena: facturas sin IVA pero conservas el derecho a deducir el IVA soportado. Necesitas el DUA o documento aduanero que pruebe la salida de la mercancía. Enviar bienes a Canarias, Ceuta o Melilla también se considera exportación; los servicios, en cambio, siguen las reglas de localización y, prestados a un particular de esos territorios, llevan en general IVA español (art. 69 de la Ley del IVA). La excepción son los servicios electrónicos, de telecomunicaciones y de radiodifusión a un particular que reside allí, que no se localizan en el territorio del IVA (art. 70.Uno.4 de la Ley del IVA); en Canarias tributan por IGIC.',
       },
     },
     {

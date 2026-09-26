@@ -3141,7 +3141,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'calculadora-iva': [...fiscalApps.slice(1, 2), ...matematicasBasicasApps.slice(0, 2)],
   'orientador-iva-espana': [
-    { url: '/calculadora-iva/', icon: '🧾', name: 'Calculadora IVA', description: 'Añade o quita IVA al 21/10/4 %' },
+    { url: '/calculadora-iva/', icon: '🧾', name: 'Calculadora IVA', description: 'Añade o quita IVA al 21/10/4 %' },
     { url: '/conversor-cnae-iae/', icon: '🧾', name: 'Códigos CNAE e IAE', description: 'El tipo de IVA depende de tu actividad' },
     { url: '/generador-facturas/', icon: '🧾', name: 'Generador Facturas', description: 'Facturas con IVA e IRPF' },
     { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Cuota Autónomo', description: 'Tu cuota RETA mensual' },

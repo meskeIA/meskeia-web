@@ -66,9 +66,12 @@ function eur(n: number): string {
   return `${formatNumber(n, 2)} €`;
 }
 
-/** Porcentaje con espacio antes del signo, como pide el formato español: «21 %». */
+/**
+ * Porcentaje con espacio antes del signo, como pide el formato español: «21 %».
+ * El espacio es DURO (U+00A0) para que el «%» no salte solo de línea (hallazgo 2129).
+ */
 function pct(n: number): string {
-  return `${formatNumber(n, Number.isInteger(n) ? 0 : 1)} %`;
+  return `${formatNumber(n, Number.isInteger(n) ? 0 : 1)} %`;
 }
 
 /** «a, b o c» / «a, b y c». */
@@ -160,7 +163,7 @@ function resolver(o: Opciones): Resultado {
             titulo: 'Entrega intracomunitaria de bienes (B2B)',
             badge: BADGE_LABEL.exento,
             badgeTipo: 'exento',
-            tipoMostrado: 'Exenta (0 %)',
+            tipoMostrado: `Exenta (${pct(0)})`,
             cuotaFactura: 0,
             totalFactura: o.base,
             explicacion:
@@ -282,7 +285,7 @@ function resolver(o: Opciones): Resultado {
           titulo: 'Exportación de bienes (fuera de la UE)',
           badge: BADGE_LABEL.exento,
           badgeTipo: 'exento',
-          tipoMostrado: 'Exenta (0 %)',
+          tipoMostrado: `Exenta (${pct(0)})`,
           cuotaFactura: 0,
           totalFactura: o.base,
           explicacion:
@@ -411,7 +414,7 @@ function resolver(o: Opciones): Resultado {
         titulo: 'Venta de bienes a Canarias, Ceuta o Melilla',
         badge: BADGE_LABEL.exento,
         badgeTipo: 'exento',
-        tipoMostrado: 'Exenta (0 %)',
+        tipoMostrado: `Exenta (${pct(0)})`,
         cuotaFactura: 0,
         totalFactura: o.base,
         explicacion:
@@ -841,7 +844,9 @@ export default function OrientadorIvaEspanaPage() {
         <p className={styles.comparativaPie}>
           Canarias, Ceuta y Melilla no forman parte del territorio del IVA: los bienes salen como exportación y entran como
           importación, igual que con un país de fuera de la UE. Los servicios, en cambio, siguen las reglas de localización
-          (arts. 69 y 70 LIVA): a una empresa de allí se facturan sin IVA, pero a un particular, con IVA español.
+          (arts. 69 y 70 LIVA): a una empresa de allí se facturan sin IVA, y a un particular, en general, con IVA español. La
+          excepción son los servicios electrónicos, de telecomunicaciones y de radiodifusión a un particular que reside allí: no
+          se localizan en el territorio del IVA (art. 70.Uno.4.º LIVA) y, en Canarias, tributan por IGIC (art. 17 Ley 20/1991).
         </p>
       </section>
 
@@ -939,8 +944,9 @@ export default function OrientadorIvaEspanaPage() {
               <dd>
                 No. Las exportaciones de bienes fuera de la UE están exentas (art. 21 LIVA). Es una exención <strong>plena</strong>: facturas sin
                 IVA pero conservas el derecho a deducir el IVA soportado. Necesitas el DUA que pruebe la salida. Enviar bienes a Canarias, Ceuta o
-                Melilla también cuenta como exportación; prestarles servicios, no: a un particular de allí se le factura con IVA español
-                (art. 69 LIVA).
+                Melilla también cuenta como exportación; prestarles servicios, no: a un particular de allí se le factura, en general, con IVA
+                español (art. 69 LIVA). Salvo los servicios electrónicos, de telecomunicaciones y de radiodifusión, que no llevan IVA español si
+                el particular reside allí (art. 70.Uno.4.º LIVA): en Canarias tributan por IGIC (art. 17 Ley 20/1991).
               </dd>
             </div>
             <div className={styles.faqItem}>
