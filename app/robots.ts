@@ -24,14 +24,22 @@ export default function robots(): MetadataRoute.Robots {
       // - /api/: endpoints serverless (MCP, ChatGPT tools, analytics, tRPC).
       //   Devuelven 4xx ante GET de crawlers — no son páginas indexables.
       //   Los LLMs que sí los necesitan tienen acceso explícito más abajo.
-      // - /*?from=*: tracking interno de cross-linking entre apps.
       // - /*?ref=*: parámetros UTM de campañas externas (Product Hunt, etc.).
       //   La canonical apunta a la URL limpia, así que Google las marca como
       //   "alternativas". Bloquearlas ahorra crawl budget y elimina el aviso.
+      //
+      // ?from= NO se bloquea desde el 26/09/2026. Se bloqueó el 26/05 (ad9a97c2),
+      // cuando todo enlace interno lo llevaba; desde el 28/07 (5097b9fc) los internos
+      // usan #from=, que Google ignora, y ?from= queda solo en los saltos
+      // cross-dominio (p. ej. delegum.com/soluciones/ → ?from=delegum). Bloquearlo
+      // dejaba esos enlaces sin seguir: Google no podía llegar a la canonical y el
+      // enlace no transmitía nada. Los cuatro verticales nunca lo bloquearon.
+      // El Analytics no se contamina: el tracker descarta a Googlebot en cliente y
+      // servidor. Medición que lo motivó: memoria project_baseline_indexacion_gsc.
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/*?from=', '/*?ref='],
+        disallow: ['/api/', '/*?ref='],
       },
       // OpenAI - GPTBot (entrenamiento) + OAI-SearchBot (búsqueda de ChatGPT, el que
       // cita y devuelve clics). Acceso completo + índice de herramientas.

@@ -14,6 +14,11 @@
  * Sin este candado, la próxima app que copie el patrón antiguo volvería a cerrar
  * esas carreteras sin que nadie se entere. Ver lib/trackingFrom.ts.
  *
+ * 26/09/2026: robots.txt ya NO bloquea `?from=` (solo quedaba en los saltos
+ * cross-dominio, que el bloqueo dejaba sin seguir). El candado sigue vigente: un
+ * `?from=` interno ya no corta el enlace, pero vuelve a crear una URL duplicada por
+ * cada origen, que Google tiene que rastrear y resolver por la canonical.
+ *
  * NO se revisan los saltos CROSS-DOMINIO (`https://…?from=meskeia|delegum`): son
  * deliberados, ningún robots.txt de los verticales los bloquea y funcionan bien.
  */
@@ -69,7 +74,7 @@ for (const carpeta of CARPETAS) {
 if (fallos.length) {
   console.error('\n❌ Enlaces INTERNOS con ?from= (deben usar #from=, ver lib/trackingFrom.ts):\n');
   fallos.forEach((f) => console.error('   ' + f));
-  console.error(`\n   ${fallos.length} enlace(s). Con ?from= robots.txt los bloquea y Googlebot no puede seguirlos.\n`);
+  console.error(`\n   ${fallos.length} enlace(s). Con ?from= cada origen crea una URL duplicada de la misma página.\n`);
   process.exit(1);
 }
 
