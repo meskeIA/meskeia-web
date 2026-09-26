@@ -89,7 +89,7 @@ const COMUNES: Record<string, string> = {
 const NOMBRES_DELICADOS: Record<number, string> = {
   11: 'Sodio', 19: 'Potasio', 26: 'Hierro', 29: 'Cobre', 30: 'Zinc', 36: 'Kriptón',
   39: 'Itrio', 40: 'Circonio', 47: 'Plata', 50: 'Estaño', 53: 'Yodo', 70: 'Iterbio',
-  73: 'Tantalio', 74: 'Wolframio', 79: 'Oro', 80: 'Mercurio', 82: 'Plomo',
+  73: 'Tántalo', 74: 'Wolframio', 79: 'Oro', 80: 'Mercurio', 82: 'Plomo',
 };
 
 // ─── Utilidades de lectura de la pantalla ────────────────────────────────────
@@ -258,7 +258,8 @@ test.describe('Quiz Símbolos Químicos', () => {
    *   · 88 elementos (26 comunes + 29 conocidos + 33 avanzados), sin símbolos, nombres ni
    *     números atómicos repetidos, y cada Z con el símbolo que le da la IUPAC
    *   · la cifra del hero y la del JSON-LD salen de ELEMENTOS.length, nunca «85 elementos»
-   *   · el elemento 73 se llama «Tantalio» (hallazgo 250)
+   *   · el elemento 73 se llama «Tántalo» (acuerdo RAC-RAE-RSEQ-Fundéu de 2017; el hallazgo 250
+   *     lo cambió a «Tantalio» al revés, y este caso lo consagraba hasta el 26/09/2026)
    *   · una partida de Difícil (20 preguntas, pool de 88) cumple las mismas invariantes
    *   · el bloque educativo dice que el bromo es LÍQUIDO a temperatura ambiente (246)
    */
@@ -289,8 +290,9 @@ test.describe('Quiz Símbolos Químicos', () => {
       const el = ELEMENTOS.find((e) => e.z === Number(z));
       expect(el?.nombre, `el elemento ${z} debe llamarse «${nombre}»`).toBe(nombre);
     }
-    // 250 · el 73 es «Tantalio»; «Tántalo» es el personaje mitológico del que sale el nombre
-    expect(ELEMENTOS.find((e) => e.z === 73)).toMatchObject({ simbolo: 'Ta', nombre: 'Tantalio' });
+    // El 73 es «Tántalo»: el acuerdo RAC-RAE-RSEQ-Fundéu de 2017 (An. Quím. 113, punto 6)
+    // suprime «tantalio», y el DLE no lo recoge. El hallazgo 250 lo había cambiado al revés.
+    expect(ELEMENTOS.find((e) => e.z === 73)).toMatchObject({ simbolo: 'Ta', nombre: 'Tántalo' });
 
     // ── 2. La cifra que la app promete, en pantalla y en el JSON-LD ───────────
     await page.goto(RUTA);

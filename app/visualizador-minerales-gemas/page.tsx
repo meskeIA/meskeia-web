@@ -159,7 +159,7 @@ interface MineralSmartphone {
 const MINERALES_SMARTPHONE: MineralSmartphone[] = [
   { mineral: 'Litio', uso: 'Batería recargable' },
   { mineral: 'Cobalto', uso: 'Cátodo de la batería' },
-  { mineral: 'Tantalio', uso: 'Condensadores electrónicos' },
+  { mineral: 'Coltán (mena del tántalo)', uso: 'Condensadores electrónicos' },
   { mineral: 'Oro', uso: 'Contactos y conectores' },
   { mineral: 'Cobre', uso: 'Circuitos y cableado' },
   { mineral: 'Cuarzo (silicio)', uso: 'Chip procesador' },

@@ -98,7 +98,7 @@ export const ELEMENTOS: Elemento[] = [
   { simbolo: 'Yb', nombre: 'Iterbio',    z: 70,  categoria: 'avanzado', grupo: 'Lantánido' },
   { simbolo: 'Lu', nombre: 'Lutecio',    z: 71,  categoria: 'avanzado', grupo: 'Lantánido' },
   { simbolo: 'Hf', nombre: 'Hafnio',     z: 72,  categoria: 'avanzado', grupo: 'Metal de transición' },
-  { simbolo: 'Ta', nombre: 'Tantalio',   z: 73,  categoria: 'avanzado', grupo: 'Metal de transición' },
+  { simbolo: 'Ta', nombre: 'Tántalo',   z: 73,  categoria: 'avanzado', grupo: 'Metal de transición' },
   { simbolo: 'Re', nombre: 'Renio',      z: 75,  categoria: 'avanzado', grupo: 'Metal de transición' },
   { simbolo: 'Os', nombre: 'Osmio',      z: 76,  categoria: 'avanzado', grupo: 'Metal de transición' },
   { simbolo: 'Ir', nombre: 'Iridio',     z: 77,  categoria: 'avanzado', grupo: 'Metal de transición' },

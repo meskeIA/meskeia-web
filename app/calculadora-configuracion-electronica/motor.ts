@@ -101,7 +101,7 @@ export const ELEMENTOS: ElementoCE[] = [
   { z: 70, simbolo: 'Yb', nombre: 'Iterbio' },
   { z: 71, simbolo: 'Lu', nombre: 'Lutecio' },
   { z: 72, simbolo: 'Hf', nombre: 'Hafnio' },
-  { z: 73, simbolo: 'Ta', nombre: 'Tantalio' },
+  { z: 73, simbolo: 'Ta', nombre: 'Tántalo' },
   { z: 74, simbolo: 'W', nombre: 'Tungsteno' },
   { z: 75, simbolo: 'Re', nombre: 'Renio' },
   { z: 76, simbolo: 'Os', nombre: 'Osmio' },
