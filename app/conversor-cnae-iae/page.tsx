@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './ConversorCnaeIae.module.css';
 import {
   MeskeiaLogo,
@@ -13,7 +13,13 @@ import {
   ShareCard,
   Footer,
 } from '@/components';
-import { formatDate, formatNumber, parseISODateLocal } from '@/lib';
+import {
+  formatDate,
+  formatFechaLarga,
+  formatNumber,
+  formatPercentage,
+  parseISODateLocal,
+} from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_CNAE_IAE_META,
@@ -208,6 +214,7 @@ function normalizarTexto(texto: string): string {
  */
 function otroGenero(termino: string): string | null {
   if (termino.includes(' ')) return null;
+  if (!esOficio(termino)) return null;
   // -ora → -or: programadora, traductora, escritora, auditora, repartidora…
   if (termino.endsWith('ora')) return `${termino.slice(0, -3)}or`;
   if (termino.endsWith('or')) return `${termino}a`;
@@ -215,6 +222,107 @@ function otroGenero(termino: string): string | null {
   if (termino.endsWith('a')) return `${termino.slice(0, -1)}o`;
   if (termino.endsWith('o')) return `${termino.slice(0, -1)}a`;
   return null;
+}
+
+/**
+ * ¿El término nombra a una PERSONA que ejerce un oficio, y no una actividad, un lugar o un
+ * producto? Solo a esos se les deriva el otro género (hallazgo 2226).
+ *
+ * ⚠️ 26/09/2026 — la reparación del 1188 derivaba el género de TODOS los sinónimos de una
+ * palabra: 241 formas, casi todas inexistentes e inofensivas («peluquerío», «agriculturo»),
+ * pero alguna era otra palabra real con otro significado, y entraba en el índice como palabra
+ * COMPLETA: «plata» (32.12, joyería) derivaba «plato» y adelantaba a 10.85 «Elaboración de
+ * platos y comidas preparados». Lo mismo con «calzado» → «calzada», «gimnasio» → «gimnasia»,
+ * «huerta» → «huerto», «moda» → «modo» o «cebada» → «cebado».
+ *
+ * El criterio son las terminaciones de nombre de persona que en el diccionario de sinónimos
+ * solo dan oficios: -or/-ora (pintor, programadora), -ero/-era (fontanero, niñera),
+ * -logo/-loga y -grafo/-grafa (psicólogo, fotógrafa), -ano/-ana (artesano), -ario/-aria
+ * (veterinaria) y -ico en masculino (médico, mecánico, músico). Se dejan fuera -ado/-ada, que
+ * mezcla oficios (letrado) con actividades (calzado, planchado, estucado, supermercado), y -ica,
+ * que es casi siempre la actividad (cosmética, domótica, estética). Los oficios que quedan fuera
+ * de esas terminaciones van en `OFICIOS_SIN_SUFIJO`. Una forma derivada de un «-ero» que no es
+ * persona («invernadero» → «invernadera») no existe como palabra y no roba ninguna búsqueda.
+ */
+const OFICIOS_SIN_SUFIJO = new Set(['letrado', 'mago', 'modista']);
+
+function esOficio(termino: string): boolean {
+  if (OFICIOS_SIN_SUFIJO.has(termino)) return true;
+  return /(?:or|ora|ero|era|logo|loga|grafo|grafa|ano|ana|ario|aria|ico)$/.test(termino);
+}
+
+/**
+ * Palabras de PERSONA de las Tarifas del IAE, normalizadas y en masculino plural, tal como
+ * figuran en los títulos de las Secciones 2ª y 3ª (hallazgo 2222).
+ *
+ * Los títulos de las profesiones van en masculino plural («Abogados», «Odontólogos», «Médicos
+ * de Medicina General») y la búsqueda es por subcadena: «abogado» está dentro de «abogados»,
+ * pero «abogada» no, y el femenino de las profesiones que RETIENEN devolvía cero. Medido sobre
+ * el catálogo sellado el 26/09/2026: 60 términos con resultado en masculino y ninguno en
+ * femenino.
+ *
+ * Es una lista cerrada y no una regla de terminaciones por el mismo motivo que el 2226: en esos
+ * títulos conviven personas con cosas («Ingenieros de caminos, canales y puertos», «Peritos
+ * tasadores de seguros, alhajas, géneros y efectos»), y feminizar «puertos», «seguros» o
+ * «superiores» abriría la puerta a búsquedas de otra cosa. Se usa en la CONSULTA, no en el
+ * índice: el femenino de una de estas palabras se busca ADEMÁS en masculino, de modo que
+ * devuelve lo que devuelve el masculino sin perder lo que ya encontraba por sí mismo.
+ */
+const PERSONAS_IAE = new Set([
+  'abogados', 'actores', 'actuarios', 'acupuntores', 'adaptadores', 'administradores',
+  'administrativos', 'agronomos', 'antropologos', 'aparejadores', 'apoderados', 'apuntadores',
+  'arbitros', 'arquitectos', 'artesanos', 'astrologos', 'auditores', 'bailarines',
+  'boxeadores', 'bromatologos', 'caricatos', 'castradores', 'censores', 'cobradores',
+  'colegiados', 'comisarios', 'compositores', 'conductores', 'corredores', 'cronometradores',
+  'decoradores', 'diplomados', 'directores', 'disenadores', 'doctores', 'entrenadores',
+  'escritores', 'escultores', 'estomatologos', 'excentricos', 'expendedores', 'expertos',
+  'falleros', 'farmaceuticos', 'gestores', 'grabadores', 'graduados', 'grafologos',
+  'habilitados', 'historiadores', 'ingenieros', 'intermediarios', 'jugadores', 'jurados',
+  'licenciados', 'liquidadores', 'maestros', 'maquilladores', 'matadores', 'mecanografos',
+  'medicos', 'meritorios', 'notarios', 'odontologos', 'operadores', 'opticos', 'peritos',
+  'pilotos', 'pintores', 'podologos', 'preparadores', 'procuradores', 'profesores',
+  'programadores', 'protesicos', 'psicologos', 'recitadores', 'regidores', 'registradores',
+  'rejoneadores', 'restauradores', 'sexadores', 'subalternos', 'tasadores', 'taquigrafos',
+  'tecnicos', 'topografos', 'traductores', 'veterinarios',
+]);
+
+/** Femeninos que no se forman por terminación. */
+const FEMENINOS_IRREGULARES: Record<string, string> = { actriz: 'actor', actrices: 'actores' };
+
+/**
+ * El masculino de una palabra (ya normalizada) si es el femenino de una persona de las Tarifas
+ * del IAE, o null. Conserva el número: «abogada» → «abogado», «profesoras» → «profesores».
+ */
+function masculinoDePersonaIae(palabra: string): string | null {
+  const irregular = FEMENINOS_IRREGULARES[palabra];
+  if (irregular) return irregular;
+  // [terminación femenina, terminación masculina, lo que le falta para el plural de la lista]
+  const reglas: Array<[string, string, string]> = [
+    ['oras', 'ores', ''],
+    ['ora', 'or', 'es'],
+    ['inas', 'ines', ''],
+    ['ina', 'in', 'es'],
+    ['as', 'os', ''],
+    ['a', 'o', 's'],
+  ];
+  for (const [femenina, masculina, alPlural] of reglas) {
+    if (!palabra.endsWith(femenina)) continue;
+    const masculino = palabra.slice(0, -femenina.length) + masculina;
+    return PERSONAS_IAE.has(masculino + alPlural) ? masculino : null;
+  }
+  return null;
+}
+
+/** La consulta del IAE con el femenino de sus profesiones en masculino, o null si no cambia. */
+function consultaIaeEnMasculino(consultaNormalizada: string): string | null {
+  let cambiada = false;
+  const palabras = consultaNormalizada.split(' ').map((palabra) => {
+    const masculino = masculinoDePersonaIae(palabra);
+    if (masculino === null) return palabra;
+    cambiada = true;
+    return masculino;
+  });
+  return cambiada ? palabras.join(' ') : null;
 }
 
 /** Deja solo los dígitos: «47.11» → «4711». */
@@ -337,9 +445,6 @@ export default function ConversorCnaeIaePage() {
   const [verTodosCnae, setVerTodosCnae] = useState(false);
   const [verTodosIae, setVerTodosIae] = useState(false);
 
-  const inputCnaeRef = useRef<HTMLInputElement>(null);
-  const inputIaeRef = useRef<HTMLInputElement>(null);
-
   /**
    * Cambiar la consulta SUELTA el despliegue. «Ver los N» es el remedio de una consulta
    * concreta —la de arriba, por código—, no un modo permanente: como no se reiniciaba,
@@ -387,12 +492,19 @@ export default function ConversorCnaeIaePage() {
     };
   }, []);
 
-  // Foco en el buscador de la pestaña activa una vez cargado el catálogo
-  useEffect(() => {
-    if (estado !== 'listo') return;
-    const destino = pestana === 'cnae' ? inputCnaeRef.current : inputIaeRef.current;
-    destino?.focus();
-  }, [estado, pestana]);
+  /*
+   * ⚠️ 26/09/2026 (hallazgos 2221 y 2225) — aquí vivía un efecto que daba el foco al buscador
+   * de la pestaña activa al terminar de cargar el catálogo y en cada cambio de pestaña. Se
+   * RETIRA entero, no se parchea con `preventScroll`:
+   *   · Al cargar, `focus()` desplazaba la página hasta el campo (1.516 px a 1280×800, 2.806 a
+   *     360×740) por encima del aviso legal, del DisclaimerCard crítico —que la política
+   *     prohíbe colapsar para que se lea— y del aviso de que no hay tabla CNAE ⇄ IAE. Con
+   *     `preventScroll` la vista se quedaría arriba, pero el lector de pantalla seguiría
+   *     empezando en el campo y no en el h1: el foco no se mueve si nadie lo ha pedido.
+   *   · Al cambiar de pestaña con las flechas, el efecto se llevaba el foco de la pestaña
+   *     destino al buscador, y el siguiente ← movía el cursor dentro del campo: la navegación
+   *     del patrón tabs era de un solo uso. En ese patrón el foco se queda en la pestaña.
+   */
 
   // ─── Índices de búsqueda ───────────────────────────────────────────────────
 
@@ -643,20 +755,31 @@ export default function ConversorCnaeIaePage() {
 
   const consultaIaeNormalizada = normalizarTexto(consultaIae);
   const digitosConsultaIae = soloDigitos(consultaIae);
+  /** «abogada» se busca también como «abogado» (hallazgo 2222); null si no nombra profesión. */
+  const consultaIaeMasculina = consultaIaeEnMasculino(consultaIaeNormalizada);
 
   const resultadosIae = useMemo<IaeIndexada[]>(() => {
     if (iaeIndexado.length === 0) return [];
 
-    const relevancia = (entrada: IaeIndexada): number => {
-      if (consultaIaeNormalizada.length === 0) return 0;
+    const relevanciaDe = (entrada: IaeIndexada, consulta: string): number => {
+      if (consulta.length === 0) return 0;
       if (entrada.codigo === consultaIae.trim()) return 0;
       if (digitosConsultaIae.length > 0 && entrada.codigoDigitos.startsWith(digitosConsultaIae)) {
         return 1;
       }
-      if (normalizarTexto(entrada.titulo).startsWith(consultaIaeNormalizada)) return 2;
-      if (coincidePalabraCompleta(entrada.textoBusqueda, consultaIaeNormalizada)) return 3;
+      if (normalizarTexto(entrada.titulo).startsWith(consulta)) return 2;
+      if (coincidePalabraCompleta(entrada.textoBusqueda, consulta)) return 3;
       return 4;
     };
+    // El femenino de una profesión puntúa como su masculino: «médica» pone delante el 831
+    // «Médicos de Medicina General», igual que «médico» (hallazgo 2222).
+    const relevancia = (entrada: IaeIndexada): number =>
+      consultaIaeMasculina === null
+        ? relevanciaDe(entrada, consultaIaeNormalizada)
+        : Math.min(
+            relevanciaDe(entrada, consultaIaeNormalizada),
+            relevanciaDe(entrada, consultaIaeMasculina),
+          );
 
     let base = iaeIndexado;
 
@@ -665,7 +788,10 @@ export default function ConversorCnaeIaePage() {
         if (digitosConsultaIae.length > 0 && entrada.codigoDigitos.startsWith(digitosConsultaIae)) {
           return true;
         }
-        return entrada.textoBusqueda.includes(consultaIaeNormalizada);
+        return (
+          entrada.textoBusqueda.includes(consultaIaeNormalizada) ||
+          (consultaIaeMasculina !== null && entrada.textoBusqueda.includes(consultaIaeMasculina))
+        );
       });
     }
 
@@ -686,7 +812,14 @@ export default function ConversorCnaeIaePage() {
       if (a.seccion !== b.seccion) return a.seccion.localeCompare(b.seccion, 'es');
       return a.codigo.localeCompare(b.codigo, 'es', { numeric: true });
     });
-  }, [iaeIndexado, consultaIae, consultaIaeNormalizada, digitosConsultaIae, seccionIae]);
+  }, [
+    iaeIndexado,
+    consultaIae,
+    consultaIaeNormalizada,
+    consultaIaeMasculina,
+    digitosConsultaIae,
+    seccionIae,
+  ]);
 
   const sinCriterioIae = consultaIaeNormalizada.length === 0 && seccionIae === 'todas';
   const iaeMostrados = sinCriterioIae
@@ -756,8 +889,11 @@ export default function ConversorCnaeIaePage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Buscador de códigos CNAE-2025 y epígrafes del IAE</h1>
         <p className={styles.subtitle}>
-          Dos catálogos completos y literales para localizar tu actividad: la CNAE-2025 del INE
-          (la que sustituyó a la CNAE-2009 en enero de 2026) y las Tarifas del Impuesto sobre
+          {/* La fecha sale de CNAE_VIGENCIA.desde, como en el aviso, la introducción y la FAQ
+              (hallazgo 2228): tecleada, coincidía con el módulo por casualidad. */}
+          Dos catálogos completos y literales para localizar tu actividad: la{' '}
+          {CNAE_VIGENCIA.vigente} del INE (la que sustituyó a la {CNAE_VIGENCIA.anterior} el{' '}
+          {formatFechaLarga(CNAE_VIGENCIA.desde)}) y las Tarifas del Impuesto sobre
           Actividades Económicas. Búsqueda por palabras corrientes, por código y también por
           códigos antiguos de la CNAE-2009.
         </p>
@@ -916,7 +1052,6 @@ export default function ConversorCnaeIaePage() {
               </label>
               <input
                 id="buscador-cnae"
-                ref={inputCnaeRef}
                 type="search"
                 className={styles.input}
                 value={consultaCnae}
@@ -1110,7 +1245,6 @@ export default function ConversorCnaeIaePage() {
               </label>
               <input
                 id="buscador-iae"
-                ref={inputIaeRef}
                 type="search"
                 className={styles.input}
                 value={consultaIae}
@@ -1459,9 +1593,10 @@ export default function ConversorCnaeIaePage() {
                 La Sección 1ª recoge las actividades empresariales y la 2ª el ejercicio individual
                 de una profesión. La diferencia práctica está en la factura: un profesional de la
                 Sección 2ª aplica retención de IRPF en sus facturas a empresas y a otros
-                profesionales ({formatNumber(SECCION_PROFESIONAL.tipoRetencion ?? 0, 0)} % con carácter
-                general y {formatNumber(SECCION_PROFESIONAL.tipoRetencionInicio ?? 0, 0)} % el año de
-                inicio de la actividad y los dos siguientes), mientras que una actividad empresarial de la Sección 1ª, con
+                profesionales (
+                {formatPercentage((SECCION_PROFESIONAL.tipoRetencion ?? 0) / 100, 0)} con carácter
+                general y {formatPercentage((SECCION_PROFESIONAL.tipoRetencionInicio ?? 0) / 100, 0)}{' '}
+                el año de inicio de la actividad y los dos siguientes), mientras que una actividad empresarial de la Sección 1ª, con
                 carácter general, no la aplica. La Sección 3ª, artística, tiene tratamiento
                 análogo al profesional.
               </p>
@@ -1632,9 +1767,11 @@ export default function ConversorCnaeIaePage() {
                 epígrafe.
               </li>
               <li>
-                <strong>Usar un código de la CNAE-2009 como si siguiera vigente.</strong> Desde
-                enero de 2026 la clasificación aplicable es la CNAE-2025, y algunas clases antiguas
-                se han dividido en varias nuevas.
+                <strong>
+                  Usar un código de la {CNAE_VIGENCIA.anterior} como si siguiera vigente.
+                </strong>{' '}
+                Desde el {formatFechaLarga(CNAE_VIGENCIA.desde)} la clasificación aplicable es la{' '}
+                {CNAE_VIGENCIA.vigente}, y algunas clases antiguas se han dividido en varias nuevas.
               </li>
             </ul>
           </div>

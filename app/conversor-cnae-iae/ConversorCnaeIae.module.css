@@ -1,8 +1,13 @@
 /* ─── Buscador CNAE-2025 e IAE — paleta meskeIA ──────────────────────────── */
 
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
+  /*
+   * `--primary` y `--secondary` NO se redeclaran aquí: los da `globals.css` con su variante
+   * oscura. Con la marca como texto se usa `--primary-texto`/`--secondary-texto`, y como fondo
+   * con texto blanco encima, `--primary-boton`/`--secondary-boton` (hallazgo 2223: el código
+   * de la ficha, las insignias de sección, la pestaña y el filtro activos daban 4,11:1 y la
+   * insignia de la Sección 2ª y los ejemplos, 2,80:1).
+   */
   --accent: #7FB3D3;
   --hero-bg: #1a5278;
   --bg-primary: #FAFAFA;
@@ -96,7 +101,7 @@
 .buscadorTitulo {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -130,13 +135,20 @@
 }
 
 .tab:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--primary-texto);
+  color: var(--primary-texto);
 }
 
-.tabActiva {
-  background: var(--primary);
-  border-color: var(--primary);
+/*
+ * `.tab.tabActiva` y no `.tabActiva` a secas (hallazgo 2224): `.tab:hover` pesa 0,2,0 y pisaba
+ * el blanco de la activa (0,1,0) con el color de su propio fondo, 1:1. En móvil el :hover se
+ * queda pegado tras el toque, así que la pestaña recién elegida quedaba en blanco. Con el
+ * :hover incluido aquí, la activa conserva su etiqueta con el puntero encima.
+ */
+.tab.tabActiva,
+.tab.tabActiva:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #FFFFFF;
 }
 
@@ -230,10 +242,10 @@
 .ejemploBtn {
   padding: 0.35rem 0.8rem;
   font-size: 0.88rem;
-  border: 1px dashed var(--secondary);
+  border: 1px dashed var(--secondary-texto);
   border-radius: 999px;
   background: transparent;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   cursor: pointer;
   transition: background 0.2s ease, border-style 0.2s ease;
 }
@@ -244,7 +256,7 @@
 }
 
 .ejemploBtn:focus-visible {
-  outline: 2px solid var(--secondary);
+  outline: 2px solid var(--secondary-texto);
   outline-offset: 2px;
 }
 
@@ -270,13 +282,15 @@
 }
 
 .filtroBtn:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--primary-texto);
+  color: var(--primary-texto);
 }
 
-.filtroActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+/* Misma especificidad que la pestaña activa, y por lo mismo (hallazgo 2224). */
+.filtroBtn.filtroActivo,
+.filtroBtn.filtroActivo:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #FFFFFF;
 }
 
@@ -315,14 +329,14 @@
   background: none;
   border: none;
   padding: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font: inherit;
   text-decoration: underline;
   cursor: pointer;
 }
 
 .verTodos:hover {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .verTodos:focus-visible {
@@ -397,7 +411,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   color: #FFFFFF;
-  background: var(--primary);
+  background: var(--primary-boton);
   padding: 0.2rem 0.6rem;
   border-radius: 6px;
   margin-bottom: var(--spacing-sm);
@@ -433,11 +447,11 @@
 }
 
 .seccion1 {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 .seccion2 {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .seccion3 {
@@ -556,7 +570,7 @@
 .guideSection h2 {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: var(--spacing-xl) 0 var(--spacing-md);
 }
 
@@ -680,7 +694,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* FAQ */
@@ -706,7 +720,7 @@
 .faqItem h4 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   line-height: 1.4;
 }
@@ -724,7 +738,7 @@
 }
 
 .faqTip strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* Guía paso a paso */
@@ -752,7 +766,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #FFFFFF;
   font-weight: 700;
   font-size: 1.05rem;

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 import { SECCIONES_IAE, IAE_EXENCION, CNAE_VIGENCIA, FISCAL_CNAE_IAE_META } from '@/data/fiscal/cnae-iae';
-import { formatNumber } from '@/lib/formatters';
+import { formatNumber, formatPercentage } from '@/lib/formatters';
 
 /**
  * Fecha ISO del módulo a formato español, sin pasar por `new Date`: la cadena '2026-01-01'
@@ -40,9 +40,22 @@ export const NORMA_IAE: string = (() => {
  * Es justamente el texto que citan Bing Copilot, ChatGPT y Perplexity.
  */
 const PROFESIONAL = SECCIONES_IAE.find((s) => s.tipoRetencion !== null);
-const RETENCION = PROFESIONAL?.tipoRetencion ?? 15;
-const RETENCION_INICIO = PROFESIONAL?.tipoRetencionInicio ?? 7;
+// Con espacio duro entre la cifra y el signo (hallazgo 2227): `formatPercentage` recibe la
+// fracción, así que el tipo del módulo, que va en %, se divide entre 100.
+const RETENCION = formatPercentage((PROFESIONAL?.tipoRetencion ?? 15) / 100, 0);
+const RETENCION_INICIO = formatPercentage((PROFESIONAL?.tipoRetencionInicio ?? 7) / 100, 0);
 const UMBRAL_EXENCION = formatNumber(IAE_EXENCION.umbralCifraNegocio, 0);
+
+/**
+ * El artículo de la exención, DERIVADO de `IAE_EXENCION.normativa` (hallazgo 2228): la misma
+ * frase del FAQPage ya derivaba el umbral y seguía tecleando la norma. Se le quita la coletilla
+ * final entre paréntesis (el nombre largo del texto refundido) y la mayúscula inicial, porque
+ * va en mitad de una frase.
+ */
+const ARTICULO_EXENCION: string = (() => {
+  const norma = IAE_EXENCION.normativa.replace(/\s*\([^)]*\)\s*$/, '').trim();
+  return norma.charAt(0).toLowerCase() + norma.slice(1);
+})();
 
 // App estructuralmente española (CNAE-2025 del INE y Tarifas del IAE de la AEAT):
 // no procede lenguaje dual ES/Latam. Ver <RegionBadge variant="es-only" />.
@@ -141,7 +154,7 @@ export const faqJsonLd = {
       name: '¿Qué significa que un epígrafe del IAE sea de la Sección 1ª o de la Sección 2ª?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `La Sección 1ª agrupa las actividades empresariales (organizadas con local, medios materiales o personal) y la Sección 2ª el ejercicio individual de una profesión. La consecuencia práctica está en la factura: las facturas de un profesional de la Sección 2ª a empresas y a otros profesionales llevan retención de IRPF (${RETENCION} % con carácter general y ${RETENCION_INICIO} % el año de inicio de la actividad y los dos siguientes), mientras que las de una actividad empresarial de la Sección 1ª, con carácter general, no la llevan. La Sección 3ª recoge las actividades artísticas, con tratamiento análogo al profesional.`,
+        text: `La Sección 1ª agrupa las actividades empresariales (organizadas con local, medios materiales o personal) y la Sección 2ª el ejercicio individual de una profesión. La consecuencia práctica está en la factura: las facturas de un profesional de la Sección 2ª a empresas y a otros profesionales llevan retención de IRPF (${RETENCION} con carácter general y ${RETENCION_INICIO} el año de inicio de la actividad y los dos siguientes), mientras que las de una actividad empresarial de la Sección 1ª, con carácter general, no la llevan. La Sección 3ª recoge las actividades artísticas, con tratamiento análogo al profesional.`,
       },
     },
     {
@@ -149,7 +162,7 @@ export const faqJsonLd = {
       name: '¿Se paga el IAE siendo autónomo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Con carácter general, no: están exentas del pago las personas físicas y quienes tengan un importe neto de la cifra de negocios inferior a ${UMBRAL_EXENCION} € (art. 82.1.c RDL 2/2004), lo que deja fuera del pago a la mayoría de autónomos y pequeñas empresas. Declarar el epígrafe es otra cosa distinta: el alta censal en el epígrafe es obligatoria aunque exista exención, porque es la forma en que la AEAT registra qué actividad se ejerce.`,
+        text: `Con carácter general, no: están exentas del pago las personas físicas y quienes tengan un importe neto de la cifra de negocios inferior a ${UMBRAL_EXENCION} €, según el ${ARTICULO_EXENCION}. Eso deja fuera del pago a la mayoría de autónomos y pequeñas empresas. Declarar el epígrafe es otra cosa distinta: el alta censal en el epígrafe es obligatoria aunque exista exención, porque es la forma en que la AEAT registra qué actividad se ejerce.`,
       },
     },
     {

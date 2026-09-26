@@ -124,7 +124,9 @@ export const SECCIONES_IAE: readonly SeccionIae[] = [
     quienes:
       'Ejercicio individual de una profesión: abogacía, arquitectura, ingeniería, medicina, traducción, consultoría, diseño y demás profesiones ejercidas por cuenta propia.',
     retencion:
-      'Las facturas a empresas y a otros profesionales llevan retención de IRPF: 15 % con carácter general y 7 % durante el año de inicio de la actividad y los dos siguientes.',
+      // «15\u00A0%»: espacio duro entre la cifra y el signo, para que el % no abra línea él
+      // solo (hallazgo 2227 del conversor CNAE-IAE; CLAUDE.md §2, desde el 25/09/2026).
+      'Las facturas a empresas y a otros profesionales llevan retención de IRPF: 15\u00A0% con carácter general y 7\u00A0% durante el año de inicio de la actividad y los dos siguientes.',
     retencionIrpf: true,
     tipoRetencion: 15,
     tipoRetencionInicio: 7,

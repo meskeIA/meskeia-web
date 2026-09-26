@@ -756,8 +756,10 @@ test('CANDADO — los porcentajes de retención de la FAQ siguen a SECCIONES_IAE
     .locator('div[class*="faqItem"]')
     .filter({ hasText: '¿Qué cambia según la sección del IAE' })
     .first();
-  await expect(respuestaFaq).toContainText(`${SECCION_2.tipoRetencion} %`);
-  await expect(respuestaFaq).toContainText(`${SECCION_2.tipoRetencionInicio} %`);
+  // Con espacio duro desde el hallazgo 2227 (26/09/2026). `toContainText` normaliza los
+  // espacios, así que aquí no distingue el duro del normal: eso lo mide el caso del 2227.
+  await expect(respuestaFaq).toContainText(`${SECCION_2.tipoRetencion}\u00A0%`);
+  await expect(respuestaFaq).toContainText(`${SECCION_2.tipoRetencionInicio}\u00A0%`);
 
   // Y el mismo par de cifras, en el texto que la página SÍ toma de data/fiscal
   // (las tarjetas de sección del panel del IAE renderizan SECCIONES_IAE[].retencion).
@@ -1304,8 +1306,11 @@ test.describe('Regresión — hallazgos del 02/09/2026, reparados', () => {
     const todo = textos.join(' · ');
 
     // Los valores publicados son EXACTAMENTE los del módulo, no una copia que pueda divergir.
-    expect(todo).toContain(`${SECCION_2.tipoRetencion} %`);
-    expect(todo).toContain(`${SECCION_2.tipoRetencionInicio} %`);
+    // Con espacio duro (U+00A0) desde el hallazgo 2227 del 26/09/2026: hasta entonces este
+    // caso consagraba el espacio normal, que deja el % solo al principio de la línea.
+    expect(todo).toContain(`${SECCION_2.tipoRetencion}\u00A0%`);
+    expect(todo).toContain(`${SECCION_2.tipoRetencionInicio}\u00A0%`);
+    expect(todo).not.toContain(`${SECCION_2.tipoRetencion} %`);
     // Y el umbral se publica con su cifra, en formato español, no como «un millón de euros».
     expect(todo).toContain('1.000.000 €');
     expect(todo).not.toContain('un millón de euros');
@@ -2874,9 +2879,9 @@ test.describe('Buscador CNAE-IAE — re-inspección del 26/09/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS del 26/09/2026 — escritos con `test.fail()` afirmando lo que DEBERÍA
-// ocurrir. El día que se reparen pasarán a ROJO («expected to fail, but passed»): entonces
-// se les quita la marca y se quedan como regresión, SIN tocar el valor esperado.
+// HALLAZGOS del 26/09/2026 (2221-2228) — se escribieron con `test.fail()` afirmando lo que
+// DEBERÍA ocurrir y se REPARARON el mismo día: se les quitó la marca sin tocar el valor
+// esperado, y quedan como regresión. Los añadidos de la reparación van marcados como tales.
 // ═══════════════════════════════════════════════════════════════════════════
 
 /** Espera a que el catálogo esté cargado y a que los efectos del montaje hayan corrido. */
@@ -2910,11 +2915,10 @@ async function contraste(page: Page, selector: string): Promise<number> {
   });
 }
 
-test.describe('Buscador CNAE-IAE — hallazgos abiertos del 26/09/2026', () => {
+test.describe('Buscador CNAE-IAE — hallazgos del 26/09/2026, reparados', () => {
   test('MEDIO — el femenino de una profesión de la Sección 2ª encuentra su grupo del IAE, como el masculino', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // La reparación del 1188 (22/09) derivó el otro género en el índice de la CNAE, y el
@@ -2941,12 +2945,54 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 26/09/2026', () => {
     // «Médicos…» de la Sección 2ª que sí da «médico».
     await buscarIaeVerificado(page, 'médica');
     await expect(fichas(page).filter({ hasText: 'Médicos de Medicina General' })).toHaveCount(1);
+
+    // Añadido en la reparación: el femenino puntúa como el masculino, así que «médica» pone
+    // delante los dos grupos de la Sección 2ª igual que «médico» (hallazgo 66 bis), y SIN perder
+    // lo que ya encontraba por sí mismo (el comercio de productos farmacéuticos de la 1ª).
+    await expect(fichas(page).nth(0)).toContainText('Médicos de Medicina General');
+    await expect(fichas(page).nth(1)).toContainText('Médicos Especialistas');
+    await expect(fichas(page).filter({ hasText: 'Sección 1ª' }).first()).toBeVisible();
+
+    // Más profesiones del acta, cada una contra su grupo de las Tarifas (literal del catálogo
+    // sellado): ingeniera, arquitecta, psicóloga (776), notaria (733), podóloga (838),
+    // maestra y profesora (grupos de la 3ª y de la 2ª), bailarina y actriz (irregulares).
+    await buscarIaeVerificado(page, 'notaria');
+    await expect(fichas(page).first()).toContainText('733');
+    await expect(fichas(page).first()).toContainText('Notarios');
+    await buscarIaeVerificado(page, 'psicóloga');
+    await expect(fichas(page).filter({ hasText: 'Psicólogos' }).first()).toBeVisible();
+    await buscarIaeVerificado(page, 'podóloga');
+    await expect(fichas(page).filter({ hasText: 'Podólogos' }).first()).toBeVisible();
+    for (const [femenino, masculino] of [
+      ['ingeniera', 'ingeniero'],
+      ['arquitecta', 'arquitecto'],
+      ['maestra', 'maestro'],
+      ['profesora', 'profesor'],
+      ['bailarina', 'bailarín'],
+      ['actriz', 'actor'],
+    ] as const) {
+      await buscarIaeVerificado(page, masculino);
+      const conMasculino = await contador(page).innerText();
+      await buscarIaeVerificado(page, femenino);
+      const conFemenino = await contador(page).innerText();
+      // El femenino devuelve AL MENOS lo del masculino: puede sumar lo que ya encontraba por
+      // sí mismo («profesora» está dentro de «profesorado»), nunca quedarse por debajo.
+      const n = (t: string) => Number(t.split(' ')[0].replace(/\./g, ''));
+      expect.soft(n(conMasculino), `${masculino}`).toBeGreaterThan(0);
+      expect.soft(n(conFemenino), `${femenino} frente a ${masculino}`).toBeGreaterThanOrEqual(
+        n(conMasculino),
+      );
+    }
+
+    // Y la regla no alcanza a lo que no es persona: «puerta» no se lee como «puerto», que está
+    // en «Ingenieros de caminos, canales y puertos» (es el defecto del 2226, al otro lado).
+    await buscarIaeVerificado(page, 'puerta');
+    await expect(fichas(page).filter({ hasText: 'canales y puertos' })).toHaveCount(0);
   });
 
   test('BAJO — la derivación del género no inventa palabras de otra actividad: «plato» encabeza con 10.85, no con joyería', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // Efecto lateral de la reparación del 1188. `otroGenero()` se aplica a TODOS los
@@ -2959,12 +3005,20 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 26/09/2026', () => {
     await buscarCnaeVerificado(page, 'plato');
     await expect(fichas(page).first()).toContainText('10.85');
     await expect(fichas(page).first()).toContainText('Elaboración de platos y comidas preparados');
+
+    // Añadido en la reparación: la derivación se limita a los oficios, pero los oficios la
+    // conservan (el 1188 no se deshace) y las actividades dejan de inventar otra palabra.
+    await buscarCnaeVerificado(page, 'letrada');
+    await expect(fichas(page).first()).toContainText('69.10');
+    await buscarCnaeVerificado(page, 'fontanera');
+    await expect(fichas(page).first()).toContainText('Fontanería');
+    await buscarCnaeVerificado(page, 'calzada');
+    await expect(fichas(page).filter({ hasText: 'calzado' })).toHaveCount(0);
   });
 
   test('MEDIO — al cargar, la página no salta por encima del aviso legal, del disclaimer crítico y del aviso de que no hay tabla CNAE ⇄ IAE', async ({
     page,
   }) => {
-    test.fail();
 
     // El efecto que da el foco al buscador «una vez cargado el catálogo» (page.tsx, desde la
     // creación de la app el 20/07) llama a `focus()` sin `preventScroll`, y el buscador está
@@ -2985,12 +3039,16 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 26/09/2026', () => {
     }
     expect(medida).toEqual({ escritorio: 0, movil: 0 });
     await expect(page.locator('h1')).toBeInViewport();
+
+    // Añadido en la reparación: nadie ha pedido el foco, así que no está en ningún buscador
+    // (el lector de pantalla empieza por el principio del documento, no por el campo).
+    const conFoco = await page.evaluate(() => document.activeElement?.id ?? '');
+    expect(conFoco).not.toMatch(/^buscador-/);
   });
 
   test('BAJO — con el foco en una pestaña, las flechas mueven el foco a la otra pestaña y no al buscador', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
     await catalogoListo(page);
 
@@ -3005,12 +3063,21 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 26/09/2026', () => {
     await expect(page.locator('#tab-iae')).toBeFocused({ timeout: 2000 });
     await page.keyboard.press('ArrowLeft');
     await expect(page.locator('#tab-cnae')).toHaveAttribute('aria-selected', 'true');
+
+    // Añadido en la reparación: el foco acompaña a la selección en cada pulsación, y Fin e
+    // Inicio también funcionan después de una flecha.
+    await expect(page.locator('#tab-cnae')).toBeFocused();
+    await page.keyboard.press('End');
+    await expect(page.locator('#tab-iae')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('#tab-iae')).toBeFocused();
+    await page.keyboard.press('Home');
+    await expect(page.locator('#tab-cnae')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('#tab-cnae')).toBeFocused();
   });
 
   test('MEDIO — el código de cada ficha, la insignia de la Sección 2ª y los ejemplos alcanzan 4,5:1', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
     await catalogoListo(page);
     await page.mouse.move(1, 1);
@@ -3033,12 +3100,36 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 26/09/2026', () => {
     };
     const bajoUmbral = Object.entries(medidas).filter(([, r]) => r < 4.5);
     expect(bajoUmbral).toEqual([]);
+
+    // Añadido en la reparación: el resto de piezas que el acta midió por debajo de 4,5:1, en
+    // los DOS temas (el h4 de la FAQ daba 3,50:1 en oscuro).
+    for (const tema of ['light', 'dark'] as const) {
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
+      // Con muchos resultados, para que exista «Ver los N». La guía educativa no hace falta
+      // desplegarla: el color computado se lee igual con el bloque plegado.
+      await buscarIaeVerificado(page, 'comercio');
+      await page.mouse.move(1, 1);
+      await page.waitForTimeout(400);
+      const resto = {
+        insigniaSeccion1Tarjeta: await contraste(page, '#panel-iae [class*="seccion1"]'),
+        insigniaSeccion2Tarjeta: await contraste(page, '#panel-iae [class*="seccion2"]'),
+        pestanaActiva: await contraste(page, '#tab-iae'),
+        filtroActivo: await contraste(page, '#panel-iae [role="group"] button[aria-pressed="true"]'),
+        verTodos: await contraste(page, '#panel-iae [class*="verTodos"]'),
+        h4Faq: await contraste(page, 'div[class*="faqItem"] h4'),
+        aTenerEnCuenta: await contraste(page, '[class*="escenarioTip"] strong'),
+        datoUtil: await contraste(page, '[class*="faqTip"] strong'),
+        ejemploEnTema: await contraste(page, '#panel-iae [class*="ejemploBtn"]'),
+        codigoEnTema: await contraste(page, '#panel-iae li[class*="ficha"] [class*="codigoCnae"]'),
+      };
+      const bajo = Object.entries(resto).filter(([, r]) => r < 4.5);
+      expect.soft(bajo, `tema ${tema}`).toEqual([]);
+    }
   });
 
   test('BAJO — la pestaña activa y el filtro activo no pierden la etiqueta con el puntero encima (ni tras un toque en móvil)', async ({
     page,
   }) => {
-    test.fail();
     await abrirHidratado(page);
     await catalogoListo(page);
 
@@ -3077,7 +3168,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 26/09/2026', () => {
   });
 
   test('BAJO — el % de la retención va con espacio duro y no salta solo de línea', async ({ page }) => {
-    test.fail();
     await page.setViewportSize({ width: 360, height: 740 });
     await abrirHidratado(page);
 
@@ -3097,7 +3187,6 @@ test.describe('Buscador CNAE-IAE — hallazgos abiertos del 26/09/2026', () => {
   });
 
   test('BAJO — la fecha de entrada en vigor de la CNAE-2025 y el artículo de la exención salen de data/fiscal', async () => {
-    test.fail();
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const pagina = readFileSync(join(process.cwd(), 'app', 'conversor-cnae-iae', 'page.tsx'), 'utf8');
