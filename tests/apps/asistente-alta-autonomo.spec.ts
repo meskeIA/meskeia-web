@@ -42,6 +42,9 @@ import { AUTONOMO_SOCIETARIO_2025 } from '../../data/fiscal/sociedades';
  * Es decir: todas las fronteras cierran por arriba (≤) MENOS la de 1.166,70, que pertenece al
  * tramo SIGUIENTE (el primero de la tabla general, tramo 4 de TRAMOS_RETA_2025).
  * Los casos con `test.fail()` vigilan hallazgos abiertos del acta del 25/09/2026.
+ *
+ * REPARACIÓN 26/09/2026 (hallazgos 2137-2144): los casos «HALLAZGO» de abajo ya no llevan
+ * `test.fail()`; cada uno dice en su comentario qué afirma ahora y de qué fuente sale.
  */
 
 const RUTA = '/asistente-alta-autonomo/';
@@ -101,7 +104,8 @@ test('CASO 1 · normal: primera alta con base mínima, y base personalizada «1.
   //   cuota anual con tarifa plana = 80 × 12 = 960,00 €
   //   total anual = 960 + 50×12 + 150 = 1710,00 € ... 960 + 150×12 + 500 = 3260,00 €
   await expect(filaCuota(page, 'Base de cotización elegida').first()).toHaveText(/653,59\s€/);
-  expect(await texto(filaCuota(page, 'Tipo de cotización'))).toBe('31,50%');
+  // «31,50 %» con espacio duro (texto() lo normaliza a espacio; el U+00A0 lo mide el caso del 2142)
+  expect(await texto(filaCuota(page, 'Tipo de cotización'))).toBe('31,50 %');
   expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('205,88 €');
   expect(await texto(filaCuota(page, 'Con tarifa plana'))).toBe('80,00 €/mes');
   expect(await texto(ahorro(page))).toBe('1510,57 €');
@@ -397,8 +401,11 @@ async function contraste(page: Page, selector: string): Promise<number> {
 
 test('REGRESIÓN 1376 · type="button", pestañas con aria-pressed, fases con aria-expanded y emojis ocultos', async ({ page }) => {
   // Antes: type=null en pestañas, fases, «Reiniciar todo» y epígrafes; el ✕ sin aria-label.
+  // Solo los botones del documento: bajo `next dev` Next inyecta su indicador (un <button> sin
+  // type en el shadow root `nextjs-portal`) y el localizador de Playwright atraviesa el shadow DOM.
   const sinType = await page.locator('button').evaluateAll(bs =>
-    bs.filter(b => b.getAttribute('type') !== 'button').map(b => (b.textContent ?? '').trim().slice(0, 30)));
+    bs.filter(b => b.getRootNode() === document && b.getAttribute('type') !== 'button')
+      .map(b => (b.textContent ?? '').trim().slice(0, 30)));
   expect(sinType).toEqual([]);
 
   const pestana = (n: RegExp) => page.getByRole('button', { name: n });
@@ -489,17 +496,36 @@ test('25/09 · fronteras que cierran por arriba (≤ 670, ≤ 900, ≤ 6.000) y 
   }
 });
 
-test('25/09 · HALLAZGO · 1.166,70 €/mes es el primer tramo de la tabla GENERAL, no el último de la reducida', async ({ page }) => {
-  test.fail(); // Hallazgo del acta 25/09/2026: tramoPorRendimientos usa «≤ rendimientoMax» también en 1.166,70
+test('25/09 · HALLAZGO 2137 · 1.166,70 €/mes es el primer tramo de la tabla GENERAL, y las etiquetas lo dicen', async ({ page }) => {
+  // Reparado: el cálculo, en c7af89ec (tramoRETA de data/fiscal); las etiquetas y el FAQPage, el 26/09.
   // Orden PJC/297/2026, art. 18: tramo 3 «> 900 y < 1.166,70»; tabla general, tramo 1
   // «≥ 1.166,70 y ≤ 1.300» (tramo 4 de TRAMOS_RETA_2025, base 950,98 a 1.300,00).
   //   base mínima: 950,98 × 31,50 % = 299,5587 → 299,56 €
-  // Hoy la app da el tramo 3: base 849,67 y cuota 267,65 €.
+  // La etiqueta de cada tramo lleva la frontera de la norma: «hasta 670» (≤), «más de 900 y
+  // menos de 1.166,70» (> y <), «desde 1.166,70 y hasta 1.300» (≥ y ≤), «más de 6.000».
   await abrirCostes(page);
+  const horquilla = page.locator('[class*="basesInfo"]').filter({ has: etiquetaTramo(page) });
   await escribirRendimientos(page, '1.166,70');
   await expect(etiquetaTramo(page)).toHaveText('Tramo 4');
   expect(await texto(filaCuota(page, 'Base de cotización elegida'))).toBe('950,98 €');
   expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('299,56 €');
+  expect(await texto(horquilla)).toContain('(rendimientos desde 1166,70 € y hasta 1300,00 €/mes)');
+
+  const etiquetas: [string, string][] = [
+    ['500', '(rendimientos de hasta 670,00 €/mes)'],
+    ['1.000', '(rendimientos de más de 900,00 € y menos de 1166,70 €/mes)'],
+    ['1.400', '(rendimientos de más de 1300,00 € y hasta 1500,00 €/mes)'],
+    ['7.000', '(rendimientos de más de 6000,00 €/mes)'], // es-ES no agrupa cuatro cifras
+  ];
+  for (const [rend, esperado] of etiquetas) {
+    await escribirRendimientos(page, rend);
+    await expect(horquilla, rend).toContainText(esperado);
+  }
+
+  // FAQPage: «≤ 670» es «de hasta 670 €», no «inferiores a 670 €»
+  const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+  expect(jsonLd).not.toContain('inferiores a 670');
+  expect(jsonLd).toContain('rendimientos netos de hasta 670 €/mes');
 });
 
 test('25/09 · rendimientos que no son un importe válido: negativo, vacío y texto', async ({ page }) => {
@@ -536,21 +562,36 @@ test('25/09 · IAE: la exención de las personas físicas, también en el FAQ vi
   expect(limpiar((await paso3.textContent()) ?? '')).toContain('exento de pago sea cual sea tu facturación');
 });
 
-test('25/09 · HALLAZGO · «Primera alta» no recoge los 3 años de quien ya disfrutó la tarifa plana', async ({ page }) => {
-  test.fail(); // Hallazgo del acta 25/09/2026
-  // Art. 38 ter.4 Ley 20/2007: el periodo sin alta exigido «será de tres años cuando los
-  // trabajadores autónomos hubieran disfrutado de dichas reducciones en su anterior período de
-  // alta». La opción «Primera alta — hace más de 2 años» concede la tarifa plana sin preguntarlo
-  // (la casilla de pluriactividad sí lo dice). Esperado: que la sección lo pregunte o lo advierta.
+test('25/09 · HALLAZGO 2138 · el alta general pregunta el plazo sin alta (3 años si ya tuvo tarifa plana)', async ({ page }) => {
+  // Art. 38 ter.4 Ley 20/2007 (cotejado en el BOE el 26/09/2026): el periodo sin alta exigido
+  // «será de tres años cuando los trabajadores autónomos hubieran disfrutado de dichas
+  // reducciones en su anterior período de alta». Reparado preguntándolo también en el alta
+  // general, con la misma casilla que ya tenía la pluriactividad (marcada por defecto: el caso
+  // más común es la primera alta). Quien la desmarca (baja hace 2,5 años tras disfrutar la
+  // tarifa plana) no tiene tarifa plana:
+  //   cuota anual = 653,59 × 31,50 % × 12 = 2.470,5702 → 2470,57 €
   await page.getByRole('button', { name: /Mis Datos/ }).click();
   // div: el <h3> de la sección también lleva «datosSeccion» en su clase (datosSeccionTitulo)
   const seccion = page.locator('div[class*="datosSeccion"]').filter({ hasText: 'Situación Laboral' });
+  await expect(page.locator('input[name="situacionLaboral"][value="nueva_alta"]')).toBeChecked();
+  const plazo = page.getByRole('checkbox', { name: /Es mi primera alta como autónomo/ });
+  await expect(plazo).toBeChecked();
+  await expect(seccion).toContainText('en los 3 últimos si ya disfruté la tarifa plana');
   await expect(page.getByText('¡Puedes solicitar la tarifa plana!')).toBeVisible();
-  await expect(seccion).toContainText(/3 años|tres años|3 si ya|3 si la/);
+
+  await plazo.uncheck();
+  await expect(page.getByText('¡Puedes solicitar la tarifa plana!')).toHaveCount(0);
+  await abrirCostes(page);
+  await expect(filaCuota(page, 'Con tarifa plana')).toHaveCount(0);
+  expect(await texto(filaCoste(page, 'Cuota autónomo (anual)'))).toBe('2470,57 €');
+
+  // El FAQPage ya no dice solo «tras 2 años sin estarlo»
+  const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+  expect(jsonLd).toContain('3 si ya disfrutaron la tarifa plana en su alta anterior');
 });
 
-test('25/09 · HALLAZGO · el FAQ de pluriactividad sigue prometiendo bonificaciones y devolución por tope de bases', async ({ page }) => {
-  test.fail(); // Hallazgo del acta 25/09/2026 (reparación incompleta de 4962fef7)
+test('25/09 · HALLAZGO 2139 · el FAQ y la tabla de pluriactividad dicen lo del art. 313 LGSS', async ({ page }) => {
+  // Reparado el 26/09/2026; art. 313 LGSS cotejado en el BOE ese día.
   // Art. 313 LGSS (redacción del RDL 13/2022): reintegro del 50 % del exceso de las cotizaciones
   // por contingencias comunes sobre la cuantía que fije la LPGE, con tope del 50 % de las cuotas
   // del RETA. No hay bonificación de la cuota ni devolución por «suma de bases sobre el tope».
@@ -558,10 +599,16 @@ test('25/09 · HALLAZGO · el FAQ de pluriactividad sigue prometiendo bonificaci
   const t = limpiar((await faq.textContent()) ?? '');
   expect(t).not.toContain('puedes tener bonificaciones en la cuota de autónomo');
   expect(t).not.toContain('Si la suma de bases supera el tope máximo');
+  expect(t).toContain('te reintegra el 50 % del exceso');
+  expect(t).toContain('con el tope del 50 % de lo que hayas ingresado en el RETA');
+  const fila = page.locator('table tr').filter({ hasText: 'Cotización SS' });
+  const f = limpiar((await fila.textContent()) ?? '');
+  expect(f).not.toContain('devolución exceso si supera tope');
+  expect(f).toContain('reintegro del 50 % del exceso');
 });
 
-test('25/09 · HALLAZGO · Verifactu no es obligatorio «desde 2025»', async ({ page }) => {
-  test.fail(); // Hallazgo del acta 25/09/2026
+test('25/09 · HALLAZGO 2140 · Verifactu no es obligatorio «desde 2025»', async ({ page }) => {
+  // Reparado el 26/09/2026; DF 4.ª del RD 1007/2023 y art. 13 del Reglamento cotejados en el BOE.
   // RD 1007/2023, disposición final 4.ª (redacción del RDL 15/2025): contribuyentes del IS antes
   // del 1 de enero de 2027; el resto de obligados (autónomos) antes del 1 de julio de 2027.
   const fases = page.locator('button[class*="faseHeader"]');
@@ -570,26 +617,73 @@ test('25/09 · HALLAZGO · Verifactu no es obligatorio «desde 2025»', async ({
   await expect(item).toBeVisible();
   const t = await texto(item);
   expect(t).not.toContain('Desde 2025 será obligatorio');
-  expect(t).toContain('2027');
+  expect(t).not.toContain('software homologado (Verifactu)');
+  expect(t).toContain('antes del 1 de julio de 2027');
+  expect(t).toContain('antes del 1 de enero de 2027');
 });
 
-test('25/09 · HALLAZGO · contraste del texto en color de marca, tema claro', async ({ page }) => {
-  test.fail(); // Hallazgo del acta 25/09/2026
-  // Texto normal (15,2 px): WCAG 1.4.3 exige 4,5:1. Medido hoy: «Ahorro primer año» 2,68:1 y
-  // «¡Puedes solicitar la tarifa plana!» 2,55:1 (--secondary sobre fondo claro), «0 €» de la
-  // columna Autónomo 2,87:1 (#27ae60).
-  await page.evaluate(() => { document.documentElement.dataset.theme = 'light'; });
-  await abrirCostes(page);
-  await expect.poll(() => contraste(page, '[class*="cuotaAhorro"] strong')).toBeGreaterThanOrEqual(4.5);
-  await expect.poll(() => contraste(page, 'td[class*="ventaja"]')).toBeGreaterThanOrEqual(4.5);
-  await page.getByRole('button', { name: /Mis Datos/ }).click();
-  await expect.poll(() => contraste(page, '[class*="infoTarifaPlana"]')).toBeGreaterThanOrEqual(4.5);
+test('26/09 · el checklist guardado conserva lo hecho, pero el texto de cada paso es el vigente', async ({ page }) => {
+  // Antes se restauraba el checklist ENTERO desde localStorage: quien ya había usado la app
+  // seguía leyendo la descripción vieja de Verifactu («Desde 2025…») después de corregirla.
+  // Se siembra con addInitScript (antes de que corra la app en la recarga): sembrarlo con
+  // evaluate() justo tras hidratar compite con el primer guardado de la app, que lo pisa.
+  await page.addInitScript(() => {
+    localStorage.setItem('meskeia-alta-autonomo', JSON.stringify({
+      checklist: [
+        { id: 'software-facturacion', fase: 5, texto: 'Elegir software de facturación',
+          descripcion: 'Obligatorio emitir facturas. Desde 2025 será obligatorio usar software homologado (Verifactu).',
+          completado: true, obligatorio: true },
+      ],
+    }));
+  });
+  await page.reload();
+  await esperarHidratacion(page, ['input[type="checkbox"]']);
+  await page.locator('button[class*="faseHeader"]').filter({ hasText: 'Operatividad' }).click();
+  const item = page.locator('[class*="checklistItem"]').filter({ hasText: 'Elegir software de facturación' });
+  await expect(item.getByRole('checkbox')).toBeChecked();
+  await expect(item).not.toContainText('Desde 2025');
+  await expect(item).toContainText('antes del 1 de julio de 2027');
+  // y los pasos que no estaban en lo guardado siguen ahí, sin marcar
+  await expect(page.locator('[class*="checklistItem"]').filter({ hasText: 'Organizar sistema de contabilidad' }).getByRole('checkbox')).not.toBeChecked();
 });
 
-test('25/09 · HALLAZGO · el % va separado por espacio duro (U+00A0)', async ({ page }) => {
-  test.fail(); // Hallazgo del acta 25/09/2026 (regla del 25/09/2026 del formato español)
-  // «31,50 %» con U+00A0: hoy la fila dice «31,50%», el progreso «0%» y el IS «25 % general»
-  // con espacio normal.
+for (const tema of ['light', 'dark'] as const) {
+  test(`25/09 · HALLAZGO 2141 · contraste del texto en color de marca, tema ${tema}`, async ({ page }) => {
+    // Texto normal: WCAG 1.4.3 exige 4,5:1. Medido el 25/09 en claro: «Ahorro primer año» 2,68:1,
+    // «¡Puedes solicitar la tarifa plana!» 2,55:1 (--secondary), «0 €» de la columna Autónomo
+    // 2,87:1 (#27ae60), total anual 3,43:1 (--primary)…; en oscuro, total anual 3,90:1, la
+    // desventaja 3,60:1, la pestaña activa 4,20:1 y el h3 de los errores 4,42:1. Reparado con
+    // --primary-texto / --secondary-texto y verde y rojo propios de la app con variante oscura.
+    await page.evaluate((t) => { document.documentElement.dataset.theme = t; }, tema);
+    const medir = async (sel: string) =>
+      expect.poll(() => contraste(page, sel), { message: `${tema} · ${sel}` }).toBeGreaterThanOrEqual(4.5);
+    await medir('[class*="pestanaActiva"]');
+    await medir('a[class*="enlaceUtil"]');
+    await medir('[class*="disclaimer"] a');
+    await abrirCostes(page);
+    await medir('[class*="cuotaAhorro"]');
+    await medir('[class*="cuotaAhorro"] strong');
+    await medir('[class*="cuotaTarifaPlana"] strong');
+    await medir('[class*="costeTotalFinal"] [class*="costeValor"]');
+    await medir('td[class*="ventaja"]');
+    await medir('td[class*="desventaja"]');
+    await page.getByRole('button', { name: /Mis Datos/ }).click();
+    await medir('[class*="infoTarifaPlana"]');
+    await page.locator('input[name="situacionLaboral"][value="pluriactividad"]').check();
+    await medir('[class*="infoPluriactividad"]');
+    await page.getByRole('button', { name: 'Ver epígrafes IAE frecuentes' }).click();
+    await medir('[class*="epigrafeCodigo"]');
+    // La guía nace colapsada: se abre para medir los títulos de los escenarios y los errores
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await medir('[class*="escenarioHeader"] h4');
+    await medir('[class*="escenarioTip"]');
+    await medir('[class*="warningHeader"] h3');
+  });
+}
+
+test('25/09 · HALLAZGO 2142 · el % va separado por espacio duro (U+00A0)', async ({ page }) => {
+  // Regla del 25/09/2026 del formato español. Reparado el 26/09 con formatPercentage y &nbsp;.
+  // Antes: la fila decía «31,50%», el progreso «0%» y el IS «25 % general» con espacio normal.
   const NBSP = String.fromCharCode(160);
   expect(await page.locator('[class*="progresoValor"]').innerText()).toBe(`0${NBSP}%`);
   await abrirCostes(page);
@@ -597,19 +691,27 @@ test('25/09 · HALLAZGO · el % va separado por espacio duro (U+00A0)', async ({
   expect(await page.locator('table tr').filter({ hasText: 'Fiscalidad' }).innerText()).toContain(`25${NBSP}% general`);
 });
 
-test('25/09 · HALLAZGO · la escala del IRPF de la comparativa no sale de data/fiscal', async () => {
-  test.fail(); // Hallazgo del acta 25/09/2026 (dato)
+test('25/09 · HALLAZGO 2143 · la escala del IRPF de la comparativa sale de data/fiscal', async ({ page }) => {
+  // Reparado el 26/09/2026: IRPF_TIPO_MIN / IRPF_TIPO_MAX salen de TRAMOS_IRPF_2025.
   // TRAMOS_IRPF_2025 (data/fiscal/irpf.ts) empieza en 19 y acaba en 47; la tabla lo escribe a
   // mano como «19-47%». Hoy coincide, pero no seguiría un cambio de la escala.
   const fuente = readFileSync(join(process.cwd(), 'app', 'asistente-alta-autonomo', 'page.tsx'), 'utf8');
   expect(fuente).not.toMatch(/19-47\s?%/);
+  expect(fuente).toContain('TRAMOS_IRPF_2025[0].tipo');
+  await abrirCostes(page);
+  const fila = limpiar((await page.locator('table tr').filter({ hasText: 'Fiscalidad' }).textContent()) ?? '');
+  expect(fila).toContain('del 19 % al 47 %');
 });
 
-test('25/09 · HALLAZGO · el autónomo societario: «al menos la cuarta parte», no «más del 25 %»', async ({ page }) => {
-  test.fail(); // Hallazgo del acta 25/09/2026
+test('25/09 · HALLAZGO 2144 · el autónomo societario: «al menos la cuarta parte», no «más del 25 %»', async ({ page }) => {
+  // Reparado el 26/09/2026 (art. 305.2.b LGSS cotejado en el BOE ese día).
   // Art. 305.2.b LGSS: control efectivo presunto con participación «igual o superior a la cuarta
   // parte» si tiene funciones de dirección y gerencia (igual o superior a la tercera parte sin
   // ellas); data/fiscal/sociedades.ts (AUTONOMO_SOCIETARIO_2025.nota) dice «≥25%».
   const fila = page.locator('table tr').filter({ hasText: 'Cuándo aplica' });
-  expect(limpiar((await fila.textContent()) ?? '')).not.toMatch(/>\s*25\s*%/);
+  const t = limpiar((await fila.textContent()) ?? '');
+  expect(t).not.toMatch(/>\s*25\s*%/);
+  expect(t).toContain('siempre con la mitad del capital');
+  expect(t).toContain('una cuarta parte o más si ejerce funciones de dirección y gerencia');
+  expect(t).toContain('un tercio o más sin ellas');
 });

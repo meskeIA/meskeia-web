@@ -5,11 +5,11 @@ import styles from './AsistenteAltaAutonomo.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, RelatedApps, EducationalSection, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   TIPO_COTIZACION_RETA, TARIFA_PLANA_2025, BASES_RETA_2025, TRAMOS_RETA_2025, tramoRETA, FISCAL_AUTONOMOS_META,
-  TIPOS_IS_2025, TRAMOS_IS_MICROPYMES_2026, AUTONOMO_SOCIETARIO_2025, SMI_2026,
+  TIPOS_IS_2025, TRAMOS_IS_MICROPYMES_2026, AUTONOMO_SOCIETARIO_2025, SMI_2026, TRAMOS_IRPF_2025,
   CNAE_IAE_RUTA_CATALOGO, FISCAL_CNAE_IAE_META,
 } from '@/data/fiscal';
 import type { TramoCotizacion } from '@/data/fiscal';
@@ -38,10 +38,16 @@ interface DatosAutonomo {
   baseElegida: 'minima' | 'media' | 'maxima' | 'personalizada';
   basePersonalizada: string;
   /**
-   * Primera alta en el RETA (o sin alta en los dos años anteriores). Solo se pregunta en
-   * pluriactividad: el art. 38 ter LETA no excluye a quien además trabaja por cuenta ajena.
-   * Opcional porque los datos guardados antes del 24/09/2026 no lo traen.
+   * Cumple el plazo sin alta de la tarifa plana: alta inicial en el RETA, o sin alta en los dos
+   * años anteriores, TRES si disfrutó la reducción en su alta anterior (art. 38 ter, párrafo
+   * inicial y apartado 4, Ley 20/2007). Se pregunta en «Alta como autónomo» y en pluriactividad
+   * (el art. 38 ter no excluye a quien además trabaja por cuenta ajena). Hasta el 26/09/2026 solo
+   * se preguntaba en pluriactividad y la opción general concedía la tarifa plana sin más
+   * (hallazgo 2138). Opcional porque los datos guardados antes no lo traen: se cae al campo
+   * anterior, que preguntaba lo mismo.
    */
+  cumplePlazoSinAlta?: boolean;
+  /** Campo anterior al 26/09/2026 (solo pluriactividad). Solo se lee, para los datos guardados. */
   primeraAltaPluriactividad?: boolean;
   /** Rendimientos netos mensuales previstos (texto tal cual lo escribe el usuario). */
   rendimientosNetos?: string;
@@ -76,12 +82,40 @@ const BASES_COTIZACION = {
  */
 const tramoPorRendimientos = (rendimientos: number): TramoCotizacion => tramoRETA(rendimientos);
 
+/**
+ * Horquilla de rendimientos de un tramo con las fronteras de la Orden PJC/297/2026, art. 18:
+ * cada frontera la incluye el tramo que la cierra (`rendimientoMaxIncluido`), así que el límite
+ * inferior es «más de X» salvo que el tramo anterior la deje fuera («desde 1.166,70»), y el
+ * superior es «hasta Y» salvo que el propio tramo la deje fuera («menos de 1.166,70»).
+ * Hallazgo 2137: las etiquetas decían «hasta 1.166,70» en el tramo 3 y «más de» en el 4.
+ */
+const horquillaRendimientos = (t: TramoCotizacion): string => {
+  const i = TRAMOS_RETA_2025.findIndex(x => x.id === t.id);
+  const anterior = i > 0 ? TRAMOS_RETA_2025[i - 1] : null;
+  const desde = anterior === null
+    ? ''
+    : anterior.rendimientoMaxIncluido
+      ? `de más de ${formatCurrency(t.rendimientoMin)}`
+      : `desde ${formatCurrency(t.rendimientoMin)}`;
+  if (t.rendimientoMax === null) return desde;
+  const hasta = t.rendimientoMaxIncluido
+    ? `hasta ${formatCurrency(t.rendimientoMax)}`
+    : `menos de ${formatCurrency(t.rendimientoMax)}`;
+  return desde === '' ? `de ${hasta}` : `${desde} y ${hasta}`;
+};
+
 const acotar = (valor: number, min: number, max: number) => Math.min(Math.max(valor, min), max);
 
 // Formato de las cifras normativas en la prosa: «80 €», «17.094 €», «515 €»
 const euros = (valor: number) => `${formatNumber(valor, 0)} €`;
+// Porcentaje entero con el espacio duro de la regla del 25/09/2026: «19 %» (hallazgo 2142)
+const pct = (valor: number) => `${formatNumber(valor, 0)} %`;
+// Primer y último tipo marginal de la escala general del IRPF (estatal + autonómica media) de
+// data/fiscal: antes iban escritos a mano en la tabla (hallazgo 2143)
+const IRPF_TIPO_MIN = TRAMOS_IRPF_2025[0].tipo;
+const IRPF_TIPO_MAX = TRAMOS_IRPF_2025[TRAMOS_IRPF_2025.length - 1].tipo;
 
-// Tipo cotización autónomo 2026 (31,50% — RDL 16/2025)
+// Tipo cotización autónomo 2026 (31,50 % — RDL 16/2025)
 const TIPO_COTIZACION = TIPO_COTIZACION_RETA;
 
 // Tarifa plana 2026 (art. 38 ter Ley 20/2007): 12 meses, prorrogables otros 12 si los
@@ -235,7 +269,11 @@ const CHECKLIST_ITEMS: Omit<ChecklistItem, 'completado'>[] = [
     id: 'software-facturacion',
     fase: 5,
     texto: 'Elegir software de facturación',
-    descripcion: 'Obligatorio emitir facturas. Desde 2025 será obligatorio usar software homologado (Verifactu).',
+    // RD 1007/2023, disposición final 4.ª en la redacción del RDL 15/2025 (cotejada en el BOE el
+    // 26/09/2026): contribuyentes del IS antes del 1/1/2027; el resto de obligados (autónomos),
+    // antes del 1/7/2027. No hay homologación: el productor lo certifica con una declaración
+    // responsable (art. 13 del Reglamento). Hallazgo 2140.
+    descripcion: 'Por regla general tienes que emitir factura por cada operación. Si la emites con un programa informático, ese programa tendrá que cumplir el Reglamento de sistemas de facturación (Veri*factu, RD 1007/2023) antes del 1 de julio de 2027 (los contribuyentes del Impuesto sobre Sociedades, antes del 1 de enero de 2027). No existe software «homologado»: el fabricante declara que su programa cumple mediante una declaración responsable.',
     obligatorio: true,
   },
   {
@@ -359,14 +397,24 @@ export default function AsistenteAltaAutonomoPage() {
     return () => { cancelado = true; };
   }, [mostrarEpigrafes, epigrafes]);
 
+  const [cargado, setCargado] = useState(false);
+
   // Cargar datos guardados
   useEffect(() => {
     try {
       const guardado = localStorage.getItem(STORAGE_KEY);
       if (guardado) {
         const datosGuardados = JSON.parse(guardado);
-        if (datosGuardados.checklist && datosGuardados.checklist.length > 0) {
-          setChecklist(datosGuardados.checklist);
+        // Del checklist guardado solo se recupera QUÉ está hecho: el texto de cada paso sale
+        // siempre de CHECKLIST_ITEMS. Antes se restauraba entero y quien ya había usado la app
+        // seguía leyendo las descripciones viejas (p. ej. Verifactu «desde 2025», hallazgo 2140).
+        if (Array.isArray(datosGuardados.checklist) && datosGuardados.checklist.length > 0) {
+          const hechos = new Set(
+            (datosGuardados.checklist as { id?: unknown; completado?: unknown }[])
+              .filter(item => item.completado === true)
+              .map(item => item.id),
+          );
+          setChecklist(CHECKLIST_ITEMS.map(item => ({ ...item, completado: hechos.has(item.id) })));
         }
         if (datosGuardados.datos) {
           setDatos(datosGuardados.datos);
@@ -375,14 +423,20 @@ export default function AsistenteAltaAutonomoPage() {
     } catch {
       // Mantener valores por defecto
     }
+    setCargado(true);
   }, []);
 
-  // Guardar cambios
+  // Guardar cambios, solo después de haber leído lo guardado: si no, el primer guardado escribe
+  // los valores por defecto antes de que se aplique lo leído, y cualquier segunda lectura (los
+  // efectos dobles del modo estricto en desarrollo) ya encuentra esos valores por defecto
   useEffect(() => {
-    if (checklist.length > 0) {
+    if (!cargado || checklist.length === 0) return;
+    try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ checklist, datos }));
+    } catch {
+      // Sin almacenamiento (modo privado, cuota llena): la app funciona igual, sin recordar
     }
-  }, [checklist, datos]);
+  }, [cargado, checklist, datos]);
 
   // Handlers
   const toggleChecklistItem = (id: string) => {
@@ -467,6 +521,8 @@ export default function AsistenteAltaAutonomoPage() {
   const baseDeOpcion = (clave: keyof typeof BASES_COTIZACION) =>
     clave === 'minima' ? baseMin : clave === 'maxima' ? baseMax : acotar(BASES_COTIZACION.media.base, baseMin, baseMax);
 
+  const cumplePlazo = datos.cumplePlazoSinAlta ?? datos.primeraAltaPluriactividad ?? true;
+
   const calcularCuotaAutonomo = () => {
     let base: number;
     if (datos.baseElegida === 'personalizada') {
@@ -479,10 +535,10 @@ export default function AsistenteAltaAutonomoPage() {
     }
 
     const cuotaNormal = base * TIPO_COTIZACION;
-    // Art. 38 ter Ley 20/2007: la tarifa plana es para quien causa alta inicial (o sin alta en
-    // los 2 años anteriores), también en pluriactividad (hallazgo 1371)
-    const puedesTarifaPlana = datos.situacionLaboral === 'nueva_alta'
-      || (datos.situacionLaboral === 'pluriactividad' && datos.primeraAltaPluriactividad !== false);
+    // Art. 38 ter Ley 20/2007: la tarifa plana es para quien causa alta inicial o no ha estado de
+    // alta en los 2 años anteriores (3 si ya la disfrutó), también en pluriactividad (hallazgo
+    // 1371); el familiar colaborador no la tiene (apartado 11). El plazo se pregunta (hallazgo 2138).
+    const puedesTarifaPlana = datos.situacionLaboral !== 'colaborador_familiar' && cumplePlazo;
 
     return {
       base,
@@ -577,7 +633,7 @@ export default function AsistenteAltaAutonomoPage() {
       <div className={styles.progresoGlobal}>
         <div className={styles.progresoHeader}>
           <span className={styles.progresoTitulo}>Progreso general</span>
-          <span className={styles.progresoValor}>{progreso}%</span>
+          <span className={styles.progresoValor}>{formatPercentage(progreso / 100, 0)}</span>
         </div>
         <div className={styles.progresoBarraContainer}>
           <div
@@ -672,7 +728,7 @@ export default function AsistenteAltaAutonomoPage() {
                           style={{ width: `${progresoFase}%` }}
                         />
                       </div>
-                      <span className={styles.faseProgresoTexto}>{progresoFase}%</span>
+                      <span className={styles.faseProgresoTexto}>{formatPercentage(progresoFase / 100, 0)}</span>
                       <span className={styles.faseExpandir} aria-hidden="true">{expandida ? '▼' : '▶'}</span>
                     </div>
                   </button>
@@ -950,7 +1006,7 @@ export default function AsistenteAltaAutonomoPage() {
               </h3>
               <div className={styles.situacionOpciones}>
                 {[
-                  { valor: 'nueva_alta', etiqueta: 'Primera alta como autónomo', desc: 'Nunca he sido autónomo o hace más de 2 años' },
+                  { valor: 'nueva_alta', etiqueta: 'Alta como autónomo', desc: 'Solo por cuenta propia, por primera vez o tras un tiempo de baja' },
                   { valor: 'pluriactividad', etiqueta: 'Pluriactividad', desc: 'También trabajo por cuenta ajena' },
                   { valor: 'colaborador_familiar', etiqueta: 'Colaborador familiar', desc: 'Trabajo en negocio de familiar' },
                 ].map(opcion => (
@@ -970,15 +1026,21 @@ export default function AsistenteAltaAutonomoPage() {
                 ))}
               </div>
 
-              {datos.situacionLaboral === 'pluriactividad' && (
+              {datos.situacionLaboral !== 'colaborador_familiar' && (
                 <label className={styles.opcionCheck}>
                   <input
                     type="checkbox"
-                    checked={datos.primeraAltaPluriactividad !== false}
-                    onChange={e => actualizarDato('primeraAltaPluriactividad', e.target.checked)}
+                    checked={cumplePlazo}
+                    onChange={e => actualizarDato('cumplePlazoSinAlta', e.target.checked)}
                   />
-                  <span>Es mi primera alta como autónomo (o no he estado de alta en los 2 últimos años; 3 si ya disfruté la tarifa plana)</span>
+                  <span>Es mi primera alta como autónomo, o no he estado de alta en el RETA en los 2 últimos años (en los 3 últimos si ya disfruté la tarifa plana en mi alta anterior)</span>
                 </label>
+              )}
+
+              {datos.situacionLaboral !== 'colaborador_familiar' && !cumplePlazo && (
+                <div className={styles.infoPluriactividad}>
+                  <span aria-hidden="true">ℹ️</span> Si no cumples ese plazo sin alta, no tienes tarifa plana (art. 38 ter de la Ley 20/2007): la cuota se calcula con la base que elijas.
+                </div>
               )}
 
               {cuotaInfo.tarifaPlana !== null && (
@@ -990,13 +1052,13 @@ export default function AsistenteAltaAutonomoPage() {
 
               {datos.situacionLaboral === 'pluriactividad' && (
                 <div className={styles.infoPluriactividad}>
-                  <span aria-hidden="true">ℹ️</span> En pluriactividad no hay una reducción propia de la cuota (la del 50 % desapareció en 2023), pero si lo que cotizas por contingencias comunes en los dos regímenes supera el umbral que fija cada año la Ley de Presupuestos, la Seguridad Social te devuelve el 50 % del exceso (art. 313 LGSS).
+                  <span aria-hidden="true">ℹ️</span> En pluriactividad no hay una reducción propia de la cuota (la del 50&nbsp;% desapareció en 2023), pero si lo que cotizas por contingencias comunes en los dos regímenes supera el umbral que fija cada año la Ley de Presupuestos, la Seguridad Social te devuelve el 50&nbsp;% del exceso (art. 313 LGSS).
                 </div>
               )}
 
               {datos.situacionLaboral === 'colaborador_familiar' && (
                 <div className={styles.infoPluriactividad}>
-                  <span aria-hidden="true">ℹ️</span> Como familiar colaborador no tienes la tarifa plana (art. 38 ter.11 de la Ley 20/2007), pero sí una bonificación de la cuota por contingencias comunes de la base mínima del tramo 1: del 50 % durante 18 meses y del 25 % los 6 siguientes, si no has estado de alta en el RETA en los 5 años anteriores (art. 35). Esta herramienta no la descuenta de la cuota que calcula.
+                  <span aria-hidden="true">ℹ️</span> Como familiar colaborador no tienes la tarifa plana (art. 38 ter.11 de la Ley 20/2007), pero sí una bonificación de la cuota por contingencias comunes de la base mínima del tramo 1: del 50&nbsp;% durante 18 meses y del 25&nbsp;% los 6 siguientes, si no has estado de alta en el RETA en los 5 años anteriores (art. 35). Esta herramienta no la descuenta de la cuota que calcula.
                 </div>
               )}
             </div>
@@ -1039,9 +1101,7 @@ export default function AsistenteAltaAutonomoPage() {
                   {tramo ? (
                     <>
                       <strong>Tramo {tramo.id}</strong>
-                      {tramo.rendimientoMax === null
-                        ? ` (rendimientos de más de ${formatCurrency(tramo.rendimientoMin)}/mes)`
-                        : ` (rendimientos de ${tramo.id === 1 ? 'hasta' : `más de ${formatCurrency(tramo.rendimientoMin)} y hasta`} ${formatCurrency(tramo.rendimientoMax)}/mes)`}
+                      {` (rendimientos ${horquillaRendimientos(tramo)}/mes)`}
                       : base entre {formatCurrency(tramo.baseMinima)} y {formatCurrency(tramo.baseMaxima)}.
                     </>
                   ) : (
@@ -1102,7 +1162,7 @@ export default function AsistenteAltaAutonomoPage() {
                 </div>
                 <div className={styles.cuotaItem}>
                   <span>Tipo de cotización</span>
-                  <strong>{formatNumber(TIPO_COTIZACION * 100, 2)}%</strong>
+                  <strong>{formatPercentage(TIPO_COTIZACION, 2)}</strong>
                 </div>
                 <div className={styles.cuotaSeparador} />
                 <div className={`${styles.cuotaItem} ${styles.cuotaNormal}`}>
@@ -1197,12 +1257,15 @@ export default function AsistenteAltaAutonomoPage() {
                     </tr>
                     <tr>
                       <td>Fiscalidad</td>
-                      <td>IRPF progresivo (19-47%, efectivo bajo en ingresos pequeños-medios)</td>
                       <td>
-                        Impuesto sobre Sociedades: {TIPOS_IS_2025.general} % general;
-                        con cifra de negocio inferior a 1 millón de euros, {TRAMOS_IS_MICROPYMES_2026[0].tipo} % hasta{' '}
-                        {euros(TRAMOS_IS_MICROPYMES_2026[0].hasta)} de base y {TRAMOS_IS_MICROPYMES_2026[1].tipo} % en el resto (2026);
-                        {' '}{TIPOS_IS_2025.nuevaCreacion} % los dos primeros ejercicios con beneficio si es de nueva creación
+                        IRPF progresivo: tipos marginales de la escala general del {pct(IRPF_TIPO_MIN)} al {pct(IRPF_TIPO_MAX)} con
+                        la escala autonómica media (cada comunidad tiene la suya); el tipo efectivo es bajo con ingresos pequeños-medios
+                      </td>
+                      <td>
+                        Impuesto sobre Sociedades: {pct(TIPOS_IS_2025.general)} general;
+                        con cifra de negocio inferior a 1 millón de euros, {pct(TRAMOS_IS_MICROPYMES_2026[0].tipo)} hasta{' '}
+                        {euros(TRAMOS_IS_MICROPYMES_2026[0].hasta)} de base y {pct(TRAMOS_IS_MICROPYMES_2026[1].tipo)} en el resto (2026);
+                        {' '}{pct(TIPOS_IS_2025.nuevaCreacion)} los dos primeros ejercicios con beneficio si es de nueva creación
                       </td>
                     </tr>
                     <tr>
@@ -1235,7 +1298,7 @@ export default function AsistenteAltaAutonomoPage() {
               </div>
 
               <div className={styles.recomendacion}>
-                <strong><span aria-hidden="true">💡</span> Recomendación general:</strong> Empieza como autónomo si facturas menos de 40.000-50.000€/año.
+                <strong><span aria-hidden="true">💡</span> Recomendación general:</strong> Empieza como autónomo si facturas menos de 40.000-50.000 €/año.
                 Cuando superes esa cifra o necesites limitar responsabilidad, valora constituir una SL.
               </div>
             </div>
@@ -1283,7 +1346,7 @@ export default function AsistenteAltaAutonomoPage() {
               <ul>
                 <li><strong>Modelo 390</strong>: Resumen anual IVA</li>
                 <li><strong>Modelo 100</strong>: Declaración de la Renta</li>
-                <li><strong>Modelo 347</strong>: Operaciones con terceros (+3.005,06€)</li>
+                <li><strong>Modelo 347</strong>: Operaciones con terceros (más de 3.005,06 € al año con un mismo cliente o proveedor)</li>
                 <li><strong>Modelo 349</strong>: Operaciones intracomunitarias</li>
               </ul>
             </div>
@@ -1296,9 +1359,12 @@ export default function AsistenteAltaAutonomoPage() {
             <details className={styles.faqItem}>
               <summary>¿Puedo ser autónomo y trabajar por cuenta ajena a la vez?</summary>
               <p>
-                Sí, se llama <strong>pluriactividad</strong>. Cotizas en ambos regímenes y puedes tener
-                bonificaciones en la cuota de autónomo. Si la suma de bases supera el tope máximo,
-                puedes solicitar devolución del exceso.
+                Sí, se llama <strong>pluriactividad</strong>. Cotizas en los dos regímenes y no hay una
+                reducción propia de la cuota de autónomo (la del 50&nbsp;% desapareció en 2023), aunque la tarifa
+                plana sí te alcanza si cumples sus requisitos. Si lo que cotizas por contingencias comunes en
+                los dos regímenes supera la cuantía que fija cada año la Ley de Presupuestos, la Seguridad
+                Social te reintegra el 50&nbsp;% del exceso, con el tope del 50&nbsp;% de lo que hayas ingresado en el
+                RETA por contingencias comunes (art. 313 LGSS).
               </p>
             </details>
             <details className={styles.faqItem}>
@@ -1343,13 +1409,13 @@ export default function AsistenteAltaAutonomoPage() {
                   <td>Cuota mínima mensual</td>
                   <td>Desde ~{euros(CUOTA_MINIMA_TRAMO_1)}/mes (rendimientos bajos)</td>
                   <td>~{euros(AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual)}/mes (base mínima RETA admin., obligatoria)</td>
-                  <td>Sin reducción propia; reintegro del 50 % del exceso de cotización (art. 313 LGSS)</td>
+                  <td>Sin reducción propia; reintegro del 50&nbsp;% del exceso de cotización (art. 313 LGSS)</td>
                 </tr>
                 <tr>
                   <td>Tarifa plana {TARIFA_PLANA_TXT}</td>
-                  <td><span aria-hidden="true">✅</span> Sí (primeras altas o sin alta en 2 años)</td>
+                  <td><span aria-hidden="true">✅</span> Sí (primeras altas o sin alta en 2 años; 3 si ya la disfrutaste)</td>
                   <td><span aria-hidden="true">✅</span> Sí, en las mismas condiciones (art. 38 ter.9 Ley 20/2007)</td>
-                  <td><span aria-hidden="true">✅</span> Sí si es primera alta como autónomo</td>
+                  <td><span aria-hidden="true">✅</span> Sí, en las mismas condiciones (art. 38 ter Ley 20/2007)</td>
                 </tr>
                 <tr>
                   <td>Obligaciones fiscales</td>
@@ -1361,7 +1427,7 @@ export default function AsistenteAltaAutonomoPage() {
                   <td>Cotización SS</td>
                   <td>RETA según rendimientos netos reales</td>
                   <td>RETA como administrador (base obligatoria)</td>
-                  <td>RETA + Régimen General; devolución exceso si supera tope</td>
+                  <td>RETA + Régimen General; reintegro del 50&nbsp;% del exceso sobre la cuantía que fija la Ley de Presupuestos (art. 313 LGSS)</td>
                 </tr>
                 <tr>
                   <td>Complejidad administrativa</td>
@@ -1372,7 +1438,11 @@ export default function AsistenteAltaAutonomoPage() {
                 <tr>
                   <td>Cuándo aplica</td>
                   <td>Actividad habitual por cuenta propia, persona física</td>
-                  <td>Socio o administrador con &gt;25 % del capital social</td>
+                  <td>
+                    Administrador o socio que trabaja para la sociedad y tiene su control efectivo: lo tiene
+                    siempre con la mitad del capital, y se presume con una cuarta parte o más si ejerce
+                    funciones de dirección y gerencia, o con un tercio o más sin ellas (art. 305.2.b LGSS)
+                  </td>
                   <td>Contrato laboral activo + actividad propia simultánea</td>
                 </tr>
               </tbody>
@@ -1394,7 +1464,7 @@ export default function AsistenteAltaAutonomoPage() {
                 Se da de alta el <strong>1 de marzo</strong>, solicita la tarifa plana de <strong>{TARIFA_PLANA_TXT}/mes</strong> durante
                 {TARIFA_PLANA.duracion} meses (y {TARIFA_PLANA.ampliacion.duracion} meses más si sus rendimientos netos siguen por debajo del SMI). Presenta el <strong>modelo 037</strong> en
                 Hacienda antes que el alta en SS, y las dos antes de empezar. Elige el epígrafe IAE <em>751 de la sección 2.ª — Profesionales de la Publicidad, relaciones públicas y similares</em>.
-                Declara el domicilio fiscal en su vivienda habitual y emite facturas con IVA 21 %.
+                Declara el domicilio fiscal en su vivienda habitual y emite facturas con IVA 21&nbsp;%.
               </p>
               <p className={styles.escenarioTip}>
                 <span aria-hidden="true">💡</span> Al no tener empleados ni local arrendado, el modelo 037 es suficiente. Si sus rendimientos no pasan de {euros(TRAMO_1.rendimientoMax ?? 0)}/mes, ahorra ~{euros(AHORRO_TARIFA_PLANA_TRAMO_1)} en cuotas SS durante el primer año (cuota mínima del tramo 1 ~{euros(CUOTA_MINIMA_TRAMO_1)}/mes − tarifa plana {TARIFA_PLANA_TXT}/mes, ×{TARIFA_PLANA.duracion}); con más rendimientos, más.
@@ -1410,11 +1480,11 @@ export default function AsistenteAltaAutonomoPage() {
                 Laura trabaja en una empresa a jornada parcial y también atiende clientes privados.
                 Su situación es de <strong>pluriactividad</strong>: cotiza en el Régimen General por su
                 empleo y en el RETA por las consultas. Si es su primera alta como autónoma, tiene la <strong>tarifa plana también en
-                pluriactividad</strong>; la bonificación del 50 % que existía para este caso desapareció en 2023. Tributa en IRPF por ambas fuentes de renta
+                pluriactividad</strong>; la bonificación del 50&nbsp;% que existía para este caso desapareció en 2023. Tributa en IRPF por ambas fuentes de renta
                 y presenta el 130 trimestralmente por los rendimientos de actividad.
               </p>
               <p className={styles.escenarioTip}>
-                <span aria-hidden="true">💡</span> Si lo que cotiza por contingencias comunes en los dos regímenes supera el umbral que fija cada año la Ley de Presupuestos, la Seguridad Social le devuelve el 50 % del exceso (art. 313 LGSS).
+                <span aria-hidden="true">💡</span> Si lo que cotiza por contingencias comunes en los dos regímenes supera el umbral que fija cada año la Ley de Presupuestos, la Seguridad Social le devuelve el 50&nbsp;% del exceso (art. 313 LGSS).
               </p>
             </div>
 
@@ -1425,13 +1495,13 @@ export default function AsistenteAltaAutonomoPage() {
               </div>
               <p className={styles.escenarioExample}>
                 Carlos cobra el paro y quiere emprender. Tiene dos opciones: <strong>compatibilizar</strong> el
-                desempleo con el alta como autónomo (cobrando el 100 % de la prestación y pagando la cuota) o
-                <strong> capitalizar</strong> el paro de golpe para financiar el negocio (al menos el 60 % de la
+                desempleo con el alta como autónomo (cobrando el 100&nbsp;% de la prestación y pagando la cuota) o
+                <strong> capitalizar</strong> el paro de golpe para financiar el negocio (al menos el 60&nbsp;% de la
                 prestación pendiente). Debe comunicar el alta al SEPE <strong>antes de iniciar la actividad</strong>.
                 La tarifa plana es compatible con ambas modalidades.
               </p>
               <p className={styles.escenarioTip}>
-                <span aria-hidden="true">💡</span> La capitalización permite invertir hasta el 100 % si se crea una sociedad o se contrata a otra persona.
+                <span aria-hidden="true">💡</span> La capitalización permite invertir hasta el 100&nbsp;% si se crea una sociedad o se contrata a otra persona.
               </p>
             </div>
 
@@ -1654,7 +1724,7 @@ export default function AsistenteAltaAutonomoPage() {
               <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <div>
                 <strong>Elegir bien el epígrafe IAE</strong>
-                <p>El epígrafe determina el tipo de IVA que aplicas (21 %, 10 %, exento) y las deducciones disponibles. Un epígrafe incorrecto puede obligarte a corregir facturas emitidas y generar regularizaciones.</p>
+                <p>El epígrafe determina el tipo de IVA que aplicas (21&nbsp;%, 10&nbsp;%, exento) y las deducciones disponibles. Un epígrafe incorrecto puede obligarte a corregir facturas emitidas y generar regularizaciones.</p>
               </div>
             </div>
             <div className={styles.tipCard}>

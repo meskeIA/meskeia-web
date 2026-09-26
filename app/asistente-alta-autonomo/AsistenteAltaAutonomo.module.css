@@ -1,5 +1,9 @@
 /* Asistente Alta Autónomo - meskeIA */
 .container {
+  /* Verde y rojo de «ventaja/desventaja» como TEXTO: #27ae60 y #e74c3c daban 2,87:1 y
+     3,82:1 sobre el fondo claro (hallazgo 2141). Medidos en el navegador en ambos temas. */
+  --alta-ok-texto: #1e7b3c;
+  --alta-ko-texto: #c0392b;
   max-width: 1000px;
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
@@ -68,7 +72,7 @@
 .infoValor {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .infoLabel {
@@ -100,7 +104,7 @@
 .progresoValor {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .progresoBarraContainer {
@@ -150,12 +154,12 @@
 }
 
 .pestana:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
 }
 
 .pestanaActiva {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -287,7 +291,7 @@
 .faseProgresoTexto {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 40px;
 }
 
@@ -340,7 +344,7 @@
 }
 
 .obligatorio {
-  color: #e74c3c;
+  color: var(--alta-ko-texto);
   margin-left: 2px;
 }
 
@@ -356,13 +360,13 @@
   margin-left: 28px;
   margin-top: var(--spacing-xs);
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .enlaceUtil:hover {
-  color: var(--secondary);
+  color: var(--secondary-texto);
   text-decoration: underline;
 }
 
@@ -497,7 +501,7 @@
   background: rgba(72, 169, 166, 0.1);
   border: 1px solid var(--secondary);
   border-radius: var(--radius);
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-size: 0.95rem;
 }
 
@@ -507,7 +511,7 @@
   background: rgba(46, 134, 171, 0.1);
   border: 1px solid var(--primary);
   border-radius: var(--radius);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
 }
 
@@ -573,7 +577,7 @@
 
 .epigrafeCodigo {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 50px;
 }
 
@@ -731,7 +735,8 @@
 }
 
 .cuotaTarifaPlana strong {
-  color: var(--primary);
+  /* Sobre el degradado de marca, --primary-texto se queda en 4,39:1: el azul marino llega */
+  color: var(--hero-bg);
   font-size: 1.3rem;
 }
 
@@ -739,7 +744,7 @@
   text-align: center;
   padding: var(--spacing-sm);
   font-size: 0.95rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* Costes desglose */
@@ -782,7 +787,7 @@
 }
 
 .costeTotalFinal .costeValor {
-  color: var(--primary);
+  color: var(--hero-bg);
   font-size: 1.1rem;
 }
 
@@ -820,12 +825,12 @@
 }
 
 .ventaja {
-  color: #27ae60 !important;
+  color: var(--alta-ok-texto) !important;
   font-weight: 500;
 }
 
 .desventaja {
-  color: #e74c3c !important;
+  color: var(--alta-ko-texto) !important;
 }
 
 .recomendacion {
@@ -953,12 +958,32 @@
   color: #ffc107;
 }
 
-[data-theme='dark'] .ventaja {
-  color: #2ecc71 !important;
+/* --hero-bg no cambia de tema: en oscuro, el texto claro del tema (medido ≥ 4,5:1) */
+[data-theme='dark'] .cuotaTarifaPlana strong {
+  color: var(--primary-texto);
 }
 
-[data-theme='dark'] .desventaja {
-  color: #e74c3c !important;
+[data-theme='dark'] .costeTotalFinal .costeValor {
+  color: var(--text-primary);
+}
+
+/* En oscuro, --primary-texto sobre el velo azul del aviso se queda en 4,42:1 */
+[data-theme='dark'] .infoPluriactividad {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .container {
+  --alta-ok-texto: #2ecc71;
+  --alta-ko-texto: #ff8a80;
+}
+
+/* Enlace del aviso propio: el azul de marca daba 3,71:1 sobre el amarillo */
+.disclaimer a {
+  color: #0b4f6c;
+}
+
+[data-theme='dark'] .disclaimer a {
+  color: #ffd75e;
 }
 
 /* Responsive */
@@ -1155,7 +1180,7 @@
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.35;
 }
 
@@ -1174,7 +1199,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   border-left: 3px solid var(--secondary);
   padding: var(--spacing-sm) var(--spacing-md);
@@ -1268,7 +1293,7 @@
   display: inline-block;
   margin-top: var(--spacing-xs);
   font-size: 0.82rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-style: italic;
 }
 
@@ -1533,7 +1558,7 @@
 }
 
 [data-theme='dark'] .warningHeader h3 {
-  color: #ff6b6b;
+  color: #ff8a80;
 }
 
 [data-theme='dark'] .warningList li {

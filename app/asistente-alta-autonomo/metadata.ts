@@ -7,6 +7,9 @@ import { TRAMOS_RETA_2025, TARIFA_PLANA_2025 } from '@/data/fiscal';
 // escritas a mano («80 €/mes», «~206 €») y no habrían cambiado con la norma.
 const TRAMO_1 = TRAMOS_RETA_2025[0];
 const TRAMO_MAX = TRAMOS_RETA_2025[TRAMOS_RETA_2025.length - 1];
+// La cuota más alta (base máxima general) ya se puede elegir antes del último tramo: desde el
+// primero cuya base máxima es la general (el 14 en 2026, «más de 4.050 €/mes»)
+const TRAMO_CUOTA_MAX = TRAMOS_RETA_2025.find(t => t.cuotaMaxima === TRAMO_MAX.cuotaMaxima) ?? TRAMO_MAX;
 const eur = (v: number) => `${formatNumber(v, 0)} €`;
 
 export const metadata: Metadata = {
@@ -67,7 +70,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se paga de cuota de autónomo en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Desde 2023 la cuota de autónomos depende de los ingresos reales netos. En 2026 hay ${TRAMOS_RETA_2025.length} tramos: el mínimo es de ~${eur(TRAMO_1.cuotaMinima)} al mes para ingresos netos inferiores a ${eur(TRAMO_1.rendimientoMax ?? 0)}/mes, y el máximo es de ~${eur(TRAMO_MAX.cuotaMaxima)} para ingresos por encima de ${eur(TRAMO_MAX.rendimientoMin)}/mes. La cuota base elegida determina también la prestación por incapacidad y la futura pensión.`,
+        text: `Desde 2023 la cuota de autónomos depende de los ingresos reales netos. En 2026 hay ${TRAMOS_RETA_2025.length} tramos: el mínimo es de ~${eur(TRAMO_1.cuotaMinima)} al mes para rendimientos netos de hasta ${eur(TRAMO_1.rendimientoMax ?? 0)}/mes, y la más alta, ~${eur(TRAMO_MAX.cuotaMaxima)} al mes, corresponde a la base máxima, que se puede elegir con rendimientos de más de ${eur(TRAMO_CUOTA_MAX.rendimientoMin)}/mes. La cuota base elegida determina también la prestación por incapacidad y la futura pensión.`,
       },
     },
     {
@@ -75,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Existe una tarifa plana para nuevos autónomos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí. Los nuevos autónomos que se den de alta por primera vez (o tras 2 años sin estarlo) tienen derecho a la cuota reducida de ${eur(TARIFA_PLANA_2025.cuota)}/mes durante los primeros ${TARIFA_PLANA_2025.duracion} meses, prorrogable otros ${TARIFA_PLANA_2025.duracion} meses si los rendimientos netos no superan el Salario Mínimo Interprofesional (art. 38 ter de la Ley 20/2007). Hay que solicitarla en el mismo momento del alta en la Seguridad Social: no se puede pedir después. Los familiares colaboradores no tienen tarifa plana (art. 38 ter.11), sino una bonificación propia (art. 35).`,
+        text: `Sí. Los nuevos autónomos que se den de alta por primera vez, o tras 2 años sin estarlo (3 si ya disfrutaron la tarifa plana en su alta anterior, art. 38 ter.4), tienen derecho a la cuota reducida de ${eur(TARIFA_PLANA_2025.cuota)}/mes durante los primeros ${TARIFA_PLANA_2025.duracion} meses, prorrogable otros ${TARIFA_PLANA_2025.duracion} meses si los rendimientos netos anuales son inferiores al Salario Mínimo Interprofesional (art. 38 ter de la Ley 20/2007). Hay que solicitarla en el mismo momento del alta en la Seguridad Social: no se puede pedir después. Los familiares colaboradores no tienen tarifa plana (art. 38 ter.11), sino una bonificación propia (art. 35).`,
       },
     },
     {
