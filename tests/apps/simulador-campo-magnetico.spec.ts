@@ -445,10 +445,9 @@ test('R4 · bordes de formatCientifico: 10⁵ exacto, justo por debajo y 10⁻³
 });
 
 test('R5 · la mantisa de la notación científica no puede redondear a «10,00»', async ({ page }) => {
-  // HALLAZGO ABIERTO (reinspección 25/09/2026): formatCientifico (page.tsx:73-74) fija el
+  // HALLAZGO 2166, REPARADO el 26/09/2026 (el exponente se fija tras redondear la mantisa). Era: formatCientifico (page.tsx:73-74) fija el
   // exponente con Math.floor(log10) ANTES de redondear la mantisa, y una mantisa ≥ 9,995 sale
   // «10,00». La cifra vale lo mismo; la notación deja de estar normalizada.
-  test.fail();
   const f = valorDeFila(page, 'Fuerza F = q·v·B');
   // Protón, v = 5,2·10⁶ m/s, B = 1,2 T, θ = 90° (arranque): F = e·v·B = 9,997582·10⁻¹³ N
   await sembrarValor(page, '#velocidad', 5.2);
@@ -469,10 +468,9 @@ test('R5 · la mantisa de la notación científica no puede redondear a «10,00�
 });
 
 test('R6 · inducción: fem, corriente, frenado y potencia conservan sus cifras significativas', async ({ page }) => {
-  // HALLAZGO ABIERTO (reinspección 25/09/2026): la pestaña Inducción presenta con
+  // HALLAZGO 2165, REPARADO el 26/09/2026 (Inducción pasa por formatCientifico). Era: la pestaña Inducción presenta con
   // formatNumber y decimales FIJOS (page.tsx:1340, 1346, 1364, 1377, 1383, 1389, 1395), la
   // misma clase de defecto que el 1344, en una ruta que no pasa por formatCientifico.
-  test.fail();
   await page.getByRole('button', { name: 'Inducción', exact: true }).click();
   await page.getByRole('button', { name: 'Barra sobre raíles' }).click();
   await esperarHidratacion(page, ['#campoBarra', '#longitudBarra', '#velocidadBarra', '#resistencia']);
@@ -488,6 +486,13 @@ test('R6 · inducción: fem, corriente, frenado y potencia conservan sus cifras 
   expect(leerCifra(await valorDeFila(page, 'Potencia disipada').innerText()) / 5.76e-4).toBeCloseTo(1, 2);
   expect(leerCifra(await valorDeFila(page, 'Corriente inducida').innerText()) / 4.8e-3).toBeCloseTo(1, 2);
   expect(leerCifra(await valorDeFila(page, 'Fuerza de frenado').innerText()) / 2.88e-4).toBeCloseTo(1, 2);
+  // Por debajo de 10⁻⁴ formatNumber escribía «≈0»: B = 0,05 T, L = 0,2 m, v = 2 m/s, R = 10 Ω →
+  // ε = 0,02 V · I = 2·10⁻³ A · F = 0,05·0,002·0,2 = 2·10⁻⁵ N · P = 0,02·0,002 = 4·10⁻⁵ W
+  await sembrarValor(page, '#campoBarra', 0.05);
+  await sembrarValor(page, '#longitudBarra', 0.2);
+  await sembrarValor(page, '#resistencia', 10);
+  await expect(valorDeFila(page, 'Fuerza de frenado')).toHaveText('2,000 × 10⁻⁵ N');
+  await expect(valorDeFila(page, 'Potencia disipada')).toHaveText('4,000 × 10⁻⁵ W');
 
   // Alternador: N = 10, B = 0,1 T, A = 0,01 m², f = 1 Hz
   await page.getByRole('button', { name: 'Espira giratoria' }).click();
@@ -502,10 +507,10 @@ test('R6 · inducción: fem, corriente, frenado y potencia conservan sus cifras 
 });
 
 test('R7 · la cota del dibujo del hilo no tacha el rótulo de la distancia', async ({ page }) => {
-  // HALLAZGO ABIERTO (reinspección 25/09/2026), nacido con la reparación del 1347: la cota
+  // HALLAZGO 2167, REPARADO el 26/09/2026 (con el rótulo a la izquierda, la distancia va bajo la
+  // cota). Era, nacido con la reparación del 1347: la cota
   // punteada va a y = 210 desde el hilo hasta el punto de medida, y cuando el rótulo pasa a la
   // izquierda del punto (r ≳ 4,3 cm, arranque incluido) su caja [201; 216] queda tachada.
-  test.fail();
   await irACorrientes(page);
   const rotulo = page.locator('svg text').filter({ hasText: 'del hilo' });
   const cotaTachaRotulo = () =>
@@ -534,11 +539,10 @@ test('R7 · la cota del dibujo del hilo no tacha el rótulo de la distancia', as
 });
 
 test('R8 · con θ = 0° el texto no anuncia giro ni trayectoria circular', async ({ page }) => {
-  // HALLAZGO ABIERTO (reinspección 25/09/2026): con θ = 0° la tabla da F = 0 y v⊥ = 0 y el
+  // HALLAZGO 2168, REPARADO el 26/09/2026 (pista y aria-label según v⊥). Era: con θ = 0° la tabla da F = 0 y v⊥ = 0 y el
   // lienzo ya no dibuja circunferencia, pero la pista dice «Giro horario/antihorario · el tamaño
   // del círculo sigue al radio real» y el aria-label del SVG, «Trayectoria circular de …»
   // (page.tsx:559 y 651-656). La partícula avanza en línea recta a lo largo de B.
-  test.fail();
   const pista = page.locator('[class*="canvasHint"]');
   const lienzo = page.locator('[class*="canvasSvg"]').first();
   // Control a 90° (arranque): protón con B saliente, circunferencia en sentido horario

@@ -65,8 +65,20 @@ const CIFRAS_SIGNIFICATIVAS_MINIMAS = 3;
 function formatCientifico(valor: number, decimales = 2): string {
   if (!Number.isFinite(valor)) return '—';
   if (valor === 0) return '0';
-  const exponente = Math.floor(Math.log10(Math.abs(valor)));
-  if (exponente >= -3 && exponente < 5) {
+  let exponente = Math.floor(Math.log10(Math.abs(valor)));
+  // El exponente se fija DESPUÉS de redondear la mantisa: 9,9976·10⁻¹³ con 2 decimales es
+  // «1,00 × 10⁻¹²», no «10,00 × 10⁻¹³»; y 9,9997·10⁻⁴ sube a la franja decimal como «0,00100»
+  // (hallazgo 2166). Solo afecta a la rama científica: en la decimal no hay mantisa que
+  // normalizar, y 99.984,77 debe seguir escribiéndose así.
+  const escala = Math.pow(10, decimales);
+  const enFranjaDecimal = (e: number) => e >= -3 && e < 5;
+  if (
+    !enFranjaDecimal(exponente) &&
+    Math.round((Math.abs(valor) / Math.pow(10, exponente)) * escala) / escala >= 10
+  ) {
+    exponente += 1;
+  }
+  if (enFranjaDecimal(exponente)) {
     const decimalesEfectivos = Math.max(decimales, CIFRAS_SIGNIFICATIVAS_MINIMAS - 1 - exponente);
     return formatNumber(valor, decimalesEfectivos);
   }
@@ -207,6 +219,9 @@ export default function SimuladorCampoMagnetico() {
       horario,
     };
   }, [particula, velocidad, campo, anguloVB, campoSaliente]);
+  // Con θ = 0° no hay componente perpendicular: ni fuerza, ni círculo, ni sentido de giro que
+  // anunciar (hallazgo 2168).
+  const sinGiro = lorentz.vPerpendicular === 0;
 
   // Radio en píxeles: proporcional al radio real, acotado para que siempre quepa
   const radioDibujo = useMemo(() => {
@@ -556,7 +571,11 @@ export default function SimuladorCampoMagnetico() {
                   <svg
                     className={styles.canvasSvg}
                     viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-                    aria-label={`Trayectoria circular de ${particula.nombre} en un campo de ${formatNumber(campo, 2)} teslas`}
+                    aria-label={
+                      sinGiro
+                        ? `${particula.nombre} en línea recta a lo largo de un campo de ${formatNumber(campo, 2)} teslas: con v paralela a B no hay fuerza ni giro`
+                        : `Trayectoria circular de ${particula.nombre} en un campo de ${formatNumber(campo, 2)} teslas`
+                    }
                   >
                     {/* Símbolos del campo uniforme */}
                     <g className={styles.simboloCampo}>
@@ -648,12 +667,19 @@ export default function SimuladorCampoMagnetico() {
                       {particula.cargas > 0 ? '+' : '−'}
                     </text>
                   </svg>
-                  <p className={styles.canvasHint}>
-                    Giro {lorentz.horario ? 'horario' : 'antihorario'} · el tamaño del círculo sigue
-                    al radio real, pero la animación va muy ralentizada: el periodo real es de
-                    {' '}
-                    {formatCientifico(lorentz.periodo, 2)} s.
-                  </p>
+                  {sinGiro ? (
+                    <p className={styles.canvasHint}>
+                      Sin giro: con la velocidad paralela a B la fuerza es nula y la partícula avanza
+                      en línea recta a lo largo del campo, perpendicular a la pantalla.
+                    </p>
+                  ) : (
+                    <p className={styles.canvasHint}>
+                      Giro {lorentz.horario ? 'horario' : 'antihorario'} · el tamaño del círculo sigue
+                      al radio real, pero la animación va muy ralentizada: el periodo real es de
+                      {' '}
+                      {formatCientifico(lorentz.periodo, 2)} s.
+                    </p>
+                  )}
                 </div>
 
                 <div className={styles.resultBlock}>
@@ -930,7 +956,7 @@ export default function SimuladorCampoMagnetico() {
                     </text>
                     <text
                       x={xEtiquetaMedida}
-                      y={SVG_H / 2 + 4}
+                      y={SVG_H / 2 + (etiquetaMedidaIzquierda ? 24 : 4)}
                       textAnchor={etiquetaMedidaIzquierda ? 'end' : 'start'}
                       className={styles.etiquetaSecundaria}
                     >
@@ -1331,19 +1357,19 @@ export default function SimuladorCampoMagnetico() {
                       <div className={styles.resultRow}>
                         <span className={styles.resultLabel}>Velocidad angular ω = 2πf</span>
                         <span className={styles.resultValue}>
-                          {formatNumber(induccion.omega, 1)} rad/s
+                          {formatCientifico(induccion.omega, 2)} rad/s
                         </span>
                       </div>
                       <div className={styles.resultRow}>
                         <span className={styles.resultLabel}>fem máxima N·B·A·ω</span>
                         <span className={styles.resultValueAccent}>
-                          {formatNumber(induccion.femMaxima, 1)} V
+                          {formatCientifico(induccion.femMaxima, 2)} V
                         </span>
                       </div>
                       <div className={styles.resultRow}>
                         <span className={styles.resultLabel}>fem eficaz (rms)</span>
                         <span className={styles.resultValue}>
-                          {formatNumber(induccion.femEficaz, 1)} V
+                          {formatCientifico(induccion.femEficaz, 2)} V
                         </span>
                       </div>
                       <div className={styles.resultRow}>
@@ -1361,7 +1387,7 @@ export default function SimuladorCampoMagnetico() {
                       <div className={styles.resultRow}>
                         <span className={styles.resultLabel}>fem en este instante</span>
                         <span className={styles.resultValue}>
-                          {formatNumber(valorInstantaneo.fem, 1)} V
+                          {formatCientifico(valorInstantaneo.fem, 2)} V
                         </span>
                       </div>
                       <p className={styles.resultNota}>
@@ -1374,25 +1400,25 @@ export default function SimuladorCampoMagnetico() {
                       <div className={styles.resultRow}>
                         <span className={styles.resultLabel}>fem inducida ε = B·L·v</span>
                         <span className={styles.resultValueAccent}>
-                          {formatNumber(induccion.femBarra, 3)} V
+                          {formatCientifico(induccion.femBarra, 3)} V
                         </span>
                       </div>
                       <div className={styles.resultRow}>
                         <span className={styles.resultLabel}>Corriente inducida I = ε/R</span>
                         <span className={styles.resultValue}>
-                          {formatNumber(induccion.corrienteBarra, 3)} A
+                          {formatCientifico(induccion.corrienteBarra, 3)} A
                         </span>
                       </div>
                       <div className={styles.resultRow}>
                         <span className={styles.resultLabel}>Fuerza de frenado B·I·L</span>
                         <span className={styles.resultValue}>
-                          {formatNumber(induccion.fuerzaFrenado, 4)} N
+                          {formatCientifico(induccion.fuerzaFrenado, 3)} N
                         </span>
                       </div>
                       <div className={styles.resultRow}>
                         <span className={styles.resultLabel}>Potencia disipada</span>
                         <span className={styles.resultValue}>
-                          {formatNumber(induccion.potenciaBarra, 3)} W
+                          {formatCientifico(induccion.potenciaBarra, 3)} W
                         </span>
                       </div>
                       <p className={styles.resultNota}>
