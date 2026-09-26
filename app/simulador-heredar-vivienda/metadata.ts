@@ -24,8 +24,8 @@ import { calcularSucesion } from '@/lib/calculadoras/sucesiones';
 const euros = (n: number) => `${n.toLocaleString('es-ES')} €`;
 const ESCALA_AHORRO = TRAMOS_GANANCIAS_PATRIMONIALES_2025.map((t, i, todos) => {
   const desde = i === 0 ? 0 : todos[i - 1].hasta;
-  if (t.hasta === Infinity) return `${t.tipo}% a partir de ${euros(desde)}`;
-  return i === 0 ? `${t.tipo}% hasta ${euros(t.hasta)}` : `${t.tipo}% de ${euros(desde)} a ${euros(t.hasta)}`;
+  if (t.hasta === Infinity) return `${t.tipo}\u00A0% a partir de ${euros(desde)}`;
+  return i === 0 ? `${t.tipo}\u00A0% hasta ${euros(t.hasta)}` : `${t.tipo}\u00A0% de ${euros(desde)} a ${euros(t.hasta)}`;
 }).join(', ');
 
 /**
@@ -133,7 +133,7 @@ export const faqJsonLd = {
       name: '¿Qué impuestos hay que pagar al heredar una vivienda en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Al heredar una vivienda en España se pagan hasta tres impuestos: el Impuesto de Sucesiones y Donaciones (ISD), la plusvalía municipal (IIVTNU) y, si se vende posteriormente, el IRPF por la ganancia patrimonial. El ISD varía mucho según la comunidad autónoma y el grado de parentesco; algunas CCAA como Madrid o Extremadura aplican bonificaciones del ${BONIFICACION_MADRID_PCT}% para familiares directos.`,
+        text: `Al heredar una vivienda en España se pagan hasta tres impuestos: el Impuesto de Sucesiones y Donaciones (ISD), la plusvalía municipal (IIVTNU) y, si se vende posteriormente, el IRPF por la ganancia patrimonial. El ISD varía mucho según la comunidad autónoma y el grado de parentesco; algunas CCAA como Madrid o Extremadura aplican bonificaciones del ${BONIFICACION_MADRID_PCT}\u00A0% para familiares directos.`,
       },
     },
     {
@@ -165,7 +165,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre heredar en Madrid y en Cataluña?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `La diferencia puede ser significativa, aunque menor de lo que suele decirse. Madrid aplica una bonificación del ${BONIFICACION_MADRID_PCT}% en la cuota del ISD para cónyuge, descendientes y ascendientes, lo que lo reduce casi a cero. Cataluña, al contrario de lo que se repite, tiene reducciones de parentesco y de vivienda habitual MAYORES que las estatales (${euros(REDUCCIONES_PARENTESCO_CATALUNA_IS['II'])} y hasta ${euros(REDUCCION_VIVIENDA_MAX_CATALUNA_IS)}, frente a ${euros(Math.round(REDUCCIONES_PARENTESCO_IS['II']))} y ${euros(Math.round(REDUCCION_VIVIENDA_MAX_IS))}); lo que tiene más limitado es la BONIFICACIÓN EN CUOTA, que es una escala ponderada (art. 58 bis de la Ley 19/2010) en vez del ${BONIFICACION_MADRID_PCT}% fijo de Madrid. Para una vivienda de ${euros(EJEMPLO_COMPARATIVA.valor)} heredada por un hijo, la diferencia que calcula este simulador es de ${euros(DIFERENCIA_MADRID_CATALUNA)} si no era la vivienda habitual del fallecido. Si lo era, la reducción catalana es tan amplia que el ISD sale a 0 € y es Cataluña la más barata de las dos.`,
+        text: `La diferencia puede ser significativa, aunque menor de lo que suele decirse. Madrid aplica una bonificación del ${BONIFICACION_MADRID_PCT}\u00A0% en la cuota del ISD para cónyuge, descendientes y ascendientes, lo que lo reduce casi a cero. Cataluña, al contrario de lo que se repite, tiene reducciones de parentesco y de vivienda habitual MAYORES que las estatales (${euros(REDUCCIONES_PARENTESCO_CATALUNA_IS['II'])} y hasta ${euros(REDUCCION_VIVIENDA_MAX_CATALUNA_IS)}, frente a ${euros(Math.round(REDUCCIONES_PARENTESCO_IS['II']))} y ${euros(Math.round(REDUCCION_VIVIENDA_MAX_IS))}); lo que tiene más limitado es la BONIFICACIÓN EN CUOTA, que es una escala ponderada (art. 58 bis de la Ley 19/2010) en vez del ${BONIFICACION_MADRID_PCT}\u00A0% fijo de Madrid. Para una vivienda de ${euros(EJEMPLO_COMPARATIVA.valor)} heredada por un hijo, la diferencia que calcula este simulador es de ${euros(DIFERENCIA_MADRID_CATALUNA)} si no era la vivienda habitual del fallecido. Si lo era, la reducción catalana es tan amplia que el ISD sale a 0 € y es Cataluña la más barata de las dos.`,
       },
     },
   ],

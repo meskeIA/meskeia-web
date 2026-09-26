@@ -13,7 +13,7 @@ import {
   DataReference,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber, formatCurrency } from '@/lib';
+import { formatNumber, formatCurrency, formatDate } from '@/lib';
 import {
   FISCAL_SUCESIONES_META,
   TARIFA_ESTATAL_IS,
@@ -49,7 +49,7 @@ import {
  * la escala en `metadata.ts` y dejó estas dos copias (hallazgo 609).
  */
 const ESCALA_AHORRO = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
-const TIPOS_AHORRO = ESCALA_AHORRO.map((t) => `${t.tipo}%`).join(' / ');
+const TIPOS_AHORRO = ESCALA_AHORRO.map((t) => `${t.tipo}\u00A0%`).join(' / ');
 const TIPO_AHORRO_MIN = ESCALA_AHORRO[0].tipo;
 const TIPO_AHORRO_MAX = ESCALA_AHORRO[ESCALA_AHORRO.length - 1].tipo;
 import {
@@ -61,6 +61,7 @@ import {
 } from '@/lib/calculadoras/sucesiones';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import styles from './SimuladorHeredarVivienda.module.css';
+import { diasDelMes, mesesCompletosEntre } from './tenencia';
 
 /**
  * El 95 % del art. 20.2.c LISD, LEÍDO de data/fiscal. Aparecía escrito a mano en las cinco
@@ -219,7 +220,7 @@ const CASOS: CasoPreconfigurado[] = [
   {
     id: 'madrid-hijo',
     nombre: 'Hijo hereda piso 200k en Madrid',
-    descripcion: 'Vivienda habitual del padre, Madrid bonifica 99%',
+    descripcion: 'Vivienda habitual del padre, Madrid bonifica 99\u00A0%',
     parentesco: 'hijo',
     edad: 45,
     ccaa: 'madrid',
@@ -302,25 +303,18 @@ const TIPO_MUNICIPAL_PLUSVALIA = PLUSVALIA_MUNICIPAL_META.tipoOrientativo / 100;
 const ANIO_REFERENCIA = 2026;
 /** Mes (1-12) con el que se pinta el HTML del servidor; el real lo pone el mismo useEffect. */
 const MES_REFERENCIA = 1;
+/** Día con el que se pinta el HTML del servidor; el real lo pone el mismo useEffect. */
+const DIA_REFERENCIA = 1;
 
 const MESES = [
   'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
 ];
 
-/**
- * Meses completos entre la adquisición y hoy (hallazgo 1615, 25/09/2026).
- *
- * El art. 107.4 TRLRHL manda tomar «años completos» y, por debajo del año, prorratear el
- * coeficiente por «meses completos». Con solo el año, «año actual − año de adquisición»
- * contaba un año de más a quien compró en un mes posterior al de hoy (diciembre de 2016,
- * visto en septiembre de 2026: 10 años y coeficiente 0,12 en vez de 9 y 0,15) y aplicaba el
- * coeficiente entero con «1 año» sin haberlo cumplido. El día no se pregunta: se supone que
- * no es posterior al de hoy, que es lo que el propio mes ya dice en todos los demás casos.
+/*
+ * Los meses completos entre la adquisición y hoy los cuenta `mesesCompletosEntre` de
+ * ./tenencia.ts, de fecha a fecha y con el DÍA (art. 107.4 TRLRHL; hallazgos 1615 y 2126).
  */
-function mesesCompletosDesde(anio: number, mes: number, anioHoy: number, mesHoy: number): number {
-  return Math.max(0, anioHoy * 12 + mesHoy - (anio * 12 + mes));
-}
 
 /** «9 años», «1 año y 3 meses», «8 meses»: la tenencia tal como decide el coeficiente. */
 function textoTenencia(meses: number): string {
@@ -689,6 +683,7 @@ export default function SimuladorHeredarViviendaPage() {
   const [anioAdquisicion, setAnioAdquisicion] = useState<number>(1995);
   // Enero por defecto: con él, «año actual − año» sigue siendo la tenencia de quien no lo toca.
   const [mesAdquisicion, setMesAdquisicion] = useState<number>(1);
+  const [diaAdquisicion, setDiaAdquisicion] = useState<number>(1);
   const [valorAdquisicion, setValorAdquisicion] = useState<number>(80000);
   const [valorReferencia, setValorReferencia] = useState<number>(200000);
   const [valorCatastralSuelo, setValorCatastralSuelo] = useState<number>(60000);
@@ -705,10 +700,12 @@ export default function SimuladorHeredarViviendaPage() {
   // sirve) vale ANIO_REFERENCIA, para que servidor y cliente pinten lo mismo
   const [anioActual, setAnioActual] = useState<number>(ANIO_REFERENCIA);
   const [mesActual, setMesActual] = useState<number>(MES_REFERENCIA);
+  const [diaActual, setDiaActual] = useState<number>(DIA_REFERENCIA);
   useEffect(() => {
     const hoy = new Date();
     setAnioActual(hoy.getFullYear());
     setMesActual(hoy.getMonth() + 1);
+    setDiaActual(hoy.getDate());
   }, []);
 
   const aplicarCaso = useCallback((caso: CasoPreconfigurado) => {
@@ -717,6 +714,7 @@ export default function SimuladorHeredarViviendaPage() {
     setCcaa(caso.ccaa);
     setAnioAdquisicion(caso.anioAdquisicion);
     setMesAdquisicion(1);
+    setDiaAdquisicion(1);
     setValorAdquisicion(caso.valorAdquisicion);
     setValorReferencia(caso.valorReferencia);
     setValorCatastralSuelo(caso.valorCatastralSuelo);
@@ -728,8 +726,21 @@ export default function SimuladorHeredarViviendaPage() {
   }, []);
 
   // Cálculos
-  // Un mes de adquisición posterior al actual en el año en curso no ha llegado: se topa en hoy.
-  const mesesTenenciaCausante = mesesCompletosDesde(anioAdquisicion, mesAdquisicion, anioActual, mesActual);
+  // El día elegido no puede pasar del último del mes (un 31 que pasa a febrero se lee 28 o 29);
+  // el selector enseña ese mismo valor, así que lo que se ve es lo que se calcula.
+  const diasMesAdquisicion = diasDelMes(anioAdquisicion, mesAdquisicion);
+  const diaAdquisicionEfectivo = Math.min(diaAdquisicion, diasMesAdquisicion);
+  const mesesDesdeAdquisicion = mesesCompletosEntre(
+    { anio: anioAdquisicion, mes: mesAdquisicion, dia: diaAdquisicionEfectivo },
+    { anio: anioActual, mes: mesActual, dia: diaActual }
+  );
+  // Una adquisición POSTERIOR a hoy —la fecha que el simulador toma como fallecimiento— es un
+  // imposible: no se liquida (hasta el 26/09/2026 se topaba en 0 meses y salía una plusvalía de
+  // 0,00 € y un IRPF inflado; hallazgo 2125). Los selectores ya no ofrecen fechas futuras; esto
+  // cubre el único camino que queda, mover el año al actual con un mes o día que aún no ha llegado.
+  const fechaAdquisicionFutura = mesesDesdeAdquisicion < 0;
+  const mesesTenenciaCausante = Math.max(0, mesesDesdeAdquisicion);
+  const textoFechaAdquisicion = formatDate(new Date(anioAdquisicion, mesAdquisicion - 1, diaAdquisicionEfectivo));
 
   const isd = useMemo(
     () => calcularISD(valorReferencia, parentesco, ccaa, viviendaHabitual, edad, convivioDosAnios),
@@ -959,7 +970,7 @@ export default function SimuladorHeredarViviendaPage() {
               Año de adquisición de la vivienda:{' '}
               <span className={styles.sliderValue}>{anioAdquisicion}</span>
               <span className={styles.muted}>
-                {' '}({textoTenencia(mesesTenenciaCausante)} hasta hoy)
+                {' '}({fechaAdquisicionFutura ? 'posterior a hoy' : `${textoTenencia(mesesTenenciaCausante)} hasta hoy`})
               </span>
             </label>
             <input
@@ -976,8 +987,10 @@ export default function SimuladorHeredarViviendaPage() {
               <span>1985</span>
               <span>{anioActual}</span>
             </div>
-            {/* El IIVTNU cuenta años COMPLETOS y, por debajo del año, meses (art. 107.4 TRLRHL):
-                con solo el año se contaba uno de más según el mes de la compra (hallazgo 1615). */}
+            {/* El IIVTNU cuenta años y meses COMPLETOS, de fecha a fecha (art. 107.4 TRLRHL): con
+                solo el año se contaba uno de más según el mes de la compra (hallazgo 1615), y con
+                solo el mes, el aniversario se daba por cumplido antes de su día (hallazgo 2126).
+                Las fechas que aún no han llegado no se ofrecen (hallazgo 2125). */}
             <label className={styles.selectLabel} htmlFor="mesAdq">
               Mes de adquisición (escritura):
             </label>
@@ -988,11 +1001,45 @@ export default function SimuladorHeredarViviendaPage() {
               className={styles.select}
             >
               {MESES.map((nombre, i) => (
-                <option key={nombre} value={i + 1}>
+                <option
+                  key={nombre}
+                  value={i + 1}
+                  disabled={anioAdquisicion === anioActual && i + 1 > mesActual}
+                >
                   {nombre}
                 </option>
               ))}
             </select>
+            <label className={styles.selectLabel} htmlFor="diaAdq">
+              Día de adquisición (escritura):
+            </label>
+            <select
+              id="diaAdq"
+              value={diaAdquisicionEfectivo}
+              onChange={e => setDiaAdquisicion(Number(e.target.value))}
+              className={styles.select}
+            >
+              {Array.from({ length: diasMesAdquisicion }, (_, i) => i + 1).map((d) => (
+                <option
+                  key={d}
+                  value={d}
+                  disabled={anioAdquisicion === anioActual && mesAdquisicion === mesActual && d > diaActual}
+                >
+                  {d}
+                </option>
+              ))}
+            </select>
+            <p className={styles.sliderHint}>
+              El día cuenta: la plusvalía municipal toma años y meses completos de fecha a fecha, y
+              el aniversario no se cumple hasta su día.
+            </p>
+            {fechaAdquisicionFutura && (
+              <p className={styles.avisoMantenimiento} role="alert">
+                La fecha de adquisición ({textoFechaAdquisicion}) es posterior a hoy, que es la fecha
+                que el simulador toma como fallecimiento. Elige una fecha anterior: mientras tanto no
+                se calcula ninguna cifra.
+              </p>
+            )}
           </div>
 
           <div className={styles.sliderGroup}>
@@ -1190,7 +1237,7 @@ export default function SimuladorHeredarViviendaPage() {
                   Es la forma exacta del hallazgo 696 —el plazo de mantenimiento que no conocía
                   los cinco años catalanes— reaparecida sobre el TOPE en vez de sobre el plazo.
                 */}
-                <span className={styles.muted}>(reducción {PORC_REDUCCION_VIVIENDA}% ISD hasta {formatCurrency(topeReduccionVivienda)})</span>
+                <span className={styles.muted}>(reducción {PORC_REDUCCION_VIVIENDA}&nbsp;% ISD hasta {formatCurrency(topeReduccionVivienda)})</span>
               </span>
             </label>
           </div>
@@ -1276,6 +1323,17 @@ export default function SimuladorHeredarViviendaPage() {
             nada, en una herramienta cuyo contenido entero es el resultado (hallazgo 613).
             Va en el contenedor y no en cada panel para que se anuncie UNA vez por cambio,
             no tres. */}
+        {/* Con una adquisición posterior a hoy no hay liquidación posible: o se calcula, o no hay
+            cifra (hallazgo 2125). El aviso con la fecha vive junto al campo, en «Datos del causante». */}
+        {fechaAdquisicionFutura ? (
+          <div className={styles.panel} role="status">
+            <p className={styles.muted}>
+              Sin cifras: la fecha de adquisición del causante es posterior a hoy. Corrígela en
+              «Datos del causante» para ver el ISD, la plusvalía municipal y el IRPF.
+            </p>
+          </div>
+        ) : (
+        <>
         <div className={styles.tresPaneles} role="status" aria-live="polite" aria-atomic="true">
           {/* Panel 1: ISD */}
           <div className={styles.panelISD}>
@@ -1302,7 +1360,7 @@ export default function SimuladorHeredarViviendaPage() {
             </div>
             {isd.reduccionVivienda > 0 && (
               <div className={styles.panelLine}>
-                <span>− Reducción vivienda habitual ({PORC_REDUCCION_VIVIENDA}%)</span>
+                <span>− Reducción vivienda habitual ({PORC_REDUCCION_VIVIENDA}&nbsp;%)</span>
                 <strong>−{formatCurrency(isd.reduccionVivienda)}</strong>
               </div>
             )}
@@ -1335,7 +1393,7 @@ export default function SimuladorHeredarViviendaPage() {
               <strong>{formatCurrency(isd.cuotaTributaria)}</strong>
             </div>
             <div className={styles.panelLine}>
-              <span>− Bonificación CCAA ({formatNumber(isd.bonificacionPorc * 100, 1)}%)</span>
+              <span>− Bonificación CCAA ({formatNumber(isd.bonificacionPorc * 100, 1)}&nbsp;%)</span>
               <strong>−{formatCurrency(isd.bonificacion)}</strong>
             </div>
             <div className={styles.panelTotal}>
@@ -1409,7 +1467,9 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.panelPlusvalia}>
             <h3 className={styles.panelHeaderTitle}>2. Plusvalía municipal (herencia)</h3>
             <p className={styles.panelHeaderSub}>
-              IIVTNU — {textoTenencia(Math.min(plusvalia.mesesTenencia, 240))} de tenencia
+              {/* La tenencia REAL: el tope de 20 años es del coeficiente, no de la tenencia, y el
+                  deslizador de arriba dice la real (hallazgo 2127). */}
+              IIVTNU — {textoTenencia(plusvalia.mesesTenencia)} de tenencia
             </p>
 
             <div className={styles.panelLine}>
@@ -1423,13 +1483,15 @@ export default function SimuladorHeredarViviendaPage() {
               <span>
                 {plusvalia.aniosTenencia < 1
                   ? `Coeficiente, menos de 1 año (prorrateado a ${textoTenencia(plusvalia.mesesTenencia)})`
+                  : plusvalia.aniosTenencia >= 20
+                  ? 'Coeficiente 20 o más años'
                   : `Coeficiente ${plusvalia.aniosTenencia} ${plusvalia.aniosTenencia === 1 ? 'año' : 'años'}`}
               </span>
               <strong>{formatNumber(plusvalia.coeficiente, plusvalia.aniosTenencia < 1 ? 4 : 2)}</strong>
             </div>
             <div className={styles.panelLine}>
               <span>Tipo municipal (orientativo)</span>
-              <strong>{formatNumber(TIPO_MUNICIPAL_PLUSVALIA * 100, 0)}%</strong>
+              <strong>{formatNumber(TIPO_MUNICIPAL_PLUSVALIA * 100, 0)}&nbsp;%</strong>
             </div>
             <div className={styles.panelLine}>
               <span>Método objetivo</span>
@@ -1599,11 +1661,13 @@ export default function SimuladorHeredarViviendaPage() {
           )}
           {aniosHastaVenta > 0 && valorVenta > 0 && (
             <p className={styles.bloquePorc}>
-              Representa el <strong>{formatNumber(porcSobreVenta, 2)}%</strong> del valor de venta
+              Representa el <strong>{formatNumber(porcSobreVenta, 2)}&nbsp;%</strong> del valor de venta
               ({formatCurrency(valorVenta)}).
             </p>
           )}
         </div>
+        </>
+        )}
       </main>
 
       <EducationalSection
@@ -1650,7 +1714,7 @@ export default function SimuladorHeredarViviendaPage() {
                     la versión anterior —la misma que el hallazgo 862 retiró del faqJsonLd—, y
                     sobre el CASO 1 daba 53.401,20 € de ganancia donde la app calcula 48.601,20 €
                     (hallazgo 1180). */}
-                <td>(Valor de transmisión − valor adquisición fiscal) × tramos {TIPO_AHORRO_MIN}-{TIPO_AHORRO_MAX}%. El valor de transmisión es el precio de venta menos la plusvalía municipal de la venta (art. 35.2 LIRPF), y el valor de adquisición fiscal incluye los impuestos pagados al heredar.</td>
+                <td>(Valor de transmisión − valor adquisición fiscal) × tramos {TIPO_AHORRO_MIN}-{TIPO_AHORRO_MAX}&nbsp;%. El valor de transmisión es el precio de venta menos la plusvalía municipal de la venta (art. 35.2 LIRPF), y el valor de adquisición fiscal incluye los impuestos pagados al heredar.</td>
                 <td>El que vende (heredero, si vendes)</td>
               </tr>
             </tbody>
@@ -1667,13 +1731,13 @@ export default function SimuladorHeredarViviendaPage() {
             <h4>Hijo hereda piso vivienda habitual del padre</h4>
             <p>
               Reducción de parentesco ({formatCurrency(REDUCCIONES_PARENTESCO_IS['II'] ?? 0)}) + reducción
-              vivienda habitual del {PORC_REDUCCION_VIVIENDA}% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}). En las
-              comunidades de régimen común que bonifican la cuota al 99% o más
+              vivienda habitual del {PORC_REDUCCION_VIVIENDA}&nbsp;% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}). En las
+              comunidades de régimen común que bonifican la cuota al 99&nbsp;% o más
               ({CCAA_BONIFICACION_CASI_TOTAL.join(', ')}) el ISD se queda en casi nada — Aragón, eso sí,
               deja de bonificar del todo por encima de 3.000.000 € de base liquidable. Ojo con las que
-              bonifican <strong>por tramos</strong>: Castilla-La Mancha empieza en el 100% pero baja al
-              80% por encima de 300.000 € de base liquidable, y Cantabria baja del 100% al 99% a partir
-              de 100.000 €. País Vasco bonifica también cerca del 99%, pero es régimen foral: la cifra
+              bonifican <strong>por tramos</strong>: Castilla-La Mancha empieza en el 100&nbsp;% pero baja al
+              80&nbsp;% por encima de 300.000 € de base liquidable, y Cantabria baja del 100&nbsp;% al 99&nbsp;% a partir
+              de 100.000 €. País Vasco bonifica también cerca del 99&nbsp;%, pero es régimen foral: la cifra
               real depende de la Hacienda Foral correspondiente (Álava, Bizkaia o Gipuzkoa) y exige
               consulta obligatoria. Cambia la comunidad en el selector de arriba y el cálculo lo dice.
               En cualquier caso quedan la plusvalía municipal y, si vende, el IRPF.
@@ -1683,8 +1747,8 @@ export default function SimuladorHeredarViviendaPage() {
             <h4>Cónyuge viudo hereda</h4>
             <p>
               Mismo trato que descendientes (Grupo II). Importante: el cónyuge viudo en gananciales
-              ya es titular del 50% antes de la herencia (no es "heredero" de esa parte). Solo
-              hereda lo que es privativo del fallecido o el 50% de los gananciales.
+              ya es titular del 50&nbsp;% antes de la herencia (no es "heredero" de esa parte). Solo
+              hereda lo que es privativo del fallecido o el 50&nbsp;% de los gananciales.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -1726,9 +1790,9 @@ export default function SimuladorHeredarViviendaPage() {
               una prórroga de otros {PLAZO_ISD.mesesProrroga} meses dentro de los{' '}
               {PLAZO_ISD.mesesParaPedirProrroga} primeros, pero no sale gratis: devenga intereses de
               demora desde que vencen los {PLAZO_ISD.mesesPresentacion} meses hasta que presentas. Si superas el plazo sin liquidar, el recargo se debe desde el primer
-              día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}% de partida más otro{' '}
-              {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso, y el{' '}
-              {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora una vez
+              día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}&nbsp;% de partida más otro{' '}
+              {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}&nbsp;% por cada mes completo de retraso, y el{' '}
+              {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}&nbsp;% más intereses de demora una vez
               transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses
               ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}). Es clave: el reloj corre desde el
               fallecimiento, no desde que tú te enteras.
@@ -1757,11 +1821,11 @@ export default function SimuladorHeredarViviendaPage() {
             <strong>Si vendo en menos de 1 año, ¿hay diferencia en el IRPF?</strong>
             <p>
               No. En España, las ganancias patrimoniales de inmuebles tributan siempre en la
-              base del ahorro ({TIPO_AHORRO_MIN}-{TIPO_AHORRO_MAX}%) sea cual sea el plazo de tenencia. Los tramos son:{' '}
+              base del ahorro ({TIPO_AHORRO_MIN}-{TIPO_AHORRO_MAX}&nbsp;%) sea cual sea el plazo de tenencia. Los tramos son:{' '}
               {ESCALA_AHORRO.map((tramo, i) => (
                 <span key={tramo.tipo}>
                   {i > 0 && ', '}
-                  {tramo.tipo}% ({Number.isFinite(tramo.hasta) ? `hasta ${formatCurrency(tramo.hasta)}` : `más de ${formatCurrency(ESCALA_AHORRO[i - 1].hasta)}`})
+                  {tramo.tipo}&nbsp;% ({Number.isFinite(tramo.hasta) ? `hasta ${formatCurrency(tramo.hasta)}` : `más de ${formatCurrency(ESCALA_AHORRO[i - 1].hasta)}`})
                 </span>
               ))}.
             </p>
@@ -1769,7 +1833,7 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.faqItem}>
             <strong>¿Cómo afecta que fuera la vivienda habitual del fallecido?</strong>
             <p>
-              Hay reducción del {PORC_REDUCCION_VIVIENDA}% en la base imponible del ISD para cónyuge, descendientes,
+              Hay reducción del {PORC_REDUCCION_VIVIENDA}&nbsp;% en la base imponible del ISD para cónyuge, descendientes,
               ascendientes o un colateral de {EDAD_MIN_COLATERAL_VIVIENDA} años o más que conviviera con el fallecido los
               últimos 2 años. El tope estatal es {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}/heredero (cada CCAA puede mejorarlo).
               Requisito: mantener la vivienda al menos {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS} años
@@ -1871,7 +1935,7 @@ export default function SimuladorHeredarViviendaPage() {
                   bloque educativo y no puede seguir al selector, pero sí dejar de prometer
                   como universal un tope que en Cataluña es cuatro veces mayor (hallazgo 1179,
                   la mitad del 861 que quedó sin reparar). */}
-              <p>Si era residencia habitual del fallecido y eres cónyuge/descendiente/ascendiente, la reducción del {PORC_REDUCCION_VIVIENDA}% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)} por heredero según el tope estatal, que cada comunidad autónoma puede mejorar: en Cataluña son {formatCurrency(REDUCCION_VIVIENDA_MAX_CATALUNA_IS)}) puede ser decisiva.</p>
+              <p>Si era residencia habitual del fallecido y eres cónyuge/descendiente/ascendiente, la reducción del {PORC_REDUCCION_VIVIENDA}&nbsp;% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)} por heredero según el tope estatal, que cada comunidad autónoma puede mejorar: en Cataluña son {formatCurrency(REDUCCION_VIVIENDA_MAX_CATALUNA_IS)}) puede ser decisiva.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
