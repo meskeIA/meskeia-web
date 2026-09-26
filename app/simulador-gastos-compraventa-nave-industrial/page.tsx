@@ -30,6 +30,9 @@ import {
   notariaDeLibreAcuerdo,
   LIMITE_ARANCEL_NOTARIAL,
   calcularRegistro,
+  honorariosLlevanIVA,
+  FACTURA_NOTARIAL,
+  REGISTRO_CONCEPTOS,
   ENLACE_CATASTRO,
   RANGO_AJD_OTROS,
   RANGO_AJD_VIVIENDA,
@@ -42,7 +45,12 @@ import {
   preguntaEscriturar,
   respuestaEscriturar,
 } from '@/data/itp-ccaa';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+import {
+  IVA_INMUEBLES_2025,
+  FISCAL_INMUEBLES_META,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  GANANCIAS_PATRIMONIALES_META,
+} from '@/data/fiscal';
 
 // ===== TIPOS =====
 type TipoTransmision = 'segunda-mano' | 'primera-mano' | 'segunda-mano-renuncia';
@@ -117,7 +125,23 @@ const IVA_NAVE_INDUSTRIAL = IVA_INMUEBLES_2025.local;
 // escrito a mano cinco veces en esta página y dos en metadata.ts, con la divergencia en
 // silencio garantizada para el día que la cifra cambie (hallazgo 650, mismo patrón que el
 // hallazgo D del 27/08/2026 con el 21 % y el 19-30 %).
-const BONIFICACION_CIUDADES = `${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)} %`;
+const BONIFICACION_CIUDADES = `${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}\u00A0%`;
+
+/**
+ * `separarPorcentajes`, como en la referencia: los textos que llegan escritos de data/ (las notas
+ * de cada comunidad) pegan el «%» a la cifra, y la regla del catálogo pide un espacio duro.
+ */
+const separarPorcentajes = (texto: string): string => texto.replace(/(\d)[ \u00A0]?%/g, '$1\u00A0%');
+
+/**
+ * La base del AJD no puede ser inferior al valor de referencia (art. 30.1 TRLITPAJD, redacción de
+ * la Ley 11/2021), aunque la del IVA sea la contraprestación pactada (art. 78 Ley 37/1992). La app
+ * tiene un solo precio y calcula los dos sobre él, así que lo dice allí donde publica el AJD: la
+ * tarjeta, el total, la ayuda del precio y las limitaciones (hallazgo 2209 de la hermana solar,
+ * llevado a las tres apps de comprador, que tienen el mismo único precio).
+ */
+const AVISO_BASE_AJD =
+  'El AJD va calculado sobre el precio escrito, pero su base no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD): si ese valor es mayor, el AJD se liquida sobre él';
 
 /**
  * Dónde NO existe la renuncia a la exención de la segunda entrega (hallazgo 1584, 24/09/2026).
@@ -151,7 +175,7 @@ const CCAA_CON_AJD_DE_RENUNCIA = Object.values(ITP_CCAA)
  * de la vivienda (del 4 % vasco hacia arriba), que no es el de esta app: una nave paga el 7 % en
  * el País Vasco (hallazgo 1582) y, con la bonificación, el 3 % efectivo en Ceuta y Melilla.
  */
-const NOTA_DATOS = `El ITP de una nave va del ${formatTipoNominal(RANGO_ITP_OTROS.min)}% al ${formatTipoNominal(RANGO_ITP_OTROS.max)}% según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota se bonifica un ${BONIFICACION_CIUDADES} (art. 57 bis TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
+const NOTA_DATOS = `El ITP de una nave va del ${formatTipoNominal(RANGO_ITP_OTROS.min)}\u00A0% al ${formatTipoNominal(RANGO_ITP_OTROS.max)}\u00A0% según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota se bonifica un ${BONIFICACION_CIUDADES} (art. 57 bis TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
 
 // El helper `tipoNominal` que vivía aquí subió a `lib/formatters.ts` como
 // `formatTipoNominal` el 25/08/2026: el mismo defecto estaba en las otras seis apps del
@@ -245,10 +269,12 @@ export default function SimuladorNaveIndustrialPage() {
     const contextoAJD = { objeto: 'otro' as const, renunciaExencionIVA: conRenuncia };
     const ajd = conIva ? calcularAJD(precio, ccaa, contextoAJD) : 0;
 
-    const notaria = estimarFacturaNotarial(precio);
+    // Con la comunidad: en Canarias, Ceuta y Melilla la factura del notario y la del registro
+    // no llevan IVA sino IGIC o IPSI, que el catálogo no calcula (hallazgo 2214).
+    const notaria = estimarFacturaNotarial(precio, ccaa);
 
     const notario = notaria.medio;
-    const registro = calcularRegistro(precio);
+    const registro = calcularRegistro(precio, ccaa);
 
     // Se suman las líneas YA redondeadas al céntimo, que es como las ve el usuario: el
     // total redondeaba la suma exacta y no cuadraba con el desglose de encima por un
@@ -313,6 +339,27 @@ export default function SimuladorNaveIndustrialPage() {
       !resultadosComprador.gestoriaLegible ||
       resultadosComprador.notariaLibre);
 
+  /**
+   * Notaría y registro sin IVA donde no rige (hallazgo 2214, 26/09/2026). El motor, con la
+   * comunidad, devuelve el arancel sin impuesto indirecto en Canarias, Ceuta y Melilla: allí esas
+   * facturas llevan IGIC o IPSI, que el catálogo no calcula. La tarjeta no puede decir «IVA
+   * incluido» y, junto al total, hay que nombrar el impuesto que le falta.
+   */
+  const territorioHonorarios = honorariosLlevanIVA(ccaa) ? undefined : TERRITORIOS_SIN_IVA[ccaa];
+  const rotuloHonorarios = territorioHonorarios ? `(sin ${territorioHonorarios.impuesto})` : '(IVA incluido)';
+
+  /**
+   * Un precio ESCRITO, legible e imposible —un 0, un negativo mientras el campo tiene el foco o
+   * un importe que se pinta 0,00 €— no es un precio que falta: es uno que no vale (patrón 5 de la
+   * familia, «no falta, no vale»; hallazgo 1799 en la referencia). El marcador lo dice así, en
+   * lugar de pedir que se introduzca un precio que el usuario ve escrito en el campo.
+   */
+  const precioNoValido =
+    !precioIlegible && precioVenta.trim() !== '' && Math.round(precioLeido * 100) <= 0;
+  const mensajePrecioNoValido = `El precio escrito («${precioVenta.trim()}»)${
+    precioLeido > 0 ? ' se queda en 0,00 € al céntimo, y' : ''
+  } tiene que ser mayor que 0: corrígelo para ver el desglose de gastos de la nave industrial.`;
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -338,12 +385,37 @@ export default function SimuladorNaveIndustrialPage() {
         collapsible={false}
       />
 
+      {/* Un sello por módulo cuyos datos publica la página, cada uno con su fuente y su fecha
+          (forma «a» de la familia, hallazgo 2205; el modelo es local-comercial). El de inmuebles
+          lleva una fuente PROPIA: el genérico cita la Ley 35/2006 y el RDL 26/2021, y esta app no
+          calcula ni el IRPF ni la plusvalía municipal. */}
       <DataReference
         normativa={`ITP/AJD/IVA ${FISCAL_INMUEBLES_META.vigencia}`}
-        fuente={FISCAL_INMUEBLES_META.fuente}
+        fuente="Real Decreto Legislativo 1/1993 (ITP y AJD) + Ley 37/1992 IVA"
         verificado={FISCAL_INMUEBLES_META.verificado}
         urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
         nota={NOTA_DATOS}
+      />
+      <DataReference
+        normativa="Arancel notarial"
+        fuente={FACTURA_NOTARIAL.baseNormativa}
+        verificado={FACTURA_NOTARIAL.verificado}
+        urlOficial={FACTURA_NOTARIAL.urlOficial}
+        nota={FACTURA_NOTARIAL.nota}
+      />
+      <DataReference
+        normativa="Arancel registral"
+        fuente={REGISTRO_CONCEPTOS.baseNormativa}
+        verificado={REGISTRO_CONCEPTOS.verificado}
+        urlOficial={REGISTRO_CONCEPTOS.urlOficial}
+      />
+      {/* La escala del ahorro que publica la guía («Vender nave con ganancia patrimonial»). */}
+      <DataReference
+        normativa={`IRPF de la ganancia ${GANANCIAS_PATRIMONIALES_META.vigencia} · lo que paga quien vende`}
+        fuente={GANANCIAS_PATRIMONIALES_META.fuente}
+        verificado={GANANCIAS_PATRIMONIALES_META.verificado}
+        urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
+        nota={GANANCIAS_PATRIMONIALES_META.nota}
       />
 
       {/* Aviso IVA deducible — es el TERCERO de los avisos que explicaban un IVA que la propia
@@ -407,7 +479,7 @@ export default function SimuladorNaveIndustrialPage() {
                 <span className={styles.transmisionSub}>
                   {territorioActualSinIva
                     ? `Paga ${territorioActualSinIva.impuesto} + AJD`
-                    : `Paga IVA ${formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% + AJD`}
+                    : `Paga IVA ${formatNumber(IVA_NAVE_INDUSTRIAL, 0)}\u00A0% + AJD`}
                 </span>
               </button>
               {/* En Ceuta y Melilla la renuncia no existe (TERRITORIOS_SIN_RENUNCIA, hallazgo
@@ -427,7 +499,7 @@ export default function SimuladorNaveIndustrialPage() {
                     ? 'No existe en el IPSI: paga ITP'
                     : territorioActualSinIva
                       ? `Paga ${territorioActualSinIva.impuesto} (ISP) + AJD`
-                      : `IVA ${formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% (ISP) + AJD`}
+                      : `IVA ${formatNumber(IVA_NAVE_INDUSTRIAL, 0)}\u00A0% (ISP) + AJD`}
                 </span>
               </button>
             </div>
@@ -489,7 +561,7 @@ export default function SimuladorNaveIndustrialPage() {
                     <strong>autoliquida el comprador</strong> (inversión del sujeto pasivo), y suele ser
                     deducible si tu actividad está sujeta a IVA. El AJD de la escritura va al{' '}
                     <strong>tipo propio de la renuncia</strong> en {datosCcaaActual.nombre} (
-                    {formatTipoNominal(ajdRotulo.tipo)}%), que es el que se aplica aquí.
+                    {formatTipoNominal(ajdRotulo.tipo)}&nbsp;%), que es el que se aplica aquí.
                   </>
                 ) : (
                   <>
@@ -516,7 +588,7 @@ export default function SimuladorNaveIndustrialPage() {
             placeholder="500000"
             helperText={
               conIvaEnPantalla
-                ? 'Contraprestación pactada en la escritura (base del IVA, art. 78 Ley 37/1992)'
+                ? 'Contraprestación pactada en la escritura (base del IVA, art. 78 Ley 37/1992). La base del AJD no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD)'
                 : 'Precio escriturado o valor de referencia catastral (el mayor de ambos)'
             }
             min={0}
@@ -550,7 +622,7 @@ export default function SimuladorNaveIndustrialPage() {
                 <span className={styles.infoCcaaLabel}>ITP General</span>
                 {/* El de una nave, no el de la vivienda: en el País Vasco, 7 % y no 4 %
                     (hallazgo 1582); en Valencia, el 11 % si el precio pasa del millón (1581). */}
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(itpGeneralRotulo)}%</span>
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(itpGeneralRotulo)}&nbsp;%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
@@ -561,14 +633,14 @@ export default function SimuladorNaveIndustrialPage() {
                     escribía ese rango sin ellos (hallazgo 685). */}
                 {/* Del motor y para esta operación: el País Vasco cobra el 0,5 % a una nave
                     (hallazgo 1583) y Valencia el 2 % con renuncia (1603). */}
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(ajdRotulo.tipo)}%</span>
+                <span className={styles.infoCcaaValue}>{formatTipoNominal(ajdRotulo.tipo)}&nbsp;%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>
                   {territorioActualSinIva ? `${territorioActualSinIva.impuesto} (obra nueva)` : 'IVA (obra nueva)'}
                 </span>
                 <span className={styles.infoCcaaValue}>
-                  {territorioActualSinIva ? 'No calculado' : `${formatTipoNominal(IVA_NAVE_INDUSTRIAL)}%`}
+                  {territorioActualSinIva ? 'No calculado' : `${formatTipoNominal(IVA_NAVE_INDUSTRIAL)}\u00A0%`}
                 </span>
               </div>
             </div>
@@ -589,8 +661,20 @@ export default function SimuladorNaveIndustrialPage() {
               </p>
             ) : (
               <p className={styles.infoCcaaNote}>
-                Las naves industriales tributan por el <strong>tipo general</strong> de ITP, sin tipos reducidos
-                (los tipos reducidos solo aplican a inmuebles residenciales).
+                Una nave industrial tributa por el <strong>tipo general</strong> de ITP: los tipos reducidos por
+                perfil del comprador (jóvenes, familia numerosa, discapacidad) exigen que el inmueble sea la
+                vivienda habitual, y una nave no lo es. Eso no agota los beneficios posibles: alguna comunidad
+                tiene tipos propios ligados a la ACTIVIDAD, no a la vivienda, y esta calculadora no los aplica.
+              </p>
+            )}
+            {/* La ficha de la comunidad, que es donde vive ese matiz: la nota de arriba negaba de
+                plano un tipo que data/itp-ccaa.ts documenta —el 1 % del art. 121-11 de Aragón por
+                adquirir un inmueble para iniciar una actividad económica, que es el caso de quien
+                compra una nave para montar un negocio—. Es la reparación del hallazgo 726
+                (local-comercial) y del 2208 (solar), llevada aquí, donde tampoco se pintaba. */}
+            {datosCcaaActual.notas && (
+              <p className={styles.infoCcaaNote}>
+                <strong>{datosCcaaActual.nombre}:</strong> {separarPorcentajes(datosCcaaActual.notas)}
               </p>
             )}
             {territorioActualSinIva && (
@@ -645,7 +729,7 @@ export default function SimuladorNaveIndustrialPage() {
                     ? resultadosComprador.tipoImpuesto
                     // Dos decimales: a cero, un 6,50 % se rotulaba «7%» junto a un importe
                     // que es el 6,5 % del precio, y las dos cifras se desmentían en pantalla.
-                    : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`
+                    : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}\u00A0%)`
                 }
                 value={
                   resultadosComprador.impuestoNoCalculado
@@ -667,7 +751,7 @@ export default function SimuladorNaveIndustrialPage() {
                         : 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
                       : resultadosComprador.bonificado
                         ? `Tipo general con la bonificación del ${BONIFICACION_CIUDADES} de la cuota ya aplicada (art. 57 bis TRLITPAJD)`
-                        : 'Tipo general — naves industriales no tienen tipos reducidos'
+                        : 'Tipo general — las naves no tienen los reducidos de vivienda, pero alguna comunidad sí tiene tipos ligados a la ACTIVIDAD'
                 }
               />
 
@@ -676,24 +760,27 @@ export default function SimuladorNaveIndustrialPage() {
                   // Tipo EFECTIVO, igual que el del ITP: en Ceuta y Melilla la cuota gradual
                   // se bonifica al 50 % (art. 57 bis.1 TRLITPAJD) y el nominal de la tabla se
                   // desmentía con el importe de al lado (hallazgo 447).
-                  title={`AJD (${formatNumber((resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100, 2)}%)`}
+                  title={`AJD (${formatNumber((resultadosComprador.ajd / resultadosComprador.precioInmueble) * 100, 2)}\u00A0%)`}
                   value={formatCurrency(resultadosComprador.ajd)}
                   variant="warning"
                   icon="📄"
-                  description={
+                  description={[
                     resultadosComprador.bonificado
                       ? `Con la bonificación del ${BONIFICACION_CIUDADES} de Ceuta y Melilla aplicada`
                       : resultadosComprador.ajdTipo.motivo === 'renuncia'
                         ? `Tipo propio de la renuncia a la exención en ${datosCcaaActual.nombre}`
                         : transmision === 'segunda-mano-renuncia'
                           ? 'Tipo general de la comunidad: algunas aplican uno incrementado cuando hay renuncia'
-                          : undefined
-                  }
+                          : null,
+                    AVISO_BASE_AJD,
+                  ]
+                    .filter((x): x is string => x !== null)
+                    .join('. ')}
                 />
               )}
 
               <ResultCard
-                title="Gastos de notaría (IVA incluido)"
+                title={`Gastos de notaría ${rotuloHonorarios}`}
                 value={formatCurrency(resultadosComprador.gastosNotario)}
                 description={
                   resultadosComprador.notariaLibre
@@ -707,7 +794,7 @@ export default function SimuladorNaveIndustrialPage() {
               />
 
               <ResultCard
-                title="Registro de la Propiedad (IVA incluido)"
+                title={`Registro de la Propiedad ${rotuloHonorarios}`}
                 value={formatCurrency(resultadosComprador.gastosRegistro)}
                 variant="default"
                 icon="🏛️"
@@ -748,7 +835,7 @@ export default function SimuladorNaveIndustrialPage() {
                 icon="➕"
                 description={
                   [
-                    `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}% sobre el precio de compra`,
+                    `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioInmueble) * 100, 2)}\u00A0% sobre el precio de compra`,
                     resultadosComprador.impuestoNoCalculado
                       ? `SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
                       : null,
@@ -770,6 +857,7 @@ export default function SimuladorNaveIndustrialPage() {
                 variant="highlight"
                 icon="💳"
                 description={
+                  `${
                   cierreParcial
                     ? `No incluye ${[
                         resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
@@ -786,8 +874,25 @@ export default function SimuladorNaveIndustrialPage() {
                           : ''
                       }`
                     : 'Precio + todos los gastos (antes de deducir IVA si aplica)'
+                  }${
+                    // Con AJD en el desglose, su base mínima (art. 30.1 TRLITPAJD): el total no se
+                    // presenta como definitivo sin esa salvedad (hallazgo 2209).
+                    resultadosComprador.ajd > 0 ? `. ${AVISO_BASE_AJD}` : ''
+                  }`
                 }
               />
+
+              {/* Lo que el motor ya no suma en Canarias, Ceuta y Melilla (hallazgo 2214): el IGIC o el
+                  IPSI de las facturas de notaría y registro. Va fuera de la tarjeta a propósito: el aviso
+                  del total habla del impuesto de la OPERACIÓN, que puede ser cero; este no lo es, y por eso
+                  esta nota no habla del «coste real» (redacción común de las siete hermanas). */}
+              {territorioHonorarios && (
+                <p className={styles.avisoHonorarios} role="note">
+                  <span aria-hidden="true">ℹ️</span> Las facturas de notaría y registro llevan además{' '}
+                  {territorioHonorarios.impuesto}, que esta herramienta no calcula, así que cuestan más de lo
+                  que se muestra.
+                </p>
+              )}
             </>
           ) : (
             <div className={styles.placeholder}>
@@ -795,7 +900,9 @@ export default function SimuladorNaveIndustrialPage() {
               <p>
                 {precioIlegible
                   ? `No se ha podido leer el precio «${precioVenta.trim()}». Introduce el precio de la nave industrial para ver el desglose de gastos, con coma decimal (500.000 o 500000,50)`
-                  : 'Introduce el precio de la nave industrial para ver el desglose de gastos'}
+                  : precioNoValido
+                    ? mensajePrecioNoValido
+                    : 'Introduce el precio de la nave industrial para ver el desglose de gastos'}
               </p>
             </div>
           )}
@@ -831,8 +938,8 @@ export default function SimuladorNaveIndustrialPage() {
               <tbody>
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>IVA obra nueva</td>
-                  <td className={styles.celdaCifra} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>{formatNumber(IVA_INMUEBLES_2025.local, 0)}%</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}%</td>
+                  <td className={styles.celdaCifra} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>{formatNumber(IVA_INMUEBLES_2025.local, 0)}&nbsp;%</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}&nbsp;%</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)' }}>ITP segunda mano</td>
@@ -857,8 +964,8 @@ export default function SimuladorNaveIndustrialPage() {
                   <td style={{ padding: '8px 10px' }}>AJD obra nueva</td>
                   {/* Un rango por objeto: el 0 % es la exención foral de la primera VIVIENDA y una
                       nave paga allí el 0,5 % (hallazgo 1583). */}
-                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí ({formatTipoNominal(RANGO_AJD_OTROS.min)}% – {formatTipoNominal(RANGO_AJD_OTROS.max)}%)</td>
-                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí ({formatTipoNominal(RANGO_AJD_VIVIENDA.min)}% – {formatTipoNominal(RANGO_AJD_VIVIENDA.max)}%)</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí ({formatTipoNominal(RANGO_AJD_OTROS.min)}&nbsp;% – {formatTipoNominal(RANGO_AJD_OTROS.max)}&nbsp;%; en Ceuta y Melilla, la mitad por la bonificación del {BONIFICACION_CIUDADES}, art. 57 bis.1 TRLITPAJD)</td>
+                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí ({formatTipoNominal(RANGO_AJD_VIVIENDA.min)}&nbsp;% – {formatTipoNominal(RANGO_AJD_VIVIENDA.max)}&nbsp;%)</td>
                 </tr>
               </tbody>
             </table>
@@ -872,7 +979,7 @@ export default function SimuladorNaveIndustrialPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🏭</span> Empresa compra nave nueva al promotor</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Paga IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% + AJD. Si la empresa está dada de alta en
+                Paga IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}&nbsp;% + AJD. Si la empresa está dada de alta en
                 actividades sujetas a IVA, puede deducir el IVA en la declaración trimestral (modelo 303).
               </p>
             </div>
@@ -896,7 +1003,7 @@ export default function SimuladorNaveIndustrialPage() {
               <strong><span aria-hidden="true">📈</span> Vender nave con ganancia patrimonial</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Si vendes la nave como persona física, la ganancia tributa en el IRPF base del ahorro
-                ({formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}-{formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo, 0)}%). Si vendes como empresa (IS), tributa en el Impuesto de Sociedades.
+                ({formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}-{formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo, 0)}&nbsp;%). Si vendes como empresa (IS), tributa en el Impuesto de Sociedades.
               </p>
             </div>
           </div>
@@ -918,7 +1025,7 @@ export default function SimuladorNaveIndustrialPage() {
               <strong>¿Se paga IVA o ITP al comprar una nave industrial?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Depende del tipo de transmisión. Si es la primera entrega del promotor (obra nueva),
-                se paga IVA al {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}%. Si es de segunda mano, se paga ITP
+                se paga IVA al {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}&nbsp;%. Si es de segunda mano, se paga ITP
                 al tipo general de la comunidad autónoma. Nunca se pagan los dos a la vez. En Canarias, Ceuta
                 y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos: por eso el simulador
                 no calcula ahí el impuesto de la obra nueva, ni en Canarias el de la renuncia.
@@ -948,14 +1055,16 @@ export default function SimuladorNaveIndustrialPage() {
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
               <strong>¿Qué tipos de ITP aplican a una nave industrial?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
-                Los tipos reducidos de ITP (jóvenes, familias numerosas, discapacidad) son exclusivos de
-                inmuebles residenciales. Para naves industriales y locales comerciales aplica el tipo general
-                de la comunidad, que hoy va del {formatTipoNominal(RANGO_ITP_OTROS.min)}% al {formatTipoNominal(RANGO_ITP_OTROS.max)}%
+                Los tipos reducidos de ITP por perfil del comprador (jóvenes, familias numerosas,
+                discapacidad) son exclusivos de la vivienda. Para naves industriales y locales comerciales
+                aplica el tipo general de la comunidad, que hoy va del {formatTipoNominal(RANGO_ITP_OTROS.min)}&nbsp;% al {formatTipoNominal(RANGO_ITP_OTROS.max)}&nbsp;%
                 — el techo corresponde al tramo más alto de las comunidades con escala progresiva, así que una
-                nave cara puede pagar un tipo efectivo superior al nominal de su comunidad. La excepción no es
-                un tipo reducido sino una bonificación de cuota: en Ceuta y Melilla se descuenta el{' '}
-                {BONIFICACION_CIUDADES} (art. 57 bis del TRLITPAJD), y ahí sí entra cualquier inmueble,
-                también una nave.
+                nave cara puede pagar un tipo efectivo superior al nominal de su comunidad. Hay dos salvedades.
+                Alguna comunidad tiene tipos propios ligados a la actividad económica y no a la vivienda —en
+                Aragón, por adquirir un inmueble para iniciar una actividad—, que esta calculadora no aplica:
+                la nota de tu comunidad, en el recuadro de la calculadora, lo dice. Y en Ceuta y Melilla la
+                cuota se bonifica un {BONIFICACION_CIUDADES} (art. 57 bis del TRLITPAJD), y ahí sí entra
+                cualquier inmueble, también una nave.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
@@ -967,7 +1076,10 @@ export default function SimuladorNaveIndustrialPage() {
                 vendedor renuncian a la exención (tercera opción de «Tipo de transmisión»), la operación
                 vuelve al IVA y sí devenga AJD sobre la propia compraventa, con varias comunidades aplicándole
                 un tipo incrementado. El País Vasco, que exime del AJD la primera transmisión de una
-                vivienda, sí lo cobra a una nave.
+                vivienda, sí lo cobra a una nave, y en Ceuta y Melilla se paga la mitad (bonificación del{' '}
+                {BONIFICACION_CIUDADES} de la cuota, art. 57 bis.1 TRLITPAJD). Su base no es solo el precio:
+                aunque el IVA se calcula sobre la contraprestación pactada, la base del AJD no puede ser
+                inferior al valor de referencia catastral (art. 30.1 TRLITPAJD, redacción de la Ley 11/2021).
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
@@ -1000,7 +1112,7 @@ export default function SimuladorNaveIndustrialPage() {
                 {/* La segunda mano no es siempre ITP: entre empresarios cabe la renuncia a la
                     exención, que la app calcula en su tercera opción (hallazgo 1268; forma del
                     hallazgo B del 27/08/2026). */}
-                Si tu actividad está sujeta a IVA, el IVA de la primera mano ({formatNumber(IVA_NAVE_INDUSTRIAL, 0)}%)
+                Si tu actividad está sujeta a IVA, el IVA de la primera mano ({formatNumber(IVA_NAVE_INDUSTRIAL, 0)}&nbsp;%)
                 es deducible, y en segunda mano entre empresarios con derecho a deducción cabe la{' '}
                 <strong>renuncia a la exención</strong>: la operación vuelve al IVA, que autoliquida el comprador
                 (inversión del sujeto pasivo) y también es deducible. Sin renuncia, la segunda mano paga ITP, que no es
@@ -1048,9 +1160,9 @@ export default function SimuladorNaveIndustrialPage() {
             <strong>Limitaciones de este simulador</strong>
           </div>
           <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column' as const, gap: '0.4rem' }}>
-            <li>El IVA del {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}% solo es deducible si el comprador es sujeto pasivo de IVA con actividad sujeta y no exenta.</li>
+            <li>El IVA del {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}&nbsp;% solo es deducible si el comprador es sujeto pasivo de IVA con actividad sujeta y no exenta.</li>
             <li>Los tipos de ITP y AJD pueden variar; verifica la normativa vigente de tu comunidad autónoma.</li>
-            <li>El valor de referencia catastral puede ser la base imponible real del ITP si supera el precio escriturado.</li>
+            <li>El valor de referencia catastral puede ser la base imponible real del ITP si supera el precio escriturado, y también la del AJD de la obra nueva o de la renuncia: aunque el IVA se calcula sobre la contraprestación pactada, la base del AJD no puede ser inferior a ese valor (art. 30.1 TRLITPAJD, redacción de la Ley 11/2021). Aquí el AJD se calcula sobre el precio escrito.</li>
             <li>La renuncia a la exención de IVA en segunda mano SÍ se calcula, en la tercera opción de «Tipo de transmisión» (en Canarias, la del IGIC; en Ceuta y Melilla el IPSI no la admite y la opción se desactiva). Lo que esta calculadora no contempla son otras situaciones especiales: operaciones vinculadas, permutas, aportaciones no dinerarias a sociedades o transmisiones de unidad económica autónoma.</li>
             <li>Consulta siempre con tu asesor fiscal antes de cerrar la operación.</li>
           </ul>

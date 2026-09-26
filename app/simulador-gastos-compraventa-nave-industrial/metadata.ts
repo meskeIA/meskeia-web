@@ -30,7 +30,7 @@ const PRECIO_EJEMPLO = 200000;
 const NOTARIA_EJEMPLO = estimarFacturaNotarial(PRECIO_EJEMPLO);
 const REGISTRO_EJEMPLO = calcularRegistro(PRECIO_EJEMPLO);
 const euros = (n: number) => `${Math.round(n)} €`;
-const pct = (n: number) => `${String(n).replace('.', ',')}%`;
+const pct = (n: number) => `${String(n).replace('.', ',')}\u00A0%`;
 
 /** El 50 % del art. 57 bis, DERIVADO de la constante que aplica el motor (hallazgo 650). */
 const BONIFICACION_PCT = pct(BONIFICACION_CUOTA_CEUTA_MELILLA * 100);
@@ -110,7 +110,7 @@ const masCaras = podio(techoDe, false)
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Nave Industrial - IVA, ITP y Costes | meskeIA',
-  description: `Calcula los gastos de compra de una nave industrial en España: IVA ${IVA_INMUEBLES_2025.local}%, ITP por comunidad autónoma, AJD, notaría y registro. Para empresas y autónomos. Gratis y sin registro.`,
+  description: `Calcula los gastos de compra de una nave industrial en España: IVA ${IVA_INMUEBLES_2025.local}\u00A0%, ITP por comunidad autónoma, AJD, notaría y registro. Para empresas y autónomos. Gratis y sin registro.`,
   keywords: 'simulador gastos compra nave industrial, gastos compraventa nave industrial, IVA nave industrial, ITP nave industrial, comprar nave impuestos, calculadora nave industrial españa, escriturar nave, cuanto cuesta escriturar',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -122,7 +122,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Simulador Gastos Compra Nave Industrial | meskeIA',
-    description: `Calcula el IVA ${IVA_INMUEBLES_2025.local}%, ITP y gastos de compraventa de una nave industrial en España.`,
+    description: `Calcula el IVA ${IVA_INMUEBLES_2025.local}\u00A0%, ITP y gastos de compraventa de una nave industrial en España.`,
     url: 'https://meskeia.com/simulador-gastos-compraventa-nave-industrial/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -131,18 +131,18 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Simulador Gastos Compra Nave Industrial | meskeIA',
-    description: `IVA ${IVA_INMUEBLES_2025.local}%, ITP, notaría y registro en la compraventa de nave industrial. Calcula gratis.`,
+    description: `IVA ${IVA_INMUEBLES_2025.local}\u00A0%, ITP, notaría y registro en la compraventa de nave industrial. Calcula gratis.`,
     images: ['https://meskeia.com/og-image.png'],
   },
 };
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador Gastos Compra Nave Industrial',
-  description: `Calculadora de gastos de compra de nave industrial en España. Incluye IVA ${IVA_INMUEBLES_2025.local}% en obra nueva, ITP por comunidad autónoma en segunda mano, AJD, notaría y registro de la propiedad.`,
+  description: `Calculadora de gastos de compra de nave industrial en España. Incluye IVA ${IVA_INMUEBLES_2025.local}\u00A0% en obra nueva, ITP por comunidad autónoma en segunda mano, AJD, notaría y registro de la propiedad.`,
   url: 'https://meskeia.com/simulador-gastos-compraventa-nave-industrial/',
   category: 'FinanceApplication',
   features: [
-    `IVA ${IVA_INMUEBLES_2025.local}% en nave industrial de nueva construcción`,
+    `IVA ${IVA_INMUEBLES_2025.local}\u00A0% en nave industrial de nueva construcción`,
     'ITP por comunidad autónoma en segunda mano',
     'AJD (Actos Jurídicos Documentados)',
     'Gastos de notaría y registro de la propiedad',
@@ -170,7 +170,7 @@ export const faqJsonLd = {
       name: '¿Qué impuesto paga la compra de una nave industrial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Si la nave es de nueva construcción y la vende el promotor, se paga IVA al ${pct(IVA_INMUEBLES_2025.local)} más AJD (Actos Jurídicos Documentados), que va del ${pct(RANGO_AJD_OTROS.min)} al ${pct(RANGO_AJD_OTROS.max)} según la comunidad autónoma. Si es una segunda transmisión (segunda mano), se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad, que va del ${pct(RANGO_ITP_OTROS.min)} al ${pct(RANGO_ITP_OTROS.max)} contando el tramo más alto de las comunidades con escala progresiva. No pueden coexistir IVA e ITP en la misma operación, salvo que se renuncie a la exención de IVA en la segunda transmisión entre empresarios: entonces vuelve a haber IVA con inversión del sujeto pasivo y no se paga ITP. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos: por eso el simulador no calcula ahí el impuesto de la obra nueva, ni en Canarias el de la renuncia, que allí es a la exención del IGIC (art. 50.Cinco de la Ley canaria 4/2012). En Ceuta y Melilla el IPSI no admite la renuncia (Ley 8/1991, arts. 7 y 20.3), así que la segunda mano paga siempre ITP, cuya cuota se bonifica al ${BONIFICACION_PCT} (art. 57 bis del TRLITPAJD), sea cual sea el uso del inmueble.`,
+        text: `Si la nave es de nueva construcción y la vende el promotor, se paga IVA al ${pct(IVA_INMUEBLES_2025.local)} más AJD (Actos Jurídicos Documentados), que va del ${pct(RANGO_AJD_OTROS.min)} al ${pct(RANGO_AJD_OTROS.max)} según la comunidad autónoma, y en Ceuta y Melilla se paga la mitad (bonificación del ${BONIFICACION_PCT} de la cuota, art. 57 bis.1 del TRLITPAJD). Si es una segunda transmisión (segunda mano), se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad, que va del ${pct(RANGO_ITP_OTROS.min)} al ${pct(RANGO_ITP_OTROS.max)} contando el tramo más alto de las comunidades con escala progresiva. No pueden coexistir IVA e ITP en la misma operación, salvo que se renuncie a la exención de IVA en la segunda transmisión entre empresarios: entonces vuelve a haber IVA con inversión del sujeto pasivo y no se paga ITP. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos: por eso el simulador no calcula ahí el impuesto de la obra nueva, ni en Canarias el de la renuncia, que allí es a la exención del IGIC (art. 50.Cinco de la Ley canaria 4/2012). En Ceuta y Melilla el IPSI no admite la renuncia (Ley 8/1991, arts. 7 y 20.3), así que la segunda mano paga siempre ITP, cuya cuota se bonifica al ${BONIFICACION_PCT} (art. 57 bis del TRLITPAJD), sea cual sea el uso del inmueble.`,
       },
     },
     {
@@ -194,7 +194,7 @@ export const faqJsonLd = {
       name: '¿En qué se diferencia comprar una nave industrial de comprar un local comercial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Fiscalmente, tanto nave industrial como local comercial tienen el mismo tratamiento: IVA ${IVA_INMUEBLES_2025.local}% en primera transmisión e ITP al tipo general en segunda mano. La diferencia práctica está en el uso (industrial vs. comercial o de oficinas) y en la calificación urbanística, que determina qué actividades pueden realizarse. La superficie, la normativa de seguridad industrial y los servicios disponibles también difieren habitualmente.`,
+        text: `Fiscalmente, tanto nave industrial como local comercial tienen el mismo tratamiento: IVA ${IVA_INMUEBLES_2025.local}\u00A0% en primera transmisión e ITP al tipo general en segunda mano. La diferencia práctica está en el uso (industrial vs. comercial o de oficinas) y en la calificación urbanística, que determina qué actividades pueden realizarse. La superficie, la normativa de seguridad industrial y los servicios disponibles también difieren habitualmente.`,
       },
     },
     {

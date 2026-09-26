@@ -38,8 +38,12 @@
  * Los tres casos están resueltos a mano ANTES de ejecutar la app; el desarrollo va comentado
  * junto a cada aserción, con los importes sin redondear.
  *
- * HALLAZGOS ABIERTOS: al final, en su propio describe. Afirman lo que DEBERÍA pasar y hoy
- * fallan a propósito; cuando se reparen, quedan como test de regresión.
+ * HALLAZGOS ABIERTOS: ninguno a 26/09/2026 (tarde). Los de la re-inspección de ese día
+ * (2214-2220) están reparados y sin marca en el último describe, con la receta de la familia
+ * (base mínima del AJD, 2209; notas de la comunidad, 2208). Los casos anteriores con Canarias,
+ * Ceuta y Melilla se recalcularon a mano (notaría y registro ÷ 1,21), y los lectores de tarjeta
+ * comparan cifras con el «%» pegado (`pegarPct`) y apartan la salvedad del AJD
+ * (`sinAvisoBaseAjd`), que tiene su propio caso.
  */
 import { test, expect, type Page } from '@playwright/test';
 import {
@@ -60,13 +64,52 @@ const RUTA = '/simulador-gastos-compraventa-terreno-rustico/';
 const PRECIO = 'Precio de compra de la finca rústica';
 const GESTORIA = 'Gastos de gestoría (€)';
 
+/**
+ * Cifras, no tipografía: desde el 26/09/2026 la app separa el «%» con espacio duro (hallazgos
+ * 2204/2211/2216), y `\s+` → ' ' lo deja en un espacio normal. Los casos anteriores comparan
+ * cifras escritas con el «%» pegado, así que los lectores de tarjeta lo vuelven a pegar; la
+ * tipografía la vigila el caso del «%» (forma «c»), que lee el texto en crudo.
+ */
+const pegarPct = (s: string): string => s.replace(/(\d) %/g, '$1%');
+
+/**
+ * La salvedad del art. 30.1 TRLITPAJD (hallazgo 2209, 26/09/2026) que la app añade a la tarjeta
+ * del AJD y al total cuando hay AJD. Es la MISMA frase en las dos, y los casos anteriores miden
+ * otra cosa en esas descripciones (la bonificación, el tipo de la renuncia, la dirección del
+ * aviso), así que el lector de descripciones la aparta; su presencia —y su ausencia sin AJD— la
+ * mide el caso «Hallazgo 2209» de este mismo fichero, sobre el texto en crudo.
+ */
+const AVISO_BASE_AJD =
+  'El AJD va calculado sobre el precio escrito, pero su base no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD): si ese valor es mayor, el AJD se liquida sobre él';
+const sinAvisoBaseAjd = (s: string): string =>
+  s.endsWith(AVISO_BASE_AJD) ? s.slice(0, -AVISO_BASE_AJD.length).replace(/\.\s*$/, '') : s;
+
+/**
+ * Para las aserciones sobre el LOCALIZADOR de la descripción del total (`toHaveText`), que lee
+ * el texto en crudo: acepta el texto esperado con o sin la salvedad del art. 30.1 detrás. Esos
+ * casos miden la dirección del aviso; la salvedad tiene su propio caso («Hallazgo 2209»).
+ */
+const admiteAvisoAjd = (texto: string): RegExp =>
+  new RegExp(`^${texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:\\. ${AVISO_BASE_AJD.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})?$`);
+
+/**
+ * El marcador del panel cuando no hay cifra que publicar. Desde el 26/09/2026 (hallazgo 2218,
+ * patrón 5 de la familia) distingue tres estados: el campo VACÍO («Introduce el precio…»), el
+ * ILEGIBLE («No se ha podido leer…», que conserva esa frase detrás) y el LEGIBLE PERO IMPOSIBLE
+ * —0, negativo o un importe que se pinta 0,00 €—, que dice que tiene que ser mayor que 0. Los
+ * casos antiguos que solo miran que no haya desglose aceptan cualquiera de los tres.
+ */
+const MARCADOR_SIN_CIFRA =
+  /Introduce el precio de la finca rústica para ver el desglose de gastos|tiene que ser mayor que 0: corrígelo para ver el desglose de gastos de la finca rústica/;
+const PRECIO_NO_VALE = 'tiene que ser mayor que 0: corrígelo para ver el desglose de gastos de la finca rústica';
+
 /** Valor de una ResultCard, con el espacio duro del formato español normalizado. */
 async function valorTarjeta(page: Page, titulo: string): Promise<string> {
   const valor = page
     .locator('h3', { hasText: titulo })
     .first()
     .locator('xpath=../following-sibling::div[1]/p');
-  return (await valor.innerText()).replace(/\s+/g, ' ').trim();
+  return pegarPct((await valor.innerText()).replace(/\s+/g, ' ').trim());
 }
 
 /** Texto descriptivo bajo el valor de una ResultCard. */
@@ -75,12 +118,12 @@ async function descripcionTarjeta(page: Page, titulo: string): Promise<string> {
     .locator('h3', { hasText: titulo })
     .first()
     .locator('xpath=../following-sibling::p[1]');
-  return (await desc.innerText()).replace(/\s+/g, ' ').trim();
+  return sinAvisoBaseAjd(pegarPct((await desc.innerText()).replace(/\s+/g, ' ').trim()));
 }
 
 /** Rótulo completo de una ResultCard (lleva dentro el tipo aplicado). */
 async function rotuloTarjeta(page: Page, patron: RegExp): Promise<string> {
-  return (await page.locator('h3', { hasText: patron }).first().innerText()).replace(/\s+/g, ' ').trim();
+  return pegarPct((await page.locator('h3', { hasText: patron }).first().innerText()).replace(/\s+/g, ' ').trim());
 }
 
 async function rellenar(page: Page, etiqueta: string, valor: string): Promise<void> {
@@ -176,24 +219,27 @@ test.describe('Simulador de gastos de compra de finca rústica — inspección 2
     //   + tramo 5 (150.253,03→200.000, 0,05 %) → 49.746,97 × 0,0005 = 24,873485
     //   arancel sin IVA = 358,43341 · con IVA = 433,704426
     //   ×1,5 = 650,556639 · ×2 = 867,408852 · punto medio = 758,982746
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('758,98 €');
+    // 26/09/2026 (hallazgo 2214): en Canarias, Ceuta y Melilla la notaría y el registro van SIN
+    // IVA —su factura lleva IGIC o IPSI, que la app no calcula y nombra junto al total—.
+    //   en Ceuta: 358,43341 ×1,5 = 537,650115 · ×2 = 716,86682 · medio ×1,75 = 627,258468
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('627,26 €');
     const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
-    expect(notaria).toContain('650,56 €');
-    expect(notaria).toContain('867,41 €');
+    expect(notaria).toContain('537,65 €');
+    expect(notaria).toContain('716,87 €');
 
     // Registro — arancel(200.000):
     //   24,04 + 42,0708575 + 37,56325 + (90.151,82 × 0,00075 = 67,613865)
     //   + tramo 5 (0,030 %) → 49.746,97 × 0,0003 = 14,924091
     //   suma = 186,2120635 (por debajo del tope) + 9,015182 = 195,2272455
-    //   con el 21 % de IVA = 236,224967
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('236,22 €');
+    //   con el 21 % de IVA = 236,224967 (en Ceuta, sin IVA: 195,2272455)
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('195,23 €');
 
-    // Total gastos = 6.000 + 758,982746 + 236,224967 + 400 = 7.395,207713
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7395,20 €');
-    // 7.395,207713 / 200.000 = 3,6976039 % → «3,70%»
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('3,70%');
-    // Coste total = 200.000 + 7.395,207713 = 207.395,207713
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('207.395,20 €');
+    // Total gastos = 6.000 + 627,26 + 195,23 + 400 = 7.222,49
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7222,49 €');
+    // 7.222,49 / 200.000 = 3,611245 % → «3,61%»
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('3,61%');
+    // Coste total = 200.000 + 7.222,49 = 207.222,49
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('207.222,49 €');
   });
 
   /**
@@ -207,7 +253,7 @@ test.describe('Simulador de gastos de compra de finca rústica — inspección 2
     await page.selectOption('#select-ccaa', 'madrid');
 
     const campo = page.locator('input[aria-label="' + PRECIO + '"]');
-    const marcador = page.getByText('Introduce el precio de la finca rústica para ver el desglose de gastos');
+    const marcador = page.getByText(MARCADOR_SIN_CIFRA);
 
     for (const entrada of ['0', '-100', '']) {
       await campo.fill(entrada);
@@ -244,7 +290,8 @@ test.describe('Simulador de gastos de compra de finca rústica — inspección 2
 
     // DataReference: normativa, fuente y fecha de verificación de FISCAL_INMUEBLES_META
     // (vigencia '2026', verificado '2026-06-17').
-    await expect(page.getByText(/ITP\/AJD\/IVA 2026/)).toBeVisible();
+    // 26/09/2026 (hallazgo 2217): el IVA de la renuncia tiene su propio sello (FISCAL_IVA_META).
+    await expect(page.getByText(/ITP\/AJD 2026/)).toBeVisible();
     await expect(page.locator('body')).toContainText('17/06/2026');
 
     // App fiscal-España estructural → RegionBadge es-only (CLAUDE.md §1.bis)
@@ -290,7 +337,7 @@ test.describe('Simulador de gastos de compra de finca rústica — inspección 2
     await page.selectOption('#select-ccaa', 'cataluna');
     await rellenar(page, PRECIO, '1000000');
 
-    await expect(page.getByText(/escala progresiva \(10 % → 11 % → 12 % → 13 %\)/)).toBeVisible();
+    await expect(page.getByText(/escala progresiva \(10\s% → 11\s% → 12\s% → 13\s%\)/)).toBeVisible();
     expect(await valorTarjeta(page, 'ITP (')).toBe('105.000,00 €');
     expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (10,50%)');
   });
@@ -426,7 +473,7 @@ test.describe('Regresión — hallazgos reparados el 26/08/2026', () => {
     await page.goto(RUTA);
     // El bloque educativo llega plegado, así que su texto está en el DOM pero no es visible:
     // `innerText` no lo devuelve y hay que leerlo con `textContent`.
-    const cuerpo = (await page.locator('body').textContent()) ?? '';
+    const cuerpo = pegarPct(((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' '));
     expect(cuerpo).toContain(`base del ahorro, ${minimo}%-${maximo}%`);
   });
 });
@@ -463,7 +510,7 @@ test.describe('Re-inspección 11/09/2026 — la escala de Aragón del art. 121-1
     expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,00%)');
 
     // La app avisa de la escala completa, los cinco tramos de la ficha reescrita.
-    await expect(page.getByText(/escala progresiva \(8 % → 8,50 % → 9 % → 9,50 % → 10 %\)/)).toBeVisible();
+    await expect(page.getByText(/escala progresiva \(8\s% → 8,50\s% → 9\s% → 9,50\s% → 10\s%\)/)).toBeVisible();
 
     // Notaría — arancel(250.000) con ARANCELES_NOTARIO:
     //   90,15 + 108,182205 + 45,0759 + 90,15182 (tramo 4 completo)
@@ -768,7 +815,7 @@ async function abrirHidratada(page: Page): Promise<void> {
 /** Las líneas del recuadro de la comunidad, normalizadas. */
 async function lineasPanelCcaa(page: Page): Promise<string[]> {
   const textos = await page.locator('[class*="infoCcaaItem"]').allInnerTexts();
-  return textos.map((t) => t.replace(/\s+/g, ' ').trim());
+  return textos.map((t) => pegarPct(t.replace(/\s+/g, ' ').trim()));
 }
 
 test.describe('Re-inspección 12/09/2026 — Murcia al 7,75 % y Melilla sin IVA', () => {
@@ -867,15 +914,18 @@ test.describe('Re-inspección 12/09/2026 — Murcia al 7,75 % y Melilla sin IVA'
     // Notaría — arancel(300.000): 90,15 + 108,182205 + 45,0759 + 90,15182 (tramo 4 completo)
     //   + (149.746,97 × 0,0005 = 74,873485) = 408,43341 · con IVA = 494,2044261
     //   ×1,5 = 741,306639 · ×2 = 988,408852 · medio = 864,85774568
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('864,86 €');
+    // 26/09/2026 (hallazgo 2214): en Canarias, Ceuta y Melilla la notaría y el registro van SIN
+    // IVA —su factura lleva IGIC o IPSI, que la app no calcula y nombra junto al total—.
+    //   en Melilla: 408,43341 × 1,75 = 714,758468 · registro 225,2272455
+    //   total 9.000 + 714,76 + 225,23 + 400 = 10.339,99 → 3,4467 % → 3,45 % · coste 310.339,99
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('714,76 €');
     // Registro — arancel(300.000): 24,04 + 42,0708575 + 37,56325 + 67,613865
     //   + (149.746,97 × 0,0003 = 44,924091) = 216,2120635 + 9,015182 = 225,2272455
-    //   con el 21 % = 272,52496706
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('272,52 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('225,23 €');
 
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('10.537,38 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('3,51%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('310.537,38 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('10.339,99 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('3,45%');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('310.339,99 €');
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL (PARCIAL)' })).toHaveCount(0);
   });
 
@@ -1145,7 +1195,7 @@ test.describe('Re-inspección 23/09/2026 — Castilla y León, Baleares en su tr
     // ITP = 45.000 × 8 % = 3.600 (primer tramo de la escala, hasta 250.000 €).
     expect(await valorTarjeta(page, 'ITP (')).toBe('3600,00 €');
     expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,00%)');
-    await expect(page.getByText(/escala progresiva \(8 % → 10 %\)/)).toBeVisible();
+    await expect(page.getByText(/escala progresiva \(8\s% → 10\s%\)/)).toBeVisible();
     // Compra habitual = exenta de IVA → sin AJD.
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
 
@@ -1205,7 +1255,7 @@ test.describe('Re-inspección 23/09/2026 — Castilla y León, Baleares en su tr
     await abrirHidratada(page);
     await page.getByRole('button', { name: /Compra habitual/ }).click();
     await page.selectOption('#select-ccaa', 'baleares');
-    await expect(page.getByText(/escala progresiva \(8 % → 9 % → 10 % → 12 % → 13 %\)/)).toBeVisible();
+    await expect(page.getByText(/escala progresiva \(8\s% → 9\s% → 10\s% → 12\s% → 13\s%\)/)).toBeVisible();
 
     // 2.000.000 € → 400.000 × 8 % (32.000) + 200.000 × 9 % (18.000) + 400.000 × 10 % (40.000)
     //             + 1.000.000 × 12 % (120.000) = 210.000 € · efectivo 10,50 %
@@ -1261,7 +1311,7 @@ test.describe('Re-inspección 23/09/2026 — Castilla y León, Baleares en su tr
   test('CASO 3 (rechazo) — precio vacío, ilegible y cero; gestoría ilegible en Canarias con renuncia, que sobrevive al cambio de régimen y de comunidad', async ({ page }) => {
     await abrirHidratada(page);
     const VACIO = 'Introduce el precio de la finca rústica para ver el desglose de gastos';
-    const marcador = page.getByText(/Introduce el precio de la finca rústica/);
+    const marcador = page.locator('[class*="placeholder"] p');
     const tarjetas = page.locator('h3', { hasText: /COSTE TOTAL|^ITP \(|^IGIC$/ });
 
     // (1a) VACÍO — el estado de partida de la app (no se siembra: el campo ya está vacío).
@@ -1276,10 +1326,11 @@ test.describe('Re-inspección 23/09/2026 — Castilla y León, Baleares en su tr
     );
     await expect(tarjetas).toHaveCount(0);
 
-    // (1c) CERO — legible, pero la app exige precio > 0: vuelve el mensaje del vacío, sin
-    // decir que no se ha podido leer (se ha leído: es un cero).
+    // (1c) CERO — legible, pero la app exige precio > 0. Hasta el 26/09/2026 volvía el mensaje del
+    // vacío; desde el hallazgo 2218 (patrón 5, «no falta, no vale») dice que no vale, sin decir
+    // que no se ha podido leer (se ha leído: es un cero).
     await sembrarValor(page, CAMPO_PRECIO, '0');
-    expect((await marcador.innerText()).trim()).toBe(VACIO);
+    expect((await marcador.innerText()).trim()).toBe(`El precio escrito («0») ${PRECIO_NO_VALE}.`);
     await expect(tarjetas).toHaveCount(0);
 
     // (2) Canarias · renuncia · 150.000 € · gestoría «2.000.50».
@@ -1291,21 +1342,23 @@ test.describe('Re-inspección 23/09/2026 — Castilla y León, Baleares en su tr
     // Sin IVA que liquidar (IGIC, no calculado) y AJD = 150.000 × 0,75 % = 1.125.
     expect(await valorTarjeta(page, 'IGIC')).toBe('No calculado');
     expect(await valorTarjeta(page, 'AJD (')).toBe('1125,00 €');
+    // 26/09/2026 (hallazgo 2214): en Canarias, Ceuta y Melilla la notaría y el registro van SIN
+    // IVA —su factura lleva IGIC o IPSI, que la app no calcula y nombra junto al total—.
     // Notaría — arancel(150.000) = 90,15 + 108,182205 + 45,0759 + 89.898,79 × 0,001 (89,89879)
-    //   = 333,306895 · × 1,21 = 403,30134295 · × 1,75 = 705,77735 → 705,78
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('705,78 €');
+    //   = 333,306895 · × 1,75 = 583,287066 → 583,29 (con IVA era 705,78)
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('583,29 €');
     // Registro — 24,04 + 42,0708575 + 37,56325 + 89.898,79 × 0,00075 (67,4240925) = 171,0982
-    //   + 9,015182 = 180,113382 · × 1,21 = 217,93719 → 217,94
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('217,94 €');
+    //   + 9,015182 = 180,113382 → 180,11 (con IVA era 217,94)
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('180,11 €');
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
-    // Total = 0 + 1.125 + 705,78 + 217,94 = 2.048,72 · / 150.000 = 1,36581 % → 1,37 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2048,72 €');
+    // Total = 0 + 1.125 + 583,29 + 180,11 = 1.888,40 · / 150.000 = 1,25893 % → 1,26 %
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1888,40 €');
     const descTotal = await descripcionTarjeta(page, 'Total gastos adicionales');
-    expect(descTotal).toContain('1,37%');
+    expect(descTotal).toContain('1,26%');
     expect(descTotal).toContain('SIN el IGIC');
     expect(descTotal).toContain('SIN la gestoría, que no se ha podido leer');
     // Las DOS ausencias en la misma frase, y la dirección: lo que falta SUBE el coste.
-    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('152.048,72 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('151.888,40 €');
     expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe(
       'No incluye el IGIC ni la gestoría, que no se ha podido leer: el coste real será mayor',
     );
@@ -1316,14 +1369,14 @@ test.describe('Re-inspección 23/09/2026 — Castilla y León, Baleares en su tr
     expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (6,50%)');
     expect(await valorTarjeta(page, 'ITP (')).toBe('9750,00 €');
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
-    // Total = 9.750 + 705,78 + 217,94 = 10.673,72
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('10.673,72 €');
+    // Total = 9.750 + 583,29 + 180,11 = 10.513,40 (sin IVA en honorarios, hallazgo 2214)
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('10.513,40 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).not.toContain('IGIC');
     // 24/09/2026 (hallazgo 1604): sin el IGIC el cierre sigue siendo PARCIAL por la gestoría
     // ilegible; hasta ese día se esperaba aquí el título definitivo, que era el defecto.
     expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
     expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
-    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('160.673,72 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('160.513,40 €');
     expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
       'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
     );
@@ -1426,7 +1479,8 @@ test.describe('Hallazgos reparados — re-inspección 23/09/2026', () => {
 
     // Preparación (pasa): la cifra es la de siempre y el cierre ya se declara parcial.
     // Total = 1.125 (AJD) + 705,78 + 217,94 + 400 (gestoría por defecto) = 2.448,72
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2448,72 €');
+    // 26/09/2026 (hallazgo 2214): sin IVA en los honorarios → 1.125 + 583,29 + 180,11 + 400 = 2.288,40
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2288,40 €');
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL (PARCIAL)' })).toHaveCount(1);
 
     // El defecto: la otra tarjeta con el mismo hueco no lo llevaba en el título.
@@ -1499,10 +1553,10 @@ test.describe('Hallazgos reparados — re-inspección 23/09/2026', () => {
         .locator('strong', { hasText: 'Empresa compra finca a otra empresa' })
         .locator('xpath=following-sibling::p[1]')
         .textContent()) ?? '';
-    expect(textoCaso).toContain(`IVA ${general}%`);
+    expect(pegarPct(textoCaso.replace(/\s+/g, ' '))).toContain(`IVA ${general}%`);
 
     const fila = (await page.locator('tr', { hasText: '¿Sujeto a IVA por empresario?' }).textContent()) ?? '';
-    expect(fila).toContain(`${general}% + AJD`);
+    expect(pegarPct(fila.replace(/\s+/g, ' '))).toContain(`${general}% + AJD`);
 
     // Reparado: el tipo ya no está tecleado. Ningún «21%» en un texto publicado de page.tsx;
     // se quitan antes los comentarios, que pueden citar la cifra sin publicarla.
@@ -1692,9 +1746,9 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, la Comunitat V
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('134.490,81 €');
     expect(await page.locator('[class*="infoCcaa"]').first().innerText()).not.toMatch(/escala progresiva \(9% → 11%\)/);
     // El recuadro lo describe como lo que es, un umbral, y rotula el 11 % a ese precio.
-    const recuadro = (await page.locator('[class*="infoCcaa"]').first().innerText()).replace(/\s+/g, ' ');
+    const recuadro = pegarPct((await page.locator('[class*="infoCcaa"]').first().innerText()).replace(/\s+/g, ' '));
     expect(recuadro).toContain('ITP General 11%');
-    expect(recuadro).toContain('pasa al 11 % sobre TODO el valor, no solo sobre el exceso');
+    expect(recuadro).toContain('pasa al 11% sobre TODO el valor, no solo sobre el exceso');
     expect(recuadro).not.toContain('escala progresiva');
     // Con 1.000.001 €: 1.000.001 × 11 % = 110.000,11 € (con la escala salían 90.000,11 €).
     await sembrarValor(page, CAMPO_PRECIO, '1000001');
@@ -1789,12 +1843,18 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, la Comunitat V
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
     expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (3,00%)');
     expect(await valorTarjeta(page, 'ITP (')).toBe('2700,00 €');
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('578,73 €');
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('163,49 €');
+    // 26/09/2026 (hallazgo 2214): en Canarias, Ceuta y Melilla la notaría y el registro van SIN
+    // IVA —su factura lleva IGIC o IPSI, que la app no calcula y nombra junto al total—.
+    //   notaría: arancel(90.000) = 90,15 + 108,182205 + 45,0759 + 29.898,79 × 0,001 = 273,306895
+    //            × 1,75 = 478,287066 · registro: 126,0982 + 9,015182 = 135,113382
+    //   total 2.700 + 478,29 + 135,11 + 400 = 3.713,40 → 4,1260 % → 4,13 % · coste 93.713,40
+    //   con la gestoría ilegible: 3.313,40 · coste 93.313,40
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('478,29 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('135,11 €');
     expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3842,22 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('4,27% sobre el precio de compra');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('93.842,22 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3713,40 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('4,13% sobre el precio de compra');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('93.713,40 €');
     const panel = await lineasPanelCcaa(page);
     expect(panel).toContain('IPSI (renuncia) No existe');
     expect(panel).toContain('AJD (renuncia) No aplica');
@@ -1803,9 +1863,9 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, la Comunitat V
     // La gestoría ilegible suma seguro: título PARCIAL y «será mayor» (hallazgo 1604).
     await sembrarValor(page, CAMPO_GESTORIA, '2.000.50');
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3442,22 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3313,40 €');
     expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
-    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('93.442,22 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('93.313,40 €');
     expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
       'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
     );
@@ -1919,6 +1979,9 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, la Comunitat V
    *   El AJD de la renuncia solo se comprueba por coherencia (rótulo × precio = importe y
    *   presencia/ausencia): su tipo es el hallazgo de la Comunitat Valenciana, y fijarlo aquí lo
    *   consagraría.
+   * 26/09/2026 (hallazgo 2214): en Canarias, Ceuta y Melilla la notaría y el registro van sin
+   * IVA: 458,43341 × 1,75 = 802,258468 → 802,26 y 255,227246 → 255,23. Y con AJD, la descripción
+   * del coste lleva detrás la salvedad del art. 30.1 (hallazgo 2209).
    * 24/09/2026: el País Vasco paga el 7 % de lo que no es vivienda (28.000, antes 16.000 con el
    * 4 % de la vivienda) y el AJD foral del 0,5 % con renuncia (antes, sin AJD); y en Ceuta y
    * Melilla la renuncia no existe (IPSI): su botón está desactivado y allí se comprueba eso.
@@ -1935,7 +1998,8 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, la Comunitat V
     const SIN_IVA: Record<string, string> = { canarias: 'IGIC', ceuta: 'IPSI', melilla: 'IPSI' };
     const SIN_AJD = new Set<string>(); // desde el 24/09/2026 el País Vasco cobra el 0,5 % (antes, 0)
     const SIN_RENUNCIA = new Set(['ceuta', 'melilla']); // el IPSI no tiene renuncia (Ley 8/1991)
-    const FIJOS = 970.73 + 308.82 + 400; // notaría + registro + gestoría
+    // notaría + registro + gestoría; sin IVA en los honorarios donde no rige (hallazgo 2214)
+    const fijos = (ccaa: string) => (SIN_IVA[ccaa] ? 802.26 + 255.23 : 970.73 + 308.82) + 400;
 
     await abrirHidratada(page);
     await sembrarValor(page, CAMPO_PRECIO, '400000');
@@ -1954,7 +2018,7 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, la Comunitat V
           continue;
         }
         await page.getByRole('button', { name: regimen === 'renuncia' ? /renuncia a la exención/i : /Compra habitual/ }).click();
-        const rotulo = regimen === 'itp' ? `ITP (${pct}%)` : sinIva ?? 'IVA (renuncia · ISP) (21,00%)';
+        const rotulo = regimen === 'itp' ? `ITP (${pct}\u00A0%)` : sinIva ?? 'IVA (renuncia · ISP) (21,00\u00A0%)';
         await expect(primera, donde).toHaveText(rotulo);
         const cards = await tarjetasPanel(page);
         const card = (re: RegExp) => cards.find((c) => re.test(c.t));
@@ -1977,33 +2041,34 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, la Comunitat V
         } else {
           expect(ajd, `${donde}: con AJD`).toBeDefined();
           ajdImporte = euros(ajd!.v);
-          const p = Number(ajd!.t.match(/\(([\d,]+)%\)/)![1].replace(',', '.'));
+          const p = Number(ajd!.t.match(/\(([\d,]+)\s?%\)/)![1].replace(',', '.'));
           expect(ajdImporte, donde).toBeGreaterThan(0);
           expect(ajdImporte, `${donde}: rótulo del AJD × precio`).toBeCloseTo((400000 * p) / 100, 0);
         }
-        expect(card(/^Gastos de notaría/)!.v, donde).toBe('970,73 €');
-        expect(card(/^Registro/)!.v, donde).toBe('308,82 €');
+        expect(card(/^Gastos de notaría/)!.v, donde).toBe(sinIva ? '802,26 €' : '970,73 €');
+        expect(card(/^Registro/)!.v, donde).toBe(sinIva ? '255,23 €' : '308,82 €');
+        expect(card(/^Registro/)!.t, donde).toBe(`Registro de la Propiedad ${sinIva ? `(sin ${sinIva})` : '(IVA incluido)'}`);
 
         const total = card(/^Total gastos/)!;
         const coste = card(/^COSTE/)!;
-        expect(euros(total.v), donde).toBeCloseTo(impuesto + ajdImporte + FIJOS, 2);
-        expect(euros(coste.v), donde).toBeCloseTo(400000 + impuesto + ajdImporte + FIJOS, 2);
+        expect(euros(total.v), donde).toBeCloseTo(impuesto + ajdImporte + fijos(ccaa), 2);
+        expect(euros(coste.v), donde).toBeCloseTo(400000 + impuesto + ajdImporte + fijos(ccaa), 2);
         const parcial = regimen === 'renuncia' && !!sinIva;
         expect(total.t, donde).toBe(parcial ? 'Total gastos adicionales (parcial)' : 'Total gastos adicionales');
         expect(coste.t, donde).toBe(parcial ? 'COSTE TOTAL (PARCIAL)' : 'COSTE TOTAL DE ADQUISICIÓN');
         expect(coste.d, donde).toBe(
-          parcial
+          (parcial
             ? `No incluye el ${sinIva}: el coste real puede ser mayor`
             : regimen === 'renuncia'
               ? 'Precio + todos los gastos (antes de deducir el IVA si tienes derecho)'
-              : 'Precio + todos los gastos de la operación',
+              : 'Precio + todos los gastos de la operación') + (ajdImporte > 0 ? `. ${AVISO_BASE_AJD}` : ''),
         );
         expect(JSON.stringify(cards), donde).not.toMatch(/NaN|undefined|Infinity/);
 
         // Lo que rodea a la cifra: el botón de la renuncia, el recuadro y el aviso propio.
         const sinRenuncia = SIN_RENUNCIA.has(ccaa);
         await expect(page.getByRole('button', { name: /renuncia a la exención/i }), donde).toContainText(
-          sinRenuncia ? 'No existe en el IPSI: paga ITP' : sinIva ? `Paga ${sinIva} (ISP) + AJD` : 'IVA 21% (ISP) + AJD',
+          sinRenuncia ? 'No existe en el IPSI: paga ITP' : sinIva ? `Paga ${sinIva} (ISP) + AJD` : 'IVA 21\u00A0% (ISP) + AJD',
         );
         expect(await lineasPanelCcaa(page), donde).toContain(
           sinRenuncia ? `${sinIva} (renuncia) No existe` : sinIva ? `${sinIva} (renuncia) No calculado` : 'IVA (renuncia) 21%',
@@ -2058,12 +2123,19 @@ test.describe('Reparación 24/09/2026 — País Vasco, notaría de libre acuerdo
     );
   });
 
-  /** «0,004» se pinta «0,00 €»: es el cero, así que se queda el marcador (como con «0»). */
+  /**
+   * «0,004» se pinta «0,00 €»: es el cero, así que no hay desglose (como con «0»). Desde el
+   * 26/09 (hallazgo 2218) el marcador dice que el precio tiene que ser mayor que 0.
+   */
   test('Un precio que se pinta 0,00 € no publica desglose', async ({ page }) => {
     await abrirHidratada(page);
+    const esperado: Record<string, string> = {
+      '0': `El precio escrito («0») ${PRECIO_NO_VALE}.`,
+      '0,004': `El precio escrito («0,004») se queda en 0,00 € al céntimo, y ${PRECIO_NO_VALE}.`,
+    };
     for (const entrada of ['0', '0,004']) {
       await sembrarValor(page, CAMPO_PRECIO, entrada);
-      await expect(page.getByText('Introduce el precio de la finca rústica para ver el desglose de gastos'), entrada).toBeVisible();
+      await expect(page.locator('[class*="placeholder"] p'), entrada).toHaveText(esperado[entrada]);
       await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
     }
   });
@@ -2187,6 +2259,9 @@ test.describe('Re-inspección 26/09/2026 — familia grupo B: casos nuevos y el 
    *   d) Canarias, renuncia (la del IGIC, 1605): IGIC «No calculado» · AJD 0,75 % 7500,00 · total
    *      PARCIAL 7.500 + 1437,01 + 478,35 + 400 = 9815,36 (0,98 %) · coste PARCIAL 1.009.815,37,
    *      y como el IGIC puede ser cero, «puede ser mayor», no «será».
+   *      ⚠️ 26/09/2026 (hallazgo 2214): sin IVA en los honorarios de Canarias → notaría
+   *      678,635833 × 1,75 = 1.187,612708 · registro 395,328457 → 7.500 + 1.187,61 + 395,33 + 400
+   *      = 9.482,94 (0,948 % → 0,95 %) · coste PARCIAL 1.009.482,95
    */
   test('CASO 2 (límite) — 1.000.000,01 €: Valencia al 11 % y con renuncia al 2 %; Madrid y Canarias con renuncia al mismo precio', async ({ page }) => {
     expect(ITP_CCAA['valencia'].umbralTipoUnico).toEqual({ superiorA: 1_000_000, tipo: 11 });
@@ -2244,12 +2319,12 @@ test.describe('Re-inspección 26/09/2026 — familia grupo B: casos nuevos y el 
     expect(await valorTarjeta(page, 'IGIC')).toBe('No calculado');
     expect(await valorTarjeta(page, 'AJD (')).toBe('7500,00 €');
     expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('9815,36 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('9482,94 €');
     expect(sinEspacioPct(await descripcionTarjeta(page, 'Total gastos adicionales'))).toBe(
-      '0,98% sobre el precio de compra — SIN el IGIC, que no está incluido',
+      '0,95% sobre el precio de compra — SIN el IGIC, que no está incluido',
     );
     expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
-    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('1.009.815,37 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('1.009.482,95 €');
     expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('No incluye el IGIC: el coste real puede ser mayor');
     panel = (await lineasPanelCcaa(page)).map(sinEspacioPct);
     expect(panel).toContain('IGIC (renuncia) No calculado');
@@ -2322,69 +2397,60 @@ test.describe('Re-inspección 26/09/2026 — familia grupo B: casos nuevos y el 
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS DEL 26/09/2026 — escritos con `test.fail()` salvo con `VER_HUECOS=1` (la
-// convención del testigo de familia): afirman lo que DEBERÍA pasar y fallan en su ÚLTIMA
-// aserción, así que las anteriores siguen comprobando que el caso se reproduce. Al repararse,
-// se quita la marca.
+// REPARACIÓN 26/09/2026 — los siete hallazgos de la re-inspección del 26/09 (2214-2220), sin
+// marca, y la receta de la familia llevada aquí: la base mínima del AJD de la renuncia (2209,
+// anotado en solar) y las notas de la comunidad (2208, anotado en solar). Los siete estaban con
+// `test.fail()`: se quita la marca y las aserciones que afirmaban el defecto («se reproduce»)
+// salen, porque ya no se reproduce. Cifras a mano; ninguna copiada de la app.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos abiertos — 26/09/2026', () => {
+test.describe('Reparación 26/09/2026 — hallazgos 2214-2220 y la receta de la familia', () => {
   test.describe.configure({ timeout: 60_000 });
-  const VER_HUECOS = Boolean(process.env.VER_HUECOS);
+  const normaliza = (s: string | null) => (s ?? '').replace(/\s+/g, ' ').trim();
 
   /**
-   * HALLAZGO (c) · contenido, bajo — el «%» va PEGADO a la cifra en la herramienta y en el
-   * JSON-LD. Regla de catálogo desde 75d5db87 (Ortografía de la RAE, 2010): «15 %» con espacio
-   * duro U+00A0, y cada app se corrige cuando pasa el Inspector. Medido con Valencia, 300.000 €,
-   * renuncia: sello («del 6% al 13%»), botón («IVA 21% (ISP)»), recuadro («ITP General 9%»,
-   * «AJD (renuncia) 2%», «IVA (renuncia) 21%»), aviso de la renuncia («(2%)»), tarjetas
-   * («(21,00%)», «(2,00%)», «23,51% sobre el precio»), y en la guía la tabla, el caso de uso y la
-   * escala del ahorro («19%-30%»). En el JSON-LD, 7 pegados (metadata.ts `pct()` pega el signo:
-   * «del 6% al 13%», «al 50%», «al 21%») y los «50 %» y «9 %» que sí van separados usan el espacio
-   * NORMAL (U+0020) — vienen de `respuestaEscriturar` y `describirSubidaITP` (data/itp-ccaa.ts),
-   * compartidos por las siete hermanas.
+   * REPARADO 2216 · forma (c) — el «%» va con espacio duro U+00A0 en la herramienta, el aviso,
+   * los sellos, el JSON-LD y las description. Valencia, renuncia, 300.000 €.
    */
-  test('HALLAZGO (c) — «%» pegado a la cifra en la herramienta y en el JSON-LD, y separado con espacio normal', async ({ page }) => {
-    if (!VER_HUECOS) test.fail();
+  test('REPARADO 2216 — ningún «%» sin espacio duro en pantalla, sellos, JSON-LD ni description', async ({ page }) => {
     await abrirHidratada(page);
     await page.selectOption('#select-ccaa', 'valencia');
     await sembrarValor(page, CAMPO_PRECIO, '300000');
     await page.getByRole('button', { name: /renuncia a la exención/i }).click();
     expect(await valorTarjeta(page, 'AJD (')).toBe('6000,00 €');
 
-    const zonas = ['[class*="resultados"]', '[class*="infoCcaa"]', '[class*="transmisionGrid"]', '[class*="renunciaAviso"]', '[aria-label="Datos de referencia normativos"]'];
-    const pantalla = (await Promise.all(zonas.map((z) => page.locator(z).first().innerText()))).join('\n');
+    const zonas = ['[class*="resultados"]', '[class*="infoCcaa"]', '[class*="transmisionGrid"]', '[class*="renunciaAviso"]'];
+    const pantalla = [
+      ...(await Promise.all(zonas.map((z) => page.locator(z).first().innerText()))),
+      ...(await page.locator('[aria-label="Datos de referencia normativos"]').allInnerTexts()),
+    ].join('\n');
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
-    // Cada «%» sin espacio duro delante, con un poco de contexto para poder encontrarlo.
+    const descripciones = await Promise.all(
+      ['meta[name="description"]', 'meta[property="og:description"]', 'meta[name="twitter:description"]'].map(
+        async (sel) => (await page.locator(sel).getAttribute('content')) ?? '',
+      ),
+    );
+    expect(pantalla).toMatch(/\d %/);
+    expect(ld).toMatch(/\d %/);
     const malos = (t: string) =>
       [...t.matchAll(/\d%|\d %/g)].map((m) => t.slice(Math.max(0, (m.index ?? 0) - 14), (m.index ?? 0) + 3).replace(/\s+/g, ' '));
-    // Se reproduce: hay «%» mal separados en las dos bocas.
-    expect(malos(pantalla).length).toBeGreaterThan(0);
-    expect(malos(ld).length).toBeGreaterThan(0);
-
-    // Lo que debería pasar: ningún «%» sin su espacio duro, ni en pantalla ni en el JSON-LD.
-    expect({ pantalla: malos(pantalla), jsonLd: malos(ld) }).toEqual({ pantalla: [], jsonLd: [] });
+    expect({ pantalla: malos(pantalla), jsonLd: malos(ld), description: malos(descripciones.join('\n')) }).toEqual({
+      pantalla: [],
+      jsonLd: [],
+      description: [],
+    });
   });
 
   /**
-   * HALLAZGO (a) · dato, bajo — un único sello (`FISCAL_INMUEBLES_META`, «ITP/AJD/IVA 2026»,
-   * verificado 17/06/2026) para una página que publica datos de módulos con sello propio:
-   *  · la escala del ahorro del IRPF, «19%-30%» en el caso de uso «Vender la finca con ganancia»,
-   *    sale de `TRAMOS_GANANCIAS_PATRIMONIALES_2025`, cuyo sello es `GANANCIAS_PATRIMONIALES_META`
-   *    (art. 66 LIRPF, verificado 12/08/2026); ese sello existe porque el de inmuebles «mide otra
-   *    cosa» (hallazgo 781, cabecera de data/fiscal/inmuebles.ts);
-   *  · el IVA de la renuncia sale de `PORCENTAJES_IVA` (data/fiscal/iva.ts), sellado por
-   *    `FISCAL_IVA_META` (verificado 18/06/2026);
-   *  · la notaría y el registro, dos líneas del total, salen del RD 1426/1989 y el RD 1427/1989,
-   *    con sello propio en `FACTURA_NOTARIAL` y `REGISTRO_CONCEPTOS` (20/08/2026). El sello no
-   *    nombra ninguno de los dos y sí el RDL 26/2021 (plusvalía municipal), que esta app dice
-   *    expresamente que no se paga;
-   *  · el umbral valenciano y el AJD de la renuncia (Ley 13/1997 arts. 13 y 14, versión vigente
-   *    desde el 11/08/2026, verificados el 24/09/2026 según la cabecera de data/itp-ccaa.ts) se
-   *    publican bajo «Última verificación: 17/06/2026», una fecha ANTERIOR a esa versión de la ley.
+   * REPARADO 2217 · forma (a) — un sello por módulo cuyos datos publica la página: la escala del
+   * ahorro de la guía (`GANANCIAS_PATRIMONIALES_META`, 12/08/2026), el IVA de la renuncia
+   * (`FISCAL_IVA_META`, 18/06/2026) y los aranceles (RD 1426/1989 y RD 1427/1989). El de
+   * inmuebles ya no cita el RDL 26/2021 de la plusvalía, que esta app dice que no se paga.
+   * (Queda fuera: el umbral y el AJD de la renuncia de Valencia, verificados en la norma el
+   * 24/09/2026, siguen bajo la fecha del sello de inmuebles, 17/06/2026; eso se decide en
+   * data/fiscal, no en la app.)
    */
-  test('HALLAZGO (a) — un solo sello de datos: faltan el de la escala del ahorro, el del IVA y el de los aranceles', async ({ page }) => {
-    if (!VER_HUECOS) test.fail();
+  test('REPARADO 2217 — sellos de la escala del ahorro, del IVA y de los aranceles', async ({ page }) => {
     const fecha = (iso: string) => iso.split('-').reverse().join('/');
     expect(fecha(FISCAL_INMUEBLES_META.verificado)).toBe('17/06/2026');
     expect(fecha(GANANCIAS_PATRIMONIALES_META.verificado)).toBe('12/08/2026');
@@ -2394,7 +2460,6 @@ test.describe('Hallazgos abiertos — 26/09/2026', () => {
 
     await abrirHidratada(page);
     await sembrarValor(page, CAMPO_PRECIO, '150000');
-    // La página publica la escala del ahorro y las dos líneas de fedatarios.
     const guia = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
     const [minAhorro, maxAhorro] = [
       TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo,
@@ -2404,75 +2469,52 @@ test.describe('Hallazgos abiertos — 26/09/2026', () => {
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('705,78 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('217,94 €');
 
-    const sellos = (await page.locator('[aria-label="Datos de referencia normativos"]').allInnerTexts()).map((s) =>
-      s.replace(/\s+/g, ' '),
-    );
+    const sellos = (await page.locator('[aria-label="Datos de referencia normativos"]').allInnerTexts()).map(normaliza);
     const todos = sellos.join(' | ');
     expect(todos).toContain(`Última verificación: ${fecha(FISCAL_INMUEBLES_META.verificado)}`);
-    // Lo que debería pasar: el sello de la escala del ahorro y el del IVA con SU fecha, y los
-    // aranceles citados.
-    expect({
-      ahorro: todos.includes(fecha(GANANCIAS_PATRIMONIALES_META.verificado)),
-      iva: todos.includes(fecha(FISCAL_IVA_META.verificado)),
-      aranceles: /1426\/1989/.test(todos) && /1427\/1989/.test(todos),
-    }).toEqual({ ahorro: true, iva: true, aranceles: true });
+    expect(todos).toContain(fecha(GANANCIAS_PATRIMONIALES_META.verificado));
+    expect(todos).toContain(fecha(FISCAL_IVA_META.verificado));
+    expect(todos).toMatch(/1426\/1989/);
+    expect(todos).toMatch(/1427\/1989/);
+    const inmuebles = sellos.find((s) => s.includes('ITP/AJD 2026')) ?? '';
+    expect(inmuebles).not.toMatch(/RDL 26\/2021|Ley 35\/2006/);
   });
 
   /**
-   * HALLAZGO (d) · contenido, bajo — un precio ESCRITO y legible pero imposible (0, o negativo
-   * mientras el campo tiene el foco) se anuncia como si FALTARA: el marcador dice «Introduce el
-   * precio de la finca rústica…» con el «0» a la vista; y el negativo, al salir del campo, el
-   * blur del NumberInput (min={0}) lo reescribe a «0» sin decir nada. Es la forma (d) de la
-   * familia —el patrón 5, «no falta, no vale» (hallazgo 1799 en el precio de compra de la
-   * referencia)—, que no ha llegado al único precio de la app. No publica ninguna cifra falsa:
-   * es el mensaje. (El panel de comprador de la referencia dice lo mismo con su precio a 0: la
-   * forma es de familia.) OJO al repararlo: «Un precio que se pinta 0,00 € no publica desglose»
-   * (reparación 24/09) espera hoy ese «Introduce el precio…» con el «0» y se pondrá rojo.
+   * REPARADO 2218 · patrón 5 de la familia, «no falta, no vale» (1799 en la referencia) — un
+   * precio escrito como 0 o negativo dice que tiene que ser mayor que 0, también después del
+   * blur, que reescribe el negativo a «0» (min={0} del NumberInput). El vacío pide «Introduce…»
+   * y el ilegible conserva su mensaje (grupo B del testigo de familia).
    */
-  test('HALLAZGO (d) — un precio escrito como 0 o negativo se anuncia como si faltara', async ({ page }) => {
-    if (!VER_HUECOS) test.fail();
+  test('REPARADO 2218 — un precio escrito como 0 o negativo dice que tiene que ser mayor que 0', async ({ page }) => {
     await abrirHidratada(page);
     const marcador = page.locator('[class*="placeholder"] p');
-    const nombra: boolean[] = [];
+    await expect(marcador).toHaveText('Introduce el precio de la finca rústica para ver el desglose de gastos');
     for (const entrada of ['0', '-150000']) {
       await sembrarValor(page, CAMPO_PRECIO, entrada);
-      // Se reproduce: ninguna cifra y el marcador de espera en pantalla.
       await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
-      const texto = ((await marcador.textContent()) ?? '').replace(/\s+/g, ' ').trim();
-      expect(texto.length).toBeGreaterThan(0);
-      // Lo que debería pasar: decir que el precio escrito no vale (tiene que ser mayor que 0),
-      // no pedir que se introduzca uno.
-      nombra.push(!texto.startsWith('Introduce el precio') && /mayor que (0|cero)|«-?\d/.test(texto));
+      await expect(marcador).toHaveText(`El precio escrito («${entrada}») ${PRECIO_NO_VALE}.`);
     }
-    // Y el negativo, al salir del campo, se reescribe a 0 en silencio. `sembrarValor` no pone el
-    // foco en el campo: se le da y se le quita para que dispare el blur.
+    // Al salir del campo el negativo pasa a «0», y el mensaje lo sigue diciendo.
     await page.locator(CAMPO_PRECIO).focus();
     await page.locator(CAMPO_GESTORIA).focus();
     await esperarValorEnReact(page, CAMPO_PRECIO, '0');
-    expect(nombra).toEqual([true, true]);
+    await expect(marcador).toHaveText(`El precio escrito («0») ${PRECIO_NO_VALE}.`);
+    await sembrarValor(page, CAMPO_PRECIO, '2.000.50');
+    await expect(marcador).toContainText('No se ha podido leer el precio «2.000.50»');
   });
 
   /**
-   * HALLAZGO (nuevo) · cálculo, medio — en Canarias, Ceuta y Melilla el registro (y la notaría)
-   * se publican «(IVA incluido)» con un 21 % de IVA, en territorios donde la propia app dice que
-   * no rige el IVA (`TERRITORIOS_SIN_IVA`; cabecera de data/fiscal/iva.ts: «Aplicable al
-   * territorio de aplicación del IVA español (península + Baleares). Canarias (IGIC), Ceuta y
-   * Melilla (IPSI) tienen sus propios impuestos indirectos»). `calcularRegistro` y
-   * `calcularArancelNotarial` multiplican siempre por 1,21 (data/itp-ccaa.ts l. 1669-1670 y
-   * 1497-1498). El Registro de la Propiedad es el del sitio de la finca —el propio motor lo
-   * supone al bonificar el AJD «cuando el Registro radica en Ceuta o Melilla»—, así que su
-   * factura lleva IGIC o IPSI, nunca IVA. La notaría depende de dónde se firme.
-   *   Canarias · compra habitual · 150.000 € · gestoría 400:
-   *     ITP 150.000 × 6,5 % = 9.750,00 · notaría 705,78 · registro 180,113382 × 1,21 = 217,94,
-   *     de los que 37,82 € son el 21 % de un IVA que allí no existe · total 11.073,72 (7,38 %)
-   *     · coste 161.073,72 rotulado «COSTE TOTAL DE ADQUISICIÓN», definitivo.
-   *   Esperado: el registro sin IVA (180,11 € de arancel + el IGIC/IPSI, que la app no calcula y
-   *   tiene que nombrar) · obtenido: «Registro de la Propiedad (IVA incluido)» 217,94 €, y lo
-   *   mismo con la renuncia, bajo la tarjeta «IGIC · En Canarias no rige el IVA».
-   * Viene del motor compartido: está en las siete hermanas.
+   * REPARADO 2214 (motor en 242fffcd; la app pasa la comunidad) — en Canarias, Ceuta y Melilla
+   * la notaría y el registro van SIN IVA, se rotulan «(sin IGIC)» / «(sin IPSI)» y una nota
+   * junto al total dice que esas facturas llevan ese impuesto, que la herramienta no calcula.
+   *   Canarias · compra habitual · 150.000 € · gestoría 400 (aranceles a mano):
+   *     ITP 150.000 × 6,5 % = 9.750 · notaría 333,306895 × 1,75 = 583,287066 → 583,29
+   *     · registro 180,113382 → 180,11 · total 9.750 + 583,29 + 180,11 + 400 = 10.913,40
+   *     (7,2756 % → 7,28 %) · coste 160.913,40
+   *   Ceuta: el mismo registro, 180,11 € «(sin IPSI)».
    */
-  test('HALLAZGO (nuevo) — en Canarias, Ceuta y Melilla el registro se cobra con un 21 % de IVA «(IVA incluido)»', async ({ page }) => {
-    if (!VER_HUECOS) test.fail();
+  test('REPARADO 2214 — Canarias y Ceuta: registro y notaría sin IVA, rotulados sin IGIC/IPSI y nombrados junto al total', async ({ page }) => {
     expect(TIPOS_ITP_CCAA_2025.find((t) => t.ccaa === 'Canarias')?.tipo).toBe(6.5);
     expect(TERRITORIOS_SIN_IVA['canarias']?.impuesto).toBe('IGIC');
     expect(TERRITORIOS_SIN_IVA['ceuta']?.impuesto).toBe('IPSI');
@@ -2480,51 +2522,43 @@ test.describe('Hallazgos abiertos — 26/09/2026', () => {
     await abrirHidratada(page);
     await page.selectOption('#select-ccaa', 'canarias');
     await sembrarValor(page, CAMPO_PRECIO, '150000');
-    // Se reproduce: el cierre es definitivo y el registro lleva el IVA peninsular.
     expect(await valorTarjeta(page, 'ITP (')).toBe('9750,00 €');
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('705,78 €');
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('11.073,72 €');
-    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
-    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('161.073,72 €');
-    const registroCanarias = {
-      rotulo: await rotuloTarjeta(page, /^Registro de la Propiedad/),
-      valor: await valorTarjeta(page, 'Registro de la Propiedad'),
-    };
-    expect(registroCanarias.valor).toBe('217,94 €');
+    expect(await rotuloTarjeta(page, /^Gastos de notaría/)).toBe('Gastos de notaría (sin IGIC)');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('583,29 €');
+    expect(await rotuloTarjeta(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (sin IGIC)');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('180,11 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('10.913,40 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('7,28% sobre el precio de compra');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('160.913,40 €');
+    const nota = page.locator('[class*="avisoHonorarios"]');
+    await expect(nota).toHaveText(
+      'ℹ️ Las facturas de notaría y registro llevan además IGIC, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
+    );
+    await expect(nota).not.toContainText('coste real');
 
-    // Con la renuncia, la contradicción queda en la misma pantalla.
+    // Con la renuncia, la tarjeta del registro ya no promete un IVA que allí no rige.
     await page.getByRole('button', { name: /renuncia a la exención/i }).click();
     expect(await descripcionTarjeta(page, 'IGIC')).toContain('En Canarias no rige el IVA');
-    expect(await rotuloTarjeta(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (IVA incluido)');
+    expect(await rotuloTarjeta(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (sin IGIC)');
 
-    // Ceuta: igual (IPSI).
     await page.selectOption('#select-ccaa', 'ceuta');
-    const registroCeuta = {
-      rotulo: await rotuloTarjeta(page, /^Registro de la Propiedad/),
-      valor: await valorTarjeta(page, 'Registro de la Propiedad'),
-    };
-    expect(registroCeuta.valor).toBe('217,94 €');
+    expect(await rotuloTarjeta(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (sin IPSI)');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('180,11 €');
+    await expect(nota).toContainText('llevan además IPSI');
 
-    // Lo que debería pasar: ni el rótulo promete un IVA que allí no rige, ni la cifra lo suma.
-    const conIva = (r: { rotulo: string; valor: string }) => /IVA incluido/.test(r.rotulo) || r.valor === '217,94 €';
-    expect({ canarias: conIva(registroCanarias), ceuta: conIva(registroCeuta) }).toEqual({ canarias: false, ceuta: false });
+    await page.selectOption('#select-ccaa', 'madrid');
+    expect(await rotuloTarjeta(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (IVA incluido)');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('217,94 €');
+    await expect(nota).toHaveCount(0);
   });
 
   /**
-   * HALLAZGO (nuevo) · accesibilidad, bajo — en modo oscuro el selector de comunidad no tiene
-   * indicador de foco perceptible (WCAG 2.4.7 y 1.4.11). El módulo quita el `outline` en
-   * `.select:focus` y confía en el cambio de borde a `--primary`, pero su propia regla
-   * `[data-theme='dark'] .select { border-color: #555 }` (SimuladorTerrenoRustico.module.css
-   * l. 130-134) tiene la misma especificidad, va DESPUÉS y lo pisa, también al borde que pone la
-   * regla global `select:focus-visible` (globals.css l. 591-595). Solo queda el anillo de
-   * `--focus`, rgba(63,165,209,0,15) sobre la tarjeta #2D2D2D: ≈ 1,25:1, por debajo del 3:1. En
-   * claro sí cambia (borde #2E86AB, 4,11:1 sobre blanco). La referencia no lo tiene: su regla
-   * oscura del select solo cambia el fondo.
-   *   Oscuro · Tab desde el precio al select → borde 1px rgb(85,85,85) igual que sin foco,
-   *   outline none · esperado: el borde (u outline) cambia al recibir el foco.
+   * REPARADO 2215 — en oscuro el select de comunidad muestra el foco: la regla
+   * `[data-theme='dark'] .select` ya no pisa el borde de `:focus` (se repone en oscuro) y
+   * `:focus-visible` añade un contorno. `--primary` oscuro (#3FA5D1) sobre la tarjeta #2D2D2D
+   * da ≈ 4,9:1, por encima del 3:1 de WCAG 1.4.11.
    */
-  test('HALLAZGO (nuevo) — en modo oscuro el select de comunidad no muestra el foco', async ({ page }) => {
-    if (!VER_HUECOS) test.fail();
+  test('REPARADO 2215 — en modo oscuro el select de comunidad muestra el foco', async ({ page }) => {
     await page.addInitScript(() => {
       try {
         localStorage.setItem('meskeia-theme', 'dark');
@@ -2534,85 +2568,85 @@ test.describe('Hallazgos abiertos — 26/09/2026', () => {
     });
     await abrirHidratada(page);
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-
     const leer = () =>
       page.locator('#select-ccaa').evaluate((el) => {
         const cs = getComputedStyle(el);
-        return { borde: cs.borderTopColor, outline: cs.outlineStyle, sombra: cs.boxShadow };
+        return { borde: cs.borderTopColor, outline: cs.outlineStyle };
       });
-    /** Espera a que la medida deje de moverse (la transición de 0,2 s del borde). */
-    const estable = async () => {
-      let previa = JSON.stringify(await leer());
-      await expect
-        .poll(async () => {
-          const ahora = JSON.stringify(await leer());
-          const quieta = ahora === previa;
-          previa = ahora;
-          return quieta;
-        }, { intervals: [150, 150, 250, 400] })
-        .toBe(true);
-      return leer();
-    };
-
-    const sinFoco = await estable();
+    const sinFoco = await leer();
     await page.locator(CAMPO_PRECIO).focus();
     await page.keyboard.press('Tab');
     await expect(page.locator('#select-ccaa')).toBeFocused();
     expect(await page.locator('#select-ccaa').evaluate((el) => el.matches(':focus-visible'))).toBe(true);
-    const conFoco = await estable();
-    // Se reproduce: el único cambio es un anillo del 15 % de opacidad.
-    expect(conFoco.sombra).toMatch(/rgba\(63, 165, 209, 0\.15\)/);
-
-    // Lo que debería pasar: el borde o el outline cambian al recibir el foco.
-    expect(conFoco.borde !== sinFoco.borde || conFoco.outline !== 'none').toBe(true);
+    await expect.poll(async () => (await leer()).borde).not.toBe(sinFoco.borde);
+    expect((await leer()).outline).not.toBe('none');
   });
 
   /**
-   * HALLAZGO (nuevo) · contenido, bajo — la tabla «Finca rústica frente a solar edificable»
-   * responde «No (exento)» a «¿Sujeto a IVA por empresario?», y dos filas más abajo que la
-   * renuncia a la exención es «Posible entre profesionales». La entrega de un terreno rústico por
-   * un empresario ESTÁ SUJETA al IVA (art. 4.Uno Ley 37/1992: «Estarán sujetas al impuesto las
-   * entregas de bienes … realizadas … por empresarios o profesionales») y EXENTA (art.
-   * 20.Uno.20.º); por estar sujeta y exenta se puede renunciar a la exención (art. 20.Dos) y paga
-   * ITP (art. 4.Cuatro). Una operación no sujeta no tendría exención a la que renunciar.
-   * Texto de la LIVA leído en sesión por la API de datos abiertos del BOE (BOE-A-1992-28740,
-   * bloques a4 y a20, versiones vigentes desde el 31/10/2012 y el 01/01/2019).
+   * REPARADO 2219 — la entrega de un terreno rústico por un empresario está SUJETA al IVA (art.
+   * 4.Uno Ley 37/1992) y EXENTA (art. 20.Uno.20.º); por eso cabe la renuncia (art. 20.Dos) de
+   * dos filas más abajo y se paga ITP. La fila ya no dice «No (exento)».
    */
-  test('HALLAZGO (nuevo) — la tabla dice «no sujeto» a una entrega sujeta y exenta, cuya exención es renunciable', async ({ page }) => {
-    if (!VER_HUECOS) test.fail();
+  test('REPARADO 2219 — la tabla dice «sujeta pero exenta», coherente con la renuncia', async ({ page }) => {
     await abrirHidratada(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const celda = (fila: string) => page.locator('tr', { hasText: fila }).locator('td').nth(1);
-    await expect(celda('¿Sujeto a IVA por empresario?')).toHaveText('No (exento)');
+    await expect(celda('¿Sujeto a IVA por empresario?')).toHaveText('Sí, pero exenta (art. 20.Uno.20.º LIVA)');
     await expect(celda('Renuncia a la exención de IVA')).toContainText('Posible entre profesionales');
-
-    // Lo que debería pasar: la fila no niega la sujeción de lo que la tabla trata como exento.
-    expect(((await celda('¿Sujeto a IVA por empresario?').textContent()) ?? '').trim()).not.toMatch(/^No\b/);
   });
 
   /**
-   * HALLAZGO (nuevo) · contenido, bajo — «Limitaciones de este simulador» manda a la fiscalidad
-   * del solar el suelo URBANIZABLE: «si el suelo es urbanizable o edificable, la fiscalidad es la
-   * de un solar (IVA/ITP + plusvalía municipal)». Para el IVA, el art. 20.Uno.20.º LIVA solo
-   * considera edificables «los terrenos calificados como solares … así como los demás terrenos
-   * aptos para la edificación por haber sido ésta autorizada por la correspondiente licencia», y
-   * la exención solo se pierde en los «urbanizados o en curso de urbanización» (letra a). Un
-   * suelo urbanizable sin urbanizar vendido por un empresario sigue EXENTO —paga ITP, con la
-   * renuncia posible—, que es justo lo que calcula esta app, no el «IVA (empresario)» que la
-   * tabla atribuye al solar. (Para la plusvalía municipal sí cuenta como urbano: esa mitad del
-   * paréntesis vale.) Mismo texto del BOE que el hallazgo anterior (bloque a20).
+   * REPARADO 2220 — «Limitaciones» ya no equipara el suelo urbanizable al solar para el IVA: el
+   * art. 20.Uno.20.º LIVA solo trata como edificables los solares y los terrenos con licencia, y
+   * la exención se pierde en los urbanizados o en curso de urbanización. El urbanizable sin
+   * urbanizar sigue exento (ITP y renuncia, lo que calcula esta app); para la plusvalía municipal
+   * sí cuenta como urbano.
    */
-  test('HALLAZGO (nuevo) — las limitaciones mandan el suelo urbanizable a la fiscalidad del solar', async ({ page }) => {
-    if (!VER_HUECOS) test.fail();
+  test('REPARADO 2220 — las limitaciones no mandan el urbanizable sin urbanizar a la fiscalidad del solar', async ({ page }) => {
     await abrirHidratada(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const caja = page.locator('[class*="warningBox"]', { hasText: 'Limitaciones de este simulador' }).first();
-    const limitaciones = ((await caja.textContent()) ?? '').replace(/\s+/g, ' ');
-    expect(limitaciones).toContain('Limitaciones de este simulador');
-    // La tabla atribuye al solar «IVA (empresario)».
-    await expect(page.locator('tr', { hasText: 'Impuesto general' }).locator('td').nth(2)).toContainText('IVA (empresario)');
-
-    // Lo que debería pasar: el urbanizable sin urbanizar no se equipara al solar para el IVA.
+    const limitaciones = normaliza(await caja.textContent());
     expect(limitaciones).not.toMatch(/urbanizable o edificable, la fiscalidad es la de un solar/);
+    expect(limitaciones).toContain('El suelo urbanizable que aún no está urbanizado ni en curso de urbanización sigue exento de IVA');
+    expect(limitaciones).toContain('Para la plusvalía municipal, en cambio, cuenta como suelo urbano');
+  });
+
+  /**
+   * Hallazgo 2209 (anotado en solar; la misma forma en la renuncia de esta app) — la base del
+   * AJD no puede ser inferior al valor de referencia (art. 30.1 TRLITPAJD). Se dice en la
+   * tarjeta del AJD, en el total, en la ayuda del precio y en las limitaciones; sin AJD, no.
+   */
+  test('Hallazgo 2209 — con la renuncia, la tarjeta del AJD, el total y la ayuda dicen que su base mínima es el valor de referencia', async ({ page }) => {
+    await abrirHidratada(page);
+    await sembrarValor(page, CAMPO_PRECIO, '100000');
+    const crudo = async (titulo: RegExp) =>
+      normaliza(await page.locator('h3', { hasText: titulo }).first().locator('xpath=../following-sibling::p[1]').innerText());
+    expect(await crudo(/^COSTE TOTAL/)).not.toContain('art. 30.1');
+
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    expect(await crudo(/^AJD/)).toContain(AVISO_BASE_AJD);
+    expect((await crudo(/^COSTE TOTAL/)).endsWith(`. ${AVISO_BASE_AJD}`)).toBe(true);
+    const ayuda = normaliza(
+      await page.locator(`[id="${await page.locator(CAMPO_PRECIO).getAttribute('aria-describedby')}"]`).innerText(),
+    );
+    expect(ayuda).toContain('art. 30.1 TRLITPAJD');
+
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const limitacion = normaliza(await page.locator('li', { hasText: 'valor de referencia catastral puede ser' }).innerText());
+    expect(limitacion).toMatch(/AJD.*art\. 30\.1 TRLITPAJD/);
+  });
+
+  /**
+   * Hallazgo 2208 (anotado en solar) — las notas de la comunidad se pintan, como en garaje,
+   * trastero, local-comercial y la referencia: ahí vive el 1 % del art. 121-11 de Aragón.
+   */
+  test('Hallazgo 2208 — Aragón: la nota de la comunidad (art. 121-11) a la vista, con el «%» separado', async ({ page }) => {
+    expect(ITP_CCAA['aragon'].notas).toContain('art. 121-11');
+    await abrirHidratada(page);
+    await page.selectOption('#select-ccaa', 'aragon');
+    const recuadro = await page.locator('[class*="infoCcaa"]').first().innerText();
+    expect(recuadro).toContain('121-11');
+    expect(recuadro).not.toMatch(/\d%/);
   });
 });

@@ -134,6 +134,20 @@
   color: var(--text-primary);
 }
 
+/* Foco del select en los dos temas (hallazgo 2215). La regla oscura de arriba tiene la misma
+   especificidad que `.select:focus`, va después y le pisaba el borde —también el de la regla
+   global `select:focus-visible`—, así que en oscuro el foco se quedaba en el anillo de `--focus`,
+   de unos 1,25:1. Se repone el borde y se añade un contorno para quien navega con teclado:
+   `--primary` da 4,1:1 sobre blanco y ~4,9:1 sobre el gris oscuro de la tarjeta (≥ 3:1). */
+[data-theme='dark'] .select:focus {
+  border-color: var(--primary);
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* ===== TRANSMISION ===== */
 .transmisionGrid {
   display: grid;
@@ -397,4 +411,24 @@
   background: rgba(245, 158, 11, 0.1);
   border-color: #f59e0b;
   color: #e0c070;
+}
+
+/* ===== IGIC / IPSI DE NOTARÍA Y REGISTRO =====
+   Nota junto al total en Canarias, Ceuta y Melilla (hallazgo 2214): allí las dos facturas no
+   llevan IVA sino IGIC o IPSI, que la herramienta no calcula. Clase propia, y no la del aviso de
+   la renuncia, para que cada aviso se pueda localizar por separado. Solo tokens de texto: el
+   fondo es un velo translúcido del azul de marca y hereda el contraste del tema. */
+.avisoHonorarios {
+  margin: 0.25rem 0 0;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  border-left: 4px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .avisoHonorarios {
+  background: rgba(46, 134, 171, 0.16);
 }

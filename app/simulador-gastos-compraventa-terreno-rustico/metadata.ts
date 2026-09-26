@@ -10,7 +10,7 @@ import {
 import { PORCENTAJES_IVA } from '@/data/fiscal';
 
 /** Un rango es un dato DERIVADO de la tabla de CCAA: escrito a mano envejece en silencio. */
-const pct = (n: number) => `${String(n).replace('.', ',')}%`;
+const pct = (n: number) => `${String(n).replace('.', ',')}\u00A0%`;
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Finca Rústica - ITP, Notaría y Registro | meskeIA',
