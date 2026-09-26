@@ -98,10 +98,12 @@ export const APPS_REGION_ES: ReadonlySet<string> = new Set([
 export const APPS_REGION_ES_DATOS: ReadonlySet<string> = new Set([
   'calculadora-amortizacion-inmovilizado',
   'calculadora-iban',
+  'comparador-electrico',
   'planificador-gastos-bebe',
   'selector-alquiler-vs-compra',
   'selector-calefaccion',
   'selector-seguro-coche',
+  'selector-vehiculo-electrico',
   'simulador-financiacion-empresarial',
   'test-perfil-inversor',
   'visualizador-ciclo-vida-freelance',
