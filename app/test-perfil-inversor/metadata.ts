@@ -70,7 +70,7 @@ export const faqJsonLd = {
       name: '¿En qué invierte un perfil agresivo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un perfil agresivo invierte principalmente en renta variable: acciones individuales, fondos de bolsa, ETFs sectoriales y mercados emergentes. Acepta fluctuaciones elevadas —incluyendo pérdidas temporales del 30-50%— a cambio de mayor potencial de rentabilidad a largo plazo.',
+        text: 'Un perfil agresivo invierte principalmente en renta variable: acciones individuales, fondos de bolsa, ETFs sectoriales y mercados emergentes. Acepta fluctuaciones elevadas —incluyendo pérdidas temporales del 30-50\u00A0%— a cambio de mayor potencial de rentabilidad a largo plazo.',
       },
     },
     {

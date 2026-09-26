@@ -105,17 +105,19 @@ test.describe('Caso normal: un recorrido de 26 puntos', () => {
     await responder(page, [2, 1, 2, 0, 3, 1, 2, 2, 1, 2]);
 
     await expect(perfilMostrado(page)).toHaveText('Equilibrado');
-    // Rasgos declarados en PROFILES.equilibrado.traits
+    // Rasgos declarados en PROFILES.equilibrado.traits. Desde el 26/09/2026 (hallazgo 2180) el
+    // % va separado de la cifra con espacio duro U+00A0, en los rasgos y en la leyenda: las
+    // expectativas antiguas («12-15%», «Renta Variable (50%)») consagraban el defecto.
     await expect(rasgo(page, 0)).toHaveText('Medio');
     await expect(rasgo(page, 1)).toHaveText('5-10 años');
-    await expect(rasgo(page, 2)).toHaveText('12-15%');
+    await expect(rasgo(page, 2)).toHaveText('12-15\u00A0%');
     await expect(rasgo(page, 3)).toHaveText('Crecimiento sostenido');
     // PROFILES.equilibrado.allocation = { rv: 50, rf: 35, liq: 10, alt: 5 }
     expect(await reparto(page)).toEqual([
-      'Renta Variable (50%)',
-      'Renta Fija (35%)',
-      'Liquidez (10%)',
-      'Alternativos (5%)',
+      'Renta Variable (50\u00A0%)',
+      'Renta Fija (35\u00A0%)',
+      'Liquidez (10\u00A0%)',
+      'Alternativos (5\u00A0%)',
     ]);
     // getBarPosition(26) = (26 - 10) / 30 * 100 = 53,333…%
     expect(await segmentoDeLaFlecha(page)).toBe(2); // Equilibrado es el 3.er segmento
@@ -181,10 +183,10 @@ test.describe('Caso límite: el corte 22 / 23 y los extremos de la escala', () =
     await responder(page, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     await expect(perfilMostrado(page)).toHaveText('Conservador');
     expect(await reparto(page)).toEqual([
-      'Renta Variable (15%)', // PROFILES.conservador.allocation = 15/60/20/5
-      'Renta Fija (60%)',
-      'Liquidez (20%)',
-      'Alternativos (5%)',
+      'Renta Variable (15\u00A0%)', // PROFILES.conservador.allocation = 15/60/20/5
+      'Renta Fija (60\u00A0%)',
+      'Liquidez (20\u00A0%)',
+      'Alternativos (5\u00A0%)',
     ]);
     expect(await segmentoDeLaFlecha(page)).toBe(0); // el mínimo cae dentro de Conservador
 
@@ -193,10 +195,10 @@ test.describe('Caso límite: el corte 22 / 23 y los extremos de la escala', () =
     await responder(page, [3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
     await expect(perfilMostrado(page)).toHaveText('Agresivo');
     expect(await reparto(page)).toEqual([
-      'Renta Variable (90%)', // PROFILES.agresivo.allocation = 90/5/0/5
-      'Renta Fija (5%)',
-      'Liquidez (0%)',
-      'Alternativos (5%)',
+      'Renta Variable (90\u00A0%)', // PROFILES.agresivo.allocation = 90/5/0/5
+      'Renta Fija (5\u00A0%)',
+      'Liquidez (0\u00A0%)',
+      'Alternativos (5\u00A0%)',
     ]);
     expect(await segmentoDeLaFlecha(page)).toBe(4); // el máximo cae dentro de Agresivo
   });
@@ -436,14 +438,14 @@ test.describe('re-inspección 22/09/2026', () => {
     // PROFILES.dinamico.traits
     await expect(rasgo(page, 0)).toHaveText('Alto');
     await expect(rasgo(page, 1)).toHaveText('10-15 años');
-    await expect(rasgo(page, 2)).toHaveText('15-20%');
+    await expect(rasgo(page, 2)).toHaveText('15-20\u00A0%');
     await expect(rasgo(page, 3)).toHaveText('Maximizar crecimiento');
     // PROFILES.dinamico.allocation = { rv: 70, rf: 20, liq: 5, alt: 5 }
     expect(await reparto(page)).toEqual([
-      'Renta Variable (70%)',
-      'Renta Fija (20%)',
-      'Liquidez (5%)',
-      'Alternativos (5%)',
+      'Renta Variable (70\u00A0%)',
+      'Renta Fija (20\u00A0%)',
+      'Liquidez (5\u00A0%)',
+      'Alternativos (5\u00A0%)',
     ]);
     // getBarPosition(31) = 3*20 + 2 + (31-29)/(34-29) * 16 = 60 + 2 + 6,4 = 68,4 %
     expect(
@@ -725,6 +727,18 @@ test.describe('re-inspección 26/09/2026', () => {
     return () => n;
   }
 
+  /**
+   * Pone el tema y espera a que terminen las transiciones de color: la app y globals.css animan
+   * `background-color`, y medir en el acto devuelve el fondo CLARO a medio camino (se vio al
+   * reparar el 2179: la tarjeta seguía en rgb(255, 255, 255) con el tema oscuro ya puesto).
+   */
+  async function ponerTema(page: Page, tema: string): Promise<void> {
+    await page.evaluate(async (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      await Promise.all(document.getAnimations().map((a) => a.finished.catch(() => undefined)));
+    }, tema);
+  }
+
   /** Contraste WCAG entre el color del texto y el primer fondo opaco de sus ancestros. */
   async function contrasteDe(loc: Locator): Promise<number> {
     return loc.evaluate((el) => {
@@ -748,6 +762,21 @@ test.describe('re-inspección 26/09/2026', () => {
       const l2 = lum(fondo);
       return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
     });
+  }
+
+  /**
+   * Texto VISIBLE de los bloques propios de la app (resultado y guía). Ni `body.textContent`,
+   * que arrastra los <script> de Next con anchos CSS como «20%», ni RelatedApps, cuyas
+   * descripciones son de otras apps.
+   */
+  async function textoPropioDeLaApp(page: Page): Promise<string> {
+    const bloques = page.locator(
+      [
+        'resultScreen', 'startScreen', 'questionCard', 'guideSection', 'comparativaSection',
+        'escenariosSection', 'faqSection', 'stepGuideSection', 'tipsSection', 'warningBox',
+      ].map((c) => `[class*="${c}"]`).join(', '),
+    );
+    return (await bloques.allInnerTexts()).join('\n');
   }
 
   // ---------- CASO 2 (límite), en escritorio ----------
@@ -797,15 +826,20 @@ test.describe('re-inspección 26/09/2026', () => {
     expect(new URL(page.url()).pathname).toBe(RUTA);
   });
 
-  test('HALLAZGO firma — una carga registra UNA visita aunque pase por portada, cuestionario y resultado', async ({
+  /*
+    ✅ REPARADOS el 26/09/2026 (hallazgos 2175 y 2176). La causa estaba en la app, no en el
+    tracker: tres `return`, uno por fase, con el Footer en otra posición del árbol cada vez.
+    Ahora hay un único árbol y lo común ocupa siempre el mismo sitio. Criterio del encargo:
+    tras la carga, CERO montajes nuevos del tracker en TODO el recorrido —Comenzar → diez
+    respuestas → Ver Resultado → Revisar → Ver Resultado → Repetir—, y una recarga con la
+    sesión restaurada monta el tracker las mismas veces que una carga limpia.
+  */
+  test('2175 (regresión) — una carga registra UNA visita aunque pase por portada, cuestionario y resultado', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'Hallazgo 26/09/2026: cada fase remonta el Footer y su AnalyticsTracker → un registro de visita por fase',
-    );
     // Esperado: 0 montajes nuevos del tracker al pasar de fase (la página es la misma carga).
-    // Obtenido hoy: 2 — uno al pulsar «Comenzar Test» y otro al pulsar «Ver Resultado».
+    // Antes: 2 hasta el resultado (uno en «Comenzar Test» y otro en «Ver Resultado») y 5 con
+    // el recorrido entero.
     const montajes = contarMontajesDelTracker(page);
     await cargarLimpia(page);
     const trasLaCarga = montajes();
@@ -815,20 +849,35 @@ test.describe('re-inspección 26/09/2026', () => {
     await expect(perfilMostrado(page)).toHaveText('Equilibrado');
     await esperarPaginaAsentada(page);
     expect(montajes() - trasLaCarga).toBe(0);
+
+    // El resto del recorrido que contaba el acta: Revisar → Ver Resultado → Repetir.
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).click();
+    await expect(enunciado(page)).toHaveText('¿Qué afirmación te representa mejor?');
+    await botonSiguiente(page).click(); // «Ver Resultado» otra vez
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await page.getByRole('button', { name: /Repetir Test/ }).click();
+    await expect(page.getByRole('button', { name: /Comenzar Test/ })).toBeVisible();
+    await esperarPaginaAsentada(page);
+    expect(montajes() - trasLaCarga).toBe(0);
   });
 
-  test('HALLAZGO firma — recuperar un test a medias tras un F5 no registra DOS visitas en esa carga', async ({
+  test('2176 (regresión) — recuperar un test a medias tras un F5 no registra DOS visitas en esa carga', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'Hallazgo 26/09/2026: la recuperación de la sesión cambia de fase en el primer efecto y remonta el tracker',
-    );
     // Esperado: una carga con la sesión recuperada monta el tracker las MISMAS veces que una
-    // carga limpia. Obtenido hoy: el doble (portada y, al restaurar, cuestionario).
+    // carga limpia. Antes: el doble (portada y, al restaurar, cuestionario).
+    //
+    // ⚠️ 26/09/2026 — la base del acta era `montajes()` justo después de `cargarLimpia`, que
+    // navega DOS veces (una para vaciar sessionStorage y otra para cargar): medía dos cargas, y
+    // comparada con una sola recarga no distinguía la app sana de la rota. Ahora se mide UNA
+    // recarga con la sesión vacía, igual que la recarga con sesión que se compara después.
     const montajes = contarMontajesDelTracker(page);
     await cargarLimpia(page);
-    const porCargaLimpia = montajes();
+    const antesDeLaCargaLimpia = montajes();
+    await page.reload();
+    await esperarPaginaAsentada(page);
+    const porCargaLimpia = montajes() - antesDeLaCargaLimpia;
+    expect(porCargaLimpia).toBeGreaterThan(0); // el testigo existe
     await page.getByRole('button', { name: /Comenzar Test/ }).click();
     await responder(page, [1, 1]); // dos respuestas guardadas en sessionStorage
     await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
@@ -842,58 +891,119 @@ test.describe('re-inspección 26/09/2026', () => {
   });
 
   // ---------- Contenido y accesibilidad ----------
-  test('HALLAZGO contraste — las cifras blancas de la barra de distribución se leen (≥ 4,5:1)', async ({
+  test('2178 (regresión) — las cifras de la barra de distribución se leen (≥ 4,5:1) en los dos temas', async ({
     page,
   }) => {
-    test.fail(true, 'Hallazgo 26/09/2026: blanco sobre #48A9A6 / #7FB3D3 / #95C8DE → 2,80 / 2,26 / 1,81:1');
     // Todo B = 20 puntos → Moderado, el perfil con los cuatro segmentos: 30/50/15/5.
-    // Medido: «30%» 4,11:1 (#2E86AB) · «50%» 2,80:1 (#48A9A6) · «15%» 2,26:1 (#7FB3D3) ·
-    // «5%» 1,81:1 (#95C8DE). Texto de 14,4 px: exige 4,5:1. En los dos temas.
+    // Antes, en blanco: «30%» 4,11:1 (#2E86AB) · «50%» 2,80:1 (#48A9A6) · «15%» 2,26:1
+    // (#7FB3D3) · «5%» 1,81:1 (#95C8DE). Texto de 14,4 px: exige 4,5:1. Umbrales calculados
+    // a mano con la fórmula WCAG: blanco sobre #26718F (--primary-boton) 5,47:1; #1A1A1A
+    // sobre #48A9A6 6,2:1, sobre #7FB3D3 7,7:1 y sobre #95C8DE 9,1:1.
     await cargarLimpia(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).click();
     await responder(page, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     await expect(perfilMostrado(page)).toHaveText('Moderado');
     const segmentos = page.locator('[class*="allocationSegment"]');
     await expect(segmentos).toHaveCount(4);
-    for (let i = 0; i < 4; i++) {
-      expect(await contrasteDe(segmentos.nth(i))).toBeGreaterThanOrEqual(4.5);
+    for (const tema of ['light', 'dark']) {
+      await ponerTema(page, tema);
+      for (let i = 0; i < 4; i++) {
+        expect(await contrasteDe(segmentos.nth(i))).toBeGreaterThanOrEqual(4.5);
+      }
     }
+    // Y ninguna cifra VISIBLE se sale de su segmento (se pintaría sobre el color de al lado):
+    // la de un segmento estrecho se oculta, porque la leyenda de debajo ya la repite.
+    const desbordadas = await segmentos.evaluateAll((els) =>
+      els.filter((el) => {
+        const cifra = el.querySelector('span');
+        if (!cifra || cifra.getClientRects().length === 0) return false; // oculta: no cuenta
+        const s = el.getBoundingClientRect();
+        const c = cifra.getBoundingClientRect();
+        return c.left < s.left - 0.5 || c.right > s.right + 0.5;
+      }).length,
+    );
+    expect(desbordadas).toBe(0);
   });
 
-  test('HALLAZGO contraste — los títulos de la guía en color de marca cumplen 4,5:1 en los dos temas', async ({
+  test('2179 (regresión) — el color de marca como texto y el blanco sobre marca cumplen 4,5:1 en los dos temas', async ({
     page,
   }) => {
-    test.fail(true, 'Hallazgo 26/09/2026: #2E86AB como TEXTO → 4,11:1 en claro y 3,50:1 en oscuro');
-    // `.contentCard h4` (17,6 px, peso 600: no llega a «texto grande») usa var(--primary) como
-    // color de TEXTO. CLAUDE.md: para eso está --primary-texto (5,47:1 sobre blanco).
+    // `.contentCard h4` (17,6 px, peso 600: no llega a «texto grande») usaba var(--primary) como
+    // color de TEXTO: 4,11:1 en claro y 3,50:1 en oscuro. CLAUDE.md: para eso está
+    // --primary-texto (5,47:1 sobre blanco), y para el blanco encima de la marca, --primary-boton.
     await cargarLimpia(page);
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const titulo = page.locator('[class*="contentCard"] h4').first();
     await expect(titulo).toContainText('¿Qué es el perfil inversor?');
+    const situacion = page.locator('[class*="escenarioExample"] p').first(); // «Situación:», 3,90:1
+    const faqAvanzada = page.locator('[class*="faqSectionItem"] h3').first();
+    const pasoFuerte = page.locator('[class*="stepContent"] p strong').first();
+    const perfilRecomendado = page.locator('[class*="escenarioTip"] strong').first();
     for (const tema of ['light', 'dark']) {
-      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
-      expect(await contrasteDe(titulo)).toBeGreaterThanOrEqual(4.5);
+      await ponerTema(page, tema);
+      for (const texto of [titulo, situacion, faqAvanzada, pasoFuerte, perfilRecomendado]) {
+        expect(await contrasteDe(texto)).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+
+    // La insignia «Pregunta 1» (13,6 px) y «Simular esta Cartera»: blanco sobre la marca, 4,11:1.
+    await ponerTema(page, 'light');
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    const insignia = page.locator('[class*="questionNumber"]');
+    await expect(insignia).toHaveText('Pregunta 1');
+    await responder(page, [2, 1, 2, 0, 3, 1, 2, 2, 1, 2]); // 26 → Equilibrado
+    const simular = page.getByRole('link', { name: /Simular esta Cartera/ });
+    for (const tema of ['light', 'dark']) {
+      await ponerTema(page, tema);
+      expect(await contrasteDe(simular)).toBeGreaterThanOrEqual(4.5);
+    }
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).click();
+    for (const tema of ['light', 'dark']) {
+      await ponerTema(page, tema);
+      expect(await contrasteDe(insignia)).toBeGreaterThanOrEqual(4.5);
     }
   });
 
-  test('HALLAZGO formato — el % va separado de la cifra con espacio duro', async ({ page }) => {
-    test.fail(true, 'Hallazgo 26/09/2026: «20%», «Renta Variable (30%)»… pegados (norma del 25/09/2026)');
+  test('2180 (regresión) — el % va separado de la cifra con espacio duro', async ({ page }) => {
+    // Norma del 25/09/2026: U+00A0 entre la cifra y el %. Se comprueba el carácter EXACTO con
+    // textContent, porque toContainText normaliza los espacios y daría por bueno uno normal.
     await cargarLimpia(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).click();
     await opcion(page, 1).click();
     await botonSiguiente(page).click();
-    // Pregunta 2, tal cual la escribe QUESTIONS[1].text: «…perdiera un 20% de su valor…»
-    await expect(enunciado(page)).toContainText('un 20 % de su valor');
+    // Pregunta 2, QUESTIONS[1].text: «…perdiera un 20 % de su valor…»
+    expect(await enunciado(page).textContent()).toContain('un 20 % de su valor');
+    // Leyenda del Moderado (todo B = 20 puntos): «Renta Variable (30 %)».
+    await responder(page, [1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    expect(await page.locator('[class*="legendItem"]').first().textContent()).toBe(
+      'Renta Variable (30 %)',
+    );
+    // En todo el texto de la app (resultado + guía abierta) ya no queda una cifra pegada al %.
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    expect((await textoPropioDeLaApp(page)).match(/\d%/g) ?? []).toEqual([]);
+    // Y el faqJsonLd que leen las IAs: «pérdidas temporales del 30-50 %».
+    const estructurados = (
+      await page.locator('script[type="application/ld+json"]').allTextContents()
+    ).join(' ');
+    expect(estructurados).toContain('30-50 %');
+    expect(estructurados).not.toMatch(/\d%/);
   });
 
-  test('HALLAZGO formato — los importes de la guía llevan espacio antes del €', async ({ page }) => {
-    test.fail(true, 'Hallazgo 26/09/2026: «10.000€», «6.000€», «1.000€/mes», «100.000€», «200.000€» pegados');
+  test('2181 (regresión) — los importes de la guía llevan espacio antes del €', async ({ page }) => {
     await cargarLimpia(page);
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
-    // Paso 4 de la guía: «Imagina que tu cartera de 10.000€ vale 6.000€ mañana».
+    // Paso 4 de la guía: «Imagina que tu cartera de 10.000 € vale 6.000 € mañana».
     await expect(page.locator('[class*="stepGuideSection"]')).toContainText(
-      /10\.000[  ]€ vale 6\.000[  ]€/,
+      /10\.000[ \u00A0]€ vale 6\.000[ \u00A0]€/,
     );
+    // Los escenarios: «1.000 €/mes», «100.000 €» y los dos «200.000 €».
+    const escenarios = page.locator('[class*="escenariosSection"]');
+    await expect(escenarios).toContainText(/1\.000[ \u00A0]€\/mes/);
+    await expect(escenarios).toContainText(/100\.000[ \u00A0]€ ahorrados/);
+    await expect(escenarios).toContainText(/Los 200\.000[ \u00A0]€ son solo una parte/);
+    // Ninguna cifra pegada al € en el texto de la app.
+    expect((await textoPropioDeLaApp(page)).match(/\d€/g) ?? []).toEqual([]);
   });
 });
 
@@ -953,37 +1063,84 @@ test.describe('re-inspección 26/09/2026 · móvil', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
   });
 
-  test('HALLAZGO móvil — tras tocar «Comenzar Test» se ve la pregunta, no el pie de la tarjeta', async ({
+  /**
+   * Borde inferior de la barra fija del logo (MeskeiaLogo, `position: fixed; top: 0`). Lo que
+   * quede por encima está en el viewport pero TAPADO: `toBeInViewport` no lo distingue.
+   */
+  async function bordeDeLaBarraFija(page: Page): Promise<number> {
+    return page.evaluate(() => {
+      let borde = 0;
+      for (const el of Array.from(document.querySelectorAll('body *'))) {
+        const estilo = getComputedStyle(el);
+        if (estilo.position !== 'fixed' || estilo.visibility === 'hidden') continue;
+        const r = el.getBoundingClientRect();
+        // Solo lo anclado arriba y de altura de barra (no un modal a pantalla completa).
+        if (r.top <= 1 && r.height > 0 && r.height < 200) borde = Math.max(borde, r.bottom);
+      }
+      return borde;
+    });
+  }
+
+  /** El elemento está en pantalla y ENTERO por debajo de la barra fija. */
+  async function aLaVistaBajoLaBarra(page: Page, loc: Locator): Promise<void> {
+    await expect(loc).toBeInViewport({ timeout: 2000 });
+    const barra = await bordeDeLaBarraFija(page);
+    const caja = await loc.boundingBox();
+    expect(caja).not.toBeNull();
+    expect(caja!.y).toBeGreaterThanOrEqual(barra);
+    expect(caja!.y + caja!.height).toBeLessThanOrEqual(740);
+  }
+
+  /** Texto accesible del elemento que tiene el foco. */
+  const foco = (page: Page) => page.evaluate(() => document.activeElement?.textContent?.trim() ?? '');
+
+  test('2177 (regresión) — tras tocar «Comenzar Test» se ve la pregunta 1, no el pie de la tarjeta', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'Hallazgo 26/09/2026: el cambio de fase conserva el scroll de la portada (enunciado en top −351 px)',
-    );
-    // «Comenzar Test» está a 1.343 px del principio de la portada (casi dos pantallas abajo).
-    // Al tocarlo, la fase de preguntas es mucho más corta y el scroll se queda donde estaba:
-    // en pantalla quedan la opción D, «Anterior» y «Siguiente» deshabilitados y el pie; el
-    // enunciado, «Pregunta 1 de 10» y las opciones A-B, por encima.
+    // «Comenzar Test» está a ~1.300 px del principio de la portada (casi dos pantallas abajo).
+    // Antes, al tocarlo, la fase de preguntas conservaba ese scroll: en pantalla quedaban la
+    // opción D, «Anterior», «Siguiente» y el pie; el enunciado, en top −351 px.
     await cargarLimpia(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).tap();
-    await expect(enunciado(page)).toBeInViewport({ timeout: 2000 });
+    await aLaVistaBajoLaBarra(page, page.getByText('Pregunta 1 de 10'));
+    await aLaVistaBajoLaBarra(page, enunciado(page));
+    // Y el foco va al encabezado de la fase nueva, no se queda en un botón que ya no existe.
+    expect(await foco(page)).toBe('¿Cuál es tu horizonte temporal de inversión?');
   });
 
-  test('HALLAZGO móvil — «Revisar mis respuestas» y «Repetir Test» dejan a la vista lo que abren', async ({
+  test('2177 (regresión) — «Ver Resultado», «Revisar mis respuestas» y «Repetir Test» dejan a la vista lo que abren', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'Hallazgo 26/09/2026: «Revisar» → enunciado en top −644 px; «Repetir» → «Comenzar Test» en top −948 px',
-    );
+    // Antes: «Revisar» → enunciado en top −644 px; «Repetir» → «Comenzar Test» en top −948 px.
     await cargarLimpia(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).tap();
     await responderTocando(page, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]); // 20 → Moderado
     await expect(perfilMostrado(page)).toHaveText('Moderado');
+    // El resultado empieza por su encabezado, y el nombre del perfil queda también a la vista.
+    await aLaVistaBajoLaBarra(page, page.getByRole('heading', { name: 'Tu perfil es:' }));
+    await aLaVistaBajoLaBarra(page, perfilMostrado(page));
+    expect(await foco(page)).toBe('Tu perfil es:');
+
     await page.getByRole('button', { name: /Revisar mis respuestas/ }).tap();
-    await expect(enunciado(page)).toBeInViewport({ timeout: 2000 });
+    await aLaVistaBajoLaBarra(page, enunciado(page));
+    expect(await foco(page)).toBe('¿Qué afirmación te representa mejor?');
+
     await botonSiguiente(page).tap();
     await page.getByRole('button', { name: /Repetir Test/ }).tap();
-    await expect(page.getByRole('button', { name: /Comenzar Test/ })).toBeInViewport({ timeout: 2000 });
+    await aLaVistaBajoLaBarra(page, page.getByRole('button', { name: /Comenzar Test/ }));
+    expect(await foco(page)).toBe('¿Qué tipo de inversor eres?');
+  });
+
+  test('2177 — la recuperación de sesión al cargar NO roba el foco', async ({ page }) => {
+    // El cambio de fase de la recuperación no lo pide la persona: la página acaba de cargarse
+    // y el foco se queda donde lo deja el navegador. (El scroll no se afirma: en una recarga el
+    // navegador restaura el suyo, y eso no es de la app.)
+    await cargarLimpia(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await responderTocando(page, [1]);
+    await page.reload();
+    await esperarPaginaAsentada(page);
+    await expect(page.getByText(/Hemos recuperado el test/)).toBeVisible();
+    expect(await page.evaluate(() => document.activeElement?.tagName)).toBe('BODY');
   });
 });

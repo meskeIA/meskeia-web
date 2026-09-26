@@ -1,7 +1,7 @@
-/* Variables CSS - Paleta meskeIA */
+/* Variables CSS - Paleta meskeIA
+   --primary y --secondary NO se redeclaran aquí: vienen de globals.css con su variante oscura, y
+   para texto y para fondos con texto blanco están --primary-texto y --primary-boton (2179). */
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
   --accent: #7FB3D3;
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
@@ -163,7 +163,7 @@
 
 .questionNumber {
   display: inline-block;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: 20px;
@@ -178,6 +178,26 @@
   margin: 0 0 var(--spacing-lg);
   line-height: 1.5;
   font-weight: 500;
+}
+
+/* ⚠️ 26/09/2026 (hallazgo 2177) — punto de llegada al cambiar de fase. El margen deja sitio a
+   la barra fija del logo (MeskeiaLogo, position: fixed), que si no taparía el principio. */
+.destinoDeFase {
+  scroll-margin-top: 96px;
+}
+
+/* Los encabezados que reciben el foco por programa no pintan el anillo tras un clic; con
+   teclado sí (:focus-visible), que es a quien le sirve para saber dónde ha caído. */
+.destinoDeFase:focus:not(:focus-visible),
+.focoDeFase:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.destinoDeFase:focus-visible,
+.focoDeFase:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 /* Opciones de Respuesta */
@@ -227,8 +247,8 @@
 
 .optionButton:hover .optionLetter,
 .optionButton.selected .optionLetter {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -266,12 +286,12 @@
 }
 
 .navButton.next {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
 .navButton.next:hover {
-  background: #256a8a;
+  background: #1d5a73;
 }
 
 .navButton:disabled {
@@ -322,12 +342,12 @@
 }
 
 .featureIcon {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .startButton {
   padding: var(--spacing-lg) var(--spacing-xl);
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -368,7 +388,7 @@
 
 .resultProfile {
   font-size: 1.3rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   margin: 0;
 }
@@ -501,18 +521,27 @@
   margin-bottom: var(--spacing-md);
 }
 
+/* ⚠️ 26/09/2026 (hallazgo 2178) — las cifras iban en blanco sobre los cuatro segmentos y
+   ninguna llegaba a 4,5:1 (4,11 · 2,80 · 2,26 · 1,81). El azul pasa a --primary-boton, que es
+   el mismo en los dos temas y con blanco encima da 5,47:1; los tres claros llevan texto casi
+   negro (#1A1A1A: 6,2:1 sobre #48A9A6, 7,7:1 sobre #7FB3D3 y más sobre #95C8DE). Los colores
+   de los segmentos no cambian con el tema, así que el contraste es el mismo en claro y oscuro. */
 .allocationSegment {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: #1A1A1A;
   font-weight: 600;
   font-size: 0.9rem;
   transition: all 0.3s ease;
+  /* Cada segmento es un contenedor: si no cabe la cifra, se oculta (la leyenda la repite). */
+  container-type: inline-size;
+  overflow: hidden;
 }
 
 .allocationSegment.rv {
-  background: #2E86AB;
+  background: var(--primary-boton);
+  color: white;
 }
 
 .allocationSegment.rf {
@@ -525,6 +554,18 @@
 
 .allocationSegment.alt {
   background: #95c8de;
+}
+
+.allocationCifra {
+  white-space: nowrap;
+}
+
+/* «10 %» en negrita a 14,4 px ocupa ~36 px: por debajo de eso se saldría del segmento y se
+   pintaría encima del de al lado, sobre un color para el que no está pensada. */
+@container (max-width: 44px) {
+  .allocationCifra {
+    display: none;
+  }
 }
 
 .allocationLegend {
@@ -547,7 +588,7 @@
   border-radius: 4px;
 }
 
-.legendColor.rv { background: #2E86AB; }
+.legendColor.rv { background: var(--primary-boton); }
 .legendColor.rf { background: #48A9A6; }
 .legendColor.liq { background: #7FB3D3; }
 .legendColor.alt { background: #95c8de; }
@@ -576,12 +617,12 @@
 }
 
 .actionButton.primary {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
 .actionButton.primary:hover {
-  background: #256a8a;
+  background: #1d5a73;
 }
 
 .actionButton.secondary {
@@ -638,6 +679,10 @@
   .hero {
     margin-top: 70px;
     padding: var(--spacing-lg);
+  }
+
+  .destinoDeFase {
+    scroll-margin-top: 80px;
   }
 
   .questionCard {
@@ -706,7 +751,7 @@
 .contentCard h4 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
 }
 
@@ -754,7 +799,7 @@
 .faqItem summary::after {
   content: '+';
   font-size: 1.25rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s ease;
 }
 
@@ -921,7 +966,7 @@
   margin: 0 0 0.5rem;
   font-weight: 600;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioExample code {
@@ -943,7 +988,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* FAQ Ampliado */
@@ -977,7 +1022,7 @@
 
 .faqSectionItem h3 {
   margin: 0 0 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
   line-height: 1.5;
 }
@@ -1046,7 +1091,7 @@
   flex-shrink: 0;
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -1076,7 +1121,7 @@
 }
 
 .stepContent p strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -1263,7 +1308,7 @@
 }
 
 .resultScoreBorde {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
