@@ -23,7 +23,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Visualiza la distribución global de recursos estratégicos: petróleo, gas, litio, tierras raras y cobre. Dependencia de Europa, conflictos por recursos y transición energética.",
   url: "https://meskeia.com/visualizador-geopolitica-recursos/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Cinco primeros productores de petróleo, gas, litio, tierras raras y cobre, con fuente y año',
+    'Reservas separadas de recursos, según el USGS (Mineral Commodity Summaries 2026) y la OPEP',
+    'Dependencia de importaciones de la UE y principales proveedores (Eurostat y Comisión Europea)',
+    'Lugar de cada recurso en la Ley de Materias Primas Críticas de la UE (Reglamento (UE) 2024/1252)',
+    'Cinco conflictos y tensiones por recursos, del Golfo al Triángulo del Litio',
+    'Proyección de demanda de minerales a 2040 de la AIE, con tabla de datos accesible',
+  ],
 });
 
 export const faqJsonLd = {
@@ -43,7 +50,7 @@ export const faqJsonLd = {
       name: '¿Por qué es tan importante el litio en la geopolítica actual?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El litio es el componente clave de las baterías de iones de litio usadas en vehículos eléctricos y almacenamiento de energía renovable. Aproximadamente el 60% de las reservas mundiales se concentran en el "triángulo del litio" formado por Chile, Argentina y Bolivia. China controla gran parte de la capacidad de refinado y producción de baterías, lo que le otorga una ventaja estructural en la transición energética global y genera dependencia en Europa y América del Norte.',
+        text: 'El litio es el componente clave de las baterías de ion-litio de los vehículos eléctricos y del almacenamiento de energía renovable. Según el USGS (Mineral Commodity Summaries 2026), Chile y Argentina reúnen el 37 % de las reservas mundiales; Bolivia, el tercer país del llamado Triángulo del Litio, no declara reservas pero sí 23 millones de toneladas de recursos, y contando los recursos los tres suman en torno al 43 %. En producción minera de 2025 lideran Australia, China y Chile, mientras que el refinado y la fabricación de baterías se concentran en China.',
       },
     },
     {
@@ -51,7 +58,7 @@ export const faqJsonLd = {
       name: '¿Qué son las tierras raras y dónde se producen principalmente?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las tierras raras son un grupo de 17 elementos metálicos (como el neodimio, el disprosio o el cerio) esenciales para fabricar imanes permanentes, pantallas, catalizadores y equipos de defensa. China produce alrededor del 60% de la minería mundial y refina más del 85% de la producción global, lo que la convierte en el proveedor dominante. Esta concentración ha llevado a la UE, EE. UU. y Japón a impulsar proyectos de diversificación de suministro.',
+        text: 'Las tierras raras son un grupo de 17 elementos metálicos (como el neodimio, el disprosio o el cerio) esenciales para fabricar imanes permanentes, pantallas, catalizadores y equipos de defensa. China produjo en 2025 el 69 % de la minería mundial (USGS, Mineral Commodity Summaries 2026) y, según la Comisión Europea (2023), procesa el 85 % de las tierras raras ligeras y la totalidad de las pesadas. Esta concentración ha llevado a la UE, EE. UU. y Japón a impulsar proyectos de diversificación de suministro.',
       },
     },
     {
@@ -59,7 +66,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la dependencia energética de Europa respecto a recursos importados?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La UE importa alrededor del 58% de su energía primaria. Antes de 2022, Rusia suministraba el 45% del gas natural y el 27% del petróleo importado por Europa. La invasión de Ucrania aceleró una reorientación del suministro hacia GNL de EE. UU. y Noruega, y reforzó las políticas de eficiencia y renovables. En minerales críticos para la transición energética, la dependencia de China es superior al 90% en tierras raras y al 70% en refinado de litio.',
+        text: 'Según Eurostat, la UE cubrió con importaciones netas el 57 % de su energía en 2024; en 2023 importó el 90 % del gas natural y el 94,9 % del petróleo que consumió. Rusia aportaba en 2021 el 45 % del gas importado por la UE, y en 2025 el 12 % (Comisión Europea, REPowerEU); el hueco lo cubrieron sobre todo el gas noruego y el GNL de EE. UU. En materias primas para la transición energética, la Comisión Europea (2023) cifra en el 100 % la dependencia de importaciones de la UE en tierras raras y en litio refinado.',
       },
     },
     {
@@ -67,7 +74,7 @@ export const faqJsonLd = {
       name: '¿Cómo afectan los conflictos por recursos al precio del petróleo y a los consumidores?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las tensiones geopolíticas en regiones productoras (Oriente Medio, el estrecho de Ormuz, el Golfo de Guinea) generan incertidumbre en los mercados y pueden elevar el precio del barril en pocas horas. Dado que el petróleo cotiza en dólares en mercados globales, cualquier conflicto o recorte de producción de la OPEP+ se traslada al precio de la gasolina, la electricidad y los bienes transportados en todo el mundo. Cada dólar de subida en el barril equivale aproximadamente a 0,7-0,9 céntimos de euro por litro en la gasolinera.',
+        text: 'Las tensiones geopolíticas en regiones productoras (Oriente Medio, el estrecho de Ormuz, el Golfo de Guinea) generan incertidumbre en los mercados y pueden elevar el precio del barril en pocas horas. Dado que el petróleo cotiza en dólares en mercados globales, cualquier conflicto o recorte de producción de la OPEP+ se traslada al precio de la gasolina, la electricidad y los bienes transportados en todo el mundo. Como un barril tiene 159 litros, cada dólar de subida del barril encarece el crudo en unos 0,6 céntimos de dólar por litro; lo que llega a la gasolinera depende además del tipo de cambio, los márgenes de refino y los impuestos.',
       },
     },
   ],

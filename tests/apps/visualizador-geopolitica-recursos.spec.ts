@@ -54,13 +54,18 @@ import { activarTema } from '../contraste-text-muted-auxiliares';
  * · Contraste: WCAG 2.2, 1.4.3 (4,5:1 texto normal; 3:1 desde 24 px, o 18,66 px en negrita).
  * · Formato: CLAUDE.md global §2 («15 %» con espacio duro U+00A0, desde el 25/09/2026).
  *
- * Los casos 1-3 afirman lo que la app hace bien y pasan hoy. Los marcados con test.fail()
- * afirman lo CORRECTO y hoy fallan por un hallazgo del acta del 25/09/2026, pendiente de
- * reparación: cuando se repare, Playwright avisará («expected to fail but passed») para
- * quitarles la marca.
+ * Los casos que llevaban test.fail() afirmaban lo CORRECTO y fallaban por los hallazgos
+ * 1916-1934 del acta del 25/09/2026. Reparados el 26/09/2026: se quitó la marca y se releyó
+ * cada caso; los que consagraban el defecto o presuponían otra reparación llevan comentario.
+ * Fuentes añadidas en la reparación: OPEP, ASB 2025, tablas 9.1 y 9.2 (gas, 2024); Eurostat
+ * (dependencia 2023 y proveedores 2024); Comisión Europea, Study on the Critical Raw Materials
+ * for the EU 2023 (dependencia de importaciones, media 2016-2020); Comisión Europea, REPowerEU
+ * (gas ruso: 45 % en 2021, 12 % en 2025).
  */
 
 const RUTA = '/visualizador-geopolitica-recursos/';
+/** Espacio duro entre cifra y «%» (CLAUDE.md global §2). */
+const NB = ' ';
 const RECURSOS = ['Petróleo', 'Gas Natural', 'Litio', 'Tierras Raras', 'Cobre'] as const;
 type NombreRecurso = (typeof RECURSOS)[number];
 
@@ -225,20 +230,30 @@ test.describe('Caso 1 · elegir un recurso muestra su ficha', () => {
     }
   });
 
-  test('Litio: criticidad «Crítico» y productores ordenados de mayor a menor', async ({ page }) => {
+  // Reescrito al reparar el hallazgo 1933: «Criticidad UE: Crítico» era un juicio propio que
+  // contradecía el «Riesgo: Medio» de la tabla. La insignia dice ahora lo que dice la ley
+  // (Reglamento (UE) 2024/1252, anexo I: el litio para baterías es materia prima estratégica).
+  test('Litio: estratégica según la CRMA y productores ordenados de mayor a menor', async ({ page }) => {
     const panel = await elegir(page, 'Litio');
-    await expect(panel.locator('[class*="criticidadBadge"]')).toHaveText('Criticidad UE: Crítico');
+    await expect(panel.locator('[class*="criticidadBadge"]')).toHaveText(
+      'Ley europea de materias primas críticas: materia prima estratégica (litio para baterías)',
+    );
     // Los productores salen ordenados de mayor a menor
     const p = await productores(panel);
     const cifras = p.map(([, v]) => v);
     expect([...cifras].sort((a, b) => b - a)).toEqual(cifras);
   });
 
-  test('las reservas de petróleo coinciden con el Statistical Review de BP (fin de 2020)', async ({ page }) => {
-    // BP Statistical Review of World Energy 2021: Venezuela 17,5 %, Arabia Saudí 17,2 %, Canadá 9,7 %
-    // (con arenas bituminosas). Es la última serie de reservas que publicó esa fuente.
+  // Reescrito en la reparación del 26/09/2026: el caso original consagraba las cifras del BP
+  // Statistical Review 2021 (fin de 2020), sin año en pantalla y con el «%» pegado. Ahora la app
+  // usa la serie más reciente de reservas probadas, la de la OPEP (ASB 2025, tabla 3.1, fin de
+  // 2024: Venezuela 303.221, Arabia Saudí 267.200, Irán 208.600 de 1.566.869 millones de
+  // barriles), que excluye las arenas bituminosas; la nota de fuente lo dice y remite a BP.
+  test('las reservas de petróleo coinciden con la OPEP (ASB 2025, fin de 2024) y citan la fuente', async ({ page }) => {
     const panel = await elegir(page, 'Petróleo');
-    expect(await reservas(panel)).toEqual(['Venezuela (17,5% mundial)', 'Arabia Saudí (17,2%)', 'Canadá (9,7%)']);
+    expect(await reservas(panel)).toEqual([`Venezuela: 19,4${NB}%`, `Arabia Saudí: 17,1${NB}%`, `Irán: 13,3${NB}%`]);
+    await expect(panel).toContainText('OPEP, Annual Statistical Bulletin 2025');
+    await expect(panel).toContainText('arenas bituminosas');
   });
 });
 
@@ -279,12 +294,13 @@ test.describe('Caso 2 · límites de la operativa', () => {
       for (const r of RECURSOS) await expect(page.getByRole('tab', { name: r, exact: true })).toBeVisible();
     });
 
-    // HALLAZGO [medio] (Inspector 25/09/2026, pendiente de reparación): por debajo de 580 px el
-    // CSS oculta (display:none) las columnas «Importación UE» y «Principal proveedor», que son dos
-    // de las tres cosas que promete el subtítulo de la sección. En 360 px quedan Recurso y Riesgo.
-    test.fail('la tabla de dependencia enseña el porcentaje importado y el proveedor', async ({ page }) => {
+    // HALLAZGO 1926 [medio] (reparado el 26/09/2026): por debajo de 580 px el CSS ocultaba las
+    // columnas «Importación UE» y «Principal proveedor». Ahora cada fila se apila como ficha.
+    // La cifra ya no es el «98%» de la Comisión de 2020: su estudio de 2023 da una dependencia de
+    // importaciones del 100 % en tierras raras ligeras y pesadas.
+    test('la tabla de dependencia enseña el porcentaje importado y el proveedor', async ({ page }) => {
       const fila = page.locator('[class*="gridDependenciaFila"]').filter({ hasText: 'Tierras Raras' });
-      await expect(fila.getByText('98%')).toBeVisible();
+      await expect(fila.getByText(`100${NB}%`)).toBeVisible();
       await expect(fila.getByText('China', { exact: true })).toBeVisible();
     });
   });
@@ -298,30 +314,30 @@ test.describe('Caso 3 · el Triángulo del Litio (sospecha con caso, hallazgo 15
     await abrir(page);
   });
 
-  // HALLAZGO [alto] (Inspector 25/09/2026, pendiente de reparación). USGS MCS 2026: 36,8 %.
-  test.fail('la tarjeta «Diplomacia del Litio» no atribuye al Triángulo el 60 % de las reservas', async ({ page }) => {
+  // HALLAZGO [alto] (Inspector 25/09/2026, reparado el 26/09/2026). USGS MCS 2026: 36,8 %.
+  test('la tarjeta «Diplomacia del Litio» no atribuye al Triángulo el 60 % de las reservas', async ({ page }) => {
     const cuerpo = await abrirConflicto(page, /Diplomacia del Litio/);
     await expect(cuerpo).not.toContainText(/60\s?%/);
     await expect(cuerpo).toContainText(/37\s?%/);
   });
 
   // HALLAZGO [alto] (mismo hallazgo, segundo sitio: page.tsx:451, «más del 60%»).
-  test.fail('la guía educativa no dice que el Triángulo tenga más del 60 % de las reservas', async ({ page }) => {
+  test('la guía educativa no dice que el Triángulo tenga más del 60 % de las reservas', async ({ page }) => {
     await abrirGuia(page);
     const parrafo = page.locator('h4', { hasText: 'Triángulo del Litio' }).locator('xpath=following-sibling::p[1]');
     await expect(parrafo).not.toContainText(/60\s?%/);
   });
 
   // HALLAZGO [alto] (mismo hallazgo, tercer sitio: la FAQ del JSON-LD, metadata.ts:46).
-  test.fail('la FAQ del JSON-LD no dice que el Triángulo tenga el 60 % de las reservas', async ({ page }) => {
+  test('la FAQ del JSON-LD no dice que el Triángulo tenga el 60 % de las reservas', async ({ page }) => {
     const respuestas = await faq(page);
     expect(respuestas['¿Por qué es tan importante el litio en la geopolítica actual?']).not.toMatch(/60\s?%/);
   });
 
-  // HALLAZGO [alto] (Inspector 25/09/2026, pendiente de reparación): «Mayores Reservas» del litio
+  // HALLAZGO [alto] (Inspector 25/09/2026, reparado el 26/09/2026): «Mayores Reservas» del litio
   // son los RECURSOS de Bolivia, Argentina y Chile del MCS 2023 (21, 20 y 11 Mt) puestos como
   // «% mundial». USGS MCS 2026: reservas Chile 24,9 %, Australia 22,7 %, China 12,4 %; Bolivia 0.
-  test.fail('las mayores reservas de litio son Chile, Australia y China, y Bolivia no figura', async ({ page }) => {
+  test('las mayores reservas de litio son Chile, Australia y China, y Bolivia no figura', async ({ page }) => {
     const panel = await elegir(page, 'Litio');
     const lista = await reservas(panel);
     expect(lista.join(' | ')).not.toContain('Bolivia');
@@ -335,60 +351,62 @@ test.describe('Caso 3 · otras cifras de producción y reservas frente a su fuen
     await abrir(page);
   });
 
-  // HALLAZGO [medio] (pendiente): top 5 de litio de ~2022. USGS MCS 2026 (2025): Australia 31,7 %,
+  // HALLAZGO [medio] (reparado el 26/09/2026): top 5 de litio de ~2022. USGS MCS 2026 (2025): Australia 31,7 %,
   // China 21,4 %, Chile 19,3 %, Zimbabue 9,7 %, Argentina 7,9 %. Zimbabue, cuarto, no aparece.
-  test.fail('Litio: Zimbabue está entre los 5 primeros productores y China es segunda', async ({ page }) => {
+  test('Litio: Zimbabue está entre los 5 primeros productores y China es segunda', async ({ page }) => {
     const p = await productores(await elegir(page, 'Litio'));
     expect(p.map(([pais]) => pais)).toContain('Zimbabue');
     expect(p[1][0]).toBe('China');
   });
 
-  // HALLAZGO [medio] (pendiente): tierras raras. USGS MCS 2026 (2025): China 69,2 %, Rusia 0,7 %
+  // HALLAZGO [medio] (reparado el 26/09/2026): tierras raras. USGS MCS 2026 (2025): China 69,2 %, Rusia 0,7 %
   // (2.600 de 390.000 t; fuera del top 5, que cierra Tailandia con 4.800 t).
-  test.fail('Tierras raras: China produce ~69 % y Rusia no llega al 1 %', async ({ page }) => {
+  test('Tierras raras: China produce ~69 % y Rusia no llega al 1 %', async ({ page }) => {
     const p = new Map(await productores(await elegir(page, 'Tierras Raras')));
     expect(p.get('China')).toBeGreaterThanOrEqual(68);
     expect(p.get('Rusia') ?? 0).toBeLessThan(1);
   });
 
-  // HALLAZGO [medio] (pendiente): reservas de tierras raras. USGS MCS 2026: China 44 Mt, Brasil
+  // HALLAZGO [medio] (reparado el 26/09/2026): reservas de tierras raras. USGS MCS 2026: China 44 Mt, Brasil
   // 11 Mt, Australia 6,3 Mt… Vietnam 3,5 Mt de >75 Mt (≤ 4,7 %), no el 18 % ni el segundo puesto.
-  test.fail('Tierras raras: Vietnam no es la segunda reserva mundial con el 18 %', async ({ page }) => {
+  test('Tierras raras: Vietnam no es la segunda reserva mundial con el 18 %', async ({ page }) => {
     const lista = await reservas(await elegir(page, 'Tierras Raras'));
     expect(lista.join(' | ')).not.toContain('Vietnam (18%)');
     expect(lista[1]).toMatch(/^Brasil/);
   });
 
-  // HALLAZGO [medio] (pendiente): petróleo. EIA (2023): EE. UU. 22 % de la producción mundial.
-  test.fail('Petróleo: EE. UU. produce en torno al 22 %, no el 14 %', async ({ page }) => {
+  // HALLAZGO [medio] (reparado el 26/09/2026): petróleo. EIA (2023): EE. UU. 22 % de la producción mundial.
+  test('Petróleo: EE. UU. produce en torno al 22 %, no el 14 %', async ({ page }) => {
     const p = new Map(await productores(await elegir(page, 'Petróleo')));
-    expect(p.get('EEUU')).toBeGreaterThanOrEqual(20);
+    // «EEUU» pasó a «EE. UU.» (abreviatura de la RAE) en la misma reparación.
+    expect(p.get('EE. UU.')).toBeGreaterThanOrEqual(20);
+    await expect(page.getByRole('tabpanel')).toContainText('EIA (EE. UU.), datos de 2023');
   });
 
-  // HALLAZGO [bajo] (pendiente): cobre. USGS MCS 2026 (2025): la RD del Congo (3.200 kt, 13,9 %)
+  // HALLAZGO [bajo] (reparado el 26/09/2026): cobre. USGS MCS 2026 (2025): la RD del Congo (3.200 kt, 13,9 %)
   // es la segunda, por delante de Perú (2.700 kt, 11,7 %); Chile 23 %, no 27 %.
-  test.fail('Cobre: la RD del Congo es el segundo productor', async ({ page }) => {
+  test('Cobre: la RD del Congo es el segundo productor', async ({ page }) => {
     const p = await productores(await elegir(page, 'Cobre'));
     expect(p[1][0]).toMatch(/Congo/);
   });
 
-  // HALLAZGO [bajo] (pendiente): el Golfo «alberga más del 60 %» de las reservas probadas.
+  // HALLAZGO [bajo] (reparado el 26/09/2026): el Golfo «alberga más del 60 %» de las reservas probadas.
   // OPEP, ASB 2025: Oriente Medio 871.218 de 1.566.869 millones de barriles = 55,6 %.
-  test.fail('Guerra del Golfo: no afirma que el Golfo tenga hoy más del 60 % de las reservas', async ({ page }) => {
+  test('Guerra del Golfo: no afirma que el Golfo tenga hoy más del 60 % de las reservas', async ({ page }) => {
     const cuerpo = await abrirConflicto(page, /Guerra del Golfo/);
     await expect(cuerpo).not.toContainText(/más del 60\s?%/);
   });
 
-  // HALLAZGO [medio] (pendiente): el título habla de coltán (tántalo, condensadores) y el texto
+  // HALLAZGO [medio] (reparado el 26/09/2026): el título habla de coltán (tántalo, condensadores) y el texto
   // de cobalto (baterías). USGS MCS 2026, capítulos TANTALUM y COBALT.
-  test.fail('el conflicto del Congo no llama «coltán de las baterías» al cobalto', async ({ page }) => {
+  test('el conflicto del Congo no llama «coltán de las baterías» al cobalto', async ({ page }) => {
     await expect(page.getByRole('button', { name: /Congo/ })).not.toContainText('coltán de las baterías');
   });
 
-  // HALLAZGO [medio] (pendiente): el gráfico «fuente: AIE» multiplica por 2-4 lo que da la AIE.
+  // HALLAZGO [medio] (reparado el 26/09/2026): el gráfico «fuente: AIE» multiplica por 2-4 lo que da la AIE.
   // GCMO 2024, NZE (el escenario más alto), hoy → 2040: grafito ≈ ×4; níquel, cobalto y tierras
   // raras ×2. La app: grafito ×8, níquel ×5, cobalto ×4, tierras raras ×6.
-  test.fail('el gráfico de demanda 2040 no supera lo que proyecta la AIE en su escenario NZE', async ({ page }) => {
+  test('el gráfico de demanda 2040 no supera lo que proyecta la AIE en su escenario NZE', async ({ page }) => {
     const { etiquetas, series } = await datosGrafico(page);
     const s2040 = series.find((s) => s.label.includes('2040'));
     expect(s2040).toBeDefined();
@@ -399,9 +417,9 @@ test.describe('Caso 3 · otras cifras de producción y reservas frente a su fuen
     expect(valor('Tierras Raras')).toBeLessThanOrEqual(2.5);
   });
 
-  // HALLAZGO [medio] (pendiente): la CRMA fija 34 materias primas FUNDAMENTALES, de las que 17
+  // HALLAZGO [medio] (reparado el 26/09/2026): la CRMA fija 34 materias primas FUNDAMENTALES, de las que 17
   // son estratégicas (JRC-RMIS), y el reciclado de referencia es el 25 %, no el 15 % (Comisión).
-  test.fail('la guía describe bien la Ley de Materias Primas Críticas', async ({ page }) => {
+  test('la guía describe bien la Ley de Materias Primas Críticas', async ({ page }) => {
     await abrirGuia(page);
     const texto = page.locator('h4', { hasText: 'Materias Primas Críticas' }).locator('xpath=following-sibling::p[1]');
     await expect(texto).toBeVisible();
@@ -414,78 +432,110 @@ test.describe('Caso 3 · otras cifras de producción y reservas frente a su fuen
 // Accesibilidad, contraste y formato
 // ════════════════════════════════════════════════════════════════════════════
 test.describe('Accesibilidad y formato', () => {
-  // HALLAZGO [medio] (pendiente): los botones de conflicto no fijan fondo ni color y se quedan con
+  // HALLAZGO [medio] (reparado el 26/09/2026): los botones de conflicto no fijan fondo ni color y se quedan con
   // el gris por defecto del navegador. En oscuro (color-scheme: dark, que pone el conmutador de
   // tema) ese gris es rgb(107,107,107) y el título va en #e8e8e8: 2,71:1. En claro es rgb(240,
   // 240,240) con borde «outset»: se lee, pero no es el diseño de la tarjeta.
-  test.fail('en tema oscuro los títulos de los conflictos se leen (≥ 4,5:1)', async ({ page }) => {
+  test('en tema oscuro los títulos de los conflictos se leen (≥ 4,5:1)', async ({ page }) => {
     await page.goto(RUTA);
     await activarTema(page, 'dark');
     const c = await peorContraste(page, '[class*="conflictoTitulo"]');
     expect(c?.ratio ?? 0).toBeGreaterThanOrEqual(4.5);
   });
 
-  // HALLAZGO [medio] (pendiente): texto pequeño bajo 4,5:1 en claro. Cabecera de la tabla blanca
+  // HALLAZGO [medio] (reparado el 26/09/2026): texto pequeño bajo 4,5:1 en claro. Cabecera de la tabla blanca
   // sobre el degradado primary→secondary 2,80-4,11:1 (2,23-2,79:1 en oscuro); semáforo naranja
   // 2,86:1; verde 3,32:1; rojo 3,95:1; badge de criticidad 2,86:1 («Alto») y 3,95:1 («Crítico»);
   // % importado 3,93:1; pestaña activa 3,62:1.
-  test.fail('el texto pequeño de la app cumple 4,5:1 en tema claro', async ({ page }) => {
-    await page.goto(RUTA);
-    await activarTema(page, 'light');
-    const fallos: string[] = [];
-    for (const sel of [
-      '[class*="gridDependenciaHeader"] > span',
-      '[class*="semaforoNaranja"]',
-      '[class*="semaforoVerde"]',
-      '[class*="semaforoRojo"]',
-      '[class*="criticidadBadge"]',
-      '[class*="gridDependenciaFila"] [class*="porcentaje"]',
-      '[role="tab"][aria-selected="true"]',
-    ]) {
-      const c = await peorContraste(page, sel);
-      if (c && c.ratio < 4.5) fallos.push(`${sel} «${c.texto}» ${c.ratio}`);
-    }
-    expect(fallos).toEqual([]);
-  });
+  // Tras la reparación se mide también el tema oscuro (el acta midió el claro y, en la cabecera,
+  // el oscuro), y la insignia en sus DOS variantes: Petróleo («no figura») y Litio («estratégica»).
+  for (const tema of ['light', 'dark'] as const) {
+    test(`el texto pequeño de la app cumple 4,5:1 en tema ${tema === 'light' ? 'claro' : 'oscuro'}`, async ({ page }) => {
+      await page.goto(RUTA);
+      // Sin transiciones: las pestañas y las filas animan el fondo y se mediría a mitad de camino
+      await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
+      await activarTema(page, tema);
+      const selectores = [
+        '[class*="gridDependenciaHeader"] > span',
+        // Los semáforos «Riesgo» se sustituyeron por el estatus en la CRMA (hallazgo 1933)
+        '[class*="crmaEstrategica"]',
+        '[class*="crmaNoFigura"]',
+        '[class*="criticidadBadge"]',
+        '[class*="gridDependenciaFila"] [class*="porcentaje"]',
+        '[role="tab"][aria-selected="true"]',
+        '[class*="fuente"]',
+      ];
+      const fallos: string[] = [];
+      for (const sel of selectores) {
+        const c = await peorContraste(page, sel);
+        if (c && c.ratio < 4.5) fallos.push(`${sel} «${c.texto}» ${c.ratio}`);
+      }
+      await elegir(page, 'Litio');
+      for (const sel of ['[class*="criticidadBadge"]', '[role="tab"][aria-selected="true"]']) {
+        const c = await peorContraste(page, sel);
+        if (c && c.ratio < 4.5) fallos.push(`Litio ${sel} «${c.texto}» ${c.ratio}`);
+      }
+      expect(fallos).toEqual([]);
+    });
+  }
 
   test.describe('estructura accesible', () => {
     test.beforeEach(async ({ page }) => {
       await abrir(page);
     });
 
-    // HALLAZGO [bajo] (pendiente): cinco role="progressbar" sin nombre accesible (axe:
+    // HALLAZGO [bajo] (reparado el 26/09/2026): cinco role="progressbar" sin nombre accesible (axe:
     // aria-progressbar-name); además, una cuota de mercado no es una barra de progreso.
-    test.fail('las barras de productores tienen nombre accesible', async ({ page }) => {
+    // Reparado: una cuota no es una barra de progreso y la cifra ya está en la etiqueta de texto,
+    // así que la barra pasa a ser su dibujo, oculto a la tecnología de apoyo (aria-hidden).
+    test('las barras de productores tienen nombre accesible', async ({ page }) => {
       const sinNombre = await page.locator('[role="progressbar"]').evaluateAll((els) =>
         els.filter((e) => !e.getAttribute('aria-label') && !e.getAttribute('aria-labelledby')).length,
       );
       expect(sinNombre).toBe(0);
+      const barras = page.locator('[class*="barraHorizontal"]');
+      await expect(barras).toHaveCount(5);
+      for (const b of await barras.all()) await expect(b).toHaveAttribute('aria-hidden', 'true');
     });
 
-    // HALLAZGO [medio] (pendiente): el gráfico de demanda es un <canvas role="img"> sin texto
+    // HALLAZGO [medio] (reparado el 26/09/2026): el gráfico de demanda es un <canvas role="img"> sin texto
     // alternativo (axe: role-img-alt); sus seis multiplicadores no existen fuera del lienzo.
-    test.fail('el gráfico de demanda tiene alternativa textual', async ({ page }) => {
+    test('el gráfico de demanda tiene alternativa textual', async ({ page }) => {
       const canvas = page.locator('canvas').first();
       const nombre = (await canvas.getAttribute('aria-label')) ?? (await canvas.textContent()) ?? '';
       expect(nombre.trim().length).toBeGreaterThan(0);
+      // Reparado con aria-label y con una tabla de datos equivalente, visible
+      expect(nombre).toContain('Litio: se multiplica por nueve');
+      const tabla = page.getByRole('table', { name: /Datos del gráfico/ });
+      await expect(tabla.getByRole('row')).toHaveCount(6);
+      await expect(tabla.getByRole('row', { name: /Grafito/ })).toContainText('Casi se cuadruplica');
     });
 
-    // HALLAZGO [bajo] (pendiente): la barra de China (60 %) lleva width:120 % y el recorte la
+    // HALLAZGO [bajo] (reparado el 26/09/2026): la barra de China (60 %) lleva width:120 % y el recorte la
     // deja llena: la escala es ×2, así que el carril entero vale 50 %.
-    test.fail('ninguna barra de productor se sale de su carril', async ({ page }) => {
+    // Reescrito al repararlo: las barras dejaron de ser role="progressbar" (hallazgo 1930), así
+    // que se localizan por su clase; si no, el caso pasaría midiendo cero barras. Se exige además
+    // proporción: China, 69,2 %, ocupa ≈ 69 % del carril (antes la escala era ×2).
+    test('ninguna barra de productor se sale de su carril', async ({ page }) => {
       await page.addStyleTag({ content: '* { transition: none !important; }' });
       await elegir(page, 'Tierras Raras');
-      const desbordes = await page.locator('[role="progressbar"]').evaluateAll((els) =>
-        els.filter((e) => (e.firstElementChild as HTMLElement).getBoundingClientRect().width > e.getBoundingClientRect().width + 0.5).length,
+      const barras = page.locator('[class*="barraHorizontal"]');
+      await expect(barras).toHaveCount(5);
+      const proporciones = await barras.evaluateAll((els) =>
+        els.map((e) => (e.firstElementChild as HTMLElement).getBoundingClientRect().width / e.getBoundingClientRect().width),
       );
-      expect(desbordes).toBe(0);
+      for (const r of proporciones) expect(r).toBeLessThanOrEqual(1.001);
+      expect(proporciones[0]).toBeCloseTo(0.692, 2);
     });
 
-    // HALLAZGO [bajo] (pendiente): «%» pegado a la cifra (CLAUDE.md §2: espacio duro U+00A0),
+    // HALLAZGO [bajo] (reparado el 26/09/2026): «%» pegado a la cifra (CLAUDE.md §2: espacio duro U+00A0),
     // «DRC» (sigla inglesa; en español RD del Congo) y «2000s» (calco del inglés).
-    test.fail('formato español: «47 %» con espacio duro, sin «DRC» ni «2000s»', async ({ page }) => {
+    // La cifra del caso era el 47 % de Australia, que era el dato desfasado (hallazgo 1918): el
+    // USGS MCS 2026 da 31,7 %. Se añade que ninguna cifra del cuerpo lleve el «%» pegado.
+    test('formato español: «31,7 %» con espacio duro, sin «DRC» ni «2000s»', async ({ page }) => {
       const litio = await elegir(page, 'Litio');
-      await expect(litio).toContainText('47 %');
+      await expect(litio).toContainText(`31,7${NB}%`);
+      expect(await page.locator('body').innerText()).not.toMatch(/\d%/);
       const cuerpo = await page.locator('body').innerText();
       expect(cuerpo).not.toMatch(/\bDRC\b/);
       expect(cuerpo).not.toContain('2000s');

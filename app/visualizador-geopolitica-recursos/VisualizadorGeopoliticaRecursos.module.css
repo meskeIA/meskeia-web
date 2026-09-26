@@ -86,7 +86,7 @@
 
 .recursoTab:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(46, 134, 171, 0.15);
 }
@@ -94,7 +94,8 @@
 .recursoTab.activo {
   border-color: var(--primary);
   background: linear-gradient(135deg, #e8f4f8 0%, #e0f5f4 100%);
-  color: var(--primary);
+  /* --primary daba 3,62:1 sobre el degradado (hallazgo 1925) */
+  color: var(--primary-texto);
   font-weight: 700;
   box-shadow: 0 4px 12px rgba(46, 134, 171, 0.2);
 }
@@ -121,6 +122,7 @@
 
 .recursoDetalleHeader {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
@@ -143,36 +145,29 @@
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 700;
+  line-height: 1.35;
 }
 
-.criticidadCritico {
-  background: #fee2e2;
-  color: #dc2626;
+/* Hallazgos 1925 y 1933: la insignia era un juicio propio («Crítico/Alto/Medio») en ámbar y
+   rojo por debajo de 4,5:1. Ahora dice lo que dice la ley, con texto del color del cuerpo. */
+.criticidadEstrategica {
+  background: #e8f4f8;
+  color: var(--primary-texto);
+  border: 1px solid var(--primary);
 }
 
-.criticidadAlto {
-  background: #fef3c7;
-  color: #d97706;
+.criticidadNoFigura {
+  background: var(--hover);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
 }
 
-.criticidadMedio {
-  background: #d1fae5;
-  color: #059669;
+[data-theme='dark'] .criticidadEstrategica {
+  background: transparent;
 }
 
-[data-theme='dark'] .criticidadCritico {
-  background: rgba(220,38,38,0.2);
-  color: #f87171;
-}
-
-[data-theme='dark'] .criticidadAlto {
-  background: rgba(217,119,6,0.2);
-  color: #fbbf24;
-}
-
-[data-theme='dark'] .criticidadMedio {
-  background: rgba(5,150,105,0.2);
-  color: #34d399;
+[data-theme='dark'] .criticidadNoFigura {
+  background: transparent;
 }
 
 .productoresGrid {
@@ -225,6 +220,13 @@
   background: linear-gradient(90deg, var(--primary), var(--secondary));
   border-radius: 5px;
   transition: width 0.5s ease;
+}
+
+.fuente {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0.6rem 0 0;
 }
 
 .reservasList {
@@ -285,7 +287,8 @@
 .gridDependenciaHeader {
   display: grid;
   grid-template-columns: 1.2fr 1fr 1.5fr 1fr;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  /* primary→secondary con blanco daba 2,80-4,11:1 (hallazgo 1925) */
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   padding: 0.75rem 1rem;
   font-size: 0.8rem;
@@ -332,72 +335,70 @@
 
 .porcentaje {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
-.semaforoRojo {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
+.crmaEstrategica,
+.crmaNoFigura {
+  display: inline-block;
   padding: 0.25rem 0.6rem;
-  background: #fee2e2;
-  color: #dc2626;
   border-radius: 20px;
   font-size: 0.78rem;
   font-weight: 700;
 }
 
-.semaforoNaranja {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.25rem 0.6rem;
-  background: #fef3c7;
-  color: #d97706;
-  border-radius: 20px;
-  font-size: 0.78rem;
-  font-weight: 700;
+.crmaEstrategica {
+  background: #e8f4f8;
+  color: var(--primary-texto);
+  border: 1px solid var(--primary);
 }
 
-.semaforoVerde {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.25rem 0.6rem;
-  background: #d1fae5;
-  color: #059669;
-  border-radius: 20px;
-  font-size: 0.78rem;
-  font-weight: 700;
+.crmaNoFigura {
+  background: var(--hover);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
 }
 
-[data-theme='dark'] .semaforoRojo {
-  background: rgba(220,38,38,0.2);
-  color: #f87171;
+[data-theme='dark'] .crmaEstrategica {
+  background: transparent;
 }
 
-[data-theme='dark'] .semaforoNaranja {
-  background: rgba(217,119,6,0.2);
-  color: #fbbf24;
+[data-theme='dark'] .crmaNoFigura {
+  background: transparent;
 }
 
-[data-theme='dark'] .semaforoVerde {
-  background: rgba(5,150,105,0.2);
-  color: #34d399;
-}
-
+/* Hallazgo 1926: en móvil se ocultaban «Importación UE» y «Principal proveedor», dos de las
+   tres cosas que promete el subtítulo. Ahora cada fila se apila como ficha, con su rótulo. */
 @media (max-width: 580px) {
-  .gridDependenciaHeader,
-  .gridDependenciaFila {
-    grid-template-columns: 1.2fr 0.8fr;
-    font-size: 0.82rem;
+  .gridDependenciaHeader {
+    display: none;
   }
 
-  .gridColProveedorHeader,
-  .gridColProveedor,
-  .gridColPorcentaje,
-  .gridColPorcentajeHeader {
-    display: none;
+  .gridDependenciaFila {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .recursoNombre {
+    grid-column: 1 / -1;
+  }
+
+  /* El proveedor, texto largo, va a su propia fila al final: importación y ley quedan juntas */
+  .celdaProveedor {
+    grid-column: 1 / -1;
+    order: 1;
+  }
+
+  .celdaDato::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    margin-bottom: 0.15rem;
   }
 }
 
@@ -428,9 +429,27 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  width: 100%;
   padding: 0.9rem 1rem;
+  /* Hallazgo 1924: sin fondo ni color propios, el botón se quedaba con el gris del navegador
+     (en oscuro, título #e8e8e8 sobre rgb(107,107,107): 2,71:1). */
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
   user-select: none;
+}
+
+.conflictoHeader:hover {
+  background: var(--hover);
+}
+
+.conflictoHeader:focus-visible,
+.recursoTab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .conflictoIcono {
@@ -501,6 +520,38 @@
 
 [data-theme='dark'] .mensajeClave {
   background: linear-gradient(135deg, rgba(46,134,171,0.12), rgba(72,169,166,0.12));
+}
+
+.tablaDatos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.tablaDatos caption {
+  text-align: left;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.tablaDatos th,
+.tablaDatos td {
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tablaDatos thead th {
+  background: var(--hover);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.tablaDatos tbody th {
+  font-weight: 600;
 }
 
 /* Warning Box (marcador v2.0) */
