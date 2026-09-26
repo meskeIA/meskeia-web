@@ -698,8 +698,10 @@ export default function SimuladorMitosisMeiosis() {
               </tr>
               <tr>
                 <td>Número de divisiones</td>
-                <td>1 (6 fases)</td>
-                <td>2 (meiosis I + meiosis II, 8 fases)</td>
+                {/* Del motor, no a mano: al añadir la Profase II la meiosis pasó a 9 pestañas y
+                    la tabla siguió diciendo 8 (hallazgo 2154). */}
+                <td>1 ({FASES_MITOSIS.length} fases)</td>
+                <td>2 (meiosis I + meiosis II, {FASES_MEIOSIS.length} fases)</td>
               </tr>
               <tr>
                 <td>Crossing-over</td>
@@ -756,9 +758,11 @@ export default function SimuladorMitosisMeiosis() {
             <div>
               <strong>Clonación y reproducción asexual</strong>
               <p>
-                Organismos como las bacterias y muchas plantas se reproducen únicamente por
-                mitosis, generando copias genéticamente idénticas. La reproducción asexual es
-                eficiente pero carece de la variabilidad que aporta el crossing-over de la meiosis.
+                Muchas plantas se reproducen también de forma asexual (esquejes, estolones,
+                tubérculos): sus células se multiplican por mitosis y generan copias genéticamente
+                idénticas. Las bacterias no hacen mitosis, porque no tienen núcleo ni huso
+                mitótico: se dividen por fisión binaria (bipartición). La reproducción asexual es
+                eficiente pero carece de la variabilidad que aportan la meiosis y la fecundación.
               </p>
             </div>
           </div>
@@ -976,6 +980,7 @@ function SeccionCasosAula() {
   const esperado = practica ? practica.respuesta : caso.respuesta;
   const etiqueta = practica ? practica.etiquetaRespuesta : caso.etiquetaRespuesta;
   const pasos = practica ? practica.pasos : caso.pasos;
+  const datos = practica ? practica.datos : caso.datos;
 
   /** Al cambiar de caso se limpia todo: si no, el veredicto del anterior se queda pegado. */
   const limpiar = () => {
@@ -992,7 +997,14 @@ function SeccionCasosAula() {
   };
 
   const nuevaPractica = () => {
-    setPractica(generarEjercicioAleatorio());
+    // Si el azar repite el enunciado que ya está en pantalla, el alumno pulsa y no pasa nada:
+    // se prueba con las semillas siguientes hasta que cambie (la baraja tiene ~90 combinaciones).
+    const semilla = Date.now();
+    let nuevo = generarEjercicioAleatorio(semilla);
+    for (let i = 1; practica && nuevo.enunciado === practica.enunciado && i < 20; i++) {
+      nuevo = generarEjercicioAleatorio(semilla + i);
+    }
+    setPractica(nuevo);
     limpiar();
   };
 
@@ -1000,7 +1012,8 @@ function SeccionCasosAula() {
     // parseSpanishNumber admite «24» y «24,0»; devuelve NaN con cualquier otra cosa, y de ese
     // NaN se encarga comprobarRespuesta con un mensaje propio: nunca sale «NaN» en pantalla.
     const valor = parseSpanishNumber(respuesta);
-    const r = comprobarRespuesta(valor, esperado);
+    // Con el enunciado, el corrector explica el error propio de ESA pregunta (hallazgo 2152).
+    const r = comprobarRespuesta(valor, esperado, datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   };
 
@@ -1047,10 +1060,16 @@ function SeccionCasosAula() {
       </div>
 
       <div className={styles.casoCuerpo}>
-        <h3 className={styles.casoTitulo}>
-          {practica ? 'Ejercicio de práctica' : `Caso ${caso.id} · ${caso.titulo}`}
-        </h3>
-        <p className={styles.casoEnunciado}>{enunciado}</p>
+        {/* Región viva (hallazgo 2153, el 1212 de simulador-movimiento-circular): al volver a
+            pulsar «Practicar» cambia el enunciado pero no el título ni el aria-pressed, y sin
+            ella un lector de pantalla no anunciaba nada. Sin aria-atomic explícito: el spec
+            localiza el rótulo de resultado del simulador por [aria-live][aria-atomic]. */}
+        <div role="status" aria-live="polite">
+          <h3 className={styles.casoTitulo}>
+            {practica ? 'Ejercicio de práctica' : `Caso ${caso.id} · ${caso.titulo}`}
+          </h3>
+          <p className={styles.casoEnunciado}>{enunciado}</p>
+        </div>
 
         <div className={styles.casoRespuesta}>
           <label className={styles.casoLabel} htmlFor="casos-aula-respuesta">

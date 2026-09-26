@@ -521,35 +521,148 @@ export const TOTAL_CASOS: number = CASOS.length;
 
 // ─── Corrección ──────────────────────────────────────────────────────────────
 
-/** Tolerancia al corregir: el MAYOR entre 0,01 y el 1 % del valor esperado. */
-export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
-}
-
 export interface Veredicto {
   correcto: boolean;
   motivo: string;
   diferencia: number;
-  tolerancia: number;
+}
+
+/** Contrapartida de una magnitud: la misma pregunta contando la otra cosa. */
+const CONTRAPARTIDA: Partial<Record<Magnitud, Magnitud>> = {
+  'cromosomas-por-polo': 'cromatidas-por-polo',
+  'cromosomas-en-celula': 'cromatidas-en-celula',
+  'cromatidas-por-polo': 'cromosomas-por-polo',
+  'cromatidas-en-celula': 'cromosomas-en-celula',
+};
+
+/** Recalcula con el MISMO motor otra magnitud del mismo enunciado; NaN si no procede. */
+function otraMagnitud(datos: DatosCaso, magnitud: Magnitud): number {
+  const r = resolverCaso({ ...datos, magnitud });
+  return r.ok ? r.valor : NaN;
+}
+
+const NO_ES = 'No es correcto.';
+
+/**
+ * Diagnostica el error a partir del número que ha dado el alumno, pero SOLO con las lecturas
+ * alternativas que el propio enunciado admite. Cada una se recalcula con el motor (contar
+ * cromátidas donde se piden cromosomas, sumar las dos células, no aplicar la reducción…), y el
+ * mensaje solo sale si el número del alumno coincide con ESA lectura.
+ *
+ * ⚠️ 26/09/2026 (hallazgo 2152) — antes bastaba con que el número fuera el doble o la mitad
+ * del esperado, sin mirar la pregunta, y el alumno repasaba lo que no tocaba: «8» en el caso de
+ * los gametos (2 × 4 en vez de 2^4) recibía la explicación de los polos, y «46» en el del
+ * gameto humano (no haber reducido) la de cromosomas frente a cromátidas.
+ */
+function diagnostico(usuario: number, esperado: number, datos: DatosCaso): string | null {
+  const encontrada = faseDe(datos.division, datos.faseId);
+  if (!encontrada) return null;
+  const fase = escalarFase(encontrada.fase, datos.dosN);
+  if (!fase) return null;
+  const n = datos.dosN / 2;
+  const tienePolos = fase.disposicion === 'separando' || fase.disposicion === 'polos';
+
+  switch (datos.magnitud) {
+    case 'gametos-distintos':
+      if (usuario === n * 2) {
+        return `${NO_ES} Has multiplicado n × 2. Cada uno de los ${ent(n)} pares aporta 2 posibilidades y los pares son independientes: las posibilidades se MULTIPLICAN entre sí, 2 × 2 × … × 2 (${ent(n)} veces) = 2^${ent(n)}.`;
+      }
+      if (usuario === n) {
+        return `${NO_ES} ${ent(n)} es el número de pares de homólogos, no de combinaciones: cada par aporta 2 posibilidades, así que hay que elevar 2 a ese número.`;
+      }
+      return null;
+
+    case 'celulas':
+      if (datos.division === 'meiosis' && usuario * 2 === esperado) {
+        return `${NO_ES} Te has quedado en la meiosis I. La meiosis encadena DOS divisiones: la meiosis II vuelve a dividir cada una de las células que salieron de la primera.`;
+      }
+      return null;
+
+    case 'cromosomas-por-polo':
+    case 'cromosomas-en-celula':
+    case 'cromatidas-por-polo':
+    case 'cromatidas-en-celula': {
+      const pideCromatidas = datos.magnitud.startsWith('cromatidas');
+      const contrapartida = CONTRAPARTIDA[datos.magnitud];
+      const otra = contrapartida ? otraMagnitud(datos, contrapartida) : NaN;
+      const confundeCosa = Number.isFinite(otra) && otra !== esperado && usuario === otra;
+      // Tras la anafase I la célula ya es haploide: dar el 2n es no haber aplicado la reducción.
+      const noReduce =
+        !pideCromatidas &&
+        datos.division === 'meiosis' &&
+        esperado < datos.dosN &&
+        usuario === datos.dosN;
+
+      if (confundeCosa && noReduce) {
+        return `${NO_ES} ${ent(usuario)} serían las cromátidas, o los cromosomas si no hubiera reducción. En la anafase I se separan los HOMÓLOGOS: cada polo recibe la mitad de los cromosomas, y cada uno conserva todavía sus dos cromátidas hermanas.`;
+      }
+      if (confundeCosa) {
+        return pideCromatidas
+          ? `${NO_ES} Has contado CROMOSOMAS y se piden CROMÁTIDAS: en esta fase cada cromosoma conserva sus dos cromátidas hermanas.`
+          : `${NO_ES} Has contado CROMÁTIDAS y se piden CROMOSOMAS: un cromosoma con dos cromátidas hermanas sigue siendo UN cromosoma (cuenta centrómeros).`;
+      }
+      if (noReduce) {
+        return `${NO_ES} ${ent(datos.dosN)} es la dotación diploide (2n) de la célula de partida. En la anafase I se separan los homólogos y cada célula queda haploide (n = ${ent(n)}); la meiosis II ya no reduce el número.`;
+      }
+
+      const porPolo = datos.magnitud.endsWith('por-polo');
+      if (porPolo && fase.separacion === 'hermanas' && usuario * 2 === esperado) {
+        return `${NO_ES} Te ha salido la MITAD. Aquí se separan cromátidas HERMANAS, no homólogos: cada cromosoma se parte en dos cromosomas hijos y cada polo recibe tantos como había.`;
+      }
+      const enLaCelula = otraMagnitud(
+        datos,
+        pideCromatidas ? 'cromatidas-en-celula' : 'cromosomas-en-celula'
+      );
+      if (porPolo && tienePolos && usuario === enLaCelula) {
+        return `${NO_ES} Te ha salido el DOBLE: has contado la célula entera, con sus dos polos, y se pide lo que recibe CADA polo.`;
+      }
+      if (!porPolo && tienePolos && usuario * 2 === esperado) {
+        return `${NO_ES} Te ha salido la MITAD: has contado un solo polo. La célula todavía NO se ha partido, así que contiene los dos.`;
+      }
+      if (!porPolo && fase.celulas > 1 && usuario === esperado * fase.celulas) {
+        return `${NO_ES} Te ha salido ${
+          fase.celulas === 2 ? 'el DOBLE' : 'de más'
+        }: has sumado las ${ent(fase.celulas)} células, y se pide lo que tiene CADA una.`;
+      }
+      return null;
+    }
+
+    case 'cromosomas-gameto-no-disyuncion': {
+      const normal = cromosomasPorPolo(fase);
+      if (usuario === normal) {
+        return `${NO_ES} ${ent(normal)} es lo que recibiría el polo si todo fuera bien. Con la no disyunción ese polo se lleva además el cromosoma que no se separó.`;
+      }
+      return null;
+    }
+
+    default:
+      return null;
+  }
 }
 
 /**
  * Corrige la respuesta del alumno. Nunca lanza: una entrada que no es un número se responde
  * con un veredicto, no con una excepción que tumbaría el render.
  *
- * Los dos errores típicos de esta app tienen mensaje propio, porque el número que sale delata
- * cuál de los dos ha sido: el DOBLE es haber contado cromátidas donde se pedían cromosomas, y
- * la MITAD es haber dado por reduccional una separación de cromátidas hermanas.
+ * ⚠️ 26/09/2026 (hallazgo 2149) — TODO lo que se pregunta aquí es un RECUENTO: cromosomas,
+ * cromátidas, células o gametos. Solo vale el entero exacto. Antes se corregía con una
+ * tolerancia del 1 % pensada para magnitudes continuas, y en el modo práctica, con 2^8 = 256
+ * gametos, daba por buenos 254, 255 (el error clásico 2^n − 1), 257 y 258; en los fijos
+ * aceptaba «46,4» cromosomas. «23,0» sigue valiendo: es 23 escrito de otra forma.
+ *
+ * `datos` es el enunciado: con él se diagnostica el error propio de esa pregunta. Sin él solo
+ * se dice si es correcto o no.
  */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
-
+export function comprobarRespuesta(
+  usuario: number,
+  esperado: number,
+  datos?: DatosCaso
+): Veredicto {
   if (!Number.isFinite(usuario)) {
     return {
       correcto: false,
-      motivo: 'Escribe un número (puedes usar la coma decimal).',
+      motivo: 'Escribe un número entero (por ejemplo, 23).',
       diferencia: NaN,
-      tolerancia,
     };
   }
 
@@ -558,53 +671,29 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
       correcto: false,
       motivo: 'Este caso no tiene una respuesta calculable.',
       diferencia: NaN,
-      tolerancia,
     };
   }
 
   const diferencia = Math.abs(usuario - esperado);
-  /**
-   * ⚠️ 22/09/2026 (hallazgo 1211) — la comparación en el borde EXACTO decidía por el ±1 ulp de
-   * la resta en binario, así que la misma desviación se aceptaba por arriba y se rechazaba por
-   * abajo: con esperado 0,1 y tolerancia 0,01, «0,11» daba 0,009999999999999995 (dentro) y
-   * «0,09» daba 0,010000000000000009 (fuera), y el mensaje de rechazo cifraba la desviación
-   * igual que la tolerancia —«te has desviado 0,01»—, que es la forma más desconcertante de
-   * suspender a alguien.
-   *
-   * El margen es 1e-9: nueve órdenes de magnitud por encima del ulp de las cifras que maneja
-   * esta app y siete por debajo de la tolerancia más pequeña (0,01), así que absorbe el ruido
-   * sin cambiar ninguna decisión real.
-   */
-  const RUIDO_BINARIO = 1e-9;
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
-    return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
-  }
 
-  if (Math.abs(usuario - esperado * 2) <= toleranciaDe(esperado * 2)) {
+  if (!Number.isInteger(usuario)) {
     return {
       correcto: false,
-      motivo:
-        'Te ha salido el DOBLE. Repasa si el enunciado pide cromosomas o cromátidas: un cromosoma con dos cromátidas hermanas sigue siendo UN cromosoma.',
+      motivo: `${NO_ES} Es un recuento: no hay fracciones de cromosoma, de cromátida, de célula ni de gameto. La respuesta es un número entero.`,
       diferencia,
-      tolerancia,
     };
   }
 
-  if (Math.abs(usuario - esperado / 2) <= toleranciaDe(esperado / 2)) {
-    return {
-      correcto: false,
-      motivo:
-        'Te ha salido la MITAD. Solo baja el recuento cuando se separan HOMÓLOGOS (anafase I); al separarse cromátidas hermanas cada polo recibe tantos cromosomas como había.',
-      diferencia,
-      tolerancia,
-    };
+  if (usuario === esperado) {
+    return { correcto: true, motivo: '¡Correcto!', diferencia };
   }
 
+  const propio = datos ? diagnostico(usuario, esperado, datos) : null;
   return {
     correcto: false,
-    motivo: 'No es correcto. Vuelve a contar con la pista, y luego abre la solución paso a paso.',
+    motivo:
+      propio ?? `${NO_ES} Vuelve a contar con la pista, y luego abre la solución paso a paso.`,
     diferencia,
-    tolerancia,
   };
 }
 

@@ -430,7 +430,6 @@ import {
   CASOS,
   TOTAL_CASOS,
   resolverCaso,
-  toleranciaDe,
   comprobarRespuesta,
   generarEjercicioAleatorio,
 } from '../../app/simulador-mitosis-meiosis/casos';
@@ -627,19 +626,41 @@ test.describe('Simulador de Mitosis y Meiosis · casos para clase', () => {
     expect(cromosomasPorPoloConNoDisyuncion(anafaseI, 1, false)).toBe(22);
   });
 
-  test('la corrección tolera el redondeo pero no confundir cromosomas con cromátidas', () => {
-    // La tolerancia es el MAYOR entre 0,01 y el 1 % del valor.
-    expect(toleranciaDe(8)).toBeCloseTo(0.08, 10);
-    expect(toleranciaDe(0.5)).toBeCloseTo(0.01, 10);
+  test('la corrección exige el entero exacto y diagnostica según lo que pide el enunciado', () => {
+    // 26/09/2026 (hallazgo 2149): antes había una tolerancia del 1 % del valor. Todo lo que se
+    // pregunta es un RECUENTO, así que solo vale el entero exacto; «8,0» es 8 escrito de otra
+    // forma y sí vale.
+    const placa = { division: 'mitosis' as const, faseId: 'metafase', dosN: 8 };
+    const cromosomas = { ...placa, magnitud: 'cromosomas-en-celula' as const };
+    expect(comprobarRespuesta(8, 8, cromosomas).correcto).toBe(true);
+    expect(comprobarRespuesta(8.0, 8, cromosomas).correcto).toBe(true);
+    expect(comprobarRespuesta(8.04, 8, cromosomas).correcto).toBe(false);
+    expect(comprobarRespuesta(7, 8, cromosomas).correcto).toBe(false);
 
-    expect(comprobarRespuesta(8, 8).correcto).toBe(true);
-    // Contar cromátidas donde se pedían cromosomas da exactamente el doble, que es el error
-    // típico del alumno: tiene que suspender, y con un motivo que lo explique.
-    const elDoble = comprobarRespuesta(16, 8);
-    expect(elDoble.correcto).toBe(false);
-    expect(elDoble.motivo.trim().length).toBeGreaterThan(0);
-    // Y la mitad es el otro error típico: aplicar la reducción de la meiosis I a una mitosis.
-    expect(comprobarRespuesta(4, 8).correcto).toBe(false);
+    // Contar cromátidas donde se pedían cromosomas da 16 en esta placa: suspende y lo dice.
+    const cromatidas = comprobarRespuesta(16, 8, cromosomas);
+    expect(cromatidas.correcto).toBe(false);
+    expect(cromatidas.motivo).toContain('CROMÁTIDAS');
+    // Aplicar la reducción de la meiosis I a la anafase de una mitosis da la mitad por polo.
+    const porPolo = { ...placa, faseId: 'anafase', magnitud: 'cromosomas-por-polo' as const };
+    expect(comprobarRespuesta(4, 8, porPolo).motivo).toContain('MITAD');
+    // Sin el enunciado no se inventa un diagnóstico: solo se dice que no es correcto.
+    expect(comprobarRespuesta(16, 8).motivo).toContain('No es correcto');
+
+    // 2^8 = 256 gametos: 255 (2^n − 1) y 257 ya no pasan (hallazgo 2149).
+    const gametos = {
+      division: 'meiosis' as const,
+      faseId: 'telofase-ii',
+      dosN: 16,
+      magnitud: 'gametos-distintos' as const,
+    };
+    for (const v of [254, 255, 257, 258]) {
+      expect(comprobarRespuesta(v, 256, gametos).correcto, `${v}`).toBe(false);
+    }
+    // 16 = n × 2: el mensaje habla de multiplicar/elevar, no de polos (hallazgo 2152).
+    const multiplica = comprobarRespuesta(16, 256, gametos).motivo;
+    expect(multiplica).toContain('2^8');
+    expect(multiplica).not.toContain('polo');
   });
 
   test('un dato imposible no lanza: devuelve un error que la vista puede pintar', () => {
@@ -804,10 +825,12 @@ test.describe('reinspección 25/09/2026 — casos de aula en el navegador', () =
   test('tolerancia en los casos fijos: acepta 46 y «23,0», rechaza el vecino y el doble', async ({
     page,
   }) => {
-    // Caso 9 (46 cromosomas por célula hija): tolerancia = 1 % de 46 = 0,46, así que 45 y 47
-    // quedan fuera; 92 es contar las dos células o las cromátidas, y es el DOBLE.
+    // Caso 9 (46 cromosomas por célula hija): un recuento solo admite el entero exacto
+    // (hallazgo 2149), así que 45, 47 y «46,4» quedan fuera; 92 es sumar las dos células
+    // hijas, y es el DOBLE.
     await irACasoAula(page, 9);
     expect(await responder(page, '46')).toContain('¡Correcto!');
+    expect(await responder(page, '46,4')).toContain('No es correcto');
     expect(await responder(page, '45')).toContain('No es correcto');
     expect(await responder(page, '47')).toContain('No es correcto');
     const doble = await responder(page, '92');
@@ -818,6 +841,7 @@ test.describe('reinspección 25/09/2026 — casos de aula en el navegador', () =
     await irACasoAula(page, 10);
     expect(await responder(page, '23,0')).toContain('¡Correcto!');
     expect(await responder(page, ' 23 ')).toContain('¡Correcto!');
+    expect(await responder(page, '23,2')).toContain('No es correcto');
     expect(await responder(page, '22')).toContain('No es correcto');
     expect(await responder(page, '24')).toContain('No es correcto');
     expect(await responder(page, '46')).not.toContain('¡Correcto!');
@@ -868,7 +892,7 @@ test.describe('reinspección 25/09/2026 — casos de aula en el navegador', () =
   test('modo práctica: con Date.now() = 1790337600010 sale el ejercicio de gametos con 2n = 16', async ({
     page,
   }) => {
-    // Precondición del test.fail de la tolerancia en práctica: si el generador cambia y esta
+    // Precondición del caso HALLAZGO 2149 (tolerancia en práctica): si el generador cambia y esta
     // semilla deja de dar este ejercicio, lo avisa ESTE test y no un «expected to fail» mudo.
     await page.clock.setFixedTime(new Date(1790337600010));
     await page.reload();
@@ -882,45 +906,48 @@ test.describe('reinspección 25/09/2026 — casos de aula en el navegador', () =
   });
 });
 
-test.describe('reinspección 25/09/2026 — hallazgos abiertos', () => {
+test.describe('reinspección 25/09/2026 — hallazgos reparados el 26/09/2026', () => {
   test.beforeEach(async ({ page }) => {
     await esperarHidratacion(page, [ENTRADA_CASOS]);
   });
 
-  test('HALLAZGO tolerancia · en práctica, 255 no puede valer por 256 gametos distintos', async ({
+  test('HALLAZGO 2149 · en práctica, 255 no puede valer por 256 gametos distintos', async ({
     page,
   }) => {
-    // toleranciaDe = máx(0,01; 1 % del valor) se aplica a RECUENTOS ENTEROS: con 256 da 2,56
-    // y acepta 254, 255, 257 y 258. 255 = 2^8 − 1 es el error clásico. Un recuento entero
-    // solo admite el entero exacto.
-    test.fail();
+    // Era toleranciaDe = máx(0,01; 1 % del valor) aplicada a RECUENTOS ENTEROS: con 256 daba
+    // 2,56 y aceptaba 254, 255, 257 y 258. 255 = 2^8 − 1 es el error clásico. Un recuento
+    // entero solo admite el entero exacto.
     await page.clock.setFixedTime(new Date(1790337600010));
     await page.reload();
     await esperarHidratacion(page, [ENTRADA_CASOS]);
     await seccionCasos(page).getByRole('button', { name: /Practicar/ }).click();
-    expect(await responder(page, '255')).not.toContain('¡Correcto!');
+    for (const v of ['255', '254', '257', '258']) {
+      expect(await responder(page, v), v).not.toContain('¡Correcto!');
+    }
+    expect(await responder(page, '256')).toContain('¡Correcto!');
   });
 
   test('HALLAZGO mensajes · caso 12 con «8» no debe recibir la explicación de los polos', async ({
     page,
   }) => {
     // 8 = 2 × 4 (multiplicar n por 2 en vez de elevar 2 a n): el error que la propia pista
-    // anticipa. Hoy el corrector lo trata como «la MITAD» y le habla de homólogos y polos.
-    test.fail();
+    // anticipa. El corrector lo trataba como «la MITAD» y le hablaba de homólogos y polos;
+    // ahora le explica que las posibilidades de cada par se multiplican (2^4).
     await irACasoAula(page, 12);
     const motivo = await responder(page, '8');
     expect(motivo).not.toContain('¡Correcto!');
     expect(motivo).not.toContain('polo');
+    expect(motivo).toContain('2^4');
   });
 
   test('HALLAZGO mensajes · caso 10 con «46» no es un error de cromátidas', async ({ page }) => {
     // Dar 46 a un gameto humano es no haber reducido (creerlo diploide); el corrector le dice
-    // que repase si se piden cromosomas o cromátidas.
-    test.fail();
+    // que repasara si se piden cromosomas o cromátidas; ahora le dice que 46 es el 2n.
     await irACasoAula(page, 10);
     const motivo = await responder(page, '46');
     expect(motivo).not.toContain('¡Correcto!');
     expect(motivo).not.toContain('cromátidas');
+    expect(motivo).toContain('diploide');
   });
 
   test('HALLAZGO región viva · volver a pulsar «Practicar» debe anunciar el enunciado nuevo', async ({
@@ -928,7 +955,6 @@ test.describe('reinspección 25/09/2026 — hallazgos abiertos', () => {
   }) => {
     // Es el 1212 de simulador-movimiento-circular: 12829fc3 lo reparó en las ocho copias de
     // CasosAula.tsx, pero aquí la sección vive dentro de page.tsx y se quedó sin tocar.
-    test.fail();
     const sec = seccionCasos(page);
     await sec.getByRole('button', { name: /Practicar/ }).click();
     const vivo = await sec.locator('h3 + p').evaluate((el) => {
@@ -942,14 +968,13 @@ test.describe('reinspección 25/09/2026 — hallazgos abiertos', () => {
 
   test('HALLAZGO contraste · el título del caso (teal sobre #FAFAFA) en claro', async ({ page }) => {
     // Medido el 25/09/2026: 2,68:1 a 16,8 px en negrita (no es texto grande: exige 4,5:1).
-    test.fail();
+    // Reparado con --secondary-texto (hallazgo 2151).
     await congelarTransiciones(page);
     expect(await contrasteDe(page, `${SECCION_CASOS} h3`)).toBeGreaterThanOrEqual(4.5);
   });
 
   test('HALLAZGO contraste · «Comprobar» (blanco sobre --primary) en oscuro', async ({ page }) => {
-    // Medido el 25/09/2026: 2,79:1 en oscuro (4,11:1 en claro).
-    test.fail();
+    // Medido el 25/09/2026: 2,79:1 en oscuro (4,11:1 en claro). Ahora --primary-boton.
     await congelarTransiciones(page);
     await page.evaluate(() => {
       document.documentElement.dataset.theme = 'dark';
@@ -959,15 +984,42 @@ test.describe('reinspección 25/09/2026 — hallazgos abiertos', () => {
 
   test('HALLAZGO contraste · el botón «Auto» del simulador en claro', async ({ page }) => {
     // Medido el 25/09/2026: 2,68:1 (teal #48A9A6 sobre #FAFAFA a 14,4 px en negrita).
-    test.fail();
+    // Ahora --secondary-texto.
     await congelarTransiciones(page);
     expect(await contrasteDe(page, 'button[aria-label="Iniciar reproducción automática"]')).toBeGreaterThanOrEqual(4.5);
   });
 
+  test('HALLAZGO 2151 · el resto de textos en color de marca pasan 4,5:1 en claro y en oscuro', async ({
+    page,
+  }) => {
+    // Los que el acta midió por debajo, además de los tres de arriba. Las clases de los CSS
+    // Modules llevan sufijo, por eso se localizan por [class*=…].
+    await congelarTransiciones(page);
+    const selectores = [
+      '[class*="btnNav"]',
+      '[class*="resultadoCell"]',
+      '[class*="velocidadBtnActiva"]',
+      '[class*="tipoBtnActive"]',
+      '[class*="fasPuntoActivo"] [class*="faseNombre"]',
+      `${SECCION_CASOS} [class*="casoBotonActivo"]`,
+      `${SECCION_CASOS} [class*="casoAyudaBoton"]`,
+      `${SECCION_CASOS} h3`,
+      `${SECCION_CASOS} button:text-is("Comprobar")`,
+      'button[aria-label="Iniciar reproducción automática"]',
+    ];
+    for (const tema of ['light', 'dark']) {
+      await page.evaluate((t) => {
+        document.documentElement.dataset.theme = t;
+      }, tema);
+      for (const sel of selectores) {
+        expect(await contrasteDe(page, sel), `${tema} · ${sel}`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+
   test('HALLAZGO fases · la meiosis tiene 9 fases y la app sigue anunciando 8', async ({ page }) => {
     // Reparación incompleta del #378: se añadió la Profase II (9 pestañas) pero la tabla
-    // comparativa y la metadata siguen diciendo «8 fases».
-    test.fail();
+    // comparativa y la metadata seguían diciendo «8 fases». La tabla lo lee ahora del motor.
     await elegirModo(page, 'Meiosis');
     await expect(page.getByRole('tab')).toHaveCount(9);
     await abrirBloqueEducativo(page);
@@ -982,7 +1034,6 @@ test.describe('reinspección 25/09/2026 — hallazgos abiertos', () => {
     // OpenStax Biology 2e, §10.5: «Prokaryotes, such as bacteria, produce daughter cells by
     // binary fission» y no tienen huso mitótico. La propia FAQ de la app dice que una célula
     // sin núcleo no puede hacer mitosis.
-    test.fail();
     await abrirBloqueEducativo(page);
     // Se compara el fragmento que casa, no el <body> entero, para que el fallo sea legible.
     const frase = await page.evaluate(

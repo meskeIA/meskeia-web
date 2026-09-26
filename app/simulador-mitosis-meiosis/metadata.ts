@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Mitosis y Meiosis - División Celular Interactiva | meskeIA',
   description:
-    'Simulador visual animado de mitosis (6 fases) y meiosis (8 fases). Observa cómo se dividen las células con cromosomas, huso acromático y crossing-over. Ideal para Bachillerato (España), preparatoria y secundaria (Latinoamérica) y biología universitaria.',
+    'Simulador visual animado de mitosis (6 fases) y meiosis (9 fases). Observa cómo se dividen las células con cromosomas, huso acromático y crossing-over. Ideal para Bachillerato (España), preparatoria y secundaria (Latinoamérica) y biología universitaria.',
   keywords:
     'mitosis, meiosis, división celular, cromosomas, crossing-over, gametos, célula, fases mitosis, fases meiosis, EBAU, Bachillerato, preparatoria, secundaria, biología, haploide, diploide',
   authors: [{ name: 'meskeIA' }],
@@ -35,12 +35,12 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Mitosis y Meiosis',
   description:
-    'Simulador interactivo de división celular que muestra las 6 fases de la mitosis y las 8 fases de la meiosis. Visualiza cromosomas, huso acromático, crossing-over y formación de células hijas con canvas 2D animado.',
+    'Simulador interactivo de división celular que muestra las 6 fases de la mitosis y las 9 fases de la meiosis. Visualiza cromosomas, huso acromático, crossing-over y formación de células hijas con canvas 2D animado.',
   url: 'https://meskeia.com/simulador-mitosis-meiosis/',
   category: 'EducationalApplication',
   features: [
     'Simulación animada de las 6 fases de la mitosis',
-    'Simulación animada de las 8 fases de la meiosis',
+    'Simulación animada de las 9 fases de la meiosis',
     'Visualización de cromosomas, huso acromático y crossing-over',
     'Control de velocidad: lenta, media y rápida',
     'Navegación manual fase a fase o reproducción automática',

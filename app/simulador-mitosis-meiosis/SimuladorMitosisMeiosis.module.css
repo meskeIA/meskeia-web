@@ -44,7 +44,7 @@
   border-radius: 2rem;
   border: 2px solid var(--primary, #2e86ab);
   background: transparent;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -56,7 +56,7 @@
 }
 
 .tipoBtnActive {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -111,11 +111,11 @@
 }
 
 .fasPunto:hover::before {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
 }
 
 .fasPuntoActivo::before {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   transform: scale(1.4);
 }
 
@@ -126,7 +126,7 @@
 }
 
 .fasPuntoActivo .faseNombre {
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -146,7 +146,7 @@
 .faseDescripcion strong {
   display: block;
   font-size: 1rem;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
 }
 
@@ -179,7 +179,7 @@
   border-radius: 0.5rem;
   border: 2px solid var(--primary, #2e86ab);
   background: transparent;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -200,7 +200,7 @@
   border-radius: 0.5rem;
   border: 2px solid var(--secondary, #48a9a6);
   background: transparent;
-  color: var(--secondary, #48a9a6);
+  color: var(--secondary-texto);
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
@@ -212,7 +212,7 @@
 }
 
 .btnAutoActivo {
-  background: var(--secondary, #48a9a6);
+  background: var(--secondary-boton);
   color: #ffffff;
 }
 
@@ -239,12 +239,12 @@
 
 .velocidadBtn:hover {
   border-color: var(--primary, #2e86ab);
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
 }
 
 .velocidadBtnActiva {
   border-color: var(--primary, #2e86ab);
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   font-weight: 700;
   background: rgba(46, 134, 171, 0.08);
 }
@@ -260,14 +260,14 @@
   text-align: center;
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
 }
 
 /* ---- Sección educativa — subtítulos ---- */
 .eduSubtitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   margin: 1.75rem 0 0.75rem;
 }
 
@@ -373,7 +373,7 @@
 
 .faqTip {
   font-style: italic;
-  color: var(--secondary, #48a9a6) !important;
+  color: var(--secondary-texto) !important;
   font-size: 0.82rem !important;
 }
 
@@ -395,7 +395,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #fff;
   display: flex;
   align-items: center;
@@ -619,7 +619,7 @@
 }
 
 [data-theme='dark'] .tipoBtnActive {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #fff;
   border-color: var(--primary, #2e86ab);
 }
@@ -634,12 +634,12 @@
 }
 
 [data-theme='dark'] .btnAuto {
-  color: var(--secondary, #48a9a6);
+  color: var(--secondary-texto);
   border-color: var(--secondary, #48a9a6);
 }
 
 [data-theme='dark'] .btnAutoActivo {
-  background: var(--secondary, #48a9a6);
+  background: var(--secondary-boton);
   color: #fff;
 }
 
@@ -744,7 +744,7 @@
   margin: 0 0 0.5rem;
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
 }
 
 .casosIntro {
@@ -777,7 +777,7 @@
 
 .casoBoton:hover {
   border-color: var(--primary, #2e86ab);
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
 }
 
 .casoBoton:focus-visible {
@@ -787,7 +787,7 @@
 
 .casoBotonActivo,
 .casoBotonActivo:hover {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   border-color: var(--primary, #2e86ab);
   color: #ffffff;
 }
@@ -808,7 +808,7 @@
   margin: 0 0 0.6rem;
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--secondary, #48a9a6);
+  color: var(--secondary-texto);
 }
 
 .casoEnunciado {
@@ -857,7 +857,7 @@
   font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -900,7 +900,7 @@
   min-height: 44px;
   padding: 0.4rem 1rem;
   font-size: 0.9rem;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   background: transparent;
   border: 1px solid var(--primary, #2e86ab);
   border-radius: 8px;
@@ -908,7 +908,7 @@
 }
 
 .casoAyudaBoton:hover {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -975,7 +975,7 @@
 
 [data-theme='dark'] .casoBotonActivo,
 [data-theme='dark'] .casoBotonActivo:hover {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   border-color: var(--primary, #2e86ab);
   color: #ffffff;
 }
@@ -985,7 +985,7 @@
 }
 
 [data-theme='dark'] .casoTitulo {
-  color: var(--secondary, #48a9a6);
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .casoEnunciado {
