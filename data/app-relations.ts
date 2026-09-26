@@ -2061,19 +2061,19 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'selector-alquiler-vs-compra': [
     { url: '/orientador-alquiler-vs-compra/', icon: '📊', name: 'Orientador Alquiler vs Compra', description: 'Cálculo financiero detallado con tus cifras reales' },
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Estimador de Hipoteca', description: 'Cuota mensual y coste total de tu préstamo' },
-    { url: '/estimador-coste-vivienda/', icon: '🏡', name: 'Estimador Coste Vivienda', description: 'Gastos totales al comprar una vivienda' },
+    { url: '/estimador-coste-vivienda/', icon: '🏡', name: 'Estimador Coste Vivienda', description: 'Lo que cuesta mantener una vivienda cada mes' },
     { url: '/selector-seguro-hogar/', icon: '🛡️', name: 'Selector Seguro de Hogar', description: '¿Qué cobertura de seguro necesitas?' },
   ],
   'selector-zona-residencia': [
     { url: '/selector-tipo-vivienda/', icon: '🏠', name: 'Selector Tipo de Vivienda', description: '¿Piso, casa, ático o estudio?' },
     { url: '/selector-alquiler-vs-compra/', icon: '🏠', name: 'Selector Alquiler o Compra', description: '¿Te conviene más alquilar o comprar?' },
-    { url: '/estimador-coste-vivienda/', icon: '🏡', name: 'Estimador Coste Vivienda', description: 'Gastos totales al comprar una vivienda' },
+    { url: '/estimador-coste-vivienda/', icon: '🏡', name: 'Estimador Coste Vivienda', description: 'Lo que cuesta mantener una vivienda cada mes' },
     { url: '/selector-seguro-hogar/', icon: '🛡️', name: 'Selector Seguro de Hogar', description: '¿Qué cobertura de seguro de hogar necesitas?' },
   ],
   'selector-tipo-vivienda': [
     { url: '/selector-zona-residencia/', icon: '🏡', name: 'Selector Zona de Residencia', description: '¿Ciudad, pueblo o costa?' },
     { url: '/orientador-alquiler-vs-compra/', icon: '⚖️', name: 'Orientador Alquiler vs Compra', description: 'Análisis financiero completo' },
-    { url: '/estimador-coste-vivienda/', icon: '🏡', name: 'Estimador Coste Vivienda', description: 'Gastos totales al comprar una vivienda' },
+    { url: '/estimador-coste-vivienda/', icon: '🏡', name: 'Estimador Coste Vivienda', description: 'Lo que cuesta mantener una vivienda cada mes' },
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Estimador de Hipoteca', description: 'Calcula tu cuota mensual' },
   ],
   'selector-dieta': [
