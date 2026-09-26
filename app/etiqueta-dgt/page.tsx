@@ -12,14 +12,21 @@ import {
   EducationalSection,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { AYUDA_AUTO_PLUS_2026, FISCAL_AYUDAS_VEHICULO_META } from '@/data/fiscal';
+import { formatDate, parseISODateLocal } from '@/lib';
+import {
+  clasificar,
+  necesitaMes,
+  type AutonomiaPhev,
+  type TipoCombustible,
+  type TipoEtiqueta,
+} from './motor';
 
 // ============================================================
 // TIPOS
 // ============================================================
 
-type TipoEtiqueta = 'cero' | 'eco' | 'c' | 'b' | 'ninguna';
 type AccesoZBE = 'libre' | 'restriccion' | 'prohibido';
-type TipoCombustible = 'bev' | 'phev' | 'hev' | 'gnc' | 'gasolina' | 'diesel';
 
 interface CiudadZBE {
   nombre: string;
@@ -31,6 +38,10 @@ interface ResultadoEtiqueta {
   etiqueta: TipoEtiqueta;
   nombre: string;
   descripcion: string;
+  /** Matiz del caso concreto (frontera de fecha, gas anterior a la C…). */
+  matiz: string | null;
+  /** Vehículo de combustión (o gas): su etiqueta se deduce de la fecha, no de la norma Euro. */
+  porFecha: boolean;
   ciudades: CiudadZBE[];
   recomendaciones: string[];
 }
@@ -38,8 +49,18 @@ interface ResultadoEtiqueta {
 interface FormState {
   combustible: TipoCombustible | '';
   anio: string;
-  autonomiaPhev: 'si' | 'no' | '';
+  mes: string;
+  autonomiaPhev: AutonomiaPhev;
 }
+
+const MESES = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+];
+
+/** Consulta oficial del distintivo por matrícula (DGT). */
+const URL_DGT_DISTINTIVO = 'https://www.dgt.es/nuestros-servicios/tu-vehiculo/tus-vehiculos/distintivo-ambiental/';
+const URL_SEDE_DGT = 'https://sede.dgt.gob.es/es/';
 
 // ============================================================
 // DATOS ZBE POR ETIQUETA
@@ -251,7 +272,7 @@ const INFO_ETIQUETA: Record<
   cero: {
     nombre: 'CERO',
     descripcion:
-      'Vehículo eléctrico puro, de pila de combustible o de gas (GNC/GLP). Máxima categoría medioambiental según la DGT.',
+      'Eléctrico de batería (BEV), de autonomía extendida (REEV), híbrido enchufable (PHEV) con 40 km o más de autonomía eléctrica, o de pila de combustible. Etiqueta azul: la máxima categoría ambiental de la DGT.',
     recomendaciones: [
       'Tu vehículo tiene la máxima categoría ambiental. Accedes a todos los beneficios ZBE, carriles BUS+VAO, y parking bonificado en muchos municipios.',
       'En Madrid puedes aparcar gratuitamente en zona SER los primeros 120 minutos (residentes de otras zonas) con autorización previa.',
@@ -261,7 +282,7 @@ const INFO_ETIQUETA: Record<
   eco: {
     nombre: 'ECO',
     descripcion:
-      'Vehículo híbrido convencional (HEV) o PHEV con autonomía eléctrica inferior a 40 km. Segunda categoría más favorable.',
+      'Híbrido no enchufable (HEV), híbrido enchufable con menos de 40 km de autonomía eléctrica o vehículo de gas (GNC, GNL o GLP), que además cumpla los criterios de la etiqueta C. Etiqueta bicolor, verde y azul.',
     recomendaciones: [
       'Buena etiqueta. Accedes a la mayoría de ZBE sin restricciones y tienes beneficios en peajes y aparcamientos públicos.',
       'En Madrid, la etiqueta ECO permite aparcar en zona SER con beneficios y acceder a carriles BUS+VAO con al menos un ocupante.',
@@ -271,7 +292,7 @@ const INFO_ETIQUETA: Record<
   c: {
     nombre: 'C',
     descripcion:
-      'Gasolina matriculado desde 2006 (Euro 4 o superior) o diésel matriculado desde 2015 (Euro 6). Etiqueta amarilla.',
+      'Gasolina matriculado a partir de enero de 2006 (Euro 4, 5 o 6) o diésel a partir de septiembre de 2015 (Euro 6). Etiqueta verde.',
     recomendaciones: [
       'Etiqueta válida en la mayoría de ZBE. En episodios de alta contaminación pueden activarse restricciones para esta etiqueta en algunas ciudades.',
       'En Madrid, vigila el protocolo anticontaminación: en escenarios 2 y 3, los vehículos C pueden quedar restringidos al viario básico.',
@@ -281,7 +302,7 @@ const INFO_ETIQUETA: Record<
   b: {
     nombre: 'B',
     descripcion:
-      'Gasolina matriculado entre 2001 y 2005 (Euro 3) o diésel matriculado entre 2006 y 2014 (Euro 4 o 5). Etiqueta verde.',
+      'Gasolina matriculado desde el 1 de enero de 2001 (Euro 3) o diésel a partir de 2006 (Euro 4 o 5), sin llegar a la C. Etiqueta amarilla.',
     recomendaciones: [
       'Etiqueta limitada. Considera el impacto futuro: las normativas ZBE se están endureciendo progresivamente en todas las ciudades con más de 50.000 habitantes.',
       'En Madrid y Barcelona, la etiqueta B ya tiene restricciones de circulación en determinadas zonas y horarios. Infórmate antes de circular.',
@@ -291,11 +312,11 @@ const INFO_ETIQUETA: Record<
   ninguna: {
     nombre: 'Sin etiqueta',
     descripcion:
-      'Vehículo sin etiqueta DGT: gasolina antes de 2001 (pre-Euro 3) o diésel antes de 2006 (pre-Euro 4). Los más contaminantes.',
+      'Sin distintivo ambiental (la categoría A del Reglamento General de Vehículos): gasolina matriculado antes de 2001 o diésel antes de 2006, es decir, anteriores a Euro 3 y Euro 4 respectivamente. Son los más restringidos en las ZBE.',
     recomendaciones: [
       'Tu vehículo no tiene etiqueta DGT y ya no puede circular por las ZBE de las principales ciudades. Si lo utilizas habitualmente en zona urbana, considera la renovación del vehículo.',
-      'Las multas por circular en ZBE sin autorización oscilan entre 90€ y 500€ según el municipio. Madrid y Barcelona disponen de control perimetral automático con cámaras.',
-      'Infórmate sobre los programas de ayuda a la renovación de vehículos (Plan MOVES III y planes autonómicos) que pueden financiar parcialmente la compra de un vehículo más eficiente.',
+      'Entrar en una ZBE sin respetar sus restricciones es una infracción grave (art. 76.z3 de la Ley sobre Tráfico): 200 € de multa, 100 € con pronto pago, sin pérdida de puntos. Madrid y Barcelona disponen de control perimetral automático con cámaras.',
+      `Si piensas cambiarlo por un eléctrico o electrificado, la ayuda estatal vigente es el ${AYUDA_AUTO_PLUS_2026.nombre} (${FISCAL_AYUDAS_VEHICULO_META.fuente.split(' (')[0]}), para vehículos matriculados desde el ${formatDate(parseISODateLocal(AYUDA_AUTO_PLUS_2026.matriculadosDesde))}. Algunas comunidades autónomas y ayuntamientos tienen además planes propios.`,
     ],
   },
 };
@@ -304,44 +325,20 @@ const INFO_ETIQUETA: Record<
 // LÓGICA DE CÁLCULO
 // ============================================================
 
-function calcularEtiqueta(
-  combustible: TipoCombustible,
-  anio: number,
-  autonomiaPhev: 'si' | 'no' | ''
-): TipoEtiqueta {
-  if (combustible === 'bev' || combustible === 'gnc') {
-    return 'cero';
-  }
+// La clasificación vive en ./motor.ts (fuentes y fechas de la DGT en su cabecera).
 
-  if (combustible === 'phev') {
-    return autonomiaPhev === 'si' ? 'cero' : 'eco';
-  }
-
-  if (combustible === 'hev') {
-    return 'eco';
-  }
-
-  if (combustible === 'gasolina') {
-    if (anio >= 2006) return 'c';
-    if (anio >= 2001) return 'b';
-    return 'ninguna';
-  }
-
-  if (combustible === 'diesel') {
-    if (anio >= 2015) return 'c';
-    if (anio >= 2006) return 'b';
-    return 'ninguna';
-  }
-
-  return 'ninguna';
-}
-
-function construirResultado(etiqueta: TipoEtiqueta): ResultadoEtiqueta {
+function construirResultado(
+  etiqueta: TipoEtiqueta,
+  matiz: string | null,
+  porFecha: boolean
+): ResultadoEtiqueta {
   const info = INFO_ETIQUETA[etiqueta];
   return {
     etiqueta,
     nombre: info.nombre,
     descripcion: info.descripcion,
+    matiz,
+    porFecha,
     ciudades: CIUDADES_ZBE[etiqueta],
     recomendaciones: info.recomendaciones,
   };
@@ -367,7 +364,8 @@ function EtiquetaCirculo({ etiqueta, nombre }: EtiquetaCirculoProps) {
   return (
     <div
       className={`${styles.etiquetaCirculo} ${claseColor}`}
-      aria-label={`Etiqueta DGT: ${nombre}`}
+      role="img"
+      aria-label={etiqueta === 'ninguna' ? 'Sin etiqueta DGT' : `Etiqueta DGT: ${nombre}`}
     >
       {mostrarLetra && (
         <span className={styles.etiquetaLetra} aria-hidden="true">
@@ -424,6 +422,21 @@ function BadgeZbe({ acceso }: BadgeZbeProps) {
   );
 }
 
+interface ErroresForm {
+  combustible?: string;
+  anio?: string;
+  mes?: string;
+  autonomia?: string;
+}
+
+/** Cualquier año anterior a 2001 ya es «sin etiqueta» por fecha: no hace falta un suelo alto. */
+const ANIO_MINIMO = 1900;
+
+/** Gasolina, diésel y gas se clasifican por fecha (el gas, para saber si cumple la C). */
+function pideAnio(combustible: TipoCombustible): boolean {
+  return combustible === 'gasolina' || combustible === 'diesel' || combustible === 'gnc';
+}
+
 // ============================================================
 // COMPONENTE PRINCIPAL
 // ============================================================
@@ -432,62 +445,84 @@ export default function EtiquetaDgtPage() {
   const [form, setForm] = useState<FormState>({
     combustible: '',
     anio: '',
+    mes: '',
     autonomiaPhev: '',
   });
   const [resultado, setResultado] = useState<ResultadoEtiqueta | null>(null);
-  const [errorAnio, setErrorAnio] = useState<string>('');
+  const [errores, setErrores] = useState<ErroresForm>({});
 
-  const anioActual = 2025;
+  function limpiar(campo: keyof ErroresForm) {
+    setErrores((prev) => ({ ...prev, [campo]: undefined }));
+    setResultado(null);
+  }
 
   function handleCombustibleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     setForm((prev) => ({
       ...prev,
-      combustible: e.target.value as TipoCombustible,
+      combustible: e.target.value as TipoCombustible | '',
       autonomiaPhev: '',
     }));
+    setErrores({});
     setResultado(null);
   }
 
   function handleAnioChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm((prev) => ({ ...prev, anio: e.target.value }));
-    setErrorAnio('');
-    setResultado(null);
+    limpiar('anio');
+  }
+
+  function handleMesChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    setForm((prev) => ({ ...prev, mes: e.target.value }));
+    limpiar('mes');
   }
 
   function handleAutonomiaChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setForm((prev) => ({ ...prev, autonomiaPhev: e.target.value as 'si' | 'no' }));
-    setResultado(null);
+    setForm((prev) => ({ ...prev, autonomiaPhev: e.target.value as AutonomiaPhev }));
+    limpiar('autonomia');
   }
 
   function handleConsultar(e: React.FormEvent) {
     e.preventDefault();
+    setResultado(null);
 
-    if (!form.combustible) return;
+    if (!form.combustible) {
+      setErrores({ combustible: 'Elige el tipo de combustible de tu vehículo.' });
+      return;
+    }
+    const combustible = form.combustible;
+    const nuevos: ErroresForm = {};
 
-    const necesitaAnio =
-      form.combustible === 'gasolina' || form.combustible === 'diesel';
-
-    if (necesitaAnio) {
-      const anioNum = parseInt(form.anio, 10);
-      if (!form.anio || isNaN(anioNum) || anioNum < 1990 || anioNum > anioActual) {
-        setErrorAnio(`Introduce un año entre 1990 y ${anioActual}`);
-        return;
+    // El año se toma del reloj: un coche matriculado este año también se clasifica.
+    const anioActual = new Date().getFullYear();
+    const anioNum = Number(form.anio);
+    if (pideAnio(combustible)) {
+      if (!/^\d{4}$/.test(form.anio.trim()) || anioNum < ANIO_MINIMO || anioNum > anioActual) {
+        nuevos.anio = `Introduce un año de cuatro cifras entre ${ANIO_MINIMO} y ${anioActual}.`;
+      } else if (necesitaMes(combustible, anioNum) && !form.mes) {
+        nuevos.mes =
+          'Indica el mes: la DGT da la etiqueta C al diésel matriculado a partir de septiembre de 2015.';
       }
     }
+    if (combustible === 'phev' && !form.autonomiaPhev) {
+      nuevos.autonomia = 'Indica si la autonomía eléctrica de tu PHEV es de 40 km o más.';
+    }
+    if (Object.keys(nuevos).length > 0) {
+      setErrores(nuevos);
+      return;
+    }
 
-    if (form.combustible === 'phev' && !form.autonomiaPhev) return;
-
-    const anioNum = form.anio ? parseInt(form.anio, 10) : 2020;
-    const etiqueta = calcularEtiqueta(
-      form.combustible as TipoCombustible,
-      anioNum,
-      form.autonomiaPhev
-    );
-    setResultado(construirResultado(etiqueta));
+    const { etiqueta, matiz } = clasificar({
+      combustible,
+      anio: pideAnio(combustible) ? anioNum : undefined,
+      mes: form.mes ? Number(form.mes) : undefined,
+      autonomiaPhev: form.autonomiaPhev,
+    });
+    setErrores({});
+    setResultado(construirResultado(etiqueta, matiz, pideAnio(combustible)));
   }
 
-  const necesitaAnio =
-    form.combustible === 'gasolina' || form.combustible === 'diesel';
+  const conAnio = form.combustible !== '' && pideAnio(form.combustible);
+  const conMes = necesitaMes(form.combustible, Number(form.anio));
   const esPhev = form.combustible === 'phev';
 
   return (
@@ -521,6 +556,8 @@ export default function EtiquetaDgtPage() {
                   onChange={handleCombustibleChange}
                   aria-required="true"
                   aria-label="Selecciona el tipo de combustible de tu vehículo"
+                  aria-describedby={errores.combustible ? 'errorCombustible' : undefined}
+                  aria-invalid={!!errores.combustible}
                 >
                   <option value="">-- Selecciona combustible --</option>
                   <option value="bev">Eléctrico puro (BEV)</option>
@@ -530,10 +567,15 @@ export default function EtiquetaDgtPage() {
                   <option value="gasolina">Gasolina</option>
                   <option value="diesel">Diésel</option>
                 </select>
+                {errores.combustible && (
+                  <div id="errorCombustible" role="alert" className={styles.mensajeError}>
+                    {errores.combustible}
+                  </div>
+                )}
               </div>
 
-              {/* Año de matriculación — solo visible para gasolina/diésel */}
-              {necesitaAnio && (
+              {/* Año de matriculación — gasolina, diésel y gas */}
+              {conAnio && (
                 <div className={styles.formGroup}>
                   <label className={styles.label} htmlFor="anioMatriculacion">
                     Año de primera matriculación
@@ -544,23 +586,50 @@ export default function EtiquetaDgtPage() {
                     className={styles.input}
                     value={form.anio}
                     onChange={handleAnioChange}
-                    min={1990}
-                    max={anioActual}
-                    placeholder={`ej. 2015`}
+                    min={ANIO_MINIMO}
+                    placeholder="ej. 2015"
                     aria-required="true"
                     aria-label="Año de primera matriculación del vehículo"
-                    aria-describedby={errorAnio ? 'errorAnio' : undefined}
-                    aria-invalid={!!errorAnio}
+                    aria-describedby={errores.anio ? 'errorAnio' : undefined}
+                    aria-invalid={!!errores.anio}
                     inputMode="numeric"
                   />
-                  {errorAnio && (
-                    <div
-                      id="errorAnio"
-                      role="alert"
-                      aria-live="polite"
-                      style={{ color: '#dc2626', fontSize: '0.875rem', marginTop: '0.25rem' }}
-                    >
-                      {errorAnio}
+                  {errores.anio && (
+                    <div id="errorAnio" role="alert" className={styles.mensajeError}>
+                      {errores.anio}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Mes — solo el diésel de 2015: la C empieza en septiembre */}
+              {conAnio && conMes && (
+                <div className={styles.formGroup}>
+                  <label className={styles.label} htmlFor="mesMatriculacion">
+                    Mes de primera matriculación
+                  </label>
+                  <select
+                    id="mesMatriculacion"
+                    className={styles.select}
+                    value={form.mes}
+                    onChange={handleMesChange}
+                    aria-required="true"
+                    aria-describedby={errores.mes ? 'ayudaMes errorMes' : 'ayudaMes'}
+                    aria-invalid={!!errores.mes}
+                  >
+                    <option value="">-- Selecciona mes --</option>
+                    {MESES.map((nombre, i) => (
+                      <option key={nombre} value={String(i + 1)}>
+                        {nombre}
+                      </option>
+                    ))}
+                  </select>
+                  <p id="ayudaMes" className={styles.ayudaCampo}>
+                    En 2015 el mes decide: la etiqueta C del diésel empieza en septiembre (Euro 6).
+                  </p>
+                  {errores.mes && (
+                    <div id="errorMes" role="alert" className={styles.mensajeError}>
+                      {errores.mes}
                     </div>
                   )}
                 </div>
@@ -570,7 +639,7 @@ export default function EtiquetaDgtPage() {
               {esPhev && (
                 <div className={styles.formGroup}>
                   <label className={styles.label} htmlFor="autonomiaPhev">
-                    ¿La autonomía eléctrica supera los 40 km?
+                    ¿La autonomía eléctrica es de 40 km o más?
                   </label>
                   <select
                     id="autonomiaPhev"
@@ -578,12 +647,18 @@ export default function EtiquetaDgtPage() {
                     value={form.autonomiaPhev}
                     onChange={handleAutonomiaChange}
                     aria-required="true"
-                    aria-label="¿La autonomía eléctrica de tu PHEV supera los 40 km?"
+                    aria-describedby={errores.autonomia ? 'errorAutonomia' : undefined}
+                    aria-invalid={!!errores.autonomia}
                   >
                     <option value="">-- Selecciona opción --</option>
-                    <option value="si">Sí, supera los 40 km</option>
-                    <option value="no">No, inferior a 40 km</option>
+                    <option value="cuarentaOMas">Sí, 40 km o más</option>
+                    <option value="menos">No, menos de 40 km</option>
                   </select>
+                  {errores.autonomia && (
+                    <div id="errorAutonomia" role="alert" className={styles.mensajeError}>
+                      {errores.autonomia}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -595,6 +670,16 @@ export default function EtiquetaDgtPage() {
                 Consultar mi etiqueta DGT
               </button>
             </form>
+
+            <p className={styles.notaOficial}>
+              Tu etiqueta oficial es la que consta en el Registro de Vehículos de la DGT según la
+              norma Euro de tu coche; aquí se deduce del combustible y la fecha. Puedes comprobarla
+              por matrícula en la{' '}
+              <a href={URL_SEDE_DGT} target="_blank" rel="noopener noreferrer">
+                sede electrónica de la DGT
+              </a>
+              .
+            </p>
           </div>
         </section>
 
@@ -609,12 +694,27 @@ export default function EtiquetaDgtPage() {
             <div className={styles.etiquetaHero}>
               <EtiquetaCirculo etiqueta={resultado.etiqueta} nombre={resultado.nombre} />
               <h2 className={styles.etiquetaHeroNombre}>
-                Etiqueta{' '}
-                <strong>
-                  {resultado.etiqueta === 'ninguna' ? 'Sin etiqueta' : resultado.nombre}
-                </strong>
+                {resultado.etiqueta === 'ninguna' ? (
+                  <strong>Sin etiqueta</strong>
+                ) : (
+                  <>
+                    Etiqueta <strong>{resultado.nombre}</strong>
+                  </>
+                )}
               </h2>
               <p className={styles.etiquetaDesc}>{resultado.descripcion}</p>
+              {resultado.matiz && <p className={styles.matiz}>{resultado.matiz}</p>}
+              {resultado.porFecha && (
+                <p className={styles.notaFecha}>
+                  Resultado por fecha de matriculación, la aproximación que publica la{' '}
+                  <a href={URL_DGT_DISTINTIVO} target="_blank" rel="noopener noreferrer">
+                    DGT
+                  </a>
+                  . Manda la norma Euro de tu ficha técnica: un vehículo homologado con una norma
+                  más reciente antes de esa fecha puede tener una etiqueta mejor. Compruébala por
+                  matrícula en la sede electrónica de la DGT.
+                </p>
+              )}
             </div>
 
             {/* Ciudades ZBE */}
@@ -651,10 +751,33 @@ export default function EtiquetaDgtPage() {
         {/* ---- Disclaimer ---- */}
         <div style={{ maxWidth: '760px', margin: '0 auto', padding: '0 1.5rem' }}>
           <DisclaimerCard
-            variant="financial"
+            variant="general"
             severity="critical"
+            title="Aviso importante sobre la etiqueta y las ZBE"
             context="etiqueta-dgt"
-          />
+          >
+            <p>
+              Esta herramienta es <strong>orientativa</strong>. Deduce la etiqueta del combustible y
+              la fecha de matriculación, que es la aproximación que publica la DGT; la etiqueta
+              oficial es la que consta en el Registro de Vehículos según la norma Euro de tu
+              vehículo. Compruébala por matrícula en la{' '}
+              <a href={URL_SEDE_DGT} target="_blank" rel="noopener noreferrer">
+                sede electrónica de la DGT
+              </a>
+              .
+            </p>
+            <p>
+              Las restricciones de cada ZBE (horarios, días, episodios de contaminación,
+              excepciones) las fija cada ayuntamiento y cambian con frecuencia; los datos de ciudades
+              de esta herramienta son orientativos a 2025. Consulta siempre el portal oficial de tu
+              municipio antes de circular por una ZBE.
+            </p>
+            <p>
+              <strong>TÚ ERES RESPONSABLE</strong> de comprobar tu etiqueta y las normas de la ZBE
+              por la que circules. meskeIA no se responsabiliza de las sanciones derivadas del uso de
+              esta herramienta.
+            </p>
+          </DisclaimerCard>
         </div>
 
         {/* ---- Sección educativa ---- */}
@@ -667,60 +790,52 @@ export default function EtiquetaDgtPage() {
             <p>
               Las Zonas de Bajas Emisiones (ZBE) son áreas urbanas en las que se restringe la
               circulación de los vehículos más contaminantes para mejorar la calidad del aire. En
-              España, por mandato de la Ley de Residuos y Suelos Contaminados (Real Decreto-ley
-              7/2022), todos los municipios de más de 50.000 habitantes y las capitales de provincia
-              debían tener implantada su ZBE antes del 1 de enero de 2023. El objetivo principal es
-              reducir la concentración de dióxido de nitrógeno (NO₂) y partículas en suspensión
+              España, la Ley 7/2021, de 20 de mayo, de cambio climático y transición energética
+              (art. 14.3), obliga a los municipios de más de 50.000 habitantes y a los territorios
+              insulares a establecer zonas de bajas emisiones antes de 2023, y a los de más de 20.000
+              habitantes cuando superan los valores límite de contaminantes. El objetivo principal
+              es reducir la concentración de dióxido de nitrógeno (NO₂) y partículas en suspensión
               (PM2,5 y PM10), contaminantes que superan con frecuencia los límites fijados por la
               Unión Europea en las grandes ciudades españolas.
             </p>
 
-            <h4>Las 4 etiquetas DGT y qué significan</h4>
+            <h4>Las etiquetas DGT y qué significan</h4>
             <p>
-              La DGT clasifica los vehículos en cinco categorías según sus emisiones. La etiqueta{' '}
-              <strong>CERO</strong> (verde oscuro) corresponde a los vehículos eléctricos puros
-              (BEV), de pila de combustible (FCEV), los PHEV con autonomía eléctrica igual o
-              superior a 40 km y los vehículos propulsados por gas natural (GNC) o GLP. La etiqueta{' '}
-              <strong>ECO</strong> (bicolor azul-verde) agrupa a los híbridos convencionales (HEV) y
-              los PHEV con autonomía inferior a 40 km. La etiqueta <strong>C</strong> (amarilla)
-              incluye los vehículos de gasolina matriculados a partir de 2006 (Euro 4 o superior) y
-              los diésel matriculados a partir de 2015 (Euro 6). La etiqueta <strong>B</strong>{' '}
-              (verde) abarca los gasolina de entre 2001 y 2005 (Euro 3) y los diésel de entre 2006 y
-              2014 (Euro 4 y 5). Los vehículos anteriores a esas fechas no tienen etiqueta y son los
-              más restringidos.
+              El Reglamento General de Vehículos (Anexo II) clasifica los turismos y furgonetas
+              ligeras por su norma Euro, y la DGT lo traduce a fechas de matriculación. La etiqueta{' '}
+              <strong>CERO</strong> (azul) corresponde a los eléctricos de batería (BEV), de
+              autonomía extendida (REEV), de pila de combustible y a los híbridos enchufables (PHEV)
+              con 40 km o más de autonomía eléctrica. La etiqueta <strong>ECO</strong> (bicolor,
+              verde y azul) agrupa a los híbridos no enchufables (HEV), los PHEV con menos de 40 km
+              y los vehículos de gas (GNC, GNL o GLP), siempre que cumplan además los criterios de
+              la etiqueta C. La etiqueta <strong>C</strong> (verde) incluye los gasolina
+              matriculados a partir de enero de 2006 (Euro 4, 5 o 6) y los diésel a partir de
+              septiembre de 2015 (Euro 6). La etiqueta <strong>B</strong> (amarilla) abarca los
+              gasolina desde el 1 de enero de 2001 (Euro 3) y los diésel a partir de 2006 (Euro 4 o
+              5). Los vehículos anteriores a esas fechas no tienen distintivo y son los más
+              restringidos. Las fechas son una aproximación: manda la norma Euro del vehículo.
             </p>
 
             <h4>¿Qué pasa si entro sin etiqueta o sin autorización?</h4>
             <p>
-              Las sanciones por circular en una ZBE sin la etiqueta correspondiente o sin
-              autorización especial oscilan entre <strong>90 € y 500 €</strong> según el municipio y
-              las circunstancias. Madrid y Barcelona cuentan con sistemas de control perimetral
-              mediante cámaras de lectura automática de matrículas (ANPR) que identifican los
-              vehículos infractores de forma continua. Zaragoza y Valladolid también han implantado
-              sistemas de control automático en los accesos a sus ZBE. En algunos municipios, la
-              denuncia puede interponerse igualmente por la Policía Local durante los controles
-              manuales.
+              No respetar las restricciones de una ZBE es una infracción grave del artículo 76.z3
+              de la Ley sobre Tráfico, Circulación de Vehículos a Motor y Seguridad Vial:{' '}
+              <strong>200 € de multa</strong> (100 € con pronto pago), sin pérdida de puntos.
+              Madrid y Barcelona cuentan con sistemas de control perimetral mediante cámaras de
+              lectura automática de matrículas (ANPR) que identifican los vehículos infractores de
+              forma continua. Zaragoza y Valladolid también han implantado sistemas de control
+              automático en los accesos a sus ZBE. En algunos municipios, la denuncia puede
+              interponerse igualmente por la Policía Local durante los controles manuales.
             </p>
 
-            <h4>El futuro de las ZBE: endurecimiento progresivo</h4>
+            <h4>El futuro de las ZBE</h4>
             <p>
-              La tendencia regulatoria en toda España es clara: las restricciones se irán ampliando
-              progresivamente. En 2025-2026 se prevé que la etiqueta B quede restringida también en
-              los principales corredores viarios de varias ciudades en horario de mayor tráfico. A
-              medio plazo, tener etiqueta C o superior ya es prácticamente imprescindible para
-              circular con normalidad en entorno urbano. Los expertos en movilidad urbana coinciden
-              en que la descarbonización del parque automovilístico español se acelerará a medida
-              que las ZBE se extiendan a municipios de menor tamaño y el control de su cumplimiento
-              se refuerce.
+              Las ordenanzas municipales suelen implantar las restricciones por fases, empezando por
+              los vehículos sin distintivo y ampliándolas después a otras etiquetas, zonas u
+              horarios. Cada ayuntamiento decide su calendario, así que la situación de una ciudad
+              puede cambiar de un año para otro: conviene revisar la ordenanza de tu municipio si
+              piensas conservar tu vehículo varios años.
             </p>
-
-            <div className={styles.warningBox}>
-              <strong>Aviso importante:</strong> La normativa ZBE está en evolución constante. Las
-              restricciones específicas (horarios, días, episodios de contaminación) varían por
-              ciudad y pueden cambiar con frecuencia. La información de esta herramienta es
-              orientativa y está actualizada a 2025. Consulta siempre el portal oficial de tu
-              municipio para obtener información actualizada antes de circular por una ZBE.
-            </div>
           </EducationalSection>
         </div>
       </main>

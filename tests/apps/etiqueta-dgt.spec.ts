@@ -35,7 +35,11 @@ import { esperarPaginaAsentada, esperarValorEnReact } from './_hidratacion';
  *   Rechazo  · gasolina 2027 (año futuro) → aviso, sin resultado
  *   Imposible· gas (GNC/GLP) → ECO, nunca CERO
  *
- * HALLAZGOS ABIERTOS (test.fail: el fichero pasa en verde hoy y avisa cuando se reparen)
+ * REPARADOS el 26/09/2026 (hallazgos 2034-2048): los quince casos ya sin test.fail.
+ *   Cambios de forma que los casos recogen: el gas y el diésel de 2015 piden además año y mes;
+ *   la autonomía del PHEV se pregunta como «40 km o más» (valores cuarentaOMas / menos).
+ *
+ * HALLAZGOS DE LA PRIMERA INSPECCIÓN
  *   CASO 10 alto   · gas natural / GLP sale CERO; la DGT le da ECO (y solo si cumple la C).
  *   CASO 11 medio  · los colores: pinta y describe la C «amarilla» y la B «verde»; son al revés.
  *   CASO 12 medio  · diésel 2015 sale C sin aviso; la C del diésel empieza en septiembre de 2015.
@@ -82,13 +86,17 @@ async function abrir(page: Page): Promise<void> {
 async function consultar(
   page: Page,
   combustible: Combustible,
-  opciones: { anio?: number; autonomia?: 'si' | 'no' } = {},
+  opciones: { anio?: number; mes?: number; autonomia?: 'cuarentaOMas' | 'menos' } = {},
 ): Promise<void> {
   await page.selectOption('#combustible', combustible);
   await esperarValorEnReact(page, '#combustible', combustible);
   if (opciones.anio !== undefined) {
     await page.fill('#anioMatriculacion', String(opciones.anio));
     await esperarValorEnReact(page, '#anioMatriculacion', String(opciones.anio));
+  }
+  if (opciones.mes !== undefined) {
+    await page.selectOption('#mesMatriculacion', String(opciones.mes));
+    await esperarValorEnReact(page, '#mesMatriculacion', String(opciones.mes));
   }
   if (opciones.autonomia !== undefined) {
     await page.selectOption('#autonomiaPhev', opciones.autonomia);
@@ -213,14 +221,15 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
     await expect(tituloResultado(page)).toHaveText('Etiqueta CERO');
     await consultar(page, 'hev');
     await expect(tituloResultado(page)).toHaveText('Etiqueta ECO');
-    await consultar(page, 'phev', { autonomia: 'si' });
+    await consultar(page, 'phev', { autonomia: 'cuarentaOMas' });
     await expect(tituloResultado(page)).toHaveText('Etiqueta CERO');
-    await consultar(page, 'phev', { autonomia: 'no' });
+    await consultar(page, 'phev', { autonomia: 'menos' });
     await expect(tituloResultado(page)).toHaveText('Etiqueta ECO');
   });
 
-  test('CASO 8 · un año futuro (2027) se rechaza con aviso y sin resultado', async ({ page }) => {
-    await consultar(page, 'gasolina', { anio: 2027 });
+  test('CASO 8 · un año futuro (el que viene) se rechaza con aviso y sin resultado', async ({ page }) => {
+    // Del reloj, no fijo: con 2027 escrito a mano el caso caducaba en 2027 (la forma del 2037).
+    await consultar(page, 'gasolina', { anio: new Date().getFullYear() + 1 });
     await expect(page.locator('#errorAnio')).toBeVisible();
     await expect(resultado(page)).toHaveCount(0);
   });
@@ -233,11 +242,15 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * cumplan los criterios de la C. La descripción de la CERO (l. 254) y el bloque educativo
    * (l. 683) repiten el error; la FAQ de la propia app (metadata.ts:81) dice ECO.
    */
-  test('CASO 10 · gas natural / GLP → ECO, no CERO', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: el gas sale CERO (page.tsx:312)');
-    await consultar(page, 'gnc');
-    // DEBERÍA: «Etiqueta ECO». Obtenido: «Etiqueta CERO».
+  test('CASO 10 · gas natural / GLP → ECO, no CERO; y sin la C por fecha, tampoco ECO', async ({ page }) => {
+    // Reparado el 26/09/2026. La ECO del gas exige «cumplir los criterios de la etiqueta C» (DGT),
+    // así que la app pide ahora el año también al gas: 2010 (≥ enero 2006) → ECO; 2003 → no llega
+    // a la C, y por fecha su norma Euro de gasolina es la 3 → B, con el matiz a la vista.
+    await consultar(page, 'gnc', { anio: 2010 });
     await expect(tituloResultado(page)).toHaveText('Etiqueta ECO', { timeout: 3000 });
+    await consultar(page, 'gnc', { anio: 2003 });
+    await expect(tituloResultado(page)).toHaveText('Etiqueta B');
+    await expect(resultado(page)).toContainText('criterios de la etiqueta C');
   });
 
   /**
@@ -247,7 +260,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * cambiadas de color: quien busca su pegatina por el color lee la contraria.
    */
   test('CASO 11 · la C se describe verde y la B amarilla, como las pinta la DGT', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: colores de la C y la B intercambiados (page.tsx:274, 284)');
     await consultar(page, 'gasolina', { anio: 2010 });
     // DEBERÍA: la descripción de la C dice «verde». Obtenido: «… Etiqueta amarilla.»
     await expect(resultado(page).locator('p').first()).toContainText('verde', { timeout: 3000 });
@@ -261,16 +273,20 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * responde «Etiqueta C» a todo 2015 (l. 331) y afirma «diésel matriculado desde 2015 (Euro 6)»,
    * sin decir en ningún sitio que manda la norma Euro de la ficha ni que la DGT lo da por matrícula.
    */
-  test('CASO 12 · un diésel de 2015 no se da por C sin advertir de la norma Euro o de septiembre', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: diésel 2015 → C sin matiz (page.tsx:331)');
+  test('CASO 12 · un diésel de 2015 pide el mes: agosto → B (con el matiz Euro 6), septiembre → C', async ({ page }) => {
+    // Reparado el 26/09/2026. El caso original esperaba un resultado con solo el año más un aviso;
+    // la reparación elegida es preguntar el mes, que es lo que decide según la DGT («a partir de
+    // septiembre de 2015»). Sin mes, no hay resultado sino un aviso que lo pide.
     await consultar(page, 'diesel', { anio: 2015 });
-    await expect(tituloResultado(page)).toBeVisible();
-    // DEBERÍA: algún texto visible que remita a septiembre de 2015, a la norma Euro o a la ficha.
+    await expect(resultado(page)).toHaveCount(0);
+    await expect(page.locator('#errorMes')).toContainText('septiembre de 2015');
+    await consultar(page, 'diesel', { anio: 2015, mes: 8 });
+    await expect(tituloResultado(page)).toHaveText('Etiqueta B', { timeout: 3000 });
     // innerText: un matiz escondido en la sección educativa colapsada no cuenta como reparación.
-    await expect(page.locator('main')).toContainText(/septiembre|ficha técnica|norma euro|por matrícula/i, {
-      timeout: 3000,
-      useInnerText: true,
-    });
+    await expect(page.locator('main')).toContainText(/ficha técnica dice Euro 6/i, { useInnerText: true });
+    await consultar(page, 'diesel', { anio: 2015, mes: 9 });
+    await expect(tituloResultado(page)).toHaveText('Etiqueta C');
+    await expect(resultado(page)).toContainText(/norma Euro/i, { useInnerText: true });
   });
 
   /**
@@ -279,7 +295,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * El año se toma del reloj para que el caso no caduque.
    */
   test('CASO 13 · un gasolina matriculado este año sale C, no se rechaza', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: anioActual = 2025 fijo (page.tsx:440)');
     await consultar(page, 'gasolina', { anio: new Date().getFullYear() });
     // DEBERÍA: «Etiqueta C». Obtenido (2026): «Introduce un año entre 1990 y 2025».
     await expect(tituloResultado(page)).toHaveText('Etiqueta C', { timeout: 3000 });
@@ -292,7 +307,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * propia app, que da B al diésel de 2014 (CASO 6).
    */
   test('CASO 14 · la FAQ no fecha la C del diésel en 2014 ni la B de la gasolina en 2000', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: FAQ con fechas que no son las de la DGT (metadata.ts:81)');
     const faq = await page
       .locator('script[type="application/ld+json"]')
       .evaluateAll((els) => els.map((e) => e.textContent ?? '').find((t) => t.includes('FAQPage')) ?? '');
@@ -307,8 +321,7 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * sobre el panel --bg-card #2D2D2D a 2,85:1, en texto de 14 px, que exige 4,5:1.
    */
   test('CASO 15 · el aviso de año inválido se lee también en tema oscuro (4,5:1 o más)', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: #dc2626 en línea sin variante oscura (page.tsx:561)');
-    await consultar(page, 'gasolina', { anio: 2027 });
+    await consultar(page, 'gasolina', { anio: new Date().getFullYear() + 1 });
     const aviso = page.locator('#errorAnio');
     await expect(aviso).toBeVisible();
     // En claro: #dc2626 sobre #FFFFFF = 4,83:1
@@ -324,13 +337,26 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * verde) da 2,88:1; «Prohibido» 4,01:1 y «Con restricciones» 4,42:1. En oscuro, «Prohibido» 4,39:1.
    */
   test('CASO 16 · la insignia «Libre acceso» alcanza 4,5:1 en claro', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: insignias ZBE por debajo de 4,5:1 (EtiquetaDgt.module.css:305-333)');
     await consultar(page, 'gasolina', { anio: 2010 });
     const libre = resultado(page).locator('[class*="zbeLibre"]').first();
     await expect(libre).toContainText('Libre acceso');
     await esperarPaginaAsentada(page);
     // DEBERÍA: ≥ 4,5:1. Obtenido: 2,88:1.
     expect(await esperarEstable(() => contrasteEfectivo(libre))).toBeGreaterThanOrEqual(4.5);
+    // Y las otras dos del acta: «Con restricciones» (diésel 2010) y «Prohibido» (diésel 2000),
+    // en claro y en oscuro.
+    await consultar(page, 'diesel', { anio: 2010 });
+    const restr = resultado(page).locator('[class*="zbeRestriccion"]').first();
+    await expect(restr).toContainText('Con restricciones');
+    expect(await esperarEstable(() => contrasteEfectivo(restr)), 'restricción en claro').toBeGreaterThanOrEqual(4.5);
+    await consultar(page, 'diesel', { anio: 2000 });
+    const prohibido = resultado(page).locator('[class*="zbeProhibido"]').first();
+    await expect(prohibido).toContainText('Prohibido');
+    expect(await esperarEstable(() => contrasteEfectivo(prohibido)), 'prohibido en claro').toBeGreaterThanOrEqual(4.5);
+    await pasarAOscuro(page);
+    expect(await esperarEstable(() => contrasteEfectivo(prohibido)), 'prohibido en oscuro').toBeGreaterThanOrEqual(4.5);
+    // «Sin etiqueta» también tiene ciudades «Con restricciones» (Sevilla, Valladolid): se mide en oscuro.
+    expect(await esperarEstable(() => contrasteEfectivo(restr)), 'restricción en oscuro').toBeGreaterThanOrEqual(4.5);
   });
 
   /**
@@ -339,7 +365,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * clasifica: «Introduce un año entre 1990 y 2025».
    */
   test('CASO 17 · un gasolina de 1989 sale «sin etiqueta», no se rechaza', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: años anteriores a 1990 rechazados (page.tsx:472)');
     await consultar(page, 'gasolina', { anio: 1989 });
     await expect(tituloResultado(page)).toContainText('Sin etiqueta', { timeout: 3000 });
   });
@@ -351,7 +376,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * respuesta literal es «No» → ECO.
    */
   test('CASO 18 · la pregunta del PHEV incluye los 40 km exactos', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: «¿supera los 40 km?» (page.tsx:573-585)');
     await page.selectOption('#combustible', 'phev');
     await esperarValorEnReact(page, '#combustible', 'phev');
     const pregunta = page.locator('label[for="autonomiaPhev"]');
@@ -365,10 +389,11 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * que MOVES «ha estado vigente entre los años 2019 y 2025».
    */
   test('CASO 19 · no remite al Plan MOVES III como ayuda vigente', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: MOVES III presentado como vigente (page.tsx:298)');
     await consultar(page, 'gasolina', { anio: 2000 });
     await expect(tituloResultado(page)).toContainText('Sin etiqueta');
     await expect(resultado(page)).not.toContainText('MOVES III', { timeout: 3000 });
+    // La ayuda vigente sale del módulo data/fiscal/ayudas-vehiculo.ts.
+    await expect(resultado(page)).toContainText('Programa Auto+');
   });
 
   /**
@@ -379,11 +404,12 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * territorios insulares, antes de 2023). La FAQ (metadata.ts:89) dice «Ley de Residuos de 2021».
    */
   test('CASO 20 · el bloque educativo no atribuye las ZBE a un «Real Decreto-ley 7/2022»', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: norma equivocada (page.tsx:669-672)');
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const bloque = page.getByText(/Las Zonas de Bajas Emisiones \(ZBE\) son áreas urbanas/);
     await expect(bloque).toBeVisible();
     await expect(bloque).not.toContainText('Real Decreto-ley 7/2022', { timeout: 3000 });
+    await expect(bloque).toContainText('Ley 7/2021');
+    await expect(bloque).not.toContainText('capitales de provincia');
   });
 
   /**
@@ -393,7 +419,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * caja): texto grande, exige 3:1. En claro, 3,38:1 en el centro.
    */
   test('CASO 21 · «ECO» se lee sobre su círculo también en tema oscuro (3:1 o más)', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: blanco sobre degradado de marca en oscuro (EtiquetaDgt.module.css:199)');
     await consultar(page, 'hev');
     const circulo = page.locator('[aria-label="Etiqueta DGT: ECO"]');
     await expect(circulo).toBeVisible();
@@ -406,10 +431,10 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
 
   /** CASO 22 (bajo, contenido) — l. 611-615: «Etiqueta» + «Sin etiqueta» = «Etiqueta Sin etiqueta». */
   test('CASO 22 · el título del resultado no dice «Etiqueta Sin etiqueta»', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: «Etiqueta Sin etiqueta» (page.tsx:611-615)');
     await consultar(page, 'diesel', { anio: 2005 });
     await expect(tituloResultado(page)).toBeVisible();
     await expect(tituloResultado(page)).not.toHaveText(/Etiqueta\s+Sin etiqueta/, { timeout: 3000 });
+    await expect(tituloResultado(page)).toHaveText('Sin etiqueta');
   });
 
   /**
@@ -418,10 +443,10 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * falta. El único role="alert" de la página es el del DisclaimerCard.
    */
   test('CASO 23 · PHEV sin la autonomía contestada: el formulario dice qué falta', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: envío incompleto sin aviso (page.tsx:465, 478)');
     await consultar(page, 'phev');
     await expect(resultado(page)).toHaveCount(0);
     await expect(page.locator('form [role="alert"]')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('form [role="alert"]')).toContainText('40 km');
   });
 
   /**
@@ -433,7 +458,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * innerText: lo oculto por la sección colapsada no cuenta.
    */
   test('CASO 24 · a la vista, sin desplegar nada, se remite a la fuente oficial', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: el aviso de ZBE solo está en la sección educativa colapsada (page.tsx:717-723)');
     await expect(page.getByRole('button', { name: 'Ver guía educativa' })).toBeVisible();
     await expect(page.locator('main')).toContainText(/portal oficial|sede electrónica|por matrícula/i, {
       timeout: 3000,

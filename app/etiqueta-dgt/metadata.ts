@@ -78,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Qué etiqueta medioambiental DGT tiene mi coche?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La etiqueta DGT depende del tipo de combustible y el año de matriculación del vehículo. Los coches eléctricos e híbridos enchufables con más de 40 km de autonomía obtienen la etiqueta CERO. Los híbridos no enchufables y vehículos de gas reciben la ECO. Los gasolina matriculados desde 2006 y diésel desde 2014 llevan la etiqueta C. Los gasolina entre 2000 y 2005 y diésel entre 2006 y 2013 obtienen la B. Los vehículos más antiguos no tienen etiqueta.',
+        text: 'La etiqueta DGT depende del tipo de motor y de su norma Euro, que la DGT aproxima por la fecha de matriculación. Los eléctricos de batería, los de pila de combustible y los híbridos enchufables con 40 km o más de autonomía eléctrica llevan la CERO (azul). Los híbridos no enchufables, los enchufables con menos de 40 km y los vehículos de gas (GNC, GNL o GLP) que cumplan los criterios de la C llevan la ECO. Los gasolina matriculados a partir de enero de 2006 y los diésel a partir de septiembre de 2015 llevan la C (verde). Los gasolina desde el 1 de enero de 2001 y los diésel a partir de 2006 llevan la B (amarilla). Los anteriores no tienen etiqueta. La etiqueta oficial se consulta por matrícula en la sede electrónica de la DGT.',
       },
     },
     {
@@ -86,7 +86,7 @@ export const faqJsonLd = {
       name: '¿Qué son las Zonas de Bajas Emisiones (ZBE) en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las Zonas de Bajas Emisiones (ZBE) son áreas urbanas delimitadas donde se restringen o prohíben determinados vehículos en función de su etiqueta medioambiental DGT, con el objetivo de mejorar la calidad del aire. La Ley de Residuos de 2021 obliga a los municipios de más de 50.000 habitantes a establecer sus ZBE. Las principales ciudades con ZBE operativas son Madrid (Madrid Central y Madrid 360), Barcelona (ZBE Rondes) y Valencia.',
+        text: 'Las Zonas de Bajas Emisiones (ZBE) son áreas urbanas delimitadas donde se restringen o prohíben determinados vehículos en función de su etiqueta medioambiental DGT, con el objetivo de mejorar la calidad del aire. La Ley 7/2021, de cambio climático y transición energética (art. 14.3), obliga a los municipios de más de 50.000 habitantes y a los territorios insulares a establecerlas, y a los de más de 20.000 cuando superan los límites de contaminación. Las principales ciudades con ZBE operativas son Madrid (Madrid Central y Madrid 360), Barcelona (ZBE Rondes) y Valencia.',
       },
     },
     {

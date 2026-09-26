@@ -193,19 +193,26 @@
 }
 
 .etiqueta_cero {
-  background: #16a34a;
+  background: #1d4ed8; /* azul, como el distintivo CERO (7,1:1 con blanco) */
 }
 
+/* ECO: bicolor verde y azul, como el distintivo; tonos fijos (no los tokens de marca, que se
+   aclaran en oscuro) para que el blanco pase de 3:1 en ambos temas. */
 .etiqueta_eco {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, #15803d 0%, #15803d 50%, #1d4ed8 50%, #1d4ed8 100%);
 }
 
 .etiqueta_c {
-  background: #d97706;
+  background: #15803d; /* verde (5,0:1 con blanco) */
 }
 
 .etiqueta_b {
-  background: #65a30d;
+  background: #facc15; /* amarilla: el texto va oscuro */
+}
+
+.etiqueta_b .etiquetaLetra {
+  color: #1a1a1a;
+  text-shadow: none;
 }
 
 .etiqueta_ninguna {
@@ -304,7 +311,7 @@
 
 .zbeLibre {
   background: rgba(22, 163, 74, 0.12);
-  color: #16a34a;
+  color: #166534;
 }
 
 [data-theme='dark'] .zbeLibre {
@@ -314,7 +321,7 @@
 
 .zbeRestriccion {
   background: rgba(217, 119, 6, 0.12);
-  color: #b45309;
+  color: #92400e;
 }
 
 [data-theme='dark'] .zbeRestriccion {
@@ -324,12 +331,12 @@
 
 .zbeProhibido {
   background: rgba(220, 38, 38, 0.12);
-  color: #dc2626;
+  color: #b91c1c;
 }
 
 [data-theme='dark'] .zbeProhibido {
   background: rgba(220, 38, 38, 0.2);
-  color: #f87171;
+  color: #fca5a5;
 }
 
 .zbeDetalle {
@@ -388,6 +395,62 @@
 [data-theme='dark'] .warningBox {
   background: rgba(217, 119, 6, 0.12);
   border-color: rgba(217, 119, 6, 0.4);
+}
+
+/* ---- Mensajes de error y ayudas del formulario ---- */
+.mensajeError {
+  color: #b91c1c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+[data-theme='dark'] .mensajeError {
+  color: #fca5a5;
+}
+
+.ayudaCampo {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.notaOficial {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 1.25rem 0 0;
+}
+
+.notaOficial a,
+.notaFecha a {
+  color: var(--primary-texto);
+  text-decoration: underline;
+}
+
+/* ---- Matices del resultado ---- */
+.matiz {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  max-width: 520px;
+  margin: 1rem auto 0;
+  line-height: 1.6;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #d97706;
+  background: rgba(217, 119, 6, 0.08);
+  border-radius: 8px;
+  text-align: left;
+}
+
+[data-theme='dark'] .matiz {
+  background: rgba(217, 119, 6, 0.14);
+}
+
+.notaFecha {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  max-width: 520px;
+  margin: 1rem auto 0;
+  line-height: 1.5;
 }
 
 /* ---- Nota informativa extra ---- */
