@@ -140,14 +140,14 @@ const COMPARATIVA: FilaComparacion[] = [
   },
   {
     aspecto: 'Lugar de replicación',
-    adn: 'Núcleo celular',
+    adn: 'Núcleo celular, en la mayoría (los poxvirus, como la viruela o el mpox, en el citoplasma)',
     arn: 'Citoplasma, en la mayoría (la gripe es la excepción: en el núcleo)',
     retrovirus: 'Citoplasma → núcleo (integración)',
   },
   {
     aspecto: 'Tasa de mutación',
     adn: 'Baja (con corrección de errores)',
-    arn: 'Alta (sin corrección de errores)',
+    arn: 'Alta: la RdRp no corrige errores (los coronavirus sí, con la exonucleasa nsp14, y mutan menos)',
     retrovirus: 'Muy alta (transcriptasa inversa propensa a errores)',
   },
   {
@@ -342,10 +342,14 @@ export default function VisualizadorCicloViral() {
                   strokeWidth="2"
                 />
 
-                <text x="250" y="215" textAnchor="middle" fontSize="11" fill="#1A5C7A" fontWeight="600">
+                {/* Rótulos fijos: el color va en el módulo CSS, con su variante oscura, y se
+                    mide sobre el fondo REAL (degradados de la célula y del núcleo), no sobre la
+                    tarjeta (hallazgo 2169 del Inspector, 25/09/2026). En móvil se ocultan: a
+                    esa escala salen a 5-6 px y la leyenda de debajo los sustituye (hallazgo 2170). */}
+                <text x="250" y="215" textAnchor="middle" fontSize="11" fontWeight="600" className={styles.rotuloNucleo}>
                   Núcleo
                 </text>
-                <text x="250" y="230" textAnchor="middle" fontSize="9" fill="#2E86AB">
+                <text x="250" y="230" textAnchor="middle" fontSize="9" className={styles.rotuloNucleoSecundario}>
                   (ADN celular)
                 </text>
 
@@ -357,7 +361,7 @@ export default function VisualizadorCicloViral() {
                 ))}
 
                 {/* Etiqueta célula: dentro de la membrana y por encima del círculo 4 (cy=370, r=17) */}
-                <text x="250" y="335" textAnchor="middle" fontSize="11" fill="#48A9A6" fontWeight="500">
+                <text x="250" y="335" textAnchor="middle" fontSize="11" fontWeight="500" className={styles.rotuloCelula}>
                   Célula huésped
                 </text>
 
@@ -434,10 +438,12 @@ export default function VisualizadorCicloViral() {
                       className={activo ? styles.circuloEtapaActivo : styles.circuloEtapa}
                       strokeWidth="2.5"
                     />
+                    {/* Centrado con dominantBaseline: en móvil el CSS lo agranda (hallazgo 2170) */}
                     <text
                       x={e.cx}
-                      y={e.cy + 4}
+                      y={e.cy}
                       textAnchor="middle"
+                      dominantBaseline="central"
                       fontSize="12"
                       fontWeight="800"
                       className={activo ? styles.numeroEtapaActivo : styles.numeroEtapa}
@@ -463,6 +469,22 @@ export default function VisualizadorCicloViral() {
                 );
               })}
             </svg>
+
+            {/* Leyenda solo para móvil (≤ 700 px, una columna): allí el SVG escala a ~0,53 y
+                los rótulos del diagrama saldrían a 5 px, así que se ocultan y se leen aquí.
+                aria-hidden: para el lector de pantalla ya están los aria-label de cada etapa. */}
+            <div className={styles.leyendaMovil} aria-hidden="true">
+              <ol className={styles.leyendaEtapas}>
+                {ETAPAS.map((e) => (
+                  <li key={e.numero}>
+                    <span className={styles.leyendaNumero}>{e.numero}</span> {e.etiqueta}
+                  </li>
+                ))}
+              </ol>
+              <p className={styles.leyendaNota}>
+                El óvalo grande es la célula huésped; el pequeño, su núcleo (ADN celular).
+              </p>
+            </div>
           </div>
 
           {/* Panel de detalle de etapa */}
@@ -620,7 +642,9 @@ export default function VisualizadorCicloViral() {
               <p>
                 La ARN polimerasa dependiente de ARN (RdRp) carece de actividad correctora, por lo que
                 introduce un error por cada 10.000-100.000 nucleótidos copiados, frente a 1 por cada
-                10⁹ de la replicación de ADN. Esto genera cuasiespecies: nubes de variantes genéticas
+                10⁹ de la replicación de ADN. Los coronavirus son la excepción: con la exonucleasa
+                nsp14 retiran parte de los nucleótidos mal emparejados, lo que les permite mantener
+                genomas de ~30.000 bases y mutar menos que otros virus ARN. Esto genera cuasiespecies: nubes de variantes genéticas
                 que permiten adaptación rápida a nuevos huéspedes y evasión inmune.
               </p>
               <p>
@@ -644,7 +668,7 @@ export default function VisualizadorCicloViral() {
                 La TI también es propensa a errores: las mutaciones se acumulan al ritmo de los virus ARN,
                 lo que hace muy difícil la erradicación completa. Además del VIH, el HTLV-1 (asociado
                 a leucemia de células T) es otro retrovirus humano importante. Los retrovirus endógenos
-                representan ~8% del genoma humano, evidencia de integraciones ancestrales.
+                representan ~8&nbsp;% del genoma humano, evidencia de integraciones ancestrales.
               </p>
             </div>
           )}
@@ -729,7 +753,11 @@ export default function VisualizadorCicloViral() {
             <h4>Ciclo lítico vs. ciclo lisogénico (bacteriófagos)</h4>
             <p>
               En bacteriófagos (virus que infectan bacterias) existe una distinción clásica.
-              El ciclo lítico sigue las 6 etapas del visualizador y termina en lisis bacteriana.
+              El ciclo lítico de un fago tiene cinco etapas (adhesión, penetración, biosíntesis,
+              maduración y liberación por lisis bacteriana) y no es el ciclo animal del visualizador:
+              el fago inyecta su genoma a través de la pared y la cápside se queda fuera, así que no
+              hay endosoma ni decapsidación dentro de la célula, ni paso por un núcleo que la
+              bacteria no tiene.
               El ciclo lisogénico (temperado) permite al fago integrar su ADN en el cromosoma
               bacteriano como profago, replicándose pasivamente con la bacteria durante generaciones.
               El estrés puede inducir la escisión del profago y la entrada al ciclo lítico.

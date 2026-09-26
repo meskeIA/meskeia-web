@@ -567,13 +567,14 @@ test.describe('REINSPECCIÓN 25/09/2026 · lo que tocó la reparación', () => {
     expect(contrasteWcag(rgbDe(anillo.trazo), rgbDe(anillo.fondo))).toBeGreaterThanOrEqual(3);
   });
 
-  test('HALLAZGO · los rótulos fijos del diagrama no llegan a 4,5:1 («Célula huésped», «(ADN celular)»)', async ({ page }) => {
+  test('2169 · los rótulos fijos del diagrama llegan a 4,5:1 sobre su fondo real («Célula huésped», «(ADN celular)»)', async ({ page }) => {
+    // REPARADO el 26/09/2026: el color va en el módulo (.rotuloCelula #1F5F5C / #7ECFCB en
+    // oscuro; .rotuloNucleo y .rotuloNucleoSecundario #0F4C66, el núcleo es claro en los dos).
     // Hallazgo de la reinspección del 25/09/2026. Al mover «Célula huésped» dentro de la célula
     // (reparación de 1361) quedó a ~2,2:1 en claro sobre el degradado y a 4,26:1 en oscuro
     // sobre #1E3A4A; «(ADN celular)», #2E86AB sobre el núcleo, ~2,5:1 en los dos temas.
     // ENTRADA cargar la página, medir cada rótulo sobre el fondo real en claro y en oscuro →
     // ESPERADO ≥ 4,5:1 (texto pequeño: 11 y 9 unidades, ~9 y ~7 px en escritorio).
-    test.fail();
     test.setTimeout(90_000);
     await irAlVisualizador(page);
     const suspensos: string[] = [];
@@ -619,15 +620,18 @@ test.describe('REINSPECCIÓN 25/09/2026 · móvil de 360 px', () => {
     }
   });
 
-  test('HALLAZGO · los rótulos y números del diagrama se pintan a 5-6 px y no se leen', async ({ page }) => {
+  test('2170 · a 360 px ningún rótulo ni número visible del diagrama baja de 12 px', async ({ page }) => {
+    // REPARADO el 26/09/2026: en una columna (≤ 700 px) los rótulos del SVG se ocultan y los
+    // sustituye una leyenda HTML debajo; los números suben a 23 unidades (≥ 12 px a 360 px).
+    // El caso se conserva y se amplía: los rótulos fijos (célula, núcleo) tampoco pueden
+    // quedar visibles por debajo de 12 px, y la leyenda tiene que estar a la vista.
     // Hallazgo de la reinspección del 25/09/2026. El SVG escala a 0,5265 (278 px para un
     // viewBox de 528): el rótulo de 10 unidades sale a 5,27 px y el número de 12 a 6,32 px.
     // ENTRADA 360 × 800 → ESPERADO todo rótulo y número VISIBLE del diagrama ≥ 12 px (umbral de
     // Lighthouse para texto legible en móvil) · OBTENIDO 5,27 y 6,32 px.
-    test.fail();
     test.setTimeout(60_000);
     await irAlVisualizador(page);
-    const pequenos = await page.locator('g[role="button"]').evaluateAll((gs) =>
+    const pequenos = await page.locator('svg[role="group"] > g').evaluateAll((gs) =>
       gs.flatMap((g) => {
         const escala = (g as SVGGElement).getScreenCTM()?.a ?? 1;
         return [...g.querySelectorAll('text')]
@@ -641,6 +645,13 @@ test.describe('REINSPECCIÓN 25/09/2026 · móvil de 360 px', () => {
       }),
     );
     expect(pequenos).toEqual([]);
+    // Los seis números siguen visibles, y la leyenda da el nombre de cada uno
+    await expect(page.locator('g[role="button"] text:visible')).toHaveCount(6);
+    const leyenda = page.locator('[class*="leyendaEtapas"] li');
+    await expect(leyenda).toHaveCount(6);
+    await expect(leyenda.nth(2)).toHaveText('3 Genoma');
+    const pxLeyenda = await leyenda.first().evaluate((li) => parseFloat(getComputedStyle(li).fontSize));
+    expect(pxLeyenda).toBeGreaterThanOrEqual(12);
   });
 });
 
@@ -667,21 +678,20 @@ test.describe('REINSPECCIÓN 25/09/2026 · contenido cotejado con fuente', () =>
     );
   });
 
-  test('HALLAZGO · ADN, «Lugar de replicación»: falta la excepción de los poxvirus, que replican en el citoplasma', async ({ page }) => {
+  test('2171 · ADN, «Lugar de replicación»: recoge la excepción de los poxvirus, que replican en el citoplasma', async ({ page }) => {
     // Hallazgo de la reinspección del 25/09/2026. OpenStax Microbiology 6.2: «Most DNA viruses
     // can replicate inside the nucleus, with an exception observed in the large DNA viruses,
     // such as the poxviruses, that can replicate in the cytoplasm». La reparación de 1355 puso
     // la excepción de la gripe en la columna ARN; la ADN sigue diciendo «Núcleo celular».
     // ENTRADA pestaña cualquiera, fila «Lugar de replicación», columna Virus ADN → ESPERADO
     // menciona los poxvirus (o la viruela) · OBTENIDO «Núcleo celular».
-    test.fail();
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     const fila = page.locator('table tbody tr').filter({ hasText: 'Lugar de replicación' });
     await expect(fila.locator('td').nth(1)).toContainText(/poxvirus|viruela/i);
   });
 
-  test('HALLAZGO · ARN, «Tasa de mutación»: «sin corrección de errores» no vale para SARS-CoV-2, que la tiene', async ({ page }) => {
+  test('2172 · ARN, «Tasa de mutación»: salva a los coronavirus, que corrigen errores con nsp14', async ({ page }) => {
     // Hallazgo de la reinspección del 25/09/2026. Robson et al., «Coronavirus RNA
     // Proofreading: Molecular Basis and Therapeutic Targeting», Mol Cell 2020;79:710-727
     // (PMID 32853546): «the capacity of CoVs to proofread and remove mismatched nucleotides
@@ -690,38 +700,42 @@ test.describe('REINSPECCIÓN 25/09/2026 · contenido cotejado con fuente', () =>
     // ENTRADA fila «Tasa de mutación», columna Virus ARN → ESPERADO la excepción de los
     // coronavirus (o que no afirme «sin corrección de errores» para todos) · OBTENIDO «Alta
     // (sin corrección de errores)».
-    test.fail();
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     const celda = page.locator('table tbody tr').filter({ hasText: 'Tasa de mutación' }).locator('td').nth(2);
     const texto = (await celda.textContent()) ?? '';
     expect(/coronavirus/i.test(texto) || !/sin corrección de errores/i.test(texto), `celda: «${texto}»`).toBe(true);
+    // Y la tarjeta ARN, que agrupaba al SARS-CoV-2 con los virus sin actividad correctora
+    await page.getByRole('button', { name: 'Virus ARN', exact: true }).click();
+    await expect(page.locator('[class*="tipoCard"]')).toContainText('nsp14');
   });
 
-  test('HALLAZGO · el ciclo lítico de los fagos no «sigue las 6 etapas del visualizador»', async ({ page }) => {
+  test('2173 · el ciclo lítico de los fagos tiene cinco etapas y la cápside se queda fuera', async ({ page }) => {
     // Hallazgo de la reinspección del 25/09/2026. OpenStax Microbiology 6.2: «There are five
     // stages in the bacteriophage lytic cycle» (attachment, penetration, biosynthesis,
     // maturation, release) y en la penetración «The phage head and remaining components remain
     // outside the bacteria»: no hay decapsidación dentro de la célula (la etapa 3 de la app).
     // ENTRADA «Ver guía educativa», tarjeta del ciclo lítico → ESPERADO sin «sigue las 6 etapas
     // del visualizador» · OBTENIDO esa frase.
-    test.fail();
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const tarjeta = page.locator('[class*="eduCard"]').filter({ hasText: 'Ciclo lítico' });
     await expect(tarjeta).toBeVisible();
     await expect(tarjeta).not.toContainText('sigue las 6 etapas del visualizador');
+    await expect(tarjeta).toContainText('cinco etapas');
+    await expect(tarjeta).toContainText('la cápside se queda fuera');
   });
 
-  test('HALLAZGO · «~8%» de retrovirus endógenos va sin el espacio duro antes del %', async ({ page }) => {
+  test('2174 · «~8 %» de retrovirus endógenos lleva el espacio duro antes del %', async ({ page }) => {
     // Hallazgo de la reinspección del 25/09/2026. Regla del CLAUDE.md global (25/09/2026):
     // «15 %», separado con espacio duro U+00A0.
     // ENTRADA pestaña Retrovirus → ESPERADO «8 %» con U+00A0 · OBTENIDO «~8%».
-    test.fail();
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await page.getByRole('button', { name: 'Retrovirus', exact: true }).click();
-    await expect(page.locator('[class*="tipoCard"]')).toContainText('8 %');
+    // toContainText normaliza los espacios: se mira el carácter crudo
+    const crudo = (await page.locator('[class*="tipoCard"]').textContent()) ?? '';
+    expect(crudo).toContain('~8\u00a0%');
   });
 });

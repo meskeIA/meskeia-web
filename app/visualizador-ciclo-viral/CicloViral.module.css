@@ -140,6 +140,92 @@
   font-weight: 800;
 }
 
+/* Rótulos fijos del diagrama (hallazgo 2169). Van sobre los degradados, no sobre la tarjeta:
+   la célula (~#C9E6F0 junto al borde) y el núcleo (~#B3D1E6). Medido sobre esos fondos:
+   #1F5F5C ≈ 5,7:1 y #0F4C66 ≈ 6:1. El núcleo conserva su degradado claro en oscuro, así que
+   sus rótulos valen igual en los dos temas; la célula pasa a #1E3A4A y lleva variante propia. */
+.rotuloCelula {
+  fill: #1f5f5c;
+}
+
+.rotuloNucleo,
+.rotuloNucleoSecundario {
+  fill: #0f4c66;
+}
+
+[data-theme='dark'] .rotuloNucleo,
+[data-theme='dark'] .rotuloNucleoSecundario {
+  fill: #0f4c66;
+}
+
+[data-theme='dark'] .rotuloCelula {
+  fill: #7ecfcb;
+}
+
+/* Leyenda de móvil (hallazgo 2170): oculta en escritorio, donde los rótulos van en el SVG */
+.leyendaMovil {
+  display: none;
+}
+
+.leyendaEtapas {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.leyendaNumero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  color: var(--primary-texto);
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-right: 0.25rem;
+}
+
+.leyendaNota {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* En una columna (≤ 700 px) el SVG mide ~280-600 px para un viewBox de 528: los rótulos de
+   10-11 unidades salen por debajo de 12 px (5,3 px a 360 px). Se ocultan y los sustituye la
+   leyenda; los números crecen hasta 23 unidades, que a 360 px son ≥ 12 px y caben en r = 17. */
+@media (max-width: 700px) {
+  .svgContainer {
+    padding: 0.5rem;
+  }
+
+  .leyendaMovil {
+    display: block;
+    padding: 0 0.5rem 0.5rem;
+  }
+
+  .etiquetaEtapa,
+  .etiquetaEtapaActiva,
+  .rotuloCelula,
+  .rotuloNucleo,
+  .rotuloNucleoSecundario {
+    display: none;
+  }
+
+  .numeroEtapa,
+  .numeroEtapaActivo {
+    font-size: 23px;
+  }
+}
+
 /* ─── Panel de detalle ───────────────────────────── */
 .panelDetalle {
   background: var(--bg-card);
