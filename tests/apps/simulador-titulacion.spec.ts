@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion } from './_hidratacion';
 
 /**
  * Inspector — simulador-titulacion (segmento cálculo/química, riesgo 3, 224 usos reales)
@@ -345,7 +346,9 @@ test('CASO 3 · no hay manera de meter 0, un negativo ni texto', async ({ page }
   await page.getByRole('button', { name: /Ácido débil \+ Base fuerte/ }).click();
 
   // Ni un solo campo de texto ni numérico: los 5 parámetros son deslizadores acotados.
-  const campos = await page.locator('input').evaluateAll((is) =>
+  // Se excluye la casilla de respuesta de los casos para clase (26/09/2026), que no es un
+  // parámetro del simulador: es la misma acotación que se hizo en simulador-fluidos-bernoulli.
+  const campos = await page.locator('input:not(#casos-respuesta)').evaluateAll((is) =>
     is.map((i) => {
       const e = i as HTMLInputElement;
       return { id: e.id, tipo: e.type, min: e.min, max: e.max };
@@ -603,3 +606,255 @@ test(
     expect(contraste).toBeGreaterThanOrEqual(4.5);
   },
 );
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (26/09/2026) — la tarea asignable de esta app (tipo A, casos numerados).
+ *
+ * Salió de la semilla S0165: 492 visitas en 90 días con solo un 4 % de tráfico de aula, así que
+ * es demanda difusa, y la app no tenía tarea dentro. La química vive ahora en dos módulos sin
+ * React:
+ *   app/simulador-titulacion/motor.ts   ← calcularPH (MOVIDA de page.tsx, no replicada) y V_eq
+ *   app/simulador-titulacion/casos.ts   ← los 12 casos, el corrector y el aleatorio
+ * Las cifras del acta de arriba (1,48 · 2,88 · 4,76 · 8,73 · 12,52) siguen pasando con el motor
+ * movido: el traslado no cambió un número.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO — a mano, en mmol y mL (mmol = M·mL):
+ *   1 · HCl 0,15 M 20 mL, NaOH 0,10 M     → V_eq = 0,15·20/0,10                     = 30,00 mL
+ *   2 · acético 0,80 M 10 mL, NaOH 0,50 M → V_eq = 0,80·10/0,50 (el pKa no entra)   = 16,00 mL
+ *   3 · 25 mL, NaOH 0,10 M, V_eq 20,00 mL → C = 0,10·20/25                          = 0,08 M
+ *   4 · 10 mL, NaOH 0,20 M, V_eq 42,50 mL → C = 0,20·42,5/10                        = 0,85 M
+ *   5 · HCl 2,5 mmol − NaOH 1,5 mmol = 1,0 mmol en 40 mL → [H⁺] 0,025 → pH 1,602  → 1,60
+ *   6 · NaOH 1,5 − HCl 1,0 = 0,5 mmol en 25 mL → [OH⁻] 0,02 → pOH 1,699          → 12,30
+ *   7 · acético 0,10 M, pKa 4,76, V = 0 → ½(pKa − log C) = ½(4,76 + 1) = 2,88
+ *   8 · pKa 4,2, V = 12,5 de V_eq 25 → semiequivalencia, pH = pKa                  → 4,20
+ *   9 · pKa 4,8: HA 2,0 − 1,5 = 0,5 mmol, A⁻ 1,5 mmol → 4,8 + log 3 = 5,277         → 5,28
+ *  10 · acético 0,20 M 20 mL, NaOH 0,20 M, V = 20: sal 4 mmol en 40 mL = 0,1 M
+ *                                        → 7 + ½(4,8 + log 0,1) = 7 + ½·3,8         = 8,90
+ *  11 · HCl 0,20 M 20 mL, NH₃ 0,20 M, pKb 4,7, V = 20: sal 0,1 M
+ *                                        → 7 − ½(4,7 + log 0,1) = 7 − ½·3,7         = 5,15
+ *  12 · HCl 0,10 M 20 mL, NH₃ 0,10 M, V = 40: NH₄⁺ 2 mmol, NH₃ 4 − 2 = 2 mmol
+ *                                        → pOH = pKb + log 1 = 4,7 → pH             = 9,30
+ *
+ * El CONVENIO de esta app: la zona tampón de ácido débil no es Henderson-Hasselbalch sino la
+ * cuadrática exacta (hallazgo 343). Los casos 7, 8 y 9 se eligieron donde las dos coinciden a
+ * dos decimales, para que el alumno que use la fórmula de su libro no suspenda; el aleatorio
+ * descarta todo lo que no cumpla eso, y la invariante 6 lo vigila.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+import {
+  CASOS as CASOS_AULA,
+  TOTAL_CASOS as TOTAL_CASOS_AULA,
+  resolverCaso,
+  comprobarRespuesta,
+  toleranciaDe,
+  generarEjercicioAleatorio,
+} from '../../app/simulador-titulacion/casos';
+import { calcularPH, volumenEquivalencia } from '../../app/simulador-titulacion/motor';
+
+const A_MANO_AULA: Readonly<Record<number, number>> = {
+  1: 30,
+  2: 16,
+  3: 0.08,
+  4: 0.85,
+  5: 1.6,
+  6: 12.3,
+  7: 2.88,
+  8: 4.2,
+  9: 5.28,
+  10: 8.9,
+  11: 5.15,
+  12: 9.3,
+};
+
+/** Redondeo a los decimales que pide el caso (2 salvo que declare otros). */
+const redondear = (v: number, d = 2) => Math.round(v * 10 ** d) / 10 ** d;
+
+/** Cuántos decimales lleva el número que se ENSEÑA en la solución («8,90» → 2). */
+function decimalesMostrados(texto: string): number {
+  const m = texto.match(/-?\d[\d.]*(?:,(\d+))?/);
+  return m?.[1]?.length ?? 0;
+}
+
+/** Múltiplo exacto de un paso, con la holgura del binario. */
+const multiploDe = (v: number, paso: number) => Math.abs(v / paso - Math.round(v / paso)) < 1e-6;
+
+test.describe('simulador-titulacion · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS_AULA).toBe(12);
+    expect(CASOS_AULA.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS_AULA) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    for (const caso of CASOS_AULA) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(redondear(r.valor, caso.datos.decimales ?? 2), `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta finita, desarrollo y pista', async () => {
+    for (const caso of CASOS_AULA) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(caso.respuestaTexto, `caso ${caso.id}`).toContain(caso.unidad);
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos?)\b/i;
+    for (const caso of CASOS_AULA) {
+      expect(PROHIBIDO.test(`${caso.titulo} ${caso.enunciado}`), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · lo que el enunciado PIDE coincide con lo que la solución MUESTRA', async () => {
+    for (const caso of CASOS_AULA) {
+      expect(decimalesMostrados(caso.respuestaTexto), `caso ${caso.id}`).toBeLessThanOrEqual(2);
+      const ultimo = caso.pasos[caso.pasos.length - 1];
+      expect(ultimo, `caso ${caso.id}: el último paso enseña la cifra de la casilla`).toContain(
+        caso.respuestaTexto,
+      );
+      if (caso.requiereRedondeo) {
+        expect(caso.enunciado, `caso ${caso.id}: exige redondeo y no lo pide`).toMatch(/redonde/i);
+      } else {
+        expect(Math.abs(resolverCaso(caso.datos).valor - caso.respuesta), `caso ${caso.id}`).toBeLessThan(1e-9);
+      }
+    }
+  });
+
+  test('5.ter · cada caso se puede montar con los controles de la app', async () => {
+    // Deslizadores: V_analito entero 10-100, concentraciones de 0,01 en 0,01, pK de 0,1 en 0,1;
+    // la bureta solo avanza con «+ 1 mL» y «+ Gota (0,1 mL)». Un caso que la app no puede
+    // reproducir no se puede comprobar en ella. El pKa 4,76 del caso 7 es la excepción
+    // declarada: no está en la rejilla del deslizador, pero es el valor con el que ARRANCA la app.
+    for (const caso of CASOS_AULA) {
+      const d = caso.datos;
+      expect(Number.isInteger(d.V_analito) && d.V_analito >= 10 && d.V_analito <= 100, `caso ${caso.id}`).toBe(true);
+      expect(multiploDe(d.C_titulante, 0.01), `caso ${caso.id}`).toBe(true);
+      if (d.C_analito !== undefined) expect(multiploDe(d.C_analito, 0.01), `caso ${caso.id}`).toBe(true);
+      if (d.V_titulante !== undefined) expect(multiploDe(d.V_titulante, 0.1), `caso ${caso.id}`).toBe(true);
+      for (const pk of [d.pKa, d.pKb]) {
+        if (pk === undefined || pk === 4.76) continue;
+        expect(multiploDe(pk, 0.1) && pk >= 1 && pk <= 12, `caso ${caso.id}: pK ${pk}`).toBe(true);
+      }
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado, alcanzable y usa la misma aritmética', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    const muestras = Array.from({ length: 200 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.slice(0, 40).map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(muestras.slice(0, 40).map((m) => m.datos.pregunta)).size).toBeGreaterThanOrEqual(2);
+    for (const m of muestras) {
+      const d = m.datos;
+      expect(Number.isFinite(m.respuesta), `semilla ${m.semilla}`).toBe(true);
+      expect(redondear(resolverCaso(d).valor, d.decimales ?? 2), `semilla ${m.semilla}`).toBe(m.respuesta);
+      if (d.V_titulante !== undefined) expect(multiploDe(d.V_titulante, 0.1), `semilla ${m.semilla}`).toBe(true);
+
+      // En la zona tampón de ácido débil, la cuadrática de la app y Henderson-Hasselbalch deben
+      // dar la MISMA cifra: el aleatorio no puede suspender a quien usa la fórmula del libro.
+      if (d.pregunta === 'pH' && d.tipo === 'ad-bf' && d.C_analito !== undefined && d.pKa !== undefined) {
+        const V = d.V_titulante ?? 0;
+        const Veq = volumenEquivalencia(d.C_analito, d.V_analito, d.C_titulante);
+        if (V > 0 && V < Veq - 1e-9) {
+          const nA = d.C_titulante * V;
+          const nHA = d.C_analito * d.V_analito - nA;
+          expect(redondear(d.pKa + Math.log10(nA / nHA)), `semilla ${m.semilla}: H-H`).toBe(m.respuesta);
+        }
+      }
+    }
+  });
+
+  test('7 · el convenio queda fijado a mano', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera.
+    for (const caso of CASOS_AULA) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO_AULA[caso.id]);
+    }
+    // (b) Fuerte con fuerte: la equivalencia es 7 exacto…
+    expect(calcularPH('af-bf', 25, 25, 0.1, 0.1, 4.76, 4.74)).toBe(7);
+    // …débil con fuerte NO: 8,90 en el caso 10. Tratar el ácido débil como fuerte daría 7.
+    expect(calcularPH('ad-bf', 20, 20, 0.2, 0.2, 4.8, 4.7)).toBeCloseTo(8.9, 10);
+    // (c) Semiequivalencia = pKa (a 2 decimales, que es lo que se pide).
+    expect(redondear(calcularPH('ad-bf', 12.5, 25, 0.1, 0.1, 4.2, 4.7))).toBe(4.2);
+    // (d) El motor movido da las cifras del acta: 1,4771 a media valoración y 2,8829 inicial.
+    expect(calcularPH('af-bf', 12.5, 25, 0.1, 0.1, 4.76, 4.74)).toBeCloseTo(1.4771, 4);
+    expect(calcularPH('ad-bf', 0, 25, 0.1, 0.1, 4.76, 4.74)).toBeCloseTo(2.8829, 4);
+    expect(volumenEquivalencia(0.15, 20, 0.1)).toBeCloseTo(30, 10);
+    // (e) La tolerancia del pH es ABSOLUTA: el 1 % relativo aceptaría 12,40 por 12,52, que es
+    // un 32 % de error en [OH⁻].
+    expect(toleranciaDe(12.52, 'pH')).toBe(0.02);
+    expect(comprobarRespuesta(12.4, 12.52, 'pH').correcto).toBe(false);
+    expect(comprobarRespuesta(12.53, 12.52, 'pH').correcto).toBe(true);
+  });
+
+  test('8 · corregir no lanza nunca y nombra los dos errores típicos', async () => {
+    expect(comprobarRespuesta(NaN, 8.9, 'pH').correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 8.9, 'pH').motivo).toContain('número');
+    // Contestar 7 en una equivalencia que no es neutra.
+    const siete = comprobarRespuesta(7, 8.9, 'pH');
+    expect(siete.correcto).toBe(false);
+    expect(siete.motivo).toContain('ácido fuerte con una base fuerte');
+    // El volumen en litros en vez de mililitros.
+    const litros = comprobarRespuesta(0.03, 30, 'volumen');
+    expect(litros.correcto).toBe(false);
+    expect(litros.motivo).toContain('mililitros');
+    // Datos imposibles: sin excepción, con error legible.
+    const malo = resolverCaso({
+      pregunta: 'volumen-equivalencia',
+      tipo: 'af-bf',
+      V_analito: 20,
+      C_analito: 0.1,
+      C_titulante: 0,
+    });
+    expect(malo.ok).toBe(false);
+    expect(Number.isNaN(malo.valor)).toBe(true);
+  });
+});
+
+test.describe('simulador-titulacion · la sección de casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+
+  // El beforeEach global solo espera al <h1>, que es HTML servido: un clic en la botonera de
+  // casos antes de que React hidrate se pierde en silencio.
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, ['#vAnalito', '#casos-respuesta']);
+  });
+
+  test('el caso 10 se monta en el simulador y el panel da el pH que corrige la casilla', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 10:/ }).click();
+    await seccion(page).getByRole('button', { name: 'Cargar en el simulador' }).click();
+    // Acético 0,20 M 20 mL con NaOH 0,20 M: V_eq = 20 mL y pH en la equivalencia 8,90.
+    await irAEquivalencia(page).click();
+    await expect(valorDe(page, 'Volumen añadido')).toHaveText('20,00 mL');
+    await expect(valorDe(page, 'pH actual')).toHaveText('8,90');
+
+    await seccion(page).locator('#casos-respuesta').fill('8,90');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('Correcto');
+  });
+
+  test('contestar 7 en una equivalencia básica se nombra como tal', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 10:/ }).click();
+    await seccion(page).locator('#casos-respuesta').fill('7');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('ácido fuerte con una base fuerte');
+  });
+});
