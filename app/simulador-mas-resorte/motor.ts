@@ -10,7 +10,11 @@
  * concordaban entre sí y nada delataba el error (hallazgo 966). Era además justo el error
  * que el bloque «Errores frecuentes» de la app enseña a evitar.
  *
- * Los tres regímenes, con β = γ/(2m) y ω₀ = √(k/m):
+ * Los tres regímenes, con β = γ/(2m) y ω₀ = √(k/m), más el caso sin amortiguamiento:
+ *
+ *   γ = 0   LIBRE (MAS)      ω_d = ω₀, x(t) = A·cos(ω₀·t): la amplitud NO decrece, así que
+ *           no se rotula «subamortiguado», que la FAQ de la app define como «oscila con
+ *           amplitud decreciente» (hallazgo 2158). Es el límite β → 0 de la fórmula de abajo.
  *
  *   β < ω₀  SUBAMORTIGUADO   ω_d = √(ω₀² − β²)
  *           x(t) = A·e^(−βt)·[cos(ω_d·t) + (β/ω_d)·sen(ω_d·t)]
@@ -30,7 +34,7 @@
  * Casos resueltos a mano en tests/mas-resorte-motor.spec.ts.
  */
 
-export type Regimen = 'subamortiguado' | 'critico' | 'sobreamortiguado';
+export type Regimen = 'libre' | 'subamortiguado' | 'critico' | 'sobreamortiguado';
 
 export interface EstadoOscilador {
   x: number;
@@ -48,7 +52,7 @@ export interface Oscilador {
   /** γ_c = 2√(k·m), el amortiguamiento que separa los regímenes. */
   gammaCritico: number;
   regimen: Regimen;
-  /** ω_d = √(ω₀² − β²). Solo existe en el régimen subamortiguado; si no, null. */
+  /** ω_d = √(ω₀² − β²). Solo existe si oscila (libre o subamortiguado); si no, null. */
   omegaD: number | null;
   /** T = 2π/ω_d. En crítico y sobreamortiguado NO hay período: null. */
   periodo: number | null;
@@ -79,7 +83,10 @@ export function describirOscilador(k: number, m: number, gamma: number): Oscilad
   let regimen: Regimen;
   let omegaD: number | null;
 
-  if (Math.abs(diferencia) <= TOLERANCIA_CRITICO * Math.max(1, omega0 * omega0)) {
+  if (beta <= 0) {
+    regimen = 'libre';
+    omegaD = omega0;
+  } else if (Math.abs(diferencia) <= TOLERANCIA_CRITICO * Math.max(1, omega0 * omega0)) {
     regimen = 'critico';
     omegaD = null;
   } else if (diferencia > 0) {
@@ -117,7 +124,7 @@ export function calcularEstado(
   let x: number;
   let v: number;
 
-  if (regimen === 'subamortiguado' && omegaD) {
+  if ((regimen === 'libre' || regimen === 'subamortiguado') && omegaD) {
     const cos = Math.cos(omegaD * t);
     const sen = Math.sin(omegaD * t);
     x = A * decaimiento * (cos + (beta / omegaD) * sen);

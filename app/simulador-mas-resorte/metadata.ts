@@ -87,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve simular el sistema masa-resorte frente a resolver las ecuaciones a mano?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La simulación permite cambiar parámetros (masa, k, amplitud, amortiguamiento) y ver al instante cómo varía la gráfica x(t) y las barras de energía, lo que facilita desarrollar la intuición física antes de los exámenes de física de Bachillerato y selectividad (EBAU/EVAU) en España, o de preparatoria, secundaria y el examen de admisión universitaria en Latinoamérica. Además permite explorar casos límite como el sobreamortiguamiento o la resonancia que son difíciles de visualizar con cálculo manual.',
+        text: 'La simulación permite cambiar parámetros (masa, k, amplitud, amortiguamiento) y ver al instante cómo varía la gráfica x(t) y las barras de energía, lo que facilita desarrollar la intuición física antes de los exámenes de física de Bachillerato y selectividad (EBAU/EVAU) en España, o de preparatoria, secundaria y el examen de admisión universitaria en Latinoamérica. Además permite explorar casos límite como el amortiguamiento crítico o el sobreamortiguamiento, que son difíciles de visualizar con cálculo manual. Es un oscilador libre: no incluye fuerza externa, así que no simula la resonancia.',
       },
     },
   ],

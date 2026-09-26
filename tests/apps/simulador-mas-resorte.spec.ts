@@ -8,8 +8,10 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *   El <h1> dice «Simulador Masa-Resorte» y el subtítulo «Movimiento Armónico Simple con
  *   amortiguamiento viscoso — observa x(t), energías y período en tiempo real». Cuatro
  *   deslizadores (m, k, A, γ), seis tarjetas de resultado (ω₀, T, f, x, v, a) y tres barras
- *   de energía (E_k, E_p, E total). Su caja de fórmulas publica:
+ *   de energía (E_k, E_p, E total). Su caja de fórmulas publicaba siempre:
  *       ω₀ = √(k/m)   ·   T = 2π/ω₀   ·   x(t) = A·cos(ω₀t)·e^(−γt/2m)   ·   E_total = ½·k·A²
+ *   y desde el 26/09/2026 (hallazgo 2155) publica la del régimen que se simula: libre,
+ *   subamortiguado (T = 2π/ω_d), crítico o sobreamortiguado.
  *   NO promete oscilación forzada ni resonancia, y NO es un muelle vertical con gravedad:
  *   la línea de equilibrio del lienzo es la posición de reposo, así que g no entra.
  *
@@ -400,6 +402,7 @@ interface OpLienzo {
   fill: string;
   stroke: string;
   lw: number;
+  font: string;
 }
 
 interface RegistroLienzo {
@@ -443,6 +446,7 @@ function ganchoLienzo(): void {
           fill: String(this.fillStyle),
           stroke: String(this.strokeStyle),
           lw: this.lineWidth,
+          font: this.font,
         });
         // El techo y la varilla se pintan con fillRect ANTES que el bloque (roundRect).
         if (k === 'anim' && nombre === 'fillRect') {
@@ -840,49 +844,58 @@ test.describe('Casos 5 a 7 — lo que DIBUJA la gráfica x(t), leído del lienzo
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test.describe('Caso 8 — hallazgos abiertos de la reinspección (25/09/2026)', () => {
+test.describe('Caso 8 — hallazgos de la reinspección (25/09/2026), reparados el 26/09/2026', () => {
   test('la caja de fórmulas ya no enseña x(t) con ω₀ en el coseno (reparación incompleta del #966)', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO: page.tsx:504-505 sigue publicando «T = 2π/ω₀» y
+    // HALLAZGO 2155, REPARADO (la caja sigue al régimen). Era: page.tsx:504-505 seguía publicando «T = 2π/ω₀» y
     // «x(t) = A·cos(ω₀t)·e^(−γt/2m)», justo la fórmula que la reparación del 966 retiró del
     // motor y que el bloque «Errores frecuentes» de la app enseña a evitar. En el crítico
     // (m=1, k=1, γ=2) la tarjeta dice «no oscila» y la caja predice x(π s) = cos(π)·e^(−π)
     // = −0,043214 m, cuando la app (bien) dibuja (1+π)·e^(−π) = +0,178974 m.
-    test.fail();
     await sembrarValor(page, '#slider-k', 1);
     await sembrarValor(page, '#slider-gamma', 2);
     await expect.poll(() => leerFila(page, 'Período T')).toBe('no oscila');
     const caja = (await page.locator('code').allTextContents()).join(' · ');
     expect(caja).not.toMatch(/cos\(\s*ω₀\s*·?\s*t\s*\)\s*·?\s*e\^/);
+    // Y lo que publica es lo que dibuja: en el crítico x(t) = A(1+βt)e^(−βt), sin período.
+    expect(caja).toContain('x(t) = A·(1 + βt)·e^(−βt)');
+    expect(caja).not.toMatch(/T = 2π/);
+    // m=1, k=10, γ=2 (subamortiguado): T = 2π/ω_d, la de la tarjeta (2,094 s), no 2π/ω₀.
+    await sembrarValor(page, '#slider-k', 10);
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,094 s');
+    const cajaSub = (await page.locator('code').allTextContents()).join(' · ');
+    expect(cajaSub).toContain('T = 2π/ω_d');
+    expect(cajaSub).not.toContain('T = 2π/ω₀');
   });
 
   test('con γ = 0 el régimen no se rotula «Subamortiguado»', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:81-85 y motor.ts:85-87. Con γ = 0 (el estado inicial) la
+    // HALLAZGO 2158, REPARADO (régimen «libre» en el motor). Era: page.tsx:81-85 y motor.ts:85-87. Con γ = 0 (el estado inicial) la
     // tarjeta «Régimen» dice «Subamortiguado», y la propia FAQ de la app define ese régimen
     // como «oscila con amplitud decreciente» (page.tsx:781); con γ = 0 la amplitud no decrece.
-    test.fail();
     // γ arranca en 0: no hay que sembrar nada, y comprobarlo es parte del caso.
     await expect(page.locator('#slider-gamma')).toHaveValue('0');
     await expect.poll(() => leerFila(page, 'Régimen')).not.toBe('');
     expect(await leerFila(page, 'Régimen')).not.toBe('Subamortiguado');
+    expect(await leerFila(page, 'Régimen')).toBe('Sin amortiguamiento (MAS)');
+    // Con la menor fricción del deslizador (0,1 N·s/m) ya sí lo es
+    await sembrarValor(page, '#slider-gamma', 0.1);
+    await expect.poll(() => leerFila(page, 'Régimen')).toBe('Subamortiguado');
   });
 
   test('el «%» de la pista va con espacio duro (regla del 25/09/2026)', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:496 escribe «… % del crítico» con un espacio normal (U+0020);
+    // HALLAZGO 2161, REPARADO. Era: page.tsx:496 escribía «… % del crítico» con un espacio normal (U+0020);
     // el formato de meskeIA pide U+00A0 para que el «%» no salte solo de línea.
-    test.fail();
     await expect.poll(() => leerPistaGamma(page)).toContain('% del crítico');
     expect(await leerPistaGamma(page)).toContain('0 % del crítico');
   });
 
   test('con A = 1 m el bloque no atraviesa el techo del que cuelga', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:177-179 dibuja a 150 px/m con el equilibrio a 165 px, así que
+    // HALLAZGO 2159, REPARADO (140 px/m con el equilibrio a 240 px). Era: page.tsx:177-179 dibujaba a 150 px/m con el equilibrio a 165 px, así que
     // en x = −A el borde superior del bloque queda en 165 − 150·A − 25 px. El anclaje (techo y
     // varilla) acaba en y = 35 px: desde A = 0,70 m el bloque lo tapa, y con A = 1 m (el
     // máximo del deslizador) sube hasta y = −10 px, por encima del techo y fuera del lienzo,
     // con el muelle dibujado por debajo del bloque. Margen esperado > 0 · obtenido −45 px.
-    test.fail();
     test.setTimeout(45000);
     await page.addInitScript(ganchoLienzo);
     await page.reload();
@@ -904,25 +917,25 @@ test.describe('Caso 8 — hallazgos abiertos de la reinspección (25/09/2026)', 
   test('la FAQ no promete explorar la resonancia sin un forzamiento que la produzca', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO: metadata.ts:90 (FAQPage) dice que la simulación «permite explorar casos
+    // HALLAZGO 2160, REPARADO: la respuesta ya no la promete y dice que el oscilador es libre.
+    // Era: metadata.ts:90 (FAQPage) decía que la simulación «permite explorar casos
     // límite como el sobreamortiguamiento o la resonancia». La resonancia exige una fuerza
     // externa periódica y la app solo tiene m, k, A y γ: el oscilador es libre.
-    test.fail();
     const faq = (await page.locator('script[type="application/ld+json"]').allTextContents())
       .filter((t) => t.includes('FAQPage'))
       .join(' ');
     expect(faq.length).toBeGreaterThan(0);
-    const prometeResonancia = /resonancia/i.test(faq);
+    // Nombrarla para decir que NO se simula es honesto; lo que no vale es prometer explorarla.
+    const prometeResonancia = /explorar[^.]*resonancia/i.test(faq);
     const deslizadores = await page.locator('input[type="range"]').count();
     // Si la promete, tendría que haber un quinto control (fuerza o frecuencia de excitación).
     expect(prometeResonancia ? deslizadores > 4 : true).toBe(true);
   });
 
   test('los «💡» de la FAQ van ocultos al lector de pantalla', async ({ page }) => {
-    // HALLAZGO ABIERTO: page.tsx:774, 785 y 805 abren cada consejo de la FAQ con «💡» como
+    // HALLAZGO 2162, REPARADO. Era: page.tsx:774, 785 y 805 abrían cada consejo de la FAQ con «💡» como
     // texto suelto, sin <span aria-hidden="true">: el lector lee «bombilla» antes del consejo.
     // Lo señala también `node scripts/check-a11y-jsx.mjs app/simulador-mas-resorte/page.tsx`.
-    test.fail();
     const sueltos = await page.evaluate(() =>
       [...document.querySelectorAll('[class*="faqTip"]')].filter((p) =>
         [...p.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && n.textContent?.includes('💡')),
@@ -932,19 +945,23 @@ test.describe('Caso 8 — hallazgos abiertos de la reinspección (25/09/2026)', 
   });
 
   test('las cifras en color de marca llegan a 4,5:1 en claro y en oscuro', async ({ page }) => {
-    // HALLAZGO ABIERTO (medido el 25/09/2026): texto en var(--primary) sobre fondo claro.
+    // HALLAZGO 2156, REPARADO (--primary-texto / --primary-boton, y un tono propio sobre los
+    // tintes en oscuro). Era (medido el 25/09/2026): texto en var(--primary) sobre fondo claro.
     //   · .valueNum (module.css:236), las 9 tarjetas de resultado: 4,11:1 en claro
     //   · .sliderValue (module.css:68), sobre su color-mix al 12 %: 3,55:1 claro / 4,09:1 oscuro
     //   · .formulaBox code (module.css:305): 3,73:1 claro / 4,34:1 oscuro
     //   · .stepNumber (module.css:389-391), blanco sobre --primary: 4,11:1 claro / 2,79:1 oscuro
     // Todo es texto de 14-17 px en negrita: no es «grande», así que el umbral es 4,5:1.
-    test.fail();
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const periodo = await marcarValorTarjeta(page, 'Período T', 'periodo');
     const medidas: Record<string, number> = {};
     for (const tema of ['light', 'dark'] as const) {
+      // globals.css anima el cambio de fondo 0,3 s: sin terminar las transiciones se mide un
+      // fondo a medio camino (la tarjeta salía «2,79:1» en oscuro, con el fondo aún blanco).
       await page.evaluate((t) => {
         document.documentElement.dataset.theme = t;
+        getComputedStyle(document.body).backgroundColor; // fuerza el recálculo
+        for (const a of document.getAnimations()) a.finish();
       }, tema);
       medidas[`${tema} tarjeta`] = await contrasteElemento(page, periodo);
       medidas[`${tema} masa`] = await contrasteElemento(page, 'label[for="slider-masa"] > span');
@@ -959,11 +976,11 @@ test.describe('Caso 8 — hallazgos abiertos de la reinspección (25/09/2026)', 
   test('los rótulos de la gráfica x(t) —el eje de tiempo del #970— llegan a 4,5:1', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO: page.tsx:292-305 rotula el eje de tiempo en #9ca3af a 10 px sobre el
+    // HALLAZGO 2157, REPARADO (#475569, y el tamaño compensa la escala del lienzo).
+    // Era: page.tsx:292-305 rotulaba el eje de tiempo en #9ca3af a 10 px sobre el
     // #f8fafc que pinta la propia gráfica (igual en los dos temas): 2,43:1. Y el lienzo de
     // 500 px se encoge al ancho de la columna: a 360 px de viewport mide 278 px, así que esos
     // 10 px se ven a 5,6 px. El eje existe (el 970 está verificado), pero cuesta leerlo.
-    test.fail();
     await page.addInitScript(ganchoLienzo);
     await page.reload();
     await esperarHidratacion(page, SLIDERS);
@@ -976,5 +993,20 @@ test.describe('Caso 8 — hallazgos abiertos de la reinspección (25/09/2026)', 
       ratio,
       `rótulos ${g.colorRotulos} sobre ${g.colorFondo}: ${ratio.toFixed(2)}:1`,
     ).toBeGreaterThanOrEqual(4.5);
+
+    // Tamaño VISIBLE en un móvil de 360 px: px de la fuente × (ancho CSS del lienzo / 500)
+    await page.setViewportSize({ width: 360, height: 800 });
+    const tamVisible = async (): Promise<number> =>
+      page.evaluate(() => {
+        const ops = (window as unknown as { __lienzo: RegistroLienzo }).__lienzo.graf;
+        const rot = ops.filter((o) => o.op === 'fillText' && /^\d+ s$/.test(String(o.a[0])));
+        const lienzo = [...document.querySelectorAll('canvas')].find(
+          (c) => c.width === 500 && c.height === 160,
+        );
+        if (!rot.length || !lienzo) return 0;
+        const m = rot[rot.length - 1].font.match(/(\d+(?:\.\d+)?)px/);
+        return ((m ? Number(m[1]) : 0) * lienzo.clientWidth) / 500;
+      });
+    await expect.poll(tamVisible, { timeout: 10000 }).toBeGreaterThanOrEqual(11);
   });
 });

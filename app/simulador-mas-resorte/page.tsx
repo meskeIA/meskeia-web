@@ -28,6 +28,8 @@ const CANVAS_H = 420;
 const GRAFICA_W = 500;
 const GRAFICA_H = 160;
 const HISTORIAL_MAX = 300;
+/** Rótulos de la gráfica x(t): 7,2:1 sobre su fondo #f8fafc, que el lienzo pinta en ambos temas. */
+const COLOR_ROTULOS_GRAFICA = '#475569';
 
 // ─── Dibujo del resorte ──────────────────────────────────────────────────────
 
@@ -79,6 +81,8 @@ interface ValoresFisicos {
 
 /** Cómo se rotula cada régimen en la tarjeta que lo anuncia. */
 const NOMBRE_REGIMEN: Record<Regimen, string> = {
+  // Con γ = 0 la amplitud no decrece: no es «subamortiguado» (hallazgo 2158)
+  libre: 'Sin amortiguamiento (MAS)',
   subamortiguado: 'Subamortiguado',
   critico: 'Amortiguamiento crítico',
   sobreamortiguado: 'Sobreamortiguado',
@@ -173,9 +177,13 @@ export default function SimuladorMasResortePage() {
           ctx.fillStyle = '#374151';
           ctx.fillRect(cx - 2, techoY, 4, 15);
 
-          // Posición de equilibrio (px desde el techo)
-          const escala = 150; // px por metro (el rango de amplitud es ~0–1 m)
-          const equilibrioY = techoY + 25 + 120; // longitud natural del resorte en reposo
+          // Posición de equilibrio (px desde el techo). Con 150 px/m y el equilibrio a 165 px,
+          // desde A = 0,65 m el muelle tenía longitud negativa y con A = 1 m el bloque salía por
+          // encima del techo (hallazgo 2159). Ahora cabe el recorrido entero del deslizador:
+          // en x = −1 m el borde superior del bloque queda en 240 − 140 − 25 = 75 px: 30 px de
+          // muelle (de 45 a 75 px), 40 px bajo el anclaje; en x = +1 m el inferior, en 405 de 420.
+          const escala = 140; // px por metro, fija para que se vea cómo cambia la amplitud
+          const equilibrioY = 240;
           const bloqueY = equilibrioY + x * escala;
 
           // Línea de equilibrio
@@ -288,29 +296,38 @@ export default function SimuladorMasResortePage() {
             ctx2.stroke();
           }
 
-          // Marcas de tiempo, cada segundo entero de la ventana visible
-          ctx2.fillStyle = '#9ca3af';
-          ctx2.strokeStyle = '#d1d5db';
+          // Rótulos: #9ca3af sobre el #f8fafc de la propia gráfica daba 2,43:1, y el lienzo
+          // de 500 px se encoge al ancho de la columna (278 px a 360 de viewport), así que
+          // 10 px se veían a 5,6 (hallazgo 2157). El tamaño se compensa con esa escala para
+          // que en pantalla midan 12 px, y el color da 7,2:1.
+          const escalaCss =
+            graficaCanvas.clientWidth > 0 ? graficaCanvas.clientWidth / GRAFICA_W : 1;
+          const tamRotulo = Math.round(12 / Math.min(Math.max(escalaCss, 0.5), 1));
+          ctx2.font = `${tamRotulo}px system-ui, sans-serif`;
+          ctx2.fillStyle = COLOR_ROTULOS_GRAFICA;
+          ctx2.strokeStyle = '#94a3b8';
           ctx2.lineWidth = 1;
-          ctx2.font = '10px system-ui, sans-serif';
-          ctx2.textAlign = 'center';
           ctx2.textBaseline = 'bottom';
+          // Marcas de tiempo, cada segundo entero de la ventana visible. El texto se ancla a
+          // la marca, pero en los bordes se alinea hacia dentro para que no se corte.
           for (const marca of marcasDeTiempo(tIni, tFin)) {
             const px = (marca - tIni) * pxPorSegundo;
             ctx2.beginPath();
             ctx2.moveTo(px, midY - 4);
             ctx2.lineTo(px, midY + 4);
             ctx2.stroke();
-            ctx2.fillText(`${formatNumber(marca, 0)} s`, px, GRAFICA_H - 2);
+            const rotulo = `${formatNumber(marca, 0)} s`;
+            const mitad = ctx2.measureText(rotulo).width / 2;
+            ctx2.textAlign = px < mitad ? 'left' : px > GRAFICA_W - mitad ? 'right' : 'center';
+            ctx2.fillText(rotulo, px, GRAFICA_H - 2);
           }
 
-          // Etiquetas eje
+          // Etiquetas del eje: el −A va por encima de la franja de los tiempos, que ocupa el pie
           ctx2.textAlign = 'left';
-          ctx2.font = '11px system-ui, sans-serif';
           ctx2.textBaseline = 'top';
-          ctx2.fillText(`+${formatNumber(amplitud, 2)}m`, 4, margenV - 2);
+          ctx2.fillText(`+${formatNumber(amplitud, 2)} m`, 4, 2);
           ctx2.textBaseline = 'bottom';
-          ctx2.fillText(`−${formatNumber(amplitud, 2)}m`, 4, GRAFICA_H - margenV + 2);
+          ctx2.fillText(`−${formatNumber(amplitud, 2)} m`, 4, GRAFICA_H - tamRotulo - 6);
           ctx2.textAlign = 'right';
           ctx2.textBaseline = 'middle';
           ctx2.fillText('x(t)', GRAFICA_W - 4, midY);
@@ -493,17 +510,52 @@ export default function SimuladorMasResortePage() {
                 del deslizador se queda en el 22 % del crítico. Ahora la pista SE CALCULA. */}
             <span className={styles.sliderHint}>
               0 = sin fricción · γ_c = {formatNumber(valores.gammaCritico, 2)} N·s/m (crítico) ·
-              ahora {formatNumber(valores.gammaCritico > 0 ? (gamma / valores.gammaCritico) * 100 : 0, 0)} % del crítico
+              ahora {formatNumber(valores.gammaCritico > 0 ? (gamma / valores.gammaCritico) * 100 : 0, 0)}&nbsp;% del crítico
             </span>
           </div>
         </div>
 
         {/* ── Fórmulas rápidas ─────────────────────────────────────────── */}
+        {/* Siguen al régimen que se está simulando. Publicaba siempre «T = 2π/ω₀» y
+            «x(t) = A·cos(ω₀t)·e^(−γt/2m)», la fórmula que la reparación del 966 retiró del
+            motor: en el crítico decía que oscilaba mientras las tarjetas decían «no oscila»
+            (hallazgo 2155). Todas con x(0) = A y v(0) = 0, como el PASO 3. */}
         <div className={styles.formulaBox}>
-          <code>ω₀ = √(k/m)</code> &nbsp;·&nbsp;
-          <code>T = 2π/ω₀</code> &nbsp;·&nbsp;
-          <code>x(t) = A·cos(ω₀t)·e^(−γt/2m)</code> &nbsp;·&nbsp;
-          <code>E_total = ½·k·A²</code>
+          {valores.regimen === 'libre' && (
+            <>
+              <code>ω₀ = √(k/m)</code> &nbsp;·&nbsp;
+              <code>T = 2π/ω₀</code> &nbsp;·&nbsp;
+              <code>x(t) = A·cos(ω₀t)</code> &nbsp;·&nbsp;
+              <code>E = ½·k·A²</code> (constante)
+            </>
+          )}
+          {valores.regimen === 'subamortiguado' && (
+            <>
+              <code>β = γ/(2m)</code> &nbsp;·&nbsp;
+              <code>ω_d = √(ω₀² − β²)</code> &nbsp;·&nbsp;
+              <code>T = 2π/ω_d</code> &nbsp;·&nbsp;
+              <code>x(t) = A·e^(−βt)·[cos(ω_d·t) + (β/ω_d)·sen(ω_d·t)]</code> &nbsp;·&nbsp;
+              <code>E(0) = ½·k·A²</code>, y solo decrece
+            </>
+          )}
+          {valores.regimen === 'critico' && (
+            <>
+              <code>γ = γ_c = 2√(k·m)</code> &nbsp;·&nbsp;
+              <code>β = γ/(2m) = ω₀</code> &nbsp;·&nbsp;
+              <code>x(t) = A·(1 + βt)·e^(−βt)</code> &nbsp;·&nbsp;
+              no oscila: no hay período &nbsp;·&nbsp;
+              <code>E(0) = ½·k·A²</code>
+            </>
+          )}
+          {valores.regimen === 'sobreamortiguado' && (
+            <>
+              <code>β = γ/(2m) &gt; ω₀</code> &nbsp;·&nbsp;
+              <code>r = √(β² − ω₀²)</code> &nbsp;·&nbsp;
+              <code>x(t) = A·e^(−βt)·[cosh(r·t) + (β/r)·senh(r·t)]</code> &nbsp;·&nbsp;
+              no oscila: no hay período &nbsp;·&nbsp;
+              <code>E(0) = ½·k·A²</code>
+            </>
+          )}
         </div>
 
         {/* ── Animación + gráfica ──────────────────────────────────────── */}
@@ -771,7 +823,7 @@ export default function SimuladorMasResortePage() {
                 fuerza media → mismo período.
               </p>
               <p className={styles.faqTip}>
-                💡 Esta propiedad (isocronismo) es lo que hace al MAS útil en relojería. El péndulo la cumple solo para ángulos pequeños.
+                <span aria-hidden="true">💡</span> Esta propiedad (isocronismo) es lo que hace al MAS útil en relojería. El péndulo la cumple solo para ángulos pequeños.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -782,7 +834,7 @@ export default function SimuladorMasResortePage() {
                 Si γ {">"} γ_c: sobreamortiguado (vuelve lentamente sin oscilar).
               </p>
               <p className={styles.faqTip}>
-                💡 Las puertas con muelle hidráulico están diseñadas cerca del crítico para cerrar suave pero rápido.
+                <span aria-hidden="true">💡</span> Las puertas con muelle hidráulico están diseñadas cerca del crítico para cerrar suave pero rápido.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -802,7 +854,7 @@ export default function SimuladorMasResortePage() {
                 oscilaciones), entonces k = (2π/T)² · m.
               </p>
               <p className={styles.faqTip}>
-                💡 El método dinámico es más preciso porque promedia muchos ciclos y elimina el error humano de reacción.
+                <span aria-hidden="true">💡</span> El método dinámico es más preciso porque promedia muchos ciclos y elimina el error humano de reacción.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -866,7 +918,7 @@ export default function SimuladorMasResortePage() {
                 <strong>Calcular energía y verificar conservación</strong>
                 <p>
                   E_total = ½·k·A² = ½·m·v² + ½·k·x² en cada instante (sin fricción). Si hay
-                  amortiguamiento, E_total decrece con e^(−γt/m).
+                  amortiguamiento débil, E_total decrece en promedio como e^(−γt/m).
                 </p>
               </div>
             </div>
@@ -925,7 +977,7 @@ export default function SimuladorMasResortePage() {
                 cambia la energía (E ∝ A²) pero no T.
               </li>
               <li>
-                <strong>Usar γ en vez de ω_amortiguado:</strong> con amortiguamiento, la frecuencia de
+                <strong>Usar ω₀ en vez de ω_d con amortiguamiento:</strong> con amortiguamiento, la frecuencia de
                 oscilación es ω_d = √(ω₀² − (γ/2m)²), no ω₀.
               </li>
               <li>

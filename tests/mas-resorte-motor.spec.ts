@@ -46,7 +46,11 @@ test.describe('Hallazgo 966 (alto) — con amortiguamiento se oscila a ω_d, no 
 
   test('sin amortiguamiento, ω_d vuelve a ser ω₀', () => {
     const o = describirOscilador(10, 1, 0);
-    expect(o.regimen).toBe('subamortiguado');
+    // Hallazgo 2158: con γ = 0 la amplitud no decrece, así que no es «subamortiguado» (la FAQ
+    // de la app lo define como «oscila con amplitud decreciente»): es el MAS libre. La menor
+    // fricción del deslizador (0,1 N·s/m) ya lo es: β = 0,05 < ω₀ = √10.
+    expect(o.regimen).toBe('libre');
+    expect(describirOscilador(10, 1, 0.1).regimen).toBe('subamortiguado');
     expect(o.omegaD).toBeCloseTo(o.omega0, 12);
     expect(o.periodo).toBeCloseTo(1.986918, 6); // 2π/√10
   });
