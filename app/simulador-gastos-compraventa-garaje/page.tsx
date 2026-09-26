@@ -23,7 +23,15 @@ import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, en
 
 /** Importe en euros SIN decimales, para los ejemplos del bloque educativo */
 const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, PLAZO_ITP, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble } from '@/data/fiscal';
+/**
+ * El `%` separado de la cifra por un espacio DURO (CLAUDE.md global §2, desde el 25/09/2026),
+ * también en los textos que llegan escritos de data/ (la nota de cada comunidad, los nombres y
+ * condiciones de los reducidos, la nota del sello de la plusvalía): los traen pegados o con un
+ * espacio normal que deja saltar el `%` solo a la línea siguiente (hallazgo 2190, eco del 1800
+ * de la referencia). Se corrige al pintarlos, sin tocar los datos, que comparten otras apps.
+ */
+const separarPorcentajes = (texto: string): string => texto.replace(/(\d)[ \u00A0]?%/g, '$1\u00A0%');
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, PLAZO_ITP, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -47,6 +55,9 @@ import {
   BONIFICACION_CUOTA_CEUTA_MELILLA,
   type ObjetoTransmision,
   TERRITORIOS_SIN_IVA,
+  honorariosLlevanIVA,
+  FACTURA_NOTARIAL,
+  REGISTRO_CONCEPTOS,
   sumarLineasVisibles,
   CASOS_ESCRITURAR,
   preguntaEscriturar,
@@ -139,6 +150,11 @@ interface ResultadosComprador {
    * el notario (RD 1426/1989, nº 2.1; hallazgo 1599), y la estimación solo cubre la parte reglada.
    */
   notariaLibre: boolean;
+  /**
+   * false en Canarias, Ceuta y Melilla: allí la factura de notaría y la de registro no llevan
+   * IVA sino IGIC o IPSI, que esta app no calcula (hallazgo 2214, motor reparado en 242fffcd).
+   */
+  honorariosConIVA: boolean;
   totalGastos: number;
   totalOperacion: number;
   /** null en primera mano (allí es IVA, no ITP) */
@@ -157,6 +173,24 @@ interface ResultadosVendedor {
   camposIlegibles: string[];
   /** Años escritos y legibles pero negativos: no «faltan», son imposibles (patrón 5, 1552). */
   aniosNegativos: boolean;
+  /**
+   * El precio de compra está escrito, se lee y es 0 (o negativo mientras el campo tiene el foco,
+   * que el blur reescribe a 0 por su min={0}): no «falta», no vale. Decía «Falta el precio de
+   * compra original» y «Rellena…» con el 0 a la vista (patrón 5, hallazgo 2189, el 1799 de la
+   * referencia).
+   */
+  precioCompraNoValido: boolean;
+  /**
+   * La comisión escrita supera el 100 % del precio de venta: el propio campo lo dice, y la app
+   * no liquida con ella ni la ganancia ni el IRPF (patrón 5, hallazgo 2191). Antes publicaba
+   * −13.237,50 € como «Lo que realmente recibes» y una pérdida falsa.
+   */
+  comisionImposible: boolean;
+  /**
+   * Con plusvalía CERO habría ganancia: solo entonces una pérdida con el total catastral
+   * ilegible puede prometer «(o puede haber ganancia)». Se CALCULA (hallazgo 2192).
+   */
+  gananciaPosibleSinPlusvalia: boolean;
   /** Años = 0 sin los meses completos elegidos: el coeficiente se prorratea por ellos (1560). */
   faltanMeses: boolean;
   /** El suelo supera al total: la plusvalía real puede ser menor y el neto MAYOR (1547). */
@@ -278,6 +312,11 @@ interface EntradaVendedor {
   comisionPct: number;
   gestoria: number;
   gastosAdquisicion: number;
+  /**
+   * true con una comisión por encima del 100 %: la ganancia y el IRPF no se liquidan con un
+   * dato imposible (patrón 5 de la familia, hallazgo 2191). Se nombran como pendientes.
+   */
+  sinGanancia?: boolean;
 }
 
 /**
@@ -320,7 +359,7 @@ function calcularVendedor(e: EntradaVendedor) {
     gastosTransmision: comision + e.gestoria,
     plusvaliaMunicipal: plusvalia,
   });
-  const hayDatosGanancia = e.precioC > 0;
+  const hayDatosGanancia = e.precioC > 0 && !e.sinGanancia;
   const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
   const totalGastos = sumarLineasVisibles(plusvalia, comision, e.gestoria, irpf);
   return {
@@ -344,7 +383,23 @@ function calcularVendedor(e: EntradaVendedor) {
  * el País Vasco cobra el 7 % (hallazgo 1582); la bonificación de Ceuta y Melilla sale del motor.
  * Decisión común de la familia con nave, solar y terreno (24/09/2026).
  */
-const NOTA_DATOS = `El ITP de un garaje comprado por separado va del ${formatTipoNominal(RANGO_ITP_OTROS.min)}% al ${formatTipoNominal(RANGO_ITP_OTROS.max)}% según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota se bonifica un ${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)} % (art. 57 bis TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
+const NOTA_DATOS = `El ITP de un garaje comprado por separado va del ${formatTipoNominal(RANGO_ITP_OTROS.min)}\u00A0% al ${formatTipoNominal(RANGO_ITP_OTROS.max)}\u00A0% según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota del ITP y la del AJD se bonifican un ${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}\u00A0% (art. 57 bis.1 TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
+
+/**
+ * Lo que de verdad aplica el sello de ITP/AJD/IVA. `FISCAL_INMUEBLES_META.fuente` nombra además
+ * la Ley 35/2006 del IRPF y el RDL 26/2021 de la plusvalía, que tienen su propio sello más abajo
+ * con su fecha: bajo este, el IRPF de la ganancia se daba por verificado el 17/06/2026 (hallazgo
+ * 2187, la forma del 781 y del 1579 de local-comercial).
+ */
+const FUENTE_ITP_AJD_IVA = 'Real Decreto Legislativo 1/1993 (ITP y AJD) + Ley 37/1992 IVA';
+/** Notaría y registro: los dos aranceles, con la verificación más antigua de las dos. */
+const VERIFICADO_ARANCELES =
+  FACTURA_NOTARIAL.verificado < REGISTRO_CONCEPTOS.verificado ? FACTURA_NOTARIAL.verificado : REGISTRO_CONCEPTOS.verificado;
+
+/** El precio de compra escrito como 0 o negativo: no falta, no vale (patrón 5, hallazgo 2189). */
+const AVISO_PRECIO_COMPRA_NO_VALIDO = 'el precio de compra original tiene que ser mayor que 0';
+/** La comisión por encima del 100 %: escrita y legible, pero imposible (patrón 5, hallazgo 2191). */
+const AVISO_COMISION_IMPOSIBLE = 'Corrige la comisión: no puede superar el 100\u00A0% del precio de venta.';
 
 export default function SimuladorGarajeCompraventaPage() {
   // Estado del formulario — comprador
@@ -432,9 +487,12 @@ export default function SimuladorGarajeCompraventaPage() {
     // AJD solo aplica en primera mano (junto con IVA)
     const ajd =
       tipoTransmision === 'primera-mano' ? calcularAJD(precio, ccaa, { objeto: objetoAJDDe(tipoGaraje) }) : 0;
-    const notaria = estimarFacturaNotarial(precio);
+    // Con la comunidad: en Canarias, Ceuta y Melilla la factura va sin IVA (hallazgo 2214). Sin
+    // ella, el motor sumaba un 21 % de IVA que allí no existe: 150.000 € daban 217,94 € de
+    // registro «(IVA incluido)» en Canarias, en lugar de 180,11 € más un IGIC sin calcular.
+    const notaria = estimarFacturaNotarial(precio, ccaa);
     const notario = notaria.medio;
-    const registro = calcularRegistro(precio);
+    const registro = calcularRegistro(precio, ccaa);
     // Se suman las líneas YA redondeadas al céntimo, que es como las ve el usuario: el
     // total redondeaba la suma exacta y no cuadraba con el desglose de encima por un
     // céntimo, en ambos sentidos (hallazgo 594).
@@ -454,6 +512,7 @@ export default function SimuladorGarajeCompraventaPage() {
       gastosGestoria: gestoria,
       gestoriaLegible,
       notariaLibre: notariaDeLibreAcuerdo(precio),
+      honorariosConIVA: honorariosLlevanIVA(ccaa),
       totalGastos,
       totalOperacion: sumarLineasVisibles(precio, totalGastos),
       tipoElegido: elegido,
@@ -513,6 +572,9 @@ export default function SimuladorGarajeCompraventaPage() {
     const gestoriaLegible = esLegible(gastosGestoriaVenta);
     const gastosAdquisicionLegible = esLegible(gastosAdquisicion);
     const valorTotalLegible = esLegible(valorCatastralTotal);
+    // Escrito, legible e imposible (patrón 5): no «falta» ni «no se lee», se corrige.
+    const precioCompraNoValido = Number.isFinite(precioC) && precioC <= 0;
+    const comisionImposible = comisionLegible && parseSpanishNumberOr(comisionInmobiliaria) > 100;
 
     // Se acota aquí y no solo en el blur del NumberInput: mientras el campo tiene el foco,
     // un importe negativo se restaba de totalGastos y su tarjeta ni se pintaba (hallazgo 474).
@@ -523,11 +585,27 @@ export default function SimuladorGarajeCompraventaPage() {
       meses,
       valorSuelo,
       valorTotal: valorTotal > 0 ? valorTotal : undefined,
-      comisionPct: Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100,
+      // Una comisión imposible no se aplica: no se liquida nada con ella (hallazgo 2191).
+      comisionPct: comisionImposible ? 0 : Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100,
       gestoria: Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta)),
       gastosAdquisicion: Math.max(0, parseSpanishNumberOr(gastosAdquisicion)),
+      sinGanancia: comisionImposible,
     };
     const r = calcularVendedor(entrada);
+    /**
+     * ¿Habría ganancia con plusvalía CERO? El total catastral solo puede abaratar la plusvalía,
+     * así que «(o puede haber ganancia)» solo cabe si, sin plusvalía ninguna, la transmisión
+     * superaría a la adquisición. Con la base R del testigo no: 23.750 < 25.800 (hallazgo 2192).
+     */
+    const gananciaPosibleSinPlusvalia =
+      r.hayDatosGanancia &&
+      calcularGananciaInmueble({
+        precioVenta: precioV,
+        precioCompra: precioC,
+        gastosAdquisicion: entrada.gastosAdquisicion,
+        gastosTransmision: r.comision + entrada.gestoria,
+        plusvaliaMunicipal: 0,
+      }).ganancia > 0;
 
     // El aviso nombra lo que de verdad falta. Antes decía siempre «falta valor catastral
     // del suelo», así que quien no había puesto el precio de compra o los años releía un
@@ -547,7 +625,7 @@ export default function SimuladorGarajeCompraventaPage() {
       plusvaliaResuelta || valorSuelo > 0 || ilegibleTexto(valorCatastralSuelo) ? null : 'el valor catastral del suelo',
       plusvaliaResuelta || aniosDisponibles || aniosNegativo || ilegibleTexto(aniosPropiedad) ? null : 'los años de propiedad',
       faltanMeses ? 'los meses completos desde la compra' : null,
-      precioC > 0 || ilegibleTexto(precioCompraOriginal) ? null : 'el precio de compra original',
+      precioC > 0 || precioCompraNoValido || ilegibleTexto(precioCompraOriginal) ? null : 'el precio de compra original',
     ].filter((x): x is string => x !== null);
     const faltanIlegibles = [
       !plusvaliaResuelta && ilegibleTexto(valorCatastralSuelo) ? 'el valor catastral del suelo' : null,
@@ -559,6 +637,8 @@ export default function SimuladorGarajeCompraventaPage() {
       faltanVacios.length > 0 ? faltaOFaltan(faltanVacios) : null,
       faltanIlegibles.length > 0 ? noSePudoLeer(faltanIlegibles) : null,
       aniosNegativos ? 'los años de propiedad no pueden ser negativos' : null,
+      // Ni un precio de compra 0: está escrito y no vale (patrón 5, hallazgo 2189).
+      precioCompraNoValido ? AVISO_PRECIO_COMPRA_NO_VALIDO : null,
     ].filter((x): x is string => x !== null).join('; ');
 
     let metodoPlusvalia = `No calculada (${porQueNoSeCalcula})`;
@@ -642,6 +722,9 @@ export default function SimuladorGarajeCompraventaPage() {
       camposVacios: faltanVacios,
       camposIlegibles: faltanIlegibles,
       aniosNegativos,
+      precioCompraNoValido,
+      comisionImposible,
+      gananciaPosibleSinPlusvalia,
       faltanMeses,
       parCatastralImposible: rp !== null && !rp.exento && rp.parCatastralImposible,
       plusvaliaPendiente: !plusvaliaResuelta && r.hayDatosGanancia,
@@ -690,7 +773,41 @@ export default function SimuladorGarajeCompraventaPage() {
     !!resultadosComprador &&
     (resultadosComprador.impuestoNoCalculado ||
       !resultadosComprador.gestoriaLegible ||
-      resultadosComprador.notariaLibre);
+      resultadosComprador.notariaLibre ||
+      !resultadosComprador.honorariosConIVA);
+  /**
+   * El impuesto de las facturas de notaría y registro donde no rige el IVA (IGIC o IPSI), que esta
+   * app no calcula; null en península y Baleares (hallazgo 2214).
+   */
+  const impuestoHonorarios =
+    resultadosComprador && !resultadosComprador.honorariosConIVA
+      ? (TERRITORIOS_SIN_IVA[ccaa]?.impuesto ?? null)
+      : null;
+  /** «(IVA incluido)» en península y Baleares; «(sin IGIC)» o «(sin IPSI)» donde no rige. */
+  const rotuloHonorarios = impuestoHonorarios ? `(sin ${impuestoHonorarios})` : '(IVA incluido)';
+  /**
+   * El aviso del COSTE TOTAL parcial. Lo que falta por el IGIC/IPSI de la COMPRA puede ser cero
+   * (tipo cero del IGIC), así que ahí la dirección es «puede ser mayor», y la gestoría ilegible
+   * suma seguro («será mayor»): es el segundo invariante del testigo de familia, que prohíbe
+   * «coste real es/será mayor» por ese impuesto. El IGIC/IPSI de las facturas de notaría y
+   * registro va APARTE, con la frase común de las siete (26/09/2026) y sin «coste real».
+   */
+  const notaHonorarios = impuestoHonorarios
+    ? `Las facturas de notaría y registro llevan además ${impuestoHonorarios}, que esta herramienta no calcula, así que cuestan más de lo que se muestra.`
+    : null;
+  const avisoCosteComprador = (() => {
+    if (!resultadosComprador) return '';
+    const faltan = [
+      resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
+      resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
+      resultadosComprador.notariaLibre
+        ? `la parte de la notaría que excede de ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)}, que es de libre acuerdo`
+        : null,
+    ].filter((x): x is string => x !== null);
+    if (faltan.length === 0) return notaHonorarios ?? 'Precio + todos los gastos';
+    const principal = `No incluye ${faltan.join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}`;
+    return notaHonorarios ? `${principal}. ${notaHonorarios}` : principal;
+  })();
   /** Años escritos que se leen como 0 (reventa antes del año): hay que preguntar los meses. */
   const aniosEnCero = (() => {
     const t = aniosPropiedad.trim();
@@ -706,6 +823,8 @@ export default function SimuladorGarajeCompraventaPage() {
    */
   const faltanEnElNeto = resultadosVendedor
     ? [
+        // Una comisión por encima del 100 % no se descuenta: no es un dato que valga (2191).
+        resultadosVendedor.comisionImposible ? 'la comisión inmobiliaria' : null,
         resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
         resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
       ].filter((x): x is string => x !== null)
@@ -745,7 +864,7 @@ export default function SimuladorGarajeCompraventaPage() {
       const matiz =
         deducibles.length === 0 || tipoMarginalAhorro === null
           ? ''
-          : ` (${enumerar(deducibles)} ${deducibles.length > 1 ? 'rebajan' : 'rebaja'} también el IRPF al descontar${deducibles.length > 1 ? 'las' : 'la'}, hasta un ${formatNumber(tipoMarginalAhorro, 0)} % de su importe)`;
+          : ` (${enumerar(deducibles)} ${deducibles.length > 1 ? 'rebajan' : 'rebaja'} también el IRPF al descontar${deducibles.length > 1 ? 'las' : 'la'}, hasta un ${formatNumber(tipoMarginalAhorro, 0)}\u00A0% de su importe)`;
       return v.seguro
         ? `No descuenta ${enumerarNi(v.campos)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
         : `${mayuscula(noSePudoLeer(v.campos))}: el neto real puede ser menor que este`;
@@ -767,7 +886,12 @@ export default function SimuladorGarajeCompraventaPage() {
   const camposPendientes = resultadosVendedor
     ? Array.from(new Set([
         ...resultadosVendedor.camposVacios.filter((c) => c !== 'los meses completos desde la compra'),
-        ...(resultadosVendedor.irpfCalculado || resultadosVendedor.camposIlegibles.includes('el precio de compra original')
+        // Un precio de compra 0 no se «rellena», se corrige (hallazgo 2189); y con la comisión
+        // imposible el IRPF falta por ella, no por el precio, que está escrito (2191).
+        ...(resultadosVendedor.irpfCalculado ||
+        resultadosVendedor.camposIlegibles.includes('el precio de compra original') ||
+        resultadosVendedor.precioCompraNoValido ||
+        resultadosVendedor.comisionImposible
           ? []
           : ['el precio de compra original']),
       ]))
@@ -828,7 +952,9 @@ export default function SimuladorGarajeCompraventaPage() {
       return `Sin cerrar: ${plusvaliaPendiente ? 'falta la plusvalía municipal, ' : ''}${noSePudoLeer(ilegibles)} y mueven la pérdida en sentidos contrarios. ${escribelo(ilegibles)} con coma decimal (1.234,56).`;
     }
     const mayorPerdida = v.tipo === 'menor';
-    const ilegible = `${mayuscula(noSePudoLeer(v.campos))}: la pérdida real ${v.seguro ? 'es' : 'puede ser'} ${mayorPerdida ? 'mayor' : 'menor'} que esta${mayorPerdida ? '' : ' (o puede haber ganancia)'}. ${escribelo(v.campos)} con coma decimal (1.234,56).`;
+    // «(o puede haber ganancia)» solo si con plusvalía CERO la habría: se calcula (hallazgo 2192).
+    const puedeHaberGanancia = !mayorPerdida && (resultadosVendedor?.gananciaPosibleSinPlusvalia ?? false);
+    const ilegible = `${mayuscula(noSePudoLeer(v.campos))}: la pérdida real ${v.seguro ? 'es' : 'puede ser'} ${mayorPerdida ? 'mayor' : 'menor'} que esta${puedeHaberGanancia ? ' (o puede haber ganancia)' : ''}. ${escribelo(v.campos)} con coma decimal (1.234,56).`;
     return plusvaliaPendiente ? `${frasePlusvalia}. ${ilegible}` : ilegible;
   };
 
@@ -877,20 +1003,36 @@ export default function SimuladorGarajeCompraventaPage() {
       />
       <DataReference
         normativa={`ITP/AJD/IVA ${FISCAL_INMUEBLES_META.vigencia}`}
-        fuente={FISCAL_INMUEBLES_META.fuente}
+        fuente={FUENTE_ITP_AJD_IVA}
         verificado={FISCAL_INMUEBLES_META.verificado}
         urlOficial={FISCAL_INMUEBLES_META.urlOficialITP}
         nota={NOTA_DATOS}
       />
-      {/* La pestaña Vendedor emite dos cifras normativas más, con vigencia y fecha de
-          verificación propias: presentarlas bajo el sello de ITP/AJD/IVA daba por revisado
-          en 2026 un coeficiente de 2025 que se actualiza cada Ley de Presupuestos. */}
+      {/* Un sello por tributo en la mitad del vendedor, con su fuente y su fecha, como
+          local-comercial (hallazgo 1579): el IRPF de la ganancia se sellaba dentro del de la
+          plusvalía, con el TRLRHL y la fecha de los coeficientes del IIVTNU (hallazgo 2187). */}
       <DataReference
         normativa={`Plusvalía municipal (IIVTNU) ${PLUSVALIA_MUNICIPAL_META.vigencia}`}
         fuente={PLUSVALIA_MUNICIPAL_META.baseNormativa}
         verificado={PLUSVALIA_MUNICIPAL_META.verificado}
         urlOficial={PLUSVALIA_MUNICIPAL_META.urlReferencia}
-        nota={`${PLUSVALIA_MUNICIPAL_META.nota} ${PLUSVALIA_MUNICIPAL_META.aviso} El IRPF de la ganancia usa los tramos del ahorro de 2025 (${TIPO_AHORRO_MIN} % a ${TIPO_AHORRO_MAX} %).`}
+        nota={separarPorcentajes(`${PLUSVALIA_MUNICIPAL_META.nota} ${PLUSVALIA_MUNICIPAL_META.aviso}`)}
+      />
+      <DataReference
+        normativa={`IRPF de la ganancia ${GANANCIAS_PATRIMONIALES_META.vigencia}`}
+        fuente={GANANCIAS_PATRIMONIALES_META.fuente}
+        verificado={GANANCIAS_PATRIMONIALES_META.verificado}
+        urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
+        nota={`${GANANCIAS_PATRIMONIALES_META.nota} Escala del ahorro: del ${formatNumber(TIPO_AHORRO_MIN, 0)}\u00A0% al ${formatNumber(TIPO_AHORRO_MAX, 0)}\u00A0%.`}
+      />
+      {/* Y los dos aranceles con los que se estiman la notaría y el registro (RD 1426/1989 y
+          RD 1427/1989), que la página publica y no tenían sello. */}
+      <DataReference
+        normativa="Aranceles de notaría y registro"
+        fuente={`${FACTURA_NOTARIAL.baseNormativa} + ${REGISTRO_CONCEPTOS.baseNormativa}`}
+        verificado={VERIFICADO_ARANCELES}
+        urlOficial={FACTURA_NOTARIAL.urlOficial}
+        nota={FACTURA_NOTARIAL.nota}
       />
 
       {/* Formulario principal */}
@@ -938,7 +1080,7 @@ export default function SimuladorGarajeCompraventaPage() {
                 >
                   <span aria-hidden="true" className={styles.transmisionIcon}>🏠</span>
                   <span>Vinculado a vivienda</span>
-                  <span className={styles.transmisionSub}>IVA {IVA_INMUEBLES_2025.anejoVinculado}%</span>
+                  <span className={styles.transmisionSub}>IVA {IVA_INMUEBLES_2025.anejoVinculado}&nbsp;%</span>
                 </button>
                 <button
                   type="button"                  className={`${styles.transmisionBtn} ${tipoGaraje === 'independiente' ? styles.active : ''}`}
@@ -947,11 +1089,11 @@ export default function SimuladorGarajeCompraventaPage() {
                 >
                   <span aria-hidden="true" className={styles.transmisionIcon}>🅿️</span>
                   <span>Independiente</span>
-                  <span className={styles.transmisionSub}>IVA {IVA_INMUEBLES_2025.garaje}%</span>
+                  <span className={styles.transmisionSub}>IVA {IVA_INMUEBLES_2025.garaje}&nbsp;%</span>
                 </button>
               </div>
               <p className={styles.infoCcaaNote}>
-                Un garaje vinculado a la vivienda (máx. 2 plazas, mismo edificio y promotor) tributa al {IVA_INMUEBLES_2025.anejoVinculado}% de IVA. Un garaje independiente, comprado por separado o en un edificio de uso no residencial, tributa al {IVA_INMUEBLES_2025.garaje}%.
+                Un garaje vinculado a la vivienda (máx. 2 plazas, mismo edificio y promotor) tributa al {IVA_INMUEBLES_2025.anejoVinculado}&nbsp;% de IVA. Un garaje independiente, comprado por separado o en un edificio de uso no residencial, tributa al {IVA_INMUEBLES_2025.garaje}&nbsp;%.
               </p>
             </div>
           )}
@@ -1004,7 +1146,7 @@ export default function SimuladorGarajeCompraventaPage() {
                 {/* Del motor, para un garaje suelto y con el precio escrito: el País Vasco lo
                     grava al 7 % y no al 4 % de la vivienda, y Valencia pasa al 11 % por encima
                     del millón (hallazgos 1581 y 1582). */}
-                <span className={styles.infoCcaaValue}>{formatNumber(tipoGeneralITP(ccaa, OBJETO_ITP, precioLeido), 2)}%</span>
+                <span className={styles.infoCcaaValue}>{formatNumber(tipoGeneralITP(ccaa, OBJETO_ITP, precioLeido), 2)}&nbsp;%</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
@@ -1013,15 +1155,15 @@ export default function SimuladorGarajeCompraventaPage() {
                     clúster que seguía forzando dos decimales a un tipo nominal. Y del motor:
                     en el País Vasco el vinculado está exento y el independiente paga el 0,5 %. */}
                 <span className={styles.infoCcaaValue}>
-                  {formatTipoNominal(tipoAJD(ccaa, { objeto: objetoAJDDe(tipoGaraje) }).tipo)}%
+                  {formatTipoNominal(tipoAJD(ccaa, { objeto: objetoAJDDe(tipoGaraje) }).tipo)}&nbsp;%
                 </span>
               </div>
             </div>
             {/* Escala o umbral, con sus palabras: Valencia no tiene escala (hallazgos 1581 y 1602). */}
             {subidaITP && (
-              <p className={styles.infoCcaaNote}>{subidaITP}</p>
+              <p className={styles.infoCcaaNote}>{separarPorcentajes(subidaITP)}</p>
             )}
-            <p className={styles.infoCcaaNote}>{datosCcaaActual.notas}</p>
+            <p className={styles.infoCcaaNote}>{separarPorcentajes(datosCcaaActual.notas)}</p>
           </div>
 
           {/* Perfil del comprador (solo ITP segunda mano) */}
@@ -1052,11 +1194,11 @@ export default function SimuladorGarajeCompraventaPage() {
                   <ul>
                     {datosCcaaActual.tiposReducidos.map((tr, idx) => (
                       <li key={idx}>
-                        <strong>{formatNumber(tr.tipo, 2)}%</strong> — {tr.nombre}
+                        <strong>{formatNumber(tr.tipo, 2)}&nbsp;%</strong> — {separarPorcentajes(tr.nombre)}
                         {tr.valorMaximo && (
                           <span className={styles.limite}> (máx. {formatCurrency(tr.valorMaximo)})</span>
                         )}
-                        <span className={styles.limite}> · {tr.condiciones.join(', ')}</span>
+                        <span className={styles.limite}> · {separarPorcentajes(tr.condiciones.join(', '))}</span>
                       </li>
                     ))}
                   </ul>
@@ -1156,7 +1298,7 @@ export default function SimuladorGarajeCompraventaPage() {
                     title={
                       resultadosComprador.impuestoNoCalculado
                         ? resultadosComprador.tipoImpuesto
-                        : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}%)`
+                        : `${resultadosComprador.tipoImpuesto} (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)}\u00A0%)`
                     }
                     value={
                       resultadosComprador.impuestoNoCalculado
@@ -1176,14 +1318,14 @@ export default function SimuladorGarajeCompraventaPage() {
                       // Tipo EFECTIVO, no el nominal de la tabla: en Ceuta y Melilla la cuota
                       // gradual se bonifica al 50 % (art. 57 bis TRLITPAJD) y el nominal
                       // desmentía el importe de al lado (hallazgo 473, efecto familia del 431).
-                      title={`AJD (${formatNumber((resultadosComprador.ajd / resultadosComprador.precioGaraje) * 100, 2)}%)`}
+                      title={`AJD (${formatNumber((resultadosComprador.ajd / resultadosComprador.precioGaraje) * 100, 2)}\u00A0%)`}
                       value={formatCurrency(resultadosComprador.ajd)}
                       variant="warning"
                       icon="📄"
                     />
                   )}
                   <ResultCard
-                    title="Gastos de notaría (IVA incluido)"
+                    title={`Gastos de notaría ${rotuloHonorarios}`}
                     value={formatCurrency(resultadosComprador.gastosNotario)}
                     description={`Factura estimada entre ${formatCurrency(resultadosComprador.gastosNotarioMin)} y ${formatCurrency(resultadosComprador.gastosNotarioMax)}. El arancel cubre la matriz y una copia; las copias adicionales y los folios se facturan aparte y dependen de la extensión de la escritura.${
                       resultadosComprador.notariaLibre
@@ -1194,7 +1336,7 @@ export default function SimuladorGarajeCompraventaPage() {
                     icon="📝"
                   />
                   <ResultCard
-                    title="Registro de la Propiedad (IVA incluido)"
+                    title={`Registro de la Propiedad ${rotuloHonorarios}`}
                     value={formatCurrency(resultadosComprador.gastosRegistro)}
                     variant="default"
                     icon="🏛️"
@@ -1241,7 +1383,7 @@ export default function SimuladorGarajeCompraventaPage() {
                     icon="➕"
                     description={
                       [
-                        `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioGaraje) * 100, 2)}% sobre el precio`,
+                        `${formatNumber((resultadosComprador.totalGastos / resultadosComprador.precioGaraje) * 100, 2)}\u00A0% sobre el precio`,
                         resultadosComprador.impuestoNoCalculado
                           ? `SIN el ${resultadosComprador.tipoImpuesto}, que no está incluido`
                           : null,
@@ -1251,6 +1393,7 @@ export default function SimuladorGarajeCompraventaPage() {
                         resultadosComprador.notariaLibre
                           ? 'SIN la parte de la notaría que es de libre acuerdo'
                           : null,
+                        impuestoHonorarios ? `SIN el ${impuestoHonorarios} de las facturas de notaría y registro` : null,
                       ]
                         .filter((x): x is string => x !== null)
                         .join(' — ')
@@ -1261,20 +1404,7 @@ export default function SimuladorGarajeCompraventaPage() {
                     value={formatCurrency(resultadosComprador.totalOperacion)}
                     variant="highlight"
                     icon="💳"
-                    description={
-                      (() => {
-                        const sinCalcular = [
-                          resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
-                          resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
-                          resultadosComprador.notariaLibre
-                            ? `la parte de la notaría que excede de ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)}, que es de libre acuerdo`
-                            : null,
-                        ].filter((x): x is string => x !== null);
-                        return sinCalcular.length === 0
-                          ? 'Precio + todos los gastos'
-                          : `No incluye ${sinCalcular.join(' ni ')}: ${resultadosComprador.gestoriaLegible ? 'el coste real puede ser mayor' : 'el coste real será mayor'}`;
-                      })()
-                    }
+                    description={avisoCosteComprador}
                   />
                   {/*
                     Tipos reducidos que encajan con el perfil pero exigen requisitos que
@@ -1297,15 +1427,15 @@ export default function SimuladorGarajeCompraventaPage() {
                       */}
                       <p className={styles.avisoReducidosTexto}>
                         El cálculo usa el tipo que te corresponde sin requisitos especiales
-                        ({formatNumber(resultadosComprador.porcentajeImpuesto, 2)}% efectivo sobre el precio)
+                        ({formatNumber(resultadosComprador.porcentajeImpuesto, 2)}&nbsp;% efectivo sobre el precio)
                         porque no podemos comprobar tu situación. En {datosCcaaActual.nombre} existe:
                       </p>
                       <ul className={styles.avisoReducidosLista}>
                         {resultadosComprador.tipoElegido.noComprobables.map(r => (
                           <li key={r.nombre}>
-                            <strong>{formatNumber(r.tipo, 2)}% — {r.nombre}</strong>
+                            <strong>{formatNumber(r.tipo, 2)}&nbsp;% — {separarPorcentajes(r.nombre)}</strong>
                             <br />
-                            Requisitos: {r.condiciones.join(' · ')}
+                            Requisitos: {separarPorcentajes(r.condiciones.join(' · '))}
                             {r.valorMaximo ? ` · Valor máximo ${formatCurrency(r.valorMaximo)}` : ''}
                             {/* El tope de valor SÍ se comprueba, así que la línea no puede
                                 ofrecerse como rebaja al alcance cuando el precio la descarta
@@ -1588,7 +1718,13 @@ export default function SimuladorGarajeCompraventaPage() {
                       !resultadosVendedor.irpfCalculado
                         ? resultadosVendedor.camposIlegibles.includes('el precio de compra original')
                           ? 'El precio de compra original no se ha podido leer: escríbelo con coma decimal (1.234,56). Este impuesto NO está incluido en el neto de abajo.'
-                          : 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
+                          : resultadosVendedor.precioCompraNoValido
+                            ? // Escrito y legible, pero 0: no «falta», se corrige (patrón 5, 2189).
+                              `${mayuscula(AVISO_PRECIO_COMPRA_NO_VALIDO)}: corrígelo. Este impuesto NO está incluido en el neto de abajo.`
+                            : resultadosVendedor.camposVacios.includes('el precio de compra original')
+                              ? 'Falta el precio de compra original. Este impuesto NO está incluido en el neto de abajo.'
+                              : // Con el precio escrito, lo único que lo impide es la comisión (2191).
+                                `${AVISO_COMISION_IMPOSIBLE} Este impuesto NO está incluido en el neto de abajo.`
                         : // Sin ganancia no hay nada que tribute: «SIN CUOTA · Tributación en base
                           // del ahorro» era la forma del hallazgo 1554 de la referencia.
                           (avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', resultadosVendedor.irpfGanancia > 0) ??
@@ -1596,25 +1732,37 @@ export default function SimuladorGarajeCompraventaPage() {
                             ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
                             : resultadosVendedor.gananciaPatrimonial === 0
                               ? 'No hay ganancia que gravar, así que esta venta no tiene IRPF'
-                              : `Tributación en base del ahorro (${TIPO_AHORRO_MIN}%-${TIPO_AHORRO_MAX}%)`))
+                              : `Tributación en base del ahorro (del ${TIPO_AHORRO_MIN}\u00A0% al ${TIPO_AHORRO_MAX}\u00A0%)`))
                     }
                   />
                   {/* Un importe ilegible no hace desaparecer su línea: se ve «Sin leer» (hallazgo
                       1252, la forma del A3 de local-comercial y del 1191 del estimador). */}
-                  {(resultadosVendedor.comisionInmobiliaria > 0 || !resultadosVendedor.comisionLegible) && (
+                  {/* Una comisión por encima del 100 % tampoco desaparece ni se liquida: «Sin aplicar»,
+                      y se pide corregirla (patrón 5, hallazgo 2191). */}
+                  {(resultadosVendedor.comisionInmobiliaria > 0 ||
+                    !resultadosVendedor.comisionLegible ||
+                    resultadosVendedor.comisionImposible) && (
                     <ResultCard
                       title={
-                        resultadosVendedor.comisionLegible
-                          ? `Comisión inmobiliaria (${formatTipoNominal(parseSpanishNumberOr(comisionInmobiliaria))}%)`
+                        resultadosVendedor.comisionLegible && !resultadosVendedor.comisionImposible
+                          ? `Comisión inmobiliaria (${formatTipoNominal(parseSpanishNumberOr(comisionInmobiliaria))}\u00A0%)`
                           : 'Comisión inmobiliaria'
                       }
-                      value={resultadosVendedor.comisionLegible ? formatCurrency(resultadosVendedor.comisionInmobiliaria) : 'Sin leer'}
+                      value={
+                        !resultadosVendedor.comisionLegible
+                          ? 'Sin leer'
+                          : resultadosVendedor.comisionImposible
+                            ? 'Sin aplicar'
+                            : formatCurrency(resultadosVendedor.comisionInmobiliaria)
+                      }
                       variant="default"
                       icon="🏪"
                       description={
-                        resultadosVendedor.comisionLegible
-                          ? undefined
-                          : 'El porcentaje no se ha podido leer: escríbelo con coma decimal (3,5)'
+                        !resultadosVendedor.comisionLegible
+                          ? 'El porcentaje no se ha podido leer: escríbelo con coma decimal (3,5)'
+                          : resultadosVendedor.comisionImposible
+                            ? `${AVISO_COMISION_IMPOSIBLE} No se descuenta del neto de abajo.`
+                            : undefined
                       }
                     />
                   )}
@@ -1683,6 +1831,10 @@ export default function SimuladorGarajeCompraventaPage() {
                           resultadosVendedor.faltanMeses ? 'elige los meses completos desde la compra' : null,
                           // Un año negativo no «falta»: se corrige (patrón 5, hallazgo 1552).
                           resultadosVendedor.aniosNegativos ? 'corrige los años de propiedad (no pueden ser negativos)' : null,
+                          // Ni un precio de compra 0 ni una comisión de más del 100 %: están escritos
+                          // y no valen (patrón 5, hallazgos 2189 y 2191).
+                          resultadosVendedor.precioCompraNoValido ? 'corrige el precio de compra original (tiene que ser mayor que 0)' : null,
+                          resultadosVendedor.comisionImposible ? 'corrige la comisión (no puede superar el 100\u00A0% del precio de venta)' : null,
                           hayIlegiblesQueCorregir ? 'escribe con coma decimal (1.234,56) lo que no se ha podido leer' : null,
                           resultadosVendedor.parCatastralImposible ? 'revisa los dos valores catastrales del recibo del IBI' : null,
                         ]
@@ -1732,16 +1884,16 @@ export default function SimuladorGarajeCompraventaPage() {
                     1582, NF 1/2011 de Bizkaia, art. 13). */}
                 <tr>
                   <td>ITP segunda mano</td>
-                  <td>Tipo general de la comunidad (en el País Vasco, {formatNumber(ITP_PV_GARAJE_SUELTO, 0)}% si se compra por separado)</td>
-                  <td>Tipo general de la comunidad (en el País Vasco, {formatNumber(ITP_PV_VIVIENDA, 0)}%)</td>
+                  <td>Tipo general de la comunidad (en el País Vasco, {formatNumber(ITP_PV_GARAJE_SUELTO, 0)}&nbsp;% si se compra por separado)</td>
+                  <td>Tipo general de la comunidad (en el País Vasco, {formatNumber(ITP_PV_VIVIENDA, 0)}&nbsp;%)</td>
                 </tr>
                 {/* La celda del garaje distingue los dos tipos porque es lo que aplica el
                     motor (IVA_INMUEBLES_2025.garaje = 21). Decir «10 %» a secas infravaloraba
                     en 2.750 € un garaje de 25.000 €, y presupuestar de menos es el error caro. */}
                 <tr>
                   <td>IVA obra nueva</td>
-                  <td>{formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}% con la vivienda · {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% independiente<br /><small>(IGIC/IPSI en Canarias, Ceuta y Melilla)</small></td>
-                  <td>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% (residencial)</td>
+                  <td>{formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}&nbsp;% con la vivienda · {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}&nbsp;% independiente<br /><small>(IGIC/IPSI en Canarias, Ceuta y Melilla)</small></td>
+                  <td>{formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}&nbsp;% (residencial)</td>
                 </tr>
                 {/* La celda del garaje decía «Sí (joven, discapacidad…)», como la vivienda, cuando
                     el motor los descarta (`viviendaHabitual: false`) y la FAQ y el caso de Carlos
@@ -1792,23 +1944,23 @@ export default function SimuladorGarajeCompraventaPage() {
                   cerca de la verdad que el número exacto que los sustituyó. Un ejemplo que no
                   cuadra con la calculadora de al lado enseña a desconfiar del resultado correcto,
                   así que si vuelve a cambiar el motor, esta cifra cambia con él. */}
-              <p>Luis compra una plaza de parking en Madrid por 25.000 €. Paga el ITP general de Madrid ({formatTipoNominal(ITP_GENERAL_MADRID)}%) = 1.500 €, más notaría (371,84 €, dentro de una horquilla de 318,72 € a 424,96 €), registro (80,21 €) y gestoría (300 €). El coste total asciende a 27.252,05 €.</p>
-              <div className={styles.casoResultado}>ITP + gastos = 9,01% del precio</div>
+              <p>Luis compra una plaza de parking en Madrid por 25.000 €. Paga el ITP general de Madrid ({formatTipoNominal(ITP_GENERAL_MADRID)}&nbsp;%) = 1.500 €, más notaría (371,84 €, dentro de una horquilla de 318,72 € a 424,96 €), registro (80,21 €) y gestoría (300 €). El coste total asciende a 27.252,05 €.</p>
+              <div className={styles.casoResultado}>ITP + gastos = 9,01&nbsp;% del precio</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
                 <span aria-hidden="true" className={styles.casoEmoji}>🏗️</span>
                 <span className={styles.casoTag}>Garaje de obra nueva con vivienda</span>
               </div>
-              <p>Elena compra un piso nuevo con garaje incluido por 200.000 €. El conjunto tributa al {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}% de IVA sobre el precio total. Si el garaje se escritura por separado (20.000 €) y está vinculado a la vivienda (máx. 2 plazas), el IVA del garaje es también el {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}%. Si lo compra de forma independiente o en un edificio no residencial, el IVA sube al {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}%.</p>
-              <div className={styles.casoResultado}>IVA {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}% (vinculado) o {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}% (independiente) en garaje de obra nueva</div>
+              <p>Elena compra un piso nuevo con garaje incluido por 200.000 €. El conjunto tributa al {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}&nbsp;% de IVA sobre el precio total. Si el garaje se escritura por separado (20.000 €) y está vinculado a la vivienda (máx. 2 plazas), el IVA del garaje es también el {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}&nbsp;%. Si lo compra de forma independiente o en un edificio no residencial, el IVA sube al {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}&nbsp;%.</p>
+              <div className={styles.casoResultado}>IVA {formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}&nbsp;% (vinculado) o {formatNumber(IVA_INMUEBLES_2025.garaje, 0)}&nbsp;% (independiente) en garaje de obra nueva</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
                 <span aria-hidden="true" className={styles.casoEmoji}>💸</span>
                 <span className={styles.casoTag}>Vender garaje con ganancia</span>
               </div>
-              <p>Ana compró un garaje por {eurosEnteros(EJEMPLO_ANA.compra)} hace 10 años y lo vende por {eurosEnteros(EJEMPLO_ANA.venta)}. La diferencia bruta son {eurosEnteros(EJEMPLO_ANA_BRUTO)}, pero no es la base que tributa: el art. 35 LIRPF resta del valor de transmisión los gastos que paga el vendedor. Con la comisión del {formatTipoNominal(EJEMPLO_ANA.comisionPct)}% que trae el simulador ({eurosEnteros(EJEMPLO_ANA_COMISION)}), sin plusvalía municipal y sin declarar los gastos de aquella compra, la ganancia queda en {eurosEnteros(EJEMPLO_ANA_REAL.ganancia)} y el IRPF en {formatCurrency(EJEMPLO_ANA_REAL.cuotaIRPF)} ({formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}% hasta {eurosEnteros(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].hasta)} y {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[1].tipo, 0)}% sobre el resto), no los {formatCurrency(EJEMPLO_ANA_BRUTO_IRPF)} que saldrían de los {eurosEnteros(EJEMPLO_ANA_BRUTO)} brutos. Si además hay plusvalía municipal, o Ana declara los impuestos y gastos que pagó al comprarlo, la ganancia baja todavía más.</p>
+              <p>Ana compró un garaje por {eurosEnteros(EJEMPLO_ANA.compra)} hace 10 años y lo vende por {eurosEnteros(EJEMPLO_ANA.venta)}. La diferencia bruta son {eurosEnteros(EJEMPLO_ANA_BRUTO)}, pero no es la base que tributa: el art. 35 LIRPF resta del valor de transmisión los gastos que paga el vendedor. Con la comisión del {formatTipoNominal(EJEMPLO_ANA.comisionPct)}&nbsp;% que trae el simulador ({eurosEnteros(EJEMPLO_ANA_COMISION)}), sin plusvalía municipal y sin declarar los gastos de aquella compra, la ganancia queda en {eurosEnteros(EJEMPLO_ANA_REAL.ganancia)} y el IRPF en {formatCurrency(EJEMPLO_ANA_REAL.cuotaIRPF)} ({formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}&nbsp;% hasta {eurosEnteros(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].hasta)} y {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[1].tipo, 0)}&nbsp;% sobre el resto), no los {formatCurrency(EJEMPLO_ANA_BRUTO_IRPF)} que saldrían de los {eurosEnteros(EJEMPLO_ANA_BRUTO)} brutos. Si además hay plusvalía municipal, o Ana declara los impuestos y gastos que pagó al comprarlo, la ganancia baja todavía más.</p>
               <div className={styles.casoResultado}>Ganancia tributa: IRPF ahorro + plusvalía municipal</div>
             </div>
             <div className={styles.casoCard}>
@@ -1816,7 +1968,7 @@ export default function SimuladorGarajeCompraventaPage() {
                 <span aria-hidden="true" className={styles.casoEmoji}>🎯</span>
                 <span className={styles.casoTag}>Tipos reducidos de ITP para garaje</span>
               </div>
-              <p>Carlos, 28 años, compra un garaje suelto en Andalucía por 18.000 €. El tipo reducido para jóvenes ({formatTipoNominal(ITP_REDUCIDO_JOVENES_ANDALUCIA)}%) exige que sea su <strong>vivienda habitual</strong>, y un garaje suelto nunca lo es: el simulador liquida el tipo general ({formatNumber(ITP_GENERAL_ANDALUCIA, 2)}% = 1.260,00 €) y avisa de que el reducido no aplica, en vez de dar por buenos 630,00 €. Solo tributa como vivienda habitual si se compra vinculado a ella, en el mismo acto.</p>
+              <p>Carlos, 28 años, compra un garaje suelto en Andalucía por 18.000 €. El tipo reducido para jóvenes ({formatTipoNominal(ITP_REDUCIDO_JOVENES_ANDALUCIA)}&nbsp;%) exige que sea su <strong>vivienda habitual</strong>, y un garaje suelto nunca lo es: el simulador liquida el tipo general ({formatNumber(ITP_GENERAL_ANDALUCIA, 2)}&nbsp;% = 1.260,00 €) y avisa de que el reducido no aplica, en vez de dar por buenos 630,00 €. Solo tributa como vivienda habitual si se compra vinculado a ella, en el mismo acto.</p>
               <div className={styles.casoResultado}>Tipos reducidos: NO aplican a un garaje suelto, solo vinculado a la vivienda habitual</div>
             </div>
           </div>
@@ -1885,12 +2037,12 @@ export default function SimuladorGarajeCompraventaPage() {
                 El ITP debe liquidarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la firma de la escritura
                 ({PLAZO_ITP.baseNormativa}). <strong>{PLAZO_ITP.aviso}</strong> Presentarlo
                 tarde por iniciativa propia, sin requerimiento de la Administración, genera recargo
-                desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}% de partida más
-                otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}% por cada mes completo de retraso,
-                y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}% más intereses de demora una vez
+                desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}&nbsp;% de partida más
+                otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}&nbsp;% por cada mes completo de retraso,
+                y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}&nbsp;% más intereses de demora una vez
                 transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses{' '}
                 ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}). Si el recargo se paga en período
-                voluntario se reduce un {ESCALA_RECARGO_EXTEMPORANEO.reduccionProntoPago}%. Planifica
+                voluntario se reduce un {ESCALA_RECARGO_EXTEMPORANEO.reduccionProntoPago}&nbsp;%. Planifica
                 la liquidación desde el día de la firma.
               </p>
             </div>

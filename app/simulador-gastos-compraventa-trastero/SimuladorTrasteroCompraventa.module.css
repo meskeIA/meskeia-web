@@ -1,7 +1,11 @@
 /* Variables CSS - Paleta meskeIA */
+/*
+ * Sin redeclarar --primary ni --secondary (hallazgo 2195, el 1801 de la referencia): el módulo
+ * fijaba --primary: #2E86AB en .container y no en su variante oscura, así que en oscuro tampoco
+ * heredaba el color de globals. El texto de marca va con --primary-texto / --secondary-texto y
+ * los fondos con texto blanco con --primary-boton, que llegan a 4,5:1 en los dos temas.
+ */
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
   --accent: #7FB3D3;
   --hero-bg: #1a5278;
   --bg-primary: #FAFAFA;
@@ -323,8 +327,8 @@
 }
 
 .tab.active {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -511,7 +515,7 @@
 .casoResultado {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-top: 0.25rem;
 }
 

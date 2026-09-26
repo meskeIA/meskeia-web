@@ -236,8 +236,8 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
     // `elegirTipoITP` recibe `viviendaHabitual: false` (un trastero suelto nunca lo es), y
     // los tres reducidos de Madrid exigen vivienda habitual o municipio pequeño, así que
     // ninguno se aplica: el general es lo correcto.
-    expect(await valorTarjeta(page, 'ITP (6,00%)')).toBe('900,00 €');
-    expect(await descripcionTarjeta(page, 'ITP (6,00%)')).toContain('Comunidad de Madrid');
+    expect(await valorTarjeta(page, 'ITP (6,00 %)')).toBe('900,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (6,00 %)')).toContain('Comunidad de Madrid');
 
     // Notaría — RD 1426/1989, número 2 (ARANCELES_NOTARIO):
     //   tramo 1 (hasta 6.010,12 €)            →                             90,15
@@ -268,7 +268,7 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
     // Total gastos = 900 + 276,55494405 + 59,03284112 + 300 = 1.535,58778517
     //   % sobre el precio = 1.535,58778517 / 15.000 = 10,237252 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1535,58 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,24%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,24 %');
 
     // Coste total = 15.000 + 1.535,58778517 = 16.535,58778517
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('16.535,58 €');
@@ -296,11 +296,11 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
       'aria-pressed',
       'true',
     );
-    expect(await valorTarjeta(page, 'IVA (10,00%)')).toBe('300,00 €');
-    expect(await descripcionTarjeta(page, 'IVA (10,00%)')).toContain('anejo transmitido con la vivienda');
+    expect(await valorTarjeta(page, 'IVA (10,00 %)')).toBe('300,00 €');
+    expect(await descripcionTarjeta(page, 'IVA (10,00 %)')).toContain('anejo transmitido con la vivienda');
 
     // AJD = 3.000 × 0,75 % = 22,50 — ITP_CCAA.madrid.ajd = 0.75. Solo hay AJD en obra nueva.
-    expect(await valorTarjeta(page, 'AJD (0,75%)')).toBe('22,50 €');
+    expect(await valorTarjeta(page, 'AJD (0,75 %)')).toBe('22,50 €');
 
     // Notaría — por debajo de 6.010,12 € solo se devenga la cuota fija del primer tramo:
     //   90,15 × 1,21 (IVA) = 109,0815 de arancel
@@ -317,7 +317,7 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
     // Total vinculado = 300 + 22,5 + 190,892625 + 39,99677022 + 300 = 853,38939522
     //   % sobre el precio = 28,446313 %  ·  coste total = 3.853,38939522
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('853,39 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('28,45%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('28,45 %');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('3853,39 €');
 
     // --- Mismo trastero, ahora INDEPENDIENTE ---
@@ -325,29 +325,29 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
 
     // IVA = 3.000 × 21 % = 630 — IVA_INMUEBLES_2025.garaje = 21 (tipo general).
     // El salto respecto al vinculado es de 330 €, el 11 % del precio del trastero.
-    expect(await valorTarjeta(page, 'IVA (21,00%)')).toBe('630,00 €');
-    expect(await descripcionTarjeta(page, 'IVA (21,00%)')).toContain('trastero independiente');
+    expect(await valorTarjeta(page, 'IVA (21,00 %)')).toBe('630,00 €');
+    expect(await descripcionTarjeta(page, 'IVA (21,00 %)')).toContain('trastero independiente');
 
     // El aviso tiene que explicar la CONDICIÓN, no solo el tipo: el 10 % es para los anejos
     // transmitidos junto con la vivienda.
     await expect(page.getByText(/solo se aplica a los anejos/)).toBeVisible();
 
     // Los fijos no se mueven (dependen del precio, no del tipo de IVA):
-    expect(await valorTarjeta(page, 'AJD (0,75%)')).toBe('22,50 €');
+    expect(await valorTarjeta(page, 'AJD (0,75 %)')).toBe('22,50 €');
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('190,89 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('40,00 €');
 
     // Total independiente = 630 + 22,5 + 190,892625 + 39,99677022 + 300 = 1.183,38939522
     //   % sobre el precio = 39,446313 %  ·  coste total = 4.183,38939522
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1183,39 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('39,45%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('39,45 %');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('4183,39 €');
 
     // El 10 %/21 % es estatal (Ley 37/1992), no autonómico: cambiar de comunidad mueve el
     // AJD (Cataluña 1,5 % → 45 €) pero NO el IVA.
     await selectCcaa(page).selectOption('cataluna');
-    expect(await valorTarjeta(page, 'IVA (21,00%)')).toBe('630,00 €');
-    expect(await valorTarjeta(page, 'AJD (1,50%)')).toBe('45,00 €');
+    expect(await valorTarjeta(page, 'IVA (21,00 %)')).toBe('630,00 €');
+    expect(await valorTarjeta(page, 'AJD (1,50 %)')).toBe('45,00 €');
 
     // País Vasco — ⚠️ REESCRITO el 24/09/2026. El caso daba por hecho que allí no hay AJD, y
     // eso solo es cierto para la vivienda y sus anejos (`ITP_CCAA['pais-vasco'].ajdVivienda`
@@ -356,8 +356,8 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
     // INDEPENDIENTE no es vivienda: paga el 0,5 % general (`ITP_CCAA['pais-vasco'].ajd`; NF
     // 1/2011 de Bizkaia art. 44.1, NF 18/1987 de Gipuzkoa art. 29.2). 3.000 × 0,5 % = 15,00 €.
     await selectCcaa(page).selectOption('pais-vasco');
-    expect(await valorTarjeta(page, 'IVA (21,00%)')).toBe('630,00 €');
-    expect(await valorTarjeta(page, 'AJD (0,50%)')).toBe('15,00 €');
+    expect(await valorTarjeta(page, 'IVA (21,00 %)')).toBe('630,00 €');
+    expect(await valorTarjeta(page, 'AJD (0,50 %)')).toBe('15,00 €');
     // El VINCULADO sí se transmite con la vivienda: ahí el AJD es 0 y la tarjeta desaparece.
     await page.getByRole('button', { name: /Vinculado a vivienda/ }).click();
     await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
@@ -485,7 +485,7 @@ test('REGRESIÓN (dato) — el rango de AJD de la tabla deja fuera el 0 % del Pa
   await expect(page.locator('h3', { hasText: 'AJD' })).toHaveCount(0);
 
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
-  await expect(page.locator('tr', { hasText: 'AJD en primera mano' })).toContainText('0%');
+  await expect(page.locator('tr', { hasText: 'AJD en primera mano' })).toContainText('0 %');
 });
 
 // ✅ REPARADO 21/08/2026 — contenido.
@@ -503,7 +503,7 @@ test('REGRESIÓN (contenido) — el ejemplo de Cataluña publica una notaría qu
   await page.goto(RUTA);
   await selectCcaa(page).selectOption('cataluna');
   await rellenar(page, 'Precio del trastero', '18000');
-  expect(await valorTarjeta(page, 'ITP (10,00%)')).toBe('1800,00 €');
+  expect(await valorTarjeta(page, 'ITP (10,00 %)')).toBe('1800,00 €');
   expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('305,14 €');
   expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('65,39 €');
 
@@ -559,7 +559,7 @@ test('REGRESIÓN (contenido) — el ejemplo del reducido gallego omite la condic
   await selectCcaa(page).selectOption('galicia');
   await rellenar(page, 'Precio del trastero', '12000');
   await selectPerfil(page).selectOption('joven');
-  expect(await valorTarjeta(page, 'ITP (8,00%)')).toBe('960,00 €');
+  expect(await valorTarjeta(page, 'ITP (8,00 %)')).toBe('960,00 €');
   await expect(page.getByText(/Podrías pagar menos/)).toBeVisible();
 
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
@@ -586,11 +586,12 @@ test('REGRESIÓN (contenido) — la nota atribuye a la CCAA una diferencia que e
   await rellenar(page, 'Precio del trastero', '3000');
   for (const comunidad of ['madrid', 'cataluna', 'pais-vasco']) {
     await selectCcaa(page).selectOption(comunidad);
-    expect(await valorTarjeta(page, 'IVA (21,00%)')).toBe('630,00 €');
+    expect(await valorTarjeta(page, 'IVA (21,00 %)')).toBe('630,00 €');
   }
 
-  const nota = await page.locator('[class*="trasteroNote"]').first().innerText();
-  expect(nota).toContain('21%');
+  // El % separado con espacio DURO desde el 26/09/2026 (hallazgo 2194): se normaliza.
+  const nota = (await page.locator('[class*="trasteroNote"]').first().innerText()).replace(ESPACIO_DURO, ' ');
+  expect(nota).toContain('21 %');
 });
 
 // ✅ REPARADO 21/08/2026 — operativa.
@@ -679,7 +680,7 @@ test.describe('MITAD B — zonas no cubiertas por la inspección del 20/08/2026'
     // Valor de transmisión (art. 35.2 LIRPF) = 15.000 − 450 de comisión (3 % por defecto)
     //   − 0 de gestoría del vendedor − 180 de plusvalía municipal = 14.370
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('14.370,00 €');
-    expect(await valorTarjeta(page, 'Comisión inmobiliaria (3%)')).toBe('450,00 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (3 %)')).toBe('450,00 €');
 
     // Ganancia = 14.370 − 9.000 = 5.370 → cabe entera en el primer tramo del ahorro
     //   (TRAMOS_GANANCIAS_PATRIMONIALES_2025: 19 % hasta 6.000) → 5.370 × 19 % = 1.020,30
@@ -749,7 +750,7 @@ test.describe('MITAD B — zonas no cubiertas por la inspección del 20/08/2026'
     // condiciones son ['Inmueble situado en Ceuta', 'Bonificación automática 50%'] — las dos
     // de UBICACIÓN, así que `elegirTipoITP` las da por cumplidas con el perfil general.
     //   20.000 × 3 % = 600,00 (la mitad de los 1.200 del tipo general)
-    expect(await valorTarjeta(page, 'ITP (3,00%)')).toBe('600,00 €');
+    expect(await valorTarjeta(page, 'ITP (3,00 %)')).toBe('600,00 €');
 
     // Cataluña, 700.000 € — tramosProgresivos 10/11/12/13 %:
     //   600.000 × 10 % = 60.000 · (700.000 − 600.000) × 11 % = 11.000 → 71.000,00
@@ -757,7 +758,7 @@ test.describe('MITAD B — zonas no cubiertas por la inspección del 20/08/2026'
     //   el tipo plano daría 70.000 €, mil euros menos)
     await selectCcaa(page).selectOption('cataluna');
     await rellenar(page, 'Precio del trastero', '700000');
-    expect(await valorTarjeta(page, 'ITP (10,14%)')).toBe('71.000,00 €');
+    expect(await valorTarjeta(page, 'ITP (10,14 %)')).toBe('71.000,00 €');
     await expect(page.getByText(/aplica escala progresiva/)).toBeVisible();
 
     // Notaría a ese precio — ARANCELES_NOTARIO acumulado hasta 700.000 = 588,63583 sin IVA;
@@ -967,9 +968,10 @@ test.describe('REGRESIÓN — hallazgos del 27/08/2026, reparados', () => {
     await rellenar(page, 'Precio de compra original', '8000');
     await rellenar(page, 'Comisión inmobiliaria (%)', '3.5');
 
-    const titulo = await page.locator('h3', { hasText: 'Comisión inmobiliaria' }).first().innerText();
-    expect(titulo).toContain('3,5%');
-    expect(titulo).not.toContain('3.5%');
+    // El % separado con espacio DURO desde el 26/09/2026 (hallazgo 2194): se normaliza.
+    const titulo = (await page.locator('h3', { hasText: 'Comisión inmobiliaria' }).first().innerText()).replace(ESPACIO_DURO, ' ');
+    expect(titulo).toContain('3,5 %');
+    expect(titulo).not.toContain('3.5 %');
   });
 
   // ✅ REPARADO 27/08 (bajo) — operativa.
@@ -1034,31 +1036,40 @@ test.describe('MITAD A (28/08/2026) — cierre de la reparación del impuesto qu
 
     // …pero el AJD SÍ se devenga en Canarias, y sin bonificación de ciudad autónoma:
     //   25.000 × 0,75 % (ITP_CCAA.canarias.ajd) = 187,50
-    expect(await valorTarjeta(page, 'AJD (0,75%)')).toBe('187,50 €');
+    expect(await valorTarjeta(page, 'AJD (0,75 %)')).toBe('187,50 €');
 
-    // Notaría — RD 1426/1989 nº 2: 90,15 + (25.000 − 6.010,12) × 0,45 % = 175,60446
-    //   × 1,21 de IVA = 212,4813966 · factura media × 1,75 = 371,84244405
-    //   horquilla: × 1,5 = 318,7220949 y × 2 = 424,9627932
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('371,84 €');
+    // ⚠️ 26/09/2026 (hallazgo 2214, motor 242fffcd): en Canarias, Ceuta y Melilla la notaría y el
+    // registro van SIN el 21 % de IVA, que allí no existe (llevan IGIC o IPSI, que la app no
+    // calcula), y el coste total pasa a PARCIAL también en segunda mano.
+    // Notaría — RD 1426/1989 nº 2: 90,15 + (25.000 − 6.010,12) × 0,45 % = 175,60446, SIN IVA
+    //   · factura media × 1,75 = 307,307805 · horquilla × 1,5 = 263,40669 y × 2 = 351,20892
+    //   (con IVA eran 371,84, 318,72 y 424,96)
+    expect(await tituloTarjeta24(page, /^Gastos de notaría/)).toBe('Gastos de notaría (sin IGIC)');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('307,31 €');
     const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
-    expect(notaria).toContain('318,72 €');
-    expect(notaria).toContain('424,96 €');
+    expect(notaria).toContain('263,41 €');
+    expect(notaria).toContain('351,21 €');
 
     // Registro — RD 1427/1989: 24,04 + (25.000 − 6.010,12) × 0,175 % = 57,27229
-    //   + 6,010121 de presentación + 3,005061 de nota simple = 66,287472 · × 1,21 = 80,20784112
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('80,21 €');
+    //   + 6,010121 de presentación + 3,005061 de nota simple = 66,287472, SIN IVA (eran 80,21)
+    expect(await tituloTarjeta24(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (sin IGIC)');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('66,29 €');
 
-    // Total = 0 de impuesto indirecto + 187,50 + 371,84244405 + 80,20784112 + 300 = 939,55028517
-    //   % sobre el precio = 939,55028517 / 25.000 = 3,758201 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('939,55 €');
+    // Total = líneas redondeadas: 0 + 187,50 + 307,31 + 66,29 + 300 = 861,10
+    //   % sobre el precio = 861,10 / 25.000 = 3,4444 % (antes 939,55 y 3,76 %)
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('861,10 €');
     const desglose = await descripcionTarjeta(page, 'Total gastos adicionales');
-    expect(desglose).toContain('3,76%');
+    expect(desglose).toContain('3,44 %');
     expect(desglose).toContain('SIN el IGIC');
+    expect(desglose).toContain('SIN el IGIC de las facturas de notaría y registro');
 
     // Y el total tiene que decir que está incompleto, no rotularse como coste de adquisición.
     const tituloTotal = await page.locator('h3', { hasText: /COSTE TOTAL/ }).first().innerText();
     expect(tituloTotal).toMatch(/PARCIAL/i);
-    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('25.939,55 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('25.861,10 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
+      'No incluye el IGIC: el coste real puede ser mayor. Las facturas de notaría y registro llevan además IGIC, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
+    );
   });
 
   /**
@@ -1082,17 +1093,24 @@ test.describe('MITAD A (28/08/2026) — cierre de la reparación del impuesto qu
     //   25.000 × 6,5 % = 1.625,00
     // Ninguno de los cuatro reducidos de Canarias es aplicable: los tres primeros exigen
     // vivienda habitual (un trastero suelto nunca lo es) y el cuarto, VPO.
-    expect(await valorTarjeta(page, 'ITP (6,50%)')).toBe('1625,00 €');
-    expect(await descripcionTarjeta(page, 'ITP (6,50%)')).toContain('Canarias');
+    expect(await valorTarjeta(page, 'ITP (6,50 %)')).toBe('1625,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (6,50 %)')).toContain('Canarias');
 
     // El aviso de territorio sin IVA NO debe salir aquí: en ITP no hay nada que advertir.
     await expect(page.getByText(/no se aplica el IVA/)).toHaveCount(0);
 
-    // Total = 1.625 + 371,84244405 + 80,20784112 + 300 = 2.377,05028517 → 9,508201 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2377,05 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,51%');
-    // Y el rótulo del total vuelve a ser el completo, sin «(PARCIAL)».
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('27.377,05 €');
+    // ⚠️ 26/09/2026 (hallazgo 2214, motor 242fffcd): en Canarias, Ceuta y Melilla la notaría y el
+    // registro van SIN el 21 % de IVA, que allí no existe (llevan IGIC o IPSI, que la app no
+    // calcula), y el coste total pasa a PARCIAL también en segunda mano.
+    // Total = 1.625 + 307,31 + 66,29 + 300 = 2.298,60 → 9,1944 % (antes 2.377,05 y 9,51 %, con
+    // IVA en la notaría y el registro). El rótulo ya no es el completo: falta el IGIC de esas
+    // dos facturas, que no puede ser cero, y se dice con la frase común de las siete.
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2298,60 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '9,19 % sobre el precio — SIN el IGIC de las facturas de notaría y registro',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('27.298,60 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('Las facturas de notaría y registro llevan además IGIC, que esta herramienta no calcula, así que cuestan más de lo que se muestra.');
   });
 });
 
@@ -1129,7 +1147,7 @@ test.describe('MITAD B (28/08/2026) — zonas del motor que ninguna ronda anteri
     // Valor de transmisión = 20.000 − 800 (comisión 4 %) − 250 (gestoría propia) − 100 = 18.850
     expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('18.500,00 €');
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('18.850,00 €');
-    expect(await valorTarjeta(page, 'Comisión inmobiliaria (4%)')).toBe('800,00 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (4 %)')).toBe('800,00 €');
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('250,00 €');
 
     // Ganancia = 18.850 − 18.500 = 350 → primer tramo del ahorro: 350 × 19 % = 66,50
@@ -1195,8 +1213,9 @@ test('REGRESIÓN — el rótulo del AJD en Ceuta anuncia el tipo bonificado, no 
   await selectCcaa(page).selectOption('ceuta');
   await rellenar(page, 'Precio del trastero', '30000');
 
-  const titulo = await page.locator('h3', { hasText: 'AJD' }).first().innerText();
-  expect(titulo).toContain('0,25%');
+  // El % separado con espacio DURO desde el 26/09/2026 (hallazgo 2194): se normaliza.
+  const titulo = (await page.locator('h3', { hasText: 'AJD' }).first().innerText()).replace(ESPACIO_DURO, ' ');
+  expect(titulo).toContain('0,25 %');
 });
 
 // Hallazgo 483 — reparado. Sin precio de compra original, `irpfCalculado` es falso y la
@@ -1284,8 +1303,8 @@ test.describe('RE-INSPECCIÓN 30/08/2026 — casos nuevos y cierre de la tanda 2
     // tarjeta coincide con el nominal. Ninguno de sus cuatro reducidos se aplica: los tres de
     // colectivo exigen «Vivienda habitual» (y la app pasa `viviendaHabitual: false`, porque un
     // trastero suelto nunca lo es) y el cuarto es VPO.
-    expect(await valorTarjeta(page, 'ITP (7,75%)')).toBe('3100,00 €');
-    expect(await descripcionTarjeta(page, 'ITP (7,75%)')).toContain('Región de Murcia');
+    expect(await valorTarjeta(page, 'ITP (7,75 %)')).toBe('3100,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (7,75 %)')).toContain('Región de Murcia');
 
     // Con perfil general y ningún reducido al alcance de cualquiera, no hay oportunidad que
     // ofrecer: el aviso «Podrías pagar menos» NO debe salir.
@@ -1318,7 +1337,7 @@ test.describe('RE-INSPECCIÓN 30/08/2026 — casos nuevos y cierre de la tanda 2
     // Total = 3.100 + 451,570194075 + 105,95096017 + 300 = 3.957,521154245
     //   % sobre el precio = 3.957,521154245 / 40.000 = 9,893803 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3957,52 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,89%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,89 %');
 
     // Coste total = 40.000 + 3.957,521154245 = 43.957,521154245
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('43.957,52 €');
@@ -1366,25 +1385,29 @@ test.describe('RE-INSPECCIÓN 30/08/2026 — casos nuevos y cierre de la tanda 2
     // del art. 57 bis.1 TRLITPAJD: 30.000 × 0,5 % = 150 → × 0,5 = 75,00.
     // El rótulo tiene que dar el tipo EFECTIVO (75 / 30.000 = 0,25 %), no el 0,5 % nominal
     // de la tabla, que era el hallazgo 484 de la tanda 2.
-    expect(await valorTarjeta(page, 'AJD (0,25%)')).toBe('75,00 €');
+    expect(await valorTarjeta(page, 'AJD (0,25 %)')).toBe('75,00 €');
 
-    // Notaría 30.000 € — 90,15 + (30.000 − 6.010,12) × 0,45 % = 198,10446 sin IVA
-    //   × 1,21 = 239,7063966 · ×1,5 = 359,5595949 · ×2 = 479,4127932 · medio = 419,48619405
-    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('419,49 €');
-    // Registro — 24,04 + 23.989,88 × 0,175 % = 66,02229 · + 6,010121 + 3,005061 = 75,037472
-    //   × 1,21 = 90,79534112
-    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('90,80 €');
+    // ⚠️ 26/09/2026 (hallazgo 2214, motor 242fffcd): en Canarias, Ceuta y Melilla la notaría y el
+    // registro van SIN el 21 % de IVA, que allí no existe (llevan IGIC o IPSI, que la app no
+    // calcula), y el coste total pasa a PARCIAL también en segunda mano.
+    // Notaría 30.000 € — 90,15 + (30.000 − 6.010,12) × 0,45 % = 198,10446, SIN IVA
+    //   · ×1,5 = 297,15669 · ×2 = 396,20892 · medio ×1,75 = 346,682805 (con IVA eran 419,49)
+    expect(await tituloTarjeta24(page, /^Gastos de notaría/)).toBe('Gastos de notaría (sin IPSI)');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('346,68 €');
+    // Registro — 24,04 + 23.989,88 × 0,175 % = 66,02229 · + 6,010121 + 3,005061 = 75,037472,
+    //   SIN IVA (eran 90,80)
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('75,04 €');
 
-    // Total = 0 (IPSI, sin cifra) + 75 + 419,48619405 + 90,79534112 + 300 = 885,28153517
-    //   % sobre el precio = 885,28153517 / 30.000 = 2,950938 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('885,29 €');
+    // Total = 0 (IPSI, sin cifra) + 75 + 346,68 + 75,04 + 300 = 796,72
+    //   % sobre el precio = 796,72 / 30.000 = 2,6557 % (antes 885,29 y 2,95 %)
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('796,72 €');
     const desglose = await descripcionTarjeta(page, 'Total gastos adicionales');
-    expect(desglose).toContain('2,95%');
+    expect(desglose).toContain('2,66 %');
     expect(desglose).toContain('SIN el IPSI');
     // Y el total no puede presentarse como completo mientras falte el impuesto indirecto.
     const tituloTotal = await page.locator('h3', { hasText: /COSTE TOTAL/ }).first().innerText();
     expect(tituloTotal).toMatch(/PARCIAL/i);
-    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('30.885,29 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('30.796,72 €');
 
     // La modalidad vinculado/independiente no mueve nada aquí, así que desde el hallazgo 595
     // el selector directamente NO se pinta en los territorios sin IVA: antes se mostraba y su
@@ -1397,14 +1420,16 @@ test.describe('RE-INSPECCIÓN 30/08/2026 — casos nuevos y cierre de la tanda 2
     // `elegirTipoITP` da por cumplidas las dos condiciones del reducido melillense
     // («Inmueble situado en Melilla» y «Bonificación automática 50%»), que son de UBICACIÓN:
     //   30.000 × 3 % = 900,00 — la mitad de los 1.800 € del tipo general del 6 %.
-    expect(await valorTarjeta(page, 'ITP (3,00%)')).toBe('900,00 €');
+    expect(await valorTarjeta(page, 'ITP (3,00 %)')).toBe('900,00 €');
     // El aviso de territorio sin IVA desaparece: en una transmisión por ITP no advierte nada.
     await expect(page.getByText(/no se aplica el IVA/)).toHaveCount(0);
-    // Total = las líneas YA redondeadas (hallazgo 594): 900 + 419,49 + 90,80 + 300 = 1.710,29
-    //   % sobre el precio = 1.710,29 / 30.000 = 5,700967 %
-    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1710,29 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('5,70%');
-    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('31.710,29 €');
+    // Total = las líneas YA redondeadas (hallazgo 594): 900 + 346,68 + 75,04 + 300 = 1.621,72
+    //   % sobre el precio = 1.621,72 / 30.000 = 5,4057 % (antes 1.710,29 con IVA en la notaría
+    //   y el registro), y el coste es PARCIAL: falta el IPSI de esas dos facturas (2214).
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1621,72 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('5,41 %');
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('31.621,72 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('Las facturas de notaría y registro llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra.');
   });
 
   /**
@@ -1437,7 +1462,7 @@ test.describe('RE-INSPECCIÓN 30/08/2026 — casos nuevos y cierre de la tanda 2
     // El neto SOLO lleva la comisión del 3 % que trae por defecto: 15.000 × 3 % = 450
     //   total gastos = 0 (plusvalía sin calcular) + 450 + 0 + 0 (IRPF sin calcular) = 450
     //   neto = 15.000 − 450 = 14.550
-    expect(await valorTarjeta(page, 'Comisión inmobiliaria (3%)')).toBe('450,00 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (3 %)')).toBe('450,00 €');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('450,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('14.550,00 €');
     // …y tiene que decir que es un techo, nombrando las DOS cosas que faltan.
@@ -1482,15 +1507,15 @@ test('526 — el ejemplo de Galicia ya publica el reducido real (3 %), no un 0 %
   await selectPerfil(page).selectOption('joven');
   // Lo que la app SÍ hace bien: cobra el tipo general y ofrece el reducido real como
   // oportunidad, con su cifra correcta.
-  expect(await valorTarjeta(page, 'ITP (8,00%)')).toBe('960,00 €');
-  expect(await texto(page.locator('[class*="avisoReducidos"]').first())).toContain('3,00%');
+  expect(await valorTarjeta(page, 'ITP (8,00 %)')).toBe('960,00 €');
+  expect(await texto(page.locator('[class*="avisoReducidos"]').first())).toContain('3,00 %');
 
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
   const ejemplo = await texto(
     page.getByText(/Un joven de 30 años que compra un trastero en Galicia/),
   );
-  expect(ejemplo).toContain('3%');
-  expect(ejemplo).not.toContain('0%');
+  expect(ejemplo).toContain('3 %');
+  expect(ejemplo).not.toContain('0 %');
 });
 
 test('527 — la nota de cabecera ya no contradice el aviso de IGIC/IPSI en Melilla', async ({
@@ -1558,8 +1583,8 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
     // vivienda— se aplica ni se ofrece: `elegirTipoITP` con `objeto: 'otro'` devuelve el
     // general sin oportunidades.
     // ITP = 22.000 × 7 % = 1.540,00
-    expect(await valorTarjeta(page, 'ITP (7,00%)')).toBe('1540,00 €');
-    expect(await descripcionTarjeta(page, 'ITP (7,00%)')).toContain('País Vasco');
+    expect(await valorTarjeta(page, 'ITP (7,00 %)')).toBe('1540,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (7,00 %)')).toContain('País Vasco');
     await expect(page.locator('[class*="avisoReducidos"]')).toHaveCount(0);
 
     // Notaría — RD 1426/1989 nº 2 (ARANCELES_NOTARIO), dos tramos:
@@ -1588,7 +1613,7 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
     //   a céntimo, como en la versión del 4 %: 880 + 343,26 + 73,86 + 300 = 1.597,12)
     //   % sobre el precio = 2.257,11 / 22.000 = 10,2596 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2257,12 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,26%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,26 %');
 
     // Coste total = 22.000 + 2.257,12 = 24.257,12
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('24.257,12 €');
@@ -1628,8 +1653,8 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
     //                                     TOTAL = 275.000,00
     //   tipo EFECTIVO = 275.000 / 2.500.000 = 11,00 % — y tiene que ser el efectivo el que
     //   rotule la tarjeta: el 8 % nominal de la tabla desmentiría a la cifra de al lado.
-    expect(await valorTarjeta(page, 'ITP (11,00%)')).toBe('275.000,00 €');
-    expect(await descripcionTarjeta(page, 'ITP (11,00%)')).toContain('Islas Baleares');
+    expect(await valorTarjeta(page, 'ITP (11,00 %)')).toBe('275.000,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (11,00 %)')).toContain('Islas Baleares');
 
     // Ningún reducido de Baleares está al alcance: los cuatro llevan `valorMaximo: 270151`,
     // muy por debajo de este precio, así que ni se aplican ni se ofrecen como oportunidad.
@@ -1658,7 +1683,7 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
     // Total = 275.000 + 2.389,886370025 + 841,34743116 + 300 = 278.531,23380119
     //   % sobre el precio = 278.531,2338 / 2.500.000 = 11,141249 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('278.531,24 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,14%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,14 %');
 
     // Coste total = 2.500.000 + 278.531,2338 = 2.778.531,2338
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('2.778.531,24 €');
@@ -1835,8 +1860,8 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
 
     // ITP = 55.000 × 9 % = 4.950. El 9 % es TIPOS_ITP_CCAA_2025 → { ccaa: 'Cantabria', tipo: 9 }.
     // Cantabria no tiene escala progresiva, así que el tipo efectivo coincide con el nominal.
-    expect(await valorTarjeta(page, 'ITP (9,00%)')).toBe('4950,00 €');
-    expect(await descripcionTarjeta(page, 'ITP (9,00%)')).toContain('Cantabria');
+    expect(await valorTarjeta(page, 'ITP (9,00 %)')).toBe('4950,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (9,00 %)')).toContain('Cantabria');
 
     // Notaría — RD 1426/1989, número 2 (ARANCELES_NOTARIO):
     //   tramo 1 (hasta 6.010,12 €)             →                              90,15
@@ -1866,7 +1891,7 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
     // Total = 4.950 + 499,21 + 128,64 + 250 = 5.827,85 (líneas ya redondeadas al céntimo)
     //   % sobre el precio = 5.827,85 / 55.000 = 10,5960909 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('5827,85 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,60%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,60 %');
     // Coste total = 55.000 + 5.827,85 = 60.827,85
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('60.827,85 €');
 
@@ -1874,9 +1899,9 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
     // requisitos: los dos de «familia» (que exigen vivienda habitual) y el de municipios
     // despoblados, que no la exige y por eso también entra en `alAlcanceDeCualquiera`.
     const aviso = await texto(page.locator('p', { hasText: 'Podrías pagar menos' }).first().locator('xpath=..'));
-    expect(aviso).toContain('4,00% — Familia numerosa');
-    expect(aviso).toContain('4,00% — Familia monoparental');
-    expect(aviso).toContain('4,00% — Municipios despoblados');
+    expect(aviso).toContain('4,00 % — Familia numerosa');
+    expect(aviso).toContain('4,00 % — Familia monoparental');
+    expect(aviso).toContain('4,00 % — Municipios despoblados');
     expect(aviso).toContain('Vivienda habitual');
   });
 
@@ -1913,7 +1938,7 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
     // ITP a 400.000 € exactos = 400.000 × 8 % = 32.000. El segundo tramo empieza DESPUÉS:
     // `calcularITPProgresivo` agota el primero (baseTramo = 400.000 − 0) y sale del bucle
     // porque al segundo le queda base 0.
-    expect(await valorTarjeta(page, 'ITP (8,00%)')).toBe('32.000,00 €');
+    expect(await valorTarjeta(page, 'ITP (8,00 %)')).toBe('32.000,00 €');
 
     // Notaría — ARANCELES_NOTARIO hasta el quinto tramo:
     //   90,15 + 24.040,49×0,0045 + 30.050,60×0,0015 + 90.151,82×0,001 + 249.746,97×0,0005
@@ -1933,7 +1958,7 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
     // Total = 32.000 + 970,73 + 308,82 + 300 (gestoría por defecto) = 33.579,55
     //   % sobre el precio = 33.579,55 / 400.000 = 8,3948875 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('33.579,55 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,39%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,39 %');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('433.579,55 €');
 
     // Los cinco reducidos de Aragón son todos de colectivo (joven, discapacidad, víctimas
@@ -1947,7 +1972,7 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
     //   tipo EFECTIVO = 36.250 / 450.000 = 8,0555 % (el nominal, 8 %, mentiría)
     //   y coincide con la cuota acumulada que la tabla del art. 121-1 fija a los 450.000 €.
     await rellenar(page, 'Precio del trastero', '450000');
-    expect(await valorTarjeta(page, 'ITP (8,06%)')).toBe('36.250,00 €');
+    expect(await valorTarjeta(page, 'ITP (8,06 %)')).toBe('36.250,00 €');
     // Notaría: 483,43341 × 1,21 = 584,9544261 → medio ×1,75 = 1.023,669245675
     // Registro: 261,2120635 + 9,015182 = 270,2272455 → ×1,21 = 326,97496706
     // Total = 36.250 + 1.023,67 + 326,97 + 300 = 37.900,64
@@ -2001,7 +2026,7 @@ test.describe('RE-INSPECCIÓN 07/09/2026 — Cantabria, la frontera de la escala
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('22.690,00 €');
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('7490,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1452,90 €');
-    expect(await valorTarjeta(page, 'Comisión inmobiliaria (4%)')).toBe('960,00 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (4 %)')).toBe('960,00 €');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2762,90 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('21.237,10 €');
     // Y el neto se anuncia como techo, nombrando el campo que de verdad falta.
@@ -2163,11 +2188,11 @@ test('REGRESIÓN 640 (dato) — el sello de la plusvalía deriva el rango del ah
   expect(fuente).toContain('formatNumber(TIPO_AHORRO_MAX, 0)');
 
   // …y en pantalla el sello sigue publicando el rango vigente, el mismo que la tarjeta del
-  // IRPF, que ya lo derivaba (19 % a 30 % con los tramos de 2025).
+  // IRPF, que ya lo derivaba (19 % a 30 % con los tramos de 2025). Desde el 26/09/2026 lo
+  // publica el sello PROPIO del IRPF (GANANCIAS_PATRIMONIALES_META), no el de la plusvalía.
   await page.goto(RUTA);
-  await expect(
-    page.getByText('El IRPF de la ganancia usa los tramos del ahorro de 2025 (19 % a 30 %)').first(),
-  ).toBeVisible();
+  await expect(page.getByText('Escala del ahorro: del 19 % al 30 %.').first()).toBeVisible();
+  await expect(page.getByText(/El IRPF de la ganancia usa los tramos/)).toHaveCount(0);
 });
 
 // ✅ REPARADO 09/09/2026 (641, bajo) — dato.
@@ -2213,8 +2238,8 @@ test('REGRESIÓN 641 (dato) — el anejo residencial se calcula y se anuncia con
   await page.getByRole('button', { name: /Primera mano/ }).click();
   await page.getByRole('button', { name: /Vinculado a vivienda/ }).click();
   await rellenar(page, 'Precio del trastero', '12000');
-  expect(await valorTarjeta(page, 'IVA (10,00%)')).toBe('1200,00 €');
-  await expect(page.getByRole('button', { name: /Primera mano/ })).toContainText('Paga IVA 10%');
+  expect(await valorTarjeta(page, 'IVA (10,00 %)')).toBe('1200,00 €');
+  await expect(page.getByRole('button', { name: /Primera mano/ })).toContainText('Paga IVA 10 %');
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -2251,8 +2276,8 @@ test.describe('RE-INSPECCIÓN 10/09/2026 — Comunidad Valenciana, la reventa an
     // familia, discapacidad, VPO) y el séptimo —víctimas de violencia de género, 3 %— exige
     // «Vivienda habitual», y `elegirTipoITP` recibe `viviendaHabitual: false` porque un
     // trastero suelto nunca lo es. Por eso tampoco sale el aviso «Podrías pagar menos».
-    expect(await valorTarjeta(page, 'ITP (9,00%)')).toBe('2160,00 €');
-    expect(await descripcionTarjeta(page, 'ITP (9,00%)')).toContain('Comunidad Valenciana');
+    expect(await valorTarjeta(page, 'ITP (9,00 %)')).toBe('2160,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (9,00 %)')).toContain('Comunidad Valenciana');
     await expect(page.getByText(/Podrías pagar menos/)).toHaveCount(0);
     // Valencia no tiene escala sino UMBRAL: por encima de 1.000.000 € el 11 % grava TODO el
     // valor (art. 13 de la Ley 13/1997 valenciana, `ITP_CCAA.valencia.umbralTipoUnico`). Desde
@@ -2292,7 +2317,7 @@ test.describe('RE-INSPECCIÓN 10/09/2026 — Comunidad Valenciana, la reventa an
     //   % sobre el precio = 2.900,40 / 24.000 = 12,085 %, que el redondeo binario del doble
     //   deja justo por debajo de la mitad y `formatNumber(x, 2)` imprime como 12,08 %.
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2900,40 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('12,08%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('12,08 %');
 
     // Coste total = 24.000 + 2.900,40 = 26.900,40
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('26.900,40 €');
@@ -2346,7 +2371,7 @@ test.describe('RE-INSPECCIÓN 10/09/2026 — Comunidad Valenciana, la reventa an
     //   total gastos = 0 de plusvalía + 540 + 0 de gestoría + 0 de IRPF = 540,00
     //   neto = 18.000 − 540 = 17.460,00 — y se anuncia como TECHO, con los dos conceptos
     //   que faltan y el ÚNICO campo que hay que rellenar (hallazgo 639: no se pide dos veces).
-    expect(await valorTarjeta(page, 'Comisión inmobiliaria (3%)')).toBe('540,00 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (3 %)')).toBe('540,00 €');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('540,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('17.460,00 €');
     const neto22 = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
@@ -2503,8 +2528,8 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escaló
     //   20.000 × 8 % = 1.600,00 · tipo efectivo = 1.600 / 20.000 = 8,00 %
     // El tipo general (8 %) sale de `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
     // leído por `tipoGeneralDe('Castilla y León')`.
-    expect(await valorTarjeta(page, 'ITP (8,00%)')).toBe('1600,00 €');
-    expect(await descripcionTarjeta(page, 'ITP (8,00%)')).toContain('Castilla y León');
+    expect(await valorTarjeta(page, 'ITP (8,00 %)')).toBe('1600,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (8,00 %)')).toContain('Castilla y León');
     expect(await texto(page.locator('p', { hasText: 'escala progresiva (' }).first())).toContain(
       '8 % → 10 %', // `describirSubidaITP` (24/09/2026)
     );
@@ -2538,7 +2563,7 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escaló
     //   1.600,00 + 324,20 + 69,62 + 300,00 = 2.293,82
     //   % sobre el precio = 2.293,82 / 20.000 = 11,4691 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2293,82 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,47%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('11,47 %');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('22.293,82 €');
 
     // Y lo que de verdad vigila este caso: los dos reducidos salen como OPORTUNIDAD y
@@ -2546,9 +2571,9 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escaló
     // 1.600,00 €; con el 4 %, 800,00 €.
     const oportunidades = page.locator('div[class*="avisoReducidos"] li');
     await expect(oportunidades).toHaveCount(2);
-    expect(await texto(oportunidades.nth(0))).toContain('4,00% — Jóvenes < 36 años');
+    expect(await texto(oportunidades.nth(0))).toContain('4,00 % — Jóvenes < 36 años');
     expect(await texto(oportunidades.nth(1))).toContain(
-      '0,01% — Municipios poco poblados (< 36 años)',
+      '0,01 % — Municipios poco poblados (< 36 años)',
     );
     // El de municipios poco poblados enseña además su tope de valor, que sí es comprobable.
     expect(await texto(oportunidades.nth(1))).toContain('Valor máximo 150.000,00 €');
@@ -2588,8 +2613,8 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escaló
     //                      fija a los 500.000 €, y que la escala de DOS tramos daba como
     //                      42.000 € hasta el 11/09/2026.
     //   tipo EFECTIVO = 40.750 / 500.000 = 8,15 % (el nominal, 8 %, mentiría)
-    expect(await valorTarjeta(page, 'ITP (8,15%)')).toBe('40.750,00 €');
-    expect(await descripcionTarjeta(page, 'ITP (8,15%)')).toContain('Aragón');
+    expect(await valorTarjeta(page, 'ITP (8,15 %)')).toBe('40.750,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (8,15 %)')).toContain('Aragón');
 
     // Notaría — ARANCELES_NOTARIO hasta el quinto tramo:
     //   90,15 + 24.040,49×0,0045 + 30.050,60×0,0015 + 90.151,82×0,001 + 349.746,97×0,0005
@@ -2611,7 +2636,7 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escaló
     // Total = 40.750,00 + 1.076,61 + 345,12 + 300,00 = 42.471,73
     //   % sobre el precio = 42.471,73 / 500.000 = 8,494346 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('42.471,73 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,49%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('8,49 %');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('542.471,73 €');
 
     // Las cinco bonificaciones de Aragón exigen vivienda habitual (las tres del art. 121-4
@@ -2677,7 +2702,7 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escaló
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('19.400,00 €');
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('5400,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1026,00 €');
-    expect(await valorTarjeta(page, 'Comisión inmobiliaria (3%)')).toBe('600,00 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (3 %)')).toBe('600,00 €');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1626,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('18.374,00 €');
 
@@ -2795,7 +2820,8 @@ test('REPARADO 11/09 (dato) — la página dice el 25 % orientativo que aplica, 
 
   // Y los dos FAQPage de metadata.ts, que es lo que citan los asistentes de IA.
   const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
-  expect(jsonLd).toMatch(/25% como referencia orientativa/);
+  // Con el espacio DURO del 26/09/2026 (hallazgo 2194): `\s` lo admite.
+  expect(jsonLd).toMatch(/25\s% como referencia orientativa/);
 });
 
 // ✅ REPARADO 11/09/2026 (medio) — accesibilidad. EFECTO FAMILIA del hallazgo 683.
@@ -2887,7 +2913,7 @@ test('REPARADO 11/09 (dato) — el reducido de Castilla y León se ofrece con su
   // `valorMaximo` de 150.000 €: queda una sola oportunidad, la del 4 % (esto pasa).
   const oportunidades = page.locator('div[class*="avisoReducidos"] li');
   await expect(oportunidades).toHaveCount(1);
-  expect(await texto(oportunidades.first())).toContain('4,00% — Jóvenes < 36 años');
+  expect(await texto(oportunidades.first())).toContain('4,00 % — Jóvenes < 36 años');
 
   // Y esa, a 200.000 €, o no debería ofrecerse o debería llevar su tope escrito.
   expect(await texto(oportunidades.first())).toContain('150.000');
@@ -2962,8 +2988,8 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — La Rioja, el quinto tramo de Aragó
     // (leído por `tipoGeneralDe('La Rioja')`). Su ficha de `ITP_CCAA` no declara
     // `tramosProgresivos`, así que `calcularITP` aplica el tipo plano:
     //   16.500 × 7 % = 1.155,00 · tipo efectivo = 1.155 / 16.500 = 7,00 %
-    expect(await valorTarjeta(page, 'ITP (7,00%)')).toBe('1155,00 €');
-    expect(await descripcionTarjeta(page, 'ITP (7,00%)')).toContain('La Rioja');
+    expect(await valorTarjeta(page, 'ITP (7,00 %)')).toBe('1155,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (7,00 %)')).toContain('La Rioja');
 
     // Y por eso mismo NO puede haber aviso de escala progresiva (el CASO 27 es el simétrico).
     await expect(page.locator('p', { hasText: 'escala progresiva (' })).toHaveCount(0);
@@ -2997,7 +3023,7 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — La Rioja, el quinto tramo de Aragó
     //   1.155,00 + 290,85 + 62,21 + 300,00 = 1.808,06
     //   % sobre el precio = 1.808,06 / 16.500 = 10,95793939 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1808,06 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,96%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('10,96 %');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('18.308,06 €');
 
     // El 5 % de familia numerosa sale como oportunidad y NO se ha cobrado: con él aplicado,
@@ -3006,7 +3032,7 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — La Rioja, el quinto tramo de Aragó
     // jóvenes o de VPO, y `elegirTipoITP` solo propone los que casan con el perfil.
     const oportunidades26 = page.locator('div[class*="avisoReducidos"] li');
     await expect(oportunidades26).toHaveCount(1);
-    expect(await texto(oportunidades26.first())).toContain('5,00% — Familia numerosa');
+    expect(await texto(oportunidades26.first())).toContain('5,00 % — Familia numerosa');
     expect(await texto(oportunidades26.first())).toContain('Vivienda habitual');
   });
 
@@ -3046,8 +3072,8 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — La Rioja, el quinto tramo de Aragó
     //   250.000 × 10 %  = 25.000          (750.000 → 1.000.000)
     //                   = 89.500,00 €
     //   tipo EFECTIVO = 89.500 / 1.000.000 = 8,95 % (el nominal, 8 %, mentiría)
-    expect(await valorTarjeta(page, 'ITP (8,95%)')).toBe('89.500,00 €');
-    expect(await descripcionTarjeta(page, 'ITP (8,95%)')).toContain('Aragón');
+    expect(await valorTarjeta(page, 'ITP (8,95 %)')).toBe('89.500,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (8,95 %)')).toContain('Aragón');
 
     // Notaría — `ARANCELES_NOTARIO` hasta el SEXTO tramo, que ningún caso había alcanzado:
     //   90,15 + 24.040,49×0,0045 + 30.050,60×0,0015 + 90.151,82×0,001
@@ -3071,7 +3097,7 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — La Rioja, el quinto tramo de Aragó
     // Total = 89.500,00 + 1.437,01 + 478,35 + 300,00 = 91.715,36
     //   % sobre el precio = 91.715,36 / 1.000.000 = 9,171536 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('91.715,36 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,17%');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('9,17 %');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.091.715,36 €');
 
     // Las cinco bonificaciones de Aragón topan el inmueble en 100.000 € (las tres del art.
@@ -3290,7 +3316,7 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — Extremadura, la ganancia cero y el 
     // 600.000 · 11 % el resto), aplicada por `calcularITPProgresivo`. 45.000 cabe entero en
     // el primer tramo: 45.000 × 8 % = 3.600,00. Tipo EFECTIVO = 3.600 / 45.000 = 8,00 %.
     expect(await valorTarjeta(page, /^ITP/)).toBe('3600,00 €');
-    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,00%)');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,00 %)');
 
     // El aviso de escala tiene que pintarse, con los tres tipos de la ficha.
     await expect(page.getByText(/Esta comunidad aplica escala progresiva/)).toContainText(
@@ -3318,7 +3344,7 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — Extremadura, la ganancia cero y el 
     //   porcentaje = 4.480,96 / 45.000 = 9,9577 % → 9,96 %
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('4480,96 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
-      '9,96% sobre el precio',
+      '9,96 % sobre el precio',
     );
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('49.480,96 €');
 
@@ -3326,7 +3352,7 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — Extremadura, la ganancia cero y el 
     // oportunidad, con sus condiciones a la vista.
     const avisoReducidos = page.locator('[role="note"]', { hasText: /Podrías pagar menos/ });
     await expect(avisoReducidos).toHaveCount(1);
-    await expect(avisoReducidos).toContainText('6,40% — Discapacidad (bonif. 20%)');
+    await expect(avisoReducidos).toContainText('6,40 % — Discapacidad (bonif. 20 %)');
     await expect(avisoReducidos).toContainText('Vivienda habitual');
   });
 
@@ -3607,7 +3633,7 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — Asturias, la reventa dentro del añ
     await sembrar(page, 'Precio del trastero', '28000');
 
     expect(await valorTarjeta(page, /^ITP/)).toBe('2240,00 €');
-    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,00%)');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,00 %)');
     await expect(page.getByText(/Esta comunidad aplica escala progresiva/)).toContainText(
       '(8 % → 9 % → 10 %)', // `describirSubidaITP` (24/09/2026)
     );
@@ -3623,7 +3649,7 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — Asturias, la reventa dentro del añ
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3026,99 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
-      '10,81% sobre el precio',
+      '10,81 % sobre el precio',
     );
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('31.026,99 €');
 
@@ -3908,13 +3934,13 @@ test.describe('RE-INSPECCIÓN 22/09/2026 — Navarra, la raya del arancel y la g
     await selectCcaa(page).selectOption('navarra');
     await sembrar(page, 'Precio del trastero', '26000');
 
-    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (6,00%)');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (6,00 %)');
     expect(await valorTarjeta(page, /^ITP/)).toBe('1560,00 €');
     expect(await descripcionTarjeta(page, /^ITP/)).toBe('ITP Comunidad Foral de Navarra');
 
     // Régimen foral: 6 % de ITP y 0,5 % de AJD, el más bajo de la tabla tras el 0 % vasco.
-    await expect(page.getByText('ITP General').locator('xpath=..')).toContainText('6%');
-    await expect(page.getByText('AJD', { exact: true }).locator('xpath=..')).toContainText('0,5%');
+    await expect(page.getByText('ITP General').locator('xpath=..')).toContainText('6 %');
+    await expect(page.getByText('AJD', { exact: true }).locator('xpath=..')).toContainText('0,5 %');
     // Navarra NO tiene escala progresiva: el aviso que la anuncia no puede aparecer.
     await expect(page.getByText(/Esta comunidad aplica escala progresiva/)).toHaveCount(0);
     // Segunda mano: no hay AJD.
@@ -3928,7 +3954,7 @@ test.describe('RE-INSPECCIÓN 22/09/2026 — Navarra, la raya del arancel y la g
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2323,70 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
-      '8,94% sobre el precio',
+      '8,94 % sobre el precio',
     );
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('28.323,70 €');
 
@@ -3970,7 +3996,7 @@ test.describe('RE-INSPECCIÓN 22/09/2026 — Navarra, la raya del arancel y la g
     await selectCcaa(page).selectOption('baleares');
     await sembrar(page, 'Precio del trastero', '6010,12');
 
-    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,00%)');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,00 %)');
     expect(await valorTarjeta(page, /^ITP/)).toBe('480,81 €');
     await expect(page.getByText(/Esta comunidad aplica escala progresiva/)).toContainText(
       '(8 % → 9 % → 10 % → 12 % → 13 %)', // `describirSubidaITP` (24/09/2026)
@@ -3984,7 +4010,7 @@ test.describe('RE-INSPECCIÓN 22/09/2026 — Navarra, la raya del arancel y la g
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('40,00 €');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1011,70 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
-      '16,83% sobre el precio',
+      '16,83 % sobre el precio',
     );
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('7021,82 €');
 
@@ -4214,7 +4240,7 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Andalucía, Castilla-La Mancha y el
     await sembrar(page, 'Precio del trastero', '21500');
 
     expect(await valorTarjeta(page, /^ITP \(/)).toBe('1505,00 €');
-    await expect(page.locator('h3', { hasText: /^ITP \(/ })).toHaveText('ITP (7,00%)');
+    await expect(page.locator('h3', { hasText: /^ITP \(/ })).toHaveText('ITP (7,00 %)');
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('338,49 €');
     expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
       'entre 290,14 € y 386,85 €',
@@ -4222,14 +4248,14 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Andalucía, Castilla-La Mancha y el
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('72,80 €');
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2216,29 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('10,31% sobre el precio');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('10,31 % sobre el precio');
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('23.716,29 €');
     expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio del trastero + todos los gastos');
 
     // El 3,5 % de familia numerosa se ENSEÑA con su requisito de vivienda habitual, pero no
     // se cobra: 21.500 × 3,5 % serían 752,50 €, y la tarjeta dice 1.505,00 €.
     const reducidos = (await avisoReducidos(page).innerText()).replace(ESPACIO_DURO, ' ');
-    expect(reducidos).toContain('3,50% — Familia numerosa');
+    expect(reducidos).toContain('3,50 % — Familia numerosa');
     expect(reducidos).toContain('Vivienda habitual');
 
     await page.getByRole('button', { name: /Vendedor/ }).click();
@@ -4247,7 +4273,7 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Andalucía, Castilla-La Mancha y el
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('20.090,00 €');
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('6990,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1347,90 €');
-    expect(await valorTarjeta(page, 'Comisión inmobiliaria (4%)')).toBe('860,00 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria (4 %)')).toBe('860,00 €');
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('250,00 €');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2757,90 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('18.742,10 €');
@@ -4292,14 +4318,14 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Andalucía, Castilla-La Mancha y el
     await sembrar(page, 'Precio del trastero', '360000');
 
     expect(await valorTarjeta(page, /^ITP \(/)).toBe('32.400,00 €');
-    await expect(page.locator('h3', { hasText: /^ITP \(/ })).toHaveText('ITP (9,00%)');
+    await expect(page.locator('h3', { hasText: /^ITP \(/ })).toHaveText('ITP (9,00 %)');
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('928,38 €');
     expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
       'entre 795,76 € y 1061,01 €',
     );
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('294,30 €');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('33.922,68 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('9,42% sobre el precio');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('9,42 % sobre el precio');
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('393.922,68 €');
     expect(await avisoReducidos(page).innerText()).not.toContain('Vivienda habitual (primera compra)');
 
@@ -4713,7 +4739,9 @@ test('la ayuda del precio depende del régimen: en IVA, el precio pactado (famil
 
 /** Título de una ResultCard (donde la redacción común escribe el «(PARCIAL)»). */
 async function tituloTarjeta24(page: Page, titulo: RegExp): Promise<string> {
-  return (await page.locator('h3').filter({ hasText: titulo }).first().innerText()).trim();
+  // El espacio duro del «%» (regla del 25/09/2026, hallazgo 2194) se normaliza, como en los
+  // demás lectores de este fichero.
+  return (await page.locator('h3').filter({ hasText: titulo }).first().innerText()).replace(ESPACIO_DURO, ' ').trim();
 }
 
 /** «1.234,56 €» → 1234.56; NaN si la tarjeta no publica un importe («SIN CALCULAR»…). */
@@ -4759,18 +4787,19 @@ test.describe('Inspección 24/09/2026 — la escala de Castilla y León, la moda
     await page.locator('#select-perfil').selectOption('familia-numerosa');
     await sembrar(page, 'Precio del trastero', '260000');
 
-    expect(await tituloTarjeta24(page, /^ITP \(/)).toBe('ITP (8,08%)');
+    expect(await tituloTarjeta24(page, /^ITP \(/)).toBe('ITP (8,08 %)');
     expect(await valorTarjeta(page, /^ITP \(/)).toBe('21.000,00 €');
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('822,51 €');
     expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('entre 705,01 € y 940,01 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('258,00 €');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('22.380,51 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('8,61% sobre el precio');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('8,61 % sobre el precio');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('282.380,51 €');
     // La frase del motor (`describirSubidaITP`, 24/09/2026), con el espacio antes del %.
-    await expect(page.getByText(/escala progresiva \(8 % → 10 %\)/)).toBeVisible();
+    // Desde 242fffcd el motor separa el % con espacio DURO: `\s` lo admite.
+    await expect(page.getByText(/escala progresiva \(8\s% → 10\s%\)/)).toBeVisible();
     const oportunidad = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
-    await expect(oportunidad).toContainText('4,00% — Familia numerosa');
+    await expect(oportunidad).toContainText('4,00 % — Familia numerosa');
     await expect(oportunidad).toContainText('Vivienda habitual');
   });
 
@@ -4794,7 +4823,7 @@ test.describe('Inspección 24/09/2026 — la escala de Castilla y León, la moda
     await sembrar(page, 'Precio del trastero', '9500');
     await page.getByRole('button', { name: /Primera mano/ }).click();
 
-    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (10,00%)');
+    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (10,00 %)');
     expect(await valorTarjeta(page, /^IVA \(/)).toBe('950,00 €');
     expect(await valorTarjeta(page, /^AJD \(/)).toBe('142,50 €');
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('224,15 €');
@@ -4802,19 +4831,25 @@ test.describe('Inspección 24/09/2026 — la escala de Castilla y León, la moda
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('11.164,04 €');
 
     await page.getByRole('button', { name: /Independiente/ }).click();
-    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (21,00%)');
+    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (21,00 %)');
     expect(await valorTarjeta(page, /^IVA \(/)).toBe('1995,00 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('28,52% sobre el precio');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('28,52 % sobre el precio');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('12.209,04 €');
-    await expect(page.getByRole('button', { name: /Primera mano/ })).toContainText('Paga IVA 21%');
+    await expect(page.getByRole('button', { name: /Primera mano/ })).toContainText('Paga IVA 21 %');
 
     await page.locator('#select-ccaa').selectOption('canarias');
     await expect(page.locator('#rotulo-modalidad')).toHaveCount(0);
     expect(await valorTarjeta(page, 'IGIC')).toBe('No calculado');
     expect(await valorTarjeta(page, /^AJD \(/)).toBe('71,25 €');
-    expect(await valorTarjeta(page, 'Total gastos adicionales (parcial)')).toBe('642,79 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('10.142,79 €');
-    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('No incluye el IGIC: el coste real puede ser mayor');
+    // ⚠️ 26/09/2026 (hallazgo 2214): sin IVA en la notaría y el registro. Arancel notarial
+    // 90,15 + 3.489,88 × 0,45 % = 105,85446 × 1,75 = 185,245305 · registro 24,04 + 3.489,88 ×
+    // 0,175 % + 9,015182 = 39,162472 → total 71,25 + 185,25 + 39,16 + 300 = 595,66 · coste
+    // 10.095,66 (antes, con IVA, 642,79 y 10.142,79).
+    expect(await valorTarjeta(page, 'Total gastos adicionales (parcial)')).toBe('595,66 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('10.095,66 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe(
+      'No incluye el IGIC: el coste real puede ser mayor. Las facturas de notaría y registro llevan además IGIC, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
+    );
 
     await page.locator('#select-ccaa').selectOption('galicia');
     await expect(page.getByRole('button', { name: /Independiente/ })).toHaveAttribute('aria-pressed', 'true');
@@ -4824,7 +4859,7 @@ test.describe('Inspección 24/09/2026 — la escala de Castilla y León, la moda
     await page.getByRole('button', { name: /Segunda mano/ }).click();
     await expect(page.locator('#rotulo-modalidad')).toHaveCount(0);
     await expect(page.getByText(/el trastero independiente tributa al/)).toHaveCount(0);
-    expect(await tituloTarjeta24(page, /^ITP \(/)).toBe('ITP (8,00%)');
+    expect(await tituloTarjeta24(page, /^ITP \(/)).toBe('ITP (8,00 %)');
     expect(await valorTarjeta(page, /^ITP \(/)).toBe('760,00 €');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('10.831,54 €');
   });
@@ -4845,18 +4880,24 @@ test.describe('Inspección 24/09/2026 — la escala de Castilla y León, la moda
     await page.getByRole('button', { name: /Primera mano/ }).click();
 
     expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
-    expect(await tituloTarjeta24(page, /^AJD \(/)).toBe('AJD (0,25%)');
+    expect(await tituloTarjeta24(page, /^AJD \(/)).toBe('AJD (0,25 %)');
     expect(await valorTarjeta(page, /^AJD \(/)).toBe('23,75 €');
-    expect(await valorTarjeta(page, 'Total gastos adicionales (parcial)')).toBe('595,29 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('10.095,29 €');
-    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('No incluye el IPSI: el coste real puede ser mayor');
+    // ⚠️ 26/09/2026 (hallazgo 2214): notaría 185,25 y registro 39,16 SIN IVA (CASO 39) →
+    // total 23,75 + 185,25 + 39,16 + 300 = 548,16 · coste 10.048,16; con la gestoría ilegible
+    // 248,16 y 9748,16 (antes, con IVA, 595,29 / 10.095,29 y 295,29 / 9795,29). El aviso del
+    // IPSI de la operación no cambia («puede ser» / «será»); el de las facturas va aparte.
+    expect(await valorTarjeta(page, 'Total gastos adicionales (parcial)')).toBe('548,16 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('10.048,16 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe(
+      'No incluye el IPSI: el coste real puede ser mayor. Las facturas de notaría y registro llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
+    );
 
     await sembrar(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
-    expect(await valorTarjeta(page, 'Total gastos adicionales (parcial)')).toBe('295,29 €');
-    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('9795,29 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales (parcial)')).toBe('248,16 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe('9748,16 €');
     expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe(
-      'No incluye el IPSI ni la gestoría, que no se ha podido leer: el coste real será mayor',
+      'No incluye el IPSI ni la gestoría, que no se ha podido leer: el coste real será mayor. Las facturas de notaría y registro llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
     );
   });
 
@@ -4879,7 +4920,7 @@ test.describe('Inspección 24/09/2026 — la escala de Castilla y León, la moda
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('20.330,00 €');
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('1030,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('195,70 €');
-    expect(await tituloTarjeta24(page, /Comisión inmobiliaria/)).toBe('Comisión inmobiliaria (2%)');
+    expect(await tituloTarjeta24(page, /Comisión inmobiliaria/)).toBe('Comisión inmobiliaria (2 %)');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('865,70 €');
     expect(await tituloTarjeta24(page, /IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('20.134,30 €');
@@ -5252,15 +5293,15 @@ test.describe('RE-INSPECCIÓN 26/09/2026 — Valencia en obra nueva, la raya del
     await page.getByRole('button', { name: /Primera mano/ }).click();
     await page.getByRole('button', { name: /Independiente/ }).click();
 
-    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (21,00%)');
+    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (21,00 %)');
     expect(await valorTarjeta(page, /^IVA \(/)).toBe('6300,00 €');
-    expect(await tituloTarjeta24(page, /^AJD \(/)).toBe('AJD (1,40%)');
+    expect(await tituloTarjeta24(page, /^AJD \(/)).toBe('AJD (1,40 %)');
     expect(await valorTarjeta(page, /^AJD \(/)).toBe('420,00 €');
     expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('419,49 €');
     expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('entre 359,56 € y 479,41 €');
     expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('90,80 €');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7530,29 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('25,10% sobre el precio');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('25,10 % sobre el precio');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('37.530,29 €');
 
     await page.getByRole('button', { name: /Vinculado a vivienda/ }).click();
@@ -5270,10 +5311,10 @@ test.describe('RE-INSPECCIÓN 26/09/2026 — Valencia en obra nueva, la raya del
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('34.230,29 €');
 
     await page.getByRole('button', { name: /Segunda mano/ }).click();
-    expect(await tituloTarjeta24(page, /^ITP \(/)).toBe('ITP (9,00%)');
+    expect(await tituloTarjeta24(page, /^ITP \(/)).toBe('ITP (9,00 %)');
     expect(await valorTarjeta(page, /^ITP \(/)).toBe('2700,00 €');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3510,29 €');
-    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('11,70% sobre el precio');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('11,70 % sobre el precio');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('33.510,29 €');
     await expect(page.locator('h3').filter({ hasText: /^AJD/ })).toHaveCount(0);
   });
@@ -5447,11 +5488,11 @@ test.describe('RE-INSPECCIÓN 26/09/2026 — Valencia en obra nueva, la raya del
   });
 });
 
-// ── HALLAZGOS ABIERTOS 26/09/2026 ────────────────────────────────────────────────
-// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
-// La aserción de FONDO va primero: dentro de un `test.fail()` basta con que falle cualquiera.
+// ── HALLAZGOS 26/09/2026 (2193-2197) — REPARADOS el mismo día ────────────────────
+// Estaban marcados con `test.fail()`; al repararlos se les quitó la marca y quedan como
+// regresión, con las aserciones añadidas al lado de cada una (resueltas a mano).
 
-test.describe('HALLAZGOS 26/09/2026 — abiertos', () => {
+test.describe('HALLAZGOS 26/09/2026 — reparados (2193-2197)', () => {
   /**
    * HALLAZGO (contenido, bajo) — EFECTO FAMILIA del 1799 (238aff76, solo en la referencia):
    * un precio de compra «0» está ESCRITO y se lee; no «falta». La referencia dice «El precio
@@ -5461,11 +5502,47 @@ test.describe('HALLAZGOS 26/09/2026 — abiertos', () => {
    * Caso: CASO 42 con compra «0» → esperado «tiene que ser mayor que 0» / «Corrige…» ·
    * obtenido «Falta el precio de compra original…» / «Rellena el precio de compra original…».
    */
-  test('ABIERTO — un precio de compra 0 se pide corregir, no «falta»', async ({ page }) => {
-    test.fail();
+  test('REPARADO 26/09 — un precio de compra 0 se pide corregir, no «falta»', async ({ page }) => {
     await vendedor26(page, { venta: '40000', compra: '0', gastos: '2000', anios: '12', suelo: '10000', total: '25000', comision: '3', gestoria: '400' });
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain('tiene que ser mayor que 0');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toContain('Rellena el precio de compra original');
+    // Reparado con los textos de la referencia (hallazgo 1799). Sin precio de compra válido no
+    // hay plusvalía ni IRPF: comisión 40.000 × 3 % = 1.200 · gestoría 400 · total 1.600,00 · neto
+    // 38.400,00 (PARCIAL).
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'No calculada (el precio de compra original tiene que ser mayor que 0)',
+    );
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
+      'El precio de compra original tiene que ser mayor que 0: corrígelo. Este impuesto NO está incluido en el neto de abajo.',
+    );
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('38.400,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'No descuenta la plusvalía municipal ni el IRPF de la ganancia: el neto real puede ser menor que este. Corrige el precio de compra original (tiene que ser mayor que 0) para obtenerlo.',
+    );
+  });
+
+  /**
+   * La forma del hallazgo 2191 de garaje, que aquí también estaba (patrón 5): una comisión
+   * que el propio campo declara imposible (> 100 %) no se liquida ni da un neto definitivo.
+   * CASO 42 con comisión 150: plusvalía objetivo 10.000 × 0,09 (12 años, COEFICIENTES_IIVTNU_2025)
+   * × 25 % = 225,00 · real 10.000 × 10.000/25.000 × 25 % = 1.000,00 → 225,00 · sin comisión ni
+   * IRPF: total 225 + 400 = 625,00 · neto 40.000 − 625 = 39.375,00 (PARCIAL). Antes: comisión 60.000 €,
+   * pérdida patrimonial y «Vendes por debajo del valor de adquisición» (40.000 > 32.000).
+   */
+  test('una comisión de más del 100 % no se liquida ni da un neto definitivo', async ({ page }) => {
+    await vendedor26(page, { venta: '40000', compra: '30000', gastos: '2000', anios: '12', suelo: '10000', total: '25000', comision: '150', gestoria: '400' });
+    await expect(page.getByText('La comisión no puede superar el 100')).toBeVisible();
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('225,00 €');
+    expect(await valorTarjeta(page, 'Comisión inmobiliaria')).toBe('Sin aplicar');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
+    await expect(page.locator('h3').filter({ hasText: /^Pérdida patrimonial/ })).toHaveCount(0);
+    await expect(page.getByText('Vendes por debajo del valor de adquisición')).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('625,00 €');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('39.375,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'No descuenta la comisión inmobiliaria ni el IRPF de la ganancia: el neto real puede ser menor que este. Corrige la comisión (no puede superar el 100 % del precio de venta) para obtenerlo.',
+    );
   });
 
   /**
@@ -5477,12 +5554,16 @@ test.describe('HALLAZGOS 26/09/2026 — abiertos', () => {
    * FAQ) y 14 del JSON-LD. Otros 4 van con espacio normal (U+0020) en vez de duro.
    * Caso: CASO 42 → esperado «Comisión inmobiliaria (3 %)» con U+00A0 · obtenido «(3%)».
    */
-  test('ABIERTO — el título de la comisión separa el % con espacio duro', async ({ page }) => {
-    test.fail();
+  test('REPARADO 26/09 — el título de la comisión separa el % con espacio duro', async ({ page }) => {
     await vendedor26(page, { venta: '40000', compra: '30000', gastos: '2000', anios: '12', suelo: '10000', total: '25000', comision: '3', gestoria: '400' });
     const tituloCrudo = (await page.locator('h3').filter({ hasText: /Comisión inmobiliaria/ }).first().innerText()).trim();
     expect(tituloCrudo).toBe('Comisión inmobiliaria (3 %)');
-    expect((await page.locator('body').innerText()).match(/\d%/g) ?? []).toHaveLength(0);
+    // Todo el texto de la APP. Se descuenta el bloque de apps relacionadas: su «IVA 21% y gastos
+    // de compra» viene de data/app-relations.ts (l. 667, 682 y 698, la tarjeta de la nave
+    // industrial), fuera del ámbito de esta app; queda anotado para repararlo allí.
+    const cuerpo = await page.locator('body').innerText();
+    const relacionadas = await page.locator('section[aria-label="Aplicaciones relacionadas"]').innerText();
+    expect(cuerpo.replace(relacionadas, '').match(/\d%/g) ?? []).toHaveLength(0);
   });
 
   /**
@@ -5492,8 +5573,7 @@ test.describe('HALLAZGOS 26/09/2026 — abiertos', () => {
    * da 4,11:1 en los dos temas. La referencia usa `--primary-boton` (#26718F, 5,47:1).
    * Caso: pestaña «Comprador» activa, tema claro → esperado ≥ 4,5:1 · obtenido 4,11:1.
    */
-  test('ABIERTO — la pestaña activa llega a 4,5:1', async ({ page }) => {
-    test.fail();
+  test('REPARADO 26/09 — la pestaña activa llega a 4,5:1', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     expect(await contraste26(page, 'button[aria-pressed="true"][class*="tab"]')).toBeGreaterThanOrEqual(4.5);
@@ -5508,8 +5588,7 @@ test.describe('HALLAZGOS 26/09/2026 — abiertos', () => {
    * `.casoTag` en la misma tarjeta y el teal de la línea de abajo se quedó.
    * Caso: guía abierta, tema claro → esperado ≥ 4,5:1 · obtenido 2,80:1.
    */
-  test('ABIERTO — el resultado de los casos de uso llega a 4,5:1 en tema claro', async ({ page }) => {
-    test.fail();
+  test('REPARADO 26/09 — el resultado de los casos de uso llega a 4,5:1 en tema claro', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -5526,12 +5605,13 @@ test.describe('HALLAZGOS 26/09/2026 — abiertos', () => {
    * Caso: guía abierta → esperado que el ejemplo diga que la cifra es un máximo o que falta
    * restar la plusvalía · obtenido «la ganancia queda en 6550,00 € y el IRPF en 1255,50 €».
    */
-  test('ABIERTO — el ejemplo de la venta no da por cerrada una ganancia sin la plusvalía', async ({ page }) => {
-    test.fail();
+  test('REPARADO 26/09 — el ejemplo de la venta no da por cerrada una ganancia sin la plusvalía', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const ejemplo = await texto(page.getByText(/El vendedor debe calcular la plusvalía municipal/));
     expect(ejemplo).toMatch(/como máximo|sin (?:contar|restar) la plusvalía|antes de (?:restar )?la plusvalía/i);
+    // Y la línea de resultado del caso dice lo mismo que la calculadora: «(máximo)».
+    expect(await texto(page.getByText(/Como máximo: ganancia de/))).toContain('antes de restar la plusvalía');
   });
 });
