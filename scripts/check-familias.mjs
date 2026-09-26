@@ -112,14 +112,24 @@ function etiquetasDe(elemento) {
   return literales.length > 0 ? literales : null;
 }
 
-/** Los bloques `slug: '…'` de la tabla del testigo, con las etiquetas de sus filas. */
+/**
+ * Los bloques `slug: '…'` de la tabla del testigo, con las etiquetas de sus filas.
+ *
+ * Un mismo slug puede abrir VARIOS bloques: el testigo de compraventa añadió el 25/09/2026
+ * (238aff76) una segunda tabla, CASOS_COMISION, con `slug: '…',` a principio de línea. Con
+ * `set` a secas el bloque nuevo pisaba al de la tabla principal y cuatro hermanas se
+ * quedaban con una sola fila: 36 «no tiene fila en el testigo» falsos y el build roto. Las
+ * etiquetas de todos los bloques de un slug se UNEN.
+ */
 function bloquesDelTestigo(src) {
   const marcas = [...src.matchAll(/^\s*slug: '([a-z0-9-]+)',/gm)];
   const bloques = new Map();
   marcas.forEach((m, i) => {
     const fin = i + 1 < marcas.length ? marcas[i + 1].index : src.length;
     const cuerpo = src.slice(m.index, fin);
-    bloques.set(m[1], new Set([...cuerpo.matchAll(/etiqueta: '([^']+)'/g)].map((x) => x[1])));
+    const etiquetas = bloques.get(m[1]) ?? new Set();
+    for (const x of cuerpo.matchAll(/etiqueta: '([^']+)'/g)) etiquetas.add(x[1]);
+    bloques.set(m[1], etiquetas);
   });
   return bloques;
 }

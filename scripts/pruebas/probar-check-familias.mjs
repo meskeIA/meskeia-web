@@ -88,16 +88,15 @@ const casos = [
       // Con autocrlf, el fichero puede estar en CRLF o en LF según quién lo tocó el último.
       const crlf = original.includes('\r\n');
       try {
-        let A1 = unaVez(
+        // Desde el 24/09/2026 (8bdf3446) la dirección no se escribe a mano: la calcula el
+        // sondeo de lib/sondeoIlegibles.ts. El caso de origen —el aviso que apunta al lado
+        // contrario— se reinyecta sondeando los gastos de adquisición con el signo cambiado,
+        // que invierte la dirección publicada. (Cruzar las dos sondas no basta: siguen siendo
+        // positivas y solo cambia «es» por «puede ser».)
+        const A1 = unaVez(
           original.replace(/\r\n/g, '\n'),
-          "        resultadosVendedor.gestoriaLegible ? null : 'la gestoría de la venta',\n",
-          "        resultadosVendedor.gestoriaLegible ? null : 'la gestoría de la venta',\n" +
-            "        resultadosVendedor.gastosAdquisicionLegible ? null : 'los impuestos y gastos de aquella compra',\n",
-        );
-        A1 = unaVez(
-          A1,
-          'resultadosVendedor.gastosAdquisicionLegible || !(resultadosVendedor.irpfGanancia > 0)',
-          'true',
+          '        pequeno: { ...entrada, gastosAdquisicion: 1 },\n        grande: { ...entrada, gastosAdquisicion: precioV * 10 },\n',
+          '        pequeno: { ...entrada, gastosAdquisicion: -1 },\n        grande: { ...entrada, gastosAdquisicion: -precioV * 10 },\n',
         );
         fs.writeFileSync(LOCAL, crlf ? A1.replace(/\n/g, '\r\n') : A1, 'utf8');
         return correr(['--grep', 'local-comercial']);
@@ -134,10 +133,16 @@ const casos = [
     correr: () => {
       // Quita la fila de las amortizaciones: el objeto entero, de su `{` a su `},`.
       const t = testigoDesechable('sin-amortizaciones', (src) => {
-        const i = src.indexOf("etiqueta: 'Amortizaciones acumuladas deducidas (€)'");
-        const desde = src.lastIndexOf('      {\n', i);
-        const hasta = src.indexOf('      },\n', i) + '      },\n'.length;
-        return src.slice(0, desde) + src.slice(hasta);
+        // TODAS sus filas (tres desde el 24/09/2026): quitar solo la primera dejaba las
+        // otras dos cubriendo el campo, y el candado callaba con razón.
+        let s = src;
+        for (;;) {
+          const i = s.indexOf("etiqueta: 'Amortizaciones acumuladas deducidas (€)'");
+          if (i < 0) return s;
+          const desde = s.lastIndexOf('      {\n', i);
+          const hasta = s.indexOf('      },\n', i) + '      },\n'.length;
+          s = s.slice(0, desde) + s.slice(hasta);
+        }
       });
       return correr(['--estatico', '--declaracion', declaracion('sin-fila', [{ ...FAM, testigo: t }])]);
     },
