@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { morseATexto, planificarTonos, segundosPorUnidad, textoAMorse } from '../../app/conversor-morse/motor';
 
 /**
  * Conversor de Código Morse — test de regresión generado por /inspector el 25/09/2026
@@ -37,8 +38,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   AnalyserNode: lo que mide ese bus es lo que llega a los altavoces. Los tiempos se leen de ese
  *   reloj y se esperan con expect.poll, no con esperas de pared.
  *
- * ORDEN: CASOS 1-3 (red de regresión, en verde) · HALLAZGOS con `test.fail()` (abiertos: el
- * fichero pasa en verde hoy y avisa cuando se reparen).
+ * ORDEN: CASOS 1-3 (red de regresión) · MOTOR (funciones puras, sin navegador) · HALLAZGOS
+ * 1978-1994, reparados el 26/09/2026: ya sin `test.fail()`, cada caso afirma el comportamiento
+ * correcto. La reproducción programa ahora cada tono en el reloj de audio con la temporización
+ * de `planificarTonos` (motor.ts), y la página se limpia al desmontarse.
  */
 
 // Sin usuario delante el AudioContext puede quedarse «suspended». Va al nivel del fichero:
@@ -128,7 +131,9 @@ function INSTRUMENTAR(): void {
   };
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }, info) => {
+  // Los casos del motor no necesitan navegador.
+  if (info.title.startsWith('MOTOR')) return;
   await page.addInitScript(INSTRUMENTAR);
   await page.goto(RUTA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Conversor de Código Morse');
@@ -275,7 +280,6 @@ test.describe('En móvil (360 px)', () => {
    * Correcto: las tres tarjetas dentro de los 360 px.
    */
   test('HALLAZGO — a 360 px las tarjetas Historia/SOS/Tiempos caben en la pantalla', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: rejilla de 3 columnas en línea (page.tsx:254)');
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const tarjetas = page.locator('[class*="infoCard"]');
     await expect(tarjetas).toHaveCount(3);
@@ -304,7 +308,57 @@ test('CASO 3 — vacío: Convertir no inventa salida, Reproducir y Copiar desact
 });
 
 // ============================================================
-// HALLAZGOS (Inspector 25/09/2026) — abiertos, con test.fail()
+// MOTOR — funciones puras de app/conversor-morse/motor.ts, con casos resueltos a mano
+// ============================================================
+
+test('MOTOR — temporización UIT de «SOS E»: 1:3:7 sin sumar huecos', () => {
+  // S: 0-1, 2-3, 4-5 · hueco de letra 3 · O: 8-11, 12-15, 16-19 · 3 · S: 22-23, 24-25, 26-27 ·
+  // hueco de palabra 7 · E: 34-35.
+  const plan = planificarTonos(textoAMorse('SOS E').palabras);
+  expect(plan.tonos).toEqual([
+    { inicio: 0, duracion: 1 }, { inicio: 2, duracion: 1 }, { inicio: 4, duracion: 1 },
+    { inicio: 8, duracion: 3 }, { inicio: 12, duracion: 3 }, { inicio: 16, duracion: 3 },
+    { inicio: 22, duracion: 1 }, { inicio: 24, duracion: 1 }, { inicio: 26, duracion: 1 },
+    { inicio: 34, duracion: 1 },
+  ]);
+  expect(plan.total).toBe(35);
+});
+
+test('MOTOR — «PARIS» dura 43 unidades, 50 con el hueco de palabra: 12 PPM = punto de 0,1 s', () => {
+  // P .--. = 1+1+3+1+3+1+1 = 11 · A .- = 5 · R .-. = 7 · I .. = 3 · S ... = 5 → 31 de letras
+  // + 4 huecos de letra × 3 = 12 → 43; + 7 de palabra = 50.
+  expect(planificarTonos(textoAMorse('PARIS').palabras).total).toBe(43);
+  const dos = planificarTonos(textoAMorse('PARIS PARIS').palabras);
+  expect(dos.tonos[dos.tonos.length / 2].inicio).toBe(50);
+  expect(segundosPorUnidad(12)).toBeCloseTo(0.1, 12);
+});
+
+test('MOTOR — Ñ, tildes, signos sin código y el % de la UIT §3.3', () => {
+  const r = textoAMorse('¿AÑO #1?');
+  expect(r.morse).toBe('.- --.-- --- / .---- ..--..');
+  expect(r.omitidos).toEqual(['¿', '#']);
+  expect(r.extensiones).toEqual(['Ñ']);
+  const t = textoAMorse('Árbol café');
+  expect(t.morse).toBe('.- .-. -... --- .-.. / -.-. .- ..-. ..-..'); // Á sin tilde · É de la UIT
+  expect(t.transcritos).toEqual(['Á']);
+  // 50 % → 5 0 - 0 / 0
+  expect(textoAMorse('50%').morse).toBe('..... ----- -....- ----- -..-. -----');
+  // El salto de línea separa palabras, no se cuela en la salida.
+  expect(textoAMorse('SOS\nSOS').morse).toBe('... --- ... / ... --- ...');
+});
+
+test('MOTOR — Morse → texto: É, códigos desconocidos, varios espacios y puntos tipográficos', () => {
+  expect(morseATexto('-.-. .- ..-. ..-..').texto).toBe('CAFÉ');
+  const d = morseATexto('... ...... ...');
+  expect(d.texto).toBe('S�S');
+  expect(d.desconocidos).toEqual(['......']);
+  expect(morseATexto('... --- ...   ... --- ...').texto).toBe('SOS SOS');
+  // Morse copiado con signos tipográficos (como el de la FAQ): «·» es punto y «—» raya.
+  expect(morseATexto('··· ——— ···').texto).toBe('SOS');
+});
+
+// ============================================================
+// HALLAZGOS (Inspector 25/09/2026) — reparados el 26/09/2026
 // ============================================================
 
 /**
@@ -318,7 +372,6 @@ test('CASO 3 — vacío: Convertir no inventa salida, Reproducir y Copiar desact
  * Correcto: al salir, ningún tono nuevo.
  */
 test('HALLAZGO — salir a otra app con un mensaje sonando lo detiene', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: sin limpieza al desmontar (page.tsx:84-146)');
   await convertir(page, 'PARIS PARIS PARIS PARIS PARIS PARIS');
   await botonReproducir(page).click();
   await expect.poll(async () => (await tonos(page)).length).toBeGreaterThanOrEqual(2);
@@ -346,7 +399,6 @@ test('HALLAZGO — salir a otra app con un mensaje sonando lo detiene', async ({
  * 2 contextos «running», 0 close(). Correcto: como mucho uno abierto.
  */
 test('HALLAZGO — ir y volver no acumula AudioContext abiertos', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: el AudioContext de page.tsx:92 nunca se cierra');
   await convertir(page, 'E');
   await reproducirHastaElFinal(page, 1);
   await page.locator('a[href*="/conversor-braille/"]').first().click();
@@ -368,13 +420,14 @@ test('HALLAZGO — ir y volver no acumula AudioContext abiertos', async ({ page 
  * Correcto (UIT §1.1.1): 9 tonos, 1 1 1 3 3 3 1 1 1.
  */
 test('HALLAZGO — en Morse → Texto, «... --- ...» suena como SOS', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: textoAMorse(entrada) sobre Morse (page.tsx:85)');
   await page.getByRole('button', { name: 'Morse → Texto' }).click();
   expect(await convertir(page, '... --- ...')).toBe('SOS');
   await botonReproducir(page).click();
   await expect.poll(async () => (await tonos(page)).length, { timeout: 10000 }).toBeGreaterThanOrEqual(9);
   const d = duraciones((await tonos(page)).slice(0, 9)).map((x) => Math.round(x));
-  await botonDetener(page).click().catch(() => undefined);
+  // Reparado, «SOS» dura 2,7 s y puede haber terminado ya: Detener solo si sigue sonando (sin
+  // el timeout corto, el clic esperaba al botón hasta agotar el tiempo del test).
+  await botonDetener(page).click({ timeout: 500 }).catch(() => undefined);
   expect(d).toEqual([1, 1, 1, 3, 3, 3, 1, 1, 1]);
 });
 
@@ -386,7 +439,6 @@ test('HALLAZGO — en Morse → Texto, «... --- ...» suena como SOS', async ({
  * Medido con «SOS E»: huecos S-O 4,20 · O-S 4,28 · S-E 14,41 unidades.
  */
 test('HALLAZGO — entre letras suenan 3 unidades y entre palabras 7', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: huecos 4 y 14 unidades (page.tsx:130-143)');
   expect(await convertir(page, 'SOS E')).toBe('... --- ... / .');
   const h = huecos(await reproducirHastaElFinal(page, 10));
   // Los temporizadores solo pueden retrasar: el menor de los dos huecos de letra no debe pasar de 3,5.
@@ -403,7 +455,6 @@ test('HALLAZGO — entre letras suenan 3 unidades y entre palabras 7', async ({ 
  * del nuevo) con 3 solapados. Correcto: 1 + 5 = 6 tonos y ninguno solapado.
  */
 test('HALLAZGO — Detener y volver a Reproducir no mezcla dos mensajes', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: el bucle viejo sobrevive a Detener (page.tsx:89, 131)');
   await convertir(page, 'T TTTT');
   await botonReproducir(page).click();
   // Primer tono (T = 0,3 s) y medio segundo después: dentro del hueco entre palabras.
@@ -435,7 +486,6 @@ test('HALLAZGO — Detener y volver a Reproducir no mezcla dos mensajes', async 
  * Correcto: o suena «SOS», o el botón está desactivado.
  */
 test('HALLAZGO — Reproducir antes de Convertir suena o está desactivado', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: botón activo que no hace nada (page.tsx:85-86, 226)');
   await escribir(page, 'SOS');
   if (await botonReproducir(page).isDisabled()) return;
   await botonReproducir(page).click();
@@ -452,7 +502,6 @@ test('HALLAZGO — Reproducir antes de Convertir suena o está desactivado', asy
  * Correcto (práctica de CW, ≈ 5 ms de subida): a 2 ms del arranque, menos de 0,15.
  */
 test('HALLAZGO — cada tono entra con rampa, no en escalón', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: envolvente rectangular (page.tsx:113-115)');
   await convertir(page, 'E');
   await botonReproducir(page).click();
   await expect
@@ -488,7 +537,6 @@ test('HALLAZGO — cada tono entra con rampa, no en escalón', async ({ page }) 
  * visible de qué caracteres no tienen código.
  */
 test('HALLAZGO — «¿AÑO #1?» no deja caracteres sueltos en la salida Morse sin avisar', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: caracteres sin código pasan tal cual (page.tsx:43)');
   const s = await convertir(page, '¿AÑO #1?');
   const soloMorse = /^[.\-/ ]+$/.test(s);
   // El aviso se busca DENTRO de la herramienta y con límite de palabra: «humano tiene» casa sin él.
@@ -507,7 +555,6 @@ test('HALLAZGO — «¿AÑO #1?» no deja caracteres sueltos en la salida Morse 
  * Medido: «CAFÉ» → «-.-. .- ..-. É»; «..-..» → «..-..». Correcto: «-.-. .- ..-. ..-..» y «É».
  */
 test('HALLAZGO — la É de la UIT: «CAFÉ» ↔ «-.-. .- ..-. ..-..»', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: falta la É de la UIT-R M.1677-1 §1.1.1 (page.tsx:10-22)');
   expect(await convertir(page, 'CAFÉ')).toBe('-.-. .- ..-. ..-..');
   await page.getByRole('button', { name: 'Morse → Texto' }).click();
   expect(await convertir(page, '-.-. .- ..-. ..-..')).toBe('CAFÉ');
@@ -520,7 +567,6 @@ test('HALLAZGO — la É de la UIT: «CAFÉ» ↔ «-.-. .- ..-. ..-..»', async
  * «... --- ...   ... --- ...» → «SOSSOS». Correcto: el código desconocido se marca o se avisa.
  */
 test('HALLAZGO — en Morse → Texto un código inexistente se marca', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: códigos desconocidos pasan tal cual (page.tsx:53)');
   await page.getByRole('button', { name: 'Morse → Texto' }).click();
   const s = await convertir(page, '... ...... ...');
   const aviso = await page
@@ -528,6 +574,8 @@ test('HALLAZGO — en Morse → Texto un código inexistente se marca', async ({
     .getByText(/\bno (reconocid|válid|existe)|\bdesconocid|\binválid/i)
     .count();
   expect(!/[.-]/.test(s) || aviso > 0, `salida: «${s}»`).toBe(true);
+  // Varios espacios seguidos separan palabras (otra convención habitual), no las juntan.
+  expect(await convertir(page, '... --- ...   ... --- ...')).toBe('SOS SOS');
 });
 
 /**
@@ -538,7 +586,6 @@ test('HALLAZGO — en Morse → Texto un código inexistente se marca', async ({
  * «⇄»: el title «Intercambiar» no cuenta cuando hay contenido.
  */
 test('HALLAZGO — el campo se llama «Texto» y el botón ⇄ «Intercambiar»', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: <label> sin asociar y ⇄ sin aria-label (page.tsx:188-206)');
   await expect(page.getByRole('textbox', { name: 'Texto', exact: true })).toHaveCount(1);
   await expect(page.getByRole('button', { name: /Intercambiar/ })).toHaveCount(1);
 });
@@ -550,7 +597,6 @@ test('HALLAZGO — el campo se llama «Texto» y el botón ⇄ «Intercambiar»'
  * da 22. Un lector de pantalla lee «portapapeles Copiar».
  */
 test('HALLAZGO — los botones se llaman sin el emoji', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: emojis sin aria-hidden (page.tsx:223-231 y otras 19 líneas)');
   await convertir(page, 'SOS');
   await expect(page.getByRole('button', { name: 'Copiar', exact: true })).toHaveCount(1);
   await expect(page.getByRole('button', { name: 'Reproducir sonido', exact: true })).toHaveCount(1);
@@ -625,7 +671,6 @@ const contraste = (page: Page, sel: string): Promise<Contraste> =>
  * (La cabecera de la tabla ya usa --primary-boton y cumple: 5,47 · 7,35.)
  */
 test('HALLAZGO — botones y títulos de la app a 4,5:1 en claro y en oscuro', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: contraste de --primary, degradado, Detener y aviso');
   await convertir(page, 'PARIS PARIS PARIS');
   await page.getByRole('button', { name: /Ver guía educativa/ }).click();
   // Botones y tarjetas llevan `transition: all`: sin esto se mide a mitad del cambio de tema
@@ -671,9 +716,9 @@ test('HALLAZGO — botones y títulos de la app a 4,5:1 en claro y en oscuro', a
  * … todavía lo evalúa en muchos países»).
  */
 test('HALLAZGO — la guía no dice que la licencia española exija Morse', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: page.tsx:331');
   await page.getByRole('button', { name: /Ver guía educativa/ }).click();
   await expect(page.getByText(/clase A requiere su dominio/)).toHaveCount(0);
+  await expect(page.getByText(/Orden IET\/1311\/2013/).first()).toBeVisible();
 });
 
 /**
@@ -682,12 +727,10 @@ test('HALLAZGO — la guía no dice que la licencia española exija Morse', asyn
  * torno a 3-4 kHz. 600-700 Hz es la costumbre en CW, no el máximo del oído.
  */
 test('HALLAZGO — la guía no sitúa la máxima sensibilidad del oído en 500-1000 Hz', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: page.tsx:471');
   await expect(page.getByText(/máxima sensibilidad entre 500-1000 Hz/)).toHaveCount(0);
 });
 
 /** HALLAZGO [bajo, contenido]. Errata «aveería» por «avería» (page.tsx:346). */
 test('HALLAZGO — sin la errata «aveería»', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto: page.tsx:346');
   await expect(page.getByText(/aveería/)).toHaveCount(0);
 });

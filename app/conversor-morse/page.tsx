@@ -1,70 +1,123 @@
 'use client';
 // @disclaimer: exempt
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styles from './ConversorMorse.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-
-// Diccionario Morse internacional
-const MORSE_CODE: Record<string, string> = {
-  'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
-  'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
-  'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
-  'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
-  'Y': '-.--', 'Z': '--..',
-  '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-',
-  '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.',
-  '.': '.-.-.-', ',': '--..--', '?': '..--..', "'": '.----.', '!': '-.-.--',
-  '/': '-..-.', '(': '-.--.', ')': '-.--.-', '&': '.-...', ':': '---...',
-  ';': '-.-.-.', '=': '-...-', '+': '.-.-.', '-': '-....-', '_': '..--.-',
-  '"': '.-..-.', '$': '...-..-', '@': '.--.-.', ' ': '/',
-};
-
-// Diccionario inverso
-const MORSE_TO_TEXT: Record<string, string> = Object.fromEntries(
-  Object.entries(MORSE_CODE).map(([k, v]) => [v, k])
-);
+import {
+  MARCA_DESCONOCIDO,
+  MORSE_EXTENSIONES,
+  MORSE_UIT,
+  morseATexto,
+  planificarTonos,
+  segundosPorUnidad,
+  textoAMorse,
+} from './motor';
 
 type ModoType = 'texto-morse' | 'morse-texto';
+
+/** Velocidad del sonido: 12 palabras por minuto (PARIS) → un punto de 100 ms. */
+const PPM = 12;
+const UNIDAD_S = segundosPorUnidad(PPM);
+const FRECUENCIA_HZ = 600;
+const GANANCIA = 0.3;
+/**
+ * Subida y bajada de cada tono (hallazgo 1988). Un tono que entra en escalón se oye como un
+ * chasquido («key click»); en CW se suaviza el flanco en unos milisegundos. La rampa va DENTRO
+ * de la duración del elemento, así que la temporización UIT no cambia.
+ */
+const RAMPA_S = 0.005;
+/** Con cuánta antelación se programa cada tono en el reloj de audio. */
+const ANTELACION_S = 0.03;
+
+interface TonoActivo {
+  oscilador: OscillatorNode;
+  ganancia: GainNode;
+}
+
+const esperar = (ms: number): Promise<void> =>
+  new Promise((resolve) => {
+    window.setTimeout(resolve, Math.max(0, ms));
+  });
+
+/** Corta un tono con una rampa corta, anclada en el valor en curso, y lo para al final de ella. */
+function cortarTono(ctx: AudioContext, tono: TonoActivo): void {
+  const ahora = ctx.currentTime;
+  const g = tono.ganancia.gain;
+  g.cancelScheduledValues(ahora);
+  g.setValueAtTime(g.value, ahora);
+  g.linearRampToValueAtTime(0, ahora + RAMPA_S);
+  try {
+    tono.oscilador.stop(ahora + RAMPA_S);
+  } catch {
+    // El oscilador ya había terminado
+  }
+}
+
+/** Letras de las extensiones, en el orden en que se enseñan. */
+const EXTENSIONES = Object.entries(MORSE_EXTENSIONES);
+const ALFABETO_UIT = Object.entries(MORSE_UIT);
 
 export default function ConversorMorsePage() {
   const [modo, setModo] = useState<ModoType>('texto-morse');
   const [entrada, setEntrada] = useState('');
   const [salida, setSalida] = useState('');
+  const [avisos, setAvisos] = useState<string[]>([]);
   const [reproduciendo, setReproduciendo] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const stopRef = useRef(false);
+  /**
+   * Número de la reproducción en curso. «Reproducir», «Detener» y el desmontaje lo incrementan:
+   * un bucle que despierta y ve otro número sabe que ya no le toca sonar (hallazgo 1981: con un
+   * simple booleano, «Reproducir» lo volvía a poner a false y el bucle viejo seguía).
+   */
+  const sesionRef = useRef(0);
+  const tonoActivoRef = useRef<TonoActivo | null>(null);
 
-  const textoAMorse = (texto: string): string => {
-    return texto
-      .toUpperCase()
-      .split('')
-      .map(char => MORSE_CODE[char] || char)
-      .join(' ');
-  };
-
-  const morseATexto = (morse: string): string => {
-    return morse
-      .split(' ')
-      .map(code => {
-        if (code === '/') return ' ';
-        if (code === '') return '';
-        return MORSE_TO_TEXT[code] || code;
-      })
-      .join('');
+  const cambiarModo = (nuevo: ModoType) => {
+    setModo(nuevo);
+    setAvisos([]);
   };
 
   const convertir = () => {
     if (modo === 'texto-morse') {
-      setSalida(textoAMorse(entrada));
+      const r = textoAMorse(entrada);
+      setSalida(r.morse);
+      const lista: string[] = [];
+      if (r.omitidos.length) {
+        lista.push(`Sin código Morse, se han omitido: ${r.omitidos.map((c) => (c === ' ' ? '␣' : c)).join(' ')}`);
+      }
+      if (r.transcritos.length) {
+        lista.push(`${r.transcritos.join(' ')}: la UIT no tiene código para las vocales con tilde (solo para la É); se transmiten sin tilde.`);
+      }
+      if (r.extensiones.length) {
+        const n = r.extensiones.filter((c) => c === 'Ñ');
+        const otras = r.extensiones.filter((c) => c !== 'Ñ');
+        const partes: string[] = [];
+        if (n.length) partes.push('Ñ (--.--) es la variante que se usa en español');
+        if (otras.length) partes.push(`${otras.join(' ')} son extensiones de radioaficionado`);
+        lista.push(`${partes.join('; ')}. No están en la Recomendación UIT-R M.1677-1: quien reciba con el código internacional puede no reconocerlas.`);
+      }
+      if (r.porcentaje) {
+        lista.push('El % se transmite como 0/0, unido a la cifra por un guion (UIT-R M.1677-1 §3.3): 50 % → 50-0/0.');
+      }
+      setAvisos(lista);
     } else {
-      setSalida(morseATexto(entrada));
+      const r = morseATexto(entrada);
+      setSalida(r.texto);
+      const lista: string[] = [];
+      if (r.desconocidos.length) {
+        lista.push(`Códigos no reconocidos (se muestran como ${MARCA_DESCONOCIDO}): ${r.desconocidos.join('  ')}`);
+      }
+      if (r.invalidos.length) {
+        lista.push(`Fragmentos no válidos, solo se admiten puntos y rayas (se muestran como ${MARCA_DESCONOCIDO}): ${r.invalidos.join('  ')}`);
+      }
+      setAvisos(lista);
     }
   };
 
   const intercambiar = () => {
-    setModo(modo === 'texto-morse' ? 'morse-texto' : 'texto-morse');
+    cambiarModo(modo === 'texto-morse' ? 'morse-texto' : 'texto-morse');
     setEntrada(salida);
     setSalida(entrada);
   };
@@ -72,6 +125,7 @@ export default function ConversorMorsePage() {
   const limpiar = () => {
     setEntrada('');
     setSalida('');
+    setAvisos([]);
   };
 
   const copiarResultado = async () => {
@@ -80,75 +134,113 @@ export default function ConversorMorsePage() {
     }
   };
 
-  // Reproducir sonido Morse
-  const reproducirMorse = useCallback(async () => {
-    const morseCode = modo === 'texto-morse' ? salida : textoAMorse(entrada);
-    if (!morseCode || reproduciendo) return;
+  /**
+   * Lo que suena es el mensaje de la ENTRADA, leído según el modo (hallazgos 1979 y 1987): en
+   * «Morse → Texto» la entrada ya es Morse y se reproduce tal cual —antes se volvía a codificar
+   * como texto y cada «.» sonaba como el signo punto—, y en «Texto → Morse» suena sin tener que
+   * pulsar antes «Convertir».
+   */
+  const palabrasParaSonar = (): string[][] =>
+    modo === 'texto-morse' ? textoAMorse(entrada).palabras : morseATexto(entrada).palabras;
 
-    setReproduciendo(true);
-    stopRef.current = false;
+  const hayQueSonar = palabrasParaSonar().length > 0;
 
-    if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContext();
-    }
+  /** Detiene lo que suene: invalida el bucle en curso y corta el tono con una rampa. */
+  const silenciar = () => {
+    sesionRef.current++;
     const ctx = audioContextRef.current;
-    const DOT_DURATION = 0.1; // 100ms para punto
-    const DASH_DURATION = DOT_DURATION * 3;
-    const SYMBOL_GAP = DOT_DURATION;
-    const LETTER_GAP = DOT_DURATION * 3;
-    const WORD_GAP = DOT_DURATION * 7;
+    const tono = tonoActivoRef.current;
+    tonoActivoRef.current = null;
+    if (ctx && tono && ctx.state !== 'closed') cortarTono(ctx, tono);
+  };
 
-    const playTone = (duration: number): Promise<void> => {
-      return new Promise((resolve) => {
-        if (stopRef.current) {
-          resolve();
-          return;
-        }
-        const oscillator = ctx.createOscillator();
-        const gainNode = ctx.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(ctx.destination);
-        oscillator.frequency.value = 600;
-        oscillator.type = 'sine';
-        gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
-        oscillator.start();
-        oscillator.stop(ctx.currentTime + duration);
-        setTimeout(resolve, duration * 1000);
-      });
-    };
+  /**
+   * Reproducción con la temporización UIT (motor.ts, `planificarTonos`). Cada tono se programa en
+   * el RELOJ DE AUDIO, un poco antes de su hora; el temporizador solo despierta al bucle. Así los
+   * huecos son los del plan (hallazgo 1980) y no la suma de esperas encadenadas.
+   */
+  const reproducirMorse = async () => {
+    const palabras = palabrasParaSonar();
+    if (!palabras.length) return;
+    silenciar();
+    const sesion = sesionRef.current;
 
-    const wait = (duration: number): Promise<void> => {
-      return new Promise((resolve) => {
-        if (stopRef.current) {
-          resolve();
-          return;
-        }
-        setTimeout(resolve, duration * 1000);
-      });
-    };
+    let ctx = audioContextRef.current;
+    if (!ctx || ctx.state === 'closed') {
+      ctx = new AudioContext();
+      audioContextRef.current = ctx;
+    }
+    if (ctx.state === 'suspended') await ctx.resume().catch(() => undefined);
+    if (sesion !== sesionRef.current) return;
+    setReproduciendo(true);
 
-    for (const char of morseCode) {
-      if (stopRef.current) break;
-      if (char === '.') {
-        await playTone(DOT_DURATION);
-        await wait(SYMBOL_GAP);
-      } else if (char === '-') {
-        await playTone(DASH_DURATION);
-        await wait(SYMBOL_GAP);
-      } else if (char === ' ') {
-        await wait(LETTER_GAP);
-      } else if (char === '/') {
-        await wait(WORD_GAP);
+    const plan = planificarTonos(palabras);
+    let origen = ctx.currentTime + 0.05;
+    for (const t of plan.tonos) {
+      let inicio = origen + t.inicio * UNIDAD_S;
+      await esperar((inicio - ANTELACION_S - ctx.currentTime) * 1000);
+      if (sesion !== sesionRef.current) return;
+      // Si el temporizador llegó tarde, se desplaza el resto del mensaje: el tono conserva su
+      // duración y el retraso se va a un hueco, nunca a un punto o una raya.
+      const retraso = ctx.currentTime + 0.005 - inicio;
+      if (retraso > 0) {
+        origen += retraso;
+        inicio += retraso;
       }
+      const fin = inicio + t.duracion * UNIDAD_S;
+      const oscilador = ctx.createOscillator();
+      const ganancia = ctx.createGain();
+      oscilador.type = 'sine';
+      oscilador.frequency.value = FRECUENCIA_HZ;
+      ganancia.gain.setValueAtTime(0, inicio);
+      ganancia.gain.linearRampToValueAtTime(GANANCIA, inicio + RAMPA_S);
+      ganancia.gain.setValueAtTime(GANANCIA, fin - RAMPA_S);
+      ganancia.gain.linearRampToValueAtTime(0, fin);
+      oscilador.connect(ganancia);
+      ganancia.connect(ctx.destination);
+      const tono: TonoActivo = { oscilador, ganancia };
+      oscilador.onended = () => {
+        oscilador.disconnect();
+        ganancia.disconnect();
+        if (tonoActivoRef.current === tono) tonoActivoRef.current = null;
+      };
+      tonoActivoRef.current = tono;
+      oscilador.start(inicio);
+      oscilador.stop(fin);
     }
 
-    setReproduciendo(false);
-  }, [modo, salida, entrada, reproduciendo]);
+    await esperar((origen + plan.total * UNIDAD_S - ctx.currentTime) * 1000);
+    if (sesion === sesionRef.current) setReproduciendo(false);
+  };
 
   const detenerReproduccion = () => {
-    stopRef.current = true;
+    silenciar();
     setReproduciendo(false);
   };
+
+  /**
+   * Limpieza al desmontar (hallazgos 1978 y 1986, la forma del 1757 de generador-ondas). Sin
+   * ella, una navegación de cliente con el mensaje sonando dejaba el bucle vivo: seguía creando
+   * tonos en la app de destino, y cada visita dejaba su AudioContext abierto. Ahora se invalida
+   * el bucle, se corta el tono con su rampa y se cierra el contexto al acabar la rampa. El ref se
+   * suelta en el acto, para que un remontaje (StrictMode en desarrollo) cree uno nuevo.
+   */
+  useEffect(() => {
+    return () => {
+      sesionRef.current++;
+      const ctx = audioContextRef.current;
+      const tono = tonoActivoRef.current;
+      audioContextRef.current = null;
+      tonoActivoRef.current = null;
+      if (!ctx || ctx.state === 'closed') return;
+      if (tono) cortarTono(ctx, tono);
+      window.setTimeout(() => {
+        ctx.close().catch(() => {
+          // El contexto ya estaba cerrado
+        });
+      }, RAMPA_S * 1000 + 50);
+    };
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -168,7 +260,7 @@ export default function ConversorMorsePage() {
           <button
             type="button"
             className={`${styles.modeBtn} ${modo === 'texto-morse' ? styles.active : ''}`}
-            onClick={() => setModo('texto-morse')}
+            onClick={() => cambiarModo('texto-morse')}
             aria-pressed={modo === 'texto-morse'}
           >
             Texto → Morse
@@ -176,7 +268,7 @@ export default function ConversorMorsePage() {
           <button
             type="button"
             className={`${styles.modeBtn} ${modo === 'morse-texto' ? styles.active : ''}`}
-            onClick={() => setModo('morse-texto')}
+            onClick={() => cambiarModo('morse-texto')}
             aria-pressed={modo === 'morse-texto'}
           >
             Morse → Texto
@@ -185,10 +277,11 @@ export default function ConversorMorsePage() {
 
         <div className={styles.converterBox}>
           <div className={styles.inputSection}>
-            <label className={styles.label}>
+            <label className={styles.label} htmlFor="morse-entrada">
               {modo === 'texto-morse' ? 'Texto' : 'Código Morse'}
             </label>
             <textarea
+              id="morse-entrada"
               value={entrada}
               onChange={(e) => setEntrada(e.target.value)}
               placeholder={modo === 'texto-morse'
@@ -203,7 +296,13 @@ export default function ConversorMorsePage() {
             <button type="button" onClick={convertir} className={styles.btnPrimary}>
               Convertir
             </button>
-            <button type="button" onClick={intercambiar} className={styles.btnSwap} title="Intercambiar">
+            <button
+              type="button"
+              onClick={intercambiar}
+              className={styles.btnSwap}
+              title="Intercambiar"
+              aria-label="Intercambiar entrada y salida"
+            >
               ⇄
             </button>
             <button type="button" onClick={limpiar} className={styles.btnSecondary}>
@@ -212,36 +311,72 @@ export default function ConversorMorsePage() {
           </div>
 
           <div className={styles.outputSection}>
-            <label className={styles.label}>
+            <p className={styles.label} id="morse-salida-titulo">
               {modo === 'texto-morse' ? 'Código Morse' : 'Texto'}
-            </label>
-            <div className={styles.outputBox} role="status" aria-live="polite" aria-atomic="true">
+            </p>
+            <div
+              className={styles.outputBox}
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              aria-labelledby="morse-salida-titulo"
+            >
               {salida || 'El resultado aparecerá aquí...'}
             </div>
+            {avisos.length > 0 && (
+              <div className={styles.avisos}>
+                {avisos.map((a) => (
+                  <p key={a}>{a}</p>
+                ))}
+              </div>
+            )}
             <div className={styles.outputActions}>
               <button type="button" onClick={copiarResultado} className={styles.btnAction} disabled={!salida}>
-                📋 Copiar
+                <span aria-hidden="true">📋</span> Copiar
               </button>
               {!reproduciendo ? (
-                <button type="button" onClick={reproducirMorse} className={styles.btnAction} disabled={!salida && !entrada}>
-                  🔊 Reproducir sonido
+                <button type="button" onClick={reproducirMorse} className={styles.btnAction} disabled={!hayQueSonar}>
+                  <span aria-hidden="true">🔊</span> Reproducir sonido
                 </button>
               ) : (
                 <button type="button" onClick={detenerReproduccion} className={styles.btnStop}>
-                  ⏹ Detener
+                  <span aria-hidden="true">⏹</span> Detener
                 </button>
               )}
             </div>
+            <p className={styles.nota}>
+              Suena el mensaje de la entrada: tono de {FRECUENCIA_HZ} Hz a {PPM} palabras por minuto
+              (un punto dura {Math.round(UNIDAD_S * 1000)} ms), con la temporización de la UIT: raya 3 puntos, 1 entre
+              símbolos, 3 entre letras y 7 entre palabras.
+            </p>
           </div>
         </div>
       </div>
 
       <section className={styles.alphabetSection}>
         <h2>Alfabeto Morse Internacional</h2>
+        <p className={styles.alphabetIntro}>
+          Letras, cifras y signos de la Recomendación UIT-R M.1677-1. La única letra con tilde que
+          recoge es la É.
+        </p>
         <div className={styles.alphabetGrid}>
-          {Object.entries(MORSE_CODE).slice(0, 36).map(([char, code]) => (
+          {ALFABETO_UIT.map(([char, code]) => (
             <div key={char} className={styles.alphabetItem}>
-              <span className={styles.char}>{char === ' ' ? '␣' : char}</span>
+              <span className={styles.char}>{char}</span>
+              <span className={styles.code}>{code}</span>
+            </div>
+          ))}
+        </div>
+        <h3 className={styles.alphabetSubtitulo}>Fuera de la norma UIT</h3>
+        <p className={styles.alphabetIntro}>
+          La Ñ con la variante que se usa en español y signos que añaden los radioaficionados. El
+          conversor los usa y lo avisa, porque quien reciba con el código internacional puede no
+          reconocerlos. Las vocales con tilde (salvo la É) se transmiten sin tilde.
+        </p>
+        <div className={styles.alphabetGrid}>
+          {EXTENSIONES.map(([char, code]) => (
+            <div key={char} className={styles.alphabetItem}>
+              <span className={styles.char}>{char}</span>
               <span className={styles.code}>{code}</span>
             </div>
           ))}
@@ -250,25 +385,24 @@ export default function ConversorMorsePage() {
 
       <EducationalSection title="Aprende sobre el Código Morse" subtitle="Historia, técnica y uso actual del lenguaje telegráfico universal" defaultOpen={false}>
         <section>
-          {/* CONTENIDO EXISTENTE: los 3 infoCard */}
-          <div style={{display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'1.5rem', marginBottom:'2rem'}}>
+          <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
-              <h3>📡 Historia</h3>
+              <h3><span aria-hidden="true">📡</span> Historia</h3>
               <p>Inventado por Samuel Morse en 1837, fue el primer sistema de comunicación eléctrica de larga distancia. Revolucionó las telecomunicaciones.</p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🆘 SOS</h3>
+              <h3><span aria-hidden="true">🆘</span> SOS</h3>
               <p>La señal de socorro internacional SOS (... --- ...) se eligió por ser fácil de recordar y transmitir, no como acrónimo.</p>
             </div>
             <div className={styles.infoCard}>
-              <h3>⏱️ Tiempos</h3>
+              <h3><span aria-hidden="true">⏱️</span> Tiempos</h3>
               <p>Un punto dura 1 unidad, una raya 3 unidades. Entre símbolos 1 unidad, entre letras 3 unidades, entre palabras 7 unidades.</p>
             </div>
           </div>
 
           {/* SECCIÓN 1: Tabla Comparativa */}
           <div className={styles.eduComparativaSection}>
-            <h3>📊 Morse Internacional vs Otros Sistemas de Telegrafía</h3>
+            <h3><span aria-hidden="true">📊</span> Morse Internacional vs Otros Sistemas de Telegrafía</h3>
             <div className={styles.eduTablaWrapper}>
               <table className={styles.eduTablaComparativa}>
                 <thead>
@@ -286,35 +420,35 @@ export default function ConversorMorsePage() {
                     <td>1865</td>
                     <td>Radio, cable</td>
                     <td>15-30 WPM</td>
-                    <td>✅ Activo (radioafición)</td>
+                    <td><span aria-hidden="true">✅</span> Activo (radioafición)</td>
                   </tr>
                   <tr>
                     <td>Morse Americano (original)</td>
                     <td>1837</td>
                     <td>Cable telegráfico</td>
                     <td>15-25 WPM</td>
-                    <td>❌ Obsoleto</td>
+                    <td><span aria-hidden="true">❌</span> Obsoleto</td>
                   </tr>
                   <tr>
                     <td>Morse Marítimo</td>
                     <td>1906</td>
                     <td>Radio 500 kHz</td>
                     <td>16-22 WPM</td>
-                    <td>❌ Retirado en 1999</td>
+                    <td><span aria-hidden="true">❌</span> Retirado en 1999</td>
                   </tr>
                   <tr>
                     <td>Código Baudot</td>
                     <td>1870</td>
                     <td>Teleimpresor</td>
                     <td>45-75 WPM</td>
-                    <td>❌ Obsoleto</td>
+                    <td><span aria-hidden="true">❌</span> Obsoleto</td>
                   </tr>
                   <tr>
                     <td>Señales de Luz (Aldis)</td>
                     <td>1867</td>
                     <td>Lámpara visual</td>
                     <td>8-12 WPM</td>
-                    <td>✅ Activo (naval/militar)</td>
+                    <td><span aria-hidden="true">✅</span> Activo (naval/militar)</td>
                   </tr>
                 </tbody>
               </table>
@@ -323,12 +457,12 @@ export default function ConversorMorsePage() {
 
           {/* SECCIÓN 2: Casos de Uso */}
           <div className={styles.eduEscenariosSection}>
-            <h3>🎯 Dónde se usa hoy el Código Morse</h3>
+            <h3><span aria-hidden="true">🎯</span> Dónde se usa hoy el Código Morse</h3>
             <div className={styles.eduEscenariosGrid}>
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioIcon} aria-hidden="true">📡</div>
                 <h4>Radioafición (Ham Radio)</h4>
-                <p>Más de 3 millones de radioaficionados en todo el mundo usan Morse (modo CW). En España, la licencia de radioaficionado clase A requiere su dominio. Los concursos internacionales premian velocidades de 30+ WPM.</p>
+                <p>El Morse sigue siendo uno de los modos habituales de la radioafición (modo CW). Ya no se exige para obtener la autorización: en España el examen vigente (Orden IET/1311/2013) tiene dos partes, electricidad y radioelectricidad, y normativa, sin telegrafía. En los concursos se opera a menudo a más de 30 palabras por minuto.</p>
               </div>
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioIcon} aria-hidden="true">✈️</div>
@@ -343,14 +477,14 @@ export default function ConversorMorsePage() {
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioIcon} aria-hidden="true">🏕️</div>
                 <h4>Supervivencia y Emergencias</h4>
-                <p>El SOS (... --- ...) es reconocido mundialmente sin importar el idioma. En situaciones de emergencia sin comunicación de voz (tormenta, aveería de radio), el Morse puede salvarte la vida con una linterna o cualquier medio de señalización.</p>
+                <p>El SOS (... --- ...) es reconocido mundialmente sin importar el idioma. En situaciones de emergencia sin comunicación de voz (tormenta, avería de radio), el Morse puede salvarte la vida con una linterna o cualquier medio de señalización.</p>
               </div>
             </div>
           </div>
 
           {/* SECCIÓN 3: FAQ */}
           <div className={styles.eduFaqSection}>
-            <h3>❓ Preguntas Frecuentes sobre el Código Morse</h3>
+            <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre el Código Morse</h3>
             <div className={styles.eduFaqList}>
               <div className={styles.eduFaqItem}>
                 <h4>¿Por qué SOS no significa &quot;Save Our Souls&quot;?</h4>
@@ -362,7 +496,7 @@ export default function ConversorMorsePage() {
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿El Morse sigue siendo obligatorio para licencias de radioaficionado?</h4>
-                <p>Ya no. La ITU eliminó el requisito de Morse en 2003. España lo retiró de las pruebas de licencia en 2004. Sin embargo, el modo CW (Continuous Wave, es decir, Morse en radio) sigue siendo muy popular por su eficiencia: una señal CW a 5 vatios alcanza distancias que la voz necesitaría 100 vatios para conseguir, gracias al ancho de banda estrecho (150 Hz vs 3 kHz de la voz).</p>
+                <p>Ya no. La Conferencia Mundial de Radiocomunicaciones de la UIT de 2003 dejó de exigirlo y cada país decide. En España la prueba de telegrafía se suprimió por la Resolución de 16 de marzo de 2005, y el examen vigente (Orden IET/1311/2013) no la incluye. Sin embargo, el modo CW (Continuous Wave, es decir, Morse en radio) sigue siendo muy popular por su eficiencia: una señal CW a 5 vatios alcanza distancias que la voz necesitaría 100 vatios para conseguir, gracias al ancho de banda estrecho (150 Hz vs 3 kHz de la voz).</p>
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Qué diferencia hay entre el Morse Internacional y el Americano original?</h4>
@@ -389,7 +523,7 @@ export default function ConversorMorsePage() {
 
           {/* SECCIÓN 4: Guía Paso a Paso */}
           <div className={styles.eduStepSection}>
-            <h3>📚 Cómo Aprender Código Morse: Método Científico</h3>
+            <h3><span aria-hidden="true">📚</span> Cómo Aprender Código Morse: Método Científico</h3>
             <div className={styles.eduStepList}>
               <div className={styles.eduStepItem}>
                 <div className={styles.eduStepNumber}>1</div>
@@ -438,7 +572,7 @@ export default function ConversorMorsePage() {
 
           {/* SECCIÓN 5: Tips */}
           <div className={styles.eduTipsSection}>
-            <h3>✅ Mejores Prácticas para Transmitir y Recibir Morse</h3>
+            <h3><span aria-hidden="true">✅</span> Mejores Prácticas para Transmitir y Recibir Morse</h3>
             <div className={styles.eduTipsGrid}>
               <div className={styles.eduTipCard}>
                 <span className={styles.eduTipIcon} aria-hidden="true">🎵</span>
@@ -467,8 +601,8 @@ export default function ConversorMorsePage() {
               </div>
               <div className={styles.eduTipCard}>
                 <span className={styles.eduTipIcon} aria-hidden="true">🎯</span>
-                <h4>Frecuencia de 600-700 Hz es la óptima</h4>
-                <p>El oído humano tiene máxima sensibilidad entre 500-1000 Hz. La frecuencia estándar de tono CW en radio es 600-700 Hz. Esta herramienta usa 600 Hz, que es la óptima para entrenar la discriminación auditiva en condiciones reales de radio.</p>
+                <h4>Un tono de 600-700 Hz es el habitual</h4>
+                <p>El oído es más sensible hacia 3-4 kHz (curvas de igual sonoridad, ISO 226:2003), pero para CW se prefieren tonos graves, que cansan menos en escuchas largas: 600-700 Hz es una elección muy común, y muchos receptores permiten ajustarlo al gusto. Esta herramienta usa 600 Hz.</p>
               </div>
             </div>
           </div>
@@ -480,12 +614,12 @@ export default function ConversorMorsePage() {
               <h3>Errores Comunes al Aprender y Usar Código Morse</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>❌ Memorizar puntos y rayas visualmente:</strong> Si aprendes que la K es &quot;-.-&quot; mirando una tabla, tu cerebro decodificará símbolo por símbolo y nunca superarás los 5 WPM. El Morse se aprende como idioma oral: por sonido, por ritmo, por asociación directa con la letra.</li>
-              <li><strong>❌ Empezar a velocidad demasiado lenta (bajo 15 WPM):</strong> Si entrenas a 5 WPM, tu cerebro aprende a decodificar a 5 WPM y luego no puede acelerar. El método Farnsworth recomienda enviar a velocidad final (20 WPM) con pausas largas entre letras, reduciendo gradualmente las pausas hasta alcanzar la velocidad objetivo real.</li>
-              <li><strong>❌ Confundir Morse Internacional con Morse Americano:</strong> Los caracteres C, F, L, O, R, Y difieren entre ambos sistemas. Si aprendes caracteres del Morse americano creyendo que es el estándar ITU, tus mensajes serán incomprensibles en comunicaciones internacionales de radioafición.</li>
-              <li><strong>❌ Practicar irregularmente en sesiones largas:</strong> 3 horas una vez a la semana es mucho menos efectivo que 15 minutos diarios. La memoria motora y auditiva del Morse se consolida durante el sueño. La constancia supera exponencialmente la intensidad en el aprendizaje de Morse.</li>
-              <li><strong>❌ Ignorar los prosignos y procedimientos:</strong> En una comunicación real de radio no basta con saber el alfabeto. Los prosignos (AR, SK, CQ, DE, K, BK, HH) y los procedimientos de llamada son esenciales para que el otro operador entienda el contexto del mensaje.</li>
-              <li><strong>❌ Usar aplicaciones de conversión en lugar de aprender a decodificar:</strong> Esta herramienta es útil para entender el código o para comunicaciones puntuales, pero no sustituye el entrenamiento auditivo. La velocidad de conversión manual (oído → letra) es la habilidad real; la conversión visual (mirar símbolos → letras) no entrena esa vía neurológica.</li>
+              <li><strong><span aria-hidden="true">❌</span> Memorizar puntos y rayas visualmente:</strong> Si aprendes que la K es &quot;-.-&quot; mirando una tabla, tu cerebro decodificará símbolo por símbolo y nunca superarás los 5 WPM. El Morse se aprende como idioma oral: por sonido, por ritmo, por asociación directa con la letra.</li>
+              <li><strong><span aria-hidden="true">❌</span> Empezar a velocidad demasiado lenta (bajo 15 WPM):</strong> Si entrenas a 5 WPM, tu cerebro aprende a decodificar a 5 WPM y luego no puede acelerar. El método Farnsworth recomienda enviar a velocidad final (20 WPM) con pausas largas entre letras, reduciendo gradualmente las pausas hasta alcanzar la velocidad objetivo real.</li>
+              <li><strong><span aria-hidden="true">❌</span> Confundir Morse Internacional con Morse Americano:</strong> Los caracteres C, F, L, O, R, Y difieren entre ambos sistemas. Si aprendes caracteres del Morse americano creyendo que es el estándar ITU, tus mensajes serán incomprensibles en comunicaciones internacionales de radioafición.</li>
+              <li><strong><span aria-hidden="true">❌</span> Practicar irregularmente en sesiones largas:</strong> 3 horas una vez a la semana es mucho menos efectivo que 15 minutos diarios. La memoria motora y auditiva del Morse se consolida durante el sueño. La constancia supera exponencialmente la intensidad en el aprendizaje de Morse.</li>
+              <li><strong><span aria-hidden="true">❌</span> Ignorar los prosignos y procedimientos:</strong> En una comunicación real de radio no basta con saber el alfabeto. Los prosignos (AR, SK, CQ, DE, K, BK, HH) y los procedimientos de llamada son esenciales para que el otro operador entienda el contexto del mensaje.</li>
+              <li><strong><span aria-hidden="true">❌</span> Usar aplicaciones de conversión en lugar de aprender a decodificar:</strong> Esta herramienta es útil para entender el código o para comunicaciones puntuales, pero no sustituye el entrenamiento auditivo. La velocidad de conversión manual (oído → letra) es la habilidad real; la conversión visual (mirar símbolos → letras) no entrena esa vía neurológica.</li>
             </ul>
           </div>
 

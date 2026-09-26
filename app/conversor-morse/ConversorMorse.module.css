@@ -1,6 +1,4 @@
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
@@ -81,7 +79,7 @@
 
 .modeBtn.active {
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -133,7 +131,7 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -158,7 +156,7 @@
 
 .btnSwap:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecondary {
@@ -175,7 +173,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .outputBox {
@@ -209,7 +207,7 @@
 
 .btnAction:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnAction:disabled {
@@ -219,12 +217,41 @@
 
 .btnStop {
   padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid #EF4444;
+  border: 1px solid #DC2626;
   background: rgba(239, 68, 68, 0.1);
   border-radius: var(--radius);
   font-size: 0.9rem;
   cursor: pointer;
-  color: #EF4444;
+  color: #B91C1C;
+}
+
+[data-theme='dark'] .container .btnStop {
+  border-color: #F87171;
+  color: #FCA5A5;
+}
+
+.avisos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border-left: 4px solid #D97706;
+  background: rgba(245, 158, 11, 0.08);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.avisos p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.nota {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
 }
 
 .alphabetSection {
@@ -239,6 +266,21 @@
   text-align: center;
   color: var(--text-primary);
   margin-bottom: var(--spacing-lg);
+}
+
+.alphabetIntro {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  text-align: center;
+  margin: 0 0 var(--spacing-md);
+}
+
+.alphabetSubtitulo {
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: var(--spacing-xl) 0 var(--spacing-sm);
 }
 
 .alphabetGrid {
@@ -259,7 +301,7 @@
 .char {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .code {
@@ -287,6 +329,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
 }
 
 .infoCard {
@@ -295,7 +338,7 @@
 }
 
 .infoCard h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -423,7 +466,7 @@
 }
 
 .eduEscenarioCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   font-size: 1rem;
 }
@@ -462,7 +505,7 @@
 }
 
 .eduFaqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   font-size: 1rem;
 }
@@ -502,7 +545,7 @@
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -554,6 +597,11 @@
   background: rgba(46, 134, 171, 0.08);
 }
 
+/* Sobre el tinte azul de la tarjeta, --primary-texto oscuro se queda en 4,34:1: un azul más claro. */
+[data-theme='dark'] .container .eduTipCard h4 {
+  color: #7DC3E6;
+}
+
 .eduTipIcon {
   font-size: 1.5rem;
   display: block;
@@ -561,7 +609,7 @@
 }
 
 .eduTipCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 6px;
   font-size: 0.95rem;
 }
@@ -598,7 +646,7 @@
 }
 
 .warningHeader h3 {
-  color: #D97706;
+  color: #92400E;
   font-size: 1.2rem;
   margin: 0;
 }

@@ -38,8 +38,8 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     'Conversión bidireccional: texto → Morse y Morse → texto con un clic',
-    'Reproducción de sonido del código Morse a 600 Hz mediante Web Audio API',
-    'Alfabeto Morse Internacional ITU-R M.1677 completo con letras, números y signos',
+    'Reproducción de sonido a 600 Hz y 12 palabras por minuto, con la temporización UIT 1:3:7',
+    'Alfabeto Morse Internacional de la Recomendación UIT-R M.1677-1 (letras, É, cifras y signos), con la Ñ y las extensiones de radioaficionado señaladas',
     'Intercambio instantáneo de entrada y salida con botón de inversión',
     'Copia del resultado al portapapeles con un clic',
     'Tabla de referencia del alfabeto Morse completo integrada en la app',
@@ -71,7 +71,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve aprender código Morse hoy en día?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Aunque la telegrafía comercial desapareció en los años 90, el código Morse sigue siendo útil en radioafición (la licencia de operador amateur todavía lo evalúa en muchos países), en señalización de emergencia mediante luz o sonido, y como ejercicio de memoria y decodificación. También se usa en accesibilidad, ya que personas con movilidad reducida pueden comunicarse mediante pulsaciones.',
+        text: 'Aunque la telegrafía comercial desapareció en los años 90, el código Morse sigue siendo útil en radioafición (ya no se exige para la licencia, y en España el examen no lo incluye desde 2005, pero el modo CW sigue muy vivo), en señalización de emergencia mediante luz o sonido, y como ejercicio de memoria y decodificación. También se usa en accesibilidad, ya que personas con movilidad reducida pueden comunicarse mediante pulsaciones.',
       },
     },
     {
