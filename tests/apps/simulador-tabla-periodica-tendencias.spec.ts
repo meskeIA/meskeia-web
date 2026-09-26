@@ -24,9 +24,10 @@ import { esperarPaginaAsentada } from './_hidratacion';
  * · Electronegatividad de Pauling: A. L. Allred, J. Inorg. Nucl. Chem. 17, 215 (1961), tal
  *   como la tabulan el CRC Handbook y la tabla periódica de PubChem (F 3,98 · O 3,44 ·
  *   Cl 3,16 · Na 0,93 · Cs 0,79).
- * · Radio atómico «calculado»: Clementi, Raimondi y Reinhardt, J. Chem. Phys. 47, 1300
- *   (1967), que es la serie que usa la app para Z = 1-86. Radio covalente de enlace sencillo:
- *   Pyykkö y Atsumi, Chem. Eur. J. 15, 186 (2009), que es la que usa para Z = 104-118.
+ * · Radio: radio covalente de enlace sencillo de Pyykkö y Atsumi, Chem. Eur. J. 15, 186
+ *   (2009), la serie única que usa la app para los 118 elementos desde la reparación del
+ *   hallazgo 1953 (26/09/2026). Antes mezclaba el radio calculado de Clementi 1967 (Z 1-86),
+ *   el de van der Waals (Fr, Ra, actínidos) y este mismo covalente (Z 104-118).
  * · Afinidad electrónica: Tm 1,029(22) eV = 99(3) kJ/mol (Davis y Thompson, Phys. Rev. A 65,
  *   010501, 2001); At 2,415 78(7) eV = 233,087 kJ/mol (Leimbach et al., Nat. Commun. 11,
  *   3824, 2020). La app usa el convenio «más negativo = más favorable».
@@ -34,7 +35,7 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *   tantalio como variante de tántalo, único nombre»; punto 11: «darmstatio») y DLE 23.8.1
  *   («einstenio», «tántalo», «darmstatio»; «einsteinio», «tantalio» y «darmstadtio» no están).
  *
- * HALLAZGOS ABIERTOS (cada uno vigilado por un test.fail que avisará cuando se repare)
+ * HALLAZGOS (todos REPARADOS el 26/09/2026; los casos se quedan como regresión)
  * ───────────────────────────────────────────────────────────────────────────────────────
  *   A · el radio mezcla tres definiciones y pinta el período 7 más pequeño que el 4
  *   B · cifras con punto decimal y la celda redondeando F 3,98 a «4.0»
@@ -235,25 +236,31 @@ test.describe('Tendencias de la Tabla Periódica — escritorio', () => {
     await expect(page.locator('[role="tooltip"]')).toContainText('Dato no disponible');
   });
 
-  test('CASO 2b · radio atómico (Clementi 1967): crece al bajar en el grupo 1 y a la izquierda en el período 2', async ({ page }) => {
+  test('CASO 2b · radio (Pyykkö y Atsumi 2009): crece al bajar en el grupo 1 y a la izquierda en el período 2', async ({ page }) => {
+    // Reescrito el 26/09/2026 con la reparación del hallazgo 1953: antes consagraba la serie
+    // de Clementi 1967, que solo cubre Z 1-86 y obligaba a completar con otras magnitudes.
+    // Ahora la app usa una sola serie para los 118. Valores de Pyykkö y Atsumi (2009), pm.
     await elegir(page, BOTON.radio);
-    // Clementi, Raimondi y Reinhardt (1967), pm.
-    const grupo1 = [['Litio', 167], ['Sodio', 190], ['Potasio', 243], ['Rubidio', 265], ['Cesio', 298]] as const;
-    const periodo2 = [['Litio', 167], ['Berilio', 112], ['Boro', 87], ['Carbono', 67], ['Nitrógeno', 56], ['Oxígeno', 48], ['Flúor', 42]] as const;
+    const grupo1 = [['Litio', 133], ['Sodio', 155], ['Potasio', 196], ['Rubidio', 210], ['Cesio', 232]] as const;
+    const periodo2 = [['Litio', 133], ['Berilio', 102], ['Boro', 85], ['Carbono', 75], ['Nitrógeno', 71], ['Oxígeno', 63]] as const;
     for (const [nombre, pm] of [...grupo1, ...periodo2]) {
       expect(await valorNumerico(page, nombre), nombre).toBe(pm);
     }
-    // Mínimo He 31 pm (Clementi).
-    expect((await extremosLeyenda(page))[0]).toBe(31);
+    // El F (64) queda a 1 pm del O (63): dentro de la dispersión de 3 pm del ajuste, no es
+    // una inversión de la tendencia. Se comprueba el dato, no una monotonía que no existe.
+    expect(await valorNumerico(page, 'Flúor')).toBe(64);
+    // Extremos de la serie: H 32 pm y Cs 232 pm.
+    expect(await extremosLeyenda(page)).toEqual([32, 232]);
+    // La leyenda rotula la serie.
+    await expect(page.locator('[class*="leyendaEscala"]')).toContainText('Pyykkö');
   });
 
   // ─── Hallazgos abiertos ────────────────────────────────────────────────────────────
   test('HALLAZGO A · radio: el período 7 no puede salir más pequeño que el 4 en el mismo grupo', async ({ page }) => {
-    // ABIERTO (25/09/2026): la serie mezcla el radio calculado de Clementi 1967 (Z 1-86) con el
+    // REPARADO 26/09/2026 (abierto el 25/09/2026): la serie mezcla el radio calculado de Clementi 1967 (Z 1-86) con el
     // de van der Waals (Fr, Ra, actínidos) y el covalente de Pyykkö-Atsumi 2009 (Z 104-118).
     // Grupo 4 en la app: Ti 176 · Zr 206 · Hf 208 · Rf 157 pm, contra la flecha «aumenta al
     // bajar en el grupo». En una sola serie (Pyykkö 2009): Ti 136 < Zr 154 ≈ Hf 152 < Rf 157.
-    test.fail();
     await elegir(page, BOTON.radio);
     const rf = await valorNumerico(page, 'Rutherfordio');
     expect(rf).toBeGreaterThan(await valorNumerico(page, 'Titanio'));
@@ -261,10 +268,9 @@ test.describe('Tendencias de la Tabla Periódica — escritorio', () => {
   });
 
   test('HALLAZGO B · cifras en formato español y la celda con la misma cifra que el tooltip', async ({ page }) => {
-    // ABIERTO (25/09/2026): leyenda «0.7 (Pauling)» / «3.98 (Pauling)», tooltip «3.98» y la
+    // REPARADO 26/09/2026 (abierto el 25/09/2026): leyenda «0.7 (Pauling)» / «3.98 (Pauling)», tooltip «3.98» y la
     // celda del F con «4.0» (toFixed(1), page.tsx:345), que además contradice los 3,98 del
     // tooltip y del bloque educativo.
-    test.fail();
     const leyenda = page.locator('[class*="leyendaLabels"]');
     await expect(leyenda).toContainText('3,98');
     await expect(leyenda).not.toContainText('3.98');
@@ -276,28 +282,25 @@ test.describe('Tendencias de la Tabla Periódica — escritorio', () => {
   });
 
   test('HALLAZGO C · nombres del 99 y el 110 según el DLE y el acuerdo de 2017', async ({ page }) => {
-    // ABIERTO (25/09/2026): page.tsx:151 «Einsteinio» (DLE: einstenio) y page.tsx:163
+    // REPARADO 26/09/2026 (abierto el 25/09/2026): page.tsx:151 «Einsteinio» (DLE: einstenio) y page.tsx:163
     // «Darmstadtio» (acuerdo RAC-RAE-RSEQ-Fundéu 2017, punto 11, y DLE: darmstatio).
-    test.fail();
     await expect(celdaZ(page, 99)).toHaveAttribute('aria-label', /^Einstenio,/);
     await expect(celdaZ(page, 110)).toHaveAttribute('aria-label', /^Darmstatio,/);
   });
 
   test('HALLAZGO D · el elemento 73 es «tántalo»', async ({ page }) => {
-    // ABIERTO (25/09/2026): page.tsx:123 «Tantalio». El acuerdo de 2017 (punto 6) dice
+    // REPARADO 26/09/2026 (abierto el 25/09/2026): page.tsx:123 «Tantalio». El acuerdo de 2017 (punto 6) dice
     // «suprimir tantalio como variante de tántalo, único nombre que debe figurar para el
     // elemento de número atómico 73», y el DLE 23.8.1 no recoge «tantalio»: su «tántalo»
     // (1.ª acepción) es el elemento. Lo introdujo 5c7f919e (24/08/2026) creyendo lo contrario.
-    test.fail();
     await expect(celdaZ(page, 73)).toHaveAttribute('aria-label', /^Tántalo,/);
   });
 
   test('HALLAZGO E · etiquetas: sin doble paréntesis, ordinal con punto, mayúsculas españolas y sin «noble» en el nitrógeno', async ({ page }) => {
-    // ABIERTO (25/09/2026): botón «Electronegatividad ((Pauling))» (page.tsx:191 + :539),
+    // REPARADO 26/09/2026 (abierto el 25/09/2026): botón «Electronegatividad ((Pauling))» (page.tsx:191 + :539),
     // «1ª» (page.tsx:200), tooltip «Metal De Transición» (text-transform: capitalize en
     // SimuladorTablaPeriodica.module.css:279) y el aria-label «0 (noble/metal d¹⁰)» para
     // N, Be, Mg, Mn y Hf (page.tsx:275).
-    test.fail();
     for (const texto of await page.locator('[role="group"] button').allInnerTexts()) {
       expect(texto).not.toContain('((');
     }
@@ -314,44 +317,73 @@ test.describe('Tendencias de la Tabla Periódica — escritorio', () => {
   });
 
   test('HALLAZGO F · punto de fusión: el texto no puede dar por máximo a otro elemento que la leyenda', async ({ page }) => {
-    // ABIERTO (25/09/2026): con «Punto de fusión» la leyenda llega a 3550 °C (el carbono,
+    // REPARADO 26/09/2026 (abierto el 25/09/2026): con «Punto de fusión» la leyenda llega a 3550 °C (el carbono,
     // page.tsx:50), y la tabla educativa dice «He y H: Tf más bajas; W la más alta»
     // (page.tsx:663; W = 3422 °C). El truco de page.tsx:780 dice además «hierve» por «funde».
-    test.fail();
     await elegir(page, BOTON.fusion);
     const [, maximo] = await extremosLeyenda(page); // hoy 3550 (C)
     const texto = (await page.locator('[class*="tablaComparativa"]').textContent()) ?? '';
     // O el máximo de la leyenda es el del W, o el texto deja de decir que el W es el máximo.
     if (maximo !== 3422) expect(texto).not.toContain('W la más alta');
+    // Reparado sacando al C de la escala (no funde a 1 atm: sublima). El máximo es el W.
+    expect(maximo).toBe(3422);
+    await expect(celda(page, 'Carbono')).toHaveAttribute('aria-label', /No disponible · No funde a 1 atm/);
     await expect(page.locator('[class*="tipsGrid"]')).not.toContainText('hierve');
   });
 
   test('HALLAZGO G · afinidad electrónica medida, no de relleno: Tm y At', async ({ page }) => {
-    // ABIERTO (25/09/2026): los 14 lantánidos Ce-Lu llevan −50 kJ/mol y los actínidos Pu-Lr
+    // REPARADO 26/09/2026 (abierto el 25/09/2026): los 14 lantánidos Ce-Lu llevan −50 kJ/mol y los actínidos Pu-Lr
     // −10, valores de relleno. Tm medido: 1,029(22) eV = 99(3) kJ/mol (Davis y Thompson 2001).
     // At medido: 2,415 78 eV = 233,09 kJ/mol (Leimbach et al. 2020); la app da −270,1.
-    test.fail();
     await elegir(page, BOTON.afinidad);
     expect(Math.abs((await valorNumerico(page, 'Tulio')) - -99)).toBeLessThanOrEqual(5);
     expect(Math.abs((await valorNumerico(page, 'Astato')) - -233.1)).toBeLessThanOrEqual(5);
   });
 
   test('HALLAZGO H · contraste de las celdas: el símbolo del F sobre rojo llega a 4,5:1', async ({ page }) => {
-    // ABIERTO (25/09/2026): colorTexto() (page.tsx:259-270) decide blanco/negro por una
+    // REPARADO 26/09/2026 (abierto el 25/09/2026): colorTexto() (page.tsx:259-270) decide blanco/negro por una
     // luminancia aproximada con umbral 140, y el blanco sobre rgb(255,0,0) da 4,00:1 en un
     // símbolo de 16 px (no es texto grande); la cifra de 7,68 px a opacidad 0,85 da 3,08:1.
     // Con electronegatividad, 122 de 360 textos de celda quedan bajo 4,5:1 (259 con afinidad).
-    test.fail();
     const f = celda(page, 'Flúor');
     expect(await contraste(f.locator('span').nth(1))).toBeGreaterThanOrEqual(4.5);
     expect(await contraste(f.locator('span').nth(2))).toBeGreaterThanOrEqual(4.5);
   });
 
+  test('HALLAZGO H (barrido) · todos los textos de celda ≥ 4,5:1 con electronegatividad y con afinidad', async ({ page }) => {
+    // El acta medía 122 de 360 textos bajo 4,5:1 con electronegatividad y 259 con afinidad.
+    // Las celdas llevan el color de fondo en línea y el texto a opacidad plena, así que basta
+    // el color de la celda como fondo.
+    const peorContraste = (): Promise<number> =>
+      page.evaluate(() => {
+        const leer = (c: string): number[] => (c.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+        const lum = ([r, g, b]: number[]): number => {
+          const f = (x: number): number => {
+            const v = x / 255;
+            return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+          };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        let peor = Infinity;
+        for (const celdaEl of document.querySelectorAll('[role="button"][aria-label*="Z="]')) {
+          const fondo = lum(leer(getComputedStyle(celdaEl).backgroundColor));
+          for (const span of celdaEl.querySelectorAll('span')) {
+            const texto = lum(leer(getComputedStyle(span).color));
+            const r = (Math.max(fondo, texto) + 0.05) / (Math.min(fondo, texto) + 0.05);
+            peor = Math.min(peor, r);
+          }
+        }
+        return peor;
+      });
+    expect(await peorContraste()).toBeGreaterThanOrEqual(4.5);
+    await elegir(page, BOTON.afinidad);
+    expect(await peorContraste()).toBeGreaterThanOrEqual(4.5);
+  });
+
   test('HALLAZGO I · en oscuro, el marcador de La/Ac se lee (4,5:1)', async ({ page }) => {
-    // ABIERTO (25/09/2026): el marcador lleva color '#555' en línea (page.tsx:333), que gana a
+    // REPARADO 26/09/2026 (abierto el 25/09/2026): el marcador lleva color '#555' en línea (page.tsx:333), que gana a
     // la regla oscura (`color: #aaa`, SimuladorTablaPeriodica.module.css:535-538): #555 sobre
     // #3a3a3a = 1,40:1 en el «57» y 1,43:1 en el «La».
-    test.fail();
     await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
     const marcador = page.locator('[aria-label="Lantano (ver fila inferior)"]');
@@ -361,10 +393,9 @@ test.describe('Tendencias de la Tabla Periódica — escritorio', () => {
   });
 
   test('HALLAZGO J · teclado: el tooltip aparece junto a la celda y no se queda con el elemento anterior', async ({ page }) => {
-    // ABIERTO (25/09/2026): Enter llama a onHover(elemento, 0, 0) (page.tsx:356), así que el
+    // REPARADO 26/09/2026 (abierto el 25/09/2026): Enter llama a onHover(elemento, 0, 0) (page.tsx:356), así que el
     // tooltip nace en (14, 14), en la esquina de la ventana; no hay onBlur ni Escape, y al
     // tabular a Neón sigue diciendo «Flúor». Espacio no hace nada en un role="button".
-    test.fail();
     const f = celda(page, 'Flúor');
     await f.focus();
     await page.keyboard.press('Enter');
@@ -382,9 +413,8 @@ test.describe('Tendencias de la Tabla Periódica — escritorio', () => {
   });
 
   test('HALLAZGO K · los botones de propiedad llegan a 4,5:1', async ({ page }) => {
-    // ABIERTO (25/09/2026): texto var(--primary) sobre el fondo de la página, 3,93:1 en claro;
+    // REPARADO 26/09/2026 (abierto el 25/09/2026): texto var(--primary) sobre el fondo de la página, 3,93:1 en claro;
     // el activo, blanco sobre var(--primary), 4,11:1 en claro y 2,79:1 en oscuro (13,6 px).
-    test.fail();
     expect(await contraste(page.getByRole('button', { name: BOTON.radio }))).toBeGreaterThanOrEqual(4.5);
     await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     // Los botones llevan `transition: background 0.18s, color 0.18s`: medir al terminar, o se

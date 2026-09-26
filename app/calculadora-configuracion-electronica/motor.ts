@@ -138,7 +138,7 @@ export const ELEMENTOS: ElementoCE[] = [
   { z: 107, simbolo: 'Bh', nombre: 'Bohrio' },
   { z: 108, simbolo: 'Hs', nombre: 'Hasio' },
   { z: 109, simbolo: 'Mt', nombre: 'Meitnerio' },
-  { z: 110, simbolo: 'Ds', nombre: 'Darmstadtio' },
+  { z: 110, simbolo: 'Ds', nombre: 'Darmstatio' },
   { z: 111, simbolo: 'Rg', nombre: 'Roentgenio' },
   { z: 112, simbolo: 'Cn', nombre: 'Copernicio' },
   { z: 113, simbolo: 'Nh', nombre: 'Nihonio' },

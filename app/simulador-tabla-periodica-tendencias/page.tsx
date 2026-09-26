@@ -5,171 +5,37 @@ import { useState, useCallback, useRef } from 'react';
 import styles from './SimuladorTablaPeriodica.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  ELEMENTOS,
+  ANION_NO_ESTABLE,
+  IONIZACION_CALCULADA,
+  FUSION_ESTIMADA,
+  NOTAS_FUSION,
+  type Elemento,
+} from './datos';
 
 // ============================================================
 // TIPOS
 // ============================================================
-interface Elemento {
-  Z: number;
-  simbolo: string;
-  nombre: string;
-  grupo: number | null;
-  periodo: number;
-  radioAtomico: number | null;
-  electronegatividad: number | null;
-  energiaIonizacion: number | null;
-  afinidadElectronica: number | null;
-  puntoFusion: number | null;
-  categoria: string;
-}
-
 type PropiedadKey = 'radioAtomico' | 'electronegatividad' | 'energiaIonizacion' | 'afinidadElectronica' | 'puntoFusion';
 
 interface PropiedadInfo {
   key: PropiedadKey;
   label: string;
+  /** Unidad que acompaña a la cifra («pm», «kJ/mol», «°C»); vacía si es adimensional. */
   unidad: string;
+  /** Texto entre paréntesis del botón: la unidad o, si no hay, la escala. */
+  unidadBoton: string;
+  /** Serie de datos y fuente, rotulada bajo la leyenda (hallazgos 1953 y 1959). */
+  escala: string;
   descripcion: string;
-  flechaGrupo: string;   // dirección de aumento en grupo (↑/↓)
-  flechaPeriodo: string; // dirección de aumento en período (←/→)
+  /** Dirección de aumento en el grupo (↑/↓), o `null` si no hay una tendencia única. */
+  flechaGrupo: string | null;
+  /** Dirección de aumento en el período (←/→), o `null` si no hay una tendencia única. */
+  flechaPeriodo: string | null;
   textoGrupo: string;
   textoPeriodo: string;
 }
-
-// ============================================================
-// DATOS: 118 ELEMENTOS
-// ============================================================
-const ELEMENTOS: Elemento[] = [
-  // Período 1
-  { Z:1, simbolo:'H', nombre:'Hidrógeno', grupo:1, periodo:1, radioAtomico:53, electronegatividad:2.20, energiaIonizacion:1312, afinidadElectronica:-72.8, puntoFusion:-259.1, categoria:'no-metal' },
-  { Z:2, simbolo:'He', nombre:'Helio', grupo:18, periodo:1, radioAtomico:31, electronegatividad:null, energiaIonizacion:2372, afinidadElectronica:0, puntoFusion:-272.2, categoria:'gas-noble' },
-  // Período 2
-  { Z:3, simbolo:'Li', nombre:'Litio', grupo:1, periodo:2, radioAtomico:167, electronegatividad:0.98, energiaIonizacion:520, afinidadElectronica:-59.6, puntoFusion:180.5, categoria:'metal-alcalino' },
-  { Z:4, simbolo:'Be', nombre:'Berilio', grupo:2, periodo:2, radioAtomico:112, electronegatividad:1.57, energiaIonizacion:900, afinidadElectronica:0, puntoFusion:1287, categoria:'metal-alcalinoterreo' },
-  { Z:5, simbolo:'B', nombre:'Boro', grupo:13, periodo:2, radioAtomico:87, electronegatividad:2.04, energiaIonizacion:801, afinidadElectronica:-26.7, puntoFusion:2075, categoria:'metaloide' },
-  { Z:6, simbolo:'C', nombre:'Carbono', grupo:14, periodo:2, radioAtomico:67, electronegatividad:2.55, energiaIonizacion:1086, afinidadElectronica:-121.8, puntoFusion:3550, categoria:'no-metal' },
-  { Z:7, simbolo:'N', nombre:'Nitrógeno', grupo:15, periodo:2, radioAtomico:56, electronegatividad:3.04, energiaIonizacion:1402, afinidadElectronica:0, puntoFusion:-210, categoria:'no-metal' },
-  { Z:8, simbolo:'O', nombre:'Oxígeno', grupo:16, periodo:2, radioAtomico:48, electronegatividad:3.44, energiaIonizacion:1314, afinidadElectronica:-141, puntoFusion:-218.8, categoria:'no-metal' },
-  { Z:9, simbolo:'F', nombre:'Flúor', grupo:17, periodo:2, radioAtomico:42, electronegatividad:3.98, energiaIonizacion:1681, afinidadElectronica:-328, puntoFusion:-219.6, categoria:'halógeno' },
-  { Z:10, simbolo:'Ne', nombre:'Neón', grupo:18, periodo:2, radioAtomico:38, electronegatividad:null, energiaIonizacion:2081, afinidadElectronica:0, puntoFusion:-248.6, categoria:'gas-noble' },
-  // Período 3
-  { Z:11, simbolo:'Na', nombre:'Sodio', grupo:1, periodo:3, radioAtomico:190, electronegatividad:0.93, energiaIonizacion:496, afinidadElectronica:-52.8, puntoFusion:97.8, categoria:'metal-alcalino' },
-  { Z:12, simbolo:'Mg', nombre:'Magnesio', grupo:2, periodo:3, radioAtomico:145, electronegatividad:1.31, energiaIonizacion:738, afinidadElectronica:0, puntoFusion:650, categoria:'metal-alcalinoterreo' },
-  { Z:13, simbolo:'Al', nombre:'Aluminio', grupo:13, periodo:3, radioAtomico:118, electronegatividad:1.61, energiaIonizacion:577, afinidadElectronica:-42.5, puntoFusion:660.3, categoria:'metal-postransicion' },
-  { Z:14, simbolo:'Si', nombre:'Silicio', grupo:14, periodo:3, radioAtomico:111, electronegatividad:1.90, energiaIonizacion:786, afinidadElectronica:-133.6, puntoFusion:1414, categoria:'metaloide' },
-  { Z:15, simbolo:'P', nombre:'Fósforo', grupo:15, periodo:3, radioAtomico:98, electronegatividad:2.19, energiaIonizacion:1012, afinidadElectronica:-72, puntoFusion:44.2, categoria:'no-metal' },
-  { Z:16, simbolo:'S', nombre:'Azufre', grupo:16, periodo:3, radioAtomico:88, electronegatividad:2.58, energiaIonizacion:1000, afinidadElectronica:-200.4, puntoFusion:112.8, categoria:'no-metal' },
-  { Z:17, simbolo:'Cl', nombre:'Cloro', grupo:17, periodo:3, radioAtomico:79, electronegatividad:3.16, energiaIonizacion:1251, afinidadElectronica:-348.6, puntoFusion:-101.5, categoria:'halógeno' },
-  { Z:18, simbolo:'Ar', nombre:'Argón', grupo:18, periodo:3, radioAtomico:71, electronegatividad:null, energiaIonizacion:1521, afinidadElectronica:0, puntoFusion:-189.4, categoria:'gas-noble' },
-  // Período 4
-  { Z:19, simbolo:'K', nombre:'Potasio', grupo:1, periodo:4, radioAtomico:243, electronegatividad:0.82, energiaIonizacion:419, afinidadElectronica:-48.4, puntoFusion:63.4, categoria:'metal-alcalino' },
-  { Z:20, simbolo:'Ca', nombre:'Calcio', grupo:2, periodo:4, radioAtomico:194, electronegatividad:1.00, energiaIonizacion:590, afinidadElectronica:-2.4, puntoFusion:842, categoria:'metal-alcalinoterreo' },
-  { Z:21, simbolo:'Sc', nombre:'Escandio', grupo:3, periodo:4, radioAtomico:184, electronegatividad:1.36, energiaIonizacion:633, afinidadElectronica:-18.1, puntoFusion:1541, categoria:'metal-transicion' },
-  { Z:22, simbolo:'Ti', nombre:'Titanio', grupo:4, periodo:4, radioAtomico:176, electronegatividad:1.54, energiaIonizacion:658, afinidadElectronica:-7.6, puntoFusion:1668, categoria:'metal-transicion' },
-  { Z:23, simbolo:'V', nombre:'Vanadio', grupo:5, periodo:4, radioAtomico:171, electronegatividad:1.63, energiaIonizacion:650, afinidadElectronica:-50.6, puntoFusion:1910, categoria:'metal-transicion' },
-  { Z:24, simbolo:'Cr', nombre:'Cromo', grupo:6, periodo:4, radioAtomico:166, electronegatividad:1.66, energiaIonizacion:653, afinidadElectronica:-64.3, puntoFusion:1907, categoria:'metal-transicion' },
-  { Z:25, simbolo:'Mn', nombre:'Manganeso', grupo:7, periodo:4, radioAtomico:161, electronegatividad:1.55, energiaIonizacion:717, afinidadElectronica:0, puntoFusion:1246, categoria:'metal-transicion' },
-  { Z:26, simbolo:'Fe', nombre:'Hierro', grupo:8, periodo:4, radioAtomico:156, electronegatividad:1.83, energiaIonizacion:762, afinidadElectronica:-15.7, puntoFusion:1538, categoria:'metal-transicion' },
-  { Z:27, simbolo:'Co', nombre:'Cobalto', grupo:9, periodo:4, radioAtomico:152, electronegatividad:1.88, energiaIonizacion:760, afinidadElectronica:-63.7, puntoFusion:1495, categoria:'metal-transicion' },
-  { Z:28, simbolo:'Ni', nombre:'Níquel', grupo:10, periodo:4, radioAtomico:149, electronegatividad:1.91, energiaIonizacion:737, afinidadElectronica:-111.5, puntoFusion:1455, categoria:'metal-transicion' },
-  { Z:29, simbolo:'Cu', nombre:'Cobre', grupo:11, periodo:4, radioAtomico:145, electronegatividad:1.90, energiaIonizacion:745, afinidadElectronica:-118.4, puntoFusion:1084.6, categoria:'metal-transicion' },
-  { Z:30, simbolo:'Zn', nombre:'Zinc', grupo:12, periodo:4, radioAtomico:142, electronegatividad:1.65, energiaIonizacion:906, afinidadElectronica:0, puntoFusion:419.5, categoria:'metal-transicion' },
-  { Z:31, simbolo:'Ga', nombre:'Galio', grupo:13, periodo:4, radioAtomico:136, electronegatividad:1.81, energiaIonizacion:579, afinidadElectronica:-28.9, puntoFusion:29.8, categoria:'metal-postransicion' },
-  { Z:32, simbolo:'Ge', nombre:'Germanio', grupo:14, periodo:4, radioAtomico:125, electronegatividad:2.01, energiaIonizacion:762, afinidadElectronica:-119, puntoFusion:938.3, categoria:'metaloide' },
-  { Z:33, simbolo:'As', nombre:'Arsénico', grupo:15, periodo:4, radioAtomico:114, electronegatividad:2.18, energiaIonizacion:947, afinidadElectronica:-78, puntoFusion:817, categoria:'metaloide' },
-  { Z:34, simbolo:'Se', nombre:'Selenio', grupo:16, periodo:4, radioAtomico:103, electronegatividad:2.55, energiaIonizacion:941, afinidadElectronica:-195.1, puntoFusion:220.8, categoria:'no-metal' },
-  { Z:35, simbolo:'Br', nombre:'Bromo', grupo:17, periodo:4, radioAtomico:94, electronegatividad:2.96, energiaIonizacion:1140, afinidadElectronica:-324.6, puntoFusion:-7.3, categoria:'halógeno' },
-  { Z:36, simbolo:'Kr', nombre:'Kriptón', grupo:18, periodo:4, radioAtomico:88, electronegatividad:3.00, energiaIonizacion:1351, afinidadElectronica:0, puntoFusion:-157.4, categoria:'gas-noble' },
-  // Período 5
-  { Z:37, simbolo:'Rb', nombre:'Rubidio', grupo:1, periodo:5, radioAtomico:265, electronegatividad:0.82, energiaIonizacion:403, afinidadElectronica:-46.9, puntoFusion:39.3, categoria:'metal-alcalino' },
-  { Z:38, simbolo:'Sr', nombre:'Estroncio', grupo:2, periodo:5, radioAtomico:219, electronegatividad:0.95, energiaIonizacion:550, afinidadElectronica:-5.0, puntoFusion:777, categoria:'metal-alcalinoterreo' },
-  { Z:39, simbolo:'Y', nombre:'Itrio', grupo:3, periodo:5, radioAtomico:212, electronegatividad:1.22, energiaIonizacion:600, afinidadElectronica:-29.6, puntoFusion:1522, categoria:'metal-transicion' },
-  { Z:40, simbolo:'Zr', nombre:'Circonio', grupo:4, periodo:5, radioAtomico:206, electronegatividad:1.33, energiaIonizacion:640, afinidadElectronica:-41.1, puntoFusion:1855, categoria:'metal-transicion' },
-  { Z:41, simbolo:'Nb', nombre:'Niobio', grupo:5, periodo:5, radioAtomico:198, electronegatividad:1.6, energiaIonizacion:652, afinidadElectronica:-86.1, puntoFusion:2477, categoria:'metal-transicion' },
-  { Z:42, simbolo:'Mo', nombre:'Molibdeno', grupo:6, periodo:5, radioAtomico:190, electronegatividad:2.16, energiaIonizacion:684, afinidadElectronica:-72.1, puntoFusion:2623, categoria:'metal-transicion' },
-  { Z:43, simbolo:'Tc', nombre:'Tecnecio', grupo:7, periodo:5, radioAtomico:183, electronegatividad:1.9, energiaIonizacion:702, afinidadElectronica:-53, puntoFusion:2157, categoria:'metal-transicion' },
-  { Z:44, simbolo:'Ru', nombre:'Rutenio', grupo:8, periodo:5, radioAtomico:178, electronegatividad:2.2, energiaIonizacion:711, afinidadElectronica:-101.3, puntoFusion:2334, categoria:'metal-transicion' },
-  { Z:45, simbolo:'Rh', nombre:'Rodio', grupo:9, periodo:5, radioAtomico:173, electronegatividad:2.28, energiaIonizacion:720, afinidadElectronica:-109.7, puntoFusion:1964, categoria:'metal-transicion' },
-  { Z:46, simbolo:'Pd', nombre:'Paladio', grupo:10, periodo:5, radioAtomico:169, electronegatividad:2.20, energiaIonizacion:805, afinidadElectronica:-53.7, puntoFusion:1555, categoria:'metal-transicion' },
-  { Z:47, simbolo:'Ag', nombre:'Plata', grupo:11, periodo:5, radioAtomico:165, electronegatividad:1.93, energiaIonizacion:731, afinidadElectronica:-125.6, puntoFusion:961.8, categoria:'metal-transicion' },
-  { Z:48, simbolo:'Cd', nombre:'Cadmio', grupo:12, periodo:5, radioAtomico:161, electronegatividad:1.69, energiaIonizacion:868, afinidadElectronica:0, puntoFusion:321.1, categoria:'metal-transicion' },
-  { Z:49, simbolo:'In', nombre:'Indio', grupo:13, periodo:5, radioAtomico:156, electronegatividad:1.78, energiaIonizacion:558, afinidadElectronica:-28.9, puntoFusion:156.6, categoria:'metal-postransicion' },
-  { Z:50, simbolo:'Sn', nombre:'Estaño', grupo:14, periodo:5, radioAtomico:145, electronegatividad:1.96, energiaIonizacion:709, afinidadElectronica:-107.3, puntoFusion:231.9, categoria:'metal-postransicion' },
-  { Z:51, simbolo:'Sb', nombre:'Antimonio', grupo:15, periodo:5, radioAtomico:133, electronegatividad:2.05, energiaIonizacion:834, afinidadElectronica:-103.2, puntoFusion:630.6, categoria:'metaloide' },
-  { Z:52, simbolo:'Te', nombre:'Telurio', grupo:16, periodo:5, radioAtomico:123, electronegatividad:2.1, energiaIonizacion:869, afinidadElectronica:-190.2, puntoFusion:449.5, categoria:'metaloide' },
-  { Z:53, simbolo:'I', nombre:'Yodo', grupo:17, periodo:5, radioAtomico:115, electronegatividad:2.66, energiaIonizacion:1008, afinidadElectronica:-295.2, puntoFusion:113.7, categoria:'halógeno' },
-  { Z:54, simbolo:'Xe', nombre:'Xenón', grupo:18, periodo:5, radioAtomico:108, electronegatividad:2.60, energiaIonizacion:1170, afinidadElectronica:0, puntoFusion:-111.8, categoria:'gas-noble' },
-  // Período 6
-  { Z:55, simbolo:'Cs', nombre:'Cesio', grupo:1, periodo:6, radioAtomico:298, electronegatividad:0.79, energiaIonizacion:376, afinidadElectronica:-45.5, puntoFusion:28.4, categoria:'metal-alcalino' },
-  { Z:56, simbolo:'Ba', nombre:'Bario', grupo:2, periodo:6, radioAtomico:253, electronegatividad:0.89, energiaIonizacion:503, afinidadElectronica:-13.95, puntoFusion:727, categoria:'metal-alcalinoterreo' },
-  // Lantánidos
-  { Z:57, simbolo:'La', nombre:'Lantano', grupo:null, periodo:6, radioAtomico:247, electronegatividad:1.10, energiaIonizacion:538, afinidadElectronica:-48, puntoFusion:920, categoria:'lantanido' },
-  { Z:58, simbolo:'Ce', nombre:'Cerio', grupo:null, periodo:6, radioAtomico:204, electronegatividad:1.12, energiaIonizacion:534, afinidadElectronica:-50, puntoFusion:798, categoria:'lantanido' },
-  { Z:59, simbolo:'Pr', nombre:'Praseodimio', grupo:null, periodo:6, radioAtomico:247, electronegatividad:1.13, energiaIonizacion:527, afinidadElectronica:-50, puntoFusion:931, categoria:'lantanido' },
-  { Z:60, simbolo:'Nd', nombre:'Neodimio', grupo:null, periodo:6, radioAtomico:206, electronegatividad:1.14, energiaIonizacion:533, afinidadElectronica:-50, puntoFusion:1021, categoria:'lantanido' },
-  { Z:61, simbolo:'Pm', nombre:'Prometio', grupo:null, periodo:6, radioAtomico:205, electronegatividad:1.13, energiaIonizacion:540, afinidadElectronica:-50, puntoFusion:1042, categoria:'lantanido' },
-  { Z:62, simbolo:'Sm', nombre:'Samario', grupo:null, periodo:6, radioAtomico:238, electronegatividad:1.17, energiaIonizacion:545, afinidadElectronica:-50, puntoFusion:1074, categoria:'lantanido' },
-  { Z:63, simbolo:'Eu', nombre:'Europio', grupo:null, periodo:6, radioAtomico:231, electronegatividad:1.20, energiaIonizacion:547, afinidadElectronica:-50, puntoFusion:822, categoria:'lantanido' },
-  { Z:64, simbolo:'Gd', nombre:'Gadolinio', grupo:null, periodo:6, radioAtomico:233, electronegatividad:1.20, energiaIonizacion:593, afinidadElectronica:-50, puntoFusion:1313, categoria:'lantanido' },
-  { Z:65, simbolo:'Tb', nombre:'Terbio', grupo:null, periodo:6, radioAtomico:225, electronegatividad:1.20, energiaIonizacion:566, afinidadElectronica:-50, puntoFusion:1356, categoria:'lantanido' },
-  { Z:66, simbolo:'Dy', nombre:'Disprosio', grupo:null, periodo:6, radioAtomico:228, electronegatividad:1.22, energiaIonizacion:573, afinidadElectronica:-50, puntoFusion:1412, categoria:'lantanido' },
-  { Z:67, simbolo:'Ho', nombre:'Holmio', grupo:null, periodo:6, radioAtomico:226, electronegatividad:1.23, energiaIonizacion:581, afinidadElectronica:-50, puntoFusion:1474, categoria:'lantanido' },
-  { Z:68, simbolo:'Er', nombre:'Erbio', grupo:null, periodo:6, radioAtomico:226, electronegatividad:1.24, energiaIonizacion:589, afinidadElectronica:-50, puntoFusion:1529, categoria:'lantanido' },
-  { Z:69, simbolo:'Tm', nombre:'Tulio', grupo:null, periodo:6, radioAtomico:222, electronegatividad:1.25, energiaIonizacion:597, afinidadElectronica:-50, puntoFusion:1545, categoria:'lantanido' },
-  { Z:70, simbolo:'Yb', nombre:'Iterbio', grupo:null, periodo:6, radioAtomico:222, electronegatividad:1.10, energiaIonizacion:603, afinidadElectronica:-50, puntoFusion:819, categoria:'lantanido' },
-  { Z:71, simbolo:'Lu', nombre:'Lutecio', grupo:null, periodo:6, radioAtomico:217, electronegatividad:1.27, energiaIonizacion:524, afinidadElectronica:-50, puntoFusion:1663, categoria:'lantanido' },
-  // Transición período 6
-  { Z:72, simbolo:'Hf', nombre:'Hafnio', grupo:4, periodo:6, radioAtomico:208, electronegatividad:1.3, energiaIonizacion:658, afinidadElectronica:0, puntoFusion:2233, categoria:'metal-transicion' },
-  { Z:73, simbolo:'Ta', nombre:'Tantalio', grupo:5, periodo:6, radioAtomico:200, electronegatividad:1.5, energiaIonizacion:761, afinidadElectronica:-31, puntoFusion:3017, categoria:'metal-transicion' },
-  { Z:74, simbolo:'W', nombre:'Wolframio', grupo:6, periodo:6, radioAtomico:193, electronegatividad:2.36, energiaIonizacion:770, afinidadElectronica:-78.6, puntoFusion:3422, categoria:'metal-transicion' },
-  { Z:75, simbolo:'Re', nombre:'Renio', grupo:7, periodo:6, radioAtomico:188, electronegatividad:1.9, energiaIonizacion:760, afinidadElectronica:-14.5, puntoFusion:3186, categoria:'metal-transicion' },
-  { Z:76, simbolo:'Os', nombre:'Osmio', grupo:8, periodo:6, radioAtomico:185, electronegatividad:2.2, energiaIonizacion:840, afinidadElectronica:-106.1, puntoFusion:3033, categoria:'metal-transicion' },
-  { Z:77, simbolo:'Ir', nombre:'Iridio', grupo:9, periodo:6, radioAtomico:180, electronegatividad:2.20, energiaIonizacion:880, afinidadElectronica:-151, puntoFusion:2446, categoria:'metal-transicion' },
-  { Z:78, simbolo:'Pt', nombre:'Platino', grupo:10, periodo:6, radioAtomico:177, electronegatividad:2.28, energiaIonizacion:870, afinidadElectronica:-205.3, puntoFusion:1768.3, categoria:'metal-transicion' },
-  { Z:79, simbolo:'Au', nombre:'Oro', grupo:11, periodo:6, radioAtomico:174, electronegatividad:2.54, energiaIonizacion:890, afinidadElectronica:-222.8, puntoFusion:1064.2, categoria:'metal-transicion' },
-  { Z:80, simbolo:'Hg', nombre:'Mercurio', grupo:12, periodo:6, radioAtomico:171, electronegatividad:2.00, energiaIonizacion:1007, afinidadElectronica:0, puntoFusion:-38.8, categoria:'metal-transicion' },
-  { Z:81, simbolo:'Tl', nombre:'Talio', grupo:13, periodo:6, radioAtomico:156, electronegatividad:1.62, energiaIonizacion:589, afinidadElectronica:-19.2, puntoFusion:304, categoria:'metal-postransicion' },
-  { Z:82, simbolo:'Pb', nombre:'Plomo', grupo:14, periodo:6, radioAtomico:154, electronegatividad:2.33, energiaIonizacion:716, afinidadElectronica:-35.1, puntoFusion:327.5, categoria:'metal-postransicion' },
-  { Z:83, simbolo:'Bi', nombre:'Bismuto', grupo:15, periodo:6, radioAtomico:143, electronegatividad:2.02, energiaIonizacion:703, afinidadElectronica:-91.2, puntoFusion:271.4, categoria:'metal-postransicion' },
-  { Z:84, simbolo:'Po', nombre:'Polonio', grupo:16, periodo:6, radioAtomico:135, electronegatividad:2.0, energiaIonizacion:812, afinidadElectronica:-183.3, puntoFusion:254, categoria:'metaloide' },
-  { Z:85, simbolo:'At', nombre:'Astato', grupo:17, periodo:6, radioAtomico:127, electronegatividad:2.2, energiaIonizacion:920, afinidadElectronica:-270.1, puntoFusion:302, categoria:'halógeno' },
-  { Z:86, simbolo:'Rn', nombre:'Radón', grupo:18, periodo:6, radioAtomico:120, electronegatividad:null, energiaIonizacion:1037, afinidadElectronica:0, puntoFusion:-71, categoria:'gas-noble' },
-  // Período 7
-  { Z:87, simbolo:'Fr', nombre:'Francio', grupo:1, periodo:7, radioAtomico:348, electronegatividad:0.7, energiaIonizacion:393, afinidadElectronica:-44, puntoFusion:27, categoria:'metal-alcalino' },
-  { Z:88, simbolo:'Ra', nombre:'Radio', grupo:2, periodo:7, radioAtomico:283, electronegatividad:0.9, energiaIonizacion:509, afinidadElectronica:-10, puntoFusion:700, categoria:'metal-alcalinoterreo' },
-  // Actínidos
-  { Z:89, simbolo:'Ac', nombre:'Actinio', grupo:null, periodo:7, radioAtomico:260, electronegatividad:1.1, energiaIonizacion:499, afinidadElectronica:-34, puntoFusion:1051, categoria:'actinido' },
-  { Z:90, simbolo:'Th', nombre:'Torio', grupo:null, periodo:7, radioAtomico:237, electronegatividad:1.3, energiaIonizacion:587, afinidadElectronica:-112, puntoFusion:1750, categoria:'actinido' },
-  { Z:91, simbolo:'Pa', nombre:'Protactinio', grupo:null, periodo:7, radioAtomico:243, electronegatividad:1.5, energiaIonizacion:568, afinidadElectronica:-53, puntoFusion:1572, categoria:'actinido' },
-  { Z:92, simbolo:'U', nombre:'Uranio', grupo:null, periodo:7, radioAtomico:240, electronegatividad:1.38, energiaIonizacion:598, afinidadElectronica:-50.5, puntoFusion:1135, categoria:'actinido' },
-  { Z:93, simbolo:'Np', nombre:'Neptunio', grupo:null, periodo:7, radioAtomico:221, electronegatividad:1.36, energiaIonizacion:605, afinidadElectronica:-45.9, puntoFusion:644, categoria:'actinido' },
-  { Z:94, simbolo:'Pu', nombre:'Plutonio', grupo:null, periodo:7, radioAtomico:243, electronegatividad:1.28, energiaIonizacion:585, afinidadElectronica:-10, puntoFusion:640, categoria:'actinido' },
-  { Z:95, simbolo:'Am', nombre:'Americio', grupo:null, periodo:7, radioAtomico:244, electronegatividad:1.3, energiaIonizacion:578, afinidadElectronica:-10, puntoFusion:1176, categoria:'actinido' },
-  { Z:96, simbolo:'Cm', nombre:'Curio', grupo:null, periodo:7, radioAtomico:245, electronegatividad:1.3, energiaIonizacion:581, afinidadElectronica:-10, puntoFusion:1345, categoria:'actinido' },
-  { Z:97, simbolo:'Bk', nombre:'Berkelio', grupo:null, periodo:7, radioAtomico:244, electronegatividad:1.3, energiaIonizacion:601, afinidadElectronica:-10, puntoFusion:986, categoria:'actinido' },
-  { Z:98, simbolo:'Cf', nombre:'Californio', grupo:null, periodo:7, radioAtomico:245, electronegatividad:1.3, energiaIonizacion:608, afinidadElectronica:-10, puntoFusion:900, categoria:'actinido' },
-  { Z:99, simbolo:'Es', nombre:'Einsteinio', grupo:null, periodo:7, radioAtomico:245, electronegatividad:1.3, energiaIonizacion:619, afinidadElectronica:-10, puntoFusion:860, categoria:'actinido' },
-  { Z:100, simbolo:'Fm', nombre:'Fermio', grupo:null, periodo:7, radioAtomico:245, electronegatividad:1.3, energiaIonizacion:627, afinidadElectronica:-10, puntoFusion:1527, categoria:'actinido' },
-  { Z:101, simbolo:'Md', nombre:'Mendelevio', grupo:null, periodo:7, radioAtomico:246, electronegatividad:1.3, energiaIonizacion:635, afinidadElectronica:-10, puntoFusion:827, categoria:'actinido' },
-  { Z:102, simbolo:'No', nombre:'Nobelio', grupo:null, periodo:7, radioAtomico:246, electronegatividad:1.3, energiaIonizacion:642, afinidadElectronica:-10, puntoFusion:827, categoria:'actinido' },
-  { Z:103, simbolo:'Lr', nombre:'Lawrencio', grupo:null, periodo:7, radioAtomico:246, electronegatividad:1.3, energiaIonizacion:470, afinidadElectronica:-10, puntoFusion:1627, categoria:'actinido' },
-  // Transición período 7
-  { Z:104, simbolo:'Rf', nombre:'Rutherfordio', grupo:4, periodo:7, radioAtomico:157, electronegatividad:null, energiaIonizacion:580, afinidadElectronica:null, puntoFusion:2100, categoria:'metal-transicion' },
-  { Z:105, simbolo:'Db', nombre:'Dubnio', grupo:5, periodo:7, radioAtomico:149, electronegatividad:null, energiaIonizacion:664, afinidadElectronica:null, puntoFusion:null, categoria:'metal-transicion' },
-  { Z:106, simbolo:'Sg', nombre:'Seaborgio', grupo:6, periodo:7, radioAtomico:143, electronegatividad:null, energiaIonizacion:757, afinidadElectronica:null, puntoFusion:null, categoria:'metal-transicion' },
-  { Z:107, simbolo:'Bh', nombre:'Bohrio', grupo:7, periodo:7, radioAtomico:141, electronegatividad:null, energiaIonizacion:740, afinidadElectronica:null, puntoFusion:null, categoria:'metal-transicion' },
-  { Z:108, simbolo:'Hs', nombre:'Hasio', grupo:8, periodo:7, radioAtomico:134, electronegatividad:null, energiaIonizacion:730, afinidadElectronica:null, puntoFusion:null, categoria:'metal-transicion' },
-  { Z:109, simbolo:'Mt', nombre:'Meitnerio', grupo:9, periodo:7, radioAtomico:129, electronegatividad:null, energiaIonizacion:800, afinidadElectronica:null, puntoFusion:null, categoria:'metal-transicion' },
-  { Z:110, simbolo:'Ds', nombre:'Darmstadtio', grupo:10, periodo:7, radioAtomico:128, electronegatividad:null, energiaIonizacion:960, afinidadElectronica:null, puntoFusion:null, categoria:'metal-transicion' },
-  { Z:111, simbolo:'Rg', nombre:'Roentgenio', grupo:11, periodo:7, radioAtomico:121, electronegatividad:null, energiaIonizacion:1020, afinidadElectronica:null, puntoFusion:null, categoria:'metal-transicion' },
-  { Z:112, simbolo:'Cn', nombre:'Copernicio', grupo:12, periodo:7, radioAtomico:122, electronegatividad:null, energiaIonizacion:1155, afinidadElectronica:null, puntoFusion:null, categoria:'metal-transicion' },
-  { Z:113, simbolo:'Nh', nombre:'Nihonio', grupo:13, periodo:7, radioAtomico:136, electronegatividad:null, energiaIonizacion:707, afinidadElectronica:null, puntoFusion:null, categoria:'metal-postransicion' },
-  { Z:114, simbolo:'Fl', nombre:'Flerovio', grupo:14, periodo:7, radioAtomico:143, electronegatividad:null, energiaIonizacion:832, afinidadElectronica:null, puntoFusion:null, categoria:'metal-postransicion' },
-  { Z:115, simbolo:'Mc', nombre:'Moscovio', grupo:15, periodo:7, radioAtomico:162, electronegatividad:null, energiaIonizacion:538, afinidadElectronica:null, puntoFusion:null, categoria:'metal-postransicion' },
-  { Z:116, simbolo:'Lv', nombre:'Livermorio', grupo:16, periodo:7, radioAtomico:175, electronegatividad:null, energiaIonizacion:663, afinidadElectronica:null, puntoFusion:null, categoria:'metal-postransicion' },
-  { Z:117, simbolo:'Ts', nombre:'Teneso', grupo:17, periodo:7, radioAtomico:165, electronegatividad:null, energiaIonizacion:736, afinidadElectronica:null, puntoFusion:null, categoria:'halógeno' },
-  { Z:118, simbolo:'Og', nombre:'Oganesón', grupo:18, periodo:7, radioAtomico:157, electronegatividad:null, energiaIonizacion:860, afinidadElectronica:null, puntoFusion:null, categoria:'gas-noble' },
-];
 
 // ============================================================
 // PROPIEDADES SELECCIONABLES
@@ -179,7 +45,9 @@ const PROPIEDADES: PropiedadInfo[] = [
     key: 'radioAtomico',
     label: 'Radio atómico',
     unidad: 'pm',
-    descripcion: 'Distancia desde el núcleo al orbital más externo',
+    unidadBoton: 'pm',
+    escala: 'Radio covalente de enlace sencillo (Pyykkö y Atsumi, 2009)',
+    descripcion: 'Mitad de la distancia entre dos núcleos unidos por un enlace sencillo',
     flechaGrupo: '↓',
     flechaPeriodo: '←',
     textoGrupo: 'aumenta al bajar en el grupo',
@@ -188,7 +56,9 @@ const PROPIEDADES: PropiedadInfo[] = [
   {
     key: 'electronegatividad',
     label: 'Electronegatividad',
-    unidad: '(Pauling)',
+    unidad: '',
+    unidadBoton: 'Pauling',
+    escala: 'Escala de Pauling (Allred, 1961; CRC Handbook)',
     descripcion: 'Capacidad de un átomo de atraer electrones del enlace',
     flechaGrupo: '↑',
     flechaPeriodo: '→',
@@ -197,8 +67,10 @@ const PROPIEDADES: PropiedadInfo[] = [
   },
   {
     key: 'energiaIonizacion',
-    label: '1ª Energía ionización',
+    label: '1.ª energía de ionización',
     unidad: 'kJ/mol',
+    unidadBoton: 'kJ/mol',
+    escala: 'NIST ASD y CRC Handbook; Rf–Og, valores calculados',
     descripcion: 'Energía necesaria para arrancar el primer electrón',
     flechaGrupo: '↑',
     flechaPeriodo: '→',
@@ -209,21 +81,28 @@ const PROPIEDADES: PropiedadInfo[] = [
     key: 'afinidadElectronica',
     label: 'Afinidad electrónica',
     unidad: 'kJ/mol',
+    unidadBoton: 'kJ/mol',
+    escala: 'ΔH al ganar un electrón, solo valores medidos (Ning y Lu, 2022)',
     descripcion: 'Energía liberada al ganar un electrón (más negativo = más favorable)',
     flechaGrupo: '↑',
     flechaPeriodo: '→',
-    textoGrupo: 'más exotérmica al subir en el grupo',
+    textoGrupo: 'más exotérmica al subir en el grupo (salvo F < Cl)',
     textoPeriodo: 'tendencia irregular, máxima en halógenos',
   },
   {
     key: 'puntoFusion',
     label: 'Punto de fusión',
     unidad: '°C',
+    unidadBoton: '°C',
+    escala: 'CRC Handbook, a 1 atm',
     descripcion: 'Temperatura a la que el sólido pasa a líquido',
-    flechaGrupo: '↑',
-    flechaPeriodo: '→',
-    textoGrupo: 'máximo en metales de transición centrales',
-    textoPeriodo: 'tendencia irregular según tipo de enlace',
+    // Hallazgo 1958: no hay un sentido de aumento. En el período sube hasta el centro del
+    // bloque d y baja después (el Ne, a la derecha, es de los más bajos); en el grupo 17
+    // crece hacia abajo (F −219,6 → I 113,7) y en el grupo 1, al revés.
+    flechaGrupo: null,
+    flechaPeriodo: null,
+    textoGrupo: 'en el grupo depende de la familia: sube en los halógenos, baja en los alcalinos',
+    textoPeriodo: 'en el período crece hacia el centro del bloque d (máximo, W) y cae hacia los extremos',
   },
 ];
 
@@ -234,7 +113,7 @@ const PROPIEDADES: PropiedadInfo[] = [
 /** Calcula el rango [min, max] de una propiedad sobre todos los elementos con valor no nulo */
 function calcularRango(propiedad: PropiedadKey): { min: number; max: number } {
   const valores = ELEMENTOS
-    .map(e => e[propiedad] as number | null)
+    .map(e => e[propiedad])
     .filter((v): v is number => v !== null);
   return { min: Math.min(...valores), max: Math.max(...valores) };
 }
@@ -247,40 +126,79 @@ function interpolarColor(t: number): string {
   return `rgb(${r},${g},${b})`;
 }
 
+const GRIS_SIN_DATO = '#d4d4d4';
+
 /** Convierte valor numérico a color del heatmap */
 function valorAColor(valor: number | null, min: number, max: number): string {
-  if (valor === null) return '#d4d4d4';
+  if (valor === null) return GRIS_SIN_DATO;
   if (max === min) return interpolarColor(0.5);
   const t = Math.max(0, Math.min(1, (valor - min) / (max - min)));
   return interpolarColor(t);
 }
 
-/** Determina si el texto debe ser oscuro o claro según la luminancia de fondo */
+/** Luminancia relativa WCAG 2.x de un color sRGB (0-255 por canal). */
+function luminancia(r: number, g: number, b: number): number {
+  const lin = (c: number): number => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+
+/**
+ * Texto negro o blanco, el que dé MÁS contraste WCAG sobre el fondo (hallazgo 1960). La
+ * versión anterior decidía por una luminancia aproximada con umbral 140 y dejaba blanco
+ * sobre rojo (4,00:1). Eligiendo el máximo de los dos, el peor caso de la escala está en
+ * ~4,58:1: siempre por encima de 4,5.
+ */
 function colorTexto(bgColor: string): string {
-  if (bgColor === '#d4d4d4') return '#555555';
-  // Extraer RGB de rgb(r,g,b)
+  if (bgColor === GRIS_SIN_DATO) return '#333333'; // 8,3:1 sobre #d4d4d4
   const m = bgColor.match(/rgb\((\d+),(\d+),(\d+)\)/);
-  if (!m) return '#000';
-  const r = parseInt(m[1]);
-  const g = parseInt(m[2]);
-  const b = parseInt(m[3]);
-  // Luminancia relativa (sRGB)
-  const luminancia = 0.299 * r + 0.587 * g + 0.114 * b;
-  return luminancia > 140 ? '#111111' : '#ffffff';
+  if (!m) return '#000000';
+  const l = luminancia(Number(m[1]), Number(m[2]), Number(m[3]));
+  const conNegro = (l + 0.05) / 0.05;
+  const conBlanco = 1.05 / (l + 0.05);
+  return conNegro >= conBlanco ? '#000000' : '#ffffff';
 }
 
-/** Formato número para tooltip */
-function fmtValor(valor: number | null, unidad: string): string {
-  if (valor === null) return 'No disponible';
-  if (valor === 0 && unidad === 'kJ/mol') return '0 (noble/metal d¹⁰)';
-  return `${valor} ${unidad}`;
+const FORMATO_2 = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2 });
+const FORMATO_1 = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 });
+
+/**
+ * Cifra en formato español con signo menos tipográfico (hallazgo 1954). Con los decimales
+ * que el dato tiene (hasta 2 en la electronegatividad, hasta 1 en el resto): 3,98 no se
+ * redondea a «4,0», y 53 pm no se convierte en «53,0».
+ */
+function formatearCifra(valor: number, propiedad: PropiedadKey): string {
+  const f = propiedad === 'electronegatividad' ? FORMATO_2 : FORMATO_1;
+  return f.format(valor + 0).replace('-', '−');
 }
 
-/** Mapa grupo → columna CSS Grid (1-indexed) */
+/** Cifra con su unidad, o «No disponible». Es lo que dicen el aria-label y el tooltip. */
+function fmtValor(elemento: Elemento, propiedad: PropiedadKey, info: PropiedadInfo): string {
+  const valor = elemento[propiedad];
+  if (valor === null) return `No disponible${notaDe(elemento, propiedad)}`;
+  const cifra = formatearCifra(valor, propiedad);
+  const base = info.unidad ? `${cifra} ${info.unidad}` : `${cifra} (Pauling)`;
+  return `${base}${notaDe(elemento, propiedad)}`;
+}
+
+/** Matiz del dato: estimado, calculado, sin anión estable o a otra presión. */
+function notaDe(elemento: Elemento, propiedad: PropiedadKey): string {
+  if (propiedad === 'afinidadElectronica' && ANION_NO_ESTABLE.has(elemento.Z)) {
+    return ' · no forma anión estable';
+  }
+  if (propiedad === 'energiaIonizacion' && IONIZACION_CALCULADA.has(elemento.Z)) return ' · calculado';
+  if (propiedad === 'puntoFusion') {
+    if (FUSION_ESTIMADA.has(elemento.Z)) return ' · estimado';
+    const nota = NOTAS_FUSION[elemento.Z];
+    if (nota) return ` · ${nota}`;
+  }
+  return '';
+}
+
+/** Mapa grupo → columna CSS Grid (1-indexed): los grupos coinciden con las columnas. */
 function grupoAColumna(grupo: number): number {
-  if (grupo <= 2) return grupo;
-  if (grupo >= 13) return grupo;
-  // grupos 3-12 → columnas 3-12
   return grupo;
 }
 
@@ -308,14 +226,14 @@ function obtenerPosicion(elemento: Elemento): PosicionTabla | null {
 // ============================================================
 interface CeldaProps {
   elemento: Elemento;
+  propiedad: PropiedadKey;
+  info: PropiedadInfo;
   bgColor: string;
-  valor: number | null;
-  unidad: string;
   onHover: (elemento: Elemento | null, x: number, y: number) => void;
   esMarcador?: boolean;
 }
 
-function CeldaElemento({ elemento, bgColor, valor, unidad, onHover, esMarcador }: CeldaProps) {
+function CeldaElemento({ elemento, propiedad, info, bgColor, onHover, esMarcador }: CeldaProps) {
   const textColor = colorTexto(bgColor);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -326,23 +244,34 @@ function CeldaElemento({ elemento, bgColor, valor, unidad, onHover, esMarcador }
     onHover(null, 0, 0);
   }, [onHover]);
 
+  /**
+   * Con teclado, el dato va JUNTO a la celda (hallazgo 1962): antes Enter lo abría en (0, 0),
+   * la esquina de la ventana, y al tabular seguía mostrando el elemento anterior.
+   */
+  const mostrarJuntoACelda = useCallback((el: HTMLElement) => {
+    const r = el.getBoundingClientRect();
+    onHover(elemento, r.left + r.width / 2, r.bottom);
+  }, [elemento, onHover]);
+
   if (esMarcador) {
+    // Solo remite a la fila inferior, donde La y Ac tienen su celda enfocable. Los colores
+    // viven en el CSS, con su variante oscura (hallazgo 1961: el #555 en línea ganaba a la
+    // regla oscura y quedaba a 1,40:1).
     return (
       <div
         className={`${styles.celda} ${styles.celdaMarcador}`}
-        style={{ backgroundColor: '#e8e8e8', color: '#555' }}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
+        role="img"
         aria-label={`${elemento.nombre} (ver fila inferior)`}
       >
-        <span className={styles.celdaZ}>{elemento.Z}</span>
-        <span className={styles.celdaSimbolo} style={{ fontSize: '0.7rem' }}>*</span>
-        <span className={styles.celdaValor}>{elemento.simbolo}</span>
+        <span className={styles.celdaZ} aria-hidden="true">{elemento.Z}</span>
+        <span className={styles.celdaSimbolo} style={{ fontSize: '0.7rem' }} aria-hidden="true">*</span>
+        <span className={styles.celdaValor} aria-hidden="true">{elemento.simbolo}</span>
       </div>
     );
   }
 
-  const valorFmt = valor !== null ? (Math.abs(valor) >= 100 ? Math.round(valor).toString() : valor.toFixed(1)) : '—';
+  const valor = elemento[propiedad];
+  const valorFmt = valor !== null ? formatearCifra(valor, propiedad) : '—';
 
   return (
     <div
@@ -350,10 +279,19 @@ function CeldaElemento({ elemento, bgColor, valor, unidad, onHover, esMarcador }
       style={{ backgroundColor: bgColor, color: textColor }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onFocus={(e) => mostrarJuntoACelda(e.currentTarget)}
+      onBlur={() => onHover(null, 0, 0)}
       role="button"
       tabIndex={0}
-      aria-label={`${elemento.nombre}, Z=${elemento.Z}, ${fmtValor(valor, unidad)}`}
-      onKeyDown={(e) => { if (e.key === 'Enter') onHover(elemento, 0, 0); }}
+      aria-label={`${elemento.nombre}, Z=${elemento.Z}, ${fmtValor(elemento, propiedad, info)}`}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          mostrarJuntoACelda(e.currentTarget);
+        } else if (e.key === 'Escape') {
+          onHover(null, 0, 0);
+        }
+      }}
     >
       <span className={styles.celdaZ}>{elemento.Z}</span>
       <span className={styles.celdaSimbolo}>{elemento.simbolo}</span>
@@ -425,14 +363,14 @@ export default function SimuladorTablaPeriodica() {
         const esAc = fila === 7 && col === 3;
 
         if (esLa) {
-          const bgColor = valorAColor(laElement[propiedad] as number | null, rango.min, rango.max);
+          const bgColor = valorAColor(laElement[propiedad], rango.min, rango.max);
           filas.push(
             <CeldaElemento
               key={`marcador-la`}
               elemento={laElement}
               bgColor={bgColor}
-              valor={laElement[propiedad] as number | null}
-              unidad={propInfo.unidad}
+              propiedad={propiedad}
+              info={propInfo}
               onHover={handleHover}
               esMarcador
             />
@@ -440,14 +378,14 @@ export default function SimuladorTablaPeriodica() {
           continue;
         }
         if (esAc) {
-          const bgColor = valorAColor(acElement[propiedad] as number | null, rango.min, rango.max);
+          const bgColor = valorAColor(acElement[propiedad], rango.min, rango.max);
           filas.push(
             <CeldaElemento
               key={`marcador-ac`}
               elemento={acElement}
               bgColor={bgColor}
-              valor={acElement[propiedad] as number | null}
-              unidad={propInfo.unidad}
+              propiedad={propiedad}
+              info={propInfo}
               onHover={handleHover}
               esMarcador
             />
@@ -456,15 +394,15 @@ export default function SimuladorTablaPeriodica() {
         }
 
         if (el) {
-          const valor = el[propiedad] as number | null;
+          const valor = el[propiedad];
           const bgColor = valorAColor(valor, rango.min, rango.max);
           filas.push(
             <CeldaElemento
               key={el.Z}
               elemento={el}
               bgColor={bgColor}
-              valor={valor}
-              unidad={propInfo.unidad}
+              propiedad={propiedad}
+              info={propInfo}
               onHover={handleHover}
             />
           );
@@ -480,15 +418,15 @@ export default function SimuladorTablaPeriodica() {
     <div className={styles.filaLantanidos}>
       <div className={styles.etiquetaLantanidos}>{etiqueta}</div>
       {elementos.map(el => {
-        const valor = el[propiedad] as number | null;
+        const valor = el[propiedad];
         const bgColor = valorAColor(valor, rango.min, rango.max);
         return (
           <CeldaElemento
             key={el.Z}
             elemento={el}
             bgColor={bgColor}
-            valor={valor}
-            unidad={propInfo.unidad}
+            propiedad={propiedad}
+            info={propInfo}
             onHover={handleHover}
           />
         );
@@ -536,7 +474,7 @@ export default function SimuladorTablaPeriodica() {
             aria-pressed={propiedad === p.key}
             type="button"
           >
-            {p.label} ({p.unidad})
+            {p.label} ({p.unidadBoton})
           </button>
         ))}
       </div>
@@ -545,27 +483,34 @@ export default function SimuladorTablaPeriodica() {
       <div className={styles.tendenciasHeader}>
         <div className={styles.flechasRow}>
           <div className={styles.flechaItem}>
-            <span className={styles.flechaIcon} aria-hidden="true">{propInfo.flechaGrupo}</span>
+            {propInfo.flechaGrupo && <span className={styles.flechaIcon} aria-hidden="true">{propInfo.flechaGrupo}</span>}
             <span>{propInfo.textoGrupo}</span>
           </div>
           <div className={styles.flechaItem}>
-            <span className={styles.flechaIcon} aria-hidden="true">{propInfo.flechaPeriodo}</span>
+            {propInfo.flechaPeriodo && <span className={styles.flechaIcon} aria-hidden="true">{propInfo.flechaPeriodo}</span>}
             <span>{propInfo.textoPeriodo}</span>
           </div>
         </div>
         <div className={styles.leyenda} aria-label="Leyenda de color">
-          <div className={styles.leyendaTitulo}>{propInfo.label}</div>
-          <div className={styles.leyendaGradiente} role="img" aria-label={`Escala de ${rango.min} a ${rango.max} ${propInfo.unidad}`} />
+          <div className={styles.leyendaTitulo}>{propInfo.label} ({propInfo.unidadBoton})</div>
+          <div
+            className={styles.leyendaGradiente}
+            role="img"
+            aria-label={`Escala de ${formatearCifra(rango.min, propiedad)} a ${formatearCifra(rango.max, propiedad)} ${propInfo.unidadBoton}`}
+          />
           <div className={styles.leyendaLabels}>
-            <span>{rango.min} {propInfo.unidad}</span>
-            <span>{rango.max} {propInfo.unidad}</span>
+            <span>{formatearCifra(rango.min, propiedad)} {propInfo.unidad}</span>
+            <span>{formatearCifra(rango.max, propiedad)} {propInfo.unidad}</span>
           </div>
+          <div className={styles.leyendaEscala}>{propInfo.escala}</div>
         </div>
       </div>
 
       {/* Tabla periódica */}
       <div className={styles.tablaWrapper}>
-        <div className={styles.tablaGrid} role="grid" aria-label="Tabla periódica interactiva">
+        {/* Un grupo, no un role="grid": el patrón grid exige filas y celdas ARIA y navegación
+            con flechas, y aquí cada elemento es un botón al que se llega con Tab (hallazgo 1962). */}
+        <div className={styles.tablaGrid} role="group" aria-label="Tabla periódica interactiva">
           {renderFilas()}
         </div>
         <div className={styles.separadorLantanidos} />
@@ -589,8 +534,8 @@ export default function SimuladorTablaPeriodica() {
           <div className={styles.tooltipValor}>
             {propInfo.label}:{' '}
             {tooltip.elemento[propiedad] !== null
-              ? `${tooltip.elemento[propiedad]} ${propInfo.unidad}`
-              : <span className={styles.tooltipNull}>Dato no disponible</span>
+              ? fmtValor(tooltip.elemento, propiedad, propInfo)
+              : <span className={styles.tooltipNull}>Dato no disponible{notaDe(tooltip.elemento, propiedad)}</span>
             }
           </div>
         </div>
@@ -632,17 +577,17 @@ export default function SimuladorTablaPeriodica() {
                 <td>Aumenta (más capas)</td>
                 <td>Disminuye (mayor Z<sub>ef</sub>)</td>
                 <td>Lantánidos: contracción lantánida</td>
-                <td>Cs (298 pm) es el más grande de los naturales</td>
+                <td>Cs (232 pm) es el mayor de la serie; el Fr (223 pm) queda algo por debajo por efectos relativistas</td>
               </tr>
               <tr>
                 <td><strong>Electronegatividad</strong></td>
                 <td>Disminuye</td>
                 <td>Aumenta</td>
-                <td>F (3,98) no sigue patrón suave en período 2</td>
+                <td>Los gases nobles ligeros no tienen valor en la escala de Pauling</td>
                 <td>F el más electronegativo; Fr el menos</td>
               </tr>
               <tr>
-                <td><strong>1ª E. ionización</strong></td>
+                <td><strong>1.ª E. ionización</strong></td>
                 <td>Disminuye</td>
                 <td>Aumenta (con excepciones)</td>
                 <td>N &gt; O y Be &gt; B por subcapas semillenas/llenas</td>
@@ -652,15 +597,15 @@ export default function SimuladorTablaPeriodica() {
                 <td><strong>Afinidad electrónica</strong></td>
                 <td>Más exotérmica hacia arriba</td>
                 <td>Tendencia irregular</td>
-                <td>N, Be, Mg: AE ≈ 0 (subnivelstables)</td>
-                <td>Cl (−348,6) más exotérmica que F (−328)</td>
+                <td>N, Be, Mg: no forman anión estable (subniveles estables)</td>
+                <td>Cl (−348,6) más exotérmica que F (−328,2)</td>
               </tr>
               <tr>
                 <td><strong>Punto de fusión</strong></td>
                 <td>Irregular según familia</td>
                 <td>Máximo en metales de transición</td>
-                <td>W (3422 °C) el metal con mayor Tf conocido</td>
-                <td>He y H: Tf más bajas; W la más alta</td>
+                <td>El C no funde a 1 atm: sublima (por eso no entra en la escala)</td>
+                <td>He y H: Tf más bajas; W (3422 °C) la más alta</td>
               </tr>
               <tr>
                 <td><strong>Regla general</strong></td>
@@ -708,7 +653,7 @@ export default function SimuladorTablaPeriodica() {
           </div>
           <div className={styles.faqItem}>
             <strong>¿Por qué el N tiene afinidad electrónica ≈ 0?</strong>
-            <p>El N tiene la configuración 2p³: tres electrones en tres orbitales p semillenos, cada uno con su spin paralelo. Añadir un cuarto electrón obligaría a aparearlo en un orbital ya ocupado, lo que cuesta energía de repulsión interelectrónica. El resultado neto es que ganar un electrón no libera energía: AE ≈ 0. Lo mismo ocurre con Be (2s² lleno) y Mg.</p>
+            <p>El N tiene la configuración 2p³: tres electrones en tres orbitales p semillenos, cada uno con su spin paralelo. Añadir un cuarto electrón obligaría a aparearlo en un orbital ya ocupado, lo que cuesta energía de repulsión interelectrónica. El resultado neto es que ganar un electrón no libera energía, sino que cuesta un poco (unos 7 kJ/mol medidos): el anión N⁻ no es estable. Algo parecido ocurre con Be y Mg (ns² lleno), que tampoco forman anión estable.</p>
           </div>
           <div className={styles.faqItem}>
             <strong>¿Por qué el W (wolframio) tiene el punto de fusión más alto de los metales?</strong>
@@ -777,7 +722,7 @@ export default function SimuladorTablaPeriodica() {
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
-            <p><strong>Punto de fusión:</strong> "El centro de la tabla hierve más". Los metales de transición del centro (W, Re, Os, Mo) tienen los Tf más altos.</p>
+            <p><strong>Punto de fusión:</strong> "El centro de la tabla funde más tarde". Los metales de transición del centro (W, Re, Os, Mo) tienen los Tf más altos.</p>
           </div>
         </div>
 
@@ -789,7 +734,7 @@ export default function SimuladorTablaPeriodica() {
           </div>
           <ul className={styles.warningList}>
             <li><strong>Confundir radio atómico con radio iónico:</strong> el catión siempre es más pequeño que el átomo neutral, el anión siempre es más grande. Las tendencias de radio iónico siguen reglas diferentes.</li>
-            <li><strong>Creer que todos los gases nobles tienen AE negativa:</strong> He, Ne, Ar, Kr tienen AE = 0 o ligeramente positiva (no ganan electrones). Solo algunos gases nobles pesados como Xe tienen compuestos estables bajo condiciones extremas.</li>
+            <li><strong>Creer que los gases nobles liberan energía al ganar un electrón:</strong> con la capa llena, ninguno forma anión estable; añadirles un electrón cuesta energía (en esta tabla figuran con 0 y la nota «no forma anión estable»). Que el Xe forme compuestos como XeF₂ no tiene que ver con la afinidad: en ellos el Xe cede densidad electrónica al flúor.</li>
             <li><strong>No recordar las anomalías de N y Be en IE:</strong> N (2p³ semilleno) tiene IE mayor que O (2p⁴), y Be (2s² lleno) mayor que B (2p¹). Estas excepciones aparecen tanto en el EBAU (España) como en los exámenes de admisión de preparatoria y secundaria en Latinoamérica.</li>
             <li><strong>Confundir electronegatividad con afinidad electrónica:</strong> la EN describe la atracción de electrones en un enlace (concepto de molécula); la AE describe la energía al ganar un electrón libre (concepto de átomo aislado). No son iguales: el Cl tiene mayor AE que el F, pero menor EN.</li>
             <li><strong>Ignorar la contracción lantánida:</strong> los elementos del período 6 después de los lantánidos (Hf, Ta, W...) tienen radios casi iguales a sus análogos del período 5, rompiendo la tendencia normal. Esto afecta a muchas propiedades de los metales pesados.</li>
