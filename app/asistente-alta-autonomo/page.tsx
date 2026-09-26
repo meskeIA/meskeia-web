@@ -8,7 +8,7 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, RelatedApps, Educational
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
-  TIPO_COTIZACION_RETA, TARIFA_PLANA_2025, BASES_RETA_2025, TRAMOS_RETA_2025, FISCAL_AUTONOMOS_META,
+  TIPO_COTIZACION_RETA, TARIFA_PLANA_2025, BASES_RETA_2025, TRAMOS_RETA_2025, tramoRETA, FISCAL_AUTONOMOS_META,
   TIPOS_IS_2025, TRAMOS_IS_MICROPYMES_2026, AUTONOMO_SOCIETARIO_2025, SMI_2026,
   CNAE_IAE_RUTA_CATALOGO, FISCAL_CNAE_IAE_META,
 } from '@/data/fiscal';
@@ -70,14 +70,11 @@ const BASES_COTIZACION = {
 };
 
 /**
- * Tramo de la tabla de 2026 que corresponde a unos rendimientos netos mensuales.
- * Los límites son «hasta X €» (tramo 1: ≤ 670; tramo 2: > 670 y ≤ 900…), así que manda
- * el primer tramo cuyo rendimientoMax no se supera.
+ * Tramo de la tabla de 2026 que corresponde a unos rendimientos netos mensuales. Lo decide
+ * `tramoRETA` de data/fiscal, que sabe qué frontera incluye cada tramo: todas cierran por
+ * arriba salvo la del SMI (tramo 3 «< 1.166,70», tramo 4 «≥ 1.166,70»; hallazgo 2137).
  */
-function tramoPorRendimientos(rendimientos: number): TramoCotizacion {
-  const encontrado = TRAMOS_RETA_2025.find(t => t.rendimientoMax === null || rendimientos <= t.rendimientoMax);
-  return encontrado ?? TRAMOS_RETA_2025[TRAMOS_RETA_2025.length - 1];
-}
+const tramoPorRendimientos = (rendimientos: number): TramoCotizacion => tramoRETA(rendimientos);
 
 const acotar = (valor: number, min: number, max: number) => Math.min(Math.max(valor, min), max);
 

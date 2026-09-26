@@ -69,12 +69,14 @@ export const RETENCIONES_IS_2025 = {
 };
 
 // ─── Cotización autónomo societario (Administrador) ──────────────────────────
-// Base mínima para administradores con participación >= 25% o >= 33% sin control
+// Base mínima para quien tiene el control efectivo de la sociedad. El art. 305.2.b LGSS lo
+// presume con una participación IGUAL O SUPERIOR a la cuarta parte si se ejercen funciones de
+// dirección y gerencia, a la tercera parte sin ellas, y siempre con la mitad (hallazgo 2144).
 
 export const AUTONOMO_SOCIETARIO_2025 = {
   baseMinimaMensual:    1634.88, // € — Base mínima obligatoria para adm. con control
   cuotaMinimaMensual:   514.99,  // € — Cuota mínima mensual (31,5% de la base desde 2026 por subida MEI)
-  nota: 'Los administradores con participación ≥25% que controlan la sociedad cotizan por base mínima obligatoria, no por ingresos reales. Tipo 31,5% (RDL 16/2025). Verificar en SS.',
+  nota: 'Quien tiene el control efectivo de la sociedad (art. 305.2.b LGSS: participación igual o superior al 25 % con funciones de dirección y gerencia, al 33 % sin ellas, o al 50 % en todo caso) cotiza por base mínima obligatoria, no por ingresos reales. Tipo 31,5% (RDL 16/2025). Verificar en SS.',
 };
 
 // ─── Gastos deducibles relevantes en SL ──────────────────────────────────────

@@ -10,7 +10,7 @@
 
 import {
   calcularCuotaIntegraGeneral,
-  TRAMOS_RETA_2025,
+  tramoRETA,
   TIPO_COTIZACION_RETA,
   MINIMOS_IRPF_2025,
   TIPOS_IS_2025,
@@ -79,10 +79,7 @@ function calcularCuotaAhorro(base: number): number {
 }
 
 function calcularCuotaRetaAnual(rendimientoMensual: number): number {
-  const tramo = TRAMOS_RETA_2025.find(t =>
-    rendimientoMensual >= t.rendimientoMin &&
-    (t.rendimientoMax === null || rendimientoMensual < t.rendimientoMax)
-  ) ?? TRAMOS_RETA_2025[TRAMOS_RETA_2025.length - 1];
+  const tramo = tramoRETA(rendimientoMensual);
   return tramo.baseMinima * TIPO_COTIZACION_RETA * 12;
 }
 

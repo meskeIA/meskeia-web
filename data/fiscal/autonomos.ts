@@ -37,6 +37,12 @@ export interface TramoCotizacion {
   id: number;
   rendimientoMin: number;
   rendimientoMax: number | null; // null = sin límite superior
+  /**
+   * Si el tramo INCLUYE su rendimientoMax. La norma cierra por arriba todas las fronteras
+   * («≤ 670», «> 670 y ≤ 900»…) salvo la del SMI: el tramo 3 es «> 900 y < 1.166,70» y el
+   * primero de la tabla general, «≥ 1.166,70 y ≤ 1.300». No elegir tramo a mano: `tramoRETA`.
+   */
+  rendimientoMaxIncluido: boolean;
   baseMinima: number;
   baseMaxima: number;
   cuotaMinima: number;
@@ -50,23 +56,39 @@ export interface TramoCotizacion {
  */
 export const TRAMOS_RETA_2025: TramoCotizacion[] = [
   // TABLA REDUCIDA (rendimientos < SMI anual)
-  { id: 1,  rendimientoMin: 0,       rendimientoMax: 670,     baseMinima: 653.59,  baseMaxima: 718.94,  cuotaMinima: 205.88, cuotaMaxima: 226.47 },
-  { id: 2,  rendimientoMin: 670,     rendimientoMax: 900,     baseMinima: 718.95,  baseMaxima: 900,     cuotaMinima: 226.47, cuotaMaxima: 283.50 },
-  { id: 3,  rendimientoMin: 900,     rendimientoMax: 1166.70, baseMinima: 849.67,  baseMaxima: 1166.70, cuotaMinima: 267.65, cuotaMaxima: 367.51 },
+  { id: 1,  rendimientoMin: 0,       rendimientoMax: 670,     rendimientoMaxIncluido: true,  baseMinima: 653.59,  baseMaxima: 718.94,  cuotaMinima: 205.88, cuotaMaxima: 226.47 },
+  { id: 2,  rendimientoMin: 670,     rendimientoMax: 900,     rendimientoMaxIncluido: true,  baseMinima: 718.95,  baseMaxima: 900,     cuotaMinima: 226.47, cuotaMaxima: 283.50 },
+  { id: 3,  rendimientoMin: 900,     rendimientoMax: 1166.70, rendimientoMaxIncluido: false, baseMinima: 849.67,  baseMaxima: 1166.70, cuotaMinima: 267.65, cuotaMaxima: 367.51 },
   // TABLA GENERAL (rendimientos >= SMI anual)
-  { id: 4,  rendimientoMin: 1166.70, rendimientoMax: 1300,    baseMinima: 950.98,  baseMaxima: 1300,    cuotaMinima: 299.56, cuotaMaxima: 409.50 },
-  { id: 5,  rendimientoMin: 1300,    rendimientoMax: 1500,    baseMinima: 960.78,  baseMaxima: 1500,    cuotaMinima: 302.65, cuotaMaxima: 472.50 },
-  { id: 6,  rendimientoMin: 1500,    rendimientoMax: 1700,    baseMinima: 960.78,  baseMaxima: 1700,    cuotaMinima: 302.65, cuotaMaxima: 535.50 },
-  { id: 7,  rendimientoMin: 1700,    rendimientoMax: 1850,    baseMinima: 1143.79, baseMaxima: 1850,    cuotaMinima: 360.29, cuotaMaxima: 582.75 },
-  { id: 8,  rendimientoMin: 1850,    rendimientoMax: 2030,    baseMinima: 1209.15, baseMaxima: 2030,    cuotaMinima: 380.88, cuotaMaxima: 639.45 },
-  { id: 9,  rendimientoMin: 2030,    rendimientoMax: 2330,    baseMinima: 1274.51, baseMaxima: 2330,    cuotaMinima: 401.47, cuotaMaxima: 733.95 },
-  { id: 10, rendimientoMin: 2330,    rendimientoMax: 2760,    baseMinima: 1356.21, baseMaxima: 2760,    cuotaMinima: 427.21, cuotaMaxima: 869.40 },
-  { id: 11, rendimientoMin: 2760,    rendimientoMax: 3190,    baseMinima: 1437.91, baseMaxima: 3190,    cuotaMinima: 452.94, cuotaMaxima: 1004.85 },
-  { id: 12, rendimientoMin: 3190,    rendimientoMax: 3620,    baseMinima: 1519.61, baseMaxima: 3620,    cuotaMinima: 478.68, cuotaMaxima: 1140.30 },
-  { id: 13, rendimientoMin: 3620,    rendimientoMax: 4050,    baseMinima: 1601.31, baseMaxima: 4050,    cuotaMinima: 504.41, cuotaMaxima: 1275.75 },
-  { id: 14, rendimientoMin: 4050,    rendimientoMax: 6000,    baseMinima: 1732.03, baseMaxima: 5101.20, cuotaMinima: 545.59, cuotaMaxima: 1606.88 },
-  { id: 15, rendimientoMin: 6000,    rendimientoMax: null,    baseMinima: 1928.10, baseMaxima: 5101.20, cuotaMinima: 607.35, cuotaMaxima: 1606.88 },
+  { id: 4,  rendimientoMin: 1166.70, rendimientoMax: 1300,    rendimientoMaxIncluido: true,  baseMinima: 950.98,  baseMaxima: 1300,    cuotaMinima: 299.56, cuotaMaxima: 409.50 },
+  { id: 5,  rendimientoMin: 1300,    rendimientoMax: 1500,    rendimientoMaxIncluido: true,  baseMinima: 960.78,  baseMaxima: 1500,    cuotaMinima: 302.65, cuotaMaxima: 472.50 },
+  { id: 6,  rendimientoMin: 1500,    rendimientoMax: 1700,    rendimientoMaxIncluido: true,  baseMinima: 960.78,  baseMaxima: 1700,    cuotaMinima: 302.65, cuotaMaxima: 535.50 },
+  { id: 7,  rendimientoMin: 1700,    rendimientoMax: 1850,    rendimientoMaxIncluido: true,  baseMinima: 1143.79, baseMaxima: 1850,    cuotaMinima: 360.29, cuotaMaxima: 582.75 },
+  { id: 8,  rendimientoMin: 1850,    rendimientoMax: 2030,    rendimientoMaxIncluido: true,  baseMinima: 1209.15, baseMaxima: 2030,    cuotaMinima: 380.88, cuotaMaxima: 639.45 },
+  { id: 9,  rendimientoMin: 2030,    rendimientoMax: 2330,    rendimientoMaxIncluido: true,  baseMinima: 1274.51, baseMaxima: 2330,    cuotaMinima: 401.47, cuotaMaxima: 733.95 },
+  { id: 10, rendimientoMin: 2330,    rendimientoMax: 2760,    rendimientoMaxIncluido: true,  baseMinima: 1356.21, baseMaxima: 2760,    cuotaMinima: 427.21, cuotaMaxima: 869.40 },
+  { id: 11, rendimientoMin: 2760,    rendimientoMax: 3190,    rendimientoMaxIncluido: true,  baseMinima: 1437.91, baseMaxima: 3190,    cuotaMinima: 452.94, cuotaMaxima: 1004.85 },
+  { id: 12, rendimientoMin: 3190,    rendimientoMax: 3620,    rendimientoMaxIncluido: true,  baseMinima: 1519.61, baseMaxima: 3620,    cuotaMinima: 478.68, cuotaMaxima: 1140.30 },
+  { id: 13, rendimientoMin: 3620,    rendimientoMax: 4050,    rendimientoMaxIncluido: true,  baseMinima: 1601.31, baseMaxima: 4050,    cuotaMinima: 504.41, cuotaMaxima: 1275.75 },
+  { id: 14, rendimientoMin: 4050,    rendimientoMax: 6000,    rendimientoMaxIncluido: true,  baseMinima: 1732.03, baseMaxima: 5101.20, cuotaMinima: 545.59, cuotaMaxima: 1606.88 },
+  { id: 15, rendimientoMin: 6000,    rendimientoMax: null,    rendimientoMaxIncluido: true,  baseMinima: 1928.10, baseMaxima: 5101.20, cuotaMinima: 607.35, cuotaMaxima: 1606.88 },
 ];
+
+/**
+ * Tramo de la tabla que corresponde a unos rendimientos netos MENSUALES (art. 18 de la
+ * Orden PJC/297/2026). Lo usan todos los consumidores: hasta el 26/09/2026 cada uno escribía
+ * su propio `find`, y ninguno acertaba todas las fronteras — el asistente de alta cerraba
+ * TODAS por arriba (1.166,70 € → tramo 3, base 101,31 € por debajo de la legal) y los otros
+ * cuatro las cerraban todas por abajo (670, 900, 1.300 … 6.000 € → el tramo SIGUIENTE).
+ * Rendimientos nulos o negativos caen en el tramo 1.
+ */
+export function tramoRETA(rendimientoMensual: number): TramoCotizacion {
+  const tramo = TRAMOS_RETA_2025.find((t) =>
+    t.rendimientoMax === null ||
+    (t.rendimientoMaxIncluido ? rendimientoMensual <= t.rendimientoMax : rendimientoMensual < t.rendimientoMax),
+  );
+  return tramo ?? TRAMOS_RETA_2025[TRAMOS_RETA_2025.length - 1];
+}
 
 // Bases de referencia 2026
 export const BASES_RETA_2025 = {

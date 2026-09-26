@@ -7,7 +7,7 @@ import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, Shar
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA } from '@/data/fiscal';
+import { FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA, tramoRETA } from '@/data/fiscal';
 
 // Datos fiscales centralizados en data/fiscal/autonomos.ts
 // FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA importados al inicio
@@ -104,12 +104,7 @@ export default function EstimadorCuotaAutonomoPage() {
     const rendimientoNetoMensual = rendimientoNetoAnual / 12;
 
     // Encontrar el tramo correspondiente
-    const tramo = TRAMOS_RETA_2025.find(t => {
-      if (t.rendimientoMax === null) {
-        return rendimientoNetoMensual >= t.rendimientoMin;
-      }
-      return rendimientoNetoMensual >= t.rendimientoMin && rendimientoNetoMensual < t.rendimientoMax;
-    }) || TRAMOS_RETA_2025[0];
+    const tramo = tramoRETA(rendimientoNetoMensual);
 
     // Calcular base de cotización (proporcional al rendimiento dentro del tramo)
     let baseCotizacion: number;

@@ -944,6 +944,27 @@ test.describe('Golden — calcularCuotaAutonomo (Capa 1 · SS 2026 ✓)', () => 
     expect(res.cuotaMensualGeneral).toBeCloseTo(427.21, 2);
     expect(res.cuotaConTarifaPlana).toBeCloseTo(80, 2);
   });
+
+  // Fronteras de la tabla (Orden PJC/297/2026, art. 18, cotejado en el BOE el 25/09/2026):
+  // todas cierran por ARRIBA («≤ 670», «> 670 y ≤ 900»… «> 4.050 y ≤ 6.000») salvo la del SMI,
+  // «> 900 y < 1.166,70» / «≥ 1.166,70 y ≤ 1.300». Hasta el 26/09/2026 cuotaAutonomo cerraba
+  // todas por abajo y 670, 900, 1.300 … 6.000 € caían en el tramo siguiente.
+  const FRONTERAS: Array<[number, number, number]> = [
+    // [rendimiento mensual, tramo esperado, base mínima]
+    [670, 1, 653.59], [670.01, 2, 718.95],
+    [900, 2, 718.95], [900.01, 3, 849.67],
+    [1166.69, 3, 849.67], [1166.70, 4, 950.98],
+    [1300, 4, 950.98], [1300.01, 5, 960.78],
+    [4050, 13, 1601.31], [4050.01, 14, 1732.03],
+    [6000, 14, 1732.03], [6000.01, 15, 1928.10],
+  ];
+  for (const [rendimiento, tramo, base] of FRONTERAS) {
+    test(`GOLDEN-M-frontera: ${rendimiento} €/mes → tramo ${tramo}, base mínima ${base} [Orden PJC/297/2026 art. 18]`, () => {
+      const res = calcularCuotaAutonomo({ rendimientoNetoMensual: rendimiento });
+      expect(res.tramo).toBe(tramo);
+      expect(res.baseMinima).toBeCloseTo(base, 2);
+    });
+  }
 });
 
 // ────────────────────────────────────────────────────────────────────────────

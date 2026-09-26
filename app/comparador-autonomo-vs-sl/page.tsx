@@ -13,7 +13,7 @@ import {
   FISCAL_SOCIEDADES_META,
   calcularCuotaIntegraGeneral,
   MINIMOS_IRPF_2025,
-  TRAMOS_RETA_2025,
+  tramoRETA,
   TIPO_COTIZACION_RETA,
   RETENCIONES_IS_2025,
   AUTONOMO_SOCIETARIO_2025,
@@ -57,10 +57,7 @@ function calcularCuotaBaseAhorro(base: number): number {
 }
 
 function calcularCuotaReta(rendimientoMensual: number): number {
-  const tramo = TRAMOS_RETA_2025.find(t => {
-    if (t.rendimientoMax === null) return rendimientoMensual >= t.rendimientoMin;
-    return rendimientoMensual >= t.rendimientoMin && rendimientoMensual < t.rendimientoMax;
-  }) || TRAMOS_RETA_2025[0];
+  const tramo = tramoRETA(rendimientoMensual);
   return tramo.baseMinima * TIPO_COTIZACION_RETA * 12;
 }
 

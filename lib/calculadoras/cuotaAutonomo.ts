@@ -9,7 +9,7 @@
  */
 
 import {
-  TRAMOS_RETA_2025,
+  tramoRETA,
   TIPO_COTIZACION_RETA,
   TARIFA_PLANA_2025,
   FISCAL_AUTONOMOS_META,
@@ -61,10 +61,7 @@ export function calcularCuotaAutonomo(p: ParametrosCuotaAutonomo): ResultadoCuot
   const r = (n: number) => Math.round(n * 100) / 100;
 
   // Buscar tramo
-  const tramo = TRAMOS_RETA_2025.find(t =>
-    p.rendimientoNetoMensual >= t.rendimientoMin &&
-    (t.rendimientoMax === null || p.rendimientoNetoMensual < t.rendimientoMax)
-  ) ?? TRAMOS_RETA_2025[TRAMOS_RETA_2025.length - 1];
+  const tramo = tramoRETA(p.rendimientoNetoMensual);
 
   // Base de cotización
   let baseCotizacion: number;

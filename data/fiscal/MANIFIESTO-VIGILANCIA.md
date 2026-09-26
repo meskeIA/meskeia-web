@@ -361,6 +361,16 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
   - También faltaba la exención **objetiva** del art. 4.1.c (monitorio y verbal de cantidad hasta 2.000 €), que alcanza igualmente a las personas jurídicas, y el IVA del 21 % sobre unos servicios profesionales que la app presentaba sin él.
 - **Verificado**: 2026-08-26 · vigencia 2025-2026.
 
+#### `ayudas-vehiculo.ts` — Ayuda estatal a la compra de vehículos eléctricos (Programa Auto+)
+- **Contiene**: importes máximos por vehículo de la línea 1 (turismo 4.500 €, furgoneta 5.000 €, motocicleta 1.100 €, cuadriciclo 1.500 €), los porcentajes acumulativos del Anexo II (eléctrico, económico, europeo), el precio máximo del turismo (45.000 € sin impuestos) y el MOVES III solo como referencia histórica (2019-2025).
+- **Normativa**: RD 609/2026, de 22 de julio (BOE-A-2026-16010).
+- **Vigilar**: modificaciones del RD en cuantías o porcentajes; agotamiento del crédito de cada ejercicio (las solicitudes cierran el 15 de octubre de cada año); un programa sucesor antes de 2031.
+- **Cadencia**: anual (octubre) + puntual.
+- **Alerta metodológica**: que vuelva un tramo por achatarramiento, o que la ayuda pase a ser una cantidad fija. Las apps no calculan la ayuda: piden la que corresponda (0 por defecto).
+- **Dependencias internas**: `comparador-electrico`, `selector-vehiculo-electrico` y `etiqueta-dgt`.
+- **Auditoría de origen (26/09/2026)** — nace de los hallazgos 1996, 1997 y 2054 del Inspector: tres apps daban el MOVES III como vigente nueve meses después de su fin, una de ellas restándolo por defecto (el equilibrio pasaba del año 8 al 4), y ofrecían «7.000 € con achatarramiento», que no corresponde a ninguna ayuda vigente.
+- **Verificado**: 2026-09-26 · vigencia 2026-2030.
+
 #### `nomada-digital.ts` — Visa nómada digital
 - **Contiene**: mínimos de ingresos (**múltiplos del SMI** — se actualiza en cascada con `smi.ts`), duraciones de visado/autorización/renovación, requisitos.
 - **Normativa**: Ley 28/2022 de Startups + RD 1008/2023.
