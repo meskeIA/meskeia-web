@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora Estadística Avanzada - Tests, Regresión y Correlación | meskeIA',
   description: 'Herramienta estadística avanzada: test t-Student, chi-cuadrado, regresión lineal, correlación Pearson/Spearman, intervalos de confianza y análisis de normalidad. Gratis y en español.',
-  keywords: 'estadística avanzada, test t-student, chi-cuadrado, regresión lineal, correlación pearson, spearman, intervalo de confianza, test de normalidad, shapiro-wilk, anova, calculadora estadística, análisis de datos',
+  keywords: 'estadística avanzada, test t-student, chi-cuadrado, regresión lineal, correlación pearson, spearman, intervalo de confianza, test de normalidad, jarque-bera, tabla de contingencia, calculadora estadística, análisis de datos',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
