@@ -12,6 +12,19 @@ import {
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorVsepr.module.css';
+// La química (tabla VSEPR, átomos, moléculas famosas y el tope X + E ≤ 6) vive en motor.ts,
+// para que los casos para clase corrijan con las mismas reglas que pinta el simulador.
+import {
+  ATOMOS,
+  MOLECULAS_PRESET,
+  TABLA_VSEPR,
+  aplicarCambioEnlaces,
+  aplicarCambioLibres,
+  geometriaDe,
+  type GeometriaInfo,
+  type MoleculaPreset,
+} from './motor';
+import CasosAula from './CasosAula';
 
 // ============================================
 // TIPOS
@@ -27,166 +40,10 @@ interface Vertice extends Vec3 {
   indice: number;
 }
 
-interface AtomoInfo {
-  simbolo: string;
-  nombre: string;
-  color: string;
-  textColor: string;
-}
-
-interface MoleculaPreset {
-  nombre: string;
-  formula: string;
-  atomo: string;
-  enlaces: number;
-  libres: number;
-}
-
-interface GeometriaInfo {
-  notacion: string;
-  geomElectronica: string;
-  geomMolecular: string;
-  anguloIdeal: string;
-  hibridacion: string;
-  ejemplos: string;
-}
-
 // ============================================
 // DATOS
 // ============================================
-const ATOMOS: AtomoInfo[] = [
-  { simbolo: 'C', nombre: 'Carbono', color: '#404040', textColor: '#ffffff' },
-  { simbolo: 'N', nombre: 'Nitrógeno', color: '#3050f8', textColor: '#ffffff' },
-  { simbolo: 'O', nombre: 'Oxígeno', color: '#ff0d0d', textColor: '#ffffff' },
-  { simbolo: 'P', nombre: 'Fósforo', color: '#ff8000', textColor: '#ffffff' },
-  { simbolo: 'S', nombre: 'Azufre', color: '#ffd000', textColor: '#1a1a1a' },
-  { simbolo: 'Cl', nombre: 'Cloro', color: '#1ff01f', textColor: '#1a1a1a' },
-  { simbolo: 'Br', nombre: 'Bromo', color: '#a62929', textColor: '#ffffff' },
-  { simbolo: 'Xe', nombre: 'Xenón', color: '#429eb0', textColor: '#ffffff' },
-  { simbolo: 'Si', nombre: 'Silicio', color: '#daa520', textColor: '#1a1a1a' },
-  { simbolo: 'B', nombre: 'Boro', color: '#ffb5b5', textColor: '#1a1a1a' },
-];
-
 const COLOR_LIGANDO = '#7FB3D3'; // azul claro estándar para ligando genérico
-
-const MOLECULAS_PRESET: MoleculaPreset[] = [
-  { nombre: 'CO₂', formula: 'CO2', atomo: 'C', enlaces: 2, libres: 0 },
-  { nombre: 'BF₃', formula: 'BF3', atomo: 'B', enlaces: 3, libres: 0 },
-  { nombre: 'H₂O', formula: 'H2O', atomo: 'O', enlaces: 2, libres: 2 },
-  { nombre: 'NH₃', formula: 'NH3', atomo: 'N', enlaces: 3, libres: 1 },
-  { nombre: 'CH₄', formula: 'CH4', atomo: 'C', enlaces: 4, libres: 0 },
-  { nombre: 'PCl₅', formula: 'PCl5', atomo: 'P', enlaces: 5, libres: 0 },
-  { nombre: 'SF₆', formula: 'SF6', atomo: 'S', enlaces: 6, libres: 0 },
-  { nombre: 'XeF₄', formula: 'XeF4', atomo: 'Xe', enlaces: 4, libres: 2 },
-];
-
-// Tabla VSEPR completa
-const TABLA_VSEPR: Record<string, GeometriaInfo> = {
-  '2-0': {
-    notacion: 'AX₂',
-    geomElectronica: 'Lineal',
-    geomMolecular: 'Lineal',
-    anguloIdeal: '180°',
-    hibridacion: 'sp',
-    ejemplos: 'CO₂, BeCl₂, HCN',
-  },
-  '3-0': {
-    notacion: 'AX₃',
-    geomElectronica: 'Trigonal plana',
-    geomMolecular: 'Trigonal plana',
-    anguloIdeal: '120°',
-    hibridacion: 'sp²',
-    ejemplos: 'BF₃, BCl₃, SO₃',
-  },
-  '2-1': {
-    notacion: 'AX₂E',
-    geomElectronica: 'Trigonal plana',
-    geomMolecular: 'Angular',
-    anguloIdeal: '<120°',
-    hibridacion: 'sp²',
-    ejemplos: 'SO₂, O₃, NO₂⁻',
-  },
-  '4-0': {
-    notacion: 'AX₄',
-    geomElectronica: 'Tetraédrica',
-    geomMolecular: 'Tetraédrica',
-    anguloIdeal: '109,5°',
-    hibridacion: 'sp³',
-    ejemplos: 'CH₄, NH₄⁺, SiCl₄',
-  },
-  '3-1': {
-    notacion: 'AX₃E',
-    geomElectronica: 'Tetraédrica',
-    geomMolecular: 'Pirámide trigonal',
-    anguloIdeal: '<109,5° (~107°)',
-    hibridacion: 'sp³',
-    ejemplos: 'NH₃, PCl₃, H₃O⁺',
-  },
-  '2-2': {
-    notacion: 'AX₂E₂',
-    geomElectronica: 'Tetraédrica',
-    geomMolecular: 'Angular',
-    anguloIdeal: '<109,5° (~104,5°)',
-    hibridacion: 'sp³',
-    ejemplos: 'H₂O, H₂S, OF₂',
-  },
-  '5-0': {
-    notacion: 'AX₅',
-    geomElectronica: 'Bipirámide trigonal',
-    geomMolecular: 'Bipirámide trigonal',
-    anguloIdeal: '90° y 120°',
-    hibridacion: 'sp³d',
-    ejemplos: 'PCl₅, PF₅, AsF₅',
-  },
-  '4-1': {
-    notacion: 'AX₄E',
-    geomElectronica: 'Bipirámide trigonal',
-    geomMolecular: 'Balancín (sube y baja)',
-    anguloIdeal: '~90° y ~120°',
-    hibridacion: 'sp³d',
-    ejemplos: 'SF₄, IF₄⁺, IO₂F₂⁻',
-  },
-  '3-2': {
-    notacion: 'AX₃E₂',
-    geomElectronica: 'Bipirámide trigonal',
-    geomMolecular: 'Forma T',
-    anguloIdeal: '~90°',
-    hibridacion: 'sp³d',
-    ejemplos: 'ClF₃, BrF₃, IF₃',
-  },
-  '2-3': {
-    notacion: 'AX₂E₃',
-    geomElectronica: 'Bipirámide trigonal',
-    geomMolecular: 'Lineal',
-    anguloIdeal: '180°',
-    hibridacion: 'sp³d',
-    ejemplos: 'XeF₂, I₃⁻, ICl₂⁻',
-  },
-  '6-0': {
-    notacion: 'AX₆',
-    geomElectronica: 'Octaédrica',
-    geomMolecular: 'Octaédrica',
-    anguloIdeal: '90°',
-    hibridacion: 'sp³d²',
-    ejemplos: 'SF₆, PF₆⁻, [Co(NH₃)₆]³⁺',
-  },
-  '5-1': {
-    notacion: 'AX₅E',
-    geomElectronica: 'Octaédrica',
-    geomMolecular: 'Pirámide cuadrada',
-    anguloIdeal: '<90°',
-    hibridacion: 'sp³d²',
-    ejemplos: 'BrF₅, IF₅, XeOF₄',
-  },
-  '4-2': {
-    notacion: 'AX₄E₂',
-    geomElectronica: 'Octaédrica',
-    geomMolecular: 'Cuadrada plana',
-    anguloIdeal: '90°',
-    hibridacion: 'sp³d²',
-    ejemplos: 'XeF₄, ICl₄⁻, BrF₄⁻',
-  },
-};
 
 // ============================================
 // VÉRTICES POR GEOMETRÍA ELECTRÓNICA
@@ -343,8 +200,7 @@ export default function SimuladorVseprPage() {
   }, [atomoCentral]);
 
   const totalPares = enlaces + libres;
-  const claveVsepr = `${enlaces}-${libres}`;
-  const geometriaInfo: GeometriaInfo | null = TABLA_VSEPR[claveVsepr] ?? null;
+  const geometriaInfo: GeometriaInfo | null = geometriaDe(enlaces, libres);
 
   const vertices = useMemo(() => asignarVertices(enlaces, libres), [enlaces, libres]);
 
@@ -395,20 +251,21 @@ export default function SimuladorVseprPage() {
   // ============================================
   // SETTERS
   // ============================================
+  // El acotado y el tope X + E ≤ 6 (máximo VSEPR común) los decide motor.ts: son las mismas
+  // funciones con las que casos.ts calcula el estado final de cada predicción.
   const handleEnlaces = (n: number) => {
-    const enlacesNuevos = Math.max(1, Math.min(6, n));
-    setEnlaces(enlacesNuevos);
-    // Limitar total a 6 (máximo VSEPR común)
-    if (enlacesNuevos + libres > 6) {
-      setLibres(Math.max(0, 6 - enlacesNuevos));
+    const resultado = aplicarCambioEnlaces(enlaces, libres, n);
+    setEnlaces(resultado.enlaces);
+    if (resultado.libres !== libres) {
+      setLibres(resultado.libres);
     }
   };
 
   const handleLibres = (n: number) => {
-    const libresNuevos = Math.max(0, Math.min(3, n));
-    setLibres(libresNuevos);
-    if (enlaces + libresNuevos > 6) {
-      setEnlaces(Math.max(1, 6 - libresNuevos));
+    const resultado = aplicarCambioLibres(enlaces, libres, n);
+    setLibres(resultado.libres);
+    if (resultado.enlaces !== enlaces) {
+      setEnlaces(resultado.enlaces);
     }
   };
 
@@ -417,6 +274,26 @@ export default function SimuladorVseprPage() {
     setEnlaces(m.enlaces);
     setLibres(m.libres);
   };
+
+  /**
+   * «Cargar el punto de partida» de los casos para clase: pone el átomo y los dos deslizadores
+   * con los mismos setters que usan los controles, y sube la vista hasta ellos para que el
+   * alumno haga él mismo el cambio que acaba de predecir.
+   */
+  const cargarCasoEnSimulador = useCallback(
+    (atomo: string, enlacesCaso: number, libresCaso: number) => {
+      setAtomoCentral(atomo);
+      setEnlaces(enlacesCaso);
+      setLibres(libresCaso);
+      if (typeof window === 'undefined') return;
+      const reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      document.getElementById('slider-enlaces')?.scrollIntoView({
+        behavior: reducirMovimiento ? 'auto' : 'smooth',
+        block: 'center',
+      });
+    },
+    []
+  );
 
   // ============================================
   // RENDERIZADO SVG
@@ -742,6 +619,9 @@ export default function SimuladorVseprPage() {
             tetraédrico) o X=2 y E=2 (H₂O angular).
           </section>
         )}
+
+        {/* CASOS PARA CLASE — predicción antes de mover (el cálculo vive en casos.ts) */}
+        <CasosAula onCargarEnSimulador={cargarCasoEnSimulador} />
 
         <EducationalSection
           title="Guía de VSEPR y Geometría Molecular"

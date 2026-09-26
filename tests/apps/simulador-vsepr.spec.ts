@@ -247,3 +247,216 @@ test.describe('Simulador VSEPR — geometría molecular contra la teoría, en la
     await expect(page.getByText('Combinación poco común')).toBeVisible();
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (26/09/2026) — la tarea asignable de esta app (tipo C, predicción antes de
+ * mover).
+ *
+ * Salió de la semilla S0165: 431 visitas en 90 días, un 9 % de aula (Panamá y Colombia) y sin
+ * tarea dentro. El alumno parte de una molécula real, se le propone UN cambio (un par más o
+ * menos, u otra molécula) y se compromete con una predicción antes de mover el deslizador.
+ *   app/simulador-vsepr/motor.ts   ← TABLA_VSEPR (MOVIDA de page.tsx, no replicada) y el tope
+ *                                    X + E ≤ 6 de los deslizadores, como funciones puras
+ *   app/simulador-vsepr/casos.ts   ← los 12 casos, la rejilla de escenarios y el aleatorio
+ * La respuesta sale de EJECUTAR el motor sobre el estado final, nunca de una tabla de casos.
+ *
+ * LA RESPUESTA DE CADA CASO, A MANO (teoría VSEPR: electrónica = X + E; molecular = solo átomos):
+ *   1 · CH₄ (4,0) → NH₃ (3,1)          4 dominios, 3 átomos                 → Pirámide trigonal
+ *   2 · NH₃ (3,1) → H₂O (2,2)          ¿cambia la electrónica? 4 → 4        → No cambia
+ *   3 · NH₃ (3,1), E − 1 → (3,0)       3 dominios, los 3 átomos             → Trigonal plana
+ *   4 · BF₃ (3,0), X + 1 → (4,0)       4 dominios, los 4 átomos             → Tetraédrica
+ *   5 · CO₂ (2,0), E + 1 → (2,1)       electrónica de 3 dominios            → Trigonal plana
+ *   6 · H₂O (2,2), E − 1 → (2,1)       3 dominios, 2 átomos                 → Angular (la trampa:
+ *                                      la molecular NO cambia aunque cambie la electrónica)
+ *   7 · SiCl₄ (4,0), E + 1 → (4,1)     5 dominios, par libre ecuatorial     → Balancín (sube y baja)
+ *   8 · PCl₃ (3,1), E + 1 → (3,2)      5 dominios, 2 pares ecuatoriales     → Forma T
+ *   9 · H₂S (2,2), E + 1 → (2,3)       5 dominios, 3 pares ecuatoriales     → Lineal (XeF₂)
+ *  10 · SF₄ (4,1), E + 1 → (4,2)       6 dominios, pares opuestos           → Cuadrada plana (XeF₄)
+ *  11 · SF₄ (4,1), X + 1 → (5,1)       6 dominios, 1 par libre              → Pirámide cuadrada (BrF₅)
+ *  12 · SF₆ (6,0) → XeF₄ (4,2)         ¿cambia la electrónica? 6 → 6        → No cambia
+ *
+ * Lo que se EXCLUYE (regla de la skill para el tipo C): los cambios en los que el tope X + E ≤ 6
+ * mueve también el OTRO deslizador —el alumno vería algo distinto de lo que se le pidió—, los
+ * estados que la app pinta como «Combinación poco común» y cualquier pregunta sobre el átomo
+ * central, que no interviene en la geometría.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+import {
+  CASOS as CASOS_AULA,
+  TOTAL_CASOS as TOTAL_CASOS_AULA,
+  SIN_CAMBIO,
+  resolverCaso,
+  estadoTrasCambio,
+  comprobarPrediccion,
+  recorrerRejilla,
+  generarEjercicioAleatorio,
+} from '../../app/simulador-vsepr/casos';
+import { geometriaDe, aplicarCambioEnlaces, aplicarCambioLibres } from '../../app/simulador-vsepr/motor';
+
+const A_MANO_AULA: Readonly<Record<number, string>> = {
+  1: 'Pirámide trigonal',
+  2: SIN_CAMBIO,
+  3: 'Trigonal plana',
+  4: 'Tetraédrica',
+  5: 'Trigonal plana',
+  6: 'Angular',
+  7: 'Balancín (sube y baja)',
+  8: 'Forma T',
+  9: 'Lineal',
+  10: 'Cuadrada plana',
+  11: 'Pirámide cuadrada',
+  12: SIN_CAMBIO,
+};
+
+test.describe('simulador-vsepr · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS_AULA).toBe(12);
+    expect(CASOS_AULA.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS_AULA) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.respuesta).toBe(a.respuesta);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada sale de ejecutar el motor y está entre las opciones', async () => {
+    for (const caso of CASOS_AULA) {
+      const r = resolverCaso(caso.datos);
+      expect(r.respuesta, `caso ${caso.id}`).toBe(caso.respuesta);
+      const valores = caso.opciones.map((o) => o.valor);
+      expect(valores, `caso ${caso.id}`).toContain(caso.respuesta);
+      expect(new Set(valores).size, `caso ${caso.id}: opciones repetidas`).toBe(valores.length);
+      expect(valores.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(3);
+      expect(valores.length, `caso ${caso.id}`).toBeLessThanOrEqual(4);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, explicación, instrucción y pista', async () => {
+    for (const caso of CASOS_AULA) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.instruccion.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(caso.filaQueMirar.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+      // El título no puede regalar la respuesta.
+      expect(caso.titulo.toLowerCase(), `caso ${caso.id}`).not.toContain(caso.respuestaTexto.toLowerCase());
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Panamá|Panama|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos?)\b/i;
+    for (const caso of CASOS_AULA) {
+      expect(PROHIBIDO.test(`${caso.titulo} ${caso.enunciado}`), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('6 · el aleatorio es reproducible, variado EN ESCENARIOS y usa la misma resolución', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    // Con respuestas cerradas la variedad se mide sobre el escenario (regla de la skill).
+    const escenarios = new Set(muestras.map((m) => JSON.stringify([m.datos.inicio, m.datos.cambio])));
+    expect(escenarios.size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      const r = resolverCaso(m.datos);
+      expect(r.ok, `semilla ${m.semilla}: ${r.error ?? ''}`).toBe(true);
+      expect(r.respuesta, `semilla ${m.semilla}`).toBe(m.respuesta);
+      expect(m.opciones.map((o) => o.valor), `semilla ${m.semilla}`).toContain(m.respuesta);
+    }
+  });
+
+  test('7 · las respuestas a mano, y la teoría fijada contra el motor', async () => {
+    // (a) Las doce, contra la tabla de la cabecera.
+    for (const caso of CASOS_AULA) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO_AULA[caso.id]);
+    }
+    // (b) Un mecanismo por fila: la electrónica depende solo de X + E…
+    expect(geometriaDe(4, 0)?.geomElectronica).toBe('Tetraédrica');
+    expect(geometriaDe(3, 1)?.geomElectronica).toBe('Tetraédrica');
+    expect(geometriaDe(2, 2)?.geomElectronica).toBe('Tetraédrica');
+    // …y los pares libres van a posiciones ecuatoriales de la bipirámide: con 3, lineal.
+    expect(geometriaDe(2, 3)?.geomMolecular).toBe('Lineal');
+    // En el octaedro, dos pares libres se oponen: cuadrada plana.
+    expect(geometriaDe(4, 2)?.geomMolecular).toBe('Cuadrada plana');
+    // (c) El átomo central no interviene: el caso 9 con otro átomo da lo mismo.
+    const caso9 = CASOS_AULA[8];
+    const otroAtomo = resolverCaso({ ...caso9.datos, inicio: { ...caso9.datos.inicio, atomo: 'Xe' } });
+    expect(otroAtomo.respuesta).toBe(caso9.respuesta);
+    // (d) El tope de la app, movido a funciones puras: subir E en el SF₆ recorta X.
+    expect(aplicarCambioLibres(6, 0, 1)).toEqual({ enlaces: 5, libres: 1 });
+    expect(aplicarCambioEnlaces(4, 2, 5)).toEqual({ enlaces: 5, libres: 1 });
+    expect(aplicarCambioEnlaces(2, 2, 4)).toEqual({ enlaces: 4, libres: 2 });
+  });
+
+  test('7.bis · ningún caso ni escenario de práctica mueve el otro deslizador ni sale de la tabla', async () => {
+    const rejilla = recorrerRejilla();
+    expect(rejilla.validos.length).toBeGreaterThan(12);
+    const todos = [...CASOS_AULA.map((c) => c.datos), ...rejilla.validos];
+    for (const e of todos) {
+      const tras = estadoTrasCambio(e.inicio, e.cambio);
+      expect(tras.ok, JSON.stringify(e)).toBe(true);
+      const f = tras.final!;
+      expect(geometriaDe(e.inicio.enlaces, e.inicio.libres), JSON.stringify(e)).not.toBeNull();
+      expect(geometriaDe(f.enlaces, f.libres), JSON.stringify(e)).not.toBeNull();
+      if (e.cambio.tipo === 'enlaces') {
+        expect(f.libres, `el tope tocó los libres: ${JSON.stringify(e)}`).toBe(e.inicio.libres);
+        expect(f.enlaces).toBe(e.inicio.enlaces + e.cambio.delta);
+      } else if (e.cambio.tipo === 'libres') {
+        expect(f.enlaces, `el tope tocó los enlaces: ${JSON.stringify(e)}`).toBe(e.inicio.enlaces);
+        expect(f.libres).toBe(e.inicio.libres + e.cambio.delta);
+      }
+    }
+    // Y el filtro del tope existe de verdad: el SF₆ con un par libre más queda excluido.
+    const sf6 = estadoTrasCambio({ molecula: 'SF₆', atomo: 'S', enlaces: 6, libres: 0 }, { tipo: 'libres', delta: 1 });
+    expect(sf6.ok).toBe(false);
+    expect(sf6.motivo).toBe('tope');
+  });
+
+  test('8 · corregir no lanza nunca', async () => {
+    expect(comprobarPrediccion('Lineal', 'Lineal').correcto).toBe(true);
+    expect(comprobarPrediccion('Angular', 'Lineal')).toEqual({ correcto: false, motivo: 'fallo' });
+    expect(comprobarPrediccion(null, 'Lineal').motivo).toBe('vacia');
+    expect(comprobarPrediccion('Lineal', null).correcto).toBe(false);
+  });
+});
+
+test.describe('simulador-vsepr · la sección de casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="aula-titulo"]');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, DESLIZADORES);
+  });
+
+  test('caso 9: se predice, se carga el punto de partida y el simulador lo confirma', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 9:/ }).click();
+    await seccion(page).getByRole('radio', { name: 'Lineal', exact: true }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto!');
+
+    // H₂S: X = 2, E = 2. El alumno añade él el tercer par libre y lee la fila de la tabla.
+    await seccion(page).getByRole('button', { name: /Cargar el punto de partida/ }).click();
+    await expect(ecoDeSlider(page, 'slider-enlaces')).toHaveText('2');
+    await expect(ecoDeSlider(page, 'slider-libres')).toHaveText('2');
+    await ponerSlider(page, 'slider-libres', 3);
+    expect((await leerResultado(page)).geomMolecular).toBe('Lineal');
+  });
+
+  test('caso 6: la trampa (cambia la electrónica, no la molecular) se corrige como fallo', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 6:/ }).click();
+    await seccion(page).getByRole('radio', { name: 'Trigonal plana', exact: true }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(seccion(page).getByRole('alert')).not.toContainText('¡Correcto!');
+    await expect(seccion(page).getByRole('alert')).toContainText('Angular');
+  });
+});
