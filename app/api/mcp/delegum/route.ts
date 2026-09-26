@@ -32,6 +32,10 @@ import { calcularPensionDesempleo } from '@/lib/calculadoras/pensionDesempleo';
 import { calcularPensionPublica } from '@/lib/calculadoras/pensionPublica';
 import { calcularBrechaJubilacion } from '@/lib/calculadoras/brechaJubilacion';
 import { calcularComplementoBrechaGenero, FECHA_MINIMA_HECHO_CAUSANTE, type SexoBeneficiario as SexoBeneficiarioBG, type TipoPensionBG } from '@/lib/calculadoras/complementoBrechaGenero';
+// Pagas y doctrina del complemento, citadas desde el módulo y no tecleadas (residuo de 2245/2246)
+import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META } from '@/data/fiscal';
+const PAGAS_BG = COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales;
+const DOCTRINA_BG = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
 import { compararDonacionHerencia } from '@/lib/calculadoras/comparacionDonacionHerencia';
 import {
   calcularSucesion,
@@ -1459,7 +1463,7 @@ function crearServidorDelegum(): McpServer {
   // ── calcular_complemento_brecha_genero ───────────────────────────────────
   servidor.tool(
     'calcular_complemento_brecha_genero',
-    `Calcula el complemento de pensión para la reducción de la brecha de género (antiguo complemento de maternidad, art. 60 LGSS). Importe fijo por hijo/a (la cuantía vigente y el máximo de hijos salen de data/fiscal; se abona en 14 pagas) sobre pensiones contributivas de jubilación, incapacidad permanente o viudedad. IMPORTANTE: tras la STJUE C-623/23 (15-may-2025) y la STS de 09-jul-2025, hombres y mujeres tienen derecho en IGUALDAD de condiciones — ya NO se exigen requisitos adicionales a los hombres. Requisitos: pensión contributiva, hecho causante desde el ${FECHA_MINIMA_HECHO_CAUSANTE} y al menos 1 hijo. Que el otro progenitor ya lo perciba por los mismos hijos NO lo deniega: cada hijo da derecho a un solo complemento y el art. 60.1 LGSS lo asigna al progenitor titular de pensiones públicas cuya SUMA sea de menor cuantía; reconocérselo al segundo extingue el del primero (art. 60.2). En ese caso indica suma_pensiones_menor; sin ella el veredicto es condicionado.`,
+    `Calcula el complemento de pensión para la reducción de la brecha de género (antiguo complemento de maternidad, art. 60 LGSS). Importe fijo por hijo/a (la cuantía vigente y el máximo de hijos salen de data/fiscal; se abona en ${PAGAS_BG} pagas) sobre pensiones contributivas de jubilación, incapacidad permanente o viudedad. IMPORTANTE: tras la ${DOCTRINA_BG.stjue.corto} (${DOCTRINA_BG.stjue.fecha}) y la STS de ${DOCTRINA_BG.ts.fecha}, hombres y mujeres tienen derecho en IGUALDAD de condiciones — ya NO se exigen requisitos adicionales a los hombres. Requisitos: pensión contributiva, hecho causante desde el ${FECHA_MINIMA_HECHO_CAUSANTE} y al menos 1 hijo. Que el otro progenitor ya lo perciba por los mismos hijos NO lo deniega: cada hijo da derecho a un solo complemento y el art. 60.1 LGSS lo asigna al progenitor titular de pensiones públicas cuya SUMA sea de menor cuantía; reconocérselo al segundo extingue el del primero (art. 60.2). En ese caso indica suma_pensiones_menor; sin ella el veredicto es condicionado.`,
     {
       sexo: z.enum(['mujer', 'hombre']).describe('Sexo del beneficiario (informativo: desde la doctrina 2025 no afecta al derecho)'),
       num_hijos: z.number().int().min(0).describe('Número de hijos/as nacidos con vida o adoptados antes del hecho causante'),
@@ -1467,7 +1471,7 @@ function crearServidorDelegum(): McpServer {
       fecha_hecho_causante: z.enum(['antes_2021', 'desde_2021', 'sin_iniciar']).optional().describe(`Momento del hecho causante. El complemento exige hecho causante desde el ${FECHA_MINIMA_HECHO_CAUSANTE}. Por defecto desde_2021.`),
       otro_progenitor: z.enum(['no_percibe', 'percibe', 'denegado', 'no_aplica']).optional().describe('Situación del OTRO progenitor (no del solicitante): no_percibe, percibe (ya lo cobra por esos hijos: no es incompatible, decide suma_pensiones_menor), denegado, no_aplica. Que se lo denegaran a ÉL no da derecho a reclamar: para eso está denegacion_propia. Por defecto no_percibe.'),
       suma_pensiones_menor: z.enum(['propia', 'otro_progenitor', 'desconocida']).optional().describe('Solo si otro_progenitor es "percibe": de quién es la SUMA de pensiones públicas (todas, p. ej. jubilación + viudedad) de menor cuantía. propia → se le reconoce al solicitante y se extingue el del otro; otro_progenitor → lo conserva el otro; desconocida (por defecto) → veredicto condicionado.'),
-      denegacion_propia: z.boolean().optional().describe('¿Al SOLICITANTE le denegaron el complemento en su día y tiene una resolución denegatoria? Es lo que decide si procede reclamar (STJUE C-623/23 para denegaciones a hombres anteriores a 2025). Por defecto false.'),
+      denegacion_propia: z.boolean().optional().describe(`¿Al SOLICITANTE le denegaron el complemento en su día y tiene una resolución denegatoria? Es lo que decide si procede reclamar (${DOCTRINA_BG.stjue.corto}, para denegaciones a hombres anteriores a esa doctrina). Por defecto false.`),
       cuantia_pension_mensual: z.number().positive().optional().describe('Cuantía mensual de la pensión base (€/mes). Opcional: para mostrar la pensión total con complemento.'),
     },
     { title: 'Calcula el complemento de pensión por brecha de género', readOnlyHint: true },
@@ -1492,7 +1496,7 @@ function crearServidorDelegum(): McpServer {
             ? [
                 r.esReclamacion ? `🔄 **Posible reclamación retroactiva**` : `✅ **Tiene derecho al complemento**`,
                 `Hijos computables: ${r.hijosComputables} · ${fmt(r.cuantiaPorHijoMensual)} €/mes por hijo`,
-                `💰 **Complemento: ${fmt(r.complementoMensual)} €/mes (${fmt(r.complementoAnual)} €/año, 14 pagas)**`,
+                `💰 **Complemento: ${fmt(r.complementoMensual)} €/mes (${fmt(r.complementoAnual)} €/año, ${PAGAS_BG} pagas)**`,
                 r.pensionTotalMensual !== undefined ? `Pensión total con complemento: **${fmt(r.pensionTotalMensual)} €/mes**` : null,
               ].filter(l => l !== null).join('\n')
             : r.condicionado
