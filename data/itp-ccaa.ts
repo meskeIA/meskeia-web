@@ -1254,7 +1254,7 @@ export function tipoGeneralITP(ccaa: ComunidadAutonoma, objeto: ObjetoTransmisio
  */
 export function describirSubidaITP(ccaa: ComunidadAutonoma): string | null {
   const datos = ITP_CCAA[ccaa];
-  const pct = (t: number) => `${formatNumber(t, Number.isInteger(t) ? 0 : 2)} %`;
+  const pct = (t: number) => `${formatNumber(t, Number.isInteger(t) ? 0 : 2)}\u00A0%`;
   if (datos.umbralTipoUnico) {
     return (
       `el tipo general es del ${pct(datos.tipoGeneral)}, y si el valor supera ` +
@@ -1398,6 +1398,32 @@ export const TERRITORIOS_SIN_IVA: Partial<Record<ComunidadAutonoma, { impuesto: 
   melilla: { impuesto: 'IPSI', nombre: 'Impuesto sobre la Producción, los Servicios y la Importación' },
 };
 
+/** IVA general que se repercute en las facturas de notaría y registro (art. 90.Uno Ley 37/1992). */
+const IVA_HONORARIOS = 0.21;
+
+/**
+ * Si la factura de notaría y registro lleva IVA: no en Canarias, Ceuta y Melilla.
+ *
+ * ── De dónde sale (26/09/2026, hallazgo 2214 del Inspector) ──────────────────
+ * `calcularRegistro` y `calcularArancelNotarial` multiplicaban SIEMPRE por 1,21, y las siete
+ * apps del clúster publicaban «Registro de la Propiedad (IVA incluido)» en Canarias, Ceuta y
+ * Melilla —150.000 € en Canarias: 217,94 € de registro, 37,82 € de ellos un IVA que allí no
+ * existe— dentro de un coste rotulado definitivo. El Registro es el del sitio de la finca, y el
+ * servicio del notario en la compraventa es un servicio relacionado con el inmueble: los dos se
+ * localizan donde radica (art. 70.Uno.1.º LIVA), y allí se factura IGIC o IPSI, no IVA.
+ *
+ * Como con el impuesto de la operación (`AvisoTerritorioSinIva`), el catálogo NO calcula el
+ * IGIC ni el IPSI: devuelve el arancel sin impuesto indirecto y la app tiene que NOMBRAR que ese
+ * impuesto se factura aparte, porque la cifra queda por debajo de lo que se paga.
+ */
+export function honorariosLlevanIVA(ccaa?: ComunidadAutonoma): boolean {
+  return !ccaa || !TERRITORIOS_SIN_IVA[ccaa];
+}
+
+function conImpuestoHonorarios(importe: number, ccaa?: ComunidadAutonoma): number {
+  return honorariosLlevanIVA(ccaa) ? importe * (1 + IVA_HONORARIOS) : importe;
+}
+
 /**
  * Calcula ITP con escala progresiva
  */
@@ -1473,10 +1499,13 @@ export function calcularAJD(valor: number, ccaa: ComunidadAutonoma, contexto: Co
 }
 
 /**
- * Arancel notarial puro: número 2 del RD 1426/1989 (documentos de cuantía), más IVA.
+ * Arancel notarial puro: número 2 del RD 1426/1989 (documentos de cuantía), más IVA donde rige.
  * Es la parte normativa exacta, pero NO es lo que se acaba pagando — ver estimarFacturaNotarial.
+ *
+ * `ccaa` es el territorio del INMUEBLE: sin él se supone península o Baleares, como hasta el
+ * 26/09/2026. Ver `honorariosLlevanIVA`.
  */
-export function calcularArancelNotarial(valor: number): number {
+export function calcularArancelNotarial(valor: number, ccaa?: ComunidadAutonoma): number {
   let total = 0;
   let limiteAnterior = 0;
   // Solo la parte reglada: lo que excede de LIMITE_ARANCEL_NOTARIAL es de libre acuerdo.
@@ -1494,8 +1523,7 @@ export function calcularArancelNotarial(valor: number): number {
     limiteAnterior = tramo.hasta;
   }
 
-  // Añadir IVA (21%) a los honorarios notariales
-  return total * 1.21;
+  return conImpuestoHonorarios(total, ccaa);
 }
 
 /**
@@ -1523,8 +1551,11 @@ export const FACTURA_NOTARIAL = {
 };
 
 /** Horquilla de la factura notarial, y su punto medio para quien necesite una sola cifra. */
-export function estimarFacturaNotarial(valor: number): { min: number; max: number; medio: number } {
-  const arancel = calcularArancelNotarial(valor);
+export function estimarFacturaNotarial(
+  valor: number,
+  ccaa?: ComunidadAutonoma,
+): { min: number; max: number; medio: number } {
+  const arancel = calcularArancelNotarial(valor, ccaa);
   const min = arancel * FACTURA_NOTARIAL.factorMin;
   const max = arancel * FACTURA_NOTARIAL.factorMax;
   return { min, max, medio: (min + max) / 2 };
@@ -1535,8 +1566,8 @@ export function estimarFacturaNotarial(valor: number): { min: number; max: numbe
  * nombre porque siete apps lo llaman, y porque lo que estaba mal no era la llamada sino que
  * devolviese el arancel en lugar de la factura.
  */
-export function calcularNotario(valor: number): number {
-  return estimarFacturaNotarial(valor).medio;
+export function calcularNotario(valor: number, ccaa?: ComunidadAutonoma): number {
+  return estimarFacturaNotarial(valor, ccaa).medio;
 }
 
 /**
@@ -1642,9 +1673,11 @@ export function horquillaEdadJoven(): { min: number; max: number } {
 }
 
 /**
- * Calcula gastos de registro de la propiedad
+ * Calcula gastos de registro de la propiedad: arancel del RD 1427/1989, más IVA donde rige.
+ * `ccaa` es el territorio del inmueble (el Registro es siempre el de la finca); ver
+ * `honorariosLlevanIVA`.
  */
-export function calcularRegistro(valor: number): number {
+export function calcularRegistro(valor: number, ccaa?: ComunidadAutonoma): number {
   let total = 0;
   let limiteAnterior = 0;
 
@@ -1666,8 +1699,7 @@ export function calcularRegistro(valor: number): number {
   // El nº 2 cubre la inscripción; presentación y nota simple van aparte y siempre se devengan
   total += REGISTRO_CONCEPTOS.presentacion + REGISTRO_CONCEPTOS.notaSimple;
 
-  // Añadir IVA (21%)
-  return total * 1.21;
+  return conImpuestoHonorarios(total, ccaa);
 }
 
 /**
@@ -1836,11 +1868,14 @@ export function respuestaEscriturar({ inmueble, valorReferencia }: CasoEscritura
     `RD 1426/1989 y la extensión de la escritura. A eso hay que sumarle la inscripción en el ` +
     `Registro de la Propiedad (unos ${euros(registro)} € para ese mismo importe) y, sobre ` +
     `todo, el impuesto de la transmisión, que es la partida más grande: el ITP, del ` +
-    `${formatNumber(RANGO_ITP_OTROS.min, 0)}% al ${formatNumber(RANGO_ITP_OTROS.max, 0)}% según la ` +
+    `${formatNumber(RANGO_ITP_OTROS.min, 0)}\u00A0% al ${formatNumber(RANGO_ITP_OTROS.max, 0)}\u00A0% según la ` +
     // El rango es de tipos nominales: en Ceuta y Melilla la cuota se bonifica al 50 % y se paga
     // la mitad, por debajo del mínimo (hallazgo 1593, 24/09/2026).
     `comunidad autónoma (la mitad en Ceuta y Melilla, por su bonificación del ` +
-    `${formatNumber(BONIFICACION_CUOTA_CEUTA_MELILLA * 100, 0)} %), o IVA más AJD cuando la operación tributa por IVA —esta página ` +
+    `${formatNumber(BONIFICACION_CUOTA_CEUTA_MELILLA * 100, 0)}\u00A0%, que alcanza también al AJD), o IVA más AJD cuando ` +
+    // Hallazgos 2206 y 2212: el AJD de Ceuta y Melilla también se paga a la mitad, y el rango
+    // nominal que publicaban las apps no contenía lo que cobraban.
+    `la operación tributa por IVA —esta página ` +
     `explica más abajo cuál de los dos toca en este caso—. Si además se encarga la gestión a ` +
     `una gestoría, súmale su minuta. El simulador de arriba lo calcula para tu precio y tu ` +
     `comunidad.`

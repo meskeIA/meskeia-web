@@ -31,6 +31,10 @@ import {
   ITP_CCAA,
   BONIFICACION_CUOTA_CEUTA_MELILLA,
   TERRITORIOS_SIN_IVA,
+  calcularRegistro,
+  calcularArancelNotarial,
+  estimarFacturaNotarial,
+  honorariosLlevanIVA,
 } from '../data/itp-ccaa';
 
 test.describe('ITP — bonificación del 50 % en Ceuta y Melilla (art. 57 bis TRLITPAJD)', () => {
@@ -98,5 +102,30 @@ test.describe('Territorios donde no rige el IVA español', () => {
   test('y ninguna comunidad de territorio IVA aparece en la lista', () => {
     expect(TERRITORIOS_SIN_IVA['madrid']).toBeUndefined();
     expect(TERRITORIOS_SIN_IVA['baleares']).toBeUndefined();
+  });
+});
+
+// ── Notaría y registro sin IVA donde no rige (26/09/2026, hallazgo 2214) ─────────────
+// El Inspector midió en terreno-rustico, Canarias, 150.000 €: «Registro de la Propiedad
+// (IVA incluido)» 217,94 €, de los que 37,82 € eran un IVA del 21 % que allí no existe. El
+// Registro es el de la finca y el notario presta un servicio relacionado con el inmueble
+// (art. 70.Uno.1.º LIVA): en Canarias se factura IGIC y en Ceuta y Melilla IPSI. El motor
+// no los calcula; devuelve el arancel sin impuesto indirecto y la app lo nombra.
+test.describe('Notaría y registro — sin IVA en Canarias, Ceuta y Melilla', () => {
+  test('Canarias, 150.000 €: registro 180,11 € (el 217,94 € de antes llevaba un 21 % inexistente)', () => {
+    expect(calcularRegistro(150000, 'canarias')).toBeCloseTo(180.11, 2);
+    expect(calcularRegistro(150000, 'madrid')).toBeCloseTo(217.94, 2);
+    // Sin territorio, península: la firma antigua conserva su resultado.
+    expect(calcularRegistro(150000)).toBeCloseTo(217.94, 2);
+  });
+
+  test('la notaría de Ceuta y Melilla es la de Madrid sin el 21 %', () => {
+    for (const ccaa of ['canarias', 'ceuta', 'melilla'] as const) {
+      expect(honorariosLlevanIVA(ccaa)).toBe(false);
+      expect(calcularArancelNotarial(150000, ccaa) * 1.21).toBeCloseTo(calcularArancelNotarial(150000, 'madrid'), 6);
+      expect(estimarFacturaNotarial(150000, ccaa).medio * 1.21).toBeCloseTo(estimarFacturaNotarial(150000).medio, 6);
+    }
+    expect(honorariosLlevanIVA('baleares')).toBe(true);
+    expect(honorariosLlevanIVA(undefined)).toBe(true);
   });
 });
