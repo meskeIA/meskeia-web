@@ -11,8 +11,21 @@
  * secretos, en raíz o en subcarpeta) entra AUTOMÁTICAMENTE, sin tocar
  * este script. La lista se obtiene de git en cada ejecución.
  *
- * Los originales NO se modifican. El destino se regenera limpio cada vez.
- * Destino: C:\Users\jaceb\Documents\meskeIA_Critico\  (Proton lo sincroniza)
+ * Los originales NO se modifican. Destino:
+ * C:\Users\jaceb\Documents\meskeIA_Critico\  (Proton lo sincroniza)
+ *
+ * En DOS pasos, y el orden es la protección:
+ *   1. La copia se prepara entera en una carpeta de %TEMP%, que Proton NO ve.
+ *   2. Solo si ha salido completa, `robocopy /MIR` la vuelca al destino:
+ *      copia lo que cambió, borra lo que ya no existe y no toca lo demás.
+ * Si algo falla en el paso 1, el script termina sin haber tocado el
+ * destino y en Proton sigue la copia buena del día anterior.
+ *
+ * Hasta el 26/09/2026 se borraba el destino y se regeneraba en el sitio.
+ * Dos consecuencias: (a) si git o una copia fallaban a mitad, la carpeta
+ * quedaba vacía y Proton subía ese vacío —la copia off-site acababa en la
+ * papelera—, y (b) cada día los ~69 MB iban a la papelera de Proton, que
+ * NO caduca: 3,73 GB acumulados en tres meses, de una cuota de 15 GB.
  *
  * ⚠️ El destino TIENE que estar dentro de `Documents`. El cliente de Proton
  * Drive en Windows NO sincroniza la carpeta `C:\Users\jaceb\Proton Drive`
@@ -26,15 +39,18 @@
  * ------------------------------------------------------------------
  */
 
-import { cpSync, mkdirSync, rmSync, existsSync, readdirSync, writeFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { cpSync, mkdirSync, rmSync, existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(__dirname, '..');
 const DOCUMENTS = 'C:\\Users\\jaceb\\Documents';
 const DESTINO = join(DOCUMENTS, 'meskeIA_Critico');
+// Fuera de Documents a propósito: lo que pase aquí Proton no lo ve
+const PREPARACION = join(tmpdir(), 'meskeIA_Critico_preparacion');
 
 // Entradas ignoradas que NO se copian (regenerables desde build/npm o gestionadas aparte)
 const NO_COPIAR = new Set([
@@ -57,9 +73,10 @@ if (!existsSync(DOCUMENTS)) {
   process.exit(1);
 }
 
-// Regenerar destino limpio (elimina obsoletos: p. ej. un doc borrado)
-rmSync(DESTINO, { recursive: true, force: true });
-mkdirSync(DESTINO, { recursive: true });
+// La preparación sí se regenera limpia: así un doc borrado en el repo
+// desaparece también de la copia (robocopy /MIR lo quitará del destino)
+rmSync(PREPARACION, { recursive: true, force: true });
+mkdirSync(PREPARACION, { recursive: true });
 
 // --- 1. Obtener de git TODO lo ignorado (carpetas completas colapsadas) ---
 // execFileSync (sin shell) con argumentos en array: seguro y sin inyección.
@@ -84,10 +101,19 @@ for (const entrada of ignorados) {
   if (NO_COPIAR.has(rel)) continue;             // saltar regenerables/pesados
   const origen = join(RAIZ, rel);
   if (!existsSync(origen)) continue;
-  const destino = join(DESTINO, rel);
+  const destino = join(PREPARACION, rel);
   mkdirSync(dirname(destino), { recursive: true });
-  cpSync(origen, destino, { recursive: true });
+  // Conservar la fecha original: robocopy decide por tamaño y fecha qué ha
+  // cambiado, y con la fecha de hoy lo daría todo por nuevo cada día
+  cpSync(origen, destino, { recursive: true, preserveTimestamps: true });
   registro.push(`  · ${entrada}`);
+}
+
+// Una lista vacía no es «nada que copiar», es git respondiendo mal: volcarla
+// con /MIR vaciaría la copia off-site, que es justo lo que se quiere evitar
+if (registro.length === 0) {
+  console.error('❌ git no ha devuelto nada que copiar: el destino se deja como estaba');
+  process.exit(1);
 }
 
 // --- 2. Último dump de Turso (vive en _backups/, excluido del barrido) ---
@@ -98,8 +124,8 @@ if (existsSync(dirTurso)) {
     .sort();
   if (dumps.length) {
     const ultimo = dumps[dumps.length - 1];
-    mkdirSync(join(DESTINO, 'turso'), { recursive: true });
-    cpSync(join(dirTurso, ultimo), join(DESTINO, 'turso', ultimo));
+    mkdirSync(join(PREPARACION, 'turso'), { recursive: true });
+    cpSync(join(dirTurso, ultimo), join(PREPARACION, 'turso', ultimo), { preserveTimestamps: true });
     registro.push(`  · turso/${ultimo} (último dump)`);
   }
 }
@@ -118,10 +144,39 @@ const manifiesto = [
   'Contenido copiado:',
   ...registro,
   '',
-  'Los originales NO se modifican. La tarea "Backup Critico meskeIA"',
-  '(08:07 diaria) regenera esta carpeta y Proton la sube sola a la nube.',
+  'Los originales NO se modifican. La Rutina Matinal (05:30 diaria)',
+  'actualiza esta carpeta y Proton la sube sola a la nube.',
 ].join('\n');
-writeFileSync(join(DESTINO, 'LEEME.txt'), manifiesto, 'utf8');
+writeFileSync(join(PREPARACION, 'LEEME.txt'), manifiesto, 'utf8');
+
+// --- 4. Volcado al destino ---
+// /MIR: copia lo nuevo o cambiado y borra lo que ya no está en la preparación.
+// Sin /NFL, para que el log diga QUÉ ficheros se movieron (suelen ser pocos).
+// /UNILOG y no la consola: robocopy escribe la consola en la página de códigos
+// OEM y los acentos llegaban rotos («M s reciente»); el log Unicode, no.
+const LOG_ROBOCOPY = join(tmpdir(), 'meskeIA_Critico_robocopy.log');
+const robocopy = spawnSync('robocopy', [
+  PREPARACION, DESTINO, '/MIR', '/R:2', '/W:5', '/XJ', '/COPY:DAT', '/DCOPY:T',
+  '/NJH', '/NJS', '/NDL', '/NP', `/UNILOG:${LOG_ROBOCOPY}`,
+]);
+const movidos = existsSync(LOG_ROBOCOPY)
+  ? readFileSync(LOG_ROBOCOPY, 'utf16le')
+      .replace(/^﻿/, '')
+      .split(/\r?\n/)
+      .map((l) => l.replaceAll(`${PREPARACION}\\`, '').replaceAll(`${DESTINO}\\`, '').replace(/\s+/g, ' ').trim())
+      .filter(Boolean)
+  : [];
+rmSync(LOG_ROBOCOPY, { force: true });
+
+// robocopy: 0-7 = éxito (bits 1 copiado, 2 extras borrados, 4 desajustes); 8 o más = fallo
+if (robocopy.error || robocopy.status === null || robocopy.status >= 8) {
+  console.error(`❌ robocopy falló (código ${robocopy.status ?? robocopy.error?.message})`);
+  console.error(movidos.join('\n'));
+  process.exit(1);
+}
+
+rmSync(PREPARACION, { recursive: true, force: true });
 
 console.log(`✅ Copia crítica actualizada en: ${DESTINO}`);
 console.log(registro.join('\n'));
+console.log(movidos.length ? `Cambios volcados (${movidos.length}):\n  ${movidos.join('\n  ')}` : 'Sin cambios que volcar');
