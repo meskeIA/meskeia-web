@@ -23,7 +23,7 @@
  */
 
 export const FISCAL_IRPF_META = {
-  fuente: 'Ley 35/2006 del IRPF (texto consolidado, arts. 57 a 66)',
+  fuente: 'Ley 35/2006 del IRPF (texto consolidado: arts. 19, 20, 56 a 66, 84.2 y 96, y DA 61.ª)',
   // 2026-09-09: reducción del art. 20 corregida contra el Manual práctico de Renta 2025
   // de la AEAT. La revisión del 2026-08-12 la dio por buena y llevaba la redacción
   // anterior al RDL 4/2024, con una reducción residual de 2.364 € que no existe.
