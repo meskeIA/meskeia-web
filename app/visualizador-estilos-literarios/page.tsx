@@ -368,9 +368,9 @@ const movimientos: Movimiento[] = [
       'Comunidad de amigos que se leen, critican y publican',
     ],
     autores: [
-      { nombre: 'Jack Kerouac', pais: 'EEUU', obras: ['En el camino', 'Los subterráneos', 'El dharma de los vagabundos'], rasgo: 'La «prosa espontánea»: rollo de papel y escritura sin parar' },
+      { nombre: 'Jack Kerouac', pais: 'EEUU', obras: ['En el camino', 'Los subterráneos', 'Los vagabundos del Dharma'], rasgo: 'La «prosa espontánea»: rollo de papel y escritura sin parar' },
       { nombre: 'Allen Ginsberg', pais: 'EEUU', obras: ['Aullido', 'Kaddish', 'América'], rasgo: 'Largo aliento whitmaniano contra la hipocresía de la sociedad' },
-      { nombre: 'William S. Burroughs', pais: 'EEUU', obras: ['El almuerzo desnudo', 'Nova Express', 'Queer'], rasgo: 'Cut-up: texto fragmentado que desintegra la narrativa lineal' },
+      { nombre: 'William S. Burroughs', pais: 'EEUU', obras: ['El almuerzo desnudo', 'Expreso Nova', 'Queer'], rasgo: 'Cut-up: texto fragmentado que desintegra la narrativa lineal' },
       { nombre: 'Lawrence Ferlinghetti', pais: 'EEUU', obras: ['Pictures of the Gone World', 'Un Coney Island de la mente'], rasgo: 'Editor, poeta y motor del movimiento desde la librería y editorial City Lights' },
     ],
     fragmento: {
@@ -493,8 +493,8 @@ export default function VisualizadorEstilosLiterariosPage() {
       {/* ── Vista detalle ── */}
       {movimientoActual && (
         <div className={styles.detalle} ref={detalleRef}>
-          <button className={styles.btnVolver} onClick={handleVolver} type="button" aria-label="Volver al listado">
-            ← Todos los movimientos
+          <button className={styles.btnVolver} onClick={handleVolver} type="button">
+            <span aria-hidden="true">←</span> Todos los movimientos
           </button>
 
           <div className={styles.detalleHeader} style={{ background: movimientoActual.color }}>
@@ -572,7 +572,7 @@ export default function VisualizadorEstilosLiterariosPage() {
           </div>
 
           <button className={`${styles.btnVolver} ${styles.btnVolverBottom}`} onClick={handleVolver} type="button">
-            ← Volver al listado
+            <span aria-hidden="true">←</span> Volver al listado
           </button>
         </div>
       )}

@@ -782,6 +782,13 @@
   border-color: rgba(231, 76, 60, 0.3);
 }
 
+/* El rojo #c0392b de claro da 2,21:1 sobre el fondo oscuro del recuadro: el título (h3 de
+   14,7 px, texto normal) exige 4,5:1 y la aspa de cada error, 3:1 (gráfico). */
+[data-theme='dark'] .warningHeader h3,
+[data-theme='dark'] .warningList li::before {
+  color: #f1948a;
+}
+
 [data-theme='dark'] .sinResultados {
   color: var(--text-secondary);
 }
@@ -872,5 +879,14 @@
 @media (max-width: 768px) {
   .hero {
     padding-top: 80px;
+  }
+}
+
+/* 100px arriba entre 769 y 1439px: por encima de 768px el logo crece y su barra baja hasta ~77px,
+   y el título, centrado, llegaba a las esquinas (medido: tapado de 769 a 989px). Mismo bloque que
+   3de36a1f; en escritorio amplio no cambia nada. */
+@media (min-width: 769px) and (max-width: 1439px) {
+  .hero {
+    padding-top: 100px;
   }
 }

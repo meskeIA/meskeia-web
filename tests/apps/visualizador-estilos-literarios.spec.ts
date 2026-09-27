@@ -791,45 +791,54 @@ test.describe('Re-inspección (27/09/2026)', () => {
     }
   });
 
-  // HALLAZGO [bajo] (Inspector 27/09/2026) — ABIERTO: entre 769 y 989 px (iPad en vertical:
-  // 810, 820, 834 px) el logo tapa el 📚 y la «E» de «Estilos». 586a4d61 da 80 px al hero solo
-  // hasta 768 px; por encima vuelven los 48 px de `.hero` y el logo, ya grande, llega a x = 203
-  // y y = 77, mientras el título centrado empieza en x = 93-198 y y = 47.
-  test.fail('el logo fijo tampoco tapa el <h1> en tableta vertical (800-980 px)', async ({ page }) => {
-    for (const ancho of [800, 834, 900, 980]) {
+  // HALLAZGO [bajo] (Inspector 27/09/2026, id 2312) — REPARADO 27/09/2026: entre 769 y 989 px
+  // (iPad en vertical: 810, 820, 834 px) el logo tapaba el 📚 y la «E» de «Estilos». 586a4d61
+  // daba 80 px al hero solo hasta 768 px; por encima volvían los 48 px de `.hero` y el logo, ya
+  // grande, llega a x = 203 y y = 77, mientras el título centrado empezaba en x = 93-198 y y = 47.
+  // Se aplica el mismo bloque que 3de36a1f: 100 px de relleno arriba entre 769 y 1439 px.
+  test('el logo fijo tampoco tapa el <h1> en tableta vertical (769-980 px)', async ({ page }) => {
+    for (const ancho of [769, 800, 834, 900, 980]) {
       await page.setViewportSize({ width: ancho, height: 1100 });
       await expect.poll(() => tituloTapadoPorLogo(page), { message: `a ${ancho} px`, timeout: 2000 }).toBe(false);
     }
   });
 
-  // S1a · HALLAZGO [bajo] (Inspector 27/09/2026) — ABIERTO: WCAG 2.5.3 (Label in Name). El
-  // botón de arriba enseña «← Todos los movimientos» y su aria-label es «Volver al listado»: el
-  // árbol de accesibilidad dice `button "Volver al listado": ← Todos los movimientos`, y quien
-  // lo maneja por voz diciendo lo que lee («pulsa Todos los movimientos») no lo encuentra.
-  test.fail('el nombre accesible del botón de arriba contiene su texto visible', async ({ page }) => {
+  // S1a · HALLAZGO [bajo] (Inspector 27/09/2026, id 2311) — REPARADO 27/09/2026: WCAG 2.5.3
+  // (Label in Name). El botón de arriba enseñaba «← Todos los movimientos» y su aria-label era
+  // «Volver al listado»: quien lo maneja por voz diciendo lo que lee no lo encontraba. Se quita
+  // el aria-label (el texto basta) y la flecha va en aria-hidden, también en el botón de abajo.
+  test('el nombre accesible del botón de arriba contiene su texto visible', async ({ page }) => {
     await tarjeta(page, 'Realismo').click();
     await leerDetalle(page);
     const visible = (await botonVolverArriba(page).innerText()).replace(/^←\s*/, '').trim();
     expect(visible).toBe('Todos los movimientos');
-    // Hoy: 0 botones cuyo nombre contenga «Todos los movimientos»
+    // Antes: 0 botones cuyo nombre contuviera «Todos los movimientos»
     await expect(page.getByRole('button', { name: visible })).toHaveCount(1);
+    // Y la flecha no se lee: el nombre es exactamente el texto
+    await expect(page.getByRole('button', { name: 'Todos los movimientos', exact: true })).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Volver al listado', exact: true })).toHaveCount(1);
   });
 
-  // HALLAZGO [bajo] (Inspector 27/09/2026) — ABIERTO: la tercera obra de Kerouac se rotula con
-  // un título que no tiene ninguna edición en español. The Dharma Bums (1958) es «Los
-  // vagabundos del Dharma» (Anagrama, trad. Mariano Antolín Rato). Misma clase que el 1890.
-  test.fail('Generación Beat: la obra de Kerouac lleva su título en español', async ({ page }) => {
+  // HALLAZGO [bajo] (Inspector 27/09/2026, id 2313) — REPARADO 27/09/2026: la tercera obra de
+  // Kerouac se rotulaba «El dharma de los vagabundos», título sin edición en español. The Dharma
+  // Bums (1958) es «Los vagabundos del Dharma» (Anagrama, trad. Mariano Antolín Rato). Misma
+  // clase que el 1890. Revisada de paso la Beat con el mismo criterio: Nova Express de Burroughs
+  // se publica en español como «Expreso Nova» (Minotauro, trad. Enrique Pezzoni, 1972).
+  test('Generación Beat: la obra de Kerouac lleva su título en español', async ({ page }) => {
     await tarjeta(page, 'Generación Beat').click();
     const kerouac = (await leerDetalle(page)).autores.find((a) => a.nombre === 'Jack Kerouac');
-    // Hoy: ['En el camino', 'Los subterráneos', 'El dharma de los vagabundos']
+    // Antes: ['En el camino', 'Los subterráneos', 'El dharma de los vagabundos']
     expect(kerouac?.obras).toEqual(['En el camino', 'Los subterráneos', 'Los vagabundos del Dharma']);
+    const burroughs = (await leerDetalle(page)).autores.find((a) => a.nombre === 'William S. Burroughs');
+    expect(burroughs?.obras).toEqual(['El almuerzo desnudo', 'Expreso Nova', 'Queer']);
   });
 
-  // HALLAZGO [medio] (Inspector 27/09/2026) — ABIERTO: en oscuro, el título del recuadro
-  // «Errores frecuentes al estudiar literatura» (h3, 14,7 px negrita: texto normal, exige 4,5:1)
-  // mantiene el rojo literal #c0392b de claro sobre el fondo oscuro: 2,21:1. `.warningHeader h3`
-  // no tiene variante `[data-theme='dark']`. En claro da 5,1:1.
-  test.fail('en tema oscuro el título del recuadro de errores se lee (≥ 4,5:1)', async ({ page }) => {
+  // HALLAZGO [medio] (Inspector 27/09/2026, id 2310) — REPARADO 27/09/2026: en oscuro, el título
+  // del recuadro «Errores frecuentes al estudiar literatura» (h3, 14,7 px negrita: texto normal,
+  // exige 4,5:1) mantenía el rojo literal #c0392b de claro sobre el fondo oscuro: 2,21:1. Ahora
+  // `[data-theme='dark'] .warningHeader h3` toma #f1948a, y también el aspa «✗» de cada error
+  // (::before), que tenía el mismo rojo. En claro no cambia (5,1:1).
+  test('en tema oscuro el título del recuadro de errores se lee (≥ 4,5:1)', async ({ page }) => {
     await activarTema(page, 'dark');
     await abrirGuia(page);
     // El tema oscuro está aplicado de verdad: el recuadro toma su fondo de `[data-theme='dark'] .warningBox`
@@ -837,8 +846,14 @@ test.describe('Re-inspección (27/09/2026)', () => {
     const c = await peorContraste(page, '[class*="warningHeader"] h3');
     // peorContraste recorta el texto a 40 caracteres
     expect(c?.texto).toBe('Errores frecuentes al estudiar literatura'.slice(0, 40));
-    // Hoy: 2,21
+    // Antes: 2,21
     expect(c?.ratio ?? 0).toBeGreaterThanOrEqual(4.5);
+    // El aspa de cada error comparte el color del título (que ya da ≥ 4,5:1, luego ≥ 3:1 de gráfico)
+    const colores = await page.locator('[class*="warningBox"]').evaluate((box) => ({
+      h3: getComputedStyle(box.querySelector('h3') as Element).color,
+      aspa: getComputedStyle(box.querySelector('li') as Element, '::before').color,
+    }));
+    expect(colores.aspa).toBe(colores.h3);
   });
 
   test.describe('en un móvil de 393 × 851', () => {
