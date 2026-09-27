@@ -1420,7 +1420,7 @@ test.describe('Inspector 27/09/2026 · casos', () => {
 
 test.describe('Inspector 27/09/2026 · hallazgos', () => {
   /**
-   * HALLAZGO bajo (Inspector 27/09/2026) · contenido — ABIERTO. La guía presenta W como un símbolo
+   * HALLAZGO bajo (Inspector 27/09/2026) · contenido — REPARADO 27/09/2026. La guía presentaba W como un símbolo
    * que no casa con el nombre del elemento EN ESPAÑOL, y en español casa: el acuerdo RAC-RAE-RSEQ-
    * Fundéu (An. Quím. 113, 2017, «Adiciones y correcciones», punto 7) da como preferida
    * «wolframio», que empieza por W. La premisa solo vale para el inglés «tungsten».
@@ -1429,9 +1429,11 @@ test.describe('Inspector 27/09/2026 · hallazgos', () => {
    *   · FAQ «¿Por qué el wolframio se llama así en español pero su símbolo es W?»: la pregunta
    *     plantea una contradicción que en español no existe (calco del «why is tungsten W?»).
    * Esperado: W no figura entre los «engañosos» y la FAQ no opone «wolframio» a «W».
+   * REPARADO 27/09/2026 (hallazgo 2288): en la lista de «engañosos» W cedió el sitio a Sb (antimonio,
+   * del latín stibium), que en español no casa; la FAQ pasó a preguntar por qué el símbolo es W si
+   * en INGLÉS se llama tungsten, y responde que en español la forma preferida, «wolframio», casa con W.
    */
   test('hallazgo · la guía no pone W (wolframio) entre los símbolos que no casan con su nombre en español', async ({ page }) => {
-    test.fail(); // ABIERTO: W (wolframio) presentado como símbolo «engañoso» en español
     await abrir(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const engañosos = page.locator('[class*="stepCard"]').filter({ hasText: 'engañosos' });
@@ -1440,10 +1442,14 @@ test.describe('Inspector 27/09/2026 · hallazgos', () => {
     await expect(engañosos).not.toContainText('W (wolframio)');
     const preguntas = await page.locator('[class*="faqItem"] h3').allTextContents();
     expect(preguntas).not.toContain('¿Por qué el wolframio se llama así en español pero su símbolo es W?');
+    // La FAQ que ocupa su sitio sitúa el desajuste en el inglés, no en el español
+    const faqW = page.locator('[class*="faqItem"]').filter({ hasText: 'tungsten' }).first();
+    await expect(faqW).toContainText('forma preferida es «wolframio»');
+    await expect(faqW).toContainText('el símbolo casa con el nombre');
   });
 
   /**
-   * HALLAZGO bajo (Inspector 27/09/2026) · dato — ABIERTO. La reparación del 1818 escribió en el
+   * HALLAZGO bajo (Inspector 27/09/2026) · dato — REPARADO 27/09/2026. La reparación del 1818 escribió en el
    * FAQPage (lo que leen ChatGPT, Copilot y Perplexity): «Sus vidas medias van de millones de años
    * en los primeros de ese tramo (el curio-247, unos 15,6 millones de años)…». 15,6 millones de años
    * es el PERIODO DE SEMIDESINTEGRACIÓN (semivida, T½) del curio-247 (NUBASE2020: 1,56·10⁷ años, la
@@ -1451,9 +1457,10 @@ test.describe('Inspector 27/09/2026 · hallazgos', () => {
    * millones de años (IUPAC Gold Book, «mean life» frente a «half life»; es.wikipedia, «Periodo de
    * semidesintegración»: «no debe confundirse con la vida media»).
    * Esperado: o «semivida / periodo de semidesintegración … 15,6 millones», o «vida media … 22,5».
+   * REPARADO 27/09/2026 (hallazgo 2289): se conserva la cifra de NUBASE2020 y se corrige el nombre de
+   * la magnitud: «Sus semividas (periodos de semidesintegración) van de millones de años…».
    */
   test('hallazgo · el FAQPage no llama «vida media» a la semivida del curio-247', async ({ page }) => {
-    test.fail(); // ABIERTO: «vidas medias» con la cifra de T½ (15,6 Ma; τ ≈ 22,5 Ma)
     await abrir(page);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
@@ -1461,5 +1468,6 @@ test.describe('Inspector 27/09/2026 · hallazgos', () => {
     const cuantos = textos.find((t) => t.includes('118 elementos'))!;
     expect(cuantos).toContain('curio-247'); // la respuesta es la que se mide
     expect(cuantos).not.toMatch(/vidas? medias?[^.]*15,6 millones/);
+    expect(cuantos).toMatch(/semividas \(periodos de semidesintegración\)[^.]*curio-247, unos 15,6 millones de años/);
   });
 });

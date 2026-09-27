@@ -533,8 +533,10 @@ export default function QuizSimbolosQuimicosPage() {
               <p>Actualmente la tabla periódica oficial de la IUPAC tiene 118 elementos, del hidrógeno (Z=1) al oganesón (Z=118). Los elementos del 1 al 94 se encuentran en la naturaleza; los restantes son artificiales.</p>
             </div>
             <div className={styles.faqItem}>
-              <h3>¿Por qué el wolframio se llama así en español pero su símbolo es W?</h3>
-              <p>El símbolo W viene del alemán <em>Wolfram</em>, nombre original del mineral wolframita del que se obtiene. En inglés se llama tungsten, pero el símbolo W se mantiene internacionalmente por tradición histórica.</p>
+              {/* La pregunta era «¿Por qué el wolframio se llama así en español pero su símbolo es W?»,
+                  calco del «why is tungsten W?»: en español la W sí casa con el nombre (hallazgo 2288). */}
+              <h3>¿Por qué el símbolo del wolframio es W si en inglés se llama tungsten?</h3>
+              <p>El símbolo W viene del alemán <em>Wolfram</em>, como el mineral wolframita del que se obtiene. En español la forma preferida es «wolframio» (acuerdo de la RAC, la RAE, la RSEQ y la Fundéu publicado en <em>Anales de Química</em> en 2017), así que el símbolo casa con el nombre. Quien no casa es el inglés, que lo llama <em>tungsten</em> (del sueco <em>tung sten</em>, «piedra pesada»).</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué elementos tienen un solo carácter en su símbolo?</h3>
@@ -571,7 +573,7 @@ export default function QuizSimbolosQuimicosPage() {
             <div className={styles.stepCard}>
               <div className={styles.stepNum}>2</div>
               <h3>Estudia los "engañosos"</h3>
-              <p>Memoriza los que no coinciden con su nombre español: Fe (hierro), Cu (cobre), Ag (plata), Au (oro), Hg (mercurio), Pb (plomo), Sn (estaño), K (potasio), Na (sodio), W (wolframio).</p>
+              <p>Memoriza los que no coinciden con su nombre español: Fe (hierro), Cu (cobre), Ag (plata), Au (oro), Hg (mercurio), Pb (plomo), Sn (estaño), K (potasio), Na (sodio), Sb (antimonio).</p>
             </div>
             <div className={styles.stepCard}>
               <div className={styles.stepNum}>3</div>
