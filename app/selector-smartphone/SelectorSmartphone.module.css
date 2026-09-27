@@ -567,3 +567,12 @@
 .preguntaTexto:focus { outline: none; }
 .preguntaTexto:focus-visible { outline: 2px solid var(--primary-texto); outline-offset: 4px; border-radius: 4px; }
 .heroTitleSm:focus { outline: none; }
+
+/* 80px arriba hasta 768px: el hero va a sangre y el logo fijo de MeskeiaLogo (hasta ~52px) tapaba
+   el principio del título en móvil y tableta. Mismo hueco que deja la plantilla. Va al final
+   para ganar a cualquier padding del hero de un breakpoint anterior. */
+@media (max-width: 768px) {
+  .hero {
+    padding-top: 80px;
+  }
+}

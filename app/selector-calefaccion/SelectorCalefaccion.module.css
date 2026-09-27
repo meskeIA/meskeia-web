@@ -485,3 +485,12 @@
 .contrasLista li::before { content: '–'; color: var(--text-secondary); font-weight: 700; flex-shrink: 0; }
 
 [data-theme='dark'] .prosContrasCard { box-shadow: none; border: 1px solid rgba(255, 255, 255, 0.08); }
+
+/* 80px arriba hasta 768px: el hero va a sangre y el logo fijo de MeskeiaLogo (hasta ~52px) tapaba
+   el principio del título en móvil y tableta. Mismo hueco que deja la plantilla. Va al final
+   para ganar a cualquier padding del hero de un breakpoint anterior. */
+@media (max-width: 768px) {
+  .hero {
+    padding-top: 80px;
+  }
+}
