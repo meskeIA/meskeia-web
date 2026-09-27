@@ -78,6 +78,16 @@ function leerValor(texto: string): number | null {
   return Number.isFinite(v) ? v : null;
 }
 
+/**
+ * Los nodos son ENTEROS, y un decimal se rechaza con aviso en vez de truncarse.
+ *
+ * Hasta el 27/09/2026 los tres controles y el textarea hacían `Math.trunc` en silencio: «2.5»
+ * respondía «Insertado 2.», «-0.5» insertaba un 0, y en «Insertar varios» el 2.7 desaparecía
+ * como duplicado del 2 sin que nadie lo dijera, aunque el aviso de la propia app pide «un
+ * número entero» (hallazgo 2301).
+ */
+const AVISO_DECIMAL = 'Los nodos son números enteros y ese valor tiene decimales.';
+
 const PRESETS: PresetArbol[] = [
   {
     id: 'ordenado',
@@ -245,7 +255,11 @@ export default function SimuladorArbolesBstAvl() {
         setMensaje(`Valor fuera de rango. Introduce un número entero entre ${VALOR_MIN} y ${VALOR_MAX}.`);
         return;
       }
-      const valorEntero = Math.trunc(valor);
+      if (!Number.isInteger(valor)) {
+        setMensaje(`${AVISO_DECIMAL} Introduce un número entero entre ${VALOR_MIN} y ${VALOR_MAX}.`);
+        return;
+      }
+      const valorEntero = valor;
       const arbolPrev = clonar(raiz);
       if (existe(arbolPrev, valorEntero)) {
         setMensaje(`El valor ${valorEntero} ya está en el árbol (no se permiten duplicados).`);
@@ -279,7 +293,11 @@ export default function SimuladorArbolesBstAvl() {
         setMensaje('Valor inválido.');
         return;
       }
-      const valorEntero = Math.trunc(valor);
+      if (!Number.isInteger(valor)) {
+        setMensaje(`${AVISO_DECIMAL} No puede estar en el árbol: escribe un número entero.`);
+        return;
+      }
+      const valorEntero = valor;
       const arbolPrev = clonar(raiz);
       if (!existe(arbolPrev, valorEntero)) {
         setMensaje(`El valor ${valorEntero} no está en el árbol.`);
@@ -309,7 +327,11 @@ export default function SimuladorArbolesBstAvl() {
         setMensaje('Valor inválido.');
         return;
       }
-      const valorEntero = Math.trunc(valor);
+      if (!Number.isInteger(valor)) {
+        setMensaje(`${AVISO_DECIMAL} No puede estar en el árbol: escribe un número entero.`);
+        return;
+      }
+      const valorEntero = valor;
       const camino = buscarCamino(raiz, valorEntero);
       if (camino.length === 0) {
         setMensaje('Árbol vacío.');
@@ -356,25 +378,40 @@ export default function SimuladorArbolesBstAvl() {
       .split(/[,;\s]+/)
       .map((s) => s.trim())
       .filter((s) => s.length > 0)
-      .map((s) => Number(s))
-      .filter((n) => Number.isFinite(n));
+      .map((texto) => ({ texto, n: Number(texto) }))
+      .filter(({ n }) => Number.isFinite(n));
     if (leidos.length === 0) {
       setMensaje('No se encontraron números válidos en el texto.');
       return;
     }
     // El MISMO rango que el botón «Insertar». Hasta el 25/08/2026 esta vía no lo aplicaba, así
     // que 12345 se rechazaba por un control y entraba por el otro en la misma pantalla.
-    const numeros = leidos.filter((n) => n >= VALOR_MIN && n <= VALOR_MAX);
-    const fueraDeRango = leidos.length - numeros.length;
+    const enRango = leidos.filter(({ n }) => n >= VALOR_MIN && n <= VALOR_MAX);
+    const fueraDeRango = leidos.length - enRango.length;
+    // Y la misma regla de enteros (hallazgo 2301): se dice CUÁLES se rechazan, tal como se
+    // escribieron, en vez de truncarlos y perderlos después como duplicados.
+    const conDecimales = enRango
+      .filter(({ n }) => !Number.isInteger(n))
+      .map(({ texto }) => `«${texto}»`);
+    const numeros = enRango.filter(({ n }) => Number.isInteger(n)).map(({ n }) => n);
+    const avisoRango =
+      fueraDeRango > 0 ? ` ${fueraDeRango} quedaron fuera del rango ${VALOR_MIN} a ${VALOR_MAX}.` : '';
+    const avisoDecimales =
+      conDecimales.length > 0
+        ? ` Rechazados por tener decimales (los nodos son números enteros): ${conDecimales.join(', ')}.`
+        : '';
     if (numeros.length === 0) {
-      setMensaje(`Todos los valores quedan fuera del rango ${VALOR_MIN} a ${VALOR_MAX}.`);
+      setMensaje(
+        conDecimales.length === 0
+          ? `Todos los valores quedan fuera del rango ${VALOR_MIN} a ${VALOR_MAX}.`
+          : `No se ha insertado ningún valor.${avisoRango}${avisoDecimales}`
+      );
       return;
     }
     let arbol = clonar(raiz);
     const logTotal: string[] = [];
     let insertados = 0;
-    for (const n of numeros) {
-      const valorEntero = Math.trunc(n);
+    for (const valorEntero of numeros) {
       if (existe(arbol, valorEntero)) continue;
       if (tipo === 'bst') {
         arbol = insertarBST(arbol, valorEntero);
@@ -387,7 +424,8 @@ export default function SimuladorArbolesBstAvl() {
     setRotaciones((prev) => [...prev, ...logTotal]);
     setMensaje(
       `Insertados ${insertados} de ${leidos.length} valores. Rotaciones aplicadas: ${logTotal.length}.` +
-        (fueraDeRango > 0 ? ` ${fueraDeRango} quedaron fuera del rango ${VALOR_MIN} a ${VALOR_MAX}.` : '')
+        avisoRango +
+        avisoDecimales
     );
     setValoresMultiples('');
   }, [valoresMultiples, raiz, tipo]);
@@ -615,8 +653,14 @@ export default function SimuladorArbolesBstAvl() {
                   type="button"
                   className={`${styles.opBtn} ${styles.opBtnSecondary}`}
                   onClick={() => {
-                    const v = Number(valorBuscar);
-                    if (!Number.isNaN(v)) handleBuscar(v);
+                    // El mismo `leerValor` que Insertar y Eliminar: con `Number(valorBuscar)` el
+                    // campo vacío se leía como 0 y buscaba —y animaba— el nodo 0 (hallazgo 2300).
+                    const v = leerValor(valorBuscar);
+                    if (v === null) {
+                      setMensaje('Escribe el valor del nodo que quieres buscar.');
+                      return;
+                    }
+                    handleBuscar(v);
                   }}
                 >
                   Buscar
@@ -1015,7 +1059,10 @@ export default function SimuladorArbolesBstAvl() {
               desbalanceado, no solo en el primero. Esto puede generar varias rotaciones en cadena.
             </p>
             <p className={styles.faqTip}>
-              Pruébalo: carga el preset balanceado y elimina valores; observa rotaciones en cascada.
+              Pruébalo en modo AVL: pega en «Insertar varios» 80, 50, 110, 30, 70, 100, 120, 20,
+              40, 60, 90, 10 (un árbol de Fibonacci, el AVL con menos nodos para su altura; entra
+              sin ninguna rotación) y elimina el 120. Se encadenan dos rotaciones: una LL en el
+              110 y, al subir, otra LL en la raíz 80.
             </p>
           </div>
           <div className={styles.faqItem}>

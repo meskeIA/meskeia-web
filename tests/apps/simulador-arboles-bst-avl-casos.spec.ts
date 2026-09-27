@@ -4,7 +4,6 @@ import {
   TOTAL_CASOS,
   resolverCaso,
   recorridosDe,
-  toleranciaDe,
   comprobarRespuesta,
   generarEjercicioAleatorio,
   textoRespuesta,
@@ -239,10 +238,26 @@ test.describe('casos.ts — las 12 respuestas y la corrección', () => {
     }
   });
 
-  test('la tolerancia es el mayor entre 0,01 y el 1 % del valor', () => {
-    expect(toleranciaDe(0)).toBeCloseTo(0.01, 10);
-    expect(toleranciaDe(0.5)).toBeCloseTo(0.01, 10);
-    expect(toleranciaDe(100)).toBeCloseTo(1, 10);
+  test('solo vale el ENTERO exacto: ni un decimal ni el entero vecino (hallazgo 2302)', () => {
+    // Hasta el 27/09/2026 aquí se fijaba `toleranciaDe` = máx(0,01; 1 %), y con ella pasaban
+    // «60,5» por la raíz 60 del caso 10, «7,05» por la altura 7 del caso 1 y «0,01» por las
+    // cero rotaciones del caso 4. Todas las respuestas de esta app son enteras: la tolerancia
+    // se retiró y esta prueba fija la regla que la sustituye, que es más estricta.
+    for (const caso of CASOS) {
+      const r = caso.respuesta;
+      expect(Number.isInteger(r), `caso ${caso.id}`).toBe(true);
+      for (const casi of [r + 0.5, r - 0.4, r + 0.05, r + 0.01, r - 0.01]) {
+        const v = comprobarRespuesta(casi, r);
+        expect(v.correcto, `caso ${caso.id} con ${casi}`).toBe(false);
+        expect(v.motivo, `caso ${caso.id} con ${casi}`).toContain('enteros');
+      }
+      for (const vecino of [r + 1, r - 1]) {
+        expect(comprobarRespuesta(vecino, r).correcto, `caso ${caso.id} con ${vecino}`).toBe(false);
+      }
+    }
+    // «7,0» es 7 escrito de otra forma, y −0 es 0.
+    expect(comprobarRespuesta(7.0, 7).correcto).toBe(true);
+    expect(comprobarRespuesta(-0, 0).correcto).toBe(true);
   });
 
   test('corrige bien, y una entrada que no es número no imprime «NaN»', () => {

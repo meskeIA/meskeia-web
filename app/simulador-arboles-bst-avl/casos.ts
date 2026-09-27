@@ -289,57 +289,53 @@ export function recorridosDe(datos: DatosCaso): {
 
 /* ─────────────────────────── Corrección ─────────────────────────── */
 
-/** El MAYOR entre 0,01 y el 1 % del valor: así un 0 o un 1 no se corrigen a ciegas. */
-export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
-}
-
 export interface Veredicto {
   correcto: boolean;
   motivo: string;
   diferencia: number;
-  tolerancia: number;
 }
 
 /**
  * Corrige la respuesta del alumno. Nunca lanza: una entrada que no es un número se responde
  * con un veredicto, no con una excepción que tumbaría el render.
+ *
+ * ⚠️ 27/09/2026 (hallazgo 2302) — TODO lo que se pregunta aquí es un entero: una altura, un
+ * número de rotaciones, de hojas o de nodos, un factor de balance, una posición o el VALOR de
+ * un nodo, y los nodos son enteros. Solo vale el entero exacto. Antes se corregía con una
+ * tolerancia del 1 % (mínimo 0,01) pensada para magnitudes continuas, y aunque el entero vecino
+ * no llegaba a colarse (la respuesta más alta es 60 ⇒ 0,6), sí un decimal: «60,5» era la raíz
+ * del caso 10, «7,05» la altura 7 del caso 1 y «0,01» las cero rotaciones del caso 4, en los
+ * doce casos y en el 100 % de los ejercicios de práctica. «7,0» sigue valiendo: es 7 escrito de
+ * otra forma. Mismo patrón que `simulador-mitosis-meiosis/casos.ts` (hallazgo 2149).
  */
 export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
-
   if (!Number.isFinite(usuario)) {
     return {
       correcto: false,
-      motivo: 'Escribe un número (aquí todas las respuestas son enteras).',
+      motivo: 'Escribe un número entero (aquí todas las respuestas son enteras).',
       diferencia: NaN,
-      tolerancia,
     };
   }
 
   const diferencia = Math.abs(usuario - esperado);
-  /**
-   * ⚠️ 22/09/2026 (hallazgo 1211) — la comparación en el borde EXACTO decidía por el ±1 ulp de
-   * la resta en binario, así que la misma desviación se aceptaba por arriba y se rechazaba por
-   * abajo: con esperado 0,1 y tolerancia 0,01, «0,11» daba 0,009999999999999995 (dentro) y
-   * «0,09» daba 0,010000000000000009 (fuera), y el mensaje de rechazo cifraba la desviación
-   * igual que la tolerancia —«te has desviado 0,01»—, que es la forma más desconcertante de
-   * suspender a alguien.
-   *
-   * El margen es 1e-9: nueve órdenes de magnitud por encima del ulp de las cifras que maneja
-   * esta app y siete por debajo de la tolerancia más pequeña (0,01), así que absorbe el ruido
-   * sin cambiar ninguna decisión real.
-   */
-  const RUIDO_BINARIO = 1e-9;
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
-    return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
+
+  if (!Number.isInteger(usuario)) {
+    return {
+      correcto: false,
+      motivo:
+        'No es correcto. Aquí todas las respuestas son números enteros: no hay alturas, rotaciones ni nodos a medias, y los valores de los nodos también son enteros.',
+      diferencia,
+    };
+  }
+
+  if (usuario === esperado) {
+    return { correcto: true, motivo: '¡Correcto!', diferencia: 0 };
   }
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia, 2)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${numero(diferencia)} de la respuesta.`,
     diferencia,
-    tolerancia,
   };
 }
 
@@ -591,7 +587,14 @@ const TEXTO_PREGUNTA: Record<
   { texto: string; etiqueta: string }
 > = {
   altura: { texto: '¿Cuál es la altura final del árbol, contada en nodos?', etiqueta: 'altura en nodos' },
-  rotaciones: { texto: '¿Cuántas rotaciones ejecuta el árbol en total?', etiqueta: 'número de rotaciones' },
+  // «Una doble cuenta como una», como el caso 12: sin decirlo la pregunta es ambigua (muchos
+  // manuales cuentan cada giro simple) y el 70,7 % de estos ejercicios lleva alguna LR o RL.
+  // Hasta el 27/09/2026 la práctica no lo declaraba y suspendía el recuento por giros (2303).
+  rotaciones: {
+    texto:
+      '¿Cuántas rotaciones ejecuta el árbol en total? Una rotación doble (LR o RL) cuenta como una sola.',
+    etiqueta: 'número de rotaciones',
+  },
   hojas: { texto: '¿Cuántos nodos hoja tiene el árbol final?', etiqueta: 'número de nodos hoja' },
 };
 

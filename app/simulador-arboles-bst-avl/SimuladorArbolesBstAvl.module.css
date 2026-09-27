@@ -124,6 +124,11 @@
 
 .opRow {
   display: flex;
+  /* La fila de «Insertar varios» lleva TRES botones: sin partirse, «Limpiar todo» salía de la
+     pantalla en móvil (a 393 px se veían 46 de sus 112 px) y el body, con overflow-x: hidden,
+     no dejaba llegar a él (hallazgo 2299). Las filas campo + botón no cambian: el campo tiene
+     base 0 y se estrecha antes de que haga falta partir. */
+  flex-wrap: wrap;
   gap: var(--spacing-sm);
 }
 
@@ -311,10 +316,16 @@
   min-height: 250px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* Sin `justify-content: center`: cuando el dibujo es más ancho que el panel, el centrado
+     reparte el desborde a los dos lados y el IZQUIERDO queda fuera del alcance del scroll
+     (scrollLeft no baja de 0). Con el ejemplo «Inserción ordenada» en BST, a 393 px, la raíz 1
+     no se veía nunca; con 45 nodos en escritorio quedaban ocultos 635 px (hallazgo 2298).
+     Centran los márgenes automáticos de los hijos, que con espacio negativo valen 0 y el
+     desborde va entero a la derecha, donde sí se desplaza. */
 }
 
 .arbolEmpty {
+  margin: 0 auto;
   color: var(--text-secondary);
   font-style: italic;
   font-size: 0.95rem;
@@ -331,6 +342,7 @@
  */
 .arbolSvg {
   display: block;
+  margin: 0 auto;
   max-width: none;
   flex-shrink: 0;
   font-family: 'SF Mono', Monaco, monospace;

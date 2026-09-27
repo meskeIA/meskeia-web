@@ -84,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Qué recorridos se pueden hacer sobre un árbol binario?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los cuatro recorridos clásicos son: inorden (izquierdo → raíz → derecho), que devuelve los elementos ordenados en un BST; preorden (raíz → izquierdo → derecho), útil para serializar el árbol; postorden (izquierdo → derecho → raíz), usado para liberar memoria o evaluar expresiones; y por niveles (BFS), que visita nodo a nodo de arriba a abajo. El simulador permite ejecutar los cuatro de forma animada.',
+        text: 'Los cuatro recorridos clásicos son: inorden (izquierdo → raíz → derecho), que devuelve los elementos ordenados en un BST; preorden (raíz → izquierdo → derecho), útil para serializar el árbol; postorden (izquierdo → derecho → raíz), usado para liberar memoria o evaluar expresiones; y por niveles (BFS), que visita nodo a nodo de arriba a abajo. El simulador muestra los cuatro a la vez, como listas que se recalculan tras cada inserción o borrado, junto al dibujo del árbol.',
       },
     },
     {
