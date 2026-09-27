@@ -567,6 +567,43 @@
   letter-spacing: 1px;
 }
 
+/* Avisos sobre el autómata (no determinista en modo DFA, símbolos fuera del alfabeto) */
+.avisosAutomata {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Vacía no ocupa sitio, pero sigue en el árbol de accesibilidad: con display: none la región
+   viva dejaría de existir y su primer aviso no se anunciaría de forma fiable. */
+.avisosAutomata:empty {
+  margin-bottom: 0;
+}
+
+.avisoAutomata {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid rgba(241, 143, 1, 0.45);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+  background: rgba(241, 143, 1, 0.1);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.avisoAutomata p {
+  margin: 0;
+}
+
+[data-theme='dark'] .avisoAutomata {
+  background: rgba(241, 143, 1, 0.14);
+  border-color: rgba(241, 143, 1, 0.55);
+}
+
 /* Batch */
 .batchHint {
   color: var(--text-secondary);
@@ -716,6 +753,21 @@
 
   .controlesAnimacion button {
     width: 100%;
+  }
+
+  .main,
+  .panel {
+    padding: var(--spacing-md);
+  }
+
+  /* 27/09/2026 (hallazgo 2293) — a 393 px el lienzo medía 247 × 500 y el viewBox 800×500 se
+     encajaba a escala 0,309 en medio de franjas vacías: etiquetas de 13 unidades pintadas a
+     4 px. Ahora la caja guarda el aspecto 8/5 del viewBox (el dibujo la llena entera y se ve
+     el autómata completo, que importa al seguir la animación), y `page.tsx` agranda la letra
+     del lienzo según la escala medida para que ninguna etiqueta baje de ~10,5 px. */
+  .editorSvg {
+    height: auto;
+    aspect-ratio: 8 / 5;
   }
 }
 

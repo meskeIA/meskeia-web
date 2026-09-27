@@ -16,7 +16,11 @@ import {
   minimizar,
   generarPasosValidacion,
   validarRapido,
+  alfabetoDeclarado,
+  conflictosDeterminismo,
+  EPSILON,
   type AutomataMotor,
+  type ConflictoDeterminismo,
   type ResultadoDeterminizacion,
   type ResultadoMinimizacion,
   type TipoAuto,
@@ -61,6 +65,10 @@ const SVG_WIDTH = 800;
 const SVG_HEIGHT = 500;
 const RADIO_ESTADO = 28;
 const RADIO_FINAL = 34;
+/** Tamaño de letra del lienzo a escala 1, en unidades del viewBox (el de escritorio). */
+const FUENTE_BASE = 13;
+/** Lo mínimo que debe medir en pantalla una etiqueta del lienzo, en px (hallazgo 2293). */
+const FUENTE_MIN_PX = 10.5;
 
 const EJEMPLOS: Record<string, EjemploAutomata> = {
   par_ceros: {
@@ -121,7 +129,8 @@ const EJEMPLOS: Record<string, EjemploAutomata> = {
     titulo: 'NFA-ε — a*b*c*',
     descripcion: 'Cero o más a, luego b, luego c (con ε-transiciones)',
     tipo: 'nfa',
-    alfabeto: 'a,b,c,ε',
+    // ε no es un símbolo del alfabeto: es la cadena vacía (hallazgo 2296, alfabeto coherente)
+    alfabeto: 'a,b,c',
     estados: [
       { id: 'q0', etiqueta: 'q0', x: 160, y: 250, esInicial: true, esFinal: false },
       { id: 'q1', etiqueta: 'q1', x: 360, y: 250, esInicial: false, esFinal: false },
@@ -178,6 +187,11 @@ function calcularPathTransicion(
   return { path, labelX: midX, labelY: midY - 6 };
 }
 
+/** «1 estado», «3 estados»: la cifra concuerda con lo que cuenta (hallazgo 2297). */
+function contar(n: number, singular: string, plural: string): string {
+  return `${n.toLocaleString('es-ES')} ${n === 1 ? singular : plural}`;
+}
+
 // Agrupa transiciones entre el mismo par origen-destino
 interface TransicionAgrupada {
   from: string;
@@ -218,15 +232,59 @@ export default function SimuladorAutomatasFinitos() {
   const [arrastrando, setArrastrando] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
 
+  // Escala a la que se pinta el viewBox 800×500 (1 en escritorio; ~0,37 en un móvil de 393 px).
+  // ⚠️ 27/09/2026 (hallazgo 2293) — en móvil las etiquetas de 13 unidades salían a 4 px. La
+  // letra del lienzo se agranda en unidades del viewBox lo justo para que en pantalla no baje
+  // de FUENTE_MIN_PX; en escritorio no cambia nada.
+  const [escalaLienzo, setEscalaLienzo] = useState<number>(1);
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg || typeof ResizeObserver === 'undefined') return;
+    const medir = () => {
+      const caja = svg.getBoundingClientRect();
+      if (caja.width === 0 || caja.height === 0) return;
+      // El viewBox se encaja con `xMidYMid meet`: manda la dimensión que antes se agota.
+      setEscalaLienzo(Math.min(caja.width / SVG_WIDTH, caja.height / SVG_HEIGHT));
+    };
+    medir();
+    const observador = new ResizeObserver(medir);
+    observador.observe(svg);
+    return () => observador.disconnect();
+  }, []);
+  const fuenteLienzo = Math.min(32, Math.max(FUENTE_BASE, Math.ceil(FUENTE_MIN_PX / escalaLienzo)));
+
   // Conversiones: determinización y minimización sobre el autómata del lienzo
   const [determinizacion, setDeterminizacion] = useState<ResultadoDeterminizacion | null>(null);
   const [minimizacion, setMinimizacion] = useState<ResultadoMinimizacion | null>(null);
 
+  // El alfabeto declarado en el campo, ya como lista de símbolos: interviene al validar
+  // (una cadena con un símbolo fuera de él no es una entrada) y en el aviso de transiciones.
+  const alfabetoLista = useMemo(() => alfabetoDeclarado(alfabeto), [alfabeto]);
+
   // Resultado de validación de la cadena actual
   const validacion = useMemo(
-    () => generarPasosValidacion(cadena, tipo, estados, transiciones),
-    [cadena, tipo, estados, transiciones],
+    () => generarPasosValidacion(cadena, tipo, estados, transiciones, alfabetoLista),
+    [cadena, tipo, estados, transiciones, alfabetoLista],
   );
+
+  const etiquetaDe = useMemo(() => new Map(estados.map((e) => [e.id, e.etiqueta])), [estados]);
+
+  // En modo DFA, lo que impide que el autómata sea determinista. Mientras haya algo, el motor
+  // lo recorre como AFND (todas las ramas) y aquí se avisa: antes se tomaba la primera flecha
+  // que casaba y el veredicto dependía del orden del dibujo (hallazgo 2291).
+  const conflictos = useMemo<ConflictoDeterminismo[]>(
+    () => (tipo === 'dfa' ? conflictosDeterminismo(transiciones) : []),
+    [tipo, transiciones],
+  );
+
+  // Símbolos de las transiciones que no están en el alfabeto declarado (hallazgo 2296)
+  const simbolosFuera = useMemo<string[]>(() => {
+    if (alfabetoLista.length === 0) return [];
+    const permitidos = new Set(alfabetoLista);
+    return [
+      ...new Set(transiciones.map((t) => t.simbolo).filter((s) => s !== EPSILON && !permitidos.has(s))),
+    ].sort((a, b) => a.localeCompare(b, 'es'));
+  }, [alfabetoLista, transiciones]);
 
   // Si el autómata se edita a media animación (borrar una transición, quitar un estado,
   // cambiar cuál es final), la validación se regenera con menos pasos y el índice puede
@@ -338,12 +396,21 @@ export default function SimuladorAutomatasFinitos() {
     return `t${n}`;
   }, [transiciones]);
 
-  // Convertir coordenadas de evento a coordenadas SVG
+  /**
+   * Convierte el punto pulsado a coordenadas del viewBox 800×500.
+   *
+   * ⚠️ 27/09/2026 (hallazgo 2292) — se escalaba con el ancho y el alto de la CAJA del SVG, pero
+   * el viewBox se dibuja encajado (`xMidYMid meet`): a escala uniforme y centrado, con franjas
+   * vacías a los lados en escritorio y arriba y abajo en móvil. El estado caía a 41 unidades
+   * del clic en escritorio y a 103 del dedo en móvil. La matriz de pantalla del propio SVG
+   * (`getScreenCTM`) ya incluye ese encaje, y el desplazamiento del contenedor si lo hay.
+   */
   const obtenerCoordenadasSvg = useCallback(
     (e: React.MouseEvent | React.TouchEvent): { x: number; y: number } => {
       const svg = svgRef.current;
       if (!svg) return { x: 0, y: 0 };
-      const rect = svg.getBoundingClientRect();
+      const matriz = svg.getScreenCTM();
+      if (!matriz) return { x: 0, y: 0 };
       let clientX: number;
       let clientY: number;
       if ('touches' in e && e.touches.length > 0) {
@@ -355,9 +422,8 @@ export default function SimuladorAutomatasFinitos() {
       } else {
         return { x: 0, y: 0 };
       }
-      const x = ((clientX - rect.left) / rect.width) * SVG_WIDTH;
-      const y = ((clientY - rect.top) / rect.height) * SVG_HEIGHT;
-      return { x, y };
+      const punto = new DOMPoint(clientX, clientY).matrixTransform(matriz.inverse());
+      return { x: punto.x, y: punto.y };
     },
     [],
   );
@@ -523,11 +589,12 @@ export default function SimuladorAutomatasFinitos() {
     const lineas = batchInput.split('\n').map((l) => l.trim());
     return lineas.map((linea) => ({
       cadena: linea,
-      resultado: validarRapido(linea, tipo, estados, transiciones),
+      resultado: validarRapido(linea, tipo, estados, transiciones, alfabetoLista),
     }));
-  }, [batchInput, tipo, estados, transiciones]);
+  }, [batchInput, tipo, estados, transiciones, alfabetoLista]);
 
-  // Cambio de tipo: si pasamos a DFA y hay ε, advertir
+  // Cambio de tipo. Si al pasar a DFA hay ε o varias transiciones con el mismo origen y
+  // símbolo, el aviso del panel «Validar cadena» lo dice (lo calcula `conflictos`).
   const cambiarTipo = useCallback(
     (nuevoTipo: TipoAuto) => {
       setTipo(nuevoTipo);
@@ -774,6 +841,11 @@ export default function SimuladorAutomatasFinitos() {
                 const { path, labelX, labelY } = calcularPathTransicion(from, to);
                 const activa =
                   estadosActivos.includes(from.id) && estadosActivos.includes(to.id);
+                // Caja del símbolo, centrada en él y proporcional a la letra (monoespaciada)
+                const anchoEtiqueta = Math.max(
+                  fuenteLienzo * 2.8,
+                  grupo.simbolos.join(', ').length * fuenteLienzo * 0.62 + 12,
+                );
                 return (
                   <g
                     key={`${grupo.from}-${grupo.to}`}
@@ -792,17 +864,18 @@ export default function SimuladorAutomatasFinitos() {
                       markerEnd={activa ? 'url(#arrow-active)' : 'url(#arrow)'}
                     />
                     <rect
-                      x={labelX - 18}
-                      y={labelY - 12}
-                      width={Math.max(36, grupo.simbolos.join(', ').length * 8 + 12)}
-                      height={20}
+                      x={labelX - anchoEtiqueta / 2}
+                      y={labelY - fuenteLienzo / 2 - 4}
+                      width={anchoEtiqueta}
+                      height={fuenteLienzo + 8}
                       rx={4}
                       className={styles.transicionLabelBg}
                     />
                     <text
                       x={labelX}
-                      y={labelY + 3}
+                      y={labelY + fuenteLienzo * 0.35}
                       className={styles.transicionLabel}
+                      style={{ fontSize: fuenteLienzo }}
                       textAnchor="middle"
                     >
                       {grupo.simbolos.join(', ')}
@@ -865,8 +938,9 @@ export default function SimuladorAutomatasFinitos() {
                     />
                     <text
                       x={est.x}
-                      y={est.y + 5}
+                      y={est.y + fuenteLienzo * 0.38}
                       className={styles.estadoLabel}
+                      style={{ fontSize: fuenteLienzo }}
                       textAnchor="middle"
                     >
                       {est.etiqueta}
@@ -882,6 +956,7 @@ export default function SimuladorAutomatasFinitos() {
                   y={SVG_HEIGHT / 2}
                   textAnchor="middle"
                   className={styles.emptyMessage}
+                  style={{ fontSize: Math.max(16, fuenteLienzo) }}
                 >
                   Activa &laquo;Añadir estado&raquo; y haz clic en el lienzo
                 </text>
@@ -891,10 +966,11 @@ export default function SimuladorAutomatasFinitos() {
 
           <div className={styles.estadoResumen}>
             <span>
-              <strong>{estados.length}</strong> estados
+              <strong>{estados.length}</strong> {estados.length === 1 ? 'estado' : 'estados'}
             </span>
             <span>
-              <strong>{transiciones.length}</strong> transiciones
+              <strong>{transiciones.length}</strong>{' '}
+              {transiciones.length === 1 ? 'transición' : 'transiciones'}
             </span>
             <span>
               Iniciales: <strong>{estados.filter((e) => e.esInicial).length}</strong>
@@ -974,8 +1050,9 @@ export default function SimuladorAutomatasFinitos() {
                 </table>
               </div>
               <p className={styles.convResumen}>
-                El AFD resultante tiene <strong>{determinizacion.automata.estados.length}</strong> estados
-                sobre el alfabeto {'{'}
+                El AFD resultante tiene{' '}
+                <strong>{contar(determinizacion.automata.estados.length, 'estado', 'estados')}</strong> sobre el
+                alfabeto {'{'}
                 {determinizacion.alfabeto.join(', ')}
                 {'}'}. Son finales los conjuntos que contienen algún estado final del original:{' '}
                 <strong>
@@ -1009,6 +1086,23 @@ export default function SimuladorAutomatasFinitos() {
                   <strong>{minimizacion.inalcanzables.join(', ')}</strong>. No cambian el lenguaje reconocido.
                 </p>
               )}
+              {minimizacion.sumideroImplicito && (
+                <p className={styles.convNota}>
+                  Al autómata le faltan transiciones. Una transición que falta equivale a ir a un estado
+                  trampa, así que se añade uno implícito, <strong>∅</strong>: no es final y de él no se sale.
+                  {minimizacion.trampa.length > 0 ? (
+                    <>
+                      {' '}
+                      <strong>{minimizacion.trampa.join(', ')}</strong>{' '}
+                      {minimizacion.trampa.length === 1 ? 'resulta equivalente' : 'resultan equivalentes'} a
+                      él (desde ahí no se llega a ningún final), así que en el mínimo las transiciones que
+                      faltaban van a esa clase.
+                    </>
+                  ) : (
+                    <> Ningún estado dibujado es equivalente a él, así que no aparece en el mínimo.</>
+                  )}
+                </p>
+              )}
               <ol className={styles.convRondas}>
                 {minimizacion.rondas.map((r, i) => (
                   <li key={i} className={styles.convRonda}>
@@ -1023,10 +1117,18 @@ export default function SimuladorAutomatasFinitos() {
               </ol>
               <p className={styles.convResumen}>
                 {minimizacion.fusionados.length === 0 ? (
-                  <>
-                    Ningún par de estados resultó equivalente: el autómata{' '}
-                    <strong>ya era mínimo</strong> con sus {minimizacion.automata.estados.length} estados.
-                  </>
+                  minimizacion.inalcanzables.length === 0 ? (
+                    <>
+                      Ningún par de estados resultó equivalente: el autómata{' '}
+                      <strong>ya era mínimo</strong> con sus{' '}
+                      {contar(minimizacion.automata.estados.length, 'estado', 'estados')}.
+                    </>
+                  ) : (
+                    <>
+                      Ningún par de estados resultó equivalente. Sin los inalcanzables, el autómata mínimo
+                      tiene <strong>{contar(minimizacion.automata.estados.length, 'estado', 'estados')}</strong>.
+                    </>
+                  )
                 ) : (
                   <>
                     Se fusionan{' '}
@@ -1036,7 +1138,8 @@ export default function SimuladorAutomatasFinitos() {
                         <code>{`{${g.join(',')}}`}</code>
                       </span>
                     ))}
-                    . El autómata mínimo tiene <strong>{minimizacion.automata.estados.length}</strong> estados.
+                    . El autómata mínimo tiene{' '}
+                    <strong>{contar(minimizacion.automata.estados.length, 'estado', 'estados')}</strong>.
                   </>
                 )}
               </p>
@@ -1054,6 +1157,45 @@ export default function SimuladorAutomatasFinitos() {
         {/* Validación de cadena */}
         <div className={styles.panel}>
           <h2 className={styles.panelTitle}>Validar cadena</h2>
+
+          {/* Avisos sobre el autómata que cambian cómo se valida (hallazgos 2291 y 2296). La
+              región viva existe siempre y solo se llena cuando hay algo: una región que aparece
+              ya con su texto no se anuncia de forma fiable. Los tests la localizan por su clase,
+              no por el rol, para no chocar con el anunciador del paso. */}
+          <div className={styles.avisosAutomata} role="status">
+            {conflictos.length > 0 && (
+              <div className={styles.avisoAutomata}>
+                <span aria-hidden="true">⚠️</span>
+                <p>
+                  <strong>Este autómata no es determinista.</strong>{' '}
+                  {conflictos
+                    .map((c, i) =>
+                      c.tipo === 'epsilon'
+                        ? `${etiquetaDe.get(c.from) ?? c.from} tiene una transición ε`
+                        : `${i === 0 ? 'Desde' : 'desde'} ${etiquetaDe.get(c.from) ?? c.from} hay más de una transición con «${c.simbolo}» (a ${c.destinos
+                            .map((d) => etiquetaDe.get(d) ?? d)
+                            .join(' y a ')})`,
+                    )
+                    .join('; ')}
+                  . En un AFD cada estado tiene como mucho una transición por símbolo, y ninguna ε. Mientras
+                  sea así, las cadenas se validan como AFND, siguiendo todas las ramas a la vez; para
+                  tratarlo como tal, pulsa NFA.
+                </p>
+              </div>
+            )}
+            {simbolosFuera.length > 0 && (
+              <div className={styles.avisoAutomata}>
+                <span aria-hidden="true">⚠️</span>
+                <p>
+                  <strong>Hay transiciones con símbolos que no están en el alfabeto declarado</strong>{' '}
+                  {'{'}
+                  {alfabetoLista.join(', ')}
+                  {'}'}: {simbolosFuera.map((x) => `«${x}»`).join(', ')}. Una cadena que los use no es una
+                  entrada válida: corrige el alfabeto o las transiciones.
+                </p>
+              </div>
+            )}
+          </div>
           <div className={styles.cadenaControl}>
             <label htmlFor="cadena">Cadena de entrada:</label>
             <input
@@ -1165,7 +1307,8 @@ export default function SimuladorAutomatasFinitos() {
                   className={
                     validacion.resultado === 'aceptada'
                       ? styles.resultadoAceptada
-                      : validacion.resultado === 'sin-transicion'
+                      : validacion.resultado === 'sin-transicion' ||
+                          validacion.resultado === 'fuera-alfabeto'
                         ? styles.resultadoSinTransicion
                         : styles.resultadoRechazada
                   }
@@ -1173,6 +1316,11 @@ export default function SimuladorAutomatasFinitos() {
                   {validacion.resultado === 'aceptada' && '✓ ACEPTADA'}
                   {validacion.resultado === 'rechazada' && '✗ RECHAZADA'}
                   {validacion.resultado === 'sin-transicion' && '⚠ SIN TRANSICIÓN'}
+                  {validacion.resultado === 'fuera-alfabeto' && (
+                    <>
+                      <span aria-hidden="true">⚠</span> FUERA DEL ALFABETO
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -1221,6 +1369,11 @@ export default function SimuladorAutomatasFinitos() {
                         {r.resultado === 'sin-transicion' && (
                           <span className={styles.badgeSinTransicion}>
                             <span aria-hidden="true">⚠</span> Sin transición
+                          </span>
+                        )}
+                        {r.resultado === 'fuera-alfabeto' && (
+                          <span className={styles.badgeSinTransicion}>
+                            <span aria-hidden="true">⚠</span> Fuera del alfabeto
                           </span>
                         )}
                       </td>

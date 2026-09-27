@@ -113,6 +113,7 @@ const TEXTO_VEREDICTO: Record<ResultadoValidacion, string> = {
   aceptada: 'ACEPTADA',
   rechazada: 'rechazada (termina en un estado no final)',
   'sin-transicion': 'rechazada (se queda sin transición a mitad de camino)',
+  'fuera-alfabeto': 'rechazada (tiene un símbolo fuera del alfabeto)',
   pendiente: 'sin resolver',
 };
 
@@ -261,31 +262,30 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
 
 /* ─────────────────────────── Corrección ─────────────────────────── */
 
-/** El MAYOR entre 0,01 y el 1 % del valor: así un 0 o un 1 no se corrigen a ciegas. */
-export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
-}
-
 export interface Veredicto {
   correcto: boolean;
   motivo: string;
   diferencia: number;
-  tolerancia: number;
 }
 
 /**
  * Corrige la respuesta del alumno. Nunca lanza: una entrada que no es número se responde
  * con un veredicto, no con una excepción que tumbaría el render.
+ *
+ * ⚠️ 27/09/2026 (hallazgos 2294 y 2295) — TODO lo que se pregunta aquí es un RECUENTO:
+ * cadenas aceptadas, estados, símbolos, clases. Solo vale el entero exacto. Antes se corregía
+ * con una tolerancia del 1 % pensada para magnitudes continuas, así que «4,04» cadenas
+ * aceptadas era «¡Correcto!», y «4,05», ya fuera, se suspendía con «Te has desviado 0 de la
+ * respuesta» (la desviación se escribía sin decimales), el mismo desconcierto que cerró el
+ * hallazgo 1211. Es el patrón aplicado en `simulador-mitosis-meiosis` el 26/09/2026. «4,0»
+ * sigue valiendo: es 4 escrito de otra forma.
  */
 export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
-
   if (!Number.isFinite(usuario)) {
     return {
       correcto: false,
       motivo: 'Escribe un número entero (aquí todas las respuestas son cuentas de algo).',
       diferencia: NaN,
-      tolerancia,
     };
   }
   if (!Number.isFinite(esperado)) {
@@ -293,33 +293,28 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
       correcto: false,
       motivo: 'Este caso no tiene respuesta calculable.',
       diferencia: NaN,
-      tolerancia,
     };
   }
 
   const diferencia = Math.abs(usuario - esperado);
-  /**
-   * ⚠️ 22/09/2026 (hallazgo 1211) — la comparación en el borde EXACTO decidía por el ±1 ulp de
-   * la resta en binario, así que la misma desviación se aceptaba por arriba y se rechazaba por
-   * abajo: con esperado 0,1 y tolerancia 0,01, «0,11» daba 0,009999999999999995 (dentro) y
-   * «0,09» daba 0,010000000000000009 (fuera), y el mensaje de rechazo cifraba la desviación
-   * igual que la tolerancia —«te has desviado 0,01»—, que es la forma más desconcertante de
-   * suspender a alguien.
-   *
-   * El margen es 1e-9: nueve órdenes de magnitud por encima del ulp de las cifras que maneja
-   * esta app y siete por debajo de la tolerancia más pequeña (0,01), así que absorbe el ruido
-   * sin cambiar ninguna decisión real.
-   */
-  const RUIDO_BINARIO = 1e-9;
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
-    return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
+
+  if (!Number.isInteger(usuario)) {
+    return {
+      correcto: false,
+      motivo:
+        'No es correcto. Es un recuento: no hay fracciones de cadena, de estado ni de símbolo. La respuesta es un número entero.',
+      diferencia,
+    };
+  }
+
+  if (usuario === esperado) {
+    return { correcto: true, motivo: '¡Correcto!', diferencia };
   }
 
   return {
     correcto: false,
     motivo: `No es correcto. Te has desviado ${numero(diferencia)} de la respuesta.`,
     diferencia,
-    tolerancia,
   };
 }
 

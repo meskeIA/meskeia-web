@@ -74,6 +74,10 @@ export interface ResultadoMinimizacion {
   inalcanzables: string[];
   /** Grupos de dos o más estados originales que resultaron equivalentes */
   fusionados: string[][];
+  /** true si al AFD le faltaba alguna transición y se completó con el estado trampa implícito ∅ */
+  sumideroImplicito: boolean;
+  /** Estados dibujados que resultaron equivalentes a ∅: estados trampa (no llevan a ningún final) */
+  trampa: string[];
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -83,6 +87,72 @@ export interface ResultadoMinimizacion {
 /** Alfabeto real del autómata: los símbolos que aparecen, sin ε y en orden estable. */
 export function alfabetoDe(transiciones: TransicionMotor[]): string[] {
   return [...new Set(transiciones.map((t) => t.simbolo).filter((s) => s !== EPSILON))].sort();
+}
+
+/**
+ * El alfabeto que declara quien usa la app, a partir del texto del campo «a,b».
+ *
+ * ⚠️ 27/09/2026 (hallazgo 2296) — el campo existía, pero no intervenía en nada: se pintaba y ya.
+ * Declarado Σ = {a, b}, la cadena «1» salía ACEPTADA en un autómata dibujado sobre {0, 1}. Desde
+ * entonces el alfabeto manda: una cadena con un símbolo fuera de Σ no es una entrada válida, y
+ * una transición con un símbolo fuera de Σ se avisa. ε no es un símbolo del alfabeto (es la
+ * cadena vacía), así que se ignora si alguien lo escribe en el campo.
+ */
+export function alfabetoDeclarado(texto: string): string[] {
+  return [
+    ...new Set(
+      texto
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s !== '' && s !== EPSILON),
+    ),
+  ];
+}
+
+/** Un motivo por el que el autómata no es determinista. */
+export interface ConflictoDeterminismo {
+  /** 'epsilon': transición vacía · 'duplicado': varias transiciones con el mismo origen y símbolo */
+  tipo: 'epsilon' | 'duplicado';
+  from: string;
+  simbolo: string;
+  /** Destinos implicados (ids de estado), sin repetir */
+  destinos: string[];
+}
+
+/**
+ * Qué impide que el autómata sea un AFD: transiciones ε y parejas (estado, símbolo) con más de
+ * un destino. Vacío si es determinista (parcial o total: que falte una transición no lo impide).
+ *
+ * ⚠️ 27/09/2026 (hallazgo 2291) — en modo DFA el recorrido tomaba con `find` la PRIMERA
+ * transición que casaba, así que el veredicto de un AFND dependía del orden en que se habían
+ * dibujado las flechas («01» salía rechazada en «Contiene 01»). `minimizar` ya lo detectaba; el
+ * recorrido y la vista, no.
+ */
+export function conflictosDeterminismo(transiciones: TransicionMotor[]): ConflictoDeterminismo[] {
+  const conflictos: ConflictoDeterminismo[] = [];
+  const porPareja = new Map<string, { from: string; simbolo: string; destinos: string[] }>();
+  const conEpsilon = new Map<string, string[]>();
+  for (const t of transiciones) {
+    if (t.simbolo === EPSILON) {
+      const lista = conEpsilon.get(t.from) ?? [];
+      if (!lista.includes(t.to)) lista.push(t.to);
+      conEpsilon.set(t.from, lista);
+      continue;
+    }
+    const clave = `${t.from}|${t.simbolo}`;
+    const par = porPareja.get(clave) ?? { from: t.from, simbolo: t.simbolo, destinos: [] };
+    par.destinos.push(t.to);
+    porPareja.set(clave, par);
+  }
+  for (const [from, destinos] of conEpsilon) {
+    conflictos.push({ tipo: 'epsilon', from, simbolo: EPSILON, destinos });
+  }
+  for (const par of porPareja.values()) {
+    // Dos flechas iguales (mismo origen, símbolo y destino) no son no determinismo: son una.
+    const distintos = [...new Set(par.destinos)];
+    if (distintos.length > 1) conflictos.push({ tipo: 'duplicado', from: par.from, simbolo: par.simbolo, destinos: distintos });
+  }
+  return conflictos;
 }
 
 /** Nombre canónico de un conjunto de estados: ordenado, para que {q1,q0} y {q0,q1} sean el mismo. */
@@ -222,6 +292,8 @@ const VACIO_MIN: ResultadoMinimizacion = {
   rondas: [],
   inalcanzables: [],
   fusionados: [],
+  sumideroImplicito: false,
+  trampa: [],
 };
 
 export function minimizar(automata: AutomataMotor): ResultadoMinimizacion {
@@ -265,23 +337,40 @@ export function minimizar(automata: AutomataMotor): ResultadoMinimizacion {
   const inalcanzables = estados.filter((e) => !alcanzables.has(e.id)).map((e) => etq(e.id)).sort((a, b) => a.localeCompare(b, 'es'));
   const vivos = estados.filter((e) => alcanzables.has(e.id));
 
-  // 2) Partición inicial: finales frente a no finales
-  const destino = new Map<string, string | undefined>();
+  // 2) El AFD se completa con un estado trampa IMPLÍCITO, ∅, antes de particionar.
+  //
+  // ⚠️ 27/09/2026 (hallazgo 2290) — antes una transición ausente firmaba como «-» y una que
+  // iba a un estado trampa dibujado firmaba con la clase de ese estado, así que no se
+  // reconocían como lo que son, el mismo lenguaje vacío. En un AFD parcial con un estado
+  // trampa (lo que la propia guía de la app aconseja dibujar) q1 ≡ q2 no se fusionaban y el
+  // resumen decía «ya era mínimo». Completar con ∅ —no final, y de él no se sale— hace que
+  // ∅ y cualquier estado muerto (desde el que no se llega a un final) caigan en la misma
+  // clase, que es justo lo que dice la teoría.
+  const destino = new Map<string, string>();
   for (const t of transiciones) destino.set(`${t.from}|${t.simbolo}`, t.to);
+
+  const SUMIDERO = '\u0000∅';
+  const parcial = vivos.some((e) => alfabeto.some((s) => !destino.has(`${e.id}|${s}`)));
+  const destinoDe = (id: string, s: string): string =>
+    id === SUMIDERO ? SUMIDERO : (destino.get(`${id}|${s}`) ?? SUMIDERO);
+  const etqClase = (id: string) => (id === SUMIDERO ? '∅' : etq(id));
+  const esFinalDe = new Map<string, boolean>(vivos.map((e) => [e.id, e.esFinal]));
 
   let clases: string[][] = [
     vivos.filter((e) => e.esFinal).map((e) => e.id),
-    vivos.filter((e) => !e.esFinal).map((e) => e.id),
+    [...vivos.filter((e) => !e.esFinal).map((e) => e.id), ...(parcial ? [SUMIDERO] : [])],
   ].filter((c) => c.length > 0);
 
   const rondas: RondaParticion[] = [];
-  const comoEtiquetas = (cs: string[][]) =>
-    cs.map((c) => c.map(etq).sort((a, b) => a.localeCompare(b, 'es')));
+  const ordenar = (xs: string[]) => [...xs].sort((a, b) => a.localeCompare(b, 'es'));
+  const comoEtiquetas = (cs: string[][]) => cs.map((c) => ordenar(c.map(etqClase)));
 
   rondas.push({
     numero: 0,
     clases: comoEtiquetas(clases),
-    descripcion: 'Partición inicial: por un lado los estados finales y por otro los no finales.',
+    descripcion: parcial
+      ? 'Partición inicial: por un lado los estados finales y por otro los no finales. Las transiciones que faltan van a un estado trampa implícito, ∅ (no final, y de él no se sale), que entra con los no finales.'
+      : 'Partición inicial: por un lado los estados finales y por otro los no finales.',
   });
 
   let ronda = 0;
@@ -294,16 +383,11 @@ export function minimizar(automata: AutomataMotor): ResultadoMinimizacion {
 
     const nuevas: string[][] = [];
     for (const clase of clases) {
-      // Dos estados siguen juntos solo si, para CADA símbolo, van a la misma clase.
-      // Una transición ausente es también una firma: no es lo mismo que ir a algún sitio.
+      // Dos estados siguen juntos solo si, para CADA símbolo, van a la misma clase. Con el
+      // AFD ya completado, no ir a ningún sitio es ir a ∅, y se firma con la clase de ∅.
       const porFirma = new Map<string, string[]>();
       for (const id of clase) {
-        const firma = alfabeto
-          .map((s) => {
-            const d = destino.get(`${id}|${s}`);
-            return d === undefined ? '-' : String(claseDe.get(d) ?? '-');
-          })
-          .join(',');
+        const firma = alfabeto.map((s) => String(claseDe.get(destinoDe(id, s)))).join(',');
         if (!porFirma.has(firma)) porFirma.set(firma, []);
         (porFirma.get(firma) as string[]).push(id);
       }
@@ -327,36 +411,44 @@ export function minimizar(automata: AutomataMotor): ResultadoMinimizacion {
     descripcion: 'Ninguna clase se parte ya: cada clase es un estado del autómata mínimo.',
   });
 
-  // 3) Construir el AFD mínimo. Cada clase es un estado.
-  const nombreDeClase = clases.map((c) => `{${c.map(etq).sort((a, b) => a.localeCompare(b, 'es')).join(',')}}`);
+  // 3) Construir el AFD mínimo. Cada clase es un estado, salvo la del ∅ implícito cuando no
+  //    tiene ningún estado dibujado: esa se omite, igual que `determinizar` omite el conjunto
+  //    vacío, y las transiciones que llevaban a ella siguen sin dibujarse. Si la clase de ∅ SÍ
+  //    contiene estados dibujados (estados trampa), se conserva con ellos, y en el mínimo las
+  //    transiciones que faltaban van a ella: es el mismo lenguaje, y el AFD queda completo.
+  const indiceSumidero = clases.findIndex((c) => c.includes(SUMIDERO));
+  const reales = clases.map((c) => c.filter((id) => id !== SUMIDERO));
+  const trampa = indiceSumidero === -1 ? [] : ordenar(reales[indiceSumidero].map(etq));
+  const omitida = indiceSumidero !== -1 && reales[indiceSumidero].length === 0 ? indiceSumidero : -1;
+
+  const nombreDeClase = reales.map((c) => `{${ordenar(c.map(etq)).join(',')}}`);
   const indiceDe = new Map<string, number>();
   clases.forEach((c, i) => c.forEach((id) => indiceDe.set(id, i)));
 
-  const estadosMin: EstadoMotor[] = clases.map((c, i) => ({
-    id: nombreDeClase[i],
-    etiqueta: nombreDeClase[i],
-    esInicial: c.includes(inicial.id),
-    esFinal: c.some((id) => vivos.find((e) => e.id === id)?.esFinal ?? false),
-  }));
+  const estadosMin: EstadoMotor[] = [];
+  reales.forEach((c, i) => {
+    if (i === omitida) return;
+    estadosMin.push({
+      id: nombreDeClase[i],
+      etiqueta: nombreDeClase[i],
+      esInicial: c.includes(inicial.id),
+      esFinal: c.some((id) => esFinalDe.get(id) ?? false),
+    });
+  });
 
   const transicionesMin: TransicionMotor[] = [];
-  const puestas = new Set<string>();
-  clases.forEach((c, i) => {
+  reales.forEach((c, i) => {
+    if (i === omitida) return;
+    // Todos los de una clase van a la misma clase con cada símbolo: basta un representante.
+    const representante = c[0];
     for (const simbolo of alfabeto) {
-      const d = destino.get(`${c[0]}|${simbolo}`);
-      if (d === undefined) continue;
-      const j = indiceDe.get(d);
-      if (j === undefined) continue;
-      const clave = `${i}|${simbolo}`;
-      if (puestas.has(clave)) continue;
-      puestas.add(clave);
+      const j = indiceDe.get(destinoDe(representante, simbolo));
+      if (j === undefined || j === omitida) continue;
       transicionesMin.push({ from: nombreDeClase[i], to: nombreDeClase[j], simbolo });
     }
   });
 
-  const fusionados = clases
-    .filter((c) => c.length > 1)
-    .map((c) => c.map(etq).sort((a, b) => a.localeCompare(b, 'es')));
+  const fusionados = reales.filter((c) => c.length > 1).map((c) => ordenar(c.map(etq)));
 
   return {
     ok: true,
@@ -365,6 +457,8 @@ export function minimizar(automata: AutomataMotor): ResultadoMinimizacion {
     rondas,
     inalcanzables,
     fusionados,
+    sumideroImplicito: parcial,
+    trampa,
   };
 }
 
@@ -389,20 +483,41 @@ export interface PasoValidacion {
   descripcion: string;
 }
 
-export type ResultadoValidacion = 'aceptada' | 'rechazada' | 'sin-transicion' | 'pendiente';
+export type ResultadoValidacion =
+  | 'aceptada'
+  | 'rechazada'
+  | 'sin-transicion'
+  | 'fuera-alfabeto'
+  | 'pendiente';
+
+/**
+ * Cómo se recorre de verdad. Un autómata marcado como AFD que no es determinista se recorre
+ * como AFND —siguiendo todas las ramas— y la vista lo avisa: tomar la primera flecha que casa
+ * daba un veredicto que dependía del orden en que se dibujaron (hallazgo 2291).
+ */
+export function tipoDeRecorrido(tipo: TipoAuto, transiciones: TransicionMotor[]): TipoAuto {
+  return tipo === 'dfa' && conflictosDeterminismo(transiciones).length > 0 ? 'nfa' : tipo;
+}
 
 /**
  * Recorre la cadena y devuelve el rastro completo más el veredicto.
  *
  * Nunca lanza: sin estado inicial devuelve un paso que lo dice y 'rechazada', porque un
  * `throw` en pleno render tumbaría la app entera.
+ *
+ * `alfabeto` es el declarado (ver `alfabetoDeclarado`). Si llega y no está vacío, una cadena
+ * con algún símbolo fuera de él no es una entrada del autómata: se detiene en ese símbolo con
+ * el veredicto 'fuera-alfabeto', sin recorrer nada (hallazgo 2296). Sin él no se comprueba,
+ * que es lo que necesitan los casos de clase: su alfabeto es el de sus transiciones.
  */
 export function generarPasosValidacion(
   cadena: string,
-  tipo: TipoAuto,
+  tipoDeclarado: TipoAuto,
   estados: EstadoMotor[],
   transiciones: TransicionMotor[],
+  alfabeto?: string[],
 ): { pasos: PasoValidacion[]; resultado: ResultadoValidacion } {
+  const tipo = tipoDeRecorrido(tipoDeclarado, transiciones);
   const inicial = estados.find((e) => e.esInicial);
   if (!inicial) {
     return {
@@ -421,6 +536,27 @@ export function generarPasosValidacion(
   const pasos: PasoValidacion[] = [];
   let activos: string[];
 
+  if (alfabeto && alfabeto.length > 0) {
+    const permitidos = new Set(alfabeto);
+    const i = Array.from(cadena).findIndex((c) => !permitidos.has(c));
+    if (i !== -1) {
+      const simbolo = Array.from(cadena)[i];
+      pasos.push({
+        posicion: 0,
+        simbolo: '',
+        estadosActivos: [inicial.id],
+        descripcion: `Estado inicial: ${inicial.id}`,
+      });
+      pasos.push({
+        posicion: i + 1,
+        simbolo,
+        estadosActivos: [],
+        descripcion: `"${simbolo}" no pertenece al alfabeto declarado {${alfabeto.join(', ')}}: la cadena no es una entrada válida`,
+      });
+      return { pasos, resultado: 'fuera-alfabeto' };
+    }
+  }
+
   if (tipo === 'nfa') {
     activos = epsilonClausura([inicial.id], transiciones);
   } else {
@@ -431,7 +567,10 @@ export function generarPasosValidacion(
     posicion: 0,
     simbolo: '',
     estadosActivos: [...activos],
-    descripcion: `Estado(s) inicial(es): ${activos.join(', ')}`,
+    descripcion:
+      tipo !== tipoDeclarado
+        ? `No es determinista: se siguen todas las ramas a la vez, como en un AFND. Estado(s) inicial(es): ${activos.join(', ')}`
+        : `Estado(s) inicial(es): ${activos.join(', ')}`,
   });
 
   for (let i = 0; i < cadena.length; i++) {
@@ -496,7 +635,8 @@ export function validarRapido(
   tipo: TipoAuto,
   estados: EstadoMotor[],
   transiciones: TransicionMotor[],
+  alfabeto?: string[],
 ): ResultadoValidacion {
-  const { resultado } = generarPasosValidacion(cadena, tipo, estados, transiciones);
+  const { resultado } = generarPasosValidacion(cadena, tipo, estados, transiciones, alfabeto);
   return resultado;
 }

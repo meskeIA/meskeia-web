@@ -3,7 +3,6 @@ import {
   CASOS,
   TOTAL_CASOS,
   resolverCaso,
-  toleranciaDe,
   comprobarRespuesta,
   generarEjercicioAleatorio,
   textoRespuesta,
@@ -13,6 +12,8 @@ import {
   minimizar,
   epsilonClausura,
   validarRapido,
+  alfabetoDeclarado,
+  conflictosDeterminismo,
   EPSILON,
 } from '../../app/simulador-automatas-finitos/motor-conversiones';
 
@@ -288,10 +289,18 @@ test.describe('casos.ts — las 12 respuestas y la corrección', () => {
     }
   });
 
-  test('la tolerancia es el mayor entre 0,01 y el 1 % del valor', () => {
-    expect(toleranciaDe(0)).toBeCloseTo(0.01, 10);
-    expect(toleranciaDe(0.5)).toBeCloseTo(0.01, 10);
-    expect(toleranciaDe(100)).toBeCloseTo(1, 10);
+  test('la corrección exige el entero exacto: son recuentos (hallazgos 2294 y 2295)', () => {
+    // 27/09/2026: antes había una tolerancia del 1 % del valor (`toleranciaDe`), pensada para
+    // magnitudes continuas. Todo lo que se pregunta aquí es un RECUENTO, así que solo vale el
+    // entero exacto; «4,0» (que llega como 4) es 4 escrito de otra forma.
+    expect(comprobarRespuesta(4, 4).correcto).toBe(true);
+    for (const casi of [4.04, 3.96, 4.05, 4.5]) {
+      const r = comprobarRespuesta(casi, 4);
+      expect(r.correcto, String(casi)).toBe(false);
+      expect(r.motivo, String(casi)).toContain('entero');
+      expect(r.motivo, String(casi)).not.toMatch(/desviado 0 de/);
+    }
+    expect(comprobarRespuesta(5, 4).motivo).toContain('Te has desviado 1 de la respuesta');
   });
 
   test('corrige bien, y una entrada que no es número no imprime «NaN»', () => {
@@ -329,5 +338,85 @@ test.describe('casos.ts — las 12 respuestas y la corrección', () => {
       expect(texto, `caso ${caso.id}`).toContain(String(caso.respuesta));
       expect(texto.trim().length, `caso ${caso.id}`).toBeGreaterThan(String(caso.respuesta).length + 2);
     }
+  });
+});
+
+/**
+ * Inspector 27/09/2026 — el motor sin navegador, con los casos de los hallazgos 2290, 2291 y 2296
+ * resueltos a mano en `tests/apps/simulador-automatas-finitos.spec.ts`.
+ */
+test.describe('motor — estado trampa implícito, no determinismo y alfabeto declarado', () => {
+  const E = (id: string, esInicial: boolean, esFinal: boolean) => ({ id, etiqueta: id, esInicial, esFinal });
+
+  test('2290 · una transición ausente equivale a ir a un estado trampa: q1 ≡ q2, 3 estados', () => {
+    const r = minimizar({
+      estados: [E('q0', true, false), E('q1', false, true), E('q2', false, true), E('q3', false, false)],
+      transiciones: [
+        { from: 'q0', to: 'q1', simbolo: 'a' },
+        { from: 'q0', to: 'q2', simbolo: 'b' },
+        { from: 'q2', to: 'q3', simbolo: 'a' },
+      ],
+    });
+    expect(r.ok).toBe(true);
+    expect(r.fusionados).toEqual([['q1', 'q2']]);
+    expect(r.automata.estados.map((e) => e.id).sort()).toEqual(['{q0}', '{q1,q2}', '{q3}']);
+    expect(r.sumideroImplicito).toBe(true);
+    expect(r.trampa).toEqual(['q3']);
+    // El mínimo es total: 3 estados × 2 símbolos, y reconoce {a, b}.
+    expect(r.automata.transiciones).toHaveLength(6);
+    const mini = r.automata;
+    for (const [w, v] of [['', 'rechazada'], ['a', 'aceptada'], ['b', 'aceptada'], ['ba', 'rechazada'], ['aa', 'rechazada']]) {
+      expect(validarRapido(w, 'dfa', mini.estados, mini.transiciones), w).toBe(v);
+    }
+  });
+
+  test('2290 · sin trampa dibujada, ∅ no aparece en el mínimo (AFD parcial, como en la determinización)', () => {
+    // q1 y q2 finales sin salidas: los dos aceptan solo ε ⇒ equivalentes; 2 estados, 1 transición por símbolo.
+    const r = minimizar({
+      estados: [E('q0', true, false), E('q1', false, true), E('q2', false, true)],
+      transiciones: [
+        { from: 'q0', to: 'q1', simbolo: 'a' },
+        { from: 'q0', to: 'q2', simbolo: 'b' },
+      ],
+    });
+    expect(r.automata.estados).toHaveLength(2);
+    expect(r.trampa).toEqual([]);
+    expect(r.automata.estados.map((e) => e.id).join(' ')).not.toContain('∅');
+    expect(r.automata.transiciones).toHaveLength(2);
+  });
+
+  test('2291 · en modo DFA un AFND se recorre siguiendo todas las ramas, no la primera flecha', () => {
+    const estados = [E('q0', true, false), E('q1', false, false), E('q2', false, true)];
+    const transiciones = [
+      { from: 'q0', to: 'q0', simbolo: '0' },
+      { from: 'q0', to: 'q0', simbolo: '1' },
+      { from: 'q0', to: 'q1', simbolo: '0' },
+      { from: 'q1', to: 'q2', simbolo: '1' },
+      { from: 'q2', to: 'q2', simbolo: '0' },
+      { from: 'q2', to: 'q2', simbolo: '1' },
+    ];
+    expect(conflictosDeterminismo(transiciones)).toEqual([
+      { tipo: 'duplicado', from: 'q0', simbolo: '0', destinos: ['q0', 'q1'] },
+    ]);
+    for (const w of ['01', '001', '1101']) expect(validarRapido(w, 'dfa', estados, transiciones), w).toBe('aceptada');
+    expect(validarRapido('110', 'dfa', estados, transiciones)).toBe('rechazada');
+    // Un AFD de verdad no tiene conflictos, y una ε sí lo es.
+    expect(conflictosDeterminismo([{ from: 'q0', to: 'q1', simbolo: 'a' }])).toEqual([]);
+    expect(conflictosDeterminismo([{ from: 'q0', to: 'q1', simbolo: EPSILON }])[0].tipo).toBe('epsilon');
+  });
+
+  test('2296 · el alfabeto declarado manda: un símbolo fuera de él no es una entrada', () => {
+    expect(alfabetoDeclarado(' a , b,,ε, a ')).toEqual(['a', 'b']);
+    const estados = [E('q0', true, true), E('q1', false, false)];
+    const transiciones = [
+      { from: 'q0', to: 'q1', simbolo: '0' },
+      { from: 'q1', to: 'q0', simbolo: '0' },
+      { from: 'q0', to: 'q0', simbolo: '1' },
+      { from: 'q1', to: 'q1', simbolo: '1' },
+    ];
+    expect(validarRapido('1', 'dfa', estados, transiciones, ['a', 'b'])).toBe('fuera-alfabeto');
+    expect(validarRapido('1', 'dfa', estados, transiciones, ['0', '1'])).toBe('aceptada');
+    // Sin alfabeto declarado no se comprueba (lo que usan los casos de clase).
+    expect(validarRapido('1', 'dfa', estados, transiciones)).toBe('aceptada');
   });
 });

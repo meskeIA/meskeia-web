@@ -364,9 +364,18 @@ test.describe('Inspector 27/09/2026 · casos límite', () => {
     await expect(veredictosDelLote(page)).toHaveText([/Aceptada/, /Rechazada/]);
   });
 
-  // «Pares de 0» es total sobre {0, 1}: «0a1» lee el 0 (q0→q1) y con «a» no hay transición.
-  test('símbolo fuera del alfabeto: «0a1» se queda SIN TRANSICIÓN', async ({ page }) => {
+  // «Pares de 0» es total sobre {0, 1}.
+  // ACTUALIZADO 27/09/2026 (hallazgo 2296): este caso decía «0a1 se queda SIN TRANSICIÓN». Era
+  // lo que pasaba cuando el alfabeto declarado no intervenía; ahora Σ = {0, 1} manda y «0a1» no
+  // es una entrada del autómata: FUERA DEL ALFABETO, sin recorrer nada. «Sin transición» sigue
+  // existiendo y se mide aparte: declarado Σ = {0, 1, a}, «0a1» lee el 0 (q0→q1) y con «a» no
+  // hay flecha.
+  test('símbolo fuera del alfabeto: «0a1» es FUERA DEL ALFABETO con Σ = {0, 1}, y SIN TRANSICIÓN con Σ = {0, 1, a}', async ({
+    page,
+  }) => {
     await escribirLote(page, '0a1');
+    await expect(veredictosDelLote(page)).toHaveText([/Fuera del alfabeto/]);
+    await page.locator('#alfabeto').fill('0,1,a');
     await expect(veredictosDelLote(page)).toHaveText([/Sin transición/]);
   });
 
@@ -387,50 +396,86 @@ test.describe('Inspector 27/09/2026 · casos límite', () => {
     await expect(resultado).toContainText('{q0,q1}');
   });
 
-  // ABIERTO (27/09/2026): el resumen de la minimización no concuerda en número —«El autómata
-  // mínimo tiene 1 estados.»— porque `page.tsx` escribe «estados» fijo detrás de la cifra.
-  test.fail('ABIERTO: con un único estado mínimo, el resumen dice «tiene 1 estados»', async ({
-    page,
-  }) => {
+  // REPARADO 27/09/2026 (hallazgo 2297): el resumen de la minimización decía «El autómata mínimo
+  // tiene 1 estados.» porque `page.tsx` escribía «estados» fijo detrás de la cifra. Ahora la
+  // palabra concuerda con la cifra (`contar`), aquí y en la determinización.
+  test('con un único estado mínimo, el resumen dice «tiene 1 estado.»', async ({ page }) => {
     await page.getByRole('button', { name: 'Alternar estado final' }).click();
     await circuloDe(page, 'q0').click();
     await page.getByRole('button', { name: 'Minimizar el AFD', exact: true }).click();
     await expect(page.locator('[class*="convResultado"]')).toContainText(/tiene 1 estado\./);
   });
 
-  // ABIERTO (27/09/2026): el campo «Alfabeto» no interviene en nada —`alfabeto` solo se lee
-  // para pintar el propio input—. Declarado Σ = {a, b}, «1» no pertenece a Σ* y no puede
-  // aceptarse; la app lo ACEPTA porque solo mira las transiciones dibujadas.
-  test.fail('ABIERTO: con el alfabeto declarado {a, b}, la cadena «1» sale ACEPTADA', async ({
+  // REPARADO 27/09/2026 (hallazgo 2296): el campo «Alfabeto» no intervenía en nada —`alfabeto`
+  // solo se leía para pintar el propio input—. Declarado Σ = {a, b}, «1» no pertenece a Σ* y no
+  // puede aceptarse; la app lo ACEPTABA porque solo miraba las transiciones dibujadas. Ahora la
+  // cadena sale FUERA DEL ALFABETO, y las transiciones con 0 y 1 se avisan.
+  test('con el alfabeto declarado {a, b}, la cadena «1» sale FUERA DEL ALFABETO y se avisa de las transiciones', async ({
     page,
   }) => {
     await page.locator('#alfabeto').fill('a,b');
     await escribirLote(page, '1');
-    await expect(veredictosDelLote(page)).not.toHaveText([/Aceptada/]);
+    await expect(veredictosDelLote(page)).toHaveText([/Fuera del alfabeto/]);
+    await expect(page.locator('[class*="avisosAutomata"]')).toContainText('no están en el alfabeto declarado');
+    await expect(page.locator('[class*="avisosAutomata"]')).toContainText('«0», «1»');
+
+    // La validación animada dice lo mismo y señala el símbolo.
+    await page.locator('#cadena').fill('1');
+    await page.getByRole('button', { name: 'Validar', exact: true }).click();
+    await expect(page.locator('[role="alert"]', { hasText: 'FUERA DEL ALFABETO' })).toBeVisible();
+    await expect(anunciadorDelPaso(page)).toContainText('"1" no pertenece al alfabeto declarado {a, b}');
+
+    // Con el alfabeto coherente, ni aviso ni rechazo: «1» (cero ceros, par) vuelve a ACEPTARSE.
+    await page.locator('#alfabeto').fill('0,1');
+    await expect(veredictosDelLote(page)).toHaveText([/Aceptada/]);
+    await expect(page.locator('[class*="avisosAutomata"]')).toHaveText('');
+  });
+
+  // Los cuatro ejemplos traen un alfabeto coherente con sus transiciones: ninguno avisa al cargarse
+  // (antes «a*b*c*» declaraba «a,b,c,ε», y ε no es un símbolo: es la cadena vacía).
+  test('ningún ejemplo precargado avisa de símbolos fuera del alfabeto', async ({ page }) => {
+    for (const nombre of [/Pares de 0/, /Termina en "ab"/, /Contiene "01"/, /a\*b\*c\*/]) {
+      await page.getByRole('button', { name: nombre }).click();
+      await expect(page.locator('[class*="avisosAutomata"]'), String(nombre)).not.toContainText('alfabeto');
+    }
+    await expect(page.locator('#alfabeto')).toHaveValue('a,b,c');
   });
 });
 
 test.describe('Inspector 27/09/2026 · lo que debe rechazarse o avisarse', () => {
-  // ABIERTO (27/09/2026): un AFND validado en modo DFA no avisa de nada. `generarPasosValidacion`
-  // toma con `find` la PRIMERA transición que casa, así que el veredicto depende del orden en que
-  // se dibujaron las flechas: en «Contiene 01», q0-0→q0 va antes que q0-0→q1 y el recorrido no
-  // sale nunca de q0, de modo que «01», que el lenguaje contiene, sale RECHAZADA sin explicación.
-  // `minimizar` sí detecta el mismo no determinismo y lo dice («esto es un AFND»); y el comentario
-  // de `cambiarTipo` anuncia un aviso («si pasamos a DFA y hay ε, advertir») que no existe.
-  test.fail('ABIERTO: el AFND «Contiene 01» en modo DFA rechaza «01» sin ningún aviso', async ({
+  // REPARADO 27/09/2026 (hallazgo 2291): un AFND validado en modo DFA no avisaba de nada.
+  // `generarPasosValidacion` tomaba con `find` la PRIMERA transición que casaba, así que el
+  // veredicto dependía del orden en que se dibujaron las flechas: en «Contiene 01», q0-0→q0 va
+  // antes que q0-0→q1 y el recorrido no salía nunca de q0, de modo que «01», que el lenguaje
+  // contiene, salía RECHAZADA sin explicación. Ahora el panel «Validar cadena» avisa de qué lo
+  // hace no determinista y, mientras sea así, se recorre como AFND (todas las ramas), así que el
+  // veredicto es el del lenguaje: 01, 001 y 1101 contienen «01» ⇒ ACEPTADAS; 110 no ⇒ RECHAZADA.
+  test('el AFND «Contiene 01» en modo DFA avisa del no determinismo y no da un veredicto engañoso', async ({
     page,
   }) => {
     await page.getByRole('button', { name: /Contiene "01"/ }).click();
     await page.getByRole('button', { name: 'DFA Determinista' }).click();
-    await escribirLote(page, '01');
+    await escribirLote(page, '01\n001\n1101\n110');
     const aviso = page
       .locator('main [role="alert"], main [role="status"]')
       .filter({ hasText: /determinista|AFND|más de una transición/i });
     await expect(aviso).not.toHaveCount(0);
+    await expect(page.locator('[class*="avisosAutomata"]')).toContainText(
+      'Desde q0 hay más de una transición con «0» (a q0 y a q1)',
+    );
+    await expect(veredictosDelLote(page)).toHaveText([/Aceptada/, /Aceptada/, /Aceptada/, /Rechazada/]);
+
+    // Con ε pasa lo mismo: «a*b*c*» en modo DFA avisa de las dos transiciones vacías.
+    await page.getByRole('button', { name: /a\*b\*c\*/ }).click();
+    await page.getByRole('button', { name: 'DFA Determinista' }).click();
+    await expect(page.locator('[class*="avisosAutomata"]')).toContainText('q0 tiene una transición ε');
+    // Y en modo NFA, que es lo que es, no hay nada que avisar.
+    await page.getByRole('button', { name: /^NFA No determinista/ }).click();
+    await expect(page.locator('[class*="avisosAutomata"]')).toHaveText('');
   });
 
-  // ABIERTO (27/09/2026): la minimización no reconoce como equivalentes una transición AUSENTE y
-  // una que lleva a un estado trampa explícito, que son el mismo lenguaje (∅).
+  // REPARADO 27/09/2026 (hallazgo 2290): la minimización no reconocía como equivalentes una
+  // transición AUSENTE y una que lleva a un estado trampa explícito, que son el mismo lenguaje (∅).
   //
   // AFD PARCIAL construido sobre el autómata por defecto (q0 inicial, q0-a→q1, q1 final):
   //   + q2 (final) y q3 (no final y sin salidas: un estado trampa), + q0-b→q2 y q2-a→q3.
@@ -438,9 +483,16 @@ test.describe('Inspector 27/09/2026 · lo que debe rechazarse o avisarse', () =>
   //   (con a cae en la trampa q3; con b no hay transición). q1 ≡ q2 ⇒ se fusionan.
   //   Mínimo: 3 estados ({q0}, {q1,q2}, {q3}) contando la trampa, o 2 si se omite como hace el
   //   convenio de AFD parcial de la app. Nunca 4.
-  // La app firma la transición ausente como «-» y la que va a q3 como «la clase de q3», separa
-  // q1 de q2 en la primera ronda y concluye «ya era mínimo con sus 4 estados».
-  test.fail('ABIERTO: minimizar un AFD parcial con un estado trampa no fusiona q1 ≡ q2', async ({
+  // La app firmaba la transición ausente como «-» y la que va a q3 como «la clase de q3», separaba
+  // q1 de q2 en la primera ronda y concluía «ya era mínimo con sus 4 estados».
+  //
+  // Ahora el AFD se completa con un estado trampa implícito ∅ antes de particionar. A MANO:
+  //   P0: finales {q1,q2} | no finales {q0,q3,∅}
+  //   R1 (firma con a, b): q1 → (∅, ∅) = (N, N); q2 → (q3, ∅) = (N, N) ⇒ juntos.
+  //       q0 → (q1, q2) = (F, F); q3 → (∅, ∅) = (N, N); ∅ → (N, N) ⇒ {q0} | {q3,∅}
+  //   R2: nada se parte. Clases: {q0}, {q1,q2}, {q3,∅}. Como la clase de ∅ contiene un estado
+  //   dibujado (q3, la trampa), se conserva: 3 estados, y las transiciones que faltaban van a {q3}.
+  test('minimizar un AFD parcial con un estado trampa fusiona q1 ≡ q2 (3 estados)', async ({
     page,
   }) => {
     await page.reload();
@@ -483,14 +535,29 @@ test.describe('Inspector 27/09/2026 · lo que debe rechazarse o avisarse', () =>
     const resultado = page.locator('[class*="convResultado"]');
     await expect(resultado).toContainText('Se fusionan');
     await expect(resultado).toContainText('{q1,q2}');
+    await expect(resultado).toContainText('El autómata mínimo tiene 3 estados.');
+    await expect(resultado).not.toContainText('ya era mínimo');
+    await expect(resultado).toContainText('q3 resulta equivalente');
+
+    // Cargado en el lienzo, el mínimo reconoce el mismo lenguaje {a, b}.
+    await page.getByRole('button', { name: 'Cargar el autómata mínimo en el lienzo' }).click();
+    await expect(page.locator('[class*="estadoResumen"]')).toContainText('3 estados');
+    await expect(veredictosDelLote(page)).toHaveText([
+      /Rechazada/,
+      /Aceptada/,
+      /Aceptada/,
+      /Rechazada/,
+      /Rechazada/,
+      /Rechazada/,
+    ]);
   });
 
-  // ABIERTO (27/09/2026): `obtenerCoordenadasSvg` escala el clic con el ancho y el alto de la
-  // CAJA del SVG (1.038 × 500 px en escritorio), pero el viewBox 800×500 se dibuja encajado
-  // (`xMidYMid meet`) a escala 1 y centrado, con ~119 px vacíos a cada lado. Pulsar sobre el
-  // punto (220, 420) del dibujo coloca el estado en x ≈ 261: 41 unidades a la derecha. Arrastrar
-  // un estado arrastra el mismo desfase.
-  test.fail('ABIERTO: «Añadir estado» coloca el estado desplazado del punto pulsado (escritorio)', async ({
+  // REPARADO 27/09/2026 (hallazgo 2292): `obtenerCoordenadasSvg` escalaba el clic con el ancho y
+  // el alto de la CAJA del SVG (1.038 × 500 px en escritorio), pero el viewBox 800×500 se dibuja
+  // encajado (`xMidYMid meet`) a escala 1 y centrado, con ~119 px vacíos a cada lado. Pulsar sobre
+  // el punto (220, 420) del dibujo colocaba el estado en x ≈ 261: 41 unidades a la derecha, y
+  // arrastrar arrastraba el mismo desfase. Ahora convierte con la inversa de `getScreenCTM`.
+  test('«Añadir estado» coloca el estado en el punto pulsado, y arrastrar lo deja bajo el puntero (escritorio)', async ({
     page,
   }) => {
     await page.getByRole('button', { name: 'Añadir estado' }).click();
@@ -501,6 +568,18 @@ test.describe('Inspector 27/09/2026 · lo que debe rechazarse o avisarse', () =>
     const nuevo = lienzo(page).locator('circle').last();
     expect(Math.abs(Number(await nuevo.getAttribute('cx')) - 220)).toBeLessThanOrEqual(5);
     expect(Math.abs(Number(await nuevo.getAttribute('cy')) - 420)).toBeLessThanOrEqual(5);
+
+    // Arrastre: q1 (520, 250) hasta el punto (650, 120) del dibujo.
+    await page.getByRole('button', { name: 'Mover estados' }).click();
+    const desde = await aPantalla(page, 520, 250);
+    const hasta = await aPantalla(page, 650, 120);
+    await page.mouse.move(desde.x, desde.y);
+    await page.mouse.down();
+    await page.mouse.move(hasta.x, hasta.y, { steps: 8 });
+    await page.mouse.up();
+    const q1 = circuloDe(page, 'q1');
+    expect(Math.abs(Number(await q1.getAttribute('cx')) - 650)).toBeLessThanOrEqual(5);
+    expect(Math.abs(Number(await q1.getAttribute('cy')) - 120)).toBeLessThanOrEqual(5);
   });
 });
 
@@ -527,28 +606,41 @@ test.describe('Inspector 27/09/2026 · S1 — tolerancia del 1 % frente a respue
     await expect(veredicto(page)).toContainText('No es correcto');
   });
 
-  // S1 ABIERTO (27/09/2026): la respuesta es un RECUENTO —el propio mensaje de error lo dice:
-  // «aquí todas las respuestas son cuentas de algo»—, pero «4,04 cadenas» está a 0,04 de 4, justo
-  // en la tolerancia, y se da por buena. Pasa igual con «3,96» y, en el caso 9 (2 estados),
-  // con «2,02».
-  test.fail('S1 ABIERTO: un decimal dentro del 1 % pasa por recuento: «4,04» cadenas → ¡Correcto!', async ({
+  // S1 REPARADO 27/09/2026 (hallazgo 2294): la respuesta es un RECUENTO —el propio mensaje de
+  // error lo dice: «aquí todas las respuestas son cuentas de algo»—, pero «4,04 cadenas» estaba a
+  // 0,04 de 4, justo en la tolerancia del 1 %, y se daba por buena. Pasaba igual con «3,96» y, en
+  // el caso 9 (2 estados), con «2,02». Ahora solo vale el entero exacto; «4,0» es 4.
+  test('S1: un decimal no pasa por recuento: «4,04» y «3,96» cadenas se rechazan pidiendo un entero', async ({
     page,
   }) => {
     await page.getByRole('button', { name: /^Caso 1:/ }).click();
-    await responder(page, '4,04');
-    await expect(veredicto(page)).not.toContainText('¡Correcto!');
+    for (const casi of ['4,04', '3,96']) {
+      await responder(page, casi);
+      await expect(veredicto(page)).not.toContainText('¡Correcto!');
+      await expect(veredicto(page)).toContainText('número entero');
+    }
+    await responder(page, '4,0');
+    await expect(veredicto(page)).toContainText('¡Correcto!');
+    await page.getByRole('button', { name: /^Caso 9:/ }).click();
+    await responder(page, '2,02');
+    await expect(veredicto(page)).toContainText('No es correcto');
+    await responder(page, '2');
+    await expect(veredicto(page)).toContainText('¡Correcto!');
   });
 
-  // ABIERTO (27/09/2026): «4,05» queda a 0,05 de 4, fuera de la tolerancia, y el rechazo cifra la
-  // desviación con `numero(diferencia)`, que no admite decimales: «Te has desviado 0 de la
-  // respuesta». Suspender diciendo que la desviación es cero es el mismo desconcierto que cerró
-  // el hallazgo 1211.
-  test.fail('ABIERTO: «4,05» se rechaza diciendo «Te has desviado 0 de la respuesta»', async ({
-    page,
-  }) => {
+  // REPARADO 27/09/2026 (hallazgo 2295): «4,05» quedaba a 0,05 de 4, fuera de la tolerancia, y el
+  // rechazo cifraba la desviación con `numero(diferencia)`, que no admite decimales: «Te has
+  // desviado 0 de la respuesta». Suspender diciendo que la desviación es cero es el mismo
+  // desconcierto que cerró el hallazgo 1211. Ahora un decimal se rechaza por no ser un entero, y
+  // la desviación solo se cifra entre enteros, donde nunca es 0.
+  test('«4,05» se rechaza pidiendo un entero, nunca «Te has desviado 0»', async ({ page }) => {
     await page.getByRole('button', { name: /^Caso 1:/ }).click();
     await responder(page, '4,05');
     await expect(veredicto(page)).toContainText('No es correcto');
+    await expect(veredicto(page)).not.toContainText(/desviado 0 de/);
+    await expect(veredicto(page)).toContainText('número entero');
+    await page.getByRole('button', { name: /^Caso 9:/ }).click();
+    await responder(page, '2,03');
     await expect(veredicto(page)).not.toContainText(/desviado 0 de/);
   });
 
@@ -605,27 +697,45 @@ test.describe('Inspector 27/09/2026 · móvil 393×851', () => {
     await expect(veredictosDelLote(page)).toHaveText([/Aceptada/, /Rechazada/]);
   });
 
-  // ABIERTO (27/09/2026): el lienzo mide 247 × 500 px a 393 px de ancho y el viewBox 800×500 se
-  // encaja a escala 0,309: el dibujo ocupa 154 px de alto en medio de 500 y las etiquetas de
-  // 13 px («q0», los símbolos de las flechas) se pintan a 4 px, ilegibles.
-  test.fail('ABIERTO: en móvil las etiquetas del lienzo se pintan a ~4 px', async ({ page }) => {
-    const px = await lienzo(page).evaluate((el) => {
-      const svg = el as SVGSVGElement;
-      const texto = svg.querySelector('text');
-      const m = svg.getScreenCTM();
-      if (!texto || !m) return 0;
-      return parseFloat(getComputedStyle(texto).fontSize) * m.a;
-    });
-    expect(px).toBeGreaterThanOrEqual(10);
-  });
-
-  // ABIERTO (27/09/2026): el mismo desfase del clic que en escritorio, aquí en vertical y mayor.
-  // El dibujo empieza 173 px por debajo del borde del SVG; tocar sobre el punto (400, 400) del
-  // dibujo (173 + 400 × 0,309 = 296 px bajo el borde) se convierte en y = 296 del viewBox: el
-  // estado aparece unas 103 unidades —32 px de pantalla— por encima del dedo.
-  test.fail('ABIERTO: en móvil un toque en «Añadir estado» deja el estado lejos del dedo', async ({
+  // REPARADO 27/09/2026 (hallazgo 2293): el lienzo medía 247 × 500 px a 393 px de ancho y el
+  // viewBox 800×500 se encajaba a escala 0,309: el dibujo ocupaba 154 px de alto en medio de 500 y
+  // las etiquetas de 13 px («q0», los símbolos de las flechas) se pintaban a 4 px, ilegibles.
+  // Ahora el lienzo guarda el aspecto 8/5 del viewBox (el dibujo llena la caja y se ve entero) y
+  // la letra del lienzo crece en unidades del viewBox según la escala medida, para no bajar de
+  // ~10,5 px en pantalla. Se miden TODAS las etiquetas, no solo la primera, y con un ejemplo de
+  // tres estados para que haya símbolos de flecha y autobucles.
+  test('en móvil las etiquetas del lienzo se leen (≥ 10 px) y la caja no deja franjas vacías', async ({
     page,
   }) => {
+    await page.getByRole('button', { name: /Termina en "ab"/ }).click();
+    const medida = await lienzo(page).evaluate((el) => {
+      const svg = el as SVGSVGElement;
+      const m = svg.getScreenCTM();
+      const caja = svg.getBoundingClientRect();
+      const textos = [...svg.querySelectorAll('text')];
+      const min = Math.min(
+        ...textos.map((t) => parseFloat(getComputedStyle(t).fontSize) * (m ? m.a : 0)),
+      );
+      return { min, n: textos.length, alto: caja.height, ancho: caja.width, escalaY: m ? m.d : 0 };
+    });
+    expect(medida.n).toBeGreaterThan(0);
+    expect(medida.min).toBeGreaterThanOrEqual(10);
+    // El dibujo ocupa la caja entera: 500 unidades a la escala del encaje = alto de la caja.
+    expect(Math.abs(medida.escalaY * 500 - medida.alto)).toBeLessThanOrEqual(2);
+    // Y la página no se desplaza en horizontal por culpa del lienzo.
+    const anchos = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollWidth,
+      cliente: document.documentElement.clientWidth,
+    }));
+    expect(anchos.scroll).toBeLessThanOrEqual(anchos.cliente);
+  });
+
+  // REPARADO 27/09/2026 (hallazgo 2292, móvil): el mismo desfase del clic que en escritorio, aquí
+  // en vertical y mayor. El dibujo empezaba 173 px por debajo del borde del SVG; tocar sobre el
+  // punto (400, 400) del dibujo (173 + 400 × 0,309 = 296 px bajo el borde) se convertía en
+  // y = 296 del viewBox: el estado aparecía unas 103 unidades —32 px de pantalla— por encima del
+  // dedo. Con la inversa de `getScreenCTM` cuenta también el desplazamiento de la caja del lienzo.
+  test('en móvil un toque en «Añadir estado» deja el estado bajo el dedo', async ({ page }) => {
     await page.getByRole('button', { name: 'Añadir estado' }).click();
     const p = await aPantalla(page, 400, 400);
     await page.touchscreen.tap(p.x, p.y);
