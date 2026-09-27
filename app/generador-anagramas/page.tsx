@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useEffect, useRef, Fragment } from 'react';
+import { useState, useMemo, useEffect, useRef, Fragment, type FormEvent } from 'react';
 import styles from './GeneradorAnagramas.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
@@ -85,6 +85,33 @@ const COMODINES_ACEPTADOS = '?*_';
  * Un tercer comodín «de margen» no le sirve a ningún jugador y sí cuadruplica la lista.
  */
 const MAX_COMODINES = 2;
+
+/**
+ * Tope de fichas del modo letras (letras concretas + blancas) y de letras del modo frase.
+ *
+ * Eran `maxLength` de los campos (15 y 28 caracteres), y un `maxLength` RECORTA EN SILENCIO lo
+ * que se pega: «electroencefalografista» se quedaba en «electroencefalo», el contador decía
+ * «15 letras» y la búsqueda se hacía sobre otra palabra sin decirlo (hallazgo 2279). Ahora el
+ * campo admite lo que se escriba y, por encima del tope, la app lo dice y no busca. El tope de
+ * letras coincide con la longitud máxima que se puede pedir (15): un texto más largo no es un
+ * atril, es un anagrama de frase, y hacia ese modo se remite.
+ */
+const MAX_FICHAS_ATRIL = 15;
+const MAX_LETRAS_FRASE = 28;
+
+/**
+ * En pantallas táctiles, al buscar desde la tecla de acción del teclado se cierra el teclado:
+ * si no, tapa justo los resultados que se acaban de pedir. Con ratón no se toca el foco.
+ * Devuelve si lo ha cerrado, para que quien llama lleve después la vista a los resultados.
+ */
+function cerrarTecladoTactil(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia('(pointer: coarse)').matches) {
+    return false;
+  }
+  const activo = document.activeElement;
+  if (activo instanceof HTMLElement) activo.blur();
+  return true;
+}
 
 interface Atril {
   /** Letras concretas, ya normalizadas */
@@ -476,6 +503,17 @@ export default function GeneradorAnagramasPage() {
   // frase, no en la carga, para no penalizar al modo de letras (el más usado).
   const indiceRef = useRef<IndiceVocabulario | null>(null);
 
+  /**
+   * Buscar con la tecla del teclado deja la vista en el campo, y en un Pixel 7 los resultados
+   * quedan 160 px por debajo del borde de la pantalla aun con el teclado ya cerrado (medido).
+   * Tras un envío táctil se lleva la vista al ancla de los resultados. Con el botón también
+   * (el navegador no distingue ambos envíos: el implícito «pulsa» el botón por defecto), y
+   * ahí no estorba: los resultados ya salían justo debajo del dedo.
+   */
+  const desplazarA = useRef<Modo | null>(null);
+  const anclaLetras = useRef<HTMLDivElement>(null);
+  const anclaFrase = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const cached = typeof window !== 'undefined' ? sessionStorage.getItem(DICT_CACHE_KEY) : null;
     if (cached) {
@@ -530,7 +568,68 @@ export default function GeneradorAnagramasPage() {
     return index;
   }, [dictionary]);
 
+  /** Longitud del lema más corto del diccionario cargado (0 mientras no ha cargado). */
+  const longitudMinimaLema = useMemo(() => {
+    const longitudes = Object.keys(wordsByLength).map(Number);
+    return longitudes.length > 0 ? Math.min(...longitudes) : 0;
+  }, [wordsByLength]);
+
+  /**
+   * Por qué no se busca con fichas blancas y ninguna letra, contado del lemario cargado.
+   *
+   * Metía la constante MAX_COMODINES donde va lo tecleado y, con UNA blanca, contaba «0 palabras
+   * de 1 letra… y poco más»: una explicación que se contradecía a sí misma (hallazgo 2280; el
+   * 460 solo había corregido la cifra del caso «??»). Con menos blancas que letras tiene el lema
+   * más corto no cabe nada, y así se dice.
+   */
+  const explicacionSoloBlancas = useMemo(() => {
+    const n = atril.comodines;
+    if (atril.letras.length > 0 || n === 0) return '';
+    const base = ' — hace falta al menos una letra concreta';
+    if (longitudMinimaLema === 0) return base;
+    const blancas = n === 1 ? '1 ficha blanca' : `${n} fichas blancas`;
+    if (n < longitudMinimaLema) {
+      return (
+        `${base}: con ${blancas} y ninguna letra no cabe ninguna palabra, porque la más ` +
+        `corta del diccionario tiene ${longitudMinimaLema} letras`
+      );
+    }
+    let cuantas = 0;
+    for (let len = longitudMinimaLema; len <= n; len++) cuantas += wordsByLength[len]?.length ?? 0;
+    return (
+      `${base}: con ${blancas} y ninguna letra saldrían todas las ${cuantas.toLocaleString('es-ES')} ` +
+      `palabras de ${n} letras o menos del diccionario, sin que tu atril decida nada`
+    );
+  }, [atril, longitudMinimaLema, wordsByLength]);
+
+  /** Fichas del atril (letras concretas + blancas usables) por encima del tope del modo. */
+  const atrilExcedido = atril.letras.length + atril.comodines > MAX_FICHAS_ATRIL;
+
+  const puedeBuscarLetras =
+    atril.letras.length > 0 &&
+    atril.letras.length + atril.comodines >= 2 &&
+    !atrilExcedido &&
+    !isSearching &&
+    dictStatus === 'ready';
+
+  /** La tecla de acción del teclado («Ir», «Buscar», Intro) busca igual que el botón. */
+  const enviarLetras = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!puedeBuscarLetras) return;
+    if (cerrarTecladoTactil()) desplazarA.current = 'letras';
+    findAnagrams();
+  };
+
+  /** Lleva un texto demasiado largo para un atril al modo que reparte TODAS sus letras. */
+  const llevarAlModoFrase = () => {
+    setFrase(letters);
+    setResultadoFrase(null);
+    setModo('frase');
+  };
+
   const findAnagrams = () => {
+    // Nunca sobre un atril distinto del tecleado: por encima del tope se avisa y no se busca
+    if (atrilExcedido) return;
     setIsSearching(true);
 
     setTimeout(() => {
@@ -707,8 +806,12 @@ export default function GeneradorAnagramasPage() {
     [frase]
   );
 
+  const fraseExcedida = letrasFrase.length > MAX_LETRAS_FRASE;
+  const puedeBuscarFrase =
+    letrasFrase.length >= 3 && !fraseExcedida && !buscandoFrase && dictStatus === 'ready';
+
   const buscarFrase = () => {
-    if (letrasFrase.length < 3 || dictStatus !== 'ready') return;
+    if (letrasFrase.length < 3 || fraseExcedida || dictStatus !== 'ready') return;
     setBuscandoFrase(true);
     setResultadoFrase(null);
 
@@ -722,6 +825,26 @@ export default function GeneradorAnagramasPage() {
       setBuscandoFrase(false);
     }, 50);
   };
+
+  const enviarFrase = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!puedeBuscarFrase) return;
+    if (cerrarTecladoTactil()) desplazarA.current = 'frase';
+    buscarFrase();
+  };
+
+  // Lleva la vista a los resultados cuando llegan, si el envío lo pidió (ver `desplazarA`)
+  useEffect(() => {
+    if (desplazarA.current !== 'letras' || !buscado) return;
+    desplazarA.current = null;
+    anclaLetras.current?.scrollIntoView({ block: 'start' });
+  }, [buscado, results]);
+
+  useEffect(() => {
+    if (desplazarA.current !== 'frase' || !resultadoFrase) return;
+    desplazarA.current = null;
+    anclaFrase.current?.scrollIntoView({ block: 'start' });
+  }, [resultadoFrase]);
 
   const limpiarFrase = () => {
     setFrase('');
@@ -815,6 +938,12 @@ export default function GeneradorAnagramasPage() {
 
         {modo === 'letras' && (
         <>
+        {/*
+          * Un <form> de verdad para que la tecla de acción del teclado («Ir», «Buscar», Intro)
+          * busque: sin él no hacía nada, y en un Pixel 7 el botón queda 410 px por debajo del
+          * campo, detrás del teclado abierto (hallazgo 2278).
+          */}
+        <form onSubmit={enviarLetras} noValidate>
         <div className={styles.inputSection}>
           <label className={styles.label} htmlFor="anagram-letters">Introduce tus letras:</label>
           <p className={styles.modeHint}>
@@ -830,12 +959,17 @@ export default function GeneradorAnagramasPage() {
             value={letters}
             onChange={(e) => { setLetters(e.target.value); setResults([]); setBuscado(false); }}
             placeholder="Ej: amorpls o casa?"
-            maxLength={15}
             autoComplete="off"
             inputMode="text"
+            enterKeyHint="search"
             aria-describedby="anagram-atril"
+            aria-invalid={atrilExcedido || undefined}
           />
-          <div className={styles.contadorLetras} id="anagram-atril" aria-live="polite">
+          <div
+            className={`${styles.contadorLetras} ${atrilExcedido ? styles.contadorExcedido : ''}`}
+            id="anagram-atril"
+            aria-live="polite"
+          >
             {atril.letras.length}{' '}
             {atril.letras.length === 1 ? 'letra' : 'letras'}
             {atril.comodines > 0 && (
@@ -848,19 +982,25 @@ export default function GeneradorAnagramasPage() {
             )}
             {atril.comodinesIgnorados > 0 &&
               ` — se ignoran ${atril.comodinesIgnorados} comodín(es) por encima del máximo de ${MAX_COMODINES}`}
-            {atril.letras.length === 0 && atril.comodines > 0 && (
-              /*
-               * La cifra se CUENTA del lemario cargado, no se estima. Antes decía «medio
-               * diccionario» y son 95 palabras sobre 86.973 —el 0,1 %—: con dos blancas y
-               * ninguna letra solo caben los lemas de dos letras, porque uno de tres no
-               * entra en dos fichas. La regla es correcta; lo que era falso era el número
-               * con el que se explicaba (hallazgo 460).
-               */
-              ` — hace falta al menos una letra concreta: solo con ${MAX_COMODINES} blancas saldrían ` +
-              `las ${dictionary.filter((w) => w.length <= atril.comodines).length} palabras de ` +
-              `${atril.comodines} ${atril.comodines === 1 ? 'letra' : 'letras o menos'} del diccionario, y poco más`
-            )}
+            {/*
+              * La cifra se CUENTA del lemario cargado, no se estima. Antes decía «medio
+              * diccionario» y son 95 palabras sobre 86.973 —el 0,1 %— (hallazgo 460); y con
+              * una sola blanca se contradecía (hallazgo 2280): ver explicacionSoloBlancas.
+              */}
+            {explicacionSoloBlancas}
+            {atrilExcedido &&
+              ` — pasa del máximo de ${MAX_FICHAS_ATRIL} fichas de este modo, así que no se busca: ` +
+              'para el anagrama de un texto largo usa «Anagrama perfecto de una frase»'}
           </div>
+          {atrilExcedido && (
+            <button
+              type="button"
+              className={`${styles.exampleBtn} ${styles.llevarFrase}`}
+              onClick={llevarAlModoFrase}
+            >
+              Llevar el texto al modo frase
+            </button>
+          )}
           <div className={styles.examples}>
             <span className={styles.exampleLabel}>Probar:</span>
             {examples.map((ex) => (
@@ -916,21 +1056,17 @@ export default function GeneradorAnagramasPage() {
               placeholder="Opcional"
               maxLength={3}
               autoComplete="off"
+              enterKeyHint="search"
             />
           </div>
         </div>
 
         <div className={styles.buttonRow}>
+          {/* type="submit": el botón por defecto del <form>, el que dispara la tecla Intro */}
           <button
-            onClick={findAnagrams}
             className={styles.btnPrimary}
-            disabled={
-              atril.letras.length === 0 ||
-              atril.letras.length + atril.comodines < 2 ||
-              isSearching ||
-              dictStatus !== 'ready'
-            }
-            type="button"
+            disabled={!puedeBuscarLetras}
+            type="submit"
           >
             {isSearching ? 'Buscando...' : 'Buscar palabras'}
           </button>
@@ -938,6 +1074,8 @@ export default function GeneradorAnagramasPage() {
             Limpiar
           </button>
         </div>
+        </form>
+        <div ref={anclaLetras} className={styles.anclaResultados} aria-hidden="true" />
 
         {results.length > 0 && (
           <div className={styles.resultsSection}>
@@ -1049,6 +1187,8 @@ export default function GeneradorAnagramasPage() {
 
         {modo === 'frase' && (
         <>
+        {/* Mismo motivo que el <form> del modo letras: que Intro busque (hallazgo 2278) */}
+        <form onSubmit={enviarFrase} noValidate>
         <div className={styles.inputSection}>
           <label className={styles.label} htmlFor="anagram-frase">
             Frase, nombre o palabra a transformar:
@@ -1070,13 +1210,22 @@ export default function GeneradorAnagramasPage() {
             // es una afirmación de exactitud, no una lista aproximada.
             onChange={(e) => { setFrase(e.target.value); setResultadoFrase(null); }}
             placeholder="Ej: Salvador Dalí"
-            maxLength={28}
             autoComplete="off"
             inputMode="text"
+            enterKeyHint="search"
+            aria-describedby="anagram-frase-contador"
+            aria-invalid={fraseExcedida || undefined}
           />
-          <div className={styles.contadorLetras} aria-live="polite">
+          {/* Sin maxLength, que recortaba en silencio lo pegado (hallazgo 2279): se avisa */}
+          <div
+            className={`${styles.contadorLetras} ${fraseExcedida ? styles.contadorExcedido : ''}`}
+            id="anagram-frase-contador"
+            aria-live="polite"
+          >
             {letrasFrase.length} letras a repartir
-            {letrasFrase.length > 20 && ' — con tantas letras la búsqueda puede quedarse a medias'}
+            {fraseExcedida
+              ? ` — pasa del máximo de ${MAX_LETRAS_FRASE} letras, así que no se busca: acórtalo`
+              : letrasFrase.length > 20 && ' — con tantas letras la búsqueda puede quedarse a medias'}
           </div>
           <div className={styles.examples}>
             <span className={styles.exampleLabel}>Probar:</span>
@@ -1124,11 +1273,11 @@ export default function GeneradorAnagramasPage() {
         </div>
 
         <div className={styles.buttonRow}>
+          {/* type="submit": el botón por defecto del <form>, el que dispara la tecla Intro */}
           <button
-            onClick={buscarFrase}
             className={styles.btnPrimary}
-            disabled={letrasFrase.length < 3 || buscandoFrase || dictStatus !== 'ready'}
-            type="button"
+            disabled={!puedeBuscarFrase}
+            type="submit"
           >
             {buscandoFrase ? 'Repartiendo letras...' : 'Buscar anagramas perfectos'}
           </button>
@@ -1136,6 +1285,8 @@ export default function GeneradorAnagramasPage() {
             Limpiar
           </button>
         </div>
+        </form>
+        <div ref={anclaFrase} className={styles.anclaResultados} aria-hidden="true" />
 
         {resultadoFrase && resultadoFrase.soluciones.length > 0 && (
           <div className={styles.resultsSection}>

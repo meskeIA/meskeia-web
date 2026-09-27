@@ -762,6 +762,30 @@
   color: var(--text-muted);
 }
 
+/* Texto por encima del tope del modo: se avisa en vez de recortarlo (hallazgo 2279) */
+.contadorExcedido {
+  padding: 4px var(--spacing-sm);
+  border-left: 3px solid #ffc107;
+  background: rgba(255, 193, 7, 0.12);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+[data-theme='dark'] .contadorExcedido {
+  background: rgba(255, 193, 7, 0.08);
+}
+
+.llevarFrase {
+  margin-top: var(--spacing-sm);
+}
+
+/* Destino del desplazamiento tras buscar desde el teclado táctil; el margen salva el logo fijo */
+.anclaResultados {
+  height: 0;
+  scroll-margin-top: 5rem;
+}
+
 /* ------------------------------------------------------------------ */
 /* Modo frase: anagramas perfectos                                     */
 /* ------------------------------------------------------------------ */

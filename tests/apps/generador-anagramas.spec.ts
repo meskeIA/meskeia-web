@@ -640,8 +640,8 @@ test.describe('generador-anagramas', () => {
 
     test('el atril más grande que admite el campo se pinta entero', async ({ page }) => {
       await abrirConDiccionario(page);
-      // maxLength del campo = 15 caracteres. 13 letras + las 2 blancas del tope es el atril
-      // máximo posible, y el oráculo da 8.847 palabras: casi el doble de las 4.976 que el
+      // Tope del modo = 15 fichas (MAX_FICHAS_ATRIL; hasta el 27/09/2026, maxLength=15).
+      // 13 letras + las 2 blancas del tope es el atril máximo posible, y el oráculo da 8.847 palabras: casi el doble de las 4.976 que el
       // commit consideró impintables al fijar el tope en 2 comodines. Se pintan igualmente.
       await buscarAtril(page, 'abcdefghijklm??');
       await expect(page.getByRole('heading', { name: /Palabras encontradas/ })).toHaveText(
@@ -1338,12 +1338,12 @@ test.describe('generador-anagramas', () => {
   //   CASO 2 (límite)  «R A P T O» (mayúsculas y espacios) → las mismas 5 letras; con 2..10,
   //                    43 palabras = 9 de 5 letras + 16 de 4 + 13 de 3 + 5 de 2 (oráculo).
   //                    Y «electroencefalografista», 23 letras y lema del diccionario, pegada
-  //                    en un campo de 15 caracteres (ABIERTO, abajo).
+  //                    en un campo de 15 caracteres (reparado 27/09, hallazgo 2279).
   //   CASO 3 (rechazo) «???» → 0 letras, 2 blancas usables y 1 ignorada: no se busca, y el
   //                    aviso cuenta 95 palabras de 2 letras o menos (oráculo: 95 de 2 letras,
   //                    ninguna de 1).
   //   MÓVIL            el flujo táctil de «rapto» deja el resultado a la vista, y la tecla
-  //                    de acción del teclado («Ir»/Intro) no busca (ABIERTO, abajo).
+  //                    de acción del teclado («Ir»/Intro) no buscaba (reparado 27/09, hallazgo 2278).
   // ---------------------------------------------------------------------------------------
   test.describe('sexta pasada · firma de rotura · 27/09/2026', () => {
     /** Carga, espera a que React haya hidratado el campo y a que el diccionario esté listo. */
@@ -1431,49 +1431,102 @@ test.describe('generador-anagramas', () => {
     });
 
     test(
-      'ABIERTO · pegar una palabra de más de 15 letras la recorta sin decirlo',
+      'REPARADO 2279 · pegar una palabra de más de 15 letras no la recorta: avisa y remite al modo frase',
       async ({ page }) => {
-        // ABIERTO: el campo de letras tiene maxLength={15} y no avisa. Pegando
+        // REPARADO 27/09/2026: el campo de letras tenía maxLength={15} y no avisaba. Pegando
         // «electroencefalografista» —23 letras, y lema del propio diccionario— el campo se
-        // queda en «electroencefalo» y el contador dice «15 letras», sin ninguna indicación
-        // de que el texto se ha cortado: la búsqueda se hace sobre OTRA palabra (oráculo:
-        // 1.043 resultados en 2..10 en vez de 7.606, y la palabra pegada no puede salir).
-        // El modo frase admite 28 caracteres, pero nada remite a él.
-        // Cuando se repare —admitiendo la palabra entera o avisando del corte—, este test
-        // pasará y Playwright pedirá quitarle el test.fail().
-        test.fail();
+        // quedaba en «electroencefalo», el contador decía «15 letras» y la búsqueda se hacía
+        // sobre OTRA palabra (oráculo: 1.043 resultados en 2..10 en vez de 7.606). Se eligió
+        // avisar y no buscar en vez de buscar con 23 letras: 15 es también la longitud
+        // máxima que se puede pedir en este modo, así que la palabra pegada no podría salir
+        // de todos modos; un texto así es un anagrama de frase, y hacia allí se remite con un
+        // botón. El modo frase tenía el mismo recorte mudo (maxLength={28}), reparado igual.
         await abrirHidratada(page);
         await page.locator('#anagram-letters').focus();
         await page.keyboard.insertText('electroencefalografista'); // como un pegado
-        const valor = await page.inputValue('#anagram-letters');
-        await esperarValorEnReact(page, '#anagram-letters', valor);
-        const textoContador = (await page.locator('#anagram-atril').textContent()) ?? '';
-        const avisaDelCorte = /recort|cort[oó]|m[aá]ximo de 15|no cabe|l[ií]mite/i.test(textoContador);
-        expect(
-          valor === 'electroencefalografista' || avisaDelCorte,
-          `el campo se quedó en «${valor}» y el contador dice «${textoContador}»`,
-        ).toBe(true);
+        await esperarValorEnReact(page, '#anagram-letters', 'electroencefalografista');
+        // El campo conserva la palabra entera y el contador cuenta las 23 letras reales
+        const atril = page.locator('#anagram-atril');
+        await expect(atril).toContainText('23 letras');
+        await expect(atril).toContainText('pasa del máximo de 15 fichas de este modo, así que no se busca');
+        await expect(page.locator('#anagram-letters')).toHaveAttribute('aria-invalid', 'true');
+        // No se busca sobre otra palabra: ni con el botón ni con Intro
+        await expect(page.getByRole('button', { name: 'Buscar palabras' })).toBeDisabled();
+        await page.locator('#anagram-letters').press('Enter');
+        await page.waitForTimeout(300);
+        await expect(page.locator('[class*="resultsHeader"]')).toHaveCount(0);
+        // El botón lleva el texto entero al modo frase, donde sí cabe (23 ≤ 28 letras)
+        await page.getByRole('button', { name: 'Llevar el texto al modo frase' }).click();
+        await expect(page.locator('#anagram-frase')).toHaveValue('electroencefalografista');
+        await expect(page.locator('#anagram-frase-contador')).toHaveText(
+          /^23 letras a repartir — con tantas letras/,
+        );
+        await expect(page.getByRole('button', { name: 'Buscar anagramas perfectos' })).toBeEnabled();
+
+        // Y el modo frase tampoco recorta: 29 letras se quedan enteras, avisa y no busca
+        const largo = 'abcdefghijklmnopqrstuvwxyzabc';
+        await page.fill('#anagram-frase', largo);
+        await esperarValorEnReact(page, '#anagram-frase', largo);
+        await expect(page.locator('#anagram-frase-contador')).toContainText(
+          '29 letras a repartir — pasa del máximo de 28 letras',
+        );
+        await expect(page.getByRole('button', { name: 'Buscar anagramas perfectos' })).toBeDisabled();
       },
     );
 
     test(
-      'ABIERTO · con UNA sola blanca el aviso habla de dos y cuenta «0 palabras… y poco más»',
+      'REPARADO 2280 · con UNA sola blanca el aviso explica que no cabe ninguna palabra',
       async ({ page }) => {
-        // ABIERTO: con «?» el contador dice «hace falta al menos una letra concreta: solo con
-        // 2 blancas saldrían las 0 palabras de 1 letra del diccionario, y poco más». El texto
-        // mete la constante MAX_COMODINES (2) donde va la cifra tecleada (1), y «0 palabras…
-        // y poco más» no explica nada. Resuelto a mano: con 1 blanca y 0 letras no cabe
-        // ninguna palabra, porque la más corta del lemario tiene 2 letras (oráculo: 0 lemas
-        // de 1 letra). El rechazo es correcto; lo que falla es la explicación (hallazgo 460
-        // reparó la cifra del caso «??», no este).
-        test.fail();
+        // REPARADO 27/09/2026: con «?» el contador decía «hace falta al menos una letra
+        // concreta: solo con 2 blancas saldrían las 0 palabras de 1 letra del diccionario, y
+        // poco más»: metía la constante MAX_COMODINES (2) donde va la cifra tecleada (1), y
+        // «0 palabras… y poco más» no explicaba nada. Resuelto a mano: con 1 blanca y 0 letras
+        // no cabe ninguna palabra, porque la más corta del lemario tiene 2 letras (oráculo: 0
+        // lemas de 1 letra). La longitud mínima se deriva ahora del diccionario cargado.
         await abrirHidratada(page);
         await page.fill('#anagram-letters', '?');
         await esperarValorEnReact(page, '#anagram-letters', '?');
         await expect(page.getByRole('button', { name: 'Buscar palabras' })).toBeDisabled();
-        await expect(page.locator('#anagram-atril')).not.toContainText(
-          'solo con 2 blancas saldrían las 0 palabras',
+        const atril = page.locator('#anagram-atril');
+        await expect(atril).toHaveText(
+          '0 letras + 1 ficha blanca — hace falta al menos una letra concreta: con 1 ficha ' +
+            'blanca y ninguna letra no cabe ninguna palabra, porque la más corta del ' +
+            'diccionario tiene 2 letras',
         );
+        await expect(atril).not.toContainText('2 blancas');
+        await expect(atril).not.toContainText('poco más');
+      },
+    );
+
+    test(
+      'REPARADO 2278 · en escritorio Intro busca desde el campo y desde «Debe contener», sin robar el foco',
+      async ({ page }) => {
+        // El hallazgo 2278 se comprobó también en escritorio. A mano, de las 16 palabras de
+        // «amor» (2..10) contienen «ma»: maro, roma y mar → 3 (amor, ramo y amo llevan «am»).
+        await abrirHidratada(page);
+        await page.fill('#anagram-letters', 'amor');
+        await esperarValorEnReact(page, '#anagram-letters', 'amor');
+        await page.locator('#anagram-letters').press('Enter');
+        await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText(
+          'Palabras encontradas: 16',
+        );
+        // Con ratón y teclado físico el foco se queda donde estaba
+        await expect(page.locator('#anagram-letters')).toBeFocused();
+        await page.fill('#anagram-contain', 'ma');
+        await esperarValorEnReact(page, '#anagram-contain', 'ma');
+        await page.locator('#anagram-contain').press('Enter');
+        await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText(
+          'Palabras encontradas: 3',
+        );
+        expect((await page.locator('[class*="chipLema"]').allTextContents()).sort()).toEqual([
+          'mar', 'maro', 'roma',
+        ]);
+        // Intro con un atril que no se puede buscar no busca: «a» sola es 1 ficha
+        await page.fill('#anagram-letters', 'a');
+        await esperarValorEnReact(page, '#anagram-letters', 'a');
+        await page.locator('#anagram-letters').press('Enter');
+        await page.waitForTimeout(300);
+        await expect(page.locator('[class*="resultsHeader"]')).toHaveCount(0);
       },
     );
 
@@ -1518,16 +1571,18 @@ test.describe('generador-anagramas', () => {
       });
 
       test(
-        'ABIERTO · la tecla de acción del teclado («Ir»/Intro) no busca en el modo letras',
+        'REPARADO 2278 · la tecla de acción del teclado («Buscar»/Intro) busca en el modo letras',
         async ({ page }) => {
-          // ABIERTO: el campo no está en un <form> ni escucha Intro, así que la tecla de acción
-          // del teclado del móvil no hace nada: ni busca ni dice por qué. En un Pixel 7 el
-          // botón «Buscar palabras» empieza 410 px por debajo del borde inferior del campo, con
-          // los tres filtros en medio, es decir, detrás del teclado abierto. Igual en escritorio (comprobado).
+          // REPARADO 27/09/2026: el campo no estaba en un <form> ni escuchaba Intro, así que la
+          // tecla de acción del teclado del móvil no hacía nada: ni buscaba ni decía por qué.
+          // En un Pixel 7 el botón «Buscar palabras» empieza 410 px por debajo del borde
+          // inferior del campo, con los tres filtros en medio, es decir, detrás del teclado
+          // abierto. Ahora cada modo es un <form> con el botón de búsqueda como submit, y los
+          // campos anuncian enterkeyhint="search" para que el teclado rotule la tecla.
           // Valor esperado: «amor» con las longitudes por defecto (2..10) → 16 palabras
           // (oráculo propio; el mismo número del CASO 1 de la primera pasada).
-          test.fail();
           await abrirHidratada(page);
+          await expect(page.locator('#anagram-letters')).toHaveAttribute('enterkeyhint', 'search');
           await page.locator('#anagram-letters').tap();
           await page.fill('#anagram-letters', 'amor');
           await esperarValorEnReact(page, '#anagram-letters', 'amor');
@@ -1536,19 +1591,24 @@ test.describe('generador-anagramas', () => {
             'Palabras encontradas: 16',
             { timeout: 3000 },
           );
+          // En táctil el teclado se cierra al buscar, para no tapar los resultados pedidos
+          await expect(page.locator('#anagram-letters')).not.toBeFocused();
+          // Y la vista baja a ellos: sin eso la cabecera quedaba a y=1.012 de 851 (medido el
+          // 27/09/2026), debajo del borde aun con el teclado cerrado
+          await expect(page.locator('[class*="resultsHeader"]')).toBeInViewport({ ratio: 1 });
         },
       );
 
       test(
-        'ABIERTO · la tecla de acción del teclado tampoco busca en el modo frase',
+        'REPARADO 2278 · la tecla de acción del teclado busca también en el modo frase',
         async ({ page }) => {
-          // ABIERTO, la misma causa en el otro campo con diccionario. Valor esperado: «roma»
-          // con los valores por defecto (3 palabras, mínimo 3 letras) → 4 repartos, amor,
-          // maro, mora y ramo (CASO 2e de la primera pasada; oráculo propio).
-          test.fail();
+          // REPARADO 27/09/2026, la misma causa en el otro campo con diccionario. Valor
+          // esperado: «roma» con los valores por defecto (3 palabras, mínimo 3 letras) → 4
+          // repartos, amor, maro, mora y ramo (CASO 2e de la primera pasada; oráculo propio).
           await abrirHidratada(page);
           await pestana(page, /Anagrama perfecto de una frase/).tap();
           await esperarHidratacion(page, ['#anagram-frase']);
+          await expect(page.locator('#anagram-frase')).toHaveAttribute('enterkeyhint', 'search');
           await page.locator('#anagram-frase').tap();
           await page.fill('#anagram-frase', 'roma');
           await esperarValorEnReact(page, '#anagram-frase', 'roma');
@@ -1557,6 +1617,8 @@ test.describe('generador-anagramas', () => {
             'Anagramas perfectos encontrados: 4',
             { timeout: 3000 },
           );
+          await expect(page.locator('#anagram-frase')).not.toBeFocused();
+          await expect(page.locator('[class*="resultsHeader"]')).toBeInViewport({ ratio: 1 });
         },
       );
 
