@@ -263,7 +263,7 @@ async function revisar(ctx, url, tituloHome) {
     else if (meta.h1.length > 1) avisos.push(`${meta.h1.length} elementos <h1>`);
     if (meta.imgsRotas > 0) avisos.push(`${meta.imgsRotas} imagen(es) que no cargan`);
 
-    if (await tituloTapadoEnMovil(page)) avisos.push('en móvil (390 px) el logo o el botón de tema tapan el título');
+    avisos.push(...await anchosConTituloTapado(page));
   } catch (e) {
     errores.push(`navegación: ${String(e.message).slice(0, 160)}`);
   }
@@ -273,26 +273,59 @@ async function revisar(ctx, url, tituloHome) {
 }
 
 /**
- * ¿Pisa la barra fija de MeskeiaLogo (logo a la izquierda, botón de tema a la derecha) el
- * texto del <h1> a ancho de móvil?
+ * Anchos a los que se mira si la barra del logo pisa el título, con el aviso de cada uno.
+ * El de 390 conserva su texto de siempre para no fabricar «nuevas» en la comparación.
+ * 1.280 es el ancho del barrido: medirlo no cuesta un redimensionado.
+ */
+const ANCHOS_TITULO = [
+  { ancho: 1280, alto: 900, aviso: 'a 1280 px el logo o el botón de tema tapan el título' },
+  { ancho: 1024, alto: 768, aviso: 'en tableta o portátil (1024 px) el logo o el botón de tema tapan el título' },
+  { ancho: 390, alto: 844, aviso: 'en móvil (390 px) el logo o el botón de tema tapan el título' },
+];
+
+/**
+ * ¿A qué anchos pisa la barra fija de MeskeiaLogo (logo a la izquierda, botón de tema a la
+ * derecha) el texto del <h1>? Devuelve el aviso de cada ancho en que ocurre.
  *
- * La ronda barre a 1.280 px y ahí no pasa nunca: el título va centrado y la barra ocupa las
- * esquinas. Pasa en las apps cuyo hero va a sangre sin dejar arriba el hueco de 80 px de la
- * plantilla: en móvil el título sube hasta la barra. Se reduce LA MISMA página, sin
- * recargarla, porque es CSS que responde a `max-width` y así la comprobación casi no cuesta.
+ * Pasa en las apps cuyo hero va a sangre sin dejar arriba el hueco de 80 px de la
+ * plantilla. Se redimensiona LA MISMA página, sin recargarla, porque es CSS que responde a
+ * `max-width` y así la comprobación casi no cuesta.
  *
  * De dónde sale (24/09/2026): revisando `quiz-tabla-periodica` en móvil, el logo tapaba
  * «Quiz» y su emoji. Barrido del catálogo en producción ese día: 193 de 1.183 URLs, con tres
  * muestras al azar confirmadas a ojo y 4 de 4 apps sanas conocidas sin marcar.
  *
+ * 1.024 y 1.280 se añadieron el 27/09/2026, al cerrar los 187 avisos móviles (586a4d61,
+ * d056b066): por encima de 768 px el logo crece y la barra baja de ~52 a ~77 px, y en esas
+ * apps un título largo y centrado llega a las esquinas. Medidas en local tras el arreglo
+ * móvil: 50 tapadas a 1.024, 6 a 1.200 y 2 a 1.280; 0 a 1.440. Antes solo se miraba a 390 y
+ * este tramo era invisible.
+ *
  * Se mide contra las cajas del TEXTO (`Range.getClientRects`), no contra la del <h1>: un h1
  * de ancho completo roza siempre las esquinas aunque sus letras estén lejos.
+ *
+ * ⚠️ En una ronda LOCAL salen marcadas las ~170 `/visualizador-historia/<slug>/` a los tres
+ * anchos, y no es un defecto: en producción esas URLs redirigen a cronicum.com, cuya
+ * cabecera baja el hero hasta ~113 px; en localhost no hay redirección ni cabecera.
  */
-async function tituloTapadoEnMovil(page) {
+async function anchosConTituloTapado(page) {
   const original = page.viewportSize();
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.waitForTimeout(150); // un par de fotogramas para recalcular el layout
-  const tapado = await page.evaluate(() => {
+  const avisos = [];
+  for (const { ancho, alto, aviso } of ANCHOS_TITULO) {
+    const actual = page.viewportSize();
+    if (!actual || actual.width !== ancho) {
+      await page.setViewportSize({ width: ancho, height: alto });
+      await page.waitForTimeout(150); // un par de fotogramas para recalcular el layout
+    }
+    if (await tituloTapado(page)) avisos.push(aviso);
+  }
+  if (original) await page.setViewportSize(original);
+  return avisos;
+}
+
+/** ¿Pisa alguna pieza de la barra fija las letras del <h1> al ancho actual? */
+async function tituloTapado(page) {
+  return page.evaluate(() => {
     const barra = [...document.querySelectorAll('body *')].find(e => {
       const cs = getComputedStyle(e);
       const r = e.getBoundingClientRect();
@@ -308,8 +341,6 @@ async function tituloTapadoEnMovil(page) {
     return piezas.some(p => letras.some(c =>
       !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom)));
   });
-  if (original) await page.setViewportSize(original);
-  return tapado;
 }
 
 // ─── Ejecución en cola ────────────────────────────────────────────────────────
