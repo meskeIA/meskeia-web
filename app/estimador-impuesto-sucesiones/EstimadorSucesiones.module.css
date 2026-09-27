@@ -1,6 +1,10 @@
+/*
+ * Sin `--primary` ni `--secondary` propios (hallazgo 2326, 27/09/2026): el módulo los fijaba en
+ * #2E86AB / #48A9A6 y no los redeclaraba en oscuro, así que el azul oscuro de globals.css nunca
+ * llegaba. Ahora vienen de globals, y el TEXTO de marca usa `--primary-texto` y
+ * `--secondary-texto` (≥ 4,5:1 en los dos temas); `--primary` queda para bordes y acentos.
+ */
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
@@ -145,7 +149,7 @@
   font-size: 1rem;
   font-weight: 600;
   margin: 0 0 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .seccionNota {
@@ -299,8 +303,13 @@
 }
 
 /* Resultado destacado */
+/*
+ * Fondo liso `--hero-bg` (8,33:1 con blanco) e igual en los dos temas, sin el degradado a teal
+ * ni las opacidades de los rótulos (hallazgo 2327): en la parada #48A9A6 la cifra daba 2,80:1 y
+ * «Tipo efectivo», con opacidad 0,8, 2,32:1.
+ */
 .resultadoDestacado {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: var(--hero-bg);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   text-align: center;
@@ -312,7 +321,6 @@
 
 .resultadoLabel {
   font-size: 0.9rem;
-  opacity: 0.9;
 }
 
 .resultadoValor {
@@ -323,7 +331,6 @@
 
 .resultadoNota {
   font-size: 0.85rem;
-  opacity: 0.85;
   background: rgba(255,255,255,0.15);
   border-radius: 6px;
   padding: 0.25rem 0.75rem;
@@ -333,7 +340,6 @@
 
 .resultadoTipoEfectivo {
   font-size: 0.82rem;
-  opacity: 0.8;
 }
 
 /* Desglose */
@@ -373,7 +379,7 @@
 
 .lineaFinal {
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .lineaBonif {
@@ -388,13 +394,13 @@
 
 .guideSection h2 {
   font-size: 1.3rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0;
 }
 
 .guideSection h3 {
   font-size: 1.05rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 1.5rem;
 }
 
@@ -415,7 +421,7 @@
 .conceptCard h4 {
   margin: 0 0 0.4rem;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .conceptCard p {
@@ -445,7 +451,7 @@
 .plazoNum {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ─── Tabla comparativa ─────────────────────────────────────────────────── */
@@ -590,7 +596,7 @@
 
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   border-left: 3px solid var(--primary);
   padding-left: 0.65rem;
   line-height: 1.5;
@@ -629,7 +635,7 @@
 .faqItem dt {
   font-size: 0.97rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.6rem;
   cursor: default;
 }
@@ -654,18 +660,18 @@
   margin-top: 0.6rem;
   font-size: 0.83rem;
   font-weight: 600;
-  color: var(--secondary);
-  background: rgba(72, 169, 166, 0.08);
-  border-radius: 6px;
-  padding: 0.45rem 0.7rem;
+  /* Sin el tinte teal de fondo: con él, `--secondary-texto` bajaba a 4,41:1 sobre la guía
+     #F5F5F5 (hallazgo 2326). El acento pasa a un filete lateral, que no es texto. */
+  color: var(--secondary-texto);
+  border-left: 3px solid var(--secondary);
+  padding: 0.3rem 0.7rem;
 }
 
 [data-theme='dark'] .faqItem dt {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .faqTip {
-  background: rgba(72, 169, 166, 0.12);
   color: #7dd3d0;
 }
 
@@ -710,7 +716,9 @@
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  /* Blanco sobre el degradado de marca daba 2,80:1 en la parada teal: mismo defecto que el
+     del bloque «Impuesto estimado» (hallazgo 2327), con el token de botón de globals. */
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-size: 0.85rem;

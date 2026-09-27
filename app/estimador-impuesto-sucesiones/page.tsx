@@ -13,6 +13,7 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_SUCESIONES_META,
+  FISCAL_SUCESIONES_CATALUNA_META,
   TARIFA_ESTATAL_IS,
   TARIFA_CATALUNA_IS,
   COEFICIENTES_IS,
@@ -387,8 +388,104 @@ const EN_LETRA = ['ninguna', 'una', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 's
   'diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete'];
 const enLetra = (n: number) => EN_LETRA[n] ?? String(n);
 
-/** Fecha de verificación del módulo en DD/MM/AAAA, como la del DataReference (hallazgo 1830). */
-const VERIFICADO_SUCESIONES = formatDate(parseISODateLocal(FISCAL_SUCESIONES_META.verificado));
+/**
+ * El sello de la rama que LIQUIDA, con su organismo para el enlace del hero.
+ *
+ * ⚠️ 27/09/2026 (hallazgo 2330) — con Cataluña elegida la app liquida con la Ley 19/2010, que
+ * tiene sello propio en `FISCAL_SUCESIONES_CATALUNA_META` (verificado el 08/09/2026, fuente la
+ * Agència Tributària de Catalunya), pero el hero y el DataReference daban siempre el del módulo
+ * (01/01/2025, AEAT). `calcularSucesion` devuelve en `fuenteDatos` el catalán para el mismo
+ * cálculo, así que la web y el MCP citaban fuentes distintas. La elección es la misma que la del
+ * motor —Cataluña o el resto— y el testigo la coteja con `fuenteDatos` para que no se separen.
+ */
+const SELLO_GENERAL = {
+  meta: FISCAL_SUCESIONES_META,
+  normativa: `ISD ${FISCAL_SUCESIONES_META.vigencia}`,
+  organismo: 'Agencia Tributaria',
+};
+const SELLO_CATALUNA = {
+  meta: FISCAL_SUCESIONES_CATALUNA_META,
+  normativa: `ISD Cataluña ${FISCAL_SUCESIONES_CATALUNA_META.vigencia}`,
+  // «Ley 19/2010 … — Agència Tributària de Catalunya»: el organismo es lo que va tras la raya.
+  organismo: FISCAL_SUCESIONES_CATALUNA_META.fuente.split(' — ').pop() ?? FISCAL_SUCESIONES_CATALUNA_META.fuente,
+};
+const selloDeLaRama = (ccaa: string) => (ccaa === 'cataluna' ? SELLO_CATALUNA : SELLO_GENERAL);
+
+/** Fecha de verificación en DD/MM/AAAA, como la del DataReference (hallazgo 1830). */
+const fechaSello = (isoFecha: string) => formatDate(parseISODateLocal(isoFecha));
+
+/**
+ * El rango de bonificación en cuota de unas comunidades para un grupo, LEÍDO de
+ * `BONIFICACIONES_CCAA_IS`: el mínimo es el porcentaje y el máximo, el 100 % allí donde hay
+ * exención total por debajo de un importe (Andalucía y Galicia hasta 1.000.000 €).
+ *
+ * ⚠️ 27/09/2026 (hallazgo 2331) — «99 %–100 %» iba tecleado en la tabla comparativa y en un
+ * consejo, con la tabla sellada al lado. Y derivado se ve que para Madrid y Canarias el techo es
+ * el 99,9 %, no el 100 %: la cifra tecleada no correspondía a ninguna de las dos.
+ */
+function rangoBonificacion(ccaas: string[], grupo: string): string {
+  const valores = ccaas.flatMap((c) => {
+    const b = BONIFICACIONES_CCAA_IS[c]?.bonificaciones[grupo];
+    if (!b || b.porcentaje === undefined) return [];
+    return b.exencion !== undefined ? [b.porcentaje, 1] : [b.porcentaje];
+  });
+  if (valores.length === 0) return '';
+  const aTexto = (f: number) => formatPercentage(f, Number.isInteger(Math.round(f * 1000) / 10) ? 0 : 1);
+  const [min, max] = [Math.min(...valores), Math.max(...valores)];
+  return min === max ? `el ${aTexto(min)}` : `del ${aTexto(min)} al ${aTexto(max)}`;
+}
+const capitalizar = (texto: string) => texto.charAt(0).toUpperCase() + texto.slice(1);
+const NOMBRES_CCAA = (ccaas: string[]) => {
+  const nombres = ccaas.map((c) => BONIFICACIONES_CCAA_IS[c].nombre.replace(/^Comunidad de /, ''));
+  return nombres.length > 1 ? `${nombres.slice(0, -1).join(', ')} y ${nombres[nombres.length - 1]}` : nombres[0];
+};
+const CCAA_BONIF_GRUPO_I = ['madrid', 'canarias', 'galicia', 'andalucia'];
+const CCAA_BONIF_GRUPO_II = ['madrid', 'canarias'];
+const CCAA_CUOTA_CASI_CERO = ['madrid', 'canarias', 'galicia'];
+
+/** Lo que queda por pagar tras la bonificación del Grupo II, en puntos (99 % → 1). */
+const RESTO_TRAS_BONIF_II = (ccaa: string) =>
+  (1 - (BONIFICACIONES_CCAA_IS[ccaa].bonificaciones['II']?.porcentaje ?? 0)) * 100;
+
+/**
+ * La misma herencia de la comparativa, liquidada en Canarias, para la FAQ de Madrid y Canarias
+ * (hallazgo 2328): la FAQ decía «La cuota resultante es de céntimos» y la herramienta de la
+ * misma página da decenas o cientos de euros, porque con un 99 % se paga el 1 % de la cuota.
+ */
+const EJEMPLO_CANARIAS_COMPARATIVA = calcularSucesion({
+  baseImponible: COMPARATIVA_CCAA.baseImponible,
+  ccaa: 'canarias',
+  grupo: 'II',
+  edadHeredero: 45,
+  viviendaHabitual: COMPARATIVA_CCAA.viviendaHabitual,
+  incluyeAjuar: true,
+});
+
+/** Plazo para PEDIR la prórroga, con la redacción del art. 68.1 RISD (hallazgo 2331). */
+const PLAZO_PEDIR_PRORROGA = `dentro de los ${PLAZO_ISD.mesesParaPedirProrroga} primeros meses`;
+
+/**
+ * Edad del heredero y del usufructuario: años cumplidos, enteros, de 0 a este máximo.
+ *
+ * ⚠️ 27/09/2026 (hallazgos 2325 y 2332) — las edades se liquidaban sin mirar: «-5» en el
+ * usufructuario daba el 70 % de un menor de 20, vacía se tomaba como 70 años sin decirlo, «-3» en
+ * el heredero se rotulaba «heredero de -3 años», y el «Descendiente menor de 21 años» venía con
+ * un 35 PRELLENADO que la app liquidaba sin reducción por edad y, en Cataluña, con la escala de
+ * bonificación del Grupo I: una cuota que no corresponde a ninguna situación posible. Desde el
+ * 740 un importe negativo se rechaza con aviso; las edades siguen ahora la misma regla.
+ */
+const EDAD_MAXIMA = 120;
+/** El Grupo I son los descendientes MENORES de esta edad (art. 20.2.a LISD). */
+const EDAD_LIMITE_GRUPO_I = 21;
+
+/** Años cumplidos de un campo de edad: `null` si está vacío y `NaN` si no es una edad posible. */
+function leerEdad(texto: string): number | null {
+  const t = texto.trim();
+  if (t === '') return null;
+  if (!/^\d{1,3}$/.test(t)) return Number.NaN;
+  const anios = Number(t);
+  return anios <= EDAD_MAXIMA ? anios : Number.NaN;
+}
 
 /**
  * Lo que ahorra una REDUCCIÓN, que por definición depende del tramo en que caiga.
@@ -435,7 +532,8 @@ export default function EstimadorImpuestoSucesionesPage() {
   // Datos del heredero
   const [ccaa, setCcaa] = useState('');
   const [grupo, setGrupo] = useState<GrupoParentesco | ''>('');
-  const [edad, setEdad] = useState('35');
+  // Sin prellenar: el 35 que traía contradecía al «Descendiente menor de 21 años» (hallazgo 2325).
+  const [edad, setEdad] = useState('');
   // Solo interviene si el heredero es colateral (Grupo III): art. 20.2.c LISD
   const [convivenciaDosAnios, setConvivenciaDosAnios] = useState(false);
   const [discapacidad, setDiscapacidad] = useState<NivelDiscapacidad>('0');
@@ -447,6 +545,7 @@ export default function EstimadorImpuestoSucesionesPage() {
   const [porcentajeHerencia, setPorcentajeHerencia] = useState('100');
 
   const ccaaInfo = useMemo(() => (ccaa ? BONIFICACIONES_CCAA_IS[ccaa] : null), [ccaa]);
+  const sello = selloDeLaRama(ccaa);
 
   /**
    * Los diez importes, leídos de una vez: cada campo trae un número utilizable o deja su
@@ -507,10 +606,49 @@ export default function EstimadorImpuestoSucesionesPage() {
     return !Number.isFinite(n) || n < 0;
   }, [porcentajeHerencia]);
 
+  /**
+   * Las edades, leídas con la misma regla que los importes (hallazgos 2325 y 2332): o son una
+   * edad posible y coherente con el parentesco, o la app se abstiene y dice por qué.
+   *
+   *  · «Descendiente menor de 21 años» EXIGE la edad, de 0 a 20: la reducción del art. 20.2.a
+   *    depende de ella y, en Cataluña, también la escala de bonificación del Grupo I.
+   *  · Hermano, tío o sobrino: la edad solo decide la vivienda habitual (65 años o más), así que
+   *    vacía se admite —la reducción no se aplica y se dice por qué—, pero imposible, no.
+   *  · Usufructo o nuda propiedad: el art. 26.a valora el derecho por la edad del usufructuario,
+   *    así que vacía o imposible no da cifra. Antes se tomaba 70 años sin decirlo.
+   */
+  const avisoEdad = useMemo(() => {
+    let heredero: string | null = null;
+    let usufructuario: string | null = null;
+    const edadHeredero = leerEdad(edad);
+    if (grupo === 'I-descendiente') {
+      if (edadHeredero === null) {
+        heredero = `Escribe la edad del heredero: con «Descendiente menor de ${EDAD_LIMITE_GRUPO_I} años» la reducción depende de ella (de 0 a ${EDAD_LIMITE_GRUPO_I - 1} años).`;
+      } else if (Number.isNaN(edadHeredero)) {
+        heredero = `La edad del heredero no es válida: escribe los años cumplidos, de 0 a ${EDAD_LIMITE_GRUPO_I - 1}, sin decimales ni signos.`;
+      } else if (edadHeredero >= EDAD_LIMITE_GRUPO_I) {
+        heredero = `La edad del heredero (${edadHeredero} años) contradice el parentesco «Descendiente menor de ${EDAD_LIMITE_GRUPO_I} años». Si tiene ${EDAD_LIMITE_GRUPO_I} o más, elige «Hijo/a de ${EDAD_LIMITE_GRUPO_I} años o más» o «Nieto/a u otro descendiente de ${EDAD_LIMITE_GRUPO_I} años o más».`;
+      }
+    } else if (grupo === 'III' && edadHeredero !== null && Number.isNaN(edadHeredero)) {
+      heredero = `La edad del heredero no es válida: escribe los años cumplidos, de 0 a ${EDAD_MAXIMA}, sin decimales ni signos.`;
+    }
+    if (tipoAdquisicion !== 'plena') {
+      const edadUsuf = leerEdad(edadUsufructuario);
+      if (edadUsuf === null) {
+        usufructuario = `Escribe la edad del usufructuario: el valor ${tipoAdquisicion === 'usufructo' ? 'del usufructo' : 'de la nuda propiedad'} depende de ella (${VALORACION_USUFRUCTO_IS.norma}).`;
+      } else if (Number.isNaN(edadUsuf)) {
+        usufructuario = `La edad del usufructuario no es válida: escribe los años cumplidos, de 0 a ${EDAD_MAXIMA}, sin decimales ni signos.`;
+      }
+    }
+    return { heredero, usufructuario, hay: heredero !== null || usufructuario !== null };
+  }, [grupo, edad, tipoAdquisicion, edadUsufructuario]);
+
   const resultado = useMemo((): ResultadoSucesiones | null => {
     if (!ccaa || !grupo) return null;
     // Con un solo importe ilegible no se estima: el aviso lo nombra y el panel no da cifra.
     if (importes.invalidos.length > 0 || porcentajeInvalido) return null;
+    // Ni con una edad imposible o que contradiga el parentesco (hallazgos 2325 y 2332).
+    if (avisoEdad.hay) return null;
 
     // Bienes
     const { bSaldos: v_cuentas, bAcciones: v_acciones, bVivienda: v_vivienda,
@@ -558,8 +696,9 @@ export default function EstimadorImpuestoSucesionesPage() {
     let baseAjustada = baseImponibleTotal * porcHerencia;
 
     // Tipo de adquisición (usufructo / nuda)
-    const edadUsufParseada = Number.parseInt(edadUsufructuario, 10);
-    const edadUsuf = Number.isFinite(edadUsufParseada) ? edadUsufParseada : 70;
+    // Ya validada en `avisoEdad`: en usufructo y nuda es un entero de 0 a 120. El «: 70» que
+    // había aquí era el defecto del 2332 — una edad vacía se liquidaba como 70 años sin decirlo.
+    const edadUsuf = leerEdad(edadUsufructuario) ?? Number.NaN;
     let porcentajeAdquisicion = 1;
     /**
      * ⚠️ 22/09/2026 (hallazgo 1196) — la regla iba tecleada aquí, sin constante y sin norma, y
@@ -602,21 +741,25 @@ export default function EstimadorImpuestoSucesionesPage() {
      * en Cataluña— se liquidaba como si tuviera 35 años y perdía la reducción entera. El
      * campo admite `min="0"`, así que el caso era expresable en pantalla y no en el cálculo.
      * El 35 solo debe salir cuando NO hay edad escrita.
+     *
+     * ⚠️ 27/09/2026 (hallazgo 2325) — y tampoco entonces: con «Descendiente menor de 21 años» el
+     * 35 contradecía el parentesco. Ahora `avisoEdad` exige para ese grupo una edad de 0 a 20
+     * antes de llegar aquí, y en el Grupo III una edad vacía queda como `null`, sin inventarla.
      */
-    const edadParseada = Number.parseInt(edad, 10);
-    const edadNum = Number.isFinite(edadParseada) ? edadParseada : 35;
-    if (grupo === 'I-descendiente' && edadNum < 21) {
+    const edadHeredero = leerEdad(edad);
+    const edadNum = edadHeredero ?? Number.NaN;
+    if (grupo === 'I-descendiente' && edadNum < EDAD_LIMITE_GRUPO_I) {
       const porAnio = esCataluna ? REDUCCION_EDAD_MENOR_21_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_IS;
       const topeTotal = esCataluna ? REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_MAX_IS;
       const reduccionEdad = Math.min(
-        reduccionParentesco + porAnio * (21 - edadNum),
+        reduccionParentesco + porAnio * (EDAD_LIMITE_GRUPO_I - edadNum),
         topeTotal
       ) - reduccionParentesco;
       if (reduccionEdad > 0) {
         // Rotulaba `${21 - edad} años < 21`, que se lee como la edad del heredero: a uno de 15
         // le ponía «6 años < 21» y a uno de 0, «21 años < 21» (hallazgo 1831).
         reducciones.push({
-          concepto: `Por edad (heredero de ${edadNum} ${edadNum === 1 ? 'año' : 'años'}, menor de 21)`,
+          concepto: `Por edad (heredero de ${edadNum} ${edadNum === 1 ? 'año' : 'años'}, menor de ${EDAD_LIMITE_GRUPO_I})`,
           importe: reduccionEdad,
         });
       }
@@ -696,14 +839,18 @@ export default function EstimadorImpuestoSucesionesPage() {
       valorVivienda: baseViviendaHeredero > 0 ? baseViviendaHeredero : undefined,
       grupo,
       ccaa,
-      edadHeredero: Number.isFinite(edadParseada) ? edadParseada : undefined,
+      edadHeredero: edadHeredero ?? undefined,
       convivenciaDosAnios,
       limiteViviendaCataluna,
     });
     if (vivienda.reduccion > 0) {
       reducciones.push({ concepto: `Vivienda habitual (${pct(REDUCCION_VIVIENDA_PORC_IS * 100)})`, importe: vivienda.reduccion });
     }
-    const viviendaNoAplicada = vivienda.noAplicada;
+    // Sin edad, el motor responde «menor de 65 años», que afirma una edad que nadie ha escrito:
+    // se dice lo que de verdad falta (hallazgo 2332, la misma forma que el 70 supuesto).
+    const viviendaNoAplicada = vivienda.noAplicada && grupo === 'III' && edadHeredero === null
+      ? `falta la edad del heredero: el pariente colateral necesita ${EDAD_MIN_COLATERAL_VIVIENDA_IS} años o más`
+      : vivienda.noAplicada;
 
     // 5. Reducción por discapacidad
     if (discapacidad === '33') {
@@ -800,7 +947,7 @@ export default function EstimadorImpuestoSucesionesPage() {
     };
   }, [
     ccaa, grupo, edad, convivenciaDosAnios, discapacidad, patrimonioIdx, tipoAdquisicion,
-    edadUsufructuario, porcentajeHerencia, porcentajeInvalido, importes, ccaaInfo,
+    edadUsufructuario, porcentajeHerencia, porcentajeInvalido, importes, ccaaInfo, avisoEdad,
   ]);
 
   return (
@@ -812,10 +959,11 @@ export default function EstimadorImpuestoSucesionesPage() {
         <p className={styles.subtitle}>
           Oriéntate sobre el ISD en las 17 comunidades autónomas antes de hablar con tu asesor fiscal
         </p>
+        {/* El sello de la rama que liquida: con Cataluña, el de la Ley 19/2010 (hallazgo 2330). */}
         <p className={styles.metaVerificado}>
-          Datos verificados: {VERIFICADO_SUCESIONES} — Fuente:{' '}
-          <a href={FISCAL_SUCESIONES_META.urlOficial} target="_blank" rel="noopener noreferrer" className={styles.linkFuente}>
-            Agencia Tributaria
+          Datos verificados: {fechaSello(sello.meta.verificado)} — Fuente:{' '}
+          <a href={sello.meta.urlOficial} target="_blank" rel="noopener noreferrer" className={styles.linkFuente}>
+            {sello.organismo}
           </a>
         </p>
       </header>
@@ -921,10 +1069,13 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div className={styles.campo}>
                 <label className={styles.label} htmlFor="edad-heredero">Edad del heredero (años)</label>
                 <input id="edad-heredero" type="number" className={styles.input} value={edad}
-                  onChange={(e) => setEdad(e.target.value)} min="0" max="100" />
+                  onChange={(e) => setEdad(e.target.value)} min="0" step="1"
+                  max={grupo === 'I-descendiente' ? EDAD_LIMITE_GRUPO_I - 1 : EDAD_MAXIMA}
+                  placeholder="Años cumplidos"
+                  aria-invalid={avisoEdad.heredero !== null} />
                 <span className={styles.helper}>
                   {grupo === 'I-descendiente'
-                    ? 'Relevante si es menor de 21 años'
+                    ? `Obligatoria: de 0 a ${EDAD_LIMITE_GRUPO_I - 1} años. La reducción por edad crece por cada año que le falte para los ${EDAD_LIMITE_GRUPO_I}`
                     : `Relevante para la reducción por vivienda habitual: el colateral solo tiene derecho con ${EDAD_MIN_COLATERAL_VIVIENDA_IS} años o más`}
                 </span>
               </div>
@@ -996,7 +1147,8 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div className={styles.campo}>
                 <label className={styles.label} htmlFor="edad-usufructuario">Edad del usufructuario</label>
                 <input id="edad-usufructuario" type="number" className={styles.input} value={edadUsufructuario}
-                  onChange={(e) => setEdadUsufructuario(e.target.value)} min="10" max="89" />
+                  onChange={(e) => setEdadUsufructuario(e.target.value)} min="0" max={EDAD_MAXIMA} step="1"
+                  aria-invalid={avisoEdad.usufructuario !== null} />
                 {/* El helper decía la fórmula abreviada y se comía su techo, que es la mitad
                     del artículo que importa en este campo: por debajo de 20 años el porcentaje
                     no se calcula, son el 70 % (hallazgo 1196). Y cita la norma, como el resto
@@ -1006,8 +1158,9 @@ export default function EstimadorImpuestoSucesionesPage() {
                   {VALORACION_USUFRUCTO_IS.edadUmbralMaximo} años y, desde ahí,{' '}
                   {VALORACION_USUFRUCTO_IS.edadReferencia} − edad, con un mínimo del{' '}
                   {pct(VALORACION_USUFRUCTO_IS.porcMinimo)}
-                  {edadUsufructuario.trim() !== '' &&
-                    ` → ${formatPercentage(porcentajeUsufructoVitalicio(Number.parseInt(edadUsufructuario, 10)), 0)}`}
+                  {/* Solo con una edad posible: con «-5» enseñaba el 70 % (hallazgo 2332). */}
+                  {Number.isFinite(leerEdad(edadUsufructuario) ?? Number.NaN) &&
+                    ` → ${formatPercentage(porcentajeUsufructoVitalicio(leerEdad(edadUsufructuario) ?? 0), 0)}`}
                 </span>
               </div>
             )}
@@ -1057,7 +1210,7 @@ export default function EstimadorImpuestoSucesionesPage() {
 
         {/* ── Panel de resultados ──────────────────────────────────── */}
         <div className={styles.resultsPanel}>
-          {importes.invalidos.length > 0 || porcentajeInvalido ? (
+          {importes.invalidos.length > 0 || porcentajeInvalido || avisoEdad.hay ? (
             /*
               El aviso NOMBRA los campos, y el panel no da ninguna cifra mientras estén así.
               Antes el importe ilegible se convertía en cero y la estimación salía igual: el
@@ -1091,6 +1244,14 @@ export default function EstimadorImpuestoSucesionesPage() {
                   da estimación con ese dato, porque tomarlo como 0 daría un impuesto de cero.
                 </p>
               )}
+              {/* Hallazgos 2325 y 2332: una edad imposible, vacía donde el cálculo la necesita o
+                  que contradice el parentesco no se sustituye por otra: se dice y no hay cifra. */}
+              {[avisoEdad.heredero, avisoEdad.usufructuario].filter((a): a is string => a !== null).map((aviso) => (
+                <p key={aviso}>
+                  <span aria-hidden="true">⚠️</span> {aviso} No se da estimación sin ese dato,
+                  porque suponer una edad cambiaría la cuota sin avisar.
+                </p>
+              ))}
             </div>
           ) : !resultado ? (
             <div className={styles.placeholder}>
@@ -1223,10 +1384,10 @@ export default function EstimadorImpuestoSucesionesPage() {
       />
 
       <DataReference
-        normativa={`ISD ${FISCAL_SUCESIONES_META.vigencia}`}
-        fuente={FISCAL_SUCESIONES_META.fuente}
-        verificado={FISCAL_SUCESIONES_META.verificado}
-        urlOficial={FISCAL_SUCESIONES_META.urlOficial}
+        normativa={sello.normativa}
+        fuente={sello.meta.fuente}
+        verificado={sello.meta.verificado}
+        urlOficial={sello.meta.urlOficial}
       />
 
       {/*
@@ -1338,7 +1499,7 @@ export default function EstimadorImpuestoSucesionesPage() {
             </div>
             <div className={styles.plazoCard}>
               <span className={styles.plazoNum}>+{PLAZO_ISD.mesesProrroga} meses</span>
-              <span>Prórroga solicitando antes de los primeros 5 meses</span>
+              <span>Prórroga, pidiéndola {PLAZO_PEDIR_PRORROGA}</span>
             </div>
           </div>
         </section>
@@ -1366,14 +1527,14 @@ export default function EstimadorImpuestoSucesionesPage() {
                   <td><strong>Grupo I</strong><br /><small>Descendiente &lt;21 a.</small></td>
                   <td>{euros(REDUCCIONES_PARENTESCO_IS['I-descendiente'])} + {euros(REDUCCION_EDAD_MENOR_21_IS)} por año &lt;21 (máx. {euros(REDUCCION_EDAD_MENOR_21_MAX_IS)})</td>
                   <td>{formatNumber(COEFICIENTES_IS['I'][0], 4)} (patrimonio &lt;402.678 €)</td>
-                  <td>99&nbsp;%–100&nbsp;% en Madrid, Canarias, Galicia, Andalucía</td>
+                  <td>{capitalizar(rangoBonificacion(CCAA_BONIF_GRUPO_I, 'I-descendiente'))} en {NOMBRES_CCAA(CCAA_BONIF_GRUPO_I)}</td>
                   <td>Hijo menor de 21 años hereda la vivienda familiar</td>
                 </tr>
                 <tr>
                   <td><strong>Grupo II</strong><br /><small>Descendiente ≥21 a. / cónyuge / ascendiente</small></td>
                   <td>{euros(REDUCCIONES_PARENTESCO_IS['II'])}</td>
                   <td>{formatNumber(COEFICIENTES_IS['II'][0], 4)} (patrimonio &lt;402.678 €)</td>
-                  <td>99&nbsp;%–100&nbsp;% en Madrid, Canarias; en Asturias, reducción de {euros(BONIFICACIONES_CCAA_IS['asturias'].bonificaciones['II']?.reduccionBase ?? 0)} en la base en vez de bonificación</td>
+                  <td>{capitalizar(rangoBonificacion(CCAA_BONIF_GRUPO_II, 'II'))} en {NOMBRES_CCAA(CCAA_BONIF_GRUPO_II)}; en Asturias, reducción de {euros(BONIFICACIONES_CCAA_IS['asturias'].bonificaciones['II']?.reduccionBase ?? 0)} en la base en vez de bonificación</td>
                   <td>Hijo adulto, cónyuge o padre hereda bienes del fallecido</td>
                 </tr>
                 <tr>
@@ -1429,7 +1590,8 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <p><strong>Cuota final estimada: {euros(EJEMPLO_MADRID.cuotaFinal)}</strong></p>
               </div>
               <div className={styles.escenarioTip}>
-                Madrid tiene bonificación del {pct((BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['II']?.porcentaje ?? 0) * 100)} para Grupos I y II. Un hijo paga prácticamente cero.
+                Madrid tiene bonificación del {pct((BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['II']?.porcentaje ?? 0) * 100)} para Grupos I y II: un hijo paga
+                el {pct(RESTO_TRAS_BONIF_II('madrid'), 0)} de la cuota, {euros(EJEMPLO_MADRID.cuotaFinal)} en este ejemplo.
               </div>
             </div>
 
@@ -1553,10 +1715,20 @@ export default function EstimadorImpuestoSucesionesPage() {
             <div className={styles.faqItem}>
               <dt>¿Tengo que pagar si heredo en Madrid o Canarias?</dt>
               <dd>
-                En la práctica, casi nunca. Madrid aplica una bonificación del {pct((BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['II']?.porcentaje ?? 0) * 100)} para los Grupos I y II
-                (cónyuge, descendientes, ascendientes). Canarias aplica el {pct((BONIFICACIONES_CCAA_IS['canarias'].bonificaciones['II']?.porcentaje ?? 0) * 100, 1)} para los mismos grupos.
-                La cuota resultante es de céntimos. Sin embargo, <strong>sí estás obligado a autoliquidar
-                aunque la cuota sea cero</strong>, presentando el modelo 650 en el plazo de {PLAZO_ISD.mesesPresentacion} meses.
+                {/* Decía «En la práctica, casi nunca […] La cuota resultante es de céntimos», y la
+                    herramienta de esta misma página da decenas o cientos de euros: con un 99 % se
+                    paga el 1 % de la cuota, que solo es de céntimos si la base liquidable apenas
+                    llega a 1.300 € (hallazgo 2328). Las cifras salen del motor, no del teclado. */}
+                Sí, aunque poco. Madrid aplica una bonificación del {pct((BONIFICACIONES_CCAA_IS['madrid'].bonificaciones['II']?.porcentaje ?? 0) * 100)} para los Grupos I y II
+                (cónyuge, descendientes, ascendientes) y Canarias, del {pct((BONIFICACIONES_CCAA_IS['canarias'].bonificaciones['II']?.porcentaje ?? 0) * 100, 1)} para los mismos grupos:
+                se paga el {pct(RESTO_TRAS_BONIF_II('madrid'), 0)} de la cuota en Madrid y
+                el {pct(RESTO_TRAS_BONIF_II('canarias'), 1)} en Canarias: poco, pero no cero, y en Madrid
+                una herencia normal deja decenas o cientos de euros. Con {euros(COMPARATIVA_CCAA.baseImponible)} heredados por un
+                hijo, {euros(COMPARATIVA_CCAA.viviendaHabitual)} de ellos en la vivienda habitual, esta
+                calculadora liquida {euros(EJEMPLO_MADRID_COMPARATIVA.cuotaFinal)} en Madrid
+                y {euros(EJEMPLO_CANARIAS_COMPARATIVA.cuotaFinal)} en Canarias. Y aunque la cuota
+                fuera cero, <strong>sí estás obligado a autoliquidar</strong>, presentando el modelo 650
+                en el plazo de {PLAZO_ISD.mesesPresentacion} meses.
                 <div className={styles.faqTip}>Presentar aunque la cuota sea 0 evita sanciones por extemporaneidad.</div>
               </dd>
             </div>
@@ -1732,8 +1904,8 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <p>
                   La CCAA competente es donde residía el causante (fallecido) de forma habitual
                   durante los 5 años anteriores al fallecimiento. Plazo: <strong>{PLAZO_ISD.mesesPresentacion} meses</strong>
-                  desde el fallecimiento. Se puede solicitar prórroga de {PLAZO_ISD.mesesProrroga} meses adicionales
-                  antes de que expiren los primeros 5 meses. El modelo 650 se presenta online
+                  desde el fallecimiento. Se puede solicitar prórroga de {PLAZO_ISD.mesesProrroga} meses adicionales{' '}
+                  {PLAZO_PEDIR_PRORROGA} ({PLAZO_ISD.norma}). El modelo 650 se presenta online
                   en el portal tributario de la CCAA correspondiente.
                 </p>
               </div>
@@ -1760,10 +1932,10 @@ export default function EstimadorImpuestoSucesionesPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">⏰</span>
               <div>
-                <strong>Solicita la prórroga antes del mes 5</strong>
+                <strong>Solicita la prórroga {PLAZO_PEDIR_PRORROGA}</strong>
                 <p>
-                  Si no tienes tiempo de tramitar la herencia en {PLAZO_ISD.mesesPresentacion} meses, solicita la prórroga
-                  antes de que expiren los primeros {PLAZO_ISD.mesesParaPedirProrroga} meses. La prórroga es de {PLAZO_ISD.mesesProrroga} meses adicionales y
+                  Si no tienes tiempo de tramitar la herencia en {PLAZO_ISD.mesesPresentacion} meses, solicita la prórroga{' '}
+                  {PLAZO_PEDIR_PRORROGA}. La prórroga es de {PLAZO_ISD.mesesProrroga} meses adicionales y
                   evita el recargo por presentación extemporánea, pero <strong>no es gratis</strong>:
                   devenga intereses de demora desde que vencen los {PLAZO_ISD.mesesPresentacion} meses hasta que presentas
                   ({PLAZO_ISD.norma}).
@@ -1801,8 +1973,11 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div>
                 <strong>Declara el ajuar doméstico correctamente</strong>
                 <p>
-                  Hacienda presume el {pct(PORC_AJUAR_DOMESTICO_IS * 100, 0)} del valor de
-                  la masa hereditaria neta como ajuar doméstico.
+                  {/* Decía «de la masa hereditaria neta», que en el panel incluye los seguros de
+                      vida; el art. 15 LISD dice caudal relicto, y así calcula la app (hallazgo 2329). */}
+                  Hacienda presume el {pct(PORC_AJUAR_DOMESTICO_IS * 100, 0)} del caudal
+                  relicto —lo que deja el fallecido, sin los seguros de vida— como ajuar doméstico
+                  (art. 15 LISD).
                   Si los muebles, ropa y enseres valen menos, puedes impugnar esta presunción
                   aportando inventario valorado. En una herencia de {euros(EJEMPLO_AJUAR_HERENCIA)}, el
                   ajuar presunto es de {euros(EJEMPLO_AJUAR_PRESUNTO)}, lo que
@@ -1834,9 +2009,9 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div>
                 <strong>Liquida aunque la cuota sea cero</strong>
                 <p>
-                  En CCAA con bonificación del 99&nbsp;%–100&nbsp;% (Madrid, Canarias, Galicia), la cuota
-                  resultante es prácticamente cero pero la obligación de presentar el modelo 650
-                  subsiste. No presentar en plazo puede acarrear una sanción por infracción
+                  En comunidades con bonificación {rangoBonificacion(CCAA_CUOTA_CASI_CERO, 'II')}{' '}
+                  ({NOMBRES_CCAA(CCAA_CUOTA_CASI_CERO)}) la cuota que queda suele ser pequeña, o cero
+                  con exención, pero la obligación de presentar el modelo 650 subsiste. No presentar en plazo puede acarrear una sanción por infracción
                   formal (art. 198 de la Ley General Tributaria) y complicar la inscripción de
                   los bienes.
                 </p>
@@ -1871,8 +2046,9 @@ export default function EstimadorImpuestoSucesionesPage() {
               </li>
               <li>
                 <strong>No solicitar prórroga en tiempo.</strong> La prórroga de {PLAZO_ISD.mesesProrroga} meses solo puede
-                pedirse antes de que expiren los primeros 5 meses. Si esperas al mes 6, ya no es
-                posible: el plazo ha vencido y cualquier presentación fuera de plazo genera recargo.
+                pedirse {PLAZO_PEDIR_PRORROGA}. Pasados esos {PLAZO_ISD.mesesParaPedirProrroga} meses ya no
+                es posible: queda el plazo ordinario de {PLAZO_ISD.mesesPresentacion} meses, y presentar
+                después genera recargo.
               </li>
               <li>
                 <strong>Ignorar el ajuar doméstico.</strong> Hacienda presume automáticamente el

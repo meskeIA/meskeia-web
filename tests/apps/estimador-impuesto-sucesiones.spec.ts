@@ -25,7 +25,9 @@ import {
   BONIFICACIONES_CCAA_IS,
   FISCAL_SUCESIONES_CATALUNA_META,
   FISCAL_SUCESIONES_META,
+  PLAZO_ISD,
 } from '../../data/fiscal/sucesiones';
+import { calcularSucesion } from '../../lib/calculadoras/sucesiones';
 
 const RUTA = '/estimador-impuesto-sucesiones/';
 
@@ -1191,8 +1193,12 @@ test.describe('Re-inspección 21/09/2026 — Baleares al 95 %, el millón de And
     expect(respuesta, 'la prórroga NO es gratis (art. 68.3)').toContain('intereses de demora');
 
     // Y la página visible dice lo mismo, no otra cosa
+    // Desde el 27/09/2026 (hallazgo 2331) la página lo redacta como el art. 68.1 RISD y el
+    // faqJsonLd, «dentro de los 5 primeros meses»; «antes de los primeros 5 meses» y, sobre todo,
+    // «antes del mes 5» —que es un mes menos— quedan fuera.
     const visible = await textoCompleto(page);
-    expect(visible).toContain('los primeros 5 meses');
+    expect(visible).toContain(`dentro de los ${PLAZO_ISD.mesesParaPedirProrroga} primeros meses`);
+    expect(visible).not.toMatch(/antes del mes \d/);
     expect(visible).not.toMatch(/prórroga[^.]{0,80}antes de que venza el (primer )?plazo/i);
   });
 
@@ -2377,55 +2383,98 @@ test.describe('Re-inspección 27/09/2026', () => {
   });
 
   /**
-   * CASO A RECHAZAR — ABIERTO (operativa, medio): «Descendiente menor de 21 años» con una edad de
-   * 21 o más, que es justo la que viene PRELLENADA (35) al elegir ese parentesco.
-   *
-   * El grupo dice «menor de 21» y el campo dice 35, y la app liquida sin decir nada: sin reducción
-   * por edad (art. 20.2.a) y, en Cataluña, con la escala de bonificación del GRUPO I del art. 58
-   * bis (99 % → 20 %), que la ley reserva a los menores de 21. Con 300.000 € en cuentas:
+   * CASO A RECHAZAR — REPARADO 27/09/2026 (hallazgo 2325, operativa, medio): «Descendiente menor
+   * de 21 años» llegaba con la edad PRELLENADA en 35, y la app liquidaba sin decir nada: sin
+   * reducción por edad (art. 20.2.a) y, en Cataluña, con la escala de bonificación del GRUPO I del
+   * art. 58 bis (99 % → 20 %), que la ley reserva a los menores de 21. Con 300.000 € en cuentas:
    *   base imponible 309.000 − 100.000 (REDUCCIONES_PARENTESCO_CATALUNA_IS) = 209.000 de base
    *   liquidable → TARIFA_CATALUNA_IS: 14.500 + 17 % × 59.000 = 24.530,00 de cuota
-   *   · escala del Grupo I sobre 309.000 € → 96,80 % → la app publica 785,91 €
+   *   · escala del Grupo I sobre 309.000 € → 96,80 % → la app publicaba 785,91 €
    *   · un hijo de 35 años es Grupo II: escala del Grupo II → 54,71 % → 11.109,95 €
    *   · un menor de 10 años reduce 196.000 € (tope del art. 2 Ley 19/2010) → otra cifra
-   * Los 785,91 € no corresponden a ninguna situación posible. Esperado: la app se abstiene y
-   * nombra la contradicción, como hace con los importes que no puede leer.
+   * Los 785,91 € no correspondían a ninguna situación posible.
+   *
+   * El testigo del acta empezaba afirmando `toHaveValue('35')`: consagraba el prellenado, que es
+   * la mitad del defecto. Ahora el campo llega VACÍO, y la app exige para ese grupo una edad de 0
+   * a 20: vacía o 35 → aviso que la nombra y ninguna cifra; 10 → cifra, con la reducción rotulada.
    */
-  test('caso a rechazar: «menor de 21» con la edad prellenada de 35 no da una cuota imposible', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la app liquida «menor de 21» con 35 años sin avisar (Inspector 27/09/2026)');
+  test('caso a rechazar: «menor de 21» sin edad o con 35 no da una cuota imposible', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('cataluna');
     await page.locator('#parentesco').selectOption('I-descendiente');
-    await expect(page.locator('#edad-heredero')).toHaveValue('35');
+    await expect(page.locator('#edad-heredero'), 'la edad no llega prellenada').toHaveValue('');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '300000');
 
-    const aviso = page.getByRole('alert').filter({ hasText: /edad|21 años/i });
-    await expect(aviso).toBeVisible();
+    const aviso = page.locator('[class*="resultsPanel"]').getByRole('alert');
+    await expect(aviso).toContainText(/edad del heredero/i);
     await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+
+    await sembrarValor(page, page.locator('#edad-heredero'), '35');
+    await expect(aviso).toContainText('contradice el parentesco');
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+    await expect(page.getByText('785,91 €')).toHaveCount(0);
+
+    // Con una edad del Grupo I la estimación vuelve, y la reducción dice la edad escrita.
+    await sembrarValor(page, page.locator('#edad-heredero'), '10');
+    await expect(page.getByText(/^Impuesto estimado en/)).toBeVisible();
+    await expect(aviso).toHaveCount(0);
+    await expect(lineaDelPanel(page, /Por edad/)).toContainText('heredero de 10 años, menor de 21');
   });
 
   /**
-   * ABIERTO (operativa, bajo): edades imposibles sin aviso. La edad del usufructuario «-5» se
-   * liquida con el 70 % de usufructo (el techo del art. 26.a para menores de 20) y la del heredero
-   * «-3» se rotula «heredero de -3 años, menor de 21». Vacía, la del usufructuario se toma como 70
-   * años sin decirlo (19 %). Los importes negativos se rechazan con aviso desde el 740; las edades no.
+   * REPARADO 27/09/2026 (hallazgo 2332, operativa, bajo): edades imposibles sin aviso. La edad del
+   * usufructuario «-5» se liquidaba con el 70 % de usufructo (el techo del art. 26.a para menores
+   * de 20), vacía se tomaba como 70 años sin decirlo (19 %) y con «150» salía el 10 %; la del
+   * heredero «-3» se rotulaba «heredero de -3 años, menor de 21». Los importes negativos se
+   * rechazan con aviso desde el 740; las edades siguen ahora la misma regla.
    *
-   * Galicia · Grupo III · 100.000 € · usufructo con «-5»: 103.000 × 70 % = 72.100 − 7993,46 =
-   * 64.106,54 → 6.789,79 + 14,45 % × 200,92 = 6818,82 × 1,5882 = 10.829,65 € (lo que publica).
+   * Galicia · Grupo III · 100.000 € · usufructo con «-5»: la app publicaba 10.829,65 €
+   * (103.000 × 70 % = 72.100 − 7993,46 = 64.106,54 → 6818,82 × 1,5882).
    */
-  test('una edad del usufructuario negativa no se liquida como la de un menor de 20', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «-5» se acepta y se liquida con el 70 % (Inspector 27/09/2026)');
+  test('una edad del usufructuario negativa, vacía o absurda no se liquida con un porcentaje supuesto', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('galicia');
     await page.locator('#parentesco').selectOption('III');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
     await page.getByRole('radio', { name: 'Usufructo' }).check();
-    await sembrarValor(page, page.locator('#edad-usufructuario'), '-5');
+    const aviso = page.locator('[class*="resultsPanel"]').getByRole('alert');
+    const helper = page.locator('#edad-usufructuario').locator('xpath=following-sibling::span[1]');
 
-    await expect(page.getByRole('alert').filter({ hasText: /edad/i })).toBeVisible();
+    for (const edad of ['-5', '', '150']) {
+      await sembrarValor(page, page.locator('#edad-usufructuario'), edad);
+      await expect(aviso, `edad del usufructuario «${edad}»`).toContainText(/edad del usufructuario/i);
+      await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+      // El helper tampoco enseña el porcentaje de una edad que no existe.
+      await expect(helper).not.toContainText('→');
+    }
+    await expect(page.getByText('10.829,65 €')).toHaveCount(0);
+
+    // Con una edad posible, la cifra vuelve: 60 años → 89 − 60 = 29 %.
+    await sembrarValor(page, page.locator('#edad-usufructuario'), '60');
+    await expect(aviso).toHaveCount(0);
+    expect(await importeDelPanel(page, /Tipo adquisición \(usufructo\)/)).toBe('29,0 %');
+  });
+
+  /** Y el heredero con edad negativa, que el desglose rotulaba tal cual (hallazgo 2332). */
+  test('una edad del heredero negativa o imposible no llega al desglose', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('extremadura');
+    await page.locator('#parentesco').selectOption('I-descendiente');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+    await sembrarValor(page, page.locator('#edad-heredero'), '-3');
+
+    const aviso = page.locator('[class*="resultsPanel"]').getByRole('alert');
+    await expect(aviso).toContainText(/edad del heredero/i);
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+    await expect(page.getByText(/heredero de -\d/)).toHaveCount(0);
+
+    // Y un colateral con una edad imposible tampoco se liquida.
+    await page.locator('#parentesco').selectOption('III');
+    await sembrarValor(page, page.locator('#edad-heredero'), '200');
+    await expect(aviso).toContainText(/edad del heredero/i);
     await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
   });
 
   /**
-   * ABIERTO (contenido, medio): la FAQ «¿Tengo que pagar si heredo en Madrid o Canarias?» responde
+   * REPARADO 27/09/2026 (hallazgo 2328, contenido, medio): la FAQ «¿Tengo que pagar si heredo en
+   * Madrid o Canarias?» respondía
    * «En la práctica, casi nunca […] La cuota resultante es de céntimos». La herramienta de la
    * misma página lo desmiente con una herencia modesta:
    *   Madrid · hijo · 50.000 € en cuentas → 51.500 − 15.956,87 = 35.543,13 de base liquidable
@@ -2434,7 +2483,6 @@ test.describe('Re-inspección 27/09/2026', () => {
    * céntimos la base liquidable tendría que quedar por debajo de ~1.300 €.
    */
   test('la FAQ de Madrid y Canarias no promete una cuota «de céntimos» que la herramienta no da', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la FAQ dice «La cuota resultante es de céntimos» (Inspector 27/09/2026)');
     await page.locator('#ccaa-causante').selectOption('madrid');
     await page.locator('#parentesco').selectOption('II');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '50000');
@@ -2443,11 +2491,17 @@ test.describe('Re-inspección 27/09/2026', () => {
     const texto = await textoCompleto(page);
     const desde = texto.indexOf('¿Tengo que pagar si heredo en Madrid o Canarias?');
     expect(desde, 'la pregunta sigue en la FAQ').toBeGreaterThan(-1);
-    expect(texto.slice(desde, desde + 450)).not.toContain('La cuota resultante es de céntimos');
+    const respuesta = texto.slice(desde, desde + 900);
+    expect(respuesta).not.toContain('céntimos');
+    expect(respuesta).not.toContain('casi nunca');
+    // Y dice lo que la herramienta liquida: el 1 % de la cuota, con la cifra del caso normal del
+    // 11/09 (Madrid, hijo, 250.000 € con 200.000 € de vivienda habitual).
+    expect(respuesta).toMatch(/1\s%\sde la cuota/);
+    expect(respuesta).toContain('154,74 €');
   });
 
   /**
-   * ABIERTO (contenido, bajo) — residuo del 1824. El consejo «Declara el ajuar doméstico
+   * REPARADO 27/09/2026 (hallazgo 2329, contenido, bajo) — residuo del 1824. El consejo «Declara el ajuar doméstico
    * correctamente» dice «Hacienda presume el 3 % del valor de la masa hereditaria neta», y la
    * «Masa hereditaria neta» del panel INCLUYE los seguros de vida, sobre los que la app ya no
    * calcula ajuar (art. 15 LISD: «caudal relicto»). Galicia · Grupo IV · solo 100.000 € de seguro:
@@ -2455,7 +2509,6 @@ test.describe('Re-inspección 27/09/2026', () => {
    * 3000 €. Los pasos del cálculo y la lista de errores de la misma guía ya dicen «caudal relicto».
    */
   test('el consejo del ajuar habla del caudal relicto, como el cálculo, y no de la masa neta', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el consejo sigue diciendo «masa hereditaria neta» (Inspector 27/09/2026)');
     await page.locator('#ccaa-causante').selectOption('galicia');
     await page.locator('#parentesco').selectOption('IV');
     await sembrarValor(page, page.locator('#seguros-vida'), '100000');
@@ -2466,10 +2519,11 @@ test.describe('Re-inspección 27/09/2026', () => {
     const desde = texto.indexOf('Declara el ajuar doméstico correctamente');
     expect(desde).toBeGreaterThan(-1);
     expect(texto.slice(desde, desde + 300)).not.toContain('masa hereditaria neta');
+    expect(texto.slice(desde, desde + 300)).toContain('caudal relicto');
   });
 
   /**
-   * ABIERTO (contenido, bajo) — era la SOSPECHA S1. Con Cataluña elegida la app liquida con la
+   * REPARADO 27/09/2026 (hallazgo 2330, contenido, bajo) — era la SOSPECHA S1. Con Cataluña elegida la app liquida con la
    * rama catalana de `data/fiscal` (Ley 19/2010: tarifa 7-32 %, 100.000 € al hijo, escala del
    * art. 58 bis), que tiene su propio sello —`FISCAL_SUCESIONES_CATALUNA_META`, verificado el
    * 08/09/2026, fuente Agència Tributària de Catalunya—, pero el hero y el DataReference solo dan
@@ -2478,7 +2532,6 @@ test.describe('Re-inspección 27/09/2026', () => {
    * para el mismo cálculo. Lo esperado se deriva del sello, para que re-sellar no rompa el testigo.
    */
   test('con Cataluña elegida la página da el sello de la rama catalana que liquida', async ({ page }) => {
-    test.fail(true, 'ABIERTO: con Cataluña solo se ve el sello del módulo, 01/01/2025 (Inspector 27/09/2026)');
     const [anio, mes, dia] = FISCAL_SUCESIONES_CATALUNA_META.verificado.split('-');
     await page.locator('#ccaa-causante').selectOption('cataluna');
     await page.locator('#parentesco').selectOption('II');
@@ -2490,10 +2543,34 @@ test.describe('Re-inspección 27/09/2026', () => {
     const sello = `${dia}/${mes}/${anio}`;
     const texto = await textoCompleto(page);
     expect(texto.includes(sello), `la página no da el sello de la rama catalana (${sello})`).toBe(true);
+
+    // El hero y el DataReference dan el sello y la fuente que `calcularSucesion` pone en
+    // `fuenteDatos` para ese mismo cálculo: la web y el MCP no pueden volver a citar dos fuentes.
+    const selloDelMotor = (ccaa: string) => {
+      const [fuente, iso] = calcularSucesion({ baseImponible: 250000, ccaa, grupo: 'II' }).fuenteDatos.split(' — verificado ');
+      const [a, m, d] = iso.split('-');
+      return { fuente, fecha: `${d}/${m}/${a}` };
+    };
+    const catalan = selloDelMotor('cataluna');
+    const referencia = page.getByRole('note', { name: 'Datos de referencia normativos' });
+    await expect(referencia).toContainText(catalan.fuente);
+    await expect(referencia).toContainText(catalan.fecha);
+    const hero = page.locator('[class*="metaVerificado"]');
+    await expect(hero).toContainText(`Datos verificados: ${catalan.fecha}`);
+    await expect(hero).toContainText('Agència Tributària de Catalunya');
+
+    // Con otra comunidad, el sello del módulo, y el catalán desaparece.
+    await page.locator('#ccaa-causante').selectOption('madrid');
+    const general = selloDelMotor('madrid');
+    await expect(referencia).toContainText(general.fuente);
+    await expect(referencia).toContainText(general.fecha);
+    await expect(hero).toContainText(`Datos verificados: ${general.fecha}`);
+    await expect(hero).not.toContainText('Agència');
+    await expect(referencia).not.toContainText(catalan.fecha);
   });
 
   /**
-   * ABIERTO (dato, bajo) — residuo del 1829: datos normativos TECLEADOS donde hay constante.
+   * REPARADO 27/09/2026 (hallazgo 2331, dato, bajo) — residuo del 1829: datos normativos TECLEADOS donde hay constante.
    *  · «5 meses» para pedir la prórroga en cuatro sitios (tarjeta de plazos, paso 6, consejo «antes
    *    del mes 5» y lista de errores «primeros 5 meses… mes 6»), con `PLAZO_ISD.mesesParaPedirProrroga`
    *    sellado desde el 13/09/2026 y usado en el párrafo de al lado. «Antes del mes 5» además dice
@@ -2503,17 +2580,19 @@ test.describe('Re-inspección 27/09/2026', () => {
    *    tabla para Asturias y para el Grupo III. Hoy cuadran; es la forma que ya divergió en el 1829.
    */
   test('los plazos y bonificaciones de la guía no van tecleados', async () => {
-    test.fail(true, 'ABIERTO: «5 meses» y «99 %–100 %» siguen tecleados (Inspector 27/09/2026)');
     const jsx = readFileSync(join(process.cwd(), 'app/estimador-impuesto-sucesiones/page.tsx'), 'utf8');
     const lineas = jsx.split('\n').filter((l) => !/^\s*(\/\/|\*|\/\*|\{\/\*)/.test(l));
     const codigo = lineas.join('\n');
     for (const tecleada of ['primeros 5 meses', 'antes del mes 5', 'mes 6', '99&nbsp;%–100&nbsp;%']) {
       expect(codigo, `sigue tecleado: ${tecleada}`).not.toContain(tecleada);
     }
+    // Y lo que los sustituye sale de data/fiscal.
+    expect(codigo).toContain('PLAZO_ISD.mesesParaPedirProrroga');
+    expect(codigo).toMatch(/rangoBonificacion\(CCAA_BONIF_GRUPO_I,/);
   });
 
   /**
-   * ABIERTO (accesibilidad, medio) — era la SOSPECHA S3, MEDIDA. El módulo redeclara
+   * REPARADO 27/09/2026 (hallazgo 2326, accesibilidad, medio) — era la SOSPECHA S3, MEDIDA. El módulo redeclara
    * `--primary: #2E86AB` en `.container` y NO en `[data-theme='dark'] .container`, así que el
    * `--primary` oscuro de globals.css (#3FA5D1) nunca llega: en oscuro sigue el azul del claro.
    * Texto en color de marca, medido con getComputedStyle sobre el fondo efectivo:
@@ -2528,7 +2607,6 @@ test.describe('Re-inspección 27/09/2026', () => {
    * comprueba que el estilo cambió de verdad antes de medir.
    */
   test('el texto en color de marca llega a 4,5:1 en claro y en oscuro', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «CUOTA A INGRESAR» da 4,11:1 en claro y 3,50:1 en oscuro (Inspector 27/09/2026)');
     await page.locator('#ccaa-causante').selectOption('murcia');
     await page.locator('#parentesco').selectOption('III');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
@@ -2562,23 +2640,30 @@ test.describe('Re-inspección 27/09/2026', () => {
   });
 
   /**
-   * ABIERTO (accesibilidad, medio): el bloque «Impuesto estimado» pinta texto BLANCO sobre el
-   * degradado de marca (#2E86AB → #48A9A6, igual en los dos temas porque el módulo fija los dos
-   * colores en `.container`). En el extremo teal:
+   * REPARADO 27/09/2026 (hallazgo 2327, accesibilidad, medio): el bloque «Impuesto estimado»
+   * pintaba texto BLANCO sobre el degradado de marca (#2E86AB → #48A9A6, igual en los dos temas
+   * porque el módulo fijaba los dos colores en `.container`). En el extremo teal:
    *   · la cifra (35 px / 700, texto grande, umbral 3:1): 2,80:1
    *   · «Impuesto estimado en …» (14,4 px, opacidad 0,9): 2,55:1; en el azul, 3,65:1
    *   · «Tipo efectivo» (13 px, opacidad 0,8): 2,32:1; en el azul, 3,22:1
-   * Es la «campaña aparte» de fondos de marca que el candado de cabeceras deja fuera, aquí sobre
-   * el dato principal de una app de riesgo 1. Se mide contra las dos paradas del degradado.
+   * Ahora el fondo es `--hero-bg` liso y sin opacidades en los rótulos.
+   *
+   * El testigo del acta medía SOLO contra las paradas del `background-image`: con un fondo liso
+   * no hay paradas, `Math.min()` de nada es `Infinity` y el test habría pasado en verde sin medir.
+   * Ahora mide contra las paradas si hay degradado y contra el `background-color` si no, exige
+   * al menos un fondo, compone el fondo propio de cada rótulo y lo hace en los DOS temas.
    */
-  test('el importe destacado y sus rótulos se leen sobre las dos paradas del degradado', async ({ page }) => {
-    test.fail(true, 'ABIERTO: blanco sobre #48A9A6 da 2,32-2,80:1 (Inspector 27/09/2026)');
+  test('el importe destacado y sus rótulos se leen sobre su fondo, en claro y en oscuro', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('murcia');
     await page.locator('#parentesco').selectOption('III');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
     await expect(page.getByText(/^Impuesto estimado en/)).toBeVisible();
 
-    const medidas = await page.locator('[class*="resultadoDestacado"]').evaluate((caja) => {
+    const medir = () => page.locator('[class*="resultadoDestacado"]').evaluate((caja) => {
+      const rgba = (texto: string) => {
+        const p = (texto.match(/rgba?\(([^)]+)\)/)?.[1] ?? '0,0,0,0').split(/[ ,/]+/).filter(Boolean).map(Number);
+        return { c: p.slice(0, 3), a: p.length > 3 ? p[3] : 1 };
+      };
       const lum = (c: number[]) => {
         const t = (v: number) => {
           const x = v / 255;
@@ -2586,27 +2671,46 @@ test.describe('Re-inspección 27/09/2026', () => {
         };
         return 0.2126 * t(c[0]) + 0.7152 * t(c[1]) + 0.0722 * t(c[2]);
       };
-      const paradas = [...getComputedStyle(caja).backgroundImage.matchAll(/rgba?\(([^)]+)\)/g)].map((m) =>
-        m[1].split(/[ ,/]+/).filter(Boolean).slice(0, 3).map(Number),
-      );
-      return [...caja.children].map((hijo) => {
-        const cs = getComputedStyle(hijo);
-        const alfa = Number(cs.opacity);
-        const color = (cs.color.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
-        const px = parseFloat(cs.fontSize);
-        const grande = px >= 24 || (px >= 18.66 && Number(cs.fontWeight) >= 700);
+      const cs = getComputedStyle(caja);
+      const degradado = [...cs.backgroundImage.matchAll(/rgba?\(([^)]+)\)/g)].map((m) => rgba(m[0]).c);
+      const liso = rgba(cs.backgroundColor);
+      const paradas = degradado.length > 0 ? degradado : liso.a > 0 ? [liso.c] : [];
+      const hijos = [...caja.children].map((hijo) => {
+        const h = getComputedStyle(hijo);
+        const alfa = Number(h.opacity);
+        const color = rgba(h.color).c;
+        const propio = rgba(h.backgroundColor);
+        const px = parseFloat(h.fontSize);
+        const grande = px >= 24 || (px >= 18.66 && Number(h.fontWeight) >= 700);
         const peor = Math.min(
           ...paradas.map((p) => {
-            const efectivo = color.map((v, i) => v * alfa + p[i] * (1 - alfa));
-            const [a, b] = [lum(efectivo), lum(p)];
+            const fondo = p.map((v, i) => propio.c[i] * propio.a + v * (1 - propio.a));
+            const efectivo = color.map((v, i) => v * alfa + fondo[i] * (1 - alfa));
+            const [a, b] = [lum(efectivo), lum(fondo)];
             return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
           }),
         );
         return { texto: (hijo as HTMLElement).innerText.slice(0, 30), ratio: Math.round(peor * 100) / 100, umbral: grande ? 3 : 4.5 };
       });
+      return { fondos: paradas.length, hijos };
     });
-    expect(medidas.length).toBeGreaterThanOrEqual(3);
-    expect(medidas.filter((m) => m.ratio < m.umbral).map((m) => `${m.texto}: ${m.ratio}:1`)).toEqual([]);
+
+    const claro = await medir();
+    const contenedor = page.locator('header[class*="hero"]').locator('xpath=..');
+    const fondoClaro = await contenedor.evaluate((e) => getComputedStyle(e).backgroundColor);
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect
+      .poll(() => contenedor.evaluate((e) => getComputedStyle(e).backgroundColor), { message: 'el tema oscuro se aplicó' })
+      .not.toBe(fondoClaro);
+    await page.waitForTimeout(700); // transición de 0,3 s de globals.css
+    const oscuro = await medir();
+
+    for (const [tema, m] of [['claro', claro], ['oscuro', oscuro]] as const) {
+      expect(m.fondos, `${tema}: el bloque tiene un fondo que medir`).toBeGreaterThanOrEqual(1);
+      expect(m.hijos.length).toBeGreaterThanOrEqual(3);
+      expect(m.hijos.filter((h) => h.ratio < h.umbral).map((h) => `${tema} ${h.texto}: ${h.ratio}:1`)).toEqual([]);
+    }
   });
 });
 
