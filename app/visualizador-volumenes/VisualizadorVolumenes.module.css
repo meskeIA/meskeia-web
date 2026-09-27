@@ -831,5 +831,14 @@
 @media (max-width: 768px) {
   .hero {
     padding-top: 80px;
+    /* Los 80px de arriba empujaron el resultado 6px bajo el pliegue a 390×844 (testigo 1222):
+       se devuelven 12px de abajo, entre el hero y la rejilla, sin tocar el hueco del logo. */
+    padding-bottom: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .mainGrid {
+    padding-top: 1rem;
   }
 }
