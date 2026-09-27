@@ -318,7 +318,7 @@ test.describe('Inspector 25/09/2026', () => {
     await page.getByRole('button', { name: 'Calcular', exact: true }).click();
     const h3 = page.getByRole('heading', { level: 3, name: 'Salario Neto Anual', exact: true });
     await expect(h3).toBeVisible();
-    expect(limpiar(await h3.locator('xpath=../following-sibling::div[1]//p').innerText())).toBe('32.600,25€');
+    expect(limpiar(await h3.locator('xpath=../following-sibling::div[1]//p').innerText())).toBe('32.600,25 €');
   });
 
   // ───────────────────────────────────────────────────────────────────────────
