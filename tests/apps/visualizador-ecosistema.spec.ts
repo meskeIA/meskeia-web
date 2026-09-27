@@ -25,8 +25,9 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *
  * RE-INSPECCIÓN del 27/09/2026: los diez REPARADOS se verificaron en el navegador (escritorio
  *   1280, móvil 393 × 851 y tema oscuro aplicado tras la hidratación) y aguantan. Dos defectos
- *   nuevos quedan con test.fail al final del fichero: la sospecha S1 (complejidad-estabilidad) y
- *   el aria-label de la pirámide que oculta al lector la energía de cada nivel.
+ *   nuevos quedaron al final del fichero: la sospecha S1 (complejidad-estabilidad) y el
+ *   aria-label de la pirámide que ocultaba al lector la energía de cada nivel. REPARADOS el mismo
+ *   27/09/2026 (hallazgos 2314 y 2315): sus test.fail ya son test normales.
  *
  * LOS DEFECTOS QUE DEJÓ DOCUMENTADOS la inspección del 25/09/2026 (hoy REPARADOS, f03c1260)
  *   · Sospecha confirmada: la regla del 10 % se enuncia como ley exacta («solo el 10% de la
@@ -600,10 +601,10 @@ test('contraste — barrido de todo el texto propio de la app en oscuro, con fic
   expect(fallos).toEqual([]);
 });
 
-// ─── Defectos NUEVOS de la re-inspección del 27/09/2026 (test.fail: expresan lo CORRECTO) ─────
+// ─── Defectos NUEVOS de la re-inspección del 27/09/2026 (REPARADOS el mismo día) ───────────────
 
-// ABIERTO: S1 confirmada — «más conexiones = más estable / más resiliente» se afirma como hecho
-// en cinco sitios: la tarjeta de la red trófica («Más estable.»), el recuadro de Datos
+// REPARADO 27/09/2026 (hallazgo 2314). S1 confirmada — «más conexiones = más estable / más
+// resiliente» se afirmaba como hecho en cinco sitios: la tarjeta de la red trófica («Más estable.»), el recuadro de Datos
 // fascinantes, dos párrafos de la guía y la 3.ª respuesta del FAQPage. Es el debate
 // complejidad-estabilidad, no una ley: May (1972, Nature 238: 413-414) mostró que un sistema
 // ensamblado al azar es estable hasta un nivel crítico de conectancia y, al subirla, «se vuelve
@@ -613,7 +614,12 @@ test('contraste — barrido de todo el texto propio de la app en oscuro, con fic
 // Williams y Martinez (2002, Ecology Letters 5: 558-567) hallan que la ROBUSTEZ ante extinciones
 // secundarias crece con la conectancia pero «parece independiente de la riqueza de especies».
 // Esperado: la relación presentada como hipótesis discutida. Obtenido: las frases de abajo.
-test.fail('S1 — la relación conexiones-estabilidad no se afirma como hecho sin matiz', async ({ page }) => {
+// La reparación quitó «Más estable.» de la tarjeta y reescribió el recuadro, los dos párrafos de
+// la guía y el FAQPage como debate abierto (May, 1972; McCann, 2000), con lo medido por Dunne et
+// al. (2002): la robustez crece con la conectancia, no con la riqueza de especies. Además de que
+// no quede ninguna de las cinco frases, el testigo exige que el recuadro y el FAQPage nombren el
+// debate: sin eso, borrar las frases sin matizar nada también pasaría.
+test('S1 — la relación conexiones-estabilidad no se afirma como hecho sin matiz', async ({ page }) => {
   await irA(page, 'Datos fascinantes');
   const tarjetaRed = (await page.locator('div[class*="redColReal"] p').textContent()) ?? '';
   const recuadro = (await contenido(page).locator('div[class*="insight"]').textContent()) ?? '';
@@ -640,17 +646,31 @@ test.fail('S1 — la relación conexiones-estabilidad no se afirma como hecho si
     /más estables ecológicamente porque/.test(faq) && 'FAQPage: «Las redes tróficas son más estables ecológicamente porque…»',
   ].filter(Boolean);
   expect(sinMatiz).toEqual([]);
+  expect(recuadro).toMatch(/debate abierto/);
+  expect(recuadro).toMatch(/May \(1972\)/);
+  expect(recuadro).toMatch(/no con el número de especies/);
+  expect(faq).toMatch(/debate abierto/);
+  expect(faq).toMatch(/no con el número de especies \(Dunne et al\., 2002\)/);
+  expect(texto).toMatch(/debate abierto en ecología \(May, 1972; McCann, 2000\)/);
 });
 
-// ABIERTO: el aria-label de cada nivel de la pirámide SUSTITUYE su contenido visible. El lector
-// oye «Consumidores terciarios: Águilas, Lobos, Atún, Tiburones, Orcas» y nunca «≈ 0,1 % de la
+// REPARADO 27/09/2026 (hallazgo 2315): el aria-label de cada nivel de la pirámide SUSTITUÍA su
+// contenido visible. El lector oía «Consumidores terciarios: Águilas, Lobos, Atún, Tiburones, Orcas» y nunca «≈ 0,1 % de la
 // energía de los productores», que es el dato que la pirámide enseña (y la ficha que abre
 // tampoco lo repite). Esperado, de lo que se ve en el botón: el nombre accesible contiene la
-// energía del nivel — 0,1 %, 1 %, 10 % y 100 % de arriba abajo.
-test.fail('accesibilidad — el nombre accesible de cada nivel de la pirámide incluye su energía', async ({ page }) => {
+// energía del nivel — 0,1 %, 1 %, 10 % y 100 % de arriba abajo. La reparación antepone el texto
+// visible (nombre y energía, en ese orden: «label in name», WCAG 2.5.3) y conserva los ejemplos:
+// «Consumidores terciarios, ≈ 0,1 % de la energía de los productores. Ejemplos: Águilas, …».
+test('accesibilidad — el nombre accesible de cada nivel de la pirámide incluye su energía', async ({ page }) => {
   await irA(page, 'Pirámide trófica');
   const esperado = [/0,1\s%/, /≈\s1\s%/, /≈\s10\s%/, /100\s%/];
   for (let i = 0; i < 4; i++) await expect(niveles(page).nth(i)).toHaveAccessibleName(esperado[i], { timeout: 1000 });
+  // El nombre empieza por lo que se ve (el cálculo del nombre accesible normaliza el espacio duro,
+  // así que el U+00A0 antes del % se comprueba en el atributo)
+  await expect(niveles(page).first()).toHaveAccessibleName(
+    /^Consumidores terciarios, ≈\s0,1\s% de la energía de los productores\. Ejemplos: Águilas/,
+  );
+  await expect(niveles(page).first()).toHaveAttribute('aria-label', /≈\u00a00,1\u00a0% de la energía/);
 });
 
 test.describe('móvil 393 × 851 con toque', () => {

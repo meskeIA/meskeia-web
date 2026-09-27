@@ -317,7 +317,7 @@ function SeccionPiramide() {
             } as CSSProperties}
             onClick={() => setNivelActivo(nivelActivo === i ? null : i)}
             aria-expanded={nivelActivo === i}
-            aria-label={`${nivel.nombre}: ${nivel.ejemplos.join(', ')}`}
+            aria-label={`${nivel.nombre}, ${energiaDelNivel(nivel)}. Ejemplos: ${nivel.ejemplos.join(', ')}`}
           >
             <span className={styles.piramideIcono} aria-hidden="true">{nivel.icono}</span>
             <span className={styles.piramideNombre}>{nivel.nombre}</span>
@@ -727,15 +727,18 @@ function SeccionDatos() {
                 <Organismo icono="🐸" nombre="Rana" />
               </div>
             </div>
-            <p className={styles.redDesc}>Interconectada. Un animal come varias cosas y es comido por varios. Más estable.</p>
+            <p className={styles.redDesc}>Interconectada. Un animal come varias cosas y es comido por varios.</p>
           </div>
         </div>
       </div>
 
+      {/* Hallazgo 2314: afirmaba como hecho que «cuantas más conexiones, más resiliente es». */}
       <div className={styles.insight}>
         <p>
-          Las redes tróficas son más realistas que las cadenas lineales. Cuantas más conexiones tiene un ecosistema,
-          <strong> más resiliente es</strong>: si desaparece una especie, otras pueden ocupar su lugar.
+          Las redes tróficas son más realistas que las cadenas lineales. ¿Las hacen más estables sus conexiones?
+          Es un <strong>debate abierto</strong>: May (1972) propuso que, en redes ensambladas al azar, más conexiones
+          desestabilizan; en redes reales, Dunne y colaboradores (2002) midieron que la resistencia a las extinciones
+          en cadena crece con las conexiones, pero no con el número de especies.
         </p>
       </div>
     </div>
@@ -812,15 +815,18 @@ export default function VisualizadorEcosistemaPage() {
           <p>
             Una cadena trófica es una secuencia lineal simplificada (planta → conejo → zorro).
             Una red trófica es el conjunto real de todas las relaciones alimentarias de un ecosistema,
-            donde cada especie puede comer y ser comida por varias. Las redes son más estables porque
-            la desaparición de una especie no rompe todo el sistema.
+            donde cada especie puede comer y ser comida por varias. Si desaparece una especie, sus
+            depredadores pueden tener otras presas; si eso hace más estable al ecosistema es un
+            debate abierto en ecología (May, 1972; McCann, 2000).
           </p>
 
           <h3>¿Por qué importa la biodiversidad?</h3>
           <p>
-            Cuantas más especies hay en un ecosistema, más conexiones tiene la red trófica y más
-            resistente es ante perturbaciones. La pérdida de biodiversidad debilita la capacidad
-            del ecosistema para autorregularse, filtrar agua, polinizar cultivos y capturar carbono.
+            La pérdida de especies puede reducir funciones de las que dependemos, como polinizar
+            cultivos, depurar el agua o capturar carbono. Si más especies dan un ecosistema más
+            estable se discute desde hace medio siglo: lo medido en redes reales es que resisten
+            mejor las extinciones en cadena cuanto más conectadas están, no cuantas más especies
+            tienen (Dunne et al., 2002).
           </p>
 
           <h3>¿Qué es una cascada trófica?</h3>

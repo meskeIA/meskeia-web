@@ -74,7 +74,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre cadena trófica y red trófica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una cadena trófica es una secuencia lineal de organismos donde cada uno se alimenta del anterior (hierba → conejo → zorro). Una red trófica es una representación más realista que muestra todas las interrelaciones alimentarias de un ecosistema, donde la mayoría de los organismos tienen múltiples fuentes de alimento y múltiples depredadores. Las redes tróficas son más estables ecológicamente porque la pérdida de una especie no destruye la cadena entera.',
+        text: 'Una cadena trófica es una secuencia lineal de organismos donde cada uno se alimenta del anterior (hierba → conejo → zorro). Una red trófica es una representación más realista que muestra todas las interrelaciones alimentarias de un ecosistema, donde la mayoría de los organismos tienen múltiples fuentes de alimento y múltiples depredadores. Si esas conexiones hacen más estable al ecosistema es un debate abierto: en modelos de redes ensambladas al azar, más conexiones desestabilizan (May, 1972); en redes reales, la resistencia a las extinciones en cadena crece con las conexiones, pero no con el número de especies (Dunne et al., 2002).',
       },
     },
     {
