@@ -284,6 +284,16 @@
   margin-bottom: 1rem;
 }
 
+/* Etiqueta visible del campo de fórmula (hallazgo 2287): el placeholder no es un nombre. */
+.labelFormula {
+  display: block;
+  max-width: 500px;
+  margin: 0 auto 0.375rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
 .calculadoraForm {
   display: flex;
   gap: 0.75rem;
@@ -539,6 +549,18 @@
 .propiedad span {
   color: var(--text-primary);
   font-weight: 600;
+}
+
+/* De qué escala es el radio y de dónde sale (hallazgo 2281). */
+.fuenteRadio {
+  margin: -0.5rem 0 1.25rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+[data-theme='dark'] .fuenteRadio {
+  color: var(--text-muted);
 }
 
 .configuracion {

@@ -16,6 +16,9 @@ import {
   toleranciaDe,
   unicoPorEstadoYFamilia,
 } from '../../app/tabla-periodica/casos';
+import { elementos } from '../../app/tabla-periodica/elementos-data';
+import { ELEMENTOS as ELEMENTOS_TENDENCIAS } from '../../app/simulador-tabla-periodica-tendencias/datos';
+import { RADIO_COVALENTE_PM, RADIO_SOLO_TEORICO_DESDE_Z } from '../../data/radios-atomicos';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
 import { parseSpanishNumber } from '../../lib/formatters';
 
@@ -31,8 +34,9 @@ import { parseSpanishNumber } from '../../lib/formatters';
  * 23/08) se conservan igual.
  *
  * RE-INSPECCIÓN 27/09/2026: al final del fichero, tres casos nuevos (16, 17 y 18), el
- * descarte medido de la sospecha S1 (tolerancia del 1 % en recuentos) y los hallazgos
- * ABIERTOS de ese día con `test.fail()`, entre ellos la sospecha S2 (el radio atómico).
+ * descarte medido de la sospecha S1 (tolerancia del 1 % en recuentos) y los hallazgos de
+ * ese día (2281-2287, entre ellos la sospecha S2, el radio atómico), escritos con
+ * `test.fail()` y REPARADOS el mismo día: hoy son regresión.
  *
  * QUÉ PROMETE
  *   <h1>      «⚛️ Tabla Periódica Interactiva»
@@ -50,8 +54,9 @@ import { parseSpanishNumber } from '../../lib/formatters';
  *                                             familia, estado, electronegatividad, radio,
  *                                             configuración electrónica). Desde el 23/08
  *                                             cita fuente para las MASAS (IUPAC/CIAAW
- *                                             2021); el radio atómico sigue sin fuente
- *                                             (ver la re-inspección del 27/09/2026).
+ *                                             2021); el radio, desde el 27/09/2026, sale
+ *                                             de data/radios-atomicos.ts (covalente de
+ *                                             Pyykkö y Atsumi 2009, hallazgo 2281).
  *   app/tabla-periodica/page.tsx            ← getPosicion() (rejilla), filtro (useMemo),
  *                                             calcularMasaMolar() (parser de fórmulas)
  *
@@ -344,7 +349,8 @@ test.describe('CASO 3 · en móvil (Pixel 7)', () => {
     await expect(page.locator('code', { hasText: '[Ar] 3d⁶ 4s²' })).toBeVisible();
     const texto = (await modal.innerText()).replace(/\s+/g, ' ');
     expect(texto).toContain('Electronegatividad: 1,83');
-    expect(texto).toContain('Radio atómico: 156 pm');
+    // Radio: desde el 27/09/2026 (hallazgo 2281), covalente de Pyykkö y Atsumi (2009): Fe 116.
+    expect(texto).toContain('Radio covalente: 116 pm');
     expect(texto).toContain('Dato curioso');
 
     // El botón de cerrar es alcanzable con el dedo (24 px es el mínimo de WCAG 2.2 AA).
@@ -452,7 +458,8 @@ test.describe('CASO 4 · normal: buscar el oxígeno y comprobar su ficha entera'
     //   grupo 16, período 2            (calcógenos, segunda fila)
     //   configuración = [He] 2s² 2p⁴   (estado fundamental; 6 electrones de valencia)
     //   electronegatividad = 3,44      (Pauling; solo el flúor, 3,98, lo supera)
-    //   radio atómico = 48 pm          (escala calculada de Clementi 1967, la que usa esta app)
+    //   radio covalente = 63 pm        (Pyykkö y Atsumi 2009; hasta el 27/09/2026 la app daba
+    //                                   48, el calculado de Clementi 1967: hallazgo 2281)
     //   estado = gas, familia = no metal
     await page.fill('#busqueda', '');
     const oxigeno = await fichaDe(page, 'Oxígeno (O)');
@@ -462,7 +469,7 @@ test.describe('CASO 4 · normal: buscar el oxígeno y comprobar su ficha entera'
     expect(oxigeno).toContain('Período: 2');
     expect(oxigeno).toContain('Familia: No Metales');
     expect(oxigeno).toContain('Estado: Gas');
-    expect(oxigeno).toContain('Radio atómico: 48 pm');
+    expect(oxigeno).toContain('Radio covalente: 63 pm');
     expect(oxigeno).toContain('Electronegatividad: 3,44');
     expect(oxigeno).toContain('[He] 2s² 2p⁴');
     await cerrarFicha(page);
@@ -497,7 +504,7 @@ test.describe('CASO 5 · límite: el oganesón (Z=118) y el hidrógeno', () => {
     expect(og).toContain('Período: 7');
     expect(og).toContain('Familia: Gases Nobles');
     expect(og).toContain('[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶');
-    expect(og).toContain('Radio atómico: N/D');
+    expect(og).toContain('Radio covalente: N/D');
     expect(og).toContain('Electronegatividad: N/D');
     await cerrarFicha(page);
 
@@ -937,7 +944,8 @@ test.describe('Tabla Periódica · fichas de búsqueda', () => {
   });
 
   test('ficha 7 · de Li, Na y K el mayor radio es el del potasio', () => {
-    // Al bajar por el grupo 1 se añade una capa, así que el radio crece: 167 < 190 < 243 pm.
+    // Al bajar por el grupo 1 se añade una capa, así que el radio crece: 133 < 155 < 196 pm
+    // (covalente de Pyykkö y Atsumi 2009; hasta el 27/09/2026, 167 < 190 < 243 de Clementi).
     const li = buscarPorSimbolo('Li')?.radioAtomico as number;
     const na = buscarPorSimbolo('Na')?.radioAtomico as number;
     const k = buscarPorSimbolo('K')?.radioAtomico as number;
@@ -1194,9 +1202,9 @@ test.describe('RE-INSPECCIÓN 12/09/2026 · la tarea de aula en el navegador', (
     // estado: "solido" — el oganesón NO es gas pese a estar en la columna de los nobles.
     expect(og).toContain('Estado: Sólido');
     // radioAtomico y electronegatividad son null en los datos: se dice «N/D», no un 0.
-    expect(og).toContain('Radio atómico: N/D');
+    expect(og).toContain('Radio covalente: N/D');
     expect(og).toContain('Electronegatividad: N/D');
-    expect(og).not.toContain('Radio atómico: 0');
+    expect(og).not.toContain('Radio covalente: 0');
     expect(og).toContain('[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶');
   });
 
@@ -1262,7 +1270,7 @@ test.describe('hallazgos reparados · 12/09/2026', () => {
     await abrirHidratada(page);
 
     // Es el mismo defecto que el «radio de Cs» reparado el 23/08 —ese quedó bien: el
-    // paso 5 nombra Fr 348 pm, Cs 298 pm y He 31 pm, que son los tres valores del
+    // paso 5 nombraba Fr 348 pm, Cs 298 pm y He 31 pm, que eran los tres valores del
     // módulo—, pero la tabla comparativa de los grupos no se revisó y tres de sus siete
     // filas riñen con lo que la propia app enseña al abrir una casilla:
     //
@@ -1357,6 +1365,7 @@ test.describe('hallazgos reparados · 12/09/2026', () => {
 //     Resuelto a mano desde elementos-data.ts (numero: 27):
 //       Z = 27 · masa 58,933 u · grupo 9 · período 4 · metales-transicion ·
 //       estado sólido · χ 1,88 · radio 152 pm · [Ar] 3d⁷ 4s²
+//       (radio covalente 111 pm desde el 27/09/2026: el 152 era el calculado de Clementi)
 //     Y las TRES vías que un estudiante usa para llegar a él, que es lo que promete
 //     el placeholder («Nombre, símbolo o número...») y el jsonLd («Búsqueda por
 //     nombre, símbolo o número atómico»):
@@ -1377,6 +1386,7 @@ test.describe('hallazgos reparados · 12/09/2026', () => {
 //     sintéticos». Tres fichas consecutivas, resueltas a mano:
 //       Np (93) · [237] u · actínido · sólido · χ 1,36 · 221 pm · SIN fila «Origen»
 //       Pu (94) · [244] u · actínido · sólido · χ 1,28 · 243 pm · SIN fila «Origen»
+//       (radios de van der Waals; desde el 27/09/2026 la ficha da el covalente: Pu 172 pm)
 //       Am (95) · [243] u · actínido · sólido · χ 1,30 · 244 pm · CON «Origen: Sintético»
 //     Nota de lectura, no defecto: la masa del americio (243) es MENOR que la del
 //     plutonio (244) pese a tener un protón más. No hay peso atómico estándar para
@@ -1442,7 +1452,7 @@ test.describe('CASO 13 · normal: el cobalto, buscado por nombre, símbolo y nú
     expect(co).toContain('Período: 4');
     expect(co).toContain('Familia: Metales de Transición');
     expect(co).toContain('Estado: Sólido');
-    expect(co).toContain('Radio atómico: 152 pm');
+    expect(co).toContain('Radio covalente: 111 pm'); // Pyykkö y Atsumi 2009 (hallazgo 2281)
     expect(co).toContain('Electronegatividad: 1,88');
     expect(co).toContain('[Ar] 3d⁷ 4s²');
     // Es natural, así que NO puede llevar la fila de origen que estrena el hallazgo 776.
@@ -1475,7 +1485,7 @@ test.describe('CASO 14 · límite: dónde deja la app de considerar natural un e
     const pu = await fichaDe(page, 'Plutonio (Pu)');
     expect(pu).toContain('Número atómico: 94');
     expect(pu).toContain('Masa atómica: [244] u');
-    expect(pu).toContain('Radio atómico: 243 pm');
+    expect(pu).toContain('Radio covalente: 172 pm'); // Pyykkö y Atsumi 2009 (hallazgo 2281)
     expect(pu).toContain('Electronegatividad: 1,28');
     expect(pu).toContain('[Rn] 5f⁶ 7s²');
     expect(pu).not.toContain('Origen:');
@@ -1703,7 +1713,7 @@ test.describe('hallazgos reparados · 14/09/2026', () => {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // RE-INSPECCIÓN 27/09/2026 — tres casos nuevos, las dos sospechas pendientes
-// (S1 y S2) y los hallazgos ABIERTOS de ese día.
+// (S1 y S2) y los hallazgos de ese día, ya reparados.
 //
 // Todos los valores esperados se resolvieron a mano ANTES de abrir el navegador:
 // masas IUPAC/CIAAW 2021 (las que cita elementos-data.ts), configuraciones del
@@ -1759,12 +1769,20 @@ async function veredictoLimpio(page: Page, id: number, respuesta: string): Promi
   return responderFicha(page, id, respuesta);
 }
 
-/** Lee el radio atómico de la ficha de un elemento: número en pm, o null si pone N/D. */
+/**
+ * Lee el radio de la ficha de un elemento: número en pm, o null si pone N/D.
+ *
+ * Desde la reparación del hallazgo 2281 la fila se rotula «Radio covalente». Si la fila no
+ * aparece con ninguno de los dos rótulos, el test FALLA en vez de devolver null: un null
+ * callado convertiría en verde cualquier invariante que se proteja con `if (x !== null)`.
+ */
 async function radioDe(page: Page, titulo: string): Promise<number | null> {
   const texto = await fichaDe(page, titulo);
   await cerrarFicha(page);
-  const m = texto.match(/Radio atómico: (\d+) pm/);
-  return m ? Number(m[1]) : null;
+  const m = texto.match(/Radio (?:atómico|covalente): (\d+ pm|N\/D)/);
+  expect(m, `fila del radio en la ficha de ${titulo}`).not.toBeNull();
+  const valor = (m as RegExpMatchArray)[1];
+  return valor === 'N/D' ? null : Number(valor.replace(' pm', ''));
 }
 
 const titulosActivos = (page: Page) =>
@@ -1850,7 +1868,7 @@ test.describe('CASO 17 · límite: lutecio y lawrencio, por número, por símbol
     expect(lr).toContain('Período: 7');
     expect(lr).toContain('Familia: Actínidos');
     expect(lr).toContain('Origen: Sintético');
-    expect(lr).toContain('Radio atómico: N/D');
+    expect(lr).toContain('Radio covalente: N/D'); // desde el Fm la serie solo es teórica
     expect(lr).toContain('[Rn] 5f¹⁴ 7s² 7p¹');
     await cerrarFicha(page);
 
@@ -1953,170 +1971,262 @@ test.describe('S1 · el 1 % no admite un entero vecino en ningún recuento de la
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la re-inspección del 27/09/2026
-// Marcados con test.fail(): afirman lo que DEBERÍA pasar, así que hoy fallan a
-// propósito. Al repararse se les quita la marca y quedan como regresión.
+// HALLAZGOS de la re-inspección del 27/09/2026 (2281-2287), REPARADOS el mismo día
+// Se escribieron con test.fail() afirmando lo que DEBÍA pasar; al repararse se les
+// retiró la marca y quedan como regresión.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('hallazgos abiertos · 27/09/2026', () => {
-  test('S2 · el «radio atómico» mezcla tres magnitudes y no dice cuál es ninguna', async ({ page }) => {
-    // ABIERTO: elementos-data.ts no cita fuente para `radioAtomico`, y la ficha lo rotula
-    // solo «Radio atómico». Cotejado en la sesión con «Atomic radii of the elements (data
-    // page)» de Wikipedia y con la tabla de PubChem (rest/pug/periodictable, AtomicRadius):
+test.describe('hallazgos reparados · 27/09/2026', () => {
+  test('2281 · el radio es UNA serie, rotulada y con fuente, y la guía compara dentro de ella', async ({ page }) => {
+    // REPARADO 27/09/2026: elementos-data.ts ya no escribe el radio; lo lee de
+    // data/radios-atomicos.ts, el radio covalente de enlace sencillo de Pyykkö y Atsumi
+    // (Chem. Eur. J. 15, 186-197, 2009), la misma serie que usa simulador-tabla-periodica-
+    // tendencias desde el hallazgo 1953. La ficha lo rotula «Radio covalente» y cita la
+    // fuente al pie; desde el Fm (Z ≥ 100) sigue N/D porque la serie solo es teórica.
     //
-    //   · Z 1-56 y 59-86: radio CALCULADO de Clementi, Raimondi y Reinhardt (1967):
-    //     H 53, O 48, Cs 298, Ba 253, Pr 247… Esa serie no llega más allá del Rn.
-    //   · La 195 y Ce 185: los EMPÍRICOS de Slater (1964). Clementi no los da (Wikipedia
-    //     pone 226 y 210 «[citation needed]»).
-    //   · Z 87-99: radios de VAN DER WAALS, idénticos a PubChem: Fr 348, Ra 283 (Mantina
-    //     et al. 2009), Ac 260, Th 237, Pa 243, U 240, Np 221, Pu 243, Am 244, Cm 245,
-    //     Bk 244, Cf 245, Es 245. Desde el Fm, N/D (PubChem tampoco tiene).
+    // Lo que había (cotejado en la inspección con «Atomic radii of the elements (data
+    // page)» y con PubChem): Clementi 1967 para Z 1-56 y 59-86 (Cs 298, Pr 247), Slater 1964
+    // para La 195 y Ce 185, y van der Waals para Z 87-99 (Fr 348). La guía decía «el mayor
+    // radio de esta tabla es el Fr (348 pm), seguido del Cs (298 pm)»: 50 pm de artefacto.
     //
-    // Es la misma mezcla que simulador-tabla-periodica-tendencias retiró el 26/09
-    // (hallazgo 1953). Y la guía de 7 pasos, justo después de avisar «compara siempre
-    // dentro de la misma [escala]», compara las dos: «El mayor radio de esta tabla es el
-    // Fr (348 pm), seguido del Cs (298 pm)». En van der Waals el Cs es 343 pm: la
-    // diferencia real es de 5 pm, no de 50. En covalente (Pyykkö y Atsumi 2009) el Fr
-    // (223) es incluso MENOR que el Cs (232).
-    //
-    // Invariante que cumple cualquier serie homogénea que cubra a los dos: Fr y Cs a
-    // menos de 15 pm (vdW +5, covalente −9), y Ce y Pr a menos de 20 (covalente 163/176,
-    // vdW PubChem 235/239). Hoy: Fr − Cs = 50 y Pr − Ce = 62.
-    test.fail();
+    // Valores de la tabla de Pyykkö y Atsumi, no del código: Cs 232 · Fr 223 · Ce 163 ·
+    // Pr 176. La invariante del acta (|Fr − Cs| ≤ 15, |Pr − Ce| ≤ 20) se sigue exigiendo,
+    // y además la cifra exacta, que es la que dice QUÉ serie es.
     await abrirHidratada(page);
 
     const cs = await radioDe(page, 'Cesio (Cs)');
     const fr = await radioDe(page, 'Francio (Fr)');
     const ce = await radioDe(page, 'Cerio (Ce)');
     const pr = await radioDe(page, 'Praseodimio (Pr)');
-    if (cs !== null && fr !== null) expect(Math.abs(fr - cs)).toBeLessThanOrEqual(15);
-    if (ce !== null && pr !== null) expect(Math.abs(pr - ce)).toBeLessThanOrEqual(20);
+    expect([cs, fr, ce, pr]).toEqual([232, 223, 163, 176]);
+    expect(Math.abs((fr as number) - (cs as number))).toBeLessThanOrEqual(15);
+    expect(Math.abs((pr as number) - (ce as number))).toBeLessThanOrEqual(20);
+
+    // La ficha dice qué magnitud es y de dónde sale.
+    const ficha = await fichaDe(page, 'Cesio (Cs)');
+    expect(ficha).toContain('Radio covalente: 232 pm');
+    expect(ficha).toContain('Pyykkö y Atsumi, 2009');
+    expect(ficha).not.toContain('Radio atómico:');
+    await cerrarFicha(page);
 
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    await expect(page.locator('[class*="__guiaSection"]')).not.toContainText(
-      'Fr (348 pm), seguido del Cs (298 pm)',
-    );
+    const guia = page.locator('[class*="__guiaSection"]');
+    await expect(guia).not.toContainText('Fr (348 pm), seguido del Cs (298 pm)');
+    // Las cifras que cita la guía son las de las fichas.
+    await expect(guia).toContainText('el mayor es el Cs (232 pm)');
+    await expect(guia).toContainText('El Fr (223 pm)');
+    await expect(guia).toContainText('el H (32 pm)');
   });
 
-  test('ficha 10 · un número atómico con decimales («19,1») se da por correcto', async ({ page }) => {
-    // ABIERTO: la forma menor de la sospecha S1. La ficha 10 pide el número atómico del
-    // potasio, un RECUENTO de protones (19), y `comprobarRespuesta` le aplica el mismo 1 %
-    // que a la masa: max(0,01; 0,19) = 0,19. «19,1» y «19,19» salen «¡Correcto! Lo has
-    // encontrado.», y 19,1 no es el número atómico de nada. Es lo que el hallazgo 2149 de
-    // simulador-mitosis-meiosis cerró allí: en un recuento solo vale el entero exacto
-    // («19,0» sí, que es 19 escrito de otra forma; lo prueba el CASO 18).
-    test.fail();
+  test('2281 · sin navegador: la tabla y el simulador de tendencias leen la misma serie', () => {
+    // La serie vive UNA vez, en data/radios-atomicos.ts. La tabla la toma de ahí (N/D desde
+    // el Fm). El simulador de tendencias conserva por ahora su copia en línea (no se pudo
+    // cablear al módulo en esta reparación): este test es el que impide que diverjan.
+    expect(RADIO_COVALENTE_PM).toHaveLength(118);
+    for (const e of elementos) {
+      const esperado = e.numero >= RADIO_SOLO_TEORICO_DESDE_Z ? null : RADIO_COVALENTE_PM[e.numero - 1];
+      expect(e.radioAtomico, `${e.simbolo} en tabla-periodica`).toBe(esperado);
+    }
+    for (const e of ELEMENTOS_TENDENCIAS) {
+      expect(e.radioAtomico, `${e.simbolo} en simulador-tabla-periodica-tendencias`).toBe(
+        RADIO_COVALENTE_PM[e.Z - 1],
+      );
+    }
+  });
+
+  test('2284 · ficha 10 · un número atómico con decimales («19,1») ya no se da por correcto', async ({ page }) => {
+    // REPARADO 27/09/2026: la ficha 10 pide el número atómico del potasio, un RECUENTO de
+    // protones (19), y `comprobarRespuesta` le aplicaba el mismo 1 % que a la masa:
+    // max(0,01; 0,19) = 0,19, así que «19,1» y «19,19» salían «¡Correcto!». Ahora las
+    // propiedades que son recuentos (número atómico, grupo, período) exigen el entero
+    // exacto, también en la práctica sin final; la masa conserva su tolerancia. Mismo
+    // patrón que el hallazgo 2149 de simulador-mitosis-meiosis. «19,0» sigue valiendo:
+    // es 19 escrito de otra forma (lo prueba también el CASO 18).
     await abrirHidratada(page);
     expect(await veredictoLimpio(page, 10, '19,1')).toContain(FALLO);
+    expect(await veredictoLimpio(page, 10, '19,19')).toContain(FALLO);
+    expect(await veredictoLimpio(page, 10, '19,0')).toContain(ACIERTO);
+    // La masa (ficha 4) conserva el margen del 1 %: «63,5» sigue siendo encontrar el dato.
+    expect(await veredictoLimpio(page, 4, '63,5')).toContain(ACIERTO);
   });
 
-  test('fichas de texto · la respuesta correcta se rechaza por cómo está escrita', async ({ page }) => {
-    // ABIERTO: la sección promete «Lo que se evalúa es si sabes buscarlo, no cómo lo
-    // tecleas», y la ficha 5 busca la configuración quitando TODOS los espacios. Pero la
-    // ficha 11 compara la cadena contra una lista cerrada de cuatro grafías y rechaza la
-    // misma configuración escrita con otra holgura:
-    //   «[Ne]3s²3p²»  → «Todavía no» (es como la escribe el propio bloque educativo:
-    //                  «Cr([Ar]3d⁵4s¹)»)
-    //   «[Ne]3s2 3p2» → «Todavía no», mientras «[Ne]3s23p2» y «[Ne] 3s2 3p2» sí valen
-    // Misma forma en las fichas de nombre: «los halógenos» (ficha 8) y «el mercurio»
-    // (ficha 9) son respuestas correctas con artículo, y se rechazan.
-    test.fail();
+  test('2284 · sin navegador: los recuentos de la práctica tampoco admiten decimales', () => {
+    for (let semilla = 1; semilla <= 300; semilla++) {
+      const ejercicio = generarEjercicioAleatorio(semilla);
+      const valor = parseSpanishNumber(ejercicio.respuestaTexto);
+      if (!ejercicio.respuestaEntera) continue;
+      expect(Number.isInteger(valor), `semilla ${semilla}`).toBe(true);
+      const conDecimal = String(valor + 0.1).replace('.', ',');
+      expect(comprobarEjercicio(conDecimal, ejercicio).correcto, `semilla ${semilla}, ${conDecimal}`).toBe(false);
+      expect(comprobarEjercicio(`${valor},0`, ejercicio).correcto, `semilla ${semilla}`).toBe(true);
+    }
+    expect(CASOS[9].respuestaEntera).toBe(true);
+    expect(CASOS[3].respuestaEntera).toBe(false);
+  });
+
+  test('2282 · fichas de texto · la respuesta correcta ya no se rechaza por cómo está escrita', async ({ page }) => {
+    // REPARADO 27/09/2026: la sección promete «Lo que se evalúa es si sabes buscarlo, no cómo
+    // lo tecleas», y la ficha 11 rechazaba la configuración del silicio escrita con otra
+    // holgura («[Ne]3s²3p²», que es como el bloque educativo escribe «Cr([Ar]3d⁵4s¹)», o
+    // «[Ne]3s2 3p2»), y las fichas de nombre rechazaban el artículo. `normalizar` pasa ya
+    // los superíndices a dígitos y quita el artículo inicial, y la comparación ignora los
+    // espacios interiores.
     await abrirHidratada(page);
     expect(await veredictoLimpio(page, 11, '[Ne]3s²3p²')).toContain(ACIERTO);
     expect(await veredictoLimpio(page, 11, '[Ne]3s2 3p2')).toContain(ACIERTO);
     expect(await veredictoLimpio(page, 8, 'los halógenos')).toContain(ACIERTO);
     expect(await veredictoLimpio(page, 9, 'el mercurio')).toContain(ACIERTO);
+    // Y la holgura no abre la puerta a lo que no es la respuesta.
+    expect(await veredictoLimpio(page, 11, '[Ne]3s²3p³')).toContain(FALLO); // la del fósforo
+    expect(await veredictoLimpio(page, 9, 'el bromo')).toContain(FALLO);
   });
 
-  test('bismuto · el dato curioso lo llama «el más pesado con isótopo estable»', async ({ page }) => {
-    // ABIERTO: el bismuto no tiene ningún isótopo estable. El ²⁰⁹Bi es radiactivo (α,
-    // semivida 2,01 × 10¹⁹ años; detectado en 2003, de Marcillac et al., Nature 422, 876).
-    // El elemento más pesado con isótopos estables es el PLOMO (Z = 82). Cotejado en la
-    // sesión con «Isotopes of bismuth» de Wikipedia: «Bismuth has one nearly stable
-    // isotope but no stable isotopes».
-    test.fail();
+  test('2282 · sin navegador: superíndices, espacios y artículos no cuentan; el contenido sí', () => {
+    expect(normalizar('[Ne] 3s² 3p²')).toBe('[ne] 3s2 3p2');
+    expect(normalizar('Los Halógenos')).toBe('halogenos');
+    expect(normalizar('El Mercurio.')).toBe('mercurio');
+    const ficha11 = CASOS[10];
+    for (const forma of ['[Ne]3s²3p²', '[Ne]3s2 3p2', '[ne] 3s² 3p2', ' [Ne] 3s²  3p² ']) {
+      expect(comprobarRespuesta(forma, ficha11).correcto, `forma «${forma}»`).toBe(true);
+    }
+    for (const forma of ['[Ne]3s²3p³', '[Ar]3s²3p²', '[Ne]3s²3p', '3s²3p²']) {
+      expect(comprobarRespuesta(forma, ficha11).correcto, `forma «${forma}»`).toBe(false);
+    }
+    expect(comprobarRespuesta('el hierro', CASOS[0]).correcto).toBe(true);
+    expect(comprobarRespuesta('la plata', CASOS[0]).correcto).toBe(false);
+    expect(comprobarRespuesta('el grupo de los halógenos', CASOS[7]).correcto).toBe(true);
+  });
+
+  test('2285 · bismuto · el dato curioso ya no lo llama «el más pesado con isótopo estable»', async ({ page }) => {
+    // REPARADO 27/09/2026: el bismuto no tiene ningún isótopo estable. El ²⁰⁹Bi es
+    // radiactivo (α, semivida 2,01 × 10¹⁹ años; de Marcillac et al., Nature 422, 876, 2003).
+    // El más pesado con isótopos estables es el PLOMO (Z = 82). El dato curioso lo dice así.
     await abrirHidratada(page);
     const bi = await fichaDe(page, 'Bismuto (Bi)');
     expect(bi).toContain('Número atómico: 83');
     expect(bi).not.toContain('Elemento más pesado con isótopo estable');
+    expect(bi).toContain('No tiene isótopos estables');
+    expect(bi).toContain('2,01 × 10¹⁹ años');
+    expect(bi).toContain('el plomo');
   });
 
-  test('formato · decimales con punto, dólares y % pegado en datos curiosos y bloque educativo', async ({ page }) => {
-    // ABIERTO: cifras fuera del formato español que exige el catálogo.
-    //   galio      «punto fusión 29.76°C»       → 29,76 °C
-    //   californio «(~$27M/gramo)»               → unos 27 millones de dólares por gramo
-    //   hidrógeno  «el 75% de la materia visible» · nitrógeno «el 78%» · argón «(~1%)»
-    //   ingeniero de materiales «(60% del acero)» · FAQ CHNOPS «el 98% de la materia viva»
-    //   convenio de las fichas «un margen del 1 %» con espacio normal, no el duro (U+00A0)
-    test.fail();
+  test('2286 · formato español en los datos curiosos y en el bloque educativo', async ({ page }) => {
+    // REPARADO 27/09/2026: cifras fuera del formato español del catálogo.
+    //   galio      «punto fusión 29.76°C»   → «29,76 °C»
+    //   californio «(~$27M/gramo)»           → sin cifra ni dólares (no tenía fuente)
+    //   hidrógeno «75%» · nitrógeno «78%» · argón «(~1%)» → con espacio duro (U+00A0)
+    //   bloque educativo «60% del acero», «98% de la materia viva», «25°C», «1.100°C»,
+    //   «3.422°C» → con espacio duro; el convenio de las fichas, «1 %» con el duro.
     await abrirHidratada(page);
-    expect(await fichaDe(page, 'Galio (Ga)')).not.toContain('29.76');
+    const galio = await fichaDe(page, 'Galio (Ga)');
+    expect(galio).not.toContain('29.76');
+    expect(galio).toContain('29,76 °C');
     await cerrarFicha(page);
     expect(await fichaDe(page, 'Californio (Cf)')).not.toContain('$');
     await cerrarFicha(page);
+    // `fichaDe` colapsa los espacios con \s, que incluye el U+00A0: por eso se lee el
+    // texto crudo para distinguir el duro del normal.
     for (const t of ['Hidrógeno (H)', 'Nitrógeno (N)', 'Argón (Ar)']) {
-      expect(await fichaDe(page, t), t).not.toMatch(/\d%/);
+      await page.locator(`[title="${t}"]`).click();
+      const crudo = await page.locator('[class*="__datoCurioso"]').innerText();
+      expect(crudo, t).not.toMatch(/\d%/);
+      expect(crudo, t).toMatch(/\d %/);
       await cerrarFicha(page);
     }
     const convenio = await page.locator('[class*="__aulaConvenio"]').innerText();
     expect(convenio).not.toMatch(/\d %/); // espacio normal; con el duro (U+00A0) no casa
+    expect(convenio).toMatch(/1 %/);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    for (const seccion of ['[class*="__escenariosSection"]', '[class*="__faqSection"]']) {
-      expect(await page.locator(seccion).innerText(), seccion).not.toMatch(/\d%/);
+    for (const seccion of [
+      '[class*="__escenariosSection"]',
+      '[class*="__faqSection"]',
+      '[class*="__comparativaSection"]',
+      '[class*="__tipsSection"]',
+    ]) {
+      const texto = await page.locator(seccion).innerText();
+      expect(texto, seccion).not.toMatch(/\d%/);
+      expect(texto, seccion).not.toMatch(/\d°C/);
     }
   });
 
-  test('ficha modal · el Tab sale del diálogo y un Enter borra las fichas resueltas por detrás', async ({ page }) => {
-    // ABIERTO: la ficha se declara role="dialog" aria-modal="true" y mete el foco en «✕»,
-    // pero no lo retiene. El siguiente Tab va al primer control que hay DETRÁS del velo:
-    // «Empezar de nuevo» de las fichas de aula, que no se ve. Un Enter ahí borra todas las
-    // respuestas con la ficha todavía abierta (WCAG 2.4.3, orden del foco; y aria-modal le
-    // dice al lector de pantalla que el resto de la página es inerte cuando no lo es).
-    test.fail();
+  test('2283 · ficha modal · el foco se queda dentro y un Enter ya no borra las fichas de detrás', async ({ page }) => {
+    // REPARADO 27/09/2026: el diálogo se declaraba aria-modal pero no retenía el foco; el Tab
+    // siguiente a «✕» iba a «Empezar de nuevo», detrás del velo, y un Enter allí borraba las
+    // respuestas con la ficha abierta (WCAG 2.4.3). Ahora el resto de la página queda
+    // `inert` mientras la ficha está abierta, Tab y Mayús+Tab ciclan dentro, Escape cierra
+    // y el foco vuelve a la casilla que la abrió.
     await abrirHidratada(page);
     expect(await responderFicha(page, 1, 'Fe')).toContain(ACIERTO);
     expect(await contadorFichas(page)).toBe('Has resuelto 1 de 12');
 
-    await page.locator('[title="Hierro (Fe)"]').click();
+    const hierro = page.locator('[title="Hierro (Fe)"]');
+    await hierro.click();
     await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Cerrar la ficha de Hierro' })).toBeFocused();
+    const cerrar = page.getByRole('button', { name: 'Cerrar la ficha de Hierro' });
+    await expect(cerrar).toBeFocused();
 
-    await page.keyboard.press('Tab');
-    const dentro = await page.evaluate(() => {
-      const dialogo = document.querySelector('[role="dialog"]');
-      return dialogo !== null && dialogo.contains(document.activeElement);
-    });
-    expect(dentro).toBe(true);
+    const focoDentro = () =>
+      page.evaluate(() => {
+        const dialogo = document.querySelector('[role="dialog"]');
+        return dialogo !== null && dialogo.contains(document.activeElement);
+      });
+
+    for (const tecla of ['Tab', 'Tab', 'Shift+Tab', 'Shift+Tab', 'Shift+Tab']) {
+      await page.keyboard.press(tecla);
+      expect(await focoDentro(), `tras ${tecla}`).toBe(true);
+    }
+    // Lo de detrás es inerte mientras la ficha está abierta: «Empezar de nuevo» no puede
+    // recibir el foco ni el clic.
+    const reiniciarInerte = await page
+      .getByRole('button', { name: 'Empezar de nuevo', includeHidden: true })
+      .evaluate((el) => el.closest('[inert]') !== null);
+    expect(reiniciarInerte).toBe(true);
+
+    // El único control de la ficha es «✕»: el Enter la cierra, y no toca nada de detrás.
+    await expect(cerrar).toBeFocused();
     await page.keyboard.press('Enter');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    expect(await contadorFichas(page)).toBe('Has resuelto 1 de 12');
+    await expect(hierro).toBeFocused();
+    expect(
+      await page.evaluate(() => document.querySelectorAll('[inert]').length),
+    ).toBe(0);
+
+    // Escape también cierra, y el foco vuelve igual a la casilla.
+    await hierro.press('Enter');
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(hierro).toBeFocused();
     expect(await contadorFichas(page)).toBe('Has resuelto 1 de 12');
   });
 
-  test('calculadora · el campo de fórmula no tiene etiqueta y el error no se anuncia', async ({ page }) => {
-    // ABIERTO: el <input> de la fórmula no tiene <label>, ni id, ni aria-label: su único
-    // nombre accesible es el placeholder «Ej: H2O, NaCl, C6H12O6», que desaparece al
-    // escribir (WCAG 1.3.1 y 3.3.2). Y el mensaje de error («Elemento "A" no reconocido»)
-    // se pinta en un <div> sin role ni aria-live en toda su cadena de ancestros: quien usa
-    // lector de pantalla pulsa «Calcular» y no oye nada (WCAG 4.1.3). El contador de la
-    // tabla se anuncia desde el hallazgo 532; la calculadora se quedó fuera.
-    test.fail();
+  test('2287 · calculadora · el campo de fórmula tiene etiqueta y el error se anuncia', async ({ page }) => {
+    // REPARADO 27/09/2026: el <input> de la fórmula no tenía <label> y su único nombre era el
+    // placeholder, que desaparece al escribir (WCAG 1.3.1 y 3.3.2); el error se pintaba en un
+    // <div> sin región viva (WCAG 4.1.3). Hoy hay <label for> visible «Fórmula química», el
+    // error va dentro de un role="alert" que solo lo contiene a él, y el campo lo enlaza con
+    // aria-describedby y aria-invalid.
     await abrirHidratada(page);
-    const campo = page.locator('input[placeholder^="Ej:"]');
+    const campo = page.getByLabel('Fórmula química');
+    await expect(campo).toHaveCount(1);
     await campo.fill('NACL');
     await page.getByRole('button', { name: 'Calcular' }).click();
     const error = page.locator('[class*="__errorMasa"]');
     await expect(error).toContainText('Elemento "A" no reconocido');
 
-    const anunciado = await error.evaluate(
-      (el) => el.closest('[role="alert"], [role="status"], [aria-live]') !== null,
-    );
-    expect(anunciado).toBe(true);
-    const etiquetado = await campo.evaluate((el) => {
-      const input = el as HTMLInputElement;
-      return (
-        (input.labels?.length ?? 0) > 0 ||
-        input.hasAttribute('aria-label') ||
-        input.hasAttribute('aria-labelledby')
-      );
+    const region = await error.evaluate((el) => {
+      const r = el.closest('[role="alert"], [role="status"], [aria-live]');
+      return r === null ? null : (r as HTMLElement).innerText.trim();
     });
-    expect(etiquetado).toBe(true);
+    // La región existe y está acotada: no lee de paso el resto de la calculadora.
+    expect(region).toBe('Elemento "A" no reconocido');
+    await expect(campo).toHaveAttribute('aria-invalid', 'true');
+    await expect(campo).toHaveAccessibleDescription('Elemento "A" no reconocido');
+
+    // Con una fórmula buena el error desaparece y el campo deja de marcarse inválido.
+    await campo.fill('NaCl');
+    await page.getByRole('button', { name: 'Calcular' }).click();
+    await expect(error).toHaveCount(0);
+    await expect(campo).toHaveAttribute('aria-invalid', 'false');
   });
 });

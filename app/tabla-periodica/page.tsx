@@ -8,6 +8,7 @@ import { formatNumber } from '@/lib';
 import { elementos, elementosPorSimbolo, FAMILIAS, ESTADOS, Elemento } from './elementos-data';
 import { parsearFormulaQuimica } from '@/lib/formula-quimica';
 import { getRelatedApps } from '@/data/app-relations';
+import { RADIOS_ATOMICOS_META, RADIO_SOLO_TEORICO_DESDE_Z } from '@/data/radios-atomicos';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -153,22 +154,76 @@ export default function TablaPerodicaPage() {
    * lo que evita tener que retabular las 118 casillas.
    */
   const cerrarModalRef = useRef<HTMLButtonElement>(null);
+  const dialogoRef = useRef<HTMLDivElement>(null);
+  const veloRef = useRef<HTMLDivElement>(null);
   const origenFocoRef = useRef<HTMLElement | null>(null);
+  const hayFicha = elementoSeleccionado !== null;
 
+  /**
+   * ⚠️ 27/09/2026 (hallazgo 2283) — el diálogo se declaraba aria-modal pero no retenía el
+   * foco: el Tab siguiente a «✕» iba a «Empezar de nuevo» de las fichas de aula, DETRÁS del
+   * velo, y un Enter allí borraba todas las respuestas con la ficha abierta. Ahora:
+   *  · todo lo que no es el diálogo queda `inert` mientras está abierto, que es lo que
+   *    aria-modal le promete al lector de pantalla;
+   *  · Tab y Mayús+Tab ciclan dentro del diálogo (por si el navegador no soporta `inert`);
+   *  · Escape cierra, y al cerrar el foco vuelve a la casilla (o al botón) que lo abrió.
+   * Depende de si HAY ficha y no de cuál: cambiar de elemento con la ficha abierta no debe
+   * volver a capturar como origen un control de dentro del propio diálogo.
+   */
   useEffect(() => {
-    if (!elementoSeleccionado) return;
+    if (!hayFicha) return;
     origenFocoRef.current = document.activeElement as HTMLElement | null;
     cerrarModalRef.current?.focus();
 
+    const velo = veloRef.current;
+    const inertes: HTMLElement[] = [];
+    if (velo?.parentElement) {
+      for (const hermano of Array.from(velo.parentElement.children)) {
+        if (hermano !== velo && hermano instanceof HTMLElement && !hermano.inert) {
+          hermano.inert = true;
+          inertes.push(hermano);
+        }
+      }
+    }
+
+    const enfocables = (): HTMLElement[] =>
+      Array.from(
+        dialogoRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      );
+
     const alPulsar = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') cerrarModal();
+      if (e.key === 'Escape') {
+        cerrarModal();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const lista = enfocables();
+      if (lista.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const primero = lista[0];
+      const ultimo = lista[lista.length - 1];
+      const activo = document.activeElement;
+      const fuera = !dialogoRef.current?.contains(activo);
+      if (e.shiftKey && (activo === primero || fuera)) {
+        e.preventDefault();
+        ultimo.focus();
+      } else if (!e.shiftKey && (activo === ultimo || fuera)) {
+        e.preventDefault();
+        primero.focus();
+      }
     };
     document.addEventListener('keydown', alPulsar);
     return () => {
       document.removeEventListener('keydown', alPulsar);
+      // Primero se devuelve la página a la vida: un elemento inerte no puede recibir el foco.
+      for (const el of inertes) el.inert = false;
       origenFocoRef.current?.focus();
     };
-  }, [elementoSeleccionado]);
+  }, [hayFicha]);
 
   // ---------------------------------------------------------- Fichas para clase
 
@@ -349,13 +404,24 @@ export default function TablaPerodicaPage() {
           Ingresa una fórmula química para calcular su masa molar (ej: H2O, NaCl, C6H12O6)
         </p>
 
+        {/* ⚠️ 27/09/2026 (hallazgo 2287) — el campo no tenía <label> y su único nombre era
+            el placeholder, que desaparece al escribir; y el error se pintaba en un <div> sin
+            región viva, así que con lector de pantalla «Calcular» no decía nada. */}
+        <label htmlFor="formula-masa-molar" className={styles.labelFormula}>
+          Fórmula química
+        </label>
         <div className={styles.calculadoraForm}>
           <input
+            id="formula-masa-molar"
             type="text"
             value={formulaMolar}
             onChange={(e) => setFormulaMolar(e.target.value)}
             placeholder="Ej: H2O, NaCl, C6H12O6"
             className={styles.inputFormula}
+            autoComplete="off"
+            spellCheck={false}
+            aria-invalid={errorMasa !== ''}
+            aria-describedby={errorMasa !== '' ? 'error-formula-masa-molar' : undefined}
             onKeyDown={(e) => e.key === 'Enter' && calcularMasaMolar()}
           />
           <button type="button" onClick={calcularMasaMolar} className={styles.btnPrimary}>
@@ -363,9 +429,13 @@ export default function TablaPerodicaPage() {
           </button>
         </div>
 
-        {errorMasa && (
-          <div className={styles.errorMasa}>{errorMasa}</div>
-        )}
+        {/* La región existe siempre y solo contiene el error: así se anuncia al aparecer, y
+            no lee de paso el resultado ni los ejemplos. */}
+        <div role="alert" aria-atomic="true">
+          {errorMasa && (
+            <div id="error-formula-masa-molar" className={styles.errorMasa}>{errorMasa}</div>
+          )}
+        </div>
 
         {resultadoMasa && (
           <div className={styles.resultadoMasa}>
@@ -413,8 +483,9 @@ export default function TablaPerodicaPage() {
 
       {/* Modal de Elemento */}
       {elementoSeleccionado && (
-        <div className={styles.modalOverlay} onClick={cerrarModal}>
+        <div className={styles.modalOverlay} onClick={cerrarModal} ref={veloRef}>
           <div
+            ref={dialogoRef}
             className={styles.modal}
             onClick={(e) => e.stopPropagation()}
             role="dialog"
@@ -472,15 +543,25 @@ export default function TablaPerodicaPage() {
                     <span>Sintético (no existe en la naturaleza: se obtiene en reactor o acelerador)</span>
                   </div>
                 )}
+                {/* ⚠️ 27/09/2026 (hallazgo 2281) — se rotulaba «Radio atómico» a secas y la
+                    columna mezclaba tres escalas (Clementi, Slater y van der Waals). Hoy es
+                    UNA serie, dicha por su nombre y con su fuente al pie de la ficha. */}
                 <div className={styles.propiedad}>
-                  <strong>Radio atómico:</strong>
-                  <span>{elementoSeleccionado.radioAtomico ? `${elementoSeleccionado.radioAtomico} pm` : 'N/D'}</span>
+                  <strong>Radio covalente:</strong>
+                  <span>{elementoSeleccionado.radioAtomico !== null ? `${elementoSeleccionado.radioAtomico} pm` : 'N/D'}</span>
                 </div>
                 <div className={styles.propiedad}>
                   <strong>Electronegatividad:</strong>
                   <span>{elementoSeleccionado.electronegatividad ? formatNumber(elementoSeleccionado.electronegatividad, 2) : 'N/D'}</span>
                 </div>
               </div>
+
+              <p className={styles.fuenteRadio}>
+                Radio covalente de enlace sencillo ({RADIOS_ATOMICOS_META.fuenteCorta}): una sola
+                escala para toda la tabla, así que los radios de dos fichas se pueden comparar.
+                Desde el fermio (Z&nbsp;≥&nbsp;{RADIO_SOLO_TEORICO_DESDE_Z}) no hay ningún enlace
+                medido y se deja en N/D.
+              </p>
 
               <div className={styles.configuracion}>
                 <strong>Configuración electrónica:</strong>
@@ -518,9 +599,12 @@ export default function TablaPerodicaPage() {
         <p className={styles.aulaConvenio}>
           <span aria-hidden="true">✍️</span> <strong>Cómo se corrigen</strong>: en las fichas que
           piden un elemento vale tanto el <strong>símbolo</strong> como el <strong>nombre</strong>,
-          con tildes o sin ellas —«Fe», «fe» y «hierro» son la misma respuesta—. En las que piden
-          un número se admite un margen del 1 %, porque copiar 63,5 de un recuadro que pone 63,546
-          es haber encontrado el dato. Lo que se evalúa es si sabes buscarlo, no cómo lo tecleas.
+          con tildes o sin ellas y con artículo o sin él —«Fe», «fe», «hierro» y «el hierro» son
+          la misma respuesta—, y una configuración vale con superíndices o sin ellos y con los
+          espacios que quieras. En las que piden una masa se admite un margen del 1&nbsp;%,
+          porque copiar 63,5 de un recuadro que pone 63,546 es haber encontrado el dato; un
+          número atómico, en cambio, es un recuento y tiene que ser el entero exacto. Lo que se
+          evalúa es si sabes buscarlo, no cómo lo tecleas.
         </p>
 
         <div className={styles.aulaContador}>
@@ -764,7 +848,7 @@ export default function TablaPerodicaPage() {
                   <th>Grupo</th>
                   <th>Propiedades</th>
                   <th>Electronegatividad</th>
-                  <th>Estado a 25°C</th>
+                  <th>Estado a 25&nbsp;°C</th>
                   <th>Reactividad</th>
                   <th>Usos principales</th>
                   <th>Elemento más importante</th>
@@ -892,7 +976,7 @@ export default function TablaPerodicaPage() {
                 <h3>Ingeniero de materiales</h3>
               </div>
               <p className={styles.escenarioDesc}>
-                Titanio (Ti, Z=22): densidad 4,51 g/cm³ (60% del acero), módulo elástico 116 GPa, biocompatible. Ideal para implantes y aeronáutica. Níquel (Ni) en superaleaciones para turbinas de avión: resiste 1.100°C.
+                Titanio (Ti, Z=22): densidad 4,51 g/cm³ (60&nbsp;% de la del acero), módulo elástico 116 GPa, biocompatible. Ideal para implantes y aeronáutica. Níquel (Ni) en superaleaciones para turbinas de avión: resiste 1.100&nbsp;°C.
               </p>
               <div className={styles.escenarioTip}>
                 <strong>Tip:</strong> La tabla periódica predice propiedades: elementos del mismo período tienen tendencias sistemáticas de resistencia, punto de fusión y electronegatividad.
@@ -915,7 +999,7 @@ export default function TablaPerodicaPage() {
                   PROCEDENCIA. El neptunio (93) y el plutonio (94) son transuránidos y aparecen en
                   la naturaleza en trazas.
                 */}
-                Uranio-235 (Z=92): fisión nuclear libera 202 MeV/átomo. 1kg U-235 = energía equivalente a 3.000 toneladas de carbón. Los elementos con Z&gt;92 son <strong>transuránidos</strong> y todos son radiactivos, pero eso no los hace sintéticos: el neptunio (93) y el plutonio (94) aparecen en trazas en la naturaleza, y es a partir del americio (Z=95) cuando solo se obtienen artificialmente.
+                Uranio-235 (Z=92): fisión nuclear libera 202 MeV/átomo. 1&nbsp;kg de U-235 = energía equivalente a 3.000 toneladas de carbón. Los elementos con Z&gt;92 son <strong>transuránidos</strong> y todos son radiactivos, pero eso no los hace sintéticos: el neptunio (93) y el plutonio (94) aparecen en trazas en la naturaleza, y es a partir del americio (Z=95) cuando solo se obtienen artificialmente.
               </p>
               <div className={styles.escenarioTip}>
                 <strong>Tip:</strong> Los isótopos de un mismo elemento tienen propiedades químicas casi idénticas (mismo número de electrones) pero masas y estabilidades nucleares muy distintas.
@@ -974,7 +1058,7 @@ export default function TablaPerodicaPage() {
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>¿Qué elementos son esenciales para la vida?</h3>
               <p className={styles.faqAnswer}>
-                Los 6 CHNOPS (Carbono, Hidrógeno, Nitrógeno, Oxígeno, Fósforo, Azufre) forman el 98% de la materia viva. Más oligoelementos: Ca, Mg, Na, K, Cl, Fe, Zn, Cu, Mn, I, Se, Mo, Co. El hierro en hemoglobina transporta O₂, el zinc en enzimas cataliza más de 300 reacciones.
+                Los 6 CHNOPS (Carbono, Hidrógeno, Nitrógeno, Oxígeno, Fósforo, Azufre) forman el 98&nbsp;% de la materia viva. Más oligoelementos: Ca, Mg, Na, K, Cl, Fe, Zn, Cu, Mn, I, Se, Mo, Co. El hierro en hemoglobina transporta O₂, el zinc en enzimas cataliza más de 300 reacciones.
               </p>
             </div>
 
@@ -1046,7 +1130,14 @@ export default function TablaPerodicaPage() {
               <div className={styles.stepContent}>
                 <h3>Predecir el radio atómico</h3>
                 <p>
-                  Disminuye → (más protones sin más capas). Aumenta ↓ (más capas electrónicas). El mayor radio de esta tabla es el Fr (348 pm), seguido del Cs (298 pm); el menor, el He (31 pm). Ojo: hay varias escalas de radio atómico y sus cifras no coinciden, así que compara siempre dentro de la misma.
+                  {/*
+                    ⚠️ 27/09/2026 (hallazgo 2281) — decía «el mayor radio de esta tabla es el Fr
+                    (348 pm), seguido del Cs (298 pm)» justo antes de avisar de que hay que
+                    comparar dentro de la misma escala, y comparaba dos: 348 era van der Waals y
+                    298 el calculado de Clementi. Las cifras de aquí son las de las fichas, que
+                    desde ese día salen de una sola serie (data/radios-atomicos.ts).
+                  */}
+                  Disminuye → (más protones sin más capas). Aumenta ↓ (más capas electrónicas). En la escala de las fichas —radio covalente de Pyykkö y Atsumi (2009)— el mayor es el Cs (232 pm) y el menor, el H (32 pm). El Fr (223 pm) rompe la tendencia y queda por debajo del Cs: en un átomo tan pesado los efectos relativistas contraen el orbital 7s. Ojo: hay varias escalas de radio atómico (covalente, de van der Waals, metálico…) y sus cifras no coinciden —en la de van der Waals el Cs mide 343 pm—, así que compara siempre dentro de la misma.
                 </p>
               </div>
             </div>
@@ -1122,7 +1213,7 @@ export default function TablaPerodicaPage() {
               <div className={styles.tipIcon}>🌡️</div>
               <h3>Punto de fusión: W es el campeón</h3>
               <p>
-                Wolframio/Tungsteno (W, Z=74): punto de fusión 3.422°C, el más alto de todos los elementos. Por eso se usa en filamentos de bombillas y electrodos de soldadura TIG.
+                Wolframio/Tungsteno (W, Z=74): punto de fusión 3.422&nbsp;°C, el más alto de todos los elementos. Por eso se usa en filamentos de bombillas y electrodos de soldadura TIG.
               </p>
             </div>
           </div>

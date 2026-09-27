@@ -27,9 +27,12 @@
  * 2. Cada ficha declara sus SINÓNIMOS aceptados, y no se aceptan por parecido: la lista es
  *    explícita. Para un elemento son siempre su símbolo y su nombre, generados desde
  *    `elementos-data.ts` — no escritos a mano, para que no puedan divergir del dato.
- * 3. Las fichas cuya respuesta ES un número (masa atómica, radio, electronegatividad) se
+ * 3. Las fichas cuya respuesta ES una medida (masa atómica, radio, electronegatividad) se
  *    comparan con tolerancia, porque ahí el problema vuelve a ser aritmético: la masa del
- *    hierro es 55,845 y quien escriba 55,85 ha encontrado el dato correcto.
+ *    hierro es 55,845 y quien escriba 55,85 ha encontrado el dato correcto. Las que piden
+ *    un RECUENTO (número atómico, grupo, período) exigen el entero exacto (hallazgo 2284).
+ * 4. Superíndices, espacios interiores y el artículo inicial no cuentan: «[Ne]3s²3p²»,
+ *    «[Ne] 3s2 3p2» y «los halógenos» son respuestas correctas (hallazgo 2282).
  *
  * LA AMBIGÜEDAD QUE HUBO QUE EVITAR AL ELEGIR LAS FICHAS
  * ─────────────────────────────────────────────────────
@@ -117,6 +120,8 @@ export interface CasoTablaPeriodica {
   respuestaTexto: string;
   /** Solo en fichas numéricas: el valor con el que se compara con tolerancia. */
   respuestaNumerica: number | null;
+  /** La respuesta es un RECUENTO (número atómico, grupo, período): solo vale el entero exacto. */
+  respuestaEntera: boolean;
   /** Formas alternativas aceptadas, ya normalizadas. */
   sinonimos: readonly string[];
   /** Dónde mirar para encontrarlo. No es un desarrollo: es el camino. */
@@ -139,12 +144,27 @@ export interface EjercicioBusqueda {
   etiquetaRespuesta: string;
   respuestaTexto: string;
   sinonimos: readonly string[];
+  /** Igual que en las fichas: un recuento no admite el margen del 1 %. */
+  respuestaEntera: boolean;
   pasos: readonly string[];
 }
+
+/** Propiedades que son RECUENTOS: su respuesta es un entero y se compara exacta. */
+const PROPIEDADES_ENTERAS: ReadonlySet<PropiedadPedida> = new Set<PropiedadPedida>([
+  'numero',
+  'grupo',
+  'periodo',
+]);
 
 // ============================================================
 // NORMALIZACIÓN — el corazón de la comparación
 // ============================================================
+
+/** Superíndices numéricos → dígitos: «3s²» y «3s2» son la misma configuración. */
+const SUPERINDICES: Readonly<Record<string, string>> = {
+  '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4',
+  '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9',
+};
 
 /**
  * Deja un texto en su forma comparable: minúsculas, sin tildes, sin espacios de sobra.
@@ -152,6 +172,12 @@ export interface EjercicioBusqueda {
  * El `normalize('NFD')` separa la letra de su tilde y el rango unicode borra la tilde
  * suelta, así que «Flúor» y «fluor» acaban en la misma cadena. Se quitan también los
  * puntos y las comas finales, porque «Fe.» es un acierto escrito con puntuación.
+ *
+ * ⚠️ 27/09/2026 (hallazgo 2282) — la sección promete «Lo que se evalúa es si sabes
+ * buscarlo, no cómo lo tecleas», y se rechazaban respuestas correctas por su grafía:
+ * «[Ne]3s²3p²» (como escribe las configuraciones el propio bloque educativo), «[Ne]3s2 3p2»,
+ * «los halógenos» o «el mercurio». Ahora los superíndices pasan a dígitos y se quita el
+ * artículo inicial; los espacios interiores los ignora `comparable`, al comparar.
  */
 export function normalizar(texto: string): string {
   return texto
@@ -159,8 +185,21 @@ export function normalizar(texto: string): string {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
+    .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, (c) => SUPERINDICES[c] ?? c)
     .replace(/[.,;:]+$/g, '')
-    .replace(/\s+/g, ' ');
+    .replace(/\s+/g, ' ')
+    .replace(/^(el|la|los|las|lo) /, '');
+}
+
+/**
+ * La forma con la que de verdad se compara: la normalizada y SIN ningún espacio.
+ *
+ * Ninguna respuesta de estas fichas se distingue de otra por un espacio —«[Ne] 3s2 3p2» y
+ * «[Ne]3s23p2» son la misma configuración, «grupo 17» y «grupo17» el mismo grupo—, así que
+ * quitarlos no puede hacer pasar una respuesta equivocada y sí evita suspender por holgura.
+ */
+function comparable(texto: string): string {
+  return normalizar(texto).replace(/\s+/g, '');
 }
 
 /** Los dos sinónimos que SIEMPRE valen para un elemento: su símbolo y su nombre. */
@@ -455,7 +494,9 @@ export function toleranciaDe(valorEsperado: number): number {
  */
 export function comprobarRespuesta(
   respuestaUsuario: string,
-  caso: Pick<CasoTablaPeriodica, 'respuestaTexto' | 'respuestaNumerica' | 'sinonimos'>,
+  caso: Pick<CasoTablaPeriodica, 'respuestaTexto' | 'respuestaNumerica' | 'sinonimos'> & {
+    respuestaEntera?: boolean;
+  },
 ): ComprobacionBusqueda {
   const escrita = normalizar(respuestaUsuario);
   if (escrita === '') return { correcto: false, motivo: 'vacia' };
@@ -466,6 +507,17 @@ export function comprobarRespuesta(
     // en absoluto. `parseFloat` se quedaría con el prefijo de «63abc» y lo daría por bueno.
     const valor = parseSpanishNumber(respuestaUsuario);
     if (!Number.isFinite(valor)) return { correcto: false, motivo: 'fallo' };
+    /**
+     * ⚠️ 27/09/2026 (hallazgo 2284) — el número atómico es un RECUENTO de protones, y se le
+     * aplicaba el mismo 1 % que a la masa: en la ficha 10 (Z = 19) «19,1» y «19,19» salían
+     * «¡Correcto!», y 19,1 no es el número atómico de nada. Mismo defecto que el hallazgo
+     * 2149 cerró en simulador-mitosis-meiosis. En un recuento solo vale el entero exacto
+     * («19,0» sí: es 19 escrito de otra forma). La masa conserva su tolerancia.
+     */
+    if (caso.respuestaEntera === true) {
+      const correcto = Number.isInteger(valor) && valor === caso.respuestaNumerica;
+      return { correcto, motivo: correcto ? 'acierto' : 'fallo' };
+    }
     /**
      * ⚠️ 22/09/2026 (hallazgo 1211, medido en simulador-movimiento-circular) — la comparación en
      * el borde EXACTO decidía por el ±1 ulp de la resta en binario, así que la misma desviación
@@ -480,7 +532,8 @@ export function comprobarRespuesta(
     return { correcto, motivo: correcto ? 'acierto' : 'fallo' };
   }
 
-  const correcto = caso.sinonimos.includes(escrita);
+  const buscada = comparable(escrita);
+  const correcto = caso.sinonimos.some((s) => comparable(s) === buscada);
   return { correcto, motivo: correcto ? 'acierto' : 'fallo' };
 }
 
@@ -600,7 +653,7 @@ const DEFINICIONES: readonly DefinicionFicha[] = [
     etiquetaRespuesta: 'Símbolo o nombre del elemento',
     pasos: [
       'Los tres están en la primera columna, uno debajo de otro.',
-      'Abre sus fichas y compara el radio atómico: litio 167 pm, sodio 190 pm, potasio 243 pm.',
+      'Abre sus fichas y compara el radio covalente: litio 133 pm, sodio 155 pm, potasio 196 pm.',
       'El potasio es el mayor: dentro de un grupo, el radio CRECE al bajar porque se añade una capa.',
     ],
     pista: 'Bajar por una columna significa añadir una capa de electrones.',
@@ -721,6 +774,10 @@ function construirFicha(definicion: DefinicionFicha, indice: number): CasoTablaP
     etiquetaRespuesta: definicion.etiquetaRespuesta,
     respuestaTexto: resultado.texto,
     respuestaNumerica: esNumerica ? resultado.numero : null,
+    respuestaEntera:
+      esNumerica &&
+      definicion.datos.propiedad !== undefined &&
+      PROPIEDADES_ENTERAS.has(definicion.datos.propiedad),
     sinonimos,
     pasos: definicion.pasos,
     pista: definicion.pista,
@@ -802,6 +859,7 @@ export function generarEjercicioAleatorio(semilla?: number): EjercicioBusqueda {
     etiquetaRespuesta: etiquetas[propiedad],
     respuestaTexto: resultado.texto,
     sinonimos: [normalizar(resultado.texto)],
+    respuestaEntera: PROPIEDADES_ENTERAS.has(propiedad),
     pasos: [
       `Usa el buscador y escribe «${elemento.nombre}» o su símbolo, ${elemento.simbolo}.`,
       'Abre su ficha y localiza el dato que se pide.',
@@ -827,5 +885,6 @@ export function comprobarEjercicio(
     respuestaTexto: ejercicio.respuestaTexto,
     respuestaNumerica: Number.isFinite(numero) ? numero : null,
     sinonimos: ejercicio.sinonimos,
+    respuestaEntera: ejercicio.respuestaEntera,
   });
 }
