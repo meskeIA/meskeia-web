@@ -230,8 +230,16 @@ export const FISCAL_PLAN_PENSIONES_META = {
   nota: 'Límites orientativos 2026. Consulta con tu entidad gestora o asesor fiscal.',
 };
 
+/**
+ * Límite de la reducción por aportaciones (art. 52.1 LIRPF, cotejado en el BOE consolidado
+ * BOE-A-2006-20764 el 27/09/2026): «la menor» de a) el 30 % de la suma de los rendimientos
+ * netos del trabajo y de actividades económicas percibidos individualmente y b) 1.500 €. El
+ * 30 % (`porcentajeRendimientosNetos`) se añadió ese día: estimador-irpf enunciaba solo los
+ * 1.500 € (hallazgo 2321). Con 4.000 € de rendimientos netos, el tope es 1.200 €, no 1.500 €.
+ */
 export const LIMITES_PLAN_PENSIONES_2025 = {
-  limiteIndividualAnual:    1500,  // €/año (solo aportación del trabajador)
+  porcentajeRendimientosNetos: 30, // % de rendimientos netos del trabajo + actividades (art. 52.1.a)
+  limiteIndividualAnual:    1500,  // €/año (solo aportación del trabajador; art. 52.1.b)
   limiteEmpresaAnual:       8500,  // €/año adicional si incluye contribución empresarial
   limiteTotalAnual:        10000,  // €/año suma individual + empresa
   limiteDiscapacidadAnual: 24250,  // Para personas con discapacidad ≥ 33%

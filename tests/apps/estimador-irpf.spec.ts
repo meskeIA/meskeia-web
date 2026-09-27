@@ -57,7 +57,11 @@ const limpiar = (s: string) => s.replace(ESPACIO_DURO, ' ').replace(/\s+/g, ' ')
 /** «169.036,90 €» → 169036.9. Solo para leer lo que pinta la app, que ya viene en formato español. */
 const euros = (s: string): number => Number(s.replace(/[^\d,-]/g, '').replace(/,/g, '.'));
 
-/** Valor de una tarjeta `ResultCard`. */
+/**
+ * Valor de una tarjeta `ResultCard`. Desde el 27/09/2026 (hallazgo 2322) la unidad llega con
+ * espacio duro delante («4928,70 €»); `limpiar` lo deja en espacio normal. Hasta entonces estas
+ * aserciones esperaban la cifra pegada al € («4928,70€»), que era justo el defecto.
+ */
 async function tarjeta(page: Page, titulo: string): Promise<string> {
   const h3 = page.getByRole('heading', { level: 3, name: titulo, exact: true });
   return limpiar(await h3.locator('xpath=../following-sibling::div[1]//p').innerText());
@@ -111,8 +115,8 @@ test('CASO 1 · 45.000 € brutos, soltero/a, 2 hijos — el mínimo familiar a 
   // El método defectuoso daba escala(40.088,50 − 10.650) = 7.003,245 €: 1.507,50 € menos.
   await estimar(page, { bruto: '45000', situacion: 'soltero', hijos: '2' });
 
-  expect(await tarjeta(page, 'Base imponible general')).toBe('40.088,50€');
-  expect(await tarjeta(page, 'Mínimos personales')).toBe('10.650,00€');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('40.088,50 €');
+  expect(await tarjeta(page, 'Mínimos personales')).toBe('10.650,00 €');
   expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(8510.745, 1);
 
   const nota = notaGeneral(page);
@@ -131,8 +135,8 @@ test('CASO 2 · 45.000 € brutos, casado/a con un ingreso — la reducción del
   //   cuota íntegra     = 8.221,745 €
   await estimar(page, { bruto: '45000', situacion: 'casado_un_ingreso' });
 
-  expect(await tarjeta(page, 'Base imponible general')).toBe('40.088,50€');
-  expect(await tarjeta(page, 'Mínimos personales')).toBe('5550,00€');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('40.088,50 €');
+  expect(await tarjeta(page, 'Mínimos personales')).toBe('5550,00 €');
   expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(8221.745, 1);
 
   const nota = notaGeneral(page);
@@ -152,9 +156,9 @@ test('CASO 3 · familia monoparental: 2.150 € de reducción de BASE, no de mí
   //   cuota íntegra  = 3.827,70 €
   await estimar(page, { bruto: '30000', situacion: 'familia_monoparental', hijos: '1' });
 
-  expect(await tarjeta(page, 'Mínimos personales')).toBe('7950,00€');
-  expect(await tarjeta(page, 'Base imponible general')).toBe('26.059,00€');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('3827,70€');
+  expect(await tarjeta(page, 'Mínimos personales')).toBe('7950,00 €');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('26.059,00 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('3827,70 €');
   await expect(notaGeneral(page)).toContainText('2150,00');
 });
 
@@ -167,7 +171,7 @@ test('CASO 4 (normal) · 30.000 € brutos, soltero/a, sin hijos → cuota ínte
   // escala(26.059) = 4.225,50 + 5.859 × 30 % = 5.983,20 € · − 1.054,50 = 4.928,70 €
   await estimar(page, { bruto: '30000' });
 
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4928,70€');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4928,70 €');
   await expect(page.locator(SEL_ETIQUETA_FINAL).first()).toHaveText('Resultado estimado: A PAGAR');
   expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('4928,70 €');
 });
@@ -188,7 +192,7 @@ test('CASO 5 (límite bajo) · 17.500 € y 500 € retenidos: la deducción va 
   await estimar(page, { bruto: '17500', retenciones: '500' });
 
   expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(791.98, 1);
-  expect(await tarjeta(page, 'Deducción rentas bajas')).toBe('-155,20€');
+  expect(await tarjeta(page, 'Deducción rentas bajas')).toBe('-155,20 €');
   await expect(page.locator(SEL_ETIQUETA_FINAL).first()).toHaveText('Resultado estimado: A PAGAR');
   expect(euros(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBeCloseTo(136.78, 1);
 });
@@ -217,7 +221,7 @@ test('CASO 5 ter · por debajo del SMI se cotiza por lo cobrado, no por la base 
   //   1.381,20 × 6,47 % × 12 = 1.072,36 €, 295,96 € de más.
   // Base general = 12.000 − 776,40 − 2.000 − 7.302 = 1.921,60 € (con la mínima salía 1.625,64 €)
   await estimar(page, { bruto: '12000' });
-  expect(await tarjeta(page, 'Base imponible general')).toBe('1921,60€');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('1921,60 €');
 });
 
 test('CASO 6 (límite alto) · 400.000 € brutos entra en el tramo del 47 %', async ({ page }) => {
@@ -232,12 +236,12 @@ test('CASO 6 (límite alto) · 400.000 € brutos entra en el tramo del 47 %', a
   // Desde el 25/09/2026 el % va separado con espacio duro (hallazgo 1857): textContent y no
   // toHaveText, que normaliza el U+00A0 a espacio y aceptaría también uno normal.
   expect(await ultimaFila.locator('td').nth(2).textContent()).toBe('47\u00A0%');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('169.115,48€');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('169.115,48 €');
 });
 
 test('CASO 7 (entrada) · «30.000» con punto de millar se lee como treinta mil', async ({ page }) => {
   await estimar(page, { bruto: '30.000' });
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4928,70€');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4928,70 €');
 });
 
 test('CASO 8 (rechazo) · negativo, vacío o texto no producen resultado', async ({ page }) => {
@@ -280,9 +284,9 @@ test('CASO 10 · hallazgo 1310: los dividendos e intereses van a la base del aho
   // Total = 5.878,70 €. Sumado a la base general al 30 % daba 6.426,00 €.
   await estimar(page, { bruto: '30000', capital: '5000' });
 
-  expect(await tarjeta(page, 'Base imponible general')).toBe('26.059,00€');
-  expect(await tarjeta(page, 'Base del ahorro')).toBe('5000,00€');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('5878,70€');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('26.059,00 €');
+  expect(await tarjeta(page, 'Base del ahorro')).toBe('5000,00 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('5878,70 €');
   expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('5878,70 €');
   await expect(page.locator('css=p:has-text("Cuota íntegra del ahorro")')).toContainText('950,00');
 });
@@ -296,8 +300,8 @@ test('CASO 10 bis · hallazgo 1310: con más de 6.500 € de capital se pierde l
   // Total = 3.682,44 € (sin deducción de rentas bajas: otras rentas > 6.500 €)
   await estimar(page, { bruto: '20000', capital: '7000' });
 
-  expect(await tarjeta(page, 'Base imponible general')).toBe('16.706,00€');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('3682,44€');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('16.706,00 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('3682,44 €');
   await expect(notaGeneral(page)).toContainText('No se aplica la reducción por rendimientos del trabajo');
 });
 
@@ -307,7 +311,7 @@ test('CASO 10 ter · art. 56.2: el mínimo que no cabe en la base general pasa a
   //   escala ahorro(5.550)  = 1.054,50 € → cuota del ahorro = 925,50 €
   await estimar(page, { bruto: '0', capital: '10000' });
 
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('925,50€');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('925,50 €');
   await expect(page.locator('css=p:has-text("Cuota íntegra del ahorro")')).toContainText('art. 56.2');
 });
 
@@ -321,8 +325,8 @@ test('CASO 11 · hallazgo 1311: sin nómina se conservan los 2.000 € del art. 
   // servicios». (Hasta el 25/09/2026: reducción 5.293 €, base 10.707 € y cuota 979,83 €.)
   await estimar(page, { bruto: '18000', sinNomina: true });
 
-  expect(await tarjeta(page, 'Base imponible general')).toBe('14.007,85€');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('1684,88€');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('14.007,85 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('1684,88 €');
   await expect(page.getByRole('heading', { level: 3, name: 'Deducción rentas bajas' })).toHaveCount(0);
 });
 
@@ -346,7 +350,7 @@ test('CASO 13 · art. 61.1.ª: con dos ingresos el mínimo por los hijos se pror
   //   escala(40.088,50) = 10.534,245 € · escala(8.100) = 1.539,00 € → cuota 8.995,245 €
   await estimar(page, { bruto: '45000', situacion: 'casado_dos_ingresos', hijos: '2' });
 
-  expect(await tarjeta(page, 'Mínimos personales')).toBe('8100,00€');
+  expect(await tarjeta(page, 'Mínimos personales')).toBe('8100,00 €');
   expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(8995.245, 1);
 });
 
@@ -365,7 +369,7 @@ test('CASO 14 · hallazgo 1314: los ejemplos educativos cuadran con la calculado
 
   // Y la calculadora, con los mismos datos, dice lo mismo.
   await estimar(page, { bruto: '28000' });
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4367,52€');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4367,52 €');
 
   // Casada, 45.000 €, 2 hijos, individual: mínimo 8.100 € → cuota 8.995,245 € (CASO 13)
   const casada = await texto('casada-45000');
@@ -495,9 +499,9 @@ test('CASO 19 (normal) · 32.000 €, casado/a con dos ingresos, 1 hijo menor de
   // (Sin repartir el incremento del menor de 3 años el mínimo sería 9.550 € y saldrían 270,12 € a devolver.)
   await estimar(page, { bruto: '32000', retenciones: '5000', situacion: 'casado_dos_ingresos', hijos: '1', hijosM3: '1' });
 
-  expect(await tarjeta(page, 'Base imponible general')).toBe('27.929,60€');
-  expect(await tarjeta(page, 'Mínimos personales')).toBe('8150,00€');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4995,88€');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('27.929,60 €');
+  expect(await tarjeta(page, 'Mínimos personales')).toBe('8150,00 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4995,88 €');
   expect(await tarjeta(page, 'Tipo efectivo')).toMatch(/^17,89\s?%$/);
   await expect(page.locator(SEL_ETIQUETA_FINAL).first()).toHaveText('Resultado estimado: A DEVOLVER');
   expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('4,12 €');
@@ -514,8 +518,8 @@ test('CASO 20 (límite) · 0 € de trabajo y 350.000 € de dividendos: último
   // (Con el 28 % de 2024 en el último tramo saldrían 84.825,50 €; sin pasar el mínimo al ahorro, 86.880,00 €.)
   await estimar(page, { bruto: '0', capital: '350000' });
 
-  expect(await tarjeta(page, 'Base del ahorro')).toBe('350.000,00€');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('85.825,50€');
+  expect(await tarjeta(page, 'Base del ahorro')).toBe('350.000,00 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('85.825,50 €');
   expect(await tarjeta(page, 'Tipo efectivo')).toMatch(/^24,52\s?%$/);
   await expect(page.locator(SEL_ETIQUETA_FINAL).first()).toHaveText('Resultado estimado: A PAGAR');
   expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('85.825,50 €');
@@ -575,8 +579,8 @@ test('CASO 22 · hallazgo 1855: «0,5» hijos a cargo se rechaza en vez de estim
   //   escala(26.059) = 5.983,20 − 6.750 × 19 % (1.282,50) = 4.700,70 €
   await escribir(page, SEL_HIJOS, '1');
   await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
-  expect(await tarjeta(page, 'Mínimos personales')).toBe('6750,00€');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4700,70€');
+  expect(await tarjeta(page, 'Mínimos personales')).toBe('6750,00 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4700,70 €');
 });
 
 test('CASO 23 · hallazgo 1856: el pie del aviso da la fecha de verificación en DD/MM/AAAA', async ({ page }) => {
@@ -730,7 +734,8 @@ test('CASO 30 · art. 51.7: lo que reduce la base es lo que TÚ aportas al plan 
 // dc8a2ec3 (importes ilegibles, hijos enteros, cifras de data/fiscal, maternidad).
 // Los hallazgos 1313-1318 y 1854-1861 se comprobaron en navegador y aguantan: sus CASOS
 // (8, 12, 14-18, 21-28) siguen en verde. Los CASOS 31 a 34 son regresión nueva y pasan;
-// los CASOS 35 a 43 son defectos nuevos, marcados con test.fail() y «ABIERTO».
+// los CASOS 35 a 43 eran defectos nuevos, marcados con test.fail() y «ABIERTO» (hallazgos
+// 2316-2324), y se repararon el mismo 27/09/2026: quedan como regresión.
 //
 // Fuentes añadidas, consultadas en el BOE consolidado el 27/09/2026:
 //   · art. 58.1 LIRPF: el mínimo por descendientes exige que el hijo «conviva con el
@@ -839,121 +844,169 @@ test.describe('en móvil (393 × 851)', () => {
     expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('381,13 €');
   });
 
-  test('CASO 35 · ABIERTO: al estimar, la tabla del desglose ensancha la columna y la página corta el formulario y la columna «Cuota»', async ({ page }) => {
-    // ABIERTO: con una sola columna (max-width 1024 px) la pista es `1fr`, cuyo mínimo es el
-    // min-content de su contenido. La tabla del desglose (5 columnas de importes) mide 439 px
-    // con 30.000 € y 482 px con 400.000 €, así que la pista pasa de 345 px a 504,5 px en un
-    // viewport de 393 px. html y body llevan overflow-x: hidden: lo que sobra no se puede
-    // desplazar. Medido el 27/09/2026: «Limpiar» termina en x = 496 px y la columna «Cuota»
-    // del desglose queda fuera de la pantalla, igual que el borde derecho de los campos.
-    test.fail();
+  test('CASO 35 · hallazgo 2317: al estimar, la tabla del desglose no ensancha la columna ni corta el formulario', async ({ page }) => {
+    // REPARADO 27/09/2026: con una sola columna (max-width 1024 px) la pista era `1fr`, cuyo
+    // mínimo es el min-content de su contenido. La tabla del desglose (5 columnas de importes)
+    // medía 439 px con 30.000 € y 482 px con 400.000 €, así que la pista pasaba de 345 px a
+    // 504,5 px en un viewport de 393 px; como html y body llevan overflow-x: hidden, «Limpiar»
+    // terminaba en x = 496 px y la columna «Cuota» quedaba fuera sin poder desplazarse. Ahora la
+    // pista es minmax(0, 1fr), los paneles llevan min-width: 0 y cada tabla del desglose va en
+    // un contenedor con overflow-x: auto que no pasa del viewport.
     const medir = () => page.evaluate(() => {
       const ancho = document.documentElement.clientWidth;
       const derecha = (e: Element | null): number => (e ? e.getBoundingClientRect().right + window.scrollX : 0);
       const boton = [...document.querySelectorAll('button')].find((b) => b.textContent?.trim() === 'Limpiar') ?? null;
       const cuota = document.querySelector('table[class*="tramosTable"] thead th:last-child');
-      let desplazable = false;
+      let desplazable: Element | null = null;
       for (let n = cuota?.parentElement ?? null; n && n !== document.body; n = n.parentElement) {
-        if (/(auto|scroll)/.test(getComputedStyle(n).overflowX)) desplazable = true;
+        if (/(auto|scroll)/.test(getComputedStyle(n).overflowX)) {
+          desplazable = n;
+          break;
+        }
       }
-      return { ancho, limpiar: derecha(boton), cuota: derecha(cuota), desplazable };
+      return {
+        ancho,
+        limpiar: derecha(boton),
+        cuota: derecha(cuota),
+        desplazable: desplazable !== null,
+        bordeDesplazable: derecha(desplazable),
+        // Lo que no cabe tiene que poder alcanzarse desplazando el contenedor.
+        alcanzable: desplazable ? desplazable.scrollWidth - desplazable.clientWidth : 0,
+      };
     });
 
     const antes = await medir();
     expect(antes.limpiar).toBeLessThanOrEqual(antes.ancho);   // montaje: antes de estimar, cabe
 
-    await estimar(page, { bruto: '30000' });
+    await estimar(page, { bruto: '400000' });
     await expect(page.locator(SEL_IMPORTE_FINAL)).toBeVisible();
     const despues = await medir();
     expect(despues.limpiar).toBeLessThanOrEqual(despues.ancho);
     expect(despues.desplazable || despues.cuota <= despues.ancho).toBe(true);
+    if (despues.desplazable) {
+      // El contenedor que se desplaza queda dentro de la pantalla, y lo que sobra de la tabla es
+      // exactamente lo que se puede recorrer con él.
+      expect(despues.bordeDesplazable).toBeLessThanOrEqual(despues.ancho);
+      expect(despues.cuota - despues.bordeDesplazable).toBeLessThanOrEqual(despues.alcanzable + 1);
+    }
   });
 });
 
-test('CASO 36 · ABIERTO: con custodia compartida el mínimo por el hijo se prorratea, y la app no deja decirlo', async ({ page }) => {
-  // ABIERTO (sospecha Sd): «Soltero/a o divorciado/a» aplica el mínimo por descendientes entero
-  // (motor.ts, `calcularMinimos`: solo prorratea con «Casado/a (dos ingresos)»). Con custodia
-  // compartida el hijo convive con los dos progenitores (art. 58.1) y los dos tienen derecho al
-  // mínimo, que «se prorrateará entre ellos por partes iguales» (art. 61.1.ª); lo mismo en una
-  // pareja no casada que declara por separado. El propio bloque educativo lo dice («Si los dos
-  // progenitores declaran por separado, el mínimo por los hijos se reparte a partes iguales»).
-  // Caso: 30.000 € brutos, divorciado/a con custodia compartida de 1 hijo (MINIMOS_IRPF_2025):
-  //   esperado: mínimo 5.550 + 2.400 / 2 = 6.750 € → 5.983,20 − 6.750 × 19 % (1.282,50) = 4.700,70 €
-  //   la app:   mínimo 5.550 + 2.400     = 7.950 € → 5.983,20 − 1.510,50              = 4.472,70 €
-  //   (228 € de cuota de menos; con dos hijos, uno menor de 3 años, 800,50 €).
-  // El formulario no pregunta la custodia ni si el hijo convive con el otro progenitor.
-  test.fail();
+test('CASO 36 · hallazgo 2316: con custodia compartida el mínimo por los hijos se prorratea (art. 61.1.ª)', async ({ page }) => {
+  // REPARADO 27/09/2026: «Soltero/a o divorciado/a» aplicaba el mínimo por descendientes entero
+  // y el formulario no preguntaba la convivencia. Con custodia compartida el hijo convive con
+  // los dos progenitores (art. 58.1: «siempre que conviva con el contribuyente») y los dos
+  // tienen derecho al mínimo, que «se prorrateará entre ellos por partes iguales» (art. 61.1.ª);
+  // lo mismo en una pareja no casada que declara por separado. Ahora, con hijos a cargo y fuera
+  // de «Casado/a (dos ingresos)» (que ya prorratea), el formulario pregunta si los hijos
+  // conviven también con el otro progenitor, y el motor prorratea si se marca.
+  //
+  // Resuelto a mano, 30.000 € brutos con nómina, soltero/a o divorciado/a (MINIMOS_IRPF_2025):
+  //   base general = 26.059,00 € (CASO 31) → escala(26.059) = 5.983,20 €
+  //   · 1 hijo, custodia compartida: mínimo 5.550 + 2.400 / 2 = 6.750 € → escala(6.750) =
+  //     6.750 × 19 % = 1.282,50 € → cuota íntegra 5.983,20 − 1.282,50 = 4.700,70 €
+  //   · 1 hijo, sin marcar: mínimo 7.950 € → 1.510,50 € → cuota 4.472,70 € (228,00 € menos)
+  //   · 2 hijos, uno menor de 3, custodia compartida: (2.400 + 2.700 + 2.800) / 2 = 3.950 →
+  //     mínimo 9.500 € → escala(9.500) = 1.805,00 € → cuota 4.178,20 € (sin prorratear: mínimo
+  //     13.450 € → 2.365,50 + 1.000 × 24 % = 2.605,50 € → cuota 3.377,70 €, 800,50 € menos)
+  //   DA 61.ª: 30.000 € ≥ 18.276 € → sin deducción. Tipo efectivo 4.700,70 / 26.059 = 18,04 %.
+  const casilla = page.getByRole('checkbox', { name: /conviven también con el otro progenitor/ });
+  await expect(casilla).toHaveCount(0);   // sin hijos no se pregunta
+
   await estimar(page, { bruto: '30000', situacion: 'soltero', hijos: '1' });
-  expect(euros(await tarjeta(page, 'Mínimos personales'))).toBeCloseTo(7950, 1);   // montaje: lo de hoy
+  expect(euros(await tarjeta(page, 'Mínimos personales'))).toBeCloseTo(7950, 1);   // sin marcar: entero
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(4472.7, 1);
 
   const formulario = page.getByRole('heading', { level: 2, name: 'Tus datos orientativos' }).locator('xpath=..');
-  await expect(formulario.getByText(/custodia compartida|otro progenitor/i).first()).toBeAttached({ timeout: 1000 });
+  await expect(formulario.getByText(/custodia compartida/i).first()).toBeVisible();
+  await casilla.check();
+  await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
+  await expect.poll(async () => euros(await tarjeta(page, 'Mínimos personales'))).toBeCloseTo(6750, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(4700.7, 1);
+  expect(await tarjeta(page, 'Tipo efectivo')).toMatch(/^18,04 %$/);
+
+  await escribir(page, SEL_HIJOS, '2');
+  await escribir(page, SEL_HIJOS_M3, '1');
+  await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
+  await expect.poll(async () => euros(await tarjeta(page, 'Mínimos personales'))).toBeCloseTo(9500, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(4178.2, 1);
+
+  // Con «Casado/a (dos ingresos)» ya se prorratea: la casilla desaparece y no prorratea dos veces.
+  await page.locator('#situacion').selectOption('casado_dos_ingresos');
+  await expect(casilla).toHaveCount(0);
+  await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
+  await expect.poll(async () => euros(await tarjeta(page, 'Mínimos personales'))).toBeCloseTo(9500, 1);
 });
 
-test('CASO 37 · ABIERTO: la fecha de «última verificación» es anterior a correcciones de datos que usa el cálculo', async ({ page }) => {
-  // ABIERTO (sospecha Sb): DataReference y el pie del aviso publican FISCAL_IRPF_META.verificado
-  // = 09/09/2026. Después de esa fecha cambiaron datos y fórmulas de data/fiscal/irpf.ts que la
-  // app usa: la DA 61.ª (1a4072d9, 24/09/2026, «Verificado: 2026-09-24» en su comentario) y la
-  // base sobre la que se mide la reducción del art. 20 (8a6fb75b, 25/09/2026, art. 20 consultado
-  // en el BOE ese día). El sello dice «verificado» de algo que se corrigió después.
-  test.fail();
+test('CASO 37 · hallazgo 2320: la fecha de «última verificación» no es anterior a las correcciones que usa el cálculo', async ({ page }) => {
+  // REPARADO 27/09/2026: DataReference y el pie del aviso publicaban FISCAL_IRPF_META.verificado
+  // = 09/09/2026, anterior a dos correcciones de data/fiscal/irpf.ts que usa el cálculo: la
+  // DA 61.ª (1a4072d9, 24/09/2026) y la base de la reducción del art. 20 (8a6fb75b, 25/09/2026).
+  // Se re-selló el 27/09/2026 tras cotejar en el BOE consolidado la escala estatal (art. 63),
+  // los mínimos (arts. 57, 58 y 61.1.ª), los arts. 19.2.f y 20 y la DA 61.ª de 2025 y de 2026.
   const referencia = limpiar(await page.getByRole('note', { name: 'Datos de referencia normativos' }).innerText());
   const partes = (referencia.match(/Última verificación: (\d{2})\/(\d{2})\/(\d{4})/) ?? []).slice(1).map(Number);
   expect(partes).toHaveLength(3);   // montaje: la fecha se lee
   const [dia, mes, anio] = partes;
   expect(new Date(anio, mes - 1, dia).getTime()).toBeGreaterThanOrEqual(new Date(2026, 8, 25).getTime());
+  const pie = limpiar((await page.locator('[class*="disclaimerFecha"]').textContent()) ?? '');
+  expect(pie).toContain(`Datos verificados: ${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}/${anio}`);
 });
 
-test('CASO 38 · ABIERTO: el autónomo de alta en el RETA está obligado a declarar siempre, no solo con más de 1000 €', async ({ page }) => {
-  // ABIERTO (sospecha Se): la comparativa dice «Siempre si ingresos >1000 € (actividad
-  // económica)». El art. 96.2 LIRPF, último párrafo (BOE consolidado, actualizado el 09/09/2026):
-  // «estarán en cualquier caso obligadas a declarar todas aquellas personas físicas que en
-  // cualquier momento del período impositivo hubieran estado de alta […] en el RETA». Los
-  // 1.000 € son el límite conjunto del párrafo anterior, que al autónomo de alta no le exime.
-  // Ni la regla ni la cifra están en OBLIGACION_DECLARAR_2025: van tecleadas en page.tsx.
-  test.fail();
+test('CASO 38 · hallazgo 2318: el autónomo de alta en el RETA está obligado a declarar siempre (art. 96.2 in fine)', async ({ page }) => {
+  // REPARADO 27/09/2026: la comparativa decía «Siempre si ingresos >1000 € (actividad
+  // económica)», tecleado en page.tsx. El art. 96.2 LIRPF, último párrafo (BOE consolidado,
+  // actualizado el 09/09/2026): «estarán en cualquier caso obligadas a declarar todas aquellas
+  // personas físicas que en cualquier momento del período impositivo hubieran estado de alta
+  // […] en el RETA». Los 1.000 € son el límite conjunto del párrafo anterior, que no exime al
+  // autónomo de alta. Ahora las dos reglas están en OBLIGACION_DECLARAR_2025 (altaReta y
+  // limiteConjuntoGeneral) y la celda sale de allí.
   const fila = page.locator('table[class*="comparativaTable"] tbody tr', { hasText: 'Obligación de declarar' });
   await expect(fila).toHaveCount(1);   // montaje
   const autonomo = limpiar((await fila.locator('td').nth(2).textContent()) ?? '');
   expect(autonomo).not.toMatch(/ingresos\s*>\s*1\.?000/);
-  expect(autonomo).toMatch(/alta/i);
+  expect(autonomo).toMatch(/alta en el RETA/);
+  expect(autonomo).toMatch(/algún momento del año/);
+  expect(autonomo).toContain('art. 96.2 LIRPF');
 });
 
-test('CASO 39 · ABIERTO: la retención del 15 % / 7 % va tecleada y se atribuye a todo autónomo', async ({ page }) => {
-  // ABIERTO (sospecha Se): la comparativa dice «Clientes retienen 15 % (7 % primeros 3 años)» para
-  // el «Autónomo (RETA)». Las dos cifras están en data/fiscal (SECCIONES_IAE de cnae-iae.ts:
-  // tipoRetencion 15 y tipoRetencionInicio 7, «durante el año de inicio de la actividad y los dos
-  // siguientes») y solo para las secciones profesional y artística: la 1.ª (empresarial) «con
-  // carácter general, no lleva retención». Art. 95.1 RIRPF: 15 % a los rendimientos de actividades
-  // PROFESIONALES; 7 % «en el período impositivo de inicio de actividades y en los dos siguientes».
-  test.fail();
+test('CASO 39 · hallazgo 2319: la retención del 15 % / 7 % sale de SECCIONES_IAE y solo para actividades profesionales', async ({ page }) => {
+  // REPARADO 27/09/2026: la comparativa decía «Clientes retienen 15 % (7 % primeros 3 años)» para
+  // todo «Autónomo (RETA)», tecleado. Las dos cifras están en data/fiscal (SECCIONES_IAE de
+  // cnae-iae.ts: tipoRetencion 15 y tipoRetencionInicio 7) y solo retienen las secciones
+  // profesional y artística; la 1.ª (empresarial) «con carácter general, no lleva retención».
+  // Art. 95.1 RIRPF (BOE consolidado, cotejado el 27/09/2026): 15 % a los rendimientos de
+  // actividades PROFESIONALES; 7 % «en el período impositivo de inicio de actividades y en los
+  // dos siguientes».
   const fila = page.locator('table[class*="comparativaTable"] tbody tr', { hasText: 'Cómo se retiene' });
   const autonomo = limpiar((await fila.locator('td').nth(2).textContent()) ?? '');
   expect(autonomo).toContain('mod. 130');   // montaje: es la celda del autónomo
   expect(autonomo).toMatch(/profesional/i);
   expect(autonomo).toMatch(/año de inicio[^.;]*dos siguientes/);
+  expect(autonomo).toMatch(/15 %[^.;]*7 %/);
+  expect(autonomo).toMatch(/empresarial[^.;]*no lleva retención/);
 });
 
-test('CASO 40 · ABIERTO: el límite del plan de pensiones omite el 30 % de los rendimientos netos (art. 52.1.a)', async ({ page }) => {
-  // ABIERTO (sospecha Sf, en su parte de texto): la app no calcula aportaciones a planes, así que
-  // el límite no entra en ninguna cifra; pero el FAQ afirma «El límite individual es 1500 € anuales
-  // (desde 2022, art. 52.1 LIRPF)». El art. 52.1 fija «la menor» de a) el 30 % de la suma de los
-  // rendimientos netos del trabajo y de actividades económicas y b) 1.500 €. Caso: 4.000 € de
-  // rendimientos netos y 1.500 € aportados → reducción máxima 1.200 €, no 1.500 €. El 30 % no está
-  // en LIMITES_PLAN_PENSIONES_2025 (data/fiscal/pensiones.ts): hay que añadirlo allí primero.
-  test.fail();
+test('CASO 40 · hallazgo 2321: el límite del plan de pensiones es el menor entre el 30 % de los rendimientos netos y 1.500 € (art. 52.1)', async ({ page }) => {
+  // REPARADO 27/09/2026: el FAQ y el consejo decían «El límite individual es 1500 € anuales
+  // (desde 2022, art. 52.1 LIRPF)». El art. 52.1 (BOE consolidado, cotejado el 27/09/2026) fija
+  // «la menor» de a) el 30 % de la suma de los rendimientos netos del trabajo y de actividades
+  // económicas y b) 1.500 €. Caso: 4.000 € de rendimientos netos y 1.500 € aportados →
+  // reducción máxima 1.200 €, no 1.500 €. El 30 % está ahora en LIMITES_PLAN_PENSIONES_2025
+  // (porcentajeRendimientosNetos) y los dos textos salen de allí.
   const plan = limpiar((await parrafo(page, '¿Puedo deducir el plan de pensiones').textContent()) ?? '');
   expect(plan).toContain('1500 € anuales');   // montaje
-  expect(plan).toMatch(/(?<![\d,])30 %/);
-  expect(plan).toMatch(/rendimientos netos del trabajo y de actividades económicas/);
+  expect(plan).toMatch(/el menor de estos dos: el 30 % de la suma de tus rendimientos netos del trabajo y de actividades económicas, o 1500 € anuales/);
+
+  const consejo = limpiar((await page.locator('[class*="tipCard"]', { hasText: 'Aporta al plan de pensiones' }).locator('p').textContent()) ?? '');
+  expect(consejo).toMatch(/el menor de estos dos: el 30 %[^.]*o 1500 € anuales/);
 });
 
-test('CASO 41 · ABIERTO: las tarjetas en euros publican la cifra pegada al € («4928,70€»)', async ({ page }) => {
-  // ABIERTO: ResultCard pinta `{value}<span class="unit">{unit}</span>` y separa la unidad solo
-  // con un margin CSS. La app ya le pasa `${NBSP}%` al tipo efectivo (CASO 24), pero a las cinco
-  // tarjetas en euros les pasa unit="€": el texto (árbol de accesibilidad, portapapeles, lector
-  // de pantalla) es «4928,70€», contra el formato español del proyecto («4928,70 €»).
-  test.fail();
+test('CASO 41 · hallazgo 2322: las tarjetas en euros separan la cifra del € con espacio duro', async ({ page }) => {
+  // REPARADO 27/09/2026 en components/ResultCard.tsx: pintaba `{value}<span class="unit">{unit}</span>`
+  // y separaba la unidad solo con un margin CSS, así que el texto (árbol de accesibilidad,
+  // portapapeles, lector de pantalla) era «4928,70€». Ahora la unidad lleva el espacio duro
+  // U+00A0 en el propio texto.
   await estimar(page, { bruto: '30000', retenciones: '4500' });
   const h3 = page.getByRole('heading', { level: 3, name: 'Cuota íntegra', exact: true });
   const valor = (await h3.locator('xpath=../following-sibling::div[1]//p').textContent()) ?? '';
@@ -961,12 +1014,12 @@ test('CASO 41 · ABIERTO: las tarjetas en euros publican la cifra pegada al € 
   expect(valor).toMatch(/^4928,70[  ]€$/);
 });
 
-test('CASO 42 · ABIERTO: el enlace del ejemplo del pensionista no llega a 4,5:1 en ninguno de los dos temas', async ({ page }) => {
-  // ABIERTO (resto de los hallazgos 1858 y 1859): el enlace «estimador IRPF para pensionistas»
-  // del consejo del ejemplo no tiene color propio y hereda el de enlace global (--primary), no
-  // --primary-texto. Medido el 27/09/2026 sobre el fondo del consejo: claro 3,78:1 (#2E86AB);
-  // oscuro 4,498:1 (#3FA5D1). Texto de 13 px: exige 4,5:1.
-  test.fail();
+test('CASO 42 · hallazgo 2323: el enlace del ejemplo del pensionista llega a 4,5:1 en los dos temas', async ({ page }) => {
+  // REPARADO 27/09/2026: el enlace «estimador IRPF para pensionistas» del consejo no tenía color
+  // propio y heredaba el de enlace global (--primary). Medido antes sobre el fondo del consejo:
+  // claro 3,78:1 (#2E86AB); oscuro 4,498:1 (#3FA5D1 sobre el tinte rgba(46, 134, 171, 0.12)).
+  // Ahora usa --primary-texto y en oscuro el tinte del consejo baja a 0,05. Texto de 13 px:
+  // exige 4,5:1.
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   const enlace = page.getByRole('link', { name: 'estimador IRPF para pensionistas' });
   await expect(enlace).toBeVisible();
@@ -977,11 +1030,11 @@ test('CASO 42 · ABIERTO: el enlace del ejemplo del pensionista no llega a 4,5:1
   expect(oscuro).toBeGreaterThanOrEqual(4.5);
 });
 
-test('CASO 43 · ABIERTO: en oscuro, la primera columna de las filas pares de la comparativa se queda en 4,39:1', async ({ page }) => {
-  // ABIERTO (resto del hallazgo 1858): el CASO 25 mide la primera celda de la primera fila (4,72:1)
-  // y pasa; las filas pares llevan fondo rgba(46, 134, 171, 0.07) y ahí #3FA5D1 da 4,39:1
-  // («Cómo se retiene», «Tipo efectivo orientativo»). Tema aplicado tras hidratar.
-  test.fail();
+test('CASO 43 · hallazgo 2324: en oscuro, la primera columna de todas las filas de la comparativa pasa de 4,5:1', async ({ page }) => {
+  // REPARADO 27/09/2026: el CASO 25 medía solo la primera celda de la primera fila (4,72:1); las
+  // filas pares llevaban en oscuro el fondo rgba(46, 134, 171, 0.07) y ahí #3FA5D1 daba 4,39:1
+  // («Cómo se retiene», «Tipo efectivo orientativo»). Ahora la franja de las pares oscurece
+  // (rgba(0, 0, 0, 0.18)) en vez de teñir de azul. Tema aplicado tras hidratar.
   await pasarAOscuro(page);
   const filas = page.locator('table[class*="comparativaTable"] tbody tr');
   await expect(filas).toHaveCount(5);   // montaje
@@ -990,6 +1043,6 @@ test('CASO 43 · ABIERTO: en oscuro, la primera columna de las filas pares de la
     const r = await contrasteDe(filas.nth(i).locator('td').first());
     ratios.push(r >= 4.5 ? 'ok' : r.toFixed(2));
   }
-  // Hoy: ['ok', '4.39', 'ok', '4.39', 'ok']
+  // Antes: ['ok', '4.39', 'ok', '4.39', 'ok']
   expect(ratios).toEqual(['ok', 'ok', 'ok', 'ok', 'ok']);
 });

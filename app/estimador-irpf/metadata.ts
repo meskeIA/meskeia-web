@@ -118,7 +118,7 @@ export const faqJsonLd = {
       name: '¿Están obligados a declarar todos los contribuyentes en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `No. En general, no están obligados a declarar quienes obtienen rendimientos del trabajo de hasta ${eur(OBLIGACION.trabajo.unPagador)} anuales de un solo pagador, o de hasta ${eur(OBLIGACION.trabajo.variosPagadores)} con dos o más pagadores cuando del segundo y siguientes se reciben más de ${eur(OBLIGACION.trabajo.limiteSegundoPagador)} al año. Hay excepciones: los rendimientos del capital mobiliario y las ganancias patrimoniales sujetos a retención de más de ${eur(OBLIGACION.capitalMobiliario.limite)}, o las rentas inmobiliarias imputadas de más de ${eur(OBLIGACION.rentasImputadas.limite)}, obligan a declarar.`,
+        text: `No. En general, no están obligados a declarar quienes obtienen rendimientos del trabajo de hasta ${eur(OBLIGACION.trabajo.unPagador)} anuales de un solo pagador, o de hasta ${eur(OBLIGACION.trabajo.variosPagadores)} con dos o más pagadores cuando del segundo y siguientes se reciben más de ${eur(OBLIGACION.trabajo.limiteSegundoPagador)} al año. Hay excepciones: los rendimientos del capital mobiliario y las ganancias patrimoniales sujetos a retención de más de ${eur(OBLIGACION.capitalMobiliario.limite)}, o las rentas inmobiliarias imputadas de más de ${eur(OBLIGACION.rentasImputadas.limite)}, obligan a declarar. Y quien haya estado de alta en el RETA como autónomo en algún momento del año está obligado a declarar siempre, sea cual sea su rendimiento (${OBLIGACION.altaReta.articulo}).`,
       },
     },
   ],

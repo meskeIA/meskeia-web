@@ -27,7 +27,24 @@ export const FISCAL_IRPF_META = {
   // 2026-09-09: reducción del art. 20 corregida contra el Manual práctico de Renta 2025
   // de la AEAT. La revisión del 2026-08-12 la dio por buena y llevaba la redacción
   // anterior al RDL 4/2024, con una reducción residual de 2.364 € que no existe.
-  verificado: '2026-09-09',
+  // 2026-09-27: re-sellado tras las correcciones del 24/09 (DA 61.ª, 1a4072d9) y del 25/09
+  // (base de la reducción del art. 20, 8a6fb75b), que el sello del 09/09 no cubría (hallazgo
+  // 2320 de estimador-irpf). Cotejado ese día contra el texto consolidado del BOE
+  // (BOE-A-2006-20764, actualizado a 09/09/2026):
+  //   · art. 63.1.1.º, escala estatal: límites 12.450 / 20.200 / 35.200 / 60.000 / 300.000 y
+  //     tipos 9,5 / 12 / 15 / 18,5 / 22,5 / 24,5 %. Cuadran los LÍMITES de TRAMOS_IRPF_2025;
+  //     sus tipos son estatal + autonómico medio (art. 74 remite a la escala de cada CCAA, que
+  //     el BOE estatal no fija): esa mitad autonómica es una hipótesis orientativa, no un dato.
+  //   · art. 57.1 (5.550 €) y 57.2 (+1.150 desde 65, +1.400 más desde 75 → 6.700 / 8.100).
+  //   · art. 58.1 (2.400 / 2.700 / 4.000 / 4.500) y 58.2 (+2.800 por menor de 3 años);
+  //     art. 61.1.ª (prorrateo por partes iguales entre quienes tienen derecho).
+  //   · art. 19.2.f (2.000 €) y art. 20 (7.302 € hasta 14.852; −1,75 × exceso hasta 17.673,52;
+  //     2.364,34 − 1,14 × exceso hasta 19.747,5; sobre el íntegro menos los gastos de las letras
+  //     a) a e) del art. 19.2; 6.500 € de otras rentas).
+  //   · DA 61.ª en su redacción de 2025 (Ley 5/2025, disp. final 3.ª, BOE-A-2025-15424): 340 €
+  //     hasta 16.576 €, 340 − 0,2 × exceso hasta 18.276 €; y la de 2026 (RDL 5/2026, art. 28):
+  //     590,89 € hasta 17.094 €, hasta 20.048,45 €.
+  verificado: '2026-09-27',
   vigencia: '2026',
   urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI01.shtml',
   nota: 'Tramos estatales + tipo autonómico medio. Cada CCAA puede tener variaciones. Verificar en la Agencia Tributaria para cálculo exacto.',
@@ -547,6 +564,13 @@ export function tipoMarginalDesdeRendimientosBrutos(brutos: number): number {
  *
  * Fuente: https://sede.agenciatributaria.gob.es
  * Verificado: 2026-04-01
+ *
+ * 2026-09-27: art. 96.2 y 96.3 cotejados en el BOE consolidado (BOE-A-2006-20764, actualizado
+ * a 09/09/2026): 22.000 · 1.600 · 1.000 · 15.876 · 1.500 € cuadran. Añadidos el límite
+ * conjunto de 1.000 € del penúltimo párrafo del art. 96.2 y la obligación del alta en el RETA
+ * de su último párrafo, que estimador-irpf llevaba tecleados y mezclados: decía que el autónomo
+ * declara «siempre si ingresos > 1000 €», cuando el alta en el RETA obliga en cualquier caso
+ * (hallazgo 2318).
  */
 export const OBLIGACION_DECLARAR_2025 = {
   // Rendimientos del trabajo
@@ -566,6 +590,28 @@ export const OBLIGACION_DECLARAR_2025 = {
   // Rendimientos del trabajo no sujetos a retención (pensiones extranjeras, etc.)
   trabajoSinRetencion: {
     limite: 15876,
+  },
+  /**
+   * Art. 96.2, penúltimo párrafo: nunca declara quien solo obtiene rendimientos íntegros del
+   * trabajo, del capital o de actividades económicas y ganancias patrimoniales hasta este
+   * límite CONJUNTO, con pérdidas patrimoniales por debajo de `perdidasMenoresDe`. No exime
+   * a quien estuvo de alta en el RETA (ver `altaReta`).
+   */
+  limiteConjuntoGeneral: {
+    limite: 1000,
+    perdidasMenoresDe: 500,
+  },
+  /**
+   * Art. 96.2, último párrafo: «estarán en cualquier caso obligadas a declarar» las personas
+   * que en cualquier momento del período impositivo hubieran estado de alta, como
+   * trabajadores por cuenta propia, en el RETA o en el régimen especial del Mar. Sin umbral
+   * de ingresos: basta un día de alta en el año.
+   */
+  altaReta: {
+    obligadoSiempre: true,
+    articulo: 'art. 96.2 LIRPF, último párrafo',
+    descripcion:
+      'Siempre, sea cual sea su rendimiento, si estuvo de alta en el RETA (o en el régimen especial del Mar) en algún momento del año',
   },
   // Obligación de declarar SIEMPRE (independientemente del importe)
   siempreObligados: [

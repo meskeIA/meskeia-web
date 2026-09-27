@@ -70,6 +70,14 @@ export interface EntradaIRPF {
   conNomina: boolean;
   /** Mínimo del contribuyente (art. 57). Por defecto, el general; los ejemplos pasan el de ≥65. */
   minimoContribuyente?: number;
+  /**
+   * Los hijos conviven también con el otro progenitor, que declara por separado: custodia
+   * compartida o pareja no casada. Los dos tienen derecho al mínimo por descendientes (art.
+   * 58.1: «siempre que conviva con el contribuyente») y se prorratea por partes iguales (art.
+   * 61.1.ª), sea cual sea la situación. Hasta el 27/09/2026 solo prorrateaba «casado/a (dos
+   * ingresos)» y un divorciado con custodia compartida se aplicaba el mínimo entero (hallazgo 2316).
+   */
+  hijosConvivenConOtroProgenitor?: boolean;
 }
 
 export interface ResultadoIRPF {
@@ -122,15 +130,18 @@ export function cotizacionTrabajadorAnual(brutoAnual: number): number {
 }
 
 /**
- * Mínimo personal y familiar (arts. 57 y 58). Con «casado/a (dos ingresos)» cada cónyuge
- * declara por separado y los dos tienen derecho al mínimo por los mismos hijos, así que se
- * prorratea por partes iguales (art. 61.1.ª LIRPF).
+ * Mínimo personal y familiar (arts. 57 y 58). Se prorratea por partes iguales (art. 61.1.ª
+ * LIRPF) cuando otro contribuyente tiene derecho al mínimo por los mismos hijos: con
+ * «casado/a (dos ingresos)», porque cada cónyuge declara por separado, y en cualquier
+ * situación si los hijos conviven también con el otro progenitor (custodia compartida o
+ * pareja no casada).
  */
 export function calcularMinimos(
   situacion: SituacionFamiliar,
   numHijos: number,
   hijosMenores3: number,
   minimoContribuyente: number = MINIMOS_IRPF_2025.personal,
+  hijosConvivenConOtroProgenitor: boolean = false,
 ): number {
   let porHijos = 0;
   if (numHijos >= 1) porHijos += MINIMOS_IRPF_2025.hijo_1;
@@ -139,7 +150,7 @@ export function calcularMinimos(
   if (numHijos >= 4) porHijos += MINIMOS_IRPF_2025.hijo_4_mas * (numHijos - 3);
   porHijos += Math.min(hijosMenores3, numHijos) * MINIMOS_IRPF_2025.hijo_menor_3;
 
-  const prorrateo = situacion === 'casado_dos_ingresos' ? 0.5 : 1;
+  const prorrateo = situacion === 'casado_dos_ingresos' || hijosConvivenConOtroProgenitor ? 0.5 : 1;
   return minimoContribuyente + porHijos * prorrateo;
 }
 
@@ -193,7 +204,9 @@ export function estimarIRPF(e: EntradaIRPF): ResultadoIRPF {
   const baseLiquidableAhorro = Math.max(0, baseImponibleAhorro - (reduccionConjunta - reduccionConjuntaGeneral));
 
   // Mínimo: a tipo cero en la general; lo que no cabe en ella, en la del ahorro (art. 56.2).
-  const minimosPersonalesFamiliares = calcularMinimos(e.situacion, e.numHijos, e.hijosMenores3, e.minimoContribuyente);
+  const minimosPersonalesFamiliares = calcularMinimos(
+    e.situacion, e.numHijos, e.hijosMenores3, e.minimoContribuyente, e.hijosConvivenConOtroProgenitor ?? false,
+  );
   const minimoEnAhorro = Math.max(0, minimosPersonalesFamiliares - baseLiquidableGeneral);
 
   const escalaGeneral = cuotaEscalaGeneral(baseLiquidableGeneral);

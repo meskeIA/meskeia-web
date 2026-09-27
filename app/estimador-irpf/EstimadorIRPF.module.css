@@ -48,10 +48,15 @@
 /* Main layout */
 .mainContent {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0, 1fr) y min-width: 0 en los hijos: una pista `1fr` no baja del min-content de su
+     contenido, y la tabla del desglose (5 columnas de importes) la ensanchaba por encima del
+     viewport en móvil, cortando el formulario y la columna «Cuota» (hallazgo 2317). */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
 }
+
+.mainContent > * { min-width: 0; }
 
 /* Cards */
 .card {
@@ -213,6 +218,14 @@
   color: var(--text-secondary);
   margin: var(--spacing-md) 0 0;
 }
+
+/* Si la tabla del desglose no cabe (móvil), se desplaza ella sola en horizontal (hallazgo 2317). */
+.tablaDesplazable {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.tablaDesplazable:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .tramosTable { width: 100%; border-collapse: collapse; }
 
@@ -378,8 +391,10 @@
   background: #164e66;
 }
 
+/* En oscuro, la franja de las filas pares OSCURECE en vez de teñir de azul: con el tinte
+   rgba(46, 134, 171, 0.07) la primera columna (#3FA5D1, 14 px) daba 4,39:1 (hallazgo 2324). */
 [data-theme='dark'] .comparativaTable tbody tr:nth-child(even) {
-  background: rgba(46, 134, 171, 0.07);
+  background: rgba(0, 0, 0, 0.18);
 }
 
 /* ── Escenarios / casos de uso ───────────────────────────────────────────── */
@@ -443,8 +458,13 @@
   font-style: italic;
 }
 
+/* Enlace del consejo con el token de texto de marca: heredaba el color de enlace global
+   (--primary) y daba 3,78:1 en claro (hallazgo 2323). */
+.escenarioTip a { color: var(--primary-texto); }
+
+/* En oscuro el tinte del consejo baja de 0,12 a 0,05: con 0,12, #3FA5D1 quedaba en 4,498:1. */
 [data-theme='dark'] .escenarioTip {
-  background: rgba(46, 134, 171, 0.12);
+  background: rgba(46, 134, 171, 0.05);
 }
 
 /* ── FAQ ─────────────────────────────────────────────────────────────────── */
@@ -649,8 +669,8 @@
 /* ── Responsive ─────────────────────────────────────────────────────────── */
 
 @media (max-width: 1024px) {
-  .mainContent { grid-template-columns: 1fr; }
-  .resultsGrid { grid-template-columns: 1fr; }
+  .mainContent { grid-template-columns: minmax(0, 1fr); }
+  .resultsGrid { grid-template-columns: minmax(0, 1fr); }
   .formRow { grid-template-columns: 1fr; }
 }
 

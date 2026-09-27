@@ -20,6 +20,7 @@ import {
   LIMITES_PLAN_PENSIONES_2025,
   APORTACIONES_PLAN_CONYUGE,
   DEDUCCION_MATERNIDAD_IRPF,
+  SECCIONES_IAE,
   calcularCuotaIntegraGeneral,
 } from '@/data/fiscal';
 import { EJERCICIO, estimarIRPF, type EntradaIRPF, type ResultadoIRPF, type SituacionFamiliar } from './motor';
@@ -56,6 +57,16 @@ const ESC_SUELDO_50 = estimarIRPF({ ...ENTRADA_BASE, brutoTrabajo: 50000 });
 const AUTONOMO_RENDIMIENTO_NETO = 35000;
 const AUTONOMO_CUOTA = calcularCuotaIntegraGeneral(AUTONOMO_RENDIMIENTO_NETO, MINIMOS_IRPF_2025.personal);
 
+// Retención en factura del autónomo: solo las secciones del IAE que retienen (profesional y
+// artística, art. 95.1 RIRPF), con sus tipos de data/fiscal. Hasta el 27/09/2026 la
+// comparativa tecleaba «15 % (7 % primeros 3 años)» para todo autónomo (hallazgo 2319).
+const SECCIONES_CON_RETENCION = SECCIONES_IAE.filter((s) => s.retencionIrpf);
+const RETENCION_PROFESIONAL = SECCIONES_CON_RETENCION[0];
+const NOMBRES_CON_RETENCION = SECCIONES_CON_RETENCION
+  .map((s) => s.nombre.replace(/^Actividades /, '').toLowerCase())
+  .join(' o ');
+const SECCIONES_CON_RETENCION_TEXTO = SECCIONES_CON_RETENCION.map((s) => s.seccion.replace('ª', '.ª')).join(' y ');
+
 // FAQ del tipo marginal frente al efectivo
 const FAQ_BASE = 35200;
 const FAQ_CUOTA = calcularCuotaIntegraGeneral(FAQ_BASE, MINIMOS_IRPF_2025.personal);
@@ -74,6 +85,16 @@ const tipoPct = (n: number): string => `${formatNumber(n, Number.isInteger(n) ? 
 const eur = (n: number): string => formatCurrency(n);
 /** Importe normativo sin céntimos cuando no los tiene (19.747,5 € no se redondea). */
 const eur0 = (n: number): string => `${formatNumber(n, Number.isInteger(n) ? 0 : 2)} €`;
+
+/**
+ * Límite de las aportaciones propias a planes de pensiones (art. 52.1 LIRPF): «la menor» de dos
+ * cantidades. Hasta el 27/09/2026 el FAQ y el consejo daban solo los 1.500 € y omitían el 30 %
+ * de la letra a) (hallazgo 2321).
+ */
+const LIMITE_PLAN_TEXTO =
+  `el menor de estos dos: el ${tipoPct(LIMITES_PLAN_PENSIONES_2025.porcentajeRendimientosNetos)} `
+  + 'de la suma de tus rendimientos netos del trabajo y de actividades económicas, o '
+  + `${eur0(LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual)} anuales`;
 
 /** Importe de un campo: vacío = 0 € · ilegible = null, que se rechaza (hallazgo 1854). */
 function leerImporte(texto: string): number | null {
@@ -109,6 +130,7 @@ export default function EstimadorIRPFPage() {
   const [hijosMenores3, setHijosMenores3] = useState('0');
   const [retencionesPracticadas, setRetencionesPracticadas] = useState('');
   const [esTrabajador, setEsTrabajador] = useState(true);
+  const [hijosConOtroProgenitor, setHijosConOtroProgenitor] = useState(false);
 
   // Resultado
   const [resultado, setResultado] = useState<ResultadoIRPF | null>(null);
@@ -171,8 +193,10 @@ export default function EstimadorIRPFPage() {
       numHijos: hijos,
       hijosMenores3: hijosM3,
       conNomina: esTrabajador,
+      // Con «casado/a (dos ingresos)» el motor ya prorratea: la casilla no se muestra.
+      hijosConvivenConOtroProgenitor: hijos > 0 && situacion !== 'casado_dos_ingresos' && hijosConOtroProgenitor,
     }));
-  }, [rendimientosTrabajo, rendimientosCapital, situacion, numHijos, hijosMenores3, retencionesPracticadas, esTrabajador]);
+  }, [rendimientosTrabajo, rendimientosCapital, situacion, numHijos, hijosMenores3, retencionesPracticadas, esTrabajador, hijosConOtroProgenitor]);
 
   const limpiar = () => {
     setRendimientosTrabajo('');
@@ -180,6 +204,7 @@ export default function EstimadorIRPFPage() {
     setRetencionesPracticadas('');
     setNumHijos('0');
     setHijosMenores3('0');
+    setHijosConOtroProgenitor(false);
     setResultado(null);
     setAviso('');
   };
@@ -297,6 +322,35 @@ export default function EstimadorIRPFPage() {
               />
             </div>
 
+            {(leerEntero(numHijos) ?? 0) > 0 && (
+              <div className={styles.formGroup}>
+                {situacion === 'casado_dos_ingresos' ? (
+                  <p className={styles.ayuda}>
+                    Con «Casado/a (dos ingresos)» cada cónyuge declara por separado y el mínimo por
+                    los hijos ya se reparte a partes iguales entre los dos (art. 61.1.ª LIRPF).
+                  </p>
+                ) : (
+                  <>
+                    <label className={styles.label}>
+                      <input
+                        type="checkbox"
+                        checked={hijosConOtroProgenitor}
+                        onChange={e => setHijosConOtroProgenitor(e.target.checked)}
+                        style={{ marginRight: '0.5rem' }}
+                        aria-describedby="ayuda-otro-progenitor"
+                      />
+                      Los hijos conviven también con el otro progenitor (custodia compartida o pareja no casada)
+                    </label>
+                    <p id="ayuda-otro-progenitor" className={styles.ayuda}>
+                      Si el otro progenitor también tiene derecho al mínimo por los mismos hijos, se
+                      reparte entre los dos a partes iguales (arts. 58.1 y 61.1.ª LIRPF): cada uno
+                      se aplica la mitad.
+                    </p>
+                  </>
+                )}
+              </div>
+            )}
+
             <div className={styles.buttonGroup}>
               <button type="button" onClick={calcular} className={styles.btnPrimary}>
                 Estimar IRPF
@@ -396,6 +450,7 @@ export default function EstimadorIRPFPage() {
               <div className={styles.tramosSection}>
                 <h3 className={styles.tramosTitle}><span aria-hidden="true">📊</span> {`Desglose por tramos IRPF ${EJERCICIO} · base general`}</h3>
                 {resultado.desgloseTramos.length > 0 ? (
+                  <div className={styles.tablaDesplazable} role="region" aria-label="Desglose por tramos de la base general" tabIndex={0}>
                   <table className={styles.tramosTable}>
                     <thead>
                       <tr>
@@ -420,6 +475,7 @@ export default function EstimadorIRPFPage() {
                         ))}
                     </tbody>
                   </table>
+                  </div>
                 ) : (
                   <p className={styles.tramosNota}>La base liquidable general es 0: no hay cuota general.</p>
                 )}
@@ -450,6 +506,7 @@ export default function EstimadorIRPFPage() {
                 {resultado.baseLiquidableAhorro > 0 && (
                   <>
                     <h3 className={styles.tramosTitle}><span aria-hidden="true">🏦</span> {`Base del ahorro IRPF ${EJERCICIO}`}</h3>
+                    <div className={styles.tablaDesplazable} role="region" aria-label="Desglose por tramos de la base del ahorro" tabIndex={0}>
                     <table className={styles.tramosTable}>
                       <thead>
                         <tr>
@@ -474,6 +531,7 @@ export default function EstimadorIRPFPage() {
                           ))}
                       </tbody>
                     </table>
+                    </div>
                     <p className={styles.tramosNota}>
                       Los dividendos y los intereses no se suman a la base general: tributan en la
                       base del ahorro con su propia escala (art. 66 LIRPF), que suma{' '}
@@ -638,14 +696,24 @@ export default function EstimadorIRPFPage() {
                     más de {eur0(OBLIGACION_DECLARAR_2025.trabajo.variosPagadores)} si del 2.º y siguientes
                     llegan más de {eur0(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)}
                   </td>
-                  <td>Siempre si ingresos &gt;1000 € (actividad económica)</td>
+                  <td>
+                    {OBLIGACION_DECLARAR_2025.altaReta.descripcion} ({OBLIGACION_DECLARAR_2025.altaReta.articulo}):
+                    el límite conjunto de {eur0(OBLIGACION_DECLARAR_2025.limiteConjuntoGeneral.limite)} no le exime
+                  </td>
                   <td>Los mismos umbrales que el asalariado: la pensión es rendimiento del trabajo</td>
                   <td>Cada uno con su propio umbral si declaran por separado</td>
                 </tr>
                 <tr>
                   <td><strong>Cómo se retiene</strong></td>
                   <td>La empresa retiene automáticamente en nómina</td>
-                  <td>Clientes retienen 15&nbsp;% (7&nbsp;% primeros 3 años); pagos propios trimestrales (mod. 130)</td>
+                  <td>
+                    En actividades {NOMBRES_CON_RETENCION} (secciones {SECCIONES_CON_RETENCION_TEXTO} del
+                    IAE), los clientes empresarios o profesionales retienen el{' '}
+                    {tipoPct(RETENCION_PROFESIONAL.tipoRetencion ?? 0)} de la factura
+                    ({tipoPct(RETENCION_PROFESIONAL.tipoRetencionInicio ?? 0)} en el año de inicio de la actividad
+                    y los dos siguientes, art. 95.1 RIRPF). Una actividad empresarial, con carácter general,
+                    no lleva retención. Además, pagos fraccionados trimestrales (mod. 130)
+                  </td>
                   <td>La entidad que paga la pensión retiene según su cuantía</td>
                   <td>Cada empleador retiene según sus datos; riesgo de infra-retención</td>
                 </tr>
@@ -729,7 +797,7 @@ export default function EstimadorIRPFPage() {
                 <p><strong>Tipo efectivo:</strong> {pct(ESC_CASADA.tipoEfectivo)} de la base</p>
               </div>
               <div className={styles.escenarioTip}>
-                Si los dos progenitores declaran por separado, el mínimo por los hijos se reparte a partes iguales (art. 61.1.ª LIRPF): {eur((MINIMOS_IRPF_2025.hijo_1 + MINIMOS_IRPF_2025.hijo_2) / 2)} para cada uno, que le ahorran {eur(ESC_CASADA_SIN_HIJOS.cuotaIntegra - ESC_CASADA.cuotaIntegra)} de cuota. El mínimo no reduce la base: se le aplica la escala desde cero, así que se valora al {tipoPct(TRAMOS_IRPF_2025[0].tipo)} y no a su tipo marginal. En la calculadora corresponde a «Casado/a (dos ingresos)».
+                Si los dos progenitores declaran por separado, el mínimo por los hijos se reparte a partes iguales (art. 61.1.ª LIRPF): {eur((MINIMOS_IRPF_2025.hijo_1 + MINIMOS_IRPF_2025.hijo_2) / 2)} para cada uno, que le ahorran {eur(ESC_CASADA_SIN_HIJOS.cuotaIntegra - ESC_CASADA.cuotaIntegra)} de cuota. El mínimo no reduce la base: se le aplica la escala desde cero, así que se valora al {tipoPct(TRAMOS_IRPF_2025[0].tipo)} y no a su tipo marginal. En la calculadora corresponde a «Casado/a (dos ingresos)»; con custodia compartida o en pareja no casada, marca que los hijos conviven también con el otro progenitor.
               </div>
             </div>
 
@@ -803,7 +871,7 @@ export default function EstimadorIRPFPage() {
             <div className={styles.faqItem}>
               <h4>¿Puedo deducir el plan de pensiones?</h4>
               <p>
-                Sí. Las aportaciones a planes de pensiones reducen directamente la <strong>base imponible general</strong>. El límite individual es <strong>{eur0(LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual)} anuales</strong> (desde 2022, art. 52.1 LIRPF). Si tu empresa también aporta, el límite conjunto sube a <strong>{eur0(LIMITES_PLAN_PENSIONES_2025.limiteTotalAnual)} anuales</strong> ({eur0(LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual)} individuales + hasta {eur0(LIMITES_PLAN_PENSIONES_2025.limiteEmpresaAnual)} de contribuciones de la empresa o de tus aportaciones al mismo plan de empleo). Esta reducción se aplica antes de calcular la cuota, por lo que el ahorro fiscal real depende de tu tipo marginal ({TRAMOS_IRPF_2025[0].tipo}–{tipoPct(TRAMOS_IRPF_2025[TRAMOS_IRPF_2025.length - 1].tipo)}).
+                Sí. Las aportaciones a planes de pensiones reducen directamente la <strong>base imponible general</strong>. El límite de tus aportaciones es <strong>{LIMITE_PLAN_TEXTO}</strong> (desde 2022, art. 52.1 LIRPF). Si tu empresa también aporta, el límite conjunto sube a <strong>{eur0(LIMITES_PLAN_PENSIONES_2025.limiteTotalAnual)} anuales</strong> ({eur0(LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual)} individuales + hasta {eur0(LIMITES_PLAN_PENSIONES_2025.limiteEmpresaAnual)} de contribuciones de la empresa o de tus aportaciones al mismo plan de empleo). Esta reducción se aplica antes de calcular la cuota, por lo que el ahorro fiscal real depende de tu tipo marginal ({TRAMOS_IRPF_2025[0].tipo}–{tipoPct(TRAMOS_IRPF_2025[TRAMOS_IRPF_2025.length - 1].tipo)}).
               </p>
             </div>
 
@@ -942,7 +1010,7 @@ export default function EstimadorIRPFPage() {
               <span className={styles.tipIcon} aria-hidden="true">💼</span>
               <h4>Aporta al plan de pensiones antes del 31 de diciembre</h4>
               <p>
-                Las aportaciones reducen la base imponible directamente: con tipo marginal del {tipoPct(PLAN_MARGINAL)}, cada {eur0(PLAN_APORTACION)} aportados suponen <strong>{eur0((PLAN_APORTACION * PLAN_MARGINAL) / 100)} menos de IRPF</strong>. El límite individual es {eur0(LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual)}/año. Si tu empresa también aporta, el límite conjunto es {eur0(LIMITES_PLAN_PENSIONES_2025.limiteTotalAnual)}. Si tu cónyuge no tiene rendimientos netos del trabajo ni de actividades económicas, o suman menos de {eur0(APORTACIONES_PLAN_CONYUGE.rendimientosMaximosConyuge)} al año, lo que tú aportes a <strong>su</strong> plan de pensiones también reduce tu base, hasta {eur0(APORTACIONES_PLAN_CONYUGE.limiteAnual)} al año (art. 51.7 LIRPF). Importante: el plan de pensiones difiere la tributación, no la elimina. Al rescatar, el importe tributa íntegro como rendimiento del trabajo. El ahorro real depende de la diferencia entre tu tipo marginal actual y el de la jubilación.
+                Las aportaciones reducen la base imponible directamente: con tipo marginal del {tipoPct(PLAN_MARGINAL)}, cada {eur0(PLAN_APORTACION)} aportados suponen <strong>{eur0((PLAN_APORTACION * PLAN_MARGINAL) / 100)} menos de IRPF</strong>. El límite de tus aportaciones es {LIMITE_PLAN_TEXTO} (art. 52.1 LIRPF). Si tu empresa también aporta, el límite conjunto es {eur0(LIMITES_PLAN_PENSIONES_2025.limiteTotalAnual)}. Si tu cónyuge no tiene rendimientos netos del trabajo ni de actividades económicas, o suman menos de {eur0(APORTACIONES_PLAN_CONYUGE.rendimientosMaximosConyuge)} al año, lo que tú aportes a <strong>su</strong> plan de pensiones también reduce tu base, hasta {eur0(APORTACIONES_PLAN_CONYUGE.limiteAnual)} al año (art. 51.7 LIRPF). Importante: el plan de pensiones difiere la tributación, no la elimina. Al rescatar, el importe tributa íntegro como rendimiento del trabajo. El ahorro real depende de la diferencia entre tu tipo marginal actual y el de la jubilación.
               </p>
             </div>
 
