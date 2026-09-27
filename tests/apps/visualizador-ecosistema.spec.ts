@@ -23,7 +23,12 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *   pasó al nivel superior de la pirámide (nivel trófico ~4,4 en FishBase): 0,1 % → 1.000 kg de
  *   fitoplancton por kg, tres transferencias (1.000 → 100 → 10 → 1).
  *
- * LOS DEFECTOS QUE DEJÓ DOCUMENTADOS la inspección (test.fail, 25/09/2026)
+ * RE-INSPECCIÓN del 27/09/2026: los diez REPARADOS se verificaron en el navegador (escritorio
+ *   1280, móvil 393 × 851 y tema oscuro aplicado tras la hidratación) y aguantan. Dos defectos
+ *   nuevos quedan con test.fail al final del fichero: la sospecha S1 (complejidad-estabilidad) y
+ *   el aria-label de la pirámide que oculta al lector la energía de cada nivel.
+ *
+ * LOS DEFECTOS QUE DEJÓ DOCUMENTADOS la inspección del 25/09/2026 (hoy REPARADOS, f03c1260)
  *   · Sospecha confirmada: la regla del 10 % se enuncia como ley exacta («solo el 10% de la
  *     energía pasa al siguiente», «▼ solo 10% pasa», «pierdes el 90%») y el FAQPage dice que el
  *     90 % «se disipa como calor metabólico», contra el 60/20/10 de la propia app. Es la forma del
@@ -162,13 +167,14 @@ test('caso límite — una sola sección, una sola ficha, y cambiar de ciclo cie
   await expect(page.locator('span[class*="cicloCentroNombre"]')).toHaveText('Ciclo del Nitrógeno');
 });
 
-// ─── Defectos documentados el 25/09/2026 (test.fail: expresan lo CORRECTO) ───────────────────
+// ─── Defectos documentados el 25/09/2026, REPARADOS en f03c1260 y verificados el 27/09/2026 ───
+// Cada test expresa lo CORRECTO; el «Obtenía» de los comentarios es lo que la app hacía ANTES.
 
-// SOSPECHA CONFIRMADA — regla del 10 % como ley exacta (forma del hallazgo 1610).
+// REPARADO (hallazgo 1734) — regla del 10 % como ley exacta (forma del hallazgo 1610).
 // Entrada: abrir «Regla del 10 %» y leer el FAQPage.
 // Esperado: el 10 % como media o aproximación (como quedó simulador-ecosistema-trofico: «en
 // promedio solo en torno al 10 %», Lindeman 1942, eficiencias reales muy dispersas), y un FAQ que
-// no contradiga el reparto de la propia app. Obtenido: «En cada nivel trófico, solo el 10% de la
+// no contradiga el reparto de la propia app. Obtenía: «En cada nivel trófico, solo el 10% de la
 // energía pasa al siguiente» sin matiz, y el FAQ «el 90% restante se disipa como calor
 // metabólico» frente al 60 % respiración + 20 % desechos + 10 % no consumido de DESTINO_ENERGIA.
 test('sospecha — la regla del 10 % se presenta como media, y el FAQ no contradice el reparto de la app', async ({
@@ -189,11 +195,11 @@ test('sospecha — la regla del 10 % se presenta como media, y el FAQ no contrad
   expect(faq[1]).not.toMatch(/el 90\s?% restante se disipa como calor/);
 });
 
-// HALLAZGO — el atún. Entrada: Pirámide → el nivel cuyos ejemplos incluyen «Atún».
+// REPARADO (hallazgo 1735) — el atún. Entrada: Pirámide → el nivel cuyos ejemplos incluyen «Atún».
 // Esperado, con la regla de la propia app: kg de fitoplancton por kg de atún = 100 / (% de energía
-// de su nivel). Atún en «Consumidores secundarios» (1 %) → 100 kg. Obtenido: la tarjeta del mismo
+// de su nivel). Atún en «Consumidores secundarios» (1 %) → 100 kg. Obtenía: la tarjeta del mismo
 // nivel dice 1 % y el recuadro de debajo «10.000 kg de fitoplancton para 1 kg de atún» (0,01 %,
-// un quinto nivel que la pirámide no tiene). El atún real está en torno al nivel trófico 4-4,5.
+// un quinto nivel que la pirámide no tiene). El atún real: nivel trófico 4,4 ± 0,4 (FishBase).
 test('atún — los kg de fitoplancton por kg de atún cuadran con el nivel donde la pirámide lo pone', async ({ page }) => {
   await irA(page, 'Pirámide trófica');
   let pctAtun = NaN;
@@ -210,7 +216,7 @@ test('atún — los kg de fitoplancton por kg de atún cuadran con el nivel dond
   expect(kgFito).toBe(100 / pctAtun);
 });
 
-// HALLAZGO — biomasa y especies por nivel. Entrada: Pirámide → Productores y Consumidores primarios.
+// REPARADO (hallazgo 1736) — biomasa y especies por nivel. Entrada: Pirámide → Productores y Consumidores primarios.
 // Esperado: cifras que no sean el 10 % aplicado a la biomasa y a las especies. Productores
 // «~1.000 kg por hectárea» queda por debajo de casi todo ecosistema terrestre (Whittaker y Likens,
 // 1975: ~7 t/ha matorral desértico, ~16 t/ha pradera templada, ~450 t/ha selva tropical), y en el
@@ -234,7 +240,7 @@ test('biomasa y especies — no son el 10 % aplicado donde no aplica', async ({ 
   await expect(contenido(page).locator('div[class*="contexto"]')).toContainText('pueden invertirse');
 });
 
-// HALLAZGO — «Tu agua es antigua». Entrada: Datos fascinantes → «Tu agua es antigua».
+// REPARADO (hallazgo 1740) — «Tu agua es antigua». Entrada: Datos fascinantes → «Tu agua es antigua».
 // Esperado, a mano: agua total ~1.386 millones de km³ / evaporación global ~500.000 km³ al año
 // ≈ 2.800 años por vuelta; en ~4.000 millones de años ≈ 1,4 millones de vueltas, no «miles de
 // millones de veces» (tres órdenes de magnitud por encima).
@@ -249,9 +255,9 @@ test('dato — el agua no ha dado «miles de millones» de vueltas al ciclo hidr
   await expect(tarjeta).toContainText('un millón y medio de vueltas');
 });
 
-// HALLAZGO — Yellowstone. Entrada: Datos → «Lobos de Yellowstone» y la guía educativa.
+// REPARADO (hallazgo 1741) — Yellowstone. Entrada: Datos → «Lobos de Yellowstone» y la guía educativa.
 // Esperado: el efecto sobre los ríos como hipótesis discutida (Marshall, Hobbs y Cooper, 2013,
-// Proc. R. Soc. B; Hobbs et al., 2024, Ecological Monographs), no como hecho. Obtenido: «los ríos
+// Proc. R. Soc. B; Hobbs et al., 2024, Ecological Monographs), no como hecho. Obtenía: «los ríos
 // cambiaron de curso» y «los ríos literalmente cambiaron de curso».
 test('contenido — los ríos de Yellowstone no se afirman como hecho', async ({ page }) => {
   await irA(page, 'Datos fascinantes');
@@ -267,9 +273,9 @@ test('contenido — los ríos de Yellowstone no se afirman como hecho', async ({
   expect(texto).toMatch(/debatid/);
 });
 
-// HALLAZGO — formato español. Entrada: abrir las cuatro secciones y cada una de sus fichas.
+// REPARADO (hallazgo 1739) — formato español. Entrada: abrir las cuatro secciones y cada una de sus fichas.
 // Esperado: «10 %» con espacio (como quedó simulador-ecosistema-trofico, 0d54c8f9), «1.000 kcal»
-// como sus vecinas «10.000» y «9.000», y «10 veces» en vez de «10x». Obtenido: «10%», «1000 kcal»
+// como sus vecinas «10.000» y «9.000», y «10 veces» en vez de «10x». Obtenía: «10%», «1000 kcal»
 // (formatNumber con es-ES no agrupa cuatro cifras) y «~2 ha (10x más)».
 test('formato — ningún «N%» pegado, «1.000 kcal» y nada de «10x»', async ({ page }) => {
   let texto = (await page.locator('nav[aria-label="Secciones del explicador"]').textContent()) ?? '';
@@ -341,8 +347,8 @@ async function contrasteMinimo(page: Page, selector: string): Promise<number> {
   }, selector);
 }
 
-// HALLAZGO — contraste en los dos temas. Todos son texto pequeño (12-17,6 px, < 18,66 px en
-// negrita): exigen 4,5:1. Medido el 25/09/2026 con getComputedStyle sobre el fondo real:
+// REPARADO (hallazgo 1738) — contraste en los dos temas. Todos son texto pequeño (12-17,6 px, < 18,66 px en
+// negrita): exigen 4,5:1. Lo que se midió ANTES de f03c1260, con getComputedStyle sobre el fondo real:
 //   claro  → «1000 kcal» #CA8A04 2,81 · «Energía solar» 2,81 · «10% de la energía» 2,94 ·
 //            «10%» de la dieta 3,02 · «Ciclo del Carbono» del centro 3,16 · datoCifra 3,67
 //   oscuro → «1%» de la dieta #DC2626 2,62 · «0,1% de la energía» 2,97 · datoCifra #2E86AB 3,50
@@ -381,8 +387,8 @@ test('contraste — cifras de nivel, flujo, dieta, datos y centro del ciclo a 4,
   expect({ claro, oscuro }).toEqual({ claro: [], oscuro: [] });
 });
 
-// HALLAZGO — la pirámide en escritorio. Entrada: 1280 px, sección Pirámide.
-// Esperado: el icono, el nombre y la energía de cada nivel dentro de su botón. Obtenido: el nivel
+// REPARADO (hallazgo 1737) — la pirámide en escritorio. Entrada: 1280 px, sección Pirámide.
+// Esperado: el icono, el nombre y la energía de cada nivel dentro de su botón. Obtenía: el nivel
 // superior mide 77 px (10 % del ancho) y su contenido ocupa ~188 px: el águila y «0,1% de la
 // energía original» se pintan fuera del borde.
 test('pirámide — en escritorio cada nivel contiene su texto', async ({ page }) => {
@@ -427,8 +433,8 @@ test.describe('móvil 375 × 667 con toque', () => {
     await expect(page.locator('div[class$="__cicloDetalle"]')).toContainText('~25');
   });
 
-  // HALLAZGO — en móvil la pirámide deja de serlo. `.piramideNivel { min-width: 80% }` iguala los
-  // tres niveles de consumidores: medido 262 · 262 · 262 · 327 px. Esperado: anchos crecientes de
+  // REPARADO (hallazgo 1737) — en móvil la pirámide dejaba de serlo. `.piramideNivel { min-width: 80% }` iguala los
+  // tres niveles de consumidores: medía 262 · 262 · 262 · 327 px. Esperado: anchos crecientes de
   // arriba abajo, que es lo que la sección enseña.
   test('móvil — los niveles de la pirámide se ensanchan de arriba abajo', async ({ page }) => {
     await nav(page).filter({ hasText: 'Pirámide trófica' }).tap();
@@ -450,8 +456,8 @@ test.describe('móvil 375 × 667 con toque', () => {
   });
 });
 
-// HALLAZGO — 13 emojis sin aria-hidden en «Cadena trófica vs Red trófica» (L603-631 de page.tsx,
-// `node scripts/check-a11y-jsx.mjs`). Esperado: el lector no los anuncia. Obtenido: el árbol de
+// REPARADO (hallazgo 1742) — 13 emojis sin aria-hidden en «Cadena trófica vs Red trófica» (L603-631 de page.tsx,
+// `node scripts/check-a11y-jsx.mjs`). Esperado: el lector no los anuncia. Obtenía: el árbol de
 // accesibilidad lee «🌿 Planta 🐇 Conejo 🦊 Zorro…».
 test('accesibilidad — los emojis de la cadena y la red trófica no llegan al lector', async ({ page }) => {
   await irA(page, 'Datos fascinantes');
@@ -459,9 +465,9 @@ test('accesibilidad — los emojis de la cadena y la red trófica no llegan al l
   expect(arbol).not.toMatch(/\p{Extended_Pictographic}/u);
 });
 
-// HALLAZGO — FAQPage de la pirámide. Esperado: coherente con la app, que dice «Descomponedores — No
+// REPARADO (hallazgo 1743) — FAQPage de la pirámide. Esperado: coherente con la app, que dice «Descomponedores — No
 // forman parte de la pirámide», y sin «siempre» para una pirámide de números que puede invertirse.
-// Obtenido: «productores…, consumidores secundarios (carnívoros) y descomponedores» y «las
+// Obtenía: «productores…, consumidores secundarios (carnívoros) y descomponedores» y «las
 // poblaciones de depredadores son siempre mucho menores que las de sus presas».
 test('FAQ — la pirámide no incluye a los descomponedores como nivel', async ({ page }) => {
   const respuesta = await page.evaluate(() => {
@@ -474,4 +480,214 @@ test('FAQ — la pirámide no incluye a los descomponedores como nivel', async (
   expect(respuesta).toContain('pirámide trófica');
   expect(respuesta).not.toMatch(/\(carnívoros\) y descomponedores/);
   expect(respuesta).not.toMatch(/siempre mucho menores/);
+});
+
+// ─── Re-inspección del 27/09/2026 ─────────────────────────────────────────────────────────────
+
+// CASO LÍMITE / ESTADO VACÍO en Datos fascinantes. Resuelto a mano: abrir «Tu agua es antigua»
+// (7.ª tarjeta) y luego «El atún y el fitoplancton» (8.ª) deja expandida SOLO la 8.ª, con su
+// cifra derivada de motor.ts: 10³ = 1.000 y 10^3,4 = 2.511,9 → redondeado a centenas, 2.500.
+// Volver a pulsarla la cierra (ninguna ficha abierta) y salir de la sección y volver la
+// desmonta: vuelve sin fichas abiertas.
+test('datos — una sola ficha abierta, pulsarla otra vez la cierra y cambiar de sección las pliega', async ({ page }) => {
+  await irA(page, 'Datos fascinantes');
+  const tarjetas = page.locator('div[class*="datosGrid"] > button');
+  await expect(tarjetas).toHaveCount(8);
+  const expandidas = () => tarjetas.evaluateAll((bs) => bs.map((b) => b.getAttribute('aria-expanded')));
+  await tarjetas.filter({ hasText: 'Tu agua es antigua' }).click();
+  const atun = tarjetas.filter({ hasText: 'El atún y el fitoplancton' });
+  await atun.click();
+  expect(await expandidas()).toEqual(['false', 'false', 'false', 'false', 'false', 'false', 'false', 'true']);
+  await expect(page.locator('span[class*="datoDetalle"]')).toHaveCount(1);
+  await expect(atun).toContainText('del orden de 1.000 a 2.500 kg de fitoplancton');
+  await expect(atun).toContainText('10 elevado a 3,4 ≈ 2.500');
+  await atun.click();
+  expect(await expandidas()).toEqual(Array(8).fill('false'));
+  await expect(page.locator('span[class*="datoDetalle"]')).toHaveCount(0);
+  await atun.click();
+  await irA(page, 'Pirámide trófica');
+  await irA(page, 'Datos fascinantes');
+  expect(await expandidas()).toEqual(Array(8).fill('false'));
+});
+
+// Barrido de contraste de TODO el texto propio de la app (clases de Ecosistema.module.css) en
+// tema oscuro, con una ficha abierta en cada sección. El test de 1738 mira siete selectores; este
+// caza cualquier otro. El tema se aplica DESPUÉS de hidratar y se comprueba que el estilo cambió
+// (fondo del contenedor #FAFAFA → #1A1A1A): sembrarlo antes pasaría en falso. Medido el
+// 27/09/2026: 0 elementos por debajo de 4,5:1 (3:1 si es texto grande) en claro y en oscuro.
+test('contraste — barrido de todo el texto propio de la app en oscuro, con fichas abiertas', async ({ page }) => {
+  const contenedor = page.locator('div[class$="__container"]').first();
+  await expect(contenedor).toHaveCSS('background-color', 'rgb(250, 250, 250)');
+  await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(contenedor).toHaveCSS('background-color', 'rgb(26, 26, 26)');
+
+  const barrer = (): Promise<string[]> =>
+    page.evaluate(() => {
+      const canal = (c: number) => {
+        const s = c / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+      const ratio = (a: number[], b: number[]) => {
+        const [l1, l2] = [lum(a), lum(b)];
+        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+      };
+      const nums = (s: string): number[] => (s.match(/[\d.]+/g) ?? []).map(Number);
+      const colores = (s: string): number[][] => [...s.matchAll(/rgba?\([^)]*\)/g)].map((m) => nums(m[0]));
+      const sobre = (base: number[], [r, g, b, a = 1]: number[]) => [
+        r * a + base[0] * (1 - a),
+        g * a + base[1] * (1 - a),
+        b * a + base[2] * (1 - a),
+      ];
+      const fallos: string[] = [];
+      for (const el of document.querySelectorAll('div[class$="__container"] *')) {
+        // Solo lo que pinta este módulo: el primer antepasado con clase es de Ecosistema.module.css
+        let conClase: Element | null = el;
+        while (conClase && !conClase.getAttribute('class')) conClase = conClase.parentElement;
+        if (!conClase?.getAttribute('class')?.includes('Ecosistema-module__')) continue;
+        const propio = [...el.childNodes]
+          .filter((n) => n.nodeType === 3)
+          .map((n) => n.textContent ?? '')
+          .join('')
+          .trim();
+        if (!/[\p{L}\p{N}]/u.test(propio)) continue;
+        const r = el.getBoundingClientRect();
+        if (!r.width || !r.height) continue;
+        type Capa = { grad: number[][] } | { color: number[] };
+        const capas: Capa[] = [];
+        for (let e: Element | null = el; e; e = e.parentElement) {
+          const cs = getComputedStyle(e);
+          const grad = cs.backgroundImage !== 'none' ? colores(cs.backgroundImage) : [];
+          const c = nums(cs.backgroundColor);
+          const a = c.length === 4 ? c[3] : 1;
+          if (grad.length) {
+            capas.push({ grad });
+            if (grad.every((g) => (g.length === 4 ? g[3] : 1) === 1)) break;
+          } else if (c.length && a > 0) {
+            capas.push({ color: [c[0], c[1], c[2], a] });
+            if (a === 1) break;
+          }
+        }
+        let bases: number[][] = [[255, 255, 255]];
+        for (const capa of capas.reverse()) {
+          bases = 'grad' in capa ? capa.grad.flatMap((g) => bases.map((b) => sobre(b, g))) : bases.map((b) => sobre(b, capa.color));
+        }
+        const cs = getComputedStyle(el);
+        const texto = nums(cs.color).slice(0, 3);
+        const px = parseFloat(cs.fontSize);
+        const grande = px >= 24 || (px >= 18.66 && Number(cs.fontWeight) >= 700);
+        const peor = Math.min(...bases.map((b) => ratio(texto, b)));
+        if (peor < (grande ? 3 : 4.5)) fallos.push(`«${propio.slice(0, 40)}» ${Math.round(peor * 100) / 100}:1`);
+      }
+      return fallos;
+    });
+
+  const pasos: Array<[string, (() => Promise<void>) | null]> = [
+    ['Ciclos biogeoquímicos', () => page.locator('div[class*="cicloDiagrama"] > button').nth(0).click()],
+    ['Pirámide trófica', null],
+    ['Pirámide trófica', () => niveles(page).nth(0).click()],
+    ['Regla del 10', () => page.locator('div[class*="destinoGrid"] > button').nth(0).click()],
+    ['Datos fascinantes', () => page.locator('div[class*="datosGrid"] > button').nth(7).click()],
+  ];
+  const fallos: string[] = [];
+  for (const [seccion, accion] of pasos) {
+    await irA(page, seccion);
+    if (accion) await accion();
+    await page.waitForTimeout(400); // transiciones de 0,2 s y fadeIn de la ficha
+    fallos.push(...(await barrer()).map((f) => `${seccion}: ${f}`));
+  }
+  expect(fallos).toEqual([]);
+});
+
+// ─── Defectos NUEVOS de la re-inspección del 27/09/2026 (test.fail: expresan lo CORRECTO) ─────
+
+// ABIERTO: S1 confirmada — «más conexiones = más estable / más resiliente» se afirma como hecho
+// en cinco sitios: la tarjeta de la red trófica («Más estable.»), el recuadro de Datos
+// fascinantes, dos párrafos de la guía y la 3.ª respuesta del FAQPage. Es el debate
+// complejidad-estabilidad, no una ley: May (1972, Nature 238: 413-414) mostró que un sistema
+// ensamblado al azar es estable hasta un nivel crítico de conectancia y, al subirla, «se vuelve
+// inestable de repente»; McCann (2000, Nature 405: 228-233) lo titula «The diversity–stability
+// debate»; Landi et al. (2018, Population Ecology 60: 319-345) concluyen con «the theoretical
+// debate and the lack of consensual agreement». Lo que sí está medido es más estrecho: Dunne,
+// Williams y Martinez (2002, Ecology Letters 5: 558-567) hallan que la ROBUSTEZ ante extinciones
+// secundarias crece con la conectancia pero «parece independiente de la riqueza de especies».
+// Esperado: la relación presentada como hipótesis discutida. Obtenido: las frases de abajo.
+test.fail('S1 — la relación conexiones-estabilidad no se afirma como hecho sin matiz', async ({ page }) => {
+  await irA(page, 'Datos fascinantes');
+  const tarjetaRed = (await page.locator('div[class*="redColReal"] p').textContent()) ?? '';
+  const recuadro = (await contenido(page).locator('div[class*="insight"]').textContent()) ?? '';
+  const texto = await page.evaluate(() => {
+    const copia = document.body.cloneNode(true) as HTMLElement;
+    copia.querySelectorAll('script, style').forEach((n) => n.remove());
+    return copia.textContent ?? '';
+  });
+  const faq = await page.evaluate(() => {
+    for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+      const j = JSON.parse(s.textContent ?? '{}');
+      if (j['@type'] === 'FAQPage') return j.mainEntity[2].acceptedAnswer.text as string;
+    }
+    return '';
+  });
+  const sinMatiz = [
+    /Más estable\.\s*$/.test(tarjetaRed) && 'tarjeta de la red: «Más estable.»',
+    /más conexiones tiene un ecosistema,\s*más resiliente es/.test(recuadro) &&
+      !/May|debat|hipótesis|discut/i.test(recuadro) &&
+      'recuadro de Datos: «Cuantas más conexiones tiene un ecosistema, más resiliente es»',
+    /Las redes son más estables porque/.test(texto) && 'guía: «Las redes son más estables porque…»',
+    /más conexiones tiene la red trófica y más\s+resistente es/.test(texto) &&
+      'guía: «Cuantas más especies… más resistente es ante perturbaciones»',
+    /más estables ecológicamente porque/.test(faq) && 'FAQPage: «Las redes tróficas son más estables ecológicamente porque…»',
+  ].filter(Boolean);
+  expect(sinMatiz).toEqual([]);
+});
+
+// ABIERTO: el aria-label de cada nivel de la pirámide SUSTITUYE su contenido visible. El lector
+// oye «Consumidores terciarios: Águilas, Lobos, Atún, Tiburones, Orcas» y nunca «≈ 0,1 % de la
+// energía de los productores», que es el dato que la pirámide enseña (y la ficha que abre
+// tampoco lo repite). Esperado, de lo que se ve en el botón: el nombre accesible contiene la
+// energía del nivel — 0,1 %, 1 %, 10 % y 100 % de arriba abajo.
+test.fail('accesibilidad — el nombre accesible de cada nivel de la pirámide incluye su energía', async ({ page }) => {
+  await irA(page, 'Pirámide trófica');
+  const esperado = [/0,1\s%/, /≈\s1\s%/, /≈\s10\s%/, /100\s%/];
+  for (let i = 0; i < 4; i++) await expect(niveles(page).nth(i)).toHaveAccessibleName(esperado[i], { timeout: 1000 });
+});
+
+test.describe('móvil 393 × 851 con toque', () => {
+  test.use({
+    viewport: { width: 393, height: 851 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.75,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  // REPARADO (hallazgo 1737), medido a mano: carril = 393 − 2 × 24 px de relleno del contenedor
+  // = 345 px (en ≤ 768 px la pirámide pierde su padding-right). Con --ancho-movil 55 · 70 · 85 ·
+  // 100 %: 189,75 · 241,5 · 293,25 · 345 px, centrados, y ningún texto fuera de su escalón.
+  test('móvil — la pirámide mide 55 · 70 · 85 · 100 % del carril y tocar el vértice abre su ficha', async ({ page }) => {
+    await nav(page).filter({ hasText: 'Pirámide trófica' }).tap();
+    await expect(nav(page).filter({ hasText: 'Pirámide trófica' })).toHaveAttribute('aria-pressed', 'true');
+    const cajas = await niveles(page).evaluateAll((bs) =>
+      bs.map((b) => {
+        const r = b.getBoundingClientRect();
+        const fuera = [...b.querySelectorAll('span')].some((s) => {
+          const q = s.getBoundingClientRect();
+          return q.left < r.left - 1 || q.right > r.right + 1;
+        });
+        return { ancho: r.width, centro: r.left + r.width / 2, fuera };
+      }),
+    );
+    const esperados = [189.75, 241.5, 293.25, 345];
+    cajas.forEach((c, i) => {
+      expect(c.ancho).toBeCloseTo(esperados[i], 0);
+      expect(c.centro).toBeCloseTo(24 + 345 / 2, 0);
+      expect(c.fuera).toBe(false);
+    });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(393);
+    await niveles(page).first().tap();
+    await expect(niveles(page).first()).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('div[class$="__nivelDetalle"] h3')).toHaveText('Consumidores terciarios');
+  });
 });

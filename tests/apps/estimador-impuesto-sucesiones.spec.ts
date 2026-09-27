@@ -18,10 +18,14 @@
  */
 
 import { test, expect, type Page } from '@playwright/test';
-import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { BONIFICACIONES_CCAA_IS, FISCAL_SUCESIONES_META } from '../../data/fiscal/sucesiones';
+import {
+  BONIFICACIONES_CCAA_IS,
+  FISCAL_SUCESIONES_CATALUNA_META,
+  FISCAL_SUCESIONES_META,
+} from '../../data/fiscal/sucesiones';
 
 const RUTA = '/estimador-impuesto-sucesiones/';
 
@@ -1775,7 +1779,8 @@ test.describe('Inspector 25/09/2026', () => {
    *
    * La cuota final se compara con precisión de 0,05 €: lo que este caso vigila —el tramo, el
    * coeficiente del Grupo III, el 50 % de Murcia— mueve cientos de euros, y el céntimo de
-   * diferencia que hoy da la app (9218,64 €) es un hallazgo aparte con su propio testigo.
+   * diferencia que daba la app (9218,64 €) fue un hallazgo aparte (1823, REPARADO el
+   * 25/09/2026 en d8b01146) con su propio testigo.
    */
   test('caso normal: sobrino en Murcia con 100.000 € paga 9218,63 € tras la bonificación del 50 %', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('murcia');
@@ -1840,8 +1845,9 @@ test.describe('Inspector 25/09/2026', () => {
    * Con «-50» el campo no dice nada legible: la app debe abstenerse y nombrar el campo, como hace
    * con los importes negativos desde el hallazgo 740 («o se lee el importe, o no se da número»).
    *
-   * HALLAZGO medio (Inspector 25/09/2026): hoy lo capa a 0 en silencio, enseña «Porcentaje de
-   * herencia 0,00 %», base ajustada 0,00 € y publica «Impuesto estimado en Galicia 0,00 €».
+   * REPARADO — hallazgo 1822 (medio, Inspector 25/09/2026; d8b01146): lo capaba a 0 en
+   * silencio, enseñaba «Porcentaje de herencia 0,00 %», base ajustada 0,00 € y publicaba
+   * «Impuesto estimado en Galicia 0,00 €». Re-verificado en el navegador el 27/09/2026.
    */
   test('caso a rechazar: un porcentaje de herencia negativo no da cuota cero, da un aviso', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('galicia');
@@ -1857,9 +1863,9 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
-   * SOSPECHA CONFIRMADA — HALLAZGO bajo (Inspector 25/09/2026): la fecha del hero va en ISO.
+   * REPARADO — hallazgo 1830 (bajo, Inspector 25/09/2026; d8b01146): la fecha del hero iba en ISO.
    *
-   * page.tsx pinta `FISCAL_SUCESIONES_META.verificado` tal cual —«Datos verificados:
+   * page.tsx pintaba `FISCAL_SUCESIONES_META.verificado` tal cual —«Datos verificados:
    * 2025-01-01»—, mientras el <DataReference> de la MISMA página formatea el mismo campo y dice
    * «Última verificación: 01/01/2025». Es la forma del hallazgo 1657 de estimador-sueldo-neto.
    * Lo esperado se deriva del sello (hoy '2025-01-01' → '01/01/2025') para que re-sellar el
@@ -1878,10 +1884,11 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — el desglose no cuadra consigo mismo por un céntimo.
+   * REPARADO — hallazgo 1823 (bajo, Inspector 25/09/2026; d8b01146): el desglose no cuadraba
+   * consigo mismo por un céntimo.
    *
    * El 1195 hizo que el coeficiente se aplicara a la cuota íntegra REDONDEADA, pero la
-   * bonificación sigue restándose sin redondear: con el caso normal de Murcia el panel imprime
+   * bonificación seguía restándose sin redondear: con el caso normal de Murcia el panel imprimía
    * «Cuota tributaria 18.437,27 €», «– Bonificación 9218,64 €» y «CUOTA A INGRESAR 9218,64 €»,
    * y 18.437,27 − 9218,64 = 9218,63. `calcularSucesion` —el que escribe las tarjetas de esta
    * misma página y la tool del MCP— resta la bonificación publicada y da 9218,63 €.
@@ -1903,27 +1910,29 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
-   * HALLAZGO alto (Inspector 25/09/2026) — en NUDA PROPIEDAD la reducción por vivienda habitual
-   * se calcula sobre el valor PLENO de la vivienda, no sobre el de la nuda propiedad adquirida.
+   * REPARADO — hallazgo 1821 (alto, Inspector 25/09/2026; d8b01146): en NUDA PROPIEDAD la
+   * reducción por vivienda habitual se calculaba sobre el valor PLENO de la vivienda, no sobre el
+   * de la nuda propiedad adquirida. Re-verificado el 27/09/2026 también en Baleares, donde el tope
+   * no aplana el defecto (describe «Re-inspección 27/09/2026», más abajo).
    *
    * Art. 20.2.c LISD (BOE, texto consolidado): «Del mismo porcentaje de reducción [95 %], con el
    * límite de 122.606,47 euros para cada sujeto pasivo […], gozarán las adquisiciones "mortis
    * causa" de la vivienda habitual». Lo adquirido es la nuda propiedad, y la propia app la valora
-   * al 81 % (art. 26.a, usufructuario de 70 años): 120.000 × 81 % = 97.200 €. Pero le reduce
+   * al 81 % (art. 26.a, usufructuario de 70 años): 120.000 × 81 % = 97.200 €. Pero le reducía
    * 95 % × 120.000 = 114.000 €, un 117 % de la vivienda por la que le hace tributar. Es la forma
-   * de los hallazgos 796 (seguro) y 1193 (tope catalán): la reducción supera la parte gravada.
+   * de los hallazgos 796 (seguro) y 1193 (tope catalán): la reducción superaba la parte gravada.
    *
    * Castilla y León · hermano de 70 años que convivió (Grupo III, art. 20.2.c) · nuda propiedad,
    * usufructuario de 70 años (el valor por defecto del campo) · 100.000 € en cuentas +
    * 120.000 € de vivienda habitual · patrimonio < 402.678 €:
    *   base imponible  226.600,00 (220.000 + ajuar 6600) × 81 % = 183.546,00 de base ajustada
    *   − parentesco      7993,46   REDUCCIONES_PARENTESCO_IS['III']
-   *   − vivienda       92.340,00   95 % × 97.200 (la app: 114.000,00)
-   *   = base liquid.   83.212,54   (la app: 61.552,54)
+   *   − vivienda       92.340,00   95 % × 97.200 (la app daba: 114.000,00)
+   *   = base liquid.   83.212,54   (la app daba: 61.552,54)
    *   cuota íntegra     9704,18    9.166,06 + 16,15 % × (83.212,54 − 79.880,52)
-   *   × 1,5882, sin bonificación en CyL para el Grupo III → 15.412,18 €   (la app: 10.275,29 €)
+   *   × 1,5882, sin bonificación en CyL para el Grupo III → 15.412,18 €   (la app daba: 10.275,29 €)
    *
-   * La app se queda 5136,89 € por debajo, un 33 %. Tolerancia de medio euro.
+   * La app se quedaba 5136,89 € por debajo, un 33 %. Tolerancia de medio euro.
    */
   test('en nuda propiedad la reducción por vivienda va sobre el valor de la nuda propiedad', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('castilla-leon');
@@ -1943,9 +1952,10 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — el concepto de la reducción por edad parece la edad.
+   * REPARADO — hallazgo 1831 (bajo, Inspector 25/09/2026; d8b01146): el concepto de la reducción
+   * por edad parecía la edad.
    *
-   * Imprime `${21 - edad} años < 21`: a un heredero de 15 años le pone «Por edad (6 años < 21)»,
+   * Imprimía `${21 - edad} años < 21`: a un heredero de 15 años le ponía «Por edad (6 años < 21)»,
    * que se lee como que tiene 6 años; con 0 años, «(21 años < 21)», que es falso literalmente.
    * El importe sí es correcto: 6 × 3990,72 = 23.944,32 € (REDUCCION_EDAD_MENOR_21_IS; con los
    * 15.956,87 del parentesco suman 39.901,19, por debajo del tope de 47.858,59).
@@ -1988,10 +1998,11 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
-   * HALLAZGO medio (Inspector 25/09/2026) — la ficha de la comunidad sigue calificándolas.
+   * REPARADO — hallazgo 1825 (medio, Inspector 25/09/2026; d8b01146): la ficha de la comunidad
+   * seguía calificándolas.
    *
    * El 738 quitó de la prosa «la de mayor recaudación efectiva», pero la caja informativa que
-   * aparece al elegir la comunidad imprime `BONIFICACIONES_CCAA_IS[…].notas` y dice de Asturias
+   * aparece al elegir la comunidad imprime `BONIFICACIONES_CCAA_IS[…].notas` y decía de Asturias
    * «Tributación más alta del régimen común» y de Canarias «La más favorable del régimen
    * común». El contraste de arriba, calculado por la propia app, desmiente las dos: Asturias sale
    * a 0,00 € y Canarias a 53,69 €, por encima de Andalucía. Es la asimetría territorial
@@ -2010,13 +2021,16 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — cifras tecleadas donde hay constante, y una ya diverge.
+   * REPARADO — hallazgo 1829 (bajo, Inspector 25/09/2026; d8b01146): cifras tecleadas donde hay
+   * constante, y una ya divergía.
    *
-   * El consejo de la tarjeta del sobrino dice «doce comunidades del régimen común no le dan nada»
+   * El consejo de la tarjeta del sobrino decía «doce comunidades del régimen común no le dan nada»
    * al Grupo III. En `BONIFICACIONES_CCAA_IS` son DIEZ: de las catorce de régimen común, Madrid y
    * Murcia bonifican el 50 %, Canarias el 99,9 % y Asturias reduce 50.000 € en base. La misma
-   * frase teclea esas otras tres cifras, y la tabla comparativa teclea «1,0000», «2,0000» y
-   * «0 €» mientras su fila del Grupo III sí lee `COEFICIENTES_IS` y `REDUCCIONES_PARENTESCO_IS`.
+   * frase tecleaba esas otras tres cifras, y la tabla comparativa tecleaba «1,0000», «2,0000» y
+   * «0 €» mientras su fila del Grupo III sí leía `COEFICIENTES_IS` y `REDUCCIONES_PARENTESCO_IS`.
+   * (Quedan tecleados en la misma tabla los «99 %–100 %» de los Grupos I y II y los «5 meses» de
+   * la prórroga: residuo que la re-inspección del 27/09/2026 deja con su propio testigo.)
    */
   test('el consejo del Grupo III cuenta las comunidades con data/fiscal, y la tabla no teclea', async ({ page }) => {
     const sinNada = Object.values(BONIFICACIONES_CCAA_IS).filter((c) => {
@@ -2036,8 +2050,9 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
-   * HALLAZGO medio (Inspector 25/09/2026) — la tarjeta del hijo con discapacidad empareja mal la
-   * cifra estatal: «más generosas que la estatal (47.858,59 € al 65%)». 47.858,59 € es la del
+   * REPARADO — hallazgo 1827 (medio, Inspector 25/09/2026; d8b01146): la tarjeta del hijo con
+   * discapacidad emparejaba mal la cifra estatal: «más generosas que la estatal (47.858,59 € al
+   * 65%)». 47.858,59 € es la del
    * 33 % al 64 % (`REDUCCION_DISCAPACIDAD_33_IS`); la del 65 % o más son 150.253,03 €
    * (`REDUCCION_DISCAPACIDAD_65_IS`), como dice bien la FAQ de la misma página y como aplica el
    * propio panel en el caso límite de arriba. La tarjeta rebaja a un tercio la estatal justo
@@ -2053,11 +2068,12 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — el selector de comunidad, dos restos.
+   * REPARADO — hallazgo 1832 (bajo, Inspector 25/09/2026; d8b01146): el selector de comunidad,
+   * dos restos.
    *
-   *  · La opción vacía dice «— Selecciona tu CCAA —» debajo de una etiqueta que pide la del
-   *    FALLECIDO y encima de un helper que dice «No es donde vives tú»: es el residuo del 736.
-   *  · Con País Vasco o Navarra la misma nota se imprime DOS veces seguidas: en la alerta foral
+   *  · La opción vacía decía «— Selecciona tu CCAA —» debajo de una etiqueta que pide la del
+   *    FALLECIDO y encima de un helper que dice «No es donde vives tú»: era el residuo del 736.
+   *  · Con País Vasco o Navarra la misma nota se imprimía DOS veces seguidas: en la alerta foral
    *    y en la caja informativa, las dos con `ccaaInfo.notas`.
    */
   test('el selector de comunidad no pide «tu» CCAA y la nota foral sale una vez', async ({ page }) => {
@@ -2070,13 +2086,14 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
-   * HALLAZGO medio (Inspector 25/09/2026) — el faqJsonLd da la reducción del Grupo I SIN su tope.
+   * REPARADO — hallazgo 1826 (medio, Inspector 25/09/2026; d8b01146): el faqJsonLd daba la
+   * reducción del Grupo I SIN su tope.
    *
    * «15.956,87 € más 3.990,72 € por cada año por debajo de 21», sin «sin que la reducción pueda
    * exceder de 47.858,59 euros» (art. 20.2.a LISD, `REDUCCION_EDAD_MENOR_21_MAX_IS`). Leída así,
-   * un recién nacido reduciría 15.956,87 + 21 × 3990,72 = 99.761,99 €, el doble del máximo: es
+   * un recién nacido reduciría 15.956,87 + 21 × 3990,72 = 99.761,99 €, el doble del máximo: era
    * el defecto que se reparó en el cálculo el 08/09/2026, vivo en el canal que leen las IAs. Las
-   * cifras van tecleadas en metadata.ts, que ya importa `PLAZO_ISD` de data/fiscal.
+   * cifras iban tecleadas en metadata.ts; ahora salen de data/fiscal.
    */
   test('el faqJsonLd da el tope de 47.858,59 € de la reducción del Grupo I', async ({ page }) => {
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -2091,8 +2108,9 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — el % va pegado a la cifra (CLAUDE.md global §2, desde
-   * el 25/09/2026: separado con espacio duro). En el panel: «Bonificación autonómica: 50,0%»,
+   * REPARADO — hallazgo 1833 (bajo, Inspector 25/09/2026; d8b01146): el % iba pegado a la cifra
+   * (CLAUDE.md global §2, desde el 25/09/2026: separado con espacio duro). El 27/09/2026 no queda
+   * ninguno pegado ni en el HTML servido ni en el JSON-LD. Eran, en el panel: «Bonificación autonómica: 50,0%»,
    * «Tipo efectivo: 8,95%», «Ajuar doméstico (3%)», «Porcentaje de herencia …%», «Tipo
    * adquisición …%», «Vivienda habitual (95%)», «Discapacidad ≥65%», «Bonificación 56,00% por
    * escala del art. 58 bis». En el formulario: «33%–64%», «≥65%», «100% si eres el único
@@ -2109,11 +2127,11 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
-   * HALLAZGO medio (Inspector 25/09/2026, accesibilidad / modo oscuro) — las líneas de
-   * reducciones y de bonificación usan `--bonif: #1A7A3E`, que el módulo no redeclara en oscuro:
-   * sobre el #2A2A2A de la tarjeta dan 2,66:1, por debajo del 4,5:1 del texto de 0,85rem (y del
-   * 3:1 del texto grande). En claro, sobre blanco, 5,39:1. El candado check:token-oscuro no lo
-   * ve porque `--bonif` no es un token de globals.css.
+   * REPARADO — hallazgo 1828 (medio, Inspector 25/09/2026, accesibilidad / modo oscuro;
+   * d8b01146): las líneas de reducciones y de bonificación usaban `--bonif: #1A7A3E`, que el
+   * módulo no redeclaraba en oscuro: sobre el #2A2A2A de la tarjeta daban 2,66:1, por debajo del
+   * 4,5:1 del texto de 0,85rem. En claro, sobre blanco, 5,39:1. El candado check:token-oscuro no
+   * lo ve porque `--bonif` no es un token de globals.css. Medido el 27/09/2026: 7,55:1.
    */
   test('en oscuro las líneas de reducción y bonificación llegan a 4,5:1', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('murcia');
@@ -2144,18 +2162,20 @@ test.describe('Inspector 25/09/2026', () => {
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — el ajuar se calcula también sobre el SEGURO DE VIDA.
+   * REPARADO — hallazgo 1824 (bajo, Inspector 25/09/2026; d8b01146): el ajuar se calculaba
+   * también sobre el SEGURO DE VIDA.
    *
    * Art. 15 LISD (BOE): el ajuar «se valorará en el tres por ciento del importe del caudal
    * relicto del causante». El seguro de vida no es caudal relicto —la propia página lo dice: «no
-   * forman parte de la herencia civil»—, pero la app lo suma a la masa y le añade su 3 %.
+   * forman parte de la herencia civil»—, pero la app lo sumaba a la masa y le añadía su 3 %.
    *
    * Galicia · amigo (Grupo IV, sin reducción de parentesco ni de seguro) · solo un seguro de
    * vida de 100.000 € · patrimonio < 402.678 €:
-   *   base imponible 100.000,00 (ajuar 0: no hay caudal relicto)   — la app: 103.000,00
+   *   base imponible 100.000,00 (ajuar 0: no hay caudal relicto)   — la app daba: 103.000,00
    *   cuota íntegra   12.415,36  9.166,06 + 16,15 % × (100.000 − 79.880,52)
-   *   × 2,0000, sin bonificación para el Grupo IV en Galicia → 24.830,72 €   — la app: 25.799,72 €
-   * La app cobra 969,00 € de más (12.899,86 × 2 = 25.799,72).
+   *   × 2,0000, sin bonificación para el Grupo IV en Galicia → 24.830,72 €   — la app daba: 25.799,72 €
+   * La app cobraba 969,00 € de más (12.899,86 × 2 = 25.799,72). Re-verificado el 27/09/2026 con
+   * un seguro que convive con caudal relicto (Castilla-La Mancha, describe de abajo).
    */
   test('el ajuar doméstico no se calcula sobre el seguro de vida', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('galicia');
@@ -2164,5 +2184,476 @@ test.describe('Inspector 25/09/2026', () => {
 
     expect(await importeDeLinea(page, /^Base imponible total/)).toBe('100.000,00 €');
     expect(await cuotaDestacada(page)).toBe('24.830,72 €');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Re-inspección 27/09/2026 — tras la reparación d8b01146 de los hallazgos 1821-1833
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// Tres casos propios en comunidades que ningún test ejecutaba con estas ramas: la Comunitat
+// Valenciana (99 % y el coeficiente 1,0500 del segundo tramo de patrimonio), Baleares (nuda
+// propiedad con la vivienda por DEBAJO del tope, donde la reparación del 1821 sí se ve) y
+// Castilla-La Mancha (seguro de vida con caudal relicto: el 1824 y el tope del art. 20.2.b).
+// Cada cifra sale de `data/fiscal/sucesiones.ts` y se resolvió a mano ANTES de abrir la app.
+//
+// Lo que esta re-inspección encuentra roto va con `test.fail()` y un comentario «ABIERTO»,
+// afirmando lo CORRECTO: cuando se repare, el test empezará a pasar y la marca hay que quitarla.
+
+/** Una línea del desglose de la columna de resultados, por su concepto. */
+const lineaDelPanel = (page: Page, concepto: RegExp) =>
+  page.locator('[class*="resultsPanel"] div[class*="linea"]').filter({ hasText: concepto }).first();
+
+/** El importe (columna derecha) de esa línea, con los espacios duros normalizados. */
+async function importeDelPanel(page: Page, concepto: RegExp): Promise<string> {
+  return (await lineaDelPanel(page, concepto).locator('span').last().innerText()).replace(/ /g, ' ');
+}
+
+/** El importe destacado «Impuesto estimado en …», con los espacios duros normalizados. */
+async function cuotaEstimada(page: Page): Promise<string> {
+  return (
+    await page.getByText(/^Impuesto estimado en/).locator('xpath=following-sibling::span[1]').innerText()
+  ).replace(/ /g, ' ');
+}
+
+/**
+ * Contraste WCAG del texto de cada selector sobre su fondo EFECTIVO: compone los fondos rgba de
+ * todos los ancestros, de la raíz hacia el nodo. No aplica la opacidad de los ancestros (la guía
+ * plegada la anima y daría 1:1 en falso); sí la del propio nodo cuando `conOpacidad`. Devuelve
+ * el primer nodo de cada selector.
+ */
+async function contrastes(
+  page: Page,
+  selectores: string[],
+): Promise<Array<{ sel: string; ratio: number; px: number; peso: number }>> {
+  return page.evaluate((sels) => {
+    type Rgba = { r: number; g: number; b: number; a: number };
+    const leer = (s: string): Rgba => {
+      const p = (s.match(/rgba?\(([^)]+)\)/)?.[1] ?? '0,0,0,0').split(/[ ,/]+/).filter(Boolean).map(Number);
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+    const sobre = (f: Rgba, b: Rgba): Rgba => ({
+      r: f.r * f.a + b.r * (1 - f.a),
+      g: f.g * f.a + b.g * (1 - f.a),
+      b: f.b * f.a + b.b * (1 - f.a),
+      a: 1,
+    });
+    const lum = (c: Rgba) => {
+      const t = (v: number) => {
+        const x = v / 255;
+        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * t(c.r) + 0.7152 * t(c.g) + 0.0722 * t(c.b);
+    };
+    return sels.map((sel) => {
+      const nodo = document.querySelector(sel) as HTMLElement | null;
+      if (!nodo) return { sel, ratio: 0, px: 0, peso: 0 };
+      const cadena: HTMLElement[] = [];
+      for (let e: HTMLElement | null = nodo; e; e = e.parentElement) cadena.unshift(e);
+      let fondo: Rgba = { r: 255, g: 255, b: 255, a: 1 };
+      for (const e of cadena) {
+        const c = leer(getComputedStyle(e).backgroundColor);
+        if (c.a > 0) fondo = sobre(c, fondo);
+      }
+      const cs = getComputedStyle(nodo);
+      const texto = sobre(leer(cs.color), fondo);
+      const [a, b] = [lum(texto), lum(fondo)];
+      return {
+        sel,
+        ratio: Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100,
+        px: parseFloat(cs.fontSize),
+        peso: Number(cs.fontWeight),
+      };
+    });
+  }, selectores);
+}
+
+test.describe('Re-inspección 27/09/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#saldos-cuentas', '#porcentaje-herencia']);
+  });
+
+  /**
+   * CASO NORMAL — hijo de 35 años (Grupo II) en la COMUNITAT VALENCIANA, con patrimonio
+   * preexistente entre 402.678 € y 2.007.380 € (segundo tramo): 150.000 € de vivienda habitual
+   * y 60.000 € en cuentas.
+   *
+   *   Activos            210.000,00
+   *   + ajuar 3 %          6300,00   PORC_AJUAR_DOMESTICO_IS × caudal relicto (art. 15 LISD)
+   *   = base imponible   216.300,00
+   *   − parentesco        15.956,87  REDUCCIONES_PARENTESCO_IS['II'] (art. 20.2.a)
+   *   − vivienda         122.606,47  min(95 % × 150.000 = 142.500 ; REDUCCION_VIVIENDA_MAX_IS)
+   *   = base liquidable   77.736,66
+   *   cuota íntegra        8838,05   TARIFA_ESTATAL_IS, tramo «hasta 79.880,52»:
+   *                                  7.943,98 + 15,30 % × (77.736,66 − 71.893,07) = 8838,04927
+   *   × 1,0500                       COEFICIENTES_IS['II'][1] (art. 22 LISD)
+   *   = cuota tributaria   9279,95   (8838,05 × 1,05 = 9279,9525)
+   *   − bonificación 99 %  9187,15   BONIFICACIONES_CCAA_IS['valencia']…['II'] = 0,99
+   *   = cuota final          92,80 €
+   *
+   * Todo es aritmética a céntimo sin redondeos dudosos: se compara el literal.
+   */
+  test('caso normal: hijo de 35 en la Comunitat Valenciana con patrimonio del segundo tramo paga 92,80 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('valencia');
+    await page.locator('#parentesco').selectOption('II');
+    await page.locator('#patrimonio-preexistente').selectOption('2');
+    await sembrarValor(page, page.locator('#vivienda-habitual'), '150.000');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '60000');
+
+    expect(await cuotaEstimada(page)).toBe('92,80 €');
+    expect(await importeDelPanel(page, /Ajuar doméstico/)).toBe('6300,00 €');
+    expect(await importeDelPanel(page, /^Base imponible total/)).toBe('216.300,00 €');
+    expect(await importeDelPanel(page, /Vivienda habitual/)).toBe('122.606,47 €');
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('77.736,66 €');
+    expect(await importeDelPanel(page, /^Cuota íntegra/)).toBe('8838,05 €');
+    expect(await importeDelPanel(page, /Coeficiente multiplicador/)).toBe('×1,0500');
+    expect(await importeDelPanel(page, /^Cuota tributaria/)).toBe('9279,95 €');
+    expect(await importeDelPanel(page, /Bonificación 99,0\s%\s\(Comunitat Valenciana\)/)).toBe('9187,15 €');
+  });
+
+  /**
+   * CASO LÍMITE — nuda propiedad en BALEARES con la vivienda POR DEBAJO del tope, que es donde la
+   * reparación del 1821 se ve: en el caso de origen (Castilla y León) el tope no llegaba a morder,
+   * pero en muchos otros la reducción mal calculada lo alcanzaba y lo tapaba.
+   *
+   * Hijo de 40 años (Grupo II) · nuda propiedad, usufructuario de 60 años · 100.000 € de
+   * vivienda habitual + 200.000 € en acciones · patrimonio < 402.678 €:
+   *   usufructo 89 − 60 = 29 % → nuda propiedad 71 %   `porcentajeUsufructoVitalicio` (art. 26.a)
+   *   base imponible   309.000,00  (300.000 + ajuar 9000) × 71 % = 219.390,00 de base ajustada
+   *   − parentesco      15.956,87
+   *   − vivienda        67.450,00  95 % × (100.000 × 71 %) — art. 20.2.c sobre el DERECHO adquirido
+   *   = base liquid.   135.983,13
+   *   cuota íntegra     18.640,38  15.606,22 + 18,70 % × (135.983,13 − 119.757,67)
+   *   − bonificación 95 % 17.708,36 BONIFICACIONES_CCAA_IS['baleares']…['II'] = 0,95
+   *   = cuota final        932,02 €
+   * Con la regla anterior (95 % del valor pleno, 95.000 €) la app habría liquidado 688,87 €.
+   */
+  test('caso límite: en nuda propiedad en Baleares la vivienda reduce 67.450,00 € y la cuota es 932,02 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('baleares');
+    await page.locator('#parentesco').selectOption('II');
+    await page.getByRole('radio', { name: 'Nuda propiedad' }).check();
+    await sembrarValor(page, page.locator('#edad-usufructuario'), '60');
+    await sembrarValor(page, page.locator('#vivienda-habitual'), '100000');
+    await sembrarValor(page, page.locator('#acciones-fondos'), '200000');
+
+    expect(await importeDelPanel(page, /Tipo adquisición \(nuda\)/)).toBe('71,0 %');
+    expect(await importeDelPanel(page, /^Base ajustada/)).toBe('219.390,00 €');
+    expect(await importeDelPanel(page, /Vivienda habitual/)).toBe('67.450,00 €');
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('135.983,13 €');
+    expect(await importeDelPanel(page, /^Cuota íntegra/)).toBe('18.640,38 €');
+    expect(await importeDelPanel(page, /Bonificación 95,0\s%/)).toBe('17.708,36 €');
+    expect(await cuotaEstimada(page)).toBe('932,02 €');
+  });
+
+  /**
+   * CASO LÍMITE — seguro de vida que CONVIVE con caudal relicto, en CASTILLA-LA MANCHA (bonificación
+   * escalonada por base liquidable). El testigo del 1824 solo tenía un seguro sin nada más.
+   *
+   * Hijo (Grupo II) · 200.000 € en cuentas + 50.000 € de seguro de vida · patrimonio < 402.678 €:
+   *   ajuar             6000,00   3 % de 200.000: el seguro no es caudal relicto (art. 15 LISD)
+   *   base imponible  256.000,00  (el seguro SÍ tributa: art. 3.1.c)
+   *   − parentesco     15.956,87
+   *   − seguro          9195,49   min(50.000 ; REDUCCION_SEGURO_VIDA_MAX_IS), art. 20.2.b
+   *   = base liquid.  230.847,64
+   *   cuota íntegra    38.195,97  23.063,25 + 21,25 % × (230.847,64 − 159.634,83)
+   *   − bonificación 90 % 34.376,37  escalón «hasta 275.000» de BONIFICACIONES_CCAA_IS['castilla-mancha']
+   *   = cuota final      3819,60 €
+   * Con el ajuar sobre el seguro (antes del 1824): base 257.500 y 3851,47 €.
+   */
+  test('caso límite: en Castilla-La Mancha el seguro de vida no genera ajuar y reduce su tope: 3819,60 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('castilla-mancha');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '200000');
+    await sembrarValor(page, page.locator('#seguros-vida'), '50000');
+
+    expect(await importeDelPanel(page, /Ajuar doméstico/)).toBe('6000,00 €');
+    expect(await importeDelPanel(page, /^Base imponible total/)).toBe('256.000,00 €');
+    expect(await importeDelPanel(page, /Seguro de vida/)).toBe('9195,49 €');
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('230.847,64 €');
+    expect(await importeDelPanel(page, /^Cuota íntegra/)).toBe('38.195,97 €');
+    expect(await importeDelPanel(page, /Bonificación 90/)).toBe('34.376,37 €');
+    expect(await cuotaEstimada(page)).toBe('3819,60 €');
+  });
+
+  /**
+   * CASO A RECHAZAR — ABIERTO (operativa, medio): «Descendiente menor de 21 años» con una edad de
+   * 21 o más, que es justo la que viene PRELLENADA (35) al elegir ese parentesco.
+   *
+   * El grupo dice «menor de 21» y el campo dice 35, y la app liquida sin decir nada: sin reducción
+   * por edad (art. 20.2.a) y, en Cataluña, con la escala de bonificación del GRUPO I del art. 58
+   * bis (99 % → 20 %), que la ley reserva a los menores de 21. Con 300.000 € en cuentas:
+   *   base imponible 309.000 − 100.000 (REDUCCIONES_PARENTESCO_CATALUNA_IS) = 209.000 de base
+   *   liquidable → TARIFA_CATALUNA_IS: 14.500 + 17 % × 59.000 = 24.530,00 de cuota
+   *   · escala del Grupo I sobre 309.000 € → 96,80 % → la app publica 785,91 €
+   *   · un hijo de 35 años es Grupo II: escala del Grupo II → 54,71 % → 11.109,95 €
+   *   · un menor de 10 años reduce 196.000 € (tope del art. 2 Ley 19/2010) → otra cifra
+   * Los 785,91 € no corresponden a ninguna situación posible. Esperado: la app se abstiene y
+   * nombra la contradicción, como hace con los importes que no puede leer.
+   */
+  test('caso a rechazar: «menor de 21» con la edad prellenada de 35 no da una cuota imposible', async ({ page }) => {
+    test.fail(true, 'ABIERTO: la app liquida «menor de 21» con 35 años sin avisar (Inspector 27/09/2026)');
+    await page.locator('#ccaa-causante').selectOption('cataluna');
+    await page.locator('#parentesco').selectOption('I-descendiente');
+    await expect(page.locator('#edad-heredero')).toHaveValue('35');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '300000');
+
+    const aviso = page.getByRole('alert').filter({ hasText: /edad|21 años/i });
+    await expect(aviso).toBeVisible();
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+  });
+
+  /**
+   * ABIERTO (operativa, bajo): edades imposibles sin aviso. La edad del usufructuario «-5» se
+   * liquida con el 70 % de usufructo (el techo del art. 26.a para menores de 20) y la del heredero
+   * «-3» se rotula «heredero de -3 años, menor de 21». Vacía, la del usufructuario se toma como 70
+   * años sin decirlo (19 %). Los importes negativos se rechazan con aviso desde el 740; las edades no.
+   *
+   * Galicia · Grupo III · 100.000 € · usufructo con «-5»: 103.000 × 70 % = 72.100 − 7993,46 =
+   * 64.106,54 → 6.789,79 + 14,45 % × 200,92 = 6818,82 × 1,5882 = 10.829,65 € (lo que publica).
+   */
+  test('una edad del usufructuario negativa no se liquida como la de un menor de 20', async ({ page }) => {
+    test.fail(true, 'ABIERTO: «-5» se acepta y se liquida con el 70 % (Inspector 27/09/2026)');
+    await page.locator('#ccaa-causante').selectOption('galicia');
+    await page.locator('#parentesco').selectOption('III');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+    await page.getByRole('radio', { name: 'Usufructo' }).check();
+    await sembrarValor(page, page.locator('#edad-usufructuario'), '-5');
+
+    await expect(page.getByRole('alert').filter({ hasText: /edad/i })).toBeVisible();
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+  });
+
+  /**
+   * ABIERTO (contenido, medio): la FAQ «¿Tengo que pagar si heredo en Madrid o Canarias?» responde
+   * «En la práctica, casi nunca […] La cuota resultante es de céntimos». La herramienta de la
+   * misma página lo desmiente con una herencia modesta:
+   *   Madrid · hijo · 50.000 € en cuentas → 51.500 − 15.956,87 = 35.543,13 de base liquidable
+   *   2.851,98 + 11,05 % × (35.543,13 − 31.955,81) = 3248,38 → − 99 % (3215,90) = 32,48 €
+   * Y con 250.000 € y vivienda habitual, 154,74 € (caso normal del 11/09). Para que fueran
+   * céntimos la base liquidable tendría que quedar por debajo de ~1.300 €.
+   */
+  test('la FAQ de Madrid y Canarias no promete una cuota «de céntimos» que la herramienta no da', async ({ page }) => {
+    test.fail(true, 'ABIERTO: la FAQ dice «La cuota resultante es de céntimos» (Inspector 27/09/2026)');
+    await page.locator('#ccaa-causante').selectOption('madrid');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '50000');
+    expect(await cuotaEstimada(page)).toBe('32,48 €');
+
+    const texto = await textoCompleto(page);
+    const desde = texto.indexOf('¿Tengo que pagar si heredo en Madrid o Canarias?');
+    expect(desde, 'la pregunta sigue en la FAQ').toBeGreaterThan(-1);
+    expect(texto.slice(desde, desde + 450)).not.toContain('La cuota resultante es de céntimos');
+  });
+
+  /**
+   * ABIERTO (contenido, bajo) — residuo del 1824. El consejo «Declara el ajuar doméstico
+   * correctamente» dice «Hacienda presume el 3 % del valor de la masa hereditaria neta», y la
+   * «Masa hereditaria neta» del panel INCLUYE los seguros de vida, sobre los que la app ya no
+   * calcula ajuar (art. 15 LISD: «caudal relicto»). Galicia · Grupo IV · solo 100.000 € de seguro:
+   * el panel dice «Masa hereditaria neta 100.000,00 €» y «Ajuar doméstico 0,00 €»; el consejo,
+   * 3000 €. Los pasos del cálculo y la lista de errores de la misma guía ya dicen «caudal relicto».
+   */
+  test('el consejo del ajuar habla del caudal relicto, como el cálculo, y no de la masa neta', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el consejo sigue diciendo «masa hereditaria neta» (Inspector 27/09/2026)');
+    await page.locator('#ccaa-causante').selectOption('galicia');
+    await page.locator('#parentesco').selectOption('IV');
+    await sembrarValor(page, page.locator('#seguros-vida'), '100000');
+    expect(await importeDelPanel(page, /^Masa hereditaria neta/)).toBe('100.000,00 €');
+    expect(await importeDelPanel(page, /Ajuar doméstico/)).toBe('0,00 €');
+
+    const texto = await textoCompleto(page);
+    const desde = texto.indexOf('Declara el ajuar doméstico correctamente');
+    expect(desde).toBeGreaterThan(-1);
+    expect(texto.slice(desde, desde + 300)).not.toContain('masa hereditaria neta');
+  });
+
+  /**
+   * ABIERTO (contenido, bajo) — era la SOSPECHA S1. Con Cataluña elegida la app liquida con la
+   * rama catalana de `data/fiscal` (Ley 19/2010: tarifa 7-32 %, 100.000 € al hijo, escala del
+   * art. 58 bis), que tiene su propio sello —`FISCAL_SUCESIONES_CATALUNA_META`, verificado el
+   * 08/09/2026, fuente Agència Tributària de Catalunya—, pero el hero y el DataReference solo dan
+   * el del módulo (01/01/2025, «Fuente: Agencia Tributaria»). `calcularSucesion`, con los mismos
+   * datos, devuelve en `fuenteDatos` el sello catalán: la web y el MCP citan fuentes distintas
+   * para el mismo cálculo. Lo esperado se deriva del sello, para que re-sellar no rompa el testigo.
+   */
+  test('con Cataluña elegida la página da el sello de la rama catalana que liquida', async ({ page }) => {
+    test.fail(true, 'ABIERTO: con Cataluña solo se ve el sello del módulo, 01/01/2025 (Inspector 27/09/2026)');
+    const [anio, mes, dia] = FISCAL_SUCESIONES_CATALUNA_META.verificado.split('-');
+    await page.locator('#ccaa-causante').selectOption('cataluna');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '250000');
+    // 257.500 − 100.000 = 157.500 → 14.500 + 17 % × 7.500 = 15.775,00; escala del Grupo II
+    // sobre 257.500 € → 55,83 % → 15.775 − 8806,43 = 6968,57 €
+    expect(await cuotaEstimada(page)).toBe('6968,57 €');
+
+    const sello = `${dia}/${mes}/${anio}`;
+    const texto = await textoCompleto(page);
+    expect(texto.includes(sello), `la página no da el sello de la rama catalana (${sello})`).toBe(true);
+  });
+
+  /**
+   * ABIERTO (dato, bajo) — residuo del 1829: datos normativos TECLEADOS donde hay constante.
+   *  · «5 meses» para pedir la prórroga en cuatro sitios (tarjeta de plazos, paso 6, consejo «antes
+   *    del mes 5» y lista de errores «primeros 5 meses… mes 6»), con `PLAZO_ISD.mesesParaPedirProrroga`
+   *    sellado desde el 13/09/2026 y usado en el párrafo de al lado. «Antes del mes 5» además dice
+   *    otra cosa que «dentro de los cinco primeros meses» (art. 68.1 RISD).
+   *  · «99 %–100 %» de bonificación en las filas de los Grupos I y II de la tabla comparativa y en
+   *    el consejo «Liquida aunque la cuota sea cero», con `BONIFICACIONES_CCAA_IS` en la misma
+   *    tabla para Asturias y para el Grupo III. Hoy cuadran; es la forma que ya divergió en el 1829.
+   */
+  test('los plazos y bonificaciones de la guía no van tecleados', async () => {
+    test.fail(true, 'ABIERTO: «5 meses» y «99 %–100 %» siguen tecleados (Inspector 27/09/2026)');
+    const jsx = readFileSync(join(process.cwd(), 'app/estimador-impuesto-sucesiones/page.tsx'), 'utf8');
+    const lineas = jsx.split('\n').filter((l) => !/^\s*(\/\/|\*|\/\*|\{\/\*)/.test(l));
+    const codigo = lineas.join('\n');
+    for (const tecleada of ['primeros 5 meses', 'antes del mes 5', 'mes 6', '99&nbsp;%–100&nbsp;%']) {
+      expect(codigo, `sigue tecleado: ${tecleada}`).not.toContain(tecleada);
+    }
+  });
+
+  /**
+   * ABIERTO (accesibilidad, medio) — era la SOSPECHA S3, MEDIDA. El módulo redeclara
+   * `--primary: #2E86AB` en `.container` y NO en `[data-theme='dark'] .container`, así que el
+   * `--primary` oscuro de globals.css (#3FA5D1) nunca llega: en oscuro sigue el azul del claro.
+   * Texto en color de marca, medido con getComputedStyle sobre el fondo efectivo:
+   *   · «CUOTA A INGRESAR (estimada)» y su importe (.lineaFinal, 16 px / 600): 4,11:1 en claro
+   *     sobre #FFF, 3,50:1 en oscuro sobre #2A2A2A — la cifra que el usuario se lleva.
+   *   · títulos de sección del formulario (16 px / 600), h4 de los grupos, consejos de las
+   *     tarjetas (13 px) y h3 de la guía (16,8 px / 600, 3,77:1 y 3,21:1 sobre #F5F5F5 / #303030).
+   *   · la pista de la FAQ (.faqTip, 13 px / 600) en `--secondary` sobre su tinte: 2,40:1 en claro.
+   * Ninguno llega a 18,66 px en negrita: el umbral es 4,5:1. El candado check:token-oscuro
+   * excluye `--primary` a propósito, y check:contraste-cabeceras solo mira <th>. Se resuelve con
+   * `--primary-texto` (5,47:1 sobre blanco en globals.css). El tema se aplica tras hidratar y se
+   * comprueba que el estilo cambió de verdad antes de medir.
+   */
+  test('el texto en color de marca llega a 4,5:1 en claro y en oscuro', async ({ page }) => {
+    test.fail(true, 'ABIERTO: «CUOTA A INGRESAR» da 4,11:1 en claro y 3,50:1 en oscuro (Inspector 27/09/2026)');
+    await page.locator('#ccaa-causante').selectOption('murcia');
+    await page.locator('#parentesco').selectOption('III');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+    expect(await cuotaEstimada(page)).toBe('9218,63 €');
+
+    const comunes = [
+      '[class*="lineaFinal"] span',
+      '[class*="seccionTitulo"]',
+      '[class*="conceptCard"] h4',
+      '[class*="escenarioTip"]',
+      '[class*="guideSection"] h3',
+    ];
+    const claro = await contrastes(page, [...comunes, '[class*="faqTip"]']);
+
+    const contenedor = page.locator('header[class*="hero"]').locator('xpath=..');
+    const fondoClaro = await contenedor.evaluate((e) => getComputedStyle(e).backgroundColor);
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect
+      .poll(() => contenedor.evaluate((e) => getComputedStyle(e).backgroundColor), { message: 'el tema oscuro se aplicó' })
+      .not.toBe(fondoClaro);
+    await page.waitForTimeout(700); // transición de 0,3 s de globals.css
+    expect(await cuotaEstimada(page), 'el cálculo no depende del tema').toBe('9218,63 €');
+    const oscuro = await contrastes(page, comunes);
+
+    const fallos = [
+      ...claro.map((c) => ({ ...c, tema: 'claro' })),
+      ...oscuro.map((c) => ({ ...c, tema: 'oscuro' })),
+    ].filter((c) => c.ratio < 4.5);
+    expect(fallos.map((f) => `${f.tema} ${f.sel} ${f.ratio}:1`)).toEqual([]);
+  });
+
+  /**
+   * ABIERTO (accesibilidad, medio): el bloque «Impuesto estimado» pinta texto BLANCO sobre el
+   * degradado de marca (#2E86AB → #48A9A6, igual en los dos temas porque el módulo fija los dos
+   * colores en `.container`). En el extremo teal:
+   *   · la cifra (35 px / 700, texto grande, umbral 3:1): 2,80:1
+   *   · «Impuesto estimado en …» (14,4 px, opacidad 0,9): 2,55:1; en el azul, 3,65:1
+   *   · «Tipo efectivo» (13 px, opacidad 0,8): 2,32:1; en el azul, 3,22:1
+   * Es la «campaña aparte» de fondos de marca que el candado de cabeceras deja fuera, aquí sobre
+   * el dato principal de una app de riesgo 1. Se mide contra las dos paradas del degradado.
+   */
+  test('el importe destacado y sus rótulos se leen sobre las dos paradas del degradado', async ({ page }) => {
+    test.fail(true, 'ABIERTO: blanco sobre #48A9A6 da 2,32-2,80:1 (Inspector 27/09/2026)');
+    await page.locator('#ccaa-causante').selectOption('murcia');
+    await page.locator('#parentesco').selectOption('III');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+    await expect(page.getByText(/^Impuesto estimado en/)).toBeVisible();
+
+    const medidas = await page.locator('[class*="resultadoDestacado"]').evaluate((caja) => {
+      const lum = (c: number[]) => {
+        const t = (v: number) => {
+          const x = v / 255;
+          return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+        };
+        return 0.2126 * t(c[0]) + 0.7152 * t(c[1]) + 0.0722 * t(c[2]);
+      };
+      const paradas = [...getComputedStyle(caja).backgroundImage.matchAll(/rgba?\(([^)]+)\)/g)].map((m) =>
+        m[1].split(/[ ,/]+/).filter(Boolean).slice(0, 3).map(Number),
+      );
+      return [...caja.children].map((hijo) => {
+        const cs = getComputedStyle(hijo);
+        const alfa = Number(cs.opacity);
+        const color = (cs.color.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+        const px = parseFloat(cs.fontSize);
+        const grande = px >= 24 || (px >= 18.66 && Number(cs.fontWeight) >= 700);
+        const peor = Math.min(
+          ...paradas.map((p) => {
+            const efectivo = color.map((v, i) => v * alfa + p[i] * (1 - alfa));
+            const [a, b] = [lum(efectivo), lum(p)];
+            return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+          }),
+        );
+        return { texto: (hijo as HTMLElement).innerText.slice(0, 30), ratio: Math.round(peor * 100) / 100, umbral: grande ? 3 : 4.5 };
+      });
+    });
+    expect(medidas.length).toBeGreaterThanOrEqual(3);
+    expect(medidas.filter((m) => m.ratio < m.umbral).map((m) => `${m.texto}: ${m.ratio}:1`)).toEqual([]);
+  });
+});
+
+/**
+ * MÓVIL 393×851 — el caso normal de arriba, escrito con el TECLADO en pantalla (toque + tecleo,
+ * con los puntos de millar que teclea la gente) en vez de sembrado. Además: sin scroll
+ * horizontal y el <h1> libre de la barra fija del logo, que es lo que tocó hoy el lote del logo
+ * (586a4d61 y siguientes no modifican esta app: su hero ya lleva 80 px de margen superior).
+ */
+test.describe('Re-inspección 27/09/2026 — móvil 393×851', () => {
+  // Enumerado en vez de `...devices[…]`: dentro de un describe, un `devices` forzaría un worker nuevo.
+  test.use({
+    viewport: { width: 393, height: 851 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.75,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('caso normal tecleado en el móvil: 92,80 €, sin scroll horizontal y con el título a la vista', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#saldos-cuentas', '#vivienda-habitual']);
+
+    const tapado = await page.evaluate(() => {
+      const h1 = document.querySelector('h1')!.getBoundingClientRect();
+      return [...document.querySelectorAll('body *')]
+        .filter((e) => getComputedStyle(e).position === 'fixed')
+        .map((e) => e.getBoundingClientRect())
+        .some((r) => r.height > 0 && r.bottom > h1.top && r.top < h1.bottom && r.right > h1.left && r.left < h1.right);
+    });
+    expect(tapado, 'la barra fija del logo no tapa el título').toBe(false);
+
+    await page.locator('#ccaa-causante').selectOption('valencia');
+    await page.locator('#parentesco').selectOption('II');
+    await page.locator('#patrimonio-preexistente').selectOption('2');
+    await page.locator('#vivienda-habitual').tap();
+    await page.keyboard.type('150.000');
+    await esperarValorEnReact(page, page.locator('#vivienda-habitual'), '150.000');
+    await page.locator('#saldos-cuentas').tap();
+    await page.keyboard.type('60.000');
+    await esperarValorEnReact(page, page.locator('#saldos-cuentas'), '60.000');
+
+    expect(await cuotaEstimada(page)).toBe('92,80 €');
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth),
+      'scroll horizontal',
+    ).toBe(false);
   });
 });

@@ -48,9 +48,8 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *   1. CASOS 1-3 (21/08/2026) y CASOS 4-6 (10/09/2026): pasan, y son la red de regresión.
  *   2. HALLAZGOS REPARADOS: los cinco defectos de 08/2026, ya corregidos. Se conservan como
  *      guardias — si vuelven a romperse, se ponen en rojo.
- *   3. HALLAZGOS ABIERTOS (10/09/2026): van con `test.fail()`, la convención de estos
- *      ficheros. Afirman lo que la app DEBERÍA hacer, así que hoy fallan a propósito; el día
- *      que se reparen, Playwright avisará de que hay que quitarles la marca y pasan al bloque 2.
+ *   3. HALLAZGOS A-D (10/09/2026): nacieron con `test.fail()` y fueron REPARADOS; hoy son
+ *      guardias de regresión como las del bloque 2 y ninguno lleva ya la marca.
  *   4. RE-INSPECCIÓN 25/09/2026: la SOSPECHA de la rampa de ganancia (hallazgo 1509 de
  *      diapason), medida aquí sobre el sonido que sale de la ganancia, y la frecuencia decimal
  *      tras el cambio de parser 527373e0. Los abiertos, con `test.fail()`.
@@ -60,7 +59,13 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *      test por hallazgo. Los abiertos, con `test.fail()`.
  *      REPARADOS el mismo 25/09/2026 (hallazgos 1803-1811): los H1-H9 dejan de ser `test.fail()` y
  *      quedan como regresión; el H2 suma el caso «0,5 s» del acta, y el CASO 6 deja de exigir que
- *      un 0 en «Hasta» salte al techo (ver su comentario).
+ *      un 0 en «Hasta» salte al techo (ver su comentario). Sus comentarios describen el defecto
+ *      tal como se midió ese día, en presente: hoy ninguno está abierto.
+ *   6. INSPECTOR 27/09/2026: la medida con el micrófono, que ningún caso tocaba, con un micrófono
+ *      FALSO en bucle (`INSTRUMENTAR_MICRO`): el caso normal A/B, el límite con el tono manual
+ *      sonando (en móvil) y los rechazos (permiso denegado, procesados activos, silencio). Los
+ *      defectos nuevos, con `test.fail()` y «ABIERTO». Y la SOSPECHA S2 (CASO 3 inestable con la
+ *      CPU cargada): `abrir` espera ahora a la hidratación (ver su comentario).
  */
 
 test.use({
@@ -225,10 +230,25 @@ function INSTRUMENTAR(): void {
   };
 }
 
+/**
+ * Abre la app instrumentada y ESPERA A QUE ESTÉ HIDRATADA (SOSPECHA S2, Inspector 27/09/2026).
+ *
+ * Hasta ese día `abrir` solo esperaba al <h1>, que llega en el HTML del servidor, y el CASO 3
+ * pulsaba «Reproducir» acto seguido. Medido con la CPU emulada (CDP
+ * `Emulation.setCPUThrottlingRate`) sobre el flujo del CASO 3, en el instante del clic la raíz de
+ * React ya existía pero el botón aún no tenía fibra ni el campo su rastreador en 8 de 8 cargas a
+ * 1/6 y 1/20: el clic no se pierde —React 19.2 hidrata en síncrono ante un evento discreto—, pero
+ * esa hidratación de la página ENTERA se cobraba dentro de los 5 s de reloj de pared del
+ * `expect.poll` que espera al oscilador: 0,44 s a 1/6, 2,0-2,8 s a 1/20 y 3,9-4,5 s a 1/40, a un
+ * paso del límite. Es la forma que falló el 24/09/2026 con 24 procesos de CPU. Esperando antes a
+ * la hidratación (margen de 15 s, `_hidratacion.ts`), el mismo paso baja a 2,3-2,8 s a 1/40 y el
+ * plazo de 5 s vuelve a medir solo lo que tarda la app en responder al botón.
+ */
 async function abrir(page: Page): Promise<void> {
   await page.addInitScript(INSTRUMENTAR);
   await page.goto(RUTA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Generador de Tonos');
+  await esperarHidratacion(page, ['input[aria-label="Frecuencia en Hz"]']);
 }
 
 const registros = (page: Page): Promise<RegistroOscilador[]> =>
@@ -459,6 +479,9 @@ test.describe('En móvil (Pixel 7)', () => {
 test('CASO 3 — un valor fuera de rango se satura en el borde y nunca genera NaN', async ({
   page,
 }) => {
+  // `abrir` ya ha esperado a la hidratación: este es el caso que salió inestable con la CPU
+  // cargada (SOSPECHA S2, 24/09/2026), porque su primer gesto es el clic y el plazo de 5 s del
+  // poll de abajo se comía la hidratación de toda la página. Ver el comentario de `abrir`.
   await abrir(page);
   await botonReproducir(page).click();
   await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
@@ -904,7 +927,9 @@ test('REGRESIÓN 131 — los presets de notas usan coma decimal', async ({ page 
 });
 
 // ============================================================
-// HALLAZGOS ABIERTOS (Inspector 10/09/2026) — fallan a propósito
+// HALLAZGOS DEL INSPECTOR 10/09/2026 — nacieron con test.fail() y
+// están REPARADOS: hoy pasan y quedan como guardias de regresión.
+// Sus comentarios describen el defecto tal como se midió entonces.
 // ============================================================
 
 /**
@@ -2119,4 +2144,431 @@ test('HALLAZGO H9 — el techo de audición del perro es el medido (~45 kHz), no
   const frase = await page.getByText(/Los perros oyen hasta/).innerText();
   const khz = Number(frase.match(/perros oyen hasta ~?(\d+)\s*kHz/)?.[1] ?? NaN);
   expect(khz, frase).toBeCloseTo(45, -1);
+});
+
+// ============================================================
+// INSPECTOR 27/09/2026 — «Medir la respuesta con el micrófono»
+// ============================================================
+
+/** Cómo contesta el micrófono falso a `getUserMedia`. */
+type ModoMicro = 'bucle' | 'silencio' | 'denegar' | 'eco' | 'agc';
+
+/**
+ * Micrófono FALSO en bucle: todo lo que la app manda a `ctx.destination` vuelve por
+ * `getUserMedia`, después de pasar por un «altavoz» del test — un contexto aparte con un filtro
+ * peaking (RBJ, el de la especificación Web Audio) a 1 kHz, Q = 4,318, ganancia ajustable. Con
+ * ganancia 0 el filtro es la identidad (|H| = 1 en todas las frecuencias): la cadena es PLANA
+ * y sin ruido, que es el caso que se puede resolver a mano. Así se mide la cadena entera de la
+ * app —tonos, FFT, resta de ruido, mediana, comparación— sin depender del hardware.
+ *
+ * Los modos que no son el bucle ensayan los rechazos: permiso denegado, un navegador que deja
+ * encendidos sus procesados (se simula con `getSettings`, que es lo que la app lee) y un
+ * micrófono que solo oye silencio. Cada `getUserMedia` entrega una pista NUEVA, porque la app
+ * detiene la suya al terminar (y eso también se comprueba).
+ */
+function INSTRUMENTAR_MICRO(): void {
+  interface Bucle {
+    ctx: AudioContext;
+    entrada: GainNode;
+    filtro: BiquadFilterNode;
+    salida: MediaStreamAudioDestinationNode;
+  }
+  const w = window as unknown as {
+    __modoMicro: ModoMicro;
+    __pedidoMicro: MediaStreamConstraints | null;
+    __pistasMicro: MediaStreamTrack[];
+    __bucle: Bucle | null;
+  };
+  w.__modoMicro = 'bucle';
+  w.__pedidoMicro = null;
+  w.__pistasMicro = [];
+  w.__bucle = null;
+
+  // Los nodos del bucle se crean con CONSTRUCTORES, no con `ctx.createGain()` y compañía: esos
+  // métodos los envuelve `INSTRUMENTAR`, y un nodo del test en `__ganancias` taparía la ganancia
+  // de la app en `vivo()`.
+  const prepararBucle = (): Bucle => {
+    if (w.__bucle) return w.__bucle;
+    const ctx = new AudioContext();
+    const entrada = new GainNode(ctx);
+    const filtro = new BiquadFilterNode(ctx, { type: 'peaking', frequency: 1000, Q: 4.318, gain: 0 });
+    const salida = new MediaStreamAudioDestinationNode(ctx);
+    entrada.connect(filtro);
+    filtro.connect(salida);
+    w.__bucle = { ctx, entrada, filtro, salida };
+    return w.__bucle;
+  };
+
+  // Lo que va a los altavoces de un contexto de la app se copia también al bucle.
+  const copias = new WeakMap<BaseAudioContext, MediaStreamAudioDestinationNode>();
+  const conectar = AudioNode.prototype.connect as unknown as (
+    this: AudioNode,
+    destino: AudioNode | AudioParam,
+    ...resto: number[]
+  ) => unknown;
+  AudioNode.prototype.connect = function (this: AudioNode, destino: AudioNode | AudioParam, ...resto: number[]) {
+    const r = conectar.call(this, destino, ...resto);
+    if (destino instanceof AudioDestinationNode) {
+      let copia = copias.get(this.context);
+      if (!copia) {
+        copia = new MediaStreamAudioDestinationNode(this.context as AudioContext);
+        copias.set(this.context, copia);
+        const b = prepararBucle();
+        new MediaStreamAudioSourceNode(b.ctx, { mediaStream: copia.stream }).connect(b.entrada);
+      }
+      conectar.call(this, copia);
+    }
+    return r;
+  } as unknown as typeof AudioNode.prototype.connect;
+
+  navigator.mediaDevices.getUserMedia = async (restricciones?: MediaStreamConstraints): Promise<MediaStream> => {
+    w.__pedidoMicro = restricciones ?? null;
+    const modo = w.__modoMicro;
+    if (modo === 'denegar') throw new DOMException('Permiso denegado', 'NotAllowedError');
+    const b = prepararBucle();
+    const pista =
+      modo === 'silencio'
+        ? new MediaStreamAudioDestinationNode(b.ctx).stream.getAudioTracks()[0]
+        : b.salida.stream.getAudioTracks()[0].clone();
+    if (modo === 'eco' || modo === 'agc') {
+      const reales = pista.getSettings.bind(pista);
+      pista.getSettings = (): MediaTrackSettings => ({
+        ...reales(),
+        autoGainControl: true,
+        ...(modo === 'eco' ? { echoCancellation: true } : {}),
+      });
+    }
+    w.__pistasMicro.push(pista);
+    return new MediaStream([pista]);
+  };
+}
+
+async function abrirConMicro(page: Page, modo: ModoMicro = 'bucle'): Promise<void> {
+  await page.addInitScript(INSTRUMENTAR_MICRO);
+  await abrir(page);
+  await fijarModoMicro(page, modo);
+}
+
+const fijarModoMicro = (page: Page, modo: ModoMicro): Promise<void> =>
+  page.evaluate((m) => {
+    (window as unknown as { __modoMicro: ModoMicro }).__modoMicro = m;
+  }, modo);
+
+/** Ganancia del «altavoz» del bucle a 1 kHz, en dB. 0 = cadena plana. */
+const fijarAltavoz = (page: Page, gananciaDb: number): Promise<void> =>
+  page.evaluate((g) => {
+    (window as unknown as { __bucle: { filtro: BiquadFilterNode } }).__bucle.filtro.gain.value = g;
+  }, gananciaDb);
+
+const pistasMicro = (page: Page): Promise<string[]> =>
+  page.evaluate(() =>
+    (window as unknown as { __pistasMicro: MediaStreamTrack[] }).__pistasMicro.map((p) => p.readyState),
+  );
+
+const pedidoMicro = (page: Page): Promise<MediaStreamConstraints | null> =>
+  page.evaluate(() => (window as unknown as { __pedidoMicro: MediaStreamConstraints | null }).__pedidoMicro);
+
+/**
+ * Lanza una medida y espera a que la app la GUARDE: el botón pasa a «Repetir medida X». Es el
+ * estado de la app, no un plazo: la medida dura lo que dicen sus constantes, 26 tonos × (140 +
+ * 3 × 35) ms + 250 ms de ruido ≈ 6,6 s, y el tope de 30 s solo cubre una máquina cargada.
+ */
+async function medir(page: Page, letra: 'A' | 'B', gesto: 'click' | 'tap' = 'click'): Promise<void> {
+  const boton = page.getByRole('button', { name: `Medir ${letra}`, exact: true });
+  await (gesto === 'tap' ? boton.tap() : boton.click());
+  await expect(page.getByRole('button', { name: `Repetir medida ${letra}`, exact: true })).toBeVisible({
+    timeout: 30000,
+  });
+}
+
+/**
+ * La tabla «Ver los números» leída en FORMATO ESPAÑOL: frecuencia → [A, B, B − A], con `null`
+ * donde la app escribe «sin medida» o «—». No es entrada del usuario: es la salida que la app
+ * acaba de formatear, y el test no puede importar `parseSpanishNumber` (corre fuera de @/).
+ */
+async function tablaMedida(page: Page): Promise<Map<number, (number | null)[]>> {
+  const detalles = page.locator('details').filter({ hasText: 'Ver los números' });
+  if (!(await detalles.evaluate((d) => (d as HTMLDetailsElement).open))) {
+    await detalles.locator('summary').click();
+  }
+  // parser-ok: se lee una celda que la propia app acaba de imprimir, no un campo de entrada.
+  const cifra = (texto: string): number => Number(texto.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.'));
+  const tabla = new Map<number, (number | null)[]>();
+  for (const fila of await detalles.locator('tbody tr').allInnerTexts()) {
+    const [frecuencia, ...celdas] = fila.split('\t');
+    tabla.set(
+      cifra(frecuencia),
+      celdas.map((c) => (/\d/.test(c) ? cifra(c) : null)),
+    );
+  }
+  return tabla;
+}
+
+/** Tercios de octava nominales (ISO 266) de 50 Hz a 16 kHz: el rango que mide la app. */
+const TERCIOS_50_16K = [
+  50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000,
+  5000, 6300, 8000, 10000, 12500, 16000,
+];
+
+const avisoMedida = (page: Page) => page.locator('[role="alert"][class*="medidaAviso"]');
+const resumenMedida = (page: Page) => page.locator('[class*="medidaResumen"]');
+const graficaMedida = (page: Page) => page.getByRole('img', { name: /Respuesta en frecuencia relativa/ });
+
+// ------------------------------------------------------------
+// CASO 10 — NORMAL: la comparación A/B que promete jsonLd.features
+// ------------------------------------------------------------
+/**
+ * «Comparación A/B de dos posiciones o dos altavoces en decibelios relativos» (jsonLd.features).
+ * A = cadena plana; B = el mismo «altavoz» con +12 dB a 1 kHz. Resuelto a mano con la fórmula
+ * del peaking (RBJ, fs = 44.100 o 48.000 Hz, da lo mismo a dos decimales):
+ *   H(1.000 Hz) = +12,00 dB exactos (es la ganancia en la frecuencia central) · H(800) = +2,84 ·
+ *   H(1.250) = +2,83 · en los extremos (50 Hz, 16 kHz) +0,00
+ *   Cada curva se normaliza a SU mediana: la de A es la de una cadena plana; la de B sube lo que
+ *   sube la mediana de H sobre los 26 tercios = +0,048 dB (media de los valores 13.º y 14.º).
+ *   ⇒ B − A en 1.000 Hz = 12,00 − 0,05 = 11,95 dB, y es el máximo de la diferencia.
+ * Tolerancia ±3 dB: este caso vigila defectos de 12 dB —la resta al revés, la frecuencia
+ * cambiada, el pico perdido—, y el ruido propio de la medida llega a ±3 dB (HALLAZGO I1, abajo).
+ * Medido el 27/09/2026 en seis cargas: 10,3 · 11,0 · 11,3 · 11,5 · 11,7 · 11,8.
+ */
+test('CASO 10 — A/B con el micrófono: un altavoz con +12 dB a 1 kHz sale como +12 dB en 1.000 Hz', async ({
+  page,
+}) => {
+  test.setTimeout(90000);
+  await abrirConMicro(page);
+
+  await medir(page, 'A');
+  // El micrófono se pide con los tres procesados apagados (motor-respuesta.ts, `evaluarMicrofono`).
+  expect(await pedidoMicro(page)).toEqual({
+    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+  });
+  // El sonido de la medida existe de verdad: UN oscilador, arrancado con el contexto en marcha,
+  // que recorre los 26 tercios en orden (el primer 50 es el de su creación) y se detiene al final.
+  const [medidaA] = await registros(page);
+  expect(medidaA.iniciado).toBe(true);
+  expect(medidaA.estadoCtx).toBe('running');
+  expect(medidaA.frecuenciasAplicadas).toEqual([50, ...TERCIOS_50_16K]);
+  await expect.poll(async () => (await registros(page))[0].detenido).toBe(true);
+  // Y el micrófono se suelta: si no, el indicador de grabación se queda encendido.
+  expect(await pistasMicro(page)).toEqual(['ended']);
+  await expect(resumenMedida(page)).toContainText('26 de 26 puntos medidos');
+  await expect(graficaMedida(page)).toBeVisible();
+
+  await fijarAltavoz(page, 12);
+  await medir(page, 'B');
+  const tabla = await tablaMedida(page);
+  expect([...tabla.keys()]).toEqual(TERCIOS_50_16K);
+  const bMenosA = tabla.get(1000)?.[2] ?? null;
+  expect(bMenosA, 'B − A en 1.000 Hz').not.toBeNull();
+  expect(bMenosA as number).toBeGreaterThanOrEqual(11.95 - 3);
+  expect(bMenosA as number).toBeLessThanOrEqual(11.95 + 3);
+  await expect(resumenMedida(page)).toContainText(/Donde más gana B es en 1\.?000 Hz/);
+  await expect(resumenMedida(page)).toContainText('Comparadas sobre 26 puntos con medida en las dos');
+  expect(await pistasMicro(page)).toEqual(['ended', 'ended']);
+});
+
+// ------------------------------------------------------------
+// HALLAZGO I1 — ABIERTO: la misma cadena medida dos veces no da la misma curva
+// ------------------------------------------------------------
+/**
+ * HALLAZGO I1 [medio · cálculo] (Inspector 27/09/2026) — ABIERTO. Las esperas de la medida son más
+ * cortas que la ventana que analizan. La FFT es de 16.384 muestras (FFT_MEDIDA) = 341 ms a 48 kHz y
+ * 372 ms a 44,1 kHz, pero cada tercio se lee a los 175, 210 y 245 ms de cambiar el tono
+ * (MS_ESTABILIZACION 140 + 3 × MS_ENTRE_LECTURAS 35): la ventana aún guarda un 30-50 % del tono
+ * anterior o del silencio, y el nivel del tono en curso está SUBIENDO cuando se lee. Medido con una
+ * sonda sobre el propio analizador de la app: −35,4 → −29,0 → −25,4 dB a los 171, 211 y 251 ms de
+ * audio, unos 0,13 dB por milisegundo, así que diez milisegundos de holgura de un setTimeout mueven
+ * el punto más de 1 dB. El primer tercio sale además 4-6 dB bajo: su ventana incluye la rampa de
+ * arranque de 50 ms.
+ *
+ * Resuelto a mano: la cadena es la identidad (bucle plano), así que las dos medidas son la MISMA
+ * situación y B − A = 0 dB en los 26 tercios; y en una curva plana el 0 relativo es el de todos los
+ * tercios, 50 Hz incluido. Tolerancias: 1 dB para B − A (la pérdida por festoneo de la ventana, hasta
+ * 1,1 dB, se cancela porque A y B se leen en las mismas frecuencias) y 1,5 dB para el punto de 50 Hz
+ * (ahí el festoneo no se cancela).
+ * Medido el 27/09/2026 en cuatro cargas: máx |B − A| = 2,1 · 2,3 · 3,2 · 2,4 dB, con 10-15 de los 26
+ * tercios a 1 dB o más, y el resumen dice «se separan 4,2-5,1 dB. Donde más gana B es en 1250 Hz;
+ * donde más pierde, en 630 Hz» entre dos medidas idénticas. El 50 Hz de A: −5,6 · −4,3 · −4,1 · −5,0
+ * dB, así que casi toda curva sale con «mínimo en 50 Hz» sea cual sea el altavoz.
+ */
+test('HALLAZGO I1 — la misma cadena medida dos veces da la misma curva, y plana', async ({ page }) => {
+  test.fail(); // ABIERTO: hallazgo del Inspector 27/09/2026
+  test.setTimeout(90000);
+  await abrirConMicro(page);
+  await medir(page, 'A');
+  await medir(page, 'B'); // el altavoz no se toca: la misma situación dos veces
+  const tabla = await tablaMedida(page);
+  const diferencias = TERCIOS_50_16K.map((f) => tabla.get(f)?.[2] ?? null);
+  expect(diferencias.every((d) => d !== null), 'en un bucle sin ruido se miden los 26 tercios').toBe(true);
+  const peor = Math.max(...diferencias.map((d) => Math.abs(d ?? Infinity)));
+  expect(peor, `B − A por tercio: ${diferencias.join(' · ')}`).toBeLessThanOrEqual(1);
+  const a50 = tabla.get(50)?.[0] ?? null;
+  expect(Math.abs(a50 ?? Infinity), 'el tercio de 50 Hz de una cadena plana, en dB rel.').toBeLessThanOrEqual(1.5);
+});
+
+// ------------------------------------------------------------
+// CASO 12 — RECHAZO: sin permiso, con procesados activos, en silencio
+// ------------------------------------------------------------
+/**
+ * Lo que debe pasar, leído en `medirRespuesta` y `evaluarMicrofono`:
+ *   permiso denegado → aviso «No se ha podido abrir el micrófono…», sin emitir ningún tono;
+ *   el navegador deja encendida la cancelación de eco → aviso de que no se mide, sin emitir
+ *     ningún tono, y la pista del micrófono DETENIDA (el indicador de grabación se apaga);
+ *   un micrófono que solo oye silencio → se emiten los 26 tonos, ninguno despega del ruido y se
+ *     avisa «Ningún tono llegó a despegar del ruido de fondo» en vez de dibujar una curva.
+ * En ninguno de los tres aparece la gráfica.
+ */
+test('CASO 12 — sin permiso, con cancelación de eco o en silencio, se avisa y no se dibuja ninguna curva', async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  await abrirConMicro(page, 'denegar');
+  const medirA = page.getByRole('button', { name: 'Medir A', exact: true });
+
+  await medirA.click();
+  await expect(avisoMedida(page)).toContainText(
+    'No se ha podido abrir el micrófono. Hay que dar permiso al navegador para medir.',
+  );
+  expect(await registros(page), 'sin micrófono no se emite nada').toHaveLength(0);
+  await expect(medirA).toBeEnabled();
+
+  await fijarModoMicro(page, 'eco');
+  await medirA.click();
+  await expect(avisoMedida(page)).toContainText('cancelación de eco');
+  await expect(avisoMedida(page)).toContainText('no se mide');
+  expect(await registros(page), 'con la medida rechazada no se emite nada').toHaveLength(0);
+  expect(await pistasMicro(page), 'el micrófono rechazado se suelta').toEqual(['ended']);
+
+  await fijarModoMicro(page, 'silencio');
+  await medirA.click();
+  await expect(avisoMedida(page)).toContainText('Ningún tono llegó a despegar del ruido de fondo', {
+    timeout: 30000,
+  });
+  const [medida] = await registros(page);
+  expect(medida.frecuenciasAplicadas, 'los 26 tonos se emitieron').toEqual([50, ...TERCIOS_50_16K]);
+  await expect.poll(async () => (await registros(page))[0].detenido).toBe(true);
+  expect(await pistasMicro(page)).toEqual(['ended', 'ended']);
+
+  await expect(graficaMedida(page)).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Repetir medida A', exact: true })).toHaveCount(0);
+});
+
+// ------------------------------------------------------------
+// HALLAZGO I3 — ABIERTO: «la control automático de ganancia»
+// ------------------------------------------------------------
+/**
+ * HALLAZGO I3 [bajo · contenido] (Inspector 27/09/2026) — ABIERTO. El aviso se arma con
+ * `mantiene activa la ${procesadosActivos.join(' y la ')} del micrófono` (page.tsx ~557), y uno de
+ * los tres nombres de motor-respuesta.ts es masculino: «control automático de ganancia».
+ *   solo el control de ganancia activo → obtenido «mantiene activa la control automático de
+ *     ganancia del micrófono» · esperado «mantiene activo el control automático de ganancia»
+ *   cancelación de eco + control de ganancia → «mantiene activa la cancelación de eco y la
+ *     control automático de ganancia»
+ * Es el aviso que ve quien usa un navegador que no deja apagar esos procesados.
+ */
+test('HALLAZGO I3 — el aviso del control automático de ganancia concuerda en género', async ({ page }) => {
+  test.fail(); // ABIERTO: hallazgo del Inspector 27/09/2026
+  await abrirConMicro(page, 'agc');
+  await page.getByRole('button', { name: 'Medir A', exact: true }).click();
+  await expect(avisoMedida(page)).toContainText('control automático de ganancia');
+  const texto = await avisoMedida(page).innerText();
+  expect(texto).not.toMatch(/\bla control\b|\bactiva el control\b/);
+});
+
+// ------------------------------------------------------------
+// HALLAZGO I4 — ABIERTO: `@disclaimer: exempt` en una app que orienta sobre la salud auditiva
+// ------------------------------------------------------------
+/**
+ * HALLAZGO I4 [medio · contenido] (Inspector 27/09/2026, SOSPECHA S1) — ABIERTO. page.tsx:2 declara
+ * `// @disclaimer: exempt` y no monta <DisclaimerCard>. La política (_private/DISCLAIMER-POLICY.md)
+ * reserva el exempt a «herramientas técnicas sin consejo profesional» (§7) y manda un DisclaimerCard
+ * a toda app que dé «consejos personalizados sobre temas … médicos» o cuyo resultado pueda llevar a
+ * «decisiones de impacto» (§7, paso 1). Esta se anuncia «Para test de oído, tinnitus» (description),
+ * trae una guía de test de audición casero con normas por edad («Valores significativamente
+ * inferiores al rango para tu edad pueden indicar presbiacusia o daño auditivo por ruido») y
+ * patologías («La asimetría auditiva puede indicar patologías como la neurinoma del acústico»), y
+ * deja el volumen llegar al 100 %: es «orientación … de salud» del Nivel 2 ALTO (§2), no colapsable.
+ * Las advertencias propias están a la vista desde el 1808, pero les falta la descarga de
+ * responsabilidad del texto estándar del Nivel 2 (§4: «meskeIA no se responsabiliza de decisiones
+ * basadas en el uso de esta herramienta»), y un role="note" no lo vigila ningún candado (el Cuadre
+ * solo cuenta DisclaimerCard, LegalNotice, role="alert"…). Sus hermanas con el mismo riesgo,
+ * generador-ruido-blanco y amplificador-sonido, llevan DisclaimerCard medical/high no colapsable.
+ */
+test('HALLAZGO I4 — la descarga de responsabilidad de salud se ve sin abrir nada', async ({ page }) => {
+  test.fail(); // ABIERTO: hallazgo del Inspector 27/09/2026
+  await abrir(page);
+  await expect(page.getByText(/meskeIA no se responsabiliza/)).toBeVisible();
+});
+
+// ------------------------------------------------------------
+// CASO 11 — LÍMITE, en móvil: medir con el tono manual sonando al 100 %
+// ------------------------------------------------------------
+test.describe('Inspector 27/09/2026 — medir con el tono sonando, en móvil (Pixel 7)', () => {
+  const PIXEL_7 = devices['Pixel 7'];
+  test.use({
+    viewport: PIXEL_7.viewport,
+    userAgent: PIXEL_7.userAgent,
+    deviceScaleFactor: PIXEL_7.deviceScaleFactor,
+    isMobile: PIXEL_7.isMobile,
+    hasTouch: PIXEL_7.hasTouch,
+  });
+
+  /**
+   * El límite: el tono manual de 1.000 Hz —el preset «Medios», justo un tercio de la retícula—
+   * sonando al volumen máximo (100 %) cuando se pulsa «Medir A». La app lo sabe («El generador
+   * manual no puede seguir sonando: contaminaría su propia medida») y lo apaga antes de abrir el
+   * micrófono.
+   */
+  async function tonoManualAlMaximo(page: Page): Promise<void> {
+    await abrirConMicro(page);
+    await page.getByRole('button', { name: 'Ir a 1.000 Hz' }).tap();
+    await page.getByRole('slider', { name: 'Volumen' }).press('End');
+    await expect(page.locator('[class*="volumenValor"]')).toHaveText('100 %');
+    await botonReproducir(page).tap();
+    await expect.poll(async () => (await vivo(page))?.ganancia ?? -1).toBeCloseTo(1, 2);
+    expect((await registros(page))[0].frecuenciasAplicadas).toEqual([1000]);
+  }
+
+  test('CASO 11 — «Medir A» con 1.000 Hz sonando al 100 %: apaga el tono y mide los 26 tercios', async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await tonoManualAlMaximo(page);
+    await medir(page, 'A', 'tap');
+
+    const [manual, medida] = await registros(page);
+    expect(manual.detenido, 'el tono manual se detiene al empezar a medir').toBe(true);
+    await expect(botonReproducir(page)).toHaveAttribute('aria-pressed', 'false');
+    expect(medida.frecuenciasAplicadas).toEqual([50, ...TERCIOS_50_16K]);
+    expect(await pistasMicro(page)).toEqual(['ended']);
+
+    // La gráfica y la tabla caben en los 412 px del Pixel 7 sin desbordar la página.
+    await expect(graficaMedida(page)).toBeVisible();
+    const tabla = await tablaMedida(page);
+    expect([...tabla.keys()]).toEqual(TERCIOS_50_16K);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
+    ).toBe(0);
+  });
+
+  /**
+   * HALLAZGO I2 [bajo · cálculo] (Inspector 27/09/2026) — ABIERTO. Apagar el tono manual no basta:
+   * el suelo de ruido se lee 250 ms después de abrir el micrófono, con una ventana de FFT de 341-372
+   * ms (la causa del I1), así que con un micrófono que entrega audio en cuanto se abre —el bucle del
+   * test; en la vida real, un dispositivo ya abierto o un altavoz con latencia, como uno Bluetooth—
+   * la rampa de salida del tono manual cae DENTRO de la ventana del «silencio». El ruido medido en
+   * 1.000 Hz queda a menos de 6 dB del tono de medida y `restarRuido` descarta el punto.
+   * Resuelto a mano: la cadena es plana y sin ruido, así que 1.000 Hz se mide como los otros 25.
+   * Medido el 27/09/2026 al 100 %: «sin medida» en 1.000 Hz en 4 de 4 cargas (una en móvil), y con B
+   * (+12 dB a 1 kHz) la comparación se hace «sobre 25 puntos» y dice «Donde más gana B es en 800 Hz»:
+   * el pico real desaparece. Al 30 % por defecto: hueco en 1 de 3 cargas y punto hundido en otra.
+   */
+  test('HALLAZGO I2 — el tono manual recién apagado no deja un hueco en su propio tercio', async ({ page }) => {
+    test.fail(); // ABIERTO: hallazgo del Inspector 27/09/2026
+    test.setTimeout(60000);
+    await tonoManualAlMaximo(page);
+    await medir(page, 'A', 'tap');
+    const tabla = await tablaMedida(page);
+    expect(tabla.get(1000)?.[0] ?? null, 'A en 1.000 Hz (null = «sin medida»)').not.toBeNull();
+    await expect(resumenMedida(page)).toContainText('26 de 26 puntos medidos');
+  });
 });

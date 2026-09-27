@@ -724,3 +724,272 @@ test('CASO 30 · art. 51.7: lo que reduce la base es lo que TÚ aportas al plan 
   expect(consejo).toContain('menos de 8000 €');
   expect(consejo).not.toContain('Las aportaciones del cónyuge');
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Inspector 27/09/2026 — re-inspección tras 8a6fb75b (art. 20 antes de la letra f) y
+// dc8a2ec3 (importes ilegibles, hijos enteros, cifras de data/fiscal, maternidad).
+// Los hallazgos 1313-1318 y 1854-1861 se comprobaron en navegador y aguantan: sus CASOS
+// (8, 12, 14-18, 21-28) siguen en verde. Los CASOS 31 a 34 son regresión nueva y pasan;
+// los CASOS 35 a 43 son defectos nuevos, marcados con test.fail() y «ABIERTO».
+//
+// Fuentes añadidas, consultadas en el BOE consolidado el 27/09/2026:
+//   · art. 58.1 LIRPF: el mínimo por descendientes exige que el hijo «conviva con el
+//     contribuyente»; art. 61.1.ª: si dos contribuyentes tienen derecho respecto de los mismos
+//     descendientes, «su importe se prorrateará entre ellos por partes iguales».
+//   · art. 96.2, último párrafo, LIRPF: obligados a declarar «en cualquier caso» quienes hayan
+//     estado de alta en el RETA en cualquier momento del período impositivo.
+//   · art. 52.1 LIRPF: límite de las aportaciones a planes, «la menor» entre el 30 % de los
+//     rendimientos netos del trabajo y de actividades económicas y 1.500 €.
+//   · art. 95.1 RIRPF: retención del 15 % a las actividades PROFESIONALES; 7 % «en el período
+//     impositivo de inicio de actividades y en los dos siguientes» (lo mismo que dice
+//     SECCIONES_IAE en data/fiscal/cnae-iae.ts).
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Clic en el conmutador de tema DESPUÉS de hidratar, y prueba de que el estilo cambió. */
+async function pasarAOscuro(page: Page): Promise<void> {
+  const contenedor = page.locator('h1').locator('xpath=ancestor::div[contains(@class, "container")][1]');
+  const fondoClaro = await contenedor.evaluate((e) => getComputedStyle(e).backgroundColor);
+  await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect.poll(() => contenedor.evaluate((e) => getComputedStyle(e).backgroundColor)).not.toBe(fondoClaro);
+  // Las transiciones de color del cambio de tema tienen que haber terminado: medido a mitad de
+  // una, el contraste sale de un color intermedio (2,15:1 en la comparativa el 27/09/2026).
+  await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
+}
+
+test('CASO 31 (normal) · 30.000 € brutos, soltero/a, 4.500 € retenidos → a pagar 428,70 €', async ({ page }) => {
+  // SS 2025 = 30.000 × 6,47 % = 1.941,00 € (2.500 €/mes, bajo la base máxima de 4.909,50 €)
+  // Art. 20: se mide sobre 30.000 − 1.941 = 28.059 € ≥ 19.747,5 € → reducción 0
+  // Base general = 28.059 − 2.000 (art. 19.2.f) = 26.059,00 €
+  // escala(26.059) = 2.365,50 + 1.860,00 + 5.859 × 30 % = 5.983,20 € · escala(5.550) = 1.054,50 €
+  // Cuota íntegra = 4.928,70 € · DA 61.ª: 30.000 ≥ 18.276 € → sin deducción
+  // Diferencial = 4.928,70 − 4.500 = 428,70 € A PAGAR · tipo efectivo 4.928,70 / 26.059 = 18,91 %
+  await estimar(page, { bruto: '30000', retenciones: '4500' });
+
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(4928.7, 1);
+  expect(await tarjeta(page, 'Tipo efectivo')).toMatch(/^18,91 %$/);
+  await expect(page.locator(SEL_ETIQUETA_FINAL).first()).toHaveText('Resultado estimado: A PAGAR');
+  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('428,70 €');
+});
+
+test('CASO 32 (límite, oscuro tras hidratar) · 320.000 € de trabajo y 320.000 € de capital: las dos bases en su último tramo', async ({ page }) => {
+  await pasarAOscuro(page);
+  // SS 2025 topada: 4.909,50 × 12 × 6,47 % = 3.811,7358 € → base general = 320.000 − 3.811,7358
+  //   − 2.000 = 314.188,2642 € (reducción art. 20: 0; además el capital supera 6.500 €)
+  // escala general = 125.901,50 (hasta 300.000) + 14.188,2642 × 47 % = 132.569,9842 €
+  //   − escala(5.550) 1.054,50 = cuota general 131.515,4842 €
+  // Ahorro (TRAMOS_GANANCIAS_PATRIMONIALES_2025): 1.140 + 9.240 + 34.500 + 27.000 + 20.000 × 30 %
+  //   = 77.880,00 € (el mínimo cabe entero en la base general: nada pasa al ahorro)
+  // Cuota íntegra = 209.395,4842 € · tipo efectivo = 209.395,48 / 634.188,26 = 33,02 %
+  // (Con el 45 % en el tramo de más de 300.000 € saldrían 283,77 € menos; con el 28 % de 2024
+  //  en el último tramo del ahorro, 400 € menos.)
+  await estimar(page, { bruto: '320000', capital: '320000' });
+
+  expect(euros(await tarjeta(page, 'Base imponible general'))).toBeCloseTo(314188.26, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(209395.48, 1);
+  expect(await tarjeta(page, 'Tipo efectivo')).toMatch(/^33,02 %$/);
+  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('209.395,48 €');
+  await expect(notaGeneral(page)).toContainText('131.515,48');
+  await expect(page.locator('css=p:has-text("Cuota íntegra del ahorro")')).toContainText('77.880,00');
+});
+
+test('CASO 33 (rechazo) · «2.000.50» no se estima en ninguno de los tres importes y borra el resultado anterior', async ({ page }) => {
+  // Dos puntos y un último grupo de dos cifras: parseSpanishNumber → NaN. Antes de dc8a2ec3 el
+  // bruto ya se rechazaba, pero retenciones y capital valían 0 € (hallazgo 1854).
+  const campos: [string, string][] = [
+    [SEL_BRUTO, 'Rendimientos del trabajo'],
+    [SEL_RETENCIONES, 'Retenciones ya practicadas'],
+    [SEL_CAPITAL, 'Rendimientos del capital mobiliario'],
+  ];
+  for (const [selector, nombre] of campos) {
+    await estimar(page, { bruto: '30000' });
+    await expect(page.locator(SEL_IMPORTE_FINAL)).toHaveText(/4928,70/);   // resultado previo a la vista
+
+    await escribir(page, selector, '2.000.50');
+    await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
+    await expect(avisoApp(page)).toContainText(`«2.000.50» en «${nombre}»`);
+    await expect(page.locator(SEL_IMPORTE_FINAL)).toHaveCount(0);
+    await escribir(page, selector, '');
+  }
+});
+
+test.describe('en móvil (393 × 851)', () => {
+  test.use({
+    viewport: { width: 393, height: 851 },
+    userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.75,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('CASO 34 (límite bajo) · 18.000 € y 600 € retenidos: art. 20 en su primer tramo decreciente y DA 61.ª decreciente', async ({ page }) => {
+    // SS 2025 = 18.000 × 6,47 % = 1.164,60 € · art. 20 sobre 18.000 − 1.164,60 = 16.835,40 €
+    //   (primer tramo decreciente): 7.302 − 1,75 × (16.835,40 − 14.852) = 3.831,05 €
+    // Base = 16.835,40 − 2.000 − 3.831,05 = 11.004,35 € → cuota = (11.004,35 − 5.550) × 19 % = 1.036,33 €
+    // DA 61.ª sobre los íntegros: 340 − 0,2 × (18.000 − 16.576) = 55,20 € (≤ cuota general)
+    // Cuota tras deducción = 981,13 € → A PAGAR 981,13 − 600 = 381,13 € · tipo 981,13 / 11.004,35 = 8,92 %
+    // (Midiendo el art. 20 después de los 2.000 € —el defecto de 8a6fb75b— la reducción sería
+    //  7.302 €, la base 7.533,40 € y la cuota íntegra 376,85 €.)
+    await estimar(page, { bruto: '18000', retenciones: '600' });
+
+    expect(euros(await tarjeta(page, 'Base imponible general'))).toBeCloseTo(11004.35, 1);
+    expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(1036.33, 1);
+    expect(euros(await tarjeta(page, 'Deducción rentas bajas'))).toBeCloseTo(-55.2, 1);
+    expect(await tarjeta(page, 'Tipo efectivo')).toMatch(/^8,92 %$/);
+    expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('381,13 €');
+  });
+
+  test('CASO 35 · ABIERTO: al estimar, la tabla del desglose ensancha la columna y la página corta el formulario y la columna «Cuota»', async ({ page }) => {
+    // ABIERTO: con una sola columna (max-width 1024 px) la pista es `1fr`, cuyo mínimo es el
+    // min-content de su contenido. La tabla del desglose (5 columnas de importes) mide 439 px
+    // con 30.000 € y 482 px con 400.000 €, así que la pista pasa de 345 px a 504,5 px en un
+    // viewport de 393 px. html y body llevan overflow-x: hidden: lo que sobra no se puede
+    // desplazar. Medido el 27/09/2026: «Limpiar» termina en x = 496 px y la columna «Cuota»
+    // del desglose queda fuera de la pantalla, igual que el borde derecho de los campos.
+    test.fail();
+    const medir = () => page.evaluate(() => {
+      const ancho = document.documentElement.clientWidth;
+      const derecha = (e: Element | null): number => (e ? e.getBoundingClientRect().right + window.scrollX : 0);
+      const boton = [...document.querySelectorAll('button')].find((b) => b.textContent?.trim() === 'Limpiar') ?? null;
+      const cuota = document.querySelector('table[class*="tramosTable"] thead th:last-child');
+      let desplazable = false;
+      for (let n = cuota?.parentElement ?? null; n && n !== document.body; n = n.parentElement) {
+        if (/(auto|scroll)/.test(getComputedStyle(n).overflowX)) desplazable = true;
+      }
+      return { ancho, limpiar: derecha(boton), cuota: derecha(cuota), desplazable };
+    });
+
+    const antes = await medir();
+    expect(antes.limpiar).toBeLessThanOrEqual(antes.ancho);   // montaje: antes de estimar, cabe
+
+    await estimar(page, { bruto: '30000' });
+    await expect(page.locator(SEL_IMPORTE_FINAL)).toBeVisible();
+    const despues = await medir();
+    expect(despues.limpiar).toBeLessThanOrEqual(despues.ancho);
+    expect(despues.desplazable || despues.cuota <= despues.ancho).toBe(true);
+  });
+});
+
+test('CASO 36 · ABIERTO: con custodia compartida el mínimo por el hijo se prorratea, y la app no deja decirlo', async ({ page }) => {
+  // ABIERTO (sospecha Sd): «Soltero/a o divorciado/a» aplica el mínimo por descendientes entero
+  // (motor.ts, `calcularMinimos`: solo prorratea con «Casado/a (dos ingresos)»). Con custodia
+  // compartida el hijo convive con los dos progenitores (art. 58.1) y los dos tienen derecho al
+  // mínimo, que «se prorrateará entre ellos por partes iguales» (art. 61.1.ª); lo mismo en una
+  // pareja no casada que declara por separado. El propio bloque educativo lo dice («Si los dos
+  // progenitores declaran por separado, el mínimo por los hijos se reparte a partes iguales»).
+  // Caso: 30.000 € brutos, divorciado/a con custodia compartida de 1 hijo (MINIMOS_IRPF_2025):
+  //   esperado: mínimo 5.550 + 2.400 / 2 = 6.750 € → 5.983,20 − 6.750 × 19 % (1.282,50) = 4.700,70 €
+  //   la app:   mínimo 5.550 + 2.400     = 7.950 € → 5.983,20 − 1.510,50              = 4.472,70 €
+  //   (228 € de cuota de menos; con dos hijos, uno menor de 3 años, 800,50 €).
+  // El formulario no pregunta la custodia ni si el hijo convive con el otro progenitor.
+  test.fail();
+  await estimar(page, { bruto: '30000', situacion: 'soltero', hijos: '1' });
+  expect(euros(await tarjeta(page, 'Mínimos personales'))).toBeCloseTo(7950, 1);   // montaje: lo de hoy
+
+  const formulario = page.getByRole('heading', { level: 2, name: 'Tus datos orientativos' }).locator('xpath=..');
+  await expect(formulario.getByText(/custodia compartida|otro progenitor/i).first()).toBeAttached({ timeout: 1000 });
+});
+
+test('CASO 37 · ABIERTO: la fecha de «última verificación» es anterior a correcciones de datos que usa el cálculo', async ({ page }) => {
+  // ABIERTO (sospecha Sb): DataReference y el pie del aviso publican FISCAL_IRPF_META.verificado
+  // = 09/09/2026. Después de esa fecha cambiaron datos y fórmulas de data/fiscal/irpf.ts que la
+  // app usa: la DA 61.ª (1a4072d9, 24/09/2026, «Verificado: 2026-09-24» en su comentario) y la
+  // base sobre la que se mide la reducción del art. 20 (8a6fb75b, 25/09/2026, art. 20 consultado
+  // en el BOE ese día). El sello dice «verificado» de algo que se corrigió después.
+  test.fail();
+  const referencia = limpiar(await page.getByRole('note', { name: 'Datos de referencia normativos' }).innerText());
+  const partes = (referencia.match(/Última verificación: (\d{2})\/(\d{2})\/(\d{4})/) ?? []).slice(1).map(Number);
+  expect(partes).toHaveLength(3);   // montaje: la fecha se lee
+  const [dia, mes, anio] = partes;
+  expect(new Date(anio, mes - 1, dia).getTime()).toBeGreaterThanOrEqual(new Date(2026, 8, 25).getTime());
+});
+
+test('CASO 38 · ABIERTO: el autónomo de alta en el RETA está obligado a declarar siempre, no solo con más de 1000 €', async ({ page }) => {
+  // ABIERTO (sospecha Se): la comparativa dice «Siempre si ingresos >1000 € (actividad
+  // económica)». El art. 96.2 LIRPF, último párrafo (BOE consolidado, actualizado el 09/09/2026):
+  // «estarán en cualquier caso obligadas a declarar todas aquellas personas físicas que en
+  // cualquier momento del período impositivo hubieran estado de alta […] en el RETA». Los
+  // 1.000 € son el límite conjunto del párrafo anterior, que al autónomo de alta no le exime.
+  // Ni la regla ni la cifra están en OBLIGACION_DECLARAR_2025: van tecleadas en page.tsx.
+  test.fail();
+  const fila = page.locator('table[class*="comparativaTable"] tbody tr', { hasText: 'Obligación de declarar' });
+  await expect(fila).toHaveCount(1);   // montaje
+  const autonomo = limpiar((await fila.locator('td').nth(2).textContent()) ?? '');
+  expect(autonomo).not.toMatch(/ingresos\s*>\s*1\.?000/);
+  expect(autonomo).toMatch(/alta/i);
+});
+
+test('CASO 39 · ABIERTO: la retención del 15 % / 7 % va tecleada y se atribuye a todo autónomo', async ({ page }) => {
+  // ABIERTO (sospecha Se): la comparativa dice «Clientes retienen 15 % (7 % primeros 3 años)» para
+  // el «Autónomo (RETA)». Las dos cifras están en data/fiscal (SECCIONES_IAE de cnae-iae.ts:
+  // tipoRetencion 15 y tipoRetencionInicio 7, «durante el año de inicio de la actividad y los dos
+  // siguientes») y solo para las secciones profesional y artística: la 1.ª (empresarial) «con
+  // carácter general, no lleva retención». Art. 95.1 RIRPF: 15 % a los rendimientos de actividades
+  // PROFESIONALES; 7 % «en el período impositivo de inicio de actividades y en los dos siguientes».
+  test.fail();
+  const fila = page.locator('table[class*="comparativaTable"] tbody tr', { hasText: 'Cómo se retiene' });
+  const autonomo = limpiar((await fila.locator('td').nth(2).textContent()) ?? '');
+  expect(autonomo).toContain('mod. 130');   // montaje: es la celda del autónomo
+  expect(autonomo).toMatch(/profesional/i);
+  expect(autonomo).toMatch(/año de inicio[^.;]*dos siguientes/);
+});
+
+test('CASO 40 · ABIERTO: el límite del plan de pensiones omite el 30 % de los rendimientos netos (art. 52.1.a)', async ({ page }) => {
+  // ABIERTO (sospecha Sf, en su parte de texto): la app no calcula aportaciones a planes, así que
+  // el límite no entra en ninguna cifra; pero el FAQ afirma «El límite individual es 1500 € anuales
+  // (desde 2022, art. 52.1 LIRPF)». El art. 52.1 fija «la menor» de a) el 30 % de la suma de los
+  // rendimientos netos del trabajo y de actividades económicas y b) 1.500 €. Caso: 4.000 € de
+  // rendimientos netos y 1.500 € aportados → reducción máxima 1.200 €, no 1.500 €. El 30 % no está
+  // en LIMITES_PLAN_PENSIONES_2025 (data/fiscal/pensiones.ts): hay que añadirlo allí primero.
+  test.fail();
+  const plan = limpiar((await parrafo(page, '¿Puedo deducir el plan de pensiones').textContent()) ?? '');
+  expect(plan).toContain('1500 € anuales');   // montaje
+  expect(plan).toMatch(/(?<![\d,])30 %/);
+  expect(plan).toMatch(/rendimientos netos del trabajo y de actividades económicas/);
+});
+
+test('CASO 41 · ABIERTO: las tarjetas en euros publican la cifra pegada al € («4928,70€»)', async ({ page }) => {
+  // ABIERTO: ResultCard pinta `{value}<span class="unit">{unit}</span>` y separa la unidad solo
+  // con un margin CSS. La app ya le pasa `${NBSP}%` al tipo efectivo (CASO 24), pero a las cinco
+  // tarjetas en euros les pasa unit="€": el texto (árbol de accesibilidad, portapapeles, lector
+  // de pantalla) es «4928,70€», contra el formato español del proyecto («4928,70 €»).
+  test.fail();
+  await estimar(page, { bruto: '30000', retenciones: '4500' });
+  const h3 = page.getByRole('heading', { level: 3, name: 'Cuota íntegra', exact: true });
+  const valor = (await h3.locator('xpath=../following-sibling::div[1]//p').textContent()) ?? '';
+  expect(valor).toMatch(/^4928,70/);   // montaje: la cifra del CASO 31
+  expect(valor).toMatch(/^4928,70[  ]€$/);
+});
+
+test('CASO 42 · ABIERTO: el enlace del ejemplo del pensionista no llega a 4,5:1 en ninguno de los dos temas', async ({ page }) => {
+  // ABIERTO (resto de los hallazgos 1858 y 1859): el enlace «estimador IRPF para pensionistas»
+  // del consejo del ejemplo no tiene color propio y hereda el de enlace global (--primary), no
+  // --primary-texto. Medido el 27/09/2026 sobre el fondo del consejo: claro 3,78:1 (#2E86AB);
+  // oscuro 4,498:1 (#3FA5D1). Texto de 13 px: exige 4,5:1.
+  test.fail();
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  const enlace = page.getByRole('link', { name: 'estimador IRPF para pensionistas' });
+  await expect(enlace).toBeVisible();
+  const claro = await contrasteDe(enlace);
+  await pasarAOscuro(page);
+  const oscuro = await contrasteDe(enlace);
+  expect(claro).toBeGreaterThanOrEqual(4.5);
+  expect(oscuro).toBeGreaterThanOrEqual(4.5);
+});
+
+test('CASO 43 · ABIERTO: en oscuro, la primera columna de las filas pares de la comparativa se queda en 4,39:1', async ({ page }) => {
+  // ABIERTO (resto del hallazgo 1858): el CASO 25 mide la primera celda de la primera fila (4,72:1)
+  // y pasa; las filas pares llevan fondo rgba(46, 134, 171, 0.07) y ahí #3FA5D1 da 4,39:1
+  // («Cómo se retiene», «Tipo efectivo orientativo»). Tema aplicado tras hidratar.
+  test.fail();
+  await pasarAOscuro(page);
+  const filas = page.locator('table[class*="comparativaTable"] tbody tr');
+  await expect(filas).toHaveCount(5);   // montaje
+  const ratios: string[] = [];
+  for (let i = 0; i < 5; i++) {
+    const r = await contrasteDe(filas.nth(i).locator('td').first());
+    ratios.push(r >= 4.5 ? 'ok' : r.toFixed(2));
+  }
+  // Hoy: ['ok', '4.39', 'ok', '4.39', 'ok']
+  expect(ratios).toEqual(['ok', 'ok', 'ok', 'ok', 'ok']);
+});

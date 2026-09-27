@@ -7,10 +7,11 @@ import { activarTema } from '../contraste-text-muted-auxiliares';
  *
  * QUÉ PROMETE LA APP
  * ──────────────────
- * H1 «📚 Estilos y Movimientos Literarios» · sub «De la Ilustración al Posmodernismo — autores,
- * obras y fragmentos» · JSON-LD: «10 movimientos literarios», «Filtros por período histórico y
- * región geográfica», «Autores representativos con obras clave», «Fragmentos literarios
- * ilustrativos atribuidos». No calcula nada: su «resultado con verdad comprobable» es el
+ * H1 «📚 Estilos y Movimientos Literarios» · sub «Del Neoclasicismo a la literatura posmoderna —
+ * autores, obras y fragmentos» (antes de la reparación: «De la Ilustración al Posmodernismo») ·
+ * JSON-LD: «10 movimientos literarios», «Filtros por período histórico y región geográfica»,
+ * «Autores representativos con obras clave», «Fragmentos literales de las obras, con autor, obra
+ * y año» (antes: «Fragmentos literarios ilustrativos atribuidos»). No calcula nada: su «resultado con verdad comprobable» es el
  * CONTENIDO (fechas, autor-obra, fragmentos entre comillas con autor, obra y año) y la
  * OPERATIVA (qué deja ver cada filtro, qué se ve al elegir un movimiento).
  *
@@ -68,6 +69,36 @@ import { activarTema } from '../contraste-text-muted-auxiliares';
  *   (1885), fuera de las Rimas (es.wikipedia «Rimas (Bécquer)», apéndices de la ed. de
  *   Montesinos). La app pasa a la rima XXI («¿Qué es poesía?…»), que sí es de las Rimas;
  *   texto en es.wikisource, Obras, t. III (1885), p. 159.
+ *
+ * RE-INSPECCIÓN (27/09/2026, tras b1a0c6af y el arreglo del logo 586a4d61)
+ * ─────────────────────────────────────────────────────────────────────
+ * Los 14 hallazgos 1880-1893 se verifican en navegador y aguantan. Casos nuevos (bloque del
+ * final), resueltos a mano leyendo el array `movimientos` antes de ejecutar:
+ * · S.XX + América Latina → Modernismo, Vanguardias, Boom, Posmoderna (los cuatro con 'sxx' en
+ *   `periodos` y 'latam' en `regiones`); S.XIX + EEUU → Romanticismo y Naturalismo.
+ * · Fragmentos que la reparación no cotejó, contra fuente:
+ *   Darío, «Yo soy aquel que ayer no más decía…», primer poema de Cantos de vida y esperanza
+ *   (Madrid, 1905) — es.wikisource «Yo soy aquel que ayer no más decía».
+ *   Huidobro, Altazor (Madrid, 1931), comienzo del Canto I: «Altazor ¿por qué perdiste tu
+ *   primera serenidad? / ¿Qué ángel malo se paró en la puerta de tu sonrisa / Con la espada en
+ *   la mano?» — Gaceta de la Universidad de Guadalajara, «Altazor».
+ *   Camus, L'Étranger (Gallimard, 1942), íncipit: «Aujourd'hui, maman est morte. Ou peut-être
+ *   hier, je ne sais pas. […] « Mère décédée. Enterrement demain. Sentiments distingués. » Cela
+ *   ne veut rien dire.» — fr.wikipedia «Aujourd'hui, maman est morte».
+ *   Ginsberg, Howl and Other Poems (City Lights, 1956): «I saw the best minds of my generation
+ *   destroyed by madness, starving hysterical naked, / dragging themselves through the negro
+ *   streets at dawn looking for an angry fix,».
+ *   Calvino, Se una notte d'inverno un viaggiatore (Einaudi, 1979), íncipit: «Stai per
+ *   cominciare a leggere il nuovo romanzo Se una notte d'inverno un viaggiatore di Italo Calvino.
+ *   Rilassati. Raccogliti. Allontana da te ogni altro pensiero.»
+ *   Los cinco anclan: texto de la obra (o traducción fiel, declarada), obra y año correctos.
+ * · Kerouac, The Dharma Bums (1958): en español «Los vagabundos del Dharma» (Anagrama, trad.
+ *   Mariano Antolín Rato, ISBN 978-84-339-6139-6). No hay edición «El dharma de los vagabundos».
+ * · WCAG 2.2, 2.5.3 (Label in Name): el nombre accesible de un control con texto visible debe
+ *   CONTENER ese texto.
+ * · Logo fijo (MeskeiaLogo): hasta 768 px la barra baja a 52 px y el hero deja 80 px (586a4d61);
+ *   desde 769 px el logo ocupa x 20-203 / y 15-77 y el hero vuelve a 48 px de relleno, así que
+ *   un título centrado que empiece antes de x = 203 queda debajo (medido: 769-989 px).
  */
 
 const RUTA = '/visualizador-estilos-literarios/';
@@ -119,8 +150,16 @@ async function filtrar(page: Page, periodo: string, region: string): Promise<voi
   await page.getByRole('group', { name: 'Filtrar por región' }).getByRole('button', { name: region, exact: true }).click();
 }
 
+/**
+ * Botón «← Todos los movimientos» de ARRIBA del detalle. Se localiza por clase y no por su
+ * nombre accesible, que hoy es «Volver al listado» y cambiará al reparar el 2.5.3 (ver el
+ * bloque de la re-inspección): así los casos que solo lo pulsan no se rompen con el arreglo.
+ */
+const botonVolverArriba = (page: Page) =>
+  page.locator('[class*="btnVolver"]:not([class*="btnVolverBottom"])');
+
 async function volverAlListado(page: Page): Promise<void> {
-  await page.getByRole('button', { name: 'Volver al listado', exact: true }).click();
+  await botonVolverArriba(page).click();
   await expect(page.locator('[class*="movimientoCard"] h2').first()).toBeVisible();
 }
 
@@ -350,7 +389,7 @@ test.describe('Caso 3 · teclado y cambios de filtro seguidos no rompen nada', (
     await tarjeta(page, 'Realismo').focus();
     await page.keyboard.press('Enter');
     expect((await leerDetalle(page)).nombre).toBe('Realismo');
-    await page.getByRole('button', { name: 'Volver al listado', exact: true }).focus();
+    await botonVolverArriba(page).focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('[class*="movimientoCard"] h2')).toHaveCount(10);
     expect(await nombresEnParrilla(page)).toEqual(MOVIMIENTOS);
@@ -467,7 +506,8 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
     test('al elegir el último movimiento, su cabecera queda a la vista', async ({ page }) => {
       await tarjeta(page, 'Literatura Posmoderna').click();
       await expect(page.locator('[class*="detalleNombre"]')).toHaveText('Literatura Posmoderna');
-      // Hoy: scrollY 1681 y la cabecera 1165 px por encima del borde; se ve «El nombre de la rosa»
+      // Antes de la reparación: scrollY 1681 y la cabecera 1165 px por encima del borde; se veía
+      // «El nombre de la rosa». REPARADO (verificado el 27/09/2026 a 393 px: cabecera a 234 px)
       await expect(page.locator('[class*="detalleNombre"]')).toBeInViewport({ timeout: 2000 });
     });
 
@@ -478,7 +518,7 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
       await tarjeta(page, 'Realismo').click();
       await leerDetalle(page);
       const radio = await page.locator('[class*="btnVolverBottom"]').evaluate((b) => getComputedStyle(b).borderTopLeftRadius);
-      // .btnVolver: border-radius 8px; el de abajo hoy hereda el del navegador
+      // .btnVolver: border-radius 8px; antes de la reparación el de abajo heredaba el del navegador
       expect(radio).toBe('8px');
       await volverAlListado(page);
       const x = await page.locator('[class*="filtros"]').evaluate((e) => e.getBoundingClientRect().x);
@@ -493,7 +533,7 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
     await page.keyboard.press('Enter');
     await leerDetalle(page);
     expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
-    await page.getByRole('button', { name: 'Volver al listado', exact: true }).focus();
+    await botonVolverArriba(page).focus();
     await page.keyboard.press('Enter');
     await expect(tarjeta(page, 'Realismo')).toBeFocused();
     await filtrar(page, 'S.XVII–XVIII', 'América Latina');
@@ -573,13 +613,16 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
   // HALLAZGO [bajo] (Inspector 25/09/2026): décadas calcadas del inglés en el texto visible.
   // RAE: «los años cuarenta» o «la década de 1940»; «1940s» y «los 1940» no son españoles.
   test('las décadas se escriben a la española (texto visible y JSON-LD)', async ({ page }) => {
-    const calco = /\b\d{4}s\b|\blos \d{4}\b/g;
-    // JSON-LD: pasa hoy («los años 60-70» es forma admitida por la RAE)
+    // Re-inspección 27/09/2026: también «60s» y «los '60», y sobre TODO el texto visible
+    const calco = /\b\d{2,4}s\b|\blos \d{4}\b|\blos '\d{2}\b/g;
+    // JSON-LD: ya pasaba («los años 60-70» es forma admitida por la RAE)
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
     expect(ld.match(calco) ?? []).toEqual([]);
     await abrirGuia(page);
-    // Hoy: ['los 1940', '1940s', '1950s', '1960s'] (FAQ de Borges, de las fechas y de la Beat)
+    // Antes de la reparación: ['los 1940', '1940s', '1950s', '1960s'] (FAQ de Borges, de las
+    // fechas y de la Beat). REPARADO: «los años cuarenta», «años cincuenta», «años sesenta»
     expect((await textoGuia(page)).match(calco) ?? []).toEqual([]);
+    expect((await page.locator('body').innerText()).match(calco) ?? []).toEqual([]);
   });
 
   // HALLAZGO [bajo] (Inspector 25/09/2026): el JSON-LD llama «Modernismo» a Joyce, Woolf y
@@ -628,5 +671,207 @@ test.describe('Hallazgos del Inspector (25/09/2026)', () => {
   test('la guía no usa el nazismo como analogía decorativa', async ({ page }) => {
     await abrirGuia(page);
     expect(await textoGuia(page)).not.toContain('nazismo');
+  });
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN (27/09/2026) — casos nuevos y hallazgos que quedan abiertos
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * ¿Pisa alguna pieza de la barra fija de MeskeiaLogo las LETRAS del <h1>? Misma medida que
+ * `tituloTapado` de scripts/ronda.mjs: cajas del texto (Range.getClientRects), no la del h1.
+ */
+async function tituloTapadoPorLogo(page: Page): Promise<boolean> {
+  return page.evaluate(() => {
+    const barra = Array.from(document.querySelectorAll('body *')).find((e) => {
+      const cs = getComputedStyle(e);
+      const r = e.getBoundingClientRect();
+      return cs.position === 'fixed' && r.top <= 1 && r.height < 120 && r.width > 300 && e.querySelector('a[href="/"]');
+    });
+    const h1 = document.querySelector('h1');
+    if (!barra || !h1) throw new Error('Sin barra del logo o sin <h1>: la medida no vale');
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    const letras = Array.from(rango.getClientRects()).filter((c) => c.width > 0);
+    const piezas = Array.from(barra.children).map((c) => c.getBoundingClientRect()).filter((c) => c.width > 0);
+    return piezas.some((p) => letras.some((c) => !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom)));
+  });
+}
+
+/** Borde inferior de la barra fija del logo (lo que tape por encima de esa línea no se ve). */
+async function bordeBarraLogo(page: Page): Promise<number> {
+  return page.locator('[class*="headerBar"]').evaluate((b) =>
+    Math.max(...Array.from(b.children).map((c) => c.getBoundingClientRect().bottom)),
+  );
+}
+
+test.describe('Re-inspección (27/09/2026)', () => {
+  test.beforeEach(async ({ page }) => {
+    await abrir(page);
+  });
+
+  // CASO NORMAL — resuelto a mano con `periodos` y `regiones` de cada movimiento en page.tsx
+  test('S.XX + América Latina y S.XIX + EEUU dejan justo los movimientos que les tocan', async ({ page }) => {
+    await filtrar(page, 'S.XX', 'América Latina');
+    // Modernismo ['sxix','sxx'] + latam · Vanguardias ['sxx'] + latam · Boom ['sxx'] + latam ·
+    // Posmoderna ['sxx','contemporaneo'] + latam. Fuera: Existencialismo (solo europa), Beat (eeuu)
+    expect(await nombresEnParrilla(page)).toEqual(['Modernismo', 'Vanguardias', 'Boom Latinoamericano', 'Literatura Posmoderna']);
+    await filtrar(page, 'S.XIX', 'EEUU');
+    // Romanticismo ['clasico','sxix'] + eeuu (Poe) · Naturalismo ['sxix'] + eeuu
+    expect(await nombresEnParrilla(page)).toEqual(['Romanticismo', 'Naturalismo']);
+    await filtrar(page, 'Contemporáneo', 'Europa');
+    expect(await nombresEnParrilla(page)).toEqual(['Literatura Posmoderna']);
+  });
+
+  // S1b — los cinco fragmentos que la reparación de b1a0c6af no cotejó (fuentes en la cabecera)
+  test('Darío y Huidobro: texto literal, obra y año de primera edición', async ({ page }) => {
+    await tarjeta(page, 'Modernismo').click();
+    let f = await leerDetalle(page);
+    expect(f.periodo).toBe('1880–1920');
+    expect(f.regiones).toEqual(['América Latina', 'España']);
+    // es.wikisource «Yo soy aquel que ayer no más decía»: los cuatro primeros versos
+    expect(f.fragmento).toBe(
+      '«Yo soy aquel que ayer no más decía / el verso azul y la canción profana, / en cuya noche un ruiseñor había / que era alondra de luz por la mañana.»',
+    );
+    // Cantos de vida y esperanza: Madrid, Tipografía de la Revista de Archivos, 1905
+    expect(f.atribucion).toBe('— Rubén Darío, Cantos de Vida y Esperanza (1905)');
+    await volverAlListado(page);
+
+    await tarjeta(page, 'Vanguardias').click();
+    f = await leerDetalle(page);
+    // Altazor, comienzo del Canto I (Gaceta UDG): «…en la puerta de tu sonrisa / Con la espada en la mano?»
+    expect(f.fragmento).toBe(
+      '«Altazor ¿por qué perdiste tu primera serenidad? / ¿Qué ángel malo se paró en la puerta de tu sonrisa / con la espada en la mano?»',
+    );
+    expect(f.atribucion).toBe('— Vicente Huidobro, Altazor (1931)');
+  });
+
+  test('Camus, Ginsberg y Calvino: traducción fiel, declarada como tal, con obra y año', async ({ page }) => {
+    const nota = page.locator('[class*="fragmentoNota"]');
+
+    await tarjeta(page, 'Existencialismo').click();
+    let f = await leerDetalle(page);
+    // «Aujourd'hui, maman est morte. Ou peut-être hier, je ne sais pas.» … «Mère décédée.
+    // Enterrement demain. Sentiments distingués.» «Cela ne veut rien dire.»
+    expect(f.fragmento).toContain('Hoy ha muerto mamá. O quizás ayer. No lo sé.');
+    expect(f.fragmento).toContain('Entierro mañana.');
+    expect(f.fragmento).toContain('Esto no quiere decir nada.');
+    expect(f.atribucion).toBe('— Albert Camus, El extranjero (1942)');
+    await expect(nota).toHaveText('Comienzo de la novela. Traducción al español del original en francés.');
+    await volverAlListado(page);
+
+    await tarjeta(page, 'Generación Beat').click();
+    f = await leerDetalle(page);
+    // «I saw the best minds of my generation destroyed by madness, starving hysterical naked, /
+    // dragging themselves through the negro streets at dawn looking for an angry fix,»
+    expect(f.fragmento).toContain('Vi las mejores mentes de mi generación destruidas por la locura');
+    expect(f.fragmento).toContain('buscando una dosis furiosa');
+    expect(f.atribucion).toBe('— Allen Ginsberg, Aullido (1956)');
+    await expect(nota).toContainText('original en inglés');
+    await volverAlListado(page);
+
+    await tarjeta(page, 'Literatura Posmoderna').click();
+    f = await leerDetalle(page);
+    // «Stai per cominciare a leggere il nuovo romanzo … Rilassati. Raccogliti. Allontana da te
+    // ogni altro pensiero.»
+    expect(f.fragmento).toContain('Estás a punto de empezar a leer la nueva novela de Italo Calvino');
+    expect(f.fragmento).toContain('Relájate.');
+    expect(f.atribucion).toBe('— Italo Calvino, Si una noche de invierno un viajero (1979)');
+    await expect(nota).toHaveText('Comienzo de la novela. Traducción al español del original en italiano.');
+  });
+
+  // Regresión de 586a4d61 (logo fijo sobre el título) a los cuatro anchos pedidos
+  test('el logo fijo no tapa el <h1> a 360, 768, 1024 ni 1280 px', async ({ page }) => {
+    for (const [ancho, alto] of [[360, 740], [768, 1024], [1024, 768], [1280, 900]]) {
+      await page.setViewportSize({ width: ancho, height: alto });
+      // Medido el 27/09/2026: a 360 y 768 el título empieza en y = 79 (logo hasta 52); a 1024
+      // y 1280 empieza en x = 220 y 348 (logo hasta x = 203)
+      await expect.poll(() => tituloTapadoPorLogo(page), { message: `a ${ancho} px` }).toBe(false);
+    }
+  });
+
+  // HALLAZGO [bajo] (Inspector 27/09/2026) — ABIERTO: entre 769 y 989 px (iPad en vertical:
+  // 810, 820, 834 px) el logo tapa el 📚 y la «E» de «Estilos». 586a4d61 da 80 px al hero solo
+  // hasta 768 px; por encima vuelven los 48 px de `.hero` y el logo, ya grande, llega a x = 203
+  // y y = 77, mientras el título centrado empieza en x = 93-198 y y = 47.
+  test.fail('el logo fijo tampoco tapa el <h1> en tableta vertical (800-980 px)', async ({ page }) => {
+    for (const ancho of [800, 834, 900, 980]) {
+      await page.setViewportSize({ width: ancho, height: 1100 });
+      await expect.poll(() => tituloTapadoPorLogo(page), { message: `a ${ancho} px`, timeout: 2000 }).toBe(false);
+    }
+  });
+
+  // S1a · HALLAZGO [bajo] (Inspector 27/09/2026) — ABIERTO: WCAG 2.5.3 (Label in Name). El
+  // botón de arriba enseña «← Todos los movimientos» y su aria-label es «Volver al listado»: el
+  // árbol de accesibilidad dice `button "Volver al listado": ← Todos los movimientos`, y quien
+  // lo maneja por voz diciendo lo que lee («pulsa Todos los movimientos») no lo encuentra.
+  test.fail('el nombre accesible del botón de arriba contiene su texto visible', async ({ page }) => {
+    await tarjeta(page, 'Realismo').click();
+    await leerDetalle(page);
+    const visible = (await botonVolverArriba(page).innerText()).replace(/^←\s*/, '').trim();
+    expect(visible).toBe('Todos los movimientos');
+    // Hoy: 0 botones cuyo nombre contenga «Todos los movimientos»
+    await expect(page.getByRole('button', { name: visible })).toHaveCount(1);
+  });
+
+  // HALLAZGO [bajo] (Inspector 27/09/2026) — ABIERTO: la tercera obra de Kerouac se rotula con
+  // un título que no tiene ninguna edición en español. The Dharma Bums (1958) es «Los
+  // vagabundos del Dharma» (Anagrama, trad. Mariano Antolín Rato). Misma clase que el 1890.
+  test.fail('Generación Beat: la obra de Kerouac lleva su título en español', async ({ page }) => {
+    await tarjeta(page, 'Generación Beat').click();
+    const kerouac = (await leerDetalle(page)).autores.find((a) => a.nombre === 'Jack Kerouac');
+    // Hoy: ['En el camino', 'Los subterráneos', 'El dharma de los vagabundos']
+    expect(kerouac?.obras).toEqual(['En el camino', 'Los subterráneos', 'Los vagabundos del Dharma']);
+  });
+
+  // HALLAZGO [medio] (Inspector 27/09/2026) — ABIERTO: en oscuro, el título del recuadro
+  // «Errores frecuentes al estudiar literatura» (h3, 14,7 px negrita: texto normal, exige 4,5:1)
+  // mantiene el rojo literal #c0392b de claro sobre el fondo oscuro: 2,21:1. `.warningHeader h3`
+  // no tiene variante `[data-theme='dark']`. En claro da 5,1:1.
+  test.fail('en tema oscuro el título del recuadro de errores se lee (≥ 4,5:1)', async ({ page }) => {
+    await activarTema(page, 'dark');
+    await abrirGuia(page);
+    // El tema oscuro está aplicado de verdad: el recuadro toma su fondo de `[data-theme='dark'] .warningBox`
+    await expect(page.locator('[class*="warningBox"]')).toHaveCSS('background-color', 'rgba(231, 76, 60, 0.1)');
+    const c = await peorContraste(page, '[class*="warningHeader"] h3');
+    // peorContraste recorta el texto a 40 caracteres
+    expect(c?.texto).toBe('Errores frecuentes al estudiar literatura'.slice(0, 40));
+    // Hoy: 2,21
+    expect(c?.ratio ?? 0).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test.describe('en un móvil de 393 × 851', () => {
+    test.use({
+      viewport: { width: 393, height: 851 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 2.75,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    // CASO LÍMITE — el último de la parrilla, abierto desde el fondo de la página y cerrado
+    // con el botón de abajo: la vista y el foco no pueden quedar bajo la barra fija del logo
+    test('el último movimiento: se abre con la cabecera a la vista y al volver su tarjeta queda visible', async ({ page }) => {
+      const ultimo = tarjeta(page, 'Literatura Posmoderna');
+      await ultimo.scrollIntoViewIfNeeded();
+      await ultimo.click();
+      await expect(page.locator('[class*="detalleNombre"]')).toHaveText('Literatura Posmoderna');
+      await expect(page.locator('[class*="detalleNombre"]')).toBeInViewport();
+      const barra = await bordeBarraLogo(page);
+      // Medido el 27/09/2026: barra hasta 52 px; «← Todos los movimientos» empieza en 96 px
+      // (scroll-margin-top: 6rem de .detalle)
+      const arriba = await botonVolverArriba(page).evaluate((b) => b.getBoundingClientRect().top);
+      expect(arriba).toBeGreaterThanOrEqual(barra);
+
+      const abajo = page.locator('[class*="btnVolverBottom"]');
+      await abajo.scrollIntoViewIfNeeded();
+      await abajo.click();
+      await expect(ultimo).toBeFocused();
+      await expect(ultimo).toBeInViewport();
+      const top = await ultimo.evaluate((b) => b.getBoundingClientRect().top);
+      expect(top).toBeGreaterThanOrEqual(barra);
+    });
   });
 });

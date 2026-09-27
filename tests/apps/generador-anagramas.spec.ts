@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Inspector — generador-anagramas (segmento interactiva, 1.548 usos reales)
@@ -1189,21 +1190,20 @@ test.describe('generador-anagramas', () => {
     });
 
     test(
-      'HALLAZGO · la K y la W no tienen ficha, y la app las cuenta como 0 sin decirlo',
+      'REPARADO (hallazgo 704) · la K y la W no tienen ficha, y la app ya no las cuenta como 0',
       async ({ page }) => {
         await abrirConDiccionario(page);
         await buscarAtril(page, 'kayak', 2, 10);
 
-        // `puntuarPalabra` hace `VALORES_FICHA[ficha] ?? 0`: una letra sin ficha suma cero y
-        // el chip presenta el total como el de cualquier jugada legal. Sale KAYAK=6 (A1+Y4+A1,
-        // las dos K a cero) y, más llamativo, KA=1: una palabra de dos letras anunciada con el
-        // valor de una sola. El resumen hereda el error y encabeza el atril con «La más
-        // valiosa: 6 puntos», sobre cinco palabras que la propia FAQ declara injugables.
+        // Lo que se vio el 10/09/2026: `puntuarPalabra` hacía `VALORES_FICHA[ficha] ?? 0`,
+        // así que una letra sin ficha sumaba cero y el chip presentaba el total como el de
+        // cualquier jugada legal. Salía KAYAK=6 (A1+Y4+A1, las dos K a cero) y KA=1, y el
+        // resumen encabezaba el atril con «La más valiosa: 6 puntos» sobre cinco palabras
+        // que la propia FAQ declara injugables.
         //
-        // Va con `test.fail()` mientras no esté reparado, igual que se hizo con los hallazgos
-        // 264-268: en cuanto la app deje de dar por buena esa cuenta —marcando la palabra,
-        // retirando la insignia o lo que se decida— este test pasará y Playwright avisará de
-        // que hay que quitarle la marca.
+        // REPARADO en 43473556 (10/09/2026): el motor expone `letrasSinFicha` y el chip dice
+        // «sin ficha K» en vez de un número. Nació con `test.fail()`; se le quitó la marca al
+        // repararse y queda como regresión.
         const chips = await chipsConPuntos(page);
         expect(puntosDe(chips, 'kayak'), 'KAYAK no puede valer 6 sin las dos K').not.toBe('6');
         expect(puntosDe(chips, 'ka'), 'KA no puede valer 1 con dos letras').not.toBe('1');
@@ -1211,18 +1211,19 @@ test.describe('generador-anagramas', () => {
     );
 
     test(
-      'HALLAZGO · gastar la ficha blanca en una K sale gratis: el mismo total con y sin ella',
+      'REPARADO (hallazgo 705) · la ficha blanca sobre una K ya no sale gratis',
       async ({ page }) => {
         await abrirConDiccionario(page);
 
-        // Con la K de verdad en el atril, la app da YAK = Y4+A1+K(sin ficha) = 5.
+        // Lo que se vio el 10/09/2026: con la K de verdad en el atril la app daba
+        // YAK = Y4+A1+K(sin ficha) = 5, y poniendo esa misma K con una ficha blanca —que
+        // según la leyenda de la app rebaja la puntuación— salía EL MISMO 5. Contraprueba con
+        // una letra que sí tiene ficha: «casa» vale 6 con la A propia y 5 con la blanca.
+        // REPARADO en 43473556: «yak» con la K propia se marca «sin ficha K» y «ya?» sí se
+        // puntúa, porque la blanca es la única manera de poner una K en el tablero.
         await buscarAtril(page, 'yak', 3, 4);
         const conFicha = puntosDe(await chipsConPuntos(page), 'yak');
 
-        // Y poniendo esa misma K con una ficha blanca —que según la leyenda de la app rebaja
-        // la puntuación: «La blanca no suma puntos: por eso una palabra cara con blanca
-        // puntúa menos de lo que parece»— sale EL MISMO número. Contraprueba con una letra
-        // que sí tiene ficha: «casa» vale 6 con la A propia y 5 poniéndola con la blanca.
         await buscarAtril(page, 'ya?', 3, 4);
         const conBlanca = puntosDe(await chipsConPuntos(page), 'yak');
 
@@ -1275,7 +1276,7 @@ test.describe('generador-anagramas', () => {
     // RESIDUOS DE REPARACIÓN — la corrección que no viajó a la tarjeta de al lado
     // -------------------------------------------------------------------------------------
     test(
-      'HALLAZGO · la tarjeta de palabras de 2-3 letras repite el defecto ya reparado en su vecina',
+      'REPARADO (hallazgo 706) · la tarjeta de palabras de 2-3 letras ya no cita léxico inglés',
       async ({ page }) => {
         await page.goto(RUTA);
         await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -1284,29 +1285,330 @@ test.describe('generador-anagramas', () => {
         });
 
         // El hallazgo 499 quitó JOT, ZAG y QAT de «Amplía tu vocabulario pasivo» por ser
-        // léxico Collins de Scrabble en INGLÉS y no estar en el lemario de la app. La tarjeta
-        // de al lado sigue diciendo «Válidas: AX, XI, QI (si se aceptan anglicismos), OI, ID,
-        // ET»: AX, XI y ET sí están en el lemario; QI, OI e ID NO (comprobado con `grep -ix`
-        // sobre public/data/diccionario-es.txt). Quien las teclee no obtiene nada.
+        // léxico Collins de Scrabble en INGLÉS. La tarjeta de al lado decía el 10/09/2026
+        // «Válidas: AX, XI, QI (si se aceptan anglicismos), OI, ID, ET», y QI, OI e ID no
+        // están en el lemario. REPARADO en 43473556: la lista actual (AX, XI, OX, JA, JE, JO,
+        // ZA, ÑU) se comprobó una a una contra public/data/diccionario-es.txt.
         await expect(tarjeta).not.toContainText(/\bQI\b|\bOI\b|\bID\b/);
       },
     );
 
     test(
-      'HALLAZGO · la FAQ del anagrama perfecto cita palabras que el lemario de la app no tiene',
+      'REPARADO (hallazgo 707) · la FAQ del anagrama perfecto ya no cita palabras ajenas al lemario',
       async ({ page }) => {
         await page.goto(RUTA);
         await page.getByRole('button', { name: 'Ver guía educativa' }).click();
         const faq = page.locator('details', { hasText: '¿Qué es un anagrama perfecto?' });
 
-        // «Ejemplos famosos en español: ROMA/AMOR/MORA/RAMO/OMAR, SALTA/ATLAS/TALAS,
-        // PIEDRA/PARDIE». De los nueve, cuatro no están en el lemario (OMAR, SALTA, TALAS y
-        // PARDIE) y PARDIE no es una palabra del español: es la forma anglofrancesa que
-        // admite el Scrabble inglés. Con «piedra» y longitud 6..6 la app devuelve una sola
-        // palabra, «piedra», así que la propia app desmiente su ejemplo.
+        // El 10/09/2026 decía «Ejemplos famosos en español: ROMA/AMOR/MORA/RAMO/OMAR,
+        // SALTA/ATLAS/TALAS, PIEDRA/PARDIE»: OMAR, SALTA, TALAS y PARDIE no están en el
+        // lemario, y PARDIE es léxico del Scrabble inglés. REPARADO en 43473556: los ejemplos
+        // de ahora (ROMA/AMOR/MORA/RAMO, RAPTO/TRAPO/TROPA/PARTO/PORTA, ASCO/CASO/COSA/SACO/
+        // CAOS) salen tecleándolos arriba; el CASO 1 de la sexta pasada comprueba RAPTO.
         await expect(faq).not.toContainText('PARDIE');
       },
     );
   });
 
+  // ---------------------------------------------------------------------------------------
+  // SEXTA PASADA — 27/09/2026 · FIRMA DE ROTURA (segmento MOTOR)
+  //
+  // La app vuelve a la cola por la firma de Analytics tipo «cambio»: visitas cortas del
+  // 53,4 % al 63,8 % en los 14 días hasta el 26/09 (z 4,2), después de la quinta pasada.
+  // Se buscó lo que impide USAR la app, en escritorio y en móvil (Pixel 7).
+  //
+  // LO QUE SE DESCARTÓ ANTES DE ESCRIBIR UN SOLO CASO
+  //   · Instrumentación: page.tsx monta UN solo `<Footer appName=…>`, en el único `return`, y
+  //     el AnalyticsTracker no se remonta al cambiar de modo, ordenar, limpiar ni abrir la
+  //     guía. Contado con el navegador creyendo estar en meskeia.com (todas las peticiones de
+  //     analytics contestadas con 204 en el propio navegador, ninguna salió): 1 POST a
+  //     /api/analytics/track/ por carga y 0 más con el uso completo de los tres modos, igual
+  //     en escritorio que en móvil; una recarga añade 1 de duración + 1 de entrada, lo
+  //     esperado. Lo fija el último test de este bloque.
+  //   · Código: ni page.tsx ni su CSS cambiaron dentro de la ventana salvo b7733c6d (22/09,
+  //     color de fondo del <th> del bloque educativo). El salto empieza hacia el 15/09.
+  //   · Recargas: 1,8 % frente al 3,1 % del catálogo. La firma es solo de visitas cortas.
+  //
+  // LOS TRES CASOS, RESUELTOS ANTES DE ABRIR EL NAVEGADOR
+  //   CASO 1 (normal)  «rapto», longitudes 5..5. A mano, las permutaciones con palabra:
+  //                    rapto, trapo, tropa, parto, porta (los cinco que cita la propia FAQ),
+  //                    más optar y topar. El oráculo en Node sobre el lemario (normalización
+  //                    NFD protegiendo la Ñ, sin importar nada de la app) añade potar y potra:
+  //                    9 en total. Cada una vale R1+A1+P3+T1+O1 = 7 puntos.
+  //   CASO 2 (límite)  «R A P T O» (mayúsculas y espacios) → las mismas 5 letras; con 2..10,
+  //                    43 palabras = 9 de 5 letras + 16 de 4 + 13 de 3 + 5 de 2 (oráculo).
+  //                    Y «electroencefalografista», 23 letras y lema del diccionario, pegada
+  //                    en un campo de 15 caracteres (ABIERTO, abajo).
+  //   CASO 3 (rechazo) «???» → 0 letras, 2 blancas usables y 1 ignorada: no se busca, y el
+  //                    aviso cuenta 95 palabras de 2 letras o menos (oráculo: 95 de 2 letras,
+  //                    ninguna de 1).
+  //   MÓVIL            el flujo táctil de «rapto» deja el resultado a la vista, y la tecla
+  //                    de acción del teclado («Ir»/Intro) no busca (ABIERTO, abajo).
+  // ---------------------------------------------------------------------------------------
+  test.describe('sexta pasada · firma de rotura · 27/09/2026', () => {
+    /** Carga, espera a que React haya hidratado el campo y a que el diccionario esté listo. */
+    const abrirHidratada = async (page: Page) => {
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#anagram-letters']);
+      await expect(page.getByText(/Diccionario cargado/)).toBeVisible({ timeout: 20000 });
+    };
+
+    /** «lema=puntos» de cada chip, en el orden en que la app los pinta. */
+    const chipsConPuntos = (page: Page) =>
+      page.locator('[class*="wordChip"]').evaluateAll((nodos) =>
+        nodos.map((chip) => {
+          const lema = chip.querySelector('[class*="chipLema"]');
+          const puntos = chip.querySelector('[class$="chipPuntos"]');
+          return `${lema?.textContent}=${(puntos?.textContent ?? '').replace(/\D/g, '')}`;
+        }),
+      );
+
+    test('CASO 1 · «rapto» (5..5) da sus 9 anagramas exactos, todos de 7 puntos', async ({
+      page,
+    }) => {
+      await abrirHidratada(page);
+      await page.selectOption('#anagram-min', '5');
+      await page.selectOption('#anagram-max', '5');
+      await page.fill('#anagram-letters', 'rapto');
+      await esperarValorEnReact(page, '#anagram-letters', 'rapto');
+      await page.getByRole('button', { name: 'Buscar palabras' }).click();
+
+      await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText(
+        'Palabras encontradas: 9',
+      );
+      // Oráculo propio (ver cabecera) y alfabético español, que es el desempate de la app
+      // dentro de una misma longitud. 7 = R1 + A1 + P3 + T1 + O1 en todas.
+      expect(await chipsConPuntos(page)).toEqual([
+        'optar=7', 'parto=7', 'porta=7', 'potar=7', 'potra=7',
+        'rapto=7', 'topar=7', 'trapo=7', 'tropa=7',
+      ]);
+      await expect(page.locator('[class*="ordenMejor"]')).toHaveText('La más valiosa: 7 puntos');
+      for (const palabra of await page.locator('[class*="chipLema"]').allTextContents()) {
+        expect(firma(palabra), `«${palabra}» no es anagrama de «rapto»`).toBe(firma('rapto'));
+      }
+    });
+
+    test('CASO 2 · LÍMITE · «R A P T O» con mayúsculas y espacios cuenta 5 letras y da 43', async ({
+      page,
+    }) => {
+      await abrirHidratada(page);
+      // Longitudes por defecto: 2..10
+      await expect(page.locator('#anagram-min')).toHaveValue('2');
+      await expect(page.locator('#anagram-max')).toHaveValue('10');
+      await page.fill('#anagram-letters', 'R A P T O');
+      await esperarValorEnReact(page, '#anagram-letters', 'R A P T O');
+      // Los espacios no son letras y las mayúsculas se pliegan: el contador lo dice
+      await expect(page.locator('#anagram-atril')).toHaveText('5 letras');
+      await page.getByRole('button', { name: 'Buscar palabras' }).click();
+
+      // Oráculo: 43 = 9 + 16 + 13 + 5
+      await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText(
+        'Palabras encontradas: 43',
+      );
+      await expect(page.locator('[class*="groupTitle"]')).toHaveText([
+        '5 letras (9)', '4 letras (16)', '3 letras (13)', '2 letras (5)',
+      ]);
+      // El grupo de 5 son los mismos 9 del CASO 1, tecleado en minúsculas y sin espacios
+      expect((await page.locator('[class*="chipLema"]').allTextContents()).slice(0, 9)).toEqual([
+        'optar', 'parto', 'porta', 'potar', 'potra', 'rapto', 'topar', 'trapo', 'tropa',
+      ]);
+    });
+
+    test('CASO 3 · RECHAZO · «???» no se busca y el aviso cuenta lo que saldría', async ({
+      page,
+    }) => {
+      await abrirHidratada(page);
+      await page.fill('#anagram-letters', '???');
+      await esperarValorEnReact(page, '#anagram-letters', '???');
+      // A mano: 3 interrogantes pedidos, tope de 2 blancas → 2 usables y 1 ignorada, 0 letras.
+      // Sin ninguna letra concreta el botón no deja buscar.
+      const atril = page.locator('#anagram-atril');
+      await expect(atril).toContainText('0 letras + 2 fichas blancas');
+      await expect(atril).toContainText('se ignoran 1 comodín(es) por encima del máximo de 2');
+      // Oráculo: 95 lemas de 2 letras y ninguno de 1
+      await expect(atril).toContainText('las 95 palabras de 2 letras o menos del diccionario');
+      await expect(page.getByRole('button', { name: 'Buscar palabras' })).toBeDisabled();
+    });
+
+    test(
+      'ABIERTO · pegar una palabra de más de 15 letras la recorta sin decirlo',
+      async ({ page }) => {
+        // ABIERTO: el campo de letras tiene maxLength={15} y no avisa. Pegando
+        // «electroencefalografista» —23 letras, y lema del propio diccionario— el campo se
+        // queda en «electroencefalo» y el contador dice «15 letras», sin ninguna indicación
+        // de que el texto se ha cortado: la búsqueda se hace sobre OTRA palabra (oráculo:
+        // 1.043 resultados en 2..10 en vez de 7.606, y la palabra pegada no puede salir).
+        // El modo frase admite 28 caracteres, pero nada remite a él.
+        // Cuando se repare —admitiendo la palabra entera o avisando del corte—, este test
+        // pasará y Playwright pedirá quitarle el test.fail().
+        test.fail();
+        await abrirHidratada(page);
+        await page.locator('#anagram-letters').focus();
+        await page.keyboard.insertText('electroencefalografista'); // como un pegado
+        const valor = await page.inputValue('#anagram-letters');
+        await esperarValorEnReact(page, '#anagram-letters', valor);
+        const textoContador = (await page.locator('#anagram-atril').textContent()) ?? '';
+        const avisaDelCorte = /recort|cort[oó]|m[aá]ximo de 15|no cabe|l[ií]mite/i.test(textoContador);
+        expect(
+          valor === 'electroencefalografista' || avisaDelCorte,
+          `el campo se quedó en «${valor}» y el contador dice «${textoContador}»`,
+        ).toBe(true);
+      },
+    );
+
+    test(
+      'ABIERTO · con UNA sola blanca el aviso habla de dos y cuenta «0 palabras… y poco más»',
+      async ({ page }) => {
+        // ABIERTO: con «?» el contador dice «hace falta al menos una letra concreta: solo con
+        // 2 blancas saldrían las 0 palabras de 1 letra del diccionario, y poco más». El texto
+        // mete la constante MAX_COMODINES (2) donde va la cifra tecleada (1), y «0 palabras…
+        // y poco más» no explica nada. Resuelto a mano: con 1 blanca y 0 letras no cabe
+        // ninguna palabra, porque la más corta del lemario tiene 2 letras (oráculo: 0 lemas
+        // de 1 letra). El rechazo es correcto; lo que falla es la explicación (hallazgo 460
+        // reparó la cifra del caso «??», no este).
+        test.fail();
+        await abrirHidratada(page);
+        await page.fill('#anagram-letters', '?');
+        await esperarValorEnReact(page, '#anagram-letters', '?');
+        await expect(page.getByRole('button', { name: 'Buscar palabras' })).toBeDisabled();
+        await expect(page.locator('#anagram-atril')).not.toContainText(
+          'solo con 2 blancas saldrían las 0 palabras',
+        );
+      },
+    );
+
+    // -------------------------------------------------------------------------------------
+    // MÓVIL — Pixel 7 (393×851, táctil). La subida de visitas cortas está TODA en móvil
+    // (del 48,5 % al 62,8 %; escritorio, del 62,9 % al 63,5 %), así que es donde se prueba.
+    // -------------------------------------------------------------------------------------
+    test.describe('móvil · Pixel 7', () => {
+      test.use({
+        viewport: { width: 393, height: 851 },
+        userAgent:
+          'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+        deviceScaleFactor: 2.75,
+        isMobile: true,
+        hasTouch: true,
+      });
+
+      test('MÓVIL · el flujo táctil de «R A P T O» deja el resultado a la vista y sin desbordar', async ({
+        page,
+      }) => {
+        await abrirHidratada(page);
+        await page.locator('#anagram-letters').tap();
+        await page.fill('#anagram-letters', 'R A P T O');
+        await esperarValorEnReact(page, '#anagram-letters', 'R A P T O');
+        await page.getByRole('button', { name: 'Buscar palabras' }).tap();
+
+        // Los mismos 43 del CASO 2: el móvil no cambia el cálculo
+        const cabecera = page.locator('[class*="resultsHeader"]');
+        await expect(cabecera.locator('h3')).toHaveText('Palabras encontradas: 43');
+        // El resultado queda DENTRO de la pantalla tras el toque (medido: arriba a ~546 px de
+        // 851), no debajo del pliegue esperando un desplazamiento que nadie sabe que hace falta
+        const caja = await cabecera.boundingBox();
+        expect(caja, 'la cabecera de resultados no tiene caja').not.toBeNull();
+        expect(caja!.y).toBeGreaterThanOrEqual(0);
+        expect(caja!.y + caja!.height).toBeLessThanOrEqual(851);
+        // Y la página no se desborda en horizontal con 43 chips
+        const [ancho, visible] = await page.evaluate(() => [
+          document.documentElement.scrollWidth,
+          document.documentElement.clientWidth,
+        ]);
+        expect(ancho).toBeLessThanOrEqual(visible);
+      });
+
+      test(
+        'ABIERTO · la tecla de acción del teclado («Ir»/Intro) no busca en el modo letras',
+        async ({ page }) => {
+          // ABIERTO: el campo no está en un <form> ni escucha Intro, así que la tecla de acción
+          // del teclado del móvil no hace nada: ni busca ni dice por qué. En un Pixel 7 el
+          // botón «Buscar palabras» empieza 410 px por debajo del borde inferior del campo, con
+          // los tres filtros en medio, es decir, detrás del teclado abierto. Igual en escritorio (comprobado).
+          // Valor esperado: «amor» con las longitudes por defecto (2..10) → 16 palabras
+          // (oráculo propio; el mismo número del CASO 1 de la primera pasada).
+          test.fail();
+          await abrirHidratada(page);
+          await page.locator('#anagram-letters').tap();
+          await page.fill('#anagram-letters', 'amor');
+          await esperarValorEnReact(page, '#anagram-letters', 'amor');
+          await page.locator('#anagram-letters').press('Enter');
+          await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText(
+            'Palabras encontradas: 16',
+            { timeout: 3000 },
+          );
+        },
+      );
+
+      test(
+        'ABIERTO · la tecla de acción del teclado tampoco busca en el modo frase',
+        async ({ page }) => {
+          // ABIERTO, la misma causa en el otro campo con diccionario. Valor esperado: «roma»
+          // con los valores por defecto (3 palabras, mínimo 3 letras) → 4 repartos, amor,
+          // maro, mora y ramo (CASO 2e de la primera pasada; oráculo propio).
+          test.fail();
+          await abrirHidratada(page);
+          await pestana(page, /Anagrama perfecto de una frase/).tap();
+          await esperarHidratacion(page, ['#anagram-frase']);
+          await page.locator('#anagram-frase').tap();
+          await page.fill('#anagram-frase', 'roma');
+          await esperarValorEnReact(page, '#anagram-frase', 'roma');
+          await page.locator('#anagram-frase').press('Enter');
+          await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText(
+            'Anagramas perfectos encontrados: 4',
+            { timeout: 3000 },
+          );
+        },
+      );
+
+      test('MÓVIL · el AnalyticsTracker se monta una vez y no se remonta al usar la app', async ({
+        page,
+      }) => {
+        // El caso de origen es test-perfil-inversor (26/09/2026): un <Footer appName=…> en cada
+        // rama del render remontaba el tracker y cada cambio de fase se registraba como otra
+        // visita en la misma sesión, que es exactamente la firma de rotura. En localhost el
+        // tracker no envía nada, pero cada montaje escribe en consola «[Analytics] Desactivado
+        // en entorno de desarrollo»: se cuentan esos mensajes y se compara con la carga limpia
+        // (así vale también con `next dev`, donde el modo estricto duplica los montajes).
+        // Esperado, a mano: 0 montajes nuevos — page.tsx tiene un solo <Footer>, en el único
+        // return, y nada le cambia la key ni la posición en el árbol.
+        let montajes = 0;
+        page.on('console', (m) => {
+          if (m.text().includes('[Analytics] Desactivado en entorno de desarrollo')) montajes++;
+        });
+        await abrirHidratada(page);
+        await page.waitForTimeout(500);
+        const trasCarga = montajes;
+        expect(trasCarga, 'el tracker no llegó a montarse').toBeGreaterThan(0);
+
+        // Uso completo: buscar, reordenar, limpiar, los otros dos modos y la guía
+        await page.fill('#anagram-letters', 'amor');
+        await esperarValorEnReact(page, '#anagram-letters', 'amor');
+        await page.getByRole('button', { name: 'Buscar palabras' }).tap();
+        await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText(
+          'Palabras encontradas: 16',
+        );
+        await page.getByRole('button', { name: 'Puntos', exact: true }).tap();
+        await page.getByRole('button', { name: 'Limpiar' }).tap();
+        await pestana(page, /Anagrama perfecto de una frase/).tap();
+        await esperarHidratacion(page, ['#anagram-frase']);
+        await page.fill('#anagram-frase', 'roma');
+        await esperarValorEnReact(page, '#anagram-frase', 'roma');
+        await page.getByRole('button', { name: 'Buscar anagramas perfectos' }).tap();
+        await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText(
+          'Anagramas perfectos encontrados: 4',
+        );
+        await pestana(page, /Verificar dos textos/).tap();
+        await page.fill('#anagram-texto-a', 'roma');
+        await page.fill('#anagram-texto-b', 'amor');
+        await expect(page.locator('[class*="veredicto"]').first()).toContainText(
+          'Son anagramas exactos',
+        );
+        await pestana(page, /Palabras con mis letras/).tap();
+        await page.getByRole('button', { name: 'Ver guía educativa' }).tap();
+        await page.waitForTimeout(500);
+
+        expect(montajes - trasCarga, 'el tracker se volvió a montar durante el uso').toBe(0);
+      });
+    });
+  });
 });

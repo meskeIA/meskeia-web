@@ -1,7 +1,16 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion } from './_hidratacion';
 
 /**
- * Inspector — simulador-arboles-bst-avl (segmento cálculo, riesgo 3, 262 usos reales)
+ * Inspector — simulador-arboles-bst-avl (segmento cálculo, riesgo 3, 262 usos reales el
+ * 25/08/2026 · 653 en la segunda inspección, 27/09/2026)
+ *
+ * ⚠️ ACTUALIZACIÓN 27/09/2026 — el cálculo ya NO vive en `page.tsx`: el 15/09/2026 se movió
+ * (corte y pega) a `app/simulador-arboles-bst-avl/motor.ts`, que comparten el panel y los
+ * «Casos para clase» (`casos.ts`, con su propio spec `simulador-arboles-bst-avl-casos.spec.ts`).
+ * Las funciones y los convenios que se describen abajo son los mismos, solo cambió el fichero.
+ * Los cinco hallazgos del 25/08/2026 (318-322) están REPARADOS y sus tests de regresión pasan;
+ * la segunda inspección añade los suyos al final de este fichero.
  *
  * Primera inspección: 25/08/2026. El <h1> promete «Simulador de Árboles BST y AVL» y el
  * subtítulo «Inserta, elimina y busca nodos. Compara un árbol binario de búsqueda simple con
@@ -109,10 +118,12 @@ import { test, expect, Page } from '@playwright/test';
  * exactamente como en el papel, y el invariante |fb| ≤ 1 se sostiene sobre 45 inserciones y
  * 20 borrados aleatorios. Lo que sigue son hallazgos de operativa y de contenido.
  *
- * HALLAZGOS del 25/08/2026. Se escriben con `test.fail()` afirmando lo que la app DEBERÍA
- * hacer y hoy falla a propósito, de modo que la suite queda en VERDE mientras el defecto siga
- * ahí. El día que se reparen saldrán en ROJO («expected to fail, but passed») y habrá que
- * quitarles la marca, con lo que pasan a ser red de regresión. El Inspector no repara.
+ * HALLAZGOS del 25/08/2026 — los cinco REPARADOS ese mismo día (se escribieron con
+ * `test.fail()` y la marca se quitó al repararlos: hoy son red de regresión). El 27/09/2026 se
+ * verificaron de nuevo en navegador y aguantan, con UNA salvedad en el [3]: el SVG ya no se
+ * encoge, pero el centrado del contenedor deja la parte IZQUIERDA del árbol fuera del alcance
+ * del desplazamiento (hallazgo nuevo [N1], al final). Y el [1] y el [5] dejaron restos en
+ * controles y textos que la reparación no tocó ([N3] y [N6]).
  *
  *   [1] operativa/medio — El campo vacío se lee como CERO y muta el árbol sin avisar. Los dos
  *       botones guardan con `if (!Number.isNaN(Number(valor)))`, y `Number('')` es 0, no NaN.
@@ -139,8 +150,9 @@ import { test, expect, Page } from '@playwright/test';
  *       borrado y búsqueda animadas» (JSON-LD) prometen de más: la inserción y el borrado se
  *       aplican de golpe y el deslizador de velocidad solo gobierna la BÚSQUEDA y el destello
  *       del nodo nuevo. El «paso a paso» que sí se entrega es textual: el historial numerado
- *       de rotaciones. No se marca con test.fail (es una promesa de metadata, no una aserción
- *       sobre el DOM); queda anotado aquí y verificado en el test del historial.
+ *       de rotaciones. REPARADO: desde el 27/09/2026 tiene su test de regresión sobre el
+ *       OpenGraph y el WebApplication del JSON-LD servidos ([5] más abajo); el resto que quedó
+ *       en la FAQ del JSON-LD es el [N6].
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -192,9 +204,14 @@ async function cargarSecuencia(page: Page, secuencia: string) {
   await botonExacto(page, 'Insertar varios').click();
 }
 
+/** Los campos que el test toca. Hasta que React no monta su rastreador, un fill() se pierde. */
+const CAMPOS = ['#ins-input', '#del-input', '#search-input', '#multi-input', '#casos-respuesta'] as const;
+
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Simulador de Árboles BST y AVL');
+  // El <h1> llega en el HTML servido: no dice que la página responda. Esto sí (27/09/2026).
+  await esperarHidratacion(page, CAMPOS);
 });
 
 test('la app promete lo que este fichero verifica', async ({ page }) => {
@@ -571,3 +588,346 @@ test(
     await expect(page.getByText(/derivado de AVL/)).toHaveCount(0);
   },
 );
+
+test('[5] REGRESIÓN 322 — ni el OpenGraph ni el WebApplication prometen inserción animada', async ({
+  page,
+}) => {
+  // Lo que la app anima de verdad es la BÚSQUEDA (camino nodo a nodo, con la velocidad del
+  // deslizador); la inserción, el borrado y la rotación saltan al estado final.
+  const og = await page.locator('meta[property="og:description"]').getAttribute('content');
+  expect(og).not.toMatch(/animadas paso a paso/);
+  expect(og).toContain('búsqueda animada');
+
+  const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const webApp = bloques.find((b) => b.includes('"WebApplication"')) ?? '';
+  expect(webApp).not.toMatch(/Inserción, borrado y búsqueda animadas/);
+  expect(webApp).toContain('búsqueda animada nodo a nodo');
+});
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// SEGUNDA INSPECCIÓN — 27/09/2026
+//
+// CASO 4 (normal), RESUELTO A MANO ANTES DE ABRIR EL NAVEGADOR
+//   Insertar 30, 20, 40, 10, 25, 35, 50, 5, 3.
+//   · Hasta el 5 el árbol se llena sin romper nada: fb(10) = +1, fb(20) = +1, fb(30) = +1.
+//   · El 3 cuelga del 5 ⇒ fb(10) = 2 − 0 = +2 con 3 < 5 ⇒ LL sobre el 10 ⇒ 5(3, 10).
+//
+//        AVL (1 rotación)                    BST (0 rotaciones)
+//             30   +1                              30
+//           /    \                               /    \
+//        20 +1    40 0                         20      40
+//        /  \     /  \                        /  \    /  \
+//      5 0  25   35   50                    10   25  35   50
+//     /  \                                  /
+//    3    10                               5
+//                                         /
+//                                        3
+//     nodos 9 · altura 4 (en NODOS)       nodos 9 · altura 5
+//     in   3, 5, 10, 20, 25, 30, 35, 40, 50         (el mismo en los dos modos)
+//     pre  30, 20, 5, 3, 10, 25, 40, 35, 50         30, 20, 10, 5, 3, 25, 40, 35, 50
+//     post 3, 10, 5, 25, 20, 35, 50, 40, 30         3, 5, 10, 25, 20, 35, 50, 40, 30
+//     BFS  30, 20, 40, 5, 25, 35, 50, 3, 10         30, 20, 40, 10, 25, 35, 50, 5, 3
+//
+//   Borrar 20 en el AVL (dos hijos: 5 y 25) ⇒ sube el SUCESOR inorden, 25 (mínimo del
+//   subárbol derecho). Al quitar el 25 original, el nodo 25 se queda con 5 (altura 2) a la
+//   izquierda y nada a la derecha ⇒ fb = +2 con fb(5) = 0 ⇒ LL TRAS BORRADO sobre el 25:
+//             30   +1           nodos 8 · altura 4
+//           /    \              in   3, 5, 10, 25, 30, 35, 40, 50
+//        5 −1     40 0          pre  30, 5, 3, 25, 10, 40, 35, 50
+//        /  \     /  \          post 3, 10, 25, 5, 35, 50, 40, 30
+//       3  25 +1 35   50        BFS  30, 5, 40, 3, 25, 35, 50, 10
+//          /
+//        10
+//   Discrimina el convenio: con el PREDECESOR (10) no habría rotación ninguna.
+//
+// S1 (sospecha heredada: `toleranciaDe` sin control de entero en recuentos) — se mide aquí:
+//   · Preguntas: altura, rotaciones, factor de la raíz, valor de la raíz, hojas, nodos,
+//     posición inorden y k-ésimo inorden. La mayor respuesta de los 12 casos es 60 (caso 10)
+//     ⇒ tolerancia 0,6; la práctica (20.000 semillas medidas con el motor) no pasa de 7.
+//     Ninguna respuesta llega a 100, así que el ENTERO VECINO no cuela nunca: descartada esa
+//     forma («61» por 60 se rechaza, abajo).
+//   · Sí cuela un DECIMAL, en los 12 casos y en el 100 % de los ejercicios de práctica, aunque
+//     la propia app avisa de que «aquí todas las respuestas son enteras» ⇒ hallazgo [N5].
+// ═════════════════════════════════════════════════════════════════════════════════════════
+
+/** El veredicto de «Casos para clase» (no el anunciador de rutas de Next, que es otro alert). */
+const veredictoCaso = (page: Page) =>
+  page.locator('div[role="alert"]').filter({ hasText: /orrecto|Escribe un número/ });
+
+async function responderCaso(page: Page, texto: string) {
+  await page.locator('#casos-respuesta').fill(texto);
+  await botonExacto(page, 'Comprobar').click();
+}
+
+/**
+ * El nodo más a la IZQUIERDA del dibujo, con el contenedor desplazado al tope izquierdo
+ * (scrollLeft = 0 es lo más lejos que puede llegar el usuario), frente al borde interior
+ * izquierdo del contenedor. Si el círculo empieza antes que el borde, ese nodo no se ve NUNCA.
+ */
+async function nodoMasIzquierdo(page: Page) {
+  return page.evaluate(() => {
+    const svg = document.querySelector('svg[role="img"]') as SVGSVGElement;
+    const contenedor = svg.parentElement as HTMLElement;
+    contenedor.scrollLeft = 0;
+    const borde = contenedor.getBoundingClientRect().left + contenedor.clientLeft;
+    const circulos = [...svg.querySelectorAll('circle')];
+    const primero = circulos.reduce((a, b) =>
+      Number(a.getAttribute('cx')) <= Number(b.getAttribute('cx')) ? a : b,
+    );
+    return {
+      valor: (primero.nextElementSibling?.textContent ?? '').trim(),
+      izquierda: primero.getBoundingClientRect().left,
+      borde,
+    };
+  });
+}
+
+test('CASO 4 · AVL 30, 20, 40, 10, 25, 35, 50, 5, 3: una LL en el 10 y el borrado del 20 fuerza otra LL', async ({
+  page,
+}) => {
+  await cargarSecuencia(page, '30, 20, 40, 10, 25, 35, 50, 5, 3');
+
+  await expect(mensaje(page)).toContainText('Insertados 9 de 9 valores. Rotaciones aplicadas: 1.');
+  await expect(historialRotaciones(page)).toHaveCount(1);
+  await expect(historialRotaciones(page).nth(0)).toContainText('Rotación LL en nodo 10 (insertando 3)');
+  await expect(infoDe(page, 'Número de nodos')).toHaveText('9');
+  await expect(infoDe(page, 'Altura del árbol')).toHaveText('4');
+  await expect(recorrido(page, 'INORDEN (LNR)')).toHaveText('3, 5, 10, 20, 25, 30, 35, 40, 50');
+  await expect(recorrido(page, 'PREORDEN (NLR)')).toHaveText('30, 20, 5, 3, 10, 25, 40, 35, 50');
+  await expect(recorrido(page, 'POSTORDEN (LRN)')).toHaveText('3, 10, 5, 25, 20, 35, 50, 40, 30');
+  await expect(recorrido(page, 'POR NIVELES (BFS)')).toHaveText('30, 20, 40, 5, 25, 35, 50, 3, 10');
+  let arbol = await arbolDelSvg(page);
+  expect(arbol.find((n) => n.valor === 30)?.factor).toBe(1);
+  expect(arbol.find((n) => n.valor === 20)?.factor).toBe(1);
+  expect(arbol.find((n) => n.valor === 5)?.profundidad).toBe(2);
+
+  // Borrar el 20 (dos hijos) ⇒ sube el 25 y el 25 se desequilibra ⇒ LL tras borrado.
+  await page.locator('#del-input').fill('20');
+  await botonExacto(page, 'Eliminar').click();
+  await expect(mensaje(page)).toContainText('Eliminado 20. Se aplicaron 1 rotación(es).');
+  await expect(historialRotaciones(page).nth(1)).toContainText('Rotación LL en nodo 25 (tras borrado)');
+  await expect(infoDe(page, 'Número de nodos')).toHaveText('8');
+  await expect(infoDe(page, 'Altura del árbol')).toHaveText('4');
+  await expect(recorrido(page, 'INORDEN (LNR)')).toHaveText('3, 5, 10, 25, 30, 35, 40, 50');
+  await expect(recorrido(page, 'PREORDEN (NLR)')).toHaveText('30, 5, 3, 25, 10, 40, 35, 50');
+  await expect(recorrido(page, 'POSTORDEN (LRN)')).toHaveText('3, 10, 25, 5, 35, 50, 40, 30');
+  await expect(recorrido(page, 'POR NIVELES (BFS)')).toHaveText('30, 5, 40, 3, 25, 35, 50, 10');
+  arbol = await arbolDelSvg(page);
+  expect(arbol.find((n) => n.valor === 5)?.factor).toBe(-1);
+  expect(arbol.find((n) => n.valor === 25)?.factor).toBe(1);
+  for (const nodo of arbol) expect(Math.abs(nodo.factor ?? 0)).toBeLessThanOrEqual(1);
+});
+
+test('CASO 4 · la misma secuencia en BST no rota y mide 5 de alto', async ({ page }) => {
+  await page.getByRole('button', { name: /^BST/ }).click();
+  await cargarSecuencia(page, '30, 20, 40, 10, 25, 35, 50, 5, 3');
+
+  await expect(mensaje(page)).toContainText('Insertados 9 de 9 valores. Rotaciones aplicadas: 0.');
+  await expect(infoDe(page, 'Altura del árbol')).toHaveText('5');
+  await expect(recorrido(page, 'INORDEN (LNR)')).toHaveText('3, 5, 10, 20, 25, 30, 35, 40, 50');
+  await expect(recorrido(page, 'PREORDEN (NLR)')).toHaveText('30, 20, 10, 5, 3, 25, 40, 35, 50');
+  await expect(recorrido(page, 'POSTORDEN (LRN)')).toHaveText('3, 5, 10, 25, 20, 35, 50, 40, 30');
+  await expect(recorrido(page, 'POR NIVELES (BFS)')).toHaveText('30, 20, 40, 10, 25, 35, 50, 5, 3');
+  const arbol = await arbolDelSvg(page);
+  expect(arbol.find((n) => n.valor === 3)?.profundidad).toBe(4); // 30 → 20 → 10 → 5 → 3
+});
+
+test('LÍMITES · −999 y 9999 entran por los dos controles; −1000 y 10000 no entran por ninguno', async ({
+  page,
+}) => {
+  for (const valor of ['-999', '9999']) {
+    await page.locator('#ins-input').fill(valor);
+    await botonExacto(page, 'Insertar').click();
+    await expect(mensaje(page)).toContainText(`Insertado ${valor}.`);
+  }
+  for (const valor of ['-1000', '10000']) {
+    await page.locator('#ins-input').fill(valor);
+    await botonExacto(page, 'Insertar').click();
+    await expect(mensaje(page)).toContainText('Valor fuera de rango. Introduce un número entero entre -999 y 9999.');
+  }
+  await expect(recorrido(page, 'INORDEN (LNR)')).toHaveText('-999, 9999');
+
+  await cargarSecuencia(page, '-1000, -999, 9999, 10000');
+  await expect(mensaje(page)).toContainText('Insertados 2 de 4 valores.');
+  await expect(recorrido(page, 'INORDEN (LNR)')).toHaveText('-999, 9999');
+});
+
+test('S1 · en «Casos para clase» el entero vecino NO cuela: 61 por 60 se rechaza', async ({ page }) => {
+  // Caso 10: BST 50, 30, 70, 20, 40, 60, 80 y se borra el 50 ⇒ sube el sucesor inorden, 60.
+  // Es la respuesta más alta de los doce casos: tolerancia 1 % = 0,6 < 1.
+  await page.getByRole('button', { name: /^Caso 10:/ }).click();
+  await responderCaso(page, '60');
+  await expect(veredictoCaso(page)).toContainText('¡Correcto!');
+  for (const vecino of ['61', '59', '70']) {
+    await responderCaso(page, vecino);
+    await expect(veredictoCaso(page)).toContainText('No es correcto');
+  }
+});
+
+test.describe('En móvil (393 px)', () => {
+  test.use({
+    viewport: { width: 393, height: 851 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.75,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('CASO 4 (móvil) — el cálculo y los recorridos salen igual que en escritorio', async ({ page }) => {
+    await page.locator('#multi-input').fill('30, 20, 40, 10, 25, 35, 50, 5, 3');
+    await botonExacto(page, 'Insertar varios').click();
+    await expect(infoDe(page, 'Altura del árbol')).toHaveText('4');
+    await expect(recorrido(page, 'PREORDEN (NLR)')).toHaveText('30, 20, 5, 3, 10, 25, 40, 35, 50');
+    await expect(historialRotaciones(page)).toContainText('Rotación LL en nodo 10 (insertando 3)');
+    // Y el documento no se sale de lado: sin scroll horizontal de página.
+    const anchoDoc = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(anchoDoc).toBeLessThanOrEqual(393);
+  });
+
+  // ABIERTO: [N1] el centrado deja la izquierda del árbol fuera del alcance del scroll.
+  test.fail(
+    '[N1] ABIERTO — en móvil, con el ejemplo «Inserción ordenada» en BST, la raíz 1 se puede ver',
+    async ({ page }) => {
+      await page.getByRole('button', { name: /^BST/ }).click();
+      await page.getByRole('button', { name: /Inserción ordenada/ }).click();
+      await expect(infoDe(page, 'Altura del árbol')).toHaveText('7');
+
+      // viewBox de 410 px (7 · 50 + 60) en un contenedor de ~200 px de contenido. Con
+      // `justify-content: center` el desborde se reparte a los dos lados y el IZQUIERDO no es
+      // desplazable: medido el 27/09/2026, 81 px del SVG quedan antes del borde con
+      // scrollLeft = 0. El nodo 1 (la RAÍZ del BST degenerado) no se ve nunca y el 2, a medias.
+      const m = await nodoMasIzquierdo(page);
+      expect(m.valor).toBe('1');
+      expect(m.izquierda).toBeGreaterThanOrEqual(m.borde - 0.5);
+    },
+  );
+
+  // ABIERTO: [N2] la fila de «Insertar varios» no se parte y el tercer botón se sale.
+  test.fail('[N2] ABIERTO — en móvil, el botón «Limpiar todo» cabe en la pantalla', async ({ page }) => {
+    // Medido el 27/09/2026 a 393 px: la fila es `flex` sin `flex-wrap`; «Insertar varios» y
+    // «Aleatorios (10)» caben, pero «Limpiar todo» va de x = 347 a x = 459 y el body lo
+    // recorta en 393 (se ven 46 de sus 112 px; a 360 px, solo 13).
+    const aleatorios = await botonExacto(page, 'Aleatorios (10)').boundingBox();
+    expect(aleatorios!.x + aleatorios!.width).toBeLessThanOrEqual(393);
+    const limpiar = await botonExacto(page, 'Limpiar todo').boundingBox();
+    expect(limpiar!.x + limpiar!.width).toBeLessThanOrEqual(393);
+  });
+});
+
+// ABIERTO: [N1] también en escritorio, en cuanto el árbol pasa del ancho del panel.
+test.fail(
+  '[N1] ABIERTO — con 45 nodos el primero (7) se alcanza desplazando el dibujo',
+  async ({ page }) => {
+    const valores = Array.from({ length: 45 }, (_, i) => (i + 1) * 7);
+    await cargarSecuencia(page, valores.join(', '));
+    await expect(infoDe(page, 'Número de nodos')).toHaveText('45');
+
+    // La reparación del 320 quitó `max-width: 100%` y el SVG ya se pinta a tamaño real, pero
+    // el contenedor sigue centrando (`display: flex; justify-content: center`): medido el
+    // 27/09/2026 en 1280 px, 635 de los 2.310 px quedan a la izquierda del borde y no hay
+    // desplazamiento que llegue a ellos. El test [3] no lo ve porque solo pide scrollWidth >
+    // clientWidth, que se cumple con el desborde DERECHO.
+    const m = await nodoMasIzquierdo(page);
+    expect(m.valor).toBe('7');
+    expect(m.izquierda).toBeGreaterThanOrEqual(m.borde - 0.5);
+  },
+);
+
+// ABIERTO: [N3] el 318 se reparó en «Insertar» y «Eliminar», pero «Buscar» sigue leyendo '' como 0.
+test.fail('[N3] ABIERTO — «Buscar» con el campo vacío avisa en vez de buscar el 0', async ({ page }) => {
+  await cargarSecuencia(page, '0, 5, 10');
+  await page.locator('#vel-input').fill('100');
+  await page.locator('#search-input').fill('');
+  await botonExacto(page, 'Buscar').click();
+
+  // Esperado: un aviso que pida el número, como ya hacen Insertar y Eliminar («Escribe …»).
+  // Obtenido el 27/09/2026: «Encontrado 0 tras 2 comparación(es). Profundidad: 1.», porque el
+  // botón hace `Number(valorBuscar)` y Number('') es 0 (sin el 0 en el árbol: «0 no está en el
+  // árbol. Búsqueda terminó tras 3 comparación(es).» sobre el ejemplo balanceado).
+  await expect(mensaje(page)).toContainText('Escribe');
+});
+
+// ABIERTO: [N4] la app dice «número entero», pero trunca el decimal sin avisar.
+test.fail('[N4] ABIERTO — «Insertar» rechaza 2.5 en vez de insertar un 2', async ({ page }) => {
+  await page.locator('#ins-input').fill('2.5');
+  await botonExacto(page, 'Insertar').click();
+
+  // Esperado: el aviso de la propia app («Introduce un número entero…») y el árbol vacío.
+  // Obtenido el 27/09/2026: «Insertado 2.» — Math.trunc sin avisar (y «-0.5» entra como 0).
+  await expect(infoDe(page, 'Número de nodos')).toHaveText('0');
+  await expect(mensaje(page)).toContainText('entero');
+});
+
+// ABIERTO: [N5] = S1 en su forma menor: un decimal dentro del 1 % cuenta como la respuesta entera.
+test.fail('[N5] ABIERTO — «60,5» no es la raíz 60 del caso 10 ni «7,05» la altura 7 del caso 1', async ({
+  page,
+}) => {
+  // La app avisa ella misma de que «aquí todas las respuestas son enteras», pero corrige con
+  // `toleranciaDe` = máx(0,01; 1 %) y ningún control de entero. Medido el 27/09/2026: pasan
+  // «60,5» y «59,4» (caso 10, tolerancia 0,6), «7,05» (caso 1, altura 7), «0,01» y «-0,01»
+  // (caso 4, cero rotaciones), y en la práctica pasa en el 100 % de las 20.000 semillas.
+  await page.getByRole('button', { name: /^Caso 1:/ }).click();
+  await responderCaso(page, '7,05');
+  await expect(veredictoCaso(page)).toContainText('No es correcto');
+
+  await page.getByRole('button', { name: /^Caso 10:/ }).click();
+  await responderCaso(page, '60,5');
+  await expect(veredictoCaso(page)).toContainText('No es correcto');
+});
+
+// ABIERTO: [N6] resto del 322 — la FAQ del JSON-LD promete recorridos animados.
+test.fail('[N6] ABIERTO — la FAQ del JSON-LD no promete recorridos animados', async ({ page }) => {
+  // Los cuatro recorridos se pintan como listas de texto estáticas; lo único animado es la
+  // búsqueda. La reparación del 322 corrigió el OpenGraph y el WebApplication, pero la FAQPage
+  // sigue diciendo: «El simulador permite ejecutar los cuatro de forma animada».
+  const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const faq = bloques.find((b) => b.includes('"FAQPage"')) ?? '';
+  expect(faq).toContain('recorridos');
+  expect(faq).not.toMatch(/ejecutar los cuatro de forma animada/);
+});
+
+// ABIERTO: [N7] el consejo promete una cascada que ese árbol no puede dar.
+test.fail('[N7] ABIERTO — el consejo del borrado no promete cascada sobre el ejemplo balanceado', async ({
+  page,
+}) => {
+  // «Pruébalo: carga el preset balanceado y elimina valores; observa rotaciones en cascada.»
+  // El preset es un árbol perfecto de altura 3: solo la RAÍZ puede llegar a fb = ±2, así que
+  // un borrado dispara como mucho UNA rotación. Medido con el motor el 27/09/2026 sobre las
+  // 5.040 órdenes de vaciado: máximo 1 rotación por borrado y 2 en todo el vaciado. Aquí, el
+  // ejemplo del propio consejo: borrar 30, 20 y 40 da una única RR, sin cascada.
+  await page.getByRole('button', { name: /Árbol balanceado/ }).click();
+  for (const valor of ['30', '20', '40']) {
+    await page.locator('#del-input').fill(valor);
+    await botonExacto(page, 'Eliminar').click();
+  }
+  await expect(historialRotaciones(page)).toHaveCount(1);
+  await expect(page.getByText(/observa rotaciones en cascada/)).toHaveCount(0);
+});
+
+// ABIERTO: [N8] la práctica pregunta rotaciones sin decir cómo se cuenta una doble.
+test.fail('[N8] ABIERTO — la práctica de rotaciones declara que una doble cuenta como una', async ({
+  page,
+}) => {
+  // El ejercicio aleatorio se siembra con Date.now(): con el reloj fijado en 2^32 · 400 + 1 ms
+  // la semilla (ToUint32) es 1 ⇒ «AVL: 25, 75, 55, 90, 20, 85, 5 · ¿Cuántas rotaciones…?».
+  // A mano: RL en 25 (al insertar 55), RL en 75 (al insertar 85) y LL en 25 (al insertar 5).
+  // La app responde 3 (una doble = UNA); quien cuente cada giro simple, como hacen muchos
+  // manuales, dirá 5 y se le suspende. El caso 12 lo declara en su enunciado («una rotación
+  // doble cuenta como una sola») y el spec de casos lo justifica: «si no, sería ambiguo». La
+  // práctica no lo declara, y el 70,7 % de sus ejercicios de rotaciones llevan alguna doble.
+  await page.clock.setFixedTime(new Date(2 ** 32 * 400 + 1));
+  await page.goto(RUTA);
+  await esperarHidratacion(page, CAMPOS);
+  await page.getByRole('button', { name: /Practicar/ }).click();
+
+  const enunciado = page.locator('p[aria-live="polite"][aria-atomic="true"]');
+  await expect(enunciado).toContainText('25, 75, 55, 90, 20, 85, 5');
+  await expect(enunciado).toContainText('¿Cuántas rotaciones ejecuta el árbol en total?');
+  await responderCaso(page, '3');
+  await expect(veredictoCaso(page)).toContainText('¡Correcto!');
+  await responderCaso(page, '5');
+  await expect(veredictoCaso(page)).toContainText('No es correcto');
+
+  await expect(enunciado).toContainText(/doble.*(una sola|como una)/i);
+});
