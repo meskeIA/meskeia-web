@@ -573,8 +573,8 @@ test.describe('Inspección 25/09/2026', () => {
     await expect(valorDe(page, 'Hipotenusa c')).toHaveText('5,0000'); // √(9+16)
     await expect(valorDe(page, 'Ángulo A')).toHaveText('36,8699°'); // arctan(3/4)
     await expect(valorDe(page, 'Ángulo B')).toHaveText('53,1301°'); // 90 − 36,8699
-    await expect(valorDe(page, 'Área')).toHaveText('6,0000u²');
-    await expect(valorDe(page, 'Perímetro')).toHaveText('12,0000u');
+    await expect(valorDe(page, 'Área')).toHaveText('6,0000 u²');
+    await expect(valorDe(page, 'Perímetro')).toHaveText('12,0000 u');
   });
 
   test('Triángulo desde cateto a y ángulo α (5 y 30°): b = 8,6603, c = 10', async ({ page }) => {
@@ -592,11 +592,11 @@ test.describe('Inspección 25/09/2026', () => {
     await modo(page, 'Conversiones');
     await escribir(page, 'Valor a convertir', '180');
     await expect(valorDe(page, 'Radianes')).toHaveText('3,141593');
-    await expect(valorDe(page, 'Gradianes')).toHaveText('200,000000gon');
+    await expect(valorDe(page, 'Gradianes')).toHaveText('200,000000 gon');
     await modo(page, 'Radianes');
     await escribir(page, 'Valor a convertir', '1');
     await expect(valorDe(page, 'Grados')).toHaveText('57,295780°'); // 180/π
-    await expect(valorDe(page, 'Gradianes')).toHaveText('63,661977gon'); // 200/π
+    await expect(valorDe(page, 'Gradianes')).toHaveText('63,661977 gon'); // 200/π
     await modo(page, 'Gradianes');
     await escribir(page, 'Valor a convertir', '100');
     await expect(valorDe(page, 'Grados')).toHaveText('90,000000°');

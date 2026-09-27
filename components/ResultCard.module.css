@@ -73,7 +73,7 @@
   font-size: 1.2rem;
   font-weight: 500;
   color: var(--text-secondary);
-  margin-left: 0.25rem;
+  /* Sin margin-left: el espacio duro va en el texto de la unidad (ResultCard.tsx) */
 }
 
 /* Description */

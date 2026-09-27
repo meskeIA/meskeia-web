@@ -85,10 +85,10 @@ test('en 12 pagas el neto anual no cambia, solo el reparto mensual', async ({ pa
     return limpiar(await h3.locator('xpath=../following-sibling::div[1]//p').innerText());
   };
 
-  expect(await netoMensual()).toBe('1141,64€');
+  expect(await netoMensual()).toBe('1141,64 €');
 
   await page.locator('#pagas').selectOption('12');
-  expect(await netoMensual()).toBe('1331,91€');
+  expect(await netoMensual()).toBe('1331,91 €');
 
   const neto = page.locator('css=div:has(> span > strong:text-is("Salario neto anual"))').first();
   expect(limpiar(await neto.locator('span').nth(1).innerText())).toBe('15.982,89 €');

@@ -178,9 +178,9 @@ async function hayResultados(page: Page): Promise<boolean> {
   return (await page.getByRole('heading', { level: 3, name: 'Salario Neto Anual', exact: true }).count()) > 0;
 }
 
-/** «42.000,01€» → 42000.01, con el parser canónico. */
+/** «42.000,01 €» → 42000.01, con el parser canónico (la unidad lleva espacio duro desde el hallazgo 2322). */
 async function numeroTarjeta(page: Page, titulo: string): Promise<number> {
-  return parseSpanishNumber((await valorTarjeta(page, titulo)).replace('€', ''));
+  return parseSpanishNumber((await valorTarjeta(page, titulo)).replace('€', '').trim());
 }
 
 /** Texto del cuerpo con el bloque educativo abierto (nace colapsado). */
@@ -226,10 +226,10 @@ test('CASO 1 (normal) · 30.000 € brutos, soltero/a, 0 hijos, 12 pagas', async
   expect(await hayResultados(page)).toBe(true);
 
   // Tarjetas principales
-  expect(await valorTarjeta(page, 'Salario Bruto Anual')).toBe('30.000,00€');
-  expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('23.124,00€');
-  expect(await valorTarjeta(page, 'Bruto Mensual (12 pagas)')).toBe('2500,00€');
-  expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('1927,00€');
+  expect(await valorTarjeta(page, 'Salario Bruto Anual')).toBe('30.000,00 €');
+  expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('23.124,00 €');
+  expect(await valorTarjeta(page, 'Bruto Mensual (12 pagas)')).toBe('2500,00 €');
+  expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('1927,00 €');
 
   // IRPF — base liquidable = RNT 26.050 € − reducción art.20 (0 €, el RNT supera los
   // 19.747,5 € en que se agota) = 26.050 €. El mínimo personal NO se resta de la base:
@@ -259,12 +259,12 @@ test('CASO 2 (límite) · 120.000 € brutos: la base de cotización se clava en
   await calcular(page, '120000');
   expect(await hayResultados(page)).toBe(true);
 
-  expect(await valorTarjeta(page, 'Salario Bruto Anual')).toBe('120.000,00€');
+  expect(await valorTarjeta(page, 'Salario Bruto Anual')).toBe('120.000,00 €');
   // 120.000 − 3.978,94 − 41.156,48 = 74.864,58 € (la cuota va en céntimos desde el 25/09/2026;
   // antes salía 74.864,59 € de sumar la cuota sin redondear, 41.156,475 €)
-  expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('74.864,58€');
-  expect(await valorTarjeta(page, 'Bruto Mensual (12 pagas)')).toBe('10.000,00€');
-  expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('6238,72€');
+  expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('74.864,58 €');
+  expect(await valorTarjeta(page, 'Bruto Mensual (12 pagas)')).toBe('10.000,00 €');
+  expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('6238,72 €');
 
   // 10.000 €/mes > BASES_SS_2026.maxima (5.101,20 €/mes) → la base de cotización
   // no sigue subiendo con el bruto: se clava en 5.101,20 €/mes.
@@ -395,7 +395,7 @@ test('Hallazgo 569 (reparado) — «Casado/a (un solo ingreso)» paga menos IRPF
   await calcular(page, '30000');
   const netoSoltero = await valorTarjeta(page, 'Salario Neto Anual');
   const irpfSoltero = await filaDesglose(page, 'IRPF anual (cuota estimada)');
-  expect(netoSoltero).toBe('23.124,00€');
+  expect(netoSoltero).toBe('23.124,00 €');
   expect(irpfSoltero).toBe('4926,00 €');
 
   await limpiarFormulario(page);
@@ -406,7 +406,7 @@ test('Hallazgo 569 (reparado) — «Casado/a (un solo ingreso)» paga menos IRPF
 
   // Reparado: ya NO coinciden con el soltero, y el importe es el que exige el art. 84.2.3ª.
   expect(irpfCasadoUnIngreso).toBe('3906,00 €');
-  expect(netoCasadoUnIngreso).toBe('24.144,00€');
+  expect(netoCasadoUnIngreso).toBe('24.144,00 €');
   expect(netoCasadoUnIngreso).not.toBe(netoSoltero);
 });
 
@@ -437,10 +437,10 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
     await calcular(page, '42000');
     expect(await hayResultados(page)).toBe(true);
 
-    expect(await valorTarjeta(page, 'Salario Bruto Anual')).toBe('42.000,00€');
-    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('30.833,10€');
-    expect(await valorTarjeta(page, 'Bruto Mensual (14 pagas)')).toBe('3000,00€');
-    expect(await valorTarjeta(page, 'Neto Mensual (14 pagas)')).toBe('2202,36€');
+    expect(await valorTarjeta(page, 'Salario Bruto Anual')).toBe('42.000,00 €');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('30.833,10 €');
+    expect(await valorTarjeta(page, 'Bruto Mensual (14 pagas)')).toBe('3000,00 €');
+    expect(await valorTarjeta(page, 'Neto Mensual (14 pagas)')).toBe('2202,36 €');
 
     expect(await filaDesglose(page, 'Contingencias comunes (4,70%)')).toBe('1974,00 €');
     expect(await filaDesglose(page, 'Desempleo (1,55%)')).toBe('651,00 €');
@@ -476,7 +476,7 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
     expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-289,69 €');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('1041,05 €');
     expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('5,60%');
-    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('16.349,95€');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('16.349,95 €');
     expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('2250,05 €');
   });
 
@@ -496,7 +496,7 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
     expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-56,43 €');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('0,00 €');
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('1040,00 €');
-    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('14.960,00€');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('14.960,00 €');
   });
 
   /**
@@ -515,8 +515,8 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('585,00 €');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('0,00 €');
     expect(await cuentaFilas(page, 'Deducción por rendimientos del trabajo')).toBe(0);
-    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('8415,00€');
-    expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('701,25€');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('8415,00 €');
+    expect(await valorTarjeta(page, 'Neto Mensual (12 pagas)')).toBe('701,25 €');
   });
 
   /**
@@ -532,9 +532,9 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
    */
   test('IDA Y VUELTA · Neto → Bruto devuelve 42.000, 18.600 y 9.000 € desde sus netos', async ({ page }) => {
     const casos: Array<[string, string, number]> = [
-      ['30833,10', '30.833,10€', 42000],
-      ['16349,95', '16.349,95€', 18600],
-      ['8415', '8415,00€', 9000],
+      ['30833,10', '30.833,10 €', 42000],
+      ['16349,95', '16.349,95 €', 18600],
+      ['8415', '8415,00 €', 9000],
     ];
     await page.getByRole('button', { name: 'Neto → Bruto', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Neto → Bruto', exact: true })).toHaveAttribute('aria-pressed', 'true');
@@ -843,8 +843,8 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('2600,00 €');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('5535,00 €');
     expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('13,84%');
-    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('31.865,00€');
-    expect(await valorTarjeta(page, 'Neto Mensual (14 pagas)')).toBe('2276,07€');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('31.865,00 €');
+    expect(await valorTarjeta(page, 'Neto Mensual (14 pagas)')).toBe('2276,07 €');
   });
 
   /**
@@ -861,7 +861,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('3978,94 €');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('169.036,90 €');
     expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('42,26%');
-    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('226.984,16€');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('226.984,16 €');
   });
 
   /**
@@ -905,7 +905,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
     await calcular(page, '20000');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('2034,71 €');
     expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('10,17%');
-    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('16.665,29€');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('16.665,29 €');
   });
 
   /**
@@ -921,7 +921,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
     await calcular(page, '17094');
     expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-590,89 €');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('0,00 €');
-    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('15.982,89€');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('15.982,89 €');
   });
 
   /**
@@ -955,7 +955,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
     await calcular(page, '35000');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('6100,50 €');
     expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('17,43%');
-    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('26.624,50€');
+    expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('26.624,50 €');
   });
 
   /**
@@ -1030,9 +1030,9 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
    */
   test('HALLAZGO cifras de ejemplo · subida de 1.000 € (+589,05 €) y seguro de 1.500 € al 30 % (450 €)', async ({ page }) => {
     await calcular(page, '45000');
-    await expect.poll(() => valorTarjeta(page, 'Salario Neto Anual')).toBe('32.600,25€');
+    await expect.poll(() => valorTarjeta(page, 'Salario Neto Anual')).toBe('32.600,25 €');
     await calcular(page, '46000');
-    await expect.poll(() => valorTarjeta(page, 'Salario Neto Anual')).toBe('33.189,30€');
+    await expect.poll(() => valorTarjeta(page, 'Salario Neto Anual')).toBe('33.189,30 €');
     const cuerpo = await cuerpoConGuiaAbierta(page);
     expect.soft(cuerpo).not.toContain('~630 € netos');
     expect.soft(cuerpo).not.toContain('~380 € en IRPF');

@@ -131,10 +131,10 @@ test.describe('Figuras planas (2D)', () => {
     await escribir(page, 'Radio', '10');
 
     // Área = π·10² = 100π = 314,159265358979… → 4 decimales, formato español.
-    expect(await resultado(page, 'Área')).toBe('314,1593u²');
+    expect(await resultado(page, 'Área')).toBe('314,1593 u²');
     // Circunferencia = 2π·10 = 20π = 62,83185307…
-    expect(await resultado(page, 'Perímetro')).toBe('62,8319u');
-    expect(await resultado(page, 'Diámetro')).toBe('20,0000u');
+    expect(await resultado(page, 'Perímetro')).toBe('62,8319 u');
+    expect(await resultado(page, 'Diámetro')).toBe('20,0000 u');
 
     // Invariante del círculo: área/perímetro = r/2 = 5, sea cual sea el radio.
     const area = aNumero(await resultado(page, 'Área'));
@@ -148,9 +148,9 @@ test.describe('Figuras planas (2D)', () => {
     await escribir(page, 'Diagonal menor', '6');
 
     // A = (d₁·d₂)/2 = 24 · lado = √(4²+3²) = 5 (terna 3-4-5) · P = 4·5 = 20
-    expect(await resultado(page, 'Área')).toBe('24,0000u²');
-    expect(await resultado(page, 'Lado')).toBe('5,0000u');
-    expect(await resultado(page, 'Perímetro')).toBe('20,0000u');
+    expect(await resultado(page, 'Área')).toBe('24,0000 u²');
+    expect(await resultado(page, 'Lado')).toBe('5,0000 u');
+    expect(await resultado(page, 'Perímetro')).toBe('20,0000 u');
     expect(aNumero(await resultado(page, 'Perímetro')))
       .toBeCloseTo(4 * aNumero(await resultado(page, 'Lado')), 4);
   });
@@ -160,16 +160,16 @@ test.describe('Figuras planas (2D)', () => {
     await escribir(page, 'Lado', '2');
 
     // Apotema = l√3/2 = √3 = 1,7320508… · P = 6·2 = 12 · A = (P·a)/2 = (3√3/2)·4 = 10,3923
-    expect(await resultado(page, 'Apotema')).toBe('1,7321u');
-    expect(await resultado(page, 'Perímetro')).toBe('12,0000u');
-    expect(await resultado(page, 'Área')).toBe('10,3923u²');
+    expect(await resultado(page, 'Apotema')).toBe('1,7321 u');
+    expect(await resultado(page, 'Perímetro')).toBe('12,0000 u');
+    expect(await resultado(page, 'Área')).toBe('10,3923 u²');
 
     await elegir(page, '2D - Planas', 'Pentágono');
     await escribir(page, 'Lado', '5');
     // Apotema = l/(2·tan(36°)) = 5/1,45308506 = 3,44095480… · P = 25 · A = (25·3,4409548)/2
-    expect(await resultado(page, 'Apotema')).toBe('3,4410u');
-    expect(await resultado(page, 'Perímetro')).toBe('25,0000u');
-    expect(await resultado(page, 'Área')).toBe('43,0119u²');
+    expect(await resultado(page, 'Apotema')).toBe('3,4410 u');
+    expect(await resultado(page, 'Perímetro')).toBe('25,0000 u');
+    expect(await resultado(page, 'Área')).toBe('43,0119 u²');
   });
 
   test('CASO 2 · lado 0 y lado negativo no producen número', async ({ page }) => {
@@ -189,13 +189,13 @@ test.describe('Figuras planas (2D)', () => {
   test('CASO 2.bis · lo que no es un número no llega ni a entrar en el campo', async ({ page }) => {
     await elegir(page, '2D - Planas', 'Cuadrado');
     await escribir(page, 'Lado', '7');
-    expect(await resultado(page, 'Área')).toBe('49,0000u²');
+    expect(await resultado(page, 'Área')).toBe('49,0000 u²');
 
     // El filtro de NumberInput sólo admite cifras, coma, punto y signo menos: React descarta
     // el cambio y restaura el valor anterior, así que el 49 de antes sigue en pantalla.
     await page.fill(campo('Lado'), 'abc');
     await esperarValorEnReact(page, campo('Lado'), '7');
-    expect(await resultado(page, 'Área')).toBe('49,0000u²');
+    expect(await resultado(page, 'Área')).toBe('49,0000 u²');
   });
 
   test('CASO 4 · el separador de millar español se lee como millar, no como decimal', async ({ page }) => {
@@ -205,8 +205,8 @@ test.describe('Figuras planas (2D)', () => {
     // 1.500² = 2.250.000 y 4·1.500 = 6.000. Con parseFloat(x.replace(',', '.')) el lado
     // habría valido 1,5 y el área 2,25: un millón de veces menos, sin ningún aviso.
     // es-ES no agrupa los millares de cuatro cifras, de ahí «6000,0000».
-    expect(await resultado(page, 'Área')).toBe('2.250.000,0000u²');
-    expect(await resultado(page, 'Perímetro')).toBe('6000,0000u');
+    expect(await resultado(page, 'Área')).toBe('2.250.000,0000 u²');
+    expect(await resultado(page, 'Perímetro')).toBe('6000,0000 u');
   });
 
   test('CASO 4.bis · tres decimales TECLEADOS no se convierten en millar', async ({ page }) => {
@@ -222,8 +222,8 @@ test.describe('Figuras planas (2D)', () => {
 
     // r = 2,5 → A = π·6,25 = 19,63495408… y diámetro 5. Si se hubiera leído 2500, el área
     // sería 19.634.954,08 u²: un millón de veces mayor.
-    expect(await resultado(page, 'Área')).toBe('19,6350u²');
-    expect(await resultado(page, 'Diámetro')).toBe('5,0000u');
+    expect(await resultado(page, 'Área')).toBe('19,6350 u²');
+    expect(await resultado(page, 'Diámetro')).toBe('5,0000 u');
   });
 
   test('triángulo con un lado COHERENTE con la base y la altura', async ({ page }) => {
@@ -234,8 +234,8 @@ test.describe('Figuras planas (2D)', () => {
 
     // Isósceles de base 6 y lados 5: su altura es √(5²−3²) = 4, o sea que el dato encaja.
     // A = (6·4)/2 = 12 · P = 6 + 2·5 = 16.
-    expect(await resultado(page, 'Área')).toBe('12,0000u²');
-    expect(await resultado(page, 'Perímetro')).toBe('16,0000u');
+    expect(await resultado(page, 'Área')).toBe('12,0000 u²');
+    expect(await resultado(page, 'Perímetro')).toBe('16,0000 u');
   });
 });
 
@@ -246,8 +246,8 @@ test.describe('Sólidos (3D)', () => {
 
     // V = (4/3)π·27 = 36π = 113,09733552… · S = 4π·9 = 36π. r = 3 es el único radio con
     // V = S, así que la coincidencia prueba las dos fórmulas a la vez.
-    expect(await resultado(page, 'Volumen')).toBe('113,0973u³');
-    expect(await resultado(page, 'Superficie Total')).toBe('113,0973u²');
+    expect(await resultado(page, 'Volumen')).toBe('113,0973 u³');
+    expect(await resultado(page, 'Superficie Total')).toBe('113,0973 u²');
   });
 
   test('CASO 1.bis · cono 3-4-5: generatriz exacta, volumen 12π y superficie 24π', async ({ page }) => {
@@ -257,10 +257,10 @@ test.describe('Sólidos (3D)', () => {
 
     // g = √(3²+4²) = 5 · V = (1/3)·9π·4 = 12π = 37,69911184…
     // Lateral = πrg = 15π = 47,12388980… · S = 9π + 15π = 24π = 75,39822369…
-    expect(await resultado(page, 'Generatriz')).toBe('5,0000u');
-    expect(await resultado(page, 'Volumen')).toBe('37,6991u³');
-    expect(await resultado(page, 'Área Lateral')).toBe('47,1239u²');
-    expect(await resultado(page, 'Superficie Total')).toBe('75,3982u²');
+    expect(await resultado(page, 'Generatriz')).toBe('5,0000 u');
+    expect(await resultado(page, 'Volumen')).toBe('37,6991 u³');
+    expect(await resultado(page, 'Área Lateral')).toBe('47,1239 u²');
+    expect(await resultado(page, 'Superficie Total')).toBe('75,3982 u²');
   });
 
   test('CASO 1.bis · pirámide de base 6 y altura 4: V = 48 y S = 96, exactos', async ({ page }) => {
@@ -270,26 +270,26 @@ test.describe('Sólidos (3D)', () => {
 
     // Apotema lateral = √(3²+4²) = 5 · base = 36 · lateral = 4·(6·5)/2 = 60
     // V = (1/3)·36·4 = 48 · S = 36 + 60 = 96
-    expect(await resultado(page, 'Volumen')).toBe('48,0000u³');
-    expect(await resultado(page, 'Área Base')).toBe('36,0000u²');
-    expect(await resultado(page, 'Superficie Total')).toBe('96,0000u²');
+    expect(await resultado(page, 'Volumen')).toBe('48,0000 u³');
+    expect(await resultado(page, 'Área Base')).toBe('36,0000 u²');
+    expect(await resultado(page, 'Superficie Total')).toBe('96,0000 u²');
   });
 
   test('cubo de lado 3 y prisma 3×4×10', async ({ page }) => {
     await elegir(page, '3D - Sólidos', 'Cubo');
     await escribir(page, 'Lado', '3');
     // V = 27 · S = 6·9 = 54 · diagonal espacial = 3√3 = 5,19615242…
-    expect(await resultado(page, 'Volumen')).toBe('27,0000u³');
-    expect(await resultado(page, 'Superficie Total')).toBe('54,0000u²');
-    expect(await resultado(page, 'Diagonal Espacial')).toBe('5,1962u');
+    expect(await resultado(page, 'Volumen')).toBe('27,0000 u³');
+    expect(await resultado(page, 'Superficie Total')).toBe('54,0000 u²');
+    expect(await resultado(page, 'Diagonal Espacial')).toBe('5,1962 u');
 
     await elegir(page, '3D - Sólidos', 'Prisma');
     await escribir(page, 'Base', '3');
     await escribir(page, 'Altura de la base', '4');
     await escribir(page, 'Profundidad', '10');
     // Caja de 3×4×10 → V = 120 · S = 2(3·4 + 3·10 + 4·10) = 2·82 = 164
-    expect(await resultado(page, 'Volumen')).toBe('120,0000u³');
-    expect(await resultado(page, 'Superficie Total')).toBe('164,0000u²');
+    expect(await resultado(page, 'Volumen')).toBe('120,0000 u³');
+    expect(await resultado(page, 'Superficie Total')).toBe('164,0000 u²');
   });
 
   test('CASO 2 · un sólido con una medida a cero deja de producir número', async ({ page }) => {
@@ -297,8 +297,8 @@ test.describe('Sólidos (3D)', () => {
     await escribir(page, 'Radio', '5');
     await escribir(page, 'Altura', '4');
     // V = π·25·4 = 100π = 314,15926536… · S = 2π·25 + 2π·5·4 = 90π = 282,74333882…
-    expect(await resultado(page, 'Volumen')).toBe('314,1593u³');
-    expect(await resultado(page, 'Superficie Total')).toBe('282,7433u²');
+    expect(await resultado(page, 'Volumen')).toBe('314,1593 u³');
+    expect(await resultado(page, 'Superficie Total')).toBe('282,7433 u²');
 
     // Y al bajar la altura a 0 los resultados tienen que DESAPARECER: un cilindro de altura
     // cero es un disco, no un sólido del que dar volumen.
@@ -336,9 +336,9 @@ test.describe('Los 5 hallazgos del 18/09/2026, reparados el mismo día', () => {
     await escribir(page, 'Altura', '4');
     await escribir(page, 'Lado (opcional)', '5');
 
-    expect(await resultado(page, 'Área')).toBe('6,0000u²');
-    expect(await resultado(page, 'Perímetro')).toBe('12,0000u');
-    expect(await resultado(page, 'Tercer lado')).toBe('4,0000u');
+    expect(await resultado(page, 'Área')).toBe('6,0000 u²');
+    expect(await resultado(page, 'Perímetro')).toBe('12,0000 u');
+    expect(await resultado(page, 'Tercer lado')).toBe('4,0000 u');
     // Y aquí NO hay supuesto que declarar, porque no se ha supuesto nada.
     await expect(page.locator('[class*="supuestoBox"]')).toHaveCount(0);
   });
@@ -355,7 +355,7 @@ test.describe('Los 5 hallazgos del 18/09/2026, reparados el mismo día', () => {
     // triángulo rectángulo 3-4-5 (perímetro 12) se lleva 11,5440 y ninguna pista.
     // Lo mismo en el trapecio: B=10, b=6, h=4 → 24,9443 asumiendo lados laterales iguales,
     // cuando el trapecio rectángulo de esas mismas medidas mide 25,6569.
-    expect(await resultado(page, 'Área')).toBe('6,0000u²');
+    expect(await resultado(page, 'Área')).toBe('6,0000 u²');
     await expect(page.locator('[role="status"]')).toContainText(/isósceles/i);
   });
 
