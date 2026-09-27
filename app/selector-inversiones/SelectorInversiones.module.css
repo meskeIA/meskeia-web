@@ -450,3 +450,12 @@
     padding-top: 80px;
   }
 }
+
+/* 100px arriba entre 769 y 1439px: por encima de 768px el logo crece y su barra baja hasta ~77px,
+   y el título largo, centrado, llegaba a las esquinas (medido: tapado hasta 1280px, libre
+   desde 1440px). En escritorio amplio no cambia nada. */
+@media (min-width: 769px) and (max-width: 1439px) {
+  .hero {
+    padding-top: 100px;
+  }
+}
