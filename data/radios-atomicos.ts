@@ -22,10 +22,9 @@
  *   (298 pm, Clementi) — 50 pm de artefacto: en van der Waals se llevan 5 pm, y en esta
  *   serie el Fr (223) es incluso MENOR que el Cs (232), por la contracción relativista 7s.
  *
- * tabla-periodica lee de aquí. simulador-tabla-periodica-tendencias conserva por ahora su
- * propia copia en `datos.ts`, y un test de tests/apps/tabla-periodica.spec.ts coteja las dos
- * series con este módulo número a número: si divergen, rompe. Pendiente (27/09/2026): que
- * tendencias lea de aquí con `radioCovalente` y la copia desaparezca.
+ * Las dos apps leen de aquí (tendencias desde el 27/09/2026, cuando borró su copia en línea),
+ * así que ya no pueden volver a divergir. Un test de tests/apps/tabla-periodica.spec.ts coteja
+ * las dos con este módulo por si alguien vuelve a teclear una serie propia.
  *
  * ── Desde el fermio (Z ≥ 100) ──
  * No se ha medido ninguna longitud de enlace: los valores de la serie son solo teóricos.

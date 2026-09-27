@@ -2019,8 +2019,8 @@ test.describe('hallazgos reparados · 27/09/2026', () => {
 
   test('2281 · sin navegador: la tabla y el simulador de tendencias leen la misma serie', () => {
     // La serie vive UNA vez, en data/radios-atomicos.ts. La tabla la toma de ahí (N/D desde
-    // el Fm). El simulador de tendencias conserva por ahora su copia en línea (no se pudo
-    // cablear al módulo en esta reparación): este test es el que impide que diverjan.
+    // el Fm). El simulador de tendencias también, con los 118 (desde el 27/09/2026, cuando
+    // borró su copia en línea); este test vigila que nadie vuelva a teclear una serie propia.
     expect(RADIO_COVALENTE_PM).toHaveLength(118);
     for (const e of elementos) {
       const esperado = e.numero >= RADIO_SOLO_TEORICO_DESDE_Z ? null : RADIO_COVALENTE_PM[e.numero - 1];
