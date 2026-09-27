@@ -1,9 +1,8 @@
 'use client';
-// @disclaimer: exempt
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorTonos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
 import {
@@ -135,10 +134,27 @@ const MEDIDA_MAX = 16000;
  */
 const FFT_MEDIDA = 16384;
 
-/** Lo que se espera a que el tono llene la sala antes de leer, y cuántas lecturas se promedian. */
-const MS_ESTABILIZACION = 140;
+/**
+ * Cuánto se espera antes de leer un tercio (hallazgos 2306 y 2307, Inspector 27/09/2026).
+ *
+ * La FFT no mira un instante: mira los últimos `fftSize` muestras, 16.384 = 341 ms a 48 kHz y
+ * 372 ms a 44,1 kHz. Antes se leía a los 175-245 ms de cambiar el tono, con una ventana que aún
+ * guardaba un 30-50 % del tono anterior o del silencio: el nivel se leía SUBIENDO, a ~0,13 dB por
+ * milisegundo, y la holgura de un setTimeout movía el punto más de 1 dB. Dos medidas de la misma
+ * cadena diferían hasta 3 dB, y el primer tercio salía 4-6 dB bajo por arrastrar el arranque.
+ *
+ * Ahora la espera se CALCULA: la ventana entera (`fftSize / sampleRate`, la del analizador que se
+ * usa, no un número fijo) + la latencia que el navegador declara (`baseLatency + outputLatency`,
+ * que en un altavoz Bluetooth pasa de 100 ms) + este margen de estabilización, que cubre la
+ * latencia de ENTRADA del micrófono —que ninguna API declara— y lo que tarda el tono en asentarse
+ * en la sala. Se cuenta en el reloj de AUDIO, que es el de las muestras que analiza la FFT.
+ * Precio: la medida pasa de unos 7 s a unos 17 s, y así se dice en pantalla.
+ */
+const MS_ESTABILIZACION = 100;
 const LECTURAS_POR_PUNTO = 3;
 const MS_ENTRE_LECTURAS = 35;
+/** Rampa de entrada del oscilador de medida: el primer tercio no se lee hasta que ha terminado. */
+const RAMPA_MEDIDA_S = 0.05;
 
 /** Volumen de la medida: fijo y moderado, para no saturar el micrófono del propio aparato. */
 const VOLUMEN_MEDIDA = 0.35;
@@ -183,6 +199,51 @@ function leerCampoBarrido(
 }
 
 const esperar = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Espera a que el reloj de AUDIO llegue a `hasta` (segundos de `ctx.currentTime`). El de pared no
+ * sirve: lo que la FFT analiza son muestras, y con la máquina cargada las dos horas se separan.
+ * Si el contexto deja de correr (se cierra al salir de la página, o el sistema lo suspende), el
+ * reloj se para: se corta con un error en vez de esperar para siempre.
+ */
+async function esperarRelojAudio(ctx: AudioContext, hasta: number): Promise<void> {
+  while (ctx.currentTime < hasta) {
+    if (ctx.state !== 'running') throw new Error('El contexto de audio ha dejado de correr');
+    await esperar(Math.max(5, (hasta - ctx.currentTime) * 1000));
+  }
+}
+
+/**
+ * Los procesados del micrófono con su artículo y su género (hallazgo 2308). El aviso pegaba «la»
+ * delante de cada nombre y salía «mantiene activa la control automático de ganancia». Las claves
+ * son los nombres que devuelve `evaluarMicrofono` en motor-respuesta.ts.
+ */
+const GENERO_PROCESADO: Record<string, 'f' | 'm'> = {
+  'cancelación de eco': 'f',
+  'control automático de ganancia': 'm',
+  'supresión de ruido': 'f',
+};
+
+/**
+ * «mantiene activo el control automático de ganancia del micrófono, que altera…» o, con varios,
+ * «mantiene activos la cancelación de eco y el control automático de ganancia del micrófono, que
+ * alteran…». Con géneros mezclados el adjetivo va en masculino plural; con todos femeninos, en
+ * femenino plural.
+ */
+function avisoProcesados(procesados: string[]): string {
+  const generos = procesados.map((p) => GENERO_PROCESADO[p] ?? 'f');
+  const conArticulo = procesados.map((p, i) => `${generos[i] === 'm' ? 'el' : 'la'} ${p}`);
+  const lista =
+    conArticulo.length > 1 ? `${conArticulo.slice(0, -1).join(', ')} y ${conArticulo[conArticulo.length - 1]}` : conArticulo[0];
+  const plural = procesados.length > 1;
+  const femenino = generos.every((g) => g === 'f');
+  const adjetivo = `activ${femenino ? 'a' : 'o'}${plural ? 's' : ''}`;
+  return (
+    `Este navegador mantiene ${adjetivo} ${lista} del micrófono, que ${plural ? 'alteran' : 'altera'} el sonido ` +
+    'antes de que llegue a medirse. La curva que saldría no sería real, así que no se mide. ' +
+    'Suele funcionar en Chrome o Edge de escritorio.'
+  );
+}
 
 /** Etiqueta corta de una frecuencia: 1.000 Hz se lee mucho peor que «1k» en un eje. */
 const etiquetaFrecuencia = (f: number) => (f >= 1000 ? `${formatNumber(f / 1000, f % 1000 === 0 ? 0 : 1)}k` : formatNumber(f, 0));
@@ -529,8 +590,15 @@ export default function GeneradorTonosPage() {
       return;
     }
 
-    // El generador manual no puede seguir sonando: contaminaría su propia medida.
-    if (reproduciendo) detenerAudio();
+    // El generador manual no puede seguir sonando: contaminaría su propia medida. Se apunta
+    // cuándo calla de verdad —al final de su rampa de salida, en el reloj de audio— porque el
+    // suelo de ruido tiene que leerse con una ventana que empiece DESPUÉS (hallazgo 2307).
+    let finTonoManual = 0;
+    if (reproduciendo) {
+      detenerAudio();
+      const ctxManual = audioContextRef.current;
+      if (ctxManual) finTonoManual = ctxManual.currentTime + RAMPA_GANANCIA_S;
+    }
     if (sweepIntervalRef.current) {
       clearInterval(sweepIntervalRef.current);
       sweepIntervalRef.current = null;
@@ -553,11 +621,7 @@ export default function GeneradorTonosPage() {
     const veredicto = evaluarMicrofono(stream.getAudioTracks()[0]?.getSettings() ?? {});
     if (!veredicto.sirve) {
       cerrarMicrofono();
-      setAvisoMedida(
-        `Este navegador mantiene activa la ${veredicto.procesadosActivos.join(' y la ')} del micrófono, ` +
-        'que altera el sonido antes de que llegue a medirse. La curva que saldría no sería real, así que ' +
-        'no se mide. Suele funcionar en Chrome o Edge de escritorio.',
-      );
+      setAvisoMedida(avisoProcesados(veredicto.procesadosActivos));
       return;
     }
 
@@ -584,13 +648,20 @@ export default function GeneradorTonosPage() {
       const espectro = new Float32Array(analizador.frequencyBinCount);
       const frecuencias = frecuenciasDeMedida(MEDIDA_MIN, MEDIDA_MAX);
 
+      // Lo que hay que esperar para que la ventana de la FFT contenga SOLO el sonido que se quiere
+      // leer: la ventana entera, la latencia declarada y el margen (ver MS_ESTABILIZACION).
+      const latenciaS = [ctx.baseLatency, ctx.outputLatency]
+        .filter((v): v is number => typeof v === 'number' && Number.isFinite(v) && v > 0)
+        .reduce((suma, v) => suma + v, 0);
+      const esperaS = analizador.fftSize / ctx.sampleRate + latenciaS + MS_ESTABILIZACION / 1000;
+
       const leerNivel = async (f: number) => {
         let acumulado = 0;
         let leidas = 0;
         for (let i = 0; i < LECTURAS_POR_PUNTO; i++) {
           await esperar(MS_ENTRE_LECTURAS);
           analizador.getFloatFrequencyData(espectro);
-          const v = nivelPico(espectro, f, ctx!.sampleRate, FFT_MEDIDA);
+          const v = nivelPico(espectro, f, ctx!.sampleRate, analizador.fftSize);
           if (Number.isFinite(v)) {
             acumulado += v;
             leidas++;
@@ -599,22 +670,26 @@ export default function GeneradorTonosPage() {
         return leidas > 0 ? acumulado / leidas : -Infinity;
       };
 
-      // 1) Suelo de ruido, en silencio.
+      // 1) Suelo de ruido, en silencio. La ventana tiene que llenarse de audio posterior a abrir
+      // el micrófono (antes, el analizador solo tiene ceros) y posterior al final del tono manual
+      // si sonaba: con un micrófono que entrega audio en cuanto se abre, o un altavoz con
+      // latencia, su cola caía dentro del «silencio» y `restarRuido` descartaba su tercio (2307).
       setFrecuenciaEnCurso(null);
-      await esperar(250);
+      await esperarRelojAudio(ctx, Math.max(ctx.currentTime, finTonoManual) + esperaS);
       const ruido = new Map<number, number>();
       for (const f of frecuencias) {
         analizador.getFloatFrequencyData(espectro);
-        ruido.set(f, nivelPico(espectro, f, ctx.sampleRate, FFT_MEDIDA));
+        ruido.set(f, nivelPico(espectro, f, ctx.sampleRate, analizador.fftSize));
       }
 
       // 2) Un tono por cada tercio de octava.
       oscilador = ctx.createOscillator();
       ganancia = ctx.createGain();
       oscilador.type = 'sine';
-      oscilador.frequency.setValueAtTime(frecuencias[0], ctx.currentTime);
-      ganancia.gain.setValueAtTime(0, ctx.currentTime);
-      ganancia.gain.linearRampToValueAtTime(VOLUMEN_MEDIDA, ctx.currentTime + 0.05);
+      const arranque = ctx.currentTime;
+      oscilador.frequency.setValueAtTime(frecuencias[0], arranque);
+      ganancia.gain.setValueAtTime(0, arranque);
+      ganancia.gain.linearRampToValueAtTime(VOLUMEN_MEDIDA, arranque + RAMPA_MEDIDA_S);
       oscilador.connect(ganancia);
       ganancia.connect(ctx.destination);
       oscilador.start();
@@ -622,9 +697,12 @@ export default function GeneradorTonosPage() {
 
       const puntos: PuntoMedida[] = [];
       for (const f of frecuencias) {
-        oscilador.frequency.setValueAtTime(f, ctx.currentTime);
+        const cambio = ctx.currentTime;
+        oscilador.frequency.setValueAtTime(f, cambio);
         setFrecuenciaEnCurso(f);
-        await esperar(MS_ESTABILIZACION);
+        // La ventana se cuenta desde que el tono suena ENTERO: en el primer tercio, desde el
+        // final de la rampa de arranque, que antes caía dentro y lo hundía 4-6 dB (2306).
+        await esperarRelojAudio(ctx, Math.max(cambio, arranque + RAMPA_MEDIDA_S) + esperaS);
         const senal = await leerNivel(f);
         puntos.push({ frecuencia: f, db: restarRuido(senal, ruido.get(f) ?? -Infinity) });
       }
@@ -1059,7 +1137,8 @@ export default function GeneradorTonosPage() {
           La app emite un tono en cada tercio de octava por el altavoz y lo escucha con el micrófono
           del mismo aparato. Mide <strong>dos veces</strong> —cambiando de sitio el altavoz, o probando
           otro— y compara: lo que aparece es la diferencia entre las dos situaciones, que es lo único
-          que un móvil sin calibrar puede decir de verdad.
+          que un móvil sin calibrar puede decir de verdad. Cada medida dura unos 20 segundos: los
+          tonos tienen que sonar lo bastante para que el análisis los capte enteros, sin restos del anterior.
         </p>
 
         <div className={styles.medidaBotones}>
@@ -1109,7 +1188,7 @@ export default function GeneradorTonosPage() {
           <p className={styles.medidaProgreso} role="status" aria-live="polite">
             {frecuenciaEnCurso === null
               ? 'Midiendo el ruido de fondo: silencio un momento…'
-              : `Emitiendo ${formatNumber(frecuenciaEnCurso, 0)} Hz — no muevas el aparato.`}
+              : `Emitiendo ${formatNumber(frecuenciaEnCurso, 0)} Hz (${formatNumber(frecuenciasMedidas.indexOf(frecuenciaEnCurso) + 1, 0)} de ${formatNumber(frecuenciasMedidas.length, 0)}) — no muevas el aparato.`}
           </p>
         )}
 
@@ -1274,6 +1353,28 @@ export default function GeneradorTonosPage() {
           </div>
         </div>
       </div>
+
+      {/*
+        Nivel 2 ALTO, variante médica (hallazgo 2309, Inspector 27/09/2026): la app se anuncia para
+        test de oído y tinnitus, orienta con normas por edad y patologías en su guía y deja el volumen
+        llegar al 100 %. Llevaba `@disclaimer: exempt`, que la política reserva a herramientas técnicas
+        sin consejo profesional. Es el mismo DisclaimerCard que sus hermanas generador-ruido-blanco y
+        amplificador-sonido, con el texto del §4 de _private/DISCLAIMER-POLICY.md. No colapsable y
+        fuera de la EducationalSection, que nace cerrada.
+      */}
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} title="Antes de usarlo como test de oído">
+        <p>
+          Esta herramienta tiene <strong>carácter orientativo</strong>: genera tonos y compara medidas de un altavoz,
+          pero no es una audiometría ni un producto sanitario. Hasta qué frecuencia oyes, si notas diferencia entre
+          un oído y otro o cómo suena un pitido que ya tienes son referencias generales, y no sustituyen la
+          valoración de un audiólogo o de un otorrinolaringólogo (ORL).
+        </p>
+        <p>
+          Si notas pérdida de audición, acúfenos persistentes, dolor o una diferencia clara entre oídos, o si usas
+          audífonos o implantes, consulta con tu médico o especialista antes de tomar ninguna decisión.
+          meskeIA no se responsabiliza de decisiones basadas en el uso de esta herramienta.
+        </p>
+      </DisclaimerCard>
 
       <EducationalSection
         title="Física del Sonido y Aplicaciones Prácticas"

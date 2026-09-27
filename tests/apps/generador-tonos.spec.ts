@@ -2270,14 +2270,15 @@ const pedidoMicro = (page: Page): Promise<MediaStreamConstraints | null> =>
 
 /**
  * Lanza una medida y espera a que la app la GUARDE: el botón pasa a «Repetir medida X». Es el
- * estado de la app, no un plazo: la medida dura lo que dicen sus constantes, 26 tonos × (140 +
- * 3 × 35) ms + 250 ms de ruido ≈ 6,6 s, y el tope de 30 s solo cubre una máquina cargada.
+ * estado de la app, no un plazo. Desde la reparación del I1 (27/09/2026) cada tercio espera la
+ * ventana entera de la FFT + latencia + 100 ms antes de sus 3 lecturas: 27 esperas × (372 + 100)
+ * ms + 26 × 3 × 35 ms ≈ 15,5 s a 44,1 kHz; el tope de 45 s solo cubre una máquina cargada.
  */
 async function medir(page: Page, letra: 'A' | 'B', gesto: 'click' | 'tap' = 'click'): Promise<void> {
   const boton = page.getByRole('button', { name: `Medir ${letra}`, exact: true });
   await (gesto === 'tap' ? boton.tap() : boton.click());
   await expect(page.getByRole('button', { name: `Repetir medida ${letra}`, exact: true })).toBeVisible({
-    timeout: 30000,
+    timeout: 45000,
   });
 }
 
@@ -2327,13 +2328,14 @@ const graficaMedida = (page: Page) => page.getByRole('img', { name: /Respuesta e
  *   sube la mediana de H sobre los 26 tercios = +0,048 dB (media de los valores 13.º y 14.º).
  *   ⇒ B − A en 1.000 Hz = 12,00 − 0,05 = 11,95 dB, y es el máximo de la diferencia.
  * Tolerancia ±3 dB: este caso vigila defectos de 12 dB —la resta al revés, la frecuencia
- * cambiada, el pico perdido—, y el ruido propio de la medida llega a ±3 dB (HALLAZGO I1, abajo).
- * Medido el 27/09/2026 en seis cargas: 10,3 · 11,0 · 11,3 · 11,5 · 11,7 · 11,8.
+ * cambiada, el pico perdido—, y el ruido propio de la medida llegaba a ±3 dB (HALLAZGO I1, abajo).
+ * Medido el 27/09/2026 en seis cargas: 10,3 · 11,0 · 11,3 · 11,5 · 11,7 · 11,8 (antes de reparar el I1;
+ * reparado, B − A de la misma cadena medida dos veces queda en 0,0-0,7 dB).
  */
 test('CASO 10 — A/B con el micrófono: un altavoz con +12 dB a 1 kHz sale como +12 dB en 1.000 Hz', async ({
   page,
 }) => {
-  test.setTimeout(90000);
+  test.setTimeout(120000);
   await abrirConMicro(page);
 
   await medir(page, 'A');
@@ -2367,10 +2369,13 @@ test('CASO 10 — A/B con el micrófono: un altavoz con +12 dB a 1 kHz sale como
 });
 
 // ------------------------------------------------------------
-// HALLAZGO I1 — ABIERTO: la misma cadena medida dos veces no da la misma curva
+// HALLAZGO I1 — REPARADO: la misma cadena medida dos veces no daba la misma curva
 // ------------------------------------------------------------
 /**
- * HALLAZGO I1 [medio · cálculo] (Inspector 27/09/2026) — ABIERTO. Las esperas de la medida son más
+ * HALLAZGO I1 [medio · cálculo] (Inspector 27/09/2026, hallazgo 2306) — REPARADO 27/09/2026: cada
+ * tercio se lee cuando el reloj de AUDIO ha pasado la ventana entera de la FFT (`fftSize /
+ * sampleRate`, leída del analizador) + la latencia declarada + 100 ms de margen, contando desde el
+ * final de la rampa de arranque en el primero. Lo que había: las esperas de la medida eran más
  * cortas que la ventana que analizan. La FFT es de 16.384 muestras (FFT_MEDIDA) = 341 ms a 48 kHz y
  * 372 ms a 44,1 kHz, pero cada tercio se lee a los 175, 210 y 245 ms de cambiar el tono
  * (MS_ESTABILIZACION 140 + 3 × MS_ENTRE_LECTURAS 35): la ventana aún guarda un 30-50 % del tono
@@ -2391,8 +2396,7 @@ test('CASO 10 — A/B con el micrófono: un altavoz con +12 dB a 1 kHz sale como
  * dB, así que casi toda curva sale con «mínimo en 50 Hz» sea cual sea el altavoz.
  */
 test('HALLAZGO I1 — la misma cadena medida dos veces da la misma curva, y plana', async ({ page }) => {
-  test.fail(); // ABIERTO: hallazgo del Inspector 27/09/2026
-  test.setTimeout(90000);
+  test.setTimeout(120000);
   await abrirConMicro(page);
   await medir(page, 'A');
   await medir(page, 'B'); // el altavoz no se toca: la misma situación dos veces
@@ -2441,7 +2445,7 @@ test('CASO 12 — sin permiso, con cancelación de eco o en silencio, se avisa y
   await fijarModoMicro(page, 'silencio');
   await medirA.click();
   await expect(avisoMedida(page)).toContainText('Ningún tono llegó a despegar del ruido de fondo', {
-    timeout: 30000,
+    timeout: 45000,
   });
   const [medida] = await registros(page);
   expect(medida.frecuenciasAplicadas, 'los 26 tonos se emitieron').toEqual([50, ...TERCIOS_50_16K]);
@@ -2453,10 +2457,12 @@ test('CASO 12 — sin permiso, con cancelación de eco o en silencio, se avisa y
 });
 
 // ------------------------------------------------------------
-// HALLAZGO I3 — ABIERTO: «la control automático de ganancia»
+// HALLAZGO I3 — REPARADO: «la control automático de ganancia»
 // ------------------------------------------------------------
 /**
- * HALLAZGO I3 [bajo · contenido] (Inspector 27/09/2026) — ABIERTO. El aviso se arma con
+ * HALLAZGO I3 [bajo · contenido] (Inspector 27/09/2026, hallazgo 2308) — REPARADO 27/09/2026: el aviso
+ * lo arma `avisoProcesados`, con el artículo y el género de cada procesado, el adjetivo en plural
+ * (masculino si hay géneros mezclados) y «que altera/alteran» según el número. El aviso se armaba con
  * `mantiene activa la ${procesadosActivos.join(' y la ')} del micrófono` (page.tsx ~557), y uno de
  * los tres nombres de motor-respuesta.ts es masculino: «control automático de ganancia».
  *   solo el control de ganancia activo → obtenido «mantiene activa la control automático de
@@ -2466,19 +2472,33 @@ test('CASO 12 — sin permiso, con cancelación de eco o en silencio, se avisa y
  * Es el aviso que ve quien usa un navegador que no deja apagar esos procesados.
  */
 test('HALLAZGO I3 — el aviso del control automático de ganancia concuerda en género', async ({ page }) => {
-  test.fail(); // ABIERTO: hallazgo del Inspector 27/09/2026
   await abrirConMicro(page, 'agc');
-  await page.getByRole('button', { name: 'Medir A', exact: true }).click();
+  const medirA = page.getByRole('button', { name: 'Medir A', exact: true });
+  await medirA.click();
   await expect(avisoMedida(page)).toContainText('control automático de ganancia');
-  const texto = await avisoMedida(page).innerText();
-  expect(texto).not.toMatch(/\bla control\b|\bactiva el control\b/);
+  const soloGanancia = await avisoMedida(page).innerText();
+  expect(soloGanancia).not.toMatch(/\bla control\b|\bactiva el control\b/);
+  expect(soloGanancia).toContain(
+    'Este navegador mantiene activo el control automático de ganancia del micrófono, que altera el sonido',
+  );
+
+  // Dos procesados de género distinto (el modo «eco» del micro falso deja también el de ganancia):
+  // adjetivo en masculino plural y verbo en plural.
+  await fijarModoMicro(page, 'eco');
+  await medirA.click();
+  await expect(avisoMedida(page)).toContainText(
+    'Este navegador mantiene activos la cancelación de eco y el control automático de ganancia del micrófono, que alteran el sonido',
+  );
 });
 
 // ------------------------------------------------------------
-// HALLAZGO I4 — ABIERTO: `@disclaimer: exempt` en una app que orienta sobre la salud auditiva
+// HALLAZGO I4 — REPARADO: `@disclaimer: exempt` en una app que orienta sobre la salud auditiva
 // ------------------------------------------------------------
 /**
- * HALLAZGO I4 [medio · contenido] (Inspector 27/09/2026, SOSPECHA S1) — ABIERTO. page.tsx:2 declara
+ * HALLAZGO I4 [medio · contenido] (Inspector 27/09/2026, SOSPECHA S1, hallazgo 2309) — REPARADO
+ * 27/09/2026: fuera el exempt; la app monta <DisclaimerCard variant="medical" severity="high"
+ * collapsible={false}> antes de la EducationalSection, con el texto del Nivel 2 médico (§4) adaptado
+ * al test de oído. Lo que había: page.tsx:2 declaraba
  * `// @disclaimer: exempt` y no monta <DisclaimerCard>. La política (_private/DISCLAIMER-POLICY.md)
  * reserva el exempt a «herramientas técnicas sin consejo profesional» (§7) y manda un DisclaimerCard
  * a toda app que dé «consejos personalizados sobre temas … médicos» o cuyo resultado pueda llevar a
@@ -2494,9 +2514,18 @@ test('HALLAZGO I3 — el aviso del control automático de ganancia concuerda en 
  * generador-ruido-blanco y amplificador-sonido, llevan DisclaimerCard medical/high no colapsable.
  */
 test('HALLAZGO I4 — la descarga de responsabilidad de salud se ve sin abrir nada', async ({ page }) => {
-  test.fail(); // ABIERTO: hallazgo del Inspector 27/09/2026
   await abrir(page);
-  await expect(page.getByText(/meskeIA no se responsabiliza/)).toBeVisible();
+  // Dentro de un DisclaimerCard (role="note" con su título), no suelta en cualquier párrafo.
+  const aviso = page
+    .getByRole('note')
+    .filter({ has: page.getByRole('heading', { name: 'Antes de usarlo como test de oído' }) });
+  await expect(aviso).toBeVisible();
+  await expect(
+    aviso.getByText(/meskeIA no se responsabiliza de decisiones basadas en el uso de esta herramienta/),
+  ).toBeVisible();
+  await expect(aviso).toContainText(/audiólogo|otorrinolaringólogo/);
+  // No colapsable: no hay botón que lo pliegue.
+  await expect(aviso.getByRole('button')).toHaveCount(0);
 });
 
 // ------------------------------------------------------------
@@ -2551,7 +2580,10 @@ test.describe('Inspector 27/09/2026 — medir con el tono sonando, en móvil (Pi
   });
 
   /**
-   * HALLAZGO I2 [bajo · cálculo] (Inspector 27/09/2026) — ABIERTO. Apagar el tono manual no basta:
+   * HALLAZGO I2 [bajo · cálculo] (Inspector 27/09/2026, hallazgo 2307) — REPARADO 27/09/2026: la app
+   * apunta cuándo calla el tono manual (final de su rampa, en el reloj de audio) y lee el suelo de
+   * ruido cuando la ventana entera de la FFT + latencia + margen es posterior a ese instante y a la
+   * apertura del micrófono. Lo que había: apagar el tono manual no bastaba:
    * el suelo de ruido se lee 250 ms después de abrir el micrófono, con una ventana de FFT de 341-372
    * ms (la causa del I1), así que con un micrófono que entrega audio en cuanto se abre —el bucle del
    * test; en la vida real, un dispositivo ya abierto o un altavoz con latencia, como uno Bluetooth—
@@ -2563,8 +2595,7 @@ test.describe('Inspector 27/09/2026 — medir con el tono sonando, en móvil (Pi
    * el pico real desaparece. Al 30 % por defecto: hueco en 1 de 3 cargas y punto hundido en otra.
    */
   test('HALLAZGO I2 — el tono manual recién apagado no deja un hueco en su propio tercio', async ({ page }) => {
-    test.fail(); // ABIERTO: hallazgo del Inspector 27/09/2026
-    test.setTimeout(60000);
+    test.setTimeout(90000);
     await tonoManualAlMaximo(page);
     await medir(page, 'A', 'tap');
     const tabla = await tablaMedida(page);
