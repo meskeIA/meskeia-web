@@ -66,7 +66,6 @@ const NIVEL_MANUAL = {
   // callaba el que sí, y lo sustituyó por uno químico propio: nivel 2 ALTO, no colapsable.
   'calculadora-piscinas':       2,  // dosis de cloro/pH/alguicida — riesgo químico, no financiero
   // Herramientas financieras informativas (sin asesoramiento)
-  'calculadora-suscripciones':  3,  // seguimiento de suscripciones personales
   'conversor-divisas':          3,  // conversor con tipos BCE (orientativo)
   'presupuesto-viaje':          3,  // planificador de presupuesto de viaje
   'estimador-gastos-comunidad': 2,  // estimador gastos comunidad (financiero, no fiscal)
@@ -78,13 +77,10 @@ const NIVEL_MANUAL = {
   'time-tracker':               3,
   'requisitos-nomada-digital':  3,  // info sobre visa nómada digital
   // Bienestar/salud educativa (sin orientación clínica)
-  'semaforo-emocional':         3,
   'orientador-jet-lag':         3,  // recomendaciones de adaptación horaria
   'lupa-digital':               3,  // herramienta de accesibilidad visual
   // Contenido educativo (no clínico)
   'huesos-cuerpo-humano':       3,
-  'simulador-genetica':         3,
-  'vitaminas-minerales':        3,
   // Fiscal con datos de data/fiscal/ → Level 1 CRÍTICO (override por contenido)
   'orientador-intereses-demora': 1, // calcula intereses de demora fiscales
   'estimador-complemento-minimos': 1, // cálculo fiscal de complementos a pensiones mínimas
@@ -106,6 +102,52 @@ const NIVEL_MANUAL = {
   'recordatorio-medicacion':            1,  // medicación = nivel 1 por decisión explícita
   'simulador-financiacion-empresarial': 1,  // sobre-protección deliberada
   'visualizador-cancer':                1,  // sobre-protección deliberada
+
+  // ── Revisión del 28/09/2026: las 31 🟡 que el PASO 5.6 de /audit-meskeia arrastraba desde
+  // el 07/09. Todas llevaban MÁS severidad que la calculada; ninguna resultó ser un descuido.
+
+  // Subieron a "high" a propósito en las tandas de auditoría de junio (commits 999f9423,
+  // 86204cdd, 11bcbe71, 5a2b7f35 y 564f1563). Las cuatro primeras estaban declaradas aquí con 3
+  // desde el 19/03: la declaración se quedó atrás y era ella la que hacía saltar el aviso.
+  'calculadora-suscripciones':  2,  // financiera, subió en la tanda 21 (14/06)
+  'semaforo-emocional':         2,  // bienestar emocional, subió en la tanda 32 (15/06)
+  'simulador-genetica':         2,  // variante medical: herencia de enfermedades
+  'vitaminas-minerales':        2,  // dosis de suplementos (antipatrón 10 del CLAUDE.md)
+  'asistente-reclamaciones':    2,  // reclamaciones de consumo: contenido con efecto legal
+
+  // Alcohol: "high" por los antipatrones 9 y 10 del CLAUDE.md. Rebajarlas sería la regresión.
+  'guia-cocteles':              2,
+  'guia-estilos-cerveza':       2,
+  'guia-varietales-vino':       2,
+  'maridaje':                   2,
+  'que-cerveza-elegir':         2,
+  'que-vino-elegir':            2,
+  'escalado-cocteles':          2,
+  'cantidades-evento':          2,  // calcula cantidades de bebida, alcohol incluido
+
+  // Antigua suite "marketing" (nivel 3 en la política), fusionada en "diseno" el 06/05/2026
+  // (605589d7). Nacieron con "medium" por ser de marketing y el cálculo por suites dejó de
+  // verlo: sus suites de hoy dan 4. No es sobre-severidad, es el nivel que les tocaba.
+  'analizador-densidad-seo':    3,
+  'analizador-geo':             3,
+  'analizador-titulos-seo':     3,
+  'calculadora-legibilidad':    3,
+  'calculadora-tiempo-lectura': 3,
+  'creador-thumbnails':         3,
+  'generador-carruseles':       3,
+  'generador-hashtags':         3,
+  'generador-lorem-ipsum':      3,
+  'generador-meta-descripciones': 3,
+  'generador-og-images':        3,
+  'generador-palabras-clave':   3,
+  'generador-schema-markup':    3,
+  'generador-utm':              3,
+
+  // "medium" deliberado por lo que la app hace, no por su suite
+  'comprobador-altavoces':      3,  // el barrido de tonos puede dañar el equipo y el oído
+  'conversor-numeros-letras':   3,  // se usa para cheques y pagarés: aviso propio sobre la cifra
+  'visualizador-geopolitica-energetica': 3,  // contenido político: medium desde su creación
+  'visualizador-regimenes-politicos':    3,  // ídem (28/09/2026: juicio, no dato)
 };
 
 // Palabras en URL/nombre que elevan a Nivel 1 CRÍTICO
