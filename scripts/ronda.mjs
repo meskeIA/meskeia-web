@@ -280,6 +280,7 @@ async function revisar(ctx, url, tituloHome) {
 const ANCHOS_TITULO = [
   { ancho: 1280, alto: 900, aviso: 'a 1280 px el logo o el botón de tema tapan el título' },
   { ancho: 1024, alto: 768, aviso: 'en tableta o portátil (1024 px) el logo o el botón de tema tapan el título' },
+  { ancho: 800, alto: 1112, aviso: 'en tableta vertical (800 px) el logo o el botón de tema tapan el título' },
   { ancho: 390, alto: 844, aviso: 'en móvil (390 px) el logo o el botón de tema tapan el título' },
 ];
 
@@ -300,6 +301,12 @@ const ANCHOS_TITULO = [
  * apps un título largo y centrado llega a las esquinas. Medidas en local tras el arreglo
  * móvil: 50 tapadas a 1.024, 6 a 1.200 y 2 a 1.280; 0 a 1.440. Antes solo se miraba a 390 y
  * este tramo era invisible.
+ *
+ * 800 se añadió el 28/09/2026 por el mismo hueco, un tramo más abajo: aquel arreglo llegaba a
+ * 768 px, y de 769 a 1.023 —tableta vertical, iPad 810-834— el logo ya tiene su tamaño de
+ * escritorio y el hero volvía a 40 px (hallazgos 2380 y 2386 del Inspector). 800 y no 834
+ * porque cerca del corte el título es más estrecho y el solape mayor: medido en tres apps
+ * del lote, 800 tapaba «Sim» donde 834 tapaba «Si».
  *
  * Se mide contra las cajas del TEXTO (`Range.getClientRects`), no contra la del <h1>: un h1
  * de ancho completo roza siempre las esquinas aunque sus letras estén lejos.

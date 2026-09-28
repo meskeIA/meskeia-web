@@ -807,10 +807,11 @@
   }
 }
 
-/* 80px arriba hasta 768px: el hero va a sangre y el logo fijo de MeskeiaLogo (hasta ~52px) tapaba
-   el principio del título en móvil y tableta. Mismo hueco que deja la plantilla. Va al final
-   para ganar a cualquier padding del hero de un breakpoint anterior. */
-@media (max-width: 768px) {
+/* 80px arriba hasta 1023px: el hero va a sangre y la barra fija de MeskeiaLogo (~52px en móvil,
+   ~77px desde 769px, cuando el logo pasa a su tamaño de escritorio) tapaba el principio del
+   título en móvil y tableta. Desde 1024px el título centrado ya no llega al logo. Mismo hueco
+   que deja la plantilla. Va al final para ganar a cualquier padding previo del hero. */
+@media (max-width: 1023px) {
   .hero {
     padding-top: 80px;
   }
