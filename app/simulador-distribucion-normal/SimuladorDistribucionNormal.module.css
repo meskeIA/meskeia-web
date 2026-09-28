@@ -617,7 +617,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
-  color: #E07A1F;
+  color: #9A4A0C;
   font-size: 1.1rem;
 }
 
@@ -637,7 +637,15 @@
 }
 
 .warningList li strong {
-  color: #E07A1F;
+  color: #9A4A0C;
+}
+
+/* El naranja #E07A1F se queda en el borde; como texto sobre la caja (naranja al 8 %) daba
+   2,56:1 en claro y 3,72:1 en oscuro, y es texto pequeño (4,5:1). Receta del hallazgo 2366
+   (simulador-fluidos-bernoulli, 28/09/2026): #9A4A0C en claro, #F5A05A en oscuro. */
+[data-theme='dark'] .warningHeader,
+[data-theme='dark'] .warningList li strong {
+  color: #F5A05A;
 }
 
 /* ============================================
