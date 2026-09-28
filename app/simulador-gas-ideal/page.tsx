@@ -13,17 +13,22 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorGasIdeal.module.css';
+// La ecuación de estado y los procesos viven en ./motor.ts desde el 28/09/2026: los casos
+// para clase (./casos.ts) corrigen con la MISMA aritmética que pintan las pestañas.
+import {
+  R,
+  ATM_TO_PA,
+  L_TO_M3,
+  calcularGasIdeal,
+  calcularProceso,
+  type CalcVar,
+  type Proceso,
+  type ResultadoProceso,
+} from './motor';
+import CasosAula from './CasosAula';
 
 type Tab = 'gas-ideal' | 'procesos' | 'ciclos';
-type CalcVar = 'P' | 'V' | 'T' | 'n';
-type Proceso = 'isotermo' | 'isobaro' | 'isocoro' | 'adiabatico';
 type Ciclo = 'carnot' | 'otto' | 'diesel' | 'stirling';
-
-// R en J/(mol·K). Trabajamos en SI: P en Pa, V en m³, T en K, n en mol.
-// Para presentar al usuario, convertimos: 1 atm = 101325 Pa, 1 L = 0.001 m³.
-const R = 8.314;
-const ATM_TO_PA = 101325;
-const L_TO_M3 = 0.001;
 
 interface Molecula {
   x: number;
@@ -48,32 +53,10 @@ function GasIdealTab(): React.ReactElement {
   const [nMol, setNMol] = useState<number>(1);
 
   // Cálculo automático de la variable seleccionada
-  const calculado = useMemo(() => {
-    const P_Pa = Patm * ATM_TO_PA;
-    const V_m3 = VL * L_TO_M3;
-    if (calcVar === 'P') {
-      // P = nRT/V
-      if (V_m3 <= 0) return null;
-      const P = (nMol * R * TK) / V_m3;
-      return P / ATM_TO_PA; // atm
-    }
-    if (calcVar === 'V') {
-      if (P_Pa <= 0) return null;
-      const V = (nMol * R * TK) / P_Pa;
-      return V / L_TO_M3; // L
-    }
-    if (calcVar === 'T') {
-      if (nMol <= 0) return null;
-      const T = (P_Pa * V_m3) / (nMol * R);
-      return T; // K
-    }
-    if (calcVar === 'n') {
-      if (TK <= 0) return null;
-      const n = (P_Pa * V_m3) / (R * TK);
-      return n; // mol
-    }
-    return null;
-  }, [calcVar, Patm, VL, TK, nMol]);
+  const calculado = useMemo(
+    () => calcularGasIdeal(calcVar, Patm, VL, TK, nMol),
+    [calcVar, Patm, VL, TK, nMol]
+  );
 
   // Valores efectivos (mostrando el calculado en lugar del input correspondiente)
   const Pef = calcVar === 'P' && calculado !== null ? calculado : Patm;
@@ -347,16 +330,6 @@ function GasIdealTab(): React.ReactElement {
 
 // ---------- TAB 2: Procesos ----------
 
-interface ResultadoProceso {
-  P2: number; // Pa
-  V2: number; // m³
-  T2: number; // K
-  W: number; // J (trabajo realizado por el gas)
-  Q: number; // J
-  dU: number; // J
-  formula: string;
-}
-
 function ProcesosTab(): React.ReactElement {
   const [proceso, setProceso] = useState<Proceso>('isotermo');
   const [P1atm, setP1atm] = useState<number>(1);
@@ -369,86 +342,10 @@ function ProcesosTab(): React.ReactElement {
   const [gamma, setGamma] = useState<number>(1.4);
 
   // Calcular resultado
-  const resultado = useMemo<ResultadoProceso | null>(() => {
-    const P1 = P1atm * ATM_TO_PA;
-    const V1 = V1L * L_TO_M3;
-    const T1 = T1K;
-    const V2 = V2L * L_TO_M3;
-
-    // Cv y Cp para gas ideal según γ
-    // ΔU = n·Cv·ΔT, con Cv = R/(γ-1)
-    const Cv = R / (gamma - 1);
-
-    if (proceso === 'isotermo') {
-      // T = cte → P1V1 = P2V2; W = nRT·ln(V2/V1); Q = W; ΔU = 0
-      if (V2 <= 0 || V1 <= 0) return null;
-      const P2 = (P1 * V1) / V2;
-      const T2 = T1;
-      const W = nMol * R * T1 * Math.log(V2 / V1);
-      return {
-        P2,
-        V2,
-        T2,
-        W,
-        Q: W,
-        dU: 0,
-        formula: 'P₁V₁ = P₂V₂ · W = nRT·ln(V₂/V₁) · ΔU = 0',
-      };
-    }
-    if (proceso === 'isobaro') {
-      // P = cte → V1/T1 = V2/T2; W = P·ΔV; ΔU = nCv·ΔT; Q = ΔU+W
-      const P2 = P1;
-      const T2 = T2K;
-      if (T1 <= 0) return null;
-      const V2calc = V1 * (T2 / T1);
-      const W = P2 * (V2calc - V1);
-      const dU = nMol * Cv * (T2 - T1);
-      const Q = dU + W;
-      return {
-        P2,
-        V2: V2calc,
-        T2,
-        W,
-        Q,
-        dU,
-        formula: 'V₁/T₁ = V₂/T₂ · W = P·ΔV · ΔU = nCᵥ·ΔT',
-      };
-    }
-    if (proceso === 'isocoro') {
-      // V = cte → P1/T1 = P2/T2; W = 0; ΔU = nCv·ΔT; Q = ΔU
-      const V2calc = V1;
-      const T2 = T2K;
-      if (T1 <= 0) return null;
-      const P2 = P1 * (T2 / T1);
-      const W = 0;
-      const dU = nMol * Cv * (T2 - T1);
-      const Q = dU;
-      return {
-        P2,
-        V2: V2calc,
-        T2,
-        W,
-        Q,
-        dU,
-        formula: 'P₁/T₁ = P₂/T₂ · W = 0 · Q = ΔU = nCᵥ·ΔT',
-      };
-    }
-    // adiabático: Q = 0; PV^γ = cte; T·V^(γ-1) = cte
-    if (V2 <= 0 || V1 <= 0) return null;
-    const P2 = P1 * Math.pow(V1 / V2, gamma);
-    const T2 = T1 * Math.pow(V1 / V2, gamma - 1);
-    const W = (P1 * V1 - P2 * V2) / (gamma - 1);
-    const dU = -W; // Q = 0 → ΔU = -W
-    return {
-      P2,
-      V2,
-      T2,
-      W,
-      Q: 0,
-      dU,
-      formula: 'PVᵞ = cte · TVᵞ⁻¹ = cte · Q = 0 · W = (P₁V₁−P₂V₂)/(γ−1)',
-    };
-  }, [proceso, P1atm, V1L, T1K, V2L, T2K, nMol, gamma]);
+  const resultado = useMemo<ResultadoProceso | null>(
+    () => calcularProceso({ proceso, P1atm, V1L, T1K, V2L, T2K, nMol, gamma }),
+    [proceso, P1atm, V1L, T1K, V2L, T2K, nMol, gamma]
+  );
 
   // Curva PV
   const curvaPV = useMemo<PuntoPV[]>(() => {
@@ -1546,6 +1443,10 @@ export default function Page(): React.ReactElement {
           {tab === 'procesos' && <ProcesosTab />}
           {tab === 'ciclos' && <CiclosTab />}
         </div>
+
+        {/* Tarea de aula (skill /casos-aula-meskeia): fuera del panel de pestañas, para que se
+            vea sea cual sea la pestaña, y FUERA de EducationalSection, que nace colapsada. */}
+        <CasosAula />
 
         <EducationalSection
           title="Guía del Gas Ideal y Termodinámica"
