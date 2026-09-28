@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { formatNumber } from '@/lib/formatters';
+import { formatNumber, formatPercentage } from '@/lib/formatters';
 import { BONO_ALQUILER_JOVEN_2026, UMBRAL_IPREM_VIVIENDA_JOVEN } from '@/data/fiscal';
 
 // Las cifras salen de data/fiscal, nunca tecleadas (hallazgo 489): antes esta metadata tenía
@@ -11,7 +11,8 @@ import { BONO_ALQUILER_JOVEN_2026, UMBRAL_IPREM_VIVIENDA_JOVEN } from '@/data/fi
 const eur = (n: number) => `${formatNumber(n, 0)} €`;
 const AYUDA_VIVIENDA = eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.vivienda);
 const AYUDA_HABITACION = eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitacion);
-const LIMITE_PORC = formatNumber(BONO_ALQUILER_JOVEN_2026.limiteSobreRenta * 100, 0);
+/** «60 %» con espacio duro (U+00A0), como la página (hallazgo 2393): `formatPercentage` recibe la fracción */
+const LIMITE_PORC = formatPercentage(BONO_ALQUILER_JOVEN_2026.limiteSobreRenta, 0);
 const RENTA_MAX_VIVIENDA = eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.vivienda);
 const RENTA_MAX_HABITACION = eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.habitacion);
 const DURACION_TOTAL_ANIOS = BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses / 12;
@@ -81,7 +82,7 @@ export const jsonLd = generateWebAppSchema({
   features: [
     "Comprueba elegibilidad para el Bono Joven Alquiler 2026-2030 (RD 326/2026) con checklist de requisitos",
     `Calcula la ayuda mensual efectiva: hasta ${AYUDA_VIVIENDA}/mes en vivienda completa o ${AYUDA_HABITACION}/mes en habitación`,
-    `Muestra el límite del ${LIMITE_PORC}% de la renta y el ahorro total acumulado en hasta ${DURACION_TOTAL_ANIOS} años`,
+    `Muestra el límite del ${LIMITE_PORC} de la renta y el ahorro total acumulado en hasta ${DURACION_TOTAL_ANIOS} años`,
     `Comprueba la renta del contrato contra el tope estatal del art. 133.1.e (${RENTA_MAX_VIVIENDA}/mes en vivienda, ${RENTA_MAX_HABITACION}/mes en habitación), con el máximo reducido de los municipios pequeños`,
     "Diferencia entre requisitos imprescindibles y condicionantes para la aprobación",
     "Resume el proceso de solicitud y la documentación habitual, comunes a toda España: la convocatoria concreta la fija cada comunidad autónoma",
@@ -99,7 +100,7 @@ export const faqJsonLd = {
       name: '¿Qué es el Bono Joven Alquiler 2026 y cuánto dinero da?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El Bono Joven Alquiler es una ayuda directa del Plan Estatal de Vivienda 2026-2030 (Real Decreto 326/2026) para jóvenes de ${EDAD_MIN} a ${EDAD_MAX} años. La cuantía máxima es de ${AYUDA_VIVIENDA}/mes para vivienda completa o ${AYUDA_HABITACION}/mes para habitación en piso compartido, durante hasta ${DURACION_TOTAL_ANIOS} años (${PLAZO_INICIAL_ANIOS} años renovables por otros ${PLAZO_PRORROGA_ANIOS}). El importe no puede superar el ${LIMITE_PORC}% de la renta mensual.`,
+        text: `El Bono Joven Alquiler es una ayuda directa del Plan Estatal de Vivienda 2026-2030 (Real Decreto 326/2026) para jóvenes de ${EDAD_MIN} a ${EDAD_MAX} años. La cuantía máxima es de ${AYUDA_VIVIENDA}/mes para vivienda completa o ${AYUDA_HABITACION}/mes para habitación en piso compartido, durante hasta ${DURACION_TOTAL_ANIOS} años (${PLAZO_INICIAL_ANIOS} años renovables por otros ${PLAZO_PRORROGA_ANIOS}). El importe no puede superar el ${LIMITE_PORC} de la renta mensual.`,
       },
     },
     {
@@ -107,7 +108,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son los requisitos de ingresos para pedir el Bono Alquiler Joven 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El RD 326/2026 (art. 133.1.d) fija el umbral en ${UMBRAL_IPREM_GENERAL} veces el IPREM de ingresos anuales, que sube con discapacidad reconocida (${UMBRAL_IPREM_33} veces con el 33% o más, ${UMBRAL_IPREM_65} veces con el 65% o más). Cada Comunidad Autónoma concreta el cómputo exacto en su propia convocatoria. Es imprescindible consultar la convocatoria de la comunidad autónoma donde se ubica la vivienda alquilada para conocer el detalle aplicable.`,
+        text: `El RD 326/2026 (art. 133.1.d) fija el umbral en ${UMBRAL_IPREM_GENERAL} veces el IPREM de ingresos anuales, que sube con discapacidad reconocida (${UMBRAL_IPREM_33} veces con el 33\u00A0% o más, ${UMBRAL_IPREM_65} veces con el 65\u00A0% o más). Cada Comunidad Autónoma concreta el cómputo exacto en su propia convocatoria. Es imprescindible consultar la convocatoria de la comunidad autónoma donde se ubica la vivienda alquilada para conocer el detalle aplicable.`,
       },
     },
     {
@@ -115,7 +116,10 @@ export const faqJsonLd = {
       name: '¿Cómo se solicita el Bono Joven Alquiler y dónde se tramita?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La solicitud se tramita a través de la consejería o agencia de vivienda de la comunidad autónoma donde esté situada la vivienda alquilada, ya que son las CCAA las encargadas de gestionar y conceder las ayudas. Cada comunidad tiene su propio plazo y procedimiento, habitualmente telemático. Es imprescindible tener contrato de alquiler en vigor y estar empadronado en la vivienda.',
+        // 28/09/2026 — «Cada comunidad tiene su propio plazo» contradecía el art. 138 (la forma del
+        // hallazgo 2396) y «contrato de alquiler en vigor» dejaba fuera a quien lo firma tras la
+        // concesión, que el art. 133.1.a admite
+        text: `La solicitud se tramita a través de la consejería o agencia de vivienda de la comunidad autónoma donde esté situada la vivienda alquilada, ya que son las CCAA las encargadas de gestionar y conceder las ayudas. El art. 138 del Real Decreto 326/2026 obliga a las comunidades a mantener la convocatoria abierta de forma continuada y permanente; el procedimiento, habitualmente telemático, lo fija cada una. Hay que ser titular de un contrato de alquiler o de cesión de uso, o firmarlo en los ${BONO_ALQUILER_JOVEN_2026.contrato.mesesParaFirmarTrasConcesion} meses siguientes a la notificación de la concesión (art. 133.1.a), y acreditar con el empadronamiento que la vivienda es la residencia habitual y permanente (art. 133.1.c).`,
       },
     },
     {
@@ -123,7 +127,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre el Bono Joven Alquiler y otras ayudas al alquiler autonómicas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Bono Joven Alquiler es una ayuda estatal cofinanciada por las comunidades autónomas, con requisitos de edad e ingresos homogéneos en toda España. Muchas comunidades tienen además sus propias ayudas complementarias al alquiler, con requisitos diferentes (límites de renta distintos, tramos de edad más amplios, cuantías adicionales). No se pueden cobrar las dos a la vez: el art. 136 del Real Decreto 326/2026 declara esta ayuda incompatible con cualquier otra destinada al pago del alquiler o de la cesión de uso de la misma vivienda o habitación. Hay que elegir la que más convenga. Distinto es la deducción autonómica del IRPF por alquiler de vivienda habitual, que no es una ayuda al pago sino un beneficio fiscal y se rige por la normativa de cada región.',
+        text: 'El Bono Joven Alquiler es una ayuda estatal cofinanciada por las comunidades autónomas, con requisitos de edad e ingresos homogéneos en toda España. Muchas comunidades tienen además sus propias ayudas complementarias al alquiler, con requisitos diferentes (límites de renta distintos, tramos de edad más amplios, cuantías adicionales). No se pueden cobrar las dos a la vez: el art. 136 del Real Decreto 326/2026 declara esta ayuda incompatible con cualquier otra destinada al pago del alquiler o de la cesión de uso de la misma vivienda o habitación, salvo las que se den para esa misma finalidad a víctimas de violencia de género, de trata o de violencia sexual, a familias monoparentales o monomarentales, a personas desahuciadas, sin hogar o en emergencia habitacional y a otras especialmente vulnerables, que el propio artículo exceptúa. Fuera de esos casos hay que elegir la que más convenga. Distinto es la deducción autonómica del IRPF por alquiler de vivienda habitual, que no es una ayuda al pago sino un beneficio fiscal y se rige por la normativa de cada región.',
       },
     },
     {
@@ -145,7 +149,7 @@ export const faqJsonLd = {
       name: '¿Hasta qué alquiler mensual puedo pedir el Bono Joven?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El art. 133.1.e del Real Decreto 326/2026 fija la renta máxima del contrato en ${RENTA_MAX_VIVIENDA} al mes para una vivienda completa y ${RENTA_MAX_HABITACION} al mes para una habitación. Si tu alquiler los supera, no puedes acceder a la ayuda aunque cumplas la edad y el límite de ingresos. Tu Comunidad Autónoma puede elevar esos topes, pero solo con acuerdo previo del Ministerio (art. 135), así que conviene mirar su convocatoria. Por debajo del tope, la ayuda es el ${LIMITE_PORC}% de la renta con un máximo de ${AYUDA_VIVIENDA} al mes en vivienda y ${AYUDA_HABITACION} en habitación (art. 137).`,
+        text: `El art. 133.1.e del Real Decreto 326/2026 fija la renta máxima del contrato en ${RENTA_MAX_VIVIENDA} al mes para una vivienda completa y ${RENTA_MAX_HABITACION} al mes para una habitación. Si tu alquiler los supera, no puedes acceder a la ayuda aunque cumplas la edad y el límite de ingresos. Tu Comunidad Autónoma puede elevar esos topes, pero solo con acuerdo previo del Ministerio (art. 135), así que conviene mirar su convocatoria. Por debajo del tope, la ayuda es el ${LIMITE_PORC} de la renta con un máximo de ${AYUDA_VIVIENDA} al mes en vivienda y ${AYUDA_HABITACION} en habitación (art. 137).`,
       },
     },
   ],

@@ -17,6 +17,13 @@
   --color-ok: #10b981;
   --color-fail: #ef4444;
   --color-warn: #f59e0b;
+  /* Los tres semánticos de arriba sirven para bordes y fondos; como TEXTO no llegaban al AA
+     en claro (la «Ayuda mensual» en #10b981 daba 2,54:1, el distintivo IMPRESCINDIBLE 3,09:1
+     y el error de renta 4,13:1 · hallazgo 2392). Estos son su versión para texto, medidos en
+     el navegador sobre el fondo real de cada uso. */
+  --color-ok-texto: #047857;
+  --color-fail-texto: #b91c1c;
+  --color-warn-texto: #92400e;
 
   max-width: 860px;
   margin: 0 auto;
@@ -36,6 +43,9 @@
   --color-ok: #34d399;
   --color-fail: #f87171;
   --color-warn: #fbbf24;
+  --color-ok-texto: #34d399;
+  --color-fail-texto: #fca5a5;
+  --color-warn-texto: #fbbf24;
 }
 
 .hero {
@@ -74,7 +84,8 @@
 .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
 .label { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
 .helperText { font-size: 0.8rem; color: var(--text-secondary); }
-.errorText { font-size: 0.8rem; color: #E53E3E; margin: 0; font-weight: 500; }
+/* #E53E3E literal y sin variante oscura: 4,13:1 en claro y 3,48:1 en oscuro (hallazgo 2392) */
+.errorText { font-size: 0.8rem; color: var(--color-fail-texto); margin: 0; font-weight: 500; }
 
 /* Slider de edad */
 .sliderRow { display: flex; align-items: center; gap: 1rem; }
@@ -158,7 +169,7 @@
   font-weight: 700;
   padding: 0.15rem 0.5rem;
   background: rgba(239,68,68,0.12);
-  color: var(--color-fail);
+  color: var(--color-fail-texto);
   border-radius: 10px;
   flex-shrink: 0;
   align-self: flex-start;
@@ -195,7 +206,7 @@
   text-align: center;
 }
 
-.ahorroValor { font-size: 1.5rem; font-weight: 800; color: var(--color-ok); display: block; }
+.ahorroValor { font-size: 1.5rem; font-weight: 800; color: var(--color-ok-texto); display: block; }
 .ahorroLabel { font-size: 0.8rem; color: var(--text-secondary); }
 .ahorroNota { font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.2rem; }
 
@@ -226,22 +237,26 @@
 
 .tipoBtn:hover { border-color: var(--primary); }
 
+/* El color de marca como TEXTO va con su token `-texto` (el rótulo activo daba 3,74:1 en claro
+   y 2,95:1 en oscuro, y el «hasta 300 €/mes» en teal 2,55:1 y 4,33:1 · hallazgo 2392) */
 .tipoBtnActivo {
   border-color: var(--primary);
   background: rgba(46, 134, 171, 0.08);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipoBono {
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .tipoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 [data-theme='dark'] .tipoBtn { background: var(--bg-card); border-color: #3a5a72; }
-[data-theme='dark'] .tipoBtnActivo { background: rgba(46, 134, 171, 0.15); }
+/* Sobre el tinte azul del botón activo, --primary-texto oscuro se queda en 4,34:1: el azul
+   claro de la marca (--accent, igual en los dos temas) da 5,36:1 */
+[data-theme='dark'] .tipoBtnActivo { background: rgba(46, 134, 171, 0.15); color: var(--accent); }
 
 @media (max-width: 480px) {
   .tipoSelector { grid-template-columns: 1fr; }
@@ -283,7 +298,8 @@
 .pasoNum {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  /* Blanco sobre la marca: los tokens `-boton` (5,47:1 y 5,15:1), iguales en los dos temas */
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border-radius: 50%;
   display: flex;
@@ -333,12 +349,12 @@
 
 .faqGrid { display: flex; flex-direction: column; gap: 1rem; }
 .faqItem { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
-.faqItem h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--primary); }
+.faqItem h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--primary-texto); }
 .faqItem p { font-size: 0.88rem; color: var(--text-secondary); margin: 0; line-height: 1.55; }
 
 .stepsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
 .stepCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
-.stepNum { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; margin-bottom: 0.75rem; }
+.stepNum { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; margin-bottom: 0.75rem; }
 .stepCard h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; }
 .stepCard p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
 
@@ -349,7 +365,7 @@
 .tipCard p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
 
 .warningBox { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius-large); padding: 1.5rem; }
-.warningBox h2 { font-size: 1.1rem; font-weight: 700; color: var(--color-warn); margin: 0 0 1rem; }
+.warningBox h2 { font-size: 1.1rem; font-weight: 700; color: var(--color-warn-texto); margin: 0 0 1rem; }
 .warningGrid { display: flex; flex-direction: column; gap: 0.75rem; }
 .warningItem { background: var(--bg-card); border-radius: var(--radius); padding: 1rem; }
 .warningItem strong { display: block; font-size: 0.9rem; margin-bottom: 0.35rem; }

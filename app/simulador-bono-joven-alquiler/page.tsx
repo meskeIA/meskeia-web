@@ -36,6 +36,22 @@ const pct = (n: number) => {
   return formatNumber(redondeado, Number.isInteger(redondeado) ? 0 : 1);
 };
 
+/**
+ * La cifra y su «%» separados por un espacio DURO (U+00A0), como pide la Ortografía de la RAE
+ * (2010) y la regla de formato del proyecto desde el 25/09/2026: «60 %», no «60%», y que el
+ * signo no salte solo a la línea siguiente (hallazgo 2393). `formatPercentage` hace lo mismo,
+ * pero con decimales fijos; aquí hacen falta los variables de `pct`.
+ */
+const conPorcentaje = (cifra: string) => `${cifra}\u00A0%`;
+
+// Los datos de los requisitos salen del módulo sellado contra el BOE, como las cuantías:
+// tecleados en la prosa, un cambio del RD dejaría la tarjeta contradiciendo a su propia
+// pregunta (hallazgo 2394, la forma de los 596 y 645).
+const EDAD_MAX = BONO_ALQUILER_JOVEN_2026.edad.maxima;
+const EXCLUSIONES = BONO_ALQUILER_JOVEN_2026.exclusiones;
+const CONTRATO = BONO_ALQUILER_JOVEN_2026.contrato;
+const CAMBIO_DOMICILIO = BONO_ALQUILER_JOVEN_2026.cambioDomicilio;
+
 /** El umbral de renta se computa sobre 14 pagas (IPREM_2026.anual14), la referencia que
  *  el propio módulo fiscal declara para cálculo de topes (hallazgo 536). */
 const topeIngresos = (veces: number) => eur(IPREM_2026.anual14 * veces);
@@ -53,20 +69,32 @@ interface Requisito {
 const REQUISITOS: Requisito[] = [
   {
     id: 'edad',
-    pregunta: `Tienes entre ${BONO_ALQUILER_JOVEN_2026.edad.minima} y ${BONO_ALQUILER_JOVEN_2026.edad.maxima} años (inclusive)`,
-    explicacion: 'El Bono Joven está destinado exclusivamente a personas de hasta 35 años.',
+    pregunta: `Tienes entre ${BONO_ALQUILER_JOVEN_2026.edad.minima} y ${EDAD_MAX} años (inclusive) al solicitar la ayuda`,
+    // Sale de `edad.maxima`, como la pregunta de encima: tecleada, un cambio del RD dejaba
+    // la tarjeta diciendo una edad y su pregunta otra (hallazgo 2394).
+    explicacion: `El art. 133.1.b del RD 326/2026 exige tener ${EDAD_MAX} años o menos, incluida esa edad, en el momento de solicitar la ayuda, y el art. 133.1, ser mayor de edad.`,
     bloqueante: true,
   },
   {
     id: 'ingresos',
     pregunta: `Tus rentas anuales no superan ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.general)}/año)`,
-    explicacion: `El RD 326/2026 fija el umbral en ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.general)}/año), que sube a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33, 1)} (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33)}/año) con una discapacidad reconocida del 33 % o más (y si eres hijo o hija de víctima de violencia de género) y a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65, 0)} (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65)}/año) con una discapacidad del 65 % o más. Cada Comunidad Autónoma concreta el cómputo en su convocatoria.`,
+    explicacion: `El RD 326/2026 fija el umbral en ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.general)}/año), que sube a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33, 1)} (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33)}/año) con una discapacidad reconocida del ${conPorcentaje('33')} o más (y si eres hijo o hija de víctima de violencia de género) y a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65, 0)} (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65)}/año) con una discapacidad del ${conPorcentaje('65')} o más. Cada Comunidad Autónoma concreta el cómputo en su convocatoria.`,
     bloqueante: true,
   },
+  /**
+   * ⚠️ 28/09/2026 (hallazgo 2391) — la tarjeta decía a secas «No puedes ser titular de un
+   * derecho de propiedad o usufructo sobre ninguna vivienda en España», y el art. 133.2.a
+   * exceptúa a quien acredite que no puede disponer de ella por separación o divorcio, que no
+   * puede habitarla por otra causa ajena a su voluntad o que le resulta inaccesible por
+   * discapacidad. Un copropietario que tras su divorcio no puede usar su vivienda respondía
+   * «No» con honestidad y recibía «No cumples los requisitos obligatorios»: rechazo de más,
+   * el sentido del 1168. La excepción va en la PREGUNTA, que es lo que se contesta, y no solo
+   * en la explicación.
+   */
   {
     id: 'propietario',
-    pregunta: 'No eres propietario de una vivienda en España',
-    explicacion: 'No puedes ser titular de un derecho de propiedad o usufructo sobre ninguna vivienda en España.',
+    pregunta: 'No eres propietario ni usufructuario de ninguna vivienda en España (salvo las excepciones de abajo)',
+    explicacion: `El art. 133.2.a del RD 326/2026 excluye a quien sea propietario o usufructuario de alguna vivienda en España, salvo que acredite que no puede disponer de ella por separación o divorcio, que no puede habitarla por otra causa ajena a su voluntad o que le resulta inaccesible por una discapacidad reconocida del ${conPorcentaje(formatNumber(EXCLUSIONES.propiedad.discapacidadMinimaInaccesible, 0))} o más. Si estás en una de esas excepciones, responde «Sí»: tendrás que acreditarla ante tu comunidad autónoma.`,
     bloqueante: true,
   },
   {
@@ -90,10 +118,20 @@ const REQUISITOS: Requisito[] = [
    * preferencia—, y además el CLAUDE.md del proyecto prohíbe expresamente esconder una
    * advertencia legal dentro de `<EducationalSection>`.
    */
+  /*
+   * ⚠️ 28/09/2026 — el art. 136 tiene un segundo párrafo que la tarjeta callaba: «No se
+   * considerarán afectados por esta incompatibilidad los supuestos excepcionales» en que una
+   * administración, una ONG o una asociación dé una ayuda para la misma finalidad a víctimas de
+   * violencia de género, de trata o de violencia sexual, a familias monoparentales o
+   * monomarentales, a personas desahuciadas, en chabolismo, infravivienda o emergencia
+   * habitacional, sin hogar u otras especialmente vulnerables. Sin él, quien está en esos
+   * supuestos respondía «No» y la app le rechazaba: la forma del 2391 (una excepción del RD
+   * que no llega a la pregunta que bloquea).
+   */
   {
     id: 'sinOtrasAyudas',
-    pregunta: 'No cobras ninguna otra ayuda al pago del alquiler',
-    explicacion: `El art. 136 del RD 326/2026 declara el Bono Joven ${BONO_ALQUILER_JOVEN_2026.compatibleConOtrasAyudasAlquiler ? 'compatible' : 'INCOMPATIBLE'} con cualquier otra ayuda al pago del alquiler o de la cesión de uso de la vivienda, venga del Estado, de tu Comunidad Autónoma o de tu ayuntamiento. Si ya cobras una, no puedes solicitar este bono mientras la percibas.`,
+    pregunta: 'No cobras ninguna otra ayuda al pago del alquiler (salvo las excepciones de abajo)',
+    explicacion: `El art. 136 del RD 326/2026 declara el Bono Joven ${BONO_ALQUILER_JOVEN_2026.compatibleConOtrasAyudasAlquiler ? 'compatible' : 'INCOMPATIBLE'} con cualquier otra ayuda al pago del alquiler o de la cesión de uso de la vivienda, venga del Estado, de tu Comunidad Autónoma, de tu ayuntamiento o de otra entidad pública. La excepción son las ayudas para esa misma finalidad que una administración, una ONG o una asociación den a víctimas de violencia de género, de trata o de violencia sexual, a familias monoparentales o monomarentales, a personas desahuciadas de su vivienda habitual, en chabolismo, infravivienda o emergencia habitacional, sin hogar u otras especialmente vulnerables: si la tuya es de ese tipo, responde «Sí».`,
     bloqueante: true,
   },
   /**
@@ -117,11 +155,50 @@ const REQUISITOS: Requisito[] = [
    * pasa a ser la del artículo por el que se bloquea; el depósito o registro autonómico se
    * dice donde corresponde, como lo que es: algo que puede pedir tu comunidad y que este
    * simulador no comprueba.
+   *
+   * ⚠️ 28/09/2026 (hallazgo 2390) — y aquella pregunta tampoco era la del artículo, porque la
+   * atribución de partida estaba mal: en el BOE el art. 133.1.e es SOLO el tope de renta (lo
+   * que el propio módulo le atribuye en `rentaMaximaMensual`), y el contrato es el art.
+   * 133.1.a, que no menciona la fianza en ninguna de sus letras y que para la HABITACIÓN
+   * dispensa expresamente la forma de la Ley 29/1994. Así, quien alquila una habitación sin
+   * fianza depositada respondía «No» y recibía «No cumples los requisitos obligatorios» por una
+   * exigencia que el RD no hace. La pregunta es ahora la del art. 133.1.a —tener contrato de
+   * alquiler o de cesión, o estar en condiciones de firmarlo—, y la fianza y el registro pasan
+   * a ser lo que son: requisitos que la comunidad autónoma PUEDE añadir (art. 8.1).
    */
   {
     id: 'contrato',
-    pregunta: 'El contrato está por escrito y la fianza depositada (o lo estará)',
-    explicacion: 'El art. 133.1.e del RD 326/2026 exige que el contrato esté formalizado por escrito y la fianza depositada: eso es lo que se comprueba aquí. Tu comunidad autónoma puede pedir además el depósito o registro oficial del contrato, que este simulador no verifica.',
+    pregunta: 'Tienes contrato de alquiler o de cesión de uso como inquilino (o lo firmarás si te conceden la ayuda)',
+    explicacion: `El art. 133.1.a del RD 326/2026 exige ser titular de un contrato de alquiler o de cesión de uso de la vivienda o la habitación, o estar en condiciones de firmarlo: en ese caso hay que firmarlo en el plazo máximo de ${CONTRATO.mesesParaFirmarTrasConcesion} meses desde que te notifiquen la concesión. Para una vivienda completa, el contrato ${CONTRATO.viviendaEnTerminosLAU ? 'ha de estar formalizado conforme a' : 'no necesita seguir la forma de'} la Ley 29/1994, de Arrendamientos Urbanos; para una habitación, el RD ${CONTRATO.habitacionEnTerminosLAU ? 'también exige' : 'no exige'} esa forma. El RD no pide que la fianza esté depositada ni el contrato registrado, pero tu comunidad autónoma puede añadirlo en su convocatoria (art. 8.1), y este simulador no lo verifica.`,
+    bloqueante: true,
+  },
+  /**
+   * ⚠️ 28/09/2026 (hallazgo 2388, ALTO) — las exclusiones del art. 133.2.b y c no llegaban al
+   * veredicto. «No podrá concederse la ayuda cuando […] la persona arrendataria o cesionaria
+   * tenga parentesco en primer o segundo grado de consanguinidad o de afinidad con la persona
+   * arrendadora o cedente» (b), ni cuando sea socia o partícipe del arrendador (c). Ninguno de
+   * los requisitos lo preguntaba, así que quien alquila el piso de su padre o de su hermana
+   * respondía «Sí» a todo con honestidad y recibía «¡Cumples todos los requisitos!». Es la
+   * forma del hallazgo 686 (art. 136): una exclusión del RD que solo contaba la prosa.
+   *
+   * Va como BLOQUEANTE y no como aviso en el veredicto porque el RD no la matiza: «no podrá
+   * concederse». Un aviso junto a «¡Cumples todos los requisitos!» seguiría aprobando de más.
+   */
+  {
+    id: 'arrendador',
+    pregunta: `Quien te alquila no es familiar tuyo hasta el ${EXCLUSIONES.parentescoArrendadorHastaGrado}.º grado ni una persona o empresa de la que seas socio`,
+    explicacion: `El art. 133.2.b del RD 326/2026 impide conceder la ayuda si tienes parentesco hasta el ${EXCLUSIONES.parentescoArrendadorHastaGrado}.º grado, por consanguinidad o por afinidad, con quien te alquila o te cede la vivienda (por ejemplo, padres, hijos, hermanos, abuelos o nietos, y suegros, yernos, nueras o cuñados). El art. 133.2.c la impide también si eres socio o partícipe de la persona o la empresa arrendadora, salvo que sea una cooperativa sin ánimo de lucro en régimen de cesión de uso.`,
+    bloqueante: true,
+  },
+  /**
+   * 28/09/2026 — el art. 8.2.a, común a todas las ayudas del Plan, exige nacionalidad española,
+   * de la UE, del EEE o Suiza, o residencia legal en España. Tampoco lo preguntaba nadie, y es
+   * la misma forma del 2388: una condición del RD que no llegaba al veredicto.
+   */
+  {
+    id: 'nacionalidad',
+    pregunta: 'Tienes nacionalidad española o de otro país de la UE, del EEE o Suiza, o residencia legal en España',
+    explicacion: 'El art. 8.2.a del RD 326/2026, común a todas las ayudas del Plan, exige la nacionalidad española o la de un Estado de la Unión Europea, del Espacio Económico Europeo o Suiza (o el parentesco con sus nacionales que prevea la normativa aplicable). Con otra nacionalidad, hace falta residencia legal en España.',
     bloqueante: true,
   },
   // El requisito de renta NO se pregunta: la app tiene el importe tecleado y el límite del
@@ -143,7 +220,8 @@ const BONO: Record<TipoVivienda, number> = BONO_ALQUILER_JOVEN_2026.ayudaMaximaM
 const DURACION_MAX_MESES = BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses; // 2 + prórroga de 2
 const LIMITE_SOBRE_RENTA = BONO_ALQUILER_JOVEN_2026.limiteSobreRenta;
 const RENTA_MAX = BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual;
-const LIMITE_PORC = pct(LIMITE_SOBRE_RENTA * 100);
+/** «60 %», con el espacio duro ya puesto (hallazgo 2393) */
+const LIMITE_PORC = conPorcentaje(pct(LIMITE_SOBRE_RENTA * 100));
 const DURACION_MAX_ANIOS = DURACION_MAX_MESES / 12;
 
 interface EscenarioCalculado {
@@ -172,7 +250,7 @@ const calcularEscenario = (renta: number, tipo: TipoVivienda): EscenarioCalculad
   // Misma regla que en el simulador de arriba: se redondea la cuantía MENSUAL, y el
   // acumulado se calcula sobre ella (hallazgo 688).
   const ayuda = redondearCentimos(Math.min(cuantiaMaxima, porElLimite));
-  const porcentaje = pct((ayuda / renta) * 100);
+  const porcentaje = conPorcentaje(pct((ayuda / renta) * 100));
   return {
     renta,
     ayuda,
@@ -180,10 +258,10 @@ const calcularEscenario = (renta: number, tipo: TipoVivienda): EscenarioCalculad
     acumulado: ayuda * DURACION_MAX_MESES,
     notaLimite:
       porElLimite < cuantiaMaxima
-        ? `el ${porcentaje}% de la renta, que es el máximo que permite el art. 137`
+        ? `el ${porcentaje} de la renta, que es el máximo que permite el art. 137`
         : porElLimite === cuantiaMaxima
-          ? `el ${porcentaje}% de la renta, justo en el límite del art. 137`
-          : `el ${porcentaje}% de la renta, por debajo del límite del ${LIMITE_PORC}%`,
+          ? `el ${porcentaje} de la renta, justo en el límite del art. 137`
+          : `el ${porcentaje} de la renta, por debajo del límite del ${LIMITE_PORC}`,
   };
 };
 
@@ -224,7 +302,14 @@ export default function SimuladorBonoJovenAlquilerPage() {
    * la norma.
    */
   const alquilerIlegible = alquilMensual.trim() !== '' && !Number.isFinite(alquilerCrudo);
-  const alquilerInvalido = alquilerNegativo || alquilerIlegible;
+  /**
+   * 28/09/2026 (sospecha del acta del Inspector, confirmada) — el tercer caso de la misma
+   * familia: un «0» o «0,00» TECLEADO se leía como campo vacío, sin `aria-invalid`, y el
+   * veredicto pedía «Introdúcela aquí arriba» a quien la tiene escrita. Una renta de 0 € no
+   * es un alquiler sobre el que calcular el 60 % del art. 137: se señala como dato no válido.
+   */
+  const alquilerCero = alquilMensual.trim() !== '' && alquilerCrudo === 0;
+  const alquilerInvalido = alquilerNegativo || alquilerIlegible || alquilerCero;
   const alquilerNum = Math.max(0, parseSpanishNumberOr(alquilMensual));
   const bonificacionMaxima = BONO[tipoVivienda];
   // El bono no puede superar el 60% de la renta mensual (RD 326/2026, art. 137)
@@ -357,7 +442,9 @@ export default function SimuladorBonoJovenAlquilerPage() {
             <p className={styles.errorText} id="alquiler-error" role="alert">
               {alquilerNegativo
                 ? 'La renta no puede ser un importe negativo.'
-                : `«${alquilMensual.trim()}» no es un importe válido: escribe solo la cifra, con coma para los decimales (por ejemplo, 550 o 1.250,50).`}
+                : alquilerCero
+                  ? 'La renta tiene que ser mayor que 0 €: escribe lo que pagas (o pagarás) cada mes.'
+                  : `«${alquilMensual.trim()}» no es un importe válido: escribe solo la cifra, con coma para los decimales (por ejemplo, 550 o 1.250,50).`}
             </p>
           ) : (
             <span className={styles.helperText}>Introduce lo que pagas actualmente o lo que pagarás</span>
@@ -397,7 +484,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
               <span className={styles.ahorroValor}>{formatCurrency(bonificacionEfectiva)}</span>
               <span className={styles.ahorroLabel}>Ayuda mensual</span>
               {bonificacionEfectiva < bonificacionMaxima && (
-                <span className={styles.ahorroNota}>Límite: {LIMITE_PORC}% de la renta</span>
+                <span className={styles.ahorroNota}>Límite: {LIMITE_PORC} de la renta</span>
               )}
             </div>
             <div className={styles.ahorroCard}>
@@ -507,11 +594,14 @@ export default function SimuladorBonoJovenAlquilerPage() {
                 )}{' '}
                 Consulta con tu Comunidad Autónoma.
               </p>
+              {/* «Los fondos y plazos varían cada año» contradecía el art. 138, que es el mismo
+                  texto que corrige el hallazgo 2396 en el paso 1 del proceso de solicitud */}
               {estados.comunidad === 'no' && (
                 <p className={styles.resultadoTexto}>
                   <strong>Tu Comunidad Autónoma no tiene el Bono Joven activo ahora mismo</strong>: aunque
                   cumplas el resto de requisitos, hoy no puedes solicitarlo hasta que abra su convocatoria.
-                  Los fondos y plazos varían cada año — vuelve a comprobarlo más adelante.
+                  El art. 138 del RD 326/2026 obliga a las comunidades autónomas a convocar esta ayuda
+                  de forma continuada y permanente, así que vuelve a comprobarlo más adelante.
                 </p>
               )}
             </div>
@@ -564,7 +654,10 @@ export default function SimuladorBonoJovenAlquilerPage() {
         <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Proceso de solicitud</h2>
         <div className={styles.pasosGrid}>
           {[
-            { num: '1', titulo: 'Verifica disponibilidad en tu CA', desc: 'Cada Comunidad Autónoma gestiona su propia convocatoria. Algunas están activas todo el año, otras tienen plazos específicos.' },
+            // «Algunas están activas todo el año, otras tienen plazos específicos» contradecía el
+            // art. 138: las comunidades «realizarán convocatorias abiertas de esta ayuda de forma
+            // continuada y permanente» (hallazgo 2396)
+            { num: '1', titulo: 'Verifica disponibilidad en tu CA', desc: 'Cada comunidad autónoma gestiona la ayuda, y el art. 138 del RD 326/2026 le obliga a convocarla de forma continuada y permanente, no por plazos cerrados. Comprueba en la web de vivienda de la tuya si la convocatoria ya está abierta y cómo se presenta.' },
             { num: '2', titulo: 'Reúne la documentación', desc: 'DNI/NIE, declaración de la renta, contrato de alquiler, certificado de empadronamiento y justificante de ingresos.' },
             { num: '3', titulo: 'Presenta la solicitud', desc: 'Normalmente se tramita online a través del portal de vivienda de tu CA o presencialmente en las oficinas de vivienda.' },
             { num: '4', titulo: 'Resolución y cobro', desc: 'El plazo de resolución lo fija cada comunidad autónoma en su convocatoria: el RD 326/2026 no lo regula. Una vez aprobado, la ayuda se abona mensualmente o de forma retroactiva.' },
@@ -646,8 +739,23 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">👫</span>
-              <h3>Pareja joven, ambos ≤35</h3>
-              <p>Solo uno de los titulares puede beneficiarse del bono. Si ambos cumplen, el bono se asigna a uno. Conviene revisar quién tiene mejor perfil para la solicitud.</p>
+              <h3>Pareja joven, ambos de {EDAD_MAX} años o menos</h3>
+              {/*
+                ⚠️ 28/09/2026 (hallazgo 2397) — aquí se afirmaba «Solo uno de los titulares puede
+                beneficiarse del bono. Si ambos cumplen, el bono se asigna a uno», sin artículo
+                detrás: los arts. 132-139 hacen beneficiaria a cada persona física que reúna los
+                requisitos y no limitan la ayuda a una por contrato, ni lo hace el resto del RD.
+                Lo que el RD sí deja abierto —cómo se aplica el 60 % del art. 137 cuando la renta
+                se comparte— se dice como lo que es: algo que concreta la convocatoria.
+              */}
+              <p>
+                El RD 326/2026 no limita la ayuda a una persona por contrato: el art. 133.1 hace
+                beneficiaria a cada persona que reúna los requisitos, y el art. 133.1.d mira las rentas
+                de cada solicitante, no las del hogar. Lo que no concreta es cómo se aplica el límite
+                del {LIMITE_PORC} de la renta (art. 137) cuando dos titulares comparten el mismo
+                alquiler, así que pregúntalo en la convocatoria de tu comunidad autónoma antes de
+                contar con dos ayudas completas.
+              </p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🏙️</span>
@@ -671,26 +779,67 @@ export default function SimuladorBonoJovenAlquilerPage() {
               <p>Sí, en la mayoría de las CCAA puedes solicitar el Bono Joven aunque el contrato ya esté vigente. La ayuda suele ser retroactiva desde la fecha de solicitud.</p>
             </div>
             <div className={styles.faqItem}>
-              <h3>¿Qué pasa si cumplo 36 años mientras cobro el bono?</h3>
-              <p>El RD 326/2026 exige la edad para <strong>acceder</strong> a la ayuda (art. 133.1.b: menos de {BONO_ALQUILER_JOVEN_2026.edad.maxima} años, incluida esa edad), pero no dice qué ocurre si se cumplen {BONO_ALQUILER_JOVEN_2026.edad.maxima + 1} durante el cobro: esa es una cuestión que resuelve la convocatoria de cada comunidad autónoma, y por eso aquí no se afirma ninguna regla general. Pregúntalo en tu CA antes de contar con la prórroga, porque la renovación tras los {BONO_ALQUILER_JOVEN_2026.plazo.inicialMeses / 12} primeros años puede requerir una nueva evaluación de los requisitos.</p>
+              {/* El título sale de `edad.maxima` como su respuesta (hallazgo 2394) */}
+              <h3>¿Qué pasa si cumplo {EDAD_MAX + 1} años mientras cobro el bono?</h3>
+              {/*
+                28/09/2026 — la respuesta decía que el RD «no dice qué ocurre» si se supera la edad
+                máxima durante el cobro, y el art. 133.1.b fija la edad «en el momento de solicitar
+                la ayuda». Lo que de verdad queda abierto es la prórroga del art. 134.
+              */}
+              <p>El art. 133.1.b del RD 326/2026 exige tener {EDAD_MAX} años o menos, incluida esa edad, <strong>en el momento de solicitar la ayuda</strong>: la edad se comprueba al pedirla, así que cumplir {EDAD_MAX + 1} durante los {BONO_ALQUILER_JOVEN_2026.plazo.inicialMeses / 12} años concedidos no te hace incumplir ese requisito. El RD no dice qué ocurre con la edad al prorrogar la ayuda: el art. 134 condiciona la prórroga al acuerdo de tu comunidad autónoma y a que se sigan cumpliendo los requisitos, así que pregúntalo en tu CA antes de contar con ella.</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Es compatible el bono con otras ayudas?</h3>
               <p>
                 Con otras ayudas al pago del alquiler, <strong>no</strong>: el art. 136 del RD 326/2026 declara esta
                 ayuda incompatible con cualquier otra destinada al pago del alquiler o de la cesión de uso de la misma
-                vivienda o habitación, venga de donde venga. No es algo que decida cada comunidad. Lo que sí es otra
-                cosa es la deducción autonómica del IRPF por alquiler de vivienda habitual, que no es una ayuda al
+                vivienda o habitación, venga de donde venga. No es algo que decida cada comunidad. La única excepción
+                la fija el propio artículo: las ayudas para esa misma finalidad que se den a víctimas de violencia de
+                género, de trata o de violencia sexual, a familias monoparentales o monomarentales, a personas
+                desahuciadas, sin hogar o en emergencia habitacional y a otras especialmente vulnerables. Lo que sí es
+                otra cosa es la deducción autonómica del IRPF por alquiler de vivienda habitual, que no es una ayuda al
                 pago sino un beneficio fiscal, y se rige por la normativa de cada región.
               </p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué ocurre si cambio de piso durante el periodo de cobro?</h3>
-              <p>Generalmente debes comunicarlo a la CA. Según los casos, la ayuda puede mantenerse si el nuevo piso también cumple los requisitos, o es necesario iniciar una nueva solicitud.</p>
+              {/*
+                ⚠️ 28/09/2026 (hallazgo 2395) — decía «Generalmente debes comunicarlo a la CA.
+                Según los casos, la ayuda puede mantenerse…», y el art. 133.3 lo fija: plazo de
+                quince días desde la firma del nuevo contrato y continuidad entre contratos. Sin
+                esas dos condiciones, quien avisa tarde o deja un hueco no sabe que se juega la ayuda.
+              */}
+              <p>
+                Si te mudas dentro de la misma comunidad autónoma con un nuevo contrato, el art. 133.3 del
+                RD 326/2026 te obliga a comunicarlo al órgano que te concedió la ayuda en el plazo máximo
+                de {CAMBIO_DOMICILIO.diasParaComunicar} días desde la firma del nuevo contrato. Conservas la
+                ayuda si el nuevo alquiler cumple todos los requisitos y el nuevo contrato se firma
+                {CAMBIO_DOMICILIO.exigeContinuidadEntreContratos ? ' sin interrupción temporal con el anterior' : ''};
+                la cuantía se ajusta a la nueva renta
+                {CAMBIO_DOMICILIO.cuantiaPuedeSubir ? '' : ' y nunca puede superar la que venías cobrando'}.
+                El artículo no regula la mudanza a otra comunidad autónoma: pregúntalo antes de mudarte.
+              </p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿El propietario del piso debe cumplir algún requisito?</h3>
-              <p>El RD 326/2026 no fija a nivel estatal ninguna condición sobre el propietario: solo exige que el contrato de arrendamiento esté formalizado por escrito y con la fianza depositada (art. 133.1.e). Cada Comunidad Autónoma puede añadir condiciones adicionales en su convocatoria — comprueba si la tuya restringe el parentesco entre propietario e inquilino.</p>
+              {/*
+                ⚠️ 28/09/2026 (hallazgo 2389) — decía que el RD «no fija a nivel estatal ninguna
+                condición sobre el propietario» y le atribuía el contrato al art. 133.1.e. Lo
+                escribió la reparación del hallazgo 537 (30/08), juzgada contra este módulo —que
+                entonces no recogía el art. 133.2— y no contra el BOE: el art. 133.2.b excluye el
+                parentesco hasta el segundo grado con el arrendador para toda España, y el contrato
+                es el art. 133.1.a (el 133.1.e es el tope de renta).
+              */}
+              <p>
+                Sí, en su relación contigo: el art. 133.2.b del RD 326/2026 impide conceder la ayuda si
+                tienes parentesco hasta el {EXCLUSIONES.parentescoArrendadorHastaGrado}.º grado, por
+                consanguinidad o por afinidad, con quien te alquila o te cede la vivienda, y el
+                art. 133.2.c si eres socio o partícipe de la persona o la empresa arrendadora (salvo
+                cooperativas sin ánimo de lucro en régimen de cesión de uso). El contrato, además, debe
+                cumplir el art. 133.1.a: para una vivienda completa, formalizado conforme a la Ley 29/1994,
+                de Arrendamientos Urbanos; para una habitación el RD no exige esa forma. Tu comunidad
+                autónoma puede añadir requisitos en su convocatoria (art. 8.1).
+              </p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Cuánto tarda en resolverse la solicitud?</h3>
@@ -761,12 +910,14 @@ export default function SimuladorBonoJovenAlquilerPage() {
           <h2><span aria-hidden="true">⚠️</span> Advertencias importantes</h2>
           <div className={styles.warningGrid}>
             {[
-              { titulo: 'Los fondos son limitados y se agotan', desc: 'El Estado transfiere fondos a las CCAA, pero estos son finitos. Cada año puede haber convocatorias distintas o sin fondos disponibles.' },
+              // «Cada año puede haber convocatorias distintas» chocaba con el art. 138, igual que el
+              // paso 1 del proceso de solicitud (hallazgo 2396)
+              { titulo: 'Los fondos son limitados y se agotan', desc: 'El Estado transfiere fondos a las CCAA, pero estos son finitos: aunque el art. 138 obliga a mantener la convocatoria abierta de forma continuada y permanente, puede haber momentos sin fondos disponibles.' },
               // El límite de renta y el plazo los fija el Estado, no la CA: decir lo contrario
               // contradecía al aviso de renta y al consejo «Consulta el límite de renta de tu
               // CA» de esta misma página, que citan el art. 135, y empujaba a quien queda fuera
               // por el art. 133.1.e a esperar otro tope en su comunidad (hallazgo 643).
-              { titulo: 'Tu CA concreta la convocatoria, no los límites estatales', desc: `El límite de renta del contrato (${eur(RENTA_MAX.vivienda)}/mes en vivienda y ${eur(RENTA_MAX.habitacion)}/mes en habitación, art. 133.1.e) y el plazo de la ayuda (${BONO_ALQUILER_JOVEN_2026.plazo.inicialMeses / 12} años prorrogables otros ${BONO_ALQUILER_JOVEN_2026.plazo.prorrogaMaximaMeses / 12}, art. 134) los fija el Real Decreto para toda España: tu Comunidad Autónoma solo puede elevar la renta máxima con acuerdo previo del Ministerio (art. 135). Lo que sí concreta cada CA es su convocatoria: cuándo abre el plazo de presentación, qué documentación exige y cómo se acreditan los requisitos. Consúltala antes de solicitar.` },
+              { titulo: 'Tu CA concreta la convocatoria, no los límites estatales', desc: `El límite de renta del contrato (${eur(RENTA_MAX.vivienda)}/mes en vivienda y ${eur(RENTA_MAX.habitacion)}/mes en habitación, art. 133.1.e) y el plazo de la ayuda (${BONO_ALQUILER_JOVEN_2026.plazo.inicialMeses / 12} años prorrogables otros ${BONO_ALQUILER_JOVEN_2026.plazo.prorrogaMaximaMeses / 12}, art. 134) los fija el Real Decreto para toda España: tu Comunidad Autónoma solo puede elevar la renta máxima con acuerdo previo del Ministerio (art. 135). Lo que sí concreta cada CA es su convocatoria —que el art. 138 le obliga a mantener abierta de forma continuada y permanente—: cuándo la abre, qué documentación exige y cómo se acreditan los requisitos. Consúltala antes de solicitar.` },
               { titulo: 'El fraude puede conllevar devolución + sanción', desc: 'Si se detecta que no cumplías los requisitos, deberás devolver todo lo cobrado más posibles sanciones. Declara siempre tu situación real.' },
               { titulo: 'La retroactividad no está garantizada en todas las CCAA', desc: 'Algunas CCAA pagan desde la fecha de solicitud, no desde el inicio del contrato. Solicita cuanto antes para no perder mensualidades.' },
             ].map(w => (

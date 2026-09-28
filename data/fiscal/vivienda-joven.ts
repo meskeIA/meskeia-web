@@ -26,9 +26,15 @@
  * estas cifras como la resolución de un caso concreto.
  */
 
+/*
+ * Re-verificado el 28/09/2026 contra el texto consolidado del BOE (arts. 8, 132-139 y 140-145):
+ * todas las cifras de los tres objetos coinciden, y se añaden a BONO_ALQUILER_JOVEN_2026 el
+ * contrato (art. 133.1.a), las exclusiones del art. 133.2, el cambio de domicilio del art. 133.3
+ * y las convocatorias permanentes del art. 138 (hallazgos 2388-2397 del Inspector).
+ */
 export const FISCAL_VIVIENDA_JOVEN_META = {
   fuente: 'Real Decreto 326/2026, de 22 de abril, por el que se regula el Plan Estatal de Vivienda 2026-2030 (BOE-A-2026-8872) — Capítulo IV, secciones 3.ª y 4.ª',
-  verificado: '2026-08-23',
+  verificado: '2026-09-28',
   vigencia: '2026-2030',
   urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-8872',
   nota: 'Sustituye al Bono Alquiler Joven del RD 42/2022 (Plan 2022-2025). Las comunidades autónomas concretan cada convocatoria y pueden elevar la renta máxima con acuerdo previo del Ministerio (art. 135).',
@@ -74,9 +80,63 @@ export const BONO_ALQUILER_JOVEN_2026 = {
   /** Edad de la persona beneficiaria (art. 133.1.b + «personas físicas mayores de edad») */
   edad: {
     minima: 18,
-    /** «Tener menos de treinta y cinco años, incluida la edad de treinta y cinco años» */
+    /**
+     * «Tener menos de treinta y cinco años, incluida la edad de treinta y cinco años, en el
+     * momento de solicitar la ayuda»: la edad se mide al SOLICITAR, no durante el cobro.
+     */
     maxima: 35,
     maximaInclusive: true,
+  },
+  /**
+   * Contrato (art. 133.1.a). Hay que ser titular —o estar en condiciones de firmar— un contrato
+   * de alquiler o de cesión de uso de vivienda o de habitación.
+   *
+   * ⚠️ Ninguna letra del art. 133 menciona la fianza, y el contrato NO es el art. 133.1.e, que es
+   * solo el tope de renta (`rentaMaximaMensual`). La app lo atribuyó a la letra e) hasta el
+   * 28/09/2026 (hallazgo 2390 del Inspector) y por eso exigía una fianza depositada que el RD no
+   * pide; el depósito de la fianza o el registro del contrato los puede pedir la comunidad
+   * autónoma como requisito adicional (art. 8.1), no el RD.
+   */
+  contrato: {
+    /** La vivienda completa, «formalizado en los términos de la Ley 29/1994» (LAU) */
+    viviendaEnTerminosLAU: true,
+    /** «Si se trata de alquiler de habitación no es exigible que la formalización sea en los términos de la Ley 29/1994» */
+    habitacionEnTerminosLAU: false,
+    /** Quien aún no lo tiene firmado debe firmarlo en este plazo desde la notificación de la concesión */
+    mesesParaFirmarTrasConcesion: 2,
+  },
+  /**
+   * Situaciones en que «no podrá concederse la ayuda» (art. 133.2). Son exclusiones, no
+   * preferencias: cualquiera de ellas impide la concesión.
+   */
+  exclusiones: {
+    /**
+     * a) Ser propietaria o usufructuaria de alguna vivienda en España, SALVO que se acredite
+     * que no se puede disponer de ella por separación o divorcio, que no se puede habitar por
+     * otra causa ajena a la voluntad, o que resulta inaccesible por una discapacidad con un
+     * grado reconocido igual o superior a `discapacidadMinimaInaccesible`.
+     */
+    propiedad: {
+      excepciones: ['separacion-divorcio', 'causa-ajena-a-la-voluntad', 'inaccesible-por-discapacidad'],
+      discapacidadMinimaInaccesible: 33,
+    },
+    /** b) Parentesco con la persona arrendadora o cedente, por consanguinidad o afinidad, hasta este grado */
+    parentescoArrendadorHastaGrado: 2,
+    /**
+     * c) Ser socio o partícipe de la persona física o jurídica arrendadora o cedente, salvo
+     * cooperativas sin ánimo de lucro en régimen de cesión de uso.
+     */
+    socioArrendador: true,
+  },
+  /**
+   * Cambio de domicilio dentro de la MISMA comunidad autónoma durante el cobro (art. 133.3).
+   * Se conserva la ayuda si el nuevo contrato cumple todos los requisitos y se firma sin
+   * interrupción temporal con el anterior; la cuantía se ajusta al nuevo alquiler y nunca sube.
+   */
+  cambioDomicilio: {
+    diasParaComunicar: 15,
+    exigeContinuidadEntreContratos: true,
+    cuantiaPuedeSubir: false,
   },
   /** Plazo de la ayuda en meses (art. 134): dos años, prorrogables por otros dos como máximo */
   plazo: {
@@ -87,6 +147,8 @@ export const BONO_ALQUILER_JOVEN_2026 = {
   },
   /** Incompatible con cualquier otra ayuda al pago del alquiler o la cesión (art. 136) */
   compatibleConOtrasAyudasAlquiler: false,
+  /** Las comunidades autónomas convocan la ayuda de forma «continuada y permanente» (art. 138) */
+  convocatoriaAbiertaPermanente: true,
 } as const;
 
 /**

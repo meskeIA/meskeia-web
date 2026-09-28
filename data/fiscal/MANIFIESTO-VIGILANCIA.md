@@ -493,7 +493,9 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 #### `vivienda-joven.ts` — Ayudas jóvenes del Plan Estatal de Vivienda 2026-2030
 
 - **Contiene**: `BONO_ALQUILER_JOVEN_2026` (cuantías 300/200 €/mes, límite del 60 % de la renta,
-  rentas máximas 1.000/600 y 500/250 en municipios pequeños, edad 18-35 inclusive, plazo 2+2 años) y
+  rentas máximas 1.000/600 y 500/250 en municipios pequeños, edad 18-35 inclusive, plazo 2+2 años,
+  contrato del art. 133.1.a, exclusiones del art. 133.2 con las excepciones de la letra a, cambio de
+  domicilio del art. 133.3 y convocatoria permanente del art. 138) y
   `AYUDA_COMPRA_JOVEN_RURAL_2026` (15.000 € o el 20 % del coste, municipios ≤10.000 hab), más el
   umbral de ingresos en veces el IPREM (5 · 5,5 · 6).
 - **Normativa**: **RD 326/2026, de 22 de abril** (BOE-A-2026-8872), Capítulo IV, secciones 3.ª
@@ -513,7 +515,10 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
   en `simulador-bono-joven-alquiler`, y al verificarlos contra el BOE resultó que **los límites de
   renta en producción eran los del RD 42/2022**, derogado. Sin punto único, el Vigía Normativo no
   tenía nada que vigilar.
-- **Verificado**: 2026-08-23 · artículo por artículo contra el texto del BOE.
+- **Verificado**: 2026-09-28 · artículo por artículo contra el texto consolidado del BOE (arts. 8,
+  132-139 y 140-145), al reparar los hallazgos 2388-2397 del Inspector. El contrato NO es el art.
+  133.1.e (solo el tope de renta): es el 133.1.a, que dispensa la habitación de la forma de la LAU y
+  no menciona la fianza.
 
 ---
 
