@@ -1,5 +1,14 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidratacion';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  resolverCaso,
+  comprobarRespuesta,
+  toleranciaDe,
+  generarEjercicioAleatorio,
+} from '../../app/simulador-mas-resorte/casos';
+import { describirOscilador } from '../../app/simulador-mas-resorte/motor';
 
 /**
  * Simulador Masa-Resorte (MAS) — inspección del 20/09/2026
@@ -1008,5 +1017,189 @@ test.describe('Caso 8 — hallazgos de la reinspección (25/09/2026), reparados 
         return ((m ? Number(m[1]) : 0) * lienzo.clientWidth) / 500;
       });
     await expect.poll(tamVisible, { timeout: 10000 }).toBeGreaterThanOrEqual(11);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * simulador-mas-resorte · casos para clase (tarea de tipo A, 28/09/2026)
+ *
+ * Doce problemas de MAS de secundaria (ω₀, T, f, k y m despejadas, energía, v y a máximas,
+ * E_k y v en una posición) y dos con amortiguamiento (γ_c y período amortiguado). Los casos
+ * calculan con `describirOscilador`, `calcularEstado` y `energiaInicial` del `motor.ts` que ya
+ * existía y que NO se tocó: la corrección y las tarjetas del panel salen de la misma función.
+ *
+ * CONVENIO DE ESTA APP: x(0) = A, v(0) = 0 · ω₀ = √(k/m) · T = 2π/ω_d · γ en N·s/m, así que
+ * γ_c = 2√(k·m) · sin gravedad (la línea de equilibrio es el reposo).
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO (a mano, sin mirar la app):
+ *   1 · ω₀ = √(50/2)                                     = 5 rad/s
+ *   2 · T = 2π/√36 = 2π/6 = 1,04720                      → 1,05 s
+ *   3 · f = √(40.000/400)/2π = 10/2π = 1,59155           → 1,59 Hz
+ *   4 · T = 5/10 = 0,5 s → k = 2·(2π/0,5)² = 315,827     → 316 N/m
+ *   5 · m = 40/(2π·1)² = 40/39,478 = 1,01321             → 1,01 kg
+ *   6 · E = ½·50·0,2²                                    = 1 J
+ *   7 · v_max = A·ω₀ = 0,2·√(5000/50) = 0,2·10           = 2 m/s
+ *   8 · a_max = k·A/m = 80·0,25/2                        = 10 m/s²
+ *   9 · E_k = ½·k·(A² − x²) = ½·40·(0,25 − 0,09)         = 3,2 J
+ *  10 · v = ω₀·√(A² − x²) = 10·√(0,25 − 0,09) = 10·0,4   = 4 m/s
+ *  11 · γ_c = 2√(100·25) = 2·50                          = 100 N·s/m
+ *  12 · β = 2/2 = 1, ω_d = √(10 − 1) = 3, T = 2π/3 = 2,0944 → 2,09 s
+ *       (con ω₀ en vez de ω_d daría 2π/√10 = 1,99 s: el error que la app enseña a evitar)
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+const A_MANO_CASOS: Readonly<Record<number, number>> = {
+  1: 5,
+  2: 1.05,
+  3: 1.59,
+  4: 316,
+  5: 1.01,
+  6: 1,
+  7: 2,
+  8: 10,
+  9: 3.2,
+  10: 4,
+  11: 100,
+  12: 2.09,
+};
+
+/** Cuántos decimales lleva el número que se ENSEÑA en la solución («1,05 s» → 2). */
+function decimalesMostrados(texto: string): number {
+  const m = texto.match(/[-−]?\d[\d.]*(?:,(\d+))?/);
+  return m?.[1]?.length ?? 0;
+}
+
+const redondeo = (v: number, d: number) => Math.round(v * 10 ** d) / 10 ** d;
+
+test.describe('simulador-mas-resorte · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    for (const caso of CASOS) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(redondeo(r.valor, caso.datos.decimales ?? 2), `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta finita y desarrollo', async () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+    }
+    expect(new Set(CASOS.map((c) => c.categoria))).toEqual(new Set(['abstracto', 'aplicado']));
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Ecuador|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos?|Bachillerato|selectividad)\b/i;
+    // La sigla va aparte y con mayúsculas: con /i, el pronombre «eso» la disparaba en falso.
+    const SIGLA_ESO = /\bESO\b/;
+    for (const caso of CASOS) {
+      const texto = `${caso.titulo} ${caso.enunciado}`;
+      expect(PROHIBIDO.test(texto) || SIGLA_ESO.test(texto), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · lo que el enunciado PIDE coincide con lo que la solución MUESTRA', async () => {
+    for (const caso of CASOS) {
+      const decimales = caso.datos.decimales ?? 2;
+      expect(decimalesMostrados(caso.respuestaTexto), `caso ${caso.id}`).toBeLessThanOrEqual(decimales);
+      const ultimo = caso.pasos[caso.pasos.length - 1];
+      expect(ultimo, `caso ${caso.id}: el último paso enseña la cifra de la casilla`).toContain(caso.respuestaTexto);
+      const exacto = Math.abs(resolverCaso(caso.datos).valor - caso.respuesta) < 1e-9;
+      expect(caso.requiereRedondeo, `caso ${caso.id}`).toBe(!exacto);
+      if (!exacto) {
+        expect(caso.enunciado, `caso ${caso.id}: se redondea y el enunciado no lo pide`).toMatch(/redonde|decimal|unidades|décima/i);
+      }
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(muestras.map((m) => m.datos.magnitud)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.respuesta)).toBe(true);
+      expect(redondeo(resolverCaso(m.datos).valor, m.datos.decimales ?? 2)).toBe(m.respuesta);
+    }
+  });
+
+  test('7 · el convenio queda fijado: ω₀ = √(k/m), T = 2π/ω_d, γ_c = 2√(k·m)', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera.
+    for (const caso of CASOS) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO_CASOS[caso.id]);
+    }
+
+    // (b) El motor que se importa sigue siendo el del acta: m = 1, k = 10 → T = 1,986918 s.
+    const libre = describirOscilador(10, 1, 0);
+    expect(libre.regimen).toBe('libre');
+    expect(libre.periodo!).toBeCloseTo(1.986918, 5);
+    expect(describirOscilador(100, 25, 100).regimen).toBe('critico');
+
+    // (c) Lo que hace un alumno con la calculadora del libro entra: π ≈ 3,14.
+    expect(comprobarRespuesta((2 * 3.14) / 6, 1.05).correcto).toBe(true);
+    expect(comprobarRespuesta(2 * (2 * 3.14 / 0.5) ** 2, 316).correcto).toBe(true);
+
+    // (d) El error del tema NO entra: oscilar a ω₀ con amortiguamiento (caso 12 → 1,99 s).
+    expect(comprobarRespuesta((2 * Math.PI) / Math.sqrt(10), 2.09).correcto).toBe(false);
+  });
+
+  test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
+    expect(comprobarRespuesta(100, 100).correcto).toBe(true);
+    expect(comprobarRespuesta(NaN, 1.05).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 1.05).motivo).not.toMatch(/NaN/);
+    expect(toleranciaDe(0)).toBe(0.01);
+    expect(toleranciaDe(316)).toBeCloseTo(3.16, 10);
+    // Borde exacto de la tolerancia, por los dos lados (hallazgo 1211 del 22/09/2026).
+    expect(comprobarRespuesta(1.06, 1.05).correcto).toBe(true);
+    expect(comprobarRespuesta(1.04, 1.05).correcto).toBe(true);
+  });
+});
+
+test.describe('simulador-mas-resorte · la sección de casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('#casos-aula');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/simulador-mas-resorte/');
+    await esperarHidratacion(page, ['#casos-respuesta', ...SLIDERS]);
+  });
+
+  test('el caso 2 se corrige con la cifra de la solución', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 2:/ }).click();
+    await seccion(page).locator('#casos-respuesta').fill('1,05');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto!');
+  });
+
+  test('usar ω₀ en el caso 12 se rechaza y la solución enseña 2,09 s', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 12:/ }).click();
+    await seccion(page).locator('#casos-respuesta').fill('1,99');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('No es correcto');
+    const solucion = seccion(page).getByRole('button', { name: /Ver solución/ });
+    await expect(solucion).toHaveAttribute('aria-expanded', 'false');
+    await solucion.click();
+    await expect(seccion(page).locator('#casos-resultado')).toContainText('2,09 s');
   });
 });

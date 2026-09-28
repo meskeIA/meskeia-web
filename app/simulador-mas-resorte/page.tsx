@@ -20,6 +20,7 @@ import {
   marcasDeTiempo,
   type Regimen,
 } from './motor';
+import CasosAula from './CasosAula';
 
 
 // ─── Constantes de renderizado ───────────────────────────────────────────────
@@ -688,6 +689,10 @@ export default function SimuladorMasResortePage() {
             <span aria-hidden="true">↺</span> Reiniciar
           </button>
         </div>
+
+        {/* Tarea de aula (skill /casos-aula-meskeia): tras los controles y FUERA de
+            EducationalSection, que nace colapsada. */}
+        <CasosAula />
 
         {/* ── Sección educativa v2.0 ───────────────────────────────────── */}
         <EducationalSection
