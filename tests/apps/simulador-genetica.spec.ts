@@ -53,8 +53,8 @@ import { test, expect, Page } from '@playwright/test';
  *
  * CONVENIO: un hallazgo ABIERTO se escribe con `test.fail()` — afirma lo que debería pasar y
  * falla a propósito; al repararlo se le quita la marca y queda como regresión. A 28/09/2026
- * los de las inspecciones del 20/08, 14/09, 22/09, 24/09 y 25/09 están REPARADOS y sin marca;
- * los abiertos del 28/09/2026 van en el último bloque del fichero.
+ * los de las inspecciones del 20/08, 14/09, 22/09, 24/09, 25/09 y 28/09 están REPARADOS y sin
+ * marca; los del 28/09/2026 (2377-2379) van en el último bloque del fichero.
  */
 
 const RUTA = '/simulador-genetica/';
@@ -2584,16 +2584,24 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     // BV, Bv, bV y bv, la madre solo da bv → un hijo de cada una de las cuatro clases.
     // En el motor, AaRr × AaRr: la primera fila del cuadro serían cuatro amarillos lisos; los
     // hijos de ejemplo son uno de cada clase del 9:3:3:1.
+    // ⚠️ 28/09/2026 (hallazgo 2377) — hasta hoy este testigo fijaba AA RR, AA rr, aa RR y aa rr:
+    // una clase de cada, sí, pero SIN UN SOLO HETEROCIGOTO en un cruce Aa × Aa, Rr × Rr, donde
+    // son la mitad de los hijos de cada rasgo y justo lo que marca el símbolo de portador del
+    // árbol. Consagraba la misma elección que en ABO × Rh escondía los grupos A y O. Ahora,
+    // además de las cuatro clases, salen los tres genotipos de cada rasgo (AA, Aa, aa · RR, Rr,
+    // rr); a mano, con las casillas en el orden del cuadro (filas AR, Ar, aR, ar de la madre),
+    // la primera elección que lo cumple es AA RR (casilla 0), Aa rr (7), aa Rr (11), aa rr (15).
     const [semilla, forma] = [GUISANTES.traits[0], GUISANTES.traits[1]];
     const f2 = generateDihybridPedigree(['Aa', 'Rr'], ['Aa', 'Rr'], semilla, forma, 4);
     expect(f2.individuals.map((i) => `${i.genotype}: ${i.phenotype}`)).toEqual([
       'Aa Rr: Amarillo / Lisa',
       'Aa Rr: Amarillo / Lisa',
       'AA RR: Amarillo / Lisa',
-      'AA rr: Amarillo / Rugosa',
-      'aa RR: Verde / Lisa',
+      'Aa rr: Amarillo / Rugosa',
+      'aa Rr: Verde / Lisa',
       'aa rr: Verde / Rugosa',
     ]);
+    expect(f2.ejemplos).toEqual({ combinacionesDelCruce: 4, combinacionesMostradas: 4, todosLosGenotipos: true });
     await abreCrucePruebaDrosophila(page);
     await pestana(page, 'Pedigree').click();
     await expect(page.locator('[class*="pedigreeIndividual"]')).toHaveCount(6);
@@ -2852,6 +2860,10 @@ test.describe('Re-inspección 25/09/2026 · móvil 375 × 812', () => {
  *      Árbol: la madre da Ar y ar (dos filas cada uno). Primera casilla de cada fenotipo, en el
  *        orden del cuadro: (Ar·AR) AA Rr, (Ar·Ar) AA rr, (ar·aR) aa Rr, (ar·ar) aa rr. El símbolo
  *        sigue al color: padres Aa portadores, AA sin marca, aa afectados.
+ *        ⚠️ Corregido el 28/09/2026 (hallazgo 2377): esa elección no enseñaba ningún Aa en un
+ *        Aa × Aa. Los hijos cubren ahora los tres genotipos del color y las cuatro clases:
+ *        AA Rr (casilla 0), Aa rr (3), aa Rr (10), aa rr (11) → sin marca, portador, afectado,
+ *        afectado.
  *      χ² forzado, N = 80 → esperados 30 · 30 · 10 · 10 (todos ≥ 5). Observados 36 · 24 · 12 · 8:
  *        χ² = 36/30 + 36/30 + 4/10 + 4/10 = 3,200 · gl = 3 · crítico 7,815.
  *        p = Q(1,5; 1,6) = erfc(√1,6) + (2/√π)·√1,6·e^(−1,6) = 0,0736 + 0,2882 = 0,362
@@ -2881,7 +2893,7 @@ test.describe('Re-inspección 25/09/2026 · móvil 375 × 812', () => {
  *      columnas de ≥ 60 px) no cabe en 246 px útiles, así que debe desplazarse DENTRO de su caja;
  *      árbol dihíbrido sin salirse ni solapar rótulos; panel de población con el aviso largo.
  *
- * HALLAZGOS ABIERTOS del 28/09/2026: al final, con `test.fail()`.
+ * HALLAZGOS del 28/09/2026 (2377-2379): al final. Eran `test.fail()`; REPARADOS el mismo día.
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
 /** El símbolo de cada individuo del árbol, en el orden del DOM (padres y luego hijos). */
@@ -2941,13 +2953,14 @@ test.describe('Inspector 28/09/2026 — re-inspección de las reparaciones del 2
       'Verde / Rugosa 12,50\u00a0%',
     ]);
 
-    // Árbol: los dos rasgos (hallazgo 1694) y el símbolo del color.
+    // Árbol: los dos rasgos (hallazgo 1694) y el símbolo del color. Hasta el 28/09/2026 el
+    // segundo hijo era AA rr y ninguno era Aa, la mitad de un Aa × Aa (hallazgo 2377).
     await pestana(page, 'Pedigree').click();
     await expect(page.locator('[class*="pedigreeGenotype"]')).toHaveText([
       'Aa Rr',
       'Aa rr',
       'AA Rr',
-      'AA rr',
+      'Aa rr',
       'aa Rr',
       'aa rr',
     ]);
@@ -2959,7 +2972,10 @@ test.describe('Inspector 28/09/2026 — re-inspección de las reparaciones del 2
       'Verde / Lisa',
       'Verde / Rugosa',
     ]);
-    expect(await simbolosDelArbol(page)).toEqual(['portador', 'portador', '-', '-', 'afectado', 'afectado']);
+    expect(await simbolosDelArbol(page)).toEqual(['portador', 'portador', '-', 'portador', 'afectado', 'afectado']);
+    await expect(page.locator('[class*="pedigreeRasgo"]')).toContainText(
+      'están todos los genotipos de cada rasgo y las 4 combinaciones de fenotipos del cruce',
+    );
 
     // Población forzada: casillas 0 (A/L), 1 (A/R), 10 (V/L) y 11 (V/R) del cuadro, 1/16 cada una.
     await pestana(page, 'Población').click();
@@ -3092,7 +3108,10 @@ test.describe('Inspector 28/09/2026 — re-inspección de las reparaciones del 2
       await page.keyboard.press('Delete');
       if (texto) await page.keyboard.type(texto);
     };
-    for (const texto of ['9', '501', '0']) {
+    // «-5» es un entero: lo que falla es el rango. Hasta el 28/09/2026 el aviso le pedía «un
+    // número entero», que es justo lo que se había escrito, y este testigo aceptaba los dos
+    // avisos con una regex; ahora cada entrada tiene el suyo.
+    for (const texto of ['9', '501', '0', '-5']) {
       await teclear(texto);
       await expect(campo).toHaveValue(texto);
       await expect(aviso).toHaveText('El tamaño de la población debe estar entre 10 y 500 individuos.');
@@ -3100,9 +3119,9 @@ test.describe('Inspector 28/09/2026 — re-inspección de las reparaciones del 2
       await expect(campo).toHaveAttribute('aria-invalid', 'true');
       await expect(simular).toBeDisabled();
     }
-    for (const texto of ['-5', '1e2', '12.5']) {
+    for (const texto of ['1e2', '12.5']) {
       await teclear(texto);
-      await expect(aviso).toHaveText(/número entero|entre 10 y 500/);
+      await expect(aviso).toHaveText('El tamaño de la población es un número entero de individuos.');
       await expect(campo).toHaveAttribute('aria-invalid', 'true');
       await expect(simular).toBeDisabled();
     }
@@ -3212,17 +3231,18 @@ for (const ancho of [390, 360]) {
   });
 }
 
-/* HALLAZGOS ABIERTOS del 28/09/2026. Afirman lo que DEBERÍA pasar y hoy fallan a propósito;
- * cuando se reparen, quitar el `test.fail()` y quedan como regresión. */
-test.describe('Inspector 28/09/2026 — hallazgos abiertos', () => {
+/* HALLAZGOS del 28/09/2026 (2377, 2378, 2379) — REPARADOS el 28/09/2026. Eran `test.fail()`;
+ * se les quitó la marca y quedan como regresión, ampliados con lo que la reparación decidió. */
+import { ORGANISMS } from '../../app/simulador-genetica/components/genetics';
+
+test.describe('Inspector 28/09/2026 — hallazgos reparados', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
   });
 
   test('árbol dihíbrido con el ABO: los hijos de ejemplo no esconden los grupos A y O', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): defecto nuevo de la reparación del 1694
+    // HALLAZGO 2377 (inspector 28/09/2026): defecto nuevo de la reparación del 1694
     // (62956eac). `elegirCasillasDeEjemplo` (pedigree.ts) toma la PRIMERA casilla de cada
     // fenotipo en el orden del cuadro y se para en cuatro. Con 8 fenotipos (ABO × Rh) las cuatro
     // primeras salen de las dos primeras filas, las del gameto materno Iᴮ: Iᴬi Dd × Iᴮi Dd da
@@ -3230,6 +3250,12 @@ test.describe('Inspector 28/09/2026 — hallazgos abiertos', () => {
     // monohíbrido del mismo ABO enseña los cuatro y el rótulo dice «uno por combinación». Con el
     // Rh como rasgo 1 (el que manda en el símbolo) los cuatro hijos salen DD: ni portador ni Rh−.
     // A mano: Iᴬi × Iᴮi → A, B, AB, O a 1/4 cada uno; Dd × Dd → Rh− 1/4.
+    // REPARADO (28/09/2026): los hijos se eligen entre todas las cuaternas de genotipos
+    // distintos del cuadro, cubriendo primero el rasgo 1 (fenotipos y genotipos), luego el 2 y
+    // luego las combinaciones; a igualdad, la que antes aparece en el cuadro.
+    //   ABO × Rh, a mano (columnas = gametos del padre IᴬD, Iᴬd, iD, id; filas = de la madre
+    //   IᴮD, Iᴮd, iD, id): la primera cuaterna que da los cuatro grupos Y los tres genotipos
+    //   del Rh es IᴬIᴮ DD (casilla 0), Iᴮi DD (2), Iᴬi Dd (9), ii dd (15).
     await page.getByRole('button', { name: /Humanos/ }).click();
     await selectorRasgo(page, 0).selectOption('grupo-abo');
     await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
@@ -3242,47 +3268,166 @@ test.describe('Inspector 28/09/2026 — hallazgos abiertos', () => {
     const grupos = new Set(hijos.map((f) => f.split(' / ')[0].trim()));
     // El símbolo sigue al ABO: sus cuatro grupos, uno por hijo.
     expect([...grupos].sort()).toEqual(['Grupo A', 'Grupo AB', 'Grupo B', 'Grupo O']);
+    await expect(page.locator('[class*="pedigreeGenotype"]')).toHaveText([
+      'Iᴬi Dd',
+      'Iᴮi Dd',
+      'IᴬIᴮ DD',
+      'Iᴮi DD',
+      'Iᴬi Dd',
+      'ii dd',
+    ]);
+    await expect(page.locator('[class*="pedigreePhenotype"]')).toHaveText([
+      'Grupo A / Rh positivo',
+      'Grupo B / Rh positivo',
+      'Grupo AB / Rh positivo',
+      'Grupo B / Rh positivo',
+      'Grupo A / Rh positivo',
+      'Grupo O / Rh negativo',
+    ]);
+    // Símbolo del ABO: portador de i los Iᴬi e Iᴮi; ni el AB ni el O son afectados.
+    expect(await simbolosDelArbol(page)).toEqual(['portador', 'portador', '-', 'portador', 'portador', '-']);
+    // El rótulo ya no promete «uno por combinación»: dice cuántas de las 8 enseña.
+    const rotulo = page.locator('[class*="pedigreeRasgo"]');
+    await expect(rotulo).toContainText(
+      'están todos los genotipos de cada rasgo y 4 de las 8 combinaciones de fenotipos del cruce',
+    );
+    await expect(rotulo).not.toContainText('uno por combinación');
+
+    // Con el Rh como rasgo 1 (Dd Iᴬi × Dd Iᴮi), en pantalla: el símbolo sigue al Rh, así que
+    // tiene que salir el portador (Dd) y el Rh negativo (dd). A mano (columnas DIᴬ, Di, dIᴬ, di;
+    // filas DIᴮ, Di, dIᴮ, di): DD IᴬIᴮ (0), DD Iᴮi (1), Dd Iᴬi (6), dd ii (15).
+    await selectorRasgo(page, 0).selectOption('factor-rh');
+    await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+    await selectorRasgo(page, 1).selectOption('grupo-abo');
+    await expect(selectorGenotipo(page, 0)).toHaveValue('Dd');
+    await expect(selectorGenotipo(page, 1)).toHaveValue('Dd');
+    await expect(page.locator('[class*="pedigreeGenotype"]')).toHaveText([
+      'Dd Iᴬi',
+      'Dd Iᴮi',
+      'DD IᴬIᴮ',
+      'DD Iᴮi',
+      'Dd Iᴬi',
+      'dd ii',
+    ]);
+    await expect(page.locator('[class*="pedigreePhenotype"]')).toHaveText([
+      'Rh positivo / Grupo A',
+      'Rh positivo / Grupo B',
+      'Rh positivo / Grupo AB',
+      'Rh positivo / Grupo B',
+      'Rh positivo / Grupo A',
+      'Rh negativo / Grupo O',
+    ]);
+    // Símbolo del Rh: portador de d los Dd; el dd no es un «afectado» (hallazgo 1589).
+    expect(await simbolosDelArbol(page)).toEqual(['portador', 'portador', '-', '-', 'portador', '-']);
 
     // En el motor, con el Rh como rasgo 1: al menos un hijo Rh negativo (dd).
     const [abo, rh] = [rasgoHumano('grupo-abo'), rasgoHumano('factor-rh')];
     const arbol = generateDihybridPedigree(['Dd', 'AO'], ['Dd', 'BO'], rh, abo, 4);
     const fenotiposRh = arbol.individuals.slice(2).map((i) => i.phenotype.split(' / ')[0]);
     expect(fenotiposRh).toContain('Rh negativo');
+    expect(arbol.individuals.slice(2).map((i) => i.genotype)).toEqual(['DD AB', 'DD BO', 'Dd AO', 'dd OO']);
+    expect(arbol.ejemplos).toEqual({ combinacionesDelCruce: 8, combinacionesMostradas: 4, todosLosGenotipos: true });
+
+    // El monohíbrido no cambia: sigue siendo el cuadro entero, una casilla por hijo.
+    await page.getByRole('button', { name: 'Monohíbrido', exact: true }).click();
+    await selectorRasgo(page, 0).selectOption('grupo-abo');
+    await expect(page.locator('[class*="pedigreeGenotype"]')).toHaveText(['Iᴬi', 'Iᴮi', 'IᴬIᴮ', 'Iᴮi', 'Iᴬi', 'ii']);
+    await expect(rotulo).toHaveText('Árbol de Grupo sanguíneo ABO');
+    expect(generateSimplePedigree('AO', 'BO', abo, 4).ejemplos).toBeUndefined();
+  });
+
+  test('2377 · en todo cruce dihíbrido de la app, los cuatro hijos cubren todos los genotipos de cada rasgo', async () => {
+    // La promesa del rótulo, comprobada contra TODOS los cruces que la app deja montar: los
+    // cuatro organismos, cada par ordenado de rasgos no ligados al sexo y cada genotipo de los
+    // cuatro progenitores. En un locus dos progenitores dan como mucho 4 genotipos y los dos
+    // rasgos se combinan libremente, así que siempre caben todos; y las combinaciones de
+    // fenotipos, todas si son 4 o menos, y 4 si son más (el ABO con 4 grupos, o con 3 y otro rasgo).
+    let cruces = 0;
+    const fallos: string[] = [];
+    for (const organismo of ORGANISMS) {
+      const rasgos = organismo.traits.filter((t) => t.inheritanceMode !== 'sex-linked');
+      for (const t1 of rasgos) {
+        for (const t2 of rasgos) {
+          if (t1.id === t2.id) continue;
+          const g1 = getPossibleGenotypes(t1);
+          const g2 = getPossibleGenotypes(t2);
+          for (const padre1 of g1) for (const madre1 of g1) for (const padre2 of g2) for (const madre2 of g2) {
+            cruces++;
+            const nombre = `${organismo.id}: ${padre1} ${padre2} × ${madre1} ${madre2} (${t1.id} + ${t2.id})`;
+            const arbol = generateDihybridPedigree([padre1, padre2], [madre1, madre2], t1, t2, 4);
+            const cuadro = generateDihybridPunnett(padre1, padre2, madre1, madre2, t1, t2);
+            const hijos = arbol.individuals.filter((i) => i.generation === 1);
+            const delRasgo = (genotipos: string[], k: 0 | 1) => [...new Set(genotipos.map((g) => g.split(' ')[k]))].sort();
+            const enCuadro = cuadro.cells.map((c) => c.genotype);
+            const enArbol = hijos.map((h) => h.genotype);
+            const combinaciones = Object.keys(cuadro.phenotypeRatios).length;
+            if (
+              hijos.length !== 4 ||
+              enArbol.some((g) => !enCuadro.includes(g)) ||
+              delRasgo(enArbol, 0).join() !== delRasgo(enCuadro, 0).join() ||
+              delRasgo(enArbol, 1).join() !== delRasgo(enCuadro, 1).join() ||
+              new Set(hijos.map((h) => h.phenotype)).size !== Math.min(combinaciones, 4) ||
+              arbol.ejemplos?.todosLosGenotipos !== true ||
+              arbol.ejemplos?.combinacionesDelCruce !== combinaciones
+            ) {
+              fallos.push(`${nombre} → ${enArbol.join(', ')}`);
+            }
+          }
+        }
+      }
+    }
+    expect(cruces).toBeGreaterThan(5000);
+    expect(fallos.slice(0, 10)).toEqual([]);
   });
 
   test('el % va tras espacio DURO también en los casos para clase y en la FAQ del χ²', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): la reparación del 1698 (75d5db87) pasó a U+00A0
+    // HALLAZGO 2378 (inspector 28/09/2026): la reparación del 1698 (75d5db87) pasó a U+00A0
     // los porcentajes del cuadro, las Estadísticas, la Población y 17 de la guía, pero dejó con
     // espacio normal (U+0020) los de «Casos para clase» (casos.ts:228 «= 25 %.», CasosAula.tsx:213
     // «' %'», casos.ts:271 «más del 100 %») y el de la FAQ del χ² (page.tsx:997 «del 5 %»). La
     // regla (CLAUDE.md §2, 25/09/2026) pide U+00A0 para que el «%» no salte solo de línea.
+    // REPARADO (28/09/2026): los cuatro, más el FAQPage del ABO (metadata.ts) y el
+    // `respuestaTexto` de casos.ts, cuyo `replace` cambiaba «% » por «% » (nada).
     await page.getByRole('button', { name: /Ver solución/ }).click();
     const solucion = await page.locator('[class*="casoSolucion"]').innerText();
-    expect(solucion).toContain('Proporción: 1/4 = 25\u00a0%.');
-    expect(solucion).toContain('Respuesta: 25\u00a0% de semillas verdes');
+    expect(solucion).toContain('Proporción: 1/4 = 25 %.');
+    expect(solucion).toContain('Respuesta: 25 % de semillas verdes');
+    expect(CASOS.find((c) => c.id === 1)?.respuestaTexto).toBe('25 % de semillas verdes');
 
     await page.locator('#casos-respuesta').fill('101');
     await esperarValorEnReact(page, '#casos-respuesta', '101');
     await page.getByRole('button', { name: 'Comprobar' }).click();
     // innerText y no toContainText: el matcher de Playwright normaliza el espacio duro a espacio.
     await expect(page.locator('[class*="casoVeredicto"]')).toContainText('de la descendencia');
-    expect(await page.locator('[class*="casoVeredicto"]').innerText()).toContain('más del 100\u00a0% de la descendencia');
+    expect(await page.locator('[class*="casoVeredicto"]').innerText()).toContain('más del 100 % de la descendencia');
+
+    // Quien copia la solución tal cual, con su espacio duro, sigue acertando.
+    await page.locator('#casos-respuesta').fill('25 %');
+    await esperarValorEnReact(page, '#casos-respuesta', '25 %');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(page.locator('[class*="casoVeredicto"]')).toContainText('¡Correcto!');
 
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const texto = await page.locator('body').innerText();
-    expect(texto).toContain('nivel de significación del 5\u00a0%');
+    expect(texto).toContain('nivel de significación del 5 %');
     // Y en toda la página, ni un «%» tras espacio normal.
     expect(texto.match(/\d %/g) ?? []).toEqual([]);
+    // Ni en los datos estructurados (la FAQ del ABO decía «un 25 %», «al 50 %»).
+    const jsonLd = await page.evaluate(() =>
+      [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join('\n'),
+    );
+    expect(jsonLd).toContain('cada uno con un 25 % de probabilidad');
+    expect(jsonLd.match(/\d %/g) ?? []).toEqual([]);
   });
 
   test('los encabezados no anuncian su emoji decorativo (aria-hidden)', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): los títulos de los paneles («⚙️» y «📊» en un
+    // HALLAZGO 2379 (inspector 28/09/2026): los títulos de los paneles («⚙️» y «📊» en un
     // <span> sin aria-hidden), los de Estadísticas (StatisticsPanel.tsx:79 y 106, emoji dentro
     // del texto del <h4>) y los ~35 emojis del bloque educativo que marca
     // `node scripts/check-a11y-jsx.mjs app/simulador-genetica/page.tsx` entran en el nombre
     // accesible: un lector de pantalla dice «gráfico de barras, Proporciones Genotípicas».
+    // REPARADO (28/09/2026): todos con aria-hidden; donde ♂ y ♀ decían algo (la tabla, la
+    // tarjeta del árbol) se dice además con palabras.
     await expect(page.getByRole('heading', { name: 'Resultados', exact: true })).toHaveCount(1);
     await expect(page.getByRole('heading', { name: 'Configuración del Cruce', exact: true })).toHaveCount(1);
     await pestana(page, 'Estadísticas').click();
@@ -3290,5 +3435,37 @@ test.describe('Inspector 28/09/2026 — hallazgos abiertos', () => {
     await expect(page.getByRole('heading', { name: 'Proporciones Fenotípicas', exact: true })).toHaveCount(1);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     await expect(page.getByRole('heading', { name: '¿Quién fue Gregor Mendel?', exact: true })).toHaveCount(1);
+    await expect(
+      page.getByRole('heading', { name: '¿Qué mide el test chi-cuadrado en la pestaña Población?', exact: true }),
+    ).toHaveCount(1);
+
+    // Ningún encabezado DE LA APP (los de RelatedApps, ShareCard o la sección educativa son de
+    // components/ y van por su cuenta), guía abierta, lleva un emoji en su nombre accesible.
+    // De la app es el que tiene como clase más cercana una del módulo de la app. Se cuentan,
+    // para que una lista vacía no pase por buena.
+    const nombres = await page.getByRole('heading').evaluateAll((els) =>
+      els
+        .filter((el) => {
+          let n: Element | null = el;
+          while (n && !(n.getAttribute('class') ?? '').trim()) n = n.parentElement;
+          return /SimuladorGenetica/.test(n?.getAttribute('class') ?? '');
+        })
+        .map((el) => {
+          const copia = el.cloneNode(true) as HTMLElement;
+          copia.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove());
+          return (copia.textContent ?? '').replace(/\s+/g, ' ').trim();
+        }),
+    );
+    expect(nombres.length).toBeGreaterThan(20);
+    expect(nombres.filter((n) => /\p{Extended_Pictographic}/u.test(n))).toEqual([]);
+
+    // La tabla comparativa se sigue leyendo sin los símbolos: «Diferente en machos y hembras».
+    const fila = page.locator('table tr', { hasText: 'Fenotipo F1 (heterocigoto)' });
+    const leible = await fila.locator('td').nth(4).evaluate((el) => {
+      const copia = el.cloneNode(true) as HTMLElement;
+      copia.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove());
+      return (copia.textContent ?? '').replace(/\s+/g, ' ').trim();
+    });
+    expect(leible).toBe('Diferente en machos y hembras');
   });
 });

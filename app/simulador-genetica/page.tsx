@@ -179,7 +179,7 @@ export default function SimuladorGeneticaPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🧬</span>
+        <span aria-hidden="true" className={styles.heroIcon}>🧬</span>
         <h1 className={styles.title}>Simulador de Cruces Genéticos y Leyes de Mendel</h1>
         <p className={styles.subtitle}>
           Cruces genéticos y herencia mendeliana paso a paso: cuadro de Punnett, cruce
@@ -214,8 +214,12 @@ export default function SimuladorGeneticaPage() {
         {/* Panel de Configuración */}
         <div className={styles.panel}>
           <div className={styles.panelHeader}>
+            {/* ⚠️ 28/09/2026 (hallazgo 2379) — los emojis decorativos de la página (títulos de
+                panel, guía, tabla, FAQ) iban sin aria-hidden y entraban en el nombre de los
+                encabezados: «⚙️Configuración del Cruce». Donde el símbolo SÍ dice algo (♂, ♀
+                en la tabla y en la tarjeta del árbol) se escribe además con palabras. */}
             <h2 className={styles.panelTitle}>
-              <span className={styles.panelIcon}>⚙️</span>
+              <span aria-hidden="true" className={styles.panelIcon}>⚙️</span>
               Configuración del Cruce
             </h2>
           </div>
@@ -325,7 +329,7 @@ export default function SimuladorGeneticaPage() {
               {/* Padre 1 */}
               <div className={styles.parentCard}>
                 <div className={styles.parentLabel}>
-                  <span className={styles.parentSex}>
+                  <span aria-hidden="true" className={styles.parentSex}>
                     {parent1Sex === 'male' ? '♂' : '♀'}
                   </span>
                   {parent1Sex === 'male' ? 'Padre' : 'Madre'}
@@ -342,7 +346,7 @@ export default function SimuladorGeneticaPage() {
                   ))}
                 </select>
                 <div className={styles.phenotypePreview}>
-                  <span className={styles.phenotypeIcon}>{parent1Phenotype.icon}</span>
+                  <span aria-hidden="true" className={styles.phenotypeIcon}>{parent1Phenotype.icon}</span>
                   <span className={styles.phenotypeName}>{parent1Phenotype.name}</span>
                 </div>
               </div>
@@ -352,7 +356,7 @@ export default function SimuladorGeneticaPage() {
               {/* Padre 2 */}
               <div className={styles.parentCard}>
                 <div className={styles.parentLabel}>
-                  <span className={styles.parentSex}>
+                  <span aria-hidden="true" className={styles.parentSex}>
                     {parent2Sex === 'male' ? '♂' : '♀'}
                   </span>
                   {parent2Sex === 'male' ? 'Padre' : 'Madre'}
@@ -369,7 +373,7 @@ export default function SimuladorGeneticaPage() {
                   ))}
                 </select>
                 <div className={styles.phenotypePreview}>
-                  <span className={styles.phenotypeIcon}>{parent2Phenotype.icon}</span>
+                  <span aria-hidden="true" className={styles.phenotypeIcon}>{parent2Phenotype.icon}</span>
                   <span className={styles.phenotypeName}>{parent2Phenotype.name}</span>
                 </div>
               </div>
@@ -420,7 +424,7 @@ export default function SimuladorGeneticaPage() {
         <div className={styles.panel}>
           <div className={styles.panelHeader}>
             <h2 className={styles.panelTitle}>
-              <span className={styles.panelIcon}>📊</span>
+              <span aria-hidden="true" className={styles.panelIcon}>📊</span>
               Resultados
             </h2>
           </div>
@@ -504,7 +508,7 @@ export default function SimuladorGeneticaPage() {
 
               {activeTab === 'pedigree' && !pedigreeChart && (
                 <div className={styles.emptyState}>
-                  <div className={styles.emptyIcon}>👨‍👩‍👧‍👦</div>
+                  <div aria-hidden="true" className={styles.emptyIcon}>👨‍👩‍👧‍👦</div>
                   <p className={styles.emptyText}>
                     Generando árbol genealógico...
                   </p>
@@ -513,7 +517,7 @@ export default function SimuladorGeneticaPage() {
             </>
           ) : (
             <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>🧬</div>
+              <div aria-hidden="true" className={styles.emptyIcon}>🧬</div>
               <p className={styles.emptyText}>
                 Configura el cruce y haz clic en &quot;Realizar Cruce&quot;
               </p>
@@ -533,7 +537,7 @@ export default function SimuladorGeneticaPage() {
         icon="📚"
       >
         <section className={styles.guideSection}>
-          <h2>🧬 ¿Quién fue Gregor Mendel?</h2>
+          <h2><span aria-hidden="true">🧬</span> ¿Quién fue Gregor Mendel?</h2>
           <p>
             Gregor Johann Mendel (1822-1884) fue un monje agustino y científico austriaco,
             considerado el padre de la genética moderna. Realizó experimentos con guisantes
@@ -548,7 +552,7 @@ export default function SimuladorGeneticaPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>📜 Las Tres Leyes de Mendel</h2>
+          <h2><span aria-hidden="true">📜</span> Las Tres Leyes de Mendel</h2>
 
           <h3>1ª Ley: Uniformidad de los híbridos</h3>
           <p>
@@ -574,7 +578,7 @@ export default function SimuladorGeneticaPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>🔬 Conceptos Clave</h2>
+          <h2><span aria-hidden="true">🔬</span> Conceptos Clave</h2>
 
           <h3>Genotipo vs Fenotipo</h3>
           <ul>
@@ -591,12 +595,20 @@ export default function SimuladorGeneticaPage() {
           <h3>Homocigoto vs Heterocigoto</h3>
           <ul>
             <li><strong>Homocigoto:</strong> Dos alelos iguales (AA o aa)</li>
-            <li><strong>Heterocigoto:</strong> Dos alelos diferentes (Aa) - también llamado &quot;portador&quot;</li>
+            {/* 28/09/2026 — decía que TODO heterocigoto es un «portador», y la misma página
+                (tabla comparativa, nota del árbol) dice que en dominancia incompleta no los hay:
+                el Rr rosa se distingue a simple vista. */}
+            <li>
+              <strong>Heterocigoto:</strong> Dos alelos diferentes (Aa). Si uno es recesivo y
+              queda oculto (Aa, Iᴬi), se le llama &quot;portador&quot; de ese alelo; en dominancia
+              incompleta no hay portadores, porque el heterocigoto (Rr, rosa) tiene su propio
+              fenotipo
+            </li>
           </ul>
         </section>
 
         <section className={styles.guideSection}>
-          <h2>🎨 Tipos de Herencia</h2>
+          <h2><span aria-hidden="true">🎨</span> Tipos de Herencia</h2>
 
           <h3>Dominancia completa</h3>
           <p>
@@ -629,7 +641,7 @@ export default function SimuladorGeneticaPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>🔢 El Cuadro de Punnett</h2>
+          <h2><span aria-hidden="true">🔢</span> El Cuadro de Punnett</h2>
           <p>
             Herramienta visual para predecir las proporciones de genotipos y fenotipos
             en la descendencia de un cruce. Se colocan los gametos de cada progenitor
@@ -645,7 +657,7 @@ export default function SimuladorGeneticaPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>🏥 Aplicaciones Prácticas</h2>
+          <h2><span aria-hidden="true">🏥</span> Aplicaciones Prácticas</h2>
 
           <h3>Asesoramiento genético</h3>
           <p>
@@ -668,7 +680,7 @@ export default function SimuladorGeneticaPage() {
 
         {/* ── TABLA COMPARATIVA ─────────────────────────────────────── */}
         <div className={styles.comparativaSection}>
-          <h2>⚖️ Comparativa: Tipos de Herencia Genética</h2>
+          <h2><span aria-hidden="true">⚖️</span> Comparativa: Tipos de Herencia Genética</h2>
           <p className={styles.comparativaSubtitle}>
             Cuatro modos de herencia clave en genética mendeliana y sus diferencias.
             El simulador permite practicar los cuatro: dominancia completa, incompleta,
@@ -691,7 +703,7 @@ export default function SimuladorGeneticaPage() {
                   <td>Igual al dominante (Aa = AA)</td>
                   <td>Fenotipo intermedio (Rr = rosa)</td>
                   <td>Ambos rasgos visibles (AB)</td>
-                  <td>Diferente en ♂ y ♀</td>
+                  <td>Diferente en machos <span aria-hidden="true">♂</span> y hembras <span aria-hidden="true">♀</span></td>
                 </tr>
                 <tr>
                   <td><strong>Ratio fenotípico F2</strong></td>
@@ -709,7 +721,7 @@ export default function SimuladorGeneticaPage() {
                 </tr>
                 <tr>
                   <td><strong>Portadores detectables</strong></td>
-                  <td>❌ No (igual que dominante)</td>
+                  <td><span aria-hidden="true">❌</span> No (igual que dominante)</td>
                   {/* ⚠️ 25/09/2026 (hallazgo 1697) — decía «✅ Sí (fenotipo intermedio)», que
                       contradice la definición de portador de la FAQ (igual en fenotipo al
                       homocigoto dominante). El Rr rosa no es un portador oculto. */}
@@ -721,21 +733,21 @@ export default function SimuladorGeneticaPage() {
                     <span aria-hidden="true">⚠️</span> Solo el heterocigoto IᴬIᴮ (grupo AB); el
                     portador de i (Iᴬi, Iᴮi) no se distingue de IᴬIᴬ ni de IᴮIᴮ
                   </td>
-                  <td>✅ Hembras portadoras (X^R X^r)</td>
+                  <td><span aria-hidden="true">✅</span> Hembras portadoras (X^R X^r)</td>
                 </tr>
                 <tr>
                   <td><strong>Afecta igual a ambos sexos</strong></td>
-                  <td>✅ Sí</td>
-                  <td>✅ Sí</td>
-                  <td>✅ Sí</td>
-                  <td>❌ No (más frecuente en ♂)</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
+                  <td><span aria-hidden="true">❌</span> No (más frecuente en machos <span aria-hidden="true">♂</span>)</td>
                 </tr>
                 <tr>
                   <td><strong>Frecuencia en exámenes de Bio</strong></td>
-                  <td>⭐⭐⭐ Muy habitual</td>
-                  <td>⭐⭐ Habitual</td>
-                  <td>⭐⭐ Habitual</td>
-                  <td>⭐⭐⭐ Muy habitual</td>
+                  <td><span aria-hidden="true">⭐⭐⭐</span> Muy habitual</td>
+                  <td><span aria-hidden="true">⭐⭐</span> Habitual</td>
+                  <td><span aria-hidden="true">⭐⭐</span> Habitual</td>
+                  <td><span aria-hidden="true">⭐⭐⭐</span> Muy habitual</td>
                 </tr>
               </tbody>
             </table>
@@ -744,14 +756,14 @@ export default function SimuladorGeneticaPage() {
 
         {/* ── CASOS DE USO ──────────────────────────────────────────── */}
         <div className={styles.escenariosSection}>
-          <h2>💼 Casos de Uso Prácticos</h2>
+          <h2><span aria-hidden="true">💼</span> Casos de Uso Prácticos</h2>
           <p className={styles.escenariosSubtitle}>
             Cómo sacar el máximo partido al simulador según tu perfil
           </p>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span aria-hidden="true" className={styles.escenarioIcon}>🎓</span>
                 <h3>Estudiante de secundaria y preparatoria</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -772,7 +784,7 @@ export default function SimuladorGeneticaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔬</span>
+                <span aria-hidden="true" className={styles.escenarioIcon}>🔬</span>
                 <h3>Universitario de Biología o Medicina</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -785,14 +797,14 @@ export default function SimuladorGeneticaPage() {
               </div>
               <p className={styles.escenarioTip}>
                 <strong>Por qué funciona:</strong> La pestaña Pedigree genera árboles
-                genealógicos visuales con símbolos estándar (cuadrado = ♂, círculo = ♀,
-                relleno = afectado). Ideal para prácticas de asesoramiento genético.
+                genealógicos visuales con símbolos estándar (cuadrado <span aria-hidden="true">♂</span> = macho, círculo <span aria-hidden="true">♀</span> =
+                hembra, relleno = afectado). Ideal para prácticas de asesoramiento genético.
               </p>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🐕</span>
+                <span aria-hidden="true" className={styles.escenarioIcon}>🐕</span>
                 <h3>Criador de animales o plantas</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -813,7 +825,7 @@ Cruce Aa × Aa → 75 % liso, 25 % rizado
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏥</span>
+                <span aria-hidden="true" className={styles.escenarioIcon}>🏥</span>
                 <h3>Asesoramiento genético familiar</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -847,10 +859,10 @@ Hija portadora (XD Xd) × marido sano (XD Y):
 
         {/* ── FAQ AMPLIADO ──────────────────────────────────────────── */}
         <div className={styles.faqSection}>
-          <h2>❓ Preguntas Frecuentes sobre Cruces Genéticos y Leyes de Mendel</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Cruces Genéticos y Leyes de Mendel</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué proporciones fenotípicas da un cruce monohíbrido? ¿Y un cruce dihíbrido?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué proporciones fenotípicas da un cruce monohíbrido? ¿Y un cruce dihíbrido?</h4>
               <p>
                 Un <strong>cruce monohíbrido</strong> entre dos heterocigotos (Aa × Aa) con
                 dominancia completa da una proporción fenotípica de <strong>3:1</strong>
@@ -861,13 +873,13 @@ Hija portadora (XD Xd) × marido sano (XD Y):
                 sus guisantes y las que reproduce el simulador en la pestaña Estadísticas.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Tip:</strong> El 9:3:3:1 del dihíbrido es simplemente el resultado de
+                <span aria-hidden="true">💡</span> <strong>Tip:</strong> El 9:3:3:1 del dihíbrido es simplemente el resultado de
                 combinar dos cruces 3:1 independientes (3/4 × 3/4 = 9/16, etc.).
               </p>
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo se hace un cruce genético paso a paso?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo se hace un cruce genético paso a paso?</h4>
               <p>
                 1) Identifica el modo de herencia y asigna símbolos a los alelos (mayúscula para el
                 dominante, minúscula para el recesivo). 2) Determina el genotipo de cada progenitor.
@@ -880,7 +892,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué en algunos cruces no obtengo la proporción 3:1?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué en algunos cruces no obtengo la proporción 3:1?</h4>
               {/*
                 ⚠️ 24/09/2026 (hallazgo 1588) — decía que el 3:1 es «exclusivo» de la dominancia
                 completa y que con codominancia «el ratio fenotípico será 1:2:1». El único rasgo
@@ -899,13 +911,13 @@ Hija portadora (XD Xd) × marido sano (XD Y):
                 proporción esperada es 9:3:3:1.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Tip:</strong> Siempre identifica primero el modo de herencia antes
+                <span aria-hidden="true">💡</span> <strong>Tip:</strong> Siempre identifica primero el modo de herencia antes
                 de calcular proporciones. El simulador lo indica junto a cada característica.
               </p>
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué diferencia exacta hay entre dominancia incompleta y codominancia?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué diferencia exacta hay entre dominancia incompleta y codominancia?</h4>
               <p>
                 En <strong>dominancia incompleta</strong>, los dos alelos &quot;se mezclan&quot;
                 produciendo un fenotipo intermedio (rojo + blanco = rosa). En
@@ -914,13 +926,13 @@ Hija portadora (XD Xd) × marido sano (XD Y):
                 sus glóbulos rojos, no un antígeno &quot;intermedio&quot;.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Regla mnemotécnica:</strong> Incompleta = mezcla de pintura.
+                <span aria-hidden="true">💡</span> <strong>Regla mnemotécnica:</strong> Incompleta = mezcla de pintura.
                 Codominancia = mezcla de manchas (cada color se mantiene intacto).
               </p>
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es un individuo portador y cómo se identifica?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es un individuo portador y cómo se identifica?</h4>
               <p>
                 Un portador es un individuo heterocigoto (Aa) que <strong>no muestra</strong> el
                 fenotipo recesivo pero puede transmitirlo a su descendencia. En herencia autosómica,
@@ -929,14 +941,14 @@ Hija portadora (XD Xd) × marido sano (XD Y):
                 sus hijos varones lo estarán.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>En el simulador:</strong> Los portadores aparecen marcados con
+                <span aria-hidden="true">💡</span> <strong>En el simulador:</strong> Los portadores aparecen marcados con
                 sombreado parcial en el árbol genealógico (Pedigree), siguiendo el estándar
                 clínico internacional.
               </p>
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Para qué sirve el cruce prueba (test cross)?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Para qué sirve el cruce prueba (test cross)?</h4>
               <p>
                 El cruce prueba consiste en cruzar un individuo de fenotipo dominante
                 con genotipo desconocido (A?) con un homocigoto recesivo (aa). Si toda
@@ -945,13 +957,13 @@ Hija portadora (XD Xd) × marido sano (XD Y):
                 clásica de Mendel para determinar genotipos ocultos.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Cómo probarlo:</strong> Selecciona un organismo y cruza
+                <span aria-hidden="true">💡</span> <strong>Cómo probarlo:</strong> Selecciona un organismo y cruza
                 Aa × aa en el simulador para ver el resultado 1:1 en acción.
               </p>
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuándo no se cumple la 3ª Ley de Mendel?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuándo no se cumple la 3ª Ley de Mendel?</h4>
               <p>
                 La ley de transmisión independiente solo aplica cuando los dos genes
                 estudiados están en <strong>cromosomas diferentes</strong> o muy alejados
@@ -963,7 +975,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué el daltonismo afecta mucho más a los hombres?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué el daltonismo afecta mucho más a los hombres?</h4>
               <p>
                 El gen del daltonismo está en el cromosoma X. Los hombres (XY) solo
                 tienen un cromosoma X, por lo que un único alelo recesivo (X^r Y) es
@@ -976,7 +988,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué mide el test chi-cuadrado en la pestaña Población?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué mide el test chi-cuadrado en la pestaña Población?</h4>
               <p>
                 El chi-cuadrado (χ²) compara las proporciones observadas en la simulación
                 con las esperadas según la teoría mendeliana. Un valor χ² bajo (p &gt; 0,05)
@@ -994,10 +1006,10 @@ Hija portadora (XD Xd) × marido sano (XD Y):
                 14,067 con 7 (α = 0,05). Como el simulador sortea la población con las
                 proporciones teóricas, aquí la herencia simple se cumple siempre; aun así, en
                 torno a 1 de cada 20 simulaciones dará p &lt; 0,05 por puro azar, que es el error
-                que acepta un nivel de significación del 5 %.
+                que acepta un nivel de significación del 5 %.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Regla práctica:</strong> el χ² solo es fiable si cada frecuencia
+                <span aria-hidden="true">💡</span> <strong>Regla práctica:</strong> el χ² solo es fiable si cada frecuencia
                 esperada es al menos 5; cuando no lo es, el panel lo avisa en lugar de dar un
                 veredicto. En un 3:1 eso pide al menos 20 individuos, y en un 9:3:3:1, 80.
                 Aumenta la población a 200-500 individuos para resultados más robustos.
@@ -1005,7 +1017,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Puedo usar este simulador para aprender genética de poblaciones?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Puedo usar este simulador para aprender genética de poblaciones?</h4>
               <p>
                 Sí, de forma básica. La pestaña Población implementa distribución
                 binomial para simular el azar de la meiosis en una muestra. No modela
@@ -1020,7 +1032,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
 
         {/* ── GUÍA PASO A PASO ──────────────────────────────────────── */}
         <div className={styles.stepGuideSection}>
-          <h2>📋 Cómo Resolver un Problema de Genética: 7 Pasos</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo Resolver un Problema de Genética: 7 Pasos</h2>
           <div className={styles.stepGuide}>
             <div className={styles.stepItem}>
               <div className={styles.stepNumber}>1</div>
@@ -1113,10 +1125,10 @@ Hija portadora (XD Xd) × marido sano (XD Y):
 
         {/* ── MEJORES PRÁCTICAS ─────────────────────────────────────── */}
         <div className={styles.tipsSection}>
-          <h2>✅ Mejores Prácticas para Estudiar Genética</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores Prácticas para Estudiar Genética</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔤</span>
+              <span aria-hidden="true" className={styles.tipIcon}>🔤</span>
               <h4>Convención de letras siempre consistente</h4>
               <p>
                 Usa la misma letra para ambos alelos de un rasgo (Aa, no AB).
@@ -1125,7 +1137,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span aria-hidden="true" className={styles.tipIcon}>📐</span>
               <h4>Dibuja el Punnett aunque parezca obvio</h4>
               <p>
                 Calcular mentalmente sin cuadro es una de las causas más
@@ -1134,7 +1146,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔗</span>
+              <span aria-hidden="true" className={styles.tipIcon}>🔗</span>
               <h4>Verifica independencia antes del dihíbrido</h4>
               <p>
                 La proporción 9:3:3:1 solo vale si los genes están en cromosomas
@@ -1143,7 +1155,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>♀♂</span>
+              <span aria-hidden="true" className={styles.tipIcon}>♀♂</span>
               <h4>En ligada al sexo, sigue el cromosoma X</h4>
               <p>
                 El padre pasa su X solo a las hijas y su Y solo a los hijos.
@@ -1153,7 +1165,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✖️</span>
+              <span aria-hidden="true" className={styles.tipIcon}>✖️</span>
               <h4>Multiplica probabilidades en cruces independientes</h4>
               <p>
                 En dihíbridos, la probabilidad de un genotipo combinado es el
@@ -1162,7 +1174,7 @@ Hija portadora (XD Xd) × marido sano (XD Y):
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧪</span>
+              <span aria-hidden="true" className={styles.tipIcon}>🧪</span>
               <h4>Usa el cruce prueba para genotipos inciertos</h4>
               <p>
                 Si no sabes si un individuo de fenotipo dominante es AA o Aa,
@@ -1176,39 +1188,39 @@ Hija portadora (XD Xd) × marido sano (XD Y):
         {/* ── WARNING BOX ───────────────────────────────────────────── */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span aria-hidden="true" className={styles.warningIcon}>⚠️</span>
             <h3>Errores Comunes que Hacen Fallar los Problemas de Genética</h3>
           </div>
           <ul className={styles.warningList}>
             <li>
-              <strong>❌ Confundir ratio fenotípico con genotípico:</strong> En dominancia
+              <strong><span aria-hidden="true">❌</span> Confundir ratio fenotípico con genotípico:</strong> En dominancia
               completa Aa × Aa, el ratio genotípico es 1:2:1 pero el fenotípico es 3:1.
               El enunciado siempre pide uno de los dos; leerlo bien evita este error.
             </li>
             <li>
-              <strong>❌ Olvidar que &quot;portador&quot; significa heterocigoto asintomático:</strong>{' '}
+              <strong><span aria-hidden="true">❌</span> Olvidar que &quot;portador&quot; significa heterocigoto asintomático:</strong>{' '}
               Un portador (Aa) tiene fenotipo dominante. Si el enunciado dice &quot;portador&quot;,
               el genotipo es Aa, no aa. Es uno de los errores más comunes en exámenes preuniversitarios.
             </li>
             <li>
-              <strong>❌ Aplicar la 3ª Ley a genes ligados:</strong> Si dos características
+              <strong><span aria-hidden="true">❌</span> Aplicar la 3ª Ley a genes ligados:</strong> Si dos características
               siempre van juntas en una familia, sospecha que los genes están en el mismo
               cromosoma. En ese caso, la proporción dihíbrida 9:3:3:1 no se cumplirá.
             </li>
             <li>
-              <strong>❌ Creer que padre daltónico transmite la enfermedad a sus hijos varones:</strong>{' '}
+              <strong><span aria-hidden="true">❌</span> Creer que padre daltónico transmite la enfermedad a sus hijos varones:</strong>{' '}
               El padre pasa el cromosoma Y a sus hijos varones, no el X. El daltonismo
               paterno pasa a las hijas (portadoras), no a los hijos. El &quot;abuelo saltado&quot;
               es un patrón clásico de herencia ligada al X.
             </li>
             <li>
-              <strong>❌ Confundir dominancia incompleta con codominancia:</strong> En
+              <strong><span aria-hidden="true">❌</span> Confundir dominancia incompleta con codominancia:</strong> En
               dominancia incompleta hay un solo fenotipo intermedio (rosa). En codominancia
               hay dos fenotipos simultáneos en el mismo individuo (tipo AB: antígenos A y B).
               No son intercambiables.
             </li>
             <li>
-              <strong>❌ Sacar conclusiones de muestras pequeñas:</strong> Con 4 o 8
+              <strong><span aria-hidden="true">❌</span> Sacar conclusiones de muestras pequeñas:</strong> Con 4 o 8
               descendientes, las proporciones reales pueden alejarse mucho de las teóricas
               por azar. La proporción 3:1 de Mendel emerge estadísticamente en muestras
               de 100+ individuos. El test chi-cuadrado lo confirma.

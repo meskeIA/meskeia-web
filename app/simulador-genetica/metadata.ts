@@ -115,7 +115,7 @@ export const faqJsonLd = {
       name: '¿Qué grupo sanguíneo pueden tener los hijos según el de los padres?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El grupo ABO depende de tres alelos: Iᴬ e Iᴮ son codominantes entre sí y los dos dominan sobre i. Una persona de grupo A puede ser IᴬIᴬ o Iᴬi, y una de grupo B, IᴮIᴮ o Iᴮi, así que dos padres Iᴬi × Iᴮi pueden tener hijos de los cuatro grupos (A, B, AB y O), cada uno con un 25 % de probabilidad. En cambio, un progenitor AB (IᴬIᴮ) con otro O (ii) solo puede tener hijos A o B, al 50 %. El factor Rh se hereda aparte, con el positivo dominante: dos padres Rh positivos heterocigotos tienen un 25 % de probabilidad de un hijo Rh negativo.',
+        text: 'El grupo ABO depende de tres alelos: Iᴬ e Iᴮ son codominantes entre sí y los dos dominan sobre i. Una persona de grupo A puede ser IᴬIᴬ o Iᴬi, y una de grupo B, IᴮIᴮ o Iᴮi, así que dos padres Iᴬi × Iᴮi pueden tener hijos de los cuatro grupos (A, B, AB y O), cada uno con un 25 % de probabilidad. En cambio, un progenitor AB (IᴬIᴮ) con otro O (ii) solo puede tener hijos A o B, al 50 %. El factor Rh se hereda aparte, con el positivo dominante: dos padres Rh positivos heterocigotos tienen un 25 % de probabilidad de un hijo Rh negativo.',
       },
     },
   ],

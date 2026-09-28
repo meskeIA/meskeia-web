@@ -225,7 +225,8 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
         `${aciertos}/${casillas} × ${busca.poblacion} = ${numero(valor)}.`
     );
   } else {
-    pasos.push(`Proporción: ${aciertos}/${casillas} = ${numero(valor)} %.`);
+    // El «%» con espacio duro (U+00A0), para que no salte solo de línea (hallazgo 2378).
+    pasos.push(`Proporción: ${aciertos}/${casillas} = ${numero(valor)} %.`);
   }
 
   return { ok: true, valor, pasos };
@@ -268,7 +269,7 @@ function fueraDeDominio(usuario: number, magnitud: 'porcentaje' | 'individuos'):
   if (magnitud === 'porcentaje') {
     if (usuario < 0) return 'Un porcentaje de la descendencia no puede ser negativo.';
     if (usuario > 100) {
-      return 'No puede haber más del 100 % de la descendencia: repasa la cuenta.';
+      return 'No puede haber más del 100 % de la descendencia: repasa la cuenta.';
     }
     return null;
   }
@@ -647,11 +648,16 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
   },
 ];
 
-/** Texto legible de la respuesta, con formato español (coma decimal). */
+/**
+ * Texto legible de la respuesta, con formato español (coma decimal). Si la etiqueta empieza por
+ * «%», el símbolo va tras espacio duro (U+00A0), como en la vista (hallazgo 2378): el
+ * `replace` que había aquí cambiaba «% » por «% », es decir, nada.
+ */
 function formatearRespuesta(valor: number, etiqueta: string): string {
   const n = redondear(valor);
   const texto = n.toLocaleString('es-ES', { maximumFractionDigits: 2 });
-  return `${texto} ${etiqueta.replace(/^% /, '% ')}`.trim();
+  const separador = etiqueta.startsWith('%') ? ' ' : ' ';
+  return `${texto}${separador}${etiqueta}`.trim();
 }
 
 /**

@@ -147,7 +147,7 @@ export default function PunnettSquare({
                     }}
                   >
                     <div className={styles.cellGenotype}>{notacionGenotipo(cell.genotype, rasgos)}</div>
-                    <div className={styles.cellIcon}>{cell.phenotypeIcon}</div>
+                    <div aria-hidden="true" className={styles.cellIcon}>{cell.phenotypeIcon}</div>
                     <div className={styles.cellPhenotype}>{cell.phenotype}</div>
                     <div className={styles.cellProbability}>
                       {formatPercentage(cell.probability, 1)}

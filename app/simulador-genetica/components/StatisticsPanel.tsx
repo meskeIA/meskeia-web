@@ -76,7 +76,11 @@ export default function StatisticsPanel({ punnett, rasgos }: StatisticsPanelProp
     <div className={styles.statsGrid}>
       {/* Proporciones Genotípicas */}
       <div className={styles.statsSection}>
-        <h4 className={styles.statsSectionTitle}>📊 Proporciones Genotípicas</h4>
+        {/* El emoji, fuera del nombre del encabezado (hallazgo 2379): el lector de pantalla
+            anunciaba «gráfico de barras, Proporciones Genotípicas». */}
+        <h4 className={styles.statsSectionTitle}>
+          <span aria-hidden="true">📊</span> Proporciones Genotípicas
+        </h4>
         {Object.entries(punnett.genotypeRatios)
           .sort(([, a], [, b]) => b - a)
           .map(([genotype, ratio]) => (
@@ -103,7 +107,9 @@ export default function StatisticsPanel({ punnett, rasgos }: StatisticsPanelProp
 
       {/* Proporciones Fenotípicas */}
       <div className={styles.statsSection}>
-        <h4 className={styles.statsSectionTitle}>🎨 Proporciones Fenotípicas</h4>
+        <h4 className={styles.statsSectionTitle}>
+          <span aria-hidden="true">🎨</span> Proporciones Fenotípicas
+        </h4>
         {Object.entries(punnett.phenotypeRatios)
           .sort(([, a], [, b]) => b.count - a.count)
           .map(([phenotype, data]) => (

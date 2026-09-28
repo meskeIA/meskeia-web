@@ -447,10 +447,10 @@ export function generateSimplePedigree(
  * - El símbolo (afectado/portador) sigue al rasgo 1. Un símbolo de pedigrí describe UN carácter;
  *   el del rasgo 2 se lee en el genotipo y el fenotipo escritos debajo.
  * - Con 16 casillas, cuatro hijos no pueden ir en proporción (en el monohíbrido sí: son las
- *   cuatro casillas). Se eligen como EJEMPLOS de lo que puede salir: primero un hijo de cada
- *   fenotipo distinto, luego de cada genotipo distinto, y solo después se repiten esos mismos, por
- *   turno. Tomar la primera fila del cuadro, por ejemplo, daría en AaRr × AaRr cuatro hijos
- *   amarillos y lisos, que es la mitad del cruce escondida. Las proporciones, en Estadísticas.
+ *   cuatro casillas). Se eligen como EJEMPLOS de lo que puede salir (`elegirCasillasDeEjemplo`):
+ *   todos los genotipos de cada rasgo y tantas combinaciones de fenotipos como quepan. Tomar la
+ *   primera fila del cuadro, por ejemplo, daría en AaRr × AaRr cuatro hijos amarillos y lisos,
+ *   que es la mitad del cruce escondida. Las proporciones, en Estadísticas.
  */
 export function generateDihybridPedigree(
   genotiposProgenitor1: [string, string],
@@ -495,36 +495,112 @@ export function generateDihybridPedigree(
     return individuo(`c${i + 1}`, 1, i, i % 2 === 0 ? 'male' : 'female', genotipo1, genotipo2, ['p1', 'p2']);
   });
 
+  // Lo que el rótulo del árbol puede afirmar, contado sobre los hijos que de verdad salen.
+  const genotiposDelRasgo = (celdas: PunnettResult['cells'], rasgo: 0 | 1) =>
+    new Set(celdas.map((cell) => cell.genotype.split(' ')[rasgo]));
+  const todosLosGenotipos = ([0, 1] as const).every(
+    (rasgo) => genotiposDelRasgo(elegidas, rasgo).size === genotiposDelRasgo(punnett.cells, rasgo).size
+  );
+
   return {
     individuals: [father, mother, ...children],
     connections: [{ parent1Id: 'p1', parent2Id: 'p2', childIds: children.map((c) => c.id) }],
+    ejemplos: {
+      combinacionesDelCruce: Object.keys(punnett.phenotypeRatios).length,
+      combinacionesMostradas: new Set(elegidas.map((cell) => cell.phenotype)).size,
+      todosLosGenotipos,
+    },
   };
 }
 
-/** Las casillas de los hijos de ejemplo: fenotipos distintos, luego genotipos distintos, luego en orden. */
+/**
+ * Las casillas de los hijos de ejemplo del árbol dihíbrido.
+ *
+ * ⚠️ 28/09/2026 (hallazgo 2377) — se tomaba la PRIMERA casilla de cada fenotipo combinado, en el
+ * orden del cuadro, y se paraba en cuatro. Con más de cuatro combinaciones (el ABO con el Rh da
+ * 8) las cuatro primeras caían en las dos primeras filas, las del mismo gameto materno: en
+ * Iᴬi Dd × Iᴮi Dd no salía ningún hijo de grupo A ni de grupo O, y con el Rh como rasgo 1 los
+ * cuatro salían DD, sin un portador ni un Rh negativo en un Dd × Dd. Tampoco bastaba con cuatro
+ * combinaciones: en AaRr × AaRr salían AA RR, AA rr, aa RR y aa rr, sin un solo heterocigoto,
+ * que es la mitad del cruce y justo lo que marca el símbolo de portador.
+ *
+ * Ahora se miran TODAS las formas de elegir cuatro genotipos distintos del cuadro y gana la que
+ * más enseña, por este orden de prioridad:
+ *   1. los fenotipos y 2. los genotipos del rasgo 1, que es el del símbolo: así salen los
+ *      afectados, los portadores y los que no son ninguna de las dos cosas;
+ *   3. los fenotipos y 4. los genotipos del rasgo 2;
+ *   5. las combinaciones de fenotipos de los dos rasgos.
+ * En un locus, dos progenitores dan como mucho cuatro genotipos (dos alelos por dos alelos), y
+ * como los rasgos se transmiten por separado, cualquier genotipo del rasgo 1 puede ir con
+ * cualquiera del rasgo 2: cuatro hijos alcanzan SIEMPRE todos los genotipos de los dos rasgos.
+ * Todas las combinaciones de fenotipos, no siempre (ABO × Rh da 8), y el árbol dice cuántas
+ * enseña. A igualdad, la elección que antes aparece en el cuadro, para que el árbol de un
+ * cruce sea siempre el mismo; y los elegidos van en el orden del cuadro.
+ *
+ * Con cuatro genotipos distintos o menos, salen todos. Si son menos que los hijos, se repiten
+ * ellos por turno: repetir las casillas del cuadro en orden daría en Bb VV × bb vv tres grises y
+ * un negro, que parece un 3:1 donde hay un 1:1.
+ */
 function elegirCasillasDeEjemplo(punnett: PunnettResult, cuantas: number): PunnettResult['cells'] {
-  const elegidas: PunnettResult['cells'] = [];
-  const usadas = new Set<number>();
-  const pasadas: Array<(cell: PunnettResult['cells'][number]) => string> = [
-    (cell) => cell.phenotype,
-    (cell) => cell.genotype,
-  ];
+  // Un representante por genotipo combinado: su primera casilla en el cuadro.
+  const distintas: PunnettResult['cells'] = [];
+  const vistos = new Set<string>();
+  for (const cell of punnett.cells) {
+    if (vistos.has(cell.genotype)) continue;
+    vistos.add(cell.genotype);
+    distintas.push(cell);
+  }
 
-  for (const clave of pasadas) {
-    const vistas = new Set(elegidas.map(clave));
-    punnett.cells.forEach((cell, i) => {
-      if (elegidas.length >= cuantas || usadas.has(i) || vistas.has(clave(cell))) return;
-      vistas.add(clave(cell));
-      usadas.add(i);
-      elegidas.push(cell);
-    });
+  if (distintas.length <= cuantas) {
+    const elegidas = [...distintas];
+    for (let i = 0; distintas.length > 0 && elegidas.length < cuantas; i++) {
+      elegidas.push(distintas[i % distintas.length]);
+    }
+    return elegidas;
   }
-  // Menos combinaciones distintas que hijos: se repiten ellas, por turno. Repetir las casillas
-  // del cuadro en orden daría en Bb VV × bb vv tres grises y un negro, que parece un 3:1 donde
-  // hay un 1:1.
-  const distintas = elegidas.length;
-  for (let i = 0; distintas > 0 && elegidas.length < cuantas; i++) {
-    elegidas.push(elegidas[i % distintas]);
-  }
-  return elegidas;
+
+  /** Lo que enseña una elección, en el orden de prioridad de arriba. */
+  const cobertura = (indices: number[]): number[] => {
+    const celdas = indices.map((i) => distintas[i]);
+    const genotipos = celdas.map((cell) => cell.genotype.split(' '));
+    const fenotipos = celdas.map((cell) => cell.phenotype.split(' / '));
+    const distintosEn = (valores: string[]) => new Set(valores).size;
+    return [
+      distintosEn(fenotipos.map((f) => f[0])),
+      distintosEn(genotipos.map((g) => g[0])),
+      distintosEn(fenotipos.map((f) => f[1])),
+      distintosEn(genotipos.map((g) => g[1])),
+      distintosEn(celdas.map((cell) => cell.phenotype)),
+    ];
+  };
+  const mejora = (a: number[], b: number[]) => {
+    for (let k = 0; k < a.length; k++) {
+      if (a[k] !== b[k]) return a[k] > b[k];
+    }
+    return false;
+  };
+
+  // Combinaciones en orden lexicográfico (a lo sumo C(16, 4) = 1.820): la primera que gana es
+  // la que antes aparece en el cuadro, y solo la desplaza otra que enseñe más.
+  let mejor: number[] = [];
+  let mejorCobertura: number[] = [];
+  const actual: number[] = [];
+  const recorrer = (desde: number) => {
+    if (actual.length === cuantas) {
+      const c = cobertura(actual);
+      if (mejor.length === 0 || mejora(c, mejorCobertura)) {
+        mejor = [...actual];
+        mejorCobertura = c;
+      }
+      return;
+    }
+    for (let i = desde; i <= distintas.length - (cuantas - actual.length); i++) {
+      actual.push(i);
+      recorrer(i + 1);
+      actual.pop();
+    }
+  };
+  recorrer(0);
+
+  return mejor.map((i) => distintas[i]);
 }

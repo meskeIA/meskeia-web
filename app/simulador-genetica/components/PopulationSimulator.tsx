@@ -74,7 +74,9 @@ export default function PopulationSimulator({
       setAvisoTamano(`Escribe un tamaño entre ${TAMANO_MINIMO} y ${TAMANO_MAXIMO} individuos.`);
       return;
     }
-    if (!/^\d+$/.test(limpio)) {
+    // Un entero negativo SÍ es un número entero: lo que falla es el rango, y eso es lo que se
+    // dice (28/09/2026: con «-5» el aviso pedía «un número entero», que es lo que se había escrito).
+    if (!/^-?\d+$/.test(limpio)) {
       setAvisoTamano('El tamaño de la población es un número entero de individuos.');
       return;
     }
@@ -268,7 +270,7 @@ export default function PopulationSimulator({
 
       {!simulation && (
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>🧬</div>
+          <div aria-hidden="true" className={styles.emptyIcon}>🧬</div>
           <p className={styles.emptyText}>
             Haz clic en &quot;Simular&quot; para generar una población
           </p>

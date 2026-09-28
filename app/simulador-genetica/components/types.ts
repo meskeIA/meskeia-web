@@ -160,6 +160,18 @@ export interface PedigreeChart {
     parent2Id: string;
     childIds: string[];
   }>;
+  /**
+   * Solo en el árbol DIHÍBRIDO: qué parte del cruce enseñan sus hijos de ejemplo, para que el
+   * rótulo del árbol diga lo que hay y no más (hallazgo 2377, ver pedigree.ts).
+   */
+  ejemplos?: {
+    /** Combinaciones de fenotipos distintas que da el cruce (8 en Iᴬi Dd × Iᴮi Dd). */
+    combinacionesDelCruce: number;
+    /** Las que salen entre los hijos del árbol. */
+    combinacionesMostradas: number;
+    /** Si entre los hijos están todos los genotipos posibles de cada uno de los dos rasgos. */
+    todosLosGenotipos: boolean;
+  };
 }
 
 // Resultado de simulación de población

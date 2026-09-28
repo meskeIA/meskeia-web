@@ -53,6 +53,29 @@ export default function PedigreeChart({ pedigree, rasgos }: PedigreeChartProps) 
   const recesivo = rasgo.alleles.recessive.symbol;
   const aleloRecesivo = rasgo.notacion?.[recesivo] ?? recesivo;
 
+  /**
+   * Qué enseñan los hijos de ejemplo del dihíbrido, dicho con lo que el motor ha contado.
+   *
+   * ⚠️ 28/09/2026 (hallazgo 2377) — el rótulo prometía «uno por combinación» también cuando el
+   * cruce da más combinaciones de fenotipos que hijos caben en el árbol (ABO × Rh da 8), y los
+   * cuatro hijos de entonces ni siquiera cubrían los grupos del ABO. Ahora cubren todos los
+   * genotipos de cada rasgo y el rótulo dice cuántas combinaciones enseñan de cuántas hay.
+   */
+  const ejemplos = pedigree.ejemplos;
+  const queEnsenan = (() => {
+    if (!ejemplos) return '';
+    const { combinacionesDelCruce: total, combinacionesMostradas: mostradas } = ejemplos;
+    const combinaciones =
+      mostradas >= total
+        ? total === 1
+          ? 'la única combinación de fenotipos del cruce'
+          : `las ${total} combinaciones de fenotipos del cruce`
+        : `${mostradas} de las ${total} combinaciones de fenotipos del cruce`;
+    return ejemplos.todosLosGenotipos
+      ? `están todos los genotipos de cada rasgo y ${combinaciones}`
+      : `están ${combinaciones}`;
+  })();
+
   return (
     <div className={styles.pedigreeContainer}>
       <p className={styles.pedigreeRasgo}>
@@ -61,8 +84,8 @@ export default function PedigreeChart({ pedigree, rasgos }: PedigreeChartProps) 
             Árbol de <strong>{rasgo.name}</strong> y <strong>{segundoRasgo.name}</strong>: debajo
             de cada símbolo, el genotipo y el fenotipo de los dos. El símbolo (afectado,
             portador) sigue solo a <strong>{rasgo.name}</strong>. Los cuatro hijos son ejemplos de
-            lo que puede salir, uno por combinación, no una muestra en proporción: las
-            proporciones están en Estadísticas.
+            lo que puede salir, no una muestra en proporción
+            {queEnsenan ? `: ${queEnsenan}` : ''}. Las proporciones están en Estadísticas.
           </>
         ) : (
           <>

@@ -210,7 +210,8 @@ export default function CasosAula() {
               Respuesta:{' '}
               <strong>
                 {esperado.toLocaleString('es-ES', { maximumFractionDigits: 2 })}
-                {/^%\s*/.test(etiqueta) ? ' %' : ''}
+                {/* Con espacio duro (U+00A0), para que el «%» no salte solo de línea (2378). */}
+                {/^%\s*/.test(etiqueta) ? ' %' : ''}
               </strong>{' '}
               {etiqueta.replace(/^%\s*/, '')}
             </p>
