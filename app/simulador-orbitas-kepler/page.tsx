@@ -11,7 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber } from '@/lib';
+import { formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorOrbitasKepler.module.css';
 // La física (constantes, cuerpos, órbitas reales, Kepler y el cálculo de la órbita) vive en
 // ./motor.ts, el mismo módulo con el que corrigen los «Casos para clase».
@@ -22,6 +22,7 @@ import {
   ANIO,
   CUERPOS,
   PRESETS,
+  EXCENTRICIDAD_MAX,
   resolverKepler,
   calcularOrbita,
   type CuerpoCentral,
@@ -29,7 +30,7 @@ import {
   type Orbita,
 } from './motor';
 import CasosAula from './CasosAula';
-import type { ConfiguracionSimulador } from './casos';
+import { cientifico, deCuerpo, type ConfiguracionSimulador } from './casos';
 
 // ============================================================
 // Geometría del lienzo
@@ -50,6 +51,12 @@ function semiejeEnPixeles(e: number): number {
   const achatamiento = Math.sqrt(1 - e * e);
   if (achatamiento <= 0) return A_PX_MAX;
   return Math.min(A_PX_MAX, B_PX_MAX / achatamiento);
+}
+
+/** El sistema pide movimiento reducido. `false` en el servidor o sin `matchMedia`. */
+function prefiereMovimientoReducido(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
 /** Mantiene una etiqueta centrada dentro del lienzo aunque su marca esté en el borde. */
@@ -94,11 +101,68 @@ function formatEnergia(julios: number): string {
   return `${signo}${formatNumber(abs, 1)} J`;
 }
 
+// ============================================================
+// Campos numéricos tecleados (hallazgo 2338, 28/09/2026)
+// ============================================================
+/**
+ * Cómo se escribe en su campo una cifra que llega de fuera (una órbita real, un caso cargado,
+ * otro cuerpo central): «42164», «2667950000», con coma si tuviera decimales. SIN puntos de
+ * millar a propósito: al borrar cifras de «42.164» quedaría «42.16», que en español es 42,16 km,
+ * y de «2.667.950.000», «2.667.950.00», que no es un número. La cifra agrupada ya se lee en la
+ * etiqueta de al lado, y `parseSpanishNumber` entiende igual «42.164» si alguien lo teclea.
+ * Nunca `toFixed()`: los semiejes y masas de la app son enteros, y si no lo fueran se
+ * conservan hasta tres decimales.
+ */
+function textoDeCampo(valor: number): string {
+  return (valor + 0).toLocaleString('es-ES', { useGrouping: false, maximumFractionDigits: 3 });
+}
+
+type LecturaCampo = { valor: number; error: '' } | { valor: null; error: string };
+
+/**
+ * Lee lo tecleado en un campo numérico. Si no vale, devuelve el MOTIVO y ninguna cifra: hasta
+ * el 28/09/2026 el semieje hacía `Number(v) || 1`, de modo que al borrarlo el campo se
+ * rellenaba solo con «1» (quien borraba 42164 y tecleaba 7000 obtenía 17000 km) y un negativo
+ * se calculaba en silencio con 1 km.
+ */
+function leerCampo(
+  texto: string,
+  campo: { minimo: number; pide: string; bajoMinimo: string },
+): LecturaCampo {
+  if (texto.trim() === '') return { valor: null, error: `Escribe ${campo.pide}.` };
+  const valor = parseSpanishNumber(texto);
+  if (!Number.isFinite(valor)) {
+    return { valor: null, error: `«${texto.trim()}» no es un número: escribe ${campo.pide}.` };
+  }
+  if (valor < campo.minimo) return { valor: null, error: campo.bajoMinimo };
+  return { valor, error: '' };
+}
+
+/** El semieje mayor: al menos 1 km, el mismo tope que aplica el motor (nunca en silencio). */
+const CAMPO_SEMIEJE = {
+  minimo: 1,
+  pide: 'el semieje mayor en km',
+  bajoMinimo: 'El semieje mayor tiene que ser de al menos 1 km.',
+};
+
+/** La masa del satélite: 0 kg o más (solo interviene en la energía total). */
+const CAMPO_MASA = {
+  minimo: 0,
+  pide: 'la masa del satélite en kg',
+  bajoMinimo: 'La masa del satélite no puede ser negativa.',
+};
+
 export default function SimuladorOrbitasKepler() {
   const [cuerpoId, setCuerpoId] = useState('tierra');
   const [semiejeKm, setSemiejeKm] = useState(42_164);
+  // Lo que hay escrito en el campo del semieje, que puede estar a medias o vacío: el cálculo
+  // solo toma el valor cuando es válido, y mientras no lo es se dice (hallazgo 2338).
+  const [semiejeTexto, setSemiejeTexto] = useState(() => textoDeCampo(42_164));
+  const [errorSemieje, setErrorSemieje] = useState('');
   const [excentricidad, setExcentricidad] = useState(0);
   const [masaSatelite, setMasaSatelite] = useState(1000);
+  const [masaTexto, setMasaTexto] = useState(() => textoDeCampo(1000));
+  const [errorMasa, setErrorMasa] = useState('');
   const [presetActivo, setPresetActivo] = useState('geo');
   const [animando, setAnimando] = useState(true);
   const [anomaliaMedia, setAnomaliaMedia] = useState(0);
@@ -107,6 +171,8 @@ export default function SimuladorOrbitasKepler() {
   const rafRef = useRef<number | null>(null);
   const ultimoTsRef = useRef<number | null>(null);
   const anomaliaRef = useRef(0);
+  /** La persona ha pulsado «Animar»/«Pausar»: desde ese momento manda su elección. */
+  const eleccionUsuarioRef = useRef(false);
 
   const cuerpo = useMemo(
     () => CUERPOS.find((c) => c.id === cuerpoId) ?? CUERPOS[1],
@@ -121,7 +187,7 @@ export default function SimuladorOrbitasKepler() {
 
   // ── Posición instantánea del satélite ───────────────────
   const posicion = useMemo(() => {
-    const e = Math.min(Math.max(excentricidad, 0), 0.99);
+    const e = Math.min(Math.max(excentricidad, 0), EXCENTRICIDAD_MAX);
     const E = resolverKepler(anomaliaMedia, e);
     const r = orbita.a * (1 - e * Math.cos(E));
     const v = Math.sqrt(G * cuerpo.masa * (2 / r - 1 / orbita.a));
@@ -142,6 +208,12 @@ export default function SimuladorOrbitasKepler() {
       ultimoTsRef.current = null;
       return;
     }
+
+    // Con movimiento reducido no se arranca sola ni un fotograma. `animando` nace en true (el
+    // servidor no sabe la preferencia) y el efecto de abajo lo pone a false, pero este corre
+    // antes y el satélite llegaba a moverse: «Fracción del periodo» salía 0,8 % en vez de 0,0 %
+    // (28/09/2026, al reparar el hallazgo 2337). Si la persona pulsa «Animar», se anima.
+    if (!eleccionUsuarioRef.current && prefiereMovimientoReducido()) return;
 
     const paso = (ts: number) => {
       if (ultimoTsRef.current === null) ultimoTsRef.current = ts;
@@ -171,38 +243,69 @@ export default function SimuladorOrbitasKepler() {
   }, []);
 
   // ── Manejadores ─────────────────────────────────────────
-  const handleCuerpo = useCallback((nuevo: CuerpoCentral) => {
-    setCuerpoId(nuevo.id);
-    setSemiejeKm(nuevo.semiejeDefecto);
-    const primero = PRESETS[nuevo.id]?.find((p) => p.semiejeKm === nuevo.semiejeDefecto);
-    setExcentricidad(primero ? primero.excentricidad : 0);
-    setPresetActivo(primero ? primero.id : '');
+  /** Un semieje que llega de fuera del campo: se escribe en él y borra cualquier aviso. */
+  const ponerSemieje = useCallback((km: number) => {
+    setSemiejeKm(km);
+    setSemiejeTexto(textoDeCampo(km));
+    setErrorSemieje('');
   }, []);
 
-  const handlePreset = useCallback((preset: OrbitaPreset) => {
-    setSemiejeKm(preset.semiejeKm);
-    setExcentricidad(preset.excentricidad);
-    setPresetActivo(preset.id);
-  }, []);
+  const handleCuerpo = useCallback(
+    (nuevo: CuerpoCentral) => {
+      setCuerpoId(nuevo.id);
+      ponerSemieje(nuevo.semiejeDefecto);
+      const primero = PRESETS[nuevo.id]?.find((p) => p.semiejeKm === nuevo.semiejeDefecto);
+      setExcentricidad(primero ? primero.excentricidad : 0);
+      setPresetActivo(primero ? primero.id : '');
+    },
+    [ponerSemieje],
+  );
+
+  const handlePreset = useCallback(
+    (preset: OrbitaPreset) => {
+      ponerSemieje(preset.semiejeKm);
+      setExcentricidad(preset.excentricidad);
+      setPresetActivo(preset.id);
+    },
+    [ponerSemieje],
+  );
 
   /**
    * «Cargar en el simulador» de los Casos para clase: pone cuerpo, semieje y excentricidad del
    * caso. Si coinciden EXACTAMENTE con una órbita real de ese cuerpo, se marca su botón (así el
    * caso 10 carga Mercurio con e = 0,2056, que el deslizador de 0,001 en 0,001 no alcanza).
    */
-  const handleCargarCaso = useCallback((config: ConfiguracionSimulador) => {
-    setCuerpoId(config.cuerpoId);
-    setSemiejeKm(config.semiejeKm);
-    setExcentricidad(config.excentricidad);
-    const coincide = PRESETS[config.cuerpoId]?.find(
-      (p) => p.semiejeKm === config.semiejeKm && p.excentricidad === config.excentricidad,
-    );
-    setPresetActivo(coincide ? coincide.id : '');
-  }, []);
+  const handleCargarCaso = useCallback(
+    (config: ConfiguracionSimulador) => {
+      setCuerpoId(config.cuerpoId);
+      ponerSemieje(config.semiejeKm);
+      setExcentricidad(config.excentricidad);
+      const coincide = PRESETS[config.cuerpoId]?.find(
+        (p) => p.semiejeKm === config.semiejeKm && p.excentricidad === config.excentricidad,
+      );
+      setPresetActivo(coincide ? coincide.id : '');
+    },
+    [ponerSemieje],
+  );
 
-  const handleSemieje = (valor: number) => {
-    setSemiejeKm(valor);
+  /**
+   * Lo tecleado se queda tal cual en el campo. Solo un valor válido llega al cálculo; uno que
+   * no lo es deja los resultados en el último válido y lo dice debajo del campo.
+   */
+  const handleSemieje = (texto: string) => {
+    setSemiejeTexto(texto);
+    const lectura = leerCampo(texto, CAMPO_SEMIEJE);
+    setErrorSemieje(lectura.error);
+    if (lectura.valor === null) return;
+    setSemiejeKm(lectura.valor);
     setPresetActivo('');
+  };
+
+  const handleMasa = (texto: string) => {
+    setMasaTexto(texto);
+    const lectura = leerCampo(texto, CAMPO_MASA);
+    setErrorMasa(lectura.error);
+    if (lectura.valor !== null) setMasaSatelite(lectura.valor);
   };
 
   const handleExcentricidad = (valor: number) => {
@@ -211,7 +314,7 @@ export default function SimuladorOrbitasKepler() {
   };
 
   // ── Geometría del dibujo ────────────────────────────────
-  const e = Math.min(Math.max(excentricidad, 0), 0.99);
+  const e = Math.min(Math.max(excentricidad, 0), EXCENTRICIDAD_MAX);
   const aPx = semiejeEnPixeles(e);
   const bPx = aPx * Math.sqrt(1 - e * e);
   const focoX = CX + aPx * e; // el cuerpo central ocupa un foco, no el centro
@@ -248,7 +351,7 @@ export default function SimuladorOrbitasKepler() {
           <span>
             {orbita.chocaSuperficie
               ? `El ${cuerpo.peri.toLowerCase()} queda a ${formatDistancia(orbita.rPeri)} del centro, por debajo del radio del cuerpo (${formatDistancia(cuerpo.radio)}). Aumenta el semieje mayor o reduce la excentricidad.`
-              : `Órbita ${e < 0.01 ? 'prácticamente circular' : e < 0.2 ? 'poco excéntrica' : e < 0.6 ? 'claramente elíptica' : 'muy excéntrica'} alrededor de ${cuerpo.nombre === 'Sol' ? 'el Sol' : cuerpo.nombre}`}
+              : `Órbita ${e < 0.01 ? 'prácticamente circular' : e < 0.2 ? 'poco excéntrica' : e < 0.6 ? 'claramente elíptica' : 'muy excéntrica'} alrededor ${deCuerpo(cuerpo)}`}
           </span>
         </section>
 
@@ -284,17 +387,24 @@ export default function SimuladorOrbitasKepler() {
                 Semieje mayor (a)
                 <span className={styles.valueBadge}>{formatNumber(semiejeKm, 0)} km</span>
               </label>
+              {/* type="text" y no "number": con "number" el navegador lee «42.164» como 42,164 y
+                  React reescribe el campo mientras se teclea (hallazgo 2338). */}
               <input
                 id="semieje"
-                type="number"
+                type="text"
                 inputMode="decimal"
-                min={1}
-                step={1}
-                value={semiejeKm}
-                onChange={(ev) => handleSemieje(Number(ev.target.value) || 1)}
+                autoComplete="off"
+                value={semiejeTexto}
+                onChange={(ev) => handleSemieje(ev.target.value)}
+                aria-invalid={errorSemieje !== ''}
+                aria-describedby="semieje-aviso semieje-ayuda"
                 className={styles.numberInput}
               />
-              <span className={styles.inputHint}>
+              <p id="semieje-aviso" className={styles.avisoCampo} aria-live="polite">
+                {errorSemieje &&
+                  `${errorSemieje} Mientras tanto, los resultados siguen siendo los de a = ${formatNumber(semiejeKm, 0)} km.`}
+              </p>
+              <span id="semieje-ayuda" className={styles.inputHint}>
                 Distancia media al cuerpo central. Es lo único que determina el periodo.
               </span>
             </div>
@@ -308,7 +418,7 @@ export default function SimuladorOrbitasKepler() {
                 id="excentricidad"
                 type="range"
                 min={0}
-                max={0.95}
+                max={EXCENTRICIDAD_MAX}
                 step={0.001}
                 value={excentricidad}
                 onChange={(ev) => handleExcentricidad(Number(ev.target.value))}
@@ -326,15 +436,20 @@ export default function SimuladorOrbitasKepler() {
               </label>
               <input
                 id="masa"
-                type="number"
+                type="text"
                 inputMode="decimal"
-                min={0}
-                step={100}
-                value={masaSatelite}
-                onChange={(ev) => setMasaSatelite(Math.max(Number(ev.target.value) || 0, 0))}
+                autoComplete="off"
+                value={masaTexto}
+                onChange={(ev) => handleMasa(ev.target.value)}
+                aria-invalid={errorMasa !== ''}
+                aria-describedby="masa-aviso masa-ayuda"
                 className={styles.numberInput}
               />
-              <span className={styles.inputHint}>
+              <p id="masa-aviso" className={styles.avisoCampo} aria-live="polite">
+                {errorMasa &&
+                  `${errorMasa} Mientras tanto, la energía total se calcula con ${formatNumber(masaSatelite, 0)} kg.`}
+              </p>
+              <span id="masa-ayuda" className={styles.inputHint}>
                 Solo interviene en la energía total: no afecta ni al periodo ni a las velocidades.
               </span>
             </div>
@@ -366,7 +481,7 @@ export default function SimuladorOrbitasKepler() {
               viewBox={`0 0 ${SVG_W} ${SVG_H}`}
               className={styles.canvasSvg}
               role="img"
-              aria-label={`Órbita elíptica de excentricidad ${formatNumber(excentricidad, 3)} alrededor de ${cuerpo.nombre}, con el satélite a ${formatDistancia(posicion.radio)} del centro`}
+              aria-label={`Órbita elíptica de excentricidad ${formatNumber(excentricidad, 3)} alrededor ${deCuerpo(cuerpo)}, con el satélite a ${formatDistancia(posicion.radio)} del centro`}
             >
               {/* Elipse de la trayectoria */}
               <ellipse cx={CX} cy={CY} rx={aPx} ry={bPx} className={styles.trayectoria} />
@@ -413,7 +528,10 @@ export default function SimuladorOrbitasKepler() {
               type="button"
               className={styles.animBtn}
               aria-pressed={animando}
-              onClick={() => setAnimando((v) => !v)}
+              onClick={() => {
+                eleccionUsuarioRef.current = true;
+                setAnimando((v) => !v);
+              }}
             >
               <span aria-hidden="true">{animando ? '⏸' : '▶'}</span>{' '}
               {animando ? 'Pausar' : 'Animar'}
@@ -499,6 +617,10 @@ export default function SimuladorOrbitasKepler() {
                 {cuerpo.apo.charAt(0).toLowerCase()} = (1+e)/(1−e) ={' '}
                 {formatNumber((1 + e) / (1 - e), 3)}
               </p>
+              <p className={styles.resultNota}>
+                La media orbital es el perímetro de la elipse entre el periodo: solo en una órbita
+                circular coincide con la velocidad circular.
+              </p>
             </div>
 
             <div className={styles.resultBlock}>
@@ -516,11 +638,11 @@ export default function SimuladorOrbitasKepler() {
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>T²/a³ (tercera ley)</span>
                 <span className={styles.resultValue}>
-                  {orbita.constanteKepler.toExponential(4).replace('.', ',')} s²/m³
+                  {cientifico(orbita.constanteKepler, 4)} s²/m³
                 </span>
               </div>
               <p className={styles.resultNota}>
-                Esa constante es la misma para cualquier órbita alrededor de {cuerpo.nombre}: cambia
+                Esa constante es la misma para cualquier órbita alrededor {deCuerpo(cuerpo)}: cambia
                 el semieje y compruébalo.
               </p>
             </div>
@@ -539,8 +661,9 @@ export default function SimuladorOrbitasKepler() {
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Fracción del periodo</span>
+                {/* formatPercentage separa el % con espacio duro (U+00A0), hallazgo 2337. */}
                 <span className={styles.resultValue}>
-                  {formatNumber((anomaliaMedia / (2 * Math.PI)) * 100, 1)} %
+                  {formatPercentage(anomaliaMedia / (2 * Math.PI), 1)}
                 </span>
               </div>
               <p className={styles.resultNota}>
@@ -597,6 +720,15 @@ export default function SimuladorOrbitasKepler() {
                   <td>v = √(GM/r)</td>
                   <td>m/s</td>
                   <td>Caso particular de la vis-viva cuando r = a</td>
+                </tr>
+                <tr>
+                  <td>Velocidad media</td>
+                  <td>v̄ = L/T</td>
+                  <td>m/s</td>
+                  <td>
+                    L es el perímetro de la elipse. En una circunferencia L = 2πa y coincide con la
+                    circular; en una elipse es menor
+                  </td>
                 </tr>
                 <tr>
                   <td>Velocidad de escape</td>

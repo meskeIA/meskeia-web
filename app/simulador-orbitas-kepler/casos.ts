@@ -38,8 +38,10 @@
  *    km (el panel da unidades entre 1.000 y 10⁶ km). Así el alumno puede cargar el caso y
  *    comparar.
  *
- * ⚠️ **«Media orbital» (2πa/T) no se pregunta.** En una órbita excéntrica no es la velocidad
- *    media, y ningún caso depende de ella.
+ * ⚠️ **«Media orbital» no se pregunta.** Hasta el 28/09/2026 era 2πa/T, que en una órbita
+ *    excéntrica no es la velocidad media; desde entonces es L/T con el perímetro de la elipse
+ *    (hallazgo 2333, `perimetroElipse` de motor.ts), que pide la integral elíptica y queda fuera
+ *    del temario. Ningún caso dependía ni depende de ella.
  *
  * ⚠️ **Caso 10 y el deslizador de excentricidad.** El deslizador va de 0,001 en 0,001 y la
  *    excentricidad de Mercurio es 0,2056. Se decidió que `configuracionSimulador` admita, además
@@ -50,7 +52,17 @@
  */
 
 import { formatNumber } from '@/lib';
-import { ANIO, DIA, G, PRESETS, UA, calcularOrbita, cuerpoPorId, type CuerpoCentral } from './motor';
+import {
+  ANIO,
+  DIA,
+  EXCENTRICIDAD_MAX,
+  G,
+  PRESETS,
+  UA,
+  calcularOrbita,
+  cuerpoPorId,
+  type CuerpoCentral,
+} from './motor';
 
 /* ─────────────────────────── Datos de un caso ─────────────────────────── */
 
@@ -142,8 +154,11 @@ const SUPERINDICES: Record<string, string> = {
   '9': '⁹',
 };
 
-/** Notación científica en formato español: «3,9856·10¹⁴». */
-function cientifico(n: number, cifras = 4): string {
+/**
+ * Notación científica en formato español: «3,9856·10¹⁴». La usa también el panel de
+ * resultados para T²/a³, que hasta el 28/09/2026 salía como «9,9050e-14».
+ */
+export function cientifico(n: number, cifras = 4): string {
   if (!Number.isFinite(n)) return '—';
   if (n === 0) return '0';
   const exponente = Math.floor(Math.log10(Math.abs(n)));
@@ -241,8 +256,11 @@ function conArticulo(cuerpo: CuerpoCentral): string {
   return cuerpo.nombre;
 }
 
-/** «del Sol», «de la Tierra», «de Marte»: evita el «de el Sol». */
-function deCuerpo(cuerpo: CuerpoCentral): string {
+/**
+ * «del Sol», «de la Tierra», «de Marte»: evita el «de el Sol». La usa también la página para
+ * «alrededor del Sol» y «alrededor de la Tierra» (hallazgo 2336).
+ */
+export function deCuerpo(cuerpo: CuerpoCentral): string {
   return cuerpo.id === 'sol' ? 'del Sol' : `de ${conArticulo(cuerpo)}`;
 }
 
@@ -347,7 +365,7 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
           if (positivo(datos.semiejeUA) && cuerpo.id === 'sol') {
             const patron = datos.semiejeUA * Math.sqrt(datos.semiejeUA);
             pasos.push(
-              `Comprobación con la Tierra como patrón (a = 1 UA, T = 1 año): T² = a³ da T = ${numero(datos.semiejeUA)}^1,5 = ${numero(patron)} años. El motor da ${numero(valor)} porque G y M_Sol llevan cuatro cifras y el año es juliano: la diferencia es del 0,01 % y desaparece al redondear.`,
+              `Comprobación con la Tierra como patrón (a = 1 UA, T = 1 año): T² = a³ da T = ${numero(datos.semiejeUA)}^1,5 = ${numero(patron)} años. El motor da ${numero(valor)} porque G y M_Sol llevan cuatro cifras y el año es juliano: la diferencia es del 0,01\u00A0% y desaparece al redondear.`,
             );
           }
         }
@@ -543,10 +561,10 @@ export interface ConfiguracionSimulador {
  * La configuración del simulador que reproduce un caso EXACTO, o `null` si no cabe en sus
  * controles. Nunca lanza.
  *
- * Cabe cuando el cuerpo es uno de los cuatro, el semieje es un número entero de km ≥ 1 (el
- * campo va de 1 en 1) y la excentricidad está en la rejilla del deslizador (0 a 0,95 de 0,001
- * en 0,001) o coincide EXACTAMENTE, junto con el semieje, con una órbita real del cuerpo
- * (caso 10, Mercurio con e = 0,2056: ver la cabecera).
+ * Cabe cuando el cuerpo es uno de los cuatro, el semieje es un número entero de km ≥ 1 y la
+ * excentricidad está en la rejilla del deslizador (0 a EXCENTRICIDAD_MAX = 0,99 de 0,001 en
+ * 0,001; hasta el 28/09/2026 llegaba a 0,95) o coincide EXACTAMENTE, junto con el semieje, con
+ * una órbita real del cuerpo (caso 10, Mercurio con e = 0,2056: ver la cabecera).
  *
  * Un semieje dado en UA se redondea al km entero (4 UA = 598.391.482,8 km → 598.391.483 km):
  * son 0,2 km en 6·10⁸, un cambio relativo de 3·10⁻¹⁰ que no mueve ninguna cifra del panel.
@@ -583,7 +601,9 @@ export function configuracionSimulador(datos: DatosCaso): ConfiguracionSimulador
   if (!Number.isFinite(excentricidad)) return null;
   const milesimas = excentricidad * 1000;
   const enRejilla =
-    excentricidad >= 0 && excentricidad <= 0.95 + 1e-12 && Math.abs(milesimas - Math.round(milesimas)) < 1e-9;
+    excentricidad >= 0 &&
+    excentricidad <= EXCENTRICIDAD_MAX + 1e-12 &&
+    Math.abs(milesimas - Math.round(milesimas)) < 1e-9;
   const esPreset = (PRESETS[cuerpo.id] ?? []).some(
     (p) => p.semiejeKm === semiejeKm && p.excentricidad === excentricidad,
   );

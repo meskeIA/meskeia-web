@@ -200,6 +200,25 @@
   color: var(--text-secondary);
 }
 
+/* Aviso de un campo que no vale (hallazgo 2338). La región viva existe siempre, vacía, para que
+   el lector de pantalla anuncie el aviso al aparecer; vacía no ocupa sitio. */
+.avisoCampo {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #991b1b;
+}
+
+/* Vacía tampoco suma el hueco del flex de .inputGroup (gap 0.4rem). */
+.avisoCampo:empty {
+  height: 0;
+  margin-top: -0.4rem;
+}
+
+.numberInput[aria-invalid='true'] {
+  border-color: #dc2626;
+}
+
 /* Presets */
 .presetsGrid {
   display: flex;
@@ -680,6 +699,14 @@
   border-color: #4b5563;
   background: #2a2a2a;
   color: var(--text-primary);
+}
+
+[data-theme='dark'] .avisoCampo {
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .numberInput[aria-invalid='true'] {
+  border-color: #f87171;
 }
 
 [data-theme='dark'] .cuerpoBtnActivo {
