@@ -59,6 +59,17 @@
   --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.12);
   --radius: 8px;
 
+  /* Alias de los nombres que usan ~200 módulos sin declararlos (--radius-large en 115,
+     --shadow-md en 112, --shadow-sm en 90, --shadow-lg en 9): una var() sin definir y sin
+     reserva anula la declaración entera, y esas apps salían con esquinas rectas y sin sombra
+     (hallazgo 2367, simulador-fluidos-bernoulli, 28/09/2026). 16px es el de la plantilla. Las
+     sombras apuntan a las de arriba, así que heredan su variante oscura. Un módulo que declare
+     el suyo sigue mandando. */
+  --radius-large: 16px;
+  --shadow-sm: var(--shadow-light);
+  --shadow-md: var(--shadow-medium);
+  --shadow-lg: var(--shadow-strong);
+
   /* ========================================
      SISTEMA RESPONSIVE - Breakpoints
      ======================================== */
