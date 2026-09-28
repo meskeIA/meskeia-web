@@ -90,7 +90,7 @@ export const faqJsonLd = {
       name: '¿En qué se diferencia el ciclo Otto del ciclo Diesel?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El ciclo Otto (motor de gasolina) añade calor a volumen constante (combustión rápida y explosiva), mientras que el ciclo Diesel añade calor a presión constante (combustión gradual con inyección de combustible). El Diesel tiene mayor eficiencia teórica a igual relación de compresión, pero opera a relaciones de compresión más altas, lo que lo hace más eficiente en la práctica para vehículos pesados y transporte de larga distancia.',
+        text: 'El ciclo Otto (motor de gasolina) añade calor a volumen constante (combustión rápida por chispa), mientras que el ciclo Diesel añade calor a presión constante (combustión gradual mientras se inyecta el combustible). A igual relación de compresión, el Otto tiene mayor eficiencia teórica: con r = 10 y γ = 1,4, un 60,2\u00A0% frente a un 53,4\u00A0% del Diesel con un corte rc = 2. Pero el Diesel solo comprime aire y admite relaciones de compresión mucho más altas (15-22 frente a 8-12), y eso le da en la práctica un rendimiento mayor, sobre todo en vehículos pesados y transporte de larga distancia.',
       },
     },
     {

@@ -14,9 +14,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   · R = 8,314 J/(mol·K) y 1 atm = 101.325 Pa (R = 0,08205 atm·L/(mol·K); la app rotula
  *     0,0821, y con ese redondeo los casos siguen dentro de la tolerancia del 1 %);
  *   · T(K) = T(°C) + 273,15 (con 273 también entra: los casos 7, 9 y 12 están elegidos así);
- *   · ⚠️ nada que dependa de n en la pestaña Procesos (Q, ΔU, W isotermo): su estado de fábrica
- *     no cumple PV = nRT (1 atm·10 L frente a 1 mol·300 K, un factor 2,46) — anotado en
- *     _private/inspector/SOSPECHAS.md el 28/09/2026.
+ *   · nada que dependa de n en la pestaña Procesos (Q, ΔU, W isotermo): cuando se escribieron,
+ *     su estado de fábrica no cumplía PV = nRT (1 atm·10 L frente a 1 mol·300 K, un factor
+ *     2,46). Hallazgo 2352, REPARADO el 28/09/2026: la n ya no se teclea, sale de P₁V₁/(RT₁),
+ *     y P₂, V₂, T₂ y el W isobárico —lo único que preguntan los casos— no cambiaron.
  *
  * CÓMO SE DERIVA CADA VALOR ESPERADO (a mano, sin mirar la app):
  *   1 · P = nRT/V = 2·8,314·300 / 0,010 m³ = 498.840 Pa = 4,9232 atm             → 4,92 atm
@@ -153,7 +154,8 @@ test.describe('simulador-gas-ideal · casos para clase', () => {
     expect(R).toBe(8.314);
     expect(ATM_TO_PA).toBe(101325);
     expect(calcularGasIdeal('V', 1, 0, 273.15, 1)).toBeCloseTo(22.4127, 4);
-    const boyle = calcularProceso({ proceso: 'isotermo', P1atm: 1, V1L: 10, T1K: 300, V2L: 4, T2K: 600, nMol: 1, gamma: 1.4 });
+    // Sin `nMol` desde el 28/09/2026: la n la deriva el motor del estado inicial (hallazgo 2352).
+    const boyle = calcularProceso({ proceso: 'isotermo', P1atm: 1, V1L: 10, T1K: 300, V2L: 4, T2K: 600, gamma: 1.4 });
     expect(boyle!.P2 / ATM_TO_PA).toBeCloseTo(2.5, 10);
 
     // (c) Los convenios de los libros entran: R = 0,0821 en el caso 1, 273 en el 7, «22,4 L».
@@ -273,11 +275,32 @@ test.describe('simulador-gas-ideal · la sección de casos en el navegador', () 
  *     Una temperatura absoluta negativa no existe. La app imprime P = 1·8,314·(−50)/0,0224 =
  *     −18.558 Pa = «−0,183 atm». Igual en «Procesos», isobárico con T₂ = −300 K → V₂ = −10 L.
  *
- * Los tests con `test.fail()` afirman lo que DEBERÍA pasar: hoy fallan a propósito. Al
- * reparar, se les quita la marca y se reescribe su comentario en pasado («REPARADO»).
+ * Los tests nacieron con `test.fail()`, afirmando lo que DEBERÍA pasar. Los 11 hallazgos se
+ * REPARARON el 28/09/2026 y los tests afirman ya lo correcto, sin la marca.
+ *
+ * ── LA REPARACIÓN DE 2352/2353, en tres líneas ───────────────────────────────
+ *   · En «Procesos» la n ya NO se teclea: sale del estado inicial, n = P₁V₁/(RT₁) = 0,40624 mol
+ *     de fábrica, y se enseña como dato calculado. P₂, V₂, T₂, W, Q, ΔU y la curva salen de ese
+ *     único estado; Q y ΔU tienen cada uno su fórmula (ya no Q = ΔU + W).
+ *   · Valores coherentes de fábrica, resueltos a mano: isobárico W 1.013,25 · ΔU 2.533,13 ·
+ *     Q 3.546,38 J; isocórico ΔU = Q = 2.533,13 J; isotermo W = Q = 1.013,25·ln 2 = 702,33 J;
+ *     adiabático W 613,38 J y ΔU = n·Cᵥ·ΔT = 0,40624·20,785·(227,357 − 300) = −613,38 J.
+ *   · Un test ANTERIOR consagraba el estado incoherente: el de γ (2356) tomaba como control
+ *     ΔU = 1·(8,314/0,67)·300 = 3722,69 J, con n = 1. Corregido a 1.013,25/0,67 = 1.512,31 J.
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 import { parseSpanishNumber } from '../../lib/formatters';
+import {
+  calcularCiclo,
+  errorCiclo,
+  errorGasIdeal,
+  errorProceso,
+  curvaProceso,
+  escalaDiagrama,
+  molesDelEstado,
+  type EntradaCiclo,
+  type EntradaProceso,
+} from '../../app/simulador-gas-ideal/motor';
 
 /** Primera cifra en formato español de un texto («-0,183 atm» → −0,183; «15.314,95 J» → 15314,95). */
 function cifra(texto: string): number {
@@ -411,34 +434,172 @@ test.describe('Inspector 28/09/2026 — lo que la app hace bien (candados de reg
   });
 });
 
-test.describe('Inspector 28/09/2026 — hallazgos abiertos', () => {
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * REPARACIÓN 28/09/2026 — el motor, sin navegador
+ *
+ * Lo que el navegador no ve de un vistazo: que el estado de «Procesos» es UNO (2352), que la
+ * comprobación ΔU = Q − W no es una identidad escrita a mano, que ningún ciclo que se publica
+ * supera su propia η de Carnot (2354, 2355) y que los datos imposibles se rechazan (2357).
+ * Todas las cifras, resueltas a mano en la cabecera del bloque del Inspector de arriba.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+const FABRICA: Omit<EntradaProceso, 'proceso'> = { P1atm: 1, V1L: 10, T1K: 300, V2L: 20, T2K: 600, gamma: 1.4 };
+
+test.describe('REPARADO 28/09/2026 — el motor (sin navegador)', () => {
+  test('2352 · n sale del estado inicial y los cuatro procesos dan los balances de un gas ideal', async () => {
+    // n = P₁V₁/(RT₁) = 1.013,25/(8,314·300) = 0,406242 mol
+    expect(molesDelEstado(1, 10, 300)).toBeCloseTo(0.406242, 6);
+
+    const isobaro = calcularProceso({ ...FABRICA, proceso: 'isobaro' })!;
+    expect(isobaro.n).toBeCloseTo(0.406242, 6);
+    expect(isobaro.W).toBeCloseTo(1013.25, 2); // P·ΔV = 101.325·0,010
+    expect(isobaro.dU).toBeCloseTo(2533.125, 2); // n·Cᵥ·ΔT = 1.013,25/300/0,4·300
+    expect(isobaro.Q).toBeCloseTo(3546.375, 2); // n·Cₚ·ΔT = 1,4·2.533,125
+    expect(isobaro.dU / isobaro.W).toBeCloseTo(2.5, 10); // 1/(γ−1)
+    expect(isobaro.Q / isobaro.dU).toBeCloseTo(1.4, 10); // γ
+
+    const isocoro = calcularProceso({ ...FABRICA, proceso: 'isocoro' })!;
+    expect(isocoro.W).toBe(0);
+    expect(isocoro.dU).toBeCloseTo(2533.125, 2); // V·(P₂ − P₁)/(γ−1) = 0,010·101.325/0,4
+    expect(isocoro.Q).toBeCloseTo(isocoro.dU, 10);
+
+    const isotermo = calcularProceso({ ...FABRICA, proceso: 'isotermo' })!;
+    expect(isotermo.W).toBeCloseTo(702.3314, 3); // P₁V₁·ln 2 = 1.013,25·0,693147
+    expect(isotermo.Q).toBeCloseTo(isotermo.W, 10);
+    expect(isotermo.dU).toBe(0);
+
+    const adiabatico = calcularProceso({ ...FABRICA, proceso: 'adiabatico' })!;
+    expect(adiabatico.T2).toBeCloseTo(227.3575, 3); // 300·0,5^0,4
+    expect(adiabatico.W).toBeCloseTo(613.3752, 3); // (1.013,25 − 767,90)/0,4
+    // ΔU sale de n·Cᵥ·ΔT, NO de −W: 0,406242·20,785·(227,357 − 300) = −613,375
+    expect(adiabatico.dU).toBeCloseTo(-613.3752, 3);
+  });
+
+  test('2352 · ΔU = Q − W es una comprobación, no una identidad: Q sale de su propia fórmula', async () => {
+    // Si Q se calculara como ΔU + W (como antes), cuadraría con cualquier n. Aquí Q = n·Cₚ·ΔT,
+    // con la n del estado; se recalcula a mano y sin pasar por ΔU ni por W.
+    const r = calcularProceso({ ...FABRICA, proceso: 'isobaro' })!;
+    const nAMano = (101325 * 0.01) / (8.314 * 300);
+    const cpAMano = (1.4 * 8.314) / 0.4;
+    expect(r.Q).toBeCloseTo(nAMano * cpAMano * 300, 6);
+    expect(r.Q - r.W).toBeCloseTo(r.dU, 6);
+    // Lo que el hallazgo pedía al subir n de 1 a 2 en el adiabático: ahora la n la mueve el
+    // estado. Con P₁ = 2 atm (n doble) el W y el ΔU se duplican: 2·613,375 = 1.226,75 J.
+    const doble = calcularProceso({ ...FABRICA, proceso: 'adiabatico', P1atm: 2 })!;
+    expect(doble.n).toBeCloseTo(0.812485, 6); // 2·1.013,25/(8,314·300) = 0,8124850
+    expect(doble.W).toBeCloseTo(1226.7505, 3);
+    expect(doble.dU).toBeCloseTo(-1226.7505, 3);
+  });
+
+  test('2353 · la curva empieza en (P₁, V₁) y acaba en (P₂, V₂) en los cuatro procesos', async () => {
+    for (const proceso of ['isotermo', 'isobaro', 'isocoro', 'adiabatico'] as const) {
+      const r = calcularProceso({ ...FABRICA, proceso })!;
+      const curva = curvaProceso(proceso, r);
+      expect(curva[0].P, `${proceso} · P del punto 1`).toBeCloseTo(r.P1, 6);
+      expect(curva[0].V, `${proceso} · V del punto 1`).toBeCloseTo(r.V1, 12);
+      expect(curva[curva.length - 1].P, `${proceso} · P del punto 2`).toBeCloseTo(r.P2, 6);
+      expect(curva[curva.length - 1].V, `${proceso} · V del punto 2`).toBeCloseTo(r.V2, 12);
+    }
+  });
+
+  test('2357 · datos imposibles o vacíos: aviso y ninguna cifra', async () => {
+    expect(errorGasIdeal('P', NaN, 22.4, -50, 1)).toMatch(/0 K/);
+    expect(calcularGasIdeal('P', NaN, 22.4, -50, 1)).toBeNull();
+    expect(errorGasIdeal('P', NaN, 22.4, 273.15, -1)).toMatch(/0 mol/);
+    expect(calcularGasIdeal('P', NaN, 22.4, 273.15, -1)).toBeNull();
+    expect(errorGasIdeal('P', NaN, NaN, 273.15, 1)).toMatch(/Falta el volumen V/);
+    // La variable que se despeja no se valida: su campo no es un dato.
+    expect(errorGasIdeal('P', NaN, 22.4, 273.15, 1)).toBeNull();
+
+    expect(errorProceso({ ...FABRICA, proceso: 'isobaro', T2K: -300 })).toMatch(/T₂.*0 K/);
+    expect(calcularProceso({ ...FABRICA, proceso: 'isobaro', T2K: -300 })).toBeNull();
+    expect(calcularProceso({ ...FABRICA, proceso: 'isobaro', P1atm: NaN })).toBeNull();
+    expect(errorProceso({ ...FABRICA, proceso: 'isobaro', P1atm: NaN })).toMatch(/P₁/);
+    // Un V₂ vaciado no bloquea un proceso que no lo lee.
+    expect(calcularProceso({ ...FABRICA, proceso: 'isobaro', V2L: NaN })).not.toBeNull();
+  });
+
+  test('2354-2355 · ningún ciclo que se publica supera su η de Carnot ni absorbe calor negativo', async () => {
+    const base: EntradaCiclo = { ciclo: 'otto', Th: 800, Tc: 300, V1L: 2, V2L: 20, r: 10, rc: 2, nMol: 1, gamma: 1.4 };
+    // El caso de la ficha: Otto con r = 12 → T₂ = 300·12^0,4 = 810,58 K > T pico 800 K.
+    expect(calcularCiclo({ ...base, r: 12 })).toBeNull();
+    expect(errorCiclo({ ...base, r: 12 })).toMatch(/810,58/);
+    // El Diesel de la ficha, r = 20: T₃ = 2·300·20^0,4 = 1.988,67 K; η 64,68 % < 84,91 %.
+    const diesel = calcularCiclo({ ...base, ciclo: 'diesel', r: 20 })!;
+    expect(diesel.Tmax).toBeCloseTo(1988.672, 2);
+    expect(diesel.eta).toBeCloseTo(0.646782, 5);
+    expect(diesel.etaCarnot).toBeCloseTo(0.849146, 5);
+    // La «T pico» no es un dato del Diesel: cambiarla no mueve nada, y tampoco lo aparenta.
+    expect(calcularCiclo({ ...base, ciclo: 'diesel', Th: 2000 })!.etaCarnot).toBeCloseTo(
+      calcularCiclo({ ...base, ciclo: 'diesel' })!.etaCarnot,
+      12,
+    );
+    // Barrido: todo lo que se publica cumple η ≤ η Carnot, Qh > 0 y W > 0.
+    let publicados = 0;
+    for (const ciclo of ['carnot', 'otto', 'diesel', 'stirling'] as const) {
+      for (const gamma of [1.33, 1.4, 1.67]) {
+        for (const r of [1.5, 2, 4, 8, 10, 12, 16, 20, 25]) {
+          for (const rc of [1.2, 1.5, 2, 3]) {
+            for (const Th of [350, 500, 800, 1200, 2000, 3000]) {
+              const res = calcularCiclo({ ...base, ciclo, gamma, r, rc, Th });
+              if (!res) continue;
+              publicados += 1;
+              const que = `${ciclo} γ ${gamma} r ${r} rc ${rc} Th ${Th}`;
+              expect(res.eta, que).toBeLessThanOrEqual(res.etaCarnot + 1e-12);
+              expect(res.Qh, que).toBeGreaterThan(0);
+              expect(res.W, que).toBeGreaterThan(0);
+            }
+          }
+        }
+      }
+    }
+    expect(publicados).toBeGreaterThan(500);
+  });
+
+  test('2362 · un eje de rango nulo va de 0 al doble del valor, nunca por debajo de 0', async () => {
+    const isocoro = escalaDiagrama(curvaProceso('isocoro', calcularProceso({ ...FABRICA, proceso: 'isocoro' })!), 0.1, 0.1, 0.15)!;
+    expect(isocoro.Vmin).toBe(0);
+    expect(isocoro.Vmax).toBeCloseTo(0.02, 12); // 20 L
+    const isobaro = escalaDiagrama(curvaProceso('isobaro', calcularProceso({ ...FABRICA, proceso: 'isobaro' })!), 0.1, 0.1, 0.15)!;
+    expect(isobaro.Pmin).toBe(0);
+    expect(isobaro.Pmax).toBeCloseTo(2 * 101325, 6);
+    // Carnot de fábrica: V de 2 L a 232 L; el 8 % de margen ya no baja el eje a −16 L.
+    const carnot = calcularCiclo({ ciclo: 'carnot', Th: 800, Tc: 300, V1L: 2, V2L: 20, r: 10, rc: 2, nMol: 1, gamma: 1.4 })!;
+    expect(escalaDiagrama(carnot.puntos, 0.08, 0.08, 0.12)!.Vmin).toBeGreaterThanOrEqual(0);
+  });
+});
+
+test.describe('Inspector 28/09/2026 — hallazgos reparados', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta', '#P', '#V', '#T', '#n']);
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): el estado inicial de «Procesos» se teclea con
-  // CUATRO campos libres (P₁, V₁, T₁, n) sin exigir PV = nRT, y el de fábrica la incumple
-  // (1.013,25 J frente a 2.494,20 J, ×2,4616). El motor mezcla las dos fuentes: P₂, V₂ y el W
-  // isobárico salen de P₁V₁; el ΔU, el Q y el W isotermo, de n. Los invariantes de abajo no
-  // dependen de cuál sea la fuente buena: los cumple cualquier gas ideal.
-  test('HALLAZGO · isobárico de fábrica: ΔU/W = 1/(γ−1) = 2,5 y Q/ΔU = γ = 1,4', async ({ page }) => {
-    test.fail();
+  // REPARADO (28/09/2026) · 2352: el estado inicial de «Procesos» se tecleaba con CUATRO campos
+  // libres (P₁, V₁, T₁, n) sin exigir PV = nRT, y el de fábrica la incumplía (1.013,25 J frente
+  // a 2.494,20 J, ×2,4616). Ahora n sale de P₁V₁/(RT₁) y se enseña como calculada. Los
+  // invariantes no dependen de cuál fuera la fuente buena: los cumple cualquier gas ideal.
+  test('REPARADO 2352 · isobárico de fábrica: ΔU/W = 1/(γ−1) = 2,5 y Q/ΔU = γ = 1,4', async ({ page }) => {
     await abrirPestana(page, 'Procesos', '#P1');
     await page.getByRole('button', { name: PROCESO.isobaro }).click();
     await expect(page.getByRole('button', { name: PROCESO.isobaro })).toHaveAttribute('aria-pressed', 'true');
     const w = await valorFila(page, /^Trabajo W$/);
     const q = await valorFila(page, /^Calor Q$/);
     const du = await valorFila(page, /^ΔU$/);
-    // Hoy: W 1013,25 · ΔU 6235,50 · Q 7248,75 → ΔU/W = 6,154 y Q/ΔU = 1,162. Con el W que
-    // enseña, lo coherente es ΔU = 2.533,13 J y Q = 3.546,38 J. El defecto es un ×2,46.
+    // Antes: W 1013,25 · ΔU 6235,50 · Q 7248,75 → ΔU/W = 6,154 y Q/ΔU = 1,162.
     expect.soft(du / w, `ΔU ${du} J / W ${w} J`).toBeCloseTo(2.5, 1);
     expect.soft(q / du, `Q ${q} J / ΔU ${du} J`).toBeCloseTo(1.4, 1);
+    // Y las cifras, resueltas a mano: W 1.013,25 · ΔU 2.533,13 · Q 3.546,38 J.
+    expect.soft(w).toBeCloseTo(1013.25, 1);
+    expect.soft(du).toBeCloseTo(2533.13, 1);
+    expect.soft(q).toBeCloseTo(3546.38, 1);
+    // La n no se teclea: sale del estado, 1.013,25/(8,314·300) = 0,4062 mol.
+    await expect(page.locator('#np')).toBeDisabled();
+    expect(await page.locator('#np').inputValue()).toBe('0.4062');
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): mismo defecto, isocórico de fábrica hasta 600 K.
-  test('HALLAZGO · isocórico de fábrica: ΔU = V·(P₂ − P₁)/(γ−1) con lo que enseña la pantalla', async ({ page }) => {
-    test.fail();
+  // REPARADO (28/09/2026) · 2352: mismo defecto, isocórico de fábrica hasta 600 K.
+  test('REPARADO 2352 · isocórico de fábrica: ΔU = V·(P₂ − P₁)/(γ−1) con lo que enseña la pantalla', async ({ page }) => {
     await abrirPestana(page, 'Procesos', '#P1');
     await page.getByRole('button', { name: PROCESO.isocoro }).click();
     await expect(page.getByRole('button', { name: PROCESO.isocoro })).toHaveAttribute('aria-pressed', 'true');
@@ -447,177 +608,217 @@ test.describe('Inspector 28/09/2026 — hallazgos abiertos', () => {
     const t2 = await valorFila(page, /^T₂$/);
     const t1 = cifra(await page.locator('#T1').inputValue());
     // P₁ = P₂·T₁/T₂ → ΔU = V₂·P₂·(1 − T₁/T₂)·101,325/0,4 = 10·2·0,5·101,325/0,4 = 2.533,13 J.
-    // Hoy: 6235,50 J (= n·Cᵥ·ΔT con n = 1), un ×2,46.
+    // Antes: 6235,50 J (= n·Cᵥ·ΔT con n = 1), un ×2,46.
     const esperado = (v2 * p2 * (1 - t1 / t2) * 101.325) / 0.4;
     const du = await valorFila(page, /^ΔU$/);
     expect(du / esperado, `ΔU ${du} J frente a ${esperado.toFixed(2)} J`).toBeCloseTo(1, 1);
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): mismo defecto, isotermo de fábrica hasta 20 L.
-  test('HALLAZGO · isotermo de fábrica: W = P₂V₂·ln(V₂/V₁) con lo que enseña la pantalla', async ({ page }) => {
-    test.fail();
+  // REPARADO (28/09/2026) · 2352: mismo defecto, isotermo de fábrica hasta 20 L.
+  test('REPARADO 2352 · isotermo de fábrica: W = P₂V₂·ln(V₂/V₁) con lo que enseña la pantalla', async ({ page }) => {
     await abrirPestana(page, 'Procesos', '#P1');
     await expect(page.getByRole('button', { name: PROCESO.isotermo })).toHaveAttribute('aria-pressed', 'true');
     const v1 = cifra(await page.locator('#V1').inputValue());
     const p2 = await valorFila(page, /^P₂$/);
     const v2 = await valorFila(page, /^V₂$/);
-    // 0,5 atm·20 L·101,325·ln 2 = 702,33 J. Hoy: nRT·ln 2 = 1728,85 J, un ×2,46.
+    // 0,5 atm·20 L·101,325·ln 2 = 702,33 J. Antes: nRT·ln 2 = 1728,85 J, un ×2,46.
     const esperado = p2 * v2 * 101.325 * Math.log(v2 / v1);
     const w = await valorFila(page, /^Trabajo W$/);
     expect(w / esperado, `W ${w} J frente a ${esperado.toFixed(2)} J`).toBeCloseTo(1, 1);
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): el diagrama P-V del isotermo dibuja P = nRT/V
-  // (punto 1 a 2,4616 atm, punto 2 a 1,2308 atm) mientras el campo dice P₁ = 1 atm y el
-  // resultado P₂ = 0,500 atm. Misma causa que los tres anteriores, síntoma distinto: el
-  // diagrama contradice los números de su propio panel.
-  test('HALLAZGO · el diagrama del isotermo de fábrica sitúa los puntos 1 y 2 en P₁ y P₂', async ({ page }) => {
-    test.fail();
+  // REPARADO (28/09/2026) · 2353: el diagrama P-V del isotermo dibujaba P = nRT/V (punto 1 a
+  // 2,4616 atm, punto 2 a 1,2308 atm) mientras el campo decía P₁ = 1 atm y el resultado
+  // P₂ = 0,500 atm. La curva sale ya del mismo estado que las cifras.
+  test('REPARADO 2353 · el diagrama del isotermo de fábrica sitúa los puntos 1 y 2 en P₁ y P₂', async ({ page }) => {
     await abrirPestana(page, 'Procesos', '#P1');
     const p1 = cifra(await page.locator('#P1').inputValue());
     const p2 = await valorFila(page, /^P₂$/);
-    // Rótulos del eje a 2 decimales: el error de lectura es < 0,01 atm; el defecto, 1,46 atm.
+    // Rótulos del eje a 2 decimales: el error de lectura es < 0,01 atm; el defecto era 1,46 atm.
     expect.soft(Math.abs((await presionDibujada(page, 0)) - p1), 'punto 1 frente a P₁').toBeLessThan(0.05);
     expect.soft(Math.abs((await presionDibujada(page, 1)) - p2), 'punto 2 frente a P₂').toBeLessThan(0.05);
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): el ΔU del isobárico y del isocórico usa γ, pero
-  // el selector de γ solo se ve en el adiabático. Tras elegir 1,67 allí, el isobárico de fábrica
-  // pasa de ΔU 6235,50 J a 3722,69 J (Cᵥ = 8,314/0,67) sin que el panel diga con qué γ calcula.
-  test('HALLAZGO · el isobárico enseña el γ con el que calcula ΔU', async ({ page }) => {
-    test.fail();
+  // REPARADO (28/09/2026) · 2356: el ΔU del isobárico y del isocórico usa γ, pero el selector de
+  // γ solo se veía en el adiabático. Ahora está a la vista en los cuatro procesos, y el pie de
+  // la fórmula dice con qué γ y qué Cᵥ se calcula.
+  // ⚠️ El control de este test consagraba el estado incoherente: esperaba ΔU = 1·(8,314/0,67)·300
+  // = 3722,69 J, con la n = 1 tecleada. Con la n del estado, ΔU = W/(γ−1) = 1.013,25/0,67 =
+  // 1.512,31 J (y con γ = 1,4 serían los 2.533,13 J de arriba: el γ sigue moviendo el ΔU).
+  test('REPARADO 2356 · el isobárico enseña el γ con el que calcula ΔU', async ({ page }) => {
     await abrirPestana(page, 'Procesos', '#P1');
     await page.getByRole('button', { name: PROCESO.adiabatico }).click();
     await page.locator('#gamma').selectOption('1.67');
     await esperarValorEnReact(page, '#gamma', 1.67);
     await page.getByRole('button', { name: PROCESO.isobaro }).click();
     await expect(page.getByRole('button', { name: PROCESO.isobaro })).toHaveAttribute('aria-pressed', 'true');
-    // Control: el ΔU SÍ ha cambiado con ese γ oculto (1·(8,314/0,67)·300 = 3722,69 J).
-    expect(await valorFila(page, /^ΔU$/)).toBeCloseTo(3722.69, 0);
-    await expect(page.locator('[class*="controlsPanel"]')).toContainText('1,67');
+    expect(await valorFila(page, /^ΔU$/)).toBeCloseTo(1512.31, 1);
+    // El selector sigue a la vista y con el valor con el que calcula…
+    await expect(page.locator('#gamma')).toBeVisible();
+    await expect(page.locator('#gamma')).toHaveValue('1.67');
+    // …y el pie de la fórmula lo dice (Cᵥ = 8,314/0,67 = 12,41 J/(mol·K)).
+    await expect(page.locator('[class*="formulaBox"]')).toContainText('γ = 1,67');
+    await expect(page.locator('[class*="formulaBox"]')).toContainText('12,41');
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): nada rechaza una temperatura absoluta negativa
-  // (ni un n negativo): la app imprime presiones y volúmenes negativos. Con n vaciado (→ 0)
-  // el isobárico imprime W = Q = 1013,25 J para un gas sin moles.
-  test('HALLAZGO · T = −50 K no produce una presión negativa', async ({ page }) => {
-    test.fail();
+  // REPARADO (28/09/2026) · 2357: nada rechazaba una temperatura absoluta negativa ni un n
+  // negativo, y un campo vaciado valía 0. Ahora cada dato imposible o vacío da un aviso y
+  // ninguna cifra.
+  test('REPARADO 2357 · T ≤ 0 K, n ≤ 0 o un campo vacío: aviso y ninguna cifra', async ({ page }) => {
+    const panel = page.locator('[class*="controlsPanel"]');
     await escribir(page, '#T', '-50', -50);
-    // Hoy: P = 1·8,314·(−50)/0,0224 m³ = −18.558 Pa → «-0,183 atm».
-    if ((await filaResultado(page, /^Presión P$/).count()) > 0) {
-      expect.soft(await valorFila(page, /^Presión P$/), 'P con T = −50 K').toBeGreaterThanOrEqual(0);
-    }
+    // Antes: P = 1·8,314·(−50)/0,0224 m³ = −18.558 Pa → «-0,183 atm».
+    await expect(panel.locator('[role="alert"]')).toContainText('0 K');
+    await expect(filaResultado(page, /^Presión P$/)).toHaveCount(0);
+    expect(await page.locator('#P').inputValue()).toBe('');
+
+    await escribir(page, '#T', '273.15', 273.15);
+    await escribir(page, '#n', '-1', -1);
+    // Antes: «-1,001 atm».
+    await expect(panel.locator('[role="alert"]')).toContainText('0 mol');
+    await expect(filaResultado(page, /^Presión P$/)).toHaveCount(0);
+
     await abrirPestana(page, 'Procesos', '#P1');
     await page.getByRole('button', { name: PROCESO.isobaro }).click();
     await escribir(page, '#T2', '-300', -300);
-    // Hoy: V₂ = 10·(−300/300) = «-10,000 L».
-    if ((await filaResultado(page, /^V₂$/).count()) > 0) {
-      expect.soft(await valorFila(page, /^V₂$/), 'V₂ con T₂ = −300 K').toBeGreaterThanOrEqual(0);
-    }
+    // Antes: V₂ = 10·(−300/300) = «-10,000 L» y W = −2026,50 J.
+    await expect(panel.locator('[role="alert"]')).toContainText('T₂');
+    await expect(filaResultado(page, /^V₂$/)).toHaveCount(0);
+    await expect(filaResultado(page, /^Trabajo W$/)).toHaveCount(0);
+
+    // Un campo vaciado ya no vale 0: sin P₁ no hay estado, ni n, ni balance.
+    await escribir(page, '#T2', '600', 600);
+    await escribir(page, '#P1', '', '');
+    await expect(panel.locator('[role="alert"]')).toContainText('P₁');
+    await expect(filaResultado(page, /^Trabajo W$/)).toHaveCount(0);
+    expect(await page.locator('#np').inputValue()).toBe('');
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): al cambiar «Calcular», el campo que se habilita
-  // recupera el valor tecleado ANTES, no el recién calculado, así que no se puede comprobar un
-  // resultado despejando otra variable. V = 11,2 L → P = 2,001 atm; al pasar a calcular V, P
-  // vuelve a 1 y V sale 22,413 L en vez de 11,20 L.
-  test('HALLAZGO · despejar P y luego V devuelve el volumen de partida', async ({ page }) => {
-    test.fail();
+  // REPARADO (28/09/2026) · 2358: al cambiar «Calcular», el campo que se habilitaba recuperaba
+  // el valor tecleado ANTES, no el recién calculado. Ahora la variable que se despejaba pasa a
+  // ser dato con el valor que enseñaba su campo (6 cifras significativas: 2,00114 atm).
+  test('REPARADO 2358 · despejar P y luego V devuelve el volumen de partida', async ({ page }) => {
     await escribir(page, '#V', '11.2', 11.2);
     // P = 1·8,314·273,15/0,0112 = 202.765 Pa = 2,00114 atm → «2,001 atm».
     expect(await valorFila(page, /^Presión P$/)).toBeCloseTo(2.001, 3);
     await page.locator('#calcvar').selectOption('V');
     await esperarValorEnReact(page, '#calcvar', 'V');
-    // Con P = 2,00114 (o 2,001 redondeado) → V = 11,200 (11,201) L. Hoy 22,413 L: 11 L de error.
-    expect(await valorFila(page, /^Volumen V$/)).toBeCloseTo(11.2, 1);
+    // Con P = 2,00114 → V = 11,19998 L → «11,200 L». Antes 22,413 L: 11 L de error.
+    expect(await valorFila(page, /^Volumen V$/)).toBeCloseTo(11.2, 2);
+    expect(await page.locator('#P').inputValue()).toBe('2.00114');
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): mismo mecanismo. Al vaciar V (→ 0) el resultado
-  // desaparece sin ningún aviso y el campo «calculado» P vuelve a enseñar el 1 de fábrica, que
-  // no sale de ningún cálculo: «Estado actual» dice P 1,000 atm con V 0,000 L.
-  test('HALLAZGO · con V vaciado el campo calculado no enseña un P que no salió de ningún cálculo', async ({ page }) => {
-    test.fail();
-    await escribir(page, '#V', '', 0);
-    expect.soft(await page.locator('#P').inputValue(), 'P deshabilitado').not.toBe('1');
+  // REPARADO (28/09/2026) · 2358: mismo mecanismo. Al vaciar V el campo «calculado» P volvía a
+  // enseñar el 1 de fábrica, que no salía de ningún cálculo, sin aviso.
+  // El `escribir` de este test esperaba antes que React guardase 0 para el campo vacío
+  // (`Number('')`): eso era justo el defecto de 2357. Un campo vacío es ahora «''».
+  test('REPARADO 2358 · con V vaciado el campo calculado no enseña un P que no salió de ningún cálculo', async ({ page }) => {
+    await escribir(page, '#V', '', '');
+    expect.soft(await page.locator('#P').inputValue(), 'P deshabilitado').toBe('');
     const estado = page.locator('div', { has: page.locator('p', { hasText: /^Estado actual$/ }) }).last();
     await expect.soft(estado).not.toContainText('1,000 atm');
+    await expect(page.locator('[class*="controlsPanel"] [role="alert"]')).toContainText('volumen V');
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): el Otto no comprueba que la T pico supere la T
-  // tras la compresión. r = 12 (dentro del 8-12 que cita la propia guía): T₂ = 810,58 K > 800 K,
-  // Qh = −219,82 J, W = −138,46 J y η = 62,99 % impresa junto a una η Carnot de 62,50 %.
-  test('HALLAZGO · Otto con r = 12: no publica una η mayor que la de Carnot', async ({ page }) => {
-    test.fail();
+  // REPARADO (28/09/2026) · 2354: el Otto no comprobaba que la T pico superase la T tras la
+  // compresión. r = 12: T₂ = 810,58 K > 800 K, Qh = −219,82 J y η = 62,99 % junto a una η
+  // Carnot de 62,50 %. Ahora se rechaza con un aviso que da la cifra.
+  test('REPARADO 2354 · Otto con r = 12: no publica una η mayor que la de Carnot', async ({ page }) => {
     await abrirPestana(page, 'Ciclos', '#Th');
     await page.getByRole('button', { name: 'Otto (gasolina)' }).click();
     await esperarHidratacion(page, ['#r']);
     await escribir(page, '#r', '12', 12);
     await etaNoSuperaCarnot(page);
-  });
-
-  // HALLAZGO ABIERTO (inspector 28/09/2026): en el Diesel la «T pico» no entra en el cálculo
-  // (T₃ = T₂·rc), solo en la η Carnot de referencia. De 800 a 2000 K el trabajo sigue en
-  // 11.707,93 J; y con r = 20 (dentro del 15-22 que cita la guía) η = 64,68 % > «Carnot» 62,50 %,
-  // con un T₃ real de 1.988,67 K.
-  test('HALLAZGO · Diesel: la T pico cuenta y la η no supera la de Carnot', async ({ page }) => {
-    test.fail();
-    await abrirPestana(page, 'Ciclos', '#Th');
-    await page.getByRole('button', { name: 'Diesel' }).click();
-    await esperarHidratacion(page, ['#rc']);
-    if ((await page.locator('#Tho').count()) > 0) {
-      const w800 = await valorFila(page, /^Trabajo neto W$/);
-      await escribir(page, '#Tho', '2000', 2000);
-      expect.soft(await valorFila(page, /^Trabajo neto W$/), 'W con T pico 2000 K frente a 800 K').not.toBeCloseTo(w800, 0);
-      await escribir(page, '#Tho', '800', 800);
-    }
-    await escribir(page, '#r', '20', 20);
+    await expect(filaResultado(page, /^Eficiencia η$/)).toHaveCount(0);
+    await expect(page.locator('[class*="controlsPanel"] [role="alert"]')).toContainText('810,58');
+    // Con la T pico por encima (900 K) vuelve a calcular: η = 1 − 12^−0,4 = 62,99 % frente a
+    // η Carnot = 1 − 300/900 = 66,67 %, y Qh = 20,785·(900 − 810,58) = 1.858,68 J.
+    await escribir(page, '#Tho', '900', 900);
+    expect(await valorFila(page, /^Eficiencia η$/)).toBeCloseTo(62.99, 1);
+    expect(await valorFila(page, /^η Carnot \(cota máx\)$/)).toBeCloseTo(66.67, 1);
+    expect(await valorFila(page, /^Calor absorbido Qh$/)).toBeCloseTo(1858.68, 0);
     await etaNoSuperaCarnot(page);
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): el campo P₂ del isobárico no tiene nombre
-  // accesible (<label> sin htmlFor y <input> sin id): un lector de pantalla anuncia «1» a secas.
-  test('HALLAZGO · el campo P₂ del isobárico tiene nombre accesible', async ({ page }) => {
-    test.fail();
+  // REPARADO (28/09/2026) · 2355: en el Diesel la «T pico» no entraba en el cálculo (T₃ = T₂·rc),
+  // solo en la η Carnot de referencia. Ahora el Diesel no tiene ese campo: su T máxima es
+  // T₃ = T₂·rc, sale en el balance y la η Carnot se calcula con ella.
+  test('REPARADO 2355 · Diesel: la T máxima es la del ciclo y la η no supera la de Carnot', async ({ page }) => {
+    await abrirPestana(page, 'Ciclos', '#Th');
+    await page.getByRole('button', { name: 'Diesel' }).click();
+    await esperarHidratacion(page, ['#rc']);
+    // Ya no hay una «T pico» que se teclee y no cuente.
+    await expect(page.locator('#Tho')).toHaveCount(0);
+    // De fábrica: T₂ = 300·10^0,4 = 753,57 K; T₃ = 2·T₂ = 1.507,13 K; η Carnot = 1 − 300/1.507,13
+    // = 80,09 %.
+    expect(await valorFila(page, /^T tras la compresión T₂$/)).toBeCloseTo(753.57, 1);
+    expect(await valorFila(page, /^T máx del ciclo/)).toBeCloseTo(1507.13, 1);
+    expect(await valorFila(page, /^η Carnot \(cota máx\)$/)).toBeCloseTo(80.09, 1);
+    // T₃ la mueve el cut-off: rc = 2,5 → T₃ = 753,566·2,5 = 1.883,91 K.
+    await escribir(page, '#rc', '2.5', 2.5);
+    expect(await valorFila(page, /^T máx del ciclo/)).toBeCloseTo(1883.91, 1);
+    await escribir(page, '#rc', '2', 2);
+    // El caso de la ficha, r = 20: T₃ = 2·300·20^0,4 = 1.988,67 K; η = 64,68 % < 84,91 %.
+    await escribir(page, '#r', '20', 20);
+    expect(await valorFila(page, /^T máx del ciclo/)).toBeCloseTo(1988.67, 1);
+    expect(await valorFila(page, /^Eficiencia η$/)).toBeCloseTo(64.68, 1);
+    expect(await valorFila(page, /^η Carnot \(cota máx\)$/)).toBeCloseTo(84.91, 1);
+    await etaNoSuperaCarnot(page);
+  });
+
+  // REPARADO (28/09/2026) · 2359: el campo P₂ del isobárico no tenía nombre accesible (<label>
+  // sin htmlFor y <input> sin id).
+  test('REPARADO 2359 · el campo P₂ del isobárico tiene nombre accesible', async ({ page }) => {
     await abrirPestana(page, 'Procesos', '#P1');
     await page.getByRole('button', { name: PROCESO.isobaro }).click();
     await expect(page.getByRole('spinbutton', { name: /P₂/ })).toHaveCount(1);
+    // Y los dos campos calculados que se añadieron con la reparación, también.
+    await expect(page.getByRole('spinbutton', { name: /^n \(mol\)/ })).toHaveCount(1);
+    await page.getByRole('button', { name: PROCESO.isocoro }).click();
+    await expect(page.getByRole('spinbutton', { name: /^V₂ \(L\)/ })).toHaveCount(1);
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): la FAQ del JSON-LD (la que leen los asistentes de
-  // IA) afirma «El Diesel tiene mayor eficiencia teórica a igual relación de compresión». Es al
-  // revés, y lo dicen la propia app (r = 10: Otto 60,19 %, Diesel 53,39 %; test de arriba) y la
-  // FAQ visible («el Otto es más eficiente en términos absolutos para el mismo r»).
-  test('HALLAZGO · la FAQ del JSON-LD no dice que el Diesel rinde más a igual compresión', async ({ page }) => {
-    test.fail();
+  // REPARADO (28/09/2026) · 2360: la FAQ del JSON-LD (la que leen los asistentes de IA) afirmaba
+  // «El Diesel tiene mayor eficiencia teórica a igual relación de compresión». Es al revés, y lo
+  // dicen la propia app (r = 10: Otto 60,19 %, Diesel 53,39 %) y la FAQ visible.
+  test('REPARADO 2360 · la FAQ del JSON-LD no dice que el Diesel rinde más a igual compresión', async ({ page }) => {
     const ld = await page.evaluate(() =>
       [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join('\n'),
     );
     expect(ld).toContain('FAQPage');
     expect(ld).not.toMatch(/Diesel tiene mayor eficiencia te[óo]rica a igual relaci[óo]n de compresi[óo]n/);
+    expect(ld).toMatch(/A igual relaci[óo]n de compresi[óo]n, el Otto tiene mayor eficiencia te[óo]rica/);
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): el «%» va con espacio normal (U+0020) y no con el
-  // duro (U+00A0) que manda el CLAUDE.md desde el 25/09/2026: en los resultados de «Ciclos»
-  // («62,50 %») y en el texto nuevo de la sección de aula del 28/09 («tolerancia del 1 %»).
-  test('HALLAZGO · el % va con espacio duro', async ({ page }) => {
-    test.fail();
+  // REPARADO (28/09/2026) · 2361: el «%» iba con espacio normal (U+0020) y no con el duro
+  // (U+00A0) que manda el CLAUDE.md desde el 25/09/2026: en «Ciclos» y en la sección de aula.
+  test('REPARADO 2361 · el % va con espacio duro', async ({ page }) => {
     // toContainText normaliza los espacios (el duro también): se lee el texto crudo.
     const aula = (await page.locator('section[aria-labelledby="casos-aula-titulo"]').textContent()) ?? '';
-    expect.soft(aula, 'intro de la sección de aula').toMatch(/tolerancia del 1\u00A0%/);
+    expect.soft(aula, 'intro de la sección de aula').toMatch(/tolerancia del 1\xA0%/);
+    expect.soft(aula, 'ningún % con espacio normal en la sección de aula').not.toMatch(/\d %/);
     await abrirPestana(page, 'Ciclos', '#Th');
     const eta = await filaResultado(page, /^Eficiencia η$/).locator('[class*="resultValue"]').first().textContent();
-    expect.soft(eta ?? '', 'η del ciclo').toMatch(/\u00A0%$/);
+    expect.soft(eta ?? '', 'η del ciclo').toMatch(/\xA0%$/);
+    const panel = (await page.locator('[class*="controlsPanel"]').textContent()) ?? '';
+    expect.soft(panel, 'ningún % con espacio normal en «Ciclos»').not.toMatch(/\d %/);
+    // Y la pista de los casos (casos.ts), que se ve al pulsar «Ver pista» en el caso 1.
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    await seccion.getByRole('button', { name: /^Caso 1:/ }).click();
+    await seccion.getByRole('button', { name: /Ver pista/ }).click();
+    expect.soft((await seccion.locator('#casos-pista').textContent()) ?? '').toMatch(/0,1\xA0%/);
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026): en el isocórico el rango de V es 0 y el respaldo
-  // `|| 1` está en m³: el eje V del diagrama va de −90,0 L a 110,0 L para un proceso a 10 L.
-  test('HALLAZGO · el eje V del diagrama isocórico no empieza en un volumen negativo', async ({ page }) => {
-    test.fail();
+  // REPARADO (28/09/2026) · 2362: en el isocórico el rango de V es 0 y el respaldo `|| 1` estaba
+  // en m³: el eje V iba de −90,0 L a 110,0 L para un proceso a 10 L. Ahora va de 0 a 20 L.
+  test('REPARADO 2362 · el eje V del diagrama isocórico no empieza en un volumen negativo', async ({ page }) => {
     await abrirPestana(page, 'Procesos', '#P1');
     await page.getByRole('button', { name: PROCESO.isocoro }).click();
     await expect(page.getByRole('button', { name: PROCESO.isocoro })).toHaveAttribute('aria-pressed', 'true');
     const svg = page.locator('svg[aria-label="Diagrama presión-volumen del proceso"]');
-    // Rótulos de V en y = padT + plotH + 15 = 345; el primero es el mínimo.
+    // Rótulos de V en y = padT + plotH + 15 = 345; el primero es el mínimo y el segundo el máximo.
     // textContent y no innerText: un <text> de SVG no es un HTMLElement.
     expect(cifra((await svg.locator('text[y="345"]').first().textContent()) ?? '')).toBeGreaterThanOrEqual(0);
+    expect(cifra((await svg.locator('text[y="345"]').nth(1).textContent()) ?? '')).toBeCloseTo(20, 1);
   });
 });

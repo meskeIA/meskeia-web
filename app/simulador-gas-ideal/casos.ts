@@ -31,11 +31,12 @@
  * ⚠️ **T(K) = T(°C) + 273,15**, porque la app resta 273,15 para pasar a °C. Con 273 la diferencia
  *    también entra en la tolerancia; los casos 7, 9 y 12 están elegidos para que dé lo mismo.
  *
- * ⚠️ **Nada que dependa de n en la pestaña Procesos** (Q, ΔU ni el W de un isotermo). Su estado
- *    inicial de fábrica no cumple PV = nRT (1 atm y 10 L frente a 1 mol y 300 K: un factor 2,46)
- *    y la app mezcla el W que sale de V con el ΔU que sale de n. Los casos de esa pestaña solo
- *    preguntan P₂, V₂, T₂ o el W de un isobárico (W = P·ΔV), que no dependen de n. Está anotado
- *    aparte; no se repara aquí.
+ * ⚠️ **En la pestaña Procesos la n no se teclea: sale del estado inicial**, n = P₁V₁/(RT₁)
+ *    (hallazgo 2352, REPARADO el 28/09/2026). Hasta entonces era un campo libre, el estado de
+ *    fábrica no cumplía PV = nRT (1 atm y 10 L frente a 1 mol y 300 K: un factor 2,46) y la app
+ *    mezclaba el W que salía de V con el ΔU que salía de n; por eso estos casos solo preguntan
+ *    P₂, V₂, T₂ o el W de un isobárico (W = P·ΔV), que no dependen de n. Siguen valiendo tal
+ *    cual: ninguno de esos cuatro cambió con la reparación.
  *
  * ⚠️ **Decimales como los imprime el panel**, para que `comoComprobar` sea verdad al pie de la
  *    letra: P en atm con 3, V en L con 3, T en K con 2 (el «Resultado» de «Ley del Gas Ideal»,
@@ -56,10 +57,11 @@ const P_REFERENCIA_ATM = 1;
 const V_REFERENCIA_L = 10;
 const T_REFERENCIA_K = 300;
 
-/** γ del aire: `calcularProceso` lo pide siempre, aunque solo lo use el adiabático y el ΔU. */
+/**
+ * γ del aire: `calcularProceso` lo pide siempre, aunque solo lo usen el adiabático y los Q y ΔU
+ * que ningún caso pregunta. La n no se le pasa: la deriva él del estado inicial.
+ */
 const GAMMA_REFERENCIA = 1.4;
-/** n para `calcularProceso` en magnitudes que NO dependen de n (P₂, V₂, T₂, W isobárico). */
-const N_REFERENCIA = 1;
 
 /* ─────────────────────────── Datos de un caso ─────────────────────────── */
 
@@ -301,7 +303,6 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
         T1K: T_REFERENCIA_K,
         V2L: datos.V2,
         T2K: T_REFERENCIA_K,
-        nMol: N_REFERENCIA,
         gamma: GAMMA_REFERENCIA,
       });
       if (!r) return falta('volúmenes positivos', pasos);
@@ -330,7 +331,6 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
         T1K: T1,
         V2L: datos.V1,
         T2K: T2,
-        nMol: N_REFERENCIA,
         gamma: GAMMA_REFERENCIA,
       });
       if (!r) return falta('una temperatura inicial positiva', pasos);
@@ -352,7 +352,6 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
         T1K: T1,
         V2L: datos.V1 ?? V_REFERENCIA_L,
         T2K: T2,
-        nMol: N_REFERENCIA,
         gamma: GAMMA_REFERENCIA,
       });
       if (!r) return falta('una temperatura inicial positiva', pasos);
@@ -380,7 +379,6 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
         T1K: T1,
         V2L: datos.V1,
         T2K: T2,
-        nMol: N_REFERENCIA,
         gamma: GAMMA_REFERENCIA,
       });
       if (!r) return falta('una temperatura inicial positiva', pasos);
@@ -568,7 +566,7 @@ export interface Caso {
 
 /** Recordatorio de R para las pistas de los casos que usan PV = nRT. */
 const PISTA_R =
-  'Si usas R = 0,0821 atm·L/(mol·K), como muchos libros, el resultado cambia menos de un 0,1 % y también vale.';
+  'Si usas R = 0,0821 atm·L/(mol·K), como muchos libros, el resultado cambia menos de un 0,1\u00A0% y también vale.';
 
 /**
  * Los datos de cada caso. La respuesta NO se escribe aquí: la calcula `resolverCaso`, de modo
@@ -599,7 +597,7 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     etiquetaRespuesta: 'V en L',
     pista: `V = nRT/P. Es el famoso «22,4 L» de los libros, con un decimal más. ${PISTA_R}`,
     comoComprobar:
-      'En la pestaña «Ley del Gas Ideal», elige Calcular «Volumen (V)» y deja P = 1, T = 273,15 y n = 1: el Resultado sale 22,413 L.',
+      'En la pestaña «Ley del Gas Ideal», elige Calcular «Volumen (V)» y escribe P = 1, T = 273,15 y n = 1: el Resultado sale 22,413 L.',
   },
   {
     id: 3,

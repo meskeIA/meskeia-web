@@ -11,24 +11,37 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber } from '@/lib';
+import { formatNumber, formatPercentage } from '@/lib';
 import styles from './SimuladorGasIdeal.module.css';
-// La ecuación de estado y los procesos viven en ./motor.ts desde el 28/09/2026: los casos
-// para clase (./casos.ts) corrigen con la MISMA aritmética que pintan las pestañas.
+// Toda la física vive en ./motor.ts (28/09/2026): la ecuación de estado, los procesos y los
+// ciclos, con sus validaciones. Los casos para clase (./casos.ts) corrigen con la MISMA
+// aritmética que pintan las pestañas; aquí solo se pinta.
 import {
   R,
   ATM_TO_PA,
   L_TO_M3,
   calcularGasIdeal,
+  errorGasIdeal,
   calcularProceso,
+  errorProceso,
+  molesDelEstado,
+  curvaProceso,
+  escalaDiagrama,
+  calcularCiclo,
+  errorCiclo,
   type CalcVar,
   type Proceso,
+  type Ciclo,
+  type PuntoPV,
+  type EscalaPV,
+  type EntradaProceso,
   type ResultadoProceso,
+  type EntradaCiclo,
+  type ResultadoCiclo,
 } from './motor';
 import CasosAula from './CasosAula';
 
 type Tab = 'gas-ideal' | 'procesos' | 'ciclos';
-type Ciclo = 'carnot' | 'otto' | 'diesel' | 'stirling';
 
 interface Molecula {
   x: number;
@@ -37,32 +50,169 @@ interface Molecula {
   vy: number;
 }
 
-interface PuntoPV {
-  P: number; // Pa
-  V: number; // m³
+// ---------- Campos numéricos ----------
+
+/**
+ * Lo que hay en un campo numérico: NaN si está vacío o a medio escribir, nunca 0. Con
+ * `Number(e.target.value)` un campo vaciado valía 0 y la app calculaba con un gas sin moles
+ * (hallazgo 2357); ahora el motor lo rechaza con un aviso.
+ */
+function leerCampo(e: React.ChangeEvent<HTMLInputElement>): number {
+  return e.target.valueAsNumber;
+}
+
+/** Lo que se pinta en un campo: vacío si no hay número. */
+function mostrarCampo(valor: number): number | '' {
+  return Number.isFinite(valor) ? valor : '';
+}
+
+/**
+ * Un valor CALCULADO que se enseña en un campo, con 6 cifras significativas: las justas para
+ * que, cuando pasa a ser dato (hallazgo 2358), despejar de vuelta devuelva el valor de partida
+ * a la precisión que imprime el panel (11,2 L → 2,00114 atm → 11,200 L).
+ */
+function valorDeCampo(valor: number): number {
+  return Number(valor.toPrecision(6));
+}
+
+/** Una cifra del panel, o «—» si no la hay: nunca «No definido» ni un número inventado. */
+function cifra(valor: number, decimales: number): string {
+  return Number.isFinite(valor) ? formatNumber(valor, decimales) : '—';
+}
+
+/** Cifra sin ceros de relleno, para los datos del gas: «1,4», «1,67». */
+function cifraCorta(valor: number): string {
+  return (valor + 0).toLocaleString('es-ES', { maximumFractionDigits: 3 });
+}
+
+// ---------- Diagrama P-V (común a Procesos y Ciclos) ----------
+
+const SVG_W = 500;
+const SVG_H = 380;
+const PAD_L = 60;
+const PAD_R = 25;
+const PAD_T = 25;
+const PAD_B = 50;
+const PLOT_W = SVG_W - PAD_L - PAD_R;
+const PLOT_H = SVG_H - PAD_T - PAD_B;
+
+/** Escala de un diagrama sin puntos: solo sirve para no dividir por cero. */
+const ESCALA_VACIA: EscalaPV = { Vmin: 0, Vmax: 1, Pmin: 0, Pmax: 1 };
+
+function useEjes(escala: EscalaPV | null) {
+  const e = escala ?? ESCALA_VACIA;
+  const toX = useCallback(
+    (V_m3: number): number => PAD_L + ((V_m3 - e.Vmin) / (e.Vmax - e.Vmin)) * PLOT_W,
+    [e.Vmin, e.Vmax],
+  );
+  const toY = useCallback(
+    (P_Pa: number): number => PAD_T + PLOT_H - ((P_Pa - e.Pmin) / (e.Pmax - e.Pmin)) * PLOT_H,
+    [e.Pmin, e.Pmax],
+  );
+  return { toX, toY };
+}
+
+/** Rejilla, ejes, rótulos y las cuatro cifras de los extremos (solo si hay escala). */
+function MarcoDiagrama({ escala }: { escala: EscalaPV | null }): React.ReactElement {
+  return (
+    <>
+      {Array.from({ length: 5 }).map((_, i) => {
+        const y = PAD_T + (PLOT_H * (i + 1)) / 5;
+        return <line key={`gh${i}`} className={styles.pvGrid} x1={PAD_L} x2={PAD_L + PLOT_W} y1={y} y2={y} />;
+      })}
+      {Array.from({ length: 5 }).map((_, i) => {
+        const x = PAD_L + (PLOT_W * (i + 1)) / 5;
+        return <line key={`gv${i}`} className={styles.pvGrid} x1={x} x2={x} y1={PAD_T} y2={PAD_T + PLOT_H} />;
+      })}
+
+      <line className={styles.pvAxis} x1={PAD_L} y1={PAD_T} x2={PAD_L} y2={PAD_T + PLOT_H} />
+      <line className={styles.pvAxis} x1={PAD_L} y1={PAD_T + PLOT_H} x2={PAD_L + PLOT_W} y2={PAD_T + PLOT_H} />
+
+      <text className={styles.pvAxisLabel} x={PAD_L + PLOT_W / 2} y={SVG_H - 12} textAnchor="middle">
+        V (L)
+      </text>
+      <text
+        className={styles.pvAxisLabel}
+        x={18}
+        y={PAD_T + PLOT_H / 2}
+        textAnchor="middle"
+        transform={`rotate(-90 18 ${PAD_T + PLOT_H / 2})`}
+      >
+        P (atm)
+      </text>
+
+      {escala ? (
+        <>
+          <text className={styles.pvAxisLabel} x={PAD_L} y={PAD_T + PLOT_H + 15} textAnchor="middle">
+            {formatNumber(escala.Vmin / L_TO_M3, 1)}
+          </text>
+          <text className={styles.pvAxisLabel} x={PAD_L + PLOT_W} y={PAD_T + PLOT_H + 15} textAnchor="middle">
+            {formatNumber(escala.Vmax / L_TO_M3, 1)}
+          </text>
+          <text className={styles.pvAxisLabel} x={PAD_L - 8} y={PAD_T + PLOT_H + 4} textAnchor="end">
+            {formatNumber(escala.Pmin / ATM_TO_PA, 2)}
+          </text>
+          <text className={styles.pvAxisLabel} x={PAD_L - 8} y={PAD_T + 8} textAnchor="end">
+            {formatNumber(escala.Pmax / ATM_TO_PA, 2)}
+          </text>
+        </>
+      ) : (
+        <text className={styles.pvAxisLabel} x={PAD_L + PLOT_W / 2} y={PAD_T + PLOT_H / 2} textAnchor="middle">
+          Sin diagrama: corrige los datos del panel
+        </text>
+      )}
+    </>
+  );
 }
 
 // ---------- TAB 1: Gas Ideal ----------
 
 function GasIdealTab(): React.ReactElement {
   const [calcVar, setCalcVar] = useState<CalcVar>('P');
-  // Inputs en unidades amigables: atm, L, K, mol
+  // Inputs en unidades amigables: atm, L, K, mol. NaN = campo vacío.
   const [Patm, setPatm] = useState<number>(1);
   const [VL, setVL] = useState<number>(22.4);
   const [TK, setTK] = useState<number>(273.15);
   const [nMol, setNMol] = useState<number>(1);
 
-  // Cálculo automático de la variable seleccionada
+  // Cálculo automático de la variable seleccionada, o el motivo por el que no se puede.
+  const error = useMemo(() => errorGasIdeal(calcVar, Patm, VL, TK, nMol), [calcVar, Patm, VL, TK, nMol]);
   const calculado = useMemo(
     () => calcularGasIdeal(calcVar, Patm, VL, TK, nMol),
     [calcVar, Patm, VL, TK, nMol]
   );
 
-  // Valores efectivos (mostrando el calculado en lugar del input correspondiente)
-  const Pef = calcVar === 'P' && calculado !== null ? calculado : Patm;
-  const Vef = calcVar === 'V' && calculado !== null ? calculado : VL;
-  const Tef = calcVar === 'T' && calculado !== null ? calculado : TK;
-  const nef = calcVar === 'n' && calculado !== null ? calculado : nMol;
+  /**
+   * Valor efectivo de cada variable: la despejada sale SOLO del cálculo, y sin cálculo no hay
+   * valor (NaN → «—»). Antes caía al valor tecleado antes de despejarla, y «Estado actual»
+   * enseñaba un P = 1 atm que no salía de ningún cálculo (hallazgo 2358).
+   */
+  const efectivo = (v: CalcVar, tecleado: number): number =>
+    calcVar === v ? (calculado ?? NaN) : tecleado;
+  const Pef = efectivo('P', Patm);
+  const Vef = efectivo('V', VL);
+  const Tef = efectivo('T', TK);
+  const nef = efectivo('n', nMol);
+
+  /** Lo que enseña cada campo: el calculado en el despejado (vacío si no lo hay), el tecleado en el resto. */
+  const valorInput = (v: CalcVar, tecleado: number): number | '' =>
+    calcVar === v ? (calculado !== null ? valorDeCampo(calculado) : '') : mostrarCampo(tecleado);
+
+  /**
+   * Al cambiar la variable que se despeja, la que se despejaba pasa a ser DATO con el valor que
+   * enseñaba su campo. Antes recuperaba el tecleado antes de despejarla, así que no se podía
+   * comprobar un resultado despejando otra variable: V = 11,2 L → P = 2,001 atm → al calcular V
+   * salía 22,413 L en vez de 11,200 (hallazgo 2358).
+   */
+  function cambiarCalcVar(nueva: CalcVar) {
+    const fijar: Record<CalcVar, (v: number) => void> = { P: setPatm, V: setVL, T: setTK, n: setNMol };
+    fijar[calcVar](calculado !== null ? valorDeCampo(calculado) : NaN);
+    setCalcVar(nueva);
+  }
+
+  // La animación necesita un estado físico: sin él, la caja de referencia (22,4 L y 0 °C).
+  const Tanim = Number.isFinite(Tef) && Tef > 0 ? Tef : 273.15;
+  const Vanim = Number.isFinite(Vef) && Vef > 0 ? Vef : 22.4;
 
   // Animación de moléculas
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -98,11 +248,11 @@ function GasIdealTab(): React.ReactElement {
     }
 
     // Velocidad media ∝ √T (escalada)
-    const speedFactor = Math.sqrt(Math.max(50, Tef) / 273.15) * 1.2;
+    const speedFactor = Math.sqrt(Math.max(50, Tanim) / 273.15) * 1.2;
 
     // Tamaño de la caja escalado al volumen relativo
     const Vref = 22.4;
-    const scaleV = Math.min(1, Math.max(0.35, Math.sqrt(Vef / Vref)));
+    const scaleV = Math.min(1, Math.max(0.35, Math.sqrt(Vanim / Vref)));
     const boxW = W * scaleV;
     const boxH = H * scaleV;
     const boxX = (W - boxW) / 2;
@@ -158,7 +308,7 @@ function GasIdealTab(): React.ReactElement {
         }
 
         // Dibujar molécula (color depende de T)
-        const tColor = Math.min(1, Math.max(0, (Tef - 100) / 800));
+        const tColor = Math.min(1, Math.max(0, (Tanim - 100) / 800));
         const r = Math.floor(46 + tColor * 200);
         const g = Math.floor(134 - tColor * 80);
         const b = Math.floor(171 - tColor * 100);
@@ -175,7 +325,7 @@ function GasIdealTab(): React.ReactElement {
     return () => {
       if (animRef.current !== null) cancelAnimationFrame(animRef.current);
     };
-  }, [Tef, Vef, initMoleculas]);
+  }, [Tanim, Vanim, initMoleculas]);
 
   return (
     <div>
@@ -190,7 +340,7 @@ function GasIdealTab(): React.ReactElement {
             <select
               id="calcvar"
               value={calcVar}
-              onChange={(e) => setCalcVar(e.target.value as CalcVar)}
+              onChange={(e) => cambiarCalcVar(e.target.value as CalcVar)}
             >
               <option value="P">Presión (P)</option>
               <option value="V">Volumen (V)</option>
@@ -208,8 +358,8 @@ function GasIdealTab(): React.ReactElement {
                 id="P"
                 type="number"
                 step="0.1"
-                value={calcVar === 'P' && calculado !== null ? Number(calculado.toFixed(3)) : Patm}
-                onChange={(e) => setPatm(Number(e.target.value))}
+                value={valorInput('P', Patm)}
+                onChange={(e) => setPatm(leerCampo(e))}
                 disabled={calcVar === 'P'}
               />
             </div>
@@ -221,8 +371,8 @@ function GasIdealTab(): React.ReactElement {
                 id="V"
                 type="number"
                 step="0.5"
-                value={calcVar === 'V' && calculado !== null ? Number(calculado.toFixed(3)) : VL}
-                onChange={(e) => setVL(Number(e.target.value))}
+                value={valorInput('V', VL)}
+                onChange={(e) => setVL(leerCampo(e))}
                 disabled={calcVar === 'V'}
               />
             </div>
@@ -234,8 +384,8 @@ function GasIdealTab(): React.ReactElement {
                 id="T"
                 type="number"
                 step="5"
-                value={calcVar === 'T' && calculado !== null ? Number(calculado.toFixed(2)) : TK}
-                onChange={(e) => setTK(Number(e.target.value))}
+                value={valorInput('T', TK)}
+                onChange={(e) => setTK(leerCampo(e))}
                 disabled={calcVar === 'T'}
               />
             </div>
@@ -247,8 +397,8 @@ function GasIdealTab(): React.ReactElement {
                 id="n"
                 type="number"
                 step="0.1"
-                value={calcVar === 'n' && calculado !== null ? Number(calculado.toFixed(4)) : nMol}
-                onChange={(e) => setNMol(Number(e.target.value))}
+                value={valorInput('n', nMol)}
+                onChange={(e) => setNMol(leerCampo(e))}
                 disabled={calcVar === 'n'}
               />
             </div>
@@ -258,6 +408,12 @@ function GasIdealTab(): React.ReactElement {
             <p className={styles.formulaTex}>P · V = n · R · T</p>
             <p className={styles.formulaCaption}>R = 8,314 J/(mol·K) = 0,0821 atm·L/(mol·K)</p>
           </div>
+
+          {error && (
+            <p className={styles.warningInline} role="alert">
+              {error}
+            </p>
+          )}
 
           {calculado !== null && (
             <div className={styles.resultBlock}>
@@ -305,21 +461,23 @@ function GasIdealTab(): React.ReactElement {
             <p className={styles.resultTitle}>Estado actual</p>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>P</span>
-              <span className={styles.resultValue}>{formatNumber(Pef, 3)} atm</span>
+              <span className={styles.resultValue}>{cifra(Pef, 3)} atm</span>
             </div>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>V</span>
-              <span className={styles.resultValue}>{formatNumber(Vef, 3)} L</span>
+              <span className={styles.resultValue}>{cifra(Vef, 3)} L</span>
             </div>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>T</span>
               <span className={styles.resultValue}>
-                {formatNumber(Tef, 2)} K ({formatNumber(Tef - 273.15, 1)} °C)
+                {Number.isFinite(Tef)
+                  ? `${formatNumber(Tef, 2)} K (${formatNumber(Tef - 273.15, 1)} °C)`
+                  : '— K'}
               </span>
             </div>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>n</span>
-              <span className={styles.resultValue}>{formatNumber(nef, 4)} mol</span>
+              <span className={styles.resultValue}>{cifra(nef, 4)} mol</span>
             </div>
           </div>
         </div>
@@ -332,114 +490,30 @@ function GasIdealTab(): React.ReactElement {
 
 function ProcesosTab(): React.ReactElement {
   const [proceso, setProceso] = useState<Proceso>('isotermo');
+  // Estado inicial: P₁, V₁ y T₁ se teclean; n SALE de ellos (n = P₁V₁/RT₁, hallazgo 2352).
   const [P1atm, setP1atm] = useState<number>(1);
   const [V1L, setV1L] = useState<number>(10);
   const [T1K, setT1K] = useState<number>(300);
   const [V2L, setV2L] = useState<number>(20); // para isotermo y adiabático
-  const [P2atm, setP2atm] = useState<number>(0.5); // para isobaro/isocoro
-  const [T2K, setT2K] = useState<number>(600);
-  const [nMol, setNMol] = useState<number>(1);
+  const [T2K, setT2K] = useState<number>(600); // para isobárico e isocórico
   const [gamma, setGamma] = useState<number>(1.4);
 
-  // Calcular resultado
-  const resultado = useMemo<ResultadoProceso | null>(
-    () => calcularProceso({ proceso, P1atm, V1L, T1K, V2L, T2K, nMol, gamma }),
-    [proceso, P1atm, V1L, T1K, V2L, T2K, nMol, gamma]
+  const entrada = useMemo<EntradaProceso>(
+    () => ({ proceso, P1atm, V1L, T1K, V2L, T2K, gamma }),
+    [proceso, P1atm, V1L, T1K, V2L, T2K, gamma]
   );
+  const error = useMemo(() => errorProceso(entrada), [entrada]);
+  const resultado = useMemo<ResultadoProceso | null>(() => calcularProceso(entrada), [entrada]);
+  // La n del estado inicial se enseña aunque el estado final no valga todavía.
+  const nEstado = useMemo(() => molesDelEstado(P1atm, V1L, T1K), [P1atm, V1L, T1K]);
 
-  // Curva PV
-  const curvaPV = useMemo<PuntoPV[]>(() => {
-    if (!resultado) return [];
-    const P1 = P1atm * ATM_TO_PA;
-    const V1 = V1L * L_TO_M3;
-    const T1 = T1K;
-    const N = 60;
-    const pts: PuntoPV[] = [];
-
-    if (proceso === 'isotermo') {
-      const V2 = resultado.V2;
-      for (let i = 0; i <= N; i += 1) {
-        const V = V1 + (V2 - V1) * (i / N);
-        if (V > 0) pts.push({ P: (nMol * R * T1) / V, V });
-      }
-    } else if (proceso === 'isobaro') {
-      const V2 = resultado.V2;
-      for (let i = 0; i <= N; i += 1) {
-        const V = V1 + (V2 - V1) * (i / N);
-        pts.push({ P: P1, V });
-      }
-    } else if (proceso === 'isocoro') {
-      const P2 = resultado.P2;
-      for (let i = 0; i <= N; i += 1) {
-        const P = P1 + (P2 - P1) * (i / N);
-        pts.push({ P, V: V1 });
-      }
-    } else {
-      const V2 = resultado.V2;
-      for (let i = 0; i <= N; i += 1) {
-        const V = V1 + (V2 - V1) * (i / N);
-        if (V > 0) {
-          const P = P1 * Math.pow(V1 / V, gamma);
-          pts.push({ P, V });
-        }
-      }
-    }
-    return pts;
-  }, [proceso, resultado, P1atm, V1L, T1K, nMol, gamma]);
-
-  // SVG dimensiones y escala
-  const svgW = 500;
-  const svgH = 380;
-  const padL = 60;
-  const padR = 25;
-  const padT = 25;
-  const padB = 50;
-  const plotW = svgW - padL - padR;
-  const plotH = svgH - padT - padB;
-
-  const escalaPV = useMemo(() => {
-    if (curvaPV.length === 0) {
-      return { Vmin: 0, Vmax: 1, Pmin: 0, Pmax: 1 };
-    }
-    let Vmin = Infinity;
-    let Vmax = -Infinity;
-    let Pmin = Infinity;
-    let Pmax = -Infinity;
-    for (const p of curvaPV) {
-      if (p.V < Vmin) Vmin = p.V;
-      if (p.V > Vmax) Vmax = p.V;
-      if (p.P < Pmin) Pmin = p.P;
-      if (p.P > Pmax) Pmax = p.P;
-    }
-    const Vrange = Vmax - Vmin || 1;
-    const Prange = Pmax - Pmin || 1;
-    return {
-      Vmin: Vmin - Vrange * 0.1,
-      Vmax: Vmax + Vrange * 0.1,
-      Pmin: Math.max(0, Pmin - Prange * 0.1),
-      Pmax: Pmax + Prange * 0.15,
-    };
-  }, [curvaPV]);
-
-  const toX = useCallback(
-    (V_m3: number): number => {
-      const VL = V_m3 / L_TO_M3;
-      const VLmin = escalaPV.Vmin / L_TO_M3;
-      const VLmax = escalaPV.Vmax / L_TO_M3;
-      return padL + ((VL - VLmin) / (VLmax - VLmin)) * plotW;
-    },
-    [escalaPV, plotW]
+  // Curva P-V y escala: del MISMO estado que las cifras (hallazgos 2353 y 2362).
+  const curvaPV = useMemo<PuntoPV[]>(
+    () => (resultado ? curvaProceso(proceso, resultado) : []),
+    [proceso, resultado]
   );
-
-  const toY = useCallback(
-    (P_Pa: number): number => {
-      const Patm = P_Pa / ATM_TO_PA;
-      const Pmin = escalaPV.Pmin / ATM_TO_PA;
-      const Pmax = escalaPV.Pmax / ATM_TO_PA;
-      return padT + plotH - ((Patm - Pmin) / (Pmax - Pmin)) * plotH;
-    },
-    [escalaPV, plotH]
-  );
+  const escala = useMemo(() => escalaDiagrama(curvaPV, 0.1, 0.1, 0.15), [curvaPV]);
+  const { toX, toY } = useEjes(escala);
 
   const pathD = useMemo(() => {
     if (curvaPV.length === 0) return '';
@@ -454,6 +528,9 @@ function ProcesosTab(): React.ReactElement {
     isocoro: styles.pvCurveIsocor,
     adiabatico: styles.pvCurveAdiabat,
   }[proceso];
+
+  const primero = curvaPV[0];
+  const ultimo = curvaPV[curvaPV.length - 1];
 
   return (
     <div>
@@ -484,8 +561,8 @@ function ProcesosTab(): React.ReactElement {
                 id="P1"
                 type="number"
                 step="0.1"
-                value={P1atm}
-                onChange={(e) => setP1atm(Number(e.target.value))}
+                value={mostrarCampo(P1atm)}
+                onChange={(e) => setP1atm(leerCampo(e))}
               />
             </div>
             <div className={styles.inputGroup}>
@@ -494,8 +571,8 @@ function ProcesosTab(): React.ReactElement {
                 id="V1"
                 type="number"
                 step="0.5"
-                value={V1L}
-                onChange={(e) => setV1L(Number(e.target.value))}
+                value={mostrarCampo(V1L)}
+                onChange={(e) => setV1L(leerCampo(e))}
               />
             </div>
             <div className={styles.inputGroup}>
@@ -504,19 +581,38 @@ function ProcesosTab(): React.ReactElement {
                 id="T1"
                 type="number"
                 step="10"
-                value={T1K}
-                onChange={(e) => setT1K(Number(e.target.value))}
+                value={mostrarCampo(T1K)}
+                onChange={(e) => setT1K(leerCampo(e))}
               />
             </div>
             <div className={styles.inputGroup}>
-              <label htmlFor="np">n (mol)</label>
+              {/* n no se teclea: la fija el estado inicial. Con cuatro campos libres el estado
+                  de fábrica incumplía PV = nRT por un factor 2,46 (hallazgo 2352). */}
+              <label htmlFor="np">
+                <span>n (mol)</span>
+                <span className={styles.unitLabel}>calculado: P₁V₁/(RT₁)</span>
+              </label>
               <input
                 id="np"
                 type="number"
-                step="0.1"
-                value={nMol}
-                onChange={(e) => setNMol(Number(e.target.value))}
+                value={nEstado !== null ? Math.round(nEstado * 10000) / 10000 : ''}
+                disabled
+                readOnly
               />
+            </div>
+            <div className={styles.inputGroup}>
+              {/* γ a la vista en los cuatro procesos: el ΔU y el Q del isobárico y del
+                  isocórico dependen de él, y antes solo se veía en el adiabático (hallazgo 2356). */}
+              <label htmlFor="gamma">γ (Cp/Cv) del gas</label>
+              <select
+                id="gamma"
+                value={gamma}
+                onChange={(e) => setGamma(Number(e.target.value))}
+              >
+                <option value={1.67}>1,67 (monoatómico: He, Ar)</option>
+                <option value={1.4}>1,4 (diatómico: O₂, N₂)</option>
+                <option value={1.33}>1,33 (poliatómico: CO₂, H₂O)</option>
+              </select>
             </div>
           </div>
 
@@ -531,8 +627,8 @@ function ProcesosTab(): React.ReactElement {
                   id="V2"
                   type="number"
                   step="0.5"
-                  value={V2L}
-                  onChange={(e) => setV2L(Number(e.target.value))}
+                  value={mostrarCampo(V2L)}
+                  onChange={(e) => setV2L(leerCampo(e))}
                 />
               </div>
             )}
@@ -543,43 +639,38 @@ function ProcesosTab(): React.ReactElement {
                   id="T2"
                   type="number"
                   step="10"
-                  value={T2K}
-                  onChange={(e) => setT2K(Number(e.target.value))}
+                  value={mostrarCampo(T2K)}
+                  onChange={(e) => setT2K(leerCampo(e))}
                 />
               </div>
             )}
-            {proceso === 'adiabatico' && (
-              <div className={styles.inputGroup}>
-                <label htmlFor="gamma">γ (Cp/Cv)</label>
-                <select
-                  id="gamma"
-                  value={gamma}
-                  onChange={(e) => setGamma(Number(e.target.value))}
-                >
-                  <option value={1.67}>1,67 (monoatómico: He, Ar)</option>
-                  <option value={1.4}>1,4 (diatómico: O₂, N₂)</option>
-                  <option value={1.33}>1,33 (poliatómico: CO₂, H₂O)</option>
-                </select>
-              </div>
-            )}
-            {/* placeholder vacío opcional */}
-            {(proceso === 'isobaro' || proceso === 'isocoro') && <div />}
-            {/* P2 indicado para isobaro está implícito; mostramos placeholder */}
+            {/* Lo que el proceso deja fijo, con su nombre accesible (hallazgo 2359: el P₂ del
+                isobárico era un <label> sin htmlFor y un <input> sin id). */}
             {proceso === 'isobaro' && (
               <div className={styles.inputGroup}>
-                <label>P₂ (atm)</label>
-                <input
-                  type="number"
-                  value={P1atm}
-                  disabled
-                  readOnly
-                />
+                <label htmlFor="P2iso">
+                  <span>P₂ (atm)</span>
+                  <span className={styles.unitLabel}>= P₁</span>
+                </label>
+                <input id="P2iso" type="number" value={mostrarCampo(P1atm)} disabled readOnly />
+              </div>
+            )}
+            {proceso === 'isocoro' && (
+              <div className={styles.inputGroup}>
+                <label htmlFor="V2iso">
+                  <span>V₂ (L)</span>
+                  <span className={styles.unitLabel}>= V₁</span>
+                </label>
+                <input id="V2iso" type="number" value={mostrarCampo(V1L)} disabled readOnly />
               </div>
             )}
           </div>
 
-          {/* P2atm no se usa en cálculo directamente, pero lo dejamos referenciado */}
-          {false && <span>{P2atm}</span>}
+          {error && (
+            <p className={styles.warningInline} role="alert">
+              {error}
+            </p>
+          )}
 
           {resultado && (
             <div className={styles.resultBlock}>
@@ -626,7 +717,18 @@ function ProcesosTab(): React.ReactElement {
           {resultado && (
             <div className={styles.formulaBox}>
               <p className={styles.formulaTex}>{resultado.formula}</p>
+              <p className={styles.formulaCaption}>
+                {proceso === 'isotermo'
+                  ? `n = ${formatNumber(resultado.n, 4)} mol · el isotermo no depende de γ`
+                  : `n = ${formatNumber(resultado.n, 4)} mol · γ = ${cifraCorta(resultado.gamma)} → Cᵥ = R/(γ−1) = ${formatNumber(R / (resultado.gamma - 1), 2)} J/(mol·K)`}
+              </p>
               <p className={styles.formulaCaption}>1ᵉʳ principio: ΔU = Q − W (gas hace W &gt; 0 al expandirse)</p>
+              {/* W, Q y ΔU salen cada uno de su fórmula: esta comprobación NO es una identidad
+                  (antes Q se calculaba como ΔU + W y cuadraba siempre, hallazgo 2352). */}
+              <p className={styles.formulaCaption}>
+                Comprobación: Q − W = {formatNumber(resultado.Q - resultado.W, 2)} J; ΔU calculado aparte ={' '}
+                {formatNumber(resultado.dU, 2)} J
+              </p>
             </div>
           )}
         </div>
@@ -634,132 +736,29 @@ function ProcesosTab(): React.ReactElement {
         <div>
           <h3 className={styles.panelTitle}>Diagrama P-V</h3>
           <svg
-            viewBox={`0 0 ${svgW} ${svgH}`}
+            viewBox={`0 0 ${SVG_W} ${SVG_H}`}
             className={styles.pvDiagram}
             role="img"
             aria-label="Diagrama presión-volumen del proceso"
           >
-            {/* Grid */}
-            {Array.from({ length: 5 }).map((_, i) => {
-              const y = padT + (plotH * (i + 1)) / 5;
-              return (
-                <line
-                  key={`gh${i}`}
-                  className={styles.pvGrid}
-                  x1={padL}
-                  x2={padL + plotW}
-                  y1={y}
-                  y2={y}
-                />
-              );
-            })}
-            {Array.from({ length: 5 }).map((_, i) => {
-              const x = padL + (plotW * (i + 1)) / 5;
-              return (
-                <line
-                  key={`gv${i}`}
-                  className={styles.pvGrid}
-                  x1={x}
-                  x2={x}
-                  y1={padT}
-                  y2={padT + plotH}
-                />
-              );
-            })}
-
-            {/* Axes */}
-            <line
-              className={styles.pvAxis}
-              x1={padL}
-              y1={padT}
-              x2={padL}
-              y2={padT + plotH}
-            />
-            <line
-              className={styles.pvAxis}
-              x1={padL}
-              y1={padT + plotH}
-              x2={padL + plotW}
-              y2={padT + plotH}
-            />
+            <MarcoDiagrama escala={escala} />
 
             {/* Curva del proceso */}
             {pathD && <path d={pathD} className={procesoColorClass} />}
 
             {/* Puntos inicial y final */}
-            {curvaPV.length > 0 && (
+            {primero && ultimo && (
               <>
-                <circle
-                  className={styles.pvPoint}
-                  cx={toX(curvaPV[0].V)}
-                  cy={toY(curvaPV[0].P)}
-                  r={5}
-                />
-                <text
-                  className={styles.pvLabel}
-                  x={toX(curvaPV[0].V) + 8}
-                  y={toY(curvaPV[0].P) - 6}
-                >
+                <circle className={styles.pvPoint} cx={toX(primero.V)} cy={toY(primero.P)} r={5} />
+                <text className={styles.pvLabel} x={toX(primero.V) + 8} y={toY(primero.P) - 6}>
                   1
                 </text>
-                <circle
-                  className={styles.pvPoint}
-                  cx={toX(curvaPV[curvaPV.length - 1].V)}
-                  cy={toY(curvaPV[curvaPV.length - 1].P)}
-                  r={5}
-                />
-                <text
-                  className={styles.pvLabel}
-                  x={toX(curvaPV[curvaPV.length - 1].V) + 8}
-                  y={toY(curvaPV[curvaPV.length - 1].P) - 6}
-                >
+                <circle className={styles.pvPoint} cx={toX(ultimo.V)} cy={toY(ultimo.P)} r={5} />
+                <text className={styles.pvLabel} x={toX(ultimo.V) + 8} y={toY(ultimo.P) - 6}>
                   2
                 </text>
               </>
             )}
-
-            {/* Etiquetas ejes */}
-            <text className={styles.pvAxisLabel} x={padL + plotW / 2} y={svgH - 12} textAnchor="middle">
-              V (L)
-            </text>
-            <text
-              className={styles.pvAxisLabel}
-              x={18}
-              y={padT + plotH / 2}
-              textAnchor="middle"
-              transform={`rotate(-90 18 ${padT + plotH / 2})`}
-            >
-              P (atm)
-            </text>
-
-            {/* Ticks numéricos */}
-            <text
-              className={styles.pvAxisLabel}
-              x={padL}
-              y={padT + plotH + 15}
-              textAnchor="middle"
-            >
-              {formatNumber(escalaPV.Vmin / L_TO_M3, 1)}
-            </text>
-            <text
-              className={styles.pvAxisLabel}
-              x={padL + plotW}
-              y={padT + plotH + 15}
-              textAnchor="middle"
-            >
-              {formatNumber(escalaPV.Vmax / L_TO_M3, 1)}
-            </text>
-            <text
-              className={styles.pvAxisLabel}
-              x={padL - 8}
-              y={padT + plotH + 4}
-              textAnchor="end"
-            >
-              {formatNumber(escalaPV.Pmin / ATM_TO_PA, 2)}
-            </text>
-            <text className={styles.pvAxisLabel} x={padL - 8} y={padT + 8} textAnchor="end">
-              {formatNumber(escalaPV.Pmax / ATM_TO_PA, 2)}
-            </text>
           </svg>
           <p className={styles.moleculasCaption}>
             Curva real del proceso. Punto 1 = inicial, punto 2 = final.
@@ -772,285 +771,31 @@ function ProcesosTab(): React.ReactElement {
 
 // ---------- TAB 3: Ciclos ----------
 
-interface ResultadoCiclo {
-  eta: number; // eficiencia [0..1]
-  etaCarnot: number;
-  W: number; // trabajo neto J
-  Qh: number; // calor absorbido J
-  Qc: number; // calor cedido J
-  puntos: PuntoPV[]; // ciclo cerrado
-}
-
 function CiclosTab(): React.ReactElement {
   const [ciclo, setCiclo] = useState<Ciclo>('carnot');
   const [Th, setTh] = useState<number>(800);
   const [Tc, setTc] = useState<number>(300);
-  const [V1, setV1] = useState<number>(2); // L (mínimo Otto/Diesel = compresión)
+  const [V1, setV1] = useState<number>(2); // L (Carnot y Stirling)
   const [V2, setV2] = useState<number>(20); // L (máximo)
   const [r, setR] = useState<number>(10); // ratio compresión Otto/Diesel
   const [rc, setRc] = useState<number>(2); // cut-off Diesel
   const [nMol, setNMol] = useState<number>(1);
   const [gamma, setGamma] = useState<number>(1.4);
 
-  const resultado = useMemo<ResultadoCiclo | null>(() => {
-    const Cv = R / (gamma - 1);
-    const Cp = gamma * Cv;
-    const etaCarnot = Th > 0 ? 1 - Tc / Th : 0;
-
-    if (ciclo === 'carnot') {
-      // 4 estados: 1→2 expansión isoterma a Th; 2→3 expansión adiabática Th→Tc;
-      // 3→4 compresión isoterma a Tc; 4→1 compresión adiabática Tc→Th.
-      // Tomamos V1, V2 (a Th); calculamos V3, V4 con relaciones adiabáticas.
-      const V1_m3 = V1 * L_TO_M3;
-      const V2_m3 = V2 * L_TO_M3;
-      if (V1_m3 <= 0 || V2_m3 <= 0 || Th <= 0 || Tc <= 0) return null;
-      // Relación adiabática T·V^(γ-1) = cte
-      // 2→3: Th·V2^(γ-1) = Tc·V3^(γ-1) → V3 = V2·(Th/Tc)^(1/(γ-1))
-      const V3_m3 = V2_m3 * Math.pow(Th / Tc, 1 / (gamma - 1));
-      // 4→1: Tc·V4^(γ-1) = Th·V1^(γ-1) → V4 = V1·(Th/Tc)^(1/(γ-1))
-      const V4_m3 = V1_m3 * Math.pow(Th / Tc, 1 / (gamma - 1));
-      const P1 = (nMol * R * Th) / V1_m3;
-      const P2 = (nMol * R * Th) / V2_m3;
-      const P3 = (nMol * R * Tc) / V3_m3;
-      const P4 = (nMol * R * Tc) / V4_m3;
-
-      // Calor absorbido en isoterma 1→2: Qh = nRTh·ln(V2/V1)
-      const Qh = nMol * R * Th * Math.log(V2_m3 / V1_m3);
-      // Calor cedido en isoterma 3→4: |Qc| = nRTc·ln(V3/V4)
-      const Qc = nMol * R * Tc * Math.log(V3_m3 / V4_m3);
-      const W = Qh - Qc;
-      const eta = Qh > 0 ? W / Qh : 0;
-
-      // Construir curva del ciclo
-      const puntos: PuntoPV[] = [];
-      const N = 30;
-      // 1→2 isoterma Th
-      for (let i = 0; i <= N; i += 1) {
-        const V = V1_m3 + ((V2_m3 - V1_m3) * i) / N;
-        puntos.push({ P: (nMol * R * Th) / V, V });
-      }
-      // 2→3 adiabática
-      for (let i = 1; i <= N; i += 1) {
-        const V = V2_m3 + ((V3_m3 - V2_m3) * i) / N;
-        const P = P2 * Math.pow(V2_m3 / V, gamma);
-        puntos.push({ P, V });
-      }
-      // 3→4 isoterma Tc
-      for (let i = 1; i <= N; i += 1) {
-        const V = V3_m3 + ((V4_m3 - V3_m3) * i) / N;
-        puntos.push({ P: (nMol * R * Tc) / V, V });
-      }
-      // 4→1 adiabática (cierre)
-      for (let i = 1; i <= N; i += 1) {
-        const V = V4_m3 + ((V1_m3 - V4_m3) * i) / N;
-        const P = P4 * Math.pow(V4_m3 / V, gamma);
-        puntos.push({ P, V });
-      }
-
-      return { eta, etaCarnot, W, Qh, Qc, puntos };
-    }
-
-    if (ciclo === 'otto') {
-      // Otto: 4 procesos. 1→2 compresión adiabática; 2→3 isocora calentamiento;
-      // 3→4 expansión adiabática; 4→1 isocora enfriamiento.
-      // Inputs: V_max=V2, V_min=V_max/r, Tc=T1 (al inicio), Th=T3 (después calentar).
-      const Vmax = V2 * L_TO_M3;
-      const Vmin = Vmax / r;
-      if (Vmin <= 0 || r <= 1) return null;
-      const T1 = Tc;
-      const T2 = T1 * Math.pow(r, gamma - 1); // adiabática
-      const T3 = Th;
-      const T4 = T3 / Math.pow(r, gamma - 1);
-      const P1 = (nMol * R * T1) / Vmax;
-      const P2 = (nMol * R * T2) / Vmin;
-      const P3 = (nMol * R * T3) / Vmin;
-      const P4 = (nMol * R * T4) / Vmax;
-
-      // Calor: solo en isocoras
-      const Qh = nMol * Cv * (T3 - T2); // 2→3 absorbido
-      const Qc = nMol * Cv * (T4 - T1); // 4→1 cedido (positivo)
-      const W = Qh - Qc;
-      const eta = 1 - 1 / Math.pow(r, gamma - 1);
-
-      const puntos: PuntoPV[] = [];
-      const N = 30;
-      // 1→2 adiabática (V de Vmax a Vmin)
-      for (let i = 0; i <= N; i += 1) {
-        const V = Vmax + ((Vmin - Vmax) * i) / N;
-        const P = P1 * Math.pow(Vmax / V, gamma);
-        puntos.push({ P, V });
-      }
-      // 2→3 isocora (V=Vmin, P sube)
-      for (let i = 1; i <= N; i += 1) {
-        const P = P2 + ((P3 - P2) * i) / N;
-        puntos.push({ P, V: Vmin });
-      }
-      // 3→4 adiabática (V de Vmin a Vmax)
-      for (let i = 1; i <= N; i += 1) {
-        const V = Vmin + ((Vmax - Vmin) * i) / N;
-        const P = P3 * Math.pow(Vmin / V, gamma);
-        puntos.push({ P, V });
-      }
-      // 4→1 isocora (V=Vmax, P baja)
-      for (let i = 1; i <= N; i += 1) {
-        const P = P4 + ((P1 - P4) * i) / N;
-        puntos.push({ P, V: Vmax });
-      }
-
-      return { eta, etaCarnot, W, Qh, Qc, puntos };
-    }
-
-    if (ciclo === 'diesel') {
-      // Diesel: 1→2 compresión adiabática; 2→3 isobara expansión (combustión a P cte);
-      // 3→4 expansión adiabática; 4→1 isocora enfriamiento.
-      const Vmax = V2 * L_TO_M3;
-      const Vmin = Vmax / r;
-      if (Vmin <= 0 || r <= 1 || rc <= 1) return null;
-      const T1 = Tc;
-      const T2 = T1 * Math.pow(r, gamma - 1);
-      const V3_m3 = Vmin * rc;
-      // Isobárico 2→3: V/T = cte
-      const T3 = T2 * rc;
-      // Adiabático 3→4 hasta V4=Vmax
-      const T4 = T3 * Math.pow(V3_m3 / Vmax, gamma - 1);
-      const P1 = (nMol * R * T1) / Vmax;
-      const P2 = (nMol * R * T2) / Vmin;
-      const P3 = P2; // isobaro
-      const P4 = (nMol * R * T4) / Vmax;
-
-      const Qh = nMol * Cp * (T3 - T2); // isobárica
-      const Qc = nMol * Cv * (T4 - T1); // isocórica enfriamiento
-      const W = Qh - Qc;
-      const eta = 1 - (1 / Math.pow(r, gamma - 1)) * ((Math.pow(rc, gamma) - 1) / (gamma * (rc - 1)));
-
-      const puntos: PuntoPV[] = [];
-      const N = 30;
-      // 1→2 adiabática (Vmax → Vmin)
-      for (let i = 0; i <= N; i += 1) {
-        const V = Vmax + ((Vmin - Vmax) * i) / N;
-        const P = P1 * Math.pow(Vmax / V, gamma);
-        puntos.push({ P, V });
-      }
-      // 2→3 isobara (Vmin → V3)
-      for (let i = 1; i <= N; i += 1) {
-        const V = Vmin + ((V3_m3 - Vmin) * i) / N;
-        puntos.push({ P: P2, V });
-      }
-      // 3→4 adiabática (V3 → Vmax)
-      for (let i = 1; i <= N; i += 1) {
-        const V = V3_m3 + ((Vmax - V3_m3) * i) / N;
-        const P = P3 * Math.pow(V3_m3 / V, gamma);
-        puntos.push({ P, V });
-      }
-      // 4→1 isocora (Vmax)
-      for (let i = 1; i <= N; i += 1) {
-        const P = P4 + ((P1 - P4) * i) / N;
-        puntos.push({ P, V: Vmax });
-      }
-
-      return { eta, etaCarnot, W, Qh, Qc, puntos };
-    }
-
-    // Stirling: 4 procesos. 1→2 isoterma a Th expansión (V1→V2);
-    // 2→3 isocora enfriamiento Th→Tc; 3→4 isoterma a Tc compresión (V2→V1);
-    // 4→1 isocora calentamiento Tc→Th.
-    const V1_m3 = V1 * L_TO_M3;
-    const V2_m3 = V2 * L_TO_M3;
-    if (V1_m3 <= 0 || V2_m3 <= 0 || Th <= 0 || Tc <= 0) return null;
-    const P1 = (nMol * R * Th) / V1_m3;
-    const P2 = (nMol * R * Th) / V2_m3;
-    const P3 = (nMol * R * Tc) / V2_m3;
-    const P4 = (nMol * R * Tc) / V1_m3;
-
-    // Sin regenerador ideal: Qh = nRTh·ln(V2/V1) + nCv(Th-Tc); Qc = nRTc·ln(V2/V1) + nCv(Th-Tc)
-    // Con regenerador (idealizado, eficiencia Carnot): solo se considera el calor isotermo
-    // Aquí asumimos Stirling con regenerador ideal → η = 1 - Tc/Th
-    const QhIso = nMol * R * Th * Math.log(V2_m3 / V1_m3);
-    const QcIso = nMol * R * Tc * Math.log(V2_m3 / V1_m3);
-    const W = QhIso - QcIso;
-    const Qh = QhIso;
-    const Qc = QcIso;
-    const eta = Th > 0 ? 1 - Tc / Th : 0;
-
-    const puntos: PuntoPV[] = [];
-    const N = 30;
-    // 1→2 isoterma Th
-    for (let i = 0; i <= N; i += 1) {
-      const V = V1_m3 + ((V2_m3 - V1_m3) * i) / N;
-      puntos.push({ P: (nMol * R * Th) / V, V });
-    }
-    // 2→3 isocora (V=V2, P baja)
-    for (let i = 1; i <= N; i += 1) {
-      const P = P2 + ((P3 - P2) * i) / N;
-      puntos.push({ P, V: V2_m3 });
-    }
-    // 3→4 isoterma Tc
-    for (let i = 1; i <= N; i += 1) {
-      const V = V2_m3 + ((V1_m3 - V2_m3) * i) / N;
-      puntos.push({ P: (nMol * R * Tc) / V, V });
-    }
-    // 4→1 isocora (V=V1)
-    for (let i = 1; i <= N; i += 1) {
-      const P = P4 + ((P1 - P4) * i) / N;
-      puntos.push({ P, V: V1_m3 });
-    }
-
-    return { eta, etaCarnot, W, Qh, Qc, puntos };
-  }, [ciclo, Th, Tc, V1, V2, r, rc, nMol, gamma]);
-
-  // SVG
-  const svgW = 500;
-  const svgH = 380;
-  const padL = 60;
-  const padR = 25;
-  const padT = 25;
-  const padB = 50;
-  const plotW = svgW - padL - padR;
-  const plotH = svgH - padT - padB;
-
-  const escalaPV = useMemo(() => {
-    if (!resultado || resultado.puntos.length === 0) {
-      return { Vmin: 0, Vmax: 1, Pmin: 0, Pmax: 1 };
-    }
-    let Vmin = Infinity;
-    let Vmax = -Infinity;
-    let Pmin = Infinity;
-    let Pmax = -Infinity;
-    for (const p of resultado.puntos) {
-      if (p.V < Vmin) Vmin = p.V;
-      if (p.V > Vmax) Vmax = p.V;
-      if (p.P < Pmin) Pmin = p.P;
-      if (p.P > Pmax) Pmax = p.P;
-    }
-    const Vrange = Vmax - Vmin || 1;
-    const Prange = Pmax - Pmin || 1;
-    return {
-      Vmin: Vmin - Vrange * 0.08,
-      Vmax: Vmax + Vrange * 0.08,
-      Pmin: Math.max(0, Pmin - Prange * 0.08),
-      Pmax: Pmax + Prange * 0.12,
-    };
-  }, [resultado]);
-
-  const toX = useCallback(
-    (V_m3: number): number => {
-      const VL = V_m3 / L_TO_M3;
-      const VLmin = escalaPV.Vmin / L_TO_M3;
-      const VLmax = escalaPV.Vmax / L_TO_M3;
-      return padL + ((VL - VLmin) / (VLmax - VLmin)) * plotW;
-    },
-    [escalaPV, plotW]
+  const entrada = useMemo<EntradaCiclo>(
+    () => ({ ciclo, Th, Tc, V1L: V1, V2L: V2, r, rc, nMol, gamma }),
+    [ciclo, Th, Tc, V1, V2, r, rc, nMol, gamma]
   );
+  // Un ciclo fuera de su dominio (Otto con la T pico por debajo de la T tras la compresión,
+  // hallazgo 2354) se rechaza con aviso: nunca se publica una η mayor que la de Carnot.
+  const error = useMemo(() => errorCiclo(entrada), [entrada]);
+  const resultado = useMemo<ResultadoCiclo | null>(() => calcularCiclo(entrada), [entrada]);
 
-  const toY = useCallback(
-    (P_Pa: number): number => {
-      const Patm = P_Pa / ATM_TO_PA;
-      const Pmin = escalaPV.Pmin / ATM_TO_PA;
-      const Pmax = escalaPV.Pmax / ATM_TO_PA;
-      return padT + plotH - ((Patm - Pmin) / (Pmax - Pmin)) * plotH;
-    },
-    [escalaPV, plotH]
+  const escala = useMemo(
+    () => (resultado ? escalaDiagrama(resultado.puntos, 0.08, 0.08, 0.12) : null),
+    [resultado]
   );
+  const { toX, toY } = useEjes(escala);
 
   const pathD = useMemo(() => {
     if (!resultado || resultado.puntos.length === 0) return '';
@@ -1091,8 +836,8 @@ function CiclosTab(): React.ReactElement {
                     id="Th"
                     type="number"
                     step="20"
-                    value={Th}
-                    onChange={(e) => setTh(Number(e.target.value))}
+                    value={mostrarCampo(Th)}
+                    onChange={(e) => setTh(leerCampo(e))}
                   />
                 </div>
                 <div className={styles.inputGroup}>
@@ -1101,8 +846,8 @@ function CiclosTab(): React.ReactElement {
                     id="Tc"
                     type="number"
                     step="10"
-                    value={Tc}
-                    onChange={(e) => setTc(Number(e.target.value))}
+                    value={mostrarCampo(Tc)}
+                    onChange={(e) => setTc(leerCampo(e))}
                   />
                 </div>
                 <div className={styles.inputGroup}>
@@ -1111,8 +856,8 @@ function CiclosTab(): React.ReactElement {
                     id="V1c"
                     type="number"
                     step="0.5"
-                    value={V1}
-                    onChange={(e) => setV1(Number(e.target.value))}
+                    value={mostrarCampo(V1)}
+                    onChange={(e) => setV1(leerCampo(e))}
                   />
                 </div>
                 <div className={styles.inputGroup}>
@@ -1121,8 +866,8 @@ function CiclosTab(): React.ReactElement {
                     id="V2c"
                     type="number"
                     step="0.5"
-                    value={V2}
-                    onChange={(e) => setV2(Number(e.target.value))}
+                    value={mostrarCampo(V2)}
+                    onChange={(e) => setV2(leerCampo(e))}
                   />
                 </div>
               </>
@@ -1136,28 +881,33 @@ function CiclosTab(): React.ReactElement {
                     id="Tco"
                     type="number"
                     step="10"
-                    value={Tc}
-                    onChange={(e) => setTc(Number(e.target.value))}
+                    value={mostrarCampo(Tc)}
+                    onChange={(e) => setTc(leerCampo(e))}
                   />
                 </div>
-                <div className={styles.inputGroup}>
-                  <label htmlFor="Tho">T pico (K)</label>
-                  <input
-                    id="Tho"
-                    type="number"
-                    step="50"
-                    value={Th}
-                    onChange={(e) => setTh(Number(e.target.value))}
-                  />
-                </div>
+                {/* El Diesel no tiene «T pico» que teclear: su T máxima es T₃ = T₂·rc y la fija
+                    el cut-off. El campo no entraba en su cálculo y solo movía la η de Carnot de
+                    referencia (hallazgo 2355); ahora T₃ sale en el balance. */}
+                {ciclo === 'otto' && (
+                  <div className={styles.inputGroup}>
+                    <label htmlFor="Tho">T pico (K)</label>
+                    <input
+                      id="Tho"
+                      type="number"
+                      step="50"
+                      value={mostrarCampo(Th)}
+                      onChange={(e) => setTh(leerCampo(e))}
+                    />
+                  </div>
+                )}
                 <div className={styles.inputGroup}>
                   <label htmlFor="V2o">V máx (L)</label>
                   <input
                     id="V2o"
                     type="number"
                     step="0.5"
-                    value={V2}
-                    onChange={(e) => setV2(Number(e.target.value))}
+                    value={mostrarCampo(V2)}
+                    onChange={(e) => setV2(leerCampo(e))}
                   />
                 </div>
                 <div className={styles.inputGroup}>
@@ -1167,8 +917,8 @@ function CiclosTab(): React.ReactElement {
                     type="number"
                     step="0.5"
                     min="1.5"
-                    value={r}
-                    onChange={(e) => setR(Number(e.target.value))}
+                    value={mostrarCampo(r)}
+                    onChange={(e) => setR(leerCampo(e))}
                   />
                 </div>
                 {ciclo === 'diesel' && (
@@ -1179,8 +929,8 @@ function CiclosTab(): React.ReactElement {
                       type="number"
                       step="0.1"
                       min="1.05"
-                      value={rc}
-                      onChange={(e) => setRc(Number(e.target.value))}
+                      value={mostrarCampo(rc)}
+                      onChange={(e) => setRc(leerCampo(e))}
                     />
                   </div>
                 )}
@@ -1193,8 +943,8 @@ function CiclosTab(): React.ReactElement {
                 id="nc"
                 type="number"
                 step="0.1"
-                value={nMol}
-                onChange={(e) => setNMol(Number(e.target.value))}
+                value={mostrarCampo(nMol)}
+                onChange={(e) => setNMol(leerCampo(e))}
               />
             </div>
             <div className={styles.inputGroup}>
@@ -1207,21 +957,35 @@ function CiclosTab(): React.ReactElement {
             </div>
           </div>
 
+          {error && (
+            <p className={styles.warningInline} role="alert">
+              {error}
+            </p>
+          )}
+
           {resultado && (
             <div className={styles.resultBlock}>
               <p className={styles.resultTitle}>Balance del ciclo</p>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Eficiencia η</span>
-                <span className={styles.resultValueAccent}>
-                  {formatNumber(resultado.eta * 100, 2)} %
-                </span>
+                <span className={styles.resultValueAccent}>{formatPercentage(resultado.eta, 2)}</span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>η Carnot (cota máx)</span>
-                <span className={styles.resultValue}>
-                  {formatNumber(resultado.etaCarnot * 100, 2)} %
-                </span>
+                <span className={styles.resultValue}>{formatPercentage(resultado.etaCarnot, 2)}</span>
               </div>
+              {resultado.Tcompresion !== null && (
+                <div className={styles.resultRow}>
+                  <span className={styles.resultLabel}>T tras la compresión T₂</span>
+                  <span className={styles.resultValue}>{formatNumber(resultado.Tcompresion, 2)} K</span>
+                </div>
+              )}
+              {ciclo === 'diesel' && (
+                <div className={styles.resultRow}>
+                  <span className={styles.resultLabel}>T máx del ciclo T₃ = T₂·rc</span>
+                  <span className={styles.resultValue}>{formatNumber(resultado.Tmax, 2)} K</span>
+                </div>
+              )}
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Trabajo neto W</span>
                 <span className={styles.resultValue}>{formatNumber(resultado.W, 2)} J</span>
@@ -1244,9 +1008,7 @@ function CiclosTab(): React.ReactElement {
                       style={{ width: `${Math.max(0, Math.min(100, resultado.eta * 100))}%` }}
                     />
                   </div>
-                  <span className={styles.efficiencyValue}>
-                    {formatNumber(resultado.eta * 100, 1)} %
-                  </span>
+                  <span className={styles.efficiencyValue}>{formatPercentage(resultado.eta, 1)}</span>
                 </div>
                 <div className={styles.efficiencyRow}>
                   <span className={styles.efficiencyLabel}>η Carnot</span>
@@ -1258,9 +1020,7 @@ function CiclosTab(): React.ReactElement {
                       }}
                     />
                   </div>
-                  <span className={styles.efficiencyValue}>
-                    {formatNumber(resultado.etaCarnot * 100, 1)} %
-                  </span>
+                  <span className={styles.efficiencyValue}>{formatPercentage(resultado.etaCarnot, 1)}</span>
                 </div>
               </div>
             </div>
@@ -1275,62 +1035,29 @@ function CiclosTab(): React.ReactElement {
             </p>
             <p className={styles.formulaCaption}>
               {ciclo === 'carnot' && 'Cota máxima absoluta: ningún ciclo real supera Carnot'}
-              {ciclo === 'otto' && 'Motor de gasolina: solo depende de la compresión y γ'}
-              {ciclo === 'diesel' && 'Penaliza el cut-off (rc) por la inyección continua'}
-              {ciclo === 'stirling' && 'Cota teórica igual a Carnot. Real: 30-40 %.'}
+              {ciclo === 'otto' &&
+                'Motor de gasolina: solo depende de la compresión y γ. La T pico tiene que superar la T tras la compresión'}
+              {ciclo === 'diesel' &&
+                'Penaliza el cut-off (rc) por la inyección continua. La T máxima es T₃ = T₂·rc: la fija el cut-off'}
+              {ciclo === 'stirling' && <>Cota teórica igual a Carnot. Real: 30-40&nbsp;%.</>}
             </p>
+            {ciclo !== 'carnot' && ciclo !== 'stirling' && (
+              <p className={styles.formulaCaption}>
+                La η de Carnot de referencia se calcula entre la T fría y la T máxima del ciclo.
+              </p>
+            )}
           </div>
         </div>
 
         <div>
           <h3 className={styles.panelTitle}>Diagrama P-V del ciclo</h3>
           <svg
-            viewBox={`0 0 ${svgW} ${svgH}`}
+            viewBox={`0 0 ${SVG_W} ${SVG_H}`}
             className={styles.pvDiagram}
             role="img"
             aria-label="Diagrama presión-volumen del ciclo termodinámico"
           >
-            {Array.from({ length: 5 }).map((_, i) => {
-              const y = padT + (plotH * (i + 1)) / 5;
-              return (
-                <line
-                  key={`gh${i}`}
-                  className={styles.pvGrid}
-                  x1={padL}
-                  x2={padL + plotW}
-                  y1={y}
-                  y2={y}
-                />
-              );
-            })}
-            {Array.from({ length: 5 }).map((_, i) => {
-              const x = padL + (plotW * (i + 1)) / 5;
-              return (
-                <line
-                  key={`gv${i}`}
-                  className={styles.pvGrid}
-                  x1={x}
-                  x2={x}
-                  y1={padT}
-                  y2={padT + plotH}
-                />
-              );
-            })}
-
-            <line
-              className={styles.pvAxis}
-              x1={padL}
-              y1={padT}
-              x2={padL}
-              y2={padT + plotH}
-            />
-            <line
-              className={styles.pvAxis}
-              x1={padL}
-              y1={padT + plotH}
-              x2={padL + plotW}
-              y2={padT + plotH}
-            />
+            <MarcoDiagrama escala={escala} />
 
             {pathD && (
               <>
@@ -1338,46 +1065,6 @@ function CiclosTab(): React.ReactElement {
                 <path d={pathD} className={styles.pvCurve} />
               </>
             )}
-
-            <text className={styles.pvAxisLabel} x={padL + plotW / 2} y={svgH - 12} textAnchor="middle">
-              V (L)
-            </text>
-            <text
-              className={styles.pvAxisLabel}
-              x={18}
-              y={padT + plotH / 2}
-              textAnchor="middle"
-              transform={`rotate(-90 18 ${padT + plotH / 2})`}
-            >
-              P (atm)
-            </text>
-            <text
-              className={styles.pvAxisLabel}
-              x={padL}
-              y={padT + plotH + 15}
-              textAnchor="middle"
-            >
-              {formatNumber(escalaPV.Vmin / L_TO_M3, 1)}
-            </text>
-            <text
-              className={styles.pvAxisLabel}
-              x={padL + plotW}
-              y={padT + plotH + 15}
-              textAnchor="middle"
-            >
-              {formatNumber(escalaPV.Vmax / L_TO_M3, 1)}
-            </text>
-            <text
-              className={styles.pvAxisLabel}
-              x={padL - 8}
-              y={padT + plotH + 4}
-              textAnchor="end"
-            >
-              {formatNumber(escalaPV.Pmin / ATM_TO_PA, 2)}
-            </text>
-            <text className={styles.pvAxisLabel} x={padL - 8} y={padT + 8} textAnchor="end">
-              {formatNumber(escalaPV.Pmax / ATM_TO_PA, 2)}
-            </text>
           </svg>
           <p className={styles.moleculasCaption}>
             Área encerrada = trabajo neto del ciclo. Sentido horario = ciclo motor.
@@ -1655,7 +1342,7 @@ export default function Page(): React.ReactElement {
                 <strong>Comprueba signos y orden de magnitud</strong>
                 <p>
                   Si el gas se expande, W &gt; 0. Si se calienta, ΔU &gt; 0. Si el resultado es
-                  absurdo (η &gt; 100 %), revisa T en K y la fórmula del ciclo.
+                  absurdo (η &gt; 100&nbsp;%), revisa T en K y la fórmula del ciclo.
                 </p>
               </div>
             </div>

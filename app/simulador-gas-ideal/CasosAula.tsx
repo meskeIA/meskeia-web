@@ -84,7 +84,7 @@ export default function CasosAula() {
           puede decir «resuelve los casos 3, 7 y 11» y corregir sin ambigüedad. Se corrigen como
           calcula el simulador: R = 8,314 J/(mol·K), 1 atm = 101.325 Pa y T(K) = T(°C) + 273,15;
           con R = 0,0821 atm·L/(mol·K) o con 273 también se acepta, porque la diferencia es menor
-          que la tolerancia del 1 %. Si un campo del simulador no te admite la coma decimal,
+          que la tolerancia del 1&nbsp;%. Si un campo del simulador no te admite la coma decimal,
           escribe el decimal con punto.
         </p>
       </div>
