@@ -5,6 +5,15 @@ import {
   sembrarValor,
   sembrarValorAcotado,
 } from './_hidratacion';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  resolverCaso,
+  comprobarRespuesta,
+  toleranciaDe,
+  generarEjercicioAleatorio,
+} from '../../app/simulador-plano-inclinado/casos';
+import { G, analizarPlano } from '../../app/simulador-plano-inclinado/motor';
 
 /**
  * Simulador de Plano Inclinado — primera inspección, 23/09/2026
@@ -413,5 +422,209 @@ test.describe('Simulador de plano inclinado — balance de energía y g', () => 
   test('H5 — la página dice que usa g = 9,81 m/s²', async ({ page }) => {
     await expect(page.getByText('Con g = 9,81 m/s²')).toBeVisible();
     expect(await leerFila(page, 'Peso P = m·g')).toBe('49,05 N');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * simulador-plano-inclinado · casos para clase (tarea de tipo A, 28/09/2026)
+ *
+ * Doce problemas de dinámica en el plano inclinado. Los casos calculan SOLO con `analizarPlano`
+ * de `motor.ts`, que se EXTRAJO del `useMemo` `fisica` de page.tsx sin tocar una operación
+ * (0 diferencias en 1.449.360 combinaciones contra el cuerpo original): lo que corrige la
+ * sección y lo que pinta el panel sale de la misma función.
+ *
+ * CONVENIO DE ESTA APP: g = 9,81 m/s² · la fuerza aplicada es paralela al plano, así que
+ * N = m·g·cos θ · en reposo el rozamiento es el que EQUILIBRA (no μₛ·N) · si desliza, μₖ·N ·
+ * ángulo crítico = arctg μₛ.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO (a mano, sin mirar la app):
+ *   1 · Pₓ = 10·9,81·sen 30° = 98,1·0,5                                       = 49,05 N
+ *   2 · N = 98,1·cos 30° = 98,1·0,866025 = 84,957                             → 84,96 N
+ *   3 · a = g·sen 30° = 9,81·0,5                                              = 4,905 m/s²
+ *   4 · tg 40° = 0,839 > 0,5 → desliza; a = 9,81·(0,642788 − 0,3·0,766044)
+ *       = 9,81·0,412975 = 4,0513                                              → 4,05 m/s²
+ *   5 · tg 25° = 0,466 < 0,5 → no desliza                                     = 0 m/s²
+ *   6 · tg 30° = 0,577 < 0,7 → en reposo; F_r = Pₓ = 20·9,81·0,5 = 98,10 N
+ *       (μₛ·N = 0,7·169,91 = 118,94 N es el error clásico)                    = 98,10 N
+ *   7 · θc = arctg 0,75                                                       → 36,87°
+ *   8 · a = 9,81·(0,5 − 0,2·0,866025) = 3,2059; t = √(2·4/3,2059) = 1,5797  → 1,58 s
+ *   9 · a = 9,81·(0,573576 − 0,25·0,819152) = 3,6178; v = √(2·3,6178·5) = 6,0148 → 6,01 m/s
+ *  10 · F = 20·9,81·(sen 15° + 0,3·cos 15°) = 196,2·0,548597 = 107,635       → 107,63 N
+ *  11 · E_p = 8·9,81·(5·sen 30°) = 8·9,81·2,5                                 = 196,20 J
+ *  12 · W = μₖ·N·d = 0,1·50·9,81·cos 30°·10 = 424,79                         → 424,79 J
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+const A_MANO_CASOS: Readonly<Record<number, number>> = {
+  1: 49.05,
+  2: 84.96,
+  3: 4.905,
+  4: 4.05,
+  5: 0,
+  6: 98.1,
+  7: 36.87,
+  8: 1.58,
+  9: 6.01,
+  10: 107.63,
+  11: 196.2,
+  12: 424.79,
+};
+
+/** Cuántos decimales lleva el número que se ENSEÑA en la solución («84,96 N» → 2). */
+function decimalesMostrados(texto: string): number {
+  const m = texto.match(/[-−]?\d[\d.]*(?:,(\d+))?/);
+  return m?.[1]?.length ?? 0;
+}
+
+const redondeo = (v: number, d: number) => Math.round(v * 10 ** d) / 10 ** d;
+
+test.describe('simulador-plano-inclinado · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    for (const caso of CASOS) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(redondeo(r.valor, caso.datos.decimales ?? 2), `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta finita y desarrollo', async () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+    }
+    expect(new Set(CASOS.map((c) => c.categoria))).toEqual(new Set(['abstracto', 'aplicado']));
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    // Sin `pesos?` suelto: en dinámica «peso» es la fuerza m·g y casaba con el caso 1. La moneda
+    // se reconoce por su gentilicio.
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Ecuador|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos (mexicanos|colombianos|argentinos|chilenos|uruguayos)|Bachillerato|selectividad)\b/i;
+    // La sigla va aparte y con mayúsculas: con /i, el pronombre «eso» la disparaba en falso.
+    const SIGLA_ESO = /\bESO\b/;
+    for (const caso of CASOS) {
+      const texto = `${caso.titulo} ${caso.enunciado}`;
+      expect(PROHIBIDO.test(texto) || SIGLA_ESO.test(texto), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · lo que el enunciado PIDE coincide con lo que la solución MUESTRA', async () => {
+    for (const caso of CASOS) {
+      const decimales = caso.datos.decimales ?? 2;
+      expect(decimalesMostrados(caso.respuestaTexto), `caso ${caso.id}`).toBeLessThanOrEqual(decimales);
+      const ultimo = caso.pasos[caso.pasos.length - 1];
+      expect(ultimo, `caso ${caso.id}: el último paso enseña la cifra de la casilla`).toContain(caso.respuestaTexto);
+      // El caso 5 pide redondear aunque su respuesta sea 0 exacto, a propósito: como el 4, para
+      // que la frase no delate la respuesta. Por eso la implicación va en un solo sentido.
+      const exacto = Math.abs(resolverCaso(caso.datos).valor - caso.respuesta) < 1e-9;
+      if (!exacto) {
+        expect(caso.requiereRedondeo, `caso ${caso.id}`).toBe(true);
+        expect(caso.enunciado, `caso ${caso.id}: se redondea y el enunciado no lo pide`).toMatch(/redonde|decimal|unidades|décima/i);
+      }
+    }
+  });
+
+  test('5.ter · si la respuesta cambia con g = 10, el enunciado declara g = 9,81', async () => {
+    // Se prueba EJECUTANDO, no leyendo: el caso 7 (ángulo crítico) no depende de g y no tiene
+    // por qué nombrarla (lección de simulador-conservacion-energia, 14/09/2026).
+    for (const caso of CASOS) {
+      const conDiez = resolverCaso(caso.datos, 10);
+      const cambia = !comprobarRespuesta(conDiez.valor, caso.respuesta).correcto;
+      if (cambia) expect(caso.enunciado, `caso ${caso.id}`).toContain('g = 9,81');
+    }
+    // Y el que se aparta con g = 10 al menos en uno: si no, la invariante no mira nada.
+    expect(CASOS.some((c) => !comprobarRespuesta(resolverCaso(c.datos, 10).valor, c.respuesta).correcto)).toBe(true);
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(muestras.map((m) => m.datos.pregunta)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.respuesta)).toBe(true);
+      expect(redondeo(resolverCaso(m.datos).valor, m.datos.decimales ?? 2)).toBe(m.respuesta);
+    }
+  });
+
+  test('7 · el convenio queda fijado: g = 9,81, rozamiento en reposo = el que equilibra', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera.
+    for (const caso of CASOS) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO_CASOS[caso.id]);
+    }
+
+    // (b) El motor extraído: la g de la app y el estado de fábrica del acta (5 kg, 25°).
+    expect(G).toBe(9.81);
+    const fabrica = analizarPlano({ masa: 5, angulo: 25, muS: 0.5, muK: 0.3, fuerza: 0, longitud: 4 });
+    expect(fabrica.peso).toBeCloseTo(49.05, 10);
+    expect(fabrica.estado).toBe('reposo');
+    expect(fabrica.rozamientoReal).toBeCloseTo(fabrica.pesoParalelo, 10);
+
+    // (c) Con g = 9,8 (la de muchos libros) entran los doce.
+    for (const caso of CASOS) {
+      expect(comprobarRespuesta(resolverCaso(caso.datos, 9.8).valor, caso.respuesta).correcto, `caso ${caso.id}`).toBe(true);
+    }
+
+    // (d) El error del tema NO entra: μₛ·N como rozamiento de un cuerpo en reposo (caso 6).
+    expect(comprobarRespuesta(0.7 * 20 * 9.81 * Math.cos(Math.PI / 6), 98.1).correcto).toBe(false);
+  });
+
+  test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
+    expect(comprobarRespuesta(0, 0).correcto).toBe(true);
+    expect(comprobarRespuesta(NaN, 4.05).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 4.05).motivo).not.toMatch(/NaN/);
+    expect(toleranciaDe(0)).toBe(0.01);
+    expect(toleranciaDe(424.79)).toBeCloseTo(4.2479, 10);
+    // Borde exacto de la tolerancia, por los dos lados (hallazgo 1211 del 22/09/2026).
+    expect(comprobarRespuesta(0.01, 0).correcto).toBe(true);
+    expect(comprobarRespuesta(-0.01, 0).correcto).toBe(true);
+  });
+});
+
+test.describe('simulador-plano-inclinado · la sección de casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('#casos-aula');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta', ...DESLIZADORES]);
+  });
+
+  test('el caso 5 (no desliza) se corrige con 0', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 5:/ }).click();
+    await seccion(page).locator('#casos-respuesta').fill('0');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto!');
+  });
+
+  test('μₛ·N en el caso 6 se rechaza y la solución enseña 98,10 N', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 6:/ }).click();
+    await seccion(page).locator('#casos-respuesta').fill('118,94');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('No es correcto');
+    const solucion = seccion(page).getByRole('button', { name: /Ver solución/ });
+    await expect(solucion).toHaveAttribute('aria-expanded', 'false');
+    await solucion.click();
+    await expect(seccion(page).locator('#casos-resultado')).toContainText('98,10 N');
   });
 });

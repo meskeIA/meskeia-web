@@ -13,12 +13,12 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorPlanoInclinado.module.css';
+import { analizarPlano } from './motor';
+import CasosAula from './CasosAula';
 
 // ============================================================
-// Constantes físicas y geometría
+// Geometría del lienzo (la física vive en ./motor.ts, con G = 9,81 m/s²)
 // ============================================================
-const G = 9.81; // m/s² (gravedad estándar en la superficie terrestre)
-
 const SVG_W = 800;
 const SVG_H = 460;
 const BASE_Y = 400; // línea del suelo en el lienzo
@@ -40,8 +40,6 @@ interface Vector2 {
   x: number;
   y: number;
 }
-
-type Estado = 'reposo' | 'baja' | 'sube';
 
 // Coeficientes de referencia: son valores orientativos de tablas de física general
 // (superficies secas y limpias). En la práctica varían mucho con el acabado,
@@ -114,68 +112,10 @@ export default function SimuladorPlanoInclinado() {
   // ----------------------------------------------------------
   // Física: todo el análisis del bloque en una sola pasada
   // ----------------------------------------------------------
-  const fisica = useMemo(() => {
-    const rad = (angulo * Math.PI) / 180;
-    const peso = masa * G;
-    const pesoParalelo = peso * Math.sin(rad); // tiende a bajar el bloque
-    const pesoPerpendicular = peso * Math.cos(rad);
-    const normal = pesoPerpendicular; // la fuerza aplicada es paralela al plano
-    const rozamientoMaximo = muS * normal;
-
-    // Resultante a lo largo del plano SIN contar el rozamiento (positiva: cuesta arriba)
-    const resultanteSinRozar = fuerza - pesoParalelo;
-    const enReposo = Math.abs(resultanteSinRozar) <= rozamientoMaximo;
-
-    // Rozamiento real: el estático se ajusta para equilibrar; el cinético es fijo
-    const rozamientoReal = enReposo ? Math.abs(resultanteSinRozar) : muK * normal;
-    const sentido = Math.sign(resultanteSinRozar); // hacia dónde tiende (o se mueve) el bloque
-    const aceleracion = enReposo
-      ? 0
-      : (Math.abs(resultanteSinRozar) - muK * normal) * sentido / masa;
-
-    const estado: Estado = enReposo ? 'reposo' : sentido > 0 ? 'sube' : 'baja';
-    const anguloCritico = (Math.atan(muS) * 180) / Math.PI;
-
-    // Cinemática de la bajada completa (solo tiene sentido si el bloque baja desde la cima)
-    const bajaLibremente = estado === 'baja';
-    const tiempoRecorrido = bajaLibremente
-      ? Math.sqrt((2 * longitud) / Math.abs(aceleracion))
-      : null;
-    const velocidadFinal = bajaLibremente ? Math.abs(aceleracion) * (tiempoRecorrido ?? 0) : null;
-
-    // Balance energético de la bajada completa
-    const alturaTotal = longitud * Math.sin(rad);
-    const energiaPotencial = masa * G * alturaTotal;
-    const trabajoRozamiento = muK * normal * longitud;
-    // Trabajo de F en la bajada: F es positiva cuesta arriba y el bloque se desplaza cuesta
-    // abajo, así que W = −F·L (positivo si empuja hacia abajo). Sin él, el balance no cierra
-    // con F ≠ 0 (hallazgo 1289).
-    const trabajoFuerza = -fuerza * longitud;
-    const energiaCinetica = bajaLibremente
-      ? Math.max(energiaPotencial - trabajoRozamiento + trabajoFuerza, 0)
-      : null;
-
-    return {
-      rad,
-      peso,
-      pesoParalelo,
-      pesoPerpendicular,
-      normal,
-      rozamientoMaximo,
-      resultanteSinRozar,
-      rozamientoReal,
-      aceleracion,
-      estado,
-      anguloCritico,
-      tiempoRecorrido,
-      velocidadFinal,
-      alturaTotal,
-      energiaPotencial,
-      trabajoRozamiento,
-      trabajoFuerza,
-      energiaCinetica,
-    };
-  }, [masa, angulo, muS, muK, fuerza, longitud]);
+  const fisica = useMemo(
+    () => analizarPlano({ masa, angulo, muS, muK, fuerza, longitud }),
+    [masa, angulo, muS, muK, fuerza, longitud],
+  );
 
   // Posición inicial: arriba si va a bajar, abajo si lo empujamos cuesta arriba
   const posicionInicial = fisica.estado === 'sube' ? 0 : longitud;
@@ -841,6 +781,10 @@ export default function SimuladorPlanoInclinado() {
             </div>
           </div>
         </section>
+
+        {/* Tarea de aula (skill /casos-aula-meskeia): fuera de los controles del simulador y
+            FUERA de EducationalSection, que nace colapsada. */}
+        <CasosAula />
 
         {/* Sección educativa v2.0 */}
         <EducationalSection
