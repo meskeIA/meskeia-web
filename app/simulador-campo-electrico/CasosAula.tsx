@@ -83,7 +83,7 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
           {TOTAL_CASOS} problemas con solución, siempre los mismos y en el mismo orden. Un
           profesor puede decir «resuelve los casos 3, 7 y 11» y corregir sin ambigüedad. Los
           casos usan k = 8,99·10⁹ N·m²/C², el valor del simulador; si tu libro usa 9·10⁹, la
-          diferencia es del 0,11 % y la corrección la admite.
+          diferencia es del 0,11&nbsp;% y la corrección la admite.
         </p>
         <p className={styles.casosIntro}>
           «Cargar en el simulador» coloca las cargas del caso en el lienzo y lleva la sonda al

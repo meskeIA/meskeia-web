@@ -11,8 +11,9 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber, parseSpanishNumberOr } from '@/lib';
+import { formatNumber } from '@/lib';
 import styles from './SimuladorCampoElectrico.module.css';
+import { CARACTERES_COORDENADA, alCentimetro, leerCoordenada, textoCoordenada } from './coordenada';
 import {
   K_COULOMB,
   NC_TO_C,
@@ -315,6 +316,92 @@ function colorParaIntensidad(E: number, Emax: number): string {
 }
 
 // ============================================================
+// Campo de «Posición exacta de la sonda»
+// ============================================================
+interface CampoCoordenadaProps {
+  id: string;
+  /** Rótulo visible, que es también el nombre accesible del campo: «x (m)». */
+  etiqueta: string;
+  /** La coordenada de la sonda, en metros. */
+  valor: number;
+  /** Mitad del lienzo en metros: el campo admite de −limite a +limite. */
+  limite: number;
+  onCambio: (v: number) => void;
+}
+
+/**
+ * Una coordenada de la sonda, escribible (hallazgos 2383, 2384 y 2385 del Inspector, 28/09/2026).
+ *
+ * Era un `<input type="number">` controlado: el navegador entrega vacío lo que se está
+ * tecleando («-», «1.») y con punto decimal lo ya tecleado, y el campo se reescribía bajo el
+ * cursor, así que «-1» acababa en 1,00 m y «2.75» en el borde. Ahora es de texto y tiene dos
+ * caras:
+ *   · con el foco, enseña LO QUE SE TECLEA, tal cual, y la sonda solo se mueve cuando lo escrito
+ *     ya es un número (`leerCoordenada`, en ./coordenada.ts). Un estado intermedio no la mueve
+ *     ni se borra;
+ *   · sin el foco, enseña dónde está la sonda, venga de donde venga (arrastre, flechas del
+ *     lienzo, casos), en formato español.
+ * Las flechas ↑/↓ dan el paso de 10 cm (1 cm con Mayús) que daba el `type="number"`, redondeado
+ * al centímetro como el del lienzo, y `role="spinbutton"` conserva lo que anunciaba.
+ * `inputMode="text"` a propósito: el teclado decimal de iOS no trae el signo menos, y media
+ * superficie del lienzo es negativa.
+ */
+function CampoCoordenada({ id, etiqueta, valor, limite, onCambio }: CampoCoordenadaProps) {
+  /** null = sin foco: el campo enseña la posición de la sonda. */
+  const [borrador, setBorrador] = useState<string | null>(null);
+  const texto = borrador ?? textoCoordenada(valor);
+  const minimo = -limite;
+  // Un signo o un separador solos («-», «,», «-.») son un número a medio escribir, no un error.
+  const noEsNumero =
+    borrador !== null && !/^\s*[+\-−–]?[.,]?\s*$/.test(borrador) && !Number.isFinite(leerCoordenada(borrador));
+
+  const escalonar = (paso: number) => {
+    const nuevo = acotarAlLienzo(alCentimetro(valor + paso), limite);
+    onCambio(nuevo);
+    setBorrador(textoCoordenada(nuevo));
+  };
+
+  return (
+    <label className={styles.sondaExactaCampo} htmlFor={id}>
+      <span>{etiqueta}</span>
+      <input
+        id={id}
+        type="text"
+        inputMode="text"
+        autoComplete="off"
+        spellCheck={false}
+        role="spinbutton"
+        aria-valuemin={minimo}
+        aria-valuemax={limite}
+        aria-valuenow={alCentimetro(valor)}
+        aria-valuetext={`${formatNumber(valor, 2)} m`}
+        aria-invalid={noEsNumero}
+        value={texto}
+        onFocus={() => setBorrador(textoCoordenada(valor))}
+        onBlur={() => setBorrador(null)}
+        onChange={(e) => {
+          const escrito = e.target.value;
+          if (!CARACTERES_COORDENADA.test(escrito)) return; // ni letras ni exponentes
+          setBorrador(escrito);
+          const n = leerCoordenada(escrito);
+          if (Number.isFinite(n)) onCambio(acotarAlLienzo(n, limite));
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            const paso = e.shiftKey ? 0.01 : 0.1;
+            escalonar(e.key === 'ArrowUp' ? paso : -paso);
+          } else if (e.key === 'Enter') {
+            // Confirma: el campo pasa a enseñar la posición aplicada (acotada, si se salía)
+            setBorrador(textoCoordenada(valor));
+          }
+        }}
+      />
+    </label>
+  );
+}
+
+// ============================================================
 // Componente principal
 // ============================================================
 export default function SimuladorCampoElectrico() {
@@ -419,14 +506,18 @@ export default function SimuladorCampoElectrico() {
    * cercana. El paso es de 10 cm, y de 1 cm con Mayús, para poder acercarse a una carga sin
    * caer en su singularidad (radio 5 cm). Debajo del panel hay además dos campos numéricos
    * con la posición exacta, que sirven igual con ratón.
+   *
+   * Cada paso se redondea al centímetro (hallazgo 2385, 28/09/2026): sumar 0,1 sin redondear
+   * acumulaba el error de la coma flotante, y en la mediatriz del dipolo —alcanzada con 15 × ←—
+   * el panel daba V = 2,84 × 10⁻¹⁴ V donde arrastrando da 0 V.
    */
   const handleCanvasKeyDown = (e: React.KeyboardEvent<SVGSVGElement>) => {
     const paso = e.shiftKey ? 0.01 : 0.1;
     const mover = (dx: number, dy: number) => {
       e.preventDefault();
       setPruebaPos((p) => ({
-        x: acotarAlLienzo(p.x + dx, LIMITE_X),
-        y: acotarAlLienzo(p.y + dy, LIMITE_Y),
+        x: acotarAlLienzo(alCentimetro(p.x + dx), LIMITE_X),
+        y: acotarAlLienzo(alCentimetro(p.y + dy), LIMITE_Y),
       }));
     };
 
@@ -1061,40 +1152,20 @@ export default function SimuladorCampoElectrico() {
                   Posición exacta de la sonda
                 </p>
                 <div className={styles.sondaExactaCampos} role="group" aria-labelledby="sonda-exacta-titulo">
-                  <label className={styles.sondaExactaCampo} htmlFor="sonda-x">
-                    <span>x (m)</span>
-                    <input
-                      id="sonda-x"
-                      type="number"
-                      step={0.1}
-                      min={-LIMITE_X}
-                      max={LIMITE_X}
-                      value={pruebaPos.x}
-                      onChange={(e) =>
-                        setPruebaPos((p) => ({
-                          ...p,
-                          x: acotarAlLienzo(parseSpanishNumberOr(e.target.value), LIMITE_X),
-                        }))
-                      }
-                    />
-                  </label>
-                  <label className={styles.sondaExactaCampo} htmlFor="sonda-y">
-                    <span>y (m)</span>
-                    <input
-                      id="sonda-y"
-                      type="number"
-                      step={0.1}
-                      min={-LIMITE_Y}
-                      max={LIMITE_Y}
-                      value={pruebaPos.y}
-                      onChange={(e) =>
-                        setPruebaPos((p) => ({
-                          ...p,
-                          y: acotarAlLienzo(parseSpanishNumberOr(e.target.value), LIMITE_Y),
-                        }))
-                      }
-                    />
-                  </label>
+                  <CampoCoordenada
+                    id="sonda-x"
+                    etiqueta="x (m)"
+                    valor={pruebaPos.x}
+                    limite={LIMITE_X}
+                    onCambio={(x) => setPruebaPos((p) => ({ ...p, x }))}
+                  />
+                  <CampoCoordenada
+                    id="sonda-y"
+                    etiqueta="y (m)"
+                    valor={pruebaPos.y}
+                    limite={LIMITE_Y}
+                    onCambio={(y) => setPruebaPos((p) => ({ ...p, y }))}
+                  />
                 </div>
               </div>
 

@@ -130,9 +130,9 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValorAcotado } from './
  *
  * Los cuatro HALLAZGOS de la segunda inspección (269-272) se REPARARON el 24/08/2026: sus
  * tests, al final del fichero, nacieron fallando a propósito y hoy son candados de regresión.
- * Los ABIERTOS de la tercera (28/09/2026) van en el bloque «Inspector 28/09/2026», marcados
- * con test.fail() (convención del proyecto: el test se escribe contra lo que debería
- * ocurrir, no contra lo que ocurre).
+ * Los cinco de la tercera (28/09/2026, 2383-2387) van en el bloque «Inspector 28/09/2026»:
+ * nacieron con test.fail() (convención del proyecto: el test se escribe contra lo que debería
+ * ocurrir, no contra lo que ocurre) y se repararon el mismo día.
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -694,9 +694,18 @@ test('REGRESIÓN 270 (accesibilidad) — el lienzo se maneja con el teclado', as
   await page.keyboard.press('Delete');
   expect(await cuantasCargas()).toBe(antes);
 
-  // Y la posición exacta se puede escribir, que es lo que arrastrando no se puede
-  await page.locator('#sonda-x').fill('2');
-  await page.locator('#sonda-y').fill('-1');
+  // Y la posición exacta se puede escribir, que es lo que arrastrando no se puede.
+  // TECLEADA carácter a carácter (28/09/2026): hasta ese día este bloque usaba fill(), que pega
+  // el valor entero de golpe, y por eso pasaba en verde mientras un «-1» tecleado acababa en
+  // 1,00 m (hallazgo 2383). La «y» negativa es justo la que se perdía.
+  for (const [campo, texto] of [
+    ['#sonda-x', '2'],
+    ['#sonda-y', '-1'],
+  ] as const) {
+    await page.locator(campo).click();
+    await page.keyboard.press('Control+a');
+    await page.keyboard.type(texto, { delay: 30 });
+  }
   await expect(valor(page, 'Posición x')).toHaveText('2,00 m');
   await expect(valor(page, 'Posición y')).toHaveText('-1,00 m');
 });
@@ -805,6 +814,11 @@ import {
   generarEjercicioAleatorio,
 } from '../../app/simulador-campo-electrico/casos';
 import { calcularCampoEnPunto, modulo } from '../../app/simulador-campo-electrico/motor';
+import {
+  alCentimetro,
+  leerCoordenada,
+  textoCoordenada,
+} from '../../app/simulador-campo-electrico/coordenada';
 
 const A_MANO_AULA: Readonly<Record<number, number>> = {
   1: 44.95,
@@ -1033,17 +1047,22 @@ test.describe('simulador-campo-electrico · la sección de casos en el navegador
  *   y 9 (d = 3·√4/(√4 + √1) = 2 m desde la de −1,5 → x = 0,50 m; allí E = 0 y
  *   V = 8,99·4/2 + 8,99·1/1 = 26,97 V), cargados en el simulador y corregidos por la interfaz.
  *
- * HALLAZGOS ABIERTOS de esta pasada (test.fail, al final del bloque):
- *   H1 medio · el campo «Posición exacta» no admite lo que se TECLEA: «-» y «1.» son estados
- *              intermedios vacíos, parseSpanishNumberOr('') da 0, la sonda salta a x = 0 y React
- *              reescribe el campo a «0» debajo del cursor.
- *   H2 bajo  · con tres decimales el parser español lee el «1.234» del navegador como mil
- *              doscientos treinta y cuatro y la sonda salta al borde, 4,00 m.
- *   H3 bajo  · las flechas acumulan error de coma flotante (1,5 − 15 × 0,1 = −1,94·10⁻¹⁶): en la
- *              mediatriz del dipolo el panel da V = «2,84 × 10⁻¹⁴ V» en vez de «0 V».
- *   H4 bajo  · entre 769 y ~930 px (iPad vertical, 810-834) el logo fijo tapa el principio del
- *              <h1>: la regla del 27/09 solo da los 80 px hasta 768.
- *   H5 bajo  · «0,11 %» de la intro de los casos, con espacio normal y no con espacio duro.
+ * HALLAZGOS de esta pasada — REPARADOS el 28/09/2026 (sus tests nacieron con test.fail(); hoy
+ * son candados de regresión, al final del bloque):
+ *   H1 medio · 2383 · el campo «Posición exacta» no admitía lo que se TECLEA: «-» y «1.» son
+ *              estados intermedios vacíos, parseSpanishNumberOr('') daba 0, la sonda saltaba a
+ *              x = 0 y React reescribía el campo a «0» debajo del cursor.
+ *   H2 bajo  · 2384 · con tres decimales el parser español leía el «1.234» del navegador como mil
+ *              doscientos treinta y cuatro y la sonda saltaba al borde, 4,00 m.
+ *   H3 bajo  · 2385 · las flechas acumulaban error de coma flotante (1,5 − 15 × 0,1 =
+ *              −1,94·10⁻¹⁶): en la mediatriz del dipolo el panel daba V = «2,84 × 10⁻¹⁴ V».
+ *   H4 bajo  · 2386 · entre 769 y ~930 px (iPad vertical, 810-834) el logo fijo tapaba el
+ *              principio del <h1>: la regla del 27/09 solo daba los 80 px hasta 768.
+ *   H5 bajo  · 2387 · «0,11 %» de la intro de los casos, con espacio normal y no con espacio duro.
+ * Cómo se repararon: H1 y H2 con un campo de TEXTO que conserva lo tecleado y solo mueve la
+ * sonda cuando ya es un número (app/simulador-campo-electrico/coordenada.ts); H3 redondeando cada
+ * paso al centímetro; H4 con el bloque del hero hasta 1023 px (a1d72a9c, en las 187 apps del
+ * lote); H5 con &nbsp;.
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 test.describe('Inspector 28/09/2026 — motor, equipotenciales, sonda escrita y hero', () => {
@@ -1257,58 +1276,187 @@ test.describe('Inspector 28/09/2026 — motor, equipotenciales, sonda escrita y 
     await expect(valor(page, 'V (potencial)')).toHaveText('26,97 V');
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026) · H1 medio · operativa.
-  test('HALLAZGO H1 · la posición exacta de la sonda admite lo que se TECLEA: negativos y punto decimal', async ({
+  /**
+   * Teclea en un campo de la posición exacta CARÁCTER A CARÁCTER, como una persona. `fill()`
+   * pega el valor entero de golpe, sin pasar por los estados intermedios («-», «2.»), y por eso
+   * el test del 270 no vio el hallazgo 2383.
+   */
+  async function teclear(page: Page, campo: string, texto: string): Promise<void> {
+    await page.locator(campo).click();
+    await page.keyboard.press('Control+a');
+    await page.keyboard.type(texto, { delay: 30 });
+  }
+
+  // HALLAZGO 2383 (H1, medio, operativa) · REPARADO (28/09/2026).
+  // El campo «Posición exacta de la sonda» (la vía sin ratón que abrió el hallazgo 270) era un
+  // <input type="number"> controlado cuyo onChange hacía parseSpanishNumberOr(e.target.value). Al
+  // teclear, «-» y «1.» son estados intermedios que el navegador entrega como «»;
+  // parseSpanishNumberOr('') daba 0, la sonda saltaba a x = 0 y React reescribía el campo a «0»
+  // debajo del cursor: «-1» → «01» → 1,00 m y «2.75» → «0» → «07» → 4,00 m. Pegado de golpe
+  // (fill) funcionaba, por eso el test del 270 pasaba.
+  // Reparación: campo de TEXTO que conserva lo tecleado mientras tiene el foco y solo mueve la
+  // sonda cuando lo escrito ya es un número. Con type="text" la configuración regional del
+  // navegador ya no interviene; se prueba en las tres que citaba la ficha para que conste.
+  // Caso: foco en x, seleccionar todo y teclear «-1» → «-1,00 m» (antes 1,00 m); «2.75» →
+  //       «2,75 m» (antes 4,00 m); «-0,5» → «-0,50 m» (antes 0,50 m).
+  for (const locale of ['es-ES', 'es-MX', 'en-US'] as const) {
+    test.describe(`tecleado con el navegador en ${locale}`, () => {
+      test.use({ locale });
+
+      test(`HALLAZGO 2383 (H1) · la posición exacta admite lo que se TECLEA: negativos y punto decimal (${locale})`, async ({
+        page,
+      }) => {
+        const campoX = page.locator('#sonda-x');
+        // A medio escribir, la sonda NO se mueve y el campo NO se reescribe: era la raíz del defecto.
+        await teclear(page, '#sonda-x', '-');
+        await expect(campoX).toHaveValue('-');
+        await expect(valor(page, 'Posición x')).toHaveText('1,50 m'); // la de arranque
+        await page.keyboard.type('1', { delay: 30 });
+        await expect(valor(page, 'Posición x')).toHaveText('-1,00 m');
+        await expect(campoX).toHaveValue('-1');
+
+        await teclear(page, '#sonda-x', '2.');
+        await expect(campoX).toHaveValue('2.');
+        await expect(valor(page, 'Posición x')).toHaveText('2,00 m');
+        await page.keyboard.type('75', { delay: 30 });
+        await expect(valor(page, 'Posición x')).toHaveText('2,75 m');
+        await expect(campoX).toHaveValue('2.75');
+
+        await teclear(page, '#sonda-x', '-0,5');
+        await expect(valor(page, 'Posición x')).toHaveText('-0,50 m');
+
+        // La y tiene su propio borde (±2,50 m) y el mismo comportamiento.
+        await teclear(page, '#sonda-y', '-2.25');
+        await expect(valor(page, 'Posición y')).toHaveText('-2,25 m');
+
+        // Fuera del campo, cada uno enseña dónde está la sonda, en formato español.
+        await lienzo(page).focus();
+        await expect(campoX).toHaveValue('-0,5');
+        await expect(page.locator('#sonda-y')).toHaveValue('-2,25');
+      });
+    });
+  }
+
+  // Lo que el <input type="number"> daba y el campo de texto tenía que conservar: ↑/↓ con paso
+  // de 10 cm (1 cm con Mayús), el borde del lienzo y que no se cuelen letras.
+  test('HALLAZGO 2383 (H1) · el campo de texto conserva las flechas, el borde y el filtro del type="number"', async ({
     page,
   }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): el campo «Posición exacta de la sonda» (la vía sin
-    // ratón que abrió el hallazgo 270) es un <input type="number"> controlado cuyo onChange hace
-    // parseSpanishNumberOr(e.target.value). Al teclear, «-» y «1.» son estados intermedios que el
-    // navegador entrega como «»; parseSpanishNumberOr('') da 0, la sonda salta a x = 0 y React
-    // reescribe el campo a «0» debajo del cursor. Resultado: un negativo tecleado pierde el signo
-    // («-1» → «01» → 1,00 m) y un decimal con punto salta al borde («2.75» → «0» → «07» → 4,00 m).
-    // Pegado de golpe (fill) funciona, por eso el test del 270 pasa.
-    // Caso: foco en x, seleccionar todo y teclear «-1» → esperado «-1,00 m» · obtenido «1,00 m»;
-    //       teclear «2.75» → esperado «2,75 m» · obtenido «4,00 m» (el campo muestra «4»).
-    const campo = page.locator('#sonda-x');
-    await campo.click();
-    await campo.press('Control+a');
-    await campo.pressSequentially('-1', { delay: 30 });
-    await expect(valor(page, 'Posición x')).toHaveText('-1,00 m', { timeout: 3000 });
-    await campo.press('Control+a');
-    await campo.pressSequentially('2.75', { delay: 30 });
-    await expect(valor(page, 'Posición x')).toHaveText('2,75 m', { timeout: 3000 });
+    const campoX = page.locator('#sonda-x');
+    await campoX.click();
+    await page.keyboard.press('ArrowUp'); // 1,50 → 1,60
+    await expect(valor(page, 'Posición x')).toHaveText('1,60 m');
+    await expect(campoX).toHaveValue('1,6');
+    await page.keyboard.press('Shift+ArrowDown'); // 1,60 → 1,59
+    await expect(valor(page, 'Posición x')).toHaveText('1,59 m');
+    await expect(campoX).toHaveValue('1,59');
+    // Nombre accesible y semántica de control numérico, como el type="number" de antes.
+    await expect(page.getByRole('spinbutton', { name: 'x (m)' })).toHaveAttribute('aria-valuenow', '1.59');
+
+    // Fuera del lienzo se acota al borde (lo pedía el 216) e Intro lo deja escrito en el campo.
+    await teclear(page, '#sonda-x', '99');
+    await expect(valor(page, 'Posición x')).toHaveText('4,00 m');
+    await page.keyboard.press('Enter');
+    await expect(campoX).toHaveValue('4');
+
+    // Ni letras ni exponentes: la «e» se rechaza en la pulsación, como en el type="number".
+    await teclear(page, '#sonda-x', '-1e3');
+    await expect(campoX).toHaveValue('-13');
+    await expect(valor(page, 'Posición x')).toHaveText('-4,00 m'); // −13 → acotado al borde
+    // Lo que tiene forma de número pero no lo es se marca y no mueve la sonda.
+    await teclear(page, '#sonda-x', '1,2,3');
+    await expect(campoX).toHaveAttribute('aria-invalid', 'true');
+    await expect(valor(page, 'Posición x')).toHaveText('1,20 m'); // el «1,2» que sí era número
+    await lienzo(page).focus();
+    await expect(campoX).toHaveValue('1,2');
+    await expect(campoX).toHaveAttribute('aria-invalid', 'false');
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026) · H2 bajo · operativa.
-  test('HALLAZGO H2 · una posición con tres decimales no se lee como millares', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): un <input type="number"> entrega SIEMPRE su valor
-    // con punto decimal («1,234» tecleado o pegado en es-ES llega como «1.234»), y la app lo pasa
-    // por parseSpanishNumberOr, que con un solo separador resuelve a favor del español: «1.234» =
-    // mil doscientos treinta y cuatro. Acotado al lienzo, la sonda salta a 4,00 m. Con uno o dos
-    // decimales no pasa (el millar exige tres cifras) y con «0.xxx» tampoco.
-    // Caso: x = 1,234 m escrito de golpe → esperado «1,23 m» · obtenido «4,00 m» (y el campo
-    //       pasa a mostrar «4»). Igual con «-2.375» → «-4,00 m».
-    await page.locator('#sonda-x').fill('1.234');
-    await expect(valor(page, 'Posición x')).toHaveText('1,23 m', { timeout: 3000 });
+  // HALLAZGO 2384 (H2, bajo, operativa) · REPARADO (28/09/2026).
+  // Un <input type="number"> entrega SIEMPRE su valor con punto decimal («1,234» tecleado o pegado
+  // en es-ES llegaba como «1.234»), y la app lo pasaba por parseSpanishNumberOr, que con un solo
+  // separador resuelve a favor del español: «1.234» = mil doscientos treinta y cuatro. Acotado al
+  // lienzo, la sonda saltaba a 4,00 m.
+  // Reparación: el campo es de texto, así que «1,234» llega con su coma; y un punto SOLO se lee
+  // como decimal, porque en un campo acotado a ±4 m ningún millar cabe (la regla del millar del
+  // parser salió de los importes, donde «1.500» sí son mil quinientos). Así «1.234» tecleado en
+  // México o en Estados Unidos también es 1,234 m.
+  // Caso: x = «1,234» escrito de golpe → «1,23 m» (antes 4,00 m); «-2.375» → «-2,38 m» (antes
+  //       -4,00 m).
+  test('HALLAZGO 2384 (H2) · una posición con tres decimales no se lee como millares', async ({ page }) => {
+    const campoX = page.locator('#sonda-x');
+    await campoX.fill('1,234');
+    await esperarValorEnReact(page, '#sonda-x', '1,234');
+    await expect(valor(page, 'Posición x')).toHaveText('1,23 m');
+    await campoX.fill('-2.375');
+    await esperarValorEnReact(page, '#sonda-x', '-2.375');
+    await expect(valor(page, 'Posición x')).toHaveText('-2,38 m');
+    // Y tecleado con punto, carácter a carácter, como en es-MX o en-US.
+    await teclear(page, '#sonda-x', '1.234');
+    await expect(valor(page, 'Posición x')).toHaveText('1,23 m');
+    await teclear(page, '#sonda-x', '1.000');
+    await expect(valor(page, 'Posición x')).toHaveText('1,00 m'); // un metro, no mil
+    // Fuera del campo se enseña con todos sus decimales y con coma.
+    await teclear(page, '#sonda-x', '1.234');
+    await lienzo(page).focus();
+    await expect(campoX).toHaveValue('1,234');
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026) · H3 bajo · cálculo.
-  test('HALLAZGO H3 · con las flechas del teclado, la mediatriz del dipolo da V = 0, como arrastrando', async ({
+  // Lo que el campo lee, cómo lo enseña y el paso del teclado, sin navegador: ./coordenada.ts.
+  test('HALLAZGOS 2383-2385 · coordenada.ts lee lo tecleado, lo enseña en español y redondea el paso', async () => {
+    // A medio escribir no hay número: la sonda se queda donde estaba.
+    for (const t of ['', '-', '+', '−', ',', '.', '1,2,3', '1.2.3']) {
+      expect(leerCoordenada(t), `«${t}»`).toBeNaN();
+    }
+    expect(leerCoordenada('1.')).toBe(1); // «1.» camino de «1.5»: la sonda va a 1
+    expect(leerCoordenada('-1')).toBe(-1);
+    expect(leerCoordenada('−0,5')).toBe(-0.5); // el menos tipográfico
+    expect(leerCoordenada('2.75')).toBe(2.75);
+    expect(leerCoordenada('.5')).toBe(0.5);
+    // El punto solo es decimal (en ±4 m no cabe un millar); la coma, como siempre.
+    expect(leerCoordenada('1.234')).toBe(1.234);
+    expect(leerCoordenada('1,234')).toBe(1.234);
+    expect(leerCoordenada('1.000')).toBe(1);
+    // Con los dos separadores manda el parser del proyecto, sin cambios.
+    expect(leerCoordenada('1.234,5')).toBe(1234.5);
+
+    expect(textoCoordenada(-1.942890293094024e-16)).toBe('0');
+    expect(textoCoordenada(-0)).toBe('0');
+    expect(textoCoordenada(1.7000000000000002)).toBe('1,7');
+    expect(textoCoordenada(0.29)).toBe('0,29'); // 0,29 · 100 = 28,999999999999996
+    expect(textoCoordenada(-2.375)).toBe('-2,375');
+    expect(textoCoordenada(4)).toBe('4');
+
+    // 15 pasos de −0,1 desde 1,5: sin redondear, −1,94·10⁻¹⁶; al centímetro, 0 (y no −0).
+    let x = 1.5;
+    for (let i = 0; i < 15; i++) x = alCentimetro(x - 0.1);
+    expect(Object.is(x, 0)).toBe(true);
+  });
+
+  // HALLAZGO 2385 (H3, bajo, cálculo) · REPARADO (28/09/2026).
+  // Las flechas sumaban ±0,1 m sin redondear, y el error de coma flotante se acumulaba: 1,5 −
+  // 15 × 0,1 = −1,94·10⁻¹⁶. El panel escribía la posición como «≈0 m», pero las filas de física
+  // pasan por sufijoNotacion, que da notación científica a todo |n| < 10⁻³: en la mediatriz del
+  // dipolo, donde el CASO 1 (arrastrando) da «0 V», por teclado salía «2,84 × 10⁻¹⁴ V», y en el
+  // centro del cuadrupolo |E| = «8,53 × 10⁻¹⁴ N/C» donde la FAQ de la propia app dice E = 0. El
+  // campo «Posición exacta» mostraba además «-1.942890293094024e-16» (y «1.7000000000000002» tras
+  // dos → desde el arranque).
+  // Reparación: cada paso de las flechas se redondea al centímetro, y el campo enseña la
+  // coordenada en formato español con los decimales que tiene.
+  // Caso: preset «Dipolo», foco en el lienzo, 15 × ← y 2 × ↓ → (0,00; 0,50) → V = «0 V»,
+  //       Eᵧ = «0 N/C», x = «0,00 m» (antes «2,84 × 10⁻¹⁴ V», «9,24 × 10⁻¹⁴ N/C», «≈0 m»).
+  test('HALLAZGO 2385 (H3) · con las flechas del teclado, la mediatriz del dipolo da V = 0, como arrastrando', async ({
     page,
   }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): las flechas suman ±0,1 m sin redondear, y el error
-    // de coma flotante se acumula: 1,5 − 15 × 0,1 = −1,94·10⁻¹⁶. El panel escribe la posición
-    // como «≈0 m», pero las filas de física pasan por sufijoNotacion, que da notación científica a
-    // todo |n| < 10⁻³: en la mediatriz del dipolo, donde el CASO 1 (arrastrando) da «0 V», por
-    // teclado sale «2,84 × 10⁻¹⁴ V», y en el centro del cuadrupolo |E| = «8,53 × 10⁻¹⁴ N/C» donde
-    // la FAQ de la propia app dice E = 0. El campo «Posición exacta» muestra además
-    // «-1.942890293094024e-16» (y «1.7000000000000002» tras dos → desde el arranque).
-    // Caso: preset «Dipolo», foco en el lienzo, 15 × ← y 2 × ↓ → (0,00; 0,50) → esperado V = «0 V»,
-    //       Eᵧ = «0 N/C», x = «0,00 m» · obtenido «2,84 × 10⁻¹⁴ V», «9,24 × 10⁻¹⁴ N/C», «≈0 m».
+    // Dos → desde el arranque: 1,5 + 0,1 + 0,1 daba «1.7000000000000002» en el campo.
+    await lienzo(page).focus();
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowRight');
+    await expect(valor(page, 'Posición x')).toHaveText('1,70 m');
+    await expect(page.locator('#sonda-x')).toHaveValue('1,7');
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowLeft'); // de vuelta a 1,50, el punto de partida de la ficha
+
     await page.getByRole('button', { name: 'Dipolo' }).click();
     await lienzo(page).focus();
     for (let i = 0; i < 15; i++) await page.keyboard.press('ArrowLeft'); // x: 1,50 → 0,00
@@ -1316,27 +1464,36 @@ test.describe('Inspector 28/09/2026 — motor, equipotenciales, sonda escrita y 
     await expect(valor(page, 'Posición y')).toHaveText('0,50 m');
     // Lo que no depende del ruido sale como en el CASO 1: la mediatriz está bien alcanzada.
     await expect(valor(page, 'Eₓ')).toHaveText('127,14 N/C');
-    // Y lo que es CERO por simetría tiene que salir cero, como arrastrando.
-    await expect(valor(page, 'Posición x')).toHaveText('0,00 m', { timeout: 3000 });
-    await expect(valor(page, 'V (potencial)')).toHaveText('0 V', { timeout: 3000 });
-    await expect(valor(page, 'Eᵧ')).toHaveText('0 N/C', { timeout: 3000 });
-    await expect(valor(page, 'U (energía)')).toHaveText('0 J', { timeout: 3000 });
-    await expect(page.locator('#sonda-x')).toHaveValue('0', { timeout: 3000 });
+    // Y lo que es CERO por simetría sale cero, como arrastrando.
+    await expect(valor(page, 'Posición x')).toHaveText('0,00 m');
+    await expect(valor(page, 'V (potencial)')).toHaveText('0 V');
+    await expect(valor(page, 'Eᵧ')).toHaveText('0 N/C');
+    await expect(valor(page, 'U (energía)')).toHaveText('0 J');
+    await expect(page.locator('#sonda-x')).toHaveValue('0');
+
+    // El segundo caso de la ficha: el centro del cuadrupolo, 5 × ↓ desde (0; 0,5).
+    await page.getByRole('button', { name: 'Cuadrupolo' }).click();
+    await lienzo(page).focus();
+    for (let i = 0; i < 5; i++) await page.keyboard.press('ArrowDown'); // y: 0,50 → 0,00
+    await expect(valor(page, 'Posición y')).toHaveText('0,00 m');
+    await expect(valor(page, '|E| (campo)')).toHaveText('0 N/C');
+    await expect(valor(page, 'V (potencial)')).toHaveText('0 V');
+    await expect(page.locator('#sonda-y')).toHaveValue('0');
   });
 
-  // HALLAZGO ABIERTO (inspector 28/09/2026) · H5 bajo · contenido.
-  test('HALLAZGO H5 · el «0,11 %» de la intro de los casos lleva espacio duro', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): CLAUDE.md global §2 (regla del 25/09/2026): el %
-    // va separado de la cifra con espacio DURO (U+00A0), para que no salte solo de línea. La
-    // intro de «Casos para clase» (CasosAula.tsx, escrita el 23/09) lo separa con un espacio
-    // normal. Es el único porcentaje visible de la app.
-    // Caso: texto de la intro → esperado «0,11 %» con U+00A0 · obtenido «0,11 %» con U+0020.
+  // HALLAZGO 2387 (H5, bajo, contenido) · REPARADO (28/09/2026).
+  // CLAUDE.md global §2 (regla del 25/09/2026): el % va separado de la cifra con espacio DURO
+  // (U+00A0), para que no salte solo de línea. La intro de «Casos para clase» (CasosAula.tsx,
+  // escrita el 23/09) lo separaba con un espacio normal. Es el único porcentaje visible de la app.
+  // Caso: texto de la intro → «0,11 %» con U+00A0 (antes con U+0020).
+  test('HALLAZGO 2387 (H5) · el «0,11 %» de la intro de los casos lleva espacio duro', async ({ page }) => {
     const intro = page
       .locator('section[aria-labelledby="casos-aula-titulo"] p')
       .filter({ hasText: /0,11/ });
     await expect(intro).toHaveCount(1);
-    expect((await intro.textContent()) ?? '').toContain('0,11 %');
+    const texto = (await intro.textContent()) ?? '';
+    expect(texto).toContain('0,11 %');
+    expect(texto).not.toContain('0,11 %');
   });
 
   test.describe('hero y logo fijo, de móvil a tableta vertical', () => {
@@ -1390,18 +1547,18 @@ test.describe('Inspector 28/09/2026 — motor, equipotenciales, sonda escrita y 
       }
     });
 
-    // HALLAZGO ABIERTO (inspector 28/09/2026) · H4 bajo · accesibilidad.
-    test('HALLAZGO H4 · en tableta vertical (800-834 px) el logo fijo tampoco tapa el <h1>', async ({ page }) => {
-      test.fail();
-      // HALLAZGO ABIERTO (inspector 28/09/2026): la regla del 27/09 (586a4d61) da 80 px al hero
-      // solo hasta 768 px. Por encima, el hero vuelve a 40 px arriba mientras el logo fijo crece
-      // a [20, 15, 203, 77] (no a [15, 10, 141, 52] como en móvil), y el <h1>, centrado y a 4vw,
-      // empieza a la izquierda de x = 203 hasta ~930 px de ancho. Medido a scroll 0:
-      //   769 px → «Si» · 800 px → «Sim» · 810-834 px → «Si» · 900 px → «S» · 1023 px → nada.
-      // Se lee «mulador de Campo Eléctrico» a 800 px e «imulador…» a 834 (iPad vertical).
-      // Caso: 834 × 1112 → esperado ninguna letra del <h1> bajo el logo · obtenido «Si»; 800 px →
-      //       obtenido «Sim» (la S, entera; la i y la m, en parte).
-      for (const ancho of [834, 800]) {
+    // HALLAZGO 2386 (H4, bajo, accesibilidad) · REPARADO (28/09/2026, a1d72a9c).
+    // La regla del 27/09 (586a4d61) daba 80 px al hero solo hasta 768 px. Por encima, el hero
+    // volvía a 40 px arriba mientras el logo fijo crece a [20, 15, 203, 77] (no a [15, 10, 141, 52]
+    // como en móvil), y el <h1>, centrado y a 4vw, empezaba a la izquierda de x = 203 hasta ~930 px
+    // de ancho. Medido a scroll 0:
+    //   769 px → «Si» · 800 px → «Sim» · 810-834 px → «Si» · 900 px → «S» · 1023 px → nada.
+    // Se leía «mulador de Campo Eléctrico» a 800 px e «imulador…» a 834 (iPad vertical).
+    // Reparación: el bloque de 80 px llega hasta 1023 px (a1d72a9c, en los 187 módulos del lote).
+    // Caso: 834 × 1112 → ninguna letra del <h1> bajo el logo (antes «Si»); 800 px → ninguna
+    //       (antes «Sim»). Se miden también los otros anchos del acta.
+    test('HALLAZGO 2386 (H4) · en tableta vertical (769-1023 px) el logo fijo tampoco tapa el <h1>', async ({ page }) => {
+      for (const ancho of [834, 800, 769, 810, 900, 1023]) {
         await page.setViewportSize({ width: ancho, height: 1112 });
         expect(await estable(page), `a ${ancho} px`).toBe('');
       }

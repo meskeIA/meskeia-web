@@ -304,6 +304,46 @@
   dominant-baseline: central;
 }
 
+/* El lienzo se dibuja a escala (800 unidades en ~308 px a 390 de ancho, el 38,5 %) y los
+   rótulos de 11 unidades quedaban en ~4 px en el móvil: la magnitud de cada carga y el «q₀» no
+   se leían. Donde el lienzo va a una columna (≤ 900 px) se escriben más grandes, en unidades
+   del propio lienzo y por tramos para quedar en ~9-14 px de pantalla, y el de las cargas con un
+   contorno oscuro para que se lea también donde desborda el círculo. El contorno va igual en
+   los dos temas: rodea texto blanco, no depende del fondo. */
+@media (max-width: 900px) {
+  .cargaLabel {
+    font-size: 16px;
+    paint-order: stroke;
+    stroke: #1f2937;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+
+  .etiquetaPrueba {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cargaLabel {
+    font-size: 22px;
+  }
+
+  .etiquetaPrueba {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 430px) {
+  .cargaLabel {
+    font-size: 26px;
+  }
+
+  .etiquetaPrueba {
+    font-size: 28px;
+  }
+}
+
 .fieldVector {
   stroke: #475569;
   stroke-width: 1;
@@ -801,7 +841,11 @@
   padding: 4px 6px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--background);
+  /* Era el token --background, que no existe ni en globals.css ni aquí: la declaración entera se
+     anulaba y el campo salía transparente. --bg-primary es el fondo de la página, un escalón
+     por debajo de la tarjeta (--bg-card) en la que vive, como los botones de este panel. Los
+     dos tokens cambian con el tema. */
+  background: var(--bg-primary);
   color: var(--text-primary);
   font-size: 0.9rem;
 }
@@ -809,6 +853,11 @@
 .sondaExactaCampo input:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 1px;
+}
+
+/* Lo escrito no es un número («1,2,3»): la sonda no se mueve y el campo lo dice */
+.sondaExactaCampo input[aria-invalid='true'] {
+  border-color: var(--error);
 }
 
 .canvasSvg:focus-visible {
