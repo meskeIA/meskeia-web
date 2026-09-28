@@ -61,14 +61,21 @@
   transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 
+/* Texto de marca → token -texto; blanco sobre marca → fondo -boton. Con --primary a secas el
+   rótulo de 14,4 px/600 se quedaba en 4,11:1 en claro y 2,79:1 en oscuro, por debajo del
+   4,5:1 del texto pequeño (hallazgo 2381 del Inspector, 28/09/2026). */
 .modeBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
-.modeBtnActive {
-  border-color: var(--primary);
-  background: var(--primary);
+/* `:hover` también: `.modeBtn:hover` pesa más que `.modeBtnActive` a secas y, con el ratón
+   encima del modo activo, pintaba el rótulo del mismo color que el fondo (1:1, el texto
+   desaparecía). Mismo patrón que `.casoBotonActivo`. */
+.modeBtnActive,
+.modeBtnActive:hover {
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -100,9 +107,10 @@
   font-weight: 500;
 }
 
+/* 14 px: texto pequeño. Con --primary daba 3,93:1 sobre la página en claro (hallazgo 2382). */
 .sliderValue {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .slider {
@@ -322,10 +330,11 @@
   border-color: #3a3a3a;
 }
 
+/* 15,2 px: texto pequeño aunque vaya en negrita (4,11:1 con --primary en claro, 2382). */
 .scenarioCard h4 {
   margin: 0.25rem 0 0.5rem;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .scenarioCard p {
@@ -360,7 +369,7 @@
 
 .faqItem dt {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   margin-bottom: 0.4rem;
 }
@@ -393,7 +402,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.85rem;
   font-weight: 700;
@@ -512,12 +521,15 @@
 
 [data-theme='dark'] .modeBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
-[data-theme='dark'] .modeBtnActive {
-  border-color: var(--primary);
-  background: var(--primary);
+/* En oscuro --primary se aclara (#3FA5D1) y el blanco encima caía a 2,79:1: --primary-boton
+   es el mismo en los dos temas (5,47:1). */
+[data-theme='dark'] .modeBtnActive,
+[data-theme='dark'] .modeBtnActive:hover {
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -593,7 +605,7 @@
 
 .casoBoton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .casoBoton:focus-visible {
@@ -601,10 +613,13 @@
   outline-offset: 2px;
 }
 
+/* Blanco sobre marca: fondo --primary-boton (5,47:1 en los dos temas). Con --primary, el caso
+   activo, «Practicar» y «Comprobar» se quedaban en 4,11:1 en claro y 2,79:1 en oscuro
+   (hallazgo 2381 del Inspector, 28/09/2026). */
 .casoBotonActivo,
 .casoBotonActivo:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -619,10 +634,11 @@
   border-radius: var(--radius);
 }
 
+/* 17,6 px/600: texto pequeño. El teal de marca como texto daba 2,68:1 en claro (hallazgo 2382). */
 .casoTitulo {
   margin: 0 0 var(--spacing-sm);
   font-size: 1.1rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .casoEnunciado {
@@ -671,7 +687,7 @@
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
-  background: var(--primary);
+  background: var(--primary-boton);
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
@@ -713,15 +729,18 @@
   min-height: 44px;
   padding: var(--spacing-xs) var(--spacing-md);
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: transparent;
-  border: 1px solid var(--primary);
+  border: 1px solid var(--primary-texto);
   border-radius: var(--radius);
   cursor: pointer;
 }
 
+/* 14,4 px/400: «Ver pista» daba 3,93:1 con --primary como texto y el blanco del hover 4,11:1
+   en claro y 2,79:1 en oscuro sobre --primary (hallazgos 2381 y 2382). */
 .casoAyudaBoton:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -769,8 +788,8 @@
 
 [data-theme='dark'] .casoBotonActivo,
 [data-theme='dark'] .casoBotonActivo:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 

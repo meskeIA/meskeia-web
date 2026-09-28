@@ -301,7 +301,12 @@ export default function SimuladorMovimientoCircularPage() {
         omegaRef.current = Math.max(0, omegaRef.current + ALPHA_MCNU * dt);
         // Al llegar al techo del simulador se vuelve a empezar. El ciclo se anuncia en
         // pantalla: antes la bola se paraba de golpe sin que nada lo explicara.
-        if (omegaRef.current > OMEGA_MAX_MCNU) omegaRef.current = 0;
+        //
+        // Se vuelve a la ω₀ del deslizador y NO a 0: con 0, desde la segunda vuelta del ciclo
+        // el panel daba ω = 0,1 rad/s mientras el deslizador seguía diciendo «10,0 rad/s», y la
+        // ley que la propia tabla enseña (ω = ω₀ + α·t) dejaba de describir lo que se veía.
+        // `omega` ≤ 10 (tope del deslizador) < OMEGA_MAX_MCNU, así que el ciclo siempre avanza.
+        if (omegaRef.current > OMEGA_MAX_MCNU) omegaRef.current = omega;
         if (timestamp - ultimoRefrescoRef.current > 100) {
           ultimoRefrescoRef.current = timestamp;
           setOmegaAnimada(omegaRef.current);
@@ -455,8 +460,8 @@ export default function SimuladorMovimientoCircularPage() {
         <p className={styles.avisoCiclo} role="note">
           <span aria-hidden="true">🔁</span> En MCNU las cifras del panel siguen a la animación:
           ω crece a {formatNumber(ALPHA_MCNU, 1)} rad/s² y, al llegar a{' '}
-          {formatNumber(OMEGA_MAX_MCNU, 0)} rad/s, el simulador vuelve a empezar para que el
-          ciclo pueda verse entero.
+          {formatNumber(OMEGA_MAX_MCNU, 0)} rad/s, el simulador vuelve a empezar desde la ω₀
+          del deslizador ({formatNumber(omega, 1)} rad/s) para que el ciclo pueda verse entero.
         </p>
       )}
 

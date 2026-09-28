@@ -1265,14 +1265,21 @@ test.describe('re-inspección 22/09/2026', () => {
  *       caso 12 · T = 0,5, r = 0,4    → ω = 2π/0,5 = 12,566371 → v = 5,0265482 → 5,03 m/s
  *                 «0,8» (= r/T, olvidar el 2π) suspende
  *
- * HALLAZGOS ABIERTOS (inspector 28/09/2026) — con test.fail() al final del bloque
- *   · logo fijo sobre el <h1> entre 769 y ~1000 px (iPad vertical: 810-834 px)
- *   · texto blanco sobre var(--primary) en los botones activos y en «Comprobar»
- *   · colores de marca como TEXTO pequeño en claro (título del caso 2,68:1)
+ * HALLAZGOS 2380-2382 (inspector 28/09/2026), REPARADOS el mismo día — estaban con
+ * test.fail() al final del bloque; ahora sujetan la reparación como regresión.
+ *   · 2380: logo fijo sobre el <h1> entre 769 y ~1000 px (iPad vertical: 810-834 px). Lo
+ *     reparó el coordinador en lote (a1d72a9c): los 80 px del hero llegan hasta 1023 px.
+ *   · 2381: texto blanco sobre var(--primary) en los botones activos, «Comprobar» y los
+ *     números de la guía → fondo var(--primary-boton), 5,47:1 en los dos temas. Al reparar
+ *     salió otro del mismo sitio: con el ratón encima del modo activo el rótulo tomaba el
+ *     color del fondo (1:1); ahora `.modeBtnActive:hover` lo mantiene en blanco.
+ *   · 2382: colores de marca como TEXTO pequeño en claro (título del caso 2,68:1) →
+ *     var(--primary-texto) / var(--secondary-texto).
  *
- * SOSPECHA sin hallazgo: en MCNU, al llegar a 20 rad/s ω vuelve a 0 y no a la ω₀ del
- * deslizador (con ω₀ = 10, a los 20,5 s el panel da 0,23 rad/s mientras el deslizador sigue
- * en «10,0 rad/s»). El aviso solo dice «vuelve a empezar», así que no hay promesa rota.
+ * SOSPECHA, confirmada y REPARADA (28/09/2026): en MCNU, al llegar a 20 rad/s ω volvía a 0 y
+ * no a la ω₀ del deslizador (con ω₀ = 10, a los 20,2 s el panel daba 0,10 rad/s y un segundo
+ * después 0,57, mientras el deslizador seguía en «10,0 rad/s»). Desde la segunda vuelta del
+ * ciclo ω = ω₀ + α·t, la ley que la propia tabla enseña, dejaba de describir lo que se veía.
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
 /** Letras del <h1> que quedan debajo de la barra fija de MeskeiaLogo (logo o botón de tema). */
@@ -1478,19 +1485,18 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula y 
     }
   });
 
-  /* ── Hallazgos abiertos del 28/09/2026 ───────────────────────────────────────────── */
+  /* ── Hallazgos del 28/09/2026, REPARADOS el mismo día ────────────────────────────── */
 
-  test('HALLAZGO · a 800 y 834 px (iPad vertical) el logo fijo no tapa el título', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): el arreglo del 27/09 (586a4d61) da 80 px al
-    // hero solo con `@media (max-width: 768px)`, y MeskeiaLogo pasa a su tamaño de escritorio
-    // a partir de 769 px (barra con 15 px de margen y píldora de 62 px de alto: [20,15,203,77]).
-    // Por encima de 768 el hero vuelve a su padding de 2,5rem (40 px) y el <h1>, centrado,
-    // empieza en x = 142 a 800 px y en x = 148 a 834 px: el logo le tapa las primeras letras.
-    // Caso: viewport 800 px → esperado «» tapado · obtenido «Sim» (61×38 px de solape con la
-    // línea del título; en la captura se lee «ulador de Movimiento Circular»); a 834 px → «Sim»
-    // (55×38 px). Bajo stemum.com, con la
-    // píldora «Stemum › Física» de 212 px, «Simula» a 800 px y hasta «S» a 1024 px.
+  test('2380 (regresión) — a 800 y 834 px (iPad vertical) el logo fijo no tapa el título', async ({ page }) => {
+    // REPARADO (28/09/2026, a1d72a9c, en lote por el coordinador): el arreglo del 27/09
+    // (586a4d61) daba 80 px al hero solo con `@media (max-width: 768px)`, y MeskeiaLogo pasa a
+    // su tamaño de escritorio a partir de 769 px (barra con 15 px de margen y píldora de 62 px
+    // de alto: [20,15,203,77]). Por encima de 768 el hero volvía a su padding de 2,5rem (40 px)
+    // y el <h1>, centrado, empezaba en x = 142 a 800 px y en x = 148 a 834 px, bajo el logo.
+    // Caso: viewport 800 px → esperado «» tapado · obtenido entonces «Sim» (61×38 px de solape
+    // con la línea del título); a 834 px → «Sim» (55×38 px). Ahora los 80 px llegan a 1023 px.
+    // Bajo stemum.com la píldora «Stemum › Física» mide 212 px: eso no se puede medir en local
+    // (no hay proxy de stemum), así que este test cubre solo meskeia.com.
     for (const ancho of [800, 834]) {
       await page.setViewportSize({ width: ancho, height: 900 });
       await page.waitForTimeout(150);
@@ -1498,41 +1504,127 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula y 
     }
   });
 
-  test('HALLAZGO · texto blanco sobre el azul de marca en los botones activos (≥ 4,5:1)', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): .modeBtnActive, .casoBotonActivo y
-    // .casoComprobar (y .stepNumber de la guía) pintan texto blanco sobre var(--primary), cuando
-    // existe --primary-boton (#26718F, 5,47:1 en los dos temas). Son 14,4-16 px con peso 600:
-    // texto pequeño, umbral 4,5:1. Caso: carga en claro → esperado ≥ 4,5 · obtenido 4,11:1 en
-    // los tres; en oscuro, donde --primary vale #3FA5D1 → obtenido 2,79:1 (también en el
-    // «Practicar» activo). «Comprobar» es el botón principal de la sección de aula.
-    const selectores = [
+  test('2381 (regresión) — texto blanco sobre el azul de marca en los botones activos (≥ 4,5:1)', async ({ page }) => {
+    // REPARADO (28/09/2026): .modeBtnActive, .casoBotonActivo, .casoComprobar, .stepNumber de
+    // la guía y el :hover de «Ver pista»/«Ver solución» pintaban texto blanco sobre
+    // var(--primary). Son 13,6-16 px con peso 400-700: texto pequeño, umbral 4,5:1. Caso: carga
+    // en claro → obtenido 4,11:1 en los tres botones; en oscuro, donde --primary vale #3FA5D1,
+    // 2,79:1 (también el «Practicar» activo). Ahora el fondo es var(--primary-boton), #26718F
+    // en los dos temas: 5,47:1.
+    //
+    // Se mide cada estado en los DOS temas: el oscuro era el peor, y un arreglo que solo
+    // tocara el claro dejaría «Comprobar» —el botón principal de la sección— a 2,79:1.
+    const PUNTOS = [
       'button[class*="modeBtnActive"]',
-      'button[class*="casoBotonActivo"]',
+      'button[class*="casoBotonActivo"]', // el caso 1, activo al cargar
       'button[class*="casoComprobar"]',
+      'span[class*="stepNumber"]', // los círculos numerados de la guía
     ];
-    for (const s of selectores) expect(await contrasteDe(page, s), `claro · ${s}`).toBeGreaterThanOrEqual(4.5);
-    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    await page.waitForTimeout(500);
-    for (const s of selectores) expect(await contrasteDe(page, s), `oscuro · ${s}`).toBeGreaterThanOrEqual(4.5);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.locator('span[class*="stepNumber"]').first()).toBeVisible();
+
+    for (const tema of ['claro', 'oscuro'] as const) {
+      if (tema === 'oscuro') {
+        await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      }
+      await page.getByRole('button', { name: /^Caso 1:/ }).click();
+      await page.mouse.move(0, 0);
+      await page.waitForTimeout(500); // transiciones de color de 0,15-0,2 s
+      for (const s of PUNTOS) expect(await contrasteDe(page, s), `${tema} · ${s}`).toBeGreaterThanOrEqual(4.5);
+
+      // El :hover de «Ver pista» también pone blanco sobre la marca.
+      await page.getByRole('button', { name: /Ver pista/ }).hover();
+      await page.waitForTimeout(300);
+      expect(await contrasteDe(page, 'button[class*="casoAyudaBoton"]'), `${tema} · «Ver pista» con el ratón encima`)
+        .toBeGreaterThanOrEqual(4.5);
+
+      // Visto al reparar: con el ratón encima del modo ACTIVO, `.modeBtn:hover` (dos clases)
+      // le ganaba a `.modeBtnActive` (una) y pintaba el rótulo del color del fondo: 1:1 en
+      // claro, el texto desaparecía. Ahora `.modeBtnActive:hover` mantiene el blanco.
+      await page.locator('button[class*="modeBtnActive"]').hover();
+      await page.waitForTimeout(300);
+      expect(await contrasteDe(page, 'button[class*="modeBtnActive"]'), `${tema} · modo activo con el ratón encima`)
+        .toBeGreaterThanOrEqual(4.5);
+
+      // Y «Practicar» cuando está activo, que es el mismo .casoBotonActivo en otro botón.
+      await page.getByRole('button', { name: /Practicar/ }).click();
+      await expect(page.getByRole('button', { name: /Practicar/ })).toHaveAttribute('aria-pressed', 'true');
+      await page.mouse.move(0, 0);
+      await page.waitForTimeout(500);
+      expect(await contrasteDe(page, 'button[class*="casoBotonActivo"]'), `${tema} · «Practicar» activo`)
+        .toBeGreaterThanOrEqual(4.5);
+    }
   });
 
-  test('HALLAZGO · en claro, los colores de marca como texto pequeño se leen (≥ 4,5:1)', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): el módulo usa --secondary y --primary como
-    // COLOR de texto pequeño, en lugar de --secondary-texto / --primary-texto. Caso: carga en
-    // claro, caso 1 → título del caso (.casoTitulo, #48A9A6 sobre #FAFAFA, 17,6 px/600)
-    // esperado ≥ 4,5 · obtenido 2,68:1; valor de cada deslizador («2,0 m», .sliderValue,
-    // #2E86AB sobre #FAFAFA, 14 px/700) 3,93:1; «Ver pista»/«Ver solución» (.casoAyudaBoton,
-    // 14,4 px/400) 3,93:1. En la guía, los h4 de escenarios y los <dt> de la FAQ, 4,11:1.
-    // En oscuro los tres cumplen.
-    for (const s of [
+  test('2382 (regresión) — los colores de marca como texto pequeño se leen (≥ 4,5:1) en los dos temas', async ({ page }) => {
+    // REPARADO (28/09/2026): el módulo usaba --secondary y --primary como COLOR de texto
+    // pequeño, en lugar de --secondary-texto / --primary-texto. Caso: carga en claro, caso 1 →
+    // título del caso (.casoTitulo, #48A9A6 sobre #FAFAFA, 17,6 px/600) obtenido 2,68:1; valor
+    // de cada deslizador («2,0 m», .sliderValue, 14 px/700) 3,93:1; «Ver pista» (.casoAyudaBoton,
+    // 14,4 px/400) 3,93:1; en la guía, los h4 de escenarios y los <dt> de la FAQ, 4,11:1.
+    // Ahora 4,94:1 el título (#327874) y 5,24-5,47:1 el resto (#26718F) en claro. En oscuro
+    // los -texto valen lo mismo que la marca (#3FA5D1 / #5ABDB9), que ya cumplía: se mide igual
+    // para que un -texto que se oscureciera allí no pase en silencio.
+    const PUNTOS = [
       'h3[class*="casoTitulo"]',
       'span[class*="sliderValue"]',
       'button[class*="casoAyudaBoton"]',
-    ]) {
-      expect(await contrasteDe(page, s), s).toBeGreaterThanOrEqual(4.5);
+      '[class*="scenarioCard"] h4',
+      '[class*="faqItem"] dt',
+    ];
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.locator('[class*="faqItem"] dt').first()).toBeVisible();
+    await page.mouse.move(0, 0);
+
+    for (const tema of ['claro', 'oscuro'] as const) {
+      if (tema === 'oscuro') {
+        await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+        await page.mouse.move(0, 0);
+        await page.waitForTimeout(500);
+      }
+      for (const s of PUNTOS) expect(await contrasteDe(page, s), `${tema} · ${s}`).toBeGreaterThanOrEqual(4.5);
     }
+  });
+
+  test('sospecha reparada — en MCNU, al pasar de 20 rad/s, ω vuelve a la ω₀ del deslizador y no a 0', async ({
+    page,
+  }) => {
+    // REPARADO (28/09/2026). Caso: ω₀ = 10 rad/s en el deslizador, MCNU → ω = 10 + 0,5·t, que
+    // toca el techo de 20 rad/s a los 20 s. Obtenido entonces: a los 20,2 s el panel daba
+    // 0,10 rad/s y un segundo después 0,57, con el deslizador en «10,0 rad/s»: el ciclo
+    // volvía a arrancar desde el reposo y ω₀ ya no era la del control. Esperado: vuelve a
+    // 10 rad/s, y a t = 21 s el panel da 10 + 0,5·1 = 10,5 rad/s.
+    //
+    // El reloj de la página (requestAnimationFrame incluido) se adelanta con page.clock:
+    // esperar 21 s reales no mediría nada más. Entre llamadas el reloj también corre solo,
+    // así que se deja holgura hacia ARRIBA (lo que tarda Playwright entre un paso y otro).
+    await page.clock.install();
+    await page.reload();
+    await esperarHidratacion(page, ['input[type="range"]']);
+    await mover(page, OMEGA, 10);
+    await expect(page.locator('label[for="slider-omega"]')).toContainText('10,0 rad/s');
+
+    await page.getByRole('button', { name: /^MCNU/ }).click();
+    await expect(page.getByRole('button', { name: /^MCNU/ })).toHaveAttribute('aria-pressed', 'true');
+    // El aviso dice desde dónde vuelve a empezar, con la cifra del deslizador.
+    await expect(page.locator('[class*="avisoCiclo"]')).toContainText('vuelve a empezar desde la ω₀ del deslizador (10,0 rad/s)');
+
+    const omegaDelPanel = async () => (await fotoPanel(page))['ω'];
+
+    // t ≈ 18 s → ω ≈ 19 rad/s, aún por debajo del techo.
+    await page.clock.runFor(18_000);
+    await expect.poll(omegaDelPanel).toBeGreaterThan(18.5);
+    expect(await omegaDelPanel()).toBeLessThan(20);
+
+    // t ≈ 21 s → ha cruzado el techo a los 20 s y ha seguido acelerando 1 s desde ω₀.
+    await page.clock.runFor(3_000);
+    await expect.poll(omegaDelPanel).toBeLessThan(15); // el ciclo ha vuelto a empezar
+    const w = await omegaDelPanel();
+    expect(w, 'ω tras el reinicio: 10 + 0,5·1 = 10,5 (con 0 habría dado ~0,5)').toBeGreaterThanOrEqual(10);
+    expect(w).toBeLessThan(12.5);
+    // Y el deslizador, que no se ha tocado, sigue diciendo la misma ω₀ que ahora describe el panel.
+    await expect(page.locator('label[for="slider-omega"]')).toContainText('10,0 rad/s');
   });
 });
