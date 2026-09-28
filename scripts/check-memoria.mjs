@@ -299,6 +299,11 @@ if (previa) {
 // Desde el 24/09/2026 cuenta los días hasta el TECHO DEL HOOK, no hasta el aviso: el aviso
 // pasó a estar a un mes del techo a propósito, y medir hasta él haría sonar este pronóstico
 // casi siempre (un color que sale siempre no informa).
+//
+// Veredicto de la regla de destino (28/09/2026, criterio escrito el 28/08: <0,8 funciona,
+// >1,2 no desvía): 0,58 fichas/día desde el 28/08 y 0,25 en los últimos 12 días → FUNCIONA.
+// Ojo al leer la línea Ritmo: es la media de las últimas 30 LECTURAS, no de 30 días, y ese
+// día aún arrastraba el tramo anterior a la regla (1,9/día del 20 al 28/08) e imprimía 0,85.
 const DIAS_MARGEN_MINIMO = 45;    // por debajo, el aviso todavía da tiempo a reaccionar
 const MIN_LECTURAS = 4;           // con menos, la pendiente es ruido
 const decimal = n => new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
