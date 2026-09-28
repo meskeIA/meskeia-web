@@ -1,5 +1,15 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  resolverCaso,
+  comprobarRespuesta,
+  toleranciaDe,
+  generarEjercicioAleatorio,
+  type DatosCaso,
+} from '../../app/simulador-lentes-opticas/casos';
+import { calcularImagen, potenciaDioptrias } from '../../app/simulador-lentes-opticas/motor';
 
 /**
  * Simulador de Lentes Ópticas — regresión del motor de óptica geométrica.
@@ -204,5 +214,223 @@ test.describe('simulador-lentes-opticas', () => {
       return false;
     });
     expect(violeta).toBe(false);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * simulador-lentes-opticas · casos para clase (tarea de tipo A, 28/09/2026)
+ *
+ * Doce problemas de lentes delgadas. Los casos calculan con `calcularImagen` y
+ * `potenciaDioptrias` de `motor.ts`, que se EXTRAJERON del `useMemo` `calculoOptico` y de la
+ * tarjeta de potencia sin tocar una operación (0 diferencias en 462.108 combinaciones): lo que
+ * corrige la sección y lo que pinta el panel sale de la misma función.
+ *
+ * ⚠️ CONVENIO: la app usa «real es positivo» (1/s + 1/s' = 1/f, s > 0 delante de la lente,
+ * M = −s'/s). En España se enseña además el DIN (1/s' − 1/s = 1/f', s < 0, M = s'/s). Los casos
+ * solo preguntan lo que da LO MISMO en los dos (s', M, h', P, f y una distancia sin signo), y la
+ * invariante 7 lo comprueba con una implementación DIN escrita aquí, independiente de la app.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO (a mano, sin mirar la app):
+ *   1 · 1/s' = 1/10 − 1/15 = 1/30                                    → s' = 30 cm
+ *   2 · 1/s' = 1/10 − 1/30 = 1/15 → s' = 15; M = −15/30              = −0,5
+ *   3 · s = 2f → s' = 20, M = −1; h' = −1·3                          = −3 cm
+ *   4 · 1/s' = 1/12 − 1/8 = −1/24 → s' = −24; M = 24/8               = 3
+ *   5 · 1/s' = 1/6 − 1/4 = −1/12                                     → s' = −12 cm
+ *   6 · 1/s' = −1/10 − 1/10 = −1/5                                   → s' = −5 cm
+ *   7 · 1/s' = −1/20 − 1/20 → s' = −10; M = 10/20 = 0,5; h' = 0,5·4  = 2 cm
+ *   8 · P = 1/(−0,20 m)                                              = −5 D
+ *   9 · P = 1/0,20 + 1/(−0,50) = 5 − 2                               = 3 D
+ *  10 · 1/f = 1/10,2 + 1/510 = (50 + 1)/510 = 1/10                   → f = 10 cm
+ *  11 · 1/s' = 1/5 − 1/105 = 20/105                                  → s' = 5,25 cm
+ *  12 · M = +5 (virtual): s = f·(1 − 1/M) = 10·0,8 = 8; con s = 8, s' = −40 y M = 40/8 = 5
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+const A_MANO_CASOS: Readonly<Record<number, number>> = {
+  1: 30,
+  2: -0.5,
+  3: -3,
+  4: 3,
+  5: -12,
+  6: -5,
+  7: 2,
+  8: -5,
+  9: 3,
+  10: 10,
+  11: 5.25,
+  12: 8,
+};
+
+/** Cuántos decimales lleva el número que se ENSEÑA en la solución («−0,50» → 2). */
+function decimalesMostrados(texto: string): number {
+  const m = texto.match(/[-−]?\d[\d.]*(?:,(\d+))?/);
+  return m?.[1]?.length ?? 0;
+}
+
+const redondeo = (v: number, d: number) => Math.round(v * 10 ** d) / 10 ** d;
+
+/**
+ * La misma pregunta resuelta en convenio DIN, sin pasar por la app: s negativa delante de la
+ * lente, 1/s' = 1/f' + 1/s y M = s'/s. Solo para las preguntas que dependen del convenio.
+ */
+function enDin(d: DatosCaso): number | null {
+  if (d.focal === undefined || d.distanciaObjeto === undefined) return null;
+  const s = -d.distanciaObjeto;
+  const sImg = 1 / (1 / d.focal + 1 / s);
+  const M = sImg / s;
+  if (d.pregunta === 'posicionImagen') return sImg;
+  if (d.pregunta === 'aumento') return M;
+  if (d.pregunta === 'alturaImagen' && d.altura !== undefined) return M * d.altura;
+  return null;
+}
+
+test.describe('simulador-lentes-opticas · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    for (const caso of CASOS) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(redondeo(r.valor, caso.datos.decimales ?? 2), `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta finita y desarrollo', async () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+    }
+    expect(new Set(CASOS.map((c) => c.categoria))).toEqual(new Set(['abstracto', 'aplicado']));
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    // La moneda por su gentilicio: «peso» suelto es una palabra de física (plano inclinado).
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Ecuador|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos (mexicanos|colombianos|argentinos|chilenos|uruguayos)|Bachillerato|selectividad)\b/i;
+    // La sigla va aparte y con mayúsculas: con /i, el pronombre «eso» la disparaba en falso.
+    const SIGLA_ESO = /\bESO\b/;
+    for (const caso of CASOS) {
+      const texto = `${caso.titulo} ${caso.enunciado}`;
+      expect(PROHIBIDO.test(texto) || SIGLA_ESO.test(texto), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · lo que el enunciado PIDE coincide con lo que la solución MUESTRA', async () => {
+    for (const caso of CASOS) {
+      const decimales = caso.datos.decimales ?? 2;
+      expect(decimalesMostrados(caso.respuestaTexto), `caso ${caso.id}`).toBeLessThanOrEqual(decimales);
+      const ultimo = caso.pasos[caso.pasos.length - 1];
+      expect(ultimo, `caso ${caso.id}: el último paso enseña la cifra de la casilla`).toContain(caso.respuestaTexto);
+      const exacto = Math.abs(resolverCaso(caso.datos).valor - caso.respuesta) < 1e-9;
+      expect(caso.requiereRedondeo, `caso ${caso.id}`).toBe(!exacto);
+      if (!exacto) {
+        expect(caso.enunciado, `caso ${caso.id}: se redondea y el enunciado no lo pide`).toMatch(/redonde|decimal|unidades|décima/i);
+      }
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(muestras.map((m) => m.datos.pregunta)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.respuesta)).toBe(true);
+      expect(redondeo(resolverCaso(m.datos).valor, m.datos.decimales ?? 2)).toBe(m.respuesta);
+      // Tampoco el aleatorio pregunta nada que dependa del convenio.
+      const din = enDin(m.datos);
+      if (din !== null) expect(comprobarRespuesta(din, m.respuesta).correcto).toBe(true);
+    }
+  });
+
+  test('7 · el convenio queda fijado, y en DIN las respuestas son las mismas', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera.
+    for (const caso of CASOS) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO_CASOS[caso.id]);
+    }
+
+    // (b) El motor extraído: el estado de fábrica del acta (f = 8, s = 15, h = 2).
+    const fabrica = calcularImagen(8, 15, 2);
+    expect(fabrica.valido).toBe(true);
+    expect(fabrica.sImg).toBeCloseTo(120 / 7, 10);
+    expect(fabrica.M).toBeCloseTo(-8 / 7, 10);
+    expect(calcularImagen(10, 10, 2).valido).toBe(false);
+    expect(potenciaDioptrias(-20)).toBe(-5);
+
+    // (c) Un alumno que trabaja en DIN obtiene la misma cifra en todos los casos que dependen
+    //     del convenio; y al menos uno lo hace, o esta comprobación no miraría nada.
+    let mirados = 0;
+    for (const caso of CASOS) {
+      const din = enDin(caso.datos);
+      if (din === null) continue;
+      mirados++;
+      expect(comprobarRespuesta(din, caso.respuesta).correcto, `caso ${caso.id}`).toBe(true);
+    }
+    expect(mirados).toBeGreaterThanOrEqual(6);
+
+    // (d) Los errores del tema NO entran: olvidar el signo de f en la divergente (caso 6 → 1/s' =
+    //     1/10 − 1/10, sin imagen) no da −5, y el valor absoluto del aumento invertido (caso 2)
+    //     tampoco vale: el signo es información.
+    expect(comprobarRespuesta(5, -5).correcto).toBe(false);
+    expect(comprobarRespuesta(0.5, -0.5).correcto).toBe(false);
+  });
+
+  test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
+    expect(comprobarRespuesta(30, 30).correcto).toBe(true);
+    expect(comprobarRespuesta(NaN, -12).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, -12).motivo).not.toMatch(/NaN/);
+    expect(toleranciaDe(0)).toBe(0.01);
+    expect(toleranciaDe(-12)).toBeCloseTo(0.12, 10);
+    // Borde exacto de la tolerancia, por los dos lados (hallazgo 1211 del 22/09/2026).
+    expect(comprobarRespuesta(-0.49, -0.5).correcto).toBe(true);
+    expect(comprobarRespuesta(-0.51, -0.5).correcto).toBe(true);
+  });
+});
+
+test.describe('simulador-lentes-opticas · la sección de casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('#casos-aula');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/simulador-lentes-opticas/');
+    await esperarHidratacion(page, ['#casos-respuesta', SLIDER_F, SLIDER_S, SLIDER_H]);
+  });
+
+  test('el caso 5 acepta el signo menos tipográfico y el del teclado', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 5:/ }).click();
+    for (const texto of ['−12', '-12']) {
+      await seccion(page).locator('#casos-respuesta').fill(texto);
+      await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+      await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto!');
+    }
+  });
+
+  test('el aumento sin signo en el caso 2 se rechaza y la solución enseña −0,50', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 2:/ }).click();
+    await seccion(page).locator('#casos-respuesta').fill('0,5');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('No es correcto');
+    const solucion = seccion(page).getByRole('button', { name: /Ver solución/ });
+    await expect(solucion).toHaveAttribute('aria-expanded', 'false');
+    await solucion.click();
+    await expect(seccion(page).locator('#casos-resultado')).toContainText('−0,50');
   });
 });

@@ -5,6 +5,8 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorLentesOpticas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { calcularImagen, potenciaDioptrias } from './motor';
+import CasosAula from './CasosAula';
 
 // ============================================
 // TIPOS
@@ -40,23 +42,9 @@ export default function SimuladorLentesOpticasPage() {
   // Distancia focal con signo (+ convergente, - divergente)
   const f = useMemo(() => tipo === 'convergente' ? fAbs : -fAbs, [tipo, fAbs]);
 
-  // Cálculos: 1/s + 1/s' = 1/f → s' = 1 / (1/f − 1/s)
-  // Convención: s_obj > 0 (objeto a la izquierda), s_img > 0 (imagen a la derecha = real),
-  //             s_img < 0 (imagen a la izquierda = virtual)
-  const calculoOptico = useMemo(() => {
-    const denom = 1 / f - 1 / sObj;
-    if (Math.abs(denom) < 1e-9) {
-      // Imagen al infinito
-      // NaN, no Infinity: el límite de M = −s'/s al acercarse desde s > f es −∞ y desde
-      // s < f es +∞, así que no hay un signo que escribir. Y `valido: false` ya dice que
-      // no hay imagen; lo que no debe haber es una cifra con signo que parezca calculada.
-      return { sImg: NaN, hImg: NaN, M: NaN, valido: false };
-    }
-    const sImg = 1 / denom;
-    const M = -sImg / sObj; // negativo = invertida
-    const hImg = M * hObj;
-    return { sImg, hImg, M, valido: true };
-  }, [f, sObj, hObj]);
+  // Cálculos: 1/s + 1/s' = 1/f → s' = 1 / (1/f − 1/s). La aritmética vive en ./motor.ts
+  // (convenio «real es positivo», explicado allí), la misma con la que corrigen los casos.
+  const calculoOptico = useMemo(() => calcularImagen(f, sObj, hObj), [f, sObj, hObj]);
 
   const { sImg, hImg, M, valido } = calculoOptico;
 
@@ -581,11 +569,15 @@ export default function SimuladorLentesOpticasPage() {
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Potencia P = 1/f</span>
-            <span className={styles.resultValue}>{fmtSigned(100 / f, 2)} D</span>
+            <span className={styles.resultValue}>{fmtSigned(potenciaDioptrias(f), 2)} D</span>
             <span className={styles.resultRange}>dioptrías (f en m)</span>
           </div>
         </div>
       </div>
+
+      {/* Tarea de aula (skill /casos-aula-meskeia): fuera de los controles del simulador y
+          FUERA de EducationalSection, que nace colapsada. */}
+      <CasosAula />
 
       {/* ============================================
           BLOQUE EDUCATIVO v2.0
