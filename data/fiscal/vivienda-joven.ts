@@ -145,7 +145,15 @@ export const BONO_ALQUILER_JOVEN_2026 = {
     prorrogaMaximaMeses: 24,
     totalMaximoMeses: 48,
   },
-  /** Incompatible con cualquier otra ayuda al pago del alquiler o la cesión (art. 136) */
+  /**
+   * Incompatible con cualquier otra ayuda al pago del alquiler o la cesión (art. 136, párrafo 1.º),
+   * SALVO lo que dice su párrafo 2.º: no quedan afectadas las ayudas que comunidades, municipios,
+   * otras entidades públicas, ONG o asociaciones den con esa misma finalidad a víctimas de violencia
+   * de género, de trata con fines de explotación sexual o de violencia sexual, familias
+   * monoparentales o monomarentales, personas desahuciadas de su vivienda habitual, en chabolismo,
+   * infravivienda o emergencia habitacional, sin hogar y otras especialmente vulnerables.
+   * Cotejado en el BOE el 28/09/2026.
+   */
   compatibleConOtrasAyudasAlquiler: false,
   /** Las comunidades autónomas convocan la ayuda de forma «continuada y permanente» (art. 138) */
   convocatoriaAbiertaPermanente: true,
