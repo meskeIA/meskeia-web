@@ -1,5 +1,14 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarHidratacion, esperarPaginaAsentada, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  resolverCaso,
+  comprobarRespuesta,
+  toleranciaDe,
+  generarEjercicioAleatorio,
+} from '../../app/simulador-circuitos-electricos/casos';
+import { resolverParalelo, resolverSerie, resolverPotencia } from '../../app/simulador-circuitos-electricos/motor';
 
 /**
  * Inspector — simulador-circuitos-electricos (segmento cálculo, riesgo 3, 223 usos reales · Stemum)
@@ -11,9 +20,11 @@ import { esperarHidratacion, esperarPaginaAsentada, esperarValorEnReact, sembrar
  * constante empírica de por medio.
  *
  * DÓNDE VIVE EL CÁLCULO
- *   app/simulador-circuitos-electricos/page.tsx — NO hay motor separado: las cuatro funciones
- *   (calcOhm, calcSerie, calcParalelo, calcPotencia) están dentro del componente, así que este
- *   fichero es el único candado que ve la física.
+ *   app/simulador-circuitos-electricos/page.tsx — NO había motor separado: las cuatro funciones
+ *   (calcOhm, calcSerie, calcParalelo, calcPotencia) estaban dentro del componente, así que este
+ *   fichero era el único candado que veía la física. Desde el 28/09/2026 su aritmética vive en
+ *   `motor.ts` (la validación sigue en la página), que comparten con los casos para clase del
+ *   final de este fichero.
  *     · calcOhm      V = I·R  ·  I = V/R  ·  R = V/I
  *     · calcSerie    Req = ΣR · I = V/Req · V_i = I·R_i · P_i = I²·R_i
  *     · calcParalelo 1/Req = Σ(1/R) · I_i = V/R_i · P_i = V²/R_i
@@ -1117,5 +1128,196 @@ test.describe('simulador-circuitos-electricos', () => {
     await page.getByRole('button', { name: 'Calcular', exact: true }).click();
     await expect(page.locator('main [role="alert"]')).toHaveText('Horas al día: no puede ser negativo.');
     await expect(page.locator('div[role="status"]')).toBeEmpty();
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * simulador-circuitos-electricos · casos para clase (tarea de tipo A, 28/09/2026)
+ *
+ * Doce problemas de ley de Ohm, serie, paralelo, potencia y consumo. Los casos calculan SOLO con
+ * `motor.ts`, que se EXTRAJO de los cuatro handlers de page.tsx sin tocar una operación (0
+ * diferencias en 1.065.488 combinaciones contra el código original): lo que corrige la sección
+ * y lo que pintan las pestañas sale de la misma función. La validación de campos y sus mensajes
+ * siguen en la página, y los cubre el acta de arriba.
+ *
+ * CONVENIO DE ESTA APP: Req serie = ΣR · Req paralelo = 1/Σ(1/R) · P = V·I · kWh =
+ * (P/1000)·horas·días · coste = kWh·tarifa, en «unidades monetarias» (la pestaña rotula €).
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO (a mano, sin mirar la app):
+ *   1 · V = 0,020·470                                                         = 9,4 V
+ *   2 · I = 4,5/15                                                            = 0,3 A
+ *   3 · R = 220/4                                                             = 55 Ω
+ *   4 · Req = 10 + 22 + 47                                                    = 79 Ω
+ *   5 · I = 12/4700 = 2,5532 mA; V₂ = 2,5532 mA·2,2 kΩ = 5,6170                → 5,62 V
+ *   6 · I = 12/(6·4)                                                          = 0,5 A
+ *   7 · Req = 1/(1/6 + 1/3) = 1/0,5                                           = 2 Ω
+ *   8 · Req = 1/(1/12 + 1/12 + 1/6) = 3 Ω; I = 12/3                           = 4 A
+ *   9 · I_lámpara = 220/440 = 0,5 A                                           = 500 mA
+ *       (con I en A daría 0,5, que en la casilla de mA es otro número)
+ *  10 · P = I²·R = 0,04·100                                                   = 4 W
+ *  11 · P = 220·10 = 2.200 W; E = 2,2 kW·2 h·30                               = 132 kWh
+ *  12 · P = 220²/484 = 100 W; E = 0,1·5·30 = 15 kWh; coste = 15·0,20          = 3,00
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+const A_MANO_CASOS: Readonly<Record<number, number>> = {
+  1: 9.4,
+  2: 0.3,
+  3: 55,
+  4: 79,
+  5: 5.62,
+  6: 0.5,
+  7: 2,
+  8: 4,
+  9: 500,
+  10: 4,
+  11: 132,
+  12: 3,
+};
+
+/** Cuántos decimales lleva el número que se ENSEÑA en la solución («5,62 V» → 2). */
+function decimalesMostrados(texto: string): number {
+  const m = texto.match(/[-−]?\d[\d.]*(?:,(\d+))?/);
+  return m?.[1]?.length ?? 0;
+}
+
+const redondeoCasos = (v: number, d: number) => Math.round(v * 10 ** d) / 10 ** d;
+
+test.describe('simulador-circuitos-electricos · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    for (const caso of CASOS) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(redondeoCasos(r.valor, caso.datos.decimales ?? 2), `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta finita y desarrollo', async () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+    }
+    expect(new Set(CASOS.map((c) => c.categoria))).toEqual(new Set(['abstracto', 'aplicado']));
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    // La moneda por su gentilicio: «peso» suelto es una palabra de física (plano inclinado).
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Ecuador|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos (mexicanos|colombianos|argentinos|chilenos|uruguayos)|Bachillerato|selectividad)\b/i;
+    // La sigla va aparte y con mayúsculas: con /i, el pronombre «eso» la disparaba en falso.
+    const SIGLA_ESO = /\bESO\b/;
+    for (const caso of CASOS) {
+      const texto = `${caso.titulo} ${caso.enunciado} ${caso.etiquetaRespuesta}`;
+      expect(PROHIBIDO.test(texto) || SIGLA_ESO.test(texto) || texto.includes('€'), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · lo que el enunciado PIDE coincide con lo que la solución MUESTRA', async () => {
+    for (const caso of CASOS) {
+      const decimales = caso.datos.decimales ?? 2;
+      expect(decimalesMostrados(caso.respuestaTexto), `caso ${caso.id}`).toBeLessThanOrEqual(decimales);
+      const ultimo = caso.pasos[caso.pasos.length - 1];
+      expect(ultimo, `caso ${caso.id}: el último paso enseña la cifra de la casilla`).toContain(caso.respuestaTexto);
+      const exacto = Math.abs(resolverCaso(caso.datos).valor - caso.respuesta) < 1e-9;
+      expect(caso.requiereRedondeo, `caso ${caso.id}`).toBe(!exacto);
+      if (!exacto) {
+        expect(caso.enunciado, `caso ${caso.id}: se redondea y el enunciado no lo pide`).toMatch(/redonde|decimal|unidades|décima/i);
+      }
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(muestras.map((m) => m.datos.pregunta)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.respuesta)).toBe(true);
+      expect(redondeoCasos(resolverCaso(m.datos).valor, m.datos.decimales ?? 2)).toBe(m.respuesta);
+    }
+  });
+
+  test('7 · el convenio queda fijado: ΣR, 1/Σ(1/R), P = V·I, kWh = P/1000·h·días', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera.
+    for (const caso of CASOS) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO_CASOS[caso.id]);
+    }
+
+    // (b) El motor extraído, con cifras de lápiz.
+    expect(resolverSerie(9, [10, 22, 47]).Req).toBe(79);
+    expect(resolverParalelo(12, [6, 3]).Req).toBeCloseTo(2, 12);
+    const pot = resolverPotencia(220, NaN, 484, 5, 30, 0.2);
+    expect(pot.ok).toBe(true);
+    if (pot.ok) {
+      expect(pot.resultado.P).toBeCloseTo(100, 10);
+      expect(pot.resultado.energiaKwh).toBeCloseTo(15, 10);
+      expect(pot.resultado.costeEuros).toBeCloseTo(3, 10);
+    }
+    // La terna que no cumple V = I·R se rechaza en el motor, como la rechazaba la página.
+    expect(resolverPotencia(10, 2, 100, 1, 30, 0.18).ok).toBe(false);
+
+    // (c) Los errores del tema NO entran: sumar resistencias en paralelo (caso 7 → 9 Ω) y
+    //     dar la corriente en A en una casilla de mA (caso 9 → 0,5).
+    expect(comprobarRespuesta(9, 2).correcto).toBe(false);
+    expect(comprobarRespuesta(0.5, 500).correcto).toBe(false);
+  });
+
+  test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
+    expect(comprobarRespuesta(132, 132).correcto).toBe(true);
+    expect(comprobarRespuesta(NaN, 5.62).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 5.62).motivo).not.toMatch(/NaN/);
+    expect(toleranciaDe(0)).toBe(0.01);
+    expect(toleranciaDe(500)).toBeCloseTo(5, 10);
+    // Borde exacto de la tolerancia, por los dos lados (hallazgo 1211 del 22/09/2026).
+    expect(comprobarRespuesta(0.31, 0.3).correcto).toBe(true);
+    expect(comprobarRespuesta(0.29, 0.3).correcto).toBe(true);
+  });
+});
+
+test.describe('simulador-circuitos-electricos · la sección de casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test('el caso 5 se corrige con 5,62 V', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 5:/ }).click();
+    await seccion(page).locator('#casos-respuesta').fill('5,62');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto!');
+  });
+
+  test('dar amperios en la casilla de mA del caso 9 se rechaza y la solución enseña 500 mA', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 9:/ }).click();
+    await seccion(page).locator('#casos-respuesta').fill('0,5');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('No es correcto');
+    const solucion = seccion(page).getByRole('button', { name: /Ver solución/ });
+    await expect(solucion).toHaveAttribute('aria-expanded', 'false');
+    await solucion.click();
+    await expect(seccion(page).locator('#casos-solucion')).toContainText('500 mA');
   });
 });

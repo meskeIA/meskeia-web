@@ -13,54 +13,25 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorCircuitosElectricos.module.css';
+// La aritmética de las cuatro pestañas vive en ./motor.ts (28/09/2026), la misma con la que
+// corrigen los «Casos para clase»: aquí solo se leen y validan los campos y se pinta.
+import {
+  consumoYCoste,
+  despejarPotencia,
+  resolverOhm,
+  resolverParalelo,
+  resolverSerie,
+  type Incognita,
+  type ResultadoOhm,
+  type ResultadoParalelo,
+  type ResultadoPotencia,
+  type ResultadoSerie,
+} from './motor';
+import CasosAula from './CasosAula';
 
 type Tab = 'ohm' | 'serie' | 'paralelo' | 'potencia';
-type Incognita = 'V' | 'I' | 'R';
-
-interface ResultadoOhm {
-  V: number;
-  I: number;
-  R: number;
-}
-
-interface ResultadoSerie {
-  Req: number;
-  V: number;
-  /** Las resistencias YA parseadas con las que se calculó, para que la tabla no relea los inputs (hallazgo 872) */
-  resistencias: number[];
-  I: number;
-  tensiones: number[];
-  potencias: number[];
-  potenciaTotal: number;
-}
-
-interface ResultadoParalelo {
-  Req: number;
-  V: number;
-  resistencias: number[];
-  Itotal: number;
-  corrientes: number[];
-  potencias: number[];
-  potenciaTotal: number;
-}
-
-interface ResultadoPotencia {
-  P: number;
-  V: number;
-  I: number;
-  R: number;
-  energiaKwh: number;
-  costeEuros: number;
-}
 
 const MAX_R = 6;
-
-/**
- * Margen relativo con el que se acepta que V, I y R tecleados A LA VEZ cumplan V = I × R.
- * Un 1 % deja pasar los redondeos normales de un enunciado (dos o tres cifras significativas)
- * y caza las ternas que no describen ningún circuito posible (hallazgo 869).
- */
-const TOLERANCIA_OHM = 0.01;
 
 const PREFIJOS_SI: [number, string][] = [
   [1e-3, 'm'],
@@ -186,15 +157,12 @@ function motivoDeRechazo(etiqueta: string, texto: string, admiteCero = false): s
     if (motivoOhm) { setErrorOhm(motivoOhm); return; }
     const a = parseSpanishNumber(ohmA);
     const b = parseSpanishNumber(ohmB);
-    let V: number, I: number, R: number;
-    if (incognita === 'V') { I = a; R = b; V = I * R; }
-    else if (incognita === 'I') { V = a; R = b; I = V / R; }
-    else { V = a; I = b; R = V / I; }
-    if (!isFinite(V) || !isFinite(I) || !isFinite(R) || R <= 0) {
+    const resultado = resolverOhm(incognita, a, b);
+    if (!resultado) {
       setErrorOhm('Valores fuera de rango. Verifica que no divides entre cero.');
       return;
     }
-    setResOhm({ V, I, R });
+    setResOhm(resultado);
   }
 
   function calcSerie() {
@@ -208,11 +176,7 @@ function motivoDeRechazo(etiqueta: string, texto: string, admiteCero = false): s
       .find(Boolean);
     if (motivoSerie) { setErrorSerie(motivoSerie); return; }
     const rs = rsSerie.slice(0, numSerie).map(parseSpanishNumber);
-    const Req = rs.reduce((a, r) => a + r, 0);
-    const I = V / Req;
-    const tensiones = rs.map(r => I * r);
-    const potencias = rs.map(r => I * I * r);
-    setResSerie({ Req, V, resistencias: rs, I, tensiones, potencias, potenciaTotal: I * I * Req });
+    setResSerie(resolverSerie(V, rs));
   }
 
   function calcParalelo() {
@@ -226,12 +190,7 @@ function motivoDeRechazo(etiqueta: string, texto: string, admiteCero = false): s
       .find(Boolean);
     if (motivoPar) { setErrorPar(motivoPar); return; }
     const rs = rsPar.slice(0, numPar).map(parseSpanishNumber);
-    const invReq = rs.reduce((a, r) => a + 1 / r, 0);
-    const Req = 1 / invReq;
-    const corrientes = rs.map(r => V / r);
-    const Itotal = corrientes.reduce((a, i) => a + i, 0);
-    const potencias = rs.map(r => V * V / r);
-    setResPar({ Req, V, resistencias: rs, Itotal, corrientes, potencias, potenciaTotal: V * V / Req });
+    setResPar(resolverParalelo(V, rs));
   }
 
   function calcPotencia() {
@@ -262,19 +221,16 @@ function motivoDeRechazo(etiqueta: string, texto: string, admiteCero = false): s
     // podía enseñar una terna que no cumple la ley de Ohm como si fuera un circuito real: las
     // tres fórmulas del encabezado (V×I, V²/R, I²×R) daban tres potencias distintas. No se
     // recalcula ninguno, porque no hay forma de saber cuál de los tres está mal (hallazgo 869).
-    if (validos.length === 3 && Math.abs(V - I * R) > TOLERANCIA_OHM * I * R) {
+    // La comprobación y el despeje están en el motor (despejarPotencia); el mensaje, aquí.
+    const despeje = despejarPotencia(V, I, R);
+    if (!despeje.ok && despeje.motivo === 'incoherente') {
       setErrorPot(
         `Los tres valores no pueden darse a la vez: la ley de Ohm exige V = I × R = ${formatNumber(I * R, 4)} V, ` +
         `no ${formatNumber(V, 4)} V. Corrige uno o deja vacío el que quieras que se calcule.`
       );
       return;
     }
-    let fV = V, fI = I, fR = R;
-    if (isNaN(fV) || fV <= 0) fV = fI * fR;
-    else if (isNaN(fI) || fI <= 0) fI = fV / fR;
-    else if (isNaN(fR) || fR <= 0) fR = fV / fI;
-    const P = fV * fI;
-    if (!isFinite(P) || P <= 0) { setErrorPot('No se puede calcular la potencia con esos valores.'); return; }
+    if (!despeje.ok) { setErrorPot('No se puede calcular la potencia con esos valores.'); return; }
     // El bloque de consumo y coste es la cifra DESTACADA del panel, y sus tres campos no se
     // validaban: vacíos se propagaban como NaN hasta imprimirse «No definido» sin decir cuál
     // faltaba, al lado de una P y una R correctas (hallazgo 870). El cero sí se admite —una
@@ -282,9 +238,8 @@ function motivoDeRechazo(etiqueta: string, texto: string, admiteCero = false): s
     if (isNaN(horas) || horas < 0) { setErrorPot('Indica las horas de uso diario (un número de 0 o más).'); return; }
     if (isNaN(dias) || dias < 0) { setErrorPot('Indica los días del periodo (un número de 0 o más).'); return; }
     if (isNaN(tarifa) || tarifa < 0) { setErrorPot('Indica la tarifa eléctrica en €/kWh (un número de 0 o más).'); return; }
-    const energiaKwh = (P / 1000) * horas * dias;
-    const costeEuros = energiaKwh * tarifa;
-    setResPot({ P, V: fV, I: fI, R: fR, energiaKwh, costeEuros });
+    const { energiaKwh, costeEuros } = consumoYCoste(despeje.P, horas, dias, tarifa);
+    setResPot({ P: despeje.P, V: despeje.V, I: despeje.I, R: despeje.R, energiaKwh, costeEuros });
   }
 
   /**
@@ -712,6 +667,10 @@ function motivoDeRechazo(etiqueta: string, texto: string, admiteCero = false): s
             </div>
           </div>
         )}
+
+        {/* Tarea de aula (skill /casos-aula-meskeia): fuera de las pestañas, para que se vea sea
+            cual sea la activa, y FUERA de EducationalSection, que nace colapsada. */}
+        <CasosAula />
 
         <EducationalSection
           title="Guía de Circuitos Eléctricos"
