@@ -134,10 +134,19 @@ export interface Resolucion {
   error?: string;
 }
 
-/** Cifra intermedia en formato español, sin ceros de relleno: «0,2546», «29.430». */
+/**
+ * El menos tipográfico «−» en vez del guion: es el que escriben la tabla de secciones y la
+ * tarjeta de ΔP del simulador. Hasta el 28/09/2026 las soluciones decían «-29,43 kPa» junto a
+ * una tabla con «−29,43 kPa».
+ */
+function conMenos(texto: string): string {
+  return texto.replace(/^-/, '−');
+}
+
+/** Cifra intermedia en formato español, sin ceros de relleno: «0,2546», «29.430», «−486,34». */
 function numero(n: number, decimales = 4): string {
   if (!Number.isFinite(n)) return '—';
-  return (n + 0).toLocaleString('es-ES', { maximumFractionDigits: decimales });
+  return conMenos((n + 0).toLocaleString('es-ES', { maximumFractionDigits: decimales }));
 }
 
 function redondear(valor: number, decimales: number): number {
@@ -189,7 +198,7 @@ export function unidadDeMagnitud(datos: DatosCaso): string {
 export function textoConUnidad(valor: number, datos: DatosCaso): string {
   if (!Number.isFinite(valor)) return '—';
   const unidad = unidadDeMagnitud(datos);
-  const cifra = formatNumber(valor, datos.decimales ?? 2);
+  const cifra = conMenos(formatNumber(valor, datos.decimales ?? 2));
   return unidad ? `${cifra} ${unidad}` : cifra;
 }
 
@@ -697,7 +706,11 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     id: 10,
     titulo: 'Una estenosis: cuánto se acelera el flujo',
     enunciado:
-      'Un modelo de vaso sanguíneo es un tubo por el que circula sangre (ρ = 1060 kg/m³) a 1 L/s. En un tramo, el diámetro se reduce al 40 % del original (D₂/D₁ = 0,4), como en una estenosis. ¿Cuántas veces más rápido va la sangre en el estrechamiento que antes de él?',
+      // Desde el 28/09/2026 pide las ÁREAS: con la tabla de la app (velocidades a dos decimales,
+      // 0,13 y 0,80 m/s) el cociente de velocidades da 6,15, fuera de la tolerancia (0,0625), y
+      // la app suspendía una cuenta hecha con las cifras que ella misma imprime. El de su
+      // columna de áreas (78,54/12,57 = 6,248) sí cae dentro.
+      'Un modelo de vaso sanguíneo es un tubo por el que circula sangre (ρ = 1060 kg/m³) a 1 L/s. En un tramo, el diámetro se reduce al 40 % del original (D₂/D₁ = 0,4), como en una estenosis. ¿Cuántas veces más rápido va la sangre en el estrechamiento que antes de él? Resuélvelo con las áreas de las dos secciones; si lo cargas en el simulador, usa su columna de áreas y no la de velocidades, que va redondeada a centésimas y desvía el cociente.',
     categoria: 'aplicado',
     datos: { magnitud: 'razonVelocidades', geometria: 'estenosis', fluido: 'sangre', caudalLs: 1, ratio: 0.4 },
     etiquetaRespuesta: 'v₂/v₁ (sin unidad)',

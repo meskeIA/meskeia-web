@@ -54,6 +54,14 @@ const P_VAPOR_AGUA_20C = 2339;
 /** Recorrido máximo del deslizador de desnivel (m). El dibujo se escala a él, no al valor. */
 const DESNIVEL_MAX = 10;
 
+/**
+ * Magenta de las presiones (manómetros del canvas, su punto de la leyenda y la cifra de ΔP),
+ * uno por tema. Los mismos dos valores están en el .module.css (.valorCae, .puntoPresion):
+ * si cambian aquí, cambian allí. En oscuro #A82E68 no se leía (hallazgo 2364).
+ */
+const COLOR_PRESION_CLARO = '#A82E68';
+const COLOR_PRESION_OSCURO = '#F08CB4';
+
 /** Densidad en formato español: «1,225» para el aire y «1.000» para el agua. */
 function fmtDensidad(rho: number): string {
   return rho.toLocaleString('es-ES', { maximumFractionDigits: 3 });
@@ -255,13 +263,22 @@ export default function SimuladorFluidosBernoulliPage() {
     const plotW = W - pad.left - pad.right;
     const plotH = H - pad.top - pad.bottom;
 
+    // El tema se lee en CADA dibujo (el bucle de animación redibuja en cada fotograma y el
+    // MutationObserver de abajo, al cambiar data-theme), así que las etiquetas cambian con él.
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const colorText = isDark ? '#E5E5E5' : '#333';
     const colorTubeBorder = isDark ? '#888' : '#555';
     const colorTubeFill = isDark ? '#1F2937' : '#E5F1F8';
     const colorParticula = '#2E86AB';
-    const colorMan = '#A82E68';
+    // Hallazgo 2364 (28/09/2026): el magenta #A82E68 era fijo y en oscuro, sobre el #1A1A1A
+    // de .canvasWrapper, las etiquetas de presión (11 px en negrita) daban 2,70:1. En oscuro va
+    // el rosa claro de la misma familia (7,55:1); en claro, #A82E68 da 6,18:1 sobre #FAFAFA.
+    const colorMan = isDark ? COLOR_PRESION_OSCURO : COLOR_PRESION_CLARO;
     const colorVeloc = '#E07A1F';
+    // El vector se queda en el naranja de la leyenda, pero su ETIQUETA es texto de 10 px sobre
+    // el #FAFAFA de la caja: #E07A1F daba 2,89:1 en claro. El texto va en naranja oscuro
+    // (5,99:1); en oscuro, #E07A1F sobre #1A1A1A ya da 5,78:1.
+    const colorVelocTexto = isDark ? colorVeloc : '#9A4A0C';
 
     ctx.clearRect(0, 0, W, H);
 
@@ -406,7 +423,7 @@ export default function SimuladorFluidosBernoulliPage() {
       ctx.fill();
 
       // Etiqueta velocidad
-      ctx.fillStyle = colorVeloc;
+      ctx.fillStyle = colorVelocTexto;
       ctx.font = '10px system-ui';
       ctx.textAlign = 'center';
       ctx.fillText(`v=${fmt(d.v, 2)} m/s`, px, yc + aPx / 2 + 14);
@@ -511,7 +528,10 @@ export default function SimuladorFluidosBernoulliPage() {
           Bernoulli <strong>P + ½ρv² + ρgh = constante</strong> en un fluido ideal estacionario.
           {geom === 'venturi' && ' En la garganta del Venturi, la velocidad sube y la presión cae — efecto que se mide con un manómetro diferencial.'}
           {geom === 'desnivel' && ' Subir altura cuesta presión: parte del trabajo se transforma en energía potencial gravitatoria.'}
-          {geom === 'estenosis' && ' Una estenosis arterial reduce la luz, acelera la sangre y la presión local cae bruscamente. Útil para entender Doppler vascular.'}
+          {/* El aviso de escala va también AQUÍ, a la vista: hasta el 28/09/2026 solo estaba en
+              el bloque educativo, que nace plegado, mientras esta tarjeta decía «Útil para
+              entender Doppler vascular» sin más. */}
+          {geom === 'estenosis' && ' Una estenosis arterial reduce la luz, acelera la sangre y la presión local cae bruscamente: es el mecanismo que mide el Doppler vascular. La escala no es fisiológica (tubo de 10 cm y caudales de litros por segundo): sirve para ver el mecanismo, no para leer las cifras de un vaso real.'}
         </p>
 
         <div className={styles.controls}>
@@ -641,45 +661,57 @@ export default function SimuladorFluidosBernoulliPage() {
               Vector velocidad
             </span>
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} aria-hidden="true" style={{ background: '#A82E68' }} />
+              {/* Por clase: sigue al tema, igual que el manómetro que representa. */}
+              <span className={`${styles.legendDot} ${styles.puntoPresion}`} aria-hidden="true" />
               Manómetro (presión local)
             </span>
           </div>
         </div>
 
-        {/* TABLA SECCIONES */}
-        <table className={styles.seccionesTable}>
-          <thead>
-            <tr>
-              <th>Sección</th>
-              <th>Diámetro (cm)</th>
-              <th>Área (cm²)</th>
-              <th>v (m/s)</th>
-              <th>Presión</th>
-              <th>Altura (m)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {datos.map(d => (
-              <tr key={d.id}>
-                <td>{d.nombre}</td>
-                <td>{fmt(d.ancho * 100, 1)}</td>
-                <td>{fmt(d.A * 10000, 2)}</td>
-                <td>{fmt(d.v, 2)}</td>
-                <td>{fmtPresion(d.P)}</td>
-                <td>{fmt(d.altura, 2)}</td>
+        {/* TABLA SECCIONES — dentro de un contenedor que se desplaza en horizontal (hallazgo
+            2363): a 390 px la tabla mide ~500 px y html/body llevan overflow-x: hidden, así que
+            sin él «Presión» y «Altura (m)» quedaban cortadas y sin forma de llegar a ellas. Es
+            región con nombre y enfocable para que también se desplace con el teclado. */}
+        <div
+          className={styles.seccionesWrapper}
+          role="region"
+          aria-label="Tabla de secciones: diámetro, área, velocidad, presión y altura"
+          tabIndex={0}
+        >
+          <table className={styles.seccionesTable}>
+            <thead>
+              <tr>
+                <th>Sección</th>
+                <th>Diámetro (cm)</th>
+                <th>Área (cm²)</th>
+                <th>v (m/s)</th>
+                <th>Presión</th>
+                <th>Altura (m)</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {datos.map(d => (
+                <tr key={d.id}>
+                  <td>{d.nombre}</td>
+                  <td>{fmt(d.ancho * 100, 1)}</td>
+                  <td>{fmt(d.A * 10000, 2)}</td>
+                  <td>{fmt(d.v, 2)}</td>
+                  <td>{fmtPresion(d.P)}</td>
+                  <td>{fmt(d.altura, 2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {/* RESULTADOS */}
         <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           <div className={styles.resultCardOk}>
             <span className={styles.resultLabel}>Diferencia de presión P₂ − P₁ {datos.length > 1 && `(de ${datos[0].nombre} a ${datos[1].nombre})`}</span>
+            {/* El color va por clase y no en línea: en línea no había variante oscura, y el
+                magenta #A82E68 daba 1,69:1 sobre la tarjeta del tema oscuro (hallazgo 2364). */}
             <span
-              className={styles.resultValueLarge}
-              style={{ color: dP < 0 ? '#A82E68' : dP > 0 ? '#48A9A6' : 'var(--text-primary)' }}
+              className={`${styles.resultValueLarge} ${dP < 0 ? styles.valorCae : dP > 0 ? styles.valorSube : ''}`}
             >
               {dP < 0 ? '−' : dP > 0 ? '+' : ''}{fmtPresion(Math.abs(dP))}
             </span>
@@ -829,7 +861,7 @@ export default function SimuladorFluidosBernoulliPage() {
                 </tr>
                 <tr>
                   <td>Mercurio</td>
-                  <td>13534</td>
+                  <td>13.534</td>
                   <td>Líquido más denso a T ambiente</td>
                 </tr>
               </tbody>
@@ -933,7 +965,7 @@ export default function SimuladorFluidosBernoulliPage() {
               <div className={styles.stepNumber}>4</div>
               <div className={styles.stepContent}>
                 <strong>Convierte unidades de presión si te lo piden</strong>
-                <p>1 atm = 101325 Pa. 1 bar = 100000 Pa. 1 mmHg = 133,3 Pa. La presión arterial sistólica de 120 mmHg = 16000 Pa = 16 kPa. Usar SI durante el cálculo, convertir solo al final.</p>
+                <p>1 atm = 101.325 Pa. 1 bar = 100.000 Pa. 1 mmHg = 133,3 Pa. La presión arterial sistólica de 120 mmHg = 16.000 Pa = 16 kPa. Usar SI durante el cálculo, convertir solo al final.</p>
               </div>
             </div>
             <div className={styles.step}>
@@ -980,7 +1012,7 @@ export default function SimuladorFluidosBernoulliPage() {
           <ul className={styles.warningList}>
             <li><strong>Aplicar Bernoulli a fluidos viscosos sin más</strong> — Bernoulli ideal NO incluye pérdidas por fricción. Para aceite, miel, sangre por capilares o tuberías largas, hay que añadir el término de pérdidas (ecuación de Darcy-Weisbach o similar).</li>
             <li><strong>Olvidar el término ρgh cuando hay desnivel</strong> — Si las dos secciones están a distinta altura, hay que sumar ρg·Δh. Olvidar este término en una tubería en pendiente da resultados absurdos por factores enormes.</li>
-            <li><strong>Confundir presión absoluta con manométrica</strong> — La presión &quot;120 mmHg&quot; arterial es manométrica (sobre la atmosférica). En cálculos absolutos hay que sumar 101325 Pa. Las tuberías industriales suelen reportar presión manométrica (gauge).</li>
+            <li><strong>Confundir presión absoluta con manométrica</strong> — La presión &quot;120 mmHg&quot; arterial es manométrica (sobre la atmosférica). En cálculos absolutos hay que sumar 101.325 Pa. Las tuberías industriales suelen reportar presión manométrica (gauge).</li>
             <li><strong>Usar Bernoulli a través de una bomba o turbina</strong> — Esos elementos AÑADEN o EXTRAEN energía al fluido. Bernoulli puro no vale; hay que añadir el trabajo de la bomba (W_bomba/ρg) al lado correspondiente.</li>
             <li><strong>Olvidar la conservación del caudal</strong> — Q = A·v se conserva SIEMPRE en un tubo sin fugas, da igual la geometría. Si te sale que cambia, has cometido un error: vuelve y revisa los diámetros.</li>
           </ul>

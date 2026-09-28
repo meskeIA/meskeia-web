@@ -65,10 +65,15 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Por qué un avión vuela gracias a Bernoulli?',
+      // Hallazgo 2369 (28/09/2026): la respuesta anterior atribuía la mayor velocidad sobre el
+      // ala a que el aire «recorre más distancia» por la cara curvada, la teoría del tiempo de
+      // tránsito igual que la NASA da por errónea (Glenn Research Center, «Incorrect Lift
+      // Theory #1»: el aire de arriba llega ANTES al borde de salida). Ahora dice lo mismo que
+      // la FAQ visible de la página: Bernoulli es una parte y Newton la otra cara de la fuerza.
+      name: '¿Por qué vuela un avión? ¿Es solo por Bernoulli?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El perfil alar de un avión tiene la cara superior más curvada que la inferior, lo que obliga al aire a recorrer más distancia y a fluir más rápido por encima del ala. Según Bernoulli, a mayor velocidad, menor presión, por lo que la presión bajo el ala supera a la de encima y genera una fuerza neta hacia arriba llamada sustentación. En la práctica intervienen también la deflexión de aire hacia abajo (principio de acción-reacción) y la viscosidad, pero Bernoulli es la aproximación más intuitiva.',
+        text: 'Bernoulli es una parte de la explicación, no toda. El ala, por su forma y sobre todo por su ángulo de ataque, desvía el aire hacia abajo, y por la tercera ley de Newton el aire empuja el ala hacia arriba. Ese mismo flujo va más rápido sobre la cara superior que bajo la inferior, y Bernoulli relaciona esa mayor velocidad con una presión menor encima del ala: la diferencia de presión entre las dos caras es la sustentación, así que ambos enfoques describen la misma fuerza y se complementan. Por eso un avión puede volar invertido ajustando el ángulo de ataque, algo que una explicación basada solo en la curvatura del ala no justifica.',
       },
     },
     {

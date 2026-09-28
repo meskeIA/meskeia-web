@@ -282,11 +282,33 @@
   display: inline-block;
 }
 
-/* SECCIONES TABLE */
+/* El punto del manómetro sigue al tema, como el propio manómetro del canvas. */
+.puntoPresion {
+  background: #A82E68;
+}
+
+[data-theme='dark'] .puntoPresion {
+  background: #F08CB4;
+}
+
+/* SECCIONES TABLE
+   Va dentro de .seccionesWrapper, que se desplaza en horizontal (hallazgo 2363): a 390 px la
+   tabla no cabe en la tarjeta, y como html y body llevan overflow-x: hidden, sin su propio
+   contenedor desplazable las columnas «Presión» y «Altura (m)» quedaban cortadas. */
+.seccionesWrapper {
+  overflow-x: auto;
+  margin-bottom: var(--spacing-lg);
+  border-radius: var(--radius);
+}
+
+.seccionesWrapper:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .seccionesTable {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: var(--spacing-lg);
   background: var(--bg-primary);
   border-radius: var(--radius);
   overflow: hidden;
@@ -309,6 +331,22 @@
 .seccionesTable th:first-child,
 .seccionesTable td:first-child {
   text-align: left;
+}
+
+/* La cifra y su unidad («101,33 kPa») no se parten en dos líneas: el contenedor ya se desplaza. */
+.seccionesTable td {
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .seccionesTable {
+    font-size: 0.82rem;
+  }
+
+  .seccionesTable th,
+  .seccionesTable td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
 }
 
 .seccionesTable tbody tr:hover {
@@ -367,16 +405,40 @@
 .resultValueLarge {
   font-size: 1.6rem;
   font-weight: 800;
-  color: #48A9A6;
+  color: var(--text-primary);
   font-family: var(--font-mono, monospace);
   line-height: 1.1;
   margin: var(--spacing-xs) 0;
+}
+
+/* Color de la cifra de ΔP según su signo (hallazgo 2364). Iba en línea sin variante oscura:
+   el magenta #A82E68 daba 1,69:1 sobre la tarjeta teal del tema oscuro, rgb(49,64,63). Los dos
+   magentas son los COLOR_PRESION_* de page.tsx, los mismos del manómetro del canvas.
+   Medido sobre la tarjeta: claro #A82E68 5,99:1 · oscuro #F08CB4 4,73:1. La subida (hoy
+   inalcanzable: ΔP ≤ 0 en las tres geometrías) usaba #48A9A6, 2,60:1 en claro. */
+.valorCae {
+  color: #A82E68;
+}
+
+.valorSube {
+  color: var(--secondary-texto);
+}
+
+[data-theme='dark'] .valorCae {
+  color: #F08CB4;
 }
 
 .resultRange {
   font-size: 0.78rem;
   color: var(--text-muted);
   font-family: var(--font-mono, monospace);
+}
+
+/* La nota de la tarjeta de ΔP (hallazgo 2365): --text-muted está medido contra la tarjeta
+   gris, no contra el teal de .resultCardOk, y en oscuro se quedaba en 3,92:1. Con
+   --text-secondary: claro 5,34:1 · oscuro 5,02:1. */
+.resultCardOk .resultRange {
+  color: var(--text-secondary);
 }
 
 /* FORMULA BOX */
@@ -586,12 +648,16 @@
   margin: var(--spacing-lg) 0;
 }
 
+/* El naranja #E07A1F se queda en el borde; como TEXTO sobre la caja (naranja al 8 %) daba
+   2,56:1 en claro y 3,72:1 en oscuro (hallazgo 2366, .warningList li strong, 16 px en negrita,
+   que exige 4,5:1). El título de la caja, 17,6 px en negrita, tampoco llega a «grande» (18,66)
+   y tenía el mismo color. Medido en navegador: claro #9A4A0C 5,31:1 · oscuro #F5A05A 5,36:1. */
 .warningHeader {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
-  color: #E07A1F;
+  color: #9A4A0C;
   font-size: 1.1rem;
 }
 
@@ -611,7 +677,12 @@
 }
 
 .warningList li strong {
-  color: #E07A1F;
+  color: #9A4A0C;
+}
+
+[data-theme='dark'] .warningHeader,
+[data-theme='dark'] .warningList li strong {
+  color: #F5A05A;
 }
 
 [data-theme='dark'] .geomBtnActive {
@@ -988,10 +1059,6 @@
   margin: 0;
   color: var(--text-primary);
   font-size: 1.05rem;
-}
-
-[data-theme='dark'] .casosSection {
-  box-shadow: none;
 }
 
 [data-theme='dark'] .casoBoton {

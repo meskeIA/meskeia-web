@@ -208,6 +208,8 @@ async function poner(page: Page, etiqueta: string, valor: number): Promise<strin
  * El manómetro se traza en #A82E68 (rgb 168,46,104) en la columna x de la sección, con el
  * mapeo del propio componente: xPx = 24 + xn·(ancho − 48). Se empieza a mirar en y = 41 para
  * dejar fuera la etiqueta de texto, que va del mismo color justo encima de la columna.
+ * ⚠️ Solo en TEMA CLARO: desde el 28/09/2026 (hallazgo 2364) el tema oscuro lo pinta en
+ * #F08CB4, y este detector no lo vería. Los tests que lo usan no cambian de tema.
  */
 async function manometros(page: Page, xs: number[]): Promise<number[]> {
   return page.evaluate((xn: number[]) => {
@@ -950,7 +952,9 @@ test.describe('simulador-fluidos-bernoulli · la sección de casos en el navegad
  *         Olvidar el cuadrado del diámetro (v₂ = 2·v₁): v₁ = √(2·7500/(1000·3)) = 2,2361 →
  *         Q = 17,56 L/s, que debe suspender.
  *
- * HALLAZGOS ABIERTOS de esta inspección: los `test.fail()` del final.
+ * HALLAZGOS de esta inspección (2363-2369): nacieron como `test.fail()` «ABIERTO» y se
+ * REPARARON el 28/09/2026 (el 2367, en la raíz: globals.css). Los tests del final afirman ya
+ * lo correcto, en los dos temas donde el acta miraba uno solo.
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 import { esperarValorEnReact } from './_hidratacion';
@@ -1118,84 +1122,121 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula', 
     expect(cuerpo).toContain('La escala de esta geometría no es fisiológica.');
   });
 
-  // ── HALLAZGOS ABIERTOS ──────────────────────────────────────────────────────────────────
+  // ── HALLAZGOS 2363-2369 — REPARADOS (28/09/2026) ──────────────────────────────────────────
+  // Los siete nacieron como `test.fail()` «ABIERTO». La reparación les quitó la marca y, donde
+  // el acta solo miraba un tema o un elemento, amplió la aserción al otro tema y a los
+  // elementos hermanos con el mismo defecto (título de la caja de avisos, etiquetas del canvas).
 
-  test('HALLAZGO · las cuatro cajas con --radius-large y --shadow-md tienen radio y sombra', async ({
+  test('HALLAZGO 2367 · las cuatro cajas con --radius-large y --shadow-md tienen radio y sombra', async ({
     page,
   }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): SimuladorFluidosBernoulli.module.css usa
-    // `var(--radius-large)` (4 veces) y `var(--shadow-md)` (2) sin valor de reserva, y NINGUNA de
-    // las dos existe en globals.css (que define --radius y --shadow-medium) ni en el módulo. Una
-    // var() sin definir y sin reserva invalida la declaración entera: el hero, los tres botones
-    // de geometría, la tarjeta principal y la sección de casos salen con esquinas a 0 px, y la
-    // tarjeta principal (#FFFFFF sobre la página #FAFAFA, sin borde) pierde además la sombra
-    // que la separaba del fondo. Caso: carga en claro → esperado border-radius > 0 y box-shadow
-    // distinto de «none» · obtenido «0px» y «none» en las cuatro cajas (getComputedStyle).
-    const medidas = await page.evaluate(() =>
-      [
-        'header[class*="hero"]',
-        'button[class*="geomBtn"]',
-        'div[class*="mainContent"]',
-        'section[class*="casosSection"]',
-      ].map((s) => {
-        const cs = getComputedStyle(document.querySelector(s) as HTMLElement);
-        return { s, radio: parseFloat(cs.borderTopLeftRadius), sombra: cs.boxShadow };
-      }),
-    );
-    for (const m of medidas) expect(m.radio, `${m.s}: border-radius`).toBeGreaterThan(0);
-    expect(medidas[2].sombra, 'mainContent: box-shadow').not.toBe('none');
-    expect(medidas[3].sombra, 'casosSection: box-shadow').not.toBe('none');
+    // REPARADO (28/09/2026), en la raíz: SimuladorFluidosBernoulli.module.css usa
+    // `var(--radius-large)` (4 veces) y `var(--shadow-md)` (2) sin valor de reserva, y NINGUNA
+    // de las dos existía en globals.css (que define --radius y --shadow-medium): una var() sin
+    // definir anula la declaración entera, y el hero, los tres botones de geometría, la tarjeta
+    // principal y la sección de casos salían con esquinas a 0 px y sin sombra. globals.css
+    // declara ahora --radius-large: 16px y --shadow-sm/md/lg como alias de las existentes, que
+    // heredan su variante oscura (commit d608b1ac; 115 módulos usaban esas variables).
+    // En la app se retiró además `[data-theme='dark'] .casosSection { box-shadow: none }`,
+    // escrito cuando la sombra no existía: la sección de casos se comporta ya como la tarjeta
+    // principal en los dos temas. Caso: carga en claro y en oscuro → border-radius > 0 en las
+    // cuatro cajas y box-shadow distinto de «none» en mainContent y casosSection.
+    const medir = () =>
+      page.evaluate(() =>
+        [
+          'header[class*="hero"]',
+          'button[class*="geomBtn"]',
+          'div[class*="mainContent"]',
+          'section[class*="casosSection"]',
+        ].map((s) => {
+          const cs = getComputedStyle(document.querySelector(s) as HTMLElement);
+          return { s, radio: parseFloat(cs.borderTopLeftRadius), sombra: cs.boxShadow };
+        }),
+      );
+    for (const tema of ['claro', 'oscuro'] as const) {
+      if (tema === 'oscuro') {
+        await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      }
+      const medidas = await medir();
+      for (const m of medidas) expect(m.radio, `${tema} · ${m.s}: border-radius`).toBeGreaterThan(0);
+      expect(medidas[2].sombra, `${tema} · mainContent: box-shadow`).not.toBe('none');
+      expect(medidas[3].sombra, `${tema} · casosSection: box-shadow`).not.toBe('none');
+    }
   });
 
-  test('HALLAZGO · en oscuro, la cifra grande de ΔP se lee (≥ 3:1, texto grande)', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): el color de la cifra de ΔP va en línea
-    // (`#A82E68` cuando cae), sin variante oscura. Sobre la tarjeta teal al 15 % del tema oscuro
-    // —rgb(49,64,63)— da 1,69:1, y es texto grande (25,6 px, peso 800), que exige 3:1. Es la
-    // cifra que la app destaca en grande y la que sale siempre: en las tres geometrías ΔP ≤ 0.
-    // Caso: tema oscuro, valores de fábrica → esperado «−486 Pa» a ≥ 3:1 · obtenido 1,69:1.
+  test('HALLAZGO 2364 · en oscuro, la cifra grande de ΔP y las etiquetas del manómetro se leen', async ({
+    page,
+  }) => {
+    // REPARADO (28/09/2026): el magenta de las presiones (#A82E68) no tenía variante oscura.
+    //   · La cifra de ΔP lo llevaba EN LÍNEA: sobre la tarjeta teal al 15 % del tema oscuro
+    //     —rgb(49,64,63)— daba 1,69:1, y es texto grande (25,6 px, peso 800), que exige 3:1. Es
+    //     la cifra que la app destaca y la que sale siempre (ΔP ≤ 0 en las tres geometrías).
+    //     Ahora va por clase (.valorCae): #A82E68 en claro (5,99:1) y #F08CB4 en oscuro (4,73:1).
+    //   · Las etiquetas «101,33 kPa» del canvas (11 px en negrita) salían fijas en #A82E68 sobre
+    //     el #1A1A1A de .canvasWrapper: 2,70:1, cuando son texto pequeño y exigen 4,5:1. El
+    //     dibujo lee ahora el tema en cada fotograma: #F08CB4 en oscuro (7,55:1).
+    // Caso: tema oscuro, valores de fábrica → «−486 Pa» a ≥ 3:1 y etiquetas del canvas a ≥ 4,5:1;
+    // y al volver al claro, las etiquetas vuelven al magenta de siempre (redibuja con el tema).
     await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await page.waitForTimeout(400);
     expect((await panel(page))[0][1]).toBe('−486 Pa');
     expect(await contrasteDe(page, 'span[class*="resultValueLarge"]')).toBeGreaterThanOrEqual(3);
+
+    const oscuro = await etiquetasPresionCanvas(page);
+    expect(oscuro.color, 'color de las etiquetas en oscuro').toEqual([240, 140, 180]);
+    expect(contrasteRgb(oscuro.color, oscuro.fondo), 'etiquetas del canvas en oscuro').toBeGreaterThanOrEqual(4.5);
+
+    await page.getByRole('button', { name: 'Cambiar a modo claro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await page.waitForTimeout(400);
+    const claro = await etiquetasPresionCanvas(page);
+    expect(claro.color, 'color de las etiquetas en claro').toEqual([168, 46, 104]);
+    expect(contrasteRgb(claro.color, claro.fondo), 'etiquetas del canvas en claro').toBeGreaterThanOrEqual(4.5);
+    expect(await contrasteDe(page, 'span[class*="resultValueLarge"]')).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO · en oscuro, la nota de la tarjeta de ΔP se lee (≥ 4,5:1)', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026), misma tarjeta: la nota («La presión CAE en el
-    // estrechamiento…», y con desnivel la de ρ·g·(h₂ − h₁) del 23/09) usa --text-muted, que en
-    // oscuro (#9B9B9B) está medido contra la tarjeta gris, no contra el teal al 15 %: 3,92:1
-    // a 12,5 px, que exige 4,5:1. En claro da 4,74 y pasa. Caso: tema oscuro, valores de fábrica
-    // → esperado ≥ 4,5:1 · obtenido 3,92:1.
+  test('HALLAZGO 2365 · la nota de la tarjeta de ΔP se lee en los dos temas (≥ 4,5:1)', async ({ page }) => {
+    // REPARADO (28/09/2026), misma tarjeta: la nota («La presión CAE en el estrechamiento…», y
+    // con desnivel la de ρ·g·(h₂ − h₁) del 23/09) usaba --text-muted, que en oscuro (#9B9B9B)
+    // está medido contra la tarjeta gris, no contra el teal al 15 %: 3,92:1 a 12,5 px, que
+    // exige 4,5:1. Ahora usa --text-secondary dentro de .resultCardOk: claro 5,34:1 · oscuro
+    // 5,02:1. Caso: valores de fábrica en claro y en oscuro → ≥ 4,5:1 en los dos.
+    const nota = 'div[class*="resultCardOk"] span[class*="resultRange"]';
+    expect(await contrasteDe(page, nota), 'claro').toBeGreaterThanOrEqual(4.5);
     await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await page.waitForTimeout(400);
-    expect(
-      await contrasteDe(page, 'div[class*="resultCardOk"] span[class*="resultRange"]'),
-    ).toBeGreaterThanOrEqual(4.5);
+    expect(await contrasteDe(page, nota), 'oscuro').toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO · los encabezados de «5 errores frecuentes» se leen (≥ 4,5:1)', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): `.warningList li strong` pinta el título de cada
-    // error en #E07A1F sobre el naranja al 8 % de la caja de avisos. Es texto de 16 px en
-    // negrita —no llega a «grande», que en negrita empieza en 18,66 px— y exige 4,5:1.
-    // Caso: bloque educativo en claro → esperado ≥ 4,5:1 · obtenido 2,56:1 (en oscuro, 3,72:1).
-    expect(await contrasteDe(page, 'ul[class*="warningList"] li strong')).toBeGreaterThanOrEqual(4.5);
-  });
-
-  test('HALLAZGO · las cifras de cinco o más dígitos del bloque educativo van agrupadas', async ({
+  test('HALLAZGO 2366 · los títulos de «5 errores frecuentes» se leen en los dos temas (≥ 4,5:1)', async ({
     page,
   }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): el formato español agrupa con punto desde las
-    // cinco cifras (CLAUDE.md §2: con cuatro no se agrupa, y por eso «1000» está bien). El
-    // bloque educativo escribe a mano «13534» (mercurio), «1 atm = 101325 Pa», «1 bar =
-    // 100000 Pa», «120 mmHg = 16000 Pa» y «hay que sumar 101325 Pa», mientras el botón de la
-    // misma página dice «101,325 kPa» y los casos «101.325 Pa». Caso: texto de la página →
-    // esperado «13.534», «101.325», «100.000», «16.000» · obtenido las cinco cifras sin punto.
+    // REPARADO (28/09/2026): `.warningList li strong` pintaba el título de cada error en
+    // #E07A1F sobre el naranja al 8 % de la caja de avisos: 2,56:1 en claro y 3,72:1 en oscuro.
+    // Es texto de 16 px en negrita —no llega a «grande», que en negrita empieza en 18,66 px— y
+    // exige 4,5:1. El título de la caja («5 errores frecuentes con Bernoulli», 17,6 px en
+    // negrita) tenía el mismo color y el mismo defecto: se repara y se mide con él. El naranja
+    // se queda en el borde; el texto va en #9A4A0C en claro (5,31:1) y #F5A05A en oscuro (5,36:1).
+    const selectores = ['ul[class*="warningList"] li strong', 'div[class*="warningHeader"] strong'];
+    for (const s of selectores) expect(await contrasteDe(page, s), `claro · ${s}`).toBeGreaterThanOrEqual(4.5);
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await page.waitForTimeout(400);
+    for (const s of selectores) expect(await contrasteDe(page, s), `oscuro · ${s}`).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('HALLAZGO 2368 · las cifras de cinco o más dígitos del bloque educativo van agrupadas', async ({
+    page,
+  }) => {
+    // REPARADO (28/09/2026): el formato español agrupa con punto desde las cinco cifras
+    // (CLAUDE.md §2: con cuatro no se agrupa, y por eso «1000» está bien). El bloque educativo
+    // escribía a mano «13534» (mercurio), «1 atm = 101325 Pa», «1 bar = 100000 Pa», «120 mmHg
+    // = 16000 Pa» y «hay que sumar 101325 Pa», mientras el botón de la misma página dice
+    // «101,325 kPa» y los casos «101.325 Pa». Caso: texto de la página → ninguna cifra de cinco
+    // o más dígitos sin punto, y las cinco escritas como manda el formato.
     const sinAgrupar = await page.evaluate(() => {
       const fuera: string[] = [];
       const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -1207,19 +1248,31 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula', 
       return fuera;
     });
     expect(sinAgrupar).toEqual([]);
+    const cuerpo = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
+    for (const cifra of [
+      '13.534',
+      '1 atm = 101.325 Pa',
+      '1 bar = 100.000 Pa',
+      '120 mmHg = 16.000 Pa',
+      'hay que sumar 101.325 Pa',
+    ]) {
+      expect(cuerpo).toContain(cifra);
+    }
   });
 
-  test('HALLAZGO · la FAQ del JSON-LD no explica la sustentación por el «mayor recorrido»', async ({
+  test('HALLAZGO 2369 · la FAQ del JSON-LD no explica la sustentación por el «mayor recorrido»', async ({
     page,
   }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): la respuesta del FAQPage «¿Por qué un avión vuela
-    // gracias a Bernoulli?» dice que la curvatura «obliga al aire a recorrer más distancia y a
-    // fluir más rápido por encima del ala». Es la teoría del mayor recorrido / tiempo de
-    // tránsito igual, que la NASA (Glenn Research Center, «Incorrect Lift Theory #1») da por
-    // errónea: el aire de arriba llega ANTES al borde de salida, no a la vez. La FAQ visible de
-    // la página lo matiza bien; el JSON-LD es lo que leen los asistentes de IA. Caso: HTML
-    // servido → esperado sin «recorrer más distancia» · obtenido la frase literal.
+    // REPARADO (28/09/2026): la respuesta del FAQPage «¿Por qué un avión vuela gracias a
+    // Bernoulli?» decía que la curvatura «obliga al aire a recorrer más distancia y a fluir más
+    // rápido por encima del ala». Es la teoría del mayor recorrido / tiempo de tránsito igual,
+    // que la NASA (Glenn Research Center, «Incorrect Lift Theory #1») da por errónea: el aire de
+    // arriba llega ANTES al borde de salida, no a la vez. La FAQ visible de la página lo matiza
+    // bien; el JSON-LD es lo que leen los asistentes de IA. Ahora la pregunta es «¿Por qué vuela
+    // un avión? ¿Es solo por Bernoulli?» y la respuesta dice lo mismo que la FAQ visible:
+    // Bernoulli es una parte, la desviación del aire (Newton) la otra cara de la misma fuerza, y
+    // por eso un avión vuela invertido. Caso: HTML servido → sin atribuir la velocidad a un
+    // recorrido más largo, y con Newton y el ángulo de ataque en la respuesta.
     const faq = await page.evaluate(() =>
       Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
         .map((s) => s.textContent ?? '')
@@ -1227,9 +1280,103 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula', 
         .join(' '),
     );
     expect(faq).toContain('FAQPage');
-    expect(faq).not.toContain('recorrer más distancia');
+    expect(faq).not.toMatch(/recorrer más distancia|más distancia|camino más largo|recorrido más largo/i);
+    const datos = JSON.parse(faq) as {
+      mainEntity: { name: string; acceptedAnswer: { text: string } }[];
+    };
+    const avion = datos.mainEntity.find((q) => /avión/i.test(q.name));
+    expect(avion, 'la pregunta del avión sigue en el FAQPage').toBeDefined();
+    expect(avion!.acceptedAnswer.text).toContain('Newton');
+    expect(avion!.acceptedAnswer.text).toContain('ángulo de ataque');
+    expect(avion!.acceptedAnswer.text).not.toMatch(/recorr/i);
+  });
+
+  // ── SOSPECHAS del acta, confirmadas con su caso y REPARADAS (28/09/2026) ─────────────────
+
+  test('SOSPECHA · caso 10: la cuenta hecha con la tabla de la app se acepta', async ({ page }) => {
+    // Confirmada: con la tabla (velocidades a dos decimales, 0,13 y 0,80 m/s) el cociente da
+    // 0,80/0,13 = 6,15, a 0,10 de 6,25 con una tolerancia de 0,0625 → «No es correcto»: la app
+    // suspendía una cuenta hecha con las cifras que ella misma imprime. Reparada en el
+    // enunciado, que pide ahora las ÁREAS (su columna de la tabla da 78,54/12,57 = 6,248) y
+    // advierte de que las velocidades van redondeadas. La respuesta sigue siendo 6,25.
+    await seccionCasos(page).getByRole('button', { name: /^Caso 10:/ }).click();
+    await expect(seccionCasos(page)).toContainText('Resuélvelo con las áreas');
+    await seccionCasos(page).getByRole('button', { name: /Cargar en el simulador/ }).click();
+    const filas = await tabla(page);
+    expect([filas[0][3], filas[1][3]]).toEqual(['0,13', '0,80']);
+    // A mano: 78,54 / 12,57 = 6,2482 → «6,25», a 0,0018 del valor (tolerancia 0,0625).
+    expect([filas[0][2], filas[1][2]]).toEqual(['78,54', '12,57']);
+    expect(await responder(page, '6,25')).toContain('Correcto');
+    // Y la cuenta del acta, con las velocidades redondeadas de la misma tabla, sigue fuera:
+    // por eso el enunciado dice ahora que no se usen.
+    expect(await responder(page, '6,15')).not.toContain('Correcto');
+  });
+
+  test('SOSPECHA · las soluciones escriben el menos como la tabla («−», no «-»)', async () => {
+    // Confirmada: la solución del caso 8 decía «-29.430 Pa … -29,43 kPa» y la del 4 «-486 Pa»
+    // mientras la tabla y la tarjeta de ΔP escriben «−». Reparada en `casos.ts` (conMenos).
+    const conGuion = /(^|[\s(=:])-\d/;
+    for (const caso of CASOS_AULA) {
+      expect(caso.respuestaTexto, `caso ${caso.id}`).not.toMatch(conGuion);
+      for (const paso of caso.pasos) expect(paso, `caso ${caso.id}`).not.toMatch(conGuion);
+    }
+    expect(CASOS_AULA.find((c) => c.id === 8)!.respuestaTexto).toBe('−29,43 kPa');
+    expect(CASOS_AULA.find((c) => c.id === 4)!.respuestaTexto).toBe('−486 Pa');
+  });
+
+  test('SOSPECHA · el aviso de escala de la estenosis también se ve fuera del bloque plegado', async ({
+    page,
+  }) => {
+    // Confirmada: el aviso «La escala de esta geometría no es fisiológica» solo vivía dentro de
+    // <EducationalSection>, que nace plegado, mientras la tarjeta visible de la geometría decía
+    // «Útil para entender Doppler vascular». Ahora la tarjeta lo dice también.
+    await page.getByRole('button', { name: /Vena con estenosis/ }).click();
+    const tarjeta = page.locator('p[class*="descriptionCard"]');
+    await expect(tarjeta).toContainText('La escala no es fisiológica');
+    await expect(tarjeta).toBeVisible();
   });
 });
+
+/**
+ * Color dominante de las etiquetas de presión del canvas y el fondo sobre el que se leen.
+ *
+ * Las etiquetas «101,33 kPa» se escriben con la línea base en y = pad.top − 4 = 36 px, así que
+ * ocupan la franja y ∈ [24, 37): ahí no hay otra cosa dibujada (la columna del manómetro empieza
+ * en y = 44). Se cuentan solo los píxeles OPACOS, para no mezclar el suavizado de los bordes.
+ * El canvas es transparente: el fondo real es el de .canvasWrapper.
+ */
+async function etiquetasPresionCanvas(page: Page): Promise<{ color: number[]; fondo: number[] }> {
+  return page.evaluate(() => {
+    const c = document.querySelector('canvas') as HTMLCanvasElement;
+    const dpr = c.width / c.getBoundingClientRect().width;
+    const img = c.getContext('2d')!.getImageData(0, 0, c.width, c.height);
+    const cuenta = new Map<string, number>();
+    for (let y = Math.round(24 * dpr); y < Math.round(37 * dpr); y++) {
+      for (let x = 0; x < c.width; x++) {
+        const i = (y * c.width + x) * 4;
+        if (img.data[i + 3] < 250) continue;
+        const k = `${img.data[i]},${img.data[i + 1]},${img.data[i + 2]}`;
+        cuenta.set(k, (cuenta.get(k) ?? 0) + 1);
+      }
+    }
+    const [dominante] = [...cuenta.entries()].sort((a, b) => b[1] - a[1])[0] ?? ['0,0,0'];
+    const fondo = getComputedStyle(c.parentElement as HTMLElement).backgroundColor.match(/\d+/g)!.map(Number);
+    return { color: dominante.split(',').map(Number), fondo: fondo.slice(0, 3) };
+  });
+}
+
+/** Contraste WCAG entre dos colores opacos [r, g, b]. */
+function contrasteRgb(a: number[], b: number[]): number {
+  const lum = (c: number[]) => {
+    const f = (v: number) => {
+      const x = v / 255;
+      return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+    };
+    return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+  };
+  const [x, y] = [lum(a), lum(b)];
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
 
 test.describe('Inspector 28/09/2026 — móvil de 390 px', () => {
   test.use({
@@ -1253,17 +1400,18 @@ test.describe('Inspector 28/09/2026 — móvil de 390 px', () => {
     expect(derechaV).toBeLessThanOrEqual(ancho);
   });
 
-  test('HALLAZGO · las columnas Presión y Altura de la tabla se pueden ver en el móvil', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): la tabla de secciones no va envuelta en un
-    // contenedor con desplazamiento (la tabla educativa sí, `.tablaWrapper`) y mide 501 px
-    // dentro de una tarjeta de 278. html y body llevan overflow-x: hidden, así que el
-    // sobrante no se puede desplazar: se corta. A 390 px la columna «Presión» empieza justo en
-    // x = 390 y «Altura (m)» acaba en 557, fuera de la pantalla y sin forma de llegar a ellas.
-    // Son las presiones absolutas por sección —las que los casos 5, 8 y 9 mandan comparar con
-    // la TABLA— y la altura de la geometría con desnivel. Caso: 390 px, valores de fábrica →
-    // esperado las seis columnas visibles o desplazables · obtenido th «Presión» en
-    // [390, 477] y «Altura (m)» en [477, 557] con innerWidth = 390 y ningún ancestro desplazable.
+  test('HALLAZGO 2363 · las columnas Presión y Altura de la tabla se pueden ver en el móvil', async ({ page }) => {
+    // REPARADO (28/09/2026): la tabla de secciones no iba envuelta en un contenedor con
+    // desplazamiento (la tabla educativa sí, `.tablaWrapper`) y medía 501 px dentro de una
+    // tarjeta de 278. html y body llevan overflow-x: hidden, así que el sobrante no se podía
+    // desplazar: se cortaba. A 390 px «Presión» empezaba justo en x = 390 y «Altura (m)» acababa
+    // en 557, fuera de la pantalla y sin forma de llegar a ellas. Son las presiones absolutas por
+    // sección —las que los casos 5, 8 y 9 mandan comparar con la TABLA— y la altura de la
+    // geometría con desnivel. Ahora va dentro de .seccionesWrapper (overflow-x: auto), que es
+    // región con nombre y enfocable para desplazarla también con el teclado, y en móvil las
+    // celdas llevan menos relleno (la tabla pasa a ~400 px y asoma «101…» de la columna Presión).
+    // Caso: 390 px, valores de fábrica → hay un ancestro desplazable y, al llevarlo hasta el
+    // final con las flechas del teclado, «Presión» y «Altura (m)» quedan enteras a la vista.
     const r = await page.evaluate(() => {
       const ths = Array.from(document.querySelectorAll('table[class*="seccionesTable"] th')) as HTMLElement[];
       let desplazable = false;
@@ -1281,5 +1429,29 @@ test.describe('Inspector 28/09/2026 — móvil de 390 px', () => {
     });
     const fuera = r.derechas.filter(([, der]) => der > r.ancho);
     expect(r.desplazable || fuera.length === 0, `fuera de pantalla: ${JSON.stringify(fuera)}`).toBe(true);
+
+    // Accesible por teclado: región con nombre, en el orden de tabulación.
+    const region = page.getByRole('region', { name: /Tabla de secciones/ });
+    await expect(region).toHaveAttribute('tabindex', '0');
+    await region.focus();
+    for (let i = 0; i < 15; i++) await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(200);
+    const visibles = await page.evaluate(() => {
+      const w = document.querySelector('div[class*="seccionesWrapper"]') as HTMLElement;
+      const caja = w.getBoundingClientRect();
+      return Array.from(w.querySelectorAll('th'))
+        .filter((th) => ['Presión', 'Altura (m)'].includes(th.textContent?.trim() ?? ''))
+        .map((th) => {
+          const b = th.getBoundingClientRect();
+          return {
+            th: th.textContent?.trim(),
+            dentro: b.left >= caja.left - 1 && b.right <= caja.right + 1 && b.right <= window.innerWidth,
+          };
+        });
+    });
+    expect(visibles).toEqual([
+      { th: 'Presión', dentro: true },
+      { th: 'Altura (m)', dentro: true },
+    ]);
   });
 });
