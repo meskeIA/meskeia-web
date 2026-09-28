@@ -41,8 +41,8 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     'Simulación Monte Carlo en directo de la distribución de la media muestral',
-    '5 distribuciones poblacionales (uniforme, exponencial, Bernoulli p=0.5, Bernoulli p=0.9, bimodal)',
-    'Tamaño muestral n configurable (1, 2, 5, 10, 30, 100)',
+    '5 distribuciones poblacionales (uniforme, exponencial, Bernoulli p = 0,5, Bernoulli p = 0,9, bimodal)',
+    'Tamaño muestral n configurable (1, 2, 4, 5, 10, 25, 30 y 100)',
     'Comparación con la N(μ, σ/√n) teórica superpuesta',
     'Estadísticos empíricos: media, desviación, asimetría y curtosis',
     'Visualiza la velocidad de convergencia según la asimetría original',

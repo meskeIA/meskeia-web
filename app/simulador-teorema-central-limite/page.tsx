@@ -6,6 +6,7 @@ import styles from './SimuladorTeoremaCentralLimite.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import CasosAula from './CasosAula';
+import { construirHistograma, type Reticula } from './histograma';
 // μ y σ de cada población NO se escriben aquí: vienen de `./casos.ts`, que es también donde se
 // corrigen los casos para clase. Una sola fuente, de modo que el panel de este simulador y la
 // corrección del alumno no puedan divergir ([[feedback_motor_calculo_aparte_y_probado]]).
@@ -32,6 +33,12 @@ interface DistribucionDef {
   // PDF/PMF teórica para dibujar la población (densidad o probabilidad)
   // Devuelve altura relativa para visualizar; para discretas se discretizan los bins
   esDiscreta: boolean;
+  /**
+   * Valores posibles de una población discreta (origen + j·paso). Con ella, las medias de n
+   * valores viven en la retícula de paso paso/n y el histograma les da una casilla a cada uno
+   * (hallazgo 2370: ver `./histograma.ts`). null en las continuas.
+   */
+  reticula: Reticula | null;
   pdfTeorica: (x: number) => number;
 }
 
@@ -88,6 +95,7 @@ const DISTRIBUCIONES: Record<DistId, DistribucionDef> = {
     xMax: 11,
     sample: sampleUniforme,
     esDiscreta: false,
+    reticula: null,
     pdfTeorica: (x) => (x >= 0 && x <= 10 ? 1 / 10 : 0),
   },
   exponencial: {
@@ -102,6 +110,7 @@ const DISTRIBUCIONES: Record<DistId, DistribucionDef> = {
     xMax: 6,
     sample: sampleExponencial,
     esDiscreta: false,
+    reticula: null,
     pdfTeorica: (x) => (x >= 0 ? Math.exp(-x) : 0),
   },
   bernoulli_05: {
@@ -116,6 +125,7 @@ const DISTRIBUCIONES: Record<DistId, DistribucionDef> = {
     xMax: 1.3,
     sample: () => sampleBernoulli(0.5),
     esDiscreta: true,
+    reticula: { origen: 0, paso: 1 },
     pdfTeorica: (x) => {
       // Devolver "altura" para los bins centrados en 0 y 1
       if (Math.abs(x - 0) < 0.05) return 0.5;
@@ -135,6 +145,7 @@ const DISTRIBUCIONES: Record<DistId, DistribucionDef> = {
     xMax: 1.3,
     sample: () => sampleBernoulli(0.9),
     esDiscreta: true,
+    reticula: { origen: 0, paso: 1 },
     pdfTeorica: (x) => {
       if (Math.abs(x - 0) < 0.05) return 0.1;
       if (Math.abs(x - 1) < 0.05) return 0.9;
@@ -153,6 +164,7 @@ const DISTRIBUCIONES: Record<DistId, DistribucionDef> = {
     xMax: 5,
     sample: sampleBimodal,
     esDiscreta: false,
+    reticula: null,
     pdfTeorica: (x) => {
       const sigma = 0.6;
       const norm = (mu: number, s: number) => (1 / (s * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mu) / s, 2));
@@ -228,6 +240,7 @@ export default function SimuladorTeoremaCentralLimitePage() {
 
   const canvasPobRef = useRef<HTMLCanvasElement>(null);
   const canvasMedRef = useRef<HTMLCanvasElement>(null);
+  const histogramaRef = useRef<HTMLDivElement>(null);
   const animacionRef = useRef<number | null>(null);
 
   const dist = DISTRIBUCIONES[distId];
@@ -255,6 +268,16 @@ export default function SimuladorTeoremaCentralLimitePage() {
     if (animando) return;
     setMedias([]);
     setAnimando(true);
+
+    // Hallazgo 2373 (28/09/2026): el histograma empieza ~350 px por debajo del botón, y en las
+    // pantallas de escritorio habituales —y en el móvil— quien pulsaba «Lanzar simulación»
+    // solo veía el rótulo cambiar: el resultado se pintaba fuera de la ventana. Se lleva a la
+    // vista con `block: 'nearest'`, que no mueve nada si ya se ve entero. Con movimiento
+    // reducido, sin animación: un `behavior: 'smooth'` explícito ganaría a la regla de
+    // globals.css. El final se anuncia en la región viva de debajo del panel.
+    const reducirMovimiento =
+      typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    histogramaRef.current?.scrollIntoView({ behavior: reducirMovimiento ? 'auto' : 'smooth', block: 'nearest' });
 
     const FRAMES = 40;
     const chunkSize = Math.max(1, Math.floor(numMuestras / FRAMES));
@@ -462,24 +485,15 @@ export default function SimuladorTeoremaCentralLimitePage() {
     const xMin = n === 1 ? dist.xMin : dist.mu - Math.max(4 * sigmaTeorico, 0.2);
     const xMax = n === 1 ? dist.xMax : dist.mu + Math.max(4 * sigmaTeorico, 0.2);
 
-    // Construir histograma
-    const NUM_BINS = 40;
-    const binWidth = (xMax - xMin) / NUM_BINS;
-    const counts = new Array(NUM_BINS).fill(0);
-    let totalEnRango = 0;
-    for (const m of medias) {
-      if (m < xMin || m > xMax) continue;
-      const idx = Math.min(NUM_BINS - 1, Math.max(0, Math.floor((m - xMin) / binWidth)));
-      counts[idx]++;
-      totalEnRango++;
-    }
-
-    // Convertir a densidad: count / (totalTotal * binWidth) para que área = fracción dentro del rango ≈ 1
-    const totalAll = medias.length || 1;
-    const densidad = counts.map((c) => c / (totalAll * binWidth));
+    // Construir histograma. En las poblaciones discretas cada valor posible k/n tiene su
+    // casilla, de ancho 1/n, y la densidad se divide por ese ancho: con 40 casillas iguales,
+    // más estrechas que el paso, salían púas de 3 a 5 veces la altura de la normal
+    // (hallazgo 2370). La densidad es recuento / (total · ancho): el área es la fracción de
+    // medias dentro del eje, ≈ 1.
+    const histograma = construirHistograma(medias, xMin, xMax, n, dist.reticula);
 
     // y máximo: la densidad máxima del histograma o de la normal teórica
-    let yMaxLocal = Math.max(...densidad, 0.01);
+    let yMaxLocal = Math.max(...histograma.casillas.map((c) => c.densidad), 0.01);
     if (superponerNormal && sigmaTeorico > 0) {
       const pdfPico = pdfNormal(dist.mu, dist.mu, sigmaTeorico);
       yMaxLocal = Math.max(yMaxLocal, pdfPico);
@@ -514,21 +528,22 @@ export default function SimuladorTeoremaCentralLimitePage() {
     }
 
     // Histograma
-    for (let i = 0; i < NUM_BINS; i++) {
-      const x0 = xMin + i * binWidth;
-      const x1 = x0 + binWidth;
-      const altura = densidad[i];
+    for (const casilla of histograma.casillas) {
+      const altura = casilla.densidad;
       if (altura <= 0) continue;
-      const px0 = xToPx(x0);
-      const px1 = xToPx(x1);
+      const px0 = xToPx(casilla.x0);
+      const px1 = xToPx(casilla.x1);
       const py = yToPx(altura);
+      // Al menos 1 px: la barra de un valor que cae justo en el borde del eje se recorta a la
+      // mitad, y con n = 100 en el móvil esa mitad ronda los 4 px.
+      const anchoPx = Math.max(1, px1 - px0 - 1);
       ctx.fillStyle = colorBar;
       ctx.globalAlpha = 0.7;
-      ctx.fillRect(px0 + 1, py, px1 - px0 - 1, pad.top + plotH - py);
+      ctx.fillRect(px0 + 1, py, anchoPx, pad.top + plotH - py);
       ctx.globalAlpha = 1;
       ctx.strokeStyle = colorBarBorder;
       ctx.lineWidth = 0.8;
-      ctx.strokeRect(px0 + 1, py, px1 - px0 - 1, pad.top + plotH - py);
+      ctx.strokeRect(px0 + 1, py, anchoPx, pad.top + plotH - py);
     }
 
     // Curva normal teórica superpuesta
@@ -574,12 +589,16 @@ export default function SimuladorTeoremaCentralLimitePage() {
     }
 
     // Excluidos del rango
-    const fueraDeRango = medias.length - totalEnRango;
+    const fueraDeRango = histograma.fueraDeRango;
     if (fueraDeRango > 0) {
       ctx.fillStyle = colorText;
       ctx.font = '10px system-ui';
       ctx.textAlign = 'right';
-      ctx.fillText(`(${fueraDeRango} medias fuera del rango visible)`, W - pad.right, pad.top + 12);
+      ctx.fillText(
+        `(${fueraDeRango} ${fueraDeRango === 1 ? 'media' : 'medias'} fuera del rango visible)`,
+        W - pad.right,
+        pad.top + 12,
+      );
     }
   }, [medias, dist, n, sigmaTeorico, superponerNormal]);
 
@@ -693,7 +712,12 @@ export default function SimuladorTeoremaCentralLimitePage() {
           </label>
 
           <div className={styles.actions}>
-            <button type="button" className={styles.runBtn} onClick={lanzar} disabled={animando}>
+            {/* `aria-disabled` y no `disabled` (hallazgo 2373, 28/09/2026): deshabilitar el botón
+                que tiene el foco obliga al navegador a sacarlo de él, y en Chrome ese cambio de
+                foco CANCELA el desplazamiento suave hacia el histograma que `lanzar` acaba de
+                pedir (medido: se quedaba a 350 px de su destino). Así el foco sigue en el
+                botón, el teclado no lo pierde, y `lanzar` ya ignora los clics repetidos. */}
+            <button type="button" className={styles.runBtn} onClick={lanzar} aria-disabled={animando}>
               <span aria-hidden="true">{animando ? '⏳' : '▶'}</span> {animando ? 'Generando muestras...' : 'Lanzar simulación'}
             </button>
             <button type="button" className={styles.resetBtn} onClick={reset}>
@@ -709,7 +733,7 @@ export default function SimuladorTeoremaCentralLimitePage() {
         </div>
 
         {/* CANVAS HISTOGRAMA MEDIAS */}
-        <div className={styles.canvasWrapper}>
+        <div className={styles.canvasWrapper} ref={histogramaRef}>
           <div className={styles.canvasLabel}><span aria-hidden="true">📊</span> Distribución de la media muestral X̄</div>
           <canvas ref={canvasMedRef} className={styles.canvasMedias} aria-label="Histograma de las medias muestrales" />
         </div>
@@ -743,12 +767,18 @@ export default function SimuladorTeoremaCentralLimitePage() {
           </div>
         </div>
 
-        {medias.length >= numMuestras && numMuestras > 0 && (
-          <div className={styles.statusBar} role="status" aria-live="polite">
-            <span aria-hidden="true">✅</span> Simulación completa con n = {n}. Cuanto mayor es n, más se
-            parecen los estadísticos a los teóricos.
-          </div>
-        )}
+        {/* La región viva existe SIEMPRE y solo cambia su contenido: una región que se monta ya
+            con el texto dentro no la anuncian todos los lectores de pantalla, y con el
+            desplazamiento del hallazgo 2373 este aviso es lo que les dice que el resultado
+            está listo. */}
+        <div role="status" aria-live="polite" aria-atomic="true">
+          {medias.length >= numMuestras && numMuestras > 0 && (
+            <div className={styles.statusBar}>
+              <span aria-hidden="true">✅</span> Simulación completa con n = {n}. Cuanto mayor es n, más se
+              parecen los estadísticos a los teóricos.
+            </div>
+          )}
+        </div>
       </div>
 
       {/* CASOS PARA CLASE — la tarea asignable (ver skill /casos-aula-meskeia) */}

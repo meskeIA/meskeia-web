@@ -206,11 +206,13 @@
   transition: background 0.2s;
 }
 
-.runBtn:hover:not(:disabled) {
+/* Mientras simula, el botón va con aria-disabled y no con disabled (ver page.tsx, 2373). */
+.runBtn:hover:not(:disabled):not([aria-disabled='true']) {
   background: #226d8f;
 }
 
-.runBtn:disabled {
+.runBtn:disabled,
+.runBtn[aria-disabled='true'] {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -558,12 +560,18 @@
   margin: var(--spacing-lg) 0;
 }
 
+/* El naranja de la marca (#E07A1F) se queda en el BORDE: como texto, sobre el naranja al 8 % de
+   la caja, daba 2,56:1 en claro y 3,72:1 en oscuro (medido en navegador contra el fondo real,
+   28/09/2026). Los títulos de cada error son 16 px en negrita y el de la caja 17,6 px en
+   negrita: ninguno llega a «grande» (18,66 px en negrita), así que exigen 4,5:1. Es la misma
+   reparación que la del hallazgo 2366 en simulador-fluidos-bernoulli: claro #9A4A0C 5,31:1 ·
+   oscuro #F5A05A 5,36:1. */
 .warningHeader {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
-  color: #E07A1F;
+  color: #9A4A0C;
   font-size: 1.1rem;
 }
 
@@ -583,7 +591,12 @@
 }
 
 .warningList li strong {
-  color: #E07A1F;
+  color: #9A4A0C;
+}
+
+[data-theme='dark'] .warningHeader,
+[data-theme='dark'] .warningList li strong {
+  color: #F5A05A;
 }
 
 /* DARK MODE */
@@ -874,7 +887,7 @@
   font-size: 1.05rem;
 }
 
-/* La invitación a comprobarlo moviendo el deslizador: es el segundo tiempo del tipo C. */
+/* La invitación a comprobarlo en el simulador: es el segundo tiempo del tipo C. */
 .casoComprobacion {
   margin: 0;
   padding-top: var(--spacing-sm);

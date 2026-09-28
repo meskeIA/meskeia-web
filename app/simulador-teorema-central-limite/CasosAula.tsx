@@ -4,7 +4,7 @@
  * Casos para clase — la tarea asignable de `simulador-teorema-central-limite`.
  *
  * Es el primer caso de aula del catálogo del TIPO C: el alumno no teclea un número, sino que
- * **se compromete con una predicción antes de tocar el deslizador**. Ese compromiso previo es
+ * **se compromete con una predicción antes de tocar el simulador**. Ese compromiso previo es
  * todo el valor pedagógico: mover un parámetro y mirar la gráfica no enseña nada si antes no
  * había una hipótesis que confirmar o romper.
  *
@@ -80,8 +80,8 @@ export default function CasosAula() {
           profesor puede decir «haz los casos 3, 7 y 11» y corregir sin ambigüedad.
         </p>
         <p className={styles.casosIntro}>
-          <strong>Primero predice, después mueve.</strong> Marca tu respuesta antes de tocar el
-          simulador de arriba: si mueves el deslizador primero, verás qué pasa pero no habrás
+          <strong>Primero predice, después simula.</strong> Marca tu respuesta antes de tocar el
+          simulador de arriba: si lanzas la simulación primero, verás qué pasa pero no habrás
           puesto a prueba lo que creías. Al comprobar se explica el mecanismo.
         </p>
       </div>
@@ -218,9 +218,12 @@ export default function CasosAula() {
               Respuesta:{' '}
               <strong>{esperado >= 0 ? opciones[esperado].texto : 'sin resolver'}</strong>
             </p>
+            {/* Hallazgo 2372 (28/09/2026): decía «mueve el deslizador», y n y el número de
+                muestras son botones: no hay ningún deslizador en la página. */}
             <p className={styles.casoComprobacion}>
               <span aria-hidden="true">🔬</span> Ahora compruébalo en el simulador de arriba:
-              mueve el deslizador y mira si ocurre lo que acabas de leer.
+              elige la población, el tamaño n y el número de muestras, pulsa «Lanzar
+              simulación» y mira si ocurre lo que acabas de leer.
             </p>
           </div>
         )}

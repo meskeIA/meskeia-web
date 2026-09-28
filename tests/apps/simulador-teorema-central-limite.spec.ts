@@ -14,6 +14,7 @@ import {
   excesoDeMedias,
   distanciaANormal,
 } from '../../app/simulador-teorema-central-limite/casos';
+import { construirHistograma } from '../../app/simulador-teorema-central-limite/histograma';
 
 /**
  * Casos para clase — `simulador-teorema-central-limite` (tipo C: predicción antes de mover).
@@ -657,7 +658,7 @@ test.describe('el simulador en el navegador — las tres leyes del TCL', () => {
      1052 · moneda sesgada, n = 1: el eje es el soporte [−0,3 ; 1,3] ... REPARADO, candado abajo
      1053 · exponencial, n = 1: el eje es [0 ; 6] ...................... REPARADO, candado abajo
      1054 · los n = 4 y n = 25 existen como botones .................... REPARADO, candado abajo
-            («mueve el deslizador» sigue en la sección: ver HALLAZGO ABIERTO 3)
+            («mueve el deslizador» seguía en la sección: hallazgo 2372, REPARADO el 28/09)
      1055 · el bloque educativo ya no dice «indistinguible» a n = 30 .... REPARADO, candado abajo
      1056 · la barra de estado es role="status" .......................... REPARADO, candado abajo
 
@@ -907,34 +908,179 @@ test.describe('Inspector 28/09/2026 — en móvil (390 × 844, táctil)', () => 
     expect(lienzo?.width ?? 0).toBeGreaterThan(200);
     expect(lienzo?.height ?? 0).toBeGreaterThan(200);
 
-    expect(arranquesTracker).toBe(1);
+    // Corregido el 28/09/2026 al reparar 2370-2373: la aserción era `toBe(1)`, que solo vale
+    // contra `next start`. Bajo `next dev` el modo estricto de React ejecuta cada efecto dos
+    // veces por montaje, y el spec entero falló aquí también en apps que nadie había tocado
+    // (simulador-fluidos-bernoulli y simulador-genetica: dos avisos por carga, en el mismo
+    // milisegundo). Se cuenta por MONTAJE, que es lo que el test quiere vigilar: un segundo
+    // <Footer> daría 2 en producción y 4 en desarrollo, y sigue fallando en los dos.
+    const enDesarrollo = await page.evaluate(() => document.querySelector('nextjs-portal') !== null);
+    expect(arranquesTracker).toBe(enDesarrollo ? 2 : 1);
+    // Contado en el documento, no con `locator`, que atraviesa el shadow DOM del indicador de Next.
+    expect(await page.evaluate(() => document.querySelectorAll('footer').length)).toBe(1);
   });
 });
 
 /* ══════════════════════════════════════════════════════════════════════════════════════════
-   HALLAZGOS ABIERTOS (inspector 28/09/2026). Afirman lo que DEBERÍA pasar y hoy fallan a
-   propósito: cuando se reparen, se les quita el `test.fail()` y quedan como regresión.
+   HALLAZGOS 2370-2373 (inspector 28/09/2026) — REPARADOS el 28/09/2026
+   ══════════════════════════════════════════════════════════════════════════════════════════
+
+   Los cuatro nacieron como `test.fail()` «ABIERTO». La reparación les quitó la marca y los
+   tests afirman ya lo correcto; donde el acta miraba un solo caso, se amplía a sus hermanos
+   (la moneda sesgada del caso 7, el móvil y el movimiento reducido del 2373).
+
+   ── 2370 · LOS COCIENTES BARRA/CURVA, RESUELTOS A MANO ANTES DE TOCAR NADA ─────────────────
+   Con las dos monedas, la media de n tiradas vale k/n. La reparación da a cada valor su
+   casilla, de ancho h = 1/n, y divide el recuento por h: el área es 1 y la barra más alta se
+   compara con el pico de la normal N(μ, σ/√n), que vale 1/(σ/√n·√(2π)).
+
+     moneda justa   n = 10   P(k=5) = C(10,5)/2¹⁰ = 252/1024 = 0,246094 → /0,1 = 2,4609
+                             pico = √10/(0,5·√(2π)) = 3,162278/1,253314 = 2,5231 → 0,975
+                             (antes: casilla de 1,264911/40 = 0,031623 → 7,78 → 3,08)
+     moneda justa   n = 25   P(k=12) = P(k=13) = 0,154981 → /0,04 = 3,8745 · pico 3,9894 → 0,971
+                             (antes, casilla 0,02: 1,94, como midió el acta)
+     moneda sesgada n = 10   P(k=9) = 10·0,9⁹·0,1 = 0,387420 → /0,1 = 3,8742
+                             pico = √10/(0,3·√(2π)) = 4,2052 → 0,921 (antes: 4,86)
+     moneda sesgada n = 30   P(k=27) = 4060·0,9²⁷·0,1³ = 0,236088 → ·30 = 7,0826
+                             pico = √30/(0,3·√(2π)) = 7,2837 → 0,972 (antes: 2,96)
+     uniforme       n = 30   continua: 40 casillas como siempre, cociente ≈ 1,05 (sin cambios)
+
+   Que el cociente de la moneda sesgada con n = 10 se quede en 0,92 y no en 1 es el TCL
+   honrado: su asimetría a ese tamaño es −0,843 y la campana todavía no encaja del todo.
+
+   En el navegador la simulación es aleatoria. Con 5.000 medias y la moneda justa, el recuento
+   de la barra del 0,5 es Binomial(5.000; 0,246094): 1.230,5 ± 30,5 (2,5 %), luego el cociente
+   vale 0,975 ± 0,024 y la banda [0,85 ; 1,10] son ≈5 desviaciones típicas. Con la moneda
+   sesgada la barra más alta es la del 0,9 (1.937 ± 34) salvo que la del 1,0 (1.743) la
+   adelante, lo que exige una desviación de 3,2 σ en la diferencia; aun así cae en 0,83. Banda
+   [0,78 ; 1,06]. La prueba EXACTA va aparte, en Node, con recuentos fijos.
    ══════════════════════════════════════════════════════════════════════════════════════════ */
 
-test.describe('Inspector 28/09/2026 — hallazgos abiertos', () => {
+/** Densidad de la normal en su pico: 1/(σ·√(2π)). */
+const picoNormal = (sigma: number): number => 1 / (sigma * Math.sqrt(2 * Math.PI));
+
+/** Repite `valor` `veces` veces: las medias de una simulación con recuentos fijos. */
+const repetir = (valor: number, veces: number): number[] => new Array<number>(veces).fill(valor);
+
+test.describe('HALLAZGO 2370 · el reparto del histograma, en Node y con recuentos fijos', () => {
+  // Recuentos = 5.000·P(k) redondeados (suman 5.000 exactos en los dos casos):
+  //   moneda justa n = 10   C(10,k)/1024·5000 → 5 · 49 · 220 · 586 · 1025 · 1230 · 1025 · 586 · 220 · 49 · 5
+  //   moneda sesgada n = 10 k = 4…10 → 1 · 7 · 56 · 287 · 969 · 1937 · 1743
+  // Las medias se escriben como k/10 calculado igual que la app (suma/n), con su error de
+  // coma flotante incluido: 3/10 no es exactamente 0,3.
+  const JUSTA = [5, 49, 220, 586, 1025, 1230, 1025, 586, 220, 49, 5];
+  const SESGADA: Record<number, number> = { 4: 1, 5: 7, 6: 56, 7: 287, 8: 969, 9: 1937, 10: 1743 };
+
+  test('moneda justa, n = 10: 11 casillas de ancho 0,1 centradas en k/10, área 1 y cociente 0,975', () => {
+    const medias = JUSTA.flatMap((c, k) => repetir(k / 10, c));
+    expect(medias).toHaveLength(5000);
+    const sigma = 0.5 / Math.sqrt(10); // 0,158114
+    const xMin = 0.5 - 4 * sigma; // −0,132456
+    const xMax = 0.5 + 4 * sigma; // 1,132456
+    const h = construirHistograma(medias, xMin, xMax, 10, { origen: 0, paso: 1 });
+
+    expect(h.anchoCasilla).toBeCloseTo(0.1, 12);
+    expect(h.fueraDeRango).toBe(0);
+    expect(h.casillas).toHaveLength(11);
+    h.casillas.forEach((c, k) => {
+      expect(c.valor, `k = ${k}`).toBeCloseTo(k / 10, 12);
+      // Una casilla por valor y ninguna más estrecha que el paso: se acabaron las púas.
+      expect(c.x1 - c.x0, `k = ${k}`).toBeCloseTo(0.1, 12);
+      expect(c.recuento).toBe(JUSTA[k]);
+      // Casillas contiguas, sin huecos entre un valor y el siguiente.
+      if (k > 0) expect(c.x0).toBeCloseTo(h.casillas[k - 1].x1, 12);
+    });
+    // Área = Σ densidad·h = Σ recuento/5000 = 1.
+    const area = h.casillas.reduce((s, c) => s + c.densidad * h.anchoCasilla, 0);
+    expect(area).toBeCloseTo(1, 12);
+    // La barra del 0,5: 1.230/(5.000·0,1) = 2,46 frente al pico 2,523133 → 0,97498.
+    const alta = h.casillas[5];
+    expect(alta.densidad).toBeCloseTo(2.46, 12);
+    expect(Math.max(...h.casillas.map((c) => c.densidad))).toBe(alta.densidad);
+    expect(alta.densidad / picoNormal(sigma)).toBeCloseTo(0.97498, 4);
+  });
+
+  test('moneda sesgada, n = 10 (el caso 7): cinco casillas en el eje y cociente 0,921', () => {
+    const medias = Object.entries(SESGADA).flatMap(([k, c]) => repetir(Number(k) / 10, c));
+    expect(medias).toHaveLength(5000);
+    const sigma = 0.3 / Math.sqrt(10); // 0,0948683
+    const xMin = 0.9 - 4 * sigma; // 0,520527: el 0,4 y el 0,5 quedan fuera
+    const xMax = 0.9 + 4 * sigma; // 1,279473
+    const h = construirHistograma(medias, xMin, xMax, 10, { origen: 0, paso: 1 });
+    expect(h.fueraDeRango).toBe(1 + 7);
+    expect(h.casillas.map((c) => Math.round((c.valor ?? NaN) * 10))).toEqual([6, 7, 8, 9, 10]);
+    // 1.937/(5.000·0,1) = 3,874 frente a √10/(0,3·√(2π)) = 4,205236 → 0,92123.
+    const alta = h.casillas.find((c) => c.recuento === 1937);
+    expect(alta?.densidad).toBeCloseTo(3.874, 12);
+    expect((alta?.densidad ?? 0) / picoNormal(sigma)).toBeCloseTo(0.92123, 4);
+  });
+
+  test('moneda justa, n = 100: el valor que cae justo en el borde del eje entra, recortado', () => {
+    // Eje 0,5 ± 4·0,05 = [0,3 ; 0,7]; el 0,3 = 30/100 es un valor posible y está EN el borde.
+    const medias = [...repetir(30 / 100, 2), ...repetir(50 / 100, 8), ...repetir(29 / 100, 1)];
+    const h = construirHistograma(medias, 0.5 - 0.2, 0.5 + 0.2, 100, { origen: 0, paso: 1 });
+    expect(h.fueraDeRango).toBe(1); // el 0,29
+    expect(h.casillas).toHaveLength(2);
+    expect(h.casillas[0].x0).toBeCloseTo(0.3, 12); // recortada al eje: [0,3 ; 0,305]
+    expect(h.casillas[0].x1).toBeCloseTo(0.305, 12);
+    // La densidad no se recorta: 2/(11·0,01).
+    expect(h.casillas[0].densidad).toBeCloseTo(2 / (11 * 0.01), 12);
+  });
+
+  test('con n = 1 son dos barras estrechas en 0 y en 1, a la altura P/1 (no un bloque plano)', () => {
+    // Moneda sesgada: 100 ceros y 900 unos. El eje es el soporte [−0,3 ; 1,3] (hallazgo 1052).
+    const medias = [...repetir(0, 100), ...repetir(1, 900)];
+    const h = construirHistograma(medias, -0.3, 1.3, 1, { origen: 0, paso: 1 });
+    expect(h.casillas).toHaveLength(2);
+    expect(h.casillas.map((c) => c.densidad)).toEqual([0.1, 0.9]);
+    // Dibujadas con una quinta parte del paso: [−0,1 ; 0,1] y [0,9 ; 1,1].
+    expect(h.casillas[0].x0).toBeCloseTo(-0.1, 12);
+    expect(h.casillas[0].x1).toBeCloseTo(0.1, 12);
+    expect(h.casillas[1].x0).toBeCloseTo(0.9, 12);
+    expect(h.casillas[1].x1).toBeCloseTo(1.1, 12);
+    // Frente al pico de N(0,9; 0,3) = 1,329808: 0,9/1,329808 = 0,6768. Sin campana todavía.
+    expect(0.9 / picoNormal(0.3)).toBeCloseTo(0.6768, 4);
+  });
+
+  test('las continuas no cambian: 40 casillas iguales y área = fracción dentro del eje', () => {
+    // Uniforme [0 ; 10], n = 30: eje 5 ± 4·0,527046, casillas de 0,2·0,527046 = 0,105409.
+    // Cinco medias, una fuera del eje. Ninguna justo en μ, que es frontera entre dos casillas
+    // y donde el redondeo de coma flotante decide el lado.
+    const sigma = Math.sqrt(100 / 12) / Math.sqrt(30);
+    const xMin = 5 - 4 * sigma;
+    const xMax = 5 + 4 * sigma;
+    const medias = [5.001, 5.01, 4.99, 6.2, 9.5];
+    const h = construirHistograma(medias, xMin, xMax, 30, null);
+    expect(h.casillas).toHaveLength(40);
+    expect(h.anchoCasilla).toBeCloseTo((xMax - xMin) / 40, 12);
+    for (const c of h.casillas) expect(c.x1 - c.x0).toBeCloseTo(h.anchoCasilla, 12);
+    expect(h.fueraDeRango).toBe(1); // el 9,5
+    const area = h.casillas.reduce((s, c) => s + c.densidad * h.anchoCasilla, 0);
+    expect(area).toBeCloseTo(4 / 5, 12);
+    // μ = 5 es el borde entre las casillas 19 y 20: el 5,001 y el 5,01 caen en la 20.
+    expect(h.casillas[20].recuento).toBe(2);
+    expect(h.casillas[19].recuento).toBe(1);
+  });
+});
+
+test.describe('Inspector 28/09/2026 — hallazgos 2370-2373, REPARADOS (28/09/2026)', () => {
   test.beforeEach(async ({ page }) => {
     test.setTimeout(120_000);
     await instrumentarLienzos(page);
   });
 
-  test('HALLAZGO ABIERTO 1 · moneda justa, n = 10: las barras no pueden triplicar la normal superpuesta', async ({
+  test('HALLAZGO 2370 · moneda justa, n = 10: la barra del 0,5 llega a la normal, no al triple', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO (inspector 28/09/2026): con las dos monedas, la media de n tiradas solo
-    // toma los valores k/n, pero `dibujarMedias` reparte las medias en 40 casillas de ancho
-    // 8·σ(X̄)/40 —más estrechas que el paso 1/n— y divide cada recuento por ESE ancho. Salen
-    // púas separadas por huecos cuya altura multiplica la de la N(μ, σ/√n) que la casilla
-    // «Superponer … para comparar» pinta encima: el TCL parece NO cumplirse justo donde los
-    // casos 7, 9 y 12 mandan mirar.
+    // REPARADO (28/09/2026): con las dos monedas, la media de n tiradas solo toma los valores
+    // k/n, pero `dibujarMedias` repartía las medias en 40 casillas de ancho 8·σ(X̄)/40 —más
+    // estrechas que el paso 1/n— y dividía cada recuento por ESE ancho: púas separadas por
+    // huecos, tres veces más altas que la N(μ, σ/√n) que la casilla «Superponer … para
+    // comparar» pinta encima. Ahora cada valor k/10 tiene su casilla de ancho 0,1 (reparto en
+    // `histograma.ts`, probado arriba con recuentos fijos).
     // ENTRADA moneda justa · n = 10 · 5.000 muestras
-    // ESPERADO barra del 0,5 / pico de la normal ≈ 0,975 (P(k=5)/h = 2,4609 frente a 2,5231)
-    // OBTENIDO ≈ 3,1 (7,78 frente a 2,52), 11 púas en 40 casillas.
-    test.fail();
+    // ESPERADO barra del 0,5 / pico de la normal ≈ 0,975 ± 0,024 (cabecera del bloque)
+    // ANTES    ≈ 3,1 (7,78 frente a 2,52), 11 púas en 40 casillas.
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[type="checkbox"]']);
     await configurar(page, 'Moneda justa', 10, 5000);
@@ -942,39 +1088,98 @@ test.describe('Inspector 28/09/2026 — hallazgos abiertos', () => {
     await lanzar(page, 10);
     const d = await leerDibujo(page, HISTOGRAMA);
     expect(d.textos.slice(0, 7)).toEqual(['-0,13', '0,08', '0,29', '0,50', '0,71', '0,92', '1,13']);
-    expect(d.barras.length).toBeGreaterThan(0);
+    // Once valores posibles (0, 0,1 … 1); el 0 y el 1 tienen P = 1/1024 y pueden no salir.
+    expect(d.barras.length).toBeGreaterThanOrEqual(9);
+    expect(d.barras.length).toBeLessThanOrEqual(11);
+    // Cada barra ocupa un paso entero, 0,1 de un eje de 1,264911: ni una púa más estrecha.
+    const ancho = await page.locator(`canvas[aria-label="${HISTOGRAMA}"]`).evaluate((c) => c.getBoundingClientRect().width);
+    const pasoPx = ((ancho - 40 - 16) * 0.1) / 1.264911; // pad.left 40 + pad.right 16
+    for (const b of d.barras) expect(Math.abs(b[2] - (pasoPx - 1))).toBeLessThan(0.01);
     const cociente = cocienteBarraCurva(d);
-    expect(cociente).toBeGreaterThan(0.7);
-    expect(cociente).toBeLessThan(1.3);
+    expect(cociente).toBeGreaterThan(0.85);
+    expect(cociente).toBeLessThan(1.1);
   });
 
-  test('HALLAZGO ABIERTO 2 · la explicación de una población simétrica no dice que la asimetría «todavía se nota»', () => {
-    // HALLAZGO ABIERTO (inspector 28/09/2026): en «Practicar», la variante «¿hacia qué lado
-    // caerá la cola?» sale con la uniforme, la moneda justa o la bimodal (1/3 × 3/5 = el 20 %
-    // de los ejercicios). La respuesta correcta es «simétrica» y el primer paso lo calcula
-    // bien (0/√n = 0), pero el tercero es la frase fija del caso asimétrico.
+  test('HALLAZGO 2370 · moneda sesgada, n = 10 (caso 7): tampoco quintuplica la normal', async ({ page }) => {
+    // REPARADO (28/09/2026), el hermano del anterior: el acta midió ≈4,9 con la moneda sesgada.
+    // Barra del 0,9: 0,387420/0,1 = 3,8742 frente al pico 4,2052 → 0,921 (banda en la cabecera).
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="checkbox"]']);
+    await configurar(page, 'Moneda sesgada', 10, 5000);
+    await lanzar(page, 10);
+    const d = await leerDibujo(page, HISTOGRAMA);
+    // En el eje [0,5205 ; 1,2795] caben los valores 0,6 … 1,0: cinco barras como mucho.
+    expect(d.barras.length).toBeGreaterThanOrEqual(4);
+    expect(d.barras.length).toBeLessThanOrEqual(5);
+    const cociente = cocienteBarraCurva(d);
+    expect(cociente).toBeGreaterThan(0.78);
+    expect(cociente).toBeLessThan(1.06);
+  });
+
+  test('HALLAZGO 2371 · la explicación de una población simétrica no dice que la asimetría «todavía se nota»', () => {
+    // REPARADO (28/09/2026): en «Practicar», la variante «¿hacia qué lado caerá la cola?» sale
+    // con la uniforme, la moneda justa o la bimodal (1/3 × 3/5 = el 20 % de los ejercicios).
+    // La respuesta correcta es «simétrica» y el primer paso lo calcula bien (0/√n = 0), pero
+    // el tercero era la frase fija del caso asimétrico. Ahora el cierre depende de la clave.
     // ENTRADA Practicar → «Población moneda justa (mitad y mitad), con n = 25. ¿Hacia qué lado
     //         caerá la cola…?» → «Hacia ninguno: será simétrica» → Comprobar
     // ESPERADO una explicación coherente con asimetría 0
-    // OBTENIDO «Con n = 25 la asimetría ya se ha reducido respecto a la población (0), pero
+    // ANTES   «Con n = 25 la asimetría ya se ha reducido respecto a la población (0), pero
     //          todavía se nota: no basta con que n sea «grande» en abstracto.»
-    test.fail();
     for (const poblacion of ['uniforme', 'bernoulli_05', 'bimodal'] as const) {
       const r = resolverCaso({ tipo: 'lado-cola', poblacion, n: 25 });
       expect(r.clave).toBe('simetrica');
       expect(r.pasos.join(' '), poblacion).not.toMatch(/todavía se nota/);
+      expect(r.pasos.join(' '), poblacion).toContain('ya era simétrica');
+    }
+    // Las asimétricas conservan su cierre: con n = 25 la exponencial sigue en 2/5 = 0,4.
+    const exp = resolverCaso({ tipo: 'lado-cola', poblacion: 'exponencial', n: 25 });
+    expect(exp.clave).toBe('derecha');
+    expect(exp.pasos.join(' ')).toMatch(/todavía se nota/);
+
+    // Y por el camino del acta: en los ejercicios de práctica que salen de verdad.
+    let simetricos = 0;
+    for (let semilla = 0; semilla < 400; semilla++) {
+      const e = generarEjercicioAleatorio(semilla);
+      if (!/caerá la cola/.test(e.enunciado)) continue;
+      if (e.opciones[e.respuesta]?.clave !== 'simetrica') continue;
+      simetricos++;
+      expect(e.pasos.join(' '), `semilla ${semilla}`).not.toMatch(/todavía se nota/);
+    }
+    expect(simetricos).toBeGreaterThan(0);
+  });
+
+  test('SOSPECHA · el veredicto no encadena dos «:» («Correcto: hacia ninguno: será simétrica.»)', () => {
+    // REPARADO (28/09/2026): el veredicto presenta la opción con dos puntos y algunas opciones
+    // traen los suyos. Dentro del veredicto pasan a coma; en la lista de opciones no cambian.
+    const caso7 = CASOS.find((c) => c.id === 7)!;
+    const simetrica = caso7.opciones.findIndex((o) => o.clave === 'simetrica');
+    expect(caso7.opciones[simetrica].texto).toBe('Hacia ninguno: será simétrica');
+    expect(comprobarRespuesta(simetrica, simetrica, caso7.opciones).motivo).toBe(
+      'Correcto: hacia ninguno, será simétrica.',
+    );
+    // El caso 4, cuya respuesta correcta también lleva dos puntos.
+    const caso4 = CASOS.find((c) => c.id === 4)!;
+    expect(comprobarRespuesta(0, caso4.respuesta, caso4.opciones).motivo).toBe(
+      'No es esa. La respuesta correcta es: no cambiará, solo se dibujará con menos ruido.',
+    );
+    // Ningún veredicto de los 12 casos lleva más de unos dos puntos.
+    for (const caso of CASOS) {
+      for (let i = 0; i < caso.opciones.length; i++) {
+        const motivo = comprobarRespuesta(i, caso.respuesta, caso.opciones).motivo;
+        expect(motivo.split(':').length - 1, `caso ${caso.id}, opción ${i}: ${motivo}`).toBe(1);
+      }
     }
   });
 
-  test('HALLAZGO ABIERTO 3 · la sección de casos no manda mover un deslizador que no existe', async ({ page }) => {
-    // HALLAZGO ABIERTO (inspector 28/09/2026): reparación incompleta del 1054, que ya lo
-    // señalaba como «añadido menor»: n y el número de muestras son BOTONES, y la sección dice
-    // «deslizador» en cuatro sitios — su introducción, el cierre de cada solución, el
-    // enunciado del caso 8 («De los tamaños que ofrece el deslizador (1, 2, 4, …)») y su
-    // explicación («De los valores que ofrece el deslizador…»).
+  test('HALLAZGO 2372 · la sección de casos no manda mover un deslizador que no existe', async ({ page }) => {
+    // REPARADO (28/09/2026): reparación incompleta del 1054, que ya lo señalaba como «añadido
+    // menor»: n y el número de muestras son BOTONES, y la sección decía «deslizador» en cuatro
+    // sitios — su introducción, el cierre de cada solución, el enunciado del caso 8 («De los
+    // tamaños que ofrece el deslizador (1, 2, 4, …)») y su explicación («De los valores que
+    // ofrece el deslizador…»). Ahora hablan del simulador y de «Lanzar simulación».
     // ENTRADA abrir la página → Caso 8 → elegir «n = 100» → Comprobar
-    // ESPERADO ninguna mención a un deslizador · OBTENIDO «mueve el deslizador y mira si ocurre…»
-    test.fail();
+    // ESPERADO ninguna mención a un deslizador · ANTES «mueve el deslizador y mira si ocurre…»
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[type="checkbox"]']);
     await expect(page.locator('input[type="range"]')).toHaveCount(0);
@@ -982,34 +1187,201 @@ test.describe('Inspector 28/09/2026 — hallazgos abiertos', () => {
     await page.getByRole('radio', { name: 'n = 100', exact: true }).click();
     await page.getByRole('button', { name: 'Comprobar predicción' }).click();
     const seccion = page.getByRole('heading', { name: 'Casos para clase' }).locator('xpath=../..');
+    await expect(seccion).toContainText('De los tamaños que ofrece el simulador (1, 2, 4, 5, 10, 25, 30 y 100)');
+    await expect(seccion).toContainText('pulsa «Lanzar simulación»');
     await expect(seccion).not.toContainText(/deslizador/i);
+    // Y en ningún otro sitio de la página.
+    await expect(page.locator('body')).not.toContainText(/deslizador/i);
   });
 
-  test('HALLAZGO ABIERTO 4 · al pulsar «Lanzar simulación» el histograma queda a la vista', async ({ page }) => {
-    // HALLAZGO ABIERTO (inspector 28/09/2026): el histograma de medias está 354 px por debajo
-    // del botón, y la app no desplaza nada al lanzar. En las resoluciones de escritorio de
-    // las visitas recientes (1366×768, 1536×864…) quien baja hasta ver el botón y lo pulsa
-    // solo ve el rótulo cambiar a «Generando muestras...» durante ~0,9 s: el resultado se
-    // pinta fuera de la pantalla. En móvil (390×844), igual: empieza en y = 947.
+  test('HALLAZGO 2373 · al pulsar «Lanzar simulación» el histograma queda a la vista', async ({ page }) => {
+    // REPARADO (28/09/2026): el histograma de medias está ~354 px por debajo del botón, y la app
+    // no desplazaba nada al lanzar. Ahora lo lleva a la vista con `scrollIntoView` (bloque
+    // «nearest»: no se mueve si ya se ve), y el final se anuncia en una región viva que
+    // existe desde el principio.
     // ENTRADA ventana 1366×640 · desplazar hasta que el botón quede 20 px sobre el borde
     //         inferior · pulsar «Lanzar simulación»
-    // ESPERADO alguna parte del histograma dentro de la ventana
-    // OBTENIDO su borde superior en y ≈ 919, por debajo de los 640 px de la ventana
-    test.fail();
+    // ESPERADO el histograma ENTERO dentro de la ventana (el acta pedía «alguna parte»)
+    // ANTES    su borde superior en y ≈ 919, por debajo de los 640 px de la ventana
     await page.setViewportSize({ width: 1366, height: 640 });
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[type="checkbox"]']);
+    // La región viva está en el árbol ANTES de lanzar, vacía: así el lector la anuncia.
+    const region = page.locator('[role="status"][aria-live="polite"]');
+    await expect(region).toHaveCount(1);
+    await expect(region).toHaveText('');
     const boton = page.getByRole('button', { name: 'Lanzar simulación' });
     await page.evaluate(() => {
       const b = [...document.querySelectorAll('button')].find((x) => x.textContent?.includes('Lanzar simulación'));
       if (b) window.scrollTo(0, b.getBoundingClientRect().bottom + window.scrollY + 20 - window.innerHeight);
     });
-    await boton.click();
-    await expect(page.getByText(/Simulación completa con n = 30\./)).toBeAttached({ timeout: 60_000 });
-    const arriba = await page.evaluate(
-      (e) => document.querySelector(`canvas[aria-label="${e}"]`)?.getBoundingClientRect().top ?? Infinity,
+    const antes = await page.evaluate(
+      (e) => document.querySelector(`canvas[aria-label="${e}"]`)?.getBoundingClientRect().top ?? -1,
       HISTOGRAMA,
     );
-    expect(arriba).toBeLessThan(640);
+    expect(antes).toBeGreaterThan(640); // el caso del acta: el histograma empieza fuera
+    await boton.click();
+    await expect(page.getByText(/Simulación completa con n = 30\./)).toBeAttached({ timeout: 60_000 });
+    await expect(region).toContainText('Simulación completa con n = 30.');
+    // El foco sigue en el botón: deshabilitarlo con `disabled` se lo quitaba, y ese cambio de
+    // foco cancelaba en Chrome el desplazamiento suave (se quedaba en scrollY 589 de 932).
+    expect(
+      await page.evaluate(() => document.activeElement?.textContent?.includes('Lanzar simulación') ?? false),
+    ).toBe(true);
+    // El desplazamiento es suave: se espera a que termine antes de medir.
+    await expect
+      .poll(
+        () =>
+          page.evaluate((e) => {
+            const r = document.querySelector(`canvas[aria-label="${e}"]`)!.getBoundingClientRect();
+            return r.top >= 0 && r.bottom <= window.innerHeight;
+          }, HISTOGRAMA),
+        { timeout: 5_000 },
+      )
+      .toBe(true);
+    const [arriba, abajo] = await page.evaluate((e) => {
+      const r = document.querySelector(`canvas[aria-label="${e}"]`)!.getBoundingClientRect();
+      return [r.top, r.bottom];
+    }, HISTOGRAMA);
+    expect(arriba).toBeGreaterThanOrEqual(0);
+    expect(abajo).toBeLessThanOrEqual(640);
+  });
+
+  test('HALLAZGO 2373 · con movimiento reducido el desplazamiento es instantáneo', async ({ page }) => {
+    // Un `behavior: 'smooth'` explícito gana a la regla `scroll-behavior: auto` que globals.css
+    // pone bajo prefers-reduced-motion: la app tiene que elegir el comportamiento ella misma.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.addInitScript(() => {
+      const llamadas: unknown[] = [];
+      (window as unknown as { __desplazamientos: unknown[] }).__desplazamientos = llamadas;
+      const original = Element.prototype.scrollIntoView;
+      Element.prototype.scrollIntoView = function (this: Element, arg?: boolean | ScrollIntoViewOptions) {
+        llamadas.push(arg);
+        original.call(this, arg);
+      };
+    });
+    await page.setViewportSize({ width: 1366, height: 640 });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="checkbox"]']);
+    await page.getByRole('button', { name: 'Lanzar simulación' }).click();
+    await expect(page.getByText(/Simulación completa con n = 30\./)).toBeAttached({ timeout: 60_000 });
+    const llamadas = await page.evaluate(() => (window as unknown as { __desplazamientos: unknown[] }).__desplazamientos);
+    expect(llamadas).toContainEqual({ behavior: 'auto', block: 'nearest' });
+    expect(llamadas).not.toContainEqual(expect.objectContaining({ behavior: 'smooth' }));
+    const abajo = await page.evaluate(
+      (e) => document.querySelector(`canvas[aria-label="${e}"]`)!.getBoundingClientRect().bottom,
+      HISTOGRAMA,
+    );
+    expect(abajo).toBeLessThanOrEqual(640);
+  });
+});
+
+test.describe('HALLAZGO 2373 · en móvil (390 × 844, táctil)', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('al tocar «Lanzar simulación» el histograma entra entero en la pantalla', async ({ page }) => {
+    // REPARADO (28/09/2026). El acta: en móvil el histograma empezaba en y = 947 con 844 de alto.
+    test.setTimeout(120_000);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="checkbox"]']);
+    await page.evaluate(() => {
+      const b = [...document.querySelectorAll('button')].find((x) => x.textContent?.includes('Lanzar simulación'));
+      if (b) window.scrollTo(0, b.getBoundingClientRect().bottom + window.scrollY + 20 - window.innerHeight);
+    });
+    await page.getByRole('button', { name: 'Lanzar simulación' }).tap();
+    await expect(page.getByText(/Simulación completa con n = 30\./)).toBeAttached({ timeout: 60_000 });
+    await expect
+      .poll(
+        () =>
+          page.evaluate((e) => {
+            const r = document.querySelector(`canvas[aria-label="${e}"]`)!.getBoundingClientRect();
+            return r.top >= 0 && r.bottom <= window.innerHeight;
+          }, HISTOGRAMA),
+        { timeout: 5_000 },
+      )
+      .toBe(true);
+  });
+});
+
+test.describe('Contraste y JSON-LD (28/09/2026)', () => {
+  /**
+   * Contraste WCAG del texto de `selector` contra su fondo REAL: compone los fondos
+   * semitransparentes de los antecesores hasta dar con uno opaco (la caja de avisos es un
+   * naranja al 8 % sobre el fondo del bloque educativo).
+   */
+  async function contrasteDe(page: Page, selector: string): Promise<number> {
+    return page.evaluate((sel) => {
+      type Rgba = { r: number; g: number; b: number; a: number };
+      const leer = (s: string): Rgba | null => {
+        const m = s.match(/rgba?\(([^)]+)\)/);
+        if (!m) return null;
+        const p = m[1].split(',').map((x) => parseFloat(x));
+        return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+      };
+      const sobre = (fg: Rgba, bg: Rgba): Rgba => ({
+        r: fg.r * fg.a + bg.r * (1 - fg.a),
+        g: fg.g * fg.a + bg.g * (1 - fg.a),
+        b: fg.b * fg.a + bg.b * (1 - fg.a),
+        a: 1,
+      });
+      const lum = (c: Rgba) => {
+        const f = (v: number) => {
+          const x = v / 255;
+          return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+        };
+        return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+      };
+      const el = document.querySelector(sel) as HTMLElement;
+      const capas: Rgba[] = [];
+      let n: HTMLElement | null = el;
+      while (n) {
+        const c = leer(getComputedStyle(n).backgroundColor);
+        if (c && c.a > 0) capas.push(c);
+        if (c && c.a === 1) break;
+        n = n.parentElement;
+      }
+      let fondo: Rgba = { r: 255, g: 255, b: 255, a: 1 };
+      for (let i = capas.length - 1; i >= 0; i--) fondo = sobre(capas[i], fondo);
+      const texto = sobre(leer(getComputedStyle(el).color)!, fondo);
+      const [a, b] = [lum(texto), lum(fondo)].sort((x, y) => y - x);
+      return (a + 0.05) / (b + 0.05);
+    }, selector);
+  }
+
+  test('los títulos de «5 errores frecuentes» se leen en los dos temas (≥ 4,5:1)', async ({ page }) => {
+    // REPARADO (28/09/2026), el mismo defecto de plantilla que el hallazgo 2366 de
+    // simulador-fluidos-bernoulli: #E07A1F sobre el naranja al 8 % de la caja daba 2,56:1 en
+    // claro y 3,72:1 en oscuro (medido aquí contra el fondo real). Los títulos son 16 px y
+    // 17,6 px en negrita, por debajo de «grande» (18,66 px): exigen 4,5:1. El naranja se queda
+    // en el borde; el texto va en #9A4A0C (5,31:1) y #F5A05A en oscuro (5,36:1).
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="checkbox"]']);
+    const selectores = ['ul[class*="warningList"] li strong', 'div[class*="warningHeader"] strong'];
+    for (const s of selectores) expect(await contrasteDe(page, s), `claro · ${s}`).toBeGreaterThanOrEqual(4.5);
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await page.waitForTimeout(400);
+    for (const s of selectores) expect(await contrasteDe(page, s), `oscuro · ${s}`).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('SOSPECHA · las características del JSON-LD nombran todos los tamaños n del simulador', async ({ page }) => {
+    // REPARADO (28/09/2026): `features` decía «(1, 2, 5, 10, 30, 100)», sin el 4 y el 25 que
+    // entraron el 20/09, y escribía p=0.5 con punto decimal.
+    await page.goto(RUTA);
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const app = bloques
+      .map((t) => JSON.parse(t) as { '@type'?: string; featureList?: string[] })
+      .find((j) => j['@type'] === 'WebApplication');
+    const linea = (app?.featureList ?? []).find((f) => f.startsWith('Tamaño muestral'));
+    const lista = `${N_DISPONIBLES.slice(0, -1).join(', ')} y ${N_DISPONIBLES[N_DISPONIBLES.length - 1]}`;
+    expect(linea).toBe(`Tamaño muestral n configurable (${lista})`);
+    expect((app?.featureList ?? []).join(' ')).not.toMatch(/\d\.\d/);
   });
 });

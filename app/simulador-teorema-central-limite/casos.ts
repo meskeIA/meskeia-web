@@ -5,8 +5,9 @@
  *
  * Es el primer módulo de casos del catálogo del **tipo C** (predecir antes de mover), y el
  * motivo es la app: aquí no hay ningún número que el alumno deba calcular. Lo que hay es un
- * simulador de exploración con dos deslizadores, y mover un deslizador y mirar la gráfica no
- * enseña nada si antes no había una hipótesis que confirmar o romper. Por eso cada caso pide
+ * simulador de exploración con dos grupos de botones (n y número de muestras), y cambiar un
+ * parámetro y mirar la gráfica no enseña nada si antes no había una hipótesis que confirmar o
+ * romper. Por eso cada caso pide
  * **comprometerse con una predicción** y solo después comprobarla en el simulador de arriba.
  *
  * ── LA REGLA QUE HACE VIABLE EL TIPO C ────────────────────────────────────────
@@ -113,10 +114,9 @@ export const POBLACIONES: Record<PoblacionId, Poblacion> = {
   },
 };
 
-/** Los tamaños muestrales que ofrece el deslizador de la app. El caso 8 depende de esta lista. */
 /**
- * Tamaños muestrales que ofrece el simulador. Es la lista CANÓNICA: la vista la importa de
- * aquí en vez de tener la suya.
+ * Tamaños muestrales que ofrece el simulador, como botones. Es la lista CANÓNICA: la vista la
+ * importa de aquí en vez de tener la suya, y el caso 8 depende de ella.
  *
  * El 4 y el 25 se añadieron el 20/09/2026 porque los casos 2 y 5 los piden expresamente
  * («pasa de n = 1 a n = 4», «de n = 1 a n = 25») y cerraban invitando a comprobarlo en el
@@ -348,7 +348,11 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
             : clave === 'derecha'
               ? 'Un valor POSITIVO significa cola hacia la derecha: la masa se acumula a la izquierda y los valores raros quedan a la derecha.'
               : 'Un valor 0 significa que las dos colas pesan lo mismo.',
-          `Con n = ${datos.n} la asimetría ya se ha reducido respecto a la población (${numero(p.asimetria, 3)}), pero todavía se nota: no basta con que n sea «grande» en abstracto.`,
+          // Hallazgo 2371 (28/09/2026): este cierre era fijo y, con una población simétrica,
+          // decía que la asimetría «todavía se nota» justo después de calcular que vale 0.
+          clave === 'simetrica'
+            ? `La población ya era simétrica (asimetría ${numero(p.asimetria, 3)}), así que las medias lo son con cualquier n: no hay cola que ir reduciendo. Lo que cambia al subir n es solo la anchura, σ/√n.`
+            : `Con n = ${datos.n} la asimetría ya se ha reducido respecto a la población (${numero(p.asimetria, 3)}), pero todavía se nota: no basta con que n sea «grande» en abstracto.`,
         ],
       };
     }
@@ -401,7 +405,7 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
         pasos: [
           `Se busca el menor n con σ/√n ≤ ${numero(datos.umbral)}.`,
           `Despejando: n ≥ (σ/umbral)² = (${numero(p.sigma, 4)}/${numero(datos.umbral)})² = ${numero(exacto, 2)}.`,
-          `De los valores que ofrece el deslizador (${N_DISPONIBLES.join(', ')}), el menor que llega es ${encontrado ?? 'ninguno'}.`,
+          `De los tamaños que ofrece el simulador (${LISTA_N_LEGIBLE}), el menor que llega es ${encontrado ?? 'ninguno'}.`,
           `Ojo con n = 30: da σ(X̄) = ${numero(sigmaDeMedias(p, 30), 4)}, que todavía NO baja del umbral. La regla de memorieta «con n ≥ 30 ya vale» responde a otra pregunta —la forma— y no a la precisión.`,
         ],
       };
@@ -603,7 +607,7 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     titulo: 'Cuando n = 30 no basta',
     categoria: 'aplicado',
     enunciado:
-      `Mides una magnitud cuyos valores se reparten de forma uniforme entre 0 y 10, y necesitas que el error típico de la media no supere 0,5 unidades. De los tamaños que ofrece el deslizador (${LISTA_N_LEGIBLE}), ¿cuál es el MENOR que lo consigue?`,
+      `Mides una magnitud cuyos valores se reparten de forma uniforme entre 0 y 10, y necesitas que el error típico de la media no supere 0,5 unidades. De los tamaños que ofrece el simulador (${LISTA_N_LEGIBLE}), ¿cuál es el MENOR que lo consigue?`,
     datos: { tipo: 'umbral-n', poblacion: 'uniforme', umbral: 0.5 },
     etiquetaRespuesta: 'Tu predicción sobre el menor n válido',
     opciones: [
@@ -720,12 +724,17 @@ export function comprobarRespuesta(elegido: number, esperado: number, opciones: 
   if (esperado < 0 || esperado >= opciones.length) {
     return { correcto: false, motivo: 'Este caso no se ha podido resolver. Avísanos si lo ves.' };
   }
+  // El veredicto ya presenta la opción con dos puntos. Si la opción trae los suyos («Hacia
+  // ninguno: será simétrica», «No cambiará: solo se dibujará…»), se leían dos seguidos
+  // («Correcto: hacia ninguno: será simétrica.»); dentro del veredicto pasan a coma. En la
+  // lista de opciones se quedan como están.
+  const enFrase = opciones[esperado].texto.toLowerCase().replace(/:\s/g, ', ');
   if (elegido === esperado) {
-    return { correcto: true, motivo: `Correcto: ${opciones[esperado].texto.toLowerCase()}.` };
+    return { correcto: true, motivo: `Correcto: ${enFrase}.` };
   }
   return {
     correcto: false,
-    motivo: `No es esa. La respuesta correcta es: ${opciones[esperado].texto.toLowerCase()}.`,
+    motivo: `No es esa. La respuesta correcta es: ${enFrase}.`,
   };
 }
 
