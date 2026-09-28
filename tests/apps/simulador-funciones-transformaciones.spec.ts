@@ -40,7 +40,7 @@ import {
   generarEjercicioAleatorio,
   type Respuesta,
 } from '../../app/simulador-funciones-transformaciones/casos';
-import { evaluarTransformada, construirEcuacion } from '../../app/simulador-funciones-transformaciones/motor';
+import { evaluarTransformada, construirEcuacion, ajustarB, type FuncionBase } from '../../app/simulador-funciones-transformaciones/motor';
 
 const RUTA = '/simulador-funciones-transformaciones/';
 
@@ -262,8 +262,9 @@ test.describe('simulador-funciones-transformaciones · la sección de casos en e
  *   Umbral: 3:1 si el texto mide ≥ 24 px, o ≥ 18,66 px en negrita (≥ 700); si no, 4,5:1. Se
  *   calcula en el navegador con el tamaño y el peso COMPUTADOS de cada elemento.
  *
- * HALLAZGOS ABIERTOS: marcados con `test.fail()`. Afirman lo que DEBERÍA pasar, así que hoy
- * fallan a propósito; al repararlos se les quita la marca y quedan como regresión.
+ * HALLAZGOS: nacieron marcados con `test.fail()` (afirmaban lo que DEBERÍA pasar). REPARADOS el
+ * 28/09/2026 los doce: se les quitó la marca y quedan como regresión, con aserciones positivas
+ * añadidas donde la ficha solo decía lo que NO debía salir.
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 test.describe('Inspector 28/09/2026 — ecuación, lienzo, textos y contraste', () => {
@@ -453,8 +454,8 @@ test.describe('Inspector 28/09/2026 — ecuación, lienzo, textos y contraste', 
   test('L1 · √ con b = −1, c = 2, d = 1: √(2 − x) + 1, dominio x ≤ 2', async ({ page }) => {
     await abrir(page);
     await escenario(page, '√x', { a: 1, b: -1, c: 2, d: 1 });
-    // El signo de b = −1 sale hoy como guion (U+002D); se admiten los dos para no atar este
-    // candado a la tipografía.
+    // El signo de b = −1 salía como guion (U+002D) hasta el 28/09/2026 y hoy es «−» (U+2212);
+    // este candado admite los dos para no atarse a la tipografía (eso lo vigila el de 2340).
     await expect(formula(page)).toHaveText(/^f\(x\) = √\([-−]\(x − 2\)\) \+ 1$/);
     await expect.poll(() => distanciaColor(page, 2, 1, TEAL)).toBeLessThan(ES_CURVA); // arranque (2, 1)
     for (const [x, y] of [[1, 2], [-2, 3], [-7, 4]]) {
@@ -505,21 +506,210 @@ test.describe('Inspector 28/09/2026 — ecuación, lienzo, textos y contraste', 
     await expect(formula(page)).toHaveText('f(x) = (x − 2)²');
   });
 
-  // ─────────────────────────────────────────────────────────── hallazgos abiertos
+  // ─────────────────────────────────────────────────────────── hallazgos reparados (28/09/2026)
 
-  test('HALLAZGO · la ecuación de x² con b ≠ 1 y c = 0 describe otra función', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): `construirEcuacion` escribe el argumento de x² sin
-    // paréntesis cuando c = 0, así que «b·x» elevado al cuadrado se lee b·x². Caso:
-    //   x², b = 2 → dibuja (2x)² = 4x² (L3) · escribe «f(x) = 2·x²», IGUAL que con a = 2
-    //   x², b = −1 → dibuja (−x)² = x², hacia arriba (L3) · escribe «f(x) = -x²», IGUAL que a = −1
-    // Dos curvas distintas no pueden compartir fórmula.
+  /**
+   * Evalúa la fórmula tal y como la ESCRIBE la app («f(x) = −2·(3·x)² + 1»), para compararla con
+   * lo que DIBUJA el lienzo (`evaluarTransformada`). Es un analizador de la notación de la app, no
+   * un traductor a JavaScript: lee lo que lee el alumno.
+   *   suma      := producto ((« + » | « − ») producto)*      — el menos BINARIO va entre espacios
+   *   producto  := unario («·» unario)*
+   *   unario    := «−» unario | potencia                      — el menos UNARIO va pegado
+   *   potencia  := primario «²»?                              — así «−x²» es −(x²) y «(−x)²» no
+   *   primario  := número | x | ( suma ) | |suma| | sin( suma ) | cos( suma ) | √primario
+   * Un guion (U+002D) o cualquier signo fuera de esta notación LANZA: también se vigila.
+   */
+  function evaluarFormulaEscrita(formula: string, x: number): number {
+    type Token = { tipo: 'num'; valor: number } | { tipo: 'op'; valor: string };
+    const fuente = formula.replace(/^f\(x\) = /, '');
+    const tokens: Token[] = [];
+    for (let i = 0; i < fuente.length; ) {
+      if (fuente.startsWith(' − ', i)) {
+        tokens.push({ tipo: 'op', valor: 'resta' });
+        i += 3;
+      } else if (fuente.startsWith(' + ', i)) {
+        tokens.push({ tipo: 'op', valor: 'suma' });
+        i += 3;
+      } else if (fuente.startsWith('sin', i) || fuente.startsWith('cos', i)) {
+        tokens.push({ tipo: 'op', valor: fuente.slice(i, i + 3) });
+        i += 3;
+      } else if (/[0-9]/.test(fuente[i])) {
+        const m = fuente.slice(i).match(/^[0-9]+(,[0-9]+)?/);
+        if (!m) throw new Error(`número ilegible en «${formula}»`);
+        tokens.push({ tipo: 'num', valor: Number(m[0].replace(',', '.')) });
+        i += m[0].length;
+      } else if ('x()|·²√−'.includes(fuente[i])) {
+        tokens.push({ tipo: 'op', valor: fuente[i] });
+        i += 1;
+      } else {
+        throw new Error(`signo «${fuente[i]}» (U+${fuente.charCodeAt(i).toString(16).toUpperCase()}) fuera de la notación en «${formula}»`);
+      }
+    }
+    let p = 0;
+    const es = (valor: string): boolean => {
+      const t = tokens[p];
+      return t !== undefined && t.tipo === 'op' && t.valor === valor;
+    };
+    const exigir = (valor: string): void => {
+      if (!es(valor)) throw new Error(`se esperaba «${valor}» en «${formula}»`);
+      p++;
+    };
+    const suma = (): number => {
+      let v = producto();
+      while (es('suma') || es('resta')) {
+        const signo = es('suma') ? 1 : -1;
+        p++;
+        v += signo * producto();
+      }
+      return v;
+    };
+    const producto = (): number => {
+      let v = unario();
+      while (es('·')) {
+        p++;
+        v *= unario();
+      }
+      return v;
+    };
+    const unario = (): number => {
+      if (es('−')) {
+        p++;
+        return -unario();
+      }
+      return potencia();
+    };
+    const potencia = (): number => {
+      const v = primario();
+      if (es('²')) {
+        p++;
+        return v * v;
+      }
+      return v;
+    };
+    const primario = (): number => {
+      const t = tokens[p];
+      if (t === undefined) throw new Error(`fórmula incompleta: «${formula}»`);
+      if (t.tipo === 'num') {
+        p++;
+        return t.valor;
+      }
+      p++;
+      switch (t.valor) {
+        case 'x':
+          return x;
+        case '(': {
+          const v = suma();
+          exigir(')');
+          return v;
+        }
+        case '|': {
+          const v = suma();
+          exigir('|');
+          return Math.abs(v);
+        }
+        case 'sin':
+        case 'cos': {
+          exigir('(');
+          const v = suma();
+          exigir(')');
+          return t.valor === 'sin' ? Math.sin(v) : Math.cos(v);
+        }
+        case '√': {
+          const v = primario();
+          return v >= 0 ? Math.sqrt(v) : Number.NaN;
+        }
+        default:
+          throw new Error(`«${t.valor}» fuera de lugar en «${formula}»`);
+      }
+    };
+    const resultado = suma();
+    if (p !== tokens.length) throw new Error(`sobra texto en «${formula}»`);
+    return resultado;
+  }
+
+  function mismaCurva(formula: string, funcion: FuncionBase, v: Valores, xs: readonly number[]): void {
+    for (const x of xs) {
+      const dibujada = evaluarTransformada(funcion, v.a, v.b, v.c, v.d, x);
+      const escrita = evaluarFormulaEscrita(formula, x);
+      if (Number.isNaN(dibujada)) {
+        expect(escrita, `${formula} en x = ${x}: el lienzo no dibuja nada`).toBeNaN();
+      } else {
+        expect(escrita, `${formula} en x = ${x}`).toBeCloseTo(dibujada, 9);
+      }
+    }
+  }
+
+  test('REPARADO (2340) · la fórmula escrita es la curva que se dibuja, para las cinco funciones', async () => {
+    // REPARADO (28/09/2026): `construirEcuacion` escribía el argumento de x² sin paréntesis con
+    // c = 0: b = 2 salía «2·x²» (igual que a = 2) y b = −1 «-x²» (igual que a = −1). Ahora el
+    // argumento b·(x − c) se escribe una vez y la potencia lo envuelve. Se comprueba evaluando la
+    // fórmula escrita contra `evaluarTransformada`, la función con la que pinta el lienzo, en una
+    // rejilla que cruza las cinco funciones con a, b, c y d de ambos signos, 0 y decimales.
+    // El analizador, primero contra valores resueltos a mano: si leyera mal, la rejilla no diría nada.
+    expect(evaluarFormulaEscrita('f(x) = 2·(3·x)²', 1)).toBe(18);
+    expect(evaluarFormulaEscrita('f(x) = −x² + 1', 2)).toBe(-3);
+    expect(evaluarFormulaEscrita('f(x) = (−x)²', 2)).toBe(4);
+    expect(evaluarFormulaEscrita('f(x) = −0,5·|−2·(x + 1)| − 3', 1)).toBe(-5);
+    expect(evaluarFormulaEscrita('f(x) = √(−(x − 2)) + 1', -7)).toBe(4);
+    expect(evaluarFormulaEscrita('f(x) = √x', -1)).toBeNaN();
+    expect(() => evaluarFormulaEscrita('f(x) = -x²', 1), 'un guion no es un signo menos').toThrow();
+
+    const FUNCIONES: readonly FuncionBase[] = ['sin', 'cos', 'cuadratica', 'absoluto', 'raiz'];
+    const XS = [-3.7, -1, 0, 0.4, 2, 5.3];
+    let formulas = 0;
+    for (const funcion of FUNCIONES) {
+      for (const a of [-2, -1, -0.5, 0, 0.5, 1, 2.5]) {
+        for (const b of [-2, -1, -0.5, 0.3, 1, 2]) {
+          for (const c of [-2.5, 0, 1, 3]) {
+            for (const d of [-1, 0, 1.5]) {
+              const f = construirEcuacion(funcion, a, b, c, d);
+              expect(f, 'sin paréntesis dobles').not.toMatch(/\(\(|\|\(|\)\)\)/);
+              mismaCurva(f, funcion, { a, b, c, d }, XS);
+              formulas++;
+            }
+          }
+        }
+      }
+    }
+    expect(formulas).toBe(5 * 7 * 6 * 4 * 3);
+
+    // Los casos de la ficha, uno a uno (resueltos a mano):
+    expect(construirEcuacion('cuadratica', 1, 2, 0, 0)).toBe('f(x) = (2·x)²'); //    = 4x², pasa por (1, 4)
+    expect(construirEcuacion('cuadratica', 2, 1, 0, 0)).toBe('f(x) = 2·x²'); //       pasa por (1, 2)
+    expect(construirEcuacion('cuadratica', 1, -1, 0, 0)).toBe('f(x) = (−x)²'); //     = x², hacia arriba
+    expect(construirEcuacion('cuadratica', -1, 1, 0, 0)).toBe('f(x) = −x²'); //       hacia abajo
+    expect(construirEcuacion('cuadratica', 2, 3, 0, 0)).toBe('f(x) = 2·(3·x)²'); //   = 18x², no 6x²
+
+    // El modo práctica y los enunciados de aula heredan el generador: cada fórmula que citan
+    // (la de partida y la de después de mover) tiene que ser la curva que se carga en el lienzo.
+    const ejercicios = [
+      ...CASOS.map((caso) => ({ enunciado: caso.enunciado, datos: caso.datos })),
+      ...Array.from({ length: 60 }, (_, i) => generarEjercicioAleatorio(i + 1)),
+    ];
+    for (const { enunciado, datos } of ejercicios) {
+      const partida = enunciado.match(/parte de (f\(x\) = .+?) \(a = /);
+      const cambio = enunciado.match(/pasa a ser (f\(x\) = .+?)\. Antes de moverlo/);
+      expect(partida, enunciado).not.toBeNull();
+      expect(cambio, enunciado).not.toBeNull();
+      const despues = { ...datos.antes, [datos.parametro]: datos.nuevoValor };
+      mismaCurva(partida?.[1] ?? '', datos.funcion, datos.antes, XS);
+      mismaCurva(cambio?.[1] ?? '', datos.funcion, despues, XS);
+    }
+  });
+
+  test('REPARADO (2340) · en pantalla, x² con b = 2 o b = −1 ya no comparte fórmula con a = 2 o a = −1', async ({ page }) => {
+    // REPARADO (28/09/2026): el caso de la ficha en el panel y en el aria-label del lienzo.
     await abrir(page);
     await escenario(page, 'x²', { a: 1, b: 2, c: 0, d: 0 });
+    await expect(formula(page)).toHaveText('f(x) = (2·x)²');
+    await expect(lienzo(page)).toHaveAttribute('aria-label', /f\(x\) = \(2·x\)²$/);
+    await expect.poll(() => distanciaColor(page, 1, 4, AZUL)).toBeLessThan(ES_CURVA); // (2·1)² = 4
     const conB2 = await textoDe(formula(page));
     await escenario(page, 'x²', { a: 2, b: 1, c: 0, d: 0 });
     const conA2 = await textoDe(formula(page));
     await escenario(page, 'x²', { a: 1, b: -1, c: 0, d: 0 });
+    await expect(formula(page)).toHaveText('f(x) = (−x)²');
+    await expect.poll(() => distanciaColor(page, 2, 4, AZUL)).toBeLessThan(ES_CURVA); // (−2)² = 4
     const conBmenos1 = await textoDe(formula(page));
     await escenario(page, 'x²', { a: -1, b: 1, c: 0, d: 0 });
     const conAmenos1 = await textoDe(formula(page));
@@ -527,70 +717,85 @@ test.describe('Inspector 28/09/2026 — ecuación, lienzo, textos y contraste', 
     expect(conBmenos1, '(−x)² = x² frente a −x²').not.toBe(conAmenos1);
   });
 
-  test('HALLAZGO · paréntesis dobles en sin, cos, √ y |x| con b = 1 y c ≠ 0', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): con b = 1 el argumento ya trae su paréntesis
-    // «(x − 2)» y el símbolo añade otro. Caso: sin, c = 2 → esperado «f(x) = sin(x − 2)» ·
-    // obtenido «f(x) = sin((x − 2))»; √ → «√((x − 2))»; |x| → «|(x − 2)|». Los enunciados de
-    // los casos 3, 7 y 12 de aula lo heredan (se construyen con la misma función).
+  test('REPARADO (2341) · sin paréntesis dobles en sin, cos, √ y |x| con b = 1 y c ≠ 0', async ({ page }) => {
+    // REPARADO (28/09/2026): con b = 1 el argumento ya traía su paréntesis «(x − 2)» y el
+    // símbolo añadía otro: «sin((x − 2))», «√((x − 2))», «|(x − 2)|». Los enunciados de los
+    // casos 3, 7 y 12 de aula lo heredaban.
     await abrir(page);
-    for (const funcion of ['sin(x)', 'cos(x)', '√x']) {
+    const esperado: Readonly<Record<string, string>> = {
+      'sin(x)': 'f(x) = sin(x − 2)',
+      'cos(x)': 'f(x) = cos(x − 2)',
+      '√x': 'f(x) = √(x − 2)',
+      '|x|': 'f(x) = |x − 2|',
+    };
+    for (const [funcion, texto] of Object.entries(esperado)) {
       await escenario(page, funcion, { a: 1, b: 1, c: 2, d: 0 });
-      expect(await textoDe(formula(page)), funcion).not.toContain('((');
+      await expect(formula(page), funcion).toHaveText(texto);
     }
-    await escenario(page, '|x|', { a: 1, b: 1, c: 2, d: 0 });
-    expect(await textoDe(formula(page)), '|x|').not.toMatch(/\|\(/);
     for (const caso of CASOS) expect(caso.enunciado, `caso ${caso.id}`).not.toMatch(/\(\(|\|\(/);
+    expect(CASOS[6].enunciado).toContain('la fórmula pasa a ser f(x) = sin(x − 2).');
   });
 
-  test('HALLAZGO · el panel describe mal a con 0 < a < 1, a = 0 y a = −1', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): `descripcionA` trata todo a > 0 como estiramiento
-    // y todo lo que no cae en (−1, 0) como «se estira y voltea». La tabla de la propia app dice
-    // «comprime (0<|a|<1)». Casos:
-    //   a = 0,5 → 0,5·sin(x) va de −0,5 a 0,5: se comprime · obtenido «…se estira verticalmente»
-    //   a = 0   → 0·sin(x) = 0, recta y = d · obtenido «Amplitud ×0 con reflexión — se estira y voltea»
-    //   a = −1  → |a| = 1, solo se voltea · obtenido «…se estira y voltea verticalmente»
+  test('REPARADO (2342) · el panel distingue estirar, comprimir, aplanar y voltear con a', async ({ page }) => {
+    // REPARADO (28/09/2026): `descripcionA` trataba todo a > 0 como estiramiento y todo lo que no
+    // caía en (−1, 0) como «se estira y voltea». Casos:
+    //   a = 0,5 → 0,5·sin(x) va de −0,5 a 0,5: se comprime
+    //   a = 0   → 0·sin(x) + d = d: la recta y = d, sin reflexión
+    //   a = −1  → |a| = 1: solo se voltea
     await abrir(page);
     await escenario(page, 'sin(x)', { a: 0.5, b: 1, c: 0, d: 0 });
-    expect(await textoDe(descripcion(page, 'a')), 'a = 0,5').not.toContain('se estira');
+    const medio = await textoDe(descripcion(page, 'a'));
+    expect(medio, 'a = 0,5').not.toContain('se estira');
+    expect(medio, 'a = 0,5').toContain('se comprime verticalmente');
     await escenario(page, 'sin(x)', { a: 0, b: 1, c: 0, d: 0 });
-    expect(await textoDe(descripcion(page, 'a')), 'a = 0').not.toContain('reflexión');
+    const cero = await textoDe(descripcion(page, 'a'));
+    expect(cero, 'a = 0').not.toContain('reflexión');
+    expect(cero, 'a = 0').toContain('recta horizontal y = 0');
     await escenario(page, 'sin(x)', { a: -1, b: 1, c: 0, d: 0 });
-    expect(await textoDe(descripcion(page, 'a')), 'a = −1').not.toContain('se estira');
+    const menosUno = await textoDe(descripcion(page, 'a'));
+    expect(menosUno, 'a = −1').not.toContain('se estira');
+    expect(menosUno, 'a = −1').toContain('Reflexión vertical');
+    await escenario(page, 'sin(x)', { a: -2, b: 1, c: 0, d: 0 });
+    expect(await textoDe(descripcion(page, 'a')), 'a = −2').toContain('se estira verticalmente y se voltea');
   });
 
-  test('HALLAZGO · el panel dice que b = −1 estira, y «1 unidades»', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): con |b| = 1 `descripcionB` cae en la rama de
-    // |b| < 1. Caso: b = −1 → esperado solo la reflexión · obtenido «Período ×1 — la gráfica se
-    // estira horizontalmente con reflexión horizontal». Y c = 1 → «se desplaza 1 unidades».
+  test('REPARADO (2343) · b = −1 solo refleja, «1 unidad», y sin período en funciones no periódicas', async ({ page }) => {
+    // REPARADO (28/09/2026): con |b| = 1 `descripcionB` caía en la rama de |b| < 1 («Período ×1 —
+    // se estira»); c = 1 daba «1 unidades»; y x² con b = 0,5 hablaba de «Período ×2».
     await abrir(page);
     await escenario(page, 'sin(x)', { a: 1, b: -1, c: 1, d: 0 });
-    expect(await textoDe(descripcion(page, 'b')), 'b = −1').not.toContain('se estira');
-    expect(await textoDe(descripcion(page, 'c')), 'c = 1').not.toContain('1 unidades');
+    const bMenos1 = await textoDe(descripcion(page, 'b'));
+    expect(bMenos1, 'b = −1').not.toContain('se estira');
+    expect(bMenos1, 'b = −1').toContain('Reflexión horizontal');
+    const c1 = await textoDe(descripcion(page, 'c'));
+    expect(c1, 'c = 1').not.toContain('1 unidades');
+    expect(c1, 'c = 1').toContain('1 unidad a la derecha');
+    await escenario(page, 'x²', { a: 1, b: 0.5, c: 0, d: 0 });
+    const parabola = await textoDe(descripcion(page, 'b'));
+    expect(parabola, 'x², b = 0,5').not.toMatch(/Período|Frecuencia/);
+    expect(parabola, 'x², b = 0,5').toContain('se estira horizontalmente');
+    await escenario(page, 'sin(x)', { a: 1, b: 0.5, c: 0, d: 0 });
+    expect(await textoDe(descripcion(page, 'b')), 'sin, b = 0,5').toContain('Período ×2');
   });
 
   for (const tema of ['light', 'dark'] as const) {
     const nombreTema = tema === 'light' ? 'claro' : 'oscuro';
 
-    test(`HALLAZGO · contraste de las etiquetas «a = …», «b = …», «c = …» del panel (${nombreTema})`, async ({ page }) => {
-      test.fail();
-      // HALLAZGO ABIERTO (inspector 28/09/2026): `paramTag` pone texto blanco de 13,6 px en
-      // negrita (umbral 4,5:1) sobre el fondo en línea de cada parámetro, igual en los dos
-      // temas. Cabecera: a 4,11 · b 2,80 · c 2,26 · d 8,33 (este sí cumple).
+    test(`REPARADO (2344) · contraste de las etiquetas «a = …», «b = …», «c = …», «d = …» del panel (${nombreTema})`, async ({ page }) => {
+      // REPARADO (28/09/2026): `paramTag` ponía texto blanco de 13,6 px sobre el color en línea de
+      // cada parámetro (a 4,11 · b 2,80 · c 2,26). Ahora el fondo es --primary-boton,
+      // --secondary-boton, --param-c-fondo (#3A67A8) y --hero-bg: 5,47 · 5,15 · 5,70 · 8,33.
       await abrir(page, tema);
       const etiquetas = page.locator('[class*="paramTag"]');
       await expect(etiquetas).toHaveCount(4);
       for (let i = 0; i < 4; i++) await exigirContraste(`etiqueta ${'abcd'[i]}`, etiquetas.nth(i));
     });
 
-    test(`HALLAZGO · contraste de las letras de color de a, b, c, d (${nombreTema})`, async ({ page }) => {
-      test.fail();
-      // HALLAZGO ABIERTO (inspector 28/09/2026): las letras de los deslizadores (19,2 px, peso
-      // 800 → texto grande, 3:1) y las de la tabla educativa (14,4 px → 4,5:1) llevan el color
-      // en línea. Claro: deslizador b 2,80 y c 2,26; tabla a 4,11, b 2,80, c 2,26.
-      // Oscuro (sobre #2D2D2D): deslizador d 1,65; tabla a 3,35 y d 1,65.
+    test(`REPARADO (2345) · contraste de las letras de color de a, b, c, d (${nombreTema})`, async ({ page }) => {
+      // REPARADO (28/09/2026): las letras de los deslizadores (19,2 px, peso 800 → 3:1) y las de
+      // la tabla educativa (14,4 px → 4,5:1) llevaban el color en línea, sin variante oscura.
+      // Ahora a y b van con --primary-texto y --secondary-texto, y c y d con variables del
+      // módulo que se redeclaran en [data-theme='dark'].
       await abrir(page, tema);
       await page.getByRole('button', { name: 'Ver guía educativa' }).click();
       const letras = page.locator('[class*="paramName"]');
@@ -602,12 +807,15 @@ test.describe('Inspector 28/09/2026 — ecuación, lienzo, textos y contraste', 
       }
     });
 
-    test(`HALLAZGO · texto pequeño en var(--primary) por debajo de 4,5:1 (${nombreTema})`, async ({ page }) => {
-      test.fail();
-      // HALLAZGO ABIERTO (inspector 28/09/2026): el color de marca como TEXTO pequeño. Medido en
-      // claro: valor del deslizador (16 px) 4,11 · botón de función activo (14,4 px) 3,42 ·
-      // «Restablecer todo» 4,11 · «— Función transformada f(x)» 3,93 · preguntas del FAQ 3,93.
-      // En oscuro solo la leyenda: 4,36.
+    test(`REPARADO (2346) · el texto de marca pequeño llega a 4,5:1 (${nombreTema})`, async ({ page }) => {
+      // REPARADO (28/09/2026): el color de marca como TEXTO pequeño iba en var(--primary).
+      // Medido en claro: valor del deslizador 4,11 · botón de función activo 3,42 · «Restablecer
+      // todo» 4,11 · leyenda de la transformada 3,93 · preguntas del FAQ 3,93; en oscuro la
+      // leyenda, 4,36 (sobre un gris #353535). Ahora van con --primary-texto y la leyenda, en
+      // oscuro, sobre --bg-primary. Al repararlo salieron más con el mismo defecto en el bloque
+      // educativo, y se miden aquí también: los títulos de escenarios, pasos y trucos (3,93 en
+      // claro), el número de cada paso (blanco sobre --primary: 2,79 en oscuro) y el naranja de
+      // «errores frecuentes» (#E07A1F: 2,56 en claro y 3,72 en oscuro).
       await abrir(page, tema);
       await page.getByRole('button', { name: 'Ver guía educativa' }).click();
       await exigirContraste('valor del deslizador a', page.locator('[class*="sliderValue"]').first());
@@ -618,13 +826,70 @@ test.describe('Inspector 28/09/2026 — ecuación, lienzo, textos y contraste', 
       await exigirContraste('Restablecer todo', page.getByRole('button', { name: 'Restablecer todos los parámetros' }));
       await exigirContraste('leyenda de la transformada', page.locator('[class*="leyendaTransf"]'));
       await exigirContraste('pregunta del FAQ', page.locator('[class*="faqItem"] h4').first());
+      await exigirContraste('título de escenario', page.locator('[class*="scenarioCard"] strong').first());
+      await exigirContraste('título de paso', page.locator('[class*="stepContent"] strong').first());
+      await exigirContraste('número de paso', page.locator('[class*="stepNumber"]').first());
+      await exigirContraste('título de truco', page.locator('[class*="tipCard"] strong').first());
+      await exigirContraste('cabecera de errores frecuentes', page.locator('[class*="warningHeader"] strong'));
+      await exigirContraste('error frecuente', page.locator('[class*="warningList"] li strong').first());
+    });
+
+    test(`REPARADO (sospecha) · la etiqueta de la ecuación dentro del lienzo llega a 4,5:1 (${nombreTema})`, async ({ page }) => {
+      // REPARADO (28/09/2026), sospecha del acta confirmada: la etiqueta se pintaba en #2E86AB,
+      // negrita de 13 px, sobre su caja (blanca al 90 % en claro, #1E1E1E al 85 % en oscuro):
+      // ≈ 4:1 en los dos temas. Ahora el texto va en la variante de texto del mismo azul
+      // (#26718F / #3FA5D1); la curva sigue en #2E86AB. Se mide en los píxeles del lienzo: el
+      // color más frecuente del tramo final de la etiqueta es su caja, y el más alejado de él
+      // entre los frecuentes, el núcleo del trazo de las letras.
+      await abrir(page, tema);
+      await expect(formula(page)).toHaveText('f(x) = sin(x)');
+      const ratio = await lienzo(page).evaluate((el) => {
+        const cv = el as HTMLCanvasElement;
+        const rect = cv.getBoundingClientRect();
+        const dpr = cv.width / rect.width;
+        const derecha = rect.width - 30 - 10; // labelX de dibujar()
+        const arriba = 30 + 10; //                labelY
+        const ctx = cv.getContext('2d');
+        if (!ctx) return 0;
+        const x0 = Math.round((derecha - 60) * dpr);
+        const y0 = Math.round((arriba + 2) * dpr);
+        const datos = ctx.getImageData(x0, y0, Math.round(60 * dpr), Math.round(16 * dpr)).data;
+        const cuenta = new Map<string, number>();
+        for (let i = 0; i < datos.length; i += 4) {
+          const k = `${datos[i]},${datos[i + 1]},${datos[i + 2]}`;
+          cuenta.set(k, (cuenta.get(k) ?? 0) + 1);
+        }
+        const orden = [...cuenta.entries()].sort((p, q) => q[1] - p[1]);
+        const caja = orden[0][0].split(',').map(Number);
+        let texto = caja;
+        let lejos = -1;
+        for (const [k, n] of orden) {
+          if (n < 4) continue;
+          const c = k.split(',').map(Number);
+          const dist = Math.hypot(c[0] - caja[0], c[1] - caja[1], c[2] - caja[2]);
+          if (dist > lejos) {
+            lejos = dist;
+            texto = c;
+          }
+        }
+        const lum = (c: number[]): number => {
+          const f = (v: number): number => {
+            const s = v / 255;
+            return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+          };
+          return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+        };
+        const l1 = lum(caja);
+        const l2 = lum(texto);
+        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+      });
+      expect(ratio, `etiqueta del lienzo: ${ratio.toLocaleString('es-ES', { maximumFractionDigits: 2 })}:1`).toBeGreaterThanOrEqual(4.5);
     });
   }
 
-  test('HALLAZGO · las cinco 💡 de los trucos del FAQ no llevan aria-hidden', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): los cinco <p> de `faqTip` empiezan con «💡» como
-    // texto suelto, junto a texto; el lector de pantalla lee «bombilla» delante de cada truco.
+  test('REPARADO (2347) · las cinco 💡 de los trucos del FAQ llevan aria-hidden', async ({ page }) => {
+    // REPARADO (28/09/2026): los cinco <p> de `faqTip` empezaban con «💡» como texto suelto junto a
+    // texto; el lector de pantalla leía «bombilla» delante de cada truco.
     await abrir(page);
     const trucos = page.locator('p[class*="faqTip"]');
     await expect(trucos).toHaveCount(5);
@@ -633,13 +898,10 @@ test.describe('Inspector 28/09/2026 — ecuación, lienzo, textos y contraste', 
     }
   });
 
-  test('HALLAZGO · el FAQ «¿Y si b es negativo?» contradice lo que se dibuja', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): dice que con sin y cos «la reflexión no cambia la
-    // forma visual» y que en «la parábola asimétrica sí se aprecia el cambio». Caso: sin, b = −1
-    // → la curva pasa por (π/2, −1) y no por (π/2, 1) (L4): sí cambia; y x² es simétrica, como
-    // dice el propio truco de debajo («b=−1 no cambia la gráfica»). El recuadro de errores
-    // frecuentes y el caso 11 de aula dicen lo contrario que este párrafo.
+  test('REPARADO (2348) · el FAQ «¿Y si b es negativo?» dice lo que se dibuja', async ({ page }) => {
+    // REPARADO (28/09/2026): decía que con sin y cos «la reflexión no cambia la forma visual» y
+    // que en «la parábola asimétrica sí se aprecia el cambio». Caso: sin, b = −1 → la curva pasa
+    // por (π/2, −1) y no por (π/2, 1) (L4): sí cambia, porque sin es impar; x² es par y no cambia.
     await abrir(page);
     await escenario(page, 'sin(x)', { a: 1, b: -1, c: 0, d: 0 });
     await expect.poll(() => distanciaColor(page, Math.PI / 2, -1, AZUL)).toBeLessThan(ES_CURVA);
@@ -647,47 +909,64 @@ test.describe('Inspector 28/09/2026 — ecuación, lienzo, textos y contraste', 
     const texto = await textoDe(faq);
     expect(texto).not.toContain('parábola asimétrica');
     expect(texto).not.toMatch(/sin y cos, la reflexión no cambia la forma visual/);
+    expect(texto).toContain('sin(−u) = −sin(u)');
+    expect(texto).toContain('(π/2, −1) en lugar de (π/2, 1)');
+    expect(texto).toMatch(/pares —cos, x² y \|x\|—/);
   });
 
-  test('HALLAZGO · «el signo que ves en la fórmula es la dirección» enseña el error clásico', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): el truco «El signo de c…» pide leer la dirección
-    // en el signo que se ve. Caso: c = −2 → la app escribe «(x + 2)²» (se ve «+») y el vértice
-    // se dibuja en x = −2, a la IZQUIERDA. La pista del caso 2 de aula dice justo lo contrario.
+  test('REPARADO (2349) · el truco del signo de c ya no enseña el error clásico', async ({ page }) => {
+    // REPARADO (28/09/2026): el truco pedía leer la dirección en «el signo que ves en la
+    // fórmula». Caso: c = −2 → la app escribe «(x + 2)²» (se ve «+») y el vértice se dibuja en
+    // x = −2, a la IZQUIERDA. Ahora dice que el signo que se ve es el CONTRARIO de la dirección.
     await abrir(page);
     await escenario(page, 'x²', { a: 1, b: 1, c: -2, d: 0 });
     await expect(formula(page)).toHaveText('f(x) = (x + 2)²');
     await expect.poll(() => distanciaColor(page, -2, 0, TEAL)).toBeLessThan(ES_CURVA);
     const truco = page.locator('[class*="tipCard"]').filter({ hasText: 'El signo de c' });
-    expect(await textoDe(truco)).not.toContain('el signo que ves en la fórmula es la dirección');
+    const texto = await textoDe(truco);
+    expect(texto).not.toContain('el signo que ves en la fórmula es la dirección');
+    expect(texto).toContain('(x + 2) es c = −2 → 2 unidades a la izquierda');
   });
 
-  test('HALLAZGO · el paso 2 toma (c, d) como el cruce central también en cos', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): «…o el punto de cruce central (sin/cos). Ese punto
-    // es (c, d)». En cos no: caso cos, c = 2, d = 1 → en x = c la curva está en su MÁXIMO
-    // a + d = 2 (L5) y corta y = d en 2 ± π/2; quien siga el paso lee c desfasado π/2.
+  test('REPARADO (2350) · el paso 2 ya no toma (c, d) como un cruce en cos', async ({ page }) => {
+    // REPARADO (28/09/2026): «…o el punto de cruce central (sin/cos). Ese punto es (c, d)». En
+    // cos no: caso cos, c = 2, d = 1 → en x = c la curva está en su MÁXIMO a + d = 2 (L5) y
+    // corta y = d en 2 ± π/2.
     await abrir(page);
     await escenario(page, 'cos(x)', { a: 1, b: 1, c: 2, d: 1 });
     await expect.poll(() => distanciaColor(page, 2, 2, AZUL)).toBeLessThan(ES_CURVA);
     const paso = page.locator('[class*="stepContent"]').filter({ hasText: 'Localiza el punto de referencia' });
-    expect(await textoDe(paso)).not.toMatch(/cruce central \(sin\/cos\)/);
+    const texto = await textoDe(paso);
+    expect(texto).not.toMatch(/cruce central \(sin\/cos\)/);
+    expect(texto).toContain('en x = c está una cresta, a la altura a + d');
   });
 
-  test('HALLAZGO · con las flechas, b no pasa de 0,1 a negativo', async ({ page }) => {
-    test.fail();
-    // HALLAZGO ABIERTO (inspector 28/09/2026): el deslizador cambia b = 0 por 0,1. Desde 0,1,
-    // «←» pide 0 y la app lo devuelve a 0,1: por teclado no se cruza a −0,1 (solo con Re Pág o
-    // Inicio, que saltan a −0,5 o −3). De −0,1 hacia la derecha sí salta a 0,1.
-    // Caso: b = 0,2, «←» dos veces → esperado −0,1 · obtenido 0,1.
+  test('REPARADO (2351) · b cruza el cero con las flechas en los dos sentidos', async ({ page }) => {
+    // REPARADO (28/09/2026): el deslizador cambiaba SIEMPRE b = 0 por 0,1, así que desde 0,1 «←»
+    // pedía 0, volvía a 0,1 y por teclado no se cruzaba a negativo. Ahora (`ajustarB`) un paso
+    // desde ±0,1 cruza al otro lado. Caso: b = 0,2, «←» dos veces → −0,1; y «→» vuelve a 0,1.
     await abrir(page);
     await sembrarValor(page, '#slider-b', '0.2');
     await page.locator('#slider-b').focus();
     await page.keyboard.press('ArrowLeft');
     await expect.poll(() => leerValorEnReact(page, '#slider-b')).toBe('0.1');
     await page.keyboard.press('ArrowLeft');
-    await expect
-      .poll(async () => Number(await leerValorEnReact(page, '#slider-b')), { timeout: 2000 })
-      .toBeLessThan(0);
+    await expect.poll(() => leerValorEnReact(page, '#slider-b')).toBe('-0.1');
+    await expect(formula(page)).toHaveText('f(x) = sin(−0,1·x)');
+    await page.keyboard.press('ArrowLeft');
+    await expect.poll(() => leerValorEnReact(page, '#slider-b')).toBe('-0.2');
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowRight');
+    await expect.poll(() => leerValorEnReact(page, '#slider-b')).toBe('0.1');
+  });
+
+  test('REPARADO (2351) · ajustarB: el paso cruza, el arrastre y el salto se quedan en su lado', async () => {
+    expect(ajustarB(0.5, 1, false)).toBe(0.5); //   lo que no es 0 pasa tal cual
+    expect(ajustarB(0, 0.1, false)).toBe(-0.1); //  flecha «←» desde 0,1
+    expect(ajustarB(0, -0.1, false)).toBe(0.1); //  flecha «→» desde −0,1
+    expect(ajustarB(0, 0.1, true)).toBe(0.1); //    arrastrando: no parpadea en el centro
+    expect(ajustarB(0, -0.1, true)).toBe(-0.1);
+    expect(ajustarB(0, 1, false)).toBe(0.1); //     salto a 0 desde lejos (L2): se queda en su lado
+    expect(ajustarB(0, -2, false)).toBe(-0.1);
   });
 });

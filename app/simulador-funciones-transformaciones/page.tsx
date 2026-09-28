@@ -6,7 +6,8 @@ import styles from './SimuladorFuncionesTransformaciones.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
-import { FUNCIONES_BASE, evaluarBase, evaluarTransformada, fmtParam, construirEcuacion, type FuncionBase } from './motor';
+import { FUNCIONES_BASE, evaluarBase, evaluarTransformada, fmtParam, construirEcuacion, ajustarB, type FuncionBase } from './motor';
+import { cifra } from './casos';
 import CasosAula from './CasosAula';
 
 // ============================================
@@ -52,6 +53,10 @@ export default function SimuladorFuncionesTransformacionesPage() {
     const colorText = isDark ? '#CCCCCC' : '#444';
     const colorBase = isDark ? 'rgba(200,200,200,0.35)' : 'rgba(120,120,120,0.4)';
     const colorTransf = '#2E86AB';
+    // La etiqueta de la ecuación es TEXTO de 13 px, y #2E86AB se quedaba en ≈ 4:1 sobre su caja
+    // en los dos temas (medido en el lienzo). Va con la variante de texto del mismo azul
+    // (--primary-texto de cada tema); la curva sigue en #2E86AB, que como trazo exige 3:1.
+    const colorEtiqueta = isDark ? '#3FA5D1' : '#26718F';
 
     const X_MIN = -10;
     const X_MAX = 10;
@@ -182,7 +187,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
     ctx.roundRect(labelX - textWidth - 10, labelY - 2, textWidth + 20, 24, 4);
     ctx.fill();
 
-    ctx.fillStyle = colorTransf;
+    ctx.fillStyle = colorEtiqueta;
     ctx.textAlign = 'right';
     ctx.fillText(ecuacion, labelX, labelY + 15);
 
@@ -215,32 +220,89 @@ export default function SimuladorFuncionesTransformacionesPage() {
     setD(0);
   };
 
+  /**
+   * El deslizador de b salta el 0 (`ajustarB`), y lo que decide a qué lado cae es si se está
+   * ARRASTRANDO: con el puntero se queda del lado de donde viene; con flechas o con el
+   * incremento de un lector de pantalla, un paso desde ±0,1 cruza al otro lado.
+   */
+  const arrastrandoB = useRef(false);
+  const empezarArrastreB = () => {
+    arrastrandoB.current = true;
+    const soltar = () => {
+      arrastrandoB.current = false;
+      window.removeEventListener('pointerup', soltar);
+      window.removeEventListener('pointercancel', soltar);
+    };
+    window.addEventListener('pointerup', soltar);
+    window.addEventListener('pointercancel', soltar);
+  };
+
+  // ── Los textos del panel (hallazgos 2342 y 2343, 28/09/2026) ─────────────────────────────
+  // Distinguen |a| > 1 (estira), 0 < |a| < 1 (comprime), a = 0 (recta y = d) y el signo
+  // (reflexión), y solo hablan de amplitud, frecuencia o período en sin y cos: x², |x| y √x no
+  // son periódicas. Antes, a = 0,5 «se estiraba», a = −1 «se estiraba y volteaba», b = −1
+  // «estiraba» con período ×1, y x² con b = 0,5 tenía «Período ×2».
+  const esPeriodica = funcBase === 'sin' || funcBase === 'cos';
+  const unidades = (v: number): string => `${fmtParam(v)} ${Math.abs(v) === 1 ? 'unidad' : 'unidades'}`;
+
   const descripcionA = (): string => {
-    if (a === 1) return 'Sin cambio (amplitud normal)';
-    if (a > 0) return `Amplitud ×${fmtParam(a)} — la gráfica se estira verticalmente`;
-    if (a < 0 && a > -1) return `Amplitud ×${fmtParam(Math.abs(a))} con reflexión — la gráfica se comprime y voltea`;
-    return `Amplitud ×${fmtParam(Math.abs(a))} con reflexión — la gráfica se estira y voltea verticalmente`;
+    if (a === 0) return `Anula la función: la gráfica se aplana en la recta horizontal y = ${fmtParam(d)}`;
+    if (a === 1) return esPeriodica ? 'Sin cambio (amplitud 1)' : 'Sin cambio vertical';
+    if (a === -1) {
+      return `Reflexión vertical — la gráfica se voltea respecto a la recta y = ${fmtParam(d)}, sin cambiar de escala`;
+    }
+    const abs = Math.abs(a);
+    const nombre = esPeriodica ? 'Amplitud' : 'Factor vertical';
+    const escala = abs > 1 ? 'se estira verticalmente' : 'se comprime verticalmente';
+    if (a > 0) return `${nombre} ×${fmtParam(abs)} — la gráfica ${escala}`;
+    return `${nombre} ×${fmtParam(abs)} con reflexión — la gráfica ${escala} y se voltea respecto a la recta y = ${fmtParam(d)}`;
+  };
+
+  /** Si el reflejo horizontal (b < 0) se ve o no depende de la simetría de la función base. */
+  const notaParidad = (): string => {
+    switch (funcBase) {
+      case 'cos':
+        return ' (cos es par, cos(−u) = cos(u): el reflejo no se nota)';
+      case 'cuadratica':
+        return ' (x² es par, (−u)² = u²: el reflejo no se nota)';
+      case 'absoluto':
+        return ' (|x| es par, |−u| = |u|: el reflejo no se nota)';
+      case 'sin':
+        return ' (sin es impar, sin(−u) = −sin(u): el reflejo equivale a voltearla en vertical)';
+      case 'raiz':
+        return ` (√ solo existe si lo de dentro es ≥ 0: la gráfica pasa al otro lado de x = ${fmtParam(c)})`;
+    }
   };
 
   const descripcionB = (): string => {
-    const bSafe = b === 0 ? 0.001 : b;
-    if (bSafe === 1) return 'Sin cambio (frecuencia normal)';
-    const abs = Math.abs(bSafe);
-    const reflexion = bSafe < 0 ? ' con reflexión horizontal' : '';
-    if (abs > 1) return `Frecuencia ×${fmtParam(abs)} — la gráfica se comprime horizontalmente${reflexion}`;
-    return `Período ×${fmtParam(Number((1 / abs).toFixed(1)))} — la gráfica se estira horizontalmente${reflexion}`;
+    const abs = Math.abs(b);
+    if (b === 1) return esPeriodica ? 'Sin cambio (período 2π)' : 'Sin cambio horizontal';
+    if (b === -1) return `Reflexión horizontal respecto a la recta x = ${fmtParam(c)}${notaParidad()}`;
+    let escala: string;
+    if (esPeriodica) {
+      escala =
+        abs > 1
+          ? `Frecuencia ×${fmtParam(abs)} — la gráfica se comprime horizontalmente`
+          : `Período ×${cifra(1 / abs)} — la gráfica se estira horizontalmente`;
+    } else {
+      escala =
+        abs > 1
+          ? `Escala horizontal — la gráfica se comprime horizontalmente: las distancias en x se dividen entre ${fmtParam(abs)}`
+          : `Escala horizontal — la gráfica se estira horizontalmente: las distancias en x se multiplican por ${cifra(1 / abs)}`;
+    }
+    return b < 0 ? `${escala}, y se refleja respecto a la recta x = ${fmtParam(c)}${notaParidad()}` : escala;
   };
 
   const descripcionC = (): string => {
     if (c === 0) return 'Sin desfase horizontal';
-    if (c > 0) return `Desfase +${fmtParam(c)} — la gráfica se desplaza ${fmtParam(c)} unidades a la derecha`;
-    return `Desfase ${fmtParam(c)} — la gráfica se desplaza ${fmtParam(Math.abs(c))} unidades a la izquierda`;
+    if (c > 0) return `Desfase +${fmtParam(c)} — la gráfica se desplaza ${unidades(c)} a la derecha`;
+    return `Desfase ${fmtParam(c)} — la gráfica se desplaza ${unidades(Math.abs(c))} a la izquierda`;
   };
 
   const descripcionD = (): string => {
     if (d === 0) return 'Sin desfase vertical';
-    if (d > 0) return `Desfase +${fmtParam(d)} — la gráfica se desplaza ${fmtParam(d)} unidades hacia arriba`;
-    return `Desfase ${fmtParam(d)} — la gráfica se desplaza ${fmtParam(Math.abs(d))} unidades hacia abajo`;
+    if (d > 0) return `Desfase +${fmtParam(d)} — la gráfica se desplaza ${unidades(d)} hacia arriba`;
+    return `Desfase ${fmtParam(d)} — la gráfica se desplaza ${unidades(Math.abs(d))} hacia abajo`;
   };
 
   const ecuacionActual = construirEcuacion(funcBase, a, b, c, d);
@@ -309,7 +371,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
         {/* Slider a */}
         <div className={styles.sliderGroup}>
           <label className={styles.sliderLabel} htmlFor="slider-a">
-            <span className={styles.paramName} style={{ color: '#2E86AB' }}>a</span> — Escala vertical / amplitud
+            <span className={`${styles.paramName} ${styles.colorParamA}`}>a</span> — Escala vertical / amplitud
           </label>
           <div className={styles.sliderRow}>
             <input
@@ -330,7 +392,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
         {/* Slider b */}
         <div className={styles.sliderGroup}>
           <label className={styles.sliderLabel} htmlFor="slider-b">
-            <span className={styles.paramName} style={{ color: '#48A9A6' }}>b</span> — Escala horizontal / frecuencia
+            <span className={`${styles.paramName} ${styles.colorParamB}`}>b</span> — Escala horizontal / frecuencia
           </label>
           <div className={styles.sliderRow}>
             <input
@@ -340,10 +402,11 @@ export default function SimuladorFuncionesTransformacionesPage() {
               max={3}
               step={0.1}
               value={b}
+              onPointerDown={empezarArrastreB}
               onChange={e => {
                 const val = parseFloat(e.target.value);
-                // Evitar exactamente 0
-                setB(val === 0 ? 0.1 : val);
+                // b = 0 no existe: `ajustarB` decide a qué lado del cero queda (hallazgo 2351).
+                setB(previo => ajustarB(val, previo, arrastrandoB.current));
               }}
               className={styles.slider}
               aria-label="Parámetro b: escala horizontal"
@@ -355,7 +418,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
         {/* Slider c */}
         <div className={styles.sliderGroup}>
           <label className={styles.sliderLabel} htmlFor="slider-c">
-            <span className={styles.paramName} style={{ color: '#7FB3D3' }}>c</span> — Desfase horizontal / traslación
+            <span className={`${styles.paramName} ${styles.colorParamC}`}>c</span> — Desfase horizontal / traslación
           </label>
           <div className={styles.sliderRow}>
             <input
@@ -376,7 +439,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
         {/* Slider d */}
         <div className={styles.sliderGroup}>
           <label className={styles.sliderLabel} htmlFor="slider-d">
-            <span className={styles.paramName} style={{ color: '#1a5278' }}>d</span> — Desfase vertical
+            <span className={`${styles.paramName} ${styles.colorParamD}`}>d</span> — Desfase vertical
           </label>
           <div className={styles.sliderRow}>
             <input
@@ -401,19 +464,19 @@ export default function SimuladorFuncionesTransformacionesPage() {
 
         <ul className={styles.parametrosList}>
           <li className={styles.parametroItem}>
-            <span className={styles.paramTag} style={{ background: '#2E86AB' }}>a = {fmtParam(a)}</span>
+            <span className={`${styles.paramTag} ${styles.paramTagA}`}>a = {fmtParam(a)}</span>
             <span>{descripcionA()}</span>
           </li>
           <li className={styles.parametroItem}>
-            <span className={styles.paramTag} style={{ background: '#48A9A6' }}>b = {fmtParam(b)}</span>
+            <span className={`${styles.paramTag} ${styles.paramTagB}`}>b = {fmtParam(b)}</span>
             <span>{descripcionB()}</span>
           </li>
           <li className={styles.parametroItem}>
-            <span className={styles.paramTag} style={{ background: '#7FB3D3' }}>c = {fmtParam(c)}</span>
+            <span className={`${styles.paramTag} ${styles.paramTagC}`}>c = {fmtParam(c)}</span>
             <span>{descripcionC()}</span>
           </li>
           <li className={styles.parametroItem}>
-            <span className={styles.paramTag} style={{ background: '#1a5278' }}>d = {fmtParam(d)}</span>
+            <span className={`${styles.paramTag} ${styles.paramTagD}`}>d = {fmtParam(d)}</span>
             <span>{descripcionD()}</span>
           </li>
         </ul>
@@ -475,25 +538,25 @@ export default function SimuladorFuncionesTransformacionesPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong style={{ color: '#2E86AB' }}>a</strong></td>
+                  <td><strong className={styles.colorParamA}>a</strong></td>
                   <td>Escala vertical / amplitud</td>
                   <td>Estira (|a|&gt;1) o comprime (0&lt;|a|&lt;1) verticalmente. Si a&lt;0, también refleja respecto al eje X.</td>
                   <td>a=2 → duplica la altura; a=−1 → invierte la gráfica</td>
                 </tr>
                 <tr>
-                  <td><strong style={{ color: '#48A9A6' }}>b</strong></td>
+                  <td><strong className={styles.colorParamB}>b</strong></td>
                   <td>Escala horizontal / frecuencia</td>
                   <td>Comprime (|b|&gt;1) o estira (0&lt;|b|&lt;1) horizontalmente. Si b&lt;0, refleja respecto al eje Y.</td>
                   <td>b=2 → período a la mitad; b=0,5 → período doble</td>
                 </tr>
                 <tr>
-                  <td><strong style={{ color: '#7FB3D3' }}>c</strong></td>
+                  <td><strong className={styles.colorParamC}>c</strong></td>
                   <td>Desfase horizontal</td>
                   <td>Desplaza la gráfica a la derecha (c&gt;0) o a la izquierda (c&lt;0).</td>
                   <td>c=3 → desplaza 3 unidades a la derecha</td>
                 </tr>
                 <tr>
-                  <td><strong style={{ color: '#1a5278' }}>d</strong></td>
+                  <td><strong className={styles.colorParamD}>d</strong></td>
                   <td>Desfase vertical</td>
                   <td>Sube (d&gt;0) o baja (d&lt;0) toda la gráfica.</td>
                   <td>d=−2 → baja la gráfica 2 unidades</td>
@@ -572,7 +635,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
                 "dentro" del argumento.
               </p>
               <p className={styles.faqTip}>
-                💡 Truco: b actúa sobre el eje X como el denominador de una fracción.
+                <span aria-hidden="true">💡</span> Truco: b actúa sobre el eje X como el denominador de una fracción.
                 b=2 → período/2. b=1/3 → período×3.
               </p>
             </div>
@@ -585,8 +648,8 @@ export default function SimuladorFuncionesTransformacionesPage() {
                 ha movido a x=c, que está a la derecha del origen si c&gt;0.
               </p>
               <p className={styles.faqTip}>
-                💡 Regla: el signo externo del c en la fórmula indica la dirección del desplazamiento.
-                (x−3) → desplaza +3 a la derecha. (x+3) → desplaza 3 a la izquierda.
+                <span aria-hidden="true">💡</span> Regla: iguala el paréntesis a cero. (x − 3) vale 0 en x = 3 → 3 unidades
+                a la derecha. (x + 3) vale 0 en x = −3 → 3 unidades a la izquierda.
               </p>
             </div>
 
@@ -598,7 +661,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
                 Por ejemplo, a=−2 duplica la amplitud Y refleja la gráfica.
               </p>
               <p className={styles.faqTip}>
-                💡 Para sin(x): a=−1 convierte máximos en mínimos. El seno "se voltea".
+                <span aria-hidden="true">💡</span> Para sin(x): a=−1 convierte máximos en mínimos. El seno "se voltea".
                 Equivale a multiplicar todos los valores Y por −1.
               </p>
             </div>
@@ -606,14 +669,16 @@ export default function SimuladorFuncionesTransformacionesPage() {
             <div className={styles.faqItem}>
               <h4>¿Y si b es negativo?</h4>
               <p>
-                <code>b&lt;0</code> produce una <strong>reflexión respecto al eje Y</strong> además
-                del escalado horizontal. Para funciones simétricas como sin y cos, la reflexión no
-                cambia la forma visual (sin es impar: sin(−x)=−sin(x); cos es par: cos(−x)=cos(x)).
-                Para la raíz o la parábola asimétrica sí se aprecia el cambio.
+                <code>b&lt;0</code> produce una <strong>reflexión respecto a la recta vertical x = c</strong> (el
+                eje Y si c = 0), además del escalado horizontal si |b| ≠ 1. Que se note depende de la
+                simetría de la función base. En las <strong>pares</strong> —cos, x² y |x|— g(−u) = g(u), así que
+                el reflejo no cambia la gráfica. En el seno, que es <strong>impar</strong>, sin(−u) = −sin(u):
+                reflejar en horizontal equivale a voltear en vertical, y con b = −1 la curva pasa por
+                (π/2, −1) en lugar de (π/2, 1). Y √x, que no es par ni impar, pasa al otro lado.
               </p>
               <p className={styles.faqTip}>
-                💡 Para x²: b=−1 no cambia la gráfica porque (−x)²=x². Pero para √x sí: la raíz
-                se refleja y solo existe para x≤0.
+                <span aria-hidden="true">💡</span> Para x²: b=−1 no cambia la gráfica porque (−x)²=x². Pero para √x sí: con
+                c = 0 la raíz se refleja y solo existe para x≤0.
               </p>
             </div>
 
@@ -626,7 +691,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
                 transformada no tiene ceros reales.
               </p>
               <p className={styles.faqTip}>
-                💡 Ejemplo: sin(x) tiene infinitos ceros. Pero 2·sin(x)+3 no tiene ninguno,
+                <span aria-hidden="true">💡</span> Ejemplo: sin(x) tiene infinitos ceros. Pero 2·sin(x)+3 no tiene ninguno,
                 porque 2·sin(x) oscila entre −2 y +2 y nunca alcanza −3.
               </p>
             </div>
@@ -653,9 +718,12 @@ export default function SimuladorFuncionesTransformacionesPage() {
               <div className={styles.stepContent}>
                 <strong>Localiza el punto de referencia (c, d)</strong>
                 <p>
-                  Busca el vértice (parábola, valor absoluto), el punto de inicio (raíz),
-                  o el punto de cruce central (sin/cos). Ese punto es (c, d): el desplazamiento
-                  del origen de la función base.
+                  Busca el vértice (parábola, valor absoluto), el punto de inicio (raíz) o, en el
+                  seno, un cruce con su línea media y = d en el que la curva sube (si a y b son
+                  positivos). Ese punto es (c, d): el desplazamiento
+                  del origen de la función base. En el coseno no hay cruce en x = c: cos(0) = 1, así
+                  que en x = c está una cresta, a la altura a + d (un valle si a es negativo), y los
+                  cruces con y = d quedan a un cuarto de período a cada lado.
                 </p>
               </div>
             </div>
@@ -717,11 +785,11 @@ export default function SimuladorFuncionesTransformacionesPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">➡️</span>
-              <strong>El signo de c indica la dirección exacta del desplazamiento</strong>
+              <strong>El signo de c engaña: busca dónde se anula el paréntesis</strong>
               <p>
-                El subtractor (x − c) hace que c&gt;0 desplace a la derecha.
-                Piénsalo así: "el signo que ves en la fórmula es la dirección".
-                (x − 3) → +3 unidades a la derecha.
+                La fórmula resta c: (x − c) vale 0 en x = c, y ahí cae lo que g tenía en el origen.
+                Por eso el signo que se ve en la fórmula es el contrario de la dirección:
+                (x − 3) → 3 unidades a la derecha; (x + 2) es c = −2 → 2 unidades a la izquierda.
               </p>
             </div>
             <div className={styles.tipCard}>
@@ -764,7 +832,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
             </li>
             <li>
               <strong>Asumir que b negativo siempre cambia la forma</strong> — Para funciones pares
-              (cos, x²) con b=−1 la gráfica parece idéntica porque f(−x)=f(x). Solo en funciones
+              (cos, x², |x|) con b=−1 la gráfica es idéntica porque g(−x)=g(x). Solo en funciones
               impares (sin, x³) o no simétricas (raíz) se aprecia la reflexión horizontal.
             </li>
           </ul>

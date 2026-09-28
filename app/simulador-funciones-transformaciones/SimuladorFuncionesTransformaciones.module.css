@@ -9,6 +9,42 @@
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
   min-height: 100vh;
+
+  /* Colores propios de los parámetros a, b, c y d (hallazgos 2344 y 2345, 28/09/2026).
+     Antes iban en línea (#2E86AB, #48A9A6, #7FB3D3, #1A5278), iguales en los dos temas: como
+     texto, b y c no llegaban ni a 3:1 en claro y d se quedaba en 1,65:1 en oscuro; con texto
+     blanco encima, a, b y c no llegaban a 4,5:1. a y b son la marca y van con sus tokens
+     (--primary-texto / --secondary-texto como texto, -boton como fondo de texto blanco); c y d
+     son colores de la app y se declaran aquí, con su variante oscura. Medidos en el navegador
+     contra el fondo real, en los dos temas (spec, bloque Inspector 28/09/2026). */
+  --param-c: #3A67A8;          /* 5,70:1 sobre blanco · 5,45 sobre #FAFAFA */
+  --param-c-fondo: #3A67A8;    /* texto blanco encima: 5,70:1 (la etiqueta no cambia con el tema) */
+  --param-d: var(--hero-bg);   /* #1A5278: 8,33:1 sobre blanco */
+  /* El naranja de «errores frecuentes» (#E07A1F) daba 2,56:1 en claro y 3,72 en oscuro como
+     texto: se queda en el borde y el texto va con este tono, más oscuro o más claro según el tema. */
+  --aviso-texto: #9A4A0B;
+}
+
+[data-theme='dark'] .container {
+  --param-c: #7FB3D3;          /* 6,09:1 sobre #2D2D2D */
+  --param-d: #9DB5E8;          /* sobre #2D2D2D: el #1A5278 del claro daba 1,65 */
+  --aviso-texto: #F5A05A;
+}
+
+.colorParamA {
+  color: var(--primary-texto);
+}
+
+.colorParamB {
+  color: var(--secondary-texto);
+}
+
+.colorParamC {
+  color: var(--param-c);
+}
+
+.colorParamD {
+  color: var(--param-d);
 }
 
 /* ============================================
@@ -84,8 +120,8 @@
 
 .funcBtnActive {
   border-color: var(--primary);
-  background: rgba(46, 134, 171, 0.12);
-  color: var(--primary);
+  background: rgba(46, 134, 171, 0.08);
+  color: var(--primary-texto);
 }
 
 .funcIcon {
@@ -217,7 +253,7 @@
   font-family: var(--font-mono, monospace);
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 38px;
   text-align: right;
 }
@@ -238,7 +274,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   font-family: var(--font-mono, monospace);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.08);
   border-left: 4px solid var(--primary);
   padding: var(--spacing-md) var(--spacing-lg);
@@ -269,7 +305,7 @@
 .paramTag {
   flex-shrink: 0;
   display: inline-block;
-  color: white;
+  color: #ffffff;
   font-family: var(--font-mono, monospace);
   font-size: 0.85rem;
   font-weight: 700;
@@ -277,6 +313,24 @@
   border-radius: 20px;
   min-width: 80px;
   text-align: center;
+}
+
+/* Texto blanco sobre fondos que dan ≥ 4,5:1 en los dos temas (el fondo de la etiqueta no
+   depende del tema, así que la medida vale para ambos). */
+.paramTagA {
+  background: var(--primary-boton);   /* 5,47:1 */
+}
+
+.paramTagB {
+  background: var(--secondary-boton); /* 5,15:1 */
+}
+
+.paramTagC {
+  background: var(--param-c-fondo);   /* 5,70:1 */
+}
+
+.paramTagD {
+  background: var(--hero-bg);         /* 8,33:1 */
 }
 
 .leyendaRow {
@@ -311,7 +365,7 @@
 .leyendaTransf {
   padding-left: 24px;
   position: relative;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -335,7 +389,7 @@
   background: transparent;
   border: 2px solid var(--primary);
   border-radius: var(--radius);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -343,8 +397,9 @@
 }
 
 .btnReset:hover {
-  background: var(--primary);
-  color: white;
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #ffffff;
 }
 
 .btnReset:focus-visible {
@@ -426,7 +481,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -456,7 +511,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -498,8 +553,8 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: var(--primary);
-  color: white;
+  background: var(--primary-boton);
+  color: #ffffff;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -511,7 +566,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -547,7 +602,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -574,7 +629,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
-  color: #E07A1F;
+  color: var(--aviso-texto);
   font-size: 1.1rem;
 }
 
@@ -594,7 +649,7 @@
 }
 
 .warningList li strong {
-  color: #E07A1F;
+  color: var(--aviso-texto);
 }
 
 /* ============================================
@@ -602,6 +657,7 @@
 ============================================ */
 [data-theme='dark'] .funcBtnActive {
   background: rgba(46, 134, 171, 0.22);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .ecuacionFormula {
@@ -632,8 +688,9 @@
   border-color: #2A2A2A;
 }
 
+/* Sobre el gris de antes (rgba(255,255,255,0.04) → #353535) la leyenda azul daba 4,36:1. */
 [data-theme='dark'] .leyendaRow {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--bg-primary);
 }
 
 [data-theme='dark'] .canvasWrapper {
