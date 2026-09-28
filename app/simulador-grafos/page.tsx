@@ -69,6 +69,63 @@ const COLOR_CAMINO = '#10b981';
 const SVG_WIDTH = 800;
 const SVG_HEIGHT = 500;
 const RADIO_NODO = 22;
+const FUENTE_NODO = 14;
+const FUENTE_PESO = 11;
+
+/**
+ * Tamaños mínimos EN PANTALLA (px CSS) de lo que se dibuja en el lienzo (hallazgo 2374,
+ * 28/09/2026).
+ *
+ * El lienzo es un SVG con viewBox fijo de 800 × 500 que se encoge hasta caber en su caja.
+ * En un móvil de 390 px quedaba a escala 0,265 y todo lo que se dibujaba en unidades del
+ * viewBox encogía con él: pesos de 2,9 px, letras de 3,7 px, nodos de 11,7 px. Ahora el
+ * tamaño de nodos, rótulos y trazos se calcula con la escala REAL del lienzo y nunca baja
+ * de estos mínimos; en escritorio, donde la escala ronda 0,83, los tamaños base ya los
+ * superan y el dibujo no cambia (salvo el peso, que sube de 9,1 a 11 px).
+ */
+const RADIO_NODO_MIN_PX = 13; // diámetro 26 px: por encima de los 24 px de WCAG 2.5.8
+const FUENTE_NODO_MIN_PX = 12;
+const FUENTE_PESO_MIN_PX = 11;
+const TRAZO_BASE_MIN_PX = 0.8; // una arista de 2 unidades no baja de 1,6 px
+/** Radio de captura, en pantalla, para borrar una arista con el dedo: gana la más cercana. */
+const CAPTURA_ARISTA_PX = 16;
+/** Un puntero que se desplaza más que esto entre pulsar y soltar no es un clic, es un gesto. */
+const UMBRAL_GESTO_PX = 8;
+
+interface Punto {
+  x: number;
+  y: number;
+}
+
+/** Distancia de un punto al segmento AB, en unidades del viewBox. */
+function distanciaPuntoSegmento(p: Punto, a: Punto, b: Punto): number {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const longitud2 = dx * dx + dy * dy;
+  if (longitud2 === 0) return Math.hypot(p.x - a.x, p.y - a.y);
+  const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / longitud2));
+  return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
+}
+
+/**
+ * Coste para mostrar en la tabla y en los textos de los pasos, con coma decimal (hallazgo
+ * 2376). Los pesos son enteros, así que g y la dist de Dijkstra lo son siempre y se pintan
+ * sin decimales; la h de A* se trunca a centésimas y va con dos. `formatNumber` pinta
+ * además «∞» para los nodos todavía sin alcanzar.
+ */
+function formatearCoste(valor: number): string {
+  return formatNumber(valor, Number.isInteger(valor) ? 0 : 2);
+}
+
+/**
+ * f = g + h en A*, sin el ruido de coma flotante (5 + 2,61 daba 7,609999999999999).
+ * g es entero y h un múltiplo de 0,01, así que la suma exacta es un número de centésimas:
+ * redondear a la centésima solo quita el ruido, nunca mueve el valor. Y así dos f iguales
+ * lo son también para la comparación que elige el siguiente nodo del conjunto abierto.
+ */
+function sumarCentesimas(g: number, h: number): number {
+  return Math.round((g + h) * 100) / 100;
+}
 
 function colorDeEstado(estado: EstadoNodo): string {
   switch (estado) {
@@ -457,10 +514,10 @@ function ejecutarDijkstra(
       auxiliar: nodos
         .filter((n) => !visitados.has(n.id) && Number.isFinite(dist[n.id]))
         .sort((a, b) => dist[a.id] - dist[b.id])
-        .map((n) => `${n.id}(${dist[n.id]})`),
+        .map((n) => `${n.id}(${formatearCoste(dist[n.id])})`),
       tablaDijkstra: tablaDeDist(),
       nodoActual: actual,
-      descripcion: `Extraemos ${actual} con dist = ${dist[actual]} (mínima en la cola).`,
+      descripcion: `Extraemos ${actual} con dist = ${formatearCoste(dist[actual])} (mínima en la cola).`,
       aristasResaltadas: Array.from(aristasResaltadasAcum),
     });
 
@@ -479,7 +536,7 @@ function ejecutarDijkstra(
         dist[v.vecino] = nuevo;
         pred[v.vecino] = actual;
         aristasResaltadasAcum.add(v.aristaId);
-        relajados.push(`${v.vecino}=${nuevo}`);
+        relajados.push(`${v.vecino}=${formatearCoste(nuevo)}`);
       }
     }
 
@@ -488,7 +545,7 @@ function ejecutarDijkstra(
       auxiliar: nodos
         .filter((n) => !visitados.has(n.id) && Number.isFinite(dist[n.id]))
         .sort((a, b) => dist[a.id] - dist[b.id])
-        .map((n) => `${n.id}(${dist[n.id]})`),
+        .map((n) => `${n.id}(${formatearCoste(dist[n.id])})`),
       tablaDijkstra: tablaDeDist(),
       nodoActual: actual,
       descripcion: `Relajamos aristas de ${actual}: ${relajados.join(', ') || '(sin mejoras)'}.`,
@@ -514,7 +571,7 @@ function ejecutarDijkstra(
       auxiliar: [],
       tablaDijkstra: tablaDeDist(),
       nodoActual: null,
-      descripcion: `Camino más corto: ${camino.join(' → ')} con coste ${costeTotal}.`,
+      descripcion: `Camino más corto: ${camino.join(' → ')} con coste ${formatearCoste(costeTotal)}.`,
       aristasResaltadas: aristasCamino,
     });
   } else {
@@ -600,10 +657,15 @@ function ejecutarAStar(
   // Heurística calibrada con el propio grafo, para que sea ADMISIBLE y A* devuelva el
   // camino óptimo. Se redondea hacia abajo a dos decimales: redondear al alza podría
   // hacerla sobreestimar por unas centésimas y romper justo la propiedad que se busca.
+  // La tolerancia de 1e-9 evita que el truncado convierta en una centésima entera el ruido
+  // de coma flotante: en el laberinto, h(I) = 560 / 186,67 = 3 exacto, pero el producto
+  // sale 2,9999999999999996 y se mostraba 2,99 (hallazgo 2376). La sobreestimación posible
+  // es menor que 1e-11 y no cambia ningún camino: los pesos son enteros, así que un camino
+  // peor cuesta al menos una unidad más.
   const k = costeMinimoPorPixel(nodos, aristas);
   for (const n of nodos) {
     g[n.id] = n.id === origen ? 0 : Infinity;
-    h[n.id] = Math.floor(k * distanciaEuclidea(n, dest) * 100) / 100;
+    h[n.id] = Math.floor(k * distanciaEuclidea(n, dest) * 100 + 1e-9) / 100;
     f[n.id] = n.id === origen ? h[n.id] : Infinity;
     pred[n.id] = null;
   }
@@ -634,10 +696,10 @@ function ejecutarAStar(
 
   pasos.push({
     estados: construirEstados(null),
-    auxiliar: [`${origen}(f=${f[origen]})`],
+    auxiliar: [`${origen}(f=${formatearCoste(f[origen])})`],
     tablaAstar: tablaA(),
     nodoActual: null,
-    descripcion: `Inicio: g[${origen}] = 0, h[${origen}] = ${h[origen]}, f = ${f[origen]}.`,
+    descripcion: `Inicio: g[${origen}] = 0, h[${origen}] = ${formatearCoste(h[origen])}, f = ${formatearCoste(f[origen])}.`,
     aristasResaltadas: [],
   });
 
@@ -659,10 +721,10 @@ function ejecutarAStar(
       estados: construirEstados(actual),
       auxiliar: Array.from(abierto)
         .sort((a, b) => f[a] - f[b])
-        .map((id) => `${id}(f=${f[id]})`),
+        .map((id) => `${id}(f=${formatearCoste(f[id])})`),
       tablaAstar: tablaA(),
       nodoActual: actual,
-      descripcion: `Extraemos ${actual} con f = ${mejorF} (menor en abierto).`,
+      descripcion: `Extraemos ${actual} con f = ${formatearCoste(mejorF)} (menor en abierto).`,
       aristasResaltadas: Array.from(aristasResaltadasAcum),
     });
 
@@ -679,11 +741,11 @@ function ejecutarAStar(
       const tentativaG = g[actual] + v.peso;
       if (tentativaG < g[v.vecino]) {
         g[v.vecino] = tentativaG;
-        f[v.vecino] = tentativaG + h[v.vecino];
+        f[v.vecino] = sumarCentesimas(tentativaG, h[v.vecino]);
         pred[v.vecino] = actual;
         abierto.add(v.vecino);
         aristasResaltadasAcum.add(v.aristaId);
-        mejoras.push(`${v.vecino}(g=${tentativaG}, f=${f[v.vecino]})`);
+        mejoras.push(`${v.vecino}(g=${formatearCoste(tentativaG)}, f=${formatearCoste(f[v.vecino])})`);
       }
     }
 
@@ -691,7 +753,7 @@ function ejecutarAStar(
       estados: construirEstados(actual),
       auxiliar: Array.from(abierto)
         .sort((a, b) => f[a] - f[b])
-        .map((id) => `${id}(f=${f[id]})`),
+        .map((id) => `${id}(f=${formatearCoste(f[id])})`),
       tablaAstar: tablaA(),
       nodoActual: actual,
       descripcion: `Expandimos vecinos: ${mejoras.join(', ') || '(sin mejoras)'}.`,
@@ -717,7 +779,7 @@ function ejecutarAStar(
       auxiliar: [],
       tablaAstar: tablaA(),
       nodoActual: null,
-      descripcion: `Camino A* encontrado: ${camino.join(' → ')} con coste ${costeTotal}.`,
+      descripcion: `Camino A* encontrado: ${camino.join(' → ')} con coste ${formatearCoste(costeTotal)}.`,
       aristasResaltadas: aristasCamino,
     });
   } else {
@@ -914,11 +976,63 @@ export default function SimuladorGrafosPage() {
   const animTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const arrastrandoNodo = useRef<string | null>(null);
+  // Dónde se pulsó (px de pantalla), para no tomar por clic un gesto de arrastre.
+  const inicioPuntero = useRef<{ x: number; y: number } | null>(null);
+  // Píxeles de pantalla por unidad del viewBox; 1 hasta que el lienzo se mide en el cliente.
+  const [pxPorUnidad, setPxPorUnidad] = useState<number>(1);
+  // Arista que se borraría al hacer clic ahora mismo (solo ratón, en modo eliminar).
+  const [aristaApuntada, setAristaApuntada] = useState<string | null>(null);
 
   // Iniciar con preset por defecto
   useEffect(() => {
     cargarPreset(presetGrid5x5());
   }, []);
+
+  // Escala real del lienzo: se vuelve a medir al girar el móvil o cambiar el ancho.
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const medir = () => {
+      const ancho = svg.getBoundingClientRect().width;
+      if (ancho > 0) setPxPorUnidad(ancho / SVG_WIDTH);
+    };
+    medir();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observador = new ResizeObserver(medir);
+    observador.observe(svg);
+    return () => observador.disconnect();
+  }, []);
+
+  /*
+   * El lienzo deja desplazar la página y pellizcar con el dedo (touch-action: manipulation):
+   * antes llevaba touch-action: none y un deslizamiento que empezaba en él ni bajaba la
+   * página ni se dejaba ampliar (hallazgo 2375). Solo el arrastre de un nodo en modo
+   * «Mover» necesita quedarse el gesto, y eso no se puede declarar con touch-action en los
+   * nodos: Chromium lo ignora en los hijos de un <svg> (medido el 28/09/2026). Por eso se
+   * cancela aquí el desplazamiento, y solo mientras hay un nodo agarrado. React registra sus
+   * escuchas táctiles como pasivas, así que esta tiene que ser nativa.
+   */
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const retenerGesto = (evt: TouchEvent) => {
+      if (arrastrandoNodo.current !== null && evt.cancelable) evt.preventDefault();
+    };
+    svg.addEventListener('touchmove', retenerGesto, { passive: false });
+    return () => svg.removeEventListener('touchmove', retenerGesto);
+  }, []);
+
+  // Tamaños en unidades del viewBox que garantizan los mínimos en pantalla.
+  const dim = useMemo(() => {
+    const escala = pxPorUnidad > 0 ? pxPorUnidad : 1;
+    return {
+      radio: Math.max(RADIO_NODO, RADIO_NODO_MIN_PX / escala),
+      fuenteNodo: Math.max(FUENTE_NODO, FUENTE_NODO_MIN_PX / escala),
+      fuentePeso: Math.max(FUENTE_PESO, FUENTE_PESO_MIN_PX / escala),
+      trazo: Math.max(1, TRAZO_BASE_MIN_PX / escala),
+      captura: CAPTURA_ARISTA_PX / escala,
+    };
+  }, [pxPorUnidad]);
 
   const cargarPreset = useCallback((p: Preset) => {
     setNodos(p.nodos);
@@ -950,7 +1064,7 @@ export default function SimuladorGrafosPage() {
   }, []);
 
   // Convertir coordenadas pantalla → SVG
-  const obtenerCoordsSvg = useCallback((evt: React.PointerEvent<SVGSVGElement>): { x: number; y: number } | null => {
+  const obtenerCoordsSvg = useCallback((evt: { clientX: number; clientY: number }): Punto | null => {
     const svg = svgRef.current;
     if (!svg) return null;
     const pt = svg.createSVGPoint();
@@ -963,8 +1077,61 @@ export default function SimuladorGrafosPage() {
     return { x: transformed.x, y: transformed.y };
   }, []);
 
+  /**
+   * La arista más cercana a un punto del lienzo, si está dentro del radio de captura.
+   * Borrar una arista exigía acertar en una línea de 0,5 px en el móvil: un toque en el
+   * punto medio exacto de A-D no la borraba (hallazgo 2374). Una diana gruesa por arista
+   * tampoco vale en el grafo denso, donde B-E pasa a 8 px del centro de A-D y se dibuja
+   * encima: el toque se lo llevaría la vecina. Gana siempre la más cercana.
+   */
+  const aristaCercana = useCallback(
+    (p: Punto): string | null => {
+      let mejor: string | null = null;
+      let mejorDistancia = dim.captura;
+      for (const a of aristas) {
+        const desde = nodos.find((n) => n.id === a.from);
+        const hasta = nodos.find((n) => n.id === a.to);
+        if (!desde || !hasta) continue;
+        const d = distanciaPuntoSegmento(p, desde, hasta);
+        if (d <= mejorDistancia) {
+          mejorDistancia = d;
+          mejor = a.id;
+        }
+      }
+      return mejor;
+    },
+    [aristas, nodos, dim.captura],
+  );
+
+  const handleSvgPointerDown = useCallback((evt: React.PointerEvent<SVGSVGElement>) => {
+    inicioPuntero.current = { x: evt.clientX, y: evt.clientY };
+  }, []);
+
+  /**
+   * Clic (o toque) en el lienzo. Hasta el 28/09/2026 el nodo se creaba en `pointerdown`,
+   * así que cualquier deslizamiento del dedo para bajar por la página dejaba un nodo
+   * fantasma (hallazgo 2375). Un `click` solo llega cuando el gesto es un toque: si el
+   * navegador se lo queda para desplazar, lo cancela. Con ratón, un arrastre sí acaba en
+   * `click`, y por eso se descarta además todo gesto que se haya movido más del umbral.
+   */
   const handleSvgClick = useCallback(
-    (evt: React.PointerEvent<SVGSVGElement>) => {
+    (evt: React.MouseEvent<SVGSVGElement>) => {
+      const inicio = inicioPuntero.current;
+      inicioPuntero.current = null;
+      if (inicio && Math.hypot(evt.clientX - inicio.x, evt.clientY - inicio.y) > UMBRAL_GESTO_PX) return;
+
+      if (modo === 'delete') {
+        const coords = obtenerCoordsSvg(evt);
+        if (!coords) return;
+        const id = aristaCercana(coords);
+        if (id) {
+          setAristas((prev) => prev.filter((a) => a.id !== id));
+          setAristaApuntada(null);
+          setResultado(null);
+        }
+        return;
+      }
+
       if (modo !== 'add-node') return;
       // Solo añadir si el target es el SVG (no un nodo)
       const target = evt.target as Element;
@@ -978,7 +1145,7 @@ export default function SimuladorGrafosPage() {
       });
       setResultado(null);
     },
-    [modo, obtenerCoordsSvg],
+    [modo, obtenerCoordsSvg, aristaCercana],
   );
 
   const handleNodoClick = useCallback(
@@ -1065,8 +1232,8 @@ export default function SimuladorGrafosPage() {
             n.id === nodoId
               ? {
                   ...n,
-                  x: Math.max(RADIO_NODO, Math.min(SVG_WIDTH - RADIO_NODO, n.x + dx)),
-                  y: Math.max(RADIO_NODO, Math.min(SVG_HEIGHT - RADIO_NODO, n.y + dy)),
+                  x: Math.max(dim.radio, Math.min(SVG_WIDTH - dim.radio, n.x + dx)),
+                  y: Math.max(dim.radio, Math.min(SVG_HEIGHT - dim.radio, n.y + dy)),
                 }
               : n,
           ),
@@ -1074,12 +1241,19 @@ export default function SimuladorGrafosPage() {
         setResultado(null);
       }
     },
-    [modo, handleNodoClick],
+    [modo, handleNodoClick, dim.radio],
   );
 
   const handleSvgPointerMove = useCallback(
     (evt: React.PointerEvent<SVGSVGElement>) => {
-      if (!arrastrandoNodo.current) return;
+      if (!arrastrandoNodo.current) {
+        // Con ratón, en modo eliminar se resalta la arista que se llevaría el clic.
+        if (modo === 'delete' && evt.pointerType === 'mouse') {
+          const coords = obtenerCoordsSvg(evt);
+          setAristaApuntada(coords ? aristaCercana(coords) : null);
+        }
+        return;
+      }
       const coords = obtenerCoordsSvg(evt);
       if (!coords) return;
       const id = arrastrandoNodo.current;
@@ -1088,14 +1262,14 @@ export default function SimuladorGrafosPage() {
           n.id === id
             ? {
                 ...n,
-                x: Math.max(RADIO_NODO, Math.min(SVG_WIDTH - RADIO_NODO, coords.x)),
-                y: Math.max(RADIO_NODO, Math.min(SVG_HEIGHT - RADIO_NODO, coords.y)),
+                x: Math.max(dim.radio, Math.min(SVG_WIDTH - dim.radio, coords.x)),
+                y: Math.max(dim.radio, Math.min(SVG_HEIGHT - dim.radio, coords.y)),
               }
             : n,
         ),
       );
     },
-    [obtenerCoordsSvg],
+    [obtenerCoordsSvg, modo, aristaCercana, dim.radio],
   );
 
   const handleSvgPointerUp = useCallback(() => {
@@ -1106,15 +1280,10 @@ export default function SimuladorGrafosPage() {
     }
   }, []);
 
-  const handleAristaClick = useCallback(
-    (id: string) => {
-      if (modo === 'delete') {
-        setAristas((prev) => prev.filter((a) => a.id !== id));
-        setResultado(null);
-      }
-    },
-    [modo],
-  );
+  const handleSvgPointerLeave = useCallback(() => {
+    setAristaApuntada(null);
+    handleSvgPointerUp();
+  }, [handleSvgPointerUp]);
 
   const ejecutar = useCallback(() => {
     if (!origen || !destino) return;
@@ -1268,7 +1437,7 @@ export default function SimuladorGrafosPage() {
               {ids.map((id) => (
                 <tr key={id}>
                   <td>{id}</td>
-                  <td>{tabla[id].dist === Infinity ? '∞' : tabla[id].dist}</td>
+                  <td>{formatearCoste(tabla[id].dist)}</td>
                   <td>{tabla[id].pred ?? '–'}</td>
                 </tr>
               ))}
@@ -1309,9 +1478,9 @@ export default function SimuladorGrafosPage() {
               {ids.map((id) => (
                 <tr key={id}>
                   <td>{id}</td>
-                  <td>{tabla[id].g === Infinity ? '∞' : tabla[id].g}</td>
-                  <td>{tabla[id].h}</td>
-                  <td>{tabla[id].f === Infinity ? '∞' : tabla[id].f}</td>
+                  <td>{formatearCoste(tabla[id].g)}</td>
+                  <td>{formatearCoste(tabla[id].h)}</td>
+                  <td>{formatearCoste(tabla[id].f)}</td>
                 </tr>
               ))}
             </tbody>
@@ -1563,13 +1732,22 @@ export default function SimuladorGrafosPage() {
             <div className={styles.editorContainer}>
               <svg
                 ref={svgRef}
-                className={styles.editorSvg}
+                className={`${styles.editorSvg} ${modo === 'delete' && aristaApuntada ? styles.editorSvgApuntando : ''}`}
                 viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
                 preserveAspectRatio="xMidYMid meet"
-                onPointerDown={handleSvgClick}
+                style={
+                  {
+                    '--trazo': dim.trazo,
+                    '--fuente-nodo': `${dim.fuenteNodo}px`,
+                    '--fuente-peso': `${dim.fuentePeso}px`,
+                  } as React.CSSProperties
+                }
+                onPointerDown={handleSvgPointerDown}
+                onClick={handleSvgClick}
                 onPointerMove={handleSvgPointerMove}
                 onPointerUp={handleSvgPointerUp}
-                onPointerLeave={handleSvgPointerUp}
+                onPointerCancel={handleSvgPointerUp}
+                onPointerLeave={handleSvgPointerLeave}
               >
                 {/* Definiciones para flechas dirigidas */}
                 <defs>
@@ -1607,20 +1785,25 @@ export default function SimuladorGrafosPage() {
                   let claseArista = styles.aristaLinea;
                   if (enCamino) claseArista = styles.aristaCamino;
                   else if (resaltada) claseArista = styles.aristaResaltada;
+                  if (modo === 'delete' && aristaApuntada === a.id) {
+                    claseArista = `${claseArista} ${styles.aristaApuntada}`;
+                  }
                   // Acortar línea para que no entre en el círculo
                   const dx = nodoTo.x - nodoFrom.x;
                   const dy = nodoTo.y - nodoFrom.y;
                   const len = Math.sqrt(dx * dx + dy * dy) || 1;
                   const ux = dx / len;
                   const uy = dy / len;
-                  const x1 = nodoFrom.x + ux * RADIO_NODO;
-                  const y1 = nodoFrom.y + uy * RADIO_NODO;
-                  const x2 = nodoTo.x - ux * RADIO_NODO;
-                  const y2 = nodoTo.y - uy * RADIO_NODO;
+                  const x1 = nodoFrom.x + ux * dim.radio;
+                  const y1 = nodoFrom.y + uy * dim.radio;
+                  const x2 = nodoTo.x - ux * dim.radio;
+                  const y2 = nodoTo.y - uy * dim.radio;
                   const mx = (x1 + x2) / 2;
                   const my = (y1 + y2) / 2;
+                  // El clic de borrado lo resuelve el lienzo (handleSvgClick): gana la arista
+                  // más cercana al dedo, no la que se dibujó encima.
                   return (
-                    <g key={a.id} onClick={() => handleAristaClick(a.id)} style={{ cursor: modo === 'delete' ? 'pointer' : 'default' }}>
+                    <g key={a.id} data-arista={a.id}>
                       <line
                         x1={x1}
                         y1={y1}
@@ -1629,7 +1812,9 @@ export default function SimuladorGrafosPage() {
                         className={claseArista}
                         markerEnd={dirigido ? (enCamino ? 'url(#flechaCamino)' : 'url(#flecha)') : undefined}
                       />
-                      <text x={mx} y={my} className={styles.aristaPeso} dy="-4">
+                      {/* Centrado sobre la propia línea: en la cuadrícula del móvil, un rótulo
+                          por encima de una arista vertical corta se montaba sobre el nodo. */}
+                      <text x={mx} y={my} className={styles.aristaPeso}>
                         {a.peso}
                       </text>
                     </g>
@@ -1655,10 +1840,10 @@ export default function SimuladorGrafosPage() {
                       <circle
                         cx={n.x}
                         cy={n.y}
-                        r={RADIO_NODO}
+                        r={dim.radio}
                         fill={color}
                         stroke={seleccionAristaFrom === n.id ? '#fbbf24' : '#1f2937'}
-                        strokeWidth={seleccionAristaFrom === n.id ? 4 : 2}
+                        strokeWidth={(seleccionAristaFrom === n.id ? 4 : 2) * dim.trazo}
                         className={styles.nodoCircle}
                       />
                       <text x={n.x} y={n.y} className={styles.nodoLabel} fill="white">
@@ -1674,7 +1859,7 @@ export default function SimuladorGrafosPage() {
                     y={SVG_HEIGHT / 2}
                     textAnchor="middle"
                     fill={COLOR_NO_VISITADO}
-                    fontSize="16"
+                    fontSize={Math.max(16, FUENTE_NODO_MIN_PX / pxPorUnidad)}
                     style={{ pointerEvents: 'none' }}
                   >
                     Lienzo vacío. Carga un preset o añade nodos.

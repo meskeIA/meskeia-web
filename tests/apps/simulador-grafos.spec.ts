@@ -382,6 +382,18 @@ test.describe('Simulador de Grafos', () => {
  * Una sola `<Footer appName=…>`, al final del árbol y fuera de toda rama condicional: el
  * AnalyticsTracker se monta UNA vez por carga (medido: un único mensaje «[Analytics]» por
  * carga tras ejecutar, borrar, mover y cambiar de preset). La firma no es de las falsas.
+ *
+ * REPARADOS los tres el 28/09/2026 (hallazgos 2374, 2375 y 2376); sus tests se llaman ahora
+ * «REGRESIÓN nnnn» y afirman el comportamiento correcto:
+ *   · 2374 — los rellenos se recortan en móvil (lienzo de 212 → 316 px en 390) y nodos,
+ *     rótulos y trazos se dimensionan con la escala REAL del lienzo, con mínimos en pantalla:
+ *     nodos de 26 px, pesos de 11 px, letras de 12 px. Borrar una arista ya no exige acertar
+ *     en una línea de medio píxel: se lleva el toque la arista más cercana en 16 px.
+ *   · 2375 — el nodo se crea en el `click`, no en `pointerdown`, y el lienzo lleva
+ *     `touch-action: manipulation`: deslizar desplaza la página y pellizcar amplía. Solo el
+ *     arrastre de un nodo en «Mover» retiene el gesto.
+ *   · 2376 — h, f, g y dist se pintan con `formatNumber` (coma decimal) y f = g + h se suma
+ *     en centésimas, sin el ruido de coma flotante.
  */
 
 /** Nombre accesible de un nodo del lienzo, sin confundir «Nodo A» con «Nodo A1». */
@@ -400,6 +412,86 @@ async function tocar(loc: Locator): Promise<void> {
   await loc.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'auto' }));
   await loc.tap();
 }
+
+/**
+ * Tamaños EN PANTALLA de lo que dibuja el lienzo. La fuente del peso se mide como la pinta el
+ * navegador: su tamaño en unidades del viewBox por la escala de la matriz de pantalla.
+ */
+async function medirLienzo(
+  page: Page,
+): Promise<{ anchoLienzo: number; fuentePeso: number; fuenteNodo: number; diametroNodo: number }> {
+  return page.evaluate(() => {
+    const svg = document.querySelector('[class*="editorSvg"]') as SVGSVGElement;
+    const peso = document.querySelector('[class*="editorSvg"] [class*="aristaPeso"]') as SVGTextElement;
+    const letra = document.querySelector('[class*="editorSvg"] [class*="nodoLabel"]') as SVGTextElement;
+    const circulo = document.querySelector('[class*="editorSvg"] [class*="nodoCircle"]') as SVGCircleElement;
+    const escala = peso.getScreenCTM()?.a ?? 0;
+    return {
+      anchoLienzo: svg.getBoundingClientRect().width,
+      fuentePeso: parseFloat(getComputedStyle(peso).fontSize) * escala,
+      fuenteNodo: parseFloat(getComputedStyle(letra).fontSize) * escala,
+      diametroNodo: circulo.getBoundingClientRect().width,
+    };
+  });
+}
+
+/**
+ * Desliza un dedo en vertical con eventos táctiles de CDP (Playwright solo trae `tap`).
+ * OJO: tras un deslizamiento así, el PRIMER toque de Playwright no genera `click` (medido el
+ * 28/09/2026 también en una página en blanco, sin la app: es la emulación, no el lienzo).
+ * Por eso en estos tests el deslizamiento va siempre después de los toques.
+ */
+async function deslizarDedo(page: Page, x: number, y0: number, dy: number, pasos = 10): Promise<void> {
+  const cdp = await page.context().newCDPSession(page);
+  const dedo = (y: number) => [{ x, y, radiusX: 1, radiusY: 1, force: 1, id: 1 }];
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: dedo(y0) });
+  for (let i = 1; i <= pasos; i++) {
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: dedo(y0 + (dy * i) / pasos) });
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await cdp.detach();
+}
+
+/**
+ * Punto medio en pantalla de la arista entre dos nodos y su normal unitaria, hacia fuera del
+ * centro del lienzo. Sale de los CÍRCULOS de los nodos, no de la línea, para que el test valga
+ * también contra el código anterior a la reparación (medido el 28/09/2026 contra producción:
+ * allí el toque en el centro de A-D la dejaba en 15 aristas).
+ */
+async function geometriaArista(
+  page: Page,
+  desde: string,
+  hasta: string,
+): Promise<{ x: number; y: number; nx: number; ny: number }> {
+  const centroDe = (id: string) =>
+    nodo(page, id)
+      .locator('circle')
+      .evaluate((el) => {
+        const c = el as SVGCircleElement;
+        const m = c.getScreenCTM();
+        if (!m) throw new Error('el nodo no tiene matriz de pantalla');
+        const p = new DOMPoint(c.cx.baseVal.value, c.cy.baseVal.value).matrixTransform(m);
+        const centro = new DOMPoint(400, 250).matrixTransform(m);
+        return { x: p.x, y: p.y, cx: centro.x, cy: centro.y };
+      });
+  const p1 = await centroDe(desde);
+  const p2 = await centroDe(hasta);
+  const x = (p1.x + p2.x) / 2;
+  const y = (p1.y + p2.y) / 2;
+  const largo = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+  let nx = -(p2.y - p1.y) / largo;
+  let ny = (p2.x - p1.x) / largo;
+  if (nx * (x - p1.cx) + ny * (y - p1.cy) < 0) {
+    nx = -nx;
+    ny = -ny;
+  }
+  return { x, y, nx, ny };
+}
+
+const aristasPresentes = (page: Page): Promise<string[]> =>
+  page
+    .locator('[class*="editorSvg"] [data-arista]')
+    .evaluateAll((gs) => gs.map((g) => g.getAttribute('data-arista') ?? ''));
 
 test.describe('Inspector 28/09/2026 — escritorio: A*, límite y rechazo', () => {
   /**
@@ -540,28 +632,110 @@ test.describe('Inspector 28/09/2026 — escritorio: A*, límite y rechazo', () =
   });
 
   /**
-   * HALLAZGO ABIERTO (inspector 28/09/2026): la tabla de A* muestra h y f en formato de EE. UU.
-   * y con el error de coma flotante a la vista.
+   * REGRESIÓN 2376 — REPARADO (28/09/2026). Descrito tal como era: la tabla de A* mostraba h
+   * y f en formato de EE. UU. y con el error de coma flotante a la vista.
    *
    * Desde la reparación del 26/08, h(n) = ⌊100 · k · distancia⌋ / 100 es un decimal, y la tabla
-   * lo pinta con `{tabla[id].h}` y `{tabla[id].f}` a pelo, sin `formatNumber`. En el denso, al
+   * lo pintaba con `{tabla[id].h}` y `{tabla[id].f}` a pelo, sin `formatNumber`. En el denso, al
    * final de A* de A a H, la fila de D debe decir h = 2,61 y f = 7,61:
    *   h(D) = ⌊100 · 360 / 137,77⌋ / 100 = ⌊261,3⌋ / 100 = 2,61 (D y H son diametralmente
    *   opuestos: 360 px) · g(D) = 5 (A-C-D, 2 + 3) · f = 5 + 2,61 = 7,61.
-   * La app muestra «2.61» y «7.609999999999999». Lo mismo en el laberinto (C: f = 3.8899999999999997)
-   * y en los textos del paso («C(f=4.41)», «h[A] = 3.4»). CLAUDE.md §2: coma decimal, nunca
-   * formato US.
+   * La app mostraba «2.61» y «7.609999999999999». Lo mismo en el laberinto (C: f =
+   * 3.8899999999999997) y en los textos del paso («C(f=4.41)», «h[A] = 3.4»). CLAUDE.md §2:
+   * coma decimal, nunca formato US.
+   *
+   * Lo que se afirma, todo resuelto a mano en los casos normales de arriba:
+   *   · Denso, fila D al final: g 5 · h 2,61 · f 7,61. Los enteros van sin decimales (g 5, y
+   *     la fila H: h 0 · f 10), los decimales con dos.
+   *   · Denso, paso 1: «h[A] = 1, f = 1» (A y H son vecinos en el círculo: su cuerda es la
+   *     misma de B-C, la arista de peso 1 que fija k, así que h(A) = 1 exacto). Paso 3: el
+   *     conjunto abierto, ordenado por f, es C(f=4,41) · B(f=5,84) · D(f=9,61) · E(f=11,41).
+   *   · Laberinto, fila C: g 2 · h 1,89 · f 3,89; paso 1: «h[A] = 3,40, f = 3,40».
+   *   · Laberinto, fila I: g 2 · h 3 · f 5. I (120, 400) y L (680, 400) están a 560 px y
+   *     k = 1 / 186,67, así que h(I) = 3 exacto; el truncado a centésimas lo dejaba en 2,99
+   *     porque el producto en coma flotante sale 2,9999999999999996 (el mismo ruido, que el
+   *     truncado convertía en una centésima entera).
    */
-  test('HALLAZGO — la tabla de A* escribe h y f con coma decimal y sin restos de coma flotante', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN 2376 — la tabla de A* escribe h y f con coma decimal y sin restos de coma flotante', async ({ page }) => {
     await abrir(page);
     await page.getByRole('button', { name: 'Grafo denso' }).click();
     await ejecutar(page, 'astar');
-    const [id, g, h, f] = await filaTablaA(page, 'D');
-    expect(id).toBe('D');
-    expect(g).toBe('5');
-    expect(h).toBe('2,61'); // hoy: «2.61»
-    expect(f).toBe('7,61'); // hoy: «7.609999999999999»
+    expect(await filaTablaA(page, 'D')).toEqual(['D', '5', '2,61', '7,61']);
+    expect(await filaTablaA(page, 'H')).toEqual(['H', '10', '0', '10']);
+
+    // Los textos de los pasos, retrocediendo al principio.
+    const descripcion = page.locator('[class*="descripcionPaso"]');
+    const paso = page.getByRole('button', { name: 'Paso', exact: true });
+    await page.getByRole('button', { name: 'Reiniciar' }).click();
+    await expect(descripcion).toContainText('Inicio: g[A] = 0, h[A] = 1, f = 1.');
+    await paso.click();
+    await paso.click();
+    await expect(descripcion).toContainText(
+      'Expandimos vecinos: B(g=4, f=5,84), C(g=2, f=4,41), D(g=7, f=9,61), E(g=9, f=11,41).',
+    );
+    await expect(page.locator('[class*="auxItem"]')).toHaveText([
+      'C(f=4,41)',
+      'B(f=5,84)',
+      'D(f=9,61)',
+      'E(f=11,41)',
+    ]);
+
+    await page.getByRole('button', { name: 'Laberinto' }).click();
+    await ejecutar(page, 'astar');
+    expect(await filaTablaA(page, 'C')).toEqual(['C', '2', '1,89', '3,89']);
+    expect(await filaTablaA(page, 'I')).toEqual(['I', '2', '3', '5']);
+    await page.getByRole('button', { name: 'Reiniciar' }).click();
+    await expect(descripcion).toContainText('Inicio: g[A] = 0, h[A] = 3,40, f = 3,40.');
+  });
+
+  /**
+   * REGRESIÓN 2375, con ratón — el nodo se crea en el clic y no al pulsar, así que arrastrar
+   * sobre el fondo del lienzo (un gesto, no un clic) no deja ningún nodo. Un clic quieto sí.
+   * Con ratón, un arrastre SÍ termina en `click` (pulsar y soltar sobre el mismo <svg>): por
+   * eso la app descarta además todo gesto que se desplace más de 8 px.
+   * Punto de partida: (320, 107,5) del viewBox, el fondo entre B, C, G y H de la cuadrícula.
+   */
+  test('REGRESIÓN 2375 — con ratón, arrastrar sobre el fondo no crea nodo y un clic sí', async ({ page }) => {
+    await abrir(page);
+    await expect(nodos(page)).toHaveCount(25);
+    const svg = page.locator('[class*="editorSvg"]');
+    // Sin esto el lienzo queda por debajo de los 720 px de la vista y el ratón pulsaría en el
+    // vacío: el arrastre «pasaría» sin haber tocado el lienzo.
+    await svg.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'auto' }));
+    const caja = await svg.boundingBox();
+    if (!caja) throw new Error('el lienzo no tiene caja');
+    const x = caja.x + (320 * caja.width) / 800;
+    const y = caja.y + (107.5 * caja.height) / 500;
+
+    // Testigo de que el gesto llega de verdad al lienzo: el `click` que emite el navegador.
+    await svg.evaluate((el) => {
+      el.addEventListener('click', () => el.setAttribute('data-clics', String(Number(el.getAttribute('data-clics') ?? 0) + 1)));
+    });
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + 60, y + 20, { steps: 6 });
+    await page.mouse.up();
+    await expect(svg).toHaveAttribute('data-clics', '1');
+    await page.waitForTimeout(300); // la comprobación es instantánea a propósito
+    expect(await nodos(page).count()).toBe(25);
+
+    await page.mouse.click(x, y);
+    await expect(nodos(page)).toHaveCount(26);
+    expect((await etiquetas(page)).slice(-1)).toEqual(['Z']);
+  });
+
+  /**
+   * REGRESIÓN 2374, en escritorio — el reparto de tamaños por escala no encoge nada aquí.
+   * A 1280 px el lienzo mide 662 px (escala 0,828): los nodos conservan su radio de 22
+   * unidades (36,4 px) y los pesos suben de 9,1 a 11 px, el mínimo común a todos los anchos.
+   */
+  test('REGRESIÓN 2374 — en escritorio los nodos no cambian (36 px) y los pesos miden 11 px', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Grafo denso' }).click();
+    const medidas = await medirLienzo(page);
+    expect(medidas.anchoLienzo).toBeGreaterThan(600);
+    expect(medidas.diametroNodo).toBeCloseTo(36.4, 0);
+    expect(medidas.fuentePeso).toBeCloseTo(11, 0);
   });
 });
 
@@ -609,49 +783,100 @@ test.describe('Inspector 28/09/2026 — móvil 390 px (toque)', () => {
   });
 
   /**
-   * HALLAZGO ABIERTO (inspector 28/09/2026): en un móvil de 390 px el grafo no se puede leer.
+   * REGRESIÓN 2374 — REPARADO (28/09/2026). Descrito tal como era: en un móvil de 390 px el
+   * grafo no se podía leer.
    *
    * El lienzo es un SVG de viewBox fijo 800 × 500 metido dentro de cuatro rellenos anidados
    * (.container 16 px + .main 32 px + .panel 24 px + .editorContainer 16 px, más bordes): le
-   * quedan 212 px de ancho, escala 0,265. Los tamaños en pantalla salen de multiplicar por ella:
+   * quedaban 212 px de ancho, escala 0,265. Los tamaños en pantalla salían de multiplicar por ella:
    *   · peso de arista: 11 × 0,265 = 2,9 px (en escritorio a 1366 px: 11 × 0,828 = 9,1 px)
    *   · letra del nodo: 14 × 0,265 = 3,7 px
    *   · diámetro del nodo: 44 × 0,265 = 11,7 px
    * Lo que se afirma es lo mínimo para usar el simulador con el dedo: que los pesos se lean al
    * menos como en escritorio (≥ 9 px) y que cada nodo mida al menos 24 px, el tamaño de
-   * objetivo de WCAG 2.5.8.
+   * objetivo de WCAG 2.5.8. Medido tras la reparación: lienzo de 316 px, pesos de 11 px,
+   * letras de 12 px y nodos de 26 px.
+   *
+   * Y como el reparto se hace con la escala REAL del lienzo, no con un punto de corte, se
+   * repite la medida girando a un móvil de 360 px sin recargar (lienzo de 286 px).
    */
-  test('HALLAZGO — en 390 px los pesos se leen (≥ 9 px) y los nodos se pueden tocar (≥ 24 px)', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN 2374 — en 390 px los pesos se leen (≥ 9 px) y los nodos se pueden tocar (≥ 24 px)', async ({ page }) => {
     await abrir(page);
     await tocar(page.getByRole('button', { name: 'Grafo denso' }));
-    const medidas = await page.evaluate(() => {
-      const peso = document.querySelector('[class*="editorSvg"] [class*="aristaPeso"]') as SVGTextElement;
-      const circulo = document.querySelector('[class*="editorSvg"] [class*="nodoCircle"]') as SVGCircleElement;
-      const escala = peso.getScreenCTM()?.a ?? 0;
-      return {
-        fuentePeso: parseFloat(getComputedStyle(peso).fontSize) * escala,
-        diametroNodo: circulo.getBoundingClientRect().width,
-      };
-    });
-    expect(medidas.fuentePeso).toBeGreaterThanOrEqual(9); // hoy: 2,9 px
-    expect(medidas.diametroNodo).toBeGreaterThanOrEqual(24); // hoy: 11,7 px
+    const en390 = await medirLienzo(page);
+    expect(en390.anchoLienzo).toBeGreaterThanOrEqual(300); // antes: 212 px
+    expect(en390.fuentePeso).toBeGreaterThanOrEqual(9); // antes: 2,9 px
+    expect(en390.fuenteNodo).toBeGreaterThanOrEqual(9); // antes: 3,7 px
+    expect(en390.diametroNodo).toBeGreaterThanOrEqual(24); // antes: 11,7 px
+
+    await page.setViewportSize({ width: 360, height: 780 });
+    await expect.poll(async () => (await medirLienzo(page)).anchoLienzo).toBeLessThan(300);
+    await expect.poll(async () => (await medirLienzo(page)).diametroNodo).toBeGreaterThanOrEqual(24);
+    const en360 = await medirLienzo(page);
+    expect(en360.fuentePeso).toBeGreaterThanOrEqual(9);
+    expect(en360.fuenteNodo).toBeGreaterThanOrEqual(9);
   });
 
   /**
-   * HALLAZGO ABIERTO (inspector 28/09/2026): deslizar el dedo sobre el lienzo para bajar por la
-   * página deja un nodo fantasma.
+   * REGRESIÓN 2374 — borrar una arista con el dedo es fiable, y el toque se lo lleva la arista
+   * MÁS CERCANA, no la que se dibujó encima.
    *
-   * En el modo por defecto, «Añadir nodo», el nodo se crea en `onPointerDown` del SVG, y el
-   * lienzo lleva `touch-action: none` (necesario para arrastrar en modo «Mover»). Un
-   * deslizamiento vertical que empieza en el fondo del lienzo no desplaza la página y SÍ crea
-   * un nodo: en la cuadrícula 5 × 5 de arranque, 25 → 26 nodos («Z») y la vista no se mueve.
-   * La pista dice «haz clic en el lienzo»: un deslizamiento no es un clic.
+   * Antes, un toque en el punto medio exacto de A-D no la borraba: la línea medía medio píxel.
+   * La trampa de la solución obvia (una diana transparente y gruesa por arista) está en este
+   * mismo grafo: B-E cruza A-D a 28,6 unidades de su punto medio, con un ángulo de 45°, así que
+   * pasa a 20 unidades (8 px en 390) de ese punto medio y se dibuja DESPUÉS. Con dianas de 24 px
+   * el toque en el centro de A-D habría borrado B-E. Aquí:
+   *   · toque en el centro de A-D → se va A-D (15 → 14) y B-E sigue;
+   *   · toque a 10 px de G-H, por fuera del círculo (no hay otra arista cerca) → se va G-H
+   *     (14 → 13): no hace falta acertar en la línea;
+   *   · toque en el hueco vacío de la izquierda (x = 64 del viewBox, lejos de G y de sus
+   *     aristas), a más de 16 px de toda arista → no se borra nada.
+   */
+  test('REGRESIÓN 2374 — borrar una arista con el dedo: gana la más cercana', async ({ page }) => {
+    await abrir(page);
+    await tocar(page.getByRole('button', { name: 'Grafo denso' }));
+    // `exact`: en modo eliminar, cada nodo se anuncia con «… Pulsa Intro para eliminar este nodo».
+    await tocar(page.getByRole('button', { name: 'Eliminar', exact: true }));
+    await expect(page.getByRole('button', { name: 'Eliminar', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    const svg = page.locator('[class*="editorSvg"]');
+    await svg.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'auto' }));
+    await expect(aristas(page)).toHaveCount(15);
+
+    const ad = await geometriaArista(page, 'A', 'D');
+    await page.touchscreen.tap(ad.x, ad.y);
+    await expect(aristas(page)).toHaveCount(14);
+    expect(await aristasPresentes(page)).not.toContain('A__D');
+    expect(await aristasPresentes(page)).toContain('B__E');
+
+    const gh = await geometriaArista(page, 'G', 'H');
+    await page.touchscreen.tap(gh.x + gh.nx * 10, gh.y + gh.ny * 10);
+    await expect(aristas(page)).toHaveCount(13);
+    expect(await aristasPresentes(page)).not.toContain('G__H');
+
+    const caja = await svg.boundingBox();
+    if (!caja) throw new Error('el lienzo no tiene caja');
+    await page.touchscreen.tap(caja.x + caja.width * 0.08, caja.y + caja.height * 0.5);
+    await page.waitForTimeout(300); // instantánea a propósito: no debe pasar nada
+    expect(await aristas(page).count()).toBe(13);
+  });
+
+  /**
+   * REGRESIÓN 2375 — REPARADO (28/09/2026). Descrito tal como era: deslizar el dedo sobre el
+   * lienzo para bajar por la página dejaba un nodo fantasma.
+   *
+   * En el modo por defecto, «Añadir nodo», el nodo se creaba en `onPointerDown` del SVG, y el
+   * lienzo llevaba `touch-action: none` (necesario para arrastrar en modo «Mover»). Un
+   * deslizamiento vertical que empezaba en el fondo del lienzo no desplazaba la página y SÍ
+   * creaba un nodo: en la cuadrícula 5 × 5 de arranque, 25 → 26 nodos («Z») y la vista no se
+   * movía. La pista dice «haz clic en el lienzo»: un deslizamiento no es un clic.
    * Punto de partida: (320, 107,5) del viewBox, el centro de la celda entre B, C, G y H, a
    * 47,5 unidades de la arista más cercana: fondo del lienzo, no un nodo ni una arista.
+   *
+   * Se afirman las dos mitades del defecto: ni nodo nuevo, ni página quieta (el dedo sube
+   * 250 px; se exige que la página baje al menos 100, sin fijar la cifra exacta, que depende
+   * de la inercia que simule el navegador).
    */
-  test('HALLAZGO — un deslizamiento que empieza en el lienzo no crea nodos', async ({ page }) => {
-    test.fail();
+  test('REGRESIÓN 2375 — un deslizamiento que empieza en el lienzo no crea nodos y desplaza la página', async ({ page }) => {
     await abrir(page);
     const svg = page.locator('[class*="editorSvg"]');
     await svg.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'auto' }));
@@ -662,18 +887,67 @@ test.describe('Inspector 28/09/2026 — móvil 390 px (toque)', () => {
     if (!caja) throw new Error('el lienzo no tiene caja');
     const x = caja.x + (320 * caja.width) / 800;
     const y0 = caja.y + (107.5 * caja.height) / 500;
-    const cdp = await page.context().newCDPSession(page);
-    const dedo = (y: number) => [{ x, y, radiusX: 1, radiusY: 1, force: 1, id: 1 }];
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: dedo(y0) });
-    for (let i = 1; i <= 10; i++) {
-      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: dedo(y0 - 25 * i) });
-    }
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    const scrollAntes = await page.evaluate(() => window.scrollY);
+    await deslizarDedo(page, x, y0, -250);
     // Margen para que React pinte lo que el gesto haya provocado: la comprobación de abajo
     // es instantánea a propósito, porque un `toHaveCount(25)` con reintentos podría darse por
     // bueno ANTES de que el nodo fantasma apareciera.
     await page.waitForTimeout(500);
 
-    expect(await nodos(page).count()).toBe(25); // hoy: 26, con el nodo «Z» donde empezó el dedo
+    expect(await nodos(page).count()).toBe(25); // antes: 26, con el nodo «Z» donde empezó el dedo
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(scrollAntes + 100); // antes: no se movía
+  });
+
+  /**
+   * REGRESIÓN 2375 — lo que la reparación NO debe romper: un toque quieto en el fondo del
+   * lienzo sigue creando un nodo (ahora en el `click`, que el navegador solo emite si el gesto
+   * fue un toque). Mismo punto que arriba: 25 → 26, y el nuevo es «Z».
+   */
+  test('REGRESIÓN 2375 — un toque en el fondo del lienzo sigue creando un nodo', async ({ page }) => {
+    await abrir(page);
+    const svg = page.locator('[class*="editorSvg"]');
+    await svg.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'auto' }));
+    await expect(nodos(page)).toHaveCount(25);
+    const caja = await svg.boundingBox();
+    if (!caja) throw new Error('el lienzo no tiene caja');
+    await page.touchscreen.tap(caja.x + (320 * caja.width) / 800, caja.y + (107.5 * caja.height) / 500);
+    await expect(nodos(page)).toHaveCount(26);
+    expect((await etiquetas(page)).slice(-1)).toEqual(['Z']);
+  });
+
+  /**
+   * REGRESIÓN 2375 — en modo «Mover», el arrastre de un nodo SÍ se queda el gesto (el nodo
+   * sigue al dedo y la página no se mueve), pero un deslizamiento que empieza en el FONDO del
+   * lienzo desplaza la página igual que en los demás modos.
+   *
+   * No se puede resolver con touch-action en los nodos: Chromium lo ignora en los hijos de un
+   * <svg> (medido el 28/09/2026 en una página en blanco). La app cancela el desplazamiento
+   * con un touchmove no pasivo, y solo mientras hay un nodo agarrado.
+   * A está en (80, 60) del viewBox; el dedo baja 60 px de pantalla, que en un lienzo de 316 px
+   * (escala 0,395) son unas 152 unidades: A debe acabar por debajo de y = 150.
+   */
+  test('REGRESIÓN 2375 — en modo Mover el nodo sigue al dedo sin desplazar la página, y el fondo desplaza', async ({ page }) => {
+    await abrir(page);
+    // Por su clase: en modo mover, cada nodo se anuncia con «… Usa las flechas para mover el nodo».
+    const botonMover = page.locator('[class*="toolBtn"]', { hasText: 'Mover' });
+    await tocar(botonMover);
+    await expect(botonMover).toHaveAttribute('aria-pressed', 'true');
+    const svg = page.locator('[class*="editorSvg"]');
+    await svg.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'auto' }));
+    const caja = await svg.boundingBox();
+    if (!caja) throw new Error('el lienzo no tiene caja');
+    const circuloA = nodos(page).first();
+
+    const scrollAntes = await page.evaluate(() => window.scrollY);
+    await deslizarDedo(page, caja.x + (80 * caja.width) / 800, caja.y + (60 * caja.height) / 500, 60);
+    await page.waitForTimeout(300);
+    expect(Number(await circuloA.getAttribute('cx'))).toBeCloseTo(80, 0);
+    expect(Number(await circuloA.getAttribute('cy'))).toBeGreaterThan(150);
+    expect(await page.evaluate(() => window.scrollY)).toBe(scrollAntes);
+
+    await deslizarDedo(page, caja.x + (320 * caja.width) / 800, caja.y + (300 * caja.height) / 500, -250);
+    await page.waitForTimeout(500);
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(scrollAntes + 100);
+    await expect(nodos(page)).toHaveCount(25);
   });
 });

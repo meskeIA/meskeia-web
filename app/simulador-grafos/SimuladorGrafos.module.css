@@ -302,6 +302,15 @@
   overflow: hidden;
 }
 
+/*
+ * touch-action: manipulation deja desplazar la página y pellizcar para ampliar cuando el
+ * dedo empieza en el lienzo (con none, ni una cosa ni otra: hallazgo 2375). El arrastre de
+ * un nodo en modo «Mover» retiene el gesto desde page.tsx, con un touchmove no pasivo.
+ *
+ * Los tamaños que dependen de la escala real del lienzo llegan de page.tsx como variables:
+ * --trazo (multiplicador del grosor de las aristas), --fuente-nodo y --fuente-peso, en
+ * unidades del viewBox (hallazgo 2374). Sin ellas, los valores de siempre.
+ */
 .editorSvg {
   display: block;
   width: 100%;
@@ -309,11 +318,16 @@
   background: var(--bg-card);
   border-radius: var(--radius);
   user-select: none;
-  touch-action: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
 
 [data-theme='dark'] .editorSvg {
   background: #1f2937;
+}
+
+.editorSvgApuntando {
+  cursor: pointer;
 }
 
 .nodoCircle {
@@ -330,43 +344,50 @@
   pointer-events: none;
   font-family: 'SF Mono', Monaco, monospace;
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--fuente-nodo, 14px);
   text-anchor: middle;
   dominant-baseline: central;
 }
 
 .aristaLinea {
   stroke: var(--text-secondary);
-  stroke-width: 2;
+  stroke-width: calc(2 * var(--trazo, 1));
   cursor: pointer;
   transition: stroke 0.2s, stroke-width 0.2s;
 }
 
 .aristaLinea:hover {
   stroke: var(--primary);
-  stroke-width: 3;
+  stroke-width: calc(3 * var(--trazo, 1));
 }
 
 .aristaResaltada {
   stroke: #60a5fa;
-  stroke-width: 3;
+  stroke-width: calc(3 * var(--trazo, 1));
 }
 
 .aristaCamino {
   stroke: #10b981;
-  stroke-width: 4;
+  stroke-width: calc(4 * var(--trazo, 1));
+}
+
+/* La arista que se llevaría el clic en modo eliminar: va la última para ganar a las otras. */
+.aristaApuntada {
+  stroke: var(--primary);
+  stroke-width: calc(4 * var(--trazo, 1));
 }
 
 .aristaPeso {
   pointer-events: none;
   font-family: 'SF Mono', Monaco, monospace;
-  font-size: 11px;
+  font-size: var(--fuente-peso, 11px);
   font-weight: 700;
   fill: var(--primary);
   text-anchor: middle;
+  dominant-baseline: central;
   paint-order: stroke;
   stroke: var(--bg-card);
-  stroke-width: 3;
+  stroke-width: calc(var(--fuente-peso, 11px) * 0.3);
 }
 
 [data-theme='dark'] .aristaPeso {
@@ -679,6 +700,18 @@
 }
 
 /* Responsive */
+
+/*
+ * Con dos columnas, el panel auxiliar se queda 320 px fijos y el lienzo lo que sobre: a
+ * 800 px de ancho eso eran 262 px, menos que en un móvil ya reparado. Por debajo de 960 px
+ * el panel pasa debajo del lienzo.
+ */
+@media (max-width: 960px) {
+  .editorLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .container {
     padding: var(--spacing-md);
@@ -693,8 +726,21 @@
     font-size: 1.5rem;
   }
 
-  .editorLayout {
-    grid-template-columns: 1fr;
+  /*
+   * Hasta el 28/09/2026 los rellenos anidados (.main 32 px + .panel 24 px +
+   * .editorContainer 16 px, más bordes) no se reducían aquí y el lienzo se quedaba en
+   * 212 px de los 390 de un móvil (hallazgo 2374). Recortados, pasa a 316 px.
+   */
+  .main {
+    padding: var(--spacing-sm);
+  }
+
+  .panel {
+    padding: var(--spacing-md) 12px;
+  }
+
+  .editorContainer {
+    padding: 0;
   }
 
   .auxiliarPanel {
