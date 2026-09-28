@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './OrientacionHerencias.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, DisclaimerCard, DataReference, ShareCard } from '@/components';
 import Link from 'next/link';
 import { getRelatedApps } from '@/data/app-relations';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
@@ -269,7 +269,7 @@ export default function OrientacionTramitacionHerenciasPage() {
           Asistente paso a paso para gestionar una herencia en España
         </p>
         <p className={styles.metaVerificado}>
-          Información basada en normativa vigente 2025 ·{' '}
+          Información basada en la normativa vigente ·{' '}
           <a
             href="https://www.mjusticia.gob.es/es/ciudadanos/tramites/sucesiones"
             target="_blank"
@@ -285,6 +285,16 @@ export default function OrientacionTramitacionHerenciasPage() {
 
       {/* Disclaimer — siempre visible */}
       <DisclaimerCard variant="financial" severity="critical" />
+      {/* El sello es el de las dos constantes que la app usa, no el del módulo de sucesiones:
+          los plazos se verificaron contra el BOE en septiembre de 2026 y el módulo, en 2025.
+          Se muestra la fecha de la más antigua. */}
+      <DataReference
+        normativa="Plazos del Impuesto sobre Sucesiones y de la plusvalía municipal"
+        fuente={`${PLAZO_ISD.norma} · ${PLAZO_IIVTNU.baseNormativa}`}
+        verificado={PLAZO_ISD.verificado < PLAZO_IIVTNU.verificado ? PLAZO_ISD.verificado : PLAZO_IIVTNU.verificado}
+        urlOficial={PLAZO_ISD.urlOficial}
+        nota="La plusvalía municipal se declara ante el Ayuntamiento y su plazo tiene prórroga propia, distinta de la del Impuesto sobre Sucesiones."
+      />
 
       {/* PASO 1: Cuestionario */}
       <section className={styles.seccion}>

@@ -150,6 +150,17 @@ const NIVEL_MANUAL = {
   'visualizador-regimenes-politicos':    3,  // ídem (28/09/2026: juicio, no dato)
 };
 
+// Apps que importan de data/fiscal/ algo que NO es un dato normativo, y por eso no llevan
+// <DataReference>: el componente muestra norma, fuente oficial y fecha de verificación, y
+// ponerles el sello de su módulo atribuiría el dato a una norma que no lo fija.
+// Formato: slug → motivo
+const SIN_DATA_REFERENCE_OK = {
+  // GASTOS_PRIMER_ANO_BEBE son estimaciones de precios (pañales, leche…) que viven en
+  // data/fiscal/maternidad.ts; el sello de ese módulo es el RDL 9/2025 del permiso por
+  // nacimiento. Revisado el 28/09/2026.
+  'planificador-gastos-bebe': 'estimaciones de gasto, no normativa',
+};
+
 // Palabras en URL/nombre que elevan a Nivel 1 CRÍTICO
 const DISPARADORES_CRITICO = [
   // Fiscal
@@ -363,7 +374,7 @@ function analizarApp(slug, appData, scan) {
   }
 
   // Datos fiscales sin DataReference
-  if (scan.usaDatosFiscales && !scan.tieneDataReference) {
+  if (scan.usaDatosFiscales && !scan.tieneDataReference && !SIN_DATA_REFERENCE_OK[slug]) {
     incidencias.push({
       prioridad: '🟢',
       codigo: 'SIN_DATA_REFERENCE',

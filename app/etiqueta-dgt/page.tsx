@@ -9,6 +9,7 @@ import {
   RelatedApps,
   ShareCard,
   DisclaimerCard,
+  DataReference,
   EducationalSection,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
@@ -778,6 +779,13 @@ export default function EtiquetaDgtPage() {
               esta herramienta.
             </p>
           </DisclaimerCard>
+          <DataReference
+            normativa="Programa Auto+ de ayudas a la compra de vehículos electrificados"
+            fuente={FISCAL_AYUDAS_VEHICULO_META.fuente}
+            verificado={FISCAL_AYUDAS_VEHICULO_META.verificado}
+            urlOficial={FISCAL_AYUDAS_VEHICULO_META.urlOficial}
+            nota="La ayuda solo se menciona en la recomendación para vehículos sin etiqueta: la etiqueta no depende de ella."
+          />
         </div>
 
         {/* ---- Sección educativa ---- */}

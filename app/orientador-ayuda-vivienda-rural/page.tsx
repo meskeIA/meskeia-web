@@ -9,12 +9,13 @@ import {
   RelatedApps,
   EducationalSection,
   DisclaimerCard,
+  DataReference,
   ShareCard,
   RegionBadge,
 } from '@/components';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { AYUDA_COMPRA_JOVEN_RURAL_2026 } from '@/data/fiscal';
+import { AYUDA_COMPRA_JOVEN_RURAL_2026, FISCAL_VIVIENDA_JOVEN_META } from '@/data/fiscal';
 
 type SiNo = 'si' | 'no' | 'pendiente';
 type TipoMunicipio = 'pequeno' | 'despoblacion' | 'grande' | 'pendiente';
@@ -95,6 +96,13 @@ export default function OrientadorAyudaViviendaRural() {
         severity="critical"
         collapsible={false}
         context="Este orientador es informativo y no vinculante. El Plan Estatal 2026-2030 (RD 326/2026) establece el marco general, pero cada Comunidad Autónoma define sus propios requisitos, importes concretos y plazos en su convocatoria. Consulta siempre la convocatoria de tu CA antes de tomar decisiones de compra."
+      />
+      <DataReference
+        normativa={`Plan Estatal de Vivienda ${FISCAL_VIVIENDA_JOVEN_META.vigencia}`}
+        fuente={FISCAL_VIVIENDA_JOVEN_META.fuente}
+        verificado={FISCAL_VIVIENDA_JOVEN_META.verificado}
+        urlOficial={FISCAL_VIVIENDA_JOVEN_META.urlOficial}
+        nota={FISCAL_VIVIENDA_JOVEN_META.nota}
       />
 
       {/* Banner convocatorias pendientes */}

@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency } from '@/lib/formatters';
 import { jsonLd } from './metadata';
 import styles from './CalculadoraPropinas.module.css';
 import { getRelatedApps } from '@/data/app-relations';
-import { SMI_2026 } from '@/data/fiscal';
+import { SMI_2026, FISCAL_SMI_META } from '@/data/fiscal';
 
 // Porcentaje de propina habitual por país/contexto
 const PORCENTAJE_POR_PAIS: Record<string, number> = {
@@ -263,6 +263,13 @@ export default function CalculadoraPropinas() {
           severity="high"
           context="calculadora-propinas"
           collapsible={false}
+        />
+        <DataReference
+          normativa={`Salario mínimo interprofesional ${FISCAL_SMI_META.vigencia}`}
+          fuente={FISCAL_SMI_META.fuente}
+          verificado={FISCAL_SMI_META.verificado}
+          urlOficial={FISCAL_SMI_META.urlOficial}
+          nota="El SMI solo se cita en la comparación entre España y EE. UU.; el cálculo de la propina no depende de él."
         />
 
         
