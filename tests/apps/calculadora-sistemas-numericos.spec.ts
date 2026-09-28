@@ -1,5 +1,13 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  resolverCaso,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+} from '../../app/calculadora-sistemas-numericos/casos';
+import { desdeDecimal, operar as operarMotor } from '../../app/calculadora-sistemas-numericos/motor';
 
 /**
  * calculadora-sistemas-numericos — Inspector, 20/09/2026
@@ -365,8 +373,10 @@ test('HALLAZGO 5 (medio, reparado) — un operando inválido se rechaza con mens
 test('HALLAZGO 6 (bajo, reparado) — los tres campos tienen etiqueta asociada', async ({
   page,
 }) => {
+  // Los tres de la calculadora: la casilla de «Casos para clase» (28/09/2026) va aparte y tiene
+  // su propia etiqueta; acotado como en simulador-fluidos-bernoulli, sin relajar el recuento.
   const campos = await page.evaluate(() =>
-    [...document.querySelectorAll<HTMLInputElement>('input[type="text"]')].map((i) => ({
+    [...document.querySelectorAll<HTMLInputElement>('input[type="text"]:not(#casos-respuesta)')].map((i) => ({
       marcador: i.placeholder,
       etiquetas: i.labels ? i.labels.length : 0,
       id: i.id,
@@ -391,4 +401,190 @@ test('HALLAZGO 6 (bajo, reparado) — los botones de copiar tienen nombre accesi
   for (const base of ['binario', 'octal', 'decimal', 'hexadecimal']) {
     await expect(page.getByRole('button', { name: `Copiar el valor en ${base}` })).toHaveCount(1);
   }
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * calculadora-sistemas-numericos · casos para clase (28/09/2026)
+ *
+ * Doce problemas de cambio de base y aritmética binaria. Variante propia del tipo A: la
+ * respuesta es un NUMERAL en una base pedida (binario, octal, decimal o hexadecimal), así que
+ * no hay tolerancia. `comprobarRespuesta` normaliza lo que teclea el alumno (espacios y guiones
+ * bajos del binario agrupado, prefijos 0x/0b/0o, subíndice de la base, minúsculas), lo lee con
+ * `esValidoParaBase` y `aDecimal` del motor y compara el NÚMERO: los ceros a la izquierda y
+ * «d7» valen; el resultado escrito en otra base, no. Los casos calculan con el `motor.ts` que ya
+ * existía, que NO se tocó.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO (a mano, sin mirar la app):
+ *   1 · 45 = 32 + 8 + 4 + 1                                          → 101101₂
+ *   2 · 10110110₂ = 128 + 32 + 16 + 4 + 2                            = 182
+ *   3 · 1101 0111₂ → D 7                                             → D7₁₆ (215)
+ *   4 · 101 110₂ → 5 6                                               → 56₈ (46)
+ *   5 · B4₁₆ = 11·16 + 4                                             = 180
+ *   6 · 2F₁₆ → 0010 1111                                             → 101111₂ (47)
+ *   7 · 01011011₂ + 00110110₂ = 91 + 54 = 145                        → 10010001₂
+ *   8 · #FF8000: el par verde es 80₁₆ = 8·16                         = 128
+ *   9 · 200 AND 240 = 11001000 AND 11110000 = 11000000               = 192
+ *  10 · rwx r-x --- = 4+2+1 · 4+1 · 0                                → 750₈
+ *  11 · K = A + 10 = 65 + 10 = 75 = 4·16 + 11                        → 4B₁₆
+ *  12 · 53 << 1 = 106 (< 256, no se pierde ningún bit en 8 bits)     = 106
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+const A_MANO_CASOS: Readonly<Record<number, { canonica: string; valor: number }>> = {
+  1: { canonica: '101101', valor: 45 },
+  2: { canonica: '182', valor: 182 },
+  3: { canonica: 'D7', valor: 215 },
+  4: { canonica: '56', valor: 46 },
+  5: { canonica: '180', valor: 180 },
+  6: { canonica: '101111', valor: 47 },
+  7: { canonica: '10010001', valor: 145 },
+  8: { canonica: '128', valor: 128 },
+  9: { canonica: '192', valor: 192 },
+  10: { canonica: '750', valor: 488 },
+  11: { canonica: '4B', valor: 75 },
+  12: { canonica: '106', valor: 106 },
+};
+
+const casoN = (id: number) => CASOS.find((c) => c.id === id)!;
+
+test.describe('calculadora-sistemas-numericos · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    for (const caso of CASOS) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(r.valor, `caso ${caso.id}`).toBe(caso.respuesta);
+      expect(caso.respuestaCanonica, `caso ${caso.id}`).toBe(desdeDecimal(caso.respuesta, caso.baseRespuesta));
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta y desarrollo', async () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isSafeInteger(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+      // La solución enseña la cifra de la casilla, en la base pedida.
+      expect(caso.pasos.join('\n'), `caso ${caso.id}`).toContain(caso.respuestaTexto);
+      expect(caso.respuestaTexto, `caso ${caso.id}`).toContain(caso.respuestaCanonica);
+    }
+    expect(new Set(CASOS.map((c) => c.categoria))).toEqual(new Set(['abstracto', 'aplicado']));
+    // Y se pide en las cuatro bases, no solo en decimal.
+    expect(new Set(CASOS.map((c) => c.baseRespuesta))).toEqual(new Set([2, 8, 10, 16]));
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Ecuador|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos (mexicanos|colombianos|argentinos|chilenos|uruguayos)|Bachillerato|selectividad)\b/i;
+    // La sigla va aparte y con mayúsculas: con /i, el pronombre «eso» la disparaba en falso.
+    const SIGLA_ESO = /\bESO\b/;
+    for (const caso of CASOS) {
+      const texto = `${caso.titulo} ${caso.enunciado}`;
+      expect(PROHIBIDO.test(texto) || SIGLA_ESO.test(texto), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · cada enunciado dice en qué base se responde', async () => {
+    const NOMBRE: Record<number, RegExp> = { 2: /binari/i, 8: /octal/i, 10: /decimal/i, 16: /hexadecimal/i };
+    for (const caso of CASOS) {
+      expect(`${caso.enunciado} ${caso.etiquetaRespuesta}`, `caso ${caso.id}`).toMatch(NOMBRE[caso.baseRespuesta]);
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(muestras.map((m) => m.baseRespuesta)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(resolverCaso(m.datos).valor).toBe(m.respuesta);
+      expect(comprobarRespuesta(m.respuestaCanonica, m).correcto, `semilla ${m.semilla}`).toBe(true);
+    }
+  });
+
+  test('7 · la corrección acepta las grafías legítimas y rechaza el resto', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera.
+    for (const caso of CASOS) {
+      expect(caso.respuestaCanonica, `caso ${caso.id}`).toBe(A_MANO_CASOS[caso.id].canonica);
+      expect(caso.respuesta, `caso ${caso.id}`).toBe(A_MANO_CASOS[caso.id].valor);
+      expect(comprobarRespuesta(caso.respuestaCanonica, caso).correcto, `caso ${caso.id}`).toBe(true);
+    }
+
+    // (b) El motor que se importa sigue siendo el del acta.
+    expect(desdeDecimal(45, 2)).toBe('101101');
+    expect(desdeDecimal(215, 16)).toBe('D7');
+    expect(operarMotor(200, 240, 'and', 8)).toMatchObject({ resultado: 192 });
+
+    // (c) Grafías legítimas del mismo número: ceros a la izquierda, agrupado, prefijo,
+    //     subíndice y minúsculas.
+    for (const t of ['101101', '00101101', '0010 1101', '0b101101', '101101₂', '101101 (2)']) {
+      expect(comprobarRespuesta(t, casoN(1)).correcto, t).toBe(true);
+    }
+    for (const t of ['d7', '0xD7', '#D7', 'D7₁₆']) {
+      expect(comprobarRespuesta(t, casoN(3)).correcto, t).toBe(true);
+    }
+    expect(comprobarRespuesta('0o56', casoN(4)).correcto).toBe(true);
+
+    // (d) Lo que NO vale: el resultado escrito en otra base, dígitos de otra base, un prefijo
+    //     que contradice la base pedida y el error típico de los permisos (755 en vez de 750).
+    expect(comprobarRespuesta('215', casoN(3)).correcto).toBe(false);
+    expect(comprobarRespuesta('145', casoN(7)).correcto).toBe(false);
+    expect(comprobarRespuesta('102101', casoN(1)).correcto).toBe(false);
+    expect(comprobarRespuesta('0x2D', casoN(1)).correcto).toBe(false);
+    expect(comprobarRespuesta('755', casoN(10)).correcto).toBe(false);
+  });
+
+  test('8 · corregir no lanza nunca y nunca dice «NaN»', async () => {
+    for (const t of ['', '   ', '-5', '1,5', 'hola', '1'.repeat(80)]) {
+      const v = comprobarRespuesta(t, casoN(1));
+      expect(v.correcto, JSON.stringify(t)).toBe(false);
+      expect(v.motivo, JSON.stringify(t)).not.toMatch(/NaN|undefined/);
+      expect(v.motivo.trim(), JSON.stringify(t)).not.toBe('');
+    }
+  });
+});
+
+test.describe('calculadora-sistemas-numericos · la sección de casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test('el caso 3 acepta el hexadecimal en minúsculas', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 3:/ }).click();
+    await seccion(page).locator('#casos-respuesta').fill('d7');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto!');
+  });
+
+  test('responder en decimal el caso 7 se rechaza y la solución enseña el binario', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 7:/ }).click();
+    await seccion(page).locator('#casos-respuesta').fill('145');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).not.toContainText('¡Correcto!');
+    const solucion = seccion(page).getByRole('button', { name: /Ver solución/ });
+    await expect(solucion).toHaveAttribute('aria-expanded', 'false');
+    await solucion.click();
+    await expect(seccion(page).locator('#casos-solucion')).toContainText('10010001');
+  });
 });

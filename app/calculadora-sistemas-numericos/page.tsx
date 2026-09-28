@@ -15,6 +15,7 @@ import {
   type Operacion,
   type ResultadoConversion,
 } from './motor';
+import CasosAula from './CasosAula';
 
 export default function CalculadoraSistemasNumericosPage() {
   // Estado para conversión
@@ -377,6 +378,10 @@ export default function CalculadoraSistemasNumericosPage() {
           </table>
         </div>
       </section>
+
+      {/* Tarea de aula (skill /casos-aula-meskeia): fuera de los paneles, para no mover sus
+          localizadores, y FUERA de EducationalSection, que nace colapsada. */}
+      <CasosAula />
 
       <EducationalSection
         title="¿Quieres aprender más sobre sistemas numéricos?"
