@@ -6,92 +6,8 @@ import styles from './SimuladorFuncionesTransformaciones.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 
-// ============================================
-// TIPOS
-// ============================================
-type FuncionBase = 'sin' | 'cos' | 'cuadratica' | 'absoluto' | 'raiz';
-
-interface ConfigFuncion {
-  id: FuncionBase;
-  etiqueta: string;
-  simbolo: string;
-  icono: string;
-}
-
-// ============================================
-// CONSTANTES
-// ============================================
-const FUNCIONES_BASE: ConfigFuncion[] = [
-  { id: 'sin', etiqueta: 'sin(x)', simbolo: 'sin', icono: '〜' },
-  { id: 'cos', etiqueta: 'cos(x)', simbolo: 'cos', icono: '〰' },
-  { id: 'cuadratica', etiqueta: 'x²', simbolo: 'x²', icono: '⌒' },
-  { id: 'absoluto', etiqueta: '|x|', simbolo: '|x|', icono: '∧' },
-  { id: 'raiz', etiqueta: '√x', simbolo: '√x', icono: '√' },
-];
-
-// ============================================
-// FUNCIONES MATEMÁTICAS
-// ============================================
-
-function evaluarBase(tipo: FuncionBase, x: number): number {
-  switch (tipo) {
-    case 'sin': return Math.sin(x);
-    case 'cos': return Math.cos(x);
-    case 'cuadratica': return x * x;
-    case 'absoluto': return Math.abs(x);
-    case 'raiz': return x >= 0 ? Math.sqrt(x) : NaN;
-  }
-}
-
-function evaluarTransformada(tipo: FuncionBase, a: number, b: number, c: number, d: number, x: number): number {
-  const bSafe = b === 0 ? 0.001 : b;
-  const inner = bSafe * (x - c);
-  const base = evaluarBase(tipo, inner);
-  if (isNaN(base)) return NaN;
-  return a * base + d;
-}
-
-function fmtParam(valor: number): string {
-  if (valor === Math.floor(valor)) return String(valor);
-  return valor.toFixed(1).replace('.', ',');
-}
-
-function construirEcuacion(funcBase: FuncionBase, a: number, b: number, c: number, d: number): string {
-  const config = FUNCIONES_BASE.find(f => f.id === funcBase);
-  const simbolo = config?.simbolo ?? funcBase;
-
-  const aStr = a === 1 ? '' : a === -1 ? '-' : `${fmtParam(a)}·`;
-  const bSafe = b === 0 ? 0.001 : b;
-  const bStr = bSafe === 1 ? '' : bSafe === -1 ? '-' : `${fmtParam(bSafe)}·`;
-  const cStr = c === 0 ? 'x' : c > 0 ? `(x − ${fmtParam(c)})` : `(x + ${fmtParam(Math.abs(c))})`;
-  const dStr = d === 0 ? '' : d > 0 ? ` + ${fmtParam(d)}` : ` − ${fmtParam(Math.abs(d))}`;
-
-  let argumento: string;
-  if (funcBase === 'cuadratica') {
-    argumento = c === 0 ? `${bStr}x` : `(${bStr}${cStr})`;
-    if (bSafe === 1 && c !== 0) argumento = cStr;
-    if (bSafe === 1 && c === 0) argumento = 'x';
-    return `f(x) = ${aStr}${argumento}²${dStr}`;
-  }
-  if (funcBase === 'absoluto') {
-    argumento = c === 0 ? `${bStr}x` : `${bStr}${cStr}`;
-    if (bSafe === 1 && c !== 0) argumento = cStr;
-    if (bSafe === 1 && c === 0) argumento = 'x';
-    return `f(x) = ${aStr}|${argumento}|${dStr}`;
-  }
-  if (funcBase === 'raiz') {
-    argumento = c === 0 ? `${bStr}x` : `${bStr}${cStr}`;
-    if (bSafe === 1 && c !== 0) argumento = cStr;
-    if (bSafe === 1 && c === 0) argumento = 'x';
-    return `f(x) = ${aStr}√(${argumento})${dStr}`;
-  }
-
-  // sin/cos
-  argumento = c === 0 ? `${bStr}x` : `${bStr}${cStr}`;
-  if (bSafe === 1 && c !== 0) argumento = cStr;
-  if (bSafe === 1 && c === 0) argumento = 'x';
-  return `f(x) = ${aStr}${simbolo}(${argumento})${dStr}`;
-}
+import { FUNCIONES_BASE, evaluarBase, evaluarTransformada, fmtParam, construirEcuacion, type FuncionBase } from './motor';
+import CasosAula from './CasosAula';
 
 // ============================================
 // COMPONENTE PRINCIPAL
@@ -329,6 +245,26 @@ export default function SimuladorFuncionesTransformacionesPage() {
 
   const ecuacionActual = construirEcuacion(funcBase, a, b, c, d);
 
+  /**
+   * «Cargar el escenario en el simulador» de las predicciones para clase: pone la función base
+   * y la PARTIDA del caso con los mismos setters que usan los controles, y sube la vista hasta
+   * la gráfica para que el alumno mueva él mismo el deslizador.
+   */
+  const refGrafica = useRef<HTMLDivElement>(null);
+  const cargarEscenarioAula = useCallback(
+    (escenario: { funcion: FuncionBase; a: number; b: number; c: number; d: number }) => {
+      setFuncBase(escenario.funcion);
+      setA(escenario.a);
+      setB(escenario.b);
+      setC(escenario.c);
+      setD(escenario.d);
+      const reducirMovimiento =
+        typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      refGrafica.current?.scrollIntoView({ behavior: reducirMovimiento ? 'auto' : 'smooth', block: 'center' });
+    },
+    []
+  );
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -360,7 +296,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
       </div>
 
       {/* === CANVAS === */}
-      <div className={styles.canvasWrapper}>
+      <div className={styles.canvasWrapper} ref={refGrafica}>
         <canvas
           ref={canvasRef}
           className={styles.canvas}
@@ -491,6 +427,9 @@ export default function SimuladorFuncionesTransformacionesPage() {
           Restablecer todo
         </button>
       </div>
+
+      {/* === PREDICCIONES PARA CLASE (tarea de aula, tipo C) — fuera de EducationalSection === */}
+      <CasosAula onCargar={cargarEscenarioAula} />
 
       {/* ============================================
           BLOQUE EDUCATIVO v2.0
