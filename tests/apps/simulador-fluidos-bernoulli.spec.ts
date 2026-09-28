@@ -909,3 +909,377 @@ test.describe('simulador-fluidos-bernoulli · la sección de casos en el navegad
     await expect(seccion(page).getByRole('alert')).toContainText('Correcto');
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR 28/09/2026 — RE-INSPECCIÓN tras los cambios del 23/09 (casos para clase, motor.ts,
+ * `fmt` con formatNumber, `fluidoPorId`, la nota ρ·g·(h₂ − h₁) del desnivel). 746 usos en 30 días.
+ *
+ * Los once hallazgos del 26/08 (397-407) siguen reparados: los tests A-J de arriba pasan en
+ * verde contra el build de HEAD, y el aviso de escala de la estenosis (K) sigue en el bloque
+ * educativo. Ninguno ha vuelto.
+ *
+ * CASOS NUEVOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (A = π·D²/4, g = 9,81 m/s²):
+ *
+ *   N (normal) · Venturi, ACEITE ρ = 920 kg/m³, Q = 4 L/s, D₂/D₁ = 0,6, P₁ = 101.325 Pa
+ *       A₁ = π·0,05² = 7,853982·10⁻³ m² (78,54 cm²) → v₁ = 0,004/A₁ = 0,509296 m/s → «0,51»
+ *       A₂ = π·0,03² = 2,827433·10⁻³ m² (28,27 cm²) → v₂ = v₁/0,6² = 1,414711 m/s → «1,41»
+ *       ΔP = ½·920·(0,259382 − 2,001407) = 460·(−1,742025) = −801,33 Pa → «−801 Pa»
+ *       P₂ = 101.325 − 801,33 = 100.523,67 Pa → «100,52 kPa» · ṁ = 920·0,004 = 3,68 → «3,680 kg/s»
+ *       (ρ del aceite: 910-930 kg/m³ para aceites vegetales a 20 °C, la horquilla que da la
+ *        propia tabla educativa y la habitual en tablas de propiedades de fluidos.)
+ *
+ *   L1 (límite, la frontera del aviso de cavitación) · desnivel 10 m, agua
+ *       P₁ = 101.325 → P₃ = 101.325 − 1000·9,81·10 = 101.325 − 98.100 = 3.225 Pa → «3225 Pa»,
+ *                     por ENCIMA de la presión de vapor (2.339 Pa a 20 °C): sin aviso
+ *       P₁ = 100.325 (un paso menos) → P₃ = 2.225 Pa → «2225 Pa», por DEBAJO: «Zona de
+ *                     cavitación», sin llamarla «presión absoluta negativa»
+ *
+ *   L2 (límite, presión absoluta negativa) · Venturi agua, Q = 10 L/s, D₂/D₁ = 0,35, P₁ = 50.325
+ *       A₂ = π·0,0175² = 9,621128·10⁻⁴ m² → v₂ = 10,393787 m/s, v₂² = 108,0308
+ *       ΔP = 500·(1,621139 − 108,0308) = −53.204,9 Pa → «−53,20 kPa»
+ *       P₂ = 50.325 − 53.204,9 = −2.879,9 Pa → «−2880 Pa» + «Cavitación segura»
+ *
+ *   R (rechazo) · Δh = −3 m → el deslizador lo deja en 0 y ΔP = 0 («Sin desnivel no hay
+ *       caída») · P₁ = 1.000.000 Pa → tope de la rejilla, 101.325 + 198·1000 = 299.325 Pa ·
+ *       «12abc» en la casilla de un caso → «Escribe un número», sin NaN.
+ *
+ *   Casos de aula resueltos a mano (superficie nueva del 23/09):
+ *     9 · P₃ = 101.325 − 920·9,81·5 = 101.325 − 45.126 = 56.199 Pa → 56,20 kPa. Con la ρ del
+ *         agua saldría 101.325 − 49.050 = 52.275 → 52,28, fuera del 1 % (0,56 kPa): suspende.
+ *    12 · 7.500 = ½·1000·(4² − 1)·v₁² → v₁² = 1 → v₁ = 1 m/s → Q = A₁·v₁ = 7,854 L/s → 7,85.
+ *         Olvidar el cuadrado del diámetro (v₂ = 2·v₁): v₁ = √(2·7500/(1000·3)) = 2,2361 →
+ *         Q = 17,56 L/s, que debe suspender.
+ *
+ * HALLAZGOS ABIERTOS de esta inspección: los `test.fail()` del final.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+import { esperarValorEnReact } from './_hidratacion';
+
+/**
+ * Contraste WCAG del texto de `selector` contra su fondo REAL: compone los fondos
+ * semitransparentes de los antecesores hasta dar con uno opaco (la tarjeta de ΔP es un teal
+ * al 15 % sobre la tarjeta del panel).
+ */
+async function contrasteDe(page: Page, selector: string): Promise<number> {
+  return page.evaluate((sel) => {
+    type Rgba = { r: number; g: number; b: number; a: number };
+    const leer = (s: string): Rgba | null => {
+      const m = s.match(/rgba?\(([^)]+)\)/);
+      if (!m) return null;
+      const p = m[1].split(',').map((x) => parseFloat(x));
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+    const sobre = (fg: Rgba, bg: Rgba): Rgba => ({
+      r: fg.r * fg.a + bg.r * (1 - fg.a),
+      g: fg.g * fg.a + bg.g * (1 - fg.a),
+      b: fg.b * fg.a + bg.b * (1 - fg.a),
+      a: 1,
+    });
+    const lum = (c: Rgba) => {
+      const f = (v: number) => {
+        const x = v / 255;
+        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+    };
+    const el = document.querySelector(sel) as HTMLElement;
+    const capas: Rgba[] = [];
+    let n: HTMLElement | null = el;
+    while (n) {
+      const c = leer(getComputedStyle(n).backgroundColor);
+      if (c && c.a > 0) capas.push(c);
+      if (c && c.a === 1) break;
+      n = n.parentElement;
+    }
+    let fondo: Rgba = { r: 255, g: 255, b: 255, a: 1 };
+    for (let i = capas.length - 1; i >= 0; i--) fondo = sobre(capas[i], fondo);
+    const texto = sobre(leer(getComputedStyle(el).color)!, fondo);
+    const [a, b] = [lum(texto), lum(fondo)];
+    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  }, selector);
+}
+
+test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula', () => {
+  const seccionCasos = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+
+  /** Escribe en la casilla del caso, espera a que React lo tenga y pulsa «Comprobar». */
+  async function responder(page: Page, texto: string): Promise<string> {
+    const casilla = seccionCasos(page).locator('#casos-respuesta');
+    await casilla.fill(texto);
+    await esperarValorEnReact(page, casilla, texto);
+    await seccionCasos(page).getByRole('button', { name: 'Comprobar' }).click();
+    // Acotado a la sección: getByRole('alert') a secas casaría con el anunciador de rutas de Next.
+    const veredicto = seccionCasos(page).getByRole('alert');
+    await expect(veredicto).toBeVisible();
+    return ((await veredicto.textContent()) ?? '').trim();
+  }
+
+  test('N · Venturi con aceite, 4 L/s y D₂/D₁ = 0,6: v₂ = 1,41 m/s y ΔP = −801 Pa', async ({ page }) => {
+    await page.getByRole('button', { name: 'Aceite', exact: true }).click();
+    expect(await poner(page, 'Caudal', 4)).toBe('4');
+    expect(await poner(page, 'Ratio de estrechamiento', 0.6)).toBe('0.6');
+
+    const filas = await tabla(page);
+    // v₁ = 0,004/7,853982·10⁻³ = 0,509296 m/s
+    expect(filas[0]).toEqual(['Entrada', '10,0', '78,54', '0,51', '101,33 kPa', '0,00']);
+    // A₂ = π·0,03² = 28,27 cm² · v₂ = 1,414711 m/s · P₂ = 101.325 − 801,33 = 100.523,67 Pa
+    expect(filas[1]).toEqual(['Garganta', '6,0', '28,27', '1,41', '100,52 kPa', '0,00']);
+    expect(filas[2]).toEqual(['Salida', '10,0', '78,54', '0,51', '101,33 kPa', '0,00']);
+
+    const tarjetas = await panel(page);
+    expect(tarjetas[0][1]).toBe('−801 Pa'); // ½·920·(0,259382 − 2,001407) = −801,33 Pa
+    expect(tarjetas[1][1]).toBe('3,680 kg/s'); // ρ·Q = 920 · 0,004
+    expect(tarjetas[4][1]).toBe('920 kg/m³');
+    expect(tarjetas[4][2]).toBe('Aceite');
+  });
+
+  test('L1 · el aviso de cavitación salta entre 3225 Pa y 2225 Pa, la presión de vapor en medio', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: /Tubería con desnivel/ }).click();
+    expect(await poner(page, 'Desnivel', 10)).toBe('10');
+    const aviso = page.locator('[role="status"] [role="note"]');
+
+    // P₃ = 101.325 − 1000·9,81·10 = 3.225 Pa: por encima de los 2.339 Pa de vapor → sin aviso
+    expect((await tabla(page))[2][4]).toBe('3225 Pa');
+    await expect(aviso).toHaveCount(0);
+
+    // Un paso de la rejilla menos: P₁ = 100.325 → P₃ = 2.225 Pa, ya por debajo
+    expect(await poner(page, 'Presión de entrada', 100325)).toBe('100325');
+    expect((await tabla(page))[2][4]).toBe('2225 Pa');
+    await expect(aviso).toHaveCount(1);
+    await expect(aviso).toContainText('Zona de cavitación');
+    await expect(aviso).toContainText('2225 Pa');
+    // Es positiva: no puede anunciarse como presión absoluta negativa.
+    await expect(aviso).not.toContainText('negativa');
+  });
+
+  test('L2 · Venturi a 10 L/s, D₂/D₁ = 0,35 y P₁ = 50.325 Pa: la garganta cae a −2880 Pa', async ({
+    page,
+  }) => {
+    expect(await poner(page, 'Caudal', 10)).toBe('10');
+    expect(await poner(page, 'Ratio de estrechamiento', 0.35)).toBe('0.35');
+    expect(await poner(page, 'Presión de entrada', 50325)).toBe('50325');
+
+    const filas = await tabla(page);
+    // A₂ = π·0,0175² = 9,62 cm² · v₂ = 0,01/9,621128·10⁻⁴ = 10,393787 m/s
+    // P₂ = 50.325 + 500·(1,621139 − 108,0308) = 50.325 − 53.204,9 = −2.879,9 Pa
+    expect(filas[1]).toEqual(['Garganta', '3,5', '9,62', '10,39', '−2880 Pa', '0,00']);
+    expect((await panel(page))[0][1]).toBe('−53,20 kPa'); // ΔP = −53.204,9 Pa
+
+    const aviso = page.locator('[role="status"] [role="note"]');
+    await expect(aviso).toContainText('Cavitación segura');
+    await expect(aviso).toContainText('presión absoluta negativa');
+    await expect(aviso).toContainText('−2880 Pa');
+  });
+
+  test('R · desnivel negativo, presión desbocada y basura en la casilla se rechazan sin NaN', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: /Tubería con desnivel/ }).click();
+    // De 2 m (fábrica) a −3: el control lo deja en su mínimo, 0 m → tubo horizontal
+    expect(await poner(page, 'Desnivel', -3)).toBe('0');
+    const tarjetas = await panel(page);
+    expect(tarjetas[0][1]).toBe('0 Pa');
+    expect(tarjetas[0][2]).toContain('Sin desnivel no hay caída');
+    expect((await tabla(page)).map((f) => f[4])).toEqual(['101,33 kPa', '101,33 kPa', '101,33 kPa']);
+
+    // 1.000.000 Pa → tope de la rejilla: 101.325 + 198·1000 = 299.325 Pa
+    expect(await poner(page, 'Presión de entrada', 1000000)).toBe('299325');
+
+    const basura = await responder(page, '12abc');
+    expect(basura).toContain('Escribe un número');
+    expect(basura).not.toContain('NaN');
+  });
+
+  test('Casos 9 y 12 de aula, resueltos a mano: 56,20 kPa y 7,85 L/s', async ({ page }) => {
+    // CASO 9 — aceite, 3 L/s, sube 5 m: P₃ = 101.325 − 920·9,81·5 = 56.199 Pa → 56,20 kPa
+    await seccionCasos(page).getByRole('button', { name: /^Caso 9:/ }).click();
+    await seccionCasos(page).getByRole('button', { name: /Cargar en el simulador/ }).click();
+    const filas = await tabla(page);
+    expect(filas[2][0]).toBe('Superior');
+    expect(filas[2][4]).toBe('56,20 kPa');
+    expect(filas[2][5]).toBe('5,00');
+    expect(await responder(page, '56,2')).toContain('Correcto');
+    // Con la ρ del AGUA: 101.325 − 49.050 = 52.275 Pa → 52,28, a 3,92 del valor (tolerancia 0,56)
+    expect(await responder(page, '52,28')).not.toContain('Correcto');
+
+    // CASO 12 — 7500 = ½·1000·15·v₁² → v₁ = 1 m/s → Q = π·0,05²·1 = 7,854 L/s → 7,85
+    await seccionCasos(page).getByRole('button', { name: /^Caso 12:/ }).click();
+    expect(await responder(page, '7,85')).toContain('Correcto');
+    // Sin el cuadrado del diámetro (v₂ = 2·v₁): v₁ = √5 = 2,2361 m/s → Q = 17,56 L/s
+    expect(await responder(page, '17,56')).not.toContain('Correcto');
+  });
+
+  test('Los once reparados del 26/08: el aviso de escala de la estenosis (K) sigue en su sitio', async ({
+    page,
+  }) => {
+    const cuerpo = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
+    expect(cuerpo).toContain('La escala de esta geometría no es fisiológica.');
+  });
+
+  // ── HALLAZGOS ABIERTOS ──────────────────────────────────────────────────────────────────
+
+  test('HALLAZGO · las cuatro cajas con --radius-large y --shadow-md tienen radio y sombra', async ({
+    page,
+  }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): SimuladorFluidosBernoulli.module.css usa
+    // `var(--radius-large)` (4 veces) y `var(--shadow-md)` (2) sin valor de reserva, y NINGUNA de
+    // las dos existe en globals.css (que define --radius y --shadow-medium) ni en el módulo. Una
+    // var() sin definir y sin reserva invalida la declaración entera: el hero, los tres botones
+    // de geometría, la tarjeta principal y la sección de casos salen con esquinas a 0 px, y la
+    // tarjeta principal (#FFFFFF sobre la página #FAFAFA, sin borde) pierde además la sombra
+    // que la separaba del fondo. Caso: carga en claro → esperado border-radius > 0 y box-shadow
+    // distinto de «none» · obtenido «0px» y «none» en las cuatro cajas (getComputedStyle).
+    const medidas = await page.evaluate(() =>
+      [
+        'header[class*="hero"]',
+        'button[class*="geomBtn"]',
+        'div[class*="mainContent"]',
+        'section[class*="casosSection"]',
+      ].map((s) => {
+        const cs = getComputedStyle(document.querySelector(s) as HTMLElement);
+        return { s, radio: parseFloat(cs.borderTopLeftRadius), sombra: cs.boxShadow };
+      }),
+    );
+    for (const m of medidas) expect(m.radio, `${m.s}: border-radius`).toBeGreaterThan(0);
+    expect(medidas[2].sombra, 'mainContent: box-shadow').not.toBe('none');
+    expect(medidas[3].sombra, 'casosSection: box-shadow').not.toBe('none');
+  });
+
+  test('HALLAZGO · en oscuro, la cifra grande de ΔP se lee (≥ 3:1, texto grande)', async ({ page }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): el color de la cifra de ΔP va en línea
+    // (`#A82E68` cuando cae), sin variante oscura. Sobre la tarjeta teal al 15 % del tema oscuro
+    // —rgb(49,64,63)— da 1,69:1, y es texto grande (25,6 px, peso 800), que exige 3:1. Es la
+    // cifra que la app destaca en grande y la que sale siempre: en las tres geometrías ΔP ≤ 0.
+    // Caso: tema oscuro, valores de fábrica → esperado «−486 Pa» a ≥ 3:1 · obtenido 1,69:1.
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await page.waitForTimeout(400);
+    expect((await panel(page))[0][1]).toBe('−486 Pa');
+    expect(await contrasteDe(page, 'span[class*="resultValueLarge"]')).toBeGreaterThanOrEqual(3);
+  });
+
+  test('HALLAZGO · en oscuro, la nota de la tarjeta de ΔP se lee (≥ 4,5:1)', async ({ page }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026), misma tarjeta: la nota («La presión CAE en el
+    // estrechamiento…», y con desnivel la de ρ·g·(h₂ − h₁) del 23/09) usa --text-muted, que en
+    // oscuro (#9B9B9B) está medido contra la tarjeta gris, no contra el teal al 15 %: 3,92:1
+    // a 12,5 px, que exige 4,5:1. En claro da 4,74 y pasa. Caso: tema oscuro, valores de fábrica
+    // → esperado ≥ 4,5:1 · obtenido 3,92:1.
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await page.waitForTimeout(400);
+    expect(
+      await contrasteDe(page, 'div[class*="resultCardOk"] span[class*="resultRange"]'),
+    ).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('HALLAZGO · los encabezados de «5 errores frecuentes» se leen (≥ 4,5:1)', async ({ page }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): `.warningList li strong` pinta el título de cada
+    // error en #E07A1F sobre el naranja al 8 % de la caja de avisos. Es texto de 16 px en
+    // negrita —no llega a «grande», que en negrita empieza en 18,66 px— y exige 4,5:1.
+    // Caso: bloque educativo en claro → esperado ≥ 4,5:1 · obtenido 2,56:1 (en oscuro, 3,72:1).
+    expect(await contrasteDe(page, 'ul[class*="warningList"] li strong')).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('HALLAZGO · las cifras de cinco o más dígitos del bloque educativo van agrupadas', async ({
+    page,
+  }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): el formato español agrupa con punto desde las
+    // cinco cifras (CLAUDE.md §2: con cuatro no se agrupa, y por eso «1000» está bien). El
+    // bloque educativo escribe a mano «13534» (mercurio), «1 atm = 101325 Pa», «1 bar =
+    // 100000 Pa», «120 mmHg = 16000 Pa» y «hay que sumar 101325 Pa», mientras el botón de la
+    // misma página dice «101,325 kPa» y los casos «101.325 Pa». Caso: texto de la página →
+    // esperado «13.534», «101.325», «100.000», «16.000» · obtenido las cinco cifras sin punto.
+    const sinAgrupar = await page.evaluate(() => {
+      const fuera: string[] = [];
+      const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let n: Node | null;
+      while ((n = w.nextNode())) {
+        if ((n.parentElement as HTMLElement | null)?.closest('script,style')) continue;
+        for (const m of (n.nodeValue ?? '').matchAll(/(?<![\d.,])\d{5,}(?!\d)/g)) fuera.push(m[0]);
+      }
+      return fuera;
+    });
+    expect(sinAgrupar).toEqual([]);
+  });
+
+  test('HALLAZGO · la FAQ del JSON-LD no explica la sustentación por el «mayor recorrido»', async ({
+    page,
+  }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): la respuesta del FAQPage «¿Por qué un avión vuela
+    // gracias a Bernoulli?» dice que la curvatura «obliga al aire a recorrer más distancia y a
+    // fluir más rápido por encima del ala». Es la teoría del mayor recorrido / tiempo de
+    // tránsito igual, que la NASA (Glenn Research Center, «Incorrect Lift Theory #1») da por
+    // errónea: el aire de arriba llega ANTES al borde de salida, no a la vez. La FAQ visible de
+    // la página lo matiza bien; el JSON-LD es lo que leen los asistentes de IA. Caso: HTML
+    // servido → esperado sin «recorrer más distancia» · obtenido la frase literal.
+    const faq = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+        .map((s) => s.textContent ?? '')
+        .filter((t) => t.includes('FAQPage'))
+        .join(' '),
+    );
+    expect(faq).toContain('FAQPage');
+    expect(faq).not.toContain('recorrer más distancia');
+  });
+});
+
+test.describe('Inspector 28/09/2026 — móvil de 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('las velocidades de la tabla de secciones caben en pantalla', async ({ page }) => {
+    // Lo que SÍ se ve a 390 px (candado): Sección, Diámetro, Área y v.
+    const ancho = await page.evaluate(() => window.innerWidth);
+    const derechaV = await page.evaluate(() => {
+      const th = Array.from(document.querySelectorAll('table[class*="seccionesTable"] th')).find(
+        (t) => t.textContent?.trim() === 'v (m/s)',
+      ) as HTMLElement;
+      return th.getBoundingClientRect().right;
+    });
+    expect(derechaV).toBeLessThanOrEqual(ancho);
+  });
+
+  test('HALLAZGO · las columnas Presión y Altura de la tabla se pueden ver en el móvil', async ({ page }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): la tabla de secciones no va envuelta en un
+    // contenedor con desplazamiento (la tabla educativa sí, `.tablaWrapper`) y mide 501 px
+    // dentro de una tarjeta de 278. html y body llevan overflow-x: hidden, así que el
+    // sobrante no se puede desplazar: se corta. A 390 px la columna «Presión» empieza justo en
+    // x = 390 y «Altura (m)» acaba en 557, fuera de la pantalla y sin forma de llegar a ellas.
+    // Son las presiones absolutas por sección —las que los casos 5, 8 y 9 mandan comparar con
+    // la TABLA— y la altura de la geometría con desnivel. Caso: 390 px, valores de fábrica →
+    // esperado las seis columnas visibles o desplazables · obtenido th «Presión» en
+    // [390, 477] y «Altura (m)» en [477, 557] con innerWidth = 390 y ningún ancestro desplazable.
+    const r = await page.evaluate(() => {
+      const ths = Array.from(document.querySelectorAll('table[class*="seccionesTable"] th')) as HTMLElement[];
+      let desplazable = false;
+      let n: HTMLElement | null = ths[0]?.closest('table')?.parentElement ?? null;
+      while (n && n !== document.body) {
+        const ox = getComputedStyle(n).overflowX;
+        if ((ox === 'auto' || ox === 'scroll') && n.scrollWidth > n.clientWidth) desplazable = true;
+        n = n.parentElement;
+      }
+      return {
+        ancho: window.innerWidth,
+        derechas: ths.map((t) => [t.textContent?.trim(), Math.round(t.getBoundingClientRect().right)] as const),
+        desplazable,
+      };
+    });
+    const fuera = r.derechas.filter(([, der]) => der > r.ancho);
+    expect(r.desplazable || fuera.length === 0, `fuera de pantalla: ${JSON.stringify(fuera)}`).toBe(true);
+  });
+});

@@ -4,7 +4,12 @@ import { esperarHidratacion, leerValorEnReact, sembrarValorAcotado } from './_hi
 /**
  * Inspector — simulador-movimiento-circular (segmento interactiva/física, riesgo 3, 816 usos)
  *
- * Primera inspección 21/08/2026 · RE-INSPECCIÓN 30/08/2026.
+ * Primera inspección 21/08/2026 · RE-INSPECCIONES 30/08/2026, 22/09/2026 y 28/09/2026
+ * (la del 28/09, con 1.675 usos en 30 días, al final del fichero).
+ *
+ * ⚠️ Desde el 15/09/2026 las cinco fórmulas del panel ya NO viven en page.tsx: están en
+ * app/simulador-movimiento-circular/casos.ts, que page.tsx importa (ver «CASOS PARA CLASE»).
+ * El bloque «DÓNDE VIVE EL CÁLCULO» de aquí abajo describe la versión de agosto.
  *
  * El <h1> promete «Simulador de Movimiento Circular» y el subtítulo «Observa en tiempo real
  * cómo se mueve una partícula en trayectoria circular. Ajusta radio, velocidad angular y masa
@@ -949,22 +954,25 @@ test.describe('simulador-movimiento-circular · la sección de casos en el naveg
  *           «0» y «-0,1» → deben suspender. (COMPROBADO: los suspende. Aquí no se reproduce
  *           el defecto que simulador-genetica tenía hoy en su corrector.)
  *
- * HALLAZGOS DE ESTA RE-INSPECCIÓN — los tres van con test.fail() hasta que se reparen
- *   · 1 (medio, operativa): la sección promete «Puedes comprobar cada resultado moviendo los
- *     deslizadores del simulador de arriba» y hay casos en los que eso SUSPENDE. El
+ * HALLAZGOS DE ESTA RE-INSPECCIÓN (1209-1212) — REPARADOS el 22/09/2026. Llevaban
+ * test.fail(); ahora sujetan la reparación como regresión (re-verificados a mano el 28/09/2026).
+ *   · 1209 (medio, operativa): la sección prometía «Puedes comprobar cada resultado moviendo
+ *     los deslizadores del simulador de arriba» y había casos en los que eso SUSPENDÍA. El
  *     deslizador de ω tiene paso 0,1 y los casos 5 y 7 piden ω = π y ω = 2π/4, que no caen en
  *     la rejilla. Caso 7 (f = 0,5 Hz, r = 3 m → v = 9,42 m/s): con ω = 3,1 el panel imprime
  *     9,30 y el corrector lo rechaza (tolerancia 0,0942 < 0,12); con 3,2 imprime 9,60 y
  *     también. El caso 12 ni siquiera se puede montar: pide r = 0,4 m (mínimo 0,5) y
- *     ω = 12,57 rad/s (máximo 10).
- *   · 2 (medio, operativa): en el modo «Practicar» el botón de pista sigue en pantalla, pasa
- *     a aria-expanded="true" y se rotula «Ocultar pista» sin desplegar nada, porque el
- *     ejercicio generado no trae pista (CasosAula.tsx pinta la pista solo si !practica).
- *   · 3 (bajo, calculo): la tolerancia no es simétrica en su borde exacto. Con esperado 0,1 y
- *     tolerancia 0,01, «0,11» se acepta y «0,09» se rechaza con el mensaje «te has desviado
- *     0,01» — justo la tolerancia. Es el ±1 ulp de la resta en binario (0,1−0,09 =
- *     0,010000000000000009 y 0,11−0,1 = 0,009999999999999995), y en el caso 2 deja fuera a
- *     «8,08» y «7,92» diciendo que se desvían 0,08 cuando la tolerancia es 0,08.
+ *     ω = 12,57 rad/s (máximo 10). Se reparó la PROMESA, no el corrector.
+ *   · 1210 (medio, operativa): en el modo «Practicar» el botón de pista seguía en pantalla,
+ *     pasaba a aria-expanded="true" y se rotulaba «Ocultar pista» sin desplegar nada, porque
+ *     el ejercicio generado no trae pista. Ahora el botón no se ofrece en ese modo.
+ *   · 1211 (bajo, calculo): la tolerancia no era simétrica en su borde exacto. Con esperado 0,1
+ *     y tolerancia 0,01, «0,11» se aceptaba y «0,09» se rechazaba con el mensaje «te has
+ *     desviado 0,01» — justo la tolerancia. Era el ±1 ulp de la resta en binario (0,1−0,09 =
+ *     0,010000000000000009 y 0,11−0,1 = 0,009999999999999995), y en el caso 2 dejaba fuera a
+ *     «8,08» y «7,92». Ahora se compara con un margen de 1e-9.
+ *   · 1212 (bajo, accesibilidad): volver a pulsar «Practicar» cambiaba el enunciado en
+ *     silencio. Ahora el enunciado es aria-live="polite" (sin role="status").
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
 test.describe('re-inspección 22/09/2026', () => {
@@ -1203,5 +1211,328 @@ test.describe('re-inspección 22/09/2026', () => {
       await page.getByRole('button', { name: /Practicar/ }).click();
     }
     expect(vistos.size, 'seis tiradas no pueden dar siempre el mismo enunciado').toBeGreaterThan(1);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN 28/09/2026 — Inspector (1.675 usos en 30 días)
+ *
+ * Lo que cambió desde el 22/09: la tolerancia del corrector (12829fc3), el enunciado con
+ * aria-live sin role="status" (d0ff643d) y, el 27/09, el `@media (max-width: 768px)` que da
+ * 80 px al hero para que el logo fijo no tape el título (586a4d61). Los 13 hallazgos de la
+ * base (167-170, 540-544, 1209-1212) siguen reparados: el spec entero en verde y, a mano en
+ * el navegador, 1209 (intro y caso 7: 9,42 ✔ · 9,30 ✘), 1210 (0 botones de pista en
+ * práctica), 1211 (caso 6: 0,11 y 0,09 ✔ · 0,12 y 0,08 ✘; caso 2: 8,08 y 7,92 ✔) y 1212
+ * (aria-live="polite", aria-atomic, sin role).
+ *
+ * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ * (convenio de la app: ω en rad/s · v = ω·r · a_c = ω²·r · F_c = m·a_c · T = 2π/ω · f = ω/2π)
+ *
+ *   CASO N1 (normal) — r = 1,6 m · ω = 7,5 rad/s · m = 0,8 kg (terna que nadie había pedido)
+ *       v   = 7,5 · 1,6      = 12 m/s                  → «12,00»
+ *       a_c = 56,25 · 1,6    = 90 m/s²                 → «90,00»  (v²/r = 144/1,6 = 90 ✔)
+ *       F_c = 0,8 · 90       = 72 N                    → «72,00»
+ *       T   = 2π/7,5         = 0,8377580 s             → «0,84»
+ *       f   = 7,5/2π         = 1,1936621 Hz            → «1,194»  (T·f = 1 ✔)
+ *   CASO N2 (normal, ω pequeña, donde el redondeo ya pesa) — r = 4,7 · ω = 0,3 · m = 3,3
+ *       v   = 0,3 · 4,7      = 1,41 m/s                → «1,41»
+ *       a_c = 0,09 · 4,7     = 0,423 m/s²              → «0,42»   (1,41²/4,7 = 1,9881/4,7 ✔)
+ *       F_c = 3,3 · 0,423    = 1,3959 N                → «1,40»
+ *       T   = 2π/0,3         = 20,943951 s             → «20,94»
+ *       f   = 0,3/2π         = 0,0477465 Hz            → «0,048»
+ *
+ *   CASO L (límite) — MCUA desde el REPOSO con radio y masa en su máximo:
+ *       r = 5 m · ω₀ = 0 rad/s · m = 5 kg, modo MCNU (α = 0,5 rad/s²)
+ *       En MCU, con ω = 0: T = 2π/0 → «∞».
+ *       En MCNU, ω(t) = ω₀ + α·t = 0,5·t; a los ~4 s: ω ≈ 2 rad/s → v = 10 m/s,
+ *       a_c = 4 · 5 = 20 m/s², F_c = 5 · 20 = 100 N, T = 2π/2 = π = 3,14 s.
+ *       (Medido: a los 4,04 s el panel daba 2,00 · 10,00 · 20,00 · 100,00 · 3,14 · 0,318.)
+ *       a_t = α·r = 0,5 · 5 = 2,5 m/s², que no va en el panel pero sí en canvas y leyenda.
+ *
+ *   CASO R (rechazo) — el error clásico del tema en el caso 11 (45 vueltas por minuto):
+ *       ω = 2π · 45/60 = 1,5π = 4,7123890 → respuesta 4,71; tolerancia = máx(0,01; 1 % de
+ *       4,71) = 0,0471.
+ *       «45»    → rpm tomadas por rad/s: suspende, «Te has desviado 40,29» (45 − 4,71)
+ *       «270»   → 45 rpm en GRADOS por segundo (45·360/60): suspende
+ *       «4,76» y «4,66» → desviados 0,05 > 0,0471 por los dos lados: suspenden los dos
+ *       «4,712» → correcto · «4,71 rad/s» (con la unidad) → «Escribe un número»
+ *
+ *   CASOS DE AULA, resueltos a mano (no copiados de la app)
+ *       caso 8  · v = 6, r = 3        → ω = 2 → a_c = 2²·3 = 12 m/s² (= v²/r = 36/3)
+ *                 «2» (se queda en ω) y «36» (v² sin dividir) suspenden
+ *       caso 10 · v = 4, r = 2, m = 0,5 → ω = 2 → a_c = 8 → F_c = 0,5·8 = 4 N
+ *                 «8» (olvidar la masa) y «2» (F = m·v) suspenden
+ *       caso 12 · T = 0,5, r = 0,4    → ω = 2π/0,5 = 12,566371 → v = 5,0265482 → 5,03 m/s
+ *                 «0,8» (= r/T, olvidar el 2π) suspende
+ *
+ * HALLAZGOS ABIERTOS (inspector 28/09/2026) — con test.fail() al final del bloque
+ *   · logo fijo sobre el <h1> entre 769 y ~1000 px (iPad vertical: 810-834 px)
+ *   · texto blanco sobre var(--primary) en los botones activos y en «Comprobar»
+ *   · colores de marca como TEXTO pequeño en claro (título del caso 2,68:1)
+ *
+ * SOSPECHA sin hallazgo: en MCNU, al llegar a 20 rad/s ω vuelve a 0 y no a la ω₀ del
+ * deslizador (con ω₀ = 10, a los 20,5 s el panel da 0,23 rad/s mientras el deslizador sigue
+ * en «10,0 rad/s»). El aviso solo dice «vuelve a empezar», así que no hay promesa rota.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Letras del <h1> que quedan debajo de la barra fija de MeskeiaLogo (logo o botón de tema). */
+async function letrasTapadasDelTitulo(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const barra = document.querySelector('[class*="headerBar"]');
+    const cajas = Array.from(barra?.children ?? []).map((h) => h.getBoundingClientRect());
+    const texto = document.querySelector('h1')!.firstChild as Text;
+    let tapadas = '';
+    for (let i = 0; i < texto.length; i++) {
+      const rango = document.createRange();
+      rango.setStart(texto, i);
+      rango.setEnd(texto, i + 1);
+      const l = rango.getBoundingClientRect();
+      const bajoLaBarra = cajas.some(
+        (c) =>
+          Math.min(c.right, l.right) - Math.max(c.left, l.left) > 0 &&
+          Math.min(c.bottom, l.bottom) - Math.max(c.top, l.top) > 0,
+      );
+      if (bajoLaBarra) tapadas += texto.data[i];
+    }
+    return tapadas;
+  });
+}
+
+/** Contraste WCAG del texto de `selector` contra su fondo efectivo (capas con alfa mezcladas). */
+async function contrasteDe(page: Page, selector: string): Promise<number> {
+  return page.evaluate((sel) => {
+    type Rgba = { r: number; g: number; b: number; a: number };
+    const leer = (s: string): Rgba | null => {
+      const m = s.match(/rgba?\(([^)]+)\)/);
+      if (!m) return null;
+      const p = m[1].split(',').map((x) => parseFloat(x));
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+    const sobre = (fg: Rgba, bg: Rgba): Rgba => ({
+      r: fg.r * fg.a + bg.r * (1 - fg.a),
+      g: fg.g * fg.a + bg.g * (1 - fg.a),
+      b: fg.b * fg.a + bg.b * (1 - fg.a),
+      a: 1,
+    });
+    const lum = (c: Rgba) => {
+      const f = (v: number) => {
+        const x = v / 255;
+        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+    };
+    const el = document.querySelector(sel) as HTMLElement;
+    const capas: Rgba[] = [];
+    let n: HTMLElement | null = el;
+    while (n) {
+      const c = leer(getComputedStyle(n).backgroundColor);
+      if (c && c.a > 0) capas.push(c);
+      if (c && c.a === 1) break;
+      n = n.parentElement;
+    }
+    let fondo: Rgba = { r: 255, g: 255, b: 255, a: 1 };
+    for (let i = capas.length - 1; i >= 0; i--) fondo = sobre(capas[i], fondo);
+    const texto = sobre(leer(getComputedStyle(el).color)!, fondo);
+    const [a, b] = [lum(texto), lum(fondo)];
+    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  }, selector);
+}
+
+test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula y el arreglo del logo', () => {
+  const CAMPO = '#casos-respuesta';
+  const veredictoCasos = (page: Page) => page.locator('[class*="casoVeredicto"]');
+
+  /** Teclea la respuesta carácter a carácter, comprueba y devuelve el veredicto. */
+  async function responder(page: Page, texto: string): Promise<string> {
+    const campo = page.locator(CAMPO);
+    await campo.click();
+    await campo.press('Control+a');
+    await campo.press('Delete');
+    await campo.pressSequentially(texto, { delay: 15 });
+    expect(await campo.inputValue()).toBe(texto);
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredictoCasos(page)).toBeVisible();
+    return ((await veredictoCasos(page).textContent()) ?? '').trim();
+  }
+
+  test('CASO N1 y N2 (normal) — dos ternas nuevas, una con ω pequeña', async ({ page }) => {
+    await configurar(page, 1.6, 7.5, 0.8);
+    await expect(magnitud(page, 'ω')).toHaveText('7,50');
+    await expect(magnitud(page, 'v tangencial')).toHaveText('12,00'); // 7,5 · 1,6
+    await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('90,00'); // 7,5² · 1,6 = 144/1,6
+    await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('72,00'); // 0,8 · 90
+    await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('0,84'); // 2π/7,5 = 0,837758
+    await expect(magnitud(page, 'Frecuencia \\(f\\)')).toHaveText('1,194'); // 7,5/2π = 1,193662
+
+    await configurar(page, 4.7, 0.3, 3.3);
+    await expect(magnitud(page, 'ω')).toHaveText('0,30');
+    await expect(magnitud(page, 'v tangencial')).toHaveText('1,41'); // 0,3 · 4,7
+    await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('0,42'); // 0,09 · 4,7 = 0,423
+    await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('1,40'); // 3,3 · 0,423 = 1,3959
+    await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('20,94'); // 2π/0,3 = 20,943951
+    await expect(magnitud(page, 'Frecuencia \\(f\\)')).toHaveText('0,048'); // 0,3/2π = 0,0477465
+  });
+
+  test('CASO L (límite) — MCUA desde el reposo: ω₀ = 0, r = 5 m, m = 5 kg', async ({ page }) => {
+    await configurar(page, 5, 0, 5);
+    await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('∞'); // MCU con ω = 0: 2π/0
+
+    const inicio = Date.now();
+    await page.getByRole('button', { name: /^MCNU/ }).click();
+    await expect(page.getByRole('button', { name: /^MCNU/ })).toHaveAttribute('aria-pressed', 'true');
+    await page.waitForTimeout(4000);
+    const foto = await fotoPanel(page);
+    const transcurrido = (Date.now() - inicio) / 1000;
+    const w = foto['ω'];
+
+    // ω = ω₀ + α·t = 0,5·t. No puede ir POR DELANTE del reloj (el bucle solo frena, con su
+    // dt ≤ 50 ms), y se le deja un 25 % por detrás para el arranque y el refresco a ~10 Hz.
+    expect(w, `ω = 0,5·t con t = ${transcurrido} s`).toBeLessThanOrEqual(0.5 * transcurrido + 0.05);
+    expect(w, `ω = 0,5·t con t = ${transcurrido} s`).toBeGreaterThan(0.5 * transcurrido * 0.75);
+
+    // Coherencia con la ω que enseña el propio panel (r = 5, m = 5), con la tolerancia que
+    // sale de propagar el redondeo a 2 decimales de ω (±0,005) más el de la propia cifra.
+    const r = 5;
+    const m = 5;
+    const dW = 0.005;
+    expect(Math.abs(foto['v tangencial'] - w * r)).toBeLessThanOrEqual(r * dW + 0.01);
+    expect(Math.abs(foto['Aceleración centrípeta'] - w * w * r)).toBeLessThanOrEqual(2 * w * r * dW + 0.01);
+    expect(Math.abs(foto['Fuerza centrípeta'] - m * w * w * r)).toBeLessThanOrEqual(2 * m * w * r * dW + 0.01);
+    expect(Math.abs(foto['Período (T)'] - (2 * Math.PI) / w)).toBeLessThanOrEqual(((2 * Math.PI) / (w * w)) * dW + 0.01);
+
+    // Y lo que el MCNU añade: a_t en la leyenda y el aviso del ciclo con sus dos cifras.
+    await expect(page.locator('[class*="legend"]').first()).toContainText('Vector aceleración tangencial (a_t)');
+    const aviso = page.locator('[class*="avisoCiclo"]');
+    await expect(aviso).toContainText('0,5 rad/s²');
+    await expect(aviso).toContainText('20 rad/s');
+    await expect(page.locator('body')).not.toContainText('NaN');
+  });
+
+  test('CASO R (rechazo) — caso 11: las rpm tomadas por rad/s se suspenden', async ({ page }) => {
+    await esperarHidratacion(page, [CAMPO]);
+    await page.getByRole('button', { name: /^Caso 11:/ }).click();
+    // ω = 2π·45/60 = 4,712389 → 4,71; tolerancia 0,0471.
+    expect(await responder(page, '45')).toContain('Te has desviado 40,29'); // 45 − 4,71
+    expect(await responder(page, '270')).toContain('No es correcto'); // 45 rpm en grados/s
+    expect(await responder(page, '4,76')).toContain('No es correcto'); // +0,05 > 0,0471
+    expect(await responder(page, '4,66')).toContain('No es correcto'); // −0,05, igual de fuera
+    expect(await responder(page, '4,71 rad/s')).toContain('Escribe un número');
+    expect(await responder(page, '4,712')).toContain('¡Correcto!');
+    expect(await responder(page, '4,71')).toContain('¡Correcto!');
+  });
+
+  test('casos de aula 8, 10 y 12 — la respuesta que la app da por buena, resuelta a mano', async ({ page }) => {
+    await esperarHidratacion(page, [CAMPO]);
+
+    await page.getByRole('button', { name: /^Caso 8:/ }).click();
+    expect(await responder(page, '12')).toContain('¡Correcto!'); // ω = 6/3 = 2 → 2²·3
+    expect(await responder(page, '2')).toContain('No es correcto'); // se queda en ω
+    expect(await responder(page, '36')).toContain('No es correcto'); // v² sin dividir entre r
+
+    await page.getByRole('button', { name: /^Caso 10:/ }).click();
+    expect(await responder(page, '4')).toContain('¡Correcto!'); // ω = 2 → a_c = 8 → 0,5·8
+    expect(await responder(page, '8')).toContain('No es correcto'); // olvidar la masa
+    expect(await responder(page, '2')).toContain('No es correcto'); // F = m·v
+
+    await page.getByRole('button', { name: /^Caso 12:/ }).click();
+    expect(await responder(page, '5,03')).toContain('¡Correcto!'); // 2π/0,5 · 0,4 = 5,0265
+    expect(await responder(page, '0,8')).toContain('No es correcto'); // r/T, sin el 2π
+    await page.getByRole('button', { name: /Ver solución/ }).click();
+    const solucion = page.locator('[class*="casoSolucion"]');
+    await expect(solucion).toContainText('12,5664 rad/s');
+    await expect(solucion).toContainText('Respuesta: 5,03 m/s');
+  });
+
+  test.describe('en móvil (390 px)', () => {
+    test.use({
+      viewport: { width: 390, height: 844 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('sin desbordes, panel a dos columnas, título libre y el corrector funciona', async ({ page }) => {
+      // El beforeEach del fichero fija 1280 px: se vuelve a 390 y se recarga.
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['input[type="range"]', CAMPO]);
+
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+      const columnas = await page
+        .locator('[class*="valuesPanel"]')
+        .evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(' ').length);
+      expect(columnas).toBe(2);
+      expect(await letrasTapadasDelTitulo(page), 'el logo no debe tapar el título a 390 px').toBe('');
+
+      expect(await responder(page, '6')).toContain('¡Correcto!'); // caso 1: 3 · 2
+    });
+  });
+
+  test('el arreglo del 27/09 sigue puesto: a 390 y 768 px el logo no tapa el título', async ({ page }) => {
+    for (const ancho of [390, 768, 1280]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      await page.waitForTimeout(150);
+      expect(await letrasTapadasDelTitulo(page), `${ancho} px`).toBe('');
+    }
+  });
+
+  /* ── Hallazgos abiertos del 28/09/2026 ───────────────────────────────────────────── */
+
+  test('HALLAZGO · a 800 y 834 px (iPad vertical) el logo fijo no tapa el título', async ({ page }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): el arreglo del 27/09 (586a4d61) da 80 px al
+    // hero solo con `@media (max-width: 768px)`, y MeskeiaLogo pasa a su tamaño de escritorio
+    // a partir de 769 px (barra con 15 px de margen y píldora de 62 px de alto: [20,15,203,77]).
+    // Por encima de 768 el hero vuelve a su padding de 2,5rem (40 px) y el <h1>, centrado,
+    // empieza en x = 142 a 800 px y en x = 148 a 834 px: el logo le tapa las primeras letras.
+    // Caso: viewport 800 px → esperado «» tapado · obtenido «Sim» (61×38 px de solape con la
+    // línea del título; en la captura se lee «ulador de Movimiento Circular»); a 834 px → «Sim»
+    // (55×38 px). Bajo stemum.com, con la
+    // píldora «Stemum › Física» de 212 px, «Simula» a 800 px y hasta «S» a 1024 px.
+    for (const ancho of [800, 834]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      await page.waitForTimeout(150);
+      expect(await letrasTapadasDelTitulo(page), `${ancho} px`).toBe('');
+    }
+  });
+
+  test('HALLAZGO · texto blanco sobre el azul de marca en los botones activos (≥ 4,5:1)', async ({ page }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): .modeBtnActive, .casoBotonActivo y
+    // .casoComprobar (y .stepNumber de la guía) pintan texto blanco sobre var(--primary), cuando
+    // existe --primary-boton (#26718F, 5,47:1 en los dos temas). Son 14,4-16 px con peso 600:
+    // texto pequeño, umbral 4,5:1. Caso: carga en claro → esperado ≥ 4,5 · obtenido 4,11:1 en
+    // los tres; en oscuro, donde --primary vale #3FA5D1 → obtenido 2,79:1 (también en el
+    // «Practicar» activo). «Comprobar» es el botón principal de la sección de aula.
+    const selectores = [
+      'button[class*="modeBtnActive"]',
+      'button[class*="casoBotonActivo"]',
+      'button[class*="casoComprobar"]',
+    ];
+    for (const s of selectores) expect(await contrasteDe(page, s), `claro · ${s}`).toBeGreaterThanOrEqual(4.5);
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await page.waitForTimeout(500);
+    for (const s of selectores) expect(await contrasteDe(page, s), `oscuro · ${s}`).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('HALLAZGO · en claro, los colores de marca como texto pequeño se leen (≥ 4,5:1)', async ({ page }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): el módulo usa --secondary y --primary como
+    // COLOR de texto pequeño, en lugar de --secondary-texto / --primary-texto. Caso: carga en
+    // claro, caso 1 → título del caso (.casoTitulo, #48A9A6 sobre #FAFAFA, 17,6 px/600)
+    // esperado ≥ 4,5 · obtenido 2,68:1; valor de cada deslizador («2,0 m», .sliderValue,
+    // #2E86AB sobre #FAFAFA, 14 px/700) 3,93:1; «Ver pista»/«Ver solución» (.casoAyudaBoton,
+    // 14,4 px/400) 3,93:1. En la guía, los h4 de escenarios y los <dt> de la FAQ, 4,11:1.
+    // En oscuro los tres cumplen.
+    for (const s of [
+      'h3[class*="casoTitulo"]',
+      'span[class*="sliderValue"]',
+      'button[class*="casoAyudaBoton"]',
+    ]) {
+      expect(await contrasteDe(page, s), s).toBeGreaterThanOrEqual(4.5);
+    }
   });
 });

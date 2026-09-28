@@ -19,8 +19,12 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *   7. CASOS 10-12 y REGRESIÓN 14/09 — la re-inspección del 14/09/2026 y sus cuatro hallazgos
  *      (852-855), reparados el 15/09/2026.
  *   8. CASOS 13-15 — los casos nuevos de la re-inspección del 21/09/2026.
- *   9. HALLAZGOS ABIERTOS 21/09 — H8, H9 y H10, marcados `test.fail()` con lo que la app
- *      DEBERÍA hacer. Al repararlos se les quita la marca, como se hizo con los anteriores.
+ *   9. REGRESIÓN 21/09 — H8, H9 y H10 (hallazgos 1168-1170), que se escribieron con
+ *      `test.fail()` y se REPARARON el 21/09/2026 (352da52c): se les quitó la marca y quedan
+ *      como guardián, igual que los anteriores.
+ *  10. CASOS 16-19, móvil y HALLAZGOS ABIERTOS 28/09 — la re-inspección del 28/09/2026, con
+ *      la sección 3.ª del RD 326/2026 cotejada contra el texto del BOE. Los abiertos van con
+ *      `test.fail()` afirmando lo que la app DEBERÍA hacer.
  *
  * Qué promete la app
  * ──────────────────
@@ -1410,5 +1414,483 @@ test.describe('Regresión — hallazgos 1168, 1169 y 1170 del 21/09/2026', () =>
 
     // O se dice que lo tecleado no vale, o no se le pide introducir lo que ya introdujo
     expect(marcadoInvalido || !pideQueLaIntroduzca).toBe(true);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 28/09/2026 (segmento fiscal, RIESGO 1 CRÍTICO) — la 10.ª
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Primero se ejecutó entera la batería anterior contra el build de producción de HEAD:
+// **39/39 en verde**. Comprobado además a mano en el navegador lo que tocó 352da52c
+// (21/09), más allá de lo que miran H8-H10:
+//
+//   · 1168 — la pregunta del contrato ya es «El contrato está por escrito y la fianza
+//     depositada (o lo estará)» y la explicación dice que el registro autonómico «este
+//     simulador no verifica». Respondida «No» con 600 €/mes: rechazo con UNA causa,
+//     «Hay al menos un requisito imprescindible que no cumples.», sin panel. PERO: cotejada
+//     con el BOE, esa pregunta sigue sin ser la del artículo que cita — ver H13 abajo.
+//   · 1169 — la coletilla «una renta más baja no bastaría» ya solo sale con la renta fuera
+//     de tope; comprobado también con el campo VACÍO (H9 solo lo mira con 600 €). CASO 18.
+//   · 1170 — «12abc», «1e3» y «mil» marcan aria-invalid, enlazan #alquiler-error por
+//     aria-describedby y el veredicto dice «La que has introducido no es válida: corrígela
+//     aquí arriba.»; al corregir a 550 el aviso desaparece y el cálculo vuelve. CASO 19.
+//   · b7733c6d (22/09) — la cabecera de la tabla pasa a --primary-boton. Sin incidencias.
+//
+// ── Cotejo con la FUENTE que cita el módulo ──────────────────────────────────
+// Esta pasada leyó el texto consolidado del RD 326/2026 en el BOE (BOE-A-2026-8872,
+// arts. 8 y 132-139), que es la fuente que cita FISCAL_VIVIENDA_JOVEN_META. Todas las cifras
+// de BONO_ALQUILER_JOVEN_2026 y UMBRAL_IPREM_VIVIENDA_JOVEN coinciden (300/200 €, 60 %,
+// 1.000/600/500/250 €, 24+24 meses, 18-35 inclusive, 5/5,5/6 × IPREM), y el art. 8.2.b
+// confirma el IPREM «referido a 14 pagas» que usa la checklist (5 × 8.400 = 42.000 €).
+// Lo que NO coincide es la prosa de la app sobre los requisitos que el módulo no sella:
+//   · art. 133.1.e es SOLO el tope de renta; el contrato es el art. 133.1.a, que no habla
+//     de fianza y para la habitación dispensa expresamente la forma de la LAU (H13);
+//   · art. 133.2.b excluye el parentesco hasta segundo grado con el arrendador y el
+//     133.2.c al socio del arrendador: ni la checklist ni el veredicto lo miran (H11), y la
+//     FAQ afirma que el RD «no fija ninguna condición sobre el propietario» (H12);
+//   · art. 133.2.a exceptúa al propietario que no puede disponer de su vivienda por
+//     separación o divorcio, causa ajena o inaccesibilidad por discapacidad (H14);
+//   · art. 133.3 (cambio de domicilio: 15 días, sin interrupción) y art. 138 (convocatorias
+//     abiertas de forma continuada y permanente) contradicen dos textos de la página
+//     (H18 y H19); la regla de la pareja no está en el RD (H20).
+//
+// ── Sobre los fallos de este spec en la suite con --workers=4 sobre next dev ──
+// Se reprodujo: el helper `abrir()` de arriba espera a que #alquiler EXISTA, no a que React
+// lo haya hidratado, y lo usan 26 de los 39 casos anteriores. Retrasando 1,5 s los chunks
+// JS (lo que hace `next dev` compilando bajo carga) los 7 clics «Sí» se pierden: 0 pulsados,
+// ningún role="status" y el `innerText` de la tarjeta espera hasta los 30 s. Es exactamente
+// el síntoma de aquella sesión. Los casos nuevos usan `abrirHidratado`. No se ha tocado el
+// helper (no se reescriben los tests existentes): basta con que `abrir()` llame a
+// `esperarHidratacion(page, ['#alquiler'])`.
+//
+// De dónde sale cada cifra esperada: `data/fiscal/vivienda-joven.ts` (sellado contra el BOE
+// el 23/08/2026) y, para los requisitos que el módulo no recoge, el texto del BOE citado.
+//
+// CASOS NUEVOS (resueltos a mano ANTES de abrir el navegador)
+// ───────────────────────────────────────────────────────────
+//   CASO 16 (normal, coma decimal) — VIVIENDA · «412,35» €/mes · los 7 a «Sí»
+//       parseSpanishNumber('412,35') = 412,35 ≤ 1.000 (rentaMaximaMensual.vivienda)
+//       60 % de 412,35 = 247,41 < 300 (ayudaMaximaMensual.vivienda, limiteSobreRenta)
+//       ayuda          247,41 €   ← manda el porcentaje, con céntimos
+//       pago real      412,35 − 247,41 = 164,94 €
+//       4 años         247,41 × 48 (plazo.totalMaximoMeses) = 11.875,68 €
+//       veredicto      APTO citando 247,41 €/mes · con la nota del límite del 60 %
+//
+//   CASO 17 (límite, los dos separadores) — VIVIENDA · «1.000,00» y «1.000,01»
+//       1.000,00 = rentaMaximaMensual.vivienda (art. 133.1.e, «igual o inferior») → dentro
+//         ayuda mín(300; 600) = 300,00 · pago 700,00 · 4 años 14.400,00 · APTO
+//       1.000,01 > 1.000 → fuera por un céntimo: aviso con «1000,00 €/mes» y
+//         «1000,01 €/mes» (es-ES no agrupa cuatro cifras) · NO APTO · sin panel
+//       y 1.000,00 como HABITACIÓN → 1.000 > 600 (rentaMaximaMensual.habitacion) · NO APTO
+//
+//   CASO 18 (rechazo, reparación del 1169) — VIVIENDA · 600 €/mes · contrato a «No»
+//       600 ≤ 1.000: la renta no es causa → «Hay al menos un requisito imprescindible que
+//       no cumples.» sin «Y además», sin «supera el máximo», sin coletilla, sin panel.
+//       Y con el campo de renta VACÍO + edad a «No»: tampoco coletilla.
+//
+//   CASO 19 (rechazo del dato, reparación del 1170) — «12abc» y «1e3»
+//       parseSpanishNumber → NaN → aria-invalid="true", aria-describedby="alquiler-error",
+//       «no es un importe válido», veredicto «Falta un dato…» con «corrígela aquí arriba»
+//       y sin «Introdúcela»; con 550 → 550 ≤ 1.000, 60 % = 330 > 300 → 300,00 · 250,00 ·
+//       14.400,00 y el aviso desaparece.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Marca «Sí» en todas las respuestas, sin fijar cuántos requisitos hay (sobrevive a que se añada uno) */
+async function marcarTodoSi(page: Page) {
+  for (const si of await page.getByRole('button', { name: 'Sí', exact: true }).all()) await si.click();
+}
+
+/** La tarjeta de veredicto de la app (no el anunciador de rutas de Next) */
+const veredictoDe = (page: Page) => page.locator('[class*="resultadoCard"]');
+
+test.describe('Inspector 28/09/2026 — casos nuevos', () => {
+  test('CASO 16 (normal): vivienda a «412,35» €/mes → el 60 % manda con céntimos: 247,41 €, 164,94 € y 11.875,68 €', async ({ page }) => {
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // Coma decimal española: 412,35 ≤ 1.000 = rentaMaximaMensual.vivienda (art. 133.1.e)
+    await sembrarValor(page, '#alquiler', '412,35');
+    await marcarTodoSi(page);
+
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+    const panel = await panelDeAhorro(page);
+    // 60 % (limiteSobreRenta) de 412,35 = 247,41 < 300 (ayudaMaximaMensual.vivienda)
+    expect(panel[0]).toContain('247,41 €');
+    // 412,35 − 247,41
+    expect(panel[1]).toContain('164,94 €');
+    // 247,41 × 48 (plazo.totalMaximoMeses, art. 134)
+    expect(panel[2]).toContain('11.875,68 €');
+    // El porcentaje rebaja la cuantía: se dice (tolerante al espacio duro que pide el H16)
+    await expect(page.getByText(/Límite: 60\s?% de la renta/)).toHaveCount(1);
+
+    await expect(veredictoDe(page)).toBeVisible();
+    const veredicto = norm(await veredictoDe(page).innerText());
+    expect(veredicto).toContain('¡Cumples todos los requisitos!');
+    expect(veredicto).toContain('247,41 €/mes');
+    expect(veredicto).not.toContain('300,00 €');
+  });
+
+  test('CASO 17 (límite): «1.000,00» es el último importe con derecho, «1.000,01» ya no, y el mismo 1.000 como habitación tampoco', async ({ page }) => {
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // 1.000 = rentaMaximaMensual.vivienda (art. 133.1.e, «igual o inferior»)
+    await sembrarValor(page, '#alquiler', '1.000,00');
+    await marcarTodoSi(page);
+
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+    let panel = await panelDeAhorro(page);
+    expect(panel[0]).toContain('300,00 €'); // mín(300; 60 % de 1.000 = 600)
+    expect(panel[1]).toContain('700,00 €'); // 1.000 − 300
+    expect(panel[2]).toContain('14.400,00 €'); // 300 × 48
+    expect(norm(await veredictoDe(page).innerText())).toContain('¡Cumples todos los requisitos!');
+
+    // Un céntimo por encima del tope, con punto de millar y coma decimal
+    await sembrarValor(page, '#alquiler', '1.000,01');
+    const aviso = norm(await page.locator('[class*="avisoRenta"]').innerText());
+    expect(aviso).toContain('1000,00 €/mes'); // es-ES no agrupa cuatro cifras
+    expect(aviso).toContain('1000,01 €/mes');
+    const rechazo = norm(await veredictoDe(page).innerText());
+    expect(rechazo).toContain('No cumples los requisitos obligatorios');
+    expect(rechazo).toContain('1000,01 €/mes');
+    panel = await panelDeAhorro(page);
+    expect(panel).toHaveLength(0);
+
+    // El mismo 1.000 como habitación: 1.000 > 600 = rentaMaximaMensual.habitacion
+    await sembrarValor(page, '#alquiler', '1.000,00');
+    await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
+    const avisoHab = norm(await page.locator('[class*="avisoRenta"]').innerText());
+    expect(avisoHab).toContain('Para una habitación el tope es 600,00 €/mes');
+    expect(avisoHab).toContain('1000,00 €/mes');
+    expect(norm(await veredictoDe(page).innerText())).toContain('No cumples los requisitos obligatorios');
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+  });
+
+  test('CASO 18 (rechazo): el contrato a «No» con la renta dentro del tope rechaza con UNA causa, y sin renta tampoco se habla de rebajarla', async ({ page }) => {
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // 600 ≤ 1.000 = rentaMaximaMensual.vivienda: la renta no es causa de nada
+    await sembrarValor(page, '#alquiler', '600');
+    await marcarTodoSi(page);
+    const contrato = page.locator('[class*="checkCard"]').filter({ hasText: /contrato/i }).first();
+    await contrato.getByRole('button', { name: 'No', exact: true }).click();
+
+    const rechazo = norm(await veredictoDe(page).innerText());
+    expect(rechazo).toContain('No cumples los requisitos obligatorios');
+    expect(rechazo).toContain('Hay al menos un requisito imprescindible que no cumples.');
+    expect(rechazo).not.toContain('Y además');
+    expect(rechazo).not.toContain('supera el máximo');
+    expect(rechazo).not.toContain('una renta más baja');
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+
+    // Hallazgo 1169, la variante que H9 no mira: el campo de renta VACÍO
+    await abrirHidratado(page);
+    await marcarTodoSi(page);
+    const edad = page.locator('[class*="checkCard"]').filter({ hasText: /años \(inclusive\)/ }).first();
+    await edad.getByRole('button', { name: 'No', exact: true }).click();
+    const sinRenta = norm(await veredictoDe(page).innerText());
+    expect(sinRenta).toContain('Hay al menos un requisito imprescindible que no cumples.');
+    expect(sinRenta).not.toContain('una renta más baja');
+  });
+
+  test('CASO 19 (dato ilegible): «12abc» y «1e3» se señalan como no válidos; corregido a 550 vuelve el cálculo', async ({ page }) => {
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    await marcarTodoSi(page);
+    const campo = page.locator('#alquiler');
+
+    for (const ilegible of ['12abc', '1e3']) {
+      // parseSpanishNumber rechaza los dos (NaN): no es un campo vacío (hallazgo 1170)
+      await sembrarValor(page, '#alquiler', ilegible);
+      await expect(campo).toHaveAttribute('aria-invalid', 'true');
+      await expect(campo).toHaveAttribute('aria-describedby', 'alquiler-error');
+      await expect(page.locator('#alquiler-error')).toContainText(`«${ilegible}» no es un importe válido`);
+      const veredicto = norm(await veredictoDe(page).innerText());
+      expect(veredicto).toContain('Falta un dato para poder juzgarlo');
+      expect(veredicto).toContain('La que has introducido no es válida: corrígela aquí arriba.');
+      expect(veredicto).not.toContain('Introdúcela');
+      expect(await panelDeAhorro(page)).toHaveLength(0);
+    }
+
+    // Corregido: 550 ≤ 1.000 · 60 % de 550 = 330 > 300 → 300,00 · 250,00 · 14.400,00
+    await sembrarValor(page, '#alquiler', '550');
+    await expect(campo).toHaveAttribute('aria-invalid', 'false');
+    await expect(page.locator('#alquiler-error')).toHaveCount(0);
+    const panel = await panelDeAhorro(page);
+    expect(panel[0]).toContain('300,00 €');
+    expect(panel[1]).toContain('250,00 €');
+    expect(panel[2]).toContain('14.400,00 €');
+    expect(norm(await veredictoDe(page).innerText())).toContain('¡Cumples todos los requisitos!');
+  });
+});
+
+test.describe('Inspector 28/09/2026 — móvil (390 px)', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('A 390 px el panel entero cabe, los botones de modalidad se apilan y la página no se desborda', async ({ page }) => {
+    await abrirHidratado(page);
+    // Mismo caso que el CASO 17: 1.000,00 € → 300,00 · 700,00 · 14.400,00
+    await sembrarValor(page, '#alquiler', '1.000,00');
+    await marcarTodoSi(page);
+    const panel = await panelDeAhorro(page);
+    expect(panel[0]).toContain('300,00 €');
+    expect(panel[1]).toContain('700,00 €');
+    expect(panel[2]).toContain('14.400,00 €');
+    for (const caja of await page.locator('[class*="ahorroCard"]').all()) {
+      const b = await caja.boundingBox();
+      expect(b).not.toBeNull();
+      if (b) expect(b.x + b.width).toBeLessThanOrEqual(390);
+    }
+
+    // ≤ 480 px: el selector de modalidad pasa a una columna
+    const viv = await page.getByRole('button', { name: /Vivienda completa/ }).boundingBox();
+    const hab = await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).boundingBox();
+    expect(viv && hab && Math.abs(viv.x - hab.x) < 2 && hab.y > viv.y).toBe(true);
+
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const anchos = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollWidth,
+      cliente: document.documentElement.clientWidth,
+    }));
+    expect(anchos.scroll).toBeLessThanOrEqual(anchos.cliente);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS — inspector 28/09/2026
+// Escritos con `test.fail()`: afirman lo que la app DEBERÍA hacer, así que hoy fallan a
+// propósito. Al repararlos se les quita la marca y quedan como regresión.
+// La fuente de H11-H14 y H18-H20 es el texto consolidado del RD 326/2026 en el BOE
+// (https://www.boe.es/buscar/act.php?id=BOE-A-2026-8872), el que cita FISCAL_VIVIENDA_JOVEN_META.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Contraste WCAG del texto de un elemento contra su fondo compuesto (capas con alfa incluidas) */
+async function contrasteDe(page: Page, selector: string): Promise<number> {
+  return page.locator(selector).first().evaluate((el) => {
+    const leer = (c: string): number[] => {
+      const m = c.match(/rgba?\(([^)]+)\)/);
+      if (!m) return [0, 0, 0, 0];
+      const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+      return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1];
+    };
+    const lin = (v: number) => {
+      const s = v / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    const lum = (c: number[]) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+    const capas: number[][] = [];
+    for (let n: Element | null = el; n; n = n.parentElement) capas.push(leer(getComputedStyle(n).backgroundColor));
+    let fondo = [255, 255, 255];
+    for (let i = capas.length - 1; i >= 0; i--) {
+      const [r, g, b, a] = capas[i];
+      fondo = [r * a + fondo[0] * (1 - a), g * a + fondo[1] * (1 - a), b * a + fondo[2] * (1 - a)];
+    }
+    const t = leer(getComputedStyle(el).color);
+    const texto = [0, 1, 2].map((k) => t[k] * t[3] + fondo[k] * (1 - t[3]));
+    const [L1, L2] = [lum(texto), lum(fondo)];
+    return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+  });
+}
+
+test.describe('Hallazgos abiertos — inspector 28/09/2026', () => {
+  // H11 (ALTO) — HALLAZGO ABIERTO (inspector 28/09/2026): el veredicto no mira las
+  // exclusiones del art. 133.2.b y c. «No podrá concederse la ayuda cuando … la persona
+  // arrendataria tenga parentesco en primer o segundo grado de consanguinidad o de afinidad
+  // con la persona arrendadora» (b), ni cuando sea socia o partícipe del arrendador (c).
+  // Ninguno de los 7 requisitos lo pregunta, así que un joven que alquila el piso de su padre
+  // o de su hermana responde «Sí» a todo con honestidad y recibe «¡Cumples todos los
+  // requisitos!» con 300,00 €/mes. Es la forma del hallazgo 686 (art. 136, reparado el 10/09):
+  // una exclusión del RD que no llega al veredicto, en el sentido malo — aprobar de más.
+  // CASO: vivienda 600 €/mes, los 7 a «Sí» → esperado un requisito (o aviso en el veredicto)
+  // sobre el parentesco con el arrendador · obtenido «¡Cumples todos los requisitos!» y ni
+  // «parentesco» ni «familiar» en toda la página fuera de la guía colapsada.
+  test('H11 — el veredicto debería contemplar la exclusión por parentesco con el arrendador (art. 133.2.b)', async ({ page }) => {
+    test.fail();
+    await abrirHidratado(page);
+    await sembrarValor(page, '#alquiler', '600'); // 600 ≤ 1.000: la renta no es el problema
+    await marcarTodoSi(page);
+    const checklist = norm(await page.locator('[class*="checkGrid"]').innerText());
+    const veredicto = norm(await veredictoDe(page).innerText());
+    expect(`${checklist} ${veredicto}`).toMatch(/parentesco|familiar|133\.2\.b/i);
+  });
+
+  // H12 (MEDIO) — HALLAZGO ABIERTO (inspector 28/09/2026): la FAQ del propietario niega una
+  // regla que el RD sí fija. Dice «El RD 326/2026 no fija a nivel estatal ninguna condición
+  // sobre el propietario … comprueba si la tuya restringe el parentesco», cuando el art.
+  // 133.2.b lo excluye para toda España. Lo escribió la reparación del hallazgo 537 (30/08),
+  // que se juzgó contra el módulo —que no recoge el art. 133.2— y no contra el BOE: la FAQ
+  // anterior, que el 537 tachó de «heredada del plan anterior», decía lo correcto.
+  // CASO: abrir la guía → «¿El propietario del piso debe cumplir algún requisito?» →
+  // esperado el parentesco hasta segundo grado del art. 133.2.b · obtenido «no fija a nivel
+  // estatal ninguna condición sobre el propietario».
+  test('H12 — la FAQ del propietario debería recoger el art. 133.2.b, no negarlo', async ({ page }) => {
+    test.fail();
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const faq = norm(
+      await page.getByRole('heading', { name: /propietario del piso/ }).locator('xpath=..').innerText(),
+    );
+    expect(faq).not.toContain('no fija a nivel estatal ninguna condición sobre el propietario');
+    expect(faq).toMatch(/133\.2\.b|segundo grado/);
+  });
+
+  // H13 (MEDIO) — HALLAZGO ABIERTO (inspector 28/09/2026): el requisito del contrato sigue
+  // sin ser el del artículo que cita. En el BOE el art. 133.1.e es SOLO el tope de renta
+  // (el mismo que BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual atribuye a esa letra); el
+  // contrato es el art. 133.1.a, que pide un contrato «formalizado en los términos de la Ley
+  // 29/1994» y añade: «Si se trata de alquiler de habitación no es exigible que la
+  // formalización sea en los términos de la Ley 29/1994». Ninguna letra del art. 133 habla de
+  // fianza. La reparación del 1168 alineó la pregunta con lo que la explicación atribuía al
+  // 133.1.e, pero esa atribución era la equivocada; y en habitación el requisito, bloqueante,
+  // exige lo que el RD dispensa.
+  // CASO: habitación 400 €/mes (≤ 600), todo «Sí» salvo «El contrato está por escrito y la
+  // fianza depositada» a «No» (habitación sin fianza depositada) → esperado que no se rechace
+  // por una exigencia que el art. 133.1.a dispensa para la habitación · obtenido «No cumples
+  // los requisitos obligatorios», con la explicación citando el art. 133.1.e.
+  test('H13 — el requisito del contrato debería citar el art. 133.1.a y no exigir fianza a la habitación', async ({ page }) => {
+    test.fail();
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
+    await sembrarValor(page, '#alquiler', '400'); // 400 ≤ 600 = rentaMaximaMensual.habitacion
+    await marcarTodoSi(page);
+    const tarjeta = page.locator('[class*="checkCard"]').filter({ hasText: /contrato/i }).first();
+    const pregunta = norm(await tarjeta.locator('[class*="checkPregunta"]').innerText());
+    const explicacion = norm(await tarjeta.locator('[class*="checkExplicacion"]').innerText());
+    await tarjeta.getByRole('button', { name: 'No', exact: true }).click();
+    const veredicto = norm(await veredictoDe(page).innerText());
+
+    // El art. 133.1.e es el tope de renta, no el contrato
+    expect(explicacion).not.toMatch(/133\.1\.e/);
+    // En habitación no puede bloquear por una fianza que el RD no exige
+    expect(/fianza/i.test(pregunta) && /No cumples los requisitos obligatorios/.test(veredicto)).toBe(false);
+  });
+
+  // H14 (MEDIO) — HALLAZGO ABIERTO (inspector 28/09/2026): el requisito del propietario
+  // bloquea sin las excepciones del art. 133.2.a: «Se exceptuarán de este requisito quienes
+  // siendo titulares de una vivienda acrediten su no disponibilidad por causa de separación o
+  // divorcio, no puedan habitarla por cualquier otra causa ajena a su voluntad o cuando la
+  // vivienda resulte inaccesible por razón de discapacidad con un grado reconocido igual o
+  // superior al 33 %». La tarjeta dice a secas «No puedes ser titular de un derecho de
+  // propiedad o usufructo sobre ninguna vivienda en España». Rechaza de más, como el 1168.
+  // CASO: joven copropietario de una vivienda que tras el divorcio no puede usar → responde
+  // «No» a «No eres propietario de una vivienda en España» → esperado que la tarjeta recoja
+  // la excepción (o no bloquee) · obtenido «No cumples los requisitos obligatorios».
+  test('H14 — el requisito de no ser propietario debería recoger las excepciones del art. 133.2.a', async ({ page }) => {
+    test.fail();
+    await abrirHidratado(page);
+    const tarjeta = page.locator('[class*="checkCard"]').filter({ hasText: /propietari/i }).first();
+    expect(norm(await tarjeta.innerText())).toMatch(/separaci|divorcio|ajena a tu voluntad|inaccesible|133\.2\.a/i);
+  });
+
+  // H15 (MEDIO) — HALLAZGO ABIERTO (inspector 28/09/2026): la cifra principal de la app y dos
+  // avisos no llegan al contraste mínimo en el tema claro. «Ayuda mensual» (.ahorroValor,
+  // 24 px/800, #10b981 sobre blanco) da 2,54:1 y por ser texto grande exige 3:1; el distintivo
+  // IMPRESCINDIBLE (11,2 px) 3,09:1, el «hasta 300 €/mes» de los botones de modalidad (teal de
+  // marca como texto, 12,5 px) 2,55:1 y el mensaje de renta no válida (#E53E3E, 12,8 px) 4,13:1,
+  // que en oscuro cae a 3,48:1 porque no tiene variante; los tres exigen 4,5:1.
+  // CASO: vivienda 450 €/mes y luego «12abc» → esperado ≥ 3:1 la cifra y ≥ 4,5:1 el resto ·
+  // obtenido 2,54 · 3,09 · 2,55 · 4,13 (claro) y 3,48 (oscuro).
+  test('H15 — la ayuda mensual, el distintivo IMPRESCINDIBLE y los avisos deberían cumplir el contraste AA', async ({ page }) => {
+    test.fail();
+    await abrirHidratado(page);
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
+    await sembrarValor(page, '#alquiler', '450');
+    const ayuda = await contrasteDe(page, '[class*="ahorroValor"]');
+    const distintivo = await contrasteDe(page, '[class*="badgeImprescindible"]');
+    const modalidad = await contrasteDe(page, '[class*="tipoBono"]');
+    await sembrarValor(page, '#alquiler', '12abc');
+    const errorClaro = await contrasteDe(page, '#alquiler-error');
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+    const errorOscuro = await contrasteDe(page, '#alquiler-error');
+
+    expect(ayuda).toBeGreaterThanOrEqual(3); // texto grande
+    expect(distintivo).toBeGreaterThanOrEqual(4.5);
+    expect(modalidad).toBeGreaterThanOrEqual(4.5);
+    expect(errorClaro).toBeGreaterThanOrEqual(4.5);
+    expect(errorOscuro).toBeGreaterThanOrEqual(4.5);
+  });
+
+  // H16 (BAJO) — HALLAZGO ABIERTO (inspector 28/09/2026): el porcentaje va pegado a la cifra
+  // («Límite: 60% de la renta», «el 37,5% de la renta», «del 60%») o con espacio normal
+  // («33 % o más»), contra la regla de formato vigente desde el 25/09/2026: «15 %» con espacio
+  // duro U+00A0, corregido app a app cuando pasa el Inspector.
+  // CASO: vivienda 450 €/mes → esperado «Límite: 60 % de la renta» con U+00A0 · obtenido
+  // «Límite: 60% de la renta»; y la tarjeta de ingresos «33 %» con U+0020.
+  test('H16 — los porcentajes deberían llevar espacio duro antes del %', async ({ page }) => {
+    test.fail();
+    await abrirHidratado(page);
+    await sembrarValor(page, '#alquiler', '450'); // 60 % de 450 = 270 < 300: sale la nota
+    const nota = (await page.locator('[class*="ahorroNota"]').textContent()) ?? '';
+    expect(nota).toContain('60 % de la renta');
+    const ingresos = (await page.locator('[class*="checkCard"]').filter({ hasText: /IPREM/ }).first().textContent()) ?? '';
+    expect(ingresos).toContain('33 %');
+  });
+
+  // H17 (BAJO) — HALLAZGO ABIERTO (inspector 28/09/2026): la edad máxima sigue tecleada en
+  // tres textos de page.tsx pudiendo salir de BONO_ALQUILER_JOVEN_2026.edad.maxima, que la
+  // pregunta de la MISMA tarjeta ya usa: la explicación «personas de hasta 35 años», el
+  // escenario «Pareja joven, ambos ≤35» y el título de FAQ «¿Qué pasa si cumplo 36 años…»
+  // (cuyo cuerpo sí deriva edad.maxima + 1). Latente: hoy coinciden con el art. 133.1.b.
+  // CASO: grep en page.tsx → esperado 0 literales de la edad · obtenido 3.
+  test('H17 — la edad máxima de la prosa debería salir del módulo, como la de la pregunta', async () => {
+    test.fail();
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const fuente = readFileSync(join(process.cwd(), 'app', 'simulador-bono-joven-alquiler', 'page.tsx'), 'utf8');
+    // 35 = BONO_ALQUILER_JOVEN_2026.edad.maxima (art. 133.1.b)
+    expect(fuente).not.toContain('personas de hasta 35 años');
+    expect(fuente).not.toContain('ambos ≤35');
+    expect(fuente).not.toContain('cumplo 36 años');
+  });
+
+  // H18 (BAJO) — HALLAZGO ABIERTO (inspector 28/09/2026): la FAQ del cambio de piso presenta
+  // como «generalmente / según los casos» lo que el art. 133.3 fija: comunicarlo «en el plazo
+  // máximo de quince días desde la firma del nuevo contrato», y se conserva la ayuda si el
+  // nuevo cumple los requisitos y «se formalice sin interrupción temporal con el anterior»,
+  // ajustando la cuantía, que será igual o inferior. Sin el plazo ni la condición de
+  // continuidad, quien deja un hueco entre contratos o avisa tarde no sabe que se juega la
+  // ayuda. CASO: guía → «¿Qué ocurre si cambio de piso…?» → esperado 15 días y art. 133.3 ·
+  // obtenido «Generalmente debes comunicarlo a la CA. Según los casos…».
+  test('H18 — la FAQ del cambio de piso debería dar el plazo de 15 días del art. 133.3', async ({ page }) => {
+    test.fail();
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const faq = norm(await page.getByRole('heading', { name: /cambio de piso/ }).locator('xpath=..').innerText());
+    expect(faq).toMatch(/quince días|15 días/);
+    expect(faq).toContain('133.3');
+  });
+
+  // H19 (BAJO) — HALLAZGO ABIERTO (inspector 28/09/2026): el paso 1 dice «Algunas están
+  // activas todo el año, otras tienen plazos específicos», y el art. 138 dispone que las
+  // comunidades autónomas «realizarán convocatorias abiertas de esta ayuda de forma
+  // continuada y permanente». CASO: sección «Proceso de solicitud», paso 1 → esperado
+  // coherente con el art. 138 · obtenido «otras tienen plazos específicos».
+  test('H19 — el proceso de solicitud no debería contradecir las convocatorias permanentes del art. 138', async ({ page }) => {
+    test.fail();
+    await abrirHidratado(page);
+    const pasos = norm(await page.locator('[class*="pasosGrid"]').innerText());
+    expect(pasos).not.toContain('otras tienen plazos específicos');
+  });
+
+  // H20 (BAJO) — HALLAZGO ABIERTO (inspector 28/09/2026): el escenario «Pareja joven» afirma
+  // una regla que no está en el RD: «Solo uno de los titulares puede beneficiarse del bono.
+  // Si ambos cumplen, el bono se asigna a uno». Los arts. 132-139 hacen beneficiaria a toda
+  // persona física que reúna los requisitos y no limitan la ayuda a una por contrato (buscado
+  // también en todo el texto del RD). Es la forma de los hallazgos 537 y 599: una regla
+  // normativa sin artículo detrás. CASO: guía → escenario «Pareja joven» → esperado cita de
+  // artículo o no afirmarla · obtenido la regla sin fuente.
+  test('H20 — el escenario de la pareja no debería afirmar una regla que el RD no contiene', async ({ page }) => {
+    test.fail();
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const pareja = norm(await page.getByText(/Pareja joven/).locator('xpath=..').innerText());
+    const afirmaUnoSolo = /Solo uno de los titulares puede beneficiarse/.test(pareja);
+    expect(afirmaUnoSolo && !/art\. \d+/.test(pareja)).toBe(false);
   });
 });

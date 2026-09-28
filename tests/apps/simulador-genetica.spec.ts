@@ -51,9 +51,10 @@ import { test, expect, Page } from '@playwright/test';
  *       1000, 0 y -5 deben rechazarse; y un rasgo ligado al sexo NO debe admitir cruce
  *       dihíbrido (la app retira el conmutador).
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()` — afirman lo que debería pasar y
- * hoy fallan a propósito. El día que se reparen se ponen en verde: quitar entonces la línea
- * `test.fail()` y quedan como regresión.
+ * CONVENIO: un hallazgo ABIERTO se escribe con `test.fail()` — afirma lo que debería pasar y
+ * falla a propósito; al repararlo se le quita la marca y queda como regresión. A 28/09/2026
+ * los de las inspecciones del 20/08, 14/09, 22/09, 24/09 y 25/09 están REPARADOS y sin marca;
+ * los abiertos del 28/09/2026 van en el último bloque del fichero.
  */
 
 const RUTA = '/simulador-genetica/';
@@ -300,7 +301,8 @@ test.describe('Caso 3 — rechazos', () => {
 });
 
 /**
- * HALLAZGOS ABIERTOS del 20/08/2026. Todos fallan HOY a propósito.
+ * HALLAZGOS del 20/08/2026 (89-98) — REPARADOS el 21/08/2026. Eran `test.fail()`; hoy pasan
+ * y quedan como regresión.
  */
 // REGRESIONES — los diez hallazgos del 20/08/2026, reparados el 21/08/2026. Afirman lo que
 // debe pasar y hoy PASAN: si alguien reintroduce el defecto, saltan aquí.
@@ -1000,8 +1002,8 @@ test.describe('Re-inspección 14/09/2026 · los tres casos', () => {
 });
 
 /**
- * HALLAZGOS ABIERTOS del 14/09/2026. Todos fallan HOY a propósito: afirman lo que debería
- * pasar. El día que se reparen, quitar el `test.fail()` y quedan como regresión.
+ * HALLAZGOS de la re-inspección del 14/09/2026 (824-832) — REPARADOS el 14/09/2026. Eran
+ * `test.fail()` que afirmaban lo que debía pasar; se les quitó la marca y quedan como regresión.
  */
 test.describe('Re-inspección 14/09/2026 · hallazgos abiertos', () => {
   test('el árbol genealógico se rehace al cambiar el genotipo de un progenitor', async ({
@@ -1216,7 +1218,7 @@ test.describe('Re-inspección 14/09/2026 · hallazgos abiertos', () => {
  *         «-25»   → incorrecto (una proporción negativa no existe)
  *         «1e3»   → no es un número: ni NaN en pantalla ni excepción
  *       El tamaño de población ya se probó con `fill()` el 14/09; aquí se teclea, que es lo
- *       que hace una persona (ver el primer hallazgo abierto de abajo).
+ *       que hace una persona (ver el primer hallazgo de abajo, el 1203, REPARADO el 22/09).
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
 test.describe('Re-inspección 22/09/2026 · los tres casos', () => {
@@ -1357,8 +1359,8 @@ test.describe('Re-inspección 22/09/2026 · los tres casos', () => {
 });
 
 /**
- * HALLAZGOS ABIERTOS del 22/09/2026. Todos fallan HOY a propósito: afirman lo que debería
- * pasar. El día que se reparen, quitar el `test.fail()` y quedan como regresión.
+ * HALLAZGOS de la re-inspección del 22/09/2026 (1203-1208) — REPARADOS el 22/09/2026. Eran
+ * `test.fail()` que afirmaban lo que debía pasar; se les quitó la marca y quedan como regresión.
  */
 test.describe('Re-inspección 22/09/2026 · hallazgos abiertos', () => {
   test('el campo «Tamaño de población» admite que se teclee un valor de su propio rango', async ({
@@ -2831,5 +2833,462 @@ test.describe('Re-inspección 25/09/2026 · móvil 375 × 812', () => {
       return fuera;
     });
     expect(solapes).toEqual([]);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR 28/09/2026 (re-inspección nº 7) — las reparaciones del 25/09 (62956eac árbol
+ * ligado al X, dihíbrido completo y χ² con esperados pequeños · 1fbd1fe8 móvil · 75d5db87 % con
+ * espacio duro) y la del 28/09 (620c1d84, espacio en el JSON-LD). Casos resueltos A MANO antes
+ * de abrir la pantalla. Columnas = gametos del padre, filas = de la madre, como dibuja la app.
+ *
+ *   CASO 1 (normal) Guisantes, dihíbrido Aa Rr × Aa rr (un rasgo 3:1 y otro 1:1).
+ *      Color: Aa × Aa → AA 1/4 · Aa 1/2 · aa 1/4 → Amarillo 3/4 · Verde 1/4.
+ *      Forma: Rr × rr → Rr 1/2 · rr 1/2 → Lisa 1/2 · Rugosa 1/2.
+ *      Genotipos (producto): AA Rr 1/8 · AA rr 1/8 · Aa Rr 1/4 · Aa rr 1/4 · aa Rr 1/8 · aa rr 1/8
+ *        → 1:1:2:2:1:1 (12,50 % · 12,50 % · 25 % · 25 % · 12,50 % · 12,50 %).
+ *      Fenotipos: Amarillo/Lisa 3/8 = 37,5 % · Amarillo/Rugosa 3/8 · Verde/Lisa 1/8 = 12,5 % ·
+ *        Verde/Rugosa 1/8 → 3:3:1:1.
+ *      Árbol: la madre da Ar y ar (dos filas cada uno). Primera casilla de cada fenotipo, en el
+ *        orden del cuadro: (Ar·AR) AA Rr, (Ar·Ar) AA rr, (ar·aR) aa Rr, (ar·ar) aa rr. El símbolo
+ *        sigue al color: padres Aa portadores, AA sin marca, aa afectados.
+ *      χ² forzado, N = 80 → esperados 30 · 30 · 10 · 10 (todos ≥ 5). Observados 36 · 24 · 12 · 8:
+ *        χ² = 36/30 + 36/30 + 4/10 + 4/10 = 3,200 · gl = 3 · crítico 7,815.
+ *        p = Q(1,5; 1,6) = erfc(√1,6) + (2/√π)·√1,6·e^(−1,6) = 0,0736 + 0,2882 = 0,362
+ *        → «p > 0,1 · Buen ajuste a las proporciones mendelianas».
+ *
+ *   CASO 2 (límite)
+ *     a) Ligado al X: Humanos, padre daltónico Xd Y × madre portadora XD Xd.
+ *          |  Xd     |  Y
+ *        XD| XD Xd   | XD Y   → hija portadora (visión normal) · hijo sano
+ *        Xd| Xd Xd   | Xd Y   → hija DALTÓNICA · hijo daltónico → 1:1:1:1, 25 % cada uno.
+ *        Árbol: padre afectado, madre portadora, hijos en el orden de las casillas.
+ *        Con la madre Xd Xd: todas las hijas Xd Xd y todos los hijos Xd Y, daltónicos.
+ *        Población N = 10: se esperan 2,5 de cada una de las cuatro clases (< 5) → sin veredicto.
+ *     b) χ² en la frontera de la esperanza mínima, Guisantes Aa × Aa (esperados N·3/4 y N·1/4):
+ *        N = 12, forzado 12 : 0 → E = 9 y 3; χ² = 9/9 + 9/3 = 4,000; p = erfc(√2) = 0,0455 —
+ *          sería «significativa», pero E = 3 < 5 → aviso en vez de veredicto.
+ *        N = 20, forzado 11 : 9 → E = 15 y 5 (borde, ya válido); χ² = 16/15 + 16/5 = 4,267;
+ *          p = erfc(√2,133) = 0,039 → «Diferencia significativa con lo esperado», sin aviso.
+ *        Dihíbrido AaRr × AaRr, N = 79 → 44,4 · 14,8 · 14,8 · 4,9375: solo «Verde / Rugosa» (4,9)
+ *          por debajo de 5.
+ *
+ *   CASO 3 (rechazo) Tamaño de población TECLEADO: 9, 501 y 0 fuera de [10, 500]; -5, 1e2 y
+ *      12.5 no son un número entero de individuos; vacío tampoco. En todos: aviso, campo
+ *      aria-invalid y «Simular» inactivo. 10, el borde, se acepta y simula 10.
+ *
+ *   MÓVIL (390 y 360 px): pestañas y rejilla dentro de la pantalla; el cuadro dihíbrido 4×4 (5
+ *      columnas de ≥ 60 px) no cabe en 246 px útiles, así que debe desplazarse DENTRO de su caja;
+ *      árbol dihíbrido sin salirse ni solapar rótulos; panel de población con el aviso largo.
+ *
+ * HALLAZGOS ABIERTOS del 28/09/2026: al final, con `test.fail()`.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/** El símbolo de cada individuo del árbol, en el orden del DOM (padres y luego hijos). */
+async function simbolosDelArbol(page: Page): Promise<string[]> {
+  return page
+    .locator('[class*="pedigreeSymbol"]')
+    .evaluateAll((els) =>
+      els.map((el) =>
+        /affected/.test(el.className) ? 'afectado' : /carrier/.test(el.className) ? 'portador' : '-',
+      ),
+    );
+}
+
+/** Sustituye Math.random por una cola fija: cada valor cae en la casilla acumulada que toca. */
+async function forzarSorteo(page: Page, cola: number[]): Promise<void> {
+  await page.evaluate((valores) => {
+    const pendientes = [...valores];
+    const original = Math.random;
+    Math.random = () => (pendientes.length > 0 ? (pendientes.shift() as number) : original());
+  }, cola);
+}
+
+/** Escribe un tamaño de población y espera a que React lo tenga. */
+async function tamanoPoblacion(page: Page, valor: number): Promise<void> {
+  const campo = page.locator('#tamano-poblacion');
+  await campo.fill(String(valor));
+  await esperarValorEnReact(page, campo, String(valor));
+}
+
+test.describe('Inspector 28/09/2026 — re-inspección de las reparaciones del 25/09', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test('CASO 1 (normal) · dihíbrido Aa Rr × Aa rr: 1:1:2:2:1:1, 3:3:1:1, árbol de los dos rasgos y χ² = 3,200', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+    await expect(selectorRasgo(page, 1)).toHaveValue('forma-semilla');
+    await selectorGenotipo(page, 3).selectOption('rr');
+    await expect(genotiposDeCelda(page)).toHaveCount(16);
+    const [columnas, filas] = await cabeceras(page);
+    expect(columnas).toEqual(['AR (25 %)', 'Ar (25 %)', 'aR (25 %)', 'ar (25 %)']);
+    expect(filas).toEqual(['Ar (25 %)', 'Ar (25 %)', 'ar (25 %)', 'ar (25 %)']);
+
+    const { genotipos, fenotipos } = await estadisticas(page);
+    expect(genotipos.ratio).toBe('Ratio: 1:1:2:2:1:1 (AA Rr · AA rr · Aa Rr · Aa rr · aa Rr · aa rr)');
+    expect(fenotipos.ratio).toBe(
+      'Ratio: 3:3:1:1 (Amarillo / Lisa · Amarillo / Rugosa · Verde / Lisa · Verde / Rugosa)',
+    );
+    // 3/8 = 37,5 % y 1/8 = 12,5 %, con el % tras espacio duro (75d5db87). El icono va delante.
+    expect(fenotipos.filas.map((f) => f.replace(/^\S+\s/, ''))).toEqual([
+      'Amarillo / Lisa 37,50\u00a0%',
+      'Amarillo / Rugosa 37,50\u00a0%',
+      'Verde / Lisa 12,50\u00a0%',
+      'Verde / Rugosa 12,50\u00a0%',
+    ]);
+
+    // Árbol: los dos rasgos (hallazgo 1694) y el símbolo del color.
+    await pestana(page, 'Pedigree').click();
+    await expect(page.locator('[class*="pedigreeGenotype"]')).toHaveText([
+      'Aa Rr',
+      'Aa rr',
+      'AA Rr',
+      'AA rr',
+      'aa Rr',
+      'aa rr',
+    ]);
+    await expect(page.locator('[class*="pedigreePhenotype"]')).toHaveText([
+      'Amarillo / Lisa',
+      'Amarillo / Rugosa',
+      'Amarillo / Lisa',
+      'Amarillo / Rugosa',
+      'Verde / Lisa',
+      'Verde / Rugosa',
+    ]);
+    expect(await simbolosDelArbol(page)).toEqual(['portador', 'portador', '-', '-', 'afectado', 'afectado']);
+
+    // Población forzada: casillas 0 (A/L), 1 (A/R), 10 (V/L) y 11 (V/R) del cuadro, 1/16 cada una.
+    await pestana(page, 'Población').click();
+    await tamanoPoblacion(page, 80);
+    await forzarSorteo(page, [
+      ...Array(36).fill(0.5 / 16),
+      ...Array(24).fill(1.5 / 16),
+      ...Array(12).fill(10.5 / 16),
+      ...Array(8).fill(11.5 / 16),
+    ]);
+    await page.getByRole('button', { name: /Simular/ }).click();
+    await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(80);
+    const [observado, esperado] = await leerPoblacion(page);
+    expect(observado.map((f) => `${f.nombre} ${f.cifra}`)).toEqual([
+      'Amarillo / Lisa 36 (45,0 %)',
+      'Amarillo / Rugosa 24 (30,0 %)',
+      'Verde / Lisa 12 (15,0 %)',
+      'Verde / Rugosa 8 (10,0 %)',
+    ]);
+    expect(esperado.map((f) => `${f.nombre} ${f.cifra}`)).toEqual([
+      'Amarillo / Lisa 30 (37,5 %)',
+      'Amarillo / Rugosa 30 (37,5 %)',
+      'Verde / Lisa 10 (12,5 %)',
+      'Verde / Rugosa 10 (12,5 %)',
+    ]);
+    await expect(page.locator('[class*="chiSquareValue"]')).toHaveText('χ² = 3,200');
+    await expect(page.locator('[class*="chiSquareGrados"]')).toContainText('gl = 3');
+    await expect(page.locator('[class*="chiSquareGrados"]')).toContainText('7,815');
+    const interpretacion = page.locator('[class*="chiSquareInterpretation"]');
+    await expect(interpretacion).toContainText('p > 0,1');
+    await expect(interpretacion).toContainText('Buen ajuste a las proporciones mendelianas');
+    await expect(interpretacion).not.toContainText('no es fiable');
+  });
+
+  test('CASO 2a (límite) · Xd Y × XD Xd: 1:1:1:1, el árbol rotula a cada afectado «Daltónico» y N = 10 no da veredicto', async ({
+    page,
+  }) => {
+    await abreDaltonismo(page);
+    await selectorGenotipo(page, 0).selectOption('Xd Y');
+    await selectorGenotipo(page, 1).selectOption('XD Xd');
+    await expect(genotiposDeCelda(page)).toHaveText(['XD Xd', 'XD Y', 'Xd Xd', 'Xd Y']);
+    await expect(fenotiposDeCelda(page)).toHaveText([
+      'Visión normal (♀)',
+      'Visión normal (♂)',
+      'Daltónico (♀)',
+      'Daltónico (♂)',
+    ]);
+    await expect(probabilidadesDeCelda(page)).toHaveText(Array(4).fill('25,0\u00a0%'));
+
+    // Árbol (hallazgo 1693): el fenotipo sale de la misma función que el cuadro.
+    await pestana(page, 'Pedigree').click();
+    const genotiposArbol = page.locator('[class*="pedigreeGenotype"]');
+    const fenotiposArbol = page.locator('[class*="pedigreePhenotype"]');
+    await expect(genotiposArbol).toHaveText(['Xd Y', 'XD Xd', 'XD Xd', 'XD Y', 'Xd Xd', 'Xd Y']);
+    await expect(fenotiposArbol).toHaveText([
+      'Daltónico',
+      'Visión normal',
+      'Visión normal',
+      'Visión normal',
+      'Daltónico',
+      'Daltónico',
+    ]);
+    expect(await simbolosDelArbol(page)).toEqual(['afectado', 'portador', 'portador', '-', 'afectado', 'afectado']);
+
+    // Con el árbol a la vista, madre Xd Xd: toda la descendencia es daltónica.
+    await selectorGenotipo(page, 1).selectOption('Xd Xd');
+    await expect(genotiposArbol).toHaveText(['Xd Y', 'Xd Xd', 'Xd Xd', 'Xd Y', 'Xd Xd', 'Xd Y']);
+    await expect(fenotiposArbol).toHaveText(Array(6).fill('Daltónico'));
+    expect(await simbolosDelArbol(page)).toEqual(Array(6).fill('afectado'));
+
+    // Población N = 10 con el cruce del principio: 2,5 esperados por clase.
+    await selectorGenotipo(page, 1).selectOption('XD Xd');
+    await pestana(page, 'Población').click();
+    await tamanoPoblacion(page, 10);
+    await page.getByRole('button', { name: /Simular/ }).click();
+    await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(10);
+    const interpretacion = page.locator('[class*="chiSquareInterpretation"]');
+    await expect(interpretacion).toContainText(
+      'El contraste no es fiable con esta muestra: se esperan 2,5 de Visión normal (♀), se esperan 2,5 de Visión normal (♂), se esperan 2,5 de Daltónico (♀), se esperan 2,5 de Daltónico (♂)',
+    );
+    await expect(interpretacion).not.toContainText(/ajuste|diferencia significativa/i);
+  });
+
+  test('CASO 2b (límite) · esperanza mínima 5: con E = 3 hay aviso aunque p = 0,0455; con E = 5 hay veredicto', async ({
+    page,
+  }) => {
+    await pestana(page, 'Población').click();
+    const valor = page.locator('[class*="chiSquareValue"]');
+    const interpretacion = page.locator('[class*="chiSquareInterpretation"]');
+
+    // N = 12, forzado 12 : 0 (0,1 cae en la casilla AA).
+    await tamanoPoblacion(page, 12);
+    await forzarSorteo(page, Array(12).fill(0.1));
+    await page.getByRole('button', { name: /Simular/ }).click();
+    await expect(valor).toHaveText('χ² = 4,000');
+    await expect(interpretacion).toContainText(
+      'El contraste no es fiable con esta muestra: se esperan 3 de Verde, y el χ² exige que cada frecuencia esperada sea al menos 5.',
+    );
+    await expect(interpretacion).not.toContainText(/diferencia significativa|ajuste/i);
+
+    // N = 20, forzado 11 : 9 (0,9 cae en aa): E = 15 y 5, el borde que ya vale.
+    await tamanoPoblacion(page, 20);
+    await forzarSorteo(page, [...Array(11).fill(0.1), ...Array(9).fill(0.9)]);
+    await page.getByRole('button', { name: /Simular/ }).click();
+    await expect(valor).toHaveText('χ² = 4,267');
+    await expect(interpretacion).toContainText('p < 0,05');
+    await expect(interpretacion).toContainText('Diferencia significativa con lo esperado');
+    await expect(interpretacion).not.toContainText('no es fiable');
+
+    // Dihíbrido AaRr × AaRr, N = 79: solo Verde / Rugosa (79/16 = 4,9375) queda por debajo.
+    await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+    await expect(selectorRasgo(page, 1)).toHaveValue('forma-semilla');
+    await tamanoPoblacion(page, 79);
+    await page.getByRole('button', { name: /Simular/ }).click();
+    await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(79);
+    await expect(interpretacion).toContainText('El contraste no es fiable con esta muestra: se esperan 4,9 de Verde / Rugosa, y');
+    await expect(interpretacion).not.toContainText('de Amarillo');
+  });
+
+  test('CASO 3 (rechazo) · el tamaño tecleado fuera de [10, 500] o no entero se rechaza con aviso; 10 se simula', async ({
+    page,
+  }) => {
+    await pestana(page, 'Población').click();
+    const campo = page.locator('#tamano-poblacion');
+    const simular = page.getByRole('button', { name: /Simular/ });
+    const aviso = page.locator('#aviso-tamano-poblacion');
+    const teclear = async (texto: string) => {
+      await campo.click();
+      await page.keyboard.press('Control+A');
+      await page.keyboard.press('Delete');
+      if (texto) await page.keyboard.type(texto);
+    };
+    for (const texto of ['9', '501', '0']) {
+      await teclear(texto);
+      await expect(campo).toHaveValue(texto);
+      await expect(aviso).toHaveText('El tamaño de la población debe estar entre 10 y 500 individuos.');
+      await expect(aviso).toHaveAttribute('role', 'alert');
+      await expect(campo).toHaveAttribute('aria-invalid', 'true');
+      await expect(simular).toBeDisabled();
+    }
+    for (const texto of ['-5', '1e2', '12.5']) {
+      await teclear(texto);
+      await expect(aviso).toHaveText(/número entero|entre 10 y 500/);
+      await expect(campo).toHaveAttribute('aria-invalid', 'true');
+      await expect(simular).toBeDisabled();
+    }
+    await teclear('');
+    await expect(aviso).toHaveText('Escribe un tamaño entre 10 y 500 individuos.');
+    await expect(simular).toBeDisabled();
+
+    await teclear('10');
+    await expect(aviso).toHaveCount(0);
+    await expect(campo).toHaveAttribute('aria-invalid', 'false');
+    await simular.click();
+    await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(10);
+  });
+
+  test('620c1d84 · el JSON-LD separa «prueba χ².» de la frase siguiente', async ({ page }) => {
+    const descripcion = await page.evaluate(() => {
+      const bloque = [...document.querySelectorAll('script[type="application/ld+json"]')]
+        .map((s) => s.textContent ?? '')
+        .find((t) => t.includes('"WebApplication"'));
+      return bloque ? (JSON.parse(bloque).description as string) : '';
+    });
+    expect(descripcion).toContain('simulación de la descendencia con prueba χ². Alternativa interactiva');
+    // Ningún punto pegado a la frase siguiente.
+    expect(descripcion).not.toMatch(/[a-záéíóúñ²]\.[A-ZÁÉÍÓÚ]/);
+  });
+});
+
+/* Móvil a 390 y 360 px (las dos anchuras más comunes por debajo de la del test de 1614). */
+for (const ancho of [390, 360]) {
+  test.describe(`Inspector 28/09/2026 — móvil ${ancho} px`, () => {
+    test.use({
+      viewport: { width: ancho, height: 800 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 2,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test(`pestañas, cuadro dihíbrido, árbol y población caben o se desplazan dentro de su caja (${ancho} px)`, async ({
+      page,
+    }) => {
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#casos-respuesta']);
+      const dentro = async (selector: string) => {
+        const cajas = await page.locator(selector).evaluateAll((els) =>
+          els
+            .map((el) => el.getBoundingClientRect())
+            .filter((r) => r.width > 0)
+            .map((r) => ({ izq: r.left, der: r.right })),
+        );
+        expect(cajas.length).toBeGreaterThan(0);
+        for (const c of cajas) {
+          expect(c.izq).toBeGreaterThanOrEqual(-0.5);
+          expect(c.der).toBeLessThanOrEqual(ancho + 0.5);
+        }
+      };
+
+      await dentro('[role="tab"]');
+      await dentro('[class*="mainContent"]');
+
+      // Dihíbrido: el cuadro 4×4 no cabe en la columna, pero se desplaza dentro de su caja.
+      await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+      await expect(genotiposDeCelda(page)).toHaveCount(16);
+      await dentro('[class*="punnettContainer"]');
+      const cuadro = await page.locator('[class*="punnettContainer"]').evaluate((el) => ({
+        cabe: el.scrollWidth <= el.clientWidth + 1,
+        desplazable: ['auto', 'scroll'].includes(getComputedStyle(el).overflowX),
+      }));
+      expect(cuadro.cabe || cuadro.desplazable).toBe(true);
+
+      // Árbol dihíbrido: rótulos largos («Amarillo / Rugosa») sin salirse ni montarse.
+      await pestana(page, 'Pedigree').click();
+      await expect(page.locator('[class*="pedigreeIndividual"]')).toHaveCount(6);
+      await dentro('[class*="pedigreeIndividual"]');
+      await dentro('[class*="pedigreeRasgo"]');
+      const solapes = await page.evaluate(() => {
+        const els = [
+          ...document.querySelectorAll(
+            '[class*="pedigreeGenerationLabel"], [class*="pedigreeSymbol"], [class*="pedigreeGenotype"], [class*="pedigreePhenotype"]',
+          ),
+        ];
+        const fuera: string[] = [];
+        for (let i = 0; i < els.length; i++) {
+          for (let j = i + 1; j < els.length; j++) {
+            const a = els[i].getBoundingClientRect();
+            const b = els[j].getBoundingClientRect();
+            const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+            const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+            if (w > 1 && h > 1) fuera.push(`${els[i].textContent} ∩ ${els[j].textContent}`);
+          }
+        }
+        return fuera;
+      });
+      expect(solapes).toEqual([]);
+
+      // Población con el aviso largo de esperanzas pequeñas (N = 10 en un 9:3:3:1).
+      await pestana(page, 'Población').click();
+      await tamanoPoblacion(page, 10);
+      await page.getByRole('button', { name: /Simular/ }).click();
+      await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(10);
+      await expect(page.locator('[class*="chiSquareNoFiable"]')).toBeVisible();
+      await dentro('[class*="populationResults"]');
+      await dentro('[class*="chiSquare"]');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(ancho);
+    });
+  });
+}
+
+/* HALLAZGOS ABIERTOS del 28/09/2026. Afirman lo que DEBERÍA pasar y hoy fallan a propósito;
+ * cuando se reparen, quitar el `test.fail()` y quedan como regresión. */
+test.describe('Inspector 28/09/2026 — hallazgos abiertos', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test('árbol dihíbrido con el ABO: los hijos de ejemplo no esconden los grupos A y O', async ({ page }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): defecto nuevo de la reparación del 1694
+    // (62956eac). `elegirCasillasDeEjemplo` (pedigree.ts) toma la PRIMERA casilla de cada
+    // fenotipo en el orden del cuadro y se para en cuatro. Con 8 fenotipos (ABO × Rh) las cuatro
+    // primeras salen de las dos primeras filas, las del gameto materno Iᴮ: Iᴬi Dd × Iᴮi Dd da
+    // hijos AB/Rh+, B/Rh+, AB/Rh−, B/Rh− — ni un grupo A ni un grupo O, cuando el árbol
+    // monohíbrido del mismo ABO enseña los cuatro y el rótulo dice «uno por combinación». Con el
+    // Rh como rasgo 1 (el que manda en el símbolo) los cuatro hijos salen DD: ni portador ni Rh−.
+    // A mano: Iᴬi × Iᴮi → A, B, AB, O a 1/4 cada uno; Dd × Dd → Rh− 1/4.
+    await page.getByRole('button', { name: /Humanos/ }).click();
+    await selectorRasgo(page, 0).selectOption('grupo-abo');
+    await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+    await selectorRasgo(page, 1).selectOption('factor-rh');
+    await expect(selectorGenotipo(page, 2)).toHaveValue('Dd');
+    await expect(selectorGenotipo(page, 3)).toHaveValue('Dd');
+    await pestana(page, 'Pedigree').click();
+    await expect(page.locator('[class*="pedigreeIndividual"]')).toHaveCount(6);
+    const hijos = (await page.locator('[class*="pedigreePhenotype"]').allInnerTexts()).slice(2);
+    const grupos = new Set(hijos.map((f) => f.split(' / ')[0].trim()));
+    // El símbolo sigue al ABO: sus cuatro grupos, uno por hijo.
+    expect([...grupos].sort()).toEqual(['Grupo A', 'Grupo AB', 'Grupo B', 'Grupo O']);
+
+    // En el motor, con el Rh como rasgo 1: al menos un hijo Rh negativo (dd).
+    const [abo, rh] = [rasgoHumano('grupo-abo'), rasgoHumano('factor-rh')];
+    const arbol = generateDihybridPedigree(['Dd', 'AO'], ['Dd', 'BO'], rh, abo, 4);
+    const fenotiposRh = arbol.individuals.slice(2).map((i) => i.phenotype.split(' / ')[0]);
+    expect(fenotiposRh).toContain('Rh negativo');
+  });
+
+  test('el % va tras espacio DURO también en los casos para clase y en la FAQ del χ²', async ({ page }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): la reparación del 1698 (75d5db87) pasó a U+00A0
+    // los porcentajes del cuadro, las Estadísticas, la Población y 17 de la guía, pero dejó con
+    // espacio normal (U+0020) los de «Casos para clase» (casos.ts:228 «= 25 %.», CasosAula.tsx:213
+    // «' %'», casos.ts:271 «más del 100 %») y el de la FAQ del χ² (page.tsx:997 «del 5 %»). La
+    // regla (CLAUDE.md §2, 25/09/2026) pide U+00A0 para que el «%» no salte solo de línea.
+    await page.getByRole('button', { name: /Ver solución/ }).click();
+    const solucion = await page.locator('[class*="casoSolucion"]').innerText();
+    expect(solucion).toContain('Proporción: 1/4 = 25\u00a0%.');
+    expect(solucion).toContain('Respuesta: 25\u00a0% de semillas verdes');
+
+    await page.locator('#casos-respuesta').fill('101');
+    await esperarValorEnReact(page, '#casos-respuesta', '101');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    // innerText y no toContainText: el matcher de Playwright normaliza el espacio duro a espacio.
+    await expect(page.locator('[class*="casoVeredicto"]')).toContainText('de la descendencia');
+    expect(await page.locator('[class*="casoVeredicto"]').innerText()).toContain('más del 100\u00a0% de la descendencia');
+
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const texto = await page.locator('body').innerText();
+    expect(texto).toContain('nivel de significación del 5\u00a0%');
+    // Y en toda la página, ni un «%» tras espacio normal.
+    expect(texto.match(/\d %/g) ?? []).toEqual([]);
+  });
+
+  test('los encabezados no anuncian su emoji decorativo (aria-hidden)', async ({ page }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): los títulos de los paneles («⚙️» y «📊» en un
+    // <span> sin aria-hidden), los de Estadísticas (StatisticsPanel.tsx:79 y 106, emoji dentro
+    // del texto del <h4>) y los ~35 emojis del bloque educativo que marca
+    // `node scripts/check-a11y-jsx.mjs app/simulador-genetica/page.tsx` entran en el nombre
+    // accesible: un lector de pantalla dice «gráfico de barras, Proporciones Genotípicas».
+    await expect(page.getByRole('heading', { name: 'Resultados', exact: true })).toHaveCount(1);
+    await expect(page.getByRole('heading', { name: 'Configuración del Cruce', exact: true })).toHaveCount(1);
+    await pestana(page, 'Estadísticas').click();
+    await expect(page.getByRole('heading', { name: 'Proporciones Genotípicas', exact: true })).toHaveCount(1);
+    await expect(page.getByRole('heading', { name: 'Proporciones Fenotípicas', exact: true })).toHaveCount(1);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.getByRole('heading', { name: '¿Quién fue Gregor Mendel?', exact: true })).toHaveCount(1);
   });
 });

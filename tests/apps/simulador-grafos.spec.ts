@@ -1,4 +1,5 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
+import { sembrarValor, sembrarValorAcotado } from './_hidratacion';
 
 /**
  * Simulador de Grafos — test de regresión del Inspector (26/08/2026)
@@ -29,10 +30,12 @@ import { test, expect, type Page, type Locator } from '@playwright/test';
  * ESTADO DE LOS HALLAZGOS
  * ───────────────────────
  * Los tres «caso N» van en verde: la app los resuelve exactamente como el papel, incluidos
- * los contadores después de BORRAR (que es donde suelen mentir). Los «HALLAZGO N» van en
- * ROJO a propósito: son defectos ABIERTOS a 26/08/2026, aún sin reparar, y afirman lo que
- * debería ocurrir. `npm run test:apps` no forma parte de `npm run build`, así que no
- * detienen ningún despliegue.
+ * los contadores después de BORRAR (que es donde suelen mentir). Los tres «HALLAZGO N» del
+ * 26/08/2026 (384, 385 y 386 en la base del Inspector) se REPARARON ese mismo día: sus tests
+ * se llaman ahora «REGRESIÓN nnn» y son candados que afirman el comportamiento correcto.
+ * La re-inspección del 28/09/2026 los confirmó en pie y añadió el bloque del final.
+ * `npm run test:apps` no forma parte de `npm run build`, así que no detienen ningún
+ * despliegue.
  */
 
 const RUTA = '/simulador-grafos/';
@@ -183,8 +186,8 @@ test.describe('Simulador de Grafos', () => {
     await expect(boton).toBeDisabled();
     await expect(boton).toHaveText('Marca origen y destino para continuar');
 
-    // Tres nodos sueltos. Se pulsa lejos del centro: ahí el texto «Lienzo vacío» se come
-    // el clic (HALLAZGO 2, más abajo).
+    // Tres nodos sueltos. Se pulsa lejos del centro: ahí el texto «Lienzo vacío» se comía
+    // el clic (HALLAZGO 2 del 26/08/2026, REPARADO: su candado es REGRESIÓN 386, más abajo).
     await page.getByRole('button', { name: 'Añadir nodo' }).click();
     for (const fx of [0.2, 0.5, 0.8]) await clicEnLienzo(page, fx, 0.2);
     await expect(nodos(page)).toHaveCount(3);
@@ -262,10 +265,13 @@ test.describe('Simulador de Grafos', () => {
   });
 
   /**
-   * HALLAZGO 1 (cálculo, alto) — ABIERTO a 26/08/2026.
+   * HALLAZGO 1 (cálculo, alto) — REPARADO el 26/08/2026 (hallazgo 384). Lo que sigue
+   * describe el defecto TAL COMO ERA; desde la reparación, h se calibra con el menor
+   * cociente peso/longitud del grafo y es admisible (re-inspección 28/09/2026: confirmado,
+   * y A* coincide con Dijkstra en 20.000 grafos aleatorios).
    *
-   * A* devuelve un camino PEOR que Dijkstra sobre el preset que trae la propia app, y lo
-   * presenta sin ninguna advertencia: «Camino A* encontrado: A → B → F → H con coste 11»
+   * A* devolvía un camino PEOR que Dijkstra sobre el preset que trae la propia app, y lo
+   * presentaba sin ninguna advertencia: «Camino A* encontrado: A → B → F → H con coste 11»
    * frente al «Camino más corto: A → C → B → F → H con coste 10» que da Dijkstra en el
    * mismo grafo, con el mismo origen y el mismo destino. El óptimo real es 10 (caso 1).
    *
@@ -290,23 +296,24 @@ test.describe('Simulador de Grafos', () => {
     await page.getByRole('button', { name: 'Grafo denso' }).click();
 
     await ejecutar(page, 'astar');
-    // El óptimo, calculado a mano en el caso 1, es 10. La app devuelve 11.
+    // El óptimo, calculado a mano en el caso 1, es 10. Antes de la reparación la app devolvía 11.
     expect(await metrica(page, 'Coste total')).toBe('10');
     await expect(page.locator('[class*="resultValue"]')).toHaveText('A → C → B → F → H');
   });
 
   /**
-   * HALLAZGO 2 (operativa, bajo) — ABIERTO a 26/08/2026.
+   * HALLAZGO 2 (operativa, bajo) — REPARADO el 26/08/2026 (hallazgo 386). Descrito tal
+   * como era; hoy el rótulo lleva `pointerEvents: 'none'`.
    *
-   * Con el lienzo vacío, el rótulo «Lienzo vacío. Carga un preset o añade nodos.» se dibuja
+   * Con el lienzo vacío, el rótulo «Lienzo vacío. Carga un preset o añade nodos.» se dibujaba
    * como un `<text>` SVG sin `pointer-events: none` justo en el centro del lienzo (400, 250
    * de 800×500). Como `handleSvgClick` solo crea un nodo cuando el objetivo del puntero es
-   * el propio `<svg>` o un `<rect>`, pulsar sobre ese rótulo NO hace nada y no avisa de
+   * el propio `<svg>` o un `<rect>`, pulsar sobre ese rótulo NO hacía nada y no avisaba de
    * nada — y el centro del lienzo es precisamente donde pulsa quien acaba de leer «haz clic
-   * en el lienzo para crear un nodo nuevo». Fuera del rótulo funciona a la primera.
+   * en el lienzo para crear un nodo nuevo». Fuera del rótulo funcionaba a la primera.
    *
-   * Las hermanas `.nodoLabel` y `.aristaPeso` sí llevan `pointer-events: none` en el CSS
-   * Module; a este rótulo se le olvidó.
+   * Las hermanas `.nodoLabel` y `.aristaPeso` ya llevaban `pointer-events: none` en el CSS
+   * Module; a este rótulo se le había olvidado.
    */
   test('REGRESIÓN 386 — el rótulo «Lienzo vacío» ya no se come el clic en el centro del lienzo', async ({ page }) => {
     await abrir(page);
@@ -318,20 +325,21 @@ test.describe('Simulador de Grafos', () => {
   });
 
   /**
-   * HALLAZGO 3 (accesibilidad, medio) — ABIERTO a 26/08/2026.
+   * HALLAZGO 3 (accesibilidad, medio) — REPARADO el 26/08/2026 (hallazgo 385). Descrito
+   * tal como era; hoy los 10 conmutadores llevan `aria-pressed` y los emojis `aria-hidden`.
    *
    * Los cuatro botones que eligen algoritmo son un conmutador excluyente: el activo se
-   * distingue solo por color (`.algoritmoActive`) y ninguno expone estado accesible —
-   * `aria-pressed` está ausente en los 15 botones de control de la app (0 apariciones en
-   * `page.tsx`). Un lector de pantalla anuncia «BFS» y «Dijkstra» igual, esté cual esté
-   * seleccionado. Es la regla 2 del §5 del CLAUDE.md global; el candado
+   * distinguía solo por color (`.algoritmoActive`) y ninguno exponía estado accesible —
+   * `aria-pressed` estaba ausente en los 15 botones de control de la app (0 apariciones en
+   * `page.tsx`). Un lector de pantalla anunciaba «BFS» y «Dijkstra» igual, estuviera cual
+   * estuviera seleccionado. Es la regla 2 del §5 del CLAUDE.md global; el candado
    * `npm run check:a11y-jsx` la lista como «toggle sin aria-pressed» pero solo avisa,
    * porque exige criterio.
    *
-   * En la misma pasada, el candado señala 16 incumplimientos de las dos reglas unívocas
+   * En la misma pasada, el candado señalaba 16 incumplimientos de las dos reglas unívocas
    * (emoji junto a texto sin `aria-hidden`: 🗑 Eliminar, 📍 Marcar origen, 🎯 Marcar destino,
-   * ▶ Iniciar, ⏸ Pausar, ⏭ Paso y diez 💡 del bloque educativo). El fichero es de junio de
-   * 2026, anterior al candado, así que es pasivo: no rompe el build.
+   * ▶ Iniciar, ⏸ Pausar, ⏭ Paso y diez 💡 del bloque educativo). El fichero era de junio de
+   * 2026, anterior al candado, así que era pasivo: no rompía el build.
    */
   test('REGRESIÓN 385 — los botones de algoritmo exponen aria-pressed', async ({ page }) => {
     await abrir(page);
@@ -345,5 +353,327 @@ test.describe('Simulador de Grafos', () => {
       'aria-pressed',
       'false',
     );
+  });
+});
+
+/**
+ * ════════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN del 28/09/2026
+ * ════════════════════════════════════════════════════════════════════════════════════════
+ *
+ * Motivo: la analítica marcaba la app con FIRMA DE ROTURA (73,4 % de visitas cortas frente
+ * al 62,6 % del catálogo y 6,3 % de recargas en la misma sesión frente al 3,1 %, sobre 79
+ * visitas en 30 días). Se buscó lo que IMPIDE USAR la app, en escritorio y en móvil.
+ *
+ * Los tres reparados del 26/08 siguen en pie (sus REGRESIÓN, arriba). En escritorio el
+ * cálculo es exacto en todos los casos resueltos a mano; lo que se encontró está en MÓVIL
+ * y en la tabla de A*:
+ *
+ *   · En 390 px el lienzo se dibuja a 212 × 132,5 px porque el viewBox fijo de 800 × 500 se
+ *     encaja dentro de cuatro rellenos anidados (16 + 32 + 24 + 16 px más bordes = 89 px por
+ *     lado). Escala 0,265: los pesos de las aristas miden 2,9 px, las letras de los nodos
+ *     3,7 px y cada nodo 11,7 px de diámetro. El grafo con pesos no se puede leer.
+ *   · En el modo por defecto («Añadir nodo») el nodo se crea en `pointerdown`, y el lienzo
+ *     lleva `touch-action: none`: quien intenta desplazar la página deslizando el dedo sobre
+ *     el lienzo no se desplaza y deja un nodo fantasma en el grafo.
+ *   · La tabla de A* imprime h y f con punto decimal y con el error de coma flotante a la
+ *     vista (f = 7.609999999999999), desde que la reparación del 26/08 hizo decimal la h.
+ *
+ * Una sola `<Footer appName=…>`, al final del árbol y fuera de toda rama condicional: el
+ * AnalyticsTracker se monta UNA vez por carga (medido: un único mensaje «[Analytics]» por
+ * carga tras ejecutar, borrar, mover y cambiar de preset). La firma no es de las falsas.
+ */
+
+/** Nombre accesible de un nodo del lienzo, sin confundir «Nodo A» con «Nodo A1». */
+const nodo = (page: Page, id: string): Locator =>
+  page.locator(`[class*="editorSvg"] g[role="button"][aria-label^="Nodo ${id}."], [class*="editorSvg"] g[role="button"][aria-label="Nodo ${id}"]`);
+
+/** Celdas de la fila de la tabla A* (Nodo · g · h · f) de un nodo, en el paso mostrado. */
+async function filaTablaA(page: Page, id: string): Promise<string[]> {
+  const filas = page.locator('[class*="tablaDijkstra"] tbody tr');
+  const fila = filas.filter({ has: page.locator('td:first-child', { hasText: new RegExp(`^${id}$`) }) });
+  return (await fila.locator('td').allTextContents()).map((t) => t.trim());
+}
+
+/** Lleva un elemento al centro de la vista (sin animación) y lo toca con el dedo. */
+async function tocar(loc: Locator): Promise<void> {
+  await loc.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'auto' }));
+  await loc.tap();
+}
+
+test.describe('Inspector 28/09/2026 — escritorio: A*, límite y rechazo', () => {
+  /**
+   * CASO NORMAL — preset «Laberinto», de A a L, con A* y con Dijkstra.
+   *
+   * El laberinto es una rejilla 4 × 3 (A B C D / E F G H / I J K L) con 14 aristas de peso 1:
+   *   A-B · B-C · C-D · A-E · C-G · D-H · E-F · G-H · F-J · G-K · H-L · I-J · J-K · E-I
+   * Caminos mínimos de A a L: A-B-C-D-H-L y A-B-C-G-H-L, los dos de 5. Cualquier otro pasa
+   * por la fila de abajo y cuesta 7.
+   *
+   * A* a mano. k = menor peso/longitud = 1 / 186,67 px (la arista horizontal, más larga que
+   * la vertical de 150 px). h(n) = ⌊100 · k · distancia(n, L)⌋ / 100 con L en (680, 400):
+   *   h(A) 3,40 · h(B) 2,56 · h(C) 1,89 · h(D) 1,60 · h(E) 3,10 · h(F) 2,15 · h(G) 1,28 ·
+   *   h(H) 0,80 · h(I) 3,00 · h(J) 2,00 · h(K) 1,00 · h(L) 0
+   * Extracciones por f mínima (empate → el que entró antes en abierto):
+   *   A(3,40) → B f=3,56, E f=4,10 · B(3,56) → C f=3,89 · C(3,89) → D f=4,60, G f=4,28 ·
+   *   E(4,10) → F f=4,15, I f=5 · F(4,15) → J f=5 · G(4,28) → H f=4,80, K f=5 ·
+   *   D(4,60) → H por D daría g=4, NO mejora (pred[H] sigue siendo G) · H(4,80) → L f=5 ·
+   *   I, J y K (f=5, entraron antes que L) · L(5) → fin.
+   *   Camino L←H←G←C←B←A = A → B → C → G → H → L, coste 5. Nodos visitados 12. Aristas
+   *   exploradas = grados de los 11 nodos expandidos = 2+2+3+3+2+3+2+3+2+3+2 = 27.
+   *
+   * Dijkstra a mano (empate → el primero en el orden A..L): A, B, E, C, F, I, D, G, J, H,
+   * K, L. H se relaja primero desde D (dist 4) y G no la mejora → A → B → C → D → H → L,
+   * coste 5, 12 visitados, 27 exploradas. Mismo coste por otro camino igual de corto: es
+   * justo lo que la tabla comparativa promete («Sí, en peso» / «Sí, si h es admisible»).
+   */
+  test('caso normal — A* y Dijkstra en el laberinto dan coste 5 por caminos mínimos distintos', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Laberinto' }).click();
+    await expect(nodos(page)).toHaveCount(12);
+    await expect(aristas(page)).toHaveCount(14);
+
+    await ejecutar(page, 'astar');
+    await expect(page.locator('[class*="resultValue"]')).toHaveText('A → B → C → G → H → L');
+    expect(await metrica(page, 'Coste total')).toBe('5');
+    expect(await metrica(page, 'Longitud del camino')).toBe('5aristas');
+    expect(await metrica(page, 'Nodos visitados')).toBe('12');
+    expect(await metrica(page, 'Aristas exploradas')).toBe('27');
+
+    await ejecutar(page, 'dijkstra');
+    await expect(page.locator('[class*="resultValue"]')).toHaveText('A → B → C → D → H → L');
+    expect(await metrica(page, 'Coste total')).toBe('5');
+    expect(await metrica(page, 'Nodos visitados')).toBe('12');
+    expect(await metrica(page, 'Aristas exploradas')).toBe('27');
+  });
+
+  /**
+   * CASO NORMAL (2) — A* en el grafo denso PODA: 7 nodos visitados frente a los 8 de Dijkstra.
+   *
+   * Con h admisible (k = 1 / 137,77 px, la cuerda de B-C y F-G, de peso 1):
+   *   h(A) 1 · h(B) 1,84 · h(C) 2,41 · h(D) 2,61 · h(E) 2,41 · h(F) 1,84 · h(G) 1 · h(H) 0
+   * A(f=1) → B g4 f5,84 · C g2 f4,41 · D g7 f9,61 · E g9 f11,41 (4 exploradas)
+   * C(4,41) → B g3 f4,84 · D g5 f7,61 · F g8 f9,84 (8)
+   * B(4,84) → E g8 f10,41 · F g7 f8,84 (12)
+   * D(7,61) → G g9 f10 (15)
+   * F(8,84) → G g8 f9 · H g10 f10 ; E por F daría 9, no mejora (20)
+   * G(9) → H por G daría 13, no mejora (23)
+   * H(10) → fin. E (f 10,41) no llega a extraerse.
+   * Camino A → C → B → F → H, coste 10 (el mismo óptimo del caso 1), 7 visitados, 23 exploradas.
+   */
+  test('caso normal — A* en el grafo denso llega al óptimo 10 visitando 7 nodos y 23 aristas', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Grafo denso' }).click();
+    await ejecutar(page, 'astar');
+    await expect(page.locator('[class*="resultValue"]')).toHaveText('A → C → B → F → H');
+    expect(await metrica(page, 'Coste total')).toBe('10');
+    expect(await metrica(page, 'Nodos visitados')).toBe('7');
+    expect(await metrica(page, 'Aristas exploradas')).toBe('23');
+  });
+
+  /**
+   * CASO LÍMITE — grafo DIRIGIDO sin salida desde el origen.
+   *
+   * En el denso marcado como dirigido, las tres aristas de H son de LLEGADA (E→H, F→H, G→H).
+   * Con origen H y destino A, A* extrae H, no tiene ninguna arista de salida que explorar y
+   * el conjunto abierto queda vacío: no existe camino. Visitados 1 (H), exploradas 0, y sin
+   * camino no hay coste ni longitud: «—».
+   */
+  test('caso límite — A* dirigido de H a A: no existe camino, 1 visitado y 0 aristas', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Grafo denso' }).click();
+    await page.getByLabel('Dirigido').check();
+    await page.getByRole('button', { name: 'Marcar origen' }).click();
+    await nodo(page, 'H').click();
+    await page.getByRole('button', { name: 'Marcar destino' }).click();
+    await nodo(page, 'A').click();
+
+    await ejecutar(page, 'astar');
+    await expect(page.locator('[class*="descripcionPaso"]')).toContainText('No existe camino de H a A.');
+    expect(await metrica(page, 'Coste total')).toBe('—');
+    expect(await metrica(page, 'Longitud del camino')).toBe('—aristas');
+    expect(await metrica(page, 'Nodos visitados')).toBe('1');
+    expect(await metrica(page, 'Aristas exploradas')).toBe('0');
+    await expect(page.locator('[class*="resultValue"]')).toHaveCount(0);
+  });
+
+  /**
+   * CASO DE RECHAZO — peso 0 o negativo (la trampa clásica de Dijkstra) y arista duplicada.
+   *
+   * El deslizador de peso va de 1 a 99: pedirle 0 o −5 debe quedarse en 1, y la arista nace
+   * con peso 1, nunca con un peso que rompa Dijkstra. En el denso (no dirigido), B→A es la
+   * misma arista que A-B y debe rechazarse: siguen 15.
+   *
+   * Después se añade A-H con ese peso 1 y se ejecuta Dijkstra de A a H, a mano:
+   *   extrae A(0) → relaja B=4, C=2, D=7, E=9 y H=1 (5 aristas exploradas)
+   *   extrae H(1), la mínima → es el destino.
+   *   Camino A → H, coste 1, 1 arista, 2 visitados, 5 exploradas.
+   */
+  test('caso de rechazo — peso 0 y −5 se quedan en 1, y la arista duplicada no se añade', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Grafo denso' }).click();
+    await page.getByRole('button', { name: 'Añadir arista' }).click();
+
+    const peso = page.locator('#peso-slider');
+    await sembrarValor(page, peso, 50); // parte de otro valor: sembrar el 1 inicial no probaría nada
+    expect(await sembrarValorAcotado(page, peso, 0)).toBe('1');
+    await sembrarValor(page, peso, 50);
+    expect(await sembrarValorAcotado(page, peso, -5)).toBe('1');
+    await expect(page.locator('[class*="pesoValue"]')).toHaveText('1');
+
+    // B→A duplica A-B en un grafo no dirigido: se descarta.
+    await nodo(page, 'B').click();
+    await nodo(page, 'A').click();
+    await expect(aristas(page)).toHaveCount(15);
+
+    // A-H no existe: se añade con el peso 1 que dejó el deslizador.
+    await nodo(page, 'A').click();
+    await nodo(page, 'H').click();
+    await expect(aristas(page)).toHaveCount(16);
+
+    await ejecutar(page, 'dijkstra');
+    await expect(page.locator('[class*="resultValue"]')).toHaveText('A → H');
+    expect(await metrica(page, 'Coste total')).toBe('1');
+    expect(await metrica(page, 'Longitud del camino')).toBe('1aristas');
+    expect(await metrica(page, 'Nodos visitados')).toBe('2');
+    expect(await metrica(page, 'Aristas exploradas')).toBe('5');
+  });
+
+  /**
+   * HALLAZGO ABIERTO (inspector 28/09/2026): la tabla de A* muestra h y f en formato de EE. UU.
+   * y con el error de coma flotante a la vista.
+   *
+   * Desde la reparación del 26/08, h(n) = ⌊100 · k · distancia⌋ / 100 es un decimal, y la tabla
+   * lo pinta con `{tabla[id].h}` y `{tabla[id].f}` a pelo, sin `formatNumber`. En el denso, al
+   * final de A* de A a H, la fila de D debe decir h = 2,61 y f = 7,61:
+   *   h(D) = ⌊100 · 360 / 137,77⌋ / 100 = ⌊261,3⌋ / 100 = 2,61 (D y H son diametralmente
+   *   opuestos: 360 px) · g(D) = 5 (A-C-D, 2 + 3) · f = 5 + 2,61 = 7,61.
+   * La app muestra «2.61» y «7.609999999999999». Lo mismo en el laberinto (C: f = 3.8899999999999997)
+   * y en los textos del paso («C(f=4.41)», «h[A] = 3.4»). CLAUDE.md §2: coma decimal, nunca
+   * formato US.
+   */
+  test('HALLAZGO — la tabla de A* escribe h y f con coma decimal y sin restos de coma flotante', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    await page.getByRole('button', { name: 'Grafo denso' }).click();
+    await ejecutar(page, 'astar');
+    const [id, g, h, f] = await filaTablaA(page, 'D');
+    expect(id).toBe('D');
+    expect(g).toBe('5');
+    expect(h).toBe('2,61'); // hoy: «2.61»
+    expect(f).toBe('7,61'); // hoy: «7.609999999999999»
+  });
+});
+
+test.describe('Inspector 28/09/2026 — móvil 390 px (toque)', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CANDADO (lo que en móvil SÍ funciona): todo el flujo a toques, sin ratón.
+   * Grafo denso → «Añadir arista» → tocar A y H (peso 1 por defecto) → A* → Ejecutar.
+   * A mano: k no cambia (A-H es una cuerda de 137,77 px con peso 1, el mismo cociente mínimo);
+   * A(f=1) relaja B, C, D, E y H(g=1, f=1) con 5 aristas; H es la de menor f → fin.
+   * Camino A → H, coste 1, 2 visitados, 5 exploradas.
+   */
+  test('móvil — crear una arista y ejecutar A* solo con toques', async ({ page }) => {
+    await abrir(page);
+    await tocar(page.getByRole('button', { name: 'Grafo denso' }));
+    await expect(aristas(page)).toHaveCount(15);
+    await tocar(page.getByRole('button', { name: 'Añadir arista' }));
+    await expect(page.getByRole('button', { name: 'Añadir arista' })).toHaveAttribute('aria-pressed', 'true');
+    await tocar(nodo(page, 'A'));
+    await tocar(nodo(page, 'H'));
+    await expect(aristas(page)).toHaveCount(16);
+
+    await tocar(page.getByRole('button', { name: ALGORITMO.astar }));
+    await tocar(page.locator('[class*="calcBtn"]'));
+    await sembrarValor(page, '#vel-slider', 100);
+    await expect
+      .poll(async () => {
+        const t = await page.locator('[class*="descripcionPaso"]').innerText();
+        const m = t.match(/Paso\s+(\d+)\s*\/\s*(\d+)/);
+        return m ? m[1] === m[2] : false;
+      }, { timeout: 30000 })
+      .toBe(true);
+    await expect(page.locator('[class*="resultValue"]')).toHaveText('A → H');
+    expect(await metrica(page, 'Coste total')).toBe('1');
+    expect(await metrica(page, 'Nodos visitados')).toBe('2');
+    expect(await metrica(page, 'Aristas exploradas')).toBe('5');
+  });
+
+  /**
+   * HALLAZGO ABIERTO (inspector 28/09/2026): en un móvil de 390 px el grafo no se puede leer.
+   *
+   * El lienzo es un SVG de viewBox fijo 800 × 500 metido dentro de cuatro rellenos anidados
+   * (.container 16 px + .main 32 px + .panel 24 px + .editorContainer 16 px, más bordes): le
+   * quedan 212 px de ancho, escala 0,265. Los tamaños en pantalla salen de multiplicar por ella:
+   *   · peso de arista: 11 × 0,265 = 2,9 px (en escritorio a 1366 px: 11 × 0,828 = 9,1 px)
+   *   · letra del nodo: 14 × 0,265 = 3,7 px
+   *   · diámetro del nodo: 44 × 0,265 = 11,7 px
+   * Lo que se afirma es lo mínimo para usar el simulador con el dedo: que los pesos se lean al
+   * menos como en escritorio (≥ 9 px) y que cada nodo mida al menos 24 px, el tamaño de
+   * objetivo de WCAG 2.5.8.
+   */
+  test('HALLAZGO — en 390 px los pesos se leen (≥ 9 px) y los nodos se pueden tocar (≥ 24 px)', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    await tocar(page.getByRole('button', { name: 'Grafo denso' }));
+    const medidas = await page.evaluate(() => {
+      const peso = document.querySelector('[class*="editorSvg"] [class*="aristaPeso"]') as SVGTextElement;
+      const circulo = document.querySelector('[class*="editorSvg"] [class*="nodoCircle"]') as SVGCircleElement;
+      const escala = peso.getScreenCTM()?.a ?? 0;
+      return {
+        fuentePeso: parseFloat(getComputedStyle(peso).fontSize) * escala,
+        diametroNodo: circulo.getBoundingClientRect().width,
+      };
+    });
+    expect(medidas.fuentePeso).toBeGreaterThanOrEqual(9); // hoy: 2,9 px
+    expect(medidas.diametroNodo).toBeGreaterThanOrEqual(24); // hoy: 11,7 px
+  });
+
+  /**
+   * HALLAZGO ABIERTO (inspector 28/09/2026): deslizar el dedo sobre el lienzo para bajar por la
+   * página deja un nodo fantasma.
+   *
+   * En el modo por defecto, «Añadir nodo», el nodo se crea en `onPointerDown` del SVG, y el
+   * lienzo lleva `touch-action: none` (necesario para arrastrar en modo «Mover»). Un
+   * deslizamiento vertical que empieza en el fondo del lienzo no desplaza la página y SÍ crea
+   * un nodo: en la cuadrícula 5 × 5 de arranque, 25 → 26 nodos («Z») y la vista no se mueve.
+   * La pista dice «haz clic en el lienzo»: un deslizamiento no es un clic.
+   * Punto de partida: (320, 107,5) del viewBox, el centro de la celda entre B, C, G y H, a
+   * 47,5 unidades de la arista más cercana: fondo del lienzo, no un nodo ni una arista.
+   */
+  test('HALLAZGO — un deslizamiento que empieza en el lienzo no crea nodos', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    const svg = page.locator('[class*="editorSvg"]');
+    await svg.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'auto' }));
+    await expect(page.getByRole('button', { name: 'Añadir nodo' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(nodos(page)).toHaveCount(25);
+
+    const caja = await svg.boundingBox();
+    if (!caja) throw new Error('el lienzo no tiene caja');
+    const x = caja.x + (320 * caja.width) / 800;
+    const y0 = caja.y + (107.5 * caja.height) / 500;
+    const cdp = await page.context().newCDPSession(page);
+    const dedo = (y: number) => [{ x, y, radiusX: 1, radiusY: 1, force: 1, id: 1 }];
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: dedo(y0) });
+    for (let i = 1; i <= 10; i++) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: dedo(y0 - 25 * i) });
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    // Margen para que React pinte lo que el gesto haya provocado: la comprobación de abajo
+    // es instantánea a propósito, porque un `toHaveCount(25)` con reintentos podría darse por
+    // bueno ANTES de que el nodo fantasma apareciera.
+    await page.waitForTimeout(500);
+
+    expect(await nodos(page).count()).toBe(25); // hoy: 26, con el nodo «Z» donde empezó el dedo
   });
 });

@@ -1,10 +1,12 @@
 import { test, expect, Page } from '@playwright/test';
-import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValorAcotado } from './_hidratacion';
 
 /**
  * Inspector — simulador-campo-electrico (segmento CÁLCULO / física)
  *
- * Primera inspección 24/08/2026 · SEGUNDA inspección 24/08/2026 (tras la reparación).
+ * Primera inspección 24/08/2026 · SEGUNDA inspección 24/08/2026 (tras la reparación) ·
+ * TERCERA 28/09/2026 (re-inspección tras el motor aparte, las equipotenciales que usan su
+ * potencial y la regla móvil del hero): bloque «Inspector 28/09/2026», al final del fichero.
  *
  * El <h1> promete «Simulador de Campo Eléctrico» y el subtítulo «Coloca cargas, observa
  * líneas de campo y mide fuerza sobre una carga de prueba». La metadata añade «Calcula E, V,
@@ -126,8 +128,10 @@ import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
  *   · 219 · El valor de k solo vivía en el JSON-LD. Hoy: en el bloque educativo visible.
  *   · 220 · El panel escribía «10^-8» con circunflejo ASCII. Hoy: superíndices reales.
  *
- * HALLAZGOS ABIERTOS de esta segunda inspección: al final del fichero, en tests que HOY
- * FALLAN a propósito (convención del proyecto: el test se escribe contra lo que debería
+ * Los cuatro HALLAZGOS de la segunda inspección (269-272) se REPARARON el 24/08/2026: sus
+ * tests, al final del fichero, nacieron fallando a propósito y hoy son candados de regresión.
+ * Los ABIERTOS de la tercera (28/09/2026) van en el bloque «Inspector 28/09/2026», marcados
+ * con test.fail() (convención del proyecto: el test se escribe contra lo que debería
  * ocurrir, no contra lo que ocurre).
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
@@ -573,15 +577,15 @@ test('HALLAZGO 220 y formato español · superíndices reales y coma decimal en 
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS (Inspector, 24/08/2026 — segunda pasada, sobre la app ya reparada)
-// Estos cuatro tests FALLAN hoy a propósito: describen lo que debería ocurrir.
+// HALLAZGOS DE LA SEGUNDA PASADA (Inspector, 24/08/2026, sobre la app ya reparada) — REPARADOS
+// el mismo día. Estos cuatro tests nacieron fallando a propósito; hoy son candados de regresión.
 // ═══════════════════════════════════════════════════════════════════════════════════════
 
 // HALLAZGO 271 (contenido) · REPARADO el 24/08/2026. El aviso de singularidad terminaba diciendo «Lo que se lee
 // abajo es lo que aportan las demás cargas», que es la frase de cuando el panel SÍ enseñaba
 // esas cifras. La reparación las sustituyó por «—» en las seis filas, así que el aviso
-// promete una lectura que ya no existe y se contradice con lo que hay debajo, en la misma
-// pantalla y a dos centímetros.
+// prometía una lectura que ya no existía y se contradecía con lo que había debajo, en la
+// misma pantalla y a dos centímetros.
 // Caso: preset «Dipolo», sonda arrastrada a (−0,50; 0,00) → esperado un aviso coherente con
 //       el panel · obtenido «Lo que se lee abajo es lo que aportan las demás cargas» encima
 //       de seis filas que ponen «—».
@@ -619,9 +623,9 @@ test('REGRESIÓN 272 (operativa) — sobre la singularidad tampoco se dibuja el 
 
 // HALLAZGO 269 (operativa) · REPARADO el 24/08/2026. La reparación del 216 acotó la SONDA pero no las
 // CARGAS, que se arrastran con el mismo mecanismo (setPointerCapture + setCargas sin acotar).
-// Una carga arrastrada fuera del viewBox queda recortada por el SVG: invisible, pero sigue
-// contada en «Cargas en el sistema» y sigue alterando el campo. No hay ningún control para
-// recuperarla; la única salida es «Limpiar todo», que destruye la configuración entera — es
+// Una carga arrastrada fuera del viewBox quedaba recortada por el SVG: invisible, pero seguía
+// contada en «Cargas en el sistema» y seguía alterando el campo. No había ningún control para
+// recuperarla; la única salida era «Limpiar todo», que destruía la configuración entera — es
 // decir, exactamente la trampa del hallazgo 216, movida de la sonda a las cargas.
 // Caso: preset «Dipolo», arrastrar la carga +5 nC 900 px a la derecha y 420 hacia abajo →
 //       esperado que quede acotada al área visible (|x| ≤ 4,00 m) · obtenido x = 10,49 m,
@@ -654,13 +658,13 @@ test('REGRESIÓN 269 (operativa) — las cargas tampoco pueden perderse fuera de
 });
 
 // HALLAZGO 270 (accesibilidad) · REPARADO el 24/08/2026. El lienzo no era operable con el teclado: dentro del
-// <svg> no hay ni un elemento focalizable, el propio <svg> no tiene tabindex ni role, y no
-// existe ninguna entrada numérica alternativa para la posición de la sonda ni para colocar
-// cargas. Sin ratón, la configuración se queda en los cuatro presets y la sonda, clavada en
-// (1,50; 0,70), no se puede mover — con lo que la promesa del subtítulo («mide fuerza sobre
-// una carga de prueba») queda fuera del alcance de un usuario de teclado o lector de
-// pantalla. El <svg> tampoco lleva <title>/<desc>, así que su aria-label es todo lo que se
-// anuncia de una configuración que puede tener diez cargas.
+// <svg> no había ni un elemento focalizable, el propio <svg> no tenía tabindex ni role, y no
+// existía ninguna entrada numérica alternativa para la posición de la sonda ni para colocar
+// cargas. Sin ratón, la configuración se quedaba en los cuatro presets y la sonda, clavada en
+// (1,50; 0,70), no se podía mover — con lo que la promesa del subtítulo («mide fuerza sobre
+// una carga de prueba») quedaba fuera del alcance de un usuario de teclado o lector de
+// pantalla. El <svg> tampoco llevaba <title>/<desc>, así que su aria-label era todo lo que se
+// anunciaba de una configuración que podía tener diez cargas.
 // Caso: cargar la app y contar elementos focalizables dentro del lienzo → esperado al menos
 //       uno (o controles numéricos equivalentes) · obtenido 0, con tabindex = null y
 //       role = null en el <svg>.
@@ -971,5 +975,436 @@ test.describe('simulador-campo-electrico · la sección de casos en el navegador
     await seccion(page).locator('#casos-respuesta').fill('−8,99');
     await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
     await expect(seccion(page).getByRole('alert')).toContainText('Correcto');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR 28/09/2026 — TERCERA PASADA (re-inspección)
+ *
+ * Qué cambió desde la segunda: el 23/09 el cálculo se MOVIÓ a motor.ts y las equipotenciales
+ * dejaron su copia de V = Σk·q/r para llamar a calcularCampoEnPunto con un corte de 0,08 m
+ * (96a4e1d2); las flechas se redondean a la centésima de píxel (92c9490c); el rótulo q₀ sigue al
+ * tema (f9c622c8). El 27/09 (586a4d61) el hero gana 80 px arriba HASTA 768 px para que el logo
+ * fijo no tape el <h1>.
+ *
+ * Los 10 hallazgos reparados (215-220 y 269-272) se han vuelto a comprobar con sus tests de
+ * arriba: los 30 pasan contra el build de producción de HEAD. Ninguno ha vuelto.
+ *
+ * CASOS NUEVOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (k = 8,99·10⁹, el de la app; con
+ * el CODATA 8,9875·10⁹ el |E| del caso A daría 10,45 en vez de 10,46: −0,027 %, ya documentado)
+ *
+ *   CASO A (normal) — dos cargas colocadas CON EL TECLADO (la vía que abrió el hallazgo 270), en
+ *   una configuración que no es ningún preset: +3 nC en (−1; 0) y −2 nC en (1; 1,5); sonda en (1; 0).
+ *       carga +3: dx = 2, dy = 0, r = 2 → |E₁| = 8,99·3/4 = 6,7425 N/C, SE ALEJA → (+6,7425; 0)
+ *                 V₁ = 8,99·3/2 = 13,485 V
+ *       carga −2: dx = 0, dy = −1,5, r = 1,5 → |E₂| = 8,99·2/2,25 = 7,991111 N/C, apunta HACIA
+ *                 ella (arriba) → (0; +7,991111) · V₂ = −8,99·2/1,5 = −11,986667 V
+ *       Eₓ = 6,7425 → «6,74 N/C» · Eᵧ = 7,991111 → «7,99 N/C»
+ *       |E| = √(45,461306 + 63,857857) = √109,319163 = 10,455580 → «10,46 N/C»
+ *       V = 13,485 − 11,986667 = 1,498333 → «1,50 V»
+ *       F = 1e-9 · 10,455580 = 1,0455580e-8 → «1,05 × 10⁻⁸ N» · U = 1,498333e-9 → «1,50 × 10⁻⁹ J»
+ *       Flecha de fuerza (q₀ > 0, va con E): en el SVG, Δy/Δx = −7,991111/6,7425 = −1,1852
+ *
+ *   CASO B (límite) — dos cargas IGUALES de +5 nC en (∓0,5; 0), sonda en el centro: los dos
+ *   campos (179,80 N/C cada uno) se anulan EXACTAMENTE → |E| = «0 N/C», |F| = «0 N» y ninguna
+ *   flecha de fuerza; el potencial NO: V = 2 · 44,95/0,5 = 179,80 → «179,80 V»,
+ *   U = 1,798e-7 → «1,80 × 10⁻⁷ J». Es el simétrico del punto medio del dipolo (CASO 2b).
+ *   (Los otros dos límites que pide el acta —punto medio del dipolo y sonda sobre una carga—
+ *   son los CASOS 2b y 3 de arriba, y siguen en verde.)
+ *
+ *   CASO C (rechazo / entrada) — la posición exacta de la sonda, ESCRITA:
+ *       «99» → acotada a «4,00 m», el borde del lienzo: bien, lo cubre el 216.
+ *       «-1» TECLEADO → esperado «-1,00 m» · obtenido «1,00 m»                    → H1
+ *       «2.75» TECLEADO → esperado «2,75 m» · obtenido «4,00 m»                   → H1
+ *       «1,234» (llega entero, como un pegado: el navegador entrega «1.234»)
+ *                     → esperado «1,23 m» · obtenido «4,00 m»                    → H2
+ *
+ *   EQUIPOTENCIALES — el refactor cambió DE DÓNDE sale su V, así que se comprueba que cada
+ *   curva dibujada es de potencial constante recalculando V = Σk·q/r a mano en sus vértices:
+ *       carga puntual +5 nC: ref = k·Σ|q|/1 m = 44,95 V → niveles positivos 44,95 · 22,475 · 8,99
+ *         → circunferencias de r = kq/V = 1,00 · 2,00 · 5,00 m (la última, fuera del lienzo).
+ *         Medido: r = 0,998–1,002 y 1,999–2,001 m.
+ *       dipolo ±5 nC: ref = 89,90 V → niveles −89,90 · −44,95 · −17,98 · +17,98 · +44,95 · +89,90.
+ *         Medido: desvío máximo 3,1 % en los vértices pegados a las cargas (interpolación lineal
+ *         de 1/r en una rejilla de 0,1 m: en posición es < 1 px). Con V ∝ 1/r² el desvío sería
+ *         del 28 al 146 %, y con el signo cambiado, del 200 %: la tolerancia del 5 % los caza.
+ *
+ *   CASOS DE AULA — 6 (|E| = 8,99·√(6² + 8²) = 89,90 N/C), 12 (Fᵧ = −2 · (−179,80) = +359,60 nN)
+ *   y 9 (d = 3·√4/(√4 + √1) = 2 m desde la de −1,5 → x = 0,50 m; allí E = 0 y
+ *   V = 8,99·4/2 + 8,99·1/1 = 26,97 V), cargados en el simulador y corregidos por la interfaz.
+ *
+ * HALLAZGOS ABIERTOS de esta pasada (test.fail, al final del bloque):
+ *   H1 medio · el campo «Posición exacta» no admite lo que se TECLEA: «-» y «1.» son estados
+ *              intermedios vacíos, parseSpanishNumberOr('') da 0, la sonda salta a x = 0 y React
+ *              reescribe el campo a «0» debajo del cursor.
+ *   H2 bajo  · con tres decimales el parser español lee el «1.234» del navegador como mil
+ *              doscientos treinta y cuatro y la sonda salta al borde, 4,00 m.
+ *   H3 bajo  · las flechas acumulan error de coma flotante (1,5 − 15 × 0,1 = −1,94·10⁻¹⁶): en la
+ *              mediatriz del dipolo el panel da V = «2,84 × 10⁻¹⁴ V» en vez de «0 V».
+ *   H4 bajo  · entre 769 y ~930 px (iPad vertical, 810-834) el logo fijo tapa el principio del
+ *              <h1>: la regla del 27/09 solo da los 80 px hasta 768.
+ *   H5 bajo  · «0,11 %» de la intro de los casos, con espacio normal y no con espacio duro.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('Inspector 28/09/2026 — motor, equipotenciales, sonda escrita y hero', () => {
+  /** N·m²/C²: el de la app (bloque educativo y motor.ts). */
+  const K = 8.99e9;
+
+  interface CargaMano {
+    x: number;
+    y: number;
+    /** nC */
+    q: number;
+  }
+
+  /** V = Σ k·q/r calculado AQUÍ, sin el motor de la app: es la comprobación, no el comprobado. */
+  const potencialAMano = (x: number, y: number, cargas: readonly CargaMano[]): number =>
+    cargas.reduce((s, c) => s + (K * c.q * 1e-9) / Math.hypot(x - c.x, y - c.y), 0);
+
+  /**
+   * Los vértices de cada nivel de equipotencial, en metros del mundo, en el orden en que se
+   * dibujan (de −ref a +ref). Los niveles sin ningún trazo no aparecen.
+   */
+  const verticesEquipotenciales = (page: Page) =>
+    lienzo(page).evaluate((svg: SVGSVGElement) =>
+      Array.from(svg.querySelectorAll('g'))
+        .map((g) =>
+          Array.from(g.children)
+            .filter(
+              (l) => l.tagName === 'line' && (l.getAttribute('class') ?? '').includes('equipotencial'),
+            )
+            .flatMap((l) => [
+              [Number(l.getAttribute('x1')), Number(l.getAttribute('y1'))],
+              [Number(l.getAttribute('x2')), Number(l.getAttribute('y2'))],
+            ])
+            // viewBox → mundo: origen en 400/250, 100 px por metro y la y del SVG hacia abajo
+            .map(([sx, sy]) => [(sx - 400) / 100, (250 - sy) / 100]),
+        )
+        .filter((vertices) => vertices.length > 0),
+    );
+
+  /** Coloca la sonda escribiendo la posición ENTERA de golpe (fill), como un pegado. */
+  async function sondaEn(page: Page, x: string, y: string): Promise<void> {
+    for (const [campo, v] of [
+      ['#sonda-x', x],
+      ['#sonda-y', y],
+    ] as const) {
+      await page.locator(campo).fill(v);
+      await esperarValorEnReact(page, campo, v);
+    }
+  }
+
+  /** Pone una carga donde está la sonda, con el teclado (+ o −, la magnitud del deslizador). */
+  async function cargaEnLaSonda(page: Page, tecla: '+' | '-'): Promise<void> {
+    const circulos = lienzo(page).locator('circle[data-tipo="carga"]');
+    const antes = await circulos.count();
+    await lienzo(page).focus();
+    await page.keyboard.press(tecla);
+    await expect(circulos).toHaveCount(antes + 1);
+  }
+
+  test('CASO A · +3 nC en (−1; 0) y −2 nC en (1; 1,5) puestas con el teclado; sonda en (1; 0)', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: 'Limpiar todo' }).click();
+    await ponerMagnitud(page, 3);
+    await sondaEn(page, '-1', '0');
+    await cargaEnLaSonda(page, '+');
+    await ponerMagnitud(page, 2);
+    await sondaEn(page, '1', '1.5');
+    await cargaEnLaSonda(page, '-');
+
+    // Las dos, donde se pidieron: (−1; 0) → viewBox (300; 250) · (1; 1,5) → (500; 100)
+    const centros = await lienzo(page)
+      .locator('circle[data-tipo="carga"]')
+      .evaluateAll((cs) => cs.map((c) => [Number(c.getAttribute('cx')), Number(c.getAttribute('cy'))]));
+    expect(centros).toEqual([
+      [300, 250],
+      [500, 100],
+    ]);
+    await expect(lienzo(page).locator('text').filter({ hasText: /^\+3,0$/ })).toHaveCount(1);
+    await expect(lienzo(page).locator('text').filter({ hasText: /^−2,0$/ })).toHaveCount(1);
+
+    await sondaEn(page, '1', '0');
+    await expect(valor(page, 'Posición x')).toHaveText('1,00 m');
+    await expect(valor(page, 'Posición y')).toHaveText('0,00 m');
+    // E₁ = 8,99·3/2² = 6,7425 hacia +x (se aleja de la +) · E₂ = 8,99·2/1,5² = 7,991111 hacia
+    // +y (va hacia la −). Cada componente viene de UNA carga: un signo mal puesto se ve solo.
+    await expect(valor(page, 'Eₓ')).toHaveText('6,74 N/C');
+    await expect(valor(page, 'Eᵧ')).toHaveText('7,99 N/C');
+    await expect(valor(page, '|E| (campo)')).toHaveText('10,46 N/C'); // √109,319163 = 10,455580
+    await expect(valor(page, 'V (potencial)')).toHaveText('1,50 V'); // 13,485 − 11,986667
+    await expect(valor(page, '|F| sobre q₀')).toHaveText('1,05 × 10⁻⁸ N'); // 1e-9 · 10,455580
+    await expect(valor(page, 'U (energía)')).toHaveText('1,50 × 10⁻⁹ J'); // 1e-9 · 1,498333
+
+    // La flecha de fuerza apunta hacia donde va E (q₀ > 0): arriba a la derecha, con la
+    // pendiente del vector. En el SVG la y crece hacia abajo: Δy/Δx = −7,991111/6,7425 = −1,1852.
+    // Las coordenadas van redondeadas a la centésima de píxel en una flecha de ~23 px, así que la
+    // pendiente es fiable a ±0,002; dos decimales bastan para separar cualquier otro sentido.
+    const flecha = lienzo(page).locator('line[stroke="#16a34a"]');
+    await expect(flecha).toHaveCount(1);
+    const d = await flecha.evaluate((l) => ({
+      dx: Number(l.getAttribute('x2')) - Number(l.getAttribute('x1')),
+      dy: Number(l.getAttribute('y2')) - Number(l.getAttribute('y1')),
+    }));
+    expect(d.dx).toBeGreaterThan(0);
+    expect(d.dy).toBeLessThan(0);
+    expect(d.dy / d.dx).toBeCloseTo(-1.1852, 2);
+  });
+
+  test('CASO B · dos cargas iguales de +5 nC: en el centro E = 0 exacto y V = 179,80 V', async ({ page }) => {
+    await page.getByRole('button', { name: 'Limpiar todo' }).click();
+    await expect(page.locator('#magnitud')).toHaveValue('5'); // la magnitud de arranque
+    await sondaEn(page, '-0.5', '0');
+    await cargaEnLaSonda(page, '+');
+    await sondaEn(page, '0.5', '0');
+    await cargaEnLaSonda(page, '+');
+    await sondaEn(page, '0', '0');
+
+    await expect(valor(page, 'Posición x')).toHaveText('0,00 m');
+    await expect(valor(page, 'Posición y')).toHaveText('0,00 m');
+    // Cada carga aporta 44,95/0,5² = 179,80 N/C, en sentidos OPUESTOS: se anulan exactos.
+    await expect(valor(page, '|E| (campo)')).toHaveText('0 N/C');
+    await expect(valor(page, 'Eₓ')).toHaveText('0 N/C');
+    await expect(valor(page, 'Eᵧ')).toHaveText('0 N/C');
+    // El potencial es un escalar con el mismo signo en las dos: NO se anula. 2 · 44,95/0,5
+    await expect(valor(page, 'V (potencial)')).toHaveText('179,80 V');
+    await expect(valor(page, '|F| sobre q₀')).toHaveText('0 N');
+    await expect(valor(page, 'U (energía)')).toHaveText('1,80 × 10⁻⁷ J'); // 1e-9 · 179,80
+    // Sin fuerza no hay flecha que dibujar, y no es una singularidad: ni aviso ni «—».
+    await expect(lienzo(page).locator('line[stroke="#16a34a"]')).toHaveCount(0);
+    await expect(page.locator('[role="status"] p')).toHaveCount(0);
+  });
+
+  test('EQUIPOTENCIALES · cada curva dibujada es de V constante (V = Σk·q/r recalculado a mano)', async ({
+    page,
+  }) => {
+    await page.getByLabel('Equipotenciales').check();
+
+    // (a) Carga puntual +5 nC en el origen: V = kq/r, así que las equipotenciales son
+    // circunferencias de r = kq/V. ref = 44,95 V; los niveles positivos 44,95 · 22,475 · 8,99 V
+    // dan r = 1,00 · 2,00 · 5,00 m, y la de 5 m cae fuera del lienzo (±4 × ±2,5 m). Los
+    // negativos no existen. Se dibujan en el orden de los niveles: primero r = 2, luego r = 1.
+    await page.getByRole('button', { name: 'Carga puntual aislada' }).click();
+    const puntual = await verticesEquipotenciales(page);
+    expect(puntual).toHaveLength(2);
+    for (const [i, radio] of [
+      [0, 2],
+      [1, 1],
+    ] as const) {
+      const desvio = Math.max(...puntual[i].map(([x, y]) => Math.abs(Math.hypot(x, y) - radio)));
+      // Medido 0,0021 m como mucho. Con V ∝ 1/r², la de 22,475 V caería en r = √2 = 1,41 m.
+      expect(desvio, `circunferencia de r = ${radio} m`).toBeLessThan(0.005);
+    }
+
+    // (b) Dipolo ±5 nC: ref = k·10 nC/1 m = 89,90 V → seis niveles, todos dentro del lienzo.
+    await page.getByRole('button', { name: 'Dipolo' }).click();
+    const dipolo = await verticesEquipotenciales(page);
+    const NIVELES = [-89.9, -44.95, -17.98, 17.98, 44.95, 89.9];
+    const DIPOLO: CargaMano[] = [
+      { x: -0.5, y: 0, q: 5 },
+      { x: 0.5, y: 0, q: -5 },
+    ];
+    expect(dipolo).toHaveLength(NIVELES.length);
+    NIVELES.forEach((nivel, i) => {
+      const peor = Math.max(
+        ...dipolo[i].map(([x, y]) => Math.abs(potencialAMano(x, y, DIPOLO) - nivel) / Math.abs(nivel)),
+      );
+      // Medido ≤ 3,1 % (interpolación lineal de 1/r en una rejilla de 0,1 m; < 1 px en posición).
+      // Un signo cambiado lo llevaría al nivel opuesto (200 %) y V ∝ 1/r², a entre el 28 y el 146 %.
+      expect(peor, `equipotencial de ${nivel} V`).toBeLessThan(0.05);
+    });
+  });
+
+  test('CASOS DE AULA 6, 12 y 9 · el panel da lo que usa la solución y se corrige lo resuelto a mano', async ({
+    page,
+  }) => {
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    const corregir = async (respuesta: string) => {
+      await seccion.locator('#casos-respuesta').fill(respuesta);
+      await seccion.getByRole('button', { name: 'Comprobar' }).click();
+      return seccion.getByRole('alert');
+    };
+
+    // Caso 6: +6 nC en (−1; 0) y +8 nC en (0; −1), punto (0; 0).
+    // E₁ = 8,99·6/1² = 53,94 hacia +x · E₂ = 8,99·8/1² = 71,92 hacia +y · |E| = 8,99·√100 = 89,90
+    await seccion.getByRole('button', { name: /^Caso 6:/ }).click();
+    await seccion.getByRole('button', { name: 'Cargar en el simulador' }).click();
+    await expect(valor(page, 'Eₓ')).toHaveText('53,94 N/C');
+    await expect(valor(page, 'Eᵧ')).toHaveText('71,92 N/C');
+    await expect(valor(page, '|E| (campo)')).toHaveText('89,90 N/C');
+    await expect(await corregir('89,9')).toContainText('Correcto');
+    // Sumar los módulos (53,94 + 71,92 = 125,86) es justo el error que el caso quiere cazar.
+    await expect(await corregir('125,86')).toContainText('No es correcto');
+
+    // Caso 12: +5 nC en (0; 0,5) y una gota de −2 nC en el origen.
+    // Eᵧ = −8,99·5/0,5² = −179,80 N/C (se aleja de la +: abajo) → Fᵧ = −2 · (−179,80) = +359,60 nN
+    await seccion.getByRole('button', { name: /^Caso 12:/ }).click();
+    await seccion.getByRole('button', { name: 'Cargar en el simulador' }).click();
+    await expect(valor(page, 'Eᵧ')).toHaveText('-179,80 N/C');
+    await expect(await corregir('359,6')).toContainText('Correcto');
+    await expect(await corregir('-359,6')).toContainText('SIGNO');
+
+    // Caso 9: +4 nC en (−1,5; 0) y +1 nC en (1,5; 0). d = 3·√4/(√4 + √1) = 2 m desde la de −1,5
+    // → x = 0,50 m. El caso no fija la sonda, y lo dice.
+    await seccion.getByRole('button', { name: /^Caso 9:/ }).click();
+    await seccion.getByRole('button', { name: 'Cargar en el simulador' }).click();
+    await expect(seccion.getByText('Este caso no fija la sonda')).toBeVisible();
+    await expect(await corregir('0,5')).toContainText('Correcto');
+    // Y el simulador lo confirma: en x = 0,50 m, E = 0 y V = 8,99·4/2 + 8,99·1/1 = 26,97 V.
+    await sondaEn(page, '0.5', '0');
+    await expect(valor(page, '|E| (campo)')).toHaveText('0 N/C');
+    await expect(valor(page, 'V (potencial)')).toHaveText('26,97 V');
+  });
+
+  // HALLAZGO ABIERTO (inspector 28/09/2026) · H1 medio · operativa.
+  test('HALLAZGO H1 · la posición exacta de la sonda admite lo que se TECLEA: negativos y punto decimal', async ({
+    page,
+  }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): el campo «Posición exacta de la sonda» (la vía sin
+    // ratón que abrió el hallazgo 270) es un <input type="number"> controlado cuyo onChange hace
+    // parseSpanishNumberOr(e.target.value). Al teclear, «-» y «1.» son estados intermedios que el
+    // navegador entrega como «»; parseSpanishNumberOr('') da 0, la sonda salta a x = 0 y React
+    // reescribe el campo a «0» debajo del cursor. Resultado: un negativo tecleado pierde el signo
+    // («-1» → «01» → 1,00 m) y un decimal con punto salta al borde («2.75» → «0» → «07» → 4,00 m).
+    // Pegado de golpe (fill) funciona, por eso el test del 270 pasa.
+    // Caso: foco en x, seleccionar todo y teclear «-1» → esperado «-1,00 m» · obtenido «1,00 m»;
+    //       teclear «2.75» → esperado «2,75 m» · obtenido «4,00 m» (el campo muestra «4»).
+    const campo = page.locator('#sonda-x');
+    await campo.click();
+    await campo.press('Control+a');
+    await campo.pressSequentially('-1', { delay: 30 });
+    await expect(valor(page, 'Posición x')).toHaveText('-1,00 m', { timeout: 3000 });
+    await campo.press('Control+a');
+    await campo.pressSequentially('2.75', { delay: 30 });
+    await expect(valor(page, 'Posición x')).toHaveText('2,75 m', { timeout: 3000 });
+  });
+
+  // HALLAZGO ABIERTO (inspector 28/09/2026) · H2 bajo · operativa.
+  test('HALLAZGO H2 · una posición con tres decimales no se lee como millares', async ({ page }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): un <input type="number"> entrega SIEMPRE su valor
+    // con punto decimal («1,234» tecleado o pegado en es-ES llega como «1.234»), y la app lo pasa
+    // por parseSpanishNumberOr, que con un solo separador resuelve a favor del español: «1.234» =
+    // mil doscientos treinta y cuatro. Acotado al lienzo, la sonda salta a 4,00 m. Con uno o dos
+    // decimales no pasa (el millar exige tres cifras) y con «0.xxx» tampoco.
+    // Caso: x = 1,234 m escrito de golpe → esperado «1,23 m» · obtenido «4,00 m» (y el campo
+    //       pasa a mostrar «4»). Igual con «-2.375» → «-4,00 m».
+    await page.locator('#sonda-x').fill('1.234');
+    await expect(valor(page, 'Posición x')).toHaveText('1,23 m', { timeout: 3000 });
+  });
+
+  // HALLAZGO ABIERTO (inspector 28/09/2026) · H3 bajo · cálculo.
+  test('HALLAZGO H3 · con las flechas del teclado, la mediatriz del dipolo da V = 0, como arrastrando', async ({
+    page,
+  }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): las flechas suman ±0,1 m sin redondear, y el error
+    // de coma flotante se acumula: 1,5 − 15 × 0,1 = −1,94·10⁻¹⁶. El panel escribe la posición
+    // como «≈0 m», pero las filas de física pasan por sufijoNotacion, que da notación científica a
+    // todo |n| < 10⁻³: en la mediatriz del dipolo, donde el CASO 1 (arrastrando) da «0 V», por
+    // teclado sale «2,84 × 10⁻¹⁴ V», y en el centro del cuadrupolo |E| = «8,53 × 10⁻¹⁴ N/C» donde
+    // la FAQ de la propia app dice E = 0. El campo «Posición exacta» muestra además
+    // «-1.942890293094024e-16» (y «1.7000000000000002» tras dos → desde el arranque).
+    // Caso: preset «Dipolo», foco en el lienzo, 15 × ← y 2 × ↓ → (0,00; 0,50) → esperado V = «0 V»,
+    //       Eᵧ = «0 N/C», x = «0,00 m» · obtenido «2,84 × 10⁻¹⁴ V», «9,24 × 10⁻¹⁴ N/C», «≈0 m».
+    await page.getByRole('button', { name: 'Dipolo' }).click();
+    await lienzo(page).focus();
+    for (let i = 0; i < 15; i++) await page.keyboard.press('ArrowLeft'); // x: 1,50 → 0,00
+    for (let i = 0; i < 2; i++) await page.keyboard.press('ArrowDown'); // y: 0,70 → 0,50
+    await expect(valor(page, 'Posición y')).toHaveText('0,50 m');
+    // Lo que no depende del ruido sale como en el CASO 1: la mediatriz está bien alcanzada.
+    await expect(valor(page, 'Eₓ')).toHaveText('127,14 N/C');
+    // Y lo que es CERO por simetría tiene que salir cero, como arrastrando.
+    await expect(valor(page, 'Posición x')).toHaveText('0,00 m', { timeout: 3000 });
+    await expect(valor(page, 'V (potencial)')).toHaveText('0 V', { timeout: 3000 });
+    await expect(valor(page, 'Eᵧ')).toHaveText('0 N/C', { timeout: 3000 });
+    await expect(valor(page, 'U (energía)')).toHaveText('0 J', { timeout: 3000 });
+    await expect(page.locator('#sonda-x')).toHaveValue('0', { timeout: 3000 });
+  });
+
+  // HALLAZGO ABIERTO (inspector 28/09/2026) · H5 bajo · contenido.
+  test('HALLAZGO H5 · el «0,11 %» de la intro de los casos lleva espacio duro', async ({ page }) => {
+    test.fail();
+    // HALLAZGO ABIERTO (inspector 28/09/2026): CLAUDE.md global §2 (regla del 25/09/2026): el %
+    // va separado de la cifra con espacio DURO (U+00A0), para que no salte solo de línea. La
+    // intro de «Casos para clase» (CasosAula.tsx, escrita el 23/09) lo separa con un espacio
+    // normal. Es el único porcentaje visible de la app.
+    // Caso: texto de la intro → esperado «0,11 %» con U+00A0 · obtenido «0,11 %» con U+0020.
+    const intro = page
+      .locator('section[aria-labelledby="casos-aula-titulo"] p')
+      .filter({ hasText: /0,11/ });
+    await expect(intro).toHaveCount(1);
+    expect((await intro.textContent()) ?? '').toContain('0,11 %');
+  });
+
+  test.describe('hero y logo fijo, de móvil a tableta vertical', () => {
+    test.use({
+      viewport: { width: 834, height: 1112 },
+      userAgent:
+        'Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+      deviceScaleFactor: 2,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    /** Letras del <h1> cuya caja se cruza con la del logo fijo, a scroll 0. */
+    const letrasTapadas = (page: Page): Promise<string> =>
+      page.evaluate(() => {
+        const logo = document.querySelector('[class*="logoContainer"]');
+        const texto = document.querySelector('h1')?.firstChild;
+        if (!logo || !texto || texto.nodeType !== Node.TEXT_NODE) throw new Error('sin logo o sin <h1>');
+        const l = logo.getBoundingClientRect();
+        const nodo = texto as Text;
+        let tapadas = '';
+        for (let i = 0; i < nodo.length; i++) {
+          const r = document.createRange();
+          r.setStart(nodo, i);
+          r.setEnd(nodo, i + 1);
+          const c = r.getBoundingClientRect();
+          const ancho = Math.min(l.right, c.right) - Math.max(l.left, c.left);
+          const alto = Math.min(l.bottom, c.bottom) - Math.max(l.top, c.top);
+          if (c.width > 0 && ancho > 0.5 && alto > 0.5) tapadas += nodo.data[i];
+        }
+        return tapadas;
+      });
+
+    /** Lee hasta que dos lecturas coinciden: tras cambiar de ancho la maquetación se asienta. */
+    async function estable(page: Page): Promise<string> {
+      let anterior = await letrasTapadas(page);
+      for (let i = 0; i < 20; i++) {
+        await page.waitForTimeout(100);
+        const actual = await letrasTapadas(page);
+        if (actual === anterior) return actual;
+        anterior = actual;
+      }
+      return anterior;
+    }
+
+    test('REGRESIÓN 586a4d61 · hasta 768 px el logo fijo no tapa ninguna letra del <h1>', async ({ page }) => {
+      // Antes de 586a4d61 el hero iba con 40 px arriba y el logo (10-52 px) tapaba «Simu» a 390.
+      for (const ancho of [360, 390, 768]) {
+        await page.setViewportSize({ width: ancho, height: 900 });
+        expect(await estable(page), `a ${ancho} px`).toBe('');
+      }
+    });
+
+    // HALLAZGO ABIERTO (inspector 28/09/2026) · H4 bajo · accesibilidad.
+    test('HALLAZGO H4 · en tableta vertical (800-834 px) el logo fijo tampoco tapa el <h1>', async ({ page }) => {
+      test.fail();
+      // HALLAZGO ABIERTO (inspector 28/09/2026): la regla del 27/09 (586a4d61) da 80 px al hero
+      // solo hasta 768 px. Por encima, el hero vuelve a 40 px arriba mientras el logo fijo crece
+      // a [20, 15, 203, 77] (no a [15, 10, 141, 52] como en móvil), y el <h1>, centrado y a 4vw,
+      // empieza a la izquierda de x = 203 hasta ~930 px de ancho. Medido a scroll 0:
+      //   769 px → «Si» · 800 px → «Sim» · 810-834 px → «Si» · 900 px → «S» · 1023 px → nada.
+      // Se lee «mulador de Campo Eléctrico» a 800 px e «imulador…» a 834 (iPad vertical).
+      // Caso: 834 × 1112 → esperado ninguna letra del <h1> bajo el logo · obtenido «Si»; 800 px →
+      //       obtenido «Sim» (la S, entera; la i y la m, en parte).
+      for (const ancho of [834, 800]) {
+        await page.setViewportSize({ width: ancho, height: 1112 });
+        expect(await estable(page), `a ${ancho} px`).toBe('');
+      }
+    });
   });
 });
