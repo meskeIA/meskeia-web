@@ -10,10 +10,16 @@ import { esperarHidratacion } from './_hidratacion';
  * Fichero aparte de generador-tonos-medidor-inspector.spec.ts solo porque el WAV del micrófono
  * falso va en los launchOptions, que son por fichero. Mismo camino de verdad: Chromium con
  * `--use-fake-device-for-media-stream` leyendo un WAV que escribe este fichero (PCM 16 bits,
- * 48 kHz, mono, senoide pura de 15 Hz, 2 s = 30 ciclos exactos, sin salto en el bucle).
+ * 48 kHz, mono, senoide pura de 15 Hz, 10 s = 150 ciclos exactos, sin salto en el bucle).
  *
- * HALLAZGO M1 [medio · cálculo] — ABIERTO. El medidor busca el pico entre FREC_MIN = 20 Hz y
- * FREC_MAX = 20.000 Hz (page.tsx → picoDominante), pero `picoDominante` arranca en el bin
+ * 10 s y no 2 s (29/09/2026): al dar la vuelta al fichero, el micrófono falso de Chromium mete un
+ * chasquido de banda ancha (medido: bins de 100 a 400 Hz hasta −66 dB durante unas diez tramas,
+ * aunque la senoide empalma sin salto). Es un sonido de verdad y las apps pueden leerlo; con 10 s
+ * la vuelta queda fuera de la ventana que se observa y el test mide solo el tono de 15 Hz.
+ *
+ * HALLAZGO M1 [medio · cálculo] (id 2412) — REPARADO el 29/09/2026 (ver los tests). Lo que
+ * pasaba: el medidor busca el pico entre FREC_MIN = 20 Hz y FREC_MAX = 20.000 Hz
+ * (page.tsx → picoDominante), pero `picoDominante` arrancaba en el bin
  * floor(fMin / hzPorBin), que está POR DEBAJO de 20 Hz (a 44,1 kHz: floor(20/2,6917) = 7 →
  * 18,84 Hz; a 48 kHz: 6 → 17,58 Hz), y no exige que el bin elegido sea un máximo local. Un tono
  * por debajo del rango pone ese primer bin en el flanco de su lóbulo principal (la ventana
@@ -64,7 +70,7 @@ function escribirWav(ruta: string, hz: number, segundos = 2, amplitud = 0.5): vo
 }
 
 const WAV_15 = join(tmpdir(), 'meskeia-generador-tonos-15hz.wav');
-escribirWav(WAV_15, 15);
+escribirWav(WAV_15, 15, 10);
 
 test.use({
   launchOptions: {
@@ -94,8 +100,12 @@ async function vigilarMicrofono(page: Page) {
   });
 }
 
-test('HALLAZGO M1 (ABIERTO) — un tono de 15 Hz no da una «Lectura estable» de otra frecuencia', async ({ page }) => {
-  test.fail(true, 'ABIERTO: M1, el primer bin del rango (bajo 20 Hz) se lee como pico en el flanco');
+/**
+ * Arranca el medidor y observa durante 3 s (tiempo de sobra para cinco lecturas seguidas, una
+ * cada 100 ms, con la ventana llena en 0,37 s). Devuelve todo lo que la cifra grande ha llegado a
+ * mostrar, muestreado cada 100 ms, y el texto de la retenida si aparece.
+ */
+async function medirQuinceHz(page: Page): Promise<{ cifras: string[]; retenida: string | null }> {
   await vigilarMicrofono(page);
   await page.goto(RUTA);
   await esperarHidratacion(page, [CAMPO_FRECUENCIA]);
@@ -107,14 +117,46 @@ test('HALLAZGO M1 (ABIERTO) — un tono de 15 Hz no da una «Lectura estable» d
   await expect
     .poll(() => page.evaluate(() => ((window as VentanaVigilada).__pistasMedidor ?? []).map((p) => p.readyState)))
     .toEqual(['live']);
-  // Tiempo de sobra para cinco lecturas seguidas (una cada 100 ms) con la ventana llena (0,37 s).
-  await page.waitForTimeout(3000);
 
-  const retenida = page.locator('#medir-frecuencia').getByText(/Última lectura estable:/);
-  if ((await retenida.count()) > 0) {
-    const texto = ((await retenida.textContent()) ?? '').replace(/ /g, ' ');
-    const m = texto.match(/([\d.,]+) Hz/);
-    const hz = m ? Number(m[1].replace(/\./g, '').replace(',', '.')) : NaN;
-    expect(Math.abs(hz - 15), `«${texto}» para un tono de 15 Hz`).toBeLessThan(1);
+  const cifra = page.locator('#medir-frecuencia [class*="medidorCifra"]');
+  const cifras = new Set<string>();
+  for (let i = 0; i < 30; i++) {
+    cifras.add(((await cifra.textContent()) ?? '').replace(/ /g, ' ').trim());
+    await page.waitForTimeout(100);
   }
+  const retenida = page.locator('#medir-frecuencia').getByText(/Última lectura estable:/);
+  const textoRetenida = (await retenida.count()) > 0 ? ((await retenida.textContent()) ?? '') : null;
+  return { cifras: [...cifras], retenida: textoRetenida };
+}
+
+/*
+ * REPARADO el 29/09/2026 en el motor (lib/calculadoras/frecuenciaDominante.ts): el rango empieza
+ * en el primer bin ≥ fMin (ceil) y el pico tiene que ser la cima de su lóbulo (±3 bins, mirando
+ * también fuera del rango), así que el flanco de un sonido más grave ya no es un pico. Lo que
+ * queda por encima de 20 Hz son rizos a la altura del fondo, que no pasan la prominencia. Se
+ * pide lo que dice la ficha como primera opción: sin cifra en ningún momento («— Hz», sin
+ * «Lectura estable» ni retenida). Golden del motor: tests/frecuencia-dominante-motor.spec.ts.
+ */
+test('HALLAZGO M1 (REPARADO) — un tono de 15 Hz a 48 kHz no da ninguna cifra', async ({ page }) => {
+  const { cifras, retenida } = await medirQuinceHz(page);
+  expect(retenida, 'no debe quedar una «Última lectura estable» de un tono de 15 Hz').toBeNull();
+  expect(cifras, 'la cifra grande no debe mostrar nada más que «— Hz»').toEqual(['— Hz']);
+});
+
+test('HALLAZGO M1 (REPARADO) — el mismo WAV con el contexto a 44,1 kHz: tampoco da cifra', async ({ page }) => {
+  // El caso de la ficha que daba «18,8 Hz · Re0 (+45 cents)»: se fuerza la frecuencia de muestreo
+  // del contexto del medidor (el WAV sigue siendo de 48 kHz; Chromium lo remuestrea).
+  await page.addInitScript(() => {
+    const Original = window.AudioContext;
+    class Contexto441 extends Original {
+      constructor(opciones?: AudioContextOptions) {
+        super({ ...opciones, sampleRate: 44100 });
+      }
+    }
+    window.AudioContext = Contexto441;
+  });
+  const { cifras, retenida } = await medirQuinceHz(page);
+  expect(await page.evaluate(() => new AudioContext().sampleRate)).toBe(44100);
+  expect(retenida, 'no debe quedar una «Última lectura estable» de un tono de 15 Hz').toBeNull();
+  expect(cifras, 'la cifra grande no debe mostrar nada más que «— Hz»').toEqual(['— Hz']);
 });

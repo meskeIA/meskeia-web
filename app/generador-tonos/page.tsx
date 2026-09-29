@@ -17,7 +17,13 @@ import {
   evaluarMicrofono,
   type PuntoMedida,
 } from './motor-respuesta';
-import { picoDominante, prominencia, lecturaEstable } from '@/lib/calculadoras/frecuenciaDominante';
+import {
+  picoDominante,
+  prominencia,
+  lecturaEstable,
+  nivelMaximo,
+  RANGO_DINAMICO_BLACKMAN_DB,
+} from '@/lib/calculadoras/frecuenciaDominante';
 import { notaMasCercana, nombreNota } from '@/lib/calculadoras/afinacionInstrumentos';
 
 interface FrecuenciaPreset {
@@ -485,6 +491,11 @@ export default function GeneradorTonosPage() {
   const medidorRef = useRef<{ ctx: AudioContext; stream: MediaStream; intervalo: number } | null>(null);
   /** Entre pulsar y que el navegador conceda el micrófono no hay aún medidor: evita abrir dos. */
   const abriendoMedidorRef = useRef(false);
+  /**
+   * Se pulsó «Reproducir» o «Iniciar barrido» mientras el micrófono se abría (hallazgo 2413): la
+   * apertura en curso se abandona al llegar, en vez de dejar al medidor escuchando el tono.
+   */
+  const aperturaCanceladaRef = useRef(false);
 
   const detenerMedidor = useCallback(() => {
     const m = medidorRef.current;
@@ -548,7 +559,9 @@ export default function GeneradorTonosPage() {
       // Un micrófono abierto deja el indicador de grabación encendido aunque se salga de la
       // página: se suelta aquí y no solo al terminar la medida.
       streamMicroRef.current?.getTracks().forEach((t) => t.stop());
-      // Lo mismo con el medidor de frecuencia, que tiene su propio micrófono y su contexto.
+      // Lo mismo con el medidor de frecuencia, que tiene su propio micrófono y su contexto. Si
+      // aún se estaba abriendo, la apertura se abandona al llegar.
+      if (abriendoMedidorRef.current) aperturaCanceladaRef.current = true;
       const medidor = medidorRef.current;
       medidorRef.current = null;
       if (medidor) {
@@ -563,6 +576,11 @@ export default function GeneradorTonosPage() {
     // El tono entraría por el micrófono y el medidor leería la salida de la propia app. Pasa
     // también por aquí el barrido, que arranca el tono con esta misma función.
     if (medidorRef.current) detenerMedidor();
+    // Y si el micrófono se está abriendo todavía (el navegador tarda, o espera al permiso), aún no
+    // hay medidor que parar: se deja dicho que esa apertura ya no vale. Gana lo último que se
+    // pulsa, igual que arriba (hallazgo 2413: antes arrancaban los dos y el medidor escuchaba el
+    // tono de la propia app).
+    if (abriendoMedidorRef.current) aperturaCanceladaRef.current = true;
     try {
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
@@ -847,6 +865,16 @@ export default function GeneradorTonosPage() {
     if (reproduciendo) detenerAudio();
 
     abriendoMedidorRef.current = true;
+    aperturaCanceladaRef.current = false;
+    /** ¿Se ha arrancado el tono mientras se abría? Entonces se suelta todo y no se mide. */
+    const abandonarSiCancelada = (abierto: MediaStream, contexto?: AudioContext) => {
+      if (!aperturaCanceladaRef.current) return false;
+      abierto.getTracks().forEach((t) => t.stop());
+      contexto?.close().catch(() => {});
+      abriendoMedidorRef.current = false;
+      aperturaCanceladaRef.current = false;
+      return true;
+    };
     let stream: MediaStream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({
@@ -857,6 +885,7 @@ export default function GeneradorTonosPage() {
       setAvisoMedidor('No se ha podido abrir el micrófono. Hay que dar permiso al navegador para medir.');
       return;
     }
+    if (abandonarSiCancelada(stream)) return;
 
     // Aquí los procesados no invalidan la medida, como en la respuesta: no cambian la
     // frecuencia de un sonido. Pero la supresión de ruido trata un tono sostenido como ruido
@@ -881,6 +910,7 @@ export default function GeneradorTonosPage() {
       setAvisoMedidor('El navegador no ha podido iniciar el audio. Se puede volver a intentar.');
       return;
     }
+    if (abandonarSiCancelada(stream, ctx)) return;
 
     const analizador = ctx.createAnalyser();
     analizador.fftSize = FFT_MEDIDOR;
@@ -888,13 +918,30 @@ export default function GeneradorTonosPage() {
     ctx.createMediaStreamSource(stream).connect(analizador);
     const espectro = new Float32Array(analizador.frequencyBinCount);
     const ventana: number[] = [];
+    /*
+     * Hasta que la ventana del análisis (16.384 muestras, 0,34-0,37 s) no está llena de audio del
+     * micrófono, mezcla el silencio de antes de abrirlo: lo que analiza es un sonido CORTADO, cuyo
+     * espectro es ancho y tiene lóbulos donde el sonido no tiene nada. Medido con un tono de 15 Hz
+     * a 44,1 kHz (hallazgo 2412): durante ese llenado aparecen picos de 33 a 46 Hz con 50 dB de
+     * prominencia, y alguna vez cinco seguidos coincidían y salía «45,9 Hz, lectura estable».
+     * No se lee hasta que la ventana está llena, más una lectura de margen para lo que tarde en
+     * llegar el primer audio. Y no se llama a getFloatFrequencyData en ese tiempo: el suavizado
+     * de Web Audio solo avanza en cada llamada, así que la primera lectura parte de cero y no
+     * arrastra el arranque.
+     */
+    const finLlenado = ctx.currentTime + analizador.fftSize / ctx.sampleRate + MS_LECTURA_MEDIDOR / 1000;
 
     const intervalo = window.setInterval(() => {
+      if (ctx.currentTime < finLlenado) return;
       analizador.getFloatFrequencyData(espectro);
       const pico = picoDominante(espectro, ctx.sampleRate, analizador.fftSize, FREC_MIN, FREC_MAX);
+      // Dos condiciones (hallazgo 2412): que el pico sobresalga del fondo y que no esté tan por
+      // debajo de lo que domina la señal —un grave fuera del rango, por ejemplo— que ya no se
+      // pueda separar de su fuga por la ventana ni de su distorsión.
       const hayTono =
         pico !== null &&
-        prominencia(espectro, pico, ctx.sampleRate, analizador.fftSize, FREC_MIN, FREC_MAX) >= PROMINENCIA_MIN_DB;
+        prominencia(espectro, pico, ctx.sampleRate, analizador.fftSize, FREC_MIN, FREC_MAX) >= PROMINENCIA_MIN_DB &&
+        pico.nivel >= nivelMaximo(espectro) - RANGO_DINAMICO_BLACKMAN_DB;
       if (!pico || !hayTono) {
         ventana.length = 0;
         setLecturaHz(null);
@@ -1212,7 +1259,7 @@ export default function GeneradorTonosPage() {
         que viene buscando quien llega por «medidor de frecuencia hz» (S0170): bajo la
         respuesta del altavoz quedaba a cinco pantallas.
       */}
-      <div className={styles.section} id="medir-frecuencia">
+      <div className={`${styles.section} ${styles.seccionMedidor}`} id="medir-frecuencia">
         <h3 className={styles.sectionTitle}>Medir la frecuencia de un sonido</h3>
         <p className={styles.medidaIntro}>
           Acerca el micrófono al sonido —un pitido, un silbido, un diapasón, una nota sostenida— y la

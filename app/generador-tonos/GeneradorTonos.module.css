@@ -231,6 +231,14 @@
   margin-bottom: 20px;
 }
 
+/* Destino del enlace «Mídelo con el micrófono» del hero (#medir-frecuencia). La barra del logo es
+   position: fixed y en móvil llega hasta 62 px: sin este margen, el salto dejaba el título de la
+   sección debajo de la píldora y se leía «frecuencia de un sonido» (hallazgo 2414, Pixel 7).
+   5rem = 80 px, lo mismo que buscador-palabras-patron y diccionario-rimas. */
+.seccionMedidor {
+  scroll-margin-top: 5rem;
+}
+
 .sectionTitle {
   font-size: 1.1rem;
   font-weight: 600;

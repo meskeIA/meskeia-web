@@ -26,6 +26,53 @@ export interface PicoEspectro {
 }
 
 /**
+ * Bins que caen DENTRO de [fMin, fMax]: el primero cuya frecuencia es ≥ fMin (ceil) y el último
+ * cuya frecuencia es ≤ fMax (floor). Nunca el bin 0 (la continua) ni el último del array, que
+ * se quedaría sin vecino por la derecha para afinar.
+ *
+ * Con floor por abajo, el primer bin del rango quedaba POR DEBAJO de fMin —17,58 Hz a 48 kHz y
+ * 18,84 Hz a 44,1 kHz con 16.384 muestras, pidiendo 20 Hz— y era ahí donde se leía el flanco de
+ * un sonido más grave que el rango (hallazgo 2412 de generador-tonos).
+ */
+function rangoDeBins(longitud: number, sampleRate: number, fftSize: number, fMin: number, fMax: number) {
+  const hzPorBin = sampleRate / fftSize;
+  return {
+    hzPorBin,
+    binMin: Math.max(1, Math.ceil(fMin / hzPorBin)),
+    binMax: Math.min(longitud - 2, Math.floor(fMax / hzPorBin)),
+  };
+}
+
+/** Un bin vacío (-Infinity en dB, o fuera del array) cuenta como lo más bajo posible. */
+function valorBin(espectro: ArrayLike<number>, i: number): number {
+  const v = i >= 0 && i < espectro.length ? espectro[i] : -Infinity;
+  return Number.isFinite(v) ? v : -Infinity;
+}
+
+/**
+ * Medio ancho del lóbulo principal de la ventana de Blackman, en bins: su primer cero cae a ±3
+ * bins del centro. Un tono de verdad tiene su bin más alto como máximo de esos ±3; lo que quede
+ * a esa distancia de algo más alto es el lóbulo de otro sonido, no un sonido.
+ */
+const SEMIANCHO_LOBULO_BINS = 3;
+
+/**
+ * ¿Es el bin `i` (de valor `v`) la cima de su propio lóbulo? Más alto que los
+ * `SEMIANCHO_LOBULO_BINS` bins de su izquierda, no más bajo que los de su derecha, y lo primero
+ * distinto por la derecha —saltando una meseta de bins iguales, como tres bytes saturados a 255—
+ * es más bajo. Mira el espectro ENTERO, también fuera del rango pedido.
+ */
+function esCimaDeLobulo(espectro: ArrayLike<number>, i: number, v: number): boolean {
+  for (let d = 1; d <= SEMIANCHO_LOBULO_BINS; d++) {
+    if (!(v > valorBin(espectro, i - d))) return false;
+    if (!(v >= valorBin(espectro, i + d))) return false;
+  }
+  let j = i + 1;
+  while (j < espectro.length && valorBin(espectro, j) === v) j++;
+  return valorBin(espectro, j) < v;
+}
+
+/**
  * Pico más alto del espectro entre `fMin` y `fMax`, afinado con una parábola sobre sus dos
  * vecinos.
  *
@@ -33,13 +80,25 @@ export interface PicoEspectro {
  * logarítmicas, un pico estrecho en agudos se diluye entre cientos de bins y la cifra solo
  * puede tomar tantos valores como bandas haya (hallazgos 884 y 886 del analizador).
  *
+ * Solo cuenta la CIMA DE UN LÓBULO (`esCimaDeLobulo`), comparada con el espectro entero y no
+ * solo con el rango: sin esa condición, un sonido más grave que `fMin` dejaba el primer bin del
+ * rango en el FLANCO de su lóbulo —la ventana de Blackman del AnalyserNode lo abre ±3 bins—, ese
+ * flanco era «el más alto del rango» y salía una cifra estable que no era la del sonido
+ * (hallazgo 2412: 15 Hz leídos como 17,6 Hz). Basta un máximo local de ±1 bin para el flanco,
+ * pero no para la cola: medido con 12 Hz a 48 kHz, la imagen de frecuencia negativa riza la cola
+ * y deja un máximo local en 22,7 Hz, 68 dB bajo el tono pero muy por encima del fondo. Con ±3
+ * bins ese rizo queda a la sombra del lóbulo del que sale. Lo que sobrevive lejos de todo lóbulo
+ * es el propio fondo (ruido, o el error numérico en un espectro sintético), y eso lo descarta la
+ * prominencia o el umbral de cada app.
+ *
  * La parábola que pasa por (−1, y₋₁), (0, y₀), (1, y₊₁) tiene el vértice en
  * δ = (y₋₁ − y₊₁) / (2·(y₋₁ − 2y₀ + y₊₁)), y ese δ es la fracción de bin que hay que sumar. Si
  * sale fuera de ±0,5 bins, el pico no tiene forma de pico (dos bins iguales saturados, por
  * ejemplo) y se deja en el centro del bin. Si un vecino no es finito —silencio en el formato
  * en dB—, tampoco se afina: con -Infinity la parábola daría NaN.
  *
- * Devuelve `null` si no hay ningún bin finito en el rango.
+ * Devuelve `null` si en el rango no hay ningún máximo local, o si el pico afinado cae fuera de
+ * [fMin, fMax] (un tono de 19,8 Hz asoma en el bin de 20,5 Hz, pero no es de este rango).
  */
 export function picoDominante(
   espectro: ArrayLike<number>,
@@ -48,19 +107,17 @@ export function picoDominante(
   fMin = 20,
   fMax = 20000,
 ): PicoEspectro | null {
-  const hzPorBin = sampleRate / fftSize;
-  const binMin = Math.max(1, Math.floor(fMin / hzPorBin));
-  const binMax = Math.min(espectro.length - 2, Math.floor(fMax / hzPorBin));
+  const { hzPorBin, binMin, binMax } = rangoDeBins(espectro.length, sampleRate, fftSize, fMin, fMax);
 
   let bin = -1;
   let nivel = -Infinity;
   for (let i = binMin; i <= binMax; i++) {
-    const v = espectro[i];
+    const v = valorBin(espectro, i);
     // Estricto: ante un empate gana el primero, que es como lo hacía el analizador.
-    if (Number.isFinite(v) && v > nivel) {
-      nivel = v;
-      bin = i;
-    }
+    if (v === -Infinity || v <= nivel) continue;
+    if (!esCimaDeLobulo(espectro, i, v)) continue;
+    nivel = v;
+    bin = i;
   }
   if (bin < 0) return null;
 
@@ -74,7 +131,9 @@ export function picoDominante(
       if (Math.abs(delta) <= 0.5) afinado = bin + delta;
     }
   }
-  return { frecuencia: afinado * hzPorBin, nivel, bin };
+  const frecuencia = afinado * hzPorBin;
+  if (frecuencia < fMin || frecuencia > fMax) return null;
+  return { frecuencia, nivel, bin };
 }
 
 /**
@@ -94,9 +153,7 @@ export function prominencia(
   fMin = 20,
   fMax = 20000,
 ): number {
-  const hzPorBin = sampleRate / fftSize;
-  const binMin = Math.max(1, Math.floor(fMin / hzPorBin));
-  const binMax = Math.min(espectro.length - 2, Math.floor(fMax / hzPorBin));
+  const { binMin, binMax } = rangoDeBins(espectro.length, sampleRate, fftSize, fMin, fMax);
   const valores: number[] = [];
   for (let i = binMin; i <= binMax; i++) {
     const v = espectro[i];
@@ -107,6 +164,34 @@ export function prominencia(
   const m = valores.length >> 1;
   const mediana = valores.length % 2 ? valores[m] : (valores[m - 1] + valores[m]) / 2;
   return pico.nivel - mediana;
+}
+
+/**
+ * Rango dinámico de la ventana de Blackman que usa el `AnalyserNode` (α = 0,16): su lóbulo
+ * lateral más alto queda 58 dB por debajo del principal (F. J. Harris, «On the use of windows
+ * for harmonic analysis with the discrete Fourier transform», Proc. IEEE 66(1), 1978, tabla 1).
+ * Lo que está más de 58 dB por debajo del sonido más fuerte del espectro no se puede separar de
+ * la fuga de ese sonido ni de su distorsión: no es un tono que se pueda anunciar.
+ */
+export const RANGO_DINAMICO_BLACKMAN_DB = 58;
+
+/**
+ * Nivel del bin más alto del espectro ENTERO, fuera del rango pedido incluido (sin el bin 0, la
+ * continua). Solo tiene sentido en el formato en dB. `-Infinity` si no hay ningún bin finito.
+ *
+ * Sirve para comparar el pico del rango con lo que de verdad domina la señal. Medido en el
+ * navegador el 29/09/2026 con un tono puro de 15 Hz (hallazgo 2412): el tono llega a −25,7 dB y,
+ * lejos de su lóbulo, quedan componentes de −117 a −136 dB (la distorsión del WAV de 16 bits y
+ * del remuestreo) sobre un fondo de −175 dB. Sobresalen 40 dB de la mediana, así que la
+ * prominencia sola los daba por tono: «468 Hz, lectura estable» para un sonido de 15 Hz.
+ */
+export function nivelMaximo(espectro: ArrayLike<number>): number {
+  let maximo = -Infinity;
+  for (let i = 1; i < espectro.length; i++) {
+    const v = espectro[i];
+    if (Number.isFinite(v) && v > maximo) maximo = v;
+  }
+  return maximo;
 }
 
 /**

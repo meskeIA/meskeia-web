@@ -16,7 +16,13 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { picoDominante, prominencia, lecturaEstable } from '../lib/calculadoras/frecuenciaDominante';
+import {
+  picoDominante,
+  prominencia,
+  lecturaEstable,
+  nivelMaximo,
+  RANGO_DINAMICO_BLACKMAN_DB,
+} from '../lib/calculadoras/frecuenciaDominante';
 
 /** FFT radix-2 in situ (re, im), tamaño potencia de dos. */
 function fft(re: Float64Array, im: Float64Array): void {
@@ -168,6 +174,126 @@ test.describe('picoDominante — bordes', () => {
     expect(p!.bin).toBe(200);
   });
 });
+
+/*
+ * Hallazgo 2412 (generador-tonos, 29/09/2026). Con fMin = 20 Hz el motor empezaba en el bin
+ * floor(20 / hzPorBin), que está por DEBAJO de 20 Hz (17,58 Hz a 48 kHz y 18,84 Hz a 44,1 kHz
+ * con 16.384 muestras), y se quedaba con el bin más alto del rango aunque no fuera la cima de
+ * nada. Un tono más grave que el rango dejaba ese primer bin en el flanco de su lóbulo: era «el
+ * pico», el afinado se descartaba (vértice a más de medio bin) y la cifra salía siempre el centro
+ * del bin, igual lectura tras lectura, o sea «estable».
+ *
+ * Resuelto a mano: 15 Hz y 12 Hz están fuera del rango de 20 a 20.000 Hz que la app se pide;
+ * lo correcto es NO dar lectura o, si hay otro tono dentro del rango, la de ese tono.
+ *
+ * Los espectros llevan aquí un fondo de ruido del orden de un paso de 16 bits, como el del WAV
+ * del test de la app: sin fondo, el espectro sintético solo tiene error numérico (−250 dB) y
+ * cualquier rizo de ese error es un «máximo local». La lectura se juzga con la misma puerta que
+ * el generador (`lecturaDelGenerador`): pico que sobresalga 20 dB de la mediana y que no quede
+ * más de 58 dB por debajo de lo más fuerte del espectro entero (RANGO_DINAMICO_BLACKMAN_DB).
+ *
+ * Reinyectado el 29/09/2026 sobre copias del motor:
+ *   · floor + el máximo a secas (el motor anterior): 15 Hz → 17,58 (48 kHz) y 18,84 (44,1 kHz);
+ *     12 Hz → las mismas; 18 Hz → 18,01; 19,8 Hz → 19,78; bytes → 16,15; y 15 + 440 Hz → 17,58.
+ *   · floor + máximo local de ±1 bin: 15 Hz → 75,05 y 82,85; 12 Hz → 22,67; bytes → 37,68. Los
+ *     rizos de la cola pasan por máximos locales y sobresalen del fondo: por eso ±3 bins.
+ *   · el motor de hoy: lo que queda son rizos a la altura del fondo, con 11-15 dB de prominencia,
+ *     por debajo de los 20 del generador.
+ */
+const FONDO_16_BITS = 1 / 32768;
+/** Lo mismo que exige page.tsx del generador (PROMINENCIA_MIN_DB). */
+const PROMINENCIA_GENERADOR_DB = 20;
+
+function lecturaDelGenerador(tonos: Tono[], sampleRate: number, fftSize = N): number | null {
+  const e = espectroDb(tonos, sampleRate, fftSize, FONDO_16_BITS);
+  const p = picoDominante(e, sampleRate, fftSize, 20, 20000);
+  if (!p) return null;
+  const sobresale = prominencia(e, p, sampleRate, fftSize, 20, 20000) >= PROMINENCIA_GENERADOR_DB;
+  const separable = p.nivel >= nivelMaximo(e) - RANGO_DINAMICO_BLACKMAN_DB;
+  return sobresale && separable ? p.frecuencia : null;
+}
+
+test.describe('picoDominante — sonidos por debajo del rango (hallazgo 2412)', () => {
+  test('15 Hz a 48 kHz con 16.384 muestras: sin lectura, no el flanco en 17,6 Hz', () => {
+    expect(lecturaDelGenerador([{ f: 15, a: 0.5 }], SR)).toBeNull();
+  });
+
+  test('15 Hz a 44,1 kHz con 16.384 muestras: sin lectura, no el flanco en 18,8 Hz', () => {
+    expect(lecturaDelGenerador([{ f: 15, a: 0.5 }], 44100)).toBeNull();
+  });
+
+  test('12 Hz, a 48 y a 44,1 kHz: sin lectura (ni el flanco ni el rizo de la cola)', () => {
+    expect(lecturaDelGenerador([{ f: 12, a: 0.5 }], SR)).toBeNull();
+    expect(lecturaDelGenerador([{ f: 12, a: 0.5 }], 44100)).toBeNull();
+  });
+
+  test('15 Hz sin fondo de ruido: si el motor da algo, no está en el lóbulo del tono', () => {
+    // Sin fondo, lo único que queda lejos del lóbulo es el error numérico (≈ −250 dB): puede
+    // salir como pico, pero nunca uno de los bins del lóbulo del tono ni de su cola cercana.
+    const p = picoDominante(espectroDb([{ f: 15, a: 0.5 }], SR, N), SR, N, 20, 20000);
+    if (p) expect(p.nivel).toBeLessThan(-200);
+  });
+
+  test('15 Hz en bytes a 44,1 kHz con 8.192 muestras (el formato del analizador): sin pico', () => {
+    // En bytes todo lo que está bajo −100 dB es 0: el motor no tiene nada que devolver.
+    const e = aBytes(espectroDb([{ f: 15, a: 0.9 }], 44100, 8192));
+    expect(picoDominante(e, 44100, 8192)).toBeNull();
+  });
+
+  test('18 Hz: su cima es el bin de 17,58 Hz, que ya no es del rango → sin lectura', () => {
+    // 18 / 2,9297 = 6,14: la cima es el bin 6 (17,58 Hz). Con floor(20/2,9297) = 6 entraba.
+    expect(lecturaDelGenerador([{ f: 18, a: 0.5 }], SR)).toBeNull();
+  });
+
+  test('19,8 Hz asoma en el bin de 20,5 Hz, pero afinado cae fuera del rango → sin lectura', () => {
+    expect(lecturaDelGenerador([{ f: 19.8, a: 0.5 }], SR)).toBeNull();
+  });
+
+  test('21 Hz, ya dentro del rango, sí se lee', () => {
+    const f = lecturaDelGenerador([{ f: 21, a: 0.5 }], SR);
+    expect(f).not.toBeNull();
+    expect(Math.abs(f! - 21)).toBeLessThan(0.3);
+  });
+
+  test('un grave fuerte fuera del rango no tapa un tono débil de dentro: 15 Hz + 440 Hz → 440', () => {
+    const f = lecturaDelGenerador([{ f: 15, a: 0.5 }, { f: 440, a: 0.02 }], SR);
+    expect(f).not.toBeNull();
+    expect(Math.abs(f! - 440)).toBeLessThan(0.3);
+  });
+
+  test('15 Hz con un resto de distorsión de −134 dB en 468 Hz: el resto no es un tono', () => {
+    // Lo que se midió en el navegador con el WAV de 15 Hz (ver `nivelMaximo`): el tono a −25,7 dB
+    // y, lejos, componentes de −117 a −136 dB sobre un fondo de −175. Aquí, sin fondo de ruido
+    // para que la mediana quede tan honda como allí. El motor SÍ ve el pico en 468 Hz (es la cima
+    // de su lóbulo) y sobresale de la mediana: lo que lo descarta es el rango dinámico.
+    const e = espectroDb([{ f: 15, a: 0.5 }, { f: 468, a: 0.5 * 10 ** (-108 / 20) }], SR, N);
+    const p = picoDominante(e, SR, N, 20, 20000)!;
+    expect(Math.abs(p.frecuencia - 468)).toBeLessThan(0.5);
+    expect(prominencia(e, p, SR, N, 20, 20000)).toBeGreaterThan(PROMINENCIA_GENERADOR_DB);
+    expect(p.nivel).toBeLessThan(nivelMaximo(e) - RANGO_DINAMICO_BLACKMAN_DB);
+  });
+
+  test('el rango dinámico no se come un tono débil de verdad: 440 Hz 50 dB bajo un grave de 15 Hz', () => {
+    const f = lecturaDelGenerador([{ f: 15, a: 0.5 }, { f: 440, a: 0.5 * 10 ** (-50 / 20) }], SR);
+    expect(f).not.toBeNull();
+    expect(Math.abs(f! - 440)).toBeLessThan(0.5);
+  });
+
+  test('nivelMaximo mira el espectro entero, sin la continua', () => {
+    const e = new Float32Array(16).fill(-Infinity);
+    e[0] = 0;
+    e[3] = -30;
+    e[12] = -10;
+    expect(nivelMaximo(e)).toBe(-10);
+    expect(nivelMaximo(new Float32Array(8).fill(-Infinity))).toBe(-Infinity);
+  });
+
+  test('440 Hz sigue igual de fino, a 48 y a 44,1 kHz', () => {
+    expect(Math.abs(lecturaDelGenerador([{ f: 440, a: 0.5 }], SR)! - 440)).toBeLessThan(0.3);
+    expect(Math.abs(lecturaDelGenerador([{ f: 440, a: 0.5 }], 44100)! - 440)).toBeLessThan(0.3);
+  });
+});
+
 
 test.describe('prominencia — ¿hay un tono o solo ruido?', () => {
   test('ruido blanco solo: el pico no se separa ni 15 dB de la mediana', () => {

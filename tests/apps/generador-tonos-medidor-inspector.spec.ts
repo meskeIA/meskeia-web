@@ -31,7 +31,7 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   3. RECHAZO: el medidor no puede escuchar mientras suena el propio generador. Con el tono o el
  *      barrido sonando, «Medir la frecuencia» los calla (pasa). Pero si se pulsa «Reproducir»
  *      mientras el navegador aún está abriendo el micrófono, los dos quedan activos a la vez
- *      (HALLAZGO M2, ABIERTO).
+ *      (HALLAZGO M2, id 2413, REPARADO el 29/09/2026).
  * Más la SOSPECHA del 28/09 (type="number" + parseSpanishNumber): aquí no se da.
  */
 
@@ -214,7 +214,8 @@ test.describe('CASO 1 (móvil) — la puerta del hero y la lectura en un Pixel 7
   });
 
   /**
-   * HALLAZGO M3 [bajo · operativa] — ABIERTO. El enlace nuevo del hero («Mídelo con el
+   * HALLAZGO M3 [bajo · operativa] (id 2414) — REPARADO el 29/09/2026: la sección lleva
+   * `scroll-margin-top: 5rem` (.seccionMedidor), 80 px, por encima de los 62 px de la barra. El enlace nuevo del hero («Mídelo con el
    * micrófono», ce2dfa44) salta a #medir-frecuencia sin `scroll-margin-top`, y la barra del logo
    * es `position: fixed`. En el Pixel 7 (412×839) el título de la sección queda a 26-49 px de
    * arriba y la píldora del logo lo tapa hasta los 62 px: se lee «frecuencia de un sonido» con
@@ -222,8 +223,7 @@ test.describe('CASO 1 (móvil) — la puerta del hero y la lectura en un Pixel 7
    *   esperado  lo que hay en el arranque del título (5 px a su derecha, a media altura) es el título
    *   obtenido  el SVG del logo (elementFromPoint), título en top = 26 px con la barra hasta 62 px
    */
-  test('HALLAZGO M3 (ABIERTO) — tras el enlace del hero, el título de la sección no queda bajo el logo', async ({ page }) => {
-    test.fail(true, 'ABIERTO: M3, el logo fijo tapa el título al llegar por el ancla');
+  test('HALLAZGO M3 (REPARADO) — tras el enlace del hero, el título de la sección no queda bajo el logo', async ({ page }) => {
     await abrir(page);
     await page.getByRole('link', { name: 'Mídelo con el micrófono' }).tap();
     await expect(page).toHaveURL(/#medir-frecuencia$/);
@@ -276,7 +276,13 @@ test.describe('CASO 3 — no se escucha a sí mismo', () => {
   });
 
   /**
-   * HALLAZGO M2 [bajo · operativa] — ABIERTO. `iniciarMedidor` comprueba `reproduciendo` y para
+   * HALLAZGO M2 [bajo · operativa] (id 2413) — REPARADO el 29/09/2026. Gana lo último que se
+   * pulsa, como cuando el medidor ya escucha: `iniciarAudio` (por la que pasa también el barrido)
+   * marca la apertura en curso como cancelada, e `iniciarMedidor`, al llegar el micrófono, suelta
+   * la pista y no arranca. De las dos salidas que admite el «esperado», esta: el medidor no
+   * arranca, el tono sigue, y la pista del micrófono queda 'ended' (sin indicador de grabación).
+   *
+   * Lo que pasaba: `iniciarMedidor` comprueba `reproduciendo` y para
    * el tono ANTES de `await getUserMedia`, y el guardia de `iniciarAudio` mira `medidorRef`, que
    * solo existe DESPUÉS. En la ventana entre las dos cosas —lo que tarda el navegador en abrir el
    * micrófono o el usuario en aceptar el permiso— pulsar «Reproducir» (o «Iniciar barrido»)
@@ -288,8 +294,7 @@ test.describe('CASO 3 — no se escucha a sí mismo', () => {
    *   obtenido  «Dejar de medir» aria-pressed=true y «Detener» aria-pressed=true a la vez
    *             (con «Iniciar barrido» en lugar de «Reproducir», igual: barrido + medidor)
    */
-  test('HALLAZGO M2 (ABIERTO) — pulsar Reproducir mientras se abre el micrófono no deja los dos activos', async ({ page }) => {
-    test.fail(true, 'ABIERTO: M2, carrera entre abrir el micrófono y arrancar el tono');
+  test('HALLAZGO M2 (REPARADO) — pulsar Reproducir mientras se abre el micrófono no deja los dos activos', async ({ page }) => {
     await vigilarMicrofono(page, 1500);
     await abrir(page);
     await botonMedidor(page).click();
@@ -301,6 +306,32 @@ test.describe('CASO 3 — no se escucha a sí mismo', () => {
     const medidor = await botonMedidor(page).getAttribute('aria-pressed');
     const tono = await botonTono(page).getAttribute('aria-pressed');
     expect({ medidor, tono }, 'medidor escuchando con el tono sonando').not.toEqual({ medidor: 'true', tono: 'true' });
+    // La salida elegida: gana el tono, y el micrófono que llegó tarde se suelta.
+    expect({ medidor, tono }).toEqual({ medidor: 'false', tono: 'true' });
+    expect((await pistas(page)).map((p) => p.estado)).toEqual(['ended']);
+  });
+
+  test('HALLAZGO M2.bis (REPARADO) — lo mismo con «Iniciar barrido» en lugar de «Reproducir»', async ({ page }) => {
+    await vigilarMicrofono(page, 1500);
+    await abrir(page);
+    await botonMedidor(page).click();
+    await page.waitForTimeout(300);
+    await botonBarrido(page).click();
+    await page.waitForTimeout(2500);
+    expect(await pistas(page), 'el micrófono tenía que haberse abierto').toHaveLength(1);
+    await expect(botonMedidor(page)).toHaveAttribute('aria-pressed', 'false');
+    await expect(botonBarrido(page)).toHaveAttribute('aria-pressed', 'true');
+    await expect(botonTono(page)).toHaveAttribute('aria-pressed', 'true');
+    expect((await pistas(page)).map((p) => p.estado)).toEqual(['ended']);
+  });
+
+  test('M2 · sin nada en medio, el micrófono lento se abre y mide igual', async ({ page }) => {
+    // Contraprueba del arreglo: la cancelación solo la dispara arrancar el tono.
+    await vigilarMicrofono(page, 1500);
+    await abrir(page);
+    await botonMedidor(page).click();
+    await expect(botonMedidor(page)).toHaveAttribute('aria-pressed', 'true', { timeout: 5000 });
+    expect((await pistas(page)).map((p) => p.estado)).toEqual(['live']);
   });
 });
 
