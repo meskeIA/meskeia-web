@@ -196,6 +196,16 @@ test.describe('parseSpanishNumber', () => {
     expect(parseSpanishNumber('3.1416')).toBe(3.1416);     // 4 dígitos → decimal
   });
 
+  // Hallazgo 2409 (simulador-fotografia, 29/09/2026): la etiqueta del campo escribía «−» y el
+  // parser solo aceptaba el guion, así que «−2» tecleado o pegado era «no es un número».
+  test('el signo menos tipográfico (U+2212) vale lo mismo que el guion', () => {
+    expect(parseSpanishNumber('−2')).toBe(-2);
+    expect(parseSpanishNumber('−0,92')).toBe(-0.92);
+    expect(parseSpanishNumber('− 1.234,5')).toBe(-1234.5);
+    // Solo como signo: en medio sigue sin ser un número
+    expect(parseSpanishNumber('1−2')).toBeNaN();
+  });
+
   test('acepta signo y no rompe con entradas sueltas', () => {
     expect(parseSpanishNumber('-200.000')).toBe(-200000);
     expect(parseSpanishNumber('1234')).toBe(1234);

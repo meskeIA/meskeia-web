@@ -221,9 +221,15 @@ export interface PartesNumericas {
 export function partesNumericas(input: string): PartesNumericas | null {
   if (!input || input.trim() === '') return null;
 
-  // Fuera lo que no aporta cifra: espacios (normal, NBSP y fino) y el símbolo pegado
+  // Fuera lo que no aporta cifra: espacios (normal, NBSP y fino) y el símbolo pegado.
+  // El signo menos tipográfico (U+2212) vale lo mismo que el guion: es el que escriben las
+  // etiquetas de la propia app («− menos luz») y el que trae un copiar-pegar de una cifra
+  // negativa bien compuesta. Hasta el 29/09/2026 se rechazaba como «no es un número», y el
+  // aviso invitaba a «usar el signo menos» a quien acababa de usarlo (hallazgo 2409, en las
+  // 21 copias de CasosAula a la vez).
   const limpio = input
     .replace(/[\s\u00A0\u202F]/g, '')
+    .replace(/\u2212/g, '-')
     .replace(/^[€$£%]+|[€$£%]+$/g, '');
 
   // A partir de aquí solo cifras, signo y separadores. Nada de letras ni exponentes.
