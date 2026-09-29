@@ -46,6 +46,39 @@ export const ORDEN_MODULOS_VIGENTE = {
   anterior: 'Orden HAC/1347/2024 (ejercicio 2025)',
 };
 
+/**
+ * Reducción general del rendimiento neto de módulos del ejercicio (DA 1.ª de la Orden anual).
+ *
+ * ⚠️ Existe porque hasta el 29/09/2026 `modulosVsDirecta.ts` aplicaba a los módulos la
+ * reducción de la estimación directa SIMPLIFICADA (art. 30.2.ª RIRPF), con su tope de
+ * 2.000 € (hallazgo 2445 del Inspector). Son dos figuras distintas: la de módulos NO tiene
+ * tope en euros, y se aplica sobre el «rendimiento neto de módulos», que es lo que queda
+ * DESPUÉS de las minoraciones por incentivos al empleo y a la inversión (Anexo II, instr.
+ * 2.2) y de los índices correctores (instr. 2.3). El motor la restaba antes del empleo.
+ *
+ * Verificado 2026-09-29 contra el texto del BOE-A-2025-25272: «podrán reducir el
+ * rendimiento neto de módulos obtenido en 2026 en un 5 por ciento» (DA 1.ª.1), y se tiene
+ * en cuenta también en los pagos fraccionados (DA 1.ª.3). Es transitoria: la fija cada
+ * Orden para su ejercicio, así que al re-sellar hay que leer la del año siguiente.
+ */
+export const REDUCCION_GENERAL_MODULOS = {
+  porcentaje: 5,
+  ejercicio: 2026,
+  norma: 'DA 1.ª de la Orden HAC/1425/2025',
+  verificado: '2026-09-29',
+};
+
+/**
+ * Reducción general de módulos ya calculada, sin tope.
+ *
+ * @param rendimientoNetoModulos Rendimiento neto de módulos (tras incentivos e índices), en €.
+ * @returns El importe de la reducción, 0 si el rendimiento no es positivo.
+ */
+export function reduccionGeneralModulos(rendimientoNetoModulos: number): number {
+  if (!(rendimientoNetoModulos > 0)) return 0;
+  return (rendimientoNetoModulos * REDUCCION_GENERAL_MODULOS.porcentaje) / 100;
+}
+
 export const LIMITES_EXCLUSION_MODULOS_2025 = {
   // Volumen de rendimientos íntegros del conjunto de actividades (año anterior)
   ingresosConjuntoActividades: 250000,

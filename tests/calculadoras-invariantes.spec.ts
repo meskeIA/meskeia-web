@@ -4694,9 +4694,59 @@ test.describe('modulosVsDirecta — elegibilidad antes que importe', () => {
     expect(reduccionGastosDificilJustificacion(0)).toBe(0);
     expect(reduccionGastosDificilJustificacion(-5000)).toBe(0);
 
+    // Desde el 29/09/2026 (hallazgo 2444) la cuota RETA del titular se deduce ANTES del 5 %:
+    // 50.000 − 11.200 − 300 × 12 = 35.200 de rendimiento previo, y su 5 % son 1.760 €. El
+    // 1.940 que había aquí era el 5 % de 38.800, con la cuota sin deducir.
     const r = compararModulosVsDirecta({
       ingresos: 50000, gastos: 11200, retaMensual: 300, actividad: 'comercio_menor', superficie: 80,
     });
-    expect(r.estimacionDirecta.reduccion5pc).toBe(1940);
+    expect(r.estimacionDirecta.rendimientoNetoPrevio).toBe(35200);
+    expect(r.estimacionDirecta.reduccion5pc).toBe(1760);
+  });
+
+  // Hallazgo 2444 (inspector 29/09/2026): en directa, la cuota RETA es gasto deducible
+  // (Manual práctico de Renta de la AEAT, cap. 7) y el motor solo la sumaba al coste. Caso: el
+  // bar de partida de la app. Cuentas a mano, escala general de 2025 (19 % hasta 12.450):
+  //   directa  30.000 − 18.000 − 3.840 = 8.160 · 5 % = 408 · base 7.752
+  //            IRPF 7.752 × 0,19 − 5.550 × 0,19 = 1.472,88 − 1.054,50 = 418,38 · coste 4.258,38
+  //   módulos  9.000 + 800 + 300 + 500 = 10.600 · empleo 100 · 10.500 · 5 % = 525 · base 9.975
+  //            IRPF 1.895,25 − 1.054,50 = 840,75 · coste 4.680,75
+  // Antes: directa 1.111,50 € de IRPF y recomendaba MÓDULOS por 271,70 €. Ahora gana directa.
+  test('ALTO [2444]: la cuota RETA se deduce en directa y la recomendación cambia de lado', () => {
+    const r = compararModulosVsDirecta({
+      ingresos: 30000, gastos: 18000, retaMensual: 320, actividad: 'bar',
+      mesas: 6, personalAsalariado: 1, personalNoAsalariado: 1, superficie: 50, kwh: 10000,
+    });
+    expect(r.estimacionDirecta.cuotaRetaDeducida).toBe(3840);
+    expect(r.estimacionDirecta.rendimientoNetoPrevio).toBe(8160);
+    expect(r.estimacionDirecta.baseLiquidable).toBeCloseTo(7752, 2);
+    expect(r.estimacionDirecta.irpf).toBeCloseTo(418.38, 2);
+    expect(r.estimacionDirecta.costeAnualTotal).toBeCloseTo(4258.38, 2);
+    expect(r.modulos.irpf).toBeCloseTo(840.75, 2);
+    expect(r.modulos.costeAnualTotal).toBeCloseTo(4680.75, 2);
+    expect(r.regimenRecomendado).toBe('Estimación Directa Simplificada');
+    // La cuota se paga igual en los dos regímenes: en módulos NO reduce el rendimiento
+    expect(r.modulos.cuotaReta).toBe(3840);
+    expect(r.modulos.rendimientoNetoPrevio).toBe(10600);
+  });
+
+  // Hallazgo 2445: la reducción general de módulos (DA 1.ª Orden HAC/1425/2025) es el 5 % SIN
+  // tope del «rendimiento neto de módulos», que en el Anexo II es posterior a la minoración por
+  // incentivos al empleo (instr. 2.2). El motor usaba la de la directa simplificada (tope de
+  // 2.000 €) y la restaba antes del empleo. Bar con 30 mesas, 5 asalariados, 200 m², 50.000 kWh:
+  //   previo 45.000 + 4.000 + 1.200 + 2.500 = 52.700 · empleo 500 · 52.200 · 5 % = 2.610
+  //   base 49.590 · escala 2.365,50 + 1.860 + 4.500 + 14.390 × 0,37 = 14.049,80 · IRPF 12.995,30
+  // El acta esperaba 12.986,05 (5 % de 52.700 antes del empleo): se corrige con el BOE delante.
+  test('[2445] el 5 % de módulos no tiene tope y va tras el incentivo al empleo', () => {
+    const r = compararModulosVsDirecta({
+      ingresos: 30000, gastos: 18000, retaMensual: 320, actividad: 'bar',
+      mesas: 30, personalAsalariado: 5, personalNoAsalariado: 1, superficie: 200, kwh: 50000,
+    });
+    expect(r.modulos.rendimientoNetoPrevio).toBe(52700);
+    expect(r.modulos.reduccionEmpleo).toBe(500);
+    expect(r.modulos.rendimientoNetoModulos).toBe(52200);
+    expect(r.modulos.reduccion5pc).toBeCloseTo(2610, 2);
+    expect(r.modulos.baseLiquidable).toBeCloseTo(49590, 2);
+    expect(r.modulos.irpf).toBeCloseTo(12995.3, 2);
   });
 });

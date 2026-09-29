@@ -19,7 +19,7 @@
  * no como cálculo definitivo del régimen.
  */
 import { MINIMOS_IRPF_2025, calcularCuotaIntegraGeneral, cuotaEscalaGeneral } from '@/data/fiscal/irpf';
-import { LIMITES_EXCLUSION_MODULOS_2025 } from '@/data/fiscal/modulos-irpf';
+import { LIMITES_EXCLUSION_MODULOS_2025, reduccionGeneralModulos } from '@/data/fiscal/modulos-irpf';
 import { reduccionGastosDificilJustificacion } from '@/data/fiscal/estimacion-directa';
 
 export type ActividadModulos = 'bar' | 'comercio_menor' | 'transporte' | 'peluqueria' | 'taxi';
@@ -44,6 +44,9 @@ export interface ParametrosModulosVsDirecta {
 export interface ResultadoRegimenED {
   ingresos: number;
   gastos: number;
+  /** Cuota RETA anual del titular, que en directa es gasto deducible (y además se paga). */
+  cuotaRetaDeducida: number;
+  /** Ingresos − gastos − cuota RETA (mínimo 0). */
   rendimientoNetoPrevio: number;
   reduccion5pc: number;
   rendimientoNetoReducido: number;
@@ -62,8 +65,12 @@ export interface ResultadoRegimenED {
 
 export interface ResultadoRegimenModulos {
   rendimientoNetoPrevio: number;
-  reduccion5pc: number;
+  /** Minoración por incentivos al empleo (Anexo II, instr. 2.2), simplificada. */
   reduccionEmpleo: number;
+  /** Previo − incentivos al empleo: lo que la Orden llama «rendimiento neto de módulos». */
+  rendimientoNetoModulos: number;
+  /** Reducción general del 5 % SIN tope sobre el rendimiento neto de módulos (DA 1.ª). */
+  reduccion5pc: number;
   rendimientoNetoReducido: number;
   /** Mínimo personal del art. 57 LIRPF. NO se resta de la base: se grava a tipo cero. */
   minimosPersonales: number;
@@ -139,7 +146,13 @@ function calcularRendimientoModulos(p: ParametrosModulosVsDirecta): number {
 }
 
 function calcularED(ingresos: number, gastos: number, retaMensual: number): ResultadoRegimenED {
-  const rendimientoNetoPrevio = Math.max(0, ingresos - gastos);
+  const cuotaReta = retaMensual * 12;
+  // Las cotizaciones del titular al RETA son gasto deducible en directa (Manual práctico de
+  // Renta de la AEAT, cap. 7, «Gastos de personal»). Hasta el 29/09/2026 este motor solo las
+  // sumaba al coste, así que el IRPF de directa salía inflado en cuota × tipo marginal
+  // (1.420,80 € en el bar de partida de la app) y la recomendación podía salir al revés
+  // (hallazgo 2444). En módulos NO se deducen: el rendimiento sale de los signos.
+  const rendimientoNetoPrevio = Math.max(0, ingresos - gastos - cuotaReta);
   // Provisiones y gastos de difícil justificación (art. 30.2.ª RIRPF), sellado en data/fiscal.
   const reduccion5pc = reduccionGastosDificilJustificacion(rendimientoNetoPrevio);
   const rendimientoNetoReducido = Math.max(0, rendimientoNetoPrevio - reduccion5pc);
@@ -147,10 +160,10 @@ function calcularED(ingresos: number, gastos: number, retaMensual: number): Resu
   // lo grava a tipo cero por la vía del art. 63.1.2º.
   const baseLiquidable = rendimientoNetoReducido;
   const { cuotaEscala, cuotaMinimo, irpf } = calcularIRPF(baseLiquidable);
-  const cuotaReta = retaMensual * 12;
   return {
     ingresos,
     gastos,
+    cuotaRetaDeducida: cuotaReta,
     rendimientoNetoPrevio,
     reduccion5pc,
     rendimientoNetoReducido,
@@ -190,12 +203,16 @@ function calcularModulos(p: ParametrosModulosVsDirecta): ResultadoRegimenModulos
   const motivoNoApta: MotivoNoApta = esApta ? null : !dentroDeLimites ? 'supera_limites' : 'sin_parametros';
 
   const rendimientoNetoPrevio = calcularRendimientoModulos(p);
-  // La Orden anual de módulos fija la misma reducción general del 5 % sobre el rendimiento
-  // neto de módulos, con el mismo tope.
-  const reduccion5pc = reduccionGastosDificilJustificacion(rendimientoNetoPrevio);
-  // Reducción incentivos al empleo (simplificado: 100 € por persona asalariada)
-  const reduccionEmpleo = asal * 100;
-  const rendimientoNetoReducido = Math.max(0, rendimientoNetoPrevio - reduccion5pc - reduccionEmpleo);
+  // Minoración por incentivos al empleo (Anexo II, instr. 2.2; simplificada: 100 € por
+  // persona asalariada). Va ANTES de la reducción general: el orden es previo → minorado →
+  // índices correctores (que esta simulación no modela) → rendimiento neto de módulos.
+  const reduccionEmpleo = Math.min(asal * 100, rendimientoNetoPrevio);
+  const rendimientoNetoModulos = Math.max(0, rendimientoNetoPrevio - reduccionEmpleo);
+  // Reducción general del 5 % de la DA 1.ª de la Orden anual, SIN tope en euros. Hasta el
+  // 29/09/2026 se usaba aquí la de la directa simplificada, con su tope de 2.000 €, y se
+  // restaba antes del incentivo al empleo (hallazgo 2445).
+  const reduccion5pc = reduccionGeneralModulos(rendimientoNetoModulos);
+  const rendimientoNetoReducido = Math.max(0, rendimientoNetoModulos - reduccion5pc);
   // El mínimo NO se resta aquí: la base liquidable general lo lleva dentro y calcularIRPF
   // lo grava a tipo cero por la vía del art. 63.1.2º.
   const baseLiquidable = rendimientoNetoReducido;
@@ -203,8 +220,9 @@ function calcularModulos(p: ParametrosModulosVsDirecta): ResultadoRegimenModulos
   const cuotaReta = p.retaMensual * 12;
   return {
     rendimientoNetoPrevio,
-    reduccion5pc,
     reduccionEmpleo,
+    rendimientoNetoModulos,
+    reduccion5pc,
     rendimientoNetoReducido,
     minimosPersonales: MINIMO_PERSONAL,
     baseLiquidable,

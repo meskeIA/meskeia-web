@@ -3000,10 +3000,11 @@ function crearServidorDelegum(): McpServer {
   servidor.tool(
     'comparar_modulos_vs_directa',
     'Compara de forma orientativa qué régimen de IRPF conviene a un autónomo: Estimación Directa Simplificada ' +
-    '(tributa por ingresos reales menos gastos) o Estimación Objetiva por módulos (tributa por parámetros de la ' +
+    '(tributa por ingresos reales menos gastos, y la cuota RETA del titular es gasto deducible) o Estimación Objetiva ' +
+    'por módulos (tributa por parámetros de la ' +
     'actividad: superficie, personal, vehículos…). Devuelve el coste anual total (IRPF + cuota RETA) en cada régimen ' +
     'y cuál sale más barato. ⚠️ Los coeficientes de módulos son DIDÁCTICOS/orientativos, no los importes reales de la ' +
-    'Orden HFP anual: sirven para entender la lógica de decisión, no como cálculo definitivo.',
+    'Orden anual de módulos: sirven para entender la lógica de decisión, no como cálculo definitivo.',
     {
       ingresos_anuales: z.number().nonnegative().describe('Ingresos anuales de la actividad (€)'),
       gastos_anuales: z.number().nonnegative().describe('Gastos deducibles anuales (€) — solo cuentan en Estimación Directa'),
@@ -3049,9 +3050,9 @@ function crearServidorDelegum(): McpServer {
           `📊 **Módulos vs Estimación Directa** (coste anual = IRPF + cuota RETA)`,
           '',
           `🅰️ **Estimación Directa Simplificada: ${fmt(r.estimacionDirecta.costeAnualTotal)} €/año**`,
-          `  • Rendimiento neto: ${fmt(r.estimacionDirecta.rendimientoNetoReducido)} € · IRPF: ${fmt(r.estimacionDirecta.irpf)} € · RETA: ${fmt(r.estimacionDirecta.cuotaReta)} €`,
+          `  • Rendimiento neto (tras deducir la cuota RETA y el 5 % de difícil justificación): ${fmt(r.estimacionDirecta.rendimientoNetoReducido)} € · IRPF: ${fmt(r.estimacionDirecta.irpf)} € · RETA: ${fmt(r.estimacionDirecta.cuotaReta)} €`,
           `🅱️ **Estimación Objetiva (Módulos): ${fmt(r.modulos.costeAnualTotal)} €/año**`,
-          `  • Rendimiento por módulos: ${fmt(r.modulos.rendimientoNetoPrevio)} € · IRPF: ${fmt(r.modulos.irpf)} € · RETA: ${fmt(r.modulos.cuotaReta)} €`,
+          `  • Rendimiento por módulos: ${fmt(r.modulos.rendimientoNetoPrevio)} € (base tras incentivos al empleo y la reducción general del 5 % sin tope: ${fmt(r.modulos.rendimientoNetoReducido)} €) · IRPF: ${fmt(r.modulos.irpf)} € · RETA: ${fmt(r.modulos.cuotaReta)} € (en módulos no desgrava)`,
           avisoNoApta,
           '',
           veredicto,

@@ -20,6 +20,9 @@ import {
   FISCAL_MODULOS_IRPF_META,
   ORDEN_MODULOS_VIGENTE,
   GASTOS_DIFICIL_JUSTIFICACION_EDS,
+  FISCAL_ESTIMACION_DIRECTA_META,
+  REDUCCION_GENERAL_MODULOS,
+  FISCAL_AUTONOMOS_META,
   TRAMOS_RETA_2025,
 } from '@/data/fiscal';
 import { compararModulosVsDirecta } from '@/lib/calculadoras/modulosVsDirecta';
@@ -328,7 +331,7 @@ export default function SimuladorModulosVsDirectaPage() {
         fuente={FISCAL_IRPF_META.fuente}
         verificado={FISCAL_IRPF_META.verificado}
         urlOficial={FISCAL_IRPF_META.urlOficial}
-        nota="El IRPF de ambos regímenes usa esta escala. La cuota RETA la introduces tú libremente dentro del rango real de la tabla de tramos (TRAMOS_RETA_2025) y el rendimiento de módulos usa una fórmula didáctica simplificada, no los coeficientes reales de la Orden HFP."
+        nota={`El IRPF de ambos regímenes usa esta escala. La cuota RETA la introduces tú libremente dentro del rango real de la tabla de tramos (TRAMOS_RETA_2025) y el rendimiento de módulos usa una fórmula didáctica simplificada, no los coeficientes reales de la ${ORDEN_MODULOS_VIGENTE.referencia}.`}
       />
 
       <DataReference
@@ -336,7 +339,23 @@ export default function SimuladorModulosVsDirectaPage() {
         fuente={FISCAL_MODULOS_IRPF_META.fuente}
         verificado={FISCAL_MODULOS_IRPF_META.verificado}
         urlOficial={FISCAL_MODULOS_IRPF_META.urlOficial}
-        nota="El simulador excluye la actividad de módulos si tus ingresos o gastos introducidos superan estos límites. El de facturación a empresas (125.000 €) es solo informativo: no hay campo para ese dato."
+        nota={`El simulador excluye la actividad de módulos si tus ingresos o gastos introducidos superan estos límites. El de facturación a empresas (${formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.facturacionAEmpresas)}) es solo informativo: no hay campo para ese dato. La reducción general del ${REDUCCION_GENERAL_MODULOS.porcentaje}\u00A0% sobre el rendimiento neto de módulos es la de la ${REDUCCION_GENERAL_MODULOS.norma} y no tiene tope en euros.`}
+      />
+
+      <DataReference
+        normativa="Estimación directa simplificada"
+        fuente={FISCAL_ESTIMACION_DIRECTA_META.fuente}
+        verificado={FISCAL_ESTIMACION_DIRECTA_META.verificado}
+        urlOficial={FISCAL_ESTIMACION_DIRECTA_META.urlOficial}
+        nota={`La columna de Estimación Directa resta tu cuota RETA como gasto deducible y aplica el ${GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje}\u00A0% de provisiones y gastos de difícil justificación, con tope de ${formatCurrency(GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual)} al año.`}
+      />
+
+      <DataReference
+        normativa="Cotización de autónomos (RETA)"
+        fuente={FISCAL_AUTONOMOS_META.fuente}
+        verificado={FISCAL_AUTONOMOS_META.verificado}
+        urlOficial={FISCAL_AUTONOMOS_META.urlOficial}
+        nota="Los tramos de rendimiento y cuota con los que se contrasta la cuota que introduces (aviso de coherencia bajo el deslizador)."
       />
 
       <LegalNotice />
@@ -614,7 +633,8 @@ export default function SimuladorModulosVsDirectaPage() {
 
           <p className={styles.notaModulos}>
             <strong>Nota didáctica:</strong> Cálculo orientativo simplificado — los valores reales
-            de los módulos por unidad se publican en la Orden HFP anual del Ministerio de Hacienda.
+            de los módulos por unidad se publican en la Orden anual de módulos del Ministerio de
+            Hacienda (para {ORDEN_MODULOS_VIGENTE.ejercicio}, la {ORDEN_MODULOS_VIGENTE.referencia}).
           </p>
         </div>
 
@@ -626,7 +646,7 @@ export default function SimuladorModulosVsDirectaPage() {
             {/* Columna ED */}
             <div className={`${styles.colED} ${ganaED ? styles.colGanadora : ''}`}>
               <h3 className={styles.colTitle}>Estimación Directa Simplificada</h3>
-              <p className={styles.colSub}>Tributas por beneficio real (ingresos − gastos)</p>
+              <p className={styles.colSub}>Tributas por beneficio real (ingresos − gastos, cuota RETA incluida)</p>
 
               <div className={styles.lineaItem}>
                 <span>Ingresos brutos</span>
@@ -636,12 +656,16 @@ export default function SimuladorModulosVsDirectaPage() {
                 <span>− Gastos deducibles</span>
                 <strong>−{formatCurrency(resED.gastos)}</strong>
               </div>
+              <div className={styles.lineaResta}>
+                <span>− Cuota RETA × 12 (gasto deducible del titular)</span>
+                <strong>−{formatCurrency(resED.cuotaRetaDeducida)}</strong>
+              </div>
               <div className={styles.lineaSubtotal}>
                 <span>= Rendimiento neto previo</span>
                 <strong>{formatCurrency(resED.rendimientoNetoPrevio)}</strong>
               </div>
               <div className={styles.lineaResta}>
-                <span>− Reducción {GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje}% (máx. {formatCurrency(GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual)})</span>
+                <span>− Reducción {GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje}{'\u00A0'}% (máx. {formatCurrency(GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual)})</span>
                 <strong>−{formatCurrency(resED.reduccion5pc)}</strong>
               </div>
               <div className={styles.lineaSubtotal}>
@@ -665,7 +689,7 @@ export default function SimuladorModulosVsDirectaPage() {
                 <strong>{formatCurrency(resED.irpf)}</strong>
               </div>
               <div className={styles.lineaSuma}>
-                <span>+ Cuota RETA × 12</span>
+                <span>+ Cuota RETA × 12 (la pagas igual)</span>
                 <strong>+{formatCurrency(resED.cuotaReta)}</strong>
               </div>
               <div className={styles.lineaTotal}>
@@ -693,12 +717,16 @@ export default function SimuladorModulosVsDirectaPage() {
                 <strong>{formatCurrency(resModulos.rendimientoNetoPrevio)}</strong>
               </div>
               <div className={styles.lineaResta}>
-                <span>− Reducción {GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje}% (máx. {formatCurrency(GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual)})</span>
-                <strong>−{formatCurrency(resModulos.reduccion5pc)}</strong>
+                <span>− Minoración por incentivos al empleo</span>
+                <strong>−{formatCurrency(resModulos.reduccionEmpleo)}</strong>
+              </div>
+              <div className={styles.lineaSubtotal}>
+                <span>= Rendimiento neto de módulos</span>
+                <strong>{formatCurrency(resModulos.rendimientoNetoModulos)}</strong>
               </div>
               <div className={styles.lineaResta}>
-                <span>− Reducción incentivos al empleo</span>
-                <strong>−{formatCurrency(resModulos.reduccionEmpleo)}</strong>
+                <span>− Reducción general {REDUCCION_GENERAL_MODULOS.porcentaje}{'\u00A0'}% (sin tope)</span>
+                <strong>−{formatCurrency(resModulos.reduccion5pc)}</strong>
               </div>
               <div className={styles.lineaSubtotal}>
                 <span>= Rendimiento neto reducido</span>
@@ -814,7 +842,7 @@ export default function SimuladorModulosVsDirectaPage() {
               <tr>
                 <td>Actividades elegibles</td>
                 <td>Cualquiera</td>
-                <td>Solo las de la Orden HFP anual</td>
+                <td>Solo las de la Orden anual de módulos</td>
                 <td>Profesionales liberales: ED obligatoria</td>
               </tr>
               <tr>
@@ -840,8 +868,8 @@ export default function SimuladorModulosVsDirectaPage() {
         </div>
         <p className={styles.tableNote}>
           Datos generales orientativos. Los límites concretos (incluida la prórroga del régimen
-          de módulos) se actualizan anualmente en la Ley de Presupuestos y en la Orden HFP que
-          regula los módulos del año siguiente.
+          de módulos) se actualizan anualmente en la Ley de Presupuestos y en la Orden de Hacienda
+          que regula los módulos del año siguiente (hoy, la {ORDEN_MODULOS_VIGENTE.referencia}).
         </p>
 
         <h3>Casos típicos</h3>
@@ -939,7 +967,7 @@ export default function SimuladorModulosVsDirectaPage() {
           <div className={styles.step}>
             <span className={styles.stepNumber}>1</span>
             <div className={styles.stepContent}>
-              <strong>Comprueba si tu actividad está en la Orden HFP</strong>
+              <strong>Comprueba si tu actividad está en la Orden anual de módulos</strong>
               <p>
                 Si tu epígrafe IAE no aparece, ni siquiera puedes plantearte módulos. Régimen
                 obligatorio: Estimación Directa.
@@ -962,8 +990,9 @@ export default function SimuladorModulosVsDirectaPage() {
               <strong>Calcula el rendimiento por módulos</strong>
               <p>
                 Según los parámetros oficiales de tu actividad (mesas, m², personal asalariado y no
-                asalariado, kWh, vehículos…). Aplicas las reducciones ({GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje}%, incentivos al empleo,
-                minoración por inversión).
+                asalariado, kWh, vehículos…). Restas las minoraciones por incentivos al empleo y a la
+                inversión, aplicas los índices correctores y, sobre ese rendimiento neto de
+                módulos, la reducción general del {REDUCCION_GENERAL_MODULOS.porcentaje}{'\u00A0'}% (sin tope).
               </p>
             </div>
           </div>
@@ -972,8 +1001,9 @@ export default function SimuladorModulosVsDirectaPage() {
             <div className={styles.stepContent}>
               <strong>Compara IRPF total + cuota RETA en ambos escenarios</strong>
               <p>
-                No olvides incluir la cuota mensual del RETA × 12. La diferencia entre ambos
-                regímenes puede ser de varios miles de € al año.
+                No olvides incluir la cuota mensual del RETA × 12. En Estimación Directa esa cuota
+                es además gasto deducible y rebaja el IRPF; en módulos no. La diferencia entre
+                ambos regímenes puede ser de varios miles de € al año.
               </p>
             </div>
           </div>
@@ -1029,7 +1059,7 @@ export default function SimuladorModulosVsDirectaPage() {
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🔍</span>
             <div>
-              <strong>Revisa la Orden HFP cada noviembre</strong>
+              <strong>Revisa la Orden de módulos cada noviembre</strong>
               <p>El Ministerio publica los módulos del año siguiente en torno a noviembre/diciembre.</p>
             </div>
           </div>
@@ -1042,11 +1072,11 @@ export default function SimuladorModulosVsDirectaPage() {
           </div>
           <ul className={styles.warningList}>
             <li>Asumir que módulos siempre es más barato — depende del margen real, no del régimen.</li>
-            <li>No comprobar si tu actividad IAE está en la Orden HFP antes de elegir módulos.</li>
+            <li>No comprobar si tu actividad IAE está en la Orden anual de módulos antes de elegir módulos.</li>
             <li>Renunciar a módulos sin saber que el lock-in son 3 años en ED.</li>
             <li>Olvidar que en módulos tributas igual aunque tengas pérdidas reales.</li>
             <li>Confundir el régimen de IRPF con el de IVA — van atados, no son independientes.</li>
-            <li>No actualizar el cálculo cada año al publicarse la Orden HFP de módulos.</li>
+            <li>No actualizar el cálculo cada año al publicarse la Orden de módulos.</li>
           </ul>
         </div>
       </EducationalSection>
