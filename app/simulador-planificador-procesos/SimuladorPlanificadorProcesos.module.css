@@ -1038,3 +1038,15 @@
   font-size: 0.75rem;
   opacity: 0.85;
 }
+
+/* Cómo se rompen los empates (hallazgo 2398): una línea bajo el selector de algoritmo */
+.notaDesempate {
+  margin: var(--spacing-md) 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Campo con un número por debajo del mínimo mientras se teclea (hallazgos 2399-2400) */
+.procesoInput[aria-invalid='true'] {
+  border-color: var(--error);
+}

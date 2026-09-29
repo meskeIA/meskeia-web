@@ -147,6 +147,136 @@ function acotar(valor: number, min: number, max: number): number {
 }
 
 /**
+ * Los motores trabajan en centésimas de unidad de tiempo, enteras. La llegada admite hasta
+ * dos decimales (el campo la redondea a la centésima) y la ráfaga es entera (hallazgo 760).
+ */
+const ESCALA = 100;
+
+/** Decimales que admite cada campo de la tabla de procesos. */
+const DECIMALES_LLEGADA = 2;
+
+/**
+ * Un tiempo en formato español con los decimales que DE VERDAD tiene (0, 1 o 2): «8», «7,6»,
+ * «0,45». Los tiempos del simulador son centésimas exactas, así que esto no redondea nada.
+ *
+ * La tabla por proceso pasaba espera, turnaround y respuesta por `formatNumber(x, 0)` e imprimía
+ * la llegada, el inicio y el fin crudos: con una llegada de 0,4 enseñaba «0.4» con punto y una
+ * espera de «8» donde el motor calculaba 7,6, así que la media de la columna (6,33) no cuadraba
+ * con la tarjeta de encima (6,20) (hallazgo 2402).
+ */
+function formatTiempo(x: number): string {
+  const centesimas = Math.round(x * ESCALA);
+  const decimales = centesimas % 100 === 0 ? 0 : centesimas % 10 === 0 ? 1 : 2;
+  return formatNumber(centesimas / ESCALA, decimales);
+}
+
+/** Caracteres que puede llevar un campo de tiempo mientras se teclea: ni letras ni exponentes. */
+const CARACTERES_CIFRA = /^[\s0-9.,+\-−]*$/;
+
+/**
+ * Lee lo tecleado en un campo de la tabla de procesos. NaN si todavía no es un número.
+ *
+ * Ningún campo de la tabla llega al millar (la llegada topa en 99), así que un punto sin coma
+ * es SIEMPRE el separador decimal: «2.5» es 2,5, como lo teclea medio continente y la tecla
+ * decimal del teclado numérico (hallazgo 2400). `parseSpanishNumber` a secas leería «1.500»
+ * como mil quinientos, que aquí no tiene sentido.
+ */
+function leerCifra(texto: string): number {
+  const normalizado = texto.includes(',') ? texto : texto.replace(/\./g, ',');
+  return parseSpanishNumber(normalizado);
+}
+
+interface CampoTiempoProps {
+  valor: number;
+  min: number;
+  max: number;
+  /** 0 = el campo es entero (lo tecleado se redondea a la unidad) */
+  decimales: number;
+  ariaLabel: string;
+  title?: string;
+  disabled?: boolean;
+  onCambio: (v: number) => void;
+}
+
+/**
+ * Un campo numérico de la tabla de procesos (hallazgos 2399 y 2400, 29/09/2026).
+ *
+ * Eran `<input type="number">` con `Number(v) || 1` (ráfaga y prioridad) y `Number(v) || 0`
+ * (llegada). Al vaciar el campo con Retroceso el estado saltaba al respaldo, React escribía «1»
+ * bajo el cursor y lo tecleado quedaba detrás: se borraba el 6 de la ráfaga, se tecleaba 3 y
+ * entraba 13; la prioridad 5 entraba como 15 → 10, la más baja. Y el navegador entrega vacío el
+ * estado intermedio «2.», así que una llegada tecleada con punto («2.5») entraba como 5.
+ *
+ * Ahora es de texto y tiene dos caras (receta del simulador-campo-electrico, 33c10c79):
+ *   · con el foco enseña LO QUE SE TECLEA, tal cual, y el valor solo se aplica cuando lo
+ *     escrito ya es un número; vacío o a medio escribir, el enunciado conserva el anterior;
+ *   · sin el foco enseña el valor aplicado, en formato español.
+ * Un número por ENCIMA del máximo se topa y el campo lo enseña en el acto (seguir tecleando
+ * solo lo haría mayor). Uno por DEBAJO del mínimo se aplica acotado pero no se reescribe bajo
+ * el cursor —«0» puede ser el principio de «0,4»—: el campo se marca inválido y al salir
+ * enseña el valor que se usa. ↑/↓ suben y bajan una unidad, como hacía el `type="number"`.
+ */
+function CampoTiempo({ valor, min, max, decimales, ariaLabel, title, disabled, onCambio }: CampoTiempoProps) {
+  /** null = sin foco: el campo enseña el valor aplicado. */
+  const [borrador, setBorrador] = useState<string | null>(null);
+  const texto = borrador ?? formatTiempo(valor);
+  const leido = borrador === null ? valor : leerCifra(borrador);
+  const invalido = borrador !== null && borrador.trim() !== '' && (!Number.isFinite(leido) || leido < min);
+
+  const redondear = (n: number) => {
+    const factor = 10 ** decimales;
+    return Math.round(n * factor) / factor;
+  };
+
+  const escalonar = (paso: number) => {
+    const nuevo = acotar(redondear(valor + paso), min, max);
+    onCambio(nuevo);
+    setBorrador(formatTiempo(nuevo));
+  };
+
+  return (
+    <input
+      type="text"
+      inputMode="decimal"
+      autoComplete="off"
+      spellCheck={false}
+      role="spinbutton"
+      aria-valuemin={min}
+      aria-valuemax={max}
+      aria-valuenow={valor}
+      aria-invalid={invalido || undefined}
+      aria-label={ariaLabel}
+      title={title}
+      disabled={disabled}
+      value={texto}
+      className={styles.procesoInput}
+      onFocus={() => setBorrador(formatTiempo(valor))}
+      onBlur={() => setBorrador(null)}
+      onChange={(e) => {
+        const escrito = e.target.value;
+        if (!CARACTERES_CIFRA.test(escrito)) return;
+        const n = leerCifra(escrito);
+        if (!Number.isFinite(n)) {
+          setBorrador(escrito);
+          return;
+        }
+        const aplicado = acotar(redondear(n), min, max);
+        onCambio(aplicado);
+        setBorrador(n > max ? formatTiempo(aplicado) : escrito);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          escalonar(e.key === 'ArrowUp' ? 1 : -1);
+        } else if (e.key === 'Enter') {
+          setBorrador(formatTiempo(valor));
+        }
+      }}
+    />
+  );
+}
+
+/**
  * El desempate es FCFS: entre dos procesos igual de buenos gana el que lleva más tiempo
  * esperando, que es la convención de Silberschatz y la que se corrige en un examen.
  *
@@ -222,52 +352,92 @@ function simularSJF(procesos: Proceso[]): { bloques: BloqueGantt[]; ordenInicio:
   return { bloques, ordenInicio };
 }
 
-// SRTF (apropiativo): tick por tick
-function simularSRTF(procesos: Proceso[]): { bloques: BloqueGantt[]; ordenInicio: Record<string, number> } {
-  const restantes: Record<string, number> = {};
+/**
+ * Motor de los dos algoritmos apropiativos (SRTF y Priority apropiativo), por EVENTOS.
+ *
+ * `clave` dice lo bueno que es un proceso (menor = mejor): el tiempo que le queda en SRTF y
+ * su prioridad en Priority. La CPU solo se replantea en dos clases de instante, que son los
+ * únicos en que puede cambiar algo: cuando llega un proceso y cuando termina el que corre.
+ *
+ * Hasta el 29/09/2026 los dos avanzaban tick a tick (`t += 1`) y solo miraban `llegada <= t`
+ * con t entero, así que un proceso que llegaba en 0,4 no podía expulsar a nadie hasta t = 1:
+ * en el ejercicio de Silberschatz P1(0; 8), P2(0,4; 4), P3(1; 1), SRTF daba 2,20 de espera
+ * media en vez de 2,00 (hallazgo 2401). FCFS, SJF y Round Robin ya trabajaban por eventos.
+ *
+ * Desempate (hallazgo 2398): el de SJF — entre dos igual de buenos gana el que llegó antes y,
+ * si llegaron a la vez, el de la fila de más arriba —, y además la regla del libro para los
+ * apropiativos: un empate NO expulsa al proceso que está en CPU; solo lo expulsa uno
+ * ESTRICTAMENTE mejor. Antes SRTF conservaba un `reduce` por orden de la tabla: con P1(2, 3)
+ * y P2(0, 5), en t=2 empataban a 3 y P1 expulsaba a P2, que es un cambio de contexto que no
+ * existe y deja las filas de la tabla intercambiadas.
+ *
+ * Los tiempos llegan ya en centésimas enteras (ver `ESCALA`), así que el resto que se descuenta
+ * en cada tramo es exacto y dos restos iguales comparan iguales.
+ */
+function simularApropiativo(
+  procesos: Proceso[],
+  clave: (p: Proceso, resto: number) => number,
+): { bloques: BloqueGantt[]; ordenInicio: Record<string, number> } {
+  const resto: Record<string, number> = {};
   procesos.forEach((p) => {
-    restantes[p.id] = p.rafaga;
+    resto[p.id] = p.rafaga;
   });
   const ordenInicio: Record<string, number> = {};
   const bloques: BloqueGantt[] = [];
+
+  const anotar = (pid: string, inicio: number, fin: number) => {
+    const ultimo = bloques[bloques.length - 1];
+    if (ultimo && ultimo.pid === pid && ultimo.fin === inicio) {
+      ultimo.fin = fin;
+      return;
+    }
+    const color = pid === 'idle' ? COLOR_IDLE : colorParaProceso(pid, procesos);
+    bloques.push({ pid, inicio, fin, color });
+  };
+
   let t = 0;
-  const totalTrabajo = procesos.reduce((s, p) => s + p.rafaga, 0);
-  const tiempoMaxEspera = procesos.reduce((max, p) => Math.max(max, p.llegada), 0) + totalTrabajo + 100;
-  let ultimoPid: string | null = null;
-  while (Object.values(restantes).some((r) => r > 0)) {
-    if (t > tiempoMaxEspera) break;
-    const disponibles = procesos.filter((p) => p.llegada <= t && restantes[p.id] > 0);
-    if (disponibles.length === 0) {
-      if (ultimoPid !== 'idle') {
-        bloques.push({ pid: 'idle', inicio: t, fin: t + 1, color: COLOR_IDLE });
-        ultimoPid = 'idle';
-      } else {
-        const last = bloques[bloques.length - 1];
-        if (last) last.fin = t + 1;
-      }
-      t += 1;
+  let enCpu: Proceso | null = null;
+  for (;;) {
+    const quedan = procesos.filter((p) => resto[p.id] > 0);
+    if (quedan.length === 0) break;
+
+    const listos = quedan.filter((p) => p.llegada <= t);
+    if (listos.length === 0) {
+      const proxima = Math.min(...quedan.map((p) => p.llegada));
+      anotar('idle', t, proxima);
+      t = proxima;
+      enCpu = null;
       continue;
     }
-    const elegido = disponibles.reduce((min, p) => (restantes[p.id] < restantes[min.id] ? p : min));
-    if (ordenInicio[elegido.id] === undefined) {
-      ordenInicio[elegido.id] = t;
+
+    let elegido = listos.reduce((a, b) => {
+      const ka = clave(a, resto[a.id]);
+      const kb = clave(b, resto[b.id]);
+      if (kb !== ka) return kb < ka ? b : a;
+      return b.llegada < a.llegada ? b : a;
+    });
+    // Un empate no expulsa: el que está en CPU sigue salvo que haya otro ESTRICTAMENTE mejor
+    if (enCpu && resto[enCpu.id] > 0 && clave(elegido, resto[elegido.id]) >= clave(enCpu, resto[enCpu.id])) {
+      elegido = enCpu;
     }
-    if (ultimoPid !== elegido.id) {
-      bloques.push({
-        pid: elegido.id,
-        inicio: t,
-        fin: t + 1,
-        color: colorParaProceso(elegido.id, procesos),
-      });
-      ultimoPid = elegido.id;
-    } else {
-      const last = bloques[bloques.length - 1];
-      if (last) last.fin = t + 1;
-    }
-    restantes[elegido.id] -= 1;
-    t += 1;
+
+    // Corre hasta el siguiente evento: su final o la próxima llegada, lo que ocurra antes
+    const llegadasFuturas = quedan.filter((p) => p.llegada > t).map((p) => p.llegada);
+    const proximaLlegada = llegadasFuturas.length > 0 ? Math.min(...llegadasFuturas) : Infinity;
+    const hasta = Math.min(t + resto[elegido.id], proximaLlegada);
+
+    if (ordenInicio[elegido.id] === undefined) ordenInicio[elegido.id] = t;
+    anotar(elegido.id, t, hasta);
+    resto[elegido.id] -= hasta - t;
+    t = hasta;
+    enCpu = elegido;
   }
   return { bloques, ordenInicio };
+}
+
+// SRTF: el apropiativo cuya clave es el tiempo que le queda a cada proceso
+function simularSRTF(procesos: Proceso[]): { bloques: BloqueGantt[]; ordenInicio: Record<string, number> } {
+  return simularApropiativo(procesos, (_p, resto) => resto);
 }
 
 // Round Robin
@@ -379,51 +549,8 @@ function simularPriority(procesos: Proceso[], apropiativo: boolean): { bloques: 
     return { bloques, ordenInicio };
   }
 
-  // Apropiativo: tick por tick
-  const restantes: Record<string, number> = {};
-  procesos.forEach((p) => {
-    restantes[p.id] = p.rafaga;
-  });
-  const ordenInicio: Record<string, number> = {};
-  const bloques: BloqueGantt[] = [];
-  let t = 0;
-  const totalTrabajo = procesos.reduce((s, p) => s + p.rafaga, 0);
-  const tiempoMaxEspera = procesos.reduce((max, p) => Math.max(max, p.llegada), 0) + totalTrabajo + 100;
-  let ultimoPid: string | null = null;
-  while (Object.values(restantes).some((r) => r > 0)) {
-    if (t > tiempoMaxEspera) break;
-    const disponibles = procesos.filter((p) => p.llegada <= t && restantes[p.id] > 0);
-    if (disponibles.length === 0) {
-      if (ultimoPid !== 'idle') {
-        bloques.push({ pid: 'idle', inicio: t, fin: t + 1, color: COLOR_IDLE });
-        ultimoPid = 'idle';
-      } else {
-        const last = bloques[bloques.length - 1];
-        if (last) last.fin = t + 1;
-      }
-      t += 1;
-      continue;
-    }
-    const elegido = disponibles.reduce(mejorPorPrioridad);
-    if (ordenInicio[elegido.id] === undefined) {
-      ordenInicio[elegido.id] = t;
-    }
-    if (ultimoPid !== elegido.id) {
-      bloques.push({
-        pid: elegido.id,
-        inicio: t,
-        fin: t + 1,
-        color: colorParaProceso(elegido.id, procesos),
-      });
-      ultimoPid = elegido.id;
-    } else {
-      const last = bloques[bloques.length - 1];
-      if (last) last.fin = t + 1;
-    }
-    restantes[elegido.id] -= 1;
-    t += 1;
-  }
-  return { bloques, ordenInicio };
+  // Apropiativo: por eventos, con la prioridad como clave (y el mismo desempate que SRTF)
+  return simularApropiativo(procesos, (p) => p.prioridad);
 }
 
 function calcularResultado(
@@ -445,49 +572,74 @@ function calcularResultado(
     };
   }
 
-  let resultado: { bloques: BloqueGantt[]; ordenInicio: Record<string, number> };
-  if (algoritmo === 'fcfs') resultado = simularFCFS(procesos);
-  else if (algoritmo === 'sjf') resultado = simularSJF(procesos);
-  else if (algoritmo === 'srtf') resultado = simularSRTF(procesos);
-  else if (algoritmo === 'rr') resultado = simularRR(procesos, quantum);
-  else resultado = simularPriority(procesos, apropiativo);
+  // Todo el cálculo se hace en CENTÉSIMAS enteras y se devuelve en unidades de tiempo
+  // (hallazgos 2401 y 2402): con una llegada de 0,4 los tramos salen de restas como 4 − 0,6,
+  // que en coma flotante dan 3,4000000000000004, y dos restos que deberían empatar dejan de
+  // hacerlo. En enteros las restas son exactas y las cifras de la tabla, las de la traza a mano.
+  const escalados: Proceso[] = procesos.map((p) => ({
+    ...p,
+    llegada: Math.round(p.llegada * ESCALA),
+    rafaga: Math.round(p.rafaga * ESCALA),
+  }));
 
-  const { bloques, ordenInicio } = resultado;
+  let resultado: { bloques: BloqueGantt[]; ordenInicio: Record<string, number> };
+  if (algoritmo === 'fcfs') resultado = simularFCFS(escalados);
+  else if (algoritmo === 'sjf') resultado = simularSJF(escalados);
+  else if (algoritmo === 'srtf') resultado = simularSRTF(escalados);
+  else if (algoritmo === 'rr') resultado = simularRR(escalados, Math.round(quantum * ESCALA));
+  else resultado = simularPriority(escalados, apropiativo);
+
+  const { ordenInicio } = resultado;
 
   // Tiempo de fin de cada proceso = último bloque de su pid
   const finPorPid: Record<string, number> = {};
-  for (const b of bloques) {
+  for (const b of resultado.bloques) {
     if (b.pid !== 'idle') {
       finPorPid[b.pid] = b.fin;
     }
   }
 
-  const metricas: MetricasProceso[] = procesos.map((p) => {
+  // Métricas en centésimas enteras; se pasan a unidades de tiempo solo al final
+  const enCentesimas = escalados.map((p) => {
     const fin = finPorPid[p.id] ?? 0;
     const inicio = ordenInicio[p.id] ?? 0;
     const turnaround = fin - p.llegada;
-    const espera = turnaround - p.rafaga;
-    const respuesta = inicio - p.llegada;
     return {
       pid: p.id,
       llegada: p.llegada,
       rafaga: p.rafaga,
       inicio,
       fin,
-      espera: Math.max(0, espera),
+      espera: Math.max(0, turnaround - p.rafaga),
       turnaround,
-      respuesta: Math.max(0, respuesta),
+      respuesta: Math.max(0, inicio - p.llegada),
     };
   });
 
-  const completados = metricas.filter((m) => m.fin > 0);
+  const aUt = (c: number) => c / ESCALA;
+  const metricas: MetricasProceso[] = enCentesimas.map((m) => ({
+    pid: m.pid,
+    llegada: aUt(m.llegada),
+    rafaga: aUt(m.rafaga),
+    inicio: aUt(m.inicio),
+    fin: aUt(m.fin),
+    espera: aUt(m.espera),
+    turnaround: aUt(m.turnaround),
+    respuesta: aUt(m.respuesta),
+  }));
+  const bloques: BloqueGantt[] = resultado.bloques.map((b) => ({ ...b, inicio: aUt(b.inicio), fin: aUt(b.fin) }));
+
+  const completados = enCentesimas.filter((m) => m.fin > 0);
   const tiempoMedioEspera =
-    completados.length > 0 ? completados.reduce((s, m) => s + m.espera, 0) / completados.length : 0;
+    completados.length > 0 ? aUt(completados.reduce((s, m) => s + m.espera, 0)) / completados.length : 0;
   const tiempoMedioTurnaround =
-    completados.length > 0 ? completados.reduce((s, m) => s + m.turnaround, 0) / completados.length : 0;
-  const tiempoTotal = bloques.length > 0 ? bloques[bloques.length - 1].fin : 0;
-  const tiempoOcupado = bloques.filter((b) => b.pid !== 'idle').reduce((s, b) => s + (b.fin - b.inicio), 0);
-  const utilizacionCpu = tiempoTotal > 0 ? (tiempoOcupado / tiempoTotal) * 100 : 0;
+    completados.length > 0 ? aUt(completados.reduce((s, m) => s + m.turnaround, 0)) / completados.length : 0;
+  const finTotal = resultado.bloques.length > 0 ? resultado.bloques[resultado.bloques.length - 1].fin : 0;
+  const tiempoTotal = aUt(finTotal);
+  const tiempoOcupado = resultado.bloques
+    .filter((b) => b.pid !== 'idle')
+    .reduce((s, b) => s + (b.fin - b.inicio), 0);
+  const utilizacionCpu = finTotal > 0 ? (tiempoOcupado / finTotal) * 100 : 0;
   const throughput = tiempoTotal > 0 ? completados.length / tiempoTotal : 0;
   const inanicion = procesos.filter((p) => !finPorPid[p.id]).map((p) => p.id);
 
@@ -549,7 +701,10 @@ function corregirRespuestas(metricas: MetricasProceso[], respuestas: RespuestasA
       const crudo = respuestas[m.pid]?.[campo] ?? '';
       const valor = crudo.trim() === '' ? NaN : parseSpanishNumber(crudo);
       const tuyo = Number.isFinite(valor) ? valor : null;
-      celdas.push({ pid: m.pid, campo, tuyo, correcto: m[campo], ok: tuyo === m[campo] });
+      // Se compara en centésimas: los tiempos del simulador son centésimas exactas, y un 7,6
+      // tecleado no tiene por qué ser el mismo double que la división del motor.
+      const ok = tuyo !== null && Math.round(tuyo * ESCALA) === Math.round(m[campo] * ESCALA);
+      celdas.push({ pid: m.pid, campo, tuyo, correcto: m[campo], ok });
     }
   }
 
@@ -566,12 +721,12 @@ function corregirRespuestas(metricas: MetricasProceso[], respuestas: RespuestasA
 /** Por qué esa casilla sale así: la regla, aplicada a los números de ESTE proceso. */
 function explicarCelda(celda: CeldaCorregida, m: MetricasProceso): string {
   if (celda.campo === 'turnaround') {
-    return `Turnaround = fin − llegada. Para ${m.pid}: ${m.fin} − ${m.llegada} = ${m.turnaround}. Es el tiempo total que el proceso pasa en el sistema, desde que llega hasta que termina.`;
+    return `Turnaround = fin − llegada. Para ${m.pid}: ${formatTiempo(m.fin)} − ${formatTiempo(m.llegada)} = ${formatTiempo(m.turnaround)}. Es el tiempo total que el proceso pasa en el sistema, desde que llega hasta que termina.`;
   }
   if (celda.campo === 'espera') {
-    return `Espera = turnaround − ráfaga. Para ${m.pid}: ${m.turnaround} − ${m.rafaga} = ${m.espera}. Es el tiempo que pasa en la cola de listos sin ocupar la CPU; si te falla, revisa antes el fin.`;
+    return `Espera = turnaround − ráfaga. Para ${m.pid}: ${formatTiempo(m.turnaround)} − ${formatTiempo(m.rafaga)} = ${formatTiempo(m.espera)}. Es el tiempo que pasa en la cola de listos sin ocupar la CPU; si te falla, revisa antes el fin.`;
   }
-  return `Fin = el instante en que ${m.pid} suelta la CPU por última vez, que en el diagrama de Gantt es el borde derecho de su último bloque. Aquí es ${m.fin}.`;
+  return `Fin = el instante en que ${m.pid} suelta la CPU por última vez, que en el diagrama de Gantt es el borde derecho de su último bloque. Aquí es ${formatTiempo(m.fin)}.`;
 }
 
 export default function SimuladorPlanificadorProcesos() {
@@ -783,6 +938,21 @@ export default function SimuladorPlanificadorProcesos() {
               </span>
             </div>
           )}
+
+          {/*
+            Cómo rompe los empates, dicho donde se elige el algoritmo (hallazgo 2398): hasta el
+            29/09/2026 solo vivía en un comentario del código, y un alumno que resuelve a mano no
+            tenía cómo saber por qué su tabla salía con dos filas intercambiadas.
+          */}
+          {(algoritmo === 'sjf' || algoritmo === 'srtf' || algoritmo === 'priority') && (
+            <p className={styles.notaDesempate}>
+              <strong>Empates:</strong> gana el proceso que llegó antes (si llegaron a la vez, el de la fila más
+              alta).
+              {algoritmo === 'srtf' || (algoritmo === 'priority' && apropiativo)
+                ? ' Y un empate no expulsa al que ya está en la CPU: solo lo expulsa uno estrictamente mejor.'
+                : ''}
+            </p>
+          )}
         </div>
 
         {/* Ejemplos */}
@@ -835,41 +1005,36 @@ export default function SimuladorPlanificadorProcesos() {
                   <tr key={p.id} className={styles.procesoRow}>
                     <td>{p.id}</td>
                     <td>
-                      <input
-                        type="number"
+                      <CampoTiempo
+                        valor={p.llegada}
                         min={0}
                         max={MAX_LLEGADA}
-                        value={p.llegada}
-                        onChange={(e) => actualizarProceso(idx, 'llegada', acotar(Number(e.target.value) || 0, 0, MAX_LLEGADA))}
-                        className={styles.procesoInput}
-                        aria-label={`Tiempo de llegada del proceso ${p.id}`}
+                        decimales={DECIMALES_LLEGADA}
+                        title="Admite hasta dos decimales (0,4 o 0.4)"
+                        onCambio={(v) => actualizarProceso(idx, 'llegada', v)}
+                        ariaLabel={`Tiempo de llegada del proceso ${p.id}`}
                       />
                     </td>
                     <td>
-                      <input
-                        type="number"
+                      <CampoTiempo
+                        valor={p.rafaga}
                         min={1}
                         max={MAX_RAFAGA}
-                        step={1}
+                        decimales={0}
                         title="Unidades de tiempo enteras"
-                        value={p.rafaga}
-                        onChange={(e) => actualizarProceso(idx, 'rafaga', acotar(Math.round(Number(e.target.value) || 1), 1, MAX_RAFAGA))}
-                        className={styles.procesoInput}
-                        aria-label={`Ráfaga de CPU del proceso ${p.id}`}
+                        onCambio={(v) => actualizarProceso(idx, 'rafaga', v)}
+                        ariaLabel={`Ráfaga de CPU del proceso ${p.id}`}
                       />
                     </td>
                     <td>
-                      <input
-                        type="number"
+                      <CampoTiempo
+                        valor={p.prioridad}
                         min={1}
-                        max={10}
-                        value={p.prioridad}
-                        onChange={(e) =>
-                          actualizarProceso(idx, 'prioridad', acotar(Math.round(Number(e.target.value) || 1), 1, MAX_PRIORIDAD))
-                        }
-                        className={styles.procesoInput}
+                        max={MAX_PRIORIDAD}
+                        decimales={0}
                         disabled={algoritmo !== 'priority'}
-                        aria-label={`Prioridad del proceso ${p.id} (1 es la más alta, ${MAX_PRIORIDAD} la más baja)`}
+                        onCambio={(v) => actualizarProceso(idx, 'prioridad', v)}
+                        ariaLabel={`Prioridad del proceso ${p.id} (1 es la más alta, ${MAX_PRIORIDAD} la más baja)`}
                       />
                     </td>
                     <td>
@@ -970,7 +1135,7 @@ export default function SimuladorPlanificadorProcesos() {
                       y={ganttPaddingTop + ganttBlockHeight + 18}
                       className={styles.ganttTimestamp}
                     >
-                      {b.inicio}
+                      {formatTiempo(b.inicio)}
                     </text>
                     {i === resultado.bloques.length - 1 && (
                       <text
@@ -978,7 +1143,7 @@ export default function SimuladorPlanificadorProcesos() {
                         y={ganttPaddingTop + ganttBlockHeight + 18}
                         className={styles.ganttTimestamp}
                       >
-                        {b.fin}
+                        {formatTiempo(b.fin)}
                       </text>
                     )}
                   </g>
@@ -1023,7 +1188,7 @@ export default function SimuladorPlanificadorProcesos() {
               <div className={styles.metricCard}>
                 <span className={styles.metricLabel}>Tiempo total</span>
                 <div className={styles.metricValue}>
-                  {formatNumber(resultado.tiempoTotal, 0)}
+                  {formatTiempo(resultado.tiempoTotal)}
                   <span className={styles.metricUnit}>ut</span>
                 </div>
               </div>
@@ -1048,8 +1213,8 @@ export default function SimuladorPlanificadorProcesos() {
                 <span aria-hidden="true">⏳</span>
                 <span>
                   <strong>Postergación:</strong> {postergado.pid}, el de prioridad más baja
-                  ({postergado.prioridad}), espera {formatNumber(postergado.espera, 0)} ut para una ráfaga
-                  de {formatNumber(postergado.rafaga, 0)} ut. En este lote termina porque los procesos son
+                  ({postergado.prioridad}), espera {formatTiempo(postergado.espera)} ut para una ráfaga
+                  de {formatTiempo(postergado.rafaga)} ut. En este lote termina porque los procesos son
                   finitos; con llegadas continuas de mayor prioridad esa espera no acabaría nunca, y eso
                   es la <strong>inanición</strong>. El remedio es el envejecimiento (aging), que este
                   simulador no implementa a propósito.
@@ -1078,13 +1243,13 @@ export default function SimuladorPlanificadorProcesos() {
                     {resultado.metricas.map((m) => (
                       <tr key={m.pid}>
                         <td>{m.pid}</td>
-                        <td>{m.llegada}</td>
-                        <td>{formatNumber(m.rafaga, 0)}</td>
-                        <td>{m.fin > 0 ? m.inicio : '—'}</td>
-                        <td>{m.fin > 0 ? m.fin : '—'}</td>
-                        <td>{m.fin > 0 ? formatNumber(m.espera, 0) : '—'}</td>
-                        <td>{m.fin > 0 ? formatNumber(m.turnaround, 0) : '—'}</td>
-                        <td>{m.fin > 0 ? formatNumber(m.respuesta, 0) : '—'}</td>
+                        <td>{formatTiempo(m.llegada)}</td>
+                        <td>{formatTiempo(m.rafaga)}</td>
+                        <td>{m.fin > 0 ? formatTiempo(m.inicio) : '—'}</td>
+                        <td>{m.fin > 0 ? formatTiempo(m.fin) : '—'}</td>
+                        <td>{m.fin > 0 ? formatTiempo(m.espera) : '—'}</td>
+                        <td>{m.fin > 0 ? formatTiempo(m.turnaround) : '—'}</td>
+                        <td>{m.fin > 0 ? formatTiempo(m.respuesta) : '—'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1140,8 +1305,8 @@ export default function SimuladorPlanificadorProcesos() {
                   {resultado.metricas.map((m) => (
                     <tr key={m.pid}>
                       <td>{m.pid}</td>
-                      <td>{m.llegada}</td>
-                      <td>{m.rafaga}</td>
+                      <td>{formatTiempo(m.llegada)}</td>
+                      <td>{formatTiempo(m.rafaga)}</td>
                       {CAMPOS_RESPUESTA.map(({ campo, etiqueta }) => {
                         const celda = celdaCorregida(m.pid, campo);
                         const marca = !celda || celda.tuyo === null ? '' : celda.ok ? styles.celdaOk : styles.celdaMal;
@@ -1149,7 +1314,7 @@ export default function SimuladorPlanificadorProcesos() {
                           <td key={campo} className={marca}>
                             <input
                               type="text"
-                              inputMode="numeric"
+                              inputMode="decimal"
                               value={respuestas[m.pid]?.[campo] ?? ''}
                               onChange={(e) => actualizarRespuesta(m.pid, campo, e.target.value)}
                               className={styles.procesoInput}
@@ -1199,7 +1364,8 @@ export default function SimuladorPlanificadorProcesos() {
                         Primer error en {correccion.primerFallo.pid}, columna{' '}
                         {CAMPOS_RESPUESTA.find((c) => c.campo === correccion.primerFallo?.campo)?.etiqueta}:
                       </strong>{' '}
-                      has escrito {correccion.primerFallo.tuyo} y sale {correccion.primerFallo.correcto}.{' '}
+                      has escrito {formatTiempo(correccion.primerFallo.tuyo ?? 0)} y sale{' '}
+                      {formatTiempo(correccion.primerFallo.correcto)}.{' '}
                       {explicarCelda(
                         correccion.primerFallo,
                         resultado.metricas.find((m) => m.pid === correccion.primerFallo?.pid) as MetricasProceso,

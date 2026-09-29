@@ -312,6 +312,12 @@ test.describe('simulador-planificador-procesos · el motor', () => {
       await rafaga.fill(entrada);
       // El campo se corrige al mínimo declarado y enseña el 1 que realmente se usa:
       // nada de simular en silencio con un valor distinto del que se ve.
+      // Desde el 29/09/2026 (hallazgo 2399) la corrección se enseña al SALIR del campo, no bajo
+      // el cursor: reescribir «1» mientras se teclea era justo lo que convertía un 3 en 13.
+      // Mientras tiene el foco, un número bajo el mínimo marca el campo como inválido; y el
+      // vacío no se aplica (el enunciado conserva el valor anterior, que aquí ya es 1).
+      if (entrada !== '') await expect(rafaga).toHaveAttribute('aria-invalid', 'true');
+      await rafaga.blur();
       await expect(rafaga).toHaveValue('1');
       // P1: llegada 0, ráfaga 1, inicio 0, fin 1, espera 0, turnaround 1, respuesta 0
       expect(await filaMetricas(page, 'P1')).toEqual(['P1', '0', '1', '0', '1', '0', '1', '0']);
@@ -323,6 +329,7 @@ test.describe('simulador-planificador-procesos · el motor', () => {
     const llegada = page.getByLabel('Tiempo de llegada del proceso P1');
     for (const entrada of ['-5', '']) {
       await llegada.fill(entrada);
+      await llegada.blur();
       await expect(llegada).toHaveValue('0');
       expect(await filaMetricas(page, 'P1')).toEqual(['P1', '0', '4', '0', '4', '0', '4', '0']);
     }
@@ -448,9 +455,11 @@ test.describe('simulador-planificador-procesos · reparación 11/09/2026', () =>
     await rafagaP1.fill('2.5');
     await rafagaP1.blur();
 
-    // El campo declara su paso y el valor entra redondeado: ni 2,5 en la tabla ni media
-    // unidad de espera inventada.
-    await expect(rafagaP1).toHaveAttribute('step', '1');
+    // El campo declara que es entero y el valor entra redondeado: ni 2,5 en la tabla ni media
+    // unidad de espera inventada. Desde el 29/09/2026 es un campo de texto (hallazgo 2399), así
+    // que ya no lleva `step`: lo declara su title y, al salir, enseña el 3 que se usa.
+    await expect(rafagaP1).toHaveAttribute('title', 'Unidades de tiempo enteras');
+    await expect(rafagaP1).toHaveValue('3');
     const fila = await filaMetricas(page, 'P1');
     expect(fila[2]).toBe('3');
     expect(fila[5]).toBe('0'); // un proceso solo, llegado en t=0, no puede esperar
@@ -498,8 +507,9 @@ test.describe('simulador-planificador-procesos · reparación 11/09/2026', () =>
  *
  * Convenciones que se aplican, las de la app:
  *   · Prioridad: 1 = la más alta (declarada en la cabecera de la columna, hallazgo 758).
- *   · Desempate: FCFS, gana el que llegó antes. La app NO lo declara en pantalla: vive solo en
- *     el comentario de `mejorPorRafaga` (page.tsx) y en el test 759. Es la de Silberschatz,
+ *   · Desempate: FCFS, gana el que llegó antes. La app NO lo declaraba en pantalla: vivía solo
+ *     en el comentario de `mejorPorRafaga` (page.tsx) y en el test 759 (desde el 29/09/2026 lo
+ *     dice bajo el selector de algoritmo, hallazgo 2398). Es la de Silberschatz,
  *     que en SRTF añade que un empate NO expulsa al que está en CPU (solo expulsa un tiempo
  *     restante ESTRICTAMENTE menor). En los dos empates de abajo ambas reglas señalan al mismo
  *     proceso, así que el esperado no depende de cuál se tome.
@@ -654,8 +664,10 @@ test.describe('simulador-planificador-procesos · inspección 29/09/2026', () =>
 
   /**
    * CASO C (control de la sospecha a) · la LLEGADA sí se puede vaciar y reteclear
-   *   Su respaldo es `|| 0`, y 0 es una llegada legítima: vaciarla deja 0, no un valor ajeno, y
-   *   lo que se teclee después se lee bien (el campo enseña «03», pero el estado es 3).
+   *   Su respaldo era `|| 0`, y 0 es una llegada legítima: vaciarla dejaba 0, no un valor ajeno,
+   *   y lo tecleado después se leía bien (el campo enseñaba «03», pero el estado era 3). Desde el
+   *   29/09/2026 el campo es de texto con borrador (hallazgos 2399-2400): vacío no aplica nada y
+   *   el campo enseña «3», lo tecleado.
    *   Por defecto P1(0, 6) · P2(1, 4) · P3(2, 8), FCFS. Con P2 en t=3:
    *   P1 [0,6] · P3 [6,14] · P2 [14,18] → P2: inicio 14, fin 18, TAT 15, espera 11, respuesta 11
    */
@@ -669,29 +681,33 @@ test.describe('simulador-planificador-procesos · inspección 29/09/2026', () =>
     await llegadaP2.press('Backspace');
     await llegadaP2.pressSequentially('3');
     await esperarValorEnReact(page, llegadaP2, 3);
+    await expect(llegadaP2).toHaveValue('3');
 
     await expect.poll(() => filaMetricas(page, 'P2')).toEqual(['P2', '3', '4', '14', '18', '11', '15', '11']);
   });
 
   /**
-   * HALLAZGO (calculo, medio) · ABIERTO — SRTF sigue desempatando por el ORDEN DE LA TABLA.
+   * HALLAZGO 2398 (calculo, medio) · REPARADO el 29/09/2026 — SRTF desempataba por el ORDEN DE
+   * LA TABLA.
    *
    * El 759 se dio por reparado, pero la reparación (`mejorPorRafaga` / `mejorPorPrioridad`)
-   * solo llegó a SJF y a Priority: `simularSRTF` conserva
+   * solo llegó a SJF y a Priority: `simularSRTF` conservaba
    * `disponibles.reduce((min, p) => (restantes[p.id] < restantes[min.id] ? p : min))`, que en
-   * un empate se queda con el primero de la tabla. Y el 759 nombraba SRTF expresamente.
+   * un empate se quedaba con el primero de la tabla. Y el 759 nombraba SRTF expresamente.
+   * Reparación: SRTF y Priority apropiativo comparten motor (`simularApropiativo`), con el
+   * desempate de SJF (llegó antes; luego la fila) y la regla del libro para los apropiativos:
+   * un empate NO expulsa al que está en CPU. La app lo dice en pantalla bajo el selector.
    *
    * A MANO — P1(llegada 2, ráfaga 3) · P2(llegada 0, ráfaga 5):
    *   t=0 solo P2 → P2 · t=2 llega P1 con 3 y a P2 le quedan 3: EMPATE.
    *   Desempate FCFS (P2 llegó en 0) y regla de libro (un empate no expulsa) → sigue P2.
    *   P2 [0,5] · P1 [5,8]
    *   P1: inicio 5, fin 8, TAT 6, espera 3, respuesta 3 · P2: inicio 0, fin 5, TAT 5, espera 0
-   * Obtenido: P2 [0,2] · P1 [2,5] · P2 [5,8] — un cambio de contexto que no existe y las dos
-   * filas cambiadas (P1 fin 5 espera 0; P2 fin 8 espera 3). Las medias (1,50 y 5,50) coinciden,
-   * que es justo por lo que no se ve sin mirar la tabla por proceso.
+   * Obtenido antes: P2 [0,2] · P1 [2,5] · P2 [5,8] — un cambio de contexto que no existe y las
+   * dos filas cambiadas (P1 fin 5 espera 0; P2 fin 8 espera 3). Las medias (1,50 y 5,50)
+   * coinciden, que es justo por lo que no se ve sin mirar la tabla por proceso.
    */
-  test('ABIERTO · SRTF: un empate con el proceso en CPU no lo expulsa (desempate FCFS)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: simularSRTF desempata por el orden de la tabla (el 759 no llegó a SRTF)');
+  test('2398 · SRTF: un empate con el proceso en CPU no lo expulsa (desempate FCFS)', async ({ page }) => {
     await abrirHidratada(page);
     await page.getByRole('button', { name: 'Limpiar' }).click();
     await page.getByRole('button', { name: '+ Añadir proceso' }).click();
@@ -703,6 +719,10 @@ test.describe('simulador-planificador-procesos · inspección 29/09/2026', () =>
     expect(await marcasTiempo(page)).toEqual(['0', '5', '8']);
     expect(await filaMetricas(page, 'P1')).toEqual(['P1', '2', '3', '5', '8', '3', '6', '3']);
     expect(await filaMetricas(page, 'P2')).toEqual(['P2', '0', '5', '0', '5', '0', '5', '0']);
+
+    // Y la regla está dicha en pantalla, donde se elige el algoritmo
+    await expect(page.getByText(/Empates:.*gana el proceso que llegó antes/)).toBeVisible();
+    await expect(page.getByText(/un empate no expulsa al que ya está en la CPU/)).toBeVisible();
   });
 
   /**
@@ -713,10 +733,9 @@ test.describe('simulador-planificador-procesos · inspección 29/09/2026', () =>
    *   t=4 empatan P1 y P2 a 5; P2 espera desde t=1 → P2 [4,9] · P1 [9,14]
    *   P2: inicio 4, fin 9, TAT 8, espera 3 · P1: inicio 9, fin 14, TAT 12, espera 7
    * Es lo mismo que da SJF con este enunciado, porque ninguna llegada expulsa a P3.
-   * Obtenido en SRTF: P3 [0,4] · P1 [4,9] · P2 [9,14] (filas de P1 y P2 intercambiadas).
+   * Obtenido antes en SRTF: P3 [0,4] · P1 [4,9] · P2 [9,14] (filas de P1 y P2 intercambiadas).
    */
-  test('ABIERTO · SRTF: el empate entre dos en espera lo gana el que llegó antes, como en SJF', async ({ page }) => {
-    test.fail(true, 'ABIERTO: simularSRTF desempata por el orden de la tabla (el 759 no llegó a SRTF)');
+  test('2398 · SRTF: el empate entre dos en espera lo gana el que llegó antes, como en SJF', async ({ page }) => {
     await abrirHidratada(page);
     await fijarProceso(page, 'P1', '2', '5');
     await fijarProceso(page, 'P2', '1', '5');
@@ -733,20 +752,49 @@ test.describe('simulador-planificador-procesos · inspección 29/09/2026', () =>
   });
 
   /**
-   * HALLAZGO (operativa, medio) · ABIERTO — sospecha (a) confirmada: vaciar la ráfaga o la
-   * prioridad con Retroceso las rellena con «1», y lo que se teclee después queda DETRÁS.
+   * El mismo desempate en Priority apropiativo, que comparte motor con SRTF desde la reparación.
    *
-   * `acotar(Math.round(Number(v) || 1), 1, MAX)`: al quedar vacío, el estado salta a 1, React
-   * reescribe el campo a «1» bajo el cursor, y la cifra tecleada se le añade.
+   * A MANO — P1(0; 4; prio 2) · P2(1; 3; prio 2) · P3(2; 2; prio 1):
+   *   t=0 P1 · t=1 llega P2 con la MISMA prioridad → no expulsa, sigue P1
+   *   t=2 llega P3 (prio 1) < P1 (2) → expulsa: P3 [2,4]
+   *   t=4 quedan P1 (prio 2, llegó en 0) y P2 (prio 2, llegó en 1) → P1 [4,6] · P2 [6,9]
+   *   P1: inicio 0, fin 6, TAT 6, espera 2 · P2: inicio 6, fin 9, TAT 8, espera 5, respuesta 5
+   *   P3: inicio 2, fin 4, TAT 2, espera 0
+   */
+  test('2398 · Priority apropiativo: una llegada con la misma prioridad no expulsa', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: BTN_PRIORITY }).click();
+    await fijarProceso(page, 'P1', '0', '4');
+    await fijarProceso(page, 'P2', '1', '3');
+    await fijarProceso(page, 'P3', '2', '2');
+    const prioridades: [string, string][] = [['P1', '2'], ['P2', '2'], ['P3', '1']];
+    for (const [pid, prio] of prioridades) {
+      const campo = page.getByLabel(`Prioridad del proceso ${pid}`, { exact: false });
+      await campo.fill(prio);
+      await esperarValorEnReact(page, campo, prio);
+    }
+
+    await expect.poll(() => bloquesGantt(page)).toEqual(['P1', 'P3', 'P1', 'P2']);
+    expect(await marcasTiempo(page)).toEqual(['0', '2', '4', '6', '9']);
+    expect(await filaMetricas(page, 'P1')).toEqual(['P1', '0', '4', '0', '6', '2', '6', '0']);
+    expect(await filaMetricas(page, 'P2')).toEqual(['P2', '1', '3', '6', '9', '5', '8', '5']);
+    expect(await filaMetricas(page, 'P3')).toEqual(['P3', '2', '2', '2', '4', '0', '2', '0']);
+  });
+
+  /**
+   * HALLAZGO 2399 (operativa, medio) · REPARADO el 29/09/2026 — sospecha (a) confirmada: vaciar
+   * la ráfaga o la prioridad con Retroceso las rellenaba con «1», y lo tecleado quedaba DETRÁS.
+   *
+   * `acotar(Math.round(Number(v) || 1), 1, MAX)`: al quedar vacío, el estado saltaba a 1, React
+   * reescribía el campo a «1» bajo el cursor, y la cifra tecleada se le añadía.
    *   · ráfaga P1 = 6 → Retroceso → «3»   → esperado 3  · obtenido 13
    *   · ráfaga P3 = 8 → Retroceso → «12»  → esperado 12 · obtenido 50 («112» topado al máximo)
    *   · prioridad P1 = 2 → Retroceso → «5» → esperado 5 · obtenido 10 («15» topado al máximo:
-   *     el proceso pasa a la prioridad MÁS BAJA)
-   * El 0 no es un valor legítimo en ninguno de los dos (mínimo 1), así que el `|| 1` no se come un
-   * valor válido: lo que rompe es poder teclear. Sobrescribir con la selección hecha sí funciona.
+   *     el proceso pasaba a la prioridad MÁS BAJA)
+   * Reparación: campo de texto con borrador (`CampoTiempo`): vacío no aplica nada y el campo
+   * enseña lo tecleado.
    */
-  test('ABIERTO · vaciar la ráfaga con Retroceso y teclear otra cifra deja la cifra tecleada', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el respaldo `|| 1` rellena el campo vacío con «1» y la cifra se añade detrás');
+  test('2399 · vaciar la ráfaga con Retroceso y teclear otra cifra deja la cifra tecleada', async ({ page }) => {
     await abrirHidratada(page);
 
     const rafagaP1 = page.getByLabel('Ráfaga de CPU del proceso P1');
@@ -767,8 +815,7 @@ test.describe('simulador-planificador-procesos · inspección 29/09/2026', () =>
     await expect.poll(() => filaMetricas(page, 'P3')).toEqual(['P3', '2', '12', '7', '19', '5', '17', '5']);
   });
 
-  test('ABIERTO · vaciar la prioridad con Retroceso y teclear 5 deja prioridad 5, no 10', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el respaldo `|| 1` rellena el campo vacío con «1» y «5» se lee 15 → 10');
+  test('2399 · vaciar la prioridad con Retroceso y teclear 5 deja prioridad 5, no 10', async ({ page }) => {
     await abrirHidratada(page);
     await page.getByRole('button', { name: BTN_PRIORITY }).click();
 
@@ -778,38 +825,49 @@ test.describe('simulador-planificador-procesos · inspección 29/09/2026', () =>
     await prioridadP1.press('Backspace');
     await prioridadP1.pressSequentially('5');
     await expect(prioridadP1).toHaveValue('5');
+    await prioridadP1.blur();
+    await expect(prioridadP1).toHaveValue('5');
   });
 
   /**
-   * HALLAZGO (operativa, medio) · ABIERTO — sospecha (b), en su forma de ESTA app.
+   * HALLAZGO 2400 (operativa, medio) · REPARADO el 29/09/2026 — sospecha (b), en su forma de ESTA
+   * app.
    *
-   * Aquí parseSpanishNumber no toca ningún `type="number"`: solo lo usa el modo «corrígeme»,
-   * cuyos campos son `type="text"`. Lo que sí ocurre es la otra mitad de la sospecha: la llegada
-   * es un `type="number"` con `Number(v) || 0`, y el navegador entrega VACÍO el estado
-   * intermedio «2.». Ese vacío se lee 0, React reescribe «0» bajo el cursor y el «5» se añade
-   * detrás: se teclea 2.5 y entra 5 (y 0.4 entra 4). Medido igual con locale es-ES, es-MX y
-   * en-US; con coma («2,5») sí entra 2,5. El punto es el separador decimal en México y en buena
-   * parte de Latinoamérica, y el de la tecla decimal del teclado numérico.
+   * La llegada era un `type="number"` con `Number(v) || 0`, y el navegador entrega VACÍO el
+   * estado intermedio «2.». Ese vacío se leía 0, React reescribía «0» bajo el cursor y el «5» se
+   * añadía detrás: se tecleaba 2.5 y entraba 5 (y 0.4 entraba 4). Medido igual con locale es-ES,
+   * es-MX y en-US; con coma («2,5») sí entraba 2,5. El punto es el separador decimal en México y
+   * en buena parte de Latinoamérica, y el de la tecla decimal del teclado numérico.
    *
-   * Se acepta cualquier lectura razonable de «2.5» (2,5, o 2 o 3 si la app decide trabajar con
-   * llegadas enteras, como ya hace con la ráfaga): lo que no vale es 5.
+   * La app decide trabajar con llegadas DECIMALES (hasta la centésima), porque sus motores ya
+   * trabajan por eventos (hallazgo 2401): «2.5» y «2,5» son 2,5.
    */
-  test('ABIERTO · teclear «2.5» en la llegada no puede dejar una llegada de 5', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el estado intermedio «2.» llega vacío, se lee 0 y el «5» queda detrás');
+  test('2400 · teclear «2.5» en la llegada deja una llegada de 2,5, no de 5', async ({ page }) => {
     await abrirHidratada(page);
     const llegadaP2 = page.getByLabel('Tiempo de llegada del proceso P2');
     await llegadaP2.click();
     await llegadaP2.press('Control+A');
     await llegadaP2.pressSequentially('2.5');
+    await expect(llegadaP2).toHaveValue('2.5');
 
-    await expect.poll(async () => (await filaMetricas(page, 'P2'))[1]).toMatch(/^(2|3|2,5)$/);
+    await expect.poll(async () => (await filaMetricas(page, 'P2'))[1]).toBe('2,5');
+    // Al salir, el campo enseña el valor aplicado en formato español
+    await llegadaP2.blur();
+    await expect(llegadaP2).toHaveValue('2,5');
+
+    // Con «0.4» igual (antes entraba 4)
+    await llegadaP2.click();
+    await llegadaP2.press('Control+A');
+    await llegadaP2.pressSequentially('0.4');
+    await expect.poll(async () => (await filaMetricas(page, 'P2'))[1]).toBe('0,4');
   });
 
   /**
-   * HALLAZGO (calculo, medio) · ABIERTO — con una LLEGADA decimal, SRTF (y Priority apropiativo)
-   * retrasan la llegada al siguiente entero. Es el 760 por la otra puerta: aquel se cerró
-   * forzando la RÁFAGA a enteros, pero la llegada sigue aceptando decimales (pegados, o
-   * tecleados con coma) y los dos motores expropiativos solo miran `llegada <= t` en t enteros.
+   * HALLAZGO 2401 (calculo, medio) · REPARADO el 29/09/2026 — con una LLEGADA decimal, SRTF (y
+   * Priority apropiativo) retrasaban la llegada al siguiente entero. Era el 760 por la otra
+   * puerta: aquel se cerró forzando la RÁFAGA a enteros, pero la llegada seguía aceptando
+   * decimales y los dos motores apropiativos solo miraban `llegada <= t` en t enteros.
+   * Reparación: los dos trabajan por EVENTOS (llegadas y finales), en centésimas enteras.
    *
    * A MANO — el ejercicio de Silberschatz con llegadas decimales: P1(0,0; 8) · P2(0,4; 4) · P3(1,0; 1)
    *   t=0   P1
@@ -818,13 +876,13 @@ test.describe('simulador-planificador-procesos · inspección 29/09/2026', () =>
    *   t=2   P2 (3,4) < P1 (7,6)              → P2 [2; 5,4]
    *   t=5,4                                  → P1 [5,4; 13]
    *   TAT: P1 13, P2 5,4 − 0,4 = 5, P3 1 → 19/3 = 6,33 · espera: 5, 1, 0 → 6/3 = 2,00
-   * Obtenido: P2 no entra hasta t=2 (P1 [0,1] P3 [1,2] P2 [2,6] P1 [6,13]) → 2,20 y 6,53.
+   *   respuesta: P1 0, P2 0 (entra en cuanto llega), P3 0
+   * Obtenido antes: P2 no entraba hasta t=2 (P1 [0,1] P3 [1,2] P2 [2,6] P1 [6,13]) → 2,20 y 6,53.
    *
-   * Si la reparación opta por llegadas enteras (0,4 → 0), el esperado de las medias es EL MISMO:
-   * P2 [0,1] P3 [1,2] P2 [2,5] P1 [5,13] → esperas 5, 1, 0 y TAT 13, 5, 1.
+   * (El bloque P1 [0; 0,4] mide menos de 25 px y no lleva rótulo, así que el orden se comprueba
+   * con los cortes de tiempo y la tabla, no con los rótulos del Gantt.)
    */
-  test('ABIERTO · SRTF con una llegada de 0,4 expulsa en t=0,4 y da 2,00 de espera media', async ({ page }) => {
-    test.fail(true, 'ABIERTO: simularSRTF avanza de 1 en 1 y no ve la llegada 0,4 hasta t=1');
+  test('2401 · SRTF con una llegada de 0,4 expulsa en t=0,4 y da 2,00 de espera media', async ({ page }) => {
     await abrirHidratada(page);
     await fijarProceso(page, 'P1', '0', '8');
     await fijarProceso(page, 'P2', '0.4', '4');
@@ -833,25 +891,58 @@ test.describe('simulador-planificador-procesos · inspección 29/09/2026', () =>
 
     await expect.poll(() => tarjeta(page, 'Tiempo medio de espera')).toBe('2,00ut');
     expect(await tarjeta(page, 'Tiempo medio turnaround')).toBe('6,33ut');
+    expect(await marcasTiempo(page)).toEqual(['0', '0,4', '1', '2', '5,4', '13']);
+    expect(await filaMetricas(page, 'P1')).toEqual(['P1', '0', '8', '0', '13', '5', '13', '0']);
+    expect(await filaMetricas(page, 'P2')).toEqual(['P2', '0,4', '4', '0,4', '5,4', '1', '5', '0']);
+    expect(await filaMetricas(page, 'P3')).toEqual(['P3', '1', '1', '1', '2', '0', '1', '0']);
   });
 
   /**
-   * HALLAZGO (contenido, bajo) · ABIERTO — con una llegada decimal la tabla por proceso deja de
-   * cuadrar con la tarjeta: la llegada sale con PUNTO («0.4», se imprime cruda) y la espera y el
-   * turnaround se redondean a entero (`formatNumber(x, 0)`, puesto en la reparación del 761).
+   * El mismo hallazgo en Priority apropiativo.
    *
-   * A MANO — FCFS (aquí el motor acierta) con P1(0; 8) · P2(0,4; 4) · P3(1; 1):
+   * A MANO — P1(0; 8; prio 3) · P2(0,4; 4; prio 1):
+   *   t=0 P1 · t=0,4 llega P2 (prio 1) < P1 (3) → expulsa: P2 [0,4; 4,4] · P1 [4,4; 12]
+   *   P1: fin 12, TAT 12, espera 4 · P2: fin 4,4, TAT 4, espera 0
+   *   espera media 4/2 = 2,00 · turnaround medio 16/2 = 8,00
+   * Obtenido antes: P2 empezaba en 1 y no en 0,4 → 2,30 y 8,30.
+   */
+  test('2401 · Priority apropiativo con una llegada de 0,4 expulsa en t=0,4', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: 'Limpiar' }).click();
+    await page.getByRole('button', { name: '+ Añadir proceso' }).click();
+    await page.getByRole('button', { name: BTN_PRIORITY }).click();
+    await fijarProceso(page, 'P1', '0', '8');
+    await fijarProceso(page, 'P2', '0,4', '4');
+    for (const [pid, prio] of [['P1', '3'], ['P2', '1']] as [string, string][]) {
+      const campo = page.getByLabel(`Prioridad del proceso ${pid}`, { exact: false });
+      await campo.fill(prio);
+      await esperarValorEnReact(page, campo, prio);
+    }
+
+    await expect.poll(() => tarjeta(page, 'Tiempo medio de espera')).toBe('2,00ut');
+    expect(await tarjeta(page, 'Tiempo medio turnaround')).toBe('8,00ut');
+    expect(await marcasTiempo(page)).toEqual(['0', '0,4', '4,4', '12']);
+    expect(await filaMetricas(page, 'P2')).toEqual(['P2', '0,4', '4', '0,4', '4,4', '0', '4', '0']);
+  });
+
+  /**
+   * HALLAZGO 2402 (contenido, bajo) · REPARADO el 29/09/2026 — con una llegada decimal la tabla
+   * por proceso dejaba de cuadrar con la tarjeta: la llegada salía con PUNTO («0.4», se imprimía
+   * cruda) y la espera y el turnaround se redondeaban a entero (`formatNumber(x, 0)`, puesto en
+   * la reparación del 761). Ahora cada tiempo sale en formato español con los decimales que de
+   * verdad tiene (`formatTiempo`).
+   *
+   * A MANO — FCFS (aquí el motor acertaba) con P1(0; 8) · P2(0,4; 4) · P3(1; 1):
    *   P1 [0,8] · P2 [8,12] · P3 [12,13]
-   *   esperas 0 · 7,6 · 11 → 18,6/3 = 6,20 (la tarjeta lo da bien)
+   *   esperas 0 · 7,6 · 11 → 18,6/3 = 6,20 (la tarjeta lo daba bien)
    *   TAT 8 · 11,6 · 12 → 31,6/3 = 10,53 (el valor de libro)
-   * Obtenido en la tabla: P2 llegada «0.4», espera «8», turnaround «12»: la columna suma
-   * 19 → media 6,33, y la tarjeta de encima dice 6,20.
+   * Obtenido antes en la tabla: P2 llegada «0.4», espera «8», turnaround «12»: la columna sumaba
+   * 19 → media 6,33, y la tarjeta de encima decía 6,20.
    * Se comprueba lo que el alumno puede juzgar sin intérprete: que la tabla cuadre con la tarjeta.
    */
-  test('ABIERTO · con una llegada decimal la tabla por proceso cuadra con la tarjeta y va en formato español', async ({
+  test('2402 · con una llegada decimal la tabla por proceso cuadra con la tarjeta y va en formato español', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: la tabla imprime la llegada cruda y redondea espera y turnaround a entero');
     await abrirHidratada(page);
     await fijarProceso(page, 'P1', '0', '8');
     await fijarProceso(page, 'P2', '0.4', '4');
@@ -861,12 +952,19 @@ test.describe('simulador-planificador-procesos · inspección 29/09/2026', () =>
 
     const tabla = await page.locator('table').filter({ hasText: 'Turnaround' }).first().innerText();
     expect.soft(tabla).not.toMatch(/\d\.\d/);
+    expect(await filaMetricas(page, 'P2')).toEqual(['P2', '0,4', '4', '8', '12', '7,6', '11,6', '7,6']);
 
     const esperas: number[] = [];
     for (const pid of ['P1', 'P2', 'P3']) esperas.push(celdaANumero((await filaMetricas(page, pid))[5]));
     const mediaTabla = esperas.reduce((s, x) => s + x, 0) / esperas.length;
     const mediaTarjeta = celdaANumero((await tarjeta(page, 'Tiempo medio de espera')).replace('ut', ''));
-    // El defecto mueve la media en 0,13 ut (6,33 frente a 6,20): basta una centésima.
+    // El defecto movía la media en 0,13 ut (6,33 frente a 6,20): basta una centésima.
     expect.soft(mediaTabla).toBeCloseTo(mediaTarjeta, 2);
+    expect(await tarjeta(page, 'Tiempo medio turnaround')).toBe('10,53ut');
+
+    // El corrector acepta la espera decimal tecleada con coma
+    await page.getByLabel('Espera del proceso P2').fill('7,6');
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(page.getByText('Correcto hasta aquí: 1 de 9 casillas')).toBeVisible();
   });
 });
