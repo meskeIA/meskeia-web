@@ -265,6 +265,24 @@
   color: var(--secondary);
 }
 
+/* Se escribieron varias palabras: la ficha dice con cuál se rima (hallazgo 2443) */
+.notaVarias {
+  margin: 0.7rem 0 0;
+  padding: 0.55rem 0.8rem;
+  border-left: 3px solid var(--secondary);
+  border-radius: 6px;
+  background: rgba(72, 169, 166, 0.08);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+}
+
+/* Destino del desplazamiento tras pulsar Intro en el teclado táctil (hallazgo 2441);
+   el margen salva la barra fija del logo */
+.anclaResultados {
+  height: 0;
+  scroll-margin-top: 5rem;
+}
+
 /* ── Filtros ──────────────────────────────────────────────────────────── */
 .filtros {
   display: flex;
@@ -554,6 +572,11 @@
 [data-theme='dark'] .buscador,
 [data-theme='dark'] .resultado {
   border-color: rgba(127, 179, 211, 0.22);
+}
+
+[data-theme='dark'] .notaVarias {
+  border-left-color: var(--accent);
+  background: rgba(127, 179, 211, 0.1);
 }
 
 [data-theme='dark'] .campo {

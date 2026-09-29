@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback, type FormEvent } from 'react';
 import styles from './DiccionarioRimas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -20,6 +20,7 @@ import {
   indexarBloque,
   indiceVacio,
   motivoSinEscansion,
+  palabraFinal,
 } from './rimas';
 import { formasVerbalesFlexionadas } from './formas-verbales';
 
@@ -44,6 +45,21 @@ const ETIQUETA_ACENTUACION: Record<Acentuacion, string> = {
 
 type EstadoCarga = 'cargando' | 'indexando' | 'listo' | 'error';
 
+/**
+ * En pantallas táctiles, pulsar la tecla de acción del teclado lo cierra: si no, tapa justo el
+ * resultado que se acaba de pedir. Con ratón no se toca el foco. Devuelve si lo ha cerrado,
+ * para que quien llama lleve después la vista al resultado (receta de buscador-palabras-patron
+ * y generador-anagramas, hallazgos 2429 y 2278).
+ */
+function cerrarTecladoTactil(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia('(pointer: coarse)').matches) {
+    return false;
+  }
+  const activo = document.activeElement;
+  if (activo instanceof HTMLElement) activo.blur();
+  return true;
+}
+
 export default function DiccionarioRimasPage() {
   const [consulta, setConsulta] = useState('');
   const [tipo, setTipo] = useState<TipoBusqueda>('consonante');
@@ -61,6 +77,15 @@ export default function DiccionarioRimasPage() {
   const [progreso, setProgreso] = useState(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
+
+  /**
+   * La búsqueda es en vivo, pero en móvil el resultado se pinta bajo los ejemplos, las
+   * pestañas y el seseo, fuera de la ventana y detrás del teclado: se tecleaba, se pulsaba
+   * Intro y no cambiaba nada a la vista (hallazgo 2441). Cada envío desde el teclado táctil
+   * suma uno aquí, y el efecto de abajo lleva la vista al resultado ya pintado.
+   */
+  const [enviosTactiles, setEnviosTactiles] = useState(0);
+  const anclaResultado = useRef<HTMLDivElement>(null);
 
   // ── Carga e indexado del diccionario ──────────────────────────────────────
   useEffect(() => {
@@ -126,6 +151,20 @@ export default function DiccionarioRimasPage() {
     return () => clearTimeout(t);
   }, [consulta]);
   const asentada = consulta === consultaAsentada;
+
+  /** Intro (o «Buscar» en el teclado del móvil) da la consulta por escrita sin esperar la pausa. */
+  const enviar = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!consulta.trim()) return;
+    setConsultaAsentada(consulta);
+    if (cerrarTecladoTactil()) setEnviosTactiles((n) => n + 1);
+  };
+
+  // Tras el render del envío (con el aviso, si lo hay, ya montado) lleva la vista al resultado
+  useEffect(() => {
+    if (enviosTactiles === 0) return;
+    anclaResultado.current?.scrollIntoView({ block: 'start' });
+  }, [enviosTactiles]);
 
   // ── Búsqueda ──────────────────────────────────────────────────────────────
   const resultado = useMemo(() => {
@@ -194,7 +233,10 @@ export default function DiccionarioRimasPage() {
   // envolvía cientos de palabras que se reemplazaban a cada tecla (hallazgo 2164).
   let anuncioResultado = '';
   if (asentada && resultado) {
-    const palabra = resultado.consulta.palabra;
+    // Con varias palabras se rima con la última, y el anuncio lo dice (hallazgo 2443)
+    const palabra = resultado.variasPalabras
+      ? `${resultado.consulta.palabra}, la última palabra de lo escrito`
+      : resultado.consulta.palabra;
     if (resultado.palabras.length > 0) {
       const n = resultado.palabras.length;
       anuncioResultado = `${formatNumber(n, 0)} ${n === 1 ? 'palabra' : 'palabras'} que riman en ${tipo} con ${palabra}`;
@@ -230,7 +272,9 @@ export default function DiccionarioRimasPage() {
           Buscar rimas
         </h2>
 
-        <div className={styles.campoFila}>
+        {/* Un <form> de verdad para que la tecla de acción del teclado («Buscar», Intro) haga
+            algo visible: en móvil cierra el teclado y lleva al resultado (hallazgo 2441) */}
+        <form className={styles.campoFila} onSubmit={enviar} noValidate>
           <label htmlFor="palabra" className={styles.etiqueta}>
             Palabra con la que quieres rimar
           </label>
@@ -244,11 +288,12 @@ export default function DiccionarioRimasPage() {
             placeholder="corazón"
             autoComplete="off"
             autoCapitalize="off"
+            enterKeyHint="search"
             spellCheck={false}
             disabled={estado !== 'listo'}
             aria-describedby="estado-diccionario"
           />
-        </div>
+        </form>
 
         <div className={styles.ejemplos}>
           <span className={styles.ejemplosLabel}>Prueba con:</span>
@@ -330,6 +375,7 @@ export default function DiccionarioRimasPage() {
           Vacía no ocupa sitio: no lleva margen ni relleno propios. Es cortés
           (status), no asertiva: es una pista sobre lo escrito, no una urgencia
           que deba cortar el eco del tecleo */}
+      <div ref={anclaResultado} className={styles.anclaResultados} aria-hidden="true" />
       <div id="aviso-entrada" role="status">
         {motivoAviso === 'sin-letras' && (
           <p className={styles.avisoEntrada}>
@@ -339,7 +385,7 @@ export default function DiccionarioRimasPage() {
         )}
         {motivoAviso === 'sin-vocales' && (
           <p className={styles.avisoEntrada}>
-            «{consulta.trim()}» no tiene ninguna vocal: sin vocal no hay sílaba ni sonido desde el
+            «{palabraFinal(consulta).palabra}» no tiene ninguna vocal: sin vocal no hay sílaba ni sonido desde el
             que rimar. Si es una sigla que se lee letra a letra, escríbela como suena (por ejemplo,
             «deuvedé» en vez de «DVD»).
           </p>
@@ -371,6 +417,14 @@ export default function DiccionarioRimasPage() {
               {ETIQUETA_ACENTUACION[resultado.consulta.acentuacion]} · rima desde{' '}
               <strong>-{resultado.consulta.nucleo}</strong>
             </p>
+            {/* Una frase se pegaba en una palabra inventada, «canciontriste» (hallazgo 2443):
+                ahora se rima con la última palabra, la que cierra el verso, y se dice aquí */}
+            {resultado.variasPalabras && (
+              <p className={styles.notaVarias}>
+                Has escrito varias palabras: se rima con la última,{' '}
+                <strong>«{resultado.consulta.palabra}»</strong>, que es la que cierra el verso.
+              </p>
+            )}
           </div>
 
           {/* Filtros */}

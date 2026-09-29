@@ -72,6 +72,10 @@ import { aFonemas, escandirPalabra } from '../../app/diccionario-rimas/rimas';
  * Casos nuevos (aguda en vocal, esdrújula, hiato, diptongo decreciente, -agüe/-ague, seseo,
  * cada rima mostrada contrastada con un algoritmo propio) y la sospecha de Intro, en los
  * bloques «Reinspección 29/09/2026» del final.
+ *
+ * REPARADOS el 29/09/2026: 2441 (Intro en móvil lleva al resultado), 2442 (la «y» como núcleo
+ * de sílaba, más las sospechas de la conjunción «y» y los anglicismos en -y) y 2443 (con
+ * varias palabras se rima con la última y se dice). Detalle en cada bloque.
  */
 
 const RUTA = '/diccionario-rimas/';
@@ -813,8 +817,15 @@ test.describe('diccionario-rimas — reinspección 29/09/2026: límites de acent
  * esdrújulas y la i/u átona final. Lo escribí a mano sin mirar el código de la app; contra el
  * diccionario coincide con ella en 191/191 (cielo), 214/214 (café), 50/50 (país), 143/143
  * (país con seseo) y 3/3 (baile), y en asonante pinta las mismas miles.
- * Solo discrepa en las palabras con «y» como única vocal de sílaba (hallazgo de más abajo) y en
- * anglicismos crudos acabados en -y (party, whisky), que no se usan aquí.
+ * Solo discrepaba en las palabras con «y» como única vocal de sílaba (hallazgo 2442, más abajo)
+ * y en anglicismos crudos acabados en -y (party, whisky).
+ * REPARADO el 29/09/2026: la app ya toma la «y» como núcleo cuando es la única vocal de la
+ * sílaba, y trata como LLANOS los acabados en consonante + «y» sin tilde (party, ferry, rugby,
+ * whisky, brandy, lady…): en español la «y» final va siempre tras vocal, así que tras consonante
+ * solo aparece en anglicismos crudos, que se pronuncian llanos con /i/ final (/ˈparti/). Con la
+ * regla ortográfica (la «y» final cuenta como consonante → aguda) «party» habría rimado en
+ * consonante con «aquí». El algoritmo propio adopta la misma regla (ver analizarP): sin ella,
+ * «party» (a-e) sale ahora en la asonante de «baile» y este contraste la daba por falsa.
  */
 const VOC_P = 'aeiouáéíóúü';
 const FUERTE_P = 'aeoáéó';
@@ -914,7 +925,12 @@ function analizarP(palabra: string): AnalisisP | null {
   else if (nuc.length === 1) it = 0;
   else {
     const ultima = w[w.length - 1];
-    it = 'aeiou'.includes(ultima) || ultima === 'n' || ultima === 's' ? nuc.length - 2 : nuc.length - 1;
+    // Consonante + «y» final: anglicismo crudo, llano en la pronunciación (party, whisky)
+    const anglicismoEnY = /[^aeiouáéíóúüy]y$/.test(w);
+    it =
+      'aeiou'.includes(ultima) || ultima === 'n' || ultima === 's' || anglicismoEnY
+        ? nuc.length - 2
+        : nuc.length - 1;
   }
   const tonica = vocalNuclearP(nuc[it]);
   let vocales = nuc
@@ -1014,7 +1030,8 @@ test.describe('diccionario-rimas — reinspección 29/09/2026: cada rima mostrad
 });
 
 /*
- * HALLAZGO ABIERTO (29/09/2026) — la «y» como única vocal de la sílaba tónica.
+ * HALLAZGO 2442 (29/09/2026) — la «y» como única vocal de la sílaba tónica.
+ * REPARADO el 29/09/2026.
  *
  * escandirPalabra() ya cuenta la «y» como vocal para aceptar la entrada (tieneNucleoVocalico),
  * pero indiceVocalNuclear() no la busca: en «pyme» la sílaba tónica «py» no tiene ninguna vocal
@@ -1025,20 +1042,40 @@ test.describe('diccionario-rimas — reinspección 29/09/2026: cada rima mostrad
  * se queda en «e»: la empareja con las AGUDAS en é (me, fe, café, pie). Y al revés: «café»
  * (aguda, é) pinta en su pestaña asonante dos llanas, pyme y byte, cuando una aguda solo asuena
  * con agudas. En el diccionario: pyme, byte, klystron y copyright, más 15 anglicismos en -y.
+ *
+ * REPARACIÓN: indiceVocalNuclear() toma la «y» cuando es la única vocal de la sílaba (con otra
+ * vocal sigue sin mandar: «ya», «rey», «hoy», «muy»); aFonemas() lee como /i/ la «y» que no va
+ * ante vocal (la de delante de vocal sigue siendo consonante, con yeísmo: «cayó» = «calló»), y
+ * claveAsonante() la cuenta como «i». Con la misma raíz se reparan dos sospechas:
+ *   · la conjunción «y» daba 0 consonantes (clave /Y/ consonante); ahora rima con «aquí», «sí»;
+ *   · los anglicismos en consonante + «y» (party, ferry, rugby, whisky…) se daban por agudos con
+ *     la regla ortográfica (la «y» final cuenta como consonante) y rimaban desde «-ty», «-ky»;
+ *     ahora son llanos, como se pronuncian: «party» /ˈparti/ asuena en a-e, «whisky» con «güisqui».
+ * Contra el diccionario entero cambian 169 de 86.973 entradas: las 15 de «y» tras consonante,
+ * pyme, byte, klystron, y 150 en «-ay/-ey/-oy/-uy» cuya clave pasa de /…Y/ a /…i/ sin cambiar
+ * con quién riman (rey sigue con ley, grey, virrey; hoy con doy, convoy).
  */
 test.describe('diccionario-rimas — reinspección 29/09/2026: la «y» como vocal de la sílaba tónica', () => {
-  // ABIERTO — hallazgo de la reinspección del 29/09/2026
-  test.fail('«pyme»: py-me, llana, rima desde -yme y consonante con sublime', async ({ page }) => {
+  // REPARADO el 29/09/2026 (hallazgo 2442)
+  test('«pyme»: py-me, llana, rima desde -yme y consonante con sublime', async ({ page }) => {
     await abrir(page);
     await buscar(page, 'pyme');
     await pestana(page, 'consonante');
     await expect(acentuacionFicha(page)).toContainText('2 sílabas · llana · rima desde -yme', { timeout: 5000 });
     const lista = await palabrasVisibles(page);
-    expect(lista, 'sublime es /ime/').toContain('sublime');
+    for (const w of ['sublime', 'mime', 'anime', 'arrime']) expect(lista, `${w} es /ime/`).toContain(w);
   });
 
-  // ABIERTO — mismo hallazgo, visto desde una consulta corriente
-  test.fail('«café» asonante (aguda): el filtro «llana» no deja ninguna (hoy deja pyme y byte)', async ({ page }) => {
+  // REPARADO el 29/09/2026 (hallazgo 2442): la clave asonante de «pyme» es i-e, no «e»
+  test('«pyme» asonante: i-e con chisme y firme; ni me, ni fe, ni café', async ({ page }) => {
+    await abrir(page);
+    const ason = await consultar(page, 'pyme', 'asonante', 'rima desde -yme');
+    for (const w of ['chisme', 'firme', 'libre']) expect(ason, `falta ${w} (i-e)`).toContain(w);
+    for (const w of ['me', 'fe', 'café', 'pie']) expect(ason, `${w} es aguda en é`).not.toContain(w);
+  });
+
+  // REPARADO el 29/09/2026 — mismo hallazgo, visto desde una consulta corriente
+  test('«café» asonante (aguda): el filtro «llana» no deja ninguna (antes dejaba pyme y byte)', async ({ page }) => {
     await abrir(page);
     await buscar(page, 'café');
     await pestana(page, 'asonante');
@@ -1047,10 +1084,44 @@ test.describe('diccionario-rimas — reinspección 29/09/2026: la «y» como voc
     // A mano: una aguda en é solo asuena con agudas → 0 llanas
     await expect(resultado(page)).toContainText('Los filtros dejan fuera', { timeout: 5000 });
   });
+
+  test('motor: la «y» núcleo suena /i/; la de «rey» y la de «cayó» no cambian de pareja', () => {
+    // La «y» sola de sílaba: núcleo desde ella y fonema /i/
+    expect(escandirPalabra('pyme')?.nucleo).toBe('yme');
+    expect(aFonemas('yme', false)).toBe(aFonemas('ime', false));
+    expect(escandirPalabra('byte')?.nucleo).toBe('yte');
+    expect(escandirPalabra('klystron')?.nucleo).toBe('ystron');
+    // Semivocal tras vocal: el núcleo no cambia
+    expect(escandirPalabra('rey')?.nucleo).toBe('ey');
+    expect(aFonemas('ey', false)).toBe(aFonemas(escandirPalabra('virrey')!.nucleo, false));
+    // Consonante ante vocal: yeísmo intacto
+    expect(aFonemas(escandirPalabra('cayó')!.nucleo, false)).toBe(aFonemas(escandirPalabra('calló')!.nucleo, false));
+    expect(aFonemas(escandirPalabra('mayo')!.nucleo, false)).toBe(aFonemas(escandirPalabra('rayo')!.nucleo, false));
+  });
+
+  test('sospecha: la conjunción «y» (/i/) rima en consonante con «aquí» y «sí»', async ({ page }) => {
+    await abrir(page);
+    const lista = await consultar(page, 'y', 'consonante', 'rima desde -y');
+    for (const w of ['aquí', 'sí', 'maní']) expect(lista, `${w} acaba en /í/`).toContain(w);
+  });
+
+  test('sospecha: los anglicismos en -y son llanos — «party» par-ty, -arty; «whisky» con «güisqui»', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'party');
+    await pestana(page, 'consonante');
+    await expect(acentuacionFicha(page)).toContainText('2 sílabas · llana · rima desde -arty');
+    await buscar(page, 'whisky');
+    await expect(acentuacionFicha(page)).toContainText('2 sílabas · llana · rima desde -isky');
+    expect(await palabrasVisibles(page), 'whisky /ˈwiski/ = güisqui /ˈgwiski/').toContain('güisqui');
+    // Y ya no riman con las agudas en /í/
+    const deMani = await consultar(page, 'maní', 'consonante', 'rima desde -í');
+    for (const w of ['party', 'ferry', 'whisky', 'rugby']) expect(deMani, `${w} es llana`).not.toContain(w);
+  });
 });
 
 /*
- * HALLAZGO ABIERTO (29/09/2026) — una frase se pega en una palabra inventada.
+ * HALLAZGO 2443 (29/09/2026) — una frase se pega en una palabra inventada.
+ * REPARADO el 29/09/2026.
  *
  * limpiarEntrada() quita TODO lo que no es letra, espacios incluidos. Con dos palabras —lo que
  * se teclea al buscar rima para un final de verso— la app no avisa ni rima con la última:
@@ -1061,10 +1132,16 @@ test.describe('diccionario-rimas — reinspección 29/09/2026: la «y» como voc
  * Con «corazón roto» el mismo camino da «5 sílabas · esdrújula · rima desde -ónroto» y 0
  * consonantes. Se espera que avise de que busca una sola palabra, o que rime con la última;
  * en ningún caso una lista de rimas de otra vocal.
+ *
+ * REPARACIÓN — de las dos salidas, rimar con la última: lo que se escribe con varias palabras
+ * es un final de verso, y un verso rima por su última palabra, así que avisar y no buscar
+ * obligaría a borrar para obtener lo mismo. La ficha lo dice («Has escrito varias palabras: se
+ * rima con la última, «triste»…») y el anuncio del recuento también. Los trozos sin letras no
+ * cuentan como palabra, y el aviso de «sin vocal» nombra la última («rey prr» → «prr»).
  */
 test.describe('diccionario-rimas — reinspección 29/09/2026: dos palabras en el campo', () => {
-  // ABIERTO — hallazgo de la reinspección del 29/09/2026
-  test.fail('«canción triste»: ni se rotula esdrújula ni pinta asonantes o-e', async ({ page }) => {
+  // REPARADO el 29/09/2026 (hallazgo 2443)
+  test('«canción triste»: ni se rotula esdrújula ni pinta asonantes o-e', async ({ page }) => {
     await abrir(page);
     await buscar(page, 'canción triste');
     await pestana(page, 'asonante');
@@ -1072,6 +1149,31 @@ test.describe('diccionario-rimas — reinspección 29/09/2026: dos palabras en e
     await expect(page.getByText('rima desde -óntriste')).toHaveCount(0, { timeout: 3000 });
     const lista = await palabrasVisibles(page);
     for (const w of ['coste', 'poste']) expect(lista, `${w} es o-e; triste es i-e`).not.toContain(w);
+  });
+
+  // REPARADO el 29/09/2026 (hallazgo 2443): rima con la última y lo dice
+  test('«canción triste»: tris-te, llana, -iste; asonantes i-e y la ficha nombra «triste»', async ({ page }) => {
+    await abrir(page);
+    const ason = await consultar(page, 'canción triste', 'asonante', '2 sílabas · llana · rima desde -iste');
+    expect(await silabeo(page)).toBe('tris-te');
+    for (const w of ['libre', 'chisme', 'firme']) expect(ason, `falta ${w} (i-e)`).toContain(w);
+    await expect(resultado(page).locator('[class*="notaVarias"]')).toContainText('se rima con la última, «triste»');
+    await expect(page.locator('#anuncio-resultado')).toContainText('con triste, la última palabra de lo escrito');
+  });
+
+  test('«corazón roto»: -oto, consonante con devoto y remoto', async ({ page }) => {
+    await abrir(page);
+    const lista = await consultar(page, 'corazón roto', 'consonante', '2 sílabas · llana · rima desde -oto');
+    for (const w of ['devoto', 'remoto']) expect(lista, `falta ${w}`).toContain(w);
+  });
+
+  test('una sola palabra no lleva la nota; «rey prr» avisa de «prr», no de la frase', async ({ page }) => {
+    await abrir(page);
+    await consultar(page, 'camino', 'consonante', 'rima desde -ino');
+    await expect(resultado(page).locator('[class*="notaVarias"]')).toHaveCount(0);
+    await buscar(page, 'rey prr');
+    await expect(avisoEntrada(page)).toContainText('«prr» no tiene ninguna vocal');
+    await expect(resultado(page)).toHaveCount(0);
   });
 });
 
@@ -1083,14 +1185,19 @@ test.describe('diccionario-rimas — reinspección 29/09/2026: dos palabras en e
  * de la primera tecla sin pulsar nada. Intro no tiene nada que buscar y no recarga ni vacía
  * el campo: la sospecha, tal como estaba escrita, se descarta (primer bloque).
  *
- * Lo que sí queda es su EFECTO en móvil (segundo bloque, ABIERTO): el resultado se pinta debajo
- * de los ejemplos, el estado, las dos pestañas apiladas y el seseo. En un Pixel 7 (412×839) la
- * sección del resultado empieza a 921 px, el recuento a 1.243 y la primera rima a 1.417, con
- * la ventana acabando en 839 y el teclado virtual abierto encima. Tras teclear «camino» lo único
- * que cambia en pantalla es el propio texto; Intro no desplaza, no cierra el teclado ni lleva
- * al resultado (scrollY sigue en 0). Es la forma del 2278 (se teclea, Intro, no pasa nada).
- * En escritorio (1280×900) asoma el principio de la ficha (752 px) y la primera rima queda en
- * 1.082.
+ * Lo que sí queda es su EFECTO en móvil (segundo bloque, hallazgo 2441): el resultado se pinta
+ * debajo de los ejemplos, el estado, las dos pestañas apiladas y el seseo. En un Pixel 7
+ * (412×839) la sección del resultado empieza a 921 px, el recuento a 1.243 y la primera rima a
+ * 1.417, con la ventana acabando en 839 y el teclado virtual abierto encima. Tras teclear
+ * «camino» lo único que cambia en pantalla es el propio texto; Intro no desplaza, no cierra el
+ * teclado ni lleva al resultado (scrollY sigue en 0). Es la forma del 2278 (se teclea, Intro,
+ * no pasa nada). En escritorio (1280×900) asoma el principio de la ficha (752 px) y la primera
+ * rima queda en 1.082.
+ *
+ * REPARADO el 29/09/2026 (2441): el campo va en un <form> con enterKeyHint="search"; el envío
+ * da la consulta por escrita sin esperar la pausa y, en pantalla táctil, cierra el teclado y
+ * lleva la vista al resultado (con scroll-margin-top por la barra fija del logo). Con ratón no
+ * se mueve nada: el primer bloque sigue igual.
  */
 test.describe('diccionario-rimas — reinspección 29/09/2026: Intro en escritorio', () => {
   test('la búsqueda es en vivo; Intro no recarga, no navega ni vacía el campo', async ({ page }) => {
@@ -1120,13 +1227,26 @@ test.describe('diccionario-rimas — reinspección 29/09/2026: Intro en móvil',
     hasTouch: true,
   });
 
-  // ABIERTO — hallazgo de la reinspección del 29/09/2026
-  test.fail('tras teclear «camino» y pulsar Intro, el recuento de rimas está a la vista', async ({ page }) => {
+  // REPARADO el 29/09/2026 (hallazgo 2441)
+  test('tras teclear «camino» y pulsar Intro, el recuento de rimas está a la vista', async ({ page }) => {
     await abrir(page);
     await buscar(page, 'camino');
     await expect(resultado(page)).toContainText('que riman en consonante con camino');
+    await expect(page.locator('#palabra')).toHaveAttribute('enterkeyhint', 'search');
     await page.locator('#palabra').press('Enter');
     await expect(resultado(page).locator('[class*="recuento"]')).toBeInViewport({ timeout: 3000 });
+    await expect(resultado(page).locator('li').first()).toBeInViewport();
+    // El teclado se cierra: el campo ya no tiene el foco
+    await expect(page.locator('#palabra')).not.toBeFocused();
+  });
+
+  test('con «prr» e Intro, el aviso de «sin vocal» sale al momento y a la vista', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'prr');
+    await page.locator('#palabra').press('Enter');
+    // Sin esperar los 800 ms de la pausa: Intro da la consulta por escrita
+    await expect(avisoEntrada(page)).toContainText('no tiene ninguna vocal', { timeout: 500 });
+    await expect(avisoEntrada(page).locator('p')).toBeInViewport();
   });
 });
 

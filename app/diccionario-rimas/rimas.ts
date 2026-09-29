@@ -31,6 +31,15 @@ const sinTilde = (texto: string): string =>
  * Posición de la vocal tónica DENTRO de su sílaba.
  * En un diptongo manda la vocal fuerte («cuen-to» → la e, por eso «cuento»
  * rima con «viento»); si las dos son débiles, la segunda («ciu-dad» → la u).
+ *
+ * La «y» es el núcleo cuando es la ÚNICA vocal de la sílaba: «py-me», «by-te»,
+ * «klys-tron» (suena /i/). Antes no se buscaba, la función devolvía -1 y el núcleo
+ * pasaba a ser la sílaba entera: «pyme» rimaba desde «-pyme», con 0 consonantes, y
+ * su clave asonante perdía la tónica y se quedaba en «e», así que «café» (aguda)
+ * pintaba en su pestaña asonante dos llanas, pyme y byte (hallazgo 2442 del
+ * Inspector, 29/09/2026). Con otra vocal en la sílaba la «y» sigue siendo la
+ * consonante de «ya» o la semivocal de «rey», «hoy», «muy», y no manda.
+ * Así dice lo mismo que `tieneNucleoVocalico`, que ya la contaba como vocal.
  */
 const indiceVocalNuclear = (silaba: string): number => {
   const letras = [...silaba];
@@ -38,12 +47,22 @@ const indiceVocalNuclear = (silaba: string): number => {
   if (conTilde !== -1) return conTilde;
 
   const vocales = letras.map((c, i) => ({ c, i })).filter((o) => VOCALES.includes(o.c));
-  if (vocales.length === 0) return -1;
+  if (vocales.length === 0) return letras.indexOf('y');
   if (vocales.length === 1) return vocales[0].i;
 
   const fuerte = vocales.find((o) => FUERTES.includes(o.c));
   return fuerte ? fuerte.i : vocales[vocales.length - 1].i;
 };
+
+/**
+ * ¿Acaba en consonante + «y» («party», «ferry», «rugby», «whisky»)? En español la «y» final
+ * va siempre tras vocal (rey, hoy, muy, Uruguay); tras consonante solo aparece en
+ * anglicismos crudos, que se pronuncian llanos con /i/ final: /ˈparti/, /ˈferi/. La regla
+ * ortográfica de la tilde (la «y» final cuenta como consonante) los daba por agudos, y con la
+ * «y» ya reconocida como núcleo «party» habría rimado en consonante con «aquí» y «maní».
+ */
+const esAnglicismoEnY = (limpia: string): boolean =>
+  /[^aeiouáéíóúüy]y$/.test(limpia) && !/[áéíóú]/.test(limpia);
 
 export interface Escansion {
   palabra: string;
@@ -62,6 +81,32 @@ const limpiarEntrada = (texto: string): string =>
     .trim()
     .replace(/[^a-záéíóúüñ]/g, '');
 
+export interface PalabraFinal {
+  /** La última palabra con letras, tal como se escribió (sin limpiar) */
+  palabra: string;
+  /** Si lo escrito tenía más de una palabra con letras */
+  varias: boolean;
+}
+
+/**
+ * La palabra con la que se rima: la ÚLTIMA de lo escrito.
+ *
+ * limpiarEntrada() quitaba también los espacios, y «canción triste» se buscaba como una
+ * palabra inventada, «canciontriste», que la tilde de «canción» hacía esdrújula y rimaba
+ * desde «-óntriste» con 1.355 asonantes o-e (hallazgo 2443 del Inspector, 29/09/2026). Lo
+ * que se escribe con varias palabras es un final de verso, y un verso rima por su última
+ * palabra: se rima con ella y la pantalla lo dice. Los trozos sin letras (una cifra, un
+ * signo suelto) no cuentan como palabra: en «canción !!!» se rima con «canción».
+ */
+export const palabraFinal = (texto: string): PalabraFinal => {
+  const conLetras = texto
+    .trim()
+    .split(/\s+/)
+    .filter((trozo) => limpiarEntrada(trozo) !== '');
+  if (conLetras.length === 0) return { palabra: texto.trim(), varias: false };
+  return { palabra: conLetras[conLetras.length - 1], varias: conLetras.length > 1 };
+};
+
 /**
  * Sin una vocal no hay sílaba y, por tanto, no hay núcleo desde el que rimar.
  * La «y» cuenta como vocal: en «rey», «muy» o la conjunción «y» suena /i/.
@@ -74,9 +119,10 @@ const tieneNucleoVocalico = (limpia: string): boolean =>
 /**
  * Por qué una entrada no se puede escandir, para decírselo al usuario:
  * `'sin-letras'` («123», «!!!»), `'sin-vocales'` («prr», «DVD») o `null` si sí se puede.
+ * Con varias palabras juzga la última, que es con la que se rima.
  */
 export const motivoSinEscansion = (texto: string): 'sin-letras' | 'sin-vocales' | null => {
-  const limpia = limpiarEntrada(texto);
+  const limpia = limpiarEntrada(palabraFinal(texto).palabra);
   if (!limpia) return 'sin-letras';
   if (!tieneNucleoVocalico(limpia)) return 'sin-vocales';
   return null;
@@ -93,7 +139,8 @@ export const escandirPalabra = (palabra: string): Escansion | null => {
   const silabas = separarSilabas(limpia);
   if (silabas.length === 0) return null;
 
-  const acentuacion = acentuacionDe(limpia, silabas);
+  const acentuacion =
+    silabas.length >= 2 && esAnglicismoEnY(limpia) ? 'llana' : acentuacionDe(limpia, silabas);
 
   // La tilde escrita manda sobre cualquier regla
   const conTilde = silabas.findIndex((s) => TILDADAS.split('').some((t) => s.includes(t)));
@@ -140,6 +187,10 @@ export const aFonemas = (nucleo: string, seseo: boolean): string => {
   s = s.replace(/c/g, 'k');
   s = s.replace(/j/g, 'x');
   s = s.replace(/v/g, 'b');
+  // La «y» que no va ante vocal es la vocal /i/ («pyme» /ime/ rima con «sublime»; la
+  // conjunción «y» con «aquí») o la semivocal de «rey» /ei/ (hallazgo 2442). Solo ante vocal
+  // es consonante, y ahí entra el yeísmo.
+  s = s.replace(/y(?![aeiouü])/g, 'i');
   s = s.replace(/y/g, 'Y'); // yeísmo: «calló» y «cayó» riman
   s = s.replace(/w/g, 'u');
   s = s.replace(/ü/g, 'u');
@@ -159,9 +210,11 @@ export const claveAsonante = (esc: Escansion): string => {
   const desdeTonica = esc.silabas.slice(esc.indiceTonica);
 
   const vocales = desdeTonica
-    .map((silaba, i) => {
-      const idx = i === 0 ? indiceVocalNuclear(silaba) : indiceVocalNuclear(silaba);
-      return idx < 0 ? '' : sinTilde(silaba[idx]);
+    .map((silaba) => {
+      const idx = indiceVocalNuclear(silaba);
+      if (idx < 0) return '';
+      // La «y» núcleo de sílaba suena /i/: «py-me» asuena en i-e con «chisme»
+      return silaba[idx] === 'y' ? 'i' : sinTilde(silaba[idx]);
     })
     .filter(Boolean);
 
@@ -257,6 +310,8 @@ export interface ResultadoRimas {
   palabras: EntradaRima[];
   /** Cuántas había antes de aplicar los filtros */
   totalSinFiltrar: number;
+  /** Se escribió más de una palabra y se rima con la última (ver `palabraFinal`) */
+  variasPalabras: boolean;
 }
 
 /**
@@ -273,7 +328,8 @@ export const buscarRimas = (
   seseo: boolean,
   filtros: FiltrosRima
 ): ResultadoRimas | null => {
-  const esc = escandirPalabra(consulta);
+  const final = palabraFinal(consulta);
+  const esc = escandirPalabra(final.palabra);
   if (!esc) return null;
 
   const mapaConsonante = seseo ? indice.consonanteSeseo : indice.consonanteDistincion;
@@ -327,5 +383,6 @@ export const buscarRimas = (
     consulta: esc,
     palabras: conAfinidad.map((c) => c.entrada),
     totalSinFiltrar: candidatas.length,
+    variasPalabras: final.varias,
   };
 };
