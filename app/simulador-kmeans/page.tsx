@@ -15,9 +15,12 @@ import { formatNumber } from '@/lib';
 import styles from './SimuladorKmeans.module.css';
 import {
   escalarAlLienzo,
+  lienzoADatos,
+  marcoDatos,
   parsearDatosTabulares,
   MAX_PUNTOS_IMPORTADOS,
   type PuntoDato,
+  type Rango,
 } from './parseo-datos';
 
 type MetodoInit = 'aleatorio' | 'kmeans++';
@@ -60,6 +63,26 @@ interface ResumenImportado {
   rangoY: { min: number; max: number };
   filasIgnoradas: number;
   recortadoA: number | null;
+  aviso: string | null;
+}
+
+/**
+ * En qué unidades viven los puntos del lienzo.
+ *  - 'lienzo': presets, generadores y clics sobre un lienzo vacío. Los datos son sintéticos,
+ *    sin unidades propias: se miden en píxeles del lienzo (iguales en los dos ejes).
+ *  - 'datos': una tabla importada. Cada columna se normaliza min-max y se dibuja en el
+ *    cuadrado de MARCO_DATOS; los centroides se devuelven a las unidades de las columnas.
+ */
+type Espacio =
+  | { tipo: 'lienzo' }
+  | { tipo: 'datos'; nombres: { x: string; y: string }; rangoX: Rango; rangoY: Rango };
+
+/** Rectángulo del lienzo donde puede caer un centroide sorteado */
+interface Zona {
+  x0: number;
+  y0: number;
+  ancho: number;
+  alto: number;
 }
 
 /** Ejemplo de la caja de texto: edad e ingresos anuales, dos magnitudes muy dispares */
@@ -88,9 +111,80 @@ const ANCHO_LIENZO = 600;
 const ALTO_LIENZO = 400;
 const MARGEN_LIENZO = 30;
 
+/** Cuadrado de 340 px donde se dibujan los datos importados (x de 130 a 470, y de 30 a 370) */
+const MARCO_DATOS = marcoDatos(ANCHO_LIENZO, ALTO_LIENZO, MARGEN_LIENZO);
+
+const ZONA_LIENZO: Zona = {
+  x0: MARGEN_LIENZO,
+  y0: MARGEN_LIENZO,
+  ancho: ANCHO_LIENZO - 2 * MARGEN_LIENZO,
+  alto: ALTO_LIENZO - 2 * MARGEN_LIENZO,
+};
+const ZONA_DATOS: Zona = {
+  x0: MARCO_DATOS.x0,
+  y0: MARCO_DATOS.y0,
+  ancho: MARCO_DATOS.lado,
+  alto: MARCO_DATOS.lado,
+};
+
+const zonaDe = (espacio: Espacio): Zona => (espacio.tipo === 'datos' ? ZONA_DATOS : ZONA_LIENZO);
+
+/**
+ * Tamaños en pantalla de lo que se dibuja en el lienzo (hallazgo 2452, 29/09/2026).
+ * El SVG tiene un viewBox fijo de 600 × 400 y en un móvil de 390 px se encogía a escala 0,41:
+ * puntos de 4,1 px y centroides de 7,3. Los tamaños se calculan con la escala REAL del lienzo
+ * (ResizeObserver) y nunca bajan de estos mínimos; en escritorio no cambian.
+ */
+const RADIO_PUNTO = 5;
+const RADIO_PUNTO_MIN_PX = 4;
+const LADO_CENTROIDE = 18;
+const LADO_CENTROIDE_MIN_PX = 16;
+/** Radio de captura, en pantalla, para coger un punto con el dedo: gana el más cercano. */
+const CAPTURA_PUNTO_PX = 22;
+/** Un puntero que se desplaza más que esto entre pulsar y soltar no es un clic, es un gesto. */
+const UMBRAL_GESTO_PX = 8;
+
 /** Los datos importados pueden ser enteros o decimales: no forzar 2 decimales a una edad */
 function formatoValor(valor: number): string {
   return Number.isInteger(valor) ? formatNumber(valor, 0) : formatNumber(valor, 2);
+}
+
+/**
+ * Un valor en las unidades de una columna, con los decimales que pide su amplitud: unas dos
+ * cifras significativas por debajo de la amplitud (8 → 1,33 · 27 años → 38,3 · 43.000 € →
+ * 45.833). Con amplitud 0 el valor es el de la columna tal cual.
+ */
+function formatoEnUnidades(valor: number, rango: Rango): string {
+  const amplitud = rango.max - rango.min;
+  if (amplitud === 0) return formatoValor(valor);
+  const decimales = Math.max(0, Math.min(6, 2 - Math.floor(Math.log10(amplitud))));
+  return formatNumber(valor, decimales);
+}
+
+/**
+ * La inercia en las unidades del espacio en que se agrupa: px² del lienzo para los datos
+ * sintéticos, y unidades normalizadas (cada eje de 0 a 1) para una tabla importada. Es lo que
+ * el algoritmo minimiza; en las unidades de las columnas no tendría sentido sumar años² y
+ * euros² (hallazgo 2450).
+ */
+function inerciaEnEspacio(inerciaPx: number, espacio: Espacio): number {
+  return espacio.tipo === 'datos' ? inerciaPx / (MARCO_DATOS.lado * MARCO_DATOS.lado) : inerciaPx;
+}
+
+function formatoInercia(inerciaPx: number, espacio: Espacio): string {
+  const v = inerciaEnEspacio(inerciaPx, espacio);
+  if (espacio.tipo === 'lienzo') return formatNumber(v, 0);
+  if (v === 0) return '0';
+  return formatNumber(v, v < 10 ? 4 : 2);
+}
+
+/** Coordenadas de un centroide: en las unidades de las columnas, o en px del lienzo con Y hacia arriba */
+function coordenadasCentroide(c: { x: number; y: number }, espacio: Espacio): string {
+  if (espacio.tipo === 'datos') {
+    const d = lienzoADatos(c, MARCO_DATOS, espacio.rangoX, espacio.rangoY);
+    return `(${formatoEnUnidades(d.x, espacio.rangoX)}; ${formatoEnUnidades(d.y, espacio.rangoY)})`;
+  }
+  return `(${formatNumber(c.x, 1)}; ${formatNumber(ALTO_LIENZO - c.y, 1)})`;
 }
 
 let contadorIds = 0;
@@ -99,10 +193,42 @@ function nuevoId(): string {
   return `p${contadorIds}`;
 }
 
+/**
+ * Generador pseudoaleatorio con semilla (mulberry32): solo operaciones enteras de 32 bits,
+ * que dan lo mismo en el Node del prerender y en el navegador.
+ */
+function crearAzarSembrado(semilla: number): () => number {
+  let a = semilla >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Semilla del dataset de partida (hallazgo 2449, 29/09/2026). Hasta entonces el
+ * «3 gaussianas separadas» inicial se sorteaba con Math.random en el prerender y otra vez al
+ * hidratar; React 19 no corrige atributos que no coinciden, así que se veían los 90 puntos del
+ * servidor y el algoritmo agrupaba los 90 del cliente, invisibles: con K=5, entre 20 y 32
+ * puntos salían con el color de otro centroide. Con semilla, los dos lados sortean lo mismo.
+ */
+const SEMILLA_INICIAL = 20260929;
+
+/**
+ * Coordenada redondeada a la centésima de píxel. Box-Muller usa Math.log y Math.cos, y el V8
+ * de Node y el de Chromium no dan siempre el mismo último bit en ellas (medido el 23/09/2026
+ * en simulador-campo-electrico): con la misma semilla, un punto podría diferir en la 15.ª
+ * cifra. Una centésima de píxel no se ve.
+ */
+const redondearSvg = (v: number): number => Math.round(v * 100) / 100;
+
 // Box-Muller para muestrear normal estándar
-function muestreoNormal(): number {
-  let u1 = Math.random();
-  let u2 = Math.random();
+function muestreoNormal(azar: () => number = Math.random): number {
+  let u1 = azar();
+  let u2 = azar();
   // Evitar log(0)
   if (u1 < 1e-10) u1 = 1e-10;
   if (u2 < 1e-10) u2 = 1e-10;
@@ -141,7 +267,7 @@ function generarUniforme(n: number): Punto[] {
   return puntos;
 }
 
-function presetSeparados(): Punto[] {
+function presetSeparados(azar: () => number = Math.random): Punto[] {
   // 3 gaussianas bien separadas
   const centros = [
     { cx: 150, cy: 120 },
@@ -153,8 +279,8 @@ function presetSeparados(): Punto[] {
     for (let i = 0; i < 30; i++) {
       puntos.push({
         id: nuevoId(),
-        x: c.cx + muestreoNormal() * 22,
-        y: c.cy + muestreoNormal() * 22,
+        x: redondearSvg(c.cx + muestreoNormal(azar) * 22),
+        y: redondearSvg(c.cy + muestreoNormal(azar) * 22),
         cluster: -1,
       });
     }
@@ -230,7 +356,7 @@ function distanciaCuad(a: { x: number; y: number }, b: { x: number; y: number })
   return dx * dx + dy * dy;
 }
 
-function inicializarAleatorio(puntos: Punto[], k: number): Centroide[] {
+function inicializarAleatorio(puntos: Punto[], k: number, zona: Zona): Centroide[] {
   if (puntos.length === 0) return [];
   // Elegir k puntos aleatorios distintos como semillas
   const indices: number[] = [];
@@ -242,15 +368,15 @@ function inicializarAleatorio(puntos: Punto[], k: number): Centroide[] {
       indices.push(idx);
     }
   }
-  // Si hay menos puntos que k, completar con coordenadas aleatorias en el lienzo
+  // Si hay menos puntos que k, completar con coordenadas aleatorias en la zona de los datos
   while (indices.length < k) {
     indices.push(-1);
   }
   return indices.map((idx) => {
     if (idx === -1) {
       return {
-        x: MARGEN_LIENZO + Math.random() * (ANCHO_LIENZO - 2 * MARGEN_LIENZO),
-        y: MARGEN_LIENZO + Math.random() * (ALTO_LIENZO - 2 * MARGEN_LIENZO),
+        x: zona.x0 + Math.random() * zona.ancho,
+        y: zona.y0 + Math.random() * zona.alto,
         trayectoria: [],
       };
     }
@@ -258,7 +384,7 @@ function inicializarAleatorio(puntos: Punto[], k: number): Centroide[] {
   });
 }
 
-function inicializarKmeansPlus(puntos: Punto[], k: number): Centroide[] {
+function inicializarKmeansPlus(puntos: Punto[], k: number, zona: Zona): Centroide[] {
   if (puntos.length === 0) return [];
   const centroides: Centroide[] = [];
   // Primer centroide: aleatorio uniforme entre los puntos
@@ -279,21 +405,21 @@ function inicializarKmeansPlus(puntos: Punto[], k: number): Centroide[] {
     if (suma === 0) {
       // Todos los puntos coinciden con un centroide
       centroides.push({
-        x: MARGEN_LIENZO + Math.random() * (ANCHO_LIENZO - 2 * MARGEN_LIENZO),
-        y: MARGEN_LIENZO + Math.random() * (ALTO_LIENZO - 2 * MARGEN_LIENZO),
+        x: zona.x0 + Math.random() * zona.ancho,
+        y: zona.y0 + Math.random() * zona.alto,
         trayectoria: [],
       });
       continue;
     }
-    // Muestreo proporcional a la distancia²
+    // Muestreo proporcional a la distancia². Un punto con d² = 0 (ya es centroide) tiene
+    // probabilidad 0 y se salta: sin eso, con Math.random() = 0 se repetía el punto 0.
     let r = Math.random() * suma;
-    let elegido = 0;
+    let elegido = -1;
     for (let i = 0; i < distancias.length; i++) {
+      if (distancias[i] === 0) continue;
+      elegido = i;
       r -= distancias[i];
-      if (r <= 0) {
-        elegido = i;
-        break;
-      }
+      if (r <= 0) break;
     }
     centroides.push({ x: puntos[elegido].x, y: puntos[elegido].y, trayectoria: [] });
   }
@@ -345,11 +471,11 @@ function recalcularCentroides(puntos: Punto[], asignaciones: number[], centroide
 }
 
 // Ejecutar k-means hasta convergencia (sin animación) — para método del codo
-function kmeansCompleto(puntos: Punto[], k: number, metodoInit: MetodoInit, maxIter: number): number {
+function kmeansCompleto(puntos: Punto[], k: number, metodoInit: MetodoInit, maxIter: number, zona: Zona): number {
   if (puntos.length === 0 || k === 0) return 0;
   let centroides = metodoInit === 'aleatorio'
-    ? inicializarAleatorio(puntos, k)
-    : inicializarKmeansPlus(puntos, k);
+    ? inicializarAleatorio(puntos, k, zona)
+    : inicializarKmeansPlus(puntos, k, zona);
   let asignaciones = asignarPuntos(puntos, centroides);
   for (let iter = 0; iter < maxIter; iter++) {
     const nuevos = recalcularCentroides(puntos, asignaciones, centroides);
@@ -363,13 +489,13 @@ function kmeansCompleto(puntos: Punto[], k: number, metodoInit: MetodoInit, maxI
   return calcularInertia(puntos, asignaciones, centroides);
 }
 
-function metodoCodo(puntos: Punto[], metodoInit: MetodoInit, maxIter: number): ResultadoElbow[] {
+function metodoCodo(puntos: Punto[], metodoInit: MetodoInit, maxIter: number, zona: Zona): ResultadoElbow[] {
   const resultados: ResultadoElbow[] = [];
   for (let k = 1; k <= 10; k++) {
-    // Repetir 3 veces y quedarse con el mejor (mín inertia)
+    // Repetir 3 veces y quedarse con el mejor (mín inercia)
     let mejor = Infinity;
     for (let r = 0; r < 3; r++) {
-      const inertia = kmeansCompleto(puntos, k, metodoInit, maxIter);
+      const inertia = kmeansCompleto(puntos, k, metodoInit, maxIter, zona);
       if (inertia < mejor) mejor = inertia;
     }
     resultados.push({ k, inertia: mejor });
@@ -378,7 +504,9 @@ function metodoCodo(puntos: Punto[], metodoInit: MetodoInit, maxIter: number): R
 }
 
 export default function SimuladorKmeans() {
-  const [puntos, setPuntos] = useState<Punto[]>(() => presetSeparados());
+  // Sorteado con semilla: el prerender y la hidratación dibujan los mismos 90 puntos (hallazgo 2449)
+  const [puntos, setPuntos] = useState<Punto[]>(() => presetSeparados(crearAzarSembrado(SEMILLA_INICIAL)));
+  const [espacio, setEspacio] = useState<Espacio>({ tipo: 'lienzo' });
   const [k, setK] = useState<number>(3);
   const [metodoInit, setMetodoInit] = useState<MetodoInit>('kmeans++');
   const [maxIter, setMaxIter] = useState<number>(20);
@@ -401,6 +529,12 @@ export default function SimuladorKmeans() {
   const [resumenImportado, setResumenImportado] = useState<ResumenImportado | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const animTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Punto agarrado en modo «Arrastrar» y desfase entre el dedo y su centro (unidades del viewBox)
+  const arrastreRef = useRef<{ id: string; dx: number; dy: number } | null>(null);
+  // Dónde se pulsó (px de pantalla), para no tomar por clic un gesto de arrastre
+  const inicioPuntero = useRef<{ x: number; y: number } | null>(null);
+  // Píxeles de pantalla por unidad del viewBox; 1 hasta que el lienzo se mide en el cliente
+  const [pxPorUnidad, setPxPorUnidad] = useState<number>(1);
 
   // Limpieza de timers al desmontar
   useEffect(() => {
@@ -410,6 +544,49 @@ export default function SimuladorKmeans() {
       }
     };
   }, []);
+
+  // Escala real del lienzo: se vuelve a medir al girar el móvil o cambiar el ancho
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const medir = () => {
+      // La matriz de pantalla da la escala del contenido, sin el borde de 1 px del <svg>
+      const escala = svg.getScreenCTM()?.a ?? svg.getBoundingClientRect().width / ANCHO_LIENZO;
+      if (escala > 0) setPxPorUnidad(escala);
+    };
+    medir();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observador = new ResizeObserver(medir);
+    observador.observe(svg);
+    return () => observador.disconnect();
+  }, []);
+
+  /*
+   * El lienzo deja desplazar la página con el dedo (touch-action: manipulation). Solo el
+   * arrastre de un punto necesita quedarse el gesto, y eso no se puede declarar con
+   * touch-action en los círculos: Chromium lo ignora en los hijos de un <svg> (medido el
+   * 28/09/2026 en simulador-grafos). Se cancela aquí el desplazamiento, y solo mientras hay un
+   * punto agarrado. React registra sus escuchas táctiles como pasivas: esta tiene que ser nativa.
+   */
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const retenerGesto = (evt: TouchEvent) => {
+      if (arrastreRef.current !== null && evt.cancelable) evt.preventDefault();
+    };
+    svg.addEventListener('touchmove', retenerGesto, { passive: false });
+    return () => svg.removeEventListener('touchmove', retenerGesto);
+  }, []);
+
+  // Tamaños en unidades del viewBox que garantizan los mínimos en pantalla (hallazgo 2452)
+  const dim = useMemo(() => {
+    const escala = pxPorUnidad > 0 ? pxPorUnidad : 1;
+    return {
+      radio: Math.max(RADIO_PUNTO, RADIO_PUNTO_MIN_PX / escala),
+      lado: Math.max(LADO_CENTROIDE, LADO_CENTROIDE_MIN_PX / escala),
+      captura: CAPTURA_PUNTO_PX / escala,
+    };
+  }, [pxPorUnidad]);
 
   // Actualizar puntos coloreados según asignaciones
   const puntosColoreados = useMemo<Punto[]>(() => {
@@ -442,16 +619,17 @@ export default function SimuladorKmeans() {
 
   const inicializarSimulacion = useCallback(() => {
     if (puntos.length === 0) return;
+    const zona = zonaDe(espacio);
     const nuevos = metodoInit === 'aleatorio'
-      ? inicializarAleatorio(puntos, k)
-      : inicializarKmeansPlus(puntos, k);
+      ? inicializarAleatorio(puntos, k, zona)
+      : inicializarKmeansPlus(puntos, k, zona);
     setCentroides(nuevos);
     const asig = asignarPuntos(puntos, nuevos);
     setAsignaciones(asig);
     setInertia(calcularInertia(puntos, asig, nuevos));
     setIteracionActual(0);
     setConvergido(false);
-  }, [puntos, k, metodoInit]);
+  }, [puntos, k, metodoInit, espacio]);
 
   const iterarUnPaso = useCallback(() => {
     if (centroides.length === 0 || convergido) return;
@@ -509,6 +687,7 @@ export default function SimuladorKmeans() {
   const limpiarPuntos = useCallback(() => {
     detenerEjecucion();
     setPuntos([]);
+    setEspacio({ tipo: 'lienzo' });
     setResumenImportado(null);
     setCentroides([]);
     setAsignaciones([]);
@@ -519,7 +698,7 @@ export default function SimuladorKmeans() {
   }, [detenerEjecucion]);
 
   // ===== Importar datos propios =====
-  const colocarPuntos = useCallback((valores: PuntoDato[]) => {
+  const colocarPuntos = useCallback((valores: PuntoDato[], nombres: { x: string; y: string }) => {
     const { escalados, rangoX, rangoY } = escalarAlLienzo(
       valores,
       ANCHO_LIENZO,
@@ -527,6 +706,7 @@ export default function SimuladorKmeans() {
       MARGEN_LIENZO,
     );
     setPuntos(escalados.map((p) => ({ id: nuevoId(), x: p.x, y: p.y, cluster: -1 })));
+    setEspacio({ tipo: 'datos', nombres, rangoX, rangoY });
     setCentroides([]);
     setAsignaciones([]);
     setIteracionActual(0);
@@ -544,10 +724,10 @@ export default function SimuladorKmeans() {
       return;
     }
     detenerEjecucion();
-    const { puntos: valores, nombres, filasIgnoradas, recortadoA } = resultado.datos;
-    const { rangoX, rangoY, n } = colocarPuntos(valores);
+    const { puntos: valores, nombres, filasIgnoradas, recortadoA, aviso } = resultado.datos;
+    const { rangoX, rangoY, n } = colocarPuntos(valores, nombres);
     setErrorImportacion(null);
-    setResumenImportado({ n, nombres, rangoX, rangoY, filasIgnoradas, recortadoA });
+    setResumenImportado({ n, nombres, rangoX, rangoY, filasIgnoradas, recortadoA, aviso });
   }, [colocarPuntos, detenerEjecucion]);
 
   const cargarFichero = useCallback((evento: React.ChangeEvent<HTMLInputElement>) => {
@@ -575,6 +755,7 @@ export default function SimuladorKmeans() {
     else if (preset === 'alargado') nuevos = presetAlargado();
     else nuevos = presetTamanos();
     setPuntos(nuevos);
+    setEspacio({ tipo: 'lienzo' });
     setResumenImportado(null);
     setCentroides([]);
     setAsignaciones([]);
@@ -588,6 +769,7 @@ export default function SimuladorKmeans() {
     detenerEjecucion();
     const nuevos = generarGaussianas(kReal, puntosPorCluster);
     setPuntos(nuevos);
+    setEspacio({ tipo: 'lienzo' });
     setResumenImportado(null);
     setCentroides([]);
     setAsignaciones([]);
@@ -601,6 +783,7 @@ export default function SimuladorKmeans() {
     detenerEjecucion();
     const nuevos = generarUniforme(puntosUniforme);
     setPuntos(nuevos);
+    setEspacio({ tipo: 'lienzo' });
     setResumenImportado(null);
     setCentroides([]);
     setAsignaciones([]);
@@ -620,8 +803,17 @@ export default function SimuladorKmeans() {
     return { x, y };
   }, []);
 
+  /**
+   * Clic (o toque) en el lienzo, modo «Añadir». Un deslizamiento del dedo para bajar por la
+   * página no llega como clic (el navegador lo cancela); con ratón, un arrastre sí, y por eso
+   * se descarta todo gesto que se haya movido más del umbral. Un punto añadido tras importar
+   * se lee con la misma escala que la tabla.
+   */
   const onSvgClick = useCallback((evt: React.MouseEvent<SVGSVGElement>) => {
+    const inicio = inicioPuntero.current;
+    inicioPuntero.current = null;
     if (modoEdicion !== 'anadir') return;
+    if (inicio && Math.hypot(evt.clientX - inicio.x, evt.clientY - inicio.y) > UMBRAL_GESTO_PX) return;
     const c = coordsSvg(evt);
     if (!c) return;
     if (c.x < MARGEN_LIENZO || c.x > ANCHO_LIENZO - MARGEN_LIENZO) return;
@@ -638,31 +830,53 @@ export default function SimuladorKmeans() {
     }
   }, [modoEdicion, coordsSvg, centroides.length]);
 
-  const onPuntoPointerDown = useCallback((evt: React.PointerEvent<SVGCircleElement>, id: string) => {
+  /**
+   * Pulsar en el lienzo. En modo «Arrastrar» coge el punto MÁS CERCANO al dedo dentro de un
+   * radio de captura en px de pantalla (hallazgo 2452): hasta el 29/09/2026 había que acertar
+   * en el propio círculo, de 4,1 px en un móvil, y un toque a 6 px de su centro no cogía nada.
+   * Una diana gruesa por punto no valdría en una nube densa, donde se la llevaría el vecino
+   * dibujado encima: gana siempre el más cercano.
+   */
+  const onSvgPointerDown = useCallback((evt: React.PointerEvent<SVGSVGElement>) => {
+    inicioPuntero.current = { x: evt.clientX, y: evt.clientY };
     if (modoEdicion !== 'arrastrar') return;
-    evt.stopPropagation();
-    setArrastrandoId(id);
-    (evt.currentTarget as Element).setPointerCapture?.(evt.pointerId);
-  }, [modoEdicion]);
-
-  const onSvgPointerMove = useCallback((evt: React.PointerEvent<SVGSVGElement>) => {
-    if (!arrastrandoId) return;
     const c = coordsSvg(evt);
     if (!c) return;
-    const nx = Math.max(MARGEN_LIENZO, Math.min(ANCHO_LIENZO - MARGEN_LIENZO, c.x));
-    const ny = Math.max(MARGEN_LIENZO, Math.min(ALTO_LIENZO - MARGEN_LIENZO, c.y));
-    setPuntos((prev) => prev.map((p) => (p.id === arrastrandoId ? { ...p, x: nx, y: ny } : p)));
-  }, [arrastrandoId, coordsSvg]);
+    let mejor: Punto | null = null;
+    let mejorDistancia = dim.captura;
+    for (const p of puntos) {
+      const d = Math.hypot(p.x - c.x, p.y - c.y);
+      if (d <= mejorDistancia) {
+        mejorDistancia = d;
+        mejor = p;
+      }
+    }
+    if (!mejor) return;
+    arrastreRef.current = { id: mejor.id, dx: mejor.x - c.x, dy: mejor.y - c.y };
+    setArrastrandoId(mejor.id);
+    evt.currentTarget.setPointerCapture?.(evt.pointerId);
+  }, [modoEdicion, coordsSvg, dim.captura, puntos]);
+
+  const onSvgPointerMove = useCallback((evt: React.PointerEvent<SVGSVGElement>) => {
+    const arrastre = arrastreRef.current;
+    if (!arrastre) return;
+    const c = coordsSvg(evt);
+    if (!c) return;
+    const nx = Math.max(MARGEN_LIENZO, Math.min(ANCHO_LIENZO - MARGEN_LIENZO, c.x + arrastre.dx));
+    const ny = Math.max(MARGEN_LIENZO, Math.min(ALTO_LIENZO - MARGEN_LIENZO, c.y + arrastre.dy));
+    setPuntos((prev) => prev.map((p) => (p.id === arrastre.id ? { ...p, x: nx, y: ny } : p)));
+  }, [coordsSvg]);
 
   const onSvgPointerUp = useCallback(() => {
+    arrastreRef.current = null;
     setArrastrandoId(null);
   }, []);
 
   const calcularElbowHandler = useCallback(() => {
     if (puntos.length < 10) return;
-    const resultados = metodoCodo(puntos, metodoInit, maxIter);
+    const resultados = metodoCodo(puntos, metodoInit, maxIter, zonaDe(espacio));
     setResultadoElbow(resultados);
-  }, [puntos, metodoInit, maxIter]);
+  }, [puntos, metodoInit, maxIter, espacio]);
 
   // Color cluster (-1 = sin asignar)
   const colorCluster = (idx: number): string => {
@@ -838,8 +1052,9 @@ export default function SimuladorKmeans() {
           <p className={styles.datosAyuda}>
             Pega dos columnas de números —o carga un archivo— y el simulador agrupa tus datos en
             lugar de los de ejemplo. Sirve el tabulador de una hoja de cálculo, el punto y coma, el
-            espacio o la coma, y los decimales pueden ir con coma (12,5) o con punto (12.5). Si la
-            primera fila es una cabecera, se usa para nombrar los ejes. Todo el proceso ocurre en tu
+            espacio o la coma, y los decimales pueden ir con coma (12,5) o con punto (12.5); si
+            separas las columnas con comas, los decimales tienen que ir con punto. Si la primera
+            fila es una cabecera, se usa para nombrar los ejes. Todo el proceso ocurre en tu
             navegador: los datos no se envían a ningún servidor.
           </p>
 
@@ -897,7 +1112,10 @@ export default function SimuladorKmeans() {
               Eje X: {resumenImportado.nombres.x} (de {formatoValor(resumenImportado.rangoX.min)} a{' '}
               {formatoValor(resumenImportado.rangoX.max)}) · Eje Y: {resumenImportado.nombres.y} (de{' '}
               {formatoValor(resumenImportado.rangoY.min)} a {formatoValor(resumenImportado.rangoY.max)}).
-              {resumenImportado.filasIgnoradas > 0 && (
+              {resumenImportado.filasIgnoradas === 1 && (
+                <> Se ha descartado 1 fila que no contenía dos números.</>
+              )}
+              {resumenImportado.filasIgnoradas > 1 && (
                 <> Se han descartado {formatNumber(resumenImportado.filasIgnoradas, 0)} filas que no
                   contenían dos números.</>
               )}
@@ -905,14 +1123,20 @@ export default function SimuladorKmeans() {
                 <> Solo se han conservado los primeros{' '}
                   {formatNumber(resumenImportado.recortadoA, 0)} puntos.</>
               )}
+              {resumenImportado.aviso && (
+                <> <strong>Revisa la lectura:</strong> {resumenImportado.aviso}</>
+              )}
             </div>
           )}
 
           <p className={styles.datosNota}>
-            Cada eje se escala por separado al lienzo, y eso equivale a <strong>normalizar</strong>:
-            sin ese paso, la variable con los números más grandes (un salario frente a una edad)
-            dominaría la distancia euclídea y el agrupamiento la obedecería casi solo a ella. Dos
-            avisos: un número con exactamente tres cifras tras un punto se lee como millar español
+            Antes de agrupar, cada columna se <strong>normaliza</strong> de 0 (su mínimo) a 1 (su
+            máximo), y las dos se dibujan con la misma escala, en un cuadrado: sin ese paso, la
+            variable con los números más grandes (un salario frente a una edad) dominaría la
+            distancia euclídea y el agrupamiento la obedecería casi solo a ella. Así las dos pesan
+            igual, da lo mismo cuál pegues primero, y el centroide más cercano que ves es el que
+            usa el algoritmo. Los centroides se dan después en las unidades de tus columnas, y la
+            inercia, en las unidades normalizadas. Dos avisos: un número con exactamente tres cifras tras un punto se lee como millar español
             (<code>1.234</code> es mil doscientos treinta y cuatro; escribe <code>1,234</code> si
             querías decimales), y el máximo son{' '}
             {formatNumber(MAX_PUNTOS_IMPORTADOS, 0)} puntos.
@@ -992,6 +1216,7 @@ export default function SimuladorKmeans() {
               className={styles.calcBtn}
               onClick={inicializarSimulacion}
               disabled={puntos.length < k}
+              title={puntos.length < k ? `Con K = ${k} hacen falta al menos ${k} puntos` : undefined}
             >
               Inicializar centroides
             </button>
@@ -1009,6 +1234,7 @@ export default function SimuladorKmeans() {
                 className={styles.actionBtn}
                 onClick={ejecutarHastaConvergencia}
                 disabled={puntos.length < k || convergido}
+                title={puntos.length < k ? `Con K = ${k} hacen falta al menos ${k} puntos` : undefined}
               >
                 Ejecutar hasta convergencia
               </button>
@@ -1053,8 +1279,10 @@ export default function SimuladorKmeans() {
             viewBox={`0 0 ${ANCHO_LIENZO} ${ALTO_LIENZO}`}
             preserveAspectRatio="xMidYMid meet"
             onClick={onSvgClick}
+            onPointerDown={onSvgPointerDown}
             onPointerMove={onSvgPointerMove}
             onPointerUp={onSvgPointerUp}
+            onPointerCancel={onSvgPointerUp}
             onPointerLeave={onSvgPointerUp}
             role="img"
             aria-label="Lienzo de puntos para clustering"
@@ -1130,46 +1358,64 @@ export default function SimuladorKmeans() {
                 key={p.id}
                 cx={p.x}
                 cy={p.y}
-                r={5}
+                r={dim.radio}
                 className={styles.puntoCircle}
                 fill={colorCluster(p.cluster)}
-                onPointerDown={(e) => onPuntoPointerDown(e, p.id)}
-                style={{ cursor: modoEdicion === 'arrastrar' ? 'grab' : 'crosshair' }}
+                style={{
+                  cursor: modoEdicion === 'arrastrar'
+                    ? (arrastrandoId === p.id ? 'grabbing' : 'grab')
+                    : 'crosshair',
+                }}
               />
             ))}
 
             {/* Centroides (cuadrados grandes) */}
-            {centroides.map((c, j) => (
-              <g key={`c-${j}`}>
-                <rect
-                  x={c.x - 9}
-                  y={c.y - 9}
-                  width={18}
-                  height={18}
-                  className={styles.centroideMarker}
-                  fill={colorCluster(j)}
-                />
-                <line
-                  x1={c.x - 6}
-                  y1={c.y}
-                  x2={c.x + 6}
-                  y2={c.y}
-                  stroke="white"
-                  strokeWidth={2}
-                />
-                <line
-                  x1={c.x}
-                  y1={c.y - 6}
-                  x2={c.x}
-                  y2={c.y + 6}
-                  stroke="white"
-                  strokeWidth={2}
-                />
-              </g>
-            ))}
+            {centroides.map((c, j) => {
+              const medio = dim.lado / 2;
+              const brazo = dim.lado / 3;
+              return (
+                <g key={`c-${j}`} pointerEvents="none">
+                  <rect
+                    x={c.x - medio}
+                    y={c.y - medio}
+                    width={dim.lado}
+                    height={dim.lado}
+                    className={styles.centroideMarker}
+                    fill={colorCluster(j)}
+                  />
+                  <line
+                    x1={c.x - brazo}
+                    y1={c.y}
+                    x2={c.x + brazo}
+                    y2={c.y}
+                    stroke="white"
+                    strokeWidth={2}
+                  />
+                  <line
+                    x1={c.x}
+                    y1={c.y - brazo}
+                    x2={c.x}
+                    y2={c.y + brazo}
+                    stroke="white"
+                    strokeWidth={2}
+                  />
+                </g>
+              );
+            })}
           </svg>
-          <p className={styles.lienzoNota}>
+          {/*
+            Hallazgo 2453: con menos puntos que K los botones se apagaban sin decir por qué. El
+            aviso va aquí, DEBAJO del lienzo, y no en el panel de parámetros: allí aparecía y
+            desaparecía mientras se añadían puntos y movía el lienzo bajo el dedo.
+          */}
+          <p className={styles.lienzoNota} role="status">
             {puntos.length} {puntos.length === 1 ? 'punto' : 'puntos'} en el lienzo
+            {puntos.length < k && (
+              <>
+                {' '}· <strong>Con K = {k} hacen falta al menos {k} puntos</strong> para agrupar:
+                añade más con un clic en el lienzo o baja K.
+              </>
+            )}
           </p>
         </div>
 
@@ -1183,21 +1429,27 @@ export default function SimuladorKmeans() {
             </div>
           </div>
           <div className={styles.metricCard}>
-            <span className={styles.metricLabel}>Inertia (SSE)</span>
+            <span className={styles.metricLabel}>Inercia (SSE)</span>
             <div className={styles.metricValue}>
-              {centroides.length > 0 ? formatNumber(inertia, 0) : '—'}
+              {centroides.length > 0 ? formatoInercia(inertia, espacio) : '—'}
+              {centroides.length > 0 && espacio.tipo === 'lienzo' && (
+                <span className={styles.metricUnit}>px²</span>
+              )}
             </div>
           </div>
           <div className={styles.metricCard}>
             <span className={styles.metricLabel}>Estado</span>
             <div className={styles.metricValue}>
+              {/* «En progreso» no valía para una ejecución parada en el tope sin converger */}
               {centroides.length === 0
                 ? 'Sin iniciar'
                 : convergido
                   ? '✓ Convergido'
                   : ejecutandoAuto
                     ? 'Ejecutando…'
-                    : 'En progreso'}
+                    : iteracionActual >= maxIter
+                      ? 'Tope sin converger'
+                      : 'En progreso'}
             </div>
           </div>
           <div className={styles.metricCard}>
@@ -1216,6 +1468,20 @@ export default function SimuladorKmeans() {
         {centroides.length > 0 && (
           <div className={styles.panel}>
             <h2 className={styles.panelTitle}>Tamaños de cada cluster</h2>
+            <p className={styles.codoDesc}>
+              {espacio.tipo === 'datos' ? (
+                <>
+                  Centroides en las unidades de tus columnas: (X = {espacio.nombres.x}; Y ={' '}
+                  {espacio.nombres.y}). La inercia va en unidades normalizadas, con cada columna
+                  de 0 (su mínimo) a 1 (su máximo), que es donde agrupa el algoritmo.
+                </>
+              ) : (
+                <>
+                  Centroides en píxeles del lienzo, con el origen abajo a la izquierda (x; y).
+                  Los datos sintéticos no tienen otras unidades.
+                </>
+              )}
+            </p>
             <div className={styles.clustersGrid}>
               {clusters.map(({ centroide, tam }, j) => (
                 <div key={j} className={styles.clusterRow}>
@@ -1229,7 +1495,7 @@ export default function SimuladorKmeans() {
                     {tam} {tam === 1 ? 'punto' : 'puntos'}
                   </span>
                   <span className={styles.clusterCoord}>
-                    centroide ({formatNumber(centroide.x, 1)}, {formatNumber(centroide.y, 1)})
+                    centroide {coordenadasCentroide(centroide, espacio)}
                   </span>
                 </div>
               ))}
@@ -1252,6 +1518,12 @@ export default function SimuladorKmeans() {
             >
               Calcular curva del codo
             </button>
+            {puntos.length < 10 && (
+              <p className={styles.codoDesc} role="status">
+                La curva prueba hasta K = 10 y necesita al menos 10 puntos; ahora hay{' '}
+                {puntos.length}.
+              </p>
+            )}
             {resultadoElbow && (
               <button
                 type="button"
@@ -1294,7 +1566,7 @@ export default function SimuladorKmeans() {
                   className={styles.elbowAxisTitle}
                   transform="rotate(-90 10 100)"
                 >
-                  Inertia
+                  Inercia
                 </text>
 
                 {/* Línea */}
@@ -1315,7 +1587,7 @@ export default function SimuladorKmeans() {
                       className={styles.elbowPoint}
                       fill={esCodo ? 'var(--secondary)' : 'var(--primary)'}
                     >
-                      <title>K={r.k}, inertia={Math.round(r.inertia)}</title>
+                      <title>K={r.k}, inercia={formatoInercia(r.inertia, espacio)}</title>
                     </circle>
                   );
                 })}
@@ -1375,7 +1647,7 @@ export default function SimuladorKmeans() {
               </tr>
               <tr>
                 <td><strong>5. Métrica</strong></td>
-                <td>Inertia (suma de distancias² intra-cluster)</td>
+                <td>Inercia (suma de distancias² intra-cluster)</td>
                 <td>SSE = Σⱼ Σ_(xᵢ ∈ Cⱼ) ‖xᵢ − μⱼ‖²</td>
                 <td>O(N·d)</td>
               </tr>
@@ -1418,7 +1690,7 @@ export default function SimuladorKmeans() {
               Una imagen RGB tiene 16M colores. Aplicando k-means con K=16 a sus píxeles, obtienes una paleta reducida y la imagen ocupa mucho menos.
             </p>
             <div className={styles.escenarioTip}>
-              Cada píxel se reasigna al centroide (color) más cercano. Es la base de los formatos GIF y de las paletas optimizadas.
+              Cada píxel se reasigna al centroide (color) más cercano. Es una de las técnicas para construir paletas reducidas, como la de 256 colores como máximo que admite el formato GIF; el formato no fija el método, y también se usan <em>median cut</em> u octree.
             </div>
           </div>
           <div className={styles.escenarioCard}>
@@ -1440,23 +1712,23 @@ export default function SimuladorKmeans() {
           <div className={styles.faqItem}>
             <h4>¿Cómo elijo el número correcto de clusters K?</h4>
             <p>
-              No hay respuesta única. Las técnicas más usadas son: <strong>método del codo</strong> (graficar inertia vs K y buscar el &laquo;codo&raquo;), <strong>coeficiente de silueta</strong> (mide qué tan bien encajan los puntos en su cluster), y <strong>conocimiento del dominio</strong> (si sabes que hay 5 segmentos de clientes, prueba K=5).
+              No hay respuesta única. Las técnicas más usadas son: <strong>método del codo</strong> (graficar la inercia frente a K y buscar el &laquo;codo&raquo;), <strong>coeficiente de silueta</strong> (mide qué tan bien encajan los puntos en su cluster), y <strong>conocimiento del dominio</strong> (si sabes que hay 5 segmentos de clientes, prueba K=5).
             </p>
             <p className={styles.faqTip}>Pulsa &laquo;Calcular curva del codo&raquo; en este simulador para ver el método aplicado a tus puntos.</p>
           </div>
           <div className={styles.faqItem}>
             <h4>¿Por qué k-means++ es mejor que la inicialización aleatoria?</h4>
             <p>
-              La inicialización aleatoria puede colocar dos centroides muy cerca, haciendo que k-means converja a un mínimo local malo. k-means++ elige los centroides iniciales separados entre sí (probabilidad proporcional a d² al centroide más cercano), lo que reduce el riesgo y suele dar mejor inertia final.
+              La inicialización aleatoria puede colocar dos centroides muy cerca, haciendo que k-means converja a un mínimo local malo. k-means++ elige los centroides iniciales separados entre sí (probabilidad proporcional a d² al centroide más cercano), lo que reduce el riesgo y suele dar mejor inercia final.
             </p>
-            <p className={styles.faqTip}>Carga &laquo;3 gaussianas separadas&raquo;, ejecuta varias veces con cada inicialización y compara la inertia final.</p>
+            <p className={styles.faqTip}>Carga &laquo;3 gaussianas separadas&raquo;, ejecuta varias veces con cada inicialización y compara la inercia final.</p>
           </div>
           <div className={styles.faqItem}>
             <h4>¿K-means siempre converge?</h4>
             <p>
-              Sí, k-means siempre converge en un número finito de iteraciones porque la inertia disminuye en cada paso (o se mantiene). Pero <strong>no garantiza el óptimo global</strong>: puede quedarse atrapado en un mínimo local. Por eso se ejecuta varias veces con distintas semillas y se elige la solución de menor inertia.
+              Sí, k-means siempre converge en un número finito de iteraciones porque la inercia disminuye en cada paso (o se mantiene). Pero <strong>no garantiza el óptimo global</strong>: puede quedarse atrapado en un mínimo local. Por eso se ejecuta varias veces con distintas semillas y se elige la solución de menor inercia.
             </p>
-            <p className={styles.faqTip}>En scikit-learn el parámetro <code>n_init</code> controla cuántas inicializaciones distintas se prueban (por defecto 10).</p>
+            <p className={styles.faqTip}>En scikit-learn el parámetro <code>n_init</code> controla cuántas inicializaciones distintas se prueban. Desde la versión 1.4 vale <code>&apos;auto&apos;</code> por defecto: una sola ejecución con <code>init=&apos;k-means++&apos;</code> (la inicialización por defecto) y 10 con <code>init=&apos;random&apos;</code>. Para quedarte con la mejor de varias con k-means++, súbelo a mano.</p>
           </div>
           <div className={styles.faqItem}>
             <h4>¿Cuándo falla k-means?</h4>
@@ -1506,7 +1778,7 @@ export default function SimuladorKmeans() {
             <div className={styles.stepContent}>
               <strong>Elige K con método del codo o silueta</strong>
               <p>
-                Ejecuta k-means para K = 2 a 10 y grafica inertia vs K. El &laquo;codo&raquo; (donde la pendiente cambia bruscamente) sugiere un buen K. Como complemento, calcula el coeficiente de silueta y elige el K con mayor silueta media.
+                Ejecuta k-means para K = 2 a 10 y grafica la inercia frente a K. El &laquo;codo&raquo; (donde la pendiente cambia bruscamente) sugiere un buen K. Como complemento, calcula el coeficiente de silueta y elige el K con mayor silueta media.
               </p>
             </div>
           </div>
@@ -1515,7 +1787,7 @@ export default function SimuladorKmeans() {
             <div className={styles.stepContent}>
               <strong>Ejecuta k-means con varias semillas</strong>
               <p>
-                Usa k-means++ y <code>n_init = 10</code> (o más) para evitar mínimos locales. Quédate con la solución de menor inertia. Establece <code>random_state</code> para reproducibilidad.
+                Usa k-means++ y <code>n_init = 10</code> (o más) para evitar mínimos locales. Quédate con la solución de menor inercia. Establece <code>random_state</code> para reproducibilidad.
               </p>
             </div>
           </div>
@@ -1540,12 +1812,12 @@ export default function SimuladorKmeans() {
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🎯</span>
             <strong>Usa k-means++ por defecto</strong>
-            <p>Es el default en scikit-learn. Casi siempre da mejor inertia final que la inicialización aleatoria, con coste computacional ligero.</p>
+            <p>Es el default en scikit-learn. Casi siempre da mejor inercia final que la inicialización aleatoria, con coste computacional ligero.</p>
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🔁</span>
             <strong>Ejecuta múltiples veces</strong>
-            <p>Sube <code>n_init</code> a 10-50 para datos importantes. Quédate con la mejor solución (menor inertia). El tiempo extra suele compensar.</p>
+            <p>Sube <code>n_init</code> a 10-50 para datos importantes. Quédate con la mejor solución (menor inercia). El tiempo extra suele compensar.</p>
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">📐</span>

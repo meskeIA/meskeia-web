@@ -285,7 +285,14 @@
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  touch-action: none;
+  /*
+   * manipulation: deslizar el dedo sobre el lienzo desplaza la página. El arrastre de un
+   * punto en modo «Arrastrar» retiene el gesto desde page.tsx, con un touchmove no pasivo, y
+   * solo mientras hay un punto agarrado (hallazgo 2452, receta de simulador-grafos).
+   */
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .canvasFondo {
@@ -508,6 +515,27 @@
 
   .title {
     font-size: 1.5rem;
+  }
+
+  /*
+   * Hasta el 29/09/2026 los rellenos anidados (.main 32 px + .canvasContainer 24 px, más el
+   * del contenedor) no se reducían aquí y el lienzo se quedaba en 246 de los 390 px de un
+   * móvil (hallazgo 2452). Recortados, pasa a unos 340 px.
+   */
+  .main {
+    padding: var(--spacing-sm);
+  }
+
+  .panel {
+    padding: var(--spacing-md) 12px;
+  }
+
+  .canvasContainer {
+    padding: var(--spacing-sm) 0;
+  }
+
+  .canvasContainer .panelTitle {
+    padding: 0 12px;
   }
 
   .presetGrid {

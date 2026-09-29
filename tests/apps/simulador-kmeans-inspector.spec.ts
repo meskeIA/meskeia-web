@@ -20,22 +20,27 @@ import {
  * de los siguientes, el primer punto cuya suma acumulada de d² alcanza c·Σd².
  *
  * ── El lienzo ──────────────────────────────────────────────────────────────────
- * Los datos importados se escalan a un lienzo de 600 × 400 con margen 30: x → 30 + (x − xmin)/Δx·540
- * e y → 370 − (y − ymin)/Δy·340 (el eje Y se invierte). La inercia se calcula en esas unidades.
+ * REPARADO el 29/09/2026 (hallazgos 2450 y 2451). Hasta entonces los datos importados se
+ * estiraban a 540 px en X y 340 en Y, y la inercia y los centroides salían en esos píxeles.
+ * Ahora cada columna se normaliza min-max a [0, 1] y se dibuja en un cuadrado de 340 px
+ * centrado (x de 130 a 470, y de 30 a 370, Y invertida): x → 130 + u·340, y → 370 − v·340.
+ * La inercia se da en unidades normalizadas (px² / 340²) y los centroides, en las unidades de
+ * las columnas.
  *
  * Casos resueltos a mano ANTES de ejecutar:
- *   1. NORMAL: (1;1) (1;2) (2;1) (8;8) (8;9) (9;8), K = 2, Math.random = 0,1 → en el lienzo
- *      (30;370) (30;327,5) (97,5;370) (502,5;72,5) (502,5;30) (570;72,5). Semillas: el punto 0 y,
- *      con 0,1·1.037.087,5 = 103.708,75 de umbral, el punto 3. Inercia al inicializar
- *      2·(1.806,25 + 4.556,25) = 12.725; tras recalcular, centroides (52,5; 355,83) y
- *      (525; 58,33) e inercia 2·(⅔·67,5² + ⅔·42,5²) = 8.483,33 → «8483»; la iteración 2 ya no
- *      mueve nada → «Convergido» en la 2. En unidades de los datos: (4/3; 4/3), (25/3; 25/3) y
- *      WCSS = 8/3 ≈ 2,67 (HALLAZGO de las unidades, abajo).
+ *   1. NORMAL: (1;1) (1;2) (2;1) (8;8) (8;9) (9;8), K = 2, Math.random = 0,1 → normalizados
+ *      (0;0) (0;⅛) (⅛;0) (⅞;⅞) (⅞;1) (1;⅞). Semillas: el punto 0 y, con umbral 0,1·326/64 y
+ *      d² acumuladas 0, 1, 2, 100 (/64), el punto 3. Inercia al inicializar 4/64 = 0,0625; tras
+ *      recalcular, centroides (1/24; 1/24) y (11/12; 11/12) e inercia 2·12/576 = 1/24 ≈ 0,0417;
+ *      la iteración 2 ya no mueve nada → «Convergido» en la 2. En unidades de las columnas:
+ *      (4/3; 4/3) = (1,33; 1,33) y (25/3; 25/3) = (8,33; 8,33). La WCSS en las unidades de las
+ *      columnas sería 8/3 = 64 · 1/24, pero no es lo que minimiza el algoritmo (ver el test).
  *   2. LÍMITES: K = n = 6 → inercia 0 y convergencia en la iteración 1 · (1;1) (1;1) (2;2) con
- *      K = 3 → el tercer centroide nace en (30 + 0,1·540; 30 + 0,1·340) = (84; 64) con 0 puntos ·
- *      K = 3 con dos puntos → no deja inicializar · el codo de tres grupos de cuatro puntos
- *      repetidos → K = 3, con inercia 891.466,67 en K = 1 y 377.000 en K = 2 (la cuenta, en el
- *      test) · K = 0 no se puede pedir (el deslizador empieza en 2).
+ *      K = 3 → el tercer centroide nace en el cuadrado de los datos, (130 + 0,1·340;
+ *      30 + 0,1·340) = (164; 64), que en las columnas es (1,10; 1,90), con 0 puntos · K = 3 con
+ *      dos puntos → no deja inicializar · el codo de tres grupos de cuatro puntos repetidos →
+ *      K = 3, con inercia 14/3 ≈ 4,6667 en K = 1 y 2 en K = 2 (la cuenta, en el test) · K = 0
+ *      no se puede pedir (el deslizador empieza en 2).
  *   3. RECHAZO: solo líneas vacías, una sola fila, una coordenada no numérica, coma decimal con
  *      punto y coma y coma decimal con la coma como separador.
  * Y las dos SOSPECHAS de SOSPECHAS.md:
@@ -77,12 +82,15 @@ const filasCluster = (page: Page) => page.locator('[class*="clusterRow"]');
 const resumen = (page: Page) => page.getByRole('status').filter({ hasText: 'puntos importados' });
 const puntos = (page: Page) => page.locator(`${LIENZO} circle[class*="puntoCircle"]`);
 
-/** Centros de los centroides DIBUJADOS (el cuadrado mide 18 y se coloca en c − 9). */
+/**
+ * Centros de los centroides DIBUJADOS. El cuadrado se coloca en c − lado/2; el lado es 18 en
+ * escritorio y crece en un móvil (hallazgo 2452), así que se lee de su propio `width`.
+ */
 async function centroidesDibujados(page: Page): Promise<{ x: number; y: number }[]> {
   return page.locator(`${LIENZO} rect[class*="centroideMarker"]`).evaluateAll((els) =>
     els.map((el) => ({
-      x: Number(el.getAttribute('x')) + 9,
-      y: Number(el.getAttribute('y')) + 9,
+      x: Number(el.getAttribute('x')) + Number(el.getAttribute('width')) / 2,
+      y: Number(el.getAttribute('y')) + Number(el.getAttribute('height')) / 2,
     })),
   );
 }
@@ -95,8 +103,8 @@ async function centroidesDibujados(page: Page): Promise<{ x: number; y: number }
 async function puntosConColorAjeno(page: Page): Promise<number> {
   return page.locator(LIENZO).evaluate((svg) => {
     const cent = [...svg.querySelectorAll('rect[class*="centroideMarker"]')].map((e) => ({
-      x: Number(e.getAttribute('x')) + 9,
-      y: Number(e.getAttribute('y')) + 9,
+      x: Number(e.getAttribute('x')) + Number(e.getAttribute('width')) / 2,
+      y: Number(e.getAttribute('y')) + Number(e.getAttribute('height')) / 2,
       fill: e.getAttribute('fill'),
     }));
     let ajenos = 0;
@@ -117,7 +125,7 @@ async function puntosConColorAjeno(page: Page): Promise<number> {
 const SEIS_PUNTOS = '1;1\n1;2\n2;1\n8;8\n8;9\n9;8';
 
 test.describe('cálculo con datos propios (semilla fijada)', () => {
-  test('normal: dos grupos de tres con K=2 → 12.725 al inicializar, 8483 y convergencia en la iteración 2', async ({ page }) => {
+  test('normal: dos grupos de tres con K=2 → 0,0625 al inicializar, 0,0417 y convergencia en la iteración 2', async ({ page }) => {
     await cargar(page);
     await importar(page, SEIS_PUNTOS);
     await expect(puntos(page)).toHaveCount(6);
@@ -125,35 +133,34 @@ test.describe('cálculo con datos propios (semilla fijada)', () => {
     await fijarAzar(page, 0.1);
 
     await boton(page, 'Inicializar centroides').click();
-    // Semillas en los puntos 0 y 3: cada grupo con 1.806,25 + 4.556,25 de d² → 12.725
-    await expect(valor(page, 'Inertia')).toHaveText('12.725');
+    // Semillas en los puntos 0 y 3: cada grupo con 1/64 + 1/64 de d² → 4/64 = 0,0625
+    await expect(valor(page, 'Inercia')).toHaveText('0,0625');
     await expect(valor(page, 'Iteración')).toHaveText('0/ 20');
 
     await boton(page, 'Iterar 1 paso').click();
-    // Centroides a la media: (52,5; 355,83) y (525; 58,33). Inercia 8.483,33, y con cuatro
-    // cifras enteras Intl es-ES no agrupa (RAE): «8483»
-    await expect(valor(page, 'Inertia')).toHaveText('8483');
+    // Centroides a la media: (1/24; 1/24) y (11/12; 11/12). Inercia 2 · 12/576 = 1/24
+    await expect(valor(page, 'Inercia')).toHaveText('0,0417');
     await expect(tarjeta(page, 'Estado')).toContainText('En progreso');
 
     await boton(page, 'Iterar 1 paso').click();
     // Recalcular otra vez no mueve nada (desplazamiento 0 < 0,5) → converge en la iteración 2
     await expect(tarjeta(page, 'Estado')).toContainText('Convergido');
     await expect(valor(page, 'Iteración')).toHaveText('2/ 20');
-    await expect(valor(page, 'Inertia')).toHaveText('8483');
+    await expect(valor(page, 'Inercia')).toHaveText('0,0417');
     await expect(filasCluster(page).nth(0)).toContainText('3 puntos');
     await expect(filasCluster(page).nth(1)).toContainText('3 puntos');
 
-    // Los centroides dibujados son la media de su grupo en el lienzo. Precisión 0,01: un
-    // recálculo equivocado (el punto de otro grupo, una media sin dividir) se va a decenas
+    // Los centroides dibujados son la media de su grupo en el lienzo (cuadrado de 340 px desde
+    // (130; 30)). Precisión 0,01: un recálculo equivocado se va a decenas
     const [c1, c2] = await centroidesDibujados(page);
-    expect(c1.x).toBeCloseTo(52.5, 2);          // (30 + 30 + 97,5) / 3
-    expect(c1.y).toBeCloseTo(1067.5 / 3, 2);    // (370 + 327,5 + 370) / 3 = 355,83
-    expect(c2.x).toBeCloseTo(525, 2);           // (502,5 + 502,5 + 570) / 3
-    expect(c2.y).toBeCloseTo(175 / 3, 2);       // (72,5 + 30 + 72,5) / 3 = 58,33
+    expect(c1.x).toBeCloseTo(130 + 340 / 24, 2);   // 144,17
+    expect(c1.y).toBeCloseTo(370 - 340 / 24, 2);   // 355,83
+    // (⅞ + ⅞ + 1) / 3 = 11/12 = ((25/3) − 1) / 8
+    expect(c2.x).toBeCloseTo(130 + (340 * 11) / 12, 2);   // 441,67
+    expect(c2.y).toBeCloseTo(370 - (340 * 11) / 12, 2);   // 58,33
   });
 
-  test('HALLAZGO (ABIERTO): tras importar, el centroide se da en píxeles del lienzo y no en las unidades de los datos', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el panel dice «centroide (525,0, 58,3)» para un grupo cuya media es (8,33; 8,33)');
+  test('HALLAZGO 2450 (REPARADO el 29/09/2026): tras importar, el centroide se da en las unidades de las columnas', async ({ page }) => {
     await cargar(page);
     await importar(page, SEIS_PUNTOS);
     await sembrarValor(page, '#k', 2);
@@ -162,11 +169,22 @@ test.describe('cálculo con datos propios (semilla fijada)', () => {
     await boton(page, 'Iterar 1 paso').click();
     await boton(page, 'Iterar 1 paso').click();
     await expect(tarjeta(page, 'Estado')).toContainText('Convergido');
-    // Media de (8;8) (8;9) (9;8) = (25/3; 25/3) = (8,33; 8,33): con uno o dos decimales empieza
-    // por «(8,3». Lo que sale hoy son las coordenadas del lienzo, (525,0, 58,3), con Y invertida
-    // (ojo: «58,3» contiene «8,3», de ahí el paréntesis)
-    await expect(filasCluster(page).nth(1)).toContainText(/centroide \(8,3/);
-    await expect(filasCluster(page).nth(1)).not.toContainText('525');
+    // Medias (4/3; 4/3) y (25/3; 25/3). Antes: «centroide (52,5, 355,8)» y «(525,0, 58,3)»
+    await expect(filasCluster(page).nth(0)).toContainText('centroide (1,33; 1,33)');
+    await expect(filasCluster(page).nth(1)).toContainText('centroide (8,33; 8,33)');
+    /*
+     * El «esperado» del acta pedía además la WCSS en las unidades de las columnas, 8/3 ≈ 2,67.
+     * Se REESCRIBE: la inercia se da en el espacio donde agrupa el algoritmo, el normalizado,
+     * que es lo que hace scikit-learn con `inertia_` tras escalar; en las columnas habría que
+     * sumar años² y euros², y esa suma no es la que baja en cada paso. Aquí vale 8/3 / 8² = 1/24
+     * (las dos columnas tienen amplitud 8), y la app dice en qué unidades va.
+     */
+    await expect(valor(page, 'Inercia')).toHaveText('0,0417');
+    const panel = page.locator('div[class*="panel"]').filter({
+      has: page.getByRole('heading', { name: 'Tamaños de cada cluster' }),
+    });
+    await expect(panel).toContainText('unidades de tus columnas');
+    await expect(panel).toContainText('unidades normalizadas');
   });
 
   test('límite K = n: seis puntos con K=6 → inercia 0 y convergencia en la iteración 1', async ({ page }) => {
@@ -176,13 +194,13 @@ test.describe('cálculo con datos propios (semilla fijada)', () => {
     await fijarAzar(page, 0.1);
     await boton(page, 'Inicializar centroides').click();
     // k-means++ nunca repite un punto ya elegido (su d² es 0): seis semillas, una por punto
-    await expect(valor(page, 'Inertia')).toHaveText('0');
+    await expect(valor(page, 'Inercia')).toHaveText('0');
     await expect(filasCluster(page)).toHaveCount(6);
     for (let j = 0; j < 6; j++) await expect(filasCluster(page).nth(j)).toContainText('1 punto');
     await boton(page, 'Iterar 1 paso').click();
     await expect(tarjeta(page, 'Estado')).toContainText('Convergido');
     await expect(valor(page, 'Iteración')).toHaveText('1/ 20');
-    await expect(valor(page, 'Inertia')).toHaveText('0');
+    await expect(valor(page, 'Inercia')).toHaveText('0');
   });
 
   test('límite puntos repetidos: (1;1) dos veces y (2;2) con K=3 → un cluster vacío que la app declara con «0 puntos»', async ({ page }) => {
@@ -191,13 +209,15 @@ test.describe('cálculo con datos propios (semilla fijada)', () => {
     await expect(boton(page, 'Inicializar centroides')).toBeEnabled();
     await fijarAzar(page, 0.1);
     await boton(page, 'Inicializar centroides').click();
-    // Tras (30;370) y (570;30) todas las d² son 0: el tercer centroide va a un sitio al azar del
-    // lienzo, (30 + 0,1·540; 30 + 0,1·340) = (84; 64), y nadie lo tiene como el más cercano
+    // Tras (130;370) y (470;30) todas las d² son 0: el tercer centroide va a un sitio al azar del
+    // cuadrado de los datos, (130 + 0,1·340; 30 + 0,1·340) = (164; 64), y nadie lo tiene como el
+    // más cercano. En las columnas (amplitud 1): x = 1 + 34/340 = 1,10 e y = 1 + 306/340 = 1,90.
+    // (Antes del 29/09/2026 salía «(84,0, 64,0)», en píxeles de todo el lienzo.)
     await expect(filasCluster(page).nth(0)).toContainText('2 puntos');
     await expect(filasCluster(page).nth(1)).toContainText('1 punto');
     await expect(filasCluster(page).nth(2)).toContainText('0 puntos');
-    await expect(filasCluster(page).nth(2)).toContainText('(84,0, 64,0)');
-    await expect(valor(page, 'Inertia')).toHaveText('0');
+    await expect(filasCluster(page).nth(2)).toContainText('(1,10; 1,90)');
+    await expect(valor(page, 'Inercia')).toHaveText('0');
     // El vacío conserva su posición: nada se mueve y converge en la 1
     await boton(page, 'Iterar 1 paso').click();
     await expect(tarjeta(page, 'Estado')).toContainText('Convergido');
@@ -214,16 +234,27 @@ test.describe('cálculo con datos propios (semilla fijada)', () => {
     await expect(boton(page, 'Calcular curva del codo')).toBeDisabled();
   });
 
-  test('HALLAZGO (ABIERTO): con K mayor que el número de puntos los botones se apagan sin decir por qué', async ({ page }) => {
-    test.fail(true, 'ABIERTO: ningún texto explica que K=3 pide al menos 3 puntos');
+  test('HALLAZGO 2453 (REPARADO el 29/09/2026): con K mayor que el número de puntos, la app dice por qué no deja agrupar', async ({ page }) => {
     await cargar(page);
     await importar(page, '1;1\n2;2');
     await expect(boton(page, 'Inicializar centroides')).toBeDisabled();
-    // El panel de parámetros hoy no nombra los puntos en ningún sitio
-    const panel = page.locator('div[class*="panel"]').filter({
-      has: page.getByRole('heading', { name: 'Parámetros del algoritmo' }),
-    });
-    await expect(panel).toContainText(/punto/);
+    /*
+     * El acta pedía el aviso en el panel «Parámetros del algoritmo». Se pone en la nota de
+     * DEBAJO del lienzo («2 puntos en el lienzo · Con K = 3 hacen falta…»), junto a donde se
+     * añaden puntos, y en el `title` de los botones apagados: en el panel de parámetros el
+     * aviso aparecía y desaparecía mientras se tocaba el lienzo y lo movía 23 px bajo el dedo
+     * (lo cazó el test de la sospecha (a) en móvil).
+     */
+    const nota = page.locator('p[class*="lienzoNota"]');
+    await expect(nota).toContainText('2 puntos en el lienzo');
+    await expect(nota).toContainText('Con K = 3 hacen falta al menos 3 puntos');
+    await expect(boton(page, 'Inicializar centroides')).toHaveAttribute('title', /al menos 3 puntos/);
+    // Y el codo, por debajo de 10 puntos
+    await expect(page.getByText('necesita al menos 10 puntos; ahora hay 2')).toBeVisible();
+    // Al bajar K a 2 el aviso se va y el botón se enciende
+    await sembrarValor(page, '#k', 2);
+    await expect(nota).not.toContainText('hacen falta al menos');
+    await expect(boton(page, 'Inicializar centroides')).toBeEnabled();
   });
 
   test('codo: tres grupos de cuatro puntos repetidos → codo en K = 3', async ({ page }) => {
@@ -232,29 +263,35 @@ test.describe('cálculo con datos propios (semilla fijada)', () => {
       page,
       ['0;0', '0;0', '0;0', '0;0', '10;0', '10;0', '10;0', '10;0', '5;10', '5;10', '5;10', '5;10'].join('\n'),
     );
+    /*
+     * Reescrito el 29/09/2026 con la normalización simétrica (hallazgo 2451). Normalizados,
+     * a = (0;0), b = (1;0), c = (0,5;1), cuatro de cada; ahora a y b están MÁS cerca entre sí
+     * (d² = 1) que cada uno de c (d² = 1,25), y con K=2 el resultado depende de las semillas:
+     * {a,b}{c} da 2 y {a,c}{b} da 2,5. Por eso se fija el azar a 0,5 (antes no hacía falta):
+     * primera semilla floor(0,5·12) = 6, un b; segunda, umbral 0,5·9 = 4,5 sobre las d²
+     * acumuladas 1, 2, 3, 4 (las a), 5,25 (primera c) → c. Semillas b y c: las a van con b.
+     *   K=1: media (0,5; ⅓) → 4·[2·(0,25 + 1/9) + 4/9] = 14/3 ≈ 4,6667
+     *   K=2: {a,b} con centroide (0,5; 0) → 8·0,25 = 2
+     *   K≥3: cada grupo su centroide → 0
+     * Codo: la distancia vertical a la cuerda (1; 4,67)–(10; 0) vale 2,15 en K=2 y 3,63 en K=3
+     * (y baja después) → K = 3
+     */
+    await fijarAzar(page, 0.5);
     await boton(page, 'Calcular curva del codo').click();
-    // Lienzo: a = (30;370), b = (570;370), c = (300;30), cuatro de cada. Media global (300; 256,67)
-    //   K=1: 4·(270² + 113,33²)·2 + 4·226,67² = 891.466,67 → «891467» (Math.round en el <title>)
-    //   K=2: la semilla que no está en c atrae a c (d² = 188.500 frente a 291.600 entre a y b),
-    //        así que se funde c con a o con b: 4·188.500/2 = 377.000
-    //   K≥3: cada grupo su centroide → 0
-    // Codo: la distancia vertical a la cuerda (1; 891.466,67)–(10; 0) vale 415.414,8 en K=2 y
-    // 693.363 en K=3 (y baja después) → K = 3
     const titulos = page.locator('svg[aria-label="Curva del método del codo"] title');
     await expect(titulos).toHaveCount(10);
-    await expect(titulos.nth(0)).toHaveText('K=1, inertia=891467');
-    await expect(titulos.nth(1)).toHaveText('K=2, inertia=377000');
-    await expect(titulos.nth(2)).toHaveText('K=3, inertia=0');
+    await expect(titulos.nth(0)).toHaveText('K=1, inercia=4,6667');
+    await expect(titulos.nth(1)).toHaveText('K=2, inercia=2,0000');
+    await expect(titulos.nth(2)).toHaveText('K=3, inercia=0');
     await expect(page.getByText('Codo detectado en K = 3')).toBeVisible();
   });
 
-  test('HALLAZGO (ABIERTO): el eje X pesa 540 y el Y 340, así que el orden de las columnas cambia los grupos', async ({ page }) => {
-    test.fail(true, 'ABIERTO: con las columnas intercambiadas la app agrupa A con B; sin intercambiar, A con C');
+  test('HALLAZGO 2451 (REPARADO el 29/09/2026): el orden de las columnas no cambia los grupos', async ({ page }) => {
     // A(0;0), B(1;0), C(0,15;1). Con los dos ejes normalizados igual, A–B = 1 < A–C = 1,011 y
     // el grupo de menor inercia es {A,B}{C}; intercambiar las columnas es una simetría y no
-    // puede cambiar la respuesta. En el lienzo, A–B = 540 y A–C = √(81² + 340²) = 349,5, y la
-    // app agrupa {A,C}{B} (inercia 61.081); con las columnas al revés, A–B = 340 y A–C = 542,4,
-    // y agrupa {A,B}{C} (inercia 57.800). Math.random = 0,5 lleva a las dos a su óptimo.
+    // puede cambiar la respuesta. Antes, en el lienzo estirado, A–B = 540 y A–C = 349,5, y la
+    // app agrupaba {A,C}{B}; con las columnas al revés agrupaba {A,B}{C}. Math.random = 0,5:
+    // semillas B (floor(1,5)) y C (umbral 0,5·2,7225 tras A = 1), y A va con B (1 < 1,0225).
     const grupoDeA = async (texto: string): Promise<string> => {
       await cargar(page);
       await importar(page, texto);
@@ -269,7 +306,33 @@ test.describe('cálculo con datos propios (semilla fijada)', () => {
     };
     const directo = await grupoDeA('0;0\n1;0\n0,15;1');
     const intercambiado = await grupoDeA('0;0\n0;1\n1;0,15');
-    expect(directo).toBe(intercambiado);
+    expect(directo).toBe('A con B');
+    expect(intercambiado).toBe('A con B');
+  });
+
+  test('SOSPECHA confirmada y REPARADA (29/09/2026): parada en el tope de iteraciones sin converger no es «En progreso»', async ({ page }) => {
+    await cargar(page);
+    // 40 puntos en una recta (0..39; Y constante, que se centra), K = 2, azar 0,00001: semillas
+    // en los puntos 0 (floor(0,0004)) y 1 (umbral 0,00001·Σi² = 0,2 ≤ 1). Lloyd avanza la
+    // frontera poco a poco: el primer grupo pasa de 11 a 16, 18, 19 y 20 puntos, y los
+    // centroides se mueven 165,6 · 43,6 · 21,8 · 8,7 · 4,4 · 4,4 · 0 px en las iteraciones
+    // 1 a 7 (simulado con la misma aritmética; separaciones irregulares, sin empates
+    // exactos). Con 5 iteraciones máximas se para SIN converger. Hasta el 29/09/2026 la
+    // tarjeta decía «En progreso», como si siguiera trabajando.
+    await importar(page, Array.from({ length: 40 }, (_, i) => `${i};0`).join('\n'));
+    await sembrarValor(page, '#k', 2);
+    await sembrarValorAcotado(page, '#iter', 5);
+    await fijarAzar(page, 0.00001);
+    await boton(page, 'Ejecutar hasta convergencia').click();
+    await expect(valor(page, 'Iteración')).toHaveText('5/ 5', { timeout: 10_000 });
+    await expect(tarjeta(page, 'Estado')).toContainText('Tope sin converger');
+    // Dos pasos más a mano: la 6.ª aún mueve 4,4 px y la 7.ª converge, 20 y 20
+    await boton(page, 'Iterar 1 paso').click();
+    await expect(tarjeta(page, 'Estado')).toContainText('Tope sin converger');
+    await boton(page, 'Iterar 1 paso').click();
+    await expect(tarjeta(page, 'Estado')).toContainText('Convergido');
+    await expect(filasCluster(page).nth(0)).toContainText('20 puntos');
+    await expect(filasCluster(page).nth(1)).toContainText('20 puntos');
   });
 });
 
@@ -306,22 +369,32 @@ test.describe('importación: rechazos y formato', () => {
     await expect(resumen(page)).toContainText('descartado 1');
   });
 
-  test('HALLAZGO (ABIERTO): si la fila mala es la primera, se toma por cabecera y no se cuenta como descartada', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «1;abc» pasa a ser la cabecera: «Eje X: 1 · Eje Y: abc», sin aviso de fila descartada');
+  test('HALLAZGO 2454 (REPARADO el 29/09/2026): si la fila mala es la primera, se cuenta como descartada y no como cabecera', async ({ page }) => {
     await cargar(page);
     await importar(page, '1;abc\n2;3\n4;5');
     await expect(puntos(page)).toHaveCount(2);
-    await expect(resumen(page)).toContainText('descartado 1');
+    await expect(resumen(page)).toContainText('Se ha descartado 1 fila que no contenía dos números');
+    await expect(resumen(page)).toContainText('Eje X: Columna 1');
+    await expect(resumen(page)).toContainText('Eje Y: Columna 2');
   });
 
-  test('HALLAZGO (ABIERTO): coma decimal con la coma como separador se lee sin aviso como otras columnas', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «1,5,2,5 / 3,2,4,8» se lee como (1;5) y (3;2): X de 1 a 3 e Y de 2 a 5');
+  test('HALLAZGO 2455 (REPARADO el 29/09/2026): coma decimal con la coma como separador → se avisa de la lectura', async ({ page }) => {
     await cargar(page);
     await importar(page, '1,5,2,5\n3,2,4,8');
-    // Leído como decimales serían X de 1,50 a 3,20 e Y de 2,50 a 4,80; la app parte por comas y
-    // se queda con los dos primeros trozos. Lo que no puede pasar es que la lectura errónea
-    // salga como buena sin decir nada
-    await expect(resumen(page)).not.toContainText('de 1 a 3');
+    /*
+     * El acta aceptaba dos salidas: leer (1,5; 2,5) o avisar de la ambigüedad. Se elige el
+     * aviso, y la aserción se reescribe: «1,5,2,5» es TAMBIÉN un CSV válido de cuatro columnas
+     * enteras (y «1,2,99», uno de tres), así que adivinar decimales rompería esos casos. La
+     * lectura por columnas se mantiene, pero ya no sale como buena sin decir nada: el resumen
+     * cita los números leídos y cómo pegarlos para que se lean con coma decimal.
+     */
+    await expect(resumen(page)).toContainText('Revisa la lectura');
+    await expect(resumen(page)).toContainText('4 campos separados por comas');
+    await expect(resumen(page)).toContainText('X = 1 e Y = 5');
+    // Y separados con punto y coma, como pide el aviso, se leen con su coma decimal
+    await importar(page, '1,5;2,5\n3,2;4,8');
+    await expect(resumen(page)).toContainText('de 1,50 a 3,20');
+    await expect(resumen(page)).not.toContainText('Revisa la lectura');
   });
 
   test('K = 0 no se puede pedir: el deslizador se queda en 2', async ({ page }) => {
@@ -333,16 +406,50 @@ test.describe('importación: rechazos y formato', () => {
 });
 
 test.describe('preset de partida', () => {
-  test('HALLAZGO (ABIERTO): los puntos dibujados al cargar no son los que se agrupan', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el preset se sortea en el servidor y otra vez en el cliente; React no corrige cx/cy');
+  test('HALLAZGO 2449 (REPARADO el 29/09/2026): los puntos dibujados al cargar son los que se agrupan', async ({ page }) => {
+    // Antes el preset se sorteaba con Math.random en el servidor y otra vez en el cliente, y
+    // React no corrige cx/cy. Ahora sale de un generador con semilla, igual en los dos lados.
     await cargar(page);
     // K=5 sobre tres nubes: al menos una nube tiene dos semillas y queda partida en dos.
-    // Justo tras inicializar, cada punto debe llevar el color del centroide más cercano
+    // Justo tras inicializar, y tras cada paso, cada punto debe llevar el color del centroide
+    // dibujado más cercano. Medido antes de reparar: entre 20 y 32 de los 90, mezclados
     await sembrarValor(page, '#k', 5);
     await boton(page, 'Inicializar centroides').click();
     await expect(filasCluster(page)).toHaveCount(5);
-    // Medido: entre 21 y 32 de los 90 puntos dibujados, con colores mezclados dentro de la nube
     expect(await puntosConColorAjeno(page)).toBe(0);
+    for (let i = 0; i < 3; i++) {
+      await boton(page, 'Iterar 1 paso').click();
+      await expect(valor(page, 'Iteración')).toHaveText(`${i + 1}/ 20`);
+      expect(await puntosConColorAjeno(page)).toBe(0);
+    }
+  });
+
+  test('HALLAZGO 2449: los cx/cy del DOM son los del estado de React, y no hay aviso de desajuste', async ({ page }) => {
+    const avisos: string[] = [];
+    page.on('console', (m) => {
+      if (/hydrat|didn.t match|did not match/i.test(m.text())) avisos.push(m.text().slice(0, 300));
+    });
+    // Lo que sirve el prerender, sin ejecutar nada: 90 puntos
+    const html = await (await page.request.get(RUTA)).text();
+    expect(html.match(/<circle[^>]*puntoCircle/g) ?? []).toHaveLength(90);
+
+    await page.goto(RUTA, { waitUntil: 'networkidle' });
+    await esperarHidratacion(page, ['#k', '#datosPropios']);
+    // El aviso de React llega DESPUÉS del testigo de hidratación (receta de 92c9490c)
+    await page.waitForTimeout(1500);
+    expect(avisos, 'avisos de hidratación en la consola').toEqual([]);
+    // React no reescribe un atributo cuyo valor no cambia, así que un DOM del servidor con
+    // otro estado debajo solo se delata comparando con las props que React guarda en el nodo.
+    // Antes de reparar: los 90 distintos
+    const distintos = await puntos(page).evaluateAll((els) =>
+      els.filter((e) => {
+        const clave = Object.keys(e).find((k) => k.startsWith('__reactProps'));
+        if (!clave) return true;
+        const props = (e as unknown as Record<string, { cx: number; cy: number }>)[clave];
+        return String(props.cx) !== e.getAttribute('cx') || String(props.cy) !== e.getAttribute('cy');
+      }).length,
+    );
+    expect(distintos).toBe(0);
   });
 
   test('control: con el preset generado en el navegador cada punto lleva el color de su centroide', async ({ page }) => {
@@ -356,16 +463,40 @@ test.describe('preset de partida', () => {
 });
 
 test.describe('contenido', () => {
-  test('HALLAZGO (ABIERTO): la métrica se rotula en inglés («Inertia»)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «Inertia (SSE)», el eje «Inertia» del codo y su <title> «inertia=891467»');
+  test('HALLAZGO 2456 (REPARADO el 29/09/2026): la métrica se rotula en español y la cifra con formato español', async ({ page }) => {
     await cargar(page);
-    await expect(page.locator('[class*="metricLabel"]').nth(1)).toContainText('Inercia');
+    await expect(page.locator('[class*="metricLabel"]').nth(1)).toHaveText('Inercia (SSE)');
+    await expect(page.getByText(/inertia/i)).toHaveCount(0);
+    // Con los datos sintéticos la inercia va en px² y con millares: el <title> del codo
+    // ya no es «inertia=891467» sino «inercia=…» con punto de millar
+    await boton(page, 'Calcular curva del codo').click();
+    const primero = page.locator('svg[aria-label="Curva del método del codo"] title').first();
+    await expect(primero).toHaveText(/^K=1, inercia=\d{1,3}(\.\d{3})+$/);
+    await expect(page.locator('svg[aria-label="Curva del método del codo"]')).toContainText('Inercia');
   });
 
-  test('HALLAZGO (ABIERTO): la guía da n_init = 10 como valor por defecto de scikit-learn', async ({ page }) => {
-    test.fail(true, 'ABIERTO: desde scikit-learn 1.4 el valor por defecto es n_init="auto" (1 ejecución con k-means++)');
+  test('HALLAZGO 2456: una fila descartada concuerda en singular', async ({ page }) => {
+    await cargar(page);
+    await importar(page, '1;2\nfila rota\n3;4');
+    await expect(resumen(page)).toContainText('Se ha descartado 1 fila que no contenía dos números.');
+    await importar(page, '1;2\nrota\notra rota\n3;4');
+    await expect(resumen(page)).toContainText('Se han descartado 2 filas que no contenían dos números.');
+  });
+
+  test('HALLAZGO 2457 (REPARADO el 29/09/2026): la guía da n_init=\'auto\' como valor por defecto de scikit-learn', async ({ page }) => {
+    // Documentación de KMeans: «Changed in version 1.4: Default value for n_init changed to
+    // 'auto'» — 1 ejecución con init='k-means++' (el valor por defecto) y 10 con 'random'
     await cargar(page);
     await expect(page.getByText('por defecto 10')).toHaveCount(0);
+    await expect(page.getByText(/Desde la versión 1\.4 vale/)).toHaveCount(1);
+  });
+
+  test('SOSPECHA confirmada y REPARADA (29/09/2026): k-means no es «la base de los formatos GIF»', async ({ page }) => {
+    // GIF89a solo define una tabla de hasta 256 colores; cómo se construye la paleta lo decide
+    // el programa que codifica (median cut, octree, k-means…)
+    await cargar(page);
+    await expect(page.getByText('base de los formatos GIF')).toHaveCount(0);
+    await expect(page.getByText(/el formato no fija el método/)).toHaveCount(1);
   });
 });
 
@@ -430,32 +561,54 @@ test.describe('lienzo en móvil 390 × 844', () => {
     }
   });
 
-  test('sospecha (b): el lienzo deja margen, y deslizar en el margen desplaza la página', async ({ page }) => {
+  /*
+   * Sospecha (b), REESCRITA el 29/09/2026 al reparar el hallazgo 2452. Antes el lienzo medía
+   * 246 × 165 px y dejaba 72 px de margen a cada lado, que eran el único sitio donde deslizar
+   * desplazaba la página (touch-action: none en el lienzo). Al agrandarlo, ese margen se queda
+   * en ~25 px; por eso el lienzo pasa a touch-action: manipulation (receta de simulador-grafos)
+   * y lo que se comprueba ahora es que deslizar DENTRO del lienzo baja la página sin crear un
+   * punto, y que el lienzo ocupa casi todo el ancho.
+   */
+  const deslizarCon = async (page: Page, x: number, y0: number, y1: number) => {
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: y0 }] });
+    for (let i = 1; i <= 10; i++) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: y0 + ((y1 - y0) * i) / 10 }] });
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  };
+
+  test('sospecha (b): el lienzo ocupa casi todo el ancho, y deslizar sobre él desplaza la página sin crear puntos', async ({ page }) => {
     await cargar(page);
     const lienzo = page.locator(LIENZO);
     await lienzo.evaluate((el) => el.scrollIntoView({ block: 'center' }));
     const caja = await lienzo.boundingBox();
     if (!caja) throw new Error('El lienzo no tiene caja');
-    // Medido: 246 × 165 px, 72 px de margen a cada lado
-    expect(caja.width / 390).toBeLessThan(0.7);
-    expect(caja.x).toBeGreaterThanOrEqual(48);
+    // 390 − 2·(16 del contenedor + 8 de .main + 1 de borde) = 340 px (antes 246)
+    expect(caja.width).toBeGreaterThanOrEqual(330);
 
-    const cdp = await page.context().newCDPSession(page);
-    const deslizar = async (x: number, y0: number, y1: number) => {
-      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: y0 }] });
-      for (let i = 1; i <= 10; i++) {
-        await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: y0 + ((y1 - y0) * i) / 10 }] });
-      }
-      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    };
     const yMedio = caja.y + caja.height / 2;
     const antes = await page.evaluate(() => window.scrollY);
-    await deslizar(caja.x / 2, yMedio + 60, yMedio - 60);
+    await deslizarCon(page, caja.x + caja.width / 2, yMedio + 60, yMedio - 60);
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(antes + 50);
+    await expect(puntos(page)).toHaveCount(90);
   });
 
-  test('HALLAZGO (ABIERTO): en «Arrastrar», un dedo a 6 px del centro no coge el punto (mide 4 px)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: a 390 px el punto mide 4,1 px de diámetro y solo lo coge un toque a ≤ 3 px de su centro');
+  test('HALLAZGO 2452 (REPARADO el 29/09/2026): puntos y centroides con tamaño mínimo en pantalla', async ({ page }) => {
+    await cargar(page);
+    await boton(page, 'Inicializar centroides').click();
+    const lienzo = page.locator(LIENZO);
+    await lienzo.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    // Antes: puntos de 4,1 px de diámetro y centroides de 7,3 px
+    const punto = await puntos(page).first().boundingBox();
+    const centroide = await page.locator(`${LIENZO} rect[class*="centroideMarker"]`).first().boundingBox();
+    if (!punto || !centroide) throw new Error('Sin cajas');
+    // Mínimos de 8 y 16 px; la caja se ajusta a píxeles de dispositivo (⅓ de px a DPR 3), medido 7,88
+    expect(punto.width).toBeGreaterThanOrEqual(7.6);
+    expect(centroide.width).toBeGreaterThanOrEqual(15.6);
+  });
+
+  test('HALLAZGO 2452 (REPARADO el 29/09/2026): en «Arrastrar», un dedo a 6 px del centro coge el punto', async ({ page }) => {
     await cargar(page);
     await importar(page, '0;0\n10;10');
     await boton(page, 'Arrastrar').click();
@@ -477,7 +630,42 @@ test.describe('lienzo en móvil 390 × 844', () => {
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: centro.y - 5 * i }] });
     }
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    // (0;0) está en (30;370) del lienzo: arrastrado 40 px de pantalla hacia arriba, su cy baja
-    await expect.poll(() => puntos(page).first().getAttribute('cy')).not.toBe('370');
+    // (0;0) está en (130;370) del lienzo: arrastrado 40 px de pantalla hacia arriba (≈ 70
+    // unidades a escala 0,57), su cy baja. Y la página no se ha movido con el gesto
+    await expect.poll(async () => Number(await puntos(page).first().getAttribute('cy'))).toBeLessThan(330);
+    const cy = Number(await puntos(page).first().getAttribute('cy'));
+    expect(cy).toBeGreaterThan(280);
+  });
+
+  test('HALLAZGO 2452: con dos puntos cerca, el toque coge el más cercano al dedo', async ({ page }) => {
+    await cargar(page);
+    // (0;0), (1;0) y (10;10): los dos primeros quedan a 34 unidades (≈ 19 px) uno del otro
+    await importar(page, '0;0\n1;0\n10;10');
+    await boton(page, 'Arrastrar').click();
+    const lienzo = page.locator(LIENZO);
+    await lienzo.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    const centros = await lienzo.evaluate((svg) => {
+      const el = svg as SVGSVGElement;
+      return [...el.querySelectorAll('circle[class*="puntoCircle"]')].map((c) => {
+        const p = el.createSVGPoint();
+        p.x = Number(c.getAttribute('cx'));
+        p.y = Number(c.getAttribute('cy'));
+        const s = p.matrixTransform(el.getScreenCTM()!);
+        return { x: s.x, y: s.y };
+      });
+    });
+    const antes = await puntos(page).evaluateAll((els) => els.map((e) => e.getAttribute('cx')));
+    // Toque a 4 px a la izquierda del SEGUNDO punto (y a 15 px del primero), arrastre de 30 px abajo
+    const cdp = await page.context().newCDPSession(page);
+    const x = centros[1].x - 4;
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: centros[1].y }] });
+    for (let i = 1; i <= 6; i++) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: centros[1].y - 5 * i }] });
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await expect.poll(() => puntos(page).nth(1).getAttribute('cy')).not.toBe('370');
+    // El primero no se ha movido
+    await expect(puntos(page).first()).toHaveAttribute('cy', '370');
+    await expect(puntos(page).first()).toHaveAttribute('cx', antes[0] ?? '');
   });
 });

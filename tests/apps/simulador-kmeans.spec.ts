@@ -63,15 +63,17 @@ test('escala cada eje por separado: el ingreso mayor queda arriba y el menor aba
     els.map((el) => Number(el.getAttribute('cx'))),
   );
 
-  // Lienzo 600x400 con margen 30: los extremos caen exactamente en los márgenes útiles
-  // (24 años -> x=30 · 51 años -> x=570 · 18.500 € -> y=370 · 61.500 € -> y=30)
-  expect(Math.min(...cxs)).toBeCloseTo(30, 5);
-  expect(Math.max(...cxs)).toBeCloseTo(570, 5);
+  // Lienzo 600x400 con margen 30. Desde el 29/09/2026 (hallazgo 2451) los datos van a un
+  // cuadrado de 340 px centrado, con los mismos px por unidad normalizada en los dos ejes
+  // (antes X iba de 30 a 570 y pesaba 1,59 veces más en la distancia):
+  // 24 años -> x=130 · 51 años -> x=470 · 18.500 € -> y=370 · 61.500 € -> y=30
+  expect(Math.min(...cxs)).toBeCloseTo(130, 5);
+  expect(Math.max(...cxs)).toBeCloseTo(470, 5);
   expect(Math.min(...cys)).toBeCloseTo(30, 5);
   expect(Math.max(...cys)).toBeCloseTo(370, 5);
 
   // El primer punto es el de menor edad y menor ingreso: esquina inferior izquierda
-  expect(cxs[0]).toBeCloseTo(30, 5);
+  expect(cxs[0]).toBeCloseTo(130, 5);
   expect(cys[0]).toBeCloseTo(370, 5);
 });
 
@@ -95,7 +97,8 @@ test('cuenta las filas ilegibles en lugar de descartarlas en silencio', async ({
 
   await expect(puntos(page)).toHaveCount(3);
   await expect(page.getByRole('status').filter({ hasText: 'puntos importados' }))
-    .toContainText('descartado 1 filas');
+    // Hasta el 29/09/2026 fijaba «descartado 1 filas», sin concordancia (hallazgo 2456)
+    .toContainText('Se ha descartado 1 fila que no contenía');
 });
 
 test('el botón de ejemplo rellena la caja y agrupa de una vez', async ({ page }) => {
