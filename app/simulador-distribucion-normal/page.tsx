@@ -5,6 +5,8 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorDistribucionNormal.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { pdf, probabilidadNormal } from './casos';
+import CasosAula from './CasosAula';
 
 // ============================================
 // TIPOS
@@ -110,39 +112,8 @@ const PROBLEMAS_TIPO: ProblemaTipo[] = [
 // FUNCIONES MATEMÁTICAS
 // ============================================
 
-/**
- * Función de densidad de probabilidad (PDF) de una N(μ, σ)
- */
-function pdf(x: number, mu: number, sigma: number): number {
-  const z = (x - mu) / sigma;
-  return (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * z * z);
-}
-
-/**
- * Función error (erf) — aproximación de Abramowitz & Stegun (precisión 1.5e-7)
- */
-function erf(x: number): number {
-  const a1 = 0.254829592;
-  const a2 = -0.284496736;
-  const a3 = 1.421413741;
-  const a4 = -1.453152027;
-  const a5 = 1.061405429;
-  const p = 0.3275911;
-
-  const sign = x < 0 ? -1 : 1;
-  const ax = Math.abs(x);
-  const t = 1.0 / (1.0 + p * ax);
-  const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-ax * ax);
-  return sign * y;
-}
-
-/**
- * Función de distribución acumulada (CDF) de una N(μ, σ)
- * P(X ≤ x)
- */
-function cdf(x: number, mu: number, sigma: number): number {
-  return 0.5 * (1 + erf((x - mu) / (sigma * Math.sqrt(2))));
-}
+// pdf, erf y cdf viven en ./casos.ts: los casos para clase corrigen con la MISMA matemática
+// que pinta el panel (skill /casos-aula-meskeia, regla de oro).
 
 /**
  * Formatea un número con coma decimal española
@@ -195,16 +166,10 @@ export default function SimuladorDistribucionNormalPage() {
   // ============================================
   // PROBABILIDAD CALCULADA
   // ============================================
-  const probabilidad = useMemo(() => {
-    if (tipoProb === 'menor') return cdf(a, mu, sigma);
-    if (tipoProb === 'mayor') return 1 - cdf(a, mu, sigma);
-    if (tipoProb === 'entre') {
-      const lo = Math.min(a, b);
-      const hi = Math.max(a, b);
-      return cdf(hi, mu, sigma) - cdf(lo, mu, sigma);
-    }
-    return 0;
-  }, [tipoProb, a, b, mu, sigma]);
+  const probabilidad = useMemo(
+    () => probabilidadNormal(tipoProb, a, b, mu, sigma),
+    [tipoProb, a, b, mu, sigma],
+  );
 
   // ============================================
   // PUNTUACIONES Z
@@ -693,6 +658,10 @@ export default function SimuladorDistribucionNormalPage() {
           )}
         </div>
       </div>
+
+      {/* Tarea de aula (skill /casos-aula-meskeia): fuera del panel del simulador, para que se
+          vea en los tres modos y no toque su estado. */}
+      <CasosAula />
 
       {/* ============================================
           BLOQUE EDUCATIVO v2.0
