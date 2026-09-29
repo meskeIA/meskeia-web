@@ -5,6 +5,7 @@ import styles from './AnalizadorEspectro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
+import { picoDominante } from '@/lib/calculadoras/frecuenciaDominante';
 
 // Bandas de frecuencia para mostrar
 const FREQUENCY_BANDS = [
@@ -175,31 +176,13 @@ export default function AnalizadorEspectroPage() {
      *     (hallazgo 886): un 1.000 Hz perfecto salía «1029 Hz» y un 440 Hz, «434 Hz».
      *
      * Ahora se recorren los bins reales (5,4 Hz a 44,1 kHz con fftSize 8192) y se afina el
-     * máximo con una interpolación parabólica sobre sus dos vecinos, que es lo estándar para
-     * un pico de FFT: la parábola que pasa por los tres puntos tiene su vértice en
-     * δ = (y₋₁ − y₊₁) / (2·(y₋₁ − 2y₀ + y₊₁)), y ese δ es la fracción de bin que hay que sumar.
+     * máximo con una interpolación parabólica sobre sus dos vecinos. El cálculo vive en
+     * lib/calculadoras/frecuenciaDominante.ts desde el 29/09/2026, porque generador-tonos
+     * mide lo mismo con el mismo micrófono y las dos apps no pueden dar cifras distintas.
      */
-    let maxBin = 0;
-    let maxBinValue = 0;
-    const binMinimo = Math.max(1, Math.floor(20 / freqPerBin));
-    const binMaximo = Math.min(bufferLength - 2, Math.floor(20000 / freqPerBin));
-    for (let bin = binMinimo; bin <= binMaximo; bin++) {
-      if (dataArray[bin] > maxBinValue) {
-        maxBinValue = dataArray[bin];
-        maxBin = bin;
-      }
-    }
-    let binAfinado = maxBin;
-    if (maxBin > 0 && maxBin < bufferLength - 1) {
-      const izq = dataArray[maxBin - 1];
-      const der = dataArray[maxBin + 1];
-      const denominador = izq - 2 * maxBinValue + der;
-      if (denominador !== 0) {
-        const delta = (izq - der) / (2 * denominador);
-        if (Math.abs(delta) <= 0.5) binAfinado = maxBin + delta;
-      }
-    }
-    const freqDominante = binAfinado * freqPerBin;
+    const pico = picoDominante(dataArray, sampleRate, analyser.fftSize);
+    const maxBinValue = pico?.nivel ?? 0;
+    const freqDominante = pico?.frecuencia ?? 0;
 
     /**
      * La altura de cada banda es el MÁXIMO de sus bins, no la media.

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
 import styles from './GeneradorTonos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
@@ -16,6 +17,8 @@ import {
   evaluarMicrofono,
   type PuntoMedida,
 } from './motor-respuesta';
+import { picoDominante, prominencia, lecturaEstable } from '@/lib/calculadoras/frecuenciaDominante';
+import { notaMasCercana, nombreNota } from '@/lib/calculadoras/afinacionInstrumentos';
 
 interface FrecuenciaPreset {
   nombre: string;
@@ -199,6 +202,38 @@ function leerCampoBarrido(
 }
 
 const esperar = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+/*
+ * ── Medidor de frecuencia (S0170, 29/09/2026) ──
+ *
+ * Google trae a esta app las búsquedas de MEDIR, no de generar: «medidor de frecuencia hz
+ * online» (posición 4,7), «medidor de hertz», «detector de frecuencias online»… unas 2.100
+ * impresiones en 90 días, y hasta hoy la app solo generaba. El medidor contesta esa pregunta con
+ * el micrófono y con el mismo motor que analizador-espectro (lib/calculadoras/frecuenciaDominante),
+ * para que las dos apps no den cifras distintas del mismo tono.
+ */
+/** 16.384 muestras: 2,9 Hz por bin a 48 kHz antes de afinar, y una ventana de ~0,34 s. */
+const FFT_MEDIDOR = 16384;
+/** Diez lecturas por segundo: sobran para una cifra que se lee a ojo. */
+const MS_LECTURA_MEDIDOR = 100;
+/**
+ * Cuánto tiene que sobresalir el pico de la mediana del espectro para contar como tono, en dB.
+ * El ruido blanco solo se queda por debajo de 15 y un tono sobre ese mismo ruido pasa de 30
+ * (tests/frecuencia-dominante-motor.spec.ts): 20 deja margen a los dos lados.
+ */
+const PROMINENCIA_MIN_DB = 20;
+/** Lecturas seguidas que tienen que coincidir para dar la cifra por estable: medio segundo. */
+const LECTURAS_ESTABLES = 5;
+
+/** Hercios medidos, en formato español: con un decimal por debajo de 100 Hz, donde un hercio es mucho. */
+const textoHzMedido = (hz: number) => formatNumber(hz, hz < 100 ? 1 : 0);
+
+/** «La4 (+3 cents)»: la nota del temperamento igual más cercana, con A4 = 440 Hz. */
+function textoNotaMedida(hz: number): string {
+  const nota = notaMasCercana(hz);
+  const cents = nota.cents === 0 ? '0' : `${nota.cents > 0 ? '+' : '−'}${formatNumber(Math.abs(nota.cents), 0)}`;
+  return `${nombreNota(nota)} (${cents}\u00A0cents)`;
+}
 
 /**
  * Espera a que el reloj de AUDIO llegue a `hasta` (segundos de `ctx.currentTime`). El de pared no
@@ -435,6 +470,36 @@ export default function GeneradorTonosPage() {
     wakeLockRef.current = null;
   }, []);
 
+  // --- Medidor de frecuencia con el micrófono -----------------------------------------------
+  const [medidorActivo, setMedidorActivo] = useState(false);
+  /** Lo que se lee ahora; `null` cuando no hay un tono que sobresalga del fondo. */
+  const [lecturaHz, setLecturaHz] = useState<number | null>(null);
+  const [lecturaEsEstable, setLecturaEsEstable] = useState(false);
+  /** La última lectura estable: se queda a la vista cuando el sonido ya ha parado. */
+  const [ultimaEstableHz, setUltimaEstableHz] = useState<number | null>(null);
+  const [avisoMedidor, setAvisoMedidor] = useState<string | null>(null);
+  /** Aviso que NO impide medir (procesados del micrófono que el navegador no deja apagar). */
+  const [notaMedidor, setNotaMedidor] = useState<string | null>(null);
+  const [anuncioMedidor, setAnuncioMedidor] = useState('');
+  /** El medidor tiene su propio contexto y su propio micrófono: se cierran enteros al parar. */
+  const medidorRef = useRef<{ ctx: AudioContext; stream: MediaStream; intervalo: number } | null>(null);
+  /** Entre pulsar y que el navegador conceda el micrófono no hay aún medidor: evita abrir dos. */
+  const abriendoMedidorRef = useRef(false);
+
+  const detenerMedidor = useCallback(() => {
+    const m = medidorRef.current;
+    medidorRef.current = null;
+    if (m) {
+      window.clearInterval(m.intervalo);
+      m.stream.getTracks().forEach((t) => t.stop());
+      m.ctx.close().catch(() => {});
+    }
+    setMedidorActivo(false);
+    setLecturaHz(null);
+    setLecturaEsEstable(false);
+    liberarWakeLock();
+  }, [liberarWakeLock]);
+
   /*
    * Al desmontar (navegar a otra app con el tono sonando, o midiendo): rampa corta a 0 y el
    * contexto se cierra cuando los osciladores ya han callado, con un temporizador de respaldo por
@@ -483,10 +548,21 @@ export default function GeneradorTonosPage() {
       // Un micrófono abierto deja el indicador de grabación encendido aunque se salga de la
       // página: se suelta aquí y no solo al terminar la medida.
       streamMicroRef.current?.getTracks().forEach((t) => t.stop());
+      // Lo mismo con el medidor de frecuencia, que tiene su propio micrófono y su contexto.
+      const medidor = medidorRef.current;
+      medidorRef.current = null;
+      if (medidor) {
+        window.clearInterval(medidor.intervalo);
+        medidor.stream.getTracks().forEach((t) => t.stop());
+        medidor.ctx.close().catch(() => {});
+      }
     };
   }, []);
 
   const iniciarAudio = useCallback(() => {
+    // El tono entraría por el micrófono y el medidor leería la salida de la propia app. Pasa
+    // también por aquí el barrido, que arranca el tono con esta misma función.
+    if (medidorRef.current) detenerMedidor();
     try {
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
@@ -519,7 +595,7 @@ export default function GeneradorTonosPage() {
     } catch (error) {
       console.error('No se pudo iniciar el generador de tonos:', error);
     }
-  }, [frecuencia, volumen, tipoOnda, solicitarWakeLock]);
+  }, [frecuencia, volumen, tipoOnda, solicitarWakeLock, detenerMedidor]);
 
   const detenerAudio = useCallback(() => {
     if (sweepIntervalRef.current) {
@@ -749,6 +825,113 @@ export default function GeneradorTonosPage() {
     }
   }, [midiendo, reproduciendo, detenerAudio, solicitarWakeLock, liberarWakeLock, cerrarMicrofono]);
 
+  /**
+   * Escucha con el micrófono y dice cuántos hercios tiene el sonido que más destaca.
+   *
+   * Cada lectura busca el pico del espectro y exige que sobresalga del fondo
+   * (`PROMINENCIA_MIN_DB`); si no, no hay cifra, porque el pico más alto de un ruido existe
+   * siempre y no significa nada. La cifra se da por ESTABLE cuando cinco lecturas seguidas
+   * coinciden a ±20 cents, que es lo que separa un tono sostenido de una voz que habla.
+   */
+  const iniciarMedidor = useCallback(async () => {
+    if (medidorRef.current || abriendoMedidorRef.current || midiendo) return;
+    setAvisoMedidor(null);
+    setNotaMedidor(null);
+    setAnuncioMedidor('');
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setAvisoMedidor('Este navegador no da acceso al micrófono, así que aquí no se puede medir.');
+      return;
+    }
+    // El tono del propio generador entraría por el micrófono: se para antes de escuchar.
+    if (reproduciendo) detenerAudio();
+
+    abriendoMedidorRef.current = true;
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+      });
+    } catch {
+      abriendoMedidorRef.current = false;
+      setAvisoMedidor('No se ha podido abrir el micrófono. Hay que dar permiso al navegador para medir.');
+      return;
+    }
+
+    // Aquí los procesados no invalidan la medida, como en la respuesta: no cambian la
+    // frecuencia de un sonido. Pero la supresión de ruido trata un tono sostenido como ruido
+    // de fondo y puede ir apagándolo, y eso sí hay que decirlo.
+    const veredicto = evaluarMicrofono(stream.getAudioTracks()[0]?.getSettings() ?? {});
+    if (!veredicto.sirve) {
+      setNotaMedidor(
+        `El navegador no ha dejado apagar ${veredicto.procesadosActivos
+          .map((p) => `${(GENERO_PROCESADO[p] ?? 'f') === 'm' ? 'el' : 'la'} ${p}`)
+          .join(' ni ')} del micrófono. ` +
+        'No cambian la frecuencia de lo que se lea, pero pueden ir atenuando un tono sostenido hasta que deje de leerse.',
+      );
+    }
+
+    let ctx: AudioContext;
+    try {
+      ctx = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      if (ctx.state === 'suspended') await ctx.resume();
+    } catch {
+      stream.getTracks().forEach((t) => t.stop());
+      abriendoMedidorRef.current = false;
+      setAvisoMedidor('El navegador no ha podido iniciar el audio. Se puede volver a intentar.');
+      return;
+    }
+
+    const analizador = ctx.createAnalyser();
+    analizador.fftSize = FFT_MEDIDOR;
+    analizador.smoothingTimeConstant = 0.5;
+    ctx.createMediaStreamSource(stream).connect(analizador);
+    const espectro = new Float32Array(analizador.frequencyBinCount);
+    const ventana: number[] = [];
+
+    const intervalo = window.setInterval(() => {
+      analizador.getFloatFrequencyData(espectro);
+      const pico = picoDominante(espectro, ctx.sampleRate, analizador.fftSize, FREC_MIN, FREC_MAX);
+      const hayTono =
+        pico !== null &&
+        prominencia(espectro, pico, ctx.sampleRate, analizador.fftSize, FREC_MIN, FREC_MAX) >= PROMINENCIA_MIN_DB;
+      if (!pico || !hayTono) {
+        ventana.length = 0;
+        setLecturaHz(null);
+        setLecturaEsEstable(false);
+        return;
+      }
+      ventana.push(pico.frecuencia);
+      if (ventana.length > LECTURAS_ESTABLES) ventana.shift();
+      const estable = lecturaEstable(ventana, LECTURAS_ESTABLES);
+      setLecturaHz(estable ?? pico.frecuencia);
+      setLecturaEsEstable(estable !== null);
+      // La retenida solo cambia si el tono se mueve más de 10 cents: vive en una región
+      // aria-live, y con cada décima de hercio de baile un lector de pantalla la anunciaría
+      // diez veces por segundo.
+      if (estable !== null) {
+        setUltimaEstableHz((previa) =>
+          previa !== null && Math.abs(1200 * Math.log2(estable / previa)) < 10 ? previa : estable,
+        );
+      }
+    }, MS_LECTURA_MEDIDOR);
+
+    medidorRef.current = { ctx, stream, intervalo };
+    abriendoMedidorRef.current = false;
+    setMedidorActivo(true);
+    void solicitarWakeLock();
+  }, [midiendo, reproduciendo, detenerAudio, solicitarWakeLock]);
+
+  /** Lleva la última lectura estable al generador, para oír (o comparar) el tono medido. */
+  const usarFrecuenciaMedida = () => {
+    if (ultimaEstableHz === null) return;
+    detenerMedidor();
+    // Un decimal: más finura que esa no la da la medida, y el campo la escribe tal cual.
+    const v = Math.round(ultimaEstableHz * 10) / 10;
+    aplicarFrecuencia(v);
+    setAnuncioMedidor(`Frecuencia puesta en el generador: ${cifraExacta(acotarFrecuencia(v))} Hz. Pulsa Reproducir para oírla.`);
+  };
+
   // El wake lock se libera solo al ocultar la pestaña; si se vuelve mientras el tono
   // sigue sonando, hay que volver a pedirlo.
   useEffect(() => {
@@ -878,6 +1061,10 @@ export default function GeneradorTonosPage() {
         <h1 className={styles.title}>Generador de Tonos</h1>
         <p className={styles.subtitle}>
           Frecuencias de audio de 20&nbsp;Hz a 20&nbsp;kHz
+        </p>
+        <p className={styles.heroMedidor}>
+          ¿Quieres saber cuántos hercios tiene un sonido?{' '}
+          <a href="#medir-frecuencia">Mídelo con el micrófono</a>
         </p>
       </header>
 
@@ -1020,6 +1207,103 @@ export default function GeneradorTonosPage() {
         </div>
       </div>
 
+      {/*
+        Medidor de frecuencia. Va justo aquí, antes de las opciones del generador, porque es lo
+        que viene buscando quien llega por «medidor de frecuencia hz» (S0170): bajo la
+        respuesta del altavoz quedaba a cinco pantallas.
+      */}
+      <div className={styles.section} id="medir-frecuencia">
+        <h3 className={styles.sectionTitle}>Medir la frecuencia de un sonido</h3>
+        <p className={styles.medidaIntro}>
+          Acerca el micrófono al sonido —un pitido, un silbido, un diapasón, una nota sostenida— y la
+          app te dice cuántos hercios tiene y a qué nota corresponde. El audio se analiza en tu
+          navegador: no sale del aparato.
+        </p>
+
+        <div className={styles.medidaBotones}>
+          <button
+            type="button"
+            className={styles.btnMedir}
+            onClick={() => (medidorActivo ? detenerMedidor() : void iniciarMedidor())}
+            disabled={midiendo !== null}
+            aria-pressed={medidorActivo}
+          >
+            <span aria-hidden="true">{medidorActivo ? '⏹️' : '🎙️'}</span>{' '}
+            {medidorActivo ? 'Dejar de medir' : 'Medir la frecuencia'}
+          </button>
+        </div>
+
+        {medidorActivo && (
+          <div className={styles.medidorLectura}>
+            <span className={styles.medidorCifra}>
+              {lecturaHz !== null ? `${textoHzMedido(lecturaHz)} Hz` : '— Hz'}
+            </span>
+            <span className={styles.medidorNota}>
+              {lecturaHz !== null ? textoNotaMedida(lecturaHz) : 'Esperando un sonido que destaque del ruido de fondo…'}
+            </span>
+            {lecturaHz !== null && (
+              <span className={lecturaEsEstable ? styles.medidorEstable : styles.medidorLeyendo}>
+                {lecturaEsEstable ? 'Lectura estable' : 'Leyendo…'}
+              </span>
+            )}
+          </div>
+        )}
+
+        <div role="status" aria-live="polite" aria-atomic="true">
+          {ultimaEstableHz !== null && (
+            <p className={styles.medidorRetenida}>
+              Última lectura estable: <strong>{textoHzMedido(ultimaEstableHz)}&nbsp;Hz</strong>
+              {' · '}
+              {textoNotaMedida(ultimaEstableHz)}
+            </p>
+          )}
+          {anuncioMedidor && <p className={styles.medidaProgreso}>{anuncioMedidor}</p>}
+        </div>
+
+        {ultimaEstableHz !== null && (
+          <div className={styles.medidaBotones}>
+            <button type="button" className={styles.btnBorrarMedida} onClick={usarFrecuenciaMedida}>
+              Llevar la lectura al generador
+            </button>
+          </div>
+        )}
+
+        {avisoMedidor && (
+          <div className={styles.medidaAviso} role="alert">
+            <span aria-hidden="true">⚠️</span> {avisoMedidor}
+          </div>
+        )}
+        {notaMedidor && (
+          <div className={styles.medidaAviso}>
+            <span aria-hidden="true">ℹ️</span> {notaMedidor}
+          </div>
+        )}
+
+        <div className={styles.medidaLimites}>
+          <strong>Qué mide y qué no</strong>
+          <ul>
+            <li>
+              Da la frecuencia del sonido que <strong>más destaca</strong>. En un tono puro —un pitido,
+              un diapasón, un silbido— es su frecuencia. En una voz o un instrumento puede salir un
+              armónico, el doble o el triple de la nota que oyes: para afinar, el{' '}
+              <Link href="/afinador-instrumentos/">afinador</Link> busca la nota fundamental.
+            </li>
+            <li>
+              Con un tono limpio y sostenido, la cifra se afina entre los puntos del análisis
+              (unos 3&nbsp;Hz de separación), así que el error queda por debajo de un hercio. La
+              frecuencia no depende de calibrar el micrófono; el volumen en decibelios sí, y eso lo
+              mide el <Link href="/sonometro/">sonómetro</Link>.
+            </li>
+            <li>
+              Si hay varios sonidos a la vez o el sonido cambia sin parar, la cifra salta y no llega a
+              «estable». El micrófono de un móvil capta peor los graves más profundos y los agudos
+              extremos: ahí puede no leer nada. Para ver todas las frecuencias a la vez está el{' '}
+              <Link href="/analizador-espectro/">analizador de espectro</Link>.
+            </li>
+          </ul>
+        </div>
+      </div>
+
       {/* Tipo de onda */}
       <div className={styles.section}>
         <h3 className={styles.sectionTitle}>Tipo de onda</h3>
@@ -1146,7 +1430,7 @@ export default function GeneradorTonosPage() {
             type="button"
             className={styles.btnMedir}
             onClick={() => void medirRespuesta('A')}
-            disabled={midiendo !== null}
+            disabled={midiendo !== null || medidorActivo}
           >
             {midiendo === 'A' ? (
               'Midiendo A…'
@@ -1161,7 +1445,7 @@ export default function GeneradorTonosPage() {
             type="button"
             className={styles.btnMedir}
             onClick={() => void medirRespuesta('B')}
-            disabled={midiendo !== null}
+            disabled={midiendo !== null || medidorActivo}
           >
             {midiendo === 'B' ? (
               'Midiendo B…'
@@ -1183,6 +1467,12 @@ export default function GeneradorTonosPage() {
             </button>
           )}
         </div>
+
+        {medidorActivo && (
+          <p className={styles.medidaIntro}>
+            El medidor de frecuencia está usando el micrófono: detenlo para medir la respuesta.
+          </p>
+        )}
 
         {midiendo && (
           <p className={styles.medidaProgreso} role="status" aria-live="polite">
@@ -1488,6 +1778,10 @@ export default function GeneradorTonosPage() {
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Qué es la frecuencia y por qué se mide en Hz?</summary>
               <p className={styles.eduFaqRespuesta}>La frecuencia es el número de oscilaciones completas por segundo de una onda sonora. El hercio (Hz), llamado así en honor al físico Heinrich Hertz, equivale a 1 ciclo por segundo. 440 Hz significa que el aire oscila 440 veces por segundo. A mayor frecuencia, más agudo es el sonido; a menor frecuencia, más grave. La velocidad del sonido en el aire (~343 m/s a 20&nbsp;°C) divide entre la frecuencia da la longitud de onda: a 440 Hz, λ ≈ 78 cm; a 20 Hz, λ ≈ 17 metros.</p>
+            </details>
+            <details className={styles.eduFaqItem}>
+              <summary className={styles.eduFaqPregunta}>¿Cómo mido cuántos hercios tiene un sonido?</summary>
+              <p className={styles.eduFaqRespuesta}>Con el medidor de esta misma página: pulsa «Medir la frecuencia», da permiso al micrófono y acerca el aparato al sonido. La app analiza el audio con una transformada de Fourier, busca el pico que más destaca y lo afina entre los puntos del análisis, así que con un tono limpio y sostenido la cifra queda a menos de un hercio. Además dice a qué nota musical corresponde. Ojo con las voces y los instrumentos: el pico más fuerte puede ser un armónico (el doble o el triple de la nota que oyes); para afinar, un afinador busca la fundamental.</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Por qué el oído humano oye exactamente de 20 Hz a 20 kHz?</summary>
