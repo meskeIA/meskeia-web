@@ -5,13 +5,32 @@ import styles from './EstimadorSueldoNeto.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatNumber, formatCurrency, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
+import { formatNumber, formatCurrency, formatPercentage, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { FISCAL_IRPF_META, FISCAL_SS_CUENTA_AJENA_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, desglosarEscalaGeneral, cuotaEscalaGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025, SMI_2026, LIMITES_PLAN_PENSIONES_2025 } from '@/data/fiscal';
-import { calcularBrutoANeto, calcularNetoABruto, tipoMarginal, TIPO_SS_TRABAJADOR, type SituacionFamiliar } from './motor';
+import { FISCAL_IRPF_META, FISCAL_SS_CUENTA_AJENA_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, desglosarEscalaGeneral, cuotaEscalaGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025, SMI_2026, LIMITES_PLAN_PENSIONES_2025, DEDUCCION_MATERNIDAD_IRPF, REDUCCION_TRIBUTACION_CONJUNTA_2025 } from '@/data/fiscal';
+import { calcularBrutoANeto, calcularNetoABruto, tipoMarginal, TIPO_SS_TRABAJADOR, COTIZACION_EMPRESA_2026, TIPO_SS_EMPRESA, type SituacionFamiliar } from './motor';
 
 // Tipos de cálculo
 type TipoCalculo = 'brutoANeto' | 'netoABruto';
+
+/**
+ * Porcentaje expresado en tanto por ciento (4,70 → «4,70 %»), con el espacio duro U+00A0 que
+ * pone formatPercentage (Ortografía de la RAE, 2010; regla del 25/09/2026). Hasta el 29/09/2026
+ * la página pegaba el % a la cifra en 45 sitios (hallazgo 2459).
+ */
+const pct = (tantoPorCiento: number, decimales: number = 2): string =>
+  formatPercentage(tantoPorCiento / 100, decimales);
+
+/** MEI de 2026, total (DT 43.ª LGSS, redacción del RDL 2/2023: 0,90 puntos en 2026). */
+const MEI_TOTAL_2026 = COTIZACIONES_SS_2026.mef + COTIZACION_EMPRESA_2026.mei;
+
+/** Reducción de la base en la tributación conjunta monoparental (art. 84.2.4.º LIRPF). */
+const REDUCCION_MONOPARENTAL = REDUCCION_TRIBUTACION_CONJUNTA_2025.monoparental;
+
+/** Deducción por maternidad (art. 81 LIRPF), toda de DEDUCCION_MATERNIDAD_IRPF (hallazgos 2460 y 2461). */
+const MATERNIDAD = DEDUCCION_MATERNIDAD_IRPF;
+const MATERNIDAD_TECHO_CON_GUARDERIA =
+  MATERNIDAD.importeAnualPorHijo + MATERNIDAD.incrementoGuarderia.importeMaximoAnual;
 
 // El motor de cálculo (IRPF + SS) vive en ./motor.ts desde el 25/09/2026: lo comparten la
 // calculadora, los ejemplos del bloque educativo y el FAQPage de metadata.ts.
@@ -89,6 +108,8 @@ export default function EstimadorSueldoNetoPage() {
   const [numHijos, setNumHijos] = useState('0');
   const [hijosMenores3, setHijosMenores3] = useState('0');
   const [pagas, setPagas] = useState('12');
+  // Hallazgo 2458: custodia compartida o pareja no casada → el mínimo por los hijos se prorratea.
+  const [hijosConOtroProgenitor, setHijosConOtroProgenitor] = useState(false);
   const [calculado, setCalculado] = useState(false);
   const [resultado, setResultado] = useState<{
     brutoAnual: number;
@@ -118,9 +139,12 @@ export default function EstimadorSueldoNetoPage() {
       return;
     }
 
+    // Con «Casado/a (dos ingresos)» el motor ya prorratea: la casilla no se muestra ni cuenta.
+    const conOtroProgenitor = hijosNum > 0 && situacion !== 'casado_dos_ingresos' && hijosConOtroProgenitor;
+
     let res;
     if (tipoCalculo === 'brutoANeto') {
-      const calc = calcularBrutoANeto(salarioNum, situacion, hijosNum, hijosMenores3Num, pagasNum);
+      const calc = calcularBrutoANeto(salarioNum, situacion, hijosNum, hijosMenores3Num, pagasNum, conOtroProgenitor);
       res = {
         brutoAnual: salarioNum,
         brutoMensual: salarioNum / pagasNum,
@@ -134,7 +158,7 @@ export default function EstimadorSueldoNetoPage() {
         deduccionRentasBajas: calc.deduccionRentasBajas,
       };
     } else {
-      const calc = calcularNetoABruto(salarioNum, situacion, hijosNum, hijosMenores3Num, pagasNum);
+      const calc = calcularNetoABruto(salarioNum, situacion, hijosNum, hijosMenores3Num, pagasNum, conOtroProgenitor);
       res = {
         brutoAnual: calc.brutoAnual,
         brutoMensual: calc.brutoMensual,
@@ -151,12 +175,13 @@ export default function EstimadorSueldoNetoPage() {
 
     setResultado(res);
     setCalculado(true);
-  }, [salario, tipoCalculo, situacion, numHijos, hijosMenores3, pagas]);
+  }, [salario, tipoCalculo, situacion, numHijos, hijosMenores3, pagas, hijosConOtroProgenitor]);
 
   const limpiar = () => {
     setSalario('');
     setNumHijos('0');
     setHijosMenores3('0');
+    setHijosConOtroProgenitor(false);
     setResultado(null);
     setCalculado(false);
   };
@@ -264,6 +289,40 @@ export default function EstimadorSueldoNetoPage() {
               />
             </div>
 
+            {/* Hallazgo 2458 (29/09/2026): con custodia compartida o en pareja no casada el
+                mínimo por descendientes se prorratea (arts. 58.1 y 61.1.ª LIRPF), y el
+                formulario no lo preguntaba. Misma forma que estimador-irpf (2316, 9bbc5c19). */}
+            {(parseInt(numHijos) || 0) > 0 && (
+              <div className={styles.formGroup}>
+                {situacion === 'casado_dos_ingresos' ? (
+                  <p className={styles.ayuda}>
+                    Con «Casado/a (dos ingresos)» cada cónyuge declara por separado y el mínimo por
+                    los hijos ya se reparte a partes iguales entre los dos (art. 61.1.ª LIRPF).
+                  </p>
+                ) : (
+                  <>
+                    <label className={styles.casilla}>
+                      <input
+                        type="checkbox"
+                        checked={hijosConOtroProgenitor}
+                        onChange={(e) => setHijosConOtroProgenitor(e.target.checked)}
+                        aria-describedby="sueldo-neto-ayuda-otro-progenitor"
+                      />
+                      <span>Los hijos conviven también con el otro progenitor (custodia compartida o pareja no casada)</span>
+                    </label>
+                    <p id="sueldo-neto-ayuda-otro-progenitor" className={styles.ayuda}>
+                      Si el otro progenitor también tiene derecho al mínimo por los mismos hijos, se
+                      reparte entre los dos a partes iguales (arts. 58.1 y 61.1.ª LIRPF): cada uno
+                      se aplica la mitad. Si convives con el padre o la madre de tus hijos,
+                      «Familia monoparental» no da la reducción de{' '}
+                      {formatCurrency(REDUCCION_MONOPARENTAL)} (art. 84.2.4.º LIRPF): elige
+                      «Soltero/a o divorciado/a».
+                    </p>
+                  </>
+                )}
+              </div>
+            )}
+
             <div className={styles.formGroup}>
               <label className={styles.label} htmlFor="sueldo-neto-pagas">Número de pagas</label>
               <select
@@ -340,7 +399,7 @@ export default function EstimadorSueldoNetoPage() {
                   )}
                   <div className={styles.desgloseRow}>
                     <span>Tipo efectivo de IRPF</span>
-                    <span className={styles.desgloseValue}>{formatNumber(resultado.tipoRetencion, 2)}%</span>
+                    <span className={styles.desgloseValue}>{pct(resultado.tipoRetencion)}</span>
                   </div>
                   {/* Hallazgo 1689: la cifra es la cuota anual de la LIRPF (con la reducción por
                       tributación conjunta y la deducción de la DA 61.ª), no la retención del
@@ -356,19 +415,19 @@ export default function EstimadorSueldoNetoPage() {
                 <div className={styles.desgloseSection}>
                   <h4>Seguridad Social (Trabajador)</h4>
                   <div className={styles.desgloseRow}>
-                    <span>Contingencias comunes ({formatNumber(COTIZACIONES_SS_2026.contingenciasComunes, 2)}%)</span>
+                    <span>Contingencias comunes ({pct(COTIZACIONES_SS_2026.contingenciasComunes)})</span>
                     <span className={styles.desgloseValue}>{formatCurrency(resultado.ssDesglose.contingenciasComunes * 12)}</span>
                   </div>
                   <div className={styles.desgloseRow}>
-                    <span>Desempleo ({formatNumber(COTIZACIONES_SS_2026.desempleo, 2)}%)</span>
+                    <span>Desempleo ({pct(COTIZACIONES_SS_2026.desempleo)})</span>
                     <span className={styles.desgloseValue}>{formatCurrency(resultado.ssDesglose.desempleo * 12)}</span>
                   </div>
                   <div className={styles.desgloseRow}>
-                    <span>Formación profesional ({formatNumber(COTIZACIONES_SS_2026.formacionProfesional, 2)}%)</span>
+                    <span>Formación profesional ({pct(COTIZACIONES_SS_2026.formacionProfesional)})</span>
                     <span className={styles.desgloseValue}>{formatCurrency(resultado.ssDesglose.formacionProfesional * 12)}</span>
                   </div>
                   <div className={styles.desgloseRow}>
-                    <span>MEF - Equidad Intergeneracional ({formatNumber(COTIZACIONES_SS_2026.mef, 2)}%)</span>
+                    <span>MEI - Equidad Intergeneracional ({pct(COTIZACIONES_SS_2026.mef)})</span>
                     <span className={styles.desgloseValue}>{formatCurrency(resultado.ssDesglose.mef * 12)}</span>
                   </div>
                   <div className={styles.desgloseRow + ' ' + styles.desgloseTotal}>
@@ -386,7 +445,7 @@ export default function EstimadorSueldoNetoPage() {
                   <div className={styles.desgloseRow}>
                     <span>Porcentaje sobre bruto</span>
                     <span className={styles.desgloseValue}>
-                      {formatNumber(((resultado.irpfAnual + resultado.ssAnual) / resultado.brutoAnual) * 100, 2)}%
+                      {pct(((resultado.irpfAnual + resultado.ssAnual) / resultado.brutoAnual) * 100)}
                     </span>
                   </div>
                 </div>
@@ -396,7 +455,7 @@ export default function EstimadorSueldoNetoPage() {
 
           {!calculado && (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>💶</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">💶</span>
               <p>Introduce tu salario y pulsa Calcular para ver el resultado</p>
             </div>
           )}
@@ -457,7 +516,7 @@ export default function EstimadorSueldoNetoPage() {
               <h4><span aria-hidden="true">💰</span> Salario Neto</h4>
               <p>
                 Es el resultado de restar al bruto las cotizaciones a la Seguridad Social
-                (un {formatNumber(TIPO_SS_TRABAJADOR, 2)}% en {EJERCICIO}) y la retención del IRPF (variable según tu situación).
+                (un {pct(TIPO_SS_TRABAJADOR)} en {EJERCICIO}) y la retención del IRPF (variable según tu situación).
                 Es lo que ingresas realmente.
               </p>
             </div>
@@ -489,7 +548,7 @@ export default function EstimadorSueldoNetoPage() {
                     <tr key={tramo.hasta}>
                       <td>{formatCurrency(desde)}</td>
                       <td>{tramo.hasta === Infinity ? 'En adelante' : formatCurrency(tramo.hasta)}</td>
-                      <td>{formatNumber(tramo.tipo, 0)}%</td>
+                      <td>{pct(tramo.tipo, 0)}</td>
                     </tr>
                   );
                 })}
@@ -505,13 +564,13 @@ export default function EstimadorSueldoNetoPage() {
             <p>
               Si tu <strong>base liquidable</strong> (tu bruto menos la Seguridad Social, los gastos
               deducibles y la reducción por rendimientos del trabajo) es de {formatCurrency(BASE_EJEMPLO)},
-              NO pagas el {formatNumber(ESCALA_EJEMPLO.tramos[ESCALA_EJEMPLO.tramos.length - 1].tipo, 0)}% de todo.
+              NO pagas el {pct(ESCALA_EJEMPLO.tramos[ESCALA_EJEMPLO.tramos.length - 1].tipo, 0)} de todo.
               Primero se aplica la escala a la base completa:
             </p>
             <ul>
               {ESCALA_EJEMPLO.tramos.map((t) => (
                 <li key={t.desde}>
-                  {formatNumber(t.tipo, 0)}% de {formatCurrency(t.desde)} a {formatCurrency(t.desde + t.base)} = {formatCurrency(t.cuota)}
+                  {pct(t.tipo, 0)} de {formatCurrency(t.desde)} a {formatCurrency(t.desde + t.base)} = {formatCurrency(t.cuota)}
                 </li>
               ))}
               <li>Cuota de la base: <strong>{formatCurrency(ESCALA_EJEMPLO.cuota)}</strong></li>
@@ -525,13 +584,13 @@ export default function EstimadorSueldoNetoPage() {
             <ul>
               <li>
                 <strong>Cuota íntegra</strong>: {formatCurrency(ESCALA_EJEMPLO.cuota)} − {formatCurrency(CUOTA_MINIMO_EJEMPLO)} ={' '}
-                <strong>{formatCurrency(CUOTA_EJEMPLO)}</strong> ({formatNumber((CUOTA_EJEMPLO / BASE_EJEMPLO) * 100, 2)}% efectivo
+                <strong>{formatCurrency(CUOTA_EJEMPLO)}</strong> ({pct((CUOTA_EJEMPLO / BASE_EJEMPLO) * 100)} efectivo
                 sobre la base liquidable)
               </li>
             </ul>
             <p>
               Si en lugar de eso se restara el mínimo de la base, se ahorraría al tipo más alto que
-              alcanzas y no al {formatNumber(TRAMOS_IRPF_2025[0].tipo, 0)}% del primer tramo, y la cuota
+              alcanzas y no al {pct(TRAMOS_IRPF_2025[0].tipo, 0)} del primer tramo, y la cuota
               saldría más baja de lo que es. Esa base liquidable corresponde a un salario bruto
               bastante más alto: la Seguridad Social, los gastos deducibles y la reducción se restan antes.
             </p>
@@ -549,27 +608,22 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.contentCard}>
               <h4><span aria-hidden="true">👤</span> Lo que pagas tú (trabajador)</h4>
               <ul>
-                <li>Contingencias comunes: {formatNumber(COTIZACIONES_SS_2026.contingenciasComunes, 2)}%</li>
-                <li>Desempleo: {formatNumber(COTIZACIONES_SS_2026.desempleo, 2)}%</li>
-                <li>Formación profesional: {formatNumber(COTIZACIONES_SS_2026.formacionProfesional, 2)}%</li>
-                <li>MEF: {formatNumber(COTIZACIONES_SS_2026.mef, 2)}%</li>
-                <li><strong>Total: {formatNumber(
-                  COTIZACIONES_SS_2026.contingenciasComunes +
-                  COTIZACIONES_SS_2026.desempleo +
-                  COTIZACIONES_SS_2026.formacionProfesional +
-                  COTIZACIONES_SS_2026.mef,
-                  2
-                )}%</strong></li>
+                <li>Contingencias comunes: {pct(COTIZACIONES_SS_2026.contingenciasComunes)}</li>
+                <li>Desempleo: {pct(COTIZACIONES_SS_2026.desempleo)}</li>
+                <li>Formación profesional: {pct(COTIZACIONES_SS_2026.formacionProfesional)}</li>
+                <li>MEI: {pct(COTIZACIONES_SS_2026.mef)}</li>
+                <li><strong>Total: {pct(TIPO_SS_TRABAJADOR)}</strong></li>
               </ul>
             </div>
             <div className={styles.contentCard}>
               <h4><span aria-hidden="true">🏢</span> Lo que paga la empresa</h4>
               <ul>
-                <li>Contingencias comunes: 23,60%</li>
-                <li>Desempleo: 5,50%</li>
-                <li>FOGASA: 0,20%</li>
-                <li>Formación: 0,60%</li>
-                <li><strong>Total: ~30%</strong></li>
+                <li>Contingencias comunes: {pct(COTIZACION_EMPRESA_2026.contingenciasComunes)}</li>
+                <li>Desempleo: {pct(COTIZACION_EMPRESA_2026.desempleoIndefinido)} (contrato indefinido)</li>
+                <li>FOGASA: {pct(COTIZACION_EMPRESA_2026.fogasa)}</li>
+                <li>Formación profesional: {pct(COTIZACION_EMPRESA_2026.formacionProfesional)}</li>
+                <li>MEI: {pct(COTIZACION_EMPRESA_2026.mei)}</li>
+                <li><strong>Total: {pct(TIPO_SS_EMPRESA)}</strong>, más accidentes de trabajo y enfermedades profesionales, según la actividad</li>
               </ul>
             </div>
           </div>
@@ -696,16 +750,16 @@ export default function EstimadorSueldoNetoPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h4>Recién graduado</h4>
               </div>
               <div className={styles.escenarioExample}>
                 <p><strong>Perfil:</strong> {formatCurrency(BRUTO_GRADUADO)} brutos, soltero/a, sin hijos</p>
                 <ul>
-                  <li>SS trabajador ({formatNumber(TIPO_SS_TRABAJADOR, 2)}%): <strong>{formatCurrency(GRADUADO.ssAnual)}/año</strong></li>
+                  <li>SS trabajador ({pct(TIPO_SS_TRABAJADOR)}): <strong>{formatCurrency(GRADUADO.ssAnual)}/año</strong></li>
                   <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>{formatCurrency(GRADUADO.baseImponible)}</strong></li>
                   <li>IRPF anual (mínimo personal {formatCurrency(GRADUADO.minimos)}, a tipo cero): <strong>{formatCurrency(GRADUADO.irpfAnual)}</strong></li>
-                  <li>Tipo efectivo de IRPF: <strong>{formatNumber(GRADUADO.tipoRetencion, 2)}%</strong></li>
+                  <li>Tipo efectivo de IRPF: <strong>{pct(GRADUADO.tipoRetencion)}</strong></li>
                   <li>Neto anual: <strong>{formatCurrency(GRADUADO.netoAnual)}</strong></li>
                   <li>Neto mensual (12 pagas): <strong>{formatCurrency(GRADUADO.netoMensual)}</strong></li>
                 </ul>
@@ -717,21 +771,21 @@ export default function EstimadorSueldoNetoPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
                 <h4>Técnico medio con familia</h4>
               </div>
               <div className={styles.escenarioExample}>
                 <p><strong>Perfil:</strong> {formatCurrency(BRUTO_FAMILIA)} brutos, casado/a (dos ingresos), 1 hijo</p>
                 <ul>
-                  <li>SS trabajador ({formatNumber(TIPO_SS_TRABAJADOR, 2)}%): <strong>{formatCurrency(FAMILIA.ssAnual)}/año</strong></li>
+                  <li>SS trabajador ({pct(TIPO_SS_TRABAJADOR)}): <strong>{formatCurrency(FAMILIA.ssAnual)}/año</strong></li>
                   <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>{formatCurrency(FAMILIA.baseImponible)}</strong></li>
                   <li>Mínimo personal + la mitad del de hijo 1 ({formatCurrency(MINIMOS_IRPF_2025.personal)} + {formatCurrency(MINIMOS_IRPF_2025.hijo_1 / 2)}, porque con dos ingresos cada progenitor aplica la mitad): <strong>{formatCurrency(FAMILIA.minimos)}</strong></li>
                   <li>IRPF anual: <strong>{formatCurrency(FAMILIA.irpfAnual)}</strong></li>
-                  <li>Tipo efectivo de IRPF: <strong>{formatNumber(FAMILIA.tipoRetencion, 2)}%</strong></li>
+                  <li>Tipo efectivo de IRPF: <strong>{pct(FAMILIA.tipoRetencion)}</strong></li>
                   <li>Neto anual: <strong>{formatCurrency(FAMILIA.netoAnual)}</strong></li>
                   <li>
                     Impacto del mínimo por el hijo: {formatCurrency(AHORRO_HIJO)}/año menos de IRPF que la
-                    misma persona sin hijos (el mínimo tributa a tipo cero, así que ahorra al {formatNumber(TRAMOS_IRPF_2025[0].tipo, 0)}%)
+                    misma persona sin hijos (el mínimo tributa a tipo cero, así que ahorra al {pct(TRAMOS_IRPF_2025[0].tipo, 0)})
                   </li>
                 </ul>
               </div>
@@ -742,7 +796,7 @@ export default function EstimadorSueldoNetoPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
                 <h4>Directivo DINK</h4>
               </div>
               <div className={styles.escenarioExample}>
@@ -751,25 +805,25 @@ export default function EstimadorSueldoNetoPage() {
                   <li>SS trabajador (base máx. {formatCurrency(BASES_SS_2026.maxima)}/mes): <strong>{formatCurrency(DIRECTIVO.ssAnual)}/año</strong></li>
                   <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>{formatCurrency(DIRECTIVO.baseImponible)}</strong></li>
                   <li>IRPF anual: <strong>{formatCurrency(DIRECTIVO.irpfAnual)}</strong></li>
-                  <li>Tipo efectivo real: <strong>{formatNumber(DIRECTIVO.tipoRetencion, 2)}%</strong></li>
+                  <li>Tipo efectivo real: <strong>{pct(DIRECTIVO.tipoRetencion)}</strong></li>
                   <li>Neto anual: <strong>{formatCurrency(DIRECTIVO.netoAnual)}</strong></li>
                   <li>Neto mensual (12 pagas): <strong>{formatCurrency(DIRECTIVO.netoMensual)}</strong></li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
-                Consejo: Aportar al plan de pensiones reduce directamente la base imponible — cada 1.000 € aportados ahorran unos {formatCurrency((1000 * MARGINAL_DIRECTIVO) / 100)} en IRPF a este nivel de ingresos (tramo marginal {formatNumber(MARGINAL_DIRECTIVO, 0)}%).
+                Consejo: Aportar al plan de pensiones reduce directamente la base imponible — cada 1.000 € aportados ahorran unos {formatCurrency((1000 * MARGINAL_DIRECTIVO) / 100)} en IRPF a este nivel de ingresos (tramo marginal {pct(MARGINAL_DIRECTIVO, 0)}).
               </div>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👩‍👧</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👩‍👧</span>
                 <h4>Trabajadora a tiempo parcial</h4>
               </div>
               <div className={styles.escenarioExample}>
-                <p><strong>Perfil:</strong> {formatCurrency(BRUTO_PARCIAL)} brutos, reducción por cuidado de hijos (50%), un hijo, declaración individual</p>
+                <p><strong>Perfil:</strong> {formatCurrency(BRUTO_PARCIAL)} brutos, reducción por cuidado de hijos (50&nbsp;%), un hijo, declaración individual</p>
                 <ul>
-                  <li>SS trabajador ({formatNumber(TIPO_SS_TRABAJADOR, 2)}% de lo cobrado: a tiempo parcial se cotiza por el salario real, no por la base mínima de jornada completa): <strong>{formatCurrency(PARCIAL.ssAnual)}/año</strong></li>
+                  <li>SS trabajador ({pct(TIPO_SS_TRABAJADOR)} de lo cobrado: a tiempo parcial se cotiza por el salario real, no por la base mínima de jornada completa): <strong>{formatCurrency(PARCIAL.ssAnual)}/año</strong></li>
                   <li>Base imponible IRPF (tras gastos deducibles y reducción): <strong>{formatCurrency(PARCIAL.baseImponible)}</strong></li>
                   <li>Mínimo personal + mínimo por un hijo: <strong>{formatCurrency(PARCIAL.minimos)}</strong></li>
                   <li>
@@ -778,12 +832,27 @@ export default function EstimadorSueldoNetoPage() {
                       <> (la base no supera el mínimo personal y familiar, que tributa a tipo cero)</>
                     )}
                   </li>
-                  <li>Tipo efectivo de IRPF: <strong>{formatNumber(PARCIAL.tipoRetencion, 2)}%</strong></li>
+                  <li>Tipo efectivo de IRPF: <strong>{pct(PARCIAL.tipoRetencion)}</strong></li>
                   <li>Neto anual: <strong>{formatCurrency(PARCIAL.netoAnual)}</strong></li>
                 </ul>
               </div>
               <div className={styles.escenarioTip}>
-                Consejo: Si tienes reducción de jornada por cuidado de hijos, comunícalo en el modelo 145 — podrías tener derecho a la deducción por maternidad de hasta 1.200 €/año.
+                {/* Hallazgos 2460 y 2461 (29/09/2026): decía «comunícalo en el modelo 145 — podrías
+                    tener derecho a la deducción por maternidad de hasta 1.200 €/año», con la cifra
+                    tecleada. El derecho no nace de la reducción de jornada sino de un hijo menor
+                    de 3 años (art. 81.1 LIRPF); el abono anticipado se pide a la AEAT con el
+                    Modelo 140 (art. 81.4), no a la empresa; y el techo no es 1.200 €: hay hasta
+                    1.000 € más por guardería (art. 81.2). Todo sale de DEDUCCION_MATERNIDAD_IRPF. */}
+                Consejo: La deducción por maternidad no depende de la jornada, sino de tener un hijo
+                menor de 3 años (y estar de alta en la Seguridad Social o cobrar el desempleo cuando
+                nació): {formatCurrency(MATERNIDAD.importeAnualPorHijo)} al año por cada hijo menor de 3 años,
+                y hasta {formatCurrency(MATERNIDAD.incrementoGuarderia.importeMaximoAnual)} más por hijo si
+                pagas guardería o un centro de educación infantil autorizado, con un máximo de{' '}
+                {formatCurrency(MATERNIDAD_TECHO_CON_GUARDERIA)} al año por hijo. Se aplica en la declaración
+                de la renta, o puedes cobrar por anticipado{' '}
+                {formatCurrency(MATERNIDAD.importeMensualPorHijo)} al mes por hijo pidiéndolo a la Agencia
+                Tributaria con el {MATERNIDAD.anticipado.formulario}. No se tramita con la empresa: el incremento
+                por guardería solo se aplica en la declaración.
               </div>
             </div>
           </div>
@@ -796,7 +865,7 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Qué es el MEI (Mecanismo de Equidad Intergeneracional) y cuánto me descuentan?</h4>
               <p>
-                El MEI es una cotización adicional a la Seguridad Social creada por la reforma de pensiones de 2023 para financiar el Fondo de Reserva. En 2026, el trabajador paga el <strong>{formatNumber(COTIZACIONES_SS_2026.mef, 2)}%</strong> y la empresa el <strong>0,75%</strong> sobre la base de cotización. Para un sueldo de {formatCurrency(BRUTO_TABLA)} brutos esto representa <strong>{formatCurrency(MEI_TABLA)} anuales a cargo del trabajador</strong>. Su tipo irá incrementándose gradualmente hasta 2032.
+                El MEI es una cotización adicional a la Seguridad Social que nutre el Fondo de Reserva (art. 127 bis de la Ley General de la Seguridad Social). En 2026 es del {pct(MEI_TOTAL_2026)} de la base de cotización: el trabajador paga el <strong>{pct(COTIZACIONES_SS_2026.mef)}</strong> y la empresa el <strong>{pct(COTIZACION_EMPRESA_2026.mei)}</strong> (art. 16 de la Orden PJC/297/2026). Para un sueldo de {formatCurrency(BRUTO_TABLA)} brutos esto representa <strong>{formatCurrency(MEI_TABLA)} anuales a cargo del trabajador</strong>. Sube una décima al año hasta el 1,20&nbsp;% de 2029 (1,00&nbsp;% la empresa y 0,20&nbsp;% el trabajador), y se mantiene en ese nivel hasta 2050 (disposición transitoria 43.ª de esa ley, redacción del Real Decreto-ley 2/2023).
               </p>
             </div>
 
@@ -832,7 +901,7 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Qué diferencia hay entre contingencias comunes y profesionales?</h4>
               <p>
-                Las <strong>contingencias comunes</strong> ({formatNumber(COTIZACIONES_SS_2026.contingenciasComunes, 2)}% trabajador) cubren enfermedad común, maternidad, paternidad y jubilación. Las <strong>contingencias profesionales</strong> (variable, cotiza solo la empresa, entre 0,90% y 7,15% según actividad) cubren accidentes de trabajo y enfermedades profesionales. El trabajador no paga directamente por contingencias profesionales; es un coste exclusivamente empresarial.
+                Las <strong>contingencias comunes</strong> ({pct(COTIZACIONES_SS_2026.contingenciasComunes)} trabajador) cubren enfermedad común, maternidad, paternidad y jubilación. Las <strong>contingencias profesionales</strong> (variable, cotiza solo la empresa, entre 0,90&nbsp;% y 7,15&nbsp;% según actividad) cubren accidentes de trabajo y enfermedades profesionales. El trabajador no paga directamente por contingencias profesionales; es un coste exclusivamente empresarial.
               </p>
             </div>
 
@@ -888,8 +957,8 @@ export default function EstimadorSueldoNetoPage() {
                   guardería (exenta sin límite para menores de 3 años), tarjeta transporte (hasta 1.500 €/año) o
                   cheques restaurante (hasta 11 €/día) pueden reducir significativamente tu base imponible sin reducir
                   tu retribución real. Un seguro médico de 1.500 €/año que cubra a tres personas queda exento
-                  entero (3 × 500 €) y, con un tipo marginal del 30 %, supone unos 450 € menos de IRPF
-                  (1.500 × 30 %).
+                  entero (3 × 500 €) y, con un tipo marginal del 30&nbsp;%, supone unos 450 € menos de IRPF
+                  (1.500 × 30&nbsp;%).
                 </p>
               </div>
             </div>
@@ -990,7 +1059,7 @@ export default function EstimadorSueldoNetoPage() {
                 están obligados a declarar la renta. Con dos o más pagadores, el límite baja a{' '}
                 {formatCurrency(LIMITE_VARIOS_PAGADORES)} si lo cobrado del segundo y restantes pagadores
                 supera los {formatCurrency(LIMITE_SEGUNDO_PAGADOR)} anuales (art. 96 LIRPF). Presentarla fuera de plazo
-                cuando estás obligado conlleva un recargo del 1 % al 15 % si sale a pagar (art. 27 LGT) o,
+                cuando estás obligado conlleva un recargo del 1&nbsp;% al 15&nbsp;% si sale a pagar (art. 27 LGT) o,
                 si sale a devolver, una multa de 200 € que baja a 100 € si la presentas antes de que
                 Hacienda te la pida (art. 198 LGT).
               </p>
@@ -1013,13 +1082,15 @@ export default function EstimadorSueldoNetoPage() {
               </li>
               <li>
                 <strong>Confundir salario bruto con coste empresa total.</strong> El coste real para
-                la empresa es el bruto <em>más</em> aproximadamente un 30% adicional en cotizaciones
-                empresariales. Para un sueldo de 30.000 € brutos, la empresa paga ~9.000 € más en SS.
+                la empresa es el bruto <em>más</em> un {pct(TIPO_SS_EMPRESA)} adicional en cotizaciones
+                empresariales, y aún más la de accidentes de trabajo, que depende de la actividad. Para un
+                sueldo de {formatCurrency(BRUTO_TABLA)} brutos, la empresa paga unos{' '}
+                {formatCurrency((BRUTO_TABLA * TIPO_SS_EMPRESA) / 100)} más en SS sin contar esa última.
                 Saberlo es útil al negociar una subida.
               </li>
               <li>
                 <strong>Pedir una subida de sueldo sin tener en cuenta el salto de tramo IRPF.</strong>
-                Con {formatCurrency(BRUTO_SUBIDA)} brutos (tipo marginal del {formatNumber(MARGINAL_SUBIDA, 0)} %), un aumento de
+                Con {formatCurrency(BRUTO_SUBIDA)} brutos (tipo marginal del {pct(MARGINAL_SUBIDA, 0)}), un aumento de
                 {' '}{formatCurrency(SUBIDA_BRUTA)} brutos se traduce en {formatCurrency(SUBIDA_NETA)} netos más, porque la subida
                 paga IRPF y también Seguridad Social.
                 Valora si es más interesante negociar retribución en especie exenta.

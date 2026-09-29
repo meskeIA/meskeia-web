@@ -154,7 +154,13 @@ async function valorTarjeta(page: Page, titulo: string): Promise<string> {
   return limpiar(await valor.innerText());
 }
 
-/** Importe de una fila del desglose («IRPF anual (cuota estimada)», «Contingencias comunes (4,70%)»…). */
+/**
+ * Importe de una fila del desglose («IRPF anual (cuota estimada)», «Contingencias comunes (4,70 %)»…).
+ * Desde el 29/09/2026 (hallazgo 2459) los % llevan espacio duro: `limpiar()` lo pasa a espacio
+ * normal en el importe, y `:text-is()` normaliza los blancos (U+00A0 incluido) en el rótulo. Por
+ * eso los rótulos y los tipos de este fichero se escriben «4,70 %» y no «4,70%», que era la forma
+ * del defecto; que el separador sea precisamente U+00A0 lo vigila el test del 2459, aparte.
+ */
 async function filaDesglose(page: Page, etiquetaExacta: string): Promise<string> {
   const fila = page.locator(`css=div:has(> span:text-is("${etiquetaExacta}"))`).first();
   return limpiar(await fila.locator('span').nth(1).innerText());
@@ -244,18 +250,18 @@ test('CASO 1 (normal) · 30.000 € brutos, soltero/a, 0 hijos, 12 pagas', async
   //   cuota          = 5.980,50 − 1.054,50            = 4.926,00 €
   // Deducción DA 61.ª: 0 € (30.000 € íntegros superan los 20.048,45 € de 2026).
   expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('4926,00 €');
-  expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('16,42%');
+  expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('16,42 %');
 
   // Seguridad Social — COTIZACIONES_SS_2026 sobre base 2.500 €/mes (sin tope)
-  expect(await filaDesglose(page, 'Contingencias comunes (4,70%)')).toBe('1410,00 €'); // 2.500×4,70%×12
-  expect(await filaDesglose(page, 'Desempleo (1,55%)')).toBe('465,00 €');              // 2.500×1,55%×12
-  expect(await filaDesglose(page, 'Formación profesional (0,10%)')).toBe('30,00 €');   // 2.500×0,10%×12
-  expect(await filaDesglose(page, 'MEF - Equidad Intergeneracional (0,15%)')).toBe('45,00 €'); // 2.500×0,15%×12
+  expect(await filaDesglose(page, 'Contingencias comunes (4,70 %)')).toBe('1410,00 €'); // 2.500×4,70%×12
+  expect(await filaDesglose(page, 'Desempleo (1,55 %)')).toBe('465,00 €');              // 2.500×1,55%×12
+  expect(await filaDesglose(page, 'Formación profesional (0,10 %)')).toBe('30,00 €');   // 2.500×0,10%×12
+  expect(await filaDesglose(page, 'MEI - Equidad Intergeneracional (0,15 %)')).toBe('45,00 €'); // 2.500×0,15%×12
   expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('1950,00 €');
 
   // Resumen — 4.926,00 + 1.950,00 = 6.876,00 € · sobre 30.000 € = 22,92 %
   expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('6876,00 €');
-  expect(await filaDesglose(page, 'Porcentaje sobre bruto')).toBe('22,92%');
+  expect(await filaDesglose(page, 'Porcentaje sobre bruto')).toBe('22,92 %');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -273,9 +279,9 @@ test('CASO 2 (límite) · 120.000 € brutos: la base de cotización se clava en
   // 10.000 €/mes > BASES_SS_2026.maxima (5.101,20 €/mes) → la base de cotización
   // no sigue subiendo con el bruto: se clava en 5.101,20 €/mes.
   // 5.101,20 × 4,70% × 12 = 2.877,08 € (si no hubiera tope serían 5.640,00 €)
-  expect(await filaDesglose(page, 'Contingencias comunes (4,70%)')).toBe('2877,08 €');
-  expect(await filaDesglose(page, 'Desempleo (1,55%)')).toBe('948,82 €');
-  expect(await filaDesglose(page, 'Formación profesional (0,10%)')).toBe('61,21 €');
+  expect(await filaDesglose(page, 'Contingencias comunes (4,70 %)')).toBe('2877,08 €');
+  expect(await filaDesglose(page, 'Desempleo (1,55 %)')).toBe('948,82 €');
+  expect(await filaDesglose(page, 'Formación profesional (0,10 %)')).toBe('61,21 €');
   // SS anual = 5.101,20 × 6,50% × 12 = 3.978,94 €
   expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('3978,94 €');
 
@@ -288,11 +294,11 @@ test('CASO 2 (límite) · 120.000 € brutos: la base de cotización se clava en
   // Nótese que el mínimo vale aquí lo mismo que en el CASO 1 (1.054,50 €): ese es
   // justamente el efecto que persigue el art. 63.1.2º y el que el cálculo viejo rompía.
   expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('41.156,48 €');
-  expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('34,30%');
+  expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('34,30 %');
 
   // 41.156,48 + 3.978,94 = 45.135,42 € · sobre 120.000 € = 37,61 %
   expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('45.135,42 €');
-  expect(await filaDesglose(page, 'Porcentaje sobre bruto')).toBe('37,61%');
+  expect(await filaDesglose(page, 'Porcentaje sobre bruto')).toBe('37,61 %');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -446,19 +452,19 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
     expect(await valorTarjeta(page, 'Bruto Mensual (14 pagas)')).toBe('3000,00 €');
     expect(await valorTarjeta(page, 'Neto Mensual (14 pagas)')).toBe('2202,36 €');
 
-    expect(await filaDesglose(page, 'Contingencias comunes (4,70%)')).toBe('1974,00 €');
-    expect(await filaDesglose(page, 'Desempleo (1,55%)')).toBe('651,00 €');
-    expect(await filaDesglose(page, 'Formación profesional (0,10%)')).toBe('42,00 €');
-    expect(await filaDesglose(page, 'MEF - Equidad Intergeneracional (0,15%)')).toBe('63,00 €');
+    expect(await filaDesglose(page, 'Contingencias comunes (4,70 %)')).toBe('1974,00 €');
+    expect(await filaDesglose(page, 'Desempleo (1,55 %)')).toBe('651,00 €');
+    expect(await filaDesglose(page, 'Formación profesional (0,10 %)')).toBe('42,00 €');
+    expect(await filaDesglose(page, 'MEI - Equidad Intergeneracional (0,15 %)')).toBe('63,00 €');
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('2730,00 €');
 
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('8436,90 €');
-    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('20,09%');
+    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('20,09 %');
     // Fuera de la zona de la DA 61.ª: la fila no se pinta.
     expect(await cuentaFilas(page, 'Deducción por rendimientos del trabajo')).toBe(0);
 
     expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('11.166,90 €');
-    expect(await filaDesglose(page, 'Porcentaje sobre bruto')).toBe('26,59%');
+    expect(await filaDesglose(page, 'Porcentaje sobre bruto')).toBe('26,59 %');
   });
 
   /**
@@ -479,7 +485,7 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('1209,00 €');
     expect(await filaDesglose(page, 'Deducción por rendimientos del trabajo')).toBe('-289,69 €');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('1041,05 €');
-    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('5,60%');
+    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('5,60 %');
     expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('16.349,95 €');
     expect(await filaDesglose(page, 'Total deducciones anuales')).toBe('2250,05 €');
   });
@@ -515,7 +521,7 @@ test.describe('Re-inspección 25/09/2026 — DA 61.ª de 2026 y base de cotizaci
    */
   test('LÍMITE · 9.000 € (bajo el SMI): se cotiza por lo cobrado, 585,00 € y no 1.111,03 €', async ({ page }) => {
     await calcular(page, '9000');
-    expect(await filaDesglose(page, 'Contingencias comunes (4,70%)')).toBe('423,00 €');
+    expect(await filaDesglose(page, 'Contingencias comunes (4,70 %)')).toBe('423,00 €');
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('585,00 €');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('0,00 €');
     expect(await cuentaFilas(page, 'Deducción por rendimientos del trabajo')).toBe(0);
@@ -648,7 +654,7 @@ test.describe('Hallazgos 1651-1660 (reparados) — re-inspección del 25/09/2026
     expect.soft(cuerpo).toContain('7165,50 €');
     expect.soft(cuerpo).toContain('1054,50 €');
     expect.soft(cuerpo).toContain('6111,00 €');
-    expect.soft(cuerpo).toContain('20,37% efectivo');
+    expect.soft(cuerpo).toContain('20,37 % efectivo');
   });
 
   /**
@@ -814,8 +820,8 @@ test.describe('Hallazgos 1651-1660 (reparados) — re-inspección del 25/09/2026
  *    mismo («Los descendientes se computarán por mitad, excepto cuando el contribuyente tenga
  *    derecho, de forma exclusiva…»), así que da igual si la app promete cuota o retención.
  *    El motor sumaba el mínimo ENTERO (2.400 €); desde el 25/09 lo prorratea. (La misma forma
- *    fuera del matrimonio —custodia compartida, pareja no casada— sigue ABIERTA: ver la
- *    re-inspección del 29/09/2026 al final del fichero.)
+ *    fuera del matrimonio —custodia compartida, pareja no casada— era el hallazgo 2458,
+ *    REPARADO el 29/09/2026: ver la re-inspección del 29/09/2026 al final del fichero.)
  *
  * 3. RETENCIÓN frente a CUOTA (hallazgo 1689): el desglose rotulaba «Retención IRPF anual» y
  *    «Tipo de retención efectivo», y el FAQPage decía que el neto era «el que recibes en
@@ -851,7 +857,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
     await calcular(page, '40000');
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('2600,00 €');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('5535,00 €');
-    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('13,84%');
+    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('13,84 %');
     expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('31.865,00 €');
     expect(await valorTarjeta(page, 'Neto Mensual (14 pagas)')).toBe('2276,07 €');
   });
@@ -869,7 +875,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
     await calcular(page, '400000');
     expect(await filaDesglose(page, 'Total Seguridad Social')).toBe('3978,94 €');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('169.036,90 €');
-    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('42,26%');
+    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('42,26 %');
     expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('226.984,16 €');
   });
 
@@ -914,7 +920,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
   test('HALLAZGO art. 20 · 20.000 €: IRPF 2.034,71 € y neto 16.665,29 €', async ({ page }) => {
     await calcular(page, '20000');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('2034,71 €');
-    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('10,17%');
+    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('10,17 %');
     expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('16.665,29 €');
   });
 
@@ -966,7 +972,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
     await escribirCampo(page, 'Número de hijos', '1');
     await calcular(page, '35000');
     expect(await filaDesglose(page, 'IRPF anual (cuota estimada)')).toBe('6100,50 €');
-    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('17,43%');
+    expect(await filaDesglose(page, 'Tipo efectivo de IRPF')).toBe('17,43 %');
     expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('26.624,50 €');
   });
 
@@ -1069,11 +1075,12 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
  * el 1689); el procedimiento de retención de los arts. 80-86 RIRPF no está en data/fiscal, así que
  * se compara con la cuota.
  *
- * Resultado: las cifras cuadran al céntimo con la fórmula canónica. Abiertos (test.fail()):
- *   (a) el mínimo por hijos entra ENTERO con custodia compartida o pareja no casada;
- *   (b) los % van pegados a la cifra o tras un espacio normal, no con espacio duro;
- *   el consejo de la deducción por maternidad (modelo 145 y «hasta 1.200 €» tecleado);
- *   y cinco emojis decorativos que el lector anuncia.
+ * Resultado: las cifras cuadran al céntimo con la fórmula canónica. Quedaron abiertos cinco
+ * hallazgos, todos REPARADOS el 29/09/2026 (sus `test.fail()` son hoy tests normales):
+ *   (a) 2458 — el mínimo por hijos entraba ENTERO con custodia compartida o pareja no casada;
+ *   (b) 2459 — los % iban pegados a la cifra o tras un espacio normal, no con espacio duro;
+ *   2460 y 2461 — el consejo de la deducción por maternidad (modelo 145 y «hasta 1.200 €» tecleado);
+ *   2462 — cinco emojis decorativos que el lector anunciaba.
  */
 test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del art. 20 y custodia compartida', () => {
   const IRPF = /^IRPF anual \(cuota estimada\)$/;
@@ -1116,7 +1123,7 @@ test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del a
     expect(await importe(page, /^Contingencias comunes \(4,70\s?%\)$/)).toBe('1410,00 €');
     expect(await importe(page, /^Desempleo \(1,55\s?%\)$/)).toBe('465,00 €');
     expect(await importe(page, /^Formación profesional \(0,10\s?%\)$/)).toBe('30,00 €');
-    expect(await importe(page, /^MEF - Equidad Intergeneracional \(0,15\s?%\)$/)).toBe('45,00 €');
+    expect(await importe(page, /^MEI - Equidad Intergeneracional \(0,15\s?%\)$/)).toBe('45,00 €');
     expect(await importe(page, /^Total Seguridad Social$/)).toBe('1950,00 €');
 
     expect(await importe(page, IRPF)).toBe('4926,00 €');
@@ -1180,7 +1187,8 @@ test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del a
    * conviviendo SOLO con el contribuyente, el mínimo entra entero y la cifra es correcta:
    *   mínimo 5.550 + 2.400 + 2.700 = 10.650 € · cuota 5.980,50 − 2.023,50 = 3.957,00 €
    *   neto 30.000 − 1.950 − 3.957 = 24.093,00 €
-   * Es también lo que la app da HOY a quien comparte la custodia: ver el test siguiente.
+   * Hasta el 29/09/2026 era también lo que la app daba a quien comparte la custodia (hallazgo
+   * 2458): ver el test siguiente. La casilla nace desmarcada, así que este control no cambia.
    */
   test('CONTROL · soltero/a con 2 hijos que conviven solo con él o ella: mínimo entero, IRPF 3.957,00 €', async ({ page }) => {
     await escribirCampo(page, 'Número de hijos', '2');
@@ -1190,7 +1198,7 @@ test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del a
   });
 
   /**
-   * HALLAZGO ABIERTO (medio, cálculo) — sospecha (a) del 27/09/2026. Con custodia compartida, o
+   * HALLAZGO 2458 — REPARADO el 29/09/2026 (medio, cálculo) — sospecha (a) del 27/09/2026. Con custodia compartida, o
    * en una pareja no casada, los hijos conviven con los dos progenitores (art. 58.1 LIRPF) y el
    * mínimo por descendientes «se prorrateará entre ellos por partes iguales» (art. 61.1.ª, en la
    * lista cotejada de FISCAL_IRPF_META; art. 84.2.º RIRPF para la retención: los descendientes
@@ -1200,11 +1208,17 @@ test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del a
    * estimador-irpf resolvió con la casilla `hijosConvivenConOtroProgenitor` (9bbc5c19).
    *   Esperado: mínimo 5.550 + (2.400 + 2.700) / 2 = 8.100 € → cuota 5.980,50 − escala(8.100)
    *   1.539,00 = 4.441,50 € · neto 30.000 − 1.950 − 4.441,50 = 23.608,50 €
-   *   Obtenido: 3.957,00 € y 24.093,00 € — 484,50 € de IRPF de menos (= 2.550 × 19 %).
-   * Lo mismo con «Familia monoparental» cuando la custodia es compartida.
+   *   Obtenido antes de reparar: 3.957,00 € y 24.093,00 € — 484,50 € de IRPF de menos (= 2.550 × 19 %).
+   *   Recalculado a mano el 29/09/2026 antes de fijarlo: escala(8.100) = 8.100 × 19 % = 1.539,00 €
+   *   (todo en el primer tramo, hasta 12.450 €) y escala(26.050) = 5.980,50 € (CASO 1); DA 61.ª 0 €
+   *   (30.000 ≥ 20.048,45). La diferencia con el control, 4.441,50 − 3.957,00 = 484,50 €, es la
+   *   mitad del mínimo de los hijos (2.550 €) al 19 %, como debe: el mínimo se grava a tipo cero.
+   * Reparado con la casilla «Los hijos conviven también con el otro progenitor», que motor.ts lleva
+   * a calcularMinimosPersonales (hijosConvivenConOtroProgenitor), con la forma del 2316 de
+   * estimador-irpf. Con «Familia monoparental» prorratea igual; con «Casado/a (dos ingresos)» la
+   * casilla no aparece porque ese caso ya prorrateaba (1688).
    */
-  test('HALLAZGO ABIERTO · custodia compartida o pareja no casada: el mínimo de 2 hijos se prorratea (IRPF 4.441,50 €)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la app no pregunta si los hijos conviven también con el otro progenitor y aplica el mínimo entero');
+  test('HALLAZGO 2458 (reparado) · custodia compartida o pareja no casada: el mínimo de 2 hijos se prorratea (IRPF 4.441,50 €)', async ({ page }) => {
     await escribirCampo(page, 'Número de hijos', '2');
     const casilla = page.getByRole('checkbox', { name: /otro progenitor/i });
     await expect(casilla).toHaveCount(1, { timeout: 1000 });
@@ -1212,6 +1226,18 @@ test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del a
     await calcular(page, '30000');
     expect(await importe(page, IRPF)).toBe('4441,50 €');
     expect(await valorTarjeta(page, 'Salario Neto Anual')).toBe('23.608,50 €');
+
+    // La vuelta Neto → Bruto usa la misma casilla: 23.608,50 € de neto vuelven a 30.000 €
+    // (marginal del 30 %: dNeto/dBruto ≈ 0,935 × 0,70 ≈ 0,65 → la tolerancia de 1 céntimo en el
+    // neto es ±0,02 € en el bruto). Sin la casilla volverían ≈ 29.255 € (484,50 / 0,65 menos).
+    await page.getByRole('button', { name: 'Neto → Bruto', exact: true }).click();
+    await calcular(page, '23608,50');
+    await expect.poll(() => valorTarjeta(page, 'Salario Neto Anual')).toBe('23.608,50 €');
+    expect(await numeroTarjeta(page, 'Salario Bruto Anual')).toBeCloseTo(30000, 0);
+
+    // Con «Casado/a (dos ingresos)» la casilla desaparece: ese caso ya prorratea (1688).
+    await page.getByRole('combobox', { name: 'Situación familiar' }).selectOption('casado_dos_ingresos');
+    await expect(casilla).toHaveCount(0);
   });
 
   /**
@@ -1262,20 +1288,22 @@ test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del a
     const subtitulo = page.locator('header').filter({ has: page.getByRole('heading', { level: 1 }) }).locator('p');
     await expect(subtitulo).toContainText('para España 2026');
     await calcular(page, '30000');
-    expect(await importe(page, /^MEF - Equidad Intergeneracional \(0,15\s?%\)$/)).toBe('45,00 €');
+    expect(await importe(page, /^MEI - Equidad Intergeneracional \(0,15\s?%\)$/)).toBe('45,00 €');
   });
 
   /**
-   * HALLAZGO ABIERTO (bajo, contenido) — sospecha (b) del 25/09/2026. La regla del 25/09/2026 (CLAUDE.md
+   * HALLAZGO 2459 — REPARADO el 29/09/2026 (bajo, contenido) — sospecha (b) del 25/09/2026. La regla del 25/09/2026 (CLAUDE.md
    * global §2) separa el % de la cifra con espacio duro (U+00A0), como hace formatPercentage de
    * @/lib. Medido en el texto visible con 30.000 € calculados y la guía abierta: 45 cifras con el
    * % pegado —6 en el desglose («Tipo efectivo de IRPF 16,42%», «Porcentaje sobre bruto 22,92%» y
    * los cuatro rótulos «Contingencias comunes (4,70%)»…, page.tsx:343, 359-371 y 389) y 39 en la
    * guía (tabla de tramos, ejemplo, cotizaciones, perfiles y FAQ)— y 5 con espacio normal («del
    * 30 %», «× 30 %», «del 1 % al 15 %», «del 37 %»). Ninguna con U+00A0.
+   * Reparado: las cifras calculadas pasan por formatPercentage de @/lib (helper `pct` de page.tsx)
+   * y los literales de la guía llevan &nbsp;. Ojo al leer los dos toBe de abajo: el espacio que se
+   * ve entre la cifra y el % es un U+00A0 literal, no un espacio normal.
    */
-  test('HALLAZGO ABIERTO · los % van separados de la cifra con espacio duro', async ({ page }) => {
-    test.fail(true, 'ABIERTO: page.tsx pega el % a la cifra (o lo separa con un espacio normal)');
+  test('HALLAZGO 2459 (reparado) · los % van separados de la cifra con espacio duro', async ({ page }) => {
     await calcular(page, '30000');
     const crudo = async (rotulo: RegExp) =>
       page.locator('span').filter({ hasText: rotulo }).first().locator('xpath=following-sibling::span[1]').innerText();
@@ -1288,39 +1316,49 @@ test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del a
   });
 
   /**
-   * HALLAZGO ABIERTO (bajo, dato) — perfil «Trabajadora a tiempo parcial»: «podrías tener derecho
+   * HALLAZGO 2460 — REPARADO el 29/09/2026 (bajo, dato) — perfil «Trabajadora a tiempo parcial»: «podrías tener derecho
    * a la deducción por maternidad de hasta 1.200 €/año», tecleado. data/fiscal/maternidad.ts ya lo
    * tiene: DEDUCCION_MATERNIDAD_IRPF.importeAnualPorHijo = 1.200 € por hijo menor de 3 años, más
    * incrementoGuarderia.importeMaximoAnual = 1.000 € por hijo con gasto de guardería: el techo con
-   * un hijo es 2.200 €/año, no 1.200 €.
+   * un hijo es 2.200 €/año, no 1.200 €. Cotejado con el art. 81.1 y 81.2 LIRPF (BOE consolidado,
+   * 29/09/2026): «hasta en 1.200 euros anuales por cada hijo menor de tres años» y «hasta en 1.000
+   * euros adicionales» por gastos de custodia en guardería o centro de educación infantil autorizado.
+   * Reparado: las cifras salen de DEDUCCION_MATERNIDAD_IRPF (formatCurrency: 1200,00 €, 1000,00 €,
+   * 2200,00 € y 100,00 € al mes; cuatro cifras sin agrupar, como hace es-ES).
    */
-  test('HALLAZGO ABIERTO · la deducción por maternidad no se da como «hasta 1.200 €/año» tecleado', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la cifra está escrita a mano y omite el incremento por guardería');
+  test('HALLAZGO 2460 (reparado) · la deducción por maternidad sale de DEDUCCION_MATERNIDAD_IRPF, con la guardería', async ({ page }) => {
     const cuerpo = await cuerpoConGuiaAbierta(page);
     expect(cuerpo).not.toContain('deducción por maternidad de hasta 1.200 €/año');
+    expect.soft(cuerpo).toContain('1200,00 € al año por cada hijo menor de 3 años');
+    expect.soft(cuerpo).toContain('hasta 1000,00 € más por hijo');
+    expect.soft(cuerpo).toContain('con un máximo de 2200,00 € al año por hijo');
   });
 
   /**
-   * HALLAZGO ABIERTO (medio, contenido) — el mismo consejo manda «comunícalo en el modelo 145»
+   * HALLAZGO 2461 — REPARADO el 29/09/2026 (medio, contenido) — el mismo consejo manda «comunícalo en el modelo 145»
    * (el que se entrega a la EMPRESA para la retención) si hay reducción de jornada por cuidado de
    * hijos. Según DEDUCCION_MATERNIDAD_IRPF, el derecho nace de tener un hijo MENOR DE 3 AÑOS
    * (requisitos.hijoMenor3), no de la reducción de jornada, y el cobro anticipado se pide a la
    * AEAT con el Modelo 140 (anticipado.formulario); si no, se aplica en la declaración.
+   * Cotejado con el art. 81.4 LIRPF: «Se podrá solicitar a la Agencia Estatal de Administración
+   * Tributaria el abono del importe de la deducción previsto en el apartado 1 anterior de forma
+   * anticipada» — solo el del apartado 1: el incremento por guardería va a la declaración.
    */
-  test('HALLAZGO ABIERTO · la deducción por maternidad no se tramita con el modelo 145', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el consejo envía la deducción por maternidad al modelo 145 de la empresa');
+  test('HALLAZGO 2461 (reparado) · la deducción por maternidad se pide a la AEAT con el Modelo 140, por tener un hijo menor de 3', async ({ page }) => {
     const cuerpo = await cuerpoConGuiaAbierta(page);
     expect(cuerpo).not.toMatch(/modelo 145[^.]*deducción por maternidad/);
+    expect.soft(cuerpo).toContain('no depende de la jornada, sino de tener un hijo menor de 3 años');
+    expect.soft(cuerpo).toContain('100,00 € al mes por hijo pidiéndolo a la Agencia Tributaria con el Modelo 140');
+    expect.soft(cuerpo).toContain('el incremento por guardería solo se aplica en la declaración');
   });
 
   /**
-   * HALLAZGO ABIERTO (bajo, accesibilidad) — emojis decorativos en su propio <span>, sin
+   * HALLAZGO 2462 — REPARADO el 29/09/2026 (bajo, accesibilidad) — emojis decorativos en su propio <span>, sin
    * aria-hidden, junto a texto: el lector los anuncia («birrete de graduación», «billete de
    * euro»…) antes del encabezado. El 💶 del hueco de resultados (page.tsx:399) y los iconos de
    * los cuatro perfiles (page.tsx:699, 720, 745 y 766). Regla del CLAUDE.md global §5.
    */
-  test('HALLAZGO ABIERTO · los emojis de los perfiles y del hueco de resultados llevan aria-hidden', async ({ page }) => {
-    test.fail(true, 'ABIERTO: cinco emojis decorativos sin aria-hidden');
+  test('HALLAZGO 2462 (reparado) · los emojis de los perfiles y del hueco de resultados llevan aria-hidden', async ({ page }) => {
     // El 💶 sale tres veces (hueco de resultados, tarjeta del SMI y RelatedApps): se acota al hueco.
     const hueco = page.getByText('Introduce tu salario y pulsa Calcular', { exact: false }).locator('xpath=preceding-sibling::span[1]');
     await expect(hueco).toHaveText('💶');

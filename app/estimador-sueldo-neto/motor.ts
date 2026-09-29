@@ -15,6 +15,7 @@ import {
   TRAMOS_IRPF_2025,
   calcularCuotaIntegraGeneral,
   COTIZACIONES_SS_2026,
+  COTIZACION_EMPRESA_2026,
   BASES_SS_2026,
   MINIMOS_IRPF_2025,
   calcularRendimientoNetoTrabajo,
@@ -32,6 +33,17 @@ export const TIPO_SS_TRABAJADOR =
   COTIZACIONES_SS_2026.desempleo +
   COTIZACIONES_SS_2026.formacionProfesional +
   COTIZACIONES_SS_2026.mef;
+
+/** Re-exportado para la vista y el metadata; el dato vive en data/fiscal/irpf.ts. */
+export { COTIZACION_EMPRESA_2026 };
+
+/** Tipo total de cotización de la empresa sin accidentes de trabajo (contrato indefinido), en %. */
+export const TIPO_SS_EMPRESA =
+  COTIZACION_EMPRESA_2026.contingenciasComunes +
+  COTIZACION_EMPRESA_2026.desempleoIndefinido +
+  COTIZACION_EMPRESA_2026.fogasa +
+  COTIZACION_EMPRESA_2026.formacionProfesional +
+  COTIZACION_EMPRESA_2026.mei;
 
 /**
  * Cuota íntegra del IRPF (art. 63.1.2º LIRPF).
@@ -102,12 +114,21 @@ export function calcularSeguridadSocial(salarioBrutoAnual: number): { anual: num
  * RIRPF: «los descendientes se computarán por mitad»). Hasta esa fecha entraba entero y el
  * perfil «Técnico medio con familia» contaba 7.950 € de mínimo en vez de 6.750 €.
  * En tributación conjunta (un solo ingreso) y en la monoparental hay un solo contribuyente:
- * entero.
+ * entero… salvo que los hijos convivan también con el otro progenitor.
+ *
+ * `hijosConvivenConOtroProgenitor` (hallazgo 2458, 29/09/2026): con custodia compartida o en
+ * una pareja no casada, los hijos conviven con los dos progenitores, los dos tienen derecho al
+ * mínimo por ellos (art. 58.1 LIRPF: «siempre que conviva con el contribuyente») y se prorratea
+ * por partes iguales (art. 61.1.ª), sea cual sea la situación que se elija en el formulario.
+ * Hasta esa fecha solo prorrateaba «Casado/a (dos ingresos)»: 30.000 € con 2 hijos en custodia
+ * compartida contaban 10.650 € de mínimo en vez de 8.100 € y el IRPF salía 484,50 € más bajo.
+ * Es la reparación del 2316 en estimador-irpf (9bbc5c19), con la misma forma.
  */
 export function calcularMinimosPersonales(
   numHijos: number,
   hijosMenores3: number,
   situacion: SituacionFamiliar,
+  hijosConvivenConOtroProgenitor: boolean = false,
 ): number {
   let descendientes = 0;
   if (numHijos >= 1) descendientes += MINIMOS_IRPF_2025.hijo_1;
@@ -117,7 +138,7 @@ export function calcularMinimosPersonales(
   // Adicional por hijos menores de 3 años (art. 58.2): forma parte del mismo mínimo.
   descendientes += hijosMenores3 * MINIMOS_IRPF_2025.hijo_menor_3;
 
-  const parte = situacion === 'casado_dos_ingresos' ? 0.5 : 1;
+  const parte = situacion === 'casado_dos_ingresos' || hijosConvivenConOtroProgenitor ? 0.5 : 1;
   return MINIMOS_IRPF_2025.personal + descendientes * parte;
 }
 
@@ -162,7 +183,9 @@ export function calcularBrutoANeto(
   situacion: SituacionFamiliar,
   numHijos: number,
   hijosMenores3: number,
-  pagas: number
+  pagas: number,
+  /** Custodia compartida o pareja no casada: el mínimo por los hijos se prorratea (art. 61.1.ª). */
+  hijosConvivenConOtroProgenitor: boolean = false,
 ): ResultadoBrutoANeto {
   const ss = calcularSeguridadSocial(brutoAnual);
   // Arts. 19 y 20 LIRPF: la reducción del art. 20 se calcula sobre bruto − SS, SIN restar
@@ -178,7 +201,7 @@ export function calcularBrutoANeto(
     0,
     baseImponible - calcularReduccionTributacionConjunta(situacion, numHijos)
   );
-  const minimos = calcularMinimosPersonales(numHijos, hijosMenores3, situacion);
+  const minimos = calcularMinimosPersonales(numHijos, hijosMenores3, situacion, hijosConvivenConOtroProgenitor);
   // En céntimos, como se liquida: con el SMI la cuota exacta es 590,8905 € y la DA 61.ª deduce
   // 590,89 €, así que sin redondear quedaba un IRPF de 0,0005 €.
   const cuotaIRPF = Math.round(calcularIRPF(baseLiquidable, minimos) * 100) / 100;
@@ -224,7 +247,8 @@ export function calcularNetoABruto(
   situacion: SituacionFamiliar,
   numHijos: number,
   hijosMenores3: number,
-  pagas: number
+  pagas: number,
+  hijosConvivenConOtroProgenitor: boolean = false,
 ): ResultadoNetoABruto {
   // Estimación inicial: neto / 0.7 (asumiendo ~30% de deducciones)
   let brutoEstimado = netoAnualObjetivo / 0.7;
@@ -243,7 +267,7 @@ export function calcularNetoABruto(
   });
 
   for (let i = 0; i < maxIteraciones; i++) {
-    const resultado = calcularBrutoANeto(brutoEstimado, situacion, numHijos, hijosMenores3, pagas);
+    const resultado = calcularBrutoANeto(brutoEstimado, situacion, numHijos, hijosMenores3, pagas, hijosConvivenConOtroProgenitor);
     const diferencia = resultado.netoAnual - netoAnualObjetivo;
 
     if (Math.abs(diferencia) < tolerancia) {
@@ -255,5 +279,5 @@ export function calcularNetoABruto(
   }
 
   // Devolver mejor aproximación
-  return empaquetar(brutoEstimado, calcularBrutoANeto(brutoEstimado, situacion, numHijos, hijosMenores3, pagas));
+  return empaquetar(brutoEstimado, calcularBrutoANeto(brutoEstimado, situacion, numHijos, hijosMenores3, pagas, hijosConvivenConOtroProgenitor));
 }

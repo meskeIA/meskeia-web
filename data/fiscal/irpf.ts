@@ -239,6 +239,29 @@ export const COTIZACIONES_SS_2026 = {
   mef:                     0.15, // Mecanismo Equidad Intergeneracional (0,9% total; 0,15% trabajador en 2026)
 };
 
+/**
+ * Cotización a cargo de la EMPRESA en 2026 (Régimen General, contrato indefinido), en %.
+ *
+ * Cotejado el 29/09/2026 en el BOE, Orden PJC/297/2026 (BOE-A-2026-7296): art. 4.a
+ * (contingencias comunes 23,60 %), art. 16 (MEI 0,90 %: 0,75 % empresa y 0,15 % trabajador,
+ * calendario de la DT 43.ª LGSS según el RDL 2/2023, que sube una décima al año hasta el
+ * 1,20 % de 2029) y art. 33.2 (desempleo 5,50 % indefinido —6,70 % de duración determinada—,
+ * FOGASA 0,20 %, formación profesional 0,60 %). Accidentes de trabajo y enfermedades
+ * profesionales van aparte, por la tarifa de primas de la DA 61.ª LGSS, según la actividad.
+ *
+ * Vivió en `app/estimador-sueldo-neto/motor.ts` unas horas del 29/09/2026 (la tarjeta
+ * «Lo que paga la empresa» omitía el MEI de la empresa); se mudó aquí el mismo día, porque un
+ * tipo de cotización es dato normativo y tiene que vigilarse con los demás.
+ */
+export const COTIZACION_EMPRESA_2026 = {
+  contingenciasComunes: 23.60,
+  desempleoIndefinido:   5.50,
+  desempleoTemporal:     6.70,
+  fogasa:                0.20,
+  formacionProfesional:  0.60,
+  mei:                   0.75,
+};
+
 // Bases de cotización 2025 (mensuales) — Orden PJC/178/2025, vigentes desde el 01-ene-2025
 export const BASES_SS_2025 = {
   minima: 1381.20,

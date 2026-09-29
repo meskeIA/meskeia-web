@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { formatNumber } from '@/lib';
+import { formatNumber, formatCurrency } from '@/lib';
 import { FISCAL_IRPF_META, COTIZACIONES_SS_2026 } from '@/data/fiscal';
-import { calcularBrutoANeto, TIPO_SS_TRABAJADOR } from './motor';
+import { calcularBrutoANeto, TIPO_SS_TRABAJADOR, TIPO_SS_EMPRESA, COTIZACION_EMPRESA_2026 } from './motor';
 
 /**
  * Ejercicio que se calcula (hallazgo 1653): el motor usa COTIZACIONES_SS_2026, BASES_SS_2026 y
@@ -102,7 +102,9 @@ export const faqJsonLd = {
       name: '¿El coste para la empresa es el mismo que el salario bruto del trabajador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `No. El coste total para la empresa (coste empresa o coste laboral) es mayor que el bruto del trabajador porque la empresa paga adicionalmente las cotizaciones empresariales a la Seguridad Social, que en ${EJERCICIO} suponen aproximadamente el 30-32 % adicional sobre el salario bruto (23,60 % contingencias comunes + cuotas de desempleo, FOGASA y formación). Así, un trabajador con 30.000 € brutos le cuesta a la empresa alrededor de 39.000-40.000 € anuales.`,
+        // Sospecha anotada (29/09/2026): el 23,60 % iba tecleado y faltaba el MEI de la empresa
+        // (0,75 % en 2026). Sale ahora de COTIZACION_EMPRESA_2026 (motor.ts, Orden PJC/297/2026).
+        text: `No. El coste total para la empresa (coste empresa o coste laboral) es mayor que el bruto del trabajador porque la empresa paga adicionalmente las cotizaciones empresariales a la Seguridad Social, que en ${EJERCICIO} suponen el ${pct(TIPO_SS_EMPRESA)} del salario bruto con un contrato indefinido (${pct(COTIZACION_EMPRESA_2026.contingenciasComunes)} contingencias comunes + ${pct(COTIZACION_EMPRESA_2026.desempleoIndefinido)} desempleo + ${pct(COTIZACION_EMPRESA_2026.fogasa)} FOGASA + ${pct(COTIZACION_EMPRESA_2026.formacionProfesional)} formación profesional + ${pct(COTIZACION_EMPRESA_2026.mei)} Mecanismo de Equidad Intergeneracional), más la cotización por accidentes de trabajo y enfermedades profesionales, que depende de la actividad. Así, un trabajador con 30.000 € brutos le cuesta a la empresa ${formatCurrency(30000 * (1 + TIPO_SS_EMPRESA / 100))} anuales más esa última cotización.`,
       },
     },
   ],
