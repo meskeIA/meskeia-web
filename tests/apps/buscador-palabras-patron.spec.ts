@@ -29,9 +29,12 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *
  * DÓNDE VIVE EL CÁLCULO — todo en app/buscador-palabras-patron/page.tsx
  *   normalizar()      ← toLowerCase + NFD + quitar U+0300–U+036F. Ese rango INCLUYE U+0303
- *                        (la tilde de la ñ), así que la ñ sale convertida en n: en el patrón,
- *                        en el diccionario y en los dos filtros. La validación /^[a-zñ_]+$/ nunca
- *                        llega a ver una ñ.
+ *                        (la tilde de la ñ), así que la ñ salía convertida en n: en el patrón,
+ *                        en el diccionario y en los dos filtros (hallazgo 2431). REPARADO el
+ *                        29/09/2026: recompone «n + U+0303» en ñ antes de quitar las marcas.
+ *
+ * REPARACIÓN DEL 29/09/2026 — hallazgos 2429-2440, los doce de la primera inspección. Los tests
+ * que eran ABIERTO ya no llevan test.fail(); sus comentarios dicen qué pasaba antes.
  *   buscar()          ← índice por longitud + RegExp `^…$` con «.» por cada comodín.
  *
  * LA SOSPECHA DE INTRO (SOSPECHAS.md, 27/09/2026) — CONFIRMADA
@@ -174,42 +177,69 @@ test.describe('buscador-palabras-patron', () => {
     });
 
     test(
-      'ABIERTO · el recuento de cinco cifras lleva punto de miles: «14.103»',
+      'el recuento de cinco cifras lleva punto de miles: «14.103»',
       async ({ page }) => {
-        // ABIERTO: la cabecera pinta `{results.length}` a pelo y sale «14103». El tamaño del
+        // REPARADO el 29/09/2026. Antes: la cabecera pinta `{results.length}` a pelo y sale «14103». El tamaño del
         // diccionario, dos líneas más arriba, sí usa toLocaleString('es-ES') («86.973»).
-        test.fail();
         await buscar(page, '________');
         await expect(cabecera(page)).toHaveText('Palabras encontradas: 14.103');
       },
     );
 
-    test('longitud máxima: 21 comodines tecleados se quedan en 20 → las 23 de 20 letras', async ({
+    test('sin tope: 20 comodines → las 23 de 20 letras; 21 tecleados → las 8 de 21', async ({
       page,
     }) => {
-      // La FAQ declara 20 caracteres. Oráculo: 23 lemas de exactamente 20 letras.
-      await page.locator(CAMPO).pressSequentially('_'.repeat(21));
-      await esperarValorEnReact(page, CAMPO, '_'.repeat(20));
-      await expect(page.locator('[class*="helpText"]')).toContainText('Longitud: 20 letras');
-      await botonBuscar(page).click();
+      // REESCRITO el 29/09/2026 (hallazgo 2436). Este test consagraba el recorte: «21 comodines
+      // tecleados se quedan en 20». El campo ya no tiene maxLength y la FAQ ya no declara un
+      // tope de 20. Oráculo: 23 lemas de 20 letras y 8 de 21 (antinorteamericanismo,
+      // constitucionalización, contrarrevolucionario, desoxirribonucleótido,
+      // electroencefalografía, interdisciplinariedad, otorrinolaringológico,
+      // preterintencionalidad).
+      await buscar(page, '_'.repeat(20));
       await expect(cabecera(page)).toHaveText('Palabras encontradas: 23');
-      const obtenidas = await palabras(page);
-      expect(obtenidas).toContain('electroencefalograma');
-      expect(obtenidas.every((w) => [...w].length === 20)).toBe(true);
+      const de20 = await palabras(page);
+      expect(de20).toContain('electroencefalograma');
+      expect(de20.every((w) => [...w].length === 20)).toBe(true);
+
+      await page.locator(CAMPO).fill('');
+      await page.locator(CAMPO).pressSequentially('_'.repeat(21));
+      await esperarValorEnReact(page, CAMPO, '_'.repeat(21));
+      await expect(page.locator('[class*="helpText"]')).toContainText('Longitud: 21 letras');
+      await botonBuscar(page).click();
+      await expect(cabecera(page)).toHaveText('Palabras encontradas: 8');
+      const de21 = await palabras(page);
+      expect(de21).toContain('electroencefalografía');
+      expect(de21.every((w) => [...w].length === 21)).toBe(true);
+    });
+
+    test('más largo que la palabra más larga (23): lo dice en vez de un «no hay» a secas', async ({
+      page,
+    }) => {
+      // Sin tope en el campo, un patrón de 24 no tiene respuesta posible en el lemario: el
+      // aviso cuenta por qué. Oráculo: el lema más largo es «electroencefalografista» (23); la
+      // app saca la cifra del diccionario cargado, no de una constante.
+      await buscar(page, '_'.repeat(24));
+      await expect(sinResultados(page)).toContainText(
+        'La palabra más larga del diccionario tiene 23 letras y el patrón tiene 24.',
+      );
     });
 
     test(
-      'ABIERTO · pegar una palabra del lemario de 21 letras no la recorta en silencio',
+      'pegar una palabra del lemario de 21 letras no la recorta en silencio',
       async ({ page }) => {
-        // ABIERTO: maxLength={20} recorta lo pegado sin avisar. «electroencefalografía» (21
+        // REPARADO el 29/09/2026. Antes: maxLength={20} recorta lo pegado sin avisar. «electroencefalografía» (21
         // letras) está en el lemario; el campo se queda en «electroencefalografí», el contador
         // dice «20 letras» y la búsqueda responde «No se encontraron palabras». Esperado: la
         // palabra entera y encontrada, o un aviso del límite. Es la forma del 2279.
-        test.fail();
+        // Ahora: sin maxLength, el campo guarda las 21 letras y la búsqueda la encuentra.
         await page.locator(CAMPO).focus();
         await page.keyboard.insertText('electroencefalografía'); // como un pegado
-        // Lo que recorta es el propio DOM (maxLength), así que basta mirar el campo
         await expect(page.locator(CAMPO)).toHaveValue('electroencefalografía', { timeout: 2000 });
+        await esperarValorEnReact(page, CAMPO, 'electroencefalografía');
+        await expect(page.locator('[class*="helpText"]')).toContainText('Longitud: 21 letras');
+        await botonBuscar(page).click();
+        await expect(cabecera(page)).toHaveText('Palabras encontradas: 1');
+        expect(await palabras(page)).toEqual(['electroencefalografía']);
       },
     );
 
@@ -222,33 +252,30 @@ test.describe('buscador-palabras-patron', () => {
       );
     });
 
-    test('ABIERTO · la ñ fija del patrón no admite la n: «_año» → 9 palabras', async ({ page }) => {
-      // ABIERTO: normalizar() convierte la ñ en n, y «_año» busca en realidad «_ano».
+    test('la ñ fija del patrón no admite la n: «_año» → 9 palabras', async ({ page }) => {
+      // REPARADO el 29/09/2026. Antes: normalizar() convierte la ñ en n, y «_año» busca en realidad «_ano».
       // Oráculo (ñ letra propia): baño, caño, daño, jaño, maño, paño, raño, taño, ñaño → 9.
       // Obtenido: 17, con cano, fano, mano, pano, rano, sano, tano y vano, que no encajan.
-      test.fail();
       await buscar(page, '_año');
       expect([...(await palabras(page))].sort()).toEqual(
         ['baño', 'caño', 'daño', 'jaño', 'maño', 'paño', 'raño', 'taño', 'ñaño'].sort(),
       );
     });
 
-    test('ABIERTO · «Debe contener: ñ» exige la ñ: «_____» → 123', async ({ page }) => {
-      // ABIERTO: el filtro «ñ» se normaliza a «n». Oráculo: 123 lemas de 5 letras con ñ.
+    test('«Debe contener: ñ» exige la ñ: «_____» → 123', async ({ page }) => {
+      // REPARADO el 29/09/2026. Antes: el filtro «ñ» se normaliza a «n». Oráculo: 123 lemas de 5 letras con ñ.
       // Obtenido: 1233 (también los 1.110 que solo llevan n, como «abano» o «ación»).
-      test.fail();
       await buscar(page, '_____', { contiene: 'ñ' });
       await expect(cabecera(page)).toHaveText('Palabras encontradas: 123');
     });
 
     test(
-      'ABIERTO · Wordle con la N gris: «sue_o» sin «n» mantiene «sueño»',
+      'Wordle con la N gris: «sue_o» sin «n» mantiene «sueño»',
       async ({ page }) => {
-        // ABIERTO: el flujo que enseña la propia app para Wordle («las grises en "no debe
+        // REPARADO el 29/09/2026. Antes: el flujo que enseña la propia app para Wordle («las grises en "no debe
         // contener"»). Con la N gris, «no debe contener n» borra también toda palabra con ñ.
         // Oráculo: sue_o → sueco, suelo, sueno, suero, suevo, sueño; sin n → sueco, suelo,
         // suero, suevo, sueño (5). Obtenido: 4, sin «sueño», que podría ser la solución.
-        test.fail();
         await buscar(page, 'sue_o', { noContiene: 'n' });
         expect([...(await palabras(page))].sort()).toEqual(
           ['sueco', 'suelo', 'suero', 'suevo', 'sueño'].sort(),
@@ -256,12 +283,11 @@ test.describe('buscador-palabras-patron', () => {
       },
     );
 
-    test('ABIERTO · «No debe contener: ñ» no descarta las palabras con n: «_____» → 4971', async ({
+    test('«No debe contener: ñ» no descarta las palabras con n: «_____» → 4971', async ({
       page,
     }) => {
-      // ABIERTO: el veto de «ñ» se normaliza a «n». Oráculo: 5.094 − 123 con ñ = 4.971.
+      // REPARADO el 29/09/2026. Antes: el veto de «ñ» se normaliza a «n». Oráculo: 5.094 − 123 con ñ = 4.971.
       // Obtenido: 3861; faltan los 1.110 que llevan n y no ñ (p. ej. «mundo», «ajeno»).
-      test.fail();
       await buscar(page, '_____', { noContiene: 'ñ' });
       await expect(cabecera(page)).toHaveText('Palabras encontradas: 4971');
     });
@@ -300,72 +326,138 @@ test.describe('buscador-palabras-patron', () => {
     });
 
     test(
-      'ABIERTO · un espacio al final se descarta, como promete el bloque educativo',
+      'un espacio al final se descarta, como promete el bloque educativo',
       async ({ page }) => {
-        // ABIERTO: «Errores frecuentes» dice «Espacios, números o signos de puntuación se
+        // REPARADO el 29/09/2026. Antes: «Errores frecuentes» dice «Espacios, números o signos de puntuación se
         // descartan automáticamente». No se descartan: «casa » (pegado con espacio final)
         // rechaza el patrón entero con «No se encontraron palabras que coincidan», y
         // «casa» está en el lemario. Esperado según la promesa: casa.
-        test.fail();
+        // Reparado en las dos mitades: los espacios de los EXTREMOS se ignoran (el caso del
+        // acta), y el texto ya no promete descartar números o signos en medio, que cambiarían
+        // la longitud: esos se señalan y no se busca (test siguiente).
         await buscar(page, 'casa ');
         expect(await palabras(page)).toEqual(['casa']);
+        await buscar(page, '  c?sa');
+        expect(await palabras(page)).toEqual(['casa', 'cosa']);
+        await expect(page.locator('body')).not.toContainText('se descartan automáticamente');
       },
     );
+
+    test('un carácter no válido en medio no se presenta como «No se encontraron palabras»', async ({
+      page,
+    }) => {
+      // «ca sa» y «c4sa» no son patrones sin palabras: no se han buscado. El aviso lo dice y
+      // nombra el carácter.
+      await buscar(page, 'ca sa');
+      await expect(sinResultados(page)).toContainText(
+        'No se ha buscado: el patrón lleva un espacio, que no es una letra ni un comodín.',
+      );
+      await expect(sinResultados(page)).not.toContainText('No se encontraron');
+      await buscar(page, 'c4s.a');
+      await expect(sinResultados(page)).toContainText(
+        'No se ha buscado: el patrón lleva «4», «.», que no son letras ni comodines.',
+      );
+    });
   });
 
   // ---------------------------------------------------------------------------------------
   // INTRO Y ESTADO — la sospecha del 27/09/2026
   // ---------------------------------------------------------------------------------------
   test.describe('Intro y estado de los resultados', () => {
-    test('ABIERTO · en escritorio, Intro en el campo busca como el botón', async ({ page }) => {
-      // ABIERTO: sin <form>, onKeyDown ni búsqueda en vivo. Con el botón, «c?sa» da 2.
-      test.fail();
+    test('en escritorio, Intro en el campo busca como el botón', async ({ page }) => {
+      // REPARADO el 29/09/2026. Antes: sin <form>, onKeyDown ni búsqueda en vivo. Con el botón, «c?sa» da 2.
       await sembrarValor(page, CAMPO, 'c?sa');
       await page.locator(CAMPO).press('Enter');
       await expect(cabecera(page)).toHaveText('Palabras encontradas: 2', { timeout: 3000 });
     });
 
     test(
-      'ABIERTO · editar el patrón tras una búsqueda vacía retira el «No se encontraron»',
+      'editar el patrón tras una búsqueda vacía retira el «No se encontraron»',
       async ({ page }) => {
-        // ABIERTO: tras buscar «zzzz», teclear «c?sa» deja en pantalla «No se encontraron
+        // REPARADO el 29/09/2026. Antes: tras buscar «zzzz», teclear «c?sa» deja en pantalla «No se encontraron
         // palabras que coincidan con ese patrón.» bajo un patrón que tiene 2. Con Intro sin
         // efecto, es lo que ve quien teclea y pulsa Intro. Es la forma del hallazgo 194.
-        test.fail();
         await buscar(page, 'zzzz');
         await sembrarValor(page, CAMPO, 'c?sa');
         await expect(sinResultados(page)).toHaveCount(0);
+        // Y con Intro se busca el patrón nuevo
+        await page.locator(CAMPO).press('Enter');
+        await expect(cabecera(page)).toHaveText('Palabras encontradas: 2', { timeout: 3000 });
       },
     );
+
+    test('editar el patrón o un filtro tras una búsqueda retira los chips del patrón anterior', async ({
+      page,
+    }) => {
+      // REPARADO el 29/09/2026 (hallazgo 2430, segunda mitad; forma del 195). Antes: tras
+      // buscar «c?sa», teclear «p_r__» dejaba «Palabras encontradas: 2», casa y cosa, bajo el
+      // patrón nuevo. Lo mismo al tocar un filtro: el resultado ya no corresponde a lo pedido.
+      await buscar(page, 'c?sa');
+      await expect(chips(page)).toHaveCount(2);
+      await sembrarValor(page, CAMPO, 'p_r__');
+      await expect(chips(page)).toHaveCount(0);
+      await expect(cabecera(page)).toHaveCount(0);
+
+      await buscar(page, 'c?sa');
+      await expect(chips(page)).toHaveCount(2);
+      await sembrarValor(page, NO_CONTIENE, 'o');
+      await expect(chips(page)).toHaveCount(0);
+      await botonBuscar(page).click();
+      await expect(cabecera(page)).toHaveText('Palabras encontradas: 1');
+      expect(await palabras(page)).toEqual(['casa']);
+    });
+
+    test('los filtros no recortan lo pegado: cinco letras grises con comas cuentan todas', async ({
+      page,
+    }) => {
+      // Mismo defecto que el 2436, en los filtros (visto al repararlo, sin ficha propia): con
+      // maxLength={6}, «a,b,c,d,l» se quedaba en «a,b,c,» y la «l» gris no se vetaba.
+      // Oráculo: sue_o → sueco, suelo, sueno, suero, suevo, sueño; sin a, b, c, d ni l →
+      // sueno, suero, suevo, sueño (4). Con el recorte salían 5, con «suelo».
+      await buscar(page, 'sue_o', { noContiene: 'a,b,c,d,l' });
+      await expect(page.locator(NO_CONTIENE)).toHaveValue('a,b,c,d,l');
+      expect([...(await palabras(page))].sort()).toEqual(['sueno', 'suero', 'suevo', 'sueño'].sort());
+    });
   });
 
   // ---------------------------------------------------------------------------------------
   // ACCESIBILIDAD
   // ---------------------------------------------------------------------------------------
   test.describe('accesibilidad', () => {
-    test('todos los botones llevan type="button"', async ({ page }) => {
-      await expect(page.locator('button:not([type="button"])')).toHaveCount(0);
-    });
-
-    test('ABIERTO · la región viva anuncia el recuento, no la lista de palabras', async ({
+    test('todos los botones llevan type="button", salvo el submit «Buscar palabras»', async ({
       page,
     }) => {
-      // ABIERTO: role="status" aria-live="polite" aria-atomic="true" envuelve la cabecera Y
+      // REESCRITO el 29/09/2026 (hallazgo 2429): «Buscar palabras» es ahora el type="submit"
+      // del <form>, el que dispara Intro; los demás siguen con type="button" para no enviar.
+      // Se mira el DOM de la página con querySelectorAll, que no entra en el shadow root del
+      // botón de Next Dev Tools (solo existe en desarrollo y no es de la app).
+      const sinTipoButton = await page.evaluate(() =>
+        Array.from(document.querySelectorAll('button'))
+          .filter((b) => b.getAttribute('type') !== 'button')
+          .map((b) => `${b.getAttribute('type')}|${b.textContent?.trim() ?? ''}`),
+      );
+      expect(sinTipoButton).toEqual(['submit|Buscar palabras']);
+    });
+
+    test('la región viva anuncia el recuento, no la lista de palabras', async ({
+      page,
+    }) => {
+      // REPARADO el 29/09/2026. Antes: role="status" aria-live="polite" aria-atomic="true" envuelve la cabecera Y
       // la rejilla de chips. Con «________» la región lleva 14.103 palabras (112.851
       // caracteres) que el lector leería enteras. Se acota a la app: el anunciador de rutas de
       // Next y el aria-live del bloque educativo quedan fuera.
-      test.fail();
       await buscar(page, 'c?sa');
       const regiones = page.locator('[class*="mainContent"] :is([aria-live], [role="status"])');
       await expect(regiones.locator('[class*="wordChip"]')).toHaveCount(0);
+      // …y el recuento sí está dentro de una región viva
+      await expect(regiones.filter({ hasText: 'Palabras encontradas: 2' })).toHaveCount(1);
     });
 
-    test('ABIERTO · «No se encontraron palabras» se anuncia en una región viva', async ({
+    test('«No se encontraron palabras» se anuncia en una región viva', async ({
       page,
     }) => {
-      // ABIERTO: el aviso de cero resultados es un <div> sin role ni aria-live, y la única
+      // REPARADO el 29/09/2026. Antes: el aviso de cero resultados es un <div> sin role ni aria-live, y la única
       // región viva de resultados se desmonta cuando no hay ninguno.
-      test.fail();
       await buscar(page, 'zzzz');
       const anunciado = page
         .locator('[class*="mainContent"] :is([aria-live], [role="status"], [role="alert"])')
@@ -373,12 +465,11 @@ test.describe('buscador-palabras-patron', () => {
       expect(await anunciado.count()).toBeGreaterThan(0);
     });
 
-    test('ABIERTO · los emojis de los <h3> del bloque educativo llevan aria-hidden', async ({
+    test('los emojis de los <h3> del bloque educativo llevan aria-hidden', async ({
       page,
     }) => {
-      // ABIERTO: 📊 🎯 ❓ 📋 💡 van pegados al texto de cinco <h3> (page.tsx L281, 323, 366,
+      // REPARADO el 29/09/2026. Antes: 📊 🎯 ❓ 📋 💡 van pegados al texto de cinco <h3> (page.tsx L281, 323, 366,
       // 424, 491) sin <span aria-hidden="true">.
-      test.fail();
       const titulos = page.locator('h3', {
         hasText: /Comparativa con otras|Casos de uso reales|Preguntas frecuentes|Cómo sacar el máximo|Mejores prácticas/,
       });
@@ -400,39 +491,50 @@ test.describe('buscador-palabras-patron', () => {
   // CONTENIDO — ejemplos que la app no puede devolver
   // ---------------------------------------------------------------------------------------
   test.describe('contenido', () => {
-    test('ABIERTO · la metadata no cita NARRADO como resultado de «_A_A_O»', async ({ page }) => {
-      // ABIERTO: description y og:description prometen «"_A_A_O" → CASADO, NARRADO». NARRADO
+    test('la metadata no cita NARRADO como resultado de «_A_A_O»', async ({ page }) => {
+      // REPARADO el 29/09/2026. Antes: description y og:description prometen «"_A_A_O" → CASADO, NARRADO». NARRADO
       // tiene 7 letras (no cabe en 6) y no está en el lemario; el CASO 1 lo confirma: 166
       // resultados sin «narrado».
-      test.fail();
       const descripcion = await page.locator('meta[name="description"]').getAttribute('content');
       expect(descripcion ?? '').not.toContain('NARRADO');
+      const og = await page.locator('meta[property="og:description"]').getAttribute('content');
+      expect(og ?? '').not.toContain('NARRADO');
+      // Las que cita ahora (CASADO, BAÑADO, PAGADO) salen del ejemplo: ver el CASO 1
+      expect(descripcion ?? '').toContain('CASADO, BAÑADO, PAGADO');
+      await page.getByRole('button', { name: '_a_a_o', exact: true }).click();
+      await esperarValorEnReact(page, CAMPO, '_A_A_O');
+      await botonBuscar(page).click();
+      await expect(cabecera(page)).toHaveText('Palabras encontradas: 166');
+      const obtenidas = await palabras(page);
+      for (const w of ['casado', 'bañado', 'pagado']) expect(obtenidas).toContain(w);
     });
 
-    test('ABIERTO · la FAQ no promete CAÍDA ni CASÉ para «c_s_»', async ({ page }) => {
-      // ABIERTO: «un patrón c_s_ encontrará también palabras con tildes como CAÍDA o CASÉ» (y
+    test('la FAQ no promete CAÍDA ni CASÉ para «c_s_»', async ({ page }) => {
+      // REPARADO el 29/09/2026. Antes: «un patrón c_s_ encontrará también palabras con tildes como CAÍDA o CASÉ» (y
       // la tarjeta «No te preocupes por las tildes» repite CASÉ). Oráculo: c_s_ → casa, casi,
       // caso, cese, cosa, coso (6), ninguna con tilde; CAÍDA tiene 5 letras y ninguna S, y
       // CASÉ no está en el lemario.
-      test.fail();
       await buscar(page, 'c_s_');
       expect(await palabras(page)).toEqual(['casa', 'casi', 'caso', 'cese', 'cosa', 'coso']);
       await expect(page.locator('body')).not.toContainText('CAÍDA o CASÉ');
+      await expect(page.locator('body')).not.toContainText('encuentra también CASÉ');
+      // Los ejemplos que pone ahora salen de verdad: «_rbol» → árbol, «cancion» → canción
+      // (CASO 2) y «_año» → baño y paño pero no mano (test de la ñ)
+      await buscar(page, '_rbol');
+      expect(await palabras(page)).toEqual(['árbol']);
     });
 
-    test('ABIERTO · el caso de crucigramas no cita CORREO para «C_R_E_O»', async ({ page }) => {
-      // ABIERTO: «tienes C_R_E_O … verás CORREO, CARTERO, CIRUELO». CORREO tiene 6 letras;
+    test('el caso de crucigramas no cita CORREO para «C_R_E_O»', async ({ page }) => {
+      // REPARADO el 29/09/2026. Antes: «tienes C_R_E_O … verás CORREO, CARTERO, CIRUELO». CORREO tiene 6 letras;
       // los 25 del oráculo (CASO 1) no la incluyen.
-      test.fail();
       await expect(page.locator('body')).not.toContainText('verás CORREO');
     });
 
-    test('ABIERTO · la FAQ no remite a un filtro de longitud mínima que no existe', async ({
+    test('la FAQ no remite a un filtro de longitud mínima que no existe', async ({
       page,
     }) => {
-      // ABIERTO: «Si necesitas explorar palabras muy largas, baja la longitud mínima en
+      // REPARADO el 29/09/2026. Antes: «Si necesitas explorar palabras muy largas, baja la longitud mínima en
       // filtros». Los únicos campos son el patrón, «Debe contener» y «No debe contener».
-      test.fail();
       await expect(page.locator('[class*="mainContent"] input')).toHaveCount(3);
       await expect(page.locator('body')).not.toContainText('baja la longitud mínima en filtros');
     });
@@ -468,16 +570,19 @@ test.describe('buscador-palabras-patron', () => {
     });
 
     test(
-      'ABIERTO · la tecla de acción del teclado busca («search»/Intro)',
+      'la tecla de acción del teclado busca («search»/Intro)',
       async ({ page }) => {
-        // ABIERTO: enterKeyHint vacío, sin <form>: el teclado ofrece la tecla genérica y al
+        // REPARADO el 29/09/2026. Antes: enterKeyHint vacío, sin <form>: el teclado ofrece la tecla genérica y al
         // pulsarla no pasa nada. Con el botón, «c?sa» da 2 (test anterior).
-        test.fail();
         await page.locator(CAMPO).tap();
         await sembrarValor(page, CAMPO, 'c?sa');
         await page.locator(CAMPO).press('Enter');
         await expect(cabecera(page)).toHaveText('Palabras encontradas: 2', { timeout: 3000 });
         await expect(page.locator(CAMPO)).toHaveAttribute('enterkeyhint', 'search');
+        // El envío táctil cierra el teclado y lleva la vista al recuento (el botón quedaba
+        // 335 px bajo el campo y los resultados, más abajo aún)
+        await expect(page.locator(CAMPO)).not.toBeFocused();
+        await expect(page.locator('[class*="resultsHeader"]')).toBeInViewport({ ratio: 1 });
       },
     );
   });

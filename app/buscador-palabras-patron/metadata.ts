@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Buscador de Palabras por Patrón - Crucigramas y Juegos de Letras | meskeIA',
-  description: 'Encuentra palabras del español a partir de un patrón con huecos: introduce "_A_A_O" y obtén CASADO, NARRADO, BAÑADO... Ideal para crucigramas, Scrabble, Wordle y aprender vocabulario.',
+  description: 'Encuentra palabras del español a partir de un patrón con huecos: introduce "_A_A_O" y obtén CASADO, BAÑADO, PAGADO... Ideal para crucigramas, Scrabble, Wordle y aprender vocabulario.',
   keywords: 'buscador palabras patrón, crucigramas, palabras con huecos, autodefinidos, scrabble, wordle, palabras cruzadas, español, completar palabras',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Buscador de Palabras por Patrón en Español',
-    description: 'Encuentra palabras del español con un patrón de huecos. Ej.: "_A_A_O" → CASADO, NARRADO. Más de 87.000 palabras del lemario.',
+    description: 'Encuentra palabras del español con un patrón de huecos. Ej.: "_A_A_O" → CASADO, BAÑADO. Casi 87.000 palabras del lemario.',
     url: 'https://meskeia.com/buscador-palabras-patron/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -38,15 +38,15 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Buscador de Palabras por Patrón',
-  description: 'Encuentra palabras del español que coinciden con un patrón de letras y huecos. Útil para resolver crucigramas, autodefinidos, Scrabble, Wordle y completar palabras parciales. Más de 87.000 lemas indexados por longitud.',
+  description: 'Encuentra palabras del español que coinciden con un patrón de letras y huecos. Útil para resolver crucigramas, autodefinidos, Scrabble, Wordle y completar palabras parciales. Casi 87.000 lemas del español.',
   url: 'https://meskeia.com/buscador-palabras-patron/',
   category: 'UtilityApplication',
   features: [
     'Búsqueda por patrón con guiones bajos como comodines (ej. "_A_A_O")',
     'Filtro opcional de letras que deben aparecer en la palabra',
     'Filtro opcional de letras a excluir',
-    'Resultados agrupados por longitud y ordenados alfabéticamente',
-    'Más de 87.000 lemas del español validados (Lemario de Olea, dominio público)',
+    'Resultados ordenados alfabéticamente, todos con la longitud exacta del patrón',
+    '86.973 lemas del español (Lemario de Olea, dominio público)',
     'Útil para crucigramas, Wordle, Scrabble y retos lingüísticos: busca por longitud exacta y letras conocidas',
     'Diccionario completo con lemas del español sin distinción regional para hispanohablantes de todo el mundo',
   ],
@@ -61,7 +61,7 @@ export const faqJsonLd = {
       name: '¿Cómo se usa un buscador de palabras por patrón para resolver crucigramas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para resolver una casilla de crucigrama, introduce el patrón usando un guion bajo (_) por cada letra desconocida y las letras que ya conoces en su posición correcta. Por ejemplo, si tienes una palabra de 6 letras cuya tercera letra es "C" y la quinta es "O", escribe "__C_O_". El buscador devuelve todas las palabras del español que encajan con ese patrón, ordenadas por longitud y alfabéticamente.',
+        text: 'Para resolver una casilla de crucigrama, introduce el patrón usando un guion bajo (_) por cada letra desconocida y las letras que ya conoces en su posición correcta. Por ejemplo, si tienes una palabra de 6 letras cuya tercera letra es "C" y la quinta es "O", escribe "__C_O_". El buscador devuelve todas las palabras del lemario que encajan con ese patrón, ordenadas alfabéticamente.',
       },
     },
     {
@@ -85,7 +85,7 @@ export const faqJsonLd = {
       name: '¿Cuántas palabras incluye el diccionario y de dónde provienen?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El buscador utiliza más de 87.000 lemas del Lemario de Olea, un recurso léxico del español de dominio público que recoge formas canónicas (infinitivos, singulares masculinos) sin conjugaciones ni plurales. Esto significa que la búsqueda trabaja con vocabulario estándar del español, adecuado para juegos y pasatiempos, aunque puede no incluir formas flexionadas o palabras de registro muy coloquial.',
+        text: 'El buscador utiliza los 86.973 lemas del Lemario de Olea, un recurso léxico del español de dominio público que recoge formas canónicas (infinitivos, singulares masculinos) sin conjugaciones ni plurales. Esto significa que la búsqueda trabaja con vocabulario estándar del español, adecuado para juegos y pasatiempos, pero no incluye formas flexionadas (casas, comió) y puede no incluir palabras de registro muy coloquial.',
       },
     },
     {

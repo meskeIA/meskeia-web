@@ -244,7 +244,8 @@
 
 .btnPrimary {
   padding: 12px 32px;
-  background: var(--primary);
+  /* --primary-boton: blanco encima a 5,47:1 en los dos temas; con --primary daba 4,11:1 */
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -284,6 +285,12 @@
   border-color: var(--primary);
   color: var(--primary);
   outline: none;
+}
+
+/* Destino del desplazamiento tras buscar desde el teclado táctil; el margen salva el logo fijo */
+.anclaResultados {
+  height: 0;
+  scroll-margin-top: 5rem;
 }
 
 .resultsSection {
