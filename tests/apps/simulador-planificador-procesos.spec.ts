@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 
 /**
  * simulador-planificador-procesos — modo «corrígeme» · 05/09/2026 (semilla S0121)
@@ -485,5 +486,387 @@ test.describe('simulador-planificador-procesos · reparación 11/09/2026', () =>
     // Y el suelo sigue donde estaba
     await rafagaP1.fill('0');
     expect((await filaMetricas(page, 'P1'))[2]).toBe('1');
+  });
+});
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * INSPECCIÓN 29/09/2026 (segunda del Inspector)
+ *
+ * Entra por dos sospechas de SOSPECHAS.md del 28/09:
+ *   (a) el respaldo `Number(v) || 1` de la ráfaga y de la prioridad (page.tsx:856 y :868);
+ *   (b) `<input type="number">` y parseSpanishNumber en el mismo page.tsx.
+ *
+ * Convenciones que se aplican, las de la app:
+ *   · Prioridad: 1 = la más alta (declarada en la cabecera de la columna, hallazgo 758).
+ *   · Desempate: FCFS, gana el que llegó antes. La app NO lo declara en pantalla: vive solo en
+ *     el comentario de `mejorPorRafaga` (page.tsx) y en el test 759. Es la de Silberschatz,
+ *     que en SRTF añade que un empate NO expulsa al que está en CPU (solo expulsa un tiempo
+ *     restante ESTRICTAMENTE menor). En los dos empates de abajo ambas reglas señalan al mismo
+ *     proceso, así que el esperado no depende de cuál se tome.
+ *   · Round Robin: el recién llegado entra en la cola antes que el reincorporado (declarada
+ *     en «Mejores prácticas»).
+ *
+ * TODOS LOS CASOS SE RESOLVIERON A MANO, CON SU GANTT, ANTES DE ABRIR LA APP.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+const SEL_RAFAGA_P1 = 'input[aria-label="Ráfaga de CPU del proceso P1"]';
+const BTN_SRTF = 'SRTF Más corto, apropiativo';
+const BTN_PRIORITY = 'Priority Por prioridad';
+
+async function abrirHidratada(page: Page): Promise<void> {
+  await page.goto(URL_APP);
+  await esperarHidratacion(page, [SEL_RAFAGA_P1]);
+}
+
+/** Rellena llegada y ráfaga de una vez (como un pegado) y espera a que el ESTADO de React las recoja. */
+async function fijarProceso(page: Page, pid: string, llegada: string, rafaga: string): Promise<void> {
+  const campoLlegada = page.getByLabel(`Tiempo de llegada del proceso ${pid}`);
+  const campoRafaga = page.getByLabel(`Ráfaga de CPU del proceso ${pid}`);
+  await campoLlegada.fill(llegada);
+  await esperarValorEnReact(page, campoLlegada, llegada);
+  await campoRafaga.fill(rafaga);
+  await esperarValorEnReact(page, campoRafaga, rafaga);
+}
+
+/** Una celda de la tabla en formato español («7,6», «11») a número. Solo cifras sin millares. */
+function celdaANumero(celda: string): number {
+  const [entera, decimal] = celda.split(',');
+  return Number(decimal === undefined ? entera : `${entera}.${decimal}`);
+}
+
+test.describe('simulador-planificador-procesos · inspección 29/09/2026', () => {
+  /**
+   * CASO A (normal, apropiativo) · SRTF sobre el «Ejemplo clásico» de la app
+   *   P1(llegada 0, ráfaga 8) · P2(1, 4) · P3(2, 9) · P4(3, 5)
+   *
+   *   t=0  solo P1                          → P1 [0,1]
+   *   t=1  llega P2 (4) < resto de P1 (7)   → expulsa: P2 [1,5]
+   *        (t=2 P3=9 y t=3 P4=5 no bajan del resto de P2: 3 y 2)
+   *   t=5  restos P1=7 · P3=9 · P4=5        → P4 [5,10]
+   *   t=10 restos P1=7 · P3=9               → P1 [10,17]
+   *   t=17                                  → P3 [17,26]
+   *   Ningún empate en todo el recorrido.
+   *
+   *   PID lleg ráf inicio fin  TAT=fin−lleg  espera=TAT−ráf  respuesta=inicio−lleg
+   *   P1   0    8    0    17      17            9               0
+   *   P2   1    4    1     5       4            0               0
+   *   P3   2    9   17    26      24           15              15
+   *   P4   3    5    5    10       7            2               2
+   *   Media espera 26/4 = 6,50 · media TAT 52/4 = 13,00 · throughput 4/26 = 0,1538… → 0,154
+   *   (6,50 es el valor de libro de este ejemplo, Silberschatz §5.3.2)
+   */
+  test('CASO A · A MANO: SRTF expulsa en t=1 y da 6,50 de espera media y 13,00 de turnaround', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: /Ejemplo clásico/ }).click();
+    await page.getByRole('button', { name: BTN_SRTF }).click();
+
+    await expect.poll(() => bloquesGantt(page)).toEqual(['P1', 'P2', 'P4', 'P1', 'P3']);
+    expect(await marcasTiempo(page)).toEqual(['0', '1', '5', '10', '17', '26']);
+
+    expect(await filaMetricas(page, 'P1')).toEqual(['P1', '0', '8', '0', '17', '9', '17', '0']);
+    expect(await filaMetricas(page, 'P2')).toEqual(['P2', '1', '4', '1', '5', '0', '4', '0']);
+    expect(await filaMetricas(page, 'P3')).toEqual(['P3', '2', '9', '17', '26', '15', '24', '15']);
+    expect(await filaMetricas(page, 'P4')).toEqual(['P4', '3', '5', '5', '10', '2', '7', '2']);
+
+    expect(await tarjeta(page, 'Tiempo medio de espera')).toBe('6,50ut');
+    expect(await tarjeta(page, 'Tiempo medio turnaround')).toBe('13,00ut');
+    expect(await tarjeta(page, 'Throughput')).toBe('0,154p/ut');
+    expect(await tarjeta(page, 'Tiempo total')).toBe('26ut');
+  });
+
+  /**
+   * CASO A2 (normal, apropiativo) · Round Robin quantum 2 con 4 procesos de llegadas distintas
+   *   P1(0, 5) · P2(1, 3) · P3(2, 1) · P4(3, 4)
+   *
+   *   t=0  cola [P1]                       → P1 [0,2]  resto 3; llegan P2(1) y P3(2) → [P2,P3,P1]
+   *   t=2                                  → P2 [2,4]  resto 1; llega P4(3)         → [P3,P1,P4,P2]
+   *   t=4                                  → P3 [4,5]  termina                      → [P1,P4,P2]
+   *   t=5                                  → P1 [5,7]  resto 1                      → [P4,P2,P1]
+   *   t=7                                  → P4 [7,9]  resto 2                      → [P2,P1,P4]
+   *   t=9                                  → P2 [9,10] termina
+   *   t=10                                 → P1 [10,11] termina
+   *   t=11                                 → P4 [11,13] termina
+   *
+   *   PID lleg ráf inicio fin TAT espera respuesta
+   *   P1   0    5    0    11  11    6       0
+   *   P2   1    3    2    10   9    6       1
+   *   P3   2    1    4     5   3    2       2
+   *   P4   3    4    7    13  10    6       4
+   *   Media espera 20/4 = 5,00 · media TAT 33/4 = 8,25 · throughput 4/13 = 0,3077… → 0,308
+   */
+  test('CASO A2 · A MANO: Round Robin q=2 con 4 procesos da 5,00 de espera media y 8,25 de turnaround', async ({
+    page,
+  }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: BTN_RR }).click();
+    await page.getByRole('button', { name: '+ Añadir proceso' }).click();
+    await fijarProceso(page, 'P1', '0', '5');
+    await fijarProceso(page, 'P2', '1', '3');
+    await fijarProceso(page, 'P3', '2', '1');
+    await fijarProceso(page, 'P4', '3', '4');
+    await expect(page.locator('[class*="quantumValue"]')).toHaveText('2');
+
+    await expect
+      .poll(() => bloquesGantt(page))
+      .toEqual(['P1', 'P2', 'P3', 'P1', 'P4', 'P2', 'P1', 'P4']);
+    expect(await marcasTiempo(page)).toEqual(['0', '2', '4', '5', '7', '9', '10', '11', '13']);
+
+    expect(await filaMetricas(page, 'P1')).toEqual(['P1', '0', '5', '0', '11', '6', '11', '0']);
+    expect(await filaMetricas(page, 'P2')).toEqual(['P2', '1', '3', '2', '10', '6', '9', '1']);
+    expect(await filaMetricas(page, 'P3')).toEqual(['P3', '2', '1', '4', '5', '2', '3', '2']);
+    expect(await filaMetricas(page, 'P4')).toEqual(['P4', '3', '4', '7', '13', '6', '10', '4']);
+
+    expect(await tarjeta(page, 'Tiempo medio de espera')).toBe('5,00ut');
+    expect(await tarjeta(page, 'Tiempo medio turnaround')).toBe('8,25ut');
+    expect(await tarjeta(page, 'Throughput')).toBe('0,308p/ut');
+    expect(await tarjeta(page, 'Utilización CPU')).toBe('100,0%');
+  });
+
+  /**
+   * CASO B (límite) · quantum mayor que todas las ráfagas: Round Robin DEBE coincidir con FCFS
+   *   «Ejemplo clásico» (ráfagas 8, 4, 9, 5) con q = 10: nadie agota nunca su quantum.
+   *   P1 [0,8] · P2 [8,12] · P3 [12,21] · P4 [21,26]
+   *   esperas 0, 7, 10, 18 → 35/4 = 8,75 · TAT 8, 11, 19, 23 → 61/4 = 15,25
+   */
+  test('CASO B · LÍMITE: con quantum 10 Round Robin degenera en FCFS, como dice la FAQ', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: /Ejemplo clásico/ }).click();
+    await page.getByRole('button', { name: BTN_RR }).click();
+    await sembrarValor(page, '#quantum', 10);
+
+    const esperado = {
+      bloques: ['P1', 'P2', 'P3', 'P4'],
+      marcas: ['0', '8', '12', '21', '26'],
+      P3: ['P3', '2', '9', '12', '21', '10', '19', '10'],
+      P4: ['P4', '3', '5', '21', '26', '18', '23', '18'],
+    };
+
+    for (const algoritmo of [BTN_RR, BTN_FCFS]) {
+      await page.getByRole('button', { name: algoritmo }).click();
+      await expect.poll(() => bloquesGantt(page), { message: algoritmo }).toEqual(esperado.bloques);
+      expect(await marcasTiempo(page)).toEqual(esperado.marcas);
+      expect(await filaMetricas(page, 'P3')).toEqual(esperado.P3);
+      expect(await filaMetricas(page, 'P4')).toEqual(esperado.P4);
+      expect(await tarjeta(page, 'Tiempo medio de espera')).toBe('8,75ut');
+      expect(await tarjeta(page, 'Tiempo medio turnaround')).toBe('15,25ut');
+    }
+  });
+
+  /**
+   * CASO C (control de la sospecha a) · la LLEGADA sí se puede vaciar y reteclear
+   *   Su respaldo es `|| 0`, y 0 es una llegada legítima: vaciarla deja 0, no un valor ajeno, y
+   *   lo que se teclee después se lee bien (el campo enseña «03», pero el estado es 3).
+   *   Por defecto P1(0, 6) · P2(1, 4) · P3(2, 8), FCFS. Con P2 en t=3:
+   *   P1 [0,6] · P3 [6,14] · P2 [14,18] → P2: inicio 14, fin 18, TAT 15, espera 11, respuesta 11
+   */
+  test('CASO C · la llegada se vacía y se reteclea sin perder el valor (su respaldo es 0, que es legítimo)', async ({
+    page,
+  }) => {
+    await abrirHidratada(page);
+    const llegadaP2 = page.getByLabel('Tiempo de llegada del proceso P2');
+    await llegadaP2.click();
+    await llegadaP2.press('End');
+    await llegadaP2.press('Backspace');
+    await llegadaP2.pressSequentially('3');
+    await esperarValorEnReact(page, llegadaP2, 3);
+
+    await expect.poll(() => filaMetricas(page, 'P2')).toEqual(['P2', '3', '4', '14', '18', '11', '15', '11']);
+  });
+
+  /**
+   * HALLAZGO (calculo, medio) · ABIERTO — SRTF sigue desempatando por el ORDEN DE LA TABLA.
+   *
+   * El 759 se dio por reparado, pero la reparación (`mejorPorRafaga` / `mejorPorPrioridad`)
+   * solo llegó a SJF y a Priority: `simularSRTF` conserva
+   * `disponibles.reduce((min, p) => (restantes[p.id] < restantes[min.id] ? p : min))`, que en
+   * un empate se queda con el primero de la tabla. Y el 759 nombraba SRTF expresamente.
+   *
+   * A MANO — P1(llegada 2, ráfaga 3) · P2(llegada 0, ráfaga 5):
+   *   t=0 solo P2 → P2 · t=2 llega P1 con 3 y a P2 le quedan 3: EMPATE.
+   *   Desempate FCFS (P2 llegó en 0) y regla de libro (un empate no expulsa) → sigue P2.
+   *   P2 [0,5] · P1 [5,8]
+   *   P1: inicio 5, fin 8, TAT 6, espera 3, respuesta 3 · P2: inicio 0, fin 5, TAT 5, espera 0
+   * Obtenido: P2 [0,2] · P1 [2,5] · P2 [5,8] — un cambio de contexto que no existe y las dos
+   * filas cambiadas (P1 fin 5 espera 0; P2 fin 8 espera 3). Las medias (1,50 y 5,50) coinciden,
+   * que es justo por lo que no se ve sin mirar la tabla por proceso.
+   */
+  test('ABIERTO · SRTF: un empate con el proceso en CPU no lo expulsa (desempate FCFS)', async ({ page }) => {
+    test.fail(true, 'ABIERTO: simularSRTF desempata por el orden de la tabla (el 759 no llegó a SRTF)');
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: 'Limpiar' }).click();
+    await page.getByRole('button', { name: '+ Añadir proceso' }).click();
+    await fijarProceso(page, 'P1', '2', '3');
+    await fijarProceso(page, 'P2', '0', '5');
+    await page.getByRole('button', { name: BTN_SRTF }).click();
+
+    await expect.poll(() => bloquesGantt(page)).toEqual(['P2', 'P1']);
+    expect(await marcasTiempo(page)).toEqual(['0', '5', '8']);
+    expect(await filaMetricas(page, 'P1')).toEqual(['P1', '2', '3', '5', '8', '3', '6', '3']);
+    expect(await filaMetricas(page, 'P2')).toEqual(['P2', '0', '5', '0', '5', '0', '5', '0']);
+  });
+
+  /**
+   * El mismo hallazgo, con el empate entre dos procesos EN ESPERA (la forma exacta del 759).
+   *
+   * A MANO — P1(2, 5) · P2(1, 5) · P3(0, 4):
+   *   t=0 P3 · t=1 llega P2 (5) > resto de P3 (3) · t=2 llega P1 (5) > resto de P3 (2) → P3 [0,4]
+   *   t=4 empatan P1 y P2 a 5; P2 espera desde t=1 → P2 [4,9] · P1 [9,14]
+   *   P2: inicio 4, fin 9, TAT 8, espera 3 · P1: inicio 9, fin 14, TAT 12, espera 7
+   * Es lo mismo que da SJF con este enunciado, porque ninguna llegada expulsa a P3.
+   * Obtenido en SRTF: P3 [0,4] · P1 [4,9] · P2 [9,14] (filas de P1 y P2 intercambiadas).
+   */
+  test('ABIERTO · SRTF: el empate entre dos en espera lo gana el que llegó antes, como en SJF', async ({ page }) => {
+    test.fail(true, 'ABIERTO: simularSRTF desempata por el orden de la tabla (el 759 no llegó a SRTF)');
+    await abrirHidratada(page);
+    await fijarProceso(page, 'P1', '2', '5');
+    await fijarProceso(page, 'P2', '1', '5');
+    await fijarProceso(page, 'P3', '0', '4');
+
+    // Control: SJF (ya reparado en el 759) resuelve este empate por FCFS
+    await page.getByRole('button', { name: BTN_SJF }).click();
+    await expect.poll(() => bloquesGantt(page)).toEqual(['P3', 'P2', 'P1']);
+
+    await page.getByRole('button', { name: BTN_SRTF }).click();
+    await expect.poll(() => bloquesGantt(page)).toEqual(['P3', 'P2', 'P1']);
+    expect(await filaMetricas(page, 'P2')).toEqual(['P2', '1', '5', '4', '9', '3', '8', '3']);
+    expect(await filaMetricas(page, 'P1')).toEqual(['P1', '2', '5', '9', '14', '7', '12', '7']);
+  });
+
+  /**
+   * HALLAZGO (operativa, medio) · ABIERTO — sospecha (a) confirmada: vaciar la ráfaga o la
+   * prioridad con Retroceso las rellena con «1», y lo que se teclee después queda DETRÁS.
+   *
+   * `acotar(Math.round(Number(v) || 1), 1, MAX)`: al quedar vacío, el estado salta a 1, React
+   * reescribe el campo a «1» bajo el cursor, y la cifra tecleada se le añade.
+   *   · ráfaga P1 = 6 → Retroceso → «3»   → esperado 3  · obtenido 13
+   *   · ráfaga P3 = 8 → Retroceso → «12»  → esperado 12 · obtenido 50 («112» topado al máximo)
+   *   · prioridad P1 = 2 → Retroceso → «5» → esperado 5 · obtenido 10 («15» topado al máximo:
+   *     el proceso pasa a la prioridad MÁS BAJA)
+   * El 0 no es un valor legítimo en ninguno de los dos (mínimo 1), así que el `|| 1` no se come un
+   * valor válido: lo que rompe es poder teclear. Sobrescribir con la selección hecha sí funciona.
+   */
+  test('ABIERTO · vaciar la ráfaga con Retroceso y teclear otra cifra deja la cifra tecleada', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el respaldo `|| 1` rellena el campo vacío con «1» y la cifra se añade detrás');
+    await abrirHidratada(page);
+
+    const rafagaP1 = page.getByLabel('Ráfaga de CPU del proceso P1');
+    await rafagaP1.click();
+    await rafagaP1.press('End');
+    await rafagaP1.press('Backspace');
+    await rafagaP1.pressSequentially('3');
+    await expect.soft(rafagaP1).toHaveValue('3');
+
+    const rafagaP3 = page.getByLabel('Ráfaga de CPU del proceso P3');
+    await rafagaP3.click();
+    await rafagaP3.press('End');
+    await rafagaP3.press('Backspace');
+    await rafagaP3.pressSequentially('12');
+    await expect.soft(rafagaP3).toHaveValue('12');
+
+    // FCFS por defecto: P1[0,3] P2[3,7] P3[7,19] → P3 fin 19, TAT 17, espera 5
+    await expect.poll(() => filaMetricas(page, 'P3')).toEqual(['P3', '2', '12', '7', '19', '5', '17', '5']);
+  });
+
+  test('ABIERTO · vaciar la prioridad con Retroceso y teclear 5 deja prioridad 5, no 10', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el respaldo `|| 1` rellena el campo vacío con «1» y «5» se lee 15 → 10');
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: BTN_PRIORITY }).click();
+
+    const prioridadP1 = page.getByLabel('Prioridad del proceso P1', { exact: false });
+    await prioridadP1.click();
+    await prioridadP1.press('End');
+    await prioridadP1.press('Backspace');
+    await prioridadP1.pressSequentially('5');
+    await expect(prioridadP1).toHaveValue('5');
+  });
+
+  /**
+   * HALLAZGO (operativa, medio) · ABIERTO — sospecha (b), en su forma de ESTA app.
+   *
+   * Aquí parseSpanishNumber no toca ningún `type="number"`: solo lo usa el modo «corrígeme»,
+   * cuyos campos son `type="text"`. Lo que sí ocurre es la otra mitad de la sospecha: la llegada
+   * es un `type="number"` con `Number(v) || 0`, y el navegador entrega VACÍO el estado
+   * intermedio «2.». Ese vacío se lee 0, React reescribe «0» bajo el cursor y el «5» se añade
+   * detrás: se teclea 2.5 y entra 5 (y 0.4 entra 4). Medido igual con locale es-ES, es-MX y
+   * en-US; con coma («2,5») sí entra 2,5. El punto es el separador decimal en México y en buena
+   * parte de Latinoamérica, y el de la tecla decimal del teclado numérico.
+   *
+   * Se acepta cualquier lectura razonable de «2.5» (2,5, o 2 o 3 si la app decide trabajar con
+   * llegadas enteras, como ya hace con la ráfaga): lo que no vale es 5.
+   */
+  test('ABIERTO · teclear «2.5» en la llegada no puede dejar una llegada de 5', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el estado intermedio «2.» llega vacío, se lee 0 y el «5» queda detrás');
+    await abrirHidratada(page);
+    const llegadaP2 = page.getByLabel('Tiempo de llegada del proceso P2');
+    await llegadaP2.click();
+    await llegadaP2.press('Control+A');
+    await llegadaP2.pressSequentially('2.5');
+
+    await expect.poll(async () => (await filaMetricas(page, 'P2'))[1]).toMatch(/^(2|3|2,5)$/);
+  });
+
+  /**
+   * HALLAZGO (calculo, medio) · ABIERTO — con una LLEGADA decimal, SRTF (y Priority apropiativo)
+   * retrasan la llegada al siguiente entero. Es el 760 por la otra puerta: aquel se cerró
+   * forzando la RÁFAGA a enteros, pero la llegada sigue aceptando decimales (pegados, o
+   * tecleados con coma) y los dos motores expropiativos solo miran `llegada <= t` en t enteros.
+   *
+   * A MANO — el ejercicio de Silberschatz con llegadas decimales: P1(0,0; 8) · P2(0,4; 4) · P3(1,0; 1)
+   *   t=0   P1
+   *   t=0,4 llega P2 (4) < resto de P1 (7,6) → expulsa: P2 [0,4; 1]
+   *   t=1   llega P3 (1) < resto de P2 (3,4) → expulsa: P3 [1; 2]
+   *   t=2   P2 (3,4) < P1 (7,6)              → P2 [2; 5,4]
+   *   t=5,4                                  → P1 [5,4; 13]
+   *   TAT: P1 13, P2 5,4 − 0,4 = 5, P3 1 → 19/3 = 6,33 · espera: 5, 1, 0 → 6/3 = 2,00
+   * Obtenido: P2 no entra hasta t=2 (P1 [0,1] P3 [1,2] P2 [2,6] P1 [6,13]) → 2,20 y 6,53.
+   *
+   * Si la reparación opta por llegadas enteras (0,4 → 0), el esperado de las medias es EL MISMO:
+   * P2 [0,1] P3 [1,2] P2 [2,5] P1 [5,13] → esperas 5, 1, 0 y TAT 13, 5, 1.
+   */
+  test('ABIERTO · SRTF con una llegada de 0,4 expulsa en t=0,4 y da 2,00 de espera media', async ({ page }) => {
+    test.fail(true, 'ABIERTO: simularSRTF avanza de 1 en 1 y no ve la llegada 0,4 hasta t=1');
+    await abrirHidratada(page);
+    await fijarProceso(page, 'P1', '0', '8');
+    await fijarProceso(page, 'P2', '0.4', '4');
+    await fijarProceso(page, 'P3', '1', '1');
+    await page.getByRole('button', { name: BTN_SRTF }).click();
+
+    await expect.poll(() => tarjeta(page, 'Tiempo medio de espera')).toBe('2,00ut');
+    expect(await tarjeta(page, 'Tiempo medio turnaround')).toBe('6,33ut');
+  });
+
+  /**
+   * HALLAZGO (contenido, bajo) · ABIERTO — con una llegada decimal la tabla por proceso deja de
+   * cuadrar con la tarjeta: la llegada sale con PUNTO («0.4», se imprime cruda) y la espera y el
+   * turnaround se redondean a entero (`formatNumber(x, 0)`, puesto en la reparación del 761).
+   *
+   * A MANO — FCFS (aquí el motor acierta) con P1(0; 8) · P2(0,4; 4) · P3(1; 1):
+   *   P1 [0,8] · P2 [8,12] · P3 [12,13]
+   *   esperas 0 · 7,6 · 11 → 18,6/3 = 6,20 (la tarjeta lo da bien)
+   *   TAT 8 · 11,6 · 12 → 31,6/3 = 10,53 (el valor de libro)
+   * Obtenido en la tabla: P2 llegada «0.4», espera «8», turnaround «12»: la columna suma
+   * 19 → media 6,33, y la tarjeta de encima dice 6,20.
+   * Se comprueba lo que el alumno puede juzgar sin intérprete: que la tabla cuadre con la tarjeta.
+   */
+  test('ABIERTO · con una llegada decimal la tabla por proceso cuadra con la tarjeta y va en formato español', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: la tabla imprime la llegada cruda y redondea espera y turnaround a entero');
+    await abrirHidratada(page);
+    await fijarProceso(page, 'P1', '0', '8');
+    await fijarProceso(page, 'P2', '0.4', '4');
+    await fijarProceso(page, 'P3', '1', '1');
+    await page.getByRole('button', { name: BTN_FCFS }).click();
+    await expect.poll(() => bloquesGantt(page)).toEqual(['P1', 'P2', 'P3']);
+
+    const tabla = await page.locator('table').filter({ hasText: 'Turnaround' }).first().innerText();
+    expect.soft(tabla).not.toMatch(/\d\.\d/);
+
+    const esperas: number[] = [];
+    for (const pid of ['P1', 'P2', 'P3']) esperas.push(celdaANumero((await filaMetricas(page, pid))[5]));
+    const mediaTabla = esperas.reduce((s, x) => s + x, 0) / esperas.length;
+    const mediaTarjeta = celdaANumero((await tarjeta(page, 'Tiempo medio de espera')).replace('ut', ''));
+    // El defecto mueve la media en 0,13 ut (6,33 frente a 6,20): basta una centésima.
+    expect.soft(mediaTabla).toBeCloseTo(mediaTarjeta, 2);
   });
 });

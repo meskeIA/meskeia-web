@@ -22,7 +22,8 @@
  *  tests verifican que la app aplica CORRECTAMENTE su propia fórmula documentada — no que
  *  esa fórmula sea la Orden HFP real, que no existe en el repositorio.
  *
- * Fórmulas de módulos usadas por la app (page.tsx, `calcularRendimientoModulos`):
+ * Fórmulas de módulos usadas por la app (hoy en lib/calculadoras/modulosVsDirecta.ts,
+ * `calcularRendimientoModulos`):
  *   bar:  1.500 €/mesa + 800 €/asalariado + 6 €/m² + 0,05 €/kWh
  *   taxi: 6.800 €/vehículo afecto
  * Reducciones de módulos: 5% (tope 2.000 €) + 100 €/asalariado (incentivo empleo).
@@ -32,15 +33,18 @@
  * en el spec de estimador-sueldo-neto. Las cifras esperadas están tomadas literales del
  * DOM tras verificarlas por aritmética independiente (ver comentario de cada caso).
  *
- * Hallazgos de esta re-inspección (ver acta — no se reparan aquí, solo se anclan casos):
- *  · "contenido" — `metadata.ts` (jsonLd.features) promete "Cálculo IRPF + RETA + IVA
- *    orientativo", pero la app NUNCA calcula IVA: no hay estado, fórmula ni cifra de IVA
- *    en ningún sitio de page.tsx, solo texto descriptivo sobre el régimen de IVA.
- *  · "dato" — los umbrales de exclusión de módulos (250.000 €/150.000 € de ingresos/gastos,
- *    50% clientes empresa) están escritos a mano en tres sitios (tabla comparativa, FAQ del
- *    bloque educativo, FAQ de metadata.ts) sin módulo propio en `data/fiscal/` (no existe
- *    ninguno con "modulos" ni "Orden HFP" en su contenido) y el código nunca los aplica:
- *    `esApta` no comprueba ingresos/gastos, solo si hay parámetros físicos > 0.
+ * Hallazgos de esta re-inspección (los dos REPARADOS el 02/09/2026; se deja el rastro):
+ *  · 566 "contenido" — `metadata.ts` (jsonLd.features) prometía "Cálculo IRPF + RETA + IVA
+ *    orientativo", pero la app no calculaba IVA en ningún sitio. REPARADO: la promesa de
+ *    IVA salió de las features.
+ *  · 567 "dato" — los umbrales de exclusión de módulos estaban escritos a mano en tres
+ *    sitios sin módulo propio en `data/fiscal/`, y `esApta` no los aplicaba. REPARADO: hoy
+ *    viven en `data/fiscal/modulos-irpf.ts` (LIMITES_EXCLUSION_MODULOS_2025) y el motor
+ *    `lib/calculadoras/modulosVsDirecta.ts` los aplica (ver el test «Hallazgo 567»).
+ *
+ * Nota (29/09/2026): la fórmula de módulos ya no vive en page.tsx sino en el motor
+ * compartido `lib/calculadoras/modulosVsDirecta.ts` (`calcularRendimientoModulos`), el mismo
+ * que sirve la tool comparar_modulos_vs_directa del MCP de Delegum.
  */
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidratacion';
@@ -615,5 +619,316 @@ test.describe('Simulador Módulos vs Estimación Directa — reparación 13/09/2
     // el tramo 12 y su cuota mínima es la misma. El aviso desaparece.
     await mover(page, 'reta', 479);
     await expect(aviso).toHaveCount(0);
+  });
+});
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * RE-INSPECCIÓN del 29/09/2026 — la cola la invalidó porque cambiaron sus DEPENDENCIAS:
+ * `lib/calculadoras/cuotaAutonomo.ts` y `data/fiscal` (irpf, autónomos).
+ *
+ * Qué movió cifras desde la reparación del 13/09 (b84fa421), y en qué dirección:
+ *  · c7af89ec (26/09) — `tramoRETA()` cierra cada frontera por ARRIBA salvo la del SMI. El
+ *    aviso de coherencia de la cuota RETA (`contrastarCuotaReta` → `calcularCuotaAutonomo`)
+ *    manda ahora 670, 900, 1.300 … 6.000 €/mes al tramo INFERIOR, con su cuota mínima más
+ *    baja: en 1.850 €/mes, tramo 7 (360,29 €) y no 8 (380,88 €). El déficit anual que
+ *    publica el aviso BAJA (con 275 €/mes: 1.270,56 € → 1.023,48 €). Los costes no se mueven:
+ *    la cuota RETA es una entrada del usuario.
+ *  · 9bbc5c19 y a1acfc3f (27/09) — re-sellado de FISCAL_IRPF_META: el DataReference pasa a
+ *    «Última verificación: 27/09/2026» y cita los arts. 19, 20, 56 a 66, 84.2, 96 y DA 61.ª.
+ *    La escala (TRAMOS_IRPF_2025), el mínimo (MINIMOS_IRPF_2025.personal) y las funciones
+ *    `cuotaEscalaGeneral` / `calcularCuotaIntegraGeneral` NO han cambiado desde el 13/09.
+ *  · 8a6fb75b y dc8a2ec3 (25/09) — no tocan el motor de esta app. La reducción del art. 20
+ *    LIRPF (rendimientos del TRABAJO) NO se aplica a ninguna de las dos columnas, como debe.
+ *
+ * De dónde sale cada cifra esperada
+ * ─────────────────────────────────
+ *  · Escala — `TRAMOS_IRPF_2025` (data/fiscal/irpf.ts, FISCAL_IRPF_META verificado
+ *    2026-09-27): 19 % hasta 12.450 · 24 % hasta 20.200 · 30 % hasta 35.200 · 37 % hasta
+ *    60.000 · 45 % hasta 300.000. Acumulados: escala(12.450) = 2.365,50 · escala(20.200) =
+ *    4.225,50 · escala(35.200) = 8.725,50.
+ *  · Mínimo — `MINIMOS_IRPF_2025.personal` = 5.550 €; escala(5.550) = 1.054,50 €. Cuota con
+ *    `calcularCuotaIntegraGeneral` (art. 63.1.2.º: el mínimo se grava a tipo cero).
+ *  · 5 % con tope de 2.000 € — `GASTOS_DIFICIL_JUSTIFICACION_EDS` (data/fiscal/estimacion-
+ *    directa.ts, art. 30.2.ª RIRPF).
+ *  · Tramos RETA — `TRAMOS_RETA_2025` + `tramoRETA()` (data/fiscal/autonomos.ts, Orden
+ *    PJC/297/2026 art. 18). Rendimiento neto = ingresos − gastos − cuota SS (su comentario).
+ *  · Límites de exclusión — `LIMITES_EXCLUSION_MODULOS_2025` (data/fiscal/modulos-irpf.ts):
+ *    250.000 € de ingresos y 250.000 € de compras de bienes y servicios.
+ *  · Módulos — fórmula DIDÁCTICA del motor (comercio: 4.500 €/no asalariado + 1.000 €/
+ *    asalariado + 8 €/m²; bar: 1.500 €/mesa + 800 €/asalariado + 6 €/m² + 0,05 €/kWh), y
+ *    100 € por asalariado de incentivo al empleo. Sin ancla normativa (ver cabecera).
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+test.describe('Simulador Módulos vs Estimación Directa — re-inspección 29/09/2026', () => {
+  const deslizar = (page: Page, id: string, valor: number) =>
+    sembrarValorAcotado(page, `#${id}`, valor);
+
+  /** El aviso de coherencia de la cuota RETA (el de la app, no el anunciador de rutas). */
+  const avisoReta = (page: Page) =>
+    page.locator('[aria-live="polite"]').filter({ hasText: 'tabla del RETA' });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, DESLIZADORES);
+  });
+
+  /**
+   * CASO N (NORMAL) — comercio menor: ingresos 60.000 €, gastos 30.000 €, RETA 402 €/mes,
+   * 1 asalariado, 1 no asalariado (heredados del bar de partida) y 80 m².
+   *
+   * ED (tal como la calcula hoy el motor, SIN restar la cuota RETA — ver HALLAZGO R abajo):
+   *   previo 30.000 · 5 % = 1.500 (bajo el tope) → base 28.500
+   *   escala(28.500) = 4.225,50 + 8.300 × 30 % = 6.715,50 → IRPF 6.715,50 − 1.054,50 = 5.661,00
+   *   + RETA 402 × 12 = 4.824,00 → 10.485,00 €
+   *   (Con la cuota RETA deducida, como manda la AEAT, el IRPF sería 4.286,16 €: 25.176 −
+   *   1.258,80 = 23.917,20 → 4.225,50 + 3.717,20 × 30 % − 1.054,50. La recomendación no
+   *   cambia en este caso; por eso aquí solo se afirma lo que el defecto no toca.)
+   *
+   * Módulos: 4.500 + 1.000 + 8 × 80 = 6.140 · 5 % = 307,00 · empleo 100 → base 5.733
+   *   escala(5.733) = 5.733 × 19 % = 1.089,27 → IRPF 1.089,27 − 1.054,50 = 34,77
+   *   + 4.824,00 → 4.858,77 €
+   *
+   * RETA según tramos: (30.000 − 4.824)/12 = 2.098 €/mes → tramo 9 (> 2.030 y ≤ 2.330),
+   *   cuota mínima 401,47 € → con 402 € no hay aviso. Con 401 €: (30.000 − 4.812)/12 =
+   *   2.099 €/mes, sigue en el tramo 9, y faltan (401,47 − 401) × 12 = 5,64 €/año.
+   */
+  test('CASO N (normal) — comercio 60.000/30.000: módulos 34,77 € de IRPF, RETA 402 € coherente con el tramo 9', async ({
+    page,
+  }) => {
+    await page.getByRole('radio', { name: /Comercio menor/ }).click();
+    await deslizar(page, 'ingresos', 60000);
+    await deslizar(page, 'gastos', 30000);
+    await deslizar(page, 'reta', 402);
+    await deslizar(page, 'sup', 80);
+
+    // Solo las líneas de ED que el HALLAZGO R no mueve (hoy: previo 30.000,00 € y coste
+    // 10.485,00 €; con la cuota deducida, 25.176,00 € y 9.110,16 €).
+    expect(await linea(page, ED, 'Ingresos brutos')).toBe('60.000,00 €');
+    expect(await linea(page, ED, '− Gastos deducibles')).toBe('−30.000,00 €');
+
+    expect(await linea(page, MOD, 'Rendimiento neto previo (módulos)')).toBe('6140,00 €');
+    expect(await linea(page, MOD, '= Base liquidable (el mínimo va dentro)')).toBe('5733,00 €');
+    expect(await linea(page, MOD, 'Escala general sobre la base completa')).toBe('1089,27 €');
+    expect(await linea(page, MOD, '= IRPF')).toBe('34,77 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('4858,77 €');
+    expect(await panel(page, MOD)).not.toContain('NO es elegible');
+
+    await expect(avisoReta(page)).toHaveCount(0);
+    expect(await page.locator('body').innerText()).toMatch(
+      /te conviene más: Estimación Objetiva \(Módulos\)/
+    );
+
+    // Un euro por debajo de la cuota mínima del tramo 9, y el aviso salta con su déficit.
+    await deslizar(page, 'reta', 401);
+    await expect(avisoReta(page)).toContainText('2099,00 €/mes');
+    await expect(avisoReta(page)).toContainText('tramo 9');
+    await expect(avisoReta(page)).toContainText('401,47 €/mes');
+    await expect(avisoReta(page)).toContainText('5,64 €');
+  });
+
+  /**
+   * CASO L1 (LÍMITE) — la frontera de 1.850 €/mes entre los tramos 7 y 8 del RETA, que
+   * `tramoRETA()` cierra por ARRIBA desde c7af89ec (26/09/2026). Bar de partida con
+   * ingresos 30.000 €, gastos 4.500 € y RETA 275 €/mes:
+   *   (25.500 − 275 × 12)/12 = 22.200/12 = 1.850,00 €/mes → tramo 7 (> 1.700 y ≤ 1.850),
+   *   cuota mínima 1.143,79 × 31,50 % = 360,29 € → déficit (360,29 − 275) × 12 = 1.023,48 €.
+   *   Antes del 26/09 la app lo mandaba al tramo 8 (380,88 €) y publicaba 1.270,56 €.
+   * Un euro menos de cuota (274 €) sube el rendimiento a 22.212/12 = 1.851,00 €/mes → tramo 8,
+   *   cuota mínima 1.209,15 × 31,50 % = 380,88 € → déficit (380,88 − 274) × 12 = 1.282,56 €.
+   */
+  test('CASO L1 (límite) — 1.850 €/mes es tramo 7 (360,29 €) y 1.851 €/mes es tramo 8 (380,88 €)', async ({
+    page,
+  }) => {
+    await deslizar(page, 'ingresos', 30000);
+    await deslizar(page, 'gastos', 4500);
+    await deslizar(page, 'reta', 275);
+
+    await expect(avisoReta(page)).toContainText('1850,00 €/mes');
+    await expect(avisoReta(page)).toContainText('tramo 7');
+    await expect(avisoReta(page)).toContainText('360,29 €/mes');
+    await expect(avisoReta(page)).toContainText('1023,48 €');
+
+    await deslizar(page, 'reta', 274);
+    await expect(avisoReta(page)).toContainText('1851,00 €/mes');
+    await expect(avisoReta(page)).toContainText('tramo 8');
+    await expect(avisoReta(page)).toContainText('380,88 €/mes');
+    await expect(avisoReta(page)).toContainText('1282,56 €');
+  });
+
+  /**
+   * CASO L2 (LÍMITE, compras) — el otro umbral de exclusión, que ningún test cubría:
+   * `LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios` = 250.000 € (el motor usa los
+   * gastos como aproximación). Bar de partida, ingresos 250.000 € (en su propio límite, que
+   * aún es apto), RETA 206 €/mes (suelo del deslizador).
+   *   Gastos 250.000 € → apto (el límite es «supera», `<=`). ED: rendimiento 0 → IRPF 0 →
+   *   coste 206 × 12 = 2.472,00 €. Módulos: 10.600 − 530 − 100 = 9.970 → 1.894,30 − 1.054,50
+   *   = 839,80 → 3.311,80 €. «Pagas 839,80 € MÁS con módulos», recomienda ED.
+   *   Gastos 250.500 € (un paso más) → excluido por compras: aviso y sin comparativa.
+   */
+  test('CASO L2 (límite) — compras de 250.000 € aún apto; 250.500 € excluye de módulos', async ({
+    page,
+  }) => {
+    await deslizar(page, 'ingresos', 250000);
+    await deslizar(page, 'gastos', 250000);
+    await deslizar(page, 'reta', 206);
+
+    expect(await linea(page, ED, '= IRPF')).toBe('0,00 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('2472,00 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('3311,80 €');
+    expect(await panel(page, MOD)).not.toContain('superan los límites de exclusión');
+    const estado = page.locator('[role="status"]');
+    await expect(estado).toContainText('839,80 €');
+    await expect(estado).toContainText('MÁS con módulos');
+
+    await deslizar(page, 'gastos', 250500);
+    expect(await panel(page, MOD)).toContain('Ingresos o gastos superan los límites de exclusión');
+    expect(await panel(page, MOD)).toContain('250.000,00 € / 250.000,00 €');
+    await expect(estado).toContainText('no parece elegible para módulos');
+    const cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).toMatch(/te conviene más: Estimación Directa Simplificada/);
+  });
+
+  /**
+   * CASO R (RECHAZO) — unos ingresos negativos no pueden entrar: los importes son
+   * deslizadores (`min=0`), no campos de texto, así que ni «−5.000» ni «2.000.50» son
+   * tecleables. Sembrar −5.000 deja el control en 0 y la columna de ED en 0,00 €, sin
+   * rendimientos negativos. Con los gastos de partida (25.000 €) el rendimiento se acota a 0
+   * y el coste de ED es solo la cuota RETA: 320 × 12 = 3.840,00 €. Módulos (bar de partida):
+   * 839,80 + 3.840,00 = 4.679,80 € → recomienda ED.
+   */
+  test('CASO R (rechazo) — ingresos negativos: el deslizador los deja en 0 y el rendimiento no baja de 0', async ({
+    page,
+  }) => {
+    expect(await deslizar(page, 'ingresos', -5000)).toBe('0');
+    expect(await linea(page, ED, 'Ingresos brutos')).toBe('0,00 €');
+    expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('0,00 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('0,00 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('3840,00 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('4679,80 €');
+    expect(await page.locator('body').innerText()).toMatch(
+      /te conviene más: Estimación Directa Simplificada/
+    );
+  });
+
+  test('DisclaimerCard crítico y DataReference con el META re-sellado y fecha en formato español', async ({
+    page,
+  }) => {
+    // severity="critical" → role="alert" y clase severity-critical (components/DisclaimerCard.tsx).
+    const disclaimer = page.locator('[role="alert"][class*="severity-critical"]');
+    await expect(disclaimer).toHaveCount(1);
+
+    const referencias = page.locator('[aria-label="Datos de referencia normativos"]');
+    // FISCAL_IRPF_META.verificado = '2026-09-27' (re-sellado de 9bbc5c19).
+    await expect(referencias.first()).toContainText('27/09/2026');
+    await expect(referencias.first()).toContainText('arts. 19, 20, 56 a 66, 84.2 y 96');
+    // FISCAL_MODULOS_IRPF_META.verificado = '2026-09-02'.
+    await expect(referencias.nth(1)).toContainText('02/09/2026');
+    await expect(referencias.nth(1)).toContainText('Orden HAC/1425/2025');
+  });
+
+  /**
+   * HALLAZGO R — ABIERTO. La cuota RETA no se deduce en la Estimación Directa.
+   *
+   * La AEAT (Manual práctico Renta 2025, cap. 7 «Estimación directa», fase 1, «Gastos del
+   * titular de la actividad» — el manual que cita FISCAL_ESTIMACION_DIRECTA_META) incluye
+   * entre los gastos deducibles «las cotizaciones del titular de la actividad al Régimen
+   * Especial de Trabajadores Autónomos (RETA)». data/fiscal/autonomos.ts define el
+   * rendimiento neto como «Ingresos − Gastos deducibles − Cuota SS», y la propia página lo
+   * usa así en el aviso del tramo RETA. Pero `calcularED` del motor calcula el rendimiento
+   * como ingresos − gastos y la cuota solo se SUMA al coste: el IRPF de ED sale inflado en
+   * ~cuota × 12 × tipo marginal, y la comparativa se inclina hacia módulos.
+   *
+   * Bar de partida (6 mesas, 1 asalariado, 50 m², 10.000 kWh), ingresos 30.000 €, gastos
+   * 18.000 €, RETA 320 €/mes:
+   *   Esperado: previo 12.000 − 3.840 = 8.160 · 5 % = 408 → base 7.752
+   *     escala(7.752) = 7.752 × 19 % = 1.472,88 → IRPF 1.472,88 − 1.054,50 = 418,38
+   *     coste ED 418,38 + 3.840 = 4.258,38 € < módulos 839,80 + 3.840 = 4.679,80 € → gana ED
+   *   Obtenido: previo 12.000 → base 11.400 → IRPF 2.166,00 − 1.054,50 = 1.111,50 → coste
+   *     4.951,50 € y «Pagas 271,70 € MENOS con módulos»: recomienda MÓDULOS.
+   */
+  test('HALLAZGO R (ABIERTO) — la cuota RETA es gasto deducible en ED: 30.000/18.000/320 debe recomendar ED', async ({
+    page,
+  }) => {
+    test.fail();
+    await deslizar(page, 'ingresos', 30000);
+    await deslizar(page, 'gastos', 18000);
+    await deslizar(page, 'reta', 320);
+
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('4679,80 €');
+    expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('7752,00 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('418,38 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('4258,38 €');
+    expect(await page.locator('body').innerText()).toMatch(
+      /te conviene más: Estimación Directa Simplificada/
+    );
+  });
+
+  /**
+   * HALLAZGO T — ABIERTO. La reducción del 5 % de MÓDULOS lleva el tope de 2.000 € de la
+   * estimación directa simplificada.
+   *
+   * La Orden HAC/1425/2025 (ORDEN_MODULOS_VIGENTE, BOE-A-2025-25272), disposición adicional
+   * primera: «podrán reducir el rendimiento neto de módulos obtenido en 2026 en un 5 por
+   * ciento», sin tope en euros. data/fiscal/estimacion-directa.ts dice de
+   * GASTOS_DIFICIL_JUSTIFICACION_EDS «Solo aplica en estimación directa simplificada: ni en la
+   * normal ni en módulos». El motor, sin embargo, usa `reduccionGastosDificilJustificacion`
+   * (5 % topado en 2.000 €) también para la columna de módulos, y la etiqueta de esa columna
+   * anuncia «(máx. 2000,00 €)». Solo muerde con un rendimiento de módulos > 40.000 €.
+   *
+   * Bar con 30 mesas, 5 asalariados, 200 m² y 50.000 kWh (el resto, de partida):
+   *   previo = 45.000 + 4.000 + 1.200 + 2.500 = 52.700
+   *   Esperado (5 % sin tope, en el mismo orden que el motor aplica hoy): 2.635,00 →
+   *     base 52.700 − 2.635 − 500 = 49.565 → escala 8.725,50 + 14.365 × 37 % = 14.040,55 →
+   *     IRPF 12.986,05 €
+   *   Obtenido: −2.000,00 → base 50.200 → IRPF 14.275,50 − 1.054,50 = 13.221,00 € (234,95 € más)
+   */
+  test('HALLAZGO T (ABIERTO) — el 5 % de módulos no tiene el tope de 2.000 € de la EDS', async ({
+    page,
+  }) => {
+    test.fail();
+    await deslizar(page, 'mesas', 30);
+    await deslizar(page, 'pAsal', 5);
+    await deslizar(page, 'sup', 200);
+    await deslizar(page, 'kwh', 50000);
+
+    expect(await linea(page, MOD, 'Rendimiento neto previo (módulos)')).toBe('52.700,00 €');
+    expect(await lineaQueEmpiezaPor(page, MOD, '− Reducción 5')).toBe('−2635,00 €');
+    expect(await linea(page, MOD, '= Base liquidable (el mínimo va dentro)')).toBe('49.565,00 €');
+    expect(await linea(page, MOD, '= IRPF')).toBe('12.986,05 €');
+  });
+
+  /**
+   * HALLAZGO P — ABIERTO. El porcentaje de la reducción va pegado a la cifra («5%») en las
+   * dos columnas; la norma del proyecto (CLAUDE.md global §2, 25/09/2026) es «5 %» con
+   * espacio duro U+00A0.
+   */
+  test('HALLAZGO P (ABIERTO) — «Reducción 5 %» con espacio duro en las dos columnas', async ({
+    page,
+  }) => {
+    test.fail();
+    for (const columna of [ED, MOD]) {
+      const contenedor = page.locator('h3', { hasText: columna }).first().locator('xpath=..');
+      const rotulo = await contenedor
+        .locator('span', { hasText: /^− Reducción 5/ })
+        .first()
+        .textContent();
+      expect(rotulo).toContain('5 %');
+    }
+  });
+
+  /**
+   * HALLAZGO H — ABIERTO. La página nombra la norma de módulos como «Orden HFP» en textos
+   * visibles (nota del DataReference, nota didáctica del panel), cuando las dos últimas son
+   * Orden HAC (ORDEN_MODULOS_VIGENTE.referencia = 'Orden HAC/1425/2025'; anterior = 'Orden
+   * HAC/1347/2024'), y la propia página cita la vigente como HAC dos centímetros más arriba.
+   */
+  test('HALLAZGO H (ABIERTO) — ningún texto visible llama «Orden HFP» a la Orden HAC de módulos', async ({
+    page,
+  }) => {
+    test.fail();
+    const referencias = page.locator('[aria-label="Datos de referencia normativos"]');
+    await expect(referencias.first()).not.toContainText('Orden HFP');
+    expect(await page.locator('main').innerText()).not.toContain('Orden HFP');
   });
 });

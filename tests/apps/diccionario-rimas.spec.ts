@@ -66,6 +66,12 @@ import { aFonemas, escandirPalabra } from '../../app/diccionario-rimas/rimas';
  * REINSPECCIÓN (25/09/2026, tras 20ecb78f y 3de61f3c): 1308 y 1309 verificados en el
  * navegador. Casos nuevos por la cadena reordenada de aFonemas y por el aviso «sin vocales»
  * en los bloques «Reinspección 25/09/2026» del final.
+ *
+ * REINSPECCIÓN (29/09/2026, tras 9542485e y los arreglos del logo fijo d056b066 y a1d72a9c):
+ * 1308, 1309, 2163 y 2164 siguen reparados; el logo ya no pisa el título de 320 a 1.280 px.
+ * Casos nuevos (aguda en vocal, esdrújula, hiato, diptongo decreciente, -agüe/-ague, seseo,
+ * cada rima mostrada contrastada con un algoritmo propio) y la sospecha de Intro, en los
+ * bloques «Reinspección 29/09/2026» del final.
  */
 
 const RUTA = '/diccionario-rimas/';
@@ -583,17 +589,18 @@ test.describe('diccionario-rimas — reinspección 25/09/2026: rechazo y rendimi
 });
 
 /*
- * HALLAZGOS ABIERTOS DE LA REINSPECCIÓN (25/09/2026)
+ * HALLAZGOS DE LA REINSPECCIÓN (25/09/2026), REPARADOS el 26/09/2026 (9542485e) y
+ * comprobados de nuevo en la reinspección del 29/09/2026
  *
- *   C. El aviso «no tiene ninguna vocal» (3de61f3c) salta en la región role="alert" con la
- *      PRIMERA letra de casi cualquier palabra: al teclear «tren», «t» y «tr» no tienen vocal
- *      todavía. role="alert" es asertivo: el lector de pantalla interrumpe el eco del tecleo
- *      para leer dos veces un párrafo de 40 palabras sobre siglas. A mano: una palabra que se
- *      está escribiendo no es una entrada inválida; mientras se teclea «tren» la región de
- *      alerta no debería recibir ningún texto.
- *   D. La región aria-live="polite" del resultado envuelve la lista entera (300 <li>, 6.153
- *      caracteres con «camino»; 10.114 <li> tras «Ver las» con «cantar»), y se reemplaza a
- *      cada tecla. Lo que hay que anunciar es el recuento, no cientos de palabras.
+ *   C. (2163) El aviso «no tiene ninguna vocal» (3de61f3c) saltaba en la región role="alert"
+ *      con la PRIMERA letra de casi cualquier palabra: al teclear «tren», «t» y «tr» no tienen
+ *      vocal todavía. role="alert" es asertivo: el lector de pantalla interrumpía el eco del
+ *      tecleo para leer dos veces un párrafo de 40 palabras sobre siglas. A mano: una palabra
+ *      que se está escribiendo no es una entrada inválida; mientras se teclea «tren» la región
+ *      del aviso no debe recibir ningún texto.
+ *   D. (2164) La región aria-live="polite" del resultado envolvía la lista entera (300 <li>,
+ *      6.153 caracteres con «camino»; 10.114 <li> tras «Ver las» con «cantar»), y se
+ *      reemplazaba a cada tecla. Lo que hay que anunciar es el recuento, no cientos de palabras.
  */
 /*
  * REPARACIÓN (26/09/2026, hallazgos 2163 y 2164)
@@ -656,4 +663,512 @@ test.describe('diccionario-rimas — reparación de la reinspección 25/09/2026 
       /^\d[\d.]* palabras que riman en consonante con camino$/,
     );
   });
+});
+
+/*
+ * REINSPECCIÓN 29/09/2026 — CASOS RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ *
+ * Sistema que la app DECLARA (metadata y bloque educativo): la rima empieza en la vocal tónica;
+ * b = v, qu = c ante a/o/u = k, g ante e/i = j, h muda, ll = y (yeísmo siempre), distinción
+ * c/z ≠ s por defecto con interruptor de seseo; asonante = solo vocales, en esdrújulas la
+ * postónica intermedia no cuenta y la i/u átona final vale e/o; la pestaña asonante NO repite
+ * las consonantes. Las palabras esperadas están comprobadas en public/data/diccionario-es.txt.
+ *
+ *   CASO 1 (normal) — «cielo», ejemplo de la propia app
+ *     cie-lo: en «ie» manda la fuerte → tónica «cie», llana, núcleo «-elo» /elo/.
+ *     Consonante: vuelo, suelo, pelo, hielo (hie-lo), anhelo (h muda), modelo, velo, celo
+ *     (/θelo/ → desde la e, /elo/). NO beso ni cuento (e-o: solo asuenan).
+ *     Asonante e-o: beso, cuento, verso, puerto (ue → e), negro. NO vuelo (ya es consonante).
+ *
+ *   CASO 2 (límites)
+ *     café   ca-fé, aguda en vocal, núcleo «-é» /e/. Consonante: pie, fe, té, bebé, puré,
+ *            chalé, bidé y «que» (qu + e: /ke/ → /e/). NO ley: /ei/ ≠ /e/.
+ *            Asonante é (una aguda solo asuena con agudas): ley, pared, mujer, bien, ser, vez.
+ *            NO leche (llana e-e).
+ *     maní   ma-ní, aguda, «-í» /i/. Consonante: rubí, aquí (qu muda), así, sí, colibrí,
+ *            jabalí, bisturí, frenesí, alhelí. NO país (/is/) ni feliz (/iθ/).
+ *            Asonante í: feliz, vivir, abril, perfil, nariz, país.
+ *     pájaro pá-ja-ro, esdrújula, «-ájaro» /axaro/. En el diccionario no hay otra palabra en
+ *            «-ájaro» → 0 consonantes. Asonante á-o (la «a» intermedia no cuenta): campo,
+ *            mano, cántaro (á-a-o), párpado (á-a-o), ánimo (á-i-o), caos (ca-os, hiato).
+ *            NO área (á-e-a → a-a) ni lágrima (á-i-a → a-a).
+ *     país   pa-ís: la tilde en la débil rompe el diptongo (hiato), aguda, «-ís» /is/.
+ *            Distinción: anís, gris, lis, tris; NO maíz, raíz, feliz, nariz (/iθ/).
+ *            Con seseo /iθ/ = /is/: maíz, raíz, feliz y nariz pasan a consonantes.
+ *     baile  diptongo DECRECIENTE «ai»: bai-le, llana, manda la a → «-aile». Consonante: las tres
+ *            del diccionario en -aile (fraile, peraile, ciquibaile). Asonante a-e (la i del
+ *            diptongo no cuenta): aire, calle, madre, tarde. NO baila (a-a).
+ *     desagüe de-sa-güe, llana, «-agüe» /aɣwe/ (con diéresis la u suena): camagüe, enjagüe,
+ *            nicaragüe. Frente a embrague em-bra-gue, «-ague» /aɣe/ (u muda): cague, bahague
+ *            (ba-ha-gue: la h no separa, a-a es hiato), enjuague, desembrague. Las dos
+ *            familias asuenan entre sí (a-e).
+ */
+
+const acentuacionFicha = (page: Page) => resultado(page).locator('[class*="fichaDatos"]');
+
+test.describe('diccionario-rimas — reinspección 29/09/2026: caso normal «cielo»', () => {
+  test('cie-lo, llana, -elo; consonante vuelo, suelo, pelo, hielo, anhelo, modelo, velo, celo', async ({ page }) => {
+    await abrir(page);
+    const lista = await consultar(page, 'cielo', 'consonante', '2 sílabas · llana · rima desde -elo');
+    expect(await silabeo(page)).toBe('cie-lo');
+    await expect(resultado(page).locator('[class*="silabaTonica"]')).toHaveText('cie');
+    for (const w of ['vuelo', 'suelo', 'pelo', 'hielo', 'anhelo', 'modelo', 'velo', 'celo']) {
+      expect(lista, `falta ${w} (/elo/)`).toContain(w);
+    }
+    for (const w of ['beso', 'cuento', 'cielo']) expect(lista, `sobra ${w}`).not.toContain(w);
+  });
+
+  test('asonante e-o: beso, cuento, verso, puerto, negro; vuelo no (ya es consonante)', async ({ page }) => {
+    await abrir(page);
+    const lista = await consultar(page, 'cielo', 'asonante', 'rima desde -elo');
+    for (const w of ['beso', 'cuento', 'verso', 'puerto', 'negro']) expect(lista, `falta ${w} (e-o)`).toContain(w);
+    expect(lista, 'vuelo rima en consonante: va en la otra pestaña').not.toContain('vuelo');
+  });
+});
+
+test.describe('diccionario-rimas — reinspección 29/09/2026: límites de acento', () => {
+  test('café (aguda en vocal): -é con pie, fe, té, bebé, puré, chalé, bidé y que; ley no', async ({ page }) => {
+    await abrir(page);
+    const cons = await consultar(page, 'café', 'consonante', '2 sílabas · aguda · rima desde -é');
+    for (const w of ['pie', 'fe', 'té', 'bebé', 'puré', 'chalé', 'bidé', 'que']) expect(cons, `falta ${w} (/e/)`).toContain(w);
+    expect(cons, 'ley es /ei/').not.toContain('ley');
+    const ason = await consultar(page, 'café', 'asonante', 'rima desde -é');
+    for (const w of ['ley', 'pared', 'mujer', 'bien', 'ser', 'vez']) expect(ason, `falta ${w} (é)`).toContain(w);
+    expect(ason, 'leche es llana e-e').not.toContain('leche');
+  });
+
+  test('maní (aguda en vocal): -í con rubí, aquí, así, colibrí…; país y feliz solo asuenan', async ({ page }) => {
+    await abrir(page);
+    const cons = await consultar(page, 'maní', 'consonante', '2 sílabas · aguda · rima desde -í');
+    for (const w of ['rubí', 'aquí', 'así', 'sí', 'colibrí', 'jabalí', 'bisturí', 'frenesí', 'alhelí']) {
+      expect(cons, `falta ${w} (/i/)`).toContain(w);
+    }
+    for (const w of ['país', 'feliz']) expect(cons, `${w} no es /i/`).not.toContain(w);
+    const ason = await consultar(page, 'maní', 'asonante', 'rima desde -í');
+    for (const w of ['feliz', 'vivir', 'abril', 'perfil', 'nariz', 'país']) expect(ason, `falta ${w} (í)`).toContain(w);
+  });
+
+  test('pájaro (esdrújula): -ájaro sin consonantes; asonante á-o con campo, cántaro, párpado, ánimo, caos', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'pájaro');
+    await pestana(page, 'consonante');
+    expect(await silabeo(page)).toBe('pá-ja-ro');
+    await expect(acentuacionFicha(page)).toContainText('3 sílabas · esdrújula · rima desde -ájaro');
+    // A mano: ninguna otra palabra del diccionario acaba en «-ájaro»
+    await expect(resultado(page)).toContainText('No hay ninguna palabra que rime en consonante con pájaro');
+    const ason = await consultar(page, 'pájaro', 'asonante', 'rima desde -ájaro');
+    for (const w of ['campo', 'mano', 'cántaro', 'párpado', 'ánimo', 'caos']) expect(ason, `falta ${w} (a-o)`).toContain(w);
+    for (const w of ['área', 'lágrima', 'pájara']) expect(ason, `${w} es a-a`).not.toContain(w);
+  });
+
+  test('país (hiato): -ís con anís, gris, lis, tris; maíz, raíz, feliz y nariz solo con seseo', async ({ page }) => {
+    await abrir(page);
+    const dist = await consultar(page, 'país', 'consonante', '2 sílabas · aguda · rima desde -ís');
+    expect(await silabeo(page)).toBe('pa-ís');
+    for (const w of ['anís', 'gris', 'lis', 'tris']) expect(dist, `falta ${w} (/is/)`).toContain(w);
+    for (const w of ['maíz', 'raíz', 'feliz', 'nariz']) expect(dist, `${w} es /iθ/ con distinción`).not.toContain(w);
+
+    await page.locator('#seseo').check();
+    await expect(page.locator('#seseo')).toBeChecked();
+    const seseo = await consultar(page, 'país', 'consonante', 'rima desde -ís');
+    for (const w of ['anís', 'gris', 'maíz', 'raíz', 'feliz', 'nariz']) expect(seseo, `con seseo falta ${w} (/is/)`).toContain(w);
+  });
+
+  test('baile (diptongo decreciente): -aile solo con fraile, peraile y ciquibaile; asonante a-e', async ({ page }) => {
+    await abrir(page);
+    const cons = await consultar(page, 'baile', 'consonante', '2 sílabas · llana · rima desde -aile');
+    expect(await silabeo(page)).toBe('bai-le');
+    expect([...cons].sort()).toEqual(['ciquibaile', 'fraile', 'peraile']);
+    const ason = await consultar(page, 'baile', 'asonante', 'rima desde -aile');
+    for (const w of ['aire', 'calle', 'madre', 'tarde']) expect(ason, `falta ${w} (a-e)`).toContain(w);
+    expect(ason, 'baila es a-a').not.toContain('baila');
+  });
+
+  test('desagüe (/aɣwe/) frente a embrague (/aɣe/): no riman en consonante, sí asuenan', async ({ page }) => {
+    await abrir(page);
+    const desague = await consultar(page, 'desagüe', 'consonante', '3 sílabas · llana · rima desde -agüe');
+    expect([...desague].sort()).toEqual(['camagüe', 'enjagüe', 'nicaragüe']);
+    const embrague = await consultar(page, 'embrague', 'consonante', '3 sílabas · llana · rima desde -ague');
+    expect([...embrague].sort()).toEqual(['bahague', 'cague', 'desembrague', 'enjuague']);
+    const ason = await consultar(page, 'desagüe', 'asonante', 'rima desde -agüe');
+    for (const w of ['embrague', 'enjuague', 'cague']) expect(ason, `${w} asuena a-e con desagüe`).toContain(w);
+  });
+
+  test('vaciar el campo: desaparecen el resultado, el aviso y el anuncio', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'camino');
+    await expect(resultado(page)).toHaveCount(1);
+    await buscar(page, '');
+    await expect(resultado(page)).toHaveCount(0);
+    await expect(avisoEntrada(page)).toHaveText('');
+    await expect(page.locator('#anuncio-resultado')).toHaveText('');
+  });
+});
+
+/*
+ * ALGORITMO PROPIO DE RIMA, independiente de rimas.ts, para contrastar CADA palabra que la app
+ * pinta (no solo una muestra): núcleos vocálicos con las reglas de diptongo/hiato de la OLE
+ * 2010, tónica por la tilde o por la regla general (vocal, n, s → llana; resto → aguda), cola
+ * desde la vocal tónica pasada a fonemas letra a letra, y clave asonante con la regla de las
+ * esdrújulas y la i/u átona final. Lo escribí a mano sin mirar el código de la app; contra el
+ * diccionario coincide con ella en 191/191 (cielo), 214/214 (café), 50/50 (país), 143/143
+ * (país con seseo) y 3/3 (baile), y en asonante pinta las mismas miles.
+ * Solo discrepa en las palabras con «y» como única vocal de sílaba (hallazgo de más abajo) y en
+ * anglicismos crudos acabados en -y (party, whisky), que no se usan aquí.
+ */
+const VOC_P = 'aeiouáéíóúü';
+const FUERTE_P = 'aeoáéó';
+const TILDE_P = 'áéíóú';
+const SIN_MARCA: Record<string, string> = { á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u', ü: 'u' };
+const sinMarca = (c: string): string => SIN_MARCA[c] ?? c;
+const esVocalP = (c: string | undefined): boolean => c !== undefined && c !== '' && VOC_P.includes(c);
+const anteEI = (c: string | undefined): boolean => c !== undefined && c !== '' && 'eiéí'.includes(c);
+
+interface UnidadP {
+  t: string;
+  k: 'V' | 'C' | 'H';
+  i: number;
+}
+
+function unidadesP(w: string): UnidadP[] {
+  const u: UnidadP[] = [];
+  for (let i = 0; i < w.length; ) {
+    const c = w[i];
+    const d = w[i + 1];
+    if ((c === 'q' || c === 'g') && d === 'u' && anteEI(w[i + 2])) {
+      u.push({ t: c + d, k: 'C', i });
+      i += 2;
+    } else if ((c === 'c' && d === 'h') || (c === 'l' && d === 'l') || (c === 'r' && d === 'r')) {
+      u.push({ t: c + d, k: 'C', i });
+      i += 2;
+    } else if (c === 'h') {
+      u.push({ t: 'h', k: 'H', i });
+      i += 1;
+    } else if (c === 'y') {
+      u.push({ t: 'y', k: esVocalP(d) ? 'C' : 'V', i });
+      i += 1;
+    } else {
+      u.push({ t: c, k: esVocalP(c) ? 'V' : 'C', i });
+      i += 1;
+    }
+  }
+  return u;
+}
+
+function diptongoP(a: string, b: string): boolean {
+  const x = a === 'y' ? 'i' : a;
+  const y = b === 'y' ? 'i' : b;
+  const fx = FUERTE_P.includes(x);
+  const fy = FUERTE_P.includes(y);
+  if (fx && fy) return false;
+  if (!fx && !fy) return sinMarca(x) !== sinMarca(y);
+  return !('íú'.includes(x) || 'íú'.includes(y));
+}
+
+function nucleosP(w: string): UnidadP[][] {
+  const u = unidadesP(w);
+  const res: UnidadP[][] = [];
+  for (let i = 0; i < u.length; ) {
+    if (u[i].k !== 'V') {
+      i++;
+      continue;
+    }
+    const n: UnidadP[] = [u[i]];
+    let j = i + 1;
+    while (j < u.length) {
+      const salto = u[j].k === 'H' ? 1 : 0;
+      const s = u[j + salto];
+      if (!s || s.k !== 'V') break;
+      if (!diptongoP(n[n.length - 1].t, s.t) || n.length >= 3) break;
+      n.push(s);
+      j = j + salto + 1;
+    }
+    res.push(n);
+    i = j;
+  }
+  return res;
+}
+
+/** La vocal que manda en un núcleo: la tildada, la fuerte o la última débil (nunca la «y»). */
+function vocalNuclearP(n: UnidadP[]): UnidadP {
+  const tildada = n.find((x) => TILDE_P.includes(x.t));
+  if (tildada) return tildada;
+  const fuerte = n.find((x) => FUERTE_P.includes(x.t));
+  if (fuerte) return fuerte;
+  const debiles = n.filter((x) => x.t !== 'y');
+  return debiles[debiles.length - 1] ?? n[0];
+}
+
+interface AnalisisP {
+  cola: string;
+  ason: string;
+}
+
+function analizarP(palabra: string): AnalisisP | null {
+  const w = palabra.toLowerCase().replace(/[^a-záéíóúüñ]/g, '');
+  const nuc = nucleosP(w);
+  if (nuc.length === 0) return null;
+  let it: number;
+  const conTilde = nuc.findIndex((n) => n.some((x) => TILDE_P.includes(x.t)));
+  if (conTilde !== -1) it = conTilde;
+  else if (nuc.length === 1) it = 0;
+  else {
+    const ultima = w[w.length - 1];
+    it = 'aeiou'.includes(ultima) || ultima === 'n' || ultima === 's' ? nuc.length - 2 : nuc.length - 1;
+  }
+  const tonica = vocalNuclearP(nuc[it]);
+  let vocales = nuc
+    .slice(it)
+    .map((n, k) => sinMarca(k === 0 ? tonica.t : vocalNuclearP(n).t))
+    .map((v) => (v === 'y' ? 'i' : v));
+  if (vocales.length >= 3) vocales = [vocales[0], vocales[vocales.length - 1]];
+  if (vocales.length > 1) {
+    const l = vocales[vocales.length - 1];
+    if (l === 'i') vocales[vocales.length - 1] = 'e';
+    if (l === 'u') vocales[vocales.length - 1] = 'o';
+  }
+  return { cola: w.slice(tonica.i), ason: vocales.join('') };
+}
+
+function fonemasP(cola: string, seseo: boolean): string {
+  let o = '';
+  for (let i = 0; i < cola.length; ) {
+    const c = cola[i];
+    const d = cola[i + 1];
+    if (c === 'c' && d === 'h') { o += 'ʧ'; i += 2; continue; }
+    if (c === 'l' && d === 'l') { o += 'ʝ'; i += 2; continue; }
+    if (c === 'r' && d === 'r') { o += 'R'; i += 2; continue; }
+    if (c === 'q' && d === 'u' && anteEI(cola[i + 2])) { o += 'k'; i += 2; continue; }
+    if (c === 'g' && d === 'u' && anteEI(cola[i + 2])) { o += 'ɣ'; i += 2; continue; }
+    if (c === 'g' && d === 'ü') { o += 'ɣw'; i += 2; continue; }
+    if (c === 'g') o += anteEI(d) ? 'x' : 'ɣ';
+    else if (c === 'j') o += 'x';
+    else if (c === 'c') o += anteEI(d) ? (seseo ? 's' : 'θ') : 'k';
+    else if (c === 'z') o += seseo ? 's' : 'θ';
+    else if (c === 'x') o += 'ks';
+    else if (c === 'h') o += '';
+    else if (c === 'v' || c === 'b') o += 'b';
+    else if (c === 'w') o += 'u';
+    else if (c === 'y') o += esVocalP(d) ? 'ʝ' : 'i';
+    else o += sinMarca(c);
+    i += 1;
+  }
+  return o;
+}
+
+/** ¿Rima `otra` con `consulta` en el tipo pedido? En asonante, excluye las consonantes (como la app). */
+function rimaP(consulta: string, otra: string, tipo: 'consonante' | 'asonante', seseo: boolean): boolean {
+  const a = analizarP(consulta);
+  const b = analizarP(otra);
+  if (!a || !b) return false;
+  const consonante = fonemasP(a.cola, seseo) === fonemasP(b.cola, seseo);
+  return tipo === 'consonante' ? consonante : !consonante && a.ason === b.ason;
+}
+
+test.describe('diccionario-rimas — reinspección 29/09/2026: el algoritmo propio, contra los casos a mano', () => {
+  test('cielo/vuelo, café/que, país/maíz (solo con seseo), pájaro/cántaro, desagüe ≠ embrague', () => {
+    expect(rimaP('cielo', 'vuelo', 'consonante', false)).toBe(true);
+    expect(rimaP('cielo', 'beso', 'asonante', false)).toBe(true);
+    expect(rimaP('café', 'que', 'consonante', false)).toBe(true);
+    expect(rimaP('café', 'ley', 'consonante', false)).toBe(false);
+    expect(rimaP('café', 'ley', 'asonante', false)).toBe(true);
+    expect(rimaP('país', 'maíz', 'consonante', false)).toBe(false);
+    expect(rimaP('país', 'maíz', 'consonante', true)).toBe(true);
+    expect(rimaP('pájaro', 'cántaro', 'asonante', false)).toBe(true);
+    expect(rimaP('pájaro', 'área', 'asonante', false)).toBe(false);
+    expect(rimaP('desagüe', 'embrague', 'consonante', false)).toBe(false);
+    expect(rimaP('desagüe', 'embrague', 'asonante', false)).toBe(true);
+    expect(rimaP('pyme', 'sublime', 'consonante', false)).toBe(true);
+  });
+});
+
+test.describe('diccionario-rimas — reinspección 29/09/2026: cada rima mostrada cumple el tipo pedido', () => {
+  // [consulta, pestaña, seseo, texto de la ficha, mínimo de palabras que debe pintar]
+  const CASOS: [string, 'consonante' | 'asonante', boolean, string, number][] = [
+    ['cielo', 'consonante', false, 'rima desde -elo', 150],
+    ['cielo', 'asonante', false, 'rima desde -elo', 5000],
+    ['café', 'consonante', false, 'rima desde -é', 150],
+    ['maní', 'consonante', false, 'rima desde -í', 200],
+    ['maní', 'asonante', false, 'rima desde -í', 1000],
+    ['pájaro', 'asonante', false, 'rima desde -ájaro', 5000],
+    ['país', 'consonante', false, 'rima desde -ís', 20],
+    ['país', 'consonante', true, 'rima desde -ís', 100],
+    ['baile', 'asonante', false, 'rima desde -aile', 2000],
+    ['taza', 'consonante', true, 'rima desde -aza', 100],
+  ];
+
+  for (const [palabra, tipo, seseo, ficha, minimo] of CASOS) {
+    test(`«${palabra}» ${tipo}${seseo ? ' con seseo' : ''}: ninguna palabra pintada deja de rimar`, async ({ page }) => {
+      await abrir(page);
+      if (seseo) {
+        await page.locator('#seseo').check();
+        await expect(page.locator('#seseo')).toBeChecked();
+      }
+      const lista = await consultar(page, palabra, tipo, ficha);
+      expect(lista.length, `«${palabra}» pinta pocas rimas`).toBeGreaterThanOrEqual(minimo);
+      const noRiman = lista.filter((w) => !rimaP(palabra, w, tipo, seseo));
+      expect(noRiman, `pintadas como ${tipo} de «${palabra}» sin serlo`).toEqual([]);
+      expect(new Set(lista).size, 'palabras repetidas').toBe(lista.length);
+    });
+  }
+});
+
+/*
+ * HALLAZGO ABIERTO (29/09/2026) — la «y» como única vocal de la sílaba tónica.
+ *
+ * escandirPalabra() ya cuenta la «y» como vocal para aceptar la entrada (tieneNucleoVocalico),
+ * pero indiceVocalNuclear() no la busca: en «pyme» la sílaba tónica «py» no tiene ninguna vocal
+ * de su lista, devuelve -1, y el `iv < 0 ? 0` toma la sílaba ENTERA como inicio del núcleo.
+ * A mano: pyme (DLE, «pequeña y mediana empresa») es py-me, llana, se dice /ˈpime/: núcleo
+ * «-yme» /ime/, consonante con sublime, mime, anime, arrime; asonante i-e (libre, chisme).
+ * La app dice «rima desde -pyme», da 0 consonantes, y en asonante la clave pierde la tónica y
+ * se queda en «e»: la empareja con las AGUDAS en é (me, fe, café, pie). Y al revés: «café»
+ * (aguda, é) pinta en su pestaña asonante dos llanas, pyme y byte, cuando una aguda solo asuena
+ * con agudas. En el diccionario: pyme, byte, klystron y copyright, más 15 anglicismos en -y.
+ */
+test.describe('diccionario-rimas — reinspección 29/09/2026: la «y» como vocal de la sílaba tónica', () => {
+  // ABIERTO — hallazgo de la reinspección del 29/09/2026
+  test.fail('«pyme»: py-me, llana, rima desde -yme y consonante con sublime', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'pyme');
+    await pestana(page, 'consonante');
+    await expect(acentuacionFicha(page)).toContainText('2 sílabas · llana · rima desde -yme', { timeout: 5000 });
+    const lista = await palabrasVisibles(page);
+    expect(lista, 'sublime es /ime/').toContain('sublime');
+  });
+
+  // ABIERTO — mismo hallazgo, visto desde una consulta corriente
+  test.fail('«café» asonante (aguda): el filtro «llana» no deja ninguna (hoy deja pyme y byte)', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'café');
+    await pestana(page, 'asonante');
+    await expect(resultado(page)).toContainText('que riman en asonante con café');
+    await resultado(page).getByRole('button', { name: 'llana', exact: true }).click();
+    // A mano: una aguda en é solo asuena con agudas → 0 llanas
+    await expect(resultado(page)).toContainText('Los filtros dejan fuera', { timeout: 5000 });
+  });
+});
+
+/*
+ * HALLAZGO ABIERTO (29/09/2026) — una frase se pega en una palabra inventada.
+ *
+ * limpiarEntrada() quita TODO lo que no es letra, espacios incluidos. Con dos palabras —lo que
+ * se teclea al buscar rima para un final de verso— la app no avisa ni rima con la última:
+ * busca una palabra que no existe. A mano, «canción triste» acaba en «triste» (tris-te, llana,
+ * asonante i-e: libre, chisme, firme). La app escande «can-ción-tris-te», la rotula
+ * «4 sílabas · esdrújula · rima desde -óntriste» (la tilde de «canción» se lleva el acento) y
+ * pinta 1.355 asonantes o-e —coste, poste, hombre— que no asuenan con «triste».
+ * Con «corazón roto» el mismo camino da «5 sílabas · esdrújula · rima desde -ónroto» y 0
+ * consonantes. Se espera que avise de que busca una sola palabra, o que rime con la última;
+ * en ningún caso una lista de rimas de otra vocal.
+ */
+test.describe('diccionario-rimas — reinspección 29/09/2026: dos palabras en el campo', () => {
+  // ABIERTO — hallazgo de la reinspección del 29/09/2026
+  test.fail('«canción triste»: ni se rotula esdrújula ni pinta asonantes o-e', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'canción triste');
+    await pestana(page, 'asonante');
+    await page.waitForTimeout(1000); // la consulta se asienta (800 ms) antes de avisar
+    await expect(page.getByText('rima desde -óntriste')).toHaveCount(0, { timeout: 3000 });
+    const lista = await palabrasVisibles(page);
+    for (const w of ['coste', 'poste']) expect(lista, `${w} es o-e; triste es i-e`).not.toContain(w);
+  });
+});
+
+/*
+ * SOSPECHA DE INTRO (SOSPECHAS.md, 27/09/2026) — medida el 29/09/2026
+ *
+ * La app no tiene <form>, onKeyDown ni enterKeyHint, así que Intro no hace nada. Pero la
+ * búsqueda es EN VIVO: con cada tecla se recalcula, y «luna» pintó su resultado a los 252 ms
+ * de la primera tecla sin pulsar nada. Intro no tiene nada que buscar y no recarga ni vacía
+ * el campo: la sospecha, tal como estaba escrita, se descarta (primer bloque).
+ *
+ * Lo que sí queda es su EFECTO en móvil (segundo bloque, ABIERTO): el resultado se pinta debajo
+ * de los ejemplos, el estado, las dos pestañas apiladas y el seseo. En un Pixel 7 (412×839) la
+ * sección del resultado empieza a 921 px, el recuento a 1.243 y la primera rima a 1.417, con
+ * la ventana acabando en 839 y el teclado virtual abierto encima. Tras teclear «camino» lo único
+ * que cambia en pantalla es el propio texto; Intro no desplaza, no cierra el teclado ni lleva
+ * al resultado (scrollY sigue en 0). Es la forma del 2278 (se teclea, Intro, no pasa nada).
+ * En escritorio (1280×900) asoma el principio de la ficha (752 px) y la primera rima queda en
+ * 1.082.
+ */
+test.describe('diccionario-rimas — reinspección 29/09/2026: Intro en escritorio', () => {
+  test('la búsqueda es en vivo; Intro no recarga, no navega ni vacía el campo', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'camino');
+    await expect(resultado(page)).toContainText('que riman en consonante con camino');
+    const recuento = await resultado(page).locator('[class*="recuento"]').textContent();
+    let navego = false;
+    page.on('framenavigated', () => {
+      navego = true;
+    });
+    await page.locator('#palabra').press('Enter');
+    await page.waitForTimeout(500);
+    expect(navego, 'Intro no debe recargar la página').toBe(false);
+    await expect(page.locator('#palabra')).toHaveValue('camino');
+    await expect(resultado(page).locator('[class*="recuento"]')).toHaveText(recuento ?? '');
+  });
+});
+
+test.describe('diccionario-rimas — reinspección 29/09/2026: Intro en móvil', () => {
+  test.use({
+    viewport: { width: 412, height: 839 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  // ABIERTO — hallazgo de la reinspección del 29/09/2026
+  test.fail('tras teclear «camino» y pulsar Intro, el recuento de rimas está a la vista', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'camino');
+    await expect(resultado(page)).toContainText('que riman en consonante con camino');
+    await page.locator('#palabra').press('Enter');
+    await expect(resultado(page).locator('[class*="recuento"]')).toBeInViewport({ timeout: 3000 });
+  });
+});
+
+/*
+ * LOGO FIJO (d056b066, a1d72a9c) — la misma medición que la Ronda (scripts/ronda.mjs,
+ * tituloTapado): las cajas del TEXTO del <h1> contra las piezas de la barra fija de MeskeiaLogo.
+ * Medido el 29/09/2026: a 320-768 px la barra acaba en 52 y el título empieza en 93-94; de
+ * 769 a 1.023, 77 frente a 93; desde 1.024 el título sube a 53 pero, centrado, no llega a las
+ * esquinas. 0 solapes a 320, 360, 390, 640, 768, 769, 800, 834, 1.000, 1.023, 1.024 y 1.280.
+ */
+test.describe('diccionario-rimas — reinspección 29/09/2026: el logo fijo no tapa el título', () => {
+  for (const [ancho, alto] of [
+    [360, 740],
+    [390, 844],
+    [800, 1112],
+    [834, 1112],
+    [1024, 768],
+    [1280, 900],
+  ]) {
+    test(`a ${ancho} px ninguna pieza de la barra pisa las letras del <h1>`, async ({ page }) => {
+      await page.setViewportSize({ width: ancho, height: alto });
+      await abrir(page);
+      const choque = await page.evaluate(() => {
+        const barra = [...document.querySelectorAll('body *')].find((e) => {
+          const cs = getComputedStyle(e);
+          const r = e.getBoundingClientRect();
+          return (
+            cs.position === 'fixed' && r.top <= 1 && r.height < 120 && r.width > 300 &&
+            e.querySelector('a[href="/"], a[href="https://meskeia.com/"]') !== null
+          );
+        });
+        const h1 = document.querySelector('h1');
+        if (!barra || !h1) return 'no se encuentra la barra del logo o el <h1>';
+        const rango = document.createRange();
+        rango.selectNodeContents(h1);
+        const letras = [...rango.getClientRects()].filter((c) => c.width > 0);
+        const piezas = [...barra.children].map((c) => c.getBoundingClientRect()).filter((c) => c.width > 0);
+        return piezas.some((p) =>
+          letras.some((c) => !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom)),
+        );
+      });
+      expect(choque, `a ${ancho} px`).toBe(false);
+    });
+  }
 });

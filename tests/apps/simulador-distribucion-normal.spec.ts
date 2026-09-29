@@ -1,5 +1,7 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliares';
+import { parseSpanishNumber } from '../../lib/formatters';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -15,7 +17,8 @@ import {
 /**
  * Inspector — simulador-distribucion-normal (segmento cálculo, riesgo 3)
  *
- * Primera inspección: 31/08/2026.
+ * Primera inspección: 31/08/2026. Re-inspección: 29/09/2026 (tras los casos para clase,
+ * 9e9c2894), al final del fichero.
  *
  * QUÉ PROMETE
  *   <h1>: «📊 Simulador de Distribución Normal»
@@ -24,8 +27,9 @@ import {
  *   bloque educativo: fórmula f(x) = (1/σ√(2π))·e^(−½((x−μ)/σ)²), tipificación Z = (X−μ)/σ,
  *     regla 68-95-99,7 y cinco errores conceptuales frecuentes.
  *
- * DÓNDE VIVE EL CÁLCULO — todo inline en app/simulador-distribucion-normal/page.tsx (no hay
- * módulo de motor aparte, todo son funciones puras en el mismo fichero):
+ * DÓNDE VIVE EL CÁLCULO — el 31/08/2026, todo inline en page.tsx. Desde el 29/09/2026
+ * (9e9c2894) pdf, erf y cdf viven en app/simulador-distribucion-normal/casos.ts, y el useMemo
+ * de la probabilidad es su `probabilidadNormal`, la misma que usa la corrección de los casos:
  *   · pdf(x, mu, sigma) — densidad N(μ,σ)
  *   · erf(x) — aproximación de Abramowitz & Stegun 7.1.26 (precisión declarada 1,5·10⁻⁷)
  *   · cdf(x, mu, sigma) = 0,5·(1 + erf((x−μ)/(σ√2))) — función de distribución acumulada
@@ -405,5 +409,377 @@ test.describe('simulador-distribucion-normal · la sección de casos en el naveg
   test('la sección no duplica el role="status" del panel ni añade deslizadores', async ({ page }) => {
     await expect(page.locator('[role="status"]')).toHaveCount(1);
     await expect(seccion(page).locator('input[type="range"], canvas')).toHaveCount(0);
+  });
+});
+
+/*
+ * ═════════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN 29/09/2026 — tras los casos para clase (9e9c2894)
+ *
+ * Foco: lo nuevo (casos.ts + CasosAula.tsx) y que el panel NO haya cambiado de cifra al mover
+ * erf/cdf a casos.ts. Todo resuelto a mano ANTES de abrir el navegador, con la tabla Z
+ * estándar (z con dos decimales, Φ con cuatro) y contrastado con una Φ propia por Simpson.
+ *
+ *   PANEL (mismas cifras que antes del traslado)
+ *     CI N(100, 15), a = 130 → z = 30/15 = 2,00 → Φ(2,00) = 0,9772 (tabla) →
+ *       P(X > 130) = 1 − 0,9772 = 0,0228 → 2,28 % · P(X < 130) = 97,72 %
+ *     Tornillos N(10; 0,2), a = 9,7 → z = −0,3/0,2 = −1,50 → 1 − Φ(1,50) = 1 − 0,9332 = 0,0668
+ *       → 6,68 %
+ *     Alturas N(176, 7), a = 185 → z = 9/7 = 1,2857 → interpolando Φ(1,28) = 0,8997 y
+ *       Φ(1,29) = 0,9015: 0,8997 + 0,57·0,0018 = 0,9007 → 1 − 0,9007 = 0,0993 → 9,93 %
+ *     Cola: N(0, 1), a = 3,06 (paso 168 del deslizador: −4,5 + 168·0,045) → Φ(3,06) = 0,9989
+ *       (fila 3,0, columna 0,06) → P(X > 3,06) = 0,0011 → 0,11 % (Simpson: 0,0011067)
+ *     σ pequeña: N(0; 0,1), a = 0,126 (paso 128) → z = 1,26 → Φ(1,26) = 0,8962 → 89,62 %
+ *     El caso 6 del corrector (baterías N(40, 5), más de 50 h) es el MISMO P(Z > 2): 2,28 %.
+ *
+ *   CORRECTOR
+ *     Caso 7: Φ(1,25) = 0,8944 → con la tabla 2·0,8944 − 1 = 0,7888 → 78,88 %; exacta 78,87 %
+ *       (Simpson 0,788700). Es el caso del convenio: la solución debe decir que 78,88 también vale.
+ *     Caso 9: z de la tabla 1,28 o 1,29 → 628 o 629 · Caso 10: z = −1,64 o −1,65 → 493,4
+ *     Caso 1 escrito con punto decimal (89.44, México): 89,44 — gana el decimal, no es un millar.
+ *
+ *   SOSPECHAS DE SOSPECHAS.md
+ *     (a) `.modeBtn:hover` sin `.modeBtnActive:hover`: aquí NO se reproduce — el hover solo
+ *         cambia el borde y el desplazamiento, no el color. Medido: 14,84:1 en claro y 11,23:1 en
+ *         oscuro con el ratón encima del modo activo.
+ *     (b) Contraste de marca: el bloque de casos NUEVO cumple en los dos temas (usa
+ *         --primary-boton / --primary-texto / --secondary-texto). Lo que NO cumple es anterior
+ *         a la tarea: los botones activos de tipo de probabilidad y de problema tipo, y el
+ *         número de los pasos del bloque educativo (blanco sobre var(--primary)), y los
+ *         valores de los deslizadores y los títulos educativos (var(--primary) como texto).
+ *     (c) toleranciaDe (1 % relativo): no rechaza ninguna lectura correcta de la tabla, pero es
+ *         demasiado ancha. En el caso 10 el 1 % se aplica a x ≈ 493 mL con σ = 4 mL: 4,93 mL
+ *         = 1,23σ, así que acepta cualquier z entre −2,88 y −0,41. En el caso 1 acepta 90,32
+ *         (Φ(1,30), fila equivocada) para P(Z < 1,25) = 89,44.
+ * ═════════════════════════════════════════════════════════════════════════════════════════
+ */
+
+const MEDIA = 'input[aria-label="Media μ"]';
+const etiquetaMedia = (page: Page) =>
+  page.locator('[class*="controlLabel"]').filter({ hasText: 'Media (μ)' });
+const seccionCasos = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+const casillaCasos = (page: Page) => page.locator('#casos-respuesta');
+/** El aviso de la app, no el anunciador de rutas de Next, que también es role="alert". */
+const avisoCasos = (page: Page) => seccionCasos(page).getByRole('alert');
+
+async function responderCaso(page: Page, nombre: string, respuesta: string) {
+  await seccionCasos(page).getByRole('button', { name: nombre }).click();
+  await casillaCasos(page).fill(respuesta);
+  await seccionCasos(page).getByRole('button', { name: 'Comprobar' }).click();
+}
+
+/** Contraste WCAG del texto de un elemento contra su fondo EFECTIVO (capas rgba compuestas). */
+async function contraste(
+  page: Page,
+  selector: string,
+): Promise<{ ratio: number; umbral: number; detalle: string }> {
+  return page
+    .locator(selector)
+    .first()
+    .evaluate((el) => {
+      const leer = (c: string): number[] => {
+        const m = c.match(/rgba?\(([^)]+)\)/);
+        if (!m) return [0, 0, 0, 0];
+        const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+        return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1];
+      };
+      const capas: number[][] = [];
+      for (let n: Element | null = el; n; n = n.parentElement) {
+        capas.push(leer(getComputedStyle(n).backgroundColor));
+      }
+      let fondo = [255, 255, 255];
+      for (let i = capas.length - 1; i >= 0; i--) {
+        const [r, g, b, a] = capas[i];
+        fondo = [r * a + fondo[0] * (1 - a), g * a + fondo[1] * (1 - a), b * a + fondo[2] * (1 - a)];
+      }
+      const estilo = getComputedStyle(el);
+      const [r, g, b, a] = leer(estilo.color);
+      const texto = [r * a + fondo[0] * (1 - a), g * a + fondo[1] * (1 - a), b * a + fondo[2] * (1 - a)];
+      const lineal = (v: number) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      const lum = (c: number[]) => 0.2126 * lineal(c[0]) + 0.7152 * lineal(c[1]) + 0.0722 * lineal(c[2]);
+      const l1 = lum(texto);
+      const l2 = lum(fondo);
+      const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+      const px = parseFloat(estilo.fontSize);
+      const grande = px >= 24 || (px >= 18.66 && parseInt(estilo.fontWeight, 10) >= 700);
+      const hex = (c: number[]) =>
+        '#' + c.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+      return {
+        ratio: Math.round(ratio * 100) / 100,
+        umbral: grande ? 3 : 4.5,
+        detalle: `${hex(texto)} sobre ${hex(fondo)}, ${px}px`,
+      };
+    });
+}
+
+/** Mide varios elementos y devuelve los que no llegan a su umbral, con su cifra. */
+async function suspensos(page: Page, tema: string, selectores: Record<string, string>): Promise<string[]> {
+  const fallos: string[] = [];
+  for (const [nombre, sel] of Object.entries(selectores)) {
+    const m = await contraste(page, sel);
+    if (m.ratio < m.umbral) fallos.push(`${tema} · ${nombre}: ${m.ratio}:1 < ${m.umbral} (${m.detalle})`);
+  }
+  return fallos;
+}
+
+test.describe('re-inspección 29/09/2026 · el panel no cambia de cifra al mover erf/cdf', () => {
+  test('CI, tornillos y alturas dan lo mismo que a mano, y el caso 6 del corrector coincide con el panel', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: /Problemas tipo/ }).click();
+
+    // CI: z = 2,00 → 1 − 0,9772 = 0,0228
+    await page.getByRole('button', { name: 'Coeficiente intelectual' }).click();
+    await expect(probLabel(page)).toHaveText('P(X > 130,00)');
+    await expect(probValueLarge(page)).toHaveText('2,28 %');
+    await expect(probDecimal(page)).toHaveText('= 0,0228');
+    await expect(valorZ(page, 'Z(a)')).toHaveText('2,000');
+    await page.getByRole('button', { name: 'P(X < a)' }).click();
+    await expect(probValueLarge(page)).toHaveText('97,72 %');
+    await expect(probDecimal(page)).toHaveText('= 0,9772');
+
+    // Tornillos: z = −1,50 → 1 − 0,9332 = 0,0668
+    await page.getByRole('button', { name: 'Control de calidad' }).click();
+    await expect(probLabel(page)).toHaveText('P(X < 9,700)');
+    await expect(probValueLarge(page)).toHaveText('6,68 %');
+    await expect(valorZ(page, 'Z(a)')).toHaveText('-1,500');
+
+    // Alturas: z = 1,2857 → interpolado 0,9007 → 0,0993
+    await page.getByRole('button', { name: 'Alturas de adultos' }).click();
+    await expect(probValueLarge(page)).toHaveText('9,93 %');
+    await expect(probDecimal(page)).toHaveText('= 0,0993');
+    await expect(valorZ(page, 'Z(a)')).toHaveText('1,286');
+
+    // El caso 6 (baterías N(40, 5), más de 50 h) es el mismo P(Z > 2): la corrección y el panel
+    // dan la misma cifra, y la cifra del panel se acepta.
+    await responderCaso(page, 'Caso 6: Baterías que duran mucho', '2,28');
+    await expect(avisoCasos(page)).toContainText('¡Correcto!');
+    await seccionCasos(page).getByRole('button', { name: 'Ver solución' }).click();
+    await expect(seccionCasos(page).locator('#casos-solucion')).toContainText('Respuesta: 2,28 %');
+  });
+
+  test('cola (z = 3,06) y σ pequeña (0,1) sin NaN y con la cifra de la tabla', async ({ page }) => {
+    // Cola: Φ(3,06) = 0,9989 → P(X > 3,06) = 0,0011 → 0,11 %
+    await page.getByRole('button', { name: 'P(X > a)' }).click();
+    await sembrarValor(page, A, 3.06);
+    await expect(probLabel(page)).toHaveText('P(X > 3,06)');
+    await expect(probValueLarge(page)).toHaveText('0,11 %');
+    await expect(probDecimal(page)).toHaveText('= 0,0011');
+    await expect(valorZ(page, 'Z(a)')).toHaveText('3,060');
+
+    // σ = 0,1 (el mínimo): a = 0,126 → z = 1,26 → Φ(1,26) = 0,8962 → 89,62 %
+    await sembrarValor(page, SIGMA, 0.1);
+    await page.getByRole('button', { name: 'P(X < a)' }).click();
+    await sembrarValor(page, A, 0.126);
+    await expect(probLabel(page)).toHaveText('P(X < 0,126)');
+    await expect(probValueLarge(page)).toHaveText('89,62 %');
+    await expect(probDecimal(page)).toHaveText('= 0,8962');
+    await expect(valorZ(page, 'Z(a)')).toHaveText('1,260');
+  });
+});
+
+test.describe('re-inspección 29/09/2026 · el corrector en el navegador', () => {
+  test('convenio de la tabla en el caso 7, lecturas de tabla aceptadas y rechazos con su motivo', async ({
+    page,
+  }) => {
+    // Caso 7: con la tabla 2·0,8944 − 1 = 0,7888 → 78,88 %; exacta 78,87 %. Las dos valen y la
+    // solución lo dice.
+    await responderCaso(page, 'Caso 7: Estaturas en un intervalo simétrico', '78,88');
+    await expect(avisoCasos(page)).toContainText('¡Correcto!');
+    await seccionCasos(page).getByRole('button', { name: 'Ver solución' }).click();
+    const solucion = seccionCasos(page).locator('#casos-solucion');
+    await expect(solucion).toContainText('Con los valores redondeados de la tabla sale 78,88 %');
+    await expect(solucion).toContainText('Respuesta: 78,87 %');
+
+    // Caso 9 con z = 1,29 de la tabla: 500 + 129 = 629 · caso 10 con z = −1,64: 493,44 → 493,4
+    await responderCaso(page, 'Caso 9: La nota de corte de una beca', '629');
+    await expect(avisoCasos(page)).toContainText('¡Correcto!');
+    await responderCaso(page, 'Caso 10: Las botellas con menos líquido', '493,4');
+    await expect(avisoCasos(page)).toContainText('¡Correcto!');
+
+    // Punto decimal de México: 89.44 es 89,44, no un millar
+    await responderCaso(page, 'Caso 1: El área a la izquierda', '89.44');
+    await expect(avisoCasos(page)).toContainText('¡Correcto!');
+
+    // Rechazos: tanto por uno (0,0228 en vez de 2,28), texto, vacío y signo olvidado
+    await responderCaso(page, 'Caso 6: Baterías que duran mucho', '0,0228');
+    await expect(avisoCasos(page)).toContainText('tanto por uno');
+    await expect(avisoCasos(page)).toContainText('(2,28)');
+    await responderCaso(page, 'Caso 5: Paquetes que pesan de menos', 'abc');
+    await expect(avisoCasos(page)).toContainText('Escribe un número');
+    await responderCaso(page, 'Caso 5: Paquetes que pesan de menos', '');
+    await expect(avisoCasos(page)).toContainText('Escribe un número');
+    await responderCaso(page, 'Caso 4: Tipificar una puntuación', '1,5');
+    await expect(avisoCasos(page)).toContainText('No es correcto');
+  });
+
+  test('las lecturas legítimas de la tabla siguen aceptadas (guarda para quien estreche la tolerancia)', () => {
+    // Caso 10: z = −1,6449 → 493,42 → 493,4; quien no redondea con z = −1,64 escribe 493,44
+    expect(comprobarRespuesta(493.4, CASOS[9].respuesta).correcto).toBe(true);
+    expect(comprobarRespuesta(493.44, CASOS[9].respuesta).correcto).toBe(true);
+    // Caso 1: Φ(1,25) = 0,8944 → 89,44 (y la exacta 0,894350, que redondea a 89,44)
+    expect(comprobarRespuesta(89.44, CASOS[0].respuesta, true).correcto).toBe(true);
+    // Caso 7 con la tabla: 78,88
+    expect(comprobarRespuesta(78.88, CASOS[6].respuesta, true).correcto).toBe(true);
+  });
+});
+
+test.describe('re-inspección 29/09/2026 · hallazgos ABIERTOS', () => {
+  test('ABIERTO · caso 10: la tolerancia del 1 % de x (4,93 mL = 1,23σ) acepta cuantiles equivocados', () => {
+    test.fail(true, 'ABIERTO: toleranciaDe aplica el 1 % a x ≈ 493 mL con σ = 4 mL');
+    // Esperado a mano: el 5 % inferior es z = −1,6449 → 493,4 mL. Estas NO son esa respuesta:
+    //   496,0 = 500 − 1·4    → z = −1, el percentil 15,87 (Φ(−1) = 1 − 0,8413)
+    //   492,2 = 500 − 1,96·4 → confunde la cola del 5 % con el intervalo bilateral del 95 %
+    //   492,0 = 500 − 2·4    → z = −2, el percentil 2,28
+    expect(comprobarRespuesta(496, CASOS[9].respuesta).correcto, '496 (z = −1)').toBe(false);
+    expect(comprobarRespuesta(492.2, CASOS[9].respuesta).correcto, '492,2 (z = −1,96)').toBe(false);
+    expect(comprobarRespuesta(492, CASOS[9].respuesta).correcto, '492 (z = −2)').toBe(false);
+  });
+
+  test('ABIERTO · caso 1: la tolerancia acepta la fila equivocada de la tabla (Φ(1,30) = 90,32)', () => {
+    test.fail(true, 'ABIERTO: 1 % de 89,44 = 0,89 puntos, 89 veces el redondeo de la tabla (0,01)');
+    // P(Z < 1,25) = Φ(1,25) = 0,8944 → 89,44 %. Leer la fila 1,3 en vez de la 1,2 con la
+    // columna 0,05 da Φ(1,30) = 0,9032 → 90,32 %: diferencia 0,88 < tolerancia 0,8944.
+    expect(comprobarRespuesta(90.32, CASOS[0].respuesta, true).correcto).toBe(false);
+  });
+
+  test('ABIERTO · «Problemas tipo» marca «Alturas de adultos» pero el panel sigue en N(0,1)', async ({ page }) => {
+    test.fail(true, 'ABIERTO: entrar en el modo no carga el problema que aparece activo');
+    await page.getByRole('button', { name: /Problemas tipo/ }).click();
+    const alturas = page.getByRole('button', { name: 'Alturas de adultos' });
+    await expect(alturas).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByText('¿Qué % de hombres miden más de 185 cm?')).toBeVisible();
+    // Lo que responde a esa pregunta: z = 9/7 → 9,93 % (ver la cabecera de esta sección).
+    // Obtenido: «P(-1,00 < X < 1,00)» y 68,27 %, la respuesta a otra pregunta.
+    await expect(probLabel(page)).toHaveText('P(X > 185,00)', { timeout: 3000 });
+    await expect(probValueLarge(page)).toHaveText('9,93 %', { timeout: 3000 });
+  });
+
+  test('ABIERTO · volver a «Probabilidad» con un problema cargado desincroniza μ: una flecha la lleva de 100 a 4', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: misma forma que el 574, en μ y σ al cambiar de modo');
+    await page.getByRole('button', { name: /Problemas tipo/ }).click();
+    await page.getByRole('button', { name: 'Coeficiente intelectual' }).click();
+    await expect(probLabel(page)).toHaveText('P(X > 130,00)');
+    await page.getByRole('button', { name: /^Probabilidad/ }).click();
+    const leerMedia = async () =>
+      parseSpanishNumber(((await etiquetaMedia(page).textContent()) ?? '').split(':')[1] ?? '');
+    const antes = await leerMedia();
+    expect(Number.isFinite(antes)).toBe(true);
+    // Con σ = 15 el paso de μ es 1: una flecha la mueve UN paso desde lo que la etiqueta enseña,
+    // sea 100 (si el recorrido la admite) o el valor al que se la acote. Obtenido: 100 → 4,
+    // porque el deslizador está en [−5, 5] y su DOM se quedó en 5 (σ, igual: 15 → 2,95).
+    await page.locator(MEDIA).focus();
+    await page.keyboard.press('ArrowLeft');
+    await expect
+      .poll(async () => Math.abs((await leerMedia()) - antes), { timeout: 3000 })
+      .toBeLessThanOrEqual(1);
+  });
+
+  test('ABIERTO · blanco sobre var(--primary) en los botones activos y en los pasos (4,11:1 claro, 2,79:1 oscuro)', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: .tipoBtnActive, .problemaBtnActive y .stepNumber no usan --primary-boton');
+    await prepararParaMedir(page);
+    const fallos: string[] = [];
+    for (const tema of ['light', 'dark'] as const) {
+      await activarTema(page, tema);
+      await page.getByRole('button', { name: /Problemas tipo/ }).click();
+      await page.getByRole('button', { name: 'Coeficiente intelectual' }).click();
+      const guia = page.getByRole('button', { name: 'Ver guía educativa' });
+      if (await guia.count()) await guia.click();
+      fallos.push(
+        ...(await suspensos(page, tema, {
+          'botón de tipo activo': '[class*="tipoBtnActive"]',
+          'problema tipo activo': '[class*="problemaBtnActive"]',
+          'número de paso (texto grande)': '[class*="stepNumber"]',
+        })),
+      );
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  test('ABIERTO · var(--primary) como texto pequeño: valores de μ/σ/a/b y títulos educativos (4,11 y 3,93:1 en claro)', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: .controlLabel strong, .stepContent strong, .faqItem h4 y .scenarioCard strong');
+    await prepararParaMedir(page);
+    await activarTema(page, 'light');
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const fallos = await suspensos(page, 'claro', {
+      'valor de μ en su etiqueta': '[class*="controlLabel"] strong',
+      'título de paso': '[class*="stepContent"] strong',
+      'pregunta frecuente': '[class*="faqItem"] h4',
+      escenario: '[class*="scenarioCard"] strong',
+    });
+    expect(fallos).toEqual([]);
+  });
+
+  test('ABIERTO · el % del panel va con espacio normal y el bloque educativo lo pega («68%»)', async ({ page }) => {
+    test.fail(true, 'ABIERTO: fmtProb concatena « %» con U+0020; regla del espacio duro del 25/09/2026');
+    // Por defecto P(−1 < X < 1) = 68,27 %: el % debe ir tras un espacio DURO (U+00A0)
+    const texto = (await probValueLarge(page).textContent()) ?? '';
+    expect(texto).toBe('68,27 %');
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    // Solo el bloque educativo de ESTA app (título → cabecera → contenedor), no el pie ni las
+    // tarjetas de apps relacionadas: «(95%)», «el 68%», «el 95%», «el 99,7%», «el 10%».
+    const bloque = page
+      .getByRole('heading', { name: /Aprende sobre la Distribución Normal/ })
+      .locator('xpath=ancestor::div[2]');
+    const pegados = (await bloque.innerText()).match(/\d%/g) ?? [];
+    expect(pegados).toEqual([]);
+  });
+
+  test('ABIERTO · caso 11: la solución resta 0,9772 − 0,0228 y escribe 0,0455 sin avisar', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el paso intermedio mezcla valores de tabla con el resultado exacto');
+    // Con los valores de tabla que la propia solución enseña: 1 − (0,9772 − 0,0228) = 0,0456 y
+    // 2000 · 0,0456 = 91,20. La solución escribe «= 0,0455» y «= 91,00», sin la nota de redondeo.
+    await seccionCasos(page).getByRole('button', { name: 'Caso 11: Tornillos rechazados en un lote' }).click();
+    await seccionCasos(page).getByRole('button', { name: 'Ver solución' }).click();
+    const solucion = seccionCasos(page).locator('#casos-solucion');
+    await expect(solucion).toContainText('Φ(2,00) = 0,9772');
+    await expect(solucion).toContainText(/0,0456|redondeados de la tabla/, { timeout: 3000 });
+  });
+
+  test('ABIERTO · los tres botones de modo no llevan type="button"', async ({ page }) => {
+    test.fail(true, 'ABIERTO: regla de oro del CLAUDE.md global §5');
+    for (const nombre of [/^Probabilidad/, /^Regla 68-95-99\.7/, /^Problemas tipo/]) {
+      await expect(page.getByRole('button', { name: nombre })).toHaveAttribute('type', 'button', {
+        timeout: 3000,
+      });
+    }
+  });
+});
+
+test.describe('re-inspección 29/09/2026 · sospechas (a) y (b) en lo nuevo: miden bien', () => {
+  test('modo activo con el ratón encima y botones del bloque de casos, en claro y en oscuro', async ({ page }) => {
+    await prepararParaMedir(page);
+    const fallos: string[] = [];
+    for (const tema of ['light', 'dark'] as const) {
+      await activarTema(page, tema);
+      // (a) el hover del modo activo no cambia el color del rótulo: 14,84:1 / 11,23:1
+      await page.locator('[class*="modeBtnActive"]').hover();
+      fallos.push(
+        ...(await suspensos(page, tema, {
+          'rótulo del modo activo (hover)': '[class*="modeBtnActive"] [class*="modeName"]',
+        })),
+      );
+      await page.mouse.move(0, 0);
+      // (b) el bloque nuevo: 5,47:1 sobre --primary-boton, --primary-texto y --secondary-texto
+      fallos.push(
+        ...(await suspensos(page, tema, {
+          'título de la sección': '[class*="casosTitulo"]',
+          'título del caso': '[class*="casoTitulo"]',
+          'caso activo': '[class*="casoBotonActivo"]',
+          Comprobar: '[class*="casoComprobar"]',
+          'Ver pista': '[class*="casoAyudaBoton"]',
+        })),
+      );
+    }
+    expect(fallos).toEqual([]);
   });
 });

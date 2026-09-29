@@ -52,7 +52,8 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *      guardias de regresión como las del bloque 2 y ninguno lleva ya la marca.
  *   4. RE-INSPECCIÓN 25/09/2026: la SOSPECHA de la rampa de ganancia (hallazgo 1509 de
  *      diapason), medida aquí sobre el sonido que sale de la ganancia, y la frecuencia decimal
- *      tras el cambio de parser 527373e0. Los abiertos, con `test.fail()`.
+ *      tras el cambio de parser 527373e0. Los que salieron abiertos nacieron con `test.fail()`
+ *      y fueron REPARADOS el 25/09/2026 (hallazgos 1637-1639): hoy son regresión.
  *   5. INSPECTOR 25/09/2026 (tarde): la SOSPECHA del desmontaje sin rampa y la de los campos del
  *      barrido que truncan con parseInt (las dos vistas al reparar diapason), tres casos nuevos
  *      —timbre triangular y sierra, barrido desde el móvil, formato español en el campo— y un
@@ -64,7 +65,9 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *   6. INSPECTOR 27/09/2026: la medida con el micrófono, que ningún caso tocaba, con un micrófono
  *      FALSO en bucle (`INSTRUMENTAR_MICRO`): el caso normal A/B, el límite con el tono manual
  *      sonando (en móvil) y los rechazos (permiso denegado, procesados activos, silencio). Los
- *      defectos nuevos, con `test.fail()` y «ABIERTO». Y la SOSPECHA S2 (CASO 3 inestable con la
+ *      defectos nuevos nacieron con `test.fail()` y «ABIERTO», y fueron REPARADOS el mismo
+ *      27/09/2026 (hallazgos 2306-2309, los I1-I4): hoy son regresión y ninguno lleva ya la
+ *      marca. Y la SOSPECHA S2 (CASO 3 inestable con la
  *      CPU cargada): `abrir` espera ahora a la hidratación (ver su comentario).
  */
 

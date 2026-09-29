@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, devices, Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
 
 /**
@@ -458,5 +458,404 @@ test.describe('simulador-vsepr · la sección de casos en el navegador', () => {
     await seccion(page).getByRole('button', { name: 'Comprobar', exact: true }).click();
     await expect(seccion(page).getByRole('alert')).not.toContainText('¡Correcto!');
     await expect(seccion(page).getByRole('alert')).toContainText('Angular');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN (29/09/2026) — 438 usos. Foco: lo nuevo desde el 31/08, los 12 casos de aula
+ * (e9af3e88), y la sospecha del `touch-action: none` del lienzo en móvil (SOSPECHAS.md, 28/09).
+ *
+ * Nota de lectura: desde el 26/09/2026 la tabla VSEPR y el tope X + E ≤ 6 viven en
+ * `app/simulador-vsepr/motor.ts`; las referencias de línea de `page.tsx` de la cabecera son de la
+ * primera inspección.
+ *
+ * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (electrones de valencia del átomo
+ * central → pares; electrónica = X + E; molecular = solo átomos):
+ *
+ *   CASO A (normal) · caso 8 «Hacia el ClF₃»
+ *     PCl₃: P tiene 5 e⁻ de valencia; 3 enlaces P–Cl gastan 3 → quedan 2 = 1 par libre → AX₃E. ✓
+ *     Añadir un par libre → AX₃E₂: 5 dominios → bipirámide trigonal. Los 2 pares libres van al
+ *     ECUADOR (en el polo tendrían 3 vecinos a 90°, en el ecuador solo 2), así que quedan 2
+ *     átomos en los polos y 1 en el ecuador → FORMA T, ángulo ~90° (ClF₃ real: 87,5°), sp³d.
+ *     Comprobación del ejemplo de la app: ClF₃ → Cl 7 e⁻, 3 enlaces → 4 e⁻ = 2 pares libres ✓.
+ *     Predicción «Forma T» → debe aceptarse.
+ *
+ *   CASO B (límite: X + E = 6, el tope) · caso 10 «Del SF₄ al XeF₄»
+ *     SF₄: S 6 e⁻; 4 enlaces S–F gastan 4 → quedan 2 = 1 par libre → AX₄E (balancín) ✓.
+ *     Añadir un par libre → AX₄E₂ = 6 dominios, justo en el tope: octaédrica. Los 2 pares libres
+ *     se ponen OPUESTOS (180°) → los 4 F en un plano → CUADRADA PLANA, 90°, sp³d².
+ *     XeF₄: Xe 8 e⁻, 4 enlaces → 4 e⁻ = 2 pares libres ✓. Predicción «Pirámide cuadrada» (la
+ *     de UN solo par libre, AX₅E) → debe RECHAZARSE con «Cuadrada plana».
+ *     Y el caso 11, desde el mismo SF₄ pero con un ENLACE más → AX₅E: pirámide cuadrada, <90°
+ *     (BrF₅ real: ~84,8°). BrF₅ → Br 7 e⁻, 5 enlaces → 2 e⁻ = 1 par libre ✓.
+ *
+ *   CASO C (a rechazar) · caso 12 «Del SF₆ al XeF₄», pregunta «¿cambia la electrónica?»
+ *     SF₆: 6 + 0 = 6 dominios; XeF₄: 4 + 2 = 6 dominios → la electrónica NO cambia (octaédrica).
+ *     «Sí: pasa a bipirámide trigonal» (5 dominios) → debe corregirse como fallo con «No cambia».
+ *     Y comprobar sin elegir → debe pedir una opción, sin fijar la predicción.
+ *
+ *   EN MÓVIL (390 × 844) · caso 7 «Hacia el SF₄»
+ *     SiCl₄: Si 4 e⁻, 4 enlaces → 0 pares libres → AX₄ ✓. Un par libre más → AX₄E: 5 dominios,
+ *     el par libre al ecuador → BALANCÍN (sube y baja), sp³d. Ejemplos de la app para AX₄E:
+ *     SF₄ ✓; IF₄⁺ (I 7 − 1 = 6 e⁻, 4 enlaces → 1 par) ✓; IO₂F₂⁻ (I 7 + 1 = 8 e⁻; 2 dobles I=O
+ *     y 2 I–F gastan 6 → 1 par) ✓.
+ *
+ *   Revisados a mano además los otros 8 casos (1-6, 9 y 12 ya en la tabla `A_MANO_AULA`) y los
+ *   ejemplos de las 13 filas de `TABLA_VSEPR` por recuento de electrones de valencia: todos los
+ *   de grupos principales cuadran (SO₂, O₃ y NO₂⁻ AX₂E; H₃O⁺ AX₃E; XeOF₄ AX₅E; I₃⁻ e ICl₂⁻
+ *   AX₂E₃; ICl₄⁻ y BrF₄⁻ AX₄E₂…). La excepción es el complejo de cobalto: ver hallazgos.
+ *
+ * LA SOSPECHA DEL `touch-action: none` (medida, no descartada por grep)
+ *   Medido con Chromium móvil y `Input.dispatchTouchEvent`: un deslizamiento vertical que EMPIEZA
+ *   sobre el lienzo NO desplaza la página (Δ = 0) y rota la molécula, que es lo que la app
+ *   promete («arrastra con el ratón o el dedo para rotar»; el eje vertical del arrastre es la
+ *   rotación en X, así que `pan-y` la mataría). Pero NO atrapa: el lienzo ocupa 274 × 274 px a
+ *   390 × 844 (70 % del ancho, 32,5 % del alto), 244 × 244 a 360 × 640 (68 % / 38 %) y 360 × 360 a
+ *   844 × 390 apaisado (43 % / 92 %), y siempre deja ≥ 58 px a cada lado por los que el mismo
+ *   gesto desplaza la página (Δ ≈ 235 px). Sin hallazgo; lo fija el test de móvil de abajo.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Color de los ligandos X en el lienzo (COLOR_LIGANDO de page.tsx). */
+const COLOR_LIGANDO = '#7FB3D3';
+
+interface Punto {
+  x: number;
+  y: number;
+}
+
+/** Lo que pinta el lienzo: centros de los átomos X y de los lóbulos de pares libres. */
+async function dibujo(page: Page): Promise<{ ligandos: Punto[]; lobulos: Punto[] }> {
+  return page.locator('svg[role="img"]').evaluate((svg, color) => {
+    const centro = (el: Element, a: string, b: string) => ({
+      x: Number(el.getAttribute(a)),
+      y: Number(el.getAttribute(b)),
+    });
+    return {
+      ligandos: Array.from(svg.querySelectorAll('circle'))
+        .filter((c) => (c.getAttribute('fill') ?? '').toLowerCase() === color.toLowerCase())
+        .map((c) => centro(c, 'cx', 'cy')),
+      lobulos: Array.from(svg.querySelectorAll('ellipse')).map((e) => centro(e, 'cx', 'cy')),
+    };
+  }, COLOR_LIGANDO);
+}
+
+/** Dos puntos del lienzo (360 × 360, centro en 180,180) diametralmente opuestos. */
+const opuestos = (a: Punto, b: Punto) => Math.abs(a.x + b.x - 360) < 0.5 && Math.abs(a.y + b.y - 360) < 0.5;
+
+/** Cuántas parejas de puntos opuestas hay en la lista (180° entre ellos, vistos desde el centro). */
+function parejasOpuestas(puntos: Punto[]): number {
+  let n = 0;
+  for (let i = 0; i < puntos.length; i++) {
+    for (let j = i + 1; j < puntos.length; j++) if (opuestos(puntos[i], puntos[j])) n++;
+  }
+  return n;
+}
+
+/** El valor de una fila del bloque de resultado, por su etiqueta. */
+async function filaResultado(page: Page, etiqueta: string): Promise<string> {
+  const filas = await page.locator('section', { hasText: 'Resultado:' }).first().locator('[class*="resultRow"]').allInnerTexts();
+  const fila = filas.find((f) => f.startsWith(etiqueta));
+  if (!fila) throw new Error(`Fila «${etiqueta}» no encontrada en el resultado`);
+  return fila.slice(etiqueta.length).trim();
+}
+
+test.describe('simulador-vsepr · re-inspección 29/09/2026 · los casos de aula, de punta a punta', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="aula-titulo"]');
+  const veredicto = (page: Page) => seccion(page).locator('p[role="alert"]');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, DESLIZADORES);
+  });
+
+  test('CASO A (normal) · caso 8: «Forma T» se acepta, y el simulador pinta 3 átomos con 2 en los polos', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 8:/ }).click();
+    // El enunciado parte del PCl₃ con X = 3, E = 1 (P: 5 e⁻, 3 enlaces → 1 par libre).
+    await expect(seccion(page).locator('[class*="aulaEnunciado"]')).toContainText(
+      'El PCl₃ tiene 3 pares enlazantes y 1 par libre en su átomo central, el fósforo.',
+    );
+    await seccion(page).getByRole('radio', { name: 'Forma T', exact: true }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(veredicto(page)).toHaveText('✅ ¡Correcto! La respuesta es «Forma T».');
+    // La predicción queda FIJADA: el fieldset se deshabilita y ya no se puede cambiar.
+    await expect(seccion(page).getByRole('radio', { name: 'Trigonal plana', exact: true })).toBeDisabled();
+    await expect(seccion(page).getByRole('button', { name: /Cargar el punto de partida/ })).toBeFocused();
+
+    await seccion(page).getByRole('button', { name: /Cargar el punto de partida/ }).click();
+    await expect(ecoDeSlider(page, 'slider-enlaces')).toHaveText('3');
+    await expect(ecoDeSlider(page, 'slider-libres')).toHaveText('1');
+    await expect(page.locator('section', { hasText: 'Resultado:' }).locator('h2')).toHaveText(
+      'Resultado: AX₃E con átomo central P',
+    );
+    await ponerSlider(page, 'slider-libres', 2);
+    // A mano: AX₃E₂ → bipirámide trigonal, forma T, ~90°, sp³d.
+    expect(await leerResultado(page)).toEqual({
+      notacion: 'AX₃E₂',
+      geomElectronica: 'Bipirámide trigonal',
+      geomMolecular: 'Forma T',
+      angulo: '~90°',
+      hibridacion: 'sp³d',
+    });
+    // Y el dibujo: 3 átomos X y 2 lóbulos, con DOS átomos opuestos (los polos) y ningún lóbulo
+    // opuesto a otro (los dos van al ecuador, a 120°).
+    const d = await dibujo(page);
+    expect(d.ligandos).toHaveLength(3);
+    expect(d.lobulos).toHaveLength(2);
+    expect(parejasOpuestas(d.ligandos)).toBe(1);
+    expect(parejasOpuestas(d.lobulos)).toBe(0);
+  });
+
+  test('CASO B (límite X + E = 6) · caso 10: «Pirámide cuadrada» se rechaza; AX₄E₂ es cuadrada plana con los pares opuestos', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 10:/ }).click();
+    await seccion(page).getByRole('radio', { name: 'Pirámide cuadrada', exact: true }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(veredicto(page)).toHaveText(
+      '❌ No. Predijiste «Pirámide cuadrada» y la respuesta es «Cuadrada plana». Carga el punto de partida, haz el cambio y mira por qué.',
+    );
+    await expect(seccion(page).getByRole('button', { name: /^Caso 10:/ })).toHaveAttribute(
+      'aria-label',
+      'Caso 10: Del SF₄ al XeF₄ (fallado)',
+    );
+
+    await seccion(page).getByRole('button', { name: /Cargar el punto de partida/ }).click();
+    await expect(ecoDeSlider(page, 'slider-enlaces')).toHaveText('4');
+    await expect(ecoDeSlider(page, 'slider-libres')).toHaveText('1');
+    await ponerSlider(page, 'slider-libres', 2); // 4 + 2 = 6: en el tope, no recorta X
+    await expect(ecoDeSlider(page, 'slider-enlaces')).toHaveText('4');
+    // A mano: AX₄E₂ → octaédrica, cuadrada plana, 90°, sp³d².
+    expect(await leerResultado(page)).toEqual({
+      notacion: 'AX₄E₂',
+      geomElectronica: 'Octaédrica',
+      geomMolecular: 'Cuadrada plana',
+      angulo: '90°',
+      hibridacion: 'sp³d²',
+    });
+    // Los dos pares libres, en vértices OPUESTOS del octaedro; los 4 F, dos parejas opuestas.
+    const d = await dibujo(page);
+    expect(d.ligandos).toHaveLength(4);
+    expect(d.lobulos).toHaveLength(2);
+    expect(opuestos(d.lobulos[0], d.lobulos[1])).toBe(true);
+    expect(parejasOpuestas(d.ligandos)).toBe(2);
+  });
+
+  test('CASO B bis · caso 11: desde el SF₄, un ENLACE más da pirámide cuadrada (<90°) y se acepta', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 11:/ }).click();
+    await seccion(page).getByRole('radio', { name: 'Pirámide cuadrada', exact: true }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(veredicto(page)).toHaveText('✅ ¡Correcto! La respuesta es «Pirámide cuadrada».');
+    await seccion(page).getByRole('button', { name: /Cargar el punto de partida/ }).click();
+    await expect(ecoDeSlider(page, 'slider-enlaces')).toHaveText('4');
+    await ponerSlider(page, 'slider-enlaces', 5); // 5 + 1 = 6: en el tope, no recorta E
+    await expect(ecoDeSlider(page, 'slider-libres')).toHaveText('1');
+    // A mano: AX₅E → octaédrica, pirámide cuadrada, <90° (BrF₅ ~84,8°), sp³d².
+    expect(await leerResultado(page)).toEqual({
+      notacion: 'AX₅E',
+      geomElectronica: 'Octaédrica',
+      geomMolecular: 'Pirámide cuadrada',
+      angulo: '<90°',
+      hibridacion: 'sp³d²',
+    });
+    const d = await dibujo(page);
+    expect(d.ligandos).toHaveLength(5);
+    expect(d.lobulos).toHaveLength(1);
+  });
+
+  test('CASO C (a rechazar) · caso 12: vacío pide opción; «Sí: pasa a bipirámide trigonal» se corrige con «No cambia»', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 12:/ }).click();
+    // Comprobar sin elegir: pide una opción y NO fija la predicción.
+    await seccion(page).getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(veredicto(page)).toHaveText('✏️ Elige una de las opciones antes de comprobar.');
+    await expect(seccion(page).getByRole('radio', { name: 'No cambia', exact: true })).toBeEnabled();
+    await seccion(page).getByRole('radio', { name: 'Sí: pasa a bipirámide trigonal', exact: true }).check();
+    await expect(veredicto(page)).toHaveCount(0); // elegir retira el aviso de «elige una opción»
+    await seccion(page).getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(veredicto(page)).toHaveText(
+      '❌ No. Predijiste «Sí: pasa a bipirámide trigonal» y la respuesta es «No cambia». Carga el punto de partida, haz el cambio y mira por qué.',
+    );
+    await expect(seccion(page).locator('[class*="aulaMarcador"]')).toHaveText('Casos comprobados: 1 de 12 · aciertos: 0');
+
+    // Y el simulador lo confirma: SF₆ (6 + 0) → XeF₄ (4 + 2), la electrónica sigue octaédrica.
+    await seccion(page).getByRole('button', { name: /Cargar el punto de partida/ }).click();
+    await expect(ecoDeSlider(page, 'slider-enlaces')).toHaveText('6');
+    expect(await filaResultado(page, 'Geometría electrónica')).toBe('Octaédrica');
+    await cargarPreset(page, 'XeF4');
+    await expect(ecoDeSlider(page, 'slider-enlaces')).toHaveText('4');
+    expect(await filaResultado(page, 'Geometría electrónica')).toBe('Octaédrica');
+    expect(await filaResultado(page, 'Geometría molecular')).toBe('Cuadrada plana');
+  });
+});
+
+test.describe('simulador-vsepr · re-inspección 29/09/2026 · en móvil (390 × 844, táctil)', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="aula-titulo"]');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, DESLIZADORES);
+  });
+
+  test('caso 7 en móvil: «Balancín» se acepta y «Cargar» deja el deslizador a la vista, bajo el logo fijo', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 7:/ }).click();
+    await expect(seccion(page).locator('h3')).toHaveText('Caso 7 · Hacia el SF₄');
+    await seccion(page).getByRole('radio', { name: 'Balancín (sube y baja)', exact: true }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(seccion(page).locator('p[role="alert"]')).toHaveText(
+      '✅ ¡Correcto! La respuesta es «Balancín (sube y baja)».',
+    );
+    await seccion(page).getByRole('button', { name: /Cargar el punto de partida/ }).click();
+    await expect(ecoDeSlider(page, 'slider-enlaces')).toHaveText('4');
+    await expect(ecoDeSlider(page, 'slider-libres')).toHaveText('0');
+    // El desplazamiento es suave: se espera a que el deslizador quede entre el logo fijo y el pie.
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() => {
+            const r = document.getElementById('slider-enlaces')!.getBoundingClientRect();
+            const techo = Math.max(
+              0,
+              ...Array.from(document.querySelectorAll('body *'))
+                .filter((n) => getComputedStyle(n).position === 'fixed')
+                .map((n) => n.getBoundingClientRect())
+                .filter((f) => f.height > 0 && f.top <= 0)
+                .map((f) => f.bottom),
+            );
+            return r.top >= techo && r.bottom <= window.innerHeight;
+          }),
+        { timeout: 5000 },
+      )
+      .toBe(true);
+    await ponerSlider(page, 'slider-libres', 1);
+    // A mano: AX₄E → bipirámide trigonal, balancín, sp³d; con el par libre en el ecuador quedan
+    // 2 átomos opuestos (los polos).
+    expect(await leerResultado(page)).toEqual({
+      notacion: 'AX₄E',
+      geomElectronica: 'Bipirámide trigonal',
+      geomMolecular: 'Balancín (sube y baja)',
+      angulo: '~90° y ~120°',
+      hibridacion: 'sp³d',
+    });
+    const d = await dibujo(page);
+    expect(d.ligandos).toHaveLength(4);
+    expect(parejasOpuestas(d.ligandos)).toBe(1);
+    // Sin desbordamiento horizontal a 390 px.
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+
+  test('SOSPECHA touch-action (medida): el gesto sobre el lienzo rota la molécula, pero el lienzo no atrapa', async ({ page }) => {
+    const svg = page.locator('svg[role="img"]');
+    await page.evaluate(() => {
+      const r = document.querySelector('svg[role="img"]')!.getBoundingClientRect();
+      window.scrollBy(0, r.top + r.height / 2 - window.innerHeight / 2);
+    });
+    await expect.poll(async () => (await svg.boundingBox())?.y ?? -1).toBeGreaterThan(0);
+    const caja = (await svg.boundingBox())!;
+    // Medido el 29/09/2026: 274 × 274 px → 70 % del ancho y 32,5 % del alto, 58 px libres por lado.
+    expect(caja.width / 390).toBeLessThan(0.8);
+    expect(caja.height / 844).toBeLessThan(0.5);
+    expect(caja.x).toBeGreaterThanOrEqual(48); // un dedo cabe en el margen izquierdo
+
+    const cdp = await page.context().newCDPSession(page);
+    const deslizar = async (x: number, y0: number, y1: number): Promise<void> => {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: y0 }] });
+      for (let i = 1; i <= 12; i++) {
+        await cdp.send('Input.dispatchTouchEvent', {
+          type: 'touchMove',
+          touchPoints: [{ x, y: y0 + ((y1 - y0) * i) / 12 }],
+        });
+      }
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    };
+    const huella = () =>
+      svg.evaluate((s) => Array.from(s.querySelectorAll('circle')).map((c) => `${c.getAttribute('cx')},${c.getAttribute('cy')}`).join(' '));
+    const scrollY = () => page.evaluate(() => window.scrollY);
+
+    const cx = Math.round(caja.x + caja.width / 2);
+    const cy = Math.round(caja.y + caja.height / 2);
+
+    // 1) Empezando en el lienzo: rota la molécula (la función prometida: «arrastra con el dedo»).
+    const antesHuella = await huella();
+    const antesScroll = await scrollY();
+    await deslizar(cx, cy + 100, cy - 100);
+    await expect.poll(huella).not.toBe(antesHuella);
+    await page.waitForTimeout(500);
+    test.info().annotations.push({
+      type: 'medida',
+      description: `Δscroll con el gesto iniciado en el lienzo: ${(await scrollY()) - antesScroll} px (29/09/2026: 0)`,
+    });
+
+    // 2) El mismo gesto por el margen lateral SÍ desplaza la página: no queda atrapado.
+    const antesMargen = await scrollY();
+    await deslizar(Math.round(caja.x / 2), cy + 100, cy - 100);
+    await expect.poll(async () => (await scrollY()) - antesMargen).toBeGreaterThan(100);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * HALLAZGOS ABIERTOS de la re-inspección del 29/09/2026. Cada uno con `test.fail()`: pasa en
+ * verde MIENTRAS el defecto siga ahí; cuando se repare, se quita `test.fail()` y el comentario
+ * pasa a «REPARADO».
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+test.describe('simulador-vsepr · hallazgos de la re-inspección del 29/09/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, DESLIZADORES);
+  });
+
+  // ABIERTO (operativa, medio): con X = 3 y E = 3 el lienzo pinta un OCTAEDRO de 6 átomos X y
+  // ningún lóbulo. `asignarVertices` (page.tsx), rama total === 6, solo reparte pares libres para
+  // E = 1 y E = 2; con E = 3 el conjunto queda vacío y los 6 vértices salen como enlaces. Se llega
+  // sin rebuscar: cargar SF₆ y subir «Pares libres» al máximo (el tope recorta X a 3).
+  test.fail('X = 3, E = 3 (SF₆ + pares libres al máximo): el lienzo debe pintar 3 átomos X, no 6', async ({ page }) => {
+    await cargarPreset(page, 'SF6');
+    await ponerSlider(page, 'slider-libres', 3);
+    await expect(ecoDeSlider(page, 'slider-enlaces')).toHaveText('3');
+    await expect(page.getByText('Combinación poco común')).toBeVisible();
+    const d = await dibujo(page);
+    // Esperado: tantos átomos X como pares enlazantes (3). Obtenido el 29/09/2026: 6, y 0 lóbulos.
+    expect(d.ligandos).toHaveLength(3);
+  });
+
+  // ABIERTO (contenido, bajo): la ficha «Pares libres en bipirámide» dice «En geometría AX₅E
+  // variantes, los pares libres se sitúan en posiciones ECUATORIALES». AX₅E es, en la propia
+  // tabla de la app, OCTAÉDRICA (pirámide cuadrada); las variantes de la bipirámide son AX₄E,
+  // AX₃E₂ y AX₂E₃ (las de AX₅).
+  test.fail('la ficha de la bipirámide no puede atribuirle AX₅E, que la tabla da como octaédrica', async ({ page }) => {
+    expect(geometriaDe(5, 1)?.geomElectronica).toBe('Octaédrica');
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const ficha = page.locator('[class*="tipCard"]', { hasText: 'Pares libres en bipirámide' });
+    await expect(ficha).toBeVisible();
+    await expect(ficha).not.toContainText('AX₅E');
+  });
+
+  // ABIERTO (dato, bajo): la fila AX₆ da como ejemplo [Co(NH₃)₆]³⁺ junto a «Hibridación: sp³d²».
+  // Es un complejo de un metal de transición —la propia app avisa en «Errores frecuentes» de no
+  // aplicarles VSEPR— y en enlace de valencia es un complejo de orbital INTERNO, d²sp³ (bajo
+  // espín, diamagnético), no sp³d² (que es el de [CoF₆]³⁻).
+  test.fail('los ejemplos de AX₆ (sp³d²) no incluyen un complejo de cobalto d²sp³', async ({ page }) => {
+    await cargarPreset(page, 'SF6');
+    expect(await filaResultado(page, 'Hibridación')).toBe('sp³d²');
+    expect(await filaResultado(page, 'Ejemplos reales')).not.toContain('[Co(NH₃)₆]³⁺');
+  });
+
+  // ABIERTO (contenido, bajo): «Pares totales» concuerda en plural con 1: «4 (3 enlazantes +
+  // 1 libres)» en el NH₃, y «1 enlazantes» con X = 1.
+  test.fail('«Pares totales» del NH₃ concuerda en singular: «1 libre»', async ({ page }) => {
+    await cargarPreset(page, 'NH3');
+    expect(await filaResultado(page, 'Pares totales')).toBe('4 (3 enlazantes + 1 libre)');
+  });
+
+  // ABIERTO (accesibilidad, bajo): fuera de la tabla, el nombre accesible del lienzo se queda en
+  // «Molécula : » (notación y geometría vacías): el lector de pantalla no dice qué se dibuja.
+  test.fail('fuera de la tabla (X = 1, E = 0), el lienzo conserva un nombre accesible con contenido', async ({ page }) => {
+    await ponerSlider(page, 'slider-enlaces', 1);
+    await expect(page.getByText('Combinación poco común')).toBeVisible();
+    await expect(page.locator('svg[role="img"]')).not.toHaveAttribute('aria-label', 'Molécula : ');
   });
 });

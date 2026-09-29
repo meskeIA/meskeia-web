@@ -1,0 +1,120 @@
+import { test, expect, type Page } from '@playwright/test';
+import { writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { esperarHidratacion } from './_hidratacion';
+
+/**
+ * Generador de Tonos — medidor de frecuencia en el LÍMITE grave (Inspector, 29/09/2026).
+ *
+ * Fichero aparte de generador-tonos-medidor-inspector.spec.ts solo porque el WAV del micrófono
+ * falso va en los launchOptions, que son por fichero. Mismo camino de verdad: Chromium con
+ * `--use-fake-device-for-media-stream` leyendo un WAV que escribe este fichero (PCM 16 bits,
+ * 48 kHz, mono, senoide pura de 15 Hz, 2 s = 30 ciclos exactos, sin salto en el bucle).
+ *
+ * HALLAZGO M1 [medio · cálculo] — ABIERTO. El medidor busca el pico entre FREC_MIN = 20 Hz y
+ * FREC_MAX = 20.000 Hz (page.tsx → picoDominante), pero `picoDominante` arranca en el bin
+ * floor(fMin / hzPorBin), que está POR DEBAJO de 20 Hz (a 44,1 kHz: floor(20/2,6917) = 7 →
+ * 18,84 Hz; a 48 kHz: 6 → 17,58 Hz), y no exige que el bin elegido sea un máximo local. Un tono
+ * por debajo del rango pone ese primer bin en el flanco de su lóbulo principal (la ventana
+ * Blackman del AnalyserNode lo abre ±3 bins): el flanco sobresale del fondo mucho más de los 20 dB
+ * de PROMINENCIA_MIN_DB, el afinado se descarta (el vértice cae a más de medio bin) y la lectura
+ * es SIEMPRE el centro de ese bin. Cinco lecturas idénticas → «Lectura estable» de una cifra que
+ * no es la del sonido. Medido también con 12 Hz (la misma cifra que con 15) y con un escalón de
+ * continua al abrirse el micrófono (el «plop» de encender un micro): «18,8 Hz» estable y
+ * retenida. El motor es compartido: analizador-espectro lo llama con los mismos 20 Hz por defecto.
+ *
+ * Resuelto a mano:
+ *   15 Hz está fuera del rango de 20 a 20.000 Hz que la app se pide a sí misma (y del que declara
+ *   en su hero), y el bloque «Qué mide y qué no» dice que en los graves extremos «puede no leer
+ *   nada». Esperado: sin cifra («— Hz», «Esperando un sonido…») o, si la da, la del sonido:
+ *   15 Hz ± 1 Hz, la precisión que la app promete. Una «Lectura estable» a 3,8 Hz no vale.
+ *   obtenido: la cifra del primer bin del rango, «Lectura estable» y retenida con el botón
+ *   «Llevar la lectura al generador». Depende de la frecuencia de muestreo del contexto:
+ *     · a 48 kHz (esta spec con `npx playwright test`): «17,6 Hz · Do#0 (+25 cents)».
+ *       17,6 = 6 × 48000/16384 = 17,578 Hz; Do#0 = 440·2^(−56/12) = 17,324 Hz → +25 cents.
+ *     · a 44,1 kHz (el mismo WAV desde un script suelto): «18,8 Hz · Re0 (+45 cents)».
+ *       18,8 = 7 × 44100/16384 = 18,842 Hz; Re0 = 440·2^(−55/12) = 18,354 Hz → +45 cents.
+ */
+
+const RUTA = '/generador-tonos/';
+const CAMPO_FRECUENCIA = 'input[aria-label="Frecuencia en Hz"]';
+
+function escribirWav(ruta: string, hz: number, segundos = 2, amplitud = 0.5): void {
+  const tasa = 48000;
+  const muestras = tasa * segundos;
+  const b = Buffer.alloc(44 + muestras * 2);
+  b.write('RIFF', 0);
+  b.writeUInt32LE(36 + muestras * 2, 4);
+  b.write('WAVE', 8);
+  b.write('fmt ', 12);
+  b.writeUInt32LE(16, 16);
+  b.writeUInt16LE(1, 20);
+  b.writeUInt16LE(1, 22);
+  b.writeUInt32LE(tasa, 24);
+  b.writeUInt32LE(tasa * 2, 28);
+  b.writeUInt16LE(2, 32);
+  b.writeUInt16LE(16, 34);
+  b.write('data', 36);
+  b.writeUInt32LE(muestras * 2, 40);
+  for (let i = 0; i < muestras; i++) {
+    b.writeInt16LE(Math.round(amplitud * 32767 * Math.sin((2 * Math.PI * hz * i) / tasa)), 44 + i * 2);
+  }
+  writeFileSync(ruta, b);
+}
+
+const WAV_15 = join(tmpdir(), 'meskeia-generador-tonos-15hz.wav');
+escribirWav(WAV_15, 15);
+
+test.use({
+  launchOptions: {
+    args: [
+      '--use-fake-ui-for-media-stream',
+      '--use-fake-device-for-media-stream',
+      `--use-file-for-fake-audio-capture=${WAV_15}`,
+      '--autoplay-policy=no-user-gesture-required',
+    ],
+  },
+  permissions: ['microphone'],
+});
+
+type VentanaVigilada = Window & { __pistasMedidor?: MediaStreamTrack[] };
+
+/** Deja a la vista las pistas de getUserMedia, sin sustituirlas: el audio es el del WAV. */
+async function vigilarMicrofono(page: Page) {
+  await page.addInitScript(() => {
+    const w = window as VentanaVigilada;
+    const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    w.__pistasMedidor = [];
+    navigator.mediaDevices.getUserMedia = async (restricciones?: MediaStreamConstraints) => {
+      const stream = await original(restricciones);
+      w.__pistasMedidor?.push(...stream.getAudioTracks());
+      return stream;
+    };
+  });
+}
+
+test('HALLAZGO M1 (ABIERTO) — un tono de 15 Hz no da una «Lectura estable» de otra frecuencia', async ({ page }) => {
+  test.fail(true, 'ABIERTO: M1, el primer bin del rango (bajo 20 Hz) se lee como pico en el flanco');
+  await vigilarMicrofono(page);
+  await page.goto(RUTA);
+  await esperarHidratacion(page, [CAMPO_FRECUENCIA]);
+
+  const boton = page.getByRole('button', { name: /Medir la frecuencia|Dejar de medir/ });
+  await boton.click();
+  await expect(boton).toHaveAttribute('aria-pressed', 'true');
+  // El micrófono falso está vivo de verdad.
+  await expect
+    .poll(() => page.evaluate(() => ((window as VentanaVigilada).__pistasMedidor ?? []).map((p) => p.readyState)))
+    .toEqual(['live']);
+  // Tiempo de sobra para cinco lecturas seguidas (una cada 100 ms) con la ventana llena (0,37 s).
+  await page.waitForTimeout(3000);
+
+  const retenida = page.locator('#medir-frecuencia').getByText(/Última lectura estable:/);
+  if ((await retenida.count()) > 0) {
+    const texto = ((await retenida.textContent()) ?? '').replace(/ /g, ' ');
+    const m = texto.match(/([\d.,]+) Hz/);
+    const hz = m ? Number(m[1].replace(/\./g, '').replace(',', '.')) : NaN;
+    expect(Math.abs(hz - 15), `«${texto}» para un tono de 15 Hz`).toBeLessThan(1);
+  }
+});

@@ -1,5 +1,7 @@
-import { test, expect, Page } from '@playwright/test';
-import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import { test, expect, Page, Locator } from '@playwright/test';
+import { esperarHidratacion, sembrarValor, esperarValorEnReact } from './_hidratacion';
+import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliares';
+import { parseSpanishNumber } from '../../lib/formatters';
 
 /**
  * Inspector — simulador-fotografia (segmento interactiva con motor de exposición)
@@ -22,7 +24,8 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *   Un paso (stop) = ×2 luz = 1 EV, en los tres ejes. Compensar = que la suma se conserve.
  *
  * DÓNDE VIVE EL CÁLCULO
- *   app/simulador-fotografia/page.tsx  (no hay motor.ts; todo está en el componente)
+ *   app/simulador-fotografia/casos.ts  (desde el 22/09/2026: escalas, stops y calcDeltaEV, que
+ *   importan tanto el medidor de page.tsx como la corrección de los casos de aula)
  *     ISO_VALUES      = [100, 200, 400, 800, 1600, 3200, 6400]                  idx 0..6
  *     APERTURE_VALUES = [1,4 · 2 · 2,8 · 4 · 5,6 · 8 · 11 · 16 · 22]            idx 0..8
  *     SHUTTER_VALUES  = [1 · 1/2 · 1/4 · 1/8 · 1/15 · 1/30 · 1/60 · 1/125 ·
@@ -50,17 +53,17 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *  4 (medio, contenido) La fórmula impresa llevaba el signo contrario al medidor. REPARADA Y
  *                     VERIFICADA: ahora rotula ΔEV y coincide con lo que marca el indicador.
  *
- * ── HALLAZGOS ABIERTOS DE LA SEGUNDA INSPECCIÓN (sus tests son TESTIGOS: fallan hasta que se
- *    reparen; no tocar la app desde aquí) ───────────────────────────────────────────────────
- *  A (medio, operativa) Cuando la compensación topa con el extremo del parámetro compañero, el
- *                     modo compensado deja de mantener la exposición y NO lo dice. En Paisaje
- *                     basta UNA muesca (1/250 → 1/125 s) para irse a +1,0 EV con el ISO ya en
- *                     100. Además solo se mueve UN compañero (velocidad↔ISO), nunca el
- *                     diafragma, aunque le queden pasos: la propia app alcanza el estado bien
- *                     expuesto ISO 100 · f/16 · 1/125 s si el que se arrastra es el diafragma.
- *  B (bajo, contenido) En 6 estados de Deportes el ΔEV sale -4,44·10⁻¹⁶ por redondeo binario y
- *                     formatNumber devuelve «≈0», así que el medidor rotula «Exposición
- *                     correcta (≈0 EV)» donde el resto de la app siempre pone «(+0,0 EV)».
+ * ── HALLAZGOS DE LA SEGUNDA INSPECCIÓN — REPARADOS el 24/08/2026 (sus tests pasaron de
+ *    testigos a regresiones: REGRESIÓN 273 y REGRESIÓN 274, más abajo) ───────────────────────
+ *  A · 273 (medio, operativa) Cuando la compensación topaba con el extremo del compañero, el
+ *                     modo compensado dejaba de mantener la exposición y NO lo decía. En
+ *                     Paisaje bastaba UNA muesca (1/250 → 1/125 s) para irse a +1,0 EV con el
+ *                     ISO ya en 100, y el diafragma no entraba nunca. REPARADO: compensación en
+ *                     cascada y aviso de límite (su efecto secundario, en la TERCERA inspección).
+ *  B · 274 (bajo, contenido) En 6 estados de Deportes el ΔEV salía -4,44·10⁻¹⁶ y el medidor
+ *                     rotulaba «(≈0 EV)». REPARADO: el rótulo se redondea antes de formatear.
+ *
+ * La TERCERA inspección (29/09/2026, foco en la tarea de aula) está al final del fichero.
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -621,6 +624,8 @@ import {
   SHUTTER_DENOMINADORES,
   FAMILIAS_APERTURA,
   FAMILIAS_VELOCIDAD,
+  textoApertura,
+  textoVelocidad,
 } from '../../app/simulador-fotografia/casos';
 
 const A_MANO: Readonly<Record<number, number>> = {
@@ -837,5 +842,434 @@ test.describe('casos para clase · simulador-fotografia', () => {
     expect(textoRespuesta(2.8, 'apertura')).toBe('f/2,8');
     expect(textoRespuesta(500, 'velocidad')).toBe('1/500 s');
     expect(textoRespuesta(1, 'velocidad')).toBe('1 s');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * TERCERA INSPECCIÓN · 29/09/2026 — la tarea de aula EN EL NAVEGADOR
+ *
+ * Los tests de arriba ejercitan `casos.ts` como módulo puro. Estos lo ejercitan por donde
+ * entra el alumno: el campo de texto, el botón «Comprobar» y el veredicto pintado. Cada
+ * esperado está resuelto a mano ANTES de abrir la app (convenio de la app: + = más luz).
+ *
+ * TOLERANCIA de la corrección: máx(0,01; 1 % del esperado), más 1e-9 de ruido binario.
+ *
+ *   Caso 1 · f/4 → f/8:  −2·log₂(8/4) = −2 EV            → tolerancia 0,02
+ *            «−1» (duplicar f = 1 paso, el error clásico) → desviación 1
+ *            «2» → |2 + (−2)| = 0 → mensaje del SIGNO
+ *   Caso 4 · f/2,8 → f/1,4 = 2·log₂(2) = +2 EV; la velocidad devuelve −2: 125·4 = 1/500 s
+ *            tolerancia 5 · «512» (1/128·4, la serie «real») → desviación 12, se rechaza
+ *   Caso 12 · ISO 1600 → 400 = −2 EV; el diafragma devuelve +2: 5,6/2 = f/2,8
+ *   Caso 9 (BORDE) · −2·log₂(11/8) = −0,918863 → −0,92; tolerancia máx(0,01; 0,0092) = 0,01
+ *            «−0,93» y «−0,91» → desviación 0,01 = tolerancia → correctos
+ *            «−0,94» → 0,02 → rechazo · «−0,9» (lo que dan los deslizadores) → 0,02 → rechazo
+ *   Caso 10 (BORDE) · log₂(60/125) = −1,058894 → −1,06; tolerancia 0,0106
+ *            «−1,07» y «−1,05» → 0,01 → correctos · «−1» (contar muescas) → 0,06 → rechazo
+ *   Rechazo · «abc» y «1/500» → no son números → mensaje propio, nunca «NaN»
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/** El veredicto de la tarea de aula; NO `getByRole('alert')`, que casa con el anunciador de Next. */
+function veredictoAula(page: Page): Locator {
+  return page.locator('[class*="casoVeredicto"][role="alert"]');
+}
+
+async function irACaso(page: Page, n: number): Promise<void> {
+  await page.getByRole('button', { name: new RegExp(`^Caso ${n}:`) }).click();
+  await expect(page.locator('h3[class*="casoTitulo"]')).toHaveText(new RegExp(`^Caso ${n} ·`));
+}
+
+/** Escribe la respuesta, espera a que React la tenga, pulsa «Comprobar» y devuelve el veredicto. */
+async function responderAula(page: Page, texto: string): Promise<string> {
+  const campo = page.locator('#casos-respuesta');
+  await campo.fill(texto);
+  await esperarValorEnReact(page, '#casos-respuesta', texto);
+  await expect(veredictoAula(page)).toHaveCount(0); // escribir borra el veredicto anterior
+  await page.getByRole('button', { name: 'Comprobar', exact: true }).click();
+  await expect(veredictoAula(page)).toBeVisible();
+  return ((await veredictoAula(page).textContent()) ?? '').trim();
+}
+
+/**
+ * Contraste WCAG entre el texto y su fondo EFECTIVO (compone los fondos translúcidos de los
+ * ancestros sobre el primero opaco). Mismo método que conversor-numeros-letras.
+ */
+async function contrasteEfectivo(el: Locator): Promise<number> {
+  return el.evaluate((nodo) => {
+    const rgba = (c: string) => {
+      const n = (c.match(/[\d.]+/g) ?? []).map(Number);
+      return [n[0], n[1], n[2], n.length > 3 ? n[3] : 1];
+    };
+    const capas: number[][] = [];
+    for (let e: Element | null = nodo; e; e = e.parentElement) {
+      const c = rgba(getComputedStyle(e).backgroundColor);
+      if (c[3] > 0) capas.push(c);
+      if (c[3] >= 1) break;
+    }
+    let fondo = [255, 255, 255];
+    for (const c of capas.reverse()) fondo = fondo.map((v, i) => v * (1 - c[3]) + c[i] * c[3]);
+    const lum = ([r, g, b]: number[]) => {
+      const f = (v: number) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+    };
+    const a = lum(rgba(getComputedStyle(nodo).color));
+    const b = lum(fondo);
+    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  });
+}
+
+test('AULA · CASO NORMAL: los casos 1, 4 y 12 se corrigen con la respuesta resuelta a mano', async ({
+  page,
+}) => {
+  await irACaso(page, 1);
+  expect(await responderAula(page, '-2')).toContain('¡Correcto!');
+  expect(await responderAula(page, '-1')).toContain('Te has desviado 1 de la respuesta');
+  expect(await responderAula(page, '2')).toContain('el signo va al revés');
+  await page.getByRole('button', { name: /Ver solución/ }).click();
+  await expect(page.locator('[class*="casoResultado"]')).toHaveText('Respuesta: -2 EV');
+
+  await irACaso(page, 4);
+  // Cambiar de caso limpia la respuesta y el veredicto anteriores
+  await expect(page.locator('#casos-respuesta')).toHaveValue('');
+  await expect(veredictoAula(page)).toHaveCount(0);
+  expect(await responderAula(page, '500')).toContain('¡Correcto!');
+  expect(await responderAula(page, '512')).toContain('Te has desviado 12 de la respuesta');
+  await page.getByRole('button', { name: /Ver solución/ }).click();
+  await expect(page.locator('[class*="casoResultado"]')).toHaveText('Respuesta: 1/500 s');
+
+  await irACaso(page, 12);
+  expect(await responderAula(page, '2,8')).toContain('¡Correcto!');
+  expect(await responderAula(page, '5,6')).toContain('No es correcto');
+});
+
+test('AULA · CASO LÍMITE: el borde exacto de la tolerancia en los casos 9 y 10', async ({ page }) => {
+  await irACaso(page, 9);
+  expect(await responderAula(page, '-0,92')).toContain('¡Correcto!');
+  // ±0,01 es justo la tolerancia: se acepta por los DOS lados (reparación del hallazgo 1211)
+  expect(await responderAula(page, '-0,93')).toContain('¡Correcto!');
+  expect(await responderAula(page, '-0,91')).toContain('¡Correcto!');
+  expect(await responderAula(page, '-0,94')).toContain('Te has desviado 0,02 de la respuesta');
+  // Contar el salto f/8 → f/11 como un paso entero es el error que el caso existe para enseñar
+  expect(await responderAula(page, '-1')).toContain('Te has desviado 0,08 de la respuesta');
+
+  await irACaso(page, 10);
+  expect(await responderAula(page, '-1,06')).toContain('¡Correcto!');
+  expect(await responderAula(page, '-1,07')).toContain('¡Correcto!');
+  expect(await responderAula(page, '-1,05')).toContain('¡Correcto!');
+  expect(await responderAula(page, '-1')).toContain('Te has desviado 0,06 de la respuesta');
+});
+
+test('AULA · CASO RECHAZO: lo que no es un número se responde con un mensaje, nunca con NaN', async ({
+  page,
+}) => {
+  await irACaso(page, 1);
+  const abc = await responderAula(page, 'abc');
+  expect(abc).toContain('Escribe un número');
+  expect(abc).not.toContain('NaN');
+  await irACaso(page, 4);
+  expect(await responderAula(page, '1/500')).toContain('Escribe un número');
+  // Enter también comprueba (onKeyDown), como el botón
+  await page.locator('#casos-respuesta').fill('500');
+  await esperarValorEnReact(page, '#casos-respuesta', '500');
+  await page.locator('#casos-respuesta').press('Enter');
+  await expect(veredictoAula(page)).toContainText('¡Correcto!');
+});
+
+test('AULA · accesibilidad: el enunciado se anuncia sin crear un segundo role="status"', async ({
+  page,
+}) => {
+  // d0ff643d: con role="status" en el enunciado el localizador del medidor encontraba DOS
+  await expect(page.locator('[role="status"]')).toHaveCount(1);
+  const enunciado = page.locator('p[class*="casoEnunciado"]');
+  await expect(enunciado).toHaveAttribute('aria-live', 'polite');
+  await irACaso(page, 7);
+  await expect(enunciado).toContainText('Subes el ISO a 400');
+  await expect(page.getByRole('button', { name: /^Caso 7:/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /^Caso 1:/ })).toHaveAttribute('aria-pressed', 'false');
+  const sinTipo = await page.evaluate(
+    () =>
+      [...document.querySelectorAll('[class*="casosSection"] button')].filter(
+        (b) => b.getAttribute('type') !== 'button',
+      ).length,
+  );
+  expect(sinTipo).toBe(0);
+});
+
+/**
+ * ABIERTO (medio, operativa) · el aviso «El modo compensado ha llegado al límite: … ni el ISO ni
+ * el diafragma tienen ya recorrido» sale con la exposición CORRECTA y los compañeros con margen.
+ *
+ * Retrato (ISO 800 · f/2,8 · 1/125 s), modo compensado, diafragma a f/5,6:
+ *   2·log₂(2,8/5,6) = −2 stops; la velocidad devuelve +2 → 1/30 s, que vale log₂(125/30) =
+ *   +2,058894 porque 1/30 es el rótulo de 1/32. ΔEV = +0,058894 → «Exposición correcta (+0,1 EV)».
+ *   El ISO sigue en 800 con 3 pasos a cada lado; el residuo es el redondeo de la escala, no un tope.
+ * `compensacionTopada` dispara con |ΔEV| > TOLERANCIA_EV = 0,05, por debajo de los residuos
+ * propios de la escala (0,052 · 0,059 · 0,063 · 0,081 · 0,140). Barrido de los 87 puestos de un
+ * deslizador en las tres escenas: 25 rotulan «Exposición correcta» y a la vez el aviso. Uno es
+ * el caso 5 de aula (Paisaje f/11 → f/22: ISO 100 · f/22 · 1/60 s, +0,059 EV).
+ */
+test('ABIERTO · el aviso de «límite» del modo compensado no sale con la exposición correcta', async ({
+  page,
+}) => {
+  test.fail();
+  await elegirModo(page, 'compensado');
+  await mover(page, 'ap-slider', 4);
+  await expect(rotulo(page, 'ap-slider')).toHaveText('f/5,6');
+  await expect(rotulo(page, 'sh-slider')).toHaveText('1/30 s');
+  await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 800');
+  expect(await evDelMarcador(page)).toBeCloseTo(0.058894, 3);
+  await expect(exposicion(page)).toContainText('Exposición correcta (+0,1 EV)');
+  await expect(
+    page.getByText('El modo compensado ha llegado al límite'),
+    'ISO 800 tiene recorrido y el medidor dice «Exposición correcta»: el aviso de tope es falso',
+  ).toHaveCount(0);
+});
+
+/**
+ * ABIERTO (medio, contenido) · la sección dice «Puedes comprobar cada resultado moviendo los
+ * deslizadores del simulador de arriba», y en los casos 9 y 10 hacerlo SUSPENDE. Es la forma
+ * del hallazgo 1209 (simulador-movimiento-circular), cuya reparación no llegó a esta copia.
+ *   Paisaje (ISO 100 · f/11 · 1/250 s), modo libre: f/8 → +0,9 EV; f/11 → +0,0 EV. El
+ *   medidor rotula con UNA decimal, así que el salto f/8 → f/11 se lee −0,9, y el caso 9 pide
+ *   −0,92 con tolerancia 0,01: «−0,9» → desviación 0,02 → «No es correcto».
+ * El test acepta las dos salidas honestas: que la promesa desaparezca o que se cumpla.
+ */
+test('ABIERTO · si la sección promete comprobar con los deslizadores, el caso 9 lo admite', async ({
+  page,
+}) => {
+  test.fail();
+  const intro = (await page.locator('p[class*="casosIntro"]').textContent()) ?? '';
+  const promete = /comprobar cada resultado moviendo los deslizadores/i.test(intro);
+
+  await elegirEscena(page, 'Paisaje');
+  await mover(page, 'ap-slider', 5);
+  await expect(exposicion(page)).toContainText('(+0,9 EV)');
+  await mover(page, 'ap-slider', 6);
+  await expect(exposicion(page)).toContainText('(+0,0 EV)');
+  // Lo que el alumno lee en el medidor: 0,0 − 0,9 = −0,9
+  await irACaso(page, 9);
+  const veredicto = await responderAula(page, '-0,9');
+  expect(
+    !promete || veredicto.includes('¡Correcto!'),
+    `la sección promete comprobar con los deslizadores y el −0,9 que dan se corrige: «${veredicto}»`,
+  ).toBe(true);
+});
+
+/**
+ * ABIERTO (bajo, cálculo) · el aviso del SIGNO decide por el ruido binario en el borde, la
+ * forma del 1211 en la rama que su reparación no tocó (`Math.abs(usuario + esperado) <=
+ * tolerancia`, sin el margen de 1e-9). Caso 9, tolerancia 0,01:
+ *   «−0,93» → |−0,93 − (−0,92)| = 0,01 → ¡Correcto! (con margen)
+ *   «0,92»  → |0,92 + (−0,92)| = 0 → «el signo va al revés»
+ *   «0,93»  → |0,93 + (−0,92)| = 0,010000000000000009 > 0,01 → «Te has desviado 1,85»
+ * La misma desviación que con el signo bueno se acepta, con el signo malo pierde la pista.
+ */
+test('ABIERTO · el mensaje del signo cubre el mismo borde que la respuesta correcta (caso 9)', async ({
+  page,
+}) => {
+  test.fail();
+  await irACaso(page, 9);
+  expect(await responderAula(page, '0,92')).toContain('el signo va al revés');
+  expect(await responderAula(page, '-0,93')).toContain('¡Correcto!');
+  expect(await responderAula(page, '0,93')).toContain('el signo va al revés');
+});
+
+/**
+ * ABIERTO (bajo, cálculo) · sospecha S1 (27/09/2026), en su forma de ESCALA DISCRETA. La
+ * respuesta de ISO, velocidad y diafragma es un valor de la escala de la cámara, pero se corrige
+ * con el 1 % relativo: en el caso 11 (ISO 100, tolerancia 1) pasan «101», «99» y «100,5»,
+ * ninguno un ISO que exista; en el caso 4 (1/500, tolerancia 5) pasan de «495» a «505» y
+ * «500,5»; en el 5 (ISO 400) «404» y «400,4». Aquí, a diferencia de simulador-arboles-bst-avl,
+ * sí cuela el ENTERO VECINO. Esperado: solo el valor de la escala.
+ */
+test('ABIERTO · un ISO que no existe en la escala no se da por bueno (caso 11)', async ({ page }) => {
+  test.fail();
+  await irACaso(page, 11);
+  expect(await responderAula(page, '100')).toContain('¡Correcto!');
+  expect(await responderAula(page, '102')).toContain('No es correcto');
+  expect(await responderAula(page, '101'), 'ISO 101 no está en la escala').not.toContain('¡Correcto!');
+  expect(await responderAula(page, '100,5'), 'ISO 100,5 no está en la escala').not.toContain('¡Correcto!');
+});
+
+/**
+ * ABIERTO (bajo, operativa) · el signo menos tipográfico (U+2212) se rechaza como «no es un
+ * número». La etiqueta del propio campo lo escribe así («− menos luz»), CasosAula.tsx dice en su
+ * comentario que parseSpanishNumber «admite −0,92», y el veredicto contesta «puedes usar … el
+ * signo menos» a quien acaba de usarlo. Caso 1: «−2» (U+2212) → esperado ¡Correcto!, como «-2».
+ */
+test('ABIERTO · el signo menos que escribe la etiqueta se acepta al responder (caso 1)', async ({
+  page,
+}) => {
+  test.fail();
+  await irACaso(page, 1);
+  await expect(page.locator('label[for="casos-respuesta"]')).toContainText('− menos luz');
+  expect(await responderAula(page, '-2')).toContain('¡Correcto!');
+  expect(await responderAula(page, '−2')).toContain('¡Correcto!');
+});
+
+/**
+ * ABIERTO (bajo, contenido) · en el modo práctica la solución afirma «Comprobación: sumando los
+ * tres ejes, ΔEV = 0,00» cuando la suma con los números de la cámara no es cero. El generador
+ * elige los datos dentro de una familia exacta, pero la RESPUESTA puede caer fuera: en las
+ * semillas 1-20.000, 1.451 de 7.720 compensaciones (18,8 %) dejan ±0,03 EV — lo mismo que los
+ * casos 9 y 10 enseñan a calcular.
+ *   Semilla 22 (Date.now() = 22): ISO 1600 · f/8 · 1/8 s, diafragma a f/2, ¿velocidad?
+ *     2·log₂(8/2) = +4 · la app responde 1/125 s: log₂(8/125) = −3,965784 → suma +0,034216 = +0,03
+ *     (y «128», que es 8·2⁴ aplicando «×2 en t = 1 paso», se corrige «Te has desviado 3»)
+ * El test lee el ejercicio que salga con esa semilla y rehace la suma con la fórmula, así que
+ * sirve igual si la reparación cambia el generador.
+ */
+test('ABIERTO · la comprobación de la solución de práctica cuadra con la suma de los tres ejes', async ({
+  page,
+}) => {
+  test.fail();
+  await page.clock.setFixedTime(new Date(22));
+  await page.goto(RUTA);
+  await esperarHidratacion(page, [...DESLIZADORES, '#casos-respuesta']);
+  await page.getByRole('button', { name: /Practicar/ }).click();
+  await expect(page.locator('h3[class*="casoTitulo"]')).toHaveText('Ejercicio de práctica');
+  const enunciado = (await page.locator('p[class*="casoEnunciado"]').textContent()) ?? '';
+  await page.getByRole('button', { name: /Ver solución/ }).click();
+  const pasos = await page.locator('[class*="casoPasos"] li').allTextContents();
+  const respuesta = ((await page.locator('[class*="casoResultado"] strong').textContent()) ?? '').trim();
+
+  const apDe = (t: string) => APERTURE_VALUES.find((v) => textoApertura(v) === t)!;
+  const denDe = (t: string) => SHUTTER_DENOMINADORES.find((d) => textoVelocidad(d) === t)!;
+  const partida = pasos[0].match(/^Partida: ISO (\d+) · (f\/[\d,]+) · (.+ s)\.$/)!;
+  const iso0 = Number(partida[1]);
+  const ap0 = apDe(partida[2]);
+  const den0 = denDe(partida[3]);
+  let iso1 = Number(enunciado.match(/llevas el ISO a (\d+)/)?.[1] ?? iso0);
+  let ap1 = apDe(enunciado.match(/pasas el diafragma a (f\/[\d,]+)/)?.[1] ?? partida[2]);
+  let den1 = denDe(enunciado.match(/pasas la velocidad a (.+? s)[ ,.y]/)?.[1] ?? partida[3]);
+  if (respuesta.startsWith('ISO ')) iso1 = Number(respuesta.slice(4));
+  else if (respuesta.startsWith('f/')) ap1 = apDe(respuesta);
+  else if (respuesta.endsWith(' s')) den1 = denDe(respuesta);
+  // ΔEV con los números rotulados: ISO + 2·log₂(N₀/N) + log₂(t/t₀), t = 1/den
+  const suma = Math.log2(iso1 / iso0) + 2 * Math.log2(ap0 / ap1) + Math.log2(den0 / den1);
+
+  const comprobacion = pasos.find((p) => p.startsWith('Comprobación'));
+  test.skip(!comprobacion, 'la semilla dio una pregunta de ΔEV, sin línea de comprobación');
+  const cifra = comprobacion!.match(/ΔEV = ([+\-−]?\d+,\d+)/)![1].replace('−', '-');
+  expect(
+    parseSpanishNumber(cifra),
+    `«${comprobacion}» · ${enunciado} · respuesta ${respuesta} · suma real ${suma.toFixed(6)}`,
+  ).toBeCloseTo(suma, 2);
+});
+
+/**
+ * ABIERTO (bajo, contenido) · la pista del caso 10 dice lo contrario de lo que pasa. La serie
+ * real de velocidades es de potencias de dos: 1/60 es el rótulo de 1/64 (el propio casos.ts lo
+ * dice de 1/15 = 1/16) y 1/125 el de 1/128, así que el paso REAL 1/64 → 1/128 vale
+ * log₂(128/64) = 1,00 EV, MENOR que el −1,06 que dan los rótulos. «Justo al revés que en el
+ * caso 9» (allí el rótulo encoge el paso: 0,92 < 1) es que aquí el rótulo lo EXAGERA. La pista
+ * dice «el rótulo se queda corto y el paso real es mayor», y el enunciado solo corrige 1/125
+ * (= 1/128), dejando 1/60 como si fuera exacto.
+ */
+test('ABIERTO · la pista del caso 10 no presenta el paso real como mayor que el de los rótulos', async ({
+  page,
+}) => {
+  test.fail();
+  await irACaso(page, 10);
+  await page.getByRole('button', { name: /Ver pista/ }).click();
+  const pista = (await page.locator('[class*="casoPista"]').textContent()) ?? '';
+  expect(pista).toContain('log₂(60/125)');
+  expect(Math.log2(128 / 64)).toBeLessThan(Math.abs(Math.log2(60 / 125))); // 1 < 1,058894
+  expect(pista, 'el paso real (1/64 → 1/128) es 1,00 EV, menor que el 1,06 de los rótulos').not.toMatch(
+    /paso real es mayor/,
+  );
+});
+
+/**
+ * ABIERTO (medio, accesibilidad) · sospecha del 28/09, MEDIDA en el navegador con el fondo
+ * compuesto. El título de cada caso (h3, 17,6 px / 600: texto normal, exige 4,5:1) va en
+ * var(--secondary) sobre el #FAFAFA de .casoCuerpo: 2,68:1 en claro (en oscuro, #5ABDB9 sobre
+ * #111827, 7,95:1, bien). Existe --secondary-texto (5,15:1) para esto.
+ */
+test('ABIERTO · el título del caso llega a 4,5:1 en el tema claro', async ({ page }) => {
+  test.fail();
+  await prepararParaMedir(page);
+  await activarTema(page, 'dark');
+  expect(await contrasteEfectivo(page.locator('h3[class*="casoTitulo"]'))).toBeGreaterThanOrEqual(4.5);
+  await activarTema(page, 'light');
+  const claro = await contrasteEfectivo(page.locator('h3[class*="casoTitulo"]'));
+  expect(claro, `título del caso en claro: ${claro.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
+});
+
+/**
+ * ABIERTO (medio, accesibilidad) · texto blanco sobre var(--primary) en los botones de la tarea:
+ * «Comprobar» (16 px / 600) y el botón del caso activo (15,2 px / 600). 4,11:1 en claro y 2,80:1
+ * en oscuro (#3FA5D1). «Ver pista» y «Ver solución» ponen var(--primary) sobre #FAFAFA: 3,93:1 en
+ * claro. Todo es texto normal (4,5:1). Existen --primary-boton (5,47:1 con blanco, igual en los
+ * dos temas) y --primary-texto.
+ */
+test('ABIERTO · los botones de la tarea de aula llegan a 4,5:1 en los dos temas', async ({ page }) => {
+  test.fail();
+  await prepararParaMedir(page);
+  const medidas: string[] = [];
+  let peor = Infinity;
+  for (const tema of ['light', 'dark'] as const) {
+    await activarTema(page, tema);
+    await page.mouse.move(0, 0);
+    for (const [nombre, sel] of [
+      ['Comprobar', 'button[class*="casoComprobar"]'],
+      ['caso activo', 'button[class*="casoBotonActivo"]'],
+      ['Ver pista', 'button[class*="casoAyudaBoton"]'],
+    ] as const) {
+      const r = await contrasteEfectivo(page.locator(sel).first());
+      medidas.push(`${tema} · ${nombre}: ${r.toFixed(2)}:1`);
+      peor = Math.min(peor, r);
+    }
+  }
+  expect(peor, medidas.join(' · ')).toBeGreaterThanOrEqual(4.5);
+});
+
+test.describe('móvil · Pixel 7', () => {
+  test.use({
+    viewport: { width: 412, height: 839 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * Caso 5 (Paisaje): f/11 → f/22 = −2·log₂(22/11) = −2 EV; el ISO devuelve +2: 100·4 = ISO 400.
+   * Caso 1 con un NEGATIVO tecleado: el inputmode es «text» a propósito (el teclado decimal de
+   * iOS no tiene signo menos) y −2 tiene que entrar.
+   */
+  test('AULA en móvil: se resuelve a toques, sin scroll horizontal y con dianas de 44 px', async ({
+    page,
+  }) => {
+    const anchos = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollWidth,
+      cliente: document.documentElement.clientWidth,
+    }));
+    expect(anchos.scroll).toBeLessThanOrEqual(anchos.cliente);
+
+    await page.getByRole('button', { name: /^Caso 5:/ }).tap();
+    await expect(page.locator('h3[class*="casoTitulo"]')).toHaveText(/^Caso 5 ·/);
+    const campo = page.locator('#casos-respuesta');
+    await expect(campo).toHaveAttribute('inputmode', 'text');
+    await campo.tap();
+    await campo.fill('400');
+    await esperarValorEnReact(page, '#casos-respuesta', '400');
+    await page.getByRole('button', { name: 'Comprobar', exact: true }).tap();
+    await expect(veredictoAula(page)).toContainText('¡Correcto!');
+
+    await page.getByRole('button', { name: /^Caso 1:/ }).tap();
+    await campo.tap();
+    await page.keyboard.type('-2');
+    await esperarValorEnReact(page, '#casos-respuesta', '-2');
+    await page.getByRole('button', { name: 'Comprobar', exact: true }).tap();
+    await expect(veredictoAula(page)).toContainText('¡Correcto!');
+
+    const alturas = await page
+      .locator('[class*="casosSection"] button')
+      .evaluateAll((bs) => bs.map((b) => Math.round(b.getBoundingClientRect().height)));
+    expect(Math.min(...alturas)).toBeGreaterThanOrEqual(44);
   });
 });
