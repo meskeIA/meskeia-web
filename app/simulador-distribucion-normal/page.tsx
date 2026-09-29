@@ -5,6 +5,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorDistribucionNormal.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { formatPercentage } from '@/lib';
 import { pdf, probabilidadNormal } from './casos';
 import CasosAula from './CasosAula';
 
@@ -116,17 +117,27 @@ const PROBLEMAS_TIPO: ProblemaTipo[] = [
 // que pinta el panel (skill /casos-aula-meskeia, regla de oro).
 
 /**
- * Formatea un número con coma decimal española
+ * Formatea un número en formato español con decimales fijos («1,286», «15.000,00»).
+ *
+ * No es `formatNumber` de `@/lib` porque este imprime «≈0» por debajo de 0,0001, y aquí los
+ * deslizadores de a y b dejan restos binarios (0 = −4,5 + 100·0,045 da 1e-16) que deben leerse
+ * «0,00». Lo que redondea a cero se imprime SIN signo: nunca «-0,00».
  */
 function fmt(n: number, decimales = 2): string {
-  return n.toFixed(decimales).replace('.', ',');
+  const limpio = Math.abs(n) < 0.5 * 10 ** -decimales ? 0 : n;
+  return (limpio + 0).toLocaleString('es-ES', {
+    minimumFractionDigits: decimales,
+    maximumFractionDigits: decimales,
+  });
 }
 
 /**
- * Formatea probabilidad como porcentaje
+ * Formatea probabilidad como porcentaje, con el espacio duro antes del % (regla del 25/09/2026,
+ * hallazgo 2426). `formatPercentage` ya lo pone; el `max` evita un «-0,00 %» si 1 − cdf deja un
+ * resto negativo de coma flotante.
  */
 function fmtProb(p: number): string {
-  return (p * 100).toFixed(2).replace('.', ',') + ' %';
+  return formatPercentage(Math.max(0, p), 2);
 }
 
 // ============================================
@@ -141,6 +152,8 @@ export default function SimuladorDistribucionNormalPage() {
   const [b, setB] = useState(1);
   const [compararEstandar, setCompararEstandar] = useState(false);
   const [problemaActivo, setProblemaActivo] = useState<string>('alturas');
+  /** El problema cuyos valores están cargados (null = la N(0, 1) de partida). */
+  const [escala, setEscala] = useState<ProblemaTipo | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -187,8 +200,51 @@ export default function SimuladorDistribucionNormalPage() {
     setA(problema.a);
     if (problema.b !== undefined) setB(problema.b);
     setProblemaActivo(problema.id);
+    setEscala(problema);
     setCompararEstandar(false);
   }, []);
+
+  /**
+   * Cambiar de modo. Al entrar en «Problemas tipo» se CARGA el problema que aparece marcado: antes
+   * se marcaba «Alturas de adultos» con su pregunta mientras el panel seguía en N(0, 1) y
+   * respondía a otra (hallazgo 2422, 29/09/2026).
+   */
+  const cambiarModo = useCallback(
+    (nuevo: SimulatorMode) => {
+      setMode(nuevo);
+      if (nuevo === 'problema') {
+        const problema = PROBLEMAS_TIPO.find(p => p.id === problemaActivo) ?? PROBLEMAS_TIPO[0];
+        cargarProblema(problema);
+      }
+    },
+    [problemaActivo, cargarProblema],
+  );
+
+  /** Vuelve a la normal estándar N(0, 1) con su recorrido de deslizadores de partida. */
+  const volverAEstandar = useCallback(() => {
+    setEscala(null);
+    setMu(0);
+    setSigma(1);
+    setA(-1);
+    setB(1);
+  }, []);
+
+  /**
+   * Recorrido de los deslizadores de μ y σ. Depende del problema CARGADO (la escala), no del
+   * modo: al volver a «Probabilidad» o a la regla con μ = 100 y σ = 15, el recorrido [−5, 5] y
+   * [0,1; 3] de la N(0, 1) dejaba el valor fuera, el navegador acotaba el DOM al tope mientras
+   * React conservaba 100 y la siguiente flecha saltaba a 4 (hallazgo 2423, la forma del 574).
+   * Con la escala del problema el valor siempre cabe, en los tres modos.
+   */
+  const recorrido = useMemo(() => {
+    if (!escala) return { muMin: -5, muMax: 5, sigmaMin: 0.1, sigmaMax: 3 };
+    return {
+      muMin: escala.mu - escala.sigma * 5,
+      muMax: escala.mu + escala.sigma * 5,
+      sigmaMin: escala.sigma * 0.2,
+      sigmaMax: escala.sigma * 3,
+    };
+  }, [escala]);
 
   // ============================================
   // DIBUJO DEL CANVAS
@@ -442,8 +498,9 @@ export default function SimuladorDistribucionNormalPage() {
       {/* === SELECTOR DE MODO === */}
       <div className={styles.modeSelector}>
         <button
+          type="button"
           className={`${styles.modeBtn} ${mode === 'probabilidad' ? styles.modeBtnActive : ''}`}
-          onClick={() => setMode('probabilidad')}
+          onClick={() => cambiarModo('probabilidad')}
           aria-pressed={mode === 'probabilidad'}
         >
           <span className={styles.modeIcon} aria-hidden="true">📐</span>
@@ -451,8 +508,9 @@ export default function SimuladorDistribucionNormalPage() {
           <span className={styles.modeDesc}>Calcula P(X&lt;a), P(X&gt;a) o P(a&lt;X&lt;b)</span>
         </button>
         <button
+          type="button"
           className={`${styles.modeBtn} ${mode === 'regla68' ? styles.modeBtnActive : ''}`}
-          onClick={() => setMode('regla68')}
+          onClick={() => cambiarModo('regla68')}
           aria-pressed={mode === 'regla68'}
         >
           <span className={styles.modeIcon} aria-hidden="true">📏</span>
@@ -460,8 +518,9 @@ export default function SimuladorDistribucionNormalPage() {
           <span className={styles.modeDesc}>Visualiza las zonas ±σ, ±2σ, ±3σ</span>
         </button>
         <button
+          type="button"
           className={`${styles.modeBtn} ${mode === 'problema' ? styles.modeBtnActive : ''}`}
-          onClick={() => setMode('problema')}
+          onClick={() => cambiarModo('problema')}
           aria-pressed={mode === 'problema'}
         >
           <span className={styles.modeIcon} aria-hidden="true">📝</span>
@@ -498,12 +557,12 @@ export default function SimuladorDistribucionNormalPage() {
         <div className={styles.controlsGrid}>
           <div className={styles.controlGroup}>
             <label className={styles.controlLabel}>
-              Media (μ): <strong>{fmt(mu, mode === 'problema' ? (sigma < 1 ? 2 : 1) : 2)}</strong>
+              Media (μ): <strong>{fmt(mu, escala ? (sigma < 1 ? 2 : 1) : 2)}</strong>
             </label>
             <input
               type="range"
-              min={mode === 'problema' && problemaActual ? problemaActual.mu - problemaActual.sigma * 5 : -5}
-              max={mode === 'problema' && problemaActual ? problemaActual.mu + problemaActual.sigma * 5 : 5}
+              min={recorrido.muMin}
+              max={recorrido.muMax}
               step={sigma < 1 ? 0.05 : sigma < 5 ? 0.1 : 1}
               value={mu}
               onChange={e => setMu(parseFloat(e.target.value))}
@@ -517,8 +576,8 @@ export default function SimuladorDistribucionNormalPage() {
             </label>
             <input
               type="range"
-              min={mode === 'problema' && problemaActual ? problemaActual.sigma * 0.2 : 0.1}
-              max={mode === 'problema' && problemaActual ? problemaActual.sigma * 3 : 3}
+              min={recorrido.sigmaMin}
+              max={recorrido.sigmaMax}
               step={sigma < 1 ? 0.01 : 0.05}
               value={sigma}
               onChange={e => setSigma(parseFloat(e.target.value))}
@@ -527,6 +586,14 @@ export default function SimuladorDistribucionNormalPage() {
             />
           </div>
         </div>
+
+        {/* Fuera de «Problemas tipo» los deslizadores conservan la escala del problema cargado
+            (hallazgo 2423): este botón devuelve la N(0, 1) y su recorrido de partida. */}
+        {escala && mode !== 'problema' && (
+          <button type="button" className={styles.volverEstandar} onClick={volverAEstandar}>
+            Volver a la normal estándar N(0, 1)
+          </button>
+        )}
 
         {/* CONTROLES DE PROBABILIDAD */}
         {mode !== 'regla68' && (
@@ -617,17 +684,17 @@ export default function SimuladorDistribucionNormalPage() {
             <>
               <div className={styles.resultCard}>
                 <span className={styles.resultLabel}>P(μ−σ &lt; X &lt; μ+σ)</span>
-                <span className={styles.resultValue}>≈ 68,27 %</span>
+                <span className={styles.resultValue}>≈ 68,27 %</span>
                 <span className={styles.resultRange}>[{fmt(mu - sigma, sigma < 1 ? 3 : 2)}, {fmt(mu + sigma, sigma < 1 ? 3 : 2)}]</span>
               </div>
               <div className={styles.resultCard}>
                 <span className={styles.resultLabel}>P(μ−2σ &lt; X &lt; μ+2σ)</span>
-                <span className={styles.resultValue}>≈ 95,45 %</span>
+                <span className={styles.resultValue}>≈ 95,45 %</span>
                 <span className={styles.resultRange}>[{fmt(mu - 2 * sigma, sigma < 1 ? 3 : 2)}, {fmt(mu + 2 * sigma, sigma < 1 ? 3 : 2)}]</span>
               </div>
               <div className={styles.resultCard}>
                 <span className={styles.resultLabel}>P(μ−3σ &lt; X &lt; μ+3σ)</span>
-                <span className={styles.resultValue}>≈ 99,73 %</span>
+                <span className={styles.resultValue}>≈ 99,73 %</span>
                 <span className={styles.resultRange}>[{fmt(mu - 3 * sigma, sigma < 1 ? 3 : 2)}, {fmt(mu + 3 * sigma, sigma < 1 ? 3 : 2)}]</span>
               </div>
             </>
@@ -701,7 +768,7 @@ export default function SimuladorDistribucionNormalPage() {
                   <th>Caso</th>
                   <th>μ</th>
                   <th>σ</th>
-                  <th>Rango ±2σ (95%)</th>
+                  <th>Rango ±2σ (95 %)</th>
                   <th>Para qué se usa</th>
                 </tr>
               </thead>
@@ -738,7 +805,7 @@ export default function SimuladorDistribucionNormalPage() {
                   <td>Error de medida (laboratorio)</td>
                   <td>0</td>
                   <td>0,01</td>
-                  <td>[−0.02, 0.02]</td>
+                  <td>[−0,02; 0,02]</td>
                   <td>Calibración, control calidad</td>
                 </tr>
                 <tr>
@@ -775,7 +842,7 @@ export default function SimuladorDistribucionNormalPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">📈</span>
               <strong>Test estandarizados</strong>
-              <p>Notas de selectividad o EBAU, exámenes de admisión universitaria en preparatoria y secundaria, SAT, GMAT, CI: se diseñan para que sigan una normal con media y σ fijas, lo que permite comparar candidatos de distintas convocatorias.</p>
+              <p>Notas de exámenes de admisión universitaria (en preparatoria o al terminar la educación media), SAT, GMAT, CI: se diseñan para que sigan una normal con media y σ fijas, lo que permite comparar candidatos de distintas convocatorias.</p>
             </div>
           </div>
         </section>
@@ -787,31 +854,31 @@ export default function SimuladorDistribucionNormalPage() {
             <div className={styles.faqItem}>
               <h4>¿Por qué es tan importante la distribución normal?</h4>
               <p>Por el <strong>Teorema Central del Límite</strong>: la suma o promedio de muchas variables aleatorias independientes tiende a seguir una normal, sea cual sea su distribución original. Esto explica por qué aparece en tantos contextos.</p>
-              <p className={styles.faqTip}>💡 Lanza 30 dados de 6 caras y suma los resultados: la distribución de la suma es prácticamente normal, aunque cada dado individual sea uniforme.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Lanza 30 dados de 6 caras y suma los resultados: la distribución de la suma es prácticamente normal, aunque cada dado individual sea uniforme.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué es la regla 68-95-99.7?</h4>
-              <p>En cualquier distribución normal, el <strong>68%</strong> de los valores está entre μ±σ, el <strong>95%</strong> entre μ±2σ, y el <strong>99,7%</strong> entre μ±3σ. Es un referente mental muy útil para hacer estimaciones rápidas sin tablas.</p>
-              <p className={styles.faqTip}>💡 Si las alturas siguen N(176, 7), el 95 % de los hombres mide entre 162 y 190 cm. Solo 0,15 % mide más de 197 cm.</p>
+              <p>En cualquier distribución normal, el <strong>68 %</strong> de los valores está entre μ±σ, el <strong>95 %</strong> entre μ±2σ, y el <strong>99,7 %</strong> entre μ±3σ. Es un referente mental muy útil para hacer estimaciones rápidas sin tablas.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Si las alturas siguen N(176, 7), el 95 % de los hombres mide entre 162 y 190 cm. Solo alrededor del 0,13 % mide más de 197 cm (μ + 3σ): 1 − Φ(3) = 0,0013. La regla, redondeada, daría 0,15 %.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué es tipificar o calcular Z?</h4>
               <p>Tipificar es transformar X en Z = (X−μ)/σ, convirtiendo cualquier N(μ, σ) en una N(0,1). Permite usar una <strong>única tabla</strong> (la Z) para resolver cualquier problema, en lugar de una tabla por cada μ y σ.</p>
-              <p className={styles.faqTip}>💡 Z=2 significa &quot;el valor está 2 desviaciones típicas por encima de la media&quot;. Es independiente de las unidades originales.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Z=2 significa &quot;el valor está 2 desviaciones típicas por encima de la media&quot;. Es independiente de las unidades originales.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿La normal puede valer para variables discretas?</h4>
               <p>Sí, como aproximación. Cuando una binomial B(n, p) tiene n grande y p ni muy próximo a 0 ni a 1 (regla práctica: np &gt; 5 y n(1−p) &gt; 5), se aproxima por N(np, √(np(1−p))). Es la base de muchos problemas de Bachillerato.</p>
-              <p className={styles.faqTip}>💡 Aplicar &quot;corrección por continuidad&quot;: P(X = k) ≈ P(k−0,5 &lt; Y &lt; k+0,5) donde Y es la normal aproximante.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Aplicar &quot;corrección por continuidad&quot;: P(X = k) ≈ P(k−0,5 &lt; Y &lt; k+0,5) donde Y es la normal aproximante.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué relación hay entre la normal y los intervalos de confianza?</h4>
-              <p>Los intervalos de confianza para la media usan la normal porque, por el TCL, la media muestral X̄ se distribuye como N(μ, σ/√n). Un intervalo al 95 % es X̄ ± 1,96 · σ/√n, donde 1,96 es el valor Z que deja 2,5 % a cada cola.</p>
-              <p className={styles.faqTip}>💡 Cuanto mayor es n, más estrecho es el intervalo (la √n en el denominador). Para reducir el error a la mitad hay que cuadruplicar la muestra.</p>
+              <p>Los intervalos de confianza para la media usan la normal porque, por el TCL, la media muestral X̄ se distribuye como N(μ, σ/√n). Un intervalo al 95 % es X̄ ± 1,96 · σ/√n, donde 1,96 es el valor Z que deja 2,5 % a cada cola.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Cuanto mayor es n, más estrecho es el intervalo (la √n en el denominador). Para reducir el error a la mitad hay que cuadruplicar la muestra.</p>
             </div>
           </div>
         </section>
@@ -831,7 +898,7 @@ export default function SimuladorDistribucionNormalPage() {
               <div className={styles.stepNumber}>2</div>
               <div className={styles.stepContent}>
                 <strong>Traduce la pregunta a una probabilidad</strong>
-                <p>&quot;Probabilidad de que mida más de 185 cm&quot; → P(X &gt; 185). &quot;Porcentaje de aprobados&quot; → P(X ≥ 5). &quot;Valor superado solo por el 10%&quot; → buscar a tal que P(X &gt; a) = 0,10.</p>
+                <p>&quot;Probabilidad de que mida más de 185 cm&quot; → P(X &gt; 185). &quot;Porcentaje de aprobados&quot; → P(X ≥ 5). &quot;Valor superado solo por el 10 %&quot; → buscar a tal que P(X &gt; a) = 0,10.</p>
               </div>
             </div>
             <div className={styles.step}>
@@ -852,7 +919,7 @@ export default function SimuladorDistribucionNormalPage() {
               <div className={styles.stepNumber}>5</div>
               <div className={styles.stepContent}>
                 <strong>Interpreta el resultado en el contexto</strong>
-                <p>No basta con dar &quot;0,1587&quot;: di &quot;el 15,87 % de los hombres mide más de 185 cm&quot;. Si en una muestra de 1000, eso son aproximadamente 159 personas. La cifra debe contar una historia.</p>
+                <p>No basta con dar &quot;0,1587&quot;: di &quot;el 15,87 % de los hombres mide más de 183 cm&quot; (183 = 176 + 7, justo una σ por encima de la media). Si en una muestra de 1000, eso son aproximadamente 159 personas. La cifra debe contar una historia.</p>
               </div>
             </div>
           </div>
@@ -870,7 +937,7 @@ export default function SimuladorDistribucionNormalPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Usa la regla 68-95-99.7 como sanity check</strong>
-              <p>Si el resultado dice que P(μ &lt; X &lt; μ+σ) = 0,12, te has equivocado: debe ser ≈ 0,34 (la mitad del 68 %). Es el control de errores más rápido en exámenes.</p>
+              <p>Si el resultado dice que P(μ &lt; X &lt; μ+σ) = 0,12, te has equivocado: debe ser ≈ 0,34 (la mitad del 68 %). Es el control de errores más rápido en exámenes.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🔄</span>
@@ -895,8 +962,8 @@ export default function SimuladorDistribucionNormalPage() {
             <li><strong>Confundir varianza con desviación típica</strong> — Si dicen N(0, 4) sin más contexto, en notación española suele ser σ = 4. Pero algunas fuentes (sobre todo anglosajonas) usan N(0, σ²) = N(0, 16). Lee con cuidado.</li>
             <li><strong>Suponer que &quot;continua&quot; implica &quot;normal&quot;</strong> — La uniforme, la exponencial y la t de Student también son continuas. Solo las simétricas y acampanadas se ajustan a normal. Prueba con un histograma antes.</li>
             <li><strong>Aplicar la normal a datos extremos</strong> — Tiempos de espera, ingresos, terremotos, viralidad: tienen colas pesadas y se modelan mejor con exponencial, lognormal o Pareto. Forzar la normal subestima los eventos raros.</li>
-            <li><strong>Olvidar la corrección por continuidad</strong> — Al aproximar una binomial discreta por una normal continua, P(X = 5) en realidad es P(4,5 &lt; Y &lt; 5,5). Saltarse este paso da errores del 5-10 % en problemas pequeños.</li>
-            <li><strong>Confundir P(Z &lt; z) con P(Z &gt; z)</strong> — Las tablas habituales dan acumulado por la izquierda. Si la pregunta es por la derecha, hay que restar de 1. Es el error más común en EBAU y se evita dibujando la campana antes.</li>
+            <li><strong>Olvidar la corrección por continuidad</strong> — Al aproximar una binomial discreta por una normal continua, P(X = 5) en realidad es P(4,5 &lt; Y &lt; 5,5). Saltarse este paso da errores del 5-10 % en problemas pequeños.</li>
+            <li><strong>Confundir P(Z &lt; z) con P(Z &gt; z)</strong> — Las tablas habituales dan acumulado por la izquierda. Si la pregunta es por la derecha, hay que restar de 1. Es el error más común en los exámenes y se evita dibujando la campana antes.</li>
           </ul>
         </div>
       </EducationalSection>

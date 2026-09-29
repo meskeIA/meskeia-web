@@ -305,18 +305,18 @@ test.describe('simulador-distribucion-normal · casos para clase', () => {
         }
         const dec = d.decimales ?? 2;
         const alumno = Math.round(conTabla * 10 ** dec) / 10 ** dec;
-        expect(comprobarRespuesta(alumno, c.respuesta).correcto, `caso ${c.id}: tabla ${alumno}`).toBe(true);
+        expect(comprobarRespuesta(alumno, c.respuesta, c.datos).correcto, `caso ${c.id}: tabla ${alumno}`).toBe(true);
       } else if (d.pregunta === 'cuantil') {
         const exacto = cuantilNormal(d.p!);
         // Los dos z de la tabla que rodean al exacto: cualquiera de los dos debe valer
         for (const z of [Math.floor(exacto * 100) / 100, Math.ceil(exacto * 100) / 100]) {
           const dec = d.decimales ?? 2;
           const x = Math.round((d.mu + z * d.sigma!) * 10 ** dec) / 10 ** dec;
-          expect(comprobarRespuesta(x, c.respuesta).correcto, `caso ${c.id}: z ${z} → ${x}`).toBe(true);
+          expect(comprobarRespuesta(x, c.respuesta, c.datos).correcto, `caso ${c.id}: z ${z} → ${x}`).toBe(true);
         }
       } else if (d.pregunta === 'sigma') {
         const sigmaTabla = (d.a! - d.mu) / r2(cuantilNormal(d.p!));
-        expect(comprobarRespuesta(Math.round(sigmaTabla * 10) / 10, c.respuesta).correcto).toBe(true);
+        expect(comprobarRespuesta(Math.round(sigmaTabla * 10) / 10, c.respuesta, c.datos).correcto).toBe(true);
       }
     }
   });
@@ -334,7 +334,7 @@ test.describe('simulador-distribucion-normal · casos para clase', () => {
     // Ningún enunciado usa la notación N(·,·), que unos libros leen con σ y otros con σ²
     for (const c of CASOS) expect(c.enunciado, `caso ${c.id}`).not.toMatch(/N\(/);
     // Si σ se leyera como varianza (σ² = 64), el caso 4 daría −0,1875: no se acepta
-    expect(comprobarRespuesta(-12 / 64, CASOS[3].respuesta).correcto).toBe(false);
+    expect(comprobarRespuesta(-12 / 64, CASOS[3].respuesta, CASOS[3].datos).correcto).toBe(false);
     // La inversa sale de la MISMA cdf
     expect(cdf(cuantilNormal(0.9), 0, 1)).toBeCloseTo(0.9, 10);
     expect(Number.isNaN(cuantilNormal(0))).toBe(true);
@@ -342,16 +342,42 @@ test.describe('simulador-distribucion-normal · casos para clase', () => {
   });
 
   test('corrección: tolerancia, tanto por uno, texto ilegible y datos imposibles', () => {
-    expect(toleranciaDe(89.44)).toBeCloseTo(0.8944, 10);
-    expect(toleranciaDe(2.28)).toBeCloseTo(0.0228, 10);
-    expect(toleranciaDe(0.5)).toBe(0.01);
-    expect(comprobarRespuesta(10.56, 10.56, true).correcto).toBe(true);
-    const tantoPorUno = comprobarRespuesta(0.1056, 10.56, true);
+    // REESCRITO el 29/09/2026 (hallazgos 2420 y 2421). Antes estas líneas afirmaban el 1 % del
+    // valor (toleranciaDe(89,44) = 0,8944), que es justo el defecto: consagraban que se aceptara
+    // Φ(1,30) = 90,32 para P(Z < 1,25). Ahora la tolerancia es la escala del error de la TABLA,
+    // y depende de la pregunta, no del tamaño de la cifra (derivación en la cabecera de
+    // toleranciaDe, casos.ts):
+    //   probabilidad en %, dos decimales → 100·0,0001 + 0,005 = 0,015 puntos
+    expect(toleranciaDe(CASOS[0].datos)).toBeCloseTo(0.015, 10);
+    expect(toleranciaDe(CASOS[5].datos)).toBeCloseTo(0.015, 10); // 2,28 %: la misma, no 0,0228
+    //   z → una centésima
+    expect(toleranciaDe(CASOS[3].datos)).toBeCloseTo(0.01, 10);
+    //   cuantil → σ·0,01 + media unidad: caso 9 (σ = 100, a unidades) 1,5 · caso 10 (σ = 4, décimas) 0,09
+    expect(toleranciaDe(CASOS[8].datos)).toBeCloseTo(1.5, 10);
+    expect(toleranciaDe(CASOS[9].datos)).toBeCloseTo(0.09, 10);
+    //   recuento → n·0,0001 + media unidad: 2000·0,0001 + 0,5 = 0,7 tornillos
+    expect(toleranciaDe(CASOS[10].datos)).toBeCloseTo(0.7, 10);
+    //   σ = (x − μ)/z → |x − μ|·0,01/z² + 0,05; con z = Φ⁻¹(0,8413) ≈ 0,99982: 16·0,01/0,99964 + 0,05 ≈ 0,21
+    expect(toleranciaDe(CASOS[11].datos)).toBeCloseTo(0.21, 2);
+
+    const caso5 = CASOS[4].datos; // 10,56 %
+    expect(comprobarRespuesta(10.56, 10.56, caso5).correcto).toBe(true);
+    const tantoPorUno = comprobarRespuesta(0.1056, 10.56, caso5);
     expect(tantoPorUno.correcto).toBe(false);
     expect(tantoPorUno.motivo).toContain('tanto por uno');
-    expect(comprobarRespuesta(0.1056, 10.56, false).motivo).not.toContain('tanto por uno');
-    expect(comprobarRespuesta(NaN, 10.56, true).motivo).toContain('Escribe un número');
-    expect(comprobarRespuesta(12, 10.56, true).correcto).toBe(false);
+    // En una pregunta que no es un porcentaje (la z del caso 4) no hay aviso de unidad
+    expect(comprobarRespuesta(0.1056, 10.56, CASOS[3].datos).motivo).not.toContain('tanto por uno');
+    expect(comprobarRespuesta(NaN, 10.56, caso5).motivo).toContain('Escribe un número');
+    expect(comprobarRespuesta(12, 10.56, caso5).correcto).toBe(false);
+    // Sospecha confirmada y reparada (29/09/2026): el tanto por uno REDONDEADO a dos decimales
+    // (0,02 para el 2,28 % del caso 6) recibía «No es correcto. Te has desviado 2,26» sin aviso
+    // de unidad. Ahora lleva el aviso, sin darle una cifra que no es la pedida.
+    const redondeado = comprobarRespuesta(0.02, CASOS[5].respuesta, CASOS[5].datos);
+    expect(redondeado.correcto).toBe(false);
+    expect(redondeado.motivo).toContain('tanto por uno');
+    expect(redondeado.motivo).not.toContain('(2,00)');
+    // …y un porcentaje de verdad equivocado (2 en vez de 2,28) no recibe el aviso de unidad
+    expect(comprobarRespuesta(2, CASOS[5].respuesta, CASOS[5].datos).motivo).not.toContain('tanto por uno');
     // Nada lanza: datos incompletos o imposibles devuelven ok: false
     expect(resolverCaso({ pregunta: 'probabilidad', mu: 0, sigma: 0, a: 1 }).ok).toBe(false);
     expect(resolverCaso({ pregunta: 'cuantil', mu: 0, sigma: 1, p: 1 }).ok).toBe(false);
@@ -618,36 +644,43 @@ test.describe('re-inspección 29/09/2026 · el corrector en el navegador', () =>
 
   test('las lecturas legítimas de la tabla siguen aceptadas (guarda para quien estreche la tolerancia)', () => {
     // Caso 10: z = −1,6449 → 493,42 → 493,4; quien no redondea con z = −1,64 escribe 493,44
-    expect(comprobarRespuesta(493.4, CASOS[9].respuesta).correcto).toBe(true);
-    expect(comprobarRespuesta(493.44, CASOS[9].respuesta).correcto).toBe(true);
+    expect(comprobarRespuesta(493.4, CASOS[9].respuesta, CASOS[9].datos).correcto).toBe(true);
+    expect(comprobarRespuesta(493.44, CASOS[9].respuesta, CASOS[9].datos).correcto).toBe(true);
     // Caso 1: Φ(1,25) = 0,8944 → 89,44 (y la exacta 0,894350, que redondea a 89,44)
-    expect(comprobarRespuesta(89.44, CASOS[0].respuesta, true).correcto).toBe(true);
+    expect(comprobarRespuesta(89.44, CASOS[0].respuesta, CASOS[0].datos).correcto).toBe(true);
     // Caso 7 con la tabla: 78,88
-    expect(comprobarRespuesta(78.88, CASOS[6].respuesta, true).correcto).toBe(true);
+    expect(comprobarRespuesta(78.88, CASOS[6].respuesta, CASOS[6].datos).correcto).toBe(true);
   });
 });
 
-test.describe('re-inspección 29/09/2026 · hallazgos ABIERTOS', () => {
-  test('ABIERTO · caso 10: la tolerancia del 1 % de x (4,93 mL = 1,23σ) acepta cuantiles equivocados', () => {
-    test.fail(true, 'ABIERTO: toleranciaDe aplica el 1 % a x ≈ 493 mL con σ = 4 mL');
+test.describe('re-inspección 29/09/2026 · hallazgos REPARADOS el 29/09/2026', () => {
+  test('REPARADO (2420) · caso 10: la tolerancia ya no acepta cuantiles equivocados', () => {
+    // REPARADO el 29/09/2026: la tolerancia del cuantil es σ·0,01 + media décima = 0,09 mL (antes
+    // el 1 % de x, 4,93 mL = 1,23σ). Las lecturas de tabla −1,64 y −1,65 siguen entrando (test
+    // «la tabla Z da la misma respuesta» y la guarda de más arriba).
     // Esperado a mano: el 5 % inferior es z = −1,6449 → 493,4 mL. Estas NO son esa respuesta:
     //   496,0 = 500 − 1·4    → z = −1, el percentil 15,87 (Φ(−1) = 1 − 0,8413)
     //   492,2 = 500 − 1,96·4 → confunde la cola del 5 % con el intervalo bilateral del 95 %
     //   492,0 = 500 − 2·4    → z = −2, el percentil 2,28
-    expect(comprobarRespuesta(496, CASOS[9].respuesta).correcto, '496 (z = −1)').toBe(false);
-    expect(comprobarRespuesta(492.2, CASOS[9].respuesta).correcto, '492,2 (z = −1,96)').toBe(false);
-    expect(comprobarRespuesta(492, CASOS[9].respuesta).correcto, '492 (z = −2)').toBe(false);
+    expect(comprobarRespuesta(496, CASOS[9].respuesta, CASOS[9].datos).correcto, '496 (z = −1)').toBe(false);
+    expect(comprobarRespuesta(492.2, CASOS[9].respuesta, CASOS[9].datos).correcto, '492,2 (z = −1,96)').toBe(false);
+    expect(comprobarRespuesta(492, CASOS[9].respuesta, CASOS[9].datos).correcto, '492 (z = −2)').toBe(false);
   });
 
-  test('ABIERTO · caso 1: la tolerancia acepta la fila equivocada de la tabla (Φ(1,30) = 90,32)', () => {
-    test.fail(true, 'ABIERTO: 1 % de 89,44 = 0,89 puntos, 89 veces el redondeo de la tabla (0,01)');
+  test('REPARADO (2421) · caso 1: la tolerancia ya no acepta la fila equivocada de la tabla (Φ(1,30) = 90,32)', () => {
+    // REPARADO el 29/09/2026: tolerancia de 0,015 puntos (dos Φ de tabla a cuatro decimales y el
+    // redondeo a dos), antes el 1 % de 89,44 = 0,89 puntos.
     // P(Z < 1,25) = Φ(1,25) = 0,8944 → 89,44 %. Leer la fila 1,3 en vez de la 1,2 con la
     // columna 0,05 da Φ(1,30) = 0,9032 → 90,32 %: diferencia 0,88 < tolerancia 0,8944.
-    expect(comprobarRespuesta(90.32, CASOS[0].respuesta, true).correcto).toBe(false);
+    expect(comprobarRespuesta(90.32, CASOS[0].respuesta, CASOS[0].datos).correcto).toBe(false);
+    // Caso 2 con la columna vecina: Φ(0,76) = 0,7764 → 77,64 en vez de Φ(0,75) = 77,34
+    expect(comprobarRespuesta(77.64, CASOS[1].respuesta, CASOS[1].datos).correcto).toBe(false);
+    // …y la columna vecina en el caso 1: Φ(1,26) = 0,8962 → 89,62
+    expect(comprobarRespuesta(89.62, CASOS[0].respuesta, CASOS[0].datos).correcto).toBe(false);
   });
 
-  test('ABIERTO · «Problemas tipo» marca «Alturas de adultos» pero el panel sigue en N(0,1)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: entrar en el modo no carga el problema que aparece activo');
+  test('REPARADO (2422) · al entrar en «Problemas tipo» se carga «Alturas de adultos», el problema marcado', async ({ page }) => {
+    // REPARADO el 29/09/2026: cambiarModo('problema') carga el problema activo.
     await page.getByRole('button', { name: /Problemas tipo/ }).click();
     const alturas = page.getByRole('button', { name: 'Alturas de adultos' });
     await expect(alturas).toHaveAttribute('aria-pressed', 'true');
@@ -656,12 +689,16 @@ test.describe('re-inspección 29/09/2026 · hallazgos ABIERTOS', () => {
     // Obtenido: «P(-1,00 < X < 1,00)» y 68,27 %, la respuesta a otra pregunta.
     await expect(probLabel(page)).toHaveText('P(X > 185,00)', { timeout: 3000 });
     await expect(probValueLarge(page)).toHaveText('9,93 %', { timeout: 3000 });
+    // La etiqueta de μ y el deslizador cuentan lo mismo (antes: «0,0» con el deslizador en 141)
+    await expect(etiquetaMedia(page)).toContainText('176,0');
+    await expect(page.locator(MEDIA)).toHaveValue('176');
   });
 
-  test('ABIERTO · volver a «Probabilidad» con un problema cargado desincroniza μ: una flecha la lleva de 100 a 4', async ({
+  test('REPARADO (2423) · volver a «Probabilidad» con un problema cargado ya no desincroniza μ', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: misma forma que el 574, en μ y σ al cambiar de modo');
+    // REPARADO el 29/09/2026: el recorrido de μ y σ sale del problema CARGADO, no del modo, así
+    // que μ = 100 y σ = 15 caben al volver a «Probabilidad» y DOM y estado coinciden.
     await page.getByRole('button', { name: /Problemas tipo/ }).click();
     await page.getByRole('button', { name: 'Coeficiente intelectual' }).click();
     await expect(probLabel(page)).toHaveText('P(X > 130,00)');
@@ -678,12 +715,35 @@ test.describe('re-inspección 29/09/2026 · hallazgos ABIERTOS', () => {
     await expect
       .poll(async () => Math.abs((await leerMedia()) - antes), { timeout: 3000 })
       .toBeLessThanOrEqual(1);
+    // Más estricto que «a lo sumo un paso» (que también pasa si la flecha no hace nada): μ = 100
+    // cabía, así que la flecha da EXACTAMENTE 99, y el DOM y la etiqueta coinciden.
+    expect(antes).toBe(100);
+    await expect(page.locator(MEDIA)).toHaveValue('99');
+    await expect(etiquetaMedia(page)).toContainText('99,0');
+    // El caso gemelo de σ: 15 → una flecha → 14,95 (paso 0,05), no 2,95.
+    await page.locator(SIGMA).focus();
+    await page.keyboard.press('ArrowLeft');
+    await expect(sigmaInput(page)).toHaveValue('14.95');
+    await expect(page.locator('[class*="controlLabel"]').filter({ hasText: 'Desviación típica' })).toContainText(
+      '14,95',
+    );
+    // En la regla 68-95-99,7 el recorrido es el mismo: μ = 99 sigue dentro y sin acotar.
+    await page.getByRole('button', { name: /^Regla 68-95-99\.7/ }).click();
+    await expect(page.locator(MEDIA)).toHaveValue('99');
+    await expect(page.locator(MEDIA)).toHaveAttribute('min', '25');
+    await expect(page.locator(MEDIA)).toHaveAttribute('max', '175');
+    // Y se puede volver a la N(0, 1) con su recorrido de partida, sin salto.
+    await page.getByRole('button', { name: 'Volver a la normal estándar N(0, 1)' }).click();
+    await expect(page.locator(MEDIA)).toHaveAttribute('min', '-5');
+    await expect(page.locator(MEDIA)).toHaveValue('0');
+    await expect(sigmaInput(page)).toHaveValue('1');
+    await expect(page.getByRole('button', { name: 'Volver a la normal estándar N(0, 1)' })).toHaveCount(0);
   });
 
-  test('ABIERTO · blanco sobre var(--primary) en los botones activos y en los pasos (4,11:1 claro, 2,79:1 oscuro)', async ({
+  test('REPARADO (2424) · botones activos y números de paso sobre --primary-boton (claro y oscuro)', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: .tipoBtnActive, .problemaBtnActive y .stepNumber no usan --primary-boton');
+    // REPARADO el 29/09/2026: .tipoBtnActive, .problemaBtnActive y .stepNumber usan --primary-boton.
     await prepararParaMedir(page);
     const fallos: string[] = [];
     for (const tema of ['light', 'dark'] as const) {
@@ -700,27 +760,51 @@ test.describe('re-inspección 29/09/2026 · hallazgos ABIERTOS', () => {
         })),
       );
     }
+    // Bajo la marca Stemum (la app es de su parrilla): el acta midió 2,21:1 en oscuro (#fff sobre
+    // #c99bf5). El layout del portal pone data-brand en <html>; aquí se simula igual, y se mide
+    // en los dos temas porque --primary-boton de Stemum no cambia con el tema.
+    await page.evaluate(() => document.documentElement.setAttribute('data-brand', 'stemum'));
+    for (const tema of ['light', 'dark'] as const) {
+      await activarTema(page, tema);
+      fallos.push(
+        ...(await suspensos(page, `stemum ${tema}`, {
+          'botón de tipo activo': '[class*="tipoBtnActive"]',
+          'problema tipo activo': '[class*="problemaBtnActive"]',
+          'número de paso (texto grande)': '[class*="stepNumber"]',
+          'valor de μ en su etiqueta': '[class*="controlLabel"] strong',
+          'título de paso': '[class*="stepContent"] strong',
+        })),
+      );
+    }
     expect(fallos).toEqual([]);
   });
 
-  test('ABIERTO · var(--primary) como texto pequeño: valores de μ/σ/a/b y títulos educativos (4,11 y 3,93:1 en claro)', async ({
+  test('REPARADO (2425) · texto de marca con --primary-texto: valores de μ/σ/a/b y títulos educativos', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: .controlLabel strong, .stepContent strong, .faqItem h4 y .scenarioCard strong');
+    // REPARADO el 29/09/2026: .controlLabel strong, .stepContent strong, .faqItem h4,
+    // .scenarioCard strong, .tipCard strong y los valores del panel usan --primary-texto.
     await prepararParaMedir(page);
-    await activarTema(page, 'light');
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    const fallos = await suspensos(page, 'claro', {
-      'valor de μ en su etiqueta': '[class*="controlLabel"] strong',
-      'título de paso': '[class*="stepContent"] strong',
-      'pregunta frecuente': '[class*="faqItem"] h4',
-      escenario: '[class*="scenarioCard"] strong',
-    });
+    const fallos: string[] = [];
+    // En los dos temas: al drenar un token en uno hay que medir el otro.
+    for (const tema of ['light', 'dark'] as const) {
+      await activarTema(page, tema);
+      fallos.push(
+        ...(await suspensos(page, tema, {
+          'valor de μ en su etiqueta': '[class*="controlLabel"] strong',
+          'título de paso': '[class*="stepContent"] strong',
+          'pregunta frecuente': '[class*="faqItem"] h4',
+          escenario: '[class*="scenarioCard"] strong',
+          'buena práctica': '[class*="tipCard"] strong',
+        })),
+      );
+    }
     expect(fallos).toEqual([]);
   });
 
-  test('ABIERTO · el % del panel va con espacio normal y el bloque educativo lo pega («68%»)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: fmtProb concatena « %» con U+0020; regla del espacio duro del 25/09/2026');
+  test('REPARADO (2426) · el % del panel y del bloque educativo va tras un espacio duro', async ({ page }) => {
+    // REPARADO el 29/09/2026: fmtProb usa formatPercentage (U+00A0) y el bloque educativo también.
     // Por defecto P(−1 < X < 1) = 68,27 %: el % debe ir tras un espacio DURO (U+00A0)
     const texto = (await probValueLarge(page).textContent()) ?? '';
     expect(texto).toBe('68,27 %');
@@ -730,12 +814,16 @@ test.describe('re-inspección 29/09/2026 · hallazgos ABIERTOS', () => {
     const bloque = page
       .getByRole('heading', { name: /Aprende sobre la Distribución Normal/ })
       .locator('xpath=ancestor::div[2]');
-    const pegados = (await bloque.innerText()).match(/\d%/g) ?? [];
+    const textoBloque = await bloque.innerText();
+    const pegados = textoBloque.match(/\d%/g) ?? [];
     expect(pegados).toEqual([]);
+    // Ni con espacio normal: todo número seguido de % lleva U+00A0
+    expect(textoBloque.match(/\d %/g) ?? []).toEqual([]);
   });
 
-  test('ABIERTO · caso 11: la solución resta 0,9772 − 0,0228 y escribe 0,0455 sin avisar', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el paso intermedio mezcla valores de tabla con el resultado exacto');
+  test('REPARADO (2427) · caso 11: la solución dice lo que da la resta con los valores de la tabla', async ({ page }) => {
+    // REPARADO el 29/09/2026: tras «= 0,0455» exacto, un paso con 1 − (0,9772 − 0,0228) = 0,0456 y
+    // 2000 · 0,0456 = 91,20, que redondeado a unidades también da 91.
     // Con los valores de tabla que la propia solución enseña: 1 − (0,9772 − 0,0228) = 0,0456 y
     // 2000 · 0,0456 = 91,20. La solución escribe «= 0,0455» y «= 91,00», sin la nota de redondeo.
     await seccionCasos(page).getByRole('button', { name: 'Caso 11: Tornillos rechazados en un lote' }).click();
@@ -743,15 +831,37 @@ test.describe('re-inspección 29/09/2026 · hallazgos ABIERTOS', () => {
     const solucion = seccionCasos(page).locator('#casos-solucion');
     await expect(solucion).toContainText('Φ(2,00) = 0,9772');
     await expect(solucion).toContainText(/0,0456|redondeados de la tabla/, { timeout: 3000 });
+    await expect(solucion).toContainText('1 − (0,9772 − 0,0228) = 0,0456');
+    await expect(solucion).toContainText('2000 · 0,0456 = 91,20');
+    await expect(solucion).toContainText('Respuesta: 91');
   });
 
-  test('ABIERTO · los tres botones de modo no llevan type="button"', async ({ page }) => {
-    test.fail(true, 'ABIERTO: regla de oro del CLAUDE.md global §5');
+  test('REPARADO (2428) · los tres botones de modo llevan type="button"', async ({ page }) => {
+    // REPARADO el 29/09/2026.
     for (const nombre of [/^Probabilidad/, /^Regla 68-95-99\.7/, /^Problemas tipo/]) {
       await expect(page.getByRole('button', { name: nombre })).toHaveAttribute('type', 'button', {
         timeout: 3000,
       });
     }
+  });
+});
+
+test.describe('reparación 29/09/2026 · sospechas del bloque educativo confirmadas', () => {
+  test('el consejo de la cola de 197 cm y el ejemplo del paso 5 cuadran con la tabla', async ({ page }) => {
+    // N(176, 7): 197 = μ + 3σ → 1 − Φ(3) = 1 − 0,99865 = 0,00135 → 0,13 % (Simpson), no el 0,15 %
+    // que sale de redondear la regla 99,7. Y 0,1587 = 1 − Φ(1) es la cola de 183 = μ + σ, no de
+    // 185 (que es 9,93 %, el problema tipo «Alturas de adultos» de la propia app).
+    expect(r4(1 - phiIndependiente(3))).toBe(0.0013);
+    expect(r4(1 - phiIndependiente(1))).toBe(0.1587);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const bloque = page
+      .getByRole('heading', { name: /Aprende sobre la Distribución Normal/ })
+      .locator('xpath=ancestor::div[2]');
+    await expect(bloque).toContainText('0,13 % mide más de 197 cm');
+    await expect(bloque).toContainText('15,87 % de los hombres mide más de 183 cm');
+    await expect(bloque).not.toContainText('15,87 % de los hombres mide más de 185 cm');
+    // La tabla comparativa con coma decimal
+    await expect(bloque).toContainText('[−0,02; 0,02]');
   });
 });
 

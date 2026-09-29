@@ -135,9 +135,9 @@
 }
 
 .problemaBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .problemaCard {
@@ -188,7 +188,7 @@
 }
 
 .controlLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
   font-family: var(--font-mono, monospace);
 }
@@ -269,10 +269,37 @@
   outline-offset: 2px;
 }
 
+/* Botón de acción (no conmuta un estado): texto de marca sobre el fondo de la tarjeta, con el
+   token -texto para llegar a 4,5:1 en los dos temas y bajo las marcas de portal. */
+.volverEstandar {
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  color: var(--primary-texto);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.volverEstandar:hover {
+  text-decoration: underline;
+}
+
+.volverEstandar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+[data-theme='dark'] .volverEstandar {
+  background: var(--bg-primary);
+  color: var(--primary-texto);
+}
+
 .tipoBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .abControls {
@@ -371,14 +398,14 @@
 .resultValue {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
 }
 
 .resultValueLarge {
   font-size: 2.5rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
   line-height: 1;
   margin: var(--spacing-xs) 0;
@@ -469,7 +496,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -499,7 +526,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -541,7 +568,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -554,7 +581,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -590,7 +617,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 

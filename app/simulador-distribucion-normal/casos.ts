@@ -30,8 +30,9 @@
  *    propia, escrita en el test e independiente de esta.
  *
  * ⚠️ **Los cuantiles de la tabla no son exactos**: el 10 % superior es z ≈ 1,28 (1,2816) y el 5 %
- *    inferior está entre −1,64 y −1,65. Esos casos piden x redondeado a unidades o a décimas, con
- *    σ grande frente al error, de modo que cualquier z de la tabla entra en la tolerancia.
+ *    inferior está entre −1,64 y −1,65. La tolerancia de esos casos es la de una centésima de z
+ *    (σ · 0,01) más el redondeo pedido: entran las dos z de la tabla que rodean a la exacta y
+ *    NO entran los errores clásicos del cuantil, z = −1 o el 1,96 bilateral (hallazgo 2420).
  *
  * ⚠️ **Las probabilidades se piden en %** con dos decimales, como las imprime el panel. Quien
  *    escribe el tanto por uno (0,1056 en vez de 10,56) recibe un aviso propio, no un «incorrecto»
@@ -371,6 +372,18 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
   pasos.push(
     `Lo que queda FUERA es el resto del área: 1 − P(${numero(lo)} < X < ${numero(hi)}) = 1 − (Φ(${fijo(zHi, 2)}) − Φ(${fijo(zLo, 2)})) = ${fijo(fuera, 4)}.`,
   );
+  /**
+   * La resta con los valores de la tabla que el paso anterior ACABA de enseñar puede mover la
+   * cuarta cifra aunque la respuesta final no cambie: en el caso 11, 1 − (0,9772 − 0,0228) =
+   * 0,0456 frente al 0,0455 exacto. Sin decirlo, el alumno que hace la resta en su cuaderno ve
+   * otra cifra en la solución y cree haberse equivocado (hallazgo 2427, 29/09/2026).
+   */
+  const intermedioDistinto = fijo(fuera, 4) !== fijo(fueraTabla, 4);
+  if (intermedioDistinto) {
+    pasos.push(
+      `Con los valores redondeados de la tabla la resta da 1 − (${fijo(phiTabla(zHi), 4)} − ${fijo(phiTabla(zLo), 4)}) = ${fijo(fueraTabla, 4)}; la diferencia con ${fijo(fuera, 4)} es solo de redondeo.`,
+    );
+  }
 
   if (pregunta === 'fuera') {
     const prob = fuera * 100;
@@ -384,17 +397,73 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
   const { n } = datos;
   if (!valido(n) || n <= 0) return falta('n');
   const esperados = n * fuera;
+  const esperadosTabla = n * fueraTabla;
   pasos.push(`De ${numero(n)} elementos se esperan ${numero(n)} · ${fijo(fuera, 4)} = ${fijo(esperados, 2)}.`);
-  const nota = notaTabla(esperados, n * fueraTabla, decimales, '');
-  if (nota) pasos.push(nota);
+  const nota = notaTabla(esperados, esperadosTabla, decimales, '');
+  if (nota) {
+    pasos.push(nota);
+  } else if (intermedioDistinto) {
+    pasos.push(
+      `Con el ${fijo(fueraTabla, 4)} de la tabla sale ${numero(n)} · ${fijo(fueraTabla, 4)} = ${fijo(esperadosTabla, 2)}, que redondeado a ${decimales === 0 ? 'unidades' : decimales === 1 ? 'décimas' : `${decimales} decimales`} da lo mismo: ${fijo(esperadosTabla, decimales)}.`,
+    );
+  }
   return { ok: true, valor: esperados, pasos };
 }
 
 /* ─────────────────────────── Corrección ─────────────────────────── */
 
-/** El MAYOR entre 0,01 y el 1 % del valor esperado. */
-export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
+/**
+ * Resolución de la tabla Z: z con dos decimales. Quien lee la tabla elige una de las dos
+ * centésimas que rodean al valor exacto, así que su z difiere de la exacta en menos de 0,01.
+ */
+const CENTESIMA_Z = 0.01;
+
+/**
+ * Error máximo de una probabilidad leída en la tabla (tanto por uno): la tabla da Φ con cuatro
+ * decimales (±0,00005) y una resta de dos lecturas acumula hasta ±0,0001.
+ */
+const ERROR_PHI_TABLA = 0.0001;
+
+/**
+ * La tolerancia de un caso, a la ESCALA DEL ERROR que se quiere tolerar: el redondeo de la tabla
+ * Z y el de la respuesta pedida, nada más (hallazgos 2420 y 2421, 29/09/2026).
+ *
+ * Antes era el 1 % del valor esperado, y el 1 % de una cifra no es la escala de su error: en el
+ * caso 10 el 1 % de 493 mL son 4,93 mL = 1,23σ, y aceptaba z = −1 (496) y el 1,96 bilateral
+ * (492,2); en el caso 1 el 1 % de 89,44 son 0,89 puntos, 89 veces el redondeo de la tabla, y
+ * aceptaba Φ(1,30) = 90,32 leyendo la fila de abajo. Ahora, con `u` = la unidad del redondeo
+ * pedido (0,01 con dos decimales, 1 a unidades):
+ *
+ *   · probabilidad y fuera (en %) → 100 · 0,0001 + u/2   (0,015 puntos con dos decimales)
+ *   · recuento de n elementos     → n · 0,0001 + u/2     (0,7 tornillos en el caso 11)
+ *   · z                           → 0,01                 (una centésima, lo que da la tabla)
+ *   · cuantil x = μ + zσ          → σ · 0,01 + u/2       (1,5 en el caso 9; 0,09 mL en el 10)
+ *   · σ = (x − μ) / z             → |x − μ| · 0,01 / z² + u/2  (derivada de σ respecto a z)
+ *
+ * El test «la tabla Z da la misma respuesta» comprueba que la lectura LEGÍTIMA de la tabla de
+ * cada caso sigue entrando.
+ */
+export function toleranciaDe(datos: DatosCaso): number {
+  const u = 10 ** -(datos.decimales ?? 2);
+  const mediaUnidad = u / 2;
+  switch (datos.pregunta) {
+    case 'probabilidad':
+    case 'fuera':
+      return 100 * ERROR_PHI_TABLA + mediaUnidad;
+    case 'recuento':
+      return valido(datos.n) ? datos.n * ERROR_PHI_TABLA + mediaUnidad : CENTESIMA_Z;
+    case 'z':
+      return CENTESIMA_Z;
+    case 'cuantil':
+      return valido(datos.sigma) ? datos.sigma * CENTESIMA_Z + mediaUnidad : CENTESIMA_Z;
+    case 'sigma': {
+      const z = valido(datos.p) ? cuantilNormal(datos.p) : NaN;
+      if (!valido(datos.a) || !Number.isFinite(z) || Math.abs(z) < 1e-9) return CENTESIMA_Z;
+      return (Math.abs(datos.a - datos.mu) * CENTESIMA_Z) / (z * z) + mediaUnidad;
+    }
+    default:
+      return CENTESIMA_Z;
+  }
 }
 
 export interface Veredicto {
@@ -405,13 +474,16 @@ export interface Veredicto {
 }
 
 /**
- * Corrige la respuesta del alumno. Nunca lanza.
+ * Corrige la respuesta del alumno frente a la de un caso. Nunca lanza.
  *
- * `enPorcentaje` activa el aviso del tanto por uno: si piden 10,56 y el alumno escribe 0,1056,
- * no se equivocó en la estadística sino en la unidad, y se le dice así.
+ * Recibe los `datos` del caso porque la tolerancia depende de la PREGUNTA (ver `toleranciaDe`),
+ * no del tamaño de la cifra. En las probabilidades en % activa el aviso del tanto por uno: si
+ * piden 10,56 y el alumno escribe 0,1056, no se equivocó en la estadística sino en la unidad, y
+ * se le dice así.
  */
-export function comprobarRespuesta(usuario: number, esperado: number, enPorcentaje = false): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
+export function comprobarRespuesta(usuario: number, esperado: number, datos: DatosCaso): Veredicto {
+  const tolerancia = toleranciaDe(datos);
+  const enPorcentaje = esPorcentaje(datos);
 
   if (!Number.isFinite(usuario)) {
     return {
@@ -437,6 +509,28 @@ export function comprobarRespuesta(usuario: number, esperado: number, enPorcenta
     return {
       correcto: false,
       motivo: `Casi: has escrito la probabilidad en tanto por uno. Aquí se pide en porcentaje: multiplícala por 100 (${fijo(usuario * 100, 2)}).`,
+      diferencia,
+      tolerancia,
+    };
+  }
+
+  /**
+   * El tanto por uno redondeado: quien escribe 0,02 para un 2,28 % redondeó la proporción a dos
+   * decimales, y su error es de unidad antes que de estadística. Medio punto porcentual es el
+   * redondeo de un tanto por uno con dos decimales; no se le da la cifra, porque la suya ya no
+   * lleva la precisión que se pide.
+   */
+  const MEDIO_PUNTO = 0.5;
+  if (
+    enPorcentaje &&
+    Math.abs(usuario) <= 1 &&
+    Math.abs(esperado) > 1 &&
+    Math.abs(usuario * 100 - esperado) <= MEDIO_PUNTO + RUIDO_BINARIO
+  ) {
+    return {
+      correcto: false,
+      motivo:
+        'Parece que has escrito la probabilidad en tanto por uno. Aquí se pide en porcentaje y con dos decimales: multiplica la proporción de la tabla por 100 antes de redondear.',
       diferencia,
       tolerancia,
     };
@@ -649,8 +743,8 @@ export interface Ejercicio {
 
 /**
  * Listas «amables». Las z van de cuarto en cuarto y hasta 2: salen EXACTAS con dos decimales
- * (la tabla y la función coinciden) y la cola más pequeña es un 2,28 %, lejos de la zona donde
- * la tolerancia mínima de 0,01 empezaría a aceptar cualquier cosa.
+ * (la tabla y la función coinciden) y la cola más pequeña es un 2,28 %, muy por encima de la
+ * tolerancia de 0,015 puntos, que es la del redondeo de la tabla.
  */
 const MEDIAS = [20, 50, 70, 100, 150, 500] as const;
 const DESVIACIONES = [2, 4, 5, 8, 10, 20] as const;

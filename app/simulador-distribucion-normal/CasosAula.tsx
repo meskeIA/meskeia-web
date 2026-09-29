@@ -19,7 +19,6 @@ import {
   CASOS,
   TOTAL_CASOS,
   comprobarRespuesta,
-  esPorcentaje,
   generarEjercicioAleatorio,
   textoRespuesta,
   type Ejercicio,
@@ -68,7 +67,7 @@ export default function CasosAula() {
     // El signo % que se cuele al final se quita: «10,56 %» es una respuesta legítima. Y el
     // menos tipográfico (−) de los enunciados pasa a guion, que es el único que lee el parser.
     const valor = parseSpanishNumber(respuesta.replace(/\s*%\s*$/, '').replace(/[−–]/g, '-'));
-    const r = comprobarRespuesta(valor, esperado, esPorcentaje(datos));
+    const r = comprobarRespuesta(valor, esperado, datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 
@@ -82,8 +81,10 @@ export default function CasosAula() {
           {TOTAL_CASOS} problemas con solución, siempre los mismos y en el mismo orden. Un profesor
           puede decir «resuelve los casos 3, 7 y 11» y corregir sin ambigüedad. Se resuelven con la
           tabla Z (z con dos decimales, Φ con cuatro): los datos están elegidos para que z salga
-          exacta, así que la tabla y la calculadora dan lo mismo, y las pequeñas diferencias de
-          redondeo entran en la tolerancia del 1&nbsp;%. Las probabilidades se piden en porcentaje.
+          exacta, así que la tabla y la calculadora dan lo mismo. La corrección admite el
+          redondeo de la tabla (una centésima de z, o una cifra en la cuarta decimal de Φ) y
+          nada más: leer otra fila de la tabla no se da por bueno. Las probabilidades se piden en
+          porcentaje.
         </p>
       </div>
 
