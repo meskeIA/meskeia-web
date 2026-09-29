@@ -99,9 +99,15 @@ export function indiceParaStops(objetivo: number, stopsDe: (i: number) => number
 }
 
 /**
- * Desviación por debajo de la cual la exposición se considera correcta. Medio décimo de stop
- * no lo distingue ningún ojo ni ningún fotómetro, y la escala de velocidades deja restos de
- * centésimas al compensar porque no es exactamente logarítmica.
+ * Desviación por debajo de la cual una compensación se da por exacta: decide si la cascada del
+ * modo compensado pasa el resto al segundo compañero, y si un caso de compensación tiene
+ * respuesta única en la escala. Medio décimo de stop no lo distingue ningún ojo ni ningún
+ * fotómetro, y la escala de velocidades deja restos de centésimas al compensar porque no es
+ * exactamente logarítmica.
+ *
+ * ⚠️ NO sirve para decidir si el modo compensado ha TOPADO (hallazgo 2403): los rótulos
+ * nominales dejan residuos de hasta 0,14 EV con los compañeros en mitad de su recorrido (1/30
+ * es el rótulo de 1/32: +0,059). Ese aviso usa su propio umbral en `page.tsx`.
  */
 export const TOLERANCIA_EV = 0.05;
 
@@ -154,6 +160,11 @@ export interface Resolucion {
 /** Formatea un número en español, con los decimales que se le pidan como máximo. */
 function numero(n: number, decimales = 2): string {
   return n.toLocaleString('es-ES', { maximumFractionDigits: decimales });
+}
+
+/** Como `numero`, pero con los decimales FIJOS: «0,03», nunca «0,030» ni «0». */
+function numeroFijo(n: number, decimales: number): string {
+  return n.toLocaleString('es-ES', { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
 }
 
 function redondear(valor: number, decimales: number): number {
@@ -301,7 +312,23 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
         : textoVelocidad(valor);
 
   pasos.push(`El valor de la escala que lo consigue es ${nombre}.`);
-  pasos.push('Comprobación: sumando los tres ejes, ΔEV = 0,00. La exposición se conserva.');
+
+  /**
+   * ⚠️ 29/09/2026 (hallazgo 2410) — aquí se afirmaba siempre «ΔEV = 0,00», y no lo es cuando
+   * la respuesta cae fuera de la familia exacta de la partida: de 1/8 s a 1/125 s hay
+   * log₂(8/125) = −3,965784, no −4, así que la suma real con los números de la cámara queda en
+   * +0,03. Pasaba en el 18,8 % de las compensaciones del modo práctica, y es justo lo que los
+   * casos 9 y 10 enseñan a calcular. La suma de los tres ejes con el valor elegido es,
+   * término a término, `stopsDe(idx) − objetivo`: la `desviacion` de arriba.
+   */
+  const suma = redondear(desviacion, 2) + 0; // el `+ 0` normaliza el −0 de Math.round
+  pasos.push(
+    suma === 0
+      ? 'Comprobación: sumando los tres ejes, ΔEV = 0,00. La exposición se conserva.'
+      : `Comprobación: sumando los tres ejes con los números de la cámara, ΔEV = ${suma > 0 ? '+' : ''}${numeroFijo(suma, 2)}. ` +
+          'No da cero porque la cámara rotula valores redondeados (f/11 es en realidad 11,3, y 1/125 es 1/128); ' +
+          'es el valor más cercano que ofrece la cámara, y a efectos prácticos la exposición se conserva.',
+  );
 
   return { ok: true, valor, pasos };
 }
@@ -321,11 +348,55 @@ export interface Veredicto {
 }
 
 /**
+ * ⚠️ 22/09/2026 (hallazgo 1211) — la comparación en el borde EXACTO decidía por el ±1 ulp de
+ * la resta en binario, así que la misma desviación se aceptaba por arriba y se rechazaba por
+ * abajo: con esperado 0,1 y tolerancia 0,01, «0,11» daba 0,009999999999999995 (dentro) y
+ * «0,09» daba 0,010000000000000009 (fuera), y el mensaje de rechazo cifraba la desviación
+ * igual que la tolerancia —«te has desviado 0,01»—, que es la forma más desconcertante de
+ * suspender a alguien.
+ *
+ * El margen es 1e-9: nueve órdenes de magnitud por encima del ulp de las cifras que maneja
+ * esta app y siete por debajo de la tolerancia más pequeña (0,01), así que absorbe el ruido
+ * sin cambiar ninguna decisión real. Vale para TODAS las comparaciones del corrector, también
+ * la del signo invertido (hallazgo 2407).
+ */
+const RUIDO_BINARIO = 1e-9;
+
+/**
+ * El valor EXACTO que redondea el rótulo de una velocidad: la serie real son potencias de dos,
+ * y 1/125 es el nombre comercial de 1/128 (1/15 de 1/16, 1/60 de 1/64…). 1, 2, 4 y 8 ya lo son.
+ */
+export function denominadorReal(den: number): number {
+  return 2 ** Math.round(Math.log2(den));
+}
+
+/**
  * Corrige la respuesta del alumno. Nunca lanza: una entrada que no es número se responde con
  * un veredicto, no con una excepción que tumbaría el render.
+ *
+ * ── LA REGLA DE CORRECCIÓN (29/09/2026, hallazgo 2408) ──────────────────────────────────
+ *
+ * · ΔEV (`deltaEV`) — es una magnitud continua: vale el MAYOR entre 0,01 y el 1 % del
+ *   esperado (`toleranciaDe`), más el margen de ruido binario.
+ *
+ * · ISO, diafragma y velocidad — la respuesta es un PUESTO de la escala de la cámara, y se
+ *   corrige por IGUALDAD, no con el 1 %. Antes, con el 1 %, se daban por buenos valores que no
+ *   existen: ISO 101, 99 y 100,5 en el caso 11; de 495 a 505 en el caso 4; ISO 404 en el 5.
+ *   Un ISO 101 no es «casi» ISO 100: no hay ninguna cámara que lo ofrezca.
+ *     Vale el rótulo (125 para 1/125 s) y, SOLO en la velocidad, también el valor exacto que
+ *   ese rótulo redondea (128 para 1/125 s, 512 para 1/500 s): es el mismo puesto del dial
+ *   escrito sin redondear, y quien llega a él aplicando «×2 en t = 1 paso» (1/8·2⁴ = 1/128) ha
+ *   razonado bien. En el diafragma no se admite la serie real porque son potencias de √2
+ *   (11,314…), que no tienen forma exacta de teclearse; el rótulo con una decimal es lo que
+ *   la etiqueta pide («escribe 2,8 para f/2,8»). En el ISO la serie rotulada ya es exacta.
  */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
+export function comprobarRespuesta(
+  usuario: number,
+  esperado: number,
+  pregunta: Pregunta = 'deltaEV',
+): Veredicto {
+  const esEscala = pregunta !== 'deltaEV';
+  const tolerancia = esEscala ? 0 : toleranciaDe(esperado);
 
   if (!Number.isFinite(usuario)) {
     return {
@@ -337,25 +408,37 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
   }
 
   const diferencia = Math.abs(usuario - esperado);
-  /**
-   * ⚠️ 22/09/2026 (hallazgo 1211) — la comparación en el borde EXACTO decidía por el ±1 ulp de
-   * la resta en binario, así que la misma desviación se aceptaba por arriba y se rechazaba por
-   * abajo: con esperado 0,1 y tolerancia 0,01, «0,11» daba 0,009999999999999995 (dentro) y
-   * «0,09» daba 0,010000000000000009 (fuera), y el mensaje de rechazo cifraba la desviación
-   * igual que la tolerancia —«te has desviado 0,01»—, que es la forma más desconcertante de
-   * suspender a alguien.
-   *
-   * El margen es 1e-9: nueve órdenes de magnitud por encima del ulp de las cifras que maneja
-   * esta app y siete por debajo de la tolerancia más pequeña (0,01), así que absorbe el ruido
-   * sin cambiar ninguna decisión real.
-   */
-  const RUIDO_BINARIO = 1e-9;
   if (diferencia <= tolerancia + RUIDO_BINARIO) {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 
+  if (esEscala) {
+    if (pregunta === 'velocidad') {
+      const real = denominadorReal(esperado);
+      if (real !== esperado && Math.abs(usuario - real) <= RUIDO_BINARIO) {
+        return {
+          correcto: true,
+          motivo: `¡Correcto! 1/${numero(real, 0)} s es el valor exacto; la cámara lo rotula ${textoVelocidad(esperado)}.`,
+          diferencia,
+          tolerancia,
+        };
+      }
+    }
+    const escala: readonly number[] =
+      pregunta === 'iso' ? ISO_VALUES : pregunta === 'apertura' ? APERTURE_VALUES : SHUTTER_DENOMINADORES;
+    const enLaEscala = escala.some((v) => Math.abs(v - usuario) <= RUIDO_BINARIO);
+    return {
+      correcto: false,
+      motivo: enLaEscala
+        ? 'No es correcto: ese valor está en la escala, pero no conserva la exposición.'
+        : 'No es correcto: ese valor no existe en la escala de la cámara. La respuesta es siempre uno de sus puestos.',
+      diferencia,
+      tolerancia,
+    };
+  }
+
   // El signo cambiado es EL error de este tema: quien viene del EV clásico lo invierte entero.
-  if (esperado !== 0 && Math.abs(usuario + esperado) <= tolerancia) {
+  if (esperado !== 0 && Math.abs(usuario + esperado) <= tolerancia + RUIDO_BINARIO) {
     return {
       correcto: false,
       motivo:
@@ -501,11 +584,18 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     id: 10,
     titulo: 'El mismo redondeo, en la velocidad',
     enunciado:
-      'Aceleras la obturación de 1/60 s a 1/125 s sin tocar nada más. La serie de velocidades también está redondeada: 1/125 es en realidad 1/128. Calcula el cambio exacto con los números que aparecen en la cámara y redondea a dos decimales.',
+      'Aceleras la obturación de 1/60 s a 1/125 s sin tocar nada más. La serie de velocidades también está redondeada: es de potencias de dos, así que 1/60 es en realidad 1/64 y 1/125 es 1/128. Calcula el cambio exacto con los números que aparecen en la cámara y redondea a dos decimales.',
     categoria: 'abstracto',
     datos: { iso0: 400, ap0: 5.6, den0: 60, den1: 125, pregunta: 'deltaEV' },
     etiquetaRespuesta: ETIQUETAS.deltaEV,
-    pista: 'log₂(60/125) da algo más de un paso entero, justo al revés que en el caso 9: aquí el rótulo se queda corto y el paso real es mayor.',
+    /*
+     * ⚠️ 29/09/2026 (hallazgo 2411) — la pista decía «aquí el rótulo se queda corto y el paso
+     * real es mayor», y es al revés: el paso REAL 1/64 → 1/128 vale log₂(128/64) = 1,00 EV
+     * exacto, y el de los rótulos, log₂(60/125) = −1,06, lo EXAGERA. En el caso 9 el rótulo lo
+     * encoge (0,92 frente a 1); aquí lo agranda. El enunciado corregía además solo 1/125 y
+     * dejaba 1/60 como si fuera exacto.
+     */
+    pista: 'log₂(60/125) da algo más de un paso entero, justo al revés que en el caso 9: allí el rótulo encogía el paso y aquí lo exagera. Con los valores reales, de 1/64 a 1/128, el salto es exactamente un paso (1,00 EV).',
     requiereRedondeo: true,
   },
   {

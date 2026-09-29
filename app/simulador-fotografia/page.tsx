@@ -72,6 +72,9 @@ const ESCENAS: EscenaConfig[] = [
   },
 ];
 
+/** Hasta aquí el medidor rotula «Exposición correcta»; por encima, el aviso de tope puede salir. */
+const UMBRAL_EXPOSICION_CORRECTA = 0.3;
+
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
@@ -219,8 +222,31 @@ export default function SimuladorFotografiaPage() {
    * compañeros han topado con el extremo de su escala. Entonces el simulador lo dice, en vez
    * de dejar al usuario con un «Ligeramente sobreexpuesto» y un texto de modo que promete sin
    * condiciones que «los otros se reajustan automáticamente» (hallazgo 273).
+   *
+   * ⚠️ 29/09/2026 (hallazgo 2403) — el aviso disparaba con |ΔEV| > TOLERANCIA_EV = 0,05, por
+   * debajo de los residuos que dejan los rótulos nominales con los compañeros en mitad de su
+   * recorrido: Retrato a f/5,6 compensa con 1/30 s, que es el rótulo de 1/32, y queda en
+   * +0,059 EV con el ISO a 800 y tres pasos a cada lado. Salían a la vez «Exposición correcta
+   * (+0,1 EV)» y «ni el ISO ni el diafragma tienen ya recorrido» en 25 de los 87 puestos de un
+   * deslizador. Barrido de TODOS los estados alcanzables en modo compensado desde las tres
+   * escenas (147): los residuos de escala llegan a 0,140 EV como mucho, y los topes de verdad
+   * empiezan en 0,919. Hay una franja vacía entre los dos, y el umbral se pone en ella, en el
+   * mismo 0,3 con el que el medidor deja de decir «Exposición correcta»: así el aviso y ese
+   * rótulo no pueden coincidir por construcción.
+   *   Y se exige además lo que el aviso AFIRMA: que en el sentido que haría falta (menos luz si
+   * sobra, más si falta) como mucho UNO de los tres ejes —el que acaba de mover el usuario—
+   * conserve recorrido. En los 147 estados las dos condiciones coinciden; la segunda cubre el
+   * paso de modo libre a compensado con una exposición ya desviada, donde nadie ha compensado
+   * todavía y decir que no queda recorrido sería falso.
    */
-  const compensacionTopada = modo === 'compensado' && Math.abs(deltaEVCrudo) > TOLERANCIA_EV;
+  const desviacionVisible = Math.abs(deltaEVCrudo) > UMBRAL_EXPOSICION_CORRECTA;
+  const faltaMenosLuz = deltaEVCrudo > 0;
+  const ejesConRecorrido = [
+    faltaMenosLuz ? isoIdx > 0 : isoIdx < ISO_VALUES.length - 1,
+    faltaMenosLuz ? apIdx < APERTURE_VALUES.length - 1 : apIdx > 0,
+    faltaMenosLuz ? shIdx < SHUTTER_VALUES.length - 1 : shIdx > 0,
+  ].filter(Boolean).length;
+  const compensacionTopada = modo === 'compensado' && desviacionVisible && ejesConRecorrido <= 1;
 
   // Efectos visuales derivados de los parámetros
   const bokehBlur = useMemo(
@@ -253,7 +279,7 @@ export default function SimuladorFotografiaPage() {
   const evAbs = Math.abs(deltaEV);
   let exposureLabel: string;
   let exposureClass: string;
-  if (evAbs <= 0.3) {
+  if (evAbs <= UMBRAL_EXPOSICION_CORRECTA) {
     exposureLabel = 'Exposición correcta';
     exposureClass = styles.expOk;
   } else if (deltaEV > 0 && deltaEV <= 1.5) {
@@ -442,8 +468,8 @@ export default function SimuladorFotografiaPage() {
                 {compensacionTopada && (
                   <p className={styles.avisoCompensacion}>
                     <span aria-hidden="true">⚠️</span> El modo compensado ha llegado al límite:
-                    con esta escena, ni el ISO ni el diafragma tienen ya recorrido para devolver
-                    la exposición a su sitio. Es lo que pasa en una cámara real cuando se agota
+                    con esta escena, los otros dos ajustes ya están en el extremo de su escala y
+                    no tienen recorrido para devolver la exposición a su sitio. Es lo que pasa en una cámara real cuando se agota
                     el margen — hay que aceptar la desviación, cambiar de escena o volver al modo
                     libre.
                   </p>

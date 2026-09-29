@@ -858,7 +858,11 @@ test.describe('casos para clase · simulador-fotografia', () => {
  *            «−1» (duplicar f = 1 paso, el error clásico) → desviación 1
  *            «2» → |2 + (−2)| = 0 → mensaje del SIGNO
  *   Caso 4 · f/2,8 → f/1,4 = 2·log₂(2) = +2 EV; la velocidad devuelve −2: 125·4 = 1/500 s
- *            tolerancia 5 · «512» (1/128·4, la serie «real») → desviación 12, se rechaza
+ *            «512» (1/128·4, la serie «real») → REESCRITO el 29/09/2026 (hallazgo 2408): se
+ *            ACEPTA. 512 es el valor exacto que el rótulo 1/500 redondea (la serie real son
+ *            potencias de dos), el mismo puesto del dial escrito sin redondear. El acta lo daba
+ *            por rechazado con «desviación 12» porque el corrector usaba el 1 % (tolerancia 5);
+ *            con la regla de escala, 505 se rechaza y 512 no. Ver casos.ts, `comprobarRespuesta`.
  *   Caso 12 · ISO 1600 → 400 = −2 EV; el diafragma devuelve +2: 5,6/2 = f/2,8
  *   Caso 9 (BORDE) · −2·log₂(11/8) = −0,918863 → −0,92; tolerancia máx(0,01; 0,0092) = 0,01
  *            «−0,93» y «−0,91» → desviación 0,01 = tolerancia → correctos
@@ -935,7 +939,8 @@ test('AULA · CASO NORMAL: los casos 1, 4 y 12 se corrigen con la respuesta resu
   await expect(page.locator('#casos-respuesta')).toHaveValue('');
   await expect(veredictoAula(page)).toHaveCount(0);
   expect(await responderAula(page, '500')).toContain('¡Correcto!');
-  expect(await responderAula(page, '512')).toContain('Te has desviado 12 de la respuesta');
+  // 512 = 1/128·4 = el valor exacto del rótulo 1/500 (ver la cabecera de esta sección)
+  expect(await responderAula(page, '512')).toContain('¡Correcto! 1/512 s es el valor exacto; la cámara lo rotula 1/500 s');
   await page.getByRole('button', { name: /Ver solución/ }).click();
   await expect(page.locator('[class*="casoResultado"]')).toHaveText('Respuesta: 1/500 s');
 
@@ -998,8 +1003,9 @@ test('AULA · accesibilidad: el enunciado se anuncia sin crear un segundo role="
 });
 
 /**
- * ABIERTO (medio, operativa) · el aviso «El modo compensado ha llegado al límite: … ni el ISO ni
- * el diafragma tienen ya recorrido» sale con la exposición CORRECTA y los compañeros con margen.
+ * HALLAZGO 2403 (medio, operativa) · REPARADO el 29/09/2026. El aviso «El modo compensado ha
+ * llegado al límite: … ni el ISO ni el diafragma tienen ya recorrido» salía con la exposición
+ * CORRECTA y los compañeros con margen.
  *
  * Retrato (ISO 800 · f/2,8 · 1/125 s), modo compensado, diafragma a f/5,6:
  *   2·log₂(2,8/5,6) = −2 stops; la velocidad devuelve +2 → 1/30 s, que vale log₂(125/30) =
@@ -1009,11 +1015,16 @@ test('AULA · accesibilidad: el enunciado se anuncia sin crear un segundo role="
  * propios de la escala (0,052 · 0,059 · 0,063 · 0,081 · 0,140). Barrido de los 87 puestos de un
  * deslizador en las tres escenas: 25 rotulan «Exposición correcta» y a la vez el aviso. Uno es
  * el caso 5 de aula (Paisaje f/11 → f/22: ISO 100 · f/22 · 1/60 s, +0,059 EV).
+ *
+ * REPARACIÓN: barrido de los 147 estados alcanzables en modo compensado desde las tres escenas
+ * (no solo de un deslizador): los residuos de escala llegan a 0,140 EV y los topes de verdad
+ * empiezan en 0,919. El aviso exige ahora |ΔEV| > 0,3 —el umbral de «Exposición correcta», así
+ * que no pueden coincidir— y que como mucho UN eje conserve recorrido en el sentido que haría
+ * falta. El tope de verdad (Deportes a 1 s) lo sigue comprobando el CASO 2.
  */
-test('ABIERTO · el aviso de «límite» del modo compensado no sale con la exposición correcta', async ({
+test('REGRESIÓN 2403 · el aviso de «límite» del modo compensado no sale con la exposición correcta', async ({
   page,
 }) => {
-  test.fail();
   await elegirModo(page, 'compensado');
   await mover(page, 'ap-slider', 4);
   await expect(rotulo(page, 'ap-slider')).toHaveText('f/5,6');
@@ -1025,21 +1036,42 @@ test('ABIERTO · el aviso de «límite» del modo compensado no sale con la expo
     page.getByText('El modo compensado ha llegado al límite'),
     'ISO 800 tiene recorrido y el medidor dice «Exposición correcta»: el aviso de tope es falso',
   ).toHaveCount(0);
+
+  // El segundo ejemplo del acta: Paisaje f/11 → f/22 (el caso 5 de aula), +0,059 EV
+  await elegirEscena(page, 'Paisaje');
+  await mover(page, 'ap-slider', 8);
+  await expect(rotulo(page, 'ap-slider')).toHaveText('f/22');
+  await expect(rotulo(page, 'sh-slider')).toHaveText('1/60 s');
+  await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 100');
+  expect(await evDelMarcador(page)).toBeCloseTo(0.058894, 3);
+  await expect(page.getByText('El modo compensado ha llegado al límite')).toHaveCount(0);
+
+  // Control del otro lado: pasar a compensado con una exposición YA desviada en modo libre.
+  // Retrato con f/8 a 1/125 s = −3,03 EV; nadie ha compensado todavía y los tres ejes tienen
+  // recorrido hacia «más luz», así que decir que se ha llegado al límite sería falso.
+  await elegirEscena(page, 'Retrato');
+  await elegirModo(page, 'libre');
+  await mover(page, 'ap-slider', 5);
+  await expect(exposicion(page)).toContainText('(-3,0 EV)');
+  await elegirModo(page, 'compensado');
+  await expect(page.getByText('El modo compensado ha llegado al límite')).toHaveCount(0);
 });
 
 /**
- * ABIERTO (medio, contenido) · la sección dice «Puedes comprobar cada resultado moviendo los
- * deslizadores del simulador de arriba», y en los casos 9 y 10 hacerlo SUSPENDE. Es la forma
- * del hallazgo 1209 (simulador-movimiento-circular), cuya reparación no llegó a esta copia.
+ * HALLAZGO 2404 (medio, contenido) · REPARADO el 29/09/2026. La sección decía «Puedes comprobar
+ * cada resultado moviendo los deslizadores del simulador de arriba», y en los casos 9 y 10
+ * hacerlo SUSPENDÍA. Es la forma del hallazgo 1209 (simulador-movimiento-circular), cuya
+ * reparación no llegó a esta copia.
  *   Paisaje (ISO 100 · f/11 · 1/250 s), modo libre: f/8 → +0,9 EV; f/11 → +0,0 EV. El
  *   medidor rotula con UNA decimal, así que el salto f/8 → f/11 se lee −0,9, y el caso 9 pide
  *   −0,92 con tolerancia 0,01: «−0,9» → desviación 0,02 → «No es correcto».
- * El test acepta las dos salidas honestas: que la promesa desaparezca o que se cumpla.
+ * El test acepta las dos salidas honestas: que la promesa desaparezca o que se cumpla. Se eligió
+ * la primera, como en el 1209: los casos 9 y 10 existen para enseñar la segunda decimal que el
+ * medidor no enseña, y aceptar −0,9 los vaciaría.
  */
-test('ABIERTO · si la sección promete comprobar con los deslizadores, el caso 9 lo admite', async ({
+test('REGRESIÓN 2404 · si la sección promete comprobar con los deslizadores, el caso 9 lo admite', async ({
   page,
 }) => {
-  test.fail();
   const intro = (await page.locator('p[class*="casosIntro"]').textContent()) ?? '';
   const promete = /comprobar cada resultado moviendo los deslizadores/i.test(intro);
 
@@ -1055,10 +1087,13 @@ test('ABIERTO · si la sección promete comprobar con los deslizadores, el caso 
     !promete || veredicto.includes('¡Correcto!'),
     `la sección promete comprobar con los deslizadores y el −0,9 que dan se corrige: «${veredicto}»`,
   ).toBe(true);
+  // Y lo que dice ahora: que el medidor va con una decimal y los casos se corrigen al exacto
+  expect(intro).toMatch(/una sola decimal/);
 });
 
 /**
- * ABIERTO (bajo, cálculo) · el aviso del SIGNO decide por el ruido binario en el borde, la
+ * HALLAZGO 2407 (bajo, cálculo) · REPARADO el 29/09/2026: el margen RUIDO_BINARIO pasa a ser de
+ * módulo y lo usan las dos ramas. Antes: el aviso del SIGNO decidía por el ruido binario en el borde, la
  * forma del 1211 en la rama que su reparación no tocó (`Math.abs(usuario + esperado) <=
  * tolerancia`, sin el margen de 1e-9). Caso 9, tolerancia 0,01:
  *   «−0,93» → |−0,93 − (−0,92)| = 0,01 → ¡Correcto! (con margen)
@@ -1066,65 +1101,102 @@ test('ABIERTO · si la sección promete comprobar con los deslizadores, el caso 
  *   «0,93»  → |0,93 + (−0,92)| = 0,010000000000000009 > 0,01 → «Te has desviado 1,85»
  * La misma desviación que con el signo bueno se acepta, con el signo malo pierde la pista.
  */
-test('ABIERTO · el mensaje del signo cubre el mismo borde que la respuesta correcta (caso 9)', async ({
+test('REGRESIÓN 2407 · el mensaje del signo cubre el mismo borde que la respuesta correcta (caso 9)', async ({
   page,
 }) => {
-  test.fail();
   await irACaso(page, 9);
   expect(await responderAula(page, '0,92')).toContain('el signo va al revés');
   expect(await responderAula(page, '-0,93')).toContain('¡Correcto!');
   expect(await responderAula(page, '0,93')).toContain('el signo va al revés');
+  expect(await responderAula(page, '0,91')).toContain('el signo va al revés');
+  // Control: una desviación de verdad con el signo malo sigue sin la pista del signo
+  expect(await responderAula(page, '0,94')).toContain('Te has desviado');
 });
 
 /**
- * ABIERTO (bajo, cálculo) · sospecha S1 (27/09/2026), en su forma de ESCALA DISCRETA. La
- * respuesta de ISO, velocidad y diafragma es un valor de la escala de la cámara, pero se corrige
- * con el 1 % relativo: en el caso 11 (ISO 100, tolerancia 1) pasan «101», «99» y «100,5»,
- * ninguno un ISO que exista; en el caso 4 (1/500, tolerancia 5) pasan de «495» a «505» y
- * «500,5»; en el 5 (ISO 400) «404» y «400,4». Aquí, a diferencia de simulador-arboles-bst-avl,
- * sí cuela el ENTERO VECINO. Esperado: solo el valor de la escala.
+ * HALLAZGO 2408 (bajo, cálculo) · REPARADO el 29/09/2026. Sospecha S1 (27/09/2026), en su forma
+ * de ESCALA DISCRETA. La respuesta de ISO, velocidad y diafragma es un valor de la escala de la
+ * cámara, pero se corregía con el 1 % relativo: en el caso 11 (ISO 100, tolerancia 1) pasaban
+ * «101», «99» y «100,5», ninguno un ISO que exista; en el caso 4 (1/500, tolerancia 5) pasaban
+ * de «495» a «505» y «500,5»; en el 5 (ISO 400) «404» y «400,4». Aquí, a diferencia de
+ * simulador-arboles-bst-avl, sí colaba el ENTERO VECINO.
+ *
+ * REGLA ESCRITA (casos.ts, `comprobarRespuesta`): un puesto de la escala se corrige por
+ * IGUALDAD. Vale el rótulo y, solo en la velocidad, también el valor exacto que el rótulo
+ * redondea (1/128 ↔ 1/125, 1/512 ↔ 1/500): el mismo puesto del dial sin redondear. Eso cierra
+ * la sospecha anotada del modo práctica: quien aplica «×2 en t = 1 paso», 1/8·2⁴ = 1/128,
+ * recibía «desviado 3» porque la escala da 1/125; ahora se le da por bueno con la aclaración.
+ * El «esperado» del acta («solo el valor de la escala») se amplía en ese punto, con esa razón.
  */
-test('ABIERTO · un ISO que no existe en la escala no se da por bueno (caso 11)', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN 2408 · un valor que no existe en la escala no se da por bueno (casos 11, 4 y 5)', async ({
+  page,
+}) => {
   await irACaso(page, 11);
   expect(await responderAula(page, '100')).toContain('¡Correcto!');
   expect(await responderAula(page, '102')).toContain('No es correcto');
-  expect(await responderAula(page, '101'), 'ISO 101 no está en la escala').not.toContain('¡Correcto!');
+  expect(await responderAula(page, '101'), 'ISO 101 no está en la escala').toContain('no existe en la escala');
+  expect(await responderAula(page, '99'), 'ISO 99 no está en la escala').not.toContain('¡Correcto!');
   expect(await responderAula(page, '100,5'), 'ISO 100,5 no está en la escala').not.toContain('¡Correcto!');
+  // Un puesto que SÍ existe pero no compensa se dice distinto
+  expect(await responderAula(page, '200')).toContain('está en la escala, pero no conserva la exposición');
+
+  await irACaso(page, 4);
+  expect(await responderAula(page, '500')).toContain('¡Correcto!');
+  for (const r of ['495', '505', '500,5']) {
+    expect(await responderAula(page, r), `1/${r} s no está en la escala`).not.toContain('¡Correcto!');
+  }
+
+  await irACaso(page, 5);
+  expect(await responderAula(page, '400')).toContain('¡Correcto!');
+  for (const r of ['404', '400,4']) {
+    expect(await responderAula(page, r), `ISO ${r} no está en la escala`).not.toContain('¡Correcto!');
+  }
+
+  // El diafragma no admite la serie real (potencias de √2, sin forma exacta): solo el rótulo
+  await irACaso(page, 12);
+  expect(await responderAula(page, '2,8')).toContain('¡Correcto!');
+  expect(await responderAula(page, '2,83')).not.toContain('¡Correcto!');
 });
 
 /**
- * ABIERTO (bajo, operativa) · el signo menos tipográfico (U+2212) se rechaza como «no es un
- * número». La etiqueta del propio campo lo escribe así («− menos luz»), CasosAula.tsx dice en su
- * comentario que parseSpanishNumber «admite −0,92», y el veredicto contesta «puedes usar … el
- * signo menos» a quien acaba de usarlo. Caso 1: «−2» (U+2212) → esperado ¡Correcto!, como «-2».
+ * HALLAZGO 2409 (bajo, operativa) · REPARADO el 29/09/2026 en la raíz: `parseSpanishNumber`
+ * (lib/formatters.ts) acepta el signo menos tipográfico U+2212 desde d5f22541. Antes se
+ * rechazaba como «no es un número», aunque la etiqueta del propio campo lo escribe así
+ * («− menos luz»), CasosAula.tsx decía en su comentario que parseSpanishNumber «admite −0,92»
+ * —ahora es verdad—, y el veredicto contestaba «puedes usar … el signo menos» a quien acababa
+ * de usarlo. Caso 1: «−2» (U+2212) → ¡Correcto!, como «-2». Caso 9: «−0,92» → ¡Correcto!.
  */
-test('ABIERTO · el signo menos que escribe la etiqueta se acepta al responder (caso 1)', async ({
+test('REGRESIÓN 2409 · el signo menos que escribe la etiqueta se acepta al responder (casos 1 y 9)', async ({
   page,
 }) => {
-  test.fail();
   await irACaso(page, 1);
   await expect(page.locator('label[for="casos-respuesta"]')).toContainText('− menos luz');
   expect(await responderAula(page, '-2')).toContain('¡Correcto!');
   expect(await responderAula(page, '−2')).toContain('¡Correcto!');
+  await irACaso(page, 9);
+  expect(await responderAula(page, '−0,92')).toContain('¡Correcto!');
+  // Y el signo invertido se sigue detectando al revés: «0,92» sin menos
+  expect(await responderAula(page, '0,92')).toContain('el signo va al revés');
 });
 
 /**
- * ABIERTO (bajo, contenido) · en el modo práctica la solución afirma «Comprobación: sumando los
+ * HALLAZGO 2410 (bajo, contenido) · REPARADO el 29/09/2026: la línea de comprobación da la suma
+ * real (la `desviacion` de `resolverCaso`) y, cuando no es cero, explica por qué. Antes: en el
+ * modo práctica la solución afirmaba «Comprobación: sumando los
  * tres ejes, ΔEV = 0,00» cuando la suma con los números de la cámara no es cero. El generador
  * elige los datos dentro de una familia exacta, pero la RESPUESTA puede caer fuera: en las
  * semillas 1-20.000, 1.451 de 7.720 compensaciones (18,8 %) dejan ±0,03 EV — lo mismo que los
  * casos 9 y 10 enseñan a calcular.
  *   Semilla 22 (Date.now() = 22): ISO 1600 · f/8 · 1/8 s, diafragma a f/2, ¿velocidad?
  *     2·log₂(8/2) = +4 · la app responde 1/125 s: log₂(8/125) = −3,965784 → suma +0,034216 = +0,03
- *     (y «128», que es 8·2⁴ aplicando «×2 en t = 1 paso», se corrige «Te has desviado 3»)
+ *     (y «128», que es 8·2⁴ aplicando «×2 en t = 1 paso», se corregía «Te has desviado 3»;
+ *     desde la regla del 2408 se acepta, porque 1/128 es el valor exacto del rótulo 1/125)
  * El test lee el ejercicio que salga con esa semilla y rehace la suma con la fórmula, así que
  * sirve igual si la reparación cambia el generador.
  */
-test('ABIERTO · la comprobación de la solución de práctica cuadra con la suma de los tres ejes', async ({
+test('REGRESIÓN 2410 · la comprobación de la solución de práctica cuadra con la suma de los tres ejes', async ({
   page,
 }) => {
-  test.fail();
   await page.clock.setFixedTime(new Date(22));
   await page.goto(RUTA);
   await esperarHidratacion(page, [...DESLIZADORES, '#casos-respuesta']);
@@ -1157,10 +1229,38 @@ test('ABIERTO · la comprobación de la solución de práctica cuadra con la sum
     parseSpanishNumber(cifra),
     `«${comprobacion}» · ${enunciado} · respuesta ${respuesta} · suma real ${suma.toFixed(6)}`,
   ).toBeCloseTo(suma, 2);
+
+  // La semilla 22 es la del acta: 1/125 s, suma +0,03, y la sospecha anotada del 2408 —quien
+  // aplica «×2 en t = 1 paso» llega a 1/8·2⁴ = 1/128— se da por buena con su aclaración.
+  expect(respuesta).toBe('1/125 s');
+  expect(comprobacion).toContain('ΔEV = +0,03');
+  expect(await responderAula(page, '125')).toContain('¡Correcto!');
+  expect(await responderAula(page, '128')).toContain('1/128 s es el valor exacto; la cámara lo rotula 1/125 s');
+});
+
+test('REGRESIÓN 2410 · en 2.000 semillas, la comprobación de práctica es la suma real de los tres ejes', async () => {
+  let fueraDeCero = 0;
+  for (let s = 1; s <= 2000; s++) {
+    const ej = generarEjercicioAleatorio(s);
+    const linea = ej.pasos.find((p) => p.startsWith('Comprobación'));
+    if (!linea) continue; // pregunta de ΔEV: no hay compensación que comprobar
+    const d = ej.datos;
+    const iso1 = d.pregunta === 'iso' ? ej.respuesta : (d.iso1 ?? d.iso0);
+    const ap1 = d.pregunta === 'apertura' ? ej.respuesta : (d.ap1 ?? d.ap0);
+    const den1 = d.pregunta === 'velocidad' ? ej.respuesta : (d.den1 ?? d.den0);
+    const suma = Math.log2(iso1 / d.iso0) + 2 * Math.log2(d.ap0 / ap1) + Math.log2(d.den0 / den1);
+    const cifra = parseSpanishNumber(linea.match(/ΔEV = ([+\-]?\d+,\d{2})\b/)![1].replace('+', ''));
+    expect(cifra, `semilla ${s}: «${linea}» y la suma real es ${suma.toFixed(6)}`).toBeCloseTo(suma, 2);
+    if (cifra !== 0) fueraDeCero++;
+  }
+  // El acta midió un 18,8 % de compensaciones con resto: tiene que haber alguna en la muestra
+  expect(fueraDeCero).toBeGreaterThan(0);
 });
 
 /**
- * ABIERTO (bajo, contenido) · la pista del caso 10 dice lo contrario de lo que pasa. La serie
+ * HALLAZGO 2411 (bajo, contenido) · REPARADO el 29/09/2026: pista y enunciado reescritos (el
+ * rótulo EXAGERA el paso; 1/60 es 1/64 y 1/125 es 1/128). Antes: la pista del caso 10 decía lo
+ * contrario de lo que pasa. La serie
  * real de velocidades es de potencias de dos: 1/60 es el rótulo de 1/64 (el propio casos.ts lo
  * dice de 1/15 = 1/16) y 1/125 el de 1/128, así que el paso REAL 1/64 → 1/128 vale
  * log₂(128/64) = 1,00 EV, MENOR que el −1,06 que dan los rótulos. «Justo al revés que en el
@@ -1168,11 +1268,13 @@ test('ABIERTO · la comprobación de la solución de práctica cuadra con la sum
  * dice «el rótulo se queda corto y el paso real es mayor», y el enunciado solo corrige 1/125
  * (= 1/128), dejando 1/60 como si fuera exacto.
  */
-test('ABIERTO · la pista del caso 10 no presenta el paso real como mayor que el de los rótulos', async ({
+test('REGRESIÓN 2411 · la pista del caso 10 no presenta el paso real como mayor que el de los rótulos', async ({
   page,
 }) => {
-  test.fail();
   await irACaso(page, 10);
+  // El enunciado corrige los DOS rótulos, no solo 1/125
+  await expect(page.locator('p[class*="casoEnunciado"]')).toContainText('1/60 es en realidad 1/64');
+  await expect(page.locator('p[class*="casoEnunciado"]')).toContainText('1/125 es 1/128');
   await page.getByRole('button', { name: /Ver pista/ }).click();
   const pista = (await page.locator('[class*="casoPista"]').textContent()) ?? '';
   expect(pista).toContain('log₂(60/125)');
@@ -1180,16 +1282,18 @@ test('ABIERTO · la pista del caso 10 no presenta el paso real como mayor que el
   expect(pista, 'el paso real (1/64 → 1/128) es 1,00 EV, menor que el 1,06 de los rótulos').not.toMatch(
     /paso real es mayor/,
   );
+  expect(pista).toMatch(/exagera/);
+  expect(pista).toContain('1,00 EV');
 });
 
 /**
- * ABIERTO (medio, accesibilidad) · sospecha del 28/09, MEDIDA en el navegador con el fondo
- * compuesto. El título de cada caso (h3, 17,6 px / 600: texto normal, exige 4,5:1) va en
+ * HALLAZGO 2405 (medio, accesibilidad) · REPARADO el 29/09/2026 con var(--secondary-texto).
+ * Sospecha del 28/09, MEDIDA en el navegador con el fondo
+ * compuesto. El título de cada caso (h3, 17,6 px / 600: texto normal, exige 4,5:1) iba en
  * var(--secondary) sobre el #FAFAFA de .casoCuerpo: 2,68:1 en claro (en oscuro, #5ABDB9 sobre
  * #111827, 7,95:1, bien). Existe --secondary-texto (5,15:1) para esto.
  */
-test('ABIERTO · el título del caso llega a 4,5:1 en el tema claro', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN 2405 · el título del caso llega a 4,5:1 en el tema claro', async ({ page }) => {
   await prepararParaMedir(page);
   await activarTema(page, 'dark');
   expect(await contrasteEfectivo(page.locator('h3[class*="casoTitulo"]'))).toBeGreaterThanOrEqual(4.5);
@@ -1199,29 +1303,41 @@ test('ABIERTO · el título del caso llega a 4,5:1 en el tema claro', async ({ p
 });
 
 /**
- * ABIERTO (medio, accesibilidad) · texto blanco sobre var(--primary) en los botones de la tarea:
+ * HALLAZGO 2406 (medio, accesibilidad) · REPARADO el 29/09/2026: fondos con var(--primary-boton)
+ * y texto de marca con var(--primary-texto), también en hover (que ahora se mide).
+ * Antes: texto blanco sobre var(--primary) en los botones de la tarea:
  * «Comprobar» (16 px / 600) y el botón del caso activo (15,2 px / 600). 4,11:1 en claro y 2,80:1
  * en oscuro (#3FA5D1). «Ver pista» y «Ver solución» ponen var(--primary) sobre #FAFAFA: 3,93:1 en
  * claro. Todo es texto normal (4,5:1). Existen --primary-boton (5,47:1 con blanco, igual en los
  * dos temas) y --primary-texto.
  */
-test('ABIERTO · los botones de la tarea de aula llegan a 4,5:1 en los dos temas', async ({ page }) => {
-  test.fail();
+test('REGRESIÓN 2406 · los botones de la tarea de aula llegan a 4,5:1 en los dos temas', async ({ page }) => {
   await prepararParaMedir(page);
   const medidas: string[] = [];
   let peor = Infinity;
+  const botones = [
+    ['Comprobar', 'button[class*="casoComprobar"]'],
+    ['caso activo', 'button[class*="casoBotonActivo"]'],
+    ['Ver pista', 'button[class*="casoAyudaBoton"]'],
+    ['caso inactivo', 'button[class*="casoBoton"]:not([class*="casoBotonActivo"])'],
+  ] as const;
   for (const tema of ['light', 'dark'] as const) {
     await activarTema(page, tema);
     await page.mouse.move(0, 0);
-    for (const [nombre, sel] of [
-      ['Comprobar', 'button[class*="casoComprobar"]'],
-      ['caso activo', 'button[class*="casoBotonActivo"]'],
-      ['Ver pista', 'button[class*="casoAyudaBoton"]'],
-    ] as const) {
+    for (const [nombre, sel] of botones) {
       const r = await contrasteEfectivo(page.locator(sel).first());
       medidas.push(`${tema} · ${nombre}: ${r.toFixed(2)}:1`);
       peor = Math.min(peor, r);
     }
+    // Y en hover, que es donde «Ver pista» pasaba a blanco sobre --primary
+    for (const [nombre, sel] of botones) {
+      const boton = page.locator(sel).first();
+      await boton.hover();
+      const r = await contrasteEfectivo(boton);
+      medidas.push(`${tema} · ${nombre} (hover): ${r.toFixed(2)}:1`);
+      peor = Math.min(peor, r);
+    }
+    await page.mouse.move(0, 0);
   }
   expect(peor, medidas.join(' · ')).toBeGreaterThanOrEqual(4.5);
 });

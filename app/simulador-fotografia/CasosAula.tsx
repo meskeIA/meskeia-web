@@ -60,7 +60,8 @@ export default function CasosAula() {
     // parseSpanishNumber admite «−0,92» y «-0.92»; devuelve NaN con cualquier otra cosa, y de
     // ese NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
     const valor = parseSpanishNumber(respuesta);
-    const r = comprobarRespuesta(valor, esperado);
+    // La pregunta decide la regla: ΔEV con tolerancia, y un puesto de la escala por igualdad (2408).
+    const r = comprobarRespuesta(valor, esperado, pregunta);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 
@@ -72,8 +73,20 @@ export default function CasosAula() {
         </h2>
         <p className={styles.casosIntro}>
           {TOTAL_CASOS} problemas con solución, siempre los mismos y en el mismo orden. Un
-          profesor puede decir «resuelve los casos 3, 7 y 11» y corregir sin ambigüedad. Puedes
-          comprobar cada resultado moviendo los deslizadores del simulador de arriba.
+          profesor puede decir «resuelve los casos 3, 7 y 11» y corregir sin ambigüedad.
+          {/*
+            ⚠️ 29/09/2026 (hallazgo 2404, la forma del 1209 de simulador-movimiento-circular) —
+            aquí decía «Puedes comprobar cada resultado moviendo los deslizadores del simulador de
+            arriba», y hacerlo SUSPENDÍA la respuesta correcta: el medidor rotula el EV con UNA
+            decimal y los casos 9 y 10 piden dos. En Paisaje, f/8 marca +0,9 y f/11 +0,0, así que
+            el salto se lee −0,9 donde el caso 9 pide −0,92 (tolerancia 0,01); el caso 10 da −1,1
+            frente a −1,06.
+            No se relaja el corrector para que acepte −0,9: los casos 9 y 10 existen justamente
+            para enseñar la segunda decimal que el medidor no enseña. Se repara la PROMESA.
+          */}{' '}
+          El simulador de arriba sirve para ver hacia dónde y cuánto se mueve la exposición, pero
+          su medidor rotula con una sola decimal: los casos se resuelven con la fórmula y se
+          corrigen contra el valor exacto.
         </p>
       </div>
 

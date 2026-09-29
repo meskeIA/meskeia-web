@@ -819,7 +819,7 @@
 
 .casoBoton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .casoBoton:focus-visible {
@@ -827,10 +827,12 @@
   outline-offset: 2px;
 }
 
+/* Texto blanco sobre la marca: --primary-boton (5,47:1, igual en los dos temas). Con
+   var(--primary) daba 4,11:1 en claro y 2,79:1 en oscuro (hallazgo 2406). */
 .casoBotonActivo,
 .casoBotonActivo:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -845,10 +847,12 @@
   border-radius: var(--radius);
 }
 
+/* --secondary-texto y no --secondary: el teal de marca como texto de 17,6 px daba 2,68:1 sobre
+   el #FAFAFA de .casoCuerpo (hallazgo 2405). En oscuro el token vale lo mismo que --secondary. */
 .casoTitulo {
   margin: 0 0 var(--spacing-sm);
   font-size: 1.1rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .casoEnunciado {
@@ -897,7 +901,7 @@
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
-  background: var(--primary);
+  background: var(--primary-boton);
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
@@ -939,7 +943,7 @@
   min-height: 44px;
   padding: var(--spacing-xs) var(--spacing-md);
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: transparent;
   border: 1px solid var(--primary);
   border-radius: var(--radius);
@@ -947,7 +951,8 @@
 }
 
 .casoAyudaBoton:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -995,8 +1000,8 @@
 
 [data-theme='dark'] .casoBotonActivo,
 [data-theme='dark'] .casoBotonActivo:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
