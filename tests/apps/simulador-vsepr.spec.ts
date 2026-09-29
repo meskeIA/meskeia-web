@@ -466,8 +466,9 @@ test.describe('simulador-vsepr · la sección de casos en el navegador', () => {
  * (e9af3e88), y la sospecha del `touch-action: none` del lienzo en móvil (SOSPECHAS.md, 28/09).
  *
  * Nota de lectura: desde el 26/09/2026 la tabla VSEPR y el tope X + E ≤ 6 viven en
- * `app/simulador-vsepr/motor.ts`; las referencias de línea de `page.tsx` de la cabecera son de la
- * primera inspección.
+ * `app/simulador-vsepr/motor.ts`, y desde el 29/09/2026 `asignarVertices`/`getVerticesElectronicos`
+ * en `app/simulador-vsepr/vertices.ts` (hallazgo 2415); las referencias de línea de `page.tsx` de la
+ * cabecera son de la primera inspección.
  *
  * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (electrones de valencia del átomo
  * central → pares; electrónica = X + E; molecular = solo átomos):
@@ -734,11 +735,14 @@ test.describe('simulador-vsepr · re-inspección 29/09/2026 · en móvil (390 ×
     await ponerSlider(page, 'slider-libres', 1);
     // A mano: AX₄E → bipirámide trigonal, balancín, sp³d; con el par libre en el ecuador quedan
     // 2 átomos opuestos (los polos).
+    // Ángulo REESCRITO el 29/09/2026 (sospecha confirmada): antes se fijaba «~90° y ~120°», pero
+    // el F–S–F ecuatorial del SF₄ mide 101,6° (Housecroft y Sharpe; Tolles y Gwinn, 1962): el
+    // par libre lo cierra 18°, no «casi nada». Queda con el patrón de la fila AX₃E (cota + real).
     expect(await leerResultado(page)).toEqual({
       notacion: 'AX₄E',
       geomElectronica: 'Bipirámide trigonal',
       geomMolecular: 'Balancín (sube y baja)',
-      angulo: '~90° y ~120°',
+      angulo: '<90° y <120° (SF₄: ~102° en el ecuador)',
       hibridacion: 'sp³d',
     });
     const d = await dibujo(page);
@@ -798,9 +802,9 @@ test.describe('simulador-vsepr · re-inspección 29/09/2026 · en móvil (390 ×
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════════
- * HALLAZGOS ABIERTOS de la re-inspección del 29/09/2026. Cada uno con `test.fail()`: pasa en
- * verde MIENTRAS el defecto siga ahí; cuando se repare, se quita `test.fail()` y el comentario
- * pasa a «REPARADO».
+ * HALLAZGOS de la re-inspección del 29/09/2026 — los cinco REPARADOS el 29/09/2026. Nacieron con
+ * `test.fail()`; al repararse se les quitó y se reforzaron donde el test original solo miraba
+ * medio caso (2415 contaba átomos pero no lóbulos; 2419 solo exigía que no quedara vacío).
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 test.describe('simulador-vsepr · hallazgos de la re-inspección del 29/09/2026', () => {
   test.beforeEach(async ({ page }) => {
@@ -808,54 +812,209 @@ test.describe('simulador-vsepr · hallazgos de la re-inspección del 29/09/2026'
     await esperarHidratacion(page, DESLIZADORES);
   });
 
-  // ABIERTO (operativa, medio): con X = 3 y E = 3 el lienzo pinta un OCTAEDRO de 6 átomos X y
-  // ningún lóbulo. `asignarVertices` (page.tsx), rama total === 6, solo reparte pares libres para
-  // E = 1 y E = 2; con E = 3 el conjunto queda vacío y los 6 vértices salen como enlaces. Se llega
-  // sin rebuscar: cargar SF₆ y subir «Pares libres» al máximo (el tope recorta X a 3).
-  test.fail('X = 3, E = 3 (SF₆ + pares libres al máximo): el lienzo debe pintar 3 átomos X, no 6', async ({ page }) => {
+  // REPARADO el 29/09/2026 (2415, operativa, medio): con X = 3 y E = 3 el lienzo pintaba un
+  // OCTAEDRO de 6 átomos X y ningún lóbulo: `asignarVertices`, rama total === 6, solo repartía
+  // pares libres para E = 1 y E = 2. Ahora vive en `vertices.ts` con un ORDEN de ocupación por
+  // geometría, y el lienzo dibuja lo que dicen los deslizadores: 3 X y 3 lóbulos. Los tres pares
+  // van en «mer» (dos polos opuestos + uno ecuatorial: dos repulsiones par–par a 90°, frente a
+  // tres en «fac»), así que los 3 átomos quedan en T: una pareja opuesta de átomos y una de lóbulos.
+  test('X = 3, E = 3 (SF₆ + pares libres al máximo): el lienzo pinta 3 átomos X y 3 lóbulos', async ({ page }) => {
     await cargarPreset(page, 'SF6');
     await ponerSlider(page, 'slider-libres', 3);
     await expect(ecoDeSlider(page, 'slider-enlaces')).toHaveText('3');
     await expect(page.getByText('Combinación poco común')).toBeVisible();
     const d = await dibujo(page);
-    // Esperado: tantos átomos X como pares enlazantes (3). Obtenido el 29/09/2026: 6, y 0 lóbulos.
+    // Obtenido el 29/09/2026 antes de reparar: 6 átomos y 0 lóbulos.
     expect(d.ligandos).toHaveLength(3);
+    expect(d.lobulos).toHaveLength(3);
+    expect(parejasOpuestas(d.ligandos)).toBe(1);
+    expect(parejasOpuestas(d.lobulos)).toBe(1);
+    // Y el aviso dice qué se está dibujando, sin inventar una geometría molecular.
+    await expect(page.locator('[class*="mensajePedagogico"]')).toContainText(
+      'El lienzo dibuja igualmente 3 átomos X y 3 pares libres, repartidos en un octaedro.',
+    );
   });
 
-  // ABIERTO (contenido, bajo): la ficha «Pares libres en bipirámide» dice «En geometría AX₅E
-  // variantes, los pares libres se sitúan en posiciones ECUATORIALES». AX₅E es, en la propia
-  // tabla de la app, OCTAÉDRICA (pirámide cuadrada); las variantes de la bipirámide son AX₄E,
-  // AX₃E₂ y AX₂E₃ (las de AX₅).
-  test.fail('la ficha de la bipirámide no puede atribuirle AX₅E, que la tabla da como octaédrica', async ({ page }) => {
+  // REPARADO el 29/09/2026 (2416, contenido, bajo): la ficha «Pares libres en bipirámide» decía
+  // «En geometría AX₅E variantes». AX₅E es, en la propia tabla de la app, OCTAÉDRICA (pirámide
+  // cuadrada); las variantes de la bipirámide son AX₄E, AX₃E₂ y AX₂E₃ (las de AX₅).
+  test('la ficha de la bipirámide no puede atribuirle AX₅E, que la tabla da como octaédrica', async ({ page }) => {
     expect(geometriaDe(5, 1)?.geomElectronica).toBe('Octaédrica');
+    for (const [x, e] of [[4, 1], [3, 2], [2, 3]]) {
+      expect(geometriaDe(x, e)?.geomElectronica, `${x}-${e}`).toBe('Bipirámide trigonal');
+    }
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const ficha = page.locator('[class*="tipCard"]', { hasText: 'Pares libres en bipirámide' });
     await expect(ficha).toBeVisible();
     await expect(ficha).not.toContainText('AX₅E');
+    await expect(ficha).toContainText('(AX₄E, AX₃E₂ y AX₂E₃)');
   });
 
-  // ABIERTO (dato, bajo): la fila AX₆ da como ejemplo [Co(NH₃)₆]³⁺ junto a «Hibridación: sp³d²».
-  // Es un complejo de un metal de transición —la propia app avisa en «Errores frecuentes» de no
-  // aplicarles VSEPR— y en enlace de valencia es un complejo de orbital INTERNO, d²sp³ (bajo
-  // espín, diamagnético), no sp³d² (que es el de [CoF₆]³⁻).
-  test.fail('los ejemplos de AX₆ (sp³d²) no incluyen un complejo de cobalto d²sp³', async ({ page }) => {
+  // REPARADO el 29/09/2026 (2417, dato, bajo): la fila AX₆ daba como ejemplo [Co(NH₃)₆]³⁺ junto
+  // a «Hibridación: sp³d²». Es un complejo de un metal de transición —la propia app avisa en
+  // «Errores frecuentes» de no aplicarles VSEPR— y en enlace de valencia es de orbital INTERNO,
+  // d²sp³ (bajo espín, diamagnético), no sp³d² (el de [CoF₆]³⁻). Sustituido por SiF₆²⁻, de grupo
+  // principal: Si 4 e⁻ + 2 de la carga = 6 e⁻, seis enlaces → 0 pares libres → AX₆.
+  test('los ejemplos de AX₆ (sp³d²) no incluyen un complejo de cobalto d²sp³', async ({ page }) => {
     await cargarPreset(page, 'SF6');
     expect(await filaResultado(page, 'Hibridación')).toBe('sp³d²');
     expect(await filaResultado(page, 'Ejemplos reales')).not.toContain('[Co(NH₃)₆]³⁺');
+    expect(await filaResultado(page, 'Ejemplos reales')).toBe('SF₆, PF₆⁻, SiF₆²⁻');
   });
 
-  // ABIERTO (contenido, bajo): «Pares totales» concuerda en plural con 1: «4 (3 enlazantes +
-  // 1 libres)» en el NH₃, y «1 enlazantes» con X = 1.
-  test.fail('«Pares totales» del NH₃ concuerda en singular: «1 libre»', async ({ page }) => {
+  // REPARADO el 29/09/2026 (2418, contenido, bajo): «Pares totales» concordaba en plural con 1:
+  // «4 (3 enlazantes + 1 libres)» en el NH₃. «1 enlazante» con X = 1 no llega a verse: X = 1 está
+  // fuera de la tabla y el bloque de resultado no se pinta; la concordancia es la misma función.
+  test('«Pares totales» del NH₃ concuerda en singular: «1 libre»', async ({ page }) => {
     await cargarPreset(page, 'NH3');
     expect(await filaResultado(page, 'Pares totales')).toBe('4 (3 enlazantes + 1 libre)');
+    await cargarPreset(page, 'H2O');
+    expect(await filaResultado(page, 'Pares totales')).toBe('4 (2 enlazantes + 2 libres)');
   });
 
-  // ABIERTO (accesibilidad, bajo): fuera de la tabla, el nombre accesible del lienzo se queda en
-  // «Molécula : » (notación y geometría vacías): el lector de pantalla no dice qué se dibuja.
-  test.fail('fuera de la tabla (X = 1, E = 0), el lienzo conserva un nombre accesible con contenido', async ({ page }) => {
+  // REPARADO el 29/09/2026 (2419, accesibilidad, bajo): fuera de la tabla, el nombre accesible
+  // del lienzo se quedaba en «Molécula : ». Ahora describe lo que se dibuja: átomo central,
+  // cuántos X y pares libres (concordados), la disposición y que la combinación no está en la tabla.
+  test('fuera de la tabla (X = 1, E = 0), el lienzo conserva un nombre accesible con contenido', async ({ page }) => {
     await ponerSlider(page, 'slider-enlaces', 1);
     await expect(page.getByText('Combinación poco común')).toBeVisible();
-    await expect(page.locator('svg[role="img"]')).not.toHaveAttribute('aria-label', 'Molécula : ');
+    const svg = page.locator('svg[role="img"]');
+    await expect(svg).not.toHaveAttribute('aria-label', 'Molécula : ');
+    await expect(svg).toHaveAttribute(
+      'aria-label',
+      'Átomo central C con 1 par enlazante y ningún par libre, repartidos en una sola dirección: combinación poco común, fuera de la tabla VSEPR',
+    );
+    // Y el de AX₃E₃, el otro hueco de la tabla que alcanzan los deslizadores.
+    await cargarPreset(page, 'SF6');
+    await ponerSlider(page, 'slider-libres', 3);
+    await expect(svg).toHaveAttribute(
+      'aria-label',
+      'Átomo central S con 3 pares enlazantes y 3 pares libres, repartidos en un octaedro: combinación poco común, fuera de la tabla VSEPR',
+    );
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * TESTIGO DE 2415 — TODAS las combinaciones que alcanzan los deslizadores (29/09/2026).
+ *
+ * El defecto vivía en una rama que solo contemplaba algunos valores de E; el testigo no mira la
+ * combinación de la ficha, sino el espacio entero: X de 1 a 6, E de 0 a 3, X + E ≤ 6 (el tope de
+ * `aplicarCambioEnlaces` / `aplicarCambioLibres`) → 18 combinaciones: 13 en la tabla y 5 fuera
+ * (X = 1 con E = 0…3, y 3-3). La invariante: el dibujo tiene EXACTAMENTE X átomos y E lóbulos.
+ * Primero contra `vertices.ts` (rápido, y con la colocación de cada familia); después en el
+ * navegador, moviendo los deslizadores de verdad.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+import { asignarVertices } from '../../app/simulador-vsepr/vertices';
+import { MIN_ENLACES, MAX_ENLACES, MIN_LIBRES, MAX_LIBRES, MAX_PARES } from '../../app/simulador-vsepr/motor';
+
+/** Las combinaciones que admiten los deslizadores, en el orden X, E. */
+function combinacionesAlcanzables(): Array<[number, number]> {
+  const lista: Array<[number, number]> = [];
+  for (let x = MIN_ENLACES; x <= MAX_ENLACES; x++) {
+    for (let e = MIN_LIBRES; e <= MAX_LIBRES; e++) if (x + e <= MAX_PARES) lista.push([x, e]);
+  }
+  return lista;
+}
+
+interface Dir3 {
+  x: number;
+  y: number;
+  z: number;
+}
+
+/** Cuántas parejas de direcciones 3D son opuestas (180° entre ellas). */
+function parejasOpuestas3(ps: Dir3[]): number {
+  let n = 0;
+  for (let i = 0; i < ps.length; i++) {
+    for (let j = i + 1; j < ps.length; j++) {
+      const a = ps[i];
+      const b = ps[j];
+      if (Math.abs(a.x + b.x) < 1e-9 && Math.abs(a.y + b.y) < 1e-9 && Math.abs(a.z + b.z) < 1e-9) n++;
+    }
+  }
+  return n;
+}
+
+test.describe('simulador-vsepr · testigo 2415: el dibujo cuadra con los deslizadores en todas las combinaciones', () => {
+  test('el espacio es el esperado: 18 combinaciones, 5 fuera de la tabla', () => {
+    const todas = combinacionesAlcanzables();
+    expect(todas).toHaveLength(18);
+    const fuera = todas.filter(([x, e]) => geometriaDe(x, e) === null).map(([x, e]) => `${x}-${e}`);
+    // Contado a mano: X = 1 con E = 0…3 (4) y X = 3 con E = 3.
+    expect(fuera).toEqual(['1-0', '1-1', '1-2', '1-3', '3-3']);
+  });
+
+  test('vertices.ts: X enlaces y E libres exactos, en direcciones distintas, en todas', () => {
+    for (const [x, e] of combinacionesAlcanzables()) {
+      const v = asignarVertices(x, e);
+      const clave = `X=${x}, E=${e}`;
+      expect(v, clave).toHaveLength(x + e);
+      expect(v.filter((p) => p.tipo === 'enlace'), clave).toHaveLength(x);
+      expect(v.filter((p) => p.tipo === 'libre'), clave).toHaveLength(e);
+      const huellas = new Set(v.map((p) => `${p.x.toFixed(6)},${p.y.toFixed(6)},${p.z.toFixed(6)}`));
+      expect(huellas.size, `${clave}: dos dominios en la misma dirección`).toBe(x + e);
+    }
+  });
+
+  test('vertices.ts: la colocación de los pares libres en la bipirámide y el octaedro', () => {
+    const libres = (x: number, e: number) => asignarVertices(x, e).filter((p) => p.tipo === 'libre');
+    const enlaces = (x: number, e: number) => asignarVertices(x, e).filter((p) => p.tipo === 'enlace');
+    // Bipirámide: los pares libres, SIEMPRE en el ecuador (z = 0).
+    for (const [x, e] of [[4, 1], [3, 2], [2, 3]] as const) {
+      for (const p of libres(x, e)) expect(Math.abs(p.z), `${x}-${e}`).toBeLessThan(1e-9);
+    }
+    // AX₂E₃: los 2 átomos en los polos, opuestos (lineal).
+    expect(parejasOpuestas3(enlaces(2, 3))).toBe(1);
+    // Octaedro: AX₅E con el par en un polo; AX₄E₂ con los pares opuestos (cuadrada plana)…
+    expect(parejasOpuestas3(enlaces(5, 1))).toBe(2);
+    expect(parejasOpuestas3(libres(4, 2))).toBe(1);
+    expect(parejasOpuestas3(enlaces(4, 2))).toBe(2);
+    // …y AX₃E₃ en «mer»: una pareja opuesta de pares y una de átomos (forma de T).
+    expect(parejasOpuestas3(libres(3, 3))).toBe(1);
+    expect(parejasOpuestas3(enlaces(3, 3))).toBe(1);
+    // Fuera de rango, nada que dibujar (y sin lanzar).
+    expect(asignarVertices(0, 0)).toEqual([]);
+    expect(asignarVertices(6, 1)).toEqual([]);
+  });
+
+  test('en el navegador: moviendo los deslizadores a las 18, el lienzo pinta X átomos y E lóbulos', async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, DESLIZADORES);
+    const svg = page.locator('svg[role="img"]');
+    // Estado inicial de la app: X = 4, E = 0.
+    let x0 = 4;
+    let e0 = 0;
+    for (const [x, e] of combinacionesAlcanzables()) {
+      const clave = `X=${x}, E=${e}`;
+      // Sin chocar con el tope: si E cambia, primero a 0; luego X; luego E. Así ningún paso
+      // supera X + E = 6 y el tope no recorta el otro deslizador por detrás del test.
+      if (e0 !== e && e0 !== 0) {
+        await ponerSlider(page, 'slider-libres', 0);
+        e0 = 0;
+      }
+      if (x0 !== x) {
+        await ponerSlider(page, 'slider-enlaces', x);
+        x0 = x;
+      }
+      if (e0 !== e) {
+        await ponerSlider(page, 'slider-libres', e);
+        e0 = e;
+      }
+      await expect(ecoDeSlider(page, 'slider-enlaces'), clave).toHaveText(String(x));
+      await expect(ecoDeSlider(page, 'slider-libres'), clave).toHaveText(String(e));
+      const d = await dibujo(page);
+      expect(d.ligandos, `${clave}: átomos dibujados`).toHaveLength(x);
+      expect(d.lobulos, `${clave}: lóbulos dibujados`).toHaveLength(e);
+      // El nombre accesible nunca queda vacío (2419), dentro o fuera de la tabla.
+      const nombre = (await svg.getAttribute('aria-label')) ?? '';
+      expect(nombre, clave).not.toMatch(/^Molécula\s*:|:\s*$/);
+      const geo = geometriaDe(x, e);
+      if (geo === null) {
+        await expect(page.getByText('Combinación poco común'), clave).toBeVisible();
+      } else {
+        expect(nombre, clave).toBe(`Molécula ${geo.notacion}: ${geo.geomMolecular}`);
+      }
+    }
   });
 });

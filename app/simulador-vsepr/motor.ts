@@ -9,6 +9,8 @@
  * Qué hay aquí, MOVIDO de `page.tsx` el 26/09/2026 sin tocar un valor:
  *   - `TABLA_VSEPR` y `GeometriaInfo`: la geometría de cada combinación X-E.
  *   - `ATOMOS` y `MOLECULAS_PRESET`: los átomos centrales y las «moléculas famosas».
+ * Valores corregidos después, con su fuente al lado: los ejemplos de AX₆ y el ángulo de AX₄E
+ * (29/09/2026, hallazgo 2417 y sospecha del ángulo ecuatorial del SF₄).
  * Y EXTRAÍDO de los manejadores `handleEnlaces` / `handleLibres`:
  *   - `aplicarCambioEnlaces` / `aplicarCambioLibres`: el tope X + E ≤ 6 de los deslizadores.
  *
@@ -133,7 +135,10 @@ export const TABLA_VSEPR: Record<string, GeometriaInfo> = {
     notacion: 'AX₄E',
     geomElectronica: 'Bipirámide trigonal',
     geomMolecular: 'Balancín (sube y baja)',
-    anguloIdeal: '~90° y ~120°',
+    // Antes «~90° y ~120°»: el «~» prometía casi 120° y el F–S–F ecuatorial del SF₄ mide 101,6°
+    // (Housecroft y Sharpe, Inorganic Chemistry; microondas, Tolles y Gwinn 1962). Corregido el
+    // 29/09/2026 con el patrón de la fila AX₃E: cota ideal y valor real entre paréntesis.
+    anguloIdeal: '<90° y <120° (SF₄: ~102° en el ecuador)',
     hibridacion: 'sp³d',
     ejemplos: 'SF₄, IF₄⁺, IO₂F₂⁻',
   },
@@ -159,7 +164,11 @@ export const TABLA_VSEPR: Record<string, GeometriaInfo> = {
     geomMolecular: 'Octaédrica',
     anguloIdeal: '90°',
     hibridacion: 'sp³d²',
-    ejemplos: 'SF₆, PF₆⁻, [Co(NH₃)₆]³⁺',
+    // Sin complejos de metales de transición (hallazgo 2417): el [Co(NH₃)₆]³⁺ que estaba aquí es,
+    // en enlace de valencia, de orbital interno d²sp³ (bajo espín), no sp³d², y la propia guía
+    // avisa de no aplicar VSEPR a esos complejos. SiF₆²⁻: Si 4 e⁻ + 2 de la carga = 6, seis
+    // enlaces → 0 pares libres, AX₆.
+    ejemplos: 'SF₆, PF₆⁻, SiF₆²⁻',
   },
   '5-1': {
     notacion: 'AX₅E',

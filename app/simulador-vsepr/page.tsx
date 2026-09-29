@@ -24,137 +24,29 @@ import {
   type GeometriaInfo,
   type MoleculaPreset,
 } from './motor';
+// Los vértices del lienzo (qué dirección es átomo X y cuál par libre) viven en vertices.ts,
+// para que un test barra todas las combinaciones de los deslizadores (hallazgo 2415).
+import { asignarVertices, type Vec3 } from './vertices';
 import CasosAula from './CasosAula';
-
-// ============================================
-// TIPOS
-// ============================================
-interface Vec3 {
-  x: number;
-  y: number;
-  z: number;
-}
-
-interface Vertice extends Vec3 {
-  tipo: 'enlace' | 'libre';
-  indice: number;
-}
 
 // ============================================
 // DATOS
 // ============================================
 const COLOR_LIGANDO = '#7FB3D3'; // azul claro estándar para ligando genérico
 
-// ============================================
-// VÉRTICES POR GEOMETRÍA ELECTRÓNICA
-// ============================================
-function getVerticesElectronicos(total: number): Vec3[] {
-  switch (total) {
-    case 1:
-      return [{ x: 1, y: 0, z: 0 }];
-    case 2:
-      // Lineal
-      return [
-        { x: 1, y: 0, z: 0 },
-        { x: -1, y: 0, z: 0 },
-      ];
-    case 3: {
-      // Trigonal plana — 120° en plano xy
-      const verts: Vec3[] = [];
-      for (let i = 0; i < 3; i++) {
-        const ang = (i * 2 * Math.PI) / 3;
-        verts.push({ x: Math.cos(ang), y: Math.sin(ang), z: 0 });
-      }
-      return verts;
-    }
-    case 4: {
-      // Tetraédrica — 4 vértices del tetraedro normalizados
-      const k = 1 / Math.sqrt(3);
-      return [
-        { x: k, y: k, z: k },
-        { x: -k, y: -k, z: k },
-        { x: -k, y: k, z: -k },
-        { x: k, y: -k, z: -k },
-      ];
-    }
-    case 5: {
-      // Bipirámide trigonal: 3 ecuatoriales (120° en xy) + 2 axiales (±z)
-      const verts: Vec3[] = [];
-      for (let i = 0; i < 3; i++) {
-        const ang = (i * 2 * Math.PI) / 3;
-        verts.push({ x: Math.cos(ang), y: Math.sin(ang), z: 0 });
-      }
-      verts.push({ x: 0, y: 0, z: 1 });
-      verts.push({ x: 0, y: 0, z: -1 });
-      return verts;
-    }
-    case 6:
-      // Octaédrica: ±x, ±y, ±z
-      return [
-        { x: 1, y: 0, z: 0 },
-        { x: -1, y: 0, z: 0 },
-        { x: 0, y: 1, z: 0 },
-        { x: 0, y: -1, z: 0 },
-        { x: 0, y: 0, z: 1 },
-        { x: 0, y: 0, z: -1 },
-      ];
-    default:
-      return [];
-  }
-}
+/** Cómo reparte el lienzo N dominios: la disposición de `getVerticesElectronicos` en palabras. */
+const DISPOSICION_POR_TOTAL: Readonly<Record<number, string>> = {
+  1: 'en una sola dirección',
+  2: 'en línea recta',
+  3: 'en un triángulo plano',
+  4: 'en un tetraedro',
+  5: 'en una bipirámide trigonal',
+  6: 'en un octaedro',
+};
 
-// ============================================
-// LÓGICA: asignar pares libres a posiciones óptimas
-// ============================================
-function asignarVertices(enlaces: number, libres: number): Vertice[] {
-  const total = enlaces + libres;
-  const posiciones = getVerticesElectronicos(total);
-  if (posiciones.length === 0) return [];
-
-  // Estrategia VSEPR: pares libres prefieren posiciones ecuatoriales en bipirámide
-  // Para tetraédrica, octaédrica y otras, asignamos los últimos índices a libres
-  const vertices: Vertice[] = [];
-
-  if (total === 5) {
-    // Bipirámide trigonal: ecuatoriales (índices 0,1,2) primero para libres
-    const ordenLibres = [0, 1, 2, 3, 4];
-    const indicesLibres = new Set<number>(ordenLibres.slice(0, libres));
-    posiciones.forEach((p, i) => {
-      vertices.push({
-        ...p,
-        tipo: indicesLibres.has(i) ? 'libre' : 'enlace',
-        indice: i,
-      });
-    });
-  } else if (total === 6) {
-    // Octaédrica: pares libres en posiciones opuestas (cuadrada plana AX4E2: ±z)
-    let indicesLibres: Set<number>;
-    if (libres === 1) {
-      indicesLibres = new Set([5]); // un eje z
-    } else if (libres === 2) {
-      indicesLibres = new Set([4, 5]); // ±z (queda cuadrada plana)
-    } else {
-      indicesLibres = new Set();
-    }
-    posiciones.forEach((p, i) => {
-      vertices.push({
-        ...p,
-        tipo: indicesLibres.has(i) ? 'libre' : 'enlace',
-        indice: i,
-      });
-    });
-  } else {
-    // Caso general: últimos índices son libres
-    posiciones.forEach((p, i) => {
-      vertices.push({
-        ...p,
-        tipo: i >= enlaces ? 'libre' : 'enlace',
-        indice: i,
-      });
-    });
-  }
-
-  return vertices;
+/** «1 libre» / «2 libres»: la cifra con el sustantivo concordado (hallazgo 2418). */
+function contarPares(n: number, singular: string, plural: string): string {
+  return `${n} ${n === 1 ? singular : plural}`;
 }
 
 // ============================================
@@ -310,6 +202,15 @@ export default function SimuladorVseprPage() {
     return base * factor;
   }
 
+  // Nombre accesible del lienzo. Dentro de la tabla, notación y geometría molecular; fuera de ella
+  // (X = 1, o X = 3 con E = 3) no hay notación que dar, así que se describe lo que SÍ se dibuja:
+  // cuántos átomos X y pares libres, y en qué disposición (hallazgo 2419: quedaba «Molécula : »).
+  const descripcionLienzo = geometriaInfo
+    ? `Molécula ${geometriaInfo.notacion}: ${geometriaInfo.geomMolecular}`
+    : `Átomo central ${atomoInfo.simbolo} con ${contarPares(enlaces, 'par enlazante', 'pares enlazantes')} y ${
+        libres === 0 ? 'ningún par libre' : contarPares(libres, 'par libre', 'pares libres')
+      }, repartidos ${DISPOSICION_POR_TOTAL[totalPares] ?? 'sin disposición definida'}: combinación poco común, fuera de la tabla VSEPR`;
+
   const relatedApps = getRelatedApps('simulador-vsepr');
 
   return (
@@ -443,9 +344,7 @@ export default function SimuladorVseprPage() {
               onPointerUp={onPointerUp}
               onPointerCancel={onPointerUp}
               role="img"
-              aria-label={`Molécula ${geometriaInfo?.notacion ?? ''}: ${
-                geometriaInfo?.geomMolecular ?? ''
-              }`}
+              aria-label={descripcionLienzo}
             >
               {/* Enlaces (líneas detrás del átomo central) */}
               {verticesProyectados.map(({ vertice, rotado }) => {
@@ -585,7 +484,8 @@ export default function SimuladorVseprPage() {
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>Pares totales</span>
               <span className={styles.resultValue}>
-                {totalPares} ({enlaces} enlazantes + {libres} libres)
+                {totalPares} ({contarPares(enlaces, 'enlazante', 'enlazantes')} +{' '}
+                {contarPares(libres, 'libre', 'libres')})
               </span>
             </div>
             <div className={styles.resultRow}>
@@ -615,8 +515,11 @@ export default function SimuladorVseprPage() {
           <section className={styles.mensajePedagogico}>
             <strong>Combinación poco común</strong>
             La combinación X={enlaces} y E={libres} no corresponde a una geometría VSEPR estándar de
-            la tabla de referencia. Prueba con otros valores: por ejemplo, X=4 y E=0 (CH₄
-            tetraédrico) o X=2 y E=2 (H₂O angular).
+            la tabla de referencia. El lienzo dibuja igualmente{' '}
+            {contarPares(enlaces, 'átomo X', 'átomos X')}
+            {libres > 0 ? ` y ${contarPares(libres, 'par libre', 'pares libres')}` : ''}, repartidos{' '}
+            {DISPOSICION_POR_TOTAL[totalPares] ?? 'sin disposición definida'}. Prueba con otros
+            valores: por ejemplo, X=4 y E=0 (CH₄ tetraédrico) o X=2 y E=2 (H₂O angular).
           </section>
         )}
 
@@ -823,8 +726,10 @@ export default function SimuladorVseprPage() {
               <div className={styles.stepContent}>
                 <strong>Ajusta los ángulos según pares libres</strong>
                 <p>
-                  Cada par libre comprime ligeramente los ángulos respecto al valor ideal (efecto
-                  típico de 1-3° por par libre).
+                  Cada par libre comprime los ángulos respecto al valor ideal. En la familia
+                  tetraédrica son pocos grados (NH₃: ~107°; H₂O: ~104,5°, frente a 109,5°), pero no
+                  es una regla fija: en el SF₄, con un solo par libre, el ángulo F–S–F ecuatorial
+                  baja de 120° a ~102°.
                 </p>
               </div>
             </div>
@@ -863,8 +768,9 @@ export default function SimuladorVseprPage() {
               <div>
                 <strong>Pares libres en bipirámide</strong>
                 <p>
-                  En geometría AX₅E variantes, los pares libres se sitúan en posiciones
-                  ECUATORIALES (no axiales) porque tienen menos repulsión.
+                  En las variantes de AX₅ con pares libres (AX₄E, AX₃E₂ y AX₂E₃), los pares libres
+                  se sitúan en posiciones ECUATORIALES (no axiales): allí solo tienen 2 vecinos a
+                  90° (en un polo tendrían 3), así que se repelen menos.
                 </p>
               </div>
             </div>
