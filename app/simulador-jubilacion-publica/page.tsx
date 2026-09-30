@@ -14,13 +14,14 @@ import {
   ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { calcularPorcentajePension } from '@/lib/calculadoras/pensionPublica';
+import { calcularPorcentajePension, mesesQueFaltanParaCien } from '@/lib/calculadoras/pensionPublica';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_PENSIONES_META,
   TABLA_EDAD_JUBILACION,
   getEdadJubilacion,
   COTIZACION_MINIMA,
+  getEscalaPorcentajePension,
   LIMITES_PENSION_2025,
   BASE_REGULADORA,
   BASES_SS_2026,
@@ -67,6 +68,8 @@ interface ResultadoPension {
   edadOrdinaria: string;
   /** Meses que aún faltan para llegar al 100 % (0 si ya se alcanzó) */
   mesesQueFaltanParaCien: number;
+  /** Meses con los que se llega al 100 % en la escala del año de jubilación (444 desde 2027) */
+  mesesParaCienTotal: number;
   porcentajeSobreMaxima: number;
   pensionMensualFinal: number;
   /** La pensión estimada queda por debajo de la mínima de referencia */
@@ -188,7 +191,8 @@ function estimarPension(baseMensualMedia: number, anosCotizados: number, anioJub
   const mesesCotizados = Math.round(anosCotizados * 12);
   // El porcentaje sale del motor compartido: tenerlo aquí duplicado es lo que permitió
   // que la app y el MCP dieran porcentajes distintos para el mismo perfil (hallazgo 1093).
-  const porcentajeAplicable = calcularPorcentajePension(mesesCotizados);
+  // La escala es la del AÑO DE JUBILACIÓN: cambia el 01/01/2027 (DT 9.ª LGSS, semilla S0163).
+  const porcentajeAplicable = calcularPorcentajePension(mesesCotizados, anioJubilacion);
 
   const brClasica = baseMensualMedia * BASE_REGULADORA.factor;
   const topeClasica = aplicarTopeMaximo(brClasica * (porcentajeAplicable / 100));
@@ -217,7 +221,8 @@ function estimarPension(baseMensualMedia: number, anosCotizados: number, anioJub
     diferenciaMensual: Math.abs(topeClasica.pension - topeDual.pension),
     porcentajeAplicable,
     edadOrdinaria: calcularEdadOrdinaria(mesesCotizados, anioJubilacion),
-    mesesQueFaltanParaCien: Math.max(0, COTIZACION_MINIMA.mesesParaCien - mesesCotizados),
+    mesesQueFaltanParaCien: mesesQueFaltanParaCien(mesesCotizados, anioJubilacion),
+    mesesParaCienTotal: getEscalaPorcentajePension(anioJubilacion).mesesParaCien,
     porcentajeSobreMaxima: (pensionFinal / LIMITES_PENSION_2025.maximaMensual) * 100,
     pensionMensualFinal: pensionFinal,
     bajoMinimo: pensionFinal < LIMITES_PENSION_2025.minimaSinConyuge,
@@ -634,7 +639,7 @@ export default function SimuladorJubilacionPublicaPage() {
                   <span className={styles.resultLabel}>Para llegar al 100 %</span>
                   <span className={styles.resultValue}>
                     {mesesATexto(resultadoPension.mesesQueFaltanParaCien)} más de cotización
-                    {' '}({formatNumber(COTIZACION_MINIMA.anosParaCien, 1)} años en total)
+                    {' '}({mesesATexto(resultadoPension.mesesParaCienTotal)} en total)
                   </span>
                 </div>
               )}
@@ -1019,7 +1024,7 @@ export default function SimuladorJubilacionPublicaPage() {
           <ul className={styles.faqList}>
             <li className={styles.faqItem}>
               <strong>¿Cuántos años hay que cotizar para cobrar el 100%?</strong>
-              <p>En 2026 se necesitan 36 años y 6 meses cotizados para alcanzar el 100% de la base reguladora. Los primeros 15 años dan el 50%; cada uno de los 49 meses siguientes suma un 0,21% y los 209 posteriores, un 0,19%. Este requisito ha ido subiendo escalón a escalón y en 2027 será de 37 años.</p>
+              <p>En 2026 se necesitan 36 años y 6 meses cotizados para alcanzar el 100% de la base reguladora. Los primeros 15 años dan el 50%; cada uno de los 49 meses siguientes suma un 0,21% y los 209 posteriores, un 0,19%. Este requisito ha ido subiendo escalón a escalón y desde el 1 de enero de 2027 será de 37 años: cada uno de los 248 meses siguientes a los 15 años suma un 0,19&nbsp;% y los 16 posteriores, un 0,18&nbsp;%. Por eso con 25 años cotizados el porcentaje baja del 73,78&nbsp;% al 72,80&nbsp;% para quien se jubile a partir de 2027, y el simulador aplica la escala del año en que te jubilas.</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Qué es el sistema dual de pensiones 2026?</strong>

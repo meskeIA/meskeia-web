@@ -11,7 +11,7 @@
 
 import {
   COTIZACION_MINIMA,
-  TRAMOS_PORCENTAJE_PENSION_2025,
+  getEscalaPorcentajePension,
   getEdadJubilacion,
   getCoeficienteAnticipada,
   COEFICIENTES_ANTICIPADA_INVOLUNTARIA_2025,
@@ -22,7 +22,18 @@ import {
 import { calcularPorcentajePension } from '@/lib/calculadoras/pensionPublica';
 import { formatNumber } from '@/lib/formatters';
 
-export { calcularPorcentajePension };
+/**
+ * La app modela la jubilación DEFINITIVA —la edad de la fila 2027 de la tabla—, así que la
+ * escala del porcentaje también es la de 2027, la del art. 210.1.b) LGSS. Hasta el
+ * 30/09/2026 combinaba la edad de 2027 con la escala de 2026 (semilla S0163).
+ */
+export const ANIO_ESCALA = 2027;
+const ESCALA = getEscalaPorcentajePension(ANIO_ESCALA);
+
+/** Porcentaje de la base reguladora con la escala definitiva (motor compartido). */
+export function porcentajePension(meses: number): number {
+  return calcularPorcentajePension(meses, ANIO_ESCALA);
+}
 
 /** «15 %» con espacio duro (U+00A0), regla del CLAUDE.md global §2. Recibe el porcentaje, no la fracción. */
 export function pct(valor: number, decimales: number): string {
@@ -49,11 +60,11 @@ export function aniosYMeses(mesesTotales: number): string {
 
 export const MESES_ACCESO = COTIZACION_MINIMA.mesesMinimosAcceso; // 180
 export const ANIOS_ACCESO = COTIZACION_MINIMA.anosMinimosAcceso; // 15
-export const MESES_PARA_CIEN = COTIZACION_MINIMA.mesesParaCien; // 438
-export const PCT_ACCESO = calcularPorcentajePension(MESES_ACCESO); // 50
+export const MESES_PARA_CIEN = ESCALA.mesesParaCien; // 444
+export const PCT_ACCESO = porcentajePension(MESES_ACCESO); // 50
 
 /** Los dos tramos crecientes de la escala, con lo que suma un año completo en cada uno. */
-export const TRAMOS_CRECIENTES = TRAMOS_PORCENTAJE_PENSION_2025
+export const TRAMOS_CRECIENTES = ESCALA.tramos
   .filter((t) => t.incrementoPorMes > 0)
   .map((t) => ({
     desde: t.mesesDesde,
@@ -109,9 +120,20 @@ export const EJEMPLO_ANTICIPADA = (() => {
 
 // ─── Ejemplos de carrera ──────────────────────────────────────────────────────
 
+/**
+ * «más de los» / «justo los» / «menos de los»: cómo queda una carrera frente a los meses que
+ * dan el 100 %. Con la escala de 2027, empezar a los 30 da exactamente 37 años = 444 meses,
+ * y el «más de los» fijo de antes escribía «37 años, más de los 37 años» (S0163).
+ */
+export function frenteAlCien(meses: number): string {
+  if (meses > MESES_PARA_CIEN) return 'más de los';
+  if (meses === MESES_PARA_CIEN) return 'justo los';
+  return 'menos de los';
+}
+
 /** Porcentaje con el que llega a la edad ordinaria quien empieza a cotizar a `edadInicio`. */
 export function ejemploInicio(edadInicio: number): { anios: number; meses: number; porcentaje: number } {
   const anios = Math.max(0, EDAD_ORDINARIA - edadInicio);
   const meses = anios * 12;
-  return { anios, meses, porcentaje: calcularPorcentajePension(meses) };
+  return { anios, meses, porcentaje: porcentajePension(meses) };
 }

@@ -62,7 +62,12 @@ export const EDAD_JUBILACION_2025 = {
 export const COTIZACION_MINIMA = {
   anosMinimosAcceso: 15,       // Años mínimos para tener pensión
   mesesMinimosAcceso: 180,
-  anosParaCien: 36.5,          // Años para alcanzar el 100% en 2026 (transitorio)
+  /**
+   * ⚠️ SOLO para quien se jubila en 2023-2026. Desde 2027 el 100 % exige 37 años (444
+   * meses): el dato de cada año sale de `getEscalaPorcentajePension(anio).mesesParaCien`.
+   * Se conserva porque lo publica /api/datos y una respuesta pública no se retira sin aviso.
+   */
+  anosParaCien: 36.5,
   mesesParaCien: 438,          // 180 + 49 + 209 = 438 meses (36 años y 6 meses)
 };
 
@@ -91,11 +96,88 @@ export interface TramosPorcentajePension {
   incrementoPorMes: number;     // % adicional por cada mes extra
 }
 
+/**
+ * ⚠️ Escala de 2023-2026 SOLAMENTE. Para calcular, `getEscalaPorcentajePension(anio)`:
+ * la escala depende del AÑO DE JUBILACIÓN y cambia el 01/01/2027. Se conserva con su
+ * nombre porque lo publica /api/datos.
+ */
 export const TRAMOS_PORCENTAJE_PENSION_2025: TramosPorcentajePension[] = [
   { mesesDesde: 180, mesesHasta: 180, porcentajeBase: 50,    incrementoPorMes: 0 },
   { mesesDesde: 181, mesesHasta: 229, porcentajeBase: 50,    incrementoPorMes: 0.21 },
   { mesesDesde: 230, mesesHasta: 438, porcentajeBase: 60.29, incrementoPorMes: 0.19 },
 ];
+
+// ─── Escala del porcentaje POR AÑO DE JUBILACIÓN (DT 9.ª LGSS) ──────────────
+
+/**
+ * Sello propio de la escala, separado de FISCAL_PENSIONES_META: aquel ampara también las
+ * cuantías y la revalorización de 2026, que no se reverificaron el día que se cotejó esto.
+ */
+export const ESCALA_PORCENTAJE_PENSION_META = {
+  fuente: 'LGSS (RDL 8/2015), art. 210.1.b) y DT 9.ª, texto consolidado del BOE (última actualización publicada el 31/07/2026)',
+  verificado: '2026-09-30',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2015-11724#dtnovena',
+};
+
+export interface EscalaPorcentajePension {
+  /** Primer año de jubilación al que se aplica */
+  desde: number;
+  /** Último año, inclusive. `null`: la escala definitiva del art. 210.1.b), sin fin */
+  hasta: number | null;
+  tramos: TramosPorcentajePension[];
+  /** Mes cotizado en el que se llega al 100 % */
+  mesesParaCien: number;
+}
+
+/**
+ * Construye los tramos a partir de lo que dice la norma: «por cada mes adicional de
+ * cotización entre los meses 1 y `meses1`, el `pct1` por ciento y por cada uno de los
+ * `meses2` meses siguientes, el `pct2` por ciento». Los meses adicionales cuentan a
+ * partir del 180 (los 15 años que dan el 50 %).
+ */
+function escalaDT9(desde: number, hasta: number | null, meses1: number, pct1: number, meses2: number, pct2: number): EscalaPorcentajePension {
+  const finTramo1 = 180 + meses1;
+  const finTramo2 = finTramo1 + meses2;
+  return {
+    desde,
+    hasta,
+    tramos: [
+      { mesesDesde: 180, mesesHasta: 180, porcentajeBase: 50, incrementoPorMes: 0 },
+      { mesesDesde: 181, mesesHasta: finTramo1, porcentajeBase: 50, incrementoPorMes: pct1 },
+      { mesesDesde: finTramo1 + 1, mesesHasta: finTramo2, porcentajeBase: Math.round((50 + meses1 * pct1) * 100) / 100, incrementoPorMes: pct2 },
+    ],
+    mesesParaCien: finTramo2,
+  };
+}
+
+/**
+ * Las cuatro etapas de la DT 9.ª, transcritas del BOE el 30/09/2026. Cada una suma
+ * EXACTAMENTE 50 puntos, que es la comprobación que delata un tramo mal puesto (hallazgo
+ * 1093): 163 × 0,21 + 83 × 0,19 · 106 × 0,21 + 146 × 0,19 · 49 × 0,21 + 209 × 0,19 ·
+ * 248 × 0,19 + 16 × 0,18. La de 2027 es la misma del art. 210.1.b), la definitiva.
+ *
+ * ⚠️ 2026-09-30 (semilla S0163): hasta hoy el módulo solo tenía la etapa 2023-2026 y el
+ *    motor la aplicaba a cualquier año, así que quien se jubile desde 2027 —casi todo el
+ *    que usa un simulador— recibía un porcentaje inflado: 25 años cotizados daban 73,78 %
+ *    en vez de 72,80 %, y 36 años y 6 meses daban 100 % en vez de 98,92 %.
+ */
+export const ESCALAS_PORCENTAJE_PENSION: EscalaPorcentajePension[] = [
+  escalaDT9(2013, 2019, 163, 0.21, 83, 0.19),  // 100 % en el mes 426 (35 años y 6 meses)
+  escalaDT9(2020, 2022, 106, 0.21, 146, 0.19), // 100 % en el mes 432 (36 años)
+  escalaDT9(2023, 2026, 49, 0.21, 209, 0.19),  // 100 % en el mes 438 (36 años y 6 meses)
+  escalaDT9(2027, null, 248, 0.19, 16, 0.18),  // 100 % en el mes 444 (37 años)
+];
+
+/**
+ * Escala que corresponde a quien se jubila en `anioJubilacion`. Antes de 2013 regía la
+ * escala anterior a la Ley 27/2011, que no se modela: devuelve la primera etapa.
+ */
+export function getEscalaPorcentajePension(anioJubilacion: number): EscalaPorcentajePension {
+  return (
+    ESCALAS_PORCENTAJE_PENSION.find((e) => anioJubilacion >= e.desde && (e.hasta === null || anioJubilacion <= e.hasta)) ??
+    ESCALAS_PORCENTAJE_PENSION[0]
+  );
+}
 
 // ─── Límites de pensión 2026 (euros/mes, 14 pagas) ───────────────────────────
 // Actualizado 2026-03-16. Revalorización ~2,8% IPC.

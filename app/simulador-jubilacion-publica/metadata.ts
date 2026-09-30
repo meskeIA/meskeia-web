@@ -65,7 +65,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la pensión pública de jubilación?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La pensión se calcula aplicando a la base reguladora un porcentaje que depende de los años cotizados: el 50% con los 15 años mínimos, más un 0,21% por cada uno de los 49 meses siguientes y un 0,19% por cada uno de los 209 posteriores, hasta el 100% a los 36 años y 6 meses en 2026. La base reguladora clásica es la suma de las últimas 300 bases de cotización dividida entre 350. Desde 2026 convive con la fórmula ampliada (las 302 mejores bases de un periodo de 304 meses, divididas entre 352,33) y la Seguridad Social aplica de oficio la más favorable, sin que haya que elegir.',
+        text: 'La pensión se calcula aplicando a la base reguladora un porcentaje que depende de los años cotizados: el 50% con los 15 años mínimos, más un 0,21% por cada uno de los 49 meses siguientes y un 0,19% por cada uno de los 209 posteriores, hasta el 100% a los 36 años y 6 meses en 2026. Desde 2027 la escala cambia: un 0,19% por cada uno de los 248 meses siguientes a los 15 años y un 0,18% por cada uno de los 16 posteriores, hasta el 100% a los 37 años. La base reguladora clásica es la suma de las últimas 300 bases de cotización dividida entre 350. Desde 2026 convive con la fórmula ampliada (las 302 mejores bases de un periodo de 304 meses, divididas entre 352,33) y la Seguridad Social aplica de oficio la más favorable, sin que haya que elegir.',
       },
     },
     {

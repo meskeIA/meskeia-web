@@ -23,6 +23,12 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-09-30',
+    fichaSlug: 'pensiones-jubilacion',
+    texto:
+      'Desde el 1 de enero de 2027 cambia la escala del porcentaje de la pensión de jubilación: el 0,19% por cada uno de los 248 meses siguientes a los 15 años cotizados y el 0,18% por cada uno de los 16 posteriores, de modo que el 100% exige 37 años cotizados en lugar de 36 años y 6 meses. Con 25 años cotizados el porcentaje pasa del 73,78% al 72,80% (disposición transitoria 9.ª y art. 210.1.b de la LGSS, texto consolidado en BOE-A-2015-11724).',
+  },
+  {
     fecha: '2026-09-11',
     fichaSlug: 'itp-ccaa',
     texto:

@@ -8,7 +8,8 @@ import DataReference from '@/components/DataReference';
 import {
   TABLA_EDAD_JUBILACION,
   COTIZACION_MINIMA,
-  TRAMOS_PORCENTAJE_PENSION_2025,
+  getEscalaPorcentajePension,
+  ESCALA_PORCENTAJE_PENSION_META,
   LIMITES_PENSION_2025,
   FISCAL_PENSIONES_META,
 } from '@/data/fiscal';
@@ -19,9 +20,24 @@ import styles from '../Ficha.module.css';
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/pensiones-jubilacion/';
 
-// Incrementos por mes cotizado (desde los datos): tramo intermedio y tramo final
-const INCREMENTO_INTERMEDIO = TRAMOS_PORCENTAJE_PENSION_2025[1].incrementoPorMes;
-const INCREMENTO_FINAL = TRAMOS_PORCENTAJE_PENSION_2025[2].incrementoPorMes;
+// La escala del porcentaje depende del AÑO DE JUBILACIÓN y cambia el 01/01/2027 (DT 9.ª
+// LGSS). Se publican las dos que importan hoy: la de quien se jubila este año y la
+// definitiva. Todo sale de los tramos del módulo, nada tecleado.
+const COLUMNAS_ESCALA = [
+  { rotulo: 'Jubilación en 2026', escala: getEscalaPorcentajePension(2026) },
+  { rotulo: 'Jubilación desde 2027', escala: getEscalaPorcentajePension(2027) },
+].map(({ rotulo, escala }) => {
+  const [, t1, t2] = escala.tramos;
+  return {
+    rotulo,
+    mesesTramo1: t1.mesesHasta - 180,
+    pctTramo1: t1.incrementoPorMes,
+    mesesTramo2: t2.mesesHasta - t1.mesesHasta,
+    pctTramo2: t2.incrementoPorMes,
+    mesesParaCien: escala.mesesParaCien,
+  };
+});
+const [ESCALA_HOY, ESCALA_2027] = COLUMNAS_ESCALA;
 
 // Límites de pensión 2026 (€/mes, 14 pagas)
 const LIMITES = [
@@ -36,9 +52,14 @@ function aniosMeses({ anios, meses }: { anios: number; meses: number }): string 
   return meses > 0 ? `${anios} años y ${meses} meses` : `${anios} años`;
 }
 
-// Formatea un incremento porcentual: 0,21%
+// Formatea un incremento porcentual: 0,21 % (espacio duro antes del signo)
 function pctTxt(n: number): string {
-  return `${n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+  return `${n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} %`;
+}
+
+// 438 → «36 años y 6 meses» · 444 → «37 años»
+function mesesTxt(meses: number): string {
+  return aniosMeses({ anios: Math.floor(meses / 12), meses: meses % 12 });
 }
 
 export default function PensionesJubilacionPage() {
@@ -147,38 +168,51 @@ export default function PensionesJubilacionPage() {
             <p className={styles.sectionIntro}>
               Hacen falta al menos {COTIZACION_MINIMA.anosMinimosAcceso} años cotizados para tener
               derecho a pensión. El porcentaje sobre la base reguladora crece con los años cotizados
-              hasta alcanzar el 100% a los {Math.floor(COTIZACION_MINIMA.anosParaCien)} años y{' '}
-              {Math.round((COTIZACION_MINIMA.anosParaCien % 1) * 12)} meses.
+              y la escala depende del año en que te jubilas: el 100 % se alcanza
+              con {mesesTxt(ESCALA_HOY.mesesParaCien)} si te jubilas en 2026 y
+              con {mesesTxt(ESCALA_2027.mesesParaCien)} a partir de 2027.
             </p>
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
                 <thead>
                   <tr>
                     <th scope="col">Años cotizados</th>
-                    <th scope="col" className={styles.numCol}>Porcentaje de la base reguladora</th>
+                    {COLUMNAS_ESCALA.map((c) => (
+                      <th key={c.rotulo} scope="col" className={styles.numCol}>{c.rotulo}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <th scope="row" className={styles.rowHead}>{COTIZACION_MINIMA.anosMinimosAcceso} años (mínimo de acceso)</th>
-                    <td className={styles.numCol}><span className={styles.tipoTag}>50%</span></td>
+                    {COLUMNAS_ESCALA.map((c) => (
+                      <td key={c.rotulo} className={styles.numCol}><span className={styles.tipoTag}>50&nbsp;%</span></td>
+                    ))}
                   </tr>
                   <tr>
-                    <th scope="row" className={styles.rowHead}>Cada uno de los 49 meses siguientes (hasta ~19 años)</th>
-                    <td className={styles.numCol}>+ {pctTxt(INCREMENTO_INTERMEDIO)}</td>
+                    <th scope="row" className={styles.rowHead}>Primer tramo, por cada mes adicional</th>
+                    {COLUMNAS_ESCALA.map((c) => (
+                      <td key={c.rotulo} className={styles.numCol}>+ {pctTxt(c.pctTramo1)} (meses 1 a {c.mesesTramo1})</td>
+                    ))}
                   </tr>
                   <tr>
-                    <th scope="row" className={styles.rowHead}>Cada uno de los 209 meses posteriores</th>
-                    <td className={styles.numCol}>+ {pctTxt(INCREMENTO_FINAL)}</td>
+                    <th scope="row" className={styles.rowHead}>Segundo tramo, por cada mes adicional</th>
+                    {COLUMNAS_ESCALA.map((c) => (
+                      <td key={c.rotulo} className={styles.numCol}>+ {pctTxt(c.pctTramo2)} ({c.mesesTramo2} meses siguientes)</td>
+                    ))}
                   </tr>
                   <tr>
-                    <th scope="row" className={styles.rowHead}>36 años y 6 meses</th>
-                    <td className={styles.numCol}><span className={styles.tipoTag}>100%</span></td>
+                    <th scope="row" className={styles.rowHead}>Se alcanza el 100&nbsp;% con</th>
+                    {COLUMNAS_ESCALA.map((c) => (
+                      <td key={c.rotulo} className={styles.numCol}><span className={styles.tipoTag}>{mesesTxt(c.mesesParaCien)}</span></td>
+                    ))}
                   </tr>
                 </tbody>
               </table>
             </div>
             <p className={styles.tableFoot}>
+              Escala del porcentaje: {ESCALA_PORCENTAJE_PENSION_META.fuente}, verificada
+              el {formatDate(new Date(ESCALA_PORCENTAJE_PENSION_META.verificado))}.{' '}
               La base reguladora es el promedio de las 300 últimas bases de cotización (25 años)
               dividido entre 350. Desde 2026 convive con un sistema dual que descarta los peores años
               de un periodo más amplio; la Seguridad Social aplica de oficio el cálculo más favorable.

@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
-import { getEdadJubilacion, REQUISITOS_ANTICIPADA_INVOLUNTARIA, REQUISITOS_ANTICIPADA_VOLUNTARIA } from '@/data/fiscal';
+import { getEdadJubilacion, getEscalaPorcentajePension, REQUISITOS_ANTICIPADA_INVOLUNTARIA, REQUISITOS_ANTICIPADA_VOLUNTARIA } from '@/data/fiscal';
 import {
-  calcularPorcentajePension,
+  porcentajePension,
+  ANIO_ESCALA,
   pct,
   aniosYMeses,
   ANIOS_ACCESO,
@@ -13,6 +14,7 @@ import {
   TRAMOS_CRECIENTES,
   EDAD_ORDINARIA,
   ejemploInicio,
+  frenteAlCien,
   ANIOS_ANTICIPO_VOLUNTARIA,
   ANIOS_ANTICIPO_INVOLUNTARIA,
 } from './escala';
@@ -64,14 +66,18 @@ export const jsonLd = generateWebAppSchema({
 // Hasta el 26/09/2026 publicaba la escala anterior a la Ley 27/2011 («25 años ≈ 80 %»,
 // «un 3 % por año»). Ahora cada número sale de ./escala.ts, que lee pensiones.ts.
 
-const [TRAMO_021, TRAMO_019] = TRAMOS_CRECIENTES;
-const PCT_25_ANIOS = calcularPorcentajePension(25 * 12); // 73,78
+const [TRAMO_1, TRAMO_2] = TRAMOS_CRECIENTES;
+const PCT_25_ANIOS = porcentajePension(25 * 12); // 72,80 con la escala de 2027
+/** Meses para el 100 % el último año de la escala anterior, para contar el cambio. */
+const MESES_PARA_CIEN_ANTERIOR = getEscalaPorcentajePension(ANIO_ESCALA - 1).mesesParaCien; // 438
 const EJEMPLO_30 = ejemploInicio(30);
 const EDAD_2026 = getEdadJubilacion(2026);
 const EDAD_2027 = getEdadJubilacion(2027);
 const edadTexto = (e: { anios: number; meses: number }) => aniosYMeses(e.anios * 12 + e.meses);
 const BASE_EJEMPLO = 1500;
-const EUROS_UN_ANIO = Math.round(BASE_EJEMPLO * TRAMO_019.porAnio) / 100; // 34,20 €
+// Con el tramo LARGO (el del 0,19 %, 248 meses), que es donde está casi cualquier carrera;
+// el del 0,18 % solo dura 16 meses. Hasta el 30/09/2026 era TRAMO_2, que entonces era el largo.
+const EUROS_UN_ANIO = Math.round(BASE_EJEMPLO * TRAMO_1.porAnio) / 100; // 34,20 €
 const puntos = (v: number) => formatNumber(v, 2);
 
 export const faqJsonLd = {
@@ -83,7 +89,7 @@ export const faqJsonLd = {
       name: `¿Cuántos años hay que cotizar para cobrar el ${pct(100, 0)} de la pensión en España?`,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Con la escala de la disposición transitoria 9.ª de la LGSS vigente en 2026, el ${pct(100, 0)} de la base reguladora se alcanza con ${aniosYMeses(MESES_PARA_CIEN)} cotizados (${MESES_PARA_CIEN} meses). Con ${ANIOS_ACCESO} años (${MESES_ACCESO} meses) se tiene derecho al ${pct(PCT_ACCESO, 0)}, y a partir de ahí cada mes suma ${puntos(TRAMO_021.porMes)} puntos entre el ${TRAMO_021.desde} y el ${TRAMO_021.hasta}, y ${puntos(TRAMO_019.porMes)} entre el ${TRAMO_019.desde} y el ${TRAMO_019.hasta}: con 25 años cotizados corresponde el ${pct(PCT_25_ANIOS, 2)}. Con menos de ${ANIOS_ACCESO} años cotizados no hay derecho a pensión contributiva.`,
+        text: `Con la escala de la LGSS que rige para quien se jubila desde ${ANIO_ESCALA} (art. 210.1.b y disposición transitoria 9.ª), el ${pct(100, 0)} de la base reguladora se alcanza con ${aniosYMeses(MESES_PARA_CIEN)} cotizados (${MESES_PARA_CIEN} meses). Con ${ANIOS_ACCESO} años (${MESES_ACCESO} meses) se tiene derecho al ${pct(PCT_ACCESO, 0)}, y a partir de ahí cada mes suma ${puntos(TRAMO_1.porMes)} puntos entre el ${TRAMO_1.desde} y el ${TRAMO_1.hasta}, y ${puntos(TRAMO_2.porMes)} entre el ${TRAMO_2.desde} y el ${TRAMO_2.hasta}: con 25 años cotizados corresponde el ${pct(PCT_25_ANIOS, 2)}. Hasta ${ANIO_ESCALA - 1}, el ${pct(100, 0)} llegaba con ${aniosYMeses(MESES_PARA_CIEN_ANTERIOR)}. Con menos de ${ANIOS_ACCESO} años cotizados no hay derecho a pensión contributiva.`,
       },
     },
     {
@@ -99,7 +105,7 @@ export const faqJsonLd = {
       name: '¿Qué pasa si empiezo a trabajar tarde y cotizo pocos años?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Empezar a cotizar tarde reduce los años cotizados y, con ellos, el porcentaje que se aplica a la base reguladora. Por ejemplo, quien empiece a trabajar a los 30 años y se jubile a los ${EDAD_ORDINARIA} habrá cotizado ${EJEMPLO_30.anios} años, más de los ${aniosYMeses(MESES_PARA_CIEN)} que dan el ${pct(EJEMPLO_30.porcentaje, 0)}. Con 25 años cotizados, la pensión sería el ${pct(PCT_25_ANIOS, 2)} de la base reguladora. El visualizador permite comparar estas trayectorias de forma gráfica.`,
+        text: `Empezar a cotizar tarde reduce los años cotizados y, con ellos, el porcentaje que se aplica a la base reguladora. Por ejemplo, quien empiece a trabajar a los 30 años y se jubile a los ${EDAD_ORDINARIA} habrá cotizado ${EJEMPLO_30.anios} años, ${frenteAlCien(EJEMPLO_30.meses)} ${aniosYMeses(MESES_PARA_CIEN)} que dan el ${pct(100, 0)}. Con 25 años cotizados, la pensión sería el ${pct(PCT_25_ANIOS, 2)} de la base reguladora. El visualizador permite comparar estas trayectorias de forma gráfica.`,
       },
     },
     {
@@ -115,7 +121,7 @@ export const faqJsonLd = {
       name: '¿Vale la pena cotizar un año más para mejorar la pensión?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Depende del punto de partida. Cada mes cotizado entre el ${TRAMO_021.desde} y el ${TRAMO_021.hasta} suma ${puntos(TRAMO_021.porMes)} puntos al porcentaje (${puntos(TRAMO_021.porAnio)} puntos por año completo) y cada mes entre el ${TRAMO_019.desde} y el ${TRAMO_019.hasta} suma ${puntos(TRAMO_019.porMes)} (${puntos(TRAMO_019.porAnio)} puntos por año). Con ${aniosYMeses(MESES_PARA_CIEN)} cotizados ya se está en el ${pct(100, 0)}, y un año más no sube el porcentaje. Sobre una base reguladora de ${formatCurrency(BASE_EJEMPLO)} al mes, ${puntos(TRAMO_019.porAnio)} puntos son ${formatCurrency(EUROS_UN_ANIO)} más de pensión bruta mensual.`,
+        text: `Depende del punto de partida. Cada mes cotizado entre el ${TRAMO_1.desde} y el ${TRAMO_1.hasta} suma ${puntos(TRAMO_1.porMes)} puntos al porcentaje (${puntos(TRAMO_1.porAnio)} puntos por año completo) y cada mes entre el ${TRAMO_2.desde} y el ${TRAMO_2.hasta} suma ${puntos(TRAMO_2.porMes)} (${puntos(TRAMO_2.porAnio)} puntos por año). Con ${aniosYMeses(MESES_PARA_CIEN)} cotizados ya se está en el ${pct(100, 0)}, y un año más no sube el porcentaje. Sobre una base reguladora de ${formatCurrency(BASE_EJEMPLO)} al mes, ${puntos(TRAMO_1.porAnio)} puntos son ${formatCurrency(EUROS_UN_ANIO)} más de pensión bruta mensual.`,
       },
     },
   ],

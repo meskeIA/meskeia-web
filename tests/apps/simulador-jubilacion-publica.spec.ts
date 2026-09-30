@@ -21,16 +21,18 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *     · TABLA_EDAD_JUBILACION[2027] → edadSinCotizacion 67a0m · cotizacionPara65 38a6m
  *       (= 462 meses). `getEdadJubilacion` devuelve esa fila para cualquier año ≥ 2027,
  *       que es lo que aplica a todo nacido a partir de 1962.
- *     · TRAMOS_PORCENTAJE_PENSION_2025 → 50 % a los 180 meses · +0,21 %/mes en los 49
- *       siguientes (meses 181-229) · +0,19 %/mes en los 209 posteriores (230-438) · 100 %
- *       a los 438 meses = 36 años y 6 meses.
+ *     · getEscalaPorcentajePension(año de jubilación) (DT 9.ª LGSS). Todos los casos se
+ *       jubilan en 2030 o después, así que les toca la de 2027: 50 % a los 180 meses ·
+ *       +0,19 %/mes en los 248 siguientes (meses 181-428) · +0,18 %/mes en los 16
+ *       posteriores (429-444) · 100 % a los 444 meses = 37 años. (La de 2023-2026 era
+ *       +0,21 % en 181-229 y +0,19 % en 230-438.)
  *     · BASE_REGULADORA.factor = 300/350 = 0,857142857…
  *     · SISTEMA_DUAL_TRANSICION[2026] (DT 40.ª LGSS) → basesSeleccionadas 302 / divisor
  *       352,33 = 0,857150…
  *     · LIMITES_PENSION_2025 → maximaMensual 3.359,60 € · maximaAnual 47.034,40 €
  *       · minimaSinConyuge 888,70 €.
  *     · COMPLEMENTO_MINIMOS_LIMITES_2026 → 9.442 € sin cónyuge a cargo · 11.013 € con él.
- *     · COTIZACION_MINIMA.anosMinimosAcceso = 15 · mesesParaCien = 438.
+ *     · COTIZACION_MINIMA.anosMinimosAcceso = 15. El 100 % lo fija la escala del año (444 meses).
  *     · COEFICIENTES_ANTICIPADA_VOLUNTARIA_2025 → 2,00 / 1,87 / 1,75 / 1,63 %/trimestre
  *       según se tengan menos de 38a6m, 41a6m, 44a6m o más años cotizados.
  *     · COEFICIENTES_ANTICIPADA_INVOLUNTARIA_2025 → 1,875 / 1,750 / 1,625 / 1,500.
@@ -61,26 +63,28 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *
  *   CASO 2 (límite) — nacido en 1962 · 38 años cotizados · base media 5.000 €/mes
  *       edad       456 meses < 462 → la OTRA rama: 67 años, en 1962 + 67 = 2029
- *       %          456 meses pasa del mes 438 → 100,00 %
+ *       %          456 meses pasa del mes 444 → 100,00 %
  *       BR         5.000 × 300/350 = 4.285,71 €
  *       pensión    las DOS fórmulas superan el tope → 3.359,60 €/mes, y ahora la app lo DICE
  *       anual      3.359,60 × 14 = 47.034,40 € = LIMITES_PENSION_2025.maximaAnual clavado
  *
- *   CASO 3 (escala, hallazgo 1093) — 1965 · 28 años (336 meses) · base 1.200 €/mes
- *       %          50 + 49 × 0,21 + (336 − 229) × 0,19 = 50 + 10,29 + 20,33 = 80,62 %
- *                  Es la cifra que delata la escala: con el tramo del 0,21 % llegando al
- *                  mes 276 salían 81,56 %, y con la resta que contaba un mes corto, 81,16 %.
+ *   CASO 3 (escala, hallazgos 1093 y S0163) — 1965 · 28 años (336 meses) · base 1.200 €/mes
+ *       año        se jubila en 2032 (336 meses < 462 → 67 años): escala de 2027
+ *       %          50 + (336 − 180) × 0,19 = 50 + 29,64 = 79,64 %
+ *                  Es la cifra que delata la escala: con la de 2026 salía 80,62 %, con el
+ *                  tramo del 0,21 % llegando al mes 276, 81,56 %, y con la resta que contaba
+ *                  un mes corto, 81,16 %.
  *       BR         1.200 × 300/350 = 1.028,571… → «1028,57 €»
- *       pensión    se jubila en 2032 (336 meses < 462 → 67 años): el escalón dual de ese
- *                  año, 314/366,33, gana por céntimos → 1.028,57 × 80,62 % = 829,24 €/mes
- *       mínimo     829,24 < 888,70 → NO se eleva (hallazgo 1089): se avisa de que el
+ *       pensión    el escalón dual de 2032, 314/366,33, gana por céntimos
+ *                  → 1.028,58 × 79,64 % = 819,16 €/mes
+ *       mínimo     819,16 < 888,70 → NO se eleva (hallazgo 1089): se avisa de que el
  *                  complemento a mínimos depende de rentas y de situación familiar.
  *
  *   CASO 4 (el suelo que se deshacía, hallazgo 1094) — 1965 · 35 años · base 1.000 €/mes
- *       %          420 meses → 50 + 10,29 + 191 × 0,19 = 96,58 %
- *       pensión    1.000 × 314/366,33 × 96,58 % = 827,84 €/mes — por debajo del mínimo,
+ *       %          420 meses, jubilación en 2032 → 50 + 240 × 0,19 = 95,60 %
+ *       pensión    1.000 × 314/366,33 × 95,60 % = 819,44 €/mes — por debajo del mínimo,
  *                  y AUN ASÍ no se eleva
- *       anticipada 35 años → tramo «< 38,5» = 2,00 %/trim × 8 = 16,00 % → 695,38 €/mes.
+ *       anticipada 35 años → tramo «< 38,5» = 2,00 %/trim × 8 = 16,00 % → 688,33 €/mes.
  *                  Antes la ordinaria subía a 888,70 € y la anticipada caía a 746,51 €,
  *                  es decir, por debajo del mínimo que la propia app acababa de garantizar.
  *
@@ -226,18 +230,21 @@ test('CASO 2 · límite: sin cotización suficiente son 67 años, y la pensión 
   await expect(valorDe(page, 'Tope máximo aplicado')).toContainText('pensión máxima');
 });
 
-test('CASO 3 · escala del porcentaje: 28 años son el 80,62 %, y quedar bajo el mínimo NO lo eleva', async ({ page }) => {
+test('CASO 3 · escala del porcentaje: 28 años son el 79,64 % jubilándose en 2032, y quedar bajo el mínimo NO lo eleva', async ({ page }) => {
   await simular(page, 1965, 28, 1200);
 
-  // ── Hallazgo 1093 · 336 meses: 50 + 49 × 0,21 + 107 × 0,19 ──
-  // Con la escala vieja (0,21 % hasta el mes 276) salía 81,56 %; con la resta que contaba
-  // un mes corto, 81,16 %. Los tres valores son distintos, así que esta cifra los separa.
-  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText('80,62%');
+  // ── S0163 (30/09/2026) · nacido en 1965 con 28 años cotizados → edad 67 → jubilación en
+  //    2032, y desde 2027 rige la escala nueva de la DT 9.ª LGSS: 0,19 % por cada mes
+  //    adicional entre el 1 y el 248. 336 meses = 156 adicionales → 50 + 156 × 0,19 = 79,64 %.
+  //    Con la escala de 2026, que el simulador aplicaba a cualquier año, salía 80,62 %
+  //    (hallazgo 1093: 50 + 49 × 0,21 + 107 × 0,19); con la escala vieja, 81,56 %.
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText('79,64%');
   await expect(valorDe(page, 'Base reguladora (25 años / 350)')).toContainText('1028,57');
 
   // ── Hallazgo 1089 · la pensión NO se eleva a minimaSinConyuge (888,70 €) ──
+  // Clásica 1.028,57 × 79,64 % = 819,15 · dual 2032 (314 / 366,33) 1.028,58 × 79,64 % = 819,16.
   const pension = await importeDe(page, 'Pensión mensual estimada (bruta)');
-  expect(pension).toBeCloseTo(829.24, 2);
+  expect(pension).toBeCloseTo(819.16, 2);
   expect(pension).toBeLessThan(888.70);
 
   // …y a cambio se explica qué hace falta de verdad para cobrar el mínimo.
@@ -250,23 +257,26 @@ test('CASO 3 · escala del porcentaje: 28 años son el 80,62 %, y quedar bajo el
   await expect(bloque).toContainText('11.013,00'); // …conConyuge
   await expect(bloque).toContainText('1256,60');   // minimaConConyuge
 
-  // ── Hallazgo 1097 · lo que falta para el 100 % se pinta: 438 − 336 = 102 meses ──
-  await expect(valorDe(page, 'Para llegar al 100 %')).toContainText('8 años y 6 meses');
+  // ── Hallazgo 1097 · lo que falta para el 100 % se pinta. Desde 2027 el 100 % llega en el
+  //    mes 444 (37 años): 444 − 336 = 108 meses (con la escala de 2026 eran 102).
+  await expect(valorDe(page, 'Para llegar al 100 %')).toContainText('9 años más de cotización');
+  await expect(valorDe(page, 'Para llegar al 100 %')).toContainText('(37 años en total)');
 });
 
 test('CASO 4 · el suelo ya no se deshace: la anticipada parte de la pensión real, no de una elevada', async ({ page }) => {
   await simular(page, 1965, 35, 1000);
 
-  // 420 meses → 50 + 10,29 + 191 × 0,19 = 96,58 %
-  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText('96,58%');
-  expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(827.84, 2);
+  // 420 meses, jubilación en 2032 (escala de 2027, S0163) → 50 + 240 × 0,19 = 95,60 %
+  // (con la de 2026 eran 96,58 %). Dual 2032: 1.000 × 314 / 366,33 × 95,60 % = 819,44.
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText('95,60%');
+  expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(819.44, 2);
 
   // ── Hallazgo 1094 · 35 años → tramo «< 38,5» = 2,00 %/trim × 8 = 16,00 % ──
   await calcularAnticipada(page, 24);
   await expect(valorDe(page, 'Reducción total')).toHaveText('-16,00%');
-  // 827,84 × 0,84 = 695,38. Con el suelo viejo la ordinaria valía 888,70 y esta salía
+  // 819,44 × 0,84 = 688,33. Con el suelo viejo la ordinaria valía 888,70 y esta salía
   // 746,51: una pensión anticipada por debajo del mínimo recién «garantizado».
-  expect(await importeDe(page, 'Pensión con reducción')).toBeCloseTo(695.38, 2);
+  expect(await importeDe(page, 'Pensión con reducción')).toBeCloseTo(688.33, 2);
 });
 
 test('CASO 5 · el campo acepta su propio ejemplo: «2.500» son dos mil quinientos, no dos y medio', async ({ page }) => {

@@ -16,7 +16,7 @@ import { getRelatedApps } from '@/data/app-relations';
 import { FISCAL_PENSIONES_META } from '@/data/fiscal';
 import Chart from 'chart.js/auto';
 import {
-  calcularPorcentajePension,
+  porcentajePension,
   pct,
   pctCompacto,
   aniosYMeses,
@@ -33,10 +33,11 @@ import {
   COEF_TRIMESTRE_MAX,
   EJEMPLO_ANTICIPADA,
   ejemploInicio,
+  frenteAlCien,
 } from './escala';
 
 // El porcentaje de la pensión sale SIEMPRE del motor compartido (calcularPorcentajePension,
-// lib/calculadoras/pensionPublica.ts), que lee TRAMOS_PORCENTAJE_PENSION_2025. Hasta el
+// lib/calculadoras/pensionPublica.ts), con la escala definitiva de 2027 (ver ./escala.ts). Hasta el
 // 26/09/2026 aquí había una copia de la escala con el tramo del 0,21 % hasta el mes 276
 // (hallazgo 2229): inflaba hasta 0,94 puntos las carreras de 20 a 36 años.
 
@@ -106,7 +107,7 @@ export default function VisualizadorJubilacionPerspectivaPage() {
 
   const anosCotizados = Math.max(0, edadJubilacion - edadInicio);
   const mesesCotizados = anosCotizados * 12;
-  const pctPension = useMemo(() => calcularPorcentajePension(mesesCotizados), [mesesCotizados]);
+  const pctPension = useMemo(() => porcentajePension(mesesCotizados), [mesesCotizados]);
   const hitos = useMemo(() => getHitos(edadInicio), [edadInicio]);
 
   // Gráfico: porcentaje de pensión según años cotizados
@@ -122,7 +123,7 @@ export default function VisualizadorJubilacionPerspectivaPage() {
     if (!ctx) return;
 
     const anos = Array.from({ length: 46 }, (_, i) => i);
-    const porcentajes = anos.map(a => calcularPorcentajePension(a * 12));
+    const porcentajes = anos.map(a => porcentajePension(a * 12));
     const c = coloresGrafico(lienzo);
 
     const grafico = new Chart(ctx, {
@@ -363,14 +364,15 @@ export default function VisualizadorJubilacionPerspectivaPage() {
 
           <h3>¿Y si empiezo tarde?</h3>
           <p>
-            Si empiezas a cotizar a los 30, llegarás a los {EDAD_ORDINARIA} con {EJEMPLO_30.anios} años, más de
-            los {aniosYMeses(MESES_PARA_CIEN)} que dan el {pct(EJEMPLO_30.porcentaje, 0)}.
+            Si empiezas a cotizar a los 30, llegarás a los {EDAD_ORDINARIA} con {EJEMPLO_30.anios} años,{' '}
+            {frenteAlCien(EJEMPLO_30.meses)} {aniosYMeses(MESES_PARA_CIEN)} que dan el {pct(100, 0)}.
             Si empiezas a los 35, llegarás con {EJEMPLO_35.anios} años cotizados, que dan el {pct(EJEMPLO_35.porcentaje, 2)}.
             Cada año que retrasas el inicio se nota en la pensión final.
           </p>
 
           <div className={styles.warningBox}>
-            <strong>Nota:</strong> este visualizador usa datos normativos 2025-2026 y asume cotización
+            <strong>Nota:</strong> este visualizador usa la edad de jubilación y la escala del porcentaje
+            definitivas, las que rigen para quien se jubile desde 2027, y asume cotización
             continua sin lagunas. La realidad incluye periodos de desempleo, cambios de base, y posibles
             reformas futuras. Para un cálculo real, consulta tu vida laboral en la Seguridad Social.
           </div>

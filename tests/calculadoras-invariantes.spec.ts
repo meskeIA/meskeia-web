@@ -2189,7 +2189,8 @@ test.describe('Golden — calcularPensionPublica (Capa 1 · LGSS / Ley 21/2021)'
     // Pensión clásica = 2.400 × 85,18% = 2.044,32 €. Pensión dual = 2.400,02 × 85,18% ≈ 2.044,34 €.
     // El sistema dual (DT 40.a LGSS, vigente desde 2026) es marginalmente más favorable → se aplica de oficio.
     // Ambas por encima de 888,70 y por debajo de 3.359,60: no se aplica ningún límite.
-    const p = calcularPensionPublica({ baseCotizacionMensual: 2800, anosCotizados: 30, edadActual: 55 });
+    // anioJubilacion 2026 explícito: sin él, el año sale de la edad y de la fecha del día.
+    const p = calcularPensionPublica({ baseCotizacionMensual: 2800, anosCotizados: 30, edadActual: 55, anioJubilacion: 2026 });
     expect(p.baseReguladoraClasica).toBeCloseTo(2400, 2);
     expect(p.baseReguladoraDual).toBeCloseTo(2400.02, 2);
     expect(p.formulaAplicada).toBe('dual');
@@ -2206,6 +2207,28 @@ test.describe('Golden — calcularPensionPublica (Capa 1 · LGSS / Ley 21/2021)'
     expect(p.mesesParaCien).toBe(78);
   });
 
+  test('GOLDEN-BM2: el mismo perfil jubilándose en 2027 → 84,20 % (escala nueva de la DT 9.ª LGSS)', () => {
+    // Semilla S0163 (30/09/2026). Desde 2027: 0,19 % por cada mes adicional entre el 1 y el
+    // 248, y 0,18 % los 16 siguientes (BOE-A-2015-11724, DT 9.ª, cotejado el 30/09/2026).
+    // 360 meses = 180 adicionales, todos en el primer tramo: 50 + 180 × 0,19 = 84,20 %.
+    // Pensión clásica = 2.400 × 84,20 % = 2.020,80 €. Faltan 444 − 360 = 84 meses.
+    const p = calcularPensionPublica({ baseCotizacionMensual: 2800, anosCotizados: 30, anioJubilacion: 2027 });
+    expect(p.porcentajePension).toBeCloseTo(84.2, 2);
+    expect(p.pensionClasicaMensual).toBeCloseTo(2020.8, 2);
+    expect(p.mesesParaCien).toBe(84);
+    expect(p.anioJubilacion).toBe(2027);
+  });
+
+  test('GOLDEN-BM3: sin año, la edad lo estima — con 55 años la jubilación cae siempre en 2027 o después', () => {
+    // 30 años cotizados no dan la jubilación a los 65, así que el año estimado es el de hoy
+    // + (67 − 55) = 12 años más: sea cual sea la fecha del test, cae en la escala de 2027.
+    // Hasta el 30/09/2026 el motor aplicaba la de 2026 a cualquier edad (daba 85,18 %).
+    const p = calcularPensionPublica({ baseCotizacionMensual: 2800, anosCotizados: 30, edadActual: 55 });
+    expect(p.anioJubilacion).toBe(new Date().getFullYear() + 12);
+    expect(p.porcentajePension).toBeCloseTo(84.2, 2);
+    expect(p.mesesParaCien).toBe(84);
+  });
+
   test('GOLDEN-BN: base mínima 1.184,40 €, 15 años cotizados (180 meses) → 507,61 €/mes, que NO se eleva al mínimo', () => {
     // BR = 1.184,40 × 300/350 = 1.015,20 €. % pensión = 50% (180 meses, primer tramo).
     // Pensión = 1.015,21 × 50% = 507,61 €, por debajo de la mínima de referencia (888,70 €).
@@ -2215,7 +2238,7 @@ test.describe('Golden — calcularPensionPublica (Capa 1 · LGSS / Ley 21/2021)'
     //    bajo COMPLEMENTO_MINIMOS_LIMITES_2026 y tiene tres cuantías según la situación
     //    familiar), así que elevar de oficio publicaba una pensión por encima de su propia
     //    base reguladora. `aplicaMinimo` sigue avisando de que se está por debajo.
-    const p = calcularPensionPublica({ baseCotizacionMensual: 1184.40, anosCotizados: 15, edadActual: 65 });
+    const p = calcularPensionPublica({ baseCotizacionMensual: 1184.40, anosCotizados: 15, edadActual: 65, anioJubilacion: 2026 });
     expect(p.baseReguladoraClasica).toBeCloseTo(1015.20, 2);
     // Sin el suelo, la fórmula ampliada de 2026 (302/352,33) gana por un céntimo y es la
     // que se aplica: antes las dos se elevaban a 888,70 y el empate lo rompía la clásica.
@@ -2234,11 +2257,24 @@ test.describe('Golden — calcularPensionPublica (Capa 1 · LGSS / Ley 21/2021)'
   test('GOLDEN-BN2: el 100 % cae exactamente en el mes 438 y el tope máximo sí es incondicional', () => {
     // La escala está construida para llevar del 50 % al 100 %: 49 × 0,21 + 209 × 0,19 = 50,00.
     // Si algún tramo se mueve, esta pareja de asserts lo delata por los dos lados.
-    const justoAntes = calcularPensionPublica({ baseCotizacionMensual: 2000, anosCotizados: 437 / 12 });
+    const justoAntes = calcularPensionPublica({ baseCotizacionMensual: 2000, anosCotizados: 437 / 12, anioJubilacion: 2026 });
     expect(justoAntes.porcentajePension).toBeCloseTo(99.81, 2);
-    const justo = calcularPensionPublica({ baseCotizacionMensual: 2000, anosCotizados: 438 / 12 });
+    const justo = calcularPensionPublica({ baseCotizacionMensual: 2000, anosCotizados: 438 / 12, anioJubilacion: 2026 });
     expect(justo.porcentajePension).toBeCloseTo(100, 2);
     expect(justo.mesesParaCien).toBe(0);
+
+    // Desde 2027 (S0163): 248 × 0,19 + 16 × 0,18 = 47,12 + 2,88 = 50,00 → 100 % en el mes 444.
+    // Mes 438: 97,12 + 10 × 0,18 = 98,92 % (36 años y 6 meses ya NO dan el 100 %).
+    // Mes 443: 97,12 + 15 × 0,18 = 99,82 %.
+    const en2027 = (meses: number) => calcularPensionPublica({ baseCotizacionMensual: 2000, anosCotizados: meses / 12, anioJubilacion: 2027 });
+    expect(en2027(438).porcentajePension).toBeCloseTo(98.92, 2);
+    expect(en2027(438).mesesParaCien).toBe(6);
+    expect(en2027(443).porcentajePension).toBeCloseTo(99.82, 2);
+    expect(en2027(444).porcentajePension).toBeCloseTo(100, 2);
+    expect(en2027(444).mesesParaCien).toBe(0);
+    // Frontera entre tramos: mes 428 (248 adicionales) = 50 + 248 × 0,19 = 97,12 %.
+    expect(en2027(428).porcentajePension).toBeCloseTo(97.12, 2);
+    expect(en2027(429).porcentajePension).toBeCloseTo(97.3, 2);
 
     // Tope máximo: 6.000 × 300/350 × 100 % = 5.142,86 € > 3.359,60 €.
     const topada = calcularPensionPublica({ baseCotizacionMensual: 6000, anosCotizados: 40 });
