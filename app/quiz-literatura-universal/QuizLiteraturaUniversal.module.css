@@ -56,10 +56,13 @@
 
 /* Recibe el foco por programa al avanzar (tabIndex=-1): no es un control, sin anillo. */
 .pregunta:focus,
+.seleccionTitle:focus,
 .resultadoCard:focus { outline: none; }
 
 /* Al avanzar, la vista se lleva al principio del quiz o del resultado: este margen deja la
-   barra del logo fijo por encima, sin taparlo (hallazgo 1716). */
+   barra del logo fijo por encima, sin taparlo (hallazgo 1716). Y al volver a la selección,
+   al principio de la selección (hallazgo 2508). */
+.seleccionBox,
 .quizBox,
 .resultadoCard { scroll-margin-top: 88px; }
 .quizCategoria { font-size: 0.8rem; color: var(--text-secondary); }

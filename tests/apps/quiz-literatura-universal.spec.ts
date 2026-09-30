@@ -1115,6 +1115,11 @@ test.describe('Re-inspección 25/09/2026 · móvil 360 × 740', () => {
           else if (d.bottom > innerHeight) scrollBy(0, d.bottom - innerHeight + 10);
         });
         const ficha = BANCO[await enunciado(page)];
+        // Lee la pregunta antes de tocar (añadido el 30/09/2026 con la reparación del 2507): a
+        // velocidad de máquina, el toque en la A llegaba a menos de 300 ms y 100 px del toque en
+        // «Siguiente» y Chrome lo cuenta como el 2.º de la misma ráfaga (`detail` 2), que es
+        // justo el toque de más que la app ignora ahora. Nadie contesta sin leer en 300 ms.
+        await page.waitForTimeout(500);
         await tapar(opciones(page).nth(0));
         // …y baja lo justo para ver «Siguiente» entero
         await page.evaluate(() => {
@@ -1149,7 +1154,7 @@ test.describe('Re-inspección 25/09/2026 · móvil 360 × 740', () => {
  *     1023, 1024 ni 1280 px (80 px de relleno hasta 1023; desde 1024 el título ya no llega).
  *   · (a) foco: al empezar → enunciado · al responder → «Siguiente →» · tras «Siguiente» →
  *     enunciado nuevo · tras «Ver resultado» → la tarjeta de la nota. Nunca <body>. PERO tras
- *     «← Cambiar de nivel» y «Jugar de nuevo» sí cae a <body> (ABIERTO, abajo).
+ *     «← Cambiar de nivel» y «Jugar de nuevo» el foco caía a <body> (2508, REPARADO el mismo día).
  *   · (b) 0 de 240 transiciones con el enunciado fuera de la vista a 360 × 740 y 390 × 844,
  *     FALLANDO con la opción más baja y bajando lo justo para ver «Siguiente».
  *   · (c) «Empezar el quiz →», «Siguiente →» y las cabeceras de la tabla: 5,47:1 en los dos temas.
@@ -1363,8 +1368,8 @@ test.describe('Inspector 30/09/2026', () => {
   });
 
   /**
-   * HALLAZGO (operativa) — ABIERTO. Un doble clic en «Empezar el quiz →» o en «Siguiente →»
-   * RESPONDE la pregunta siguiente: el primer clic cambia de pantalla (y traerALaVista mueve la
+   * HALLAZGO 2507 (operativa) — REPARADO el 30/09/2026. Un doble clic en «Empezar el quiz →» o en «Siguiente →»
+   * RESPONDÍA la pregunta siguiente: el primer clic cambia de pantalla (y traerALaVista mueve la
    * vista al principio del quiz) y el segundo cae, en el mismo punto, sobre una opción de la
    * pregunta nueva, que queda contestada sin que nadie la eligiera. Medido el 30/09/2026 con
    * 150 ms entre clic y clic (un doble clic humano), fallando con la opción más baja y con el
@@ -1375,9 +1380,11 @@ test.describe('Inspector 30/09/2026', () => {
    * recién empezada. Y en «Ver resultado» el segundo toque cae en «Jugar de nuevo» y la nota
    * desaparece antes de verse: 3 de 4 a 360 × 740 y 2 de 4 a 390 × 844 (0 de 4 en escritorio).
    * Lo correcto: un doble clic es una sola intención; la pregunta nueva llega sin responder.
+   * REPARACIÓN: toda acción del quiz ignora el clic con `detail > 1` (el 2.º de una ráfaga en el
+   * mismo sitio, lo cuenta el navegador, no un temporizador de la app). Este caso mide el doble
+   * clic humano (150 ms); el de abajo, el `dblclick()` de ráfaga.
    */
-  test('ABIERTO · un doble clic en «Empezar» o en «Siguiente» no contesta solo la pregunta siguiente', async ({ page }) => {
-    test.fail(); // ABIERTO: hallazgo del Inspector del 30/09/2026
+  test('2507 · un doble clic en «Empezar» o en «Siguiente» no contesta solo la pregunta siguiente', async ({ page }) => {
     test.setTimeout(120_000);
     await sembrarAzarSinAviso(page);
     await page.setViewportSize({ width: 1280, height: 800 });
@@ -1398,6 +1405,32 @@ test.describe('Inspector 30/09/2026', () => {
       await page.waitForTimeout(100);
     };
     expect(await contestadasSinQuerer(page, dobleClic)).toEqual([]);
+  });
+
+  /**
+   * 2507 con `dblclick()` de Playwright: los dos clics en ráfaga, sin pausa. El primero ya ha
+   * cambiado la pantalla cuando llega el segundo (React vacía los eventos discretos al acabar
+   * cada uno), así que el segundo cae igual sobre la pantalla nueva. Además, la partida tiene
+   * que seguir ENTERA: 15 preguntas contadas de una en una, sin saltarse ninguna, y la nota a la
+   * vista con su «Jugar de nuevo» sin pulsar.
+   */
+  test('2507 · con `dblclick()` en ráfaga tampoco se contesta, se salta ni se abandona nada', async ({ page }) => {
+    test.setTimeout(120_000);
+    await sembrarAzarSinAviso(page);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrirAsentada(page);
+    const rafaga = async (boton: Locator) => {
+      await boton.scrollIntoViewIfNeeded();
+      await boton.dblclick();
+      await page.waitForTimeout(100);
+    };
+    expect(await contestadasSinQuerer(page, rafaga)).toEqual([]);
+    // (No se exige el foco en la tarjeta: el mousedown del 2.º clic lo mueve adonde cae, como
+    // cualquier pulsación del ratón; lo que no puede hacer ese clic es ACTUAR.)
+    await expect(page.locator('[class*="resultadoCard"]')).toBeVisible();
+    // Fallando las 15 con la opción más baja: 0/15. Si un segundo clic hubiera contestado alguna
+    // (acertándola por azar) o saltado una pregunta, la cuenta no cuadraría.
+    await expect(page.locator('[class*="resultadoPuntuacion"]')).toHaveText('0 / 15 correctas');
   });
 
   /**
@@ -1426,15 +1459,15 @@ test.describe('Inspector 30/09/2026', () => {
   });
 
   /**
-   * HALLAZGO (accesibilidad) — ABIERTO. La gestión del foco cubre el quiz y el resultado, pero
+   * HALLAZGO 2508 (accesibilidad) — REPARADO el 30/09/2026 (el foco va al título de la
+   * selección, con la regla de la vista de los 1714/1716). La gestión del foco cubría el quiz y el resultado, pero
    * no la vuelta a la selección: «← Cambiar de nivel» y «Jugar de nuevo» se desmontan al
-   * pulsarlos y el foco cae a <body>, así que el lector no anuncia la pantalla nueva. Medido el
+   * pulsarlos y el foco caía a <body>, así que el lector no anuncia la pantalla nueva. Medido el
    * 30/09/2026 con Enter en los dos. (En Chromium el Tab siguiente llega a «Básico», porque
    * recuerda dónde estaba el botón; el anuncio es lo que se pierde.)
    * Lo correcto: el foco dentro de la pantalla de selección (su título o el nivel pulsado).
    */
-  test('ABIERTO · tras «Cambiar de nivel» y «Jugar de nuevo» el foco no cae a <body>', async ({ page }) => {
-    test.fail(); // ABIERTO: hallazgo del Inspector del 30/09/2026
+  test('2508 · tras «Cambiar de nivel» y «Jugar de nuevo» el foco no cae a <body>', async ({ page }) => {
     test.setTimeout(120_000);
     await arrancarAsentado(page, /^Básico/);
     await page.getByRole('button', { name: /Cambiar de nivel/ }).focus();
@@ -1556,13 +1589,13 @@ test.describe('Inspector 30/09/2026', () => {
   });
 
   /**
-   * HALLAZGO (contenido) — ABIERTO. La FAQ remata «La «Mezcla» es el modo más desafiante», pero
+   * HALLAZGO 2509 (contenido) — REPARADO el 30/09/2026: la FAQ dice ahora que Mezcla toma un
+   * tercio de cada nivel y que es más fácil que Avanzado. Decía «La «Mezcla» es el modo más desafiante», pero
    * Mezcla saca sus 15 preguntas del banco entero (`preguntasDeNivel('todos')`): por partida,
    * 15 · 19/56 = 5,1 básicas y solo 15 · 18/56 = 4,8 avanzadas, frente a 15 de 15 en Avanzado.
    * Medido el 30/09/2026 en 100 partidas de Mezcla: 518 básicas, 513 medias y 469 avanzadas de 1.500.
    */
-  test('ABIERTO · la FAQ no llama a «Mezcla» el modo más desafiante si un tercio de sus preguntas son de Básico', async ({ page }) => {
-    test.fail(); // ABIERTO: hallazgo del Inspector del 30/09/2026
+  test('2509 · la FAQ no llama a «Mezcla» el modo más desafiante si un tercio de sus preguntas son de Básico', async ({ page }) => {
     test.setTimeout(120_000);
     await abrirAsentada(page);
     const faq = norm(await page.locator('[class*="faqList"]').textContent());
@@ -1573,15 +1606,15 @@ test.describe('Inspector 30/09/2026', () => {
   });
 
   /**
-   * HALLAZGO (contenido) — ABIERTO. El paso 4 de «Estrategia para mejorar» afirma: «Cada
+   * HALLAZGO 2510 (contenido) — REPARADO el 30/09/2026: el paso 4 ya no lo promete y nombra los
+   * tres movimientos sin preguntas. El paso 4 de «Estrategia para mejorar» afirmaba: «Cada
    * movimiento literario del visualizador corresponde a un bloque de preguntas del quiz». El
    * visualizador (app/visualizador-estilos-literarios/page.tsx, leído el 30/09/2026) tiene diez
    * movimientos, y tres no tienen NINGUNA pregunta: ni el movimiento ni ninguno de sus cuatro
    * autores aparece en el enunciado, la respuesta buena o la explicación de las 56 del banco.
    * «Neoclasicismo» y «Modernismo» solo salen como distractores (b15, m14).
    */
-  test('ABIERTO · la guía no promete un bloque de preguntas por cada movimiento del visualizador que no lo tiene', async ({ page }) => {
-    test.fail(); // ABIERTO: hallazgo del Inspector del 30/09/2026
+  test('2510 · la guía no promete un bloque de preguntas por cada movimiento del visualizador que no lo tiene', async ({ page }) => {
     await abrirAsentada(page);
     const guia = norm(await page.locator('[class*="guideSection"]').textContent());
     const promete = /Cada movimiento literario del visualizador corresponde a un bloque de preguntas/.test(guia);
@@ -1601,16 +1634,18 @@ test.describe('Inspector 30/09/2026', () => {
   });
 
   /**
-   * HALLAZGO (contenido) — ABIERTO. Formato español del CLAUDE.md global (decidido el 25/09/2026,
+   * HALLAZGO 2511 (contenido) — REPARADO el 30/09/2026 (80 %, 70 % y 85 % con U+00A0). Formato español del CLAUDE.md global (decidido el 25/09/2026,
    * se corrige app a app al pasar el Inspector): el porcentaje va separado del número, con espacio
    * duro. El bloque educativo pega los tres: «más del 80%» y «supera el 70%» (FAQ) y «superar el
    * 85%» (paso 1 de la estrategia).
    */
-  test('ABIERTO · los porcentajes del bloque educativo no van pegados al número', async ({ page }) => {
-    test.fail(); // ABIERTO: hallazgo del Inspector del 30/09/2026
+  test('2511 · los porcentajes del bloque educativo no van pegados al número', async ({ page }) => {
     await abrirAsentada(page);
     const guia = (await page.locator('[class*="guideSection"]').textContent()) ?? '';
     expect(guia.match(/\d+%/g) ?? []).toEqual([]);
+    // Y separados con espacio DURO, no con uno normal que deje el % solo a principio de línea
+    expect(guia.match(/\d+ %/g) ?? []).toEqual([]);
+    expect(guia.match(/\d+ %/g)).toEqual(['80 %', '70 %', '85 %']);
   });
 });
 
@@ -1639,8 +1674,24 @@ async function sembrarAzarSinAviso(page: Page) {
  * con la opción más baja, la que obliga a bajar (la forma (b) de SOSPECHAS.md: acertando con la A
  * se esconden los defectos de la vista). Devuelve cada vez que el segundo clic contestó por su
  * cuenta la pregunta nueva o sacó de la partida.
+ *
+ * La respuesta se elige como lo haría una persona (con `elegir`: clic en escritorio, toque en
+ * móvil) y DESPUÉS DE LEER la pregunta: 500 ms, más que la ventana de ráfaga del navegador
+ * (300 ms para el doble toque en Chrome). Sin esa pausa, en móvil el toque que responde llegaba
+ * a unos 100 ms del doble toque en «Siguiente» y a menos de 100 px de él, y Chrome lo cuenta
+ * como el TERCERO de la misma ráfaga (`detail` 3), que la app ignora igual que el segundo: eso
+ * no mide el defecto del 2507 (el segundo toque del doble), sino un toque triple que nadie da
+ * leyendo la pregunta.
  */
-async function contestadasSinQuerer(page: Page, doble: (boton: Locator) => Promise<void>): Promise<string[]> {
+async function contestadasSinQuerer(
+  page: Page,
+  doble: (boton: Locator) => Promise<void>,
+  elegir: (opcion: Locator) => Promise<void> = (o) => o.click(),
+): Promise<string[]> {
+  const elegirTrasLeer = async (opcion: Locator) => {
+    await page.waitForTimeout(500);
+    await elegir(opcion);
+  };
   const pantalla = () =>
     page.evaluate(() => {
       const bs = [...document.querySelectorAll('button')].filter((b) => b.querySelector('[class*="opcionLetra"]'));
@@ -1659,7 +1710,7 @@ async function contestadasSinQuerer(page: Page, doble: (boton: Locator) => Promi
     if (p.bloqueadas === 0) {
       const ficha = BANCO[await enunciado(page)];
       const iCorrecta = (await textosOpcion(page)).indexOf(ficha.correcta);
-      await opciones(page).nth(iCorrecta === 3 ? 2 : 3).click();
+      await elegirTrasLeer(opciones(page).nth(iCorrecta === 3 ? 2 : 3));
     }
     const antes = await contador(page);
     await doble(page.getByRole('button', { name: /Siguiente/ }));
@@ -1675,7 +1726,7 @@ async function contestadasSinQuerer(page: Page, doble: (boton: Locator) => Promi
     if (p.bloqueadas === 0) {
       const ficha = BANCO[await enunciado(page)];
       const iCorrecta = (await textosOpcion(page)).indexOf(ficha.correcta);
-      await opciones(page).nth(iCorrecta === 3 ? 2 : 3).click();
+      await elegirTrasLeer(opciones(page).nth(iCorrecta === 3 ? 2 : 3));
     }
     await doble(page.getByRole('button', { name: /Ver resultado/ }));
     if ((await page.locator('[class*="resultadoCard"]').count()) === 0) {
@@ -1733,6 +1784,10 @@ async function enunciadosFueraDeLaVista(page: Page, niveles: RegExp[]): Promise<
       const ops = await textosOpcion(page);
       const iCorrecta = ops.indexOf(ficha.correcta);
       const elegida = opciones(page).nth(iCorrecta === 3 ? 2 : 3);
+      // Lee la pregunta antes de tocar: a velocidad de máquina el toque llegaba a menos de 300 ms
+      // y 100 px del de «Siguiente», y Chrome lo cuenta como el 2.º de la misma ráfaga, el toque
+      // de más que la app ignora desde la reparación del 2507 (30/09/2026).
+      await page.waitForTimeout(500);
       await bajarLoJusto(elegida);
       await tocarCentro(page, elegida);
       const siguiente = page.getByRole('button', { name: /Siguiente|Ver resultado/ });
@@ -1790,13 +1845,12 @@ test.describe('Inspector 30/09/2026 · móvil 360 × 740', () => {
   });
 
   /**
-   * HALLAZGO (operativa) — ABIERTO. El del doble clic del bloque de escritorio, donde más pasa:
+   * HALLAZGO 2507 (operativa) — REPARADO el 30/09/2026. El del doble clic del bloque de escritorio, donde más pasa:
    * dos toques a 150 ms. Medido el 30/09/2026 a 360 × 740: 4 de 4 en «Empezar» y 46 de 56 en
    * «Siguiente» contestaron la pregunta nueva con el segundo toque, y en «Ver resultado» 3 de 4
    * cayeron en «Jugar de nuevo» y borraron la nota antes de verla.
    */
-  test('ABIERTO · dos toques seguidos en «Empezar» o en «Siguiente» no contestan solos la pregunta siguiente', async ({ page }) => {
-    test.fail(); // ABIERTO: hallazgo del Inspector del 30/09/2026
+  test('2507 · dos toques seguidos en «Empezar» o en «Siguiente» no contestan solos la pregunta siguiente', async ({ page }) => {
     test.setTimeout(120_000);
     await sembrarAzarSinAviso(page);
     await abrirAsentada(page);
@@ -1809,6 +1863,12 @@ test.describe('Inspector 30/09/2026 · móvil 360 × 740', () => {
       await page.touchscreen.tap(x, y);
       await page.waitForTimeout(100);
     };
-    expect(await contestadasSinQuerer(page, dobleToque)).toEqual([]);
+    const tocar = async (opcion: Locator) => {
+      await bajarLoJusto(opcion);
+      await tocarCentro(page, opcion);
+    };
+    expect(await contestadasSinQuerer(page, dobleToque, tocar)).toEqual([]);
+    // Fallando las 15: 0/15, y la nota a la vista (el 2.º toque de «Ver resultado» no la borra)
+    await expect(page.locator('[class*="resultadoPuntuacion"]')).toHaveText('0 / 15 correctas');
   });
 });

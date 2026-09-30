@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef, type MouseEvent } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -133,8 +133,22 @@ export default function QuizLiteraturaUniversal() {
   const enunciadoRef = useRef<HTMLHeadingElement>(null);
   const botonSiguienteRef = useRef<HTMLButtonElement>(null);
   const resultadoRef = useRef<HTMLDivElement>(null);
+  /**
+   * Y al volver a la selección («← Cambiar de nivel», «Jugar de nuevo»), el botón pulsado se
+   * desmonta y el foco caía a <body>: el lector no anunciaba la pantalla nueva (hallazgo 2508).
+   * Va al título de la selección, con la misma regla de la vista. Solo al VOLVER: en la carga
+   * de la página el foco no se toca.
+   */
+  const seleccionBoxRef = useRef<HTMLElement>(null);
+  const seleccionTituloRef = useRef<HTMLHeadingElement>(null);
+  const volviendoRef = useRef(false);
   useEffect(() => {
-    if (fase === 'quiz' && respondida) {
+    if (fase === 'seleccion') {
+      if (!volviendoRef.current) return;
+      volviendoRef.current = false;
+      traerALaVista(seleccionBoxRef.current, seleccionTituloRef.current);
+      seleccionTituloRef.current?.focus({ preventScroll: true });
+    } else if (fase === 'quiz' && respondida) {
       botonSiguienteRef.current?.focus();
     } else if (fase === 'quiz') {
       traerALaVista(quizBoxRef.current, enunciadoRef.current);
@@ -145,7 +159,30 @@ export default function QuizLiteraturaUniversal() {
     }
   }, [fase, indice, respondida]);
 
-  const handleIniciar = useCallback(() => {
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 2507). «Empezar», «Siguiente», «Ver resultado»,
+   * «← Cambiar de nivel» y «Jugar de nuevo» cambian la pantalla en el primer clic, y el segundo
+   * caía en el mismo punto sobre lo que hubiera debajo en la pantalla nueva: contestaba la
+   * pregunta siguiente sin que nadie la eligiera, abandonaba la partida recién empezada o se
+   * llevaba la nota antes de verla (46 de 56 «Siguiente» a 360 px). Un doble clic es UNA
+   * intención, así que un clic se ignora cuando cumple las dos cosas:
+   *   · es el 2.º (o 3.º…) de una ráfaga: `detail` > 1. Lo cuenta el navegador (clics seguidos
+   *     en el mismo sitio), no un temporizador de la app; con teclado o lector de pantalla es 0;
+   *   · y el clic ANTERIOR de la app cambió de pantalla. Sin esta condición, contestar y pulsar
+   *     «Siguiente» deprisa en un móvil —dos toques a menos de 100 px, que Chrome también cuenta
+   *     como ráfaga— se comía el «Siguiente», que sí era una intención nueva.
+   * El clic ignorado no toca el registro: el 3.º de una ráfaga se ignora igual que el 2.º.
+   */
+  const ultimoCambioPantallaRef = useRef(false);
+  const clicDeMas = (e: MouseEvent<HTMLButtonElement>): boolean =>
+    e.detail > 1 && ultimoCambioPantallaRef.current;
+  const registrarClic = (cambiaPantalla: boolean) => {
+    ultimoCambioPantallaRef.current = cambiaPantalla;
+  };
+
+  const handleIniciar = useCallback((e: MouseEvent<HTMLButtonElement>) => {
+    if (e.detail > 1 && ultimoCambioPantallaRef.current) return;
+    ultimoCambioPantallaRef.current = true;
     setPreguntas(seleccionarPreguntas(nivelElegido));
     setIndice(0);
     setSeleccionada(null);
@@ -154,8 +191,15 @@ export default function QuizLiteraturaUniversal() {
     setFase('quiz');
   }, [nivelElegido]);
 
-  function handleRespuesta(idx: number) {
-    if (respondida) return;
+  function elegirNivel(e: MouseEvent<HTMLButtonElement>, n: Nivel | 'todos') {
+    if (clicDeMas(e)) return;
+    registrarClic(false);
+    setNivelElegido(n);
+  }
+
+  function handleRespuesta(e: MouseEvent<HTMLButtonElement>, idx: number) {
+    if (clicDeMas(e) || respondida) return;
+    registrarClic(false);
     setSeleccionada(idx);
     setRespondida(true);
     if (preguntaActual && idx === preguntaActual.correcta) {
@@ -163,17 +207,24 @@ export default function QuizLiteraturaUniversal() {
     }
   }
 
-  function handleSiguiente() {
+  // Avanza a la pregunta SIGUIENTE A LA PULSADA (`indice + 1` del render, no `i => i + 1`):
+  // si el mismo botón recibiera dos clics antes de repintar, no saltaría una pregunta.
+  function handleSiguiente(e: MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e) || !respondida) return;
+    registrarClic(true);
     if (indice + 1 >= preguntas.length) {
       setFase('resultado');
     } else {
-      setIndice(i => i + 1);
+      setIndice(indice + 1);
       setSeleccionada(null);
       setRespondida(false);
     }
   }
 
-  function handleReiniciar() {
+  function handleReiniciar(e: MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
+    volviendoRef.current = true;
     setFase('seleccion');
     setIndice(0);
     setSeleccionada(null);
@@ -199,8 +250,8 @@ export default function QuizLiteraturaUniversal() {
       <main className={styles.main}>
         {/* ── Pantalla de selección ── */}
         {fase === 'seleccion' && (
-          <section className={styles.seleccionBox}>
-            <h2 className={styles.seleccionTitle}>Elige el nivel de dificultad</h2>
+          <section className={styles.seleccionBox} ref={seleccionBoxRef}>
+            <h2 className={styles.seleccionTitle} ref={seleccionTituloRef} tabIndex={-1}>Elige el nivel de dificultad</h2>
             <div className={styles.nivelesGrid}>
               {(['basico', 'medio', 'avanzado'] as Nivel[]).map(n => (
                 <button
@@ -208,7 +259,7 @@ export default function QuizLiteraturaUniversal() {
                   key={n}
                   className={`${styles.nivelBtn} ${nivelElegido === n ? styles.nivelBtnActivo : ''}`}
                   style={nivelElegido === n ? { borderColor: NIVEL_CONFIG[n].color, background: NIVEL_CONFIG[n].color + '18' } : {}}
-                  onClick={() => setNivelElegido(n)}
+                  onClick={e => elegirNivel(e, n)}
                   aria-pressed={nivelElegido === n}
                 >
                   <span className={styles.nivelEmoji} aria-hidden="true">{NIVEL_CONFIG[n].emoji}</span>
@@ -220,7 +271,7 @@ export default function QuizLiteraturaUniversal() {
                 type="button"
                 className={`${styles.nivelBtn} ${nivelElegido === 'todos' ? styles.nivelBtnActivo : ''}`}
                 style={nivelElegido === 'todos' ? { borderColor: '#7B5EA7', background: '#7B5EA714' } : {}}
-                onClick={() => setNivelElegido('todos')}
+                onClick={e => elegirNivel(e, 'todos')}
                 aria-pressed={nivelElegido === 'todos'}
               >
                 <span className={styles.nivelEmoji} aria-hidden="true">🎲</span>
@@ -293,7 +344,7 @@ export default function QuizLiteraturaUniversal() {
                     type="button"
                     key={i}
                     className={`${styles.opcion} ${estadoClass}`}
-                    onClick={() => handleRespuesta(i)}
+                    onClick={e => handleRespuesta(e, i)}
                     disabled={respondida}
                     aria-label={`${String.fromCharCode(65 + i)}. ${opcion}${marca}`}
                   >
@@ -452,7 +503,7 @@ export default function QuizLiteraturaUniversal() {
               </div>
               <div className={styles.faqItem}>
                 <h4>¿Qué nivel debo elegir si soy principiante?</h4>
-                <p>Empieza por «Básico» para calibrar. Si aciertas más del 80%, sube a «Medio». Si en Medio superas el 70%, prueba «Avanzado». La «Mezcla» es el modo más desafiante.</p>
+                <p>Empieza por «Básico» para calibrar. Si aciertas más del 80 %, sube a «Medio». Si en Medio superas el 70 %, prueba «Avanzado». La «Mezcla» saca sus preguntas de los tres niveles a la vez —en torno a un tercio de cada uno—: sirve para repasar todo el banco, pero es más fácil que «Avanzado», donde las 15 son avanzadas.</p>
               </div>
             </div>
 
@@ -461,7 +512,7 @@ export default function QuizLiteraturaUniversal() {
               <div className={styles.step}>
                 <div className={styles.stepNumber}>1</div>
                 <div className={styles.stepContent}>
-                  <h4>Haz el nivel básico hasta superar el 85%</h4>
+                  <h4>Haz el nivel básico hasta superar el 85 %</h4>
                   <p>Los autores y obras básicos son la base. Sin ellos, el contexto de las preguntas de nivel medio no se entiende.</p>
                 </div>
               </div>
@@ -483,7 +534,7 @@ export default function QuizLiteraturaUniversal() {
                 <div className={styles.stepNumber}>4</div>
                 <div className={styles.stepContent}>
                   <h4>Complementa con el Visualizador de Estilos Literarios</h4>
-                  <p>Cada movimiento literario del visualizador corresponde a un bloque de preguntas del quiz. Úsalos en paralelo.</p>
+                  <p>El visualizador recorre diez movimientos con sus rasgos y sus autores, y el quiz no pregunta por todos: el Neoclasicismo, el Modernismo hispánico y la generación Beat no tienen preguntas propias. Úsalo para situar en su movimiento a los autores que te salgan y para repasar los que el quiz no toca.</p>
                 </div>
               </div>
             </div>
