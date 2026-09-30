@@ -18,6 +18,9 @@ import {
   TARIFA_CATALUNA_IS,
   COEFICIENTES_IS,
   COEFICIENTES_CATALUNA_IS,
+  LIMITES_PATRIMONIO_PREEXISTENTE_IS,
+  indiceTramoPatrimonioIS,
+  cuotaTributariaConCorreccionIS,
   REDUCCIONES_PARENTESCO_IS,
   REDUCCIONES_PARENTESCO_CATALUNA_IS,
   REDUCCION_EDAD_MENOR_21_IS,
@@ -85,6 +88,8 @@ interface ResultadoSucesiones {
   // Liquidación
   cuotaIntegra: number;
   coeficienteMultiplicador: number;
+  /** Lo que la corrección del salto del art. 22.2 LISD resta de la cuota (0 si no procede) */
+  correccionSalto: number;
   cuotaTributaria: number;
   // Bonificación
   bonificacionCcaa: number;
@@ -435,6 +440,22 @@ function rangoBonificacion(ccaas: string[], grupo: string): string {
   return min === max ? `el ${aTexto(min)}` : `del ${aTexto(min)} al ${aTexto(max)}`;
 }
 const capitalizar = (texto: string) => texto.charAt(0).toUpperCase() + texto.slice(1);
+
+/**
+ * Tramo del art. 22.2 LISD en que cae el patrimonio tecleado, con los límites legales exactos
+ * de `data/fiscal` (hallazgo 2484: la página los escribía truncados, «Menos de 402.678 €»).
+ */
+function textoTramoPatrimonio(patrimonio: number): string {
+  const [l1, l2, l3] = LIMITES_PATRIMONIO_PREEXISTENTE_IS;
+  const rangos = [
+    `de 0 a ${euros(l1)}`,
+    `de más de ${euros(l1)} a ${euros(l2)}`,
+    `de más de ${euros(l2)} a ${euros(l3)}`,
+    `más de ${euros(l3)}`,
+  ];
+  const k = indiceTramoPatrimonioIS(patrimonio);
+  return `Tramo ${k + 1} del coeficiente multiplicador (${rangos[k]}). Vacío cuenta como 0 €.`;
+}
 const NOMBRES_CCAA = (ccaas: string[]) => {
   const nombres = ccaas.map((c) => BONIFICACIONES_CCAA_IS[c].nombre.replace(/^Comunidad de /, ''));
   return nombres.length > 1 ? `${nombres.slice(0, -1).join(', ')} y ${nombres[nombres.length - 1]}` : nombres[0];
@@ -537,7 +558,14 @@ export default function EstimadorImpuestoSucesionesPage() {
   // Solo interviene si el heredero es colateral (Grupo III): art. 20.2.c LISD
   const [convivenciaDosAnios, setConvivenciaDosAnios] = useState(false);
   const [discapacidad, setDiscapacidad] = useState<NivelDiscapacidad>('0');
-  const [patrimonioIdx, setPatrimonioIdx] = useState('1');
+  /**
+   * El patrimonio preexistente se pide como IMPORTE, no por tramos (hallazgo 2483, 30/09/2026).
+   * Con un selector de tramos la corrección del salto de coeficiente del art. 22.2 LISD no se
+   * podía aplicar —depende de cuánto pasa el patrimonio del límite—, y a quien superaba un umbral
+   * por poco se le cobraba el coeficiente entero: 899,86 € de más para un sobrino gallego con
+   * 402.700 €. Vacío vale 0 €, el primer tramo, que era la opción por defecto del selector.
+   */
+  const [patrimonioPreexistente, setPatrimonioPreexistente] = useState('');
 
   // Tipo de adquisición
   const [tipoAdquisicion, setTipoAdquisicion] = useState<TipoAdquisicion>('plena');
@@ -581,13 +609,15 @@ export default function EstimadorImpuestoSucesionesPage() {
     const [dHipotecas, dPrestamos, dSepelio] = [hipotecas, otrosPrestamos, gastosSepelio].map(
       (texto, i) => leer(CAMPOS_DEUDAS[i].etiqueta, texto)
     );
+    const patrimonio = leer('Patrimonio preexistente del heredero', patrimonioPreexistente);
     return {
       invalidos,
+      patrimonio,
       bienes: { bSaldos, bAcciones, bVivienda, bOtrosInm, bVehiculos, bSeguros, bOtros },
       deudas: { dHipotecas, dPrestamos, dSepelio },
     };
   }, [saldosCuentas, accionesFondos, viviendaHabitual, otrosInmuebles, vehiculos, segurosVida,
-      otrosBienes, hipotecas, otrosPrestamos, gastosSepelio]);
+      otrosBienes, hipotecas, otrosPrestamos, gastosSepelio, patrimonioPreexistente]);
 
   /**
    * El porcentaje de herencia, leído con la misma regla que los importes: o es utilizable, o
@@ -889,8 +919,7 @@ export default function EstimadorImpuestoSucesionesPage() {
     // Coeficiente multiplicador
     const grupoBase = getGrupoBase(grupo);
     const coeficientes = esCataluna ? COEFICIENTES_CATALUNA_IS : COEFICIENTES_IS;
-    const idxPatrimonio = Math.min(3, Math.max(0, parseInt(patrimonioIdx) - 1));
-    const coeficienteMultiplicador = coeficientes[grupoBase]?.[idxPatrimonio] ?? 1;
+    const filaCoeficientes = coeficientes[grupoBase] ?? [1, 1, 1, 1];
 
     /**
      * ⚠️ 25/09/2026 (hallazgo 1823) — a céntimo la cuota tributaria y la bonificación, como en
@@ -902,7 +931,12 @@ export default function EstimadorImpuestoSucesionesPage() {
      * cifras publicadas.
      */
     const aCentimo = (n: number) => Math.round(n * 100) / 100;
-    const cuotaTributaria = aCentimo(cuotaIntegra * coeficienteMultiplicador);
+    // Coeficiente del tramo y corrección del salto del art. 22.2 LISD, con la fórmula de data/fiscal.
+    const {
+      coeficiente: coeficienteMultiplicador,
+      cuotaTributaria,
+      correccionSalto,
+    } = cuotaTributariaConCorreccionIS(cuotaIntegra, filaCoeficientes, importes.patrimonio);
 
     // Bonificación CCAA. `baseAjustada` es la base IMPONIBLE de ESTE heredero —ya con el ajuar
     // y con su porcentaje de herencia o su usufructo aplicados—, que es sobre la que la escala
@@ -935,6 +969,7 @@ export default function EstimadorImpuestoSucesionesPage() {
       baseLiquidable,
       cuotaIntegra,
       coeficienteMultiplicador,
+      correccionSalto,
       cuotaTributaria,
       bonificacionCcaa: bonificacion,
       porcentajeBonificacion: porcentaje,
@@ -946,7 +981,7 @@ export default function EstimadorImpuestoSucesionesPage() {
       esForal,
     };
   }, [
-    ccaa, grupo, edad, convivenciaDosAnios, discapacidad, patrimonioIdx, tipoAdquisicion,
+    ccaa, grupo, edad, convivenciaDosAnios, discapacidad, tipoAdquisicion,
     edadUsufructuario, porcentajeHerencia, porcentajeInvalido, importes, ccaaInfo, avisoEdad,
   ]);
 
@@ -1110,12 +1145,15 @@ export default function EstimadorImpuestoSucesionesPage() {
 
             <div className={styles.campo}>
               <label className={styles.label} htmlFor="patrimonio-preexistente">Patrimonio preexistente del heredero</label>
-              <select id="patrimonio-preexistente" className={styles.select} value={patrimonioIdx} onChange={(e) => setPatrimonioIdx(e.target.value)}>
-                <option value="1">Menos de 402.678 €</option>
-                <option value="2">402.678 € – 2.007.380 €</option>
-                <option value="3">2.007.380 € – 4.020.770 €</option>
-                <option value="4">Más de 4.020.770 €</option>
-              </select>
+              <div className={styles.inputConUnidad}>
+                <input id="patrimonio-preexistente" type="text" className={styles.input} value={patrimonioPreexistente}
+                  onChange={(e) => setPatrimonioPreexistente(e.target.value)}
+                  placeholder="0,00" inputMode="decimal" aria-describedby="patrimonio-preexistente-ayuda" />
+                <span className={styles.unidad}>€</span>
+              </div>
+              <span className={styles.helper} id="patrimonio-preexistente-ayuda">
+                {textoTramoPatrimonio(importes.patrimonio)}
+              </span>
             </div>
 
             <div className={styles.campo}>
@@ -1345,6 +1383,12 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <h3 className={styles.desgloseTitle}>Liquidación</h3>
                 <div className={styles.linea}><span>Cuota íntegra</span><span>{formatCurrency(resultado.cuotaIntegra)}</span></div>
                 <div className={styles.linea}><span>× Coeficiente multiplicador</span><span>×{formatNumber(resultado.coeficienteMultiplicador, 4)}</span></div>
+                {resultado.correccionSalto > 0 && (
+                  <div className={styles.linea}>
+                    <span>– Corrección del salto de coeficiente (art. 22.2 LISD)</span>
+                    <span>{formatCurrency(resultado.correccionSalto)}</span>
+                  </div>
+                )}
                 <div className={styles.linea}><span>Cuota tributaria</span><span>{formatCurrency(resultado.cuotaTributaria)}</span></div>
                 {resultado.bonificacionCcaa > 0 && (
                   <div className={styles.linea}>
@@ -1526,35 +1570,35 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <tr>
                   <td><strong>Grupo I</strong><br /><small>Descendiente &lt;21 a.</small></td>
                   <td>{euros(REDUCCIONES_PARENTESCO_IS['I-descendiente'])} + {euros(REDUCCION_EDAD_MENOR_21_IS)} por año &lt;21 (máx. {euros(REDUCCION_EDAD_MENOR_21_MAX_IS)})</td>
-                  <td>{formatNumber(COEFICIENTES_IS['I'][0], 4)} (patrimonio &lt;402.678 €)</td>
+                  <td>{formatNumber(COEFICIENTES_IS['I'][0], 4)} (patrimonio hasta {euros(LIMITES_PATRIMONIO_PREEXISTENTE_IS[0])})</td>
                   <td>{capitalizar(rangoBonificacion(CCAA_BONIF_GRUPO_I, 'I-descendiente'))} en {NOMBRES_CCAA(CCAA_BONIF_GRUPO_I)}</td>
                   <td>Hijo menor de 21 años hereda la vivienda familiar</td>
                 </tr>
                 <tr>
                   <td><strong>Grupo II</strong><br /><small>Descendiente ≥21 a. / cónyuge / ascendiente</small></td>
                   <td>{euros(REDUCCIONES_PARENTESCO_IS['II'])}</td>
-                  <td>{formatNumber(COEFICIENTES_IS['II'][0], 4)} (patrimonio &lt;402.678 €)</td>
+                  <td>{formatNumber(COEFICIENTES_IS['II'][0], 4)} (patrimonio hasta {euros(LIMITES_PATRIMONIO_PREEXISTENTE_IS[0])})</td>
                   <td>{capitalizar(rangoBonificacion(CCAA_BONIF_GRUPO_II, 'II'))} en {NOMBRES_CCAA(CCAA_BONIF_GRUPO_II)}; en Asturias, reducción de {euros(BONIFICACIONES_CCAA_IS['asturias'].bonificaciones['II']?.reduccionBase ?? 0)} en la base en vez de bonificación</td>
                   <td>Hijo adulto, cónyuge o padre hereda bienes del fallecido</td>
                 </tr>
                 <tr>
                   <td><strong>Grupo III</strong><br /><small>Hermanos, tíos, sobrinos</small></td>
                   <td>{euros(REDUCCIONES_PARENTESCO_IS['III'])}</td>
-                  <td>{formatNumber(COEFICIENTES_IS['III'][0], 4)} (patrimonio &lt;402.678 €)</td>
+                  <td>{formatNumber(COEFICIENTES_IS['III'][0], 4)} (patrimonio hasta {euros(LIMITES_PATRIMONIO_PREEXISTENTE_IS[0])})</td>
                   <td>Escasa o nula en la mayoría de CCAA</td>
                   <td>Sobrino hereda de tía sin hijos</td>
                 </tr>
                 <tr>
                   <td><strong>Grupo IV</strong><br /><small>Primos, parientes lejanos, extraños</small></td>
                   <td>{euros(REDUCCIONES_PARENTESCO_IS['IV'])}</td>
-                  <td>{formatNumber(COEFICIENTES_IS['IV'][0], 4)} (patrimonio &lt;402.678 €)</td>
+                  <td>{formatNumber(COEFICIENTES_IS['IV'][0], 4)} (patrimonio hasta {euros(LIMITES_PATRIMONIO_PREEXISTENTE_IS[0])})</td>
                   <td>Generalmente sin bonificación</td>
                   <td>Amigo o pareja no registrada hereda bienes</td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <p className={styles.helper}>* Coeficientes para el régimen estatal (tarifa de 2025). Cataluña tiene coeficientes propios.</p>
+          <p className={styles.helper}>* Coeficientes del art. 22.2 LISD para el régimen estatal (tarifa de {FISCAL_SUCESIONES_META.vigencia}). Cataluña tiene coeficientes propios.</p>
         </section>
 
         {/* ── Sección 2: Casos de uso ───────────────────────────────── */}
@@ -1761,11 +1805,14 @@ export default function EstimadorImpuestoSucesionesPage() {
               <dt>¿Qué es el coeficiente multiplicador?</dt>
               <dd>
                 Es un factor que incrementa la cuota íntegra según el grupo de parentesco y el
-                patrimonio preexistente del heredero. Un hijo con menos de 402.678 € de patrimonio
+                patrimonio preexistente del heredero. Un hijo con un patrimonio de hasta {euros(LIMITES_PATRIMONIO_PREEXISTENTE_IS[0])}
                 usa el coeficiente {formatNumber(COEFICIENTES_IS['II'][0], 4)} (sin incremento). Un sobrino (Grupo III) con el mismo
                 patrimonio usa {formatNumber(COEFICIENTES_IS['III'][0], 4)}, por lo que paga un {pct((COEFICIENTES_IS['III'][0] - 1) * 100, 2)} más que la cuota íntegra base.
-                Con patrimonio preexistente superior a 4.020.770 €, el coeficiente llega a{' '}
+                Con patrimonio preexistente de más de {euros(LIMITES_PATRIMONIO_PREEXISTENTE_IS[2])}, el coeficiente llega a{' '}
                 {formatNumber(COEFICIENTES_IS['IV'][COEFICIENTES_IS['IV'].length - 1], 1)} en el Grupo IV.
+                Al pasar de un tramo al siguiente, el art. 22.2 LISD impide que la cuota suba más de
+                lo que el patrimonio excede del límite: la herramienta aplica esa corrección con el
+                importe que escribas.
               </dd>
             </div>
 
@@ -1802,8 +1849,9 @@ export default function EstimadorImpuestoSucesionesPage() {
                 Sí. Las deudas acreditadas del fallecido (hipotecas, préstamos, facturas pendientes)
                 minoran la masa hereditaria. También son deducibles los <strong>gastos de última
                 enfermedad</strong> y los gastos de sepelio (entierro y funeral) en cuantía razonable.
-                No son deducibles las deudas contraídas con herederos, ni las garantizadas con cláusula
-                de reserva de dominio.
+                No lo son, en cambio, las deudas a favor de los herederos o de los legatarios de parte
+                alícuota, ni las que lo sean a favor de sus cónyuges, ascendientes, descendientes o
+                hermanos, aunque renuncien a la herencia (art. 13.1 LISD).
               </dd>
             </div>
 

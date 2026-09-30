@@ -66,7 +66,19 @@
 }
 
 .linkFuente {
-  color: rgba(255,255,255,0.9);
+  color: #FFFFFF;
+  /* Subrayado: el enlace no puede distinguirse solo por el color (WCAG 1.4.1). Sin él, en
+     reposo quedaba a 1,15:1 del texto de al lado, y al pasar el ratón `a:hover` de globals.css
+     (0,1,1) le ganaba a `.linkFuente` (0,1,0) y lo pintaba en --primary-hover sobre el hero:
+     1,31:1 (hallazgo 2489, estimador-impuesto-sucesiones, 30/09/2026, y sus tres copias). */
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.linkFuente:hover,
+.linkFuente:focus-visible {
+  color: #FFFFFF;
+  text-decoration-thickness: 2px;
 }
 
 .disclaimerCritico {

@@ -32,13 +32,15 @@ import { calcularSucesion } from '../../lib/calculadoras/sucesiones';
 const RUTA = '/estimador-impuesto-sucesiones/';
 
 /** Los 10 campos de importe (7 bienes + 3 deudas), en el orden en que se pintan. */
-const CAMPO = { saldos: 0, acciones: 1, viviendaHabitual: 2, otrosInmuebles: 3 } as const;
+const CAMPO = { saldos: 'saldos-cuentas', acciones: 'acciones-fondos', viviendaHabitual: 'vivienda-habitual', otrosInmuebles: 'otros-inmuebles' } as const;
+// Por id y no por posición: desde el 30/09/2026 el patrimonio preexistente también es un importe
+// (hallazgo 2483), va antes que los bienes y desplazaba todos los `nth()`.
 
-/** Los tres desplegables de la columna de datos, en orden. */
-const SELECT = { ccaa: 0, parentesco: 1, patrimonio: 2 } as const;
+/** Los dos primeros desplegables de la columna de datos, en orden (el patrimonio es un importe desde el 30/09/2026). */
+const SELECT = { ccaa: 0, parentesco: 1 } as const;
 
-async function importe(page: Page, campo: number, valor: string) {
-  await page.locator('input[inputmode="decimal"]').nth(campo).fill(valor);
+async function importe(page: Page, campo: string, valor: string) {
+  await page.locator(`#${campo}`).fill(valor);
 }
 
 /** El importe destacado del panel: «Impuesto estimado en …». */
@@ -298,7 +300,8 @@ test.describe('Estimador ISD — inspección: caso normal, caso límite y caso a
 
     // El coeficiente multiplicador del Grupo III sí crece con el patrimonio preexistente.
     // 2081,95 × 1,9059 = 3967,9887… → 3967,99 (antes 3968,00, desde 2081,95436).
-    await page.locator('select').nth(SELECT.patrimonio).selectOption('4');
+    // Último tramo del art. 22.2 (más de 4.020.770,98 €), tan lejos del límite que la corrección no actúa.
+    await sembrarValor(page, page.locator('#patrimonio-preexistente'), '10.000.000');
     expect(await cuota(page)).toBe('3967,99 €');
   });
 
@@ -605,7 +608,7 @@ test.describe('Re-inspección 12/09/2026 — tarifa del art. 21, coeficiente del
 
     await page.locator('select').nth(SELECT.ccaa).selectOption('rioja');
     await page.locator('select').nth(SELECT.parentesco).selectOption('II-ascendiente');
-    await sembrarValor(page, page.locator('input[inputmode="decimal"]').nth(CAMPO.saldos), '600000');
+    await sembrarValor(page, page.locator(`#${CAMPO.saldos}`), '600000');
 
     expect(await cuota(page)).toBe('2822,53 €');
 
@@ -643,8 +646,9 @@ test.describe('Re-inspección 12/09/2026 — tarifa del art. 21, coeficiente del
 
     await page.locator('select').nth(SELECT.ccaa).selectOption('valencia');
     await page.locator('select').nth(SELECT.parentesco).selectOption('IV');
-    await page.locator('select').nth(SELECT.patrimonio).selectOption('4');
-    await sembrarValor(page, page.locator('input[inputmode="decimal"]').nth(CAMPO.saldos), '1000000');
+    // Último tramo del art. 22.2 (más de 4.020.770,98 €), tan lejos del límite que la corrección no actúa.
+    await sembrarValor(page, page.locator('#patrimonio-preexistente'), '10.000.000');
+    await sembrarValor(page, page.locator(`#${CAMPO.saldos}`), '1000000');
 
     expect(await cuota(page)).toBe('667.974,41 €');
 
@@ -678,8 +682,8 @@ test.describe('Re-inspección 12/09/2026 — tarifa del art. 21, coeficiente del
 
     await page.locator('select').nth(SELECT.ccaa).selectOption('madrid');
     await page.locator('select').nth(SELECT.parentesco).selectOption('II');
-    await sembrarValor(page, page.locator('input[inputmode="decimal"]').nth(CAMPO.viviendaHabitual), '1e3');
-    await sembrarValor(page, page.locator('input[inputmode="decimal"]').nth(CAMPO.saldos), '50000');
+    await sembrarValor(page, page.locator(`#${CAMPO.viviendaHabitual}`), '1e3');
+    await sembrarValor(page, page.locator(`#${CAMPO.saldos}`), '50000');
 
     await expect(page.getByRole('alert').filter({ hasText: /no se puede leer/ }))
       .toContainText('Vivienda habitual');
@@ -2304,7 +2308,9 @@ test.describe('Re-inspección 27/09/2026', () => {
   test('caso normal: hijo de 35 en la Comunitat Valenciana con patrimonio del segundo tramo paga 92,80 €', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('valencia');
     await page.locator('#parentesco').selectOption('II');
-    await page.locator('#patrimonio-preexistente').selectOption('2');
+    // Segundo tramo lejos del umbral (desde el 30/09/2026 el patrimonio se pide por IMPORTE, hallazgo
+    // 2483): con 1.000.000 € la corrección del salto no actúa (salto 441,90 € < 597.321,89 € de exceso).
+    await sembrarValor(page, page.locator('#patrimonio-preexistente'), '1.000.000');
     await sembrarValor(page, page.locator('#vivienda-habitual'), '150.000');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '60000');
 
@@ -2747,11 +2753,17 @@ test.describe('Re-inspección 27/09/2026 — móvil 393×851', () => {
 
     await page.locator('#ccaa-causante').selectOption('valencia');
     await page.locator('#parentesco').selectOption('II');
-    await page.locator('#patrimonio-preexistente').selectOption('2');
+    // El patrimonio (un importe desde el 30/09/2026) se SIEMBRA: teclearlo con el dedo y pasar después
+    // a «Vivienda habitual» con otro toque deja, en el Chromium emulado, las pulsaciones siguientes
+    // en keydown sin input (medido: 2 de 3 repeticiones sin un solo carácter en el campo). Lo que este
+    // test mide es el tecleo de los BIENES con puntos de millar, y eso sigue haciéndose con el dedo.
+    await sembrarValor(page, page.locator('#patrimonio-preexistente'), '1.000.000');
     await page.locator('#vivienda-habitual').tap();
+    await expect(page.locator('#vivienda-habitual')).toBeFocused();
     await page.keyboard.type('150.000');
     await esperarValorEnReact(page, page.locator('#vivienda-habitual'), '150.000');
     await page.locator('#saldos-cuentas').tap();
+    await expect(page.locator('#saldos-cuentas')).toBeFocused();
     await page.keyboard.type('60.000');
     await esperarValorEnReact(page, page.locator('#saldos-cuentas'), '60.000');
 
@@ -2773,8 +2785,8 @@ test.describe('Re-inspección 27/09/2026 — móvil 393×851', () => {
 // céntimo con el tramo del 34 %, y el borde del Grupo I (20 frente a 21 años). Y el coeficiente
 // del art. 22.2 LISD en el segundo tramo de patrimonio, que es donde vive la otra sospecha.
 //
-// Lo que esta inspección encuentra roto va con `test.fail()` y un comentario «ABIERTO», afirmando
-// lo CORRECTO: cuando se repare, el test empezará a pasar y la marca hay que quitarla.
+// Lo que esta inspección encontró roto (hallazgos 2483-2490) iba con `test.fail()` y afirmaba lo
+// CORRECTO. Reparado el 30/09/2026: las marcas se retiraron y los testigos siguen como regresión.
 //
 // Lo que NO es hallazgo: que la app reste las deudas del caudal relicto ANTES de calcular el 3 %
 // del ajuar. El art. 15 LISD dice «el tres por ciento del importe del caudal relicto» y el
@@ -2884,18 +2896,18 @@ test.describe('Inspector 30/09/2026', () => {
    * CASO LÍMITE — el coeficiente del art. 22.2 LISD en el SEGUNDO tramo de patrimonio, lejos del
    * umbral. Sobrino (Grupo III) en GALICIA, que no bonifica al Grupo III
    * (`BONIFICACIONES_CCAA_IS['galicia']…['III'] = 0`), con 100.000 € en cuentas y 1.000.000 € de
-   * patrimonio preexistente (opción «402.678 € – 2.007.380 €»):
+   * patrimonio preexistente (segundo tramo del art. 22.2):
    *   base imponible 103.000,00 − 7993,46 (REDUCCIONES_PARENTESCO_IS['III']) = 95.006,54
    *   cuota íntegra   11.608,91   9166,06 + 16,15 % × (95.006,54 − 79.880,52) = 11.608,91223
    *   × 1,6676                    COEFICIENTES_IS['III'][1] («De más de 402.678,11 a 2.007.380,43»)
    *   = cuota         19.359,02 €
-   * Con 1.000.000 € la corrección del salto (el ABIERTO de abajo) no actúa: la diferencia de cuota
+   * Con 1.000.000 € la corrección del salto (el 2483 de abajo) no actúa: la diferencia de cuota
    * entre 1,6676 y 1,5882, 921,75 €, es menor que lo que el patrimonio pasa del umbral, 597.321,89 €.
    */
   test('caso límite: un sobrino en Galicia con patrimonio del segundo tramo liquida ×1,6676: 19.359,02 €', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('galicia');
     await page.locator('#parentesco').selectOption('III');
-    await page.locator('#patrimonio-preexistente').selectOption('2');
+    await sembrarValor(page, page.locator('#patrimonio-preexistente'), '1.000.000');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
 
     expect(await importeDelPanel(page, /^Base liquidable/)).toBe('95.006,54 €');
@@ -2940,7 +2952,7 @@ test.describe('Inspector 30/09/2026', () => {
   });
 
   /**
-   * ABIERTO — hallazgo (calculo, medio, Inspector 30/09/2026). El art. 22.2 LISD, tras la tabla de
+   * REPARADO el 30/09/2026 — hallazgo (calculo, medio, Inspector 30/09/2026). El art. 22.2 LISD, tras la tabla de
    * coeficientes, CORRIGE EL SALTO: «Cuando la diferencia entre la cuota tributaria obtenida por la
    * aplicación del coeficiente multiplicador que corresponda y la que resultaría de aplicar a la
    * misma cuota íntegra el coeficiente multiplicador inmediato inferior sea mayor que la que exista
@@ -2954,8 +2966,7 @@ test.describe('Inspector 30/09/2026', () => {
    *   → cuota tributaria 18.437,27 + 21,89 = 18.459,16 € (la app: 19.359,02 €, 899,86 € de más)
    * Afirma lo correcto con un campo de IMPORTE para el patrimonio, que es lo que la regla necesita.
    */
-  test('ABIERTO — con 402.700 € de patrimonio el art. 22.2 corrige el salto de coeficiente: 18.459,16 €', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el patrimonio se pide por tramos y no se aplica la corrección del salto del art. 22.2 LISD');
+  test('con 402.700 € de patrimonio el art. 22.2 corrige el salto de coeficiente: 18.459,16 €', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('galicia');
     await page.locator('#parentesco').selectOption('III');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
@@ -2963,11 +2974,25 @@ test.describe('Inspector 30/09/2026', () => {
     const campo = page.getByLabel(/Patrimonio preexistente/);
     expect(await campo.evaluate((e) => e.tagName), 'el patrimonio se pide por importe, no por tramo').toBe('INPUT');
     await sembrarValor(page, campo, '402.700');
+    expect(await importeDelPanel(page, /Coeficiente multiplicador/)).toBe('×1,6676');
+    expect(await importeDelPanel(page, /Corrección del salto/)).toBe('899,86 €');
+    expect(await importeDelPanel(page, /^Cuota tributaria/)).toBe('18.459,16 €');
     expect(await cuotaEstimada(page)).toBe('18.459,16 €');
+
+    // En el límite exacto (402.678,11 €, «De 0 a 402.678,11») es tramo 1: ×1,5882 y sin corrección.
+    await sembrarValor(page, campo, '402.678,11');
+    expect(await importeDelPanel(page, /Coeficiente multiplicador/)).toBe('×1,5882');
+    await expect(page.getByText(/Corrección del salto/)).toHaveCount(0);
+    expect(await cuotaEstimada(page)).toBe('18.437,27 €');
+
+    // Un importe que no es un número no se convierte en 0 €: se nombra y no hay cifra.
+    await sembrarValor(page, campo, '12abc');
+    await expect(page.locator('[class*="resultsPanel"]').getByRole('alert')).toContainText('Patrimonio preexistente del heredero');
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
   });
 
   /**
-   * ABIERTO — hallazgo (dato, bajo, Inspector 30/09/2026) — era la sospecha del 27/09 sobre
+   * REPARADO el 30/09/2026 — hallazgo (dato, bajo, Inspector 30/09/2026) — era la sospecha del 27/09 sobre
    * `data/fiscal`. Los umbrales del art. 22.2 LISD («De 0 a 402.678,11 · De más de 402.678,11 a
    * 2.007.380,43 · De más de 2.007.380,43 a 4.020.770,98 · Más de 4.020.770,98») no están en
    * `data/fiscal/sucesiones.ts` —que sí tiene `COEFICIENTES_IS`, la otra mitad de la misma tabla—
@@ -2976,8 +3001,7 @@ test.describe('Inspector 30/09/2026', () => {
    * otra cosa en el borde: con 402.678,11 € de patrimonio (tramo 1, ×1,0000) la única opción que
    * lo contiene es «402.678 € – 2.007.380 €» (×1,0500), porque la primera dice «Menos de 402.678 €».
    */
-  test('ABIERTO — los umbrales de patrimonio del art. 22.2 salen de data/fiscal, con sus céntimos', async ({ page }) => {
-    test.fail(true, 'ABIERTO: umbrales del art. 22.2 LISD tecleados y truncados, sin constante en data/fiscal');
+  test('los umbrales de patrimonio del art. 22.2 salen de data/fiscal, con sus céntimos', async ({ page }) => {
     const modulo = readFileSync(join(process.cwd(), 'data/fiscal/sucesiones.ts'), 'utf8');
     for (const umbral of [/402_?678\.11/, /2_?007_?380\.43/, /4_?020_?770\.98/]) {
       expect(modulo, `data/fiscal no tiene el umbral ${umbral}`).toMatch(umbral);
@@ -2986,13 +3010,16 @@ test.describe('Inspector 30/09/2026', () => {
     for (const tecleado of ['402.678', '2.007.380', '4.020.770']) {
       expect(jsx, `sigue tecleado: ${tecleado}`).not.toContain(tecleado);
     }
-    // Si el patrimonio se sigue pidiendo por tramos, el primero incluye su límite legal.
-    const opciones = await page.locator('#patrimonio-preexistente option').allInnerTexts();
-    if (opciones.length > 0) expect(opciones[0]).toContain('402.678,11');
+    // El patrimonio se pide por importe, y en el límite legal el tramo es el 1.
+    await sembrarValor(page, page.locator('#patrimonio-preexistente'), '402.678,11');
+    await expect(page.locator('#patrimonio-preexistente-ayuda')).toContainText('Tramo 1');
+    await expect(page.locator('#patrimonio-preexistente-ayuda')).toContainText('402.678,11');
+    await sembrarValor(page, page.locator('#patrimonio-preexistente'), '402.678,12');
+    await expect(page.locator('#patrimonio-preexistente-ayuda')).toContainText('Tramo 2');
   });
 
   /**
-   * ABIERTO — hallazgo (contenido, bajo, Inspector 30/09/2026) — era la sospecha del 27/09. El
+   * REPARADO el 30/09/2026 — hallazgo (contenido, bajo, Inspector 30/09/2026) — era la sospecha del 27/09. El
    * FAQPage del JSON-LD responde a «¿Cuánto se paga…?» que «Madrid o Andalucía bonifican el 99 % de
    * la CUOTA para cónyuge e hijos»: el 99 % sale de `bonifMadrid` y se le atribuye también a
    * Andalucía, cuando `BONIFICACIONES_CCAA_IS['andalucia']` le da exención TOTAL por debajo de
@@ -3000,8 +3027,7 @@ test.describe('Inspector 30/09/2026', () => {
    * desmiente: un hijo con 300.000 € en Andalucía liquida 0,00 €; siguiendo la FAQ, el 1 % de una
    * cuota de 53.692,81 € (293.043,13 € de base liquidable), 536,93 €. Es el canal que leen las IAs.
    */
-  test('ABIERTO — el FAQPage no reduce Andalucía a «bonifica el 99 %»: por debajo de 1.000.000 € exime', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el FAQPage atribuye a Andalucía el 99 % de Madrid y calla la exención');
+  test('el FAQPage no reduce Andalucía a «bonifica el 99 %»: por debajo de 1.000.000 € exime', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('andalucia');
     await page.locator('#parentesco').selectOption('II');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '300000');
@@ -3013,7 +3039,7 @@ test.describe('Inspector 30/09/2026', () => {
   });
 
   /**
-   * ABIERTO — hallazgo (dato, bajo, Inspector 30/09/2026) — era la sospecha del 27/09. El «2025» del
+   * REPARADO el 30/09/2026 — hallazgo (dato, bajo, Inspector 30/09/2026) — era la sospecha del 27/09. El «2025» del
    * title, la tarjeta de Open Graph, la de Twitter y las keywords va TECLEADO en metadata.ts, y la
    * nota de la tabla comparativa dice «tarifa de 2025» a mano, con `FISCAL_SUCESIONES_META.vigencia`
    * sellado y usado por el DataReference de la misma página. Hoy coinciden; al re-sellar el módulo
@@ -3021,8 +3047,7 @@ test.describe('Inspector 30/09/2026', () => {
    * Y ya hoy, con Cataluña elegida, la página liquida con la vigencia 2026 de
    * `FISCAL_SUCESIONES_CATALUNA_META` bajo un título que dice 2025.
    */
-  test('ABIERTO — el año del título, las tarjetas sociales y las keywords sale de la vigencia del sello', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el año va tecleado en metadata.ts y en la nota de la tabla');
+  test('el año del título, las tarjetas sociales y las keywords sale de la vigencia del sello', async ({ page }) => {
     // En pantalla hoy coincide: 2025 es la vigencia del sello general.
     const anios = (await page.title()).match(/\b20\d\d\b/g) ?? [];
     expect(anios.every((a) => a === FISCAL_SUCESIONES_META.vigencia), await page.title()).toBe(true);
@@ -3034,15 +3059,14 @@ test.describe('Inspector 30/09/2026', () => {
   });
 
   /**
-   * ABIERTO — hallazgo (contenido, bajo, Inspector 30/09/2026). El WebApplication del JSON-LD
+   * REPARADO el 30/09/2026 — hallazgo (contenido, bajo, Inspector 30/09/2026). El WebApplication del JSON-LD
    * anuncia «Usufructo y nuda propiedad por la regla del 89 menos la edad», la forma abreviada que
    * `VALORACION_USUFRUCTO_IS` documenta como incompleta: solo vale desde los 20 años; por debajo el
    * art. 26.a LISD fija un 70 % plano, y el suelo es el 10 %. Con un usufructuario de 15 años la
    * regla anunciada da el 74 % y la herramienta, bien, el 70,0 %. El hallazgo 1196 arregló el
    * helper del campo y no llegó a esta línea del canal que leen las IAs.
    */
-  test('ABIERTO — el WebApplication no anuncia el usufructo como «89 menos la edad» sin su techo del 70 %', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la característica del JSON-LD da la regla del usufructo sin su techo');
+  test('el WebApplication no anuncia el usufructo como «89 menos la edad» sin su techo del 70 %', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('madrid');
     await page.locator('#parentesco').selectOption('II');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
@@ -3057,14 +3081,13 @@ test.describe('Inspector 30/09/2026', () => {
   });
 
   /**
-   * ABIERTO — hallazgo (accesibilidad, medio, Inspector 30/09/2026). El título «Qué no incluye esta
+   * REPARADO el 30/09/2026 — hallazgo (accesibilidad, medio, Inspector 30/09/2026). El título «Qué no incluye esta
    * estimación» (16 px / 700, umbral 4,5:1) pinta `--danger` #C0392B, que el módulo declara en
    * `.container` y NO redeclara en `[data-theme='dark'] .container`, donde solo cambia el fondo
    * (`--danger-bg` #3D1A18): 4,76:1 en claro, 2,84:1 en oscuro. Es la forma del 1828 (`--success`
    * y `--bonif`), con un token semántico que `check:token-oscuro` deja fuera a propósito.
    */
-  test('ABIERTO — en oscuro el título «Qué no incluye esta estimación» llega a 4,5:1', async ({ page }) => {
-    test.fail(true, 'ABIERTO: --danger sin variante oscura en el módulo');
+  test('en oscuro el título «Qué no incluye esta estimación» llega a 4,5:1', async ({ page }) => {
     const selector = '[class*="disclaimerTitulo"]';
     await expect(page.locator(selector)).toContainText('Qué no incluye esta estimación');
     const [claro] = await contrastes(page, [selector]);
@@ -3083,15 +3106,14 @@ test.describe('Inspector 30/09/2026', () => {
   });
 
   /**
-   * ABIERTO — hallazgo (accesibilidad, bajo, Inspector 30/09/2026). El enlace «Agencia Tributaria»
+   * REPARADO el 30/09/2026 — hallazgo (accesibilidad, bajo, Inspector 30/09/2026). El enlace «Agencia Tributaria»
    * del hero («Datos verificados: … — Fuente: …») solo se distingue del texto de al lado por el
    * color: sin subrayado (globals.css: `a { text-decoration: none }`) y a 1,14:1 de ese texto, cuando
    * WCAG 1.4.1 pide 3:1 o una marca que no sea el color. Y al pasar el ratón `a:hover` (0,1,1) gana a
    * `.linkFuente` (0,1,0) y lo pinta en `--primary-hover` #246B8A sobre el `--hero-bg` #1A5278: el
    * nombre de la fuente se queda a ~1,3:1 de su fondo.
    */
-  test('ABIERTO — el enlace a la fuente del hero se distingue sin color y se lee al pasar el ratón', async ({ page }) => {
-    test.fail(true, 'ABIERTO: enlace del hero sin subrayado y ilegible en hover');
+  test('el enlace a la fuente del hero se distingue sin color y se lee al pasar el ratón', async ({ page }) => {
     const enlace = page.locator('[class*="metaVerificado"] a');
     const medir = () =>
       enlace.evaluate((a) => {
@@ -3138,7 +3160,7 @@ test.describe('Inspector 30/09/2026', () => {
   });
 
   /**
-   * ABIERTO — hallazgo (contenido, bajo, Inspector 30/09/2026). La FAQ «¿Puedo deducir las deudas
+   * REPARADO el 30/09/2026 — hallazgo (contenido, bajo, Inspector 30/09/2026). La FAQ «¿Puedo deducir las deudas
    * del causante?» dice que no son deducibles las «garantizadas con cláusula de reserva de dominio».
    * Ni el art. 13 LISD ni el art. 32 RISD —las dos normas de las deudas deducibles— tienen esa
    * exclusión: deducen «con carácter general las deudas que dejare contraídas el causante» que se
@@ -3147,8 +3169,7 @@ test.describe('Inspector 30/09/2026', () => {
    * única, y que la FAQ recorta a «deudas contraídas con herederos». La herramienta, en cambio,
    * deduce cualquier deuda que se escriba en «Otros préstamos y deudas».
    */
-  test('ABIERTO — la FAQ de las deudas no añade la exclusión de la «reserva de dominio», que la ley no tiene', async ({ page }) => {
-    test.fail(true, 'ABIERTO: exclusión de deudas sin ancla en el art. 13 LISD ni en el art. 32 RISD');
+  test('la FAQ de las deudas no añade la exclusión de la «reserva de dominio», que la ley no tiene', async ({ page }) => {
     const texto = await textoCompleto(page);
     const desde = texto.indexOf('¿Puedo deducir las deudas del causante?');
     expect(desde, 'la pregunta sigue en la FAQ').toBeGreaterThan(-1);

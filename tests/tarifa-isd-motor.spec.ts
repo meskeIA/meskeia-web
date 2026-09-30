@@ -27,7 +27,14 @@
 
 import { test, expect } from '@playwright/test';
 
-import { TARIFA_ESTATAL_ISD, TARIFA_ESTATAL_IS } from '../data/fiscal/sucesiones';
+import {
+  TARIFA_ESTATAL_ISD,
+  TARIFA_ESTATAL_IS,
+  COEFICIENTES_IS,
+  COEFICIENTES_CATALUNA_IS,
+  cuotaTributariaConCorreccionIS,
+  indiceTramoPatrimonioIS,
+} from '../data/fiscal/sucesiones';
 import { TARIFA_ESTATAL_ID } from '../data/fiscal/donaciones';
 import { calcularCuotaIntegraIS, calcularSucesion } from '../lib/calculadoras/sucesiones';
 
@@ -129,5 +136,58 @@ test.describe('Tarifa estatal del ISD (art. 21.2 LISD)', () => {
       prevHasta = tramo.hasta;
       if (prevHasta === Infinity) break;
     }
+  });
+});
+
+/**
+ * Corrección del salto de coeficiente del art. 22.2 LISD, último párrafo (hallazgo 2483,
+ * 30/09/2026, cotejado en BOE-A-1987-28141): la cuota con el coeficiente del tramo no puede pasar
+ * de la del coeficiente inferior más lo que el patrimonio excede del límite de ese tramo.
+ *
+ * Caso de la ficha, a mano. Sobrino (Grupo III) en Galicia, sin bonificación, base imponible
+ * 103.000 € (100.000 en cuentas + 3 % de ajuar):
+ *   base liquidable 103.000 − 7993,46 = 95.006,54
+ *   cuota íntegra   9166,06 + 16,15 % × (95.006,54 − 79.880,52) = 11.608,91
+ *   ×1,6676 = 19.359,02 · ×1,5882 = 18.437,27 · salto 921,75
+ *   patrimonio 402.700 → exceso 402.700 − 402.678,11 = 21,89 < 921,75
+ *   → cuota tributaria 18.437,27 + 21,89 = 18.459,16 (corrección 899,86)
+ */
+test.describe('Art. 22.2 LISD — tramos de patrimonio y corrección del salto', () => {
+  test('los límites de cada tramo son los del BOE, con el límite dentro del tramo inferior', () => {
+    expect(indiceTramoPatrimonioIS(0)).toBe(0);
+    expect(indiceTramoPatrimonioIS(402678.11)).toBe(0);
+    expect(indiceTramoPatrimonioIS(402678.12)).toBe(1);
+    expect(indiceTramoPatrimonioIS(2007380.43)).toBe(1);
+    expect(indiceTramoPatrimonioIS(2007380.44)).toBe(2);
+    expect(indiceTramoPatrimonioIS(4020770.98)).toBe(2);
+    expect(indiceTramoPatrimonioIS(4020770.99)).toBe(3);
+  });
+
+  test('pasar el umbral por 21,89 € sube la cuota 21,89 €, no 921,75 €', () => {
+    const r = cuotaTributariaConCorreccionIS(11608.91, COEFICIENTES_IS['III'], 402700);
+    expect(r).toEqual({ coeficiente: 1.6676, cuotaTributaria: 18459.16, correccionSalto: 899.86 });
+  });
+
+  test('lejos del umbral la corrección no actúa: 1.000.000 € liquida el coeficiente entero', () => {
+    // exceso 597.321,89 > salto 921,75
+    const r = cuotaTributariaConCorreccionIS(11608.91, COEFICIENTES_IS['III'], 1000000);
+    expect(r).toEqual({ coeficiente: 1.6676, cuotaTributaria: 19359.02, correccionSalto: 0 });
+  });
+
+  test('con coeficientes planos (Cataluña) no hay salto que corregir', () => {
+    const r = cuotaTributariaConCorreccionIS(11608.91, COEFICIENTES_CATALUNA_IS['III'], 402700);
+    expect(r.correccionSalto).toBe(0);
+    expect(r.cuotaTributaria).toBe(18437.27);
+  });
+
+  test('el motor aplica la corrección con el importe y el coeficiente entero con solo el índice', () => {
+    const base = { baseImponible: 103000, ccaa: 'galicia', grupo: 'III' } as const;
+    const conImporte = calcularSucesion({ ...base, patrimonioPreexistente: 402700 });
+    expect(conImporte.cuotaIntegra).toBe(11608.91);
+    expect(conImporte.cuotaTributaria).toBe(18459.16);
+    expect(conImporte.correccionSaltoCoeficiente).toBe(899.86);
+    const conIndice = calcularSucesion({ ...base, patrimonioIdx: 2 });
+    expect(conIndice.cuotaTributaria).toBe(19359.02);
+    expect(conIndice.correccionSaltoCoeficiente).toBe(0);
   });
 });

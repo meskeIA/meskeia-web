@@ -36,6 +36,11 @@
   --text-secondary: #B0B0B0;
   --border: #404040;
   --danger-bg: #3D1A18;
+  /* Sin él, el título «Qué no incluye esta estimación» seguía en el rojo del claro (#C0392B) y
+     daba 2,84:1 sobre #3D1A18 (hallazgo 2488, la forma del 1828 con un token semántico que
+     check:token-oscuro excluye a propósito). #F28B82 da 6,47:1 sobre #3D1A18 y 6,01:1 sobre
+     la tarjeta #2A2A2A. */
+  --danger: #F28B82;
   --warning-bg: #3D3000;
   --warning-border: #A07800;
   --success-bg: #0D2E1A;
@@ -75,8 +80,19 @@
 }
 
 .linkFuente {
-  color: rgba(255,255,255,0.9);
+  color: #FFFFFF;
+  /* Subrayado: el enlace no puede distinguirse solo por el color (WCAG 1.4.1). Sin él, en
+     reposo quedaba a 1,15:1 del texto de al lado, y al pasar el ratón `a:hover` de globals.css
+     (0,1,1) le ganaba a `.linkFuente` (0,1,0) y lo pintaba en --primary-hover sobre el hero:
+     1,31:1 (hallazgo 2489, estimador-impuesto-sucesiones, 30/09/2026, y sus tres copias). */
+  text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.linkFuente:hover,
+.linkFuente:focus-visible {
+  color: #FFFFFF;
+  text-decoration-thickness: 2px;
 }
 
 /* Disclaimer crítico */

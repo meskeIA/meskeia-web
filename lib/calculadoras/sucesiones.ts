@@ -15,6 +15,7 @@ import {
   TARIFA_CATALUNA_IS,
   COEFICIENTES_IS,
   COEFICIENTES_CATALUNA_IS,
+  cuotaTributariaConCorreccionIS,
   REDUCCIONES_PARENTESCO_IS,
   REDUCCIONES_PARENTESCO_CATALUNA_IS,
   REDUCCION_DISCAPACIDAD_33_IS,
@@ -76,8 +77,18 @@ export interface ParametrosSucesiones {
    * Índice de patrimonio preexistente del heredero:
    * 1 = 0–402.678 €, 2 = 402.678–2.007.380 €,
    * 3 = 2.007.380–4.020.770 €, 4 = más de 4.020.770 €
+   *
+   * Con el índice solo se conoce el tramo, no cuánto pasa el patrimonio de su límite inferior,
+   * así que la corrección del salto del art. 22.2 LISD no se puede aplicar: se usa el
+   * coeficiente entero del tramo. Quien conozca el importe debe pasar `patrimonioPreexistente`.
    */
   patrimonioIdx?: IndicePatrimonioIS;
+  /**
+   * Importe del patrimonio preexistente del heredero, en euros. Si se pasa, MANDA sobre
+   * `patrimonioIdx`: fija el tramo y permite aplicar la corrección del salto de coeficiente del
+   * art. 22.2 LISD (hallazgo 2483, 30/09/2026).
+   */
+  patrimonioPreexistente?: number;
   /** Valor de la vivienda habitual incluida en la herencia (para reducción 95%) */
   viviendaHabitual?: number;
   /**
@@ -124,6 +135,8 @@ export interface ResultadoSucesiones {
   baseLiquidable: number;
   cuotaIntegra: number;
   coeficienteMultiplicador: number;
+  /** Lo que la corrección del salto del art. 22.2 LISD resta de la cuota (0 si no procede o no se conoce el importe). */
+  correccionSaltoCoeficiente: number;
   cuotaTributaria: number;
   bonificacionCcaa: number;
   porcentajeBonificacion: number;
@@ -413,6 +426,10 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
   const grupoBase = getGrupoBase(p.grupo);
   const discapacidad = p.discapacidad ?? '0';
   const patrimonioIdx = Math.min(4, Math.max(1, p.patrimonioIdx ?? 1)) - 1;
+  const patrimonioConocido =
+    typeof p.patrimonioPreexistente === 'number' && Number.isFinite(p.patrimonioPreexistente) && p.patrimonioPreexistente >= 0
+      ? p.patrimonioPreexistente
+      : null;
   const edad = p.edadHeredero;
 
   // 1. Ajuar doméstico (3% de la base si se incluye)
@@ -492,8 +509,17 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
 
   // 8. Coeficiente multiplicador
   const coefs = esCataluna ? COEFICIENTES_CATALUNA_IS : COEFICIENTES_IS;
-  const coeficienteMultiplicador = coefs[grupoBase]?.[patrimonioIdx] ?? 1;
-  const cuotaTributaria = r(cuotaIntegra * coeficienteMultiplicador);
+  const filaCoefs = coefs[grupoBase] ?? [1, 1, 1, 1];
+  // Con el importe, el tramo sale de él y se aplica la corrección del salto del art. 22.2 LISD
+  // (la cuota no puede superar la del coeficiente inferior más lo que el patrimonio pasa del
+  // límite). Con solo el índice, el coeficiente entero del tramo, como hasta el 30/09/2026.
+  const { coeficiente: coeficienteMultiplicador, cuotaTributaria, correccionSalto } = patrimonioConocido !== null
+    ? cuotaTributariaConCorreccionIS(cuotaIntegra, filaCoefs, patrimonioConocido)
+    : {
+        coeficiente: filaCoefs[patrimonioIdx] ?? 1,
+        cuotaTributaria: r(cuotaIntegra * (filaCoefs[patrimonioIdx] ?? 1)),
+        correccionSalto: 0,
+      };
 
   // 9. Bonificación autonómica
   // `baseConAjuar` es la base IMPONIBLE, que es sobre la que la escala catalana del art. 58 bis
@@ -536,6 +562,7 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
     baseLiquidable,
     cuotaIntegra,
     coeficienteMultiplicador,
+    correccionSaltoCoeficiente: correccionSalto,
     cuotaTributaria,
     bonificacionCcaa:         bonificacionPublicada,
     porcentajeBonificacion:   r(porcentaje),

@@ -128,6 +128,68 @@ export const COEFICIENTES_IS: Record<string, number[]> = {
   'IV':  [2.0000, 2.1000, 2.2000, 2.4000],
 };
 
+/**
+ * Límites SUPERIORES de los tres primeros tramos de patrimonio preexistente (art. 22.2 LISD,
+ * cotejado en el texto consolidado del BOE, BOE-A-1987-28141, el 30/09/2026): «De 0 a
+ * 402.678,11», «De más de 402.678,11 a 2.007.380,43», «De más de 2.007.380,43 a 4.020.770,98» y
+ * «Más de 4.020.770,98». Son la otra mitad de la tabla de `COEFICIENTES_IS`.
+ *
+ * Hasta el 30/09/2026 no estaban aquí: la página los tecleaba truncados en diez líneas
+ * («Menos de 402.678 €»), así que quien tenía justo 402.678,11 € —tramo 1 por ley— solo cabía
+ * en la opción del tramo 2 (hallazgo 2484).
+ */
+export const LIMITES_PATRIMONIO_PREEXISTENTE_IS = [402678.11, 2007380.43, 4020770.98] as const;
+
+/** Índice 0-3 del tramo de patrimonio preexistente al que pertenece un importe (art. 22.2 LISD). */
+export function indiceTramoPatrimonioIS(patrimonio: number): 0 | 1 | 2 | 3 {
+  const [l1, l2, l3] = LIMITES_PATRIMONIO_PREEXISTENTE_IS;
+  if (patrimonio <= l1) return 0;
+  if (patrimonio <= l2) return 1;
+  if (patrimonio <= l3) return 2;
+  return 3;
+}
+
+export interface CuotaTributariaIS {
+  /** Coeficiente del tramo en que cae el patrimonio. */
+  coeficiente: number;
+  /** Cuota íntegra × coeficiente, ya con la corrección del salto, a céntimo. */
+  cuotaTributaria: number;
+  /** Lo que la corrección del art. 22.2 in fine le ha quitado (0 si no procede). */
+  correccionSalto: number;
+}
+
+/**
+ * Cuota tributaria del art. 22 LISD con la corrección del salto de coeficiente (art. 22.2, último
+ * párrafo): cuando la diferencia entre la cuota con el coeficiente del tramo y la que daría el
+ * coeficiente inmediato inferior es MAYOR que lo que el patrimonio preexistente pasa del límite
+ * de ese tramo inferior, la cuota se reduce en el exceso. Es decir:
+ *
+ *   cuota = mín( CI × c[k],  CI × c[k−1] + (patrimonio − límite[k−1]) )
+ *
+ * Sin ella, a quien pasa un umbral por un euro se le cobraba el coeficiente entero: un sobrino
+ * gallego con 402.700 € de patrimonio y 11.608,91 € de cuota íntegra pagaba 19.359,02 € en vez
+ * de 18.459,16 € (899,86 € de más; hallazgo 2483, 30/09/2026).
+ *
+ * `coeficientes` es la fila del grupo (estatal o autonómica): con coeficientes planos, como los
+ * de Cataluña, la diferencia es cero y la corrección nunca actúa.
+ */
+export function cuotaTributariaConCorreccionIS(
+  cuotaIntegra: number,
+  coeficientes: readonly number[],
+  patrimonio: number,
+): CuotaTributariaIS {
+  const aCentimo = (n: number) => Math.round(n * 100) / 100;
+  const k = indiceTramoPatrimonioIS(Math.max(0, patrimonio));
+  const coeficiente = coeficientes[k] ?? 1;
+  const cuotaEntera = aCentimo(cuotaIntegra * coeficiente);
+  if (k === 0) return { coeficiente, cuotaTributaria: cuotaEntera, correccionSalto: 0 };
+  const cuotaInferior = aCentimo(cuotaIntegra * (coeficientes[k - 1] ?? coeficiente));
+  const exceso = patrimonio - LIMITES_PATRIMONIO_PREEXISTENTE_IS[k - 1];
+  const tope = aCentimo(cuotaInferior + exceso);
+  if (cuotaEntera <= tope) return { coeficiente, cuotaTributaria: cuotaEntera, correccionSalto: 0 };
+  return { coeficiente, cuotaTributaria: tope, correccionSalto: aCentimo(cuotaEntera - tope) };
+}
+
 // Cataluña: coeficientes propios (Gr I-II sin incremento por patrimonio)
 export const COEFICIENTES_CATALUNA_IS: Record<string, number[]> = {
   'I':   [1.0000, 1.0000, 1.0000, 1.0000],
