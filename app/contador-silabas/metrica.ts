@@ -173,6 +173,21 @@ export const acentuacionDe = (palabra: string, silabas: string[]): Acentuacion =
     return 'esdrujula';
   }
 
+  /**
+   * ── La «y» final tras CONSONANTE suena vocal (hallazgo 2463, 30/09/2026) ──────────────
+   * La regla ortográfica de la tilde trata la «y» final como consonante, y así rey, virrey,
+   * jersey, estoy o Uruguay son agudas sin tilde. Pero esa «y» va siempre tras VOCAL: cierra
+   * un diptongo o triptongo. Tras consonante no hay ninguna palabra patrimonial; solo
+   * anglicismos crudos (ferry, whisky, rugby, party) cuya «y» se pronuncia [i] como núcleo
+   * de sílaba, y la palabra acaba en vocal a efectos de acento: sus formas adaptadas por la
+   * RAE —ferri, güisqui, rugbi— se escriben sin tilde, o sea que son LLANAS. Antes se daban
+   * por agudas y el verso sumaba +1: «cruzamos el mar en ferry» medía 9 y «…en ferri», 8.
+   * La «y» tras vocal (hockey, jersey) sigue la regla escrita: sin léxico no hay manera de
+   * separarlas. diccionario-rimas lo tapaba solo en su lado (`esAnglicismoEnY`); aquí lo
+   * arregla para las dos apps, que comparten esta función.
+   */
+  if (/[^aeiouáéíóúüy]y$/.test(p)) return 'llana';
+
   // Sin tilde: termina en vocal, «n» o «s» → llana; en cualquier otra letra → aguda
   const ultima = p[p.length - 1];
   if (esVocalMetrica(ultima) || ultima === 'n' || ultima === 's') return 'llana';

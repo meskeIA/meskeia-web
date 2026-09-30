@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion as esperarHidratacionReact, esperarValorEnReact } from './_hidratacion';
+import { acentuacionDe, analizarVerso, separarSilabas } from '../../app/contador-silabas/metrica';
 
 /**
  * Inspector — contador-silabas (segmento interactiva con motor lingüístico)
@@ -1453,18 +1454,19 @@ test.describe('contador-silabas · Inspector 30/09/2026', () => {
   });
 
   // -----------------------------------------------------------------------------------
-  // HALLAZGOS 30/09/2026 — ABIERTOS, con test.fail(), afirmando lo que DEBERÍA ocurrir.
-  // Comprobados SIN la marca: fallan por lo que dice su comentario. Al repararlos, quitar la
-  // marca DESPUÉS de verificar que lo que afirman sigue siendo lo correcto.
+  // HALLAZGOS 30/09/2026 (2463-2465) — REPARADOS el mismo 30/09/2026. Se escribieron con
+  // test.fail(), afirmando lo que DEBERÍA ocurrir; se les quitó la marca tras comprobar que
+  // lo que afirman sigue siendo lo correcto, y quedan como regresión.
   // -----------------------------------------------------------------------------------
 
-  test('HALLAZGO ABIERTO · un anglicismo en consonante + «y» al final del verso se computa agudo (+1)', async ({
+  test('HALLAZGO 2463 (reparado) · un anglicismo en consonante + «y» al final del verso es llano (±0)', async ({
     page,
   }) => {
-    // ABIERTO. La partición es correcta; lo que falla es el acento: `acentuacionDe` ve la «y»
-    // final como consonante y, sin tilde, declara aguda la palabra. Así el mismo verso mide 8
-    // con «ferri» (CASO 2) y 9 con «ferry», que se pronuncian igual.
-    test.fail();
+    // REPARADO el 30/09/2026. La partición era correcta; fallaba el acento: `acentuacionDe` veía
+    // la «y» final como consonante y, sin tilde, declaraba aguda la palabra, así que el mismo
+    // verso medía 8 con «ferri» (CASO 2) y 9 con «ferry», que se pronuncian igual. Ahora la «y»
+    // tras consonante se trata como la vocal [i] que suena; tras vocal (rey, jersey) sigue la
+    // regla escrita — lo fija el test de motor que va detrás de este bloque.
     await analizarConEstado(
       page,
       'cruzamos el mar en ferry\ny un vaso lleno de whisky\nlos chicos juegan al rugby',
@@ -1486,7 +1488,7 @@ test.describe('contador-silabas · Inspector 30/09/2026', () => {
         })),
       );
     // ferry: 8 fonéticas ± 0 = 8 · whisky: 9 − 1 ± 0 = 8 · rugby: 8 ± 0 = 8, las tres llanas.
-    // Obtenido: 9, 9 y 9, las tres con «+ 1 (última palabra aguda)».
+    // Antes de la reparación: 9, 9 y 9, las tres con «+ 1 (última palabra aguda)».
     expect(medidas).toEqual([
       { metricas: '8', llana: true },
       { metricas: '8', llana: true },
@@ -1494,15 +1496,14 @@ test.describe('contador-silabas · Inspector 30/09/2026', () => {
     ]);
   });
 
-  test('HALLAZGO ABIERTO · los 11 iconos del bloque educativo se leen en voz alta antes de cada titular', async ({
+  test('HALLAZGO 2464 (reparado) · los 11 iconos del bloque educativo ya no se leen antes de cada titular', async ({
     page,
   }) => {
-    // ABIERTO. 🎭 📚 🎵 🌍 (usos), 🗣️ 🔤 📌 ✍️ 🎯 📖 (consejos) y ⚠️ (limitaciones) van en su
-    // propio <span> sin aria-hidden: el árbol de accesibilidad los expone como texto
+    // REPARADO el 30/09/2026: los 11 llevan ahora aria-hidden="true". Lo que se vio: 🎭 📚 🎵 🌍 (usos), 🗣️ 🔤 📌 ✍️ 🎯 📖 (consejos) y ⚠️ (limitaciones) van en su
+    // propio <span> sin aria-hidden: el árbol de accesibilidad los exponía como texto
     // («text: 🎭») justo antes del <h4>. Son decorativos —el titular ya lo dice todo—, así que
-    // un lector de pantalla anuncia «máscaras de teatro» antes de «Poesía y Métrica Española».
-    // Es el hallazgo 709 de generador-anagramas, reparado allí en 43473556, el mismo commit.
-    test.fail();
+    // un lector de pantalla anunciaba «máscaras de teatro» antes de «Poesía y Métrica Española».
+    // Es el hallazgo 709 de generador-anagramas, reparado allí en 43473556.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     await expect(page.getByRole('heading', { name: 'Poesía y Métrica Española' })).toBeVisible();
     const sinOcultar = await page
@@ -1510,24 +1511,56 @@ test.describe('contador-silabas · Inspector 30/09/2026', () => {
       .evaluateAll((iconos) =>
         iconos.filter((el) => el.getAttribute('aria-hidden') !== 'true').map((el) => el.textContent),
       );
-    expect(sinOcultar).toEqual([]); // obtenido: los 11 iconos
+    expect(sinOcultar).toEqual([]); // antes de la reparación: los 11 iconos
   });
 
-  test('HALLAZGO ABIERTO · el chip de diptongo pide un fondo con una variable que no existe', async ({
+  test('HALLAZGO 2465 (reparado) · el chip de diptongo tiene relleno también en claro', async ({
     page,
   }) => {
-    // ABIERTO. `.encuentro` declara `background: var(--bg-secondary)` y globals.css no define
-    // ese token (tiene --bg-primary y --bg-card): una var() sin definir y sin reserva anula la
-    // declaración, y en claro el chip se queda TRANSPARENTE, solo con el borde. El tema oscuro
-    // sí le da relleno (su regla usa un rgba literal), así que los dos temas no pintan lo mismo.
-    // Es uno de los nombres sueltos de la sospecha transversal del 28/09 (var() sin definir).
-    test.fail();
+    // REPARADO el 30/09/2026: `.encuentro` declaraba `background: var(--bg-secondary)` y
+    // globals.css no define ese token (tiene --bg-primary y --bg-card): una var() sin definir y
+    // sin reserva anula la declaración, y en claro el chip se quedaba TRANSPARENTE, solo con el
+    // borde, mientras el oscuro sí tenía relleno (rgba literal). Ahora usa --bg-card, blanco
+    // sobre el --bg-primary de la tarjeta de palabra. Era uno de los nombres sueltos de la
+    // sospecha transversal del 28/09 (var() sin definir).
     await analizarConEstado(page, 'murciélago');
     const chip = page.locator('[class*="palabraEncuentros"] > span').first();
     await expect(chip).toContainText('Diptongo');
     const tema = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
     expect(tema).not.toBe('dark');
     const fondo = await chip.evaluate((el) => getComputedStyle(el).backgroundColor);
-    expect(fondo).not.toBe('rgba(0, 0, 0, 0)'); // obtenido: rgba(0, 0, 0, 0)
+    expect(fondo).not.toBe('rgba(0, 0, 0, 0)'); // antes de la reparación: rgba(0, 0, 0, 0)
+    expect(fondo).toBe('rgb(255, 255, 255)'); // --bg-card en claro
   });
+});
+
+/**
+ * Motor · la «y» final tras VOCAL sigue siendo aguda; tras CONSONANTE, llana (hallazgo 2463).
+ *
+ * La reparación de 2463 no podía romper lo que ya estaba bien. A mano, por la OLE 2010:
+ *   · «y» tras vocal cierra diptongo o triptongo y cuenta como consonante para la tilde, así
+ *     que sin tilde son AGUDAS: rey y ley (monosílabos), jer-sey, vi-rrey, es-toy, U-ru-guay,
+ *     Pa-ra-guay. «hockey» (hoc-key) cae aquí por escritura: limitación declarada, igual que
+ *     en la sexta inspección.
+ *   · «y» tras consonante suena [i] y la palabra acaba en vocal: LLANAS ferry, whisky, rugby,
+ *     party, como sus formas adaptadas ferri, güisqui, rugbi (sin tilde).
+ *   · la tilde escrita manda: pó-ney, yó-quey son llanas.
+ * Y el verso del acta: «esta noche vamos a la party» → es-ta(2) no-che(2) va-mos(2) a(1) la(1)
+ * par-ty(2) = 10 fonéticas; ningún contacto vocal-vocal («vamos a» acaba en s, «a la» empieza
+ * por l); llana ±0 → 10, decasílabo (la app daba 11).
+ */
+test('motor 2463 · la «y» final: aguda tras vocal, llana tras consonante', () => {
+  const acento = (palabra: string) => acentuacionDe(palabra, separarSilabas(palabra));
+  for (const aguda of ['rey', 'ley', 'jersey', 'virrey', 'estoy', 'Uruguay', 'Paraguay', 'hockey']) {
+    expect(acento(aguda), aguda).toBe('aguda');
+  }
+  for (const llana of ['ferry', 'whisky', 'rugby', 'party', 'ferri', 'güisqui', 'rugbi', 'póney', 'yóquey']) {
+    expect(acento(llana), llana).toBe('llana');
+  }
+  const verso = analizarVerso('esta noche vamos a la party');
+  expect(verso?.silabasFoneticas).toBe(10);
+  expect(verso?.sinalefas).toHaveLength(0);
+  expect(verso?.acentuacion).toBe('llana');
+  expect(verso?.silabasMetricas).toBe(10);
+  expect(verso?.nombre).toBe('decasílabo');
 });

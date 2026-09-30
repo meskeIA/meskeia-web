@@ -696,22 +696,22 @@ sabañón garrafal, morado y frito.`,
           <h3><span aria-hidden="true">🎯</span> Usos del Contador de Sílabas</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🎭</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🎭</span>
               <h4>Poesía y Métrica Española</h4>
               <p>La métrica española clasifica los versos por número de sílabas: heptasílabo (7), octosílabo (8), endecasílabo (11), alejandrino (14). El soneto usa endecasílabos. El romance usa octosílabos con rima asonante en los pares. Contar sílabas correctamente es fundamental para escribir o analizar poesía con rigor.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>📚</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">📚</span>
               <h4>Lengua y Literatura (secundaria y preparatoria)</h4>
               <p>El análisis métrico es habitual en los exámenes de Lengua Castellana en secundaria y preparatoria. Incluye identificar el número de sílabas, el tipo de verso (tónico), las licencias poéticas (sinalefa, dialefa, sineresis, dieresis) y la rima (consonante o asonante). Esta herramienta ayuda a verificar cuentas antes de entregar trabajos.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🎵</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🎵</span>
               <h4>Composición de Letras Musicales</h4>
               <p>Las letras de canciones en español siguen patrones silábicos para encajar con la melodía. Una sílaba por nota es lo habitual; las melismas (varias notas por sílaba) son la excepción. Contar sílabas de tus letras te ayuda a saber cuándo una línea es demasiado larga o corta para la frase musical que tienes en mente.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🌍</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🌍</span>
               <h4>Aprendizaje del Español como LE</h4>
               <p>Para hablantes no nativos, el silabeo es uno de los aspectos más difíciles del español. Idiomas como el inglés no distinguen claramente sílabas en la escritura. Usar esta herramienta ayuda a interiorizar los patrones silábicos del español, mejorando la pronunciación, el acento y la comprensión de la acentuación ortográfica.</p>
             </div>
@@ -808,12 +808,12 @@ sabañón garrafal, morado y frito.`,
           <h3><span aria-hidden="true">💡</span> Consejos para Dominar el Silabeo Español</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🗣️</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🗣️</span>
               <h4>Pronuncia en voz alta siempre</h4>
               <p>El silabeo español es fonético: sigue cómo se pronuncia, no cómo se escribe. Si no estás seguro de dónde cae la división, pronúncialo lentamente golpeando la mesa con cada sílaba. Tu oído y tu boca saben la respuesta.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🔤</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🔤</span>
               <h4>Recuerda las vocales fuertes y débiles</h4>
               {/* El mnemotécnico —que es lo que un estudiante memoriza— partía las cinco
                   vocales como «A-E-IO-U», metiendo la O en el grupo de las débiles y
@@ -824,7 +824,7 @@ sabañón garrafal, morado y frito.`,
               <p>Mnemotécnico: las <strong>fuertes</strong> (o abiertas) son <strong>A</strong>, <strong>E</strong>, <strong>O</strong> —las tres que puedes gritar con la boca abierta— y las <strong>débiles</strong> (o cerradas) son <strong>I</strong> y <strong>U</strong>, las dos que se pronuncian con la boca casi cerrada. Dos fuertes nunca van juntas en la misma sílaba: po-e-ta, ca-os. Este es el dato más importante para resolver diptongos e hiatos.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>📌</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">📌</span>
               <h4>La tilde sobre i/u rompe el diptongo… con una excepción</h4>
               {/* Decía «Regla sin excepciones», y es falso: la OLE 2010 fija que dos vocales
                   cerradas DISTINTAS forman siempre diptongo ortográfico aunque una lleve
@@ -841,17 +841,17 @@ sabañón garrafal, morado y frito.`,
               <p><strong>La excepción:</strong> entre dos vocales <strong>cerradas distintas</strong> (i, u) hay diptongo aunque una lleve tilde, porque así lo fija la ortografía académica: ca-suís-ti-co, cuí-da-te, lin-güís-ti-ca. Pruébalas arriba y verás que la herramienta las rotula como diptongo.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>✍️</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">✍️</span>
               <h4>Para poesía: fíjate en las sílabas métricas, no en las fonéticas</h4>
               <p>Son dos cuentas distintas y la herramienta te da las dos. Las <strong>fonéticas</strong> salen de silabear cada palabra aislada; las <strong>métricas</strong> son las que cuentan en el verso, y resultan de restar las sinalefas y aplicar el ajuste por acento final. Un verso de 11 sílabas métricas puede tener 13 fonéticas.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🎯</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🎯</span>
               <h4>Los grupos bl, br, cl, cr, dr, fl, fr... van juntos</h4>
               <p>Estos grupos consonánticos (oclusiva + líquida) nunca se separan en el silabeo: a-brir, o-tros, a-gra-dar, a-fli-gir. En cambio, los que no pueden abrir sílaba se reparten entre las dos: cons-tar, ins-ti-tu-to, obs-tá-cu-lo, pers-pec-ti-va. La regla es esa: si el grupo puede iniciar una sílaba en español, viaja entero a la siguiente; si no, se parte.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>📖</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">📖</span>
               <h4>Practica con poemas que ya conoces</h4>
               <p>Toma un poema conocido (Lorca, Machado, Neruda, Gustavo Adolfo Bécquer) cuya métrica sea conocida y verifica que tus cuentas coinciden. El Soneto XXIII de Garcilaso (&quot;En tanto que de rosa y azucena&quot;) tiene 11 sílabas por verso: es un banco de pruebas inmejorable.</p>
             </div>
@@ -860,7 +860,7 @@ sabañón garrafal, morado y frito.`,
 
         <section>
           <div className={styles.warningBox}>
-            <span className={styles.warningIcono}>⚠️</span>
+            <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
             <div>
               <strong>Limitaciones del algoritmo de silabeo automático</strong>
               <ul>

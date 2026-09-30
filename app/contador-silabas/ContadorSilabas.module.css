@@ -1030,7 +1030,10 @@
 .encuentro {
   font-size: 0.72rem;
   color: var(--text-secondary);
-  background: var(--bg-secondary);
+  /* Era var(--bg-secondary), un token que globals.css no define: la declaración se anulaba y
+     en claro el chip quedaba transparente (hallazgo 2465, 30/09/2026). --bg-card (blanco)
+     destaca sobre el --bg-primary de .palabraCard; #666 sobre #FFF da 5,7:1. */
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 0.1rem 0.5rem;
