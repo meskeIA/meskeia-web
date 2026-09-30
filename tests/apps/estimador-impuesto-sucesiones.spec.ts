@@ -1373,10 +1373,10 @@ test.describe('Estimador ISD — lo que hay por delante del primer control en 39
  * Cataluña—, y que por tanto ejecutan una rama de `aplicarBonificacion` que hasta hoy no
  * había ejecutado ningún test.
  *
- * Y dos testigos de lo que esta re-inspección encontró roto, marcados con `test.fail()`
- * porque la reparación no es cosa del Inspector: cuando se arreglen, empezarán a pasar y
- * Playwright lo dirá («expected to fail, but passed»), que es justo el aviso que hace
- * falta para venir aquí a quitar la marca.
+ * Y dos testigos de lo que esta re-inspección encontró roto (1193 y 1194+1195), que iban
+ * marcados con `test.fail()` mientras estuvieron abiertos. REPARADOS: ya sin la marca, siguen
+ * aquí como testigos de regresión (la base no tiene ningún hallazgo abierto de esta app a
+ * 30/09/2026).
  * ─────────────────────────────────────────────────────────────────────────────
  */
 test.describe('re-inspección 22/09/2026', () => {
@@ -2203,8 +2203,9 @@ test.describe('Inspector 25/09/2026', () => {
 // Castilla-La Mancha (seguro de vida con caudal relicto: el 1824 y el tope del art. 20.2.b).
 // Cada cifra sale de `data/fiscal/sucesiones.ts` y se resolvió a mano ANTES de abrir la app.
 //
-// Lo que esta re-inspección encuentra roto va con `test.fail()` y un comentario «ABIERTO»,
-// afirmando lo CORRECTO: cuando se repare, el test empezará a pasar y la marca hay que quitarla.
+// Lo que esta re-inspección encontró roto (hallazgos 2325-2332) iba con `test.fail()` y un
+// comentario «ABIERTO», afirmando lo CORRECTO. REPARADO en af90d4f3 (27/09/2026): las marcas se
+// retiraron y cada testigo lo dice en su cabecera; el Inspector del 30/09 lo comprobó en verde.
 
 /** Una línea del desglose de la columna de resultados, por su concepto. */
 const lineaDelPanel = (page: Page, concepto: RegExp) =>
@@ -2759,5 +2760,398 @@ test.describe('Re-inspección 27/09/2026 — móvil 393×851', () => {
       await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth),
       'scroll horizontal',
     ).toBe(false);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Inspector 30/09/2026 — tras la reparación af90d4f3 de los hallazgos 2325-2332
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// Entró por dos SOSPECHAS del 27/09/2026. Tres casos propios, resueltos a mano con
+// `data/fiscal/sucesiones.ts` y el BOE delante ANTES de abrir la app: Castilla y León (cuatro
+// bienes distintos a la vez y el tramo del 21,25 %), el umbral de 1.000.000 € de Andalucía al
+// céntimo con el tramo del 34 %, y el borde del Grupo I (20 frente a 21 años). Y el coeficiente
+// del art. 22.2 LISD en el segundo tramo de patrimonio, que es donde vive la otra sospecha.
+//
+// Lo que esta inspección encuentra roto va con `test.fail()` y un comentario «ABIERTO», afirmando
+// lo CORRECTO: cuando se repare, el test empezará a pasar y la marca hay que quitarla.
+//
+// Lo que NO es hallazgo: que la app reste las deudas del caudal relicto ANTES de calcular el 3 %
+// del ajuar. El art. 15 LISD dice «el tres por ciento del importe del caudal relicto» y el
+// art. 34.3 RISD solo saca de ese caudal los bienes adicionados (arts. 25 a 28 RISD), las
+// donaciones acumuladas y los seguros de vida; ninguno de los dos, ni los arts. 22 y 23 RISD,
+// dice si las deudas se restan antes o después. Con el BOE delante no hay ancla: no se registra.
+
+/** Texto de una respuesta del FAQPage del JSON-LD, por su pregunta, con los espacios duros normalizados. */
+async function respuestaFaqJsonLd(page: Page, pregunta: RegExp): Promise<string> {
+  const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
+  const encontrada = (faq.mainEntity as Array<{ name: string; acceptedAnswer: { text: string } }>).find((q) =>
+    pregunta.test(q.name),
+  );
+  expect(encontrada, `la pregunta ${pregunta} sigue en el FAQPage`).toBeTruthy();
+  return encontrada!.acceptedAnswer.text.split(' ').join(' ');
+}
+
+/** Código de un fichero sin sus líneas de comentario: las crónicas citan las cifras viejas a propósito. */
+const codigoSinComentarios = (ruta: string): string =>
+  readFileSync(join(process.cwd(), ruta), 'utf8')
+    .split('\n')
+    .filter((l) => !/^\s*(\/\/|\*|\/\*|\{\/\*)/.test(l))
+    .join('\n');
+
+test.describe('Inspector 30/09/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#saldos-cuentas', '#porcentaje-herencia']);
+  });
+
+  /**
+   * CASO NORMAL — hijo de 30 años (Grupo II: la app no pide la edad a partir de 21) en CASTILLA Y
+   * LEÓN, patrimonio preexistente del primer tramo y sin deudas, con CUATRO bienes distintos a la
+   * vez (ningún testigo sumaba acciones, otros inmuebles y vehículos):
+   *
+   *   Activos           210.000,00   45.000 cuentas + 30.000 acciones + 120.000 inmuebles + 15.000 vehículos
+   *   + ajuar 3 %         6300,00    PORC_AJUAR_DOMESTICO_IS × caudal relicto (art. 15 LISD)
+   *   = base imponible  216.300,00
+   *   − parentesco       15.956,87   REDUCCIONES_PARENTESCO_IS['II'] (art. 20.2.a LISD)
+   *   = base liquidable 200.343,13
+   *   cuota íntegra      31.713,76   TARIFA_ESTATAL_IS (art. 21.2), tramo «hasta 239.389,13»:
+   *                                  23.063,25 + 21,25 % × (200.343,13 − 159.634,83) = 31.713,76375
+   *   × 1,0000                       COEFICIENTES_IS['II'][0] (art. 22.2, patrimonio de 0 a 402.678,11)
+   *   − bonificación 99 % 31.396,62  BONIFICACIONES_CCAA_IS['castilla-leon']…['II'] = 0,99
+   *   = cuota final         317,14 €  (tipo efectivo 317,14 / 216.300 = 0,15 %)
+   */
+  test('caso normal: hijo en Castilla y León con 210.000 € en cuatro bienes paga 317,14 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('castilla-leon');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '45.000');
+    await sembrarValor(page, page.locator('#acciones-fondos'), '30000');
+    await sembrarValor(page, page.locator('#otros-inmuebles'), '120.000');
+    await sembrarValor(page, page.locator('#vehiculos'), '15000');
+
+    expect(await importeDelPanel(page, /^Total activos/)).toBe('210.000,00 €');
+    expect(await importeDelPanel(page, /Ajuar doméstico/)).toBe('6300,00 €');
+    expect(await importeDelPanel(page, /^Base imponible total/)).toBe('216.300,00 €');
+    expect(await importeDelPanel(page, /Por parentesco/)).toBe('15.956,87 €');
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('200.343,13 €');
+    expect(await importeDelPanel(page, /^Cuota íntegra/)).toBe('31.713,76 €');
+    expect(await importeDelPanel(page, /Coeficiente multiplicador/)).toBe('×1,0000');
+    expect(await importeDelPanel(page, /Bonificación 99,0\s%\s\(Castilla y León\)/)).toBe('31.396,62 €');
+    expect(await cuotaEstimada(page)).toBe('317,14 €');
+    await expect(page.locator('[class*="resultsPanel"]').getByText(/^Tipo efectivo:/)).toHaveText(/0,15\s%/);
+  });
+
+  /**
+   * CASO LÍMITE — el umbral de ANDALUCÍA al céntimo, con el tramo más alto de la tarifa.
+   * `BONIFICACIONES_CCAA_IS['andalucia']…['II'] = { porcentaje: 0,99, exencion: 1.000.000 }`, y su
+   * nota: «Exención total si base liquidable < 1.000.000 €. Si supera, bonificación 99 %». La
+   * desigualdad es ESTRICTA: con 1.000.000,00 € justos ya no hay exención.
+   *
+   * Hijo · 900.000 € en cuentas + 98.152,36 € de seguro de vida (el seguro no genera ajuar,
+   * art. 34.3 RISD, y así la base liquidable cae en el millón exacto):
+   *   ajuar              27.000,00   3 % de 900.000
+   *   base imponible  1.025.152,36
+   *   − parentesco       15.956,87
+   *   − seguro            9195,49    REDUCCION_SEGURO_VIDA_MAX_IS (art. 20.2.b LISD)
+   *   = base liquid.  1.000.000,00
+   *   cuota íntegra    268.122,67    199.291,40 + 34 % × (1.000.000 − 797.555,08) = 268.122,6728
+   *   − bonif. 99 %    265.441,44
+   *   = cuota final       2681,23 €
+   * Un céntimo menos de seguro (98.152,35) deja la base en 999.999,99 € → exención → 0,00 €.
+   */
+  test('caso límite: en Andalucía 1.000.000,00 € de base liquidable pagan 2681,23 € y un céntimo menos, 0,00 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('andalucia');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '900.000');
+    await sembrarValor(page, page.locator('#seguros-vida'), '98.152,36');
+
+    expect(await importeDelPanel(page, /Ajuar doméstico/)).toBe('27.000,00 €');
+    expect(await importeDelPanel(page, /^Base imponible total/)).toBe('1.025.152,36 €');
+    expect(await importeDelPanel(page, /Seguro de vida/)).toBe('9195,49 €');
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('1.000.000,00 €');
+    expect(await importeDelPanel(page, /^Cuota íntegra/)).toBe('268.122,67 €');
+    expect(await importeDelPanel(page, /Bonificación 99,0\s%\s\(Andalucía\)/)).toBe('265.441,44 €');
+    expect(await cuotaEstimada(page)).toBe('2681,23 €');
+
+    await sembrarValor(page, page.locator('#seguros-vida'), '98.152,35');
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('999.999,99 €');
+    expect(await importeDelPanel(page, /Exención total/)).toBe('268.122,67 €');
+    expect(await cuotaEstimada(page)).toBe('0,00 €');
+  });
+
+  /**
+   * CASO LÍMITE — el coeficiente del art. 22.2 LISD en el SEGUNDO tramo de patrimonio, lejos del
+   * umbral. Sobrino (Grupo III) en GALICIA, que no bonifica al Grupo III
+   * (`BONIFICACIONES_CCAA_IS['galicia']…['III'] = 0`), con 100.000 € en cuentas y 1.000.000 € de
+   * patrimonio preexistente (opción «402.678 € – 2.007.380 €»):
+   *   base imponible 103.000,00 − 7993,46 (REDUCCIONES_PARENTESCO_IS['III']) = 95.006,54
+   *   cuota íntegra   11.608,91   9166,06 + 16,15 % × (95.006,54 − 79.880,52) = 11.608,91223
+   *   × 1,6676                    COEFICIENTES_IS['III'][1] («De más de 402.678,11 a 2.007.380,43»)
+   *   = cuota         19.359,02 €
+   * Con 1.000.000 € la corrección del salto (el ABIERTO de abajo) no actúa: la diferencia de cuota
+   * entre 1,6676 y 1,5882, 921,75 €, es menor que lo que el patrimonio pasa del umbral, 597.321,89 €.
+   */
+  test('caso límite: un sobrino en Galicia con patrimonio del segundo tramo liquida ×1,6676: 19.359,02 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('galicia');
+    await page.locator('#parentesco').selectOption('III');
+    await page.locator('#patrimonio-preexistente').selectOption('2');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('95.006,54 €');
+    expect(await importeDelPanel(page, /^Cuota íntegra/)).toBe('11.608,91 €');
+    expect(await importeDelPanel(page, /Coeficiente multiplicador/)).toBe('×1,6676');
+    expect(await importeDelPanel(page, /^Cuota tributaria/)).toBe('19.359,02 €');
+    expect(await cuotaEstimada(page)).toBe('19.359,02 €');
+  });
+
+  /**
+   * CASO A RECHAZAR — el BORDE del Grupo I. «Descendiente menor de 21 años» con 21 años se rechaza
+   * (el art. 20.2.a LISD pone a los de 21 en el Grupo II): aviso y ninguna cifra. Con 20 años sí, y
+   * la reducción por edad es UN año: 3990,72 € (REDUCCION_EDAD_MENOR_21_IS), lejos del tope de
+   * 47.858,59 € (REDUCCION_EDAD_MENOR_21_MAX_IS). Región de Murcia · 100.000 € en cuentas:
+   *   103.000 − 15.956,87 − 3990,72 = 83.052,41 de base liquidable
+   *   9166,06 + 16,15 % × (83.052,41 − 79.880,52) = 9678,32 − 99 % (9581,54) = 96,78 €
+   * Y sin ningún bien —solo una hipoteca de 50.000 €— tampoco hay cifra: el panel pide los bienes.
+   */
+  test('caso a rechazar: «menor de 21» con 21 años no liquida; con 20 reduce 3990,72 € y paga 96,78 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('murcia');
+    await page.locator('#parentesco').selectOption('I-descendiente');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+    await sembrarValor(page, page.locator('#edad-heredero'), '21');
+
+    const aviso = page.locator('[class*="resultsPanel"]').getByRole('alert');
+    await expect(aviso).toContainText('(21 años) contradice el parentesco');
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+
+    await sembrarValor(page, page.locator('#edad-heredero'), '20');
+    await expect(aviso).toHaveCount(0);
+    expect(await importeDelPanel(page, /Por edad/)).toBe('3990,72 €');
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('83.052,41 €');
+    expect(await importeDelPanel(page, /^Cuota íntegra/)).toBe('9678,32 €');
+    expect(await cuotaEstimada(page)).toBe('96,78 €');
+
+    // Sin bienes y con una deuda: ni cifra ni aviso de error; el panel pide los bienes.
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '');
+    await sembrarValor(page, page.locator('#hipotecas'), '50000');
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+    await expect(aviso).toHaveCount(0);
+    await expect(page.locator('[class*="resultsPanel"]')).toContainText('introduce los bienes');
+  });
+
+  /**
+   * ABIERTO — hallazgo (calculo, medio, Inspector 30/09/2026). El art. 22.2 LISD, tras la tabla de
+   * coeficientes, CORRIGE EL SALTO: «Cuando la diferencia entre la cuota tributaria obtenida por la
+   * aplicación del coeficiente multiplicador que corresponda y la que resultaría de aplicar a la
+   * misma cuota íntegra el coeficiente multiplicador inmediato inferior sea mayor que la que exista
+   * entre el importe del patrimonio preexistente tenido en cuenta para la liquidación y el importe
+   * máximo del tramo de patrimonio preexistente que motivaría la aplicación del citado coeficiente
+   * multiplicador inferior, aquélla se reducirá en el importe del exceso» (BOE-A-1987-28141).
+   * La app pide el patrimonio por TRAMOS, así que no puede aplicarla: a quien pasa el umbral por
+   * poco le cobra el coeficiente entero, sin avisar. El mismo sobrino del caso de arriba con
+   * 402.700 € de patrimonio, 21,89 € por encima de 402.678,11:
+   *   con 1,6676 → 19.359,02 · con 1,5882 → 18.437,27 · salto 921,75 > 21,89
+   *   → cuota tributaria 18.437,27 + 21,89 = 18.459,16 € (la app: 19.359,02 €, 899,86 € de más)
+   * Afirma lo correcto con un campo de IMPORTE para el patrimonio, que es lo que la regla necesita.
+   */
+  test('ABIERTO — con 402.700 € de patrimonio el art. 22.2 corrige el salto de coeficiente: 18.459,16 €', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el patrimonio se pide por tramos y no se aplica la corrección del salto del art. 22.2 LISD');
+    await page.locator('#ccaa-causante').selectOption('galicia');
+    await page.locator('#parentesco').selectOption('III');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+
+    const campo = page.getByLabel(/Patrimonio preexistente/);
+    expect(await campo.evaluate((e) => e.tagName), 'el patrimonio se pide por importe, no por tramo').toBe('INPUT');
+    await sembrarValor(page, campo, '402.700');
+    expect(await cuotaEstimada(page)).toBe('18.459,16 €');
+  });
+
+  /**
+   * ABIERTO — hallazgo (dato, bajo, Inspector 30/09/2026) — era la sospecha del 27/09 sobre
+   * `data/fiscal`. Los umbrales del art. 22.2 LISD («De 0 a 402.678,11 · De más de 402.678,11 a
+   * 2.007.380,43 · De más de 2.007.380,43 a 4.020.770,98 · Más de 4.020.770,98») no están en
+   * `data/fiscal/sucesiones.ts` —que sí tiene `COEFICIENTES_IS`, la otra mitad de la misma tabla—
+   * y la página los TECLEA, truncados, en diez líneas: las cuatro opciones del selector, las
+   * cuatro filas de la tabla comparativa y dos frases de la FAQ del coeficiente. Truncados dicen
+   * otra cosa en el borde: con 402.678,11 € de patrimonio (tramo 1, ×1,0000) la única opción que
+   * lo contiene es «402.678 € – 2.007.380 €» (×1,0500), porque la primera dice «Menos de 402.678 €».
+   */
+  test('ABIERTO — los umbrales de patrimonio del art. 22.2 salen de data/fiscal, con sus céntimos', async ({ page }) => {
+    test.fail(true, 'ABIERTO: umbrales del art. 22.2 LISD tecleados y truncados, sin constante en data/fiscal');
+    const modulo = readFileSync(join(process.cwd(), 'data/fiscal/sucesiones.ts'), 'utf8');
+    for (const umbral of [/402_?678\.11/, /2_?007_?380\.43/, /4_?020_?770\.98/]) {
+      expect(modulo, `data/fiscal no tiene el umbral ${umbral}`).toMatch(umbral);
+    }
+    const jsx = codigoSinComentarios('app/estimador-impuesto-sucesiones/page.tsx');
+    for (const tecleado of ['402.678', '2.007.380', '4.020.770']) {
+      expect(jsx, `sigue tecleado: ${tecleado}`).not.toContain(tecleado);
+    }
+    // Si el patrimonio se sigue pidiendo por tramos, el primero incluye su límite legal.
+    const opciones = await page.locator('#patrimonio-preexistente option').allInnerTexts();
+    if (opciones.length > 0) expect(opciones[0]).toContain('402.678,11');
+  });
+
+  /**
+   * ABIERTO — hallazgo (contenido, bajo, Inspector 30/09/2026) — era la sospecha del 27/09. El
+   * FAQPage del JSON-LD responde a «¿Cuánto se paga…?» que «Madrid o Andalucía bonifican el 99 % de
+   * la CUOTA para cónyuge e hijos»: el 99 % sale de `bonifMadrid` y se le atribuye también a
+   * Andalucía, cuando `BONIFICACIONES_CCAA_IS['andalucia']` le da exención TOTAL por debajo de
+   * 1.000.000 € de base liquidable y el 99 % solo por encima. La herramienta de la misma página lo
+   * desmiente: un hijo con 300.000 € en Andalucía liquida 0,00 €; siguiendo la FAQ, el 1 % de una
+   * cuota de 53.692,81 € (293.043,13 € de base liquidable), 536,93 €. Es el canal que leen las IAs.
+   */
+  test('ABIERTO — el FAQPage no reduce Andalucía a «bonifica el 99 %»: por debajo de 1.000.000 € exime', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el FAQPage atribuye a Andalucía el 99 % de Madrid y calla la exención');
+    await page.locator('#ccaa-causante').selectOption('andalucia');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '300000');
+    expect(await cuotaEstimada(page)).toBe('0,00 €');
+
+    const respuesta = await respuestaFaqJsonLd(page, /Cuánto se paga/);
+    const hablaDeAndalucia = respuesta.includes('Andalucía');
+    expect(!hablaDeAndalucia || /1\.000\.000|exen|exim/i.test(respuesta), respuesta).toBe(true);
+  });
+
+  /**
+   * ABIERTO — hallazgo (dato, bajo, Inspector 30/09/2026) — era la sospecha del 27/09. El «2025» del
+   * title, la tarjeta de Open Graph, la de Twitter y las keywords va TECLEADO en metadata.ts, y la
+   * nota de la tabla comparativa dice «tarifa de 2025» a mano, con `FISCAL_SUCESIONES_META.vigencia`
+   * sellado y usado por el DataReference de la misma página. Hoy coinciden; al re-sellar el módulo
+   * en enero el DataReference dirá el año nuevo y el título seguirá en 2025 (la forma del 2331).
+   * Y ya hoy, con Cataluña elegida, la página liquida con la vigencia 2026 de
+   * `FISCAL_SUCESIONES_CATALUNA_META` bajo un título que dice 2025.
+   */
+  test('ABIERTO — el año del título, las tarjetas sociales y las keywords sale de la vigencia del sello', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el año va tecleado en metadata.ts y en la nota de la tabla');
+    // En pantalla hoy coincide: 2025 es la vigencia del sello general.
+    const anios = (await page.title()).match(/\b20\d\d\b/g) ?? [];
+    expect(anios.every((a) => a === FISCAL_SUCESIONES_META.vigencia), await page.title()).toBe(true);
+
+    const meta = codigoSinComentarios('app/estimador-impuesto-sucesiones/metadata.ts');
+    expect(meta, 'año tecleado en metadata.ts').not.toMatch(/(Sucesiones|ISD) 20\d\d/);
+    const jsx = codigoSinComentarios('app/estimador-impuesto-sucesiones/page.tsx');
+    expect(jsx, 'año tecleado en la nota de la tabla comparativa').not.toMatch(/tarifa de 20\d\d/);
+  });
+
+  /**
+   * ABIERTO — hallazgo (contenido, bajo, Inspector 30/09/2026). El WebApplication del JSON-LD
+   * anuncia «Usufructo y nuda propiedad por la regla del 89 menos la edad», la forma abreviada que
+   * `VALORACION_USUFRUCTO_IS` documenta como incompleta: solo vale desde los 20 años; por debajo el
+   * art. 26.a LISD fija un 70 % plano, y el suelo es el 10 %. Con un usufructuario de 15 años la
+   * regla anunciada da el 74 % y la herramienta, bien, el 70,0 %. El hallazgo 1196 arregló el
+   * helper del campo y no llegó a esta línea del canal que leen las IAs.
+   */
+  test('ABIERTO — el WebApplication no anuncia el usufructo como «89 menos la edad» sin su techo del 70 %', async ({ page }) => {
+    test.fail(true, 'ABIERTO: la característica del JSON-LD da la regla del usufructo sin su techo');
+    await page.locator('#ccaa-causante').selectOption('madrid');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+    await page.getByRole('radio', { name: 'Usufructo' }).check();
+    await sembrarValor(page, page.locator('#edad-usufructuario'), '15');
+    expect(await importeDelPanel(page, /Tipo adquisición \(usufructo\)/)).toBe('70,0 %');
+
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const webApp = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'WebApplication');
+    const linea = ((webApp.featureList as string[]).find((c) => /usufructo/i.test(c)) ?? '').split(' ').join(' ');
+    expect(!/89/.test(linea) || /70\s?%/.test(linea), linea).toBe(true);
+  });
+
+  /**
+   * ABIERTO — hallazgo (accesibilidad, medio, Inspector 30/09/2026). El título «Qué no incluye esta
+   * estimación» (16 px / 700, umbral 4,5:1) pinta `--danger` #C0392B, que el módulo declara en
+   * `.container` y NO redeclara en `[data-theme='dark'] .container`, donde solo cambia el fondo
+   * (`--danger-bg` #3D1A18): 4,76:1 en claro, 2,84:1 en oscuro. Es la forma del 1828 (`--success`
+   * y `--bonif`), con un token semántico que `check:token-oscuro` deja fuera a propósito.
+   */
+  test('ABIERTO — en oscuro el título «Qué no incluye esta estimación» llega a 4,5:1', async ({ page }) => {
+    test.fail(true, 'ABIERTO: --danger sin variante oscura en el módulo');
+    const selector = '[class*="disclaimerTitulo"]';
+    await expect(page.locator(selector)).toContainText('Qué no incluye esta estimación');
+    const [claro] = await contrastes(page, [selector]);
+    expect(claro.ratio, 'claro').toBeGreaterThanOrEqual(4.5);
+
+    const contenedor = page.locator('header[class*="hero"]').locator('xpath=..');
+    const fondoClaro = await contenedor.evaluate((e) => getComputedStyle(e).backgroundColor);
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect
+      .poll(() => contenedor.evaluate((e) => getComputedStyle(e).backgroundColor), { message: 'el tema oscuro se aplicó' })
+      .not.toBe(fondoClaro);
+    await page.waitForTimeout(700); // transición de 0,3 s de globals.css
+    const [oscuro] = await contrastes(page, [selector]);
+    expect(oscuro.ratio, 'oscuro').toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * ABIERTO — hallazgo (accesibilidad, bajo, Inspector 30/09/2026). El enlace «Agencia Tributaria»
+   * del hero («Datos verificados: … — Fuente: …») solo se distingue del texto de al lado por el
+   * color: sin subrayado (globals.css: `a { text-decoration: none }`) y a 1,14:1 de ese texto, cuando
+   * WCAG 1.4.1 pide 3:1 o una marca que no sea el color. Y al pasar el ratón `a:hover` (0,1,1) gana a
+   * `.linkFuente` (0,1,0) y lo pinta en `--primary-hover` #246B8A sobre el `--hero-bg` #1A5278: el
+   * nombre de la fuente se queda a ~1,3:1 de su fondo.
+   */
+  test('ABIERTO — el enlace a la fuente del hero se distingue sin color y se lee al pasar el ratón', async ({ page }) => {
+    test.fail(true, 'ABIERTO: enlace del hero sin subrayado y ilegible en hover');
+    const enlace = page.locator('[class*="metaVerificado"] a');
+    const medir = () =>
+      enlace.evaluate((a) => {
+        type Rgb = [number, number, number];
+        const leer = (s: string): { c: Rgb; a: number } => {
+          const p = (s.match(/rgba?\(([^)]+)\)/)?.[1] ?? '0,0,0,0').split(/[ ,/]+/).filter(Boolean).map(Number);
+          return { c: [p[0], p[1], p[2]], a: p.length > 3 ? p[3] : 1 };
+        };
+        const mezcla = (f: Rgb, b: Rgb, alfa: number): Rgb => [0, 1, 2].map((i) => f[i] * alfa + b[i] * (1 - alfa)) as Rgb;
+        const lum = (c: Rgb) => {
+          const t = (v: number) => {
+            const x = v / 255;
+            return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+          };
+          return 0.2126 * t(c[0]) + 0.7152 * t(c[1]) + 0.0722 * t(c[2]);
+        };
+        const ratio = (x: Rgb, y: Rgb) => {
+          const [l1, l2] = [lum(x), lum(y)];
+          return Math.round(((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)) * 100) / 100;
+        };
+        const hero = a.closest('header') as HTMLElement;
+        const fondo = leer(getComputedStyle(hero).backgroundColor).c;
+        // Color efectivo de un nodo del hero: su color con su alfa, y la opacidad de sus ancestros.
+        const efectivo = (el: Element): Rgb => {
+          let opacidad = 1;
+          for (let e: Element | null = el; e && e !== hero; e = e.parentElement) opacidad *= Number(getComputedStyle(e).opacity);
+          const propio = leer(getComputedStyle(el).color);
+          return mezcla(mezcla(propio.c, fondo, propio.a), fondo, opacidad);
+        };
+        const colorEnlace = efectivo(a);
+        return {
+          subrayado: getComputedStyle(a).textDecorationLine.includes('underline'),
+          frenteAlTexto: ratio(colorEnlace, efectivo(a.parentElement as Element)),
+          frenteAlFondo: ratio(colorEnlace, fondo),
+        };
+      });
+
+    const reposo = await medir();
+    expect(reposo.subrayado || reposo.frenteAlTexto >= 3, `en reposo: ${JSON.stringify(reposo)}`).toBe(true);
+    await enlace.hover();
+    await page.waitForTimeout(400); // transición de 0,2 s del color de los enlaces
+    const encima = await medir();
+    expect(encima.frenteAlFondo, `con el ratón encima: ${JSON.stringify(encima)}`).toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * ABIERTO — hallazgo (contenido, bajo, Inspector 30/09/2026). La FAQ «¿Puedo deducir las deudas
+   * del causante?» dice que no son deducibles las «garantizadas con cláusula de reserva de dominio».
+   * Ni el art. 13 LISD ni el art. 32 RISD —las dos normas de las deudas deducibles— tienen esa
+   * exclusión: deducen «con carácter general las deudas que dejare contraídas el causante» que se
+   * acrediten, «salvo las que lo fuesen a favor de los herederos o de los legatarios de parte
+   * alícuota y de los cónyuges, ascendientes, descendientes o hermanos de aquéllos», que es la
+   * única, y que la FAQ recorta a «deudas contraídas con herederos». La herramienta, en cambio,
+   * deduce cualquier deuda que se escriba en «Otros préstamos y deudas».
+   */
+  test('ABIERTO — la FAQ de las deudas no añade la exclusión de la «reserva de dominio», que la ley no tiene', async ({ page }) => {
+    test.fail(true, 'ABIERTO: exclusión de deudas sin ancla en el art. 13 LISD ni en el art. 32 RISD');
+    const texto = await textoCompleto(page);
+    const desde = texto.indexOf('¿Puedo deducir las deudas del causante?');
+    expect(desde, 'la pregunta sigue en la FAQ').toBeGreaterThan(-1);
+    expect(texto.slice(desde, desde + 700)).not.toContain('reserva de dominio');
   });
 });

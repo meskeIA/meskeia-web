@@ -1,8 +1,12 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion as esperarHidratacionReact, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Inspector — contador-silabas (segmento interactiva con motor lingüístico)
  *
+ * SEXTA INSPECCIÓN: 30/09/2026, por la SOSPECHA del 29/09 sobre `acentuacionDe` y los
+ * anglicismos en consonante + «y». Sus casos y sus TRES hallazgos, en su propio bloque al
+ * final del fichero (el único que espera la hidratación con tests/apps/_hidratacion.ts).
  * QUINTA INSPECCIÓN: 10/09/2026, RE-INSPECCIÓN tras el refactor de motores del 10/09. Sus
  * tres casos y sus SEIS hallazgos, al final del fichero, en su propio bloque. El silabeador
  * y la escansión salieron intactos; cinco de los seis hallazgos son material DIDÁCTICO que
@@ -1022,8 +1026,10 @@ test.describe('contador-silabas', () => {
   //       «~~~ ¿¿?? ¡¡!! «» ///»    ni una letra: aviso explícito, sin resumen ni tarjetas.
   //       «la vïuda del rey»        la diéresis poética sobre la i → HALLAZGO, al final.
   //
-  // HALLAZGOS de esta ronda: los seis del final, con test.fail(), afirmando lo que DEBERÍA
-  // ocurrir. Cinco son del material didáctico y uno del extractor de palabras.
+  // HALLAZGOS de esta ronda (698-703): los seis del final. Se escribieron con test.fail(),
+  // afirmando lo que DEBERÍA ocurrir; se REPARARON el 10/09/2026 (43473556) y quedan como
+  // regresión, sin la marca. Cinco eran del material didáctico y uno del extractor de palabras.
+  // La sexta inspección (30/09/2026) los re-verificó en verde y con entradas nuevas.
   //
   // AUDITORÍA DE LOS CASOS PREVIOS (obligatoria en esta tanda): se rehízo a mano la cuenta de
   // los versos afirmados por las cuatro inspecciones anteriores —Quevedo, Fray Luis, Machado,
@@ -1132,13 +1138,13 @@ test.describe('contador-silabas', () => {
     });
 
     // -----------------------------------------------------------------------------------
-    // HALLAZGOS 10/09/2026 — con test.fail(), afirmando lo que DEBERÍA ocurrir.
-    // Al repararlos, quitar la marca DESPUÉS de comprobar que lo que afirman sigue siendo
-    // lo correcto: un test.fail() que pasa a verde no prueba nada hasta verificar su
-    // contenido (regla de la ronda 1).
+    // HALLAZGOS 698-703 (10/09/2026) — REPARADOS el 10/09/2026 (43473556). Se escribieron con
+    // test.fail(), afirmando lo que DEBERÍA ocurrir, y se les quitó la marca tras comprobar
+    // que lo que afirman sigue siendo lo correcto. Los «antes:» de los comentarios son lo que
+    // la app daba ANTES de la reparación, no lo que da hoy.
     // -----------------------------------------------------------------------------------
 
-    test('HALLAZGO · la tarjeta «la tilde sobre i/u» declara sin excepciones una regla que el motor no aplica', async ({
+    test('REPARADO 698 · la tarjeta «la tilde sobre i/u» declaraba sin excepciones una regla que el motor no aplica', async ({
       page,
     }) => {
       // Lo que la app hace, y hace bien (OLE 2010): dos vocales cerradas DISTINTAS forman
@@ -1160,7 +1166,7 @@ test.describe('contador-silabas', () => {
       expect(tarjeta).toContain('distinta'); // la excepción de las dos cerradas distintas
     });
 
-    test('HALLAZGO · esa misma tarjeta escribe «mai-z», una sílaba sin ninguna vocal', async ({
+    test('REPARADO 699 · esa misma tarjeta escribía «mai-z», una sílaba sin ninguna vocal', async ({
       page,
     }) => {
       // El motor acierta: «ai» es diptongo, «maiz» es UNA sílaba.
@@ -1182,7 +1188,7 @@ test.describe('contador-silabas', () => {
       expect(separacion?.respuesta).toContain('al menos una vocal'); // esto sí lo dice
     });
 
-    test('HALLAZGO · la FAQ visible deja al octosílabo fuera del arte menor y del arte mayor', async ({
+    test('REPARADO 700 · la FAQ visible dejaba al octosílabo fuera del arte menor y del arte mayor', async ({
       page,
     }) => {
       // La app rotula el octosílabo como arte MENOR, igual que su código (`>= 9 → mayor`),
@@ -1204,7 +1210,7 @@ test.describe('contador-silabas', () => {
       expect(respuesta).toContain('ocho o menos'); // lo que ya dice bien el JSON-LD
     });
 
-    test('HALLAZGO · el mnemotécnico de vocales fuertes y débiles coloca la O entre las débiles', async ({
+    test('REPARADO 701 · el mnemotécnico de vocales fuertes y débiles colocaba la O entre las débiles', async ({
       page,
     }) => {
       // El motor trata la «o» como abierta: «poeta» es po-e-ta y la tarjeta lo rotula
@@ -1224,7 +1230,7 @@ test.describe('contador-silabas', () => {
       expect(tarjeta).not.toContain('IO-U los débiles');
     });
 
-    test('HALLAZGO · la h final no se trata como muda: «oh alma» no funde y «la hoja» sí', async ({
+    test('REPARADO 702 · la h final no se trataba como muda: «oh alma» no fundía y «la hoja» sí', async ({
       page,
     }) => {
       // Testigo de que la app SÍ aplica la regla por el lado de la h inicial:
@@ -1233,37 +1239,295 @@ test.describe('contador-silabas', () => {
       await expect(sinalefasDe(page)).toHaveCount(2);
       await expect(metricasDe(page)).toHaveText('3');
 
-      // Por el otro lado no. La h no representa ningún sonido en español (OLE 2010), así que
+      // Por el otro lado no lo hacía. La h no representa ningún sonido en español (OLE 2010), así que
       // «oh» suena [o] y su vocal final está en contacto con la «a» de «alma»: hay sinalefa.
       // oh(1) al-ma(2) mí-a(2) = 5 fonéticas − 1 sinalefa ± 0 (llana) = 4, tetrasílabo.
-      // `terminaEnVocal()` mira el último CARÁCTER y ve una «h», mientras su hermana
-      // `empiezaPorVocal()` sí salta la h inicial: la misma regla, aplicada por un solo lado.
+      // `terminaEnVocal()` miraba el último CARÁCTER y veía una «h», mientras su hermana
+      // `empiezaPorVocal()` sí saltaba la h inicial: la misma regla, aplicada por un solo lado.
       // El universo práctico son las interjecciones («oh», «ah», «eh»), donde el poeta deshace
       // a menudo la fusión — pero la app declara detectar «toda sinalefa posible» y marcar
       // «con pausa» las deshacibles, y aquí ni siquiera llega a verla.
       await page.getByRole('button', { name: 'Limpiar' }).click();
       await analizar(page, 'oh alma mía');
-      await expect(sinalefasDe(page)).toHaveCount(1); // obtenido: 0
-      await expect(metricasDe(page)).toHaveText('4'); // obtenido: 5, pentasílabo
+      await expect(sinalefasDe(page)).toHaveCount(1); // antes de 43473556: 0
+      await expect(metricasDe(page)).toHaveText('4'); // antes de 43473556: 5, pentasílabo
     });
 
-    test('HALLAZGO · la diéresis poética sobre la i parte la palabra en dos palabras inventadas', async ({
+    test('REPARADO 703 · la diéresis poética sobre la i partía la palabra en dos palabras inventadas', async ({
       page,
     }) => {
-      // El extractor de palabras es /[a-záéíóúüñ]+/gi, y la «ï» no está en esa clase. La app
+      // El extractor de palabras ERA /[a-záéíóúüñ]+/gi (hoy «\p{L}+», toda letra), sin la «ï». La app
       // promociona la diéresis en su bloque educativo («"suave" en verso puede leerse
       // su-a-ve»), y la diéresis sobre la i se escribe exactamente así: vïuda, crïado,
-      // sïempre. Al no reconocer el carácter, «vïuda» se parte en «v» + «uda»: dos palabras
+      // sïempre. Al no reconocer el carácter, «vïuda» se partía en «v» + «uda»: dos palabras
       // que no existen, una de ellas con una «sílaba» sin ninguna vocal — lo mismo que el
       // FAQPage de la app declara imposible.
       // Esperado: 4 palabras (la · vïuda · del · rey), con «vïuda» entera.
       await analizar(page, 'la vïuda del rey');
-      await expect(page.locator('[class*="palabraCard"]')).toHaveCount(4); // obtenido: 5
-      await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('4'); // obtenido: 5
+      await expect(page.locator('[class*="palabraCard"]')).toHaveCount(4); // antes de 43473556: 5
+      await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('4'); // antes de 43473556: 5
       await expect(page.locator('[class*="palabraCard"]').nth(1)).toContainText('vïuda');
       // Y ninguna tarjeta puede ser una consonante suelta contada como una sílaba.
       const palabras = await page.locator('[class*="palabraOriginal"]').allTextContents();
-      expect(palabras).not.toContain('v'); // obtenido: ['la', 'v', 'uda', 'del', 'rey']
+      expect(palabras).not.toContain('v'); // antes de 43473556: ['la', 'v', 'uda', 'del', 'rey']
     });
+  });
+});
+
+// =====================================================================================
+// SEXTA INSPECCIÓN — Inspector 30/09/2026 (segmento cálculo, riesgo 3)
+//
+// Entra por una SOSPECHA del 29/09: `acentuacionDe` (metrica.ts, compartida con
+// diccionario-rimas) aplica la regla ortográfica de la «y» final —cuenta como consonante,
+// así que sin tilde la palabra sería AGUDA: rey, virrey, jersey, Uruguay— también a los
+// anglicismos en CONSONANTE + «y» (ferry, whisky, rugby, party). Esa regla está hecha para
+// la «y» tras vocal; tras consonante no existe ninguna palabra española, y esos préstamos se
+// pronuncian LLANOS con /i/ final. diccionario-rimas lo corrigió solo en su lado
+// (`esAnglicismoEnY`, aed01c6b); aquí seguía sin medir.
+//
+// De dónde sale el acento esperado (no de la memoria del modelo):
+//   · Las formas adaptadas que propone la RAE se escriben SIN tilde y acaban en vocal —ferri,
+//     güisqui, rugbi—, y por la regla general de la OLE 2010 eso las hace LLANAS: si fueran
+//     agudas se escribirían «ferrí», «güisquí». La misma app lo confirma: «ferri» le da llana.
+//   · «rugby»: Wikcionario, [ˈraɣ.βi], «acentuación: llana», variante «rugbi».
+// Y de la métrica: verso llano ±0, agudo +1, esdrújulo −1; una sinalefa por contacto vocálico.
+//
+// LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+//
+//   CASO 1 (normal) — Garcilaso, soneto XXIII, versos 3 y 4:
+//       «y que vuestro mirar ardiente, honesto,» → y(1) que(1) vues-tro(2) mi-rar(2)
+//           ar-dien-te(3) ho-nes-to(3) = 12 fonéticas. Un solo contacto vocálico, «ardiente,
+//           honesto» (la h es muda y no encabeza hue-/hui-/hie-/huy-), y con coma en medio:
+//           sinalefa CON PAUSA. «mirar ardiente» no funde: «mirar» acaba en r. «honesto» es
+//           llana (acaba en vocal, sin tilde) → ±0. 12 − 1 = 11, endecasílabo.
+//       «con clara luz la tempestad serena;» → con(1) cla-ra(2) luz(1) la(1) tem-pes-tad(3)
+//           se-re-na(3) = 11 fonéticas, ningún contacto vocal-vocal, llana → 11.
+//       Texto entero: 12 + 11 = 23 sílabas en 12 palabras → 1,916… → «1,9».
+//
+//   CASO 2 (límite) — la regla de la «y» final donde SÍ vale, y la forma adaptada:
+//       «cruzamos el mar en ferri» → cru-za-mos(3) el(1) mar(1) en(1) fe-rri(2) = 8, sin
+//           sinalefas (s, l, r y n finales), «ferri» llana → 8, octosílabo.
+//       «y cruzó el mar el virrey» → y(1) cru-zó(2) el(1) mar(1) el(1) vi-rrey(2) = 8; una
+//           sinalefa, «cruzó_el»; «virrey» es aguda —la «y» tras vocal cuenta como consonante
+//           y por eso no lleva tilde— → +1. 8 − 1 + 1 = 8, octosílabo.
+//
+//   CASO 3 (rechazo) — el campo vacío, solo espacios y saltos, y una línea sin letras
+//       («2026 — 3,14 % ¿¡!?»): los dos primeros no calculan nada (se queda el marcador
+//       «Introduce un texto…»); el tercero da el aviso explícito de que no hay palabras.
+//
+//   RE-INSPECCIÓN de 43473556 (hallazgos 702 y 703) con entradas nuevas:
+//       «eh amigo mío» → eh(1) a-mi-go(3) mí-o(2) = 6; la h final es muda: «eh_amigo» funde;
+//           «mío» llana por la tilde en la penúltima → 6 − 1 = 5, pentasílabo.
+//       «el fiel crïado» → la diéresis poética rompe el diptongo: crï-a-do(3); el(1) fiel(1)
+//           → 5 fonéticas, sin contactos, llana → 5; TRES palabras, «crïado» entera.
+//
+//   HALLAZGO (sospecha convertida) — los mismos versos con el anglicismo:
+//       «cruzamos el mar en ferry»    8 fonéticas, 0 sinalefas, llana → 8 · la app: 9
+//       «y un vaso lleno de whisky»   9 fonéticas − 1 («y_un»; «de whisky» no funde: [ˈgwis-])
+//                                     ± 0 → 8 · la app: 9
+//       «los chicos juegan al rugby»  8 fonéticas, 0 sinalefas, llana → 8 · la app: 9
+//
+// DESCARTADO como hallazgo aparte, con la medida: «los chicos juegan al hockey» da 9 (aguda),
+// y pronunciado [ˈxo.kei] serían 8. Pero ahí la «y» va tras VOCAL, que es justo donde la
+// regla de la OLE sí vale (rey, virrey, jersey son agudas; póney y yóquey llevan tilde por ser
+// llanas): «hockey» crudo se escribe igual que «jersey» y ninguna regla los separa sin un
+// léxico. Cae en la limitación declarada de «nombres propios y extranjerismos».
+// =====================================================================================
+
+test.describe('contador-silabas · Inspector 30/09/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    // El textarea es controlado: cuando React le ha montado su rastreador, ya escucha.
+    await esperarHidratacionReact(page, ['textarea']);
+  });
+
+  /** Escribe el texto, comprueba que llegó al ESTADO de React y pulsa «Analizar Sílabas». */
+  async function analizarConEstado(page: Page, texto: string): Promise<void> {
+    await page.getByRole('button', { name: 'Limpiar' }).click();
+    await esperarValorEnReact(page, 'textarea', '');
+    await page.fill('textarea', texto);
+    await esperarValorEnReact(page, 'textarea', texto);
+    await page.getByRole('button', { name: 'Analizar Sílabas' }).click();
+  }
+
+  test('CASO 1 (normal) · dos endecasílabos de Garcilaso: sinalefa con pausa y la h muda', async ({
+    page,
+  }) => {
+    await analizarConEstado(
+      page,
+      'y que vuestro mirar ardiente, honesto,\ncon clara luz la tempestad serena;',
+    );
+
+    await expect(silabasDe(page, 2)).toHaveText(['vues', 'tro']);
+    await expect(silabasDe(page, 4)).toHaveText(['ar', 'dien', 'te']);
+    await expect(silabasDe(page, 5)).toHaveText(['ho', 'nes', 'to']);
+    await expect(silabasDe(page, 10)).toHaveText(['tem', 'pes', 'tad']);
+
+    // 23 sílabas en 12 palabras → 1,9 con coma decimal.
+    await expect(page.locator('[class*="resumenValor"]').nth(0)).toHaveText('23');
+    await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('12');
+    await expect(page.locator('[class*="resumenValor"]').nth(2)).toHaveText('1,9');
+
+    // Verso 3: 12 − 1 («ardiente, honesto», con pausa) ± 0 = 11.
+    await expect(metricasDe(page, 0)).toHaveText('11');
+    await expect(nombreDe(page, 0)).toContainText('endecasílabo');
+    await expect(nombreDe(page, 0)).toContainText('arte mayor');
+    await expect(desgloseDe(page, 0)).toContainText('12 fonéticas');
+    await expect(desgloseDe(page, 0)).toContainText('1 sinalefa');
+    await expect(desgloseDe(page, 0)).toContainText('llana');
+    await expect(sinalefasDe(page, 0)).toHaveCount(1);
+    await expect(sinalefasDe(page, 0).first()).toContainText('ardiente');
+    await expect(sinalefasDe(page, 0).first()).toContainText('honesto');
+    await expect(sinalefasDe(page, 0).first()).toContainText('con pausa');
+
+    // Verso 4: 11 fonéticas, ningún contacto, llana = 11.
+    await expect(metricasDe(page, 1)).toHaveText('11');
+    await expect(nombreDe(page, 1)).toContainText('endecasílabo');
+    await expect(desgloseDe(page, 1)).toContainText('11 fonéticas');
+    await expect(desgloseDe(page, 1)).toContainText('llana');
+    await expect(sinalefasDe(page, 1)).toHaveCount(0);
+  });
+
+  test('CASO 2 (límite) · la «y» final tras vocal hace aguda; la forma adaptada «ferri» es llana', async ({
+    page,
+  }) => {
+    await analizarConEstado(page, 'cruzamos el mar en ferri\ny cruzó el mar el virrey');
+
+    await expect(silabasDe(page, 4)).toHaveText(['fe', 'rri']);
+    await expect(silabasDe(page, 10)).toHaveText(['vi', 'rrey']);
+
+    // «ferri»: 8 fonéticas, sin sinalefas, llana ±0 = 8.
+    await expect(metricasDe(page, 0)).toHaveText('8');
+    await expect(nombreDe(page, 0)).toContainText('octosílabo');
+    await expect(desgloseDe(page, 0)).toContainText('8 fonéticas');
+    await expect(desgloseDe(page, 0)).toContainText('± 0');
+    await expect(desgloseDe(page, 0)).toContainText('llana');
+    await expect(sinalefasDe(page, 0)).toHaveCount(0);
+
+    // «virrey»: 8 fonéticas − 1 («cruzó_el») + 1 (aguda) = 8.
+    await expect(metricasDe(page, 1)).toHaveText('8');
+    await expect(nombreDe(page, 1)).toContainText('octosílabo');
+    await expect(desgloseDe(page, 1)).toContainText('1 sinalefa');
+    await expect(desgloseDe(page, 1)).toContainText('+ 1');
+    await expect(desgloseDe(page, 1)).toContainText('aguda');
+    await expect(sinalefasDe(page, 1)).toHaveCount(1);
+    await expect(sinalefasDe(page, 1).first()).toContainText('cruzó');
+  });
+
+  test('CASO 3 (rechazo) · vacío y espacios no calculan; sin letras, aviso explícito', async ({
+    page,
+  }) => {
+    for (const vacio of ['', '   \n   ']) {
+      await analizarConEstado(page, vacio);
+      await expect(page.getByText('Introduce un texto para analizar sus sílabas')).toBeVisible();
+      await expect(page.locator('[class*="resumenValor"]')).toHaveCount(0);
+      await expect(page.locator('[class*="palabraCard"]')).toHaveCount(0);
+    }
+
+    await analizarConEstado(page, '2026 — 3,14 % ¿¡!?');
+    await expect(page.getByText('No hay ninguna palabra que analizar')).toBeVisible();
+    await expect(page.locator('[class*="resumenValor"]')).toHaveCount(0);
+    await expect(page.locator('[class*="palabraCard"]')).toHaveCount(0);
+    await expect(page.locator('[class*="versoCard"]')).toHaveCount(0);
+  });
+
+  test('RE-INSPECCIÓN · 702 y 703 (43473556) siguen reparados, con entradas nuevas', async ({
+    page,
+  }) => {
+    // 702 · la h final es muda: «eh_amigo» funde. 6 − 1 ± 0 = 5.
+    await analizarConEstado(page, 'eh amigo mío');
+    await expect(metricasDe(page)).toHaveText('5');
+    await expect(nombreDe(page)).toContainText('pentasílabo');
+    await expect(desgloseDe(page)).toContainText('6 fonéticas');
+    await expect(sinalefasDe(page)).toHaveCount(1);
+    await expect(sinalefasDe(page).first()).toContainText('eh');
+    await expect(sinalefasDe(page).first()).toContainText('amigo');
+
+    // 703 · «crïado» es UNA palabra, y la diéresis parte el diptongo: crï-a-do.
+    await analizarConEstado(page, 'el fiel crïado');
+    await expect(page.locator('[class*="palabraCard"]')).toHaveCount(3);
+    await expect(page.locator('[class*="resumenValor"]').nth(0)).toHaveText('5');
+    await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('3');
+    await expect(silabasDe(page, 2)).toHaveText(['crï', 'a', 'do']);
+    await expect(metricasDe(page)).toHaveText('5');
+  });
+
+  // -----------------------------------------------------------------------------------
+  // HALLAZGOS 30/09/2026 — ABIERTOS, con test.fail(), afirmando lo que DEBERÍA ocurrir.
+  // Comprobados SIN la marca: fallan por lo que dice su comentario. Al repararlos, quitar la
+  // marca DESPUÉS de verificar que lo que afirman sigue siendo lo correcto.
+  // -----------------------------------------------------------------------------------
+
+  test('HALLAZGO ABIERTO · un anglicismo en consonante + «y» al final del verso se computa agudo (+1)', async ({
+    page,
+  }) => {
+    // ABIERTO. La partición es correcta; lo que falla es el acento: `acentuacionDe` ve la «y»
+    // final como consonante y, sin tilde, declara aguda la palabra. Así el mismo verso mide 8
+    // con «ferri» (CASO 2) y 9 con «ferry», que se pronuncian igual.
+    test.fail();
+    await analizarConEstado(
+      page,
+      'cruzamos el mar en ferry\ny un vaso lleno de whisky\nlos chicos juegan al rugby',
+    );
+    await expect(silabasDe(page, 4)).toHaveText(['fe', 'rry']);
+    await expect(silabasDe(page, 10)).toHaveText(['whis', 'ky']);
+    await expect(silabasDe(page, 15)).toHaveText(['rug', 'by']);
+
+    // Los tres versos ya pintados; se leen de una vez para que el fallo enseñe las tres cifras
+    // (y no espere tres veces el tiempo de reintento de un toHaveText).
+    await expect(page.locator('[class*="versoCard"]')).toHaveCount(3);
+    await expect(desgloseDe(page, 1)).toContainText('1 sinalefa'); // «y_un», esto sí lo hace
+    const medidas = await page
+      .locator('[class*="versoCard"]')
+      .evaluateAll((versos) =>
+        versos.map((v) => ({
+          metricas: v.querySelector('[class*="versoSilabas"]')?.textContent ?? '',
+          llana: (v.querySelector('[class*="versoDesglose"]')?.textContent ?? '').includes('llana'),
+        })),
+      );
+    // ferry: 8 fonéticas ± 0 = 8 · whisky: 9 − 1 ± 0 = 8 · rugby: 8 ± 0 = 8, las tres llanas.
+    // Obtenido: 9, 9 y 9, las tres con «+ 1 (última palabra aguda)».
+    expect(medidas).toEqual([
+      { metricas: '8', llana: true },
+      { metricas: '8', llana: true },
+      { metricas: '8', llana: true },
+    ]);
+  });
+
+  test('HALLAZGO ABIERTO · los 11 iconos del bloque educativo se leen en voz alta antes de cada titular', async ({
+    page,
+  }) => {
+    // ABIERTO. 🎭 📚 🎵 🌍 (usos), 🗣️ 🔤 📌 ✍️ 🎯 📖 (consejos) y ⚠️ (limitaciones) van en su
+    // propio <span> sin aria-hidden: el árbol de accesibilidad los expone como texto
+    // («text: 🎭») justo antes del <h4>. Son decorativos —el titular ya lo dice todo—, así que
+    // un lector de pantalla anuncia «máscaras de teatro» antes de «Poesía y Métrica Española».
+    // Es el hallazgo 709 de generador-anagramas, reparado allí en 43473556, el mismo commit.
+    test.fail();
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.getByRole('heading', { name: 'Poesía y Métrica Española' })).toBeVisible();
+    const sinOcultar = await page
+      .locator('[class*="eduEscenarioIcon"], [class*="eduTipIcono"], [class*="warningIcono"]')
+      .evaluateAll((iconos) =>
+        iconos.filter((el) => el.getAttribute('aria-hidden') !== 'true').map((el) => el.textContent),
+      );
+    expect(sinOcultar).toEqual([]); // obtenido: los 11 iconos
+  });
+
+  test('HALLAZGO ABIERTO · el chip de diptongo pide un fondo con una variable que no existe', async ({
+    page,
+  }) => {
+    // ABIERTO. `.encuentro` declara `background: var(--bg-secondary)` y globals.css no define
+    // ese token (tiene --bg-primary y --bg-card): una var() sin definir y sin reserva anula la
+    // declaración, y en claro el chip se queda TRANSPARENTE, solo con el borde. El tema oscuro
+    // sí le da relleno (su regla usa un rgba literal), así que los dos temas no pintan lo mismo.
+    // Es uno de los nombres sueltos de la sospecha transversal del 28/09 (var() sin definir).
+    test.fail();
+    await analizarConEstado(page, 'murciélago');
+    const chip = page.locator('[class*="palabraEncuentros"] > span').first();
+    await expect(chip).toContainText('Diptongo');
+    const tema = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+    expect(tema).not.toBe('dark');
+    const fondo = await chip.evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(fondo).not.toBe('rgba(0, 0, 0, 0)'); // obtenido: rgba(0, 0, 0, 0)
   });
 });

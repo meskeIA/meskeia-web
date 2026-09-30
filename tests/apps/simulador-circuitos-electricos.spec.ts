@@ -181,8 +181,9 @@ import { resolverParalelo, resolverSerie, resolverPotencia } from '../../app/sim
  *
  * HALLAZGOS 1661-1667 (25/09/2026), REPARADOS el mismo día: sus casos, al final, quedan como
  * regresión (ya sin test.fail). Lo que se hizo, en una línea por caso:
- *   CASO 16 · la app lee «0.xxx» con el punto como decimal (un millar no empieza por 0); el
- *             resto sigue yendo a parseSpanishNumber. Regla local en page.tsx (leerNumero).
+ *   CASO 16 · «0.xxx» se lee con el punto como decimal (un millar no empieza por 0). La regla
+ *             no quedó en page.tsx sino en lib/formatters.ts (71003f60): AGRUPA_CON_PUNTO exige
+ *             un primer grupo de 1 a 9, así que la app sigue llamando a parseSpanishNumber.
  *   CASO 17 · Reducir/Aumentar retiran la ficha; el diagrama se dibuja con el circuito calculado.
  *   CASO 18 · cada <label> lleva htmlFor y su campo, id.
  *   CASO 19 · el aviso pasa a una clase con variante oscura (#fca5a5).
@@ -389,7 +390,7 @@ test.describe('simulador-circuitos-electricos', () => {
     await expect(filas(page).nth(1)).toContainText('0,0143');
     await expect(filas(page).nth(2)).toContainText('0,0098');
 
-    // ── Parte B: EL MISMO circuito en formato español (HALLAZGO 1, hoy en rojo) ─
+    // ── Parte B: EL MISMO circuito en formato español (hallazgo 868, REPARADO el 16/09/2026) ─
     // Mil, dos mil doscientos y mil quinientos ohmios se escriben así en español, y el proyecto
     // declara ese formato canónico (CLAUDE.md global §2). El resultado debe ser IDÉNTICO.
     await sembrarValor(page, resistencia(page, 0), '1.000');
@@ -398,11 +399,11 @@ test.describe('simulador-circuitos-electricos', () => {
     await page.getByRole('button', { name: 'Calcular circuito' }).click();
 
     // Mismo Req que en la parte A: 1000 + 2200 + 1500 = 4700 Ω.
-    // Obtenido hoy: «4,700 Ω» — parseFloat('1.000') = 1, así que suma 1 + 2,2 + 1,5.
+    // Obtenido antes de la reparación: «4,700 Ω» — parseFloat('1.000') = 1, así que sumaba 1 + 2,2 + 1,5.
     await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('4700,000 Ω');
-    // Y la corriente: 12 / 4700 = 0,0026 A. Obtenido hoy: «2,5532 A (2553,19 mA)».
+    // Y la corriente: 12 / 4700 = 0,0026 A. Obtenido antes de la reparación: «2,5532 A (2553,19 mA)».
     await expect(valorDe(page, 'Corriente total')).toHaveText('0,0026 A (2,55 mA)');
-    // La tabla enseña el desajuste en crudo: el campo muestra «1.000» y la celda R, «1,00».
+    // La tabla enseñaba el desajuste en crudo: el campo mostraba «1.000» y la celda R, «1,00».
     await expect(filas(page).nth(0)).toContainText('1000,00');
   });
 
@@ -655,8 +656,9 @@ test.describe('simulador-circuitos-electricos', () => {
    *     V = I · R = 0,02 × 150 = 3 V exactos              → 3,0000 V
    *     I en miliamperios = 0,02 × 1000 = 20 mA           → 0,0200 A — 20,00 mA
    *     P = V · I = 3 × 0,02 = 0,06 W                     → 0,0600 W
-   * Obtenido hoy con «0,020»: V = 3000,0000 V, I = 20,0000 A, P = 60.000,0000 W. El campo es
-   * `type="number"` y deja «0.020», que `parseSpanishNumber` lee como millar español → 20 A.
+   * Obtenido el 18/09/2026 con «0,020»: V = 3000,0000 V, I = 20,0000 A, P = 60.000,0000 W. El
+   * campo era `type="number"` y dejaba «0.020», que `parseSpanishNumber` leía como millar
+   * español → 20 A. REPARADO (hallazgo 873): hoy los campos son type="text".
    */
   test('CASO 8 · 0,020 A es la misma corriente que 0,02 A', async ({ page }) => {
     // La pestaña arranca en «Calcular Tensión (V)», que es lo que hace falta: se dan I y R.
@@ -697,7 +699,8 @@ test.describe('simulador-circuitos-electricos', () => {
    *     kWh  = 2,3 × 4 × 30 = 276 kWh                     → 276,0000 kWh
    *     con tarifa 0,15  €/kWh → 276 × 0,15  = 41,40 €    → 41,4000 €   (control, en verde)
    *     con tarifa 0,145 €/kWh → 276 × 0,145 = 40,02 €    → 40,0200 €
-   * Obtenido hoy con 0,145: «40.020,0000 €» — el campo deja «0.145» y el parser lee 145 €/kWh.
+   * Obtenido el 18/09/2026 con 0,145: «40.020,0000 €» — el campo dejaba «0.145» y el parser
+   * leía 145 €/kWh. REPARADO con el hallazgo 873.
    */
   test('CASO 9 · una tarifa de tres decimales no puede multiplicar el coste por mil', async ({ page }) => {
     await page.getByRole('button', { name: 'Potencia', exact: true }).click();
@@ -749,7 +752,8 @@ test.describe('simulador-circuitos-electricos', () => {
     await page.getByRole('button', { name: 'Calcular', exact: true }).click();
 
     // Un aviso VISIBLE, como en el CASO 4 y como en el CASO 3: lo que no puede existir no
-    // produce ficha. Obtenido hoy: ninguna alerta y un panel completo.
+    // produce ficha. Obtenido el 18/09/2026: ninguna alerta y un panel completo (hallazgo 874,
+    // REPARADO).
     const aviso = page.locator('main [role="alert"]');
     await expect(aviso).toBeVisible();
     await expect(page.locator('div[role="status"]')).toBeEmpty();
@@ -1319,5 +1323,461 @@ test.describe('simulador-circuitos-electricos · la sección de casos en el nave
     await expect(solucion).toHaveAttribute('aria-expanded', 'false');
     await solucion.click();
     await expect(seccion(page).locator('#casos-solucion')).toContainText('500 mA');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 30/09/2026 — re-inspección tras 59198142 (casos para clase + motor.ts extraído)
+ *
+ * La app volvió a la cola INVALIDADA: la aritmética de las cuatro pestañas se trasladó a
+ * motor.ts y se añadieron doce casos de aula que nunca se habían inspeccionado. Todo lo de
+ * abajo se resolvió a lápiz ANTES de abrir el navegador, en escritorio y en 390×844 táctil.
+ *
+ *   CASO 23 (normal) — 100, 220 y 330 Ω a 12 V
+ *     Serie:    Req = 650 Ω · I = 12/650 = 0,0184615 A = 18,4615 mA · P = 144/650 = 0,221538 W
+ *               V₁ = 1,846154 · V₂ = 4,061538 · V₃ = 6,092308 V (suman 12)
+ *               P₁ = I²·100 = 0,034083 · P₂ = 0,074982 · P₃ = 0,112473 W (suman 0,2215)
+ *     Paralelo: 1/Req = 66/6600 + 30/6600 + 20/6600 = 116/6600 → Req = 56,896552 Ω
+ *               I = 0,12 + 0,054545 + 0,036364 = 1392/6600 = 0,210909 A
+ *               P = 1,44 + 0,654545 + 0,436364 = 16704/6600 = 2,530909 W
+ *   CASO 24 (límite) — 5 V sobre 0,001 Ω: I = 5000 A = 5.000.000 mA, P = 25.000 W · el
+ *     paralelo no baja de 2 resistencias · un aparato de 230 V y 8,7 A (P = 2001 W) 3,5 h al
+ *     día durante 30 días: E = 2,001·3,5·30 = 210,105 kWh; a 0,1547 /kWh, 32,5032435.
+ *   CASO 25 (rechazo) — R = 0 donde divide (I = V/R) · R negativa, vacía o «abc» en serie · y
+ *     «1.500» NO se rechaza: es mil quinientos. 1500 + 220 + 330 = 2050 Ω, I = 12/2050 =
+ *     0,0058537 A = 5,8537 mA, P = 144/2050 = 0,0702439 W.
+ *
+ *   Casos de aula resueltos a mano: 1 (Ohm, 0,020·470 = 9,4 V) · 5 (serie, 12·2200/4700 =
+ *     5,617 → 5,62 V) · 7 (paralelo, 1/(1/6 + 1/3) = 2 Ω) · 9 (paralelo, 220/440 = 0,5 A =
+ *     500 mA) · 11 (220·10·2·30/1000 = 132 kWh) · 12 (coste, 220²/484 = 100 W → 15 kWh ·
+ *     0,20 = 3,00). Los doce «Verlo en el simulador», seguidos al pie de la letra, imprimen
+ *     en el panel la cifra que prometen (CASO 30).
+ *
+ * HALLAZGOS NUEVOS, ABIERTOS (cinco test.fail —el 28 tiene dos, 28.b y 28.d—, comprobados
+ * SIN la marca: los cinco en rojo, cada uno en la línea del defecto)
+ *   CASO 26 · bajo  · «Horas de uso diario» admite 25 h: consumo de 1500,7500 kWh sin aviso.
+ *   CASO 27 · bajo  · la tensión de fuente de Serie y Paralelo rechaza «1e3», «0», «abc» y el
+ *                     vacío con el mismo «Tensión de fuente inválida.», cuando las R de al lado
+ *                     nombran la causa (el patrón que cerró el hallazgo 875).
+ *   CASO 28 · medio · la tolerancia del corrector es el 1 % de la respuesta, y con datos
+ *                     exactos eso da por buenas cifras que ningún cálculo produce: 505 mA por
+ *                     500, 133 kWh por 132, 5,57 V por 5,617. La que da la PREGUNTA es media
+ *                     unidad del redondeo pedido (no hay error de lectura: los datos son exactos).
+ *   CASO 29 · bajo  · «se acepta un margen del 1 %» lleva un espacio normal, no el duro (§2).
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/** El aviso de error de la app (no el anunciador de rutas de Next, que también es role=alert). */
+const avisoApp = (page: Page): Locator => page.locator('main [role="alert"]').filter({ hasNotText: /Correcto|No es correcto|Escribe un número/ });
+
+/** La ficha de resultados de la pestaña activa. */
+const fichaApp = (page: Page): Locator => page.locator('div[role="status"]');
+
+test.describe('Inspector 30/09/2026 · las cuatro pestañas tras extraer motor.ts', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#ohm-a', '#ohm-b']);
+  });
+
+  test('CASO 23 · normal: 100, 220 y 330 Ω a 12 V, en serie y en paralelo', async ({ page }) => {
+    await page.getByRole('button', { name: 'Serie', exact: true }).click();
+    await esperarHidratacion(page, ['#serie-r1']);
+    // TECLEADO tecla a tecla: así entra el dato de verdad
+    await teclearComoUsuario(page, page.locator('#serie-r1'), '100');
+    await teclearComoUsuario(page, page.locator('#serie-r2'), '220');
+    await teclearComoUsuario(page, page.locator('#serie-r3'), '330');
+    await teclearComoUsuario(page, page.locator('#serie-v'), '12');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+
+    // Req = 100 + 220 + 330 = 650 Ω (la serie imprime 3 decimales)
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('650,000 Ω');
+    // I = 12/650 = 0,0184615 A → 0,0185 A · 18,4615 mA → 18,46 mA
+    await expect(valorDe(page, 'Corriente total')).toHaveText('0,0185 A (18,46 mA)');
+    // P = V²/Req = 144/650 = 0,221538 W
+    await expect(valorDe(page, 'Potencia total disipada')).toHaveText('0,2215 W');
+    await expect(filas(page)).toHaveCount(3);
+    // [R, V caída = I·R, I, P = I²·R] — las caídas suman 1,8462 + 4,0615 + 6,0923 = 12,0000 V
+    const serie = [
+      ['100,00', '1,8462 V', '0,0185', '0,0341'], // 12·100/650 = 1,846154 · 144·100/650² = 0,034083
+      ['220,00', '4,0615 V', '0,0185', '0,0750'], // 12·220/650 = 4,061538 · 0,074982
+      ['330,00', '6,0923 V', '0,0185', '0,1125'], // 12·330/650 = 6,092308 · 0,112473
+    ];
+    for (let i = 0; i < 3; i++) {
+      const celdas = filas(page).nth(i).locator('td');
+      for (let c = 0; c < 4; c++) await expect(celdas.nth(c + 1)).toHaveText(serie[i][c]);
+    }
+
+    await page.getByRole('button', { name: 'Paralelo', exact: true }).click();
+    await esperarHidratacion(page, ['#par-r1']);
+    await teclearComoUsuario(page, page.locator('#par-r1'), '100');
+    await teclearComoUsuario(page, page.locator('#par-r2'), '220');
+    await teclearComoUsuario(page, page.locator('#par-r3'), '330');
+    await teclearComoUsuario(page, page.locator('#par-v'), '12');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+
+    // 1/Req = (66 + 30 + 20)/6600 = 116/6600 → Req = 56,896552 Ω (menor que la rama de 100 Ω)
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('56,8966 Ω');
+    // I = 12·116/6600 = 0,210909 A
+    await expect(valorDe(page, 'Corriente total (fuente)')).toHaveText('0,2109 A');
+    // P = 144·116/6600 = 2,530909 W
+    await expect(valorDe(page, 'Potencia total disipada')).toHaveText('2,5309 W');
+    const paralelo = [
+      ['100,00', '12,0000', '0,1200', '1,4400'], // 12/100 · 144/100
+      ['220,00', '12,0000', '0,0545', '0,6545'], // 12/220 = 0,054545 · 144/220 = 0,654545
+      ['330,00', '12,0000', '0,0364', '0,4364'], // 12/330 = 0,036364 · 144/330 = 0,436364
+    ];
+    for (let i = 0; i < 3; i++) {
+      const celdas = filas(page).nth(i).locator('td');
+      for (let c = 0; c < 4; c++) await expect(celdas.nth(c + 1)).toHaveText(paralelo[i][c]);
+    }
+  });
+
+  test('CASO 24 · límite: 0,001 Ω, el paralelo mínimo y un consumo con tarifa de cuatro decimales', async ({ page }) => {
+    // Ley de Ohm, I = V/R con una R diminuta: 5/0,001 = 5000 A = 5.000.000 mA · P = 5·5000 W
+    await page.getByRole('button', { name: 'Calcular Corriente (I)', exact: true }).click();
+    await teclearComoUsuario(page, page.locator('#ohm-a'), '5');
+    await teclearComoUsuario(page, page.locator('#ohm-b'), '0,001');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    await expect(valorDe(page, 'Corriente (I)')).toHaveText('5000,0000 A — 5.000.000,00 mA');
+    await expect(valorDe(page, 'Resistencia (R)')).toHaveText('0,0010 Ω');
+    await expect(valorDe(page, 'Potencia disipada (P)')).toHaveText('25.000,0000 W');
+
+    // Paralelo: el contador arranca en 3 y su mínimo es 2 — «Reducir» dos veces deja 2 campos
+    await page.getByRole('button', { name: 'Paralelo', exact: true }).click();
+    await esperarHidratacion(page, ['#par-r1']);
+    await page.getByRole('button', { name: 'Reducir' }).click();
+    await page.getByRole('button', { name: 'Reducir' }).click();
+    await expect(page.locator('input[placeholder="Ω"]')).toHaveCount(2);
+
+    // Potencia: 230 V · 8,7 A = 2001 W; 2,001 kW · 3,5 h · 30 días = 210,105 kWh;
+    // 210,105 · 0,1547 = 32,5032435 → 32,5032
+    await page.getByRole('button', { name: 'Potencia', exact: true }).click();
+    await esperarHidratacion(page, ['#pot-v']);
+    await teclearComoUsuario(page, page.locator('#pot-v'), '230');
+    await teclearComoUsuario(page, page.locator('#pot-i'), '8,7');
+    await teclearComoUsuario(page, page.locator('#pot-horas'), '3,5');
+    await teclearComoUsuario(page, page.locator('#pot-dias'), '30');
+    await teclearComoUsuario(page, page.locator('#pot-tarifa'), '0,1547');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    await expect(valorDe(page, 'Potencia (P)')).toHaveText('2001,00 W');
+    // R = 230/8,7 = 26,436782 Ω
+    await expect(valorDe(page, 'Resistencia (R)')).toHaveText('26,4368 Ω');
+    await expect(valorDe(page, 'Consumo del periodo')).toHaveText('210,1050 kWh');
+    await expect(valorDe(page, 'Coste estimado')).toHaveText('32,5032 €');
+    // La misma tarifa con el punto decimal de Latinoamérica: «0.1547» no agrupa millares
+    await teclearComoUsuario(page, page.locator('#pot-tarifa'), '0.1547');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    await expect(valorDe(page, 'Coste estimado')).toHaveText('32,5032 €');
+  });
+
+  test('CASO 25 · rechazo: R = 0 donde divide, negativa, vacía o texto; y «1.500» es mil quinientos', async ({ page }) => {
+    // I = V/R con R = 0: no hay corriente finita que enseñar
+    await page.getByRole('button', { name: 'Calcular Corriente (I)', exact: true }).click();
+    await teclearComoUsuario(page, page.locator('#ohm-a'), '12');
+    await teclearComoUsuario(page, page.locator('#ohm-b'), '0');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    await expect(avisoApp(page)).toHaveText('Resistencia R (Ω): tiene que ser mayor que cero.');
+    await expect(fichaApp(page)).toBeEmpty();
+
+    await page.getByRole('button', { name: 'Serie', exact: true }).click();
+    await esperarHidratacion(page, ['#serie-r1']);
+    await teclearComoUsuario(page, page.locator('#serie-r2'), '220');
+    await teclearComoUsuario(page, page.locator('#serie-r3'), '330');
+    await teclearComoUsuario(page, page.locator('#serie-v'), '12');
+    for (const [r1, mensaje] of [
+      ['-5', 'R1: tiene que ser mayor que cero.'],
+      ['', 'R1: falta el valor.'],
+      ['abc', 'R1: «abc» no es un número.'],
+    ]) {
+      await teclearComoUsuario(page, page.locator('#serie-r1'), r1);
+      await page.getByRole('button', { name: 'Calcular circuito' }).click();
+      await expect(avisoApp(page), `R1 = «${r1}»`).toHaveText(mensaje);
+      await expect(fichaApp(page), `R1 = «${r1}»`).toBeEmpty();
+    }
+
+    // «1.500» con punto de millar NO se rechaza: 1500 + 220 + 330 = 2050 Ω
+    await teclearComoUsuario(page, page.locator('#serie-r1'), '1.500');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+    await expect(avisoApp(page)).toHaveCount(0);
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('2050,000 Ω');
+    // I = 12/2050 = 0,0058537 A = 5,8537 mA · P = 144/2050 = 0,0702439 W
+    await expect(valorDe(page, 'Corriente total')).toHaveText('0,0059 A (5,85 mA)');
+    await expect(valorDe(page, 'Potencia total disipada')).toHaveText('0,0702 W');
+    await expect(filas(page).nth(0).locator('td').nth(1)).toHaveText('1500,00');
+  });
+
+  /**
+   * CASO 26 (bajo, operativa) — ABIERTO. «Horas de uso diario» acepta cualquier número de 0 o
+   * más, así que un día de 25 horas da un consumo que ningún aparato puede tener. Es la cifra
+   * DESTACADA del panel (el coste), la que el usuario se lleva.
+   *   Esperado: 25 h al día se rechaza (un día tiene 24), sin ficha detrás.
+   *   Obtenido: 2,001 kW · 25 h · 30 días = 1500,7500 kWh y 232,1660 €, sin aviso.
+   */
+  test.fail('CASO 26 · ABIERTO: un día de 25 horas de uso no puede dar un consumo', async ({ page }) => {
+    await page.getByRole('button', { name: 'Potencia', exact: true }).click();
+    await esperarHidratacion(page, ['#pot-v']);
+    await teclearComoUsuario(page, page.locator('#pot-v'), '230');
+    await teclearComoUsuario(page, page.locator('#pot-i'), '8,7');
+    await teclearComoUsuario(page, page.locator('#pot-horas'), '24');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    // Control: 24 h sí existen (una nevera, un router), y la reparación tiene que seguir
+    // admitiéndolas. 2,001 kW · 24 h · 30 días = 1440,72 kWh
+    await expect(valorDe(page, 'Consumo del periodo')).toHaveText('1440,7200 kWh');
+
+    await teclearComoUsuario(page, page.locator('#pot-horas'), '25');
+    await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+    await expect(avisoApp(page)).toBeVisible({ timeout: 1500 });
+    await expect(fichaApp(page)).toBeEmpty();
+  });
+
+  /**
+   * CASO 27 (bajo, operativa) — ABIERTO. Los campos de resistencia de Serie y Paralelo pasan por
+   * motivoDeRechazo y NOMBRAN la causa («notación científica… escribe 1000 en vez de 1e3»,
+   * «tiene que ser mayor que cero»). La tensión de fuente de esas dos pestañas no: vacía, «0»,
+   * «abc» y «1e3» reciben el mismo «Tensión de fuente inválida.». Es la forma del hallazgo 875
+   * en el campo vecino.
+   */
+  test.fail('CASO 27 · ABIERTO: la tensión de fuente dice por qué la rechaza, como las R de al lado', async ({ page }) => {
+    await page.getByRole('button', { name: 'Serie', exact: true }).click();
+    await esperarHidratacion(page, ['#serie-r1']);
+    await teclearComoUsuario(page, page.locator('#serie-r1'), '100');
+    await teclearComoUsuario(page, page.locator('#serie-r2'), '220');
+    await teclearComoUsuario(page, page.locator('#serie-r3'), '1e3');
+    await teclearComoUsuario(page, page.locator('#serie-v'), '12');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+    // Contraste, en verde: en una R, «1e3» se explica
+    await expect(avisoApp(page)).toContainText('notación científica');
+
+    await teclearComoUsuario(page, page.locator('#serie-r3'), '330');
+    await teclearComoUsuario(page, page.locator('#serie-v'), '1e3');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+    await expect(avisoApp(page)).toBeVisible();
+    // Esperado: la misma explicación. Obtenido: «Tensión de fuente inválida.»
+    await expect(avisoApp(page)).toContainText('notación científica', { timeout: 1500 });
+  });
+});
+
+/** Seis de los doce casos, resueltos a mano (cabecera del bloque). */
+const A_MANO_30_09: Readonly<Record<number, number>> = { 1: 9.4, 5: 5.62, 7: 2, 9: 500, 11: 132, 12: 3 };
+
+test.describe('Inspector 30/09/2026 · el corrector de los casos para clase', () => {
+  test('CASO 28.a · acepta la respuesta redondeada como pide el enunciado y rechaza los errores del tema', async () => {
+    const caso = (id: number) => CASOS.find((c) => c.id === id)!;
+    for (const [id, valor] of Object.entries(A_MANO_30_09)) {
+      expect(caso(Number(id)).respuesta, `caso ${id}`).toBe(valor);
+    }
+    // [caso, respuesta del alumno, ¿correcta?, de dónde sale]
+    const PRUEBAS: [number, number, boolean, string][] = [
+      [1, 9.4, true, '0,020 A · 470 Ω'],
+      [1, 9400, false, 'los 20 mA sin pasar a amperios'],
+      [5, 5.62, true, '12·2200/4700 = 5,617, a dos decimales'],
+      [5, 5.617, true, 'la cifra que imprime el panel (5,6170 V)'],
+      [5, 5.72, false, 'I redondeada a 0,0026 A antes de multiplicar'],
+      [5, 8.25, false, 'divisor con R₁ + R₂ en vez de la suma de las tres'],
+      [7, 2, true, '1/(1/6 + 1/3)'],
+      [7, 9, false, 'sumar las resistencias en paralelo'],
+      [7, 0.5, false, 'olvidar dar la vuelta a 1/Req'],
+      [9, 500, true, '220/440 = 0,5 A = 500 mA'],
+      [9, 0.5, false, 'amperios en la casilla de mA'],
+      [9, 5500, false, 'la corriente total de la regleta'],
+      [11, 132, true, '2,2 kW · 2 h · 30 días'],
+      [11, 132000, false, 'Wh en vez de kWh'],
+      [11, 4.4, false, 'sin multiplicar por los días'],
+      [12, 3, true, '15 kWh · 0,20'],
+      [12, 3000, false, 'W en vez de kW'],
+      [12, 0.1, false, 'sin multiplicar por los días'],
+    ];
+    for (const [id, respuesta, correcta, porque] of PRUEBAS) {
+      expect(comprobarRespuesta(respuesta, caso(id).respuesta).correcto, `caso ${id}: ${respuesta} (${porque})`).toBe(correcta);
+    }
+  });
+
+  /**
+   * CASO 28.b (medio, cálculo) — ABIERTO. `toleranciaDe` es el mayor entre 0,01 y el 1 % de la
+   * respuesta. Los datos de estos casos son EXACTOS (no hay tabla ni gráfica que leer), así que
+   * la tolerancia que da la pregunta es media unidad del redondeo pedido; el 1 % de 500 mA son
+   * 5 mA y el de 132 kWh, 1,32 kWh, y pasan enteros que ninguna cuenta produce. Ningún error
+   * de concepto cae dentro (28.a), pero sí cifras que no existen. Mismo mecanismo que los
+   * hallazgos 2149 y 2420 de otras apps de la familia.
+   *   Esperado: rechazadas. Obtenido: «¡Correcto!» en las siete.
+   * Práctica («Redondea a dos decimales» en todas): con la semilla 1 sale 6/(22 + 12) A =
+   * 176,47 mA y pasa 177,47 (tolerancia 1,76 mA); con la 16, 6/20 A = 300 mA y pasa 301. Una
+   * UNIDAD entera de desvío cuando se piden centésimas no sale de ningún redondeo intermedio;
+   * medido el 30/09 en 20.000 semillas, pasa en el 66 % de las de corriente en serie.
+   * ⚠️ Nada de este test fija cifras del generador: con test.fail, un fallo por otra causa lo
+   * dejaría en verde aunque la tolerancia ya estuviera reparada.
+   */
+  test.fail('CASO 28.b · ABIERTO: con datos exactos no pasan cifras que ninguna cuenta produce', async () => {
+    const caso = (id: number) => CASOS.find((c) => c.id === id)!;
+    const NO_EXISTEN: [number, number, string][] = [
+      [5, 5.57, '5,617 V: 5,57 no sale de ningún redondeo'],
+      [5, 5.67, '5,617 V: 5,67 tampoco'],
+      [9, 495, '500 mA exactos'],
+      [9, 505, '500 mA exactos'],
+      [11, 131, '132 kWh exactos'],
+      [11, 133, '132 kWh exactos'],
+      [12, 3.03, '3 exactos; redondeando I a 0,46 A saldría 3,04'],
+    ];
+    const aceptadas = NO_EXISTEN.filter(([id, r]) => comprobarRespuesta(r, caso(id).respuesta).correcto).map(
+      ([id, r, p]) => `caso ${id}: ${r} (${p})`,
+    );
+    for (let semilla = 1; semilla <= 200; semilla++) {
+      const e = generarEjercicioAleatorio(semilla);
+      if ((e.datos.decimales ?? 2) === 2 && comprobarRespuesta(e.respuesta + 1, e.respuesta).correcto) {
+        aceptadas.push(`práctica semilla ${semilla}: ${e.respuesta + 1} por ${e.respuestaTexto}`);
+      }
+    }
+    expect(aceptadas).toEqual([]);
+  });
+});
+
+test.describe('Inspector 30/09/2026 · los casos para clase en el navegador', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+  const veredicto = (page: Page) => seccion(page).getByRole('alert');
+
+  async function responder(page: Page, id: number, texto: string): Promise<void> {
+    await seccion(page).getByRole('button', { name: new RegExp(`^Caso ${id}:`) }).click();
+    await teclearComoUsuario(page, seccion(page).locator('#casos-respuesta'), texto);
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta', '#ohm-a']);
+  });
+
+  test('CASO 28.c · tecleado: la respuesta buena pasa y el error de unidades no', async ({ page }) => {
+    await responder(page, 1, '9,4'); // 0,020 A · 470 Ω
+    await expect(veredicto(page)).toContainText('¡Correcto!');
+    await responder(page, 1, '9400'); // sin pasar mA a A
+    await expect(veredicto(page)).toContainText('No es correcto');
+    await responder(page, 7, '9'); // 6 + 3: sumar en paralelo
+    await expect(veredicto(page)).toContainText('No es correcto');
+    await responder(page, 12, '3,00'); // 15 kWh · 0,20
+    await expect(veredicto(page)).toContainText('¡Correcto!');
+    await responder(page, 12, '3000'); // W en vez de kW
+    await expect(veredicto(page)).toContainText('No es correcto');
+  });
+
+  /** CASO 28.b en pantalla: el entero vecino de 132 kWh exactos. ABIERTO. */
+  test.fail('CASO 28.d · ABIERTO: 133 kWh no es la energía del calentador del caso 11', async ({ page }) => {
+    await responder(page, 11, '132'); // 220 V · 10 A · 2 h · 30 días / 1000
+    await expect(veredicto(page)).toContainText('¡Correcto!');
+    await responder(page, 11, '133');
+    // Esperado: rechazo. Obtenido: «✅ ¡Correcto!» (tolerancia 1,32 kWh)
+    await expect(veredicto(page)).toContainText('No es correcto', { timeout: 1500 });
+  });
+
+  /**
+   * CASO 29 (bajo, contenido) — ABIERTO. La intro dice «se acepta un margen del 1 %» con un
+   * espacio normal (U+0020) entre la cifra y el %: el § 2 del CLAUDE.md global pide el duro
+   * (U+00A0) desde el 25/09/2026, y la sección nació el 28/09. Si la frase desaparece al
+   * reparar la tolerancia, este caso pasa a verde por sí solo y hay que quitarle la marca.
+   */
+  test.fail('CASO 29 · ABIERTO: el «1 %» de la intro va con espacio duro', async ({ page }) => {
+    // Toda la sección, no un <p> concreto: un localizador que se desplazara pasaría a verde y
+    // la marca se delataría sola, que es el lado seguro.
+    const texto = (await seccion(page).textContent()) ?? '';
+    expect(texto).not.toMatch(/\d %/);
+  });
+
+  /**
+   * CASO 30 — cada caso trae «Verlo en el simulador»: qué teclear y en qué pestaña, y la cifra
+   * que sale. Se sigue AL PIE DE LA LETRA en una página recién cargada (el estado de las
+   * pestañas se conserva, y la instrucción parte del de arranque) y se lee esa cifra. Si el
+   * motor o el formato cambian, el texto del caso quedaría mintiendo sin que nada lo dijera.
+   */
+  test('CASO 30 · los doce «Verlo en el simulador» dicen la verdad', async ({ page }) => {
+    test.setTimeout(180_000);
+    const boton = (n: string) => page.getByRole('button', { name: n, exact: true });
+    const celda = (fila: number, col: number) => filas(page).nth(fila).locator('td').nth(col);
+    const t = (sel: string, texto: string) => teclearComoUsuario(page, page.locator(sel), texto);
+    const nueva = async (pestana?: string, testigo?: string) => {
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#ohm-a']);
+      if (pestana && testigo) {
+        await boton(pestana).click();
+        await esperarHidratacion(page, [testigo]);
+      }
+    };
+
+    // 1 · 0,02 A · 470 Ω = 9,4 V
+    await nueva(); await boton('Calcular Tensión (V)').click(); await t('#ohm-a', '0,02'); await t('#ohm-b', '470'); await boton('Calcular').click();
+    await expect(valorDe(page, 'Tensión (V)')).toHaveText('9,4000 V');
+    // 2 · 4,5/15 = 0,3 A
+    await nueva(); await boton('Calcular Corriente (I)').click(); await t('#ohm-a', '4,5'); await t('#ohm-b', '15'); await boton('Calcular').click();
+    await expect(valorDe(page, 'Corriente (I)')).toHaveText('0,3000 A — 300,00 mA');
+    // 3 · 220/4 = 55 Ω
+    await nueva(); await boton('Calcular Resistencia (R)').click(); await t('#ohm-a', '220'); await t('#ohm-b', '4'); await boton('Calcular').click();
+    await expect(valorDe(page, 'Resistencia (R)')).toHaveText('55,0000 Ω');
+    // 4 · 10 + 22 + 47 = 79 Ω
+    await nueva('Serie', '#serie-r1'); await t('#serie-r1', '10'); await t('#serie-r2', '22'); await t('#serie-r3', '47'); await t('#serie-v', '9'); await boton('Calcular circuito').click();
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('79,000 Ω');
+    // 5 · 12·2200/4700 = 5,617021 V en la fila R2
+    await nueva('Serie', '#serie-r1'); await t('#serie-r1', '1000'); await t('#serie-r2', '2200'); await t('#serie-r3', '1500'); await t('#serie-v', '12'); await boton('Calcular circuito').click();
+    await expect(celda(1, 2)).toHaveText('5,6170 V');
+    // 6 · «+» tres veces: 6 × 4 Ω = 24 Ω → 12/24 = 0,5 A
+    await nueva('Serie', '#serie-r1');
+    for (let i = 0; i < 3; i++) await boton('Aumentar').click();
+    for (let i = 1; i <= 6; i++) await t(`#serie-r${i}`, '4');
+    await t('#serie-v', '12'); await boton('Calcular circuito').click();
+    await expect(valorDe(page, 'Corriente total')).toHaveText('0,5000 A (500,00 mA)');
+    // 7 · «−» una vez: 6 ∥ 3 = 2 Ω
+    await nueva('Paralelo', '#par-r1'); await boton('Reducir').click(); await t('#par-r1', '6'); await t('#par-r2', '3'); await t('#par-v', '12'); await boton('Calcular circuito').click();
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('2,0000 Ω');
+    // 8 · 12 ∥ 12 ∥ 6 = 3 Ω → 12/3 = 4 A
+    await nueva('Paralelo', '#par-r1'); await t('#par-r1', '12'); await t('#par-r2', '12'); await t('#par-r3', '6'); await t('#par-v', '12'); await boton('Calcular circuito').click();
+    await expect(valorDe(page, 'Corriente total (fuente)')).toHaveText('4,0000 A');
+    // 9 · «−» una vez: por la lámpara, 220/440 = 0,5 A (columna «I rama (A)», fila R2)
+    await nueva('Paralelo', '#par-r1'); await boton('Reducir').click(); await t('#par-r1', '44'); await t('#par-r2', '440'); await t('#par-v', '220'); await boton('Calcular circuito').click();
+    await expect(celda(1, 3)).toHaveText('0,5000');
+    // 10 · tensión vacía: 0,2² · 100 = 4 W
+    await nueva('Potencia', '#pot-v'); await t('#pot-i', '0,2'); await t('#pot-r', '100'); await boton('Calcular').click();
+    await expect(valorDe(page, 'Potencia (P)')).toHaveText('4,00 W');
+    // 11 · 2,2 kW · 2 h · 30 días = 132 kWh
+    await nueva('Potencia', '#pot-v'); await t('#pot-v', '220'); await t('#pot-i', '10'); await t('#pot-horas', '2'); await t('#pot-dias', '30'); await boton('Calcular').click();
+    await expect(valorDe(page, 'Consumo del periodo')).toHaveText('132,0000 kWh');
+    // 12 · 220²/484 = 100 W → 0,1 · 5 · 30 = 15 kWh → 15 · 0,20 = 3
+    await nueva('Potencia', '#pot-v'); await t('#pot-v', '220'); await t('#pot-r', '484'); await t('#pot-horas', '5'); await t('#pot-dias', '30'); await t('#pot-tarifa', '0,20'); await boton('Calcular').click();
+    await expect(valorDe(page, 'Coste estimado')).toHaveText('3,0000 €');
+  });
+});
+
+test.describe('Inspector 30/09/2026 · en móvil (390×844, táctil)', () => {
+  // Enumerado, no `devices[…]`: dentro de un describe no debe forzar un worker nuevo.
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.7922.34 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#ohm-a', '#casos-respuesta']);
+  });
+
+  test('CASO 31 · la serie del CASO 23 y el caso 9 de aula, con el dedo', async ({ page }) => {
+    await page.getByRole('button', { name: 'Serie', exact: true }).tap();
+    await esperarHidratacion(page, ['#serie-r1']);
+    await teclearComoUsuario(page, page.locator('#serie-r1'), '100');
+    await teclearComoUsuario(page, page.locator('#serie-r2'), '220');
+    await teclearComoUsuario(page, page.locator('#serie-r3'), '330');
+    await teclearComoUsuario(page, page.locator('#serie-v'), '12');
+    await page.getByRole('button', { name: 'Calcular circuito' }).tap();
+    // Req = 650 Ω · I = 12/650 = 18,4615 mA · P = 144/650 = 0,221538 W
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('650,000 Ω');
+    await expect(valorDe(page, 'Corriente total')).toHaveText('0,0185 A (18,46 mA)');
+    await expect(valorDe(page, 'Potencia total disipada')).toHaveText('0,2215 W');
+
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    await seccion.getByRole('button', { name: /^Caso 9:/ }).tap();
+    await teclearComoUsuario(page, seccion.locator('#casos-respuesta'), '0,5'); // A en la casilla de mA
+    await seccion.getByRole('button', { name: 'Comprobar' }).tap();
+    await expect(seccion.getByRole('alert')).toContainText('No es correcto');
+    await teclearComoUsuario(page, seccion.locator('#casos-respuesta'), '500'); // 220/440 A = 500 mA
+    await seccion.getByRole('button', { name: 'Comprobar' }).tap();
+    await expect(seccion.getByRole('alert')).toContainText('¡Correcto!');
   });
 });

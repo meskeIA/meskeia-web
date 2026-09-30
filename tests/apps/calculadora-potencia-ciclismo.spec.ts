@@ -1,4 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, Locator } from '@playwright/test';
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Inspector — calculadora-potencia-ciclismo (segmento MOTOR de cálculo, riesgo 2)
@@ -8,6 +9,8 @@ import { test, expect, Page } from '@playwright/test';
  * anterior: conserva sus casos válidos, corrige dos regex suyas que habían perdido los
  * escapes (`/^d+ – d+ W$/` no casaba nada y dejaba la comprobación de contigüidad INERTE) y
  * añade los bordes que la reparación introdujo.
+ * Tercera: 31/08/2026 (sin hallazgos). Cuarta: 30/09/2026, re-inspección completa tras los lotes
+ * del catálogo (cabeceras de tabla, logo sobre el hero) — su bloque va al final del fichero.
  *
  * QUÉ PROMETE
  *   <h1>: «🚴 Calculadora de Vatios en Ciclismo»
@@ -88,22 +91,23 @@ import { test, expect, Page } from '@playwright/test';
  *   238 «W/kg = VAM / 255» al 8 % ...... REPARADO: ahora 280 (Ferrari) y 288 (fuerzas), y el
  *                                        288 lo confirma el propio estimador (CASO 1b)
  *   239 escala de VAM desfasada ........ REPARADO (CASO 2)
- *   240 promesa incumplida ............. REPARADO con el estimador por fuerzas (CASO 1b),
- *                                        salvo el FAQ y la tarjeta «Sin potenciómetro»
- *                                        (hallazgo abierto 5)
+ *   240 promesa incumplida ............. REPARADO con el estimador por fuerzas (CASO 1b); el
+ *                                        FAQ y la tarjeta «Sin potenciómetro» se quedaron
+ *                                        atrás (hallazgo 256, REPARADO el 24/08/2026)
  *   241 sliders aria-hidden tabulables . REPARADO (bloque de accesibilidad)
  *   242 disclaimer exento .............. REPARADO: DisclaimerCard médico, severidad alta y no
  *                                        colapsable; ya no hay «@disclaimer: exempt»
- *   243 VAM que desaparecía sin decirlo . REPARADO (CASO 2), salvo con desnivel 0
- *                                        (hallazgo abierto 4)
- *   244 huecos entre zonas ............. REPARADO (CASO 1a y 2), con un borde nuevo en FTP
- *                                        absurdamente bajos (hallazgo abierto 3)
- *   245 vatios sin formatNumber() ...... REPARADO; la mitad del rango declarado, NO
- *                                        (hallazgo abierto 2)
+ *   243 VAM que desaparecía sin decirlo . REPARADO (CASO 2); con desnivel 0 quedó a medias
+ *                                        (hallazgo 255, REPARADO el 24/08/2026)
+ *   244 huecos entre zonas ............. REPARADO (CASO 1a y 2); dejó un borde nuevo en FTP
+ *                                        absurdamente bajos (hallazgo 254, REPARADO el 24/08/2026)
+ *   245 vatios sin formatNumber() ...... REPARADO; la mitad del rango declarado quedó
+ *                                        pendiente (hallazgo 253, REPARADO el 24/08/2026)
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()`. Afirman lo que DEBERÍA pasar, así
- * que hoy fallan a propósito; cuando se reparen, se les quita el `test.fail()` y quedan como
- * regresión.
+ * Los hallazgos 252-256 de la segunda inspección estuvieron marcados con `test.fail()` y ya
+ * no lo llevan: se repararon el 24/08/2026 y quedan como regresión. Los ABIERTOS de la
+ * re-inspección del 30/09/2026 van en su bloque, al final, con `test.fail()`: afirman lo que
+ * DEBERÍA pasar, así que hoy fallan a propósito.
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -176,7 +180,9 @@ async function rangosDeZona(page: Page): Promise<[number, number][]> {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
-  // La app es un client component: sin hidratación no hay cálculo que inspeccionar.
+  // La app es un client component: sin hidratación no hay cálculo que inspeccionar. Que el
+  // campo se vea no basta (viaja en el HTML del servidor): se espera a que React lo controle.
+  await esperarHidratacion(page, ['#peso', '#ftp']);
   await expect(page.locator('#peso')).toBeVisible();
   await expect(page.getByRole('button', { name: /Calcular potencia/i })).toBeEnabled();
 });
@@ -564,5 +570,443 @@ test.describe('Hallazgos 252-256, ya reparados', () => {
     const sinPotenciometro = textos.find((t) => t.includes('potenciómetro'))!;
     expect(sinPotenciometro).not.toContain('si ya conoces tu FTP por haber realizado un test');
     expect(sinPotenciometro).toContain('modelo de fuerzas');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 30/09/2026 — re-inspección completa (INVALIDADA por b833b716 en
+ * lib/calculadoras/deporte.ts, que solo tocó calcularSWOLF, y por los lotes del catálogo
+ * b7733c6d, 586a4d61, 3de36a1f y a1d72a9c, que solo tocaron el CSS de la cabecera de tabla y
+ * el relleno del hero).
+ *
+ * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ *   Modelo de fuerzas de libro: P = (m·g·sen θ + Crr·m·g·cos θ + ½·ρ·CdA·v²)·v / η, con
+ *   θ = arctan(pendiente/100), g 9,80665, y los coeficientes que la propia tarjeta declara:
+ *   Crr 0,005 · CdA 0,32 m² · ρ 1,225 kg/m³ (nivel del mar) · η 0,975 (transmisión).
+ *
+ *   CASO 1 (normal) — ciclista de 70 kg con bici de 8 kg (78 kg en movimiento)
+ *     · FTP 250 W → 250 / 70 = 3,5714 → «3,57 W/kg»; 3,5 ≤ 3,57 < 4,5 → «Amateur competitivo»
+ *       Zonas de Coggan como límite superior (55/75/90/105/120/150 %): 137,5 · 187,5 · 225 ·
+ *       262,5 · 300 · 375 W, que redondeados son 138 · 188 · 225 · 263 · 300 · 375 y cada zona
+ *       empieza en el anterior + 1: 0–138 · 139–188 · 189–225 · 226–263 · 264–300 · 301–375.
+ *     · Subida al 7 % a 15 km/h: v = 4,16667 m/s · sen θ = 0,0698291 · cos θ = 0,9975590
+ *         F_grav = 78 · 9,80665 · 0,0698291          = 53,4136 N → 228,26 W
+ *         F_rod  = 0,005 · 78 · 9,80665 · 0,9975590  =  3,8153 N →  16,30 W
+ *         F_aero = ½ · 1,225 · 0,32 · 4,16667²       =  3,4028 N →  14,54 W
+ *         P = 60,6316 N · 4,16667 m/s / 0,975 = 259,11 W → «259 W» (228 · 16 · 15)
+ *         VAM = 4,16667 · 0,0698291 · 3600 = 1047,4 → «1047 m/h»
+ *     · VAM cronometrada: 850 m en 45 min → 850 · 60 / 45 = 1133,3 → «1133 m/h», «Amateur»
+ *
+ *   CASO 2 (límite)
+ *     · Llano (0 %) a 15 km/h: sin gravedad; rodadura 3,8246 N → 16,34 W, aire 14,54 W,
+ *       P = 30,89 → «31 W», y sin VAM.
+ *     · Bajada al −7 % a 15 km/h: 3,8153 + 3,4028 − 53,4136 = −46,1955 N → P = −197,42 W:
+ *       no se pedalea y sobran «197 W».
+ *     · Pendiente máxima que admite el campo (25 %) a 10 km/h: v = 2,77778 · sen θ = 0,2425356
+ *       · cos θ = 0,9701425 → 185,520 + 3,710 + 1,512 = 190,743 N → P = 543,43 → «543 W»;
+ *       VAM = 10.000 m/h · 0,2425356 = 2425,4 → «2425 m/h».
+ *
+ *   CASO 3 (rechazo)
+ *     · Peso tecleado «abc»: un campo numérico no admite letras, el valor queda vacío (0 kg) y
+ *       la app debe avisar sin veredicto.
+ *     · FTP «1.500»: el navegador lee el punto como decimal (1,5 W) y el rango 50-600 lo rechaza.
+ *     · Desnivel «1.500» m: en español son mil quinientos metros → con 50 min, 1500 · 60 / 50 =
+ *       1800 m/h; lo que no puede salir es 1,5 m → 2 m/h «Principiante» (hallazgo ABIERTO).
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Teclea como un usuario —foco, seleccionar lo que hubiera y escribir tecla a tecla— tras
+ *  esperar a que React controle ese campo. `fill()` escribe el valor entero de una vez y por
+ *  eso no ve lo que pasa con los estados intermedios («-», «14.»), que es justo el hallazgo. */
+async function teclear(page: Page, selector: string, texto: string, tocar = false): Promise<void> {
+  await esperarHidratacion(page, [selector]);
+  if (tocar) await page.tap(selector);
+  else await page.click(selector);
+  await page.keyboard.press('Control+A');
+  await page.keyboard.type(texto);
+}
+
+/** Contraste WCAG del texto de un elemento contra el primer fondo opaco de sus ancestros. */
+async function contraste(elemento: Locator): Promise<number> {
+  return elemento.evaluate((el) => {
+    const rgb = (s: string) => (s.match(/[\d.]+/g) ?? []).map(Number);
+    const lum = ([r, g, b]: number[]) => {
+      const f = (c: number) => {
+        const x = c / 255;
+        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+    };
+    let fondo = [255, 255, 255];
+    for (let n: Element | null = el; n; n = n.parentElement) {
+      const c = rgb(getComputedStyle(n).backgroundColor);
+      if (c.length === 3 || (c.length === 4 && c[3] === 1)) {
+        fondo = c;
+        break;
+      }
+    }
+    const a = lum(rgb(getComputedStyle(el).color));
+    const b = lum(fondo);
+    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  });
+}
+
+test.describe('Inspector 30/09/2026', () => {
+  // Coma decimal y punto de miles del español: el caso de rechazo depende de ello.
+  test.use({ locale: 'es-ES' });
+
+  test.describe('CASO 1 (normal) — 70 kg, bici de 8 kg y FTP 250 W', () => {
+    test('FTP 250 W: «3,57 W/kg», «Amateur competitivo» y zonas desde 137,5 W', async ({ page }) => {
+      await calcular(page, { peso: '70', ftp: '250' });
+      const tabla = resultados(page);
+      // 250 / 70 = 3,5714 → 3,57, dentro de [3,5; 4,5)
+      await expect(tabla).toContainText('3,57');
+      await expect(tabla).toContainText('Amateur competitivo');
+      // 55/75/90/105/120/150 % de 250 W = 137,5 · 187,5 · 225 · 262,5 · 300 · 375
+      await expect(tabla).toContainText('basadas en tu FTP: 250 W');
+      expect(await rangosDeZona(page)).toEqual([
+        [0, 138],
+        [139, 188],
+        [189, 225],
+        [226, 263],
+        [264, 300],
+        [301, 375],
+      ]);
+    });
+
+    test('estimador: 78 kg a 15 km/h por una rampa del 7 % son 259 W y 1047 m/h', async ({
+      page,
+    }) => {
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', velocidad: '15', pendiente: '7' });
+      // P = (53,4136 + 3,8153 + 3,4028) N · 4,16667 m/s / 0,975 = 259,11 W
+      await expect(tarjeta).toContainText('Potencia estimada');
+      await expect(tarjeta).toContainText('259 W');
+      await expect(tarjeta).toContainText('228 W contra la gravedad');
+      await expect(tarjeta).toContainText('16 W de rodadura');
+      await expect(tarjeta).toContainText('15 W contra el aire');
+      // VAM = v · sen θ · 3600 = 4,16667 · 0,0698291 · 3600 = 1047,4
+      await expect(tarjeta).toContainText('1047 m/h de VAM');
+    });
+
+    test('VAM cronometrada: 850 m en 45 min son 1133 m/h, «Amateur»', async ({ page }) => {
+      await abrirVam(page);
+      await calcular(page, { peso: '70', ftp: '250', desnivel: '850', tiempo: '45' });
+      // 850 · 60 / 45 = 1133,3 → 1133, en [1000; 1200) → «Amateur»
+      await expect(resultados(page)).toContainText('1133 m/h');
+      const tarjetaVam = resultados(page).locator('div').filter({ hasText: /^VAM/ }).first();
+      await expect(tarjetaVam).toContainText('Amateur');
+      await expect(tarjetaVam).not.toContainText('Amateur fuerte');
+    });
+  });
+
+  test.describe('CASO 2 (límite) — llano, bajada y la pendiente máxima', () => {
+    test('llano a 15 km/h: 31 W, cero contra la gravedad y sin VAM', async ({ page }) => {
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', velocidad: '15', pendiente: '0' });
+      // (3,8246 + 3,4028) N · 4,16667 / 0,975 = 30,89 W
+      await expect(tarjeta).toContainText('31 W');
+      await expect(tarjeta).toContainText('0 W contra la gravedad');
+      await expect(tarjeta).toContainText('16 W de rodadura');
+      await expect(tarjeta).toContainText('15 W contra el aire');
+      await expect(tarjeta).not.toContainText('de VAM');
+    });
+
+    test('bajada al −7 % a 15 km/h (escrita de una vez): no se pedalea y sobran 197 W', async ({
+      page,
+    }) => {
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', velocidad: '15', pendiente: '-7' });
+      await esperarValorEnReact(page, '#pendiente', -7);
+      // 3,8153 + 3,4028 − 53,4136 = −46,1955 N → −197,42 W
+      await expect(tarjeta).toContainText('No hace falta pedalear');
+      await expect(tarjeta).toContainText('sobran 197 W');
+      await expect(tarjeta).not.toContainText('Potencia estimada');
+    });
+
+    test('la pendiente más alta que admite el campo (25 %) a 10 km/h: 543 W y 2425 m/h', async ({
+      page,
+    }) => {
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', velocidad: '10', pendiente: '25' });
+      // (185,520 + 3,710 + 1,512) N · 2,77778 / 0,975 = 543,43 W
+      await expect(tarjeta).toContainText('543 W');
+      // 10.000 m/h · sen(arctan 0,25) = 10.000 · 0,2425356 = 2425,4 m/h
+      await expect(tarjeta).toContainText('2425 m/h de VAM');
+    });
+  });
+
+  test.describe('CASO 3 (rechazo)', () => {
+    test('peso tecleado «abc»: el campo no lo admite y la app avisa sin veredicto', async ({
+      page,
+    }) => {
+      await teclear(page, '#peso', 'abc');
+      await page.getByRole('button', { name: /Calcular potencia/i }).click();
+      await expect(page.locator('p[role="alert"]')).toContainText(
+        'El peso debe ser un número mayor que 0 kg.',
+      );
+      await expect(resultados(page)).toHaveCount(0);
+    });
+
+    test('FTP «1.500»: el navegador lo lee como 1,5 W y el rango 50-600 lo rechaza', async ({
+      page,
+    }) => {
+      await calcular(page, { peso: '70', ftp: '1.500' });
+      await expect(page.locator('p[role="alert"]')).toContainText('entre 50 y 600 W');
+      await expect(resultados(page)).toHaveCount(0);
+    });
+  });
+
+  test.describe('Hallazgos ABIERTOS del 30/09/2026', () => {
+    test('ABIERTO · teclear «-7» en la pendiente es una bajada, no una subida del 7 %', async ({
+      page,
+    }) => {
+      // ABIERTO. Los campos con estado numérico (peso, FTP, masa, velocidad y pendiente) hacen
+      // `setX(Number(e.target.value))`. Al teclear «-», el navegador entrega un valor vacío
+      // (un «-» suelto no es un número), Number('') es 0 y React reescribe «0» en el campo:
+      // el signo desaparece y el «7» que sigue deja «07». La app calcula la SUBIDA del 7 %.
+      // ENTRADA 78 kg · 15 km/h · seleccionar el 0 de la pendiente y teclear «-7»
+      // ESPERADO (a mano, CASO 2) «No hace falta pedalear» y sobran 197 W
+      // OBTENIDO el campo muestra «07» y la tarjeta «Potencia estimada 259 W … Esa subida son
+      // 1047 m/h de VAM». Con `fill('-7')` —como escriben los tests anteriores— no se ve.
+      test.fail();
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', velocidad: '15' });
+      await teclear(page, '#pendiente', '-7');
+      await page.getByRole('button', { name: /Estimar vatios/i }).click();
+      await expect(page.locator('#pendiente')).toHaveValue('-7');
+      await expect(tarjeta).toContainText('No hace falta pedalear');
+      await expect(tarjeta).toContainText('sobran 197 W');
+    });
+
+    test('ABIERTO · teclear «14.5» en la velocidad son 14,5 km/h, no 5', async ({ page }) => {
+      // ABIERTO. El mismo mecanismo con el punto decimal: «14.» no es un número válido, el
+      // navegador entrega '' y la app escribe «0»; el «5» final deja «05». Pasa igual con
+      // locale es-ES y es-MX, en escritorio y en móvil (medido el 30/09/2026), y el punto es el
+      // separador decimal de México y del teclado numérico.
+      // ENTRADA 78 kg · 7 % · teclear «14.5» en la velocidad
+      // ESPERADO v = 4,02778 m/s → (53,4136 + 3,8153 + 3,1797) N · 4,02778 / 0,975 = 249,55
+      //          → «250 W» y VAM 4,02778 · 0,0698291 · 3600 = 1012,5 → «1013 m/h»
+      // OBTENIDO el campo queda en «05» y la app calcula con 5 km/h: «82 W» y «349 m/h».
+      test.fail();
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', pendiente: '7' });
+      await esperarValorEnReact(page, '#pendiente', 7);
+      await teclear(page, '#velocidad', '14.5');
+      await page.getByRole('button', { name: /Estimar vatios/i }).click();
+      await expect(page.locator('#velocidad')).toHaveValue('14.5');
+      await expect(tarjeta).toContainText('250 W');
+      await expect(tarjeta).toContainText('1013 m/h');
+    });
+
+    test('control del anterior: con coma, «14,5» sí llega y son 250 W', async ({ page }) => {
+      // Con locale es-ES Chromium admite la coma y la traduce a «14.5» sin pasar por un valor
+      // vacío: es la prueba de que el fallo de arriba es del punto y no del cálculo.
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', pendiente: '7' });
+      await esperarValorEnReact(page, '#pendiente', 7);
+      await teclear(page, '#velocidad', '14,5');
+      await esperarValorEnReact(page, '#velocidad', 14.5);
+      await page.getByRole('button', { name: /Estimar vatios/i }).click();
+      await expect(tarjeta).toContainText('250 W');
+      await expect(tarjeta).toContainText('1013 m/h');
+    });
+
+    test('ABIERTO · un desnivel de «1.500» m no se convierte en 1,5 m', async ({ page }) => {
+      // ABIERTO. El desnivel es un <input type="number">: el navegador lee «1.500» con el punto
+      // como decimal y la app calcula la VAM de un metro y medio, con veredicto.
+      // ENTRADA peso 70 · FTP 250 · desnivel «1.500» · tiempo 50 min
+      // ESPERADO 1500 · 60 / 50 = 1800 m/h («1.234 = mil» en español, el criterio del catálogo
+      //          para el separador ambiguo), o un aviso que lo rechace
+      // OBTENIDO «2 m/h» y «Principiante» (1,5 · 60 / 50 = 1,8 → 2)
+      test.fail();
+      await abrirVam(page);
+      await calcular(page, { peso: '70', ftp: '250' });
+      await teclear(page, '#desnivel', '1.500');
+      await teclear(page, '#tiempoMin', '50');
+      await page.getByRole('button', { name: /Calcular potencia/i }).click();
+      await expect(resultados(page).or(page.locator('p[role="alert"]'))).toBeVisible();
+      const texto = (await resultados(page).count()) ? await resultados(page).innerText() : '';
+      expect(texto).not.toMatch(/(^|\s)2 m\/h/);
+    });
+
+    test('ABIERTO · 30 kg con 600 W no recibe el veredicto «Profesional / Élite»', async ({
+      page,
+    }) => {
+      // ABIERTO. Reparación a medias del hallazgo 253: ahora se hacen cumplir los rangos de peso
+      // (30-150) y de FTP (50-600) por SEPARADO, pero no el cociente. El comentario del motor
+      // cita «20,00 W/kg — casi el triple del récord humano» como el absurdo que se quería
+      // evitar, y sigue saliendo con dos datos que la herramienta admite.
+      // ENTRADA peso 30 kg · FTP 600 W → 600 / 30 = 20,00 W/kg
+      // ESPERADO un aviso y ningún veredicto (la propia guía sitúa a los grandes escaladores
+      //          del World Tour en 6,0-7,5 W/kg)
+      // OBTENIDO «20,00 W/kg · Profesional / Élite · Nivel profesional internacional»
+      test.fail();
+      await calcular(page, { peso: '30', ftp: '600' });
+      await expect(page.locator('p[role="alert"]')).toBeVisible();
+      if (await resultados(page).count()) {
+        await expect(resultados(page)).not.toContainText('Profesional / Élite');
+      }
+    });
+
+    test('ABIERTO · 1000 m en 10 min (6000 m/h) no es «Élite / Profesional»', async ({ page }) => {
+      // ABIERTO. La VAM no tiene ni el control de rangos que se añadió al W/kg: los min/max del
+      // desnivel (0-3000) y del tiempo (1-600) son sugerencias del navegador (5000 m en 0,5 min
+      // dan «600.000 m/h»), y aun dentro de ellos sale una VAM que triplica lo que la guía de
+      // la misma página da como tope («los mejores escaladores han superado los 1.800 m/h»).
+      // ENTRADA peso 70 · FTP 250 · desnivel 1000 m · tiempo 10 min → 1000 · 60 / 10 = 6000
+      // ESPERADO un aviso y ningún veredicto sobre una VAM imposible
+      // OBTENIDO «6000 m/h · Élite / Profesional»
+      test.fail();
+      await abrirVam(page);
+      await calcular(page, { peso: '70', ftp: '250', desnivel: '1000', tiempo: '10' });
+      await expect(resultados(page).or(page.locator('p[role="alert"]'))).toBeVisible();
+      if (await resultados(page).count()) {
+        await expect(resultados(page)).not.toContainText('Élite / Profesional');
+      }
+    });
+
+    test('ABIERTO · el estimador no publica 34.687 W a 200 km/h (máximo declarado: 80)', async ({
+      page,
+    }) => {
+      // ABIERTO. calcularVatiosPorFuerzas solo exige masa y velocidad > 0: los rangos que
+      // declaran sus campos (masa 30-200, velocidad 1-80, pendiente −15/25) no se cumplen.
+      // ENTRADA 78 kg · 200 km/h · 0 % → (3,8246 + 604,94) N · 55,556 / 0,975 = 34.687 W
+      // ESPERADO un aviso con el rango, como el de peso y FTP del formulario principal
+      // OBTENIDO «Potencia estimada 34.687 W» sin una palabra
+      test.fail();
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', velocidad: '200', pendiente: '0' });
+      await expect(page.locator('p[role="alert"]')).toBeVisible();
+      await expect(tarjeta).toHaveCount(0);
+    });
+
+    test('ABIERTO · los veredictos y las zonas se leen con contraste 4,5:1', async ({ page }) => {
+      // ABIERTO. Las insignias ponen texto blanco de 12,5-12,8 px en negrita sobre colores
+      // fijos: texto pequeño, exige 4,5:1. Medido el 30/09/2026 (igual en los dos temas):
+      //   nivel  Cicloturista 2,87 · Principiante 3,54 · Semi-profesional 3,82 · Amateur 4,11
+      //   zonas  Z1 2,80 · Z2 2,87 · Z3 2,19 · Z4 2,97 · Z5 3,82 (Z6 5,87 sí cumple)
+      // El veredicto de la app ES el texto de la insignia.
+      // ENTRADA 70 kg · FTP 150 W → 2,14 W/kg «Cicloturista»
+      // ESPERADO ≥ 4,5:1 · OBTENIDO 2,87:1 (blanco sobre #27AE60) y Z3 2,19:1 (sobre #F39C12)
+      test.fail();
+      await calcular(page, { peso: '70', ftp: '150' });
+      await expect(resultados(page)).toContainText('Cicloturista');
+      const insignia = resultados(page).locator('[class*="nivelBadge"]');
+      expect(await contraste(insignia)).toBeGreaterThanOrEqual(4.5);
+      const z3 = resultados(page).locator('[class*="zonaBadge"]').nth(2);
+      await expect(z3).toHaveText('Z3');
+      expect(await contraste(z3)).toBeGreaterThanOrEqual(4.5);
+    });
+
+    test('ABIERTO · el azul de marca como texto pequeño no llega a 4,5:1', async ({ page }) => {
+      // ABIERTO. `color: var(--primary)` (#2E86AB) sobre blanco da 4,11:1, y el texto es
+      // pequeño (13-16 px en negrita): el título de la tabla de zonas, el del panel, los dos
+      // plegables, los h4 de la guía y los rangos de vatios (3,96:1 en las filas pares). La
+      // guía suma el h2 (3,77:1), el título de «Errores frecuentes» (#c0621a, 3,57:1), los
+      // números de los pasos (blanco sobre el degradado de marca, 2,80:1; 2,23:1 en oscuro) y
+      // los niveles de la tabla W/kg con color en línea (2,64-3,77:1; 2,25:1 «Profesional /
+      // Élite» en oscuro). El token para texto es --primary-texto.
+      // ENTRADA 70 kg · FTP 250 W → título «Zonas de Potencia…»
+      // ESPERADO ≥ 4,5:1 · OBTENIDO 4,11:1
+      test.fail();
+      await calcular(page, { peso: '70', ftp: '250' });
+      const titulo = resultados(page).locator('h3', { hasText: 'Zonas de Potencia' });
+      await expect(titulo).toBeVisible();
+      expect(await contraste(titulo)).toBeGreaterThanOrEqual(4.5);
+    });
+
+    test('ABIERTO · el % de la tabla de zonas va separado con espacio duro', async ({ page }) => {
+      // ABIERTO. Regla del 25/09/2026 (Ortografía de la RAE, 2010): «15 %», con U+00A0. Los
+      // rótulos salen del motor (`hasta ${limite}%`, lib/calculadoras/deporte.ts) y van pegados;
+      // la guía repite el patrón («10–20%», «2–5%», «70–80%» dos veces), el FAQ («95%») y la
+      // única que lo separa («al 8 %») usa un espacio normal.
+      // ENTRADA 70 kg · FTP 250 W → celda «% FTP» de Z1
+      // ESPERADO «hasta 55 %» (con U+00A0) · OBTENIDO «hasta 55%»
+      test.fail();
+      await calcular(page, { peso: '70', ftp: '250' });
+      const celda = resultados(page).locator('tbody tr').first().locator('td').nth(2);
+      expect(await celda.textContent()).toBe('hasta 55 %');
+    });
+
+    test('ABIERTO · la tarjeta del estimador dice cuándo esa cifra vale como FTP', async ({
+      page,
+    }) => {
+      // ABIERTO. La guía («Sin potenciómetro: Esta misma página lo estima», en la sección del
+      // FTP, remitiendo a un «Estimar mis vatios» que no existe con ese nombre) y el FAQ («Con
+      // esa estimación —o con un FTP ya conocido— calcula el ratio W/kg y las seis zonas»)
+      // tratan la potencia estimada como un FTP. El estimador da la potencia a la velocidad
+      // introducida, que solo se aproxima al FTP si fue un esfuerzo máximo de alrededor de una
+      // hora; la tarjeta no lo dice y no lleva la cifra al W/kg ni a las zonas.
+      // ENTRADA 78 kg · 30 km/h · 0 % → «Potencia estimada 149 W»
+      // ESPERADO que la tarjeta diga cuándo esa cifra sirve como FTP (o la lleve al cálculo)
+      // OBTENIDO ninguna mención del FTP; el formulario principal sigue con 200 W
+      test.fail();
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', velocidad: '30', pendiente: '0' });
+      await expect(tarjeta).toContainText('149 W');
+      await expect(tarjeta).toContainText('FTP');
+    });
+
+    test('ABIERTO · el FAQ usa la misma escala de niveles que la calculadora', async ({ page }) => {
+      // ABIERTO. El FAQPage (lo que leen Bing Copilot, ChatGPT o Perplexity) desplaza las
+      // etiquetas un escalón respecto a la app y a su propia guía visible:
+      //   W/kg: «Un ciclista recreativo medio suele estar entre 2,5 y 3,5 W/kg», cuando la app
+      //         llama a 2,5-3,5 «Amateur · Entrenamiento estructurado» y pone lo recreativo
+      //         («Salidas recreativas regulares», «fondo recreativo») en 1,5-2,5 «Cicloturista».
+      //   VAM:  «Un ciclista aficionado suele tener una VAM de 800-1.000 m/h», cuando la app
+      //         llama a 800-1000 «Cicloturista» y reserva «Amateur» para 1000-1200.
+      // Es el patrón del hallazgo 239 (la guía un escalón desfasada), ahora en el FAQ.
+      // ENTRADA 900 m/h → app «Cicloturista» · FAQ «aficionado»; 3,00 W/kg → app «Amateur» ·
+      //         FAQ «recreativo medio»
+      test.fail();
+      const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+      const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
+      const textos: string[] = faq.mainEntity.map(
+        (q: { acceptedAnswer: { text: string } }) => q.acceptedAnswer.text,
+      );
+      const todo = textos.join(' ');
+      expect(todo).not.toContain('recreativo medio suele estar entre 2,5 y 3,5');
+      expect(todo).not.toContain('aficionado suele tener una VAM de 800-1.000');
+    });
+  });
+
+  test.describe('Móvil 390×844', () => {
+    test.use({
+      viewport: { width: 390, height: 844 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('70 kg y FTP 250 W: 3,57 W/kg y la tabla cabe sin desbordar la página', async ({
+      page,
+    }) => {
+      await calcular(page, { peso: '70', ftp: '250' });
+      await expect(resultados(page)).toContainText('3,57');
+      await expect(resultados(page)).toContainText('Amateur competitivo');
+      await expect(resultados(page)).toContainText('301 – 375 W');
+      const anchos = await page.evaluate(() => ({
+        pagina: document.documentElement.scrollWidth,
+        vista: document.documentElement.clientWidth,
+      }));
+      expect(anchos.pagina).toBeLessThanOrEqual(anchos.vista);
+    });
+
+    test('ABIERTO · en móvil, teclear «-7» en la pendiente también da la subida', async ({
+      page,
+    }) => {
+      // ABIERTO. El hallazgo del «-» borrado, con toque y viewport de móvil.
+      // ENTRADA 78 kg · 15 km/h · tocar la pendiente, seleccionar el 0 y teclear «-7»
+      // ESPERADO «No hace falta pedalear», sobran 197 W · OBTENIDO «07» y 259 W de subida
+      test.fail();
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', velocidad: '15' });
+      await teclear(page, '#pendiente', '-7', true);
+      await page.getByRole('button', { name: /Estimar vatios/i }).tap();
+      await expect(page.locator('#pendiente')).toHaveValue('-7');
+      await expect(tarjeta).toContainText('No hace falta pedalear');
+    });
   });
 });

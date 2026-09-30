@@ -902,3 +902,260 @@ test.describe('Inspección 24/09/2026 — casos para clase contra el modelo, lí
     await expect(seccion(page).getByRole('button', { name: /^Caso 5:/ })).toBeFocused();
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 30/09/2026 — RE-inspección por la sospecha del 27/09 («las redes son enormemente
+ * complejas, lo que hace al sistema más resiliente») y de las reparaciones 3ea3c384 (hallazgos
+ * 1607-1613) y 0d54c8f9 (porcentajes con espacio). Los tests de arriba siguen en verde: esas
+ * reparaciones están en pie, salvo el <h4> que 3ea3c384 se llevó por delante (ver abajo).
+ *
+ * Resuelto A MANO con las fórmulas de motor.ts antes de abrir el navegador
+ * (arriba f_i = 0,3 + 0,7 × f_{i−1}; abajo f_i = 1 + 0,7 × (1 − f_{i+1})):
+ *
+ *   N · Pradera [100,40,15,5] + Plaga de herbívoros al 30 %: cambio = +0,8 × 0,3 = +0,24 (nivel 1)
+ *       herbívoros   40 × 1,24                          = 49,6   → «50»  (+10)
+ *       carnívoros   15 × (0,3 + 0,7 × 1,24)  = 15 × 1,168   = 17,52  → «18»  (+3)
+ *       superdep.     5 × (0,3 + 0,7 × 1,168) = 5 × 1,1176   = 5,588  → «6»   (+1)
+ *       productores 100 × (1 + 0,7 × (1 − 1,24)) = 100 × 0,832 = 83,2 → «83»  (−17)
+ *       panel: 16,8 → 17 % · 24 % · 16,8 → 17 % · 11,76 → 12 %
+ *     La ENERGÍA, con la eficiencia del 10 % que declara la app (100 × 0,1^(n−1)):
+ *       leyenda 100 · 10 · 1 · 0,1 % · tarjeta 10.000 → ~1.000 → ~100 → ~10 kJ/m²/año ·
+ *       FAQ 1 kg de ápice ← 10 kg ← 100 kg ← 1.000 kg · 5.º nivel 0,01 % y 6.º 0,001 %.
+ *
+ *   L · Pradera + Sequía al 100 % (el golpe más fuerte a la base): cambio = −0,6
+ *       productores 100 × 0,4                         = 40     → «40»  (−60)
+ *       herbívoros   40 × (0,3 + 0,7 × 0,4)  = 40 × 0,58  = 23,2   → «23»  (−17)
+ *       carnívoros   15 × (0,3 + 0,7 × 0,58) = 15 × 0,706 = 10,59  → «11»  (−4)
+ *       superdep.     5 × (0,3 + 0,7 × 0,706) = 5 × 0,7942 = 3,971 → «4»   (−1)
+ *       panel: 60 % · 16,8/40 = 42 % · 4,41/15 = 29,4 → 29 % · 1,029/5 = 20,58 → 21 %
+ *
+ *   R · Estado inválido: Pradera + Sequía al 50 % y se pulsa Océano. La sequía no existe en el
+ *       océano (hallazgo 1608), así que no puede quedar aplicada: «Sin perturbación» pulsado, sin
+ *       deslizador, barras de fábrica 100 · 38 · 14 · 5 sin delta y el panel de equilibrio. La
+ *       intensidad sí se conserva: con «Contaminación del agua» sale el 50 % y el escenario A del
+ *       24/09 (75 · 31 · 12 · 4,6).
+ *
+ * HALLAZGOS NUEVOS (ABIERTOS, con test.fail comprobado sin la marca):
+ *   · La cima de la pirámide no cabe en su escalón: 84 px de caja para 124 px de contenido.
+ *   · Complejidad = resiliencia afirmada como hecho (la sospecha del 27/09). Fuentes: May 1972,
+ *     Nature 238:413 · McCann 2000, Nature 405:228 · Dunne, Williams y Martinez 2002, Ecology
+ *     Letters 5:558 («robustness increases with food-web connectance but appears independent of
+ *     species richness») · Landi et al. 2018, Population Ecology 60:319 («the lack of consensual
+ *     agreement»).
+ *   · La FAQ de los eslabones perdió su pregunta en 3ea3c384: una tarjeta que empieza «Pocos:».
+ *   · Yellowstone como hecho (Marshall, Hobbs y Cooper 2013, Proc. R. Soc. B 280:20122977;
+ *     Hobbs et al. 2024, Ecological Monographs 94:e1598; en visualizador-ecosistema, hallazgo 1741).
+ *   · Myers et al. 2007 exagerado y sin su réplica (Grubbs et al. 2016, Scientific Reports 6:20970).
+ *   · «Productores: 100 % energía solar» en la leyenda, cuando las plantas fijan en torno al 1 %
+ *     de la luz (Wikipedia, «Photosynthetic efficiency»: 3-6 % como máximo).
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Lo que sobresale de cada escalón de la pirámide: spans cuyo borde cae fuera de su caja (> 1 px). */
+async function fueraDeSuEscalon(page: Page): Promise<string[]> {
+  return page.locator('[role="list"][aria-label="Pirámide trófica"] [role="listitem"]').evaluateAll((escalones) =>
+    escalones.flatMap((escalon) => {
+      const caja = escalon.getBoundingClientRect();
+      return [...escalon.querySelectorAll('span')]
+        .map((s) => {
+          const r = s.getBoundingClientRect();
+          const fuera = Math.max(0, caja.left - r.left) + Math.max(0, r.right - caja.right);
+          return { texto: (s.textContent ?? '').trim(), fuera: Math.round(fuera) };
+        })
+        .filter((s) => s.fuera > 1)
+        .map((s) => `${s.texto} (${s.fuera} px fuera)`);
+    })
+  );
+}
+
+/** El texto del documento, bloque educativo plegado incluido (textContent, no innerText). */
+async function textoDeLaPagina(page: Page): Promise<string> {
+  return page.evaluate(() => document.body.textContent ?? '');
+}
+
+/**
+ * ¿La página sigue diciendo esta frase? Devuelve un booleano para que el fallo imprima la frase
+ * y no los 30 KB del documento que imprime `not.toContain`.
+ */
+async function laPaginaDice(page: Page, frase: string): Promise<boolean> {
+  return (await textoDeLaPagina(page)).includes(frase);
+}
+
+test.describe('Inspector 30/09/2026 — escritorio', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['section[aria-labelledby="aula-titulo"] input[type="radio"]']);
+    await page.addStyleTag({ content: '*{transition:none !important}' });
+  });
+
+  test('N · pradera + plaga al 30 %: 83 / 50 / 18 / 6, y la energía cae al 10 % por nivel', async ({ page }) => {
+    await ponerEscenario(page, 'Pradera', 'Plaga de herbívoros', '0.3');
+    // Cabecera de este bloque, caso N: 83,2 · 49,6 · 17,52 · 5,588.
+    expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['83 (-17)', '50 (+10)', '18 (+3)', '6 (+1)']);
+    await expect(page.getByText('18 ind. rel.', { exact: true })).toBeVisible();
+    await expect(page.getByText('6 ind. rel.', { exact: true })).toBeVisible();
+    await expect(page.locator('[role="status"]')).toContainText(
+      'Una plaga hace crecer los herbívoros sin control. Los productores se han reducido un 17 %, los herbívoros han aumentado un 24 %, los carnívoros un 17 % y los superdepredadores un 12 %.'
+    );
+
+    // Energía: 100 × 0,1^(n−1) en la leyenda (la etiqueta de los productores es otro hallazgo).
+    // Solo `trim()`: `\s` casa también con el espacio duro (U+00A0) y lo borraría.
+    const leyenda = (await page.locator('[class*="leyendaLinea"]').allTextContents()).map((t) => t.trim());
+    expect(leyenda[0].startsWith('Productores: 100 %')).toBe(true);
+    expect(leyenda.slice(1)).toEqual(['Herbívoros: 10 %', 'Carnívoros: 1 %', 'Superdepredadores: 0,1 %']);
+    // Y las cuentas del bloque educativo con la misma eficiencia.
+    const texto = await textoDeLaPagina(page);
+    expect(texto).toContain('los herbívoros tendrán ~1.000, los carnívoros ~100 y los superdepredadores ~10 kJ/m²/año');
+    expect(texto).toContain('del orden de 10 kg de carnívoro, 100 kg de herbívoro y 1.000 kg de');
+    expect(texto).toContain('al quinto nivel le quedaría el 0,01 % de la energía que fijaron los productores, y al sexto, el 0,001 %');
+  });
+
+  test('L · pradera + sequía al 100 %: 40 / 23 / 11 / 4 y el panel 60 · 42 · 29 · 21 %', async ({ page }) => {
+    await ponerEscenario(page, 'Pradera', 'Sequía', '1');
+    // Cabecera, caso L: 40 · 23,2 · 10,59 · 3,971.
+    expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['40 (-60)', '23 (-17)', '11 (-4)', '4 (-1)']);
+    await expect(page.locator('[role="status"]')).toContainText(
+      'Los productores se han reducido un 60 %, los herbívoros un 42 %, los carnívoros un 29 % y los superdepredadores un 21 %.'
+    );
+    for (const b of await leerBarras(page)) {
+      expect(Number.isFinite(b.valor)).toBe(true);
+      expect(b.valor).toBeGreaterThan(0);
+    }
+  });
+
+  test('R · la sequía no sobrevive al cambio a Océano: vuelve el equilibrio y la intensidad se conserva', async ({ page }) => {
+    await ponerEscenario(page, 'Pradera', 'Sequía', '0.5');
+    await page.getByRole('group', { name: 'Seleccionar ecosistema' }).getByRole('button', { name: 'Océano', exact: true }).click();
+    const perturbaciones = page.getByRole('group', { name: 'Seleccionar perturbación' });
+    await expect(perturbaciones.getByRole('button', { name: 'Sequía', exact: true })).toHaveCount(0);
+    await expect(perturbaciones.getByRole('button', { name: 'Sin perturbación', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#slider-intensidad')).toHaveCount(0);
+    // Océano de fábrica: 100 · 38 · 14 · 5, sin paréntesis de cambio.
+    expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['100', '38', '14', '5']);
+    await expect(page.locator('[role="status"]')).toContainText('El ecosistema está en equilibrio.');
+    await expect(page.getByText('En el océano no hay «Sequía»')).toBeVisible();
+
+    // La intensidad del 50 % sigue ahí: contaminación al 50 % en el océano = escenario A del 24/09.
+    await perturbaciones.getByRole('button', { name: 'Contaminación del agua', exact: true }).click();
+    await expect(page.locator('label[for="slider-intensidad"]')).toContainText('50 %');
+    expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['75 (-25)', '31 (-7)', '12 (-2)', '4,6 (-0,4)']);
+  });
+
+  test('ABIERTO · la cima de la pirámide cabe en su escalón (hoy «Superdepreda…», 84 px para 124)', async ({ page }) => {
+    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
+    test.fail(true, 'ABIERTO desde el 30/09/2026: la cima de la pirámide desborda su escalón');
+    // Esperado: cada rótulo dentro de su escalón. Obtenido (1280 px, pradera de fábrica): el
+    // escalón de arriba mide el 30 % de 280 px = 84 px y su contenido 124; «Superdepredadores»
+    // sobresale 41 px a la derecha, blanco sobre el fondo blanco de la página, y el emoji 40 px
+    // a la izquierda. En claro se lee «Superdepreda» y el «5» de «5 ind. rel.» sale mordido.
+    expect(await fueraDeSuEscalon(page)).toEqual([]);
+  });
+
+  test('ABIERTO · la red trófica no se da por más resiliente como hecho (sospecha del 27/09)', async ({ page }) => {
+    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
+    test.fail(true, 'ABIERTO desde el 30/09/2026: complejidad = resiliencia afirmado como hecho');
+    // Esperado: la relación complejidad-estabilidad como debate (May 1972; McCann 2000; Landi et al.
+    // 2018), y lo medido en redes reales: la robustez ante extinciones en cadena crece con la
+    // conectancia, no con el número de especies (Dunne et al. 2002). Obtenido, en la FAQ «¿Qué
+    // diferencia hay entre cadena y red trófica?»: «las redes son enormemente complejas, lo que
+    // hace al sistema más resiliente: si desaparece una especie, hay alternativas».
+    const frase = 'enormemente complejas, lo que hace al sistema más resiliente';
+    expect(await laPaginaDice(page, frase), frase).toBe(false);
+  });
+
+  test('ABIERTO · cada tarjeta de las preguntas frecuentes lleva su pregunta', async ({ page }) => {
+    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
+    test.fail(true, 'ABIERTO desde el 30/09/2026: la FAQ de los eslabones sin su <h4>');
+    // 3ea3c384 (hallazgo 1610) sustituyó el <h4>«¿Cuántos eslabones puede tener una cadena
+    // trófica?» por el comentario de la reparación: queda una respuesta que empieza «Pocos:» sin
+    // la pregunta a la que responde, y el lector de pantalla no la encuentra por encabezados.
+    const sinPregunta = await page.locator('[class*="faqItem"]').evaluateAll((items) =>
+      items
+        .filter((item) => !item.querySelector('h4'))
+        .map((item) => (item.querySelector('p')?.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 40))
+    );
+    expect(sinPregunta).toEqual([]);
+  });
+
+  test('ABIERTO · Yellowstone no se cuenta como hecho demostrado', async ({ page }) => {
+    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
+    test.fail(true, 'ABIERTO desde el 30/09/2026: Yellowstone como hecho');
+    // Esperado: hipótesis debatida. Marshall, Hobbs y Cooper (2013, Proc. R. Soc. B): «moderating
+    // browsing alone was not sufficient to restore riparian zones along small streams»; Hobbs et
+    // al. (2024, Ecological Monographs), 20 años de experimento. Obtenido: «Los valles se
+    // revegetaron, los ríos se estabilizaron y aumentó la biodiversidad» y, en el FAQPage, «que
+    // restableció el equilibrio vegetal al controlar a los ciervos».
+    expect(await laPaginaDice(page, 'los ríos se estabilizaron'), 'los ríos se estabilizaron').toBe(false);
+    const faq = await page.evaluate(() =>
+      [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join(' ')
+    );
+    expect(faq.includes('restableció el equilibrio vegetal'), 'FAQPage: restableció el equilibrio vegetal').toBe(false);
+  });
+
+  test('ABIERTO · Myers et al. (2007) se cita por lo que dice y con su réplica', async ({ page }) => {
+    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
+    test.fail(true, 'ABIERTO desde el 30/09/2026: Myers et al. exagerado y sin su réplica');
+    // Myers et al. (Science 315:1846): la depredación de las rayas bastó para «terminate a
+    // century-long scallop fishery» (una pesquería, la de la vieira). Grubbs et al. (2016,
+    // Scientific Reports 6:20970): «the purported trophic cascade is lacking the empirical linkages
+    // required of a trophic cascade». Obtenido: «La industria pesquera de Carolina del Norte
+    // colapsó. Eliminar un superdepredador puede destruir toda la red alimentaria subyacente.»
+    const frase = 'La industria pesquera de Carolina del Norte colapsó';
+    expect(await laPaginaDice(page, frase), frase).toBe(false);
+  });
+
+  test('ABIERTO · la leyenda no dice que los productores tengan el 100 % de la energía solar', async ({ page }) => {
+    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
+    test.fail(true, 'ABIERTO desde el 30/09/2026: «Productores: 100 % energía solar»');
+    // El 100 % es la energía que FIJAN los productores (la propia FAQ: «el 0,01 % de la energía
+    // que fijaron los productores»); de la luz, las plantas convierten como mucho un 3-6 %
+    // (Wikipedia, «Photosynthetic efficiency») y en torno al 1 % de media, como enseña
+    // visualizador-ecosistema. Obtenido: «Productores: 100 % energía solar».
+    // `\s` casa con el espacio normal y con el duro: vale se escriba como se escriba.
+    const primera = (await page.locator('[class*="leyendaLinea"]').first().textContent()) ?? '';
+    expect(primera).not.toMatch(/100\s*%\s*energía solar/);
+  });
+});
+
+test.describe('Inspector 30/09/2026 — móvil 390×844', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['section[aria-labelledby="aula-titulo"] input[type="radio"]']);
+    await page.addStyleTag({ content: '*{transition:none !important}' });
+  });
+
+  test('N y L con el dedo: los mismos números que en escritorio y sin scroll horizontal', async ({ page }) => {
+    const grupoPerturbacion = page.getByRole('group', { name: 'Seleccionar perturbación' });
+    await page.getByRole('group', { name: 'Seleccionar ecosistema' }).getByRole('button', { name: 'Pradera', exact: true }).tap();
+    await grupoPerturbacion.getByRole('button', { name: 'Plaga de herbívoros', exact: true }).tap();
+    await page.locator('#slider-intensidad').fill('0.3');
+    await expect(page.locator('label[for="slider-intensidad"]')).toContainText('30 %');
+    // Caso N de la cabecera del bloque.
+    expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['83 (-17)', '50 (+10)', '18 (+3)', '6 (+1)']);
+
+    await grupoPerturbacion.getByRole('button', { name: 'Sequía', exact: true }).tap();
+    await page.locator('#slider-intensidad').fill('1');
+    await expect(page.locator('label[for="slider-intensidad"]')).toContainText('100 %');
+    // Caso L de la cabecera del bloque.
+    expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['40 (-60)', '23 (-17)', '11 (-4)', '4 (-1)']);
+
+    const ancho = await page.evaluate(() => ({ doc: document.documentElement.scrollWidth, vista: window.innerWidth }));
+    expect(ancho.doc).toBeLessThanOrEqual(ancho.vista);
+  });
+
+  test('ABIERTO · en móvil la cima de la pirámide tampoco cabe (83 px para 123)', async ({ page }) => {
+    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
+    test.fail(true, 'ABIERTO desde el 30/09/2026: la cima de la pirámide desborda su escalón en móvil');
+    // Mismo defecto que en escritorio: «Superdepredadores» 42 px fuera, el emoji 41 px fuera y
+    // «Águilas, halcones» y «5 ind. rel.» 2 px mordidos por el borde.
+    expect(await fueraDeSuEscalon(page)).toEqual([]);
+  });
+});

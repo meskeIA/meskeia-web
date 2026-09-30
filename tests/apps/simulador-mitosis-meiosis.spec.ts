@@ -57,9 +57,8 @@ import { test, expect, Page } from '@playwright/test';
  *   alfa, y el azul siempre <= -3-34·alfa. Con |g-b| <= 8 la membrana punteada no cuela.
  *
  * HALLAZGOS del 26/08/2026, REPARADOS ese mismo día: al final. Afirmaban lo que debía pasar y
- * hoy fallan a propósito. El día que se reparen se ponen en verde: quitar entonces la línea
- * la reparación los puso en verde, así que se les retiró el `test.fail()` y quedan como
- * regresión: son el contrato de que ninguno de los siete vuelve.
+ * fallaban a propósito; la reparación los puso en verde, así que se les retiró el `test.fail()`
+ * y quedan como regresión: son el contrato de que ninguno de los siete vuelve.
  */
 
 const RUTA = '/simulador-mitosis-meiosis/';
@@ -290,7 +289,7 @@ test('CASO 3 · operativa: extremos deshabilitados, secuencia sin saltos, cambio
 });
 
 // ============================================================================
-// HALLAZGOS ABIERTOS (26/08/2026) — afirman la biología correcta y hoy fallan
+// HALLAZGOS REPARADOS (26/08/2026) — afirman la biología correcta; fallaban hasta repararse
 // ============================================================================
 
 test.describe('regresión — hallazgos reparados el 26/08/2026', () => {
@@ -300,7 +299,7 @@ test.describe('regresión — hallazgos reparados el 26/08/2026', () => {
     // En la anafase mitótica se separan las CROMÁTIDAS HERMANAS: los 4 cromosomas replicados
     // dan 8 cromosomas, 4 por polo (2 naranjas + 2 teal). La propia descripción de la fase lo
     // dice: «Cada polo recibe un conjunto completo de cromosomas (2n)».
-    // Hoy dibuja 2 por polo (1 naranja + 1 teal), que es el reparto de la ANAFASE I meiótica.
+    // Antes dibujaba 2 por polo (1 naranja + 1 teal), el reparto de la ANAFASE I meiótica.
     await irAFase(page, 'Anafase');
     const superior = await contarCromosomas(page, { x0: 0, x1: 1, y0: 0, y1: 0.5 });
     expect(superior.n).toBe(4);
@@ -310,8 +309,8 @@ test.describe('regresión — hallazgos reparados el 26/08/2026', () => {
     page,
   }) => {
     // Las células hijas de una mitosis son 2n=4, como confirma el propio rótulo final
-    // «Resultado: 2 células (2n=4)». Hoy cada polo muestra 2 cromosomas, o sea n=2: la app
-    // pinta la mitosis como si redujera la ploidía.
+    // «Resultado: 2 células (2n=4)». Antes cada polo mostraba 2 cromosomas, o sea n=2: la app
+    // pintaba la mitosis como si redujera la ploidía.
     await irAFase(page, 'Telofase');
     const superior = await contarCromosomas(page, { x0: 0, x1: 1, y0: 0, y1: 0.5 });
     expect(superior.n).toBe(4);
@@ -322,7 +321,7 @@ test.describe('regresión — hallazgos reparados el 26/08/2026', () => {
   }) => {
     // Es la diferencia que la propia app declara clave en «Errores frecuentes en exámenes»:
     // «anafase de mitosis = cromátidas hermanas; anafase I = cromosomas homólogos completos».
-    // Hoy los dos canvas son idénticos byte a byte.
+    // Antes los dos canvas eran idénticos byte a byte.
     await irAFase(page, 'Anafase');
     const anafaseMitosis = await page.evaluate(() =>
       (document.querySelector('canvas') as HTMLCanvasElement).toDataURL()
@@ -340,7 +339,7 @@ test.describe('regresión — hallazgos reparados el 26/08/2026', () => {
   }) => {
     // La guía «Cómo identificar una fase en el microscopio» de la propia app dice: «En metafase I
     // de meiosis ves bivalentes (pares de cromosomas homólogos), mientras que en metafase de
-    // mitosis cada cromosoma está aislado en la placa». Hoy las dos imágenes son idénticas.
+    // mitosis cada cromosoma está aislado en la placa». Antes las dos imágenes eran idénticas.
     await irAFase(page, 'Metafase');
     const metafaseMitosis = await page.evaluate(() =>
       (document.querySelector('canvas') as HTMLCanvasElement).toDataURL()
@@ -391,7 +390,7 @@ test.describe('regresión — hallazgos reparados el 26/08/2026', () => {
   }) => {
     // Una célula haploide de este modelo (n=2) lleva UN cromosoma de cada par de homólogos:
     // 1 naranja (par 1) + 1 teal (par 2). Que los dos sean del mismo par sería una no
-    // disyunción. Hoy la app pinta los dos naranjas y el par teal desaparece de la meiosis II.
+    // disyunción. Antes la app pintaba los dos naranjas y el par teal desaparecía de la meiosis II.
     await elegirModo(page, 'Meiosis');
     await irAFase(page, 'Metafase II');
     const celulaIzquierda = await contarCromosomas(page, { x0: 0, x1: 0.5, y0: 0, y1: 1 });
@@ -402,7 +401,7 @@ test.describe('regresión — hallazgos reparados el 26/08/2026', () => {
   test('HALLAZGO 6 · Anafase II: cada polo debe recibir 2 cromosomas, no 1', async ({ page }) => {
     // Cada célula llega a la meiosis II con n=2 cromosomas de 2 cromátidas. Al separarse las
     // cromátidas hermanas, cada polo recibe 2 cromosomas, y así las 4 células finales son n=2
-    // como anuncia el rótulo «Resultado: 4 células (n=2)». Hoy dibuja 1 por polo, o sea n=1.
+    // como anuncia el rótulo «Resultado: 4 células (n=2)». Antes dibujaba 1 por polo, o sea n=1.
     await elegirModo(page, 'Meiosis');
     await irAFase(page, 'Anafase II');
     const arribaIzquierda = await contarCromosomas(page, { x0: 0, x1: 0.5, y0: 0, y1: 0.5 });
@@ -954,7 +953,8 @@ test.describe('reinspección 25/09/2026 — hallazgos reparados el 26/09/2026', 
     page,
   }) => {
     // Es el 1212 de simulador-movimiento-circular: 12829fc3 lo reparó en las ocho copias de
-    // CasosAula.tsx, pero aquí la sección vive dentro de page.tsx y se quedó sin tocar.
+    // CasosAula.tsx, pero aquí la sección vive dentro de page.tsx y se quedó sin tocar hasta
+    // 62eb878c (hallazgo 2153, REPARADO).
     const sec = seccionCasos(page);
     await sec.getByRole('button', { name: /Practicar/ }).click();
     const vivo = await sec.locator('h3 + p').evaluate((el) => {
@@ -1017,9 +1017,10 @@ test.describe('reinspección 25/09/2026 — hallazgos reparados el 26/09/2026', 
     }
   });
 
-  test('HALLAZGO fases · la meiosis tiene 9 fases y la app sigue anunciando 8', async ({ page }) => {
+  test('HALLAZGO 2154 · la meiosis tiene 9 fases y la app ya no anuncia 8', async ({ page }) => {
     // Reparación incompleta del #378: se añadió la Profase II (9 pestañas) pero la tabla
-    // comparativa y la metadata seguían diciendo «8 fases». La tabla lo lee ahora del motor.
+    // comparativa y la metadata seguían diciendo «8 fases». REPARADO en 62eb878c: la tabla lo
+    // lee ahora del motor.
     await elegirModo(page, 'Meiosis');
     await expect(page.getByRole('tab')).toHaveCount(9);
     await abrirBloqueEducativo(page);
@@ -1040,5 +1041,469 @@ test.describe('reinspección 25/09/2026 — hallazgos reparados el 26/09/2026', 
       () => document.body.innerText.match(/bacterias[^.]*únicamente por\s+mitosis/)?.[0] ?? null
     );
     expect(frase).toBeNull();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Inspector 30/09/2026 — reinspección tras 62eb878c (hallazgos 2149-2154) y el lote del
+// hero con logo fijo (d056b066, 3de36a1f, a1d72a9c)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * RESUELTOS A MANO ANTES DE ABRIR LA APP. Biología (OpenStax Biology 2e, §10.2 y §11.1): la
+ * fase S duplica cada cromosoma en dos cromátidas hermanas; se cuentan centrómeros; la
+ * anafase I separa homólogos y es la única que reduce (2n → n); entre la meiosis I y la II no
+ * hay fase S; la segregación independiente da 2^n combinaciones («in humans … over eight
+ * million (2^23) possibilities», §11.1). 2n = 46: NHGRI, «Chromosomes Fact Sheet».
+ *
+ *   CASO A · humano, 2n = 46 (n = 23)
+ *     metafase mitótica ......... 46 cromosomas · 46 × 2 = 92 cromátidas
+ *     anafase I, cada polo ...... 23 cromosomas · 23 × 2 = 46 cromátidas
+ *     metafase II, cada célula .. 23 cromosomas · 23 × 2 = 46 cromátidas (no hay fase S)
+ *     telofase II ............... 23 cromosomas de 1 cromátida por célula · 4 × 23 = 92 en total
+ *     gametos por reparto ....... 2^23 = 8.388.608
+ *     en pantalla: caso 9 → 46, caso 10 → 23, caso 11 → 23 + 1 = 24; «92» en el caso 10 es
+ *     sumar las 4 células (4 × 23)
+ *   CASO B · límites
+ *     2n mínimo del motor = 2 (n = 1): metafase II → 1 cromosoma; gametos 2^1 = 2; impar → no
+ *     práctica 2n = 4:  telofase II en total → 4 × 2 = 8 · gametos → 2^2 = 4
+ *     práctica 2n = 16: telofase II en total → 4 × 8 = 32 · metafase mitótica, cromátidas → 32
+ *   CASO C · rechazo
+ *     caso 9 con «-46» y «0» → no correcto · caso 10 con «» y «23abc» → «Escribe un número entero»
+ *   HERO · el logo fijo no pisa las letras del <h1> a 390 (móvil), 800 y 1024 px
+ */
+
+/**
+ * Semillas del modo práctica, leídas cada una en una página RECIÉN CARGADA: con un ejercicio ya
+ * en pantalla, `nuevaPractica` salta a la semilla siguiente si el azar repite el enunciado, y
+ * la misma hora ya no da el mismo ejercicio.
+ */
+const SEMILLAS_LIMITE = [
+  // 2n = 4 → 4 células × n = 2
+  { t: 1790337600000, dosN: '2n = 4', pide: 'en total', valor: '8' },
+  // 2n = 4 → 2^2
+  { t: 1790337600081, dosN: '2n = 4', pide: 'GENÉTICAMENTE DISTINTOS', valor: '4' },
+  // 2n = 16 → 4 células × n = 8
+  { t: 1790337600018, dosN: '2n = 16', pide: 'en total', valor: '32' },
+  // 2n = 16, metafase de la mitosis → 16 cromosomas × 2 cromátidas
+  { t: 1790337600053, dosN: '2n = 16', pide: 'CROMÁTIDAS', valor: '32' },
+];
+
+/** ¿Pisa alguna pieza de la barra fija las LETRAS del <h1>? La misma medida que la Ronda. */
+async function tituloTapadoPorLogo(page: Page): Promise<boolean> {
+  return page.evaluate(() => {
+    const barra = [...document.querySelectorAll('body *')].find((e) => {
+      const cs = getComputedStyle(e);
+      const r = e.getBoundingClientRect();
+      return (
+        cs.position === 'fixed' &&
+        r.top <= 1 &&
+        r.height < 120 &&
+        r.width > 300 &&
+        e.querySelector('a[href="/"], a[href="https://meskeia.com/"]') !== null
+      );
+    });
+    const h1 = document.querySelector('h1');
+    if (!barra || !h1) throw new Error('sin barra fija del logo o sin <h1>');
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    const letras = [...rango.getClientRects()].filter((c) => c.width > 0);
+    const piezas = [...barra.children]
+      .map((c) => c.getBoundingClientRect())
+      .filter((c) => c.width > 0);
+    return piezas.some((p) =>
+      letras.some(
+        (c) => !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom)
+      )
+    );
+  });
+}
+
+interface PiezaCanvas {
+  /** píxeles de la pieza */
+  n: number;
+  /** tonos del glifo: '1'/'3' cromátida plena (naranja/teal), '2'/'4' cromátida al 75 % */
+  tonos: string;
+}
+
+/**
+ * Piezas cromosómicas CONEXAS de una región del canvas (fracciones 0..1). A diferencia de
+ * `contarCromosomas`, que agrupa por columnas, aquí dos trozos uno encima de otro con un hueco
+ * cuentan como dos: es lo que ve quien cuenta cuerpos en un polo.
+ *
+ * El glifo de `dibujarCromosoma` pinta cada cromátida con su tono (la segunda al 75 % de
+ * alfa): dos tonos en una pieza = un cromosoma de DOS cromátidas; uno = de una sola.
+ */
+async function piezasConexas(
+  page: Page,
+  r: { x0: number; x1: number; y0: number; y1: number }
+): Promise<PiezaCanvas[]> {
+  return page.evaluate((reg) => {
+    const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    const W = canvas.width;
+    const H = canvas.height;
+    const x0 = Math.floor(reg.x0 * W);
+    const y0 = Math.floor(reg.y0 * H);
+    const w = Math.ceil(reg.x1 * W) - x0;
+    const h = Math.ceil(reg.y1 * H) - y0;
+    const d = ctx.getImageData(x0, y0, w, h).data;
+    // 0 nada · 1 naranja pleno · 2 naranja 75 % · 3 teal pleno · 4 teal 75 % · 5/6 borde
+    const clase = new Int8Array(w * h);
+    for (let i = 0; i < w * h; i++) {
+      const R = d[i * 4];
+      const G = d[i * 4 + 1];
+      const B = d[i * 4 + 2];
+      const naranja = R > 150 && R - G > 50 && G - B > 30 && B < 120;
+      const teal = G > 120 && G - R > 50 && Math.abs(G - B) <= 8;
+      if (naranja) clase[i] = B < 55 ? 1 : B > 70 ? 2 : 5;
+      else if (teal) clase[i] = R < 90 ? 3 : R > 105 ? 4 : 6;
+    }
+    const visto = new Uint8Array(w * h);
+    const piezas: { n: number; tonos: string }[] = [];
+    for (let i = 0; i < w * h; i++) {
+      if (!clase[i] || visto[i]) continue;
+      const pila = [i];
+      visto[i] = 1;
+      let n = 0;
+      const tonos = new Set<number>();
+      while (pila.length) {
+        const k = pila.pop() as number;
+        n++;
+        if (clase[k] <= 4) tonos.add(clase[k]);
+        const x = k % w;
+        const y = (k / w) | 0;
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            const xx = x + dx;
+            const yy = y + dy;
+            if (xx < 0 || yy < 0 || xx >= w || yy >= h) continue;
+            const kk = yy * w + xx;
+            if (clase[kk] && !visto[kk]) {
+              visto[kk] = 1;
+              pila.push(kk);
+            }
+          }
+        }
+      }
+      // Menos de 30 px es antialias suelto, no un cuerpo.
+      if (n >= 30) piezas.push({ n, tonos: [...tonos].sort().join('') });
+    }
+    return piezas;
+  }, r);
+}
+
+/** Píxeles de envoltura azul (#2E86AB) en una franja de 9 px sobre el ecuador de la célula. */
+async function envolturaEnElEcuador(page: Page): Promise<number> {
+  return page.evaluate(() => {
+    const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    const W = canvas.width;
+    const H = canvas.height;
+    const cx = W / 2;
+    const radioCelula = Math.min(W, H) * 0.38; // una sola célula
+    const d = ctx.getImageData(0, Math.round(H / 2 - 4), W, 9).data;
+    let n = 0;
+    for (let y = 0; y < 9; y++) {
+      for (let x = 0; x < W; x++) {
+        const i = (y * W + x) * 4;
+        const r = d[i];
+        const g = d[i + 1];
+        const b = d[i + 2];
+        // azul de membrana; el relleno del núcleo (15 %) y el teal (g≈b) quedan fuera
+        const azul = b - r > 90 && g > 100 && r < 120 && b - g > 20;
+        // dentro de la célula y lejos de su membrana externa (que está a 1 radio)
+        if (azul && Math.abs(x - cx) < 0.8 * radioCelula) n++;
+      }
+    }
+    return n;
+  });
+}
+
+type MagnitudCaso = Parameters<typeof resolverCaso>[0]['magnitud'];
+
+test.describe('Inspector 30/09/2026 — casos a mano', () => {
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, [ENTRADA_CASOS]);
+  });
+
+  test('CASO A · humano 2n = 46 en el motor: metafase mitótica, metafase II y final de la meiosis', () => {
+    const v = (division: 'mitosis' | 'meiosis', faseId: string, magnitud: MagnitudCaso) =>
+      resolverCaso({ division, faseId, dosN: 46, magnitud }).valor;
+    // Metafase mitótica: 46 cromosomas duplicados → 92 cromátidas
+    expect(v('mitosis', 'metafase', 'cromosomas-en-celula')).toBe(46);
+    expect(v('mitosis', 'metafase', 'cromatidas-en-celula')).toBe(92);
+    // Anafase I: 23 por polo, cada uno aún con sus dos cromátidas → 46
+    expect(v('meiosis', 'anafase-i', 'cromosomas-por-polo')).toBe(23);
+    expect(v('meiosis', 'anafase-i', 'cromatidas-por-polo')).toBe(46);
+    // Metafase II: n = 23 sin nueva fase S → 23 × 2 = 46 cromátidas
+    expect(v('meiosis', 'metafase-ii', 'cromosomas-en-celula')).toBe(23);
+    expect(v('meiosis', 'metafase-ii', 'cromatidas-en-celula')).toBe(46);
+    // Final de la meiosis: 4 células de 23 cromosomas de una cromátida
+    expect(v('meiosis', 'telofase-ii', 'celulas')).toBe(4);
+    expect(v('meiosis', 'telofase-ii', 'cromosomas-en-celula')).toBe(23);
+    expect(v('meiosis', 'telofase-ii', 'cromatidas-en-celula')).toBe(23);
+    expect(v('meiosis', 'telofase-ii', 'cromosomas-totales')).toBe(92);
+    // 2^23, OpenStax §11.1 («over eight million»)
+    expect(v('meiosis', 'telofase-ii', 'gametos-distintos')).toBe(8388608);
+  });
+
+  test('CASO A · en pantalla: 46, 23 y 24; «92» en el caso 10 es sumar las cuatro células', async ({
+    page,
+  }) => {
+    await irACasoAula(page, 9);
+    expect(await responder(page, '46')).toContain('¡Correcto!');
+    await irACasoAula(page, 10);
+    expect(await responder(page, '23')).toContain('¡Correcto!');
+    // 92 = 4 × 23: el diagnóstico nombra las 4 células
+    const suma = await responder(page, '92');
+    expect(suma).not.toContain('¡Correcto!');
+    expect(suma).toContain('has sumado las 4 células');
+    await irACasoAula(page, 11);
+    expect(await responder(page, '24')).toContain('¡Correcto!');
+  });
+
+  test('CASO B · el 2n más pequeño que admite el motor (2) y el número de fases', async ({ page }) => {
+    const metafaseII = FASES_MEIOSIS.find((f) => f.id === 'metafase-ii')!;
+    // 2n = 2 → n = 1: un solo cromosoma en cada célula de la meiosis II
+    expect(escalarFase(metafaseII, 2)?.cromosomasPorCelula).toBe(1);
+    expect(gametosDistintosPorReparto(2)).toBe(2); // 2^1
+    expect(
+      resolverCaso({
+        division: 'meiosis',
+        faseId: 'anafase-i',
+        dosN: 2,
+        magnitud: 'cromosomas-por-polo',
+      }).valor
+    ).toBe(1);
+    // 2n impar: no existe; el motor no lo escala
+    expect(escalarFase(metafaseII, 3)).toBeNull();
+    // Fases: 6 en la mitosis del simulador y 9 en la meiosis, y la tabla dice lo mismo.
+    await expect(page.getByRole('tab')).toHaveCount(6);
+    await elegirModo(page, 'Meiosis');
+    await expect(page.getByRole('tab')).toHaveCount(9);
+    await abrirBloqueEducativo(page);
+    const fila = page.locator('tr', { hasText: 'Número de divisiones' });
+    await expect(fila).toContainText('1 (6 fases)');
+    await expect(fila).toContainText('2 (meiosis I + meiosis II, 9 fases)');
+  });
+
+  test('CASO B · práctica en los extremos de la baraja: 2n = 4 y 2n = 16', async ({ page }) => {
+    test.setTimeout(90000);
+    for (const s of SEMILLAS_LIMITE) {
+      await page.clock.setFixedTime(new Date(s.t));
+      await page.reload();
+      await esperarHidratacion(page, [ENTRADA_CASOS]);
+      const sec = seccionCasos(page);
+      await sec.getByRole('button', { name: /Practicar/ }).click();
+      await expect(sec.locator('h3 + p'), `semilla ${s.t}`).toContainText(s.dosN);
+      await expect(sec.locator('h3 + p'), `semilla ${s.t}`).toContainText(s.pide);
+      expect(await responder(page, s.valor), `semilla ${s.t}`).toContain('¡Correcto!');
+    }
+    // Con 2n = 4 hay n = 2 pares: «2» son los pares, no las combinaciones, y 3 = 2^2 − 1 no vale
+    await page.clock.setFixedTime(new Date(1790337600081));
+    await page.reload();
+    await esperarHidratacion(page, [ENTRADA_CASOS]);
+    await seccionCasos(page).getByRole('button', { name: /Practicar/ }).click();
+    expect(await responder(page, '2')).toContain('número de pares de homólogos');
+    expect(await responder(page, '3')).not.toContain('¡Correcto!');
+  });
+
+  test('CASO C · se rechaza lo que no es un recuento: negativo, cero, decimal, vacío y texto', async ({
+    page,
+  }) => {
+    await irACasoAula(page, 9);
+    for (const v of ['-46', '0', '46,4']) {
+      expect(await responder(page, v), v).toContain('No es correcto');
+    }
+    expect(await responder(page, '46,4')).toContain('número entero');
+    await irACasoAula(page, 10);
+    expect(await responder(page, '')).toContain('Escribe un número entero');
+    expect(await responder(page, '23abc')).toContain('Escribe un número entero');
+  });
+});
+
+test.describe('Inspector 30/09/2026 — el logo fijo no tapa el título (tableta y portátil)', () => {
+  for (const ancho of [800, 1024]) {
+    test(`a ${ancho} px las letras del <h1> quedan por debajo de la barra del logo`, async ({
+      page,
+    }) => {
+      // a1d72a9c + 3de36a1f: de 769 a 1439 px el hero lleva 100 px arriba; la barra, ~77 px.
+      await page.setViewportSize({ width: ancho, height: ancho === 800 ? 1112 : 768 });
+      await expect(page.locator('header h1')).toBeVisible();
+      await expect.poll(() => tituloTapadoPorLogo(page)).toBe(false);
+    });
+  }
+});
+
+test.describe('Inspector 30/09/2026 — móvil 390 × 844', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('el logo no tapa el título y el caso 9 se corrige con Intro', async ({ page }) => {
+    // d056b066/a1d72a9c: hasta 1023 px el hero lleva 80 px arriba; la barra móvil, ~52 px.
+    await expect.poll(() => tituloTapadoPorLogo(page)).toBe(false);
+    await esperarHidratacion(page, [ENTRADA_CASOS]);
+    await seccionCasos(page).getByRole('button', { name: /^Caso 9:/ }).tap();
+    await page.locator(ENTRADA_CASOS).fill('46');
+    await esperarValorEnReact(page, ENTRADA_CASOS, '46');
+    await page.locator(ENTRADA_CASOS).press('Enter');
+    await expect(seccionCasos(page).locator('[role="alert"]')).toContainText('¡Correcto!');
+    // Sin desbordamiento horizontal con las 9 pestañas de la meiosis
+    await page.getByRole('button', { name: 'Meiosis', exact: true }).tap();
+    await expect(page.getByRole('tab')).toHaveCount(9);
+    const desborde = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+    );
+    expect(desborde).toBe(0);
+  });
+});
+
+test.describe('Inspector 30/09/2026 — hallazgos ABIERTOS', () => {
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, [ENTRADA_CASOS]);
+  });
+
+  test('HALLAZGO ABIERTO · anafases: cada cromosoma que llega a un polo es UNA pieza, no dos', async ({
+    page,
+  }) => {
+    // ABIERTO (30/09/2026): dibujarCromosoma(…, separado = true) aparta el brazo de arriba del
+    // de abajo con un hueco mayor que el propio brazo, así que cada cromosoma del polo se ve
+    // como dos cuerpos. Medido: mitosis 8 piezas en el polo superior (esperado 4 = 2n), anafase I
+    // 4 (esperado 2 = n), anafase II 4 por polo en cada célula (esperado 2 = n).
+    test.fail();
+    await irAFase(page, 'Anafase');
+    expect((await piezasConexas(page, { x0: 0, x1: 1, y0: 0, y1: 0.5 })).length).toBe(4);
+    await elegirModo(page, 'Meiosis');
+    await irAFase(page, 'Anafase I');
+    expect((await piezasConexas(page, { x0: 0, x1: 1, y0: 0, y1: 0.5 })).length).toBe(2);
+    await irAFase(page, 'Anafase II');
+    expect((await piezasConexas(page, { x0: 0, x1: 0.5, y0: 0, y1: 0.5 })).length).toBe(2);
+  });
+
+  test('HALLAZGO ABIERTO · tras separarse las hermanas cada cromosoma se dibuja con UNA cromátida', async ({
+    page,
+  }) => {
+    // ABIERTO (30/09/2026): en la anafase y la telofase de la mitosis los cromosomas conservan
+    // el glifo de dos cromátidas (dos tonos), igual que en la metafase y en la anafase I. El
+    // propio motor dice 1 (cromatidasPorCromosoma), y la app declara que esa es la diferencia
+    // entre la anafase mitótica y la anafase I.
+    test.fail();
+    // Control: el detector SÍ ve dos cromátidas donde las hay (metafase, cromosomas duplicados).
+    await irAFase(page, 'Metafase');
+    const metafase = await piezasConexas(page, { x0: 0, x1: 1, y0: 0, y1: 1 });
+    expect(metafase).toHaveLength(4);
+    expect(metafase.every((p) => p.tonos.length === 2)).toBe(true);
+    for (const fase of ['Anafase', 'Telofase']) {
+      await irAFase(page, fase);
+      const polo = await piezasConexas(page, { x0: 0, x1: 1, y0: 0, y1: 0.5 });
+      expect(
+        polo.filter((p) => p.tonos.length > 1),
+        `${fase}: piezas con dos cromátidas`
+      ).toHaveLength(0);
+    }
+  });
+
+  test('HALLAZGO ABIERTO · Telofase de la mitosis: dos envolturas nuevas, ninguna en el ecuador', async ({
+    page,
+  }) => {
+    // ABIERTO (30/09/2026): con `nucleos: 2`, dibujarCelula pinta además el núcleo central
+    // (radio 0,55 del de la célula, discontinuo) junto a las dos envolturas de los polos: tres
+    // envolturas donde el texto dice «dos nuevas membranas nucleares». Y las polares (radio 0,3)
+    // dejan fuera los dos cromosomas exteriores de cada juego (a ±0,39).
+    test.fail();
+    // Control: en la profase el núcleo original SÍ cruza el ecuador (se está disolviendo).
+    await irAFase(page, 'Profase');
+    expect(await envolturaEnElEcuador(page)).toBeGreaterThan(0);
+    await irAFase(page, 'Telofase');
+    expect(await envolturaEnElEcuador(page)).toBe(0);
+  });
+
+  test('HALLAZGO ABIERTO · la FAQ estructurada no cuenta la interfase como etapa de la mitosis', async ({
+    page,
+  }) => {
+    // ABIERTO (30/09/2026): «La mitosis tiene 6 etapas: interfase (duplicación del ADN),
+    // profase…». OpenStax Biology 2e §10.2: la interfase y la fase mitótica forman el ciclo
+    // celular; la mitosis (cariocinesis) es profase, prometafase, metafase, anafase y telofase,
+    // y la citocinesis es la segunda parte de la fase mitótica. Es la respuesta que citan las IA.
+    test.fail();
+    const respuesta = await page.evaluate(() => {
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        const datos = JSON.parse(s.textContent ?? '{}');
+        if (datos['@type'] !== 'FAQPage') continue;
+        for (const q of datos.mainEntity) {
+          if (/fases tiene la mitosis/.test(q.name)) return String(q.acceptedAnswer.text);
+        }
+      }
+      return null;
+    });
+    expect(respuesta).not.toBeNull();
+    expect(respuesta).not.toMatch(/mitosis tiene[^.]*\binterfase\b/i);
+  });
+
+  test('HALLAZGO ABIERTO · caso 6 con «24»: es el error que el caso nombra, no sumar dos células', async ({
+    page,
+  }) => {
+    // ABIERTO (30/09/2026): 24 = 12 cromosomas × 2 cromátidas, lo que sale si se cree que no
+    // hubo reducción o que el ADN se duplicó otra vez entre la meiosis I y la II (el título del
+    // caso). También es 2 células × 12, pero el corrector solo dice «has sumado las 2 células».
+    test.fail();
+    await irACasoAula(page, 6);
+    const motivo = await responder(page, '24');
+    expect(motivo).not.toContain('¡Correcto!');
+    expect(motivo).toMatch(/duplic|reduc/i);
+  });
+
+  test('HALLAZGO ABIERTO · caso 7 con «12»: contar la célula entera (6 + 6) también da 12', async ({
+    page,
+  }) => {
+    // ABIERTO (30/09/2026): en la anafase II la célula aún contiene los dos polos (6 + 6 = 12),
+    // la lectura que el corrector ya diagnostica en los casos 3 y 5 («has contado la célula
+    // entera»). Aquí solo sale «12 es la dotación diploide». El caso 4 sí une dos lecturas.
+    test.fail();
+    await irACasoAula(page, 7);
+    const motivo = await responder(page, '12');
+    expect(motivo).not.toContain('¡Correcto!');
+    expect(motivo).toMatch(/polo/);
+  });
+
+  test('HALLAZGO ABIERTO · el canvas se repinta al cambiar a modo oscuro', async ({ page }) => {
+    // ABIERTO (30/09/2026): `dibujar` lee data-theme pero solo se llama al cambiar de fase, de
+    // división o de tamaño. Tras «Cambiar a modo oscuro» el canvas sigue en #f0f4f8 hasta pulsar
+    // «Siguiente», cuando pasa al #1a1a1a que la propia app pinta en oscuro.
+    test.fail();
+    const pixel = () =>
+      page.evaluate(() => {
+        const lienzo = document.querySelector('canvas') as HTMLCanvasElement;
+        const ctx = lienzo.getContext('2d') as CanvasRenderingContext2D;
+        return [...ctx.getImageData(2, 2, 1, 1).data];
+      });
+    expect(await pixel()).toEqual([240, 244, 248, 255]);
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect.poll(pixel, { timeout: 3000 }).toEqual([26, 26, 26, 255]);
+  });
+
+  test('HALLAZGO ABIERTO · el featureList del JSON-LD no mezcla inglés («ploidy»)', async ({
+    page,
+  }) => {
+    // ABIERTO (30/09/2026): «Contador de células resultado con ploidy (2n/n)», que además
+    // repite la última característica («… conteo de células hijas y ploidía (2n/n)»).
+    test.fail();
+    const lista = await page.evaluate(() => {
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        const datos = JSON.parse(s.textContent ?? '{}');
+        if (datos['@type'] === 'WebApplication') return datos.featureList as string[];
+      }
+      return [] as string[];
+    });
+    expect(lista.length).toBeGreaterThan(0);
+    expect(lista.filter((f) => /ploidy/i.test(f))).toHaveLength(0);
   });
 });

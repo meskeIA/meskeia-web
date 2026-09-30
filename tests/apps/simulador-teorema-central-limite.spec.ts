@@ -83,7 +83,8 @@ import { construirHistograma } from '../../app/simulador-teorema-central-limite/
  *   7  cola, Bernoulli 0,9, n=10     → «hacia la izquierda». asim(X̄) = −2,6667/√10 = −0,843,
  *                                      y en el convenio de Fisher negativo = cola izquierda.
  *   8  umbral σ(X̄)≤0,5, uniforme     → «n = 100». n ≥ (2,8868/0,5)² = 33,33; de la lista
- *                                      (1,2,5,10,30,100) el menor que llega es 100.
+ *                                      (1,2,4,5,10,25,30,100; el 4 y el 25 desde el 20/09)
+ *                                      el menor que llega es 100: n=25 da 0,5774 > 0,5.
  *                                      ⚠️ n=30 da 0,5271 y NO cumple: es el caso que desmonta
  *                                      la regla de memorieta «con n ≥ 30 ya vale».
  *   9  más estrecho a n=10           → «la moneda justa». 0,5/√10=0,1581 < 1/√10=0,3162.
@@ -1383,5 +1384,357 @@ test.describe('Contraste y JSON-LD (28/09/2026)', () => {
     const lista = `${N_DISPONIBLES.slice(0, -1).join(', ')} y ${N_DISPONIBLES[N_DISPONIBLES.length - 1]}`;
     expect(linea).toBe(`Tamaño muestral n configurable (${lista})`);
     expect((app?.featureList ?? []).join(' ')).not.toMatch(/\d\.\d/);
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════════════════════════════
+   INSPECTOR 30/09/2026 — la firma de rotura vuelve (cortas 56,9 % → 93,3 %, z 3,7)
+   ══════════════════════════════════════════════════════════════════════════════════════════
+
+   Los hallazgos 2370-2373 y las dos sospechas del 28/09 (features del JSON-LD sin el 4 ni el
+   25; veredicto con dos «:») están REPARADOS en a6fa266e y siguen en pie: sus candados, arriba.
+
+   ── CASOS RESUELTOS A MANO ANTES DE EJECUTAR ──────────────────────────────────────────────
+     NORMAL   bimodal ½N(−2;0,6)+½N(2;0,6), n = 10, 1.000 muestras.
+              μ = 0 → «μ teórica = 0,000». σ = √4,36 = 2,088061 → σ/√10 = 0,660303 → «0,6603».
+              Eje 0 ± 4·0,660303 = ±2,641212 → marcas −2,64 · −1,76 · −0,88 · 0,00 · 0,88 · 1,76 · 2,64.
+              Media: ET = 2,088061/√(10·1.000) = 0,02088 → ±5 ET = [−0,105 ; 0,105].
+              σ empírica: κ(X̄) = 3 − 1,6834/10 = 2,8317 → ET ≈ 0,6603·√(1,8317/4.000) = 0,0141
+              → ±5 ET = [0,590 ; 0,731]. Asimetría 0 (ET ≈ √(6/1.000) = 0,077) → |a| < 0,45.
+              Curtosis 2,832 (ET ≈ √(24/1.000) = 0,155) → [2,05 ; 3,65].
+     LÍMITE   el n más alto: moneda sesgada p = 0,9, n = 100, 5.000 muestras.
+              «μ teórica = 0,900» · σ/√n = 0,3/10 = 0,03 → «σ/√n teórica = 0,0300».
+              Eje 0,9 ± max(4·0,03 ; 0,2) = [0,7 ; 1,1] → 0,70 · 0,77 · 0,83 · 0,90 · 0,97 · 1,03 · 1,10.
+              P(X̄ < 0,7) = P(k ≤ 69) ≈ 10⁻⁹ → ninguna media fuera del rango.
+              Valores k/100 con masa apreciable: k ≈ 78…99 → entre 15 y 31 barras.
+              Pico: P(k = 90) = C(100,10)·0,9⁹⁰·0,1¹⁰ = 0,1319 → densidad 0,1319/0,01 = 13,19;
+              normal 1/(0,03·√(2π)) = 13,298 → cociente 0,992; ±4,5 ET del recuento → [0,85 ; 1,15].
+              Media: ET 0,03/√5.000 = 0,000424 → [0,8979 ; 0,9021]. σ: κ = 3,0511 → ET 0,000304
+              → [0,0285 ; 0,0315]. Asimetría −2,6667/10 = −0,267 (ET 0,035) → [−0,44 ; −0,09].
+              Curtosis 3,051 (ET 0,069) → [2,70 ; 3,40].
+     RECHAZO  no hay campos libres: el estado inválido es pulsar dos veces «Lanzar» (debe dar
+              1.000 medias, no 2.000, y un solo aviso de fin) y cambiar n A MITAD de una
+              simulación de 5.000 × n = 100 (debe quedar en 0 medias y «—», y seguir en 0 un
+              segundo después: ninguna animación huérfana sigue añadiendo).
+
+   ── LA FIRMA (dump turso-dump-2026-09-30.sql, solo lectura) ───────────────────────────────
+   Reaparece por volumen, no por un fallo nuevo: con el corte en el 28/09 la ventana reciente
+   (15-28/09) tenía 29 visitas, por debajo del mínimo de 30, y no había firma; las 2 del 29/09
+   la llevan a 30. Esas 2 son las únicas posteriores al despliegue de a6fa266e (push del 28/09
+   a las 20:42): Chile 3 s y Argentina 80 s, escritorio. De las 30 recientes, 28 son de
+   escritorio y 0 recargas; la base de 42 días estaba hecha de días de aula (25/08: 15 visitas,
+   27/08: 27, mayoría largas) que en el periodo reciente no aparecen, y 5 visitas de Guatemala
+   entran desde RelatedApps de `simulador-distribucion-normal` y vuelven a ella en segundos.
+   ══════════════════════════════════════════════════════════════════════════════════════════ */
+
+interface Rotulo {
+  t: string;
+  x0: number;
+  x1: number;
+  y: number;
+}
+
+/** Registra la CAJA de cada texto pintado en el histograma (con `measureText`). Antes del `goto`. */
+async function instrumentarRotulos(page: Page): Promise<void> {
+  await page.addInitScript((etiqueta: string) => {
+    const registro: { rotulos: Array<{ t: string; x0: number; x1: number; y: number }> } = { rotulos: [] };
+    (window as unknown as { __rotulos: typeof registro }).__rotulos = registro;
+    const proto = CanvasRenderingContext2D.prototype;
+    const clearRect = proto.clearRect;
+    proto.clearRect = function (this: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+      if (this.canvas.getAttribute('aria-label') === etiqueta) registro.rotulos = [];
+      clearRect.call(this, x, y, w, h);
+    };
+    const fillText = proto.fillText;
+    proto.fillText = function (this: CanvasRenderingContext2D, t: string, x: number, y: number, m?: number) {
+      if (this.canvas.getAttribute('aria-label') === etiqueta) {
+        const ancho = this.measureText(String(t)).width;
+        const x0 = this.textAlign === 'center' ? x - ancho / 2 : this.textAlign === 'right' ? x - ancho : x;
+        registro.rotulos.push({ t: String(t), x0, x1: x0 + ancho, y });
+      }
+      if (m === undefined) fillText.call(this, t, x, y);
+      else fillText.call(this, t, x, y, m);
+    };
+  }, HISTOGRAMA);
+}
+
+async function leerRotulos(page: Page): Promise<Rotulo[]> {
+  await page.evaluate(
+    () => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
+  );
+  return page.evaluate(() => (window as unknown as { __rotulos: { rotulos: Rotulo[] } }).__rotulos.rotulos);
+}
+
+/** Qué elemento hay de verdad en el pico del histograma (x = μ, 10 px sobre el eje X). */
+async function queHayEnElPico(page: Page): Promise<string> {
+  return page.evaluate((e) => {
+    const c = document.querySelector(`canvas[aria-label="${e}"]`)!.getBoundingClientRect();
+    // El eje X va de pad.left = 40 a W − pad.right = 16, centrado en μ; el eje, 32 px sobre el borde.
+    const el = document.elementFromPoint(c.left + 40 + (c.width - 56) / 2, c.bottom - 42);
+    return el?.getAttribute('aria-label') ?? el?.closest('[aria-label]')?.getAttribute('aria-label') ?? el?.tagName ?? 'nada';
+  }, HISTOGRAMA);
+}
+
+test.describe('Inspector 30/09/2026 — casos resueltos a mano, en escritorio', () => {
+  test.beforeEach(async ({ page }) => {
+    test.setTimeout(120_000);
+    await instrumentarLienzos(page);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="checkbox"]']);
+  });
+
+  test('NORMAL · bimodal con n = 10: centro en 0 y anchura √4,36/√10 = 0,6603', async ({ page }) => {
+    await configurar(page, 'Bimodal', 10, 1000);
+    await expect(referenciaDe(page, 'Media empírica X̄')).toHaveText('μ teórica = 0,000');
+    await expect(referenciaDe(page, 'σ empírica')).toHaveText('σ/√n teórica = 0,6603');
+    await lanzar(page, 10);
+    await expect(valorDe(page, 'Muestras generadas')).toHaveText('1000');
+
+    const d = await leerDibujo(page, HISTOGRAMA);
+    expect(d.textos.slice(0, 7)).toEqual(['-2,64', '-1,76', '-0,88', '0,00', '0,88', '1,76', '2,64']);
+
+    const media = await leerCifra(page, 'Media empírica X̄'); // 0 ± 5·0,02088
+    expect(media).toBeGreaterThan(-0.105);
+    expect(media).toBeLessThan(0.105);
+    const sigma = await leerCifra(page, 'σ empírica'); // 0,6603 ± 5·0,0141
+    expect(sigma).toBeGreaterThan(0.59);
+    expect(sigma).toBeLessThan(0.731);
+    // La población tiene DOS picos, pero la media de 10 ya es una sola campana simétrica.
+    expect(Math.abs(await leerCifra(page, 'Asimetría (skew)'))).toBeLessThan(0.45);
+    const curtosis = await leerCifra(page, 'Curtosis'); // 3 − 1,6834/10 = 2,832
+    expect(curtosis).toBeGreaterThan(2.05);
+    expect(curtosis).toBeLessThan(3.65);
+  });
+
+  test('LÍMITE · moneda sesgada con n = 100: σ/√n = 0,0300, eje [0,7 ; 1,1] y el pico a la altura de la normal', async ({
+    page,
+  }) => {
+    await configurar(page, 'Moneda sesgada', 100, 5000);
+    await expect(referenciaDe(page, 'Media empírica X̄')).toHaveText('μ teórica = 0,900');
+    await expect(referenciaDe(page, 'σ empírica')).toHaveText('σ/√n teórica = 0,0300');
+    await lanzar(page, 100);
+    await expect(valorDe(page, 'Muestras generadas')).toHaveText('5000');
+
+    const d = await leerDibujo(page, HISTOGRAMA);
+    // La semianchura mínima de 0,2 manda sobre 4·0,03 = 0,12.
+    expect(d.textos.slice(0, 7)).toEqual(['0,70', '0,77', '0,83', '0,90', '0,97', '1,03', '1,10']);
+    expect(d.textos.some((t) => t.includes('fuera del rango'))).toBe(false);
+    // Una casilla por valor k/100 que haya salido (k ≈ 78…99).
+    expect(d.barras.length).toBeGreaterThanOrEqual(15);
+    expect(d.barras.length).toBeLessThanOrEqual(31);
+    // P(k = 90)/0,01 = 13,19 frente a 13,298 → 0,992.
+    const cociente = cocienteBarraCurva(d);
+    expect(cociente).toBeGreaterThan(0.85);
+    expect(cociente).toBeLessThan(1.15);
+
+    const media = await leerCifra(page, 'Media empírica X̄');
+    expect(media).toBeGreaterThan(0.8979);
+    expect(media).toBeLessThan(0.9021);
+    const sigma = await leerCifra(page, 'σ empírica');
+    expect(sigma).toBeGreaterThan(0.0285);
+    expect(sigma).toBeLessThan(0.0315);
+    const asimetria = await leerCifra(page, 'Asimetría (skew)'); // −0,267: todavía a la izquierda
+    expect(asimetria).toBeGreaterThan(-0.44);
+    expect(asimetria).toBeLessThan(-0.09);
+    const curtosis = await leerCifra(page, 'Curtosis'); // 3 + 5,1111/100 = 3,051
+    expect(curtosis).toBeGreaterThan(2.7);
+    expect(curtosis).toBeLessThan(3.4);
+  });
+
+  test('RECHAZO · dos pulsaciones seguidas no duplican la simulación, y cambiar n a mitad la anula', async ({
+    page,
+  }) => {
+    // Doble clic con la configuración inicial (exponencial, n = 30, 1.000): 1.000 medias, no 2.000.
+    await page.getByRole('button', { name: 'Lanzar simulación' }).dblclick();
+    await expect(page.getByText(/Simulación completa con n = 30\./)).toBeVisible({ timeout: 60_000 });
+    await page.waitForTimeout(1000);
+    await expect(valorDe(page, 'Muestras generadas')).toHaveText('1000');
+    await expect(page.getByText(/Simulación completa/)).toHaveCount(1);
+
+    // A mitad de 5.000 medias de n = 100, pasar a n = 1.
+    await configurar(page, 'Exponencial', 100, 5000);
+    await page.getByRole('button', { name: 'Lanzar simulación' }).click();
+    await expect(page.getByRole('button', { name: /Generando muestras/ })).toBeVisible();
+    await page.getByRole('group', { name: 'Tamaño muestral' }).getByRole('button', { name: '1', exact: true }).click();
+    await expect(referenciaDe(page, 'σ empírica')).toHaveText('σ/√n teórica = 1,0000');
+    await expect(valorDe(page, 'Muestras generadas')).toHaveText('0');
+    await page.waitForTimeout(1000); // una animación huérfana seguiría sumando lotes aquí
+    await expect(valorDe(page, 'Muestras generadas')).toHaveText('0');
+    for (const etiqueta of ['Media empírica X̄', 'σ empírica', 'Asimetría (skew)', 'Curtosis']) {
+      await expect(valorDe(page, etiqueta)).toHaveText('—');
+    }
+    await expect(page.getByRole('button', { name: 'Lanzar simulación' })).toBeVisible();
+    await expect(page.getByText(/Simulación completa/)).toHaveCount(0);
+  });
+
+  test('SOSPECHA 28/09 descartada · en la app, el veredicto del caso 4 lleva un solo «:»', async ({ page }) => {
+    // Reparada en a6fa266e. La opción correcta trae sus propios dos puntos; en el veredicto,
+    // a mano: «No cambiará: solo…» → minúscula → «: » pasa a «, ».
+    await page.getByRole('button', { name: /^Caso 4:/ }).click();
+    await page.getByRole('radio', { name: 'No cambiará: solo se dibujará con menos ruido', exact: true }).click();
+    await page.getByRole('button', { name: 'Comprobar predicción' }).click();
+    await expect(page.locator('[role="alert"]').filter({ hasText: /Correcto|No es esa/ })).toHaveText(
+      '✅ Correcto: no cambiará, solo se dibujará con menos ruido.',
+    );
+  });
+
+  test('HALLAZGO nuevo · el rótulo de la normal no separa sus dos números con coma', async ({ page }) => {
+    test.fail(); // ABIERTO (30/09/2026)
+    // Con coma decimal, la coma no puede separar además los dos parámetros: «N(0,00, 0,660)» se
+    // lee como cuatro números. El separador es el punto y coma, como hace casos.ts en sus
+    // comentarios («½N(−2;0,6)»). ENTRADA bimodal, n = 10 (el rótulo se pinta sin lanzar).
+    // ESPERADO «N(0,00; 0,660) teórica» o equivalente sin «dígito, dígito»
+    // OBTENIDO «N(0,00, 0,660) teórica»
+    await configurar(page, 'Bimodal', 10, 1000);
+    const d = await leerDibujo(page, HISTOGRAMA);
+    // Sin condición previa con expect: bajo `test.fail()` daría verde en silencio si fallara.
+    const rotulo = d.textos.find((t) => t.includes('teórica')) ?? '';
+    expect(rotulo).not.toMatch(/\d, \d/);
+  });
+});
+
+test.describe('Inspector 30/09/2026 — el resultado a la vista tras lanzar, en escritorio', () => {
+  test('HALLAZGO nuevo · en la primera visita, el aviso de privacidad tapa el pico y las cifras quedan bajo el borde', async ({
+    page,
+  }) => {
+    test.fail(); // ABIERTO (30/09/2026)
+    // La reparación del 2373 lleva el histograma a la vista con `block: 'nearest'`, que lo deja
+    // PEGADO AL BORDE INFERIOR de la ventana. En escritorio, ese borde es donde vive el aviso
+    // fijo «Tu privacidad es importante» (600 px de ancho, centrado, 24 px sobre el borde), que
+    // ve todo visitante nuevo hasta que lo cierra: tapa el 31 % del lienzo, y justo el centro,
+    // donde está μ y el pico de las barras. Las cinco cifras empíricas y el aviso de fin quedan
+    // 16 px por debajo del borde. Medido igual a 1366×657, 1536×730 y 1920×950.
+    // ENTRADA ventana 1366×657 (una pantalla de 1366×768), contexto nuevo · bajar hasta que el
+    //         botón quede 20 px sobre el borde · pulsar «Lanzar simulación» (exponencial, n = 30)
+    // ESPERADO en el pico del histograma, el lienzo; las cinco tarjetas de cifras, dentro de la
+    //          ventana y sin nada encima
+    // OBTENIDO en el pico, el aviso de privacidad; las tarjetas en y = 673-790 con 657 de alto
+    test.setTimeout(120_000);
+    await page.setViewportSize({ width: 1366, height: 657 });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="checkbox"]']);
+    // El aviso aparece 500 ms después de montar. Se ESPERA, sin exigirlo: si un día deja de
+    // salir aquí, este test tiene que pasar y avisar de que el hallazgo se ha cerrado, no
+    // fallar por la condición previa y seguir en verde con la marca.
+    await page
+      .getByRole('complementary', { name: 'Aviso de transparencia sobre datos locales' })
+      .waitFor({ state: 'visible', timeout: 3_000 })
+      .catch(() => undefined);
+    await page.evaluate(() => {
+      const b = [...document.querySelectorAll('button')].find((x) => x.textContent?.includes('Lanzar simulación'));
+      if (b) window.scrollTo(0, b.getBoundingClientRect().bottom + window.scrollY + 20 - window.innerHeight);
+    });
+    await page.getByRole('button', { name: 'Lanzar simulación' }).click();
+    await expect(page.getByText(/Simulación completa con n = 30\./)).toBeAttached({ timeout: 60_000 });
+    // Se espera a que acabe el desplazamiento suave (el candado del 2373, arriba).
+    await expect
+      .poll(
+        () =>
+          page.evaluate((e) => {
+            const r = document.querySelector(`canvas[aria-label="${e}"]`)!.getBoundingClientRect();
+            return r.top >= 0 && r.bottom <= window.innerHeight;
+          }, HISTOGRAMA),
+        { timeout: 5_000 },
+      )
+      .toBe(true);
+    await page.waitForTimeout(300);
+    expect(await queHayEnElPico(page)).toBe(HISTOGRAMA);
+    const tarjetas = await page.evaluate(() => {
+      const etiquetas = ['Muestras generadas', 'Media empírica X̄', 'σ empírica', 'Asimetría (skew)', 'Curtosis'];
+      return etiquetas.map((et) => {
+        const card = [...document.querySelectorAll('span')].find((s) => s.textContent?.trim() === et)!.parentElement!;
+        const r = card.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dentro = r.top >= 0 && r.bottom <= window.innerHeight;
+        const encima = dentro ? document.elementFromPoint(cx, cy) : null;
+        return { et, dentro, libre: Boolean(encima && card.contains(encima)) };
+      });
+    });
+    for (const t of tarjetas) {
+      expect(t.dentro, `${t.et} dentro de la ventana`).toBe(true);
+      expect(t.libre, `${t.et} sin nada encima`).toBe(true);
+    }
+  });
+});
+
+test.describe('Inspector 30/09/2026 — en móvil (390 × 844, táctil)', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('LÍMITE con el dedo · moneda sesgada, n = 100: cifras en banda y el histograma visible y sin nada encima', async ({
+    page,
+  }) => {
+    // Los mismos valores a mano que el caso LÍMITE de escritorio. En móvil el aviso de privacidad
+    // va en el flujo al final de la página (hallazgo 1636), así que aquí el pico sí se ve.
+    test.setTimeout(120_000);
+    await instrumentarLienzos(page);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="checkbox"]']);
+    await page.getByRole('button', { name: /^Moneda sesgada/ }).tap();
+    await page.getByRole('group', { name: 'Tamaño muestral' }).getByRole('button', { name: '100', exact: true }).tap();
+    await page.getByRole('group', { name: 'Número de muestras' }).getByRole('button', { name: '5000', exact: true }).tap();
+    await expect(referenciaDe(page, 'σ empírica')).toHaveText('σ/√n teórica = 0,0300');
+    await page.getByRole('button', { name: 'Lanzar simulación' }).tap();
+    await expect(page.getByText(/Simulación completa con n = 100\./)).toBeAttached({ timeout: 60_000 });
+    await expect(valorDe(page, 'Muestras generadas')).toHaveText('5000');
+    await expect
+      .poll(
+        () =>
+          page.evaluate((e) => {
+            const r = document.querySelector(`canvas[aria-label="${e}"]`)!.getBoundingClientRect();
+            return r.top >= 0 && r.bottom <= window.innerHeight;
+          }, HISTOGRAMA),
+        { timeout: 5_000 },
+      )
+      .toBe(true);
+    expect(await queHayEnElPico(page)).toBe(HISTOGRAMA);
+    const media = await leerCifra(page, 'Media empírica X̄');
+    expect(media).toBeGreaterThan(0.8979);
+    expect(media).toBeLessThan(0.9021);
+    const sigma = await leerCifra(page, 'σ empírica');
+    expect(sigma).toBeGreaterThan(0.0285);
+    expect(sigma).toBeLessThan(0.0315);
+    const d = await leerDibujo(page, HISTOGRAMA);
+    const cociente = cocienteBarraCurva(d);
+    expect(cociente).toBeGreaterThan(0.85);
+    expect(cociente).toBeLessThan(1.15);
+  });
+
+  test('HALLAZGO nuevo · los dos rótulos de arriba del histograma se pisan', async ({ page }) => {
+    test.fail(); // ABIERTO (30/09/2026)
+    // El rótulo de la normal va a la izquierda (x = 48, 11 px) y el de las medias fuera del
+    // rango, a la derecha (alineado a W − 16, 10 px), los dos a 28-30 px de altura. En el móvil
+    // el lienzo mide 244 px: el primero acaba en x ≈ 151 y el segundo empieza en x ≈ 77, así que
+    // 74 px se escriben uno encima del otro y no se lee ninguno.
+    // ENTRADA exponencial · n = 2 · 5.000 muestras · Lanzar. Fuera del eje [1 − 4/√2 ; 1 + 4/√2]
+    //         caen las medias > 3,828: P = e^−7,657·(1 + 7,657) = 0,0041 → ≈ 20 de 5.000, así que
+    //         el rótulo de la derecha sale siempre.
+    // ESPERADO los dos rótulos sin solaparse (o en filas distintas)
+    // OBTENIDO «N(1,00, 0,707) teórica» en x 48-151 y «(k medias fuera del rango visible)» en
+    //          x 77-228, a 2 px de altura uno del otro
+    test.setTimeout(120_000);
+    await instrumentarRotulos(page);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="checkbox"]']);
+    await page.getByRole('button', { name: /^Exponencial/ }).tap();
+    await page.getByRole('group', { name: 'Tamaño muestral' }).getByRole('button', { name: '2', exact: true }).tap();
+    await page.getByRole('group', { name: 'Número de muestras' }).getByRole('button', { name: '5000', exact: true }).tap();
+    await page.getByRole('button', { name: 'Lanzar simulación' }).tap();
+    await expect(page.getByText(/Simulación completa con n = 2\./)).toBeAttached({ timeout: 60_000 });
+    const rotulos = await leerRotulos(page);
+    // Sin exigir que existan los dos: si la reparación saca uno del lienzo, ya no se pisan y el
+    // test debe pasar (y la marca, avisar). Por lo mismo, ninguna condición previa con expect:
+    // bajo `test.fail()` una condición previa rota daría verde en silencio.
+    const normal = rotulos.find((r) => r.t.includes('teórica'));
+    const fuera = rotulos.find((r) => r.t.includes('fuera del rango'));
+    const seSolapan = Boolean(normal && fuera && normal.x1 > fuera.x0 && Math.abs(normal.y - fuera.y) < 12);
+    expect(seSolapan).toBe(false);
   });
 });
