@@ -15,7 +15,7 @@ import { formatNumber } from '@/lib';
 import styles from './SimuladorTitulacion.module.css';
 // El pH y el volumen de equivalencia viven en `./motor.ts`, que comparten el simulador y la
 // corrección de los casos para clase: una sola implementación (skill /casos-aula-meskeia).
-import { calcularPH, volumenEquivalencia, type TipoTitulacion } from './motor';
+import { calcularPH, volumenEquivalencia, volumenParaPH, type TipoTitulacion } from './motor';
 import CasosAula, { type ConfiguracionSimulador } from './CasosAula';
 
 type Indicador = 'fenolftaleina' | 'naranja-metilo' | 'azul-bromotimol' | 'tornasol';
@@ -91,6 +91,30 @@ const TIPOS_TITULACION: Record<TipoTitulacion, { titulo: string; ecuacion: strin
     ejemplo: 'CH₃COOH + NH₃',
   },
 };
+
+/**
+ * Ancho del salto vertical, en fracción de V_eq, dentro del cual tiene que caer TODO el
+ * viraje para que un indicador sirva (el porqué, en `virajes`).
+ */
+const MARGEN_SALTO = 0.02;
+
+/**
+ * pH redondeado a lo que se muestra. `formatNumber` escribe «≈0» para |x| < 0,0001, y el pH
+ * de un HCl 1 M con el agua incluida es −4·10⁻¹⁵: sin redondear antes, el panel diría «≈0»
+ * donde el acta pide «0,00» (hallazgo 346).
+ */
+function textoPH(pH: number): string {
+  return formatNumber(Math.round(pH * 100) / 100, 2);
+}
+
+/** Dónde empieza y dónde termina de virar un indicador, en mL de la bureta, dicho en una frase. */
+function describirViraje(desde: number | null, hasta: number | null): string {
+  if (desde === null) return 'ni con el doble de V_eq llega a empezar a virar';
+  if (hasta === 0) return 'ya ha virado antes de añadir la primera gota';
+  const inicio = desde === 0 ? 'ya está virando antes de añadir la primera gota' : `empieza a virar a ${formatNumber(desde, 2)} mL`;
+  const fin = hasta === null ? 'no termina ni con el doble de V_eq' : `termina a ${formatNumber(hasta, 2)} mL`;
+  return `${inicio} y ${fin}`;
+}
 
 function getColorMatraz(pH: number, indicador: Indicador): string {
   const info = INDICADORES[indicador];
@@ -194,13 +218,33 @@ export default function SimuladorTitulacion() {
    * indicador inadecuado el propio simulador induce el error, porque el matraz declara
    * «amarillo» —color básico, punto final alcanzado— con la valoración al 32 % (hallazgo 344).
    *
-   * El criterio es el que la propia app enseña: el rango de viraje tiene que contener el pH
-   * de equivalencia, o al menos quedar dentro del salto vertical de la curva.
+   * El criterio es el que la propia app enseña en su FAQ: el rango de viraje tiene que quedar
+   * DENTRO DEL SALTO VERTICAL de la curva. Hasta el 30/09/2026 se exigía algo más estrecho,
+   * que el viraje CONTUVIERA el pH de equivalencia exacto, y en el estado de fábrica
+   * (HCl + NaOH 0,1 M con fenolftaleína) la app decía que la fenolftaleína «no sirve», cuando
+   * empieza a virar a 25,0008 mL de 25 (hallazgo 2516).
+   *
+   * El salto se mide en volumen, que es lo que se lee en la bureta: el indicador vale si
+   * EMPIEZA a virar después del 98 % de V_eq y TERMINA antes del 102 %, es decir, si el punto
+   * final se lea donde se lea dentro del viraje queda a menos de un 2 % de la equivalencia.
+   * Con 0,1 M ese margen reproduce la tabla del bloque educativo en los cuatro tipos: en
+   * AF+BF valen los cuatro indicadores; en AD+BF solo la fenolftaleína; en AF+BD solo el
+   * naranja de metilo; en AD+BD ninguno, que es lo que dice la FAQ («la elección es crítica»).
    */
-  const indicadorAdecuado = useMemo(() => {
-    const [min, max] = INDICADORES[indicador].rango;
-    return pHEquivalencia >= min && pHEquivalencia <= max;
-  }, [indicador, pHEquivalencia]);
+  const virajes = useMemo(() => {
+    const V_max = V_eq * 2;
+    const resultado = {} as Record<Indicador, { desde: number | null; hasta: number | null; sirve: boolean }>;
+    for (const ind of Object.keys(INDICADORES) as Indicador[]) {
+      const [min, max] = INDICADORES[ind].rango;
+      const desde = volumenParaPH(min, V_max, tipo, V_analito, C_analito, C_titulante, pKa, pKb);
+      const hasta = volumenParaPH(max, V_max, tipo, V_analito, C_analito, C_titulante, pKa, pKb);
+      const sirve =
+        desde !== null && hasta !== null && desde >= V_eq * (1 - MARGEN_SALTO) && hasta <= V_eq * (1 + MARGEN_SALTO);
+      resultado[ind] = { desde, hasta, sirve };
+    }
+    return resultado;
+  }, [tipo, V_eq, V_analito, C_analito, C_titulante, pKa, pKb]);
+  const indicadorAdecuado = virajes[indicador].sirve;
 
   // Curva visible (solo hasta V_titulante actual)
   const curvaVisible = useMemo(
@@ -425,7 +469,7 @@ export default function SimuladorTitulacion() {
           <div className={styles.indicatorSelector}>
             {(Object.keys(INDICADORES) as Indicador[]).map((ind) => {
               const info = INDICADORES[ind];
-              const sirve = pHEquivalencia >= info.rango[0] && pHEquivalencia <= info.rango[1];
+              const sirve = virajes[ind].sirve;
               return (
                 <button
                   key={ind}
@@ -449,11 +493,13 @@ export default function SimuladorTitulacion() {
           {!indicadorAdecuado && (
             <p className={styles.indicatorAviso} role="status">
               <strong>Este indicador no sirve para esta valoración.</strong> El punto de equivalencia
-              está en pH {formatNumber(pHEquivalencia, 2)} y {INDICADORES[indicador].nombre} vira entre{' '}
-              {formatNumber(INDICADORES[indicador].rango[0], 1)} y {formatNumber(INDICADORES[indicador].rango[1], 1)}:
-              el color cambiaría {pHEquivalencia > INDICADORES[indicador].rango[1] ? 'antes' : 'después'} de
-              llegar a la equivalencia, así que el punto final leído sería erróneo. Es exactamente el
-              error que la tabla de más abajo explica.
+              está en pH {textoPH(pHEquivalencia)} ({formatNumber(V_eq, 2)} mL) y {INDICADORES[indicador].nombre} vira entre{' '}
+              {formatNumber(INDICADORES[indicador].rango[0], 1)} y {formatNumber(INDICADORES[indicador].rango[1], 1)}:{' '}
+              {describirViraje(virajes[indicador].desde, virajes[indicador].hasta)}. El color cambiaría{' '}
+              {virajes[indicador].desde !== null && virajes[indicador].desde < V_eq * (1 - MARGEN_SALTO) ? 'antes' : 'después'} de
+              llegar a la equivalencia, fuera del margen del {formatNumber(MARGEN_SALTO * 100, 0)}{' '}% a cada lado de
+              V_eq, así que el punto final leído sería erróneo. Es exactamente el error que la tabla de
+              más abajo explica.
             </p>
           )}
         </section>
@@ -645,7 +691,7 @@ export default function SimuladorTitulacion() {
             <h3 className={styles.resultTitle}>Estado actual</h3>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>pH actual</span>
-              <span className={styles.resultValueAccent}>{formatNumber(pHActual, 2)}</span>
+              <span className={styles.resultValueAccent}>{textoPH(pHActual)}</span>
             </div>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>Volumen añadido</span>
@@ -657,7 +703,7 @@ export default function SimuladorTitulacion() {
             </div>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>% completado</span>
-              <span className={styles.resultValue}>{formatNumber(porcentaje, 1)} %</span>
+              <span className={styles.resultValue}>{formatNumber(porcentaje, 1)}{' '}%</span>
             </div>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>Fase</span>
@@ -786,7 +832,8 @@ export default function SimuladorTitulacion() {
               <p>
                 El rango de viraje del indicador debe quedar dentro del salto vertical de la curva. Si la curva
                 tiene salto entre pH 4 y 10 (AF+BF), casi cualquier indicador funciona; si el salto es estrecho
-                (AD+BD), la elección es crítica.
+                (AD+BD), la elección es crítica. El simulador marca un indicador como «apto aquí» cuando todo su
+                viraje ocurre entre el 98{' '}% y el 102{' '}% del volumen de equivalencia.
               </p>
             </div>
             <div className={styles.faqItem}>

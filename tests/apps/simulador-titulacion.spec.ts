@@ -791,7 +791,11 @@ test.describe('simulador-titulacion · casos para clase', () => {
     // (b) Fuerte con fuerte: la equivalencia es 7 exacto…
     expect(calcularPH('af-bf', 25, 25, 0.1, 0.1, 4.76, 4.74)).toBe(7);
     // …débil con fuerte NO: 8,90 en el caso 10. Tratar el ácido débil como fuerte daría 7.
-    expect(calcularPH('ad-bf', 20, 20, 0.2, 0.2, 4.8, 4.7)).toBeCloseTo(8.9, 10);
+    // Hasta el 30/09/2026 esto exigía 8,9 con 10 decimales, que es la fórmula 7 + ½(pKa + log C)
+    // al pie de la letra. Desde que el motor resuelve el balance de cargas con Kw (hallazgos
+    // 2512-2515), el acetato 0,1 M da [OH⁻]² = Kb·(C − [OH⁻]) + Kw = 6,3101·10⁻¹¹ ⇒ 8,900017: la
+    // fórmula queda a 2·10⁻⁵, y lo que el fondo del test protege —que NO sea 7— sigue igual.
+    expect(calcularPH('ad-bf', 20, 20, 0.2, 0.2, 4.8, 4.7)).toBeCloseTo(8.9, 4);
     // (c) Semiequivalencia = pKa (a 2 decimales, que es lo que se pide).
     expect(redondear(calcularPH('ad-bf', 12.5, 25, 0.1, 0.1, 4.2, 4.7))).toBe(4.2);
     // (d) El motor movido da las cifras del acta: 1,4771 a media valoración y 2,8829 inicial.
@@ -894,24 +898,26 @@ test.describe('simulador-titulacion · la sección de casos en el navegador', ()
  *     caso 12 (AF+BD 2·V_eq)   2 mmol NH₄⁺ y 2 mmol NH₃ → pOH = pKb = 4,7 → 9,30 (balance: 9,2995)
  *     caso 8 (semiequivalencia) pKa 4,2 → cuadrática 4,2016 → 4,20
  *
- * HALLAZGOS ABIERTOS (30/09/2026), con su esperado a mano:
- *   H1 calculo/medio  AD+BD de fábrica: una gota pasada la equivalencia BAJA el pH, 7,01 → 6,86.
- *                     A mano 7,01 → 7,16. El motor aplica pOH = pKb + log(n(BH⁺)/n(B)) con
- *                     n(B) = 0,01 mmol frente a 2,5 de NH₄⁺, e ignora el acetato, que amortigua.
- *   H2 calculo/medio  AF+BD con pKb alto: la Henderson-Hasselbalch del lado de la base es el
+ * HALLAZGOS del 30/09/2026, REPARADOS ese mismo día (sin `test.fail()`: regresión), con su
+ * esperado a mano. H1-H4 (2512-2515) se cerraron cambiando el motor entero por el balance de
+ * cargas exacto (cabecera de `motor.ts`); H5 (2516), con el criterio de la FAQ; H6 (2517), U+00A0:
+ *   H1 calculo/medio  AD+BD de fábrica: una gota pasada la equivalencia BAJABA el pH, 7,01 → 6,86.
+ *                     A mano 7,01 → 7,16. El motor aplicaba pOH = pKb + log(n(BH⁺)/n(B)) con
+ *                     n(B) = 0,01 mmol frente a 2,5 de NH₄⁺, e ignoraba el acetato, que amortigua.
+ *   H2 calculo/medio  AF+BD con pKb alto: la Henderson-Hasselbalch del lado de la base era el
  *                     espejo exacto del hallazgo 343. pKb 9,4 (anilina): 3,70 → 2,95 → 2,20 en
  *                     24,90 / 25,00 / 25,10 mL, a mano 2,92 → 2,96 → 2,99. Con pKb 12, a
- *                     25,10 mL el panel da pH −0,40 (a mano 1,75): por debajo del HCl de partida.
- *   H3 calculo/bajo   AD+BF con pKa alto: tras la equivalencia se desprecia el OH⁻ del anión.
+ *                     25,10 mL el panel daba pH −0,40 (a mano 1,75): por debajo del HCl de partida.
+ *   H3 calculo/bajo   AD+BF con pKa alto: tras la equivalencia se despreciaba el OH⁻ del anión.
  *                     pKa 9,2 (HCN): 10,95 → 10,30 al añadir una gota; a mano 10,95 → 10,99.
- *   H4 calculo/bajo   La fórmula de hidrólisis sin Kw cruza el 7 con pK bajos: AD+BF pKa 1 da
- *                     6,85 en la equivalencia (a mano 7,09) y AF+BD pKb 1 da 7,15 (a mano 6,91).
- *   H5 contenido/medio En el estado de fábrica (HCl + NaOH con fenolftaleína) la app dice que la
+ *   H4 calculo/bajo   La fórmula de hidrólisis sin Kw cruzaba el 7 con pK bajos: AD+BF pKa 1 daba
+ *                     6,85 en la equivalencia (a mano 7,09) y AF+BD pKb 1 daba 7,15 (a mano 6,91).
+ *   H5 contenido/medio En el estado de fábrica (HCl + NaOH con fenolftaleína) la app decía que la
  *                     fenolftaleína «no sirve para esta valoración». Una gota a cada lado de
  *                     V_eq lleva el pH de 4,00 a 10,00, y la fenolftaleína empieza a virar a
  *                     25,0008 mL (0,003 % de error). Su propia FAQ dice que en AF+BF «casi
  *                     cualquier indicador funciona», y su propio matraz vira a 25,10 mL.
- *   H6 contenido/bajo «% completado» separa el % con un espacio normal, no con U+00A0.
+ *   H6 contenido/bajo «% completado» separaba el % con un espacio normal, no con U+00A0.
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 import { sembrarValor } from './_hidratacion';
@@ -1043,10 +1049,10 @@ test.describe('Inspector 30/09/2026 · escritorio', () => {
     await expect(valorDe(page, 'pH actual')).toHaveText('4,20');
   });
 
-  // ─────────────────── HALLAZGOS ABIERTOS del 30/09/2026 (test.fail) ───────────────────
+  // ─────────── HALLAZGOS del 30/09/2026 · REPARADOS ese mismo día (regresión) ───────────
 
   test('H1 · calculo/medio — AD+BD de fábrica: una gota pasada la equivalencia no puede bajar el pH', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026): la app da 6,86 tras 7,01.
+    // REPARADO el 30/09/2026 (hallazgo 2512): la app daba 6,86 tras 7,01; el motor resuelve ahora el balance de cargas.
     await page.getByRole('button', { name: /Ácido débil \+ Base débil/ }).click();
     // Acetato de amonio 0,05 M: ½(pKa + 14 − pKb) = ½(4,76 + 14 − 4,74) = 7,01.
     await irAEquivalencia(page).click();
@@ -1061,7 +1067,7 @@ test.describe('Inspector 30/09/2026 · escritorio', () => {
   });
 
   test('H2 · calculo/medio — AF+BD con anilina (pKb 9,4): el pH no puede caer al cruzar la equivalencia', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026): la app da 3,70 → 2,95 → 2,20.
+    // REPARADO el 30/09/2026 (hallazgo 2513): la app daba 3,70 → 2,95 → 2,20.
     await page.getByRole('button', { name: /Ácido fuerte \+ Base débil/ }).click();
     await sembrarValor(page, '#pKb', 9.4);
     // Balance de cargas con Ka(BH⁺) = 10⁻⁴·⁶: 24,90 mL → 2,9162 · 25,00 → 2,9554 · 25,10 → 2,9945.
@@ -1080,7 +1086,7 @@ test.describe('Inspector 30/09/2026 · escritorio', () => {
   });
 
   test('H2 bis · calculo/medio — AF+BD con pKb 12: añadir base no puede dar un pH negativo', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026): la app da pH −0,40 a 25,10 mL.
+    // REPARADO el 30/09/2026 (hallazgo 2513): la app daba pH −0,40 a 25,10 mL; ahora 1,75.
     await page.getByRole('button', { name: /Ácido fuerte \+ Base débil/ }).click();
     await sembrarValor(page, '#pKb', 12);
     await expect(valorDe(page, 'pH actual')).toHaveText('1,00'); // HCl 0,1 M de partida
@@ -1093,7 +1099,7 @@ test.describe('Inspector 30/09/2026 · escritorio', () => {
   });
 
   test('H3 · calculo/bajo — AD+BF con pKa 9,2 (HCN): una gota pasada la equivalencia no baja el pH', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026): la app da 10,95 → 10,30.
+    // REPARADO el 30/09/2026 (hallazgo 2514): la app daba 10,95 → 10,30.
     await page.getByRole('button', { name: /Ácido débil \+ Base fuerte/ }).click();
     await sembrarValor(page, '#pKa', 9.2);
     // Cianuro 0,05 M, Kb = 10⁻⁴·⁸ ⇒ 10,9456 (7 + ½(9,2 − 1,301) = 10,9495, la fórmula vale aquí)
@@ -1107,7 +1113,7 @@ test.describe('Inspector 30/09/2026 · escritorio', () => {
   });
 
   test('H4 · calculo/bajo — AD+BF con pKa 1: la sal de un ácido débil no da una equivalencia ácida', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026): la app da 6,85.
+    // REPARADO el 30/09/2026 (hallazgo 2515): la app daba 6,85, sin Kw.
     await page.getByRole('button', { name: /Ácido débil \+ Base fuerte/ }).click();
     await sembrarValor(page, '#pKa', 1);
     await irAEquivalencia(page).click();
@@ -1117,7 +1123,7 @@ test.describe('Inspector 30/09/2026 · escritorio', () => {
   });
 
   test('H4 bis · calculo/bajo — AF+BD con pKb 1: la sal de una base débil no da una equivalencia básica', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026): la app da 7,15.
+    // REPARADO el 30/09/2026 (hallazgo 2515): la app daba 7,15, sin Kw.
     await page.getByRole('button', { name: /Ácido fuerte \+ Base débil/ }).click();
     await sembrarValor(page, '#pKb', 1);
     await irAEquivalencia(page).click();
@@ -1126,7 +1132,9 @@ test.describe('Inspector 30/09/2026 · escritorio', () => {
   });
 
   test('H5 · contenido/medio — la fenolftaleína sirve para HCl + NaOH 0,1 M, que es el estado de fábrica', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026): la app dice «Este indicador no sirve».
+    // REPARADO el 30/09/2026 (hallazgo 2516): la app decía «Este indicador no sirve». El criterio es
+    // ahora el de su FAQ, todo el viraje dentro del salto (98-102 % de V_eq), y aquí vira entre
+    // 25,0008 y 25,05 mL.
     // Salto de una gota a cada lado de V_eq: 24,95 mL → pH 4,00 · 25,05 mL → pH 10,00. El pH 8,2
     // se alcanza a 25,0008 mL (0,003 % de V_eq). La FAQ: «Si la curva tiene salto entre pH 4 y
     // 10 (AF+BF), casi cualquier indicador funciona». El propio matraz vira a 25,10 mL (test A).
@@ -1136,7 +1144,7 @@ test.describe('Inspector 30/09/2026 · escritorio', () => {
   });
 
   test('H6 · contenido/bajo — «% completado» separa el % con espacio duro (U+00A0)', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026): «0,0 %» con U+0020.
+    // REPARADO el 30/09/2026 (hallazgo 2517): decía «0,0 %» con U+0020.
     // Regla de formato del proyecto desde el 25/09/2026 (RAE 2010): «15 %», con U+00A0.
     const texto = await valorDe(page, '% completado').evaluate((e) => e.textContent ?? '');
     expect(texto).toMatch(/\d %$/);
@@ -1183,5 +1191,73 @@ test.describe('Inspector 30/09/2026 · móvil 390×844', () => {
     // Caso 1 en litros: el aviso de unidades también llega en móvil.
     await casosAula(page).getByRole('button', { name: /^Caso 1:/ }).tap();
     expect(await responder(page, '0,03', true)).toContain('en litros');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * TESTIGOS DEL MOTOR (30/09/2026) — tras la reparación de 2512-2515, que cambió las fórmulas por
+ * tramos por UN balance de cargas con Kw.
+ *
+ * Los cuatro hallazgos tenían la misma forma: una costura entre dos fórmulas donde la curva
+ * BAJABA al añadir base. Buscarlos caso a caso es lo que dejó pasar tres de ellos después del
+ * 343, así que el testigo es la propiedad, no los casos: la curva de un ácido valorado con una
+ * base es MONÓTONA CRECIENTE, en los cuatro tipos y en todo el rango de los deslizadores.
+ *
+ * Y los puntos fijos, resueltos a mano ANTES de ejecutar (acético 0,1 M 25 mL, NaOH 0,1 M):
+ *   V = 0     [H⁺]² + Ka[H⁺] − Ka·C = 0, Ka = 1,7378·10⁻⁵ ⇒ [H⁺] = 1,3096·10⁻³  ⇒ 2,8829
+ *   V = 12,5  semiequivalencia: el balance da [H⁺] ≈ Ka·(C_HA − [H⁺])/(C_A + [H⁺]) ⇒ 4,7605
+ *   V = 25    acetato 0,05 M: [OH⁻]² ≈ Kb·C + Kw = 5,7544·10⁻¹⁰·0,05 + 10⁻¹⁴ ⇒ pOH 5,2705 ⇒ 8,7295
+ *   HCl + NaOH en la equivalencia: [H⁺] = [OH⁻] = 10⁻⁷ ⇒ 7 exacto
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('simulador-titulacion · testigos del motor', () => {
+  test('puntos resueltos a mano: acético 2,88 · 4,76 · 8,73, y 7 exacto en fuerte con fuerte', async () => {
+    expect(calcularPH('ad-bf', 0, 25, 0.1, 0.1, 4.76, NaN)).toBeCloseTo(2.8829, 3);
+    expect(calcularPH('ad-bf', 12.5, 25, 0.1, 0.1, 4.76, NaN)).toBeCloseTo(4.7605, 3);
+    expect(calcularPH('ad-bf', 25, 25, 0.1, 0.1, 4.76, NaN)).toBeCloseTo(8.7295, 3);
+    expect(calcularPH('af-bf', 25, 25, 0.1, 0.1, NaN, NaN)).toBe(7);
+    // Los esperados del acta, cada uno en el MOTOR (los mismos que H1-H4 miran en pantalla).
+    expect(calcularPH('ad-bd', 25.1, 25, 0.1, 0.1, 4.76, 4.74)).toBeCloseTo(7.1619, 3);
+    expect(calcularPH('af-bd', 25.1, 25, 0.1, 0.1, NaN, 12)).toBeCloseTo(1.7493, 3);
+    expect(calcularPH('ad-bf', 25.1, 25, 0.1, 0.1, 9.2, NaN)).toBeCloseTo(10.9946, 3);
+    expect(calcularPH('ad-bf', 25, 25, 0.1, 0.1, 1, NaN)).toBeCloseTo(7.088, 3);
+    expect(calcularPH('af-bd', 25, 25, 0.1, 0.1, NaN, 1)).toBeCloseTo(6.912, 3);
+  });
+
+  test('la curva es monótona creciente en los cuatro tipos, con cualquier pK y concentración', async () => {
+    const tipos = ['af-bf', 'ad-bf', 'af-bd', 'ad-bd'] as const;
+    const pks = [1, 2.5, 4.76, 7, 9.4, 12];
+    // Los extremos de los deslizadores (0,01 y 1 M) cruzados, y el caso de fábrica.
+    const concentraciones: ReadonlyArray<readonly [number, number]> = [
+      [0.1, 0.1],
+      [0.01, 1],
+      [1, 0.01],
+      [0.01, 0.01],
+      [1, 1],
+    ];
+    const bajadas: string[] = [];
+    for (const tipo of tipos) {
+      for (const pKa of pks) {
+        for (const pKb of pks) {
+          for (const [Ca, Ct] of concentraciones) {
+            const Veq = volumenEquivalencia(Ca, 25, Ct);
+            let anterior = -Infinity;
+            // 401 puntos de 0 a 2·V_eq (la curva de la app usa 201) y la gota a cada lado de V_eq.
+            const volumenes = Array.from({ length: 401 }, (_, i) => (i / 400) * 2 * Veq);
+            volumenes.push(Veq - 0.1, Veq, Veq + 0.1);
+            volumenes.sort((a, b) => a - b);
+            for (const v of volumenes.filter((x) => x >= 0)) {
+              const ph = calcularPH(tipo, v, 25, Ca, Ct, pKa, pKb);
+              if (!Number.isFinite(ph)) bajadas.push(`${tipo} pKa ${pKa} pKb ${pKb} ${Ca}/${Ct} M: pH no finito a ${v} mL`);
+              else if (ph < anterior - 1e-9) {
+                bajadas.push(`${tipo} pKa ${pKa} pKb ${pKb} ${Ca}/${Ct} M: baja de ${anterior} a ${ph} en ${v} mL`);
+              }
+              anterior = ph;
+            }
+          }
+        }
+      }
+    }
+    expect(bajadas).toEqual([]);
   });
 });

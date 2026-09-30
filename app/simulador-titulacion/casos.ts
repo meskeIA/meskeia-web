@@ -19,18 +19,24 @@
  * · Siempre se titula un ÁCIDO (analito, en el matraz) con una BASE (titulante, en la
  *   bureta). V_eq = C_a·V_a/C_t. Volúmenes en mL y concentraciones en mol/L, así que
  *   C·V sale en milimoles.
+ * · El motor NO usa las fórmulas de libro: resuelve el balance de cargas completo, con Kw
+ *   (cabecera de `motor.ts`, 30/09/2026). Las fórmulas de libro —−log del ácido sobrante,
+ *   ½(pKa − log C), Henderson-Hasselbalch, 7 ± ½(pK + log C_sal)— son las que enseñan los
+ *   PASOS, y los datos de los casos se eligieron donde coinciden con el motor a dos
+ *   decimales, para que el alumno que use las de su libro no suspenda. Donde un dato
+ *   aleatorio las separase, el paso lo dice en vez de escribir una igualdad falsa
+ *   (`cierreMotor`).
  * · Ácido fuerte + base fuerte: la equivalencia es pH 7 exacto.
- * · Ácido débil + base fuerte: en la zona tampón el motor NO usa Henderson-Hasselbalch sino
- *   la cuadrática exacta del equilibrio (`phZonaTampon`). Los datos de los casos se eligieron
- *   donde las dos coinciden a dos decimales —la semiequivalencia, o relaciones A⁻/HA entre
- *   1:3 y 3:1 con C ≥ 0,05 M y pKa ≥ 4—, para que el alumno que use la H-H de su libro no
- *   suspenda. Por el mismo motivo, el pH inicial ½(pKa − log C) y la cuadrática coinciden a
- *   dos decimales en el caso 7. Equivalencia: 7 + ½(pKa + log C_sal).
+ * · Ácido débil + base fuerte: zona tampón con H-H (la semiequivalencia, o relaciones A⁻/HA
+ *   entre 1:3 y 3:1 con C ≥ 0,05 M y pKa ≥ 4); el pH inicial ½(pKa − log C) coincide a dos
+ *   decimales en el caso 7; equivalencia 7 + ½(pKa + log C_sal).
  * · Ácido fuerte + base débil: antes de la equivalencia manda el ácido fuerte sobrante; en la
  *   equivalencia, 7 − ½(pKb + log C_sal); después, tampón inverso con H-H sobre el pOH.
- * · Ácido débil + base débil no entra en los doce casos: su equivalencia ½(pKa + 14 − pKb) es
- *   una aproximación que el propio motor rotula así. `resolverCaso` la resuelve igual, por si
- *   un caso futuro la pide.
+ * · Ácido débil + base débil no entra en los doce casos: su fórmula de libro
+ *   ½(pKa + 14 − pKb) es una aproximación. `resolverCaso` la resuelve igual, por si un caso
+ *   futuro la pide.
+ * · Como el motor es exacto, casi ningún pH sale redondo: los casos de pH piden redondear a
+ *   dos decimales (el 10, el 11 y el 12 lo piden desde el 30/09/2026).
  * · Todos los datos se pueden reproducir con los controles del simulador: V_analito entero
  *   entre 10 y 100 mL, concentraciones de 0,01 a 1 M en pasos de 0,01, pKa y pKb de 1 a 12
  *   en pasos de 0,1 (salvo el 4,76 del caso 7, que es el valor con el que ARRANCA el
@@ -132,6 +138,20 @@ function cifra(n: number, maxDecimales = 4): string {
 /** Un logaritmo con su signo tipográfico entre paréntesis si es negativo: «(−1)». */
 function conSigno(n: number): string {
   return n < 0 ? `(${cifra(n)})` : cifra(n);
+}
+
+/**
+ * La frase que cierra una explicación hecha con la fórmula de libro. El motor resuelve el
+ * balance de cargas completo; aquí se dice si a dos decimales es lo mismo y, si no, POR QUÉ.
+ * Hasta el 30/09/2026 los pasos escribían «fórmula = valor del motor» aunque la fórmula diese
+ * otra cifra (con pKa 9,2, la base sobrante «despreciaba» un OH⁻ mayor que ella: hallazgo
+ * 2514).
+ */
+function cierreMotor(aprox: number, valor: number, porQue: string): string {
+  if (redondear(aprox, 2) === redondear(valor, 2)) {
+    return `El simulador resuelve el balance de cargas completo, sin aproximar, y da ${resultado(valor)}: a dos decimales es lo mismo.`;
+  }
+  return `El simulador resuelve el balance de cargas completo, sin aproximar, y da ${resultado(valor)}, no ${formatNumber(aprox, 2)}: aquí la aproximación no basta, porque ${porQue}.`;
 }
 
 /**
@@ -283,13 +303,13 @@ function resolverPH(d: DatosCaso, pasos: string[]): Resolucion {
       pasos.push(
         `Todavía no se ha añadido base: en el matraz solo hay ácido DÉBIL, que se disocia poco. [H⁺] ≈ √(Ka·C), es decir, pH = ½(pKa − log C) = ½(${cifra(pKa)} − ${conSigno(Math.log10(Ca))}) = ${cifra(aprox)}.`,
       );
-      pasos.push(
-        `El simulador resuelve el equilibrio sin aproximar (una ecuación de segundo grado) y da ${resultado(valor)}: a dos decimales es lo mismo.`,
-      );
+      pasos.push(cierreMotor(aprox, valor, 'con estos datos el ácido se disocia demasiado para suponer [HA] ≈ C'));
     } else {
+      const aprox = -Math.log10(Ca);
       pasos.push(
-        `Todavía no se ha añadido base: el ácido FUERTE está disociado por completo, [H⁺] = ${cifra(Ca)} mol/L y pH = −log ${cifra(Ca)} = ${resultado(valor)}.`,
+        `Todavía no se ha añadido base: el ácido FUERTE está disociado por completo, [H⁺] = ${cifra(Ca)} mol/L y pH = −log ${cifra(Ca)} = ${cifra(aprox)}.`,
       );
+      pasos.push(cierreMotor(aprox, valor, 'el ácido está tan diluido que el H⁺ del agua ya cuenta'));
     }
   } else if (enEquivalencia) {
     const Csal = nA / Vtot;
@@ -299,19 +319,27 @@ function resolverPH(d: DatosCaso, pasos: string[]): Resolucion {
     if (tipo === 'af-bf') {
       pasos.push('La sal de un ácido fuerte y una base fuerte (como el NaCl) no reacciona con el agua: el pH es neutro, 7.');
     } else if (tipo === 'ad-bf') {
+      const aprox = 7 + 0.5 * (pKa + Math.log10(Csal));
       pasos.push(
-        `La sal contiene la base conjugada del ácido débil (A⁻), que toma H⁺ del agua y libera OH⁻: el medio queda BÁSICO. pH = 7 + ½(pKa + log C_sal) = 7 + ½(${cifra(pKa)} + ${conSigno(Math.log10(Csal))}) = ${resultado(valor)}.`,
+        `La sal contiene la base conjugada del ácido débil (A⁻), que toma H⁺ del agua y libera OH⁻: el medio queda BÁSICO. pH = 7 + ½(pKa + log C_sal) = 7 + ½(${cifra(pKa)} + ${conSigno(Math.log10(Csal))}) = ${cifra(aprox)}.`,
       );
+      pasos.push(cierreMotor(aprox, valor, 'la fórmula no cuenta el OH⁻ del propio agua, que con un anión tan poco básico ya pesa'));
       pasos.push('Por eso la equivalencia NO está en 7, y por eso se usa un indicador que vire en zona básica.');
     } else if (tipo === 'af-bd') {
+      const aprox = 7 - 0.5 * (pKb + Math.log10(Csal));
       pasos.push(
-        `La sal contiene el ácido conjugado de la base débil (BH⁺, como el NH₄⁺), que cede H⁺ al agua: el medio queda ÁCIDO. pH = 7 − ½(pKb + log C_sal) = 7 − ½(${cifra(pKb)} + ${conSigno(Math.log10(Csal))}) = ${resultado(valor)}.`,
+        `La sal contiene el ácido conjugado de la base débil (BH⁺, como el NH₄⁺), que cede H⁺ al agua: el medio queda ÁCIDO. pH = 7 − ½(pKb + log C_sal) = 7 − ½(${cifra(pKb)} + ${conSigno(Math.log10(Csal))}) = ${cifra(aprox)}.`,
+      );
+      pasos.push(
+        cierreMotor(aprox, valor, 'la fórmula supone que el BH⁺ se disocia poco y no cuenta el H⁺ del agua, y con este pKb alguno de los dos pesa'),
       );
       pasos.push('Por eso la equivalencia NO está en 7, y por eso se usa un indicador que vire en zona ácida.');
     } else {
+      const aprox = 0.5 * (pKa + 14 - pKb);
       pasos.push(
-        `Los dos iones de la sal reaccionan con el agua y sus efectos se compensan en parte: pH ≈ ½(pKa + 14 − pKb) = ½(${cifra(pKa)} + 14 − ${cifra(pKb)}) = ${resultado(valor)}. No depende de la concentración.`,
+        `Los dos iones de la sal reaccionan con el agua y sus efectos se compensan en parte: pH ≈ ½(pKa + 14 − pKb) = ½(${cifra(pKa)} + 14 − ${cifra(pKb)}) = ${cifra(aprox)}. Casi no depende de la concentración.`,
       );
+      pasos.push(cierreMotor(aprox, valor, 'la fórmula supone que los dos iones se hidrolizan poco, y con estos pK no es así'));
     }
   } else if (V < Veq) {
     if (acidoDebil) {
@@ -331,18 +359,28 @@ function resolverPH(d: DatosCaso, pasos: string[]): Resolucion {
         );
       }
       pasos.push(
-        `El simulador resuelve el equilibrio sin aproximar y da ${resultado(valor)}: a dos decimales es lo mismo que Henderson-Hasselbalch.`,
+        cierreMotor(mitad ? pKa : hh, valor, 'Henderson-Hasselbalch supone que el ácido apenas se disocia frente al A⁻ que ya hay'),
       );
     } else {
       const nH = nA - nB;
       const cH = nH / Vtot;
+      const aprox = -Math.log10(cH);
       pasos.push(
         `Se han añadido ${cifra(nB)} mmol de base (${cifra(Ct)} · ${cifra(V)}), menos que el ácido: sobra ácido FUERTE. n(H⁺) = ${cifra(nA)} − ${cifra(nB)} = ${cifra(nH)} mmol en un volumen total de ${cifra(Va)} + ${cifra(V)} = ${cifra(Vtot)} mL.`,
       );
-      pasos.push(`[H⁺] = ${cifra(nH)} / ${cifra(Vtot)} = ${cifra(cH, 5)} mol/L, y pH = −log[H⁺] = ${resultado(valor)}.`);
+      pasos.push(`[H⁺] = ${cifra(nH)} / ${cifra(Vtot)} = ${cifra(cH, 5)} mol/L, y pH = −log[H⁺] = ${cifra(aprox)}.`);
       if (baseDebil) {
-        pasos.push('Mientras sobre ácido fuerte, que la base sea débil no cambia nada: el pH lo fija el H⁺ sobrante.');
+        pasos.push('Mientras sobre bastante ácido fuerte, que la base sea débil casi no cambia nada: el pH lo fija el H⁺ sobrante.');
       }
+      pasos.push(
+        cierreMotor(
+          aprox,
+          valor,
+          baseDebil
+            ? 'con este pKb la base es tan débil que no llega a captar todo el H⁺ que se le echa'
+            : 'queda tan poco ácido que el H⁺ del agua ya cuenta',
+        ),
+      );
     }
   } else if (baseDebil) {
     const nBlibre = nB - nA;
@@ -353,7 +391,16 @@ function resolverPH(d: DatosCaso, pasos: string[]): Resolucion {
     pasos.push(
       `Henderson-Hasselbalch escrita para el pOH: pOH = pKb + log(n(BH⁺)/n(B)) = ${cifra(pKb)} + log(${cifra(nA)}/${cifra(nBlibre)}) = ${cifra(pOH)}.`,
     );
-    pasos.push(`pH = 14 − pOH = 14 − ${cifra(pOH)} = ${resultado(valor)}.`);
+    pasos.push(`pH = 14 − pOH = 14 − ${cifra(pOH)} = ${cifra(14 - pOH)}.`);
+    pasos.push(
+      cierreMotor(
+        14 - pOH,
+        valor,
+        acidoDebil
+          ? 'Henderson-Hasselbalch no cuenta el par del ácido débil, que también amortigua'
+          : 'con tan poca base libre, o con una base tan débil, el BH⁺ que se disocia ya no es despreciable',
+      ),
+    );
   } else {
     const nOH = nB - nA;
     const cOH = nOH / Vtot;
@@ -361,10 +408,23 @@ function resolverPH(d: DatosCaso, pasos: string[]): Resolucion {
     pasos.push(
       `Se han añadido ${cifra(nB)} mmol de base (${cifra(Ct)} · ${cifra(V)}), más que el ácido: sobra base FUERTE. n(OH⁻) = ${cifra(nB)} − ${cifra(nA)} = ${cifra(nOH)} mmol en ${cifra(Va)} + ${cifra(V)} = ${cifra(Vtot)} mL.`,
     );
-    pasos.push(`[OH⁻] = ${cifra(nOH)} / ${cifra(Vtot)} = ${cifra(cOH, 5)} mol/L, pOH = −log[OH⁻] = ${cifra(pOH)}, y pH = 14 − pOH = ${resultado(valor)}.`);
+    pasos.push(`[OH⁻] = ${cifra(nOH)} / ${cifra(Vtot)} = ${cifra(cOH, 5)} mol/L, pOH = −log[OH⁻] = ${cifra(pOH)}, y pH = 14 − pOH = ${cifra(14 - pOH)}.`);
     if (acidoDebil) {
-      pasos.push('La base conjugada del ácido débil también aporta algo de OH⁻, pero frente a la base fuerte sobrante es despreciable.');
+      // Hasta el 30/09/2026 decía que el OH⁻ del anión era despreciable SIEMPRE, y con pKa 9,2
+      // una gota pasada la equivalencia aporta 7,95·10⁻⁴ M frente a 2,0·10⁻⁴ M sobrantes (2514).
+      pasos.push(
+        'La base conjugada del ácido débil (A⁻) también aporta algo de OH⁻ al hidrolizarse. Frente a la base fuerte sobrante suele ser despreciable, pero no siempre: cuanto más alto el pKa, más pesa.',
+      );
     }
+    pasos.push(
+      cierreMotor(
+        14 - pOH,
+        valor,
+        acidoDebil
+          ? 'con este pKa el A⁻ es una base apreciable y su OH⁻ no se puede despreciar'
+          : 'sobra tan poca base que el OH⁻ del agua ya cuenta',
+      ),
+    );
   }
 
   return { ok: true, valor, pasos };
@@ -628,7 +688,7 @@ const DEFINICIONES: ReadonlyArray<
     id: 10,
     titulo: 'Un vinagre que no acaba en pH 7',
     enunciado:
-      'Un vinagre diluido tiene ácido acético 0,20 M (toma pKa = 4,8). Se titulan 20 mL con NaOH 0,20 M. ¿Cuál es el pH en el punto de equivalencia? Compruébalo: carga el caso y pulsa el botón que lleva la bureta a la equivalencia.',
+      'Un vinagre diluido tiene ácido acético 0,20 M (toma pKa = 4,8). Se titulan 20 mL con NaOH 0,20 M. ¿Cuál es el pH en el punto de equivalencia? Redondea a dos decimales. Compruébalo: carga el caso y pulsa el botón que lleva la bureta a la equivalencia.',
     categoria: 'aplicado',
     datos: { pregunta: 'pH', tipo: 'ad-bf', V_analito: 20, C_analito: 0.2, C_titulante: 0.2, pKa: 4.8, V_titulante: 20 },
     pista: 'En la equivalencia solo queda acetato de sodio en 40 mL. El acetato es una base débil: pH = 7 + ½(pKa + log C_sal).',
@@ -637,7 +697,7 @@ const DEFINICIONES: ReadonlyArray<
     id: 11,
     titulo: 'Un limpiador ácido titulado con amoníaco',
     enunciado:
-      'Se titulan 20 mL de un limpiador que contiene HCl 0,20 M con una disolución de amoníaco (NH₃, base débil, pKb = 4,7) 0,20 M. ¿Cuál es el pH en el punto de equivalencia?',
+      'Se titulan 20 mL de un limpiador que contiene HCl 0,20 M con una disolución de amoníaco (NH₃, base débil, pKb = 4,7) 0,20 M. ¿Cuál es el pH en el punto de equivalencia? Redondea a dos decimales.',
     categoria: 'aplicado',
     datos: { pregunta: 'pH', tipo: 'af-bd', V_analito: 20, C_analito: 0.2, C_titulante: 0.2, pKb: 4.7, V_titulante: 20 },
     pista: 'En la equivalencia queda cloruro de amonio (NH₄Cl) en 40 mL. El NH₄⁺ es un ácido débil: pH = 7 − ½(pKb + log C_sal).',
@@ -646,7 +706,7 @@ const DEFINICIONES: ReadonlyArray<
     id: 12,
     titulo: 'Amoníaco de sobra: tampón de la base',
     enunciado:
-      'Se titulan 20 mL de HCl 0,10 M con amoníaco 0,10 M (pKb = 4,7). ¿Cuál es el pH después de añadir 40 mL de amoníaco, el doble del volumen de equivalencia?',
+      'Se titulan 20 mL de HCl 0,10 M con amoníaco 0,10 M (pKb = 4,7). ¿Cuál es el pH después de añadir 40 mL de amoníaco, el doble del volumen de equivalencia? Redondea a dos decimales.',
     categoria: 'abstracto',
     datos: { pregunta: 'pH', tipo: 'af-bd', V_analito: 20, C_analito: 0.1, C_titulante: 0.1, pKb: 4.7, V_titulante: 40 },
     pista: 'Pasada la equivalencia hay NH₄⁺ y NH₃ a la vez: un tampón. Compara sus moles y usa pOH = pKb + log(n(NH₄⁺)/n(NH₃)).',

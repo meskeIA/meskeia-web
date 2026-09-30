@@ -8,64 +8,110 @@
  * suspender un pH que ella misma acaba de mostrar, que es el peor fallo posible en algo que
  * corrige a un alumno.
  *
- * `calcularPH`, `phZonaTampon` y `phEnEquivalenciaAdBf` se trasladaron de `page.tsx` el
- * 26/09/2026 SIN cambiar una sola operación ni un comentario. Lo único nuevo es
- * `volumenEquivalencia`: la expresión C_a·V_a/C_t que `page.tsx` escribía en su `useMemo` y
- * `calcularPH` en su cuerpo, sacada tal cual —mismos factores, mismo orden— para que haya
- * una sola definición del volumen de equivalencia.
- *
  * Convenio (el de la app): siempre se valora un ÁCIDO (analito) con una BASE (titulante).
  * Volúmenes en mL, concentraciones en mol/L.
+ *
+ * ── UN SOLO BALANCE DE CARGAS, NO UNA FÓRMULA POR TRAMO (30/09/2026) ──────────────────────
+ *
+ * Hasta el 30/09/2026 `calcularPH` encadenaba las aproximaciones de libro, una por tramo
+ * (−log del ácido sobrante, cuadrática del tampón con un «techo», 7 ± ½(pK + log C) en la
+ * equivalencia, Henderson-Hasselbalch sobre el pOH después) y cada una fallaba donde dejaba
+ * de valer su supuesto. En las costuras entre tramos la curva BAJABA al añadir base:
+ *   · AD+BD de fábrica: 7,01 en V_eq y 6,86 una gota después (hallazgo 2512).
+ *   · AF+BD con pKb 9,4: 3,70 → 2,95 → 2,20 al cruzar V_eq, y con pKb 12 un pH de −0,40, por
+ *     debajo del HCl de partida (2513).
+ *   · AD+BF con pKa 9,2: 10,95 → 10,30 una gota pasada la equivalencia, por despreciar el OH⁻
+ *     de la hidrólisis del anión frente a una base sobrante que aún es menor que él (2514).
+ *   · Las fórmulas 7 ± ½(pK + log C) no llevan Kw, y con pK bajo cruzaban el 7 hacia el lado
+ *     equivocado: la sal de un ácido débil salía ÁCIDA (6,85 con pKa 1) (2515).
+ * Era la misma clase de defecto que el valle del hallazgo 343, remendado entonces con un tope.
+ *
+ * Ahora hay UNA ecuación para todo el ensayo, la electroneutralidad de la disolución:
+ *
+ *     [H⁺] + [catión de la base] = [anión del ácido] + [OH⁻]
+ *
+ *   · ácido fuerte → [Cl⁻] = C_a            · ácido débil → [A⁻]  = C_a · Ka / ([H⁺] + Ka)
+ *   · base fuerte  → [Na⁺] = C_b            · base débil  → [BH⁺] = C_b · [H⁺] / ([H⁺] + Ka')
+ *   · [OH⁻] = Kw/[H⁺], con Kw = 10⁻¹⁴ y Ka' = Kw/Kb, el Ka del ácido conjugado BH⁺
+ *   · C_a = n_ácido / V_total y C_b = n_base / V_total: las concentraciones ya diluidas
+ *
+ * El lado izquierdo menos el derecho CRECE con [H⁺] (cada término lo hace), así que tiene una
+ * sola raíz, y se busca por bisección en pH. Y la raíz se mueve siempre en el mismo sentido al
+ * añadir base: a [H⁺] fija, derivar C_a·α − C_b·β respecto de V da −(C_t·β·V_a + n_a·α)/V_tot²,
+ * negativo, así que [H⁺] baja y el pH SUBE. La curva es continua y monótona POR CONSTRUCCIÓN,
+ * en los cuatro tipos y con cualquier pK de los deslizadores.
+ *
+ * Casos resueltos a mano antes de escribir esto (acético 0,1 M · 25 mL, pKa 4,76, NaOH 0,1 M):
+ *   V = 0       [H⁺]² + Ka·[H⁺] − Ka·C = 0 → 1,3096·10⁻³ M          → pH 2,8829 → 2,88
+ *   V = 12,5    semiequivalencia: C_A⁻ = C_HA = 0,0333 M → [H⁺] ≈ Ka   → pH 4,7605 → 4,76
+ *   V = 25      acetato 0,05 M: [OH⁻]² = Kb·C + Kw = 2,877·10⁻¹¹       → pH 8,7295 → 8,73
+ * y fuerte con fuerte en la equivalencia: [H⁺] = [OH⁻] = 10⁻⁷ → 7 EXACTO (forma cerrada abajo).
  */
 
 export type TipoTitulacion = 'af-bf' | 'ad-bf' | 'af-bd' | 'ad-bd';
 
+/** Producto iónico del agua a 25 °C. */
+const KW = 1e-14;
+
 /**
  * Volumen de titulante (mL) que neutraliza exactamente el analito: n(ácido) = n(base), así
- * que V_eq = C_analito · V_analito / C_titulante. Con C_titulante = 0 devuelve Infinity, igual
- * que la expresión que sustituye.
+ * que V_eq = C_analito · V_analito / C_titulante. Con C_titulante = 0 devuelve Infinity.
  */
 export function volumenEquivalencia(C_analito: number, V_analito: number, C_titulante: number): number {
   return (C_analito * V_analito) / C_titulante;
 }
 
 /**
- * pH de una mezcla ácido débil / base conjugada, resolviendo el balance de cargas.
+ * pH que cumple el balance de cargas para unas concentraciones YA diluidas.
  *
- * Con [HA] = C_HA − x y [A⁻] = C_A + x, la constante de acidez da una cuadrática:
- *
- *     x² + (Ka + C_A)·x − Ka·C_HA = 0
- *
- * y de sus dos raíces solo la positiva tiene sentido físico. Es la fórmula que Henderson y
- * Hasselbalch simplifican SUPONIENDO que x es despreciable frente a C_HA y a C_A; esa
- * suposición se cae justo al principio de la valoración, cuando C_A es minúsculo, y ahí H-H
- * da un pH MENOR que el del ácido puro. De ahí el valle del hallazgo 343.
- *
- * Casos resueltos a mano con acético 0,1 M · 25 mL (pKa 4,76), antes de escribir esto:
- *   V = 0,00 mL → 2,8829 (idéntico a la aproximación ½(pKa − log C) que había: 2,88)
- *   V = 0,10 mL → 2,9502 → 2,95, y SUBE, que es lo que tiene que hacer al echar base
- *   V = 12,50 mL (semiequivalencia) → 4,7605, contra el 4,7600 de H-H: ahí sí valía
- *
- * `techo` acota el resultado: la cuadrática ignora la autoionización del agua, así que con
- * el HA casi agotado el pH se dispararía por encima del de la propia equivalencia (10,16 a
- * dos microlitros de ella). El pH antes de la equivalencia nunca puede superar el de la
- * equivalencia, y ese tope solo llega a morder a partir de V = 24,998 mL de 25.
+ * Con ácido y base fuertes el balance es [H⁺] − Kw/[H⁺] = C_a − C_b, una cuadrática con forma
+ * cerrada: se resuelve así para que la equivalencia dé 7 EXACTO y no 7 ± el ruido de la
+ * bisección. La raíz se escribe de la forma que no resta dos números casi iguales.
  */
-function phZonaTampon(C_HA: number, C_A: number, pKa: number, techo: number): number {
-  const Ka = Math.pow(10, -pKa);
-  const b = Ka + C_A;
-  const x = (-b + Math.sqrt(b * b + 4 * Ka * C_HA)) / 2;
-  return Math.min(-Math.log10(Math.max(x, 1e-14)), techo);
-}
+function phPorBalance(
+  acidoDebil: boolean,
+  baseDebil: boolean,
+  Ca: number,
+  Cb: number,
+  pKa: number,
+  pKb: number
+): number {
+  if (!acidoDebil && !baseDebil) {
+    const delta = Ca - Cb;
+    if (delta === 0) return 7;
+    const raiz = Math.sqrt(delta * delta + 4 * KW);
+    const H = delta > 0 ? (delta + raiz) / 2 : (2 * KW) / (raiz - delta);
+    return -Math.log10(H);
+  }
 
-/** pH en la equivalencia de ácido débil + base fuerte: hidrólisis de la sal. */
-function phEnEquivalenciaAdBf(moles_analito: number, V_total_L: number, pKa: number): number {
-  const C_sal = moles_analito / V_total_L;
-  return 7 + 0.5 * (pKa + Math.log10(Math.max(C_sal, 1e-14)));
+  const Ka = Math.pow(10, -pKa);
+  const KaConjugado = KW / Math.pow(10, -pKb);
+
+  /** Cargas positivas menos negativas: crece con [H⁺], así que tiene una sola raíz. */
+  const exceso = (H: number): number => {
+    const cation = baseDebil ? (Cb * H) / (H + KaConjugado) : Cb;
+    const anion = acidoDebil ? (Ca * Ka) / (H + Ka) : Ca;
+    return H + cation - anion - KW / H;
+  };
+
+  // pH entre −2 y 16 abarca de sobra lo que permiten los deslizadores (concentraciones de
+  // 0,01 a 1 M, pK de 1 a 12). 80 mitades dejan el intervalo por debajo de 10⁻²³: el límite
+  // lo pone ya la precisión del doble, no el número de pasos.
+  let pHbajo = -2; // [H⁺] alta → exceso > 0
+  let pHalto = 16; // [H⁺] baja → exceso < 0
+  for (let i = 0; i < 80; i++) {
+    const medio = (pHbajo + pHalto) / 2;
+    if (exceso(Math.pow(10, -medio)) > 0) pHbajo = medio;
+    else pHalto = medio;
+  }
+  return (pHbajo + pHalto) / 2;
 }
 
 /**
- * Calcula pH a un volumen V (mL) de titulante añadido para un escenario dado.
+ * Calcula el pH a un volumen V (mL) de titulante añadido para un escenario dado.
+ *
+ * `pKa` solo interviene con ácido débil y `pKb` solo con base débil: en los otros tipos se
+ * ignoran (los casos para clase pasan NaN en el que no aplica).
  */
 export function calcularPH(
   tipo: TipoTitulacion,
@@ -76,102 +122,41 @@ export function calcularPH(
   pKa: number,
   pKb: number
 ): number {
-  const moles_analito = (C_analito * V_analito) / 1000;
-  const moles_titulante = (C_titulante * V_titulante) / 1000;
-  const V_total_L = (V_analito + V_titulante) / 1000;
-  const V_eq = volumenEquivalencia(C_analito, V_analito, C_titulante);
+  const V_total = V_analito + Math.max(0, V_titulante);
+  // mmol / mL = mol/L: las concentraciones de todo lo que hay en el matraz, ya diluidas.
+  const Ca = (C_analito * V_analito) / V_total;
+  const Cb = (C_titulante * Math.max(0, V_titulante)) / V_total;
+  const acidoDebil = tipo === 'ad-bf' || tipo === 'ad-bd';
+  const baseDebil = tipo === 'af-bd' || tipo === 'ad-bd';
+  return phPorBalance(acidoDebil, baseDebil, Ca, Cb, pKa, pKb);
+}
 
-  // En todos los casos, el analito es el ácido y el titulante la base (esto se podría invertir)
-  // Para simplicidad: siempre titulamos un ácido con una base.
-
-  if (tipo === 'af-bf') {
-    if (V_titulante < V_eq) {
-      // Exceso de ácido
-      const moles_H = moles_analito - moles_titulante;
-      const conc_H = moles_H / V_total_L;
-      return -Math.log10(Math.max(conc_H, 1e-14));
-    } else if (Math.abs(V_titulante - V_eq) < 0.001) {
-      return 7;
-    } else {
-      // Exceso de base
-      const moles_OH = moles_titulante - moles_analito;
-      const conc_OH = moles_OH / V_total_L;
-      const pOH = -Math.log10(Math.max(conc_OH, 1e-14));
-      return 14 - pOH;
-    }
+/**
+ * Volumen de titulante (mL) al que la valoración llega a un pH dado, o `null` si no lo alcanza
+ * entre 0 y `V_max`. Invierte `calcularPH` por bisección, que vale porque la curva es monótona
+ * creciente (ver la cabecera). Si el pH ya se ha superado antes de añadir nada, devuelve 0.
+ *
+ * Lo usa el aviso del indicador: dónde EMPIEZA y dónde TERMINA de virar, en mL.
+ */
+export function volumenParaPH(
+  pHObjetivo: number,
+  V_max: number,
+  tipo: TipoTitulacion,
+  V_analito: number,
+  C_analito: number,
+  C_titulante: number,
+  pKa: number,
+  pKb: number
+): number | null {
+  const ph = (v: number) => calcularPH(tipo, v, V_analito, C_analito, C_titulante, pKa, pKb);
+  if (ph(0) >= pHObjetivo) return 0;
+  if (ph(V_max) < pHObjetivo) return null;
+  let bajo = 0;
+  let alto = V_max;
+  for (let i = 0; i < 60; i++) {
+    const medio = (bajo + alto) / 2;
+    if (ph(medio) < pHObjetivo) bajo = medio;
+    else alto = medio;
   }
-
-  if (tipo === 'ad-bf') {
-    if (V_titulante < V_eq) {
-      // Una sola fórmula para V = 0 y para toda la zona tampón, y por eso no hay salto:
-      // hasta el 25/08/2026 V = 0 usaba ½(pKa − log C) y V > 0 saltaba a
-      // Henderson-Hasselbalch puro, así que la PRIMERA GOTA de NaOH bajaba el pH de 2,88 a
-      // 2,36 — añadir base acidificaba (hallazgo 343). H-H no vale cuando n(A⁻) es mucho
-      // menor que n(HA): ahí el H⁺ que aporta el propio ácido no es despreciable frente al
-      // A⁻ que hay, y hay que resolver el balance de cargas.
-      const moles_HA = moles_analito - moles_titulante;
-      const moles_A = moles_titulante;
-      if (moles_HA <= 0) return 7;
-      // El techo es el pH de la equivalencia, calculado con el volumen que HABRÁ allí.
-      const techo = phEnEquivalenciaAdBf(moles_analito, (V_analito + V_eq) / 1000, pKa);
-      return phZonaTampon(moles_HA / V_total_L, moles_A / V_total_L, pKa, techo);
-    } else if (Math.abs(V_titulante - V_eq) < 0.001) {
-      // Punto de equivalencia: hidrólisis de la sal
-      return phEnEquivalenciaAdBf(moles_analito, V_total_L, pKa);
-    } else {
-      // Exceso de base fuerte
-      const moles_OH = moles_titulante - moles_analito;
-      const conc_OH = moles_OH / V_total_L;
-      const pOH = -Math.log10(Math.max(conc_OH, 1e-14));
-      return 14 - pOH;
-    }
-  }
-
-  if (tipo === 'af-bd') {
-    // Titulamos ácido fuerte con base débil. Curva en imagen especular.
-    if (V_titulante <= 0) {
-      // pH inicial de ácido fuerte: pH = -log(C)
-      return -Math.log10(C_analito);
-    }
-    if (V_titulante < V_eq) {
-      // Antes de equivalencia: domina exceso de ácido fuerte
-      const moles_H = moles_analito - moles_titulante;
-      const conc_H = moles_H / V_total_L;
-      return -Math.log10(Math.max(conc_H, 1e-14));
-    } else if (Math.abs(V_titulante - V_eq) < 0.001) {
-      // Punto de equivalencia: solución de sal de base débil + ácido fuerte
-      const C_sal = moles_analito / V_total_L;
-      // pH = 7 - 0.5*(pKb + log C_sal)
-      return 7 - 0.5 * (pKb + Math.log10(Math.max(C_sal, 1e-14)));
-    } else {
-      // Exceso de base débil tras la equivalencia: zona tampón inversa
-      const moles_BH = moles_analito;
-      const moles_B = moles_titulante - moles_analito;
-      if (moles_B <= 0) return 7;
-      // pOH = pKb + log([BH+]/[B]) → pH = 14 - pOH
-      const pOH = pKb + Math.log10(moles_BH / moles_B);
-      return 14 - pOH;
-    }
-  }
-
-  // ad-bd: aproximación
-  if (V_titulante < V_eq) {
-    // Misma zona tampón que en ad-bf y, hasta el 25/08/2026, el mismo valle en la primera
-    // gota: el acta solo lo describe en ad-bf, pero el código era idéntico. Aquí el techo es
-    // el pH de la equivalencia de ácido débil + base débil, ½(pKa + 14 − pKb).
-    const moles_HA = moles_analito - moles_titulante;
-    const moles_A = moles_titulante;
-    if (moles_HA <= 0) return 7;
-    return phZonaTampon(moles_HA / V_total_L, moles_A / V_total_L, pKa, 0.5 * (pKa + 14 - pKb));
-  } else if (Math.abs(V_titulante - V_eq) < 0.001) {
-    // pH ≈ 0.5*(pKa + 14 - pKb)
-    return 0.5 * (pKa + 14 - pKb);
-  } else {
-    // Exceso de base débil
-    const moles_BH = moles_analito;
-    const moles_B = moles_titulante - moles_analito;
-    if (moles_B <= 0) return 7;
-    const pOH = pKb + Math.log10(moles_BH / moles_B);
-    return 14 - pOH;
-  }
+  return (bajo + alto) / 2;
 }
