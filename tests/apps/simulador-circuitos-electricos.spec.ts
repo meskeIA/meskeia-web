@@ -1283,19 +1283,37 @@ test.describe('simulador-circuitos-electricos · casos para clase', () => {
 
     // (c) Los errores del tema NO entran: sumar resistencias en paralelo (caso 7 → 9 Ω) y
     //     dar la corriente en A en una casilla de mA (caso 9 → 0,5).
-    expect(comprobarRespuesta(9, 2).correcto).toBe(false);
-    expect(comprobarRespuesta(0.5, 500).correcto).toBe(false);
+    const c = (id: number) => CASOS.find((x) => x.id === id)!;
+    expect(comprobarRespuesta(9, 2, c(7).datos).correcto).toBe(false);
+    expect(comprobarRespuesta(0.5, 500, c(9).datos).correcto).toBe(false);
   });
 
   test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
-    expect(comprobarRespuesta(132, 132).correcto).toBe(true);
-    expect(comprobarRespuesta(NaN, 5.62).correcto).toBe(false);
-    expect(comprobarRespuesta(NaN, 5.62).motivo).not.toMatch(/NaN/);
-    expect(toleranciaDe(0)).toBe(0.01);
-    expect(toleranciaDe(500)).toBeCloseTo(5, 10);
-    // Borde exacto de la tolerancia, por los dos lados (hallazgo 1211 del 22/09/2026).
-    expect(comprobarRespuesta(0.31, 0.3).correcto).toBe(true);
-    expect(comprobarRespuesta(0.29, 0.3).correcto).toBe(true);
+    const c = (id: number) => CASOS.find((x) => x.id === id)!;
+    expect(comprobarRespuesta(132, 132, c(11).datos).correcto).toBe(true);
+    expect(comprobarRespuesta(NaN, 5.62, c(5).datos).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 5.62, c(5).datos).motivo).not.toMatch(/NaN/);
+    // Reescrito al reparar el hallazgo 2518 (30/09/2026). Antes fijaba la tolerancia vieja
+    // (toleranciaDe(0) = 0,01 y toleranciaDe(500) = 5, el 1 % de la cifra), que es el defecto.
+    // Ahora la da la pregunta: media unidad del redondeo pedido si la cifra exacta lo necesita
+    // (caso 5: 12·2200/4700 = 5,617 → dos decimales → 0,005) y nada si es exacta (caso 9:
+    // 220/440 A = 500 mA justos → 0).
+    expect(toleranciaDe(c(5).datos)).toBeCloseTo(0.005, 12);
+    expect(toleranciaDe(c(9).datos)).toBe(0);
+    // Un caso sin datos que resolver no lanza: tolerancia 0 y la respuesta se corrige igual.
+    expect(toleranciaDe({ pregunta: 'serieTension' })).toBe(0);
+    // El fondo del test se conserva: el borde EXACTO de la tolerancia, por los dos lados
+    // (hallazgo 1211 del 22/09/2026). Antes era 0,29/0,31 frente a 0,3 con el suelo de 0,01;
+    // hoy 0,3 A es exacta y ese par queda fuera, así que el borde se mide donde sí hay margen:
+    // 5,615 y 5,625 frente a 5,62, que redondean a 5,62 los dos (o a 5,63 el segundo, según el
+    // desempate: los dos están a media centésima justa).
+    expect(comprobarRespuesta(5.615, 5.62, c(5).datos).correcto).toBe(true);
+    expect(comprobarRespuesta(5.625, 5.62, c(5).datos).correcto).toBe(true);
+    expect(comprobarRespuesta(5.6149, 5.62, c(5).datos).correcto).toBe(false);
+    expect(comprobarRespuesta(5.6251, 5.62, c(5).datos).correcto).toBe(false);
+    expect(comprobarRespuesta(0.31, 0.3, c(2).datos).correcto).toBe(false);
+    expect(comprobarRespuesta(0.29, 0.3, c(2).datos).correcto).toBe(false);
+    expect(comprobarRespuesta(0.3, 0.3, c(2).datos).correcto).toBe(true);
   });
 });
 
@@ -1353,8 +1371,15 @@ test.describe('simulador-circuitos-electricos · la sección de casos en el nave
  *     0,20 = 3,00). Los doce «Verlo en el simulador», seguidos al pie de la letra, imprimen
  *     en el panel la cifra que prometen (CASO 30).
  *
- * HALLAZGOS NUEVOS, ABIERTOS (cinco test.fail —el 28 tiene dos, 28.b y 28.d—, comprobados
- * SIN la marca: los cinco en rojo, cada uno en la línea del defecto)
+ * HALLAZGOS 2518-2521, REPARADOS el 30/09/2026 (nacieron con cinco test.fail —el 28 tenía dos,
+ * 28.b y 28.d—; hoy son regresión sin marca). Lo que se hizo, en una línea por caso:
+ *   CASO 26 · «Horas de uso diario» por encima de 24 da aviso y ninguna ficha; 24 sigue valiendo.
+ *   CASO 27 · la tensión de fuente de Serie y Paralelo pasa por motivoDeRechazo (motivoTension).
+ *   CASO 28 · toleranciaDe(datos): media unidad del redondeo pedido si la cifra exacta lo
+ *             necesita, 0 si es exacta. comprobarRespuesta recibe los datos del caso.
+ *   CASO 29 · la frase del «1 %» desapareció con la tolerancia: la intro dice ahora que no hay
+ *             margen porque los datos son exactos, y que se redondea solo al final.
+ * Lo que decía el acta al abrirlos:
  *   CASO 26 · bajo  · «Horas de uso diario» admite 25 h: consumo de 1500,7500 kWh sin aviso.
  *   CASO 27 · bajo  · la tensión de fuente de Serie y Paralelo rechaza «1e3», «0», «abc» y el
  *                     vacío con el mismo «Tensión de fuente inválida.», cuando las R de al lado
@@ -1506,13 +1531,14 @@ test.describe('Inspector 30/09/2026 · las cuatro pestañas tras extraer motor.t
   });
 
   /**
-   * CASO 26 (bajo, operativa) — ABIERTO. «Horas de uso diario» acepta cualquier número de 0 o
+   * CASO 26 (bajo, operativa) — REPARADO el 30/09/2026 (hallazgo 2519): por encima de 24 horas
+   * la pestaña avisa y no publica ficha, como el resto de sus rechazos. Lo que decía el acta: «Horas de uso diario» acepta cualquier número de 0 o
    * más, así que un día de 25 horas da un consumo que ningún aparato puede tener. Es la cifra
    * DESTACADA del panel (el coste), la que el usuario se lleva.
    *   Esperado: 25 h al día se rechaza (un día tiene 24), sin ficha detrás.
    *   Obtenido: 2,001 kW · 25 h · 30 días = 1500,7500 kWh y 232,1660 €, sin aviso.
    */
-  test.fail('CASO 26 · ABIERTO: un día de 25 horas de uso no puede dar un consumo', async ({ page }) => {
+  test('CASO 26 · un día de 25 horas de uso no puede dar un consumo', async ({ page }) => {
     await page.getByRole('button', { name: 'Potencia', exact: true }).click();
     await esperarHidratacion(page, ['#pot-v']);
     await teclearComoUsuario(page, page.locator('#pot-v'), '230');
@@ -1526,17 +1552,19 @@ test.describe('Inspector 30/09/2026 · las cuatro pestañas tras extraer motor.t
     await teclearComoUsuario(page, page.locator('#pot-horas'), '25');
     await page.getByRole('button', { name: 'Calcular', exact: true }).click();
     await expect(avisoApp(page)).toBeVisible({ timeout: 1500 });
+    await expect(avisoApp(page)).toContainText('24 horas');
     await expect(fichaApp(page)).toBeEmpty();
   });
 
   /**
-   * CASO 27 (bajo, operativa) — ABIERTO. Los campos de resistencia de Serie y Paralelo pasan por
+   * CASO 27 (bajo, operativa) — REPARADO el 30/09/2026 (hallazgo 2520): la tensión de fuente
+   * pasa por el mismo motivoDeRechazo que las R. Lo que decía el acta: Los campos de resistencia de Serie y Paralelo pasan por
    * motivoDeRechazo y NOMBRAN la causa («notación científica… escribe 1000 en vez de 1e3»,
    * «tiene que ser mayor que cero»). La tensión de fuente de esas dos pestañas no: vacía, «0»,
    * «abc» y «1e3» reciben el mismo «Tensión de fuente inválida.». Es la forma del hallazgo 875
    * en el campo vecino.
    */
-  test.fail('CASO 27 · ABIERTO: la tensión de fuente dice por qué la rechaza, como las R de al lado', async ({ page }) => {
+  test('CASO 27 · la tensión de fuente dice por qué la rechaza, como las R de al lado', async ({ page }) => {
     await page.getByRole('button', { name: 'Serie', exact: true }).click();
     await esperarHidratacion(page, ['#serie-r1']);
     await teclearComoUsuario(page, page.locator('#serie-r1'), '100');
@@ -1551,8 +1579,34 @@ test.describe('Inspector 30/09/2026 · las cuatro pestañas tras extraer motor.t
     await teclearComoUsuario(page, page.locator('#serie-v'), '1e3');
     await page.getByRole('button', { name: 'Calcular circuito' }).click();
     await expect(avisoApp(page)).toBeVisible();
-    // Esperado: la misma explicación. Obtenido: «Tensión de fuente inválida.»
+    // Esperado: la misma explicación. Obtenía: «Tensión de fuente inválida.»
     await expect(avisoApp(page)).toContainText('notación científica', { timeout: 1500 });
+    await expect(fichaApp(page)).toBeEmpty();
+    // Los otros tres del acta, cada uno con su causa
+    for (const [texto, causa] of [
+      ['0', 'tiene que ser mayor que cero'],
+      ['abc', 'no es un número'],
+      ['', 'falta el valor'],
+    ] as const) {
+      await teclearComoUsuario(page, page.locator('#serie-v'), texto);
+      await page.getByRole('button', { name: 'Calcular circuito' }).click();
+      await expect(avisoApp(page), `tensión «${texto}»`).toContainText(`Tensión de fuente: `);
+      await expect(avisoApp(page), `tensión «${texto}»`).toContainText(causa);
+    }
+    // Paralelo usa la misma función: el 0 también se explica allí
+    await page.getByRole('button', { name: 'Paralelo', exact: true }).click();
+    await esperarHidratacion(page, ['#par-r1']);
+    await teclearComoUsuario(page, page.locator('#par-r1'), '100');
+    await teclearComoUsuario(page, page.locator('#par-r2'), '220');
+    await teclearComoUsuario(page, page.locator('#par-r3'), '330');
+    await teclearComoUsuario(page, page.locator('#par-v'), '0');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+    await expect(avisoApp(page)).toContainText('Tensión de fuente: tiene que ser mayor que cero');
+    // Y el control: 12 V sí calcula (Req = 6600/116 = 56,896552 Ω, CASO 23)
+    await teclearComoUsuario(page, page.locator('#par-v'), '12');
+    await page.getByRole('button', { name: 'Calcular circuito' }).click();
+    await expect(avisoApp(page)).toHaveCount(0);
+    await expect(valorDe(page, 'Resistencia equivalente')).toHaveText('56,8966 Ω');
   });
 });
 
@@ -1585,14 +1639,20 @@ test.describe('Inspector 30/09/2026 · el corrector de los casos para clase', ()
       [12, 3, true, '15 kWh · 0,20'],
       [12, 3000, false, 'W en vez de kW'],
       [12, 0.1, false, 'sin multiplicar por los días'],
+      // Añadidos al reparar el 2518 (30/09/2026): redondear un paso INTERMEDIO saca la respuesta
+      // del margen. La pista del caso 5 y la intro de la sección lo avisan («redondea solo al final»).
+      [5, 5.61, false, 'I = 12/4700 redondeada a 2,55 mA: 0,00255·2200 = 5,61'],
+      [5, 5.617, true, 'I con todos sus decimales: 0,0025532·2200 = 5,617'],
+      [12, 2.97, false, 'I = 220/484 redondeada a 0,45 A: 99 W → 14,85 kWh → 2,97'],
     ];
     for (const [id, respuesta, correcta, porque] of PRUEBAS) {
-      expect(comprobarRespuesta(respuesta, caso(id).respuesta).correcto, `caso ${id}: ${respuesta} (${porque})`).toBe(correcta);
+      expect(comprobarRespuesta(respuesta, caso(id).respuesta, caso(id).datos).correcto, `caso ${id}: ${respuesta} (${porque})`).toBe(correcta);
     }
   });
 
   /**
-   * CASO 28.b (medio, cálculo) — ABIERTO. `toleranciaDe` es el mayor entre 0,01 y el 1 % de la
+   * CASO 28.b (medio, cálculo) — REPARADO el 30/09/2026 (hallazgo 2518): la tolerancia sale de
+   * la pregunta (`toleranciaDe(datos)`), no del 1 % de la cifra. Lo que decía el acta: `toleranciaDe` es el mayor entre 0,01 y el 1 % de la
    * respuesta. Los datos de estos casos son EXACTOS (no hay tabla ni gráfica que leer), así que
    * la tolerancia que da la pregunta es media unidad del redondeo pedido; el 1 % de 500 mA son
    * 5 mA y el de 132 kWh, 1,32 kWh, y pasan enteros que ninguna cuenta produce. Ningún error
@@ -1606,7 +1666,7 @@ test.describe('Inspector 30/09/2026 · el corrector de los casos para clase', ()
    * ⚠️ Nada de este test fija cifras del generador: con test.fail, un fallo por otra causa lo
    * dejaría en verde aunque la tolerancia ya estuviera reparada.
    */
-  test.fail('CASO 28.b · ABIERTO: con datos exactos no pasan cifras que ninguna cuenta produce', async () => {
+  test('CASO 28.b · con datos exactos no pasan cifras que ninguna cuenta produce', async () => {
     const caso = (id: number) => CASOS.find((c) => c.id === id)!;
     const NO_EXISTEN: [number, number, string][] = [
       [5, 5.57, '5,617 V: 5,57 no sale de ningún redondeo'],
@@ -1617,16 +1677,35 @@ test.describe('Inspector 30/09/2026 · el corrector de los casos para clase', ()
       [11, 133, '132 kWh exactos'],
       [12, 3.03, '3 exactos; redondeando I a 0,46 A saldría 3,04'],
     ];
-    const aceptadas = NO_EXISTEN.filter(([id, r]) => comprobarRespuesta(r, caso(id).respuesta).correcto).map(
+    const aceptadas = NO_EXISTEN.filter(([id, r]) => comprobarRespuesta(r, caso(id).respuesta, caso(id).datos).correcto).map(
       ([id, r, p]) => `caso ${id}: ${r} (${p})`,
     );
     for (let semilla = 1; semilla <= 200; semilla++) {
       const e = generarEjercicioAleatorio(semilla);
-      if ((e.datos.decimales ?? 2) === 2 && comprobarRespuesta(e.respuesta + 1, e.respuesta).correcto) {
+      if ((e.datos.decimales ?? 2) === 2 && comprobarRespuesta(e.respuesta + 1, e.respuesta, e.datos).correcto) {
         aceptadas.push(`práctica semilla ${semilla}: ${e.respuesta + 1} por ${e.respuestaTexto}`);
       }
     }
     expect(aceptadas).toEqual([]);
+  });
+
+  /**
+   * CASO 28.e — la otra mitad de la reparación del 2518: estrechar la tolerancia no puede
+   * suspender una respuesta buena. En Practicar («Redondea a dos decimales») pasan la cifra
+   * redondeada, la exacta del motor y la exacta con tres decimales (lo que se lee en un panel
+   * que imprime cuatro y se redondea de más), en todas las semillas 1..500.
+   */
+  test('CASO 28.e · en Practicar pasa toda respuesta bien redondeada, y la exacta', async () => {
+    const suspendidas: string[] = [];
+    for (let semilla = 1; semilla <= 500; semilla++) {
+      const e = generarEjercicioAleatorio(semilla);
+      const exacta = resolverCaso(e.datos).valor;
+      const tres = Math.round(exacta * 1000) / 1000;
+      for (const [r, que] of [[e.respuesta, 'redondeada'], [exacta, 'exacta'], [tres, 'con tres decimales']] as const) {
+        if (!comprobarRespuesta(r, e.respuesta, e.datos).correcto) suspendidas.push(`semilla ${semilla}: ${r} (${que}) por ${e.respuestaTexto}`);
+      }
+    }
+    expect(suspendidas).toEqual([]);
   });
 });
 
@@ -1658,22 +1737,23 @@ test.describe('Inspector 30/09/2026 · los casos para clase en el navegador', ()
     await expect(veredicto(page)).toContainText('No es correcto');
   });
 
-  /** CASO 28.b en pantalla: el entero vecino de 132 kWh exactos. ABIERTO. */
-  test.fail('CASO 28.d · ABIERTO: 133 kWh no es la energía del calentador del caso 11', async ({ page }) => {
+  /** CASO 28.b en pantalla: el entero vecino de 132 kWh exactos. REPARADO el 30/09/2026 (2518). */
+  test('CASO 28.d · 133 kWh no es la energía del calentador del caso 11', async ({ page }) => {
     await responder(page, 11, '132'); // 220 V · 10 A · 2 h · 30 días / 1000
     await expect(veredicto(page)).toContainText('¡Correcto!');
     await responder(page, 11, '133');
-    // Esperado: rechazo. Obtenido: «✅ ¡Correcto!» (tolerancia 1,32 kWh)
+    // Esperado: rechazo. Obtenía: «✅ ¡Correcto!» (tolerancia 1,32 kWh)
     await expect(veredicto(page)).toContainText('No es correcto', { timeout: 1500 });
   });
 
   /**
-   * CASO 29 (bajo, contenido) — ABIERTO. La intro dice «se acepta un margen del 1 %» con un
+   * CASO 29 (bajo, contenido) — REPARADO el 30/09/2026 (hallazgo 2521): la frase del margen se
+   * reescribió con la tolerancia nueva y ya no lleva porcentaje. Lo que decía el acta: La intro dice «se acepta un margen del 1 %» con un
    * espacio normal (U+0020) entre la cifra y el %: el § 2 del CLAUDE.md global pide el duro
    * (U+00A0) desde el 25/09/2026, y la sección nació el 28/09. Si la frase desaparece al
    * reparar la tolerancia, este caso pasa a verde por sí solo y hay que quitarle la marca.
    */
-  test.fail('CASO 29 · ABIERTO: el «1 %» de la intro va con espacio duro', async ({ page }) => {
+  test('CASO 29 · el «1 %» de la intro va con espacio duro', async ({ page }) => {
     // Toda la sección, no un <p> concreto: un localizador que se desplazara pasaría a verde y
     // la marca se delataría sola, que es el lado seguro.
     const texto = (await seccion(page).textContent()) ?? '';

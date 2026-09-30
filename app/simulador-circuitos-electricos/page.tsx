@@ -147,6 +147,17 @@ function motivoDeRechazo(etiqueta: string, texto: string, admiteCero = false): s
   return null;
 }
 
+/**
+ * La tensión de fuente de Serie y Paralelo pasa por el MISMO `motivoDeRechazo` que las R de al
+ * lado (hallazgo 2520, 30/09/2026): antes el vacío, el 0, el texto y «1e3» recibían todos
+ * «Tensión de fuente inválida.», sin decir qué corregir, que es el defecto que el hallazgo 875
+ * cerró en las R. Aquí el vacío no es «no lo sé»: sin tensión no hay circuito.
+ */
+function motivoTension(texto: string): string | null {
+  const etiqueta = 'Tensión de fuente';
+  return motivoDeRechazo(etiqueta, texto) ?? (texto.trim() === '' ? `${etiqueta}: falta el valor.` : null);
+}
+
   function calcOhm() {
     setErrorOhm('');
     setResOhm(null);
@@ -168,8 +179,9 @@ function motivoDeRechazo(etiqueta: string, texto: string, admiteCero = false): s
   function calcSerie() {
     setErrorSerie('');
     setResSerie(null);
+    const motivoV = motivoTension(vSerie);
+    if (motivoV) { setErrorSerie(motivoV); return; }
     const V = parseSpanishNumber(vSerie);
-    if (isNaN(V) || V <= 0) { setErrorSerie('Tensión de fuente inválida.'); return; }
     const motivoSerie = rsSerie
       .slice(0, numSerie)
       .map((texto, i) => motivoDeRechazo(`R${i + 1}`, texto) ?? (texto.trim() === '' ? `R${i + 1}: falta el valor.` : null))
@@ -182,8 +194,9 @@ function motivoDeRechazo(etiqueta: string, texto: string, admiteCero = false): s
   function calcParalelo() {
     setErrorPar('');
     setResPar(null);
+    const motivoV = motivoTension(vPar);
+    if (motivoV) { setErrorPar(motivoV); return; }
     const V = parseSpanishNumber(vPar);
-    if (isNaN(V) || V <= 0) { setErrorPar('Tensión de fuente inválida.'); return; }
     const motivoPar = rsPar
       .slice(0, numPar)
       .map((texto, i) => motivoDeRechazo(`R${i + 1}`, texto) ?? (texto.trim() === '' ? `R${i + 1}: falta el valor.` : null))
@@ -236,6 +249,9 @@ function motivoDeRechazo(etiqueta: string, texto: string, admiteCero = false): s
     // faltaba, al lado de una P y una R correctas (hallazgo 870). El cero sí se admite —una
     // tarifa de 0 €/kWh es autoconsumo, y 0 horas da 0 kWh, que no es una cifra falsa.
     if (isNaN(horas) || horas < 0) { setErrorPot('Indica las horas de uso diario (un número de 0 o más).'); return; }
+    // Un día tiene 24 horas: con 25 se publicaba un consumo y un coste imposibles, y el coste es
+    // la cifra destacada del panel (hallazgo 2519, 30/09/2026). 24 sí vale: una nevera, un router.
+    if (horas > 24) { setErrorPot('Horas al día: un día tiene 24 horas, así que el uso diario no puede pasar de 24.'); return; }
     if (isNaN(dias) || dias < 0) { setErrorPot('Indica los días del periodo (un número de 0 o más).'); return; }
     if (isNaN(tarifa) || tarifa < 0) { setErrorPot('Indica la tarifa eléctrica en €/kWh (un número de 0 o más).'); return; }
     const { energiaKwh, costeEuros } = consumoYCoste(despeje.P, horas, dias, tarifa);

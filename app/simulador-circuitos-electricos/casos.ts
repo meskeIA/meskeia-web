@@ -395,9 +395,30 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
 
 /* ─────────────────────────── Corrección ─────────────────────────── */
 
-/** El MAYOR entre 0,01 y el 1 % del valor. */
-export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
+/**
+ * La tolerancia de un caso la da la PREGUNTA, no el tamaño de la cifra (hallazgo 2518,
+ * 30/09/2026). Es el error de lectura de los datos propagado a la respuesta más media unidad del
+ * redondeo pedido; aquí los datos son EXACTOS (no hay tabla ni gráfica que leer), así que solo
+ * queda el redondeo:
+ *
+ *   · si la cifra exacta tiene más decimales de los que se piden, media unidad del último
+ *     decimal pedido: se acepta todo lo que redondea a la respuesta (5,615 a 5,625 en el caso 5,
+ *     que incluye el 5,617 que imprime el panel);
+ *   · si la cifra es exacta, no hay redondeo que tolerar: solo vale ella (0,3 A, 500 mA, 132 kWh).
+ *
+ * Antes era el mayor entre 0,01 y el 1 % de la respuesta, y el 1 % de una cifra no es la escala
+ * de su error: el de 500 mA son 5 mA y el de 132 kWh, 1,32 kWh, así que pasaban 505 y 133, que
+ * ninguna cuenta produce; y por debajo de 1 el suelo de 0,01 era un 3,3 % de 0,3 A. Es la forma
+ * que se reparó en simulador-distribucion-normal (afdef86f) y simulador-fotografia (794ace00).
+ *
+ * ⚠️ Redondear un paso intermedio saca la respuesta del margen: en el caso 5, I = 2,55 mA da
+ * 5,61 V, y en el 12, I = 0,45 A da 2,97. Por eso la pista del caso 5 y la intro lo avisan.
+ */
+export function toleranciaDe(datos: DatosCaso): number {
+  const decimales = datos.decimales ?? 2;
+  const r = resolverCaso(datos);
+  if (!r.ok) return 0;
+  return exigeRedondeo(r.valor, decimales) ? 10 ** -decimales / 2 : 0;
 }
 
 export interface Veredicto {
@@ -407,9 +428,12 @@ export interface Veredicto {
   tolerancia: number;
 }
 
-/** Corrige la respuesta del alumno. Nunca lanza. */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
+/**
+ * Corrige la respuesta del alumno. Nunca lanza. Recibe los `datos` del caso porque la
+ * tolerancia depende de la pregunta (ver `toleranciaDe`), no de la cifra.
+ */
+export function comprobarRespuesta(usuario: number, esperado: number, datos: DatosCaso): Veredicto {
+  const tolerancia = toleranciaDe(datos);
 
   if (!Number.isFinite(usuario)) {
     return {
@@ -425,7 +449,8 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
    * Margen de ruido binario (hallazgo 1211 de `simulador-conservacion-energia`): en el borde
    * EXACTO de la tolerancia la resta en coma flotante decide por ±1 ulp, así que la misma
    * desviación se aceptaba por arriba y se rechazaba por abajo. 1e-9 absorbe ese ruido y queda
-   * siete órdenes de magnitud por debajo de la tolerancia más pequeña (0,01).
+   * seis órdenes de magnitud por debajo de la menor tolerancia no nula (0,005); con una
+   * respuesta exacta (tolerancia 0) es lo único que separa 0,3 de 0,30000000000000004.
    */
   const RUIDO_BINARIO = 1e-9;
   if (diferencia <= tolerancia + RUIDO_BINARIO) {
@@ -542,7 +567,7 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     },
     etiquetaRespuesta: 'Tensión en V',
     pista:
-      'Pasa los kΩ a ohmios, suma las tres para tener Req, calcula la corriente del circuito (I = V/Req) y multiplícala por R₂. La resistencia más grande se queda con la mayor parte de la tensión.',
+      'Pasa los kΩ a ohmios, suma las tres para tener Req, calcula la corriente del circuito (I = V/Req) y multiplícala por R₂, sin redondear la corriente: con I = 2,55 mA saldría 5,61 V. La resistencia más grande se queda con la mayor parte de la tensión.',
     comoComprobar:
       'En la pestaña «Serie», con 3 resistencias, escribe 1000, 2200 y 1500 y una tensión de 12: en la fila R2, la columna «V caída» sale 5,6170 V.',
   },
@@ -766,7 +791,7 @@ function resistenciasConNombre(rs: readonly number[]): string {
   return enumerar(rs.map((r, i) => `${nombreR(i)} = ${numero(r)} Ω`));
 }
 
-/** Corriente por debajo de 1 A: se pide en mA, para que la tolerancia mínima (0,01) no sea laxa. */
+/** Corriente por debajo de 1 A: se pide en mA, que es la unidad en la que se habla de ella. */
 function pedirEnMa(amperios: number): boolean {
   return Number.isFinite(amperios) && amperios < 1;
 }
@@ -820,8 +845,8 @@ export function generarEjercicioAleatorio(semilla = Date.now()): Ejercicio {
     etiqueta = enMiliamperios ? 'Corriente en mA' : 'Corriente en A';
   } else if (pregunta === 'serieTension') {
     // Se descartan las caídas de menos de 1 V (una R pequeña al lado de otras grandes): con dos
-    // decimales, la tolerancia mínima (0,01) sería más de un 1 % de la respuesta. La caída se
-    // mide con el MISMO motor. Número de intentos acotado, con un circuito fijo de reserva.
+    // decimales quedarían una o dos cifras significativas, poco para comprobar nada. La caída
+    // se mide con el MISMO motor. Número de intentos acotado, con un circuito fijo de reserva.
     const caida = (vs: number, lista: number[], k: number) => resolverSerie(vs, lista).tensiones[k];
     let rs = elegirSerie(rnd);
     let V: number = elegir(TENSIONES, rnd);
@@ -880,8 +905,8 @@ export function generarEjercicioAleatorio(semilla = Date.now()): Ejercicio {
     etiqueta = 'Potencia en W';
   } else {
     // Energía o coste de un aparato de la red. Se descartan los consumos diminutos (menos de
-    // 1 kWh, o de 1 unidad monetaria): con dos decimales, la tolerancia mínima (0,01) sería
-    // más de un 1 % de la respuesta. Número de intentos acotado, con un valor fijo de reserva.
+    // 1 kWh, o de 1 unidad monetaria): con dos decimales quedarían una o dos cifras
+    // significativas. Número de intentos acotado, con un valor fijo de reserva.
     const esCoste = pregunta === 'coste';
     const cuenta = (i: number, h: number, d: number, t: number) => ((RED * i) / 1000) * h * d * (esCoste ? t : 1);
     let I: number = elegir(CORRIENTES_APARATO, rnd);

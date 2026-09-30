@@ -40,6 +40,8 @@ export default function CasosAula() {
   const caso = CASOS[indice];
   const enunciado = practica ? practica.enunciado : caso.enunciado;
   const esperado = practica ? practica.respuesta : caso.respuesta;
+  /** La tolerancia sale de la pregunta (sus datos y el redondeo pedido), no de la cifra: 2518. */
+  const datos = practica ? practica.datos : caso.datos;
   const etiqueta = practica ? practica.etiquetaRespuesta : caso.etiquetaRespuesta;
   const pasos = practica ? practica.pasos : caso.pasos;
   const textoEsperado = practica ? practica.respuestaTexto : caso.respuestaTexto;
@@ -72,7 +74,7 @@ export default function CasosAula() {
     // parseSpanishNumber admite «5,62» y «5.62»; devuelve NaN con cualquier otra cosa, y de
     // ese NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
     const valor = parseSpanishNumber(respuesta);
-    const r = comprobarRespuesta(valor, esperado);
+    const r = comprobarRespuesta(valor, esperado, datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 
@@ -87,8 +89,9 @@ export default function CasosAula() {
           puede decir «resuelve los casos 3, 7 y 11» y corregir sin ambigüedad. Se corrigen como
           calcula el simulador: en serie las resistencias se suman, en paralelo se suman sus
           inversos, P = V·I, y la energía en kWh es la potencia en kilovatios por las horas de uso.
-          Escribe la respuesta en la unidad que pide la casilla (A o mA, V, Ω…); se acepta un
-          margen del 1 %.
+          Escribe la respuesta en la unidad que pide la casilla (A o mA, V, Ω…). Los datos son
+          exactos, así que no hay margen: vale la cifra exacta o, si el enunciado pide redondear,
+          la redondeada como pide. Redondea solo al final, nunca un resultado intermedio.
         </p>
       </div>
 
