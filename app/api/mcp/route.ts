@@ -1638,7 +1638,14 @@ function crearServidorMCP(): McpServer {
       const aiCaller = (extra as { _meta?: { userAgent?: string } })?._meta?.userAgent ?? 'desconocido';
       await registrarUsoMCP('calcular_potencia_ciclismo', aiCaller);
 
-      const r = calcularPotenciaCiclismo(peso_kg, ftp_w, desnivel_m, tiempo_min);
+      // El motor rechaza lo imposible con un error que lleva el motivo (hallazgo 2493, 30/09/2026):
+      // se devuelve ese motivo en vez de dejar que la tool falle sin explicación.
+      let r: ReturnType<typeof calcularPotenciaCiclismo>;
+      try {
+        r = calcularPotenciaCiclismo(peso_kg, ftp_w, desnivel_m, tiempo_min);
+      } catch (e) {
+        return { content: [{ type: 'text', text: `⚠️ ${e instanceof Error ? e.message : 'Datos fuera de rango.'}` }], isError: true };
+      }
 
       const lineas = [
         `🚴 **Potencia en Ciclismo — ${ftp_w} W · ${peso_kg} kg**`,
@@ -1648,6 +1655,8 @@ function crearServidorMCP(): McpServer {
 
       if (r.vam !== null) {
         lineas.push(`🏔️ **VAM: ${r.vam} m/h** → ${r.nivelVam}`);
+      } else if (r.avisoVam) {
+        lineas.push(`🏔️ VAM sin calcular: ${r.avisoVam}`);
       }
 
       lineas.push(``, `📊 **Zonas de entrenamiento (basadas en FTP ${ftp_w} W):**`);

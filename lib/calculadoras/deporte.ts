@@ -227,6 +227,26 @@ export const PESO_MAX_KG = 150;
 export const FTP_MIN_W = 50;
 export const FTP_MAX_W = 600;
 
+/**
+ * Techo del cociente W/kg de FTP. Los rangos de peso y FTP por separado no bastan: 30 kg y
+ * 600 W caben en los dos y dan «20,00 W/kg · Profesional / Élite», el absurdo que el hallazgo
+ * 253 quería evitar (hallazgo 2493). 7,5 W/kg es el extremo superior que la guía de la app da
+ * para los grandes escaladores del World Tour (6,0-7,5); por encima no hay veredicto que dar.
+ */
+export const WKG_MAX = 7.5;
+
+/** Rangos que declaran los campos de la VAM (hallazgo 2494): son contrato, no adorno. */
+export const DESNIVEL_MAX_M = 3000;
+export const TIEMPO_MIN_MIN = 1;
+export const TIEMPO_MAX_MIN = 600;
+/**
+ * VAM por encima de la cual no se emite veredicto. La guía de la app da como tope que «los
+ * mejores escaladores han superado los 1.800 m/h» en las grandes subidas; 2.000 m/h deja
+ * margen sobre esa cifra y sigue por debajo de lo que da cualquier error de tecleo típico
+ * (1000 m en 10 min son 6000 m/h y la app los clasificaba «Élite / Profesional»).
+ */
+export const VAM_MAX_M_H = 2000;
+
 const ZONAS_COGGAN: { zona: string; nombre: string; limite: number }[] = [
   { zona: 'Z1', nombre: 'Recuperación activa', limite: 55 },
   { zona: 'Z2', nombre: 'Resistencia', limite: 75 },
@@ -272,6 +292,12 @@ export function calcularPotenciaCiclismo(
   }
 
   const wattsKg = Math.round((ftp_w / peso_kg) * 100) / 100;
+  if (wattsKg > WKG_MAX) {
+    throw new Error(
+      `${ftp_w} W con ${peso_kg} kg son ${wattsKg.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} W/kg, ` +
+      `por encima de los 6,0-7,5 W/kg de los mejores escaladores profesionales: revisa el peso y el FTP.`,
+    );
+  }
 
   let nivelWattsKg: string;
   let descripcionNivel: string;
@@ -287,13 +313,28 @@ export function calcularPotenciaCiclismo(
   let avisoVam: string | null = null;
   const pidioVam = desnivel_m !== undefined || tiempo_min !== undefined;
   if (desnivel_m !== undefined && tiempo_min !== undefined && tiempo_min > 0 && desnivel_m > 0) {
-    vam = Math.round((desnivel_m / tiempo_min) * 60);
-    if      (vam < 800)  nivelVam = 'Principiante';
-    else if (vam < 1000) nivelVam = 'Cicloturista';
-    else if (vam < 1200) nivelVam = 'Amateur';
-    else if (vam < 1400) nivelVam = 'Amateur fuerte';
-    else if (vam < 1600) nivelVam = 'Semi-profesional';
-    else                 nivelVam = 'Élite / Profesional';
+    const vamCalculada = Math.round((desnivel_m / tiempo_min) * 60);
+    // Los rangos de los campos se hacen cumplir aquí, y una VAM que ninguna subida real
+    // alcanza no recibe veredicto (hallazgo 2494): antes 5000 m en 0,5 min salían
+    // «600.000 m/h · Élite / Profesional».
+    if (desnivel_m > DESNIVEL_MAX_M) {
+      avisoVam = `El desnivel debe estar entre 1 y ${DESNIVEL_MAX_M} m, que es el rango que admite la herramienta.`;
+    } else if (tiempo_min < TIEMPO_MIN_MIN || tiempo_min > TIEMPO_MAX_MIN) {
+      avisoVam = `El tiempo debe estar entre ${TIEMPO_MIN_MIN} y ${TIEMPO_MAX_MIN} minutos, que es el rango que admite la herramienta.`;
+    } else if (vamCalculada > VAM_MAX_M_H) {
+      avisoVam =
+        `${desnivel_m} m en ${tiempo_min} min serían ${vamCalculada.toLocaleString('es-ES')} m/h de VAM, más de lo que se ha medido ` +
+        `en las grandes subidas del ciclismo profesional (los mejores escaladores rondan los 1.800 m/h): revisa el desnivel y el tiempo. ` +
+        `En un repecho de pocos minutos la VAM se dispara, y esta escala, pensada para subidas largas, no se le aplica.`;
+    } else {
+      vam = vamCalculada;
+      if      (vam < 800)  nivelVam = 'Principiante';
+      else if (vam < 1000) nivelVam = 'Cicloturista';
+      else if (vam < 1200) nivelVam = 'Amateur';
+      else if (vam < 1400) nivelVam = 'Amateur fuerte';
+      else if (vam < 1600) nivelVam = 'Semi-profesional';
+      else                 nivelVam = 'Élite / Profesional';
+    }
   } else if (pidioVam) {
     // Antes la tarjeta desaparecía sin decir nada: el usuario abría el plegable, rellenaba un
     // campo, pulsaba Calcular y no obtenía ni VAM ni explicación.
@@ -319,7 +360,9 @@ export function calcularPotenciaCiclismo(
     return {
       zona: z.zona,
       nombre: z.nombre,
-      porcentajeFTP: i === 0 ? `hasta ${z.limite}%` : `${ZONAS_COGGAN[i - 1].limite}–${z.limite}%`,
+      // El % va separado con espacio duro (U+00A0), Ortografía de la RAE (2010) y regla del
+      // catálogo del 25/09/2026 (hallazgo 2497): «hasta 55 %», nunca «hasta 55%».
+      porcentajeFTP: i === 0 ? `hasta ${z.limite}\u00A0%` : `${ZONAS_COGGAN[i - 1].limite}–${z.limite}\u00A0%`,
       wattsMin,
       wattsMax,
     };
@@ -367,6 +410,14 @@ const RHO = 1.225;
 /** Rendimiento de la transmisión: parte de la potencia del pedal que llega a la rueda */
 const RENDIMIENTO_TRANSMISION = 0.975;
 
+/** Rangos que declaran los campos del estimador en la app (hallazgo 2494). */
+export const MASA_TOTAL_MIN_KG = 30;
+export const MASA_TOTAL_MAX_KG = 200;
+export const VELOCIDAD_MIN_KMH = 1;
+export const VELOCIDAD_MAX_KMH = 80;
+export const PENDIENTE_MIN_PCT = -15;
+export const PENDIENTE_MAX_PCT = 25;
+
 /**
  * Estima los vatios a partir de datos que el ciclista SÍ tiene sin potenciómetro: su peso, la
  * velocidad que sostuvo y la pendiente.
@@ -388,6 +439,17 @@ export function calcularVatiosPorFuerzas(p: ParametrosVatios): ResultadoVatios {
   }
   if (!Number.isFinite(p.pendiente_pct)) {
     throw new Error('La pendiente debe ser un número.');
+  }
+  // Los rangos que declaran los campos del estimador (hallazgo 2494): con 200 km/h en llano
+  // salía «Potencia estimada 34.687 W» sin una palabra, porque solo se exigía > 0.
+  if (p.masaTotal_kg < MASA_TOTAL_MIN_KG || p.masaTotal_kg > MASA_TOTAL_MAX_KG) {
+    throw new Error(`La masa total debe estar entre ${MASA_TOTAL_MIN_KG} y ${MASA_TOTAL_MAX_KG} kg, que es el rango que admite la herramienta.`);
+  }
+  if (p.velocidad_kmh < VELOCIDAD_MIN_KMH || p.velocidad_kmh > VELOCIDAD_MAX_KMH) {
+    throw new Error(`La velocidad debe estar entre ${VELOCIDAD_MIN_KMH} y ${VELOCIDAD_MAX_KMH} km/h, que es el rango que admite la herramienta.`);
+  }
+  if (p.pendiente_pct < PENDIENTE_MIN_PCT || p.pendiente_pct > PENDIENTE_MAX_PCT) {
+    throw new Error(`La pendiente debe estar entre ${PENDIENTE_MIN_PCT} y ${PENDIENTE_MAX_PCT}\u00A0%, que es el rango que admite la herramienta.`);
   }
 
   const v = p.velocidad_kmh / 3.6;                    // m/s

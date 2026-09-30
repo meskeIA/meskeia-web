@@ -34,7 +34,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const r = calcularPotenciaCiclismo(peso_kg, ftp_w, desnivel_m, tiempo_min);
+    // El motor RECHAZA lo imposible (un W/kg por encima del de los mejores profesionales, un peso
+    // fuera de rango…) lanzando un error con el motivo. Es un 400 con ese motivo, no un 500 mudo:
+    // desde el techo de 7,5 W/kg del hallazgo 2493 (30/09/2026) hay más entradas que lo disparan.
+    let r: ReturnType<typeof calcularPotenciaCiclismo>;
+    try {
+      r = calcularPotenciaCiclismo(peso_kg, ftp_w, desnivel_m, tiempo_min);
+    } catch (e) {
+      return NextResponse.json(
+        { error: e instanceof Error ? e.message : 'Datos fuera de rango.' },
+        { status: 400, headers: corsHeaders(origin) },
+      );
+    }
 
     try {
       await initializeDatabase();
@@ -63,6 +74,9 @@ export async function POST(req: NextRequest) {
     if (r.vam !== null) {
       respuesta.vam_m_h = r.vam;
       respuesta.nivel_vam = r.nivelVam;
+    } else if (r.avisoVam) {
+      // Desnivel o tiempo fuera de rango, o una VAM imposible: sin cifra, con el porqué.
+      respuesta.aviso_vam = r.avisoVam;
     }
 
     return NextResponse.json(respuesta, { headers: corsHeaders(origin) });

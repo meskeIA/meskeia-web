@@ -11,7 +11,7 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularPotenciaCiclismo,
@@ -40,20 +40,35 @@ const NIVEL_VAM_CLASE: Record<string, string> = {
   'Élite / Profesional':   styles.nivelElite,
 };
 
+// Fondos de las insignias de zona, con texto blanco encima: es texto pequeño y exige 4,5:1.
+// Los tonos de antes (#48A9A6, #27AE60, #F39C12, #E07B39, #E74C3C) daban 2,19-3,82:1
+// (hallazgo 2495); estos conservan el matiz y pasan de 5:1. Iguales en los dos temas, porque
+// el contraste es entre el blanco y el fondo de la propia insignia.
 const ZONA_COLORES: Record<string, string> = {
-  Z1: '#48A9A6',
-  Z2: '#27AE60',
-  Z3: '#F39C12',
-  Z4: '#E07B39',
-  Z5: '#E74C3C',
-  Z6: '#8E44AD',
+  Z1: 'var(--secondary-boton)', // #327874 · 5,15:1
+  Z2: '#1D7A43',                // 5,36:1
+  Z3: '#8A5A00',                // 5,93:1
+  Z4: '#A84D14',                // 5,62:1
+  Z5: '#B03A2E',                // 6,02:1
+  Z6: '#8E44AD',                // 5,87:1
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * Los campos guardan el TEXTO tecleado y el número se deriva con parseSpanishNumber.
+ *
+ * Hasta el 30/09/2026 eran `type="number"` con `setX(Number(e.target.value))`: al teclear un
+ * estado intermedio que todavía no es un número («-» suelto, «14.») el navegador entrega '',
+ * Number('') vale 0 y React reescribía «0» en el campo, así que el signo o el punto
+ * desaparecían y «-7» quedaba en «07» (una subida en vez de una bajada) y «14.5» en «05»
+ * (hallazgo 2491). Y el desnivel, también `type="number"`, leía «1.500» con el punto como
+ * decimal: metro y medio en vez de mil quinientos (hallazgo 2492). Con texto, el campo
+ * muestra lo que se escribe y «1.500» son 1500, el criterio del catálogo.
+ */
 export default function CalculadoraPotenciaCiclismoPage() {
-  const [peso, setPeso] = useState<number>(70);
-  const [ftp, setFtp] = useState<number>(200);
+  const [peso, setPeso] = useState<string>('70');
+  const [ftp, setFtp] = useState<string>('200');
   const [desnivel, setDesnivel] = useState<string>('');
   const [tiempoMin, setTiempoMin] = useState<string>('');
   const [resultado, setResultado] = useState<ResultadoPotenciaCiclismo | null>(null);
@@ -62,18 +77,29 @@ export default function CalculadoraPotenciaCiclismoPage() {
 
   // Estimador de vatios sin potenciómetro (modelo de fuerzas)
   const [mostrarEstimador, setMostrarEstimador] = useState<boolean>(false);
-  const [masaTotal, setMasaTotal] = useState<number>(78);
-  const [velocidad, setVelocidad] = useState<number>(20);
-  const [pendiente, setPendiente] = useState<number>(0);
+  const [masaTotal, setMasaTotal] = useState<string>('78');
+  const [velocidad, setVelocidad] = useState<string>('20');
+  const [pendiente, setPendiente] = useState<string>('0');
   const [vatios, setVatios] = useState<ResultadoVatios | null>(null);
 
+  // Lo tecleado, ya leído como número (NaN si no lo es: el motor lo rechaza con su aviso)
+  const pesoNum = parseSpanishNumber(peso);
+  const ftpNum = parseSpanishNumber(ftp);
+
   const calcular = () => {
-    const des = desnivel !== '' ? Number(desnivel) : undefined;
-    const tMin = tiempoMin !== '' ? Number(tiempoMin) : undefined;
+    const des = desnivel.trim() !== '' ? parseSpanishNumber(desnivel) : undefined;
+    const tMin = tiempoMin.trim() !== '' ? parseSpanishNumber(tiempoMin) : undefined;
+    // Un desnivel o un tiempo que no son un número se avisan aquí: el motor solo sabe de
+    // «falta» o «≤ 0», y un NaN caería en el aviso equivocado.
+    if ((des !== undefined && !Number.isFinite(des)) || (tMin !== undefined && !Number.isFinite(tMin))) {
+      setResultado(null);
+      setError('El desnivel y el tiempo deben ser números (por ejemplo, 850 m y 45 min).');
+      return;
+    }
     try {
       // El motor valida: un peso de 0 kg daba Infinity, que la app rotulaba «∞ W/kg» con el
       // veredicto MÁS favorable de su escala, y uno negativo, con el más desfavorable.
-      setResultado(calcularPotenciaCiclismo(peso, ftp, des, tMin));
+      setResultado(calcularPotenciaCiclismo(pesoNum, ftpNum, des, tMin));
       setError(null);
     } catch (e) {
       setResultado(null);
@@ -84,9 +110,9 @@ export default function CalculadoraPotenciaCiclismoPage() {
   const estimarVatios = () => {
     try {
       const r = calcularVatiosPorFuerzas({
-        masaTotal_kg: masaTotal,
-        velocidad_kmh: velocidad,
-        pendiente_pct: pendiente,
+        masaTotal_kg: parseSpanishNumber(masaTotal),
+        velocidad_kmh: parseSpanishNumber(velocidad),
+        pendiente_pct: parseSpanishNumber(pendiente),
       });
       setVatios(r);
       setError(null);
@@ -124,21 +150,24 @@ export default function CalculadoraPotenciaCiclismoPage() {
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel} htmlFor="peso">
                 Peso corporal
+                <span className={styles.inputHint}>Entre 30 y 150 kg</span>
               </label>
               <div className={styles.inputRow}>
                 <input
                   id="peso"
-                  type="number"
-                  min={30} max={150} value={peso}
-                  onChange={e => { setPeso(Number(e.target.value)); setResultado(null); }}
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  value={peso}
+                  onChange={e => { setPeso(e.target.value); setResultado(null); }}
                   className={styles.inputNumber}
                   aria-label="Peso en kilogramos"
                 />
                 <span className={styles.inputUnidad}>kg</span>
               </div>
               <input
-                type="range" min={30} max={150} value={peso}
-                onChange={e => { setPeso(Number(e.target.value)); setResultado(null); }}
+                type="range" min={30} max={150} value={Number.isFinite(pesoNum) ? pesoNum : 30}
+                onChange={e => { setPeso(e.target.value); setResultado(null); }}
                 className={styles.slider}
                 aria-hidden="true"
                 tabIndex={-1}
@@ -148,22 +177,24 @@ export default function CalculadoraPotenciaCiclismoPage() {
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel} htmlFor="ftp">
                 FTP (Umbral de Potencia Funcional)
-                <span className={styles.inputHint}>Potencia sostenible durante 1 hora</span>
+                <span className={styles.inputHint}>Potencia sostenible durante 1 hora (50-600 W)</span>
               </label>
               <div className={styles.inputRow}>
                 <input
                   id="ftp"
-                  type="number"
-                  min={50} max={600} value={ftp}
-                  onChange={e => { setFtp(Number(e.target.value)); setResultado(null); }}
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  value={ftp}
+                  onChange={e => { setFtp(e.target.value); setResultado(null); }}
                   className={styles.inputNumber}
                   aria-label="FTP en vatios"
                 />
                 <span className={styles.inputUnidad}>W</span>
               </div>
               <input
-                type="range" min={50} max={600} value={ftp}
-                onChange={e => { setFtp(Number(e.target.value)); setResultado(null); }}
+                type="range" min={50} max={600} value={Number.isFinite(ftpNum) ? ftpNum : 50}
+                onChange={e => { setFtp(e.target.value); setResultado(null); }}
                 className={styles.slider}
                 aria-hidden="true"
                 tabIndex={-1}
@@ -188,12 +219,14 @@ export default function CalculadoraPotenciaCiclismoPage() {
               <div className={styles.inputGroup}>
                 <label className={styles.inputLabel} htmlFor="desnivel">
                   Desnivel positivo
+                  <span className={styles.inputHint}>Hasta 3000 m</span>
                 </label>
                 <div className={styles.inputRow}>
                   <input
                     id="desnivel"
-                    type="number"
-                    min={0} max={3000}
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
                     value={desnivel}
                     placeholder="850"
                     onChange={e => { setDesnivel(e.target.value); setResultado(null); }}
@@ -206,12 +239,14 @@ export default function CalculadoraPotenciaCiclismoPage() {
               <div className={styles.inputGroup}>
                 <label className={styles.inputLabel} htmlFor="tiempoMin">
                   Tiempo empleado
+                  <span className={styles.inputHint}>Entre 1 y 600 min</span>
                 </label>
                 <div className={styles.inputRow}>
                   <input
                     id="tiempoMin"
-                    type="number"
-                    min={1} max={600}
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
                     value={tiempoMin}
                     placeholder="45"
                     onChange={e => { setTiempoMin(e.target.value); setResultado(null); }}
@@ -255,16 +290,16 @@ export default function CalculadoraPotenciaCiclismoPage() {
                 <div className={styles.inputGroup}>
                   <label className={styles.inputLabel} htmlFor="masaTotal">
                     Peso total en movimiento
-                    <span className={styles.inputHint}>Tú + la bici + lo que lleves</span>
+                    <span className={styles.inputHint}>Tú + la bici + lo que lleves (30-200 kg)</span>
                   </label>
                   <div className={styles.inputRow}>
                     <input
                       id="masaTotal"
-                      type="number"
-                      min={30}
-                      max={200}
+                      type="text"
+                      inputMode="decimal"
+                      autoComplete="off"
                       value={masaTotal}
-                      onChange={e => { setMasaTotal(Number(e.target.value)); setVatios(null); }}
+                      onChange={e => { setMasaTotal(e.target.value); setVatios(null); }}
                       className={styles.inputNumber}
                       aria-label="Peso total en kilogramos"
                     />
@@ -275,15 +310,16 @@ export default function CalculadoraPotenciaCiclismoPage() {
                 <div className={styles.inputGroup}>
                   <label className={styles.inputLabel} htmlFor="velocidad">
                     Velocidad media sostenida
+                    <span className={styles.inputHint}>Entre 1 y 80 km/h</span>
                   </label>
                   <div className={styles.inputRow}>
                     <input
                       id="velocidad"
-                      type="number"
-                      min={1}
-                      max={80}
+                      type="text"
+                      inputMode="decimal"
+                      autoComplete="off"
                       value={velocidad}
-                      onChange={e => { setVelocidad(Number(e.target.value)); setVatios(null); }}
+                      onChange={e => { setVelocidad(e.target.value); setVatios(null); }}
                       className={styles.inputNumber}
                       aria-label="Velocidad en kilómetros por hora"
                     />
@@ -294,17 +330,18 @@ export default function CalculadoraPotenciaCiclismoPage() {
                 <div className={styles.inputGroup}>
                   <label className={styles.inputLabel} htmlFor="pendiente">
                     Pendiente media
-                    <span className={styles.inputHint}>0 en llano; negativa en bajada</span>
+                    <span className={styles.inputHint}>0 en llano; negativa en bajada (−15 a 25)</span>
                   </label>
                   <div className={styles.inputRow}>
                     <input
                       id="pendiente"
-                      type="number"
-                      min={-15}
-                      max={25}
-                      step={0.5}
+                      type="text"
+                      // Teclado de texto y no «decimal»: el teclado decimal de iOS no trae el
+                      // signo menos, y la pendiente de bajada lo necesita.
+                      inputMode="text"
+                      autoComplete="off"
                       value={pendiente}
-                      onChange={e => { setPendiente(Number(e.target.value)); setVatios(null); }}
+                      onChange={e => { setPendiente(e.target.value); setVatios(null); }}
                       className={styles.inputNumber}
                       aria-label="Pendiente en porcentaje"
                     />
@@ -349,6 +386,16 @@ export default function CalculadoraPotenciaCiclismoPage() {
                       {vatios.vam !== null && (
                         <> Esa subida son {formatNumber(vatios.vam, 0)} m/h de VAM.</>
                       )}
+                    </p>
+                  )}
+                  {/* La potencia a esa velocidad NO es el FTP salvo en un caso concreto, y la guía
+                      y el FAQ la presentaban como si lo fuera (hallazgo 2498). */}
+                  {!vatios.sinPedalear && (
+                    <p className={styles.resultDesc}>
+                      Es la potencia que exige <strong>esa velocidad</strong>, no tu FTP. Solo se
+                      le parece si fue tu esfuerzo máximo sostenido durante alrededor de una hora
+                      (una subida larga o una contrarreloj a tope); en ese caso puedes escribirla
+                      como FTP arriba, con tu peso corporal sin la bici, para ver el W/kg y las zonas.
                     </p>
                   )}
                   <p className={styles.resultDesc}>
@@ -409,7 +456,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
             {/* Tabla de zonas */}
             <div className={styles.zonasCard}>
               <h3 className={styles.zonasTitle}>
-                Zonas de Potencia (basadas en tu FTP: {formatNumber(ftp, 0)} W)
+                Zonas de Potencia (basadas en tu FTP: {formatNumber(ftpNum, 0)} W)
               </h3>
               <div className={styles.tableWrapper}>
                 <table className={styles.zonasTable}>
@@ -479,7 +526,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
                   <h3>¿Cada cuánto actualizarlo?</h3>
                 </div>
                 <p className={styles.escenarioTip}>
-                  Se recomienda repetir el test FTP cada 6–8 semanas de entrenamiento estructurado. El FTP puede mejorar notablemente en principiantes (10–20% en los primeros meses) y de forma más gradual en ciclistas avanzados (2–5% por temporada).
+                  Se recomienda repetir el test FTP cada 6–8 semanas de entrenamiento estructurado. El FTP puede mejorar notablemente en principiantes (10–20&nbsp;% en los primeros meses) y de forma más gradual en ciclistas avanzados (2–5&nbsp;% por temporada).
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -488,7 +535,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
                   <h3>Sin potenciómetro</h3>
                 </div>
                 <p className={styles.escenarioTip}>
-                  Esta misma página lo estima: en «Estimar mis vatios», arriba, con tu peso, la velocidad que sostuviste y la pendiente. Sale del modelo de fuerzas (gravedad, rodadura y aire), así que es orientativo y supone coeficientes típicos de carretera. También hay aplicaciones de entrenamiento (Zwift, TrainerRoad, Garmin Connect) que estiman el FTP con la frecuencia cardíaca y la velocidad en rodillos calibrados. Un potenciómetro físico sigue siendo la medición más precisa.
+                  Esta misma página estima tus vatios: en «¿No tienes potenciómetro? Estima tus vatios a partir de la velocidad», arriba, con tu peso total, la velocidad que sostuviste y la pendiente. Da la potencia que exige esa velocidad, que solo se parece a tu FTP si fue tu esfuerzo máximo sostenido durante alrededor de una hora (una subida larga o una contrarreloj a tope). Sale del modelo de fuerzas (gravedad, rodadura y aire), así que es orientativo y supone coeficientes típicos de carretera. También hay aplicaciones de entrenamiento (Zwift, TrainerRoad, Garmin Connect) que estiman el FTP con la frecuencia cardíaca y la velocidad en rodillos calibrados. Un potenciómetro físico sigue siendo la medición más precisa.
                 </p>
               </div>
             </div>
@@ -507,32 +554,32 @@ export default function CalculadoraPotenciaCiclismoPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong style={{color:'#888'}}>Principiante</strong></td>
+                    <td><strong className={styles.nivelTxtPrincipiante}>Principiante</strong></td>
                     <td>&lt; 1,5</td>
                     <td>Inicio en la bicicleta, salidas cortas</td>
                   </tr>
                   <tr>
-                    <td><strong style={{color:'#27AE60'}}>Cicloturista</strong></td>
+                    <td><strong className={styles.nivelTxtCicloturista}>Cicloturista</strong></td>
                     <td>1,5 – 2,5</td>
                     <td>Salidas regulares en grupo, fondo recreativo</td>
                   </tr>
                   <tr>
-                    <td><strong style={{color:'#2E86AB'}}>Amateur</strong></td>
+                    <td><strong className={styles.nivelTxtAmateur}>Amateur</strong></td>
                     <td>2,5 – 3,5</td>
                     <td>Entrenamiento estructurado, marchas populares</td>
                   </tr>
                   <tr>
-                    <td><strong style={{color:'#E07B39'}}>Amateur competitivo</strong></td>
+                    <td><strong className={styles.nivelTxtCompetitivo}>Amateur competitivo</strong></td>
                     <td>3,5 – 4,5</td>
                     <td>Competición federada, escapadas en carrera</td>
                   </tr>
                   <tr>
-                    <td><strong style={{color:'#E74C3C'}}>Semi-profesional</strong></td>
+                    <td><strong className={styles.nivelTxtSemiPro}>Semi-profesional</strong></td>
                     <td>4,5 – 5,5</td>
                     <td>Ciclismo de élite regional o nacional</td>
                   </tr>
                   <tr>
-                    <td><strong style={{color:'#8E44AD'}}>Profesional / Élite</strong></td>
+                    <td><strong className={styles.nivelTxtElite}>Profesional / Élite</strong></td>
                     <td>&gt; 5,5</td>
                     <td>Nivel World Tour (6,0–7,5 W/kg en grandes escaladores)</td>
                   </tr>
@@ -565,7 +612,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">🔗</span> Relación VAM y W/kg</h4>
                 <p>
-                  Existe una relación aproximada entre VAM y W/kg que depende de la pendiente media. La regla que popularizó el propio Ferrari es <strong>VAM ≈ W/kg × (2 + %pendiente/10) × 100</strong>: al 8 % sale el factor 280, no 255 —ese corresponde a una pendiente del 5,5 %—, y resolver la subida con el modelo de fuerzas da 288 para un ciclista de 70 kg con una bici de 8. Es decir, al 8 % de pendiente, <strong>W/kg ≈ VAM / 280</strong>. La relación varía con la resistencia aerodinámica, el peso de la bici, la temperatura y la altitud: úsala como estimación orientativa, no como fórmula exacta.
+                  Existe una relación aproximada entre VAM y W/kg que depende de la pendiente media. La regla que popularizó el propio Ferrari es <strong>VAM ≈ W/kg × (2 + %pendiente/10) × 100</strong>: al 8&nbsp;% sale el factor 280, no 255 —ese corresponde a una pendiente del 5,5&nbsp;%—, y resolver la subida con el modelo de fuerzas da 288 para un ciclista de 70 kg con una bici de 8. Es decir, al 8&nbsp;% de pendiente, <strong>W/kg ≈ VAM / 280</strong>. La relación varía con la resistencia aerodinámica, el peso de la bici, la temperatura y la altitud: úsala como estimación orientativa, no como fórmula exacta.
                 </p>
               </div>
             </div>
@@ -585,7 +632,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
                 <div className={styles.stepNumber}>2</div>
                 <div className={styles.stepContent}>
                   <h4>Entrena más tiempo en Z2 y Z3 (base aeróbica)</h4>
-                  <p>La mayoría del volumen semanal (70–80%) debería realizarse en Z2 (Resistencia) y Z3 (Tempo). Esta base aeróbica es lo que permite luego expresar el rendimiento en zonas altas sin lesiones ni sobreentrenamiento.</p>
+                  <p>La mayoría del volumen semanal (70–80&nbsp;%) debería realizarse en Z2 (Resistencia) y Z3 (Tempo). Esta base aeróbica es lo que permite luego expresar el rendimiento en zonas altas sin lesiones ni sobreentrenamiento.</p>
                 </div>
               </div>
               <div className={styles.step}>
@@ -628,7 +675,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">🌬️</span>
                 <h4>La aerodinámica importa más en llano</h4>
-                <p>En llano, la resistencia aerodinámica representa el 70–80% del esfuerzo total. Una postura más agresiva sobre la bici o componentes aerodinámicos pueden ser más rentables que mejorar el FTP para reducir tiempos en terreno plano.</p>
+                <p>En llano, la resistencia aerodinámica representa el 70–80&nbsp;% del esfuerzo total. Una postura más agresiva sobre la bici o componentes aerodinámicos pueden ser más rentables que mejorar el FTP para reducir tiempos en terreno plano.</p>
               </div>
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">😴</span>

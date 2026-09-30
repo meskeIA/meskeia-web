@@ -66,7 +66,7 @@ export const faqJsonLd = {
       name: '¿Qué es el FTP en ciclismo y cómo se mide?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El FTP (Functional Threshold Power, potencia umbral funcional) es la potencia máxima en vatios que un ciclista puede mantener durante aproximadamente una hora. Es el indicador de referencia para estructurar el entrenamiento por zonas de potencia. La forma más habitual de medirlo es mediante un test de 20 minutos a máximo esfuerzo: el FTP equivale aproximadamente al 95% de la potencia media obtenida en ese test.',
+        text: 'El FTP (Functional Threshold Power, potencia umbral funcional) es la potencia máxima en vatios que un ciclista puede mantener durante aproximadamente una hora. Es el indicador de referencia para estructurar el entrenamiento por zonas de potencia. La forma más habitual de medirlo es mediante un test de 20 minutos a máximo esfuerzo: el FTP equivale aproximadamente al 95\u00A0% de la potencia media obtenida en ese test.',
       },
     },
     {
@@ -74,7 +74,7 @@ export const faqJsonLd = {
       name: '¿Qué significa el ratio W/kg en ciclismo y qué valores son buenos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El ratio W/kg (vatios por kilogramo de peso corporal) es la métrica más importante para comparar el rendimiento ciclista, especialmente en ascensiones. Un ciclista recreativo medio suele estar entre 2,5 y 3,5 W/kg de FTP; uno amateur competitivo entre 3,5 y 4,5 W/kg; y un profesional de élite supera los 5,5-6 W/kg. A diferencia del FTP absoluto, el W/kg permite comparar ciclistas de distinto peso en rutas con desnivel.',
+        text: 'El ratio W/kg (vatios por kilogramo de peso corporal) es la métrica más importante para comparar el rendimiento ciclista, especialmente en ascensiones. La calculadora usa esta escala de W/kg de FTP: por debajo de 1,5, principiante; de 1,5 a 2,5, cicloturista con salidas recreativas regulares; de 2,5 a 3,5, amateur con entrenamiento estructurado; de 3,5 a 4,5, amateur competitivo; de 4,5 a 5,5, semiprofesional; y por encima de 5,5, profesional o élite (los grandes escaladores del World Tour rondan los 6,0-7,5). A diferencia del FTP absoluto, el W/kg permite comparar ciclistas de distinto peso en rutas con desnivel.',
       },
     },
     {
@@ -90,7 +90,7 @@ export const faqJsonLd = {
       name: '¿Qué es la VAM y cómo se calcula en una subida?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La VAM (Velocidad Ascensional Media) mide cuántos metros de desnivel positivo sube un ciclista por hora. Se calcula dividiendo los metros de desnivel entre el tiempo empleado en superarlos: VAM (m/h) = desnivel (m) / tiempo (h). Un ciclista aficionado suele tener una VAM de 800-1.000 m/h en subidas sostenidas; los profesionales en grandes puertos de montaña superan los 1.600-1.700 m/h.',
+        text: 'La VAM (Velocidad Ascensional Media) mide cuántos metros de desnivel positivo sube un ciclista por hora. Se calcula dividiendo los metros de desnivel entre el tiempo empleado en superarlos: VAM (m/h) = desnivel (m) / tiempo (h). En la escala de la calculadora, por debajo de 800 m/h es nivel principiante; de 800 a 1.000, cicloturista; de 1.000 a 1.200, amateur; de 1.200 a 1.400, amateur fuerte; de 1.400 a 1.600, semiprofesional; y por encima de 1.600 m/h, élite. Los profesionales se mueven en 1.600-1.800 m/h en los grandes puertos de montaña.',
       },
     },
     {
@@ -98,7 +98,7 @@ export const faqJsonLd = {
       name: '¿Necesito un potenciómetro para usar estas métricas de potencia?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para medir el FTP con precisión durante los entrenamientos reales sí se necesita un potenciómetro (medidor de potencia integrado en el pedal, biela o buje), pero la calculadora no lo exige: estima los vatios a partir del peso, la velocidad sostenida y la pendiente, aplicando el modelo de fuerzas (gravedad, rodadura y resistencia del aire). Con esa estimación —o con un FTP ya conocido— calcula el ratio W/kg y las seis zonas de entrenamiento. La VAM, por su parte, solo requiere el desnivel y el tiempo invertido.',
+        text: 'Para medir el FTP con precisión durante los entrenamientos reales sí se necesita un potenciómetro (medidor de potencia integrado en el pedal, biela o buje), pero la calculadora no lo exige: estima los vatios a partir del peso, la velocidad sostenida y la pendiente, aplicando el modelo de fuerzas (gravedad, rodadura y resistencia del aire). Esa cifra es la potencia que exige la velocidad indicada, no el FTP: solo se le aproxima si corresponde a un esfuerzo máximo sostenido durante alrededor de una hora, y en ese caso puede usarse como FTP para calcular el ratio W/kg y las seis zonas de entrenamiento. La VAM, por su parte, solo requiere el desnivel y el tiempo invertido.',
       },
     },
   ],
