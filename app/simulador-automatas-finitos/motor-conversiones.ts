@@ -309,14 +309,16 @@ export function minimizar(automata: AutomataMotor): ResultadoMinimizacion {
   if (alfabeto.length === 0) {
     return { ...VACIO_MIN, error: 'El autómata no tiene ninguna transición con símbolo: no hay nada que minimizar.' };
   }
-  // No determinista: dos transiciones con el mismo origen y símbolo
-  const vistas = new Set<string>();
-  for (const t of transiciones) {
-    const k = `${t.from}|${t.simbolo}`;
-    if (vistas.has(k)) {
-      return { ...VACIO_MIN, error: 'Hay más de una transición con el mismo origen y símbolo: esto es un AFND. Determinízalo primero.' };
-    }
-    vistas.add(k);
+  // No determinista: dos transiciones con el mismo origen y símbolo hacia destinos DISTINTOS.
+  //
+  // ⚠️ 30/09/2026 (hallazgo 2472) — aquí se miraba solo origen|símbolo, así que una flecha
+  // repetida idéntica (q0 -0→ q1 dibujada dos veces) hacía rechazar como AFND un AFD que la
+  // validación y el aviso de la vista trataban, con razón, como determinista. Dos flechas
+  // iguales no son no determinismo: son una. Se decide con el MISMO criterio que la vista,
+  // `conflictosDeterminismo`, para que las dos no vuelvan a discrepar (las ε ya se han
+  // rechazado arriba, así que aquí solo quedan los duplicados).
+  if (conflictosDeterminismo(transiciones).some((c) => c.tipo === 'duplicado')) {
+    return { ...VACIO_MIN, error: 'Hay más de una transición con el mismo origen y símbolo: esto es un AFND. Determinízalo primero.' };
   }
 
   const etiquetaDe = new Map(estados.map((e) => [e.id, e.etiqueta]));
@@ -536,6 +538,17 @@ export function generarPasosValidacion(
   const pasos: PasoValidacion[] = [];
   let activos: string[];
 
+  // La traza nombra cada estado por su ETIQUETA, la que se ve en el lienzo; `estadosActivos`
+  // sigue llevando ids, que es lo que usa la vista para resaltar.
+  //
+  // ⚠️ 30/09/2026 (hallazgo 2473) — escribía el id. En lo dibujado a mano id y etiqueta
+  // coinciden (q0, q1…), pero un AFD cargado desde «Determinizar» o «Minimizar» tiene ids s0,
+  // s1… y etiquetas {q0,q1,q2}: la traza decía «Lee "b" → s1», un nombre que no aparece en
+  // ninguna parte de la pantalla, y el anunciador del paso es lo único que llega a quien no ve
+  // el lienzo.
+  const etiquetaDe = new Map(estados.map((e) => [e.id, e.etiqueta]));
+  const nombres = (ids: string[]): string => ids.map((id) => etiquetaDe.get(id) ?? id).join(', ');
+
   if (alfabeto && alfabeto.length > 0) {
     const permitidos = new Set(alfabeto);
     const i = Array.from(cadena).findIndex((c) => !permitidos.has(c));
@@ -545,7 +558,7 @@ export function generarPasosValidacion(
         posicion: 0,
         simbolo: '',
         estadosActivos: [inicial.id],
-        descripcion: `Estado inicial: ${inicial.id}`,
+        descripcion: `Estado inicial: ${nombres([inicial.id])}`,
       });
       pasos.push({
         posicion: i + 1,
@@ -569,8 +582,8 @@ export function generarPasosValidacion(
     estadosActivos: [...activos],
     descripcion:
       tipo !== tipoDeclarado
-        ? `No es determinista: se siguen todas las ramas a la vez, como en un AFND. Estado(s) inicial(es): ${activos.join(', ')}`
-        : `Estado(s) inicial(es): ${activos.join(', ')}`,
+        ? `No es determinista: se siguen todas las ramas a la vez, como en un AFND. Estado(s) inicial(es): ${nombres(activos)}`
+        : `Estado(s) inicial(es): ${nombres(activos)}`,
   });
 
   for (let i = 0; i < cadena.length; i++) {
@@ -586,7 +599,7 @@ export function generarPasosValidacion(
           posicion: i + 1,
           simbolo,
           estadosActivos: [],
-          descripcion: `Sin transición desde ${activos[0]} con "${simbolo}"`,
+          descripcion: `Sin transición desde ${nombres([activos[0]])} con "${simbolo}"`,
         });
         return { pasos, resultado: 'sin-transicion' };
       }
@@ -618,7 +631,7 @@ export function generarPasosValidacion(
       posicion: i + 1,
       simbolo,
       estadosActivos: [...activos],
-      descripcion: `Lee "${simbolo}" → ${activos.join(', ')}`,
+      descripcion: `Lee "${simbolo}" → ${nombres(activos)}`,
     });
   }
 

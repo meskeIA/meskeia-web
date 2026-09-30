@@ -4,6 +4,7 @@ import {
   minimizar,
   epsilonClausura,
   alfabetoDe,
+  generarPasosValidacion,
   EPSILON,
   type AutomataMotor,
 } from '../app/simulador-automatas-finitos/motor-conversiones';
@@ -269,6 +270,27 @@ test.describe('minimizar — refinamiento de particiones', () => {
     expect(r.error).toContain('AFND');
   });
 
+  /**
+   * A MANO (hallazgo 2472, 30/09/2026) · «Pares de 0» con la flecha q0 -0→ q1 dibujada DOS veces.
+   *
+   *   δ no cambia: q0 -0→ q1 · q1 -0→ q0 · q0 -1→ q0 · q1 -1→ q1 ; q0 inicial y final.
+   *   Partición 0: {q0} | {q1}. Firmas (0,1): q0 → (clase q1, clase q0), q1 → (clase q0, clase q1):
+   *   clases de un solo estado, nada que partir ni fusionar ⇒ 2 estados, «ya era mínimo».
+   *   Dos flechas iguales no son no determinismo: son una (el criterio de `conflictosDeterminismo`).
+   */
+  test('una flecha repetida idéntica NO es un AFND: minimiza como el AFD que es', () => {
+    const r = minimizar(
+      af(
+        [['q0', true, true], ['q1', false, false]],
+        [['q0', '0', 'q1'], ['q1', '0', 'q0'], ['q0', '1', 'q0'], ['q1', '1', 'q1'], ['q0', '0', 'q1']],
+      ),
+    );
+    expect(r.ok).toBe(true);
+    expect(r.automata.estados).toHaveLength(2);
+    expect(r.fusionados).toEqual([]);
+    expect(r.sumideroImplicito).toBe(false);
+  });
+
   test('RECHAZO: sin estado inicial no se minimiza', () => {
     const r = minimizar(af([['q0', false, true]], [['q0', 'a', 'q0']]));
     expect(r.ok).toBe(false);
@@ -346,5 +368,50 @@ test.describe('auxiliares', () => {
         { from: 'a', to: 'b', simbolo: EPSILON },
       ]),
     ).toEqual(['a', 'b']);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+// Traza de la validación
+// ─────────────────────────────────────────────────────────────
+
+test.describe('generarPasosValidacion — la traza nombra los estados por su etiqueta', () => {
+  /**
+   * A MANO (hallazgo 2473, 30/09/2026) · el AFD de «a*b*c*» tal y como queda al cargarlo en el
+   * lienzo: ids s0, s1, s2 y etiquetas {q0,q1,q2}, {q1,q2}, {q2}, los tres finales.
+   *   s0 -a→ s0 · s0 -b→ s1 · s0 -c→ s2 · s1 -b→ s1 · s1 -c→ s2 · s2 -c→ s2
+   *   «ab»: {q0,q1,q2} -a→ {q0,q1,q2} -b→ {q1,q2} (final) ⇒ ACEPTADA, 3 pasos.
+   *   «ba»: {q0,q1,q2} -b→ {q1,q2}, y con «a» desde {q1,q2} no hay flecha ⇒ SIN TRANSICIÓN.
+   * El resaltado del lienzo sigue yendo por id: el último paso de «ab» activa s1.
+   */
+  const estados = [
+    { id: 's0', etiqueta: '{q0,q1,q2}', esInicial: true, esFinal: true },
+    { id: 's1', etiqueta: '{q1,q2}', esInicial: false, esFinal: true },
+    { id: 's2', etiqueta: '{q2}', esInicial: false, esFinal: true },
+  ];
+  const transiciones = [
+    { from: 's0', to: 's0', simbolo: 'a' },
+    { from: 's0', to: 's1', simbolo: 'b' },
+    { from: 's0', to: 's2', simbolo: 'c' },
+    { from: 's1', to: 's1', simbolo: 'b' },
+    { from: 's1', to: 's2', simbolo: 'c' },
+    { from: 's2', to: 's2', simbolo: 'c' },
+  ];
+
+  test('A MANO: «ab» se traza con {q0,q1,q2} y {q1,q2}, no con s0 y s1', () => {
+    const r = generarPasosValidacion('ab', 'dfa', estados, transiciones);
+    expect(r.resultado).toBe('aceptada');
+    expect(r.pasos.map((p) => p.descripcion)).toEqual([
+      'Estado(s) inicial(es): {q0,q1,q2}',
+      'Lee "a" → {q0,q1,q2}',
+      'Lee "b" → {q1,q2}',
+    ]);
+    expect(r.pasos[2].estadosActivos).toEqual(['s1']);
+  });
+
+  test('A MANO: «ba» se detiene diciendo desde qué conjunto falta la flecha', () => {
+    const r = generarPasosValidacion('ba', 'dfa', estados, transiciones);
+    expect(r.resultado).toBe('sin-transicion');
+    expect(r.pasos[r.pasos.length - 1].descripcion).toBe('Sin transición desde {q1,q2} con "a"');
   });
 });

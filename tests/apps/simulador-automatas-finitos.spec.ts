@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliares';
 import {
   CASOS,
   comprobarRespuesta,
@@ -26,6 +27,11 @@ import {
  * obligatoria del CLAUDE.md §5, que un lector de pantalla agradece— el nombre pasó a ser
  * «Validar» a secas y estos selectores dejaron de encontrar nada. Lo que el test comprueba
  * no ha cambiado: solo cómo se localiza el botón.
+ *
+ * ACTUALIZADO 30/09/2026 (hallazgo 2476, WCAG 2.5.3): «Toggle final» se anunciaba «Alternar
+ * estado final» y «Limpiar todo», «Limpiar lienzo». Ahora el nombre accesible es lo que pone en
+ * el botón («Alternar final», «Limpiar todo») y así los localizan estos casos; lo que comprueban
+ * no cambia.
  *
  * Los 3 casos de este fichero se trazaron A MANO antes de tocar el navegador, y se
  * verifican por DOS vías independientes que comparten el mismo motor:
@@ -384,7 +390,7 @@ test.describe('Inspector 27/09/2026 · casos límite', () => {
   test('autómata sin estados finales: rechaza todo, también ε, y minimiza a una sola clase', async ({
     page,
   }) => {
-    await page.getByRole('button', { name: 'Alternar estado final' }).click();
+    await page.getByRole('button', { name: 'Alternar final' }).click();
     await circuloDe(page, 'q0').click();
     await expect(page.locator('[class*="estadoResumen"]')).toContainText('Finales: 0');
     await escribirLote(page, '\n00\n1');
@@ -400,7 +406,7 @@ test.describe('Inspector 27/09/2026 · casos límite', () => {
   // tiene 1 estados.» porque `page.tsx` escribía «estados» fijo detrás de la cifra. Ahora la
   // palabra concuerda con la cifra (`contar`), aquí y en la determinización.
   test('con un único estado mínimo, el resumen dice «tiene 1 estado.»', async ({ page }) => {
-    await page.getByRole('button', { name: 'Alternar estado final' }).click();
+    await page.getByRole('button', { name: 'Alternar final' }).click();
     await circuloDe(page, 'q0').click();
     await page.getByRole('button', { name: 'Minimizar el AFD', exact: true }).click();
     await expect(page.locator('[class*="convResultado"]')).toContainText(/tiene 1 estado\./);
@@ -508,7 +514,7 @@ test.describe('Inspector 27/09/2026 · lo que debe rechazarse o avisarse', () =>
     }
     await expect(page.locator('[class*="estadoResumen"]')).toContainText('4 estados');
 
-    await page.getByRole('button', { name: 'Alternar estado final' }).click();
+    await page.getByRole('button', { name: 'Alternar final' }).click();
     await circuloDe(page, 'q2').click();
 
     const simbolos = ['b', 'a'];
@@ -878,7 +884,7 @@ test.describe('Inspector 30/09/2026 · casos resueltos a mano (escritorio)', () 
     await page.getByRole('button', { name: /a\*b\*c\*/ }).click();
     await page.getByRole('button', { name: 'Minimizar el AFD', exact: true }).click();
     await expect(error).toContainText('Solo se minimiza un AFD, y este tiene transiciones ε. Determinízalo primero.');
-    await page.getByRole('button', { name: 'Limpiar lienzo' }).click();
+    await page.getByRole('button', { name: 'Limpiar todo' }).click();
     await page.getByRole('button', { name: 'Determinizar (AFND → AFD)', exact: true }).click();
     await expect(error).toContainText('El autómata no tiene estado inicial: no hay por dónde empezar.');
 
@@ -891,15 +897,15 @@ test.describe('Inspector 30/09/2026 · casos resueltos a mano (escritorio)', () 
     );
   });
 
-  // ABIERTO (Inspector 30/09/2026): una flecha repetida idéntica no hace no determinista un AFD
-  // —el propio motor lo dice en `conflictosDeterminismo`: «Dos flechas iguales (mismo origen,
-  // símbolo y destino) no son no determinismo: son una»—, y la validación lo trata así (sin
-  // aviso). Pero `minimizar` mira solo origen|símbolo y lo rechaza como AFND.
+  // REPARADO el 30/09/2026 (hallazgo 2472): una flecha repetida idéntica no hace no determinista
+  // un AFD —el propio motor lo dice en `conflictosDeterminismo`: «Dos flechas iguales (mismo
+  // origen, símbolo y destino) no son no determinismo: son una»—, y la validación lo trataba así
+  // (sin aviso). Pero `minimizar` miraba solo origen|símbolo y lo rechazaba como AFND. Ahora
+  // decide con el mismo `conflictosDeterminismo` (golden en tests/automatas-motor.spec.ts).
   // A MANO, «Pares de 0» + otra q0-0→q1: δ no cambia, así que 00 ACEPTADA, 0 RECHAZADA, y
   // minimizado P0 = {q0} | {q1}, firmas (0,1): q0 → (N,F), q1 → (F,N); nada que fusionar ⇒
   // «ya era mínimo con sus 2 estados».
   test('una flecha repetida idéntica no convierte el AFD en AFND al minimizar', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026)
     page.once('dialog', (d) => d.accept('0'));
     await page.getByRole('button', { name: 'Añadir transición' }).click();
     await circuloDe(page, 'q0').click();
@@ -914,14 +920,14 @@ test.describe('Inspector 30/09/2026 · casos resueltos a mano (escritorio)', () 
     await expect(page.locator('[class*="convError"]')).toHaveCount(0);
   });
 
-  // ABIERTO (Inspector 30/09/2026): `cargarEnLienzo` da a los estados cargados el id s0, s1… y
-  // la etiqueta del conjunto; la traza de la validación escribe el ID. A MANO, sobre el AFD de
+  // REPARADO el 30/09/2026 (hallazgo 2473): `cargarEnLienzo` da a los estados cargados el id s0,
+  // s1… y la etiqueta del conjunto; la traza de la validación escribía el ID. Ahora la traza (y la
+  // pista de «Transición») nombra cada estado por su etiqueta; el resaltado sigue yendo por id. A MANO, sobre el AFD de
   // «a*b*c*» cargado en el lienzo, «ab»: {q0,q1,q2} -a→ {q0,q1,q2} -b→ {q1,q2} (final) ⇒
-  // ACEPTADA. La app dice «Estado(s) inicial(es): s0», «Lee "a" → s0», «Lee "b" → s1»: nombres
+  // ACEPTADA. La app decía «Estado(s) inicial(es): s0», «Lee "a" → s0», «Lee "b" → s1»: nombres
   // que no aparecen en ninguna parte de la pantalla (el lienzo resalta bien {q1,q2}). El
   // anunciador es aria-live: para quien no ve el lienzo, la traza es lo único que hay.
   test('tras cargar el AFD en el lienzo, la traza nombra los estados como el lienzo', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026)
     await page.getByRole('button', { name: /a\*b\*c\*/ }).click();
     await page.getByRole('button', { name: 'Determinizar (AFND → AFD)', exact: true }).click();
     await page.getByRole('button', { name: 'Cargar el AFD en el lienzo' }).click();
@@ -934,32 +940,41 @@ test.describe('Inspector 30/09/2026 · casos resueltos a mano (escritorio)', () 
     await pasoSiguiente.click();
     await expect(anunciadorDelPaso(page)).toContainText('Paso 3 / 3: Lee "b" → {q1,q2}');
     await expect(page.locator('[role="alert"]', { hasText: 'ACEPTADA' })).toBeVisible();
+
+    // La pista del modo «Transición» también nombra el origen por su etiqueta (decía «Origen: s0»).
+    // «Termina en c»: el AFD cargado pone {q0,q1,q2} arriba del círculo (índice 0, ángulo -90°).
+    await page.getByRole('button', { name: 'Añadir transición' }).click();
+    await circuloDe(page, '\\{q0,q1,q2\\}').click();
+    await expect(page.locator('[class*="modoHint"]')).toHaveText('Origen: {q0,q1,q2}. Selecciona el destino.');
   });
 
-  // ABIERTO (Inspector 30/09/2026): con el lienzo vacío, el mensaje «Activa «Añadir estado» y
+  // REPARADO el 30/09/2026 (hallazgo 2471): con el lienzo vacío, el mensaje «Activa «Añadir estado» y
   // haz clic en el lienzo» ocupa el centro y NO lleva `pointer-events: none` (las etiquetas de
-  // estado y de flecha sí): el clic cae en el <text>, `handleClickLienzo` solo acepta svg o
-  // rect, y no se crea nada. Mide 315 × 21 unidades en escritorio y 574 × 38 en móvil (el 72 %
+  // estado y de flecha sí): el clic caía en el <text>, `handleClickLienzo` solo acepta svg o
+  // rect, y no se creaba nada. Ahora el mensaje lleva `pointer-events: none`. Mide 315 × 21 unidades en escritorio y 574 × 38 en móvil (el 72 %
   // del ancho). A MANO: «Limpiar todo», «Añadir estado» y clic en el centro (400, 250) ⇒ un
   // estado q0, inicial por ser el primero, en (400, 250).
   test('con el lienzo vacío, un clic sobre el mensaje del centro crea el estado', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026)
-    await page.getByRole('button', { name: 'Limpiar lienzo' }).click();
+    await page.getByRole('button', { name: 'Limpiar todo' }).click();
     await page.getByRole('button', { name: 'Añadir estado' }).click();
     const p = await aPantalla(page, 400, 250);
     await page.mouse.click(p.x, p.y);
     await expect(page.locator('[class*="estadoResumen"]')).toContainText('1 estado');
     await expect(page.locator('[class*="estadoResumen"]')).toContainText('Iniciales: 1');
+    const nuevo = circuloDe(page, 'q0');
+    expect(Math.abs(Number(await nuevo.getAttribute('cx')) - 400)).toBeLessThanOrEqual(5);
+    expect(Math.abs(Number(await nuevo.getAttribute('cy')) - 250)).toBeLessThanOrEqual(5);
   });
 
-  // ABIERTO (Inspector 30/09/2026): sin ratón no se puede editar el autómata. Todo lo que hace
+  // REPARADO el 30/09/2026 (hallazgo 2470): sin ratón no se podía editar el autómata. Todo lo que hace
   // el editor (añadir estado, transición, marcar inicial o final, borrar) exige pulsar dentro
   // del <svg role="img">, que no tiene ni un elemento enfocable: con «Añadir estado» activado
   // por teclado, el Tab salta de «Limpiar todo» a «Determinizar (AFND → AFD)», en otro panel.
   // WCAG 2.1.1 (nivel A). Se exige lo mínimo que cualquier reparación deja: algo enfocable en
-  // el panel del editor fuera de la barra de herramientas.
+  // el panel del editor fuera de la barra de herramientas. La reparación es «El autómata en
+  // texto», bajo el lienzo: listas de estados y transiciones con sus controles; el caso de abajo
+  // construye un autómata entero con el teclado.
   test('el panel del editor tiene, fuera de la barra, algo alcanzable con el teclado', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026)
     const enfocables = await panelDelEditor(page).evaluate(
       (panel) =>
         [...panel.querySelectorAll('a[href], button, input, select, textarea, [tabindex]')].filter(
@@ -969,13 +984,77 @@ test.describe('Inspector 30/09/2026 · casos resueltos a mano (escritorio)', () 
     expect(enfocables).toBeGreaterThan(0);
   });
 
-  // ABIERTO (Inspector 30/09/2026): el veredicto es EL resultado de la app y se pinta en verde,
-  // rojo y naranja claros sobre un fondo del mismo color al 12-15 %. Texto de 16,8 px en negrita
+  // REPARADO el 30/09/2026 (hallazgo 2470) · CASO NORMAL construido SOLO con el teclado (los
+  // botones se activan con Intro o Espacio; los desplegables son <select> nativos).
+  // AFD «número IMPAR de aes» sobre {a, b}, el mismo del caso móvil de abajo:
+  //   q0 (inicial, por ser el primero) -a→ q1 · q1 -a→ q0 · q0 -b→ q0 · q1 -b→ q1 · q1 final
+  // A MANO: bab → q0 -b→ q0 -a→ q1 -b→ q1 (final) ⇒ ACEPTADA · aab → q0 → q1 → q0 → q0 ⇒ RECHAZADA.
+  // Sin q1 -b→ q1: bab → q0 → q0 → q1 y con «b» desde q1 no hay flecha ⇒ SIN TRANSICIÓN.
+  // Sin el estado q1 se van con él sus tres flechas (q0-a→q1, q1-a→q0, q1-b→q1 ya quitada): queda
+  // q0 -b→ q0, 1 estado y 1 transición.
+  test('con el teclado se crea, conecta, marca y borra: el AFD «impar de aes» valida lo calculado a mano', async ({
+    page,
+  }) => {
+    await page.locator('#alfabeto').fill('a,b');
+    await esperarValorEnReact(page, '#alfabeto', 'a,b');
+    await page.getByRole('button', { name: 'Limpiar todo' }).focus();
+    await page.keyboard.press('Enter');
+    const resumen = page.locator('[class*="estadoResumen"]');
+    await expect(resumen).toContainText('0 estados');
+
+    // Desde la barra, el Tab llega al editor en texto (antes saltaba a «Determinizar»).
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('button', { name: 'Nuevo estado' })).toBeFocused();
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Enter');
+    await expect(resumen).toContainText('2 estados');
+    await expect(resumen).toContainText('Iniciales: 1');
+
+    const desde = page.getByLabel('Desde', { exact: true });
+    const simbolo = page.getByLabel(/^con el símbolo/);
+    const hasta = page.getByLabel('va a', { exact: true });
+    for (const [de, s, a] of [
+      ['q0', 'a', 'q1'],
+      ['q1', 'a', 'q0'],
+      ['q0', 'b', 'q0'],
+      ['q1', 'b', 'q1'],
+    ]) {
+      await desde.selectOption(de);
+      await hasta.selectOption(a);
+      await simbolo.focus();
+      await page.keyboard.type(s);
+      await page.keyboard.press('Enter');
+    }
+    await page.getByRole('button', { name: 'Final (q1)' }).focus();
+    await page.keyboard.press(' ');
+    await expect(page.getByRole('button', { name: 'Final (q1)' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(resumen).toContainText('4 transiciones');
+    await expect(resumen).toContainText('Finales: 1');
+    await expect(page.locator('[class*="avisosAutomata"]')).toHaveText('');
+    // Lo creado en texto está en el lienzo
+    await expect(circuloDe(page, 'q1')).toBeVisible();
+
+    await escribirLote(page, 'bab\naab');
+    await expect(veredictosDelLote(page)).toHaveText([/Aceptada/, /Rechazada/]);
+
+    await page.getByRole('button', { name: 'Quitar la transición de q1 con b a q1' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(resumen).toContainText('3 transiciones');
+    await expect(veredictosDelLote(page)).toHaveText([/Sin transición/, /Rechazada/]);
+
+    await page.getByRole('button', { name: 'Quitar el estado q1' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(resumen).toContainText('1 estado');
+    await expect(resumen).toContainText('1 transición');
+  });
+
+  // REPARADO el 30/09/2026 (hallazgo 2474): el veredicto es EL resultado de la app y se pintaba en
+  // verde, rojo y naranja claros sobre un fondo del mismo color al 12-15 %. Ahora el texto va en el
+  // tono 700-800 de su color en claro y en el 300 en oscuro (se mide en los dos temas, abajo). Texto de 16,8 px en negrita
   // (13,6 px en el lote): no es «texto grande» (< 18,66 px en negrita), así que WCAG 1.4.3 pide
   // 4,5:1. Medido en tema claro: ACEPTADA 2,20:1 · RECHAZADA 3,09:1 (lote 3,22:1) · SIN
   // TRANSICIÓN 2,13:1. «Pares de 0»: «00» ACEPTADA y «0» RECHAZADA (trazas del caso 1 y 3).
   test('el veredicto se lee: 4,5:1 en la validación y en el lote (tema claro)', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026)
     await escribirLote(page, '00\n0');
     await expect(veredictosDelLote(page)).toHaveText([/Aceptada/, /Rechazada/]);
     expect(await contrasteDe(page.locator('[class*="badgeAceptada"]').first())).toBeGreaterThanOrEqual(4.5);
@@ -987,24 +1066,107 @@ test.describe('Inspector 30/09/2026 · casos resueltos a mano (escritorio)', () 
     expect(await contrasteDe(alerta)).toBeGreaterThanOrEqual(4.5);
   });
 
-  // ABIERTO (Inspector 30/09/2026) — la sospecha del 28/09 (contraste de marca en botones y en
-  // «Casos para clase», sin medir en esta app): texto blanco sobre var(--primary) da 4,11:1 en
-  // claro y 2,79:1 en oscuro («Validar», «Cargar el AFD en el lienzo», «Comprobar», el caso
+  // REPARADO el 30/09/2026 (hallazgo 2474), el resto del caso: RECHAZADA y SIN TRANSICIÓN en la
+  // validación, las celdas de la cinta (leída y actual) y los tres veredictos del lote, EN LOS DOS
+  // TEMAS. A MANO en «Pares de 0»: «0» → q1 ⇒ RECHAZADA; con q1 -1→ q1 quitada, «01» → q1 y con
+  // «1» desde q1 no hay flecha ⇒ SIN TRANSICIÓN. «010» a mitad (paso 2 de 4) deja la celda 1
+  // leída y la 2 actual.
+  for (const tema of ['light', 'dark'] as const) {
+    test(`veredictos, lote y cinta llegan a 4,5:1 (tema ${tema === 'light' ? 'claro' : 'oscuro'})`, async ({
+      page,
+    }) => {
+      // Sin transiciones: el cambio de tema se mediría a medio camino (fondos grises intermedios)
+      await prepararParaMedir(page);
+      await activarTema(page, tema);
+      const medir = async (loc: import('@playwright/test').Locator, que: string) => {
+        await expect(loc).toBeVisible();
+        const c = await contrasteDe(loc);
+        expect(c, `${que}: ${c.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
+      };
+      await page.locator('#cadena').fill('010');
+      await page.getByRole('button', { name: 'Validar', exact: true }).click();
+      await page.getByRole('button', { name: 'Pausar', exact: true }).click();
+      // Se fija el paso 3 de 4 (tras leer «0» y «1»): celda 1 leída, celda 2 actual
+      const pasoMostrado = async () => Number((await anunciadorDelPaso(page).innerText()).match(/^Paso (\d+)/)?.[1]);
+      for (let n = await pasoMostrado(); n !== 3; n = await pasoMostrado()) {
+        const boton = n > 3 ? 'Paso anterior' : 'Paso siguiente';
+        await page.getByRole('button', { name: boton, exact: true }).click();
+      }
+      await medir(page.locator('[class*="celdaLeida"]').first(), 'celda leída');
+      await medir(page.locator('[class*="celdaActual"]').first(), 'celda actual');
+
+      await page.locator('#cadena').fill('0');
+      await page.getByRole('button', { name: 'Validar', exact: true }).click();
+      await medir(page.locator('[role="alert"]', { hasText: 'RECHAZADA' }), 'RECHAZADA');
+      await page.locator('#cadena').fill('00');
+      await page.getByRole('button', { name: 'Validar', exact: true }).click();
+      await medir(page.locator('[role="alert"]', { hasText: 'ACEPTADA' }), 'ACEPTADA');
+
+      await page.getByRole('button', { name: 'Eliminar', exact: true }).click();
+      await page.locator('[class*="transicionLabel"]', { hasText: /^1$/ }).last().click({ force: true });
+      await expect(page.locator('[class*="estadoResumen"]')).toContainText('3 transiciones');
+      await page.locator('#cadena').fill('01');
+      await page.getByRole('button', { name: 'Validar', exact: true }).click();
+      await medir(page.locator('[role="alert"]', { hasText: 'SIN TRANSICIÓN' }), 'SIN TRANSICIÓN');
+
+      await escribirLote(page, '00\n0\n01');
+      await expect(veredictosDelLote(page)).toHaveText([/Aceptada/, /Rechazada/, /Sin transición/]);
+      await medir(page.locator('[class*="badgeAceptada"]').first(), 'lote Aceptada');
+      await medir(page.locator('[class*="badgeRechazada"]').first(), 'lote Rechazada');
+      await medir(page.locator('[class*="badgeSinTransicion"]').first(), 'lote Sin transición');
+    });
+  }
+
+  // REPARADO el 30/09/2026 (hallazgo 2475) — la sospecha del 28/09 (contraste de marca en botones
+  // y en «Casos para clase», sin medir en esta app): texto blanco sobre var(--primary) daba 4,11:1
+  // en claro y 2,79:1 en oscuro («Validar», «Cargar el AFD en el lienzo», «Comprobar», el caso
   // activo), y el título del caso en var(--secondary) 2,68:1. Todo es texto de 15-17,6 px ⇒ 4,5:1.
+  // Ahora van con --primary-boton / --*-texto; el caso de abajo mide el resto en los dos temas.
   test('los botones de marca y el título del caso se leen (4,5:1, tema claro)', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026)
     await page.getByRole('button', { name: /^Caso 1:/ }).click();
     expect(await contrasteDe(page.getByRole('button', { name: 'Validar', exact: true }))).toBeGreaterThanOrEqual(4.5);
     expect(await contrasteDe(page.getByRole('button', { name: 'Comprobar', exact: true }))).toBeGreaterThanOrEqual(4.5);
     expect(await contrasteDe(page.locator('[class*="casoTitulo"]'))).toBeGreaterThanOrEqual(4.5);
   });
 
-  // ABIERTO (Inspector 30/09/2026): tres botones de la barra se anuncian con un nombre que no
-  // contiene lo que pone en ellos (WCAG 2.5.3, nivel A): quien los maneja por voz y dice lo que
-  // lee («pulsa Toggle final», «pulsa Limpiar todo») no los activa. «Toggle final» es además un
-  // anglicismo en una interfaz en español.
+  // REPARADO el 30/09/2026 (hallazgo 2475), el caso completo del acta y en LOS DOS TEMAS: además de
+  // lo de arriba, «Cargar el AFD en el lienzo», el caso activo, la etiqueta del tipo de caso,
+  // «800 ms», «Ver pista», el modo activo de la barra y «Limpiar todo».
+  for (const tema of ['light', 'dark'] as const) {
+    test(`botones de marca, barra y «Casos para clase» llegan a 4,5:1 (tema ${tema === 'light' ? 'claro' : 'oscuro'})`, async ({
+      page,
+    }) => {
+      // Sin transiciones: el cambio de tema se mediría a medio camino (fondos grises intermedios)
+      await prepararParaMedir(page);
+      await activarTema(page, tema);
+      const medir = async (loc: import('@playwright/test').Locator, que: string) => {
+        await expect(loc).toBeVisible();
+        const c = await contrasteDe(loc);
+        expect(c, `${que}: ${c.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
+      };
+      await medir(page.getByRole('button', { name: 'Validar', exact: true }), 'Validar');
+      await medir(page.locator('[class*="velocidadValor"]'), '800 ms');
+      await medir(page.getByRole('button', { name: 'Mover estados' }), 'modo activo');
+      await medir(page.getByRole('button', { name: 'Limpiar todo' }), 'Limpiar todo');
+      await medir(page.locator('[class*="estadoResumen"] strong').first(), 'cifras del resumen');
+      await page.getByRole('button', { name: /a\*b\*c\*/ }).click();
+      await page.getByRole('button', { name: 'Determinizar (AFND → AFD)', exact: true }).click();
+      await medir(page.getByRole('button', { name: 'Cargar el AFD en el lienzo' }), 'Cargar el AFD');
+
+      await page.getByRole('button', { name: /^Caso 1:/ }).click();
+      await medir(page.getByRole('button', { name: /^Caso 1:/ }), 'caso activo');
+      await medir(page.locator('[class*="casoTitulo"]'), 'título del caso');
+      await medir(page.locator('[class*="casoEtiquetaTipo"]'), 'etiqueta del tipo');
+      await medir(page.getByRole('button', { name: 'Comprobar', exact: true }), 'Comprobar');
+      await medir(page.getByRole('button', { name: /Ver pista/ }), 'Ver pista');
+    });
+  }
+
+  // REPARADO el 30/09/2026 (hallazgo 2476): tres botones de la barra se anunciaban con un nombre
+  // que no contenía lo que pone en ellos (WCAG 2.5.3, nivel A): quien los maneja por voz y dice lo
+  // que lee («pulsa Toggle final», «pulsa Limpiar todo») no los activaba. «Toggle final» era
+  // además un anglicismo: ahora dice «Alternar final», y el nombre accesible es el texto visible.
   test('cada botón de la barra se anuncia con un nombre que contiene su texto visible', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026)
     const botones = await page.locator('[role="toolbar"] button').evaluateAll((bs) =>
       bs.map((b) => ({
         visible: [...b.childNodes]
@@ -1045,7 +1207,8 @@ test.describe('Inspector 30/09/2026 · móvil 390×844 con el dedo', () => {
   // A MANO: bab → q0 -b→ q0 -a→ q1 -b→ q1 (final) ⇒ ACEPTADA (4 pasos, el último «Lee "b" → q1»)
   //         aab → q0 -a→ q1 -a→ q0 -b→ q0 ⇒ RECHAZADA · ε → q0 ⇒ RECHAZADA
   //         abc → «c» ∉ {a, b} ⇒ FUERA DEL ALFABETO
-  // Los estados se ponen en y = 380, lejos del mensaje del lienzo vacío (ver el ABIERTO de arriba).
+  // Los estados se ponen en y = 380, lejos del mensaje del lienzo vacío (hallazgo 2471, ya
+  // reparado: el mensaje ya no se come el toque, pero el caso conserva sus coordenadas).
   // El `beforeEach` carga «Pares de 0», que declara Σ = {0, 1}, y «Limpiar todo» no toca el
   // alfabeto: se declara {a, b} a mano, o bab y aab saldrían FUERA DEL ALFABETO (y con razón).
   test('crear, conectar y marcar final con el dedo: el AFD «impar de aes» valida lo calculado a mano', async ({
@@ -1055,7 +1218,7 @@ test.describe('Inspector 30/09/2026 · móvil 390×844 con el dedo', () => {
     page.on('dialog', (d) => d.accept(simbolos.shift() ?? ''));
     await page.locator('#alfabeto').fill('a,b');
     await esperarValorEnReact(page, '#alfabeto', 'a,b');
-    await page.getByRole('button', { name: 'Limpiar lienzo' }).click();
+    await page.getByRole('button', { name: 'Limpiar todo' }).click();
     await page.getByRole('button', { name: 'Añadir estado' }).click();
     await tocarEnLienzo(page, 200, 380);
     await tocarEnLienzo(page, 550, 380);
@@ -1071,7 +1234,7 @@ test.describe('Inspector 30/09/2026 · móvil 390×844 con el dedo', () => {
       await tocarEnLienzo(page, de, 380);
       await tocarEnLienzo(page, a, 380);
     }
-    await page.getByRole('button', { name: 'Alternar estado final' }).click();
+    await page.getByRole('button', { name: 'Alternar final' }).click();
     await tocarEnLienzo(page, 550, 380);
     const resumen = page.locator('[class*="estadoResumen"]');
     await expect(resumen).toContainText('4 transiciones');
@@ -1088,16 +1251,18 @@ test.describe('Inspector 30/09/2026 · móvil 390×844 con el dedo', () => {
     await expect(anunciadorDelPaso(page)).toContainText('Paso 4 / 4: Lee "b" → q1');
   });
 
-  // ABIERTO (Inspector 30/09/2026) — la sospecha del 27/09, con caso: en «Mover» (el modo de
-  // entrada, «Arrastra los estados para reorganizarlos») el dedo no mueve nada. La app solo
-  // escucha mousedown/mousemove/mouseup, y un arrastre táctil no los genera: el navegador lo
-  // toma como desplazamiento de la página. El gesto se envía como toques reales (CDP
+  // REPARADO el 30/09/2026 (hallazgo 2469) — la sospecha del 27/09, con caso: en «Mover» (el modo
+  // de entrada, «Arrastra los estados para reorganizarlos») el dedo no movía nada. La app solo
+  // escuchaba mousedown/mousemove/mouseup, y un arrastre táctil no los genera: el navegador lo
+  // tomaba como desplazamiento de la página. Ahora el arrastre va por eventos de puntero, y un
+  // touchmove nativo no pasivo cancela el desplazamiento solo mientras hay un estado agarrado
+  // (receta de simulador-grafos; el candado de abajo vigila que el resto del lienzo siga
+  // desplazando la página). El gesto se envía como toques reales (CDP
   // Input.dispatchTouchEvent), no como ratón. A MANO: arrastrar q1 de (520, 250) a (650, 120)
   // lo deja en (650, 120) ±5, como hace el ratón en escritorio (caso del 27/09); y mientras se
   // arrastra un estado la página no se desplaza. Medido: q1 sigue en (520, 250) y la página
   // baja 37 px.
   test('arrastrar un estado con el dedo lo deja bajo el dedo y no desplaza la página', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 30/09/2026)
     await lienzo(page).evaluate((el) => el.scrollIntoView({ block: 'center' }));
     const desde = await aPantalla(page, 520, 250);
     const hasta = await aPantalla(page, 650, 120);

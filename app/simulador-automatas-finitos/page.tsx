@@ -70,6 +70,21 @@ const FUENTE_BASE = 13;
 /** Lo mínimo que debe medir en pantalla una etiqueta del lienzo, en px (hallazgo 2293). */
 const FUENTE_MIN_PX = 10.5;
 
+/**
+ * Dónde cae un estado creado desde el editor en texto, que no tiene un punto pulsado: el primer
+ * hueco de una rejilla que quede a más de dos anillos de final de cualquier otro estado. Si la
+ * rejilla está llena, el centro (se puede mover luego con el dedo o el ratón).
+ */
+function posicionLibre(estados: { x: number; y: number }[]): { x: number; y: number } {
+  const separacion = 2 * RADIO_FINAL + 30;
+  for (const y of [250, 120, 380]) {
+    for (const x of [160, 400, 640, 280, 520, 90, 710]) {
+      if (estados.every((e) => Math.hypot(e.x - x, e.y - y) >= separacion)) return { x, y };
+    }
+  }
+  return { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+}
+
 const EJEMPLOS: Record<string, EjemploAutomata> = {
   par_ceros: {
     titulo: 'DFA — Pares de 0',
@@ -229,8 +244,34 @@ export default function SimuladorAutomatasFinitos() {
 
   // Estados auxiliares para el editor
   const [origenTransicion, setOrigenTransicion] = useState<string | null>(null);
-  const [arrastrando, setArrastrando] = useState<string | null>(null);
+  // El estado que se está arrastrando en «Mover». Es una ref, no un estado de React, porque la
+  // lee también la escucha táctil nativa de abajo, que se registra una sola vez.
+  const arrastrando = useRef<string | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
+
+  // Editor en texto (hallazgo 2470): la transición que se está componiendo con el teclado
+  const [formOrigen, setFormOrigen] = useState<string>('');
+  const [formDestino, setFormDestino] = useState<string>('');
+  const [formSimbolo, setFormSimbolo] = useState<string>('');
+
+  /*
+   * ⚠️ 30/09/2026 (hallazgo 2469) — el arrastre solo escuchaba mousedown/mousemove/mouseup, y un
+   * arrastre con el dedo no genera eventos de ratón: en móvil el estado no se movía y el gesto
+   * desplazaba la página. Ahora va por eventos de puntero (ratón, dedo y lápiz), con la receta
+   * de simulador-grafos (28/09/2026): el lienzo lleva touch-action: manipulation, para que
+   * deslizar por él siga desplazando la página, y solo mientras hay un estado agarrado se
+   * cancela el desplazamiento aquí. Tiene que ser una escucha nativa y NO pasiva: React registra
+   * las táctiles como pasivas, y touch-action en los hijos de un <svg> Chromium lo ignora.
+   */
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const retenerGesto = (evt: TouchEvent) => {
+      if (arrastrando.current !== null && evt.cancelable) evt.preventDefault();
+    };
+    svg.addEventListener('touchmove', retenerGesto, { passive: false });
+    return () => svg.removeEventListener('touchmove', retenerGesto);
+  }, []);
 
   // Escala a la que se pinta el viewBox 800×500 (1 en escritorio; ~0,37 en un móvil de 393 px).
   // ⚠️ 27/09/2026 (hallazgo 2293) — en móvil las etiquetas de 13 unidades salían a 4 px. La
@@ -502,33 +543,34 @@ export default function SimuladorAutomatasFinitos() {
     [modo, origenTransicion, siguienteIdTransicion, tipo],
   );
 
-  // Drag de estado
-  const handleMouseDownEstado = useCallback(
-    (estadoId: string, e: React.MouseEvent) => {
+  // Arrastre de un estado, con ratón o con el dedo (eventos de puntero; ver la escucha táctil)
+  const handlePointerDownEstado = useCallback(
+    (estadoId: string, e: React.PointerEvent) => {
       if (modo !== 'move') return;
       e.stopPropagation();
-      setArrastrando(estadoId);
+      arrastrando.current = estadoId;
     },
     [modo],
   );
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<SVGSVGElement>) => {
-      if (!arrastrando) return;
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<SVGSVGElement>) => {
+      const id = arrastrando.current;
+      if (!id) return;
       const { x, y } = obtenerCoordenadasSvg(e);
       const xClamp = Math.max(40, Math.min(SVG_WIDTH - 40, x));
       const yClamp = Math.max(40, Math.min(SVG_HEIGHT - 40, y));
       setEstados((prev) =>
         prev.map((est) =>
-          est.id === arrastrando ? { ...est, x: xClamp, y: yClamp } : est,
+          est.id === id ? { ...est, x: xClamp, y: yClamp } : est,
         ),
       );
     },
-    [arrastrando, obtenerCoordenadasSvg],
+    [obtenerCoordenadasSvg],
   );
 
-  const handleMouseUp = useCallback(() => {
-    setArrastrando(null);
+  const handlePointerUp = useCallback(() => {
+    arrastrando.current = null;
   }, []);
 
   // Click en transición
@@ -551,6 +593,52 @@ export default function SimuladorAutomatasFinitos() {
     setReproduciendo(false);
     setOrigenTransicion(null);
   }, []);
+
+  // ── Editor en texto (hallazgo 2470) ──
+  // Lo mismo que el lienzo, con controles de formulario: sin ratón no había forma de editar el
+  // autómata, porque todo exigía pulsar dentro de un <svg role="img"> sin nada enfocable.
+  const anadirEstadoLibre = useCallback(() => {
+    setEstados((prev) => {
+      const usados = new Set(prev.map((e) => e.id));
+      let n = 0;
+      while (usados.has(`q${n}`)) n += 1;
+      const id = `q${n}`;
+      const { x, y } = posicionLibre(prev);
+      return [...prev, { id, etiqueta: id, x, y, esInicial: prev.length === 0, esFinal: false }];
+    });
+  }, []);
+
+  const marcarInicial = useCallback((estadoId: string) => {
+    setEstados((prev) => prev.map((est) => ({ ...est, esInicial: est.id === estadoId })));
+  }, []);
+
+  const alternarFinal = useCallback((estadoId: string) => {
+    setEstados((prev) =>
+      prev.map((est) => (est.id === estadoId ? { ...est, esFinal: !est.esFinal } : est)),
+    );
+  }, []);
+
+  const quitarEstado = useCallback((estadoId: string) => {
+    setEstados((prev) => prev.filter((est) => est.id !== estadoId));
+    setTransiciones((prev) => prev.filter((tr) => tr.from !== estadoId && tr.to !== estadoId));
+    setOrigenTransicion((o) => (o === estadoId ? null : o));
+  }, []);
+
+  const quitarTransicion = useCallback((transicionId: string) => {
+    setTransiciones((prev) => prev.filter((tr) => tr.id !== transicionId));
+  }, []);
+
+  // Los desplegables apuntan a ids: si el elegido desaparece, vale el primero que quede
+  const origenForm = estados.some((e) => e.id === formOrigen) ? formOrigen : (estados[0]?.id ?? '');
+  const destinoForm = estados.some((e) => e.id === formDestino) ? formDestino : (estados[0]?.id ?? '');
+
+  const crearTransicionTexto = useCallback(() => {
+    const simbolo = formSimbolo.trim();
+    if (simbolo === '' || origenForm === '' || destinoForm === '') return;
+    const nuevoId = siguienteIdTransicion();
+    setTransiciones((prev) => [...prev, { id: nuevoId, from: origenForm, to: destinoForm, simbolo }]);
+    setFormSimbolo('');
+  }, [formSimbolo, origenForm, destinoForm, siguienteIdTransicion]);
 
   const limpiarLienzo = useCallback(() => {
     setEstados([]);
@@ -682,6 +770,10 @@ export default function SimuladorAutomatasFinitos() {
         {/* Toolbar de modos */}
         <div className={styles.panel}>
           <h2 className={styles.panelTitle}>Editor visual</h2>
+          {/* ⚠️ 30/09/2026 (hallazgo 2476, WCAG 2.5.3) — tres botones se anunciaban con un nombre
+              que no contenía su texto visible («Toggle final» era «Alternar estado final»,
+              «Limpiar todo» era «Limpiar lienzo»): quien los maneja por voz y dice lo que lee no
+              los activaba. Donde queda un aria-label, contiene lo que se ve. */}
           <div className={styles.toolbar} role="toolbar" aria-label="Herramientas del editor">
             <button
               type="button"
@@ -729,7 +821,6 @@ export default function SimuladorAutomatasFinitos() {
                 setModo('set-initial');
                 setOrigenTransicion(null);
               }}
-              aria-label="Marcar estado inicial"
               aria-pressed={modo === 'set-initial'}
             >
               <span aria-hidden="true">▶</span>
@@ -742,11 +833,10 @@ export default function SimuladorAutomatasFinitos() {
                 setModo('toggle-final');
                 setOrigenTransicion(null);
               }}
-              aria-label="Alternar estado final"
               aria-pressed={modo === 'toggle-final'}
             >
               <span aria-hidden="true">◎</span>
-              <span>Toggle final</span>
+              <span>Alternar final</span>
             </button>
             <button
               type="button"
@@ -765,7 +855,6 @@ export default function SimuladorAutomatasFinitos() {
               type="button"
               className={styles.toolBtnSecondary}
               onClick={limpiarLienzo}
-              aria-label="Limpiar lienzo"
             >
               Limpiar todo
             </button>
@@ -777,7 +866,7 @@ export default function SimuladorAutomatasFinitos() {
             {modo === 'add-transition' &&
               (origenTransicion === null
                 ? 'Selecciona el estado de origen.'
-                : `Origen: ${origenTransicion}. Selecciona el destino.`)}
+                : `Origen: ${etiquetaDe.get(origenTransicion) ?? origenTransicion}. Selecciona el destino.`)}
             {modo === 'set-initial' && 'Haz clic en el estado que será el inicial.'}
             {modo === 'toggle-final' && 'Haz clic en un estado para alternar si es final.'}
             {modo === 'delete' && 'Haz clic en un estado o transición para eliminar.'}
@@ -792,11 +881,12 @@ export default function SimuladorAutomatasFinitos() {
               width="100%"
               height={SVG_HEIGHT}
               onClick={handleClickLienzo}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+              onPointerLeave={handlePointerUp}
               role="img"
-              aria-label="Editor visual del autómata"
+              aria-label={`Diagrama del autómata: ${contar(estados.length, 'estado', 'estados')} y ${contar(transiciones.length, 'transición', 'transiciones')}. En texto, y editable con el teclado, en «El autómata en texto», bajo el diagrama.`}
             >
               {/* Fondo */}
               <rect
@@ -892,7 +982,7 @@ export default function SimuladorAutomatasFinitos() {
                   <g
                     key={est.id}
                     onClick={(e) => handleClickEstado(est.id, e)}
-                    onMouseDown={(e) => handleMouseDownEstado(est.id, e)}
+                    onPointerDown={(e) => handlePointerDownEstado(est.id, e)}
                     style={{
                       cursor:
                         modo === 'move'
@@ -979,6 +1069,166 @@ export default function SimuladorAutomatasFinitos() {
               Finales: <strong>{finales.size}</strong>
             </span>
           </div>
+
+          {/* ── El autómata en texto ──
+              ⚠️ 30/09/2026 (hallazgo 2470, WCAG 2.1.1) — sin ratón no se podía editar nada: todo
+              exigía pulsar dentro del <svg role="img">, que no tiene ni un elemento enfocable, y
+              los estados y las transiciones no llegaban a un lector de pantalla. Aquí está el
+              mismo autómata como listas y controles de formulario: se lee, y se crea, marca y
+              borra con el teclado. Lo que se hace aquí se ve en el lienzo, y al revés. */}
+          <section className={styles.editorTexto} aria-labelledby="editor-texto-titulo">
+            <h3 id="editor-texto-titulo" className={styles.editorTextoTitulo}>
+              El autómata en texto
+            </h3>
+            <p className={styles.editorTextoIntro}>
+              El mismo autómata del diagrama, para leerlo o editarlo con el teclado.
+            </p>
+            <div className={styles.editorTextoGrid}>
+              <div>
+                <h4 className={styles.editorTextoSub}>Estados</h4>
+                {estados.length === 0 ? (
+                  <p className={styles.editorTextoVacio}>Todavía no hay ningún estado.</p>
+                ) : (
+                  <ul className={styles.editorLista}>
+                    {estados.map((est) => (
+                      <li key={est.id} className={styles.editorFila}>
+                        <span className={styles.editorNombre}>
+                          <code>{est.etiqueta}</code>
+                          {(est.esInicial || est.esFinal) && (
+                            <span className={styles.editorMarcas}>
+                              {[est.esInicial ? 'inicial' : '', est.esFinal ? 'final' : '']
+                                .filter(Boolean)
+                                .join(' y ')}
+                            </span>
+                          )}
+                        </span>
+                        <span className={styles.editorAcciones}>
+                          <button
+                            type="button"
+                            className={styles.editorBtn}
+                            aria-pressed={est.esInicial}
+                            onClick={() => marcarInicial(est.id)}
+                          >
+                            Inicial<span className={styles.srOnly}> ({est.etiqueta})</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.editorBtn}
+                            aria-pressed={est.esFinal}
+                            onClick={() => alternarFinal(est.id)}
+                          >
+                            Final<span className={styles.srOnly}> ({est.etiqueta})</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.editorBtnQuitar}
+                            onClick={() => quitarEstado(est.id)}
+                          >
+                            Quitar<span className={styles.srOnly}> el estado {est.etiqueta}</span>
+                          </button>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <button type="button" className={styles.btnSecondary} onClick={anadirEstadoLibre}>
+                  Nuevo estado
+                </button>
+              </div>
+
+              <div>
+                <h4 className={styles.editorTextoSub}>Transiciones</h4>
+                {transiciones.length === 0 ? (
+                  <p className={styles.editorTextoVacio}>Todavía no hay ninguna transición.</p>
+                ) : (
+                  <ul className={styles.editorLista}>
+                    {transiciones.map((t) => {
+                      const de = etiquetaDe.get(t.from) ?? t.from;
+                      const a = etiquetaDe.get(t.to) ?? t.to;
+                      return (
+                        <li key={t.id} className={styles.editorFila}>
+                          <span className={styles.editorNombre}>
+                            <code>{de}</code> con <code>{t.simbolo}</code> va a <code>{a}</code>
+                          </span>
+                          <button
+                            type="button"
+                            className={styles.editorBtnQuitar}
+                            onClick={() => quitarTransicion(t.id)}
+                          >
+                            Quitar
+                            <span className={styles.srOnly}>
+                              {' '}
+                              la transición de {de} con {t.simbolo} a {a}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+                <div className={styles.editorForm}>
+                  <div className={styles.editorCampo}>
+                    <label htmlFor="editor-desde">Desde</label>
+                    <select
+                      id="editor-desde"
+                      value={origenForm}
+                      onChange={(e) => setFormOrigen(e.target.value)}
+                      disabled={estados.length === 0}
+                    >
+                      {estados.map((est) => (
+                        <option key={est.id} value={est.id}>
+                          {est.etiqueta}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className={styles.editorCampo}>
+                    <label htmlFor="editor-simbolo">
+                      con el símbolo{tipo === 'nfa' ? ' (ε para épsilon)' : ''}
+                    </label>
+                    <input
+                      id="editor-simbolo"
+                      type="text"
+                      value={formSimbolo}
+                      onChange={(e) => setFormSimbolo(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          crearTransicionTexto();
+                        }
+                      }}
+                      maxLength={8}
+                      autoComplete="off"
+                      className={styles.editorSimbolo}
+                    />
+                  </div>
+                  <div className={styles.editorCampo}>
+                    <label htmlFor="editor-hasta">va a</label>
+                    <select
+                      id="editor-hasta"
+                      value={destinoForm}
+                      onChange={(e) => setFormDestino(e.target.value)}
+                      disabled={estados.length === 0}
+                    >
+                      {estados.map((est) => (
+                        <option key={est.id} value={est.id}>
+                          {est.etiqueta}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.btnSecondary}
+                    onClick={crearTransicionTexto}
+                    disabled={estados.length === 0 || formSimbolo.trim() === ''}
+                  >
+                    Crear transición
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
 
         {/* Conversiones: los dos algoritmos que se piden en examen, ejecutados sobre
