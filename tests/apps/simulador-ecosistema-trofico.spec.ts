@@ -935,7 +935,8 @@ test.describe('Inspección 24/09/2026 — casos para clase contra el modelo, lí
  *       intensidad sí se conserva: con «Contaminación del agua» sale el 50 % y el escenario A del
  *       24/09 (75 · 31 · 12 · 4,6).
  *
- * HALLAZGOS NUEVOS (ABIERTOS, con test.fail comprobado sin la marca):
+ * HALLAZGOS NUEVOS (2477-2482), abiertos con test.fail comprobado sin la marca y REPARADOS el
+ *   mismo 30/09/2026 (los testigos, más abajo, ya en verde):
  *   · La cima de la pirámide no cabe en su escalón: 84 px de caja para 124 px de contenido.
  *   · Complejidad = resiliencia afirmada como hecho (la sospecha del 27/09). Fuentes: May 1972,
  *     Nature 238:413 · McCann 2000, Nature 405:228 · Dunne, Williams y Martinez 2002, Ecology
@@ -949,6 +950,24 @@ test.describe('Inspección 24/09/2026 — casos para clase contra el modelo, lí
  *   · «Productores: 100 % energía solar» en la leyenda, cuando las plantas fijan en torno al 1 %
  *     de la luz (Wikipedia, «Photosynthetic efficiency»: 3-6 % como máximo).
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Hallazgo 2477, en los cuatro ecosistemas: nada sobresale de su escalón y la pirámide sigue siendo
+ * una pirámide (cada escalón más ancho que el de encima), para que la reparación no pueda consistir
+ * en ensanchar la cima hasta la base.
+ */
+async function comprobarPiramide(page: Page): Promise<void> {
+  const grupo = page.getByRole('group', { name: 'Seleccionar ecosistema' });
+  for (const eco of ['Pradera', 'Bosque Templado', 'Océano', 'Sabana']) {
+    await grupo.getByRole('button', { name: eco, exact: true }).click();
+    await expect(grupo.getByRole('button', { name: eco, exact: true })).toHaveAttribute('aria-pressed', 'true');
+    expect(await fueraDeSuEscalon(page), eco).toEqual([]);
+    const anchos = await page
+      .locator('[role="list"][aria-label="Pirámide trófica"] [role="listitem"]')
+      .evaluateAll((es) => es.map((e) => e.getBoundingClientRect().width));
+    for (let i = 1; i < anchos.length; i++) expect(anchos[i], `${eco}: escalón ${i}`).toBeGreaterThan(anchos[i - 1]);
+  }
+}
 
 /** Lo que sobresale de cada escalón de la pirámide: spans cuyo borde cae fuera de su caja (> 1 px). */
 async function fueraDeSuEscalon(page: Page): Promise<string[]> {
@@ -1040,31 +1059,30 @@ test.describe('Inspector 30/09/2026 — escritorio', () => {
     expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['75 (-25)', '31 (-7)', '12 (-2)', '4,6 (-0,4)']);
   });
 
-  test('ABIERTO · la cima de la pirámide cabe en su escalón (hoy «Superdepreda…», 84 px para 124)', async ({ page }) => {
-    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
-    test.fail(true, 'ABIERTO desde el 30/09/2026: la cima de la pirámide desborda su escalón');
-    // Esperado: cada rótulo dentro de su escalón. Obtenido (1280 px, pradera de fábrica): el
-    // escalón de arriba mide el 30 % de 280 px = 84 px y su contenido 124; «Superdepredadores»
-    // sobresale 41 px a la derecha, blanco sobre el fondo blanco de la página, y el emoji 40 px
-    // a la izquierda. En claro se lee «Superdepreda» y el «5» de «5 ind. rel.» sale mordido.
-    expect(await fueraDeSuEscalon(page)).toEqual([]);
+  test('2477 · la cima de la pirámide cabe en su escalón, en los cuatro ecosistemas', async ({ page }) => {
+    // REPARADO el 30/09/2026 (hallazgo 2477). El escalón de arriba medía el 30 % de 280 px = 84 px
+    // y su contenido 124: «Superdepredadores» sobresalía 41 px a la derecha, blanco sobre el fondo
+    // de la página, y el emoji 40 px a la izquierda. Ahora el emoji va encima del rótulo, los
+    // ejemplos pueden partirse y los anchos son 52/68/84/100 % (146 px la cima a 1280 px).
+    await comprobarPiramide(page);
   });
 
-  test('ABIERTO · la red trófica no se da por más resiliente como hecho (sospecha del 27/09)', async ({ page }) => {
-    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
-    test.fail(true, 'ABIERTO desde el 30/09/2026: complejidad = resiliencia afirmado como hecho');
-    // Esperado: la relación complejidad-estabilidad como debate (May 1972; McCann 2000; Landi et al.
+  test('2478 · la red trófica no se da por más resiliente como hecho (sospecha del 27/09)', async ({ page }) => {
+    // REPARADO el 30/09/2026 (hallazgo 2478): la FAQ presenta la relación como debate y cita lo
+    // medido en redes reales. Esperado: la relación complejidad-estabilidad como debate (May 1972; McCann 2000; Landi et al.
     // 2018), y lo medido en redes reales: la robustez ante extinciones en cadena crece con la
     // conectancia, no con el número de especies (Dunne et al. 2002). Obtenido, en la FAQ «¿Qué
     // diferencia hay entre cadena y red trófica?»: «las redes son enormemente complejas, lo que
     // hace al sistema más resiliente: si desaparece una especie, hay alternativas».
     const frase = 'enormemente complejas, lo que hace al sistema más resiliente';
     expect(await laPaginaDice(page, frase), frase).toBe(false);
+    const texto = (await textoDeLaPagina(page)).replace(/\s+/g, ' ');
+    expect(texto).toContain('es un debate abierto. May (1972)');
+    expect(texto).toContain('Dunne, Williams y Martinez (2002)');
   });
 
-  test('ABIERTO · cada tarjeta de las preguntas frecuentes lleva su pregunta', async ({ page }) => {
-    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
-    test.fail(true, 'ABIERTO desde el 30/09/2026: la FAQ de los eslabones sin su <h4>');
+  test('2479 · cada tarjeta de las preguntas frecuentes lleva su pregunta', async ({ page }) => {
+    // REPARADO el 30/09/2026 (hallazgo 2479): vuelve el <h4>, con el comentario encima.
     // 3ea3c384 (hallazgo 1610) sustituyó el <h4>«¿Cuántos eslabones puede tener una cadena
     // trófica?» por el comentario de la reparación: queda una respuesta que empieza «Pocos:» sin
     // la pregunta a la que responde, y el lector de pantalla no la encuentra por encabezados.
@@ -1074,12 +1092,13 @@ test.describe('Inspector 30/09/2026 — escritorio', () => {
         .map((item) => (item.querySelector('p')?.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 40))
     );
     expect(sinPregunta).toEqual([]);
+    await expect(
+      page.locator('[class*="faqItem"] h4', { hasText: '¿Cuántos eslabones puede tener una cadena trófica?' })
+    ).toHaveCount(1);
   });
 
-  test('ABIERTO · Yellowstone no se cuenta como hecho demostrado', async ({ page }) => {
-    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
-    test.fail(true, 'ABIERTO desde el 30/09/2026: Yellowstone como hecho');
-    // Esperado: hipótesis debatida. Marshall, Hobbs y Cooper (2013, Proc. R. Soc. B): «moderating
+  test('2480 · Yellowstone no se cuenta como hecho demostrado', async ({ page }) => {
+    // REPARADO el 30/09/2026 (hallazgo 2480), en la tarjeta y en el FAQPage. Esperado: hipótesis debatida. Marshall, Hobbs y Cooper (2013, Proc. R. Soc. B): «moderating
     // browsing alone was not sufficient to restore riparian zones along small streams»; Hobbs et
     // al. (2024, Ecological Monographs), 20 años de experimento. Obtenido: «Los valles se
     // revegetaron, los ríos se estabilizaron y aumentó la biodiversidad» y, en el FAQPage, «que
@@ -1089,30 +1108,51 @@ test.describe('Inspector 30/09/2026 — escritorio', () => {
       [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join(' ')
     );
     expect(faq.includes('restableció el equilibrio vegetal'), 'FAQPage: restableció el equilibrio vegetal').toBe(false);
+    expect(faq.includes('Marshall, Hobbs y Cooper, 2013; Hobbs et al., 2024'), 'FAQPage: la réplica').toBe(true);
+    const texto = (await textoDeLaPagina(page)).replace(/\s+/g, ' ');
+    expect(texto).toContain('uapitíes (Cervus canadensis)');
+    expect(texto).toContain('(Marshall, Hobbs y Cooper, 2013; Hobbs et al., 2024)');
   });
 
-  test('ABIERTO · Myers et al. (2007) se cita por lo que dice y con su réplica', async ({ page }) => {
-    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
-    test.fail(true, 'ABIERTO desde el 30/09/2026: Myers et al. exagerado y sin su réplica');
-    // Myers et al. (Science 315:1846): la depredación de las rayas bastó para «terminate a
+  test('2481 · Myers et al. (2007) se cita por lo que dice y con su réplica', async ({ page }) => {
+    // REPARADO el 30/09/2026 (hallazgo 2481). Myers et al. (Science 315:1846): la depredación de las rayas bastó para «terminate a
     // century-long scallop fishery» (una pesquería, la de la vieira). Grubbs et al. (2016,
     // Scientific Reports 6:20970): «the purported trophic cascade is lacking the empirical linkages
     // required of a trophic cascade». Obtenido: «La industria pesquera de Carolina del Norte
     // colapsó. Eliminar un superdepredador puede destruir toda la red alimentaria subyacente.»
     const frase = 'La industria pesquera de Carolina del Norte colapsó';
     expect(await laPaginaDice(page, frase), frase).toBe(false);
+    expect(await laPaginaDice(page, 'destruir toda la red alimentaria'), 'generalización').toBe(false);
+    const texto = (await textoDeLaPagina(page)).replace(/\s+/g, ' ');
+    expect(texto).toContain('una pesquería de vieira que llevaba un siglo activa');
+    expect(texto).toContain('Grubbs et al. (2016)');
   });
 
-  test('ABIERTO · la leyenda no dice que los productores tengan el 100 % de la energía solar', async ({ page }) => {
-    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
-    test.fail(true, 'ABIERTO desde el 30/09/2026: «Productores: 100 % energía solar»');
-    // El 100 % es la energía que FIJAN los productores (la propia FAQ: «el 0,01 % de la energía
+  test('2482 · la leyenda no dice que los productores tengan el 100 % de la energía solar', async ({ page }) => {
+    // REPARADO el 30/09/2026 (hallazgo 2482): «Productores: 100 % de la energía fijada», y la nota
+    // de la leyenda explica que es una pequeña parte de la luz. El 100 % es la energía que FIJAN los productores (la propia FAQ: «el 0,01 % de la energía
     // que fijaron los productores»); de la luz, las plantas convierten como mucho un 3-6 %
     // (Wikipedia, «Photosynthetic efficiency») y en torno al 1 % de media, como enseña
     // visualizador-ecosistema. Obtenido: «Productores: 100 % energía solar».
     // `\s` casa con el espacio normal y con el duro: vale se escriba como se escriba.
     const primera = (await page.locator('[class*="leyendaLinea"]').first().textContent()) ?? '';
     expect(primera).not.toMatch(/100\s*%\s*energía solar/);
+    expect(primera.trim()).toBe('Productores: 100\u00A0% de la energía fijada');
+    await expect(page.locator('[class*="leyendaNota"]')).toContainText('no la luz que reciben');
+  });
+
+  test('sospecha del 30/09 · la tundra no tiene al oso polar de cima y el FAQPage no hace de los descomponedores un nivel', async ({ page }) => {
+    // REPARADO el 30/09/2026 (SOSPECHAS.md). Caso: tabla comparativa → fila Tundra Ártica →
+    // esperado un depredador de caribús y lemmings → obtenido «Oso polar», un mamífero marino
+    // que caza focas sobre el hielo. Y la pregunta 1 del FAQPage daba cinco niveles con los
+    // descomponedores dentro cuando la página y el simulador definen cuatro sin ellos.
+    const fila = page.locator('table tr', { hasText: 'Tundra Ártica' });
+    await expect(fila.locator('td').nth(3)).toHaveText('Lobo, zorro ártico');
+    const faq = await page.evaluate(() =>
+      [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join(' ')
+    );
+    expect(faq.includes('y descomponedores (hongos y bacterias que reciclan materia orgánica)')).toBe(false);
+    expect(faq.includes('Los descomponedores (hongos y bacterias) no ocupan un escalón de la cadena')).toBe(true);
   });
 });
 
@@ -1151,11 +1191,10 @@ test.describe('Inspector 30/09/2026 — móvil 390×844', () => {
     expect(ancho.doc).toBeLessThanOrEqual(ancho.vista);
   });
 
-  test('ABIERTO · en móvil la cima de la pirámide tampoco cabe (83 px para 123)', async ({ page }) => {
-    // ABIERTO: se espera que falle hasta que se repare; entonces se quita la marca.
-    test.fail(true, 'ABIERTO desde el 30/09/2026: la cima de la pirámide desborda su escalón en móvil');
-    // Mismo defecto que en escritorio: «Superdepredadores» 42 px fuera, el emoji 41 px fuera y
-    // «Águilas, halcones» y «5 ind. rel.» 2 px mordidos por el borde.
-    expect(await fueraDeSuEscalon(page)).toEqual([]);
+  test('2477 · en móvil la cima de la pirámide también cabe, en los cuatro ecosistemas', async ({ page }) => {
+    // REPARADO el 30/09/2026 (hallazgo 2477). Antes, 83 px para 123: «Superdepredadores» 42 px
+    // fuera, el emoji 41 px fuera y «Águilas, halcones» y «5 ind. rel.» 2 px mordidos por el borde.
+    // Ahora la pirámide mide 276 px y la cima el 52 %, 144 px.
+    await comprobarPiramide(page);
   });
 });

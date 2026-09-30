@@ -72,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Qué es una cadena trófica y cuáles son sus niveles?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una cadena trófica es la secuencia de organismos en la que cada uno se alimenta del anterior, transfiriendo energía y materia. Los niveles son: productores (plantas y algas que fotosintetizan), consumidores primarios (herbívoros), consumidores secundarios (carnívoros que comen herbívoros), consumidores terciarios (carnívoros que comen carnívoros) y descomponedores (hongos y bacterias que reciclan materia orgánica). En un ecosistema real coexisten múltiples cadenas formando una red trófica.',
+        text: 'Una cadena trófica es la secuencia de organismos en la que cada uno se alimenta del anterior, transfiriendo energía y materia. Los niveles son: productores (plantas y algas que fotosintetizan), consumidores primarios (herbívoros), consumidores secundarios (carnívoros que comen herbívoros) y consumidores terciarios o superdepredadores (carnívoros que comen carnívoros). Los descomponedores (hongos y bacterias) no ocupan un escalón de la cadena: se alimentan de la materia muerta de todos los niveles y devuelven sus nutrientes al suelo o al agua. En un ecosistema real coexisten múltiples cadenas formando una red trófica.',
       },
     },
     {
@@ -88,7 +88,7 @@ export const faqJsonLd = {
       name: '¿Qué es una cascada trófica y cómo afecta al ecosistema?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una cascada trófica es el efecto en cadena que provoca el aumento o la disminución drástica de una especie sobre los demás niveles del ecosistema. Por ejemplo, la eliminación de un depredador tope provoca explosión de herbívoros, que devoran la vegetación y reducen la biodiversidad. El caso más estudiado es la reintroducción del lobo en Yellowstone (1995), que restableció el equilibrio vegetal al controlar a los ciervos.',
+        text: 'Una cascada trófica es el efecto en cadena que provoca el aumento o la disminución drástica de una especie sobre los demás niveles del ecosistema. Por ejemplo, la eliminación de un depredador tope puede disparar la población de herbívoros, que a su vez reducen la vegetación. Un caso clásico es el de las nutrias marinas, los erizos y los bosques de kelp del Pacífico (Estes y Palmisano, 1974). La reintroducción del lobo en Yellowstone (1995) se propuso como otro ejemplo, pero es un caso debatido: estudios de campo de hasta 20 años (Marshall, Hobbs y Cooper, 2013; Hobbs et al., 2024) encuentran que la recuperación de los sauces es limitada y depende también de la pérdida de los castores.',
       },
     },
     {

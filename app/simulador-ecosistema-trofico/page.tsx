@@ -162,8 +162,10 @@ export default function SimuladorEcosistemaTroficoPage() {
   const nivelesInvertidos = [...nivelesActuales].reverse();
   const clasesInvertidas = [...NOMBRES_CLASE_NIVEL].reverse();
 
-  // Anchos de pirámide: base 100%, luego 75%, 50%, 30%
-  const anchosPiramide = ['30%', '55%', '75%', '100%'];
+  // Anchos de pirámide, de la cima a la base. Eran 30/55/75/100 % y la cima (84 px) no daba
+  // cabida a «Superdepredadores» (hallazgo 2477): la escala sigue siendo una pirámide, pero su
+  // escalón más estrecho tiene que caber el rótulo más largo a 390 px de pantalla.
+  const anchosPiramide = ['52%', '68%', '84%', '100%'];
 
   const handleReset = () => {
     setEventoId('ninguno');
@@ -364,6 +366,10 @@ export default function SimuladorEcosistemaTroficoPage() {
                 Esta leyenda representa la <strong>transferencia de energía</strong> entre niveles (regla del 10&nbsp;%),
                 un concepto distinto de la <strong>población relativa</strong> mostrada en las barras de arriba:
                 un nivel puede tener pocos individuos pero canalizar mucha energía, o al contrario.
+                El 100&nbsp;% es la energía que <strong>fijan</strong> los productores con la fotosíntesis,
+                no la luz que reciben: de esa luz aprovechan solo una pequeña parte (en la práctica,
+                pocas veces más del 1-2&nbsp;%; el máximo teórico ronda el 4,6&nbsp;% en las plantas C3 y
+                el 6&nbsp;% en las C4, según Zhu, Long y Ort, 2008).
               </p>
               {/* Las cifras se LEEN del dato (`energiaPorcentaje`), no se escriben a mano.
                   Estaban rellenas en los 16 niveles de los cuatro ecosistemas y no se leían
@@ -377,7 +383,9 @@ export default function SimuladorEcosistemaTroficoPage() {
                     <div className={styles.leyendaProduces} style={{ background: COLORES_NIVEL[idx] }} />
                     <span>
                       {nivel.nombre}: {formatNumber(nivel.energiaPorcentaje, nivel.energiaPorcentaje < 1 ? 1 : 0)}&nbsp;%
-                      {idx === 0 ? ' energía solar' : ''}
+                      {/* Decía «Productores: 100 % energía solar», que se lee como que las plantas
+                          se quedan con toda la luz del sol (hallazgo 2482). */}
+                      {idx === 0 ? ' de la energía fijada' : ''}
                     </span>
                   </div>
                 ))}
@@ -479,7 +487,9 @@ export default function SimuladorEcosistemaTroficoPage() {
                     <td><span aria-hidden="true">🏔️</span> Tundra Ártica</td>
                     <td>Líquenes y musgos</td>
                     <td>Caribús, lemmings</td>
-                    <td>Oso polar</td>
+                    {/* Decía «Oso polar»: es un mamífero marino que caza focas sobre el hielo, no
+                        el depredador de los caribús y lemmings de esta fila (sospecha del 30/09). */}
+                    <td>Lobo, zorro ártico</td>
                     <td>Deshielo ártico (cambio climático)</td>
                   </tr>
                   <tr>
@@ -500,21 +510,34 @@ export default function SimuladorEcosistemaTroficoPage() {
               <div className={styles.scenarioCard}>
                 <span className={styles.scenarioIcon} aria-hidden="true">🐺</span>
                 <strong>Reintroducción del lobo en Yellowstone (EE. UU., 1995)</strong>
+                {/* Contaba como hecho demostrado que los valles se revegetaron y los ríos se
+                    estabilizaron (hallazgo 2480, el mismo que el 1741 en visualizador-ecosistema).
+                    Es una hipótesis debatida: Marshall, Hobbs y Cooper (2013, Proc. R. Soc. B) y
+                    Hobbs et al. (2024, Ecological Monographs). Los «ciervos» de allí son uapitíes. */}
                 <p>
-                  La vuelta de los lobos redujo a los ciervos y cambió su comportamiento (dejaron
-                  de pastar en zonas abiertas). Los valles se revegetaron, los ríos se estabilizaron
-                  y aumentó la biodiversidad. Ejemplo clásico de cascada trófica positiva («trophic
-                  cascade») y del papel clave de una sola especie.
+                  Tras la vuelta de los lobos bajó el número de uapitíes (<em>Cervus canadensis</em>)
+                  y en algunos lugares se recuperaron sauces y álamos. Se propuso como ejemplo de
+                  cascada trófica, y se llegó a decir que estabilizó las orillas de los ríos, pero es
+                  un caso debatido: en la caída de los uapitíes también influyeron otros depredadores,
+                  la caza y el clima, y estudios de campo de hasta 20 años (Marshall, Hobbs y Cooper,
+                  2013; Hobbs et al., 2024) encuentran que los sauces apenas se recuperan donde los
+                  arroyos se encajaron tras desaparecer los castores.
                 </p>
               </div>
               <div className={styles.scenarioCard}>
                 <span className={styles.scenarioIcon} aria-hidden="true">🦈</span>
                 <strong>Sobrepesca de tiburones en el Atlántico noroeste</strong>
+                {/* Decía que «la industria pesquera de Carolina del Norte colapsó» y que eliminar un
+                    superdepredador «puede destruir toda la red alimentaria». Myers et al. hablan de
+                    UNA pesquería, la de la vieira, y la cascada tiene réplica: Grubbs et al. (2016,
+                    Scientific Reports) (hallazgo 2481). */}
                 <p>
                   Según Myers et al. (2007, <em>Science</em>), el desplome de los grandes tiburones
-                  costeros en varias décadas disparó la población de rayas (sus presas), que arrasaron
-                  los bancos de vieiras. La industria pesquera de Carolina del Norte colapsó. Eliminar
-                  un superdepredador puede destruir toda la red alimentaria subyacente.
+                  costeros en varias décadas disparó la población de rayas (sus presas), cuya
+                  depredación bastó para acabar con una pesquería de vieira que llevaba un siglo
+                  activa en Carolina del Norte. Es un ejemplo muy citado, pero discutido: Grubbs et
+                  al. (2016) reexaminaron los datos y sostienen que faltan las pruebas de cada eslabón
+                  que una cascada trófica exige.
                 </p>
               </div>
               <div className={styles.scenarioCard}>
@@ -628,7 +651,10 @@ export default function SimuladorEcosistemaTroficoPage() {
                 {/* Decía «raramente más de 4-6 eslabones» y, a renglón seguido, que el sexto
                     nivel era «matemáticamente imposible»: la regla del 10 % tratada como ley
                     exacta (hallazgo 1610). Se retiraron también dos afirmaciones sin fuente
-                    (cadenas más largas en océanos muy productivos y en el trópico húmedo). */}
+                    (cadenas más largas en océanos muy productivos y en el trópico húmedo).
+                    Al reescribirla, este comentario ocupó el sitio del <h4> y la tarjeta se quedó
+                    sin su pregunta (hallazgo 2479). */}
+                <h4>¿Cuántos eslabones puede tener una cadena trófica?</h4>
                 <p>
                   Pocos: lo habitual es que una cadena no pase de <strong>cinco niveles</strong>. Una
                   razón es energética: si en cada paso llegara el 10&nbsp;%, al quinto nivel le quedaría
@@ -650,8 +676,19 @@ export default function SimuladorEcosistemaTroficoPage() {
                   Una <strong>cadena trófica</strong> es una secuencia lineal simplificada:
                   A → B → C → D. Una <strong>red trófica</strong> representa la realidad:
                   cada especie puede comer a varias otras y ser comida por varias. En los
-                  ecosistemas reales, las redes son enormemente complejas, lo que hace al
-                  sistema más resiliente: si desaparece una especie, hay alternativas.
+                  ecosistemas reales, las redes son enormemente complejas.
+                </p>
+                {/* Decía que esa complejidad «hace al sistema más resiliente», como hecho. Es la
+                    relación complejidad-estabilidad, un debate abierto (hallazgo 2478; el 2314
+                    lo matizó en visualizador-ecosistema). */}
+                <p>
+                  Si esa complejidad las hace más estables es un debate abierto. May (1972) mostró
+                  con modelos de comunidades ensambladas al azar que más especies y más conexiones
+                  tienden a desestabilizarlas, y la discusión sigue viva (McCann, 2000). Lo observado
+                  en redes reales es más acotado: Dunne, Williams y Martinez (2002) encontraron que la
+                  resistencia a las extinciones en cadena crece con la <em>conectancia</em> (la
+                  proporción de enlaces posibles que existen de verdad), pero no con el número de
+                  especies.
                 </p>
                 <p className={styles.faqTip}>
                   <span aria-hidden="true">💡</span> Este simulador usa cadenas simplificadas (4 niveles). Los ecosistemas reales

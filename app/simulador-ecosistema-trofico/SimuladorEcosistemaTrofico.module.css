@@ -266,12 +266,19 @@
   letter-spacing: 0.02em;
 }
 
+/* El emoji va ENCIMA del rótulo, no a su lado, y los ejemplos pueden partirse en dos líneas.
+   Con el emoji al lado y los anchos 30/55/75/100 %, la cima medía 84 px para 124 de contenido:
+   «Superdepredadores» sobresalía 41 px, blanco sobre el fondo de la página, y en claro se leía
+   «Superdepreda…» (hallazgo 2477). Los anchos de page.tsx suben con esto a 52/68/84/100 %: el
+   rótulo más largo cabe en la cima también a 390 px, donde la pirámide mide 276. */
 .nivelPiramide {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.6rem 0.8rem;
+  gap: 0.15rem;
+  padding: 0.5rem 0.5rem;
+  box-sizing: border-box;
   border-radius: 8px;
   color: white;
   text-align: center;
@@ -287,15 +294,18 @@
 .nivelSuperdepr { background-color: var(--color-superdepr); }
 
 .nivelEmoji {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
+  line-height: 1.1;
   flex-shrink: 0;
 }
 
 .nivelInfo {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.1rem;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .nivelNombre {
