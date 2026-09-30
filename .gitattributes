@@ -1,0 +1,6 @@
+# Las cabeceras YAML de skills y agentes de Claude Code se rompen EN SILENCIO con CRLF: el fichero
+# carga, pero sus campos (description, effort, model) no se leen. Con core.autocrlf=true, Git
+# reescribiría estos ficheros en CRLF al primer checkout, stash o clon. Aquí se fuerza LF.
+# Origen: 30/09/2026, al crear .claude/agents/inspector-app.md, cuyo effort: xhigh es lo único que
+# hace que el Inspector no corra en high.
+.claude/** text eol=lf
