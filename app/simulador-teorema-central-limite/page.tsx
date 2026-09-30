@@ -241,6 +241,7 @@ export default function SimuladorTeoremaCentralLimitePage() {
   const canvasPobRef = useRef<HTMLCanvasElement>(null);
   const canvasMedRef = useRef<HTMLCanvasElement>(null);
   const histogramaRef = useRef<HTMLDivElement>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
   const animacionRef = useRef<number | null>(null);
 
   const dist = DISTRIBUCIONES[distId];
@@ -275,9 +276,27 @@ export default function SimuladorTeoremaCentralLimitePage() {
     // vista con `block: 'nearest'`, que no mueve nada si ya se ve entero. Con movimiento
     // reducido, sin animación: un `behavior: 'smooth'` explícito ganaría a la regla de
     // globals.css. El final se anuncia en la región viva de debajo del panel.
+    //
+    // Hallazgo 2466 (30/09/2026): con el histograma solo, `nearest` lo dejaba pegado al borde
+    // inferior y las cinco tarjetas de cifras y el aviso de fin, 16 px por debajo (1366×657,
+    // 1536×730 y 1920×950). Ahora se lleva a la vista el BLOQUE entero —histograma, tarjetas y
+    // aviso, ~570 px en escritorio—, que cabe en esas ventanas. Si no cabe (el móvil, donde las
+    // tarjetas van en columna), manda el histograma: se alinea su borde superior con el de la
+    // ventana y las tarjetas que quepan quedan debajo; y si ya se ve entero, no se mueve.
+    // Los dos llevan `scroll-margin-top` (la barra fija del logo, 62 px en móvil, tapaba el
+    // rótulo del histograma), así que el alto útil es la ventana menos ese margen.
     const reducirMovimiento =
       typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    histogramaRef.current?.scrollIntoView({ behavior: reducirMovimiento ? 'auto' : 'smooth', block: 'nearest' });
+    const behavior: ScrollBehavior = reducirMovimiento ? 'auto' : 'smooth';
+    const bloque = resultadoRef.current;
+    const histograma = histogramaRef.current;
+    const margenCabecera = bloque ? parseFloat(getComputedStyle(bloque).scrollMarginTop) || 0 : 0;
+    if (bloque && bloque.getBoundingClientRect().height <= window.innerHeight - margenCabecera) {
+      bloque.scrollIntoView({ behavior, block: 'nearest' });
+    } else if (histograma) {
+      const r = histograma.getBoundingClientRect();
+      if (r.top < margenCabecera || r.bottom > window.innerHeight) histograma.scrollIntoView({ behavior, block: 'start' });
+    }
 
     const FRAMES = 40;
     const chunkSize = Math.max(1, Math.floor(numMuestras / FRAMES));
@@ -546,6 +565,10 @@ export default function SimuladorTeoremaCentralLimitePage() {
       ctx.strokeRect(px0 + 1, py, anchoPx, pad.top + plotH - py);
     }
 
+    // Borde derecho del rótulo de la normal, si se pinta: el de las medias fuera del rango se
+    // coloca mirándolo (hallazgo 2467).
+    let finRotuloNormal: number | null = null;
+
     // Curva normal teórica superpuesta
     if (superponerNormal && sigmaTeorico > 0) {
       ctx.strokeStyle = colorNormal;
@@ -561,11 +584,14 @@ export default function SimuladorTeoremaCentralLimitePage() {
       }
       ctx.stroke();
 
-      // Etiqueta
+      // Etiqueta. Los dos parámetros van separados por punto y coma: con coma decimal,
+      // «N(0,00, 0,660)» se lee como cuatro números (hallazgo 2468, 30/09/2026).
       ctx.fillStyle = colorNormal;
       ctx.font = '11px system-ui';
       ctx.textAlign = 'left';
-      ctx.fillText(`N(${fmt(dist.mu, 2)}, ${fmt(sigmaTeorico, 3)}) teórica`, pad.left + 8, pad.top + 14);
+      const rotuloNormal = `N(${fmt(dist.mu, 2)}; ${fmt(sigmaTeorico, 3)}) teórica`;
+      ctx.fillText(rotuloNormal, pad.left + 8, pad.top + 14);
+      finRotuloNormal = pad.left + 8 + ctx.measureText(rotuloNormal).width;
     }
 
     // Línea vertical en μ poblacional
@@ -588,17 +614,19 @@ export default function SimuladorTeoremaCentralLimitePage() {
       ctx.globalAlpha = 1;
     }
 
-    // Excluidos del rango
+    // Excluidos del rango. Va arriba a la derecha, en la misma fila que el rótulo de la normal
+    // si caben los dos con 8 px de hueco; si no, una fila más abajo. En el lienzo del móvil
+    // (244 px) los dos medían 74 px más que el hueco y se escribían uno encima del otro
+    // (hallazgo 2467, 30/09/2026). Se mide con measureText, no con un ancho supuesto.
     const fueraDeRango = histograma.fueraDeRango;
     if (fueraDeRango > 0) {
       ctx.fillStyle = colorText;
       ctx.font = '10px system-ui';
       ctx.textAlign = 'right';
-      ctx.fillText(
-        `(${fueraDeRango} ${fueraDeRango === 1 ? 'media' : 'medias'} fuera del rango visible)`,
-        W - pad.right,
-        pad.top + 12,
-      );
+      const rotuloFuera = `(${fueraDeRango} ${fueraDeRango === 1 ? 'media' : 'medias'} fuera del rango visible)`;
+      const inicioFuera = W - pad.right - ctx.measureText(rotuloFuera).width;
+      const cabeEnLaFila = finRotuloNormal === null || inicioFuera >= finRotuloNormal + 8;
+      ctx.fillText(rotuloFuera, W - pad.right, cabeEnLaFila ? pad.top + 12 : pad.top + 30);
     }
   }, [medias, dist, n, sigmaTeorico, superponerNormal]);
 
@@ -732,8 +760,11 @@ export default function SimuladorTeoremaCentralLimitePage() {
           <canvas ref={canvasPobRef} className={styles.canvasPoblacion} aria-label="Distribución poblacional teórica" />
         </div>
 
+        {/* BLOQUE DEL RESULTADO — histograma, cifras y aviso de fin: lo que `lanzar` lleva a la
+            vista, junto (hallazgo 2466). */}
+        <div ref={resultadoRef} className={styles.anclaResultado}>
         {/* CANVAS HISTOGRAMA MEDIAS */}
-        <div className={styles.canvasWrapper} ref={histogramaRef}>
+        <div className={`${styles.canvasWrapper} ${styles.anclaResultado}`} ref={histogramaRef}>
           <div className={styles.canvasLabel}><span aria-hidden="true">📊</span> Distribución de la media muestral X̄</div>
           <canvas ref={canvasMedRef} className={styles.canvasMedias} aria-label="Histograma de las medias muestrales" />
         </div>
@@ -770,14 +801,16 @@ export default function SimuladorTeoremaCentralLimitePage() {
         {/* La región viva existe SIEMPRE y solo cambia su contenido: una región que se monta ya
             con el texto dentro no la anuncian todos los lectores de pantalla, y con el
             desplazamiento del hallazgo 2373 este aviso es lo que les dice que el resultado
-            está listo. */}
-        <div role="status" aria-live="polite" aria-atomic="true">
+            está listo. Reserva el alto del aviso (hallazgo 2466): así el bloque que se lleva a
+            la vista al lanzar ya lo cuenta, y el aviso no aparece por debajo del borde. */}
+        <div role="status" aria-live="polite" aria-atomic="true" className={styles.regionEstado}>
           {medias.length >= numMuestras && numMuestras > 0 && (
             <div className={styles.statusBar}>
               <span aria-hidden="true">✅</span> Simulación completa con n = {n}. Cuanto mayor es n, más se
               parecen los estadísticos a los teóricos.
             </div>
           )}
+        </div>
         </div>
       </div>
 

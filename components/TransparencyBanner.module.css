@@ -1,38 +1,30 @@
+/* El aviso va en el flujo, al final de la página, a TODOS los anchos.
+   Fijo abajo tapaba lo que quedara en esa franja: en móvil, el botón principal (hallazgo 1636,
+   generador-loteria, 25/09/2026, que lo sacó del flujo hasta 640 px); en escritorio, el 31 % del
+   histograma de simulador-teorema-central-limite justo al lanzar, con μ y el pico debajo, a
+   1366×657, 1536×730 y 1920×950 (hallazgo 2466, 30/09/2026). La razón de entonces valía para
+   cualquier ancho: una capa fija abajo tapa lo que haya en esa franja, y reservar espacio no lo
+   arregla. Al final del flujo no tapa nada ni provoca saltos de maquetación. */
 .banner {
-  position: fixed;
-  bottom: var(--spacing-lg);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
+  position: static;
   max-width: 600px;
-  width: calc(100% - var(--spacing-xl) * 2);
-  animation: slideUp 0.3s ease-out;
+  margin: var(--spacing-lg) auto;
+  padding: 0 var(--spacing-md);
+  animation: fadeIn 0.3s ease-out;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .banner.closing {
-  animation: slideDown 0.3s ease-in forwards;
+  animation: fadeOut 0.3s ease-in forwards;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(-50%) translateY(20px);
-  }
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 .content {
@@ -122,25 +114,10 @@
   border-color: var(--border);
 }
 
-/* Mobile: el aviso deja de flotar y va en el flujo, al final de la página.
-   Fijo abajo ocupaba el 19-24 % de la pantalla (412×915 y 360×800), justo donde queda el
-   botón principal al bajar hasta él, y el toque se lo llevaba el aviso (hallazgo 1636,
-   generador-loteria, 25/09/2026). Cualquier capa fija abajo tapa lo que haya en esa franja,
-   así que la reserva de espacio no lo arregla. Al final del flujo no tapa nada, y aparecer
-   ahí, después del contenido, no provoca saltos de maquetación. */
+/* Móvil: mismo flujo, con el relleno y la letra más compactos. */
 @media (max-width: 640px) {
   .banner {
-    position: static;
-    transform: none;
-    width: auto;
-    max-width: none;
-    margin: var(--spacing-md);
-    animation: none;
-  }
-
-  .banner.closing {
-    animation: none;
-    opacity: 0;
+    margin: var(--spacing-md) auto;
   }
 
   .content {
@@ -174,9 +151,9 @@
 }
 
 /* El aviso de privacidad no se imprime.
-   Va fijo sobre la ventana, así que en papel aparece incrustado en la primera página de
-   cualquier cosa que se imprima: el parte del sonómetro, una ficha, una tabla. Y allí no
-   informa de nada —no se puede cerrar ni seguir su enlace—, solo tapa contenido. Se ve
+   Cuando iba fijo sobre la ventana, en papel salía incrustado en la primera página de
+   cualquier cosa que se imprimiera: el parte del sonómetro, una ficha, una tabla. En el flujo
+   saldría al final, igual de inútil: en papel no se puede cerrar ni seguir su enlace. Se ve
    solo la primera visita, lo que hace el defecto intermitente y fácil de no encontrar. */
 @media print {
   .banner {

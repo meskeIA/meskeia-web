@@ -337,9 +337,24 @@
   font-family: var(--font-mono, monospace);
 }
 
-.statusBar {
+/* Lo que `lanzar` lleva a la vista (hallazgo 2466) no se alinea con el borde superior de la
+   ventana sino 72 px más abajo: ahí está la barra fija del logo (62 px en móvil), que tapaba
+   el rótulo del histograma. `lanzar` lee este margen para decidir si el bloque cabe. */
+.anclaResultado {
+  scroll-margin-top: 72px;
+}
+
+/* La región viva reserva el alto de UNA línea del aviso de fin (0,95rem × 1,6 de interlineado
+   + el relleno): el bloque que `lanzar` lleva a la vista ya lo incluye, y el aviso no aparece
+   por debajo del borde de la ventana (hallazgo 2466). El margen va aquí y no en el aviso. */
+.regionEstado {
   margin-top: var(--spacing-md);
+  min-height: calc(0.95rem * 1.6 + var(--spacing-sm) * 2);
+}
+
+.statusBar {
   font-size: 0.95rem;
+  line-height: 1.6;
   color: var(--text-secondary);
   text-align: center;
   padding: var(--spacing-sm);

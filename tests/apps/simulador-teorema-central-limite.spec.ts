@@ -1267,7 +1267,12 @@ test.describe('Inspector 28/09/2026 — hallazgos 2370-2373, REPARADOS (28/09/20
     await page.getByRole('button', { name: 'Lanzar simulación' }).click();
     await expect(page.getByText(/Simulación completa con n = 30\./)).toBeAttached({ timeout: 60_000 });
     const llamadas = await page.evaluate(() => (window as unknown as { __desplazamientos: unknown[] }).__desplazamientos);
-    expect(llamadas).toContainEqual({ behavior: 'auto', block: 'nearest' });
+    // Corregido el 30/09/2026 al reparar el 2466: exigía `{ behavior: 'auto', block: 'nearest' }`
+    // literal. Desde entonces `lanzar` elige el bloque según quepa o no el resultado entero
+    // (histograma + cifras + aviso, 571 px) bajo la barra del logo: a 1366×640 no cabe en
+    // 640 − 72 = 568 y manda el histograma con `block: 'start'`. Lo que este test vigila es el
+    // COMPORTAMIENTO, y ese no cambia: instantáneo, nunca suave.
+    expect(llamadas).toContainEqual(expect.objectContaining({ behavior: 'auto' }));
     expect(llamadas).not.toContainEqual(expect.objectContaining({ behavior: 'smooth' }));
     const abajo = await page.evaluate(
       (e) => document.querySelector(`canvas[aria-label="${e}"]`)!.getBoundingClientRect().bottom,
@@ -1578,84 +1583,100 @@ test.describe('Inspector 30/09/2026 — casos resueltos a mano, en escritorio', 
     );
   });
 
-  test('HALLAZGO nuevo · el rótulo de la normal no separa sus dos números con coma', async ({ page }) => {
-    test.fail(); // ABIERTO (30/09/2026)
-    // Con coma decimal, la coma no puede separar además los dos parámetros: «N(0,00, 0,660)» se
-    // lee como cuatro números. El separador es el punto y coma, como hace casos.ts en sus
-    // comentarios («½N(−2;0,6)»). ENTRADA bimodal, n = 10 (el rótulo se pinta sin lanzar).
-    // ESPERADO «N(0,00; 0,660) teórica» o equivalente sin «dígito, dígito»
-    // OBTENIDO «N(0,00, 0,660) teórica»
+  test('HALLAZGO 2468 · el rótulo de la normal no separa sus dos números con coma', async ({ page }) => {
+    // REPARADO el 30/09/2026: con coma decimal, la coma no puede separar además los dos
+    // parámetros: «N(0,00, 0,660)» se leía como cuatro números. Ahora el separador es el punto y
+    // coma, como hace casos.ts en sus comentarios («½N(−2;0,6)»). ENTRADA bimodal, n = 10 (el
+    // rótulo se pinta sin lanzar). A MANO: μ = 0 → «0,00»; σ/√n = √4,36/√10 = 0,660303 → «0,660».
+    // ESPERADO «N(0,00; 0,660) teórica» · ANTES «N(0,00, 0,660) teórica»
     await configurar(page, 'Bimodal', 10, 1000);
     const d = await leerDibujo(page, HISTOGRAMA);
-    // Sin condición previa con expect: bajo `test.fail()` daría verde en silencio si fallara.
     const rotulo = d.textos.find((t) => t.includes('teórica')) ?? '';
+    expect(rotulo).toBe('N(0,00; 0,660) teórica');
     expect(rotulo).not.toMatch(/\d, \d/);
   });
 });
 
 test.describe('Inspector 30/09/2026 — el resultado a la vista tras lanzar, en escritorio', () => {
-  test('HALLAZGO nuevo · en la primera visita, el aviso de privacidad tapa el pico y las cifras quedan bajo el borde', async ({
-    page,
-  }) => {
-    test.fail(); // ABIERTO (30/09/2026)
-    // La reparación del 2373 lleva el histograma a la vista con `block: 'nearest'`, que lo deja
-    // PEGADO AL BORDE INFERIOR de la ventana. En escritorio, ese borde es donde vive el aviso
-    // fijo «Tu privacidad es importante» (600 px de ancho, centrado, 24 px sobre el borde), que
-    // ve todo visitante nuevo hasta que lo cierra: tapa el 31 % del lienzo, y justo el centro,
-    // donde está μ y el pico de las barras. Las cinco cifras empíricas y el aviso de fin quedan
-    // 16 px por debajo del borde. Medido igual a 1366×657, 1536×730 y 1920×950.
-    // ENTRADA ventana 1366×657 (una pantalla de 1366×768), contexto nuevo · bajar hasta que el
-    //         botón quede 20 px sobre el borde · pulsar «Lanzar simulación» (exponencial, n = 30)
-    // ESPERADO en el pico del histograma, el lienzo; las cinco tarjetas de cifras, dentro de la
-    //          ventana y sin nada encima
-    // OBTENIDO en el pico, el aviso de privacidad; las tarjetas en y = 673-790 con 657 de alto
-    test.setTimeout(120_000);
-    await page.setViewportSize({ width: 1366, height: 657 });
-    await page.goto(RUTA);
-    await esperarHidratacion(page, ['input[type="checkbox"]']);
-    // El aviso aparece 500 ms después de montar. Se ESPERA, sin exigirlo: si un día deja de
-    // salir aquí, este test tiene que pasar y avisar de que el hallazgo se ha cerrado, no
-    // fallar por la condición previa y seguir en verde con la marca.
-    await page
-      .getByRole('complementary', { name: 'Aviso de transparencia sobre datos locales' })
-      .waitFor({ state: 'visible', timeout: 3_000 })
-      .catch(() => undefined);
-    await page.evaluate(() => {
-      const b = [...document.querySelectorAll('button')].find((x) => x.textContent?.includes('Lanzar simulación'));
-      if (b) window.scrollTo(0, b.getBoundingClientRect().bottom + window.scrollY + 20 - window.innerHeight);
-    });
-    await page.getByRole('button', { name: 'Lanzar simulación' }).click();
-    await expect(page.getByText(/Simulación completa con n = 30\./)).toBeAttached({ timeout: 60_000 });
-    // Se espera a que acabe el desplazamiento suave (el candado del 2373, arriba).
-    await expect
-      .poll(
-        () =>
-          page.evaluate((e) => {
-            const r = document.querySelector(`canvas[aria-label="${e}"]`)!.getBoundingClientRect();
-            return r.top >= 0 && r.bottom <= window.innerHeight;
-          }, HISTOGRAMA),
-        { timeout: 5_000 },
-      )
-      .toBe(true);
-    await page.waitForTimeout(300);
-    expect(await queHayEnElPico(page)).toBe(HISTOGRAMA);
-    const tarjetas = await page.evaluate(() => {
-      const etiquetas = ['Muestras generadas', 'Media empírica X̄', 'σ empírica', 'Asimetría (skew)', 'Curtosis'];
-      return etiquetas.map((et) => {
-        const card = [...document.querySelectorAll('span')].find((s) => s.textContent?.trim() === et)!.parentElement!;
-        const r = card.getBoundingClientRect();
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-        const dentro = r.top >= 0 && r.bottom <= window.innerHeight;
-        const encima = dentro ? document.elementFromPoint(cx, cy) : null;
-        return { et, dentro, libre: Boolean(encima && card.contains(encima)) };
+  // HALLAZGO 2466 — REPARADO el 30/09/2026, en dos mitades.
+  // La reparación del 2373 llevaba el histograma a la vista con `block: 'nearest'`, que lo dejaba
+  // PEGADO AL BORDE INFERIOR de la ventana. En escritorio, ese borde era donde vivía el aviso
+  // fijo «Tu privacidad es importante» (600 px de ancho, centrado, 24 px sobre el borde), que ve
+  // todo visitante nuevo hasta que lo cierra: tapaba el 31 % del lienzo, y justo el centro,
+  // donde está μ y el pico de las barras. Y las cinco cifras empíricas y el aviso de fin
+  // quedaban 16 px por debajo del borde. Medido igual a 1366×657, 1536×730 y 1920×950.
+  //   · el aviso: `components/TransparencyBanner` ya no flota a ningún ancho; va en el flujo,
+  //     al final de la página (antes, solo hasta 640 px: hallazgo 1636).
+  //   · las cifras: `lanzar` lleva a la vista el BLOQUE histograma + tarjetas + aviso de fin
+  //     (~571 px en escritorio), y la región del aviso reserva su alto antes de que aparezca.
+  //     Medido tras reparar: el aviso de fin acaba en y = 656,5 / 729,5 / 949,5, dentro.
+  // ENTRADA contexto nuevo (aviso de privacidad sin cerrar) · bajar hasta que el botón quede
+  //         20 px sobre el borde · pulsar «Lanzar simulación» (exponencial, n = 30)
+  // ESPERADO en el pico del histograma, el lienzo; las cinco tarjetas de cifras y el aviso de
+  //          fin, dentro de la ventana y sin nada encima
+  // ANTES    en el pico, el aviso de privacidad; las tarjetas en y = 673-790 con 657 de alto
+  for (const [ancho, alto] of [
+    [1366, 657],
+    [1536, 730],
+    [1920, 950],
+  ] as const) {
+    test(`HALLAZGO 2466 · ${ancho}×${alto}, primera visita: el pico se ve y las cifras quedan dentro`, async ({
+      page,
+    }) => {
+      test.setTimeout(120_000);
+      await page.setViewportSize({ width: ancho, height: alto });
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['input[type="checkbox"]']);
+      // El aviso aparece 500 ms después de montar, y el caso es la primera visita, con él sin
+      // cerrar: se ESPERA a que salga para medir con él en la página. Sin exigirlo: lo que se
+      // juzga es el resultado a la vista, no la presencia del aviso (que ya no flota y puede
+      // cambiar de sitio o de política sin que esto deje de valer).
+      await page
+        .getByRole('complementary', { name: 'Aviso de transparencia sobre datos locales' })
+        .waitFor({ state: 'visible', timeout: 3_000 })
+        .catch(() => undefined);
+      await page.evaluate(() => {
+        const b = [...document.querySelectorAll('button')].find((x) => x.textContent?.includes('Lanzar simulación'));
+        if (b) window.scrollTo(0, b.getBoundingClientRect().bottom + window.scrollY + 20 - window.innerHeight);
       });
+      await page.getByRole('button', { name: 'Lanzar simulación' }).click();
+      await expect(page.getByText(/Simulación completa con n = 30\./)).toBeAttached({ timeout: 60_000 });
+      // Se espera a que acabe el desplazamiento suave (el candado del 2373, arriba).
+      await expect
+        .poll(
+          () =>
+            page.evaluate((e) => {
+              const r = document.querySelector(`canvas[aria-label="${e}"]`)!.getBoundingClientRect();
+              return r.top >= 0 && r.bottom <= window.innerHeight;
+            }, HISTOGRAMA),
+          { timeout: 5_000 },
+        )
+        .toBe(true);
+      await page.waitForTimeout(300);
+      expect(await queHayEnElPico(page)).toBe(HISTOGRAMA);
+      const tarjetas = await page.evaluate(() => {
+        const etiquetas = ['Muestras generadas', 'Media empírica X̄', 'σ empírica', 'Asimetría (skew)', 'Curtosis'];
+        return etiquetas.map((et) => {
+          const card = [...document.querySelectorAll('span')].find((s) => s.textContent?.trim() === et)!.parentElement!;
+          const r = card.getBoundingClientRect();
+          const cx = r.left + r.width / 2;
+          const cy = r.top + r.height / 2;
+          const dentro = r.top >= 0 && r.bottom <= window.innerHeight;
+          const encima = dentro ? document.elementFromPoint(cx, cy) : null;
+          return { et, dentro, libre: Boolean(encima && card.contains(encima)) };
+        });
+      });
+      for (const t of tarjetas) {
+        expect(t.dentro, `${t.et} dentro de la ventana`).toBe(true);
+        expect(t.libre, `${t.et} sin nada encima`).toBe(true);
+      }
+      // El aviso de fin también: es lo que confirma que el resultado está completo.
+      const fin = await page.getByText(/Simulación completa con n = 30\./).boundingBox();
+      expect(fin).not.toBeNull();
+      expect(fin!.y).toBeGreaterThanOrEqual(0);
+      expect(fin!.y + fin!.height).toBeLessThanOrEqual(alto);
     });
-    for (const t of tarjetas) {
-      expect(t.dentro, `${t.et} dentro de la ventana`).toBe(true);
-      expect(t.libre, `${t.et} sin nada encima`).toBe(true);
-    }
-  });
+  }
 });
 
 test.describe('Inspector 30/09/2026 — en móvil (390 × 844, táctil)', () => {
@@ -1671,8 +1692,9 @@ test.describe('Inspector 30/09/2026 — en móvil (390 × 844, táctil)', () => 
   test('LÍMITE con el dedo · moneda sesgada, n = 100: cifras en banda y el histograma visible y sin nada encima', async ({
     page,
   }) => {
-    // Los mismos valores a mano que el caso LÍMITE de escritorio. En móvil el aviso de privacidad
-    // va en el flujo al final de la página (hallazgo 1636), así que aquí el pico sí se ve.
+    // Los mismos valores a mano que el caso LÍMITE de escritorio. El aviso de privacidad va en el
+    // flujo al final de la página (en móvil desde el hallazgo 1636; a todos los anchos desde el
+    // 2466), así que aquí el pico se ve.
     test.setTimeout(120_000);
     await instrumentarLienzos(page);
     await page.goto(RUTA);
@@ -1707,17 +1729,18 @@ test.describe('Inspector 30/09/2026 — en móvil (390 × 844, táctil)', () => 
     expect(cociente).toBeLessThan(1.15);
   });
 
-  test('HALLAZGO nuevo · los dos rótulos de arriba del histograma se pisan', async ({ page }) => {
-    test.fail(); // ABIERTO (30/09/2026)
-    // El rótulo de la normal va a la izquierda (x = 48, 11 px) y el de las medias fuera del
-    // rango, a la derecha (alineado a W − 16, 10 px), los dos a 28-30 px de altura. En el móvil
-    // el lienzo mide 244 px: el primero acaba en x ≈ 151 y el segundo empieza en x ≈ 77, así que
-    // 74 px se escriben uno encima del otro y no se lee ninguno.
+  test('HALLAZGO 2467 · los dos rótulos de arriba del histograma no se pisan', async ({ page }) => {
+    // REPARADO el 30/09/2026. El rótulo de la normal va a la izquierda (x = 48, 11 px) y el de las
+    // medias fuera del rango, a la derecha (alineado a W − 16, 10 px), los dos a 28-30 px de
+    // altura. En el móvil el lienzo mide 244 px: el primero acababa en x ≈ 151 y el segundo
+    // empezaba en x ≈ 77, así que 74 px se escribían uno encima del otro. Ahora la app mide los
+    // dos con measureText y, si no caben en la fila con 8 px de hueco, baja el segundo a
+    // y = 46 (16 px bajo el primero, a y = 30).
     // ENTRADA exponencial · n = 2 · 5.000 muestras · Lanzar. Fuera del eje [1 − 4/√2 ; 1 + 4/√2]
     //         caen las medias > 3,828: P = e^−7,657·(1 + 7,657) = 0,0041 → ≈ 20 de 5.000, así que
     //         el rótulo de la derecha sale siempre.
     // ESPERADO los dos rótulos sin solaparse (o en filas distintas)
-    // OBTENIDO «N(1,00, 0,707) teórica» en x 48-151 y «(k medias fuera del rango visible)» en
+    // ANTES    «N(1,00, 0,707) teórica» en x 48-151 y «(k medias fuera del rango visible)» en
     //          x 77-228, a 2 px de altura uno del otro
     test.setTimeout(120_000);
     await instrumentarRotulos(page);
@@ -1729,12 +1752,20 @@ test.describe('Inspector 30/09/2026 — en móvil (390 × 844, táctil)', () => 
     await page.getByRole('button', { name: 'Lanzar simulación' }).tap();
     await expect(page.getByText(/Simulación completa con n = 2\./)).toBeAttached({ timeout: 60_000 });
     const rotulos = await leerRotulos(page);
-    // Sin exigir que existan los dos: si la reparación saca uno del lienzo, ya no se pisan y el
-    // test debe pasar (y la marca, avisar). Por lo mismo, ninguna condición previa con expect:
-    // bajo `test.fail()` una condición previa rota daría verde en silencio.
+    // Reparado, se exige que estén los dos: sin uno de ellos, «no se pisan» sería trivial.
+    // P(ninguna media fuera) = (1 − 0,0041)^5000 ≈ e^−20,5: el rótulo de la derecha sale siempre.
     const normal = rotulos.find((r) => r.t.includes('teórica'));
     const fuera = rotulos.find((r) => r.t.includes('fuera del rango'));
+    expect(normal?.t).toBe('N(1,00; 0,707) teórica'); // 1/√2 = 0,70711
+    expect(fuera).toBeDefined();
     const seSolapan = Boolean(normal && fuera && normal.x1 > fuera.x0 && Math.abs(normal.y - fuera.y) < 12);
     expect(seSolapan).toBe(false);
+    // Y los dos dentro del lienzo.
+    const anchoLienzo = await page.evaluate(
+      (e) => document.querySelector(`canvas[aria-label="${e}"]`)!.getBoundingClientRect().width,
+      HISTOGRAMA,
+    );
+    expect(fuera!.x0).toBeGreaterThanOrEqual(0);
+    expect(fuera!.x1).toBeLessThanOrEqual(anchoLienzo);
   });
 });
