@@ -13,6 +13,7 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { parseSpanishNumber } from '@/lib';
 import {
+  cromatidasPorCromosoma,
   cromosomasPorPolo,
   FASES_MEIOSIS,
   FASES_MITOSIS,
@@ -55,6 +56,17 @@ interface PuntoCanvas {
   y: number;
 }
 
+/**
+ * Un cromosoma, con tantas cromátidas como diga el MOTOR para esa fase (`cromatidasPorCromosoma`).
+ *
+ * ⚠️ 30/09/2026 (hallazgos 2500 y 2501) — antes el glifo tenía siempre DOS cromátidas y, en las
+ * anafases, un parámetro `separado` que apartaba el brazo de arriba del de abajo con un hueco
+ * mayor que el propio brazo. Resultado: en la anafase de la mitosis cada cromosoma del polo se
+ * veía como DOS cuerpos (8 por polo donde hay 4) y, además, con dos cromátidas cuando las
+ * hermanas ya se habían separado; en la anafase I, que no separa hermanas, también se partía.
+ * Un cromosoma es una sola pieza unida por su centrómero: lo que cambia entre fases es si
+ * lleva una cromátida o dos, y eso lo decide el motor, no el dibujo.
+ */
 function dibujarCromosoma(
   ctx: CanvasRenderingContext2D,
   cx: number,
@@ -62,39 +74,27 @@ function dibujarCromosoma(
   radio: number,
   color: string,
   angulo: number,
-  separado: boolean
+  cromatidas: 1 | 2
 ): void {
-  // Cromosoma como dos barras en X unidas en el centrómero
   const largo = radio * 0.9;
   const ancho = radio * 0.22;
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate(angulo);
-  // Barra 1 (arriba del centrómero)
-  const offset = separado ? largo * 0.7 : 0;
-  // Cromátida 1
-  ctx.beginPath();
-  ctx.roundRect(-ancho / 2, -largo - offset, ancho, largo, ancho / 2);
   ctx.fillStyle = color;
-  ctx.fill();
-  // Cromátida 2 (ligeramente desplazada)
+  // Cromátida (o primera cromátida hermana): una barra continua de brazo a brazo, con el
+  // centrómero en el centro.
   ctx.beginPath();
-  ctx.roundRect(ancho * 0.3, -largo - offset, ancho, largo, ancho / 2);
-  ctx.fillStyle = color;
-  ctx.globalAlpha = 0.75;
+  ctx.roundRect(-ancho / 2, -largo, ancho, largo * 2, ancho / 2);
   ctx.fill();
-  ctx.globalAlpha = 1;
-  // Barra 2 (abajo del centrómero)
-  ctx.beginPath();
-  ctx.roundRect(-ancho / 2, offset, ancho, largo, ancho / 2);
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.beginPath();
-  ctx.roundRect(ancho * 0.3, offset, ancho, largo, ancho / 2);
-  ctx.fillStyle = color;
-  ctx.globalAlpha = 0.75;
-  ctx.fill();
-  ctx.globalAlpha = 1;
+  if (cromatidas === 2) {
+    // Segunda cromátida hermana, pegada a la primera y en otro tono para poder contarlas.
+    ctx.beginPath();
+    ctx.roundRect(ancho * 0.3, -largo, ancho, largo * 2, ancho / 2);
+    ctx.globalAlpha = 0.75;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
   ctx.restore();
 }
 
@@ -168,7 +168,8 @@ function dibujarCelula(
   fase: FaseConfig,
   isDark: boolean,
   isMeiosis: boolean,
-  celIndice: number // 0-3 para meiosis II
+  /** Cromátidas de cada cromosoma en esta fase, tal y como las da `cromatidasPorCromosoma`. */
+  cromatidas: 1 | 2
 ): void {
   // Fondo de la célula
   ctx.save();
@@ -188,8 +189,10 @@ function dibujarCelula(
   }
   ctx.restore();
 
-  // Núcleo
-  if (fase.nucleos > 0 && (fase.celulas === 1 || celIndice < fase.celulas)) {
+  // Núcleo central: solo cuando la célula tiene UNO. Con `nucleos: 2` (telofase de la mitosis)
+  // las dos envolturas nuevas se dibujan en los polos, más abajo; antes se pintaba además esta,
+  // y salían tres envolturas donde la fase dice «dos nuevas membranas nucleares» (hallazgo 2502).
+  if (fase.nucleos === 1) {
     const radioNucleo = radioCell * 0.55;
     ctx.save();
     ctx.beginPath();
@@ -262,7 +265,7 @@ function dibujarCelula(
       );
     }
     posiciones.forEach((pos, i) => {
-      dibujarCromosoma(ctx, pos.x, pos.y, radioCell * 0.18, colorDe(i), i % 2 === 0 ? 0.3 : -0.3, false);
+      dibujarCromosoma(ctx, pos.x, pos.y, radioCell * 0.18, colorDe(i), i % 2 === 0 ? 0.3 : -0.3, cromatidas);
     });
 
     if (fase.bivalentes && posiciones.length >= 4) {
@@ -295,14 +298,14 @@ function dibujarCelula(
       for (let b = 0; b < nBivalentes; b++) {
         const px = cx - totalAncho / 2 + b * espaciado * 1.6;
         const color = COLORES_CROMOSOMAS[b % 2];
-        dibujarCromosoma(ctx, px, cy - separacionHomologos, radioCell * 0.16, color, 0, false);
-        dibujarCromosoma(ctx, px, cy + separacionHomologos, radioCell * 0.16, color, 0, false);
+        dibujarCromosoma(ctx, px, cy - separacionHomologos, radioCell * 0.16, color, 0, cromatidas);
+        dibujarCromosoma(ctx, px, cy + separacionHomologos, radioCell * 0.16, color, 0, cromatidas);
       }
     } else {
       const totalAncho = (n - 1) * espaciado;
       for (let i = 0; i < n; i++) {
         const px = cx - totalAncho / 2 + i * espaciado;
-        dibujarCromosoma(ctx, px, cy, radioCell * 0.18, colorDe(i), 0, false);
+        dibujarCromosoma(ctx, px, cy, radioCell * 0.18, colorDe(i), 0, cromatidas);
       }
     }
     dibujarEcuador(ctx, cx, cy, radioCell, isDark);
@@ -323,8 +326,11 @@ function dibujarCelula(
       // célula: al separarse homólogos cada polo recibe uno de cada par (naranja + teal),
       // y al separarse hermanas recibe el juego completo (naranja, naranja, teal, teal).
       const color = COLORES_CROMOSOMAS[parDelCromosoma(i, porPolo)];
-      dibujarCromosoma(ctx, px, cy - poloDist, radio, color, 0, separando);
-      dibujarCromosoma(ctx, px, cy + poloDist, radio, color, separando ? Math.PI : 0, separando);
+      // Una pieza por cromosoma, con las cromátidas que diga el motor: una tras separarse
+      // hermanas (anafase y telofase de la mitosis, anafase II), dos tras separarse homólogos
+      // (anafase I). Hallazgos 2500 y 2501.
+      dibujarCromosoma(ctx, px, cy - poloDist, radio, color, 0, cromatidas);
+      dibujarCromosoma(ctx, px, cy + poloDist, radio, color, 0, cromatidas);
     }
 
     if (separando) {
@@ -346,7 +352,11 @@ function dibujarCelula(
       ctx.globalAlpha = 1;
       ctx.restore();
     } else {
-      // Envolturas nucleares formándose alrededor de cada juego.
+      // Envolturas nucleares formándose alrededor de cada juego: UNA por polo y que abarque
+      // el juego ENTERO. Un círculo de radio 0,3 dejaba fuera los cromosomas exteriores, que
+      // están a ±(porPolo − 1) / 2 × 0,26 del centro (±0,39 con 4 por polo), así que se usa
+      // una elipse con ese semiancho más el medio grosor del glifo y un margen (hallazgo 2502).
+      const semiancho = totalAncho / 2 + radioCell * 0.13;
       ctx.save();
       ctx.setLineDash([5, 4]);
       ctx.strokeStyle = COLOR_MEMBRANA;
@@ -354,7 +364,7 @@ function dibujarCelula(
       ctx.globalAlpha = 0.7;
       for (const dy of [-poloDist, poloDist]) {
         ctx.beginPath();
-        ctx.arc(cx, cy + dy, radioCell * 0.3, 0, Math.PI * 2);
+        ctx.ellipse(cx, cy + dy, Math.max(semiancho, radioCell * 0.2), radioCell * 0.22, 0, 0, Math.PI * 2);
         ctx.stroke();
       }
       ctx.setLineDash([]);
@@ -439,28 +449,43 @@ export default function SimuladorMitosisMeiosis() {
     // Determinar cuántas células dibujar y sus posiciones
     const numCelulas = faseData.celulas;
     const isMeiosis = tipoDivision === 'meiosis';
+    // El glifo obedece al motor, fase a fase (hallazgo 2501). NaN solo en la interfase, que se
+    // dibuja como cromatina difusa y no llega a usarlo.
+    const cromatidas: 1 | 2 = cromatidasPorCromosoma(fases, faseActual) === 1 ? 1 : 2;
 
     if (numCelulas === 1) {
       const radioCell = Math.min(W, H) * 0.38;
-      dibujarCelula(ctx, W / 2, H / 2, radioCell, faseData, isDark, isMeiosis, 0);
+      dibujarCelula(ctx, W / 2, H / 2, radioCell, faseData, isDark, isMeiosis, cromatidas);
     } else if (numCelulas === 2) {
       const radioCell = Math.min(W / 2, H) * 0.38;
       const gap = radioCell * 0.25;
-      dibujarCelula(ctx, W / 2 - radioCell - gap, H / 2, radioCell, faseData, isDark, isMeiosis, 0);
-      dibujarCelula(ctx, W / 2 + radioCell + gap, H / 2, radioCell, faseData, isDark, isMeiosis, 1);
+      dibujarCelula(ctx, W / 2 - radioCell - gap, H / 2, radioCell, faseData, isDark, isMeiosis, cromatidas);
+      dibujarCelula(ctx, W / 2 + radioCell + gap, H / 2, radioCell, faseData, isDark, isMeiosis, cromatidas);
     } else if (numCelulas === 4) {
       const radioCell = Math.min(W / 2, H / 2) * 0.4;
       const gap = radioCell * 0.18;
-      dibujarCelula(ctx, W / 2 - radioCell - gap, H / 2 - radioCell - gap, radioCell, faseData, isDark, isMeiosis, 0);
-      dibujarCelula(ctx, W / 2 + radioCell + gap, H / 2 - radioCell - gap, radioCell, faseData, isDark, isMeiosis, 1);
-      dibujarCelula(ctx, W / 2 - radioCell - gap, H / 2 + radioCell + gap, radioCell, faseData, isDark, isMeiosis, 2);
-      dibujarCelula(ctx, W / 2 + radioCell + gap, H / 2 + radioCell + gap, radioCell, faseData, isDark, isMeiosis, 3);
+      dibujarCelula(ctx, W / 2 - radioCell - gap, H / 2 - radioCell - gap, radioCell, faseData, isDark, isMeiosis, cromatidas);
+      dibujarCelula(ctx, W / 2 + radioCell + gap, H / 2 - radioCell - gap, radioCell, faseData, isDark, isMeiosis, cromatidas);
+      dibujarCelula(ctx, W / 2 - radioCell - gap, H / 2 + radioCell + gap, radioCell, faseData, isDark, isMeiosis, cromatidas);
+      dibujarCelula(ctx, W / 2 + radioCell + gap, H / 2 + radioCell + gap, radioCell, faseData, isDark, isMeiosis, cromatidas);
     }
   }, [tipoDivision, faseActual, fases]);
 
   // Redibujar cuando cambia la fase o el tipo
   useEffect(() => {
     dibujar();
+  }, [dibujar]);
+
+  // Repintar al cambiar el tema: `dibujar` lee data-theme, pero solo se llamaba al cambiar de
+  // fase, de división o de tamaño, y el canvas se quedaba claro sobre la página oscura hasta la
+  // siguiente interacción (hallazgo 2505).
+  useEffect(() => {
+    const observador = new MutationObserver(() => dibujar());
+    observador.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+    return () => observador.disconnect();
   }, [dibujar]);
 
   // Redimensionar canvas al cambiar el tamaño del contenedor
@@ -882,10 +907,14 @@ export default function SimuladorMitosisMeiosis() {
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🧠</span>
             <div>
-              <strong>IPMAT para mitosis</strong>
+              <strong>IPMAT para el recorrido, PMAT para la mitosis</strong>
+              {/* La interfase no es una fase de la mitosis: precede a la fase mitótica dentro del
+                  ciclo celular (OpenStax Biology 2e, §10.2). Hallazgo 2503. */}
               <p>
-                Interfase, Profase, Metafase, Anafase, Telofase → la inicial de cada fase en orden.
-                Añade "C" al final para Citocinesis: IPMATC.
+                Interfase, Profase, Metafase, Anafase, Telofase → la inicial de cada etapa en
+                orden. Ojo: la I es la interfase, que PRECEDE a la mitosis (en ella se duplica el
+                ADN) pero no es una de sus fases; la mitosis propiamente dicha es PMAT. Después
+                viene la citocinesis (C), que reparte el citoplasma.
               </p>
             </div>
           </div>

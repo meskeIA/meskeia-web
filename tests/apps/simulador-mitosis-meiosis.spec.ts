@@ -1133,6 +1133,14 @@ interface PiezaCanvas {
  *
  * El glifo de `dibujarCromosoma` pinta cada cromátida con su tono (la segunda al 75 % de
  * alfa): dos tonos en una pieza = un cromosoma de DOS cromátidas; uno = de una sola.
+ *
+ * Un tono solo cuenta si cubre al menos el 30 % de la pieza (reparación del 30/09/2026). El
+ * borde antialiasado de una barra PLENA mezcla el color con el fondo y cae en la franja del
+ * tono al 75 %: una columna de borde. Medido a 480 px de canvas, tras la reparación de los
+ * hallazgos 2500/2501: los cromosomas de UNA cromátida de la anafase y la telofase dan 2-45 px
+ * de «segundo tono» en piezas de 207-211 px (≤ 22 %), y los de DOS cromátidas de la metafase
+ * dan 145-174 px en piezas de 345-373 (≥ 42 %). Sin el umbral, el detector veía dos cromátidas
+ * en cualquier barra con bordes, y el testigo del 2501 no podía distinguir la reparación.
  */
 async function piezasConexas(
   page: Page,
@@ -1166,11 +1174,11 @@ async function piezasConexas(
       const pila = [i];
       visto[i] = 1;
       let n = 0;
-      const tonos = new Set<number>();
+      const porTono = new Map<number, number>();
       while (pila.length) {
         const k = pila.pop() as number;
         n++;
-        if (clase[k] <= 4) tonos.add(clase[k]);
+        if (clase[k] <= 4) porTono.set(clase[k], (porTono.get(clase[k]) ?? 0) + 1);
         const x = k % w;
         const y = (k / w) | 0;
         for (let dy = -1; dy <= 1; dy++) {
@@ -1187,7 +1195,8 @@ async function piezasConexas(
         }
       }
       // Menos de 30 px es antialias suelto, no un cuerpo.
-      if (n >= 30) piezas.push({ n, tonos: [...tonos].sort().join('') });
+      const tonos = [...porTono].filter(([, c]) => c >= 0.3 * n).map(([t]) => t);
+      if (n >= 30) piezas.push({ n, tonos: tonos.sort().join('') });
     }
     return piezas;
   }, r);
@@ -1365,19 +1374,19 @@ test.describe('Inspector 30/09/2026 — móvil 390 × 844', () => {
   });
 });
 
-test.describe('Inspector 30/09/2026 — hallazgos ABIERTOS', () => {
+test.describe('Inspector 30/09/2026 — hallazgos REPARADOS el 30/09/2026 (2500-2506)', () => {
   test.beforeEach(async ({ page }) => {
     await esperarHidratacion(page, [ENTRADA_CASOS]);
   });
 
-  test('HALLAZGO ABIERTO · anafases: cada cromosoma que llega a un polo es UNA pieza, no dos', async ({
+  test('HALLAZGO 2500 · anafases: cada cromosoma que llega a un polo es UNA pieza, no dos', async ({
     page,
   }) => {
-    // ABIERTO (30/09/2026): dibujarCromosoma(…, separado = true) aparta el brazo de arriba del
-    // de abajo con un hueco mayor que el propio brazo, así que cada cromosoma del polo se ve
-    // como dos cuerpos. Medido: mitosis 8 piezas en el polo superior (esperado 4 = 2n), anafase I
-    // 4 (esperado 2 = n), anafase II 4 por polo en cada célula (esperado 2 = n).
-    test.fail();
+    // REPARADO el 30/09/2026: dibujarCromosoma(…, separado = true) apartaba el brazo de arriba
+    // del de abajo con un hueco mayor que el propio brazo, así que cada cromosoma del polo se veía
+    // como dos cuerpos. Medido entonces: mitosis 8 piezas en el polo superior (esperado 4 = 2n),
+    // anafase I 4 (esperado 2 = n), anafase II 4 por polo en cada célula (esperado 2 = n). Ya no
+    // hay parámetro `separado`: el glifo es una barra continua con 1 o 2 cromátidas.
     await irAFase(page, 'Anafase');
     expect((await piezasConexas(page, { x0: 0, x1: 1, y0: 0, y1: 0.5 })).length).toBe(4);
     await elegirModo(page, 'Meiosis');
@@ -1387,14 +1396,12 @@ test.describe('Inspector 30/09/2026 — hallazgos ABIERTOS', () => {
     expect((await piezasConexas(page, { x0: 0, x1: 0.5, y0: 0, y1: 0.5 })).length).toBe(2);
   });
 
-  test('HALLAZGO ABIERTO · tras separarse las hermanas cada cromosoma se dibuja con UNA cromátida', async ({
+  test('HALLAZGO 2501 · tras separarse las hermanas cada cromosoma se dibuja con UNA cromátida', async ({
     page,
   }) => {
-    // ABIERTO (30/09/2026): en la anafase y la telofase de la mitosis los cromosomas conservan
-    // el glifo de dos cromátidas (dos tonos), igual que en la metafase y en la anafase I. El
-    // propio motor dice 1 (cromatidasPorCromosoma), y la app declara que esa es la diferencia
-    // entre la anafase mitótica y la anafase I.
-    test.fail();
+    // REPARADO el 30/09/2026: en la anafase y la telofase de la mitosis los cromosomas
+    // conservaban el glifo de dos cromátidas (dos tonos), igual que en la metafase y en la
+    // anafase I. El motor dice 1 (cromatidasPorCromosoma) y ahora el dibujo lo lee fase a fase.
     // Control: el detector SÍ ve dos cromátidas donde las hay (metafase, cromosomas duplicados).
     await irAFase(page, 'Metafase');
     const metafase = await piezasConexas(page, { x0: 0, x1: 1, y0: 0, y1: 1 });
@@ -1408,16 +1415,38 @@ test.describe('Inspector 30/09/2026 — hallazgos ABIERTOS', () => {
         `${fase}: piezas con dos cromátidas`
       ).toHaveLength(0);
     }
+    // El mismo criterio en la meiosis, fase a fase contra cromatidasPorCromosoma: la anafase I
+    // separa HOMÓLOGOS y cada cromosoma llega al polo con sus DOS cromátidas; la telofase I y la
+    // meiosis II hasta la metafase II las conservan (no hay otra fase S); la anafase II separa
+    // hermanas y cada cromosoma pasa a tener UNA.
+    await elegirModo(page, 'Meiosis');
+    const esperadas: [string, { x0: number; x1: number; y0: number; y1: number }, number, number][] = [
+      // fase, región, piezas, cromátidas por pieza
+      ['Anafase I', { x0: 0, x1: 1, y0: 0, y1: 0.5 }, 2, 2],
+      ['Telofase I / Citocinesis I', { x0: 0, x1: 0.5, y0: 0, y1: 1 }, 2, 2],
+      ['Profase II', { x0: 0, x1: 0.5, y0: 0, y1: 1 }, 2, 2],
+      ['Metafase II', { x0: 0, x1: 0.5, y0: 0, y1: 1 }, 2, 2],
+      ['Anafase II', { x0: 0, x1: 0.5, y0: 0, y1: 0.5 }, 2, 1],
+    ];
+    for (const [fase, region, piezas, cromatidas] of esperadas) {
+      await irAFase(page, fase);
+      const medida = await piezasConexas(page, region);
+      expect(medida, `${fase}: cromosomas`).toHaveLength(piezas);
+      expect(
+        medida.map((p) => p.tonos.length),
+        `${fase}: cromátidas de cada cromosoma`
+      ).toEqual(Array(piezas).fill(cromatidas));
+    }
   });
 
-  test('HALLAZGO ABIERTO · Telofase de la mitosis: dos envolturas nuevas, ninguna en el ecuador', async ({
+  test('HALLAZGO 2502 · Telofase de la mitosis: dos envolturas nuevas, ninguna en el ecuador', async ({
     page,
   }) => {
-    // ABIERTO (30/09/2026): con `nucleos: 2`, dibujarCelula pinta además el núcleo central
+    // REPARADO el 30/09/2026: con `nucleos: 2`, dibujarCelula pintaba además el núcleo central
     // (radio 0,55 del de la célula, discontinuo) junto a las dos envolturas de los polos: tres
     // envolturas donde el texto dice «dos nuevas membranas nucleares». Y las polares (radio 0,3)
-    // dejan fuera los dos cromosomas exteriores de cada juego (a ±0,39).
-    test.fail();
+    // dejaban fuera los dos cromosomas exteriores de cada juego (a ±0,39). Ahora el núcleo
+    // central solo sale con `nucleos: 1` y las polares son elipses que abarcan el juego entero.
     // Control: en la profase el núcleo original SÍ cruza el ecuador (se está disolviendo).
     await irAFase(page, 'Profase');
     expect(await envolturaEnElEcuador(page)).toBeGreaterThan(0);
@@ -1425,14 +1454,13 @@ test.describe('Inspector 30/09/2026 — hallazgos ABIERTOS', () => {
     expect(await envolturaEnElEcuador(page)).toBe(0);
   });
 
-  test('HALLAZGO ABIERTO · la FAQ estructurada no cuenta la interfase como etapa de la mitosis', async ({
+  test('HALLAZGO 2503 · la FAQ estructurada no cuenta la interfase como etapa de la mitosis', async ({
     page,
   }) => {
-    // ABIERTO (30/09/2026): «La mitosis tiene 6 etapas: interfase (duplicación del ADN),
-    // profase…». OpenStax Biology 2e §10.2: la interfase y la fase mitótica forman el ciclo
+    // REPARADO el 30/09/2026: decía «La mitosis tiene 6 etapas: interfase (duplicación del
+    // ADN), profase…». OpenStax Biology 2e §10.2: la interfase y la fase mitótica forman el ciclo
     // celular; la mitosis (cariocinesis) es profase, prometafase, metafase, anafase y telofase,
     // y la citocinesis es la segunda parte de la fase mitótica. Es la respuesta que citan las IA.
-    test.fail();
     const respuesta = await page.evaluate(() => {
       for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
         const datos = JSON.parse(s.textContent ?? '{}');
@@ -1447,37 +1475,34 @@ test.describe('Inspector 30/09/2026 — hallazgos ABIERTOS', () => {
     expect(respuesta).not.toMatch(/mitosis tiene[^.]*\binterfase\b/i);
   });
 
-  test('HALLAZGO ABIERTO · caso 6 con «24»: es el error que el caso nombra, no sumar dos células', async ({
+  test('HALLAZGO 2504 · caso 6 con «24»: es el error que el caso nombra, no sumar dos células', async ({
     page,
   }) => {
-    // ABIERTO (30/09/2026): 24 = 12 cromosomas × 2 cromátidas, lo que sale si se cree que no
-    // hubo reducción o que el ADN se duplicó otra vez entre la meiosis I y la II (el título del
-    // caso). También es 2 células × 12, pero el corrector solo dice «has sumado las 2 células».
-    test.fail();
+    // REPARADO el 30/09/2026: 24 = 12 cromosomas × 2 cromátidas (sin reducción) = 6 × 4 (con
+    // otra duplicación entre la meiosis I y la II, el título del caso) = 2 células × 12. El
+    // corrector solo decía «has sumado las 2 células»; ahora reúne las lecturas que dan 24.
     await irACasoAula(page, 6);
     const motivo = await responder(page, '24');
     expect(motivo).not.toContain('¡Correcto!');
     expect(motivo).toMatch(/duplic|reduc/i);
   });
 
-  test('HALLAZGO ABIERTO · caso 7 con «12»: contar la célula entera (6 + 6) también da 12', async ({
+  test('HALLAZGO 2504 · caso 7 con «12»: contar la célula entera (6 + 6) también da 12', async ({
     page,
   }) => {
-    // ABIERTO (30/09/2026): en la anafase II la célula aún contiene los dos polos (6 + 6 = 12),
-    // la lectura que el corrector ya diagnostica en los casos 3 y 5 («has contado la célula
-    // entera»). Aquí solo sale «12 es la dotación diploide». El caso 4 sí une dos lecturas.
-    test.fail();
+    // REPARADO el 30/09/2026: en la anafase II la célula aún contiene los dos polos (6 + 6 =
+    // 12), la lectura que el corrector ya diagnostica en los casos 3 y 5 («has contado la célula
+    // entera»). Solo salía «12 es la dotación diploide»; ahora salen las dos.
     await irACasoAula(page, 7);
     const motivo = await responder(page, '12');
     expect(motivo).not.toContain('¡Correcto!');
     expect(motivo).toMatch(/polo/);
   });
 
-  test('HALLAZGO ABIERTO · el canvas se repinta al cambiar a modo oscuro', async ({ page }) => {
-    // ABIERTO (30/09/2026): `dibujar` lee data-theme pero solo se llama al cambiar de fase, de
-    // división o de tamaño. Tras «Cambiar a modo oscuro» el canvas sigue en #f0f4f8 hasta pulsar
-    // «Siguiente», cuando pasa al #1a1a1a que la propia app pinta en oscuro.
-    test.fail();
+  test('HALLAZGO 2505 · el canvas se repinta al cambiar a modo oscuro', async ({ page }) => {
+    // REPARADO el 30/09/2026: `dibujar` leía data-theme pero solo se llamaba al cambiar de fase,
+    // de división o de tamaño, y tras «Cambiar a modo oscuro» el canvas seguía en #f0f4f8 hasta
+    // pulsar «Siguiente». Ahora un MutationObserver sobre <html> repinta al cambiar data-theme.
     const pixel = () =>
       page.evaluate(() => {
         const lienzo = document.querySelector('canvas') as HTMLCanvasElement;
@@ -1490,12 +1515,12 @@ test.describe('Inspector 30/09/2026 — hallazgos ABIERTOS', () => {
     await expect.poll(pixel, { timeout: 3000 }).toEqual([26, 26, 26, 255]);
   });
 
-  test('HALLAZGO ABIERTO · el featureList del JSON-LD no mezcla inglés («ploidy»)', async ({
+  test('HALLAZGO 2506 · el featureList del JSON-LD no mezcla inglés («ploidy»)', async ({
     page,
   }) => {
-    // ABIERTO (30/09/2026): «Contador de células resultado con ploidy (2n/n)», que además
-    // repite la última característica («… conteo de células hijas y ploidía (2n/n)»).
-    test.fail();
+    // REPARADO el 30/09/2026: «Contador de células resultado con ploidy (2n/n)», que además
+    // repetía otra característica («… conteo de células hijas y ploidía (2n/n)»), y una «tabla
+    // comparativa … fase a fase» que compara por características.
     const lista = await page.evaluate(() => {
       for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
         const datos = JSON.parse(s.textContent ?? '{}');
@@ -1505,5 +1530,49 @@ test.describe('Inspector 30/09/2026 — hallazgos ABIERTOS', () => {
     });
     expect(lista.length).toBeGreaterThan(0);
     expect(lista.filter((f) => /ploidy/i.test(f))).toHaveLength(0);
+    // Sin repetir: el resultado (células hijas y su ploidía) sale UNA vez, y ninguna
+    // característica está dos. La tabla puede nombrar la ploidía como una de sus filas.
+    expect(lista.filter((f) => /ploid/i.test(f) && /células (hijas|resultado)/i.test(f))).toHaveLength(1);
+    expect(new Set(lista).size).toBe(lista.length);
+    // La tabla compara por características (finalidad, células, divisiones…), no fase a fase.
+    expect(lista.filter((f) => /tabla/i.test(f) && /fase a fase/i.test(f))).toHaveLength(0);
+  });
+
+  test('HALLAZGO 2504 · el corrector reúne TODAS las lecturas que dan ese número (a mano)', () => {
+    // Resuelto a mano, 2n = 8 (n = 4):
+    //   caso 4 (anafase I, cromosomas por polo, esperado 4) con «8»: son las cromátidas del polo
+    //   (4 × 2), el 2n sin reducir, y la célula entera con sus dos polos (4 + 4). Tres lecturas:
+    //   las dos primeras ya iban juntas en un mensaje (62eb878c), así que salen dos «caminos».
+    //   caso 5 (anafase I, cromátidas por polo, esperado 4 × 2 = 8) con «16»: sin reducción
+    //   (8 cromosomas × 2) y la célula entera (8 + 8). Dos lecturas.
+    //   caso 1 (metafase mitótica, cromosomas, esperado 8) con «16»: solo cromátidas (8 × 2).
+    const anafaseI = { division: 'meiosis' as const, faseId: 'anafase-i', dosN: 8 };
+    const c4 = comprobarRespuesta(8, 4, { ...anafaseI, magnitud: 'cromosomas-por-polo' }).motivo;
+    expect(c4).toContain('cromátidas');
+    expect(c4).toContain('reducción');
+    expect(c4).toContain('célula entera');
+    const c5 = comprobarRespuesta(16, 8, { ...anafaseI, magnitud: 'cromatidas-por-polo' }).motivo;
+    expect(c5).toContain('dos caminos');
+    expect(c5).toContain('reducción');
+    expect(c5).toContain('célula entera');
+    const c1 = comprobarRespuesta(16, 8, {
+      division: 'mitosis',
+      faseId: 'metafase',
+      dosN: 8,
+      magnitud: 'cromosomas-en-celula',
+    }).motivo;
+    expect(c1).not.toContain('caminos');
+    expect(c1).toContain('CROMÁTIDAS');
+    // Caso 6 (2n = 12, metafase II, cromátidas, esperado 6 × 2 = 12) con «24»: 12 × 2 sin
+    // reducción, 6 × 4 con otra duplicación, y 2 células × 12. Las tres ideas en el mensaje.
+    const c6 = comprobarRespuesta(24, 12, {
+      division: 'meiosis',
+      faseId: 'metafase-ii',
+      dosN: 12,
+      magnitud: 'cromatidas-en-celula',
+    }).motivo;
+    expect(c6).toContain('12 cromosomas × 2');
+    expect(c6).toContain('6 × 4');
+    expect(c6).toContain('has sumado las 2 células');
   });
 });

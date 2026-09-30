@@ -17,6 +17,7 @@
 import { test, expect } from '@playwright/test';
 
 import {
+  cromatidasPorCromosoma,
   cromosomasPorPolo,
   FASES_MEIOSIS,
   FASES_MITOSIS,
@@ -211,5 +212,53 @@ test.describe('coherencia del recorrido', () => {
       const incompletas = fases.filter(f => !f.id || !f.nombre || f.descripcion.length < 40);
       expect(incompletas).toEqual([]);
     }
+  });
+});
+
+// ─── Cromátidas por cromosoma: el convenio que obedece el DIBUJO (30/09/2026) ─
+
+test.describe('cromátidas por cromosoma, fase a fase — hallazgos 2500-2502', () => {
+  // Resuelto a mano, biología de libro (OpenStax Biology 2e, §10.2 y §11.1):
+  //   · la fase S (en la interfase) duplica cada cromosoma en dos cromátidas hermanas; la
+  //     interfase ABARCA la duplicación, así que no tiene un valor único (NaN a propósito);
+  //   · desde la profase, 2 cromátidas por cromosoma;
+  //   · la anafase de la mitosis y la anafase II separan HERMANAS: desde ahí, 1;
+  //   · la anafase I separa HOMÓLOGOS: cada cromosoma llega al polo con sus 2 cromátidas, y
+  //     entre la meiosis I y la II no hay otra fase S, así que siguen siendo 2 hasta la anafase II.
+  // El canvas dibuja el glifo de 1 o 2 cromátidas con este valor: si cambia, cambia el dibujo.
+  const porFase = (fases: FaseConfig[]) =>
+    fases.map((f, i) => [f.id, cromatidasPorCromosoma(fases, i)] as const);
+
+  test('mitosis: 2 hasta la metafase, 1 desde la anafase', () => {
+    expect(porFase(FASES_MITOSIS)).toEqual([
+      ['interfase', NaN],
+      ['profase', 2],
+      ['metafase', 2],
+      ['anafase', 1],
+      ['telofase', 1],
+      ['citocinesis', 1],
+    ]);
+  });
+
+  test('meiosis: 2 durante toda la meiosis I y hasta la metafase II, 1 desde la anafase II', () => {
+    expect(porFase(FASES_MEIOSIS)).toEqual([
+      ['interfase', NaN],
+      ['profase-i', 2],
+      ['metafase-i', 2],
+      ['anafase-i', 2],
+      ['telofase-i', 2],
+      ['profase-ii', 2],
+      ['metafase-ii', 2],
+      ['anafase-ii', 1],
+      ['telofase-ii', 1],
+    ]);
+  });
+
+  test('solo la telofase de la mitosis tiene dos núcleos: el dibujo no pinta además el central', () => {
+    // La telofase forma DOS envolturas nuevas, una por polo; el núcleo central del dibujo solo
+    // sale con `nucleos: 1`. Hallazgo 2502: salían tres.
+    const conDos = [...FASES_MITOSIS, ...FASES_MEIOSIS].filter(f => f.nucleos === 2).map(f => f.id);
+    expect(conDos).toEqual(['telofase']);
+    expect(fase(FASES_MITOSIS, 'telofase').disposicion).toBe('polos');
   });
 });

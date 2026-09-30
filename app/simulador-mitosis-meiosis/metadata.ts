@@ -35,18 +35,19 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Mitosis y Meiosis',
   description:
-    'Simulador interactivo de división celular que muestra las 6 fases de la mitosis y las 9 fases de la meiosis. Visualiza cromosomas, huso acromático, crossing-over y formación de células hijas con canvas 2D animado.',
+    'Simulador interactivo de división celular que recorre la mitosis (6 etapas, de la interfase a la citocinesis) y la meiosis (9 etapas). Visualiza cromosomas, huso acromático, crossing-over y formación de células hijas con canvas 2D animado.',
   url: 'https://meskeia.com/simulador-mitosis-meiosis/',
   category: 'EducationalApplication',
   features: [
-    'Simulación animada de las 6 fases de la mitosis',
-    'Simulación animada de las 9 fases de la meiosis',
-    'Visualización de cromosomas, huso acromático y crossing-over',
-    'Control de velocidad: lenta, media y rápida',
-    'Navegación manual fase a fase o reproducción automática',
-    'Contador de células resultado con ploidy (2n/n)',
-    'Tabla comparativa mitosis vs meiosis: diferencias clave fase a fase',
-    'Identificador de resultado con conteo de células hijas y ploidía (2n/n)',
+    // Hallazgo 2506: sin inglés («ploidy»), sin repetir la misma característica dos veces y sin
+    // prometer una tabla «fase a fase» que la app no tiene (compara por características).
+    'Mitosis paso a paso, de la interfase a la citocinesis (6 etapas)',
+    'Meiosis I y II paso a paso, de la interfase a la telofase II (9 etapas)',
+    'Cromosomas, cromátidas hermanas, huso acromático y crossing-over dibujados en cada fase',
+    'Reproducción automática a tres velocidades o avance manual fase a fase',
+    'Rótulo de resultado con el número de células hijas y su ploidía (2n o n)',
+    'Tabla comparativa de mitosis y meiosis por características: divisiones, células, ploidía y crossing-over',
+    'Doce casos de aula con corrección y solución paso a paso, más ejercicios de práctica',
   ],
   keywords: [
     'mitosis',
@@ -87,7 +88,7 @@ export const faqJsonLd = {
       name: '¿Cuántas fases tiene la mitosis y en qué consiste cada una?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La mitosis tiene 6 etapas: interfase (duplicación del ADN), profase (condensación de cromosomas y formación del huso), metafase (alineación de cromosomas en el ecuador), anafase (separación de cromátidas hacia los polos), telofase (reconstitución de núcleos) y citocinesis (división del citoplasma). Al final se obtienen dos células hijas diploides (2n) genéticamente idénticas.',
+        text: 'La mitosis, o división del núcleo, tiene cuatro fases: profase (condensación de los cromosomas y formación del huso), metafase (alineación de los cromosomas en la placa ecuatorial), anafase (separación de las cromátidas hermanas hacia los polos) y telofase (formación de dos núcleos nuevos); muchos textos distinguen además la prometafase, entre la profase y la metafase. La interfase, en la que se duplica el ADN, no forma parte de la mitosis: es la etapa del ciclo celular que la precede. Tras la mitosis, la citocinesis divide el citoplasma y se obtienen dos células hijas diploides (2n) genéticamente idénticas.',
       },
     },
     {

@@ -586,45 +586,90 @@ function diagnostico(usuario: number, esperado: number, datos: DatosCaso): strin
       const contrapartida = CONTRAPARTIDA[datos.magnitud];
       const otra = contrapartida ? otraMagnitud(datos, contrapartida) : NaN;
       const confundeCosa = Number.isFinite(otra) && otra !== esperado && usuario === otra;
-      // Tras la anafase I la célula ya es haploide: dar el 2n es no haber aplicado la reducción.
-      const noReduce =
-        !pideCromatidas &&
+      // Cromosomas que responden a ESTA misma pregunta (por polo o en la célula).
+      const cromosomasPregunta = pideCromatidas ? otra : esperado;
+      // ¿Refleja la respuesta la reducción de la meiosis I? Solo entonces «no reducir» es un error.
+      const reducida =
         datos.division === 'meiosis' &&
-        esperado < datos.dosN &&
-        usuario === datos.dosN;
+        Number.isFinite(cromosomasPregunta) &&
+        cromosomasPregunta > 0 &&
+        cromosomasPregunta < datos.dosN;
+      // Tras la anafase I la célula ya es haploide: dar el 2n es no haber aplicado la reducción.
+      const noReduce = !pideCromatidas && reducida && usuario === datos.dosN;
+      // Lo mismo contando cromátidas: sin reducción habría el doble de cromosomas y, por tanto,
+      // el doble de cromátidas. En la meiosis II el doble sale también de creer que el ADN se
+      // duplicó otra vez tras la meiosis I (el error que nombra el título del caso 6).
+      const enMeiosisII =
+        datos.division === 'meiosis' &&
+        encontrada.indice > FASES_MEIOSIS.findIndex((f) => f.id === 'telofase-i');
+      const cromatidasSinReducir = pideCromatidas && reducida && usuario === esperado * 2;
+
+      // ⚠️ 30/09/2026 (hallazgo 2504) — un mismo número puede salir de DOS lecturas equivocadas
+      // (en el caso 6, «24» es no haber reducido —o haber duplicado otra vez— Y sumar las dos
+      // células; en el 7, «12» es el 2n Y la célula entera de la anafase II). Antes el primer
+      // `return` se llevaba el diagnóstico y el alumno repasaba solo uno de los dos errores, a
+      // veces justo el que no era el suyo. Ahora se reúnen TODAS las lecturas que dan ese número.
+      const lecturas: string[] = [];
 
       if (confundeCosa && noReduce) {
-        return `${NO_ES} ${ent(usuario)} serían las cromátidas, o los cromosomas si no hubiera reducción. En la anafase I se separan los HOMÓLOGOS: cada polo recibe la mitad de los cromosomas, y cada uno conserva todavía sus dos cromátidas hermanas.`;
+        lecturas.push(
+          `${ent(usuario)} serían las cromátidas, o los cromosomas si no hubiera reducción. En la anafase I se separan los HOMÓLOGOS: cada polo recibe la mitad de los cromosomas, y cada uno conserva todavía sus dos cromátidas hermanas.`
+        );
+      } else if (confundeCosa) {
+        lecturas.push(
+          pideCromatidas
+            ? 'Has contado CROMOSOMAS y se piden CROMÁTIDAS: en esta fase cada cromosoma conserva sus dos cromátidas hermanas.'
+            : 'Has contado CROMÁTIDAS y se piden CROMOSOMAS: un cromosoma con dos cromátidas hermanas sigue siendo UN cromosoma (cuenta centrómeros).'
+        );
+      } else if (noReduce) {
+        lecturas.push(
+          `${ent(datos.dosN)} es la dotación diploide (2n) de la célula de partida. En la anafase I se separan los homólogos y cada célula queda haploide (n = ${ent(n)}); la meiosis II ya no reduce el número.`
+        );
       }
-      if (confundeCosa) {
-        return pideCromatidas
-          ? `${NO_ES} Has contado CROMOSOMAS y se piden CROMÁTIDAS: en esta fase cada cromosoma conserva sus dos cromátidas hermanas.`
-          : `${NO_ES} Has contado CROMÁTIDAS y se piden CROMOSOMAS: un cromosoma con dos cromátidas hermanas sigue siendo UN cromosoma (cuenta centrómeros).`;
-      }
-      if (noReduce) {
-        return `${NO_ES} ${ent(datos.dosN)} es la dotación diploide (2n) de la célula de partida. En la anafase I se separan los homólogos y cada célula queda haploide (n = ${ent(n)}); la meiosis II ya no reduce el número.`;
+      if (cromatidasSinReducir) {
+        const porCromosoma = esperado / cromosomasPregunta;
+        lecturas.push(
+          enMeiosisII
+            ? `${ent(usuario)} saldría si la célula no se hubiera reducido (${ent(cromosomasPregunta * 2)} cromosomas × ${ent(porCromosoma)}) o si el ADN se hubiera duplicado otra vez entre la meiosis I y la II (${ent(cromosomasPregunta)} × ${ent(porCromosoma * 2)}). No ocurre ninguna de las dos cosas: tras la meiosis I hay n = ${ent(n)} cromosomas y, sin nueva duplicación, ${porCromosoma === 1 ? 'una vez separadas las hermanas cada uno tiene una sola cromátida' : 'cada uno conserva sus dos cromátidas'}.`
+            : `${ent(usuario)} saldría si no se hubiera aplicado la reducción (${ent(cromosomasPregunta * 2)} cromosomas × ${ent(porCromosoma)}). En la anafase I se separan los homólogos: cada polo recibe la mitad de los cromosomas, cada uno todavía con sus dos cromátidas.`
+        );
       }
 
       const porPolo = datos.magnitud.endsWith('por-polo');
       if (porPolo && fase.separacion === 'hermanas' && usuario * 2 === esperado) {
-        return `${NO_ES} Te ha salido la MITAD. Aquí se separan cromátidas HERMANAS, no homólogos: cada cromosoma se parte en dos cromosomas hijos y cada polo recibe tantos como había.`;
+        lecturas.push(
+          'Te ha salido la MITAD. Aquí se separan cromátidas HERMANAS, no homólogos: cada cromosoma se parte en dos cromosomas hijos y cada polo recibe tantos como había.'
+        );
       }
       const enLaCelula = otraMagnitud(
         datos,
         pideCromatidas ? 'cromatidas-en-celula' : 'cromosomas-en-celula'
       );
       if (porPolo && tienePolos && usuario === enLaCelula) {
-        return `${NO_ES} Te ha salido el DOBLE: has contado la célula entera, con sus dos polos, y se pide lo que recibe CADA polo.`;
+        lecturas.push(
+          'Te ha salido el DOBLE: has contado la célula entera, con sus dos polos, y se pide lo que recibe CADA polo.'
+        );
       }
       if (!porPolo && tienePolos && usuario * 2 === esperado) {
-        return `${NO_ES} Te ha salido la MITAD: has contado un solo polo. La célula todavía NO se ha partido, así que contiene los dos.`;
+        lecturas.push(
+          'Te ha salido la MITAD: has contado un solo polo. La célula todavía NO se ha partido, así que contiene los dos.'
+        );
       }
       if (!porPolo && fase.celulas > 1 && usuario === esperado * fase.celulas) {
-        return `${NO_ES} Te ha salido ${
-          fase.celulas === 2 ? 'el DOBLE' : 'de más'
-        }: has sumado las ${ent(fase.celulas)} células, y se pide lo que tiene CADA una.`;
+        lecturas.push(
+          `Te ha salido ${fase.celulas === 2 ? 'el DOBLE' : 'de más'}: has sumado las ${ent(
+            fase.celulas
+          )} células, y se pide lo que tiene CADA una.`
+        );
       }
-      return null;
+
+      if (lecturas.length === 0) return null;
+      if (lecturas.length === 1) return `${NO_ES} ${lecturas[0]}`;
+      const cuantos =
+        lecturas.length === 2 ? 'dos' : lecturas.length === 3 ? 'tres' : ent(lecturas.length);
+      return `${NO_ES} A ${ent(usuario)} se llega por ${cuantos} caminos equivocados. ${lecturas
+        .map((l, i) => `(${i + 1}) ${l}`)
+        .join(' ')}`;
     }
 
     case 'cromosomas-gameto-no-disyuncion': {
