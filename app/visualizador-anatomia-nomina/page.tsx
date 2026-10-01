@@ -365,6 +365,25 @@ export default function VisualizadorAnatomiaNominaPage() {
             (cheque guardería, seguro médico, etc.).
           </p>
 
+          <h3>Tu contrato debe decirte qué complementos cobras</h3>
+          <p>
+            Desde el 5 de octubre de 2026, el{' '}
+            <a href="https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-19200" target="_blank" rel="noopener noreferrer">
+              Real Decreto 723/2026
+            </a>{' '}
+            obliga a la empresa a informar por escrito de la cuantía del salario base y de
+            <strong> cada complemento salarial por separado</strong>, con su periodicidad y forma de
+            pago, de cómo se calculan los conceptos variables y del convenio colectivo aplicable,
+            con su código. Ese documento es la referencia para comprobar que cada línea de
+            devengos de tu nómina corresponde a algo pactado.
+          </p>
+          <p>
+            Si tu contrato ya existía el 5 de octubre de 2026, esa información no llega sin
+            pedirla: puedes solicitarla y la empresa tiene <strong>30 días hábiles</strong> para
+            entregártela, salvo que ya la tengas. Solo se aplica a relaciones laborales de más
+            de cuatro semanas.
+          </p>
+
           <div className={styles.warningBox}>
             <strong>Nota:</strong> esta nómina es ficticia y simplificada con fines educativos.
             Las nóminas reales varían según convenio colectivo, categoría profesional, antigüedad,
