@@ -10,6 +10,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *
  * ─────────────────────────────────────────────────────────────────────────────────────────
  * QUÉ PROMETE (de aquí salen los valores esperados de este fichero)
+ *   (Texto tal como estaba en la 1.ª pasada. Desde la reparación 296 —25/08/2026— la página
+ *   cita una sola guía, «ESH 2023», sin «/ESC»: lo vigila la REGRESIÓN 296 de más abajo.)
  *   - <h1> «Orientador Tensión Arterial» + subtítulo: «Clasifica tu presión según las guías
  *     ESH/ESC 2023 · Calcula TAM y presión de pulso».
  *   - Tabla de referencia de la propia app (botón «Ver tabla de clasificación ESH/ESC 2023»)
@@ -812,3 +814,309 @@ test.describe('Re-inspección 25/09/2026', () => {
     });
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN · 01/10/2026
+// ═════════════════════════════════════════════════════════════════════════════════════════
+/**
+ * Cambios desde la anterior: f51cfe8d (25/09, redondeo, historial recalculado y contraste) y dos
+ * lotes de catálogo sobre el hero, d056b066 (27/09, el logo tapaba el título en móvil) y
+ * a1d72a9c (28/09, ídem en tableta de 769 a 1.023 px).
+ *
+ * LA GUÍA QUE LA APP CITA, Y SU TABLA — ESH 2023, clasificación de la PA en consulta, tal como
+ * la reproduce «from [1], with permission» la sinopsis de la ERA (PMC11139525, leída el
+ * 01/10/2026): óptima < 120 y < 80 · normal 120–129 / 80–84 · normal-alta 130–139 y/o 85–89 ·
+ * grado 1 140–159 y/o 90–99 · grado 2 160–179 y/o 100–109 · grado 3 ≥ 180 y/o ≥ 110 · HTA
+ * sistólica aislada ≥ 140 y < 90 · HTA diastólica aislada < 140 y ≥ 90 (las dos aisladas se
+ * gradúan 1, 2 o 3 por el valor que está alto). «The BP category is defined by the highest level
+ * of BP, whether systolic or diastolic.» En esa tabla NO hay «hipotensión» ni «crisis
+ * hipertensiva»: las dos filas son de la app, aunque su tabla las rotule «Fuente: Guías ESH 2023».
+ *
+ * LOS CASOS DE ESTA TANDA, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ *   Normal — 124/83, pulso 66: S y D normales → «Tensión Normal». TAM = 83 + 41/3 = 96,67 → 97 ·
+ *     PP = 41 → «Normal (40–60 mmHg)».
+ *   Límites con S y D en categorías distintas —
+ *     130/79 → S normal-alta (borde inclusivo), D óptima → «Normal-Alta». TAM = 79 + 51/3 = 96.
+ *     119/85 → S óptima, D normal-alta (borde 85) → «Normal-Alta». TAM = 85 + 34/3 = 96,33 → 96 ·
+ *       PP 34 → «Baja (< 40 mmHg)».
+ *     159/100 → S grado 1 (borde alto), D grado 2 (borde bajo) → «HTA Grado 2», «Urgente»; no es
+ *       aislada porque D ≥ 90. TAM = 100 + 59/3 = 119,67 → 120 · PP 59 → normal.
+ *     129,5/84,4 → redondeo 130/84 → «Normal-Alta», con la nota de los dos redondeos.
+ *   Rechazos — 90/110 (D > S) · S vacía con D 80 · 100,4/100 (redondea a 100/100) · 300,6/80
+ *     (redondea a 301, fuera de 50–300): aviso y ningún resultado.
+ *
+ * LA SOSPECHA DE LA BARRA FIJA (SOSPECHAS.md, 30/09/2026) — DESCARTADA EN ESTA APP
+ *   El único desplazamiento es `scrollIntoView({ block: 'nearest' })` sobre la recomendación, y
+ *   la recomendación nace siempre POR DEBAJO del botón que la dispara: con `nearest` el navegador
+ *   alinea su borde INFERIOR con el de la pantalla, nunca el superior con la barra. Medido con el
+ *   botón pegado al pie de la pantalla (el peor caso, el que obliga a desplazar) en 390×664,
+ *   390×844, 800×1.100, 800×600, 844×390 y 1.280×800, con y sin movimiento reducido: la cabecera
+ *   del resultado queda a ≥ 161 px por debajo de la barra (apaisado 844×390: h2 en 238 px,
+ *   barra hasta 77). Los dos tests de abajo lo fijan a 390 y a 800 px.
+ *
+ * HALLAZGOS DE ESTA TANDA — cinco, ABIERTOS (test.fail). Los dos primeros enfrentan la app con la
+ * guía que cita; el fichero ya tiene tests que fijan el comportamiento ACTUAL de esas dos filas
+ * (CASO 2c, CASO 4, «Límites altos», REPARADO 1717 y REGRESIÓN 294d). Si la reparación alinea la
+ * clasificación con la ESH, hay que reescribirlos con su grado ESH; si en cambio decide conservar
+ * las filas y declararlas criterio propio fuera de la ESH, son estos dos test.fail los que se
+ * reescriben para vigilar esa declaración.
+ */
+test.describe('Re-inspección 01/10/2026', () => {
+  test('Normal · 124/83 con pulso 66 es «Tensión Normal», TAM 97 y presión de pulso 41', async ({ page }) => {
+    await medirHidratado(page, '124', '83', '66');
+    // S 124 (120–129) y D 83 (80–84): las dos en «normal» de la ESH 2023.
+    await expect(categoria(page)).toHaveText('Tensión Normal');
+    await expect(urgencia(page)).toContainText('Normal');
+    await expect(recomendacion(page)).toHaveText(
+      'Recomendación: Bien. Continúa con hábitos saludables y revisiones periódicas.',
+    );
+    // TAM = 83 + (124 − 83)/3 = 96,67 → 97 · PP = 124 − 83 = 41
+    await expect(derivadoValor(page, 0)).toHaveText('97 mmHg');
+    await expect(derivadoValor(page, 1)).toHaveText('41 mmHg');
+    await expect(derivadoNota(page, 1)).toHaveText('Normal (40–60 mmHg)');
+    await expect(page.locator('[class*="metricaValor"]').nth(2)).toHaveText('66ppm');
+    await expect(page.locator('[class*="resultadoRedondeo"]')).toHaveCount(0);
+  });
+
+  test('Límites · con S y D en categorías distintas y justo en el borde, manda la más alta', async ({ page }) => {
+    // [S, D, categoría, TAM, PP, valoración de la PP] — resueltos con la tabla ESH 2023
+    const casos: Array<[string, string, string, string, string, string]> = [
+      ['130', '79', 'Normal-Alta', '96 mmHg', '51 mmHg', 'Normal (40–60 mmHg)'],  // S 130 borde inclusivo
+      ['119', '85', 'Normal-Alta', '96 mmHg', '34 mmHg', 'Baja (< 40 mmHg)'],     // D 85 borde inclusivo
+      ['159', '100', 'HTA Grado 2', '120 mmHg', '59 mmHg', 'Normal (40–60 mmHg)'], // S G1 tope, D G2 suelo
+    ];
+    for (const [sis, dia, esperada, tam, pp, nota] of casos) {
+      await medirHidratado(page, sis, dia);
+      await expect(categoria(page), `${sis}/${dia}`).toHaveText(esperada);
+      await expect(derivadoValor(page, 0), `${sis}/${dia}`).toHaveText(tam);
+      await expect(derivadoValor(page, 1), `${sis}/${dia}`).toHaveText(pp);
+      await expect(derivadoNota(page, 1), `${sis}/${dia}`).toHaveText(nota);
+    }
+    // 159/100 no es «aislada»: D ≥ 90. La urgencia es la del grado 2.
+    await expect(urgencia(page)).toContainText('Urgente');
+
+    // Decimales justo en el borde: 129,5 → 130 (normal-alta) y 84,4 → 84 (normal).
+    await medirHidratado(page, '129.5', '84.4');
+    await expect(categoria(page)).toHaveText('Normal-Alta');
+    await expect(page.locator('[class*="resultadoRedondeo"]')).toContainText(
+      'sistólica 129,5 → 130 · diastólica 84,4 → 84',
+    );
+  });
+
+  test('Rechazos · D > S, sistólica vacía y redondeos que salen de la regla: aviso y ningún resultado', async ({ page }) => {
+    await medirHidratado(page, '90', '110');
+    await expect(page.locator('#error-sis')).toHaveText('La sistólica debe ser mayor que la diastólica');
+
+    await medirHidratado(page, '', '80');
+    await expect(page.locator('#error-sis')).toHaveText('Introduce la tensión sistólica');
+    await expect(page.locator('#error-dia')).toHaveCount(0);
+
+    // 100,4 se clasifica como 100 (cortes enteros): 100/100 no es una lectura.
+    await medirHidratado(page, '100.4', '100');
+    await expect(page.locator('#error-sis')).toHaveText('La sistólica debe ser mayor que la diastólica');
+
+    // 300,6 redondea a 301, fuera de 50–300.
+    await medirHidratado(page, '300.6', '80');
+    await expect(page.locator('#error-sis')).toHaveText('Valor fuera de rango (50–300 mmHg)');
+
+    await expect(categoria(page)).toHaveCount(0);
+    await expect(page.locator('table[aria-label*="Historial"]')).toHaveCount(0);
+  });
+
+  test('Hero · a 1.280 px el logo y el botón de tema no tocan el <h1>', async ({ page }) => {
+    await esperarHidratacion(page, ['#sistolica']);
+    await expect(page.locator('[class*="themeToggle"]')).toBeVisible();
+    expect(await tituloTapado(page)).toBe(false);
+  });
+
+  // ─── Hallazgos de esta tanda: ABIERTOS ──────────────────────────────────────────────────
+
+  // ABIERTO, hallazgo: «Crisis Hipertensiva ≥ 180 y/o ≥ 120» no es una categoría de la ESH 2023
+  // y desplaza al grado 3 que esa guía da a toda sistólica ≥ 180 con diastólica < 120 (y deja
+  // inalcanzable «HTA Sistólica Aislada (Grado 3)», que el motor sabe rotular).
+  test.fail('ABIERTO · 185/100 y 190/85 son grado 3 en la ESH 2023 que la app cita, no «Crisis Hipertensiva»', async ({ page }) => {
+    // S 185 → grado 3 (≥ 180); D 100 → grado 2. Manda la más alta: HTA Grado 3.
+    await medirHidratado(page, '185', '100');
+    await expect(categoria(page)).toHaveText('HTA Grado 3');
+    // S 190 con D 85 (< 90): HTA sistólica aislada, graduada por la sistólica → grado 3.
+    await medirHidratado(page, '190', '85');
+    await expect(categoria(page)).toHaveText('HTA Sistólica Aislada (Grado 3)');
+  });
+
+  // ABIERTO, hallazgo: la fila «Hipotensión < 90/60» no está en la tabla ESH 2023 y, como la app
+  // la evalúa antes que «normal» y «óptima», rotula hipotensión lecturas que esa guía llama normales.
+  test.fail('ABIERTO · 125/58 es «Tensión Normal» en la tabla ESH 2023, no «Hipotensión»', async ({ page }) => {
+    // S 125 → normal (120–129); D 58 → óptima (< 80). Manda la más alta: normal.
+    await medirHidratado(page, '125', '58');
+    await expect(categoria(page)).toHaveText('Tensión Normal');
+  });
+
+  // ABIERTO, hallazgo: ante una crisis el resultado manda «a urgencias inmediatamente o al 112»
+  // sin condición, mientras la FAQ visible dice que sin síntomas se repite tras 15-30 min de
+  // reposo y el FAQPage, que sin síntomas graves se contacta con el médico en el día.
+  // Comprobación neutra respecto a la reparación: basta con que las tres digan lo mismo.
+  test.fail('ABIERTO · la conducta ante una crisis es la misma en el resultado, la FAQ y el FAQPage', async ({ page }) => {
+    await medirHidratado(page, '185', '125');
+    await expect(categoria(page)).toHaveText('Crisis Hipertensiva');
+    const textoRecomendacion = (await recomendacion(page).textContent()) ?? '';
+    const textoFaq = (await page.locator('[class*="faqItem"]', { hasText: '¿Cuándo debo ir a urgencias' }).textContent()) ?? '';
+    const textoLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    const otrasDistinguenSinSintomas = /sin síntomas/i.test(textoFaq) || /sin síntomas/i.test(textoLd);
+    expect(
+      otrasDistinguenSinSintomas && !/síntomas/i.test(textoRecomendacion),
+      'la FAQ y el FAQPage separan «con síntomas» de «sin síntomas»; la recomendación del resultado no',
+    ).toBe(false);
+  });
+
+  // ABIERTO, hallazgo: el FAQPage (lo que leen buscadores e IAs) da la TAM normal entre 70 y
+  // 100 mmHg y la página, en su FAQ y en su sección «¿Qué es la TAM?», entre 70 y 105.
+  test.fail('ABIERTO · el rango normal de la TAM es el mismo en el FAQPage y en la página', async ({ page }) => {
+    const textoLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    const textoFaq = (await page.locator('[class*="faqItem"]', { hasText: '¿Qué es la TAM' }).textContent()) ?? '';
+    const enLd = textoLd.match(/TAM[^"]*?entre (\d+) y (\d+) mmHg/)?.slice(1);
+    const enPagina = textoFaq.match(/entre (\d+) y (\d+) mmHg/)?.slice(1);
+    // Hoy: página 70–105, FAQPage 70–100. Vale cualquiera de los dos, pero el mismo en ambos.
+    expect(enPagina, 'la FAQ visible da un rango normal de TAM').toBeTruthy();
+    expect(enLd, 'el FAQPage da un rango normal de TAM').toBeTruthy();
+    expect(enLd).toEqual(enPagina);
+  });
+
+  // ABIERTO, hallazgo: una entrada rechazada deja en pantalla la clasificación de la lectura
+  // ANTERIOR. Con 190 tecleado en la sistólica y la diastólica mal escrita, debajo sigue
+  // «Tensión Normal · Bien. Continúa con hábitos saludables».
+  test.fail('ABIERTO · tras una entrada rechazada no queda a la vista la clasificación de la lectura anterior', async ({ page }) => {
+    await medirHidratado(page, '124', '83');
+    await expect(categoria(page)).toHaveText('Tensión Normal');
+    await medirHidratado(page, '190', '1200');
+    await expect(page.locator('#error-dia')).toHaveText('Valor fuera de rango (30–200 mmHg)');
+    // Lo rechazado no se clasifica, y lo que se ve debajo no puede ser la respuesta a otra lectura.
+    await expect(categoria(page)).toHaveCount(0);
+  });
+
+  test.describe('en móvil de 390 px (iPhone 13)', () => {
+    const IPHONE_13 = devices['iPhone 13'];
+    test.use({
+      viewport: IPHONE_13.viewport, // 390 × 664
+      userAgent: IPHONE_13.userAgent,
+      deviceScaleFactor: IPHONE_13.deviceScaleFactor,
+      isMobile: IPHONE_13.isMobile,
+      hasTouch: IPHONE_13.hasTouch,
+    });
+
+    test('Hero · a 390 px el logo y el botón de tema no tocan el <h1> (d056b066)', async ({ page }) => {
+      await esperarHidratacion(page, ['#sistolica']);
+      await expect(page.locator('[class*="themeToggle"]')).toBeVisible();
+      expect(await tituloTapado(page)).toBe(false);
+    });
+
+    test('Barra fija · con el botón al pie, tras Calcular la cabecera y la recomendación quedan bajo la barra, no debajo de ella', async ({ page }) => {
+      await calcularConBotonAlPie(page, '185', '125');
+      await comprobarResultadoLibreDeBarra(page);
+    });
+  });
+
+  test.describe('en tableta de 800 px', () => {
+    test.use({
+      viewport: { width: 800, height: 1100 },
+      userAgent: devices['iPad Mini'].userAgent,
+      deviceScaleFactor: 2,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('Hero · a 800 px el logo y el botón de tema no tocan el <h1> (a1d72a9c)', async ({ page }) => {
+      await esperarHidratacion(page, ['#sistolica']);
+      await expect(page.locator('[class*="themeToggle"]')).toBeVisible();
+      expect(await tituloTapado(page)).toBe(false);
+    });
+
+    test('Barra fija · con el botón al pie, tras Calcular la cabecera y la recomendación quedan bajo la barra, no debajo de ella', async ({ page }) => {
+      await calcularConBotonAlPie(page, '185', '125');
+      await comprobarResultadoLibreDeBarra(page);
+    });
+  });
+});
+
+/**
+ * ¿Algún renglón del <h1> se cruza con la píldora del logo o con el botón de tema? Son las dos
+ * piezas opacas de la barra fija de MeskeiaLogo; el resto de la barra es transparente.
+ */
+async function tituloTapado(page: Page): Promise<boolean> {
+  return page.evaluate(() => {
+    const barra = document.querySelector('[class*="headerBar"]');
+    const piezas = [
+      barra?.querySelector('[class*="logoContainer"]')?.getBoundingClientRect(),
+      barra?.querySelector('[class*="themeToggle"]')?.getBoundingClientRect(),
+    ];
+    const h1 = document.querySelector('h1');
+    if (!h1 || piezas.some((p) => !p)) throw new Error('Falta el <h1> o una pieza de la barra fija');
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    return Array.from(rango.getClientRects()).some((l) =>
+      piezas.some((p) => p && !(l.right <= p.left || p.right <= l.left || l.bottom <= p.top || p.bottom <= l.top)),
+    );
+  });
+}
+
+/**
+ * El peor caso del `scrollIntoView`: el botón «Calcular» pegado al pie de la pantalla, de modo que
+ * el resultado nace entero bajo el pliegue y la app TIENE que desplazar. Espera a que el
+ * desplazamiento (suave) termine.
+ */
+async function calcularConBotonAlPie(page: Page, sistolica: string, diastolica: string): Promise<void> {
+  await esperarHidratacion(page, ['#sistolica', '#diastolica']);
+  for (const [selector, valor] of [['#sistolica', sistolica], ['#diastolica', diastolica]] as const) {
+    await page.fill(selector, valor);
+    await esperarValorEnReact(page, selector, valor);
+  }
+  await page.evaluate(() => {
+    const boton = Array.from(document.querySelectorAll('button')).find((b) => b.textContent?.trim() === 'Calcular');
+    if (!boton) throw new Error('No está el botón «Calcular»');
+    const r = boton.getBoundingClientRect();
+    window.scrollTo({ top: window.scrollY + r.bottom - window.innerHeight + 4, behavior: 'instant' });
+  });
+  const antes = await page.evaluate(() => window.scrollY);
+  await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+  await expect(categoria(page)).toHaveText('Crisis Hipertensiva');
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolver) => {
+        let ultimo = window.scrollY;
+        let quietos = 0;
+        const paso = (): void => {
+          if (window.scrollY === ultimo) quietos += 1;
+          else {
+            quietos = 0;
+            ultimo = window.scrollY;
+          }
+          if (quietos >= 12) resolver();
+          else requestAnimationFrame(paso);
+        };
+        requestAnimationFrame(paso);
+      }),
+  );
+  // Control: la app ha desplazado de verdad (si no, el caso no mediría la barra).
+  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(antes);
+}
+
+/** La cabecera del resultado (h2) y la recomendación empiezan por debajo de la barra y caben en pantalla. */
+async function comprobarResultadoLibreDeBarra(page: Page): Promise<void> {
+  const m = await page.evaluate(() => {
+    const barra = document.querySelector('[class*="headerBar"]');
+    const pill = barra?.querySelector('[class*="logoContainer"]')?.getBoundingClientRect();
+    const tema = barra?.querySelector('[class*="themeToggle"]')?.getBoundingClientRect();
+    const h2 = document.querySelector('[class*="resultadoNombre"]')?.getBoundingClientRect();
+    const rec = document.querySelector('[class*="resultadoRecomendacion"]')?.getBoundingClientRect();
+    if (!pill || !tema || !h2 || !rec) throw new Error('Falta la barra fija o el resultado');
+    return {
+      finBarra: Math.max(pill.bottom, tema.bottom),
+      h2Arriba: h2.top,
+      recArriba: rec.top,
+      recAbajo: rec.bottom,
+      alto: window.innerHeight,
+    };
+  });
+  expect(m.h2Arriba, 'el nombre de la categoría empieza bajo la barra fija').toBeGreaterThanOrEqual(m.finBarra);
+  expect(m.recArriba, 'la recomendación empieza bajo la barra fija').toBeGreaterThanOrEqual(m.finBarra);
+  expect(m.recAbajo, 'la recomendación cabe en pantalla').toBeLessThanOrEqual(m.alto + 1);
+}

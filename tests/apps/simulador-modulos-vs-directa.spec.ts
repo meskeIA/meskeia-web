@@ -344,7 +344,11 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 31/0
   test('DataReference cita la fuente de lo que realmente se calcula (IRPF)', async ({ page }) => {
     const referencias = page.locator('[aria-label="Datos de referencia normativos"]');
     await expect(referencias).toHaveCount(4);
-    await expect(referencias.first()).toContainText('IRPF 2025');
+    // 01/10/2026 — antes se exigía el literal «IRPF 2025», que es justo lo que contradice al
+    // <title> (2026, de FISCAL_IRPF_META.vigencia). El AÑO lo vigila ahora el test
+    // «[año] el DataReference del IRPF anuncia el mismo año que el title» de la re-inspección
+    // del 01/10/2026; aquí solo se exige que el sello sea el del IRPF.
+    await expect(referencias.first()).toContainText(/IRPF \d{4}/);
     await expect(referencias.first()).toContainText('fórmula didáctica simplificada');
     await expect(referencias.nth(2)).toContainText('Estimación directa simplificada');
     await expect(referencias.nth(2)).toContainText('cuota RETA como gasto deducible');
@@ -1037,5 +1041,345 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 29/0
     // body y no solo main: los DataReference y el bloque educativo viven fuera de <main>.
     expect(await page.locator('body').innerText()).not.toContain('Orden HFP');
     expect(await page.locator('body').textContent()).not.toContain('Orden HFP');
+  });
+});
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * RE-INSPECCIÓN del 01/10/2026 — la cola la invalidó por e02a9981 (29/09: la cuota RETA
+ * desgrava en directa y el 5 % de módulos va sin tope y tras el empleo, hallazgos 2444-2448)
+ * y b7ec248c (01/10: el año del <title> sale de FISCAL_IRPF_META.vigencia; candado
+ * check:anio-titulo).
+ *
+ * La sospecha que traía (SOSPECHAS.md, 29/09): «el title dice "Autónomos 2025" y la app modela
+ * la Orden de módulos de 2026 con la escala IRPF de 2025». SE DESCARTA para el title: desde
+ * b7ec248c dice 2026, y es coherente con todo lo que aplica el motor —
+ *  · escala: TRAMOS_IRPF_2025, cuyo sufijo es histórico; FISCAL_IRPF_META.vigencia = '2026' y
+ *    su cabecera registra que el art. 63 no se toca desde la Ley 11/2020 (misma escala en 2026);
+ *  · Orden de módulos: ORDEN_MODULOS_VIGENTE.ejercicio = 2026 (Orden HAC/1425/2025) y
+ *    REDUCCION_GENERAL_MODULOS.ejercicio = 2026;
+ *  · tabla RETA del aviso: TRAMOS_RETA_2025, también sufijo histórico, con los datos de la
+ *    Orden PJC/297/2026 (FISCAL_AUTONOMOS_META.vigencia = '2026').
+ * Lo que queda incoherente es el CUERPO: el sello del primer DataReference dice «IRPF 2025»
+ * (escrito a mano) y su nota enseña el identificador «TRAMOS_RETA_2025». Ver los test.fail.
+ *
+ * De dónde sale cada cifra esperada: las mismas anclas de la re-inspección del 29/09 (escala
+ * TRAMOS_IRPF_2025 · mínimo MINIMOS_IRPF_2025.personal = 5.550 → escala(5.550) = 1.054,50 ·
+ * GASTOS_DIFICIL_JUSTIFICACION_EDS 5 % con tope de 2.000 € solo en ED · REDUCCION_GENERAL_
+ * MODULOS 5 % sin tope tras el incentivo al empleo · TRAMOS_RETA_2025 + tramoRETA() con
+ * TIPO_COTIZACION_RETA 31,50 % · LIMITES_EXCLUSION_MODULOS_2025 250.000 / 250.000). Acumulados
+ * de la escala: escala(12.450) = 2.365,50 · escala(35.200) = 8.725,50 · escala(60.000) =
+ * 17.901,50. Todas resueltas a mano ANTES de ejecutar la app.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+test.describe('Simulador Módulos vs Estimación Directa — re-inspección 01/10/2026', () => {
+  const deslizar = (page: Page, id: string, valor: number) =>
+    sembrarValorAcotado(page, `#${id}`, valor);
+
+  /** El aviso de coherencia de la cuota RETA (el de la app, no el anunciador de rutas). */
+  const avisoReta = (page: Page) =>
+    page.locator('[aria-live="polite"]').filter({ hasText: 'tabla del RETA' });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, DESLIZADORES);
+  });
+
+  /**
+   * CASO 1 (NORMAL) — revalida A LA VEZ las dos reparaciones del 29/09 en el único régimen
+   * cuya fórmula didáctica pasa de 40.000 € (el bar), que es donde el tope de 2.000 € de la
+   * EDS mordería si volviera a colarse en módulos.
+   * Bar, ingresos 120.000 €, gastos 50.000 €, RETA 500 €/mes, 28 mesas, 4 asalariados,
+   * 1 no asalariado (de partida), 100 m², 20.000 kWh.
+   *
+   * ED: cuota RETA 500 × 12 = 6.000 (gasto deducible, hallazgo 2444)
+   *   previo 120.000 − 50.000 − 6.000 = 64.000 · 5 % = 3.200 > tope → −2.000 → base 62.000
+   *   escala(62.000) = 17.901,50 + 2.000 × 45 % = 18.801,50 → IRPF 18.801,50 − 1.054,50 = 17.747,00
+   *   + 6.000 → coste ED 23.747,00 €
+   *   (Sin deducir la cuota —el defecto 2444— la base sería 68.000, el IRPF 20.447,00 y el coste
+   *   26.447,00 €: 2.700 € más = 6.000 × 45 %.)
+   * Módulos: 1.500 × 28 + 800 × 4 + 6 × 100 + 0,05 × 20.000 = 42.000 + 3.200 + 600 + 1.000 = 46.800
+   *   − incentivo al empleo 4 × 100 = 400 → rendimiento neto de módulos 46.400
+   *   − 5 % SIN tope = 2.320,00 (con el tope de la EDS serían 2.000) → base 44.080
+   *   escala(44.080) = 8.725,50 + 8.880 × 37 % = 8.725,50 + 3.285,60 = 12.011,10
+   *   → IRPF 10.956,60 · + 6.000 → coste módulos 16.956,60 €
+   *   (Con el defecto 2445 —5 % topado y antes del empleo— base 44.400 e IRPF 11.075,00.)
+   * Diferencia 23.747,00 − 16.956,60 = 6.790,40 € a favor de módulos.
+   * Aviso RETA: (70.000 − 6.000)/12 = 5.333,33 €/mes → tramo 14 (> 4.050 y ≤ 6.000), cuota
+   *   mínima r(1.732,03 × 31,50 %) = 545,59 € → déficit (545,59 − 500) × 12 = 547,08 €.
+   */
+  test('CASO 1 (normal) — bar 120.000/50.000/500 con 28 mesas: la cuota RETA desgrava en ED y el 5 % de módulos (2320,00 €) va sin tope y tras el empleo', async ({
+    page,
+  }) => {
+    await deslizar(page, 'ingresos', 120000);
+    await deslizar(page, 'gastos', 50000);
+    await deslizar(page, 'reta', 500);
+    await deslizar(page, 'mesas', 28);
+    await deslizar(page, 'pAsal', 4);
+    await deslizar(page, 'sup', 100);
+    await deslizar(page, 'kwh', 20000);
+
+    expect(await linea(page, ED, '− Cuota RETA × 12 (gasto deducible del titular)')).toBe('−6000,00 €');
+    expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('64.000,00 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Reducción 5')).toBe('−2000,00 €');
+    expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('62.000,00 €');
+    expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('18.801,50 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Escala sobre el mínimo personal')).toBe('−1054,50 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('17.747,00 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('23.747,00 €');
+
+    expect(await linea(page, MOD, 'Rendimiento neto previo (módulos)')).toBe('46.800,00 €');
+    expect(await linea(page, MOD, '− Minoración por incentivos al empleo')).toBe('−400,00 €');
+    expect(await linea(page, MOD, '= Rendimiento neto de módulos')).toBe('46.400,00 €');
+    // 2.320,00 y NO 2.000,00 (tope de la EDS) ni 2.340,00 (5 % antes del empleo).
+    expect(await lineaQueEmpiezaPor(page, MOD, '− Reducción general')).toBe('−2320,00 €');
+    expect(await linea(page, MOD, '= Base liquidable (el mínimo va dentro)')).toBe('44.080,00 €');
+    expect(await linea(page, MOD, 'Escala general sobre la base completa')).toBe('12.011,10 €');
+    expect(await linea(page, MOD, '= IRPF')).toBe('10.956,60 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('16.956,60 €');
+    expect(await panel(page, MOD)).not.toContain('NO es elegible');
+
+    const estado = page.locator('[role="status"]');
+    await expect(estado).toContainText('6790,40 €');
+    await expect(estado).toContainText('MENOS con módulos');
+    expect(await page.locator('body').innerText()).toMatch(
+      /te conviene más: Estimación Objetiva \(Módulos\)/
+    );
+
+    await expect(avisoReta(page)).toContainText('5333,33 €/mes');
+    await expect(avisoReta(page)).toContainText('tramo 14');
+    await expect(avisoReta(page)).toContainText('545,59 €/mes');
+    await expect(avisoReta(page)).toContainText('547,08 €');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — la cuota RETA lleva el rendimiento de ED justo a cero y luego por
+   * debajo. Bar de partida (6 mesas, 1 asalariado, 50 m², 10.000 kWh), ingresos 40.000 €,
+   * gastos 37.000 €: ingresos − gastos = 3.000 €.
+   *   RETA 250 €/mes → 3.000 − 3.000 = 0 exacto: reducción 0,00, base 0, IRPF 0 (el mínimo se
+   *     acota a la base: escala(0) − escala(0)), coste ED = 3.000,00 €.
+   *   RETA 300 €/mes → 3.000 − 3.600 = −600, que el motor acota a 0 (no publica rendimientos
+   *     negativos): IRPF 0, coste ED = 3.600,00 €.
+   * Módulos (no depende de la cuota): 10.600 − 100 = 10.500 − 525,00 = 9.975 → escala 1.895,25
+   *   − 1.054,50 = 840,75 de IRPF → coste 840,75 + 3.000 = 3.840,75 € y 840,75 + 3.600 = 4.440,75 €.
+   * Diferencia en los dos puntos: −840,75 € → «Pagas 840,75 € MÁS con módulos», recomienda ED.
+   * Aviso RETA: rendimiento mensual (3.000 − 3.000)/12 = 0 y (3.000 − 3.600)/12 = −50, los dos
+   *   ≤ 0 → `contrastarCuotaReta` devuelve null y no hay aviso.
+   */
+  test('CASO 2 (límite) — la cuota RETA deja el rendimiento de ED en 0 (250 €) y por debajo (300 €): base 0, IRPF 0, sin aviso RETA', async ({
+    page,
+  }) => {
+    await deslizar(page, 'ingresos', 40000);
+    await deslizar(page, 'gastos', 37000);
+    await deslizar(page, 'reta', 250);
+
+    expect(await linea(page, ED, '− Cuota RETA × 12 (gasto deducible del titular)')).toBe('−3000,00 €');
+    expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('0,00 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Reducción 5')).toBe('−0,00 €');
+    expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('0,00 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Escala sobre el mínimo personal')).toBe('−0,00 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('0,00 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('3000,00 €');
+    expect(await linea(page, MOD, '= IRPF')).toBe('840,75 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('3840,75 €');
+    const estado = page.locator('[role="status"]');
+    await expect(estado).toContainText('840,75 €');
+    await expect(estado).toContainText('MÁS con módulos');
+    await expect(avisoReta(page)).toHaveCount(0);
+
+    await deslizar(page, 'reta', 300);
+    // −600 € acotados a 0: ni rendimiento negativo en pantalla ni cuota negativa.
+    expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('0,00 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('0,00 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('3600,00 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('4440,75 €');
+    await expect(estado).toContainText('840,75 €');
+    await expect(estado).toContainText('MÁS con módulos');
+    await expect(avisoReta(page)).toHaveCount(0);
+    expect(await page.locator('body').innerText()).toMatch(
+      /te conviene más: Estimación Directa Simplificada/
+    );
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — una cuota RETA imposible y unos ingresos fuera de rango no entran.
+   * Taxi con vehículo afecto, ingresos 30.000 €, gastos 10.000 €, y se intenta sembrar una cuota
+   * de 150 €/mes, por debajo de la mínima de TRAMOS_RETA_2025 (205,88 €): el deslizador la deja
+   * en su suelo, ceil(205,88) = 206.
+   *   ED: 30.000 − 10.000 − 206 × 12 = 30.000 − 10.000 − 2.472 = 17.528 · 5 % = 876,40 →
+   *     base 16.651,60 · escala = 2.365,50 + 4.201,60 × 24 % = 2.365,50 + 1.008,38 = 3.373,88
+   *     → IRPF 2.319,38 · + 2.472 → 4.791,38 €
+   *   Módulos (taxi): 6.800 − 0 = 6.800 − 340,00 = 6.460 → escala 1.227,40 → IRPF 172,90
+   *     → 2.644,90 € · diferencia 2.146,48 € a favor de módulos.
+   *   Aviso: (20.000 − 2.472)/12 = 1.460,67 €/mes → tramo 5 (> 1.300 y ≤ 1.500), cuota mínima
+   *     r(960,78 × 31,50 %) = 302,65 € → déficit (302,65 − 206) × 12 = 1.159,80 €.
+   * Después se intenta sembrar 350.000 € de ingresos: el deslizador los deja en 300.000 €, que
+   *   supera LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades (250.000 €) → aviso de
+   *   exclusión, sin comparativa de importes, y la única recomendación es ED.
+   */
+  test('CASO 3 (rechazo) — taxi: una cuota RETA de 150 € se queda en 206 € y 350.000 € de ingresos en 300.000 €, que excluyen de módulos', async ({
+    page,
+  }) => {
+    await page.getByRole('radio', { name: /Taxi \(autotaxi\)/ }).click();
+    await deslizar(page, 'veh', 1);
+    await deslizar(page, 'ingresos', 30000);
+    await deslizar(page, 'gastos', 10000);
+    expect(await deslizar(page, 'reta', 150)).toBe('206');
+
+    expect(await linea(page, ED, '− Cuota RETA × 12 (gasto deducible del titular)')).toBe('−2472,00 €');
+    expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('17.528,00 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Reducción 5')).toBe('−876,40 €');
+    expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('16.651,60 €');
+    expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('3373,88 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('2319,38 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('4791,38 €');
+    expect(await linea(page, MOD, '= Base liquidable (el mínimo va dentro)')).toBe('6460,00 €');
+    expect(await linea(page, MOD, '= IRPF')).toBe('172,90 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('2644,90 €');
+    const estado = page.locator('[role="status"]');
+    await expect(estado).toContainText('2146,48 €');
+    await expect(estado).toContainText('MENOS con módulos');
+    await expect(avisoReta(page)).toContainText('1460,67 €/mes');
+    await expect(avisoReta(page)).toContainText('tramo 5');
+    await expect(avisoReta(page)).toContainText('302,65 €/mes');
+    await expect(avisoReta(page)).toContainText('1159,80 €');
+
+    expect(await deslizar(page, 'ingresos', 350000)).toBe('300000');
+    expect(await linea(page, ED, 'Ingresos brutos')).toBe('300.000,00 €');
+    expect(await panel(page, MOD)).toContain('Ingresos o gastos superan los límites de exclusión');
+    await expect(estado).toContainText('no parece elegible para módulos');
+    await expect(estado).not.toContainText('Pagas');
+    const cuerpo = await page.locator('body').innerText();
+    expect(cuerpo).toMatch(/te conviene más: Estimación Directa Simplificada/);
+    expect(cuerpo).not.toMatch(/te conviene más: Estimación Objetiva \(Módulos\)/);
+  });
+
+  /**
+   * [año] El <title> sale de FISCAL_IRPF_META.vigencia = '2026' (b7ec248c), y og:title y
+   * twitter:title no llevan año. Es coherente con lo que aplica el motor (ver cabecera de este
+   * bloque). Al re-sellar el módulo en enero, este literal se actualiza con él.
+   */
+  test('[año] el title anuncia 2026, de FISCAL_IRPF_META.vigencia, y og/twitter no llevan año', async ({
+    page,
+  }) => {
+    await expect(page).toHaveTitle('Simulador Módulos vs Estimación Directa Autónomos 2026 | meskeIA');
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+      'content',
+      'Simulador Módulos vs Estimación Directa | meskeIA'
+    );
+    await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute(
+      'content',
+      'Módulos vs Estimación Directa | meskeIA'
+    );
+  });
+
+  /**
+   * ABIERTO, hallazgo (01/10/2026): el sello del primer DataReference anuncia «IRPF 2025»,
+   * escrito a mano en page.tsx (`normativa="IRPF 2025"`), mientras el <title> de la misma página
+   * dice 2026, sacado de FISCAL_IRPF_META.vigencia — el mismo META que ese DataReference cita
+   * como fuente y fecha. El usuario ve 2026 en la pestaña y en el buscador, y 2025 en el sello
+   * de los datos.
+   */
+  test('[año] el DataReference del IRPF anuncia el mismo año que el title', async ({ page }) => {
+    test.fail(true, 'ABIERTO, hallazgo: el DataReference dice «IRPF 2025» escrito a mano y el title, 2026 de FISCAL_IRPF_META.vigencia');
+    const anio = (await page.title()).match(/Autónomos (\d{4})/)?.[1];
+    expect(anio).toBe('2026');
+    const referencias = page.locator('[aria-label="Datos de referencia normativos"]');
+    await expect(referencias.first()).toContainText(`IRPF ${anio}`, { timeout: 1000 });
+  });
+
+  /**
+   * ABIERTO, hallazgo (01/10/2026): la nota del primer DataReference enseña al usuario un
+   * identificador de código, «(TRAMOS_RETA_2025)», cuyo sufijo además contradice al dato: esa
+   * tabla es la de la Orden PJC/297/2026 (FISCAL_AUTONOMOS_META.vigencia = '2026'), como dice el
+   * cuarto DataReference de la misma página.
+   */
+  test('[RETA] ninguna nota visible enseña un identificador de código', async ({ page }) => {
+    test.fail(true, 'ABIERTO, hallazgo: la nota del DataReference del IRPF muestra «(TRAMOS_RETA_2025)»');
+    const referencias = page.locator('[aria-label="Datos de referencia normativos"]');
+    await expect(referencias.first()).not.toContainText(/[A-Z]+_[A-Z_]+\d{4}/, { timeout: 1000 });
+  });
+
+  /**
+   * ABIERTO, hallazgo (01/10/2026): con la actividad Bar / Cafetería la app pinta el deslizador
+   * «Personal no asalariado (incluido titular)» en el panel de módulos, pero la fórmula del bar
+   * del motor (`1.500 × mesas + 800 × asalariados + 6 × m² + 0,05 × kWh`) no lo usa, y tampoco
+   * cambia la elegibilidad (con m² > 0 ya es apta). Moverlo de 1 a 3 no mueve ninguna cifra.
+   * Bar de partida: 1.500 × 6 + 800 + 6 × 50 + 0,05 × 10.000 = 10.600 € con 1 o con 3.
+   * Pasa si se repara de cualquiera de las dos formas: retirando el control del bar o haciendo
+   * que cuente.
+   */
+  test('[bar] el deslizador de personal no asalariado mueve el rendimiento de módulos (o no se muestra)', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO, hallazgo: en Bar el «Personal no asalariado» se muestra y no mueve ninguna cifra');
+    expect(await linea(page, MOD, 'Rendimiento neto previo (módulos)')).toBe('10.600,00 €');
+    if ((await page.locator('#pNoAsal').count()) === 0) return; // reparado retirándolo
+    await deslizar(page, 'pNoAsal', 3);
+    expect(await linea(page, MOD, 'Rendimiento neto previo (módulos)')).not.toBe('10.600,00 €');
+  });
+
+  /**
+   * ABIERTO, hallazgo (01/10/2026): las tarjetas «Casos típicos» del bloque educativo no
+   * llegaron a la reparación del 2444. Dicen «ED tributa sobre 65.000 € de rendimiento» (bar,
+   * 90.000/25.000) y «ED tributa sobre solo 5.000 € de beneficio real» (bar, 60.000/55.000),
+   * es decir, ingresos − gastos sin la cuota RETA. Los presets de la app con esas mismas cifras
+   * (RETA 320 €/mes) calculan un rendimiento neto previo de 61.160,00 € y 1160,00 €
+   * (90.000 − 25.000 − 3.840 y 60.000 − 55.000 − 3.840).
+   */
+  test('[educativo] las tarjetas de casos típicos no contradicen la deducción de la cuota RETA', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO, hallazgo: las tarjetas dicen que ED tributa sobre 65.000 € y 5.000 €, sin la cuota RETA');
+    await page.getByRole('button', { name: /Aplicar caso Bar pequeño rentable/ }).click();
+    expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('61.160,00 €');
+    await page.getByRole('button', { name: /Aplicar caso Bar con pérdidas/ }).click();
+    expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('1160,00 €');
+
+    const tarjeta = (titulo: string) => page.locator('h4', { hasText: titulo }).locator('xpath=..');
+    await expect(tarjeta('Bar pequeño con margen alto')).not.toContainText('tributa sobre 65.000 €', {
+      timeout: 1000,
+    });
+    await expect(tarjeta('Bar con pérdidas o margen bajo')).not.toContainText('tributa sobre solo 5.000 €', {
+      timeout: 1000,
+    });
+  });
+
+  /**
+   * ABIERTO, hallazgo (01/10/2026): el faqJsonLd de metadata.ts escribe a mano los tres límites
+   * de exclusión («250.000 €», «125.000 €», «250.000 €») y la Orden de módulos («Orden
+   * HAC/1425/2025, de 9 de diciembre (BOE-A-2025-25272)», «Orden HAC/1347/2024»), que la página
+   * deriva de LIMITES_EXCLUSION_MODULOS_2025 y ORDEN_MODULOS_VIGENTE. Hoy coinciden, así que
+   * este testigo PASA: no detecta el literal, vigila la DERIVA. Compara el FAQPage —lo que leen
+   * los buscadores con IA— con lo que la página pinta desde data/fiscal; cuando se re-selle la
+   * Orden de 2027, si el FAQPage no se mueve con ella, este test se pone en rojo.
+   */
+  test('[FAQPage] cita la misma Orden y los mismos límites que la página deriva de data/fiscal', async ({
+    page,
+  }) => {
+    const faq = await page.evaluate(
+      () =>
+        [...document.querySelectorAll('script[type="application/ld+json"]')]
+          .map((s) => s.textContent ?? '')
+          .find((t) => t.includes('"FAQPage"')) ?? ''
+    );
+    expect(faq).not.toBe('');
+
+    // Aviso de elegibilidad del panel de módulos: ORDEN_MODULOS_VIGENTE.referencia y .boe.
+    const aviso = await page.locator('p', { hasText: 'Solo determinadas actividades pueden acogerse' }).innerText();
+    const orden = aviso.match(/Orden HAC\/\d+\/\d{4}/)?.[0];
+    const boe = aviso.match(/BOE-A-\d{4}-\d+/)?.[0];
+    expect(orden).toBe('Orden HAC/1425/2025');
+    expect(boe).toBe('BOE-A-2025-25272');
+    expect(faq).toContain(orden);
+    expect(faq).toContain(boe);
+
+    // FAQ del bloque educativo «¿Qué pasa si supero los límites…?», de LIMITES_EXCLUSION_MODULOS_2025.
+    const limites = (
+      await page.locator('strong', { hasText: '¿Qué pasa si supero los límites de módulos?' }).locator('xpath=..').textContent()
+    )?.replace(/\s+/g, ' ');
+    const cifras = [...(limites ?? '').matchAll(/(\d{1,3}(?:\.\d{3})+),00\s€/g)].map((m) => m[1]);
+    expect(cifras).toEqual(['250.000', '125.000', '250.000']);
+    for (const c of new Set(cifras)) expect(faq).toContain(`${c} €`);
   });
 });

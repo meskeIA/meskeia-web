@@ -307,7 +307,8 @@ test('CASO 3 (variante) — «2» no es un dígito binario, ni «8» uno octal',
 });
 
 // ──────────────────────────────────────────────────────────────────────────────
-// Los demás hallazgos abiertos, como TESTIGO
+// Los demás hallazgos del 20/09/2026: eran TESTIGO y se REPARARON el mismo día; hoy exigen
+// el comportamiento correcto.
 // ──────────────────────────────────────────────────────────────────────────────
 
 test('HALLAZGO 3 (medio, reparado) — en decimal salen las cinco divisiones sucesivas', async ({
@@ -586,5 +587,370 @@ test.describe('calculadora-sistemas-numericos · la sección de casos en el nave
     await expect(solucion).toHaveAttribute('aria-expanded', 'false');
     await solucion.click();
     await expect(seccion(page).locator('#casos-solucion')).toContainText('10010001');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN, 01/10/2026 — los 12 casos de aula (733055dc) y la calculadora tras b7733c6d
+ *
+ * LOS 12 CASOS, RESUELTOS A MANO ANTES DE ABRIR LA APP (coinciden con A_MANO_CASOS, de arriba):
+ *   1 · 45 ÷ 2 → restos 1,0,1,1,0,1 leídos de abajo arriba                       → 101101₂
+ *   2 · 10110110₂ = 128 + 32 + 16 + 4 + 2                                         = 182
+ *   3 · 1101 | 0111 → D | 7                                                       → D7₁₆
+ *   4 · 101 | 110 → 5 | 6                                                         → 56₈
+ *   5 · B4₁₆ = 11·16 + 4                                                          = 180
+ *   6 · 2 → 0010, F → 1111                                                        → 00101111₂
+ *   7 · 01011011 + 00110110: acarreos en las columnas 2 a 7, 91 + 54 = 145        → 10010001₂
+ *   8 · #FF8000 → verde 80₁₆ = 8·16                                               = 128
+ *   9 · 11001000 AND 11110000 = 11000000                                          = 192
+ *  10 · rwx r-x --- → 111 101 000 → 7 5 0                                         → 750₈
+ *  11 · K = 65 + 10 = 75 = 4·16 + 11                                              → 4B₁₆
+ *  12 · 00110101 << 1 = 01101010 (no sale ningún 1 del registro)                  = 106
+ *
+ * LA CORRECCIÓN ES EXACTA. En un cambio de base no cabe tolerancia: una tolerancia relativa del
+ * 1 % (la forma vista en SOSPECHAS.md, 27-30/09) daría por bueno 751₈ (489) en el caso 10, cuya
+ * respuesta vale 488. Se comprueba que la respuesta que difiere en UNA unidad se rechaza en los
+ * doce, y en el navegador.
+ *
+ * LA CALCULADORA, RESUELTA A MANO:
+ *   · 2026 = 1024+512+256+128+64+32+8+2 = 111 1110 1010₂ → octal 3752 (3·512+7·64+5·8+2) ·
+ *     hexadecimal 7EA (7·256+14·16+10).
+ *   · 0 → 0 en las cuatro bases (el binario se pinta relleno a un nibble: «0000»).
+ *   · 2⁵³ + 1 = 9.007.199.254.740.993 no es representable en un `number`: parseInt lo redondea
+ *     a 2⁵³ y la app debe RECHAZARLO, no convertir otro número.
+ *   · «-5» y «10,5» se rechazan: la app no promete ni negativos ni fracciones.
+ *
+ * HALLAZGOS NUEVOS (todos bajos; los doce casos y su corrector están limpios):
+ *   A · Un operando que no cabe en el ancho se recorta en silencio: 300 + 1 en 8 bits da 45 y la
+ *       explicación dice «44 + 1 = 45», sin decir que 300 no cabe (300 mod 256 = 44).
+ *   B · Los <h2> de los paneles llevan el emoji en el nombre accesible («📐 Conversión de Bases»).
+ *   C · «Ver proceso paso a paso» es un desplegable con aria-pressed en vez de aria-expanded.
+ *   D · Cuatro <label> sin control («Base de entrada:» ×2, «Ancho de bits:», «Operación:»): los dos
+ *       juegos de botones BIN/OCT/DEC/HEX quedan sin nombre de grupo.
+ *   E · «Practicar» lleva aria-pressed pero es una acción: pulsado otra vez sigue «presionado» y
+ *       cambia de ejercicio.
+ *   F · Bloque educativo: «En Python 2, 078 era tratado como decimal». La gramática oficial de
+ *       Python 2.7 (Doc/reference/lexical_analysis.rst: decimalinteger ::= nonzerodigit digit* |
+ *       "0"; octinteger ::= "0" octdigit+) no admite «078»: es un error de sintaxis.
+ *   G · Bloque educativo: «Kilobyte = 1024 bytes = 2^10 (no 1000)». NIST, «Prefixes for binary
+ *       multiples»: 1 kbit = 10³ bit = 1000 bit; 1024 es el prefijo binario kibi (IEC, 1998).
+ *   H · Bloque educativo: «un sumador de 8 bits = 8 puertas lógicas en cascada». Cada columna
+ *       del sumador da DOS salidas (suma y acarreo) y una puerta da una sola: son 8 sumadores
+ *       completos en cascada, no 8 puertas.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/** El numeral canónico de un valor en una base: sin ceros a la izquierda, en mayúsculas. */
+const enBase = (valor: number, base: number) => valor.toString(base).toUpperCase();
+
+test.describe('re-inspección 01/10/2026 · el corrector de los casos es exacto', () => {
+  test('una respuesta que difiere en UNA unidad se rechaza en los doce casos', async () => {
+    for (const caso of CASOS) {
+      const valor = A_MANO_CASOS[caso.id].valor;
+      for (const desvio of [valor - 1, valor + 1]) {
+        const texto = enBase(desvio, caso.baseRespuesta);
+        expect(comprobarRespuesta(texto, caso).correcto, `caso ${caso.id}: ${texto}`).toBe(false);
+      }
+    }
+    // El caso de mayor valor: 750₈ = 488. Con un 1 % de tolerancia (±4,88) pasarían 747₈ a 754₈.
+    expect(comprobarRespuesta('751', casoN(10)).correcto).toBe(false); // 489
+    expect(comprobarRespuesta('747', casoN(10)).correcto).toBe(false); // 487
+    expect(comprobarRespuesta('D8', casoN(3)).correcto).toBe(false); // 216 en vez de 215
+  });
+
+  test('grafías legítimas de más: hexadecimal partido, cero inicial, # y subíndice con prefijo', async () => {
+    for (const t of ['D 7', '0d7', '#4b', '0x4B₁₆']) {
+      const caso = t.toUpperCase().includes('4B') ? casoN(11) : casoN(3);
+      expect(comprobarRespuesta(t, caso).correcto, t).toBe(true);
+    }
+    expect(comprobarRespuesta('0750', casoN(10)).correcto).toBe(true); // cero inicial al estilo C
+    expect(comprobarRespuesta('182₁₀', casoN(2)).correcto).toBe(true);
+    // Lo que NO vale: doble prefijo, separadores que no son espacio ni guion bajo, signo.
+    for (const t of ['0b0b101101', '101.101', '101-101', '+101101', '101101b']) {
+      expect(comprobarRespuesta(t, casoN(1)).correcto, t).toBe(false);
+    }
+    expect(comprobarRespuesta('182.0', casoN(2)).correcto).toBe(false);
+    expect(comprobarRespuesta('D7h', casoN(3)).correcto).toBe(false);
+  });
+
+  test('el modo práctica: 300 ejercicios, cada respuesta recalculada APARTE desde su enunciado', async () => {
+    const BASE: Record<string, number> = { binario: 2, octal: 8, decimal: 10, hexadecimal: 16 };
+    for (let semilla = 1; semilla <= 300; semilla++) {
+      const m = generarEjercicioAleatorio(semilla);
+      const e = m.enunciado;
+      let esperado: string;
+      let conv: RegExpMatchArray | null;
+      let suma: RegExpMatchArray | null;
+      let and: RegExpMatchArray | null;
+      let shl: RegExpMatchArray | null;
+      if ((conv = e.match(/^Convierte ([0-9A-F]+)[₀-₉]+ \(en (\w+)\) a (\w+)\./))) {
+        esperado = enBase(parseInt(conv[1], BASE[conv[2]]), BASE[conv[3]]);
+      } else if ((suma = e.match(/^Suma en binario ([01]{8}) \+ ([01]{8}),/))) {
+        const s = parseInt(suma[1], 2) + parseInt(suma[2], 2);
+        expect(s, `semilla ${semilla}: la suma cabe en 8 bits`).toBeLessThan(256);
+        esperado = enBase(s, 2);
+      } else if ((and = e.match(/^Calcula ([01]{8}) AND ([01]{8}),/))) {
+        esperado = enBase(parseInt(and[1], 2) & parseInt(and[2], 2), 2);
+      } else if ((shl = e.match(/está el número (\d+)\. Desplaza/))) {
+        esperado = enBase((Number(shl[1]) * 2) % 256, 10);
+      } else {
+        throw new Error(`semilla ${semilla}: enunciado sin forma conocida: ${e}`);
+      }
+      expect(m.respuestaCanonica, `semilla ${semilla}: ${e}`).toBe(esperado);
+      expect(comprobarRespuesta(esperado, m).correcto, `semilla ${semilla}`).toBe(true);
+      const unoMas = enBase(m.respuesta + 1, m.baseRespuesta);
+      expect(comprobarRespuesta(unoMas, m).correcto, `semilla ${semilla}: ${unoMas}`).toBe(false);
+    }
+  });
+});
+
+test.describe('re-inspección 01/10/2026 · los doce casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+  const casilla = (page: Page) => page.locator('#casos-respuesta');
+
+  async function responder(page: Page, texto: string) {
+    await casilla(page).fill(texto);
+    await esperarValorEnReact(page, casilla(page), texto);
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test('las doce respuestas resueltas a mano dan «¡Correcto!» y la de una unidad menos, no', async ({ page }) => {
+    // Lo que teclearía el alumno: la respuesta de la cabecera de este bloque (el 6, con sus 8 bits).
+    const TECLEADO: Record<number, [string, string]> = {
+      1: ['101101', '101100'], 2: ['182', '181'], 3: ['D7', 'D6'], 4: ['56', '55'],
+      5: ['180', '179'], 6: ['00101111', '00101110'], 7: ['10010001', '10010000'], 8: ['128', '127'],
+      9: ['192', '191'], 10: ['750', '747'], 11: ['4B', '4A'], 12: ['106', '105'],
+    };
+    const alerta = seccion(page).getByRole('alert');
+    for (let id = 1; id <= 12; id++) {
+      await seccion(page).getByRole('button', { name: new RegExp(`^Caso ${id}:`) }).click();
+      const [bien, mal] = TECLEADO[id];
+      await responder(page, bien);
+      await expect(alerta, `caso ${id}: ${bien}`).toHaveText(/¡Correcto!/);
+      await responder(page, mal);
+      await expect(alerta, `caso ${id}: ${mal}`).toContainText('No es correcto');
+    }
+  });
+
+  test('el foco no se pierde al comprobar y el veredicto se anuncia en una región viva', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 1:/ }).click();
+    await responder(page, '101101');
+    const alerta = seccion(page).getByRole('alert');
+    await expect(alerta).toHaveCount(1);
+    await expect(alerta).toContainText('¡Correcto!');
+    // El foco se queda en el botón pulsado, no cae al <body>.
+    await expect(seccion(page).getByRole('button', { name: 'Comprobar' })).toBeFocused();
+
+    // Con Enter en la casilla también se corrige, y el foco sigue en la casilla.
+    await casilla(page).fill('101100');
+    await esperarValorEnReact(page, casilla(page), '101100');
+    await expect(alerta).toHaveCount(0); // al teclear se retira el veredicto anterior
+    await casilla(page).press('Enter');
+    await expect(alerta).toContainText('101100₂ vale 44 en decimal');
+    await expect(casilla(page)).toBeFocused();
+
+    // Al cambiar de caso no se queda pegado el veredicto ni la respuesta del anterior.
+    await seccion(page).getByRole('button', { name: /^Caso 2:/ }).click();
+    await expect(alerta).toHaveCount(0);
+    await expect(casilla(page)).toHaveValue('');
+  });
+
+  test('HALLAZGO E (bajo) — «Practicar» no es un conmutador: pulsado dos veces sigue «presionado»', async ({ page }) => {
+    // ABIERTO, hallazgo: «Practicar» lleva aria-pressed pero es una acción (cada pulsación da
+    // otro ejercicio). Un lector anuncia «conmutador, presionado» y al pulsarlo no se suelta.
+    test.fail();
+    const practicar = seccion(page).getByRole('button', { name: /Practicar/ });
+    await practicar.click();
+    await expect(seccion(page).getByRole('heading', { level: 3 }).first()).toHaveText('Ejercicio de práctica');
+    await practicar.click();
+    await expect(practicar).not.toHaveAttribute('aria-pressed', 'true');
+  });
+});
+
+test.describe('re-inspección 01/10/2026 · los casos en un móvil de 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('sin desbordamiento, botones de 44 px y la suma en columna sin partirse', async ({ page }) => {
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+
+    const medidas = await page.evaluate(() => {
+      const s = document.querySelector('section[aria-labelledby="casos-aula-titulo"]')!;
+      return {
+        scroll: document.documentElement.scrollWidth,
+        ancho: document.documentElement.clientWidth,
+        botones: [...s.querySelectorAll('[role="group"] button')].map((b) => {
+          const r = b.getBoundingClientRect();
+          return { w: r.width, h: r.height, right: r.right };
+        }),
+      };
+    });
+    expect(medidas.scroll).toBeLessThanOrEqual(medidas.ancho);
+    expect(medidas.botones).toHaveLength(13); // 12 casos + Practicar
+    for (const b of medidas.botones) {
+      expect(b.w).toBeGreaterThanOrEqual(44);
+      expect(b.h).toBeGreaterThanOrEqual(44);
+      expect(b.right).toBeLessThanOrEqual(medidas.ancho);
+    }
+
+    await seccion.getByRole('button', { name: /^Caso 7:/ }).tap();
+    await page.locator('#casos-respuesta').fill('1001 0001'); // agrupado, como lo escribiría a mano
+    await esperarValorEnReact(page, '#casos-respuesta', '1001 0001');
+    const comprobar = seccion.getByRole('button', { name: 'Comprobar' });
+    await expect(comprobar).toBeInViewport();
+    await comprobar.tap();
+    await expect(seccion.getByRole('alert')).toContainText('¡Correcto!');
+
+    await seccion.getByRole('button', { name: /Ver solución/ }).tap();
+    const filas = await page.evaluate(() => {
+      const sol = document.querySelector('#casos-solucion')!;
+      const pasos = [...sol.querySelectorAll('[class*="casoPaso"]')];
+      const columna = pasos.filter((p) => /^\s+(acarreos|\+|=)?\s+[01 ]+$/.test(p.textContent ?? ''));
+      return {
+        desborda: sol.scrollWidth > sol.clientWidth,
+        filas: columna.map((p) => ({ t: p.textContent, h: p.getBoundingClientRect().height, lh: parseFloat(getComputedStyle(p).lineHeight) })),
+      };
+    });
+    expect(filas.desborda).toBe(false);
+    expect(filas.filas).toHaveLength(4); // acarreos, A, + B, = suma
+    for (const f of filas.filas) expect(f.h, f.t ?? '').toBeLessThan(f.lh * 1.5 + 4); // una sola línea
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+});
+
+test.describe('re-inspección 01/10/2026 · la calculadora', () => {
+  test('2026 en decimal: 111 1110 1010, 3752 y 7EA', async ({ page }) => {
+    await convertir(page, 'DEC', '2026');
+    await expect(errorConversion(page)).toHaveCount(0);
+    await expect(tarjeta(page, 'Binario (Base 2)')).toHaveText('0111 1110 1010');
+    await expect(tarjeta(page, 'Octal (Base 8)')).toHaveText('3752');
+    await expect(tarjeta(page, 'Hexadecimal (Base 16)')).toHaveText('7EA');
+  });
+
+  test('0 sale 0 en las cuatro bases y su paso a paso lo dice', async ({ page }) => {
+    await convertir(page, 'DEC', '0');
+    await expect(tarjeta(page, 'Binario (Base 2)')).toHaveText('0000');
+    await expect(tarjeta(page, 'Octal (Base 8)')).toHaveText('0');
+    await expect(tarjeta(page, 'Decimal (Base 10)')).toHaveText('0');
+    await expect(tarjeta(page, 'Hexadecimal (Base 16)')).toHaveText('0');
+    await page.locator(`${CONV} [class*="stepsToggle"]`).click();
+    await expect(page.locator(`${CONV} [class*="stepsContent"]`)).toContainText(
+      'El cero se escribe igual en las cuatro bases: 0',
+    );
+  });
+
+  test('2⁵³ + 1 en decimal se rechaza en vez de convertirse redondeado a 2⁵³', async ({ page }) => {
+    await convertir(page, 'DEC', '9007199254740991'); // 2⁵³ − 1, el último exacto
+    await expect(tarjeta(page, 'Hexadecimal (Base 16)')).toHaveText('1FFFFFFFFFFFFF');
+    await convertir(page, 'DEC', '9007199254740993'); // 2⁵³ + 1
+    await expect(errorConversion(page)).toHaveText('Número demasiado grande');
+    await expect(page.locator(`${CONV} [class*="resultCard"]`)).toHaveCount(0);
+  });
+
+  test('negativos y fracciones se rechazan, que es lo que la app promete', async ({ page }) => {
+    await convertir(page, 'DEC', '-5');
+    await expect(errorConversion(page)).toHaveText('Valor inválido para base 10');
+    await convertir(page, 'DEC', '10,5');
+    await expect(errorConversion(page)).toHaveText('Valor inválido para base 10');
+    await expect(page.locator(`${CONV} [class*="resultCard"]`)).toHaveCount(0);
+  });
+
+  test('lo que dicen los «Verlo en la calculadora» de los casos 7, 9 y 12 sale en el panel', async ({ page }) => {
+    await operar(page, { base: 'BIN', bits: '8 bits', op: 'suma', a: '01011011', b: '00110110' });
+    await expect(filaOperacion(page, 'Binario:')).toHaveText('1001 0001'); // 91 + 54 = 145
+    await operar(page, { bits: '8 bits', op: 'and', a: '200', b: '240' });
+    await expect(filaOperacion(page, 'Decimal:')).toHaveText('192');
+    await operar(page, { bits: '8 bits', op: 'shl', a: '53', b: '1' });
+    await expect(filaOperacion(page, 'Decimal:')).toHaveText('106');
+  });
+
+  test('HALLAZGO 939 (bajo, reparado) — la resta dice que 11111001 representa −7', async ({ page }) => {
+    // 3 − 10 = −7; en 8 bits, 256 − 7 = 249 = 11111001.
+    await operar(page, { bits: '8 bits', op: 'resta', a: '3', b: '10' });
+    await expect(tarjetaOperacion(page).locator('[class*="opExplanation"]')).toContainText('−7');
+    await expect(tarjetaOperacion(page).locator('[class*="opExplanation"]')).toContainText('11111001');
+  });
+
+  test('HALLAZGO A (bajo) — un operando que no cabe en 8 bits se recorta sin decirlo', async ({ page }) => {
+    // ABIERTO, hallazgo: 300 + 1 en 8 bits da 45 y la explicación dice «44 + 1 = 45». En un
+    // registro de 8 bits 300 se guarda como 300 mod 256 = 44, pero la app no lo dice: ni rechaza
+    // el operando ni explica de dónde sale el 44. La suma que desborda SÍ lo explica.
+    test.fail();
+    await operar(page, { bits: '8 bits', op: 'suma', a: '300', b: '1' });
+    await expect(page.locator(OPS)).toContainText('300');
+  });
+
+  test('HALLAZGO B (bajo) — los títulos de los paneles no leen el emoji', async ({ page }) => {
+    // ABIERTO, hallazgo: «📐 Conversión de Bases», «⚡ Operaciones Binarias» y «📚 Tabla de
+    // Referencia Rápida» llevan el emoji sin aria-hidden (y los <h3> del bloque educativo).
+    test.fail();
+    for (const nombre of ['Conversión de Bases', 'Operaciones Binarias', 'Tabla de Referencia Rápida']) {
+      await expect(page.getByRole('heading', { level: 2, name: nombre, exact: true }), nombre).toHaveCount(1);
+    }
+  });
+
+  test('HALLAZGO C (bajo) — «Ver proceso paso a paso» es un desplegable con aria-expanded', async ({ page }) => {
+    // ABIERTO, hallazgo: lleva aria-pressed, que anuncia un conmutador, y no aria-expanded.
+    test.fail();
+    await convertir(page, 'DEC', '25');
+    const desplegable = page.locator(`${CONV} [class*="stepsToggle"]`);
+    await expect(desplegable).toHaveAttribute('aria-expanded', 'false');
+    await desplegable.click();
+    await expect(desplegable).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  test('HALLAZGO D (bajo) — ninguna <label> de los paneles queda sin control', async ({ page }) => {
+    // ABIERTO, hallazgo: «Base de entrada:» (dos), «Ancho de bits:» y «Operación:» son <label>
+    // sin control, y los dos juegos de botones BIN/OCT/DEC/HEX no tienen nombre de grupo.
+    test.fail();
+    const huerfanas = await page.evaluate(() =>
+      [...document.querySelectorAll('[class*="conversionSection"] label, [class*="operationsSection"] label')]
+        .filter((l) => !(l as HTMLLabelElement).control)
+        .map((l) => l.textContent?.trim()),
+    );
+    expect(huerfanas).toEqual([]);
+    await expect(page.getByRole('group', { name: /Base de entrada/ })).toHaveCount(2);
+  });
+});
+
+test.describe('re-inspección 01/10/2026 · el bloque educativo', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  });
+
+  test('HALLAZGO F (bajo) — Python 2 no leía «078» como decimal', async ({ page }) => {
+    // ABIERTO, hallazgo: la gramática de Python 2.7 (decimalinteger ::= nonzerodigit digit* |
+    // "0"; octinteger ::= "0" octdigit+) no admite «078»: es un error de sintaxis, no un
+    // decimal silencioso.
+    test.fail();
+    await expect(page.locator('li', { hasText: 'Mezclar BIN y OCT' })).not.toContainText('tratado como decimal');
+  });
+
+  test('HALLAZGO G (bajo) — un kilobyte son 1000 bytes; 1024 es un kibibyte', async ({ page }) => {
+    // ABIERTO, hallazgo: «Kilobyte = 1024 bytes = 2^10 (no 1000)». NIST, «Prefixes for binary
+    // multiples»: 1 kbit = 10³ bit = 1000 bit; 1 Kibit = 2¹⁰ bit = 1024 bit (IEC, 1998).
+    test.fail();
+    await expect(page.locator('[class*="faqItem"]', { hasText: 'nibble, un byte' })).not.toContainText(
+      'Kilobyte = 1024 bytes',
+    );
+  });
+
+  test('HALLAZGO H (bajo) — un sumador de 8 bits no son 8 puertas lógicas', async ({ page }) => {
+    // ABIERTO, hallazgo: cada columna da suma Y acarreo (dos salidas) y una puerta da una: son 8
+    // sumadores completos en cascada (cada uno, varias puertas).
+    test.fail();
+    await expect(page.locator('[class*="escenarioCard"]', { hasText: 'Electrónica y hardware' })).not.toContainText(
+      '8 puertas lógicas',
+    );
   });
 });

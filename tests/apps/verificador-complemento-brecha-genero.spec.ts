@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, APIRequestContext } from '@playwright/test';
 import {
   COMPLEMENTO_MATERNIDAD_DEROGADO,
   COMPLEMENTO_BRECHA_GENERO_2026,
@@ -821,8 +821,9 @@ test.describe('Verificador del complemento por brecha de género', () => {
   });
 
   /**
-   * HALLAZGO ABIERTO (27/08/2026) — el campo «hijos» se traga lo tecleado antes de un
-   * carácter que el navegador rechaza, y los dígitos siguientes forman OTRO número.
+   * HALLAZGO 470 (27/08/2026), REPARADO el 27/08 — el campo «hijos» se tragaba lo tecleado
+   * antes de un carácter que el navegador rechaza, y los dígitos siguientes formaban OTRO
+   * número. Lo que sigue describe el defecto que hubo, para reconocerlo si vuelve.
    *
    * `onChange` hace `Math.max(0, parseInt(e.target.value) || 0)`. En un `<input
    * type="number">`, mientras el contenido no es un número válido el navegador devuelve
@@ -894,8 +895,8 @@ test.describe('Verificador del complemento por brecha de género', () => {
   );
 
   /**
-   * HALLAZGO ABIERTO (27/08/2026) — la guía educativa no se enteró de la exclusión del
-   * art. 60.4 LGSS.
+   * HALLAZGO 471 (27/08/2026), REPARADO — la guía educativa no se había enterado de la
+   * exclusión del art. 60.4 LGSS. Hoy la cita en la tabla comparativa y en la FAQ.
    *
    * La reparación del hallazgo 280 llevó la exclusión de la jubilación parcial a
    * `data/fiscal` (COMPLEMENTO_BRECHA_GENERO_2026.exclusiones), al motor de la app, a la
@@ -928,7 +929,8 @@ test.describe('Verificador del complemento por brecha de género', () => {
   );
 
   /**
-   * HALLAZGO ABIERTO (27/08/2026) — plazos y subapartados normativos tecleados en el JSX.
+   * HALLAZGO 472 (27/08/2026), REPARADO — plazos y subapartados normativos que iban
+   * tecleados en el JSX y hoy se leen de `data/fiscal`.
    *
    * CLAUDE.md prohíbe hardcodear datos normativos —incluidos los PLAZOS LEGALES— pudiendo
    * vivir en `data/fiscal`, y el precedente es de esta misma app: al reparar el hallazgo
@@ -974,7 +976,8 @@ test.describe('Verificador del complemento por brecha de género', () => {
   // subapartados del art. 60.3 y la exclusión del art. 60.4 CIERRA en `page.tsx` y en la
   // guía visible —lo comprueban los tests de arriba y se reprodujo en navegador—, pero
   // quedan copias supervivientes FUERA de `page.tsx`, que es donde mira el candado que
-  // dejó aquella reparación. Van marcadas con `test.fail()` abajo.
+  // dejó aquella reparación. Se marcaron con `test.fail()` (hallazgos 503-508) y están
+  // REPARADAS: abajo quedan como REGRESIÓN, sin la marca.
   //
   // Mitad B: tres casos nuevos resueltos a mano contra `COMPLEMENTO_BRECHA_GENERO_2026`
   // ANTES de abrir el navegador.
@@ -1180,7 +1183,8 @@ test.describe('Verificador del complemento por brecha de género', () => {
   // el corte temporal, la exclusión del art. 60.4 y la paridad con el MCP siguen cerrados.
   // Lo de aquí abajo son tres casos troncales resueltos a mano contra
   // `COMPLEMENTO_BRECHA_GENERO_2026` (data/fiscal/pensiones.ts, líneas 440-513) ANTES de
-  // abrir el navegador, y dos hallazgos nuevos marcados con `test.fail()`.
+  // abrir el navegador, y dos hallazgos nuevos que se marcaron con `test.fail()`: el 605,
+  // REPARADO el 05/09, y el 606, REPARADO el 02/09. Los dos quedan como regresión.
   // ──────────────────────────────────────────────────────────────────────────
 
   /**
@@ -1410,9 +1414,9 @@ test.describe('Verificador del complemento por brecha de género', () => {
 
 // ═════════════════════════════════════════════════════════════════════════════
 // REGRESIÓN — hallazgos 607 y 608 del 02/09/2026, REPARADOS ese mismo día.
-// El 605 (los «30 días naturales» del art. 71.2 LRJS) sigue ABIERTO: es un dato
-// normativo YMYL y su corrección va por /triaje-fiscal, con fuente oficial y OK
-// del usuario. Decidido así el 02/09/2026.
+// El 605 (los «30 días naturales» del art. 71.2 LRJS) se dejó abierto ese día porque es
+// un dato normativo YMYL y su corrección iba por /triaje-fiscal, con fuente oficial y OK
+// del usuario; se REPARÓ el 05/09/2026 (días hábiles, ver su regresión más arriba).
 // ═════════════════════════════════════════════════════════════════════════════
 
 test.describe('Regresión — hallazgos 607 y 608, reparados', () => {
@@ -1916,7 +1920,8 @@ test.describe('Inspección 07/09/2026', () => {
 //     después») y no el umbral de 16 años que no está en el art. 60.1 LGSS.
 //
 // Debajo van TRES casos nuevos resueltos a mano contra el módulo sellado antes de abrir
-// el navegador, y DOS hallazgos vivos marcados con `test.fail()`.
+// el navegador, y DOS hallazgos que se marcaron con `test.fail()` (1171, y 1172-1173 en un
+// solo test), REPARADOS el 21/09/2026 y hoy sin la marca.
 // ═════════════════════════════════════════════════════════════════════════════
 
 test.describe('Re-inspección 21/09/2026', () => {
@@ -2084,7 +2089,8 @@ test.describe('Re-inspección 21/09/2026', () => {
   });
 
   /**
-   * ⚠️ HALLAZGO VIVO 21/09/2026 — BAJO (dato). La jurisprudencia se LEE del módulo en la
+   * ✅ HALLAZGOS 1172 y 1173 del 21/09/2026 — BAJO (dato), REPARADOS el 21/09. Lo que sigue
+   * describe el defecto que hubo. La jurisprudencia se LEÍA del módulo en la
    * prosa de la guía y se TECLEA en los veredictos, que son lo que el usuario lee.
    *
    * Es el patrón de los hallazgos 606, 607 y 653 —el dato sube a `data/fiscal`, la página
@@ -2919,5 +2925,440 @@ test.describe('Re-inspección 26/09/2026 — redacción de la guía', () => {
     expect.soft(guia).toContain('C-623/23 (15 de mayo');
     // Barrido general: ninguna letra pegada a un paréntesis de apertura ni a «:»
     expect.soft(guia).not.toMatch(/[a-záéíóú]\((?!s\))/);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 01/10/2026 — segmento FISCAL, riesgo 1 CRÍTICO
+//
+// Volvió a la cola por a7be5add (26/09, la reparación de 2239-2249) y por b7ec248c (01/10,
+// el año del título sale de `COMPLEMENTO_BRECHA_GENERO_META.vigencia`, candado
+// `check:anio-titulo`). La batería entera (61 tests) se ejecutó ANTES de tocar nada y pasó
+// los 61: las once reparaciones del 26/09 se sostienen.
+//
+// Lo que se miró esta vez, y no antes, es el art. 60 LGSS entero contra la fuente oficial:
+//   · Texto consolidado del art. 60 (BOE-A-2015-11724, versión vigente desde el 18/03/2023,
+//     API de datos abiertos del BOE, consultada el 01/10/2026).
+//   · RD 241/2026 (BOE-A-2026-6977), art. 12: «Con efectos de 1 de enero de 2026, la cuantía
+//     del complemento para la reducción de la brecha de género queda establecida en 36,90
+//     euros mensuales, conforme a lo dispuesto en el artículo 2 del Real Decreto-ley 3/2026».
+//     Cuadra con `cuantiaPorHijoMensual` y con la fuente que declara el META (RDL 3/2026).
+//   · Art. 60.3: «La cuantía a percibir estará limitada a cuatro veces el importe mensual
+//     fijado por hijo o hija» (= maxHijos 4) y 60.3.c) «catorce pagas» (= pagasAnuales 14).
+//
+// Los requisitos adicionales del art. 60.1.b) para el padre (interrupción o afectación de
+// la carrera y suma de pensiones inferior a la de la madre) siguen en el texto consolidado;
+// que ya no se exijan sale de `COMPLEMENTO_BRECHA_GENERO_META.doctrina` (STJUE C-623/23 y
+// STS 9-jul-2025). La sentencia no se pudo cotejar en EUR-Lex desde esta sesión: se toma
+// el módulo como ancla, que es lo que manda la regla fiscal del Inspector.
+//
+// Tres casos nuevos RESUELTOS A MANO antes de abrir el navegador (los tres coincidieron, en
+// 1280 px y en 390 px, en claro y en oscuro), y siete hallazgos ABIERTOS con `test.fail()`.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Llama a la tool `calcular_complemento_brecha_genero` del MCP de Delegum y normaliza el texto. */
+async function porMcpDelegum(
+  request: APIRequestContext,
+  argumentos: Record<string, unknown>,
+): Promise<string> {
+  const respuesta = await request.post('/api/mcp/delegum/', {
+    headers: { Accept: 'application/json, text/event-stream' },
+    data: {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: { name: 'calcular_complemento_brecha_genero', arguments: argumentos },
+    },
+  });
+  expect(respuesta.ok()).toBeTruthy();
+  return normalizar((await respuesta.json()).result.content[0].text);
+}
+
+test.describe('Re-inspección 01/10/2026', () => {
+  /**
+   * DATOS (01/10): el módulo dice lo mismo que el BOE. Fuentes en la cabecera del bloque.
+   * Si en enero se revaloriza, este test DEBE fallar: se vuelve a cotejar con el RD de
+   * revalorización del año, no se ajusta a lo que diga el módulo.
+   */
+  test('datos (01/10): 36,90 €/mes por hijo (RD 241/2026, art. 12), tope de 4 y 14 pagas (art. 60.3 LGSS)', async () => {
+    const m = COMPLEMENTO_BRECHA_GENERO_2026;
+    expect(m.cuantiaPorHijoMensual).toBe(36.9);
+    expect(m.maxHijos).toBe(4);
+    expect(m.pagasAnuales).toBe(14);
+    expect(m.maxMensual).toBeCloseTo(4 * 36.9, 2); // 147,60
+    expect(m.maxAnual).toBeCloseTo(4 * 36.9 * 14, 2); // 2066,40
+    expect(COMPLEMENTO_BRECHA_GENERO_META.fuente).toContain('RDL 3/2026');
+    expect(COMPLEMENTO_BRECHA_GENERO_META.vigencia).toBe('2026');
+  });
+
+  /**
+   * CASO X1 (NORMAL) — la concurrencia resuelta A FAVOR de un HOMBRE, que ningún test
+   * recorría (el del 2239 lo hace con una mujer y 2 hijos).
+   *
+   *   P1 incapacidad permanente ∈ pensionesElegibles · P2 desde el 4-feb-2021
+   *   P3 3 hijos → hijosComputables = mín(3, maxHijos 4) = 3
+   *   P4 hombre: sin requisitos adicionales (META.doctrina)
+   *   P5 el otro progenitor ya lo percibe · P5 bis «La mía es menor» → art. 60.1: le
+   *      corresponde a quien tiene la suma menor, y el 60.2 extingue el del otro
+   *   P6 sin denegación propia
+   *
+   *   mensual = 3 × 36,90 = 110,70 €          ← esperado literal
+   *   anual   = 110,70 × 14 = 1549,80 €       ← esperado literal (es-ES no agrupa 4 cifras)
+   *
+   * OBTENIDO el 01/10/2026: exactamente eso, y la tool del MCP da lo mismo.
+   */
+  test('caso X1 (01/10): hombre, IP y 3 hijos con la suma menor → 110,70 €/mes y se extingue el del otro', async ({
+    page,
+    request,
+  }) => {
+    const { cuantiaPorHijoMensual, pagasAnuales } = COMPLEMENTO_BRECHA_GENERO_2026;
+    expect(3 * cuantiaPorHijoMensual).toBeCloseTo(110.7, 2);
+    expect(3 * cuantiaPorHijoMensual * pagasAnuales).toBeCloseTo(1549.8, 2);
+
+    await responderConSiembra(page, {
+      pension: 'Incapacidad permanente',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '3',
+      sexo: 'Hombre',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      sumaMenor: 'La mía es menor',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+110,70 €/mes');
+    expect(resultado).toContain('Te corresponde a ti: se extingue el del otro progenitor');
+    expect(resultado).toContain('Hijos computables 3 (máx. 4)');
+    expect(resultado).toContain('Mensual estimado 110,70 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 1549,80 €/año');
+    expect(resultado).toContain('tu suma de pensiones públicas es la menor');
+    expect(resultado).toContain('C-623/23'); // la rama de hombre cita META.doctrina
+    expect(resultado).toContain('a quien el INSS da audiencia antes de resolver');
+    expect(resultado).toContain('art. 60.2 LGSS');
+    expect(resultado).not.toContain('No procede ahora');
+    expect(resultado).not.toContain('Posible reclamación retroactiva');
+
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'hombre',
+      num_hijos: 3,
+      tipo_pension: 'incapacidad_permanente',
+      fecha_hecho_causante: 'desde_2021',
+      otro_progenitor: 'percibe',
+      suma_pensiones_menor: 'propia',
+    });
+    expect(mcp).toContain('Tiene derecho al complemento');
+    expect(mcp).toContain('110,70 €/mes (1549,80 €/año, 14 pagas)');
+    expect(mcp).toContain('art. 60.2 LGSS');
+  });
+
+  /**
+   * CASO X2 (LÍMITE) — el tope de 4 hijos DENTRO de la rama condicionada, nacida el 26/09
+   * (2239) y que solo se había probado con 2 hijos.
+   *
+   *   mujer · viudedad · desde el 4-feb-2021 · 6 hijos · el otro ya lo percibe · «No lo sé»
+   *   hijosComputables = mín(6, 4) = 4 → 4 × 36,90 = 147,60 €/mes (= maxMensual)
+   *   anual = 147,60 × 14 = 2066,40 €/año (= maxAnual) · NUNCA 6 × 36,90 = 221,40 €/mes
+   *   Veredicto: condicionado («Depende de la suma de pensiones»), no un «no».
+   *
+   * OBTENIDO el 01/10/2026: exactamente eso, también por la tool del MCP.
+   */
+  test('caso X2 (01/10, límite): 6 hijos en la rama condicionada topan en 147,60 €/mes', async ({
+    page,
+    request,
+  }) => {
+    await responderConSiembra(page, {
+      pension: 'Viudedad',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '6',
+      sexo: 'Mujer',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      sumaMenor: 'No lo sé',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('Depende de la suma de pensiones');
+    expect(resultado).toContain('Si tu suma de pensiones públicas es la menor, te corresponde: +147,60 €/mes');
+    expect(resultado).toContain('Desglose, si te corresponde');
+    expect(resultado).toContain('Hijos computables 4 (máx. 4)');
+    expect(resultado).toContain('Mensual estimado 147,60 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 2066,40 €/año');
+    expect(resultado).not.toContain('221,40');
+    expect(resultado).not.toContain('No procede ahora');
+    expect(resultado).not.toContain('Cumples los requisitos básicos');
+
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'mujer',
+      num_hijos: 6,
+      tipo_pension: 'viudedad',
+      fecha_hecho_causante: 'desde_2021',
+      otro_progenitor: 'percibe',
+      suma_pensiones_menor: 'desconocida',
+    });
+    expect(mcp).toContain('Depende de la suma de pensiones');
+    expect(mcp).toContain('147,60 €/mes (2066,40 €/año)');
+    expect(mcp).not.toContain('221,40');
+  });
+
+  /**
+   * CASO X3 (RECHAZO) — una respuesta de concurrencia FAVORABLE no puede saltarse la
+   * exclusión del art. 60.4 LGSS.
+   *
+   *   mujer · jubilación PARCIAL · desde el 4-feb-2021 · 4 hijos · el otro ya lo percibe ·
+   *   «La mía es menor» → art. 60.4: «No se tendrá derecho a este complemento en los casos
+   *   de jubilación parcial». Esperado: «No procede ahora», sin importe (ni los 147,60 € del
+   *   tope) y sin «Te corresponde a ti».
+   *
+   * OBTENIDO el 01/10/2026: exactamente eso, y el MCP igual.
+   */
+  test('caso X3 (01/10, rechazo): jubilación parcial con la suma menor sigue sin derecho (art. 60.4)', async ({
+    page,
+    request,
+  }) => {
+    await responderConSiembra(page, {
+      pension: 'Jubilación parcial',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '4',
+      sexo: 'Mujer',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      sumaMenor: 'La mía es menor',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).toContain('Art. 60.4 LGSS excluye expresamente');
+    expect(resultado).not.toContain('147,60');
+    expect(resultado).not.toContain('Te corresponde a ti');
+    expect(resultado).not.toContain('se extingue el del otro progenitor');
+    expect(resultado).not.toContain('Desglose');
+
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'mujer',
+      num_hijos: 4,
+      tipo_pension: 'jubilacion_parcial',
+      fecha_hecho_causante: 'desde_2021',
+      otro_progenitor: 'percibe',
+      suma_pensiones_menor: 'propia',
+    });
+    expect(mcp).toContain('60.4');
+    expect(mcp).not.toContain('147,60');
+    expect(mcp).not.toContain('Tiene derecho al complemento');
+  });
+
+  /**
+   * TÍTULO (01/10, b7ec248c): el año del <title>, del og:title y del twitter:title es la
+   * vigencia del módulo. Cierra; lo que no alcanzó la reparación va en el test siguiente.
+   */
+  test('título (01/10): title, og y twitter llevan el año de META.vigencia', async ({ page }) => {
+    const anio = COMPLEMENTO_BRECHA_GENERO_META.vigencia;
+    expect(await page.title()).toContain(`Brecha de Género ${anio}`);
+    const og = await page.locator('meta[property="og:title"]').getAttribute('content');
+    const tw = await page.locator('meta[name="twitter:title"]').getAttribute('content');
+    expect(og).toContain(`Brecha de Género ${anio}`);
+    expect(tw).toContain(`Brecha de Género ${anio}`);
+  });
+
+  /**
+   * ABIERTO, hallazgo (01/10/2026) — BAJO (dato). b7ec248c sacó el año del título de
+   * `META.vigencia`, pero en el MISMO metadata.ts el JSON-LD lo sigue tecleando tres veces:
+   * `jsonLd.name` («…Brecha de Género 2026»), la feature «Datos normativos 2026 verificados»
+   * y la pregunta 1 del FAQPage («¿… a cuánto asciende en 2026?»), cuya respuesta interpola
+   * `CUANTIA` del módulo. El candado excluye el FAQPage porque «un texto con IMPORTES escritos
+   * a mano tiene que llevar el año escrito a mano», pero aquí el importe NO va a mano: al
+   * re-sellar el módulo para 2027, el título dirá 2027 y el FAQPage preguntará por 2026 y
+   * contestará con la cuantía de 2027.
+   */
+  test('ABIERTO, hallazgo: el JSON-LD teclea el año que el título ya lee de META.vigencia', async () => {
+    test.fail();
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const fuente = readFileSync(
+      join(process.cwd(), 'app', 'verificador-complemento-brecha-genero', 'metadata.ts'),
+      'utf8',
+    );
+    // Desde `jsonLd` hasta el final (las keywords quedan antes y fuera); lo interpolado no cuenta,
+    // ni un año pegado a guion o barra («RDL 3/2021»), con el mismo criterio que check:anio-titulo.
+    const ld = fuente.slice(fuente.indexOf('export const jsonLd')).replace(/\$\{[^}]*\}/g, '');
+    expect(ld.match(/(?<![-\/\d])20\d\d(?![-\/\d])/g) ?? []).toEqual([]);
+  });
+
+  /**
+   * ABIERTO, hallazgo (01/10/2026) — MEDIO (contenido). La P5 bis decide el veredicto y su
+   * ayuda manda «Suma TODAS las pensiones públicas de cada uno», sin la regla con la que el
+   * art. 60.7 LGSS fija esa comparación: «se computarán dichas pensiones teniendo en cuenta
+   * su importe inicial, una vez revalorizadas, sin computar los complementos que pudieran
+   * corresponder». El propio complemento «tendrá a todos los efectos naturaleza jurídica de
+   * pensión pública contributiva» (art. 60.3), así que «todas» lo incluye.
+   *
+   * Caso, resuelto con el 60.7: madre con jubilación de 900 € que ya cobra el complemento
+   * por 2 hijos (73,80 €) frente a padre con jubilación de 950 €. Sin complementos, 900 <
+   * 950 → le corresponde a la madre, y el padre debería contestar «La del otro progenitor es
+   * menor» → «No procede ahora». Siguiendo la ayuda, 973,80 > 950 → el padre contesta «La
+   * mía es menor» y la app le da «+73,80 €/mes · Te corresponde a ti». La regla no está en
+   * `data/fiscal` (`concurrencia.entreProgenitores`) ni en la tool del MCP.
+   */
+  test('ABIERTO, hallazgo: la ayuda de la P5 bis no dice que la suma se compara sin complementos (art. 60.7)', async ({
+    page,
+  }) => {
+    test.fail();
+    await elegir(page, 'Ya lo percibe por los mismos hijos');
+    const ayuda = normalizar(await page.locator('#p5bis-ayuda').innerText());
+    expect(ayuda).toMatch(/sin (computar|contar|incluir) (los |ningún )?complementos?/i);
+  });
+
+  /**
+   * ABIERTO, hallazgo (01/10/2026) — BAJO (contenido). El art. 60.3.b) LGSS niega el
+   * complemento a quien haya sido privado de la patria potestad por incumplimiento de sus
+   * deberes y a quien haya sido condenado por violencia contra la madre o contra los hijos.
+   * La página no lo menciona en ningún sitio, y el FAQPage afirma lo contrario en general:
+   * «Son 4 requisitos: […] el complemento se reconoce automáticamente si se cumplen estas
+   * condiciones». Caso: progenitor privado de la patria potestad por sentencia, con
+   * jubilación desde 2021 y 2 hijos → esperado (art. 60.3.b): sin derecho; la app no lo
+   * pregunta ni lo advierte y contesta «+73,80 €/mes · Cumples los requisitos básicos».
+   */
+  test('ABIERTO, hallazgo: las exclusiones del art. 60.3.b) (patria potestad, violencia) no aparecen', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirGuia(page);
+    const cuerpo = normalizar(await page.locator('body').innerText());
+    expect(cuerpo).toContain('patria potestad');
+  });
+
+  /**
+   * ABIERTO, hallazgo (01/10/2026) — BAJO (contenido). Art. 60.3.f) LGSS: si la pensión se
+   * causa por totalización de períodos a prorrata temporis (normativa internacional), «el
+   * importe real del complemento será el resultado de aplicar a la cuantía […] la prorrata
+   * aplicada a la pensión». Caso: jubilación con prorrata española del 50 % y 2 hijos →
+   * esperado 2 × 36,90 × 0,50 = 36,90 €/mes; la app muestra «+73,80 €/mes» sin ninguna
+   * advertencia, y «prorrata» no aparece en la página.
+   */
+  test('ABIERTO, hallazgo: la prorrata del art. 60.3.f) (carreras internacionales) no se advierte', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirGuia(page);
+    const cuerpo = normalizar(await page.locator('body').innerText());
+    expect(cuerpo).toMatch(/prorrata/i);
+  });
+
+  /**
+   * ABIERTO, hallazgo (01/10/2026) — BAJO (dato). La FAQ del hijo que nació con vida dice que
+   * al nacido sin vida «el art. 60.1 LGSS sí excluye», y `computoHijoFallecido.norma` vale
+   * 'art. 60.1 LGSS'. En el texto vigente la exigencia está en el 60.3.a), párrafo segundo:
+   * «únicamente se computarán los hijos o hijas que con anterioridad al hecho causante de la
+   * pensión correspondiente hubieran nacido con vida o hubieran sido adoptados». El 60.1 no
+   * dice «con vida» (ni lo decía la redacción de 2016, que hablaba de «hijos nacidos»).
+   */
+  test('ABIERTO, hallazgo: la regla del nacido con vida se cita en el 60.1 y está en el 60.3.a)', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrirGuia(page);
+    const respuesta = normalizar(
+      await page.locator('h3', { hasText: 'nació con vida y falleció después' }).locator('..').innerText(),
+    );
+    expect(respuesta).not.toContain('art. 60.1 LGSS sí excluye');
+    expect(respuesta).toContain('60.3.a)');
+  });
+
+  /**
+   * ABIERTO, hallazgo (01/10/2026) — BAJO (contenido). Concurrencia a favor de una MUJER
+   * (jubilación, 3 hijos, el otro ya lo percibe, «La mía es menor»): el motivo termina en
+   * «Cumples los requisitos básicos del art. 60 LGSS para reconocimiento automático del
+   * complemento», y el paso siguiente dice «Si ya cobras la pensión y no aparece el
+   * complemento en tu nómina…». Pero el art. 60.2 exige resolución con audiencia previa al
+   * que lo venía cobrando, con efectos del mes siguiente a esa resolución: no es automático
+   * y no va a aparecer solo, porque lo cobra el otro. Con un hombre, el mismo caso no dice
+   * «automático».
+   */
+  test('ABIERTO, hallazgo: la concurrencia a favor de una mujer promete «reconocimiento automático»', async ({
+    page,
+  }) => {
+    test.fail();
+    await responderConSiembra(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '3',
+      sexo: 'Mujer',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      sumaMenor: 'La mía es menor',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('a quien el INSS da audiencia antes de resolver');
+    expect(resultado).not.toContain('reconocimiento automático');
+  });
+
+  /**
+   * ABIERTO, hallazgo (01/10/2026) — BAJO (contenido). En el veredicto de concurrencia a
+   * favor (web y MCP), la cita queda huérfana tras el punto: «…a quien el INSS da audiencia
+   * antes de resolver. (art. 60.2 LGSS)», sin punto final. `PASO_A_FAVOR` interpola
+   * `extincion.detalle`, que ya termina en punto, y después la norma.
+   */
+  test('ABIERTO, hallazgo: «antes de resolver. (art. 60.2 LGSS)» deja la cita tras el punto', async ({ page }) => {
+    test.fail();
+    await responderConSiembra(page, {
+      pension: 'Incapacidad permanente',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '3',
+      sexo: 'Hombre',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      sumaMenor: 'La mía es menor',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('art. 60.2 LGSS');
+    expect(resultado).not.toContain('resolver. (art. 60.2 LGSS)');
+  });
+});
+
+// Móvil (390 px) y tema oscuro sobre la rama nueva del 26/09: el veredicto condicionado.
+test.describe('Re-inspección 01/10/2026 — móvil y oscuro', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * Caso X2 en 390 × 844: la P5 bis aparece y se puede pulsar, el veredicto condicionado se
+   * lleva a la vista con el foco (2247), no hay desborde horizontal y sus textos pasan 4,5:1
+   * en los dos temas. Medido el 01/10/2026: 16,67:1 en claro y 13,82:1 en oscuro.
+   */
+  test('X2 en móvil: el veredicto condicionado se ve, recibe el foco y contrasta en claro y oscuro', async ({
+    page,
+  }) => {
+    await responderConSiembra(page, {
+      pension: 'Viudedad',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '6',
+      sexo: 'Mujer',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      sumaMenor: 'No lo sé',
+    });
+    const importe = page.locator('[class*="resultImporte"]');
+    await expect(importe).toHaveText('Depende de la suma de pensiones');
+    const caja = await importe.boundingBox();
+    expect(caja).not.toBeNull();
+    const { y, height } = caja as { y: number; height: number };
+    expect(y).toBeGreaterThanOrEqual(0);
+    expect(y + height).toBeLessThanOrEqual(844);
+    expect(await page.evaluate(() => (document.activeElement?.className ?? '').toString())).toContain(
+      'resultHeroCondicionado',
+    );
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+
+    await prepararMedicion(page);
+    const selectores = [
+      '[class*="resultHeroCondicionado"] [class*="resultImporte"]',
+      '[class*="resultHeroCondicionado"] [class*="resultLabel"]',
+      '#p5bis-ayuda',
+    ];
+    for (const sel of selectores) {
+      expect.soft(await contrasteMinimo(page, sel), `${sel} claro`).toBeGreaterThanOrEqual(4.5);
+    }
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+    await page.mouse.move(0, 0);
+    for (const sel of selectores) {
+      expect.soft(await contrasteMinimo(page, sel), `${sel} oscuro`).toBeGreaterThanOrEqual(4.5);
+    }
   });
 });

@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, devices, Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
 
 /**
@@ -15,9 +15,12 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *   · El bloque educativo la ofrece para «eliminar feedback en directo», «ecualizar una
  *     mezcla», «detectar ruidos no deseados (50 Hz en Europa)» y «física del sonido».
  *
- * DÓNDE VIVE EL CÁLCULO — no hay motor aparte: los 878 renglones de
- * app/analizador-espectro/page.tsx lo hacen todo dentro de `analyzeLoop`, un callback que se
- * auto-encadena con requestAnimationFrame.
+ * DÓNDE VIVE EL CÁLCULO — hasta el 29/09/2026, dentro de `analyzeLoop` en
+ * app/analizador-espectro/page.tsx. Desde ce2dfa44 el pico lo busca el motor COMPARTIDO con
+ * generador-tonos, `picoDominante` de lib/calculadoras/frecuenciaDominante.ts, al que esta app
+ * llama con sus valores por defecto (20 Hz–20 kHz) y con los BYTES de getByteFrequencyData;
+ * el generador le pasa dB en coma flotante. La nota y los cents siguen en page.tsx. Ver la
+ * re-inspección del 01/10/2026 al final del fichero.
  *
  * CÓMO SE PRUEBA — Chromium con dispositivo de medios falso NO basta: su tono es un beep
  * periódico y no se elige la frecuencia. Aquí se SUSTITUYE `getUserMedia` por un stream
@@ -200,6 +203,13 @@ async function hercios(page: Page): Promise<number> {
  * ventana de Blackman ensancha el pico, así que apretar más sería fijar ese ruido y no la
  * medida. Medido el 18/09/2026: el error real se queda en 7 Hz a 1 kHz y a 10 kHz, o sea
  * 0,7 % y 0,07 %. Antes de la reparación era del 2,9 % a 1 kHz y a 10 kHz no había cifra.
+ *
+ * Re-inspección del 01/10/2026: esos 7 Hz NO eran ruido de los bytes. `inyectarTono` suena con
+ * ganancia 0,9 y satura varios bins seguidos a 255; el motor elige el PRIMERO de la meseta y le
+ * suma medio bin, así que la cifra se va hacia abajo hasta un bin. Con un tono a −26 dBFS el
+ * error baja a menos de 1 Hz (ver «Re-inspección» al final). Esta tolerancia se deja como está
+ * porque estos tests vigilan los hallazgos 884-886 (cifra que falta o rejilla de 64 bandas),
+ * y el sesgo de la meseta tiene su propio test, más estrecho.
  */
 const TOLERANCIA_HZ = 9;
 
@@ -451,5 +461,481 @@ test.describe('Los 8 hallazgos del 18/09/2026, reparados el mismo día', () => {
     // El grupo de vista se rotula con role="group" + aria-labelledby, que sí es lo que
     // corresponde a dos botones conmutadores.
     await expect(page.getByRole('group', { name: 'Vista:' })).toBeVisible();
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN DEL 01/10/2026 — ¿le ha roto algo el motor de generador-tonos?
+ *
+ * Entre la reparación del 18/09 y hoy, generador-tonos estrenó un medidor con micrófono y sacó
+ * el algoritmo de esta app a lib/calculadoras/frecuenciaDominante.ts (ce2dfa44), y luego lo
+ * cambió para su hallazgo 2412 (c3e3e8ca). Lo que cambió para ESTA app, leído en el diff:
+ *   · La firma y los valores por defecto, no: `picoDominante(bytes, sampleRate, fftSize)`, con
+ *     fMin = 20 y fMax = 20000. El umbral «> 20» sigue en page.tsx, sin prominencia ni lectura
+ *     estable: eso son del generador, que trabaja en dB.
+ *   · El primer bin del rango pasa de floor(20/Δf) = 3 a ceil(20/Δf) = 4 (17,58 → 23,44 Hz a
+ *     48 kHz; 16,15 → 21,53 Hz a 44,1 kHz).
+ *   · El pico tiene que ser la CIMA de su lóbulo (±3 bins, mirando el espectro entero), y si el
+ *     vértice afinado cae fuera de [20, 20000] no hay pico.
+ *
+ * RESUELTO A MANO ANTES DE ABRIR EL NAVEGADOR (fftSize 8192; se fija el contexto a 48 kHz para
+ * que la cuenta no dependa del dispositivo: medido hoy, el mismo Chromium arrancó una vez a
+ * 44,1 kHz y otras a 48 kHz): Δf = 48000/8192 = 5,859375 Hz.
+ *   · 440 Hz → bin 75,09 → «440 Hz», A4 = MIDI 69, 0 ¢. Medio bin son 2,93 Hz = 11,5 ¢, así
+ *     que se exige ±1 Hz y ±4 ¢: más que eso es afinado perdido o sesgado.
+ *   · 82,41 Hz (Mi2, la sexta cuerda de la guitarra) → 12·log2(82,41/440)+69 = 40,00 → E2, 0 ¢.
+ *   · 21 Hz → bin 3,58: la cima cae en el bin 4, dentro del rango → 12·log2(21/440)+69 = 16,33
+ *     → E0 +33 ¢.
+ *   · 20,3 Hz → bin 3,47: la cima cae en el bin 3 (17,58 Hz), FUERA del rango nuevo, y el 4 es
+ *     su flanco → el motor no devuelve pico. Pero 20,3 Hz está dentro de los 20 Hz–20 kHz que
+ *     la app promete: 12·log2(20,3/440)+69 = 15,74 → E0 −26 ¢.
+ *   · 25 Hz → G0: 12·log2(25/440)+69 = 19,35 → MIDI 19 = G0 +35 ¢.
+ *
+ * El nivel importa: getByteFrequencyData recorta en maxDecibels = −30 dB, y un seno de
+ * amplitud A llega al bin del pico a unos −13,8 dB + 20·log10(A) (medido: 0,02 → byte 190 =
+ * −47,8 dB). Por encima de unos −16 dBFS el pico se aplana en una MESETA de bytes a 255.
+ * Medido con WAV por el micrófono falso a 48 kHz, antes de escribir estos tests:
+ *     tono      a −34 dBFS (0,02)      a −6 dBFS (0,5)
+ *     55 Hz     55 Hz · A1 +4 ¢        50 Hz · G1 +28 ¢     (bytes 8, 9, 10 a 255)
+ *     82,41 Hz  82 Hz · E2 −1 ¢        79 Hz · D#2 +29 ¢    (bytes 13, 14, 15 a 255)
+ *     110 Hz    110 Hz · A2 −1 ¢       108 Hz · A2 −25 ¢
+ *     440 Hz    440 Hz · A4 +0 ¢       439 Hz · A4 −5 ¢ (y fotogramas de 433 Hz · −26 ¢)
+ * El motor se queda con el PRIMER bin de la meseta (esCimaDeLobulo salta la meseta hacia la
+ * derecha) y la parábola, con un vecino a 255, suma exactamente medio bin. Esto NO lo trajo el
+ * motor nuevo: el código en línea del 18/09 también elegía el primero. Pero generador-tonos no
+ * lo sufre, porque le pasa dB en coma flotante, que no se recortan.
+ * ══════════════════════════════════════════════════════════════════════════════════════════ */
+
+type VentanaEspia = Window & {
+  __contextosApp?: AudioContext[];
+  __pistas?: MediaStreamTrack[];
+  __maxByte?: number;
+  __rellenos?: { color: string; alto: number; ancho: number; lienzoAncho: number; lienzoAlto: number }[];
+};
+
+/**
+ * Espía lo que la APP crea: el contexto que llama a createMediaStreamSource (el del tono
+ * inyectado no lo llama) y el byte más alto que lee el bucle de dibujo.
+ */
+async function espiarAudio(page: Page) {
+  await page.addInitScript(() => {
+    const w = window as VentanaEspia;
+    w.__contextosApp = [];
+    w.__maxByte = 0;
+    const crearFuente = AudioContext.prototype.createMediaStreamSource;
+    AudioContext.prototype.createMediaStreamSource = function (this: AudioContext, flujo: MediaStream) {
+      w.__contextosApp?.push(this);
+      return crearFuente.call(this, flujo);
+    };
+    const leerBytes = AnalyserNode.prototype.getByteFrequencyData;
+    AnalyserNode.prototype.getByteFrequencyData = function (
+      this: AnalyserNode,
+      arreglo: Parameters<typeof leerBytes>[0],
+    ) {
+      leerBytes.call(this, arreglo);
+      let maximo = 0;
+      for (let i = 0; i < arreglo.length; i++) if (arreglo[i] > maximo) maximo = arreglo[i];
+      w.__maxByte = maximo;
+    };
+  });
+}
+
+/**
+ * Como `inyectarTono`, pero con el NIVEL del tono y la frecuencia de muestreo fijados: la
+ * ganancia 0,9 de `inyectarTono` satura los bytes y mide la meseta, no el afinado.
+ */
+async function inyectarTonoNivel(page: Page, hz: number, ganancia: number, tasa = 48000) {
+  await espiarAudio(page);
+  await page.addInitScript(
+    ({ hz: f, ganancia: g, tasa: sr }: { hz: number; ganancia: number; tasa: number }) => {
+      const Original = window.AudioContext;
+      class ContextoFijo extends Original {
+        constructor(opciones?: AudioContextOptions) {
+          super({ ...opciones, sampleRate: sr });
+        }
+      }
+      window.AudioContext = ContextoFijo;
+      navigator.mediaDevices.getUserMedia = async (): Promise<MediaStream> => {
+        const contexto = new AudioContext();
+        await contexto.resume();
+        const oscilador = contexto.createOscillator();
+        oscilador.type = 'sine';
+        oscilador.frequency.value = f;
+        const nivel = contexto.createGain();
+        nivel.gain.value = g;
+        const destino = contexto.createMediaStreamDestination();
+        oscilador.connect(nivel);
+        nivel.connect(destino);
+        oscilador.start();
+        return destino.stream;
+      };
+    },
+    { hz, ganancia, tasa },
+  );
+}
+
+async function arrancarNivel(page: Page, hz: number, ganancia: number, tasa = 48000) {
+  await inyectarTonoNivel(page, hz, ganancia, tasa);
+  await page.goto('/analizador-espectro/');
+  await esperarHidratacion(page, ['#sensitivity-slider']);
+  await botonIniciar(page).click();
+  await expect(frecuencia(page)).toBeVisible();
+  await page.waitForTimeout(2000);
+  // El contexto de la app corre de verdad y a la tasa fijada; si no, las cuentas de arriba no valen.
+  const contexto = await page.evaluate(() => {
+    const c = (window as VentanaEspia).__contextosApp?.[0];
+    return c ? { estado: c.state, tasa: c.sampleRate } : null;
+  });
+  expect(contexto).toEqual({ estado: 'running', tasa });
+}
+
+/** Los cents de la nota: «A4+0 ¢» → 0 · «E0−26 ¢» → −26 · sin cents → NaN. */
+async function centsMostrados(page: Page): Promise<number> {
+  const texto = (await nota(page).textContent()) ?? '';
+  const m = texto.match(/([+−-])\s*(\d+)\s*¢/);
+  if (!m) return Number.NaN;
+  return (m[1] === '+' ? 1 : -1) * Number(m[2]);
+}
+
+/** −26 dBFS: muy por encima del umbral de 20 y lejos de saturar (byte de pico ≈ 210). */
+const NIVEL_MODERADO = 0.05;
+/** −6 dBFS: una cuerda o un silbido cerca del micrófono del móvil. */
+const NIVEL_FUERTE = 0.5;
+
+test.describe('Re-inspección 01/10/2026 · lo que el motor compartido NO ha roto', () => {
+  test('440 Hz a −26 dBFS: «440 Hz», A4 y menos de 4 ¢', async ({ page }) => {
+    await arrancarNivel(page, 440, NIVEL_MODERADO);
+    expect(Math.abs((await hercios(page)) - 440)).toBeLessThanOrEqual(1);
+    await expect(nota(page)).toContainText('A4');
+    expect(Math.abs(await centsMostrados(page))).toBeLessThanOrEqual(4);
+  });
+
+  test('Mi2 (82,41 Hz) a −26 dBFS, sin saturar: «82 Hz», E2 a menos de 10 ¢', async ({ page }) => {
+    // Testigo de que el sesgo del test de la meseta (abajo) depende del NIVEL y no del motor.
+    await arrancarNivel(page, 82.41, NIVEL_MODERADO);
+    expect(Math.abs((await hercios(page)) - 82.41)).toBeLessThanOrEqual(1);
+    await expect(nota(page)).toContainText('E2');
+    expect(Math.abs(await centsMostrados(page))).toBeLessThanOrEqual(10);
+  });
+
+  test('21 Hz a 48 kHz se lee: la cima cae en el bin 4, ya dentro del rango', async ({ page }) => {
+    await arrancarNivel(page, 21, NIVEL_MODERADO);
+    expect(Math.abs((await hercios(page)) - 21)).toBeLessThanOrEqual(1);
+    await expect(nota(page)).toContainText('E0');
+    expect(Math.abs((await centsMostrados(page)) - 33)).toBeLessThanOrEqual(6);
+  });
+
+  test('Iniciar → Detener dos veces: ninguna pista ni contexto queda vivo', async ({ page }) => {
+    // Con el micrófono falso del navegador, sin tono inyectado.
+    await espiarAudio(page);
+    await page.addInitScript(() => {
+      const w = window as VentanaEspia;
+      w.__pistas = [];
+      const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+      navigator.mediaDevices.getUserMedia = async (r?: MediaStreamConstraints) => {
+        const flujo = await original(r);
+        w.__pistas?.push(...flujo.getTracks());
+        return flujo;
+      };
+    });
+    await page.goto('/analizador-espectro/');
+    await esperarHidratacion(page, ['#sensitivity-slider']);
+    for (let vuelta = 0; vuelta < 2; vuelta++) {
+      await botonIniciar(page).click();
+      await expect(page.getByRole('button', { name: /Detener/ })).toBeVisible();
+      await expect
+        .poll(() => page.evaluate(() => (window as VentanaEspia).__contextosApp?.at(-1)?.state))
+        .toBe('running');
+      await page.getByRole('button', { name: /Detener/ }).click();
+      await expect(botonIniciar(page)).toBeVisible();
+    }
+    const estado = await page.evaluate(() => {
+      const w = window as VentanaEspia;
+      return {
+        contextos: (w.__contextosApp ?? []).map((c) => c.state),
+        pistas: (w.__pistas ?? []).map((p) => p.readyState),
+      };
+    });
+    expect(estado.contextos).toEqual(['closed', 'closed']);
+    expect(estado.pistas).toEqual(['ended', 'ended']);
+  });
+});
+
+test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
+  test.fail(
+    'ABIERTO, hallazgo: con un tono fuerte la meseta de bytes saturados hunde la cifra — Mi2 a −6 dBFS sale «79 Hz · D#2»',
+    async ({ page }) => {
+      // Esperado (a mano, arriba): «82 Hz», E2, 0 ¢. Obtenido el 01/10/2026: «79 Hz», D#2 +29 ¢.
+      // Los bytes 13, 14 y 15 valen 255; el motor elige el 13 y le suma medio bin: 13,5 ×
+      // 5,859 = 79,1 Hz. Igual un La1 de 55 Hz → «50 Hz · G1 +28 ¢». Se tolera ±1 Hz y ±10 ¢,
+      // que es lo que da el mismo tono sin saturar (test de arriba).
+      await arrancarNivel(page, 82.41, NIVEL_FUERTE);
+      expect(await page.evaluate(() => (window as VentanaEspia).__maxByte)).toBe(255);
+      expect(Math.abs((await hercios(page)) - 82.41)).toBeLessThanOrEqual(1);
+      await expect(nota(page)).toContainText('E2');
+      expect(Math.abs(await centsMostrados(page))).toBeLessThanOrEqual(10);
+    },
+  );
+
+  test.fail(
+    'ABIERTO, hallazgo: un tono de 20,3 Hz, dentro del rango de 20 Hz–20 kHz, da «-- Hz» a 48 kHz desde c3e3e8ca',
+    async ({ page }) => {
+      // Esperado: «20 Hz», E0 −26 ¢. Obtenido: «-- Hz» y «--». Su cima está en el bin 3
+      // (17,58 Hz), que el rango nuevo —ceil(20/5,859) = 4— deja fuera, y el 4 es flanco. Con
+      // el motor del 18/09 (floor, bin 3 dentro) los mismos bytes medidos (183, 216, 215)
+      // daban 3,47 bins = 20,3 Hz. Zona muerta: 20,0–20,5 Hz a cualquier nivel.
+      await arrancarNivel(page, 20.3, NIVEL_MODERADO);
+      expect(Math.abs((await hercios(page)) - 20.3)).toBeLessThanOrEqual(1);
+      await expect(nota(page)).toContainText('E0');
+      expect(Math.abs((await centsMostrados(page)) + 26)).toBeLessThanOrEqual(6);
+    },
+  );
+
+  test.fail(
+    'ABIERTO, hallazgo: el mismo de arriba, agravado por la meseta — un tono FUERTE de 25 Hz da «-- Hz»',
+    async ({ page }) => {
+      // Esperado: «25 Hz», G0 +35 ¢. Obtenido: «-- Hz». La meseta a 255 empieza en el bin 3,
+      // fuera del rango, así que ningún bin del rango es cima de su lóbulo: con un tono fuerte
+      // la zona muerta llega hasta ~26 Hz (bin 4,5) a 48 kHz.
+      await arrancarNivel(page, 25, NIVEL_FUERTE);
+      expect(Math.abs((await hercios(page)) - 25)).toBeLessThanOrEqual(1);
+      await expect(nota(page)).toContainText('G0');
+    },
+  );
+
+  test.fail(
+    'ABIERTO, hallazgo: dos clics en «Iniciar» abren dos micrófonos y «Detener» solo cierra uno',
+    async ({ page }) => {
+      // Esperado: tras «Detener», todas las pistas en 'ended' y todos los contextos en 'closed'.
+      // Obtenido el 01/10/2026: una pista 'live' y un AudioContext 'running' —el micrófono sigue
+      // abierto, con su indicador encendido, hasta cerrar la pestaña—. startAnalyzing no tiene
+      // guarda de «ya se está abriendo»: el botón no cambia hasta que getUserMedia resuelve, y
+      // ese hueco es justo el que el usuario pasa mirando el diálogo de permiso (aquí, 400 ms).
+      await espiarAudio(page);
+      await page.addInitScript(() => {
+        const w = window as VentanaEspia;
+        w.__pistas = [];
+        const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+        navigator.mediaDevices.getUserMedia = async (r?: MediaStreamConstraints) => {
+          await new Promise((resolver) => setTimeout(resolver, 400));
+          const flujo = await original(r);
+          w.__pistas?.push(...flujo.getTracks());
+          return flujo;
+        };
+      });
+      await page.goto('/analizador-espectro/');
+      await esperarHidratacion(page, ['#sensitivity-slider']);
+      await botonIniciar(page).click();
+      await botonIniciar(page).click();
+      await expect(page.getByRole('button', { name: /Detener/ })).toBeVisible();
+      await page.waitForTimeout(1000);
+      await page.getByRole('button', { name: /Detener/ }).click();
+      await expect(botonIniciar(page)).toBeVisible();
+      await page.waitForTimeout(500);
+      const estado = await page.evaluate(() => {
+        const w = window as VentanaEspia;
+        return {
+          contextos: (w.__contextosApp ?? []).map((c) => c.state),
+          pistas: (w.__pistas ?? []).map((p) => p.readyState),
+        };
+      });
+      expect(estado.pistas.length).toBeGreaterThan(0);
+      expect(estado.pistas.filter((p) => p !== 'ended')).toEqual([]);
+      expect(estado.contextos.filter((c) => c !== 'closed')).toEqual([]);
+    },
+  );
+
+  test.fail(
+    'ABIERTO, hallazgo: la región viva se re-anuncia en cada fotograma, entera, con su párrafo',
+    async ({ page }) => {
+      // `role="status" aria-live="polite" aria-atomic="true"` envuelve la cifra, la nota Y el
+      // párrafo de 40 palabras sobre la FFT, y la cifra cambia en cada requestAnimationFrame.
+      // Esperado: como mucho un anuncio por segundo (3 en 3 s). Obtenido con el pitido
+      // periódico del micrófono falso: 36 cambios en 3 s, cada uno de 265 caracteres. Con un
+      // tono estable no hay ninguno, pero una voz o un instrumento real cambian a cada paso.
+      await page.goto('/analizador-espectro/');
+      await esperarHidratacion(page, ['#sensitivity-slider']);
+      await botonIniciar(page).click();
+      await expect(frecuencia(page)).toBeVisible();
+      await page.waitForTimeout(1500);
+      const cambios = await page.evaluate(
+        () =>
+          new Promise<number>((resolver) => {
+            const regiones = Array.from(
+              document.querySelectorAll(
+                '[class*="analyzerPanel"] [aria-live], [class*="analyzerPanel"] [role="status"]',
+              ),
+            );
+            let n = 0;
+            const ultimos = regiones.map((r) => r.textContent);
+            const observador = new MutationObserver(() => {
+              regiones.forEach((r, i) => {
+                if (r.textContent !== ultimos[i]) {
+                  n++;
+                  ultimos[i] = r.textContent;
+                }
+              });
+            });
+            regiones.forEach((r) =>
+              observador.observe(r, { subtree: true, childList: true, characterData: true }),
+            );
+            setTimeout(() => {
+              observador.disconnect();
+              resolver(n);
+            }, 3000);
+          }),
+      );
+      expect(cambios).toBeLessThanOrEqual(3);
+    },
+  );
+
+  test.fail(
+    'ABIERTO, hallazgo: en el tema claro los marcadores de pico son blancos sobre fondo blanco',
+    async ({ page }) => {
+      // «Mostrar picos» viene marcado y el JSON-LD promete «marcadores de picos con decay
+      // automático». El código los pinta con '#ffffff' fijo, y el fondo del lienzo es
+      // --bg-card, que en el tema claro (el de por defecto) es #FFFFFF: contraste 1:1, no se ven.
+      // En el oscuro (#2D2D2D) sí. Esperado: un color de marcador distinto del fondo.
+      await inyectarTonoNivel(page, 1000, NIVEL_MODERADO);
+      await page.addInitScript(() => {
+        const w = window as VentanaEspia;
+        w.__rellenos = [];
+        const original = CanvasRenderingContext2D.prototype.fillRect;
+        CanvasRenderingContext2D.prototype.fillRect = function (
+          this: CanvasRenderingContext2D,
+          x: number,
+          y: number,
+          ancho: number,
+          alto: number,
+        ) {
+          if ((w.__rellenos?.length ?? 0) < 3000) {
+            w.__rellenos?.push({
+              color: typeof this.fillStyle === 'string' ? this.fillStyle : 'degradado',
+              alto,
+              ancho,
+              lienzoAncho: this.canvas.width,
+              lienzoAlto: this.canvas.height,
+            });
+          }
+          return original.call(this, x, y, ancho, alto);
+        };
+      });
+      await page.goto('/analizador-espectro/');
+      await esperarHidratacion(page, ['#sensitivity-slider']);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+      await botonIniciar(page).click();
+      await expect(frecuencia(page)).toBeVisible();
+      await page.waitForTimeout(1000);
+      const { fondos, marcadores } = await page.evaluate(() => {
+        const r = (window as VentanaEspia).__rellenos ?? [];
+        return {
+          fondos: [
+            ...new Set(r.filter((x) => x.ancho === x.lienzoAncho && x.alto === x.lienzoAlto).map((x) => x.color)),
+          ],
+          marcadores: [...new Set(r.filter((x) => x.alto === 2 && x.color !== 'degradado').map((x) => x.color))],
+        };
+      });
+      expect(fondos).toEqual(['#ffffff']);
+      expect(marcadores.length).toBeGreaterThan(0);
+      for (const color of marcadores) expect(color).not.toBe('#ffffff');
+    },
+  );
+
+  test.fail(
+    'ABIERTO, hallazgo: la FAQ visible dice que no hay indicador de cents, y la app los enseña',
+    async ({ page }) => {
+      // Desde el hallazgo 887 (18/09) la nota sale con sus cents («B5 +21 ¢»), pero la FAQ
+      // «¿Puedo usar esto para afinar mi instrumento?» sigue diciendo que el analizador «no tiene
+      // un indicador de "cents" de desviación como un afinador».
+      await page.goto('/analizador-espectro/');
+      await esperarHidratacion(page, ['#sensitivity-slider']);
+      await page.getByRole('button', { name: /Ver guía|guía educativa/i }).first().click();
+      const faq = page.locator('[class*="faqList"]');
+      await expect(faq).toBeVisible();
+      await expect(faq).not.toContainText('no tiene un indicador');
+    },
+  );
+
+  test.fail(
+    'ABIERTO, hallazgo: con el micrófono ocupado por otra aplicación el aviso sale en inglés',
+    async ({ page }) => {
+      // Chrome rechaza con NotReadableError «Could not start audio source» cuando otra
+      // aplicación retiene el micrófono (habitual en Windows con una videollamada abierta). La
+      // app solo traduce NotAllowedError y NotFoundError; el resto cae en `Error: ${message}`.
+      // Esperado: una explicación en español. Obtenido: «⚠️ Error: Could not start audio source».
+      await page.addInitScript(() => {
+        navigator.mediaDevices.getUserMedia = async (): Promise<MediaStream> => {
+          throw new DOMException('Could not start audio source', 'NotReadableError');
+        };
+      });
+      await page.goto('/analizador-espectro/');
+      await esperarHidratacion(page, ['#sensitivity-slider']);
+      await botonIniciar(page).click();
+      await expect(mensajeError(page)).toBeVisible();
+      await expect(mensajeError(page)).not.toContainText('Could not start audio source');
+      await expect(mensajeError(page)).toContainText(/micrófono/i);
+    },
+  );
+});
+
+test.describe('Re-inspección 01/10/2026 · en un móvil (Pixel 7)', () => {
+  // Enumerado y no `...devices['Pixel 7']`: este arrastra defaultBrowserType, que es de worker.
+  const pixel7 = devices['Pixel 7'];
+  test.use({
+    viewport: pixel7.viewport,
+    userAgent: pixel7.userAgent,
+    deviceScaleFactor: pixel7.deviceScaleFactor,
+    isMobile: pixel7.isMobile,
+    hasTouch: pixel7.hasTouch,
+  });
+
+  test('con el micrófono falso del navegador arranca de verdad y se detiene con un toque', async ({ page }) => {
+    await espiarAudio(page);
+    await page.goto('/analizador-espectro/');
+    await esperarHidratacion(page, ['#sensitivity-slider']);
+    await botonIniciar(page).tap();
+    await expect(frecuencia(page)).toBeVisible();
+    // El pitido periódico del dispositivo falso da cifra mientras suena.
+    await expect(frecuencia(page)).toHaveText(/^\s*\d[\d.]*\s*Hz\s*$/, { timeout: 5000 });
+    const enMarcha = await page.evaluate(() => {
+      const w = window as VentanaEspia;
+      return { estado: w.__contextosApp?.[0]?.state, byte: w.__maxByte ?? 0 };
+    });
+    expect(enMarcha.estado).toBe('running');
+    expect(enMarcha.byte).toBeGreaterThan(20);
+    // Sin desbordamiento horizontal en 412 px.
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(412);
+
+    await page.getByRole('button', { name: /Detener/ }).tap();
+    await expect(botonIniciar(page)).toBeVisible();
+    await expect
+      .poll(() => page.evaluate(() => (window as VentanaEspia).__contextosApp?.[0]?.state))
+      .toBe('closed');
+  });
+
+  test('un 440 Hz a −26 dBFS se lee igual que en escritorio', async ({ page }) => {
+    await arrancarNivel(page, 440, NIVEL_MODERADO);
+    expect(Math.abs((await hercios(page)) - 440)).toBeLessThanOrEqual(1);
+    await expect(nota(page)).toContainText('A4');
+  });
+
+  test.fail('ABIERTO, hallazgo: en 412 px la regleta monta «10 kHz» encima de «20 kHz»', async ({ page }) => {
+    // Las etiquetas van en su posición logarítmica real (hallazgo 889), pero entre 10 y 20 kHz
+    // solo hay el 10 % del ancho: 31 px en el móvil para dos rótulos de ~36 px. Medido el
+    // 01/10/2026: «10 kHz» acaba en x = 349,6 y «20 kHz» empieza en x = 326,9 → «1020kHz».
+    // En escritorio (1.280 px) no se tocan. Esperado: ninguna etiqueta pisa a la siguiente.
+    await page.goto('/analizador-espectro/');
+    const cajas = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('[class*="freqTick"]')).map((e) => {
+        const r = e.getBoundingClientRect();
+        return { texto: e.textContent ?? '', izquierda: r.left, derecha: r.right };
+      }),
+    );
+    expect(cajas.length).toBe(5);
+    for (let i = 1; i < cajas.length; i++) {
+      expect(cajas[i].izquierda, `${cajas[i - 1].texto} pisa ${cajas[i].texto}`).toBeGreaterThanOrEqual(
+        cajas[i - 1].derecha,
+      );
+    }
   });
 });
