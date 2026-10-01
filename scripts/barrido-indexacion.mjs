@@ -36,7 +36,34 @@
  *   node scripts/barrido-indexacion.mjs --estado=rastreada # o descubierta | indexada | 404
  *   node scripts/barrido-indexacion.mjs --todo             # sitemap completo (el barrido del 28/09)
  *   node scripts/barrido-indexacion.mjs --demanda          # + sonda de Bing de las que sigan fuera
+ *   node scripts/barrido-indexacion.mjs --muertas          # + sonda de las INDEXADAS con ≤ 5 impr. en 90 d
+ *   node scripts/barrido-indexacion.mjs --muertas=0        #   (o con otro umbral; 0 = ninguna)
  *   node scripts/barrido-indexacion.mjs --limite=20        # recorta la lista (pruebas)
+ *
+ * La pasada útil para `--muertas` es `--estado=indexada --muertas` (las 723 que el baseline dio
+ * por dentro) o `--todo --muertas` (el sitemap entero, ~1.200 de las 2.000 inspecciones diarias).
+ *
+ * ─────────────────────────────────────────────────────────────────────────────────────────────
+ * La clase «indexada y muerta» (01/10/2026, semilla S0175)
+ * ─────────────────────────────────────────────────────────────────────────────────────────────
+ * Estar dentro del índice no basta. `/estimador-plusvalia-municipal/` está «Enviada e indexada»,
+ * con veredicto PASS, y lleva 2 impresiones en Google en 90 días; su último rastreo es del
+ * 20/06/2026, anterior a las tres correcciones del Inspector de septiembre. Diagnosticarlo costó
+ * cuatro herramientas a mano: el cuadrante (MUERTO), la URL Inspection, las consultas de GSC y
+ * la sonda de Bing («plusvalía municipal» 510 + 287 + «calcular plusvalía municipal» 63). Y el
+ * cuadrante STEM ya avisaba de lo mismo: «MUERTO no dice por qué», mezcla «nadie busca el tema»
+ * con «se busca y la app no aparece», que piden cosas opuestas.
+ *
+ * Con `--muertas`, la sonda de demanda que antes solo pasaba por lo de FUERA pasa también por
+ * las indexadas con impresiones ≤ N en GSC (5 por defecto: la plusvalía tiene 2 por página aunque
+ * por consulta salga vacía), y las lista en un bloque APARTE: allí no hay nada que
+ * rescatar del índice. Si su palabra se busca, el problema es otro —relevancia, autoridad o una
+ * hermana que se lleva la consulta— y la lectura sigue siendo humana: el corpus de la plusvalía,
+ * por ejemplo, es sobre todo navegacional (ayuntamientos, ATRM), no de calculadora.
+ *
+ * Las impresiones salen de UNA consulta de Search Analytics por página. Si devuelve menos de 50
+ * páginas, el script se planta en vez de dar el catálogo entero por muerto: es el mismo control
+ * del instrumento que «hipoteca» para Bing.
  *
  * Requisitos: GSC_SA_KEY_FILE (cuenta de servicio de Search Console) y MWT (Bing Webmaster Tools)
  * en .env.local. Cuota de la URL Inspection API: 2.000 URLs/día por propiedad.
@@ -64,7 +91,18 @@ const flag = (n) => args.includes(`--${n}`);
 const valor = (n, def) => (args.find((a) => a.startsWith(`--${n}=`)) || '').split('=')[1] || def;
 
 const LIMITE = Number(valor('limite', 0)) || 0;
-const CON_DEMANDA = flag('demanda');
+// `--muertas` a secas es umbral 5; `--muertas=N`, impresiones ≤ N. Implica la sonda de demanda.
+// No es 0 porque el caso de origen no lo es: por PÁGINA, plusvalía municipal tiene 2 impresiones
+// en 90 días, aunque por CONSULTA salga vacía (Google anonimiza las consultas raras y las quita
+// de esa vista, no de la suma por página). Con umbral 0, el flag se perdía justo su caso.
+const UMBRAL_MUERTAS_DEFECTO = 5;
+const argMuertas = args.find((a) => a === '--muertas' || a.startsWith('--muertas='));
+const MUERTAS = argMuertas !== undefined;
+const valorMuertas = MUERTAS && argMuertas.includes('=') ? Number(argMuertas.split('=')[1]) : NaN;
+const UMBRAL_MUERTAS = Number.isFinite(valorMuertas) ? valorMuertas : UMBRAL_MUERTAS_DEFECTO;
+const CON_DEMANDA = flag('demanda') || MUERTAS;
+const GSC_API = 'https://www.googleapis.com/webmasters/v3/sites';
+const MIN_PAGINAS_GSC = 50;
 const TODO = flag('todo');
 const FUERA = flag('fuera');
 const ESTADO = valor('estado', 'no-reconoce');
@@ -142,6 +180,23 @@ async function inspeccionar(cliente, url) {
     const msg = e?.response?.data?.error?.message ?? e.message ?? String(e);
     return { url, estado: `ERROR: ${msg.slice(0, 80)}`, veredicto: '', ultimoRastreo: '', canonicalGoogle: '' };
   }
+}
+
+/**
+ * Impresiones de Google por página en los últimos 90 días (hasta hace 3, que es lo que GSC tarda
+ * en consolidar). Una sola consulta: el catálogo cabe de sobra en las 25.000 filas por llamada.
+ * Una página que no aparece en la respuesta tuvo 0 impresiones.
+ */
+async function impresionesPorPagina(cliente) {
+  const fin = new Date(Date.now() - 3 * 864e5);
+  const ini = new Date(fin.getTime() - 90 * 864e5);
+  const d = (x) => x.toISOString().slice(0, 10);
+  const { data } = await cliente.request({
+    url: `${GSC_API}/${encodeURIComponent(SITIO)}/searchAnalytics/query`,
+    method: 'POST',
+    data: { startDate: d(ini), endDate: d(fin), dimensions: ['page'], rowLimit: 25000 },
+  });
+  return new Map((data.rows ?? []).map((f) => [f.keys[0], f.impressions]));
 }
 
 /** Cola con concurrencia fija: la API admite 600 llamadas/minuto, 8 a la vez va sobrado. */
@@ -288,11 +343,46 @@ if (!process.env.GSC_SA_KEY_FILE || !existsSync(process.env.GSC_SA_KEY_FILE)) {
   console.log(`  salieron del índice: ${caidas.length}`);
   for (const f of caidas.slice(0, 15)) console.log(`     ↓ /${f.slug}/  (${f.antes} → ${f.estado})`);
 
-  // ── Fase 2: preguntarle a Bing cuánto se busca lo que sigue fuera ──────────────────────────
+  // ── Fase 2: preguntarle a Bing cuánto se busca lo que sigue fuera (y, con --muertas, lo que
+  //    está dentro sin que Google lo enseñe) ──────────────────────────────────────────────────
   const fuera = filas.filter((f) => !estaDentro(f.estado) && !f.estado.startsWith('ERROR'));
+  let muertas = [];
+  let imprGsc = null;
   const demanda = new Map();
 
-  if (CON_DEMANDA && fuera.length) {
+  if (MUERTAS) {
+    imprGsc = await impresionesPorPagina(cliente);
+    if (imprGsc.size < MIN_PAGINAS_GSC) {
+      // Mismo principio que el control «hipoteca»: una respuesta casi vacía es el instrumento
+      // roto, no un catálogo muerto. Sin este freno, TODAS las indexadas saldrían como muertas.
+      console.error(`\n🚨 CONTROL FALLIDO: Search Analytics devolvió ${imprGsc.size} páginas con impresiones`
+        + ` (mínimo ${MIN_PAGINAS_GSC}). No se clasifica ninguna indexada como muerta.`);
+      process.exitCode = 2;
+      imprGsc = null;
+    } else {
+      muertas = filas.filter((f) => estaDentro(f.estado) && (imprGsc.get(f.url) ?? 0) <= UMBRAL_MUERTAS);
+      console.log(`\nINDEXADAS SIN IMPRESIONES en Google (≤ ${UMBRAL_MUERTAS} en 90 días): `
+        + `${muertas.length} de ${filas.filter((f) => estaDentro(f.estado)).length}`
+        + `  (control: ${imprGsc.size} páginas con impresiones)`);
+    }
+  }
+
+  /** Imprime un grupo ordenado por demanda. Los ceros se cuentan, no se listan. */
+  function listarDemanda(titulo, grupo, conRastreo) {
+    console.log(`\n${titulo}\n`);
+    const orden = grupo.map((f) => [f, demanda.get(f.url)]).sort((a, b) => b[1].total - a[1].total);
+    for (const [f, d] of orden) {
+      if (!d.total) continue;
+      const rastreo = conRastreo ? `  (último rastreo ${f.ultimoRastreo || '¿?'})` : '';
+      console.log(`  ${String(d.total).padStart(8)} impr  «${d.termino}»`.padEnd(34) + `  /${f.slug}/${rastreo}`);
+      console.log(`           ${d.top.join(' · ')}`);
+    }
+    const mudas = orden.filter(([, d]) => !d.total).length;
+    console.log(`\n  (${mudas} sin ninguna demanda medible en Bing)`);
+  }
+
+  const aSondar = [...fuera, ...muertas];
+  if (CON_DEMANDA && aSondar.length) {
     if (!process.env.MWT) {
       console.error('\n⚠️  Falta MWT en .env.local: no se puede sondar la demanda. CSV sin esas columnas.');
     } else {
@@ -309,27 +399,31 @@ if (!process.env.GSC_SA_KEY_FILE || !existsSync(process.env.GSC_SA_KEY_FILE)) {
         console.error('   El instrumento no está midiendo: NO interpretes ningún cero. Sonda omitida.');
         process.exitCode = 2;
       } else {
-        console.log(`\n✅ control «hipoteca»: ${control.filas.length} keywords\n`);
+        console.log(`\n✅ control «hipoteca»: ${control.filas.length} keywords`);
         const kwCatalogo = keywordsDelCatalogo();
-        console.log(`DEMANDA de las ${fuera.length} que siguen fuera del índice (Bing, 6 meses)\n`);
-        for (const f of fuera) {
+        // Un término se sonda una sola vez aunque lo compartan varias URL
+        const cache = new Map();
+        let hechasBing = 0;
+        for (const f of aSondar) {
           const termino = sondaDe(f.slug, kwCatalogo);
-          const r = await sondarBing(termino, ventana);
+          if (!cache.has(termino)) cache.set(termino, await sondarBing(termino, ventana));
+          const r = cache.get(termino);
           const total = r.filas.reduce((a, b) => a + b.impr, 0);
           const top = r.filas.slice().sort((a, b) => b.impr - a.impr).slice(0, 3).map((x) => x.kw);
           demanda.set(f.url, { termino, total, n: r.filas.length, top });
+          if (++hechasBing % 25 === 0) process.stdout.write(`  Bing ${hechasBing}/${aSondar.length}\r`);
         }
-        const orden = [...demanda.entries()].sort((a, b) => b[1].total - a[1].total);
-        for (const [url, d] of orden) {
-          if (!d.total) continue;
-          const slug = url.replace(SITIO, '').replace(/\/$/, '');
-          console.log(`  ${String(d.total).padStart(8)} impr  «${d.termino}»`.padEnd(34)
-            + `  /${slug}/`);
-          console.log(`           ${d.top.join(' · ')}`);
+
+        if (fuera.length) {
+          listarDemanda(`DEMANDA de las ${fuera.length} que siguen FUERA del índice (Bing, 6 meses)`, fuera, false);
+          console.log('  Aquí la palanca es el índice: si se busca, merece pedir el rastreo.');
         }
-        const mudas = orden.filter(([, d]) => !d.total).length;
-        console.log(`\n  (${mudas} sin ninguna demanda medible: ahí no hay nada que rescatar)`);
-        console.log('  ⚠️  El volumen NO es el criterio: hay que LEER el corpus. Un corpus de marcas');
+        if (muertas.length) {
+          listarDemanda(`DEMANDA de las ${muertas.length} INDEXADAS SIN IMPRESIONES (Bing, 6 meses)`, muertas, true);
+          console.log('  Aquí el índice NO es el problema: Google la tiene y no la enseña. Si su palabra');
+          console.log('  se busca, mirar relevancia, autoridad o una hermana que se lleve la consulta.');
+        }
+        console.log('\n  ⚠️  El volumen NO es el criterio: hay que LEER el corpus. Un corpus de marcas');
         console.log('      ajenas o de otro tema no es demanda de herramienta, por alto que sume.');
       }
     }
@@ -338,10 +432,13 @@ if (!process.env.GSC_SA_KEY_FILE || !existsSync(process.env.GSC_SA_KEY_FILE)) {
   // ── CSV ────────────────────────────────────────────────────────────────────────────────────
   const destino = path.join(RAIZ, '_private', `indexacion-${hoy}.csv`);
   const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-  const cab = 'url,slug,estado_hoy,estado_baseline,ultimo_rastreo,canonical_google,sonda,impresiones_bing,top_keywords';
+  const cab = 'url,slug,estado_hoy,estado_baseline,ultimo_rastreo,canonical_google,impresiones_gsc_90d,clase,sonda,impresiones_bing,top_keywords';
+  const setMuertas = new Set(muertas.map((f) => f.url));
   const cuerpo = filas.map((f) => {
     const d = demanda.get(f.url);
+    const clase = !estaDentro(f.estado) ? 'fuera' : setMuertas.has(f.url) ? 'indexada-muerta' : 'indexada';
     return [f.url, f.slug, f.estado, f.antes, f.ultimoRastreo, f.canonicalGoogle,
+      imprGsc ? (imprGsc.get(f.url) ?? 0) : '', clase,
       d?.termino ?? '', d?.total ?? '', (d?.top ?? []).join(' | ')].map(esc).join(',');
   });
   writeFileSync(destino, [cab, ...cuerpo].join('\n') + '\n', 'utf8');
