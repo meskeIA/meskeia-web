@@ -46,11 +46,12 @@ export const jsonLd = generateWebAppSchema({
     'Letra gancho: obliga a que la palabra se apoye en una ficha ya colocada',
     'Valores oficiales de las fichas del Scrabble en español, con dígrafos CH, LL y RR',
     'Modo sin dígrafos para juegos de palabras que tratan CH, LL y RR como letras sueltas',
-    'Multiplicadores de casilla: doble y triple letra, doble y triple palabra',
+    'Multiplicadores de casilla: hasta tres casillas de doble o triple letra y una o dos de palabra (×2, ×3, ×4 y ×9), sin sumar las palabras cruzadas',
+    'CH, LL y RR solo con su ficha o con un comodín, nunca con dos fichas sueltas, como manda el reglamento',
     'Bonificación automática de 50 puntos al colocar las siete fichas del atril',
     'Desglose de puntuación ficha a ficha en cada jugada propuesta',
     'Validación contra más de 87.000 lemas del español, sin enviar datos a ningún servidor',
-    'Marcador de partida con hasta 4 jugadores: anota cada jugada y el turno pasa solo al siguiente',
+    'Marcador de partida con hasta 4 jugadores: anota cada jugada desde la lista o a mano, pasa turno con 0 puntos y se guarda solo en el navegador',
   ],
 });
 
@@ -63,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la puntuación de una palabra en Scrabble?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Se suma el valor de cada ficha de la palabra, aplicando primero los multiplicadores de letra (casilla de doble o triple letra) y multiplicando después el total por los multiplicadores de palabra (doble o triple palabra). El orden importa: la casilla de palabra se aplica al final, sobre la suma ya bonificada por las casillas de letra. Si en la misma jugada se colocan las siete fichas del atril, se añaden 50 puntos al final, después de todos los multiplicadores.',
+        text: 'Se suma el valor de cada ficha de la palabra, aplicando primero los multiplicadores de letra (casilla de doble o triple letra) y multiplicando después el total por los multiplicadores de palabra (doble o triple palabra; si la palabra pisa dos de doble se multiplica por 4, y si pisa dos de triple, por 9). El orden importa: la casilla de palabra se aplica al final, sobre la suma ya bonificada por las casillas de letra. Si en la misma jugada se colocan las siete fichas del atril, se añaden 50 puntos al final, después de todos los multiplicadores.',
       },
     },
     {
@@ -71,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Cuánto vale cada ficha en el Scrabble en español?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Valen 1 punto A, E, O, I, S, N, R, U, L y T; 2 puntos D y G; 3 puntos C, B, M y P; 4 puntos H, F, V e Y; 5 puntos CH y Q; 8 puntos J, LL, Ñ, RR y X; y 10 puntos la Z. Los dos comodines valen 0. La edición española no incluye fichas de K ni de W, de modo que las palabras que las contienen no se pueden formar salvo cubriéndolas con un comodín.',
+        text: 'Valen 1 punto A, E, O, I, S, N, R, U, L y T; 2 puntos D y G; 3 puntos C, B, M y P; 4 puntos H, F, V e Y; 5 puntos CH y Q; 8 puntos J, LL, Ñ, RR y X; y 10 puntos la Z. Los dos comodines valen 0 y pueden hacer de cualquier ficha, también de CH, LL o RR, salvo de K y de W. La edición española no incluye fichas de K ni de W, de modo que las palabras que las contienen no se pueden formar, ni siquiera con un comodín.',
       },
     },
     {
@@ -103,7 +104,7 @@ export const faqJsonLd = {
       name: '¿Se puede llevar el marcador de la partida entre varios jugadores?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. El marcador de partida admite hasta 4 jugadores: al anotar una jugada desde la lista de resultados se suma a su total, el turno pasa solo al siguiente jugador y el atril se vacía para preparar la próxima consulta. Se guarda en el navegador, así que el marcador sobrevive a cerrar la pestaña entre turnos, y una nueva partida lo reinicia cuando haga falta.',
+        text: 'Sí. El marcador de partida admite hasta 4 jugadores: al anotar una jugada desde la lista de resultados se suma a su total, el turno pasa solo al siguiente jugador y el atril se vacía para preparar la próxima consulta. Lo que la lista no trae, como un plural, una forma verbal o los puntos de las palabras cruzadas, se anota a mano, y pasar o cambiar fichas se anota con 0 puntos. Se guarda solo en el almacenamiento local del navegador, así que sobrevive a cerrar la pestaña entre turnos, y una nueva partida lo reinicia cuando haga falta.',
       },
     },
   ],

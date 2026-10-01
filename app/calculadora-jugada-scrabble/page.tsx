@@ -1,11 +1,13 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import styles from './CalculadoraJugadaScrabble.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { parseSpanishNumber } from '@/lib';
 import {
+  BONUS_ATRIL_COMPLETO,
   buscarJugadas,
   COMODIN,
   DIGRAFOS,
@@ -13,6 +15,7 @@ import {
   FICHAS_ATRIL,
   LETRAS_SIMPLES,
   VALORES,
+  type CasillaLetra,
   type Ficha,
   type Jugada,
   type Modo,
@@ -38,6 +41,9 @@ interface JugadaAnotada {
   jugadorIndice: number;
   palabra: string;
   puntos: number;
+  /** De dónde sale: de la lista de resultados (por defecto, también en partidas guardadas
+   *  antes de existir el campo), un turno pasado o un cambio de fichas, o una anotación a mano. */
+  tipo?: 'lista' | 'pasa' | 'manual';
 }
 
 interface MarcadorGuardado {
@@ -45,6 +51,28 @@ interface MarcadorGuardado {
   turno?: number;
   historial?: JugadaAnotada[];
 }
+
+/** La partida tal y como estaba antes de pulsar «Nueva partida», para poder recuperarla. */
+interface PartidaBorrada {
+  turno: number;
+  historial: JugadaAnotada[];
+}
+
+/** Casillas de palabra que se pueden marcar. ×4 y ×9: la palabra pisa dos (art. 15 FISE). */
+const OPCIONES_PALABRA: Array<{ valor: MultiplicadorPalabra; etiqueta: string }> = [
+  { valor: 1, etiqueta: 'Normal' },
+  { valor: 2, etiqueta: '×2 palabra' },
+  { valor: 3, etiqueta: '×3 palabra' },
+  { valor: 4, etiqueta: '×4 · dos dobles' },
+  { valor: 9, etiqueta: '×9 · dos triples' },
+];
+
+/** Casillas de letra que puede pisar una misma palabra en la calculadora. */
+const MAX_CASILLAS_LETRA = 3;
+
+/** Puntos que admite la anotación a mano: negativos para el ajuste final de la partida. */
+const PUNTOS_MANUAL_MIN = -500;
+const PUNTOS_MANUAL_MAX = 2000;
 
 /** Fichas agrupadas por valor, para la tabla de referencia. */
 const GRUPOS_VALOR: Array<{ puntos: number; fichas: string[] }> = [
@@ -57,15 +85,25 @@ const GRUPOS_VALOR: Array<{ puntos: number; fichas: string[] }> = [
   { puntos: 10, fichas: ['Z'] },
 ];
 
+/** «1 punto», «9 puntos», «−3 puntos». */
+function puntosEnTexto(puntos: number): string {
+  return `${puntos.toLocaleString('es-ES')} ${Math.abs(puntos) === 1 ? 'punto' : 'puntos'}`;
+}
+
 export default function CalculadoraJugadaScrabblePage() {
   const [modo, setModo] = useState<Modo>('digrafos');
   const [atril, setAtril] = useState<Ficha[]>([]);
   const [gancho, setGancho] = useState('');
-  const [multLetra, setMultLetra] = useState<MultiplicadorLetra>(1);
+  // Primera casilla de letra (1 = ninguna) y su posición; las demás van en `casillasExtra`.
+  const [multLetra, setMultLetra] = useState<1 | MultiplicadorLetra>(1);
   const [posicionBonus, setPosicionBonus] = useState<PosicionBonus>('auto');
+  const [casillasExtra, setCasillasExtra] = useState<CasillaLetra[]>([]);
   const [multPalabra, setMultPalabra] = useState<MultiplicadorPalabra>(1);
 
   const [jugadas, setJugadas] = useState<Jugada[]>([]);
+  // La casilla de palabra con la que se calculó la lista: el desglose no debe cambiar si
+  // después se toca el selector sin volver a buscar.
+  const [multPalabraResultado, setMultPalabraResultado] = useState<MultiplicadorPalabra>(1);
   const [calculando, setCalculando] = useState(false);
   const [buscado, setBuscado] = useState(false);
 
@@ -80,6 +118,18 @@ export default function CalculadoraJugadaScrabblePage() {
   const [historialMarcador, setHistorialMarcador] = useState<JugadaAnotada[]>([]);
   const [marcadorAbierto, setMarcadorAbierto] = useState(false);
   const [marcadorCargado, setMarcadorCargado] = useState(false);
+  const [avisoMarcador, setAvisoMarcador] = useState('');
+  const [partidaBorrada, setPartidaBorrada] = useState<PartidaBorrada | null>(null);
+  const [puntosManual, setPuntosManual] = useState('');
+  const [palabraManual, setPalabraManual] = useState('');
+  const [errorManual, setErrorManual] = useState('');
+
+  // En el móvil el botón de buscar y el de anotar quedan lejos de lo que cambian: tras
+  // pulsarlos se lleva la vista a los resultados o al marcador (hallazgos 2593 y 2596).
+  const anclaResultados = useRef<HTMLDivElement>(null);
+  const seccionMarcador = useRef<HTMLElement>(null);
+  const desplazarAResultados = useRef(false);
+  const desplazarAMarcador = useRef(false);
 
   useEffect(() => {
     try {
@@ -116,8 +166,21 @@ export default function CalculadoraJugadaScrabblePage() {
     (j) => j.jugadorIndice === jugadores.length - 1
   );
 
+  /** Nombre que se muestra: el campo puede quedar vacío mientras se reescribe. */
+  const nombreDe = (indice: number): string =>
+    jugadores[indice]?.trim() || `Jugador ${indice + 1}`;
+
+  // Se guarda tal cual, también vacío: reponer «Jugador N» en cada pulsación impedía borrar
+  // el nombre y pegaba lo tecleado detrás («Jugador 1Ana», hallazgo 2598). El nombre por
+  // defecto vuelve al salir del campo, si se ha quedado vacío.
   const renombrarJugador = (indice: number, nombre: string) => {
     setJugadores((previo) => previo.map((j, i) => (i === indice ? nombre : j)));
+  };
+
+  const completarNombreVacio = (indice: number) => {
+    setJugadores((previo) =>
+      previo.map((j, i) => (i === indice && j.trim() === '' ? `Jugador ${i + 1}` : j))
+    );
   };
 
   const añadirJugador = () => {
@@ -131,26 +194,82 @@ export default function CalculadoraJugadaScrabblePage() {
     setTurno((previo) => (previo >= jugadores.length - 1 ? 0 : previo));
   };
 
-  const anotarJugada = (jugada: Jugada) => {
-    setHistorialMarcador((previo) => [
-      ...previo,
-      { jugadorIndice: turno, palabra: jugada.palabra, puntos: jugada.puntos },
-    ]);
-    setTurno((previo) => (previo + 1) % jugadores.length);
+  /** Anota una entrada al jugador al que le toca, pasa el turno y lleva la vista al marcador. */
+  const anotarEntrada = (entrada: Omit<JugadaAnotada, 'jugadorIndice'>, aviso: string) => {
+    const siguiente = (turno + 1) % jugadores.length;
+    setHistorialMarcador((previo) => [...previo, { ...entrada, jugadorIndice: turno }]);
+    setTurno(siguiente);
+    setPartidaBorrada(null);
+    setAvisoMarcador(`${aviso} Le toca a ${nombreDe(siguiente)}.`);
     setMarcadorAbierto(true);
+    desplazarAMarcador.current = true;
+  };
+
+  const anotarJugada = (jugada: Jugada) => {
+    // El aviso no repite la palabra: ya está en el historial, justo debajo.
+    anotarEntrada(
+      { palabra: jugada.palabra, puntos: jugada.puntos, tipo: 'lista' },
+      `Anotados ${puntosEnTexto(jugada.puntos)} a ${nombreDe(turno)}.`
+    );
     limpiar();
   };
 
-  const deshacerUltimaAnotacion = () => {
-    if (historialMarcador.length === 0) return;
-    setHistorialMarcador((previo) => previo.slice(0, -1));
-    setTurno((previo) => (previo - 1 + jugadores.length) % jugadores.length);
+  // Pasar el turno o cambiar fichas: 0 puntos y el turno pasa (arts. 25-26 FISE).
+  const pasarTurno = () => {
+    anotarEntrada({ palabra: '', puntos: 0, tipo: 'pasa' }, `${nombreDe(turno)} pasa o cambia fichas: 0 puntos.`);
   };
 
+  // Para lo que la lista no trae: plurales y formas verbales que el lemario no recoge, la
+  // puntuación con las palabras cruzadas (art. 18) o el ajuste final de la partida.
+  const anotarManual = () => {
+    const puntos = parseSpanishNumber(puntosManual);
+    if (!Number.isInteger(puntos) || puntos < PUNTOS_MANUAL_MIN || puntos > PUNTOS_MANUAL_MAX) {
+      setErrorManual(
+        `Escribe los puntos como un número entero entre ${PUNTOS_MANUAL_MIN.toLocaleString('es-ES')} y ${PUNTOS_MANUAL_MAX.toLocaleString('es-ES')}.`
+      );
+      return;
+    }
+    setErrorManual('');
+    anotarEntrada(
+      { palabra: palabraManual.trim().toUpperCase(), puntos, tipo: 'manual' },
+      `Anotados ${puntosEnTexto(puntos)} a mano a ${nombreDe(turno)}.`
+    );
+    setPuntosManual('');
+    setPalabraManual('');
+  };
+
+  // El turno vuelve a QUIEN hizo la jugada deshecha. Restar uno con el número de jugadores
+  // actual se lo daba a otro en cuanto se añadía un jugador a mitad de partida (hallazgo 2597).
+  const deshacerUltimaAnotacion = () => {
+    const ultima = historialMarcador[historialMarcador.length - 1];
+    if (!ultima) return;
+    setHistorialMarcador((previo) => previo.slice(0, -1));
+    setTurno(ultima.jugadorIndice < jugadores.length ? ultima.jugadorIndice : 0);
+    setAvisoMarcador(`Anotación deshecha: vuelve a tocarle a ${nombreDe(ultima.jugadorIndice)}.`);
+  };
+
+  // Sin diálogo de confirmación, pero recuperable: un toque de más en el móvil ya no se
+  // lleva la partida entera (hallazgo 2599). La copia vive hasta la siguiente anotación.
   const nuevaPartida = () => {
+    setPartidaBorrada({ turno, historial: historialMarcador });
     setHistorialMarcador([]);
     setTurno(0);
+    setAvisoMarcador('Partida nueva: totales a cero. Si ha sido sin querer, puedes recuperar la anterior.');
   };
+
+  const recuperarPartida = () => {
+    if (!partidaBorrada) return;
+    setHistorialMarcador(partidaBorrada.historial);
+    setTurno(partidaBorrada.turno < jugadores.length ? partidaBorrada.turno : 0);
+    setPartidaBorrada(null);
+    setAvisoMarcador('Partida anterior recuperada.');
+  };
+
+  useEffect(() => {
+    if (!desplazarAMarcador.current || !marcadorAbierto) return;
+    desplazarAMarcador.current = false;
+    seccionMarcador.current?.scrollIntoView({ block: 'start' });
+  }, [marcadorAbierto, historialMarcador]);
 
   useEffect(() => {
     const cached = typeof window !== 'undefined' ? sessionStorage.getItem(DICT_CACHE_KEY) : null;
@@ -188,7 +307,7 @@ export default function CalculadoraJugadaScrabblePage() {
 
   // Mismo cómputo que `maxCasillas` en el motor (atril + la del gancho, si hay). Una posición
   // fuera de este rango nunca puede caer sobre ninguna ficha colocada: el motor la descarta en
-  // silencio (`puntuar()` deja indiceBonus en -1) y el multiplicador se pierde sin avisar.
+  // silencio y el multiplicador se pierde sin avisar.
   const maxCasillasBonus = atril.length + (gancho !== '' ? 1 : 0);
 
   // Si el atril o el gancho cambian y la posición elegida deja de caber, no se queda fija en
@@ -197,7 +316,51 @@ export default function CalculadoraJugadaScrabblePage() {
     if (typeof posicionBonus === 'number' && posicionBonus > maxCasillasBonus) {
       setPosicionBonus('auto');
     }
+    setCasillasExtra((previo) =>
+      previo.some((c) => typeof c.posicion === 'number' && c.posicion > maxCasillasBonus)
+        ? previo.map((c) =>
+            typeof c.posicion === 'number' && c.posicion > maxCasillasBonus ? { ...c, posicion: 'auto' } : c
+          )
+        : previo
+    );
   }, [maxCasillasBonus, posicionBonus]);
+
+  /** Todas las casillas de letra marcadas: la primera y las añadidas. */
+  const casillasLetra: CasillaLetra[] = useMemo(
+    () => (multLetra === 1 ? [] : [{ multiplicador: multLetra, posicion: posicionBonus }, ...casillasExtra]),
+    [multLetra, posicionBonus, casillasExtra]
+  );
+
+  /** Posiciones fijas que ya ocupa otra casilla de letra: una ficha no pisa dos casillas. */
+  const posicionesOcupadas = (excepto: number): Set<number> => {
+    const ocupadas = new Set<number>();
+    casillasLetra.forEach((c, i) => {
+      if (i !== excepto && typeof c.posicion === 'number') ocupadas.add(c.posicion);
+    });
+    return ocupadas;
+  };
+
+  const elegirMultLetra = (valor: 1 | MultiplicadorLetra) => {
+    setMultLetra(valor);
+    if (valor === 1) setCasillasExtra([]);
+    setBuscado(false);
+  };
+
+  const añadirCasillaLetra = () => {
+    if (multLetra === 1 || casillasLetra.length >= MAX_CASILLAS_LETRA) return;
+    setCasillasExtra((previo) => [...previo, { multiplicador: 2, posicion: 'auto' }]);
+    setBuscado(false);
+  };
+
+  const cambiarCasillaExtra = (indice: number, cambio: Partial<CasillaLetra>) => {
+    setCasillasExtra((previo) => previo.map((c, i) => (i === indice ? { ...c, ...cambio } : c)));
+    setBuscado(false);
+  };
+
+  const quitarCasillaExtra = (indice: number) => {
+    setCasillasExtra((previo) => previo.filter((_, i) => i !== indice));
+    setBuscado(false);
+  };
 
   const añadirFicha = (ficha: Ficha) => {
     if (atril.length >= FICHAS_ATRIL) return;
@@ -214,6 +377,7 @@ export default function CalculadoraJugadaScrabblePage() {
     setAtril([]);
     setGancho('');
     setMultLetra(1);
+    setCasillasExtra([]);
     setMultPalabra(1);
     setPosicionBonus('auto');
     setJugadas([]);
@@ -224,25 +388,41 @@ export default function CalculadoraJugadaScrabblePage() {
     if (atril.length === 0 || dictStatus !== 'ready') return;
     setCalculando(true);
     setBuscado(true);
+    desplazarAResultados.current = true;
 
     // Se cede un frame al navegador para que pinte el estado "calculando".
     setTimeout(() => {
       const resultado = buscarJugadas(diccionario, atril, {
         modo,
         gancho,
-        multiplicadorLetra: multLetra,
-        posicionBonus,
+        casillasLetra,
         multiplicadorPalabra: multPalabra,
       }, 40);
       setJugadas(resultado);
+      setMultPalabraResultado(multPalabra);
       setCalculando(false);
     }, 30);
   };
+
+  useEffect(() => {
+    if (!desplazarAResultados.current || !buscado || calculando) return;
+    desplazarAResultados.current = false;
+    anclaResultados.current?.scrollIntoView({ block: 'start' });
+  }, [buscado, calculando, jugadas]);
 
   const puntosDeFicha = (jugada: Jugada, indice: number): number => {
     if (jugada.indicesComodin.includes(indice)) return 0;
     return VALORES[jugada.fichas[indice]] ?? 0;
   };
+
+  /** Lo que se anuncia al lector de pantalla al terminar la búsqueda: un resumen, no la lista. */
+  const anuncioResultados = calculando
+    ? 'Buscando jugadas…'
+    : !buscado
+      ? ''
+      : jugadas.length === 0
+        ? 'Sin jugadas: con esas fichas no sale ninguna palabra del lemario.'
+        : `${jugadas.length} ${jugadas.length === 1 ? 'jugada encontrada' : 'jugadas encontradas'}. La mejor: ${jugadas[0].palabra}, ${puntosEnTexto(jugadas[0].puntos)}.`;
 
   const totalFichasBolsa = useMemo(
     () => Object.values(DISTRIBUCION).reduce((suma, n) => suma + n, 0),
@@ -265,13 +445,16 @@ export default function CalculadoraJugadaScrabblePage() {
       <LegalNotice />
 
       <div className={styles.mainContent}>
-        <section className={styles.marcadorSeccion}>
+        <section ref={seccionMarcador} className={styles.marcadorSeccion}>
           <button
             type="button"
             className={styles.marcadorToggle}
             aria-expanded={marcadorAbierto}
             aria-controls="panel-marcador"
-            onClick={() => setMarcadorAbierto((previo) => !previo)}
+            onClick={() => {
+              setMarcadorAbierto((previo) => !previo);
+              setAvisoMarcador('');
+            }}
           >
             <span><span aria-hidden="true">🏆</span> Marcador de partida</span>
             {historialMarcador.length > 0 && (
@@ -282,10 +465,20 @@ export default function CalculadoraJugadaScrabblePage() {
 
           {marcadorAbierto && (
             <div id="panel-marcador" className={styles.marcadorPanel}>
+              <p className={styles.marcadorAviso} role="status">
+                {avisoMarcador}
+              </p>
+              {partidaBorrada && (
+                <button type="button" className={styles.btnAnotar} onClick={recuperarPartida}>
+                  Recuperar la partida anterior
+                </button>
+              )}
+
               <p className={styles.ayuda}>
                 Lleva el tanteo de la partida entre varios jugadores: anota cada jugada desde la
-                lista de resultados y el turno pasa solo al siguiente. Se guarda en este
-                navegador, así que sobrevive a cerrar la pestaña entre turnos.
+                lista de resultados, o a mano si la lista no la trae, y el turno pasa solo al
+                siguiente. Se guarda en este navegador, así que sobrevive a cerrar la pestaña
+                entre turnos.
               </p>
 
               <ul className={styles.marcadorJugadores}>
@@ -301,7 +494,10 @@ export default function CalculadoraJugadaScrabblePage() {
                         className={styles.marcadorNombreInput}
                         value={nombre}
                         maxLength={24}
-                        onChange={(e) => renombrarJugador(i, e.target.value || `Jugador ${i + 1}`)}
+                        placeholder={`Jugador ${i + 1}`}
+                        autoComplete="off"
+                        onChange={(e) => renombrarJugador(i, e.target.value)}
+                        onBlur={() => completarNombreVacio(i)}
                       />
                     </label>
                     <span className={styles.marcadorPuntos}>{totalesMarcador[i]}</span>
@@ -309,6 +505,63 @@ export default function CalculadoraJugadaScrabblePage() {
                   </li>
                 ))}
               </ul>
+
+              <div className={styles.marcadorTurnoAcciones}>
+                <button type="button" className={styles.btnSecondary} onClick={pasarTurno}>
+                  Pasar turno o cambiar fichas (0 puntos)
+                </button>
+                <div className={styles.marcadorManual} role="group" aria-labelledby="titulo-anotar-mano">
+                  <span id="titulo-anotar-mano" className={styles.marcadorManualTitulo}>
+                    Anotar a mano a {nombreDe(turno)}
+                  </span>
+                  <div className={styles.marcadorManualCampos}>
+                    <label className={styles.marcadorManualCampo}>
+                      <span>Palabra (opcional)</span>
+                      <input
+                        type="text"
+                        className={styles.marcadorManualInput}
+                        value={palabraManual}
+                        maxLength={20}
+                        autoComplete="off"
+                        autoCapitalize="characters"
+                        onChange={(e) => setPalabraManual(e.target.value)}
+                      />
+                    </label>
+                    <label className={styles.marcadorManualCampo}>
+                      <span>Puntos</span>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        className={styles.marcadorManualInput}
+                        value={puntosManual}
+                        maxLength={6}
+                        autoComplete="off"
+                        aria-invalid={errorManual !== ''}
+                        aria-describedby={errorManual !== '' ? 'error-anotar-mano' : undefined}
+                        onChange={(e) => { setPuntosManual(e.target.value); setErrorManual(''); }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') anotarManual(); }}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className={styles.btnSecondary}
+                      onClick={anotarManual}
+                      disabled={puntosManual.trim() === ''}
+                    >
+                      Anotar a mano
+                    </button>
+                  </div>
+                  <p className={styles.ayudaCampo}>
+                    Para un plural o una forma verbal que la lista no trae, la puntuación con las
+                    palabras cruzadas o el ajuste final de la partida (con signo menos para restar).
+                  </p>
+                  {errorManual !== '' && (
+                    <p id="error-anotar-mano" className={styles.marcadorManualError} role="alert">
+                      {errorManual}
+                    </p>
+                  )}
+                </div>
+              </div>
 
               <div className={styles.marcadorAcciones}>
                 <button
@@ -351,10 +604,16 @@ export default function CalculadoraJugadaScrabblePage() {
                   {historialMarcador.map((entrada, i) => (
                     <li key={i} className={styles.marcadorHistorialItem}>
                       <span className={styles.marcadorHistorialJugador}>
-                        {jugadores[entrada.jugadorIndice] ?? `Jugador ${entrada.jugadorIndice + 1}`}
+                        {nombreDe(entrada.jugadorIndice)}
                       </span>
-                      <span className={styles.marcadorHistorialPalabra}>{entrada.palabra}</span>
-                      <span className={styles.marcadorHistorialPuntos}>{entrada.puntos} pts</span>
+                      <span className={styles.marcadorHistorialPalabra}>
+                        {entrada.tipo === 'pasa'
+                          ? 'Pasa o cambia fichas'
+                          : entrada.tipo === 'manual'
+                            ? `${entrada.palabra}${entrada.palabra !== '' ? ' ' : ''}(a mano)`
+                            : entrada.palabra}
+                      </span>
+                      <span className={styles.marcadorHistorialPuntos}>{entrada.puntos.toLocaleString('es-ES')} pts</span>
                     </li>
                   ))}
                 </ol>
@@ -404,8 +663,10 @@ export default function CalculadoraJugadaScrabblePage() {
             </button>
           </div>
           <p className={styles.ayuda}>
-            El Scrabble en español clásico trae fichas de CH, LL y RR que ocupan una sola casilla. Muchas
-            versiones digitales las eliminaron: si tus fichas no las tienen, elige la segunda opción.
+            El Scrabble en español clásico trae fichas de CH, LL y RR que ocupan una sola casilla, y en ese
+            modo no se pueden formar con dos fichas sueltas (C y H, dos L, dos R): solo con su ficha o con
+            un comodín. Muchas versiones digitales las eliminaron: si tus fichas no las tienen, elige la
+            segunda opción.
           </p>
         </section>
 
@@ -488,7 +749,7 @@ export default function CalculadoraJugadaScrabblePage() {
             <div className={styles.campo}>
               <span className={styles.label} id="label-mult-palabra">Casilla de palabra</span>
               <div className={styles.toggleGroup} role="group" aria-labelledby="label-mult-palabra">
-                {([1, 2, 3] as MultiplicadorPalabra[]).map((valor) => (
+                {OPCIONES_PALABRA.map(({ valor, etiqueta }) => (
                   <button
                     type="button"
                     key={valor}
@@ -496,22 +757,26 @@ export default function CalculadoraJugadaScrabblePage() {
                     aria-pressed={multPalabra === valor}
                     onClick={() => { setMultPalabra(valor); setBuscado(false); }}
                   >
-                    {valor === 1 ? 'Normal' : `×${valor} palabra`}
+                    {etiqueta}
                   </button>
                 ))}
               </div>
+              <p className={styles.ayudaCampo}>
+                Si la palabra pisa dos casillas de doble palabra se multiplica ×4 (2×2), y si pisa dos de
+                triple, ×9 (3×3): así lo cuenta el reglamento de la FISE.
+              </p>
             </div>
 
             <div className={styles.campo}>
               <span className={styles.label} id="label-mult-letra">Casilla de letra</span>
               <div className={styles.toggleGroup} role="group" aria-labelledby="label-mult-letra">
-                {([1, 2, 3] as MultiplicadorLetra[]).map((valor) => (
+                {([1, 2, 3] as const).map((valor) => (
                   <button
                     type="button"
                     key={valor}
                     className={`${styles.toggleBtn} ${multLetra === valor ? styles.toggleBtnActivo : ''}`}
                     aria-pressed={multLetra === valor}
-                    onClick={() => { setMultLetra(valor); setBuscado(false); }}
+                    onClick={() => elegirMultLetra(valor)}
                   >
                     {valor === 1 ? 'Ninguna' : `×${valor} letra`}
                   </button>
@@ -536,7 +801,9 @@ export default function CalculadoraJugadaScrabblePage() {
                 >
                   <option value="auto">La ficha más valiosa (mejor caso)</option>
                   {Array.from({ length: maxCasillasBonus }, (_, i) => i + 1).map((p) => (
-                    <option key={p} value={p}>Posición {p} de la palabra</option>
+                    <option key={p} value={p} disabled={posicionesOcupadas(0).has(p)}>
+                      Posición {p} de la palabra
+                    </option>
                   ))}
                 </select>
                 <p className={styles.ayudaCampo}>
@@ -544,6 +811,67 @@ export default function CalculadoraJugadaScrabblePage() {
                   tu atril{gancho !== '' ? ' y el gancho' : ''} pueden llegar a ocupar. Si eliges «la ficha más
                   valiosa», el resultado es el techo de la jugada: solo lo alcanzarás si la palabra encaja así
                   en el tablero.
+                </p>
+              </div>
+            )}
+
+            {multLetra > 1 && casillasExtra.map((casilla, i) => {
+              const numero = i + 2;
+              const idEtiqueta = `label-casilla-letra-${numero}`;
+              return (
+                <div className={styles.campo} key={numero}>
+                  <span className={styles.label} id={idEtiqueta}>Otra casilla de letra ({numero}.ª)</span>
+                  <div className={styles.casillaExtraFila}>
+                    <div className={styles.toggleGroup} role="group" aria-labelledby={idEtiqueta}>
+                      {([2, 3] as const).map((valor) => (
+                        <button
+                          type="button"
+                          key={valor}
+                          className={`${styles.toggleBtn} ${casilla.multiplicador === valor ? styles.toggleBtnActivo : ''}`}
+                          aria-pressed={casilla.multiplicador === valor}
+                          onClick={() => cambiarCasillaExtra(i, { multiplicador: valor })}
+                        >
+                          {`×${valor}`}
+                        </button>
+                      ))}
+                    </div>
+                    <select
+                      className={styles.select}
+                      aria-label={`Posición de la ${numero}.ª casilla de letra`}
+                      value={String(casilla.posicion)}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        cambiarCasillaExtra(i, { posicion: v === 'auto' ? 'auto' : Number(v) });
+                      }}
+                    >
+                      <option value="auto">La siguiente ficha más valiosa</option>
+                      {Array.from({ length: maxCasillasBonus }, (_, p) => p + 1).map((p) => (
+                        <option key={p} value={p} disabled={posicionesOcupadas(i + 1).has(p)}>
+                          Posición {p} de la palabra
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      className={styles.btnQuitarCasilla}
+                      onClick={() => quitarCasillaExtra(i)}
+                      aria-label={`Quitar la ${numero}.ª casilla de letra`}
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+
+            {multLetra > 1 && casillasLetra.length < MAX_CASILLAS_LETRA && (
+              <div className={styles.campo}>
+                <button type="button" className={styles.btnAnotar} onClick={añadirCasillaLetra}>
+                  + Otra casilla de letra en la misma palabra
+                </button>
+                <p className={styles.ayudaCampo}>
+                  Una palabra larga puede pisar dos o tres casillas de letra a la vez. Cada ficha solo
+                  puede caer en una, y la que ya estaba en el tablero no recibe ninguna.
                 </p>
               </div>
             )}
@@ -564,12 +892,16 @@ export default function CalculadoraJugadaScrabblePage() {
           </div>
         </section>
 
-        {/* Resultados */}
-        <section className={styles.bloque} aria-live="polite">
+        {/* Resultados. Sin aria-live en la sección: con hasta 40 jugadas y 40 botones, el
+            lector de pantalla leía la lista entera al pintarse. Se anuncia solo un resumen. */}
+        <section id="resultados-jugada" className={styles.bloque}>
+          <p className={styles.srOnly} role="status">{anuncioResultados}</p>
+          <div ref={anclaResultados} className={styles.anclaResultados} />
+
           {calculando && <p className={styles.estado}>Revisando {dictSize} palabras…</p>}
 
           {!calculando && buscado && jugadas.length === 0 && (
-            <div className={styles.sinResultados} role="status">
+            <div className={styles.sinResultados}>
               <p><strong>Ninguna palabra encaja con esas fichas.</strong></p>
               <p>
                 Si has fijado una letra de apoyo, prueba a quitarla: obliga a que aparezca en la palabra.
@@ -603,7 +935,7 @@ export default function CalculadoraJugadaScrabblePage() {
                       {jugada.fichas.map((ficha, i) => {
                         const esGancho = i === jugada.indiceGancho;
                         const esComodin = jugada.indicesComodin.includes(i);
-                        const esBonus = i === jugada.indiceBonus;
+                        const esBonus = jugada.bonos.some((b) => b.indice === i);
                         return (
                           <span
                             key={`${ficha}-${i}`}
@@ -627,18 +959,24 @@ export default function CalculadoraJugadaScrabblePage() {
                       {jugada.indicesComodin.length > 0 && (
                         <> · comodín sobre {jugada.indicesComodin.map((i) => jugada.fichas[i]).join(' y ')}</>
                       )}
-                      {jugada.indiceBonus !== -1 && (
-                        <> · ×{multLetra} en la <strong>{jugada.fichas[jugada.indiceBonus]}</strong></>
+                      {jugada.bonos.map((bono) => (
+                        <span key={bono.indice}> · ×{bono.multiplicador} en la <strong>{jugada.fichas[bono.indice]}</strong></span>
+                      ))}
+                      {multPalabraResultado > 1 && (
+                        <>
+                          {' '}· palabra ×{multPalabraResultado}
+                          {multPalabraResultado === 4 && ' (dos casillas de doble palabra)'}
+                          {multPalabraResultado === 9 && ' (dos casillas de triple palabra)'}
+                        </>
                       )}
-                      {multPalabra > 1 && <> · palabra ×{multPalabra}</>}
-                      {jugada.atrilCompleto && <> · <strong>+{50} por colocar las siete fichas</strong></>}
+                      {jugada.atrilCompleto && <> · <strong>+{BONUS_ATRIL_COMPLETO} por colocar las siete fichas</strong></>}
                     </p>
                     <button
                       type="button"
                       className={styles.btnAnotar}
                       onClick={() => anotarJugada(jugada)}
                     >
-                      Anotar esta jugada a {jugadores[turno] ?? `Jugador ${turno + 1}`}
+                      Anotar esta jugada a {nombreDe(turno)}
                     </button>
                   </li>
                 ))}
@@ -714,6 +1052,13 @@ export default function CalculadoraJugadaScrabblePage() {
             palabra. Y solo al final, si has colocado las siete fichas del atril, se suman los 50 puntos de
             bonificación, que <em>no</em> se multiplican por nada.
           </p>
+          <p>
+            Si la palabra pisa dos casillas de palabra, los multiplicadores se encadenan: dos de doble
+            palabra multiplican por 4 y dos de triple, por 9. Una palabra larga también puede pisar varias
+            casillas de letra; la calculadora admite hasta tres en la misma jugada, cada una sobre una ficha
+            distinta. Lo que no cuenta son las palabras que se formen de lado al cruzar: esas se suman
+            aparte, y su total puedes anotarlo a mano en el marcador.
+          </p>
 
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -764,8 +1109,9 @@ export default function CalculadoraJugadaScrabblePage() {
             <div className={styles.escenarioCard}>
               <h4><span aria-hidden="true">⚖️</span> Resolver una duda de tanteo</h4>
               <p>
-                ¿Discutís cuánto vale una palabra? Introduce sus fichas y la casilla, y el desglose muestra
-                ficha a ficha de dónde sale cada punto, incluida la que ya estaba en el tablero.
+                ¿Discutís cuánto vale una palabra? Introduce sus fichas y las casillas que pisa, y el desglose
+                muestra ficha a ficha de dónde sale cada punto, incluida la que ya estaba en el tablero. Las
+                palabras que se forman de lado al cruzar no entran en la cuenta.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -779,7 +1125,8 @@ export default function CalculadoraJugadaScrabblePage() {
               <h4><span aria-hidden="true">🏆</span> Llevar el marcador entre varios</h4>
               <p>
                 Abre el marcador de partida, ponle nombre a cada jugador y anota cada jugada desde la
-                lista de resultados: el turno pasa solo y no hace falta sumar a mano.
+                lista de resultados, o a mano si no está en ella. Pasar o cambiar fichas se anota con
+                0 puntos, y el turno pasa solo al siguiente.
               </p>
             </div>
           </div>
@@ -790,7 +1137,12 @@ export default function CalculadoraJugadaScrabblePage() {
               <span className={styles.stepNumber}>1</span>
               <div className={styles.stepContent}>
                 <h4>Elige si tus fichas traen CH, LL y RR</h4>
-                <p>Cambia el tanteo y las palabras posibles: con la ficha RR, CARRO ocupa cuatro casillas en vez de cinco.</p>
+                <p>
+                  Cambia el tanteo y las palabras posibles. Con dígrafos, CH, LL y RR solo se forman con su
+                  ficha o con un comodín: el reglamento no deja juntar una C y una H sueltas, ni dos L, ni dos R.
+                  Así, CARRO necesita la ficha RR y ocupa cuatro casillas; sin dígrafos se escribe con dos R
+                  sueltas y ocupa cinco.
+                </p>
               </div>
             </div>
             <div className={styles.step}>
@@ -887,6 +1239,15 @@ export default function CalculadoraJugadaScrabblePage() {
               </p>
             </div>
             <div className={styles.faqItem}>
+              <h4>¿Qué casillas de premio tiene en cuenta?</h4>
+              <p>
+                Una casilla de palabra por jugada (doble o triple) o dos iguales, que multiplican por 4 o
+                por 9, y hasta tres casillas de letra, cada una sobre una ficha distinta. La ficha que ya
+                estaba en el tablero no recibe bonificación. No suma las palabras que se forman de lado al
+                cruzar, porque para eso hace falta el tablero entero.
+              </p>
+            </div>
+            <div className={styles.faqItem}>
               <h4>¿Por qué no le puedo dar el tablero entero?</h4>
               <p>
                 Porque resolver el tablero completo obliga a validar todas las palabras perpendiculares que se
@@ -897,8 +1258,11 @@ export default function CalculadoraJugadaScrabblePage() {
             <div className={styles.faqItem}>
               <h4>¿Se guarda lo que escribo?</h4>
               <p>
-                No. El diccionario se descarga una vez y todo el cálculo ocurre en tu navegador: las fichas que
-                introduces no salen de tu dispositivo ni quedan registradas en ningún sitio.
+                Solo en tu navegador. El diccionario se descarga una vez y todo el cálculo ocurre en tu
+                dispositivo: las fichas que introduces no se envían a ningún servidor. El marcador de partida
+                sí se guarda en el almacenamiento local de este navegador (los nombres de los jugadores, las
+                palabras anotadas y los puntos) para que sobreviva a cerrar la pestaña entre turnos. No sale
+                de tu dispositivo, y lo borras con «Nueva partida» o limpiando los datos del sitio.
               </p>
             </div>
           </div>

@@ -183,9 +183,9 @@ interface ResultadoPalabra {
    * dejaba a cero en silencio— y presentaba el total como el de una jugada legal, mientras
    * su propia FAQ dice que «no tiene fichas K ni W, así que ninguna palabra que las lleve es
    * jugable»: «kayak 6 pt» con las dos K a cero, «ka 1 pt» con el valor de una sola letra
-   * (hallazgo 704). Una blanca sobre esa letra sí la hace jugable —es la única manera de
-   * ponerla en el tablero—, y por eso `letrasSinFicha` no cuenta las posiciones cubiertas:
-   * ahí está la diferencia que el hallazgo 705 echaba en falta entre «yak» y «ya?».
+   * (hallazgo 704). Tampoco una blanca la hace jugable: «El comodín no puede reemplazar la K
+   * ni la W» (art. 10.2 del reglamento FISE). Hasta el 01/10/2026 `letrasSinFicha` no contaba
+   * las posiciones cubiertas por la blanca y daba «ya?» → yak por buena (5 puntos).
    */
   sinFicha: string[];
 }

@@ -1219,8 +1219,13 @@ test.describe('generador-anagramas', () => {
         // YAK = Y4+A1+K(sin ficha) = 5, y poniendo esa misma K con una ficha blanca —que
         // según la leyenda de la app rebaja la puntuación— salía EL MISMO 5. Contraprueba con
         // una letra que sí tiene ficha: «casa» vale 6 con la A propia y 5 con la blanca.
-        // REPARADO en 43473556: «yak» con la K propia se marca «sin ficha K» y «ya?» sí se
-        // puntúa, porque la blanca es la única manera de poner una K en el tablero.
+        // REPARADO en 43473556: «yak» con la K propia se marca «sin ficha K» y «ya?» se
+        // puntuaba, porque se dio por hecho que la blanca podía hacer de K.
+        // CORREGIDO el 01/10/2026: el art. 10.2 del reglamento FISE dice que «el comodín no
+        // puede reemplazar la K ni la W», así que «ya?» tampoco da una YAK jugable y las dos
+        // lecturas salen «sin ficha K». La aserción de abajo no cambia: solo exige que la blanca
+        // no salga «gratis» (5|5), y ahora ninguna de las dos tiene número.
+        // (Detectado al inspeccionar /calculadora-jugada-scrabble/, cuyo motor ya lo hacía bien.)
         await buscarAtril(page, 'yak', 3, 4);
         const conFicha = puntosDe(await chipsConPuntos(page), 'yak');
 
@@ -1231,6 +1236,7 @@ test.describe('generador-anagramas', () => {
           `${conFicha}|${conBlanca}`,
           'la blanca sobre la K no descuenta nada porque la K ya valía 0',
         ).not.toBe('5|5');
+        expect(conBlanca, 'la blanca no puede hacer de K (art. 10.2 FISE): YAK no tiene puntos').toBe('');
       },
     );
 

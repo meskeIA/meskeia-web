@@ -315,9 +315,11 @@ test.describe('calculadora-jugada-scrabble · marcador de partida', () => {
  * lemas se usó además un oráculo propio escrito con esas reglas (no reutiliza el motor de la app).
  */
 
-/** Las jugadas de la lista de resultados (el historial del marcador también es un <ol>). */
+/** Las jugadas de la lista de resultados (el historial del marcador también es un <ol>).
+ *  Hasta el 01/10/2026 se localizaba por `section[aria-live="polite"]`; la sección dejó de ser
+ *  una región viva (leía las 40 jugadas al pintarse) y ahora se busca por su id. */
 function jugadasLista(page: Page) {
-  return page.locator('section[aria-live="polite"] ol > li');
+  return page.locator('#resultados-jugada ol > li');
 }
 
 /** «PALABRA N pts» de cada fila de resultados, en orden. */
@@ -405,9 +407,15 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · cálc
     expect(desglose).toContain('×3 en la B');
   });
 
-  test.fail(
-    'ABIERTO, hallazgo: el comodín no puede hacer de CH, LL ni RR si el atril no trae una de sus letras · ★,U,S,Q,U,E,L da CHUSQUEL 60 pts',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2591: el comodín hace de CH, LL o RR aunque el atril no traiga ninguna de sus letras · ★,U,S,Q,U,E,L da CHUSQUEL 60 pts',
     async ({ page }) => {
+      // Reparado: `esViable` cuenta ahora FICHAS que faltan, no letras, sobre la palabra ya
+      // partida en fichas (CH = una). Las otras cuatro palabras de la ficha, resueltas a mano:
+      //   TORRENTE (T,O,★,E,N,T,E; ★ = RR): 1+1+0+1+1+1+1 = 6 +50 = 56
+      //   CHAQUETA (★,A,Q,U,E,T,A; ★ = CH): 0+1+5+1+1+1+1 = 10 +50 = 60
+      //   MARTILLO y MARCHITO (M,A,R,T,I,★,O; ★ = LL / CH): 3+1+1+1+1+0+1 = 8 +50 = 58
+      //   CASTILLO (C,A,S,T,I,★,O; ★ = LL): 3+1+1+1+1+0+1 = 8 +50 = 58
       // Art. 10 FISE: el comodín sustituye a cualquier letra, y CH es una letra con ficha propia.
       // A mano: CH(★)0 + U1 + S1 + Q5 + U1 + E1 + L1 = 10; siete fichas → +50 = 60. Lo siguiente
       // (oráculo) es LUQUES, 10. El filtro previo `esViable` del motor cuenta LETRAS que faltan
@@ -417,26 +425,59 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · cálc
       await añadirFichas(page, ['★', 'U', 'S', 'Q', 'U', 'E', 'L']);
       await buscar(page);
       expect((await cabeceras(page))[0]).toBe('CHUSQUEL 60 pts');
+      expect(await desgloseDe(page, 'CHUSQUEL 60 pts')).toContain('comodín sobre CH');
+
+      const casos: Array<[string[], string[]]> = [
+        [['T', 'O', '★', 'E', 'N', 'T', 'E'], ['TORRENTE 56 pts']],
+        [['★', 'A', 'Q', 'U', 'E', 'T', 'A'], ['CHAQUETA 60 pts']],
+        [['M', 'A', 'R', 'T', 'I', '★', 'O'], ['MARCHITO 58 pts', 'MARTILLO 58 pts']],
+        [['C', 'A', 'S', 'T', 'I', '★', 'O'], ['CASTILLO 58 pts']],
+      ];
+      for (const [atril, esperadas] of casos) {
+        await page.getByRole('button', { name: 'Limpiar' }).click();
+        await añadirFichas(page, atril);
+        await buscar(page);
+        const lista = await cabeceras(page);
+        for (const esperada of esperadas) expect(lista, atril.join(',')).toContain(esperada);
+      }
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: forma CH con una C y una H sueltas, que el art. 11 FISE prohíbe · C,H,A,P,A da HACA 9 pts',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2590: ya no forma CH con una C y una H sueltas (art. 11 FISE) · C,H,A,P,A da HACA 9 pts',
     async ({ page }) => {
       // Modo «Con CH, LL y RR» (el de partida). Sin la ficha CH, CHAPA y PACHA no se pueden
       // formar (art. 11). Lo mejor legal (oráculo): HACA = H4 + A1 + C3 + A1 = 9.
-      // Hoy encabezan CHAPA 12 y PACHA 12 (C3 + H4 sueltas = 7, más de lo que vale la CH, 5).
+      // Encabezaban CHAPA 12 y PACHA 12 (C3 + H4 sueltas = 7, más de lo que vale la CH, 5).
+      // Reparado: con dígrafos, la palabra se parte en fichas y CH/LL/RR son SIEMPRE una sola
+      // (`fichasDePalabra` en motor.ts): solo las cubre su ficha o un comodín entero.
       await conDiccionario(page);
       await añadirFichas(page, ['C', 'H', 'A', 'P', 'A']);
       await buscar(page);
       const lista = await cabeceras(page);
       expect(lista[0]).toBe('HACA 9 pts');
       expect(lista.filter((c) => /^(CHAPA|PACHA) /.test(c))).toEqual([]);
+
+      // Y con la ficha CH en el atril, la palabra CH sale con ESA ficha (5), no con C3 + H4 = 7.
+      await page.getByRole('button', { name: 'Limpiar' }).click();
+      await añadirFichas(page, ['X', 'D', 'C', 'S', 'CH', 'M', 'H']);
+      await buscar(page);
+      const conFicha = await cabeceras(page);
+      expect(conFicha).toContain('CH 5 pts');
+      expect(conFicha).not.toContain('CH 7 pts');
+
+      // Contraprueba: en «Solo letras sueltas» la C y la H sí se juntan, porque ahí no hay
+      // ficha CH. CHAPA = C3 + H4 + A1 + P3 + A1 = 12 (empata con PACHA; desempate alfabético).
+      await page.getByRole('button', { name: 'Limpiar' }).click();
+      await page.getByRole('button', { name: 'Solo letras sueltas' }).click();
+      await añadirFichas(page, ['C', 'H', 'A', 'P', 'A']);
+      await buscar(page);
+      expect((await cabeceras(page)).slice(0, 2)).toEqual(['CHAPA 12 pts', 'PACHA 12 pts']);
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: forma LL y RR con dos fichas sueltas (art. 11 FISE) · C,A,L,L,E no da CALLE y C,A,R,R,O no da CARRO',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2590: ya no forma LL y RR con dos fichas sueltas (art. 11 FISE) · C,A,L,L,E no da CALLE y C,A,R,R,O no da CARRO',
     async ({ page }) => {
       // Lo mejor legal (oráculo, mismas reglas): ACLE = A1 + C3 + L1 + E1 = 6 (empata con ALCE,
       // CALE y CELA; desempate alfabético) y CORAR = C3 + O1 + R1 + A1 + R1 = 7 (con CROAR y
@@ -454,12 +495,33 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · cálc
       lista = await cabeceras(page);
       expect(lista[0]).toBe('CORAR 7 pts');
       expect(lista.filter((c) => /^(CARRO|CORRA) /.test(c))).toEqual([]);
+
+      // Con un comodín ENTERO haciendo de RR sí sale: C,A,★,O → CARRO = C3 + A1 + RR(★)0 + O1 = 5,
+      // en cuatro casillas.
+      await page.getByRole('button', { name: 'Limpiar' }).click();
+      await añadirFichas(page, ['C', 'A', '★', 'O']);
+      await buscar(page);
+      expect(await cabeceras(page)).toContain('CARRO 5 pts');
+      expect(await desgloseDe(page, 'CARRO 5 pts')).toContain('comodín sobre RR');
+
+      // La ficha lo decía con AHORRO: salía con una R + el comodín como la otra R. Ahora el
+      // comodín cubre la RR entera y la R suelta se queda en el atril:
+      // A1 + H4 + O1 + RR(★)0 + O1 = 7, colocando 5 fichas de las 6.
+      await page.getByRole('button', { name: 'Limpiar' }).click();
+      await añadirFichas(page, ['A', 'H', 'O', 'R', '★', 'O']);
+      await buscar(page);
+      expect(await cabeceras(page)).toContain('AHORRO 7 pts');
+      const desglose = await desgloseDe(page, 'AHORRO 7 pts');
+      expect(desglose).toContain('Coloca 5 fichas de tu atril');
+      expect(desglose).toContain('comodín sobre RR');
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: la misma palabra sale dos veces (papa y papá del lemario) · P,A,P,A da una sola PAPA 8 pts y sin nota de empate',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2595: la misma palabra ya no sale dos veces (papa y papá del lemario) · P,A,P,A da una sola PAPA 8 pts y sin nota de empate',
     async ({ page }) => {
+      // Reparado: el motor descarta una forma normalizada que ya ha puntuado. En fichas, papa y
+      // papá son la misma jugada; la key de React (la palabra) vuelve a ser única.
       // A mano: PAPA = P3 + A1 + P3 + A1 = 8, y es la única palabra de 4 fichas. El lemario
       // trae «papa» y «papá», que normalizadas son la misma jugada; la app las lista dos veces
       // (y con la misma `key` de React) y la nota de empate anuncia «más de una jugada con 8».
@@ -468,6 +530,8 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · cálc
       await buscar(page);
       const lista = await cabeceras(page);
       expect(lista.filter((c) => c === 'PAPA 8 pts')).toHaveLength(1);
+      expect(lista.filter((c) => c === 'APA 5 pts')).toHaveLength(1);
+      expect(new Set(lista).size).toBe(lista.length);
       await expect(page.getByText(/Hay más de una jugada con/)).toHaveCount(0);
     },
   );
@@ -492,8 +556,8 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · cálc
     expect(lista.filter((c) => /[KW]/.test(c.split(' ')[0]))).toEqual([]);
   });
 
-  test.fail(
-    'ABIERTO, hallazgo: el FAQPage dice que K y W se forman «cubriéndolas con un comodín», y el art. 10.2 FISE lo prohíbe',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2600: el FAQPage ya no dice que K y W se forman «cubriéndolas con un comodín» (art. 10.2 FISE)',
     async ({ page }) => {
       // metadata.ts, pregunta «¿Cuánto vale cada ficha…?». El motor hace lo correcto (test de
       // arriba: ninguna palabra con K o W, ni con dos comodines); lo que se equivoca es la
@@ -502,29 +566,77 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · cálc
       const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
       expect(ld).toContain('FAQPage');
       expect(ld).not.toContain('salvo cubriéndolas con un comodín');
+      expect(ld).toContain('ni siquiera con un comodín');
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: una jugada sobre dos casillas de palabra no se puede expresar (art. 15 FISE: ×4 o ×9)',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2592: una jugada sobre dos casillas de palabra multiplica ×4 o ×9 (art. 15 FISE) y admite varias casillas de letra',
     async ({ page }) => {
       // PALABRA con las 7 fichas: P3 + A1 + L1 + A1 + B3 + R1 + A1 = 11. Sobre dos casillas de
       // doble palabra (en el tablero estándar, fila 5 de la columna 5 a la 11): 11 × 4 = 44,
-      // +50 = 94. La app solo admite UN multiplicador de palabra (Normal / ×2 / ×3) y una casilla
-      // de letra, así que lo más que da es 11 × 2 + 50 = 72. Quien lo repare adapta el selector
-      // de abajo al control que añada.
+      // +50 = 94. La app solo admitía UN multiplicador de palabra (Normal / ×2 / ×3) y una
+      // casilla de letra: lo más que daba era 11 × 2 + 50 = 72. Reparado con dos opciones más,
+      // «×4 · dos dobles» y «×9 · dos triples», y hasta tres casillas de letra por jugada.
       await conDiccionario(page);
       await añadirFichas(page, ['P', 'A', 'L', 'A', 'B', 'R', 'A']);
       await page.getByRole('button', { name: '×2 palabra' }).click();
       await buscar(page);
       expect((await cabeceras(page))[0]).toBe('PALABRA 72 pts');
-      // Acotado al bloque 3: la tabla de valores escribe «×4» y «×9» como número de fichas.
-      const bloque3 = page.locator('section').filter({ has: page.getByRole('heading', { name: '3. Dónde vas a jugar' }) });
-      await expect
-        .poll(() => bloque3.getByText(/×4|×9|dos casillas de palabra|segunda casilla/i).count(), { timeout: 2000 })
-        .toBeGreaterThan(0);
+
+      await page.getByRole('button', { name: '×4 · dos dobles' }).click();
+      await buscar(page);
+      expect((await cabeceras(page))[0]).toBe('PALABRA 94 pts');
+      expect(await desgloseDe(page, 'PALABRA 94 pts')).toContain('palabra ×4 (dos casillas de doble palabra)');
+
+      // ×9: 11 × 9 = 99, +50 = 149.
+      await page.getByRole('button', { name: '×9 · dos triples' }).click();
+      await buscar(page);
+      expect((await cabeceras(page))[0]).toBe('PALABRA 149 pts');
+
+      // Dos casillas de letra en la misma palabra, las dos en «auto», con ×2 palabra: el ×3 va a
+      // la ficha más valiosa (P y B empatan a 3: la primera, la P) y el ×2 a la siguiente (la B).
+      //   P3×3 + A1 + L1 + A1 + B3×2 + R1 + A1 = 9 + 1 + 1 + 1 + 6 + 1 + 1 = 20 → ×2 = 40 → +50 = 90
+      await page.getByRole('button', { name: '×2 palabra' }).click();
+      await page.getByRole('button', { name: '×2 letra' }).click();
+      await page.getByRole('button', { name: '+ Otra casilla de letra en la misma palabra' }).click();
+      await page.getByRole('group', { name: 'Otra casilla de letra (2.ª)' }).getByRole('button', { name: '×3' }).click();
+      await buscar(page);
+      expect((await cabeceras(page))[0]).toBe('PALABRA 90 pts');
+      const desglose = await desgloseDe(page, 'PALABRA 90 pts');
+      expect(desglose).toContain('×3 en la P');
+      expect(desglose).toContain('×2 en la B');
+
+      // Una ficha no pisa dos casillas: con la 1.ª en la posición 1, la 2.ª no la ofrece.
+      await page.selectOption('#posicion-bonus', '1');
+      await expect(
+        page.getByRole('combobox', { name: 'Posición de la 2.ª casilla de letra' }).locator('option[value="1"]'),
+      ).toBeDisabled();
     },
   );
+});
+
+test.describe('calculadora-jugada-scrabble · reparación 01/10/2026 · lector de pantalla', () => {
+  test('REPARADO (01/10/2026), sospecha: la sección de resultados ya no es una región viva con 40 jugadas; se anuncia un resumen', async ({ page }) => {
+    // Sospecha anotada en la inspección: la sección entera era aria-live="polite", con hasta 40
+    // jugadas, 40 desgloses y 40 botones «Anotar…». Al pintarse, un lector de pantalla la leía
+    // entera. Confirmado con G,A,T,O: la región viva contenía 8 filas y 8 botones. Ahora no hay
+    // región viva alrededor de la lista y un estado oculto anuncia solo el resumen.
+    // A mano: G,A,T,O da 8 palabras (oráculo); la mejor, GATO = G2 + A1 + T1 + O1 = 5.
+    await conDiccionario(page);
+    await añadirFichas(page, ['G', 'A', 'T', 'O']);
+    await buscar(page);
+    const vivasConLista = await page.evaluate(
+      () =>
+        Array.from(document.querySelectorAll('[aria-live], [role="status"], [role="alert"]')).filter((el) =>
+          el.querySelector('ol'),
+        ).length,
+    );
+    expect(vivasConLista).toBe(0);
+    await expect(page.locator('#resultados-jugada [role="status"]')).toHaveText(
+      '8 jugadas encontradas. La mejor: GATO, 5 puntos.',
+    );
+  });
 });
 
 test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · marcador', () => {
@@ -565,9 +677,10 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · marca
     await expect(jugadasLista(page).first().getByRole('button', { name: 'Anotar esta jugada a Luis' })).toBeVisible();
   });
 
-  test.fail(
-    'ABIERTO, hallazgo: deshacer tras añadir un jugador devuelve el turno a quien no jugó',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2597: deshacer tras añadir un jugador devuelve el turno a quien hizo la jugada',
     async ({ page }) => {
+      // Reparado: deshacer pone el turno en el `jugadorIndice` de la anotación deshecha.
       // Jugador 1 y Jugador 2 anotan ÑU (9 cada uno); se suma un tercero; se deshace la última
       // anotación, que era de Jugador 2 → le vuelve a tocar a Jugador 2. Hoy le toca a Jugador 3:
       // deshacer resta uno al turno con el número de jugadores NUEVO en vez de devolvérselo a
@@ -579,12 +692,15 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · marca
       await page.getByRole('button', { name: 'Deshacer última anotación' }).click();
       await expect(page.locator('#panel-marcador ol > li')).toHaveCount(1);
       await expect(await filaJugador(page, 'Nombre del jugador 2')).toContainText('Le toca');
+      await expect(await filaJugador(page, 'Nombre del jugador 3')).not.toContainText('Le toca');
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: el nombre de un jugador no se puede vaciar con la tecla de borrar',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2598: el nombre de un jugador se puede vaciar con la tecla de borrar',
     async ({ page }) => {
+      // Reparado: el campo admite quedar vacío mientras se escribe; «Jugador N» vuelve solo al
+      // salir del campo si se ha quedado vacío (se comprueba abajo, con el jugador 2).
       // Nueve retrocesos sobre «Jugador 1» → campo vacío; teclear «Ana» → «Ana». Hoy, al borrar
       // la última letra el onChange repone «Jugador 1» y lo tecleado se pega detrás:
       // «Jugador 1Ana».
@@ -597,28 +713,39 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · marca
       await expect(nombre).toHaveValue('', { timeout: 2000 });
       await nombre.pressSequentially('Ana');
       await esperarValorEnReact(page, nombre, 'Ana');
+
+      const nombre2 = page.getByLabel('Nombre del jugador 2');
+      await nombre2.fill('');
+      await nombre2.blur();
+      await expect(nombre2).toHaveValue('Jugador 2');
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: «Nueva partida» borra la partida de un toque, sin confirmar y sin poder deshacerlo',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2599: «Nueva partida» se puede deshacer con «Recuperar la partida anterior»',
     async ({ page }) => {
-      // Está junto a «Deshacer última anotación». Esperado: o pide confirmación (aquí se rechaza)
-      // o se puede recuperar. Hoy el historial desaparece y «Deshacer» queda deshabilitado.
+      // Está junto a «Deshacer última anotación». Esperado: o pide confirmación o se puede
+      // recuperar. Se eligió lo segundo: un diálogo en cada partida nueva estorba al uso normal,
+      // y lo que había que evitar es perder la partida por un toque de más. La aserción original
+      // (historial visible o «Deshacer» habilitado justo después) medía la vía del diálogo; con
+      // la vía elegida, el historial se vacía y lo que tiene que existir es el botón que lo trae
+      // de vuelta, con totales y turno.
       await conDiccionario(page);
       await anotarÑU(page);
       page.on('dialog', (d) => void d.dismiss());
       await page.getByRole('button', { name: 'Nueva partida' }).click();
       const historial = page.locator('#panel-marcador ol > li');
-      const deshacer = page.getByRole('button', { name: 'Deshacer última anotación' });
-      await expect
-        .poll(async () => (await historial.count()) > 0 || (await deshacer.isEnabled()), { timeout: 2000 })
-        .toBe(true);
+      await expect(historial).toHaveCount(0);
+      await page.getByRole('button', { name: 'Recuperar la partida anterior' }).click();
+      await expect(historial).toHaveCount(1);
+      await expect(await filaJugador(page, 'Nombre del jugador 1')).toContainText('9');
+      await expect(await filaJugador(page, 'Nombre del jugador 2')).toContainText('Le toca');
+      await expect(page.getByRole('button', { name: 'Recuperar la partida anterior' })).toHaveCount(0);
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: no hay forma de pasar turno ni de anotar una jugada que la lista no trae',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2594: se puede pasar turno o cambiar fichas (0 puntos) y anotar puntos a mano',
     async ({ page }) => {
       // Cambiar fichas o pasar (art. 25-26 FISE) da 0 puntos y pasa el turno; un plural o una
       // forma verbal (que el lemario no trae) no sale en la lista y no se puede anotar. El
@@ -632,11 +759,35 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · marca
         (await panel.getByRole('button', { name: /pasa|cambi|a mano|manual/i }).count()) +
         (await panel.locator('input[type="number"], input[inputmode="numeric"]').count());
       expect(controles).toBeGreaterThan(0);
+
+      // Jugador 1 cambia fichas: 0 puntos y le toca a Jugador 2.
+      await panel.getByRole('button', { name: 'Pasar turno o cambiar fichas (0 puntos)' }).click();
+      await expect(await filaJugador(page, 'Nombre del jugador 1')).toContainText('0');
+      await expect(await filaJugador(page, 'Nombre del jugador 2')).toContainText('Le toca');
+      await expect(panel.locator('ol > li').first()).toContainText('Pasa o cambia fichas');
+
+      // Jugador 2 juega CANTABAS (forma verbal que el lemario no trae) con cruces: la puntuación
+      // la cuenta el jugador, 23, y se anota a mano. Una entrada que no es un número entero
+      // («12abc») se rechaza con aviso y no anota nada.
+      const puntos = panel.getByRole('textbox', { name: 'Puntos' });
+      await puntos.fill('12abc');
+      await panel.getByRole('button', { name: 'Anotar a mano' }).click();
+      await expect(panel.getByRole('alert')).toContainText('número entero');
+      await expect(panel.locator('ol > li')).toHaveCount(1);
+
+      await panel.getByRole('textbox', { name: 'Palabra (opcional)' }).fill('cantabas');
+      await puntos.fill('23');
+      await panel.getByRole('button', { name: 'Anotar a mano' }).click();
+      await expect(panel.locator('ol > li')).toHaveCount(2);
+      await expect(panel.locator('ol > li').nth(1)).toContainText('CANTABAS (a mano)');
+      await expect(await filaJugador(page, 'Nombre del jugador 2')).toContainText('23');
+      await expect(await filaJugador(page, 'Nombre del jugador 1')).toContainText('Le toca');
+      await expect(panel.getByRole('status')).toContainText('Anotados 23 puntos a mano a Jugador 2');
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: la FAQ «¿Se guarda lo que escribo?» responde que no, y el marcador guarda nombres y jugadas',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2601: la FAQ «¿Se guarda lo que escribo?» dice que el marcador se guarda en el navegador',
     async ({ page }) => {
       // Lo único que se teclea en la app es el nombre de los jugadores, y queda en localStorage
       // (meskeia_scrabble_marcador_v1) junto a las palabras y los puntos. La FAQ visible dice:
@@ -684,9 +835,11 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · móvi
     expect(ancho).toBeLessThanOrEqual(visible);
   });
 
-  test.fail(
-    'MÓVIL · ABIERTO, hallazgo: con el botón al pie de la pantalla, la lista se pinta fuera de la vista y la app no lleva a ella',
+  test(
+    'MÓVIL · REPARADO (01/10/2026), hallazgo 2593: con el botón al pie de la pantalla, la app lleva la vista a la lista',
     async ({ page }) => {
+      // Reparado: tras buscar, la vista se lleva a un ancla al principio de los resultados, con
+      // `scroll-margin-top` para que la barra fija del logo no tape la cabecera.
       // Medido el 01/10/2026: el teclado de fichas acaba en y≈1241 del documento y el botón
       // empieza en y≈1669 (428 px más abajo, con el bloque 3 en medio). Con el botón al pie de
       // la pantalla, tras tocarlo la cabecera «Mejores jugadas» queda en y≈944 y la primera
@@ -703,11 +856,22 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · móvi
       await boton.tap();
       await expect(page.getByRole('heading', { name: /Mejores jugadas/ })).toBeVisible({ timeout: 10000 });
       await expect(jugadasLista(page).first()).toBeInViewport({ timeout: 2000 });
+      // La cabecera, entera y por debajo de la barra fija del logo.
+      const cabecera = page.getByRole('heading', { name: /Mejores jugadas/ });
+      await expect(cabecera).toBeInViewport({ ratio: 1 });
+      const tapa = await page.evaluate(() => {
+        const h = Array.from(document.querySelectorAll('h2')).find((e) => e.textContent?.includes('Mejores jugadas'));
+        if (!h) return 'sin cabecera';
+        const r = h.getBoundingClientRect();
+        const encima = document.elementFromPoint(r.left + 8, r.top + r.height / 2);
+        return encima && h.contains(encima) ? 'visible' : `tapada por ${encima?.className ?? '?'}`;
+      });
+      expect(tapa).toBe('visible');
     },
   );
 
-  test.fail(
-    'MÓVIL · ABIERTO, hallazgo: tras «Anotar», el marcador que confirma la anotación queda ~1.700 px por encima de la vista',
+  test(
+    'MÓVIL · REPARADO (01/10/2026), hallazgo 2596: tras «Anotar», la vista va al marcador y un aviso confirma la anotación',
     async ({ page }) => {
       // Medido el 01/10/2026: tras tocar «Anotar esta jugada a Jugador 1», los resultados se
       // vacían, la vista cae sobre la tabla «Cuánto vale cada ficha» y el panel del marcador,
@@ -720,6 +884,10 @@ test.describe('calculadora-jugada-scrabble · re-inspección 01/10/2026 · móvi
       await jugadasLista(page).first().getByRole('button', { name: /^Anotar esta jugada a/ }).tap();
       await expect(page.locator('#panel-marcador')).toBeVisible();
       await expect(page.locator('#panel-marcador')).toBeInViewport({ timeout: 2000 });
+      // GATO = G2 + A1 + T1 + O1 = 5.
+      const aviso = page.locator('#panel-marcador').getByRole('status');
+      await expect(aviso).toHaveText('Anotados 5 puntos a Jugador 1. Le toca a Jugador 2.');
+      await expect(aviso).toBeInViewport({ ratio: 1 });
     },
   );
 });

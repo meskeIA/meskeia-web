@@ -120,7 +120,99 @@
 
 .marcadorSeccion {
   margin-bottom: var(--spacing-lg);
+  /* Tras anotar se lleva la vista aquí; el margen salva la barra fija del logo */
+  scroll-margin-top: 5rem;
 }
+
+.marcadorAviso {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.marcadorAviso:not(:empty) {
+  margin-bottom: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--hover);
+  border-left: 3px solid var(--secondary);
+  border-radius: 6px;
+}
+
+.marcadorTurnoAcciones {
+  display: grid;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.marcadorTurnoAcciones > .btnSecondary {
+  justify-self: start;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.marcadorManual {
+  display: grid;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+.marcadorManualTitulo {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.marcadorManualCampos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+}
+
+.marcadorManualCampo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.marcadorManualInput {
+  width: 9rem;
+  max-width: 100%;
+  padding: 0.5rem 0.6rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+}
+
+.marcadorManualInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.marcadorManualCampos .btnSecondary {
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.marcadorManualCampos .btnSecondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.marcadorManualError {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #b71c1c;
+}
+
+[data-theme='dark'] .marcadorManualError { color: #ef9a9a; }
 
 .marcadorToggle {
   display: flex;
@@ -550,7 +642,44 @@
 
 .btnSecondary:hover { border-color: var(--primary); }
 
+/* ---------- Casillas de letra adicionales ---------- */
+
+.casillaExtraFila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.casillaExtraFila .select {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.btnQuitarCasilla {
+  padding: 0.55rem 0.9rem;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.btnQuitarCasilla:hover { border-color: var(--primary); }
+
+.btnQuitarCasilla:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* ---------- Resultados ---------- */
+
+/* Destino del desplazamiento tras buscar; el margen salva la barra fija del logo */
+.anclaResultados {
+  height: 0;
+  scroll-margin-top: 5rem;
+}
 
 .estado {
   font-size: 0.95rem;

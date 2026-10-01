@@ -43,19 +43,25 @@ export const LETRAS_SIN_FICHA: readonly string[] = ['K', 'W'];
  * Las letras sin ficha que lleva la palabra, sin repetir y en el orden en que aparecen.
  *
  * Devuelve `[]` cuando la palabra es jugable, así que `letrasSinFicha(p).length === 0` es la
- * pregunta «¿se puede jugar?». Las posiciones cubiertas por una ficha blanca NO cuentan: la
- * blanca puede representar cualquier letra, K y W incluidas, y es la única forma de ponerlas
- * sobre el tablero.
+ * pregunta «¿se puede jugar?».
+ *
+ * Una ficha blanca NO las salva: el art. 10.2 del reglamento de la FISE dice que «el comodín
+ * no puede reemplazar la K ni la W». Hasta el 01/10/2026 este comentario decía lo contrario
+ * («K y W incluidas») y las posiciones cubiertas por una blanca se saltaban, así que el
+ * generador de anagramas daba «ya?» → YAK como jugada de 5 puntos (sospecha anotada al
+ * inspeccionar /calculadora-jugada-scrabble/, cuyo motor ya descartaba bien K y W).
+ *
+ * @param posicionesComodin Se acepta porque el generador de anagramas la pasa, pero no exime
+ *   a ninguna letra: dónde caigan las blancas no cambia que la K y la W no se pueden jugar.
  */
 export function letrasSinFicha(
   palabra: string,
   posicionesComodin: readonly number[] = [],
 ): string[] {
-  const cubiertas = new Set(posicionesComodin);
+  void posicionesComodin;
   const fichas = aFichas(palabra);
   const sinFicha: string[] = [];
   for (let i = 0; i < fichas.length; i++) {
-    if (cubiertas.has(i)) continue;
     if (LETRAS_SIN_FICHA.includes(fichas[i]) && !sinFicha.includes(fichas[i])) {
       sinFicha.push(fichas[i]);
     }
