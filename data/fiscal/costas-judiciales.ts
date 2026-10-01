@@ -20,8 +20,13 @@
  *     STC 140/2016, de 21 de julio (BOE-A-2016-7905).
  *   - Ley 1/2000, de 7 de enero, de Enjuiciamiento Civil (BOE-A-2000-323), en la redacción
  *     dada por la Ley Orgánica 1/2025, de 2 de enero, con efectos desde el 03/04/2025.
+ *   - Ley 29/1998, reguladora de la Jurisdicción Contencioso-administrativa
+ *     (BOE-A-1998-16718), arts. 23 y 139.4: su propio tope de costas, que NO es el de la LEC.
+ *   - Ley 36/2011, reguladora de la Jurisdicción Social (BOE-A-2011-15936), arts. 21, 97.3
+ *     y 235: en la instancia social no hay condena en costas por vencimiento.
  *
- * Verificado: 2026-08-26 (textos consolidados del BOE leídos en sesión)
+ * Verificado: 2026-10-01 (textos consolidados del BOE leídos en sesión; el 26/08/2026 se
+ * leyeron los mismos y el 01/10/2026 se cotejaron de nuevo, con la LJCA y la LRJS añadidas)
  * Vigencia: desde 2025-04-03 (última reforma de la LEC incorporada)
  *
  * ⚠️ ACTUALIZACIÓN NECESARIA:
@@ -35,8 +40,8 @@
 // ─── Metadatos ────────────────────────────────────────────────────────────────
 
 export const COSTAS_JUDICIALES_META = {
-  fuente: 'RD 434/2024 (arancel Procura) + Ley 10/2012 y STC 140/2016 (tasas) + LEC tras LO 1/2025',
-  verificado: '2026-08-26',
+  fuente: 'RD 434/2024 (arancel Procura) + Ley 10/2012 y STC 140/2016 (tasas) + LEC tras LO 1/2025 + LJCA y LRJS (costas)',
+  verificado: '2026-10-01',
   vigencia: '2025-2026',
   urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2024-8706',
   nota: 'El arancel de la Procura es de MÁXIMOS: el profesional puede cobrar menos, nunca más. Los honorarios de abogado son libres y no tienen arancel.',
@@ -94,8 +99,25 @@ export const ARANCEL_PROCURA = {
   excesoSobre: 600000,
   fraccionExceso: 6000,
   maximoPorFraccion: 15.17,
-  /** Art. 3: cuantía indeterminada, inestimable o sin concepto propio en el arancel. */
+  /**
+   * Art. 3: cuantía indeterminada, inestimable o sin concepto propio en el arancel. Es
+   * SUPLETORIO («en aquellos que no tengan fijado expresamente un concepto especial»): el
+   * contencioso tiene el suyo en el art. 69.2 (`contenciosoInestimable`).
+   */
   cuantiaIndeterminada: 351.0,
+  /**
+   * Art. 69.2: recursos contencioso-administrativos de cuantía inestimable, según el órgano.
+   * La cuantía determinada va por el art. 2 (art. 69.1), sin el 10 % del art. 18.d, que es
+   * del juicio ordinario CIVIL.
+   */
+  contenciosoInestimable: {
+    /** a) Juzgados de lo Contencioso-Administrativo. */
+    juzgados: 351.11,
+    /** b) Juzgados Centrales, Audiencia Nacional y Tribunales Superiores de Justicia. */
+    juzgadosCentralesAudienciaNacionalTSJ: 451.41,
+    /** c) Tribunal Supremo (cifra corregida en el BOE de 06/06/2024, BOE-A-2024-11486). */
+    tribunalSupremo: 401.27,
+  },
   /** Art. 1.4: tope global por profesional y asunto, sumadas todas sus instancias. */
   topeGlobalPorAsunto: 75000,
   /** Art. 18.d: en juicio ordinario se percibe un 10 % más de lo que dan los arts. 2 o 3. */
@@ -111,8 +133,15 @@ export const ARANCEL_PROCURA = {
 /**
  * Cuotas fijas del art. 7.1 Ley 10/2012 que SIGUEN VIGENTES en primera instancia.
  *
- * La STC 140/2016 anuló las de apelación (800 €) y casación (1.200 €) del orden civil
- * y las equivalentes del contencioso y el social; las de instancia no se tocaron.
+ * El fallo de la STC 140/2016 declaró nulas (el texto consolidado las marca en negrilla):
+ *   - en el orden CIVIL, solo las de apelación (800 €) y casación y extraordinario por
+ *     infracción procesal (1.200 €); las de instancia de abajo siguen vigentes;
+ *   - en el CONTENCIOSO, LAS CUATRO: abreviado (200 €), ordinario (350 €), apelación (800 €)
+ *     y casación (1.200 €). También las de instancia: en el contencioso no queda tasa.
+ *     Hasta el 01/10/2026 este módulo decía lo contrario («las de instancia no se tocaron»)
+ *     y la app cobraba 350 € a las personas jurídicas (hallazgo 2550 del Inspector);
+ *   - en el SOCIAL, las dos únicas que había: suplicación (500 €) y casación (750 €).
+ * Y todo el apartado 2 (la cuota variable): ver `TASAS_JUDICIALES.cuotaVariable`.
  */
 export const TASAS_JUDICIALES_CUOTA_FIJA = {
   civil: {
@@ -123,11 +152,14 @@ export const TASAS_JUDICIALES_CUOTA_FIJA = {
     ejecucionExtrajudicial: 200,
     concursoNecesario: 200,
   },
+  /** Sin tasa: la STC 140/2016 anuló sus cuatro cuotas, también las de instancia. */
   contencioso: {
-    abreviado: 200,
-    ordinario: 350,
+    instancia: 0,
   },
-  /** El orden social no devenga tasa en instancia: solo suplicación y casación. */
+  /**
+   * Sin tasa: la Ley 10/2012 no gravaba la instancia social, y sus dos únicas cuotas
+   * (suplicación y casación) las anuló la STC 140/2016.
+   */
   social: {
     instancia: 0,
   },
@@ -151,6 +183,13 @@ export const TASAS_JUDICIALES = {
    * del art. 517 LEC.
    */
   exencionObjetivaCuantiaHasta: 2000,
+  /**
+   * Art. 6.2: lo de cuantía indeterminada se valora en 18.000 € «a los solos efectos de
+   * establecer la base imponible de esta tasa». No es la valoración del art. 394.3 LEC
+   * (24.000 €) ni sirve para la exención del art. 4.1.c, que es del verbal «en reclamación
+   * de cantidad»: un asunto indeterminado nunca cae en ella.
+   */
+  valorCuantiaIndeterminada: 18000,
 } as const;
 
 // ─── Umbrales procesales de la LEC ────────────────────────────────────────────
@@ -179,4 +218,38 @@ export const UMBRALES_LEC = {
   /** Art. 394.3: a esos solos efectos, las pretensiones inestimables se valoran así. */
   valorPretensionInestimable: 24000,
   valorPretensionInestimableDesde: '2025-04-03',
+} as const;
+
+// ─── Costas en el contencioso-administrativo (LJCA) ───────────────────────────
+
+export const COSTAS_LJCA = {
+  /**
+   * Art. 139.4: en primera o única instancia el condenado paga «una cantidad TOTAL que no
+   * exceda de la tercera parte de la cuantía del proceso, por cada uno de los favorecidos».
+   * A diferencia del art. 394.3 LEC, el tope abarca TODAS las costas, procurador incluido,
+   * y no tiene la excepción por temeridad.
+   */
+  limiteCostasFraccion: 1 / 3,
+  /** Art. 139.4: a esos solos efectos, la cuantía indeterminada se valora así. */
+  valorCuantiaIndeterminada: 18000,
+  /**
+   * Art. 23.1: ante órganos UNIPERSONALES (Juzgados) el procurador es potestativo y el
+   * abogado obligatorio; art. 23.2: ante los colegiados (Salas), los dos obligatorios.
+   */
+  procuradorPotestativoAnteJuzgados: true,
+} as const;
+
+// ─── Costas en el orden social (LRJS) ─────────────────────────────────────────
+
+export const COSTAS_LRJS = {
+  /**
+   * Art. 97.3: en la instancia NO hay condena en costas por vencimiento. Solo por mala fe o
+   * temeridad, o por no acudir sin causa a la conciliación o mediación, cabe una sanción
+   * pecuniaria y, si el condenado es el EMPRESARIO, los honorarios del abogado o graduado
+   * social contrario hasta este límite.
+   */
+  honorariosInstanciaEmpresarioHasta: 600,
+  /** Art. 235.1: en los recursos sí rige el vencimiento, con estos techos de honorarios. */
+  honorariosSuplicacionHasta: 1200,
+  honorariosCasacionHasta: 1800,
 } as const;

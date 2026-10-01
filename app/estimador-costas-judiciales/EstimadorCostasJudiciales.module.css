@@ -1,11 +1,13 @@
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
+  /* --primary y --secondary NO se redeclaran: vienen de globals.css con su variante oscura.
+     Para texto de marca, --primary-texto; para fondo bajo texto blanco, --primary-boton. */
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
   --text-secondary: #666666;
   --border: #E5E5E5;
+  /* Campo deshabilitado (hallazgo 2560): usaba var(--bg-secondary), que no existe. */
+  --input-deshabilitado: #EEEEEE;
   --success: #27AE60;
   --radius: 12px;
   --radius-large: 16px;
@@ -28,6 +30,7 @@
   --text-primary: #E5E5E5;
   --text-secondary: #B0B0B0;
   --border: #404040;
+  --input-deshabilitado: #1F1F1F;
 }
 
 .hero {
@@ -63,7 +66,7 @@
 .cardTitle {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-lg);
   padding-bottom: var(--spacing-md);
   border-bottom: 2px solid var(--border);
@@ -90,7 +93,7 @@
 }
 .input:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
 .input:disabled {
-  background: var(--bg-secondary);
+  background: var(--input-deshabilitado);
   color: var(--text-secondary);
   cursor: not-allowed;
   opacity: 0.7;
@@ -146,8 +149,11 @@
   border-color: var(--primary);
   background: rgba(46, 134, 171, 0.07);
 }
-.optionActivo strong { color: var(--primary); }
+.optionActivo strong { color: var(--primary-texto); }
 [data-theme='dark'] .optionActivo { background: rgba(46, 134, 171, 0.15); }
+/* En oscuro, --primary-texto (#3FA5D1) sobre el tinte azul de la opción elegida da 4,34:1:
+   se aclara para pasar de 4,5:1 (hallazgo 2559). */
+[data-theme='dark'] .optionActivo strong { color: #7CC3E6; }
 
 .switchRow { display: flex; gap: 0.5rem; }
 .switchBtn {
@@ -164,15 +170,15 @@
 }
 .switchBtn:hover { border-color: var(--primary); }
 .switchActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
 .btn {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -183,7 +189,7 @@
   transition: opacity 0.2s;
 }
 .btn:hover { opacity: 0.9; }
-.btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.btn:focus-visible { outline: 2px solid var(--primary-texto); outline-offset: 2px; }
 
 .placeholder {
   text-align: center;
@@ -193,14 +199,17 @@
 }
 .resultados { display: flex; flex-direction: column; gap: var(--spacing-md); }
 
+/* Región viva del total (hallazgo 2561): montada siempre; sin resultado está vacía y no ocupa. */
+.regionTotal:not(:empty) { margin-bottom: var(--spacing-md); }
+
 .totalHero {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: var(--radius-large);
   padding: 1.5rem;
   text-align: center;
   color: white;
 }
-.totalLabel { font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.3rem; }
+.totalLabel { font-size: 0.9rem; margin-bottom: 0.3rem; }
 .totalImporte { font-size: 1.8rem; font-weight: 800; }
 
 .desgloseCard, .notasCard {
@@ -230,13 +239,16 @@
 .desgloseItem span { flex: 1; }
 
 .nota {
-  display: flex;
-  gap: 0.5rem;
+  /* block, no flex (hallazgo 2554): con flex cada trozo de texto y cada <strong> era un
+     elemento flexible y sus anchos mínimos sumados sacaban las tarjetas del móvil. */
+  display: block;
   font-size: 0.83rem;
+  overflow-wrap: anywhere;
   color: var(--text-secondary);
   line-height: 1.5;
   margin: 0.3rem 0;
 }
+.nota > span[aria-hidden='true']:first-child { margin-right: 0.35rem; }
 
 .infoCard {
   display: flex;
@@ -253,7 +265,7 @@
 /* ===== PROFESIONALIZACIÓN v2.0 ===== */
 
 .guideSection h2 {
-  font-size: 1.2rem; font-weight: 700; color: var(--primary);
+  font-size: 1.2rem; font-weight: 700; color: var(--primary-texto);
   margin: 1.5rem 0 0.75rem;
 }
 .guideSection h2:first-child { margin-top: 0; }
@@ -293,7 +305,7 @@
   display: flex; justify-content: space-between; align-items: center;
 }
 .faqItem summary::-webkit-details-marker { display: none; }
-.faqItem summary::after { content: '+'; font-size: 1.2rem; color: var(--primary); }
+.faqItem summary::after { content: '+'; font-size: 1.2rem; color: var(--primary-texto); }
 .faqItem[open] summary::after { content: '\2212'; }
 .faqItem p {
   padding: 0 1.25rem 1rem; font-size: 0.9rem;
@@ -306,7 +318,7 @@
 }
 [data-theme='dark'] .warningBox { background: rgba(249,168,37,0.1); border-color: #f9a825; }
 .warningHeader { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-.warningHeader strong { font-size: 1rem; color: #e65100; }
+.warningHeader strong { font-size: 1rem; color: #bf360c; }
 [data-theme='dark'] .warningHeader strong { color: #ffb74d; }
 .warningIcon { font-size: 1.4rem; }
 .warningList {

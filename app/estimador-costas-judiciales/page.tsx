@@ -9,7 +9,8 @@ import {
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
-  ARANCEL_PROCURA, COSTAS_JUDICIALES_META, PORCENTAJES_IVA, UMBRALES_LEC,
+  ARANCEL_PROCURA, COSTAS_JUDICIALES_META, COSTAS_LJCA, COSTAS_LRJS, PORCENTAJES_IVA,
+  TASAS_JUDICIALES_CUOTA_FIJA, UMBRALES_LEC,
 } from '@/data/fiscal';
 import {
   calcular, PROCEDIMIENTOS,
@@ -65,7 +66,7 @@ export default function EstimadorCostasJudicialesPage() {
         <LegalNotice />
         <DisclaimerCard variant="financial" severity="critical" context="estimador-costas-judiciales" />
         <DataReference
-          normativa="Costas judiciales 2025-2026"
+          normativa={`Costas judiciales ${COSTAS_JUDICIALES_META.vigencia}`}
           fuente={COSTAS_JUDICIALES_META.fuente}
           verificado={COSTAS_JUDICIALES_META.verificado}
           urlOficial={COSTAS_JUDICIALES_META.urlOficial}
@@ -160,16 +161,23 @@ export default function EstimadorCostasJudicialesPage() {
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>Estimación de costes</h2>
 
-            {!resultado ? (
-              <p className={styles.placeholder}>Completa los datos y pulsa &laquo;Estimar costas&raquo;</p>
-            ) : (
-              <div className={styles.resultados}>
+            {/* Región viva SIEMPRE montada (vacía sin resultado): así el lector de pantalla
+                anuncia el total al pulsar «Estimar costas». Solo el total, no el desglose entero. */}
+            <div className={styles.regionTotal} role="status" aria-live="polite" aria-atomic="true">
+              {resultado && (
                 <div className={styles.totalHero}>
                   <div className={styles.totalLabel}>Coste total estimado (IVA incluido)</div>
                   <div className={styles.totalImporte}>
                     {formatCurrency(resultado.total.min)} – {formatCurrency(resultado.total.max)}
                   </div>
                 </div>
+              )}
+            </div>
+
+            {!resultado ? (
+              <p className={styles.placeholder}>Completa los datos y pulsa &laquo;Estimar costas&raquo;</p>
+            ) : (
+              <div className={styles.resultados}>
 
                 <div className={styles.desgloseCard}>
                   <h3 className={styles.desgloseTitle}>Desglose</h3>
@@ -182,7 +190,10 @@ export default function EstimadorCostasJudicialesPage() {
                     <strong>{formatCurrency(resultado.abogado.min)} – {formatCurrency(resultado.abogado.max)}</strong>
                   </div>
                   <div className={styles.desgloseItem}>
-                    <span><span aria-hidden="true">📋</span> Procurador</span>
+                    <span>
+                      <span aria-hidden="true">📋</span> Procurador
+                      {resultado.procuradorPotestativo && <span className={styles.optionDesc}> (potestativo ante un Juzgado)</span>}
+                    </span>
                     <strong>{resultado.procurador > 0 ? formatCurrency(resultado.procurador) : 'No requerido'}</strong>
                   </div>
                   <div className={styles.desgloseItem}>
@@ -203,20 +214,7 @@ export default function EstimadorCostasJudicialesPage() {
 
                 <div className={styles.notasCard}>
                   <h3 className={styles.desgloseTitle}>Si te condenan en costas</h3>
-                  <p className={styles.nota}>
-                    <span aria-hidden="true">⚖️</span> El art. 394.3 LEC limita lo que pagarías de la
-                    parte contraria por abogado y demás profesionales no sujetos a arancel a un{' '}
-                    <strong>tercio de la cuantía del proceso</strong>: en tu caso,{' '}
-                    <strong>{formatCurrency(resultado.limiteCostas)}</strong>
-                    {resultado.cuantiaIndeterminada && ` (la pretensión inestimable se valora en ${formatCurrency(UMBRALES_LEC.valorPretensionInestimable)})`}.
-                    {resultado.limiteCostasMuerde
-                      ? ' Ese tope está por debajo del máximo estimado del abogado, así que aquí sí muerde.'
-                      : ' Con esta cuantía el tope queda por encima del máximo estimado, así que no llega a aplicarse.'}
-                  </p>
-                  <p className={styles.nota}>
-                    <span aria-hidden="true">ℹ️</span> El tope no rige si el tribunal declara la temeridad
-                    del condenado, y los aranceles del procurador quedan fuera de él por estar sujetos a arancel.
-                  </p>
+                  <BloqueCondena resultado={resultado} incluirPerito={incluirPerito} />
                 </div>
 
                 {resultado.notas.length > 0 && (
@@ -285,12 +283,13 @@ export default function EstimadorCostasJudicialesPage() {
               El art. 394.3 LEC limita esa parte —abogado y demás profesionales <em>no sujetos a tarifa o
               arancel</em>— a <strong>un tercio de la cuantía del proceso</strong> por cada litigante que
               haya obtenido la condena en costas. En un verbal de 2.000 € el tope son 666,67 €, por debajo
-              de lo que costaría el abogado del contrario. Dos matices que suelen omitirse:
+              de lo que costaría el abogado del contrario. Matices que suelen omitirse:
             </p>
             <ul className={styles.warningList}>
               <li>El tope <strong>no se aplica</strong> si el tribunal declara la temeridad del condenado en costas.</li>
               <li>Los aranceles del procurador <strong>quedan fuera</strong> del tope, precisamente por estar sujetos a arancel.</li>
               <li>Si la pretensión es inestimable, a estos solos efectos se valora en {formatCurrency(UMBRALES_LEC.valorPretensionInestimable)}, salvo que el tribunal disponga otra cosa por la complejidad del asunto.</li>
+              <li>Es la regla del proceso <strong>civil</strong>. En el contencioso-administrativo rige el art. 139.4 LJCA: el tercio limita <strong>todas</strong> las costas, procurador incluido, y lo indeterminado se valora en {formatCurrency(COSTAS_LJCA.valorCuantiaIndeterminada)}. En la instancia social no hay condena en costas por perder el juicio (art. 97.3 LRJS).</li>
             </ul>
 
             <h2>El IVA no es opcional</h2>
@@ -317,7 +316,7 @@ export default function EstimadorCostasJudicialesPage() {
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Cuánto se paga de tasa judicial?</summary>
-                <p>Las personas físicas no pagan nada desde marzo de 2015. Las personas jurídicas pagan una cuota fija según el procedimiento: 150 € en verbal y cambiario, 300 € en ordinario, 100 € en monitorio y 350 € en el contencioso ordinario. La cuota proporcional a la cuantía que preveía el art. 7.2 de la Ley 10/2012 fue declarada inconstitucional y nula por la STC 140/2016: ya no existe. El monitorio y el verbal de cantidad hasta {formatCurrency(2000)} están además exentos por el objeto (art. 4.1.c).</p>
+                <p>Las personas físicas no pagan nada desde marzo de 2015. Las personas jurídicas pagan una cuota fija según el procedimiento civil: {formatCurrency(TASAS_JUDICIALES_CUOTA_FIJA.civil.verbal)} en verbal y cambiario, {formatCurrency(TASAS_JUDICIALES_CUOTA_FIJA.civil.ordinario)} en ordinario y {formatCurrency(TASAS_JUDICIALES_CUOTA_FIJA.civil.monitorio)} en monitorio. En el contencioso-administrativo y en el orden social no queda tasa: la STC 140/2016 anuló todas sus cuotas, también las de primera instancia del contencioso. La cuota proporcional a la cuantía que preveía el art. 7.2 de la Ley 10/2012 fue declarada inconstitucional y nula por la STC 140/2016: ya no existe. El monitorio y el verbal de cantidad hasta {formatCurrency(2000)} están además exentos por el objeto (art. 4.1.c).</p>
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Puedo pedir justicia gratuita?</summary>
@@ -345,5 +344,65 @@ export default function EstimadorCostasJudicialesPage() {
         <ShareCard appName="estimador-costas-judiciales" />
         <Footer appName="estimador-costas-judiciales" />
     </div>
+  );
+}
+
+interface BloqueCondenaProps {
+  resultado: Resultado;
+  incluirPerito: boolean;
+}
+
+/**
+ * «Si te condenan en costas»: cada orden tiene su propia regla (hallazgo 2553). La LEC limita
+ * solo a los profesionales sin arancel; la LJCA, todas las costas; y en la instancia social no
+ * hay condena por vencimiento.
+ */
+function BloqueCondena({ resultado, incluirPerito }: BloqueCondenaProps) {
+  if (resultado.regimenCostas === 'lrjs' || resultado.limiteCostas === null) {
+    return (
+      <>
+        <p className={styles.nota}>
+          <span aria-hidden="true">⚖️</span> En la instancia social <strong>no hay condena en costas por perder el
+          juicio</strong>. Solo si el tribunal aprecia mala fe o temeridad, o que no se acudió sin causa a la
+          conciliación o mediación, puede imponer una multa y, si el condenado es el empresario, los honorarios
+          del abogado o graduado social contrario hasta {formatCurrency(COSTAS_LRJS.honorariosInstanciaEmpresarioHasta)} (art. 97.3 LRJS).
+        </p>
+        <p className={styles.nota}>
+          <span aria-hidden="true">ℹ️</span> En los recursos sí rige el vencimiento: quien pierde la suplicación o la
+          casación paga los honorarios contrarios hasta {formatCurrency(COSTAS_LRJS.honorariosSuplicacionHasta)} o{' '}
+          {formatCurrency(COSTAS_LRJS.honorariosCasacionHasta)}, salvo que tenga reconocida la justicia gratuita o sea
+          un sindicato o un empleado público (art. 235.1 LRJS).
+        </p>
+      </>
+    );
+  }
+
+  const ljca = resultado.regimenCostas === 'ljca';
+  const sujetos = ljca
+    ? (incluirPerito ? 'abogado, procurador y perito' : 'abogado y procurador')
+    : (incluirPerito ? 'abogado y perito' : 'abogado');
+  const valorIndeterminada = ljca ? COSTAS_LJCA.valorCuantiaIndeterminada : UMBRALES_LEC.valorPretensionInestimable;
+
+  return (
+    <>
+      <p className={styles.nota}>
+        <span aria-hidden="true">⚖️</span>{' '}
+        {ljca
+          ? 'El art. 139.4 LJCA limita lo que pagarías de la parte contraria —abogado, procurador y demás costas— a una cantidad total de un '
+          : 'El art. 394.3 LEC limita lo que pagarías de la parte contraria por abogado y demás profesionales no sujetos a arancel a un '}
+        <strong>tercio de la cuantía del proceso</strong>: en tu caso,{' '}
+        <strong>{formatCurrency(resultado.limiteCostas)}</strong>
+        {resultado.cuantiaIndeterminada && ` (la pretensión de cuantía indeterminada se valora en ${formatCurrency(valorIndeterminada)})`}.
+        {resultado.limiteCostasMuerde
+          ? ` Ese tope está por debajo del máximo estimado de ${sujetos}, así que aquí sí muerde.`
+          : ' Con esta cuantía el tope queda por encima del máximo estimado, así que no llega a aplicarse.'}
+      </p>
+      <p className={styles.nota}>
+        <span aria-hidden="true">ℹ️</span>{' '}
+        {ljca
+          ? 'El tribunal puede valorar de otro modo lo indeterminado si el asunto es complejo, y el tope es de la primera o única instancia: en los recursos la condena puede ser total, parcial o hasta una cifra máxima.'
+          : 'El tope no rige si el tribunal declara la temeridad del condenado, y los aranceles del procurador quedan fuera de él por estar sujetos a arancel.'}
+      </p>
+    </>
   );
 }

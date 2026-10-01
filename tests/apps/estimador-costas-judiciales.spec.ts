@@ -95,9 +95,11 @@ import { COSTAS_JUDICIALES_META } from '../../data/fiscal/costas-judiciales';
  *
  *   CASO 10 (móvil 390 px + tema oscuro) — verbal · física · «12.000,5» tecleado
  *       12.000,50 excede el escalón «hasta 12.000» → 535,50 (12.000 clavados → 356,99)
- *       tercio 4.000,17 · el desbordamiento horizontal va aparte, como ABIERTO
+ *       tercio 4.000,17 · el desbordamiento horizontal va aparte (hallazgo 2554)
  *
- *   ABIERTOS (test.fail) — cada uno lleva su caso y su fuente en el comentario.
+ *   Hallazgos 2550-2561: abiertos con `test.fail()` en la re-inspección y REPARADOS el
+ *   01/10/2026. Cada caso conserva su fuente; las cifras del motor las fijan además los casos
+ *   10 a 16 de `tests/costas-judiciales-motor.spec.ts`.
  */
 
 const RUTA = '/estimador-costas-judiciales/';
@@ -232,9 +234,11 @@ test('CASO 1 (normal) · ordinario, persona física, 30.000 €: el desglose sum
   await expect(disclaimer).toContainText('no constituye asesoramiento financiero, fiscal ni jurídico');
   expect(await disclaimer.locator('button').count()).toBe(0); // no colapsable
 
-  // HALLAZGO 417 — la app declara de dónde salen sus cifras y cuándo se verificaron.
+  // HALLAZGO 417 — la app declara de dónde salen sus cifras y cuándo se verificaron. La fecha
+  // sale del sello del módulo (re-sellado el 01/10/2026 al cotejar los hallazgos 2550-2557),
+  // no de un literal que envejezca con cada re-sellado.
   await expect(page.locator('body')).toContainText('RD 434/2024');
-  await expect(page.locator('body')).toContainText('26/08/2026');
+  await expect(page.locator('body')).toContainText(COSTAS_JUDICIALES_META.verificado.split('-').reverse().join('/'));
 
   await elegirProcedimiento(page, /Juicio ordinario/);
   await elegirPersona(page, 'Persona física');
@@ -435,7 +439,13 @@ test('CASO 8 (límite) · 15.000 € clavados siguen siendo verbal; 15.000,01 te
   // Un céntimo más, tecleado con coma decimal: el campo admite el estado intermedio «15000,».
   await teclearYEstimar(page, '15000,01');
   expect(await partida(page, 'Procurador')).toBe('535,50 €');
-  expect(await notas(page)).toContain('ℹ️ Con más de 15.000,00 € el procedimiento sería un juicio ordinario, no un verbal (art. 250.2 LEC)');
+  // Hasta el 01/10/2026 se exigía la nota EXACTA «… sería un juicio ordinario, no un verbal
+  // (art. 250.2 LEC)», y eso consagraba el hallazgo 2557: el art. 250.1 LEC lleva al verbal
+  // «cualquiera que sea su cuantía» los desahucios, las rentas o la propiedad horizontal. Se
+  // comprueba el principio de la nota y que la salvedad está; el caso propio va abajo.
+  const aviso = (await notas(page)).find(n => n.includes('sería un juicio ordinario')) ?? '';
+  expect(aviso).toContain('ℹ️ Con más de 15.000,00 € el procedimiento sería un juicio ordinario, no un verbal (art. 250.2 LEC)');
+  expect(aviso).toContain('art. 250.1 LEC');
 });
 
 test('CASO 9 (rechazo) · campo vacío y «-0,01» tecleado se rechazan con su motivo', async ({ page }) => {
@@ -481,8 +491,11 @@ test.describe('CASO 10 · móvil 390 px en tema oscuro', () => {
     await expect(bloqueCondena(page)).toContainText('4000,17 €');
   });
 
-  test('ABIERTO · con resultado en pantalla, las tarjetas no se salen de los 390 px', async ({ page }) => {
-    test.fail(true, 'ABIERTO, hallazgo: en móvil, al pintar el resultado las dos tarjetas se ensanchan a 432 px y se recortan');
+  test('REPARADO · con resultado en pantalla, las tarjetas no se salen de los 390 px', async ({ page }) => {
+    // REPARADO (01/10/2026), hallazgo 2554: `.nota` pasa a `display: block`. Medido en navegador
+    // a 390 px, verbal · 10.000 €: con la regla vieja inyectada las tarjetas acababan en x = 643
+    // (con las notas de hoy, más largas que las del acta, que dio 456); con la nueva, en x = 366
+    // antes y después de estimar, en claro y en oscuro.
     // `html` y `body` llevan overflow-x: hidden, así que `scrollWidth` da 390 y NO delata nada: lo
     // recortado simplemente no se ve. Se mide el borde derecho de cada tarjeta. Antes de estimar
     // acaban en x = 366; después, en x = 456 (66 px fuera): el «€» de las cifras del desglose y
@@ -504,10 +517,10 @@ test.describe('CASO 10 · móvil 390 px en tema oscuro', () => {
 });
 
 test('CASO 11 (vigilancia) · el año del JSON-LD y del DataReference sigue al de la vigencia del módulo', async ({ page }) => {
-  // ABIERTO, hallazgo: `jsonLd.name` («… 2026») y `normativa` del DataReference («2025-2026»)
-  // están escritos a mano, mientras el <title> lo deriva de COSTAS_JUDICIALES_META.vigencia
-  // (b7ec248c). Hoy coinciden y este caso pasa; es el que se pondrá rojo el día que se re-selle
-  // el módulo sin tocar metadata.ts ni page.tsx. `check:anio-titulo` no mira el JSON-LD.
+  // REPARADO (01/10/2026), hallazgo 2558: `jsonLd.name` y la `normativa` del DataReference
+  // estaban escritos a mano («… 2026», «2025-2026»); ahora salen de
+  // COSTAS_JUDICIALES_META.vigencia, como el <title> desde b7ec248c. Este caso pasaba también
+  // antes porque los literales coincidían: lo que vigila es que sigan coincidiendo al re-sellar.
   const anio = COSTAS_JUDICIALES_META.vigencia.slice(-4);
   await expect(page).toHaveTitle(new RegExp(`Estimador de Costas Judiciales ${anio}`));
   const nombres = await page.evaluate(() =>
@@ -521,13 +534,13 @@ test('CASO 11 (vigilancia) · el año del JSON-LD y del DataReference sigue al d
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// RE-INSPECCIÓN DEL 01/10/2026 — hallazgos ABIERTOS (test.fail)
-// Cada caso afirma lo CORRECTO; cuando llegue la reparación se pondrá verde, Playwright
-// avisará de que un `test.fail()` ha pasado y entonces se retira la marca.
+// RE-INSPECCIÓN DEL 01/10/2026 — hallazgos 2550-2561, REPARADOS el 01/10/2026
+// Nacieron como `test.fail()`; cada caso afirmaba lo CORRECTO y hoy pasa sin la marca.
 // ═════════════════════════════════════════════════════════════════════════════
 
-test('ABIERTO · contencioso, empresa, 30.000 €: no hay tasa de instancia que cobrar', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo: cobra 350 € de tasa en el contencioso ordinario, cuota anulada por la STC 140/2016');
+test('REPARADO · contencioso, empresa, 30.000 €: no hay tasa de instancia que cobrar', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2550: `TASAS_JUDICIALES_CUOTA_FIJA.contencioso` es ya
+  // `{ instancia: 0 }` y el motor no cobra tasa en el contencioso.
   // Fallo 3.º de la STC 140/2016 (BOE-A-2016-7905): nulos los incisos «en el orden jurisdiccional
   // contencioso-administrativo: abreviado: 200 €; ordinario: 350 €; apelación…; casación…».
   // El texto consolidado de la Ley 10/2012 los marca en negrilla como anulados. El error está en
@@ -540,19 +553,23 @@ test('ABIERTO · contencioso, empresa, 30.000 €: no hay tasa de instancia que 
   expect(await partida(page, 'Tasas judiciales')).toBe('Exento');
   // abogado 1.500 – 4.500 + procurador 714 = 2.214 – 5.214 · ×1,21 → 2.678,94 – 6.308,94
   expect(await totalEstimado(page)).toBe('2678,94 € – 6308,94 €');
+  // El procurador se estima, pero ante un Juzgado es potestativo (art. 23.1 LJCA, hallazgo 2555).
+  await expect(page.locator('h3', { hasText: 'Desglose' }).locator('xpath=..')).toContainText('potestativo ante un Juzgado');
 });
 
-test('ABIERTO · el FAQ (página y FAQPage) no anuncia la tasa anulada del contencioso', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo: «350 € en el contencioso ordinario» en el FAQ y en el JSON-LD');
+test('REPARADO · el FAQ (página y FAQPage) no anuncia la tasa anulada del contencioso', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2550: las cuotas del FAQ y del FAQPage salen del módulo y
+  // el contencioso se explica como sin tasa.
   const faq = await page.evaluate(() =>
     Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map((s) => s.textContent || '').join(' '),
   );
   expect(faq).not.toContain('350 € en el contencioso');
+  expect(faq).toContain('En el contencioso-administrativo y en el orden social no queda tasa');
   await expect(page.locator('body')).not.toContainText('350 € en el contencioso');
 });
 
-test('ABIERTO · verbal de cuantía indeterminada: la empresa paga la tasa del verbal', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo: la cuantía indeterminada se pasa como 0 € y cae en la exención de los 2.000 €');
+test('REPARADO · verbal de cuantía indeterminada: la empresa paga la tasa del verbal', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2551: la base de la tasa es la del art. 6.2 (18.000 €).
   // Ley 10/2012: la exención del art. 4.1.c es para el verbal «en reclamación de cantidad» que no
   // supere 2.000 €; lo indeterminado se valora en 18.000 € (art. 6.2). Cuota: art. 7.1, 150 €.
   await elegirProcedimiento(page, /Juicio verbal/);
@@ -561,10 +578,14 @@ test('ABIERTO · verbal de cuantía indeterminada: la empresa paga la tasa del v
   await page.getByRole('button', { name: 'Estimar costas' }).click();
   expect(await partida(page, 'Procurador')).toBe('351,00 €'); // art. 3 del arancel
   expect(await partida(page, 'Tasas judiciales')).toBe('150,00 €');
+  // abogado 1.300 – 3.900 (24.000, art. 394.3) + procurador 351 → ×1,21 + 150 de tasa.
+  expect(await totalEstimado(page)).toBe('2147,71 € – 5293,71 €');
+  // Y la nota ya no afirma una cuantía que el usuario no ha dado.
+  expect((await notas(page)).some(n => n.includes('Cuantía superior a'))).toBe(false);
 });
 
-test('ABIERTO · monitorio de 5.000 €: la petición inicial no exige abogado ni procurador', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo: el monitorio por encima de 2.000 € trata abogado y procurador como preceptivos');
+test('REPARADO · monitorio de 5.000 €: la petición inicial no exige abogado ni procurador', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2552: el umbral de 2.000 € ya no se aplica al monitorio.
   // LEC arts. 23.2.1.º y 31.2.1.º: «y para la petición inicial de los procedimientos monitorios»,
   // SIN límite de cuantía (el de 2.000 € es solo del verbal). La propia nota de la app lo dice.
   await elegirProcedimiento(page, /Proceso monitorio/);
@@ -572,11 +593,12 @@ test('ABIERTO · monitorio de 5.000 €: la petición inicial no exige abogado n
   await estimar(page, '5000');
   // Anclas de mercado del monitorio: 2.000 → 200/500 · 6.000 → 400/1.000, t = 3/4 → máximo 875.
   expect(await partida(page, 'Abogado')).toBe('0,00 € – 875,00 €');
+  await expect(page.locator('h3', { hasText: 'Desglose' }).locator('xpath=..')).toContainText('no preceptivo');
   expect(await partida(page, 'Procurador')).toBe('No requerido');
 });
 
-test('ABIERTO · laboral: el art. 394.3 LEC no rige en el orden social', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo: el bloque «Si te condenan en costas» aplica la LEC a laboral y contencioso');
+test('REPARADO · laboral: el art. 394.3 LEC no rige en el orden social', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2553: el bloque explica el art. 97.3 y el 235 de la LRJS.
   // LRJS: en instancia no hay condena en costas por vencimiento; solo la del art. 97.3 (mala fe
   // o temeridad, honorarios hasta 600 € y solo si el condenado es el empresario). El art. 235
   // regula las costas de los RECURSOS. Hoy la app promete un tope de 10.000,00 €.
@@ -585,10 +607,12 @@ test('ABIERTO · laboral: el art. 394.3 LEC no rige en el orden social', async (
   await estimar(page, '30000');
   await expect(tarjetaResultados(page)).toContainText('Coste total estimado');
   await expect(tarjetaResultados(page)).not.toContainText('art. 394.3 LEC limita');
+  await expect(bloqueCondena(page)).toContainText('no hay condena en costas por perder el juicio');
+  await expect(bloqueCondena(page)).toContainText('600,00 € (art. 97.3 LRJS)');
 });
 
-test('ABIERTO · contencioso de cuantía indeterminada: el tope es el del art. 139.4 LJCA', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo: el bloque «Si te condenan en costas» aplica la LEC a laboral y contencioso');
+test('REPARADO · contencioso de cuantía indeterminada: el tope es el del art. 139.4 LJCA', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2553.
   // LJCA art. 139.4: «una cantidad total que no exceda de la tercera parte»; lo indeterminado se
   // valora en 18.000 € (no en los 24.000 € del art. 394.3 LEC) → 18.000 / 3 = 6.000,00 €.
   await elegirProcedimiento(page, /Contencioso/);
@@ -596,10 +620,13 @@ test('ABIERTO · contencioso de cuantía indeterminada: el tope es el del art. 1
   await page.getByRole('button', { name: 'Cuantía indeterminada' }).click();
   await page.getByRole('button', { name: 'Estimar costas' }).click();
   await expect(bloqueCondena(page)).toContainText('6000,00 €');
+  await expect(bloqueCondena(page)).toContainText('art. 139.4 LJCA');
+  await expect(bloqueCondena(page)).toContainText('18.000,00 €');
+  await expect(bloqueCondena(page)).not.toContainText('quedan fuera');
 });
 
-test('ABIERTO · contencioso de cuantía indeterminada: el procurador tiene concepto propio', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo: el procurador del contencioso indeterminado sale del art. 3 y no del art. 69.2');
+test('REPARADO · contencioso de cuantía indeterminada: el procurador tiene concepto propio', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2555: `ARANCEL_PROCURA.contenciosoInestimable`.
   // RD 434/2024, art. 69.2.a: 351,11 € ante los Juzgados de lo Contencioso (451,41 € TSJ/AN,
   // 401,27 € TS). El art. 3 (351,00 €) es supletorio: «en aquellos que no tengan fijado
   // expresamente un concepto especial».
@@ -608,10 +635,12 @@ test('ABIERTO · contencioso de cuantía indeterminada: el procurador tiene conc
   await page.getByRole('button', { name: 'Cuantía indeterminada' }).click();
   await page.getByRole('button', { name: 'Estimar costas' }).click();
   expect(await partida(page, 'Procurador')).toBe('351,11 €');
+  expect((await notas(page)).some(n => n.includes('art. 69.2 RD 434/2024'))).toBe(true);
+  expect((await notas(page)).some(n => n.includes('art. 3 RD 434/2024'))).toBe(false);
 });
 
-test('ABIERTO · verbal de 6.000 € con perito: el perito entra en el tercio', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo: el tope del tercio se compara solo con el abogado y deja fuera al perito');
+test('REPARADO · verbal de 6.000 € con perito: el perito entra en el tercio', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2556: el tope se compara con abogado + perito.
   // Art. 394.3 LEC: «abogados y demás profesionales que no estén sujetos a tarifa o arancel»;
   // el perito no tiene arancel. Tope 6.000 / 3 = 2.000; abogado máx. 1.500 (ancla) + perito 600
   // (ancla de 15.000 €, que rige por debajo) = 2.100 > 2.000 → el tope sí muerde.
@@ -624,8 +653,8 @@ test('ABIERTO · verbal de 6.000 € con perito: el perito entra en el tercio', 
   await expect(bloqueCondena(page)).toContainText('sí muerde');
 });
 
-test('ABIERTO · verbal de 20.000 €: el aviso del ordinario debe salvar el verbal por materia', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo: «sería un juicio ordinario» sin la salvedad del art. 250.1 LEC');
+test('REPARADO · verbal de 20.000 €: el aviso del ordinario debe salvar el verbal por materia', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2557.
   // Art. 250.1 LEC: desahucios, rentas impagadas, propiedad horizontal… van a verbal
   // «cualquiera que sea su cuantía». El aviso por cuantía solo vale para el art. 250.2.
   await elegirProcedimiento(page, /Juicio verbal/);
@@ -635,28 +664,95 @@ test('ABIERTO · verbal de 20.000 €: el aviso del ordinario debe salvar el ver
   expect(aviso).toContain('250.1');
 });
 
-test('ABIERTO · contraste del procedimiento elegido (texto de marca sobre fondo claro)', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo: texto de marca por debajo de 4,5:1 en el formulario y el resultado');
-  // «Juicio ordinario» viene elegido de inicio: #2E86AB sobre rgba(46,134,171,0,07) → 3,78:1
-  // (2,95:1 en oscuro). Es texto de 14 px en negrita: WCAG 1.4.3 pide 4,5:1. El token que
-  // cumple es --primary-texto (#26718F, 5,47:1 sobre blanco).
-  const elegido = page.locator('button[aria-pressed="true"] strong', { hasText: 'Juicio ordinario' });
-  await expect(elegido).toBeVisible();
-  expect(await contraste(elegido)).toBeGreaterThanOrEqual(4.5);
+test.describe('REPARADO · contraste del texto de marca, en claro y en oscuro (hallazgo 2559)', () => {
+  // REPARADO (01/10/2026): el módulo ya no fija --primary/--secondary en literal; el texto de
+  // marca usa --primary-texto y los fondos bajo texto blanco, --primary-boton/--secondary-boton
+  // (degradados incluidos). «Importante» pasa a #bf360c. En oscuro, el <strong> de la opción
+  // elegida va sobre un tinte azul que deja --primary-texto en 4,34:1: lleva su propio color.
+  // Medido aquí en navegador: el umbral es 4,5:1 (WCAG 1.4.3, texto de 14-16 px).
+
+  /** Contraste del texto contra CADA parada del degradado de fondo (el peor manda). */
+  async function contrasteSobreDegradado(locator: Locator): Promise<number[]> {
+    return locator.evaluate((el) => {
+      const parse = (c: string) => (c.match(/rgba?\(([^)]+)\)/)?.[1] ?? '0,0,0').split(',').map((v) => parseFloat(v));
+      let n: Element | null = el;
+      let degradado = '';
+      for (; n; n = n.parentElement) {
+        const bg = getComputedStyle(n).backgroundImage;
+        if (bg.includes('gradient')) { degradado = bg; break; }
+      }
+      const paradas = Array.from(degradado.matchAll(/rgba?\([^)]+\)/g)).map((m) => parse(m[0]));
+      const lum = ([r, g, b]: number[]) => {
+        const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+      };
+      const texto = parse(getComputedStyle(el).color);
+      return paradas.map((p) => {
+        const [l1, l2] = [lum(texto), lum(p)].sort((x, y) => y - x);
+        return (l1 + 0.05) / (l2 + 0.05);
+      });
+    });
+  }
+
+  for (const tema of ['claro', 'oscuro'] as const) {
+    test(`tema ${tema}`, async ({ page }) => {
+      if (tema === 'oscuro') {
+        await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      }
+      // «Juicio ordinario» viene elegido de inicio (era 3,78:1 en claro y 2,95:1 en oscuro).
+      const elegido = page.locator('button[aria-pressed="true"] strong', { hasText: 'Juicio ordinario' });
+      await expect(elegido).toBeVisible();
+      // Con `poll`: los botones llevan `transition: all 0.15s` y, recién cambiado el tema, el
+      // color está a medio camino (1,79:1 medido en mitad de la transición).
+      await expect.poll(() => contraste(elegido)).toBeGreaterThanOrEqual(4.5);
+      // Conmutador activo, blanco sobre --primary-boton (era 4,11:1).
+      await expect.poll(() => contraste(page.getByRole('button', { name: 'Persona física', exact: true }))).toBeGreaterThanOrEqual(4.5);
+      await expect.poll(() => contraste(page.getByRole('group', { name: '¿Necesitarás perito?' }).getByRole('button', { name: 'No', exact: true }))).toBeGreaterThanOrEqual(4.5);
+      // Botón «Estimar costas» sobre el degradado (era 2,80:1 en la parada teal).
+      for (const c of await contrasteSobreDegradado(page.getByRole('button', { name: 'Estimar costas' }))) {
+        expect(c).toBeGreaterThanOrEqual(4.5);
+      }
+      // «Importante», en la guía plegada (era 3,57:1): el color se calcula igual aunque no se vea.
+      const importante = page.locator('strong', { hasText: 'Importante' });
+      expect(await contraste(importante)).toBeGreaterThanOrEqual(4.5);
+
+      await elegirProcedimiento(page, /Juicio verbal/);
+      await estimar(page, '10000');
+      // Etiqueta del total sobre el degradado (era 2,55:1 en la parada #48A9A6).
+      const etiqueta = page.locator('xpath=//*[starts-with(text(),"Coste total estimado")]');
+      const paradas = await contrasteSobreDegradado(etiqueta);
+      expect(paradas.length).toBeGreaterThanOrEqual(2);
+      for (const c of paradas) expect(c).toBeGreaterThanOrEqual(4.5);
+    });
+  }
 });
 
-test('ABIERTO · el campo deshabilitado no cambia de fondo (--bg-secondary sin definir)', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo: .input:disabled usa var(--bg-secondary), que no existe');
-  const campo = page.locator('#cuantia');
-  const habilitado = await campo.evaluate((el) => getComputedStyle(el).backgroundColor);
-  await page.getByRole('button', { name: 'Cuantía indeterminada' }).click();
-  await expect(campo).toBeDisabled();
-  const deshabilitado = await campo.evaluate((el) => getComputedStyle(el).backgroundColor);
-  expect(deshabilitado).not.toBe(habilitado);
-});
+for (const tema of ['claro', 'oscuro'] as const) {
+  test(`REPARADO · el campo deshabilitado cambia de fondo (tema ${tema})`, async ({ page }) => {
+    // REPARADO (01/10/2026), hallazgo 2560: .input:disabled usaba var(--bg-secondary), que no
+    // existe. Ahora usa --input-deshabilitado, declarado en el módulo para los dos temas
+    // (#EEEEEE en claro; #1F1F1F en oscuro, frente a los #2A2A2A de la tarjeta).
+    if (tema === 'oscuro') {
+      await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    }
+    const campo = page.locator('#cuantia');
+    const habilitado = await campo.evaluate((el) => getComputedStyle(el).backgroundColor);
+    await page.getByRole('button', { name: 'Cuantía indeterminada' }).click();
+    await expect(campo).toBeDisabled();
+    await expect.poll(() => campo.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(habilitado);
+  });
+}
 
-test('ABIERTO · el resultado se anuncia al lector de pantalla', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo: pulsar «Estimar costas» no anuncia nada; el foco se queda en el botón');
+test('REPARADO · el resultado se anuncia al lector de pantalla', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2561: la tarjeta lleva una región role="status" montada
+  // SIEMPRE (vacía sin resultado), y el total se pinta dentro: al pulsar «Estimar costas» el
+  // lector de pantalla lo anuncia. Solo el total, no el desglose entero.
+  // Antes de estimar, la región existe y no dice nada.
+  const regiones = page.locator('[aria-live]:not(#__next-route-announcer__), [role="status"]');
+  await expect(regiones.filter({ hasText: 'Coste total estimado' })).toHaveCount(0);
+  await expect(page.locator('[role="status"][aria-live="polite"][aria-atomic="true"]')).toHaveCount(1);
   await elegirProcedimiento(page, /Juicio verbal/);
   await estimar(page, '10000');
   await expect(page.locator('h3', { hasText: 'Desglose' })).toBeVisible();
