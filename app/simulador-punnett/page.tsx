@@ -61,17 +61,22 @@ const GENOTIPOS_B: GenotipoParB[] = ['BB', 'Bb', 'bb'];
 
 /** Type guards de los <select>: lo que no se reconoce no entra en el estado, y así lo que se
  *  ve y lo que se calcula no pueden separarse (hallazgo 754). */
+/** Espacio duro (U+00A0) entre la cifra y el «%» (CLAUDE.md global §2, 25/09/2026). */
+const ESPACIO_DURO = ' ';
 const esGenotipoPar = (v: string): v is GenotipoPar => GENOTIPOS_A.includes(v as GenotipoPar);
 const esGenotipoParB = (v: string): v is GenotipoParB => GENOTIPOS_B.includes(v as GenotipoParB);
 /**
- * Porcentaje en formato español, con decimales SOLO cuando hacen falta: «25 %», «12,5 %»,
- * «6,25 %». Con Math.round a secas, 1/16 salía «6%» y 2/16 «13%», y la columna sumaba 101 %
+ * Porcentaje en formato español, con decimales SOLO cuando hacen falta: «25 %», «12,5 %»,
+ * «6,25 %». Con Math.round a secas, 1/16 salía «6%» y 2/16 «13%», y la columna sumaba 101 %
  * en el dihíbrido clásico — en una página que pide al alumno verificar justamente esa suma
- * (hallazgo 751). Y 12,5 % es un dato que hay que poder copiar al examen.
+ * (hallazgo 751). Y 12,5 % es un dato que hay que poder copiar al examen.
  */
 const porcentaje = (v: number): string => {
   const t = formatNumber(v, 2);
-  return t.includes(',') ? t.replace(/0+$/, '').replace(/,$/, '') : t;
+  const cifra = t.includes(',') ? t.replace(/0+$/, '').replace(/,$/, '') : t;
+  // Con el «%» y separado por espacio DURO (U+00A0), como el «€»: con un espacio normal el «%»
+  // saltaba solo a la línea siguiente («… 1 (6,25» / «%) recesivo-recesivo.»), hallazgo 2588.
+  return `${cifra}${ESPACIO_DURO}%`;
 };
 // ============================================================
 // LÓGICA PURA (fuera del componente)
@@ -225,15 +230,15 @@ function interpretarMonohibrido(celdas: CeldaPunnett[]): string {
   // Mismo criterio que la tabla: sin redondear a entero, que en el dihíbrido falseaba la suma
   const pctDom = porcentaje((dom / total) * 100);
   const pctRec = porcentaje((rec / total) * 100);
-  if (dom === 0) return 'El 100 % de la descendencia mostrará el fenotipo recesivo.';
-  if (rec === 0) return 'El 100 % de la descendencia mostrará el fenotipo dominante (ningún individuo recesivo).';
+  if (dom === 0) return 'El 100 % de la descendencia mostrará el fenotipo recesivo.';
+  if (rec === 0) return 'El 100 % de la descendencia mostrará el fenotipo dominante (ningún individuo recesivo).';
   // La razón se simplifica con el mismo criterio que `formatRatio` usa dos bloques más
   // arriba: sin esto, el cruce de prueba Aa × aa imprimía «proporción 2:2» mientras la tarjeta
   // de al lado decía «1 dominante : 1 recesivo» y el bloque educativo enseñaba 1:1. Un alumno
   // que copiara la línea de «Resultado:» escribía 2:2 en su examen (hallazgo 752).
   const mcdRazon = (a: number, b: number): number => (b === 0 ? a : mcdRazon(b, a % b));
   const divisor = mcdRazon(dom, rec) || 1;
-  return `El ${pctDom} % de la descendencia mostrará el fenotipo dominante y el ${pctRec} % el fenotipo recesivo (proporción ${dom / divisor}:${rec / divisor}).`;
+  return `El ${pctDom} de la descendencia mostrará el fenotipo dominante y el ${pctRec} el fenotipo recesivo (proporción ${dom / divisor}:${rec / divisor}).`;
 }
 
 function interpretarDihibrido(celdas: CeldaPunnett[]): string {
@@ -242,9 +247,9 @@ function interpretarDihibrido(celdas: CeldaPunnett[]): string {
   const dr = celdas.filter(c => c.fenotipo === 'dominante-recesivo').length;
   const rd = celdas.filter(c => c.fenotipo === 'recesivo-dominante').length;
   const rr = celdas.filter(c => c.fenotipo === 'recesivo-recesivo').length;
-  // Mismo criterio que la tabla de recuento: con Math.round, AaBb × Aabb sumaba 102 % y el
+  // Mismo criterio que la tabla de recuento: con Math.round, AaBb × Aabb sumaba 102 % y el
   // dihíbrido clásico daba 56/19/19/6 en vez de 56,25/18,75/18,75/6,25 (hallazgo 1668).
-  const pct = (n: number): string => `${porcentaje((n / total) * 100)} %`;
+  const pct = (n: number): string => porcentaje((n / total) * 100);
   return (
     `De las ${total} combinaciones: ` +
     `${dd} (${pct(dd)}) dominante-dominante, ` +
@@ -571,13 +576,13 @@ export default function SimuladorPunnettPage() {
                   <td>{celda ? nombreFenotipo(celda.fenotipo) : '-'}</td>
                   <td>{n}</td>
                   {/*
-                    Math.round sin decimales convertía 6,25 % en «6%» y 12,5 % en «13%», y la
-                    columna sumaba 101 % en el dihíbrido clásico — el caso de aula por excelencia
+                    Math.round sin decimales convertía 6,25 % en «6%» y 12,5 % en «13%», y la
+                    columna sumaba 101 % en el dihíbrido clásico — el caso de aula por excelencia
                     de esta app, en una página que pide al alumno «verifica siempre el recuento:
-                    si la suma no coincide, has cometido un error» (hallazgo 751). Además 12,5 %
+                    si la suma no coincide, has cometido un error» (hallazgo 751). Además 12,5 %
                     es un dato que el alumno necesita escribir, y «13%» no lo es.
                   */}
-                  <td>{porcentaje((n / celdas.length) * 100)} %</td>
+                  <td>{porcentaje((n / celdas.length) * 100)}</td>
                 </tr>
               );
             })}
@@ -662,38 +667,38 @@ export default function SimuladorPunnettPage() {
               <tbody>
                 <tr>
                   <td>AA × AA</td>
-                  <td>100 % AA</td>
-                  <td>100 % dominante</td>
+                  <td>100 % AA</td>
+                  <td>100 % dominante</td>
                   <td>No</td>
                 </tr>
                 <tr>
                   <td>AA × Aa</td>
                   <td>1 AA : 1 Aa</td>
-                  <td>100 % dominante</td>
-                  <td>50 % portadores</td>
+                  <td>100 % dominante</td>
+                  <td>50 % portadores</td>
                 </tr>
                 <tr>
                   <td>Aa × Aa</td>
                   <td>1 AA : 2 Aa : 1 aa</td>
                   <td>3 dom : 1 rec (3:1)</td>
-                  <td>50 % portadores</td>
+                  <td>50 % portadores</td>
                 </tr>
                 <tr>
                   <td>AA × aa</td>
-                  <td>100 % Aa</td>
-                  <td>100 % dominante</td>
-                  <td>100 % portadores</td>
+                  <td>100 % Aa</td>
+                  <td>100 % dominante</td>
+                  <td>100 % portadores</td>
                 </tr>
                 <tr>
                   <td>Aa × aa</td>
                   <td>1 Aa : 1 aa</td>
                   <td>1 dom : 1 rec (1:1)</td>
-                  <td>50 % portadores</td>
+                  <td>50 % portadores</td>
                 </tr>
                 <tr>
                   <td>aa × aa</td>
-                  <td>100 % aa</td>
-                  <td>100 % recesivo</td>
+                  <td>100 % aa</td>
+                  <td>100 % recesivo</td>
                   <td>No</td>
                 </tr>
               </tbody>
@@ -743,7 +748,7 @@ export default function SimuladorPunnettPage() {
               <strong>Enfermedades autosómicas recesivas (fibrosis quística)</strong>
               <p style={{ fontSize: '0.88rem', marginTop: '0.3rem', color: 'var(--text-secondary)' }}>
                 Si ambos progenitores son portadores (Aa × Aa), el riesgo de descendencia
-                afectada es 25 % (aa). El 50 % serán portadores asintomáticos. Cruce Mendel clásico.
+                afectada es 25 % (aa). El 50 % serán portadores asintomáticos. Cruce Mendel clásico.
               </p>
             </div>
           </div>
@@ -928,7 +933,7 @@ export default function SimuladorPunnettPage() {
             <li>
               <strong>Creer que los alelos recesivos desaparecen</strong>: los portadores (Aa) mantienen
               el alelo recesivo en silencio. Puede reaparecer en generaciones futuras si dos portadores
-              se cruzan (Aa × Aa → 25 % aa).
+              se cruzan (Aa × Aa → 25 % aa).
             </li>
             <li>
               <strong>Olvidar que el dihíbrido tiene 16 combinaciones</strong>: cada progenitor

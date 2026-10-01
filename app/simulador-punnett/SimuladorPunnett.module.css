@@ -43,12 +43,15 @@
   flex-wrap: wrap;
 }
 
+/* Texto de marca con --primary-texto y texto blanco sobre --primary-boton (hallazgos 2584 y
+   2585): con var(--primary) el botón inactivo daba 3,93:1 sobre la página y el activo, blanco
+   sobre el azul, 4,11:1 en claro y 2,79:1 en oscuro (2,21:1 bajo Stemum en oscuro). */
 .tipoBtn {
   padding: 0.55rem 1.4rem;
   border-radius: 24px;
-  border: 2px solid var(--primary, #2E86AB);
+  border: 2px solid var(--primary-texto);
   background: transparent;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -56,12 +59,14 @@
 }
 
 .tipoBtn:hover {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
 .tipoBtnActive {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -112,16 +117,21 @@
   padding: 0.55rem 1.6rem;
   border-radius: 24px;
   border: none;
-  background: var(--secondary, #48A9A6);
+  /* Blanco sobre var(--secondary) daba 2,80:1 (2,23:1 en oscuro) y el hover lo bajaba aún más
+     con opacidad 0,85 (hallazgo 2585). --secondary-boton: 5,15:1 en los dos temas; el hover
+     OSCURECE en vez de aclarar, así que el contraste solo sube. */
+  background: var(--secondary-boton);
   color: #fff;
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.18s;
+  transition: background 0.18s;
 }
 
+/* El hover cambia de fondo en vez de bajar la opacidad (que aclaraba el fondo bajo el blanco):
+   --primary-boton lleva el blanco a 5,47:1 (8,72:1 bajo Stemum). */
 .btnAleatorio:hover {
-  opacity: 0.85;
+  background: var(--primary-boton);
 }
 
 /* ---------- Cuadro de Punnett ---------- */
@@ -183,9 +193,12 @@
   color: #fff;
 }
 
+/* Blanco sobre este teal daba 2,80:1 (hallazgo 2583). Se queda el teal —es el color que
+   distingue A_bb en la rejilla y en la leyenda— y el genotipo pasa a texto oscuro: 6,21:1,
+   igual en los dos temas porque el color está fijado aquí y no depende de ninguno. */
 .cellDomiRec {
   background: #48A9A6;
-  color: #fff;
+  color: #1a1a1a;
 }
 
 .cellRecDomi {
@@ -227,7 +240,7 @@
 .propRatio {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -291,12 +304,14 @@
   margin-inline: auto;
 }
 
+/* Teal de var(--secondary) como texto: 2,68:1 en claro, y bajo Stemum 3,79 / 4,40:1; con el
+   puntero encima, blanco sobre él, 2,80:1 (hallazgos 2584 y 2585). */
 .scenarioBtn {
   padding: 0.45rem 1rem;
   border-radius: 20px;
-  border: 1.5px solid var(--secondary, #48A9A6);
+  border: 1.5px solid var(--secondary-texto);
   background: transparent;
-  color: var(--secondary, #48A9A6);
+  color: var(--secondary-texto);
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
@@ -305,7 +320,8 @@
 }
 
 .scenarioBtn:hover {
-  background: var(--secondary, #48A9A6);
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: #fff;
 }
 
@@ -328,10 +344,17 @@
   color: var(--text-secondary, #666);
 }
 
+/* Las manchas de la leyenda (sin texto) son objetos gráficos: 3:1 contra la página (WCAG
+   1.4.11). Su relleno es el de las celdas y no puede cambiar sin cambiar la rejilla; contra
+   #FAFAFA el teal daba 2,68:1, el azul claro 2,17:1 y el gris 1,54:1, y en oscuro el azul
+   marino 2,09:1 (hallazgo 2587). El borde lleva el color del texto de la leyenda
+   (--text-secondary, ≥ 4,5:1 sobre la página en los dos temas) y delimita la mancha. */
 .legendDot {
   width: 14px;
   height: 14px;
   border-radius: 3px;
+  border: 1px solid currentColor;
+  box-sizing: border-box;
   display: inline-block;
   flex-shrink: 0;
 }
@@ -346,13 +369,15 @@
   padding: 1.1rem 1.4rem;
 }
 
+/* #e65100 daba 3,57:1 sobre #fff8e1 y 3,76:1 sobre el #332a00 del oscuro, que oscurecía la
+   caja y no el título (hallazgo 2586). */
 .warningHeader {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-weight: 800;
   font-size: 1rem;
-  color: #e65100;
+  color: #a33900;
   margin-bottom: 0.6rem;
 }
 
@@ -375,15 +400,18 @@
 }
 
 /* ---------- Sección educativa interna ---------- */
+/* Sin tinte de fondo: con --primary-texto encima, el azul al 10 % dejaba la fórmula en 4,48:1
+   en claro y 4,25:1 en oscuro, y al 5 % el oscuro seguía en 4,49:1 (hallazgo 2584). El borde
+   ya la destaca. */
 .formulaBox {
-  background: rgba(46,134,171,0.1);
+  background: transparent;
   border: 1.5px solid var(--primary, #2E86AB);
   border-radius: 8px;
   padding: 0.75rem 1.25rem;
   font-family: 'Courier New', monospace;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   text-align: center;
   margin: 0.75rem 0;
 }
@@ -406,7 +434,7 @@
 
 .faqItem strong {
   display: block;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin-bottom: 0.3rem;
   font-size: 0.97rem;
 }
@@ -436,7 +464,7 @@
   min-width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   font-weight: 800;
   font-size: 0.9rem;
@@ -455,7 +483,7 @@
 }
 
 .stepContent strong {
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .tipsGrid {
@@ -539,6 +567,10 @@
   color: #f5e0b0;
 }
 
+[data-theme='dark'] .warningHeader {
+  color: #ffb74d;
+}
+
 [data-theme='dark'] .interpretacionText {
   color: var(--text-primary, #e5e5e5);
 }
@@ -588,6 +620,18 @@
    que deja la plantilla. Va al final para ganar a cualquier padding previo del hero. */
 @media (max-width: 1023px) {
   .hero {
+    padding-top: 80px;
+  }
+}
+
+/* Bajo stemum.com la barra fija no lleva el logo de meskeia.com (hasta x = 203) sino la píldora
+   «Stemum › Biología», que llega a x = 253; el título centrado empieza en x = 239 a 1024 px y
+   la píldora le pisaba el principio de 1024 a 1044 px (54 puntos tapados a 1024, 16 a 1044;
+   hallazgo 2589). La caja del texto deja de cruzarse con la de la píldora a 1052 px; el corte
+   llega a 1059 para dejar unos píxeles de aire (a 1060 el título empieza en x = 257). Solo bajo
+   Stemum: en meskeia.com el logo es 50 px más estrecho y desde 1024 px ya no llega al título. */
+@media (min-width: 1024px) and (max-width: 1059px) {
+  :global([data-brand='stemum']) .hero {
     padding-top: 80px;
   }
 }

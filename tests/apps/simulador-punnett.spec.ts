@@ -123,9 +123,9 @@ test.describe('Cuadro de Punnett', () => {
 
     // Recuento a mano: 1/4 = 25 %, 2/4 = 50 %, 1/4 = 25 %. Suman 100 %.
     expect(await recuento(page)).toEqual([
-      ['AA', 'Dominante (A_)', '1', '25 %'],
-      ['Aa', 'Dominante (A_)', '2', '50 %'],
-      ['aa', 'Recesivo (aa)', '1', '25 %'],
+      ['AA', 'Dominante (A_)', '1', '25 %'],
+      ['Aa', 'Dominante (A_)', '2', '50 %'],
+      ['aa', 'Recesivo (aa)', '1', '25 %'],
     ]);
 
     await expect(page.locator('[class*="interpretacionText"]')).toContainText(
@@ -143,7 +143,7 @@ test.describe('Cuadro de Punnett', () => {
       ['Aa', 'Aa'],
     ]);
     expect(await proporcion(page, 0)).toBe('1 Aa');
-    expect(await recuento(page)).toEqual([['Aa', 'Dominante (A_)', '4', '100 %']]);
+    expect(await recuento(page)).toEqual([['Aa', 'Dominante (A_)', '4', '100 %']]);
     await expect(page.locator('[class*="interpretacionText"]')).toContainText(
       'El 100 % de la descendencia mostrará el fenotipo dominante (ningún individuo recesivo).',
     );
@@ -244,19 +244,19 @@ test.describe('Cuadro de Punnett', () => {
     // caso de aula por excelencia de esta app, que además pide al alumno «verifica siempre el
     // recuento: si la suma no coincide, has cometido un error».
     expect(filas.map(f => f[3])).toEqual([
-      '6,25 %', // AABB
-      '12,5 %', // AABb
-      '12,5 %', // AaBB
-      '25 %',   // AaBb
-      '6,25 %', // AAbb
-      '12,5 %', // Aabb
-      '6,25 %', // aaBB
-      '12,5 %', // aaBb
-      '6,25 %', // aabb
+      '6,25 %', // AABB
+      '12,5 %', // AABb
+      '12,5 %', // AaBB
+      '25 %',   // AaBb
+      '6,25 %', // AAbb
+      '12,5 %', // Aabb
+      '6,25 %', // aaBB
+      '12,5 %', // aaBb
+      '6,25 %', // aabb
     ]);
 
     const suma = filas.reduce(
-      (acc, f) => acc + Number(f[3].replace(' %', '').replace(',', '.')),
+      (acc, f) => acc + Number(f[3].replace(' %', '').replace(',', '.')),
       0,
     );
     expect(suma).toBeCloseTo(100, 6);
@@ -467,17 +467,17 @@ test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
 
     // 4/16 = 25 % cada fila.
     expect(await recuento(page)).toEqual([
-      ['AaBb', 'Doble dominante (A_B_)', '4', '25 %'],
-      ['Aabb', 'Dom. A / Rec. B (A_bb)', '4', '25 %'],
-      ['aaBb', 'Rec. A / Dom. B (aaB_)', '4', '25 %'],
-      ['aabb', 'Doble recesivo (aabb)', '4', '25 %'],
+      ['AaBb', 'Doble dominante (A_B_)', '4', '25 %'],
+      ['Aabb', 'Dom. A / Rec. B (A_bb)', '4', '25 %'],
+      ['aaBb', 'Rec. A / Dom. B (aaB_)', '4', '25 %'],
+      ['aabb', 'Doble recesivo (aabb)', '4', '25 %'],
     ]);
 
     // Los conteos del «Resultado:». El formato del porcentaje fue el hallazgo A (1668, REPARADO
-    // el 25/09/2026, con su test propio más abajo): aquí se admite con espacio y sin él porque
+    // el 25/09/2026, con su test propio más abajo): aquí se admite con espacio (normal o duro, 2588) y sin él porque
     // este test mide los conteos, no el formato.
     await expect(page.locator(RESULTADO)).toHaveText(
-      /De las 16 combinaciones: 4 \(25 ?%\) dominante-dominante, 4 \(25 ?%\) dominante-recesivo, 4 \(25 ?%\) recesivo-dominante, 4 \(25 ?%\) recesivo-recesivo\./,
+      /De las 16 combinaciones: 4 \(25\s?%\) dominante-dominante, 4 \(25\s?%\) dominante-recesivo, 4 \(25\s?%\) recesivo-dominante, 4 \(25\s?%\) recesivo-recesivo\./,
     );
   });
 
@@ -500,15 +500,15 @@ test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
     // 2/16 = 12,5 % y 4/16 = 25 %.
     const filas = await recuento(page);
     expect(filas).toEqual([
-      ['AABB', 'Doble dominante (A_B_)', '2', '12,5 %'],
-      ['AaBB', 'Doble dominante (A_B_)', '4', '25 %'],
-      ['AABb', 'Doble dominante (A_B_)', '2', '12,5 %'],
-      ['AaBb', 'Doble dominante (A_B_)', '4', '25 %'],
-      ['aaBB', 'Rec. A / Dom. B (aaB_)', '2', '12,5 %'],
-      ['aaBb', 'Rec. A / Dom. B (aaB_)', '2', '12,5 %'],
+      ['AABB', 'Doble dominante (A_B_)', '2', '12,5 %'],
+      ['AaBB', 'Doble dominante (A_B_)', '4', '25 %'],
+      ['AABb', 'Doble dominante (A_B_)', '2', '12,5 %'],
+      ['AaBb', 'Doble dominante (A_B_)', '4', '25 %'],
+      ['aaBB', 'Rec. A / Dom. B (aaB_)', '2', '12,5 %'],
+      ['aaBb', 'Rec. A / Dom. B (aaB_)', '2', '12,5 %'],
     ]);
     expect(filas.reduce((acc, f) => acc + Number(f[2]), 0)).toBe(16);
-    const suma = filas.reduce((acc, f) => acc + Number(f[3].replace(' %', '').replace(',', '.')), 0);
+    const suma = filas.reduce((acc, f) => acc + Number(f[3].replace(' %', '').replace(',', '.')), 0);
     expect(suma).toBeCloseTo(100, 6);
   });
 
@@ -522,8 +522,8 @@ test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
     expect(await proporcion(page, 0)).toBe('1 AA : 1 Aa');
     expect(await proporcion(page, 1)).toBe('1 dominante');
     expect(await recuento(page)).toEqual([
-      ['AA', 'Dominante (A_)', '2', '50 %'],
-      ['Aa', 'Dominante (A_)', '2', '50 %'],
+      ['AA', 'Dominante (A_)', '2', '50 %'],
+      ['Aa', 'Dominante (A_)', '2', '50 %'],
     ]);
     await expect(page.locator(RESULTADO)).toContainText(
       'El 100 % de la descendencia mostrará el fenotipo dominante (ningún individuo recesivo).',
@@ -535,7 +535,7 @@ test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
       ['aa', 'aa'],
       ['aa', 'aa'],
     ]);
-    expect(await recuento(page)).toEqual([['aa', 'Recesivo (aa)', '4', '100 %']]);
+    expect(await recuento(page)).toEqual([['aa', 'Recesivo (aa)', '4', '100 %']]);
     await expect(page.locator(RESULTADO)).toContainText(
       'El 100 % de la descendencia mostrará el fenotipo recesivo.',
     );
@@ -546,7 +546,7 @@ test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
     // A mano: P1 solo produce AB y P2 solo ab → todas AaBb.
     expect(await rejilla(page)).toEqual(Array.from({ length: 4 }, () => ['AaBb', 'AaBb', 'AaBb', 'AaBb']));
     expect(await proporcion(page, 0)).toBe('1 AaBb');
-    expect(await recuento(page)).toEqual([['AaBb', 'Doble dominante (A_B_)', '16', '100 %']]);
+    expect(await recuento(page)).toEqual([['AaBb', 'Doble dominante (A_B_)', '16', '100 %']]);
   });
 
   test('CASO 7 — AaBb × Aabb: rejilla, 3:3:1:1 y recuento exacto que suma 100 %', async ({ page }) => {
@@ -560,19 +560,19 @@ test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
     );
     const filas = await recuento(page);
     expect(filas).toEqual([
-      ['AABb', 'Doble dominante (A_B_)', '2', '12,5 %'],
-      ['AaBb', 'Doble dominante (A_B_)', '4', '25 %'],
-      ['AAbb', 'Dom. A / Rec. B (A_bb)', '2', '12,5 %'],
-      ['Aabb', 'Dom. A / Rec. B (A_bb)', '4', '25 %'],
-      ['aaBb', 'Rec. A / Dom. B (aaB_)', '2', '12,5 %'],
-      ['aabb', 'Doble recesivo (aabb)', '2', '12,5 %'],
+      ['AABb', 'Doble dominante (A_B_)', '2', '12,5 %'],
+      ['AaBb', 'Doble dominante (A_B_)', '4', '25 %'],
+      ['AAbb', 'Dom. A / Rec. B (A_bb)', '2', '12,5 %'],
+      ['Aabb', 'Dom. A / Rec. B (A_bb)', '4', '25 %'],
+      ['aaBb', 'Rec. A / Dom. B (aaB_)', '2', '12,5 %'],
+      ['aabb', 'Doble recesivo (aabb)', '2', '12,5 %'],
     ]);
-    const suma = filas.reduce((acc, f) => acc + Number(f[3].replace(' %', '').replace(',', '.')), 0);
+    const suma = filas.reduce((acc, f) => acc + Number(f[3].replace(' %', '').replace(',', '.')), 0);
     expect(suma).toBeCloseTo(100, 6);
     // Los CONTEOS del «Resultado:» (6, 6, 2, 2). Sus porcentajes fueron el hallazgo A (1668,
     // REPARADO el 25/09/2026): los vigila el test «REPARADO 25/09 (1668)».
     await expect(page.locator(RESULTADO)).toHaveText(
-      /6 \([\d,]+ ?%\) dominante-dominante, 6 \([\d,]+ ?%\) dominante-recesivo, 2 \([\d,]+ ?%\) recesivo-dominante, 2 \([\d,]+ ?%\) recesivo-recesivo\./,
+      /6 \([\d,]+\s?%\) dominante-dominante, 6 \([\d,]+\s?%\) dominante-recesivo, 2 \([\d,]+\s?%\) recesivo-dominante, 2 \([\d,]+\s?%\) recesivo-recesivo\./,
     );
   });
 
@@ -809,13 +809,16 @@ test.describe('Cuadro de Punnett · móvil · re-inspección 25/09/2026', () => 
  *   52-53), desde y = 77 a 800 px (logo hasta 77, sin solape) y desde x = 367 a 1280 px (logo
  *   hasta x = 203). En meskeia.com, 0 anchos tapados barriendo de 360 a 1300 px de 4 en 4.
  *   Bajo stemum.com la píldora «Stemum › Biología» es 50 px más ancha (hasta x = 253) y de 1024
- *   a 1044 px pisa el 🧬 del principio del título: hallazgo abierto, test del bloque de Stemum.
+ *   a 1044 px pisaba el 🧬 del principio del título (hallazgo 2589, REPARADO el 01/10/2026).
  *
  * SOSPECHA del 28/09 (colores de marca EN LÍNEA, #48A9A6 y #7FB3D3): DESCARTADA para el texto.
  *   En esta app esos colores en línea solo pintan las cuatro manchas de la leyenda (sin texto).
  *   Pero el teal #48A9A6 SÍ pinta texto desde el CSS del módulo: el fondo de las celdas A_bb del
- *   dihíbrido, con el genotipo en blanco a 2,80:1 (hallazgo abierto). Y el contraste medido con
- *   el fondo real deja más texto de marca por debajo de 4,5:1 (hallazgos abiertos, abajo).
+ *   dihíbrido, con el genotipo en blanco a 2,80:1 (2583). Y el contraste medido con el fondo
+ *   real dejaba más texto de marca por debajo de 4,5:1 (2584-2586).
+ *
+ * HALLAZGOS 2583-2589 (abiertos en esta re-inspección), REPARADOS el 01/10/2026: eran test.fail
+ *   y hoy son de regresión, con su medida de antes y de después en cada test.
  *
  * .punnettHeader (hallazgo 1670, reparado el 25/09 a mano): sigue en 5,47:1 en los dos temas en
  *   meskeia.com y en 8,72:1 bajo Stemum (--primary-boton es #6B21A8 también en oscuro).
@@ -863,34 +866,6 @@ async function contrasteReal(locator: Locator): Promise<number> {
     const texto = sobre({ ...color, a: color.a * opacidad }, fondo);
     const a = lum(texto);
     const b = lum(fondo);
-    return +((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)).toFixed(2);
-  });
-}
-
-/** Contraste de un objeto gráfico SIN texto (su color de fondo) contra el fondo que lo rodea. */
-async function contrasteMancha(locator: Locator): Promise<number> {
-  return locator.evaluate((el) => {
-    interface Rgba { r: number; g: number; b: number; a: number }
-    const leer = (css: string): Rgba => {
-      const p = (css.match(/[\d.]+/g) ?? []).map(Number);
-      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
-    };
-    const canal = (c: number): number => {
-      const s = c / 255;
-      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
-    };
-    const lum = (c: Rgba): number => 0.2126 * canal(c.r) + 0.7152 * canal(c.g) + 0.0722 * canal(c.b);
-    const mancha = leer(getComputedStyle(el).backgroundColor);
-    let alrededor: Rgba = { r: 255, g: 255, b: 255, a: 1 };
-    for (let n: Element | null = el.parentElement; n; n = n.parentElement) {
-      const c = leer(getComputedStyle(n).backgroundColor);
-      if (c.a >= 1) {
-        alrededor = c;
-        break;
-      }
-    }
-    const a = lum(mancha);
-    const b = lum(alrededor);
     return +((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)).toFixed(2);
   });
 }
@@ -955,15 +930,15 @@ test.describe('Cuadro de Punnett · re-inspección 01/10/2026', () => {
     // 2/16 = 12,5 % y 4/16 = 25 %.
     const filas = await recuento(page);
     expect(filas).toEqual([
-      ['AaBB', 'Doble dominante (A_B_)', '2', '12,5 %'],
-      ['AaBb', 'Doble dominante (A_B_)', '4', '25 %'],
-      ['Aabb', 'Dom. A / Rec. B (A_bb)', '2', '12,5 %'],
-      ['aaBB', 'Rec. A / Dom. B (aaB_)', '2', '12,5 %'],
-      ['aaBb', 'Rec. A / Dom. B (aaB_)', '4', '25 %'],
-      ['aabb', 'Doble recesivo (aabb)', '2', '12,5 %'],
+      ['AaBB', 'Doble dominante (A_B_)', '2', '12,5 %'],
+      ['AaBb', 'Doble dominante (A_B_)', '4', '25 %'],
+      ['Aabb', 'Dom. A / Rec. B (A_bb)', '2', '12,5 %'],
+      ['aaBB', 'Rec. A / Dom. B (aaB_)', '2', '12,5 %'],
+      ['aaBb', 'Rec. A / Dom. B (aaB_)', '4', '25 %'],
+      ['aabb', 'Doble recesivo (aabb)', '2', '12,5 %'],
     ]);
     expect(filas.reduce((acc, f) => acc + Number(f[2]), 0)).toBe(16);
-    const suma = filas.reduce((acc, f) => acc + Number(f[3].replace(' %', '').replace(',', '.')), 0);
+    const suma = filas.reduce((acc, f) => acc + Number(f[3].replace(' %', '').replace(',', '.')), 0);
     expect(suma).toBeCloseTo(100, 6);
 
     // 6/16 = 37,5 % · 2/16 = 12,5 %.
@@ -980,7 +955,7 @@ test.describe('Cuadro de Punnett · re-inspección 01/10/2026', () => {
     expect(await rejilla(page)).toEqual(Array.from({ length: 4 }, () => ['AaBb', 'AaBb', 'AaBb', 'AaBb']));
     expect(await proporcion(page, 0)).toBe('1 AaBb');
     expect(await proporcion(page, 1)).toBe('1 dominante-dominante');
-    expect(await recuento(page)).toEqual([['AaBb', 'Doble dominante (A_B_)', '16', '100 %']]);
+    expect(await recuento(page)).toEqual([['AaBb', 'Doble dominante (A_B_)', '16', '100 %']]);
     // Los tres fenotipos ausentes salen con «0 (0 %)», no con «0,00» ni vacíos.
     await expect(page.locator(RESULTADO)).toContainText(
       'De las 16 combinaciones: 16 (100 %) dominante-dominante, 0 (0 %) dominante-recesivo, 0 (0 %) recesivo-dominante, 0 (0 %) recesivo-recesivo.',
@@ -990,7 +965,7 @@ test.describe('Cuadro de Punnett · re-inspección 01/10/2026', () => {
     // A mano: ab × ab en las 16 celdas.
     expect(await rejilla(page)).toEqual(Array.from({ length: 4 }, () => ['aabb', 'aabb', 'aabb', 'aabb']));
     expect(await proporcion(page, 1)).toBe('1 recesivo-recesivo');
-    expect(await recuento(page)).toEqual([['aabb', 'Doble recesivo (aabb)', '16', '100 %']]);
+    expect(await recuento(page)).toEqual([['aabb', 'Doble recesivo (aabb)', '16', '100 %']]);
     await expect(page.locator(RESULTADO)).toContainText(
       'De las 16 combinaciones: 0 (0 %) dominante-dominante, 0 (0 %) dominante-recesivo, 0 (0 %) recesivo-dominante, 16 (100 %) recesivo-recesivo.',
     );
@@ -1060,18 +1035,19 @@ test.describe('Cuadro de Punnett · re-inspección 01/10/2026', () => {
   });
 
   // ============================================================
-  // ABIERTOS el 01/10/2026 — test.fail(): se ponen en rojo el día que se reparen
+  // REPARADOS el 01/10/2026 (hallazgos 2583-2588; eran `test.fail`). Mismos casos del acta, con
+  // los dos temas medidos donde el acta solo midió uno, y el hover de los botones.
   // ============================================================
 
-  test('ABIERTO, hallazgo: el genotipo de las celdas A_bb del dihíbrido, blanco sobre #48A9A6, no llega a 4,5:1', async ({
+  test('REPARADO (01/10/2026) 2583 — el genotipo de las celdas A_bb del dihíbrido llega a 4,5:1', async ({
     page,
   }) => {
-    test.fail();
     await page.addStyleTag({ content: SIN_TRANSICIONES });
     await page.getByRole('button', { name: /Dihíbrido clásico/ }).click();
     // Celda «AAbb» (fila Ab, columna Ab). 17,6 px en negrita: no es «texto grande» (18,66 px).
-    // Obtenido el 01/10/2026: 2,80:1 (#fff sobre #48a9a6), igual en oscuro y bajo Stemum,
-    // porque el teal está escrito en el módulo (.cellDomiRec) y no depende del tema.
+    // Obtenido el 01/10/2026: 2,80:1 (#fff sobre #48a9a6). Reparado dejando el teal (es el color
+    // de A_bb en la rejilla y en la leyenda) y pasando el genotipo a #1a1a1a: 6,22:1. El color
+    // está fijado en el módulo, así que da lo mismo en oscuro y bajo Stemum.
     const celda = page.locator(`${CUADRO} td`).filter({ hasText: /^AAbb$/ });
     await expect(celda).toHaveCount(1);
     expect(await contrasteReal(celda)).toBeGreaterThanOrEqual(4.5);
@@ -1079,10 +1055,9 @@ test.describe('Cuadro de Punnett · re-inspección 01/10/2026', () => {
     expect(await contrasteReal(celda)).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('ABIERTO, hallazgo: texto en color de marca por debajo de 4,5:1 en tema claro (proporciones, botones, guía)', async ({
+  test('REPARADO (01/10/2026) 2584 — el texto en color de marca llega a 4,5:1 en claro y en oscuro (proporciones, botones, guía)', async ({
     page,
   }) => {
-    test.fail();
     await page.addStyleTag({ content: SIN_TRANSICIONES });
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     // Obtenido el 01/10/2026 en claro (var(--primary) #2E86AB / var(--secondary) #48A9A6):
@@ -1091,6 +1066,9 @@ test.describe('Cuadro de Punnett · re-inspección 01/10/2026', () => {
     //   escenarios «Mendel original (Aa×Aa)»… (14,08 px, 600) en teal sobre #FAFAFA → 2,68:1
     //   .formulaBox (16 px, 700) sobre su fondo azulado → 3,36:1 (4,25:1 en oscuro)
     //   preguntas del FAQ (.faqItem strong, 15,5 px) → 4,11:1 · pasos (.stepContent strong) → 3,77:1
+    // Reparado con --primary-texto / --secondary-texto y la fórmula sin tinte de fondo (con el
+    // tinte al 10 % quedaba en 4,48 / 4,25:1). Medido tras reparar, claro / oscuro: 5,47 / 4,93 ·
+    // 5,24 / 6,23 · 4,94 / 7,80 · 5,01 / 4,72 · 5,47 / 4,93 · 5,01 / 4,72.
     const medidas: Record<string, Locator> = {
       'proporciones genotípicas': page.locator(clase('propRatio')).first(),
       'botón Dihíbrido inactivo': page.getByRole('button', { name: 'Dihíbrido (2 genes)' }),
@@ -1098,30 +1076,6 @@ test.describe('Cuadro de Punnett · re-inspección 01/10/2026', () => {
       'fórmula de combinaciones': page.locator(clase('formulaBox')),
       'pregunta del FAQ': page.locator(`${clase('faqItem')} > strong`).first(),
       'paso 1 de la guía': page.locator(`${clase('stepContent')} strong`).first(),
-    };
-    const fallan: string[] = [];
-    for (const [nombre, loc] of Object.entries(medidas)) {
-      const r = await contrasteReal(loc);
-      if (r < 4.5) fallan.push(`${nombre} ${r}:1`);
-    }
-    expect(fallan).toEqual([]);
-  });
-
-  test('ABIERTO, hallazgo: texto blanco sobre el color de marca por debajo de 4,5:1 (tipo activo, aleatorio, nº de paso)', async ({
-    page,
-  }) => {
-    test.fail();
-    await page.addStyleTag({ content: SIN_TRANSICIONES });
-    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    // Obtenido el 01/10/2026 (claro / oscuro):
-    //   «Monohíbrido (1 gen)» activo, blanco sobre var(--primary) → 4,11 / 2,79:1 (2,21 bajo Stemum)
-    //   «Caso aleatorio», blanco sobre var(--secondary) → 2,80 / 2,23:1 (3,96 bajo Stemum)
-    //   .stepNumber «1», blanco sobre var(--primary) → 4,11 / 2,79:1
-    // (Con el puntero encima, .tipoBtn y .scenarioBtn pasan también a blanco sobre la marca.)
-    const medidas: Record<string, Locator> = {
-      'tipo activo': page.getByRole('button', { name: 'Monohíbrido (1 gen)' }),
-      'caso aleatorio': page.getByRole('button', { name: 'Generar caso aleatorio' }),
-      'número de paso': page.locator(clase('stepNumber')).first(),
     };
     const fallan: string[] = [];
     for (const tema of ['claro', 'oscuro']) {
@@ -1134,62 +1088,228 @@ test.describe('Cuadro de Punnett · re-inspección 01/10/2026', () => {
     expect(fallan).toEqual([]);
   });
 
-  test('ABIERTO, hallazgo: el título naranja «Errores frecuentes que debes evitar» no llega a 4,5:1', async ({ page }) => {
-    test.fail();
+  test('REPARADO (01/10/2026) 2585 — el texto blanco sobre la marca llega a 4,5:1 (tipo activo, aleatorio, nº de paso y los hover)', async ({
+    page,
+  }) => {
+    await page.addStyleTag({ content: SIN_TRANSICIONES });
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    // Obtenido el 01/10/2026 (claro / oscuro):
+    //   «Monohíbrido (1 gen)» activo, blanco sobre var(--primary) → 4,11 / 2,79:1 (2,21 bajo Stemum)
+    //   «Caso aleatorio», blanco sobre var(--secondary) → 2,80 / 2,23:1 (3,96 bajo Stemum)
+    //   .stepNumber «1», blanco sobre var(--primary) → 4,11 / 2,79:1
+    //   con el puntero encima, .tipoBtn y .scenarioBtn pasaban también a blanco sobre la marca,
+    //   y «Caso aleatorio» bajaba a opacidad 0,85.
+    // Reparado con --primary-boton / --secondary-boton (iguales en los dos temas): 5,47 · 5,15 ·
+    // 5,47; con hover, 5,47 · 5,15 y el aleatorio cambia a --primary-boton (5,47) en vez de aclararse.
+    const tipoActivo = page.getByRole('button', { name: 'Monohíbrido (1 gen)' });
+    const tipoInactivo = page.getByRole('button', { name: 'Dihíbrido (2 genes)' });
+    const aleatorio = page.getByRole('button', { name: 'Generar caso aleatorio' });
+    const escenario = page.getByRole('button', { name: 'Mendel original (Aa×Aa)' });
+    const numeroPaso = page.locator(clase('stepNumber')).first();
+    const fallan: string[] = [];
+    const anotar = (tema: string, nombre: string, r: number): void => {
+      if (r < 4.5) fallan.push(`${tema} · ${nombre} ${r}:1`);
+    };
+    for (const tema of ['claro', 'oscuro']) {
+      if (tema === 'oscuro') await aOscuro(page);
+      await page.mouse.move(0, 0);
+      anotar(tema, 'tipo activo', await contrasteReal(tipoActivo));
+      anotar(tema, 'caso aleatorio', await contrasteReal(aleatorio));
+      anotar(tema, 'número de paso', await contrasteReal(numeroPaso));
+      // Con el puntero encima: comprobar que el hover se ha aplicado (fondo opaco) antes de medir.
+      for (const [nombre, loc] of [
+        ['hover tipo inactivo', tipoInactivo],
+        ['hover escenario', escenario],
+        ['hover caso aleatorio', aleatorio],
+      ] as const) {
+        await loc.hover();
+        await expect(loc).toHaveCSS('color', 'rgb(255, 255, 255)');
+        anotar(tema, nombre, await contrasteReal(loc));
+      }
+    }
+    expect(fallan).toEqual([]);
+  });
+
+  test('REPARADO (01/10/2026) 2586 — el título «Errores frecuentes que debes evitar» llega a 4,5:1', async ({ page }) => {
     await page.addStyleTag({ content: SIN_TRANSICIONES });
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     // #e65100 a 16 px en negrita. Obtenido el 01/10/2026: 3,57:1 sobre #fff8e1 en claro y 3,76:1
-    // sobre #332a00 en oscuro (el módulo oscurece la caja pero no el título).
+    // sobre #332a00 en oscuro (el módulo oscurecía la caja pero no el título). Reparado: #a33900
+    // en claro (6,29:1) y #ffb74d en oscuro (8,24:1), con los dos temas declarados en el módulo.
     const titulo = page.locator(clase('warningHeader'));
     expect(await contrasteReal(titulo)).toBeGreaterThanOrEqual(4.5);
     await aOscuro(page);
     expect(await contrasteReal(titulo)).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('ABIERTO, hallazgo: las manchas de la leyenda no llegan a 3:1 contra la página', async ({ page }) => {
-    test.fail();
+  test('REPARADO (01/10/2026) 2587 — las manchas de la leyenda se delimitan con un borde de ≥ 3:1 contra la página', async ({
+    page,
+  }) => {
     await page.addStyleTag({ content: SIN_TRANSICIONES });
     await page.getByRole('button', { name: 'Dihíbrido (2 genes)' }).click();
-    // Objetos gráficos: umbral 3:1 (WCAG 1.4.11). Obtenido el 01/10/2026 contra #FAFAFA en claro:
-    // #48A9A6 2,68:1 · #7FB3D3 2,17:1 · #cccccc 1,54:1 (#1a5278, 7,98:1). En oscuro, contra
-    // #1A1A1A: #1a5278 2,09:1 (las otras tres pasan). El genotipo escrito en cada celda repite la
-    // información, de ahí la severidad baja; pero la leyenda existe para leer el color.
+    // Objetos gráficos: umbral 3:1 (WCAG 1.4.11). Obtenido el 01/10/2026 con el RELLENO contra
+    // #FAFAFA en claro: #48A9A6 2,68:1 · #7FB3D3 2,17:1 · #cccccc 1,54:1; en oscuro, contra
+    // #1A1A1A, #1a5278 2,09:1.
+    // Por qué la aserción mide ahora el BORDE y no el relleno: el relleno es el de las celdas de
+    // la rejilla y no puede cambiar sin cambiar la rejilla (y ningún juego de cuatro colores
+    // distinguibles entre sí pasa 3:1 contra el blanco Y contra el negro a la vez). Lo que 1.4.11
+    // exige es que el objeto se pueda percibir, y lo delimita su contorno: un borde de 1 px con
+    // el color del texto de la leyenda (--text-secondary). Medido tras reparar: 5,50:1 en claro y
+    // 8,03:1 en oscuro, igual bajo Stemum. El acta proponía exactamente esto.
     const fallan: string[] = [];
     for (const tema of ['claro', 'oscuro']) {
       if (tema === 'oscuro') await aOscuro(page);
       const manchas = page.locator(clase('legendDot'));
       await expect(manchas).toHaveCount(4);
       for (let i = 0; i < 4; i++) {
-        const r = await contrasteMancha(manchas.nth(i));
-        if (r < 3) fallan.push(`${tema} · mancha ${i + 1} ${r}:1`);
+        const borde = await bordeDeMancha(manchas.nth(i));
+        if (borde.ancho < 1 || borde.estilo !== 'solid' || borde.contraste < 3) {
+          fallan.push(`${tema} · mancha ${i + 1}: borde ${borde.ancho} px ${borde.estilo}, ${borde.contraste}:1`);
+        }
       }
     }
     expect(fallan).toEqual([]);
   });
 
-  test('ABIERTO, hallazgo: el «%» va con espacio normal y salta solo a la línea siguiente', async ({ page }) => {
-    test.fail();
+  test('REPARADO (01/10/2026) 2588 — el «%» va con espacio duro y no salta solo a la línea siguiente', async ({ page }) => {
     // CLAUDE.md §2 (25/09/2026): «15 %» con espacio DURO (U+00A0) para que el % no salte solo de
     // línea. Obtenido el 01/10/2026 a 390 px en el dihíbrido clásico: «… 1 (6,25» al final de una
     // línea del «Resultado:» y «%) recesivo-recesivo.» al principio de la siguiente; en el mismo
     // barrido (320-1280 px) el % salta en las cinco pasadas medidas, también en la guía.
+    // Reparado en el helper porcentaje(), que ahora devuelve la cifra con « %» (U+00A0), y en
+    // los 26 porcentajes escritos del bloque educativo. Ojo: las cadenas esperadas de abajo y las
+    // de los recuentos de todo el fichero llevan un U+00A0 LITERAL entre la cifra y el «%».
     await page.setViewportSize({ width: 390, height: 900 });
     await page.getByRole('button', { name: /Dihíbrido clásico/ }).click();
     const resultado = (await page.locator(RESULTADO).textContent()) ?? '';
     expect(resultado).toContain('1 (6,25 %) recesivo-recesivo.');
     const recuentoTexto = (await page.locator(RECUENTO).textContent()) ?? '';
     expect(recuentoTexto).toContain('6,25 %');
+
+    // Los dos casos de la guía que nombra el acta, y ningún porcentaje con espacio normal en
+    // toda la página (cifra + U+0020 + «%»).
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const pagina = (await page.locator('body').textContent()) ?? '';
+    expect(pagina).toContain('afectada es 25 % (aa)');
+    expect(pagina).toContain('Aa × Aa → 25 % aa');
+    expect(pagina.match(/\d %/g) ?? []).toEqual([]);
+
+    // Y en pantalla: ningún «%» empieza una línea distinta de la de su cifra (barrido 320-1280).
+    for (let ancho = 320; ancho <= 1280; ancho += 40) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      expect(await porcentajesHuerfanos(page), `${ancho} px: «%» separados de su cifra`).toEqual([]);
+    }
+  });
+
+  test('2589 — en meskeia.com el hueco de Stemum no se aplica: a 1024 px el hero vuelve a sus 40 px', async ({
+    page,
+  }) => {
+    // El corte que arregla 2589 va escrito SOLO para [data-brand='stemum']: en meskeia.com el
+    // logo llega a x = 203 y el título empieza en x = 239, así que no hay nada que apartar.
+    await page.setViewportSize({ width: 1024, height: 900 });
+    await expect(page.locator('header[class*="hero"]')).toHaveCSS('padding-top', '40px');
+    expect((await tituloBajoLaBarra(page)).tapados).toBe(0);
   });
 });
+
+/** Ancho, estilo y contraste del borde de una mancha de la leyenda contra el fondo que la rodea. */
+async function bordeDeMancha(locator: Locator): Promise<{ ancho: number; estilo: string; contraste: number }> {
+  return locator.evaluate((el) => {
+    interface Rgba { r: number; g: number; b: number; a: number }
+    const leer = (css: string): Rgba => {
+      const p = (css.match(/[\d.]+/g) ?? []).map(Number);
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+    const canal = (c: number): number => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    const lum = (c: Rgba): number => 0.2126 * canal(c.r) + 0.7152 * canal(c.g) + 0.0722 * canal(c.b);
+    const cs = getComputedStyle(el);
+    let alrededor: Rgba = { r: 255, g: 255, b: 255, a: 1 };
+    for (let n: Element | null = el.parentElement; n; n = n.parentElement) {
+      const c = leer(getComputedStyle(n).backgroundColor);
+      if (c.a >= 1) {
+        alrededor = c;
+        break;
+      }
+    }
+    const a = lum(leer(cs.borderTopColor));
+    const b = lum(alrededor);
+    return {
+      ancho: parseFloat(cs.borderTopWidth),
+      estilo: cs.borderTopStyle,
+      contraste: +((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)).toFixed(2),
+    };
+  });
+}
+
+/** Porcentajes cuyo «%» cae en otra línea que la última cifra de su número (texto de 10 caracteres). */
+async function porcentajesHuerfanos(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const salida: string[] = [];
+    const recorrido = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n = recorrido.nextNode(); n; n = recorrido.nextNode()) {
+      const t = n.nodeValue ?? '';
+      for (let i = 2; i < t.length; i++) {
+        if (t[i] !== '%' || !/\s/.test(t[i - 1]) || !/\d/.test(t[i - 2])) continue;
+        const cifra = document.createRange();
+        cifra.setStart(n, i - 2);
+        cifra.setEnd(n, i - 1);
+        const signo = document.createRange();
+        signo.setStart(n, i);
+        signo.setEnd(n, i + 1);
+        const rc = cifra.getBoundingClientRect();
+        const rs = signo.getBoundingClientRect();
+        if (rs.height > 0 && Math.abs(rc.top - rs.top) > 2) salida.push(t.slice(Math.max(0, i - 8), i + 2));
+      }
+    }
+    return salida;
+  });
+}
+
+/**
+ * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
+ * admite meskeia.com) y, sin él, la página NO se hidrata: la píldora «Stemum › Biología» no
+ * llega a montarse (useStemumHost corre en un efecto) y `esperarPaginaAsentada` agota su espera.
+ * Medido el 01/10/2026: con el puente, la página hidrata y la píldora aparece; sin él, el bloque
+ * entero de Stemum falla antes de medir nada. El puente reenvía el socket a localhost:3050, que
+ * sí se acepta; no toca ninguna petición HTTP, así que lo que se mide es la página real.
+ * (En producción no hay HMR: el puente solo existe para el servidor de desarrollo.)
+ */
+async function puenteHmr(page: Page): Promise<void> {
+  const abiertos: WebSocket[] = [];
+  page.on('close', () => abiertos.forEach((s) => s.close()));
+  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
+    const u = new URL(ws.url());
+    const arriba = new WebSocket(`ws://localhost:3050${u.pathname}${u.search}`);
+    arriba.binaryType = 'arraybuffer';
+    abiertos.push(arriba);
+    const cola: (string | Buffer)[] = [];
+    arriba.onopen = () => {
+      for (const m of cola) arriba.send(m);
+      cola.length = 0;
+    };
+    ws.onMessage((m) => {
+      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
+      else cola.push(m);
+    });
+    arriba.onmessage = (e: MessageEvent) =>
+      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
+    ws.onClose(() => arriba.close());
+  });
+}
 
 // ============================================================
 // Bajo stemum.com: la marca del portal y su píldora «Stemum › Biología»
 // ============================================================
 test.describe('Cuadro de Punnett · stemum.com · re-inspección 01/10/2026', () => {
   test.beforeEach(async ({ page }) => {
+    await puenteHmr(page);
     await page.goto('http://stemum.com/simulador-punnett/');
     await esperarPaginaAsentada(page);
     await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
+    await expect(page.locator(clase('stemumPill'))).toBeVisible();
   });
 
   test('REPARADO 25/09 (1670) — bajo Stemum las cabeceras del cuadro y del recuento siguen en ≥ 4,5:1', async ({
@@ -1215,19 +1335,68 @@ test.describe('Cuadro de Punnett · stemum.com · re-inspección 01/10/2026', ()
     }
   });
 
-  test('ABIERTO, hallazgo: de 1024 a 1044 px la píldora «Stemum › Biología» pisa el principio del título', async ({
+  test('REPARADO (01/10/2026) 2584 y 2585 bajo Stemum — escenarios, tipo activo y aleatorio llegan a 4,5:1 en los dos temas', async ({
     page,
   }) => {
-    test.fail();
+    await page.addStyleTag({ content: SIN_TRANSICIONES });
+    // El acta midió bajo Stemum: escenarios (var(--secondary) #A855F7 como texto) 3,79:1 en claro
+    // y 4,40:1 en oscuro; tipo activo, blanco sobre #C99BF5, 2,21:1 en oscuro; aleatorio, blanco
+    // sobre #A855F7, 3,96:1. Con los tokens -texto/-boton, que el bloque [data-brand='stemum'] de
+    // globals redeclara: 5,52 / 6,73 · 8,72 · 5,76 (medido tras reparar, 01/10/2026).
+    const medidas: Record<string, Locator> = {
+      'escenario Mendel original': page.getByRole('button', { name: 'Mendel original (Aa×Aa)' }),
+      'tipo activo': page.getByRole('button', { name: 'Monohíbrido (1 gen)' }),
+      'caso aleatorio': page.getByRole('button', { name: 'Generar caso aleatorio' }),
+      'proporciones genotípicas': page.locator(clase('propRatio')).first(),
+    };
+    const fallan: string[] = [];
+    for (const tema of ['claro', 'oscuro']) {
+      if (tema === 'oscuro') await aOscuro(page);
+      for (const [nombre, loc] of Object.entries(medidas)) {
+        const r = await contrasteReal(loc);
+        if (r < 4.5) fallan.push(`${tema} · ${nombre} ${r}:1`);
+      }
+    }
+    expect(fallan).toEqual([]);
+  });
+
+  test('REPARADO (01/10/2026) 2589 — de 1024 a 1059 px la píldora «Stemum › Biología» ya no pisa el título', async ({
+    page,
+  }) => {
     // a1d72a9c deja el hueco de 80 px hasta 1023 px, medido con el logo de meskeia.com (hasta
     // x = 203). La píldora de Stemum llega a x = 253 y el título centrado empieza en x = 239 a
     // 1024 px. Obtenido el 01/10/2026: 54 de 1639 puntos tapados a 1024 px, 16 a 1044 px, 0 a
     // 1048. Solo el 🧬 decorativo: las letras quedan libres (con un título más largo, no).
-    for (const ancho of [1024, 1036, 1044]) {
+    // Reparado en el módulo de la app: bajo [data-brand='stemum'] el hueco llega hasta 1059 px.
+    // A 1048 el muestreo ya daba 0, pero la CAJA del texto (x = 251) seguía cruzando la de la
+    // píldora (x = 253) hasta 1052; a 1060 el título empieza en x = 257, 4 px de aire.
+    for (const [ancho, relleno] of [
+      [1024, '80px'],
+      [1036, '80px'],
+      [1044, '80px'],
+      [1048, '80px'],
+      [1059, '80px'],
+      [1060, '40px'],
+      [1100, '40px'],
+    ] as const) {
       await page.setViewportSize({ width: ancho, height: 900 });
+      await expect(page.locator('header[class*="hero"]')).toHaveCSS('padding-top', relleno);
       const m = await tituloBajoLaBarra(page);
       expect(m.total).toBeGreaterThan(100);
       expect(m.tapados, `${ancho} px: puntos del título bajo la píldora`).toBe(0);
+      // Y las cajas: el borde derecho de la píldora no entra en la del texto del título.
+      const cajas = await page.evaluate(() => {
+        const pildora = document.querySelector('[class*="stemumPill"]')?.getBoundingClientRect();
+        const rango = document.createRange();
+        rango.selectNodeContents(document.querySelector('h1') as Element);
+        const titulo = rango.getBoundingClientRect();
+        return {
+          seCruzan: !!pildora && pildora.right > titulo.left && pildora.bottom > titulo.top + 1,
+          pildora: pildora ? [Math.round(pildora.right), Math.round(pildora.bottom)] : null,
+          titulo: [Math.round(titulo.left), Math.round(titulo.top)],
+        };
+      });
+      expect(cajas.seCruzan, `${ancho} px: píldora ${cajas.pildora} · título ${cajas.titulo}`).toBe(false);
     }
   });
 });

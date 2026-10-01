@@ -94,7 +94,7 @@ export const faqJsonLd = {
       name: '¿Qué es un individuo portador en genética mendeliana?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un portador es un individuo heterocigoto (Aa) que presenta el fenotipo dominante pero lleva un alelo recesivo que puede transmitir a su descendencia. Si dos portadores se cruzan, hay un 25% de probabilidad de que un hijo presente el fenotipo recesivo (aa). Este concepto es clave para entender enfermedades hereditarias autosómicas recesivas como la fibrosis quística o la fenilcetonuria.',
+        text: 'Un portador es un individuo heterocigoto (Aa) que presenta el fenotipo dominante pero lleva un alelo recesivo que puede transmitir a su descendencia. Si dos portadores se cruzan, hay un 25 % de probabilidad de que un hijo presente el fenotipo recesivo (aa). Este concepto es clave para entender enfermedades hereditarias autosómicas recesivas como la fibrosis quística o la fenilcetonuria.',
       },
     },
     {
