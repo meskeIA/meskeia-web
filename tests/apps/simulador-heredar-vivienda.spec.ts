@@ -36,13 +36,15 @@
  * dice la tenencia real y el `%` lleva espacio duro. Los asserts antiguos que esperaban el `%`
  * pegado o «20 años de tenencia» con 31 se corrigieron con ellos: consagraban esos defectos.
  *
- * ❌ ABIERTOS desde la re-inspección del 01/10/2026 (último `describe` del fichero), cada uno con
- * su `test.fail()`: [01-A] el patrimonio preexistente del heredero no se pregunta y la cuota
- * supone en silencio el primer tramo del art. 22.2 LISD · [01-B] «Grupo I» con 21 años o más se
- * liquida como Grupo I bajo un aviso que dice que es Grupo II · [01-C] «3 % del caudal» con
- * espacio normal · [01-D] el faqJsonLd sitúa el ISD en la CCAA «donde radica el inmueble» ·
- * [01-E] la tarjeta «El ISD lo cobra la CCAA del fallecido» califica Madrid de «mucho más
- * beneficioso». Al repararlos, quitar la marca y pasar esta línea a pasado.
+ * ✅ Los cinco que la re-inspección del 01/10/2026 abrió (último `describe` del fichero,
+ * hallazgos 2533 a 2537) se repararon ese mismo día y sus tests ya no llevan `test.fail()`:
+ * [01-A] el patrimonio preexistente del heredero se pregunta en euros y el coeficiente es el de
+ * su tramo del art. 22.2 LISD, con la corrección del salto · [01-B] una edad que contradice el
+ * grupo elegido ya no se liquida · [01-C] «3 % del caudal» lleva espacio duro · [01-D] el
+ * faqJsonLd sitúa el ISD en la CCAA de residencia del fallecido · [01-E] la tarjeta del ISD por
+ * CCAA ya no califica a Madrid. Dos asserts antiguos consagraban el [01-B] (el 612 leía la
+ * reducción del Grupo II con 10 años, y el barrido WEB ↔ MOTOR liquidaba un «Grupo I» de 70
+ * años): se corrigieron con él.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria: todas de `data/fiscal/`):
  *
@@ -67,8 +69,8 @@
  *    - `TARIFA_CATALUNA_IS`, 5 tramos propios: 7 % hasta 50.000 · 11 % hasta 150.000 ·
  *      17 % hasta 400.000 · 24 % hasta 800.000 · 32 % en adelante
  *    - `COEFICIENTES_IS['II'][0]` = 1,0000 · `['III'][0]` = 1,5882 · `['IV'][0]` = 2,0000
- *      (índice 0 = patrimonio preexistente del heredero por debajo de 402.678,11 €, que es
- *       el supuesto que simula la app)
+ *      (índice 0 = patrimonio preexistente del heredero de hasta 402.678,11 €, que es lo que
+ *       vale el campo vacío: desde el hallazgo 2533 la app lo pregunta, y vacío cuenta como 0 €)
  *    - `BONIFICACIONES_CCAA_IS['asturias']…['II'].reduccionBase` = 300.000 € (única CCAA
  *      cuyo beneficio está modelado sobre la BASE) y `porcentaje` = 0
  *    - `['rioja']…['II']` = { porcentaje: 0,99, tope: 500.000, porcentajeMayor: 0,98 }
@@ -913,8 +915,10 @@ test.describe('Simulador de heredar vivienda — re-inspección 27/08/2026', () 
    *     La reducción de vivienda aquí es el 95 % (47.500) y NO el tope (122.606,47): el
    *     tope solo muerde por encima de 129.059,44 € de valor de referencia.
    *
-   *  b) La app no tiene ningún campo de texto —todo son deslizadores y desplegables—, así
-   *     que el «texto basura» solo puede entrar forzando el valor del `input[type=range]`.
+   *  b) Los importes de la herencia son deslizadores y desplegables, así que el «texto
+   *     basura» solo puede entrar en ellos forzando el valor del `input[type=range]`. (El único
+   *     campo de texto, el patrimonio preexistente del hallazgo 2533, tiene su propio rechazo
+   *     en el último `describe`.)
    *     El saneado del navegador lo devuelve al valor por defecto (mitad del recorrido) o
    *     al extremo, y la app nunca llega a ver un NaN. Se comprueba que no aparece ni
    *     «NaN» ni «Infinity» ni «undefined» en ninguna parte de la página.
@@ -2136,16 +2140,16 @@ test.describe('Regresión — hallazgos 612 y 613, reparados', () => {
       .innerText();
     expect(reduccion.replace(/\u00a0/g, ' ')).toContain('47.858,59');
 
-    // Y el mismo heredero como Grupo II se queda en la reducción base: la diferencia es
-    // exactamente lo que el hallazgo decía que se estaba perdiendo.
+    // ⚠️ 01/10/2026 (hallazgo 2534): aquí se leía que el mismo heredero de 10 años como
+    // Grupo II «se queda en la reducción base» (15.956,87 €), es decir, se daba por buena una
+    // cuota liquidada con el grupo que su edad contradice. Ese assert consagraba el defecto:
+    // ahora la app avisa de que el parentesco correcto es el Grupo I y NO liquida.
     await page.locator('#parentescoSel').selectOption({ label: 'Hijo o hija ≥21 años (Grupo II)' });
-    const reduccionII = await page
-      .getByText('− Reducción parentesco')
-      .locator('xpath=following-sibling::strong[1]')
-      .innerText();
-    expect(reduccionII.replace(/\u00a0/g, ' ')).toContain('15.956,87');
-    // Con 10 años y Grupo II, la app avisa de que el parentesco correcto es el Grupo I.
     await expect(page.getByText(/es .*Grupo I.*, no Grupo II/)).toBeVisible();
+    await expect(page.getByText('− Reducción parentesco')).toHaveCount(0);
+    await expect(
+      page.getByText('Sin cifras: la edad (10 años) no corresponde al parentesco elegido')
+    ).toBeVisible();
   });
 
   test('612 bis — el Grupo I con 21 años o más avisa, y en Cataluña se aplican SUS cuantías', async ({
@@ -3160,8 +3164,12 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
     await abrir(page);
     await mover(page, 'aniosVenta', 0); // aislar el ISD
 
-    // ── Pasada 1: 250.000 € de vivienda habitual, heredero de 70 años que convivió
+    // ── Pasada 1: 250.000 € de vivienda habitual, heredero de 70 años que convivió.
+    // ⚠️ 01/10/2026 (hallazgo 2534): el Grupo I (descendientes MENORES de 21) se comparaba aquí
+    // con 70 años, una herencia que no existe y que la web y el motor liquidaban igual de mal.
+    // La app ya no la liquida; el Grupo I se compara en la pasada 2, con 8 años.
     for (const { ui, grupo } of MAPA) {
+      if (ui === 'hijo_menor21') continue;
       await page.selectOption('#parentescoSel', ui);
       await mover(page, 'edadHer', 70);
       await mover(page, 'valorRef', 250000);
@@ -3211,9 +3219,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
         );
       }
     }
-    // El barrido tiene que haber comparado de verdad las 119 + 17 herencias: un bucle que
+    // El barrido tiene que haber comparado de verdad las 102 + 17 herencias: un bucle que
     // no entra deja el test verde sin haber mirado nada.
-    expect(comparadas).toBe(17 * 7 + 17);
+    expect(comparadas).toBe(17 * 6 + 17);
 
     // ── Pasada 3: el perfil que divergía un céntimo hasta el commit `0a2fa220`
     await page.selectOption('#parentescoSel', 'hijo');
@@ -5829,35 +5837,104 @@ test.describe('Simulador de heredar vivienda — re-inspección 01/10/2026', () 
   });
 
   /**
-   * ❌ ABIERTO 01/10/2026 [01-A] (calculo, medio) — el `test.fail()` afirma lo que DEBERÍA pasar.
+   * ✅ REPARADO (01/10/2026) [01-A] (calculo, medio, hallazgo 2533).
    *
-   * La app no pregunta el patrimonio preexistente del heredero (ni en euros ni por tramo) y
-   * multiplica SIEMPRE por `COEFICIENTES_IS[grupo][0]`, el del primer tramo del art. 22.2 LISD. El
-   * supuesto vive en un comentario de page.tsx («que es el supuesto que simula esta app») y en
-   * ningún sitio que el usuario vea: el panel rotula «× Coef. patrimonio (Grupo III) ×1,5882» como
-   * si fuera el suyo. Con la herencia del CASO 1 la app da 18.437,27 € a cualquier sobrino; con
-   * 402.700 € de patrimonio son 18.459,16 €, con 1.000.000 € 19.359,02 € (921,75 € más) y con
-   * 5.000.000 € 22.125,42 €. La app hermana estimador-impuesto-sucesiones lo pide en euros desde
-   * `d96e492c`, así que la misma herencia tiene dos respuestas en meskeIA.
+   * La app no preguntaba el patrimonio preexistente del heredero (ni en euros ni por tramo) y
+   * multiplicaba SIEMPRE por `COEFICIENTES_IS[grupo][0]`, el del primer tramo del art. 22.2 LISD,
+   * con el supuesto escrito solo en un comentario de page.tsx: el panel rotulaba «× Coef.
+   * patrimonio (Grupo III) ×1,5882» como si fuera el suyo. Con la herencia del CASO 1 daba
+   * 18.437,27 € a cualquier sobrino; la app hermana estimador-impuesto-sucesiones lo pide en euros
+   * desde `d96e492c`, así que la misma herencia tenía dos respuestas en meskeIA.
    *
-   * Lo que se pide: o el campo (y entonces la cuota del oráculo de arriba), o el supuesto dicho
-   * junto a la cifra con su umbral exacto.
+   * Reparado con el patrón de la hermana: campo «Patrimonio preexistente del heredero (€)», vacío
+   * = 0 €, leído con `parseSpanishNumber` y liquidado con `cuotaTributariaConCorreccionIS`. El panel
+   * dice el tramo del que sale el coeficiente y, si actúa, la corrección del salto en su línea.
+   *
+   * Resuelto a mano ANTES de abrir el navegador, con la cuota íntegra del CASO 1 (11.608,91 €),
+   * la fila `COEFICIENTES_IS['III']` = 1,5882 / 1,6676 / 1,7471 / 1,9059 y Galicia sin
+   * bonificación al Grupo III:
+   *   · vacío (0 €) o 402.678,11 € justos → tramo 1 → × 1,5882 = 18.437,27 €
+   *   · 402.700 € → tramo 2 → 11.608,91 × 1,6676 = 19.359,02, pero el tope del último párrafo
+   *     del art. 22.2 es 18.437,27 + (402.700 − 402.678,11 = 21,89) = 18.459,16 €, así que la
+   *     corrección quita 19.359,02 − 18.459,16 = 899,86 €
+   *   · 1.000.000 € → tramo 2 → 19.359,02 €; el tope (18.437,27 + 597.321,89) no muerde
+   *   · 5.000.000 € → tramo 4 → 11.608,91 × 1,9059 = 22.125,42 €; la corrección tampoco muerde
    */
-  test('[01-A] ABIERTO — el patrimonio preexistente se pregunta, o el supuesto del primer tramo se dice junto a la cifra', async ({ page }) => {
-    test.fail(true, 'ABIERTO, hallazgo: la cuota supone en silencio el primer tramo de patrimonio del art. 22.2 LISD');
+  test('[01-A] REPARADO (01/10/2026) — el patrimonio preexistente se pregunta en euros y el coeficiente es el de su tramo', async ({ page }) => {
     await sobrinoGalicia(page, false);
+    const campo = page.getByLabel('Patrimonio preexistente del heredero (€):');
+    await expect(campo).toHaveCount(1);
+    await expect(campo).toHaveValue('');
+
+    // Vacío = 0 €: el primer tramo, y ahora dicho junto al coeficiente
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo III)')).toBe('×1,5882');
+    expect(await linea(page, ISD, 'Tramo de patrimonio preexistente')).toBe('1.º (de 0 a 402.678,11 €)');
     expect(await linea(page, ISD, 'Cuota ISD final')).toBe('18.437,27 €');
-    const campo = page.getByLabel(/patrimonio/i).first();
-    if ((await page.getByLabel(/patrimonio/i).count()) > 0) {
-      await campo.fill('402700');
-      await esperarValorEnReact(page, campo, '402700');
-      expect(await linea(page, ISD, 'Cuota ISD final')).toBe('18.459,16 €');
-      await campo.fill('1000000');
-      await esperarValorEnReact(page, campo, '1000000');
-      expect(await linea(page, ISD, 'Cuota ISD final')).toBe('19.359,02 €');
-    } else {
-      expect(await panel(page, ISD)).toContain('402.678,11');
-    }
+
+    // En el límite exacto, con sus céntimos y en formato español: tramo 1 por ley
+    await campo.fill('402.678,11');
+    await esperarValorEnReact(page, campo, '402.678,11');
+    expect(await linea(page, ISD, 'Tramo de patrimonio preexistente')).toBe('1.º (de 0 a 402.678,11 €)');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('18.437,27 €');
+
+    // 21,89 € por encima: coeficiente del tramo 2, topado por la corrección del salto
+    await campo.fill('402700');
+    await esperarValorEnReact(page, campo, '402700');
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo III)')).toBe('×1,6676');
+    expect(await linea(page, ISD, 'Tramo de patrimonio preexistente')).toBe(
+      '2.º (de más de 402.678,11 € a 2.007.380,43 €)'
+    );
+    expect(await linea(page, ISD, '− Corrección del salto de tramo (art. 22.2 LISD)')).toBe('−899,86 €');
+    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('18.459,16 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('18.459,16 €');
+
+    // Lejos del umbral la corrección no actúa: coeficiente entero, sin línea de corrección
+    await campo.fill('1.000.000');
+    await esperarValorEnReact(page, campo, '1.000.000');
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo III)')).toBe('×1,6676');
+    expect(await panel(page, ISD)).not.toContain('Corrección del salto');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('19.359,02 €');
+
+    await campo.fill('5000000');
+    await esperarValorEnReact(page, campo, '5000000');
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo III)')).toBe('×1,9059');
+    expect(await linea(page, ISD, 'Tramo de patrimonio preexistente')).toBe('4.º (más de 4.020.770,98 €)');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('22.125,42 €');
+
+    // La misma respuesta que el oráculo de data/fiscal, la fórmula de la app hermana
+    expect(cuotaTributariaConCorreccionIS(11608.91, COEFICIENTES_IS['III'], 5000000).cuotaTributaria).toBe(22125.42);
+  });
+
+  /**
+   * [01-A] RECHAZO — lo que no es un importe no se convierte en un cero inventado: con texto o con
+   * signo menos la app se abstiene y lo dice junto al campo. Y en Cataluña, cuya fila de
+   * coeficientes es plana (`COEFICIENTES_CATALUNA_IS['III']` = 1,5882 en los cuatro tramos), el
+   * patrimonio no mueve la cuota y el panel lo dice en vez de inventar un tramo.
+   */
+  test('[01-A] REPARADO (01/10/2026) — patrimonio ilegible: sin cifra; en Cataluña el patrimonio no influye', async ({ page }) => {
+    await sobrinoGalicia(page, false);
+    const campo = page.locator('#patrimonioPreexistente');
+
+    await campo.fill('mucho');
+    await esperarValorEnReact(page, campo, 'mucho');
+    await expect(page.locator('[role="alert"]', { hasText: 'no es un importe válido' })).toBeVisible();
+    await expect(page.getByText('Sin cifras: el patrimonio preexistente no es un importe válido')).toBeVisible();
+    await expect(page.locator('h3', { hasText: ISD })).toHaveCount(0);
+
+    await campo.fill('-500000');
+    await esperarValorEnReact(page, campo, '-500000');
+    await expect(page.locator('h3', { hasText: ISD })).toHaveCount(0);
+
+    // Vaciarlo vuelve a 0 €, el primer tramo
+    await campo.fill('');
+    await esperarValorEnReact(page, campo, '');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('18.437,27 €');
+
+    await campo.fill('1.000.000');
+    await esperarValorEnReact(page, campo, '1.000.000');
+    await page.selectOption('#ccaaSel', 'cataluna');
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo III)')).toBe('×1,5882');
+    expect(await linea(page, ISD, 'Tramo de patrimonio preexistente')).toBe('No influye en Cataluña');
   });
 
   /**
@@ -5886,33 +5963,65 @@ test.describe('Simulador de heredar vivienda — re-inspección 01/10/2026', () 
   });
 
   /**
-   * ❌ ABIERTO 01/10/2026 [01-B] (calculo, bajo) — el `test.fail()` afirma lo que DEBERÍA pasar.
+   * ✅ REPARADO (01/10/2026) [01-B] (calculo, bajo, hallazgo 2534).
    *
-   * Tras el aviso, la app liquida igualmente como Grupo I: el hijo de 30 años de arriba paga
+   * Tras el aviso, la app liquidaba igualmente como Grupo I: el hijo de 30 años de arriba pagaba
    * 536,93 € (bonificación del 99 % del Grupo I en Baleares) en vez de los 2684,64 € que el propio
-   * aviso da por correctos. En Cataluña la distancia es mayor: 785,91 € con la escala del Grupo I
-   * del art. 58 bis frente a 11.109,95 € con la del Grupo II. Y al revés: un hijo de 10 años dejado
-   * en «Hijo ≥21 (Grupo II)» paga 2684,64 € en vez de 455,58 € (reducción del art. 20.2.a topada
-   * en 47.858,59 € y 99 %). Es un aviso al pie de una cifra que el usuario se lleva: o se liquida
-   * con el grupo que corresponde a la edad, o no se da cifra.
+   * aviso daba por correctos; en Cataluña, 785,91 € con la escala del Grupo I del art. 58 bis
+   * frente a 11.109,95 €. Y al revés: un hijo de 10 años dejado en «Hijo ≥21 (Grupo II)» pagaba
+   * 2684,64 € en vez de 455,58 €.
+   *
+   * Reparado por la vía de NO dar cifra: con la edad en contra del grupo, la app avisa junto a la
+   * edad, dice «Sin cifras» en el sitio de los resultados y espera a que se elija la opción
+   * correcta. Se descartó reasignar el grupo en silencio porque con 21 años o más «descendiente»
+   * puede ser hijo o nieto, y en Cataluña reducen distinto (100.000 € frente a 50.000 €, art. 2
+   * de la Ley 19/2010): cualquier reasignación sería una cifra adivinada.
+   *
+   * Las cifras con la opción correcta, resueltas a mano:
+   *   · Baleares, hijo de 30 años, 300.000 € sin vivienda habitual: base imponible 309.000 −
+   *     15.956,87 = 293.043,13; cuota íntegra 40.011,04 + 53.654,00 × 25,50 % = 53.692,81;
+   *     Grupo II al 95 % → bonificación 51.008,17 → 2684,64 €
+   *   · Cataluña, el mismo hijo: 309.000 − 100.000 = 209.000 de base liquidable; tarifa catalana
+   *     3.500 + 11.000 + 59.000 × 17 % = 24.530,00; escala del Grupo II del art. 58 bis sobre la
+   *     base IMPONIBLE: (60.000 + 55.000 + 50.000 + 9.000 × 45 %) / 309.000 = 54,7087 % →
+   *     bonificación 13.420,05 → 11.109,95 €
+   *   · Baleares, hijo de 10 años como Grupo I: reducción 15.956,87 + 11 × 3.990,72 = 59.854,79,
+   *     topada en 47.858,59 → base liquidable 261.141,41; cuota íntegra 40.011,04 + 21.752,28 ×
+   *     25,50 % = 45.557,87; bonificación del 99 % 45.102,29 → 455,58 €
    */
-  test('[01-B] ABIERTO — una edad incompatible con el grupo elegido no se liquida con ese grupo', async ({ page }) => {
-    test.fail(true, 'ABIERTO, hallazgo: «Grupo I» con 21 años o más se liquida como Grupo I bajo el aviso');
+  test('[01-B] REPARADO (01/10/2026) — una edad incompatible con el grupo elegido no se liquida', async ({ page }) => {
     await abrir(page);
     await page.selectOption('#ccaaSel', 'baleares');
     await casilla(page, 'viviendaHabitual', false);
     await mover(page, 'valorRef', 300000);
     await mover(page, 'edadHer', 30);
+
+    // 30 años con la opción del Grupo I: aviso y ninguna cifra
     await page.selectOption('#parentescoSel', 'hijo_menor21');
-    if ((await page.locator('h3', { hasText: ISD }).count()) > 0) {
-      expect(await linea(page, ISD, 'Cuota ISD final')).toBe('2684,64 €');
-    }
-    // El reverso: 10 años con la opción del Grupo II → debería ser el Grupo I (455,58 €)
+    await expect(page.getByText(/Con 30 años el parentesco correcto es el Grupo II/)).toBeVisible();
+    await expect(page.getByText('Sin cifras: la edad (30 años) no corresponde al parentesco elegido')).toBeVisible();
+    await expect(page.locator('h3', { hasText: ISD })).toHaveCount(0);
+    await expect(page.getByText('Coste fiscal total acumulado')).toHaveCount(0);
+
+    // Con la opción que corresponde, la cifra del Grupo II
+    await page.selectOption('#parentescoSel', 'hijo');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('2684,64 €');
+    await page.selectOption('#ccaaSel', 'cataluna');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('11.109,95 €');
+    await page.selectOption('#parentescoSel', 'hijo_menor21');
+    await expect(page.locator('h3', { hasText: ISD })).toHaveCount(0);
+
+    // El reverso: 10 años con la opción del Grupo II → sin cifra; con la del Grupo I, 455,58 €
+    await page.selectOption('#ccaaSel', 'baleares');
     await page.selectOption('#parentescoSel', 'hijo');
     await mover(page, 'edadHer', 10);
-    if ((await page.locator('h3', { hasText: ISD }).count()) > 0) {
-      expect(await linea(page, ISD, 'Cuota ISD final')).toBe('455,58 €');
-    }
+    await expect(page.getByText(/es .*Grupo I.*, no Grupo II/)).toBeVisible();
+    await expect(page.locator('h3', { hasText: ISD })).toHaveCount(0);
+    await page.selectOption('#parentescoSel', 'nieto');
+    await expect(page.locator('h3', { hasText: ISD })).toHaveCount(0);
+    await page.selectOption('#parentescoSel', 'hijo_menor21');
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−47.858,59 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('455,58 €');
   });
 
   /**
@@ -5936,14 +6045,13 @@ test.describe('Simulador de heredar vivienda — re-inspección 01/10/2026', () 
   });
 
   /**
-   * ❌ ABIERTO 01/10/2026 [01-C] (contenido, bajo) — residuo del hallazgo 2128.
+   * ✅ REPARADO (01/10/2026) [01-C] (contenido, bajo, hallazgo 2535) — residuo del hallazgo 2128.
    *
-   * La línea del ajuar se escribe `({PORC_AJUAR} % del caudal…` con un espacio NORMAL (U+0020):
-   * «3 % del caudal» puede partirse entre el 3 y el %. Es la única de la página; la guarda del
-   * 2128 solo buscaba el `%` pegado (`\d%`), así que no podía verla.
+   * La línea del ajuar se escribía `({PORC_AJUAR} % del caudal…` con un espacio NORMAL (U+0020):
+   * «3 % del caudal» podía partirse entre el 3 y el %. Era la única de la página; la guarda del
+   * 2128 solo buscaba el `%` pegado (`\d%`), así que no podía verla. Ahora lleva `&nbsp;`.
    */
-  test('[01-C] ABIERTO — el «3 % del caudal» del ajuar lleva espacio duro, como el resto', async ({ page }) => {
-    test.fail(true, 'ABIERTO, hallazgo: «3 % del caudal» con espacio normal');
+  test('[01-C] REPARADO (01/10/2026) — el «3 % del caudal» del ajuar lleva espacio duro, como el resto', async ({ page }) => {
     await abrir(page);
     const principal = await page.locator('main').innerText();
     expect(principal).toContain('Ajuar doméstico (3');
@@ -5951,22 +6059,24 @@ test.describe('Simulador de heredar vivienda — re-inspección 01/10/2026', () 
   });
 
   /**
-   * ❌ ABIERTO 01/10/2026 [01-D] (contenido, bajo) — la cuarta respuesta del faqJsonLd dice que el
-   * simulador sirve «para comparar el impacto según la comunidad autónoma donde radica el
-   * inmueble». La propia página dice lo contrario dos veces: el selector pregunta la «CCAA donde
-   * residía el causante» y la tarjeta de buenas prácticas, «El ISD lo cobra la CCAA del fallecido».
+   * ✅ REPARADO (01/10/2026) [01-D] (contenido, bajo, hallazgo 2536) — la cuarta respuesta del
+   * faqJsonLd decía que el simulador sirve «para comparar el impacto según la comunidad autónoma
+   * donde radica el inmueble». La propia página dice lo contrario dos veces: el selector pregunta
+   * la «CCAA donde residía el causante» y la tarjeta de buenas prácticas, «El ISD lo cobra la CCAA
+   * del fallecido». Ahora la respuesta habla de la comunidad donde residía el fallecido.
    */
-  test('[01-D] ABIERTO — el faqJsonLd no sitúa el ISD en la CCAA donde radica el inmueble', async ({ page }) => {
-    test.fail(true, 'ABIERTO, hallazgo: el faqJsonLd contradice al selector sobre qué CCAA liquida el ISD');
+  test('[01-D] REPARADO (01/10/2026) — el faqJsonLd no sitúa el ISD en la CCAA donde radica el inmueble', async ({ page }) => {
     await abrir(page);
     await expect(page.locator('label[for="ccaaSel"]')).toContainText('CCAA donde residía el causante');
     const faq = (await faqServida(page)).map((q) => q.acceptedAnswer.text).join(' ');
     expect(faq).not.toContain('donde radica el inmueble');
+    const util = (await faqServida(page)).find((q) => q.name.startsWith('¿Para quién es útil'));
+    expect(util?.acceptedAnswer.text).toContain('comunidad autónoma donde residía el fallecido');
   });
 
   /**
-   * ❌ ABIERTO 01/10/2026 [01-E] (contenido, bajo) — la tarjeta «El ISD lo cobra la CCAA del
-   * fallecido» remata «pagas en Madrid (mucho más beneficioso en este caso)». Es una valoración
+   * ✅ REPARADO (01/10/2026) [01-E] (contenido, bajo, hallazgo 2537) — la tarjeta «El ISD lo
+   * cobra la CCAA del fallecido» remataba «pagas en Madrid (mucho más beneficioso en este caso)». Es una valoración
    * territorial (CLAUDE.md §1.quinquies.6) y el motor de la página la desmiente en el caso que la
    * app simula: hijo de 45 años, 300.000 € de vivienda habitual → Madrid 253,59 € (309.000 −
    * 15.956,87 − 122.606,47 = 170.436,66; 25.358,64 − 99 %) y Cataluña 0,00 € (309.000 − 100.000 −
@@ -5985,13 +6095,16 @@ test.describe('Simulador de heredar vivienda — re-inspección 01/10/2026', () 
     expect(await linea(page, ISD, 'Cuota ISD final')).toBe('0,00 €');
   });
 
-  test('[01-E] ABIERTO — la tarjeta del ISD por CCAA no califica Madrid de «mucho más beneficioso»', async ({ page }) => {
-    test.fail(true, 'ABIERTO, hallazgo: valoración territorial que el propio motor desmiente');
+  test('[01-E] REPARADO (01/10/2026) — la tarjeta del ISD por CCAA no califica Madrid de «mucho más beneficioso»', async ({ page }) => {
     await abrir(page);
     // `textContent` y no `innerText`: <EducationalSection> oculta su contenido por CSS
     const tarjeta = page
       .locator('strong', { hasText: 'El ISD lo cobra la CCAA del fallecido' })
       .locator('xpath=..');
-    expect(await tarjeta.textContent()).not.toContain('mucho más beneficioso');
+    const texto = (await tarjeta.textContent()) ?? '';
+    expect(texto).not.toContain('mucho más beneficioso');
+    expect(texto).not.toMatch(/beneficios|favorable|onerosa/i);
+    // Sigue diciendo el hecho: se aplica la normativa de la comunidad del fallecido
+    expect(texto).toContain('se aplica la normativa de Madrid');
   });
 });

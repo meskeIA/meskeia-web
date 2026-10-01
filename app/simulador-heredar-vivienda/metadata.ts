@@ -157,7 +157,7 @@ export const faqJsonLd = {
       name: '¿Para quién es útil este simulador de heredar vivienda?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es útil para herederos que quieren estimar el coste fiscal total antes de tomar decisiones: aceptar la herencia, vender inmediatamente, esperar o acordar con otros herederos. También sirve para comparar el impacto según la comunidad autónoma donde radica el inmueble. Los resultados son orientativos y no sustituyen a un asesor fiscal o notario.',
+        text: 'Es útil para herederos que quieren estimar el coste fiscal total antes de tomar decisiones: aceptar la herencia, vender inmediatamente, esperar o acordar con otros herederos. También sirve para comparar el impacto según la comunidad autónoma donde residía el fallecido, que es la que liquida el Impuesto de Sucesiones (no la del heredero ni la de la vivienda; la plusvalía municipal, en cambio, se paga en el Ayuntamiento donde está el inmueble). Los resultados son orientativos y no sustituyen a un asesor fiscal o notario.',
       },
     },
     {

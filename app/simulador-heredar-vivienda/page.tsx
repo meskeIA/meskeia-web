@@ -13,7 +13,7 @@ import {
   DataReference,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber, formatCurrency, formatDate } from '@/lib';
+import { formatNumber, formatCurrency, formatDate, parseSpanishNumber } from '@/lib';
 import {
   FISCAL_SUCESIONES_META,
   TARIFA_ESTATAL_IS,
@@ -23,6 +23,9 @@ import {
   BONIFICACIONES_CCAA_IS,
   COEFICIENTES_IS,
   COEFICIENTES_CATALUNA_IS,
+  LIMITES_PATRIMONIO_PREEXISTENTE_IS,
+  indiceTramoPatrimonioIS,
+  cuotaTributariaConCorreccionIS,
   coeficienteIIVTNU,
   REDUCCION_VIVIENDA_PORC_IS,
   PORC_AJUAR_DOMESTICO_IS,
@@ -76,11 +79,36 @@ const PORC_REDUCCION_VIVIENDA = formatNumber(REDUCCION_VIVIENDA_PORC_IS * 100, 0
 const PORC_AJUAR = formatNumber(PORC_AJUAR_DOMESTICO_IS * 100, 0);
 
 /**
- * El coeficiente multiplicador del Grupo IV con el patrimonio preexistente más bajo, que es
- * el supuesto que simula esta app (índice 0). La tarjeta educativa lo escribía a mano en la
- * misma frase en la que SÍ derivaba el otro extremo de la fila (hallazgo 658).
+ * El coeficiente multiplicador del Grupo IV con el patrimonio preexistente más bajo (índice 0,
+ * primer tramo del art. 22.2 LISD). La tarjeta educativa lo escribía a mano en la misma frase
+ * en la que SÍ derivaba el otro extremo de la fila (hallazgo 658).
  */
 const COEF_GRUPO_IV_MIN = COEFICIENTES_IS['IV'][0];
+
+/**
+ * Los cuatro tramos de patrimonio preexistente del art. 22.2 LISD, con los límites EXACTOS de
+ * `data/fiscal` (con sus céntimos: quien tiene justo 402.678,11 € es tramo 1 por ley).
+ */
+function rangoTramoPatrimonio(k: number): string {
+  const [l1, l2, l3] = LIMITES_PATRIMONIO_PREEXISTENTE_IS;
+  return [
+    `de 0 a ${formatCurrency(l1)}`,
+    `de más de ${formatCurrency(l1)} a ${formatCurrency(l2)}`,
+    `de más de ${formatCurrency(l2)} a ${formatCurrency(l3)}`,
+    `más de ${formatCurrency(l3)}`,
+  ][k] ?? '';
+}
+
+/**
+ * Lee el patrimonio preexistente tecleado. Vacío vale 0 € (primer tramo, el supuesto que la app
+ * aplicaba en silencio hasta el hallazgo 2533); lo que no es un importe válido —texto, signo
+ * menos— devuelve `null` y la app se abstiene de dar cifra en vez de inventar un cero.
+ */
+function leerPatrimonio(texto: string): number | null {
+  if (texto.trim() === '') return 0;
+  const n = parseSpanishNumber(texto);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -101,6 +129,12 @@ interface ResultadoISD {
   baseLiquidable: number;
   cuotaIntegra: number;
   coeficiente: number;
+  /** Índice 0-3 del tramo de patrimonio preexistente del art. 22.2 LISD. */
+  tramoPatrimonio: number;
+  /** Si la fila de coeficientes del grupo es plana (Cataluña): el patrimonio no la mueve. */
+  coeficientePlano: boolean;
+  /** Lo que la corrección del salto del art. 22.2 in fine quita a la cuota (0 si no actúa). */
+  correccionSalto: number;
   cuotaTributaria: number;
   bonificacion: number;
   cuotaFinal: number;
@@ -381,7 +415,8 @@ function calcularISD(
   ccaa: string,
   viviendaHabitual: boolean,
   edad: number,
-  convivioDosAnios: boolean
+  convivioDosAnios: boolean,
+  patrimonioPreexistente: number
 ): ResultadoISD {
   const parentescoData = PARENTESCOS.find(p => p.id === parentesco) ?? PARENTESCOS[0];
   const grupo = parentescoData.grupo;
@@ -475,11 +510,26 @@ function calcularISD(
   const tarifa = esCataluna ? TARIFA_CATALUNA_IS : TARIFA_ESTATAL_IS;
   const cuotaIntegra = redondearCentimos(calcularCuotaIntegraIS(baseLiquidable, tarifa));
 
-  // Coeficiente por patrimonio preexistente, desde data/fiscal. Índice 0 = primer tramo
-  // (patrimonio del heredero < 402.678,11 €), que es el supuesto que simula esta app.
+  /**
+   * Coeficiente por patrimonio preexistente del heredero (art. 22.2 LISD), con la corrección del
+   * salto de su último párrafo: la fórmula es la de `data/fiscal`, la misma que aplica
+   * `estimador-impuesto-sucesiones`.
+   *
+   * ⚠️ 01/10/2026 (hallazgo 2533) — la app no preguntaba el patrimonio y multiplicaba SIEMPRE por
+   * el coeficiente del primer tramo («De 0 a 402.678,11»), con el supuesto escrito solo en este
+   * comentario. Un sobrino gallego con 1.000.000 € de patrimonio y 11.608,91 € de cuota íntegra
+   * leía 18.437,27 € (× 1,5882) donde la ley y la app hermana dan 19.359,02 € (× 1,6676): la
+   * misma herencia, dos respuestas en meskeIA.
+   */
   const tablaCoeficientes = esCataluna ? COEFICIENTES_CATALUNA_IS : COEFICIENTES_IS;
-  const coeficiente = tablaCoeficientes[grupo]?.[0] ?? 1.0;
-  const cuotaTributaria = redondearCentimos(cuotaIntegra * coeficiente);
+  const filaCoeficientes = tablaCoeficientes[grupo] ?? [1, 1, 1, 1];
+  const tramoPatrimonio = indiceTramoPatrimonioIS(Math.max(0, patrimonioPreexistente));
+  const coeficientePlano = filaCoeficientes.every((c) => c === filaCoeficientes[0]);
+  const {
+    coeficiente,
+    cuotaTributaria,
+    correccionSalto,
+  } = cuotaTributariaConCorreccionIS(cuotaIntegra, filaCoeficientes, patrimonioPreexistente);
 
   // Bonificación CCAA
   let bonificacionPorc = 0;
@@ -540,6 +590,9 @@ function calcularISD(
     baseLiquidable,
     cuotaIntegra,
     coeficiente,
+    tramoPatrimonio,
+    coeficientePlano,
+    correccionSalto,
     cuotaTributaria,
     bonificacion,
     cuotaFinal,
@@ -558,7 +611,7 @@ function calcularISD(
  * la CCAA más cara ni el coeficiente más alto del Grupo IV llegan ahí. Y era el texto que
  * aconseja «valorar si compensa renunciar a la herencia» (hallazgo 275 del Inspector).
  */
-const EJEMPLO_GRUPO_IV = calcularISD(200000, 'sin_parentesco', 'madrid', false, 50, false);
+const EJEMPLO_GRUPO_IV = calcularISD(200000, 'sin_parentesco', 'madrid', false, 50, false, 0);
 
 function calcularPlusvaliaMunicipal(
   valorCatastralSuelo: number,
@@ -695,6 +748,15 @@ export default function SimuladorHeredarViviendaPage() {
   const [convivioDosAnios, setConvivioDosAnios] = useState<boolean>(false);
   const [aniosHastaVenta, setAniosHastaVenta] = useState<number>(5);
   const [valorVenta, setValorVenta] = useState<number>(250000);
+  /**
+   * Patrimonio preexistente del heredero, como IMPORTE y no por tramos: la corrección del salto
+   * del art. 22.2 LISD depende de cuánto pasa el patrimonio del límite (hallazgo 2533). Texto
+   * libre en formato español; vacío vale 0 €, el primer tramo.
+   */
+  const [patrimonioTexto, setPatrimonioTexto] = useState<string>('');
+  const patrimonioLeido = leerPatrimonio(patrimonioTexto);
+  const patrimonioInvalido = patrimonioLeido === null;
+  const patrimonioPreexistente = patrimonioLeido ?? 0;
 
   // El año real solo se conoce en el navegador: en el primer render (y en el HTML que se
   // sirve) vale ANIO_REFERENCIA, para que servidor y cliente pinten lo mismo
@@ -723,6 +785,7 @@ export default function SimuladorHeredarViviendaPage() {
     setConvivioDosAnios(false);
     setAniosHastaVenta(caso.aniosHastaVenta);
     setValorVenta(caso.valorVenta);
+    // El patrimonio preexistente es del heredero, no del caso: se deja como esté.
   }, []);
 
   // Cálculos
@@ -743,8 +806,8 @@ export default function SimuladorHeredarViviendaPage() {
   const textoFechaAdquisicion = formatDate(new Date(anioAdquisicion, mesAdquisicion - 1, diaAdquisicionEfectivo));
 
   const isd = useMemo(
-    () => calcularISD(valorReferencia, parentesco, ccaa, viviendaHabitual, edad, convivioDosAnios),
-    [valorReferencia, parentesco, ccaa, viviendaHabitual, edad, convivioDosAnios]
+    () => calcularISD(valorReferencia, parentesco, ccaa, viviendaHabitual, edad, convivioDosAnios, patrimonioPreexistente),
+    [valorReferencia, parentesco, ccaa, viviendaHabitual, edad, convivioDosAnios, patrimonioPreexistente]
   );
 
   const plusvalia = useMemo(
@@ -815,8 +878,8 @@ export default function SimuladorHeredarViviendaPage() {
     ccaa === 'cataluna' ? REDUCCION_VIVIENDA_MAX_CATALUNA_IS : REDUCCION_VIVIENDA_MAX_IS;
 
   const isdSinReduccionVivienda = useMemo(
-    () => calcularISD(valorReferencia, parentesco, ccaa, false, edad, convivioDosAnios),
-    [valorReferencia, parentesco, ccaa, edad, convivioDosAnios]
+    () => calcularISD(valorReferencia, parentesco, ccaa, false, edad, convivioDosAnios, patrimonioPreexistente),
+    [valorReferencia, parentesco, ccaa, edad, convivioDosAnios, patrimonioPreexistente]
   );
 
   const ventaDentroDePlazo =
@@ -876,6 +939,27 @@ export default function SimuladorHeredarViviendaPage() {
   const avisoEdad = edad < 21 && (parentesco === 'hijo' || parentesco === 'nieto');
   const avisoGrupoIMayor = edad >= 21 && parentesco === 'hijo_menor21';
   const avisoGrupoICataluna = parentesco === 'hijo_menor21' && edad < 21 && ccaa === 'cataluna';
+  /**
+   * La edad decide el grupo del descendiente (art. 20.2.a LISD: Grupo I por debajo de 21 años,
+   * Grupo II desde los 21). Si contradice la opción elegida, NO se liquida.
+   *
+   * ⚠️ 01/10/2026 (hallazgo 2534) — los dos primeros avisos de arriba iban al pie de una cuota
+   * calculada con el grupo equivocado: un hijo de 30 años en «Grupo I» pagaba en Baleares 536,93 €
+   * (99 % del Grupo I) en vez de 2684,64 €, y en Cataluña 785,91 € con la escala del Grupo I del
+   * art. 58 bis en vez de 11.109,95 €. Se descartó reasignar el grupo en silencio: con 21 años o
+   * más, «descendiente» puede ser hijo o nieto, y en Cataluña reducen distinto (art. 2 de la
+   * Ley 19/2010), así que cualquier reasignación sería una cifra adivinada. O se calcula con el
+   * grupo correcto, o no hay cifra: la elección es del usuario, y el aviso le dice cuál.
+   */
+  const grupoIncompatibleConEdad = avisoEdad || avisoGrupoIMayor;
+  /** Por qué no se da ninguna cifra, o `null` si se puede liquidar. */
+  const motivoSinCifras = fechaAdquisicionFutura
+    ? 'la fecha de adquisición del causante es posterior a hoy. Corrígela en «Datos del causante»'
+    : grupoIncompatibleConEdad
+      ? `la edad (${edad} años) no corresponde al parentesco elegido. Elige en «Datos del heredero» la opción de su grupo`
+      : patrimonioInvalido
+        ? 'el patrimonio preexistente no es un importe válido. Escríbelo en euros (por ejemplo, 250.000) o déjalo vacío si es 0 €'
+        : null;
 
   // Grupo del parentesco elegido, para decidir qué campos tienen sentido en el formulario
   const grupoParentesco = PARENTESCOS.find(p => p.id === parentesco)?.grupo ?? 'II';
@@ -1109,14 +1193,17 @@ export default function SimuladorHeredarViviendaPage() {
             {avisoEdad && (
               <p className={styles.sliderHint} role="status" aria-live="polite">
                 <span aria-hidden="true">⚠️</span> Con menos de 21 años, un hijo o descendiente
-                es <strong>Grupo I</strong>, no Grupo II: elige esa opción en el parentesco para
-                que se aplique la reducción del art. 20.2.a LISD.
+                es <strong>Grupo I</strong>, no Grupo II: elige «Hijo o descendiente &lt;21 años»
+                en el parentesco para que se aplique la reducción del art. 20.2.a LISD. Mientras
+                tanto no se calcula ninguna cifra.
               </p>
             )}
             {avisoGrupoIMayor && (
               <p className={styles.sliderHint} role="status" aria-live="polite">
                 <span aria-hidden="true">⚠️</span> El Grupo I es solo para descendientes de
-                menos de 21 años. Con {edad} años el parentesco correcto es el Grupo II.
+                menos de 21 años. Con {edad} años el parentesco correcto es el Grupo II. Elige
+                «Hijo o hija ≥21 años» o «Nieto u otro descendiente ≥21 años»: mientras tanto no
+                se calcula ninguna cifra.
               </p>
             )}
             {avisoGrupoICataluna && (
@@ -1145,6 +1232,40 @@ export default function SimuladorHeredarViviendaPage() {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Hallazgo 2533: el coeficiente del art. 22.2 LISD depende de este dato, y la app lo
+              suponía en el primer tramo sin preguntarlo. Mismo patrón que la app hermana
+              estimador-impuesto-sucesiones: importe en euros, vacío = 0 €, tramo derivado. */}
+          <div className={styles.ccaaSelector}>
+            <label className={styles.selectLabel} htmlFor="patrimonioPreexistente">
+              Patrimonio preexistente del heredero (€):
+            </label>
+            <input
+              id="patrimonioPreexistente"
+              type="text"
+              inputMode="decimal"
+              autoComplete="off"
+              placeholder="0,00"
+              value={patrimonioTexto}
+              onChange={e => setPatrimonioTexto(e.target.value)}
+              className={`${styles.select} ${styles.inputImporte}`}
+              aria-invalid={patrimonioInvalido}
+              aria-describedby="patrimonioPreexistenteAyuda"
+            />
+            <p id="patrimonioPreexistenteAyuda" className={styles.sliderHint}>
+              {patrimonioInvalido
+                ? 'No es un importe válido: escríbelo en euros, sin signo (por ejemplo, 250.000).'
+                : isd.coeficientePlano
+                  ? `${isd.ccaaNombre}: el coeficiente del Grupo ${isd.grupo} es el mismo con cualquier patrimonio previo. Vacío cuenta como 0 €.`
+                  : `Tramo ${isd.tramoPatrimonio + 1} del coeficiente multiplicador del art. 22.2 LISD (${rangoTramoPatrimonio(isd.tramoPatrimonio)}). Vacío cuenta como 0 €.`}
+            </p>
+            {patrimonioInvalido && (
+              <p className={styles.avisoMantenimiento} role="alert">
+                El patrimonio preexistente «{patrimonioTexto}» no es un importe válido: mientras
+                tanto no se calcula ninguna cifra.
+              </p>
+            )}
           </div>
         </div>
 
@@ -1325,11 +1446,12 @@ export default function SimuladorHeredarViviendaPage() {
             no tres. */}
         {/* Con una adquisición posterior a hoy no hay liquidación posible: o se calcula, o no hay
             cifra (hallazgo 2125). El aviso con la fecha vive junto al campo, en «Datos del causante». */}
-        {fechaAdquisicionFutura ? (
+        {/* Lo mismo con un grupo que la edad contradice (hallazgo 2534) o un patrimonio
+            ilegible: el motivo lo da `motivoSinCifras`, y el aviso detallado vive junto al campo. */}
+        {motivoSinCifras ? (
           <div className={styles.panel} role="status">
             <p className={styles.muted}>
-              Sin cifras: la fecha de adquisición del causante es posterior a hoy. Corrígela en
-              «Datos del causante» para ver el ISD, la plusvalía municipal y el IRPF.
+              Sin cifras: {motivoSinCifras} para ver el ISD, la plusvalía municipal y el IRPF.
             </p>
           </div>
         ) : (
@@ -1347,7 +1469,7 @@ export default function SimuladorHeredarViviendaPage() {
               <strong>{formatCurrency(isd.caudalRelicto)}</strong>
             </div>
             <div className={styles.panelLine}>
-              <span>+ Ajuar doméstico ({PORC_AJUAR} % del caudal, art. 15 LISD)</span>
+              <span>+ Ajuar doméstico ({PORC_AJUAR}&nbsp;% del caudal, art. 15 LISD)</span>
               <strong>+{formatCurrency(isd.ajuarDomestico)}</strong>
             </div>
             <div className={styles.panelLine}>
@@ -1388,6 +1510,22 @@ export default function SimuladorHeredarViviendaPage() {
               <span>× Coef. patrimonio (Grupo {isd.grupo})</span>
               <strong>×{formatNumber(isd.coeficiente, 4)}</strong>
             </div>
+            {/* El tramo del que sale el coeficiente, para que el rótulo diga de quién es: hasta el
+                hallazgo 2533 era siempre el primero y no se decía en ninguna parte. */}
+            <div className={styles.panelLine}>
+              <span>Tramo de patrimonio preexistente</span>
+              <strong>
+                {isd.coeficientePlano
+                  ? `No influye en ${isd.ccaaNombre}`
+                  : `${isd.tramoPatrimonio + 1}.º (${rangoTramoPatrimonio(isd.tramoPatrimonio)})`}
+              </strong>
+            </div>
+            {isd.correccionSalto > 0 && (
+              <div className={styles.panelLine}>
+                <span>− Corrección del salto de tramo (art. 22.2 LISD)</span>
+                <strong>−{formatCurrency(isd.correccionSalto)}</strong>
+              </div>
+            )}
             <div className={styles.panelLine}>
               <span>= Cuota tributaria</span>
               <strong>{formatCurrency(isd.cuotaTributaria)}</strong>
@@ -1754,7 +1892,13 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.escenarioCard}>
             <h4>Hermano o sobrino hereda (Grupo III)</h4>
             <p>
-              Reducción de parentesco mucho menor ({formatCurrency(REDUCCIONES_PARENTESCO_IS['III'] ?? 0)}) y coeficiente multiplicador {formatNumber(COEFICIENTES_IS['III'][0], 4)}.
+              {/* El coeficiente depende del patrimonio previo del heredero (art. 22.2 LISD): la
+                  tarjeta daba el del primer tramo como si fuera EL coeficiente (hallazgo 2533). */}
+              Reducción de parentesco mucho menor ({formatCurrency(REDUCCIONES_PARENTESCO_IS['III'] ?? 0)}) y un coeficiente
+              multiplicador de {formatNumber(COEFICIENTES_IS['III'][0], 4)} si su patrimonio previo no pasa de{' '}
+              {formatCurrency(LIMITES_PATRIMONIO_PREEXISTENTE_IS[0])}, que sube por tramos hasta{' '}
+              {formatNumber(COEFICIENTES_IS['III'][COEFICIENTES_IS['III'].length - 1], 4)} por encima de{' '}
+              {formatCurrency(LIMITES_PATRIMONIO_PREEXISTENTE_IS[2])}.
               La mayoría de CCAA NO bonifican al Grupo III. Resultado: tributación notable, a
               menudo decenas de miles de euros sobre 200-300k.
             </p>
@@ -1762,8 +1906,9 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.escenarioCard}>
             <h4>Heredero del Grupo IV (sin parentesco)</h4>
             <p>
-              Coeficiente multiplicador {formatNumber(COEF_GRUPO_IV_MIN, 1)} y sin reducciones. Casi ninguna CCAA bonifica.
-              Heredar 200.000 € supone {formatCurrency(EJEMPLO_GRUPO_IV.cuotaFinal)} de ISD en
+              Coeficiente multiplicador {formatNumber(COEF_GRUPO_IV_MIN, 1)} con un patrimonio previo de hasta{' '}
+              {formatCurrency(LIMITES_PATRIMONIO_PREEXISTENTE_IS[0])} y sin reducciones. Casi ninguna CCAA bonifica.
+              Heredar 200.000 € con ese patrimonio supone {formatCurrency(EJEMPLO_GRUPO_IV.cuotaFinal)} de ISD en
               régimen común, y más con un patrimonio previo alto (el coeficiente llega a {formatNumber(COEFICIENTES_IS['IV'][COEFICIENTES_IS['IV'].length - 1], 1)}).
               Conviene valorar si compensa renunciar a la herencia (la herencia es siempre
               voluntaria). Simula tu caso arriba: cada CCAA cambia el resultado.
@@ -1917,7 +2062,10 @@ export default function SimuladorHeredarViviendaPage() {
             <span className={styles.tipIcon} aria-hidden="true">📍</span>
             <div>
               <strong>El ISD lo cobra la CCAA del fallecido</strong>
-              <p>No la del heredero. Si el fallecido vivía en Madrid y tú en Cataluña, pagas en Madrid (mucho más beneficioso en este caso).</p>
+              {/* Sin calificar a ninguna de las dos (CLAUDE.md §1.quinquies.6, hallazgo 2537): cuál
+                  sale más barata depende del caso, y con la vivienda habitual que simula esta app
+                  el propio motor da Cataluña por debajo de Madrid. */}
+              <p>No la del heredero. Si el fallecido vivía en Madrid y tú en Cataluña, se aplica la normativa de Madrid. Cuál de las dos sale más barata depende del parentesco, del importe y de si era la vivienda habitual: cambia la comunidad en el selector y compáralas.</p>
             </div>
           </div>
           <div className={styles.tipCard}>

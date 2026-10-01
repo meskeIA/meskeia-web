@@ -818,3 +818,17 @@
 [data-theme='dark'] .avisoMantenimiento strong {
   color: #fcd34d;
 }
+
+/* Campo de importe (patrimonio preexistente, hallazgo 2533): hereda el aspecto de `.select`,
+   también su variante oscura, y solo cambia el cursor. */
+.inputImporte {
+  cursor: text;
+}
+
+.inputImporte[aria-invalid='true'] {
+  border-color: #b91c1c;
+}
+
+[data-theme='dark'] .inputImporte[aria-invalid='true'] {
+  border-color: #f87171;
+}
