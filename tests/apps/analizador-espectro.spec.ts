@@ -207,11 +207,15 @@ async function hercios(page: Page): Promise<number> {
  * Re-inspección del 01/10/2026: esos 7 Hz NO eran ruido de los bytes. `inyectarTono` suena con
  * ganancia 0,9 y satura varios bins seguidos a 255; el motor elige el PRIMERO de la meseta y le
  * suma medio bin, así que la cifra se va hacia abajo hasta un bin. Con un tono a −26 dBFS el
- * error baja a menos de 1 Hz (ver «Re-inspección» al final). Esta tolerancia se deja como está
- * porque estos tests vigilan los hallazgos 884-886 (cifra que falta o rejilla de 64 bandas),
- * y el sesgo de la meseta tiene su propio test, más estrecho.
+ * error baja a menos de 1 Hz (ver «Re-inspección» al final).
+ *
+ * Reparado el 01/10/2026 (hallazgo 2567): la cifra se mide ahora sobre getFloatFrequencyData,
+ * los dB sin recortar, y la meseta desaparece. Con eso los 9 Hz ya no tapan nada: se aprieta a
+ * 1 Hz, que es lo que da el afinado parabólico sobre la ventana de Blackman (su sesgo es de unas
+ * centésimas de bin, 0,2 Hz) con margen para el suavizado. Con 9 Hz el sesgo de la meseta —hasta
+ * un bin, 5,9 Hz— pasaba por estos tests sin que nadie lo viera.
  */
-const TOLERANCIA_HZ = 9;
+const TOLERANCIA_HZ = 1;
 
 test.describe('Analizador de Espectro · lo que funciona', () => {
   test('un tono puro de 440 Hz se lee como 440 Hz y se etiqueta A4', async ({ page }) => {
@@ -504,6 +508,10 @@ test.describe('Los 8 hallazgos del 18/09/2026, reparados el mismo día', () => {
  * derecha) y la parábola, con un vecino a 255, suma exactamente medio bin. Esto NO lo trajo el
  * motor nuevo: el código en línea del 18/09 también elegía el primero. Pero generador-tonos no
  * lo sufre, porque le pasa dB en coma flotante, que no se recortan.
+ *
+ * REPARADOS el 01/10/2026 los 8 (2567-2574). La cifra se mide ahora sobre getFloatFrequencyData
+ * (dB sin recortar) y el motor da el centro de una meseta y decide el rango por la frecuencia
+ * afinada de cada cima; los goldens están en tests/frecuencia-dominante-motor.spec.ts.
  * ══════════════════════════════════════════════════════════════════════════════════════════ */
 
 type VentanaEspia = Window & {
@@ -662,9 +670,12 @@ test.describe('Re-inspección 01/10/2026 · lo que el motor compartido NO ha rot
 });
 
 test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
-  test.fail(
-    'ABIERTO, hallazgo: con un tono fuerte la meseta de bytes saturados hunde la cifra — Mi2 a −6 dBFS sale «79 Hz · D#2»',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2567: con un tono fuerte la meseta de bytes saturados hundía la cifra — Mi2 a −6 dBFS salía «79 Hz · D#2»',
     async ({ page }) => {
+      // Reparación: la app mide sobre getFloatFrequencyData (dB sin recortar) y deja los bytes
+      // para el dibujo; el motor, además, ya da el centro de una meseta y no su primer bin.
+      // El __maxByte = 255 de abajo prueba que el caso sigue SATURANDO los bytes.
       // Esperado (a mano, arriba): «82 Hz», E2, 0 ¢. Obtenido el 01/10/2026: «79 Hz», D#2 +29 ¢.
       // Los bytes 13, 14 y 15 valen 255; el motor elige el 13 y le suma medio bin: 13,5 ×
       // 5,859 = 79,1 Hz. Igual un La1 de 55 Hz → «50 Hz · G1 +28 ¢». Se tolera ±1 Hz y ±10 ¢,
@@ -677,9 +688,11 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: un tono de 20,3 Hz, dentro del rango de 20 Hz–20 kHz, da «-- Hz» a 48 kHz desde c3e3e8ca',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2568: un tono de 20,3 Hz, dentro del rango de 20 Hz–20 kHz, daba «-- Hz» a 48 kHz desde c3e3e8ca',
     async ({ page }) => {
+      // Reparación: el motor decide si una cima es del rango por su frecuencia AFINADA, no por
+      // el bin donde cae, así que la cima del bin 3 (17,58 Hz) que afina en 20,3 Hz cuenta.
       // Esperado: «20 Hz», E0 −26 ¢. Obtenido: «-- Hz» y «--». Su cima está en el bin 3
       // (17,58 Hz), que el rango nuevo —ceil(20/5,859) = 4— deja fuera, y el 4 es flanco. Con
       // el motor del 18/09 (floor, bin 3 dentro) los mismos bytes medidos (183, 216, 215)
@@ -691,8 +704,8 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: el mismo de arriba, agravado por la meseta — un tono FUERTE de 25 Hz da «-- Hz»',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2568: el mismo de arriba, agravado por la meseta — un tono FUERTE de 25 Hz daba «-- Hz»',
     async ({ page }) => {
       // Esperado: «25 Hz», G0 +35 ¢. Obtenido: «-- Hz». La meseta a 255 empieza en el bin 3,
       // fuera del rango, así que ningún bin del rango es cima de su lóbulo: con un tono fuerte
@@ -703,9 +716,11 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: dos clics en «Iniciar» abren dos micrófonos y «Detener» solo cierra uno',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2569: dos clics en «Iniciar» abrían dos micrófonos y «Detener» solo cerraba uno',
     async ({ page }) => {
+      // Reparación: startAnalyzing no abre nada mientras otra apertura está en curso (ni si ya
+      // hay una captura), con una guarda en un ref, que no espera a un render.
       // Esperado: tras «Detener», todas las pistas en 'ended' y todos los contextos en 'closed'.
       // Obtenido el 01/10/2026: una pista 'live' y un AudioContext 'running' —el micrófono sigue
       // abierto, con su indicador encendido, hasta cerrar la pestaña—. startAnalyzing no tiene
@@ -740,14 +755,19 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
         };
       });
       expect(estado.pistas.length).toBeGreaterThan(0);
+      // Y el segundo clic ni siquiera llegó a pedir el micrófono: una sola captura.
+      expect(estado.pistas.length).toBe(1);
       expect(estado.pistas.filter((p) => p !== 'ended')).toEqual([]);
       expect(estado.contextos.filter((c) => c !== 'closed')).toEqual([]);
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: la región viva se re-anuncia en cada fotograma, entera, con su párrafo',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2570: la región viva se re-anunciaba en cada fotograma, entera, con su párrafo',
     async ({ page }) => {
+      // Reparación: la cifra visible ya no es región viva; el lector de pantalla oye una frase
+      // corta («Frecuencia dominante: 440 hercios, nota A4, más 0 cents») en una región aparte,
+      // actualizada como mucho cada 1,2 s y solo si cambia, sin el párrafo sobre la FFT.
       // `role="status" aria-live="polite" aria-atomic="true"` envuelve la cifra, la nota Y el
       // párrafo de 40 palabras sobre la FFT, y la cifra cambia en cada requestAnimationFrame.
       // Esperado: como mucho un anuncio por segundo (3 en 3 s). Obtenido con el pitido
@@ -786,12 +806,20 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
           }),
       );
       expect(cambios).toBeLessThanOrEqual(3);
+      // Una sola región viva en el panel, corta y sin el párrafo de la FFT.
+      const regiones = page.locator('[class*="analyzerPanel"] [aria-live], [class*="analyzerPanel"] [role="status"]');
+      await expect(regiones).toHaveCount(1);
+      await expect(regiones).not.toContainText('FFT');
+      await expect(regiones).toContainText(/Frecuencia dominante|Sin frecuencia dominante/);
+      expect(((await regiones.textContent()) ?? '').length).toBeLessThan(100);
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: en el tema claro los marcadores de pico son blancos sobre fondo blanco',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2571: en el tema claro los marcadores de pico eran blancos sobre fondo blanco',
     async ({ page }) => {
+      // Reparación: el marcador se pinta con --text-primary, leído del tema como el resto de
+      // colores del lienzo (#1A1A1A sobre #FFFFFF en claro, 17:1).
       // «Mostrar picos» viene marcado y el JSON-LD promete «marcadores de picos con decay
       // automático». El código los pinta con '#ffffff' fijo, y el fondo del lienzo es
       // --bg-card, que en el tema claro (el de por defecto) es #FFFFFF: contraste 1:1, no se ven.
@@ -838,11 +866,21 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
       expect(fondos).toEqual(['#ffffff']);
       expect(marcadores.length).toBeGreaterThan(0);
       for (const color of marcadores) expect(color).not.toBe('#ffffff');
+      // Contraste de cada marcador con el fondo, ≥ 3:1 (WCAG 1.4.11, elementos gráficos).
+      const luminancia = (hex: string): number => {
+        const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+        const lin = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+        return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+      };
+      for (const color of marcadores) {
+        expect(color).toMatch(/^#[0-9a-f]{6}$/);
+        expect((luminancia(fondos[0]) + 0.05) / (luminancia(color) + 0.05)).toBeGreaterThanOrEqual(3);
+      }
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: la FAQ visible dice que no hay indicador de cents, y la app los enseña',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2572: la FAQ visible decía que no hay indicador de cents, y la app los enseña',
     async ({ page }) => {
       // Desde el hallazgo 887 (18/09) la nota sale con sus cents («B5 +21 ¢»), pero la FAQ
       // «¿Puedo usar esto para afinar mi instrumento?» sigue diciendo que el analizador «no tiene
@@ -853,11 +891,13 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
       const faq = page.locator('[class*="faqList"]');
       await expect(faq).toBeVisible();
       await expect(faq).not.toContainText('no tiene un indicador');
+      const respuesta = faq.locator('li').filter({ hasText: '¿Puedo usar esto para afinar mi instrumento?' });
+      await expect(respuesta).toContainText('cents');
     },
   );
 
-  test.fail(
-    'ABIERTO, hallazgo: con el micrófono ocupado por otra aplicación el aviso sale en inglés',
+  test(
+    'REPARADO (01/10/2026), hallazgo 2573: con el micrófono ocupado por otra aplicación el aviso salía en inglés',
     async ({ page }) => {
       // Chrome rechaza con NotReadableError «Could not start audio source» cuando otra
       // aplicación retiene el micrófono (habitual en Windows con una videollamada abierta). La
@@ -874,6 +914,8 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
       await expect(mensajeError(page)).toBeVisible();
       await expect(mensajeError(page)).not.toContainText('Could not start audio source');
       await expect(mensajeError(page)).toContainText(/micrófono/i);
+      await expect(mensajeError(page)).toContainText('en uso por otra aplicación');
+      await expect(botonIniciar(page)).toBeVisible();
     },
   );
 });
@@ -919,23 +961,51 @@ test.describe('Re-inspección 01/10/2026 · en un móvil (Pixel 7)', () => {
     await expect(nota(page)).toContainText('A4');
   });
 
-  test.fail('ABIERTO, hallazgo: en 412 px la regleta monta «10 kHz» encima de «20 kHz»', async ({ page }) => {
+  test('REPARADO (01/10/2026), hallazgo 2574: en 412 px la regleta montaba «10 kHz» encima de «20 kHz»', async ({ page }) => {
     // Las etiquetas van en su posición logarítmica real (hallazgo 889), pero entre 10 y 20 kHz
     // solo hay el 10 % del ancho: 31 px en el móvil para dos rótulos de ~36 px. Medido el
     // 01/10/2026: «10 kHz» acaba en x = 349,6 y «20 kHz» empieza en x = 326,9 → «1020kHz».
-    // En escritorio (1.280 px) no se tocan. Esperado: ninguna etiqueta pisa a la siguiente.
+    // En escritorio (1.280 px) no se tocan. Esperado: ninguna etiqueta pisa a otra.
+    //
+    // Reparación: en pantallas estrechas «20 kHz» baja a una segunda línea, en su mismo sitio
+    // horizontal. Por eso el criterio ya no es «la izquierda de cada una después de la derecha
+    // de la anterior», que exigía separación HORIZONTAL y obligaba a mover o encoger rótulos que
+    // están donde deben: es que ninguna CAJA se cruce con otra.
     await page.goto('/analizador-espectro/');
     const cajas = await page.evaluate(() =>
       Array.from(document.querySelectorAll('[class*="freqTick"]')).map((e) => {
         const r = e.getBoundingClientRect();
-        return { texto: e.textContent ?? '', izquierda: r.left, derecha: r.right };
+        return { texto: e.textContent ?? '', izquierda: r.left, derecha: r.right, arriba: r.top, abajo: r.bottom };
       }),
     );
     expect(cajas.length).toBe(5);
-    for (let i = 1; i < cajas.length; i++) {
-      expect(cajas[i].izquierda, `${cajas[i - 1].texto} pisa ${cajas[i].texto}`).toBeGreaterThanOrEqual(
-        cajas[i - 1].derecha,
-      );
+    for (const c of cajas) expect(c.derecha - c.izquierda, `${c.texto} visible`).toBeGreaterThan(0);
+    for (let i = 0; i < cajas.length; i++) {
+      for (let j = i + 1; j < cajas.length; j++) {
+        const a = cajas[i];
+        const b = cajas[j];
+        const seCruzan = a.izquierda < b.derecha && b.izquierda < a.derecha && a.arriba < b.abajo && b.arriba < a.abajo;
+        expect(seCruzan, `${a.texto} pisa ${b.texto}`).toBe(false);
+      }
     }
+    // Y sigue cada una en su sitio: el centro de «10 kHz» al 90 % del ancho de la regleta.
+    const regleta = await page.locator('[class*="freqScale"]').boundingBox();
+    const diezK = cajas.find((c) => c.texto === '10 kHz')!;
+    const centro = ((diezK.izquierda + diezK.derecha) / 2 - regleta!.x) / regleta!.width;
+    expect(Math.abs(centro - 0.9)).toBeLessThan(0.04);
+  });
+
+  test('REPARADO (01/10/2026), hallazgo 2574: el lienzo se dibuja al alto con que se muestra, sin aplastar', async ({ page }) => {
+    // Medido el 01/10/2026: dibujado a 314×300 y mostrado a 314×200 (CSS), así que los rótulos
+    // internos salían a 2/3 de su altura. Esperado: el alto del dibujo es el alto mostrado.
+    await page.goto('/analizador-espectro/');
+    await esperarHidratacion(page, ['#sensitivity-slider']);
+    const medidas = await page.evaluate(() => {
+      const c = document.querySelector('canvas') as HTMLCanvasElement;
+      return { ancho: c.width, alto: c.height, anchoCss: c.clientWidth, altoCss: c.clientHeight };
+    });
+    expect(medidas.altoCss).toBeGreaterThan(0);
+    expect(medidas.alto).toBe(medidas.altoCss);
+    expect(medidas.ancho).toBe(medidas.anchoCss);
   });
 });

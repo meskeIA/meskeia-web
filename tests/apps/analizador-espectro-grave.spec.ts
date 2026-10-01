@@ -27,6 +27,10 @@ import { esperarHidratacion } from './_hidratacion';
  *     (16,15 Hz), era el flanco: la cifra del flanco, no la del sonido.
  * El arreglo del motor (rango desde ceil, pico = cima de su lóbulo, afinado dentro del rango) la
  * resuelve aquí sin tocar la app: el motor ya no devuelve pico y el analizador escribe «-- Hz».
+ *
+ * 01/10/2026 (hallazgos 2567-2568): el motor ya no corta el rango por bins sino por la frecuencia
+ * AFINADA de cada cima (la de 15 Hz afina en 15 Hz y se descarta), y el analizador mide sobre los
+ * dB de getFloatFrequencyData. Este testigo sigue exigiendo lo mismo: «-- Hz».
  */
 
 function escribirWav(ruta: string, hz: number, segundos = 2, amplitud = 0.5): void {

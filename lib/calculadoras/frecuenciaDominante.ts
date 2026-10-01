@@ -93,12 +93,22 @@ function esCimaDeLobulo(espectro: ArrayLike<number>, i: number, v: number): bool
  *
  * La parábola que pasa por (−1, y₋₁), (0, y₀), (1, y₊₁) tiene el vértice en
  * δ = (y₋₁ − y₊₁) / (2·(y₋₁ − 2y₀ + y₊₁)), y ese δ es la fracción de bin que hay que sumar. Si
- * sale fuera de ±0,5 bins, el pico no tiene forma de pico (dos bins iguales saturados, por
- * ejemplo) y se deja en el centro del bin. Si un vecino no es finito —silencio en el formato
- * en dB—, tampoco se afina: con -Infinity la parábola daría NaN.
+ * sale fuera de ±0,5 bins, el pico no tiene forma de pico y se deja en el centro del bin. Si un
+ * vecino no es finito —silencio en el formato en dB—, tampoco se afina: con -Infinity la
+ * parábola daría NaN. Una cima de VARIOS bins iguales (una meseta) no se afina con la parábola,
+ * sino con `centroDeMeseta`.
  *
- * Devuelve `null` si en el rango no hay ningún máximo local, o si el pico afinado cae fuera de
- * [fMin, fMax] (un tono de 19,8 Hz asoma en el bin de 20,5 Hz, pero no es de este rango).
+ * Lo que decide si un pico es «de este rango» es su frecuencia AFINADA, no el bin donde cae: un
+ * tono de 20,3 Hz a 48 kHz con 8.192 muestras tiene la cima en el bin 3 (17,58 Hz) y afinado da
+ * 20,3 Hz, que sí es del rango; un tono de 19,8 Hz asoma en el bin de 20,5 Hz con 16.384
+ * muestras, pero afinado da 19,8 y no lo es. Por eso se recorren TODOS los bins hasta el último
+ * cuya cima pueda afinar por debajo de fMax, y cada cima se afina antes de compararla: la que
+ * cae fuera de [fMin, fMax] no cuenta, y la búsqueda sigue con las demás (un grave fuerte de
+ * fuera no tapa un tono débil de dentro). Antes se buscaba solo entre los bins que caían dentro
+ * —desde ceil(fMin/Δf)— y quedaba una zona muerta de 20,0 a 20,5 Hz a 48 kHz, que con un tono
+ * fuerte, cuya meseta empieza en el bin 3, llegaba a unos 26 Hz (hallazgo 2568 del analizador).
+ *
+ * Devuelve `null` si ninguna cima afina dentro de [fMin, fMax].
  */
 export function picoDominante(
   espectro: ArrayLike<number>,
@@ -107,33 +117,92 @@ export function picoDominante(
   fMin = 20,
   fMax = 20000,
 ): PicoEspectro | null {
-  const { hzPorBin, binMin, binMax } = rangoDeBins(espectro.length, sampleRate, fftSize, fMin, fMax);
+  const hzPorBin = sampleRate / fftSize;
+  // Una cima afinada queda, como mucho, medio bin por debajo de su primer bin (la parábola
+  // suma ±0,5 y el centro de una meseta no baja de ahí): más allá de este bin, ninguna cima
+  // puede afinar dentro del rango.
+  const binTope = Math.min(espectro.length - 2, Math.floor(fMax / hzPorBin + 0.5));
 
-  let bin = -1;
-  let nivel = -Infinity;
-  for (let i = binMin; i <= binMax; i++) {
+  let mejor: PicoEspectro | null = null;
+  for (let i = 1; i <= binTope; i++) {
     const v = valorBin(espectro, i);
     // Estricto: ante un empate gana el primero, que es como lo hacía el analizador.
-    if (v === -Infinity || v <= nivel) continue;
+    if (v === -Infinity || (mejor && v <= mejor.nivel)) continue;
     if (!esCimaDeLobulo(espectro, i, v)) continue;
-    nivel = v;
-    bin = i;
+    const { posicion, bin } = afinarCima(espectro, i, v);
+    const frecuencia = posicion * hzPorBin;
+    if (frecuencia < fMin || frecuencia > fMax) continue;
+    mejor = { frecuencia, nivel: v, bin };
   }
-  if (bin < 0) return null;
+  return mejor;
+}
 
-  let afinado = bin;
-  const izq = espectro[bin - 1];
-  const der = espectro[bin + 1];
+/**
+ * Posición afinada (en bins, con decimales) de la cima que empieza en el bin `i`, y el bin
+ * entero más cercano a ella.
+ */
+function afinarCima(espectro: ArrayLike<number>, i: number, v: number): { posicion: number; bin: number } {
+  let fin = i;
+  while (fin + 1 < espectro.length && valorBin(espectro, fin + 1) === v) fin++;
+  if (fin > i) {
+    const posicion = centroDeMeseta(espectro, i, fin);
+    return { posicion, bin: Math.min(fin, Math.max(i, Math.round(posicion))) };
+  }
+  let posicion = i;
+  const izq = espectro[i - 1];
+  const der = espectro[i + 1];
   if (Number.isFinite(izq) && Number.isFinite(der)) {
-    const denominador = izq - 2 * nivel + der;
+    const denominador = izq - 2 * v + der;
     if (denominador !== 0) {
       const delta = (izq - der) / (2 * denominador);
-      if (Math.abs(delta) <= 0.5) afinado = bin + delta;
+      if (Math.abs(delta) <= 0.5) posicion = i + delta;
     }
   }
-  const frecuencia = afinado * hzPorBin;
-  if (frecuencia < fMin || frecuencia > fMax) return null;
-  return { frecuencia, nivel, bin };
+  return { posicion, bin: i };
+}
+
+/**
+ * Centro de una cima plana: los bins `a` a `b` valen todos `v` (el techo).
+ *
+ * Pasa con los BYTES de `getByteFrequencyData`, que recortan en `maxDecibels` (−30 dB por
+ * defecto): un tono por encima de unos −16 dBFS aplana su pico en 2-4 bins a 255. Afinar el
+ * primero de ellos con la parábola, que con un vecino igual da siempre +0,5, dejaba la cifra
+ * entre medio bin y un bin por debajo: Mi2 (82,41 Hz) a −6 dBFS salía «79 Hz · D#2 +29 ¢» a
+ * 48 kHz (hallazgo 2567 del analizador). En los dB en coma flotante del generador no hay techo,
+ * y dos bins exactamente iguales no se dan.
+ *
+ * El lóbulo de la ventana es SIMÉTRICO alrededor del tono, y recortarlo no le quita la
+ * simetría. Los dos vecinos de la meseta, a−1 y b+1, caen en flancos opuestos a distancias dI
+ * y dD del tono que suman D = b − a + 2 bins, y como los dos están fuera del techo, ninguno
+ * queda a un bin más que el otro. El vecino MÁS ALTO es el más cercano; su flanco se conoce
+ * en dos puntos (él y el siguiente hacia fuera), y el vecino bajo del otro flanco, por la
+ * simetría, cae en ese mismo tramo de curva: interpolando su valor entre esos dos puntos sale
+ * cuánto más lejos está, Δ = dLejos − dCerca, en fracción de bin. Con dCerca + dLejos = D, el
+ * tono queda a Δ/2 del centro geométrico de la meseta, hacia el vecino alto.
+ *
+ * Solo usa cocientes de diferencias, así que vale igual en bytes que en dB, sin conocer la
+ * escala. Medido sobre espectros fabricados como los del AnalyserNode (tests/frecuencia-
+ * dominante-motor), a 48 kHz con 8.192 muestras, de −30 a 0 dBFS y con el tono en cualquier
+ * fracción de bin: error máximo de 0,09 bins (0,5 Hz), frente a 0,49 del centro geométrico a
+ * secas y hasta un bin entero del método anterior. Lo que no puede arreglar es un pico
+ * recortado de UN solo bin, que no se distingue de un pico sin recortar: por eso el analizador
+ * mide sobre los dB y deja los bytes para el dibujo.
+ *
+ * Si falta un punto o no es finito, se da el centro geométrico. Nunca sale de [a − 0,5, b + 0,5].
+ */
+function centroDeMeseta(espectro: ArrayLike<number>, a: number, b: number): number {
+  const centro = (a + b) / 2;
+  const izquierdo = valorBin(espectro, a - 1);
+  const derecho = valorBin(espectro, b + 1);
+  if (izquierdo === derecho) return centro;
+  const cercaEsIzquierdo = izquierdo > derecho;
+  const cerca = cercaEsIzquierdo ? izquierdo : derecho;
+  const siguiente = cercaEsIzquierdo ? valorBin(espectro, a - 2) : valorBin(espectro, b + 2);
+  const lejos = cercaEsIzquierdo ? derecho : izquierdo;
+  if (!Number.isFinite(cerca) || !Number.isFinite(siguiente) || !Number.isFinite(lejos)) return centro;
+  if (!(cerca > siguiente)) return centro;
+  const delta = Math.min(1, Math.max(0, (cerca - lejos) / (cerca - siguiente)));
+  return cercaEsIzquierdo ? centro - delta / 2 : centro + delta / 2;
 }
 
 /**

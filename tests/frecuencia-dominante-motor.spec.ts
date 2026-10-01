@@ -165,13 +165,141 @@ test.describe('picoDominante — bordes', () => {
     expect(p!.nivel).toBeGreaterThan(20);
   });
 
-  test('bytes saturados (tres bins a 255): sin afinado, en el primer bin del empate', () => {
+  // Hasta el 01/10/2026 este caso se llamaba «sin afinado, en el primer bin del empate» y
+  // exigía bin 200: consagraba el defecto del hallazgo 2567 (ver «mesetas» más abajo). Una
+  // meseta simétrica tiene el tono en su CENTRO, no en su primer bin.
+  test('bytes saturados (tres bins a 255, vecinos iguales): el centro de la meseta', () => {
     const e = new Uint8Array(4096);
     e[200] = 255;
     e[201] = 255;
     e[202] = 255;
     const p = picoDominante(e, 44100, 8192);
-    expect(p!.bin).toBe(200);
+    // A mano: vecinos 199 y 203 iguales (0) → centro (200 + 202)/2 = 201 → 201 · 44100/8192.
+    expect(p!.bin).toBe(201);
+    expect(p!.frecuencia).toBeCloseTo((201 * 44100) / 8192, 6); // 1.082,058 Hz
+    expect(p!.nivel).toBe(255);
+  });
+});
+
+/*
+ * Hallazgo 2567 (analizador-espectro, 01/10/2026). `getByteFrequencyData` recorta en
+ * maxDecibels = −30 dB, y un tono por encima de unos −16 dBFS aplana su pico en 2-4 bytes a 255.
+ * El motor se quedaba con el PRIMER bin de la meseta y la parábola, con un vecino igual, le
+ * sumaba siempre medio bin: Mi2 (82,41 Hz) a −6 dBFS salía 79,1 Hz (13,5 bins × 5,859).
+ *
+ * Lo que se exige, resuelto a mano: el lóbulo es simétrico alrededor del tono, así que el tono
+ * está en el centro de la meseta corrido hacia el vecino MÁS ALTO, Δ/2 bins, donde Δ es lo que
+ * el vecino bajo está más lejos, interpolado en el flanco del alto:
+ *     Δ = (alto − bajo) / (alto − siguiente del alto)
+ * El estimador no conoce la escala de los bytes, así que tiene un error propio; se midió sobre
+ * estos mismos espectros antes de escribir los tests (de −30 a 0 dBFS, el tono en cualquier
+ * fracción de bin): 0,087 bins como máximo. Se exige 0,1 bins. El centro geométrico a secas
+ * erraba hasta 0,49 bins, y el método anterior, hasta un bin.
+ */
+const BINS_MAX_MESETA = 0.1;
+
+test.describe('picoDominante — mesetas de bytes saturados (hallazgo 2567)', () => {
+  test('meseta asimétrica sintética: Δ/2 hacia el vecino alto', () => {
+    // Bins 298…304 = 100, 200, 255, 255, 255, 150, 50. Vecino alto: el izquierdo (200), su
+    // siguiente hacia fuera 100, el bajo 150 → Δ = (200 − 150)/(200 − 100) = 0,5 → centro
+    // 301 − 0,25 = 300,75 bins → 300,75 × 48000/8192 = 1.762,207 Hz; bin entero 301.
+    const e = new Uint8Array(4096);
+    [100, 200, 255, 255, 255, 150, 50].forEach((v, k) => (e[298 + k] = v));
+    const p = picoDominante(e, SR, 8192)!;
+    expect(p.frecuencia).toBeCloseTo(1762.20703125, 6);
+    expect(p.bin).toBe(301);
+  });
+
+  test('Mi2 (82,41 Hz) a −6 dBFS en bytes, 48 kHz y 8.192 muestras: ya no 79,1 Hz', () => {
+    // 82,41 / 5,859375 = 14,065 bins. La meseta son los bytes 13, 14 y 15 (el caso del acta).
+    const e = aBytes(espectroDb([{ f: 82.41, a: 0.5 }], SR, 8192));
+    expect([e[13], e[14], e[15]]).toEqual([255, 255, 255]);
+    const p = picoDominante(e, SR, 8192)!;
+    expect(Math.abs(p.frecuencia - 82.41)).toBeLessThan(BINS_MAX_MESETA * (SR / 8192));
+    // En cents: 12·log2(f/82,41)·100, a menos de 10 ¢ (E2 sigue siendo E2).
+    expect(Math.abs(1200 * Math.log2(p.frecuencia / 82.41))).toBeLessThan(10);
+  });
+
+  test('La1 (55 Hz) y La2 (110 Hz) a −6 dBFS: a menos de 0,1 bins', () => {
+    for (const f of [55, 110]) {
+      const p = picoDominante(aBytes(espectroDb([{ f, a: 0.5 }], SR, 8192)), SR, 8192)!;
+      expect(Math.abs(p.frecuencia - f), `${f} Hz`).toBeLessThan(BINS_MAX_MESETA * (SR / 8192));
+    }
+  });
+
+  test('barrido: de −30 a 0 dBFS y el tono en cualquier fracción de bin, ninguna meseta pasa de 0,1 bins', () => {
+    const hzPorBin = SR / 8192;
+    let mesetas = 0;
+    for (let dbfs = -30; dbfs <= 0; dbfs += 3) {
+      for (const base of [14, 75, 1700]) {
+        for (let fraccion = 0; fraccion < 1; fraccion += 0.05) {
+          const bins = base + fraccion;
+          const e = aBytes(espectroDb([{ f: bins * hzPorBin, a: 10 ** (dbfs / 20) }], SR, 8192));
+          const p = picoDominante(e, SR, 8192)!;
+          if (e[p.bin - 1] !== 255 && e[p.bin + 1] !== 255) continue; // no es meseta
+          mesetas++;
+          expect(Math.abs(p.frecuencia / hzPorBin - bins), `${dbfs} dBFS, bin ${bins.toFixed(2)}`).toBeLessThan(
+            BINS_MAX_MESETA,
+          );
+        }
+      }
+    }
+    // Que el barrido de verdad pase por mesetas: si no, no prueba nada.
+    expect(mesetas).toBeGreaterThan(100);
+  });
+
+  test('en dB (el formato del generador) no hay meseta: el mismo Mi2 a −6 dBFS, a 0,3 Hz', () => {
+    const p = picoDominante(espectroDb([{ f: 82.41, a: 0.5 }], SR, 8192), SR, 8192)!;
+    expect(Math.abs(p.frecuencia - 82.41)).toBeLessThan(0.3);
+  });
+});
+
+/*
+ * Hallazgo 2568 (analizador-espectro, 01/10/2026), regresión de c3e3e8ca. El rango empezaba en
+ * ceil(20/Δf): a 48 kHz con 8.192 muestras, el bin 4 (23,44 Hz). Un tono de 20,0 a 20,5 Hz tiene
+ * la cima en el bin 3 (17,58 Hz), fuera, y el 4 es su flanco: sin lectura para un tono que está
+ * dentro de los 20 Hz–20 kHz. Lo que decide ahora es la frecuencia AFINADA de cada cima.
+ *
+ * Resuelto a mano (Δf = 5,859375 Hz): 20,3 Hz = 3,465 bins → cima en el bin 3, afinada en 3,465
+ * → 20,3 Hz, dentro → se lee. 25 Hz = 4,267 bins; fuerte, su meseta empieza en el bin 3.
+ */
+test.describe('picoDominante — el borde de 20 Hz (hallazgo 2568)', () => {
+  test('20,3 Hz a 48 kHz con 8.192 muestras, en bytes a −26 dBFS: 20,3 Hz, no null', () => {
+    const p = picoDominante(aBytes(espectroDb([{ f: 20.3, a: 0.05 }], SR, 8192)), SR, 8192);
+    expect(p).not.toBeNull();
+    expect(p!.bin).toBe(3);
+    expect(Math.abs(p!.frecuencia - 20.3)).toBeLessThan(0.3);
+  });
+
+  test('20,1, 20,3 y 20,45 Hz en dB, con 8.192 muestras: los tres se leen', () => {
+    for (const f of [20.1, 20.3, 20.45]) {
+      const lectura = lecturaDelGenerador([{ f, a: 0.5 }], SR, 8192);
+      expect(lectura, `${f} Hz`).not.toBeNull();
+      expect(Math.abs(lectura! - f), `${f} Hz`).toBeLessThan(0.3);
+    }
+  });
+
+  test('25 Hz FUERTE (−6 dBFS) en bytes: la meseta empieza en el bin 3 y aun así se lee', () => {
+    const e = aBytes(espectroDb([{ f: 25, a: 0.5 }], SR, 8192));
+    expect(e[3]).toBe(255);
+    const p = picoDominante(e, SR, 8192)!;
+    expect(Math.abs(p.frecuencia - 25)).toBeLessThan(BINS_MAX_MESETA * (SR / 8192));
+  });
+
+  test('lo de fuera sigue fuera: 19,8 Hz y 15 Hz con 8.192 muestras, sin lectura', () => {
+    expect(lecturaDelGenerador([{ f: 19.8, a: 0.5 }], SR, 8192)).toBeNull();
+    expect(lecturaDelGenerador([{ f: 15, a: 0.5 }], SR, 8192)).toBeNull();
+  });
+
+  test('una cima que afina fuera no tapa un tono de dentro: 18 Hz + 440 Hz y 19,8 Hz + 440 Hz → 440', () => {
+    // Con 16.384 muestras, la cima de 18 Hz es el bin 6 (17,58 Hz) y la de 19,8 Hz el 7
+    // (20,51 Hz); las dos afinan por debajo de 20 y se descartan, y la búsqueda sigue. Antes, la
+    // de 19,8 Hz era «el pico del rango», afinaba fuera y el motor devolvía null: tapaba el 440.
+    for (const grave of [18, 19.8]) {
+      const f = lecturaDelGenerador([{ f: grave, a: 0.5 }, { f: 440, a: 0.02 }], SR);
+      expect(f, `${grave} + 440 Hz`).not.toBeNull();
+      expect(Math.abs(f! - 440), `${grave} + 440 Hz`).toBeLessThan(0.3);
+    }
   });
 });
 

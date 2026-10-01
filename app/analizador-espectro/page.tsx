@@ -60,6 +60,39 @@ function frecuenciaDeMidi(midi: number): number {
   return LA4_HZ * Math.pow(2, (midi - LA4_MIDI) / 12);
 }
 
+/**
+ * Por debajo de este valor en bytes (0-255) no se publica cifra: es el umbral de «hay señal»
+ * que la app aplica desde el 18/09/2026. La cifra ya no se mide en bytes (ver `analyzeLoop`),
+ * así que se traduce a decibelios con la misma escala que usa `getByteFrequencyData`.
+ */
+const UMBRAL_SENAL_BYTE = 20;
+
+/**
+ * Cada cuánto, como mucho, se anuncia la lectura a un lector de pantalla. La cifra en pantalla
+ * cambia en cada fotograma; anunciarla así eran decenas de anuncios por segundo con una voz o
+ * un instrumento real (hallazgo 2570). 1,2 s deja leer la frase entera antes de la siguiente.
+ */
+const MS_ANUNCIO = 1200;
+
+/** Mensaje en español para cada fallo de `getUserMedia`. */
+function mensajeErrorMicrofono(nombre: string): string {
+  switch (nombre) {
+    case 'NotAllowedError':
+    case 'SecurityError':
+      return 'Permiso de micrófono denegado. Permite el acceso en la configuración del navegador.';
+    case 'NotFoundError':
+    case 'OverconstrainedError':
+      return 'No se encontró ningún micrófono. Conecta uno e intenta de nuevo.';
+    case 'NotReadableError':
+    case 'AbortError':
+      // Chrome lo da como «Could not start audio source» cuando otra aplicación retiene el
+      // micrófono: en Windows, típicamente una videollamada abierta (hallazgo 2573).
+      return 'El micrófono está en uso por otra aplicación (por ejemplo, una videollamada) o el sistema no deja abrirlo. Ciérrala y vuelve a intentarlo.';
+    default:
+      return 'No se pudo abrir el micrófono. Comprueba que está conectado y que ninguna otra aplicación lo usa, y vuelve a intentarlo.';
+  }
+}
+
 export default function AnalizadorEspectroPage() {
   const [isActive, setIsActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,13 +112,52 @@ export default function AnalizadorEspectroPage() {
   const animationRef = useRef<number | null>(null);
   const peaksRef = useRef<number[]>([]);
   const peakDecayRef = useRef<number[]>([]);
+  /**
+   * `true` mientras se espera a `getUserMedia`. El botón no cambia hasta que el micrófono se
+   * abre —que es justo el rato que el usuario pasa ante el diálogo de permiso—, y un segundo
+   * clic abría una segunda captura que «Detener» ya no cerraba (hallazgo 2569).
+   */
+  const abriendoRef = useRef(false);
+  const montadoRef = useRef(true);
+  /** La última lectura, para el anuncio espaciado de la región viva. */
+  const lecturaRef = useRef<{ hz: number; nota: string; cents: number | null }>({ hz: 0, nota: '--', cents: null });
+  const [anuncio, setAnuncio] = useState('');
 
   // Limpiar recursos al desmontar
   useEffect(() => {
+    montadoRef.current = true;
     return () => {
+      montadoRef.current = false;
       stopAnalyzing();
     };
   }, []);
+
+  /**
+   * La región viva solo para lectores de pantalla. Antes `role="status"` envolvía la cifra, la
+   * nota y un párrafo de 40 palabras, con aria-atomic, y la cifra se reescribía en cada
+   * fotograma: con una señal real eran decenas de re-anuncios por segundo de 265 caracteres
+   * (hallazgo 2570). Ahora es una frase corta que se actualiza como mucho cada `MS_ANUNCIO` y
+   * solo si cambia.
+   */
+  useEffect(() => {
+    if (!isActive) {
+      setAnuncio('');
+      return;
+    }
+    const intervalo = window.setInterval(() => {
+      const { hz, nota, cents } = lecturaRef.current;
+      let texto = 'Sin frecuencia dominante';
+      if (hz > 0) {
+        texto = `Frecuencia dominante: ${formatNumber(hz, 0)} hercios`;
+        if (nota !== '--') {
+          texto += `, nota ${nota}`;
+          if (cents !== null) texto += `, ${cents >= 0 ? 'más' : 'menos'} ${formatNumber(Math.abs(cents), 0)} cents`;
+        }
+      }
+      setAnuncio((previo) => (previo === texto ? previo : texto));
+    }, MS_ANUNCIO);
+    return () => window.clearInterval(intervalo);
+  }, [isActive]);
 
   /**
    * Los tres controles de visualización, en refs además de en estado.
@@ -143,6 +215,12 @@ export default function AnalizadorEspectroPage() {
     const colorPrimario = token('--primary', '#2E86AB');
     const colorBorde = token('--border', '#d1d5db');
     const colorTextoTenue = token('--text-muted', '#6b7280');
+    /**
+     * Los marcadores de pico iban en '#ffffff' fijo, y el fondo del lienzo es --bg-card, que en
+     * el tema claro —el de por defecto— también es blanco: 1:1, invisibles (hallazgo 2571). El
+     * color del texto principal contrasta con --bg-card en los dos temas (17:1 y 11:1).
+     */
+    const colorMarcador = token('--text-primary', '#1a1a1a');
 
     // Limpiar canvas
     ctx.fillStyle = colorFondo;
@@ -179,9 +257,25 @@ export default function AnalizadorEspectroPage() {
      * máximo con una interpolación parabólica sobre sus dos vecinos. El cálculo vive en
      * lib/calculadoras/frecuenciaDominante.ts desde el 29/09/2026, porque generador-tonos
      * mide lo mismo con el mismo micrófono y las dos apps no pueden dar cifras distintas.
+     *
+     * ── Y se mide sobre los DECIBELIOS, no sobre los bytes del dibujo ──
+     *
+     * `getByteFrequencyData` recorta en maxDecibels (−30 dB): con un tono por encima de unos
+     * −16 dBFS el pico se aplana en 2-4 bins a 255, y la forma del pico, que es lo que afina la
+     * cifra, desaparece. Mi2 (82,41 Hz) a −6 dBFS salía «79 Hz · D#2 +29 ¢» (hallazgo 2567). El
+     * motor ya sabe estimar el centro de una meseta, pero un pico recortado de UN solo bin no se
+     * distingue de uno entero, y ahí el error seguía siendo de hasta 0,3 bins (25 ¢ a 82 Hz).
+     * `getFloatFrequencyData` da los mismos dB sin recortar —es lo que lee generador-tonos—, y
+     * los bytes se quedan para lo que sirven: dibujar.
      */
-    const pico = picoDominante(dataArray, sampleRate, analyser.fftSize);
-    const maxBinValue = pico?.nivel ?? 0;
+    const espectroDb = new Float32Array(bufferLength);
+    analyser.getFloatFrequencyData(espectroDb);
+    const pico = picoDominante(espectroDb, sampleRate, analyser.fftSize);
+    // El umbral de siempre, «más de 20 en bytes», en dB: el byte es
+    // floor(255·(dB − min)/(max − min)), así que pasa de 20 desde min + 21·(max − min)/255.
+    const umbralDb =
+      analyser.minDecibels + ((UMBRAL_SENAL_BYTE + 1) * (analyser.maxDecibels - analyser.minDecibels)) / 255;
+    const haySenal = pico !== null && pico.nivel >= umbralDb;
     const freqDominante = pico?.frecuencia ?? 0;
 
     /**
@@ -244,7 +338,7 @@ export default function AnalizadorEspectroPage() {
 
         // Dibujar peak
         if (showPeaks && peaksRef.current[i] > 0) {
-          ctx.fillStyle = '#ffffff';
+          ctx.fillStyle = colorMarcador;
           ctx.fillRect(
             i * barWidth + 1,
             canvas.height - peaksRef.current[i] - 2,
@@ -306,15 +400,17 @@ export default function AnalizadorEspectroPage() {
     // Actualizar frecuencia dominante. El umbral se aplica al BIN del pico, no a la media de
     // su banda: un pico puro de 10 kHz vale 255 en su bin y 1,3 en la media de la banda, y ese
     // 1,3 era lo que antes se comparaba contra el 20 exigido.
-    if (maxBinValue > 20) {
+    if (haySenal) {
       setDominantFreq(freqDominante);
       const nota = notaDeFrecuencia(freqDominante);
       setDominantNote(nota ? nota.nombre : '--');
       setDominantCents(nota ? nota.cents : null);
+      lecturaRef.current = { hz: freqDominante, nota: nota ? nota.nombre : '--', cents: nota ? nota.cents : null };
     } else {
       setDominantFreq(0);
       setDominantNote('--');
       setDominantCents(null);
+      lecturaRef.current = { hz: 0, nota: '--', cents: null };
     }
 
     animationRef.current = requestAnimationFrame(analyzeLoop);
@@ -322,6 +418,9 @@ export default function AnalizadorEspectroPage() {
 
   // Iniciar análisis
   const startAnalyzing = async () => {
+    // Una sola apertura a la vez, y ninguna si ya hay una captura en marcha (hallazgo 2569).
+    if (abriendoRef.current || streamRef.current) return;
+    abriendoRef.current = true;
     try {
       setError(null);
 
@@ -332,6 +431,12 @@ export default function AnalizadorEspectroPage() {
           autoGainControl: false
         }
       });
+
+      // Si la página se desmontó mientras se esperaba el permiso, nadie cerraría esta captura.
+      if (!montadoRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
 
       streamRef.current = stream;
       setPermissionState('granted');
@@ -357,15 +462,12 @@ export default function AnalizadorEspectroPage() {
     } catch (err) {
       console.error('Error al acceder al micrófono:', err);
       setPermissionState('denied');
-      if (err instanceof Error) {
-        if (err.name === 'NotAllowedError') {
-          setError('Permiso de micrófono denegado. Permite el acceso en la configuración del navegador.');
-        } else if (err.name === 'NotFoundError') {
-          setError('No se encontró ningún micrófono. Conecta uno e intenta de nuevo.');
-        } else {
-          setError(`Error: ${err.message}`);
-        }
-      }
+      // Solo NotAllowedError y NotFoundError tenían texto propio; el resto salía como
+      // `Error: ${err.message}`, en el inglés del navegador (hallazgo 2573).
+      const nombre = err !== null && typeof err === 'object' && 'name' in err ? String(err.name) : '';
+      setError(mensajeErrorMicrofono(nombre));
+    } finally {
+      abriendoRef.current = false;
     }
   };
 
@@ -390,16 +492,23 @@ export default function AnalizadorEspectroPage() {
     setIsActive(false);
     setDominantFreq(0);
     setDominantNote('--');
+    setDominantCents(null);
+    lecturaRef.current = { hz: 0, nota: '--', cents: null };
   };
 
   // Ajustar canvas al tamaño del contenedor
   useEffect(() => {
+    /*
+     * El alto del dibujo es el alto con que el CSS MUESTRA el lienzo. Iba fijo a 300, y en
+     * móvil el contenedor mide 200 px: el lienzo se dibujaba a 300 y se aplastaba a 2/3, con
+     * los rótulos internos achatados (hallazgo 2574).
+     */
     const handleResize = () => {
       if (canvasRef.current) {
         const container = canvasRef.current.parentElement;
         if (container) {
           canvasRef.current.width = container.clientWidth;
-          canvasRef.current.height = 300;
+          canvasRef.current.height = container.clientHeight || 300;
         }
       }
     };
@@ -466,8 +575,13 @@ export default function AnalizadorEspectroPage() {
             ))}
           </div>
 
-          {/* Información de frecuencia dominante */}
-          <div role="status" aria-live="polite" aria-atomic="true">
+          {/* Lo que oye un lector de pantalla: una frase corta, como mucho cada MS_ANUNCIO. */}
+          <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+            {anuncio}
+          </div>
+
+          {/* Información de frecuencia dominante (visual; cambia en cada fotograma) */}
+          <div>
           {isActive && (
             <div className={styles.dominantFreq}>
               <div className={styles.freqInfo}>
@@ -492,7 +606,8 @@ export default function AnalizadorEspectroPage() {
           {isActive && (
             <p className={styles.freqNota}>
               La frecuencia sale del pico de la FFT (8.192 muestras: {formatNumber(44100 / 8192, 1)} Hz
-              por bin a 44,1 kHz), afinado por interpolación entre bins vecinos. Los cents son la
+              por bin a 44,1 kHz), medido en decibelios sin recortar y afinado por interpolación
+              entre bins vecinos. Los cents son la
               desviación respecto a la nota del temperamento igual, con A4 = 440 Hz.
             </p>
           )}
@@ -761,7 +876,7 @@ export default function AnalizadorEspectroPage() {
           </li>
           <li className={styles.faqItem}>
             <h3>¿Puedo usar esto para afinar mi instrumento?</h3>
-            <p>El analizador muestra qué frecuencias están presentes, pero no tiene un indicador de &quot;cents&quot; de desviación como un afinador. Para afinar, usa el Afinador Cromático de meskeIA. El analizador de espectro es más útil para entender la composición frecuencial del sonido.</p>
+            <p>Para una comprobación rápida, sí: junto a la frecuencia dominante sale la nota más cercana con su desviación en cents (por ejemplo, «A4 +3 ¢»), con A4 = 440 Hz. Pero la cifra se refresca en cada fotograma y sigue al sonido más fuerte, que en un instrumento real puede ser un armónico y no la nota que tocas. Para afinar con comodidad, el Afinador Cromático de meskeIA busca la frecuencia fundamental, no el pico más fuerte, y muestra la desviación en un indicador que se pone en verde al llegar a la nota. El analizador de espectro es más útil para entender la composición frecuencial del sonido.</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿Por qué la zona 2-5 kHz es tan importante en la voz?</h3>

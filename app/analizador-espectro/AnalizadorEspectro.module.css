@@ -118,6 +118,8 @@
   top: 0;
   transform: translateX(-50%);
   white-space: nowrap;
+  /* El alto de la regleta: con el interlineado heredado (1,6) cada rótulo medía 19 px. */
+  line-height: 1.1rem;
 }
 
 /* Los extremos se acuestan sobre el borde para no salirse del contenedor. */
@@ -540,6 +542,17 @@
 
   .canvasContainer {
     height: 200px;
+  }
+
+  /* Entre 10 y 20 kHz solo queda el 10 % del ancho: en un móvil, unos 31 px para dos rótulos
+     de ~36 px, y se leía «1020kHz» (hallazgo 2574). El último baja a una segunda línea, en su
+     sitio horizontal de siempre. */
+  .freqScale {
+    height: 2.3rem;
+  }
+
+  .freqTick:last-child {
+    top: 1.2rem;
   }
 
   .dominantFreq {
