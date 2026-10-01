@@ -1,6 +1,11 @@
 import { Metadata } from 'next';
+import { COSTAS_JUDICIALES_META } from '@/data/fiscal';
 
-const title = 'Estimador de Costes de Divorcio 2026 — Cuánto cuesta divorciarse en España | meskeIA';
+// Año del título: el último de la vigencia del módulo («2025-2026» → 2026). Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = COSTAS_JUDICIALES_META.vigencia.slice(-4);
+
+const title = `Estimador de Costes de Divorcio ${anio} — Cuánto cuesta divorciarse en España | meskeIA`;
 const description = 'Cuánto cuesta divorciarse en España en 2026: estima el precio orientativo del divorcio según el tipo (mutuo acuerdo vs contencioso), con el desglose de honorarios de abogado y procurador, tarifa notarial, registro y tasas judiciales. Con o sin hijos y con bienes comunes.';
 
 export const metadata: Metadata = {
@@ -13,7 +18,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Estimador de Costes de Divorcio 2026 | meskeIA',
+    title: `Estimador de Costes de Divorcio ${anio} | meskeIA`,
     description,
     url: 'https://meskeia.com/estimador-costes-divorcio/',
     siteName: 'meskeIA',
@@ -27,7 +32,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador de Costes de Divorcio 2026 | meskeIA',
+    title: `Estimador de Costes de Divorcio ${anio} | meskeIA`,
     description: 'Calcula cuánto cuesta divorciarse en España: mutuo acuerdo vs contencioso',
     images: ['https://meskeia.com/og-image.png']
   },

@@ -3,6 +3,10 @@ import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META } from '
 import { formatCurrency } from '@/lib/formatters';
 import { NUM_REQUISITOS_ART60, REQUISITOS_ART60 } from '@/lib/calculadoras/complementoBrechaGenero';
 
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = COMPLEMENTO_BRECHA_GENERO_META.vigencia;
+
 // Las cifras salen del módulo fiscal, nunca tecleadas: en la próxima revalorización el
 // snippet de buscadores y el JSON-LD envejecían en silencio mientras la app decía otra cosa.
 const CUANTIA = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual);
@@ -29,7 +33,7 @@ const NORMA_COMPATIBLE_MINIMOS = COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.com
 const REQUISITOS_EN_PROSA = REQUISITOS_ART60.map(r => r.detalle);
 const LISTA_REQUISITOS = `${REQUISITOS_EN_PROSA.slice(0, -1).join('; ')}; y ${REQUISITOS_EN_PROSA[REQUISITOS_EN_PROSA.length - 1]}`;
 
-const title = 'Verificador del Complemento por Brecha de Género 2026 — ¿Te corresponde? | meskeIA';
+const title = `Verificador del Complemento por Brecha de Género ${anio} — ¿Te corresponde? | meskeIA`;
 // La sentencia se cita desde META.doctrina y no con el año tecleado (hallazgo 2246).
 const description = `Comprueba si tienes derecho al complemento por brecha de género en tu pensión: ${CUANTIA}/mes por hijo (máximo ${MAX_HIJOS}). Incluye los cambios tras la ${DOCTRINA.stjue.corto}, que iguala el trato a hombres y mujeres.`;
 
@@ -43,7 +47,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Verificador del Complemento por Brecha de Género 2026 | meskeIA',
+    title: `Verificador del Complemento por Brecha de Género ${anio} | meskeIA`,
     description,
     url: 'https://meskeia.com/verificador-complemento-brecha-genero/',
     siteName: 'meskeIA',
@@ -57,7 +61,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Verificador del Complemento por Brecha de Género 2026 | meskeIA',
+    title: `Verificador del Complemento por Brecha de Género ${anio} | meskeIA`,
     description: `6 preguntas para saber si te corresponde el complemento de ${CUANTIA}/mes por hijo en tu pensión.`,
     images: ['https://meskeia.com/og-image.png'],
   },

@@ -1,8 +1,13 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FISCAL_PENSIONES_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = FISCAL_PENSIONES_META.vigencia;
 
 export const metadata: Metadata = {
-  title: 'Simulador de Jubilación Pública 2026 — Edad, pensión y anticipada | meskeIA',
+  title: `Simulador de Jubilación Pública ${anio} — Edad, pensión y anticipada | meskeIA`,
   description: 'Simula tu jubilación pública completa: edad de jubilación, pensión estimada (sistema dual 2026), jubilación anticipada con coeficientes reductores y jubilación parcial. Todo en una sola herramienta.',
   keywords: 'simulador jubilacion, edad jubilacion 2026, pension publica, jubilacion anticipada, jubilacion parcial, seguridad social pension, sistema dual 2026, coeficientes reductores, cuando me jubilo',
   authors: [{ name: 'meskeIA' }],
@@ -11,7 +16,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Simulador de Jubilación Pública 2026 | meskeIA',
+    title: `Simulador de Jubilación Pública ${anio} | meskeIA`,
     description: 'Edad de jubilación, pensión estimada, anticipada y parcial. Todo en una herramienta.',
     url: 'https://meskeia.com/simulador-jubilacion-publica/',
     siteName: 'meskeIA',
@@ -25,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Simulador de Jubilación Pública 2026 | meskeIA',
+    title: `Simulador de Jubilación Pública ${anio} | meskeIA`,
     description: 'Simula tu jubilación completa: edad, pensión, anticipada y parcial.',
     images: ['https://meskeia.com/og-image.png']
   },

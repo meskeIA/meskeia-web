@@ -1,6 +1,11 @@
 import { Metadata } from 'next';
+import { COSTAS_JUDICIALES_META } from '@/data/fiscal';
 
-const title = 'Estimador de Costas Judiciales 2026 — Cuánto cuesta un juicio en España | meskeIA';
+// Año del título: el último de la vigencia del módulo («2025-2026» → 2026). Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = COSTAS_JUDICIALES_META.vigencia.slice(-4);
+
+const title = `Estimador de Costas Judiciales ${anio} — Cuánto cuesta un juicio en España | meskeIA`;
 const description = 'Estima el coste orientativo de un procedimiento judicial en España: honorarios de abogado, aranceles de procurador, tasas judiciales, peritos e IVA. Con el límite del tercio del art. 394.3 LEC y el arancel vigente de la Procura.';
 
 export const metadata: Metadata = {
@@ -13,7 +18,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Estimador de Costas Judiciales 2026 | meskeIA',
+    title: `Estimador de Costas Judiciales ${anio} | meskeIA`,
     description,
     url: 'https://meskeia.com/estimador-costas-judiciales/',
     siteName: 'meskeIA',
@@ -27,7 +32,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador de Costas Judiciales 2026 | meskeIA',
+    title: `Estimador de Costas Judiciales ${anio} | meskeIA`,
     description: 'Calcula cuánto puede costar un juicio en España: abogado, procurador, tasas y peritos',
     images: ['https://meskeia.com/og-image.png']
   },

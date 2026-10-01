@@ -1,8 +1,13 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FISCAL_SMI_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = FISCAL_SMI_META.vigencia;
 
 export const metadata: Metadata = {
-  title: 'Estimador SMI 2026 — Neto, Atrasos y Comparativa Provincial | meskeIA',
+  title: `Estimador SMI ${anio} — Neto, Atrasos y Comparativa Provincial | meskeIA`,
   description: 'Calcula tu sueldo neto con el SMI 2026 (1.221 €/mes × 14 pagas), los atrasos retroactivos desde enero y compara el SMI con el salario medio de tu provincia.',
   keywords: 'SMI 2026, salario mínimo interprofesional, SMI neto, atrasos SMI, SMI por provincia, 1221 euros, salario mínimo España',
   authors: [{ name: 'meskeIA' }],
@@ -11,7 +16,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Estimador SMI 2026 — Neto, atrasos y comparativa provincial',
+    title: `Estimador SMI ${anio} — Neto, atrasos y comparativa provincial`,
     description: 'SMI 2026: 1.221 €/mes. Calcula tu neto, los atrasos retroactivos y compara con el sueldo medio de tu provincia.',
     url: 'https://meskeia.com/estimador-smi/',
     siteName: 'meskeIA',
@@ -25,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador SMI 2026 — ¿Cuánto cobras neto?',
+    title: `Estimador SMI ${anio} — ¿Cuánto cobras neto?`,
     description: 'Calcula tu neto con el nuevo SMI, los atrasos retroactivos y compara con tu provincia.',
     images: ['https://meskeia.com/og-image.png']
   },

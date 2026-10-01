@@ -1,8 +1,13 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FISCAL_PENSIONES_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = FISCAL_PENSIONES_META.vigencia;
 
 export const metadata: Metadata = {
-  title: 'Estimador Pensión de Viudedad 2026 — Cuantía y requisitos SS | meskeIA',
+  title: `Estimador Pensión de Viudedad ${anio} — Cuantía y requisitos SS | meskeIA`,
   description: 'Calcula la pensión de viudedad estimada según la Seguridad Social española 2026. Porcentaje aplicable (52%, 60% o 70%), base reguladora, pensión mínima garantizada y requisitos de acceso.',
   keywords: 'pension viudedad 2026, cuantia pension viudedad, como calcular pension viudedad, requisitos pension viudedad, pension viudedad 52 60 70 por ciento, base reguladora viudedad, pension minima viudedad',
   authors: [{ name: 'meskeIA' }],
@@ -11,7 +16,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Estimador Pensión de Viudedad 2026 | meskeIA',
+    title: `Estimador Pensión de Viudedad ${anio} | meskeIA`,
     description: 'Estima la cuantía de la pensión de viudedad: porcentaje (52/60/70%), mínimos garantizados y requisitos de la Seguridad Social.',
     url: 'https://meskeia.com/estimador-pension-viudedad/',
     siteName: 'meskeIA',
@@ -25,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador Pensión de Viudedad 2026 | meskeIA',
+    title: `Estimador Pensión de Viudedad ${anio} | meskeIA`,
     description: 'Calcula la pensión de viudedad 2026: base reguladora, porcentaje y mínimos garantizados',
     images: ['https://meskeia.com/og-image.png']
   },

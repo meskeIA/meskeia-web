@@ -1,10 +1,15 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FISCAL_IRPF_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = FISCAL_IRPF_META.vigencia;
 
 export const metadata: Metadata = {
-  title: 'Simulador Visual IRPF Tramos 2025 - "¿Qué pasa si subo X €?" | meskeIA',
-  description: 'Visualiza los 6 tramos del IRPF español de forma interactiva. Mueve el slider y observa cómo cambia tu cuota. Vista por tramos, escalera de tipos y comparativa "qué pasa si subo X €". Datos 2025.',
-  keywords: 'simulador IRPF tramos visual, tramos IRPF 2025, escalera IRPF, tipo marginal medio, base liquidable, cuota íntegra, AEAT, qué pasa si subo sueldo IRPF, gráfico IRPF',
+  title: `Simulador Visual IRPF Tramos ${anio} - "¿Qué pasa si subo X €?" | meskeIA`,
+  description: `Visualiza los 6 tramos del IRPF español de forma interactiva. Mueve el slider y observa cómo cambia tu cuota. Vista por tramos, escalera de tipos y comparativa "qué pasa si subo X €". Datos ${anio}.`,
+  keywords: `simulador IRPF tramos visual, tramos IRPF ${anio}, escalera IRPF, tipo marginal medio, base liquidable, cuota íntegra, AEAT, qué pasa si subo sueldo IRPF, gráfico IRPF`,
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -14,7 +19,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Simulador Visual IRPF Tramos 2025 | meskeIA',
+    title: `Simulador Visual IRPF Tramos ${anio} | meskeIA`,
     description: 'Visualiza los tramos del IRPF y cómo afectan a tu cuota — interactivo y didáctico',
     url: 'https://meskeia.com/simulador-irpf-tramos/',
     siteName: 'meskeIA',
@@ -30,12 +35,12 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Simulador Visual de Tramos IRPF 2025',
-  description: 'Simulador visual e interactivo de los 6 tramos del IRPF español 2025. Visualiza cómo se aplica cada tramo, el tipo marginal vs medio, y qué pasa con tu cuota si tu base liquidable cambia.',
+  name: `Simulador Visual de Tramos IRPF ${anio}`,
+  description: `Simulador visual e interactivo de los 6 tramos del IRPF español ${anio}. Visualiza cómo se aplica cada tramo, el tipo marginal vs medio, y qué pasa con tu cuota si tu base liquidable cambia.`,
   url: 'https://meskeia.com/simulador-irpf-tramos/',
   category: 'FinanceApplication',
   features: [
-    'Vista interactiva de los 6 tramos del IRPF 2025',
+    `Vista interactiva de los 6 tramos del IRPF ${anio}`,
     'Slider "qué pasa si subo X €"',
     '3 modos: por tramos, escalera de tipos, comparativa',
     'Cálculo de tipo marginal y tipo medio efectivo',

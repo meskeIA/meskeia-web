@@ -1,10 +1,15 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FISCAL_IRPF_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = FISCAL_IRPF_META.vigencia;
 
 export const metadata: Metadata = {
-  title: 'Simulador Desglose de Nómina - Bruto a Neto Paso a Paso 2025 | meskeIA',
+  title: `Simulador Desglose de Nómina - Bruto a Neto Paso a Paso ${anio} | meskeIA`,
   description:
-    'Visualiza tu nómina paso a paso: bruto anual → cotizaciones Seguridad Social → IRPF → neto. Animación didáctica con cada deducción explicada. Datos 2025.',
+    `Visualiza tu nómina paso a paso: bruto anual → cotizaciones Seguridad Social → IRPF → neto. Animación didáctica con cada deducción explicada. Datos ${anio}.`,
   keywords:
     'desglose nómina, bruto neto España, calculadora nómina, cotizaciones seguridad social, IRPF retención, salario neto mensual, paga prorrateada, pagas extra',
   authors: [{ name: 'meskeIA' }],

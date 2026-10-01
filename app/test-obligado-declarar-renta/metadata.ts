@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
+  // anio-ok: «Renta 2025» es el EJERCICIO que se declara, no la vigencia del dato; cambia con la campaña junto al cuerpo
   title: 'Test: ¿Estoy obligado a declarar la Renta 2025? | meskeIA',
   description: 'Descubre en 2 minutos si estás obligado a presentar la declaración de la Renta 2025-2026. Umbrales actualizados: 22.000 €, 15.876 €, varios pagadores, desempleo, IMV.',
   keywords: 'obligado declarar renta 2025, declaración renta obligatoria, límite renta 2025, varios pagadores IRPF, campaña renta 2026, AEAT',
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
+    // anio-ok: el ejercicio declarado, como el title de arriba
     title: '¿Estoy obligado a declarar la Renta 2025? — Test rápido',
     description: 'Test interactivo para saber si debes presentar la declaración de IRPF 2025. Umbrales actualizados, desempleo, IMV y más.',
     url: 'https://meskeia.com/test-obligado-declarar-renta/',
@@ -25,6 +27,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
+    // anio-ok: el ejercicio declarado, como el title de arriba
     title: '¿Estoy obligado a declarar la Renta 2025?',
     description: 'Test rápido con los umbrales actualizados de la campaña 2026.',
     images: ['https://meskeia.com/og-image.png']

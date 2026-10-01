@@ -1,10 +1,15 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FISCAL_IRPF_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = FISCAL_IRPF_META.vigencia;
 
 export const metadata: Metadata = {
-  title: 'Simulador Módulos vs Estimación Directa Autónomos 2025 | meskeIA',
+  title: `Simulador Módulos vs Estimación Directa Autónomos ${anio} | meskeIA`,
   description: 'Compara orientativamente cuál régimen fiscal te conviene como autónomo: Estimación Directa Simplificada o Estimación Objetiva (Módulos). Cálculo por actividad y comparativa de coste fiscal anual.',
-  keywords: 'módulos vs estimación directa, autónomo régimen fiscal, EDS estimación directa simplificada, estimación objetiva módulos, IRPF autónomos, RETA autónomos 2025, qué régimen me conviene',
+  keywords: `módulos vs estimación directa, autónomo régimen fiscal, EDS estimación directa simplificada, estimación objetiva módulos, IRPF autónomos, RETA autónomos ${anio}, qué régimen me conviene`,
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -60,7 +65,7 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué actividades pueden acogerse al régimen de módulos en 2025?',
+      name: '¿Qué actividades pueden acogerse al régimen de módulos en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Pueden usar módulos las actividades recogidas en la Orden anual de estimación objetiva — para 2026, la Orden HAC/1425/2025, de 9 de diciembre (BOE-A-2025-25272), que mantiene el listado y los importes de la Orden HAC/1347/2024 del ejercicio anterior, entre ellas restaurantes y bares, comercio minorista de determinados sectores, transporte de viajeros y mercancías, peluquerías y servicios similares. Quedan excluidas si el volumen de ingresos supera 250.000 € anuales, si la facturación a otros empresarios y profesionales supera 125.000 € anuales, o si las compras en bienes y servicios superan 250.000 €.',

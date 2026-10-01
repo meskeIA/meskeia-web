@@ -1,8 +1,13 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { NOMADA_DIGITAL_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = NOMADA_DIGITAL_META.vigencia;
 
 export const metadata: Metadata = {
-  title: 'Orientador Visa Nómada Digital 2025 — ¿Cumples los Requisitos? | meskeIA',
+  title: `Orientador Visa Nómada Digital ${anio} — ¿Cumples los Requisitos? | meskeIA`,
   description:
     'Comprueba en 2 minutos si cumples los requisitos para la Visa Nómada Digital española (Ley de Startups 28/2022). Perfil empleado o freelancer, ingresos mínimos y documentación necesaria.',
   keywords:

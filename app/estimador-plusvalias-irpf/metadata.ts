@@ -1,18 +1,23 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { GANANCIAS_PATRIMONIALES_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = GANANCIAS_PATRIMONIALES_META.vigencia;
 
 export const metadata: Metadata = {
-  title: 'Estimador Plusvalías IRPF 2025 - Ganancias Patrimoniales | meskeIA',
-  description: 'Estima orientativamente el IRPF por venta de inmuebles, fondos o acciones. Calcula la ganancia patrimonial y la cuota fiscal según los tramos de la base del ahorro 2025.',
-  keywords: 'plusvalias irpf, ganancias patrimoniales, venta inmueble impuestos, venta acciones irpf, base del ahorro, tramos ahorro irpf 2025, calculo plusvalia',
+  title: `Estimador Plusvalías IRPF ${anio} - Ganancias Patrimoniales | meskeIA`,
+  description: `Estima orientativamente el IRPF por venta de inmuebles, fondos o acciones. Calcula la ganancia patrimonial y la cuota fiscal según los tramos de la base del ahorro ${anio}.`,
+  keywords: `plusvalias irpf, ganancias patrimoniales, venta inmueble impuestos, venta acciones irpf, base del ahorro, tramos ahorro irpf ${anio}, calculo plusvalia`,
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Estimador Plusvalías IRPF 2025 - Ganancias Patrimoniales',
-    description: 'Estima la cuota de IRPF por la venta de inmuebles, fondos o acciones. Tramos base del ahorro 2025.',
+    title: `Estimador Plusvalías IRPF ${anio} - Ganancias Patrimoniales`,
+    description: `Estima la cuota de IRPF por la venta de inmuebles, fondos o acciones. Tramos base del ahorro ${anio}.`,
     url: 'https://meskeia.com/estimador-plusvalias-irpf/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -25,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador Plusvalías IRPF 2025 | meskeIA',
+    title: `Estimador Plusvalías IRPF ${anio} | meskeIA`,
     description: 'Estima el IRPF por ganancias patrimoniales: inmuebles, fondos, acciones',
     images: ['https://meskeia.com/og-image.png']
   },
@@ -36,7 +41,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Estimador Plusvalías IRPF",
-  description: "Estima orientativamente el IRPF por venta de inmuebles, fondos o acciones. Calcula la ganancia patrimonial y la cuota fiscal según los tramos de la base del ahorro 2025.",
+  description: `Estima orientativamente el IRPF por venta de inmuebles, fondos o acciones. Calcula la ganancia patrimonial y la cuota fiscal según los tramos de la base del ahorro ${anio}.`,
   url: "https://meskeia.com/estimador-plusvalias-irpf/",
   category: 'FinanceApplication',
   features: [],

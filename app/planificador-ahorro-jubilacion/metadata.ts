@@ -1,8 +1,13 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FISCAL_PLAN_PENSIONES_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = FISCAL_PLAN_PENSIONES_META.vigencia;
 
 export const metadata: Metadata = {
-  title: 'Planificador de Ahorro para la Jubilación 2026 — Brecha, ahorro y plan de pensiones | meskeIA',
+  title: `Planificador de Ahorro para la Jubilación ${anio} — Brecha, ahorro y plan de pensiones | meskeIA`,
   description: 'Calcula tu brecha de jubilación, cuánto necesitas ahorrar mensualmente, la ventaja fiscal del plan de pensiones y la proyección de capital acumulado por escenarios.',
   keywords: 'brecha jubilacion, ahorro jubilacion, plan de pensiones, diferencia pension sueldo, cuanto ahorrar jubilacion, deduccion irpf plan pensiones, pension complementaria, proyeccion capital jubilacion',
   authors: [{ name: 'meskeIA' }],
@@ -11,7 +16,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Planificador de Ahorro para la Jubilación 2026 | meskeIA',
+    title: `Planificador de Ahorro para la Jubilación ${anio} | meskeIA`,
     description: 'Brecha, ahorro necesario, ventaja fiscal del plan de pensiones y proyección de capital.',
     url: 'https://meskeia.com/planificador-ahorro-jubilacion/',
     siteName: 'meskeIA',
@@ -25,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Planificador de Ahorro para la Jubilación 2026 | meskeIA',
+    title: `Planificador de Ahorro para la Jubilación ${anio} | meskeIA`,
     description: 'Brecha, ahorro, plan de pensiones y proyección de capital para tu jubilación.',
     images: ['https://meskeia.com/og-image.png']
   },

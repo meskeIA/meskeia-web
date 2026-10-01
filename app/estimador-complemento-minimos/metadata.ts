@@ -1,5 +1,9 @@
 import { Metadata } from 'next';
-import { PENSIONES_MINIMAS_2026, COMPLEMENTO_MINIMOS_LIMITES_2026 } from '@/data/fiscal';
+import { PENSIONES_MINIMAS_2026, COMPLEMENTO_MINIMOS_LIMITES_2026, FISCAL_PENSIONES_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = FISCAL_PENSIONES_META.vigencia;
 
 /**
  * Las cuantías del FAQPage salen de @/data/fiscal, no tecleadas.
@@ -14,7 +18,7 @@ const eur = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2,
 const minimo = (subtipo: string, campo: 'conConyuge' | 'sinConyuge' | 'unipersonal') =>
   eur(PENSIONES_MINIMAS_2026.find(e => e.tipo === 'jubilacion' && e.subtipo === subtipo)![campo]);
 
-const title = 'Estimador de Complemento a Mínimos 2026 — Pensión mínima garantizada | meskeIA';
+const title = `Estimador de Complemento a Mínimos ${anio} — Pensión mínima garantizada | meskeIA`;
 const description = 'Estima si tienes derecho al complemento a mínimos de la Seguridad Social. Pensiones mínimas 2026 por tipo (jubilación, viudedad, incapacidad), edad y situación familiar.';
 
 export const metadata: Metadata = {
@@ -27,7 +31,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Estimador de Complemento a Mínimos 2026 | meskeIA',
+    title: `Estimador de Complemento a Mínimos ${anio} | meskeIA`,
     description,
     url: 'https://meskeia.com/estimador-complemento-minimos/',
     siteName: 'meskeIA',
@@ -41,7 +45,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador de Complemento a Mínimos 2026 | meskeIA',
+    title: `Estimador de Complemento a Mínimos ${anio} | meskeIA`,
     description: 'Pensiones mínimas 2026: calcula si tienes derecho al complemento a mínimos de la SS',
     images: ['https://meskeia.com/og-image.png']
   },

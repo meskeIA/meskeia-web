@@ -1,18 +1,23 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FISCAL_AUTONOMOS_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = FISCAL_AUTONOMOS_META.vigencia;
 
 export const metadata: Metadata = {
-  title: 'Estimador Cuota de Autónomo 2025 - Orientación RETA | meskeIA',
-  description: 'Estima tu cuota de autónomo según tus ingresos reales. Sistema de cotización por tramos 2025, tarifa plana, bonificaciones y orientación sobre pagos mensuales.',
-  keywords: 'cuota autonomo, estimador reta, cotizacion autonomos, tarifa plana autonomos, cuota seguridad social, autonomo ingresos reales, tramos cotizacion, base cotizacion, cuota minima autonomo 2025',
+  title: `Estimador Cuota de Autónomo ${anio} - Orientación RETA | meskeIA`,
+  description: `Estima tu cuota de autónomo según tus ingresos reales. Sistema de cotización por tramos ${anio}, tarifa plana, bonificaciones y orientación sobre pagos mensuales.`,
+  keywords: `cuota autonomo, estimador reta, cotizacion autonomos, tarifa plana autonomos, cuota seguridad social, autonomo ingresos reales, tramos cotizacion, base cotizacion, cuota minima autonomo ${anio}`,
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Estimador Cuota de Autónomo 2025 - Orientación RETA',
-    description: 'Estima tu cuota de autónomo según tus ingresos reales. Tramos 2025, tarifa plana y bonificaciones.',
+    title: `Estimador Cuota de Autónomo ${anio} - Orientación RETA`,
+    description: `Estima tu cuota de autónomo según tus ingresos reales. Tramos ${anio}, tarifa plana y bonificaciones.`,
     url: 'https://meskeia.com/estimador-cuota-autonomo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -25,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador Cuota de Autónomo 2025',
+    title: `Estimador Cuota de Autónomo ${anio}`,
     description: 'Estima tu cuota de autónomo según el sistema de cotización por ingresos reales',
     images: ['https://meskeia.com/og-image.png']
   },
@@ -40,7 +45,7 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuánto se paga de cuota de autónomo en 2025 según los ingresos?',
+      name: '¿Cuánto se paga de cuota de autónomo en 2026 según los ingresos?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'En 2026 la cuota de autónomo depende de los ingresos netos reales. El sistema tiene 15 tramos: la cuota mínima (ingresos hasta 670 €/mes) es de 205,88 € al mes, y la máxima (ingresos superiores a 6.000 €/mes) es de 607,35 € mensuales. Para ingresos entre 1.700 y 1.850 €/mes, la cuota es de 360,29 € al mes. Los autónomos societarios tienen cuotas distintas.',
@@ -48,7 +53,7 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cuál es la tarifa plana para nuevos autónomos en 2025?',
+      name: '¿Cuál es la tarifa plana para nuevos autónomos en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Los autónomos que se dan de alta por primera vez (o reincorporados tras más de 2 años de baja) pueden acogerse a la cuota reducida de 80 € al mes durante los primeros 12 meses, independientemente de sus ingresos. Este período puede prorrogarse otros 12 meses adicionales si los rendimientos netos mensuales no superan el SMI (1.221 € en 2026). El sistema anterior de tarifa plana de 60 € se eliminó con la reforma del RETA.',
@@ -83,7 +88,7 @@ export const faqJsonLd = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Estimador de Cuota de Autónomo",
-  description: "Estima tu cuota de autónomo según tus ingresos reales. Sistema de cotización por tramos 2025, tarifa plana, bonificaciones y orientación sobre pagos mensuales.",
+  description: `Estima tu cuota de autónomo según tus ingresos reales. Sistema de cotización por tramos ${anio}, tarifa plana, bonificaciones y orientación sobre pagos mensuales.`,
   url: "https://meskeia.com/estimador-cuota-autonomo/",
   category: 'FinanceApplication',
   features: [],

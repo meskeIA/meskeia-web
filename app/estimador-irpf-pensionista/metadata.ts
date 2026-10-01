@@ -7,7 +7,12 @@ import {
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   OBLIGACION_DECLARAR_2025,
   cuotaEscalaGeneral,
+  FISCAL_IRPF_META,
 } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = FISCAL_IRPF_META.vigencia;
 
 /**
  * El FAQPage se sirve a Bing Copilot, ChatGPT, Perplexity y Gemini para grounding, así que sus
@@ -21,7 +26,7 @@ const LIMITE_OTRAS_RENTAS_ART_20 = REDUCCION_RENDIMIENTOS_TRABAJO_2025.limiteOtr
 const VALOR_MINIMO_75 = cuotaEscalaGeneral(MINIMOS_IRPF_2025.personal_75);
 
 export const metadata: Metadata = {
-  title: 'Estimador IRPF Pensionista 2026 - Cuánto pagas de renta | meskeIA',
+  title: `Estimador IRPF Pensionista ${anio} - Cuánto pagas de renta | meskeIA`,
   description: 'Estima el IRPF que pagas como pensionista: reducción por rendimientos del trabajo, mínimo personal por edad y cuota orientativa. Pensión neta mensual real.',
   keywords: 'irpf pensionista, declaracion renta jubilado, cuanto paga de irpf un pensionista, reduccion rendimientos trabajo pension, minimo personal 65 años, pension neta mensual',
   authors: [{ name: 'meskeIA' }],
@@ -30,7 +35,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Estimador IRPF Pensionista 2026 | meskeIA',
+    title: `Estimador IRPF Pensionista ${anio} | meskeIA`,
     description: 'Cuánto IRPF pagas como pensionista y cuál es tu pensión neta mensual real.',
     url: 'https://meskeia.com/estimador-irpf-pensionista/',
     siteName: 'meskeIA',
@@ -44,7 +49,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador IRPF Pensionista 2026 | meskeIA',
+    title: `Estimador IRPF Pensionista ${anio} | meskeIA`,
     description: 'Renta del pensionista orientativa: cuota IRPF y pensión neta mensual 2026',
     images: ['https://meskeia.com/og-image.png']
   },

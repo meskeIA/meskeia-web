@@ -1,8 +1,13 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { ALQUILER_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = ALQUILER_META.vigencia;
 
 export const metadata: Metadata = {
-  title: 'Estimador Actualización Alquiler 2026 — IRAV e IPC | meskeIA',
+  title: `Estimador Actualización Alquiler ${anio} — IRAV e IPC | meskeIA`,
   description: 'Estima cuánto puede subir tu alquiler en 2026. Aplica el índice correcto: IRAV (contratos desde mayo 2023) o IPC interanual (contratos anteriores). Ley de Vivienda actualizada.',
   keywords: 'estimador alquiler 2026, IRAV alquiler, subida alquiler 2026, actualización renta alquiler, IPC alquiler, cuanto puede subir el alquiler, ley vivienda 2023 alquiler, indice actualizacion alquiler',
   authors: [{ name: 'meskeIA' }],
@@ -11,7 +16,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Estimador Actualización Alquiler 2026 — IRAV e IPC | meskeIA',
+    title: `Estimador Actualización Alquiler ${anio} — IRAV e IPC | meskeIA`,
     description: 'Estima la subida máxima permitida de tu alquiler según la Ley de Vivienda. IRAV para contratos nuevos, IPC para los anteriores.',
     url: 'https://meskeia.com/estimador-actualizacion-alquiler/',
     siteName: 'meskeIA',
@@ -25,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador Actualización Alquiler 2026 | meskeIA',
+    title: `Estimador Actualización Alquiler ${anio} | meskeIA`,
     description: '¿Cuánto puede subir tu alquiler? Estima con IRAV o IPC según tu tipo de contrato.',
     images: ['https://meskeia.com/og-image.png']
   },

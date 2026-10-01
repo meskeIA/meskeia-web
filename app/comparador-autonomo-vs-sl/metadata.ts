@@ -1,8 +1,13 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FISCAL_IRPF_META } from '@/data/fiscal';
+
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = FISCAL_IRPF_META.vigencia;
 
 export const metadata: Metadata = {
-  title: 'Comparador Autónomo vs SL 2025 - ¿Qué conviene más fiscalmente? | meskeIA',
+  title: `Comparador Autónomo vs SL ${anio} - ¿Qué conviene más fiscalmente? | meskeIA`,
   description: 'Compara orientativamente la carga fiscal entre ser autónomo (IRPF + RETA) y constituir una Sociedad Limitada (IS 25% + dividendos). Descubre a partir de qué ingresos conviene una SL.',
   keywords: 'autonomo vs sl, autónomo o sociedad limitada, cuándo crear sl, fiscalidad autonomo sl, is 25, irpf autonomo, comparativa fiscal, constituir sl',
   authors: [{ name: 'meskeIA' }],
@@ -11,7 +16,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Comparador Autónomo vs SL 2025 - Orientación Fiscal',
+    title: `Comparador Autónomo vs SL ${anio} - Orientación Fiscal`,
     description: 'Compara orientativamente la carga fiscal entre autónomo y Sociedad Limitada según tus ingresos.',
     url: 'https://meskeia.com/comparador-autonomo-vs-sl/',
     siteName: 'meskeIA',
@@ -25,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Comparador Autónomo vs SL 2025 | meskeIA',
+    title: `Comparador Autónomo vs SL ${anio} | meskeIA`,
     description: '¿Cuándo conviene más una SL que ser autónomo? Compara la carga fiscal',
     images: ['https://meskeia.com/og-image.png']
   },

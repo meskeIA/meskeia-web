@@ -3,22 +3,26 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 import { COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META, PLAZO_IIVTNU } from '@/data/fiscal';
 import { formatNumber } from '@/lib';
 
+// Año del título: la vigencia del módulo que sella los datos. Sale del dato
+// y no se escribe a mano (lo exige check:anio-titulo).
+const anio = PLUSVALIA_MUNICIPAL_META.vigencia;
+
 // Extremos de la tabla vigente, derivados: hasta el 24/09/2026 el FAQPage los traía escritos
 // a mano con la tabla caducada del RDL 26/2021 (0,14 … 0,45), hallazgo 1559.
 const COEF_MENOS_DE_UN_ANIO = formatNumber(COEFICIENTES_IIVTNU_2025[0].coeficiente, 2);
 const COEF_VEINTE_O_MAS = formatNumber(COEFICIENTES_IIVTNU_2025[COEFICIENTES_IIVTNU_2025.length - 1].coeficiente, 2);
 
 export const metadata: Metadata = {
-  title: 'Estimador Plusvalía Municipal (IIVTNU) 2025 | meskeIA',
+  title: `Estimador Plusvalía Municipal (IIVTNU) ${anio} | meskeIA`,
   description: 'Oriéntate sobre el importe de la Plusvalía Municipal (IIVTNU) al vender o heredar un inmueble en España. Compara el método objetivo y el método real conforme al RDL 26/2021.',
-  keywords: 'plusvalia municipal, IIVTNU, impuesto plusvalia venta piso, metodo objetivo, metodo real, RDL 26/2021, impuesto ayuntamiento venta inmueble, orientacion plusvalia municipal 2025',
+  keywords: `plusvalia municipal, IIVTNU, impuesto plusvalia venta piso, metodo objetivo, metodo real, RDL 26/2021, impuesto ayuntamiento venta inmueble, orientacion plusvalia municipal ${anio}`,
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Estimador Plusvalía Municipal (IIVTNU) 2025 — meskeIA',
+    title: `Estimador Plusvalía Municipal (IIVTNU) ${anio} — meskeIA`,
     description: 'Estima orientativamente la Plusvalía Municipal con los dos métodos legales: objetivo y real. Consulta siempre al Ayuntamiento o a un asesor fiscal.',
     url: 'https://meskeia.com/estimador-plusvalia-municipal/',
     siteName: 'meskeIA',
@@ -32,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Estimador Plusvalía Municipal (IIVTNU) 2025',
+    title: `Estimador Plusvalía Municipal (IIVTNU) ${anio}`,
     description: 'Oriéntate sobre el impuesto municipal al vender o heredar un inmueble. Dos métodos comparados según RDL 26/2021.',
     images: ['https://meskeia.com/og-image.png']
   },

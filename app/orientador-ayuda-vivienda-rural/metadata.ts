@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Orientador Ayudas Primera Vivienda en Zona Rural 2026 - meskeIA',
+  title: 'Orientador Ayudas Primera Vivienda en Zona Rural (Plan 2026-2030) - meskeIA',
   description: 'Orienta si puedes recibir hasta 15.000€ para comprar tu primera vivienda en un pueblo pequeño. Plan Estatal Vivienda 2026-2030 (RD 326/2026): ≤35 años, municipio ≤10.000 hab, hasta el 20% del precio.',
   keywords: 'ayuda primera vivienda zona rural 2026, 15000 euros primera vivienda pueblo, plan estatal vivienda 2026 municipio pequeño, ayuda compra vivienda rural jóvenes, RD 326/2026 vivienda rural, despoblación rural ayuda vivienda',
   authors: [{ name: 'meskeIA' }],
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Orientador Ayudas Primera Vivienda Rural 2026 — hasta 15.000 € para comprar en un pueblo',
+    title: 'Orientador Ayudas Primera Vivienda Rural (Plan 2026-2030) — hasta 15.000 € para comprar en un pueblo',
     description: '¿Quieres comprar tu primera vivienda en un municipio pequeño? Descubre si la ayuda del Plan Estatal 2026-2030 aplica a tu caso y cuánto podrías recibir.',
     url: 'https://meskeia.com/orientador-ayuda-vivienda-rural/',
     siteName: 'meskeIA',
@@ -27,12 +27,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Orientador Ayudas Primera Vivienda Rural 2026',
+    title: 'Orientador Ayudas Primera Vivienda Rural (Plan 2026-2030)',
     description: 'Hasta 15.000€ (o el 20% del precio) para comprar tu primera vivienda en un pueblo. Comprueba si te corresponde.',
     images: ['https://meskeia.com/og-image.png'],
   },
   other: {
-    'application-name': 'Orientador Ayudas Primera Vivienda Rural 2026 - meskeIA',
+    'application-name': 'Orientador Ayudas Primera Vivienda Rural (Plan 2026-2030) - meskeIA',
   },
 };
 
