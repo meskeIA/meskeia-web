@@ -11,7 +11,7 @@ import { guidesJourney } from '@/data/guides-journey';
 // public/ no podía auto-refrescar las cifras y caducaba: ahora el total de apps,
 // los counts por suite, la fecha, los contadores de los verticales y la sección
 // de guías-journey (cuenta + lista) se calculan en build desde los datos. Las
-// cifras de MCP (185 tools) y GPTs (12) siguen siendo manuales: no se derivan
+// cifras de MCP (42 tools meskeIA, 49 Delegum) y GPTs (12) siguen siendo manuales: no se derivan
 // del catálogo de apps (revisadas en la auditoría mensual /audit-meskeia).
 export const dynamic = 'force-static';
 

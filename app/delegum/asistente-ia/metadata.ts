@@ -93,7 +93,7 @@ export const faqJsonLd = {
       name: '¿En qué se diferencia Delegum del servidor MCP de meskeIA?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El MCP de meskeIA es una biblioteca amplia de 185 herramientas de cálculo. Delegum es un servicio enfocado y orquestador: menos herramientas pero mejor descritas y agrupadas en consultas de escenario, lo que mejora la precisión del asistente al elegir qué calcular. Ambos comparten la misma biblioteca de cálculo.',
+        text: 'El MCP de meskeIA reúne calculadoras del día a día (fechas, porcentajes, deporte, cocina, foto y vídeo) y no incluye fiscalidad. Delegum es el servidor especializado en fiscalidad, derecho laboral y finanzas de España: herramientas descritas con más detalle y agrupadas en consultas de escenario, lo que mejora la precisión del asistente al elegir qué calcular.',
       },
     },
     {

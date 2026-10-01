@@ -49,40 +49,40 @@ const CLIENTES = [
 
 const CATEGORIAS = [
   {
-    icon: '🏛️',
-    nombre: 'Fiscal y Tributario',
-    desc: 'IRPF, Impuesto de Sociedades, IVA, modelos 130/303/111/347 y toda la normativa tributaria española.',
-    ejemplos: 'cuota autónomo, sucesiones, donaciones, plusvalías, IIVTNU...',
-  },
-  {
-    icon: '💼',
-    nombre: 'Laboral y Nóminas',
-    desc: 'Sueldo neto, finiquitos, prestaciones, ERTEs, despidos, excedencias y todo el derecho laboral.',
-    ejemplos: 'indemnización, horas extra, reducción jornada, baja médica...',
-  },
-  {
-    icon: '🏘️',
-    nombre: 'Inmobiliario',
-    desc: 'Hipotecas, compraventa de inmuebles, plusvalías, ITP/AJD por CCAA, alquiler y rendimientos.',
-    ejemplos: 'capacidad hipoteca, amortización anticipada, ITP, rentabilidad alquiler...',
-  },
-  {
-    icon: '📈',
-    nombre: 'Financiero',
-    desc: 'Inversiones, interés compuesto, TIR/VAN, FIRE, estrategia de deuda y objetivos de ahorro.',
-    ejemplos: 'regla del 72, reequilibrio cartera, descuento efectos...',
-  },
-  {
-    icon: '🏥',
-    nombre: 'Salud',
-    desc: 'Calculadoras de IMC y macronutrientes con avisos sanitarios incluidos en cada respuesta.',
-    ejemplos: 'IMC, necesidades calóricas, distribución de macros...',
-  },
-  {
     icon: '🔧',
-    nombre: 'Cotidiano y Educativo',
-    desc: 'Fechas, porcentajes, unidades, estadísticas, regla de tres y otras utilidades generales.',
-    ejemplos: 'diferencia entre fechas, MCD/MCM, conversor de unidades...',
+    nombre: 'Cálculo cotidiano',
+    desc: 'Porcentajes, propinas, regla de tres, conversión de unidades, estadística básica e inflación.',
+    ejemplos: 'MCD/MCM, media y desviación, edad de una mascota en años humanos...',
+  },
+  {
+    icon: '📅',
+    nombre: 'Fechas',
+    desc: 'Días entre dos fechas, la fecha que resulta de sumar o restar un plazo, día de la semana y edad exacta.',
+    ejemplos: 'cuántos días faltan, qué día cae dentro de 90 días...',
+  },
+  {
+    icon: '🏃',
+    nombre: 'Deporte y salud',
+    desc: 'IMC, gasto energético y macros, ritmo y predicción en running, zonas cardíacas, ciclismo, natación y gimnasio. Con aviso sanitario en cada respuesta.',
+    ejemplos: 'pace, 1RM, W/kg y zonas por FTP, SWOLF...',
+  },
+  {
+    icon: '🚗',
+    nombre: 'Coche y movilidad',
+    desc: 'Consumo y coste de combustible, compensación por kilómetro con vehículo propio, etiqueta ambiental DGT y año en que el coche eléctrico sale más barato.',
+    ejemplos: 'coste de un viaje, qué etiqueta lleva un coche...',
+  },
+  {
+    icon: '📷',
+    nombre: 'Foto y vídeo',
+    desc: 'Profundidad de campo, exposición equivalente, astrofotografía, regla de los 180°, cámara lenta, filtros ND, bitrate y campo de visión.',
+    ejemplos: 'regla 500/NPF, velocidad de obturación, peso de un vídeo...',
+  },
+  {
+    icon: '🍞',
+    nombre: 'Panadería y repostería',
+    desc: 'Porcentaje del panadero, hidratación, masa madre, temperatura de la masa, azúcar, gelatina, ganache y escalado de recetas.',
+    ejemplos: 'pasar de levadura a masa madre, receta para 8 en vez de 4...',
   },
 ];
 
@@ -95,7 +95,7 @@ const PASOS = [
   {
     n: '2',
     titulo: 'La IA descubre las herramientas',
-    desc: 'Al conectarse, el cliente recibe automáticamente la lista de las 160+ herramientas disponibles con sus parámetros.',
+    desc: 'Al conectarse, el cliente recibe automáticamente la lista de herramientas disponibles con sus parámetros.',
   },
   {
     n: '3',
@@ -131,8 +131,9 @@ export default function DevelopersPage() {
         <span className={styles.heroLabel}>Para desarrolladores</span>
         <h1 className={styles.heroTitle}>Integra meskeIA en tu IA</h1>
         <p className={styles.heroSubtitle}>
-          160+ calculadoras fiscales, financieras y de salud disponibles mediante
-          el protocolo MCP. Gratuito, sin registro, sin API key.
+          Calculadoras del día a día en español —porcentajes, fechas, deporte,
+          coche, foto y vídeo, cocina— disponibles mediante el protocolo MCP.
+          Gratuito, sin registro, sin API key.
         </p>
 
         <div className={styles.heroUrl}>
@@ -152,7 +153,7 @@ export default function DevelopersPage() {
         <div className={styles.heroBadges}>
           <span className={styles.badge}>✓ Protocolo MCP estándar</span>
           <span className={styles.badge}>✓ Sin API key</span>
-          <span className={styles.badge}>✓ 160+ herramientas</span>
+          <span className={styles.badge}>✓ Cálculo determinista</span>
           <span className={styles.badge}>✓ En español</span>
         </div>
       </header>
@@ -214,6 +215,12 @@ export default function DevelopersPage() {
               </div>
             ))}
           </div>
+          <p className={styles.configNote}>
+            ¿Buscas cálculos fiscales, laborales o inmobiliarios de España (IRPF, nóminas,
+            autónomos, hipotecas, herencias)? Están en el servidor MCP de Delegum,
+            en <code>https://delegum.com/api/mcp/</code>.{' '}
+            <a href="https://delegum.com/asistente-ia/">Ver cómo conectarlo</a>.
+          </p>
         </section>
 
         {/* ── Cómo funciona ─────────────────────────────── */}

@@ -29,7 +29,7 @@ export default function TerminosMCPPage() {
 
           <h2>1. Descripción del servicio</h2>
           <p>
-            meskeIA pone a disposición pública un <strong>servidor MCP (Model Context Protocol)</strong> que expone más de 160 calculadoras especializadas en áreas fiscal, financiera, laboral y de salud en español.
+            meskeIA pone a disposición pública un <strong>servidor MCP (Model Context Protocol)</strong> que expone calculadoras del día a día en español: porcentajes, fechas, unidades, deporte y salud, coche, fotografía y vídeo, panadería y repostería. Los cálculos fiscales, laborales e inmobiliarios de España se sirven desde un servidor aparte, el de Delegum, al que también se aplican estos términos.
           </p>
           <p>
             El servidor es accesible en la URL <code>https://meskeia.com/api/mcp/</code> y es compatible con cualquier cliente que implemente el protocolo MCP estándar (Claude Desktop, Cursor, Windsurf y similares).

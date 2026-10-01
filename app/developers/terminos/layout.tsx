@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Términos de Uso del Servidor MCP | Desarrolladores | meskeIA',
-  description: 'Condiciones de uso del servidor MCP de meskeIA para desarrolladores e integradores. 160+ calculadoras disponibles mediante el protocolo Model Context Protocol.',
+  description: 'Condiciones de uso del servidor MCP de meskeIA para desarrolladores e integradores. Calculadoras del día a día disponibles mediante el protocolo Model Context Protocol.',
   keywords: 'meskeIA MCP, términos de uso API, servidor MCP desarrolladores, calculadoras MCP, protocolo MCP español',
   authors: [{ name: 'meskeIA' }],
   robots: 'index, follow',

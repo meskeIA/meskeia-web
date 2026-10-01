@@ -1,7 +1,7 @@
 /**
  * Servidor MCP «Delegum» — Plataforma de fiscalidad, derecho laboral y finanzas (España)
  *
- * A diferencia del MCP meskeIA (185 tools, modelo «biblioteca»), Delegum es el
+ * A diferencia del MCP meskeIA (42 tools del día a día, sin fiscalidad), Delegum es el
  * modelo «gestoría»: enfocado, con herramientas de ESCENARIO que orquestan varios
  * cálculos para responder la pregunta real del usuario, y un conjunto curado de
  * herramientas individuales para consultas concretas.

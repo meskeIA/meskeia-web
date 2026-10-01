@@ -6,10 +6,10 @@
     "name": "meskeia-mcp",
     "title": "meskeIA MCP",
     "version": "1.0.0",
-    "description": "160+ calculadoras fiscales, financieras, laborales y de salud en español. Cubre IRPF, autónomos, hipotecas, sucesiones, nóminas, inversiones, IMC y más. Sin registro, sin API key.",
+    "description": "Calculadoras del día a día en español: porcentajes, fechas, unidades, deporte y salud, coche y etiqueta DGT, foto y vídeo, panadería y repostería. Sin registro, sin API key. Lo fiscal y laboral de España está en el MCP de Delegum (delegum.com/asistente-ia/).",
     "homepage": "https://meskeia.com/developers/"
   },
-  "description": "Servidor MCP público de meskeIA con 160+ herramientas especializadas en fiscalidad española, finanzas, derecho laboral y salud. Compatible con Claude Desktop, Cursor, Windsurf y cualquier cliente MCP estándar. Gratuito, sin registro, sin API key. Cada respuesta incluye aviso legal sobre el carácter orientativo del resultado.",
+  "description": "Servidor MCP público de meskeIA con calculadoras deterministas del día a día: porcentajes, propinas, regla de tres, conversión de unidades, fechas y edades, estadística, inflación, IMC y macros, running, ciclismo, natación y gimnasio, consumo de combustible y etiqueta DGT, fotografía y vídeo, panadería y repostería. Los cálculos fiscales, laborales e inmobiliarios de España están en el servidor MCP de Delegum: https://delegum.com/api/mcp/. Compatible con Claude Desktop, Cursor, Windsurf y cualquier cliente MCP estándar. Gratuito, sin registro, sin API key. Cada respuesta incluye aviso legal sobre el carácter orientativo del resultado.",
   "iconUrl": "https://meskeia.com/icon-512x512.png",
   "documentationUrl": "https://meskeia.com/developers/",
   "termsOfServiceUrl": "https://meskeia.com/developers/terminos/",
@@ -26,5 +26,5 @@
     "required": false,
     "schemes": []
   },
-  "tags": ["finance", "fiscal", "legal", "health", "spanish", "tax", "utilities"]
+  "tags": ["utilities", "calculators", "health", "fitness", "photography", "cooking", "spanish"]
 }

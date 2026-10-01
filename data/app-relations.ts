@@ -6483,9 +6483,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   'developers': [
-    { url: '/estimador-irpf/', icon: '🏛️', name: 'Calculadora IRPF', description: 'Ejemplo de herramienta fiscal disponible vía MCP' },
-    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador de Hipoteca', description: 'Ejemplo de herramienta financiera disponible vía MCP' },
-    { url: '/estimador-cuota-autonomo/', icon: '💼', name: 'Cuota de Autónomo', description: 'Ejemplo de herramienta laboral disponible vía MCP' },
+    { url: '/calculadora-macros/', icon: '🥗', name: 'Calculadora de Macros', description: 'Ejemplo de herramienta de salud disponible vía MCP' },
+    { url: '/calculadora-profundidad-campo/', icon: '🎯', name: 'Profundidad de Campo', description: 'Ejemplo de herramienta de fotografía disponible vía MCP' },
+    { url: '/calculadora-porcentaje-panadero/', icon: '🍞', name: 'Porcentaje del Panadero', description: 'Ejemplo de herramienta de panadería disponible vía MCP' },
     { url: '/developers/terminos/', icon: '⚖️', name: 'Términos de Uso MCP', description: 'Condiciones legales para integradores del servidor MCP' },
   ],
 

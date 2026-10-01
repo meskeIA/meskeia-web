@@ -17,7 +17,7 @@ export default function McpPage() {
           <div className={styles.hero}>
             <h1 className={styles.title}>Servidor MCP de meskeIA</h1>
             <p className={styles.subtitle}>
-              185 herramientas de cálculo accesibles directamente desde Claude, Mistral,
+              Calculadoras del día a día accesibles directamente desde Claude, Mistral,
               ChatGPT y cualquier cliente compatible con el Model Context Protocol.
             </p>
             <div className={styles.badge}>
@@ -57,19 +57,20 @@ export default function McpPage() {
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Herramientas disponibles</h2>
             <p className={styles.sectionIntro}>
-              185 herramientas organizadas en 8 categorías, optimizadas para el público hispanohablante
-              con normativa española 2025 donde aplica.
+              Calculadoras deterministas del día a día, en español y con formato español.
+              Los cálculos fiscales, laborales e inmobiliarios de España están en un servidor aparte,
+              el <a href="https://delegum.com/asistente-ia/" className={styles.link}>MCP de Delegum</a>{' '}
+              (<code>https://delegum.com/api/mcp/</code>).
             </p>
             <div className={styles.categoriesGrid}>
               {[
-                { icon: '⚖️', name: 'Fiscal España', desc: 'IRPF, IVA, ITP/AJD, IS, Sucesiones, Donaciones, RETA, plusvalías, paro, nóminas, recargo de equivalencia y más de 60 cálculos normativos 2025.' },
-                { icon: '💶', name: 'Finanzas personales', desc: 'Hipotecas, préstamos, amortización anticipada, interés compuesto, ETF, dividendos, plan de ahorro y calculadoras de inversión.' },
-                { icon: '🏘️', name: 'Inmobiliaria', desc: 'Gastos de compraventa, plusvalía municipal (IIVTNU), rentabilidad de alquiler, tasación simplificada y coeficientes 2025.' },
-                { icon: '💼', name: 'Laboral y RRHH', desc: 'Coste de contratar, finiquito, prestación por desempleo, sueldo neto, complemento de pensión y cálculos de autónomos.' },
-                { icon: '🏥', name: 'Salud y deporte', desc: 'IMC, zonas de frecuencia cardíaca (Karvonen), calorías, macronutrientes y métricas de rendimiento deportivo.' },
-                { icon: '📷', name: 'Fotografía', desc: 'Regla NPF y 500 para astrofotografía, profundidad de campo, focal equivalente, balance de blancos y tiempos de exposición.' },
-                { icon: '🎬', name: 'Vídeo y cocina', desc: 'Factor de cámara lenta, velocidad de obturación por regla de los 180°, proporciones de ganache, porcentajes de chef y conversiones culinarias.' },
-                { icon: '🔢', name: 'Cotidiano', desc: 'Porcentajes, conversión de divisas, combustible, propinas por país, diferencia entre fechas, IPC histórico y calculadoras de uso diario.' },
+                { icon: '🔢', name: 'Cotidiano', desc: 'Porcentajes, propinas, regla de tres, conversión de unidades, estadística básica, MCD/MCM, inflación y edad de una mascota en años humanos.' },
+                { icon: '📅', name: 'Fechas', desc: 'Días entre dos fechas, la fecha que resulta de sumar o restar un plazo, día de la semana y edad exacta.' },
+                { icon: '🏥', name: 'Salud y deporte', desc: 'IMC, gasto energético, macronutrientes, zonas de frecuencia cardíaca, ritmo y predicción en running, potencia en ciclismo, SWOLF en natación y 1RM de gimnasio.' },
+                { icon: '🚗', name: 'Coche y movilidad', desc: 'Consumo y coste de combustible, compensación por kilómetro con vehículo propio, etiqueta ambiental DGT y año en que el coche eléctrico sale más barato.' },
+                { icon: '📷', name: 'Fotografía', desc: 'Regla NPF y 500 para astrofotografía, profundidad de campo y exposición equivalente.' },
+                { icon: '🎬', name: 'Vídeo', desc: 'Regla de los 180°, factor de cámara lenta, filtro ND, bitrate y tamaño de archivo, y campo de visión.' },
+                { icon: '🍞', name: 'Panadería y repostería', desc: 'Porcentaje del panadero, hidratación, sustitución de levadura por masa madre, temperatura de la masa, azúcar, gelatina, ganache y escalado de recetas.' },
               ].map(cat => (
                 <div key={cat.name} className={styles.categoryCard}>
                   <span className={styles.categoryIcon} aria-hidden="true">{cat.icon}</span>
@@ -87,9 +88,9 @@ export default function McpPage() {
             <h2 className={styles.sectionTitle}>Ejemplos de uso</h2>
             <div className={styles.examplesGrid}>
               {[
-                { q: '¿Cuánto pagaré de IRPF con 38.000 € brutos en Madrid, soltero, sin hijos?', tag: 'Fiscal' },
-                { q: 'Hipoteca de 220.000 € a 25 años al 3,2%. ¿Cuota mensual y total de intereses?', tag: 'Finanzas' },
-                { q: 'Tengo 45 años, llevo 22 cotizando y cobro 2.400 €/mes. ¿Qué pensión pública me corresponde?', tag: 'Laboral' },
+                { q: 'Corro 10 km en 52 minutos. ¿A qué ritmo voy y qué tiempo puedo esperar en una media maratón?', tag: 'Deporte' },
+                { q: 'Viaje de 620 km con un coche que gasta 6,5 l/100 km y la gasolina a 1,62 €/l. ¿Cuánto me cuesta?', tag: 'Coche' },
+                { q: 'Mi receta de pan lleva 7 g de levadura seca. ¿Cuánta masa madre uso en su lugar?', tag: 'Panadería' },
                 { q: '¿Cuánto chocolate y nata necesito para 400 g de ganache de trufa firme?', tag: 'Cocina' },
                 { q: 'Sony A7III, 24 MP, focal 20 mm, f/2,8. ¿Tiempo máximo de exposición para astrofoto sin rastro de estrella?', tag: 'Fotografía' },
               ].map(ex => (
@@ -108,7 +109,7 @@ export default function McpPage() {
               <li>Los parámetros de cada llamada se procesan en memoria y <strong>no se almacenan</strong>.</li>
               <li>Toda la comunicación viaja cifrada por <strong>HTTPS/TLS</strong>.</li>
               <li>No se requiere cuenta, email ni ningún dato personal para usar el servidor.</li>
-              <li>Los cálculos fiscales incluyen aviso de vigencia normativa (ejercicio 2025) y recomendación de consultar a un asesor colegiado.</li>
+              <li>Cada respuesta incluye el aviso que le corresponde: sanitario en salud y deporte, y de vigencia normativa en la compensación por kilómetro.</li>
               <li>Política de privacidad completa: <a href="/privacidad" className={styles.link}>meskeia.com/privacidad</a>.</li>
             </ul>
           </section>
