@@ -470,7 +470,7 @@ export const implementedAppsUrls = [
   "/simulador-mito-tramo-superior/", // Demuestra que el mito "subir de tramo te quita más" es falso con números reales
 
   // Tanda 2 simuladores Fiscales-España visuales (2026-05-07)
-  "/simulador-modulos-vs-directa/", // Autónomos: comparativa ED Simplificada vs Módulos por actividad
+  "/simulador-modulos-vs-directa/", // Autónomos: coste ED Simplificada vs Módulos con el rendimiento que aporta el usuario
   "/simulador-heredar-vivienda/",   // ISD + plusvalía municipal + IRPF al vender, 17 CCAA, 4 casos
   "/simulador-renta-plan-pensiones/", // 3 escenarios IRPF (sin/con plan óptimo/con plan mal rescate)
 

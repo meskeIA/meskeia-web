@@ -14,10 +14,15 @@ const orden = ORDEN_MODULOS_VIGENTE;
 const limites = LIMITES_EXCLUSION_MODULOS_2025;
 const euros = (n: number) => `${formatNumber(n, 0)} €`;
 
+// ⚠️ 01/10/2026 (hallazgo 2545) — la app dejó de estimar el rendimiento de módulos con
+// fórmulas inventadas por actividad y de recomendar régimen: el rendimiento lo aporta el
+// usuario y la diferencia de costes se da como dato. Description, features y FAQPage dejaron
+// de prometer qué régimen elegir y un «cálculo por actividad».
+
 export const metadata: Metadata = {
   title: `Simulador Módulos vs Estimación Directa Autónomos ${anio} | meskeIA`,
-  description: 'Compara orientativamente cuál régimen fiscal te conviene como autónomo: Estimación Directa Simplificada o Estimación Objetiva (Módulos). Cálculo por actividad y comparativa de coste fiscal anual.',
-  keywords: `módulos vs estimación directa, autónomo régimen fiscal, EDS estimación directa simplificada, estimación objetiva módulos, IRPF autónomos, RETA autónomos ${anio}, qué régimen me conviene`,
+  description: 'Calcula el coste anual de IRPF y cuota RETA de un autónomo en Estimación Directa Simplificada y en módulos, con tus ingresos, tus gastos y tu rendimiento neto de módulos. Diferencia entre ambos y límites de exclusión.',
+  keywords: `módulos vs estimación directa, autónomo régimen fiscal, EDS estimación directa simplificada, estimación objetiva módulos, IRPF autónomos, RETA autónomos ${anio}, rendimiento neto de módulos`,
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -28,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Simulador Módulos vs Estimación Directa | meskeIA',
-    description: 'Compara los dos regímenes fiscales del autónomo y descubre cuál te conviene',
+    description: 'Coste anual de IRPF y cuota RETA del autónomo en directa y en módulos, con tus datos',
     url: 'https://meskeia.com/simulador-modulos-vs-directa/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -44,15 +49,16 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador Módulos vs Estimación Directa para Autónomos',
-  description: 'Comparador orientativo entre los dos regímenes fiscales del IRPF para autónomos en España: Estimación Directa Simplificada y Estimación Objetiva (Módulos). Cálculo por actividad.',
+  description: 'Calculadora orientativa del coste anual (IRPF + cuota RETA) de un autónomo en España en Estimación Directa Simplificada y, con el rendimiento neto de módulos que aporta el usuario, en Estimación Objetiva (módulos).',
   url: 'https://meskeia.com/simulador-modulos-vs-directa/',
   category: 'FinanceApplication',
   features: [
-    'Comparativa visual lado a lado de los dos regímenes',
-    'Cálculo IRPF + RETA orientativo',
-    '4 casos preconfigurados (bar rentable, bar con pérdidas, comercio, profesional)',
-    'Aviso sobre actividades elegibles a módulos',
-    'IRPF calculado con la escala general del art. 63 de la Ley 35/2006 del IRPF; módulos con fórmula didáctica simplificada, no los coeficientes oficiales de la Orden anual de módulos',
+    'Desglose lado a lado del coste anual en los dos regímenes',
+    'Estimación directa con la cuota RETA como gasto deducible y el 5\u00A0% de gastos de difícil justificación',
+    'Módulos con el rendimiento neto que aporta el usuario y la reducción general de la Orden vigente',
+    'Límites de exclusión de módulos por ingresos y compras',
+    'IRPF con la escala general y el mínimo personal (art. 63 de la Ley 35/2006)',
+    'Diferencia de costes como dato, sin veredicto sobre qué régimen elegir',
     'Solo orientativo — no sustituye al asesor fiscal',
     'En español',
   ],
@@ -68,7 +74,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre módulos y estimación directa para autónomos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En estimación directa (simplificada o normal) el IRPF se calcula sobre el beneficio real: ingresos menos gastos deducibles. En estimación objetiva (módulos) el rendimiento se calcula mediante indicadores fijos por actividad (mesas, empleados, potencia eléctrica…) independientemente del beneficio real. Módulos puede ser ventajoso en actividades con márgenes altos, pero no permite deducir gastos reales.',
+        text: 'En estimación directa (simplificada o normal) el IRPF se calcula sobre el beneficio real: ingresos menos gastos deducibles. En estimación objetiva (módulos) el rendimiento se calcula mediante indicadores fijos por actividad (mesas, empleados, potencia eléctrica…) independientemente del beneficio real. En módulos los gastos reales no se deducen uno a uno, y la cuota de autónomo tampoco.',
       },
     },
     {
@@ -81,10 +87,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cuándo conviene más la estimación directa que los módulos?',
+      name: '¿De qué depende que la estimación directa cueste más o menos que los módulos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La estimación directa simplificada suele convenir cuando el negocio tiene muchos gastos deducibles (alquiler, suministros, personal), márgenes ajustados o resultados variables. Si el beneficio real es inferior al rendimiento que calcularían los módulos, pagar por módulos implica tributar más de lo necesario. Un asesor fiscal puede confirmar cuál resulta más favorable según la situación concreta.',
+        text: 'De la distancia entre el beneficio real (ingresos menos gastos deducibles y cuota de autónomo) y el rendimiento neto de módulos que fija la Orden para la actividad: cuanto más se separan, más se separan las cuotas de IRPF, en un sentido o en otro. La comparación de un año no recoge que la renuncia a módulos obliga a seguir tres años en estimación directa, que el rendimiento de módulos no baja en un año con menos margen, ni el IVA. Un asesor fiscal puede valorar la situación concreta.',
       },
     },
     {
@@ -100,7 +106,7 @@ export const faqJsonLd = {
       name: '¿El simulador de módulos vs estimación directa reemplaza al asesor fiscal?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `No. El simulador calcula el IRPF de ambos regímenes con la escala general del art. 63 de la Ley 35/2006 del IRPF, pero el rendimiento de módulos usa una fórmula didáctica simplificada por actividad, no los coeficientes reales que publica la Orden anual de módulos (para ${orden.ejercicio}, la ${orden.referencia}). Sirve para entender la lógica de la comparación, no para presentar una declaración. La decisión final debe tomarse con un asesor fiscal o gestor que conozca la situación particular del autónomo, sus deducciones aplicables y las implicaciones del IVA.`,
+        text: `No. El simulador calcula el IRPF de ambos regímenes con la escala general del art. 63 de la Ley 35/2006 del IRPF, pero no calcula el rendimiento de módulos: lo aporta el usuario, porque depende de los módulos que la Orden anual (para ${orden.ejercicio}, la ${orden.referencia}) fija para cada epígrafe. Da las cifras y su diferencia, no un veredicto sobre qué régimen elegir ni una declaración. La decisión debe tomarse con un asesor fiscal o gestor que conozca la situación particular del autónomo, sus deducciones aplicables y las implicaciones del IVA.`,
       },
     },
   ],

@@ -122,7 +122,7 @@ import {
   type RolPensionDivorcio,
   type PosHipotecaDivorcio,
 } from '@/lib/calculadoras/impuestosDivorcio';
-import { compararModulosVsDirecta, type ActividadModulos } from '@/lib/calculadoras/modulosVsDirecta';
+import { compararModulosVsDirecta } from '@/lib/calculadoras/modulosVsDirecta';
 import { LIMITES_EXCLUSION_MODULOS_2025, ORDEN_MODULOS_VIGENTE } from '@/data/fiscal/modulos-irpf';
 
 // ---------------------------------------------------------------------------
@@ -3008,27 +3008,29 @@ function crearServidorDelegum(): McpServer {
   );
 
   // ── comparar_modulos_vs_directa ──────────────────────────────────────────
+  // ⚠️ 01/10/2026 (hallazgo 2545) — la tool ya no estima el rendimiento de módulos con
+  // fórmulas inventadas por actividad ni dice qué régimen «sale más barato»: el rendimiento
+  // neto de módulos lo aporta quien pregunta, y la diferencia se da como dato. Por qué, en
+  // la cabecera de lib/calculadoras/modulosVsDirecta.ts.
   servidor.tool(
     'comparar_modulos_vs_directa',
-    'Compara de forma orientativa qué régimen de IRPF conviene a un autónomo: Estimación Directa Simplificada ' +
-    '(tributa por ingresos reales menos gastos, y la cuota RETA del titular es gasto deducible) o Estimación Objetiva ' +
-    'por módulos (tributa por parámetros de la ' +
-    'actividad: superficie, personal, vehículos…). Devuelve el coste anual total (IRPF + cuota RETA) en cada régimen ' +
-    'y cuál sale más barato. ⚠️ Los coeficientes de módulos son DIDÁCTICOS/orientativos, no los importes reales de la ' +
-    'Orden anual de módulos: sirven para entender la lógica de decisión, no como cálculo definitivo.',
+    'Calcula el coste anual (IRPF + cuota RETA) de un autónomo en España en Estimación Directa Simplificada ' +
+    '(tributa por ingresos menos gastos; la cuota RETA del titular es gasto deducible y se aplica el 5\u00A0% de gastos ' +
+    'de difícil justificación con su tope) y, si se aporta el rendimiento neto de módulos, también en Estimación ' +
+    'Objetiva (módulos), con la reducción general del 5\u00A0% de la Orden de módulos vigente, y la diferencia entre ambos ' +
+    'costes. NO calcula el rendimiento de módulos: depende de los signos y módulos de cada epígrafe de la Orden; sin ' +
+    'él, solo calcula la directa. No recomienda régimen: la diferencia de un año es un dato, no una decisión.',
     {
       ingresos_anuales: z.number().nonnegative().describe('Ingresos anuales de la actividad (€)'),
-      gastos_anuales: z.number().nonnegative().describe('Gastos deducibles anuales (€) — solo cuentan en Estimación Directa'),
+      gastos_anuales: z.number().nonnegative().describe('Gastos deducibles anuales (€) — solo cuentan en Estimación Directa; también se usan como aproximación a las compras para el límite de exclusión de módulos'),
       cuota_reta_mensual: z.number().positive().describe('Cuota mensual de autónomo (RETA) en €'),
-      actividad: z.enum(['bar', 'comercio_menor', 'transporte', 'peluqueria', 'taxi']).describe('Tipo de actividad (determina la fórmula de módulos)'),
-      personal_asalariado: z.number().int().min(0).optional().describe('Nº de trabajadores asalariados. Por defecto 0.'),
-      personal_no_asalariado: z.number().int().min(0).optional().describe('Nº de personas no asalariadas (titular, familiares colaboradores). Por defecto 0.'),
-      superficie_m2: z.number().nonnegative().optional().describe('Superficie del local en m². Por defecto 0.'),
-      kwh_anuales: z.number().nonnegative().optional().describe('Consumo eléctrico anual en kWh (relevante en hostelería). Por defecto 0.'),
-      mesas: z.number().int().min(0).optional().describe('Nº de mesas (bares y restaurantes). Por defecto 0.'),
-      vehiculos: z.number().int().min(0).optional().describe('Nº de vehículos (transporte/taxi). Por defecto 0.'),
+      rendimiento_neto_modulos: z.number().nonnegative().optional().describe(
+        'Rendimiento neto de módulos anual (€): el que resulta de aplicar a la actividad la Orden de módulos vigente ' +
+        '(módulos × importe, menos minoraciones por incentivos al empleo y a la inversión, con los índices correctores), ' +
+        'ANTES de la reducción general del 5\u00A0%. Lo da la gestoría. Si no se aporta, solo se calcula la Estimación Directa.'
+      ),
     },
-    { title: 'Compara Estimación Directa vs Módulos para un autónomo', readOnlyHint: true },
+    { title: 'Coste anual en Estimación Directa y en módulos de un autónomo', readOnlyHint: true },
     async (a, extra) => {
       await registrarUsoDelegum('comparar_modulos_vs_directa', getCaller(extra));
       try {
@@ -3036,41 +3038,43 @@ function crearServidorDelegum(): McpServer {
           ingresos: a.ingresos_anuales,
           gastos: a.gastos_anuales,
           retaMensual: a.cuota_reta_mensual,
-          actividad: a.actividad as ActividadModulos,
-          personalAsalariado: a.personal_asalariado,
-          personalNoAsalariado: a.personal_no_asalariado,
-          superficie: a.superficie_m2,
-          kwh: a.kwh_anuales,
-          mesas: a.mesas,
-          vehiculo: a.vehiculos,
+          rendimientoNetoModulos: a.rendimiento_neto_modulos,
         });
-        const dif = Math.abs(r.diferencia);
-        // El veredicto se toma de esApta ANTES que de los importes: hasta el 13/09/2026 esta
-        // respuesta imprimía el aviso de no elegibilidad y dos líneas más abajo recomendaba
-        // ese mismo régimen (hallazgos 808 y 809 del Inspector).
-        const avisoNoApta =
-          r.modulos.motivoNoApta === 'supera_limites'
-            ? `  ⚠️ Con ${fmt(a.ingresos_anuales)} € de ingresos y ${fmt(a.gastos_anuales)} € de compras quedas EXCLUIDO de módulos: los límites son ${fmt(LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades)} € de ingresos y ${fmt(LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios)} € de compras de bienes y servicios (año anterior).`
-            : r.modulos.motivoNoApta === 'sin_parametros'
-            ? '  ⚠️ Con estos parámetros tu actividad probablemente NO sea elegible para módulos (las profesiones liberales nunca pueden acogerse).'
-            : '';
-        const veredicto = r.modulos.esApta
-          ? `✅ **Sale más barato: ${r.regimenRecomendado}** (diferencia ${fmt(dif)} €/año)`
-          : `✅ **Única opción viable: ${r.regimenRecomendado}** — la comparativa de importes no aplica porque con estos datos no puedes acogerte a módulos.`;
+        const ed = r.estimacionDirecta;
         const lineas = [
-          `📊 **Módulos vs Estimación Directa** (coste anual = IRPF + cuota RETA)`,
+          `📊 **Estimación Directa Simplificada vs módulos** (coste anual = IRPF + cuota RETA)`,
           '',
-          `🅰️ **Estimación Directa Simplificada: ${fmt(r.estimacionDirecta.costeAnualTotal)} €/año**`,
-          `  • Rendimiento neto (tras deducir la cuota RETA y el 5 % de difícil justificación): ${fmt(r.estimacionDirecta.rendimientoNetoReducido)} € · IRPF: ${fmt(r.estimacionDirecta.irpf)} € · RETA: ${fmt(r.estimacionDirecta.cuotaReta)} €`,
-          `🅱️ **Estimación Objetiva (Módulos): ${fmt(r.modulos.costeAnualTotal)} €/año**`,
-          `  • Rendimiento por módulos: ${fmt(r.modulos.rendimientoNetoPrevio)} € (base tras incentivos al empleo y la reducción general del 5 % sin tope: ${fmt(r.modulos.rendimientoNetoReducido)} €) · IRPF: ${fmt(r.modulos.irpf)} € · RETA: ${fmt(r.modulos.cuotaReta)} € (en módulos no desgrava)`,
-          avisoNoApta,
+          `🅰️ **Estimación Directa Simplificada: ${fmt(ed.costeAnualTotal)} €/año**`,
+          `  • Rendimiento neto (tras deducir la cuota RETA y el 5\u00A0% de difícil justificación): ${fmt(ed.rendimientoNetoReducido)} € · IRPF: ${fmt(ed.irpf)} € · RETA: ${fmt(ed.cuotaReta)} €`,
+        ];
+        if (r.modulos) {
+          const m = r.modulos;
+          lineas.push(
+            `🅱️ **Estimación Objetiva (módulos): ${fmt(m.costeAnualTotal)} €/año**`,
+            `  • Rendimiento neto de módulos aportado: ${fmt(m.rendimientoNetoModulos)} € · tras la reducción general del 5\u00A0% sin tope: ${fmt(m.rendimientoNetoReducido)} € · IRPF: ${fmt(m.irpf)} € · RETA: ${fmt(m.cuotaReta)} € (en módulos no se deduce)`,
+            ''
+          );
+          const dif = r.diferencia ?? 0;
+          lineas.push(
+            dif === 0
+              ? 'Con estos datos, el coste anual es el mismo en los dos regímenes.'
+              : `Con estos datos, el coste anual en Estimación Directa es ${fmt(Math.abs(dif))} € ${dif > 0 ? 'mayor' : 'menor'} que en módulos.`,
+            `Es la cifra de un año: no recoge que la renuncia a módulos obliga a seguir al menos tres años en Estimación Directa, que el rendimiento de módulos no baja por sí solo en un año de menos margen, ni el IVA (en módulos suele aplicarse el régimen simplificado o, en el comercio minorista, el recargo de equivalencia).`
+          );
+        } else if (r.motivoSinModulos === 'supera_limites') {
+          lineas.push(
+            `🅱️ **Módulos: no aplica.** Con ${fmt(a.ingresos_anuales)} € de ingresos y ${fmt(a.gastos_anuales)} € de compras se supera algún límite de exclusión (${fmt(LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades)} € de ingresos o ${fmt(LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios)} € de compras de bienes y servicios, año anterior): no hay comparación de importes.`
+          );
+        } else {
+          lineas.push(
+            `🅱️ **Módulos: sin calcular.** Falta el rendimiento neto de módulos (parámetro rendimiento_neto_modulos). Sale de aplicar a la actividad la ${ORDEN_MODULOS_VIGENTE.referencia} (${ORDEN_MODULOS_VIGENTE.boe}), que fija los módulos de cada epígrafe para ${ORDEN_MODULOS_VIGENTE.ejercicio}; normalmente lo calcula la gestoría.`
+          );
+        }
+        lineas.push(
           '',
-          veredicto,
-          '',
-          `📝 Los coeficientes de módulos usados aquí son orientativos/didácticos; los reales los fija la ${ORDEN_MODULOS_VIGENTE.referencia} (${ORDEN_MODULOS_VIGENTE.boe}), que desarrolla el método para ${ORDEN_MODULOS_VIGENTE.ejercicio}. Verifica con un asesor antes de elegir régimen.`,
-        ].filter(l => l !== '');
-        return conAviso(lineas.join('\n'), AVISO_FISCAL);
+          `📝 Solo pueden tributar por módulos las actividades incluidas en la ${ORDEN_MODULOS_VIGENTE.referencia}; las profesiones liberales nunca. IRPF con la escala general (estatal + autonómica media) y el mínimo personal, sin mínimos familiares ni deducciones.`
+        );
+        return conAviso(lineas.filter((l, i, arr) => !(l === '' && arr[i - 1] === '')).join('\n'), AVISO_FISCAL);
       } catch (err) {
         return errorMcp(err);
       }

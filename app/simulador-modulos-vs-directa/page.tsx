@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -13,7 +13,7 @@ import {
   DataReference,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber, formatCurrency } from '@/lib';
+import { formatCurrency, parseSpanishNumber } from '@/lib';
 import {
   FISCAL_IRPF_META,
   LIMITES_EXCLUSION_MODULOS_2025,
@@ -21,6 +21,7 @@ import {
   ORDEN_MODULOS_VIGENTE,
   GASTOS_DIFICIL_JUSTIFICACION_EDS,
   FISCAL_ESTIMACION_DIRECTA_META,
+  LIMITE_CIFRA_NEGOCIO_EDS,
   REDUCCION_GENERAL_MODULOS,
   FISCAL_AUTONOMOS_META,
   TRAMOS_RETA_2025,
@@ -31,194 +32,29 @@ import styles from './SimuladorModulosVsDirecta.module.css';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-type Actividad = 'bar' | 'comercio_menor' | 'transporte' | 'peluqueria' | 'taxi';
-
-interface ActividadInfo {
-  id: Actividad;
-  nombre: string;
-  descripcion: string;
-  // Variables relevantes a mostrar
-  usaMesas: boolean;
-  usaSuperficie: boolean;
-  usaKwh: boolean;
-  usaVehiculo: boolean;
-  usaPersonalAsalariado: boolean;
-  usaPersonalNoAsalariado: boolean;
-}
-
-const ACTIVIDADES: ActividadInfo[] = [
-  {
-    id: 'bar',
-    nombre: 'Bar / Cafetería',
-    descripcion: 'Hostelería con servicio de mesa',
-    usaMesas: true,
-    usaSuperficie: true,
-    usaKwh: true,
-    usaVehiculo: false,
-    usaPersonalAsalariado: true,
-    usaPersonalNoAsalariado: true,
-  },
-  {
-    id: 'comercio_menor',
-    nombre: 'Comercio menor',
-    descripcion: 'Tiendas pequeñas, menudeo',
-    usaMesas: false,
-    usaSuperficie: true,
-    usaKwh: false,
-    usaVehiculo: false,
-    usaPersonalAsalariado: true,
-    usaPersonalNoAsalariado: true,
-  },
-  {
-    id: 'transporte',
-    nombre: 'Transporte de mercancías',
-    descripcion: 'Transportistas autónomos',
-    usaMesas: false,
-    usaSuperficie: false,
-    usaKwh: false,
-    usaVehiculo: true,
-    usaPersonalAsalariado: false,
-    usaPersonalNoAsalariado: false,
-  },
-  {
-    id: 'peluqueria',
-    nombre: 'Peluquería',
-    descripcion: 'Servicios de peluquería',
-    usaMesas: false,
-    usaSuperficie: true,
-    usaKwh: false,
-    usaVehiculo: false,
-    usaPersonalAsalariado: true,
-    usaPersonalNoAsalariado: true,
-  },
-  {
-    id: 'taxi',
-    nombre: 'Taxi (autotaxi)',
-    descripcion: 'Servicio de taxi urbano',
-    usaMesas: false,
-    usaSuperficie: false,
-    usaKwh: false,
-    usaVehiculo: true,
-    usaPersonalAsalariado: false,
-    usaPersonalNoAsalariado: false,
-  },
-];
-
 interface DatosComunes {
   ingresos: number;
   gastos: number;
   retaMensual: number;
 }
 
-interface DatosModulos {
-  actividad: Actividad;
-  personalAsalariado: number;
-  personalNoAsalariado: number;
-  superficie: number;
-  kwh: number;
-  mesas: number;
-  vehiculo: number; // 1 = un vehículo, 0 = ninguno
-}
-
-interface CasoPreconfig {
-  id: string;
-  etiqueta: string;
-  descripcion: string;
-  comunes: DatosComunes;
-  modulos: DatosModulos;
-}
-
-const CASOS: CasoPreconfig[] = [
-  {
-    id: 'bar_rentable',
-    etiqueta: 'Bar pequeño rentable',
-    descripcion: 'Margen alto: módulos suelen ganar',
-    comunes: { ingresos: 90000, gastos: 25000, retaMensual: 320 },
-    modulos: {
-      actividad: 'bar',
-      personalAsalariado: 1,
-      personalNoAsalariado: 1,
-      superficie: 60,
-      kwh: 12000,
-      mesas: 8,
-      vehiculo: 0,
-    },
-  },
-  {
-    id: 'bar_perdidas',
-    etiqueta: 'Bar con pérdidas',
-    descripcion: 'Mucho gasto: ED gana porque pagas menos',
-    comunes: { ingresos: 60000, gastos: 55000, retaMensual: 320 },
-    modulos: {
-      actividad: 'bar',
-      personalAsalariado: 1,
-      personalNoAsalariado: 1,
-      superficie: 60,
-      kwh: 12000,
-      mesas: 8,
-      vehiculo: 0,
-    },
-  },
-  {
-    id: 'comercio_medio',
-    etiqueta: 'Comercio mediano',
-    descripcion: 'Depende del margen real',
-    comunes: { ingresos: 70000, gastos: 35000, retaMensual: 300 },
-    modulos: {
-      actividad: 'comercio_menor',
-      personalAsalariado: 1,
-      personalNoAsalariado: 1,
-      superficie: 80,
-      kwh: 0,
-      mesas: 0,
-      vehiculo: 0,
-    },
-  },
-  {
-    id: 'profesional_puro',
-    etiqueta: 'Profesional puro',
-    descripcion: 'NO puede acogerse a módulos — solo ED',
-    comunes: { ingresos: 50000, gastos: 8000, retaMensual: 300 },
-    modulos: {
-      actividad: 'comercio_menor',
-      personalAsalariado: 0,
-      personalNoAsalariado: 1,
-      superficie: 0,
-      kwh: 0,
-      mesas: 0,
-      vehiculo: 0,
-    },
-  },
-];
-
-/**
- * Rendimiento neto previo de la Estimación Directa para un preset, con el MISMO motor que la
- * comparativa: ingresos − gastos − cuota RETA × 12 (la cuota del titular es gasto deducible).
- * ⚠️ 01/10/2026 — las tarjetas «Casos típicos» del bloque educativo decían 65.000 € y 5.000 €
- * (ingresos − gastos, sin la cuota), mientras los presets con esas cifras ya la deducían
- * (hallazgo 2548). Salen de aquí para que no vuelvan a separarse.
- */
-function casoTipico(id: string): { caso: CasoPreconfig; rendimientoED: number } {
-  const caso = CASOS.find(c => c.id === id) ?? CASOS[0];
-  const { estimacionDirecta } = compararModulosVsDirecta({ ...caso.comunes, ...caso.modulos });
-  return { caso, rendimientoED: estimacionDirecta.rendimientoNetoPrevio };
-}
-const CASO_BAR_RENTABLE = casoTipico('bar_rentable');
-const CASO_BAR_PERDIDAS = casoTipico('bar_perdidas');
-
-/** Importe en prosa, sin céntimos: «61.160 €», con espacio duro antes del símbolo. */
-const euros = (n: number) => `${formatNumber(n, 0)}\u00A0€`;
+/** Lectura del campo «Rendimiento neto de módulos»: sin dato, dato válido o error. */
+type LecturaRendimiento =
+  | { estado: 'vacio' }
+  | { estado: 'valido'; valor: number }
+  | { estado: 'error'; mensaje: string };
 
 // ─── Cálculos ────────────────────────────────────────────────────────────────
 
 // La fórmula NO vive aquí: la página consume lib/calculadoras/modulosVsDirecta.ts, que es
 // el mismo motor que sirve a la tool comparar_modulos_vs_directa del MCP de Delegum.
 //
-// ⚠️ 13/09/2026 — hasta hoy esta página mantenía su propia copia inline del mismo cálculo,
-// y las dos divergieron (hallazgos 808 y 809 del Inspector): la reparación del 31/08 (no
-// recomendar módulos a quien no es apto) y la del 02/09 (límites de exclusión por volumen)
-// se aplicaron solo a esta copia, así que por el MCP se seguía recomendando el régimen que
-// la misma respuesta acababa de declarar inaccesible.
+// ⚠️ 01/10/2026 — hallazgo 2545 y decisión del usuario del mismo día: la página ya no estima
+// el rendimiento de módulos con un selector de actividad y deslizadores (mesas, m², kWh,
+// vehículos, personal) ni recomienda régimen. Aquellas fórmulas eran inventadas —la Orden
+// real usa otros signos y otras cuantías— y con ellas la página decía «te conviene más X».
+// Ahora el rendimiento neto de módulos lo teclea el usuario y la diferencia es un dato.
+// Por qué no se modela la Orden entera: cabecera del motor.
 
 // Rango real de cuota RETA mensual (tabla de tramos por rendimiento neto).
 const RETA_CUOTA_MIN = Math.min(...TRAMOS_RETA_2025.map(t => t.cuotaMinima));
@@ -260,7 +96,7 @@ interface CoherenciaReta {
  * «ingresos − gastos deducibles − cuota SS», así que la cuota que el usuario teclea
  * determina el tramo al que él mismo pertenece. Por debajo de la cuota mínima de ese tramo,
  * el «coste fiscal anual total» que la app publica queda por debajo del mínimo legalmente
- * posible (hallazgo 812): con el estado de fábrica, 1.904,16 €/año por debajo.
+ * posible (hallazgo 812).
  *
  * Se AVISA, no se corrige: la app no sabe si hay tarifa plana, pluriactividad, base
  * elegida por encima de la mínima o un alta a mitad de año.
@@ -280,6 +116,28 @@ function contrastarCuotaReta(d: DatosComunes): CoherenciaReta | null {
   };
 }
 
+/**
+ * Lee el campo de texto del rendimiento neto de módulos. Vacío = sin dato (solo se calcula
+ * la directa); lo que no es un número o es negativo NO se convierte en cifra.
+ */
+function leerRendimiento(texto: string): LecturaRendimiento {
+  if (texto.trim() === '') return { estado: 'vacio' };
+  const valor = parseSpanishNumber(texto);
+  if (!Number.isFinite(valor)) {
+    return {
+      estado: 'error',
+      mensaje: 'Eso no es un importe. Escribe el rendimiento en euros, por ejemplo 18.500 o 18.500,50.',
+    };
+  }
+  if (valor < 0) {
+    return {
+      estado: 'error',
+      mensaje: 'El rendimiento neto de módulos no puede ser negativo. Escribe 0 o un importe positivo.',
+    };
+  }
+  return { estado: 'valido', valor };
+}
+
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export default function SimuladorModulosVsDirectaPage() {
@@ -288,55 +146,25 @@ export default function SimuladorModulosVsDirectaPage() {
     gastos: 25000,
     retaMensual: 320,
   });
+  const [rendimientoTexto, setRendimientoTexto] = useState('');
 
-  const [modulos, setModulos] = useState<DatosModulos>({
-    actividad: 'bar',
-    personalAsalariado: 1,
-    personalNoAsalariado: 1,
-    superficie: 50,
-    kwh: 10000,
-    mesas: 6,
-    vehiculo: 0,
-  });
-
-  const actividadActual = useMemo(
-    () => ACTIVIDADES.find(a => a.id === modulos.actividad) ?? ACTIVIDADES[0],
-    [modulos.actividad]
-  );
+  const lectura = useMemo(() => leerRendimiento(rendimientoTexto), [rendimientoTexto]);
 
   const comparativa = useMemo(
-    () => compararModulosVsDirecta({ ...comunes, ...modulos }),
-    [comunes, modulos]
+    () =>
+      compararModulosVsDirecta({
+        ...comunes,
+        rendimientoNetoModulos: lectura.estado === 'valido' ? lectura.valor : undefined,
+      }),
+    [comunes, lectura]
   );
   const resED = comparativa.estimacionDirecta;
   const resModulos = comparativa.modulos;
   const diferencia = comparativa.diferencia;
-  // El motor ya devuelve ganaED = true cuando módulos no es apta: ahí no hay comparación
-  // de importes que valga.
-  const ganaED = comparativa.ganaED;
+  const superaLimites = comparativa.motivoSinModulos === 'supera_limites';
 
   // Coherencia de la cuota RETA tecleada con el tramo que le toca por rendimiento.
   const coherenciaReta = useMemo(() => contrastarCuotaReta(comunes), [comunes]);
-
-  const aplicarCaso = useCallback((caso: CasoPreconfig) => {
-    setComunes(caso.comunes);
-    setModulos(caso.modulos);
-  }, []);
-
-  const cambiarActividad = useCallback((id: Actividad) => {
-    const info = ACTIVIDADES.find(a => a.id === id) ?? ACTIVIDADES[0];
-    setModulos(prev => ({
-      actividad: id,
-      // Los campos que la nueva actividad no muestra se reinician: si no, conservan el
-      // valor de la actividad anterior y falsean tanto la elegibilidad como las reducciones.
-      personalAsalariado: info.usaPersonalAsalariado ? prev.personalAsalariado : 0,
-      personalNoAsalariado: info.usaPersonalNoAsalariado ? prev.personalNoAsalariado : 0,
-      superficie: info.usaSuperficie ? prev.superficie : 0,
-      kwh: info.usaKwh ? prev.kwh : 0,
-      mesas: info.usaMesas ? prev.mesas : 0,
-      vehiculo: info.usaVehiculo ? prev.vehiculo : 0,
-    }));
-  }, []);
 
   return (
     <div className={styles.container}>
@@ -346,7 +174,8 @@ export default function SimuladorModulosVsDirectaPage() {
         <span className={styles.heroIcon} aria-hidden="true">⚖️</span>
         <h1 className={styles.title}>Simulador Módulos vs Estimación Directa</h1>
         <p className={styles.subtitle}>
-          Qué régimen fiscal te conviene como autónomo en España (orientativo)
+          Coste anual de IRPF y cuota RETA de un autónomo en España en los dos regímenes, con tus
+          datos (orientativo)
         </p>
       </header>
 
@@ -359,7 +188,7 @@ export default function SimuladorModulosVsDirectaPage() {
         fuente={FISCAL_IRPF_META.fuente}
         verificado={FISCAL_IRPF_META.verificado}
         urlOficial={FISCAL_IRPF_META.urlOficial}
-        nota={`El IRPF de ambos regímenes usa esta escala. La cuota RETA la introduces tú libremente dentro del rango real de la ${NOMBRE_TABLA_RETA} y el rendimiento de módulos usa una fórmula didáctica simplificada, no los coeficientes reales de la ${ORDEN_MODULOS_VIGENTE.referencia}.`}
+        nota={`El IRPF de ambos regímenes usa esta escala, con el mínimo personal y sin mínimos familiares. La cuota RETA la introduces tú dentro del rango real de la ${NOMBRE_TABLA_RETA}, y el rendimiento neto de módulos también: la app no lo calcula a partir de la ${ORDEN_MODULOS_VIGENTE.referencia}.`}
       />
 
       <DataReference
@@ -367,7 +196,7 @@ export default function SimuladorModulosVsDirectaPage() {
         fuente={FISCAL_MODULOS_IRPF_META.fuente}
         verificado={FISCAL_MODULOS_IRPF_META.verificado}
         urlOficial={FISCAL_MODULOS_IRPF_META.urlOficial}
-        nota={`El simulador excluye la actividad de módulos si tus ingresos o gastos introducidos superan estos límites. El de facturación a empresas (${formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.facturacionAEmpresas)}) es solo informativo: no hay campo para ese dato. La reducción general del ${REDUCCION_GENERAL_MODULOS.porcentaje}\u00A0% sobre el rendimiento neto de módulos es la de la ${REDUCCION_GENERAL_MODULOS.norma} y no tiene tope en euros.`}
+        nota={`El simulador no calcula módulos si tus ingresos o gastos introducidos superan estos límites. El de facturación a empresas (${formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.facturacionAEmpresas)}) es solo informativo: no hay campo para ese dato. La reducción general del ${REDUCCION_GENERAL_MODULOS.porcentaje}\u00A0% sobre el rendimiento neto de módulos es la de la ${REDUCCION_GENERAL_MODULOS.norma} y no tiene tope en euros.`}
       />
 
       <DataReference
@@ -389,25 +218,6 @@ export default function SimuladorModulosVsDirectaPage() {
       <LegalNotice />
 
       <main className={styles.main}>
-        {/* Casos preconfigurados */}
-        <div className={styles.panel}>
-          <h2 className={styles.panelTitle}>Casos preconfigurados</h2>
-          <div className={styles.casosGrid}>
-            {CASOS.map(caso => (
-              <button
-                key={caso.id}
-                type="button"
-                className={styles.casoBtn}
-                onClick={() => aplicarCaso(caso)}
-                aria-label={`Aplicar caso ${caso.etiqueta}: ${caso.descripcion}`}
-              >
-                <strong>{caso.etiqueta}</strong>
-                <span>{caso.descripcion}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Datos comunes */}
         <div className={styles.panel}>
           <h2 className={styles.panelTitle}>Tus datos como autónomo</h2>
@@ -454,7 +264,9 @@ export default function SimuladorModulosVsDirectaPage() {
               <span>300.000 €</span>
             </div>
             <p className={styles.sliderHint}>
-              Solo deducibles para Estimación Directa Simplificada (alquiler local, suministros afectos, material…).
+              Solo cuentan en Estimación Directa (alquiler del local, suministros afectos,
+              material…). También se usan como aproximación a tus compras para el límite de
+              exclusión de módulos ({formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios)}).
             </p>
           </div>
 
@@ -498,7 +310,7 @@ export default function SimuladorModulosVsDirectaPage() {
           </div>
         </div>
 
-        {/* Selector de actividad para módulos */}
+        {/* Dato de módulos */}
         <div className={styles.panel}>
           <h2 className={styles.panelTitle}>Datos para Estimación Objetiva (Módulos)</h2>
 
@@ -511,168 +323,52 @@ export default function SimuladorModulosVsDirectaPage() {
             tu asesor fiscal si tu actividad es elegible.
           </p>
 
-          <div className={styles.actividadSelector} role="radiogroup" aria-label="Actividad para módulos">
-            {ACTIVIDADES.map(a => (
-              <button
-                key={a.id}
-                type="button"
-                role="radio"
-                aria-checked={modulos.actividad === a.id}
-                className={`${styles.actividadBtn} ${modulos.actividad === a.id ? styles.actividadActiva : ''}`}
-                onClick={() => cambiarActividad(a.id)}
-              >
-                <strong>{a.nombre}</strong>
-                <span>{a.descripcion}</span>
-              </button>
-            ))}
+          <div className={styles.campoGroup}>
+            <label className={styles.sliderLabel} htmlFor="rendimientoModulos">
+              Rendimiento neto de módulos (anual, en €)
+            </label>
+            <input
+              id="rendimientoModulos"
+              name="rendimientoModulos"
+              type="text"
+              inputMode="decimal"
+              autoComplete="off"
+              placeholder="Por ejemplo, 18.500"
+              value={rendimientoTexto}
+              onChange={e => setRendimientoTexto(e.target.value)}
+              aria-invalid={lectura.estado === 'error'}
+              aria-describedby="rendimientoModulos-ayuda"
+              className={`${styles.campoTexto} ${lectura.estado === 'error' ? styles.campoTextoError : ''}`}
+            />
+            {lectura.estado === 'error' && (
+              <p className={styles.campoError} role="alert">
+                {lectura.mensaje}
+              </p>
+            )}
+            <p id="rendimientoModulos-ayuda" className={styles.sliderHint}>
+              Es lo que resulta de aplicar a tu actividad los módulos de la{' '}
+              {ORDEN_MODULOS_VIGENTE.referencia}: cada módulo (personas, potencia eléctrica, mesas…)
+              por su importe, menos las minoraciones por incentivos al empleo y a la inversión y
+              con los índices correctores aplicados, <strong>antes</strong> de la reducción general
+              del {REDUCCION_GENERAL_MODULOS.porcentaje}{'\u00A0'}%, que la app aplica después.
+              Te lo calcula tu gestoría. Si lo dejas vacío, solo se calcula la Estimación Directa.
+            </p>
           </div>
 
-          {actividadActual.usaPersonalAsalariado && (
-            <div className={styles.sliderGroup}>
-              <label className={styles.sliderLabel} htmlFor="pAsal">
-                Personal asalariado: <span className={styles.sliderValue}>{modulos.personalAsalariado}</span>
-              </label>
-              <input
-                id="pAsal"
-                type="range"
-                min={0}
-                max={5}
-                step={1}
-                value={modulos.personalAsalariado}
-                onChange={e => setModulos({ ...modulos, personalAsalariado: Number(e.target.value) })}
-                className={styles.slider}
-              />
-              <div className={styles.sliderRange}>
-                <span>0</span>
-                <span>5</span>
-              </div>
-            </div>
-          )}
-
-          {actividadActual.usaPersonalNoAsalariado && (
-            <div className={styles.sliderGroup}>
-              <label className={styles.sliderLabel} htmlFor="pNoAsal">
-                Personal no asalariado (incluido titular): <span className={styles.sliderValue}>{modulos.personalNoAsalariado}</span>
-              </label>
-              <input
-                id="pNoAsal"
-                type="range"
-                min={0}
-                max={3}
-                step={1}
-                value={modulos.personalNoAsalariado}
-                onChange={e => setModulos({ ...modulos, personalNoAsalariado: Number(e.target.value) })}
-                className={styles.slider}
-              />
-              <div className={styles.sliderRange}>
-                <span>0</span>
-                <span>3</span>
-              </div>
-            </div>
-          )}
-
-          {actividadActual.usaSuperficie && (
-            <div className={styles.sliderGroup}>
-              <label className={styles.sliderLabel} htmlFor="sup">
-                Superficie del local: <span className={styles.sliderValue}>{formatNumber(modulos.superficie, 0)} m²</span>
-              </label>
-              <input
-                id="sup"
-                type="range"
-                min={0}
-                max={200}
-                step={5}
-                value={modulos.superficie}
-                onChange={e => setModulos({ ...modulos, superficie: Number(e.target.value) })}
-                className={styles.slider}
-              />
-              <div className={styles.sliderRange}>
-                <span>0 m²</span>
-                <span>200 m²</span>
-              </div>
-            </div>
-          )}
-
-          {actividadActual.usaKwh && (
-            <div className={styles.sliderGroup}>
-              <label className={styles.sliderLabel} htmlFor="kwh">
-                Consumo eléctrico anual: <span className={styles.sliderValue}>{formatNumber(modulos.kwh, 0)} kWh</span>
-              </label>
-              <input
-                id="kwh"
-                type="range"
-                min={0}
-                max={50000}
-                step={500}
-                value={modulos.kwh}
-                onChange={e => setModulos({ ...modulos, kwh: Number(e.target.value) })}
-                className={styles.slider}
-              />
-              <div className={styles.sliderRange}>
-                <span>0 kWh</span>
-                <span>50.000 kWh</span>
-              </div>
-            </div>
-          )}
-
-          {actividadActual.usaMesas && (
-            <div className={styles.sliderGroup}>
-              <label className={styles.sliderLabel} htmlFor="mesas">
-                Mesas: <span className={styles.sliderValue}>{modulos.mesas}</span>
-              </label>
-              <input
-                id="mesas"
-                type="range"
-                min={0}
-                max={30}
-                step={1}
-                value={modulos.mesas}
-                onChange={e => setModulos({ ...modulos, mesas: Number(e.target.value) })}
-                className={styles.slider}
-              />
-              <div className={styles.sliderRange}>
-                <span>0</span>
-                <span>30</span>
-              </div>
-            </div>
-          )}
-
-          {actividadActual.usaVehiculo && (
-            <div className={styles.sliderGroup}>
-              <label className={styles.sliderLabel} htmlFor="veh">
-                Vehículo afecto: <span className={styles.sliderValue}>{modulos.vehiculo === 1 ? 'Sí (1)' : 'No (0)'}</span>
-              </label>
-              <input
-                id="veh"
-                type="range"
-                min={0}
-                max={1}
-                step={1}
-                value={modulos.vehiculo}
-                onChange={e => setModulos({ ...modulos, vehiculo: Number(e.target.value) })}
-                className={styles.slider}
-              />
-              <div className={styles.sliderRange}>
-                <span>No</span>
-                <span>Sí</span>
-              </div>
-            </div>
-          )}
-
           <p className={styles.notaModulos}>
-            <strong>Nota didáctica:</strong> Cálculo orientativo simplificado — los valores reales
-            de los módulos por unidad se publican en la Orden anual de módulos del Ministerio de
-            Hacienda (para {ORDEN_MODULOS_VIGENTE.ejercicio}, la {ORDEN_MODULOS_VIGENTE.referencia}).
+            <strong>Por qué la app no lo calcula:</strong> cada epígrafe de la Orden tiene sus
+            propios módulos con importes distintos, y una fórmula genérica daría una cifra que no
+            es la tuya.
           </p>
         </div>
 
         {/* Comparativa lado a lado */}
         <div className={styles.panel}>
-          <h2 className={styles.panelTitle}>Comparativa: Estimación Directa vs Módulos</h2>
+          <h2 className={styles.panelTitle}>Coste anual en cada régimen</h2>
 
           <div className={styles.comparativaLayout}>
             {/* Columna ED */}
-            <div className={`${styles.colED} ${ganaED ? styles.colGanadora : ''}`}>
+            <div className={styles.colED}>
               <h3 className={styles.colTitle}>Estimación Directa Simplificada</h3>
               <p className={styles.colSub}>Tributas por beneficio real (ingresos − gastos, cuota RETA incluida)</p>
 
@@ -727,101 +423,118 @@ export default function SimuladorModulosVsDirectaPage() {
             </div>
 
             {/* Columna Módulos */}
-            <div className={`${styles.colModulos} ${!ganaED ? styles.colGanadora : ''}`}>
+            <div className={styles.colModulos}>
               <h3 className={styles.colTitle}>Estimación Objetiva (Módulos)</h3>
-              <p className={styles.colSub}>Tributas por unidades, NO por beneficio real</p>
+              <p className={styles.colSub}>Tributas por los módulos de la actividad, no por el beneficio real</p>
 
-              {!resModulos.esApta && (
+              {resModulos ? (
+                <>
+                  <div className={styles.lineaItem}>
+                    <span>Rendimiento neto de módulos (tu dato)</span>
+                    <strong>{formatCurrency(resModulos.rendimientoNetoModulos)}</strong>
+                  </div>
+                  <div className={styles.lineaResta}>
+                    <span>− Reducción general {REDUCCION_GENERAL_MODULOS.porcentaje}{'\u00A0'}% (sin tope)</span>
+                    <strong>−{formatCurrency(resModulos.reduccion5pc)}</strong>
+                  </div>
+                  <div className={styles.lineaSubtotal}>
+                    <span>= Rendimiento neto reducido</span>
+                    <strong>{formatCurrency(resModulos.rendimientoNetoReducido)}</strong>
+                  </div>
+                  <div className={styles.lineaSubtotal}>
+                    <span>= Base liquidable (el mínimo va dentro)</span>
+                    <strong>{formatCurrency(resModulos.baseLiquidable)}</strong>
+                  </div>
+                  <div className={styles.lineaItem}>
+                    <span>Escala general sobre la base completa</span>
+                    <strong>{formatCurrency(resModulos.cuotaEscala)}</strong>
+                  </div>
+                  <div className={styles.lineaResta}>
+                    <span>− Escala sobre el mínimo personal ({formatCurrency(resModulos.minimosPersonales)}, a tipo cero)</span>
+                    <strong>−{formatCurrency(resModulos.cuotaMinimo)}</strong>
+                  </div>
+                  <div className={styles.lineaItem}>
+                    <span>= IRPF</span>
+                    <strong>{formatCurrency(resModulos.irpf)}</strong>
+                  </div>
+                  <div className={styles.lineaSuma}>
+                    <span>+ Cuota RETA × 12 (en módulos no se deduce)</span>
+                    <strong>+{formatCurrency(resModulos.cuotaReta)}</strong>
+                  </div>
+                  <div className={styles.lineaTotal}>
+                    <span>Coste fiscal anual total</span>
+                    <strong>{formatCurrency(resModulos.costeAnualTotal)}</strong>
+                  </div>
+                </>
+              ) : superaLimites ? (
                 <p className={styles.avisoNoApta}>
                   <span aria-hidden="true">⚠️</span>{' '}
-                  {resModulos.motivoNoApta === 'supera_limites'
-                    ? `Ingresos o gastos superan los límites de exclusión (${formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades)} / ${formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios)}) — con estos datos quedarías excluido de módulos aunque la actividad encajase.`
-                    : 'Sin parámetros suficientes — esta actividad/configuración probablemente NO es elegible para módulos.'}
+                  Ingresos o gastos superan los límites de exclusión ({formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades)} / {formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios)}) — con estos datos quedarías excluido de módulos aunque la actividad encajase.
+                </p>
+              ) : (
+                <p className={styles.sinDatoModulos}>
+                  Falta tu <strong>rendimiento neto de módulos</strong>. Escríbelo en el campo de
+                  arriba para ver el coste en este régimen: la app no lo calcula, porque depende de
+                  los módulos que la {ORDEN_MODULOS_VIGENTE.referencia} fija para tu epígrafe.
                 </p>
               )}
-
-              <div className={styles.lineaItem}>
-                <span>Rendimiento neto previo (módulos)</span>
-                <strong>{formatCurrency(resModulos.rendimientoNetoPrevio)}</strong>
-              </div>
-              <div className={styles.lineaResta}>
-                <span>− Minoración por incentivos al empleo</span>
-                <strong>−{formatCurrency(resModulos.reduccionEmpleo)}</strong>
-              </div>
-              <div className={styles.lineaSubtotal}>
-                <span>= Rendimiento neto de módulos</span>
-                <strong>{formatCurrency(resModulos.rendimientoNetoModulos)}</strong>
-              </div>
-              <div className={styles.lineaResta}>
-                <span>− Reducción general {REDUCCION_GENERAL_MODULOS.porcentaje}{'\u00A0'}% (sin tope)</span>
-                <strong>−{formatCurrency(resModulos.reduccion5pc)}</strong>
-              </div>
-              <div className={styles.lineaSubtotal}>
-                <span>= Rendimiento neto reducido</span>
-                <strong>{formatCurrency(resModulos.rendimientoNetoReducido)}</strong>
-              </div>
-              <div className={styles.lineaSubtotal}>
-                <span>= Base liquidable (el mínimo va dentro)</span>
-                <strong>{formatCurrency(resModulos.baseLiquidable)}</strong>
-              </div>
-              <div className={styles.lineaItem}>
-                <span>Escala general sobre la base completa</span>
-                <strong>{formatCurrency(resModulos.cuotaEscala)}</strong>
-              </div>
-              <div className={styles.lineaResta}>
-                <span>− Escala sobre el mínimo personal ({formatCurrency(resModulos.minimosPersonales)}, a tipo cero)</span>
-                <strong>−{formatCurrency(resModulos.cuotaMinimo)}</strong>
-              </div>
-              <div className={styles.lineaItem}>
-                <span>= IRPF</span>
-                <strong>{formatCurrency(resModulos.irpf)}</strong>
-              </div>
-              <div className={styles.lineaSuma}>
-                <span>+ Cuota RETA × 12</span>
-                <strong>+{formatCurrency(resModulos.cuotaReta)}</strong>
-              </div>
-              <div className={styles.lineaTotal}>
-                <span>Coste fiscal anual total</span>
-                <strong>{formatCurrency(resModulos.costeAnualTotal)}</strong>
-              </div>
             </div>
           </div>
 
-          {/* Diferencia + recomendación */}
+          {/* Diferencia como dato, sin veredicto */}
           <div className={styles.diferenciaBox} role="status" aria-live="polite">
-            {resModulos.esApta ? (
+            {resModulos && diferencia !== null ? (
               <>
                 <span className={styles.diferenciaTitulo}>
-                  Pagas <strong>{formatCurrency(Math.abs(diferencia))}</strong> {ganaED ? 'MÁS' : 'MENOS'} con módulos
-                  que con Estimación Directa
+                  {diferencia === 0 ? (
+                    'Con estos datos, el coste anual es el mismo en los dos regímenes.'
+                  ) : (
+                    <>
+                      Con estos datos, el coste anual en Estimación Directa es{' '}
+                      <strong>{formatCurrency(Math.abs(diferencia))}</strong>{' '}
+                      {diferencia > 0 ? 'mayor' : 'menor'} que en módulos.
+                    </>
+                  )}
                 </span>
                 <span className={styles.diferenciaDetalle}>
-                  ED: {formatCurrency(resED.costeAnualTotal)} · Módulos: {formatCurrency(resModulos.costeAnualTotal)}
+                  Directa: {formatCurrency(resED.costeAnualTotal)} · Módulos: {formatCurrency(resModulos.costeAnualTotal)}
                 </span>
               </>
+            ) : superaLimites ? (
+              <span className={styles.diferenciaTitulo}>
+                Con estos ingresos o gastos quedarías excluido de módulos: no hay comparación de importes.
+              </span>
             ) : (
               <span className={styles.diferenciaTitulo}>
-                Con estos datos, la actividad no parece elegible para módulos: la comparativa de
-                importes no aplica.
+                Sin el rendimiento neto de módulos solo se calcula la Estimación Directa.
               </span>
             )}
           </div>
 
-          <div className={styles.recomendacionBox}>
-            <strong className={styles.recomendacionTitulo}>
-              Para tu situación, te conviene más: {!resModulos.esApta || ganaED ? 'Estimación Directa Simplificada' : 'Estimación Objetiva (Módulos)'}
-            </strong>
-            <p className={styles.recomendacionTexto}>
-              {!resModulos.esApta
-                ? 'Con los datos introducidos, la actividad no parece elegible para módulos, así que la única opción real es Estimación Directa Simplificada. Verifica la elegibilidad exacta de tu epígrafe con tu asesor.'
-                : ganaED
-                ? 'Tu margen real (ingresos − gastos) es relativamente bajo, así que tributar por beneficio real (ED) sale más barato que por unidades (módulos).'
-                : 'Tu margen real es alto, así que tributar por unidades (módulos) limita el rendimiento computable y reduce el IRPF respecto a tributar por beneficio real (ED).'}
-            </p>
-            <p className={styles.recomendacionAviso}>
-              <span aria-hidden="true">⚠️</span> <strong>Importante:</strong> Módulos solo es elegible para tu actividad si está
-              listada en la {ORDEN_MODULOS_VIGENTE.referencia}. <strong>Verifica con tu asesor fiscal</strong> antes
-              de cambiar de régimen.
+          <div className={styles.noRecogeBox}>
+            <strong className={styles.noRecogeTitulo}>Lo que la cifra de un año no recoge</strong>
+            <ul className={styles.noRecogeLista}>
+              <li>
+                La renuncia a módulos obliga a seguir al menos <strong>tres años</strong> en
+                Estimación Directa.
+              </li>
+              <li>
+                En módulos el rendimiento no baja por sí solo en un año con menos margen; en
+                directa sí, porque sale del resultado real.
+              </li>
+              <li>
+                Las minoraciones y los índices correctores de la Orden tienen que ir ya dentro del
+                rendimiento que escribes.
+              </li>
+              <li>
+                El IVA: en módulos suele aplicarse el régimen simplificado (o el recargo de
+                equivalencia en el comercio minorista); estas cifras solo recogen IRPF y cuota RETA.
+              </li>
+            </ul>
+            <p className={styles.noRecogeAviso}>
+              <span aria-hidden="true">⚠️</span> Módulos solo es posible si tu actividad está
+              listada en la {ORDEN_MODULOS_VIGENTE.referencia}. <strong>Consulta con tu asesor
+              fiscal</strong> antes de cambiar de régimen.
             </p>
           </div>
         </div>
@@ -829,9 +542,9 @@ export default function SimuladorModulosVsDirectaPage() {
 
       <EducationalSection
         title="Guía Módulos vs Estimación Directa"
-        subtitle="Cómo elegir tu régimen fiscal autónomo"
+        subtitle="Qué cambia entre los dos regímenes y cómo leer la comparación"
       >
-        <h3>Comparativa de regímenes</h3>
+        <h3>Diferencias entre los dos regímenes</h3>
         <div className={styles.tableWrapper}>
           <table className={styles.comparativaTable}>
             <thead>
@@ -839,57 +552,43 @@ export default function SimuladorModulosVsDirectaPage() {
                 <th>Característica</th>
                 <th>ED Simplificada</th>
                 <th>Módulos</th>
-                <th>Cuándo conviene</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Cómo se calcula</td>
+                <td>Cómo se calcula el rendimiento</td>
                 <td>Ingresos − gastos reales</td>
-                <td>Por unidades (mesas, m², personal…)</td>
-                <td>Depende del margen real</td>
+                <td>Por los módulos de la actividad (personas, potencia, mesas…)</td>
               </tr>
               <tr>
-                <td>Tributa por</td>
-                <td>Beneficio real</td>
-                <td>Importe fijo por parámetros</td>
-                <td>Si beneficio real bajo: ED</td>
+                <td>Año con menos margen</td>
+                <td>El rendimiento baja con el resultado (puede ser 0)</td>
+                <td>El rendimiento no depende del resultado real</td>
               </tr>
               <tr>
-                <td>Pérdidas computables</td>
-                <td>Sí (rendimiento puede ser 0)</td>
-                <td>No (siempre tributas algo)</td>
-                <td>Año malo: ED</td>
+                <td>Cuota RETA del titular</td>
+                <td>Gasto deducible</td>
+                <td>No se deduce</td>
               </tr>
               <tr>
-                <td>Contabilidad exigida</td>
-                <td>Libros de ingresos, gastos, bienes</td>
-                <td>Solo libro de ventas</td>
-                <td>Menos burocracia: módulos</td>
-              </tr>
-              <tr>
-                <td>Actividades elegibles</td>
+                <td>Actividades</td>
                 <td>Cualquiera</td>
-                <td>Solo las de la Orden anual de módulos</td>
-                <td>Profesionales liberales: ED obligatoria</td>
+                <td>Solo las de la Orden anual de módulos (las profesiones liberales, nunca)</td>
               </tr>
               <tr>
                 <td>IVA</td>
                 <td>Régimen general</td>
-                <td>Régimen simplificado (cuotas trimestrales fijas)</td>
-                <td>Operativa simple: módulos</td>
+                <td>Normalmente régimen simplificado (o recargo de equivalencia en comercio minorista)</td>
               </tr>
               <tr>
-                <td>Límite de ingresos</td>
-                <td>Sin límite</td>
-                <td>{formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades)}/año (o {formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.facturacionAEmpresas)} facturados a empresas)</td>
-                <td>Volumen alto: ED</td>
+                <td>Límites</td>
+                <td>{formatCurrency(LIMITE_CIFRA_NEGOCIO_EDS)} de cifra de negocios (por encima, directa normal)</td>
+                <td>{formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.ingresosConjuntoActividades)} de ingresos, {formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.facturacionAEmpresas)} facturados a empresas o {formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios)} de compras</td>
               </tr>
               <tr>
                 <td>Renuncia</td>
                 <td>—</td>
-                <td>Voluntaria con efectos 3 años</td>
-                <td>Ojo al lock-in si renuncias</td>
+                <td>Voluntaria; obliga a tres años como mínimo en directa</td>
               </tr>
             </tbody>
           </table>
@@ -900,36 +599,29 @@ export default function SimuladorModulosVsDirectaPage() {
           que regula los módulos del año siguiente (hoy, la {ORDEN_MODULOS_VIGENTE.referencia}).
         </p>
 
-        <h3>Casos típicos</h3>
+        <h3>Qué mueve la diferencia</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h4>Bar pequeño con margen alto</h4>
+            <h4>Beneficio real frente a rendimiento de módulos</h4>
             <p>
-              Ingresos {euros(CASO_BAR_RENTABLE.caso.comunes.ingresos)}, gastos{' '}
-              {euros(CASO_BAR_RENTABLE.caso.comunes.gastos)} y cuota RETA de{' '}
-              {euros(CASO_BAR_RENTABLE.caso.comunes.retaMensual)}/mes. ED parte de un rendimiento
-              neto de {euros(CASO_BAR_RENTABLE.rendimientoED)} (la cuota RETA es gasto deducible).
-              Módulos tributa sobre el importe fijo por mesas + personal + m² (que suele ser
-              bastante menor).
-              <strong> Módulos suele ganar</strong> en hostelería rentable.
+              La directa tributa por ingresos − gastos − cuota RETA; módulos, por el rendimiento
+              que fija la Orden. Cuanto más se separan esas dos cifras, más se separan las cuotas
+              de IRPF, en un sentido o en otro.
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>Bar con pérdidas o margen bajo</h4>
+            <h4>Años distintos</h4>
             <p>
-              Ingresos {euros(CASO_BAR_PERDIDAS.caso.comunes.ingresos)}, gastos{' '}
-              {euros(CASO_BAR_PERDIDAS.caso.comunes.gastos)} y cuota RETA de{' '}
-              {euros(CASO_BAR_PERDIDAS.caso.comunes.retaMensual)}/mes. ED parte de solo{' '}
-              {euros(CASO_BAR_PERDIDAS.rendimientoED)} de rendimiento neto, con la cuota ya deducida.
-              Módulos sigue tributando por el importe fijo por unidades, ignorando que tu negocio va
-              mal. <strong>ED gana en años malos</strong>.
+              En directa el rendimiento sigue al resultado de cada año. En módulos depende de los
+              módulos de la actividad, así que un año flojo no lo reduce por sí solo. Por eso
+              compensa repetir la comparación con varios escenarios de ingresos y gastos.
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <h4>Comercio menor estándar</h4>
+            <h4>La cuota de autónomo</h4>
             <p>
-              Resultado intermedio: depende de la rotación, márgenes y plantilla. Calcula ambos
-              escenarios cada año y compara antes de mantenerte en módulos o renunciar.
+              Se paga en los dos regímenes, pero solo en directa es gasto deducible: rebaja la
+              base del IRPF. En módulos solo se suma al coste.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -954,27 +646,32 @@ export default function SimuladorModulosVsDirectaPage() {
             </p>
           </div>
           <div className={styles.faqItem}>
+            <strong>¿De dónde saco el rendimiento neto de módulos?</strong>
+            <p>
+              De aplicar a tu actividad el Anexo de la {ORDEN_MODULOS_VIGENTE.referencia}: cada
+              módulo de tu epígrafe por su importe, menos las minoraciones y con los índices
+              correctores. Es un cálculo propio de cada epígrafe, y lo habitual es que lo haga la
+              gestoría. Esta app aplica después la reducción general del{' '}
+              {REDUCCION_GENERAL_MODULOS.porcentaje}{'\u00A0'}%, el IRPF y la cuota RETA.
+            </p>
+          </div>
+          <div className={styles.faqItem}>
             <strong>¿Cómo cambio de régimen?</strong>
             <p>
-              Mediante la <em>declaración censal</em> (modelo 036/037) presentada antes del 31 de
-              diciembre del año anterior al que se quiere cambiar. La renuncia a módulos tiene
-              efectos durante <strong>3 años mínimo</strong> (no puedes volver hasta entonces).
+              Mediante la <em>declaración censal</em> (modelo 036/037). La renuncia a módulos se
+              presenta en diciembre del año anterior al que se quiere cambiar; también cuenta
+              como renuncia presentar en plazo el primer pago fraccionado del año por estimación
+              directa. Tiene efectos durante <strong>3 años mínimo</strong> (no puedes volver
+              hasta entonces) (art. 33 del Reglamento del IRPF).
             </p>
           </div>
           <div className={styles.faqItem}>
             <strong>¿Tributo el IVA igual en ambos regímenes?</strong>
             <p>
-              No. En ED estás en régimen general de IVA (declaras IVA repercutido − IVA soportado).
-              En módulos estás en <em>régimen simplificado de IVA</em>, con cuotas trimestrales
-              fijas calculadas también por unidades. El régimen de IVA va atado al de IRPF.
-            </p>
-          </div>
-          <div className={styles.faqItem}>
-            <strong>¿Y si tengo pérdidas estando en módulos?</strong>
-            <p>
-              Sigues tributando lo mismo. Los módulos NO admiten pérdidas: aunque ganes 0 €,
-              tributarás por el rendimiento estimado por las unidades. Por eso ED es más
-              conveniente en años malos.
+              No. En directa estás en el régimen general de IVA (declaras IVA repercutido − IVA
+              soportado). En módulos lo normal es el <em>régimen simplificado de IVA</em>, que
+              también se calcula por módulos, o el recargo de equivalencia si es comercio
+              minorista. Esta app no calcula el IVA.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -990,14 +687,15 @@ export default function SimuladorModulosVsDirectaPage() {
           <div className={styles.faqItem}>
             <strong>¿Hay obligaciones contables distintas?</strong>
             <p>
-              Sí. ED Simplificada exige llevar libros de ingresos, gastos, bienes de inversión y
-              provisiones. Módulos solo exige libro registro de ventas + facturas emitidas y
-              recibidas. Módulos es claramente menos exigente en burocracia.
+              Sí. La directa simplificada exige llevar libros de ingresos, gastos y bienes de
+              inversión. En módulos basta, en general, con conservar las facturas emitidas y
+              recibidas y los justificantes de los módulos aplicados; si deduces amortizaciones,
+              también el libro registro de bienes de inversión (art. 68 del Reglamento del IRPF).
             </p>
           </div>
         </div>
 
-        <h3>Cómo decidir paso a paso</h3>
+        <h3>Cómo hacer la comparación paso a paso</h3>
         <div className={styles.stepGuide}>
           <div className={styles.step}>
             <span className={styles.stepNumber}>1</span>
@@ -1014,41 +712,39 @@ export default function SimuladorModulosVsDirectaPage() {
             <div className={styles.stepContent}>
               <strong>Estima ingresos y gastos reales del próximo año</strong>
               <p>
-                Necesitas una previsión razonable basada en el histórico y proyecciones (apertura de
-                personal, cambios de local, mayor inversión, etc.).
+                Una previsión razonable basada en el histórico y en lo que vaya a cambiar (personal,
+                local, inversiones…).
               </p>
             </div>
           </div>
           <div className={styles.step}>
             <span className={styles.stepNumber}>3</span>
             <div className={styles.stepContent}>
-              <strong>Calcula el rendimiento por módulos</strong>
+              <strong>Obtén tu rendimiento neto de módulos</strong>
               <p>
-                Según los parámetros oficiales de tu actividad (mesas, m², personal asalariado y no
-                asalariado, kWh, vehículos…). Restas las minoraciones por incentivos al empleo y a la
-                inversión, aplicas los índices correctores y, sobre ese rendimiento neto de
-                módulos, la reducción general del {REDUCCION_GENERAL_MODULOS.porcentaje}{'\u00A0'}% (sin tope).
+                Con los módulos oficiales de tu epígrafe: restas las minoraciones por incentivos al
+                empleo y a la inversión y aplicas los índices correctores. Sobre ese rendimiento se
+                aplica la reducción general del {REDUCCION_GENERAL_MODULOS.porcentaje}{'\u00A0'}% (sin tope).
               </p>
             </div>
           </div>
           <div className={styles.step}>
             <span className={styles.stepNumber}>4</span>
             <div className={styles.stepContent}>
-              <strong>Compara IRPF total + cuota RETA en ambos escenarios</strong>
+              <strong>Compara IRPF + cuota RETA en ambos escenarios</strong>
               <p>
-                No olvides incluir la cuota mensual del RETA × 12. En Estimación Directa esa cuota
-                es además gasto deducible y rebaja el IRPF; en módulos no. La diferencia entre
-                ambos regímenes puede ser de varios miles de € al año.
+                En Estimación Directa la cuota es además gasto deducible y rebaja el IRPF; en
+                módulos no. Prueba también con un año de menos ingresos.
               </p>
             </div>
           </div>
           <div className={styles.step}>
             <span className={styles.stepNumber}>5</span>
             <div className={styles.stepContent}>
-              <strong>Decide con tu asesor antes del 31 de diciembre</strong>
+              <strong>Consulta con tu asesor antes de diciembre</strong>
               <p>
-                La renuncia o vuelta al régimen tiene plazo: presenta el modelo 036/037 antes del
-                fin del año anterior. Recuerda que renunciar a módulos te ata 3 años mínimo a ED.
+                La renuncia se presenta con el modelo 036/037 en diciembre del año anterior, y
+                renunciar a módulos te ata 3 años mínimo a la directa.
               </p>
             </div>
           </div>
@@ -1059,29 +755,29 @@ export default function SimuladorModulosVsDirectaPage() {
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">📊</span>
             <div>
-              <strong>Recalcula cada año</strong>
-              <p>Tu margen real cambia. Lo que era óptimo hace 2 años puede no serlo hoy.</p>
+              <strong>Repite la comparación cada año</strong>
+              <p>Tu margen y la Orden de módulos cambian: las cifras de hace dos años ya no valen.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">📅</span>
             <div>
-              <strong>Decide antes del 31 de diciembre</strong>
-              <p>El cambio se solicita en modelo 036/037 antes de fin de año.</p>
+              <strong>Atento a diciembre</strong>
+              <p>La renuncia a módulos se presenta en el modelo 036/037 en diciembre del año anterior.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🔒</span>
             <div>
-              <strong>Cuidado con el lock-in de 3 años</strong>
-              <p>Renunciar a módulos te obliga a 3 años mínimo en ED. No es decisión rápida.</p>
+              <strong>La renuncia dura 3 años</strong>
+              <p>Renunciar a módulos te obliga a 3 años mínimo en directa: compara más de un año.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">📑</span>
             <div>
               <strong>Guarda toda la documentación</strong>
-              <p>En ED necesitas justificar cada gasto. En módulos, las facturas igualmente para IVA.</p>
+              <p>En directa necesitas justificar cada gasto. En módulos, las facturas igualmente para IVA.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
@@ -1094,7 +790,7 @@ export default function SimuladorModulosVsDirectaPage() {
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🔍</span>
             <div>
-              <strong>Revisa la Orden de módulos cada noviembre</strong>
+              <strong>Revisa la Orden de módulos cada año</strong>
               <p>El Ministerio publica los módulos del año siguiente en torno a noviembre/diciembre.</p>
             </div>
           </div>
@@ -1106,12 +802,12 @@ export default function SimuladorModulosVsDirectaPage() {
             Errores frecuentes a evitar
           </div>
           <ul className={styles.warningList}>
-            <li>Asumir que módulos siempre es más barato — depende del margen real, no del régimen.</li>
+            <li>Dar por hecho que un régimen es siempre más barato: depende del margen real de cada año.</li>
             <li>No comprobar si tu actividad IAE está en la Orden anual de módulos antes de elegir módulos.</li>
-            <li>Renunciar a módulos sin saber que el lock-in son 3 años en ED.</li>
-            <li>Olvidar que en módulos tributas igual aunque tengas pérdidas reales.</li>
-            <li>Confundir el régimen de IRPF con el de IVA — van atados, no son independientes.</li>
-            <li>No actualizar el cálculo cada año al publicarse la Orden de módulos.</li>
+            <li>Renunciar a módulos sin saber que la renuncia te ata 3 años a la directa.</li>
+            <li>Olvidar que en módulos el rendimiento no baja aunque el año vaya peor.</li>
+            <li>Confundir el régimen de IRPF con el de IVA: van atados, no son independientes.</li>
+            <li>Usar el rendimiento de módulos de una Orden antigua: se actualiza cada año.</li>
           </ul>
         </div>
       </EducationalSection>

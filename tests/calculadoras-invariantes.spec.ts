@@ -49,7 +49,7 @@ import { calcularIndemnizacionDespido } from '../lib/calculadoras/indemnizacionD
 import { calcularSueldoNeto } from '../lib/calculadoras/sueldoNeto';
 import { calcularDeduccionRentasBajas, limitarDeduccionRendimientosTrabajo } from '../data/fiscal/irpf';
 import { calcularCuotaAutonomo } from '../lib/calculadoras/cuotaAutonomo';
-import { compararModulosVsDirecta } from '../lib/calculadoras/modulosVsDirecta';
+import { compararModulosVsDirecta, superaLimitesModulos } from '../lib/calculadoras/modulosVsDirecta';
 import {
   GASTOS_DIFICIL_JUSTIFICACION_EDS,
   reduccionGastosDificilJustificacion,
@@ -4717,91 +4717,121 @@ test.describe('Cuota íntegra general — art. 63.1.2º LIRPF (fuente única des
 // modulosVsDirecta — el motor que sirve a la tool comparar_modulos_vs_directa
 // del MCP de Delegum Y, desde el 13/09/2026, a la propia app.
 //
-// Origen: hallazgos 808 y 809 del Inspector (tanda del 12/09/2026). El motor era una
-// RÉPLICA de la lógica inline de la app, y las dos copias envejecieron por su lado: las
-// reparaciones del 31/08 (no recomendar un régimen inaccesible) y del 02/09 (límites de
-// exclusión por volumen) se aplicaron solo a la copia de la app. Por el MCP se imprimía
-// «⚠️ probablemente NO sea elegible para módulos» y dos líneas después «✅ Sale más
-// barato: Estimación Objetiva (Módulos)».
+// ⚠️ REESCRITO el 01/10/2026 (hallazgo 2545, decisión del usuario). El motor ya no estima el
+// rendimiento de módulos con fórmulas inventadas por actividad ni devuelve `regimenRecomendado`
+// / `ganaED`: el rendimiento neto de módulos lo aporta el usuario y la diferencia de costes es
+// un dato. Lo que cubrían los tests anteriores y dónde queda:
+//  · [808] «no se recomienda módulos a quien no es apto» → ya no hay recomendación que pueda
+//    salir mal: sin dato o fuera de límites, `modulos` es null y `diferencia` también.
+//  · [809] límites de exclusión → mismos umbrales, 250.000 / 250.001 en ingresos y en compras.
+//  · [811] el 5 % del art. 30.2.ª RIRPF sale de data/fiscal → se conserva.
+//  · [2444] la cuota RETA se deduce en directa → se conserva con el mismo caso.
+//  · [2445] el 5 % de módulos va sin tope → se conserva sobre el rendimiento que llega tecleado.
+//
+// Goldens resueltos A MANO antes de ejecutar. Anclas: escala TRAMOS_IRPF_2025 (19 % hasta 12.450,
+// 24 % hasta 20.200, 30 % hasta 35.200, 37 % hasta 60.000, 45 % hasta 300.000; acumulados
+// escala(12.450) = 2.365,50 · escala(35.200) = 8.725,50), mínimo personal 5.550 €
+// (escala(5.550) = 1.054,50, gravado a tipo cero por calcularCuotaIntegraGeneral), 5 % de
+// difícil justificación con tope de 2.000 € solo en directa, 5 % SIN tope de la reducción
+// general de módulos (REDUCCION_GENERAL_MODULOS) y LIMITES_EXCLUSION_MODULOS_2025.
 // ─────────────────────────────────────────────────────────────────────────────
-test.describe('modulosVsDirecta — elegibilidad antes que importe', () => {
-  test('ALTO [808]: un profesional puro NO recibe la recomendación de módulos', () => {
-    // Preset «Profesional puro» de la app: sin superficie, sin mesas, sin vehículo y sin
-    // asalariados, solo el titular. La fórmula didáctica le da un rendimiento por módulos
-    // de 4.500 € (muy inferior a sus 42.000 € reales), así que POR IMPORTE módulos ganaba
-    // por 9.447 €/año. Pero no puede acogerse.
-    const r = compararModulosVsDirecta({
-      ingresos: 50000,
-      gastos: 8000,
-      retaMensual: 300,
-      actividad: 'comercio_menor',
-      personalNoAsalariado: 1,
-    });
-    expect(r.modulos.esApta).toBe(false);
-    expect(r.modulos.motivoNoApta).toBe('sin_parametros');
-    expect(r.regimenRecomendado).toBe('Estimación Directa Simplificada');
-    expect(r.ganaED).toBe(true);
-    // Y el importe de módulos seguía siendo el barato: la recomendación NO puede salir de ahí.
-    expect(r.modulos.costeAnualTotal).toBeLessThan(r.estimacionDirecta.costeAnualTotal);
+test.describe('modulosVsDirecta — rendimiento de módulos aportado, diferencia como dato', () => {
+  // Directa del bar de 90.000/25.000/320 (los dos primeros casos):
+  //   previo 90.000 − 25.000 − 3.840 = 61.160 · 5 % = 3.058 > tope → −2.000 → base 59.160
+  //   escala(59.160) = 8.725,50 + 23.960 × 37 % = 8.725,50 + 8.865,20 = 17.590,70
+  //   IRPF 17.590,70 − 1.054,50 = 16.536,20 · coste 16.536,20 + 3.840 = 20.376,20
+  const BAR = { ingresos: 90000, gastos: 25000, retaMensual: 320 };
+
+  test('con dato: 20.000 € de rendimiento de módulos → 6723,00 € de coste y 13.653,20 € de diferencia', () => {
+    // Módulos: 20.000 − 5 % (1.000,00) = 19.000 = base
+    //   escala(19.000) = 2.365,50 + 6.550 × 24 % = 2.365,50 + 1.572,00 = 3.937,50
+    //   IRPF 3.937,50 − 1.054,50 = 2.883,00 · coste 2.883,00 + 3.840 = 6.723,00
+    // Diferencia 20.376,20 − 6.723,00 = 13.653,20 (positiva: la directa cuesta más).
+    const r = compararModulosVsDirecta({ ...BAR, rendimientoNetoModulos: 20000 });
+    expect(r.estimacionDirecta.rendimientoNetoPrevio).toBe(61160);
+    expect(r.estimacionDirecta.reduccion5pc).toBe(2000);
+    expect(r.estimacionDirecta.baseLiquidable).toBe(59160);
+    expect(r.estimacionDirecta.cuotaEscala).toBeCloseTo(17590.7, 2);
+    expect(r.estimacionDirecta.irpf).toBeCloseTo(16536.2, 2);
+    expect(r.estimacionDirecta.costeAnualTotal).toBeCloseTo(20376.2, 2);
+
+    expect(r.motivoSinModulos).toBe(null);
+    expect(r.modulos).not.toBe(null);
+    const m = r.modulos!;
+    expect(m.rendimientoNetoModulos).toBe(20000);
+    expect(m.reduccion5pc).toBeCloseTo(1000, 2);
+    expect(m.baseLiquidable).toBeCloseTo(19000, 2);
+    expect(m.cuotaEscala).toBeCloseTo(3937.5, 2);
+    expect(m.cuotaMinimo).toBeCloseTo(1054.5, 2);
+    expect(m.irpf).toBeCloseTo(2883, 2);
+    // En módulos la cuota RETA no reduce el rendimiento: solo se suma al coste.
+    expect(m.cuotaReta).toBe(3840);
+    expect(m.costeAnualTotal).toBeCloseTo(6723, 2);
+    expect(r.diferencia).toBeCloseTo(13653.2, 2);
   });
 
-  test('ALTO [809]: superar los límites de exclusión excluye, aunque la actividad encaje', () => {
-    // Bar con todos los parámetros físicos en regla, pero 300.000 € de ingresos: por encima
-    // de los 250.000 € del art. 31 LIRPF. Antes salía esApta=true, sin aviso, recomendando
-    // módulos con una diferencia de 113.510,72 €/año.
-    const r = compararModulosVsDirecta({
-      ingresos: 300000,
-      gastos: 20000,
-      retaMensual: 320,
-      actividad: 'bar',
-      mesas: 8,
-      personalAsalariado: 1,
-      personalNoAsalariado: 1,
-      superficie: 60,
-      kwh: 12000,
-    });
-    expect(r.modulos.esApta).toBe(false);
-    expect(r.modulos.motivoNoApta).toBe('supera_limites');
-    expect(r.regimenRecomendado).toBe('Estimación Directa Simplificada');
+  test('el resultado no trae veredicto: ni régimen recomendado ni «gana»', () => {
+    const r = compararModulosVsDirecta({ ...BAR, rendimientoNetoModulos: 20000 });
+    expect(Object.keys(r).sort()).toEqual(['diferencia', 'estimacionDirecta', 'modulos', 'motivoSinModulos']);
+    expect(r).not.toHaveProperty('regimenRecomendado');
+    expect(r).not.toHaveProperty('ganaED');
   });
 
-  test('[809] el umbral de compras excluye igual que el de ingresos', () => {
-    const base = {
-      ingresos: 240000,
-      retaMensual: 320,
-      actividad: 'bar' as const,
-      mesas: 8,
-      personalAsalariado: 1,
-      superficie: 60,
-      kwh: 12000,
-    };
-    // Justo en el límite: dentro. Un euro por encima: fuera. Los dos ejes, uno a uno.
-    expect(compararModulosVsDirecta({ ...base, gastos: 250000 }).modulos.esApta).toBe(true);
-    expect(compararModulosVsDirecta({ ...base, gastos: 250001 }).modulos.motivoNoApta).toBe('supera_limites');
-    expect(compararModulosVsDirecta({ ...base, ingresos: 250000, gastos: 1000 }).modulos.esApta).toBe(true);
-    expect(compararModulosVsDirecta({ ...base, ingresos: 250001, gastos: 1000 }).modulos.motivoNoApta).toBe('supera_limites');
+  test('sin dato: solo directa, módulos null con motivo «sin_dato» y sin diferencia', () => {
+    const r = compararModulosVsDirecta(BAR);
+    expect(r.modulos).toBe(null);
+    expect(r.motivoSinModulos).toBe('sin_dato');
+    expect(r.diferencia).toBe(null);
+    // La directa se calcula igual que con dato.
+    expect(r.estimacionDirecta.costeAnualTotal).toBeCloseTo(20376.2, 2);
   });
 
-  test('[808] cuando módulos SÍ es apta, la recomendación vuelve a salir del importe', () => {
-    // Candado por el otro lado: que la guarda de elegibilidad no se coma la comparación.
-    const r = compararModulosVsDirecta({
-      ingresos: 90000,
-      gastos: 25000,
-      retaMensual: 320,
-      actividad: 'bar',
-      mesas: 8,
-      personalAsalariado: 1,
-      personalNoAsalariado: 1,
-      superficie: 60,
-      kwh: 12000,
-    });
-    expect(r.modulos.esApta).toBe(true);
-    expect(r.modulos.motivoNoApta).toBe(null);
-    expect(r.regimenRecomendado).toBe(
-      r.estimacionDirecta.costeAnualTotal < r.modulos.costeAnualTotal
-        ? 'Estimación Directa Simplificada'
-        : 'Estimación Objetiva (Módulos)'
-    );
+  test('rendimiento 0: es un dato, no la falta de él → IRPF 0 y coste igual a la cuota RETA', () => {
+    // 30.000/18.000/320. Directa (hallazgo 2444, mismo caso que abajo):
+    //   previo 30.000 − 18.000 − 3.840 = 8.160 · 5 % = 408 → base 7.752
+    //   IRPF 7.752 × 19 % − 1.054,50 = 1.472,88 − 1.054,50 = 418,38 · coste 4.258,38
+    // Módulos con 0: reducción 0, base 0, escala(0) − escala(0) = 0 → coste 3.840,00.
+    // Diferencia 4.258,38 − 3.840,00 = 418,38.
+    const r = compararModulosVsDirecta({ ingresos: 30000, gastos: 18000, retaMensual: 320, rendimientoNetoModulos: 0 });
+    expect(r.motivoSinModulos).toBe(null);
+    const m = r.modulos!;
+    expect(m.reduccion5pc).toBe(0);
+    expect(m.baseLiquidable).toBe(0);
+    expect(m.cuotaEscala).toBe(0);
+    expect(m.cuotaMinimo).toBe(0);
+    expect(m.irpf).toBe(0);
+    expect(m.costeAnualTotal).toBe(3840);
+    expect(r.diferencia).toBeCloseTo(418.38, 2);
+  });
+
+  test('límites de exclusión: 250.000 € dentro y 250.001 € fuera, en ingresos y en compras', () => {
+    const dato = { retaMensual: 320, rendimientoNetoModulos: 10000 };
+    const ingresosEn = compararModulosVsDirecta({ ...dato, ingresos: 250000, gastos: 1000 });
+    expect(ingresosEn.motivoSinModulos).toBe(null);
+    expect(ingresosEn.modulos).not.toBe(null);
+    const ingresosFuera = compararModulosVsDirecta({ ...dato, ingresos: 250001, gastos: 1000 });
+    expect(ingresosFuera.motivoSinModulos).toBe('supera_limites');
+    expect(ingresosFuera.modulos).toBe(null);
+    expect(ingresosFuera.diferencia).toBe(null);
+
+    const comprasEn = compararModulosVsDirecta({ ...dato, ingresos: 240000, gastos: 250000 });
+    expect(comprasEn.motivoSinModulos).toBe(null);
+    expect(comprasEn.modulos).not.toBe(null);
+    const comprasFuera = compararModulosVsDirecta({ ...dato, ingresos: 240000, gastos: 250001 });
+    expect(comprasFuera.motivoSinModulos).toBe('supera_limites');
+    expect(comprasFuera.modulos).toBe(null);
+
+    // Los límites mandan sobre la falta de dato: fuera de ellos el motivo es la exclusión.
+    expect(compararModulosVsDirecta({ ingresos: 250001, gastos: 0, retaMensual: 320 }).motivoSinModulos).toBe('supera_limites');
+    expect(superaLimitesModulos(250000, 250000)).toBe(false);
+    expect(superaLimitesModulos(250001, 0)).toBe(true);
+    expect(superaLimitesModulos(0, 250001)).toBe(true);
+  });
+
+  test('un dato inválido no se convierte en cifra: negativo, NaN o infinito lanzan RangeError', () => {
+    for (const malo of [-1, NaN, Infinity]) {
+      expect(() => compararModulosVsDirecta({ ...BAR, rendimientoNetoModulos: malo })).toThrow(RangeError);
+    }
   });
 
   test('[811] la reducción del art. 30.2.ª RIRPF es la de data/fiscal, no un 5 ni un 7 tecleados', () => {
@@ -4818,58 +4848,52 @@ test.describe('modulosVsDirecta — elegibilidad antes que importe', () => {
     expect(reduccionGastosDificilJustificacion(-5000)).toBe(0);
 
     // Desde el 29/09/2026 (hallazgo 2444) la cuota RETA del titular se deduce ANTES del 5 %:
-    // 50.000 − 11.200 − 300 × 12 = 35.200 de rendimiento previo, y su 5 % son 1.760 €. El
-    // 1.940 que había aquí era el 5 % de 38.800, con la cuota sin deducir.
-    const r = compararModulosVsDirecta({
-      ingresos: 50000, gastos: 11200, retaMensual: 300, actividad: 'comercio_menor', superficie: 80,
-    });
+    // 50.000 − 11.200 − 300 × 12 = 35.200 de rendimiento previo, y su 5 % son 1.760 €.
+    const r = compararModulosVsDirecta({ ingresos: 50000, gastos: 11200, retaMensual: 300 });
     expect(r.estimacionDirecta.rendimientoNetoPrevio).toBe(35200);
     expect(r.estimacionDirecta.reduccion5pc).toBe(1760);
   });
 
   // Hallazgo 2444 (inspector 29/09/2026): en directa, la cuota RETA es gasto deducible
-  // (Manual práctico de Renta de la AEAT, cap. 7) y el motor solo la sumaba al coste. Caso: el
-  // bar de partida de la app. Cuentas a mano, escala general de 2025 (19 % hasta 12.450):
+  // (Manual práctico de Renta de la AEAT, cap. 7) y el motor solo la sumaba al coste.
   //   directa  30.000 − 18.000 − 3.840 = 8.160 · 5 % = 408 · base 7.752
-  //            IRPF 7.752 × 0,19 − 5.550 × 0,19 = 1.472,88 − 1.054,50 = 418,38 · coste 4.258,38
-  //   módulos  9.000 + 800 + 300 + 500 = 10.600 · empleo 100 · 10.500 · 5 % = 525 · base 9.975
-  //            IRPF 1.895,25 − 1.054,50 = 840,75 · coste 4.680,75
-  // Antes: directa 1.111,50 € de IRPF y recomendaba MÓDULOS por 271,70 €. Ahora gana directa.
-  test('ALTO [2444]: la cuota RETA se deduce en directa y la recomendación cambia de lado', () => {
-    const r = compararModulosVsDirecta({
-      ingresos: 30000, gastos: 18000, retaMensual: 320, actividad: 'bar',
-      mesas: 6, personalAsalariado: 1, personalNoAsalariado: 1, superficie: 50, kwh: 10000,
-    });
+  //            IRPF 1.472,88 − 1.054,50 = 418,38 · coste 4.258,38
+  //   módulos  (rendimiento aportado) 10.500 · 5 % = 525 · base 9.975
+  //            IRPF 9.975 × 19 % − 1.054,50 = 1.895,25 − 1.054,50 = 840,75 · coste 4.680,75
+  //   diferencia 4.258,38 − 4.680,75 = −422,37 (negativa: la directa cuesta menos)
+  test('ALTO [2444]: la cuota RETA se deduce en directa y no en módulos; la diferencia puede salir negativa', () => {
+    const r = compararModulosVsDirecta({ ingresos: 30000, gastos: 18000, retaMensual: 320, rendimientoNetoModulos: 10500 });
     expect(r.estimacionDirecta.cuotaRetaDeducida).toBe(3840);
     expect(r.estimacionDirecta.rendimientoNetoPrevio).toBe(8160);
     expect(r.estimacionDirecta.baseLiquidable).toBeCloseTo(7752, 2);
     expect(r.estimacionDirecta.irpf).toBeCloseTo(418.38, 2);
     expect(r.estimacionDirecta.costeAnualTotal).toBeCloseTo(4258.38, 2);
-    expect(r.modulos.irpf).toBeCloseTo(840.75, 2);
-    expect(r.modulos.costeAnualTotal).toBeCloseTo(4680.75, 2);
-    expect(r.regimenRecomendado).toBe('Estimación Directa Simplificada');
-    // La cuota se paga igual en los dos regímenes: en módulos NO reduce el rendimiento
-    expect(r.modulos.cuotaReta).toBe(3840);
-    expect(r.modulos.rendimientoNetoPrevio).toBe(10600);
+    expect(r.modulos!.baseLiquidable).toBeCloseTo(9975, 2);
+    expect(r.modulos!.irpf).toBeCloseTo(840.75, 2);
+    expect(r.modulos!.cuotaReta).toBe(3840);
+    expect(r.modulos!.costeAnualTotal).toBeCloseTo(4680.75, 2);
+    expect(r.diferencia).toBeCloseTo(-422.37, 2);
   });
 
   // Hallazgo 2445: la reducción general de módulos (DA 1.ª Orden HAC/1425/2025) es el 5 % SIN
-  // tope del «rendimiento neto de módulos», que en el Anexo II es posterior a la minoración por
-  // incentivos al empleo (instr. 2.2). El motor usaba la de la directa simplificada (tope de
-  // 2.000 €) y la restaba antes del empleo. Bar con 30 mesas, 5 asalariados, 200 m², 50.000 kWh:
-  //   previo 45.000 + 4.000 + 1.200 + 2.500 = 52.700 · empleo 500 · 52.200 · 5 % = 2.610
-  //   base 49.590 · escala 2.365,50 + 1.860 + 4.500 + 14.390 × 0,37 = 14.049,80 · IRPF 12.995,30
-  // El acta esperaba 12.986,05 (5 % de 52.700 antes del empleo): se corrige con el BOE delante.
-  test('[2445] el 5 % de módulos no tiene tope y va tras el incentivo al empleo', () => {
-    const r = compararModulosVsDirecta({
-      ingresos: 30000, gastos: 18000, retaMensual: 320, actividad: 'bar',
-      mesas: 30, personalAsalariado: 5, personalNoAsalariado: 1, superficie: 200, kwh: 50000,
-    });
-    expect(r.modulos.rendimientoNetoPrevio).toBe(52700);
-    expect(r.modulos.reduccionEmpleo).toBe(500);
-    expect(r.modulos.rendimientoNetoModulos).toBe(52200);
-    expect(r.modulos.reduccion5pc).toBeCloseTo(2610, 2);
-    expect(r.modulos.baseLiquidable).toBeCloseTo(49590, 2);
-    expect(r.modulos.irpf).toBeCloseTo(12995.3, 2);
+  // tope del «rendimiento neto de módulos». Con 52.200 € aportados:
+  //   5 % = 2.610 (con el tope de la EDS serían 2.000) · base 49.590
+  //   escala(49.590) = 8.725,50 + 14.390 × 37 % = 8.725,50 + 5.324,30 = 14.049,80 · IRPF 12.995,30
+  // Y con 50.000 € (el bar de arriba): 5 % = 2.500 · base 47.500
+  //   escala(47.500) = 8.725,50 + 12.300 × 37 % = 8.725,50 + 4.551,00 = 13.276,50 · IRPF 12.222,00
+  //   coste 12.222,00 + 3.840 = 16.062,00 · diferencia 20.376,20 − 16.062,00 = 4.314,20
+  test('[2445] el 5 % de módulos no tiene el tope de 2.000 € de la directa simplificada', () => {
+    const r = compararModulosVsDirecta({ ingresos: 30000, gastos: 18000, retaMensual: 320, rendimientoNetoModulos: 52200 });
+    expect(r.modulos!.reduccion5pc).toBeCloseTo(2610, 2);
+    expect(r.modulos!.baseLiquidable).toBeCloseTo(49590, 2);
+    expect(r.modulos!.cuotaEscala).toBeCloseTo(14049.8, 2);
+    expect(r.modulos!.irpf).toBeCloseTo(12995.3, 2);
+
+    const b = compararModulosVsDirecta({ ...BAR, rendimientoNetoModulos: 50000 });
+    expect(b.modulos!.reduccion5pc).toBeCloseTo(2500, 2);
+    expect(b.modulos!.baseLiquidable).toBeCloseTo(47500, 2);
+    expect(b.modulos!.irpf).toBeCloseTo(12222, 2);
+    expect(b.modulos!.costeAnualTotal).toBeCloseTo(16062, 2);
+    expect(b.diferencia).toBeCloseTo(4314.2, 2);
   });
 });
