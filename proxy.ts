@@ -26,8 +26,39 @@ const CRONICUM_HOSTS = new Set(['cronicum.com', 'www.cronicum.com']);
 const STEMUM_HOSTS = new Set(['stemum.com', 'www.stemum.com']);
 const COQUINUM_HOSTS = new Set(['coquinum.com', 'www.coquinum.com']);
 
+/**
+ * Iconos de ruta fija de cada marca. Los buscadores (Bing, y Qwant con él) no se
+ * fían solo del <link rel="icon"> del HTML: piden también /favicon.ico y
+ * /apple-touch-icon.png en la raíz del dominio. Sin esta tabla, esas dos rutas
+ * caían en public/ y servían el icono de meskeIA en los cuatro portales
+ * (detectado el 01/10/2026: stemum.com salía en Qwant con el icono de meskeIA).
+ * Delegum no tiene .ico: sirve su PNG de 32 px, como hace el public/favicon.ico
+ * de meskeIA, que también es un PNG.
+ */
+const ICONOS_RAIZ: Record<string, Record<string, string>> = {
+  delegum: { '/favicon.ico': '/delegum/favicon-32.png', '/apple-touch-icon.png': '/delegum/app-icon-180.png' },
+  cronicum: { '/favicon.ico': '/cronicum/favicon.ico', '/apple-touch-icon.png': '/cronicum/app-icon-180.png' },
+  stemum: { '/favicon.ico': '/stemum/favicon.ico', '/apple-touch-icon.png': '/stemum/app-icon-180.png' },
+  coquinum: { '/favicon.ico': '/coquinum/favicon.ico', '/apple-touch-icon.png': '/coquinum/app-icon-180.png' },
+};
+
+function marcaDelHost(host: string): string | null {
+  if (DELEGUM_HOSTS.has(host)) return 'delegum';
+  if (CRONICUM_HOSTS.has(host)) return 'cronicum';
+  if (STEMUM_HOSTS.has(host)) return 'stemum';
+  if (COQUINUM_HOSTS.has(host)) return 'coquinum';
+  return null;
+}
+
 export function proxy(req: NextRequest) {
   const host = (req.headers.get('host') ?? '').split(':')[0].toLowerCase();
+  const marca = marcaDelHost(host);
+  const icono = marca ? ICONOS_RAIZ[marca][req.nextUrl.pathname] : undefined;
+  if (icono) {
+    const url = req.nextUrl.clone();
+    url.pathname = icono;
+    return NextResponse.rewrite(url);
+  }
   if (DELEGUM_HOSTS.has(host)) return handleDelegum(req);
   if (CRONICUM_HOSTS.has(host)) return handleCronicum(req);
   if (STEMUM_HOSTS.has(host)) return handleStemum(req);
@@ -243,7 +274,14 @@ function handleStemum(req: NextRequest) {
 
 export const config = {
   // Todas las rutas de página, excepto API, internos de Next y ficheros con
-  // extensión (assets, favicon, og-image…). sitemap.xml y robots.txt se añaden
-  // explícitamente para poder enrutarlos por marca (Cronicum tiene los suyos).
-  matcher: ['/((?!api|_next|.*\\..*).*)', '/sitemap.xml', '/robots.txt', '/llms.txt'],
+  // extensión (assets, og-image…). sitemap.xml, robots.txt, llms.txt y los dos
+  // iconos de ruta fija se añaden explícitamente para poder enrutarlos por marca.
+  matcher: [
+    '/((?!api|_next|.*\\..*).*)',
+    '/sitemap.xml',
+    '/robots.txt',
+    '/llms.txt',
+    '/favicon.ico',
+    '/apple-touch-icon.png',
+  ],
 };
