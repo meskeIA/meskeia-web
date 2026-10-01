@@ -1,5 +1,6 @@
 import { test, expect, devices, type Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { CONDUCTA_GRADO_3 } from '../../app/orientador-tension-arterial/motor';
 
 /**
  * Orientador Tensión Arterial — test de regresión (Inspector; 1.ª pasada 25/08/2026)
@@ -38,6 +39,11 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     HTA grado 3 ............ ≥ 180 / ≥ 110
  *     HTA sistólica aislada .. ≥ 140 con diastólica < 90
  *     Crisis hipertensiva .... ≥ 180 o ≥ 120  (definición propia declarada por la app)
+ *
+ *   (Tabla tal como estaba en la 1.ª pasada. Desde el 01/10/2026 —hallazgos 2562 y 2563— la app
+ *   aplica la tabla ESH 2023 tal cual: sin «crisis hipertensiva», con grado 3 ≥ 180 y/o ≥ 110 y
+ *   la HTA diastólica aislada; la hipotensión queda como criterio propio solo dentro del tramo
+ *   «óptima». Ver la sección «RE-INSPECCIÓN · 01/10/2026» al final.)
  *
  *   REGLA CLÍNICA QUE GOBIERNA TODO ESTE FICHERO: cuando sistólica y diastólica caen en
  *   categorías distintas, manda LA MÁS ALTA de las dos. Nunca la sistólica por defecto, nunca
@@ -199,13 +205,16 @@ test('CASO 2b · los bordes inferiores también son inclusivos: 119/79 óptima, 
   await expect(categoria(page)).toHaveText('Tensión Normal');
 });
 
-test('CASO 2c · el corte de crisis: 179/119 es Grado 3 y 180/120 ya es Crisis', async ({ page }) => {
-  // La app declara la crisis como «sistólica ≥ 180 y/o diastólica ≥ 120».
+test('CASO 2c · el techo de la tabla ESH es el grado 3: 179/119 y 180/120 son HTA Grado 3', async ({ page }) => {
+  // Reescrito el 01/10/2026 (hallazgo 2562). Antes fijaba 180/120 como «Crisis Hipertensiva»,
+  // una categoría que la ESH 2023 no tiene: su tabla termina en grado 3 (≥ 180 y/o ≥ 110).
+  // 179/119: S grado 2, D grado 3 → manda la más alta. No es aislada: S ≥ 140.
   await medir(page, '179', '119');
   await expect(categoria(page)).toHaveText('HTA Grado 3');
 
   await medir(page, '180', '120');
-  await expect(categoria(page)).toHaveText('Crisis Hipertensiva');
+  await expect(categoria(page)).toHaveText('HTA Grado 3');
+  await expect(categoria(page)).not.toContainText('Crisis');
 });
 
 // ─── CASO 3 · el discordante ────────────────────────────────────────────────────────────
@@ -213,9 +222,11 @@ test('CASO 2c · el corte de crisis: 179/119 es Grado 3 y 180/120 ya es Crisis',
 test('CASO 3 · 135/95 manda la diastólica: es HTA Grado 1, no Normal-Alta ni un promedio', async ({ page }) => {
   await medir(page, '135', '95');
 
-  // Sistólica 135 (normal-alta) + diastólica 95 (grado 1) → manda la MÁS ALTA.
+  // Sistólica 135 (normal-alta) + diastólica 95 (grado 1) → manda la MÁS ALTA: grado 1.
   // Quedarse con la sistólica daría «Normal-Alta»; promediar (115/…) daría «Óptima».
-  await expect(categoria(page)).toHaveText('HTA Grado 1');
+  // Desde el 01/10/2026 (hallazgo 2562) el patrón se nombra: S < 140 y D ≥ 90 es la fila ESH
+  // «HTA diastólica aislada», graduada por la diastólica.
+  await expect(categoria(page)).toHaveText('HTA Diastólica Aislada (Grado 1)');
   await expect(recomendacion(page)).toContainText('Consulta a tu médico');
 
   // TAM = 95 + (135 − 95)/3 = 108,33 → 108 · presión de pulso = 40
@@ -247,15 +258,22 @@ test('CASO 3c · 165/85: la sistólica de grado 2 manda sobre una diastólica no
 
 // ─── CASO 4 · crisis hipertensiva ───────────────────────────────────────────────────────
 
-test('CASO 4 · 185/125 es Crisis Hipertensiva y deriva a urgencias, no a un consejo de hábitos', async ({ page }) => {
+test('CASO 4 · 185/125 es HTA Grado 3 y su conducta separa con síntomas (112) de sin síntomas (médico hoy)', async ({ page }) => {
+  // Reescrito el 01/10/2026 (hallazgos 2562 y 2564). Antes fijaba «Crisis Hipertensiva» con
+  // «Emergencia» y el 112 sin condición. La ESH 2023 llama a esto grado 3, y lo que lo hace
+  // emergencia es el daño agudo de órgano, que se ve en los síntomas (van den Born et al., ESC
+  // Council on Hypertension 2019): con ellos, 112; sin ellos, repetir y médico en el día.
   await medir(page, '185', '125');
 
-  await expect(categoria(page)).toHaveText('Crisis Hipertensiva');
-  await expect(urgencia(page)).toContainText('Emergencia');
+  await expect(categoria(page)).toHaveText('HTA Grado 3');
+  await expect(urgencia(page)).toContainText('Muy urgente');
 
-  // Lo que NO puede pasar aquí es que la app recomiende dieta o ejercicio.
+  // Lo que NO puede pasar aquí es que la app recomiende dieta o ejercicio, ni que se pierda
+  // la salida al 112 para quien tiene síntomas.
   await expect(recomendacion(page)).toContainText('urgencias');
   await expect(recomendacion(page)).toContainText('112');
+  await expect(recomendacion(page)).toContainText('dolor en el pecho');
+  await expect(recomendacion(page)).toContainText('hoy mismo con tu médico');
   await expect(recomendacion(page)).not.toContainText(/sodio|ejercicio|hábitos/i);
 
   // TAM = 125 + (185 − 125)/3 = 145
@@ -361,28 +379,37 @@ test('REGRESIÓN 294d · la hipotensión se sigue emitiendo cuando NADA está el
   await medir(page, '110', '55');
   await expect(categoria(page)).toHaveText('Hipotensión');
 
-  // Y con la sistólica ya en rango «normal»: la diastólica baja sigue avisando, porque
-  // ahí no hay ninguna categoría hipertensiva a la que la hipotensión pueda eclipsar.
+  // Reescrito el 01/10/2026 (hallazgo 2563). Antes fijaba 125/58 como «Hipotensión»; pero la
+  // hipotensión no es de la tabla ESH, y S 125 es «normal» en ella (manda la más alta). El
+  // criterio propio de la app ya solo actúa dentro del tramo «óptima», que la ESH deja sin suelo:
+  // nunca rebautiza una lectura que la guía citada clasifica.
   await medir(page, '125', '58');
-  await expect(categoria(page)).toHaveText('Hipotensión');
+  await expect(categoria(page)).toHaveText('Tensión Normal');
 
   // El límite: a partir de normal-alta ya manda lo elevado, no la diastólica baja.
   await medir(page, '135', '58');
   await expect(categoria(page)).toHaveText('Normal-Alta');
 });
 
-test('REGRESIÓN 295 (MEDIO) · la tabla visible usa el mismo corte de crisis que el código', async ({ page }) => {
+test('REGRESIÓN 295 (MEDIO) · la tabla visible usa el mismo corte de grado 3 que el código', async ({ page }) => {
+  // Reescrito el 01/10/2026 (hallazgo 2562). El 295 era que la fila de crisis decía «> 180»
+  // y el código aplicaba ≥. La fila de crisis ya no existe (no es de la ESH 2023); lo que se
+  // vigila ahora es el techo de la tabla, el grado 3, contra el código.
   await page.getByRole('button', { name: /tabla de clasificación/i }).click();
-  const filaCrisis = page.locator('table[aria-label*="Clasificación"] tbody tr', {
-    hasText: 'Crisis Hipertensiva',
-  });
-  await expect(filaCrisis.locator('td').nth(1)).toHaveText('≥ 180');
-  await expect(filaCrisis.locator('td').nth(2)).toHaveText('≥ 120');
+  const tabla = page.locator('table[aria-label*="Clasificación"] tbody');
+  await expect(tabla.locator('tr', { hasText: 'Crisis' })).toHaveCount(0);
+  const filaG3 = tabla.locator('tr', { hasText: 'HTA Grado 3' });
+  await expect(filaG3.locator('td').nth(1)).toHaveText('≥ 180');
+  await expect(filaG3.locator('td').nth(2)).toHaveText('y/o ≥ 110');
 
-  // Y la tabla explica la superposición que hacía «HTA Grado 3 ≥ 180» inalcanzable por
-  // vía sistólica: sin esa nota, quien lea la tabla deduce grado 3 donde la app dice crisis.
   await expect(page.locator('[class*="tablaNotas"]')).toContainText('se superponen');
   await expect(page.locator('[class*="tablaNotas"]')).toContainText('manda la más alta');
+
+  // Y el código da grado 3 en los dos bordes que la tabla anuncia.
+  await medir(page, '180', '100');
+  await expect(categoria(page)).toHaveText('HTA Grado 3');
+  await medir(page, '150', '110');
+  await expect(categoria(page)).toHaveText('HTA Grado 3');
 });
 
 test('REGRESIÓN 296 (MEDIO) · la app cita UNA sola versión de la guía en toda la página', async ({ page }) => {
@@ -480,12 +507,15 @@ test.describe('Re-inspección 25/09/2026', () => {
   test('ESH 2023 · con sistólica y diastólica en categorías distintas manda la MÁS ALTA', async ({ page }) => {
     // [sistólica, diastólica, categoría, urgencia] — cada fila resuelta con la tabla ESH 2023
     const casos: Array<[string, string, string, string]> = [
-      ['128', '92', 'HTA Grado 1', 'Alerta'],       // S normal (120–129), D grado 1 (90–99)
+      // Desde el 01/10/2026 (hallazgo 2562) la HTA diastólica aislada se NOMBRA, como la
+      // sistólica; el grado y la urgencia no cambian. El nivel máximo se rotula «Muy urgente»
+      // y no «Emergencia» (hallazgo 2564).
+      ['128', '92', 'HTA Diastólica Aislada (Grado 1)', 'Alerta'],       // S normal (120–129), D grado 1
       ['112', '86', 'Normal-Alta', 'Atención'],     // S óptima, D normal-alta (85–89)
       ['105', '82', 'Tensión Normal', 'Normal'],    // S óptima, D normal (80–84)
-      ['115', '104', 'HTA Grado 2', 'Urgente'],     // D grado 2 (100–109)
-      ['125', '112', 'HTA Grado 3', 'Emergencia'],  // D grado 3 (≥ 110) con S normal
-      ['139', '90', 'HTA Grado 1', 'Alerta'],       // HTA diastólica aislada (< 140 y ≥ 90) → grado 1
+      ['115', '104', 'HTA Diastólica Aislada (Grado 2)', 'Urgente'],     // D grado 2 (100–109)
+      ['125', '112', 'HTA Diastólica Aislada (Grado 3)', 'Muy urgente'], // D grado 3 (≥ 110) con S normal
+      ['139', '90', 'HTA Diastólica Aislada (Grado 1)', 'Alerta'],       // < 140 y ≥ 90 → grado 1
       ['159', '89', 'HTA Sistólica Aislada (Grado 1)', 'Alerta'],   // aislada, S 140–159
       ['160', '89', 'HTA Sistólica Aislada (Grado 2)', 'Urgente'],  // aislada, S 160–179
     ];
@@ -496,25 +526,32 @@ test.describe('Re-inspección 25/09/2026', () => {
     }
   });
 
-  test('Límites altos · 179/109 grado 2, 179/110 grado 3, y ≥ 180 o ≥ 120 crisis con el 112', async ({ page }) => {
+  test('Límites altos · 179/109 grado 2; 179/110 y todo ≥ 180 o ≥ 110 grado 3, con la conducta por síntomas', async ({ page }) => {
+    // Reescrito el 01/10/2026 (hallazgos 2562 y 2564). Antes fijaba ≥ 180 o ≥ 120 como «Crisis
+    // Hipertensiva» con «Acude a urgencias inmediatamente o llama al 112» sin condición. La ESH
+    // 2023 los llama grado 3 (185/55: sistólica aislada de grado 3), y la conducta es la de
+    // CONDUCTA_GRADO_3, la misma para todo el grado 3.
+    const conducta = `Recomendación: ${CONDUCTA_GRADO_3.conSintomas}${CONDUCTA_GRADO_3.sinSintomas}`;
+
     await medirHidratado(page, '179', '109');
     await expect(categoria(page)).toHaveText('HTA Grado 2');
 
-    // D = 110 entra en grado 3 (≥ 110) sin llegar a crisis (≥ 120). TAM = 110 + 69/3 = 133.
+    // D = 110 entra en grado 3 (≥ 110). TAM = 110 + 69/3 = 133.
     await medirHidratado(page, '179', '110');
     await expect(categoria(page)).toHaveText('HTA Grado 3');
-    await expect(urgencia(page)).toContainText('Emergencia');
-    await expect(recomendacion(page)).toContainText('Busca atención médica urgente');
+    await expect(urgencia(page)).toContainText('Muy urgente');
+    await expect(recomendacion(page)).toHaveText(conducta);
     await expect(derivadoValor(page, 0)).toContainText('133');
 
-    // Regla declarada por la app (nota de su tabla): ≥ 180 y/o ≥ 120 se rotula crisis.
-    const crisis: Array<[string, string]> = [['180', '110'], ['150', '120'], ['185', '55']];
-    for (const [sis, dia] of crisis) {
+    const grado3: Array<[string, string, string]> = [
+      ['180', '110', 'HTA Grado 3'],
+      ['150', '120', 'HTA Grado 3'],                      // S grado 1, D grado 3; no aislada (S ≥ 140)
+      ['185', '55', 'HTA Sistólica Aislada (Grado 3)'],   // antes inalcanzable
+    ];
+    for (const [sis, dia, esperada] of grado3) {
       await medirHidratado(page, sis, dia);
-      await expect(categoria(page), `${sis}/${dia}`).toHaveText('Crisis Hipertensiva');
-      await expect(recomendacion(page), `${sis}/${dia}`).toHaveText(
-        'Recomendación: Acude a urgencias inmediatamente o llama al 112.',
-      );
+      await expect(categoria(page), `${sis}/${dia}`).toHaveText(esperada);
+      await expect(recomendacion(page), `${sis}/${dia}`).toHaveText(conducta);
     }
     // 185/55: PP = 130 → «Muy elevada (> 80 mmHg)»; TAM = 55 + 130/3 = 98,33 → 98.
     await expect(derivadoValor(page, 0)).toContainText('98');
@@ -585,10 +622,11 @@ test.describe('Re-inspección 25/09/2026', () => {
   // grave. La reparación REDONDEA al mmHg entero (la ESH fija sus cortes en enteros) y lo dice.
   // Se eligió redondear y no rechazar porque la propia app pide «la media de tus mediciones»:
   // rechazarla empujaba a truncarla a mano, que es el mismo error hecho por la persona.
-  test('REPARADO 1717 · 179,67/100 se redondea a 180 → Crisis Hipertensiva, y la app lo dice', async ({ page }) => {
+  test('REPARADO 1717 · 179,67/100 se redondea a 180 → HTA Grado 3, y la app lo dice', async ({ page }) => {
     await medirHidratado(page, '179.67', '100');
-    // Media de 179, 180 y 180 = 179,67 → 180 → regla declarada ≥ 180: crisis.
-    await expect(categoria(page)).toHaveText('Crisis Hipertensiva');
+    // Media de 179, 180 y 180 = 179,67 → 180 → grado 3 de la ESH (≥ 180). Hasta el 01/10/2026
+    // la app lo rotulaba «Crisis Hipertensiva», categoría ajena a la ESH (hallazgo 2562).
+    await expect(categoria(page)).toHaveText('HTA Grado 3');
     await expect(recomendacion(page)).toContainText('112');
     await expect(page.locator('[class*="metricaValor"]').first()).toContainText('180');
     await expect(page.locator('[class*="resultadoRedondeo"]')).toContainText('sistólica 179,67 → 180');
@@ -599,9 +637,9 @@ test.describe('Re-inspección 25/09/2026', () => {
     // patrón es sistólico aislado, graduado por la sistólica.
     await medirHidratado(page, '139.5', '85');
     await expect(categoria(page)).toHaveText('HTA Sistólica Aislada (Grado 1)');
-    // 129/89,5 → 129/90: HTA diastólica aislada → grado 1.
+    // 129/89,5 → 129/90: HTA diastólica aislada → grado 1 (nombrada desde el 01/10, hallazgo 2562).
     await medirHidratado(page, '129', '89.5');
-    await expect(categoria(page)).toHaveText('HTA Grado 1');
+    await expect(categoria(page)).toHaveText('HTA Diastólica Aislada (Grado 1)');
     await expect(page.locator('[class*="resultadoRedondeo"]')).toContainText('diastólica 89,5 → 90');
     // 139,4 → 139: redondear no es subir siempre; sigue siendo normal-alta.
     await medirHidratado(page, '139.4', '85');
@@ -701,7 +739,9 @@ test.describe('Re-inspección 25/09/2026', () => {
   // 1721 (E) — texto blanco sobre el color de categoría. Se mide TODO el texto blanco (pastilla
   // de urgencia, nombre, descripción) en las OCHO categorías, en claro y en oscuro, sobre el
   // fondo real compuesto (la pastilla lleva un velo semitransparente encima de la cabecera).
-  test('REPARADO 1721 · la cabecera del resultado cumple AA (≥ 4,5:1) en las 8 categorías y en los dos temas', async ({ page }) => {
+  test('REPARADO 1721 · la cabecera del resultado cumple AA (≥ 4,5:1) en todas las categorías y en los dos temas', async ({ page }) => {
+    // Desde el 01/10/2026 (hallazgo 2562) no hay categoría «crisis»: son siete colores. La
+    // octava fila es un grado 3 aislado, para que sigan saliendo 8 × 2 = 16 pastillas abajo.
     const casos: Array<[string, string, string]> = [
       ['85', '55', 'Hipotensión'],
       ['115', '75', 'Tensión Óptima'],
@@ -710,7 +750,7 @@ test.describe('Re-inspección 25/09/2026', () => {
       ['150', '95', 'HTA Grado 1'],
       ['165', '102', 'HTA Grado 2'],
       ['175', '112', 'HTA Grado 3'],
-      ['185', '125', 'Crisis Hipertensiva'],
+      ['190', '85', 'HTA Sistólica Aislada (Grado 3)'],
     ];
     for (const tema of ['light', 'dark'] as const) {
       await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
@@ -794,10 +834,11 @@ test.describe('Re-inspección 25/09/2026', () => {
       hasTouch: PIXEL_7.hasTouch,
     });
 
-    test('Móvil · 185/125 muestra la cabecera de crisis y la página no desborda en horizontal', async ({ page }) => {
+    test('Móvil · 185/125 muestra la cabecera de grado 3 y la página no desborda en horizontal', async ({ page }) => {
       await medirHidratado(page, '185', '125');
-      await expect(categoria(page)).toHaveText('Crisis Hipertensiva');
-      await expect(urgencia(page)).toContainText('Emergencia');
+      // «HTA Grado 3» y «Muy urgente» desde el 01/10/2026 (hallazgos 2562 y 2564).
+      await expect(categoria(page)).toHaveText('HTA Grado 3');
+      await expect(urgencia(page)).toContainText('Muy urgente');
       await expect(categoria(page)).toBeInViewport();
       const desborde = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -854,12 +895,32 @@ test.describe('Re-inspección 25/09/2026', () => {
  *   del resultado queda a ≥ 161 px por debajo de la barra (apaisado 844×390: h2 en 238 px,
  *   barra hasta 77). Los dos tests de abajo lo fijan a 390 y a 800 px.
  *
- * HALLAZGOS DE ESTA TANDA — cinco, ABIERTOS (test.fail). Los dos primeros enfrentan la app con la
- * guía que cita; el fichero ya tiene tests que fijan el comportamiento ACTUAL de esas dos filas
- * (CASO 2c, CASO 4, «Límites altos», REPARADO 1717 y REGRESIÓN 294d). Si la reparación alinea la
- * clasificación con la ESH, hay que reescribirlos con su grado ESH; si en cambio decide conservar
- * las filas y declararlas criterio propio fuera de la ESH, son estos dos test.fail los que se
- * reescriben para vigilar esa declaración.
+ * HALLAZGOS DE ESTA TANDA — cinco (ids 2562-2566), REPARADOS el 01/10/2026. Lo que decidió la
+ * reparación:
+ *   2562 · la categoría es la de la tabla ESH 2023, sin añadidos: grado 3 ≥ 180 y/o ≥ 110, y las
+ *          dos aisladas (sistólica y diastólica) nombradas y graduadas por la cifra alta. La
+ *          «crisis hipertensiva» desaparece como categoría: el documento de posición de la ESC
+ *          Council on Hypertension (van den Born et al., Eur Heart J Cardiovasc Pharmacother
+ *          2019;5:37-46, publicado por la ESH) define la emergencia por el daño agudo de órgano,
+ *          no por la cifra, y da el término «hypertensive crisis» por obsoleto. Lo que la app
+ *          añade al grado 3 es la CONDUCTA, declarada aparte y con esa fuente.
+ *   2563 · la hipotensión (< 90/60, umbral habitual; NHS) sigue, declarada criterio propio fuera
+ *          de la tabla, pero solo dentro del tramo «óptima», que la ESH deja sin suelo. Se eligió
+ *          así y no sacarla del todo porque 85/55 rotulado «Tensión Óptima · Excelente» sería
+ *          tranquilizar a quien puede necesitar consultar; y no se dejó como estaba porque
+ *          rebautizaba lecturas que la guía citada clasifica (125/58 es «normal»).
+ *   2564 · una sola conducta para el grado 3, en el motor (CONDUCTA_GRADO_3), que pintan el
+ *          resultado, la FAQ visible y el FAQPage: con síntomas de alarma (los «emergency
+ *          symptoms» de van den Born 2019) 112; sin ellos, repetir en reposo y médico en el día.
+ *          El rótulo de urgencia pasa de «Emergencia» a «Muy urgente»: sin síntomas no lo es.
+ *   2565 · TAM normal «entre 70 y 100 mmHg» en los dos sitios. Se eligió 100 y no 105 porque es
+ *          lo que dice la propia tabla de la app (TAM normal 93–99, normal-alta desde 100); el
+ *          techo varía entre fuentes y la página lo dice.
+ *   2566 · una entrada rechazada pone el resultado a null: no queda tarjeta ni la región
+ *          role=status anuncia la lectura vieja.
+ * Tests anteriores reescritos por consagrar el criterio viejo (no borrados): CASO 2c, CASO 3,
+ * CASO 4, REGRESIÓN 294d, REGRESIÓN 295, la tabla ESH del 25/09, «Límites altos», REPARADO
+ * 1717, 1717b y 1721, y los dos de móvil. Cada uno dice qué fijaba y por qué cambió.
  */
 test.describe('Re-inspección 01/10/2026', () => {
   test('Normal · 124/83 con pulso 66 es «Tensión Normal», TAM 97 y presión de pulso 41', async ({ page }) => {
@@ -929,48 +990,87 @@ test.describe('Re-inspección 01/10/2026', () => {
     expect(await tituloTapado(page)).toBe(false);
   });
 
-  // ─── Hallazgos de esta tanda: ABIERTOS ──────────────────────────────────────────────────
+  // ─── Hallazgos de esta tanda: REPARADOS el 01/10/2026 ────────────────────────────────────
 
-  // ABIERTO, hallazgo: «Crisis Hipertensiva ≥ 180 y/o ≥ 120» no es una categoría de la ESH 2023
-  // y desplaza al grado 3 que esa guía da a toda sistólica ≥ 180 con diastólica < 120 (y deja
-  // inalcanzable «HTA Sistólica Aislada (Grado 3)», que el motor sabe rotular).
-  test.fail('ABIERTO · 185/100 y 190/85 son grado 3 en la ESH 2023 que la app cita, no «Crisis Hipertensiva»', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2562: «Crisis Hipertensiva ≥ 180 y/o ≥ 120» no es una
+  // categoría de la ESH 2023 y desplazaba al grado 3 que esa guía da a toda sistólica ≥ 180 con
+  // diastólica < 120 (y dejaba inalcanzable «HTA Sistólica Aislada (Grado 3)»).
+  test('REPARADO (01/10/2026) 2562 · 185/100 y 190/85 son grado 3 en la ESH 2023 que la app cita, no «Crisis Hipertensiva»', async ({ page }) => {
     // S 185 → grado 3 (≥ 180); D 100 → grado 2. Manda la más alta: HTA Grado 3.
     await medirHidratado(page, '185', '100');
     await expect(categoria(page)).toHaveText('HTA Grado 3');
     // S 190 con D 85 (< 90): HTA sistólica aislada, graduada por la sistólica → grado 3.
     await medirHidratado(page, '190', '85');
     await expect(categoria(page)).toHaveText('HTA Sistólica Aislada (Grado 3)');
+    // La fila ESH «HTA diastólica aislada» (< 140 y ≥ 90) se nombra: 135/105 → grado 2 por la D.
+    await medirHidratado(page, '135', '105');
+    await expect(categoria(page)).toHaveText('HTA Diastólica Aislada (Grado 2)');
+    await expect(urgencia(page)).toContainText('Urgente');
+
+    // La tabla rotulada «ESH 2023» solo tiene filas ESH, incluida la diastólica aislada; lo que
+    // la app añade va fuera, con su fuente.
+    await page.getByRole('button', { name: /tabla de clasificación/i }).click();
+    const filas = page.locator('table[aria-label*="Clasificación"] tbody tr');
+    await expect(filas).toHaveCount(8);
+    await expect(filas.filter({ hasText: /Crisis|Hipotensión/ })).toHaveCount(0);
+    await expect(filas.filter({ hasText: 'HTA Diastólica Aislada' })).toHaveCount(1);
+    const propios = page.locator('[class*="criteriosPropios"]').first();
+    await expect(propios).toContainText('Fuera de la tabla ESH');
+    await expect(propios).toContainText('van den Born');
   });
 
-  // ABIERTO, hallazgo: la fila «Hipotensión < 90/60» no está en la tabla ESH 2023 y, como la app
-  // la evalúa antes que «normal» y «óptima», rotula hipotensión lecturas que esa guía llama normales.
-  test.fail('ABIERTO · 125/58 es «Tensión Normal» en la tabla ESH 2023, no «Hipotensión»', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2563: la fila «Hipotensión < 90/60» no está en la tabla ESH
+  // 2023 y, como la app la evaluaba antes que «normal», rotulaba hipotensión lecturas que esa guía
+  // llama normales. Ahora es criterio propio declarado, y solo dentro del tramo «óptima».
+  test('REPARADO (01/10/2026) 2563 · 125/58 es «Tensión Normal» en la tabla ESH 2023, no «Hipotensión»', async ({ page }) => {
     // S 125 → normal (120–129); D 58 → óptima (< 80). Manda la más alta: normal.
     await medirHidratado(page, '125', '58');
     await expect(categoria(page)).toHaveText('Tensión Normal');
+
+    // Donde sigue saliendo (tramo «óptima» de la ESH), el resultado dice que es criterio propio.
+    await medirHidratado(page, '85', '55');
+    await expect(categoria(page)).toHaveText('Hipotensión');
+    await expect(page.locator('[class*="resultadoCriterio"]')).toContainText('fuera de la tabla ESH 2023');
+    await expect(page.locator('[class*="resultadoCriterio"]')).toContainText('NHS');
   });
 
-  // ABIERTO, hallazgo: ante una crisis el resultado manda «a urgencias inmediatamente o al 112»
-  // sin condición, mientras la FAQ visible dice que sin síntomas se repite tras 15-30 min de
-  // reposo y el FAQPage, que sin síntomas graves se contacta con el médico en el día.
-  // Comprobación neutra respecto a la reparación: basta con que las tres digan lo mismo.
-  test.fail('ABIERTO · la conducta ante una crisis es la misma en el resultado, la FAQ y el FAQPage', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2564: ante una lectura muy elevada el resultado mandaba «a
+  // urgencias inmediatamente o al 112» sin condición, la FAQ visible decía que sin síntomas se
+  // repite tras 15-30 min de reposo y el FAQPage, que sin síntomas se llama al médico en el día.
+  // Ahora las tres pintan CONDUCTA_GRADO_3 del motor (fuente: van den Born et al., 2019).
+  test('REPARADO (01/10/2026) 2564 · la conducta ante una lectura de grado 3 es la misma en el resultado, la FAQ y el FAQPage', async ({ page }) => {
     await medirHidratado(page, '185', '125');
-    await expect(categoria(page)).toHaveText('Crisis Hipertensiva');
+    await expect(categoria(page)).toHaveText('HTA Grado 3');
     const textoRecomendacion = (await recomendacion(page).textContent()) ?? '';
     const textoFaq = (await page.locator('[class*="faqItem"]', { hasText: '¿Cuándo debo ir a urgencias' }).textContent()) ?? '';
     const textoLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
-    const otrasDistinguenSinSintomas = /sin síntomas/i.test(textoFaq) || /sin síntomas/i.test(textoLd);
+    // La comprobación neutra del acta: si las otras separan por síntomas, el resultado también.
+    const otrasDistinguenSinSintomas = /sin síntomas|ninguno de esos síntomas/i.test(textoFaq + textoLd);
     expect(
       otrasDistinguenSinSintomas && !/síntomas/i.test(textoRecomendacion),
       'la FAQ y el FAQPage separan «con síntomas» de «sin síntomas»; la recomendación del resultado no',
     ).toBe(false);
+    // Y la fuerte: las dos ramas, literales, en los tres sitios.
+    for (const rama of [CONDUCTA_GRADO_3.conSintomas, CONDUCTA_GRADO_3.sinSintomas]) {
+      expect(textoRecomendacion, 'resultado').toContain(rama);
+      expect(textoFaq, 'FAQ visible').toContain(rama);
+      expect(textoLd, 'FAQPage').toContain(rama);
+    }
+    // Ninguna versión vieja sobrevive: ni el 112 incondicional ni la espera de 15-30 minutos.
+    expect(textoFaq + textoLd).not.toContain('15-30 minutos');
+    expect(textoRecomendacion).not.toContain('Acude a urgencias inmediatamente');
+    // El rótulo no llama «Emergencia» a lo que sin síntomas no lo es.
+    await expect(urgencia(page)).toContainText('Muy urgente');
+    // Y el aviso médico (no colapsable) dice lo mismo: 112 con síntomas, médico ese día sin ellos.
+    const aviso = page.locator('[class*="disclaimerCard"]').first();
+    await expect(aviso).toContainText('112');
+    await expect(aviso).toContainText('ese mismo día');
   });
 
-  // ABIERTO, hallazgo: el FAQPage (lo que leen buscadores e IAs) da la TAM normal entre 70 y
-  // 100 mmHg y la página, en su FAQ y en su sección «¿Qué es la TAM?», entre 70 y 105.
-  test.fail('ABIERTO · el rango normal de la TAM es el mismo en el FAQPage y en la página', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2565: el FAQPage (lo que leen buscadores e IAs) daba la TAM
+  // normal entre 70 y 100 mmHg y la página, en su FAQ y en su sección «¿Qué es la TAM?», entre
+  // 70 y 105. Ahora 70–100 en todos (coherente con la columna de TAM de la propia tabla).
+  test('REPARADO (01/10/2026) 2565 · el rango normal de la TAM es el mismo en el FAQPage y en la página', async ({ page }) => {
     const textoLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
     const textoFaq = (await page.locator('[class*="faqItem"]', { hasText: '¿Qué es la TAM' }).textContent()) ?? '';
     const enLd = textoLd.match(/TAM[^"]*?entre (\d+) y (\d+) mmHg/)?.slice(1);
@@ -979,18 +1079,26 @@ test.describe('Re-inspección 01/10/2026', () => {
     expect(enPagina, 'la FAQ visible da un rango normal de TAM').toBeTruthy();
     expect(enLd, 'el FAQPage da un rango normal de TAM').toBeTruthy();
     expect(enLd).toEqual(enPagina);
+    // También la sección «¿Qué es la Tensión Arterial Media (TAM)?», fuera de la FAQ.
+    expect(await page.content()).not.toContain('entre 70 y 105');
   });
 
-  // ABIERTO, hallazgo: una entrada rechazada deja en pantalla la clasificación de la lectura
-  // ANTERIOR. Con 190 tecleado en la sistólica y la diastólica mal escrita, debajo sigue
-  // «Tensión Normal · Bien. Continúa con hábitos saludables».
-  test.fail('ABIERTO · tras una entrada rechazada no queda a la vista la clasificación de la lectura anterior', async ({ page }) => {
+  // REPARADO (01/10/2026), hallazgo 2566: una entrada rechazada dejaba en pantalla la
+  // clasificación de la lectura ANTERIOR. Con 190 tecleado en la sistólica y la diastólica mal
+  // escrita, debajo seguía «Tensión Normal · Bien. Continúa con hábitos saludables».
+  test('REPARADO (01/10/2026) 2566 · tras una entrada rechazada no queda a la vista la clasificación de la lectura anterior', async ({ page }) => {
     await medirHidratado(page, '124', '83');
     await expect(categoria(page)).toHaveText('Tensión Normal');
     await medirHidratado(page, '190', '1200');
     await expect(page.locator('#error-dia')).toHaveText('Valor fuera de rango (30–200 mmHg)');
     // Lo rechazado no se clasifica, y lo que se ve debajo no puede ser la respuesta a otra lectura.
     await expect(categoria(page)).toHaveCount(0);
+    await expect(recomendacion(page)).toHaveCount(0);
+    // La región que anuncia el resultado queda vacía: el lector de pantalla oye solo el aviso.
+    await expect(page.locator('div[role="status"][aria-atomic="true"]')).toHaveText('');
+    // Y una lectura válida después vuelve a clasificarse.
+    await medirHidratado(page, '150', '95');
+    await expect(categoria(page)).toHaveText('HTA Grado 1');
   });
 
   test.describe('en móvil de 390 px (iPhone 13)', () => {
@@ -1077,7 +1185,8 @@ async function calcularConBotonAlPie(page: Page, sistolica: string, diastolica: 
   });
   const antes = await page.evaluate(() => window.scrollY);
   await page.getByRole('button', { name: 'Calcular', exact: true }).click();
-  await expect(categoria(page)).toHaveText('Crisis Hipertensiva');
+  // 185/125 es grado 3 de la ESH desde el 01/10/2026 (antes «Crisis Hipertensiva», hallazgo 2562).
+  await expect(categoria(page)).toHaveText('HTA Grado 3');
   await page.evaluate(
     () =>
       new Promise<void>((resolver) => {

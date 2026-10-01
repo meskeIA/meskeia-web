@@ -11,7 +11,6 @@
   --cl-hta1:         #C2410C;   /* Naranja — 5,18:1 */
   --cl-hta2:         #B91C1C;   /* Rojo — 6,47:1 */
   --cl-hta3:         #991B1B;   /* Rojo oscuro — 8,31:1 */
-  --cl-crisis:       #7F1D1D;   /* Granate — 10,02:1 */
 }
 
 /* ─── Contenedor ───────────────────────────────────────────────────────────── */
@@ -350,6 +349,27 @@
   line-height: 1.5;
 }
 
+/* La conducta del grado 3, partida por síntomas (hallazgo 2564). */
+.recomendacionLista {
+  margin: 0.4rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.recomendacionLista li + li {
+  margin-top: 0.35rem;
+}
+
+/* Lo que no es de la tabla ESH 2023, dicho con su fuente (hallazgos 2562-2563). */
+.resultadoCriterio {
+  margin: 0;
+  padding: 0.75rem 1.25rem;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border, #e5e5e5);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
 .resultadoRedondeo {
   margin: 0;
   padding: 0.75rem 1.25rem;
@@ -454,6 +474,39 @@
   padding: 0.5rem 1rem;
   margin: 0;
   border-top: 1px solid var(--border, #e5e5e5);
+}
+
+/* Criterios propios, fuera de la tabla ESH (hallazgos 2562-2563). */
+.criteriosPropios {
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid var(--border, #e5e5e5);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.criteriosPropiosTitulo {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.criteriosPropiosLista {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.criteriosPropiosLista li + li {
+  margin-top: 0.5rem;
+}
+
+[data-theme='dark'] .criteriosPropios,
+[data-theme='dark'] .resultadoCriterio {
+  border-top-color: #3a3a3a;
+}
+
+[data-theme='dark'] .resultadoCriterio {
+  background: var(--bg-card);
 }
 
 [data-theme='dark'] .tablaNotas {

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { CONDUCTA_GRADO_3, FUENTE_CONDUCTA_GRADO_3 } from './motor';
 
 export const metadata: Metadata = {
   title: 'Orientador Tensión Arterial - Clasifica tu Presión según la guía ESH 2023 | meskeIA',
@@ -40,13 +41,14 @@ export const jsonLd = generateWebAppSchema({
   url: "https://meskeia.com/orientador-tension-arterial/",
   category: 'UtilityApplication',
   features: [
-    'Clasificación de tensión arterial según guías ESH 2023 (hipotensión, óptima, normal, normal-alta, HTA grados 1-3, crisis)',
+    'Clasificación de tensión arterial según la tabla de la guía ESH 2023 (óptima, normal, normal-alta, HTA grados 1-3)',
+    'HTA sistólica aislada (≥ 140 / < 90 mmHg) y diastólica aislada (< 140 / ≥ 90 mmHg), graduadas como indica la ESH 2023',
     'Cálculo de TAM (Tensión Arterial Media) con fórmula diastólica + (sistólica − diastólica) / 3',
     'Cálculo e interpretación de la presión de pulso (normal 40-60 mmHg)',
     'Historial de mediciones con almacenamiento local (hasta 20 entradas)',
     'Tabla de referencia visual con rangos por categoría',
-    'Aviso inmediato de crisis hipertensiva (≥ 180/120 mmHg)',
-    'Detección de HTA sistólica aislada (≥ 140 / < 90 mmHg)',
+    'Ante una lectura de grado 3 (≥ 180 y/o ≥ 110 mmHg), conducta según síntomas: 112 con síntomas de alarma; sin ellos, repetir en reposo y contactar con el médico en el día (criterio de la ESC Council on Hypertension, fuera de la tabla ESH)',
+    'Aviso de tensión baja por debajo de 90/60 mmHg, criterio propio fuera de la tabla ESH',
   ],
 });
 
@@ -75,7 +77,7 @@ export const faqJsonLd = {
       name: '¿Qué es la TAM o presión arterial media?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La TAM (Tensión Arterial Media) representa la presión de perfusión promedio que llega a los órganos durante un ciclo cardíaco completo. Se calcula como diastólica + (sistólica − diastólica) / 3. Un valor normal está entre 70 y 100 mmHg; por debajo de 60 mmHg puede indicar riesgo de hipoperfusión orgánica.',
+        text: 'La TAM (Tensión Arterial Media) representa la presión de perfusión promedio que llega a los órganos durante un ciclo cardíaco completo. Se calcula como diastólica + (sistólica − diastólica) / 3. Un valor normal está entre 70 y 100 mmHg (orientativo: el techo varía entre fuentes); por debajo de 60 mmHg puede indicar riesgo de hipoperfusión orgánica.',
       },
     },
     {
@@ -91,7 +93,8 @@ export const faqJsonLd = {
       name: '¿A partir de qué cifra debo consultar al médico urgentemente?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una crisis hipertensiva se define por una tensión sistólica ≥180 mmHg o diastólica ≥120 mmHg. Si además aparecen síntomas como dolor de cabeza intenso, visión borrosa, dolor en el pecho o dificultad para respirar, es una emergencia hipertensiva que requiere atención médica inmediata. Sin síntomas graves, se habla de urgencia hipertensiva y se debe contactar con el médico en el mismo día.',
+        // El mismo texto que el resultado y la FAQ visible (hallazgo 2564, 01/10/2026).
+        text: `Con una lectura muy elevada (grado 3 de la guía ESH 2023: sistólica ≥ 180 y/o diastólica ≥ 110 mmHg), lo que decide es si hay síntomas. ${CONDUCTA_GRADO_3.conSintomas} ${CONDUCTA_GRADO_3.sinSintomas} Fuente: ${FUENTE_CONDUCTA_GRADO_3}.`,
       },
     },
   ],

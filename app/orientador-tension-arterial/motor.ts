@@ -20,6 +20,27 @@
  * antes del arreglo. La categoría se DERIVA de sistólica y diastólica, así que ya no se
  * guarda ni se lee: se recalcula al pintar. Una lectura guardada que no se puede leer
  * (valores ausentes, fuera de rango o sistólica ≤ diastólica) no recibe categoría.
+ *
+ * ── Lo que es de la ESH y lo que no (hallazgos 2562 y 2563, 01/10/2026) ────────────────
+ * La app rotula «ESH 2023», así que la categoría es la de la tabla ESH 2023 de PA en consulta
+ * (Mancia et al., J Hypertens 2023; reproducida en la sinopsis de la ERA, PMC11139525):
+ * óptima · normal · normal-alta · grados 1, 2 y 3 (≥ 180 y/o ≥ 110), con la HTA sistólica
+ * aislada (≥ 140 y < 90) y la diastólica aislada (< 140 y ≥ 90) graduadas 1-2-3 por el valor
+ * que está alto. Hasta esa fecha la app anteponía una «Crisis hipertensiva ≥ 180 y/o ≥ 120»
+ * que la tabla no tiene: toda sistólica ≥ 180 con diastólica < 120 salía «crisis» en vez de
+ * grado 3, y la HTA sistólica aislada de grado 3 era inalcanzable.
+ *
+ * Dos cosas que NO son de la tabla ESH siguen existiendo, declaradas aparte:
+ *   · La conducta ante una lectura de grado 3. Si es una emergencia no lo decide la cifra sino
+ *     el daño agudo de órgano (corazón, cerebro, riñón, retina, grandes arterias): sin él no hay
+ *     emergencia, y el término «crisis hipertensiva» se da por obsoleto (ESC Council on
+ *     Hypertension, van den Born et al., Eur Heart J Cardiovasc Pharmacother 2019;5:37-46,
+ *     publicado también por la ESH). De ahí que la conducta se parta por síntomas:
+ *     `CONDUCTA_GRADO_3` es el ÚNICO texto que usan el resultado, la FAQ visible y el FAQPage
+ *     (hallazgo 2564).
+ *   · La hipotensión (< 90/60, umbral habitual; p. ej. NHS). La ESH no fija un suelo para
+ *     «óptima», así que la app solo la señala DENTRO de ese tramo abierto: nunca rebautiza una
+ *     lectura que la ESH llama normal o superior (125/58 es «normal», no hipotensión).
  */
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
@@ -32,10 +53,17 @@ export type ClasificacionId =
   | 'hta-grado-1'
   | 'hta-grado-2'
   | 'hta-grado-3'
-  | 'crisis-hipertensiva'
-  | 'sistolica-aislada';
+  | 'sistolica-aislada'
+  | 'diastolica-aislada';
 
-export type Urgencia = 'normal' | 'atencion' | 'alerta' | 'urgente' | 'emergencia';
+/**
+ * El nivel más alto se llama «muy urgente» y no «emergencia» (hallazgo 2564): una lectura de
+ * grado 3 sin síntomas no es una emergencia según la fuente que la app cita para la conducta.
+ */
+export type Urgencia = 'normal' | 'atencion' | 'alerta' | 'urgente' | 'muy-urgente';
+
+/** De dónde sale una categoría: la tabla ESH 2023 o un criterio propio de la app. */
+export type OrigenCategoria = 'esh-2023' | 'propio';
 
 export interface Clasificacion {
   id: ClasificacionId;
@@ -44,7 +72,37 @@ export interface Clasificacion {
   recomendacion: string;
   color: string;
   urgencia: Urgencia;
+  origen: OrigenCategoria;
 }
+
+// ─── Conducta ante una lectura de grado 3 (hallazgo 2564) ────────────────────
+
+/**
+ * Síntomas de alarma: los «emergency symptoms» del documento de posición de la ESC Council on
+ * Hypertension (van den Born et al., 2019): cefalea, alteraciones visuales, dolor torácico,
+ * disnea y síntomas neurológicos focales o generales.
+ */
+export const SINTOMAS_ALARMA =
+  'dolor en el pecho, dificultad para respirar, dolor de cabeza intenso, visión borrosa o ' +
+  'alterada, confusión, o debilidad, hormigueo o dificultad para hablar';
+
+/**
+ * La conducta ante una lectura de grado 3 (≥ 180 y/o ≥ 110). Es el ÚNICO texto que dicen el
+ * resultado, la FAQ visible y el FAQPage de metadata.ts: hasta el 01/10/2026 eran tres
+ * instrucciones distintas para la misma lectura.
+ */
+export const CONDUCTA_GRADO_3 = {
+  conSintomas: `Si tienes ${SINTOMAS_ALARMA}, llama al 112 o acude a urgencias ahora.`,
+  sinSintomas:
+    'Si no tienes ninguno de esos síntomas, siéntate, descansa 5 minutos y vuelve a medirte, ' +
+    'y contacta hoy mismo con tu médico o tu centro de salud. Si mientras tanto aparece ' +
+    'alguno de esos síntomas, llama al 112.',
+} as const;
+
+/** Fuente de la conducta, para citarla allí donde se dé. */
+export const FUENTE_CONDUCTA_GRADO_3 =
+  'ESC Council on Hypertension, documento de posición sobre emergencias hipertensivas ' +
+  '(van den Born et al., Eur Heart J Cardiovasc Pharmacother 2019)';
 
 // ─── Clasificaciones ESH 2023 ────────────────────────────────────────────────
 
@@ -52,10 +110,13 @@ export const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
   hipotension: {
     id: 'hipotension',
     nombre: 'Hipotensión',
-    descripcion: 'Tensión arterial por debajo de los valores normales (< 90/60 mmHg)',
+    descripcion:
+      'Por debajo de 90/60 mmHg. No es una categoría de la tabla ESH 2023, que no fija un ' +
+      'límite inferior: es el umbral habitual de tensión baja, criterio propio de esta herramienta.',
     recomendacion: 'Consulta con tu médico si presentas síntomas como mareos, cansancio o desmayos.',
     color: 'var(--cl-hipotension)',
     urgencia: 'atencion',
+    origen: 'propio',
   },
   optima: {
     id: 'optima',
@@ -64,6 +125,7 @@ export const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
     recomendacion: 'Excelente. Mantén tus hábitos de vida saludable.',
     color: 'var(--cl-optima)',
     urgencia: 'normal',
+    origen: 'esh-2023',
   },
   normal: {
     id: 'normal',
@@ -72,6 +134,7 @@ export const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
     recomendacion: 'Bien. Continúa con hábitos saludables y revisiones periódicas.',
     color: 'var(--cl-normal)',
     urgencia: 'normal',
+    origen: 'esh-2023',
   },
   'normal-alta': {
     id: 'normal-alta',
@@ -80,6 +143,7 @@ export const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
     recomendacion: 'Presta atención a tu dieta, reduce el sodio y haz ejercicio regular. Consulta a tu médico.',
     color: 'var(--cl-normal-alta)',
     urgencia: 'atencion',
+    origen: 'esh-2023',
   },
   'hta-grado-1': {
     id: 'hta-grado-1',
@@ -88,6 +152,7 @@ export const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
     recomendacion: 'Consulta a tu médico. Pueden recomendarse cambios en el estilo de vida o tratamiento.',
     color: 'var(--cl-hta1)',
     urgencia: 'alerta',
+    origen: 'esh-2023',
   },
   'hta-grado-2': {
     id: 'hta-grado-2',
@@ -96,25 +161,21 @@ export const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
     recomendacion: 'Consulta a tu médico con prontitud. Suele requerir tratamiento farmacológico.',
     color: 'var(--cl-hta2)',
     urgencia: 'urgente',
+    origen: 'esh-2023',
   },
   'hta-grado-3': {
     id: 'hta-grado-3',
     nombre: 'HTA Grado 3',
-    descripcion: 'Hipertensión severa (≥ 180 / ≥ 110 mmHg)',
-    recomendacion: 'Busca atención médica urgente. No esperes para consultar.',
-    color: 'var(--cl-hta3)',
-    urgencia: 'emergencia',
-  },
-  'crisis-hipertensiva': {
-    id: 'crisis-hipertensiva',
-    nombre: 'Crisis Hipertensiva',
-    descripcion: 'Tensión sistólica ≥ 180 mmHg y/o diastólica ≥ 120 mmHg',
+    descripcion: 'Hipertensión severa (≥ 180 y/o ≥ 110 mmHg)',
     // Sin emoji: la cadena se lee en voz alta y un lector de pantalla antepondría
     // «señal de advertencia» a la única instrucción urgente de la app (hallazgo 297).
-    recomendacion: 'Acude a urgencias inmediatamente o llama al 112.',
-    color: 'var(--cl-crisis)',
-    urgencia: 'emergencia',
+    recomendacion: `${CONDUCTA_GRADO_3.conSintomas} ${CONDUCTA_GRADO_3.sinSintomas}`,
+    color: 'var(--cl-hta3)',
+    urgencia: 'muy-urgente',
+    origen: 'esh-2023',
   },
+  // Las dos aisladas son filas de la tabla ESH, pero `clasificarTension` nunca las devuelve:
+  // son un matiz sobre el grado (ver `nombreClasificacion`). Están aquí por la tabla de la vista.
   'sistolica-aislada': {
     id: 'sistolica-aislada',
     nombre: 'HTA Sistólica Aislada',
@@ -122,6 +183,16 @@ export const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
     recomendacion: 'Consulta a tu médico. Es frecuente en personas mayores y requiere seguimiento.',
     color: 'var(--cl-hta1)',
     urgencia: 'alerta',
+    origen: 'esh-2023',
+  },
+  'diastolica-aislada': {
+    id: 'diastolica-aislada',
+    nombre: 'HTA Diastólica Aislada',
+    descripcion: 'Diastólica elevada con sistólica por debajo de 140 (< 140 / ≥ 90 mmHg)',
+    recomendacion: 'Consulta a tu médico. Requiere seguimiento.',
+    color: 'var(--cl-hta1)',
+    urgencia: 'alerta',
+    origen: 'esh-2023',
   },
 };
 
@@ -137,21 +208,24 @@ export const CLASIFICACIONES: Record<ClasificacionId, Clasificacion> = {
  * diastólica < 60 se resolvía como «Hipotensión» sin llegar a mirar la sistólica —
  * 175/55 salía rotulada como tensión baja (hallazgo 294 del Inspector).
  *
- * La HTA sistólica aislada NO es una rama de esta función: la guía la gradúa por el valor
- * de la sistólica, así que es un matiz sobre el grado (ver `esSistolicaAislada`), no una
- * categoría que lo sustituya.
+ * Las HTA sistólica y diastólica aisladas NO son ramas de esta función: la guía las gradúa
+ * por el valor de la que está alta, así que son un matiz sobre el grado (ver
+ * `esSistolicaAislada` y `esDiastolicaAislada`), no categorías que lo sustituyan.
+ *
+ * Sin «crisis hipertensiva» desde el 01/10/2026 (hallazgo 2562): la tabla ESH termina en el
+ * grado 3. Lo que la app añade para ese grado es la conducta (`CONDUCTA_GRADO_3`), no otra
+ * categoría.
  */
 export function clasificarTension(sis: number, dia: number): ClasificacionId {
-  // Crisis hipertensiva (prioridad máxima) — PAS ≥ 180 y/o PAD ≥ 120
-  if (sis >= 180 || dia >= 120) return 'crisis-hipertensiva';
   if (sis >= 180 || dia >= 110) return 'hta-grado-3';
   if (sis >= 160 || dia >= 100) return 'hta-grado-2';
   if (sis >= 140 || dia >= 90) return 'hta-grado-1';
   if (sis >= 130 || dia >= 85) return 'normal-alta';
-  // Hipotensión — solo cuando NADA está elevado, para que nunca eclipse a una HTA. Va aquí
-  // y no al final para no perder los casos de diastólica baja con sistólica de 120-129.
-  if (sis < 90 || dia < 60) return 'hipotension';
   if (sis >= 120 || dia >= 80) return 'normal';
+  // Tramo «óptima» de la ESH (< 120 y < 80), que no tiene suelo. Solo aquí la app señala la
+  // hipotensión, criterio propio (hallazgo 2563): nunca eclipsa una HTA (crítico 294) ni
+  // rebautiza una lectura que la ESH llama normal, como 125/58.
+  if (sis < 90 || dia < 60) return 'hipotension';
   return 'optima';
 }
 
@@ -163,13 +237,27 @@ export function esSistolicaAislada(sis: number, dia: number): boolean {
   return sis >= 140 && dia < 90;
 }
 
+/**
+ * Patrón de HTA diastólica aislada (fila de la tabla ESH 2023, hallazgo 2562): diastólica
+ * alta con sistólica < 140. El grado lo fija la diastólica.
+ */
+export function esDiastolicaAislada(sis: number, dia: number): boolean {
+  return sis < 140 && dia >= 90;
+}
+
+const GRADO: Partial<Record<ClasificacionId, number>> = {
+  'hta-grado-1': 1,
+  'hta-grado-2': 2,
+  'hta-grado-3': 3,
+};
+
 /** Nombre que se muestra: el del grado, con el matiz del patrón cuando lo hay. */
 export function nombreClasificacion(clId: ClasificacionId, sis: number, dia: number): string {
   const base = CLASIFICACIONES[clId].nombre;
-  if (!esSistolicaAislada(sis, dia)) return base;
-  if (clId === 'hta-grado-1') return 'HTA Sistólica Aislada (Grado 1)';
-  if (clId === 'hta-grado-2') return 'HTA Sistólica Aislada (Grado 2)';
-  if (clId === 'hta-grado-3') return 'HTA Sistólica Aislada (Grado 3)';
+  const grado = GRADO[clId];
+  if (grado === undefined) return base;
+  if (esSistolicaAislada(sis, dia)) return `HTA Sistólica Aislada (Grado ${grado})`;
+  if (esDiastolicaAislada(sis, dia)) return `HTA Diastólica Aislada (Grado ${grado})`;
   return base;
 }
 

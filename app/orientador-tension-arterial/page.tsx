@@ -9,12 +9,15 @@ import { getRelatedApps } from '@/data/app-relations';
 import { formatDate, formatNumber } from '@/lib';
 import {
   CLASIFICACIONES,
+  CONDUCTA_GRADO_3,
+  FUENTE_CONDUCTA_GRADO_3,
   MAX_HISTORIAL,
   agregarAlHistorial,
   calcularPresionPulso,
   calcularTAM,
   clasificarGuardada,
   clasificarTension,
+  esDiastolicaAislada,
   esSistolicaAislada,
   leerLectura,
   nombreClasificacion,
@@ -34,8 +37,14 @@ const URGENCIA_ETIQUETAS: Record<Urgencia, { emoji: string; texto: string }> = {
   atencion:   { emoji: '👀', texto: 'Atención' },
   alerta:     { emoji: '⚠️', texto: 'Alerta' },
   urgente:    { emoji: '🔶', texto: 'Urgente' },
-  emergencia: { emoji: '🚨', texto: 'Emergencia' },
+  // «Muy urgente» y no «Emergencia»: sin síntomas, una lectura de grado 3 no es una emergencia
+  // (hallazgo 2564; fuente en CONDUCTA_GRADO_3 del motor).
+  'muy-urgente': { emoji: '🚨', texto: 'Muy urgente' },
 };
+
+/** Fuente del umbral de hipotensión, criterio propio fuera de la tabla ESH (hallazgo 2563). */
+const FUENTE_HIPOTENSION =
+  'umbral habitual de tensión baja, por ejemplo el del NHS británico («Low blood pressure (hypotension)»: «a reading of less than 90/60 mmHg»)';
 
 // ─── Historial (localStorage) ─────────────────────────────────────────────────
 
@@ -83,13 +92,17 @@ function Resultado({ lectura, recomendacionRef }: ResultadoProps) {
   const { sis: sistolica, dia: diastolica, pulso, redondeos } = lectura;
   const clId = clasificarTension(sistolica, diastolica);
   const cl = CLASIFICACIONES[clId];
-  const aislada = esSistolicaAislada(sistolica, diastolica);
   const nombre = nombreClasificacion(clId, sistolica, diastolica);
-  // Con el patrón aislado la descripción del grado no encaja: sus rangos de diastólica
-  // presuponen que también está elevada, y aquí precisamente no lo está.
-  const descripcion = aislada && nombre !== cl.nombre
-    ? `Sistólica elevada (${sistolica} mmHg) con diastólica normal (< 90 mmHg). El grado lo fija la sistólica.`
-    : cl.descripcion;
+  const conPatron = nombre !== cl.nombre;
+  // Con un patrón aislado la descripción del grado no encaja: sus rangos presuponen que las
+  // dos cifras están elevadas, y aquí precisamente una no lo está.
+  let descripcion = cl.descripcion;
+  if (conPatron && esSistolicaAislada(sistolica, diastolica)) {
+    descripcion = `Sistólica elevada (${sistolica} mmHg) con diastólica por debajo de 90 mmHg. El grado lo fija la sistólica.`;
+  } else if (conPatron && esDiastolicaAislada(sistolica, diastolica)) {
+    descripcion = `Diastólica elevada (${diastolica} mmHg) con sistólica por debajo de 140 mmHg. El grado lo fija la diastólica.`;
+  }
+  const esGrado3 = clId === 'hta-grado-3';
   const tam = calcularTAM(sistolica, diastolica);
   const pp = calcularPresionPulso(sistolica, diastolica);
   const ppLabel = valorarPresionPulso(pp);
@@ -111,8 +124,33 @@ function Resultado({ lectura, recomendacionRef }: ResultadoProps) {
           aria-live="polite", y anidar aquí un role="alert" (que implica assertive) hacía que
           la recomendación se anunciase dos veces (hallazgo 297). */}
       <div className={styles.resultadoRecomendacion} ref={recomendacionRef}>
-        <strong>Recomendación:</strong> {cl.recomendacion}
+        <strong>Recomendación:</strong>{' '}
+        {esGrado3 ? (
+          // Partida por síntomas, con el MISMO texto que la FAQ y el FAQPage (hallazgo 2564).
+          <ul className={styles.recomendacionLista}>
+            <li>{CONDUCTA_GRADO_3.conSintomas}</li>
+            <li>{CONDUCTA_GRADO_3.sinSintomas}</li>
+          </ul>
+        ) : (
+          cl.recomendacion
+        )}
       </div>
+
+      {/* Lo que no es de la tabla ESH 2023 se dice aquí, con su fuente (hallazgos 2562-2563). */}
+      {esGrado3 && (
+        <p className={styles.resultadoCriterio}>
+          La categoría es la de la tabla ESH 2023. La conducta no sale de esa tabla: la cifra fija
+          el grado, pero lo que hace de una lectura de grado 3 una emergencia es el daño agudo en
+          órganos (corazón, cerebro, riñón, retina o grandes arterias), que se manifiesta con esos
+          síntomas. Fuente: {FUENTE_CONDUCTA_GRADO_3}.
+        </p>
+      )}
+      {cl.origen === 'propio' && (
+        <p className={styles.resultadoCriterio}>
+          Criterio propio de esta herramienta, fuera de la tabla ESH 2023 (que en este tramo diría
+          «óptima»): {FUENTE_HIPOTENSION}.
+        </p>
+      )}
 
       {redondeos.length > 0 && (
         <p className={styles.resultadoRedondeo}>
@@ -176,16 +214,17 @@ function Resultado({ lectura, recomendacionRef }: ResultadoProps) {
 // ─── Tabla de clasificaciones ─────────────────────────────────────────────────
 
 function TablaClasificaciones() {
+  // SOLO las filas de la tabla ESH 2023 (PMC11139525). La hipotensión y la conducta ante el
+  // grado 3 son de la app y van aparte, con su fuente (hallazgos 2562 y 2563, 01/10/2026).
   const filas: Array<{ rango: string; sis: string; dia: string; id: ClasificacionId }> = [
-    { rango: 'Hipotensión',          sis: '< 90',      dia: '< 60',      id: 'hipotension'        },
-    { rango: 'Tensión Óptima',       sis: '< 120',     dia: '< 80',      id: 'optima'             },
-    { rango: 'Normal',               sis: '120–129',   dia: '80–84',     id: 'normal'             },
-    { rango: 'Normal-Alta',          sis: '130–139',   dia: '85–89',     id: 'normal-alta'        },
-    { rango: 'HTA Grado 1',          sis: '140–159',   dia: '90–99',     id: 'hta-grado-1'        },
-    { rango: 'HTA Grado 2',          sis: '160–179',   dia: '100–109',   id: 'hta-grado-2'        },
-    { rango: 'HTA Grado 3',          sis: '≥ 180',     dia: '≥ 110',     id: 'hta-grado-3'        },
-    { rango: 'Crisis Hipertensiva',  sis: '≥ 180',     dia: '≥ 120',     id: 'crisis-hipertensiva' },
-    { rango: 'HTA Sistólica Aislada',sis: '≥ 140',     dia: '< 90',      id: 'sistolica-aislada'  },
+    { rango: 'Tensión Óptima',          sis: '< 120',     dia: 'y < 80',      id: 'optima'             },
+    { rango: 'Normal',                  sis: '120–129',   dia: 'y 80–84',     id: 'normal'             },
+    { rango: 'Normal-Alta',             sis: '130–139',   dia: 'y/o 85–89',   id: 'normal-alta'        },
+    { rango: 'HTA Grado 1',             sis: '140–159',   dia: 'y/o 90–99',   id: 'hta-grado-1'        },
+    { rango: 'HTA Grado 2',             sis: '160–179',   dia: 'y/o 100–109', id: 'hta-grado-2'        },
+    { rango: 'HTA Grado 3',             sis: '≥ 180',     dia: 'y/o ≥ 110',   id: 'hta-grado-3'        },
+    { rango: 'HTA Sistólica Aislada',   sis: '≥ 140',     dia: 'y < 90',      id: 'sistolica-aislada'  },
+    { rango: 'HTA Diastólica Aislada',  sis: '< 140',     dia: 'y ≥ 90',      id: 'diastolica-aislada' },
   ];
 
   return (
@@ -220,13 +259,30 @@ function TablaClasificaciones() {
           de las dos</strong>: 175/55 es hipertensión de grado 2, no tensión baja.
         </li>
         <li>
-          Las dos últimas filas se <strong>superponen</strong> a los grados en lugar de sustituirlos.
-          La <em>HTA sistólica aislada</em> se gradúa por la sistólica (140–159 → grado 1, 160–179 →
-          grado 2). Una lectura de ≥ 180 y/o ≥ 120 se rotula <em>crisis hipertensiva</em>, que es la
-          categoría que esta herramienta muestra por delante de grado 3.
+          Las dos últimas filas se <strong>superponen</strong> a los grados en lugar de sustituirlos:
+          la <em>HTA sistólica aislada</em> se gradúa 1, 2 o 3 por la sistólica y la <em>diastólica
+          aislada</em>, por la diastólica. 190/85 es HTA sistólica aislada de grado 3; 135/105, HTA
+          diastólica aislada de grado 2.
         </li>
       </ul>
       <p className={styles.tablaFuente}>Fuente: Guías ESH 2023 para el manejo de la hipertensión arterial</p>
+      <div className={styles.criteriosPropios}>
+        <h3 className={styles.criteriosPropiosTitulo}>Fuera de la tabla ESH: lo que añade esta herramienta</h3>
+        <ul className={styles.criteriosPropiosLista}>
+          <li>
+            <strong>Hipotensión (&lt; 90/60 mmHg).</strong> La ESH no fija un límite inferior para
+            «óptima»; dentro de ese tramo, la herramienta rotula hipotensión la lectura con sistólica
+            &lt; 90 o diastólica &lt; 60. Nunca sustituye a una categoría más alta: 125/58 es
+            «normal». Fuente: {FUENTE_HIPOTENSION}.
+          </li>
+          <li>
+            <strong>Qué hacer con una lectura de grado 3.</strong> {CONDUCTA_GRADO_3.conSintomas}{' '}
+            {CONDUCTA_GRADO_3.sinSintomas} Lo que hace de una lectura muy elevada una emergencia
+            no es la cifra sino el daño agudo en órganos, que da esos síntomas; por eso esta
+            herramienta no usa la etiqueta «crisis hipertensiva». Fuente: {FUENTE_CONDUCTA_GRADO_3}.
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }
@@ -262,7 +318,12 @@ export default function CalculadoraTensionArterial() {
   const calcular = useCallback(() => {
     const { lectura, errores: nuevosErrores } = leerLectura(sistolica, diastolica, pulso);
     setErrores(nuevosErrores);
-    if (!lectura) return;
+    // Una entrada rechazada retira el resultado anterior: dejarlo debajo del aviso respondía a
+    // OTRA lectura, y podía tranquilizar justo en el caso contrario (hallazgo 2566).
+    if (!lectura) {
+      setResultado(null);
+      return;
+    }
 
     setResultado(lectura);
 
@@ -337,8 +398,10 @@ export default function CalculadoraTensionArterial() {
             sobre tu salud cardiovascular, <strong>consulta siempre a tu médico o especialista</strong>.
           </p>
           <p>
-            En caso de síntomas graves (dolor en el pecho, dificultad para respirar, visión borrosa,
-            cefalea intensa) o lecturas muy elevadas, <strong>acude a urgencias o llama al 112</strong>.
+            Ante síntomas graves (dolor en el pecho, dificultad para respirar, visión borrosa,
+            dolor de cabeza intenso, confusión, debilidad o dificultad para hablar),{' '}
+            <strong>acude a urgencias o llama al 112</strong>. Una lectura muy elevada (grado 3) sin
+            esos síntomas se repite en reposo y se consulta con tu médico <strong>ese mismo día</strong>.
           </p>
         </DisclaimerCard>
       </div>
@@ -601,7 +664,7 @@ export default function CalculadoraTensionArterial() {
                 <td>≥ 180</td>
                 <td>≥ 110</td>
                 <td>≥ 133 mmHg</td>
-                <td>Tratamiento urgente; riesgo muy alto</td>
+                <td>Con síntomas de alarma, 112; sin ellos, repetir en reposo y médico en el día</td>
               </tr>
               <tr>
                 <td><strong>HTA sistólica aislada</strong></td>
@@ -611,21 +674,24 @@ export default function CalculadoraTensionArterial() {
                 <td>Frecuente en mayores; consultar médico</td>
               </tr>
               <tr>
-                <td><strong>Crisis hipertensiva</strong></td>
-                <td>≥ 180</td>
-                <td>≥ 120</td>
-                <td>≥ 140 mmHg</td>
-                <td><span aria-hidden="true">🚨</span> Urgencias / llamar al 112</td>
+                <td><strong>HTA diastólica aislada</strong></td>
+                <td>&lt; 140</td>
+                <td>≥ 90</td>
+                <td>Variable</td>
+                <td>Consultar médico</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p>
-          <strong>Cómo se lee esta tabla:</strong> cuando la sistólica y la diastólica caen en
-          categorías distintas, manda la más alta de las dos. Las dos últimas filas se superponen
-          a los grados en vez de sustituirlos: la HTA sistólica aislada se gradúa por la sistólica
-          (140–159 → grado 1; 160–179 → grado 2), y una lectura de ≥ 180 y/o ≥ 120 se rotula como
-          crisis hipertensiva.
+          <strong>Cómo se lee esta tabla:</strong> es la clasificación de la guía ESH 2023 (la columna
+          de TAM y la acción recomendada son orientaciones de esta herramienta). Cuando la sistólica
+          y la diastólica caen en categorías distintas, manda la más alta de las dos. Las dos últimas
+          filas se superponen a los grados en vez de sustituirlos: la HTA sistólica aislada se gradúa
+          1, 2 o 3 por la sistólica y la diastólica aislada, por la diastólica. La tabla ESH termina
+          en el grado 3 y no tiene una fila de «crisis hipertensiva»: que una lectura muy elevada
+          sea una emergencia lo decide el daño agudo en órganos, no la cifra. Tampoco
+          tiene una fila de tensión baja: la de esta herramienta (&lt; 90/60) es un criterio propio.
         </p>
 
         {/* Escenarios de uso */}
@@ -684,11 +750,12 @@ export default function CalculadoraTensionArterial() {
           </li>
           <li className={styles.faqItem}>
             <h3>¿Cuándo debo ir a urgencias por la tensión arterial?</h3>
-            <p>Ante una crisis hipertensiva (sistólica ≥180 mmHg O diastólica ≥120 mmHg), especialmente si va acompañada de síntomas: dolor de cabeza intenso, visión borrosa o doble, dolor en el pecho, dificultad para respirar, confusión, debilidad unilateral. Llama al 112. Sin síntomas, una lectura elevada aislada puede repetirse tras descansar 15-30 minutos antes de actuar.</p>
+            {/* El mismo texto que el resultado y el FAQPage: sale de CONDUCTA_GRADO_3 (hallazgo 2564). */}
+            <p>Con una lectura muy elevada (grado 3 de la ESH: sistólica ≥ 180 y/o diastólica ≥ 110 mmHg), lo que decide es si hay síntomas. {CONDUCTA_GRADO_3.conSintomas} {CONDUCTA_GRADO_3.sinSintomas} Fuente: {FUENTE_CONDUCTA_GRADO_3}.</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿Qué es la TAM (Tensión Arterial Media) y por qué importa?</h3>
-            <p>La TAM estima la presión de perfusión promedio de los órganos durante un ciclo cardíaco completo. Se calcula como: TAM = Diastólica + (Sistólica − Diastólica) / 3. Una TAM normal está entre 70 y 105 mmHg. En medicina intensiva, mantener una TAM superior a 65 mmHg es el objetivo mínimo de perfusión en pacientes críticos.</p>
+            <p>La TAM estima la presión de perfusión promedio de los órganos durante un ciclo cardíaco completo. Se calcula como: TAM = Diastólica + (Sistólica − Diastólica) / 3. Una TAM normal está entre 70 y 100 mmHg (orientativo: el techo varía entre fuentes). En medicina intensiva, mantener una TAM superior a 65 mmHg es el objetivo mínimo de perfusión en pacientes críticos.</p>
           </li>
         </ul>
 
@@ -779,7 +846,7 @@ export default function CalculadoraTensionArterial() {
           <ul className={styles.warningList}>
             <li>Los resultados son orientativos basados en guías ESH 2023. No constituyen diagnóstico ni prescripción médica.</li>
             <li>Ante lecturas repetidamente elevadas (HTA Grado 1 o superior), consulta a tu médico. No modifiques ni suspendas medicación antihipertensiva por tu cuenta.</li>
-            <li>En crisis hipertensiva (sistólica ≥180 o diastólica ≥120), especialmente con síntomas (dolor de cabeza intenso, visión borrosa, dolor en el pecho), llama al 112 o acude a urgencias inmediatamente.</li>
+            <li>Con una lectura de grado 3 (sistólica ≥ 180 y/o diastólica ≥ 110): {CONDUCTA_GRADO_3.conSintomas} {CONDUCTA_GRADO_3.sinSintomas}</li>
             <li>Una sola medición elevada no es diagnóstico de hipertensión. Se requieren mediciones repetidas en condiciones correctas a lo largo de varios días.</li>
           </ul>
         </div>
@@ -803,7 +870,7 @@ export default function CalculadoraTensionArterial() {
         <p>
           La TAM estima la presión promedio en las arterias durante un ciclo cardíaco completo.
           Se calcula como: <strong>TAM = Diastólica + (Sistólica − Diastólica) / 3</strong>.
-          Un valor normal está entre 70 y 105 mmHg.
+          Un valor normal está entre 70 y 100 mmHg (orientativo: el techo varía entre fuentes).
         </p>
 
         <h3>¿Qué es la presión de pulso?</h3>
@@ -827,7 +894,8 @@ export default function CalculadoraTensionArterial() {
           Ante cualquier lectura en rango HTA Grado 1 o superior de forma repetida,
           o si presentas síntomas como dolor de cabeza intenso, visión borrosa, mareos,
           dolor en el pecho o dificultad para respirar.
-          En caso de crisis hipertensiva (≥ 180 y/o ≥ 120), acude a urgencias o llama al 112.
+          Con una lectura de grado 3 (≥ 180 y/o ≥ 110): {CONDUCTA_GRADO_3.conSintomas}{' '}
+          {CONDUCTA_GRADO_3.sinSintomas}
         </p>
       </EducationalSection>
 
