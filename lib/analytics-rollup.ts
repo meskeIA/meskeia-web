@@ -149,13 +149,21 @@ export function esAgenteIALectura(navegador: string | null): boolean {
  * irreversible, y con una lista blanca en escritura el primer uso de un cliente MCP
  * nuevo quedaría sellado como bot para siempre: justo la adopción que se quiere medir.
  *
- * ⚠️ Esta lista está REPLICADA a mano en tres sitios más (no hay forma limpia de
+ * ⚠️ Esta lista está REPLICADA a mano en cuatro sitios más (no hay forma limpia de
  * compartirla entre .ts y los .mjs de análisis). Al añadir un cliente, actualizar:
  *   · scripts/rollup-verify.mjs   (si no, el verificador reporta descuadre falso)
  *   · scripts/analizar-ia-paginas.mjs
  *   · scripts/digest-diario.mjs   (const MCP_CLIENTES_IA — fuera del repo, gitignored)
+ *   · scripts/cruce-seo.mjs       (const UA_IA_OK — gitignored)
+ * Lo vigila `npm run check:clasificador-ia`, que rompe el build si divergen.
+ *
+ * Se busca el token DENTRO del UA, no como prefijo (01/10/2026): el de los GPT es
+ * `Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; ChatGPT-User/1.0; …`,
+ * con el nombre del producto en medio. Con `^` no casaba nunca, y era el único cliente
+ * real de `modo='chatgpt'` (4 llamadas del 14/09 al 30/09; las otras 47 eran pruebas
+ * propias lanzadas en local). Las copias deben comparar IGUAL, no solo listar lo mismo.
  */
-const MCP_CLIENTES_IA = /^(Claude-User|openai-mcp|MistralAI-MCPClient)/i;
+const MCP_CLIENTES_IA = /(Claude-User|openai-mcp|MistralAI-MCPClient|ChatGPT-User)/i;
 
 /**
  * true si una fila con modo='mcp' viene de un cliente IA identificado.

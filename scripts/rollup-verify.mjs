@@ -62,12 +62,18 @@ const noPropio = () => `(es_propio IS NULL OR es_propio=0) AND (ip_address IS NU
 // propósito, para no destruir el dato—, así que hay que replicar aquí la lista blanca o
 // la referencia cuenta filas que el rollup ya no cuenta. Sin esto salían 20 descuadres
 // falsos, todos de esta única causa.
-const MCP_ANON =
-  `(modo='mcp' AND NOT (` +
-  ['Claude-User', 'openai-mcp', 'MistralAI-MCPClient']
-    .map(c => `COALESCE(json_extract(datos_adicionales,'$.uaCliente'),'') LIKE '${c}%'`)
-    .join(' OR ') +
-  `))`;
+//
+// Réplica EXACTA de la lista blanca de lib/analytics-rollup.ts. Una sola declaración: la
+// condición SQL se deriva del regex para que el fichero no pueda divergir consigo mismo.
+// Token CONTENIDO, no prefijo (01/10/2026): el UA de los GPT lleva `ChatGPT-User` en medio.
+const MCP_CLIENTES_IA = /(Claude-User|openai-mcp|MistralAI-MCPClient|ChatGPT-User)/i;
+const UA_IDENTIFICADO = '(' + MCP_CLIENTES_IA.source.slice(1, -1).split('|')
+  .map(c => `COALESCE(json_extract(datos_adicionales,'$.uaCliente'),'') LIKE '%${c}%'`)
+  .join(' OR ') + ')';
+// `modo='chatgpt'` sin cliente identificado es bot desde el 14/09/2026, como en el rollup.
+// Este verificador siguió contándolo como canal IA hasta el 01/10/2026: era la quinta copia
+// de la lista y el candado check:clasificador-ia no la conocía.
+const MCP_ANON = `(modo IN ('mcp','chatgpt') AND NOT ${UA_IDENTIFICADO})`;
 
 // IA · lectura y crawlers: mismo caso que el MCP anónimo. La reclasificación vive en la
 // capa derivada y la columna `modo` CRUDA sigue diciendo 'web' en los registros
@@ -111,7 +117,7 @@ const num = async (sql) => Number((await client.execute(sql)).rows[0].n);
 
 // Réplica EXACTA de lib/analytics-rollup.ts::clasificarOrigenReal. Si divergen, este
 // verificador reporta descuadres que no existen. Al tocar una, tocar la otra.
-const MCP_CLIENTES_IA = /^(Claude-User|openai-mcp|MistralAI-MCPClient)/i;
+// (MCP_CLIENTES_IA está declarada arriba, junto a MCP_ANON, que se deriva de ella.)
 const AGENTES_IA_LECTURA = /NotebookLM/i;
 const CRAWLERS_UA =
   /bingbot|Googlebot|Google-InspectionTool|AdsBot-Google|Slurp|DuckDuckBot|Baiduspider|YandexBot|Bytespider|PetalBot|AhrefsBot|SemrushBot|MJ12bot|DotBot|facebookexternalhit|meta-externalagent|Applebot|Amazonbot|GPTBot|OAI-SearchBot|ClaudeBot|anthropic-ai|PerplexityBot|Diffbot|Screaming Frog/i;
@@ -124,7 +130,10 @@ function clasificarOrigenReal(modo, datosAd, navegador = null) {
     const ua = typeof datosAd?.uaCliente === 'string' ? datosAd.uaCliente : '';
     return MCP_CLIENTES_IA.test(ua) ? 'mcp' : 'bot';
   }
-  if (modo === 'chatgpt') return 'chatgpt';
+  if (modo === 'chatgpt') {
+    const ua = typeof datosAd?.uaCliente === 'string' ? datosAd.uaCliente : '';
+    return MCP_CLIENTES_IA.test(ua) ? 'chatgpt' : 'bot';
+  }
   const ref = datosAd?.referrer_ia ?? null;
   if (modo === 'referral-ia') return ref === 'chatgpt.com' ? 'chatgpt' : ref === 'copilot.microsoft.com' ? 'copilot' : 'otras-ia';
   if (modo === 'pwa') return 'pwa';

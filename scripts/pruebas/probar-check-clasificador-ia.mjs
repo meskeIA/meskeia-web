@@ -21,6 +21,13 @@
  *   7. Sin `cruce-seo.mjs` (que es gitignored: así se ve el árbol en Vercel y en un clon nuevo)
  *      PASA con aviso. Si este caso fallara, el candado rompería todos los despliegues.
  *   8. El referrer `'chatgpt.com'` NO dispara la regla 2: es una visita con clic, no el modo.
+ *   9. Una copia que sigue comparando por PREFIJO (`/^(…)/`) falla aunque liste lo mismo
+ *      (regla 3, 01/10/2026: con `^` el UA de los GPT, `…; compatible; ChatGPT-User/1.0`, no
+ *      casa nunca).
+ *  10. Lo mismo en el digest, donde la comparación no está en la lista sino en el SQL que la
+ *      recorre (`LIKE '${c.ua}%'`).
+ *  11. CASO DE ORIGEN del 01/10/2026: `rollup-verify.mjs` tal como estaba en git esa mañana
+ *      —quinta copia que el candado no conocía— falla.
  */
 
 import fs from 'node:fs';
@@ -37,7 +44,12 @@ const FICHEROS = [
   'scripts/digest-diario.mjs',
   'scripts/analizar-ia-paginas.mjs',
   'scripts/cruce-seo.mjs',
+  'scripts/rollup-verify.mjs',
 ];
+
+// La lista tal como está hoy en las copias de tipo regex. Si cambia, cambiarla aquí: los
+// casos que la usan de ancla lo avisan como «no se pudo montar», no aprueban en falso.
+const REGEX_HOY = '/(Claude-User|openai-mcp|MistralAI-MCPClient|ChatGPT-User)/i';
 
 const casos = [];
 const anotar = (nombre, ok, detalle = '') => casos.push({ nombre, ok, detalle });
@@ -117,8 +129,8 @@ if (hayCruce) {
   const raiz = montar();
   const ok = sustituir(
     raiz, 'scripts/analizar-ia-paginas.mjs',
-    '/^(Claude-User|openai-mcp|MistralAI-MCPClient)/i',
-    '/^(Claude-User|openai-mcp|MistralAI-MCPClient|perplexity-mcp)/i'
+    REGEX_HOY,
+    REGEX_HOY.replace(')/i', '|perplexity-mcp)/i')
   );
   const { codigo, salida } = candado(raiz);
   anotar('un UA añadido en UNA sola copia → falla', ok && codigo === 1 && /SOBRAN/.test(salida),
@@ -144,8 +156,8 @@ if (hayCruce) {
   const raiz = montar();
   const ok = sustituir(
     raiz, 'scripts/analizar-ia-paginas.mjs',
-    'const MCP_CLIENTES_IA = /^(Claude-User|openai-mcp|MistralAI-MCPClient)/i;',
-    'const CLIENTES = new Map([["Claude-User", 1], ["openai-mcp", 1], ["MistralAI-MCPClient", 1]]);'
+    `const MCP_CLIENTES_IA = ${REGEX_HOY};`,
+    'const CLIENTES = new Map([["Claude-User", 1], ["openai-mcp", 1], ["MistralAI-MCPClient", 1], ["ChatGPT-User", 1]]);'
   );
   const { codigo, salida } = candado(raiz);
   anotar(
@@ -160,7 +172,7 @@ if (hayCruce) {
 if (hayCruce) {
   const raiz = montar();
   const t = leer(raiz, 'scripts/cruce-seo.mjs')
-    .replace(/const UA_IA_OK = `[\s\S]*?`;/, "const UA_IA_OK = `LIKE 'Claude-User%' OR LIKE 'openai-mcp%' OR LIKE 'MistralAI-MCPClient%'`;")
+    .replace(/const UA_IA_OK = `[\s\S]*?`;/, "const UA_IA_OK = `LIKE '%Claude-User%' OR LIKE '%openai-mcp%' OR LIKE '%MistralAI-MCPClient%' OR LIKE '%ChatGPT-User%'`;")
     .replace(
       /if \(modo === 'referral-ia'\) a\.ia30 \+= n;/,
       "// clasificador-ia-ok: caso de prueba del probador\n      if (modo === 'referral-ia' || modo === 'chatgpt') a.ia30 += n;"
@@ -209,6 +221,46 @@ if (hayCruce) {
   escribir(raiz, 'lib/analytics-rollup.ts', t);
   const { codigo } = candado(raiz);
   anotar("el referrer 'chatgpt.com' NO dispara la regla 2", codigo === 0, `código ${codigo}`);
+  fs.rmSync(raiz, { recursive: true, force: true });
+}
+
+// ── 9. Una copia que sigue comparando por prefijo ─────────────────────────────
+{
+  const raiz = montar();
+  const ok = sustituir(raiz, 'scripts/analizar-ia-paginas.mjs', REGEX_HOY, REGEX_HOY.replace('/(', '/^('));
+  const { codigo, salida } = candado(raiz);
+  anotar('una copia que compara por PREFIJO (misma lista) → falla',
+    ok && codigo === 1 && /COMPARA distinto/.test(salida) && !/SOBRAN|FALTAN/.test(salida),
+    ok ? `código ${codigo}` : 'no se pudo montar');
+  fs.rmSync(raiz, { recursive: true, force: true });
+}
+
+// ── 10. El digest con el SQL por prefijo ──────────────────────────────────────
+if (fs.existsSync(path.join(RAIZ, 'scripts/digest-diario.mjs'))) {
+  const raiz = montar();
+  const t = leer(raiz, 'scripts/digest-diario.mjs');
+  const ok = t.includes("LIKE '%${c.ua}%'");
+  escribir(raiz, 'scripts/digest-diario.mjs', t.replace("LIKE '%${c.ua}%'", "LIKE '${c.ua}%'"));
+  const { codigo, salida } = candado(raiz);
+  anotar('el digest con UN `LIKE` por prefijo en el SQL que recorre la lista → falla',
+    ok && codigo === 1 && /digest-diario[\s\S]*COMPARA distinto/.test(salida),
+    ok ? `código ${codigo}` : 'no se pudo montar');
+  fs.rmSync(raiz, { recursive: true, force: true });
+} else {
+  anotar('digest por prefijo: digest-diario.mjs no está en este árbol', true, 'omitido (gitignored)');
+}
+
+// ── 11. CASO DE ORIGEN del 01/10/2026: rollup-verify.mjs como estaba esa mañana ─
+{
+  const raiz = montar();
+  // El fichero real de antes de la reparación, sacado de git: no una imitación escrita a mano.
+  const r = spawnSync('git', ['show', '30cd3e24:scripts/rollup-verify.mjs'], { cwd: RAIZ, encoding: 'utf8' });
+  const ok = r.status === 0 && /if \(modo === 'chatgpt'\) return 'chatgpt';/.test(r.stdout);
+  if (ok) escribir(raiz, 'scripts/rollup-verify.mjs', r.stdout);
+  const { codigo, salida } = candado(raiz);
+  anotar('CASO DE ORIGEN (01/10/2026): rollup-verify.mjs de esa mañana → falla',
+    ok && codigo === 1 && /rollup-verify/.test(salida),
+    ok ? `código ${codigo}` : '⚠️ no se pudo recuperar de git el estado de esa mañana');
   fs.rmSync(raiz, { recursive: true, force: true });
 }
 

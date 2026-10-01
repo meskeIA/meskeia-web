@@ -25,7 +25,8 @@ const client = createClient({
 
 // Clasificador IA idéntico a lib/analytics-rollup.ts::clasificarOrigenReal
 // (lista blanca de clientes MCP incluida: al tocar una, tocar la otra)
-const MCP_CLIENTES_IA = /^(Claude-User|openai-mcp|MistralAI-MCPClient)/i;
+// Token CONTENIDO, no prefijo: el UA de los GPT lleva `ChatGPT-User` en medio (01/10/2026).
+const MCP_CLIENTES_IA = /(Claude-User|openai-mcp|MistralAI-MCPClient|ChatGPT-User)/i;
 function clasificarIA(modo, datosAd) {
   if (modo === 'mcp') {
     // MCP anónimo (sondeadores/escáneres) no es una IA leyendo páginas: fuera del análisis.

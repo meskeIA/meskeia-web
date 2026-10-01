@@ -36,7 +36,13 @@
  *      `if (modo === 'referral-ia' || modo === 'chatgpt') a.ia30 += n;` no tenía ninguna marca
  *      de lista blanca a la vista.
  *
- * Y una tercera condición, que es la que impide que este candado se vuelva un adorno: si no
+ *   3. Todos COMPARAN igual que la fuente: por prefijo (`/^(…)/`, `LIKE 'X%'`) o por token
+ *      contenido (`/(…)/`, `LIKE '%X%'`). Nace el 01/10/2026, al entrar `ChatGPT-User`: su UA
+ *      lleva el token EN MEDIO (`Mozilla/5.0 …; compatible; ChatGPT-User/1.0; …`) y las copias
+ *      pasaron de prefijo a contenido. Una copia que se quedara con `^` listaría lo MISMO que
+ *      la fuente y aun así contaría 0 GPT: la regla 1 la daría por buena.
+ *
+ * Y una cuarta condición, que es la que impide que este candado se vuelva un adorno: si no
  * consigue LEER el conjunto de un fichero declarado, **falla**. Un validador que devuelve
  * «0 errores» tiene que poder distinguir entre «está bien» y «no he mirado» — la lección del
  * `tsc` ciego del 14/08/2026 (§TypeScript del CLAUDE.md). Si mañana alguien escribe la lista
@@ -95,6 +101,9 @@ const CONSUMIDORES = [
   { ruta: 'scripts/digest-diario.mjs', soloLocal: true },
   { ruta: 'scripts/analizar-ia-paginas.mjs', soloLocal: false },
   { ruta: 'scripts/cruce-seo.mjs', soloLocal: true },
+  // Quinta copia, descubierta el 01/10/2026: llevaba desde el 14/09 contando `modo='chatgpt'`
+  // sin lista blanca, porque este candado no la tenía en su lista.
+  { ruta: 'scripts/rollup-verify.mjs', soloLocal: false },
 ];
 
 /**
@@ -143,36 +152,57 @@ function valorDesde(texto, i) {
 function extraerUA(texto) {
   const ua = new Set();
   const patrones = [];
+  /** Cómo compara cada declaración leída: 'prefijo' · 'contiene' · 'desconocida' (regla 3). */
+  const comparacion = new Set();
+  const segun = (pct) => (pct ? 'contiene' : 'prefijo');
   NOMBRE_LISTA.lastIndex = 0;
 
   for (const m of texto.matchAll(NOMBRE_LISTA)) {
     const valor = valorDesde(texto, m.index + m[0].length);
 
-    // A) Alternancia dentro de un regex:  /^(Claude-User|openai-mcp|MistralAI-MCPClient)/i
-    for (const r of valor.matchAll(/\/\^\(([A-Za-z0-9|_.\-]+)\)\//g)) {
-      const partes = r[1].split('|').map((s) => s.trim()).filter(Boolean);
-      if (partes.length) { partes.forEach((p) => ua.add(p)); patrones.push('regex ^(A|B|C)'); }
+    // A) Alternancia dentro de un regex:  /(Claude-User|openai-mcp)/i  o, por prefijo, /^(…)/i
+    for (const r of valor.matchAll(/\/(\^?)\(([A-Za-z0-9|_.\-]+)\)\//g)) {
+      const partes = r[2].split('|').map((s) => s.trim()).filter(Boolean);
+      if (partes.length) {
+        partes.forEach((p) => ua.add(p));
+        patrones.push('regex (A|B|C)');
+        comparacion.add(r[1] ? 'prefijo' : 'contiene');
+      }
     }
 
     // B) Array de objetos:  [{ ua: 'Claude-User', nombre: 'Claude' }, …]
     //    Solo el campo `ua`; el `nombre` es la etiqueta para pantalla, no el user-agent.
     const porCampo = [...valor.matchAll(/\bua\s*:\s*['"`]([^'"`]+)['"`]/g)];
-    if (porCampo.length) { porCampo.forEach((r) => ua.add(r[1])); patrones.push('campo ua:'); }
+    if (porCampo.length) {
+      porCampo.forEach((r) => ua.add(r[1]));
+      patrones.push('campo ua:');
+      // El array no dice cómo se compara: lo dice el SQL que lo recorre, `LIKE '%${c.ua}%'`.
+      const usos = [...texto.matchAll(/LIKE\s*'(%?)\$\{\s*\w+\.ua\s*\}%'/g)];
+      if (usos.length) usos.forEach((u) => comparacion.add(segun(u[1])));
+      else comparacion.add('desconocida');
+    }
 
-    // C) SQL:  … LIKE 'Claude-User%' OR … LIKE 'openai-mcp%'
-    const porLike = [...valor.matchAll(/LIKE\s*'([^%']+)%'/g)];
-    if (porLike.length) { porLike.forEach((r) => ua.add(r[1])); patrones.push("SQL LIKE 'A%'"); }
+    // C) SQL:  … LIKE '%Claude-User%' OR … LIKE '%openai-mcp%'  (o 'X%', por prefijo)
+    const porLike = [...valor.matchAll(/LIKE\s*'(%?)([^%']+)%'/g)];
+    if (porLike.length) {
+      porLike.forEach((r) => { ua.add(r[2]); comparacion.add(segun(r[1])); });
+      patrones.push("SQL LIKE '%A%'");
+    }
 
     // D) Array de cadenas sueltas:  ['Claude-User', 'openai-mcp']
     //    Solo si ninguna de las formas anteriores ha leído nada de este valor: si las hay,
     //    las cadenas restantes son etiquetas o trozos de SQL, no user-agents.
     if (!porCampo.length && !porLike.length && /^\s*\[/.test(valor)) {
       const sueltas = [...valor.matchAll(/['"`]([^'"`]+)['"`]/g)];
-      if (sueltas.length) { sueltas.forEach((r) => ua.add(r[1])); patrones.push('array de cadenas'); }
+      if (sueltas.length) {
+        sueltas.forEach((r) => ua.add(r[1]));
+        patrones.push('array de cadenas');
+        comparacion.add('desconocida'); // una lista suelta no dice cómo se usa
+      }
     }
   }
 
-  return { ua, patrones: [...new Set(patrones)] };
+  return { ua, patrones: [...new Set(patrones)], comparacion };
 }
 
 /** Líneas que tratan `chatgpt` como MODO (no el referrer 'chatgpt.com', que es otra cosa). */
@@ -202,7 +232,7 @@ if (!existsSync(absFuente)) {
   process.exit(1);
 }
 const textoFuente = readFileSync(absFuente, 'utf8');
-const { ua: uaFuente, patrones: patFuente } = extraerUA(textoFuente);
+const { ua: uaFuente, patrones: patFuente, comparacion: compFuente } = extraerUA(textoFuente);
 
 if (uaFuente.size === 0) {
   console.error(`❌ Clasificador IA: no sé leer la lista blanca de la FUENTE (${FUENTE}).`);
@@ -211,7 +241,14 @@ if (uaFuente.size === 0) {
   process.exit(1);
 }
 
-// ── Regla 1 y 2 sobre cada consumidor ─────────────────────────────────────────
+if (compFuente.size !== 1 || compFuente.has('desconocida')) {
+  console.error(`❌ Clasificador IA: no sé decir cómo compara la FUENTE (${FUENTE}): ${[...compFuente].join(', ') || 'nada'}.`);
+  console.error('   Tiene que ser UNA forma, prefijo o token contenido (regla 3 de la cabecera).');
+  process.exit(1);
+}
+const comparaFuente = [...compFuente][0];
+
+// ── Reglas 1, 2 y 3 sobre cada consumidor ─────────────────────────────────────
 
 const listaFuente = [...uaFuente].sort();
 
@@ -233,7 +270,7 @@ for (const { ruta, soloLocal } of CONSUMIDORES) {
   const escapado = (n) => ESCAPE.test(lineas[n - 1] || '') || ESCAPE.test(lineas[n - 2] || '');
 
   // REGLA 1 — el conjunto tiene que ser el mismo
-  const { ua, patrones } = extraerUA(texto);
+  const { ua, patrones, comparacion } = extraerUA(texto);
   if (ua.size === 0) {
     fallos.push({
       ruta,
@@ -254,6 +291,17 @@ for (const { ruta, soloLocal } of CONSUMIDORES) {
      Al tocar una copia hay que tocar las ${CONSUMIDORES.length + 1} a la vez, o divergen.`,
       });
     }
+  }
+
+  // REGLA 3 — y tiene que COMPARAR igual: la misma lista por prefijo y por token contenido
+  // no casa con los mismos UA (`ChatGPT-User` va en medio del suyo)
+  if (ua.size > 0 && (comparacion.size !== 1 || !comparacion.has(comparaFuente))) {
+    fallos.push({
+      ruta,
+      que: 'su lista blanca COMPARA distinto que la fuente',
+      detalle: `fuente: ${comparaFuente} · aquí: ${[...comparacion].join(' + ') || 'no lo sé leer'}
+     Por prefijo (^ o LIKE 'X%') el UA de los GPT no casa nunca: lleva el token en medio.`,
+    });
   }
 
   // REGLA 2 — `modo='chatgpt'` tiene que pasar por la lista blanca
