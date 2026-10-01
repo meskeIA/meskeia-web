@@ -116,7 +116,7 @@ export interface ResultadoIRPF {
   tipoEfectivo: number;
 }
 
-/** Cotización del trabajador de 2025: contingencias comunes + desempleo + FP + MEI = 6,47 %. */
+/** Cotización del trabajador de 2025: contingencias comunes + desempleo + FP + MEI = 6,48 %. */
 export function cotizacionTrabajadorAnual(brutoAnual: number): number {
   if (!(brutoAnual > 0)) return 0;
   // Sin suelo en la base MÍNIMA: esa base es la de jornada completa, y coincide con el SMI, así

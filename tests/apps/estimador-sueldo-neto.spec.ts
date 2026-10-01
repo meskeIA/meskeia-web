@@ -660,7 +660,7 @@ test.describe('Hallazgos 1651-1660 (reparados) — re-inspección del 25/09/2026
   /**
    * MEDIO · Ejercicio declarado frente a ejercicio calculado. Hero, <title>, description, og y
    * jsonLd dicen «2025», pero el cálculo usa COTIZACIONES_SS_2026 (MEI 0,15 %; en
-   * COTIZACIONES_SS_2025 era 0,12 %), BASES_SS_2026 y la DA 61.ª de 2026
+   * COTIZACIONES_SS_2025 es 0,13 %; ponía 0,12 % hasta el 01/10/2026), BASES_SS_2026 y la DA 61.ª de 2026
    * (calcularDeduccionRentasBajas(…, 2026)): 19.000 € deducen 209,69 € (CASO 0), cuando con la
    * de 2025 serían 0 € (≥ 18.276 €). El propio aviso de la página dice «Vigencia: 2026».
    */
@@ -1103,7 +1103,7 @@ test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del a
   /**
    * NORMAL · 30.000 € brutos, soltero/a sin hijos, 14 pagas.
    *   SS: base 30.000 / 12 = 2.500 €/mes (< 5.101,20) → CC 1.410,00 · desempleo 465,00 ·
-   *     FP 30,00 · MEI 45,00 (2.500 × 0,15 % × 12; con el 0,12 % de 2025 serían 36,00) = 1.950,00 €
+   *     FP 30,00 · MEI 45,00 (2.500 × 0,15 % × 12; con el 0,13 % de 2025 serían 39,00) = 1.950,00 €
    *   Entrada del art. 20 = 30.000 − 1.950 = 28.050 € ≥ 19.747,5 → reducción 0 €
    *   Rendimiento neto = 28.050 − 2.000 = 26.050 € = base liquidable (sin reducción del art. 84.2)
    *   cuota = escala(26.050) [2.365,50 + 1.860,00 + 5.850 × 30 % = 5.980,50] − escala(5.550) 1.054,50
@@ -1266,7 +1266,7 @@ test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del a
    * no colapsable) y los dos DataReference con su META: FISCAL_IRPF_META (escala, mínimos, arts.
    * 19-20 y DA 61.ª) y FISCAL_SS_CUENTA_AJENA_META (Orden PJC/297/2026). Las fechas, en
    * DD/MM/AAAA. El hero anuncia FISCAL_IRPF_META.vigencia (2026) y el cálculo es de 2026: el MEI
-   * de 30.000 € sale con el 0,15 % de COTIZACIONES_SS_2026 (45,00 €; con el 0,12 % de 2025, 36,00 €).
+   * de 30.000 € sale con el 0,15 % de COTIZACIONES_SS_2026 (45,00 €; con el 0,13 % de 2025, 39,00 €).
    */
   test('AVISOS · DisclaimerCard crítico, DataReference con el META de IRPF y de SS, y ejercicio 2026', async ({ page }) => {
     const critico = page.locator('[class*="severity-critical"]');

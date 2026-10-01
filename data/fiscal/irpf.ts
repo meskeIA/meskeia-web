@@ -228,8 +228,28 @@ export const COTIZACIONES_SS_2025 = {
   contingenciasComunes:    4.70,
   desempleo:               1.55,
   formacionProfesional:    0.10,
-  mef:                     0.12, // Mecanismo Equidad Intergeneracional
+  // Mecanismo de Equidad Intergeneracional: 0,80 % en 2025, 0,13 % a cargo del trabajador y
+  // 0,67 % de la empresa (DT 43.ª LGSS, en la redacción del RDL 2/2023; cotejado en el BOE el
+  // 01/10/2026). Hasta ese día valía 0,12, que es el tipo del trabajador de 2024.
+  mef:                     0.13,
 };
+
+/**
+ * Calendario del Mecanismo de Equidad Intergeneracional, en % de la base de contingencias
+ * comunes: DT 43.ª LGSS (redacción del RDL 2/2023, BOE-A-2023-6967), cotejada en el BOE el
+ * 01/10/2026. Desde 2030 hasta 2050 se mantiene el 1,20 % con el reparto de 2029.
+ * Los tipos de cada año en curso siguen viviendo en COTIZACIONES_SS_AAAA.mef (trabajador) y
+ * COTIZACION_EMPRESA_AAAA.mei (empresa); esto es la escala entera, para quien la explique.
+ */
+export const CALENDARIO_MEI = {
+  2023: { trabajador: 0.10, empresa: 0.50 },
+  2024: { trabajador: 0.12, empresa: 0.58 },
+  2025: { trabajador: 0.13, empresa: 0.67 },
+  2026: { trabajador: 0.15, empresa: 0.75 },
+  2027: { trabajador: 0.17, empresa: 0.83 },
+  2028: { trabajador: 0.18, empresa: 0.92 },
+  2029: { trabajador: 0.20, empresa: 1.00 },
+} as const;
 
 // Tipos de cotización 2026 (porción trabajador) — DT 38ª LGSS / Orden PJC/297/2026
 export const COTIZACIONES_SS_2026 = {

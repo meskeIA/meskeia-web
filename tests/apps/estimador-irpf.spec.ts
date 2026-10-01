@@ -7,8 +7,15 @@ import { esperarHidratacion, esperarValorEnReact, esperarPaginaAsentada } from '
  * Los CASOS 1 a 3 se escribieron el 12/09/2026 (mínimo restado de la base, reducción por
  * tributación conjunta tratada como mínimo). El Inspector añadió el 24/09/2026 los CASOS 4 a
  * 8 y los hallazgos 1310-1318; reparados ese mismo día, sus casos quedan como regresión
- * (CASOS 9 a 18). Los CASOS 1 a 3 se RECALCULARON a mano con la cotización de 2025 (6,47 %),
+ * (CASOS 9 a 18). Los CASOS 1 a 3 se RECALCULARON a mano con la cotización de 2025 (6,48 %),
  * que es la del ejercicio que la app declara estimar (hallazgo 1312).
+ *
+ * El 01/10/2026 TODAS las cifras con cotización se recalcularon de 6,47 % a 6,48 %: el MEI del
+ * trabajador de 2025 es 0,13 % (DT 43.ª LGSS, cotejada en el BOE), y data/fiscal guardaba el
+ * 0,12 % de 2024 (visto en visualizador-anatomia-nomina, hallazgo 2524). Recalculadas con una
+ * calculadora aparte escrita con las reglas de esta cabecera, que antes reproducía al céntimo
+ * todos los goldens del 6,47 %. Lo que se cuenta como historia («hasta el …, la app daba …»)
+ * conserva la cifra de entonces.
  *
  * DE DÓNDE SALE CADA CIFRA — de data/fiscal, NO de lo que devuelve la app
  * ─────────────────────────────────────────────────────────────────────────
@@ -29,7 +36,7 @@ import { esperarHidratacion, esperarValorEnReact, esperarPaginaAsentada } from '
  *     2025): sobre los rendimientos ÍNTEGROS, 340 € hasta 16.576 € y 340 − 0,2 × (íntegros −
  *     16.576) hasta 18.276 €; tope en la cuota íntegra GENERAL, donde tributa el trabajo
  *     (`DEDUCCION_RENDIMIENTOS_TRABAJO_2025`); solo con nómina (prestación efectiva de servicios).
- *   · cotización del trabajador de 2025: 4,70 + 1,55 + 0,10 + 0,12 = 6,47 %, base máxima
+ *   · cotización del trabajador de 2025: 4,70 + 1,55 + 0,10 + 0,13 = 6,48 %, base máxima
  *     4.909,50 €/mes, mínima 1.381,20 €/mes (`COTIZACIONES_SS_2025`, `BASES_SS_2025`)
  *   · base del ahorro (dividendos e intereses, arts. 46 y 66): 6.000 @19 % · 50.000 @21 % …
  *     (`TRAMOS_GANANCIAS_PATRIMONIALES_2025` de `data/fiscal/inmuebles.ts`); el remanente
@@ -59,7 +66,7 @@ const euros = (s: string): number => Number(s.replace(/[^\d,-]/g, '').replace(/,
 
 /**
  * Valor de una tarjeta `ResultCard`. Desde el 27/09/2026 (hallazgo 2322) la unidad llega con
- * espacio duro delante («4928,70 €»); `limpiar` lo deja en espacio normal. Hasta entonces estas
+ * espacio duro delante («4927,80 €»); `limpiar` lo deja en espacio normal. Hasta entonces estas
  * aserciones esperaban la cifra pegada al € («4928,70€»), que era justo el defecto.
  */
 async function tarjeta(page: Page, titulo: string): Promise<string> {
@@ -106,41 +113,41 @@ test.beforeEach(async ({ page }) => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 test('CASO 1 · 45.000 € brutos, soltero/a, 2 hijos — el mínimo familiar a tipo cero', async ({ page }) => {
-  // SS 2025: base 3.750 €/mes × 6,47 % × 12 = 2.911,50 €
-  // RNT = 45.000 − 2.911,50 − 2.000 = 40.088,50 € → reducción art. 20 = 0 € (supera 19.747,5 €)
+  // SS 2025: base 3.750 €/mes × 6,48 % × 12 = 2.916,00 €
+  // RNT = 45.000 − 2.916,00 − 2.000 = 40.084,00 € → reducción art. 20 = 0 € (supera 19.747,5 €)
   // Mínimo = 5.550 + 2.400 + 2.700 = 10.650,00 € (soltero/a: sin prorrateo)
-  //   escala(40.088,50) = 8.725,50 + 4.888,50 × 37 % = 8.725,50 + 1.808,745 = 10.534,245 €
+  //   escala(40.084,00) = 8.725,50 + 4.884,00 × 37 % = 8.725,50 + 1.807,08 = 10.532,58 €
   //   escala(10.650)    = 10.650 × 19 %                                     =  2.023,50 €
-  //   cuota íntegra     = 8.510,745 €
-  // El método defectuoso daba escala(40.088,50 − 10.650) = 7.003,245 €: 1.507,50 € menos.
+  //   cuota íntegra     = 8.509,08 €
+  // El método defectuoso daba escala(40.084,00 − 10.650) = escala(29.434,00) = 6.995,70 €: 1.513,38 € menos.
   await estimar(page, { bruto: '45000', situacion: 'soltero', hijos: '2' });
 
-  expect(await tarjeta(page, 'Base imponible general')).toBe('40.088,50 €');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('40.084,00 €');
   expect(await tarjeta(page, 'Mínimos personales')).toBe('10.650,00 €');
-  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(8510.745, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(8509.08, 1);
 
   const nota = notaGeneral(page);
-  await expect(nota).toContainText(/10\.534,2[45]/);  // los tramos sobre la base entera
+  await expect(nota).toContainText('10.532,58');  // los tramos sobre la base entera
   await expect(nota).toContainText('2023,50');        // la escala sobre el mínimo
-  await expect(nota).toContainText(/8510,7[45]/);     // la cuota íntegra
+  await expect(nota).toContainText('8509,08');     // la cuota íntegra
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 test('CASO 2 · 45.000 € brutos, casado/a con un ingreso — la reducción del art. 84.2 sí baja la base', async ({ page }) => {
-  // Base imponible general = 40.088,50 € (CASO 1)
-  // Base liquidable general = 40.088,50 − 3.400 = 36.688,50 €   ← la reducción sí resta aquí
+  // Base imponible general = 40.084,00 € (CASO 1)
+  // Base liquidable general = 40.084,00 − 3.400 = 36.684,00 €   ← la reducción sí resta aquí
   // Mínimo = 5.550,00 € (personal, sin hijos)                   ← el mínimo NO resta aquí
-  //   escala(36.688,50) = 8.725,50 + 1.488,50 × 37 % = 8.725,50 + 550,745 = 9.276,245 €
+  //   escala(36.684,00) = 8.725,50 + 1.484,00 × 37 % = 8.725,50 + 549,08 = 9.274,58 €
   //   escala(5.550)     = 1.054,50 €
-  //   cuota íntegra     = 8.221,745 €
+  //   cuota íntegra     = 8.220,08 €
   await estimar(page, { bruto: '45000', situacion: 'casado_un_ingreso' });
 
-  expect(await tarjeta(page, 'Base imponible general')).toBe('40.088,50 €');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('40.084,00 €');
   expect(await tarjeta(page, 'Mínimos personales')).toBe('5550,00 €');
-  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(8221.745, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(8220.08, 1);
 
   const nota = notaGeneral(page);
-  await expect(nota).toContainText(/9276,2[45]/);
+  await expect(nota).toContainText('9274,58');
   await expect(nota).toContainText('1054,50');
   await expect(nota).toContainText('tributación conjunta');
   await expect(nota).toContainText('3400,00');
@@ -149,16 +156,16 @@ test('CASO 2 · 45.000 € brutos, casado/a con un ingreso — la reducción del
 // ─────────────────────────────────────────────────────────────────────────────
 test('CASO 3 · familia monoparental: 2.150 € de reducción de BASE, no de mínimo', async ({ page }) => {
   // Mínimo = 5.550 + 2.400 = 7.950,00 € — SIN los 2.150 € del art. 84.2 regla 4.ª.
-  // SS 2025: 2.500 €/mes × 6,47 % × 12 = 1.941,00 € · RNT = 30.000 − 1.941 − 2.000 = 26.059,00 €
-  // Base liquidable = 26.059 − 2.150 = 23.909,00 €
-  //   escala(23.909) = 4.225,50 + 3.709 × 30 % = 4.225,50 + 1.112,70 = 5.338,20 €
+  // SS 2025: 2.500 €/mes × 6,48 % × 12 = 1.944,00 € · RNT = 30.000 − 1.944 − 2.000 = 26.056,00 €
+  // Base liquidable = 26.056 − 2.150 = 23.906,00 €
+  //   escala(23.906) = 4.225,50 + 3.706 × 30 % = 4.225,50 + 1.111,80 = 5.337,30 €
   //   escala(7.950)  = 1.510,50 €
-  //   cuota íntegra  = 3.827,70 €
+  //   cuota íntegra  = 3.826,80 €
   await estimar(page, { bruto: '30000', situacion: 'familia_monoparental', hijos: '1' });
 
   expect(await tarjeta(page, 'Mínimos personales')).toBe('7950,00 €');
-  expect(await tarjeta(page, 'Base imponible general')).toBe('26.059,00 €');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('3827,70 €');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('26.056,00 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('3826,80 €');
   await expect(notaGeneral(page)).toContainText('2150,00');
 });
 
@@ -166,68 +173,68 @@ test('CASO 3 · familia monoparental: 2.150 € de reducción de BASE, no de mí
 // Inspector 24/09/2026 — casos normal, límite y rechazo
 // ═════════════════════════════════════════════════════════════════════════════
 
-test('CASO 4 (normal) · 30.000 € brutos, soltero/a, sin hijos → cuota íntegra 4.928,70 €', async ({ page }) => {
-  // SS 2025 1.941,00 € · RNT 26.059,00 € · reducción art. 20 = 0
-  // escala(26.059) = 4.225,50 + 5.859 × 30 % = 5.983,20 € · − 1.054,50 = 4.928,70 €
+test('CASO 4 (normal) · 30.000 € brutos, soltero/a, sin hijos → cuota íntegra 4.927,80 €', async ({ page }) => {
+  // SS 2025 1.944,00 € · RNT 26.056,00 € · reducción art. 20 = 0
+  // escala(26.056) = 4.225,50 + 5.856 × 30 % = 5.982,30 € · − 1.054,50 = 4.927,80 €
   await estimar(page, { bruto: '30000' });
 
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4928,70 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4927,80 €');
   await expect(page.locator(SEL_ETIQUETA_FINAL).first()).toHaveText('Resultado estimado: A PAGAR');
-  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('4928,70 €');
+  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('4927,80 €');
 });
 
 test('CASO 5 (límite bajo) · 17.500 € y 500 € retenidos: la deducción va sobre los ÍNTEGROS (155,20 €, no 340 €)', async ({ page }) => {
-  // SS 2025: 1.458,33 €/mes × 6,47 % × 12 = 1.132,25 €
-  // Reducción art. 20, medida sobre 17.500 − 1.132,25 = 16.367,75 € (art. 20: SIN restar antes
+  // SS 2025: 1.458,33 €/mes × 6,48 % × 12 = 1.134,00 €
+  // Reducción art. 20, medida sobre 17.500 − 1.134,00 = 16.366,00 € (art. 20: SIN restar antes
   //   los 2.000 € de la letra f); hallazgo 1687) → primer tramo decreciente:
-  //   7.302 − 1,75 × (16.367,75 − 14.852) = 7.302 − 2.652,56 = 4.649,44 €
-  // Rendimiento neto = 16.367,75 − 2.000 = 14.367,75 € → base = 14.367,75 − 4.649,44 = 9.718,31 €
-  // Cuota íntegra = (9.718,31 − 5.550) × 19 % = 791,98 €
+  //   7.302 − 1,75 × (16.366,00 − 14.852) = 7.302 − 2.649,50 = 4.652,50 €
+  // Rendimiento neto = 16.366,00 − 2.000 = 14.366,00 € → base = 14.366,00 − 4.652,50 = 9.713,50 €
+  // Cuota íntegra = (9.713,50 − 5.550) × 19 % = 791,065 €
   // Deducción DA 61.ª sobre los ÍNTEGROS: 340 − 0,2 × (17.500 − 16.576) = 155,20 € — la misma
   //   cifra que da la AEAT para 17.500 € en el Ejemplo 3 del Manual Renta 2025. Hasta el
-  //   24/09/2026 la app la calculaba sobre el neto (14.367,75 € ≤ 14.852) y daba 340 €.
-  // Cuota tras deducción = 791,98 − 155,20 = 636,78 € → A PAGAR 636,78 − 500 = 136,78 €
+  //   24/09/2026 la app la calculaba sobre el neto (14.366,00 € ≤ 14.852) y daba 340 €.
+  // Cuota tras deducción = 791,065 − 155,20 = 635,865 € → A PAGAR 635,865 − 500 = 135,865 € (medio céntimo: ±0,05 €)
   // (Hasta el 25/09/2026, con la reducción medida sobre 14.367,75 €: cuota 287,99 € y
   //  «A DEVOLVER 367,21 €».)
   await estimar(page, { bruto: '17500', retenciones: '500' });
 
-  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(791.98, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(791.07, 1);
   expect(await tarjeta(page, 'Deducción rentas bajas')).toBe('-155,20 €');
   await expect(page.locator(SEL_ETIQUETA_FINAL).first()).toHaveText('Resultado estimado: A PAGAR');
-  expect(euros(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBeCloseTo(136.78, 1);
+  expect(euros(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBeCloseTo(135.87, 1);
 });
 
 test('CASO 5 bis · DA 61.ª: el tope es la cuota GENERAL; la del ahorro no la amplía', async ({ page }) => {
   // Trabajo 15.000 € (por debajo del SMI: jornada parcial, se cotiza por lo cobrado) →
-  //   SS 2025 = 15.000 × 6,47 % = 970,50 € · RNT = 15.000 − 970,50 − 2.000 = 12.029,50 €
-  //   → reducción art. 20 = 7.302 € · base general = 4.727,50 €, por debajo del mínimo
-  //   (5.550 €) → cuota general 0 y pasan 822,50 € de mínimo a la base del ahorro (art. 56.2).
+  //   SS 2025 = 15.000 × 6,48 % = 972,00 € · RNT = 15.000 − 972,00 − 2.000 = 12.028,00 €
+  //   → reducción art. 20 = 7.302 € · base general = 4.726,00 €, por debajo del mínimo
+  //   (5.550 €) → cuota general 0 y pasan 824,00 € de mínimo a la base del ahorro (art. 56.2).
   // Capital 3.000 € (≤ 6.500: no quita la deducción) → cuota del ahorro =
-  //   (3.000 − 822,50) × 19 % = 413,725 €
+  //   (3.000 − 824,00) × 19 % = 413,44 €
   // Deducción: 15.000 ≤ 16.576 → 340 €, pero su tope es la parte de la cuota que corresponde
   //   al trabajo, y el trabajo solo está en la base general, cuya cuota es 0 → deducción 0.
-  //   Antes se restaba de la cuota TOTAL: 413,73 − 340 = 73,73 €, 340 € de menos.
+  //   Antes se restaba de la cuota TOTAL: 413,44 − 340 = 73,44 €, 340 € de menos.
   await estimar(page, { bruto: '15000', capital: '3000' });
 
-  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(413.73, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(413.44, 1);
   await expect(page.getByRole('heading', { level: 3, name: 'Deducción rentas bajas', exact: true })).toHaveCount(0);
-  expect(euros(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBeCloseTo(413.73, 1);
+  expect(euros(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBeCloseTo(413.44, 1);
 });
 
 test('CASO 5 ter · por debajo del SMI se cotiza por lo cobrado, no por la base mínima de jornada completa', async ({ page }) => {
   // 12.000 € de nómina en 2025 solo pueden ser jornada parcial o parte del año (el SMI de 2025
   //   son 16.576 € y la base mínima, 1.381,20 €/mes, es la de jornada completa).
-  //   SS = 12.000 × 6,47 % = 776,40 €. Hasta el 24/09/2026 la app la subía a la mínima:
-  //   1.381,20 × 6,47 % × 12 = 1.072,36 €, 295,96 € de más.
-  // Base general = 12.000 − 776,40 − 2.000 − 7.302 = 1.921,60 € (con la mínima salía 1.625,64 €)
+  //   SS = 12.000 × 6,48 % = 777,60 €. Hasta el 24/09/2026 la app la subía a la mínima:
+  //   1.381,20 × 6,48 % × 12 = 1.074,02 €, 296,42 € de más.
+  // Base general = 12.000 − 777,60 − 2.000 − 7.302 = 1.920,40 € (con la mínima salía 1.623,98 €)
   await estimar(page, { bruto: '12000' });
-  expect(await tarjeta(page, 'Base imponible general')).toBe('1921,60 €');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('1920,40 €');
 });
 
 test('CASO 6 (límite alto) · 400.000 € brutos entra en el tramo del 47 %', async ({ page }) => {
-  // SS 2025 topada: 4.909,50 × 12 × 6,47 % = 3.811,74 €
-  // RNT = 400.000 − 3.811,74 − 2.000 = 394.188,26 €
-  // escala = 125.901,50 + 94.188,26 × 47 % = 170.169,98 € · − 1.054,50 = 169.115,48 €
+  // SS 2025 topada: 4.909,50 × 12 × 6,48 % = 3.817,63 €
+  // RNT = 400.000 − 3.817,63 − 2.000 = 394.182,37 €
+  // escala = 125.901,50 + 94.182,37 × 47 % = 170.167,22 € · − 1.054,50 = 169.112,72 €
   await estimar(page, { bruto: '400000' });
 
   const ultimaFila = page.locator('table').first().locator('tbody tr').last();
@@ -236,12 +243,12 @@ test('CASO 6 (límite alto) · 400.000 € brutos entra en el tramo del 47 %', a
   // Desde el 25/09/2026 el % va separado con espacio duro (hallazgo 1857): textContent y no
   // toHaveText, que normaliza el U+00A0 a espacio y aceptaría también uno normal.
   expect(await ultimaFila.locator('td').nth(2).textContent()).toBe('47\u00A0%');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('169.115,48 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('169.112,72 €');
 });
 
 test('CASO 7 (entrada) · «30.000» con punto de millar se lee como treinta mil', async ({ page }) => {
   await estimar(page, { bruto: '30.000' });
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4928,70 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4927,80 €');
 });
 
 test('CASO 8 (rechazo) · negativo, vacío o texto no producen resultado', async ({ page }) => {
@@ -266,9 +273,9 @@ test('CASO 8 (rechazo) · negativo, vacío o texto no producen resultado', async
 // ═════════════════════════════════════════════════════════════════════════════
 
 test('CASO 9 · hallazgo 1312: el ejercicio 2025 usa la cotización de 2025 en todo', async ({ page }) => {
-  // Con la de 2026 (6,50 %, base máxima 5.101,20 €) salía 169.036,90 €: 78,58 € de menos.
+  // Con la de 2026 (6,50 %, base máxima 5.101,20 €) salía 169.036,90 €: 75,82 € de menos.
   await estimar(page, { bruto: '400000' });
-  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(169115.48, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(169112.72, 1);
 
   // Y el año se dice igual en todas partes: título, desglose, referencia de datos y pie.
   await expect(page).toHaveTitle(/Estimador IRPF 2025/);
@@ -279,29 +286,29 @@ test('CASO 9 · hallazgo 1312: el ejercicio 2025 usa la cotización de 2025 en t
 });
 
 test('CASO 10 · hallazgo 1310: los dividendos e intereses van a la base del ahorro', async ({ page }) => {
-  // Trabajo 30.000 € → cuota general 4.928,70 € (CASO 4).
+  // Trabajo 30.000 € → cuota general 4.927,80 € (CASO 4).
   // Capital 5.000 € → base del ahorro: 5.000 × 19 % = 950,00 € (primer tramo, hasta 6.000).
-  // Total = 5.878,70 €. Sumado a la base general al 30 % daba 6.426,00 €.
+  // Total = 5.877,80 €. Sumados a la base general, los 5.000 € tributaban al 30 % (1.500 €) y no al 19 % (950 €).
   await estimar(page, { bruto: '30000', capital: '5000' });
 
-  expect(await tarjeta(page, 'Base imponible general')).toBe('26.059,00 €');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('26.056,00 €');
   expect(await tarjeta(page, 'Base del ahorro')).toBe('5000,00 €');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('5878,70 €');
-  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('5878,70 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('5877,80 €');
+  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('5877,80 €');
   await expect(page.locator('css=p:has-text("Cuota íntegra del ahorro")')).toContainText('950,00');
 });
 
 test('CASO 10 bis · hallazgo 1310: con más de 6.500 € de capital se pierde la reducción del art. 20', async ({ page }) => {
-  // Trabajo 20.000 €: SS 2025 = 1.666,67 × 6,47 % × 12 = 1.294,00 € · RNT = 16.706,00 €
-  //   con reducción serían 7.302 − 1,75 × 1.854 = 4.057,50 €, pero el capital (7.000 €)
-  //   supera 6.500 € (art. 20.2) → reducción 0 → base general 16.706,00 €
-  //   escala(16.706) = 2.365,50 + 4.256 × 24 % = 2.365,50 + 1.021,44 = 3.386,94 € · − 1.054,50 = 2.332,44 €
+  // Trabajo 20.000 €: SS 2025 = 1.666,67 × 6,48 % × 12 = 1.296,00 € · RNT = 16.704,00 €
+  //   con reducción serían 7.302 − 1,75 × 1.852 = 4.061,00 €, pero el capital (7.000 €)
+  //   supera 6.500 € (art. 20.2) → reducción 0 → base general 16.704,00 €
+  //   escala(16.704) = 2.365,50 + 4.254 × 24 % = 2.365,50 + 1.020,96 = 3.386,46 € · − 1.054,50 = 2.331,96 €
   // Ahorro: 6.000 × 19 % + 1.000 × 21 % = 1.140 + 210 = 1.350,00 €
-  // Total = 3.682,44 € (sin deducción de rentas bajas: otras rentas > 6.500 €)
+  // Total = 3.681,96 € (sin deducción de rentas bajas: otras rentas > 6.500 €)
   await estimar(page, { bruto: '20000', capital: '7000' });
 
-  expect(await tarjeta(page, 'Base imponible general')).toBe('16.706,00 €');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('3682,44 €');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('16.704,00 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('3681,96 €');
   await expect(notaGeneral(page)).toContainText('No se aplica la reducción por rendimientos del trabajo');
 });
 
@@ -332,7 +339,7 @@ test('CASO 11 · hallazgo 1311: sin nómina se conservan los 2.000 € del art. 
 
 test('CASO 12 · hallazgo 1313: una entrada rechazada borra el resultado anterior y avisa', async ({ page }) => {
   await estimar(page, { bruto: '30000' });
-  await expect(page.locator(SEL_IMPORTE_FINAL)).toHaveText(/4928,70/);
+  await expect(page.locator(SEL_IMPORTE_FINAL)).toHaveText(/4927,80/);
 
   await estimar(page, { bruto: '-30000' });
   await expect(page.locator(SEL_BRUTO)).toHaveValue('0');
@@ -347,34 +354,34 @@ test('CASO 12 · hallazgo 1313: una entrada rechazada borra el resultado anterio
 test('CASO 13 · art. 61.1.ª: con dos ingresos el mínimo por los hijos se prorratea', async ({ page }) => {
   // Cada progenitor declara por separado → (2.400 + 2.700) / 2 = 2.550 € cada uno
   // Mínimo = 5.550 + 2.550 = 8.100,00 €
-  //   escala(40.088,50) = 10.534,245 € · escala(8.100) = 1.539,00 € → cuota 8.995,245 €
+  //   escala(40.084,00) = 10.532,58 € · escala(8.100) = 1.539,00 € → cuota 8.993,58 €
   await estimar(page, { bruto: '45000', situacion: 'casado_dos_ingresos', hijos: '2' });
 
   expect(await tarjeta(page, 'Mínimos personales')).toBe('8100,00 €');
-  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(8995.245, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(8993.58, 1);
 });
 
 test('CASO 14 · hallazgo 1314: los ejemplos educativos cuadran con la calculadora', async ({ page }) => {
   const ejemplo = (id: string) => page.locator(`[data-escenario="${id}"]`);
   const texto = async (id: string) => limpiar((await ejemplo(id).textContent()) ?? '');
 
-  // Soltero 28.000 €: SS 2025 = 2.333,33 × 6,47 % × 12 = 1.811,60 € · RNT = 24.188,40 €
-  //   reducción art. 20 = 0 · escala(24.188,40) = 4.225,50 + 3.988,40 × 30 % = 5.422,02 €
-  //   cuota = 5.422,02 − 1.054,50 = 4.367,52 € · tipo efectivo 4.367,52 / 24.188,40 = 18,06 %
+  // Soltero 28.000 €: SS 2025 = 2.333,33 × 6,48 % × 12 = 1.814,40 € · RNT = 24.185,60 €
+  //   reducción art. 20 = 0 · escala(24.185,60) = 4.225,50 + 3.985,60 × 30 % = 5.421,18 €
+  //   cuota = 5.421,18 − 1.054,50 = 4.366,68 € · tipo efectivo 4.366,68 / 24.185,60 = 18,05 %
   const soltero = await texto('soltero-28000');
-  expect(soltero).toContain('24.188,40 €');
-  expect(soltero).toContain('4367,52 €');
-  expect(soltero).toContain('18,06 %');
+  expect(soltero).toContain('24.185,60 €');
+  expect(soltero).toContain('4366,68 €');
+  expect(soltero).toContain('18,05 %');
   expect(soltero).not.toContain('3.700');
 
   // Y la calculadora, con los mismos datos, dice lo mismo.
   await estimar(page, { bruto: '28000' });
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4367,52 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4366,68 €');
 
-  // Casada, 45.000 €, 2 hijos, individual: mínimo 8.100 € → cuota 8.995,245 € (CASO 13)
+  // Casada, 45.000 €, 2 hijos, individual: mínimo 8.100 € → cuota 8.993,58 € (CASO 13)
   const casada = await texto('casada-45000');
   expect(casada).toContain('8100,00 €');
-  expect(casada).toMatch(/8995,2[45] €/);
+  expect(casada).toContain('8993,58 €');
   expect(casada).not.toContain('28.150');
 
   // Pensión 18.000 €: reducción 1.992,15 €, base 14.007,85 €, cuota 1.684,88 € (CASO 11);
@@ -485,26 +492,26 @@ async function contrasteDe(elemento: Locator): Promise<number> {
   });
 }
 
-test('CASO 19 (normal) · 32.000 €, casado/a con dos ingresos, 1 hijo menor de 3 años, 5.000 € retenidos → a devolver 4,12 €', async ({ page }) => {
-  // SS 2025: 32.000 × 6,47 % = 2.070,40 € (2.666,67 €/mes, bajo la base máxima de 4.909,50 €)
-  // Reducción art. 20: se mide sobre 32.000 − 2.070,40 = 29.929,60 € ≥ 19.747,5 € → 0 €
-  // Base general = 29.929,60 − 2.000 (art. 19.2.f) = 27.929,60 €
+test('CASO 19 (normal) · 32.000 €, casado/a con dos ingresos, 1 hijo menor de 3 años, 5.000 € retenidos → a devolver 5,08 €', async ({ page }) => {
+  // SS 2025: 32.000 × 6,48 % = 2.073,60 € (2.666,67 €/mes, bajo la base máxima de 4.909,50 €)
+  // Reducción art. 20: se mide sobre 32.000 − 2.073,60 = 29.926,40 € ≥ 19.747,5 € → 0 €
+  // Base general = 29.926,40 − 2.000 (art. 19.2.f) = 27.926,40 €
   // Mínimo (arts. 57, 58 y 61.1.ª, MINIMOS_IRPF_2025): 5.550 + (2.400 + 2.800) / 2 = 8.150,00 €.
   //   El incremento por menor de 3 años (art. 58.2) es parte del mínimo por descendientes, así
   //   que también se reparte entre los dos progenitores que declaran por separado.
-  // escala(27.929,60) = 4.225,50 + 7.729,60 × 30 % = 6.544,38 € · escala(8.150) = 8.150 × 19 % = 1.548,50 €
-  // Cuota íntegra = 4.995,88 € · DA 61.ª: 32.000 ≥ 18.276 € → sin deducción
-  // Diferencial = 4.995,88 − 5.000 = −4,12 € → A DEVOLVER 4,12 €
-  // Tipo efectivo = 4.995,88 / 27.929,60 = 17,89 %
-  // (Sin repartir el incremento del menor de 3 años el mínimo sería 9.550 € y saldrían 270,12 € a devolver.)
+  // escala(27.926,40) = 4.225,50 + 7.726,40 × 30 % = 6.543,42 € · escala(8.150) = 8.150 × 19 % = 1.548,50 €
+  // Cuota íntegra = 4.994,92 € · DA 61.ª: 32.000 ≥ 18.276 € → sin deducción
+  // Diferencial = 4.994,92 − 5.000 = −5,08 € → A DEVOLVER 5,08 €
+  // Tipo efectivo = 4.994,92 / 27.926,40 = 17,89 %
+  // (Sin repartir el incremento del menor de 3 años el mínimo sería 9.550 € y saldrían 271,08 € a devolver.)
   await estimar(page, { bruto: '32000', retenciones: '5000', situacion: 'casado_dos_ingresos', hijos: '1', hijosM3: '1' });
 
-  expect(await tarjeta(page, 'Base imponible general')).toBe('27.929,60 €');
+  expect(await tarjeta(page, 'Base imponible general')).toBe('27.926,40 €');
   expect(await tarjeta(page, 'Mínimos personales')).toBe('8150,00 €');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4995,88 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4994,92 €');
   expect(await tarjeta(page, 'Tipo efectivo')).toMatch(/^17,89\s?%$/);
   await expect(page.locator(SEL_ETIQUETA_FINAL).first()).toHaveText('Resultado estimado: A DEVOLVER');
-  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('4,12 €');
+  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('5,08 €');
 });
 
 test('CASO 20 (límite) · 0 € de trabajo y 350.000 € de dividendos: último tramo del ahorro al 30 % y el mínimo entero en esa base', async ({ page }) => {
@@ -540,7 +547,7 @@ test('CASO 21 (rechazo) · hallazgo 1854: unas retenciones o un capital ilegible
   // «4.928.70» no es un número para el parser canónico (dos puntos y el último grupo de dos
   // cifras: parseSpanishNumber → NaN) y el campo lo conserva tras el blur. Hasta el 25/09/2026
   // la app hacía `|| 0` y estimaba con 0 € retenidos: «A PAGAR 4928,70 €», la cuota íntegra
-  // entera de 30.000 € (CASO 4), cuando quien lo tecleó quería declarar 4.928,70 € ya
+  // entera de 30.000 € (CASO 4), cuando quien lo tecleó quería declarar 4.927,80 € ya
   // retenidos. Lo mismo con un capital ilegible («1.2.3») junto a un bruto válido. Ahora hace
   // lo que ya hacía con el bruto ilegible (CASO 8): no estima y avisa.
   await estimar(page, { bruto: '30000', retenciones: '4.928.70' });
@@ -552,7 +559,7 @@ test('CASO 21 (rechazo) · hallazgo 1854: unas retenciones o un capital ilegible
   await expect(avisoApp(page)).toContainText('Retenciones ya practicadas');
 
   // Con las retenciones bien escritas, el resultado sale y el aviso se retira.
-  await escribir(page, SEL_RETENCIONES, '4928,70');
+  await escribir(page, SEL_RETENCIONES, '4927,80');
   await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
   expect(euros(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBeCloseTo(0, 1);
   await expect(avisoApp(page)).toBeEmpty();
@@ -567,7 +574,7 @@ test('CASO 21 (rechazo) · hallazgo 1854: unas retenciones o un capital ilegible
 test('CASO 22 · hallazgo 1855: «0,5» hijos a cargo se rechaza en vez de estimarse como 0 hijos', async ({ page }) => {
   // El campo admite decimales (NumberInput) y conserva «0,5» tras el blur. Hasta el 25/09/2026
   // la página lo leía con parseInt('0,5') = 0: mínimo 5.550 € (sin descendiente) y cuota
-  // 4.928,70 € (CASO 4), como si no hubiera hijo. Un número de hijos no entero se rechaza.
+  // 4.927,80 € (CASO 4), como si no hubiera hijo. Un número de hijos no entero se rechaza.
   await estimar(page, { bruto: '30000', situacion: 'casado_dos_ingresos', hijos: '0,5' });
   await expect(page.locator(SEL_HIJOS)).toHaveValue('0,5');
   await expect(page.locator(SEL_IMPORTE_FINAL).or(avisoApp(page).locator('p')).first()).toBeVisible();
@@ -576,11 +583,11 @@ test('CASO 22 · hallazgo 1855: «0,5» hijos a cargo se rechaza en vez de estim
   await expect(avisoApp(page)).toContainText('número entero');
 
   // Con «1» y «Casado/a (dos ingresos)»: 5.550 + 2.400 / 2 = 6.750 € (art. 61.1.ª)
-  //   escala(26.059) = 5.983,20 − 6.750 × 19 % (1.282,50) = 4.700,70 €
+  //   escala(26.056) = 5.982,30 − 6.750 × 19 % (1.282,50) = 4.699,80 €
   await escribir(page, SEL_HIJOS, '1');
   await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
   expect(await tarjeta(page, 'Mínimos personales')).toBe('6750,00 €');
-  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4700,70 €');
+  expect(await tarjeta(page, 'Cuota íntegra')).toBe('4699,80 €');
 });
 
 test('CASO 23 · hallazgo 1856: el pie del aviso da la fecha de verificación en DD/MM/AAAA', async ({ page }) => {
@@ -762,39 +769,39 @@ async function pasarAOscuro(page: Page): Promise<void> {
   await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
 }
 
-test('CASO 31 (normal) · 30.000 € brutos, soltero/a, 4.500 € retenidos → a pagar 428,70 €', async ({ page }) => {
-  // SS 2025 = 30.000 × 6,47 % = 1.941,00 € (2.500 €/mes, bajo la base máxima de 4.909,50 €)
-  // Art. 20: se mide sobre 30.000 − 1.941 = 28.059 € ≥ 19.747,5 € → reducción 0
-  // Base general = 28.059 − 2.000 (art. 19.2.f) = 26.059,00 €
-  // escala(26.059) = 2.365,50 + 1.860,00 + 5.859 × 30 % = 5.983,20 € · escala(5.550) = 1.054,50 €
-  // Cuota íntegra = 4.928,70 € · DA 61.ª: 30.000 ≥ 18.276 € → sin deducción
-  // Diferencial = 4.928,70 − 4.500 = 428,70 € A PAGAR · tipo efectivo 4.928,70 / 26.059 = 18,91 %
+test('CASO 31 (normal) · 30.000 € brutos, soltero/a, 4.500 € retenidos → a pagar 427,80 €', async ({ page }) => {
+  // SS 2025 = 30.000 × 6,48 % = 1.944,00 € (2.500 €/mes, bajo la base máxima de 4.909,50 €)
+  // Art. 20: se mide sobre 30.000 − 1.944 = 28.056 € ≥ 19.747,5 € → reducción 0
+  // Base general = 28.056 − 2.000 (art. 19.2.f) = 26.056,00 €
+  // escala(26.056) = 2.365,50 + 1.860,00 + 5.856 × 30 % = 5.982,30 € · escala(5.550) = 1.054,50 €
+  // Cuota íntegra = 4.927,80 € · DA 61.ª: 30.000 ≥ 18.276 € → sin deducción
+  // Diferencial = 4.927,80 − 4.500 = 427,80 € A PAGAR · tipo efectivo 4.927,80 / 26.056 = 18,91 %
   await estimar(page, { bruto: '30000', retenciones: '4500' });
 
-  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(4928.7, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(4927.8, 1);
   expect(await tarjeta(page, 'Tipo efectivo')).toMatch(/^18,91 %$/);
   await expect(page.locator(SEL_ETIQUETA_FINAL).first()).toHaveText('Resultado estimado: A PAGAR');
-  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('428,70 €');
+  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('427,80 €');
 });
 
 test('CASO 32 (límite, oscuro tras hidratar) · 320.000 € de trabajo y 320.000 € de capital: las dos bases en su último tramo', async ({ page }) => {
   await pasarAOscuro(page);
-  // SS 2025 topada: 4.909,50 × 12 × 6,47 % = 3.811,7358 € → base general = 320.000 − 3.811,7358
-  //   − 2.000 = 314.188,2642 € (reducción art. 20: 0; además el capital supera 6.500 €)
-  // escala general = 125.901,50 (hasta 300.000) + 14.188,2642 × 47 % = 132.569,9842 €
-  //   − escala(5.550) 1.054,50 = cuota general 131.515,4842 €
+  // SS 2025 topada: 4.909,50 × 12 × 6,48 % = 3.817,6272 € → base general = 320.000 − 3.817,6272
+  //   − 2.000 = 314.182,3728 € (reducción art. 20: 0; además el capital supera 6.500 €)
+  // escala general = 125.901,50 (hasta 300.000) + 14.182,3728 × 47 % = 132.567,2152 €
+  //   − escala(5.550) 1.054,50 = cuota general 131.512,7152 €
   // Ahorro (TRAMOS_GANANCIAS_PATRIMONIALES_2025): 1.140 + 9.240 + 34.500 + 27.000 + 20.000 × 30 %
   //   = 77.880,00 € (el mínimo cabe entero en la base general: nada pasa al ahorro)
-  // Cuota íntegra = 209.395,4842 € · tipo efectivo = 209.395,48 / 634.188,26 = 33,02 %
+  // Cuota íntegra = 209.392,7152 € · tipo efectivo = 209.392,72 / 634.182,37 = 33,02 %
   // (Con el 45 % en el tramo de más de 300.000 € saldrían 283,77 € menos; con el 28 % de 2024
   //  en el último tramo del ahorro, 400 € menos.)
   await estimar(page, { bruto: '320000', capital: '320000' });
 
-  expect(euros(await tarjeta(page, 'Base imponible general'))).toBeCloseTo(314188.26, 1);
-  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(209395.48, 1);
+  expect(euros(await tarjeta(page, 'Base imponible general'))).toBeCloseTo(314182.37, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(209392.72, 1);
   expect(await tarjeta(page, 'Tipo efectivo')).toMatch(/^33,02 %$/);
-  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('209.395,48 €');
-  await expect(notaGeneral(page)).toContainText('131.515,48');
+  expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('209.392,72 €');
+  await expect(notaGeneral(page)).toContainText('131.512,72');
   await expect(page.locator('css=p:has-text("Cuota íntegra del ahorro")')).toContainText('77.880,00');
 });
 
@@ -808,7 +815,7 @@ test('CASO 33 (rechazo) · «2.000.50» no se estima en ninguno de los tres impo
   ];
   for (const [selector, nombre] of campos) {
     await estimar(page, { bruto: '30000' });
-    await expect(page.locator(SEL_IMPORTE_FINAL)).toHaveText(/4928,70/);   // resultado previo a la vista
+    await expect(page.locator(SEL_IMPORTE_FINAL)).toHaveText(/4927,80/);   // resultado previo a la vista
 
     await escribir(page, selector, '2.000.50');
     await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
@@ -828,20 +835,20 @@ test.describe('en móvil (393 × 851)', () => {
   });
 
   test('CASO 34 (límite bajo) · 18.000 € y 600 € retenidos: art. 20 en su primer tramo decreciente y DA 61.ª decreciente', async ({ page }) => {
-    // SS 2025 = 18.000 × 6,47 % = 1.164,60 € · art. 20 sobre 18.000 − 1.164,60 = 16.835,40 €
-    //   (primer tramo decreciente): 7.302 − 1,75 × (16.835,40 − 14.852) = 3.831,05 €
-    // Base = 16.835,40 − 2.000 − 3.831,05 = 11.004,35 € → cuota = (11.004,35 − 5.550) × 19 % = 1.036,33 €
+    // SS 2025 = 18.000 × 6,48 % = 1.166,40 € · art. 20 sobre 18.000 − 1.166,40 = 16.833,60 €
+    //   (primer tramo decreciente): 7.302 − 1,75 × (16.833,60 − 14.852) = 3.834,20 €
+    // Base = 16.833,60 − 2.000 − 3.834,20 = 10.999,40 € → cuota = (10.999,40 − 5.550) × 19 % = 1.035,386 €
     // DA 61.ª sobre los íntegros: 340 − 0,2 × (18.000 − 16.576) = 55,20 € (≤ cuota general)
-    // Cuota tras deducción = 981,13 € → A PAGAR 981,13 − 600 = 381,13 € · tipo 981,13 / 11.004,35 = 8,92 %
+    // Cuota tras deducción = 980,186 € → A PAGAR 980,186 − 600 = 380,19 € · tipo 980,19 / 10.999,40 = 8,91 %
     // (Midiendo el art. 20 después de los 2.000 € —el defecto de 8a6fb75b— la reducción sería
-    //  7.302 €, la base 7.533,40 € y la cuota íntegra 376,85 €.)
+    //  7.302 €, la base 7.531,60 € y la cuota íntegra 376,50 €.)
     await estimar(page, { bruto: '18000', retenciones: '600' });
 
-    expect(euros(await tarjeta(page, 'Base imponible general'))).toBeCloseTo(11004.35, 1);
-    expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(1036.33, 1);
+    expect(euros(await tarjeta(page, 'Base imponible general'))).toBeCloseTo(10999.4, 1);
+    expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(1035.39, 1);
     expect(euros(await tarjeta(page, 'Deducción rentas bajas'))).toBeCloseTo(-55.2, 1);
-    expect(await tarjeta(page, 'Tipo efectivo')).toMatch(/^8,92 %$/);
-    expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('381,13 €');
+    expect(await tarjeta(page, 'Tipo efectivo')).toMatch(/^8,91 %$/);
+    expect(limpiar(await page.locator(SEL_IMPORTE_FINAL).innerText())).toBe('380,19 €');
   });
 
   test('CASO 35 · hallazgo 2317: al estimar, la tabla del desglose no ensancha la columna ni corta el formulario', async ({ page }) => {
@@ -902,34 +909,34 @@ test('CASO 36 · hallazgo 2316: con custodia compartida el mínimo por los hijos
   // conviven también con el otro progenitor, y el motor prorratea si se marca.
   //
   // Resuelto a mano, 30.000 € brutos con nómina, soltero/a o divorciado/a (MINIMOS_IRPF_2025):
-  //   base general = 26.059,00 € (CASO 31) → escala(26.059) = 5.983,20 €
+  //   base general = 26.056,00 € (CASO 31) → escala(26.056) = 5.982,30 €
   //   · 1 hijo, custodia compartida: mínimo 5.550 + 2.400 / 2 = 6.750 € → escala(6.750) =
-  //     6.750 × 19 % = 1.282,50 € → cuota íntegra 5.983,20 − 1.282,50 = 4.700,70 €
-  //   · 1 hijo, sin marcar: mínimo 7.950 € → 1.510,50 € → cuota 4.472,70 € (228,00 € menos)
+  //     6.750 × 19 % = 1.282,50 € → cuota íntegra 5.982,30 − 1.282,50 = 4.699,80 €
+  //   · 1 hijo, sin marcar: mínimo 7.950 € → 1.510,50 € → cuota 4.471,80 € (228,00 € menos)
   //   · 2 hijos, uno menor de 3, custodia compartida: (2.400 + 2.700 + 2.800) / 2 = 3.950 →
-  //     mínimo 9.500 € → escala(9.500) = 1.805,00 € → cuota 4.178,20 € (sin prorratear: mínimo
-  //     13.450 € → 2.365,50 + 1.000 × 24 % = 2.605,50 € → cuota 3.377,70 €, 800,50 € menos)
-  //   DA 61.ª: 30.000 € ≥ 18.276 € → sin deducción. Tipo efectivo 4.700,70 / 26.059 = 18,04 %.
+  //     mínimo 9.500 € → escala(9.500) = 1.805,00 € → cuota 4.177,30 € (sin prorratear: mínimo
+  //     13.450 € → 2.365,50 + 1.000 × 24 % = 2.605,50 € → cuota 3.376,80 €, 800,50 € menos)
+  //   DA 61.ª: 30.000 € ≥ 18.276 € → sin deducción. Tipo efectivo 4.699,80 / 26.056 = 18,04 %.
   const casilla = page.getByRole('checkbox', { name: /conviven también con el otro progenitor/ });
   await expect(casilla).toHaveCount(0);   // sin hijos no se pregunta
 
   await estimar(page, { bruto: '30000', situacion: 'soltero', hijos: '1' });
   expect(euros(await tarjeta(page, 'Mínimos personales'))).toBeCloseTo(7950, 1);   // sin marcar: entero
-  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(4472.7, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(4471.8, 1);
 
   const formulario = page.getByRole('heading', { level: 2, name: 'Tus datos orientativos' }).locator('xpath=..');
   await expect(formulario.getByText(/custodia compartida/i).first()).toBeVisible();
   await casilla.check();
   await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
   await expect.poll(async () => euros(await tarjeta(page, 'Mínimos personales'))).toBeCloseTo(6750, 1);
-  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(4700.7, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(4699.8, 1);
   expect(await tarjeta(page, 'Tipo efectivo')).toMatch(/^18,04 %$/);
 
   await escribir(page, SEL_HIJOS, '2');
   await escribir(page, SEL_HIJOS_M3, '1');
   await page.getByRole('button', { name: 'Estimar IRPF', exact: true }).click();
   await expect.poll(async () => euros(await tarjeta(page, 'Mínimos personales'))).toBeCloseTo(9500, 1);
-  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(4178.2, 1);
+  expect(euros(await tarjeta(page, 'Cuota íntegra'))).toBeCloseTo(4177.3, 1);
 
   // Con «Casado/a (dos ingresos)» ya se prorratea: la casilla desaparece y no prorratea dos veces.
   await page.locator('#situacion').selectOption('casado_dos_ingresos');
@@ -1010,8 +1017,8 @@ test('CASO 41 · hallazgo 2322: las tarjetas en euros separan la cifra del € c
   await estimar(page, { bruto: '30000', retenciones: '4500' });
   const h3 = page.getByRole('heading', { level: 3, name: 'Cuota íntegra', exact: true });
   const valor = (await h3.locator('xpath=../following-sibling::div[1]//p').textContent()) ?? '';
-  expect(valor).toMatch(/^4928,70/);   // montaje: la cifra del CASO 31
-  expect(valor).toMatch(/^4928,70[  ]€$/);
+  expect(valor).toMatch(/^4927,80/);   // montaje: la cifra del CASO 31
+  expect(valor).toMatch(/^4927,80[  ]€$/);
 });
 
 test('CASO 42 · hallazgo 2323: el enlace del ejemplo del pensionista llega a 4,5:1 en los dos temas', async ({ page }) => {
