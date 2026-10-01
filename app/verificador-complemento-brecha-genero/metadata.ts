@@ -1,10 +1,18 @@
 import { Metadata } from 'next';
 import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META } from '@/data/fiscal';
 import { formatCurrency } from '@/lib/formatters';
-import { NUM_REQUISITOS_ART60, REQUISITOS_ART60 } from '@/lib/calculadoras/complementoBrechaGenero';
+import {
+  NUM_REQUISITOS_ART60,
+  REQUISITOS_ART60,
+  EXCLUSION_ART60_3B,
+  conCita,
+} from '@/lib/calculadoras/complementoBrechaGenero';
 
 // Año del título: la vigencia del módulo que sella los datos. Sale del dato
-// y no se escribe a mano (lo exige check:anio-titulo).
+// y no se escribe a mano (lo exige check:anio-titulo). Desde el 01/10/2026 lo leen también
+// las keywords y el JSON-LD (nombre, featureList y la pregunta 1 del FAQPage), que lo
+// tecleaban mientras interpolaban la CUANTÍA del módulo: al re-sellar, el año y la cifra se
+// habrían separado (hallazgo 2539).
 const anio = COMPLEMENTO_BRECHA_GENERO_META.vigencia;
 
 // Las cifras salen del módulo fiscal, nunca tecleadas: en la próxima revalorización el
@@ -24,6 +32,9 @@ const DOCTRINA = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
 const NORMA_EXCLUSION_JUBILACION_PARCIAL = COMPLEMENTO_BRECHA_GENERO_2026.exclusiones
   .find(e => e.supuesto === 'jubilacion_parcial')!.norma;
 const NORMA_COMPATIBLE_MINIMOS = COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.compatibleConComplementoAMinimos.norma;
+/** Prorrata temporis (art. 60.3.f LGSS, hallazgo 2541) y concurrencia (art. 60.2, hallazgo 2543) */
+const PRORRATA = COMPLEMENTO_BRECHA_GENERO_2026.prorrataTemporis;
+const EXTINCION = COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.entreProgenitores.extincion;
 /**
  * Hallazgo 654: el FAQPage enumeraba TRES requisitos a mano mientras la página anunciaba
  * «5 requisitos clave» y el motor del MCP los listaba como cuatro. Ahora los tres sitios
@@ -40,7 +51,7 @@ const description = `Comprueba si tienes derecho al complemento por brecha de g�
 export const metadata: Metadata = {
   title,
   description,
-  keywords: 'complemento brecha género 2026, complemento maternidad pensión, art 60 LGSS, sentencia TJUE complemento, reclamación complemento hombres, pensión jubilación viudedad complemento',
+  keywords: `complemento brecha género ${anio}, complemento maternidad pensión, art 60 LGSS, sentencia TJUE complemento, reclamación complemento hombres, pensión jubilación viudedad complemento`,
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -73,7 +84,7 @@ export const metadata: Metadata = {
 export const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: 'Verificador del Complemento por Brecha de Género 2026',
+  name: `Verificador del Complemento por Brecha de Género ${anio}`,
   description,
   url: 'https://meskeia.com/verificador-complemento-brecha-genero/',
   applicationCategory: 'FinanceApplication',
@@ -87,7 +98,8 @@ export const jsonLd = {
     `Aplica la ${DOCTRINA.stjue.corto} y la ${DOCTRINA.ts.corto}: igualdad de trato H/M`,
     'Resuelve la concurrencia entre progenitores por la suma de pensiones públicas (art. 60.1 LGSS)',
     'Detecta casos de reclamación retroactiva (denegaciones previas)',
-    'Datos normativos 2026 verificados con fuente oficial',
+    `Aplica la prorrata temporis del ${PRORRATA.norma} a las pensiones con cotizaciones en otro país`,
+    `Datos normativos ${anio} verificados con fuente oficial`,
     // % con espacio duro U+00A0 (hallazgo 2244)
     'Sin registro, gratuito y 100 % en el navegador',
   ],
@@ -99,7 +111,7 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Qué es el complemento por brecha de género en la pensión y a cuánto asciende en 2026?',
+      name: `¿Qué es el complemento por brecha de género en la pensión y a cuánto asciende en ${anio}?`,
       acceptedAnswer: {
         '@type': 'Answer',
         text: `El complemento por brecha de género es un incremento en la pensión de jubilación, viudedad o incapacidad permanente reconocido por el artículo 60 de la Ley General de la Seguridad Social. Su importe vigente es de ${CUANTIA} al mes por cada hijo o hija, con un máximo de ${MAX_HIJOS} hijos (${MAX_MES}/mes). La cuantía se fija cada año en la Ley de Presupuestos o en el Real Decreto-ley de revalorización de pensiones, y tributa como rendimiento del trabajo en el IRPF.`,
@@ -118,7 +130,10 @@ export const faqJsonLd = {
       name: '¿Cómo saber si tengo derecho al complemento por brecha de género?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Son ${NUM_REQUISITOS_ART60} requisitos: ${LISTA_REQUISITOS}. No es necesario acreditar una interrupción concreta de la carrera laboral: el complemento se reconoce automáticamente si se cumplen estas condiciones. El verificador las comprueba en 6 preguntas y calcula el importe estimado según el número de hijos.`,
+        // Hallazgo 2540: decía «el complemento se reconoce automáticamente si se cumplen estas
+        // condiciones», y ni es automático en todos los casos (art. 60.2) ni basta con ellas
+        // (art. 60.3.b). La prorrata del art. 60.3.f cambia además el importe.
+        text: `Son ${NUM_REQUISITOS_ART60} requisitos: ${LISTA_REQUISITOS}. No es necesario acreditar una interrupción concreta de la carrera laboral. Aun cumpliéndolos, hay exclusiones: ${conCita(EXCLUSION_ART60_3B.detalle.charAt(0).toLowerCase() + EXCLUSION_ART60_3B.detalle.slice(1), EXCLUSION_ART60_3B.norma)} Y si la pensión se causó sumando cotizaciones de otro país, el complemento se reduce en la misma prorrata que la pensión (${PRORRATA.norma}). El verificador las comprueba en 6 preguntas y calcula el importe estimado según el número de hijos.`,
       },
     },
     {
@@ -126,7 +141,9 @@ export const faqJsonLd = {
       name: '¿Cómo se solicita el complemento por brecha de género al INSS?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La solicitud se tramita ante el Instituto Nacional de la Seguridad Social (INSS) mediante el formulario de revisión de pensión. Puede presentarse de forma presencial en cualquier Centro de Atención e Información de la Seguridad Social, por sede electrónica con certificado digital o a través del servicio Tu Seguridad Social. Si la pensión ya está reconocida, el complemento se añade de oficio en muchos casos, pero conviene verificarlo en el resumen de la pensión.',
+        text: 'La solicitud se tramita ante el Instituto Nacional de la Seguridad Social (INSS) mediante el formulario de revisión de pensión. Puede presentarse de forma presencial en cualquier Centro de Atención e Información de la Seguridad Social, por sede electrónica con certificado digital o a través del servicio Tu Seguridad Social. Si la pensión ya está reconocida, el complemento se añade de oficio en muchos casos, pero conviene verificarlo en el resumen de la pensión.' +
+          // Hallazgo 2543: si lo cobra el otro progenitor, nunca es de oficio
+          ` Si el otro progenitor ya lo cobra por los mismos hijos, hay que solicitarlo siempre: ${conCita(EXTINCION.detalle, EXTINCION.norma)}`,
       },
     },
     {

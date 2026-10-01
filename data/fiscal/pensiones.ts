@@ -649,8 +649,14 @@ export const COMPLEMENTO_BRECHA_GENERO_META = {
    *     la respuesta se invierte.
    * Las piezas (normas y criterio) viven en `COMPLEMENTO_BRECHA_GENERO_2026.concurrencia
    * .entreProgenitores`, que es lo que interpolan la app y el motor del MCP.
+   *
+   * 01/10/2026 (hallazgo 2538): añadida la regla con la que el art. 60.7 fija esa
+   * comparación —importe inicial revalorizado, SIN complementos—. Sin ella, «todas las
+   * pensiones públicas» incluía el propio complemento (que «tendrá a todos los efectos
+   * naturaleza jurídica de pensión pública contributiva», art. 60.3) y la respuesta podía
+   * invertirse.
    */
-  nota: 'Cada hijo o hija da derecho a un solo complemento (art. 60.3.a) LGSS). Si los dos progenitores lo piden por los mismos hijos, se reconoce al que sea titular de pensiones públicas cuya suma sea de menor cuantía (art. 60.1 LGSS), y reconocérselo al segundo extingue el ya reconocido al primero (art. 60.2 LGSS).',
+  nota: 'Cada hijo o hija da derecho a un solo complemento (art. 60.3.a) LGSS). Si los dos progenitores lo piden por los mismos hijos, se reconoce al que sea titular de pensiones públicas cuya suma sea de menor cuantía (art. 60.1 LGSS), comparando el importe inicial de cada pensión, una vez revalorizado, sin computar ningún complemento (art. 60.7 LGSS), y reconocérselo al segundo extingue el ya reconocido al primero (art. 60.2 LGSS).',
 };
 
 /**
@@ -710,18 +716,54 @@ export const COMPLEMENTO_BRECHA_GENERO_2026 = {
         'El complemento no se reconoce en la jubilación parcial del art. 215 LGSS. Sí se reconoce ' +
         'cuando desde ella se accede a la jubilación plena, una vez cumplida la edad que corresponda.',
     },
+    /**
+     * Art. 60.3.b) LGSS (hallazgo 2540, 01/10/2026). Hasta esa fecha no estaba en ningún
+     * módulo ni en la app, cuyo FAQPage afirmaba que el complemento «se reconoce
+     * automáticamente» si se cumplían los requisitos. Texto del consolidado
+     * (BOE-A-2015-11724, versión vigente desde el 18/03/2023). La norma no distingue por
+     * hijo: niega «el derecho al complemento» al padre o a la madre.
+     */
+    {
+      supuesto: 'patria_potestad_o_violencia',
+      norma: 'art. 60.3.b) LGSS',
+      detalle:
+        'No se reconoce al padre o a la madre privado de la patria potestad por sentencia fundada en ' +
+        'el incumplimiento de los deberes inherentes a ella o dictada en causa criminal o matrimonial, ' +
+        'al padre condenado por violencia contra la mujer ejercida sobre la madre, ni al padre o a la ' +
+        'madre condenado por ejercer violencia contra los hijos o hijas.',
+    },
   ] as const,
+  /**
+   * Pensión causada por totalización de períodos de seguro a prorrata temporis (normativa
+   * internacional): art. 60.3.f) LGSS. «El importe real del complemento será el resultado de
+   * aplicar a la cuantía […], que será considerada importe teórico, la prorrata aplicada a la
+   * pensión a la que acompaña.» Hasta el 01/10/2026 la app daba siempre el importe íntegro
+   * (hallazgo 2541): con una prorrata española del 50 % y 2 hijos, 73,80 €/mes donde
+   * corresponden 36,90 €/mes.
+   */
+  prorrataTemporis: {
+    norma: 'art. 60.3.f) LGSS',
+    detalle:
+      'Si tu pensión se causó sumando cotizaciones de otro país (totalización a prorrata temporis), ' +
+      'el complemento se reduce en la misma prorrata que tu pensión: la cuantía por hijo es el ' +
+      'importe teórico, y se cobra el porcentaje de prorrata que figura en la resolución de la pensión.',
+  },
   /**
    * Cómputo de hijos nacidos con vida que fallecen después del nacimiento. Hasta el
    * 30/08/2026 esta regla se afirmaba en el FAQPage sin norma ni criterio ('la doctrina
    * administrativa también los computa...'), así que quedaba fuera del alcance de
    * /triaje-fiscal (hallazgo 505). Fuente: STS 748/2023 (ECLI:ES:TS:2023:748), Pleno Sala
    * IV, 10-mar-2023: distingue el nacido con vida que fallece a las pocas horas (SÍ
-   * computa) del feto nacido sin vida (NO computa) — el art. 60.1 LGSS exige expresamente
-   * que el hijo «hubiera nacido con vida».
+   * computa) del feto nacido sin vida (NO computa).
+   *
+   * ⚠️ Norma corregida el 01/10/2026 (hallazgo 2542): decía «art. 60.1 LGSS». En el texto
+   * vigente (BOE-A-2015-11724, versión del 18/03/2023) la exigencia está en el art. 60.3.a),
+   * párrafo segundo: «únicamente se computarán los hijos o hijas que con anterioridad al
+   * hecho causante de la pensión correspondiente hubieran nacido con vida o hubieran sido
+   * adoptados». El 60.1 no dice «con vida».
    */
   computoHijoFallecido: {
-    norma: 'art. 60.1 LGSS',
+    norma: 'art. 60.3.a) LGSS',
     sentencia: 'STS 748/2023 (ECLI:ES:TS:2023:748), Pleno Sala IV, 10 de marzo de 2023',
     computa: true,
     detalle:
@@ -753,12 +795,41 @@ export const COMPLEMENTO_BRECHA_GENERO_2026 = {
       /** A cuál de los dos se reconoce */
       norma: 'art. 60.1 LGSS',
       criterio: 'que sea titular de pensiones públicas cuya suma sea de menor cuantía',
+      /**
+       * CÓMO se compara esa suma: art. 60.7 LGSS (hallazgo 2538, 01/10/2026). «Se
+       * computarán dichas pensiones teniendo en cuenta su importe inicial, una vez
+       * revalorizadas, sin computar los complementos que pudieran corresponder.» Como el
+       * propio complemento tiene «naturaleza jurídica de pensión pública contributiva»
+       * (art. 60.3), sumar «todas» sin esta regla lo incluía y podía invertir la respuesta.
+       */
+      comparacion: {
+        norma: 'art. 60.7 LGSS',
+        detalle:
+          'cada pensión cuenta por su importe inicial, una vez revalorizado, sin computar ningún ' +
+          'complemento: ni este ni, por ejemplo, el complemento a mínimos',
+        /** Párrafo segundo del 60.7: el empate, solo entre progenitores del mismo sexo */
+        desempate: {
+          norma: 'art. 60.7 LGSS, párrafo segundo',
+          detalle:
+            'Si los dos progenitores son del mismo sexo y sus pensiones computables suman lo mismo, ' +
+            'se reconoce al que solicitó en primer lugar la pensión con derecho a complemento.',
+        },
+      },
       /** Qué pasa con el complemento del que ya lo cobraba */
       extincion: {
         norma: 'art. 60.2 LGSS',
         detalle:
           'Reconocérselo al segundo progenitor extingue el complemento ya reconocido al primero, ' +
           'a quien el INSS da audiencia antes de resolver.',
+        /**
+         * Efectos económicos del reconocimiento al segundo progenitor (art. 60.2, párrafo
+         * primero). Hace falta una RESOLUCIÓN: no es automático (hallazgo 2543).
+         */
+        efectos:
+          'Produce efectos económicos el primer día del mes siguiente al de la resolución, si se ' +
+          'dicta dentro de los seis meses siguientes a la solicitud (o, en su caso, al reconocimiento ' +
+          'de la pensión que la cause); pasado ese plazo, desde el ' +
+          'primer día del séptimo mes.',
       },
     },
   },

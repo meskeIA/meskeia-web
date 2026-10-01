@@ -36,6 +36,8 @@ import { calcularComplementoBrechaGenero, FECHA_MINIMA_HECHO_CAUSANTE, type Sexo
 import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META } from '@/data/fiscal';
 const PAGAS_BG = COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales;
 const DOCTRINA_BG = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
+// Concurrencia entre progenitores y cómo se comparan las sumas (art. 60.7 LGSS, hallazgo 2538)
+const CONCURRENCIA_BG = COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.entreProgenitores;
 import { compararDonacionHerencia } from '@/lib/calculadoras/comparacionDonacionHerencia';
 import {
   calcularSucesion,
@@ -1463,19 +1465,21 @@ function crearServidorDelegum(): McpServer {
   // ── calcular_complemento_brecha_genero ───────────────────────────────────
   servidor.tool(
     'calcular_complemento_brecha_genero',
-    `Calcula el complemento de pensión para la reducción de la brecha de género (antiguo complemento de maternidad, art. 60 LGSS). Importe fijo por hijo/a (la cuantía vigente y el máximo de hijos salen de data/fiscal; se abona en ${PAGAS_BG} pagas) sobre pensiones contributivas de jubilación, incapacidad permanente o viudedad. IMPORTANTE: tras la ${DOCTRINA_BG.stjue.corto} (${DOCTRINA_BG.stjue.fecha}) y la STS de ${DOCTRINA_BG.ts.fecha}, hombres y mujeres tienen derecho en IGUALDAD de condiciones — ya NO se exigen requisitos adicionales a los hombres. Requisitos: pensión contributiva, hecho causante desde el ${FECHA_MINIMA_HECHO_CAUSANTE} y al menos 1 hijo. Que el otro progenitor ya lo perciba por los mismos hijos NO lo deniega: cada hijo da derecho a un solo complemento y el art. 60.1 LGSS lo asigna al progenitor titular de pensiones públicas cuya SUMA sea de menor cuantía; reconocérselo al segundo extingue el del primero (art. 60.2). En ese caso indica suma_pensiones_menor; sin ella el veredicto es condicionado.`,
+    `Calcula el complemento de pensión para la reducción de la brecha de género (antiguo complemento de maternidad, art. 60 LGSS). Importe fijo por hijo/a (la cuantía vigente y el máximo de hijos salen de data/fiscal; se abona en ${PAGAS_BG} pagas) sobre pensiones contributivas de jubilación, incapacidad permanente o viudedad. IMPORTANTE: tras la ${DOCTRINA_BG.stjue.corto} (${DOCTRINA_BG.stjue.fecha}) y la STS de ${DOCTRINA_BG.ts.fecha}, hombres y mujeres tienen derecho en IGUALDAD de condiciones — ya NO se exigen requisitos adicionales a los hombres. Requisitos: pensión contributiva, hecho causante desde el ${FECHA_MINIMA_HECHO_CAUSANTE} y al menos 1 hijo. Que el otro progenitor ya lo perciba por los mismos hijos NO lo deniega: cada hijo da derecho a un solo complemento y el art. 60.1 LGSS lo asigna al progenitor titular de pensiones públicas cuya SUMA sea de menor cuantía; reconocérselo al segundo extingue el del primero (art. 60.2), previa solicitud expresa y resolución del INSS. En ese caso indica suma_pensiones_menor; sin ella el veredicto es condicionado. Para comparar las sumas, ${CONCURRENCIA_BG.comparacion.detalle} (${CONCURRENCIA_BG.comparacion.norma}). Si la pensión se causó por totalización internacional a prorrata temporis, indica prorrata_porcentaje: el complemento se reduce en esa prorrata (${COMPLEMENTO_BRECHA_GENERO_2026.prorrataTemporis.norma}). Si al solicitante le alcanza una exclusión del art. 60.3.b) (privación de la patria potestad, condena por violencia contra la madre o contra los hijos), indica excluido_art_60_3_b.`,
     {
       sexo: z.enum(['mujer', 'hombre']).describe('Sexo del beneficiario (informativo: desde la doctrina 2025 no afecta al derecho)'),
       num_hijos: z.number().int().min(0).describe('Número de hijos/as nacidos con vida o adoptados antes del hecho causante'),
       tipo_pension: z.enum(['jubilacion', 'jubilacion_parcial', 'incapacidad_permanente', 'viudedad', 'no_contributiva', 'ninguna']).describe('Tipo de pensión. Solo las contributivas dan acceso, y la jubilación parcial queda excluida por el art. 60.4 LGSS.'),
       fecha_hecho_causante: z.enum(['antes_2021', 'desde_2021', 'sin_iniciar']).optional().describe(`Momento del hecho causante. El complemento exige hecho causante desde el ${FECHA_MINIMA_HECHO_CAUSANTE}. Por defecto desde_2021.`),
       otro_progenitor: z.enum(['no_percibe', 'percibe', 'denegado', 'no_aplica']).optional().describe('Situación del OTRO progenitor (no del solicitante): no_percibe, percibe (ya lo cobra por esos hijos: no es incompatible, decide suma_pensiones_menor), denegado, no_aplica. Que se lo denegaran a ÉL no da derecho a reclamar: para eso está denegacion_propia. Por defecto no_percibe.'),
-      suma_pensiones_menor: z.enum(['propia', 'otro_progenitor', 'desconocida']).optional().describe('Solo si otro_progenitor es "percibe": de quién es la SUMA de pensiones públicas (todas, p. ej. jubilación + viudedad) de menor cuantía. propia → se le reconoce al solicitante y se extingue el del otro; otro_progenitor → lo conserva el otro; desconocida (por defecto) → veredicto condicionado.'),
+      suma_pensiones_menor: z.enum(['propia', 'otro_progenitor', 'desconocida']).optional().describe(`Solo si otro_progenitor es "percibe": de quién es la SUMA de pensiones públicas de menor cuantía. Cuentan todas las pensiones públicas de cada progenitor (p. ej. jubilación + viudedad), pero ${CONCURRENCIA_BG.comparacion.detalle} (${CONCURRENCIA_BG.comparacion.norma}). ${CONCURRENCIA_BG.comparacion.desempate.detalle} propia → se le reconoce al solicitante y se extingue el del otro; otro_progenitor → lo conserva el otro; desconocida (por defecto) → veredicto condicionado.`),
       denegacion_propia: z.boolean().optional().describe(`¿Al SOLICITANTE le denegaron el complemento en su día y tiene una resolución denegatoria? Es lo que decide si procede reclamar (${DOCTRINA_BG.stjue.corto}, para denegaciones a hombres anteriores a esa doctrina). Por defecto false.`),
+      excluido_art_60_3_b: z.boolean().optional().describe('¿Le alcanza al SOLICITANTE alguna exclusión del art. 60.3.b) LGSS? Privación de la patria potestad por sentencia fundada en el incumplimiento de sus deberes o dictada en causa criminal o matrimonial; padre condenado por violencia contra la mujer ejercida sobre la madre; padre o madre condenado por violencia contra los hijos. Con true no procede. Por defecto false.'),
+      prorrata_porcentaje: z.number().gt(0).max(100).optional().describe('Solo si la pensión se causó por totalización de períodos de seguro a prorrata temporis (normativa internacional): prorrata española de la pensión, en % (figura en su resolución). El complemento se multiplica por ella (art. 60.3.f LGSS). Sin el dato, importe íntegro.'),
       cuantia_pension_mensual: z.number().positive().optional().describe('Cuantía mensual de la pensión base (€/mes). Opcional: para mostrar la pensión total con complemento.'),
     },
     { title: 'Calcula el complemento de pensión por brecha de género', readOnlyHint: true },
-    async ({ sexo, num_hijos, tipo_pension, fecha_hecho_causante, otro_progenitor, suma_pensiones_menor, denegacion_propia, cuantia_pension_mensual }, extra) => {
+    async ({ sexo, num_hijos, tipo_pension, fecha_hecho_causante, otro_progenitor, suma_pensiones_menor, denegacion_propia, excluido_art_60_3_b, prorrata_porcentaje, cuantia_pension_mensual }, extra) => {
       await registrarUsoDelegum('calcular_complemento_brecha_genero', getCaller(extra));
       try {
         const r = calcularComplementoBrechaGenero({
@@ -1486,8 +1490,14 @@ function crearServidorDelegum(): McpServer {
           otroProgenitor: otro_progenitor,
           sumaPensionesMenor: suma_pensiones_menor,
           denegacionPropia: denegacion_propia,
+          excluidoArt60_3b: excluido_art_60_3_b,
+          prorrataPorcentaje: prorrata_porcentaje,
           cuantiaPensionBeneficiario: cuantia_pension_mensual,
         });
+        // Art. 60.3.f: con prorrata, la cuantía por hijo es el importe TEÓRICO (hallazgo 2541)
+        const lineaProrrata = r.prorrataPorcentaje !== undefined
+          ? `Prorrata de la pensión: ${fmt(r.prorrataPorcentaje)} % (${COMPLEMENTO_BRECHA_GENERO_2026.prorrataTemporis.norma}) · ${fmt(r.cuantiaPorHijoMensual)} €/mes por hijo es el importe teórico`
+          : null;
         const lineas = [
           `👶 **Complemento por Brecha de Género (art. 60 LGSS)**`,
           `Beneficiario: ${sexo === 'mujer' ? 'Mujer' : 'Hombre'} · Hijos: ${r.numHijos}`,
@@ -1496,12 +1506,13 @@ function crearServidorDelegum(): McpServer {
             ? [
                 r.esReclamacion ? `🔄 **Posible reclamación retroactiva**` : `✅ **Tiene derecho al complemento**`,
                 `Hijos computables: ${r.hijosComputables} · ${fmt(r.cuantiaPorHijoMensual)} €/mes por hijo`,
+                lineaProrrata,
                 `💰 **Complemento: ${fmt(r.complementoMensual)} €/mes (${fmt(r.complementoAnual)} €/año, ${PAGAS_BG} pagas)**`,
                 r.pensionTotalMensual !== undefined ? `Pensión total con complemento: **${fmt(r.pensionTotalMensual)} €/mes**` : null,
               ].filter(l => l !== null).join('\n')
             : r.condicionado
               // Hallazgo 2239: la concurrencia sin saber qué suma es menor no es un «no»
-              ? `⚖️ **Depende de la suma de pensiones:** ${r.motivo}\nSi te corresponde: ${fmt(r.complementoMensual)} €/mes (${fmt(r.complementoAnual)} €/año)`
+              ? `⚖️ **Depende de la suma de pensiones:** ${r.motivo}\nSi te corresponde: ${fmt(r.complementoMensual)} €/mes (${fmt(r.complementoAnual)} €/año)${lineaProrrata ? `\n${lineaProrrata}` : ''}`
               : `❌ **No procede ahora:** ${r.motivo}`,
           '',
           r.tieneDerechoComplemento ? `ℹ️ ${r.motivo}` : null,

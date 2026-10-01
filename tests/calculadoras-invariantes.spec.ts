@@ -2986,6 +2986,93 @@ test.describe('Golden — calcularComplementoBrechaGenero (Capa 1 · art. 60 LGS
     expect(cb.esReclamacion).toBe(false);
     expect(cb.complementoMensual).toBe(0);
     expect(cb.motivo).toContain('suma sea de menor cuantía');
+    // Art. 60.7 LGSS (hallazgo 2538): el paso siguiente dice cómo se compara la suma
+    expect(cb.pasoSiguiente).toContain('sin computar ningún complemento');
+    expect(cb.pasoSiguiente).toContain('60.7');
+  });
+
+  /**
+   * Concurrencia a favor (hallazgos 2543 y 2544, 01/10/2026): mientras lo cobra el otro
+   * progenitor no se reconoce de oficio (art. 60.2: resolución con audiencia, efectos desde
+   * el mes siguiente), y la cita va antes del punto final. El importe no cambia: 2 × 36,90
+   * = 73,80 €/mes, como en GOLDEN-CC1.
+   */
+  test('GOLDEN-CC4: concurrencia a favor → solicitud expresa y cita antes del punto (art. 60.2) [sin contraste oficial]', () => {
+    const cb = calcularComplementoBrechaGenero({
+      sexo: 'mujer',
+      numHijos: 2,
+      tipoPension: 'jubilacion',
+      otroProgenitor: 'percibe',
+      sumaPensionesMenor: 'propia',
+    });
+    expect(cb.complementoMensual).toBeCloseTo(73.80, 2);
+    expect(cb.pasoSiguiente).toContain('solicitud expresa');
+    expect(cb.pasoSiguiente).not.toContain('nómina');
+    expect(cb.pasoSiguiente).toContain('antes de resolver (art. 60.2 LGSS).');
+    expect(cb.pasoSiguiente).not.toContain('resolver. (art. 60.2 LGSS)');
+  });
+
+  /**
+   * Prorrata temporis (art. 60.3.f LGSS, hallazgo 2541, 01/10/2026): el importe real es el
+   * teórico por la prorrata de la pensión. Ningún golden anterior la cubría: son nuevos.
+   *
+   * Resuelto a mano: 2 hijos al 50 % → 2 × 36,90 × 0,50 = 36,90 €/mes · × 14 = 516,60 €/año.
+   * 6 hijos al 40 % → topan en 4: 4 × 36,90 × 0,40 = 59,04 €/mes · × 14 = 826,56 €/año.
+   */
+  test('GOLDEN-CP1: prorrata del 50 %, 2 hijos → 36,90 €/mes y 516,60 €/año [sin contraste oficial]', () => {
+    const cb = calcularComplementoBrechaGenero({
+      sexo: 'mujer',
+      numHijos: 2,
+      tipoPension: 'jubilacion',
+      prorrataPorcentaje: 50,
+    });
+    expect(cb.tieneDerechoComplemento).toBe(true);
+    expect(cb.cuantiaPorHijoMensual).toBeCloseTo(36.90, 2); // el importe TEÓRICO no cambia
+    expect(cb.prorrataPorcentaje).toBe(50);
+    expect(cb.complementoMensual).toBeCloseTo(36.90, 2);
+    expect(cb.complementoAnual).toBeCloseTo(516.60, 2);
+  });
+
+  test('GOLDEN-CP2: prorrata del 40 %, 6 hijos → tope de 4 antes de la prorrata: 59,04 €/mes [sin contraste oficial]', () => {
+    const cb = calcularComplementoBrechaGenero({
+      sexo: 'hombre',
+      numHijos: 6,
+      tipoPension: 'incapacidad_permanente',
+      prorrataPorcentaje: 40,
+    });
+    expect(cb.hijosComputables).toBe(4);
+    expect(cb.complementoMensual).toBeCloseTo(59.04, 2);
+    expect(cb.complementoAnual).toBeCloseTo(826.56, 2);
+  });
+
+  test('GOLDEN-CP3: una prorrata fuera de (0, 100] se rechaza, no se calcula [sin contraste oficial]', () => {
+    for (const prorrataPorcentaje of [0, -10, 120]) {
+      expect(() => calcularComplementoBrechaGenero({
+        sexo: 'mujer',
+        numHijos: 2,
+        tipoPension: 'jubilacion',
+        prorrataPorcentaje,
+      })).toThrow();
+    }
+  });
+
+  /**
+   * Exclusiones del art. 60.3.b) LGSS (hallazgo 2540, 01/10/2026): privación de la patria
+   * potestad o condena por violencia → sin derecho y SIN importe (no un aviso bajo 73,80 €).
+   */
+  test('GOLDEN-CX1: le alcanza una exclusión del art. 60.3.b) → no procede y 0 € [sin contraste oficial]', () => {
+    const cb = calcularComplementoBrechaGenero({
+      sexo: 'hombre',
+      numHijos: 2,
+      tipoPension: 'jubilacion',
+      excluidoArt60_3b: true,
+    });
+    expect(cb.tieneDerechoComplemento).toBe(false);
+    expect(cb.condicionado).toBe(false);
+    expect(cb.complementoMensual).toBe(0);
+    expect(cb.complementoAnual).toBe(0);
+    expect(cb.motivo).toContain('60.3.b)');
+    expect(cb.motivo).toContain('patria potestad');
   });
 
 });

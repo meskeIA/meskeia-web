@@ -7,7 +7,7 @@ import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
   ShareCard, DisclaimerCard, DataReference, RegionBadge,
 } from '@/components';
-import { formatCurrency, formatFechaLarga } from '@/lib';
+import { formatCurrency, formatFechaLarga, formatPercentage, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
   COMPLEMENTO_BRECHA_GENERO_2026,
@@ -22,7 +22,15 @@ import {
  * la web, las dos tools del MCP y el FAQPage cuentan lo mismo por construcción (hallazgo
  * 654, que había dejado «5 requisitos clave» donde el verificador evalúa cuatro).
  */
-import { NUM_REQUISITOS_ART60 } from '@/lib/calculadoras/complementoBrechaGenero';
+import {
+  NUM_REQUISITOS_ART60,
+  conCita,
+  COMO_SE_COMPARA,
+  EXCLUSION_ART60_3B,
+  PASO_EXCLUSION_ART60_3B,
+  PASO_SOLICITUD_CONCURRENCIA,
+  PASO_EXTINCION,
+} from '@/lib/calculadoras/complementoBrechaGenero';
 
 /**
  * Las dos resoluciones que fijan la igualdad de trato, LEÍDAS del módulo fiscal. Iban
@@ -54,6 +62,19 @@ const CONCURRENCIA = COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.entreProgenitor
 const REGLA_CONCURRENCIA =
   `Cada hijo o hija da derecho a un solo complemento (${CONCURRENCIA.unComplementoPorHijo.norma}), ` +
   `y el ${CONCURRENCIA.norma} lo asigna al progenitor ${CONCURRENCIA.criterio}.`;
+/**
+ * CÓMO se compara esa suma: art. 60.7 LGSS, importe inicial revalorizado y SIN complementos
+ * (hallazgo 2538). Hasta el 01/10/2026 la P5 bis mandaba sumar «TODAS» las pensiones, y como
+ * el propio complemento es pensión pública contributiva (art. 60.3), quien ya lo cobraba lo
+ * sumaba y la respuesta se invertía: 900 + 73,80 € frente a 950 € daba el complemento al que
+ * no le correspondía.
+ */
+const COMPARACION = CONCURRENCIA.comparacion;
+
+/** Prorrata temporis del art. 60.3.f) LGSS (hallazgo 2541), leída del módulo */
+const PRORRATA = COMPLEMENTO_BRECHA_GENERO_2026.prorrataTemporis;
+/** Pensiones sobre las que se pregunta la prorrata: las que dan derecho al complemento */
+const TIPOS_CON_PRORRATA: readonly TipoPension[] = ['jubilacion', 'incapacidad', 'viudedad'];
 
 /**
  * Las cifras del complemento se escriben UNA vez, aquí, y se interpolan en toda la página.
@@ -82,7 +103,11 @@ const EXCLUSION_PARCIAL = COMPLEMENTO_BRECHA_GENERO_2026.exclusiones.find(
   e => e.supuesto === 'jubilacion_parcial',
 )!;
 
-/** Cómputo de hijos nacidos con vida que fallecen después — STS 748/2023 (hallazgo 505) */
+/**
+ * Cómputo de hijos nacidos con vida que fallecen después — STS 748/2023 (hallazgo 505). Su
+ * `norma` es el art. 60.3.a) LGSS desde el 01/10/2026: citaba el 60.1, que no dice «con
+ * vida» (hallazgo 2542).
+ */
 const COMPUTO_HIJO_FALLECIDO = COMPLEMENTO_BRECHA_GENERO_2026.computoHijoFallecido;
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -187,6 +212,11 @@ interface Resultado {
   /** true cuando procede porque la suma propia es la menor: se extingue el del otro */
   concurrenciaAFavor?: boolean;
   hijosComputables: number;
+  /**
+   * Prorrata de la pensión (%) aplicada al importe, si se causó por totalización
+   * internacional a prorrata temporis (art. 60.3.f LGSS, hallazgo 2541).
+   */
+  prorrata?: number;
   importeMensual: number;
   importeAnual: number;
   motivo: string;
@@ -204,11 +234,19 @@ function evaluar(
   otroProgenitor: EstadoOtroProgenitor,
   sumaMenor: SumaMenor,
   denegacionPropia: boolean,
+  /** P3 bis: le alcanza una exclusión del art. 60.3.b) LGSS (hallazgo 2540) */
+  excluido: boolean,
+  /** P1 bis: prorrata de la pensión en %, o null si no es a prorrata (hallazgo 2541) */
+  prorrata: number | null,
 ): Resultado {
   const { cuantiaPorHijoMensual, maxHijos, pagasAnuales } = COMPLEMENTO_BRECHA_GENERO_2026;
   const hijosComputables = Math.min(numHijos, maxHijos);
-  const importeMensual = hijosComputables * cuantiaPorHijoMensual;
+  // Art. 60.3.f: con prorrata temporis, la cuantía por hijo es el importe TEÓRICO y se cobra
+  // la prorrata de la pensión. Redondeado al céntimo, como el motor del MCP.
+  const factorProrrata = prorrata !== null ? prorrata / 100 : 1;
+  const importeMensual = Math.round(hijosComputables * cuantiaPorHijoMensual * factorProrrata * 100) / 100;
   const importeAnual = importeMensual * pagasAnuales;
+  const conProrrata = prorrata !== null ? { prorrata } : {};
 
   // Caso 1: no tiene pensión contributiva elegible
   if (tipo === 'no_contributiva') {
@@ -305,6 +343,24 @@ function evaluar(
   }
 
   /**
+   * Caso 3.bis: exclusiones del art. 60.3.b) LGSS (hallazgo 2540). Hasta el 01/10/2026 no
+   * se preguntaban ni se mencionaban, y a quien estaba privado de la patria potestad la app
+   * le daba «+73,80 €/mes · Cumples los requisitos básicos». Un aviso debajo de esa cifra no
+   * bastaba (quien lee se lleva el número), así que se pregunta y, si alcanza, no hay cifra.
+   */
+  if (excluido) {
+    return {
+      procede: false,
+      hijosComputables: 0,
+      importeMensual: 0,
+      importeAnual: 0,
+      motivo: `No procede por el ${EXCLUSION_ART60_3B.norma}. ${EXCLUSION_ART60_3B.detalle}`,
+      esReclamacion: false,
+      pasoSiguiente: PASO_EXCLUSION_ART60_3B,
+    };
+  }
+
+  /**
    * Caso 4: el otro progenitor ya percibe el complemento por los mismos hijos.
    *
    * NO es una incompatibilidad (hallazgo 2239). Hasta el 26/09/2026 esta rama contestaba
@@ -326,10 +382,7 @@ function evaluar(
         `${REGLA_CONCURRENCIA} El otro progenitor ya lo percibe por los mismos hijos y su suma de ` +
         'pensiones públicas es menor que la tuya, así que le corresponde a él o a ella.',
       esReclamacion: false,
-      pasoSiguiente:
-        'Comprueba la comparación con TODAS las pensiones públicas de cada uno (jubilación, ' +
-        'viudedad, incapacidad…), no solo con la que da derecho al complemento: si en realidad tu ' +
-        'suma es la menor, puedes solicitarlo.',
+      pasoSiguiente: `Comprueba la comparación. ${COMO_SE_COMPARA} Si en realidad tu suma es la menor, puedes solicitarlo.`,
     };
   }
   if (otroProgenitor === 'percibe' && sumaMenor === 'desconocida') {
@@ -337,6 +390,7 @@ function evaluar(
       procede: false,
       condicionado: true,
       hijosComputables,
+      ...conProrrata,
       importeMensual,
       importeAnual,
       motivo:
@@ -344,17 +398,25 @@ function evaluar(
         `es la menor, se te reconoce a ti y se extingue el suyo (${CONCURRENCIA.extincion.norma}); ` +
         'si es la suya, lo conserva él o ella.',
       esReclamacion: false,
+      // La regla del art. 60.7 va aquí, que es donde el usuario hace la cuenta (hallazgo 2538)
       pasoSiguiente:
-        'Suma todas las pensiones públicas de cada progenitor (no solo la que da derecho al ' +
-        'complemento), compáralas y contesta la pregunta 5 bis. Si la tuya es la menor, ' +
-        'solicítalo ante el INSS citando el art. 60 LGSS.',
+        `${COMO_SE_COMPARA} Después contesta la pregunta 5 bis. Si la tuya es la menor, ` +
+        `solicítalo ante el INSS citando el art. 60 LGSS. ${COMPARACION.desempate.detalle}`,
     };
   }
   /** Lo que se antepone al motivo y se añade al paso siguiente si la suma propia es la menor */
   const MOTIVO_A_FAVOR =
     `${REGLA_CONCURRENCIA} El otro progenitor ya lo percibe por los mismos hijos, pero tu suma de ` +
     'pensiones públicas es la menor, así que te corresponde a ti. ';
-  const PASO_A_FAVOR = ` ${CONCURRENCIA.extincion.detalle} (${CONCURRENCIA.extincion.norma})`;
+  /**
+   * El paso siguiente de la concurrencia a favor NO es el de la rama general («si no aparece
+   * en tu nómina…»): mientras lo cobra el otro progenitor no va a aparecer solo. Hace falta
+   * solicitud expresa y una resolución, con audiencia al otro y efectos desde el mes
+   * siguiente (art. 60.2, hallazgo 2543). Y la cita va antes del punto final, no colgada
+   * detrás (hallazgo 2544). Las frases son las del motor del MCP: las dos vías dicen lo mismo.
+   */
+  const pasoAFavor = (r: Resultado): string =>
+    `${r.esReclamacion ? r.pasoSiguiente : PASO_SOLICITUD_CONCURRENCIA} ${PASO_EXTINCION}`;
 
   /**
    * Caso 5: al SOLICITANTE le denegaron el complemento en su día.
@@ -366,10 +428,12 @@ function evaluar(
    * abogado a impugnar una resolución denegatoria que el usuario no tenía—. Ahora lo
    * pregunta la P6, y la respuesta de la P5 sobre el otro progenitor no dispara nada.
    */
-  const conConcurrencia = (r: Resultado): Resultado =>
-    concurrenciaAFavor
-      ? { ...r, concurrenciaAFavor: true, motivo: MOTIVO_A_FAVOR + r.motivo, pasoSiguiente: r.pasoSiguiente + PASO_A_FAVOR }
-      : r;
+  const conConcurrencia = (r: Resultado): Resultado => {
+    const conImporte = { ...r, ...conProrrata };
+    return concurrenciaAFavor
+      ? { ...conImporte, concurrenciaAFavor: true, motivo: MOTIVO_A_FAVOR + r.motivo, pasoSiguiente: pasoAFavor(r) }
+      : conImporte;
+  };
 
   if (denegacionPropia) {
     return conConcurrencia({
@@ -408,8 +472,12 @@ function evaluar(
         ? `Tras la STJUE de ${DOCTRINA.stjue.fecha} (${DOCTRINA.stjue.asunto}) y la doctrina del ` +
           `Tribunal Supremo (${DOCTRINA.ts.fecha}), los hombres tienen derecho al complemento en las ` +
           'mismas condiciones que las mujeres. Cumples los requisitos básicos del art. 60 LGSS.'
-        : 'Cumples los requisitos básicos del art. 60 LGSS para reconocimiento automático del ' +
-          'complemento (mujer con pensión contributiva e hijos computables).',
+        // En la concurrencia a favor NO es automático: lo cobra el otro progenitor y hace
+        // falta resolución con audiencia (art. 60.2, hallazgo 2543).
+        : concurrenciaAFavor
+          ? 'Cumples los requisitos básicos del art. 60 LGSS (pensión contributiva e hijos computables).'
+          : 'Cumples los requisitos básicos del art. 60 LGSS para reconocimiento automático del ' +
+            'complemento (mujer con pensión contributiva e hijos computables).',
     esReclamacion: false,
     pasoSiguiente:
       'Si ya cobras la pensión y no aparece el complemento en tu nómina, presenta una solicitud ' +
@@ -448,6 +516,18 @@ export default function VerificadorComplementoBrechaGeneroPage() {
   const [otroProgenitor, setOtroProgenitor] = useState<EstadoOtroProgenitor>('no_percibe');
   const [sumaMenor, setSumaMenor] = useState<SumaMenor>('desconocida');
   const [denegacionPropia, setDenegacionPropia] = useState<boolean>(false);
+  /** P3 bis — exclusiones del art. 60.3.b) LGSS (hallazgo 2540) */
+  const [excluido, setExcluido] = useState<boolean>(false);
+  /**
+   * P1 bis — pensión a prorrata temporis (art. 60.3.f LGSS, hallazgo 2541). La prorrata se
+   * guarda como TEXTO, como el número de hijos, y se lee con `parseSpanishNumber`: «37,5»
+   * es 37,5 % y lo que no es un número no se convierte en otro.
+   */
+  const [aProrrata, setAProrrata] = useState<boolean>(false);
+  const [prorrataTexto, setProrrataTexto] = useState<string>('');
+  const prorrataAplica = TIPOS_CON_PRORRATA.includes(tipo) && aProrrata;
+  const prorrataLeida = parseSpanishNumber(prorrataTexto);
+  const prorrataEsValida = Number.isFinite(prorrataLeida) && prorrataLeida > 0 && prorrataLeida <= 100;
   const [evaluado, setEvaluado] = useState(false);
   /**
    * Cuántas veces se ha pulsado «Verificar mi derecho». Es la señal para llevar el
@@ -495,9 +575,32 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           pasoSiguiente: `Escribe en la pregunta 3 un número entero de 0 a ${LIMITE_HIJOS_CAMPO} y vuelve a verificar.`,
         };
       }
-      return evaluar(tipo, fecha, hijos, genero, otroProgenitor, sumaMenor, denegacionPropia);
+      const r = evaluar(
+        tipo, fecha, hijos, genero, otroProgenitor, sumaMenor, denegacionPropia, excluido,
+        prorrataAplica && prorrataEsValida ? prorrataLeida : null,
+      );
+      // Pensión a prorrata sin una prorrata válida: si el veredicto lleva cifra, no se da.
+      // El importe íntegro sería falso, y un aviso debajo no lo arregla (hallazgo 2541).
+      if (prorrataAplica && !prorrataEsValida && (r.procede || r.condicionado)) {
+        return {
+          procede: false,
+          sinCalcular: true,
+          hijosComputables: 0,
+          importeMensual: 0,
+          importeAnual: 0,
+          motivo: prorrataTexto.trim() === ''
+            ? 'Falta la prorrata de tu pensión, así que no hay importe que calcular todavía: con prorrata, el complemento se reduce en ella.'
+            : `«${prorrataTexto}» no es una prorrata válida (un porcentaje mayor que 0 y no mayor que 100), así que no hay importe que calcular todavía.`,
+          esReclamacion: false,
+          pasoSiguiente:
+            'Escribe en la pregunta 1 bis el porcentaje de prorrata que figura en la resolución de tu ' +
+            'pensión y vuelve a verificar.',
+        };
+      }
+      return r;
     },
-    [tipo, fecha, hijos, hijosEsValido, hijosSuperaLimite, hijosTexto, genero, otroProgenitor, sumaMenor, denegacionPropia],
+    [tipo, fecha, hijos, hijosEsValido, hijosSuperaLimite, hijosTexto, genero, otroProgenitor, sumaMenor,
+      denegacionPropia, excluido, prorrataAplica, prorrataEsValida, prorrataLeida, prorrataTexto],
   );
 
   const reset = () => {
@@ -594,6 +697,60 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             />
           </div>
 
+          {/* P1 bis: prorrata temporis (art. 60.3.f LGSS, hallazgo 2541). Solo para las
+              pensiones que dan derecho al complemento. Se pregunta y se CALCULA: con un aviso
+              bajo el importe íntegro, quien lee se llevaba el doble de lo que le corresponde
+              con una prorrata del 50 %. */}
+          {TIPOS_CON_PRORRATA.includes(tipo) && (
+            <div className={styles.formGroup}>
+              <p className={styles.label} id="p1bis-titulo">
+                1 bis. ¿Tu pensión se calcula a prorrata por haber cotizado también en otro país?
+              </p>
+              <GrupoRadio<boolean>
+                idTitulo="p1bis-titulo"
+                idAyuda="p1bis-ayuda"
+                apilado
+                opciones={[
+                  { id: false, label: 'No, solo con cotizaciones en España' },
+                  { id: true, label: 'Sí, a prorrata (totalización internacional)' },
+                ]}
+                valor={aProrrata}
+                onElegir={(v) => { setAProrrata(v); reset(); }}
+              />
+              <p className={styles.hint} id="p1bis-ayuda">
+                {conCita(PRORRATA.detalle, PRORRATA.norma)}
+              </p>
+              {aProrrata && (
+                <>
+                  <label className={styles.label} htmlFor="prorrata">
+                    Prorrata española de tu pensión (%)
+                  </label>
+                  <input
+                    id="prorrata"
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
+                    className={styles.input}
+                    value={prorrataTexto}
+                    placeholder="Por ejemplo, 37,5"
+                    onChange={e => { setProrrataTexto(e.target.value); reset(); }}
+                    aria-invalid={prorrataTexto.trim() !== '' && !prorrataEsValida}
+                    aria-describedby="prorrata-ayuda"
+                  />
+                  {prorrataTexto.trim() !== '' && !prorrataEsValida && (
+                    <p className={styles.hint} role="alert">
+                      <span aria-hidden="true">⚠️</span> Escribe un porcentaje mayor que 0 y no mayor que 100: «{prorrataTexto}» no se interpreta.
+                    </p>
+                  )}
+                  <p className={styles.hint} id="prorrata-ayuda">
+                    Figura en la resolución de tu pensión: es la parte que paga España por los períodos
+                    cotizados aquí.
+                  </p>
+                </>
+              )}
+            </div>
+          )}
+
           {/* P2: fecha del hecho causante */}
           <div className={styles.formGroup}>
             <p className={styles.label} id="p2-titulo">
@@ -643,6 +800,28 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             <p className={styles.hint} id="hijos-ayuda">
               Cuentan hijos/as nacidos con vida o adoptados antes del hecho causante de la pensión.
               El complemento se calcula como máximo sobre {MAX_HIJOS} hijos.
+            </p>
+          </div>
+
+          {/* P3 bis: exclusiones del art. 60.3.b) LGSS (hallazgo 2540). Se preguntan porque
+              un aviso bajo la cifra no basta: si alcanzan, no hay derecho y no hay importe. */}
+          <div className={styles.formGroup}>
+            <p className={styles.label} id="p3bis-titulo">
+              3 bis. ¿Te alcanza alguna de las exclusiones del {EXCLUSION_ART60_3B.norma}?
+            </p>
+            <GrupoRadio<boolean>
+              idTitulo="p3bis-titulo"
+              idAyuda="p3bis-ayuda"
+              apilado
+              opciones={[
+                { id: false, label: 'No me alcanza ninguna' },
+                { id: true, label: 'Sí, me alcanza alguna' },
+              ]}
+              valor={excluido}
+              onElegir={(v) => { setExcluido(v); reset(); }}
+            />
+            <p className={styles.hint} id="p3bis-ayuda">
+              {EXCLUSION_ART60_3B.detalle}
             </p>
           </div>
 
@@ -709,10 +888,13 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 valor={sumaMenor}
                 onElegir={(v) => { setSumaMenor(v); reset(); }}
               />
+              {/* La regla del art. 60.7 decide la comparación (hallazgo 2538): sin ella, quien ya
+                  cobra el complemento lo sumaba y la respuesta se invertía. */}
               <p className={styles.hint} id="p5bis-ayuda">
-                Suma TODAS las pensiones públicas de cada uno, no solo la que da derecho al
-                complemento: con jubilación de 900 € más viudedad de 600 € (1.500 €) frente a una
-                jubilación de 1.200 €, la suma menor es la segunda.
+                Cuentan todas las pensiones públicas de cada uno, no solo la que da derecho al
+                complemento, pero {COMPARACION.detalle} ({COMPARACION.norma}). Con jubilación de
+                900 € más viudedad de 600 € (1.500 €) frente a una jubilación de 1.200 €, la suma
+                menor es la segunda. {COMPARACION.desempate.detalle}
               </p>
             </div>
           )}
@@ -819,9 +1001,15 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                     <strong>{resultado.hijosComputables} (máx. {COMPLEMENTO_BRECHA_GENERO_2026.maxHijos})</strong>
                   </div>
                   <div className={styles.desgloseItem}>
-                    <span>Cuantía por hijo</span>
+                    <span>Cuantía por hijo{resultado.prorrata !== undefined ? ' (importe teórico)' : ''}</span>
                     <strong>{formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual)}/mes</strong>
                   </div>
+                  {resultado.prorrata !== undefined && (
+                    <div className={styles.desgloseItem}>
+                      <span>Prorrata de tu pensión ({PRORRATA.norma})</span>
+                      <strong>{formatPercentage(resultado.prorrata / 100)}</strong>
+                    </div>
+                  )}
                   <div className={styles.desgloseItem}>
                     <span>Mensual estimado</span>
                     <strong>{formatCurrency(resultado.importeMensual)}/mes</strong>
@@ -974,8 +1162,10 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 complemento por esos hijos: el que sea titular de pensiones públicas cuya suma sea
                 de menor cuantía ({CONCURRENCIA.norma}). Cuenta la suma, no una sola pensión: con
                 jubilación de 900 € más viudedad de 600 € (1.500 €) frente a una jubilación de
-                1.200 €, le corresponde a quien cobra 1.200 €. Y que el otro ya lo perciba no cierra
-                nada: reconocérselo al segundo extingue el del primero ({CONCURRENCIA.extincion.norma}).
+                1.200 €, le corresponde a quien cobra 1.200 €. Y en esa suma no entra ningún
+                complemento: {COMPARACION.detalle} ({COMPARACION.norma}). Que el otro ya lo perciba
+                no cierra nada: reconocérselo al segundo extingue el del primero, previa solicitud
+                expresa ({CONCURRENCIA.extincion.norma}).
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -997,7 +1187,28 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <p>
                 En muchos casos el INSS lo reconoce automáticamente al resolver la pensión. Si no
                 aparece en la nómina, conviene pedirlo por escrito ante el INSS citando el art. 60
-                LGSS.
+                LGSS. Si el otro progenitor ya lo cobra por los mismos hijos, hay que pedirlo
+                siempre: {conCita(CONCURRENCIA.extincion.detalle, CONCURRENCIA.extincion.norma)}{' '}
+                {CONCURRENCIA.extincion.efectos}
+              </p>
+            </div>
+            {/* Hallazgo 2540: el art. 60.3.b) no aparecía en ninguna parte de la página */}
+            <div className={styles.faqItem}>
+              <h3>¿Hay casos en que no se reconoce aunque se cumplan los requisitos?</h3>
+              <p>
+                Sí. {conCita(EXCLUSION_ART60_3B.detalle, EXCLUSION_ART60_3B.norma)} La norma no distingue
+                por hijo: si la sentencia o la condena afecta solo a alguno, conviene consultarlo con
+                un abogado laboralista.
+              </p>
+            </div>
+            {/* Hallazgo 2541: la prorrata del art. 60.3.f) tampoco aparecía */}
+            <div className={styles.faqItem}>
+              <h3>¿Y si mi pensión se calcula a prorrata porque coticé en otro país?</h3>
+              <p>
+                {conCita(PRORRATA.detalle, PRORRATA.norma)} Con una prorrata española del {PORCENTAJE(50)} y 2 hijos,
+                el complemento es 2 × {CUANTIA_MES} × 0,50 ={' '}
+                {formatCurrency(2 * COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual * 0.5)}/mes.
+                El verificador lo calcula si lo indicas en la pregunta 1 bis.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -1020,9 +1231,10 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             <div className={styles.faqItem}>
               {/* El titular enuncia la REGLA (nacer con vida), no una edad: hasta el
                   09/09/2026 decía «¿Y los hijos fallecidos antes de los 16 años?», un umbral
-                  que no está ni en el art. 60.1 LGSS ni en la STS que la respuesta cita, y
+                  que no está ni en el art. 60.3.a) LGSS ni en la STS que la respuesta cita, y
                   que dejaba fuera —en apariencia— a quien perdió a un hijo más tarde, cuando
-                  la regla también le da derecho (hallazgo 655). */}
+                  la regla también le da derecho (hallazgo 655). La norma se cita desde el
+                  módulo: el art. 60.3.a), párrafo segundo, no el 60.1 (hallazgo 2542). */}
               <h3>¿Cuenta un hijo o hija que nació con vida y falleció después?</h3>
               <p>
                 {COMPUTO_HIJO_FALLECIDO.detalle} Lo fija la {COMPUTO_HIJO_FALLECIDO.sentencia},
