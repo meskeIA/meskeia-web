@@ -106,10 +106,13 @@ export default function CasosAula() {
             {c.id}
           </button>
         ))}
+        {/* Acción, no conmutador: cada pulsación genera otro ejercicio, así que no lleva
+            aria-pressed (se anunciaba «presionado» y no se soltaba nunca, hallazgo 2579). Que se
+            está practicando lo dice el <h3> «Ejercicio de práctica»; el resaltado es solo visual.
+            a11y-ok: acción que genera otro ejercicio, no conmutador (hallazgo 2579) */}
         <button
           type="button"
           className={`${styles.casoBoton} ${styles.casoBotonPractica} ${practica ? styles.casoBotonActivo : ''}`}
-          aria-pressed={practica !== null}
           onClick={nuevaPractica}
         >
           <span aria-hidden="true">🎲</span> Practicar

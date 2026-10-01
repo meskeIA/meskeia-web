@@ -110,12 +110,15 @@ export default function CalculadoraSistemasNumericosPage() {
 
       <div className={styles.mainContent}>
         {/* Panel de Conversión */}
-        <section className={styles.conversionSection}>
-          <h2 className={styles.sectionTitle}>📐 Conversión de Bases</h2>
+        {/* Cada panel es una región con el nombre de su <h2>, y cada juego de botones un grupo
+            con su rótulo: antes eran <label> sin control y un lector oía dos veces «BIN,
+            conmutador» sin saber de qué panel era (hallazgo 2578). */}
+        <section className={styles.conversionSection} aria-labelledby="titulo-conversion">
+          <h2 className={styles.sectionTitle} id="titulo-conversion"><span aria-hidden="true">📐</span> Conversión de Bases</h2>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Base de entrada:</label>
-            <div className={styles.baseSelector}>
+            <span className={styles.label} id="rotulo-base-conversion">Base de entrada:</span>
+            <div className={styles.baseSelector} role="group" aria-labelledby="rotulo-base-conversion">
               {([2, 8, 10, 16] as Base[]).map(base => (
                 <button
                   key={base}
@@ -215,16 +218,18 @@ export default function CalculadoraSistemasNumericosPage() {
 
           {result && result.pasos.length > 0 && (
             <div className={styles.stepsSection}>
+              {/* Desplegable, no conmutador: aria-expanded + aria-controls (hallazgo 2577). */}
               <button
                 type="button"
                 onClick={() => setShowSteps(!showSteps)}
-                aria-pressed={showSteps}
+                aria-expanded={showSteps}
+                aria-controls="pasos-conversion"
                 className={styles.stepsToggle}
               >
-                {showSteps ? '▼' : '▶'} Ver proceso paso a paso
+                <span aria-hidden="true">{showSteps ? '▼' : '▶'}</span> Ver proceso paso a paso
               </button>
               {showSteps && (
-                <div className={styles.stepsContent}>
+                <div className={styles.stepsContent} id="pasos-conversion">
                   {result.pasos.map((step, i) => (
                     <div key={i} className={styles.step}>{step}</div>
                   ))}
@@ -235,12 +240,12 @@ export default function CalculadoraSistemasNumericosPage() {
         </section>
 
         {/* Panel de Operaciones */}
-        <section className={styles.operationsSection}>
-          <h2 className={styles.sectionTitle}>⚡ Operaciones Binarias</h2>
+        <section className={styles.operationsSection} aria-labelledby="titulo-operaciones">
+          <h2 className={styles.sectionTitle} id="titulo-operaciones"><span aria-hidden="true">⚡</span> Operaciones Binarias</h2>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Base de entrada:</label>
-            <div className={styles.baseSelector}>
+            <span className={styles.label} id="rotulo-base-operaciones">Base de entrada:</span>
+            <div className={styles.baseSelector} role="group" aria-labelledby="rotulo-base-operaciones">
               {([2, 8, 10, 16] as Base[]).map(base => (
                 <button
                   key={base}
@@ -256,8 +261,8 @@ export default function CalculadoraSistemasNumericosPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Ancho de bits:</label>
-            <div className={styles.baseSelector}>
+            <span className={styles.label} id="rotulo-ancho">Ancho de bits:</span>
+            <div className={styles.baseSelector} role="group" aria-labelledby="rotulo-ancho">
               {ANCHOS.map(bits => (
                 <button
                   key={bits}
@@ -301,8 +306,8 @@ export default function CalculadoraSistemasNumericosPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Operación:</label>
-            <div className={styles.operationSelector}>
+            <span className={styles.label} id="rotulo-operacion">Operación:</span>
+            <div className={styles.operationSelector} role="group" aria-labelledby="rotulo-operacion">
               {(Object.keys(operationLabels) as Operacion[]).map(op => (
                 <button
                   key={op}
@@ -354,7 +359,7 @@ export default function CalculadoraSistemasNumericosPage() {
 
       {/* Tabla de referencia */}
       <section className={styles.referenceSection}>
-        <h2 className={styles.sectionTitle}>📚 Tabla de Referencia Rápida</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📚</span> Tabla de Referencia Rápida</h2>
         <div className={styles.referenceTable}>
           <table>
             <thead>
@@ -391,7 +396,7 @@ export default function CalculadoraSistemasNumericosPage() {
         {/* 1. Tabla Comparativa */}
         <div style={{ marginBottom: 'var(--spacing-xl)' }}>
           <h3 style={{ color: 'var(--text-primary)', marginBottom: 'var(--spacing-lg)', fontSize: '1.4rem' }}>
-            📊 Los 4 Sistemas Numéricos: Comparativa
+            <span aria-hidden="true">📊</span> Los 4 Sistemas Numéricos: Comparativa
           </h3>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -469,7 +474,7 @@ export default function CalculadoraSistemasNumericosPage() {
         {/* 2. Casos de Uso Prácticos */}
         <div style={{ marginBottom: 'var(--spacing-xl)' }}>
           <h3 style={{ color: 'var(--text-primary)', marginBottom: 'var(--spacing-lg)', fontSize: '1.4rem' }}>
-            🎯 Casos de Uso Prácticos
+            <span aria-hidden="true">🎯</span> Casos de Uso Prácticos
           </h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
@@ -478,7 +483,7 @@ export default function CalculadoraSistemasNumericosPage() {
                 <strong>Electrónica y hardware digital</strong>
               </div>
               <p className={styles.escenarioExample}>
-                El binario es el lenguaje de los circuitos. Un transistor = 1 bit (0V = 0, 5V = 1). Los ingenieros diseñan puertas lógicas AND/OR/XOR que operan en binario. Ej: un sumador de 8 bits = 8 puertas lógicas en cascada.
+                El binario es el lenguaje de los circuitos: cada señal es un bit, tensión baja = 0 y alta = 1 (5 V en la lógica TTL clásica, bastante menos en los chips actuales). Los ingenieros combinan puertas lógicas AND/OR/XOR que operan en binario. Ej: un sumador de 8 bits = 8 sumadores completos en cascada, cada uno con su suma y su acarreo de salida, y de varias puertas (dos XOR para la suma; dos AND y un OR para el acarreo).
               </p>
               <span className={styles.escenarioTip}>Base fundamental del hardware</span>
             </div>
@@ -538,7 +543,7 @@ export default function CalculadoraSistemasNumericosPage() {
         {/* 3. FAQ Ampliado */}
         <div style={{ marginBottom: 'var(--spacing-xl)' }}>
           <h3 style={{ color: 'var(--text-primary)', marginBottom: 'var(--spacing-lg)', fontSize: '1.4rem' }}>
-            ❓ Preguntas Frecuentes
+            <span aria-hidden="true">❓</span> Preguntas Frecuentes
           </h3>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
@@ -547,7 +552,7 @@ export default function CalculadoraSistemasNumericosPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Para qué sirve el hexadecimal si tenemos decimal?</h4>
-              <p>Cada dígito hex representa exactamente 4 bits (un nibble). Un byte = 2 dígitos hex. 1 GB = 0x40000000 (8 dígitos vs 10 decimales). Más compacto para leer datos binarios. Los colores RGB (0-255) se expresan perfectamente en 2 dígitos hex.</p>
+              <p>Cada dígito hex representa exactamente 4 bits (un nibble). Un byte = 2 dígitos hex. Las potencias de 2 salen redondas: 1 GiB = 2^30 bytes = 0x40000000 (8 dígitos hex frente a los 10 de 1073741824). En cambio 1 GB = 10^9 bytes = 0x3B9ACA00, redondo solo en decimal. Más compacto para leer datos binarios. Los colores RGB (0-255) se expresan perfectamente en 2 dígitos hex.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cuándo se usa el octal hoy en día?</h4>
@@ -563,11 +568,11 @@ export default function CalculadoraSistemasNumericosPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué es un nibble, un byte y una palabra?</h4>
-              <p>Nibble = 4 bits = 1 dígito hex (0-15). Byte = 8 bits = 2 dígitos hex (0-255). Word = depende de la arquitectura (16 bits en x86 legacy, 32 en 32-bit, 64 en 64-bit). Kilobyte = 1024 bytes = 2^10 (no 1000).</p>
+              <p>Nibble = 4 bits = 1 dígito hex (0-15). Byte = 8 bits = 2 dígitos hex (0-255). Word = depende de la arquitectura (16 bits en x86 legacy, 32 en 32-bit, 64 en 64-bit). Kilobyte (kB) = 1000 bytes = 10^3, como todo «kilo»; 1024 bytes = 2^10 es un kibibyte (KiB).</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Por qué 1 KB son 1024 bytes y no 1000?</h4>
-              <p>En binario, las potencias de 2 son naturales: 2^10 = 1024 ≈ 1000. Los fabricantes de discos usan 1000 (decimal), el SO muestra 1024 (binario). Por eso un disco de "1 TB" aparece como 931 GB en Windows. ISO definió KiB (kibibyte = 1024) para distinguir.</p>
+              <h4>¿Un kilobyte son 1000 o 1024 bytes?</h4>
+              <p>1000. «Kilo» significa 10^3 en el Sistema Internacional, así que 1 kB = 1000 bytes, 1 MB = 10^6 y 1 GB = 10^9. Como en binario 2^10 = 1024 ≈ 1000, durante décadas se escribió «KB» también para 1024 bytes, y de ahí la confusión. En 1998 la IEC (Comisión Electrotécnica Internacional) creó los prefijos binarios: kibibyte (KiB) = 1024 bytes, mebibyte (MiB) = 1024², gibibyte (GiB) = 1024³. Los fabricantes de discos usan los decimales y Windows divide entre 1024 aunque escriba «GB»: por eso un disco de 1 TB (10^12 bytes) aparece como unos 931 «GB», que en realidad son GiB.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cómo convierto mentalmente hex a binario rápido?</h4>
@@ -579,7 +584,7 @@ export default function CalculadoraSistemasNumericosPage() {
         {/* 4. Guía Paso a Paso */}
         <div style={{ marginBottom: 'var(--spacing-xl)' }}>
           <h3 style={{ color: 'var(--text-primary)', marginBottom: 'var(--spacing-lg)', fontSize: '1.4rem' }}>
-            📋 Guía Paso a Paso: Convertir entre Bases
+            <span aria-hidden="true">📋</span> Guía Paso a Paso: Convertir entre Bases
           </h3>
           <div className={styles.stepGuide}>
             {[
@@ -633,7 +638,7 @@ export default function CalculadoraSistemasNumericosPage() {
         {/* 5. Mejores Prácticas */}
         <div style={{ marginBottom: 'var(--spacing-xl)' }}>
           <h3 style={{ color: 'var(--text-primary)', marginBottom: 'var(--spacing-lg)', fontSize: '1.4rem' }}>
-            ✅ Mejores Prácticas
+            <span aria-hidden="true">✅</span> Mejores Prácticas
           </h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
@@ -654,7 +659,7 @@ export default function CalculadoraSistemasNumericosPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Piensa en potencias de 2</strong>
-              <p>2^8=256, 2^10=1024≈1K, 2^16=65536, 2^32=4G. Memorizar estas potencias acelera el trabajo con sistemas de 8, 16, 32 y 64 bits.</p>
+              <p>2^8=256, 2^10=1024 (1 Ki), 2^16=65.536 (64 Ki), 2^32=4.294.967.296 (4 Gi). Memorizar estas potencias acelera el trabajo con sistemas de 8, 16, 32 y 64 bits.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">✅</span>
@@ -679,8 +684,8 @@ export default function CalculadoraSistemasNumericosPage() {
             <li><strong>El cero inicial en C/C++ significa octal:</strong> <code>int x = 0755;</code> NO es 755 decimal, es 755 en octal = 493 decimal. Un bug clásico en permisos de archivos programados en C.</li>
             <li><strong>Confundir unsigned y signed en operaciones de bits:</strong> En C, <code>char</code> puede ser signed (-128 a 127) o unsigned (0-255) según la plataforma. <code>(char)0xFF = -1</code> en signed, 255 en unsigned. Usar <code>uint8_t</code> para ser explícito.</li>
             <li><strong>Overflow silencioso:</strong> <code>uint8_t x = 255; x++;</code> → x = 0, sin error ni aviso. En Python los enteros son de precisión arbitraria (no hay overflow). En C/Java/Rust sí ocurre.</li>
-            <li><strong>Shift de bits fuera de rango:</strong> <code>1 &lt;&lt; 32</code> en C con int de 32 bits es undefined behavior. En JavaScript los bits extras se descartan. Usa <code>BigInt</code> en JS o <code>1LL &lt;&lt; 32</code> en C para shifts grandes.</li>
-            <li><strong>Mezclar BIN y OCT mentalmente:</strong> El octal NO incluye los dígitos 8 y 9. <code>078</code> es inválido en octal. En Python 3, <code>0o78</code> da error de sintaxis (correcto). En Python 2, <code>078</code> era tratado como decimal (bug silencioso).</li>
+            <li><strong>Shift de bits fuera de rango:</strong> <code>1 &lt;&lt; 32</code> en C con int de 32 bits es undefined behavior. En JavaScript el contador se toma módulo 32, así que <code>1 &lt;&lt; 32</code> vale 1. Usa <code>BigInt</code> en JS o <code>1LL &lt;&lt; 32</code> en C para shifts grandes.</li>
+            <li><strong>Mezclar BIN y OCT mentalmente:</strong> El octal NO incluye los dígitos 8 y 9. <code>078</code> es inválido en octal. En Python 3, <code>0o78</code> da error de sintaxis. En Python 2, <code>078</code> también era un error de sintaxis, pero <code>017</code> se leía en silencio como octal (vale 15, no 17): por eso Python 3 exige el prefijo <code>0o</code> y rechaza <code>017</code>.</li>
             <li><strong>Asumir que -1 en hex es 0xFF:</strong> Solo es cierto para 8 bits. En 16 bits, -1 = 0xFFFF. En 32 bits, -1 = 0xFFFFFFFF. Al hacer cast de tipos distintos, los bits extra se propagan o truncan.</li>
           </ul>
         </div>
@@ -688,26 +693,26 @@ export default function CalculadoraSistemasNumericosPage() {
         {/* 7. Conceptos Clave (infoCards originales) */}
         <div>
           <h3 style={{ color: 'var(--text-primary)', marginBottom: 'var(--spacing-lg)', fontSize: '1.4rem' }}>
-            💡 Conceptos Clave
+            <span aria-hidden="true">💡</span> Conceptos Clave
           </h3>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
-              <h3>🔢 Binario (Base 2)</h3>
+              <h3><span aria-hidden="true">🔢</span> Binario (Base 2)</h3>
               <p>Usa solo 0 y 1. Es el lenguaje nativo de los ordenadores. Cada dígito se llama "bit".</p>
               <code>1010₂ = 1×8 + 0×4 + 1×2 + 0×1 = 10₁₀</code>
             </div>
             <div className={styles.infoCard}>
-              <h3>8️⃣ Octal (Base 8)</h3>
+              <h3><span aria-hidden="true">8️⃣</span> Octal (Base 8)</h3>
               <p>Usa dígitos del 0 al 7. Cada dígito octal representa exactamente 3 bits.</p>
               <code>12₈ = 1×8 + 2×1 = 10₁₀</code>
             </div>
             <div className={styles.infoCard}>
-              <h3>🔟 Decimal (Base 10)</h3>
+              <h3><span aria-hidden="true">🔟</span> Decimal (Base 10)</h3>
               <p>El sistema que usamos habitualmente. Usa dígitos del 0 al 9.</p>
               <code>10₁₀ = 1×10 + 0×1 = 10₁₀</code>
             </div>
             <div className={styles.infoCard}>
-              <h3>🔤 Hexadecimal (Base 16)</h3>
+              <h3><span aria-hidden="true">🔤</span> Hexadecimal (Base 16)</h3>
               <p>Usa 0-9 y A-F (A=10, B=11... F=15). Muy usado en programación para representar colores, direcciones de memoria, etc.</p>
               <code>A₁₆ = 10₁₀ | FF₁₆ = 255₁₀</code>
             </div>

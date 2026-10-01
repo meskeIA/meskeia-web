@@ -183,6 +183,21 @@ export function operar(a: number, b: number, op: Operacion, bits: number): Resul
   const A = BigInt(a) & mascara;
   const B = BigInt(b) & mascara;
 
+  // Un operando que no cabe en el registro se guarda recortado, como la suma que desborda,
+  // y se dice con las mismas palabras. Hasta el 01/10/2026 el recorte era mudo: 300 + 1 en
+  // 8 bits explicaba «44 + 1 = 45» sin nombrar el 300 (hallazgo 2575). En NOT no hay B, y en
+  // los desplazamientos B es un contador de posiciones, no un valor del registro.
+  const recortes: string[] = [];
+  const avisarRecorte = (nombre: string, original: number, guardado: bigint) => {
+    if (BigInt(original) > mascara) {
+      recortes.push(
+        `El operando ${nombre}, ${original}, no cabe en ${bits} bits (máximo ${mascara}): el registro guarda el resto módulo ${2 ** bits}, ${guardado}.`
+      );
+    }
+  };
+  avisarRecorte('A', a, A);
+  if (op !== 'not' && op !== 'shl' && op !== 'shr') avisarRecorte('B', b, B);
+
   let resultado: bigint;
   let explicacion: string;
 
@@ -241,6 +256,8 @@ export function operar(a: number, b: number, op: Operacion, bits: number): Resul
     default:
       return { ok: false, error: 'Operación desconocida' };
   }
+
+  if (recortes.length > 0) explicacion = `${recortes.join(' ')} ${explicacion}`;
 
   return { ok: true, resultado: Number(resultado), explicacion };
 }

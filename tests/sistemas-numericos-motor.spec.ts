@@ -94,6 +94,69 @@ test.describe('Hallazgo 939 — la resta dice lo que vale el complemento a dos',
   });
 });
 
+/*
+ * Hallazgo 2575 (01/10/2026): un operando que no cabe en el ancho se recortaba EN SILENCIO.
+ * Se mantiene la semántica de registro (lo que no cabe se pierde, igual que en la suma que
+ * desborda) y se EXPLICA el recorte con las mismas palabras. Resuelto a mano:
+ *   300 en 8 bits: 300 − 256 = 44 → 44 + 1 = 45
+ *   300 como B:    1 + 44 = 45
+ *   256 en 8 bits: 256 − 256 = 0 → NOT 00000000 = 11111111 = 255
+ *   20 en 4 bits:  20 − 16 = 4 → 0100 OR 0000 = 0100 = 4
+ *   1 << 300 en 8 bits: 300 es un CONTADOR, no un valor del registro → 0, sin aviso de recorte
+ */
+test.describe('Hallazgo 2575 — el operando que no cabe en el ancho se explica, no se recorta mudo', () => {
+  test('300 + 1 en 8 bits da 45 y dice de dónde sale el 44', () => {
+    const r = operar(300, 1, 'add', 8);
+    if (!r.ok) throw new Error(r.error);
+    expect(r.resultado).toBe(45);
+    expect(r.explicacion).toContain('El operando A, 300, no cabe en 8 bits (máximo 255)');
+    expect(r.explicacion).toContain('resto módulo 256, 44');
+    expect(r.explicacion.endsWith('44 + 1 = 45')).toBe(true);
+  });
+
+  test('también el operando B', () => {
+    const r = operar(1, 300, 'add', 8);
+    if (!r.ok) throw new Error(r.error);
+    expect(r.resultado).toBe(45);
+    expect(r.explicacion).toContain('El operando B, 300, no cabe en 8 bits');
+    expect(r.explicacion).not.toContain('operando A');
+  });
+
+  test('NOT y las lógicas también avisan; los desplazamientos no confunden el contador con un valor', () => {
+    const n = operar(256, 0, 'not', 8);
+    if (!n.ok) throw new Error(n.error);
+    expect(n.resultado).toBe(255);
+    expect(n.explicacion).toContain('El operando A, 256, no cabe en 8 bits');
+
+    const o = operar(20, 0, 'or', 4);
+    if (!o.ok) throw new Error(o.error);
+    expect(o.resultado).toBe(4);
+    expect(o.explicacion).toContain('resto módulo 16, 4');
+
+    const s = operar(1, 300, 'shl', 8);
+    if (!s.ok) throw new Error(s.error);
+    expect(s.resultado).toBe(0);
+    expect(s.explicacion).not.toContain('no cabe en 8 bits (máximo');
+  });
+
+  test('control: el desbordamiento de la SUMA sigue explicándose igual y sin aviso de operando', () => {
+    const r = operar(255, 1, 'add', 8);
+    if (!r.ok) throw new Error(r.error);
+    expect(r.explicacion).toBe(
+      '255 + 1 = 256, que no cabe en 8 bits: se conserva el resto módulo 256, 0',
+    );
+  });
+
+  test('desde la vista: calcularOperacion pasa el aviso tal cual', () => {
+    const r = calcularOperacion('300', '1', 'add', 10, 8);
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.resultado).toBe(45);
+      expect(r.explicacion).toContain('300');
+    }
+  });
+});
+
 test.describe('Hallazgo 937 — un operando inválido se rechaza con mensaje', () => {
   test('el 2 no es un dígito binario', () => {
     const r = calcularOperacion('1010', '2', 'add', 2, 8);

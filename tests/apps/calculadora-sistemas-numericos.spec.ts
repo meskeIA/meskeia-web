@@ -758,15 +758,19 @@ test.describe('re-inspección 01/10/2026 · los doce casos en el navegador', () 
     await expect(casilla(page)).toHaveValue('');
   });
 
-  test('HALLAZGO E (bajo) — «Practicar» no es un conmutador: pulsado dos veces sigue «presionado»', async ({ page }) => {
-    // ABIERTO, hallazgo: «Practicar» lleva aria-pressed pero es una acción (cada pulsación da
-    // otro ejercicio). Un lector anuncia «conmutador, presionado» y al pulsarlo no se suelta.
-    test.fail();
+  test('HALLAZGO E · 2579 (bajo) — «Practicar» es una acción y no lleva aria-pressed', async ({ page }) => {
+    // REPARADO (01/10/2026), hallazgo 2579: llevaba aria-pressed siendo una acción (cada
+    // pulsación da otro ejercicio), así que se anunciaba «presionado» y no se soltaba nunca.
+    // Se elige quitarlo y no convertirlo en conmutador: pulsarlo otra vez debe dar OTRO
+    // ejercicio, no salir de la práctica. Que se está practicando lo dice el <h3>.
     const practicar = seccion(page).getByRole('button', { name: /Practicar/ });
+    await expect(practicar).not.toHaveAttribute('aria-pressed', /.*/);
     await practicar.click();
     await expect(seccion(page).getByRole('heading', { level: 3 }).first()).toHaveText('Ejercicio de práctica');
+    await expect(practicar).not.toHaveAttribute('aria-pressed', /.*/);
     await practicar.click();
-    await expect(practicar).not.toHaveAttribute('aria-pressed', 'true');
+    await expect(seccion(page).getByRole('heading', { level: 3 }).first()).toHaveText('Ejercicio de práctica');
+    await expect(practicar).not.toHaveAttribute('aria-pressed', /.*/);
   });
 });
 
@@ -881,38 +885,59 @@ test.describe('re-inspección 01/10/2026 · la calculadora', () => {
     await expect(tarjetaOperacion(page).locator('[class*="opExplanation"]')).toContainText('11111001');
   });
 
-  test('HALLAZGO A (bajo) — un operando que no cabe en 8 bits se recorta sin decirlo', async ({ page }) => {
-    // ABIERTO, hallazgo: 300 + 1 en 8 bits da 45 y la explicación dice «44 + 1 = 45». En un
-    // registro de 8 bits 300 se guarda como 300 mod 256 = 44, pero la app no lo dice: ni rechaza
-    // el operando ni explica de dónde sale el 44. La suma que desborda SÍ lo explica.
-    test.fail();
+  test('HALLAZGO A · 2575 (bajo) — un operando que no cabe en 8 bits se explica, no se recorta mudo', async ({ page }) => {
+    // REPARADO (01/10/2026), hallazgo 2575: 300 + 1 en 8 bits daba 45 explicando «44 + 1 = 45»
+    // sin nombrar el 300. Se elige EXPLICAR y no rechazar, por coherencia con la suma que
+    // desborda, que la app ya resuelve con la semántica de registro (lo que no cabe se pierde).
+    // A mano: 300 − 256 = 44; 44 + 1 = 45 = 0010 1101 = 0x2D.
     await operar(page, { bits: '8 bits', op: 'suma', a: '300', b: '1' });
-    await expect(page.locator(OPS)).toContainText('300');
+    await expect(filaOperacion(page, 'Decimal:')).toHaveText('45');
+    await expect(filaOperacion(page, 'Binario:')).toHaveText('0010 1101');
+    const explicacion = tarjetaOperacion(page).locator('[class*="opExplanation"]');
+    await expect(explicacion).toContainText('El operando A, 300, no cabe en 8 bits (máximo 255)');
+    await expect(explicacion).toContainText('resto módulo 256, 44');
+    await expect(explicacion).toContainText('44 + 1 = 45');
   });
 
-  test('HALLAZGO B (bajo) — los títulos de los paneles no leen el emoji', async ({ page }) => {
-    // ABIERTO, hallazgo: «📐 Conversión de Bases», «⚡ Operaciones Binarias» y «📚 Tabla de
-    // Referencia Rápida» llevan el emoji sin aria-hidden (y los <h3> del bloque educativo).
-    test.fail();
+  test('HALLAZGO B · 2576 (bajo) — los títulos de los paneles no leen el emoji', async ({ page }) => {
+    // REPARADO (01/10/2026), hallazgo 2576: el emoji de cada título va en <span aria-hidden>.
     for (const nombre of ['Conversión de Bases', 'Operaciones Binarias', 'Tabla de Referencia Rápida']) {
       await expect(page.getByRole('heading', { level: 2, name: nombre, exact: true }), nombre).toHaveCount(1);
     }
+    // Y los <h3> del bloque educativo, que nace colapsado.
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    for (const nombre of [
+      'Los 4 Sistemas Numéricos: Comparativa',
+      'Casos de Uso Prácticos',
+      'Preguntas Frecuentes',
+      'Guía Paso a Paso: Convertir entre Bases',
+      'Mejores Prácticas',
+      'Conceptos Clave',
+      'Binario (Base 2)',
+      'Octal (Base 8)',
+      'Decimal (Base 10)',
+      'Hexadecimal (Base 16)',
+    ]) {
+      await expect(page.getByRole('heading', { level: 3, name: nombre, exact: true }), nombre).toHaveCount(1);
+    }
   });
 
-  test('HALLAZGO C (bajo) — «Ver proceso paso a paso» es un desplegable con aria-expanded', async ({ page }) => {
-    // ABIERTO, hallazgo: lleva aria-pressed, que anuncia un conmutador, y no aria-expanded.
-    test.fail();
+  test('HALLAZGO C · 2577 (bajo) — «Ver proceso paso a paso» es un desplegable con aria-expanded', async ({ page }) => {
+    // REPARADO (01/10/2026), hallazgo 2577: llevaba aria-pressed (conmutador) y no aria-expanded.
     await convertir(page, 'DEC', '25');
-    const desplegable = page.locator(`${CONV} [class*="stepsToggle"]`);
+    const desplegable = page.getByRole('button', { name: 'Ver proceso paso a paso', exact: true });
+    await expect(desplegable).not.toHaveAttribute('aria-pressed', /.*/);
     await expect(desplegable).toHaveAttribute('aria-expanded', 'false');
+    await expect(desplegable).toHaveAttribute('aria-controls', 'pasos-conversion');
     await desplegable.click();
     await expect(desplegable).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('#pasos-conversion')).toContainText('25 ÷ 2 = 12, resto = 1');
   });
 
-  test('HALLAZGO D (bajo) — ninguna <label> de los paneles queda sin control', async ({ page }) => {
-    // ABIERTO, hallazgo: «Base de entrada:» (dos), «Ancho de bits:» y «Operación:» son <label>
-    // sin control, y los dos juegos de botones BIN/OCT/DEC/HEX no tienen nombre de grupo.
-    test.fail();
+  test('HALLAZGO D · 2578 (bajo) — ninguna <label> de los paneles queda sin control', async ({ page }) => {
+    // REPARADO (01/10/2026), hallazgo 2578: «Base de entrada:» (dos), «Ancho de bits:» y
+    // «Operación:» eran <label> sin control. Ahora son rótulos de grupos role="group", y cada
+    // panel es una región con el nombre de su <h2>, que es lo que distingue los dos «BIN».
     const huerfanas = await page.evaluate(() =>
       [...document.querySelectorAll('[class*="conversionSection"] label, [class*="operationsSection"] label')]
         .filter((l) => !(l as HTMLLabelElement).control)
@@ -920,6 +945,12 @@ test.describe('re-inspección 01/10/2026 · la calculadora', () => {
     );
     expect(huerfanas).toEqual([]);
     await expect(page.getByRole('group', { name: /Base de entrada/ })).toHaveCount(2);
+    const conversion = page.getByRole('region', { name: 'Conversión de Bases' });
+    const operaciones = page.getByRole('region', { name: 'Operaciones Binarias' });
+    await expect(conversion.getByRole('group', { name: 'Base de entrada:' }).getByRole('button')).toHaveCount(4);
+    await expect(operaciones.getByRole('group', { name: 'Base de entrada:' }).getByRole('button')).toHaveCount(4);
+    await expect(operaciones.getByRole('group', { name: 'Ancho de bits:' }).getByRole('button')).toHaveCount(4);
+    await expect(operaciones.getByRole('group', { name: 'Operación:' }).getByRole('button')).toHaveCount(8);
   });
 });
 
@@ -928,29 +959,42 @@ test.describe('re-inspección 01/10/2026 · el bloque educativo', () => {
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   });
 
-  test('HALLAZGO F (bajo) — Python 2 no leía «078» como decimal', async ({ page }) => {
-    // ABIERTO, hallazgo: la gramática de Python 2.7 (decimalinteger ::= nonzerodigit digit* |
-    // "0"; octinteger ::= "0" octdigit+) no admite «078»: es un error de sintaxis, no un
-    // decimal silencioso.
-    test.fail();
-    await expect(page.locator('li', { hasText: 'Mezclar BIN y OCT' })).not.toContainText('tratado como decimal');
+  test('HALLAZGO F · 2580 (bajo) — Python 2 no leía «078» como decimal', async ({ page }) => {
+    // REPARADO (01/10/2026), hallazgo 2580: la gramática de Python 2.7 (decimalinteger ::=
+    // nonzerodigit digit* | "0"; octinteger ::= "0" octdigit+) no admite «078»: es un error de
+    // sintaxis. Lo silencioso era otra cosa: «017» se leía como octal, 1×8 + 7 = 15.
+    const punto = page.locator('li', { hasText: 'Mezclar BIN y OCT' });
+    await expect(punto).not.toContainText('tratado como decimal');
+    await expect(punto).toContainText('En Python 2, 078 también era un error de sintaxis');
+    await expect(punto).toContainText('017 se leía en silencio como octal (vale 15');
   });
 
-  test('HALLAZGO G (bajo) — un kilobyte son 1000 bytes; 1024 es un kibibyte', async ({ page }) => {
-    // ABIERTO, hallazgo: «Kilobyte = 1024 bytes = 2^10 (no 1000)». NIST, «Prefixes for binary
-    // multiples»: 1 kbit = 10³ bit = 1000 bit; 1 Kibit = 2¹⁰ bit = 1024 bit (IEC, 1998).
-    test.fail();
-    await expect(page.locator('[class*="faqItem"]', { hasText: 'nibble, un byte' })).not.toContainText(
-      'Kilobyte = 1024 bytes',
-    );
+  test('HALLAZGO G · 2581 (bajo) — un kilobyte son 1000 bytes; 1024 es un kibibyte', async ({ page }) => {
+    // REPARADO (01/10/2026), hallazgo 2581. NIST, «Prefixes for binary multiples»: 1 kbit =
+    // 10³ bit = 1000 bit; 1 Kibit = 2¹⁰ bit = 1024 bit, prefijos binarios de la IEC (1998).
+    // A mano: 10⁹ = 0x3B9ACA00 (3·16⁷ + 11·16⁶ + 9·16⁵ + 10·16⁴ + 12·16³ + 10·16² = 1.000.000.000)
+    // y 2³⁰ = 0x40000000.
+    const faq = (texto: string) => page.locator('[class*="faqItem"]', { hasText: texto });
+    await expect(faq('nibble, un byte')).not.toContainText('Kilobyte = 1024 bytes');
+    await expect(faq('nibble, un byte')).toContainText('Kilobyte (kB) = 1000 bytes');
+    await expect(faq('nibble, un byte')).toContainText('1024 bytes = 2^10 es un kibibyte (KiB)');
+
+    // La FAQ siguiente atribuía el KiB a «ISO»: lo definió la IEC.
+    await expect(faq('1000 o 1024')).not.toContainText('ISO');
+    await expect(faq('1000 o 1024')).toContainText('IEC');
+
+    // «1 GB = 0x40000000» era 1 GiB.
+    await expect(faq('hexadecimal si tenemos decimal')).not.toContainText('1 GB = 0x40000000');
+    await expect(faq('hexadecimal si tenemos decimal')).toContainText('1 GiB = 2^30 bytes = 0x40000000');
+    await expect(faq('hexadecimal si tenemos decimal')).toContainText('1 GB = 10^9 bytes = 0x3B9ACA00');
   });
 
-  test('HALLAZGO H (bajo) — un sumador de 8 bits no son 8 puertas lógicas', async ({ page }) => {
-    // ABIERTO, hallazgo: cada columna da suma Y acarreo (dos salidas) y una puerta da una: son 8
-    // sumadores completos en cascada (cada uno, varias puertas).
-    test.fail();
-    await expect(page.locator('[class*="escenarioCard"]', { hasText: 'Electrónica y hardware' })).not.toContainText(
-      '8 puertas lógicas',
-    );
+  test('HALLAZGO H · 2582 (bajo) — un sumador de 8 bits no son 8 puertas lógicas', async ({ page }) => {
+    // REPARADO (01/10/2026), hallazgo 2582: cada columna da suma Y acarreo (dos salidas) y una
+    // puerta da una: son 8 sumadores completos en cascada. Cada uno, S = A ⊕ B ⊕ Cin (dos XOR)
+    // y Cout = A·B + Cin·(A ⊕ B) (dos AND y un OR).
+    const tarjeta = page.locator('[class*="escenarioCard"]', { hasText: 'Electrónica y hardware' });
+    await expect(tarjeta).not.toContainText('8 puertas lógicas');
+    await expect(tarjeta).toContainText('8 sumadores completos en cascada');
   });
 });
