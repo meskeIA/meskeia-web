@@ -1,10 +1,18 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { FISCAL_IRPF_META } from '@/data/fiscal';
+import { FISCAL_IRPF_META, LIMITES_EXCLUSION_MODULOS_2025, ORDEN_MODULOS_VIGENTE } from '@/data/fiscal';
+import { formatNumber } from '@/lib/formatters';
 
 // Año del título: la vigencia del módulo que sella los datos. Sale del dato
 // y no se escribe a mano (lo exige check:anio-titulo).
 const anio = FISCAL_IRPF_META.vigencia;
+
+// El FAQPage (lo que leen los buscadores con IA) cita la Orden de módulos y los límites de
+// exclusión desde data/fiscal, como la página. Hasta el 01/10/2026 iban tecleados y se habrían
+// quedado atrás al re-sellar la Orden del año siguiente (hallazgo 2549).
+const orden = ORDEN_MODULOS_VIGENTE;
+const limites = LIMITES_EXCLUSION_MODULOS_2025;
+const euros = (n: number) => `${formatNumber(n, 0)} €`;
 
 export const metadata: Metadata = {
   title: `Simulador Módulos vs Estimación Directa Autónomos ${anio} | meskeIA`,
@@ -65,10 +73,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué actividades pueden acogerse al régimen de módulos en 2026?',
+      name: `¿Qué actividades pueden acogerse al régimen de módulos en ${orden.ejercicio}?`,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Pueden usar módulos las actividades recogidas en la Orden anual de estimación objetiva — para 2026, la Orden HAC/1425/2025, de 9 de diciembre (BOE-A-2025-25272), que mantiene el listado y los importes de la Orden HAC/1347/2024 del ejercicio anterior, entre ellas restaurantes y bares, comercio minorista de determinados sectores, transporte de viajeros y mercancías, peluquerías y servicios similares. Quedan excluidas si el volumen de ingresos supera 250.000 € anuales, si la facturación a otros empresarios y profesionales supera 125.000 € anuales, o si las compras en bienes y servicios superan 250.000 €.',
+        text: `Pueden usar módulos las actividades recogidas en la Orden anual de estimación objetiva — para ${orden.ejercicio}, la ${orden.referencia}, de ${orden.fecha} (${orden.boe}), que sustituye a la ${orden.anterior}, entre ellas restaurantes y bares, comercio minorista de determinados sectores, transporte de viajeros y mercancías, peluquerías y servicios similares. Quedan excluidas si el volumen de ingresos supera ${euros(limites.ingresosConjuntoActividades)} anuales, si la facturación a otros empresarios y profesionales supera ${euros(limites.facturacionAEmpresas)} anuales, o si las compras en bienes y servicios superan ${euros(limites.comprasBienesYServicios)}.`,
       },
     },
     {
@@ -92,7 +100,7 @@ export const faqJsonLd = {
       name: '¿El simulador de módulos vs estimación directa reemplaza al asesor fiscal?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. El simulador calcula el IRPF de ambos regímenes con la escala general del art. 63 de la Ley 35/2006 del IRPF, pero el rendimiento de módulos usa una fórmula didáctica simplificada por actividad, no los coeficientes reales que publica la Orden anual de módulos (para 2026, la Orden HAC/1425/2025). Sirve para entender la lógica de la comparación, no para presentar una declaración. La decisión final debe tomarse con un asesor fiscal o gestor que conozca la situación particular del autónomo, sus deducciones aplicables y las implicaciones del IVA.',
+        text: `No. El simulador calcula el IRPF de ambos regímenes con la escala general del art. 63 de la Ley 35/2006 del IRPF, pero el rendimiento de módulos usa una fórmula didáctica simplificada por actividad, no los coeficientes reales que publica la Orden anual de módulos (para ${orden.ejercicio}, la ${orden.referencia}). Sirve para entender la lógica de la comparación, no para presentar una declaración. La decisión final debe tomarse con un asesor fiscal o gestor que conozca la situación particular del autónomo, sus deducciones aplicables y las implicaciones del IVA.`,
       },
     },
   ],

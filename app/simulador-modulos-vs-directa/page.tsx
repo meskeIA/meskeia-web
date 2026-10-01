@@ -191,6 +191,24 @@ const CASOS: CasoPreconfig[] = [
   },
 ];
 
+/**
+ * Rendimiento neto previo de la Estimación Directa para un preset, con el MISMO motor que la
+ * comparativa: ingresos − gastos − cuota RETA × 12 (la cuota del titular es gasto deducible).
+ * ⚠️ 01/10/2026 — las tarjetas «Casos típicos» del bloque educativo decían 65.000 € y 5.000 €
+ * (ingresos − gastos, sin la cuota), mientras los presets con esas cifras ya la deducían
+ * (hallazgo 2548). Salen de aquí para que no vuelvan a separarse.
+ */
+function casoTipico(id: string): { caso: CasoPreconfig; rendimientoED: number } {
+  const caso = CASOS.find(c => c.id === id) ?? CASOS[0];
+  const { estimacionDirecta } = compararModulosVsDirecta({ ...caso.comunes, ...caso.modulos });
+  return { caso, rendimientoED: estimacionDirecta.rendimientoNetoPrevio };
+}
+const CASO_BAR_RENTABLE = casoTipico('bar_rentable');
+const CASO_BAR_PERDIDAS = casoTipico('bar_perdidas');
+
+/** Importe en prosa, sin céntimos: «61.160 €», con espacio duro antes del símbolo. */
+const euros = (n: number) => `${formatNumber(n, 0)}\u00A0€`;
+
 // ─── Cálculos ────────────────────────────────────────────────────────────────
 
 // La fórmula NO vive aquí: la página consume lib/calculadoras/modulosVsDirecta.ts, que es
@@ -213,6 +231,16 @@ const RETA_CUOTA_MAX = Math.max(...TRAMOS_RETA_2025.map(t => t.cuotaMaxima));
 // (hallazgo 814).
 const RETA_SLIDER_MIN = Math.ceil(RETA_CUOTA_MIN);
 const RETA_SLIDER_MAX = Math.floor(RETA_CUOTA_MAX);
+
+// Nombre de la tabla de tramos del RETA tal como lo lee el usuario: la Orden de cotización
+// sale de FISCAL_AUTONOMOS_META.fuente (hoy «Orden PJC/297/2026»), y si un re-sellado cambia
+// el formato de la fuente, cae al año de vigencia antes que a un literal tecleado.
+// ⚠️ 01/10/2026 — hasta hoy la nota del primer DataReference enseñaba el identificador de
+// código «(TRAMOS_RETA_2025)», cuyo sufijo además contradecía al dato (hallazgo 2547).
+const ORDEN_COTIZACION_RETA = FISCAL_AUTONOMOS_META.fuente.match(/Orden [A-Z]+\/\d+\/\d{4}/)?.[0];
+const NOMBRE_TABLA_RETA = ORDEN_COTIZACION_RETA
+  ? `tabla de tramos del RETA de la ${ORDEN_COTIZACION_RETA}`
+  : `tabla de tramos del RETA de ${FISCAL_AUTONOMOS_META.vigencia}`;
 
 interface CoherenciaReta {
   /** Tramo de TRAMOS_RETA_2025 al que lleva el rendimiento calculado. */
@@ -327,11 +355,11 @@ export default function SimuladorModulosVsDirectaPage() {
       <DisclaimerCard variant="financial" severity="critical" />
 
       <DataReference
-        normativa="IRPF 2025"
+        normativa={`IRPF ${FISCAL_IRPF_META.vigencia}`}
         fuente={FISCAL_IRPF_META.fuente}
         verificado={FISCAL_IRPF_META.verificado}
         urlOficial={FISCAL_IRPF_META.urlOficial}
-        nota={`El IRPF de ambos regímenes usa esta escala. La cuota RETA la introduces tú libremente dentro del rango real de la tabla de tramos (TRAMOS_RETA_2025) y el rendimiento de módulos usa una fórmula didáctica simplificada, no los coeficientes reales de la ${ORDEN_MODULOS_VIGENTE.referencia}.`}
+        nota={`El IRPF de ambos regímenes usa esta escala. La cuota RETA la introduces tú libremente dentro del rango real de la ${NOMBRE_TABLA_RETA} y el rendimiento de módulos usa una fórmula didáctica simplificada, no los coeficientes reales de la ${ORDEN_MODULOS_VIGENTE.referencia}.`}
       />
 
       <DataReference
@@ -877,15 +905,22 @@ export default function SimuladorModulosVsDirectaPage() {
           <div className={styles.escenarioCard}>
             <h4>Bar pequeño con margen alto</h4>
             <p>
-              Ingresos 90.000 €, gastos 25.000 €. ED tributa sobre 65.000 € de rendimiento. Módulos
-              tributa sobre el importe fijo por mesas + personal + m² (que suele ser bastante menor).
+              Ingresos {euros(CASO_BAR_RENTABLE.caso.comunes.ingresos)}, gastos{' '}
+              {euros(CASO_BAR_RENTABLE.caso.comunes.gastos)} y cuota RETA de{' '}
+              {euros(CASO_BAR_RENTABLE.caso.comunes.retaMensual)}/mes. ED parte de un rendimiento
+              neto de {euros(CASO_BAR_RENTABLE.rendimientoED)} (la cuota RETA es gasto deducible).
+              Módulos tributa sobre el importe fijo por mesas + personal + m² (que suele ser
+              bastante menor).
               <strong> Módulos suele ganar</strong> en hostelería rentable.
             </p>
           </div>
           <div className={styles.escenarioCard}>
             <h4>Bar con pérdidas o margen bajo</h4>
             <p>
-              Ingresos 60.000 €, gastos 55.000 €. ED tributa sobre solo 5.000 € de beneficio real.
+              Ingresos {euros(CASO_BAR_PERDIDAS.caso.comunes.ingresos)}, gastos{' '}
+              {euros(CASO_BAR_PERDIDAS.caso.comunes.gastos)} y cuota RETA de{' '}
+              {euros(CASO_BAR_PERDIDAS.caso.comunes.retaMensual)}/mes. ED parte de solo{' '}
+              {euros(CASO_BAR_PERDIDAS.rendimientoED)} de rendimiento neto, con la cuota ya deducida.
               Módulos sigue tributando por el importe fijo por unidades, ignorando que tu negocio va
               mal. <strong>ED gana en años malos</strong>.
             </p>

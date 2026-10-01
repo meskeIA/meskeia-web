@@ -1061,7 +1061,7 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 29/0
  *  · tabla RETA del aviso: TRAMOS_RETA_2025, también sufijo histórico, con los datos de la
  *    Orden PJC/297/2026 (FISCAL_AUTONOMOS_META.vigencia = '2026').
  * Lo que queda incoherente es el CUERPO: el sello del primer DataReference dice «IRPF 2025»
- * (escrito a mano) y su nota enseña el identificador «TRAMOS_RETA_2025». Ver los test.fail.
+ * (escrito a mano) y su nota enseñaba el identificador «TRAMOS_RETA_2025» (los dos, REPARADOS el 01/10/2026).
  *
  * De dónde sale cada cifra esperada: las mismas anclas de la re-inspección del 29/09 (escala
  * TRAMOS_IRPF_2025 · mínimo MINIMOS_IRPF_2025.personal = 5.550 → escala(5.550) = 1.054,50 ·
@@ -1274,14 +1274,13 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 01/1
   });
 
   /**
-   * ABIERTO, hallazgo (01/10/2026): el sello del primer DataReference anuncia «IRPF 2025»,
-   * escrito a mano en page.tsx (`normativa="IRPF 2025"`), mientras el <title> de la misma página
-   * dice 2026, sacado de FISCAL_IRPF_META.vigencia — el mismo META que ese DataReference cita
-   * como fuente y fecha. El usuario ve 2026 en la pestaña y en el buscador, y 2025 en el sello
-   * de los datos.
+   * Hallazgo 2546 — REPARADO (01/10/2026). El sello del primer DataReference anunciaba
+   * «IRPF 2025», escrito a mano en page.tsx (`normativa="IRPF 2025"`), mientras el <title> de la
+   * misma página dice 2026, sacado de FISCAL_IRPF_META.vigencia — el mismo META que ese
+   * DataReference cita como fuente y fecha. Hoy el sello interpola esa misma vigencia, así que
+   * title y sello se mueven juntos al re-sellar el módulo.
    */
   test('[año] el DataReference del IRPF anuncia el mismo año que el title', async ({ page }) => {
-    test.fail(true, 'ABIERTO, hallazgo: el DataReference dice «IRPF 2025» escrito a mano y el title, 2026 de FISCAL_IRPF_META.vigencia');
     const anio = (await page.title()).match(/Autónomos (\d{4})/)?.[1];
     expect(anio).toBe('2026');
     const referencias = page.locator('[aria-label="Datos de referencia normativos"]');
@@ -1289,30 +1288,44 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 01/1
   });
 
   /**
-   * ABIERTO, hallazgo (01/10/2026): la nota del primer DataReference enseña al usuario un
-   * identificador de código, «(TRAMOS_RETA_2025)», cuyo sufijo además contradice al dato: esa
+   * Hallazgo 2547 — REPARADO (01/10/2026). La nota del primer DataReference enseñaba al usuario
+   * un identificador de código, «(TRAMOS_RETA_2025)», cuyo sufijo además contradecía al dato: esa
    * tabla es la de la Orden PJC/297/2026 (FISCAL_AUTONOMOS_META.vigencia = '2026'), como dice el
-   * cuarto DataReference de la misma página.
+   * cuarto DataReference de la misma página. Hoy la nombra en lenguaje llano, «tabla de tramos
+   * del RETA de la Orden PJC/297/2026», con la Orden sacada de FISCAL_AUTONOMOS_META.fuente.
+   * Se mira además el body entero: ningún texto visible debe enseñar un identificador.
    */
   test('[RETA] ninguna nota visible enseña un identificador de código', async ({ page }) => {
-    test.fail(true, 'ABIERTO, hallazgo: la nota del DataReference del IRPF muestra «(TRAMOS_RETA_2025)»');
     const referencias = page.locator('[aria-label="Datos de referencia normativos"]');
     await expect(referencias.first()).not.toContainText(/[A-Z]+_[A-Z_]+\d{4}/, { timeout: 1000 });
+    await expect(referencias.first()).toContainText('tabla de tramos del RETA de la Orden PJC/297/2026');
+    // La misma Orden que el cuarto sello, el de la cotización de autónomos.
+    await expect(referencias.nth(3)).toContainText('Orden PJC/297/2026');
+    expect(await page.locator('body').innerText()).not.toMatch(/\b[A-Z]+_[A-Z_]+_\d{4}\b/);
   });
 
   /**
-   * ABIERTO, hallazgo (01/10/2026): con la actividad Bar / Cafetería la app pinta el deslizador
+   * ABIERTO, hallazgo 2545 (01/10/2026): con la actividad Bar / Cafetería la app pinta el deslizador
    * «Personal no asalariado (incluido titular)» en el panel de módulos, pero la fórmula del bar
    * del motor (`1.500 × mesas + 800 × asalariados + 6 × m² + 0,05 × kWh`) no lo usa, y tampoco
    * cambia la elegibilidad (con m² > 0 ya es apta). Moverlo de 1 a 3 no mueve ninguna cifra.
    * Bar de partida: 1.500 × 6 + 800 + 6 × 50 + 0,05 × 10.000 = 10.600 € con 1 o con 3.
    * Pasa si se repara de cualquiera de las dos formas: retirando el control del bar o haciendo
    * que cuente.
+   *
+   * ⚠️ 01/10/2026 — NO se repara en la vista, a propósito. El término SÍ existe en la norma:
+   * Orden HAC/1425/2025 (BOE núm. 297, 11/12/2025, Anexo II, pág. 162779), «Actividad: Otros
+   * cafés y bares · Epígrafe I.A.E.: 673.2», módulo 2 «Personal no asalariado · Persona ·
+   * 11.413,08» € de rendimiento anual por unidad (los demás módulos del epígrafe son personal
+   * asalariado, potencia eléctrica en kW, mesas, longitud de barra y máquinas tipo «A» y «B»:
+   * ni m² ni kWh). Retirar el control enseñaría que el personal no asalariado no cuenta en un
+   * bar, que es falso; lo que falta es el término en la fórmula del motor compartido con el MCP
+   * de Delegum (lib/calculadoras/modulosVsDirecta.ts), fuera del ámbito de esta reparación.
    */
   test('[bar] el deslizador de personal no asalariado mueve el rendimiento de módulos (o no se muestra)', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO, hallazgo: en Bar el «Personal no asalariado» se muestra y no mueve ninguna cifra');
+    test.fail(true, 'ABIERTO, hallazgo 2545: en Bar el «Personal no asalariado» se muestra y no mueve ninguna cifra (falta el término en el motor)');
     expect(await linea(page, MOD, 'Rendimiento neto previo (módulos)')).toBe('10.600,00 €');
     if ((await page.locator('#pNoAsal').count()) === 0) return; // reparado retirándolo
     await deslizar(page, 'pNoAsal', 3);
@@ -1320,17 +1333,22 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 01/1
   });
 
   /**
-   * ABIERTO, hallazgo (01/10/2026): las tarjetas «Casos típicos» del bloque educativo no
+   * Hallazgo 2548 — REPARADO (01/10/2026). Las tarjetas «Casos típicos» del bloque educativo no
    * llegaron a la reparación del 2444. Dicen «ED tributa sobre 65.000 € de rendimiento» (bar,
    * 90.000/25.000) y «ED tributa sobre solo 5.000 € de beneficio real» (bar, 60.000/55.000),
    * es decir, ingresos − gastos sin la cuota RETA. Los presets de la app con esas mismas cifras
    * (RETA 320 €/mes) calculan un rendimiento neto previo de 61.160,00 € y 1160,00 €
    * (90.000 − 25.000 − 3.840 y 60.000 − 55.000 − 3.840).
+   *
+   * Reparado: las tarjetas toman ingresos, gastos y cuota de los propios presets y el
+   * rendimiento del mismo motor, así que dicen «Ingresos 90.000 €, gastos 25.000 € y cuota RETA
+   * de 320 €/mes. ED parte de un rendimiento neto de 61.160 €» y «… ED parte de solo 1160 €»
+   * (resueltas a mano arriba; 4 cifras enteras sin agrupar, como manda la RAE). Se exigen las
+   * cifras correctas, no solo la ausencia de las viejas.
    */
   test('[educativo] las tarjetas de casos típicos no contradicen la deducción de la cuota RETA', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO, hallazgo: las tarjetas dicen que ED tributa sobre 65.000 € y 5.000 €, sin la cuota RETA');
     await page.getByRole('button', { name: /Aplicar caso Bar pequeño rentable/ }).click();
     expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('61.160,00 €');
     await page.getByRole('button', { name: /Aplicar caso Bar con pérdidas/ }).click();
@@ -1343,16 +1361,23 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 01/1
     await expect(tarjeta('Bar con pérdidas o margen bajo')).not.toContainText('tributa sobre solo 5.000 €', {
       timeout: 1000,
     });
+    await expect(tarjeta('Bar pequeño con margen alto')).toContainText(/rendimiento neto de 61\.160\s€/);
+    await expect(tarjeta('Bar pequeño con margen alto')).toContainText(/cuota RETA de 320\s€\/mes/);
+    await expect(tarjeta('Bar con pérdidas o margen bajo')).toContainText(/solo 1160\s€ de rendimiento neto/);
   });
 
   /**
-   * ABIERTO, hallazgo (01/10/2026): el faqJsonLd de metadata.ts escribe a mano los tres límites
+   * Hallazgo 2549 — REPARADO (01/10/2026): el faqJsonLd de metadata.ts escribía a mano los tres límites
    * de exclusión («250.000 €», «125.000 €», «250.000 €») y la Orden de módulos («Orden
    * HAC/1425/2025, de 9 de diciembre (BOE-A-2025-25272)», «Orden HAC/1347/2024»), que la página
    * deriva de LIMITES_EXCLUSION_MODULOS_2025 y ORDEN_MODULOS_VIGENTE. Hoy coinciden, así que
    * este testigo PASA: no detecta el literal, vigila la DERIVA. Compara el FAQPage —lo que leen
    * los buscadores con IA— con lo que la página pinta desde data/fiscal; cuando se re-selle la
    * Orden de 2027, si el FAQPage no se mueve con ella, este test se pone en rojo.
+   *
+   * Reparado: metadata.ts interpola ORDEN_MODULOS_VIGENTE (referencia, fecha, BOE, ejercicio y
+   * anterior) y LIMITES_EXCLUSION_MODULOS_2025, y el año de la pregunta sale de
+   * ORDEN_MODULOS_VIGENTE.ejercicio, el mismo que el aviso de elegibilidad («para 2026»).
    */
   test('[FAQPage] cita la misma Orden y los mismos límites que la página deriva de data/fiscal', async ({
     page,
@@ -1373,6 +1398,10 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección 01/1
     expect(boe).toBe('BOE-A-2025-25272');
     expect(faq).toContain(orden);
     expect(faq).toContain(boe);
+    // El año de la pregunta es el ejercicio de la Orden que pinta el aviso, no un literal.
+    const ejercicio = aviso.match(/método para (\d{4})/)?.[1];
+    expect(ejercicio).toBe('2026');
+    expect(faq).toContain(`módulos en ${ejercicio}?`);
 
     // FAQ del bloque educativo «¿Qué pasa si supero los límites…?», de LIMITES_EXCLUSION_MODULOS_2025.
     const limites = (
