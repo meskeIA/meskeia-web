@@ -1,5 +1,17 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { formatCurrency, formatPercentage } from '@/lib';
+import { ANIO_NOMINA, TIPOS_EMPRESA, TIPOS_TRABAJADOR, aCentimos } from './motor';
+
+// Tipos del FAQPage: los mismos de la nómina de ejemplo, importados de @/data/fiscal vía
+// motor.ts. Nada se teclea aquí (hallazgos 2525, 2529 y 2531, 01/10/2026).
+const pct = (tipo: number): string => formatPercentage(tipo / 100, 2);
+const T = TIPOS_TRABAJADOR;
+const E = TIPOS_EMPRESA;
+const tipoEmpresa = aCentimos(
+  E.contingenciasComunes + E.desempleoIndefinido + E.fogasa + E.formacionProfesional + E.mei,
+);
+const BASE_EJEMPLO = 2000;
 
 export const metadata: Metadata = {
   title: 'Anatomía de una Nómina - Explicador Visual Interactivo | meskeIA',
@@ -62,7 +74,7 @@ export const faqJsonLd = {
       name: '¿Por qué el salario neto es menor que el bruto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Al salario bruto se le restan dos tipos de deducciones: las cotizaciones a la Seguridad Social a cargo del trabajador (contingencias comunes ~4,7%, desempleo ~1,55%, formación ~0,1%) y la retención del IRPF, cuyo porcentaje varía según los ingresos anuales y la situación familiar. Estas deducciones no son un descuento sino anticipos del trabajador para financiar pensiones, desempleo y la declaración de la renta.',
+        text: `Al salario bruto se le restan dos tipos de deducciones. Las cotizaciones a la Seguridad Social a cargo del trabajador (en ${ANIO_NOMINA}: contingencias comunes ${pct(T.contingenciasComunes)}, desempleo ${pct(T.desempleo)} en un contrato indefinido, formación profesional ${pct(T.formacionProfesional)} y Mecanismo de Equidad Intergeneracional ${pct(T.mef)}), que financian las pensiones, el paro y las bajas. Y la retención del IRPF, un pago a cuenta del impuesto cuyo porcentaje depende de los ingresos anuales y de la situación personal y familiar, y que se ajusta en la declaración de la renta.`,
       },
     },
     {
@@ -78,7 +90,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la retención del IRPF en la nómina?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La empresa aplica un porcentaje de retención a cuenta del IRPF sobre el salario bruto menos las cotizaciones sociales del trabajador. Ese porcentaje lo calcula Hacienda en función de los ingresos anuales previstos, las circunstancias personales (hijos, discapacidad, situación familiar) y las deducciones aplicables. Al hacer la declaración de la renta, si se ha retenido de más, Hacienda devuelve; si es de menos, el trabajador paga la diferencia.',
+        text: 'El tipo de retención lo calcula la empresa, que es quien paga y retiene, con el procedimiento del Reglamento del IRPF: parte de las retribuciones anuales previstas, les resta las cotizaciones a la Seguridad Social y otras reducciones, tiene en cuenta los mínimos personales y familiares (hijos, discapacidad, situación familiar) y obtiene un porcentaje. Ese porcentaje se aplica después a la cuantía total de lo que se cobra en cada nómina. En la declaración de la renta se regulariza: si se ha retenido de más, Hacienda devuelve; si de menos, el trabajador paga la diferencia.',
       },
     },
     {
@@ -86,7 +98,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre la nómina que paga la empresa y lo que recibe el trabajador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El coste real para la empresa es mayor que el salario bruto del trabajador: la empresa también paga cuotas patronales a la Seguridad Social (contingencias comunes ~23,6%, desempleo ~5,5%, FOGASA, formación…), lo que supone en torno al 30-33% adicional sobre el bruto. Por ejemplo, si tu bruto son 2.000 €/mes, la empresa puede estar pagando unos 2.600-2.700 € en total. El trabajador solo ve en su nómina la parte a su cargo.',
+        text: `El coste real para la empresa es mayor que el salario bruto del trabajador: la empresa paga sus propias cuotas a la Seguridad Social, que en ${ANIO_NOMINA} suman un ${pct(tipoEmpresa)} sobre la base de cotización (contingencias comunes ${pct(E.contingenciasComunes)}, desempleo ${pct(E.desempleoIndefinido)} en un contrato indefinido, FOGASA ${pct(E.fogasa)}, formación profesional ${pct(E.formacionProfesional)} y Mecanismo de Equidad Intergeneracional ${pct(E.mei)}), más la tarifa de accidentes de trabajo, que depende de la actividad. Por ejemplo, con una base de ${formatCurrency(BASE_EJEMPLO)} al mes, la empresa paga ${formatCurrency(aCentimos((BASE_EJEMPLO * tipoEmpresa) / 100))} más esa tarifa. El trabajador solo ve en su nómina la parte a su cargo.`,
       },
     },
   ],

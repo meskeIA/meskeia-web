@@ -1,6 +1,16 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { FISCAL_IRPF_META } from '@/data/fiscal';
+import { FISCAL_IRPF_META, COTIZACIONES_SS_2026, COTIZACION_EMPRESA_2026 } from '@/data/fiscal';
+import { formatPercentage } from '@/lib';
+
+// Tipos de cotización del FAQPage: de data/fiscal, no tecleados. Hasta el 01/10/2026 el MEI
+// decía «En 2025 el trabajador paga el 0,12% y la empresa el 0,58%», que son los de 2024
+// (DT 43.ª LGSS), en una app que calcula con los de 2026.
+const pct = (tipo: number): string => formatPercentage(tipo / 100, 2);
+const SS = COTIZACIONES_SS_2026;
+const totalTrabajador = Math.round(
+  (SS.contingenciasComunes + SS.desempleo + SS.formacionProfesional + SS.mef) * 100,
+) / 100;
 
 // Año del título: la vigencia del módulo que sella los datos. Sale del dato
 // y no se escribe a mano (lo exige check:anio-titulo).
@@ -72,7 +82,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se descuenta por Seguridad Social en la nómina en 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En 2026, el trabajador cotiza: 4,7% por contingencias comunes, 1,55% por desempleo, 0,1% por formación profesional y 0,15% por el MEI (Mecanismo de Equidad Intergeneracional). El total aproximado es el 6,50% del salario bruto, aunque varía según el tipo de contrato. El empleador paga además alrededor del 30% adicional que no aparece en la nómina del trabajador.',
+        text: `En 2026, el trabajador cotiza: ${pct(SS.contingenciasComunes)} por contingencias comunes, ${pct(SS.desempleo)} por desempleo, ${pct(SS.formacionProfesional)} por formación profesional y ${pct(SS.mef)} por el MEI (Mecanismo de Equidad Intergeneracional). El total es el ${pct(totalTrabajador)} de la base de cotización, aunque varía según el tipo de contrato. El empleador paga además alrededor de un 30\u00A0% adicional que no aparece en la nómina del trabajador.`,
       },
     },
     {
@@ -96,7 +106,7 @@ export const faqJsonLd = {
       name: '¿Qué es el MEI en la nómina y para qué sirve?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El MEI (Mecanismo de Equidad Intergeneracional) es una cotización solidaria creada en 2023 para reforzar la sostenibilidad del sistema de pensiones. En 2025 el trabajador paga el 0,12% y la empresa el 0,58% del salario. Estos fondos se destinan al Fondo de Reserva de la Seguridad Social, no a la pensión individual del cotizante.',
+        text: `El MEI (Mecanismo de Equidad Intergeneracional) es una cotización solidaria creada en 2023 para reforzar la sostenibilidad del sistema de pensiones. En 2026 es el ${pct(SS.mef + COTIZACION_EMPRESA_2026.mei)} de la base de cotización: el trabajador paga el ${pct(SS.mef)} y la empresa el ${pct(COTIZACION_EMPRESA_2026.mei)}. Estos fondos se destinan al Fondo de Reserva de la Seguridad Social, no a la pensión individual del cotizante.`,
       },
     },
     {

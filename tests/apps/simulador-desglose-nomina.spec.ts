@@ -152,3 +152,26 @@ test('la tabla de tramos se aplica a la base ENTERA y lo dice', async ({ page })
   await expect(filas.nth(2)).toContainText('30 %');
   await expect(filas.nth(2)).toContainText('5850,00');   // 26.050 − 20.200
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('MEI de 2026 en los textos: 0,15 % el trabajador y 0,75 % la empresa (DT 43.ª LGSS)', async ({ page }) => {
+  // Reparado el 01/10/2026 (hermana del hallazgo 2524 de visualizador-anatomia-nomina): la
+  // tabla de fórmulas daba al trabajador el MEI de 2024 (0,12 %) y a la empresa el de 2025
+  // (0,67 %); la lista de lo que paga la empresa, 0,67 % junto a un trabajador de 2026; y el
+  // FAQPage, «En 2025 el trabajador paga el 0,12% y la empresa el 0,58%» (los de 2024).
+  // DT 43.ª LGSS (RDL 2/2023), cotejada en el BOE: 2026 = 0,90 % → 0,15 % trabajador y
+  // 0,75 % empresa (data/fiscal COTIZACIONES_SS_2026.mef y COTIZACION_EMPRESA_2026.mei).
+  // Empresa 2026: 23,60 + 5,50 + 0,60 + 0,20 + 0,75 = 30,65 % → 30.000 × 1,3065 = 39.195,00 €.
+  const texto = limpiar(await page.evaluate(() => document.body.textContent ?? ''));
+  expect(texto).toContain('Bruto × 0,15 %');
+  expect(texto).toContain('también empresa: 0,75 %');
+  expect(texto).toContain('MEI 0,75 %');
+  expect(texto).toContain('30,65 %');
+  expect(texto).toContain('39.195,00 €');
+  expect(texto).not.toMatch(/0,12 %|0,67 %|0,58 %/);
+
+  const bloques = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+  const faq = limpiar(bloques);
+  expect(faq).toContain('el trabajador paga el 0,15 % y la empresa el 0,75 %');
+  expect(faq).not.toMatch(/0,12 ?%|0,58 ?%|0,67 ?%/);
+});

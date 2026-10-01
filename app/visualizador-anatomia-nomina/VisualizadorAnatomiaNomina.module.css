@@ -8,8 +8,11 @@
   --text-muted: #6E6E6E;
   --border: #E5E5E5;
   --hover: #F5F5F5;
-  --rojo: #e74c3c;
-  --verde: #27ae60;
+  /* Colores de TEXTO de los importes (hallazgo 2528, 01/10/2026). Los anteriores, #27ae60 y
+     #e74c3c, daban 2,87:1 y 3,82:1 sobre blanco en cifras de 14 px. Medidos en navegador:
+     claro sobre #FFFFFF y #F5F5F5; oscuro sobre #2A2A2A y #333333 (todos ≥ 4,5:1). */
+  --rojo: #B83227;
+  --verde: #1A7A43;
   --radius: 12px;
   --radius-large: 16px;
   --spacing-sm: 0.5rem;
@@ -33,6 +36,8 @@
   --text-muted: #9B9B9B;
   --border: #404040;
   --hover: #333333;
+  --rojo: #FF8A80;
+  --verde: #5FD08F;
 }
 
 .hero {
@@ -115,7 +120,8 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  background: var(--primary);
+  /* --primary-boton: texto blanco encima a 5,47:1 en los dos temas (con --primary, 4,11:1) */
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-size: 0.75rem;
@@ -244,7 +250,8 @@
   justify-content: space-between;
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  /* --primary-texto y no --primary: en móvil baja a 16 px y deja de ser texto grande (hallazgo 2532) */
+  color: var(--primary-texto);
   padding: 0.7rem 0 0;
   border-top: 3px double var(--primary);
   margin-top: var(--spacing-sm);
@@ -293,7 +300,7 @@
 }
 
 .rojo { color: var(--rojo); }
-.azul { color: var(--primary); }
+.azul { color: var(--primary-texto); }
 
 /* ─── Enlace ─── */
 .enlaceApp {
@@ -306,7 +313,7 @@
   margin-bottom: var(--spacing-xl);
 }
 
-.enlaceApp a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.enlaceApp a { color: var(--primary-texto); font-weight: 600; text-decoration: none; }
 .enlaceApp a:hover { text-decoration: underline; }
 
 .warningBox {

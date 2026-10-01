@@ -13,12 +13,13 @@ import {
   DataReference,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber, formatCurrency } from '@/lib';
+import { formatNumber, formatCurrency, formatPercentage } from '@/lib';
 import {
   desglosarEscalaGeneral,
   cuotaEscalaGeneral,
   MINIMOS_IRPF_2025,
   COTIZACIONES_SS_2026,
+  COTIZACION_EMPRESA_2026,
   BASES_SS_2026,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   calcularRendimientoNetoTrabajo,
@@ -27,6 +28,23 @@ import {
   limitarDeduccionRendimientosTrabajo,
 } from '@/data/fiscal';
 import styles from './SimuladorDesgloseNomina.module.css';
+
+// ─── Tipos de cotización de los textos ─────────────────────────────────────────
+// Los textos educativos citan los MISMOS tipos con que calcula la app, de data/fiscal. Hasta el
+// 01/10/2026 iban tecleados y mezclaban años: la tabla daba al trabajador el MEI de 2024
+// (0,12 %) y a la empresa el de 2025 (0,67 %), y la lista de la empresa el de 2025 junto a un
+// trabajador de 2026 (0,15 %); en 2026 la empresa paga el 0,75 % (DT 43.ª LGSS).
+const pctTexto = (tipo: number): string => formatPercentage(tipo / 100, 2);
+const SS_TRAB = COTIZACIONES_SS_2026;
+const SS_EMPR = COTIZACION_EMPRESA_2026;
+const TIPO_TRABAJADOR_TOTAL = Math.round(
+  (SS_TRAB.contingenciasComunes + SS_TRAB.desempleo + SS_TRAB.formacionProfesional + SS_TRAB.mef) * 100,
+) / 100;
+const TIPO_EMPRESA_TOTAL = Math.round(
+  (SS_EMPR.contingenciasComunes + SS_EMPR.desempleoIndefinido + SS_EMPR.fogasa +
+    SS_EMPR.formacionProfesional + SS_EMPR.mei) * 100,
+) / 100;
+const BRUTO_EJEMPLO_EMPRESA = 30000;
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -738,26 +756,26 @@ export default function SimuladorDesgloseNominaPage() {
                 </tr>
                 <tr>
                   <td><strong>SS Contingencias Comunes</strong></td>
-                  <td>Bruto × 4,70 %</td>
-                  <td>Trabajador (también empresa: 23,60 %)</td>
+                  <td>Bruto × {pctTexto(SS_TRAB.contingenciasComunes)}</td>
+                  <td>Trabajador (también empresa: {pctTexto(SS_EMPR.contingenciasComunes)})</td>
                   <td>LGSS art. 145; Orden PJC/51/2025</td>
                 </tr>
                 <tr>
                   <td><strong>SS Desempleo</strong></td>
-                  <td>Bruto × 1,55 %</td>
-                  <td>Trabajador (también empresa: 5,50 %)</td>
+                  <td>Bruto × {pctTexto(SS_TRAB.desempleo)}</td>
+                  <td>Trabajador (también empresa: {pctTexto(SS_EMPR.desempleoIndefinido)})</td>
                   <td>LGSS art. 273; LPGE 2025</td>
                 </tr>
                 <tr>
                   <td><strong>SS Formación Profesional</strong></td>
-                  <td>Bruto × 0,10 %</td>
-                  <td>Trabajador (también empresa: 0,60 %)</td>
+                  <td>Bruto × {pctTexto(SS_TRAB.formacionProfesional)}</td>
+                  <td>Trabajador (también empresa: {pctTexto(SS_EMPR.formacionProfesional)})</td>
                   <td>Ley 30/2015 de Formación Profesional</td>
                 </tr>
                 <tr>
                   <td><strong>SS MEI</strong></td>
-                  <td>Bruto × 0,12 %</td>
-                  <td>Trabajador (también empresa: 0,67 %)</td>
+                  <td>Bruto × {pctTexto(SS_TRAB.mef)}</td>
+                  <td>Trabajador (también empresa: {pctTexto(SS_EMPR.mei)})</td>
                   <td>RDL 2/2023 — Mecanismo Equidad Intergeneracional</td>
                 </tr>
                 <tr>
@@ -864,11 +882,15 @@ export default function SimuladorDesgloseNominaPage() {
               <h4>¿Qué cotiza el empresario y por qué no aparece en mi nómina?</h4>
               <p>
                 La empresa paga, además de tu nómina, otra cotización a la Seguridad
-                Social que <strong>no se descuenta de tu bruto</strong>: aproximadamente
-                un 30 % adicional sobre tu base de cotización (Contingencias Comunes 23,60 %,
-                Desempleo 5,50 %, Formación 0,60 %, FOGASA 0,20 %, MEI 0,67 %). Es un
-                coste empresarial, por eso contratar a alguien con 30.000 € brutos cuesta
-                a la empresa unos 39.000 €.
+                Social que <strong>no se descuenta de tu bruto</strong>: un{' '}
+                {pctTexto(TIPO_EMPRESA_TOTAL)} adicional sobre tu base de cotización (Contingencias
+                Comunes {pctTexto(SS_EMPR.contingenciasComunes)}, Desempleo{' '}
+                {pctTexto(SS_EMPR.desempleoIndefinido)} en un contrato indefinido, Formación{' '}
+                {pctTexto(SS_EMPR.formacionProfesional)}, FOGASA {pctTexto(SS_EMPR.fogasa)}, MEI{' '}
+                {pctTexto(SS_EMPR.mei)}), más la tarifa de accidentes de trabajo, que depende de la
+                actividad. Es un coste empresarial, por eso contratar a alguien con{' '}
+                {formatCurrency(BRUTO_EJEMPLO_EMPRESA)} brutos cuesta a la empresa unos{' '}
+                {formatCurrency(BRUTO_EJEMPLO_EMPRESA * (1 + TIPO_EMPRESA_TOTAL / 100))} más esa tarifa.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -928,8 +950,9 @@ export default function SimuladorDesgloseNominaPage() {
                 <p>
                   La base de cotización suele coincidir con el bruto (excepto si superas
                   la base máxima de 5.101,20 €/mes en 2026). Sobre ella se calculan los
-                  porcentajes del trabajador: 4,70 % CC + 1,55 % desempleo + 0,10 % FP
-                  + 0,15 % MEI = <strong>6,50 % total</strong>.
+                  porcentajes del trabajador: {pctTexto(SS_TRAB.contingenciasComunes)} CC +{' '}
+                  {pctTexto(SS_TRAB.desempleo)} desempleo + {pctTexto(SS_TRAB.formacionProfesional)} FP
+                  + {pctTexto(SS_TRAB.mef)} MEI = <strong>{pctTexto(TIPO_TRABAJADOR_TOTAL)} total</strong>.
                 </p>
               </div>
             </div>

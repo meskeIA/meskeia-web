@@ -10,8 +10,14 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *    (base de cotización, plus de transporte, MEI, Guía de la empresa, contingencias comunes,
  *    redondeo del IRPF); cada punto se recalculó aquí desde la norma antes de mirar la app.
  *    Lo que hoy falla va con `test.fail()` y su comentario «ABIERTO, hallazgo: …».
+ *  · 01/10/2026 — reparación de los hallazgos 2522-2532. Las cifras salen ahora de
+ *    `app/visualizador-anatomia-nomina/motor.ts` (base × tipo, tipos de @/data/fiscal) y la
+ *    nómina pasa a «Enero 2026»: es el año vigente y data/fiscal tiene para él todos los tipos
+ *    que la página enseña (los de la empresa de 2025 no existen allí, y la Guía los usa). Los
+ *    tests que dependen del año ya llevaban los esperados de 2026, resueltos a mano abajo.
+ *    data/fiscal COTIZACIONES_SS_2025.mef ya vale 0,13 (corregido por el coordinador).
  *
- * La app es una nómina FICTICIA y fija (periodo «Enero 2025»), sin entradas. Sus casos son:
+ * La app es una nómina FICTICIA y fija (periodo «Enero 2026»), sin entradas. Sus casos son:
  *   A. sus cifras, recalculadas a mano desde sus propios devengos y la norma;
  *   B. su contenido normativo, contra data/fiscal y el BOE;
  *   C. operativa y accesibilidad (teclado, 390 px, tema oscuro, contraste).
@@ -32,8 +38,8 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *     MEI — DT 43.ª LGSS (escala del RDL 2/2023): 2025 = 0,80 % (0,67 empresa / 0,13
  *     trabajador); 2026 = 0,90 % (0,75 / 0,15, también en COTIZACIONES_SS_2026 y
  *     COTIZACION_EMPRESA_2026); 2029 = 1,2 % (1,00 / 0,2).
- *     ⚠️ data/fiscal lleva COTIZACIONES_SS_2025.mef = 0.12, que es el tipo de 2024 según esa
- *     misma DT 43.ª: aquí manda el BOE.
+ *     (data/fiscal llevaba COTIZACIONES_SS_2025.mef = 0.12, el tipo de 2024; corregido a 0,13
+ *     el 01/10/2026.)
  *       CC   2.777,00 × 4,70 % = 130,519  → 130,52
  *       Des. 2.777,00 × 1,55 % =  43,0435 →  43,04
  *       FP   2.777,00 × 0,10 % =   2,777  →   2,78
@@ -43,6 +49,9 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *     2.419,86 × 15,27 % = 369,5126 → 369,51 €.
  *   · Total deducciones (2025) 130,52 + 43,04 + 2,78 + 3,61 + 369,51 = 549,46 €
  *     → líquido 2.419,86 − 549,46 = 1.870,40 €.  (2026: 550,02 € → 1.869,84 €.)
+ *   · Empresa 2026 — COTIZACION_EMPRESA_2026 (Orden PJC/297/2026): 23,60 + 5,50 + 0,20 + 0,60 +
+ *     0,75 (MEI) = 30,65 % más AT/EP. Sobre 2.777,00 €: 655,37 + 152,74 + 5,55 + 16,66 + 20,83
+ *     = 851,15 € (= 2.777,00 × 30,65 % = 851,1505).
  */
 
 const RUTA = '/visualizador-anatomia-nomina/';
@@ -200,18 +209,16 @@ test.describe('A. Cifras de la nómina, recalculadas a mano', () => {
   });
 
   test('A2 · base de cotización CC y CP = 2.777,00 € (devengos + prorrata de extras, art. 147 LGSS)', async ({ page }) => {
-    // ABIERTO, hallazgo: la base mostrada (2.419,86 €) es el total devengado, sin la prorrata
-    // de pagas extra (357,14 €) que exige el art. 147.1 LGSS y que la propia explicación cita.
-    test.fail();
+    // REPARADO (01/10/2026), hallazgo 2522: la base era el total devengado (2.419,86 €), sin la
+    // prorrata de pagas extra (357,14 €) que exige el art. 147.1 LGSS. Ahora la calcula motor.ts.
     // 2.142,86 + 85 + 72 + 120 + 357,14 = 2.777,00 €. Defecto de 357,14 €: basta un decimal.
     expect(await importe(page, 'Base de cotización contingencias comunes')).toBeCloseTo(2777.0, 1);
     expect(await importe(page, 'Base cotización contingencias profesionales')).toBeCloseTo(2777.0, 1);
   });
 
   test('A3 · cotizaciones del trabajador sobre la base correcta: CC 130,52 · desempleo 43,04 · FP 2,78 · MEI del año', async ({ page }) => {
-    // ABIERTO, hallazgo: las cuatro cuotas salen de la base errónea de 2.419,86 € (CC 113,74 €,
-    // 16,78 € de menos) y el MEI con el tipo de 2024 (0,12 % → 2,90 € en vez de 3,61 €).
-    test.fail();
+    // REPARADO (01/10/2026), hallazgos 2522 y 2524: las cuotas salían de la base errónea de
+    // 2.419,86 € (CC 113,74 €) y el MEI con el tipo de 2024 (0,12 % → 2,90 €).
     const anio = await anioPeriodo(page);
     // Precisión de un decimal (±0,05 €): el defecto más pequeño que vigila es el del MEI, 0,71 €.
     expect(await importe(page, 'Contingencias comunes')).toBeCloseTo(130.52, 1);
@@ -221,9 +228,8 @@ test.describe('A. Cifras de la nómina, recalculadas a mano', () => {
   });
 
   test('A4 · cada cuota de SS es la base CC mostrada × el tipo de su propia etiqueta, al céntimo', async ({ page }) => {
-    // ABIERTO, hallazgo (el de la base de cotización): con su propia base, 2.419,86 × 4,70 % =
-    // 113,733 → 113,73 €, y la línea dice 113,74 €. Las cuotas están tecleadas, no calculadas.
-    test.fail();
+    // REPARADO (01/10/2026), hallazgos 2522 y 2525: las cuotas estaban tecleadas (113,74 € con
+    // una base de 2.419,86 €, que da 113,73 €). Ahora son base × tipo importado de data/fiscal.
     const base = await importe(page, 'Base de cotización contingencias comunes');
     for (const c of ['Contingencias comunes', 'Desempleo', 'Formación profesional', 'MEI']) {
       const tipo = aTipo(await concepto(page, c));
@@ -234,17 +240,16 @@ test.describe('A. Cifras de la nómina, recalculadas a mano', () => {
   });
 
   test('A5 · retención IRPF = 2.419,86 × 15,27 % = 369,51 € (art. 82.5.º RIRPF)', async ({ page }) => {
-    // ABIERTO, hallazgo: la línea dice 369,54 € (3 céntimos de más sobre su propia base y tipo).
-    test.fail();
+    // REPARADO (01/10/2026), hallazgo 2530: decía 369,54 € (3 céntimos de más). Ahora es
+    // base × tipo, calculado.
     expect(aTipo(await concepto(page, 'Retención IRPF'))).toBeCloseTo(15.27, 2);
     expect(await importe(page, 'Base sujeta a retención IRPF')).toBeCloseTo(2419.86, 2);
     // Precisión 2 (±0,005 €): el defecto es de 0,03 €.
     expect(await importe(page, 'Retención IRPF')).toBeCloseTo(369.51, 2);
   });
 
-  test('A6 · líquido a percibir = 1.870,40 € (enero 2025) con la base y los tipos correctos', async ({ page }) => {
-    // ABIERTO, hallazgo (base de cotización + MEI): la app da 1.893,75 €, 23,35 € de más.
-    test.fail();
+  test('A6 · líquido a percibir del año del periodo (2025: 1.870,40 € · 2026: 1.869,84 €) con la base y los tipos correctos', async ({ page }) => {
+    // REPARADO (01/10/2026), hallazgos 2522 y 2524: daba 1.893,75 € (23,35 € de más en 2025).
     const anio = await anioPeriodo(page);
     // 2025: 2.419,86 − 549,46 = 1.870,40 · 2026: 2.419,86 − 550,02 = 1.869,84
     const esperado: Record<number, number> = { 2025: 1870.4, 2026: 1869.84 };
@@ -257,9 +262,9 @@ test.describe('A. Cifras de la nómina, recalculadas a mano', () => {
 
 test.describe('B. Contenido normativo, contra data/fiscal y el BOE', () => {
   test('B1 · MEI: tipo del trabajador y de la empresa del año del periodo, y 0,20 % en 2029 (DT 43.ª LGSS)', async ({ page }) => {
-    // ABIERTO, hallazgo: la nómina de enero de 2025 lleva los tipos de 2024 (0,12 % / 0,58 %) y
-    // dice «Para 2029 será del 0,17 %», que es el tipo de 2027; en 2029 es 0,2 %.
-    test.fail();
+    // REPARADO (01/10/2026), hallazgo 2524: la nómina de enero de 2025 llevaba los tipos de 2024
+    // (0,12 % / 0,58 %) y decía «Para 2029 será del 0,17 %» (el de 2027). Ahora los tipos salen
+    // de data/fiscal y 2029 dice 0,20 % del trabajador y 1,00 % de la empresa.
     const anio = await anioPeriodo(page);
     expect(await concepto(page, 'MEI')).toContain(`(${MEI[anio].trabajador}`);
     const texto = await explicacion(page, 'MEI');
@@ -268,49 +273,63 @@ test.describe('B. Contenido normativo, contra data/fiscal y el BOE', () => {
   });
 
   test('B2 · plus de transporte: no se presenta como exento de cotizar (art. 147.2 LGSS)', async ({ page }) => {
-    // ABIERTO, hallazgo: dice «NO salarial hasta ciertos límites (actualmente ~0,26 €/km)» y la
-    // base lo resta «(no cotiza)». El art. 147.2 LGSS solo excluye la locomoción FUERA del
-    // centro habitual; los 0,26 €/km son la exención IRPF de esa locomoción (art. 9.A.2 RIRPF).
-    test.fail();
+    // REPARADO (01/10/2026), hallazgo 2523: decía «NO salarial hasta ciertos límites
+    // (actualmente ~0,26 €/km)» y la base lo restaba «(no cotiza)». El art. 147.2 LGSS solo
+    // excluye la locomoción FUERA del centro habitual; los 0,26 €/km son la exención IRPF de
+    // esa locomoción (art. 9.A.2 RIRPF).
     const transporte = await explicacion(page, 'Plus transporte');
     expect(transporte).not.toMatch(/0,26\s*€\/km/);
     expect(transporte).not.toMatch(/NO salarial hasta/i);
     const base = await explicacion(page, 'Base de cotización contingencias comunes');
     expect(base).not.toMatch(/transporte \(no cotiza\)/i);
+    // Y lo positivo: el plus (72,00 €) aparece entre los sumandos de la base.
+    expect(base).toMatch(/plus transporte \(72,00\)/);
   });
 
   test('B3 · contingencias comunes: la explicación nombra la jubilación', async ({ page }) => {
-    // ABIERTO, hallazgo: enumera «enfermedad común, accidente no laboral, maternidad/paternidad e
-    // incapacidad temporal» y omite la jubilación. El art. 152.1 LGSS exime de cotizar «por
-    // contingencias comunes, salvo por incapacidad temporal» al alcanzar la edad de jubilación.
-    test.fail();
+    // REPARADO (01/10/2026), hallazgo 2527: enumeraba «enfermedad común, accidente no laboral,
+    // maternidad/paternidad e incapacidad temporal» y omitía la jubilación. El art. 152.1 LGSS
+    // exime de cotizar «por contingencias comunes, salvo por incapacidad temporal» al alcanzar
+    // la edad de jubilación.
     expect(await explicacion(page, 'Contingencias comunes')).toMatch(/jubilaci[oó]n/i);
   });
 
   test('B4 · Guía «Lo que tu empresa paga por ti»: incluye el MEI de la empresa', async ({ page }) => {
-    // ABIERTO, hallazgo: la lista (23,60 + AT + 5,50 + 0,20 + 0,60) omite el MEI de la empresa,
-    // 0,75 % en 2026 (data/fiscal COTIZACION_EMPRESA_2026.mei; Orden PJC/297/2026, art. 16).
-    test.fail();
-    expect(await abrirGuia(page)).toMatch(/MEI|Equidad Intergeneracional/i);
+    // REPARADO (01/10/2026), hallazgo 2529: la lista (23,60 + AT + 5,50 + 0,20 + 0,60) omitía el
+    // MEI de la empresa, 0,75 % en 2026 (data/fiscal COTIZACION_EMPRESA_2026.mei; Orden
+    // PJC/297/2026, art. 16), y daba «~720 €» sobre 2.400 €. El ejemplo usa ahora la base de la
+    // propia nómina: 2.777,00 × 30,65 % = 851,1505 → 851,15 € más AT (resuelto arriba).
+    const guia = await abrirGuia(page);
+    expect(guia).toMatch(/MEI|Equidad Intergeneracional/i);
+    expect(guia).toMatch(/0,75\s*%/);
+    expect(guia).toMatch(/30,65\s*%/);
+    expect(guia).toContain('851,15');
   });
 
   test('B5 · los porcentajes llevan espacio duro antes del «%» (RAE 2010, norma del proyecto)', async ({ page }) => {
-    // ABIERTO, hallazgo: «(4,70%)», «23,60%», «30-33%»… pegados (10 en pantalla con la Guía abierta).
-    test.fail();
+    // REPARADO (01/10/2026), hallazgo 2531: «(4,70%)», «23,60%», «30-33%»… iban pegados (10 en
+    // pantalla con la Guía abierta). Ahora todos salen de formatPercentage, con U+00A0.
     await abrirGuia(page);
     const pegados = await page.evaluate(() => (document.body.innerText.match(/\d%/g) ?? []).length);
     const conEspacioNormal = await page.evaluate(() => (document.body.innerText.match(/\d %/g) ?? []).length);
     expect(pegados + conEspacioNormal).toBe(0);
+    // Y en el FAQPage, que también los pegaba («~4,7%», «30-33%»).
+    const bloques = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(bloques.match(/\d ?%/g) ?? []).toEqual([]);
   });
 
   test('B6 · FAQPage: la retención es el tipo × la cuantía total de las retribuciones, y la calcula el pagador', async ({ page }) => {
-    // ABIERTO, hallazgo: dice que el porcentaje se aplica «sobre el salario bruto menos las
-    // cotizaciones sociales» y que «lo calcula Hacienda». Art. 82 RIRPF: las operaciones las hace
-    // el retenedor y el importe es el tipo «a la cuantía total de las retribuciones» (82.5.º).
-    test.fail();
+    // REPARADO (01/10/2026), hallazgo 2526: decía que el porcentaje se aplica «sobre el salario
+    // bruto menos las cotizaciones sociales» y que «lo calcula Hacienda». Art. 82 RIRPF: las
+    // operaciones las hace el retenedor y el importe es el tipo «a la cuantía total de las
+    // retribuciones» (82.5.º).
     const r = await faq(page, /retención del IRPF/);
     expect(r).not.toMatch(/bruto menos las cotizaciones/i);
     expect(r).not.toMatch(/lo calcula Hacienda/i);
+    expect(r).toMatch(/lo calcula la empresa/i);
+    expect(r).toMatch(/cuantía total/i);
+    // El FAQPage nombra también el MEI entre las cotizaciones del trabajador (hallazgo 2529).
+    expect(await faq(page, /neto es menor que el bruto/)).toMatch(/Equidad Intergeneracional 0,15\s*%/);
   });
 
   test('B7 · RD 723/2026: lo que afirma la Guía está en el BOE (BOE-A-2026-19200)', async ({ page }) => {
@@ -370,9 +389,9 @@ test.describe('C. Operativa y accesibilidad', () => {
   });
 
   test('C3 · importes de devengos y deducciones con contraste ≥ 4,5:1 en los dos temas', async ({ page }) => {
-    // ABIERTO, hallazgo: verde #27ae60 sobre blanco 2,87:1 y rojo #e74c3c 3,82:1 (3,76:1 en
-    // oscuro), en texto de 14 px a peso 600 (texto normal: WCAG 1.4.3 pide 4,5:1).
-    test.fail();
+    // REPARADO (01/10/2026), hallazgo 2528: verde #27ae60 sobre blanco daba 2,87:1 y rojo #e74c3c
+    // 3,82:1 (3,76:1 en oscuro), en texto de 14 px a peso 600. Ahora --verde/--rojo del módulo
+    // tienen variante en cada tema.
     const leer = async () => ({
       devengo: await contraste(page, '[class*="linea_devengo"] [class*="lineaImporte"]'),
       deduccion: await contraste(page, '[class*="linea_deduccion"] [class*="lineaImporte"]'),
@@ -387,9 +406,8 @@ test.describe('C. Operativa y accesibilidad', () => {
   });
 
   test('C4 · enlaces a las apps de sueldo neto con contraste ≥ 4,5:1 en los dos temas', async ({ page }) => {
-    // ABIERTO, hallazgo: --primary #2E86AB como texto de 14,4 px sobre #F5F5F5 da 3,77:1, y sobre
-    // #333333 en oscuro 3,08:1 (el módulo no redeclara --primary en su variante oscura).
-    test.fail();
+    // REPARADO (01/10/2026), hallazgo 2532: --primary #2E86AB como texto de 14,4 px sobre #F5F5F5
+    // daba 3,77:1, y sobre #333333 en oscuro 3,08:1. Ahora usa --primary-texto.
     const leer = () => contraste(page, '[class*="enlaceApp"] a');
     const claro = await esperarEstable(leer);
     await activarTemaOscuro(page);
@@ -421,5 +439,17 @@ test.describe('C. Móvil (390 px)', () => {
     await cc.tap();
     await expect(cc).toHaveAttribute('aria-expanded', 'true');
     await expect(page.locator('[role="region"][aria-label^="Explicación de Contingencias comunes"]')).toBeVisible();
+  });
+
+  test('C6 · «Líquido total a percibir» con contraste ≥ 4,5:1 en móvil, en los dos temas', async ({ page }) => {
+    // REPARADO (01/10/2026), hallazgo 2532: a 390 px baja a 16 px en negrita y deja de ser texto
+    // grande; con --primary #2E86AB daba 4,11:1 en claro (3,50:1 en oscuro). Ahora usa
+    // --primary-texto.
+    const leer = () => contraste(page, '[class*="liquidoResultado"] span');
+    const claro = await esperarEstable(leer);
+    await activarTemaOscuro(page);
+    const oscuro = await esperarEstable(leer);
+    expect(claro, 'líquido, claro').toBeGreaterThanOrEqual(4.5);
+    expect(oscuro, 'líquido, oscuro').toBeGreaterThanOrEqual(4.5);
   });
 });
