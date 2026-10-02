@@ -32,6 +32,10 @@
  *     avisa de él.
  *   · Tiempo por sesión: cabe si la sesión MÍNIMA de la ficha no supera el tiempo declarado
  *     (gimnasio 45-75 min, ciclismo 1-3 horas; con «Menos de 30 minutos» quedan fuera).
+ *     «Menos de 30 minutos» es un límite ABIERTO: una sesión de 30 no cabe (hallazgo 2687).
+ *     Antes el techo 30 se trataba como cerrado y entraban la natación y el yoga o el pilates,
+ *     cuyas fichas dicen «sesiones de 30-60 min», en 219.232 de los 344.064 perfiles con poco
+ *     tiempo. «Entre 30 y 60» y «Entre 1 y 2 horas» incluyen su extremo: son cerrados.
  * Las demás respuestas (objetivo, compañía, condición, motivación, experiencia y las otras
  * prioridades) son preferencias y siguen siendo pesos. El entrenamiento en casa pasa todos los
  * filtros (sin impacto, en casa, sin cuota, sesiones desde 20 min), así que siempre queda una.
@@ -240,7 +244,7 @@ export const EJERCICIOS: Record<EjercicioKey, EjercicioInfo> = {
     sesionMinima: 45,
     beneficios: ['Mejora de fuerza y masa muscular demostrable', 'Control total de cargas y progresión', 'Acceso a todos los grupos musculares', 'Protección articular a largo plazo si entrenas bien', 'Independiente del clima'],
     equipo: ['Zapatillas de entrenamiento (no de running)', 'Ropa cómoda y transpirable', 'Toalla y candado para taquilla', 'Botella de agua reutilizable', 'Opcional: guantes, cinturón, straps'],
-    consejos: ['Empieza con pesos bajos para aprender la técnica', 'El descanso entre sesiones es tan importante como entrenar', 'La progresión debe ser gradual: no subas más del 10% de carga por semana', 'Come proteína suficiente (1,6-2 g por kg de peso al día) si quieres ganar músculo'],
+    consejos: ['Empieza con pesos bajos para aprender la técnica', 'El descanso entre sesiones es tan importante como entrenar', 'La progresión debe ser gradual: no subas más del 10 % de carga por semana', 'Come proteína suficiente (1,6-2 g por kg de peso al día) si quieres ganar músculo'],
   },
   running: {
     icono: '🏃',
@@ -259,7 +263,7 @@ export const EJERCICIOS: Record<EjercicioKey, EjercicioInfo> = {
     sesionMinima: 20,
     beneficios: ['Mejora cardiovascular muy rápida', 'Quema calórica alta por sesión', 'Libera endorfinas y reduce el estrés', 'Puedes hacerlo en cualquier lugar del mundo', 'Comunidad muy amplia y accesible'],
     equipo: ['Zapatillas de running específicas (imprescindible)', 'Ropa técnica transpirable', 'Reloj o app para medir ritmo y distancia', 'Si usas sujetador, uno deportivo de sujeción alta', 'Opcional: auriculares inalámbricos'],
-    consejos: ['El 80% de tu entrenamiento debe ser a ritmo conversacional (test: puedes hablar)', 'Descansa al menos un día entre sesiones al principio', 'Estira y fortalece el core para prevenir lesiones', 'Las lesiones del corredor tienen varias causas a la vez: el entrenamiento, la salud y los hábitos, la morfología y la biomecánica (Correia et al., 2024). El factor de riesgo que más se repite en los estudios de seguimiento es haber tenido otra lesión en los últimos 12 meses (Saragiotto et al., 2014): si vienes de una, empieza con más prudencia'],
+    consejos: ['El 80 % de tu entrenamiento debe ser a ritmo conversacional (test: puedes hablar)', 'Descansa al menos un día entre sesiones al principio', 'Estira y fortalece el core para prevenir lesiones', 'Las lesiones del corredor tienen varias causas a la vez: el entrenamiento, la salud y los hábitos, la morfología y la biomecánica (Correia et al., 2024). El factor de riesgo que más se repite en los estudios de seguimiento es haber tenido otra lesión en los últimos 12 meses (Saragiotto et al., 2014): si vienes de una, empieza con más prudencia'],
   },
   natacion: {
     icono: '🏊',
@@ -383,6 +387,17 @@ export const TECHO_SESION: Record<string, number> = {
   mucho: Infinity,
 };
 
+/** Tramos cuyo techo NO se incluye: «Menos de 30 minutos» no admite una sesión de 30. */
+export const TECHO_SESION_ABIERTO: Record<string, boolean> = {
+  poco: true,
+};
+
+/** ¿Cabe una sesión que empieza en `minima` minutos en el tramo de tiempo declarado? */
+export function cabeLaSesion(minima: number, tiempo: string | undefined): boolean {
+  const techo = (tiempo !== undefined ? TECHO_SESION[tiempo] : undefined) ?? Infinity;
+  return tiempo !== undefined && TECHO_SESION_ABIERTO[tiempo] ? minima < techo : minima <= techo;
+}
+
 export type MotivoDescarte = 'impacto' | 'casa' | 'presupuesto' | 'tiempo';
 
 /** Las preguntas que deshacen un empate, en orden, y cómo se dice cada una. */
@@ -438,7 +453,6 @@ export function calcularResultado(respuestas: Record<string, string>): Resultado
   const conLimitacion = limitacion === 'rodillas' || limitacion === 'espalda' || limitacion === 'general';
   const pideBajoImpacto = conLimitacion || respuestas.prioridad === 'impacto';
   const techoCuota = TECHO_CUOTA[respuestas.presupuesto] ?? Infinity;
-  const techoSesion = TECHO_SESION[respuestas.tiempo] ?? Infinity;
   const descartes: Resultado['descartes'] = {};
   for (const k of CLAVES) {
     const info = EJERCICIOS[k];
@@ -446,7 +460,7 @@ export function calcularResultado(respuestas: Record<string, string>): Resultado
     if (pideBajoImpacto && info.impacto) motivos.push('impacto');
     if (respuestas.lugar === 'casa' && !info.enCasa) motivos.push('casa');
     if (info.cuotaMin > techoCuota) motivos.push('presupuesto');
-    if (info.sesionMinima > techoSesion) motivos.push('tiempo');
+    if (!cabeLaSesion(info.sesionMinima, respuestas.tiempo)) motivos.push('tiempo');
     if (motivos.length > 0) descartes[k] = motivos;
   }
 
@@ -469,8 +483,15 @@ export function calcularResultado(respuestas: Record<string, string>): Resultado
     return `su ficha habla de ${info.sesion} y has indicado «${etiquetaDe('tiempo', respuestas.tiempo)}»`;
   };
   const apartados = ordenTotal.slice(0, ordenTotal.indexOf(ejercicio));
+  // «Por puntos iba por delante» solo si de verdad sumaba MÁS: una apartada con los mismos
+  // puntos iba delante únicamente por el desempate, y decir «por puntos» era falso (hallazgo
+  // 2689, 66.157 perfiles). Entonces se dice que empataba.
   const avisosDescarte = apartados.map((k) => {
     const motivos = (descartes[k] ?? []).map((m) => motivoEnFrase(k, m)).join(', y además ');
+    if (puntos[k] === puntos[ejercicio]) {
+      const nombre = CON_ARTICULO[k].charAt(0).toUpperCase() + CON_ARTICULO[k].slice(1);
+      return `${nombre} empataba a puntos con ${CON_ARTICULO[ejercicio]}, pero ${motivos}.`;
+    }
     return `Por puntos iba por delante ${CON_ARTICULO[k]}, pero ${motivos}.`;
   });
 
@@ -484,6 +505,10 @@ export function calcularResultado(respuestas: Record<string, string>): Resultado
     if (ejercicio === 'entrenamiento-casa' || ejercicio === 'gimnasio') {
       aTenerEnCuenta.push('Con esa limitación, elige ejercicios sin saltos ni impactos: muchas rutinas de HIIT los incluyen.');
     }
+  } else if (pideBajoImpacto && (ejercicio === 'entrenamiento-casa' || ejercicio === 'gimnasio')) {
+    // La prioridad «Bajo impacto» ya aparta el running por impacto; el HIIT que propone la ficha
+    // de casa no puede quedar sin el mismo matiz (hallazgo 2690, 19.892 perfiles).
+    aTenerEnCuenta.push('Como priorizas el bajo impacto para las articulaciones, elige ejercicios sin saltos ni impactos: muchas rutinas de HIIT los incluyen.');
   }
   if (respuestas.presupuesto === 'cero' && info.equipoDePartida) {
     aTenerEnCuenta.push(`Con «Cero euros, sin gasto», cuenta con el equipo de partida si no lo tienes ya: ${info.equipoDePartida}.`);

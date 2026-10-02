@@ -250,7 +250,29 @@
    título en móvil y tableta. Desde 1024px el título centrado ya no llega al logo. Mismo hueco
    que deja la plantilla. Va al final para ganar a cualquier padding previo del hero. */
 @media (max-width: 1023px) {
-  .hero {
+  .hero,
+  .heroResultados {
     padding-top: 80px;
   }
 }
+/* .heroResultados se quedó fuera de los lotes 586a4d61 y a1d72a9c, y la píldora del logo pisaba
+   «Tu ejercicio recomendado» a 360 y 390 px (hallazgo 2686): mismo trato que .hero. */
+
+/* Al cambiar de pantalla, el bloque que recibe el foco se desplaza bajo la barra fija del logo,
+   no detrás (hallazgo 2684); mismo valor que MARGEN_LOGO en page.tsx. */
+.introContainer,
+.testContainer,
+.preguntaTexto,
+.heroTitleSm { scroll-margin-top: 80px; }
+
+/* Los enunciados y el título de la intro reciben el foco (tabIndex=-1): visible solo con teclado. */
+.preguntaTexto:focus,
+.introTitulo:focus { outline: none; }
+.preguntaTexto:focus-visible,
+.introTitulo:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; border-radius: 4px; }
+
+/* La guía educativa vive fuera de las pantallas (se monta en todas, hallazgo 2688). */
+.guiaContainer { max-width: 800px; margin: 0 auto 2rem; padding: 0 1rem; }
+
+/* El aviso médico de la intro, separado de su tarjeta. */
+.introContainer > .warningBox { margin: 1.25rem 0 0; }

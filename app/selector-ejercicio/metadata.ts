@@ -10,7 +10,7 @@ const CARACTERISTICAS = [
   'Respeta lo que declaras como límite: entrenar en casa, el presupuesto mensual y el tiempo por sesión',
   'Frecuencia, coste estimado y cómo empezar con cada actividad',
   'Beneficios, equipamiento y consejos para mantener la constancia',
-  '100% en el navegador, sin registro',
+  '100 % en el navegador, sin registro',
 ];
 
 export const metadata: Metadata = {
@@ -76,7 +76,7 @@ export const faqJsonLd = {
       name: '¿Qué ejercicio me conviene si soy principiante y tengo poco tiempo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Para quien empieza con la agenda ajustada, lo más práctico son actividades de sesión corta y sin desplazamientos: caminar rápido, entrenar en casa con el propio peso, yoga o pilates guiados, o correr alternando carrera y caminata. Con menos de 30 minutos por sesión, este test aparta las actividades cuya sesión habitual es más larga, como el gimnasio (${EJERCICIOS.gimnasio.sesion}) o el ciclismo de ruta (${EJERCICIOS.ciclismo.sesion}). La Organización Mundial de la Salud recomienda a los adultos al menos 150 minutos semanales de actividad moderada y recuerda que toda actividad cuenta, así que las sesiones cortas también suman.`,
+        text: `Para quien empieza con la agenda ajustada, lo más práctico son actividades de sesión corta y sin desplazamientos: caminar rápido, entrenar en casa con el propio peso o correr alternando carrera y caminata. Con menos de 30 minutos por sesión, este test aparta las actividades cuya sesión habitual es más larga, es decir, de 30 minutos o más: el gimnasio (${EJERCICIOS.gimnasio.sesion}), la natación y el yoga o el pilates (${EJERCICIOS.natacion.sesion}) o el ciclismo de ruta (${EJERCICIOS.ciclismo.sesion}). La Organización Mundial de la Salud recomienda a los adultos al menos 150 minutos semanales de actividad moderada y recuerda que toda actividad cuenta, así que las sesiones cortas también suman.`,
       },
     },
     {
