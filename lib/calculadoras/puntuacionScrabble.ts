@@ -70,28 +70,93 @@ export function letrasSinFicha(
 }
 
 /**
- * Puntúa una palabra letra a letra, con las posiciones cubiertas por comodín a 0.
+ * Una ficha de la palabra: su texto (letra o dígrafo) y las posiciones de letra que ocupa.
  *
- * **Letra a letra a propósito**: quien teclea un atril de letras sueltas no puede
- * expresar que tiene la ficha RR en vez de dos R, así que puntuar «CARRO» como
- * 8 estaría contando una ficha que ese jugador no ha dicho tener. Es además el
- * criterio de Apalabrados y de las ediciones sin dígrafos. Para la puntuación
- * con dígrafos y tablero está el motor de /calculadora-jugada-scrabble/.
+ * `posiciones` se refiere a la palabra normalizada (una posición por letra), que es como el
+ * generador de anagramas cuenta dónde caen las fichas blancas: un dígrafo ocupa DOS.
+ */
+export interface FichaDePalabra {
+  ficha: string;
+  posiciones: number[];
+}
+
+/**
+ * Parte una palabra en las fichas que ocupa en el tablero del Scrabble español.
  *
- * @param palabra Palabra en cualquier caja; las tildes no cuentan como ficha
- *   distinta (Á es la ficha A), pero la Ñ sí tiene ficha propia y vale 8.
- * @param posicionesComodin Índices (base 0, sobre la palabra ya normalizada) que
- *   cubre una ficha blanca: valen 0 puntos.
+ * CH, LL y RR son SIEMPRE una ficha: el art. 11 del reglamento de la FISE dice que «no podrán
+ * utilizarse dos eres, ni dos eles, ni la ce y la hache para formar una doble letra». Es el
+ * mismo corte voraz de izquierda a derecha que `fichasDePalabra(palabra, 'digrafos')` del motor
+ * de /calculadora-jugada-scrabble/ (hallazgo 2590), que no tiene ambigüedad con este lemario:
+ * ningún lema trae CHH, LLL ni RRR.
+ */
+export function fichasConDigrafos(palabra: string): FichaDePalabra[] {
+  const letras = aFichas(palabra);
+  const fichas: FichaDePalabra[] = [];
+  let i = 0;
+  while (i < letras.length) {
+    const par = i + 1 < letras.length ? letras[i] + letras[i + 1] : '';
+    if (par !== '' && DIGRAFOS.includes(par)) {
+      fichas.push({ ficha: par, posiciones: [i, i + 1] });
+      i += 2;
+    } else {
+      fichas.push({ ficha: letras[i], posiciones: [i] });
+      i += 1;
+    }
+  }
+  return fichas;
+}
+
+/**
+ * Puntúa una palabra con las fichas del Scrabble español, dígrafos incluidos, y con las
+ * fichas que cubre una blanca a 0.
+ *
+ * **Con dígrafos a propósito** (hallazgo 2602, 02/10/2026). Hasta entonces sumaba letra a
+ * letra —CARRO = C3+A1+R1+R1+O1 = 7, CHAPA = 12— con el argumento de que un atril tecleado no
+ * puede decir si tiene la ficha RR o dos R. Pero no hay dos formas legales: el art. 11 FISE
+ * prohíbe formar el dígrafo con dos fichas sueltas, así que ese 7 no era el valor de ninguna
+ * jugada de la edición cuyos valores usa la tabla (con la ficha RR, CARRO vale 13). La única
+ * lectura que el reglamento admite es la del dígrafo, y es la que se puntúa; qué ficha hace
+ * falta para jugarla lo dice `digrafosNecesarios`.
+ *
+ * Una blanca que cae sobre CUALQUIERA de las dos letras de un dígrafo es esa ficha entera
+ * (el comodín sustituye a cualquier ficha, también CH, LL y RR: art. 10), así que el dígrafo
+ * vale 0. Es la lectura con la que la palabra se puede jugar: «car?o» forma CARRO poniendo la
+ * blanca de RR (C3+A1+0+O1 = 5) y la R suelta se queda en el atril.
+ *
+ * @param palabra Palabra en cualquier caja; las tildes no cuentan como ficha distinta (Á es
+ *   la ficha A), pero la Ñ sí tiene ficha propia y vale 8.
+ * @param posicionesComodin Índices (base 0, sobre la palabra ya normalizada, una posición por
+ *   letra) que cubre una ficha blanca.
  */
 export function puntuarPalabra(palabra: string, posicionesComodin: readonly number[] = []): number {
   const cubiertas = new Set(posicionesComodin);
-  const fichas = aFichas(palabra);
   let total = 0;
-  for (let i = 0; i < fichas.length; i++) {
-    if (cubiertas.has(i)) continue;
-    total += VALORES_FICHA[fichas[i]] ?? 0;
+  for (const { ficha, posiciones } of fichasConDigrafos(palabra)) {
+    if (posiciones.some((p) => cubiertas.has(p))) continue;
+    total += VALORES_FICHA[ficha] ?? 0;
   }
   return total;
+}
+
+/**
+ * Los dígrafos (CH, LL, RR) que la palabra necesita como FICHA propia del atril, sin repetir y
+ * en el orden en que aparecen; los que cubre una blanca no cuentan.
+ *
+ * Devuelve `[]` cuando la palabra se juega con letras sueltas. Si no está vacío, la palabra
+ * solo es jugable teniendo esas fichas: con dos R sueltas no se forma la RR (art. 11 FISE).
+ */
+export function digrafosNecesarios(
+  palabra: string,
+  posicionesComodin: readonly number[] = [],
+): string[] {
+  const cubiertas = new Set(posicionesComodin);
+  const necesarios: string[] = [];
+  for (const { ficha, posiciones } of fichasConDigrafos(palabra)) {
+    if (!DIGRAFOS.includes(ficha)) continue;
+    if (posiciones.some((p) => cubiertas.has(p))) continue;
+    if (!necesarios.includes(ficha)) necesarios.push(ficha);
+  }
+  return necesarios;
 }
 
 /**

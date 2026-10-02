@@ -5,7 +5,11 @@ import { useState, useMemo, useEffect, useRef, Fragment, type FormEvent } from '
 import styles from './GeneradorAnagramas.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { puntuarPalabra, letrasSinFicha } from '@/lib/calculadoras/puntuacionScrabble';
+import {
+  puntuarPalabra,
+  letrasSinFicha,
+  digrafosNecesarios,
+} from '@/lib/calculadoras/puntuacionScrabble';
 
 /**
  * Diccionario español basado en el Lemario General del Español
@@ -174,8 +178,23 @@ interface ResultadoPalabra {
   /** Forma normalizada: es a la que se refieren las posiciones de `comodines` */
   normalizada: string;
   comodines: number[];
-  /** Puntuación base de la palabra en fichas españolas, con las blancas a 0 */
+  /**
+   * Puntuación base de la palabra en fichas españolas, con las blancas a 0 y CH, LL y RR
+   * como UNA ficha (art. 11 FISE). Hasta el 02/10/2026 se sumaban letra a letra —CARRO 7,
+   * CHAPA 12—, un número que no era el de ninguna jugada legal (hallazgo 2602).
+   */
   puntos: number;
+  /**
+   * Fichas de dígrafo (CH, LL, RR) que hace falta tener en el atril para jugar la palabra;
+   * las que pone una blanca no cuentan. Vacío = se juega con letras sueltas.
+   *
+   * El atril se teclea letra a letra y no puede decir si «rr» son dos R o la ficha RR, así
+   * que la búsqueda (que reparte letras) encuentra CARRO con cualquiera de las dos. Pero solo
+   * una es legal: con dos R sueltas no se forma la RR. La palabra se puntúa con la ficha
+   * —13, la única cifra que el reglamento admite— y se marca con ella, para que quien tiene
+   * dos R sueltas sepa que esa no la puede poner.
+   */
+  digrafos: string[];
   /**
    * Letras que la palabra lleva y la bolsa española NO tiene (K y W). Vacío = jugable.
    *
@@ -244,16 +263,36 @@ function InsigniaPuntos({ resultado }: { resultado: ResultadoPalabra }) {
       </span>
     );
   }
+  const digrafos = resultado.digrafos.join(' y ');
   return (
-    <span className={styles.chipPuntos}>
+    <span
+      className={styles.chipPuntos}
+      title={
+        digrafos
+          ? `Solo con la ficha ${digrafos}: dos fichas sueltas no forman el dígrafo (art. 11 FISE)`
+          : undefined
+      }
+    >
       {resultado.puntos}
       <span className={styles.chipPuntosUnidad} aria-hidden="true"> pt</span>
       <span className={styles.soloLectores}>
         {' '}
         {resultado.puntos === 1 ? 'punto' : 'puntos'}
+        {digrafos && `, solo con la ficha ${digrafos}`}
       </span>
+      {/* Lo que hace falta para jugarla, a la vista: una palabra con RR no vale con dos R */}
+      {digrafos && (
+        <span className={styles.chipDigrafo} aria-hidden="true">
+          {' '}con {digrafos}
+        </span>
+      )}
     </span>
   );
+}
+
+/** «1 punto», «7 puntos»: el resumen concuerda en número como el chip (hallazgo 2604). */
+function textoPuntos(n: number): string {
+  return `${n} ${n === 1 ? 'punto' : 'puntos'}`;
 }
 
 function PalabraConComodines({ resultado }: { resultado: ResultadoPalabra }) {
@@ -627,14 +666,19 @@ export default function GeneradorAnagramasPage() {
     setModo('frase');
   };
 
-  const findAnagrams = () => {
+  /**
+   * Busca las palabras del atril. Recibe el texto porque los botones de ejemplo lo fijan y
+   * buscan en el mismo gesto (hallazgo 2606): leído del estado, todavía sería el anterior.
+   */
+  const findAnagrams = (texto: string = letters) => {
+    const atrilBuscado = analizarAtril(texto);
     // Nunca sobre un atril distinto del tecleado: por encima del tope se avisa y no se busca
-    if (atrilExcedido) return;
+    if (atrilBuscado.letras.length + atrilBuscado.comodines > MAX_FICHAS_ATRIL) return;
     setIsSearching(true);
 
     setTimeout(() => {
       // Sin tildes, igual que los otros dos modos de la app; las fichas blancas van aparte
-      const { letras, comodines } = analizarAtril(letters);
+      const { letras, comodines } = atrilBuscado;
 
       if (letras.length + comodines < 2 || letras.length === 0) {
         setResults([]);
@@ -665,6 +709,7 @@ export default function GeneradorAnagramasPage() {
               // desplazaría y la blanca descontaría la ficha equivocada.
               puntos: puntuarPalabra(normalizada, posiciones),
               sinFicha: letrasSinFicha(normalizada, posiciones),
+              digrafos: digrafosNecesarios(normalizada, posiciones),
             });
           }
         }
@@ -725,12 +770,23 @@ export default function GeneradorAnagramasPage() {
   const resultadosOrdenados = useMemo(() => {
     const lista = [...results];
     if (orden === 'puntos') {
-      // A igual puntuación mandan las que NO gastan blanca: dos jugadas que valen
-      // lo mismo no son igual de buenas si una se deja la ficha comodín puesta.
       lista.sort((a, b) => {
-        if (b.puntos !== a.puntos) return b.puntos - a.puntos;
+        // Las injugables (K, W) van al final, por longitud: no tienen puntuación que ordenar.
+        // Ordenaban por `puntos`, que para ellas es la suma con esas letras a 0, y «kayak»
+        // encabezaba la lista con 6 fantasma por encima de AY y YA, las únicas jugables
+        // (hallazgo 2603; el 704 había quitado ese número del chip, no del orden).
+        const injugableA = a.sinFicha.length > 0;
+        const injugableB = b.sinFicha.length > 0;
+        if (injugableA !== injugableB) return injugableA ? 1 : -1;
+        if (!injugableA && b.puntos !== a.puntos) return b.puntos - a.puntos;
+        // A igual puntuación mandan las que NO gastan blanca: dos jugadas que valen
+        // lo mismo no son igual de buenas si una se deja la ficha comodín puesta.
         if (a.comodines.length !== b.comodines.length) {
           return a.comodines.length - b.comodines.length;
+        }
+        // Y después las que se juegan con letras sueltas, sin pedir la ficha CH, LL o RR
+        if (a.digrafos.length !== b.digrafos.length) {
+          return a.digrafos.length - b.digrafos.length;
         }
         if (b.normalizada.length !== a.normalizada.length) {
           return b.normalizada.length - a.normalizada.length;
@@ -774,14 +830,26 @@ export default function GeneradorAnagramasPage() {
    * palabras que la propia app declara injugables —del atril «kayak» anunciaba «La más
    * valiosa: 6 puntos», que es KAYAK con sus dos K a cero (hallazgo 704)—.
    */
-  const mejorPuntuacion = useMemo(
-    () =>
-      results.reduce(
-        (maximo, r) => (r.sinFicha.length === 0 && r.puntos > maximo ? r.puntos : maximo),
-        0,
-      ),
-    [results],
-  );
+  /**
+   * Se separan las que se juegan con letras sueltas de las que piden la ficha de un dígrafo
+   * (hallazgo 2602): con el atril «carro», la más valiosa con fichas sueltas es CORAR (7) y
+   * CARRO (13) solo vale si tienes la RR. Un único máximo diría 13 a quien tiene dos R.
+   */
+  const mejorPuntuacion = useMemo(() => {
+    let sueltas = 0;
+    let conDigrafo = 0;
+    let digrafos: string[] = [];
+    for (const r of results) {
+      if (r.sinFicha.length > 0) continue;
+      if (r.digrafos.length === 0) {
+        if (r.puntos > sueltas) sueltas = r.puntos;
+      } else if (r.puntos > conDigrafo) {
+        conDigrafo = r.puntos;
+        digrafos = r.digrafos;
+      }
+    }
+    return { sueltas, conDigrafo, digrafos };
+  }, [results]);
 
   /** Cuántas de las encontradas necesitan gastar una ficha blanca. */
   const conComodin = useMemo(
@@ -1007,7 +1075,17 @@ export default function GeneradorAnagramasPage() {
               <button
                 key={ex.letters}
                 className={styles.exampleBtn}
-                onClick={() => { setLetters(ex.letters); setResults([]); setBuscado(false); }}
+                // Busca en el mismo gesto, como promete la guía (hallazgo 2606): solo rellenaba
+                // el campo, y a 360 px el botón «Buscar palabras» quedaba fuera de la pantalla.
+                // En táctil lleva además la vista a los resultados, como el envío del teclado.
+                onClick={() => {
+                  setLetters(ex.letters);
+                  setResults([]);
+                  setBuscado(false);
+                  if (dictStatus !== 'ready' || isSearching) return;
+                  if (window.matchMedia('(pointer: coarse)').matches) desplazarA.current = 'letras';
+                  findAnagrams(ex.letters);
+                }}
                 type="button"
               >
                 {ex.label}
@@ -1105,18 +1183,35 @@ export default function GeneradorAnagramasPage() {
                   Puntos
                 </button>
               </div>
-              {mejorPuntuacion > 0 && (
+              {mejorPuntuacion.conDigrafo > mejorPuntuacion.sueltas ? (
                 <span className={styles.ordenMejor}>
-                  La más valiosa: <strong>{mejorPuntuacion} puntos</strong>
+                  La más valiosa:{' '}
+                  <strong>{textoPuntos(mejorPuntuacion.conDigrafo)}</strong> con la ficha{' '}
+                  {mejorPuntuacion.digrafos.join(' y ')}
+                  {mejorPuntuacion.sueltas > 0 && (
+                    <>
+                      {' '}· con letras sueltas, <strong>{textoPuntos(mejorPuntuacion.sueltas)}</strong>
+                    </>
+                  )}
                 </span>
+              ) : (
+                mejorPuntuacion.sueltas > 0 && (
+                  <span className={styles.ordenMejor}>
+                    La más valiosa: <strong>{textoPuntos(mejorPuntuacion.sueltas)}</strong>
+                  </span>
+                )
               )}
             </div>
 
             <p className={styles.leyendaPuntos}>
               Los puntos son los de las fichas del <strong>Scrabble en español</strong>, sumados
-              letra a letra y sin tablero: no incluyen los multiplicadores de casilla ni el
-              bonus por colocar las siete fichas. Las fichas CH, LL y RR se cuentan como letras
-              sueltas, porque un atril tecleado no puede decir cuál de las dos formas tienes.
+              ficha a ficha y sin tablero: no incluyen los multiplicadores de casilla ni el
+              bonus por colocar las siete fichas. <strong>CH, LL y RR son una sola ficha</strong>:
+              dos fichas sueltas no forman el dígrafo (art. 11 del reglamento FISE). Como un
+              atril tecleado no dice si «rr» son dos R o la ficha RR, las palabras con dígrafo
+              se puntúan con su ficha y llevan la marca «con RR», «con CH» o «con LL»: solo
+              puedes ponerlas si tienes esa ficha o una blanca que haga de ella. Las palabras
+              con K o W no se pueden jugar y, al ordenar por puntos, van al final.
             </p>
 
             {conComodin > 0 && (
@@ -1571,8 +1666,10 @@ export default function GeneradorAnagramasPage() {
             <li className={styles.eduStep}>
               <span className={styles.eduStepNum}>2</span>
               <div>
-                <strong>Para Scrabble: busca primero las más largas</strong>
-                <p>Los resultados aparecen ordenados de mayor a menor longitud. Las palabras más largas dan más puntos base. Examina primero las de 7+ letras (potencial bingo) antes de conformarte con una corta.</p>
+                <strong>Para Scrabble: elige el orden según lo que buscas</strong>
+                {/* Hallazgo 2605: decía que «las palabras más largas dan más puntos base», y la
+                    propia app lo desmiente con ZAPA y PASTA; tampoco nombraba el orden por puntos. */}
+                <p>Por defecto los resultados salen agrupados de mayor a menor longitud: es la vista para buscar un bingo (colocar las siete fichas del atril, +50 puntos). Con <strong>Ordenar por → Puntos</strong> pasan a ir de más a menos puntos, que es la vista para la jugada de este turno. Más letras no significa más puntos, porque manda el valor de cada ficha: de «zapatas» salen PASTA, con 5 letras y 7 puntos, y ZAPA, con 4 letras y 15.</p>
               </div>
             </li>
             <li className={styles.eduStep}>
@@ -1593,7 +1690,7 @@ export default function GeneradorAnagramasPage() {
               <span className={styles.eduStepNum}>5</span>
               <div>
                 <strong>Prueba los ejemplos para familiarizarte</strong>
-                <p>Los botones de ejemplo (amor, mesa, palabra, corazon) muestran cómo funciona la herramienta. &quot;corazon&quot; con 7 letras genera docenas de palabras — es un buen punto de partida para explorar.</p>
+                <p>Los botones de ejemplo (amor, mesa, palabra, corazon) rellenan el atril y buscan en el mismo toque, así que muestran de inmediato cómo funciona la herramienta. &quot;corazon&quot; con 7 letras genera docenas de palabras — es un buen punto de partida para explorar.</p>
               </div>
             </li>
             <li className={styles.eduStep}>

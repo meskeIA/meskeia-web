@@ -87,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Cómo usar el generador de anagramas para Scrabble o Apalabrados?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Introduce en el generador las letras que tienes en tu atril, hasta quince caracteres. El generador busca todas las palabras válidas que puedes formar con esas letras, ordenadas por longitud de mayor a menor. Para Scrabble o Apalabrados, las palabras más largas suelen dar más puntos. También puedes introducir las letras del tablero junto con las tuyas para encontrar combinaciones que aprovechen letras ya colocadas.',
+        text: 'Introduce en el generador las letras que tienes en tu atril, hasta quince caracteres. El generador busca todas las palabras válidas que puedes formar con esas letras y las ordena por longitud o, si lo eliges, por los puntos de las fichas del Scrabble en español. Más letras no significa más puntos: manda el valor de cada ficha, y ZAPA, con la Z de 10, vale 15 mientras PASTA vale 7. Las palabras con CH, LL o RR se puntúan con esa ficha, porque dos fichas sueltas no forman el dígrafo. También puedes introducir las letras del tablero junto con las tuyas para encontrar combinaciones que aprovechen letras ya colocadas.',
       },
     },
     {

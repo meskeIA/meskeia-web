@@ -1089,6 +1089,14 @@
   opacity: 0.85;
 }
 
+/* La ficha de dígrafo que pide la palabra («con RR»): sin ella no se puede jugar, porque
+   dos fichas sueltas no forman la RR (art. 11 FISE, hallazgo 2602). Hereda el color de la
+   insignia, así que el contraste es el suyo en los dos temas. */
+.chipDigrafo {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
 /* «pt» se lee bien con los ojos y fatal con un lector de pantalla, que diría
    «casa seis pt». El abreviado se oculta a la voz y la palabra entera se oculta
    a la vista. */
