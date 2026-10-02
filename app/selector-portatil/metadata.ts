@@ -15,7 +15,8 @@ const FEATURES = [
   'Gama de rendimiento acotada al presupuesto declarado',
   'Características técnicas que buscar (procesador, memoria, almacenamiento, pantalla), sin marcas ni modelos',
   'Razones sacadas de tus respuestas y consejos de compra',
-  '100% en el navegador, sin registro ni instalación',
+  // Espacio duro antes del «%» (CLAUDE.md §2, hallazgo 2708)
+  '100\u00A0% en el navegador, sin registro ni instalación',
 ];
 
 const DESCRIPCION =

@@ -43,6 +43,21 @@
  *     la horquilla de su gama, ofrecían un reacondicionado a quien prefería nuevo y dependían solo
  *     de sistema × gama, no del formato. Ahora el resultado dice QUÉ BUSCAR, escrito para el
  *     formato, el sistema y la gama finales, con la horquilla de la propia gama.
+ *
+ *  8. Torre o mini PC, con la gama del USO (hallazgo 2703). La regla del punto 6 miraba la gama
+ *     FINAL, la que «Más de 1.800 €» sube a pro: a un uso básico le salía una torre «porque tu uso
+ *     pide gráfica dedicada o la potencia de una gama alta» encima de «el salto responde a tu
+ *     presupuesto, no a una necesidad técnica» (6.432 perfiles). Ahora decide `gamaPorUso`, la
+ *     que piden las respuestas antes del presupuesto, que es de lo que habla la razón. Si el
+ *     presupuesto la recorta, la torre sigue (el uso la pide, y se puede ampliar después).
+ *
+ *  9. Sobremesa y sistema (hallazgo 2702). Con macOS salía «Sobremesa + Monitor» con una torre
+ *     «para poder cambiar la gráfica más adelante» y la razón «tu uso pide gráfica dedicada», al
+ *     lado de «La gráfica va integrada en el chip» (15.888 perfiles). Un Mac de sobremesa es un
+ *     equipo compacto cuya gráfica va en el chip y no se cambia: con macOS el escritorio es siempre
+ *     el formato compacto (`mini-pc`), con su propia ficha (`infoFormato`), y la potencia que pida
+ *     el uso se busca en el chip. Con ChromeOS pasa lo mismo por otra razón: su escritorio es un
+ *     equipo compacto y su uso web no aprovecha una gráfica dedicada (punto 5).
  */
 
 export type FormatoKey = 'portatil' | 'sobremesa' | 'mini-pc';
@@ -105,6 +120,22 @@ export const FORMATOS: Record<FormatoKey, FormatoInfo> = {
     descripcion: 'Un sobremesa del tamaño de un libro, silencioso y con poco consumo. Necesita monitor, teclado y ratón. Cubre de sobra un uso sin juegos exigentes ni edición pesada.',
   },
 };
+
+/**
+ * La ficha del escritorio compacto con macOS (hallazgo 2702). «Mini PC» a secas promete «un uso
+ * sin juegos exigentes ni edición pesada», y un Mac de sobremesa con un chip de gama alta sí edita
+ * vídeo: lo que lo distingue no es la potencia, sino que la gráfica va en el chip y no se cambia.
+ */
+export const FORMATO_MAC_ESCRITORIO: FormatoInfo = {
+  nombre: 'Sobremesa compacto + Monitor',
+  icon: '🔲',
+  descripcion: 'Un Mac de sobremesa: equipo compacto y silencioso, con la gráfica integrada en el chip. No se amplía por dentro, así que la potencia se elige al comprarlo. Necesita monitor, teclado y ratón.',
+};
+
+/** La ficha del formato tal como se muestra: con macOS, el escritorio compacto tiene la suya. */
+export function infoFormato(formato: FormatoKey, os: OSKey): FormatoInfo {
+  return formato === 'mini-pc' && os === 'mac' ? FORMATO_MAC_ESCRITORIO : FORMATOS[formato];
+}
 
 export const OS_INFO: Record<OSKey, OSInfo> = {
   windows: {
@@ -533,9 +564,14 @@ export function calcularResultado(r: Record<number, string>): Resultado {
     // que ese caso no se da.
     criterioDesempate = `se muestra primero ${FORMATO_CON_ARTICULO[ganador]} porque ${decide ? decide.motivo : 'ninguna respuesta los distingue'}`;
   }
-  // Escritorio: torre si el uso pide gráfica dedicada o la potencia de una gama alta; si no, mini PC.
-  const pideTorre = r[2] === 'medio' || r[2] === 'alto' || r[1] === 'creativo' || esMayor(gama, 'media');
-  const formato: FormatoKey = ganador === 'portatil' ? 'portatil' : pideTorre ? 'sobremesa' : 'mini-pc';
+  // Escritorio: torre si el USO pide gráfica dedicada o la potencia de una gama alta; si no, mini
+  // PC. Con la gama que piden las respuestas, no con la final (hallazgo 2703: «Más de 1.800 €»
+  // sube la gama a pro, y eso no es una necesidad de gráfica). Con macOS y ChromeOS no hay torre:
+  // el escritorio de los dos es compacto (hallazgo 2702; cabecera, punto 9).
+  const pideTorre = r[2] === 'medio' || r[2] === 'alto' || r[1] === 'creativo' || esMayor(gamaPorUso, 'media');
+  const sinTorre = os === 'mac' || os === 'chromeos';
+  const formato: FormatoKey = ganador === 'portatil' ? 'portatil' : pideTorre && !sinTorre ? 'sobremesa' : 'mini-pc';
+  const nombreFormato = infoFormato(formato, os).nombre;
 
   // ─ Razones: salen de las respuestas, no del resultado ─
   const razones: string[] = [];
@@ -543,12 +579,24 @@ export function calcularResultado(r: Record<number, string>): Resultado {
     .filter((id) => pesoFormato(id, ganador) > 0)
     .map((id) => ({ pregunta: id, puntos: pesoFormato(id, ganador) }));
   const citaFormato = citar(r, porFormato);
-  if (formato === 'mini-pc') {
-    razones.push(`Formato — ${FORMATOS[formato].nombre}, por lo que has respondido: ${citaFormato}. Y como tu uso no pide gráfica dedicada ni la potencia de una gama alta, un mini PC lo cubre en mucho menos espacio que una torre.`);
+  if (formato === 'mini-pc' && os === 'mac') {
+    razones.push(`Formato — ${nombreFormato}, por lo que has respondido: ${citaFormato}. Con macOS el sobremesa es un equipo compacto con la gráfica integrada en el chip, que no se cambia después: ${pideTorre ? 'la potencia que pide tu uso se elige al comprarlo, en la configuración del chip' : 'elige al comprarlo la configuración que vayas a necesitar'}.`);
+  } else if (formato === 'mini-pc' && os === 'chromeos') {
+    razones.push(`Formato — ${nombreFormato}, por lo que has respondido: ${citaFormato}. Con ChromeOS el sobremesa es un equipo compacto: un uso centrado en la web no aprovecha la gráfica dedicada ni el espacio de una torre.`);
+  } else if (formato === 'mini-pc') {
+    razones.push(`Formato — ${nombreFormato}, por lo que has respondido: ${citaFormato}. Y como tu uso no pide gráfica dedicada ni la potencia de una gama alta, un mini PC lo cubre en mucho menos espacio que una torre.`);
   } else if (formato === 'sobremesa') {
-    razones.push(`Formato — ${FORMATOS[formato].nombre}, por lo que has respondido: ${citaFormato}. Una torre, y no un mini PC, porque tu uso pide gráfica dedicada o la potencia de una gama alta.`);
+    // El motivo concreto, de las respuestas de uso: «gráfica dedicada o la potencia de una gama
+    // alta», a secas, se leía como lo contrario de «con tu uso bastaría la gama media» cuando el
+    // presupuesto ampliaba la gama (hallazgo 2703).
+    const motivoTorre = r[2] === 'medio' || r[2] === 'alto'
+      ? `juegas («${etiquetaDe(r, 2)}») y eso pide gráfica dedicada`
+      : r[1] === 'creativo'
+        ? `editas («${etiquetaDe(r, 1)}») y eso pide gráfica dedicada`
+        : `tus respuestas de uso (${citar(r, uso.aportes)}) piden la potencia de una gama ${GAMA_CORTA[gamaPorUso]}`;
+    razones.push(`Formato — ${nombreFormato}, por lo que has respondido: ${citaFormato}. Una torre, y no un mini PC, porque ${motivoTorre}.`);
   } else {
-    razones.push(`Formato — ${FORMATOS[formato].nombre}, por lo que has respondido: ${citaFormato}.`);
+    razones.push(`Formato — ${nombreFormato}, por lo que has respondido: ${citaFormato}.`);
   }
 
   const citaDescartado = citar(r, aportesDescartado);
@@ -708,7 +756,8 @@ export function perfilTecnico(formato: FormatoKey, os: OSKey, gama: GamaKey, r: 
 
   // Pantalla, o monitor
   const extrasPantalla = [
-    creativo ? 'buena cobertura de color (100 % sRGB o más)' : '',
+    // Espacio duro antes del «%» (CLAUDE.md §2, hallazgo 2708)
+    creativo ? 'buena cobertura de color (100\u00A0% sRGB o más)' : '',
     r[2] === 'medio' || r[2] === 'alto' ? 'tasa de refresco de 120 Hz o más' : '',
   ].filter(Boolean);
   const conExtras = extrasPantalla.length > 0 ? `, con ${extrasPantalla.join(' y ')}` : '';
@@ -721,9 +770,12 @@ export function perfilTecnico(formato: FormatoKey, os: OSKey, gama: GamaKey, r: 
     }
   } else {
     lineas.push({ icono: '🖼️', texto: `Monitor aparte de ${r[4] === 'grande' ? '27" o más' : '24 a 27"'} con panel IPS${conExtras}` });
-    lineas.push({ icono: formato === 'mini-pc' ? '🔲' : '🗄️', texto: formato === 'mini-pc'
-      ? 'Mini PC con las salidas de vídeo y los puertos USB que necesites para monitor, teclado y ratón'
-      : 'Torre con espacio y fuente de alimentación holgados, para poder cambiar la gráfica más adelante' });
+    // Con macOS no se promete cambiar la gráfica: va en el chip (hallazgo 2702).
+    lineas.push({ icono: formato === 'mini-pc' ? '🔲' : '🗄️', texto: formato === 'mini-pc' && os === 'mac'
+      ? 'Sobremesa compacto con las salidas de vídeo y los puertos que necesites para monitor, teclado y ratón: no se amplía por dentro, así que elige de inicio la configuración del chip, la memoria y el almacenamiento'
+      : formato === 'mini-pc'
+        ? 'Mini PC con las salidas de vídeo y los puertos USB que necesites para monitor, teclado y ratón'
+        : 'Torre con espacio y fuente de alimentación holgados, para poder cambiar la gráfica más adelante' });
   }
 
   // Sistema

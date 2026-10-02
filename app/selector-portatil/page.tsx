@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
 import styles from './SelectorPortatil.module.css';
 import {
   MeskeiaLogo,
@@ -15,7 +15,7 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularResultado,
-  FORMATOS,
+  infoFormato,
   OS_INFO,
   GAMAS,
   PREGUNTAS,
@@ -40,46 +40,135 @@ function enumerar(items: string[]): string {
 
 type Pantalla = 'intro' | 'test' | 'resultado';
 
+/**
+ * Lo que ocupa la barra fija de MeskeiaLogo (~52 px en móvil, ~77 px desde 769 px) más un
+ * respiro: el mismo hueco de 80 px que los lotes 586a4d61 y a1d72a9c dieron al hero. Va también
+ * como `scroll-margin-top` del enunciado y del título del resultado, en el CSS.
+ */
+const HUECO_BARRA_LOGO = 80;
+
 export default function SelectorPortatil() {
   const [pantalla, setPantalla] = useState<Pantalla>('intro');
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const tituloResultado = useRef<HTMLHeadingElement>(null);
+  const enunciado = useRef<HTMLHeadingElement>(null);
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
   const progreso = (paso / totalPreguntas) * 100;
+  const respuestaActual = respuestas[preguntaActual.id];
 
-  // Al pulsar «Ver resultado» se desmonta la sección del test con el botón que tenía el foco, y el
-  // foco caía a <body>: se lleva al encabezado del resultado (familia selector-*, forma g).
+  // Al cambiar de pantalla o de pregunta se desmonta o se desactiva el botón que tenía el foco
+  // («Empezar», «Siguiente» sin respuesta aún, «Anterior» al volver a la 1, «Ver resultado»), y el
+  // foco caía a <body>: el siguiente Tab saltaba a «Apps relacionadas» sin pasar por la pregunta
+  // (hallazgo 2705, forma del 1680 de selector-smartphone). Se lleva al enunciado de la pregunta
+  // nueva o al título del resultado. Y en móvil la página no se movía al avanzar: el enunciado
+  // nuevo quedaba por encima de la pantalla o bajo la barra fija del logo. Si no está entero a la
+  // vista y por debajo de la barra, se sube a su sitio; el hueco lo da su `scroll-margin-top`
+  // (receta de selector-mascota, hallazgo 2670).
   useEffect(() => {
-    if (pantalla === 'resultado') tituloResultado.current?.focus();
-  }, [pantalla]);
+    const destino = pantalla === 'resultado' ? tituloResultado.current
+      : pantalla === 'test' ? enunciado.current
+        : null;
+    if (!destino) return;
+    const caja = destino.getBoundingClientRect();
+    if (caja.top < HUECO_BARRA_LOGO || caja.bottom > window.innerHeight) {
+      destino.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
+    destino.focus({ preventScroll: true });
+  }, [pantalla, paso]);
+
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 2704, receta de la familia: 2659 de
+   * selector-smartphone). «Empezar», «Siguiente», «Anterior», «Ver resultado» y «Repetir» cambian
+   * la pantalla en el primer clic, y el segundo caía en el mismo punto sobre lo que hubiera debajo
+   * en la pantalla nueva: de la pregunta 8 (3 opciones) a la 9 (4), marcaba «Más de 1.800 €»; con
+   * «Empezar» al pie de la pantalla, abría una app relacionada. Un doble clic es UNA intención,
+   * así que un clic se ignora cuando cumple las dos cosas:
+   *   · es el 2.º (o 3.º…) de una ráfaga: `detail` > 1. Lo cuenta el navegador, no un
+   *     temporizador; con teclado o lector de pantalla es 0;
+   *   · y el clic ANTERIOR de la app cambió de pantalla. Sin esto, elegir y pulsar «Siguiente»
+   *     deprisa en un móvil —dos toques cercanos, que Chrome también cuenta como ráfaga— se
+   *     comería el «Siguiente», que sí era una intención nueva.
+   */
+  const ultimoCambioPantallaRef = useRef(false);
+  const clicDeMas = (e: MouseEvent<HTMLButtonElement>): boolean =>
+    e.detail > 1 && ultimoCambioPantallaRef.current;
+  const registrarClic = (cambiaPantalla: boolean) => {
+    ultimoCambioPantallaRef.current = cambiaPantalla;
+  };
 
   function seleccionarOpcion(valor: string) {
+    registrarClic(false);
     setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
   }
 
-  function avanzar() {
+  function elegirOpcion(e: MouseEvent<HTMLButtonElement>, valor: string) {
+    if (clicDeMas(e)) return;
+    seleccionarOpcion(valor);
+  }
+
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG): las flechas mueven el foco a la opción vecina y
+   * la marcan, con vuelta al principio, e Inicio/Fin van a los extremos. El grupo es UNA parada de
+   * Tab (tabindex itinerante). Antes cada opción era una parada y las flechas no hacían nada
+   * (hallazgo 2706, forma del 1681 de selector-smartphone).
+   */
+  function teclaEnOpcion(e: KeyboardEvent<HTMLButtonElement>, indice: number) {
+    const total = preguntaActual.opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    seleccionarOpcion(preguntaActual.opciones[destino].valor);
+    const radios = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    radios?.[destino]?.focus();
+  }
+
+  function empezar(e: MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
+    setPantalla('test');
+  }
+
+  // Avanza a la pregunta SIGUIENTE A LA PULSADA (`paso + 1` del render, no `p => p + 1`): dos clics
+  // antes de repintar no saltan una pregunta. Y solo con la pregunta respondida, aunque el botón ya
+  // esté desactivado sin ella: el `disabled` lo pone el render, y un clic que llega antes de
+  // repintar no lo ve (hallazgo 2704).
+  function avanzar(e: MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e) || !respuestaActual) return;
+    registrarClic(true);
     if (paso < totalPreguntas - 1) {
-      setPaso(p => p + 1);
+      setPaso(paso + 1);
     } else {
       setResultado(calcularResultado(respuestas));
       setPantalla('resultado');
     }
   }
 
-  function retroceder() {
-    if (paso > 0) setPaso(p => p - 1);
+  function retroceder(e: MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e) || paso === 0) return;
+    registrarClic(true);
+    setPaso(paso - 1);
   }
 
-  function reiniciar() {
+  function reiniciar(e: MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
     setPantalla('intro');
     setPaso(0);
     setRespuestas({});
     setResultado(null);
   }
+
+  // La ficha del formato tal como se muestra: con macOS el escritorio compacto tiene la suya
+  // (hallazgo 2702).
+  const formatoInfo = resultado ? infoFormato(resultado.formato, resultado.os) : null;
 
   return (
     <div className={styles.container}>
@@ -134,7 +223,7 @@ export default function SelectorPortatil() {
               <li><span aria-hidden="true">✅</span> Características técnicas que buscar, sin marcas ni modelos</li>
               <li><span aria-hidden="true">✅</span> Consejos de compra personalizados</li>
             </ul>
-            <button type="button" className={styles.btnStart} onClick={() => setPantalla('test')}>
+            <button type="button" className={styles.btnStart} onClick={empezar}>
               Empezar el test →
             </button>
           </div>
@@ -168,19 +257,22 @@ export default function SelectorPortatil() {
 
           <div className={styles.preguntaCard}>
             <span className={styles.preguntaIcon} aria-hidden="true">{preguntaActual.icon}</span>
-            <h2 className={styles.preguntaTexto}>{preguntaActual.pregunta}</h2>
+            <h2 className={styles.preguntaTexto} ref={enunciado} tabIndex={-1}>{preguntaActual.pregunta}</h2>
             <div className={styles.opcionesGrid} role="radiogroup" aria-label={preguntaActual.pregunta}>
-              {preguntaActual.opciones.map(op => (
+              {preguntaActual.opciones.map((op, indice) => (
                 <button
                   key={op.valor}
                   type="button"
-                  className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
-                  onClick={() => seleccionarOpcion(op.valor)}
+                  className={`${styles.opcionBtn} ${respuestaActual === op.valor ? styles.opcionSeleccionada : ''}`}
+                  onClick={e => elegirOpcion(e, op.valor)}
                   // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
                   // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
                   // radio dentro (selector-smartphone, hallazgo 950).
                   role="radio"
-                  aria-checked={respuestas[preguntaActual.id] === op.valor}
+                  aria-checked={respuestaActual === op.valor}
+                  // Tabindex itinerante: la marcada, o la primera si no hay ninguna (2706).
+                  tabIndex={respuestaActual ? (respuestaActual === op.valor ? 0 : -1) : indice === 0 ? 0 : -1}
+                  onKeyDown={e => teclaEnOpcion(e, indice)}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.desc}</span>
@@ -197,7 +289,7 @@ export default function SelectorPortatil() {
               type="button"
               className={styles.btnSiguiente}
               onClick={avanzar}
-              disabled={!respuestas[preguntaActual.id]}
+              disabled={!respuestaActual}
               aria-label={paso === totalPreguntas - 1 ? 'Ver resultado' : 'Siguiente pregunta'}
             >
               {paso === totalPreguntas - 1 ? 'Ver resultado →' : 'Siguiente →'}
@@ -207,16 +299,16 @@ export default function SelectorPortatil() {
       )}
 
       {/* ── RESULTADO ── */}
-      {pantalla === 'resultado' && resultado && (
+      {pantalla === 'resultado' && resultado && formatoInfo && (
         <div className={styles.resultadosContainer}>
 
           {/* 3 tarjetas de recomendación */}
           <div className={styles.recomendacionGrid}>
             <div className={styles.recomendacionCard}>
-              <span className={styles.recomendacionIcon} aria-hidden="true">{FORMATOS[resultado.formato].icon}</span>
+              <span className={styles.recomendacionIcon} aria-hidden="true">{formatoInfo.icon}</span>
               <p className={styles.recomendacionLabel}>Formato</p>
-              <p className={styles.recomendacionValor}>{FORMATOS[resultado.formato].nombre}</p>
-              <p className={styles.recomendacionDesc}>{FORMATOS[resultado.formato].descripcion}</p>
+              <p className={styles.recomendacionValor}>{formatoInfo.nombre}</p>
+              <p className={styles.recomendacionDesc}>{formatoInfo.descripcion}</p>
             </div>
             <div className={`${styles.recomendacionCard} ${styles.recomendacionCardOS}`}>
               <span className={styles.recomendacionIcon} aria-hidden="true">{OS_INFO[resultado.os].icon}</span>
@@ -277,7 +369,7 @@ export default function SelectorPortatil() {
               y 1412; política del proyecto desde 81fd4bea en smartphone). */}
           <div className={styles.perfilSection}>
             <h2 className={styles.perfilTitulo}>
-              Qué buscar — {FORMATOS[resultado.formato].nombre} · {OS_INFO[resultado.os].nombre} · {GAMAS[resultado.gama].nombre}
+              Qué buscar — {formatoInfo.nombre} · {OS_INFO[resultado.os].nombre} · {GAMAS[resultado.gama].nombre}
             </h2>
             <p className={styles.perfilNota}>
               Horquilla orientativa de la gama: <strong>{GAMAS[resultado.gama].precioOrientativo}</strong>. Compara
@@ -306,71 +398,80 @@ export default function SelectorPortatil() {
           <button type="button" className={styles.btnRepetir} onClick={reiniciar} aria-label="Repetir el test">
             ← Repetir el test
           </button>
-
-          <EducationalSection
-            title="Guía completa: cómo elegir ordenador"
-            subtitle="Formato, sistema, gama, qué especificaciones importan y cuándo comprar"
-            defaultOpen={false}
-          >
-            <h3>Portátil (laptop o notebook) vs sobremesa: la primera decisión</h3>
-            <p>
-              Un <strong>portátil</strong> —conocido como <strong>laptop</strong> o <strong>notebook</strong> en
-              gran parte de Latinoamérica— es la elección correcta si te mueves con frecuencia, estudias o trabajas en
-              distintos lugares. A igual precio, un sobremesa (computadora de escritorio) ofrece más rendimiento, mejor
-              ergonomía y es más fácil de actualizar. Si siempre trabajas en casa u oficina, el sobremesa + monitor
-              externo es más rentable.
-            </p>
-            <p>
-              Los <strong>2 en 1</strong> (bisagra de 360° con pantalla táctil) son portátiles pensados para tomar
-              notas a mano o dibujar con lápiz. No son los más potentes por su precio, pero ofrecen versatilidad real.
-              Los <strong>mini PC</strong> son sobremesas del tamaño de un libro: silenciosos, con poco consumo y
-              suficientes para cualquier uso que no pida una gráfica dedicada; para jugar a títulos exigentes o editar
-              vídeo con soltura, una torre sigue dando más margen.
-            </p>
-
-            <h3>Windows, macOS, Linux o ChromeOS</h3>
-            <p>
-              <strong>Windows</strong> tiene la mayor compatibilidad de software: es imprescindible si usas programas
-              que solo existen para Windows (algunas herramientas de ingeniería, CAD o de empresa) o si quieres jugar a
-              títulos exigentes. La variedad de equipos y precios es enorme.
-            </p>
-            <p>
-              <strong>macOS</strong> encaja si ya usas iPhone y quieres integración entre dispositivos. Los chips de
-              Apple destacan por su eficiencia (autonomía y rendimiento por vatio), y algunos programas de vídeo y
-              audio de Apple solo existen para sus equipos. No hay ningún Mac nuevo por debajo de 600 € a precio
-              general.
-            </p>
-            <p>
-              <strong>Linux</strong> es habitual entre desarrolladores y administradores de sistemas. Máxima
-              personalización, excelente para programación, servidores y ciencia de datos. Requiere cierta curva de
-              aprendizaje y algunos programas populares no tienen versión nativa.
-            </p>
-            <p>
-              <strong>ChromeOS</strong> es ligero, seguro y pensado para tareas en la nube y Google Workspace.
-              Encaja en perfiles básicos, en educación y en entornos de trabajo con Google; no instala programas de
-              escritorio tradicionales.
-            </p>
-
-            <h3>Qué especificaciones importan de verdad</h3>
-            <ul>
-              <li><strong>Procesador (CPU):</strong> los dos grandes fabricantes de procesadores para PC numeran sus gamas
-                como series 3, 5, 7 y 9. Para ofimática basta una serie 5 reciente; para edición de vídeo o IA, una serie 7
-                o superior, o las gamas intermedias y altas de los chips de Apple.</li>
-              <li><strong>RAM:</strong> {RAM_MINIMA_GB} GB es el mínimo razonable. Con {RAM_RECOMENDADA_GB} GB irás cómodo
-                para multitarea. {RAM_EXIGENTE_GB} GB si editas vídeo o usas máquinas virtuales.</li>
-              <li><strong>Almacenamiento:</strong> SSD siempre. 256 GB es justo; 512 GB es lo recomendable; 1 TB si guardas muchos archivos localmente.</li>
-              <li><strong>Pantalla:</strong> resolución mínima Full HD (1920×1080). Un panel IPS da mejores colores que uno TN. OLED es excelente para creativos, pero más caro y con riesgo de marcas permanentes.</li>
-              <li><strong>Batería:</strong> la cifra del fabricante se mide en condiciones favorables. Busca pruebas independientes de batería en uso real.</li>
-            </ul>
-            <div className={styles.warningBox}>
-              <strong>Truco de compra:</strong> la generación del procesador importa tanto como su serie: una serie 5
-              reciente puede rendir como una serie 7 de hace varios años. Comprueba el año del chip, no solo su nombre, y
-              ojo con la nomenclatura: los Intel Core Ultra (Series 1, Series 2…) son una familia distinta de los Core i
-              de 13.ª y 14.ª generación.
-            </div>
-          </EducationalSection>
         </div>
       )}
+
+      {/* Sección educativa, en TODAS las pantallas (hallazgo 2709, forma del 2663 de
+          selector-smartphone). Vivía dentro de la rama `pantalla === 'resultado'`: el HTML servido
+          no traía ni una línea de la guía, aunque EducationalSection monta su contenido siempre
+          «porque Googlebot no hace clic», y quien no terminaba las 10 preguntas no la veía. El
+          LegalNotice y la DisclaimerCard van arriba, fuera de ella: nace colapsada y no puede
+          esconder un aviso. */}
+      <div className={styles.guiaContainer}>
+        <EducationalSection
+          title="Guía completa: cómo elegir ordenador"
+          subtitle="Formato, sistema, gama, qué especificaciones importan y cuándo comprar"
+          defaultOpen={false}
+        >
+          <h3>Portátil (laptop o notebook) vs sobremesa: la primera decisión</h3>
+          <p>
+            Un <strong>portátil</strong> —conocido como <strong>laptop</strong> o <strong>notebook</strong> en
+            gran parte de Latinoamérica— es la elección correcta si te mueves con frecuencia, estudias o trabajas en
+            distintos lugares. A igual precio, un sobremesa (computadora de escritorio) ofrece más rendimiento, mejor
+            ergonomía y es más fácil de actualizar. Si siempre trabajas en casa u oficina, el sobremesa + monitor
+            externo es más rentable.
+          </p>
+          <p>
+            Los <strong>2 en 1</strong> (bisagra de 360° con pantalla táctil) son portátiles pensados para tomar
+            notas a mano o dibujar con lápiz. No son los más potentes por su precio, pero ofrecen versatilidad real.
+            Los <strong>mini PC</strong> son sobremesas del tamaño de un libro: silenciosos, con poco consumo y
+            suficientes para cualquier uso que no pida una gráfica dedicada; para jugar a títulos exigentes o editar
+            vídeo con soltura, una torre sigue dando más margen.
+          </p>
+
+          <h3>Windows, macOS, Linux o ChromeOS</h3>
+          <p>
+            <strong>Windows</strong> tiene la mayor compatibilidad de software: es imprescindible si usas programas
+            que solo existen para Windows (algunas herramientas de ingeniería, CAD o de empresa) o si quieres jugar a
+            títulos exigentes. La variedad de equipos y precios es enorme.
+          </p>
+          <p>
+            <strong>macOS</strong> encaja si ya usas iPhone y quieres integración entre dispositivos. Los chips de
+            Apple destacan por su eficiencia (autonomía y rendimiento por vatio), y algunos programas de vídeo y
+            audio de Apple solo existen para sus equipos. No hay ningún Mac nuevo por debajo de 600 € a precio
+            general. Los Mac de sobremesa son equipos compactos con la gráfica integrada en el chip: no admiten
+            cambiar la gráfica ni ampliar la memoria después, así que la potencia se elige al comprarlos.
+          </p>
+          <p>
+            <strong>Linux</strong> es habitual entre desarrolladores y administradores de sistemas. Máxima
+            personalización, excelente para programación, servidores y ciencia de datos. Requiere cierta curva de
+            aprendizaje y algunos programas populares no tienen versión nativa.
+          </p>
+          <p>
+            <strong>ChromeOS</strong> es ligero, seguro y pensado para tareas en la nube y Google Workspace.
+            Encaja en perfiles básicos, en educación y en entornos de trabajo con Google; no instala programas de
+            escritorio tradicionales.
+          </p>
+
+          <h3>Qué especificaciones importan de verdad</h3>
+          <ul>
+            <li><strong>Procesador (CPU):</strong> los dos grandes fabricantes de procesadores para PC numeran sus gamas
+              como series 3, 5, 7 y 9. Para ofimática basta una serie 5 reciente; para edición de vídeo o IA, una serie 7
+              o superior, o las gamas intermedias y altas de los chips de Apple.</li>
+            <li><strong>RAM:</strong> {RAM_MINIMA_GB} GB es el mínimo razonable. Con {RAM_RECOMENDADA_GB} GB irás cómodo
+              para multitarea. {RAM_EXIGENTE_GB} GB si editas vídeo o usas máquinas virtuales.</li>
+            <li><strong>Almacenamiento:</strong> SSD siempre. 256 GB es justo; 512 GB es lo recomendable; 1 TB si guardas muchos archivos localmente.</li>
+            <li><strong>Pantalla:</strong> resolución mínima Full HD (1920×1080). Un panel IPS da mejores colores que uno TN. OLED es excelente para creativos, pero más caro y con riesgo de marcas permanentes.</li>
+            <li><strong>Batería:</strong> la cifra del fabricante se mide en condiciones favorables. Busca pruebas independientes de batería en uso real.</li>
+          </ul>
+          <div className={styles.warningBox}>
+            <strong>Truco de compra:</strong> la generación del procesador importa tanto como su serie: una serie 5
+            reciente puede rendir como una serie 7 de hace varios años. Comprueba el año del chip, no solo su nombre, y
+            ojo con la nomenclatura: los Intel Core Ultra (Series 1, Series 2…) son una familia distinta de los Core i
+            de 13.ª y 14.ª generación.
+          </div>
+        </EducationalSection>
+      </div>
 
       <RelatedApps apps={getRelatedApps('selector-portatil')} />
       <ShareCard appName="selector-portatil" />

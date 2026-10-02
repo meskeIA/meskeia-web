@@ -295,9 +295,10 @@ function barridoReparacion(): RecuentoReparacion {
     if (res.os === 'mac' && res.gama === 'basica') c.macEnEntrada++;
     if (res.os === 'chromeos' && ORDEN_GAMAS.indexOf(res.gama) > ORDEN_GAMAS.indexOf('media')) c.chromeSobreMedia++;
     const dePortatil = perfil.some((t) => /^Pantalla de|^Peso de|pesará más/.test(t));
-    const deEscritorio = perfil.some((t) => /^Monitor aparte|^Mini PC con|^Torre con/.test(t));
+    const deEscritorio = perfil.some((t) => /^Monitor aparte|^Mini PC con|^Sobremesa compacto con|^Torre con/.test(t));
     if (res.formato === 'portatil' ? deEscritorio || !dePortatil : dePortatil || !deEscritorio) c.perfilContraFormato++;
-    if (res.formato === 'mini-pc' && !perfil.some((t) => t.startsWith('Mini PC con'))) c.perfilContraFormato++;
+    // Con macOS el escritorio compacto tiene su propia línea, sin «Mini PC» (hallazgo 2702).
+    if (res.formato === 'mini-pc' && !perfil.some((t) => t.startsWith(res.os === 'mac' ? 'Sobremesa compacto con' : 'Mini PC con'))) c.perfilContraFormato++;
     if (res.formato === 'sobremesa' && !perfil.some((t) => t.startsWith('Torre con'))) c.perfilContraFormato++;
     if (r[2] === 'alto' && res.os !== 'windows') c.gamingFueraDeWindows++;
     if (r[2] === 'medio' && res.os === 'chromeos') c.bastanteConChromeOS++;
@@ -473,7 +474,11 @@ test.describe('Reparación 24/09/2026 — presupuesto, sistemas y formatos alcan
     await expect(tarjeta(page, 0)).toHaveText('Portátil');
     await expect(page.locator('[class*="consejoItem"]').filter({ hasText: 'convertibles 2 en 1' })).toHaveCount(1);
     const b = barridoReparacion();
-    expect(b.formatos['mini-pc']).toBe(28_320);
+    // 28.320 hasta el 02/10/2026. Con la reparación de 2702 (macOS y ChromeOS no llevan torre:
+    // +15.888 Mac) y 2703 (la torre la decide la gama del USO, no la que sube «Más de 1.800 €»):
+    // 42.912 = 17.424 Windows + 22.032 macOS + 2.592 ChromeOS + 864 Linux, medido con el barrido
+    // del motor antes y después.
+    expect(b.formatos['mini-pc']).toBe(42_912);
     expect(b.formatos['dos-en-uno'] ?? 0).toBe(0);
     expect(Object.keys(FORMATOS)).toEqual(['portatil', 'sobremesa', 'mini-pc']);
     // Nada de lo que se sirve promete el 2 en 1 como resultado del test.
@@ -595,17 +600,18 @@ test.describe('Reparación 24/09/2026 — presupuesto, sistemas y formatos alcan
 // arriba pasan y la base no tiene ninguno abierto). Cada valor esperado de este bloque se resolvió
 // a mano desde motor.ts ANTES de abrir el navegador, para el flujo de su propio test.
 //
-// Hallazgos ABIERTOS que fija este bloque (con test.fail, afirman lo correcto):
-//   · macOS con «Sobremesa + Monitor» pide una torre «para poder cambiar la gráfica» y razona
-//     «tu uso pide gráfica dedicada», con la gráfica integrada en el chip (punto ciego del grupo:
-//     solo esta hermana cruza un TERCER eje, el formato, con el sistema);
-//   · la torre que pide el presupuesto se atribuye al uso: dos razones que se contradicen;
-//   · un doble clic o doble toque en «Siguiente», de una pregunta de 3 opciones a una de 4,
-//     contesta la siguiente (P9: «Más de 1.800 €»);
-//   · el foco cae a <body> tras «Empezar», «Siguiente» y «Anterior» (forma del 1680 de smartphone);
-//   · las flechas no mueven la selección y cada opción es una parada de Tab (forma del 1681);
-//   · el <h1> del resultado queda bajo la barra del logo a 360-412 px (forma del 2658);
-//   · porcentajes sin espacio duro; la guía educativa no está en el HTML servido.
+// Hallazgos que fijó este bloque con test.fail (2702-2709), REPARADOS el 02/10/2026 con la receta
+// de la familia (selector-smartphone y selector-mascota); cada test dice qué se cambió:
+//   · 2702: macOS con «Sobremesa + Monitor» pedía una torre «para poder cambiar la gráfica» y
+//     razonaba «tu uso pide gráfica dedicada», con la gráfica integrada en el chip (punto ciego del
+//     grupo: solo esta hermana cruza un TERCER eje, el formato, con el sistema);
+//   · 2703: la torre que pedía el presupuesto se atribuía al uso: dos razones que se contradecían;
+//   · 2704: un doble clic o doble toque en «Siguiente», de una pregunta de 3 opciones a una de 4,
+//     contestaba la siguiente (P9: «Más de 1.800 €»);
+//   · 2705: el foco caía a <body> tras «Empezar», «Siguiente» y «Anterior» (forma del 1680);
+//   · 2706: las flechas no movían la selección y cada opción era una parada de Tab (forma del 1681);
+//   · 2707: el <h1> del resultado quedaba bajo la barra del logo a 360-412 px (forma del 2658);
+//   · 2708 y 2709: porcentajes sin espacio duro; la guía educativa no estaba en el HTML servido.
 
 /** ¿Pisa alguna pieza de la barra fija del logo las letras del elemento? (función de la Ronda) */
 async function bajoLaBarra(page: Page, selector: string): Promise<{ tapado: boolean; top: number; barra: number }> {
@@ -640,6 +646,11 @@ const focoActual = (page: Page) => page.evaluate(() =>
 /** Lo mismo que `responder`, con toques: para los describe de móvil (hasTouch). */
 async function responderTocando(page: Page, indices: readonly number[]): Promise<void> {
   for (let i = 0; i < indices.length; i++) {
+    // Lee la pregunta antes de tocar (añadido el 02/10/2026 con la reparación del 2704): a
+    // velocidad de máquina, el toque en la opción llega a menos de 300 ms y 100 px del toque en
+    // «Empezar» o «Siguiente», y Chrome lo cuenta como el 2.º de la misma ráfaga (`detail` 2), que
+    // es justo el toque de más que la app ignora ahora. Nadie contesta sin leer en 300 ms.
+    await page.waitForTimeout(500);
     await page.locator('[role="radiogroup"] [role="radio"]').nth(indices[i]).tap();
     await page.getByRole('button', { name: i === indices.length - 1 ? 'Ver resultado' : 'Siguiente pregunta', exact: true }).tap();
   }
@@ -649,10 +660,14 @@ async function responderTocando(page: Page, indices: readonly number[]): Promise
 /** Contesta P1..P(k−1) con la primera opción y P(k) con la ÚLTIMA, para distinguirla después. */
 async function llegarAPregunta(page: Page, k: number): Promise<void> {
   for (let i = 1; i < k; i++) {
+    // La misma espera de lectura que `responderTocando`: con toques, la opción justo después de
+    // «Siguiente» cuenta como 2.º de la ráfaga y la app la ignora (hallazgo 2704).
+    await page.waitForTimeout(500);
     await page.locator('[role="radiogroup"] [role="radio"]').first().click();
     await page.getByRole('button', { name: 'Siguiente pregunta', exact: true }).click();
   }
   await expect(page.getByText(`Pregunta ${k} de 10`).first()).toBeVisible();
+  await page.waitForTimeout(500);
   await page.locator('[role="radiogroup"] [role="radio"]').last().click();
 }
 
@@ -722,13 +737,20 @@ function barridoReinspeccion(): RecuentoReinspeccion {
     // movilidad, que solo da puntos al portátil. Cualquier otra forma estaría mal explicada.
     if (res.formatosEmpatados.length > 0 && !(res.formato === 'portatil' && r[3] === 'aveces' && r[4] === 'grande'
       && res.criterioDesempate === 'se muestra primero el portátil porque encaja mejor con lo que has dicho sobre llevarte el ordenador fuera de casa')) c.empateMalExplicado++;
-    if (res.os === 'mac' && res.formato === 'sobremesa') {
+    // Cualquier escritorio con macOS, no solo el que se llamaba «Sobremesa»: tras la reparación un
+    // Mac de sobremesa sale siempre como el formato compacto, y ahí tampoco cabe la promesa.
+    if (res.os === 'mac' && res.formato !== 'portatil') {
       if (res.perfil.some((l) => l.texto.includes('cambiar la gráfica'))) c.macTorreCambiarGrafica++;
       if (res.razones.some((x) => x.startsWith('Formato') && x.includes('gráfica dedicada'))) c.macTorreGraficaDedicada++;
     }
+    // 2703, por el motivo y no por la frase: la torre tiene que salir de las respuestas de USO
+    // (juegos, edición o una gama alta pedida por el uso), y el mini PC no puede decir «tu uso no
+    // pide…» cuando sí lo pide. Medir la frase «porque tu uso pide» daba 0 solo con cambiarla.
+    const usoPideTorre = r[2] === 'medio' || r[2] === 'alto' || r[1] === 'creativo'
+      || res.gamaPorUso === 'alta' || res.gamaPorUso === 'pro';
     const razonFormato = res.razones.find((x) => x.startsWith('Formato')) ?? '';
-    const razonGama = res.razones.find((x) => x.startsWith('Gama')) ?? '';
-    if (razonFormato.includes('porque tu uso pide') && razonGama.includes('no a una necesidad técnica')) c.torrePorPresupuestoAlUso++;
+    if (res.formato === 'sobremesa' && !usoPideTorre) c.torrePorPresupuestoAlUso++;
+    if (razonFormato.includes('tu uso no pide') && usoPideTorre) c.torrePorPresupuestoAlUso++;
     // Pegado o con espacio normal (U+0020): \s casaría también el U+00A0, que es el correcto.
     if (textos.some((t) => /\d ?%/.test(t))) c.porcentajeSinEspacioDuro++;
   };
@@ -824,49 +846,58 @@ test.describe('re-inspección 02/10/2026 · escritorio', () => {
     }
   });
 
-  test('HALLAZGO: con macOS y «Sobremesa + Monitor» no se pide una torre para cambiar la gráfica', async ({ page }) => {
-    // ABIERTO (02/10/2026). pideTorre (motor.ts:537) no mira el sistema, y el perfil escribe la
-    // línea de la torre igual para macOS. RE_MAC_TORRE da hoy, en la MISMA lista de «Qué buscar»,
-    // «La gráfica va integrada en el chip» y «Torre con espacio y fuente de alimentación
-    // holgados, para poder cambiar la gráfica más adelante», y la razón de formato dice «Una
-    // torre, y no un mini PC, porque tu uso pide gráfica dedicada». Barrido: 15.888 perfiles con
-    // macOS + sobremesa, todos con las dos frases (10.800 además con la de la gráfica integrada).
-    test.fail();
+  test('2702: con macOS el sobremesa es compacto y no se pide una torre para cambiar la gráfica', async ({ page }) => {
+    // REPARADO (02/10/2026). pideTorre no miraba el sistema, y el perfil escribía la línea de la
+    // torre igual para macOS: RE_MAC_TORRE daba, en la MISMA lista de «Qué buscar», «La gráfica va
+    // integrada en el chip» y «Torre con espacio y fuente de alimentación holgados, para poder
+    // cambiar la gráfica más adelante», y la razón «tu uso pide gráfica dedicada». Barrido: 15.888
+    // perfiles con macOS + sobremesa. Ahora, con macOS (y con ChromeOS) el escritorio es siempre
+    // el formato compacto, con su propia ficha (motor.ts, `infoFormato`, cabecera punto 9), y la
+    // potencia que pide el uso se busca en el chip.
     await abrirTest(page);
     await responder(page, RE_MAC_TORRE);
+    await expect(tarjeta(page, 0)).toHaveText('Sobremesa compacto + Monitor');
     await expect(tarjeta(page, 1)).toHaveText('macOS (Apple)');
+    await expect(tarjeta(page, 2)).toHaveText('Gama alta');
     const perfil = (await lineasPerfil(page)).join(' · ');
     expect(perfil).toContain('La gráfica va integrada en el chip');
+    expect(perfil).toContain('Sobremesa compacto con las salidas de vídeo');
     expect(perfil).not.toContain('cambiar la gráfica');
-    expect(await razonDe(page, 'Formato')).not.toContain('gráfica dedicada');
+    expect(perfil).not.toMatch(/Torre con|Mini PC con/);
+    const razon = await razonDe(page, 'Formato');
+    expect(razon).not.toContain('gráfica dedicada');
+    expect(razon).toContain('Con macOS el sobremesa es un equipo compacto con la gráfica integrada en el chip');
     const b = barridoReinspeccion();
     expect({ cambiarGrafica: b.macTorreCambiarGrafica, graficaDedicada: b.macTorreGraficaDedicada })
       .toEqual({ cambiarGrafica: 0, graficaDedicada: 0 });
   });
 
-  test('HALLAZGO: si la torre la pide el presupuesto, la razón de formato no la atribuye al uso', async ({ page }) => {
-    // ABIERTO (02/10/2026). pideTorre mira la gama FINAL, que «Más de 1.800 €» sube a pro, y no la
-    // del uso; la regla que el propio motor.ts declara (cabecera, punto 6) es «mini PC si el uso no
-    // pide gráfica dedicada ni la potencia de una gama alta». PRO_POR_PRESUPUESTO, a mano: uso 0 →
-    // entrada, ampliada a pro por el tramo; escritorio 3 → hoy torre, con «Una torre, y no un mini
-    // PC, porque tu uso pide gráfica dedicada o la potencia de una gama alta» encima de «con tu uso
-    // bastaría la gama de entrada; el salto responde a tu presupuesto … no a una necesidad
-    // técnica». Barrido: 6.432 perfiles con las dos razones a la vez.
-    test.fail();
+  test('2703: la torre o el mini PC los decide el uso, no la gama que sube el presupuesto', async ({ page }) => {
+    // REPARADO (02/10/2026). pideTorre miraba la gama FINAL, que «Más de 1.800 €» sube a pro, y no
+    // la del uso; la regla que el propio motor.ts declara (cabecera, punto 6) es «mini PC si el uso
+    // no pide gráfica dedicada ni la potencia de una gama alta». PRO_POR_PRESUPUESTO, a mano: uso 0
+    // → entrada, ampliada a pro por el tramo; escritorio 3 → salía torre, con «porque tu uso pide
+    // gráfica dedicada o la potencia de una gama alta» encima de «con tu uso bastaría la gama de
+    // entrada… no a una necesidad técnica» (6.432 perfiles). Ahora decide `gamaPorUso` → mini PC.
+    // Y la razón de la torre dice su motivo concreto (juegos, edición o la gama que pide el uso),
+    // porque «gráfica dedicada o una gama alta», a secas, también chocaba con «bastaría la gama
+    // media» cuando el uso pedía la gráfica y el presupuesto ampliaba la gama.
     await abrirTest(page);
     await responder(page, PRO_POR_PRESUPUESTO);
+    await expect(tarjeta(page, 0)).toHaveText('Mini PC + Monitor');
     await expect(page.locator('[class*="avisoPresupuesto"]')).toContainText('Con tu uso declarado bastaría la gama de entrada');
     expect(await razonDe(page, 'Gama')).toContain('con tu uso bastaría la gama de entrada');
-    expect(await razonDe(page, 'Formato')).not.toContain('porque tu uso pide');
+    expect(await razonDe(page, 'Formato')).toContain('como tu uso no pide gráfica dedicada ni la potencia de una gama alta');
+    // Antes: 6.432 torres sin motivo de uso y 7.104 mini PC que decían «tu uso no pide…» con un
+    // uso que sí la pedía (la gama recortada por el presupuesto). Ahora, 0 de las dos.
     expect(barridoReinspeccion().torrePorPresupuestoAlUso).toBe(0);
   });
 
-  test('HALLAZGO: un doble clic en «Siguiente» de la pregunta 8 no contesta el presupuesto', async ({ page }) => {
-    // ABIERTO (02/10/2026). P8 tiene 3 opciones y P9 (presupuesto) 4: la navegación baja una
-    // opción y el segundo clic, en el mismo punto, cae en la última de P9, «Más de 1.800 €». Medido
-    // a 1280 px con el botón a media pantalla y al pie, 150 ms entre clics; igual de P5 (3) a P6
-    // (4), y a 360, 390 y 412 px con toques. Correcto: la pregunta nueva llega sin respuesta.
-    test.fail();
+  test('2704: un doble clic en «Siguiente» de la pregunta 8 no contesta el presupuesto', async ({ page }) => {
+    // REPARADO (02/10/2026). P8 tiene 3 opciones y P9 (presupuesto) 4: la navegación bajaba una
+    // opción y el segundo clic, en el mismo punto, caía en la última de P9, «Más de 1.800 €».
+    // Ahora se ignora el 2.º clic de una ráfaga (`detail` > 1) si el anterior cambió de pantalla,
+    // y «Siguiente» avanza desde el paso del render (receta del 2659 de selector-smartphone).
     await abrirTest(page);
     await llegarAPregunta(page, 8);
     const siguiente = page.getByRole('button', { name: 'Siguiente pregunta', exact: true });
@@ -876,20 +907,38 @@ test.describe('re-inspección 02/10/2026 · escritorio', () => {
     const y = caja.y + caja.height / 2;
     await page.mouse.click(x, y);
     await page.waitForTimeout(150);
-    await page.mouse.click(x, y);
+    // El segundo clic de un doble clic real lleva `detail` 2: el navegador lo cuenta así cuando
+    // llega en el mismo punto y a menos de ~500 ms. `page.mouse.click` manda SIEMPRE clickCount 1
+    // por CDP, así que dos `mouse.click` seguidos son dos clics sueltos, que ningún ratón produce
+    // con un doble clic (la ficha se midió así, y con eso el guard no puede distinguir un doble
+    // clic de un segundo clic intencionado). Mismo método que quiz-literatura-universal (2507).
+    // No `click({ clickCount: 2 })`, que manda DOS clics más.
+    await page.mouse.down({ clickCount: 2 });
+    await page.mouse.up({ clickCount: 2 });
     await expect(page.getByText('Pregunta 9 de 10').first()).toBeVisible();
     await page.waitForTimeout(300);
     await expect(radiosMarcados(page)).toHaveCount(0, { timeout: 1_000 });
+    // Y el mismo doble clic en «Empezar» no contesta la pregunta 1.
+    await page.goto('/selector-portatil/');
+    await esperarHidratacionBotones(page);
+    const empezar = page.getByRole('button', { name: /Empezar el test/ });
+    await empezar.evaluate((e) => e.scrollIntoView({ block: 'center' }));
+    const cajaEmpezar = (await empezar.boundingBox())!;
+    await page.mouse.click(cajaEmpezar.x + cajaEmpezar.width / 2, cajaEmpezar.y + cajaEmpezar.height / 2);
+    await page.waitForTimeout(150);
+    await page.mouse.down({ clickCount: 2 });
+    await page.mouse.up({ clickCount: 2 });
+    await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+    await page.waitForTimeout(300);
+    await expect(radiosMarcados(page)).toHaveCount(0, { timeout: 1_000 });
+    expect(new URL(page.url()).pathname).toBe('/selector-portatil/');
   });
 
-  test('HALLAZGO: tras «Empezar», «Siguiente» y «Anterior» el foco va al enunciado, no a <body>', async ({ page }) => {
-    // ABIERTO (02/10/2026). Forma del 1680 de smartphone, que allí se reparó llevando el foco al
-    // <h2 tabIndex=-1> del enunciado. Aquí «Empezar» se desmonta, «Siguiente» se desactiva (la
-    // pregunta nueva no tiene respuesta) y «Anterior» se desactiva al volver a P1: en los tres
-    // casos el foco cae a <body>, y el siguiente Tab salta a «Apps relacionadas». En móvil, sin
-    // foco que desplace la página, el enunciado nuevo queda fuera por arriba (360 px, botón a
-    // media pantalla: 6 de 10 preguntas). Al repararlo, con scroll-margin-top (forma del 2657).
-    test.fail();
+  test('2705: tras «Empezar», «Siguiente» y «Anterior» el foco va al enunciado, no a <body>', async ({ page }) => {
+    // REPARADO (02/10/2026). Forma del 1680 de smartphone: «Empezar» se desmonta, «Siguiente» se
+    // desactiva (la pregunta nueva no tiene respuesta) y «Anterior» se desactiva al volver a P1, y
+    // en los tres casos el foco caía a <body>. Ahora va al <h2 tabIndex=-1> del enunciado, que en
+    // móvil además se sube a la vista bajo la barra del logo (test de 360 px, más abajo).
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/selector-portatil/');
     await esperarHidratacionBotones(page);
@@ -908,16 +957,18 @@ test.describe('re-inspección 02/10/2026 · escritorio', () => {
     await page.keyboard.press('Enter');
     await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
     medidas.push(`Anterior → ${await focoActual(page)}`);
-    // Hoy: ['Empezar → BODY', 'Siguiente → BODY', 'Anterior → BODY'].
+    // Antes: ['Empezar → BODY', 'Siguiente → BODY', 'Anterior → BODY'].
     expect(medidas).toEqual(['Empezar → H2', 'Siguiente → H2', 'Anterior → H2']);
+    // Y el siguiente Tab entra en la pregunta (la opción marcada), no en «Apps relacionadas».
+    await page.keyboard.press('Tab');
+    await expect(page.locator('[role="radiogroup"] [role="radio"]').first()).toBeFocused();
   });
 
-  test('HALLAZGO: las flechas mueven la selección entre las opciones (patrón de radios APG)', async ({ page }) => {
-    // ABIERTO (02/10/2026). Forma del 1681 de smartphone: role="radio" sin tabindex itinerante ni
-    // teclado. Hoy ↓ y Fin no mueven el foco ni marcan nada, y las cuatro opciones son cuatro
-    // paradas de Tab. Correcto: una parada; ↓/→ y ↑/← a la vecina con vuelta, Inicio/Fin a los
-    // extremos, y mover el foco marca.
-    test.fail();
+  test('2706: las flechas mueven la selección entre las opciones (patrón de radios APG)', async ({ page }) => {
+    // REPARADO (02/10/2026). Forma del 1681 de smartphone: role="radio" sin tabindex itinerante ni
+    // teclado; ↓ y Fin no movían el foco ni marcaban nada, y las cuatro opciones eran cuatro
+    // paradas de Tab. Ahora: una parada; ↓/→ y ↑/← a la vecina con vuelta, Inicio/Fin a los
+    // extremos, y mover el foco marca (`teclaEnOpcion`, la de la referencia).
     await abrirTest(page);
     const radios = page.locator('[role="radiogroup"] [role="radio"]');
     expect(await radios.evaluateAll((els) => els.filter((e) => e.getAttribute('tabindex') !== '-1').length)).toBe(1);
@@ -929,32 +980,46 @@ test.describe('re-inspección 02/10/2026 · escritorio', () => {
     await expect(radios.nth(3)).toBeFocused({ timeout: 1_000 });
     await page.keyboard.press('ArrowDown');
     await expect(radios.nth(0)).toBeFocused({ timeout: 1_000 });
+    await page.keyboard.press('ArrowUp');
+    await expect(radios.nth(3)).toBeFocused({ timeout: 1_000 });
+    await page.keyboard.press('Home');
+    await expect(radios.nth(0)).toBeFocused({ timeout: 1_000 });
+    await expect(radiosMarcados(page)).toHaveCount(1);
+    // Con una marcada, la parada de Tab es ella.
+    expect(await radios.evaluateAll((els) => els.map((e) => e.getAttribute('tabindex')))).toEqual(['0', '-1', '-1', '-1']);
   });
 
-  test('HALLAZGO: los porcentajes llevan espacio duro antes del «%» (CLAUDE.md §2)', async ({ page }) => {
-    // ABIERTO (02/10/2026). «100 % sRGB» (perfil, motor.ts:711) lleva un espacio normal, y el
-    // JSON-LD dice «100% en el navegador» (metadata.ts:18), pegado. La norma del 25/09/2026: U+00A0,
-    // y lo viejo se corrige cuando pasa el Inspector. RE_MAC_TORRE es creativo → sale el sRGB.
-    test.fail();
+  test('2708: los porcentajes llevan espacio duro antes del «%» (CLAUDE.md §2)', async ({ page }) => {
+    // REPARADO (02/10/2026). «100 % sRGB» (perfil, motor.ts) llevaba un espacio normal, y el
+    // JSON-LD decía «100% en el navegador» (metadata.ts), pegado. Los dos, con U+00A0 (norma del
+    // 25/09/2026). RE_MAC_TORRE es creativo → sale el sRGB.
     await abrirTest(page);
     await responder(page, RE_MAC_TORRE);
     const texto = (await page.locator('[class*="resultadosContainer"]').textContent()) ?? '';
     const jsonld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
     const separadores = [...`${texto} ${jsonld}`.matchAll(/\d(\s?)%/g)]
       .map((m) => (m[1] === ' ' ? 'U+00A0' : m[1] === '' ? 'pegado' : 'espacio normal'));
-    // Hoy: ['espacio normal' (100 % sRGB), 'pegado' (100% en el navegador)].
+    // Antes: ['espacio normal' (100 % sRGB), 'pegado' (100% en el navegador)].
     expect(separadores.length).toBeGreaterThan(0);
     expect(separadores.filter((s) => s !== 'U+00A0')).toEqual([]);
-    expect(barridoReinspeccion().porcentajeSinEspacioDuro).toBe(0); // hoy 82.944 perfiles
+    expect(barridoReinspeccion().porcentajeSinEspacioDuro).toBe(0); // antes, 82.944 perfiles
   });
 
-  test('HALLAZGO: la guía educativa está en el HTML servido', async ({ page }) => {
-    // ABIERTO (02/10/2026). Forma del 2663 de smartphone: <EducationalSection> va dentro de
-    // `pantalla === 'resultado'` (page.tsx:310), así que el HTML servido no lleva ni una línea de
-    // la guía y quien no termina las 10 preguntas no la ve nunca.
-    test.fail();
+  test('2709: la guía educativa está en el HTML servido', async ({ page }) => {
+    // REPARADO (02/10/2026). Forma del 2663 de smartphone: <EducationalSection> iba dentro de
+    // `pantalla === 'resultado'`, así que el HTML servido no llevaba ni una línea de la guía y
+    // quien no terminaba las 10 preguntas no la veía nunca. Ahora se monta en todas las pantallas,
+    // fuera de la rama del resultado, y ningún aviso legal vive dentro de ella.
     const html = await (await page.request.get('/selector-portatil/')).text();
     expect(html).toContain('Portátil (laptop o notebook) vs sobremesa: la primera decisión');
+    expect(html).toContain('Truco de compra');
+    // En la intro y durante el test, no solo en el resultado.
+    await page.goto('/selector-portatil/');
+    await esperarHidratacionBotones(page);
+    await expect(page.getByRole('button', { name: 'Ver guía educativa' })).toBeVisible();
+    await page.getByRole('button', { name: /Empezar el test/ }).click();
+    await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Ver guía educativa' })).toBeVisible();
   });
 });
 
@@ -991,12 +1056,42 @@ test.describe('re-inspección 02/10/2026 · móvil 360 px', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
   });
 
-  test('HALLAZGO: el <h1> del resultado no queda bajo la barra del logo a 360, 390 ni 412 px', async ({ page }) => {
-    // ABIERTO (02/10/2026). Forma del 2658 de smartphone: los lotes dieron aire a `.hero`, pero el
+  test('2705: tocando «Siguiente» a media pantalla, cada enunciado nuevo queda a la vista y bajo la barra', async ({ page }) => {
+    // REPARADO (02/10/2026). A 360 px, sin un foco que desplazara la página, el enunciado nuevo
+    // quedaba fuera por arriba en 6 de 10 preguntas y bajo la barra del logo en otras 3. Ahora el
+    // efecto del cambio de pregunta lo sube a la vista con su scroll-margin-top de 80 px.
+    test.setTimeout(60_000);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-portatil/');
+    await esperarHidratacionBotones(page);
+    const empezar = page.getByRole('button', { name: /Empezar el test/ });
+    await empezar.evaluate((e) => e.scrollIntoView({ block: 'center' }));
+    await empezar.tap();
+    const fallos: string[] = [];
+    for (let k = 1; k <= 10; k++) {
+      await expect(page.getByText(`Pregunta ${k} de 10`).first()).toBeVisible();
+      const medida = await bajoLaBarra(page, 'h2[tabindex="-1"]');
+      const visible = await page.locator('h2[tabindex="-1"]').evaluate((el) => {
+        const caja = el.getBoundingClientRect();
+        return caja.top >= 0 && caja.bottom <= window.innerHeight;
+      });
+      if (medida.tapado || !visible) fallos.push(`P${k}: top ${medida.top}, barra ${medida.barra}`);
+      await expect(page.locator('h2[tabindex="-1"]')).toBeFocused();
+      if (k === 10) break;
+      await page.waitForTimeout(500); // lectura: ver `responderTocando`
+      await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
+      const siguiente = page.getByRole('button', { name: 'Siguiente pregunta', exact: true });
+      await siguiente.evaluate((e) => e.scrollIntoView({ block: 'center' }));
+      await siguiente.tap();
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  test('2707: el <h1> del resultado no queda bajo la barra del logo a 360, 390 ni 412 px', async ({ page }) => {
+    // REPARADO (02/10/2026). Forma del 2658 de smartphone: los lotes dieron aire a `.hero`, pero el
     // hero del resultado es `.heroResultados` (2rem arriba). Medido: a 360 px la píldora del logo
-    // ocupa [15, 10, 141, 52] y las letras de «Tu ordenador ideal» [81, 31, 279, 61]; igual a 390
-    // y 412 px, en claro y en oscuro. Desde 800 px el título centrado ya no llega al logo.
-    test.fail();
+    // ocupaba [15, 10, 141, 52] y las letras de «Tu ordenador ideal» [81, 31, 279, 61]; igual a 390
+    // y 412 px. Ahora `.heroResultados` lleva los mismos 80 px que `.hero` hasta 1.023 px.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/selector-portatil/');
     await esperarHidratacionBotones(page);
@@ -1022,12 +1117,12 @@ test.describe('re-inspección 02/10/2026 · móvil 390 px', () => {
     hasTouch: true,
   });
 
-  test('HALLAZGO: un doble toque en «Siguiente» de la pregunta 5 no contesta la 6', async ({ page }) => {
-    // ABIERTO (02/10/2026). P5 (dispositivos Apple) tiene 3 opciones y P6 (software) 4: el segundo
-    // toque, 150 ms después y en el mismo punto, cae en «Sin requisitos específicos». A 390 px
+  test('2704: un doble toque en «Siguiente» de la pregunta 5 no contesta la 6', async ({ page }) => {
+    // REPARADO (02/10/2026). P5 (dispositivos Apple) tiene 3 opciones y P6 (software) 4: el segundo
+    // toque, 150 ms después y en el mismo punto, caía en «Sin requisitos específicos». A 390 px
     // también de P3 a P4 («Me da igual») y de P8 a P9 («Más de 1.800 €»); a 360 px un doble toque
-    // en «Empezar» con el botón al pie de la pantalla abre /selector-smartphone/ (Apps relacionadas).
-    test.fail();
+    // en «Empezar» con el botón al pie de la pantalla abría /selector-smartphone/. Mismo guard que
+    // el doble clic de escritorio.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/selector-portatil/');
     await esperarHidratacionBotones(page);
