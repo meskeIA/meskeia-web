@@ -27,13 +27,34 @@
  *     ningún iPhone nuevo (hallazgo 1678). Ahora, si el presupuesto alcanza el tramo del iPhone
  *     nuevo más barato, la gama sube hasta él y se dice por qué; si no lo alcanza, la gama se
  *     queda en el tramo y un aviso explica que ahí solo cabe un reacondicionado.
+ *
+ *  5. Lo que quedaba del 1678 (hallazgo 2660): el presupuesto descartaba en la GAMA pero no en el
+ *     SISTEMA. A quien tiene ecosistema Apple, declara un tramo sin iPhone nuevo y responde «No,
+ *     prefiero nuevo», la tarjeta principal le decía «iPhone (iOS)» y solo el aviso de debajo
+ *     confesaba que eso no existe en su tramo. Ahora el presupuesto descarta también el sistema:
+ *     `os` sigue siendo el que pide el ecosistema y `osRecomendado` el que cabe, que en ese caso
+ *     es Android. Es la misma regla que con la gama (el presupuesto es un TOPE, no un aviso).
+ *
+ *  6. Los años de actualizaciones de iOS salían de tres cifras escritas a mano y distintas
+ *     (FAQPage 5-7, pantalla y guía 6-7; hallazgo 2662). Ahora salen de UNA constante,
+ *     `COMPROMISO_ACTUALIZACIONES_IOS`, que importan la pantalla, la guía y el FAQPage.
  */
 
 export type SistemaOS = 'ios' | 'android';
 export type GamaKey = 'basica' | 'media' | 'alta' | 'pro';
 
 export interface Resultado {
+  /** El sistema que pide el ecosistema declarado (P4 y P5), sin mirar el bolsillo. */
   os: SistemaOS;
+  /**
+   * El que se RECOMIENDA, y el que pinta la tarjeta: el de `os`, salvo que el presupuesto lo
+   * descarte (iPhone sin modelo nuevo en el tramo y «No, prefiero nuevo» → Android).
+   */
+  osRecomendado: SistemaOS;
+  /** El presupuesto y «prefiero nuevo» han descartado el iPhone que pedía el ecosistema. */
+  sistemaDescartadoPorPresupuesto: boolean;
+  /** Se recomienda iPhone, pero en el tramo solo cabe como reacondicionado certificado. */
+  iphoneSoloReacondicionado: boolean;
   /** La gama que se recomienda, ya acotada por el presupuesto. */
   gama: GamaKey;
   /** La que pedirían las respuestas de uso, sin mirar el presupuesto. */
@@ -79,6 +100,20 @@ export const ETIQUETA_PRESUPUESTO: Record<string, string> = {
  * nuevo en básica (100-250 €) ni en media (250-500 €). Revisar si Apple lanza uno por debajo.
  */
 export const GAMA_MINIMA_IPHONE_NUEVO: GamaKey = 'alta';
+
+/**
+ * Lo que Apple COMPROMETE por escrito sobre actualizaciones del iPhone, y la única cifra de años
+ * de iOS que la app publica: tarjeta, razón, guía y FAQPage la importan de aquí (hallazgo 2662,
+ * que encontró 5-7 en el FAQPage y 6-7 en pantalla, ninguna con fuente).
+ *
+ * Fuente: la declaración de conformidad que Apple publicó en 2024 para la ley PSTI del Reino
+ * Unido (iPhone 15 en adelante): «defined support period: minimum of five years from the first
+ * supply date», es decir, actualizaciones de SEGURIDAD durante al menos 5 años desde que el modelo
+ * sale a la venta. Comprobado el 02/10/2026. Apple no compromete un número de versiones nuevas de
+ * iOS: las que ha dado de hecho no son una garantía, así que no se publican como tal.
+ */
+export const COMPROMISO_ACTUALIZACIONES_IOS =
+  'un mínimo de 5 años de actualizaciones de seguridad desde que cada modelo sale a la venta';
 
 const NOMBRE_GAMA: Record<GamaKey, string> = {
   basica: 'básica',
@@ -136,13 +171,26 @@ export function calcularResultado(respuestas: Record<number, string>): Resultado
   const gamaDeUso = gama;
   let elevadaPorSistema = false;
   let avisoSistema: string | null = null;
+  let osRecomendado: SistemaOS = os;
+  let sistemaDescartadoPorPresupuesto = false;
+  let iphoneSoloReacondicionado = false;
   if (os === 'ios' && esMayor(GAMA_MINIMA_IPHONE_NUEVO, gama)) {
     if (esMayor(GAMA_MINIMA_IPHONE_NUEVO, tope)) {
-      // El presupuesto no llega: la gama se queda en el tramo, pero se dice qué cabe en él.
-      avisoSistema =
-        respuestas[10] === 'si' || respuestas[10] === 'quizas'
-          ? 'Apple no vende ningún iPhone nuevo en este tramo: el más barato de su tienda supera los 500 €. Aquí la vía es un iPhone reacondicionado certificado de una generación anterior; antes de comprarlo, comprueba cuántos años de actualizaciones le quedan.'
-          : 'Apple no vende ningún iPhone nuevo en este tramo: el más barato de su tienda supera los 500 €. Como prefieres comprar nuevo, las salidas son subir de tramo o elegir un Android nuevo de esta gama; si lo reconsideras, un iPhone reacondicionado certificado sí puede caber en tu presupuesto.';
+      // El presupuesto no llega al iPhone nuevo: la gama se queda en el tramo.
+      if (respuestas[10] === 'si' || respuestas[10] === 'quizas') {
+        // Acepta segunda mano: el iPhone cabe como reacondicionado, y la tarjeta lo dice.
+        iphoneSoloReacondicionado = true;
+        avisoSistema =
+          'Apple no vende ningún iPhone nuevo en este tramo: el más barato de su tienda supera los 500 €. Aquí la vía es un iPhone reacondicionado certificado de una generación anterior; antes de comprarlo, comprueba cuántos años de actualizaciones le quedan.';
+      } else {
+        // «No, prefiero nuevo»: el iPhone no cabe de NINGUNA forma que el usuario acepte, así
+        // que el presupuesto lo descarta y se recomienda lo que sí cabe (hallazgo 2660). Antes la
+        // tarjeta decía «iPhone (iOS)» y el aviso de debajo declaraba imposible esa misma tarjeta.
+        osRecomendado = 'android';
+        sistemaDescartadoPorPresupuesto = true;
+        avisoSistema =
+          'Tu ecosistema Apple apuntaba a un iPhone, pero Apple no vende ninguno nuevo en este tramo: el más barato de su tienda supera los 500 €. Como prefieres comprar nuevo, la recomendación pasa a un Android nuevo de esta gama. Si el iPhone es decisivo para ti, las salidas son subir de tramo o, si lo reconsideras, un iPhone reacondicionado certificado, que sí puede caber en tu presupuesto.';
+      }
     } else {
       gama = GAMA_MINIMA_IPHONE_NUEVO;
       elevadaPorSistema = true;
@@ -151,10 +199,15 @@ export function calcularResultado(respuestas: Record<number, string>): Resultado
   }
 
   // ─ Razones: explican LO QUE SE HA RESPONDIDO, no la gama de salida ─
-  if (os === 'ios') {
+  if (osRecomendado === 'ios') {
     razones.push('Tienes otros dispositivos Apple: el ecosistema integrado (AirDrop, iMessage, Handoff) te aporta valor real.');
-    razones.push('iOS recibe actualizaciones durante 6-7 años, lo que protege tu inversión a largo plazo.');
+    razones.push(`Apple declara ${COMPROMISO_ACTUALIZACIONES_IOS}, lo que protege tu inversión a largo plazo.`);
   } else {
+    if (sistemaDescartadoPorPresupuesto) {
+      razones.push(
+        'Tienes dispositivos Apple y el ecosistema apuntaba a un iPhone, pero en tu tramo no hay iPhone nuevo y prefieres comprar nuevo: la recomendación pasa a Android, que sí tiene modelos nuevos en esta gama.',
+      );
+    }
     razones.push('Android ofrece más variedad de modelos, marcas y precios que se adaptan a cualquier necesidad.');
     razones.push('Mayor libertad de personalización y compatibilidad con ecosistemas no Apple (Google, Microsoft…).');
   }
@@ -191,7 +244,7 @@ export function calcularResultado(respuestas: Record<number, string>): Resultado
 
   // ─ Consejos ─
   if (respuestas[10] === 'si' || respuestas[10] === 'quizas') {
-    consejos.push('💡 Un dispositivo reacondicionado certificado puede ahorrarte un 30-40 % con garantía incluida; comprueba el estado de la batería antes de comprar.');
+    consejos.push('💡 Un dispositivo reacondicionado certificado puede ahorrarte un 30-40 % con garantía incluida; comprueba el estado de la batería antes de comprar.');
   }
   if (recortadaPorPresupuesto && respuestas[10] === 'no') {
     consejos.push('♻️ Un reacondicionado certificado de la gama que pedía tu uso suele costar lo mismo que uno nuevo del tramo que has elegido: es la vía más directa para no renunciar a nada.');
@@ -297,6 +350,9 @@ export function calcularResultado(respuestas: Record<number, string>): Resultado
 
   return {
     os,
+    osRecomendado,
+    sistemaDescartadoPorPresupuesto,
+    iphoneSoloReacondicionado,
     gama,
     gamaPorPerfil,
     recortadaPorPresupuesto,

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { COMPROMISO_ACTUALIZACIONES_IOS } from './motor';
 
 // Una sola lista para el JSON-LD que inyecta layout.tsx y la meta schema:WebApplication. El
 // JSON-LD salía con `features: []` y las ocho vivían solo en la meta (hallazgo 1686).
@@ -10,7 +11,7 @@ const FEATURES = [
   'Pliego de características técnicas a buscar, escrito para la gama recomendada',
   'Aviso cuando el presupuesto recorta lo que pide tu uso, o cuando no hay iPhone nuevo en tu tramo',
   'Consejos de compra: cuándo comprar y cuándo conviene un reacondicionado certificado',
-  '100 % en el navegador, sin registro ni instalación',
+  '100 % en el navegador, sin registro ni instalación',
 ];
 
 export const metadata: Metadata = {
@@ -86,7 +87,8 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre iOS y Android para elegir móvil?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'iOS (Apple) ofrece un ecosistema cerrado pero muy integrado: actualizaciones garantizadas durante 5-7 años, privacidad reforzada y sincronización fluida con otros productos Apple. Android es más abierto, con mayor variedad de fabricantes y rangos de precio, y mayor flexibilidad de personalización. La elección depende en gran medida de si ya usas otros dispositivos Apple y de cuánto valoras la personalización frente a la simplicidad.',
+        // Los años de iOS, de la MISMA constante que la tarjeta y la guía (hallazgo 2662).
+        text: `iOS (Apple) ofrece un ecosistema cerrado pero muy integrado: Apple declara ${COMPROMISO_ACTUALIZACIONES_IOS}, con privacidad reforzada y sincronización fluida con otros productos Apple. Android es más abierto, con mayor variedad de fabricantes y rangos de precio, y mayor flexibilidad de personalización. La elección depende en gran medida de si ya usas otros dispositivos Apple y de cuánto valoras la personalización frente a la simplicidad.`,
       },
     },
     {
@@ -102,7 +104,7 @@ export const faqJsonLd = {
       name: '¿Cuánto debería durar un smartphone antes de cambiarlo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un smartphone de gama media o alta debería funcionar correctamente entre 3 y 5 años. El factor limitante suele ser el soporte de actualizaciones del sistema operativo: sin actualizaciones de seguridad, el dispositivo queda expuesto. En Android depende del fabricante y del modelo: los más generosos declaran hasta 7 años, e incluso en la gama de entrada ya hay modelos con 5 o más; Apple suele mantener el soporte durante años. En la Unión Europea, desde el 20/06/2025 (Reglamento (UE) 2023/1670), si el fabricante publica actualizaciones del sistema para un modelo debe ofrecerlas gratis a todas sus unidades hasta al menos 5 años después de que deje de venderse. La cifra que cuenta sigue siendo la que el fabricante declara para ese modelo concreto.',
+        text: `Un smartphone de gama media o alta debería funcionar correctamente entre 3 y 5 años. El factor limitante suele ser el soporte de actualizaciones del sistema operativo: sin actualizaciones de seguridad, el dispositivo queda expuesto. En Android depende del fabricante y del modelo: los más generosos declaran hasta 7 años, e incluso en la gama de entrada ya hay modelos con 5 o más; Apple declara ${COMPROMISO_ACTUALIZACIONES_IOS}. En la Unión Europea, desde el 20/06/2025 (Reglamento (UE) 2023/1670), si el fabricante publica actualizaciones del sistema para un modelo debe ofrecerlas gratis a todas sus unidades hasta al menos 5 años después de que deje de venderse. La cifra que cuenta sigue siendo la que el fabricante declara para ese modelo concreto.`,
       },
     },
     {

@@ -4,10 +4,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorSmartphone.module.css';
 import {
   calcularResultado,
-  ORDEN_GAMAS,
+  COMPROMISO_ACTUALIZACIONES_IOS,
   type GamaKey,
   type Resultado,
-  type SistemaOS,
 } from './motor';
 import {
   MeskeiaLogo,
@@ -236,8 +235,42 @@ export default function SelectorSmartphone() {
   const totalPreguntas = PREGUNTAS.length;
   const progreso = ((paso) / totalPreguntas) * 100;
 
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 2659, la forma del 2507 de los quizzes).
+   * «Empezar», «Siguiente», «Anterior», «Ver resultado» y «Repetir» cambian la pantalla en el
+   * primer clic, y el foco desplaza la página; el segundo clic caía en el mismo punto sobre lo que
+   * hubiera debajo en la pantalla nueva. Con «Empezar» centrado hacia y 360 en un móvil, marcaba
+   * «Fotografía y vídeo» en la pregunta 1 (+2 a la gama) sin que nadie la eligiera. Un doble clic
+   * es UNA intención, así que un clic se ignora cuando cumple las dos cosas:
+   *   · es el 2.º (o 3.º…) de una ráfaga: `detail` > 1. Lo cuenta el navegador (clics seguidos en
+   *     el mismo sitio), no un temporizador de la app; con teclado o lector de pantalla es 0;
+   *   · y el clic ANTERIOR de la app cambió de pantalla. Sin esta condición, contestar y tocar
+   *     «Siguiente» deprisa —dos toques cercanos, que Chrome también cuenta como ráfaga— se comía
+   *     el «Siguiente», que sí era una intención nueva.
+   * El clic ignorado no toca el registro: el 3.º de una ráfaga se ignora igual que el 2.º.
+   * Receta común de la familia de selectores; la de los quizzes, en quiz-literatura-universal.
+   */
+  const ultimoCambioPantallaRef = useRef(false);
+  const clicDeMas = (e: React.MouseEvent<HTMLButtonElement>): boolean =>
+    e.detail > 1 && ultimoCambioPantallaRef.current;
+  const registrarClic = (cambiaPantalla: boolean) => {
+    ultimoCambioPantallaRef.current = cambiaPantalla;
+  };
+
   function seleccionarOpcion(valor: string) {
+    registrarClic(false);
     setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
+  }
+
+  function elegirOpcion(e: React.MouseEvent<HTMLButtonElement>, valor: string) {
+    if (clicDeMas(e)) return;
+    seleccionarOpcion(valor);
+  }
+
+  function empezar(e: React.MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
+    setPantalla('test');
   }
 
   /**
@@ -260,9 +293,15 @@ export default function SelectorSmartphone() {
     radios?.[destino]?.focus();
   }
 
-  function avanzar() {
+  // Avanza a la pregunta SIGUIENTE A LA PULSADA (`paso + 1` del render, no `p => p + 1`): si el
+  // botón recibiera dos clics antes de repintar, no saltaría una pregunta. Y solo con la pregunta
+  // respondida, aunque el botón ya esté desactivado sin ella: el `disabled` lo pone el render, y
+  // un clic que llega antes de repintar no lo ve.
+  function avanzar(e: React.MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e) || !respuestas[preguntaActual.id]) return;
+    registrarClic(true);
     if (paso < totalPreguntas - 1) {
-      setPaso(p => p + 1);
+      setPaso(paso + 1);
     } else {
       const res = calcularResultado(respuestas);
       setResultado(res);
@@ -270,20 +309,40 @@ export default function SelectorSmartphone() {
     }
   }
 
-  function retroceder() {
-    if (paso > 0) setPaso(p => p - 1);
+  function retroceder(e: React.MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e) || paso === 0) return;
+    registrarClic(true);
+    setPaso(paso - 1);
   }
 
-  function reiniciar() {
+  function reiniciar(e: React.MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
     setPantalla('intro');
     setPaso(0);
     setRespuestas({});
     setResultado(null);
   }
 
-  const osInfo = resultado ? (resultado.os === 'ios'
-    ? { nombre: 'iPhone (iOS)', icon: '🍎', desc: 'El ecosistema Apple integrado, actualizaciones garantizadas 6-7 años y experiencia fluida desde el primer día.' }
-    : { nombre: 'Android', icon: '🤖', desc: 'Mayor variedad de modelos y precios, personalización avanzada y compatibilidad con los servicios de Google.' })
+  // La tarjeta pinta el sistema RECOMENDADO, ya filtrado por el presupuesto, y dice en ella misma
+  // lo que lo condiciona: lo que el usuario se lleva es la tarjeta, no el aviso de debajo
+  // (hallazgo 2660). Los años de iOS salen de la constante del motor que usa también el FAQPage
+  // (hallazgo 2662: aquí decía «6-7 años» y el FAQPage «5-7»).
+  const osInfo = resultado ? (resultado.osRecomendado === 'ios'
+    ? {
+        nombre: 'iPhone (iOS)',
+        icon: '🍎',
+        desc: resultado.iphoneSoloReacondicionado
+          ? `El ecosistema Apple integrado, en tu tramo como reacondicionado certificado: no hay iPhone nuevo por debajo de la gama alta. Apple declara ${COMPROMISO_ACTUALIZACIONES_IOS}, así que a uno de generación anterior le quedan menos.`
+          : `El ecosistema Apple integrado y una experiencia fluida desde el primer día. Apple declara ${COMPROMISO_ACTUALIZACIONES_IOS}.`,
+      }
+    : {
+        nombre: 'Android',
+        icon: '🤖',
+        desc: resultado.sistemaDescartadoPorPresupuesto
+          ? 'Tu ecosistema Apple apuntaba a un iPhone, pero en tu tramo no hay iPhone nuevo y prefieres comprar nuevo. Android sí tiene modelos nuevos en esta gama, con variedad de marcas y precios.'
+          : 'Mayor variedad de modelos y precios, personalización avanzada y compatibilidad con los servicios de Google.',
+      })
     : null;
 
   return (
@@ -337,7 +396,7 @@ export default function SelectorSmartphone() {
               <li><span aria-hidden="true">✅</span> Consejos de compra personalizados</li>
               <li><span aria-hidden="true">✅</span> Sin marcas patrocinadas, solo tu perfil real</li>
             </ul>
-            <button type="button" className={styles.btnStart} onClick={() => setPantalla('test')}>
+            <button type="button" className={styles.btnStart} onClick={empezar}>
               Empezar el test →
             </button>
           </div>
@@ -379,7 +438,7 @@ export default function SelectorSmartphone() {
                   key={op.valor}
                   type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
-                  onClick={() => seleccionarOpcion(op.valor)}
+                  onClick={e => elegirOpcion(e, op.valor)}
                   // role="radio" + aria-checked, no aria-pressed: la semántica real es la
                   // elección ÚNICA entre cuatro, no un conmutador. El contenedor declaraba
                   // radiogroup y no había un solo radio dentro (hallazgo 950).
@@ -511,84 +570,90 @@ export default function SelectorSmartphone() {
           <button type="button" className={styles.btnRepetir} onClick={reiniciar} aria-label="Repetir el test">
             ← Repetir el test
           </button>
-
-          {/* Sección educativa */}
-          <EducationalSection
-            title="Guía completa: cómo elegir smartphone"
-            subtitle="iOS vs Android, gamas, qué mirar y cuándo comprar"
-            defaultOpen={false}
-          >
-            <h3>iOS vs Android: diferencias clave</h3>
-            <p>
-              <strong>iOS</strong> es el sistema operativo de Apple, exclusivo de los iPhone. Su mayor ventaja es la
-              integración perfecta con el resto de dispositivos Apple (Mac, iPad, AirPods, Apple Watch) y la garantía de
-              recibir actualizaciones durante 6-7 años. Es más restrictivo en personalización, pero muy estable.
-            </p>
-            <p>
-              <strong>Android</strong> (desarrollado por Google) lo usan Samsung, Xiaomi, Google, OnePlus y la mayoría
-              de fabricantes. Ofrece mayor variedad de modelos y precios, más opciones de personalización y mejor
-              integración con servicios de Google (Gmail, Drive, Meet). La duración de las actualizaciones varía
-              según fabricante y modelo: los más generosos declaran hasta 7 años, e incluso en la gama de entrada
-              ya hay modelos con 5 años o más. Mira siempre la cifra que el fabricante declara para el modelo concreto.
-            </p>
-            <p>
-              En la Unión Europea, desde el 20/06/2025 el Reglamento (UE) 2023/1670 obliga a que, si el fabricante
-              publica actualizaciones del sistema para un modelo, las ofrezca gratis a todas sus unidades hasta al
-              menos 5 años después de que ese modelo deje de venderse. Regula cómo se reparten las actualizaciones,
-              no promete versiones nuevas: la cifra declarada sigue siendo la referencia.
-            </p>
-
-            <h3>Las gamas explicadas</h3>
-            <p>
-              <strong>Gama básica (hasta 250 €):</strong> ideal para llamadas, mensajería y redes sociales. Las cámaras
-              son modestas, el rendimiento suficiente para el uso cotidiano y la batería suele ser generosa en capacidad.
-              En este tramo y en la gama media no hay iPhone nuevo: quien quiera iOS con este presupuesto tiene la vía
-              del reacondicionado certificado.
-            </p>
-            <p>
-              <strong>Gama media (250-500 €):</strong> el segmento con mejor relación calidad-precio del mercado. Pantallas
-              AMOLED de calidad, cámaras con modo noche y teleobjetivo básico, autonomía de todo el día. La mayoría de
-              usuarios encuentra aquí su móvil ideal.
-            </p>
-            <p>
-              <strong>Gama alta (500-900 €):</strong> procesadores de primer nivel, cámaras con zoom óptico real,
-              pantallas de 120 Hz con brillo máximo elevado y materiales premium. Para quienes usan el móvil de forma
-              intensiva o valoran mucho la fotografía.
-            </p>
-            <p>
-              <strong>Flagship / Pro (más de 900 €):</strong> lo más avanzado disponible. Zoom periscópico, sensores
-              de cámara grandes, el procesador más potente, funciones de IA avanzadas y soporte garantizado durante
-              muchos años. Se justifica para usuarios profesionales o quienes planean conservarlo 5+ años.
-            </p>
-
-            <h3>Qué mirar antes de comprar</h3>
-            <ul>
-              <li><strong>Actualizaciones garantizadas:</strong> cuántos años de soporte ofrece el fabricante. Importante si planeas usar el móvil 3+ años.</li>
-              <li><strong>Batería (mAh) y carga rápida:</strong> más mAh no siempre significa más autonomía — el software de optimización importa mucho.</li>
-              <li><strong>Cámara:</strong> los megapíxeles no lo dicen todo. El tamaño del sensor, la apertura y el procesado de imagen son más importantes.</li>
-              <li><strong>Pantalla:</strong> resolución, tecnología (AMOLED vs LCD), tasa de refresco (60 Hz vs 120 Hz) y brillo máximo para exteriores.</li>
-              <li><strong>Conectividad:</strong> 5G ya es estándar en gama media-alta. Comprueba también NFC si usas pagos móviles.</li>
-              <li><strong>IP68 o IP67:</strong> resistencia al agua. Cada vez más habitual incluso en gama media.</li>
-            </ul>
-
-            <h3>Cuándo y dónde comprar</h3>
-            <div className={styles.warningBox}>
-              <strong>Mejores momentos para comprar:</strong> el precio de los smartphones baja considerablemente en las
-              campañas de descuentos de cada país (el Black Friday de noviembre y el Prime Day de julio están
-              extendidos en buena parte del mundo hispanohablante, y en México se suma el Buen Fin) y, sobre todo,
-              cuando se lanza la generación siguiente del modelo que te interesa. Comprar el modelo del año anterior
-              tras el lanzamiento del nuevo puede suponer un ahorro del 20-30%.
-            </div>
-            <p>
-              Los canales más habituales son las tiendas oficiales de cada marca, las grandes superficies de
-              electrónica y los mercados en línea; en España se añaden El Corte Inglés y MediaMarkt, y en Latinoamérica
-              cadenas como Falabella, Liverpool o Mercado Libre. Para segunda mano certificada, plataformas como Back
-              Market o Amazon Renewed dan garantía propia: comprueba cuántos meses cubre en tu país, porque el mínimo
-              legal cambia de uno a otro.
-            </p>
-          </EducationalSection>
         </div>
       )}
+
+      {/* Sección educativa, en TODAS las pantallas (hallazgo 2663). Vivía dentro de la rama
+          `pantalla === 'resultado'`: el HTML servido no traía ni una línea de la guía, aunque
+          EducationalSection monta su contenido siempre «porque Googlebot no hace clic», y quien
+          no terminaba las 10 preguntas tampoco la veía. El LegalNotice y la DisclaimerCard van
+          arriba, fuera de ella: nace colapsada y no puede esconder un aviso. */}
+      <div className={styles.guiaContainer}>
+        <EducationalSection
+          title="Guía completa: cómo elegir smartphone"
+          subtitle="iOS vs Android, gamas, qué mirar y cuándo comprar"
+          defaultOpen={false}
+        >
+          <h3>iOS vs Android: diferencias clave</h3>
+          <p>
+            <strong>iOS</strong> es el sistema operativo de Apple, exclusivo de los iPhone. Su mayor ventaja es la
+            integración perfecta con el resto de dispositivos Apple (Mac, iPad, AirPods, Apple Watch) y el compromiso que
+            declara Apple: {COMPROMISO_ACTUALIZACIONES_IOS}. Es más restrictivo en personalización, pero muy estable.
+          </p>
+          <p>
+            <strong>Android</strong> (desarrollado por Google) lo usan Samsung, Xiaomi, Google, OnePlus y la mayoría
+            de fabricantes. Ofrece mayor variedad de modelos y precios, más opciones de personalización y mejor
+            integración con servicios de Google (Gmail, Drive, Meet). La duración de las actualizaciones varía
+            según fabricante y modelo: los más generosos declaran hasta 7 años, e incluso en la gama de entrada
+            ya hay modelos con 5 años o más. Mira siempre la cifra que el fabricante declara para el modelo concreto.
+          </p>
+          <p>
+            En la Unión Europea, desde el 20/06/2025 el Reglamento (UE) 2023/1670 obliga a que, si el fabricante
+            publica actualizaciones del sistema para un modelo, las ofrezca gratis a todas sus unidades hasta al
+            menos 5 años después de que ese modelo deje de venderse. Regula cómo se reparten las actualizaciones,
+            no promete versiones nuevas: la cifra declarada sigue siendo la referencia.
+          </p>
+
+          <h3>Las gamas explicadas</h3>
+          <p>
+            <strong>Gama básica (hasta 250 €):</strong> ideal para llamadas, mensajería y redes sociales. Las cámaras
+            son modestas, el rendimiento suficiente para el uso cotidiano y la batería suele ser generosa en capacidad.
+            En este tramo y en la gama media no hay iPhone nuevo: quien quiera iOS con este presupuesto tiene la vía
+            del reacondicionado certificado.
+          </p>
+          <p>
+            <strong>Gama media (250-500 €):</strong> el segmento con mejor relación calidad-precio del mercado. Pantallas
+            AMOLED de calidad, cámaras con modo noche y teleobjetivo básico, autonomía de todo el día. La mayoría de
+            usuarios encuentra aquí su móvil ideal.
+          </p>
+          <p>
+            <strong>Gama alta (500-900 €):</strong> procesadores de primer nivel, cámaras con zoom óptico real,
+            pantallas de 120 Hz con brillo máximo elevado y materiales premium. Para quienes usan el móvil de forma
+            intensiva o valoran mucho la fotografía.
+          </p>
+          <p>
+            <strong>Flagship / Pro (más de 900 €):</strong> lo más avanzado disponible. Zoom periscópico, sensores
+            de cámara grandes, el procesador más potente, funciones de IA avanzadas y soporte garantizado durante
+            muchos años. Se justifica para usuarios profesionales o quienes planean conservarlo 5+ años.
+          </p>
+
+          <h3>Qué mirar antes de comprar</h3>
+          <ul>
+            <li><strong>Actualizaciones garantizadas:</strong> cuántos años de soporte ofrece el fabricante. Importante si planeas usar el móvil 3+ años.</li>
+            <li><strong>Batería (mAh) y carga rápida:</strong> más mAh no siempre significa más autonomía — el software de optimización importa mucho.</li>
+            <li><strong>Cámara:</strong> los megapíxeles no lo dicen todo. El tamaño del sensor, la apertura y el procesado de imagen son más importantes.</li>
+            <li><strong>Pantalla:</strong> resolución, tecnología (AMOLED vs LCD), tasa de refresco (60 Hz vs 120 Hz) y brillo máximo para exteriores.</li>
+            <li><strong>Conectividad:</strong> 5G ya es estándar en gama media-alta. Comprueba también NFC si usas pagos móviles.</li>
+            <li><strong>IP68 o IP67:</strong> resistencia al agua. Cada vez más habitual incluso en gama media.</li>
+          </ul>
+
+          <h3>Cuándo y dónde comprar</h3>
+          <div className={styles.warningBox}>
+            <strong>Mejores momentos para comprar:</strong> el precio de los smartphones baja considerablemente en las
+            campañas de descuentos de cada país (el Black Friday de noviembre y el Prime Day de julio están
+            extendidos en buena parte del mundo hispanohablante, y en México se suma el Buen Fin) y, sobre todo,
+            cuando se lanza la generación siguiente del modelo que te interesa. Comprar el modelo del año anterior
+            tras el lanzamiento del nuevo puede suponer un ahorro del 20-30&nbsp;%.
+          </div>
+          <p>
+            Los canales más habituales son las tiendas oficiales de cada marca, las grandes superficies de
+            electrónica y los mercados en línea; en España se añaden El Corte Inglés y MediaMarkt, y en Latinoamérica
+            cadenas como Falabella, Liverpool o Mercado Libre. Para segunda mano certificada, plataformas como Back
+            Market o Amazon Renewed dan garantía propia: comprueba cuántos meses cubre en tu país, porque el mínimo
+            legal cambia de uno a otro.
+          </p>
+        </EducationalSection>
+      </div>
 
       <RelatedApps apps={getRelatedApps('selector-smartphone')} />
       <ShareCard appName="selector-smartphone" />
