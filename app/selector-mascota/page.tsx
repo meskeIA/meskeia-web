@@ -1,8 +1,15 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, type MouseEvent } from 'react';
 import styles from './SelectorMascota.module.css';
-import { calcularResultado, MASCOTAS, ETIQUETA_MENSUAL, type Resultado } from './motor';
+import {
+  calcularResultado,
+  MASCOTAS,
+  ETIQUETA_MENSUAL,
+  TIEMPO_ESCASO,
+  AUSENCIA_LARGA,
+  type Resultado,
+} from './motor';
 import {
   MeskeiaLogo,
   Footer,
@@ -19,8 +26,25 @@ import { getRelatedApps } from '@/data/app-relations';
 // Tipos
 // ─────────────────────────────────────────────
 
-interface Opcion { valor: string; etiqueta: string; desc: string; }
-interface Pregunta { id: number; categoria: string; pregunta: string; icon: string; opciones: Opcion[]; }
+interface Opcion {
+  valor: string;
+  etiqueta: string;
+  desc: string;
+  /** En una pregunta de varias respuestas, la que excluye a las demás («Sin restricciones»). */
+  exclusiva?: boolean;
+}
+interface Pregunta {
+  id: number;
+  categoria: string;
+  pregunta: string;
+  icon: string;
+  opciones: Opcion[];
+  /**
+   * Varias respuestas a la vez: casillas (role="checkbox") en vez de radios. La respuesta se
+   * guarda como la lista de valores marcados separada por comas (motor.ts, punto 7).
+   */
+  multiple?: boolean;
+}
 
 // Los datos de cada mascota y la lógica de recomendación viven en ./motor.ts.
 
@@ -74,12 +98,15 @@ const PREGUNTAS: Pregunta[] = [
     ],
   },
   {
+    // Varias a la vez (hallazgo 2666): alergia, comunidad y silencio no se excluyen, y como
+    // elección única un hogar alérgico con normas de comunidad perdía el filtro de la alergia.
     id: 6, categoria: 'Tu situación', pregunta: '¿Hay alguna alergia o restricción en casa?', icon: '🤧',
+    multiple: true,
     opciones: [
       { valor: 'alergia_pelo', etiqueta: 'Alergia al pelo animal', desc: 'Alguien en casa tiene alergia confirmada' },
       { valor: 'comunidad', etiqueta: 'La comunidad restringe ciertas mascotas', desc: 'Normas del edificio o alquiler con límites' },
       { valor: 'sin_ruido', etiqueta: 'Necesidad de silencio (trabajo en casa, bebé…)', desc: 'El ruido es un problema importante' },
-      { valor: 'ninguna', etiqueta: 'Sin restricciones', desc: 'Total libertad para elegir' },
+      { valor: 'ninguna', etiqueta: 'Sin restricciones', desc: 'Total libertad para elegir', exclusiva: true },
     ],
   },
   {
@@ -131,30 +158,131 @@ function enumerar(items: string[]): string {
 
 type Pantalla = 'intro' | 'test' | 'resultado';
 
+/**
+ * Lo que ocupa la barra fija de MeskeiaLogo (~52 px en móvil, ~77 px desde 769 px) más un
+ * respiro: el mismo hueco de 80 px que los lotes 586a4d61 y a1d72a9c dieron al hero. Va también
+ * como `scroll-margin-top` del enunciado y del título del resultado, en el CSS.
+ */
+const HUECO_BARRA_LOGO = 80;
+
 export default function SelectorMascota() {
   const [pantalla, setPantalla] = useState<Pantalla>('intro');
   const [paso, setPaso] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const tituloResultado = useRef<HTMLHeadingElement>(null);
+  const enunciado = useRef<HTMLHeadingElement>(null);
 
-  // «Ver resultado» se desmonta con el test y el foco caía a <body>: se lleva al título del
-  // resultado (regla g de la familia de selectores).
+  // Al cambiar de pantalla o de pregunta se desmonta o se desactiva el botón que tenía el foco
+  // («Empezar», «Siguiente» sin respuesta aún, «Ver resultado»), y el foco caía a <body>: el
+  // siguiente Tab salía del cuestionario (hallazgo 2667, forma del 1680 de selector-smartphone).
+  // Se lleva al enunciado de la pregunta nueva o al título del resultado. Y en móvil la página no
+  // se movía al avanzar: el enunciado nuevo quedaba bajo la barra fija del logo o por encima de
+  // la pantalla (hallazgo 2670). Si no está entero a la vista y por debajo de la barra, se sube a
+  // su sitio; el hueco lo da su `scroll-margin-top` (80 px, el del hero).
   useEffect(() => {
-    if (pantalla === 'resultado') tituloResultado.current?.focus();
-  }, [pantalla]);
+    const destino = pantalla === 'resultado' ? tituloResultado.current
+      : pantalla === 'test' ? enunciado.current
+        : null;
+    if (!destino) return;
+    const caja = destino.getBoundingClientRect();
+    if (caja.top < HUECO_BARRA_LOGO || caja.bottom > window.innerHeight) {
+      destino.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
+    destino.focus({ preventScroll: true });
+  }, [pantalla, paso]);
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
   const progreso = (paso / totalPreguntas) * 100;
+  const respuestaActual = respuestas[preguntaActual.id] ?? '';
+  const marcadas = respuestaActual.split(',').filter(Boolean);
+
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 2671, receta de quiz-literatura-universal,
+   * ce0ad0bc). «Empezar», «Siguiente», «Anterior», «Ver resultado» y «Repetir» cambian la
+   * pantalla en el primer clic, y el segundo caía en el mismo punto sobre lo que hubiera debajo
+   * en la pantalla nueva: a 412 px, el «Siguiente» de la pregunta 8 contestaba la 9, que tiene
+   * una opción más y crece hacia abajo. Un clic se ignora cuando cumple las dos cosas:
+   *   · es el 2.º (o 3.º…) de una ráfaga: `detail` > 1. Lo cuenta el navegador, no un
+   *     temporizador; con teclado o lector de pantalla es 0;
+   *   · y el clic ANTERIOR de la app cambió de pantalla. Sin esto, elegir y pulsar «Siguiente»
+   *     deprisa en un móvil —dos toques cercanos, que Chrome también cuenta como ráfaga— se
+   *     comería el «Siguiente», que sí era una intención nueva.
+   */
+  const ultimoCambioPantallaRef = useRef(false);
+  const clicDeMas = (e: MouseEvent<HTMLButtonElement>): boolean =>
+    e.detail > 1 && ultimoCambioPantallaRef.current;
+  const registrarClic = (cambiaPantalla: boolean) => {
+    ultimoCambioPantallaRef.current = cambiaPantalla;
+  };
 
   function seleccionarOpcion(valor: string) { setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor })); }
-  function avanzar() {
-    if (paso < totalPreguntas - 1) { setPaso(p => p + 1); }
+
+  /** Casilla de una pregunta de varias respuestas: «Sin restricciones» excluye a las demás. */
+  function alternarCasilla(op: Opcion) {
+    const marcada = marcadas.includes(op.valor);
+    const exclusivas = preguntaActual.opciones.filter(o => o.exclusiva).map(o => o.valor);
+    const nuevas = marcada
+      ? marcadas.filter(v => v !== op.valor)
+      : op.exclusiva ? [op.valor] : [...marcadas.filter(v => !exclusivas.includes(v)), op.valor];
+    // En el orden de las opciones, para que la misma elección dé siempre la misma respuesta
+    const valor = preguntaActual.opciones.map(o => o.valor).filter(v => nuevas.includes(v)).join(',');
+    setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
+  }
+
+  function pulsarOpcion(e: MouseEvent<HTMLButtonElement>, op: Opcion) {
+    if (clicDeMas(e)) return;
+    registrarClic(false);
+    if (preguntaActual.multiple) alternarCasilla(op);
+    else seleccionarOpcion(op.valor);
+  }
+
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG): las flechas mueven el foco a la opción vecina y
+   * la marcan, con vuelta al principio, e Inicio/Fin van a los extremos. El grupo es UNA parada de
+   * Tab (tabindex itinerante). Antes cada opción era una parada y las flechas no hacían nada
+   * (hallazgo 2668, forma del 1681 de selector-smartphone). Las casillas no lo llevan: en el
+   * patrón de casillas cada una es su propia parada y se marca con Espacio.
+   */
+  function teclaEnOpcion(e: React.KeyboardEvent<HTMLButtonElement>, indice: number) {
+    if (preguntaActual.multiple) return;
+    const total = preguntaActual.opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    seleccionarOpcion(preguntaActual.opciones[destino].valor);
+    const radios = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    radios?.[destino]?.focus();
+  }
+
+  // Avanza desde la pregunta DEL RENDER (`paso + 1`, no `p => p + 1`) y solo si está respondida:
+  // dos clics antes de repintar no saltan una pregunta (hallazgo 2671).
+  function avanzar(e: MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e) || !respuestaActual) return;
+    registrarClic(true);
+    if (paso < totalPreguntas - 1) { setPaso(paso + 1); }
     else { setResultado(calcularResultado(respuestas)); setPantalla('resultado'); }
   }
-  function retroceder() { if (paso > 0) setPaso(p => p - 1); }
-  function reiniciar() { setPantalla('intro'); setPaso(0); setRespuestas({}); setResultado(null); }
+  function retroceder(e: MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e) || paso === 0) return;
+    registrarClic(true);
+    setPaso(paso - 1);
+  }
+  function empezar(e: MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
+    setPantalla('test');
+  }
+  function reiniciar(e: MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
+    setPantalla('intro'); setPaso(0); setRespuestas({}); setResultado(null);
+  }
 
   const ficha = resultado ? MASCOTAS[resultado.mascota] : null;
   const porPerfil = resultado ? MASCOTAS[resultado.mascotaPorPerfil] : null;
@@ -210,7 +338,7 @@ export default function SelectorMascota() {
               <li><span aria-hidden="true">✅</span> Consejos antes de adoptar o comprar</li>
               <li><span aria-hidden="true">✅</span> Sin juicios, solo tu realidad</li>
             </ul>
-            <button type="button" className={styles.btnStart} onClick={() => setPantalla('test')}>
+            <button type="button" className={styles.btnStart} onClick={empezar}>
               Empezar el test →
             </button>
           </div>
@@ -242,27 +370,48 @@ export default function SelectorMascota() {
           </div>
           <div className={styles.preguntaCard}>
             <span className={styles.preguntaIcon} aria-hidden="true">{preguntaActual.icon}</span>
-            <h2 className={styles.preguntaTexto}>{preguntaActual.pregunta}</h2>
-            <div className={styles.opcionesGrid} role="radiogroup" aria-label={preguntaActual.pregunta}>
-              {preguntaActual.opciones.map(op => (
-                <button key={op.valor} type="button"
-                  className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
-                  onClick={() => seleccionarOpcion(op.valor)}
-                  // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
-                  // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
-                  // radio dentro (hallazgo 1341; selector-smartphone, hallazgo 950).
-                  role="radio"
-                  aria-checked={respuestas[preguntaActual.id] === op.valor}
-                >
-                  <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
-                  <span className={styles.opcionDesc}>{op.desc}</span>
-                </button>
-              ))}
+            <h2 className={styles.preguntaTexto} ref={enunciado} tabIndex={-1}>{preguntaActual.pregunta}</h2>
+            {preguntaActual.multiple && (
+              <p className={styles.preguntaAyuda} id={`ayuda-pregunta-${preguntaActual.id}`}>
+                Marca todas las que se den en tu casa.
+              </p>
+            )}
+            {/* Una pregunta de varias respuestas es un grupo de casillas (role="checkbox"), no
+                de radios: «alergia» y «comunidad» se pueden declarar a la vez (hallazgo 2666). */}
+            <div
+              className={styles.opcionesGrid}
+              role={preguntaActual.multiple ? 'group' : 'radiogroup'}
+              aria-label={preguntaActual.pregunta}
+              aria-describedby={preguntaActual.multiple ? `ayuda-pregunta-${preguntaActual.id}` : undefined}
+            >
+              {preguntaActual.opciones.map((op, indice) => {
+                const marcada = marcadas.includes(op.valor);
+                return (
+                  <button key={op.valor} type="button"
+                    className={`${styles.opcionBtn} ${marcada ? styles.opcionSeleccionada : ''}`}
+                    onClick={e => pulsarOpcion(e, op)}
+                    // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
+                    // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
+                    // radio dentro (hallazgo 1341; selector-smartphone, hallazgo 950).
+                    role={preguntaActual.multiple ? 'checkbox' : 'radio'}
+                    aria-checked={marcada}
+                    // Radios: tabindex itinerante, la marcada o la primera si no hay (2668).
+                    // Casillas: cada una es su propia parada de Tab.
+                    tabIndex={preguntaActual.multiple ? 0
+                      : marcadas.length > 0 ? (marcada ? 0 : -1)
+                        : indice === 0 ? 0 : -1}
+                    onKeyDown={e => teclaEnOpcion(e, indice)}
+                  >
+                    <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
+                    <span className={styles.opcionDesc}>{op.desc}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
           <div className={styles.navegacion}>
             <button type="button" className={styles.btnAnterior} onClick={retroceder} disabled={paso === 0} aria-label="Pregunta anterior">← Anterior</button>
-            <button type="button" className={styles.btnSiguiente} onClick={avanzar} disabled={!respuestas[preguntaActual.id]} aria-label={paso === totalPreguntas - 1 ? 'Ver resultado' : 'Siguiente pregunta'}>
+            <button type="button" className={styles.btnSiguiente} onClick={avanzar} disabled={!respuestaActual} aria-label={paso === totalPreguntas - 1 ? 'Ver resultado' : 'Siguiente pregunta'}>
               {paso === totalPreguntas - 1 ? 'Ver resultado →' : 'Siguiente →'}
             </button>
           </div>
@@ -291,6 +440,13 @@ export default function SelectorMascota() {
               {/* Los CDC incluyen a los roedores en la misma recomendación (hallazgo 1441) */}
               {motivoRecorte === 'salud' && resultado.mascotaPorPerfil === 'roedor' &&
                 'con niños menores de 5 años los CDC de Estados Unidos recomiendan evitar el contacto con roedores, y a esa edad el riesgo de infección con cualquier pequeño mamífero es mayor.'}
+              {/* Poco tiempo y la casa vacía muchas horas descartan al perro (hallazgo 2665) */}
+              {motivoRecorte === 'atencion' && (
+                <>has dicho que tienes {TIEMPO_ESCASO[respuestas[1]]} y que la casa se queda vacía{' '}
+                  {AUSENCIA_LARGA[respuestas[2]]}: un perro necesita salir varias veces al día, y las guías
+                  de bienestar animal (RSPCA, PDSA) aconsejan no dejarlo solo más de cuatro horas seguidas.
+                  La recomendación se limita a animales que llevan bien esas ausencias.</>
+              )}
               {motivoRecorte === 'presupuesto' && (
                 <>su coste mensual ({porPerfil.costeMensual}) no cabe en tu presupuesto de{' '}
                   {ETIQUETA_MENSUAL[respuestas[10]]}: la recomendación se ajusta a lo que cabe en ese tramo.</>
@@ -356,7 +512,10 @@ export default function SelectorMascota() {
 
           <div className={styles.consejosSection}>
             <p className={styles.consejosTitulo}>Antes de decidirte</p>
-            {resultado.consejos.map((c, i) => <p key={i} className={styles.consejoItem}>{c}</p>)}
+            {/* El emoji, aparte y oculto al lector: dentro de la cadena lo leía (hallazgo 2672) */}
+            {resultado.consejos.map((c, i) => (
+              <p key={i} className={styles.consejoItem}><span aria-hidden="true">{c.icono}</span> {c.texto}</p>
+            ))}
           </div>
 
           <button type="button" className={styles.btnRepetir} onClick={reiniciar} aria-label="Repetir el test">← Repetir el test</button>
@@ -365,7 +524,7 @@ export default function SelectorMascota() {
             <h3>El coste real de tener una mascota</h3>
             <p>Muchas personas subestiman el coste de mantener una mascota. Además del coste mensual visible (comida, arena, accesorios), hay gastos ocultos importantes: veterinario de urgencias, vacunas anuales, peluquería, guardería en vacaciones y posibles operaciones.</p>
             <div className={styles.warningBox}>
-              <strong>Coste veterinario de urgencia:</strong> una operación de urgencia puede costar tanto como varios meses de manutención, y no es un caso raro: en la encuesta de la OCU de 2022, el 45 % de los dueños de perro y el 24 % de los de gato tuvieron que llevarlo a urgencias en el último año. Un seguro de salud para mascotas (su precio depende de la especie, la edad y la cobertura) u otra forma de prever ese gasto puede evitar una situación económica difícil.
+              <strong>Coste veterinario de urgencia:</strong> una operación de urgencia puede costar tanto como varios meses de manutención, y no es un caso raro: en la encuesta de la OCU de 2022, el 45&nbsp;% de los dueños de perro y el 24&nbsp;% de los de gato tuvieron que llevarlo a urgencias en el último año. Un seguro de salud para mascotas (su precio depende de la especie, la edad y la cobertura) u otra forma de prever ese gasto puede evitar una situación económica difícil.
             </div>
 
             <h3>Adopción vs compra</h3>

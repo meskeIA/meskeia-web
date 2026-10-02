@@ -18,6 +18,9 @@
 .heroSubtitleSm { font-size: 1rem; opacity: 0.88; margin: 0; }
 /* Recibe el foco al mostrarse el resultado (tabIndex -1): anillo solo con teclado */
 .heroTitleSm:focus { outline: none; }
+/* scroll-margin-top: al recibir el foco se sube a la vista sin quedar bajo la barra fija del logo
+   (hallazgos 2669 y 2670; el mismo hueco de 80 px del hero, HUECO_BARRA_LOGO en page.tsx). */
+.heroTitleSm, .preguntaTexto { scroll-margin-top: 80px; }
 .heroTitleSm:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 
 /* ─── Intro ────────────────────────────────────────────────────── */
@@ -58,6 +61,11 @@
 .preguntaCard { background: var(--bg-card); border-radius: 16px; padding: 2rem 1.75rem 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
 .preguntaIcon { font-size: 2.5rem; margin-bottom: 1rem; display: block; text-align: center; }
 .preguntaTexto { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 1.5rem; text-align: center; line-height: 1.4; }
+/* Recibe el foco al cambiar de pregunta (tabIndex -1): anillo solo con teclado (hallazgo 2667) */
+.preguntaTexto:focus { outline: none; }
+.preguntaTexto:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; border-radius: 4px; }
+/* Indicación de la pregunta de varias respuestas, pegada al enunciado */
+.preguntaAyuda { font-size: 0.88rem; color: var(--text-secondary); text-align: center; margin: -1rem 0 1.25rem; }
 .opcionesGrid { display: flex; flex-direction: column; gap: 0.65rem; }
 
 .opcionBtn {
@@ -173,7 +181,10 @@
    título en móvil y tableta. Desde 1024px el título centrado ya no llega al logo. Mismo hueco
    que deja la plantilla. Va al final para ganar a cualquier padding previo del hero. */
 @media (max-width: 1023px) {
-  .hero {
+  .hero,
+  .heroResultados {
+    /* .heroResultados se quedó fuera de los lotes y el logo tapaba «Tu m» a 360 y 390 px
+       (hallazgo 2669) */
     padding-top: 80px;
   }
 }

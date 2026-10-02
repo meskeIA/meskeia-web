@@ -50,6 +50,27 @@
  *     silencio frente a un perro (1439), el ciclo de vida corto frente a un animal longevo
  *     (1440) y las 3 – 5 horas a solas de un perro, que dejan de ser una razón «a favor»
  *     (1443: RSPCA y PDSA aconsejan no dejarlo solo más de cuatro horas).
+ *
+ *  6. Sin tiempo y con la casa vacía, no hay perro (hallazgo 2665, forma del 1678). Con «Poco» o
+ *     «Mínimo» de tiempo Y la casa vacía 6 – 10 horas o varios días seguidos, el perro ganaba a
+ *     puntos en 3.430 perfiles y la misma pantalla explicaba por qué no se podía atender: que
+ *     necesita salir varias veces al día y que RSPCA y PDSA aconsejan no dejarlo solo más de
+ *     cuatro horas. Ahora esa combinación descarta a los tres perros, como la alergia o el
+ *     presupuesto, y se dice. Cada condición por separado sigue siendo un aviso: con poco tiempo
+ *     pero alguien en casa, o con jornada fuera pero más de una hora al día, puede organizarse.
+ *
+ *  7. La pregunta 6 admite varias respuestas (hallazgo 2666). Era una elección única entre
+ *     alergia, comunidad y silencio, que no se excluyen: un hogar con alergia y normas de
+ *     comunidad solo podía declarar una, y al elegir la comunidad perdía el filtro de la
+ *     alergia. Ahora `r[6]` es la lista de las marcadas separada por comas («alergia_pelo,
+ *     comunidad»), o «ninguna»; un valor suelto, como antes, sigue valiendo. Cada restricción
+ *     suma sus pesos y aplica sus filtros y avisos por separado.
+ *
+ *  8. La comunidad o el contrato (hallazgo 2664). Solo restaba 2 puntos al perro grande, y en
+ *     17.430 perfiles salía un perro sin una palabra de la restricción. No se filtra —la
+ *     respuesta dice «ciertas mascotas», sin decir cuáles—, pero si la recomendada no es de las
+ *     que esa respuesta favorece (perros, pájaro o reptil), el resultado pide comprobar que la
+ *     comunidad y el contrato la admiten, con la regla de la LAU que ya explica la guía.
  */
 
 export type MascotaKey =
@@ -260,6 +281,30 @@ export const TECHO_INICIAL_BAJO = 300;
 /** Animales que los CDC desaconsejan con niños menores de 5 años (ver la cabecera, punto 2). */
 const NO_CON_MENORES_DE_5: MascotaKey[] = ['reptil', 'roedor'];
 
+/** Lo que declara la pregunta 6: varias restricciones a la vez, o ninguna (ver la cabecera, punto 7). */
+export function restriccionesDeclaradas(r: Record<number, string>): string[] {
+  return (r[6] ?? '').split(',').filter((v) => v !== '' && v !== 'ninguna');
+}
+
+const declara = (r: Record<number, string>, restriccion: string): boolean =>
+  restriccionesDeclaradas(r).includes(restriccion);
+
+/** Pregunta 1, en las frases: solo las dos respuestas de poco tiempo. */
+export const TIEMPO_ESCASO: Record<string, string> = {
+  poco: 'menos de una hora al día',
+  minimo: 'tiempo solo los fines de semana',
+};
+
+/** Pregunta 2, en las frases: solo las dos respuestas de ausencia larga. */
+export const AUSENCIA_LARGA: Record<string, string> = {
+  muchas: '6 – 10 horas',
+  viajes: 'varios días seguidos',
+};
+
+/** Poco tiempo Y la casa vacía muchas horas: un perro no puede atenderse (punto 6). */
+export const sinTiempoNiCompania = (r: Record<number, string>): boolean =>
+  r[1] in TIEMPO_ESCASO && r[2] in AUSENCIA_LARGA;
+
 /** Lista legible: «A, B y C». */
 function enumerarConY(items: string[]): string {
   if (items.length <= 1) return items.join('');
@@ -429,7 +474,7 @@ function tensiones(m: MascotaKey, r: Record<number, string>): string[] {
     if (r[3] === 'piso_pequeno' && m !== 'perro-pequeno') {
       t.push(`En menos de 50 m², ${nombre} necesitará salidas largas para compensar la falta de espacio.`);
     }
-    if (r[6] === 'sin_ruido') {
+    if (declara(r, 'sin_ruido')) {
       // Antes solo se avisaba del ruido del pájaro, que no gana en ningún perfil con silencio;
       // al perro mediano y al grande ni siquiera les restaba puntos (hallazgo 1439).
       t.push(`Has indicado que necesitas silencio: ${nombre} puede ladrar, sobre todo cuando se queda solo o se aburre; el ejercicio diario y el adiestramiento lo reducen, pero no lo eliminan.`);
@@ -438,7 +483,7 @@ function tensiones(m: MascotaKey, r: Record<number, string>): string[] {
   if (m === 'gato' && r[2] === 'viajes') {
     t.push('Un gato tolera un día solo, no varios: con viajes frecuentes necesitarás a alguien que pase a atenderlo.');
   }
-  if (m === 'pajaro' && r[6] === 'sin_ruido') {
+  if (m === 'pajaro' && declara(r, 'sin_ruido')) {
     t.push('Necesitas silencio: elige especies calladas (el canario canta, los periquitos y los loros gritan).');
   }
   if (m === 'roedor' && r[8] === 'corto') {
@@ -448,7 +493,22 @@ function tensiones(m: MascotaKey, r: Record<number, string>): string[] {
     // Solo el pequeño mamífero tenía tensión con «ciclo corto» (hallazgo 1440).
     t.push(`Prefieres un compromiso más corto, pero la esperanza de vida de ${nombre} es de ${MASCOTAS[m].esperanzaVida}: es un compromiso de muchos años.`);
   }
+  // La comunidad o el contrato (hallazgo 2664): no se sabe QUÉ restringen, así que no se filtra,
+  // pero a las que esa respuesta no favorece se les pide comprobarlo. La regla de la LAU es la
+  // de la guía («Mascotas y alquiler»).
+  if (declara(r, 'comunidad') && (PESOS[6].comunidad[m] ?? 0) <= 0) {
+    t.push(`Has indicado que la comunidad o el contrato de alquiler restringen ciertas mascotas: antes de decidirte, comprueba en los estatutos y en el contrato que admiten a ${nombre}. En España, una cláusula del contrato que prohíba tener animales es válida, y no respetarla puede ser motivo para resolverlo.`);
+  }
   return t;
+}
+
+/** `atencion`: poco tiempo y la casa vacía muchas horas, con un perro (ver la cabecera, punto 6). */
+export type MotivoDescarte = 'alergia' | 'salud' | 'atencion' | 'presupuesto';
+
+/** El emoji va aparte para pintarlo con aria-hidden: dentro del texto lo leía el lector (hallazgo 2672). */
+export interface Consejo {
+  icono: string;
+  texto: string;
 }
 
 export interface Resultado {
@@ -456,7 +516,7 @@ export interface Resultado {
   /** La que ganaría por estilo de vida, sin aplicar alergia, salud ni presupuesto. */
   mascotaPorPerfil: MascotaKey;
   /** Por qué se ha descartado cada animal que no podía ser recomendado. */
-  descartes: Partial<Record<MascotaKey, 'alergia' | 'salud' | 'presupuesto'>>;
+  descartes: Partial<Record<MascotaKey, MotivoDescarte>>;
   /** Puntos finales de cada animal (los descartados también, para poder explicarlos). */
   puntos: Record<MascotaKey, number>;
   /** Otras opciones admitidas con la MISMA puntuación que la recomendada. */
@@ -470,33 +530,39 @@ export interface Resultado {
   costeInicial: { valor: string; nota: string };
   razones: string[];
   aTenerEnCuenta: string[];
-  consejos: string[];
+  consejos: Consejo[];
 }
 
 export function calcularResultado(r: Record<number, string>): Resultado {
-  // ─ Puntos, y cuánto aporta cada pregunta a cada animal ─
+  // ─ Puntos, y cuánto aporta cada respuesta a cada animal ─
+  // Una entrada por respuesta: la pregunta 6 puede aportar varias (punto 7 de la cabecera).
   const puntos = Object.fromEntries(CLAVES.map((k) => [k, 0])) as Record<MascotaKey, number>;
-  const aporte: Record<number, Pesos> = {};
+  const aportes: { id: number; respuesta: string; pesos: Pesos }[] = [];
   for (const [idTexto, porRespuesta] of Object.entries(PESOS)) {
     const id = Number(idTexto);
-    const pesos = porRespuesta[r[id]];
-    if (!pesos) continue;
-    aporte[id] = pesos;
-    for (const k of CLAVES) puntos[k] += pesos[k] ?? 0;
+    const respuestas = id === 6 ? restriccionesDeclaradas(r) : [r[id]];
+    for (const respuesta of respuestas) {
+      const pesos = porRespuesta[respuesta];
+      if (!pesos) continue;
+      aportes.push({ id, respuesta, pesos });
+      for (const k of CLAVES) puntos[k] += pesos[k] ?? 0;
+    }
   }
 
   // ─ Filtros: lo declarado como límite no se negocia a puntos ─
   const descartes: Resultado['descartes'] = {};
   const techo = TECHO_MENSUAL[r[10]] ?? Infinity;
   for (const k of CLAVES) {
-    if (r[6] === 'alergia_pelo' && MASCOTAS[k].tienePelo) descartes[k] = 'alergia';
+    if (declara(r, 'alergia_pelo') && MASCOTAS[k].tienePelo) descartes[k] = 'alergia';
     else if (r[5] === 'si_pequenos' && NO_CON_MENORES_DE_5.includes(k)) descartes[k] = 'salud';
+    // Poco tiempo y nadie en casa: el perro no puede atenderse (hallazgo 2665).
+    else if (sinTiempoNiCompania(r) && esPerro(k)) descartes[k] = 'atencion';
     // Cabe si su mínimo queda POR DEBAJO del techo (hallazgo 1438; ver la cabecera, punto 3).
     else if (MASCOTAS[k].costeMensualMin >= techo) descartes[k] = 'presupuesto';
   }
 
   // ─ Orden explicable: puntos; luego vínculo buscado; luego coste mensual; luego inicial ─
-  const vinculo = aporte[7] ?? {};
+  const vinculo = aportes.find((a) => a.id === 7)?.pesos ?? {};
   const ordenar = (a: MascotaKey, b: MascotaKey) =>
     puntos[b] - puntos[a] ||
     (vinculo[b] ?? 0) - (vinculo[a] ?? 0) ||
@@ -538,21 +604,22 @@ export function calcularResultado(r: Record<number, string>): Resultado {
 
   // ─ Razones: las respuestas que más han sumado a la ganadora ─
   const razones: string[] = [];
-  const aFavor = Object.entries(aporte)
-    .map(([id, pesos]) => ({ id: Number(id), valor: pesos[mascota] ?? 0 }))
+  const aFavor = aportes
+    .map(({ id, respuesta, pesos }) => ({ id, respuesta, valor: pesos[mascota] ?? 0 }))
     // Solo las que tienen frase: la alergia se explica aparte, con el filtro. Las 3 – 5 horas a
     // solas no son una razón a favor de un perro (hallazgo 1443): van a `tensiones`.
-    .filter((x) => x.valor > 0 && RAZON_A_FAVOR[x.id]?.[r[x.id]] !== undefined)
-    .filter((x) => !(x.id === 2 && r[2] === 'pocas' && esPerro(mascota)))
+    .filter((x) => x.valor > 0 && RAZON_A_FAVOR[x.id]?.[x.respuesta] !== undefined)
+    .filter((x) => !(x.id === 2 && x.respuesta === 'pocas' && esPerro(mascota)))
+    // `sort` es estable: dos restricciones de la 6 con el mismo valor quedan en el orden marcado
     .sort((a, b) => b.valor - a.valor || a.id - b.id)
     .slice(0, 3);
-  for (const { id } of aFavor) {
-    const texto = RAZON_A_FAVOR[id]?.[r[id]];
+  for (const { id, respuesta } of aFavor) {
+    const texto = RAZON_A_FAVOR[id]?.[respuesta];
     if (texto) razones.push(texto(info.conArticulo, (sing, plur) => (info.plural ? plur : sing)));
   }
 
   // Lo que ha filtrado, dicho a la cara.
-  if (r[6] === 'alergia_pelo') {
+  if (declara(r, 'alergia_pelo')) {
     razones.push('Has declarado alergia al pelo: se han descartado perros, gatos y pequeños mamíferos (roedores y conejo), porque todos tienen pelo.');
   }
   // Solo si el descartado competía de verdad: si iba por detrás, el filtro no ha cambiado nada.
@@ -561,6 +628,10 @@ export function calcularResultado(r: Record<number, string>): Resultado {
   }
   if (descartes.roedor === 'salud' && puntos.roedor >= puntos[mascota]) {
     razones.push('Con niños menores de 5 años se ha descartado el pequeño mamífero: los CDC de Estados Unidos recomiendan que a esa edad eviten el contacto con roedores (hámster, rata, cobaya…) y cuentan a los menores de 5 años entre quienes más riesgo de infección tienen con cualquier pequeño mamífero, conejo incluido.');
+  }
+  // Como los de salud: solo si algún perro competía de verdad con la recomendada (hallazgo 2665).
+  if (PERROS.some((k) => descartes[k] === 'atencion' && puntos[k] >= puntos[mascota])) {
+    razones.push(`Has dicho que tienes ${TIEMPO_ESCASO[r[1]]} y que la casa se queda vacía ${AUSENCIA_LARGA[r[2]]}: se han descartado los perros, porque necesitan salir varias veces al día y las guías de bienestar animal (RSPCA, PDSA) aconsejan no dejarlos solos más de cuatro horas seguidas.`);
   }
   if (mascotaPorPerfil !== mascota && descartes[mascotaPorPerfil] === 'presupuesto') {
     const otra = MASCOTAS[mascotaPorPerfil];
@@ -577,7 +648,7 @@ export function calcularResultado(r: Record<number, string>): Resultado {
       `La parte alta de la horquilla de ${info.conArticulo} (${info.costeMensual}) supera tu tramo de ${ETIQUETA_MENSUAL[r[10]]}: los meses con veterinario pueden salirse de él.`,
     );
   }
-  if (mascota === 'pajaro' && r[6] === 'alergia_pelo') {
+  if (mascota === 'pajaro' && declara(r, 'alergia_pelo')) {
     aTenerEnCuenta.push('Las plumas y el polvo que desprenden también son alérgenos: consulta con tu alergólogo antes de traer un pájaro a casa.');
   }
   if (r[9] === 'minimo' && !info.adoptable) {
@@ -592,16 +663,17 @@ export function calcularResultado(r: Record<number, string>): Resultado {
   }
 
   // ─ Consejos ─
-  const consejos: string[] = [];
-  consejos.push('🏥 Antes de decidir, visita una protectora o refugio: adoptar suele ser más económico y das hogar a un animal que lo necesita.');
+  const consejos: Consejo[] = [];
+  consejos.push({ icono: '🏥', texto: 'Antes de decidir, visita una protectora o refugio: adoptar suele ser más económico y das hogar a un animal que lo necesita.' });
   if (esPerro(mascota)) {
-    consejos.push('💉 Prevé cómo afrontarías un gasto veterinario imprevisto, con un seguro de salud para mascotas o de otra forma: en la encuesta de la OCU (España, 2022), el 45 % de los dueños de perro tuvo que llevarlo a urgencias en el último año. El precio del seguro depende de la especie, la edad, la raza y lo que cubra: compara varias ofertas.');
-    consejos.push('📋 Chip, vacunas y, si el perro está catalogado como potencialmente peligroso, licencia y seguro son gastos de los primeros meses. En España la esterilización del perro no es obligatoria por ley estatal, pero sí evitar que críe sin control.');
+    // «45\u00A0%»: el porcentaje va con espacio duro (CLAUDE.md global §2; hallazgo 2673).
+    consejos.push({ icono: '💉', texto: 'Prevé cómo afrontarías un gasto veterinario imprevisto, con un seguro de salud para mascotas o de otra forma: en la encuesta de la OCU (España, 2022), el 45\u00A0% de los dueños de perro tuvo que llevarlo a urgencias en el último año. El precio del seguro depende de la especie, la edad, la raza y lo que cubra: compara varias ofertas.' });
+    consejos.push({ icono: '📋', texto: 'Chip, vacunas y, si el perro está catalogado como potencialmente peligroso, licencia y seguro son gastos de los primeros meses. En España la esterilización del perro no es obligatoria por ley estatal, pero sí evitar que críe sin control.' });
   }
   if (mascota === 'gato') {
-    consejos.push('✂️ La esterilización reduce problemas de salud y comportamiento. Su precio depende del sexo (en la hembra es una cirugía abdominal, más compleja que la castración del macho) y de la clínica: pide presupuesto. En España es obligatoria antes de los 6 meses (Ley 7/2023, art. 26.i), salvo gatos inscritos como reproductores.');
+    consejos.push({ icono: '✂️', texto: 'La esterilización reduce problemas de salud y comportamiento. Su precio depende del sexo (en la hembra es una cirugía abdominal, más compleja que la castración del macho) y de la clínica: pide presupuesto. En España es obligatoria antes de los 6 meses (Ley 7/2023, art. 26.i), salvo gatos inscritos como reproductores.' });
   }
-  consejos.push('⏳ Una mascota es un compromiso de años. Asegúrate de tener plan B para vacaciones, enfermedad o cambios de vida.');
+  consejos.push({ icono: '⏳', texto: 'Una mascota es un compromiso de años. Asegúrate de tener plan B para vacaciones, enfermedad o cambios de vida.' });
 
   const costeInicial =
     r[9] === 'minimo' && info.adoptable
