@@ -1086,10 +1086,16 @@ test.describe('Re-inspección 02/10/2026 — móvil 360 px', () => {
   // la guía educativa y las apps relacionadas. Forma del 1679 de la referencia, en el reinicio.
   test('2694: tras «Repetir el test» se ve la pregunta 1 y el foco no cae a <body>', async ({ page }) => {
     await abrirTest(page);
+    // Medio segundo entre un toque que cambia de pantalla y el siguiente: es lo que tarda una
+    // persona en leer, y sin la pausa el guard de doble toque (2698) trata el toque siguiente como
+    // el 2.º de una ráfaga y lo ignora, que es lo correcto. Bajo next dev pasaba sin ella porque
+    // la página tardaba más; contra next start falló 5 de 5 en «Repetir» (suite del 02/10/2026).
     for (let i = 0; i < 10; i++) {
+      await page.waitForTimeout(500);
       await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
       await page.getByRole('button', { name: i === 9 ? 'Ver mi resultado' : 'Siguiente pregunta' }).tap();
     }
+    await page.waitForTimeout(500);
     await page.getByRole('button', { name: 'Repetir el test' }).tap();
     await expect(page.locator('[class*="preguntaTexto"]')).toHaveText('¿Cuál es tu distancia habitual al trabajo o estudios?');
     const p = await tapadoPorLogo(page, '[class*="preguntaTexto"]');
