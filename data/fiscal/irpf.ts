@@ -23,7 +23,7 @@
  */
 
 export const FISCAL_IRPF_META = {
-  fuente: 'Ley 35/2006 del IRPF (texto consolidado: arts. 19, 20, 56 a 66, 84.2 y 96, y DA 61.ª)',
+  fuente: 'Ley 35/2006 del IRPF (texto consolidado: arts. 19, 20, 32.2.3.º, 56 a 66, 84.2 y 96, y DA 61.ª)',
   // 2026-09-09: reducción del art. 20 corregida contra el Manual práctico de Renta 2025
   // de la AEAT. La revisión del 2026-08-12 la dio por buena y llevaba la redacción
   // anterior al RDL 4/2024, con una reducción residual de 2.364 € que no existe.
@@ -44,6 +44,9 @@ export const FISCAL_IRPF_META = {
   //   · DA 61.ª en su redacción de 2025 (Ley 5/2025, disp. final 3.ª, BOE-A-2025-15424): 340 €
   //     hasta 16.576 €, 340 − 0,2 × exceso hasta 18.276 €; y la de 2026 (RDL 5/2026, art. 28):
   //     590,89 € hasta 17.094 €, hasta 20.048,45 €.
+  // 2026-10-02: añadido el art. 32.2.3.º y 4.º (REDUCCION_ACTIVIDADES_RENTAS_BAJAS), cotejado ese
+  //     día en el texto consolidado: 1.620 € hasta 8.000 €; −0,405 × exceso hasta 12.000 €;
+  //     tope conjunto con el art. 20 de 3.700 € (hallazgo 2608). El sello del resto no cambia.
   verificado: '2026-09-27',
   vigencia: '2026',
   urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI01.shtml',
@@ -597,6 +600,60 @@ export function tipoMarginalDesdeRendimientosBrutos(brutos: number): number {
     if (baseImponible <= tramo.hasta) return tramo.tipo;
   }
   return 47;
+}
+
+// ─── Reducción de actividades económicas con rentas bajas (art. 32.2.3.º LIRPF) ──
+
+/**
+ * Reducción del rendimiento neto de actividades económicas de los contribuyentes con rentas
+ * bajas que NO cumplen los requisitos del art. 32.2.2.º (cliente único, gastos ≤ 30 %…), que
+ * es el caso general del autónomo. Vale en estimación directa y en objetiva: el 2.º exige la
+ * directa, y quien no lo cumple pasa al 3.º.
+ *
+ * Fuente: art. 32.2.3.º y 4.º Ley 35/2006 (BOE-A-2006-20764, texto consolidado consultado el
+ * 02/10/2026): «los contribuyentes con rentas no exentas inferiores a 12.000 euros, incluidas
+ * las de la propia actividad económica, podrán reducir el rendimiento neto de las actividades
+ * económicas»: 1.620 € con rentas ≤ 8.000 €; 1.620 − 0,405 × (rentas − 8.000) entre 8.000,01
+ * y 12.000 €. Junto con la del art. 20 no puede pasar de 3.700 €, y el saldo no puede ser
+ * negativo (4.º).
+ *
+ * ⚠️ Nace el 02/10/2026 por el hallazgo 2608: simulador-modulos-vs-directa (y la tool del MCP
+ * que comparte su motor) no la aplicaba y sobrestimaba el IRPF de las dos columnas a todo
+ * autónomo con menos de 12.000 € de rendimiento.
+ */
+export const REDUCCION_ACTIVIDADES_RENTAS_BAJAS = {
+  limiteReduccionMaxima: 8000,
+  reduccionMaxima: 1620,
+  limiteRentas: 12000,
+  pendiente: 0.405,
+  /** Tope conjunto con la reducción del art. 20 (rendimientos del trabajo). */
+  topeConjuntoArt20: 3700,
+  norma: 'art. 32.2.3.º LIRPF',
+};
+
+/**
+ * Importe de la reducción del art. 32.2.3.º LIRPF.
+ *
+ * @param p.rentasNoExentas Suma de las rentas no exentas del contribuyente, INCLUIDO el
+ *   rendimiento neto de la actividad, en €.
+ * @param p.rendimientoActividad Rendimiento neto de las actividades económicas al que se
+ *   aplica, en €: la reducción no puede dejarlo negativo (art. 32.2.4.º).
+ * @param p.reduccionArt20 Reducción por rendimientos del trabajo ya aplicada (por defecto 0),
+ *   para respetar el tope conjunto de 3.700 €.
+ * @returns La reducción en €, 0 con rentas de 12.000 € o más.
+ */
+export function reduccionActividadesRentasBajas(p: {
+  rentasNoExentas: number;
+  rendimientoActividad: number;
+  reduccionArt20?: number;
+}): number {
+  const r = REDUCCION_ACTIVIDADES_RENTAS_BAJAS;
+  if (!(p.rendimientoActividad > 0) || p.rentasNoExentas >= r.limiteRentas) return 0;
+  const escala = p.rentasNoExentas <= r.limiteReduccionMaxima
+    ? r.reduccionMaxima
+    : r.reduccionMaxima - r.pendiente * (p.rentasNoExentas - r.limiteReduccionMaxima);
+  const disponible = Math.max(0, r.topeConjuntoArt20 - (p.reduccionArt20 ?? 0));
+  return Math.max(0, Math.min(escala, disponible, p.rendimientoActividad));
 }
 
 // ─── Obligación de declarar IRPF 2025 (ejercicio fiscal 2025, campaña 2026) ──

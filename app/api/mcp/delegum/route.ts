@@ -3045,13 +3045,17 @@ function crearServidorDelegum(): McpServer {
           `📊 **Estimación Directa Simplificada vs módulos** (coste anual = IRPF + cuota RETA)`,
           '',
           `🅰️ **Estimación Directa Simplificada: ${fmt(ed.costeAnualTotal)} €/año**`,
-          `  • Rendimiento neto (tras deducir la cuota RETA y el 5\u00A0% de difícil justificación): ${fmt(ed.rendimientoNetoReducido)} € · IRPF: ${fmt(ed.irpf)} € · RETA: ${fmt(ed.cuotaReta)} €`,
+          `  • Rendimiento neto (tras deducir la cuota RETA y el 5\u00A0% de difícil justificación): ${fmt(ed.rendimientoNeto)} €` +
+            (ed.reduccionRentasBajas > 0 ? ` · reducido por rentas bajas (art. 32.2.3.º LIRPF, actividad como única renta): ${fmt(ed.rendimientoNetoReducido)} €` : '') +
+            ` · IRPF: ${fmt(ed.irpf)} € · RETA: ${fmt(ed.cuotaReta)} €`,
         ];
         if (r.modulos) {
           const m = r.modulos;
           lineas.push(
             `🅱️ **Estimación Objetiva (módulos): ${fmt(m.costeAnualTotal)} €/año**`,
-            `  • Rendimiento neto de módulos aportado: ${fmt(m.rendimientoNetoModulos)} € · tras la reducción general del 5\u00A0% sin tope: ${fmt(m.rendimientoNetoReducido)} € · IRPF: ${fmt(m.irpf)} € · RETA: ${fmt(m.cuotaReta)} € (en módulos no se deduce)`,
+            `  • Rendimiento neto de módulos aportado: ${fmt(m.rendimientoNetoModulos)} € · tras la reducción general del 5\u00A0% sin tope: ${fmt(m.rendimientoNeto)} €` +
+              (m.reduccionRentasBajas > 0 ? ` · reducido por rentas bajas (art. 32.2.3.º LIRPF): ${fmt(m.rendimientoNetoReducido)} €` : '') +
+              ` · IRPF: ${fmt(m.irpf)} € · RETA: ${fmt(m.cuotaReta)} € (en módulos no se deduce)`,
             ''
           );
           const dif = r.diferencia ?? 0;
@@ -3059,7 +3063,7 @@ function crearServidorDelegum(): McpServer {
             dif === 0
               ? 'Con estos datos, el coste anual es el mismo en los dos regímenes.'
               : `Con estos datos, el coste anual en Estimación Directa es ${fmt(Math.abs(dif))} € ${dif > 0 ? 'mayor' : 'menor'} que en módulos.`,
-            `Es la cifra de un año: no recoge que la renuncia a módulos obliga a seguir al menos tres años en Estimación Directa, que el rendimiento de módulos no baja por sí solo en un año de menos margen, ni el IVA (en módulos suele aplicarse el régimen simplificado o, en el comercio minorista, el recargo de equivalencia).`
+            `Es la cifra de un año: no recoge que la renuncia a módulos (y también la exclusión por superar los límites) obliga a seguir tres años en Estimación Directa, que el rendimiento de módulos no baja por sí solo en un año de menos margen, ni el IVA (en módulos suele aplicarse el régimen simplificado; el comercio minorista persona física está en recargo de equivalencia en los dos regímenes de IRPF).`
           );
         } else if (r.motivoSinModulos === 'supera_limites') {
           lineas.push(

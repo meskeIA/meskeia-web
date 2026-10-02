@@ -31,8 +31,20 @@
  *  · 29/09/2026 (hallazgo 2444) — en directa, la cuota RETA del titular es gasto deducible.
  *  · 29/09/2026 (hallazgo 2445) — la reducción de módulos es el 5 % SIN tope de la DA 1.ª de
  *    la Orden anual, sobre el rendimiento neto de módulos; no la de la directa simplificada.
+ *  · 02/10/2026 (hallazgo 2608) — las dos columnas aplican la reducción del art. 32.2.3.º LIRPF
+ *    (rentas no exentas < 12.000 €, incluidas las de la actividad). Como el motor modela la
+ *    actividad como ÚNICA renta, esas rentas son el rendimiento neto de la actividad. Sin ella,
+ *    a todo autónomo por debajo de 12.000 € se le sobrestimaba el IRPF en los dos regímenes.
+ *    La del art. 32.2.1.º (cliente único, TRADE) no se modela: exige datos que no se piden.
+ *    Y «rendimiento neto reducido» vuelve a significar lo que significa en el IRPF: lo que
+ *    queda DESPUÉS de las reducciones del art. 32, no tras el 5 % de difícil justificación.
  */
-import { MINIMOS_IRPF_2025, calcularCuotaIntegraGeneral, cuotaEscalaGeneral } from '@/data/fiscal/irpf';
+import {
+  MINIMOS_IRPF_2025,
+  calcularCuotaIntegraGeneral,
+  cuotaEscalaGeneral,
+  reduccionActividadesRentasBajas,
+} from '@/data/fiscal/irpf';
 import { LIMITES_EXCLUSION_MODULOS_2025, reduccionGeneralModulos } from '@/data/fiscal/modulos-irpf';
 import { reduccionGastosDificilJustificacion } from '@/data/fiscal/estimacion-directa';
 
@@ -65,7 +77,13 @@ export interface ResultadoRegimenED {
   cuotaRetaDeducida: number;
   /** Ingresos − gastos − cuota RETA (mínimo 0). */
   rendimientoNetoPrevio: number;
+  /** Provisiones y gastos de difícil justificación (5 %, tope 2.000 €; art. 30.2.ª RIRPF). */
   reduccion5pc: number;
+  /** Rendimiento neto de la actividad: el previo menos el 5 %. */
+  rendimientoNeto: number;
+  /** Reducción del art. 32.2.3.º LIRPF (rentas < 12.000 €); 0 por encima. */
+  reduccionRentasBajas: number;
+  /** Rendimiento neto reducido (art. 32): base del IRPF de la actividad. */
   rendimientoNetoReducido: number;
   /** Mínimo personal del art. 57 LIRPF. NO se resta de la base: se grava a tipo cero. */
   minimosPersonales: number;
@@ -85,6 +103,11 @@ export interface ResultadoRegimenModulos {
   rendimientoNetoModulos: number;
   /** Reducción general del 5 % SIN tope sobre el rendimiento neto de módulos (DA 1.ª). */
   reduccion5pc: number;
+  /** Rendimiento neto de la actividad: el de módulos menos la reducción general. */
+  rendimientoNeto: number;
+  /** Reducción del art. 32.2.3.º LIRPF (rentas < 12.000 €); 0 por encima. */
+  reduccionRentasBajas: number;
+  /** Rendimiento neto reducido (art. 32): base del IRPF de la actividad. */
   rendimientoNetoReducido: number;
   /** Mínimo personal del art. 57 LIRPF. NO se resta de la base: se grava a tipo cero. */
   minimosPersonales: number;
@@ -116,6 +139,14 @@ export interface ResultadoModulosVsDirecta {
 const MINIMO_PERSONAL = MINIMOS_IRPF_2025.personal;
 
 /**
+ * Reducción del art. 32.2.3.º LIRPF con la actividad como única renta: las «rentas no
+ * exentas, incluidas las de la propia actividad», son el propio rendimiento neto.
+ */
+function reduccionRentasBajasActividadUnica(rendimientoNeto: number): number {
+  return reduccionActividadesRentasBajas({ rentasNoExentas: rendimientoNeto, rendimientoActividad: rendimientoNeto });
+}
+
+/**
  * Cuota íntegra de IRPF (art. 63.1.2º LIRPF): el mínimo forma parte de la base y se grava a
  * tipo cero aplicando la escala dos veces. La fórmula vive en `calcularCuotaIntegraGeneral`.
  */
@@ -139,7 +170,9 @@ function calcularED(ingresos: number, gastos: number, retaMensual: number): Resu
   const rendimientoNetoPrevio = Math.max(0, ingresos - gastos - cuotaReta);
   // Provisiones y gastos de difícil justificación (art. 30.2.ª RIRPF), sellado en data/fiscal.
   const reduccion5pc = reduccionGastosDificilJustificacion(rendimientoNetoPrevio);
-  const rendimientoNetoReducido = Math.max(0, rendimientoNetoPrevio - reduccion5pc);
+  const rendimientoNeto = Math.max(0, rendimientoNetoPrevio - reduccion5pc);
+  const reduccionRentasBajas = reduccionRentasBajasActividadUnica(rendimientoNeto);
+  const rendimientoNetoReducido = Math.max(0, rendimientoNeto - reduccionRentasBajas);
   const baseLiquidable = rendimientoNetoReducido;
   const { cuotaEscala, cuotaMinimo, irpf } = calcularIRPF(baseLiquidable);
   return {
@@ -148,6 +181,8 @@ function calcularED(ingresos: number, gastos: number, retaMensual: number): Resu
     cuotaRetaDeducida: cuotaReta,
     rendimientoNetoPrevio,
     reduccion5pc,
+    rendimientoNeto,
+    reduccionRentasBajas,
     rendimientoNetoReducido,
     minimosPersonales: MINIMO_PERSONAL,
     baseLiquidable,
@@ -162,13 +197,17 @@ function calcularED(ingresos: number, gastos: number, retaMensual: number): Resu
 function calcularModulos(rendimientoNetoModulos: number, retaMensual: number): ResultadoRegimenModulos {
   // Reducción general del 5 % de la DA 1.ª de la Orden anual, SIN tope en euros (hallazgo 2445).
   const reduccion5pc = reduccionGeneralModulos(rendimientoNetoModulos);
-  const rendimientoNetoReducido = Math.max(0, rendimientoNetoModulos - reduccion5pc);
+  const rendimientoNeto = Math.max(0, rendimientoNetoModulos - reduccion5pc);
+  const reduccionRentasBajas = reduccionRentasBajasActividadUnica(rendimientoNeto);
+  const rendimientoNetoReducido = Math.max(0, rendimientoNeto - reduccionRentasBajas);
   const baseLiquidable = rendimientoNetoReducido;
   const { cuotaEscala, cuotaMinimo, irpf } = calcularIRPF(baseLiquidable);
   const cuotaReta = retaMensual * 12;
   return {
     rendimientoNetoModulos,
     reduccion5pc,
+    rendimientoNeto,
+    reduccionRentasBajas,
     rendimientoNetoReducido,
     minimosPersonales: MINIMO_PERSONAL,
     baseLiquidable,

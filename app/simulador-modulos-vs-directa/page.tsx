@@ -13,7 +13,7 @@ import {
   DataReference,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatCurrency, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
   FISCAL_IRPF_META,
   LIMITES_EXCLUSION_MODULOS_2025,
@@ -25,7 +25,13 @@ import {
   REDUCCION_GENERAL_MODULOS,
   FISCAL_AUTONOMOS_META,
   TRAMOS_RETA_2025,
+  GASTOS_GENERICOS_RETA,
+  REDUCCION_ACTIVIDADES_RENTAS_BAJAS,
+  rendimientoComputableMensualRETA,
+  nombreTramoRETA,
+  tramoRETA,
 } from '@/data/fiscal';
+import type { ResultadoRegimenED } from '@/lib/calculadoras/modulosVsDirecta';
 import { compararModulosVsDirecta } from '@/lib/calculadoras/modulosVsDirecta';
 import { calcularCuotaAutonomo } from '@/lib/calculadoras/cuotaAutonomo';
 import styles from './SimuladorModulosVsDirecta.module.css';
@@ -68,6 +74,9 @@ const RETA_CUOTA_MAX = Math.max(...TRAMOS_RETA_2025.map(t => t.cuotaMaxima));
 const RETA_SLIDER_MIN = Math.ceil(RETA_CUOTA_MIN);
 const RETA_SLIDER_MAX = Math.floor(RETA_CUOTA_MAX);
 
+/** Cuota del estado de partida (deslizador y casilla de la cuota exacta). */
+const RETA_INICIAL = 320;
+
 // Nombre de la tabla de tramos del RETA tal como lo lee el usuario: la Orden de cotización
 // sale de FISCAL_AUTONOMOS_META.fuente (hoy «Orden PJC/297/2026»), y si un re-sellado cambia
 // el formato de la fuente, cae al año de vigencia antes que a un literal tecleado.
@@ -79,40 +88,56 @@ const NOMBRE_TABLA_RETA = ORDEN_COTIZACION_RETA
   : `tabla de tramos del RETA de ${FISCAL_AUTONOMOS_META.vigencia}`;
 
 interface CoherenciaReta {
-  /** Tramo de TRAMOS_RETA_2025 al que lleva el rendimiento calculado. */
-  tramo: number;
+  /** Tramo de la tabla tal como lo numera la Orden: tabla reducida 1-3 o general 1-12. */
+  tabla: 'reducida' | 'general';
+  numeroTramo: number;
   /** Cuota mensual mínima de ese tramo, en €. */
   cuotaMinimaTramo: number;
-  /** Rendimiento neto mensual con el que se ha buscado el tramo, en €. */
+  /** Rendimiento computable mensual (art. 308.1.c LGSS) con el que se ha buscado el tramo, en €. */
   rendimientoMensual: number;
   /** Cuánto queda por debajo del mínimo el coste anual publicado, en €. */
   deficitAnual: number;
 }
 
 /**
- * Contrasta la cuota RETA introducida con el tramo que le toca por rendimiento neto.
+ * Contrasta la cuota RETA introducida con el tramo que le toca por rendimiento.
  *
- * El rendimiento neto del art. 308.1 LGSS —el que encabeza TRAMOS_RETA_2025— es
- * «ingresos − gastos deducibles − cuota SS», así que la cuota que el usuario teclea
- * determina el tramo al que él mismo pertenece. Por debajo de la cuota mínima de ese tramo,
- * el «coste fiscal anual total» que la app publica queda por debajo del mínimo legalmente
- * posible (hallazgo 812).
+ * El tramo lo decide el rendimiento COMPUTABLE del art. 308.1.c LGSS, no el neto del IRPF:
+ * en directa, el rendimiento neto (que ya lleva restados la cuota y el 5 % de difícil
+ * justificación) MÁS las cuotas, y a eso un 7 % menos de gastos genéricos
+ * (`rendimientoComputableMensualRETA`). Por debajo de la cuota mínima de ese tramo, el «coste
+ * fiscal anual total» que la app publica queda por debajo del mínimo legalmente posible
+ * (hallazgo 812).
+ *
+ * ⚠️ 02/10/2026 — hallazgo 2607: hasta hoy buscaba el tramo con (ingresos − gastos − cuota)/12,
+ * atribuyéndolo al art. 308.1. Con 100.000 / 21.000 / 560 avisaba de un déficit de 568,20 €
+ * que no existe, y con 30.000 / 4.500 / 370 callaba uno de 130,56 €. Y nombraba el tramo por el
+ * id correlativo de la tabla (1-15), que la Orden no usa (hallazgo 2611).
  *
  * Se AVISA, no se corrige: la app no sabe si hay tarifa plana, pluriactividad, base
  * elegida por encima de la mínima o un alta a mitad de año.
  *
  * @returns null cuando la cuota es coherente con el tramo (o no hay rendimiento positivo).
  */
-function contrastarCuotaReta(d: DatosComunes): CoherenciaReta | null {
-  const rendimientoMensual = (Math.max(0, d.ingresos - d.gastos) - d.retaMensual * 12) / 12;
+function contrastarCuotaReta(retaMensual: number, ed: ResultadoRegimenED): CoherenciaReta | null {
+  // Con pérdidas, el rendimiento neto REAL es negativo y así entra en el art. 308.1.c: el
+  // `rendimientoNeto` del motor está acotado a 0 para el IRPF, que es otra cosa.
+  const rendimientoNetoReal = ed.ingresos - ed.gastos - ed.cuotaRetaDeducida - ed.reduccion5pc;
+  const rendimientoMensual = rendimientoComputableMensualRETA({
+    rendimientoNetoAnual: rendimientoNetoReal,
+    cuotasAnuales: ed.cuotaRetaDeducida,
+    metodo: 'directa',
+  });
   if (rendimientoMensual <= 0) return null;
-  const { tramo, cuotaEfectiva } = calcularCuotaAutonomo({ rendimientoNetoMensual: rendimientoMensual });
-  if (d.retaMensual >= cuotaEfectiva) return null;
+  const { cuotaEfectiva } = calcularCuotaAutonomo({ rendimientoNetoMensual: rendimientoMensual });
+  if (retaMensual >= cuotaEfectiva) return null;
+  const { tabla, numero } = nombreTramoRETA(tramoRETA(rendimientoMensual));
   return {
-    tramo,
+    tabla,
+    numeroTramo: numero,
     cuotaMinimaTramo: cuotaEfectiva,
     rendimientoMensual,
-    deficitAnual: (cuotaEfectiva - d.retaMensual) * 12,
+    deficitAnual: (cuotaEfectiva - retaMensual) * 12,
   };
 }
 
@@ -144,9 +169,15 @@ export default function SimuladorModulosVsDirectaPage() {
   const [comunes, setComunes] = useState<DatosComunes>({
     ingresos: 70000,
     gastos: 25000,
-    retaMensual: 320,
+    retaMensual: RETA_INICIAL,
   });
   const [rendimientoTexto, setRendimientoTexto] = useState('');
+  // Texto de la cuota exacta: borrador libre; solo se aplica si es un importe de la tabla.
+  const [retaTexto, setRetaTexto] = useState(() => formatNumber(RETA_INICIAL, 2));
+  const retaLeida = parseSpanishNumber(retaTexto);
+  const retaTextoInvalido =
+    retaTexto.trim() !== '' &&
+    !(Number.isFinite(retaLeida) && retaLeida >= RETA_CUOTA_MIN && retaLeida <= RETA_CUOTA_MAX);
 
   const lectura = useMemo(() => leerRendimiento(rendimientoTexto), [rendimientoTexto]);
 
@@ -163,8 +194,11 @@ export default function SimuladorModulosVsDirectaPage() {
   const diferencia = comparativa.diferencia;
   const superaLimites = comparativa.motivoSinModulos === 'supera_limites';
 
-  // Coherencia de la cuota RETA tecleada con el tramo que le toca por rendimiento.
-  const coherenciaReta = useMemo(() => contrastarCuotaReta(comunes), [comunes]);
+  // Coherencia de la cuota RETA con el tramo que le toca por rendimiento computable.
+  const coherenciaReta = useMemo(
+    () => contrastarCuotaReta(comunes.retaMensual, resED),
+    [comunes.retaMensual, resED]
+  );
 
   return (
     <div className={styles.container}>
@@ -188,7 +222,7 @@ export default function SimuladorModulosVsDirectaPage() {
         fuente={FISCAL_IRPF_META.fuente}
         verificado={FISCAL_IRPF_META.verificado}
         urlOficial={FISCAL_IRPF_META.urlOficial}
-        nota={`El IRPF de ambos regímenes usa esta escala, con el mínimo personal y sin mínimos familiares. La cuota RETA la introduces tú dentro del rango real de la ${NOMBRE_TABLA_RETA}, y el rendimiento neto de módulos también: la app no lo calcula a partir de la ${ORDEN_MODULOS_VIGENTE.referencia}.`}
+        nota={`El IRPF de ambos regímenes usa esta escala, con el mínimo personal y sin mínimos familiares, y toma la actividad como tu única renta: por eso, por debajo de ${formatCurrency(REDUCCION_ACTIVIDADES_RENTAS_BAJAS.limiteRentas)} de rendimiento aplica la reducción por rentas bajas del ${REDUCCION_ACTIVIDADES_RENTAS_BAJAS.norma} (si tienes otras rentas, la reducción sería menor o nula). No se modela la reducción del art. 32.2.1.º (cliente único o TRADE). La cuota RETA la introduces tú dentro del rango real de la ${NOMBRE_TABLA_RETA}, y el rendimiento neto de módulos también: la app no lo calcula a partir de la ${ORDEN_MODULOS_VIGENTE.referencia}.`}
       />
 
       <DataReference
@@ -196,7 +230,7 @@ export default function SimuladorModulosVsDirectaPage() {
         fuente={FISCAL_MODULOS_IRPF_META.fuente}
         verificado={FISCAL_MODULOS_IRPF_META.verificado}
         urlOficial={FISCAL_MODULOS_IRPF_META.urlOficial}
-        nota={`El simulador no calcula módulos si tus ingresos o gastos introducidos superan estos límites. El de facturación a empresas (${formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.facturacionAEmpresas)}) es solo informativo: no hay campo para ese dato. La reducción general del ${REDUCCION_GENERAL_MODULOS.porcentaje}\u00A0% sobre el rendimiento neto de módulos es la de la ${REDUCCION_GENERAL_MODULOS.norma} y no tiene tope en euros.`}
+        nota={`${FISCAL_MODULOS_IRPF_META.salvedad} El simulador no calcula módulos si tus ingresos o gastos introducidos superan estos límites. El de facturación a empresas (${formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.facturacionAEmpresas)}) es solo informativo: no hay campo para ese dato. La reducción general del ${REDUCCION_GENERAL_MODULOS.porcentaje}\u00A0% sobre el rendimiento neto de módulos es la de la ${REDUCCION_GENERAL_MODULOS.norma} y no tiene tope en euros.`}
       />
 
       <DataReference
@@ -281,32 +315,79 @@ export default function SimuladorModulosVsDirectaPage() {
               max={RETA_SLIDER_MAX}
               step={1}
               value={comunes.retaMensual}
-              onChange={e => setComunes({ ...comunes, retaMensual: Number(e.target.value) })}
+              onChange={e => {
+                const v = Number(e.target.value);
+                setComunes({ ...comunes, retaMensual: v });
+                setRetaTexto(formatNumber(v, 2));
+              }}
               className={styles.slider}
             />
             <div className={styles.sliderRange}>
               <span>{formatCurrency(RETA_SLIDER_MIN)}</span>
               <span>{formatCurrency(RETA_SLIDER_MAX)}</span>
             </div>
-            <p className={styles.sliderHint}>
-              Cuota mensual del RETA según tu base de cotización elegida. El recorrido del
-              deslizador ({formatCurrency(RETA_SLIDER_MIN)} a {formatCurrency(RETA_SLIDER_MAX)})
-              se queda DENTRO del rango real de la tabla de tramos por rendimiento neto
-              ({formatCurrency(RETA_CUOTA_MIN)} a {formatCurrency(RETA_CUOTA_MAX)}) — introduce
-              tu cuota exacta si ya la conoces.
+            {/*
+              El deslizador va de euro en euro, y todas las cuotas mínimas de la tabla llevan
+              céntimos (205,88 €, 302,65 €…): quien paga justo la mínima no podía introducirla y
+              el aviso le decía que estaba por debajo del mínimo legal (hallazgo 2613). La cuota
+              exacta se escribe aquí, con céntimos.
+            */}
+            <div className={styles.campoReta}>
+              <label className={styles.campoRetaLabel} htmlFor="retaExacta">
+                o escribe tu cuota exacta (€/mes, con céntimos)
+              </label>
+              <input
+                id="retaExacta"
+                name="retaExacta"
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                value={retaTexto}
+                onChange={e => {
+                  const texto = e.target.value;
+                  setRetaTexto(texto);
+                  const v = parseSpanishNumber(texto);
+                  if (Number.isFinite(v) && v >= RETA_CUOTA_MIN && v <= RETA_CUOTA_MAX) {
+                    setComunes({ ...comunes, retaMensual: Math.round(v * 100) / 100 });
+                  }
+                }}
+                aria-invalid={retaTextoInvalido}
+                aria-describedby="retaExacta-ayuda"
+                className={`${styles.campoTexto} ${retaTextoInvalido ? styles.campoTextoError : ''}`}
+              />
+            </div>
+            <p id="retaExacta-ayuda" className={styles.sliderHint}>
+              Cuota mensual del RETA según tu base de cotización elegida, entre{' '}
+              {formatCurrency(RETA_CUOTA_MIN)} y {formatCurrency(RETA_CUOTA_MAX)} (el rango real de
+              la tabla de tramos). Mueve el deslizador o escribe tu cuota exacta en la casilla.
+              {retaTextoInvalido && (
+                <> <strong>Ese importe no está en la tabla: se mantiene {formatCurrency(comunes.retaMensual)}.</strong></>
+              )}
             </p>
-            {coherenciaReta && (
-              <p className={styles.avisoReta} aria-live="polite">
-                <span aria-hidden="true">⚠️</span> Con {formatCurrency(comunes.ingresos)} de
-                ingresos y {formatCurrency(comunes.gastos)} de gastos, tu rendimiento neto sale a{' '}
-                {formatCurrency(coherenciaReta.rendimientoMensual)}/mes, que es el tramo{' '}
-                {coherenciaReta.tramo} de la tabla del RETA: la cuota mínima de ese tramo es{' '}
-                <strong>{formatCurrency(coherenciaReta.cuotaMinimaTramo)}/mes</strong>. Con{' '}
-                {formatCurrency(comunes.retaMensual)} el coste anual que ves más abajo queda{' '}
-                {formatCurrency(coherenciaReta.deficitAnual)} por debajo del mínimo posible, salvo
-                que tengas tarifa plana, pluriactividad o un alta a mitad de año.
-              </p>
-            )}
+            {/*
+              Región viva PERSISTENTE (hallazgo 2614): antes el <p aria-live> se montaba ya con el
+              texto y el lector podía no anunciarlo. Ahora el contenedor existe desde la carga y lo
+              que cambia es su contenido.
+            */}
+            <div aria-live="polite" aria-atomic="true">
+              {coherenciaReta && (
+                <p className={styles.avisoReta}>
+                  <span aria-hidden="true">⚠️</span> Con {formatCurrency(comunes.ingresos)} de
+                  ingresos y {formatCurrency(comunes.gastos)} de gastos, tu rendimiento computable
+                  para el RETA (rendimiento neto más tus cuotas, menos el{' '}
+                  {formatNumber(GASTOS_GENERICOS_RETA.general * 100, 0)}{' '}% de gastos genéricos;{' '}
+                  {GASTOS_GENERICOS_RETA.norma}) sale a{' '}
+                  {formatCurrency(coherenciaReta.rendimientoMensual)}/mes: tabla{' '}
+                  {coherenciaReta.tabla}, tramo {coherenciaReta.numeroTramo}, cuya cuota mínima es{' '}
+                  <strong>{formatCurrency(coherenciaReta.cuotaMinimaTramo)}/mes</strong>. Con{' '}
+                  {formatCurrency(comunes.retaMensual)} el coste anual que ves más abajo queda{' '}
+                  {formatCurrency(coherenciaReta.deficitAnual)} por debajo del mínimo posible, salvo
+                  que tengas tarifa plana, pluriactividad, seas autónomo societario (deducción del{' '}
+                  {formatNumber(GASTOS_GENERICOS_RETA.societarios * 100, 0)}{' '}%) o un alta a
+                  mitad de año.
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -393,9 +474,21 @@ export default function SimuladorModulosVsDirectaPage() {
                 <strong>−{formatCurrency(resED.reduccion5pc)}</strong>
               </div>
               <div className={styles.lineaSubtotal}>
-                <span>= Rendimiento neto reducido</span>
-                <strong>{formatCurrency(resED.rendimientoNetoReducido)}</strong>
+                <span>= Rendimiento neto de la actividad</span>
+                <strong>{formatCurrency(resED.rendimientoNeto)}</strong>
               </div>
+              {resED.reduccionRentasBajas > 0 && (
+                <>
+                  <div className={styles.lineaResta}>
+                    <span>− Reducción por rentas bajas ({REDUCCION_ACTIVIDADES_RENTAS_BAJAS.norma})</span>
+                    <strong>−{formatCurrency(resED.reduccionRentasBajas)}</strong>
+                  </div>
+                  <div className={styles.lineaSubtotal}>
+                    <span>= Rendimiento neto reducido</span>
+                    <strong>{formatCurrency(resED.rendimientoNetoReducido)}</strong>
+                  </div>
+                </>
+              )}
               <div className={styles.lineaSubtotal}>
                 <span>= Base liquidable (el mínimo va dentro)</span>
                 <strong>{formatCurrency(resED.baseLiquidable)}</strong>
@@ -437,10 +530,22 @@ export default function SimuladorModulosVsDirectaPage() {
                     <span>− Reducción general {REDUCCION_GENERAL_MODULOS.porcentaje}{'\u00A0'}% (sin tope)</span>
                     <strong>−{formatCurrency(resModulos.reduccion5pc)}</strong>
                   </div>
-                  <div className={styles.lineaSubtotal}>
-                    <span>= Rendimiento neto reducido</span>
-                    <strong>{formatCurrency(resModulos.rendimientoNetoReducido)}</strong>
-                  </div>
+                <div className={styles.lineaSubtotal}>
+                  <span>= Rendimiento neto de la actividad</span>
+                  <strong>{formatCurrency(resModulos.rendimientoNeto)}</strong>
+                </div>
+                {resModulos.reduccionRentasBajas > 0 && (
+                  <>
+                    <div className={styles.lineaResta}>
+                      <span>− Reducción por rentas bajas ({REDUCCION_ACTIVIDADES_RENTAS_BAJAS.norma})</span>
+                      <strong>−{formatCurrency(resModulos.reduccionRentasBajas)}</strong>
+                    </div>
+                    <div className={styles.lineaSubtotal}>
+                      <span>= Rendimiento neto reducido</span>
+                      <strong>{formatCurrency(resModulos.rendimientoNetoReducido)}</strong>
+                    </div>
+                  </>
+                )}
                   <div className={styles.lineaSubtotal}>
                     <span>= Base liquidable (el mínimo va dentro)</span>
                     <strong>{formatCurrency(resModulos.baseLiquidable)}</strong>
@@ -527,8 +632,9 @@ export default function SimuladorModulosVsDirectaPage() {
                 rendimiento que escribes.
               </li>
               <li>
-                El IVA: en módulos suele aplicarse el régimen simplificado (o el recargo de
-                equivalencia en el comercio minorista); estas cifras solo recogen IRPF y cuota RETA.
+                El IVA: estas cifras solo recogen IRPF y cuota RETA. En módulos suele aplicarse el
+                régimen simplificado de IVA, y el comercio minorista persona física está en recargo
+                de equivalencia en cualquiera de los dos regímenes de IRPF.
               </li>
             </ul>
             <p className={styles.noRecogeAviso}>
@@ -577,8 +683,8 @@ export default function SimuladorModulosVsDirectaPage() {
               </tr>
               <tr>
                 <td>IVA</td>
-                <td>Régimen general</td>
-                <td>Normalmente régimen simplificado (o recargo de equivalencia en comercio minorista)</td>
+                <td>Régimen general (el comercio minorista persona física, recargo de equivalencia)</td>
+                <td>Normalmente régimen simplificado (el comercio minorista, recargo de equivalencia)</td>
               </tr>
               <tr>
                 <td>Límites</td>
@@ -588,15 +694,15 @@ export default function SimuladorModulosVsDirectaPage() {
               <tr>
                 <td>Renuncia</td>
                 <td>—</td>
-                <td>Voluntaria; obliga a tres años como mínimo en directa</td>
+                <td>Voluntaria; la renuncia y la exclusión obligan a tres años en directa</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p className={styles.tableNote}>
-          Datos generales orientativos. Los límites concretos (incluida la prórroga del régimen
-          de módulos) se actualizan anualmente en la Ley de Presupuestos y en la Orden de Hacienda
-          que regula los módulos del año siguiente (hoy, la {ORDEN_MODULOS_VIGENTE.referencia}).
+          Datos generales orientativos. Los límites de exclusión los fija la Ley del IRPF (art.
+          31.1.3.ª y su disposición transitoria 32.ª), no la Orden anual de módulos (hoy, la{' '}
+          {ORDEN_MODULOS_VIGENTE.referencia}), que solo remite a ellos. {FISCAL_MODULOS_IRPF_META.salvedad}
         </p>
 
         <h3>Qué mueve la diferencia</h3>
@@ -668,10 +774,13 @@ export default function SimuladorModulosVsDirectaPage() {
           <div className={styles.faqItem}>
             <strong>¿Tributo el IVA igual en ambos regímenes?</strong>
             <p>
-              No. En directa estás en el régimen general de IVA (declaras IVA repercutido − IVA
-              soportado). En módulos lo normal es el <em>régimen simplificado de IVA</em>, que
-              también se calcula por módulos, o el recargo de equivalencia si es comercio
-              minorista. Esta app no calcula el IVA.
+              Depende de la actividad. En módulos lo normal es el <em>régimen simplificado de
+              IVA</em>, que también se calcula por módulos, y si renuncias a módulos en el IRPF
+              también sales del simplificado. Pero el comercio minorista persona física va al{' '}
+              <em>recargo de equivalencia</em> por la Ley del IVA (arts. 148 y 149), sin depender del
+              régimen de IRPF: si renuncias a módulos y más del 80{' '}% de tus ventas son a
+              consumidores, sigues en recargo y no pasas a declarar IVA repercutido menos soportado.
+              Las demás actividades, en directa, van al régimen general. Esta app no calcula el IVA.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -681,7 +790,9 @@ export default function SimuladorModulosVsDirectaPage() {
               ingresos anuales, {formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.facturacionAEmpresas)} facturados
               a otros empresarios y profesionales, o {formatCurrency(LIMITES_EXCLUSION_MODULOS_2025.comprasBienesYServicios)} de
               compras en bienes y servicios (excluido el inmovilizado), quedas <strong>excluido
-              automáticamente</strong> y pasas a Estimación Directa al año siguiente.
+              automáticamente</strong> y pasas a Estimación Directa el año siguiente, y ahí te
+              quedas <strong>durante los tres años siguientes</strong>, igual que con la renuncia
+              (art. 31.1.5.ª de la Ley del IRPF). {FISCAL_MODULOS_IRPF_META.salvedad}
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -804,9 +915,9 @@ export default function SimuladorModulosVsDirectaPage() {
           <ul className={styles.warningList}>
             <li>Dar por hecho que un régimen es siempre más barato: depende del margen real de cada año.</li>
             <li>No comprobar si tu actividad IAE está en la Orden anual de módulos antes de elegir módulos.</li>
-            <li>Renunciar a módulos sin saber que la renuncia te ata 3 años a la directa.</li>
+            <li>Renunciar a módulos, o dejarse excluir por superar los límites, sin saber que las dos cosas atan 3 años a la directa.</li>
             <li>Olvidar que en módulos el rendimiento no baja aunque el año vaya peor.</li>
-            <li>Confundir el régimen de IRPF con el de IVA: van atados, no son independientes.</li>
+            <li>Dar por hecho que el IVA sigue al IRPF: el simplificado sí va atado a módulos, pero el recargo de equivalencia del comercio minorista no depende del régimen de IRPF.</li>
             <li>Usar el rendimiento de módulos de una Orden antigua: se actualiza cada año.</li>
           </ul>
         </div>

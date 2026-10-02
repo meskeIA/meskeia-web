@@ -51,8 +51,15 @@ export interface TramoCotizacion {
 
 /**
  * Tabla de tramos 2026 (importass.seg-social.es, verificada 2026-06-09)
- * Rendimiento neto = Ingresos - Gastos deducibles - Cuota SS
+ * Los tramos son de RENDIMIENTO COMPUTABLE mensual del art. 308.1.c LGSS, no del rendimiento
+ * neto del IRPF: calcúlalo con `rendimientoComputableMensualRETA` (más abajo).
  * cuotaMinima/cuotaMaxima = baseMinima/Maxima × 31,50% (informativo)
+ *
+ * ⚠️ 02/10/2026 — hallazgo 2607 del Inspector: hasta hoy este comentario decía «Rendimiento
+ * neto = Ingresos − Gastos deducibles − Cuota SS», y simulador-modulos-vs-directa lo copió
+ * atribuyéndoselo al art. 308.1. La ley dice otra cosa (ver `rendimientoComputableMensualRETA`).
+ * La numeración `id` (1-15) es interna: la Orden numera por tabla —reducida 1-3 y general
+ * 1-12—, así que para enseñar el tramo usa `nombreTramoRETA`.
  */
 export const TRAMOS_RETA_2025: TramoCotizacion[] = [
   // TABLA REDUCIDA (rendimientos < SMI anual)
@@ -88,6 +95,68 @@ export function tramoRETA(rendimientoMensual: number): TramoCotizacion {
     (t.rendimientoMaxIncluido ? rendimientoMensual <= t.rendimientoMax : rendimientoMensual < t.rendimientoMax),
   );
   return tramo ?? TRAMOS_RETA_2025[TRAMOS_RETA_2025.length - 1];
+}
+
+/** Número de tramos de la tabla reducida (rendimientos por debajo del SMI); el resto, general. */
+const TRAMOS_TABLA_REDUCIDA = 3;
+
+/**
+ * Nombre del tramo tal como lo numera la Orden PJC/297/2026, art. 18: «tabla reducida, tramo
+ * 1-3» y «tabla general, tramo 1-12». El `id` de TRAMOS_RETA_2025 es correlativo (1-15) y
+ * no existe en la norma: «tramo 15» no lo encuentra nadie en el BOE (hallazgo 2611).
+ */
+export function nombreTramoRETA(t: TramoCotizacion): { tabla: 'reducida' | 'general'; numero: number } {
+  return t.id <= TRAMOS_TABLA_REDUCIDA
+    ? { tabla: 'reducida', numero: t.id }
+    : { tabla: 'general', numero: t.id - TRAMOS_TABLA_REDUCIDA };
+}
+
+/**
+ * Deducción por gastos genéricos del art. 308.1.c), regla 2.ª, LGSS (BOE-A-2015-11724, texto
+ * consolidado consultado el 02/10/2026): 7 % con carácter general y 3 % para los autónomos
+ * societarios y los socios de entidades del art. 305.2 b) y e).
+ */
+export const GASTOS_GENERICOS_RETA = {
+  general: 0.07,
+  societarios: 0.03,
+  norma: 'art. 308.1.c), regla 2.ª, LGSS',
+};
+
+/**
+ * Rendimiento COMPUTABLE mensual del art. 308.1.c LGSS, que es el que decide el tramo de la
+ * tabla del RETA (BOE-A-2015-11724, texto consolidado consultado el 02/10/2026):
+ *   · regla 1.ª — en estimación DIRECTA, «el rendimiento neto, incrementado en el importe de
+ *     las cuotas de la Seguridad Social y aportaciones a mutualidades alternativas del
+ *     titular»; en estimación OBJETIVA, «el rendimiento neto previo» (el minorado en las
+ *     actividades agrícolas, forestales y ganaderas);
+ *   · regla 2.ª — a eso se le aplica la deducción por gastos genéricos (7 % / 3 %).
+ * En la directa simplificada, el rendimiento neto del IRPF ya lleva restados la cuota (gasto
+ * deducible) y el 5 % de difícil justificación (art. 30.2.ª RIRPF): la cuota vuelve a sumarse,
+ * el 5 % no.
+ *
+ * ⚠️ 02/10/2026 — hallazgo 2607: simulador-modulos-vs-directa buscaba el tramo con
+ * (ingresos − gastos − cuota) / 12, sin devolver la cuota ni restar el 7 %, y avisaba de un
+ * déficit inexistente con rentas altas y callaba el real con rentas medias. Los demás
+ * consumidores de `tramoRETA` (estimador-cuota-autonomo, comparador-autonomo-vs-sl y los
+ * motores de lib/calculadoras) siguen buscando con su propia base: anotado en SOSPECHAS.
+ *
+ * @param p.rendimientoNetoAnual Rendimiento neto anual de la actividad según el IRPF, en €
+ *   (en objetiva, el rendimiento neto previo).
+ * @param p.cuotasAnuales Cuotas del RETA (y mutualidad alternativa) deducidas en ese
+ *   rendimiento, en €. Solo cuentan en directa.
+ * @param p.metodo 'directa' (normal o simplificada) u 'objetiva' (módulos).
+ * @param p.societario true para el 3 % de los autónomos del art. 305.2 b) y e).
+ * @returns El rendimiento computable MENSUAL, en € (puede ser ≤ 0: tramo 1 de la reducida).
+ */
+export function rendimientoComputableMensualRETA(p: {
+  rendimientoNetoAnual: number;
+  cuotasAnuales: number;
+  metodo: 'directa' | 'objetiva';
+  societario?: boolean;
+}): number {
+  const base = p.metodo === 'directa' ? p.rendimientoNetoAnual + p.cuotasAnuales : p.rendimientoNetoAnual;
+  const deduccion = p.societario ? GASTOS_GENERICOS_RETA.societarios : GASTOS_GENERICOS_RETA.general;
+  return (base * (1 - deduccion)) / 12;
 }
 
 // Bases de referencia 2026

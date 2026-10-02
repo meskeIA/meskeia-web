@@ -4788,10 +4788,12 @@ test.describe('modulosVsDirecta — rendimiento de módulos aportado, diferencia
 
   test('rendimiento 0: es un dato, no la falta de él → IRPF 0 y coste igual a la cuota RETA', () => {
     // 30.000/18.000/320. Directa (hallazgo 2444, mismo caso que abajo):
-    //   previo 30.000 − 18.000 − 3.840 = 8.160 · 5 % = 408 → base 7.752
-    //   IRPF 7.752 × 19 % − 1.054,50 = 1.472,88 − 1.054,50 = 418,38 · coste 4.258,38
+    //   previo 30.000 − 18.000 − 3.840 = 8.160 · 5 % = 408 → rendimiento neto 7.752
+    //   art. 32.2.3.º (desde el 02/10/2026, hallazgo 2608): rentas 7.752 ≤ 8.000 → −1.620 → base 6.132
+    //   IRPF 6.132 × 19 % − 1.054,50 = 1.165,08 − 1.054,50 = 110,58 · coste 3.950,58
+    //   (hasta el 02/10 el golden era 418,38: la reducción no se aplicaba)
     // Módulos con 0: reducción 0, base 0, escala(0) − escala(0) = 0 → coste 3.840,00.
-    // Diferencia 4.258,38 − 3.840,00 = 418,38.
+    // Diferencia 3.950,58 − 3.840,00 = 110,58.
     const r = compararModulosVsDirecta({ ingresos: 30000, gastos: 18000, retaMensual: 320, rendimientoNetoModulos: 0 });
     expect(r.motivoSinModulos).toBe(null);
     const m = r.modulos!;
@@ -4801,7 +4803,51 @@ test.describe('modulosVsDirecta — rendimiento de módulos aportado, diferencia
     expect(m.cuotaMinimo).toBe(0);
     expect(m.irpf).toBe(0);
     expect(m.costeAnualTotal).toBe(3840);
-    expect(r.diferencia).toBeCloseTo(418.38, 2);
+    expect(r.estimacionDirecta.rendimientoNeto).toBeCloseTo(7752, 2);
+    expect(r.estimacionDirecta.reduccionRentasBajas).toBe(1620);
+    expect(r.estimacionDirecta.baseLiquidable).toBeCloseTo(6132, 2);
+    expect(r.estimacionDirecta.irpf).toBeCloseTo(110.58, 2);
+    expect(r.diferencia).toBeCloseTo(110.58, 2);
+  });
+
+  test('[2608] art. 32.2.3.º LIRPF: con rentas ≤ 8.000 € las dos columnas reducen 1.620 € y el coste se iguala', () => {
+    // Caso de la ficha: 20.000/10.000/230, módulos 6.000.
+    //   Directa: previo 20.000 − 10.000 − 2.760 = 7.240 · 5 % = 362 → 6.878 · −1.620 → 5.258
+    //            escala(5.258) = 999,02 ≤ escala(mínimo) → IRPF 0 · coste 2.760
+    //   Módulos: 6.000 − 5 % (300) = 5.700 · −1.620 → 4.080 → IRPF 0 · coste 2.760
+    //   Diferencia 0. Sin la reducción salía directa 252,32 € de IRPF y módulos 28,50 €.
+    const r = compararModulosVsDirecta({ ingresos: 20000, gastos: 10000, retaMensual: 230, rendimientoNetoModulos: 6000 });
+    expect(r.estimacionDirecta.rendimientoNeto).toBeCloseTo(6878, 2);
+    expect(r.estimacionDirecta.reduccionRentasBajas).toBe(1620);
+    expect(r.estimacionDirecta.rendimientoNetoReducido).toBeCloseTo(5258, 2);
+    expect(r.estimacionDirecta.irpf).toBe(0);
+    expect(r.estimacionDirecta.costeAnualTotal).toBe(2760);
+    const m = r.modulos!;
+    expect(m.rendimientoNeto).toBeCloseTo(5700, 2);
+    expect(m.reduccionRentasBajas).toBe(1620);
+    expect(m.rendimientoNetoReducido).toBeCloseTo(4080, 2);
+    expect(m.irpf).toBe(0);
+    expect(m.costeAnualTotal).toBe(2760);
+    expect(r.diferencia).toBe(0);
+  });
+
+  test('[2608] art. 32.2.3.º: entre 8.000 y 12.000 € la reducción decrece 0,405 por euro, y desde 12.000 € es 0', () => {
+    // Módulos 10.000 → 5 % (500) → rendimiento neto 9.500
+    //   reducción 1.620 − 0,405 × (9.500 − 8.000) = 1.620 − 607,50 = 1.012,50 → base 8.487,50
+    //   escala(8.487,50) = 1.612,625 · IRPF 1.612,625 − 1.054,50 = 558,125
+    const dentro = compararModulosVsDirecta({ ingresos: 40000, gastos: 1000, retaMensual: 320, rendimientoNetoModulos: 10000 });
+    expect(dentro.modulos!.reduccionRentasBajas).toBeCloseTo(1012.5, 2);
+    expect(dentro.modulos!.baseLiquidable).toBeCloseTo(8487.5, 2);
+    expect(dentro.modulos!.irpf).toBeCloseTo(558.125, 2);
+    // 12.631,58 × 0,95 = 12.000,00 → sin reducción; justo por debajo, todavía algo.
+    const frontera = compararModulosVsDirecta({ ingresos: 40000, gastos: 1000, retaMensual: 320, rendimientoNetoModulos: 12000 / 0.95 });
+    expect(frontera.modulos!.reduccionRentasBajas).toBe(0);
+    const debajo = compararModulosVsDirecta({ ingresos: 40000, gastos: 1000, retaMensual: 320, rendimientoNetoModulos: 11990 / 0.95 });
+    expect(debajo.modulos!.reduccionRentasBajas).toBeCloseTo(1620 - 0.405 * 3990, 2);
+    // Por encima de 12.000 € (el bar del primer caso) no hay reducción en ninguna columna.
+    const bar = compararModulosVsDirecta({ ...BAR, rendimientoNetoModulos: 20000 });
+    expect(bar.estimacionDirecta.reduccionRentasBajas).toBe(0);
+    expect(bar.modulos!.reduccionRentasBajas).toBe(0);
   });
 
   test('límites de exclusión: 250.000 € dentro y 250.001 € fuera, en ingresos y en compras', () => {
@@ -4856,23 +4902,26 @@ test.describe('modulosVsDirecta — rendimiento de módulos aportado, diferencia
 
   // Hallazgo 2444 (inspector 29/09/2026): en directa, la cuota RETA es gasto deducible
   // (Manual práctico de Renta de la AEAT, cap. 7) y el motor solo la sumaba al coste.
-  //   directa  30.000 − 18.000 − 3.840 = 8.160 · 5 % = 408 · base 7.752
-  //            IRPF 1.472,88 − 1.054,50 = 418,38 · coste 4.258,38
-  //   módulos  (rendimiento aportado) 10.500 · 5 % = 525 · base 9.975
-  //            IRPF 9.975 × 19 % − 1.054,50 = 1.895,25 − 1.054,50 = 840,75 · coste 4.680,75
-  //   diferencia 4.258,38 − 4.680,75 = −422,37 (negativa: la directa cuesta menos)
+  //   directa  30.000 − 18.000 − 3.840 = 8.160 · 5 % = 408 · rendimiento neto 7.752
+  //            art. 32.2.3.º (desde el 02/10/2026, hallazgo 2608): −1.620 · base 6.132
+  //            IRPF 1.165,08 − 1.054,50 = 110,58 · coste 3.950,58
+  //   módulos  (rendimiento aportado) 10.500 · 5 % = 525 · rendimiento neto 9.975
+  //            art. 32.2.3.º: 1.620 − 0,405 × 1.975 = 820,125 · base 9.154,875
+  //            IRPF 9.154,875 × 19 % − 1.054,50 = 1.739,42625 − 1.054,50 = 684,92625 · coste 4.524,93
+  //   diferencia 3.950,58 − 4.524,93 = −574,35 (negativa: la directa cuesta menos)
+  //   (hasta el 02/10 los goldens eran 7.752 / 418,38 / 9.975 / 840,75 / −422,37: sin el art. 32)
   test('ALTO [2444]: la cuota RETA se deduce en directa y no en módulos; la diferencia puede salir negativa', () => {
     const r = compararModulosVsDirecta({ ingresos: 30000, gastos: 18000, retaMensual: 320, rendimientoNetoModulos: 10500 });
     expect(r.estimacionDirecta.cuotaRetaDeducida).toBe(3840);
     expect(r.estimacionDirecta.rendimientoNetoPrevio).toBe(8160);
-    expect(r.estimacionDirecta.baseLiquidable).toBeCloseTo(7752, 2);
-    expect(r.estimacionDirecta.irpf).toBeCloseTo(418.38, 2);
-    expect(r.estimacionDirecta.costeAnualTotal).toBeCloseTo(4258.38, 2);
-    expect(r.modulos!.baseLiquidable).toBeCloseTo(9975, 2);
-    expect(r.modulos!.irpf).toBeCloseTo(840.75, 2);
+    expect(r.estimacionDirecta.baseLiquidable).toBeCloseTo(6132, 2);
+    expect(r.estimacionDirecta.irpf).toBeCloseTo(110.58, 2);
+    expect(r.estimacionDirecta.costeAnualTotal).toBeCloseTo(3950.58, 2);
+    expect(r.modulos!.baseLiquidable).toBeCloseTo(9154.875, 2);
+    expect(r.modulos!.irpf).toBeCloseTo(684.92625, 2);
     expect(r.modulos!.cuotaReta).toBe(3840);
-    expect(r.modulos!.costeAnualTotal).toBeCloseTo(4680.75, 2);
-    expect(r.diferencia).toBeCloseTo(-422.37, 2);
+    expect(r.modulos!.costeAnualTotal).toBeCloseTo(4524.92625, 2);
+    expect(r.diferencia).toBeCloseTo(-574.34625, 2);
   });
 
   // Hallazgo 2445: la reducción general de módulos (DA 1.ª Orden HAC/1425/2025) es el 5 % SIN

@@ -25,7 +25,7 @@
  *
  * Re-inspección del 02/10/2026 (la primera ENTERA tras el rediseño) — qué cambió en este fichero
  * ──────────────────────────────────────────────────────────────────────────────────────────────
- *  · Hallazgos ABIERTOS hoy, cada uno con su caso en `test.fail()` (afirma lo CORRECTO):
+ *  · Hallazgos abiertos por la mañana (2607-2614, reparados ese mismo día: ver el bloque siguiente):
  *      – el aviso de la cuota RETA calcula el rendimiento con «ingresos − gastos − cuota», y el
  *        art. 308.1.c LGSS manda «rendimiento neto + cuotas, − 7 % de gastos genéricos»;
  *      – el aviso numera los tramos del 1 al 15 seguidos, y la Orden PJC/297/2026 (art. 18) los
@@ -51,6 +51,25 @@
  *    cae en el tramo de 1.850-2.030 € y su caso pasa al `test.fail()` del aviso. La frontera de
  *    `tramoRETA()` la vigila `tests/apps/asistente-alta-autonomo.spec.ts`.
  *
+ * Recálculo del 02/10/2026, tras REPARAR los hallazgos 2607-2614 (mismo día)
+ * ──────────────────────────────────────────────────────────────────────────
+ *  · Los ocho `test.fail()` pasan a ser casos normales, «REPARADO (02/10/2026)», tras comprobar
+ *    que lo que afirman es lo correcto. El del 2613 se reescribe: la reparación no da céntimos al
+ *    deslizador, añade una casilla `#retaExacta` (ver su comentario).
+ *  · El aviso de la cuota RETA ya no dice «tabla del RETA», y el localizador que lo filtraba por
+ *    ese texto se quedó ciego: sus `toHaveCount(0)` pasaban en falso. Ahora se localiza la región
+ *    viva PERSISTENTE del grupo de la cuota (hallazgo 2614) y «sin aviso» es «región vacía», que
+ *    no puede pasar si la región desaparece.
+ *  · Vuelven las aserciones del rendimiento computable mensual y del tramo (retiradas por la
+ *    mañana mientras eran hallazgos abiertos), ya con la fórmula del art. 308.1.c LGSS y la
+ *    numeración de la Orden.
+ *  · La línea «= Rendimiento neto reducido» solo se pinta si hay reducción del art. 32.2.3.º; sin
+ *    ella, la línea es «= Rendimiento neto de la actividad» (caso del 45 %).
+ *  · `main input` pasa de 4 a 5 controles (la casilla de la cuota exacta), y los cinco mueven el
+ *    resultado.
+ *  · Caso nuevo del art. 32.2.3.º en su tramo INTERMEDIO (rentas entre 8.000 y 12.000 €), que el
+ *    del hallazgo 2608 (≤ 8.000 €, 1.620 € enteros) no ejercitaba, con aviso en la tabla REDUCIDA.
+ *
  * De dónde sale cada cifra esperada (todas resueltas a mano ANTES de ejecutar)
  * ─────────────────────────────────
  *  · Escala — `TRAMOS_IRPF_2025` (data/fiscal/irpf.ts): 19 % hasta 12.450 · 24 % hasta 20.200 ·
@@ -73,10 +92,18 @@
  *    incrementado en el importe de las cuotas de la Seguridad Social»; regla 2.ª: «una deducción
  *    por gastos genéricos del 7 por ciento». El rendimiento neto de la directa simplificada lleva
  *    ya el 5 % de difícil justificación (art. 30 RIRPF, BOE-A-2007-6820).
+ *    Fórmula: (rendimiento neto de la actividad + cuota × 12) × 0,93 / 12, donde el rendimiento
+ *    neto es el de ANTES de la reducción del art. 32.2.3.º (`rendimientoComputableMensualRETA`).
+ *    Tramos por tabla, como la Orden: reducida 1 (≤ 670) · 2 (≤ 900) · 3 (< 1.166,70); general
+ *    1 (≤ 1.300) · 2 (≤ 1.500) · 3 (≤ 1.700) · 4 (≤ 1.850) · 5 (≤ 2.030) · 6 (≤ 2.330) ·
+ *    7 (≤ 2.760) · 8 (≤ 3.190) · 9 (≤ 3.620) · 10 (≤ 4.050) · 11 (≤ 6.000) · 12 (> 6.000).
  *  · Art. 32.2.3.º LIRPF (BOE-A-2006-20764, consolidado a 30/09/2026): con rentas no exentas
  *    ≤ 8.000 €, incluidas las de la actividad, el rendimiento neto se reduce en 1.620 €; entre
  *    8.000 y 12.000 €, en 1.620 − 0,405 × (rentas − 8.000). Vale cuando no se cumplen los
  *    requisitos del 2.º (que exige estimación directa y cliente único): directa y módulos.
+ *    Desde el 02/10/2026 la app la aplica con la actividad como ÚNICA renta: rentas = rendimiento
+ *    neto de la actividad (directa: previo − 5 % con tope; módulos: dato − 5 % sin tope), y el
+ *    IRPF se calcula sobre el rendimiento neto REDUCIDO, que nunca queda negativo.
  *
  * Formato: `formatCurrency` (es-ES) no agrupa millares con 4 cifras enteras (6723,00 €) y sí
  * desde 5 (20.376,20 €), como manda la RAE. El signo de resta de la plantilla es «−» (U+2212).
@@ -86,9 +113,13 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
 
 const RUTA = '/simulador-modulos-vs-directa/';
 
-/** Los tres deslizadores y el campo del rendimiento de módulos: los cuatro controles de la app. */
+/**
+ * Los tres deslizadores, la casilla de la cuota RETA exacta (hallazgo 2613, 02/10/2026) y el
+ * campo del rendimiento de módulos: los cinco controles de la app.
+ */
 const CAMPO_MODULOS = '#rendimientoModulos';
-const ENTRADAS = ['#ingresos', '#gastos', '#reta', CAMPO_MODULOS];
+const CAMPO_RETA_EXACTA = '#retaExacta';
+const ENTRADAS = ['#ingresos', '#gastos', '#reta', CAMPO_RETA_EXACTA, CAMPO_MODULOS];
 
 const ED = 'Estimación Directa Simplificada';
 const MOD = 'Estimación Objetiva (Módulos)';
@@ -126,8 +157,21 @@ const escribirModulos = (page: Page, texto: string) => sembrarValor(page, CAMPO_
 /** La caja de la diferencia (role="status"): un dato, nunca un veredicto. */
 const estado = (page: Page) => page.locator('[role="status"]');
 
-/** El aviso de coherencia de la cuota RETA (el de la app, no el anunciador de rutas). */
-const avisoReta = (page: Page) => page.locator('[aria-live="polite"]').filter({ hasText: 'tabla del RETA' });
+/**
+ * La región viva del aviso de la cuota RETA: el `[aria-live="polite"]` PERSISTENTE del grupo del
+ * deslizador (hallazgo 2614), no el anunciador de rutas. Hasta el 02/10/2026 se filtraba por el
+ * texto «tabla del RETA»; la reparación cambió la redacción y los `toHaveCount(0)` pasaban en
+ * falso. Ahora «sin aviso» se escribe `sinAvisoReta`: la región EXISTE y está vacía.
+ */
+const avisoReta = (page: Page) =>
+  page.locator('label[for="reta"]').locator('xpath=..').locator('[aria-live="polite"]');
+const sinAvisoReta = async (page: Page) => {
+  await expect(avisoReta(page)).toHaveCount(1);
+  await expect(avisoReta(page)).toHaveText('');
+};
+
+/** Escribe la cuota RETA exacta, con céntimos, en su casilla de texto (hallazgo 2613). */
+const escribirRetaExacta = (page: Page, texto: string) => sembrarValor(page, CAMPO_RETA_EXACTA, texto);
 
 /** Palabras de veredicto que la app ya no puede decir (hallazgo 2545). */
 const VEREDICTO = /te conviene|conviene más|recomend|\bgana(?:s|n|r|dora|dor)?\b|sale más barat/i;
@@ -233,7 +277,7 @@ test.describe('Simulador Módulos vs Estimación Directa — rendimiento de mód
    *   IRPF 5.005,50 − 1.054,50 = 3.951,00 · coste 3.951,00 + 3.840 = 7.791,00 €
    *   diferencia 12.976,20 − 7.791,00 = 5.185,20 €.
    *   (02/10/2026: antes se tecleaba «12.000»; sus 11.400 € de rentas caen bajo la reducción del
-   *   art. 32.2.3.º LIRPF, hallazgo abierto ese día, y el caso vigila el PARSEO, no esa reducción.)
+   *   art. 32.2.3.º LIRPF —hallazgo 2608, reparado ese mismo día—, y el caso vigila el PARSEO, no esa reducción.)
    * Vaciar el campo devuelve al estado sin dato, sin aviso.
    */
   test('RECHAZO — «abc», «1e3», «1.2.3», «12abc», «-5.000» y «−300» avisan y no dan cifra; «24.000» son veinticuatro mil', async ({
@@ -360,14 +404,16 @@ test.describe('Simulador Módulos vs Estimación Directa — rendimiento de mód
     await expect(page.getByRole('radio')).toHaveCount(0);
     await expect(page.getByRole('button', { name: /Aplicar caso/ })).toHaveCount(0);
 
-    // Los controles que quedan son exactamente cuatro, y los cuatro mueven el resultado.
-    await expect(page.locator('main input')).toHaveCount(4);
+    // Los controles que quedan son exactamente cinco (desde el 02/10/2026: la casilla de la cuota
+    // exacta del hallazgo 2613 se suma a los cuatro de antes), y los cinco mueven el resultado.
+    await expect(page.locator('main input')).toHaveCount(5);
     const resultado = page.locator('h2', { hasText: 'Coste anual en cada régimen' }).locator('xpath=..');
     const mover: Array<[string, () => Promise<unknown>]> = [
       [CAMPO_MODULOS, () => escribirModulos(page, '15.000')],
       ['#ingresos', () => deslizar(page, 'ingresos', 80000)],
       ['#gastos', () => deslizar(page, 'gastos', 30000)],
       ['#reta', () => deslizar(page, 'reta', 400)],
+      [CAMPO_RETA_EXACTA, () => escribirRetaExacta(page, '350,25')],
     ];
     for (const [control, accion] of mover) {
       const antes = await resultado.innerText();
@@ -411,6 +457,9 @@ test.describe('Simulador Módulos vs Estimación Directa — columna de estimaci
    *   previo 200.000 − 7.200 = 192.800 · −2.000 → 190.800 = base
    *   escala(190.800) = 17.901,50 + 130.800 × 45 % = 76.761,50 · IRPF 75.707,00
    *   + 7.200 → coste 82.907,00 € (el mínimo, entero en el 45 %: techo del error de restarlo)
+   * (02/10/2026: la cifra 190.800,00 € se rotula ahora «= Rendimiento neto de la actividad»; la
+   * línea «= Rendimiento neto reducido» solo aparece si hay reducción del art. 32.2.3.º, y con
+   * 190.800 € de rentas no la hay.)
    */
   test('tramo del 45 % — 200.000/0/600: IRPF 75.707,00 € y coste 82.907,00 €', async ({ page }) => {
     await deslizar(page, 'ingresos', 200000);
@@ -418,7 +467,9 @@ test.describe('Simulador Módulos vs Estimación Directa — columna de estimaci
     await deslizar(page, 'reta', 600);
 
     expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('192.800,00 €');
-    expect(await linea(page, ED, '= Rendimiento neto reducido')).toBe('190.800,00 €');
+    expect(await linea(page, ED, '= Rendimiento neto de la actividad')).toBe('190.800,00 €');
+    expect(await panel(page, ED)).not.toContain('Reducción por rentas bajas');
+    expect(await panel(page, ED)).not.toContain('= Rendimiento neto reducido');
     expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('190.800,00 €');
     expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('76.761,50 €');
     expect(await lineaQueEmpiezaPor(page, ED, '− Escala sobre el mínimo personal')).toBe('−1054,50 €');
@@ -455,7 +506,7 @@ test.describe('Simulador Módulos vs Estimación Directa — columna de estimaci
    *     IRPF 2.997,00 · coste 6.837,00 €
    *   Diferencia 6.303,48 − 6.837,00 = −533,52 → «… es 533,52 € menor que en módulos».
    * (02/10/2026: antes 30.000/18.000/320 con «10.500»; sus 7.752 y 9.975 € de rentas caen bajo
-   * el art. 32.2.3.º LIRPF, hallazgo abierto ese día. El caso vigila la cuota deducible.)
+   * el art. 32.2.3.º LIRPF (hallazgo 2608, reparado ese mismo día). El caso vigila la cuota deducible.)
    */
   test('HALLAZGO R (REPARADO el 29/09/2026) — la cuota RETA es gasto deducible en ED: 40.000/18.000/320', async ({
     page,
@@ -483,9 +534,11 @@ test.describe('Simulador Módulos vs Estimación Directa — columna de estimaci
    * gastos 37.000 €: ingresos − gastos = 3.000 €.
    *   RETA 250 €/mes → 3.000 − 3.000 = 0: reducción 0,00, base 0, IRPF 0, coste 3.000,00 €.
    *   RETA 300 €/mes → −600, acotado a 0: IRPF 0, coste 3.600,00 €.
-   * Aviso RETA: con el rendimiento de la app (0 y −50 €/mes) y con el del art. 308.1.c LGSS
-   * ((0 + 3.000) × 0,93 / 12 = 232,50 y (−600 + 3.600) × 0,93 / 12 = 232,50 €/mes, tramo 1 de
-   * la tabla reducida, mínima 205,88 €) → en ningún caso hay aviso.
+   * Aviso RETA (art. 308.1.c LGSS): con 250 €, (0 + 3.000) × 0,93 / 12 = 232,50 €/mes; con 300 €,
+   * la pérdida REAL entra en la cuenta, (−600 + 3.600) × 0,93 / 12 = 232,50 €/mes (hasta el
+   * 02/10 la app partía del rendimiento acotado a 0 y daba 279,00; lo corrigió el mismo día la
+   * sesión de reparación). Las dos cifras caen en la tabla reducida, tramo 1, mínima 205,88 € →
+   * en ningún caso hay aviso.
    */
   test('la cuota RETA deja el rendimiento de ED en 0 (250 €) y por debajo (300 €): base 0, IRPF 0, sin aviso RETA', async ({
     page,
@@ -501,13 +554,13 @@ test.describe('Simulador Módulos vs Estimación Directa — columna de estimaci
     expect(await lineaQueEmpiezaPor(page, ED, '− Escala sobre el mínimo personal')).toBe('−0,00 €');
     expect(await linea(page, ED, '= IRPF')).toBe('0,00 €');
     expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('3000,00 €');
-    await expect(avisoReta(page)).toHaveCount(0);
+    await sinAvisoReta(page);
 
     await deslizar(page, 'reta', 300);
     expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('0,00 €');
     expect(await linea(page, ED, '= IRPF')).toBe('0,00 €');
     expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('3600,00 €');
-    await expect(avisoReta(page)).toHaveCount(0);
+    await sinAvisoReta(page);
   });
 
   /**
@@ -529,11 +582,13 @@ test.describe('Simulador Módulos vs Estimación Directa — columna de estimaci
    * deslizador la deja en ceil(205,88) = 206.
    *   ED: 30.000 − 10.000 − 2.472 = 17.528 · 5 % = 876,40 → 16.651,60 · escala 2.365,50 +
    *     4.201,60 × 24 % = 3.373,88 → IRPF 2.319,38 · + 2.472 → 4.791,38 €
-   *   Aviso: con el rendimiento de la app, 17.528 / 12 = 1.460,67 €/mes; con el del art. 308.1.c
-   *     LGSS, (16.651,60 + 2.472) × 0,93 / 12 = 1.482,08 €/mes. Los dos caen en «> 1.300 y
-   *     ≤ 1.500» (tabla general, tramo 2 de la Orden), cuota mínima 302,65 € → déficit
-   *     (302,65 − 206) × 12 = 1.159,80 €. (02/10/2026: se retiran las aserciones del rendimiento
-   *     mensual y del número de tramo, que son hallazgos abiertos ese día.)
+   *   (16.651,60 € de rentas: por encima de 12.000, sin reducción del art. 32.2.3.º.)
+   *   Aviso (art. 308.1.c LGSS): (16.651,60 + 2.472) × 0,93 / 12 = 19.123,60 × 0,93 / 12 =
+   *     17.784,948 / 12 = 1.482,079 → 1.482,08 €/mes, en «> 1.300 y ≤ 1.500» (tabla general,
+   *     tramo 2 de la Orden), cuota mínima 302,65 € → déficit (302,65 − 206) × 12 = 1.159,80 €.
+   *     (Antes del 02/10 la app buscaba con 17.528 / 12 = 1.460,67 €/mes y lo llamaba «tramo 5»:
+   *     mismo tramo por casualidad. Las aserciones del rendimiento y del tramo, retiradas por la
+   *     mañana mientras eran hallazgos abiertos, vuelven tras la reparación.)
    * 350.000 € de ingresos se quedan en 300.000 €, que excluyen de módulos.
    */
   test('rechazo de deslizadores — una cuota de 150 € se queda en 206 € y 350.000 € de ingresos en 300.000 €, que excluyen de módulos', async ({
@@ -550,6 +605,8 @@ test.describe('Simulador Módulos vs Estimación Directa — columna de estimaci
     expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('3373,88 €');
     expect(await linea(page, ED, '= IRPF')).toBe('2319,38 €');
     expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('4791,38 €');
+    await expect(avisoReta(page)).toContainText('1482,08 €/mes');
+    await expect(avisoReta(page)).toContainText('tabla general, tramo 2,');
     await expect(avisoReta(page)).toContainText('302,65 €/mes');
     await expect(avisoReta(page)).toContainText('1159,80 €');
 
@@ -591,11 +648,15 @@ test.describe('Simulador Módulos vs Estimación Directa — fuentes, avisos y m
     const disclaimer = page.locator('[role="alert"][class*="severity-critical"]');
     await expect(disclaimer).toHaveCount(1);
 
+    // 02/10/2026 — la fuente del IRPF suma el art. 32.2.3.º (hallazgo 2608; antes «arts. 19, 20,
+    // 56 a 66, 84.2 y 96») sin cambiar su sello, y el de los límites se re-sella ese día (2610;
+    // antes «02/09/2026»). La Orden HAC/1425/2025 sigue en ese sello, pero solo como norma de la
+    // reducción general del 5 % (su DA 1.ª), no como fuente de los importes.
     const referencias = page.locator('[aria-label="Datos de referencia normativos"]');
     await expect(referencias.first()).toContainText('27/09/2026');
-    await expect(referencias.first()).toContainText('arts. 19, 20, 56 a 66, 84.2 y 96');
-    await expect(referencias.nth(1)).toContainText('02/09/2026');
-    await expect(referencias.nth(1)).toContainText('Orden HAC/1425/2025');
+    await expect(referencias.first()).toContainText('arts. 19, 20, 32.2.3.º, 56 a 66, 84.2 y 96');
+    await expect(referencias.nth(1)).toContainText('02/10/2026');
+    await expect(referencias.nth(1)).toContainText('DA 1.ª de la Orden HAC/1425/2025');
   });
 
   test('[810] la Orden de módulos se cita con su referencia real, y en ningún sitio queda el comodín', async ({
@@ -671,28 +732,30 @@ test.describe('Simulador Módulos vs Estimación Directa — fuentes, avisos y m
   });
 
   test('[812] una cuota RETA imposible con ese rendimiento se avisa, y una posible no', async ({ page }) => {
-    // Estado de partida: rendimiento de la app (45.000 − 3.840)/12 = 3.430,00 €/mes; el del
-    // art. 308.1.c LGSS, (39.160 + 3.840) × 0,93 / 12 = 3.332,50 €/mes. Los dos caen en
-    // «> 3.190 y ≤ 3.620» (tabla general, tramo 9 de la Orden), cuota mínima 478,68 €/mes.
-    // Faltan (478,68 − 320) × 12 = 1.904,16 €/año. (02/10/2026: fuera la aserción «tramo 12»,
-    // que es la numeración del hallazgo abierto ese día.)
-    const aviso = page.locator('[aria-live="polite"]').filter({ hasText: 'tramo' });
+    // Estado de partida (70.000/25.000/320): rendimiento neto 39.160; art. 308.1.c LGSS,
+    // (39.160 + 3.840) × 0,93 / 12 = 39.990 / 12 = 3.332,50 €/mes, en «> 3.190 y ≤ 3.620»
+    // (tabla general, tramo 9 de la Orden), cuota mínima 478,68 €/mes. Faltan
+    // (478,68 − 320) × 12 = 1.904,16 €/año. (Hasta el 02/10 la app buscaba con
+    // (45.000 − 3.840)/12 = 3.430,00 €/mes y lo llamaba «tramo 12»: misma cuota mínima.)
+    const aviso = avisoReta(page);
+    await expect(aviso).toContainText('3332,50 €/mes');
     await expect(aviso).toContainText('478,68');
     await expect(aviso).toContainText('1904,16');
 
-    // Con 479 €/mes: app 3.271,00 €/mes; art. 308, (37.289,40 + 5.748) × 0,93 / 12 = 3.335,40.
-    // Los dos siguen en el mismo tramo, y 479 ≥ 478,68: sin aviso.
+    // Con 479 €/mes: previo 45.000 − 5.748 = 39.252 · −1.962,60 → 37.289,40; art. 308,
+    // (37.289,40 + 5.748) × 0,93 / 12 = 3.335,40 €/mes, mismo tramo, y 479 ≥ 478,68: sin aviso.
     await sembrarValor(page, '#reta', 479);
-    await expect(aviso).toHaveCount(0);
+    await sinAvisoReta(page);
   });
 
   /**
    * Comercio 60.000/30.000/402 (re-inspección del 29/09): ED previo 25.176 · 5 % 1.258,80 →
    * 23.917,20 · escala 4.225,50 + 3.717,20 × 30 % = 5.340,66 · IRPF 4.286,16 · coste 9.110,16 €.
-   * Aviso: app 2.098,00 €/mes; art. 308.1.c LGSS (23.917,20 + 4.824) × 0,93 / 12 = 2.227,44 €/mes.
-   * Los dos en «> 2.030 y ≤ 2.330» (tabla general, tramo 6), mínima 401,47 € → sin aviso.
-   * Con 401 €: faltan (401,47 − 401) × 12 = 5,64 €/año. (02/10/2026: fuera las aserciones del
-   * rendimiento mensual y del número de tramo, hallazgos abiertos ese día.)
+   * Aviso (art. 308.1.c LGSS): (23.917,20 + 4.824) × 0,93 / 12 = 26.729,316 / 12 = 2.227,44 €/mes,
+   * en «> 2.030 y ≤ 2.330» (tabla general, tramo 6), mínima 401,47 € → sin aviso.
+   * Con 401 €: previo 30.000 − 4.812 = 25.188 · −1.259,40 → 23.928,60; (23.928,60 + 4.812) × 0,93
+   * / 12 = 26.728,758 / 12 = 2.227,40 €/mes, mismo tramo → faltan (401,47 − 401) × 12 = 5,64 €/año.
+   * (Hasta el 02/10 la app buscaba con 2.098,00 €/mes y decía «tramo 9»: misma cuota mínima.)
    */
   test('RETA 402 € coherente con su tramo y 401 € no — ED 9110,16 €', async ({ page }) => {
     await deslizar(page, 'ingresos', 60000);
@@ -705,9 +768,11 @@ test.describe('Simulador Módulos vs Estimación Directa — fuentes, avisos y m
     expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('5340,66 €');
     expect(await linea(page, ED, '= IRPF')).toBe('4286,16 €');
     expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('9110,16 €');
-    await expect(avisoReta(page)).toHaveCount(0);
+    await sinAvisoReta(page);
 
     await deslizar(page, 'reta', 401);
+    await expect(avisoReta(page)).toContainText('2227,40 €/mes');
+    await expect(avisoReta(page)).toContainText('tabla general, tramo 6,');
     await expect(avisoReta(page)).toContainText('401,47 €/mes');
     await expect(avisoReta(page)).toContainText('5,64 €');
   });
@@ -715,16 +780,16 @@ test.describe('Simulador Módulos vs Estimación Directa — fuentes, avisos y m
   // RETIRADO el 02/10/2026 — «1.850 €/mes es tramo 7 (360,29 €) y 1.851 €/mes es tramo 8»: fijaba
   // la frontera con el rendimiento de la app (ingresos − gastos − cuota), que no es el del
   // art. 308.1.c LGSS. Con el legal, 30.000/4.500/275 da 1.890,23 €/mes (tramo de 1.850-2.030 €)
-  // y su caso pasa al `test.fail()` del aviso RETA; la frontera de `tramoRETA()` la vigila
+  // y su caso está en «2607 REPARADO»; la frontera de `tramoRETA()` la vigila
   // tests/apps/asistente-alta-autonomo.spec.ts.
 
   /**
    * Re-inspección del 01/10/2026, CASO 1 — ingresos 120.000 €, gastos 50.000 €, RETA 500 €/mes.
    *   ED: 120.000 − 50.000 − 6.000 = 64.000 · −2.000 → 62.000 · escala 17.901,50 + 2.000 × 45 %
    *     = 18.801,50 · IRPF 17.747,00 · coste 23.747,00 €
-   *   Aviso RETA: app 5.333,33 €/mes; art. 308.1.c LGSS (62.000 + 6.000) × 0,93 / 12 = 5.270,00.
-   *     Los dos en «> 4.050 y ≤ 6.000» (tabla general, tramo 11), mínima 545,59 € → 547,08 €/año.
-   *     (02/10/2026: fuera las aserciones del rendimiento mensual y del número de tramo.)
+   *   Aviso RETA (art. 308.1.c LGSS): (62.000 + 6.000) × 0,93 / 12 = 63.240 / 12 = 5.270,00 €/mes,
+   *     en «> 4.050 y ≤ 6.000» (tabla general, tramo 11), mínima 545,59 € → (545,59 − 500) × 12 =
+   *     547,08 €/año. (Hasta el 02/10 la app buscaba con 5.333,33 €/mes y decía «tramo 14».)
    */
   test('120.000/50.000/500: ED 23.747,00 € y aviso RETA de 545,59 €', async ({ page }) => {
     await deslizar(page, 'ingresos', 120000);
@@ -739,6 +804,8 @@ test.describe('Simulador Módulos vs Estimación Directa — fuentes, avisos y m
     expect(await linea(page, ED, '= IRPF')).toBe('17.747,00 €');
     expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('23.747,00 €');
 
+    await expect(avisoReta(page)).toContainText('5270,00 €/mes');
+    await expect(avisoReta(page)).toContainText('tabla general, tramo 11,');
     await expect(avisoReta(page)).toContainText('545,59 €/mes');
     await expect(avisoReta(page)).toContainText('547,08 €');
   });
@@ -862,9 +929,10 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección del 
    *     IRPF 2.626,5912 − 1.054,50 = 1.572,0912 → 1.572,09 · coste 5.772,0912 → 5.772,09 €
    *   Diferencia 9.519,00 − 5.772,0912 = 3.746,9088 → «3746,91 € mayor que en módulos».
    *   Rentas de 27.360 y 13.537,88 €: por encima de 12.000, el art. 32.2.3.º no juega.
-   *   Aviso RETA: app (33.000 − 4.200)/12 = 2.400,00 €/mes; art. 308.1.c LGSS
-   *     (27.360 + 4.200) × 0,93 / 12 = 2.445,90 €/mes. Los dos en «> 2.330 y ≤ 2.760» (tabla
-   *     general, tramo 7), mínima 427,21 € → faltan (427,21 − 350) × 12 = 926,52 €/año.
+   *   Aviso RETA (art. 308.1.c LGSS): (27.360 + 4.200) × 0,93 / 12 = 29.350,80 / 12 = 2.445,90 €/mes,
+   *     en «> 2.330 y ≤ 2.760» (tabla general, tramo 7), mínima 427,21 € → faltan
+   *     (427,21 − 350) × 12 = 926,52 €/año. (Hasta el 02/10 la app buscaba con 2.400,00 €/mes y
+   *     decía «tramo 10»: misma cuota mínima.)
    */
   test('NORMAL — 48.000/15.000/350 con «14.250,40»: directa 9519,00 €, módulos 5772,09 €, diferencia 3746,91 €', async ({
     page,
@@ -890,6 +958,8 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección del 
 
     await expect(estado(page)).toContainText('3746,91 €');
     await expect(estado(page)).toContainText('mayor que en módulos');
+    await expect(avisoReta(page)).toContainText('2445,90 €/mes');
+    await expect(avisoReta(page)).toContainText('tabla general, tramo 7,');
     await expect(avisoReta(page)).toContainText('427,21 €/mes');
     await expect(avisoReta(page)).toContainText('926,52 €');
   });
@@ -901,7 +971,8 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección del 
    *     escala = 17.901,50 + 218.728 × 45 % = 17.901,50 + 98.427,60 = 116.329,10
    *     IRPF 115.274,60 · coste 115.274,60 + 19.272 = 134.546,60 €
    *   Módulos: 300.000 > 250.000 → excluido aunque haya dato; sin cifras.
-   *   Aviso: 280.728 / 12 = 23.394 €/mes → último tramo, mínima 607,35 ≤ 1.606 → sin aviso.
+   *   Aviso (art. 308.1.c LGSS): (278.728 + 19.272) × 0,93 / 12 = 23.095,00 €/mes → tabla general,
+   *     tramo 12, mínima 607,35 ≤ 1.606 → sin aviso. (Hasta el 02/10: 280.728 / 12 = 23.394.)
    */
   test('LÍMITE — 300.000/0/1606: directa 134.546,60 € y módulos excluido aunque haya dato', async ({ page }) => {
     await deslizar(page, 'ingresos', 300000);
@@ -919,7 +990,7 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección del 
     expect(mod).not.toContain('Coste fiscal anual total');
     expect(mod).not.toContain('10.000,00 €');
     await expect(estado(page)).toContainText('no hay comparación de importes');
-    await expect(avisoReta(page)).toHaveCount(0);
+    await sinAvisoReta(page);
   });
 
   /**
@@ -949,7 +1020,7 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección del 
     expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('105.459,80 €');
     await expect(estado(page)).toContainText('64.283,20 €');
     await expect(estado(page)).toContainText('menor que en módulos');
-    await expect(avisoReta(page)).toHaveCount(0);
+    await sinAvisoReta(page);
   });
 
   /**
@@ -964,165 +1035,300 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección del 
   });
 
   /**
-   * ABIERTO (02/10/2026) — el rendimiento con el que el aviso busca el tramo del RETA no es el
-   * del art. 308.1.c LGSS (BOE-A-2015-11724): en directa es «el rendimiento neto, incrementado
-   * en el importe de las cuotas» (regla 1.ª) con «una deducción por gastos genéricos del 7 por
-   * ciento» (regla 2.ª). La app usa ingresos − gastos − cuota, sin el 7 %.
-   *   (1) 100.000/21.000/560 — legal: previo 79.000 − 6.720 = 72.280 · −2.000 → 70.280 + 6.720 =
-   *       77.000 × 0,93 = 71.610 → 5.967,50 €/mes → «> 4.050 y ≤ 6.000», mínima 545,59 € ≤ 560:
-   *       SIN aviso. La app: 72.280 / 12 = 6.023,33 → último tramo, 607,35 → avisa de 568,20 €.
-   *   (2) 30.000/4.500/370 — legal: 21.060 − 1.053 = 20.007 + 4.440 = 24.447 × 0,93 = 22.735,71
-   *       → 1.894,64 €/mes → «> 1.850 y ≤ 2.030», mínima 380,88 € > 370: aviso de
-   *       (380,88 − 370) × 12 = 130,56 €. La app: 21.060 / 12 = 1.755 → mínima 360,29: no avisa.
-   *   (3) misma entrada con 275 €/mes — legal: 22.200 − 1.110 = 21.090 + 3.300 = 24.390 × 0,93 =
-   *       22.682,70 → 1.890,23 €/mes → mínima 380,88 → déficit (380,88 − 275) × 12 = 1.270,56 €.
-   *       La app: 1.850,00 €/mes → mínima 360,29 → 1.023,48 €.
+   * Hallazgo 2607 — REPARADO (02/10/2026). El rendimiento con el que el aviso busca el tramo del
+   * RETA es ya el del art. 308.1.c LGSS (BOE-A-2015-11724): en directa, «el rendimiento neto,
+   * incrementado en el importe de las cuotas» (regla 1.ª), con «una deducción por gastos
+   * genéricos del 7 por ciento» (regla 2.ª). Hasta ese día la app usaba ingresos − gastos − cuota,
+   * sin el 7 %. Los tres casos van en los dos sentidos: un aviso falso que desaparece y uno real
+   * que aparece (el «2607 al revés» de la ficha es el (2)).
+   *   (1) 100.000/21.000/560 — previo 79.000 − 6.720 = 72.280 · −2.000 → 70.280 · (70.280 +
+   *       6.720) × 0,93 = 71.610 → 5.967,50 €/mes → tabla general, tramo 11, mínima 545,59 € ≤ 560:
+   *       SIN aviso. (La app, hasta el 02/10: 72.280 / 12 = 6.023,33 → «tramo 15», 607,35 → avisaba
+   *       de 568,20 €.)
+   *   (2) 30.000/4.500/370 — previo 25.500 − 4.440 = 21.060 · −1.053 → 20.007 · (20.007 + 4.440) ×
+   *       0,93 = 22.735,71 → 1.894,6425 → 1.894,64 €/mes → tabla general, tramo 5 («> 1.850 y
+   *       ≤ 2.030»), mínima 380,88 € > 370: aviso de (380,88 − 370) × 12 = 130,56 €. (La app, hasta
+   *       el 02/10: 21.060 / 12 = 1.755 → mínima 360,29: callaba.)
+   *   (3) misma entrada con 275 €/mes — previo 22.200 · −1.110 → 21.090 · (21.090 + 3.300) × 0,93 =
+   *       22.682,70 → 1.890,225 €/mes, MEDIO CÉNTIMO exacto: redondeado como manda la aritmética
+   *       sería 1.890,23 (lo que dice la ficha), y la pantalla da 1890,22 porque 22.682,70 / 12 en
+   *       coma flotante es 1.890,22499…; no se fija ese céntimo (el tramo no cambia por él, y se
+   *       reporta aparte como detalle de presentación) → mismo tramo, mínima 380,88 → déficit
+   *       (380,88 − 275) × 12 = 1.270,56 €. (La app, hasta el 02/10: 1.850,00 €/mes → 360,29 →
+   *       1.023,48 €.)
    */
-  test('ABIERTO (02/10/2026) — el aviso RETA usa el rendimiento del art. 308.1.c LGSS (cuotas sumadas y 7 % genérico)', async ({
+  test('2607 REPARADO (02/10/2026) — el aviso RETA usa el rendimiento del art. 308.1.c LGSS (cuotas sumadas y 7 % genérico)', async ({
     page,
   }) => {
-    test.fail();
     await deslizar(page, 'ingresos', 100000);
     await deslizar(page, 'gastos', 21000);
     await deslizar(page, 'reta', 560);
-    await expect(avisoReta(page)).toHaveCount(0);
+    await sinAvisoReta(page);
 
     await deslizar(page, 'ingresos', 30000);
     await deslizar(page, 'gastos', 4500);
     await deslizar(page, 'reta', 370);
+    await expect(avisoReta(page)).toContainText('1894,64 €/mes');
+    await expect(avisoReta(page)).toContainText('tabla general, tramo 5,');
     await expect(avisoReta(page)).toContainText('380,88 €/mes');
     await expect(avisoReta(page)).toContainText('130,56 €');
 
     await deslizar(page, 'reta', 275);
+    await expect(avisoReta(page)).toContainText(/1890,2[23]\s€\/mes/);
     await expect(avisoReta(page)).toContainText('380,88 €/mes');
     await expect(avisoReta(page)).toContainText('1270,56 €');
   });
 
   /**
-   * ABIERTO (02/10/2026) — el aviso numera los tramos del 1 al 15 seguidos (el `id` de
-   * TRAMOS_RETA_2025), pero la Orden PJC/297/2026 (art. 18, BOE-A-2026-7296) numera por tabla:
-   * reducida 1-3 y general 1-12. En el estado de partida el rendimiento cae en «> 3.190 y
-   * ≤ 3.620», que la Orden llama «Tabla general · Tramo 9»; su «Tramo 12» es «> 6.000 €», base
-   * mínima 1.928,10 €. La app dice «tramo 12» (y con 100.000/21.000/560, «tramo 15», que la Orden
-   * no tiene).
+   * Hallazgo 2611 — REPARADO (02/10/2026). El aviso nombra el tramo como la Orden PJC/297/2026
+   * (art. 18, BOE-A-2026-7296), por tabla: reducida 1-3 y general 1-12. Hasta ese día usaba el
+   * `id` correlativo de TRAMOS_RETA_2025 (1-15). En el estado de partida el rendimiento computable,
+   * 3.332,50 €/mes, cae en «> 3.190 y ≤ 3.620», que la Orden llama «Tabla general · Tramo 9»; su
+   * «Tramo 12» es «> 6.000 €», base mínima 1.928,10 €, y la app decía «tramo 12». La tabla
+   * reducida la ejercita el caso del art. 32.2.3.º intermedio, más abajo («tabla reducida,
+   * tramo 3»).
    */
-  test('ABIERTO (02/10/2026) — el aviso RETA nombra el tramo como la Orden PJC/297/2026 (tabla general, tramo 9)', async ({
+  test('2611 REPARADO (02/10/2026) — el aviso RETA nombra el tramo como la Orden PJC/297/2026 (tabla general, tramo 9)', async ({
     page,
   }) => {
-    test.fail();
     await expect(avisoReta(page)).toContainText('478,68 €/mes');
     const texto = (await avisoReta(page).innerText()).replace(/\s+/g, ' ');
     expect(texto).not.toMatch(/tramo 12\b/);
-    expect(texto).toMatch(/tramo 9\b/);
+    expect(texto).toContain('tabla general, tramo 9,');
   });
 
   /**
-   * ABIERTO (02/10/2026) — el IRPF de las dos columnas no aplica la reducción del art. 32.2.3.º
-   * LIRPF: con rentas no exentas ≤ 8.000 € (la actividad como única renta, que es lo que la app
-   * modela) el rendimiento neto se reduce en 1.620 €. Vale en directa y en módulos (el 2.º exige
-   * estimación directa y cliente único; quien no lo cumple va al 3.º).
+   * Hallazgo 2608 — REPARADO (02/10/2026). El IRPF de las dos columnas aplica la reducción del
+   * art. 32.2.3.º LIRPF: con rentas no exentas ≤ 8.000 € (la actividad como única renta, que es lo
+   * que la app modela) el rendimiento neto se reduce en 1.620 €. Vale en directa y en módulos.
    * Ingresos 20.000, gastos 10.000, RETA 230 €/mes, módulos «6.000».
-   *   Directa: 10.000 − 2.760 = 7.240 · 5 % = 362 → 6.878 · − 1.620 → 5.258 < 5.550 de mínimo
-   *     → IRPF 0,00 · coste 2.760,00 €. (La app: escala(6.878) = 1.306,82 → IRPF 252,32 €.)
-   *   Módulos: 6.000 − 300 = 5.700 · − 1.620 → 4.080 → IRPF 0,00 · coste 2.760,00 €.
-   *     (La app: escala(5.700) = 1.083,00 → IRPF 28,50 €.)
-   *   Diferencia 0 → «el coste anual es el mismo en los dos regímenes». (La app: «223,82 € mayor».)
+   *   Directa: 10.000 − 2.760 = 7.240 · 5 % = 362 → 6.878 (≤ 8.000) · − 1.620 → 5.258 = base
+   *     escala(5.258) = 5.258 × 19 % = 999,02 · mínimo: escala(min(5.550; 5.258)) = 999,02
+   *     → IRPF 0,00 · coste 2.760,00 €. (La app, hasta el 02/10: escala(6.878) = 1.306,82 →
+   *     IRPF 252,32 €.)
+   *   Módulos: 6.000 − 300 = 5.700 (≤ 8.000) · − 1.620 → 4.080 → IRPF 0,00 · coste 2.760,00 €.
+   *     (La app, hasta el 02/10: escala(5.700) = 1.083,00 → IRPF 28,50 €.)
+   *   Diferencia 0 → «el coste anual es el mismo en los dos regímenes». (Antes: «223,82 € mayor».)
+   *   Aviso RETA: (6.878 + 2.760) × 0,93 / 12 = 746,945 €/mes → tabla reducida, tramo 2, mínima
+   *     226,47 € ≤ 230 → sin aviso.
    */
-  test('ABIERTO (02/10/2026) — rentas < 12.000 €: la reducción del art. 32.2.3.º LIRPF deja el IRPF en 0 en los dos regímenes', async ({
+  test('2608 REPARADO (02/10/2026) — rentas ≤ 8.000 €: la reducción del art. 32.2.3.º LIRPF (1.620 €) deja el IRPF en 0 en los dos regímenes', async ({
     page,
   }) => {
-    test.fail();
     await deslizar(page, 'ingresos', 20000);
     await deslizar(page, 'gastos', 10000);
     await deslizar(page, 'reta', 230);
     await escribirModulos(page, '6.000');
 
+    const RENTAS_BAJAS = '− Reducción por rentas bajas (art. 32.2.3.º LIRPF)';
+    expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('7240,00 €');
+    expect(await linea(page, ED, '= Rendimiento neto de la actividad')).toBe('6878,00 €');
+    expect(await linea(page, ED, RENTAS_BAJAS)).toBe('−1620,00 €');
+    expect(await linea(page, ED, '= Rendimiento neto reducido')).toBe('5258,00 €');
+    expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('5258,00 €');
+    expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('999,02 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Escala sobre el mínimo personal')).toBe('−999,02 €');
     expect(await linea(page, ED, '= IRPF')).toBe('0,00 €');
     expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('2760,00 €');
+
+    expect(await linea(page, MOD, '= Rendimiento neto de la actividad')).toBe('5700,00 €');
+    expect(await linea(page, MOD, RENTAS_BAJAS)).toBe('−1620,00 €');
+    expect(await linea(page, MOD, '= Rendimiento neto reducido')).toBe('4080,00 €');
+    expect(await linea(page, MOD, '= Base liquidable (el mínimo va dentro)')).toBe('4080,00 €');
     expect(await linea(page, MOD, '= IRPF')).toBe('0,00 €');
     expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('2760,00 €');
     await expect(estado(page)).toContainText('el coste anual es el mismo');
+    await sinAvisoReta(page);
   });
 
   /**
-   * ABIERTO (02/10/2026) — el bloque educativo dice que en directa el IVA va SIEMPRE por el régimen
-   * general («En directa estás en el régimen general de IVA (declaras IVA repercutido − IVA
-   * soportado)»; fila «IVA» de la tabla: «Régimen general»), y que IRPF e IVA «van atados».
-   * Para el comercio minorista no es así: el recargo de equivalencia se aplica a los comerciantes
-   * minoristas personas físicas sin condición de método de IRPF (art. 148.Uno LIVA); el método
-   * solo exime del requisito del 80 % de ventas a consumidores a quien está en módulos
-   * (art. 149.Uno.2.º b). Un minorista que renuncia a módulos sigue en recargo de equivalencia
-   * (si vende más del 80 % a consumidores) y no liquida IVA (art. 154.Dos).
+   * Art. 32.2.3.º en su tramo INTERMEDIO (rentas entre 8.000 y 12.000 €: 1.620 − 0,405 × exceso),
+   * que el caso del 2608 no ejercita, y aviso RETA en la tabla REDUCIDA (hallazgo 2611).
+   * Ingresos 20.000, gastos 7.000 (el deslizador va de 500 en 500), RETA 262 €/mes, módulos
+   * «10.400». Entradas elegidas para que ninguna cifra caiga en medio céntimo. Resuelto a mano el
+   * 02/10/2026:
+   *   Directa: 20.000 − 7.000 − 3.144 = 9.856 · 5 % = 492,80 → 9.363,20
+   *     reducción 1.620 − 0,405 × (9.363,20 − 8.000) = 1.620 − 552,096 = 1.067,904 → 1.067,90
+   *     reducido 9.363,20 − 1.067,904 = 8.295,296 → 8.295,30 = base
+   *     escala(8.295,296) = 8.295,296 × 19 % = 1.576,10624 → 1.576,11
+   *     IRPF 1.576,10624 − 1.054,50 = 521,60624 → 521,61 · coste 521,60624 + 3.144 = 3.665,61 €
+   *   Módulos: 10.400 − 520 = 9.880
+   *     reducción 1.620 − 0,405 × 1.880 = 1.620 − 761,40 = 858,60 → 9.021,40 = base
+   *     escala = 9.021,40 × 19 % = 1.714,066 → 1.714,07 · IRPF 659,566 → 659,57
+   *     coste 659,566 + 3.144 = 3.803,566 → 3.803,57 €
+   *   Diferencia 3.665,60624 − 3.803,566 = −137,95976 → «137,96 € menor que en módulos».
+   *   (Sin la reducción, como hasta el 02/10: directa base 9.363,20 → IRPF 724,51; módulos base
+   *   9.880 → IRPF 822,70.)
+   *   Aviso RETA: (9.363,20 + 3.144) × 0,93 / 12 = 11.631,696 / 12 = 969,308 → 969,31 €/mes →
+   *     «> 900 y < 1.166,70», tabla reducida, tramo 3, mínima 849,67 × 31,5 % = 267,65 € > 262 →
+   *     faltan (267,65 − 262) × 12 = 67,80 €/año.
    */
-  test('ABIERTO (02/10/2026) — el bloque educativo no manda al minorista en directa al régimen general del IVA', async ({
+  test('art. 32.2.3.º intermedio — 20.000/7.000/262 con «10.400»: reducciones 1067,90 € y 858,60 €, aviso en la tabla reducida', async ({
     page,
   }) => {
-    test.fail();
+    await deslizar(page, 'ingresos', 20000);
+    await deslizar(page, 'gastos', 7000);
+    await deslizar(page, 'reta', 262);
+    await escribirModulos(page, '10.400');
+
+    const RENTAS_BAJAS = '− Reducción por rentas bajas (art. 32.2.3.º LIRPF)';
+    expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('9856,00 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Reducción 5')).toBe('−492,80 €');
+    expect(await linea(page, ED, '= Rendimiento neto de la actividad')).toBe('9363,20 €');
+    expect(await linea(page, ED, RENTAS_BAJAS)).toBe('−1067,90 €');
+    expect(await linea(page, ED, '= Rendimiento neto reducido')).toBe('8295,30 €');
+    expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('8295,30 €');
+    expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('1576,11 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('521,61 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('3665,61 €');
+
+    expect(await lineaQueEmpiezaPor(page, MOD, '− Reducción general')).toBe('−520,00 €');
+    expect(await linea(page, MOD, '= Rendimiento neto de la actividad')).toBe('9880,00 €');
+    expect(await linea(page, MOD, RENTAS_BAJAS)).toBe('−858,60 €');
+    expect(await linea(page, MOD, '= Rendimiento neto reducido')).toBe('9021,40 €');
+    expect(await linea(page, MOD, 'Escala general sobre la base completa')).toBe('1714,07 €');
+    expect(await linea(page, MOD, '= IRPF')).toBe('659,57 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('3803,57 €');
+
+    await expect(estado(page)).toContainText('137,96 €');
+    await expect(estado(page)).toContainText('menor que en módulos');
+    await expect(avisoReta(page)).toContainText('969,31 €/mes');
+    await expect(avisoReta(page)).toContainText('tabla reducida, tramo 3,');
+    await expect(avisoReta(page)).toContainText('267,65 €/mes');
+    await expect(avisoReta(page)).toContainText('67,80 €');
+  });
+
+  /**
+   * Hallazgo 2609 — REPARADO (02/10/2026). El bloque educativo ya no manda al minorista en directa
+   * al régimen general del IVA: el recargo de equivalencia se aplica a los comerciantes minoristas
+   * personas físicas sin condición de método de IRPF (art. 148.Uno LIVA); el método solo exime del
+   * requisito del 80 % de ventas a consumidores a quien está en módulos (art. 149.Uno.2.º b). Un
+   * minorista que renuncia a módulos sigue en recargo (si vende más del 80 % a consumidores) y no
+   * liquida IVA (art. 154.Dos). Se vigilan los tres sitios de la ficha: la fila «IVA» de la tabla,
+   * la FAQ y «errores frecuentes» («van atados, no son independientes»).
+   */
+  test('2609 REPARADO (02/10/2026) — el bloque educativo no manda al minorista en directa al régimen general del IVA', async ({
+    page,
+  }) => {
     const fila = page.locator('table tr', { has: page.locator('td', { hasText: /^IVA$/ }) });
     const celdaDirecta = ((await fila.locator('td').nth(1).textContent()) ?? '').replace(/\s+/g, ' ');
     const faq = ((await page.locator('strong', { hasText: '¿Tributo el IVA igual en ambos regímenes?' }).locator('xpath=..').textContent()) ?? '').replace(/\s+/g, ' ');
+    const cuerpo = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
     expect(celdaDirecta).toContain('recargo de equivalencia');
     expect(faq).not.toContain('En directa estás en el régimen general de IVA');
+    expect(faq).toContain('recargo de equivalencia');
+    expect(cuerpo).not.toContain('van atados, no son independientes');
   });
 
   /**
-   * ABIERTO (02/10/2026) — el sello de los límites atribuye su importe a la Orden de módulos
-   * («límites prorrogados por Orden HAC/1425/2025»). La Orden no fija importes: su art. 3.1 a) y
-   * c) remite a «el previsto, para el período impositivo 2026, en el artículo 31.1.3.ª» LIRPF
-   * (BOE-A-2025-25272). Los 250.000/125.000 € salen de la DT 32.ª LIRPF, que en el texto
-   * consolidado (a 30/09/2026) los fija para 2016-2024: las prórrogas de 2025-2026 (RDL 9/2024,
-   * 16/2025 y 2/2026) fueron derogadas por el Congreso. La sede de la AEAT sí dice «desde 2016
-   * hasta 2026 inclusive». El sello debe citar la base real del importe, no la Orden.
+   * Hallazgo 2610 — REPARADO (02/10/2026). El sello de los límites ya no atribuye su importe a la
+   * Orden de módulos («límites prorrogados por Orden HAC/1425/2025»): la Orden no fija importes,
+   * su art. 3.1 a) y c) remite al art. 31.1.3.ª LIRPF (BOE-A-2025-25272). Cita la base real —el
+   * art. 31.1.3.ª y la DT 32.ª LIRPF— y la salvedad: la DT 32.ª consolidada (a 30/09/2026) solo
+   * cubre 2016-2024 y la AEAT los aplica «desde 2016 hasta 2026 inclusive».
    */
-  test('ABIERTO (02/10/2026) — el sello de los límites no atribuye los importes a la Orden HAC/1425/2025', async ({ page }) => {
-    test.fail();
+  test('2610 REPARADO (02/10/2026) — el sello de los límites no atribuye los importes a la Orden HAC/1425/2025', async ({ page }) => {
     const referencias = page.locator('[aria-label="Datos de referencia normativos"]');
     await expect(referencias.nth(1)).toContainText('Límites de exclusión de módulos');
     await expect(referencias.nth(1)).not.toContainText('prorrogados por Orden HAC/1425/2025', { timeout: 1000 });
+    await expect(referencias.nth(1)).toContainText('art. 31.1.3.ª');
+    await expect(referencias.nth(1)).toContainText('DT 32.ª');
+    await expect(referencias.nth(1)).toContainText('La AEAT los aplica para 2026');
   });
 
   /**
-   * ABIERTO (02/10/2026) — la FAQ «¿Qué pasa si supero los límites de módulos?» dice que quedas
-   * excluido «y pasas a Estimación Directa al año siguiente». La exclusión, como la renuncia,
-   * obliga a la directa «durante los tres años siguientes» (art. 31.1.5.ª LIRPF), y la página solo
-   * lo dice de la renuncia.
+   * Hallazgo 2612 — REPARADO (02/10/2026). La FAQ «¿Qué pasa si supero los límites de módulos?»
+   * dice ya que la exclusión, como la renuncia, obliga a la directa «durante los tres años
+   * siguientes» (art. 31.1.5.ª LIRPF); hasta ese día decía «al año siguiente». La ficha señalaba
+   * también el FAQPage, que solo daba los tres años a la renuncia: se vigila igual.
    */
-  test('ABIERTO (02/10/2026) — la FAQ de la exclusión dice que obliga a tres años en directa', async ({ page }) => {
-    test.fail();
+  test('2612 REPARADO (02/10/2026) — la FAQ y el FAQPage dicen que la exclusión obliga a tres años en directa', async ({ page }) => {
     const faq = (
       (await page.locator('strong', { hasText: '¿Qué pasa si supero los límites de módulos?' }).locator('xpath=..').textContent()) ?? ''
     ).replace(/\s+/g, ' ');
     expect(faq).toContain('excluido');
     expect(faq).toMatch(/tres años|3 años/);
+
+    const faqJson = await page.evaluate(
+      () =>
+        [...document.querySelectorAll('script[type="application/ld+json"]')]
+          .map((s) => s.textContent ?? '')
+          .find((t) => t.includes('"FAQPage"')) ?? ''
+    );
+    expect(faqJson).toMatch(/exclusión obliga[^"]*tres años/);
   });
 
   /**
-   * ABIERTO (02/10/2026) — el rótulo de la cuota RETA dice «introduce tu cuota exacta si ya la
-   * conoces», pero el control es un deslizador de paso 1 €: 302,65 € (la mínima de «> 1.300 y
-   * ≤ 1.500») se queda en 303. Con 302 la app avisa de que faltan 7,80 € a quien paga justo la
-   * mínima. O el control admite céntimos, o el rótulo no promete la cuota exacta.
+   * Hallazgo 2613 — REPARADO (02/10/2026), de OTRA FORMA que la que suponía el caso. El rótulo
+   * prometía «tu cuota exacta» y el deslizador va de euro en euro: 302,65 € (la mínima de
+   * «> 1.300 y ≤ 1.500») se quedaba en 303, y con 302 la app avisaba de que faltaban 7,80 €. El
+   * test de la mañana esperaba que el PROPIO deslizador aceptara 302,65; la reparación lo deja de
+   * paso 1 € y añade una casilla de texto `#retaExacta` con céntimos, que es lo que el rótulo
+   * promete ahora. Se prueba la intención —poder introducir la cuota exacta y que la app la use—
+   * con el caso de la ficha (ingresos 25.000, gastos 5.000):
+   *   «302,65» → cuota × 12 = 3.631,80 · previo 20.000 − 3.631,80 = 16.368,20 · 5 % = 818,41 →
+   *     15.549,79 = base (> 12.000, sin art. 32.2.3.º) · escala 2.365,50 + 3.099,79 × 24 % =
+   *     2.365,50 + 743,9496 = 3.109,4496 → 3.109,45 · IRPF 2.054,9496 → 2.054,95 · coste
+   *     2.054,9496 + 3.631,80 = 5.686,7496 → 5.686,75 €
+   *     Aviso: (15.549,79 + 3.631,80) × 0,93 / 12 = 1.486,57 €/mes → tabla general, tramo 2,
+   *     mínima 302,65 € = la cuota → SIN aviso.
+   *   Deslizador a 302 → previo 16.376 · −818,80 → 15.557,20 · (15.557,20 + 3.624) × 0,93 / 12 =
+   *     1.486,543 → 1.486,54 €/mes, mismo tramo → faltan (302,65 − 302) × 12 = 7,80 €.
+   *   «150» (fuera de la tabla, mínima 205,88 €) → la casilla queda inválida y la cuota se mantiene
+   *     en 302 € (cuota × 12 = 3.624,00 €).
    */
-  test('ABIERTO (02/10/2026) — si el rótulo promete la cuota exacta, el control admite 302,65 €', async ({ page }) => {
-    test.fail();
-    const rotulo = await page.locator('label[for="reta"]').locator('xpath=..').innerText();
-    const aceptado = await deslizar(page, 'reta', '302.65');
-    expect(!/exacta/.test(rotulo) || aceptado === '302.65', `rótulo «exacta» y el control dejó ${aceptado}`).toBe(true);
+  test('2613 REPARADO (02/10/2026) — la casilla de la cuota exacta admite 302,65 € y la app la usa', async ({ page }) => {
+    const rotulo = await page.locator(`label[for="${CAMPO_RETA_EXACTA.slice(1)}"]`).innerText();
+    expect(rotulo).toContain('exacta');
+    expect(rotulo).toContain('céntimos');
+
+    await deslizar(page, 'ingresos', 25000);
+    await deslizar(page, 'gastos', 5000);
+    await escribirRetaExacta(page, '302,65');
+    await expect(page.locator(CAMPO_RETA_EXACTA)).toHaveAttribute('aria-invalid', 'false');
+    expect(await linea(page, ED, '− Cuota RETA × 12 (gasto deducible del titular)')).toBe('−3631,80 €');
+    expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('16.368,20 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Reducción 5')).toBe('−818,41 €');
+    expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('15.549,79 €');
+    expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('3109,45 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('2054,95 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('5686,75 €');
+    await sinAvisoReta(page);
+
+    await deslizar(page, 'reta', 302);
+    await expect(page.locator(CAMPO_RETA_EXACTA)).toHaveValue('302,00');
+    await expect(avisoReta(page)).toContainText('1486,54 €/mes');
+    await expect(avisoReta(page)).toContainText('tabla general, tramo 2,');
+    await expect(avisoReta(page)).toContainText('302,65 €/mes');
+    await expect(avisoReta(page)).toContainText('7,80 €');
+
+    await escribirRetaExacta(page, '150');
+    await expect(page.locator(CAMPO_RETA_EXACTA)).toHaveAttribute('aria-invalid', 'true');
+    expect(await linea(page, ED, '− Cuota RETA × 12 (gasto deducible del titular)')).toBe('−3624,00 €');
   });
 
   /**
-   * ABIERTO (02/10/2026) — el aviso de la cuota RETA (`<p aria-live="polite">`) se monta YA con su
-   * texto cuando la cuota deja de cuadrar: antes no hay ninguna región viva en ese grupo, así que
-   * el lector de pantalla no tiene una región que vigilar cuando aparece (WCAG 4.1.3). Estado de
-   * partida con 500 €/mes (3.250 €/mes con la app, 3.336,38 con el art. 308: mínima 478,68 → sin
-   * aviso): el grupo del deslizador no tiene región viva.
+   * Hallazgo 2614 — REPARADO (02/10/2026). La región viva del aviso de la cuota RETA existe desde
+   * la carga dentro del grupo del deslizador, vacía mientras la cuota cuadra, y es ESA MISMA la
+   * que recibe el texto al dejar de cuadrar (WCAG 4.1.3). Hasta ese día el `<p aria-live>` se
+   * montaba ya con su texto.
+   *   Con 500 €/mes: previo 45.000 − 6.000 = 39.000 · 5 % = 1.950 → 37.050 · (37.050 + 6.000) ×
+   *     0,93 / 12 = 3.336,375 → 3.336,38 €/mes → tabla general, tramo 9, mínima 478,68 ≤ 500 →
+   *     región vacía.
+   *   Con 320 €/mes (estado de partida): 3.332,50 €/mes, mismo tramo → aviso de 478,68 €.
    */
-  test('ABIERTO (02/10/2026) — el grupo de la cuota RETA tiene una región viva antes de que aparezca el aviso', async ({
+  test('2614 REPARADO (02/10/2026) — el grupo de la cuota RETA tiene una región viva antes de que aparezca el aviso, y es la que lo recibe', async ({
     page,
   }) => {
-    test.fail();
     await deslizar(page, 'reta', 500);
-    await expect(avisoReta(page)).toHaveCount(0);
+    await sinAvisoReta(page);
     const grupo = page.locator('label[for="reta"]').locator('xpath=..');
     expect(await grupo.locator('[aria-live], [role="status"], [role="alert"]').count()).toBeGreaterThan(0);
+
+    const region = await avisoReta(page).elementHandle();
+    await deslizar(page, 'reta', 320);
+    await expect(avisoReta(page)).toContainText('478,68 €/mes');
+    const misma = await region.evaluate((el) => el.isConnected && (el.textContent ?? '').includes('478,68'));
+    expect(misma, 'el aviso llegó a otro nodo, no a la región viva que ya existía').toBe(true);
   });
 });

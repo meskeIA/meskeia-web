@@ -822,3 +822,21 @@
     font-size: 0.95rem;
   }
 }
+
+/* Casilla de la cuota RETA exacta, con céntimos (hallazgo 2613) */
+.campoReta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.campoRetaLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.campoReta .campoTexto {
+  max-width: 10rem;
+}

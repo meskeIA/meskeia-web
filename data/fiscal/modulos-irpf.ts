@@ -5,10 +5,11 @@
  * Datos verificados a la fecha indicada. Pueden haber cambiado.
  * Verifica siempre en la fuente oficial antes de tomar decisiones.
  *
- * Fuente: art. 31 Ley 35/2006 IRPF + art. 32 Reglamento IRPF (RD 439/2007),
- * límites cuantitativos prorrogados desde 2016 por sucesivas Órdenes HFP/HAC
- * anuales (última: Orden HAC/1425/2025, que mantiene los mismos importes para 2026).
- * Verificado: 2026-09-02
+ * Fuente de los LÍMITES: art. 31.1.3.ª Ley 35/2006 IRPF (150.000 / 75.000 / 150.000 €),
+ * elevados a 250.000 / 125.000 / 250.000 € por la DT 32.ª LIRPF, y su aplicación a
+ * 2025-2026 según la sede de la AEAT. NO salen de la Orden de módulos: la Orden
+ * HAC/1425/2025, art. 3.1 a) y c), remite al art. 31.1.3.ª sin cifras.
+ * Verificado: 2026-10-02 (ver FISCAL_MODULOS_IRPF_META)
  * URL oficial: https://sede.agenciatributaria.gob.es/Sede/empresarios-individuales-profesionales/contribuyentes-modulos/quien-se-aplica/irpf.html
  *
  * ⚠️ Estos tres límites son ADEMÁS de que la actividad esté en el listado de la
@@ -16,12 +17,32 @@
  * el listado (p. ej. profesionales puros nunca pueden acogerse a módulos).
  */
 
+/**
+ * ⚠️ 02/10/2026 — hallazgo 2610 del Inspector. Hasta hoy el sello atribuía los importes a la
+ * Orden de módulos («límites prorrogados por Orden HAC/1425/2025»), y la Orden no fija ninguno:
+ * su art. 3.1 a) y c) remite «al previsto, para el período impositivo 2026, en el artículo
+ * 31.1.3.ª» LIRPF, que dice 150.000 / 75.000 / 150.000 €. Cotejado ese día en el BOE:
+ *   · la DT 32.ª LIRPF consolidada (BOE-A-2006-20764, última actualización del 28/02/2026) fija
+ *     250.000 / 125.000 / 250.000 € «para los ejercicios 2016 a 2024», y nada más;
+ *   · las tres prórrogas a 2025-2026 —RDL 9/2024 (BOE-A-2024-26915), RDL 16/2025
+ *     (BOE-A-2025-26458) y RDL 2/2026 (BOE-A-2026-2547)— las derogó el Congreso al no
+ *     convalidarlas (resoluciones BOE-A-2025-1136, BOE-A-2026-2024 y BOE-A-2026-4667);
+ *   · la sede de la AEAT (página «Quién puede aplicar el método de estimación objetiva»,
+ *     actualizada el 28/09/2026) dice: «Desde 2016 hasta 2026 inclusive los límites de 150.000 €
+ *     y 75.000 € pasan a ser 250.000 € y 125.000 €», y lo mismo para las compras.
+ * Se conservan los 250.000 € porque es el criterio que aplica la Administración, pero su base
+ * legal para 2026 NO está en el texto consolidado, y la app lo dice. Al re-sellar: leer la DT 32.ª
+ * y la sede de la AEAT, NO la Orden de módulos (que nunca llevará cifras y no avisaría de una
+ * vuelta a 150.000 €).
+ */
 export const FISCAL_MODULOS_IRPF_META = {
-  fuente: 'Ley 35/2006 IRPF art. 31 + Reglamento IRPF (RD 439/2007) art. 32, límites prorrogados por Orden HAC/1425/2025',
-  verificado: '2026-09-02',
+  fuente: 'Ley 35/2006 IRPF, art. 31.1.3.ª (150.000 / 75.000 €) y DT 32.ª (250.000 / 125.000 € para 2016-2024); para 2025-2026, criterio de la AEAT',
+  verificado: '2026-10-02',
   vigencia: '2025-2026',
   urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/empresarios-individuales-profesionales/contribuyentes-modulos/quien-se-aplica/irpf.html',
-  nota: 'Límites cuantitativos vigentes desde 2016 y prorrogados sin cambios ejercicio a ejercicio (la Orden HAC/1425/2025 los mantiene para 2026). Se excluye del régimen si se supera CUALQUIERA de los tres.',
+  nota: 'La AEAT aplica los límites elevados «desde 2016 hasta 2026 inclusive», pero el texto consolidado de la DT 32.ª LIRPF solo nombra 2016-2024: las prórrogas a 2025-2026 por real decreto-ley fueron derogadas al no convalidarse. Si tus cifras están entre 150.000 € y 250.000 € (o entre 75.000 € y 125.000 € facturados a empresas), confírmalo con tu asesor antes de decidir. Se excluye del régimen si se supera CUALQUIERA de los límites.',
+  /** Resumen visible de la salvedad, para el aviso de la app. */
+  salvedad: 'La AEAT los aplica para 2026, aunque el texto consolidado de la ley solo los fija hasta 2024 (las prórrogas posteriores por real decreto-ley no se convalidaron). Sin ellos, los límites serían 150.000 € y 75.000 €.',
 };
 
 /**

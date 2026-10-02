@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { FISCAL_IRPF_META, LIMITES_EXCLUSION_MODULOS_2025, ORDEN_MODULOS_VIGENTE } from '@/data/fiscal';
+import { FISCAL_IRPF_META, FISCAL_MODULOS_IRPF_META, LIMITES_EXCLUSION_MODULOS_2025, ORDEN_MODULOS_VIGENTE } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
 
 // Año del título: la vigencia del módulo que sella los datos. Sale del dato
@@ -82,7 +82,7 @@ export const faqJsonLd = {
       name: `¿Qué actividades pueden acogerse al régimen de módulos en ${orden.ejercicio}?`,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Pueden usar módulos las actividades recogidas en la Orden anual de estimación objetiva — para ${orden.ejercicio}, la ${orden.referencia}, de ${orden.fecha} (${orden.boe}), que sustituye a la ${orden.anterior}, entre ellas restaurantes y bares, comercio minorista de determinados sectores, transporte de viajeros y mercancías, peluquerías y servicios similares. Quedan excluidas si el volumen de ingresos supera ${euros(limites.ingresosConjuntoActividades)} anuales, si la facturación a otros empresarios y profesionales supera ${euros(limites.facturacionAEmpresas)} anuales, o si las compras en bienes y servicios superan ${euros(limites.comprasBienesYServicios)}.`,
+        text: `Pueden usar módulos las actividades recogidas en la Orden anual de estimación objetiva — para ${orden.ejercicio}, la ${orden.referencia}, de ${orden.fecha} (${orden.boe}), que sustituye a la ${orden.anterior}, entre ellas restaurantes y bares, comercio minorista de determinados sectores, transporte de viajeros y mercancías, peluquerías y servicios similares. Quedan excluidas si el volumen de ingresos supera ${euros(limites.ingresosConjuntoActividades)} anuales, si la facturación a otros empresarios y profesionales supera ${euros(limites.facturacionAEmpresas)} anuales, o si las compras en bienes y servicios superan ${euros(limites.comprasBienesYServicios)}. ${FISCAL_MODULOS_IRPF_META.salvedad}`,
       },
     },
     {
@@ -98,7 +98,7 @@ export const faqJsonLd = {
       name: '¿Se puede cambiar de módulos a estimación directa?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, el autónomo puede renunciar a módulos presentando la comunicación a la Agencia Tributaria (modelo 036 o 037), pero la renuncia tiene efecto mínimo durante tres años: no se puede volver a módulos hasta transcurrido ese periodo. También es posible quedar excluido automáticamente si se superan los límites de ingresos o de facturación a empresas.',
+        text: 'Sí, el autónomo puede renunciar a módulos presentando la comunicación a la Agencia Tributaria (modelo 036 o 037), pero la renuncia tiene efecto mínimo durante tres años: no se puede volver a módulos hasta transcurrido ese periodo. También es posible quedar excluido automáticamente si se superan los límites de ingresos, de facturación a empresas o de compras, y la exclusión obliga igualmente a tributar en estimación directa durante los tres años siguientes (art. 31.1.5.ª de la Ley del IRPF).',
       },
     },
     {
