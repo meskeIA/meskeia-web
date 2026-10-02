@@ -46,7 +46,7 @@ export const jsonLd = generateWebAppSchema({
     '5 arquetipos lector con descripción detallada',
     'Géneros literarios asociados a cada perfil',
     'Autores emblema y lecturas recomendadas por arquetipo',
-    'Resultado compartible con descripción personalizada',
+    'Reparto de puntos visible y perfil mixto cuando dos o más arquetipos empatan',
   ],
 });
 
@@ -67,7 +67,7 @@ export const faqJsonLd = {
       name: '¿En qué se diferencia este test de otros tests de personalidad lectora?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'A diferencia de los tests genéricos de "género favorito", este analiza motivaciones lectoras profundas: por qué lees, qué buscas en una historia, cómo reaccionas ante los personajes o el estilo del autor. El resultado no solo nombra tu arquetipo, sino que incluye géneros afines, autores emblema de ese perfil y recomendaciones de lectura concretas adaptadas a tus respuestas.',
+        text: 'A diferencia de los tests genéricos de "género favorito", este analiza motivaciones lectoras profundas: por qué lees, qué buscas en una historia, cómo reaccionas ante los personajes o el estilo del autor. El resultado no solo nombra tu arquetipo, sino que incluye géneros afines, autores emblema y cuatro lecturas concretas para ese perfil, además del reparto de puntos entre los cinco arquetipos.',
       },
     },
     {
@@ -75,7 +75,7 @@ export const faqJsonLd = {
       name: '¿Qué géneros literarios corresponden a cada arquetipo lector?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Detective se orienta al thriller, la novela negra y el misterio. El Explorador disfruta de la ciencia ficción, la fantasía épica y la literatura de viajes. El Empático se inclina por la ficción literaria contemporánea y las novelas de formación. El Esteta prefiere la poesía, el ensayo y la prosa de autor cuidada. El Pensador busca la no ficción, el ensayo filosófico y la ciencia divulgativa.',
+        text: 'El Detective se orienta al thriller, la novela negra, el misterio y el suspense psicológico. El Explorador disfruta de la fantasía épica, la ciencia ficción, la novela histórica y la distopía. El Empático se inclina por la novela contemporánea, el drama familiar y las novelas de formación. El Esteta prefiere la novela literaria, el modernismo y la poesía en prosa. El Pensador busca la ficción filosófica, la novela de ideas, el ensayo literario y la literatura existencial.',
       },
     },
     {
@@ -83,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Puedo tener características de más de un arquetipo lector?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, los perfiles no son excluyentes. El test determina tu arquetipo predominante en función de la suma de tus respuestas, pero muchos lectores combinan rasgos de dos o más perfiles: un lector puede ser principalmente Empático con fuerte componente Pensador. Si tu resultado te parece mixto, es porque probablemente lo es: los arquetipos son orientaciones, no categorías rígidas.',
+        text: 'Sí, los perfiles no son excluyentes. El test suma tus respuestas y te da el arquetipo con más puntos; si dos o más empatan, el resultado lo dice como perfil mixto y te deja ver la ficha de cada uno. Además muestra el reparto de puntos entre los cinco, porque muchos lectores combinan rasgos: uno puede ser principalmente Empático con fuerte componente Pensador. Los arquetipos son orientaciones, no categorías rígidas.',
       },
     },
     {

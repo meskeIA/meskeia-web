@@ -19,18 +19,22 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *   Cada respuesta suma 2 puntos a su arquetipo (`handleSiguiente`). Máximo posible en un
  *   arquetipo: 8×2 = 16 (si se elige la misma letra las 8 veces). Total repartido siempre 16.
  *
- *   Ganador (`resultado`, con `Object.entries(puntos).reduce`, comparación estricta `>`):
- *     recorre las categorías en el orden en que se declaran en `puntuacionInicial()` —
- *     detective, explorador, empatico, esteta, pensador— y sustituye el máximo solo si el
- *     candidato es ESTRICTAMENTE mayor. En un empate exacto gana quien aparece ANTES en ese
- *     orden, y la pantalla no lo dice.
+ *   Ganador, HASTA el 02/10/2026 (`Object.entries(puntos).reduce`, comparación estricta `>`):
+ *     recorría las categorías en el orden de declaración —detective, explorador, empatico,
+ *     esteta, pensador— y en un empate exacto ganaba quien aparecía ANTES, sin decirlo.
  *
  *   La primera inspección lo dio por bueno («es determinista y siempre da un único arquetipo»).
  *   La segunda lo contó: de las 5^8 = 390.625 combinaciones de respuestas, 114.100 (29,21 %)
  *   acaban en empate en cabeza (51.100 dobles, 50.400 triples, 12.600 cuádruples). Con
- *   respuestas al azar, un test simétrico daría el 20 % a cada perfil; este da Detective
+ *   respuestas al azar, un test simétrico daría el 20 % a cada perfil; este daba Detective
  *   29,71 % · Explorador 22,60 % · Empático 18,06 % · Esteta 15,47 % · Pensador 14,16 %, y el
- *   Pensador no gana un solo empate. Hallazgo de hoy: ver «Empates» abajo.
+ *   Pensador no ganaba un solo empate.
+ *
+ *   REPARADO (hallazgo 2616): `ganadores` = todos los perfiles con la puntuación máxima. Si hay
+ *   más de uno, el resultado dice «Tu perfil lector es mixto», nombra a todos en el <h2>
+ *   («El Esteta y El Pensador»), y unos botones con aria-pressed dejan ver la ficha de cada uno
+ *   (abierta por defecto la del primero en el orden fijo, que ya no se presenta como ganador).
+ *   Debajo, el reparto de puntos de los cinco hace visible el criterio.
  */
 
 const RUTA = '/test-tipo-lector/';
@@ -168,32 +172,30 @@ test.describe('Caso 2: perfil B claro — todo Empático', () => {
 });
 
 test.describe('Caso 3: empate exacto en el límite — Esteta vs Pensador', () => {
-  // Desde el 02/10/2026 el desempate silencioso es un hallazgo (ver «Empates»). Estos dos casos
-  // solo fijan lo que seguirá siendo cierto tras repararlo: que El Esteta, primero en el orden
-  // de declaración, está en el resultado. Por eso `toContainText` y no `toHaveText`.
-  test('4×D + 4×E empata esteta=8 y pensador=8 → sale El Esteta por orden de declaración', async ({
+  // Desde la reparación del hallazgo 2616 (02/10/2026) el empate se DICE: perfil mixto con los
+  // dos nombres. La ficha que se abre por defecto es la del primero en el orden fijo (Esteta),
+  // pero ya no se presenta como ganador.
+  test('4×D + 4×E empata esteta=8 y pensador=8 → perfil mixto «El Esteta y El Pensador»', async ({
     page,
   }) => {
     await abrir(page);
     // Cálculo a mano: preguntas 1-4 opción D (esteta, +2 cada una) = 8 puntos esteta.
     // Preguntas 5-8 opción E (pensador, +2 cada una) = 8 puntos pensador. Empate 8-8.
-    // El reduce compara con `>` estricto y recorre detective→explorador→empatico→esteta→
-    // pensador: cuando llega a esteta (8 > 0 del máximo previo) lo adopta como ganador;
-    // cuando llega a pensador, 8 no es > 8, así que NO lo sustituye. Gana esteta.
     await responder(page, [3, 3, 3, 3, 4, 4, 4, 4]);
 
-    await expect(nombreResultado(page)).toContainText('El Esteta');
+    await expect(nombreResultado(page)).toHaveText('El Esteta y El Pensador');
+    await expect(seccionResultado(page)).toContainText('Tu perfil lector es mixto');
+    await expect(seccionResultado(page)).toContainText('mismos puntos (8 de 16) a 2 perfiles');
+    // Ficha abierta por defecto: la del Esteta.
     await expect(page.locator('[class*="generoTag"]').first()).toHaveText('Novela literaria');
     await expect(page.locator('[class*="autorItem"]').first()).toHaveText('Vladimir Nabokov');
   });
 
-  test('el orden inverso del mismo empate (4×E + 4×D) también da El Esteta', async ({ page }) => {
-    // Confirma que el criterio de desempate depende del ORDEN DE DECLARACIÓN de los
-    // arquetipos, no del orden en que se contestan las preguntas: aquí se responde
-    // primero pensador y luego esteta, y el resultado es idéntico al caso anterior.
+  test('el orden inverso del mismo empate (4×E + 4×D) da el mismo perfil mixto', async ({ page }) => {
+    // El resultado no depende del orden en que se contestan las preguntas.
     await abrir(page);
     await responder(page, [4, 4, 4, 4, 3, 3, 3, 3]);
-    await expect(nombreResultado(page)).toContainText('El Esteta');
+    await expect(nombreResultado(page)).toHaveText('El Esteta y El Pensador');
   });
 });
 
@@ -306,21 +308,78 @@ test.describe('Cálculo: secuencias mixtas, extremos y recuento', () => {
   });
 });
 
-test.describe('Empates — hallazgo ABIERTO del 02/10/2026', () => {
-  // E,E,E,A,A,A,C,D → pensador 6 = detective 6, empático 2, esteta 2. El reduce se queda con
-  // detective (primero declarado) y la pantalla dice «Tu perfil lector es El Detective» sin
-  // mencionar al Pensador. El FAQ promete «el perfil dominante» «en función de la suma de tus
-  // respuestas»: en un empate no lo hay. Lo correcto es decir el empate (o mostrar los dos).
-  test.fail('un empate 6-6 entre Detective y Pensador se dice en el resultado', async ({ page }) => {
+test.describe('Empates — hallazgo 2616, REPARADO el 02/10/2026', () => {
+  // E,E,E,A,A,A,C,D → pensador 6 = detective 6, empático 2, esteta 2. Antes el reduce se quedaba
+  // con detective (primero declarado) y la pantalla decía «Tu perfil lector es El Detective» sin
+  // mencionar al Pensador, aunque el FAQ prometía «el perfil dominante». Ahora el empate se dice.
+  test('un empate 6-6 entre Detective y Pensador se dice en el resultado', async ({ page }) => {
     await abrir(page);
     await responderLetras(page, 'EEEAAACD');
-    await expect(seccionResultado(page)).toContainText('Pensador', { timeout: 2000 });
-    await expect(seccionResultado(page)).toContainText('Detective');
+    await expect(nombreResultado(page)).toHaveText('El Detective y El Pensador');
+    await expect(seccionResultado(page)).toContainText('Tu perfil lector es mixto');
+    await expect(seccionResultado(page)).toContainText('mismos puntos (6 de 16) a 2 perfiles');
+  });
+
+  test('los botones del empate cambian la ficha y llevan aria-pressed', async ({ page }) => {
+    await abrir(page);
+    await responderLetras(page, 'EEEAAACD');
+    const boton = (nombre: string) => page.locator('button[class*="btnEmpate"]', { hasText: nombre });
+    await expect(page.locator('button[class*="btnEmpate"]')).toHaveCount(2);
+    await expect(boton('El Detective')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[class*="generoTag"]').first()).toHaveText('Thriller');
+    await boton('El Pensador').click();
+    await expect(boton('El Pensador')).toHaveAttribute('aria-pressed', 'true');
+    await expect(boton('El Detective')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('[class*="generoTag"]').first()).toHaveText('Ficción filosófica');
+    // El encabezado sigue diciendo el empate: elegir ficha no elige ganador.
+    await expect(nombreResultado(page)).toHaveText('El Detective y El Pensador');
+  });
+
+  test('empate cuádruple A,B,C,D,A,B,C,D: los cuatro en el encabezado y en los botones', async ({ page }) => {
+    await abrir(page);
+    // A mano: detective 4, explorador 4, empático 4, esteta 4, pensador 0.
+    await responderLetras(page, 'ABCDABCD');
+    await expect(nombreResultado(page)).toHaveText('El Detective, El Explorador, El Empático y El Esteta');
+    await expect(page.locator('button[class*="btnEmpate"]')).toHaveCount(4);
+  });
+
+  test('con un ganador único no hay perfil mixto ni botones de empate', async ({ page }) => {
+    await abrir(page);
+    // A mano: B,E,B,C,B,E,A,D → explorador 6, pensador 4, el resto 2.
+    await responderLetras(page, 'BEBCBEAD');
+    await expect(nombreResultado(page)).toHaveText('El Explorador');
+    await expect(seccionResultado(page)).toContainText('Tu perfil lector es');
+    await expect(seccionResultado(page)).not.toContainText('mixto');
+    await expect(page.locator('button[class*="btnEmpate"]')).toHaveCount(0);
+    // El reparto de puntos, de mayor a menor: explorador 6 primero.
+    await expect(page.locator('[class*="repartoFila"]').first()).toContainText('El Explorador');
+    await expect(page.locator('[class*="repartoFila"]').first()).toContainText('6 de 16');
   });
 });
 
-test.describe('Foco — hallazgo ABIERTO del 02/10/2026', () => {
-  test.fail('tras «Siguiente» con teclado el foco sigue en el cuestionario, no en <body>', async ({
+test.describe('Clave de puntuación — hallazgo 2625, REPARADO el 02/10/2026', () => {
+  // La opción «Abierto o ambiguo» de la pregunta 6 sumaba al Esteta, pero es la tarjeta del
+  // Pensador la que dice «Un final sin respuestas es un regalo» (y la del Detective, «Sufres con
+  // los finales abiertos»). Ahora el final abierto es la opción E (pensador) y la D del Esteta
+  // habla de la última frase por cómo está escrita. Se mantiene una opción por perfil y el
+  // orden A-E de todas las preguntas.
+  test('el final abierto puntúa al Pensador: E,E,D,D,A,<abierto>,B,C → El Pensador', async ({ page }) => {
+    await abrir(page);
+    await responderLetras(page, 'EEDDA'); // pensador 4, esteta 4, detective 2
+    await expect(etiquetaPregunta(page)).toHaveText('Pregunta 6 de 8');
+    await page.locator('button[class*="opcion"]', { hasText: 'Abierto o ambiguo' }).click();
+    await botonSiguiente(page).click();
+    await responderLetras(page, 'BC');
+    // A mano: pensador 6, esteta 4, detective 2, explorador 2, empático 2.
+    await expect(nombreResultado(page)).toHaveText('El Pensador');
+    await expect(seccionResultado(page)).toContainText('Un final sin respuestas es un regalo');
+  });
+});
+
+test.describe('Foco — hallazgo 2618, REPARADO el 02/10/2026', () => {
+  // Antes el foco caía a <body> en cada cambio de pantalla. Ahora va al enunciado de la pregunta
+  // nueva (<h2 tabIndex={-1}>) o al encabezado del resultado.
+  test('tras «Siguiente» con teclado el foco sigue en el cuestionario, no en <body>', async ({
     page,
   }) => {
     await abrir(page);
@@ -328,27 +387,52 @@ test.describe('Foco — hallazgo ABIERTO del 02/10/2026', () => {
     await botonSiguiente(page).focus();
     await page.keyboard.press('Enter');
     await expect(etiquetaPregunta(page)).toHaveText('Pregunta 2 de 8');
-    // El botón pulsado se desactiva (la pregunta 2 aún no tiene respuesta) y el foco cae a
-    // <body>; el siguiente Tab sale del test hacia «Ver Guía Completa».
     const dentro = await page.evaluate(() => {
       const a = document.activeElement;
       return Boolean(a && a !== document.body && a.closest('section[class*="testBox"]'));
     });
     expect(dentro).toBe(true);
+    // Y el siguiente Tab va a la primera opción de la pregunta 2, no fuera del test.
+    await page.keyboard.press('Tab');
+    await expect(opcion(page, 0)).toBeFocused();
   });
 
-  test.fail('al pulsar «Ver mi resultado» el foco va al resultado', async ({ page }) => {
+  test('al pulsar «Ver mi resultado» el foco va al resultado', async ({ page }) => {
     await abrir(page);
     await responderLetras(page, 'BBBBBBB');
     await opcion(page, LETRA.B).click();
     await botonSiguiente(page).focus();
     await page.keyboard.press('Enter');
     await expect(nombreResultado(page)).toHaveText('El Explorador');
-    const dentro = await page.evaluate(() => {
-      const a = document.activeElement;
-      return Boolean(a && a.closest('section[class*="resultado"]'));
-    });
-    expect(dentro).toBe(true);
+    await expect(nombreResultado(page)).toBeFocused();
+  });
+
+  test('tras «Repetir el test» el foco va a la pregunta 1', async ({ page }) => {
+    await abrir(page);
+    await responderLetras(page, 'AAAAAAAA');
+    await page.locator('button[class*="btnReiniciar"]').focus();
+    await page.keyboard.press('Enter');
+    await expect(etiquetaPregunta(page)).toHaveText('Pregunta 1 de 8');
+    await expect(page.locator('h2[class*="pregunta"]')).toBeFocused();
+    await expect(page.locator('h2[class*="pregunta"]')).toBeInViewport({ ratio: 1 });
+  });
+
+  test('al cargar la página el foco NO se mueve al cuestionario', async ({ page }) => {
+    await abrir(page);
+    await expect(page.locator('h2[class*="pregunta"]')).not.toBeFocused();
+  });
+});
+
+test.describe('Vista del resultado — hallazgo 2617, REPARADO el 02/10/2026 (escritorio)', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+  test('1280×800, «Ver mi resultado» centrado: el perfil queda a la vista', async ({ page }) => {
+    await abrir(page);
+    await responderLetras(page, 'CCCCCCC');
+    await opcion(page, LETRA.C).click();
+    await botonSiguiente(page).evaluate((b) => b.scrollIntoView({ block: 'center' }));
+    await botonSiguiente(page).click();
+    await expect(nombreResultado(page)).toHaveText('El Empático');
+    await expect(nombreResultado(page)).toBeInViewport({ ratio: 1, timeout: 3000 });
   });
 });
 
@@ -362,7 +446,7 @@ test.describe('Móvil 360 px con toque', () => {
     hasTouch: true,
   });
 
-  test('doble toque en «Siguiente» avanza una sola pregunta y el empate D/E da El Esteta', async ({ page }) => {
+  test('doble toque en «Siguiente» avanza una sola pregunta y el empate D/E da el perfil mixto', async ({ page }) => {
     await abrir(page);
     await opcion(page, LETRA.D).tap();
     const caja = await botonSiguiente(page).boundingBox();
@@ -371,20 +455,20 @@ test.describe('Móvil 360 px con toque', () => {
     await page.touchscreen.tap(caja.x + caja.width / 2, caja.y + caja.height / 2);
     await expect(etiquetaPregunta(page)).toHaveText('Pregunta 2 de 8');
     // A mano: D en la 1 + D,D,D en la 2-4 = esteta 8 · E en la 5-8 = pensador 8. Empate:
-    // gana esteta por orden de declaración.
+    // perfil mixto (hallazgo 2616 reparado).
     for (const l of 'DDDEEEE') {
       await opcion(page, LETRA[l]).tap();
       await botonSiguiente(page).tap();
     }
-    await expect(nombreResultado(page)).toContainText('El Esteta');
+    await expect(nombreResultado(page)).toHaveText('El Esteta y El Pensador');
   });
 
-  // Hallazgo ABIERTO del 02/10/2026. Con «Ver mi resultado» a media pantalla (como queda al
+  // Hallazgo 2617, REPARADO el 02/10/2026. Con «Ver mi resultado» a media pantalla (como queda al
   // desplazar con el pulgar), el cuestionario se sustituye por un resultado ~1.000 px más alto
-  // y el anclaje de desplazamiento de Chrome (overflow-anchor) mantiene en pantalla lo que había
-  // DEBAJO: se ve «Repetir el test» y el nombre del perfil queda 1.114 px por encima del borde
-  // (medido). Con el botón abajo del todo no pasa; a 1280×800, botón centrado, queda a −409 px.
-  test.fail('al pulsar «Ver mi resultado» a media pantalla, el perfil queda a la vista', async ({ page }) => {
+  // y el anclaje de desplazamiento de Chrome (overflow-anchor) mantenía en pantalla lo que había
+  // DEBAJO: se veía «Repetir el test» y el nombre del perfil quedaba 1.114 px por encima del
+  // borde. Ahora el resultado se lleva a la vista con scrollIntoView y scroll-margin-top: 80px.
+  test('al pulsar «Ver mi resultado» a media pantalla, el perfil queda a la vista', async ({ page }) => {
     await abrir(page);
     for (const l of 'CCCCCCC') {
       await opcion(page, LETRA[l]).tap();
@@ -396,7 +480,9 @@ test.describe('Móvil 360 px con toque', () => {
     if (!caja) throw new Error('«Ver mi resultado» no tiene caja');
     await page.touchscreen.tap(caja.x + caja.width / 2, caja.y + caja.height / 2);
     await expect(nombreResultado(page)).toHaveText('El Empático');
-    await expect(nombreResultado(page)).toBeInViewport({ ratio: 1, timeout: 2000 });
+    await expect(nombreResultado(page)).toBeInViewport({ ratio: 1, timeout: 3000 });
+    // Y la barra fija del logo no tapa el nombre del perfil.
+    await expect.poll(() => solapeConBarra(page, 'h2[class*="resultadoNombre"]'), { timeout: 3000 }).toBe(0);
   });
 });
 
@@ -424,57 +510,96 @@ test.describe('Lotes de CSS (b7733c6d, 586a4d61, a1d72a9c): barra del logo y cab
   }
 });
 
-test.describe('Contraste — hallazgos ABIERTOS del 02/10/2026', () => {
-  // «Siguiente →» (16 px/600, no es texto grande) pone blanco sobre var(--primary): 4,11:1 en
-  // claro (#2E86AB) y 2,79:1 en oscuro (#3FA5D1). Existe --primary-boton (5,47:1 en ambos).
-  test.fail('«Siguiente» cumple 4,5:1 en tema claro', async ({ page }) => {
-    await abrir(page);
-    await opcion(page, 0).click();
-    await page.mouse.move(0, 0);
-    await expect
-      .poll(() => contraste(page, 'button[class*="btnSiguiente"]'), { timeout: 3000 })
-      .toBeGreaterThanOrEqual(4.5);
-  });
+test.describe('Contraste — hallazgos 2619 y 2620, REPARADOS el 02/10/2026', () => {
+  for (const tema of ['light', 'dark'] as const) {
+    // 2619: «Siguiente →» (16 px/600, no es texto grande), la letra de la opción elegida y los
+    // números de «Cómo usar tu resultado» ponían blanco sobre var(--primary): 4,11:1 en claro y
+    // 2,79:1 en oscuro. Ahora van sobre --primary-boton (#26718F, 5,47:1 en los dos temas).
+    test(`tema ${tema}: «Siguiente», la letra elegida y los pasos de la guía cumplen 4,5:1`, async ({ page }) => {
+      await page.addInitScript((t) => window.localStorage.setItem('meskeia-theme', t), tema);
+      await abrir(page);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
+      await opcion(page, 0).click();
+      await page.mouse.move(0, 0);
+      await expect
+        .poll(() => contraste(page, 'button[class*="btnSiguiente"]'), { timeout: 3000 })
+        .toBeGreaterThanOrEqual(4.5);
+      await expect
+        .poll(() => contraste(page, '[class*="opcionSeleccionada"] [class*="opcionLetra"]'), { timeout: 3000 })
+        .toBeGreaterThanOrEqual(4.5);
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      await expect
+        .poll(() => contraste(page, '[class*="stepNumber"]'), { timeout: 3000 })
+        .toBeGreaterThanOrEqual(4.5);
+      // 2620: el título del aviso (#c0392b fijo) daba 2,21:1 en oscuro.
+      await expect
+        .poll(() => contraste(page, '[class*="warningHeader"] h4'), { timeout: 3000 })
+        .toBeGreaterThanOrEqual(4.5);
+    });
 
-  // Las etiquetas de género del resultado llevan `color: resultado.color` en línea, pensado
-  // para el fondo claro. En oscuro, sobre #1A1A1A: 1,58:1 (Detective) a 3,32:1 (Esteta).
-  test.fail('tema oscuro: las etiquetas de género del resultado cumplen 4,5:1', async ({ page }) => {
-    await page.addInitScript(() => window.localStorage.setItem('meskeia-theme', 'dark'));
-    await abrir(page);
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    await responderLetras(page, 'AAAAAAAA');
-    await expect(nombreResultado(page)).toHaveText('El Detective');
-    await expect
-      .poll(() => contraste(page, '[class*="generoTag"]'), { timeout: 3000 })
-      .toBeGreaterThanOrEqual(4.5);
-  });
+    // 2620: las etiquetas de género llevaban `color: resultado.color` en línea, pensado para el
+    // fondo claro (en oscuro, 1,58:1 a 3,32:1). Ahora cada perfil define --perfil-acento con su
+    // variante oscura. Se miden los cinco perfiles y también el texto blanco de la cabecera.
+    test(`tema ${tema}: las etiquetas de género y la cabecera de los 5 perfiles cumplen 4,5:1`, async ({ page }) => {
+      await page.addInitScript((t) => window.localStorage.setItem('meskeia-theme', t), tema);
+      await abrir(page);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
+      const perfiles: [string, string][] = [
+        ['A', 'El Detective'],
+        ['B', 'El Explorador'],
+        ['C', 'El Empático'],
+        ['D', 'El Esteta'],
+        ['E', 'El Pensador'],
+      ];
+      for (const [letra, nombre] of perfiles) {
+        await responderLetras(page, letra.repeat(8));
+        await expect(nombreResultado(page)).toHaveText(nombre);
+        await expect
+          .poll(() => contraste(page, '[class*="generoTag"]'), { timeout: 3000, message: `${nombre}: género` })
+          .toBeGreaterThanOrEqual(4.5);
+        await expect
+          .poll(() => contraste(page, '[class*="resultadoNombre"]'), { timeout: 3000, message: `${nombre}: cabecera` })
+          .toBeGreaterThanOrEqual(4.5);
+        await page.locator('button[class*="btnReiniciar"]').click();
+      }
+    });
+  }
 });
 
-test.describe('Contenido — hallazgos ABIERTOS del 02/10/2026', () => {
-  // Formato del porcentaje: CLAUDE.md global §2 (25/09/2026) pide «0 %» con espacio duro U+00A0.
-  test.fail('el progreso escribe el porcentaje con espacio duro', async ({ page }) => {
+test.describe('Contenido — hallazgos 2621 a 2624, REPARADOS el 02/10/2026', () => {
+  // 2621. Formato del porcentaje: CLAUDE.md global §2 (25/09/2026) pide «0 %» con espacio duro U+00A0.
+  test('el progreso escribe el porcentaje con espacio duro', async ({ page }) => {
     await abrir(page);
-    await expect(etiquetaPorcentaje(page)).toHaveText('0 %', { timeout: 2000 });
+    await expect(etiquetaPorcentaje(page)).toHaveText('0 %');
+    await opcion(page, 0).click();
+    await botonSiguiente(page).click();
+    await expect(etiquetaPorcentaje(page)).toHaveText('13 %');
   });
 
-  test.fail('«¿Cómo lees según tu perfil?» trae una tarjeta por cada uno de los 5 perfiles', async ({
+  // 2623. Antes había 4: Detective, Explorador, Empático y Pensador. Faltaba El Esteta.
+  test('«¿Cómo lees según tu perfil?» trae una tarjeta por cada uno de los 5 perfiles', async ({
     page,
   }) => {
     await abrir(page);
-    // Hoy hay 4: Detective, Explorador, Empático y Pensador. Falta El Esteta.
-    await expect(page.locator('[class*="escenarioCard"]')).toHaveCount(5, { timeout: 2000 });
+    await expect(page.locator('[class*="escenarioCard"]')).toHaveCount(5);
+    await expect(page.locator('[class*="escenarioCard"]', { hasText: 'El Esteta elige un libro' })).toHaveCount(1);
   });
 
-  test.fail('sin erratas en los rasgos y lecturas: «glosarios», «Millennium»', async ({ page }) => {
+  // 2624.
+  test('sin erratas en los rasgos y lecturas: «glosarios», «Millennium», «Gente normal»', async ({ page }) => {
     await abrir(page);
     await responderLetras(page, 'BBBBBBBB');
-    await expect(seccionResultado(page)).not.toContainText('glossarios', { timeout: 2000 });
+    await expect(seccionResultado(page)).toContainText('Lees con mapas, glosarios e índices');
     await page.locator('button[class*="btnReiniciar"]').click();
     await responderLetras(page, 'AAAAAAAA');
-    await expect(page.locator('[class*="lecturaTitulo"]').nth(1)).toHaveText(/^Millennium/);
+    await expect(page.locator('[class*="lecturaTitulo"]').nth(1)).toHaveText('Millennium');
+    await page.locator('button[class*="btnReiniciar"]').click();
+    await responderLetras(page, 'CCCCCCCC');
+    await expect(page.locator('[class*="lecturaTitulo"]').nth(1)).toHaveText('Gente normal');
   });
 
-  test.fail('el FAQPage no promete géneros ni funciones que el resultado no da', async ({ page }) => {
+  // 2622.
+  test('el FAQPage no promete géneros ni funciones que el resultado no da', async ({ page }) => {
     await abrir(page);
     const ldJson = await page.locator('script[type="application/ld+json"]').allTextContents();
     const todo = ldJson.join('\n');
@@ -486,5 +611,9 @@ test.describe('Contenido — hallazgos ABIERTOS del 02/10/2026', () => {
     expect(todo).not.toContain('literatura de viajes');
     expect(todo).not.toContain('adaptadas a tus respuestas');
     expect(todo).not.toContain('Resultado compartible');
+    // Lo que el FAQ sí atribuye a cada perfil está en su tarjeta.
+    expect(todo).toContain('ficción filosófica');
+    expect(todo).toContain('perfil mixto');
+    expect(todo).toContain('"@type":"FAQPage"');
   });
 });

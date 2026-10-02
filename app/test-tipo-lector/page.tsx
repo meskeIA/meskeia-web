@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -31,7 +31,6 @@ interface Arquetipo {
   id: ArquetipoId;
   nombre: string;
   emoji: string;
-  color: string;
   descripcion: string;
   rasgos: string[];
   generos: string[];
@@ -99,8 +98,8 @@ const PREGUNTAS: Pregunta[] = [
       { texto: 'Resolutivo: todo encaja y el caso queda cerrado', arquetipo: 'detective' },
       { texto: 'Épico o que cierra el arco del mundo construido', arquetipo: 'explorador' },
       { texto: 'Emocionalmente verdadero, aunque sea doloroso', arquetipo: 'empatico' },
-      { texto: 'Abierto o ambiguo: prefiero seguir pensando', arquetipo: 'esteta' },
-      { texto: 'Con una idea final que me deja dando vueltas días después', arquetipo: 'pensador' },
+      { texto: 'Con una última frase que se queda resonando por cómo está escrita', arquetipo: 'esteta' },
+      { texto: 'Abierto o ambiguo: con una idea que me deja dando vueltas días después', arquetipo: 'pensador' },
     ],
   },
   {
@@ -130,7 +129,6 @@ const ARQUETIPOS: Record<ArquetipoId, Arquetipo> = {
     id: 'detective',
     nombre: 'El Detective',
     emoji: '🔍',
-    color: '#2C3E50',
     descripcion: 'Lees para resolver algo. La tensión narrativa, los giros inesperados y las revelaciones son tu motor. Un libro sin suspense no es un libro: es un texto. Eres el lector más difícil de engañar y el que más sufre cuando adivina el final demasiado pronto.',
     rasgos: [
       'Lees rápido cuando la trama aprieta',
@@ -143,7 +141,7 @@ const ARQUETIPOS: Record<ArquetipoId, Arquetipo> = {
     autores: ['Agatha Christie', 'Stieg Larsson', 'Gillian Flynn', 'Donna Leon', 'Jo Nesbø'],
     lecturas: [
       { titulo: 'El nombre de la rosa', autor: 'Umberto Eco' },
-      { titulo: 'Millenium', autor: 'Stieg Larsson' },
+      { titulo: 'Millennium', autor: 'Stieg Larsson' },
       { titulo: 'La chica del tren', autor: 'Paula Hawkins' },
       { titulo: 'Y no quedó ninguno', autor: 'Agatha Christie' },
     ],
@@ -153,10 +151,9 @@ const ARQUETIPOS: Record<ArquetipoId, Arquetipo> = {
     id: 'explorador',
     nombre: 'El Explorador',
     emoji: '🌌',
-    color: '#1A5276',
     descripcion: 'Necesitas salir del mundo real cuando abres un libro. La ambientación, el worldbuilding y los universos creados son para ti tan importantes como la trama. La realidad cotidiana es demasiado estrecha: buscas épocas remotas, futuros imposibles y tierras que no existen en ningún mapa.',
     rasgos: [
-      'Lees con mapas, glossarios e índices de personajes a mano',
+      'Lees con mapas, glosarios e índices de personajes a mano',
       'Sufres el "síndrome del libro huérfano" al terminar una saga',
       'La ambientación falla → el libro falla',
       'Tienes tolerancia infinita a las páginas de descripción de mundos',
@@ -176,7 +173,6 @@ const ARQUETIPOS: Record<ArquetipoId, Arquetipo> = {
     id: 'empatico',
     nombre: 'El Empático',
     emoji: '❤️',
-    color: '#8B2635',
     descripcion: 'Un libro tiene éxito si sus personajes te importan de verdad. Puedes perdonar una trama floja si los personajes son complejos y verdaderos. Cuando un libro te emociona, necesitas hablar de ello. Eres el lector que sufre cuando un personaje que quieres muere y que guarda cuentas con los autores crueles.',
     rasgos: [
       'Te identificas o te opones intensamente a los personajes',
@@ -189,7 +185,7 @@ const ARQUETIPOS: Record<ArquetipoId, Arquetipo> = {
     autores: ['Elena Ferrante', 'Sally Rooney', 'Jhumpa Lahiri', 'Alice Munro', 'Chimamanda Ngozi Adichie'],
     lecturas: [
       { titulo: 'La amiga estupenda', autor: 'Elena Ferrante' },
-      { titulo: 'Normal People', autor: 'Sally Rooney' },
+      { titulo: 'Gente normal', autor: 'Sally Rooney' },
       { titulo: 'El guardián entre el centeno', autor: 'J.D. Salinger' },
       { titulo: 'La tregua', autor: 'Mario Benedetti' },
     ],
@@ -199,7 +195,6 @@ const ARQUETIPOS: Record<ArquetipoId, Arquetipo> = {
     id: 'esteta',
     nombre: 'El Esteta',
     emoji: '✒️',
-    color: '#7B5EA7',
     descripcion: 'La forma de contar importa tanto como lo que se cuenta. Lees en busca de la frase perfecta, el párrafo que te deja sin respiración. Un libro con trama mediocre pero escritura extraordinaria te puede gustar más que un bestseller ágil. Subrayas, anotas, vuelves a las páginas. Eres el lector más exigente con el oficio.',
     rasgos: [
       'Lees más despacio que la media porque te detienes a releer',
@@ -222,7 +217,6 @@ const ARQUETIPOS: Record<ArquetipoId, Arquetipo> = {
     id: 'pensador',
     nombre: 'El Pensador',
     emoji: '💡',
-    color: '#1A6B4A',
     descripcion: 'Un libro tiene éxito si te ha dejado pensando más de lo que esperabas. Buscas libros que te confronten, que desafíen lo que creías saber, que te dejen una pregunta sin resolver. Eres el lector más propenso a releer en momentos distintos de la vida, porque el libro cambia según quién lo lee.',
     rasgos: [
       'Lees la bibliografía de los libros que te gustan para seguir tirando del hilo',
@@ -247,8 +241,33 @@ const ARQUETIPOS: Record<ArquetipoId, Arquetipo> = {
 
 type Puntos = Record<ArquetipoId, number>;
 
+/** Orden fijo de los perfiles: el de las opciones A-E y el del reparto de puntos. */
+const ORDEN_ARQUETIPOS: ArquetipoId[] = ['detective', 'explorador', 'empatico', 'esteta', 'pensador'];
+
+/** Puntos máximos posibles: cada respuesta suma 2 al perfil elegido. */
+const PUNTOS_MAXIMOS = PREGUNTAS.length * 2;
+
+/**
+ * Clase de color de cada perfil (hallazgo 2620). Antes era un color en línea pensado para fondo
+ * claro, que en oscuro dejaba las etiquetas de género entre 1,58:1 y 3,32:1. Ahora cada clase
+ * define `--perfil-acento` con su variante oscura en el CSS, medida ≥ 4,5:1 en los dos temas.
+ */
+const CLASE_PERFIL: Record<ArquetipoId, string> = {
+  detective: styles.perfilDetective,
+  explorador: styles.perfilExplorador,
+  empatico: styles.perfilEmpatico,
+  esteta: styles.perfilEsteta,
+  pensador: styles.perfilPensador,
+};
+
 function puntuacionInicial(): Puntos {
   return { detective: 0, explorador: 0, empatico: 0, esteta: 0, pensador: 0 };
+}
+
+/** «El Detective», «El Detective y El Pensador», «A, B y C». */
+function unirNombres(nombres: string[]): string {
+  if (nombres.length <= 1) return nombres.join('');
+  return `${nombres.slice(0, -1).join(', ')} y ${nombres[nombres.length - 1]}`;
 }
 
 export default function TestTipoLector() {
@@ -256,15 +275,64 @@ export default function TestTipoLector() {
   const [puntos, setPuntos] = useState<Puntos>(puntuacionInicial());
   const [seleccionada, setSeleccionada] = useState<number | null>(null);
   const [fase, setFase] = useState<'test' | 'resultado'>('test');
+  // En un empate, el perfil cuya ficha se está viendo (null = el primero de los empatados).
+  const [perfilElegido, setPerfilElegido] = useState<ArquetipoId | null>(null);
 
-  const resultado = useMemo<Arquetipo | null>(() => {
-    if (fase !== 'resultado') return null;
-    const ganador = (Object.entries(puntos) as [ArquetipoId, number][]).reduce(
-      (max, entry) => (entry[1] > max[1] ? entry : max),
-      ['detective', 0] as [ArquetipoId, number]
-    );
-    return ARQUETIPOS[ganador[0]];
+  const enunciadoRef = useRef<HTMLHeadingElement>(null);
+  const tituloResultadoRef = useRef<HTMLHeadingElement>(null);
+  const seccionResultadoRef = useRef<HTMLElement>(null);
+  // El foco solo se mueve tras una acción del usuario, nunca al cargar la página.
+  const huboInteraccionRef = useRef(false);
+
+  /**
+   * Perfiles con la puntuación máxima (hallazgo 2616). Antes un `reduce` con `>` estricto
+   * deshacía los empates en silencio por el orden de declaración: el 29,21 % de las
+   * combinaciones empata en cabeza y el resultado nombraba un único perfil (el Detective ganaba
+   * el 29,71 % con respuestas al azar y el Pensador ningún empate). Ahora, si hay empate, el
+   * resultado lo dice —perfil mixto— y deja ver la ficha de cada perfil empatado.
+   */
+  const ganadores = useMemo<ArquetipoId[]>(() => {
+    if (fase !== 'resultado') return [];
+    const maximo = Math.max(...ORDEN_ARQUETIPOS.map((id) => puntos[id]));
+    return ORDEN_ARQUETIPOS.filter((id) => puntos[id] === maximo);
   }, [fase, puntos]);
+
+  const resultado: Arquetipo | null =
+    ganadores.length === 0
+      ? null
+      : ARQUETIPOS[perfilElegido && ganadores.includes(perfilElegido) ? perfilElegido : ganadores[0]];
+
+  const esMixto = ganadores.length > 1;
+
+  /** Reparto de puntos de mayor a menor (a igualdad, en el orden fijo de los perfiles). */
+  const reparto = useMemo<{ id: ArquetipoId; puntos: number }[]>(
+    () =>
+      ORDEN_ARQUETIPOS.map((id) => ({ id, puntos: puntos[id] })).sort((a, b) => b.puntos - a.puntos),
+    [puntos]
+  );
+
+  /**
+   * Foco y desplazamiento al cambiar de pantalla (hallazgos 2617 y 2618). «Siguiente» se
+   * desactiva en la pregunta nueva, y «Ver mi resultado» y «Repetir el test» se desmontan: el foco
+   * caía a <body>, el lector de pantalla no anunciaba nada y el siguiente Tab salía del test. Se
+   * lleva al enunciado de la pregunta nueva o al encabezado del resultado. Además, al mostrar el
+   * resultado, el anclaje de desplazamiento del navegador dejaba en pantalla lo que había DEBAJO
+   * del cuestionario y el perfil quedaba hasta 1.400 px por encima: se lleva la vista a la
+   * tarjeta. `scroll-margin-top` (CSS) deja libres los 80 px de la barra fija del logo.
+   */
+  useEffect(() => {
+    if (!huboInteraccionRef.current) return;
+    if (fase === 'resultado') {
+      const reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      tituloResultadoRef.current?.focus({ preventScroll: true });
+      seccionResultadoRef.current?.scrollIntoView({
+        block: 'start',
+        behavior: reducirMovimiento ? 'auto' : 'smooth',
+      });
+    } else {
+      enunciadoRef.current?.focus();
+    }
+  }, [fase, indice]);
 
   function handleOpcion(idx: number) {
     setSeleccionada(idx);
@@ -272,10 +340,12 @@ export default function TestTipoLector() {
 
   function handleSiguiente() {
     if (seleccionada === null) return;
+    huboInteraccionRef.current = true;
     const arquetipo = PREGUNTAS[indice].opciones[seleccionada].arquetipo;
     const nuevos = { ...puntos, [arquetipo]: puntos[arquetipo] + 2 };
     setPuntos(nuevos);
     setSeleccionada(null);
+    setPerfilElegido(null);
 
     if (indice + 1 >= PREGUNTAS.length) {
       setFase('resultado');
@@ -285,9 +355,11 @@ export default function TestTipoLector() {
   }
 
   function handleReiniciar() {
+    huboInteraccionRef.current = true;
     setIndice(0);
     setPuntos(puntuacionInicial());
     setSeleccionada(null);
+    setPerfilElegido(null);
     setFase('test');
   }
 
@@ -313,7 +385,8 @@ export default function TestTipoLector() {
             <div className={styles.progreso}>
               <div className={styles.progresoInfo}>
                 <span className={styles.progresoLabel}>Pregunta {indice + 1} de {PREGUNTAS.length}</span>
-                <span className={styles.progresoLabel}>{progreso}%</span>
+                {/* Espacio duro U+00A0 antes del % (CLAUDE.md global §2, hallazgo 2621). */}
+                <span className={styles.progresoLabel}>{progreso}{' '}%</span>
               </div>
               <div className={styles.progresoBar}>
                 <div className={styles.progresoFill} style={{ width: `${progreso}%` }} />
@@ -321,7 +394,7 @@ export default function TestTipoLector() {
             </div>
 
             {/* Pregunta */}
-            <h2 className={styles.pregunta}>{PREGUNTAS[indice].texto}</h2>
+            <h2 className={styles.pregunta} ref={enunciadoRef} tabIndex={-1}>{PREGUNTAS[indice].texto}</h2>
 
             {/* Opciones */}
             <div className={styles.opciones}>
@@ -351,17 +424,47 @@ export default function TestTipoLector() {
         )}
 
         {fase === 'resultado' && resultado && (
-          <section className={styles.resultado}>
-            <div className={styles.resultadoCard} style={{ borderColor: resultado.color }}>
-              <div className={styles.resultadoHeader} style={{ background: resultado.color }}>
-                <span className={styles.resultadoEmoji} aria-hidden="true">{resultado.emoji}</span>
+          <section className={styles.resultado} ref={seccionResultadoRef}>
+            <div className={`${styles.resultadoCard} ${CLASE_PERFIL[resultado.id]}`}>
+              <div className={`${styles.resultadoHeader} ${esMixto ? styles.resultadoHeaderMixto : ''}`}>
+                <span className={styles.resultadoEmoji} aria-hidden="true">
+                  {ganadores.map((id) => ARQUETIPOS[id].emoji).join('')}
+                </span>
                 <div>
-                  <p className={styles.resultadoEtiqueta}>Tu perfil lector es</p>
-                  <h2 className={styles.resultadoNombre}>{resultado.nombre}</h2>
+                  <p className={styles.resultadoEtiqueta}>
+                    {esMixto ? 'Tu perfil lector es mixto' : 'Tu perfil lector es'}
+                  </p>
+                  <h2 className={styles.resultadoNombre} ref={tituloResultadoRef} tabIndex={-1}>
+                    {unirNombres(ganadores.map((id) => ARQUETIPOS[id].nombre))}
+                  </h2>
                 </div>
               </div>
 
               <div className={styles.resultadoBody}>
+                {esMixto && (
+                  <div className={styles.empateBox}>
+                    <p className={styles.empateTexto}>
+                      Tus respuestas dan los mismos puntos ({puntos[ganadores[0]]} de {PUNTOS_MAXIMOS}) a{' '}
+                      {ganadores.length} perfiles, así que ninguno domina: lees con los motores de todos ellos.
+                      Elige cuál quieres ver en detalle.
+                    </p>
+                    <div className={styles.empateBotones} role="group" aria-label="Perfil empatado que se muestra">
+                      {ganadores.map((id) => (
+                        <button
+                          key={id}
+                          type="button"
+                          className={`${styles.btnEmpate} ${resultado.id === id ? styles.btnEmpateActivo : ''}`}
+                          aria-pressed={resultado.id === id}
+                          onClick={() => setPerfilElegido(id)}
+                        >
+                          <span aria-hidden="true">{ARQUETIPOS[id].emoji}</span> {ARQUETIPOS[id].nombre}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {esMixto && <h3 className={styles.fichaTitulo}>{resultado.nombre}</h3>}
                 <p className={styles.resultadoDesc}>{resultado.descripcion}</p>
 
                 <div className={styles.resultadoGrid}>
@@ -380,7 +483,7 @@ export default function TestTipoLector() {
                     <h3 className={styles.resultadoBloqueTitle}><span aria-hidden="true">📚</span> Tus géneros</h3>
                     <div className={styles.generosWrap}>
                       {resultado.generos.map(g => (
-                        <span key={g} className={styles.generoTag} style={{ borderColor: resultado.color, color: resultado.color }}>{g}</span>
+                        <span key={g} className={styles.generoTag}>{g}</span>
                       ))}
                     </div>
 
@@ -398,7 +501,7 @@ export default function TestTipoLector() {
                   <h3 className={styles.resultadoBloqueTitle}><span aria-hidden="true">📖</span> Lecturas recomendadas para ti</h3>
                   <div className={styles.lecturasGrid}>
                     {resultado.lecturas.map(l => (
-                      <div key={l.titulo} className={styles.lecturaCard} style={{ borderLeftColor: resultado.color }}>
+                      <div key={l.titulo} className={styles.lecturaCard}>
                         <p className={styles.lecturaTitulo}>{l.titulo}</p>
                         <p className={styles.lecturaAutor}>{l.autor}</p>
                       </div>
@@ -407,9 +510,25 @@ export default function TestTipoLector() {
                 </div>
 
                 {/* Consejo */}
-                <div className={styles.consejoBox} style={{ borderColor: resultado.color }}>
+                <div className={styles.consejoBox}>
                   <span className={styles.consejoIcono} aria-hidden="true">💬</span>
                   <p className={styles.consejoTexto}>{resultado.consejo}</p>
+                </div>
+
+                {/* Reparto: hace visible el criterio (la suma de las 8 respuestas) */}
+                <div className={styles.repartoBloque}>
+                  <h3 className={styles.resultadoBloqueTitle}><span aria-hidden="true">📊</span> Tu reparto de puntos</h3>
+                  <ul className={styles.repartoLista}>
+                    {reparto.map(({ id, puntos: p }) => (
+                      <li key={id} className={`${styles.repartoFila} ${CLASE_PERFIL[id]}`}>
+                        <span className={styles.repartoNombre}>{ARQUETIPOS[id].nombre}</span>
+                        <span className={styles.repartoBarra} aria-hidden="true">
+                          <span className={styles.repartoRelleno} style={{ width: `${(p / PUNTOS_MAXIMOS) * 100}%` }} />
+                        </span>
+                        <span className={styles.repartoCifra}>{p} de {PUNTOS_MAXIMOS}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
                 <button type="button" className={styles.btnReiniciar} onClick={handleReiniciar}>
@@ -476,6 +595,14 @@ export default function TestTipoLector() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
+                  <span className={styles.escenarioIcono} aria-hidden="true">✒️</span>
+                  <h4>El Esteta elige un libro</h4>
+                </div>
+                <p>Abre el libro por una página cualquiera y lee un párrafo. Si la frase no le retiene, la sinopsis da igual. Antes de decidir, mira quién firma la traducción.</p>
+                <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> El relato breve y la poesía en prosa concentran mucha escritura en pocas páginas: buen atajo para descubrir autores.</p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <div className={styles.escenarioHeader}>
                   <span className={styles.escenarioIcono} aria-hidden="true">💡</span>
                   <h4>El Pensador elige un libro</h4>
                 </div>
@@ -489,7 +616,7 @@ export default function TestTipoLector() {
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <h4>¿Puedo ser una mezcla de varios arquetipos?</h4>
-                <p>Sí, y es lo más habitual. El test detecta el perfil dominante, pero la mayoría de lectores tienen rasgos de dos o tres arquetipos. Un Detective que también es Pensador suele leer mucho noir filosófico (Camus, Ellroy). Un Explorador con alma de Esteta busca worldbuilding con prosa trabajada (Le Guin, Peake).</p>
+                <p>Sí, y es lo más habitual. El test suma tus respuestas y te da el perfil con más puntos; si dos o más empatan, te lo dice como perfil mixto y te deja ver la ficha de cada uno. En cualquier caso, la mayoría de lectores tienen rasgos de dos o tres arquetipos. Un Detective que también es Pensador suele leer mucho noir filosófico (Camus, Ellroy). Un Explorador con alma de Esteta busca worldbuilding con prosa trabajada (Le Guin, Peake).</p>
               </div>
               <div className={styles.faqItem}>
                 <h4>¿Los perfiles cambian con el tiempo?</h4>

@@ -22,6 +22,8 @@
 .progresoFill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.3s ease; }
 
 .pregunta { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 1.5rem; line-height: 1.45; }
+.pregunta:focus { outline: none; }
+.pregunta:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; border-radius: 4px; }
 
 .opciones { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.5rem; }
 
@@ -48,14 +50,14 @@
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.opcionSeleccionada .opcionLetra { background: var(--primary); color: white; }
+.opcionSeleccionada .opcionLetra { background: var(--primary-boton); color: white; }
 
 .opcionTexto { font-size: 0.92rem; line-height: 1.45; }
 
 .btnSiguiente {
   display: block; width: 100%;
   padding: 0.9rem;
-  background: var(--primary); color: white;
+  background: var(--primary-boton); color: white;
   border: none; border-radius: 10px;
   font-size: 1rem; font-weight: 600;
   cursor: pointer;
@@ -69,17 +71,22 @@
 
 .resultadoCard {
   border-radius: 16px;
-  border: 2px solid;
+  border: 2px solid var(--perfil-acento);
   overflow: hidden;
 }
 
 .resultadoHeader {
   display: flex; align-items: center; gap: 1.25rem;
   padding: 2rem; color: white;
+  background: var(--perfil-fondo);
 }
+/* Empate: ningún perfil manda, así que la cabecera no lleva el color de uno (8,33:1 con blanco). */
+.resultadoHeaderMixto { background: var(--hero-bg); }
 .resultadoEmoji { font-size: 3rem; line-height: 1; }
 .resultadoEtiqueta { font-size: 0.82rem; opacity: 0.9; margin: 0 0 0.25rem; }
 .resultadoNombre { font-size: 1.8rem; font-weight: 700; margin: 0; }
+.resultadoNombre:focus { outline: none; }
+.resultadoNombre:focus-visible { outline: 2px solid white; outline-offset: 4px; border-radius: 4px; }
 
 .resultadoBody { padding: 1.75rem; }
 .resultadoDesc { font-size: 0.95rem; color: var(--text-primary); line-height: 1.65; margin-bottom: 1.5rem; }
@@ -94,23 +101,23 @@
 .rasgoItem::before { content: '▸'; position: absolute; left: 0; color: var(--primary); font-size: 0.72rem; }
 
 .generosWrap { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem; }
-.generoTag { font-size: 0.78rem; padding: 0.2rem 0.6rem; border: 1.5px solid; border-radius: 12px; font-weight: 500; }
+.generoTag { font-size: 0.78rem; padding: 0.2rem 0.6rem; border: 1.5px solid var(--perfil-acento); color: var(--perfil-acento); border-radius: 12px; font-weight: 500; }
 
 .autoresList { display: flex; flex-direction: column; gap: 0.3rem; }
 .autorItem { font-size: 0.84rem; color: var(--text-secondary); }
 
 .lecturasBloque { margin-bottom: 1.25rem; }
 .lecturasGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
-.lecturaCard { background: var(--bg-primary); border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 0.75rem; }
+.lecturaCard { background: var(--bg-primary); border-left: 3px solid var(--perfil-acento); border-radius: 0 8px 8px 0; padding: 0.75rem; }
 .lecturaTitulo { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.2rem; }
 .lecturaAutor { font-size: 0.78rem; color: var(--text-secondary); margin: 0; font-style: italic; }
 
-.consejoBox { display: flex; gap: 0.75rem; align-items: flex-start; padding: 1rem 1.25rem; border: 1.5px solid; border-radius: 10px; margin-bottom: 1.25rem; background: rgba(46,134,171,0.04); }
+.consejoBox { display: flex; gap: 0.75rem; align-items: flex-start; padding: 1rem 1.25rem; border: 1.5px solid var(--perfil-acento); border-radius: 10px; margin-bottom: 1.25rem; background: rgba(46,134,171,0.04); }
 .consejoIcono { font-size: 1.2rem; flex-shrink: 0; }
 .consejoTexto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
 
 .btnReiniciar { display: block; width: 100%; padding: 0.85rem; background: transparent; border: 1.5px solid rgba(0,0,0,0.18); border-radius: 10px; color: var(--text-secondary); font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; }
-.btnReiniciar:hover { border-color: var(--primary); color: var(--primary); }
+.btnReiniciar:hover { border-color: var(--primary); color: var(--primary-texto); }
 
 /* ── Educational v2.0 ── */
 .guideSection { display: flex; flex-direction: column; gap: 1.5rem; }
@@ -129,7 +136,7 @@
 .escenarioIcono { font-size: 1.5rem; }
 .escenarioHeader h4 { font-size: 0.92rem; font-weight: 700; margin: 0; color: var(--text-primary); }
 .escenarioCard p { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55; margin: 0 0 0.5rem; }
-.escenarioTip { font-size: 0.8rem; color: var(--secondary); font-weight: 500; }
+.escenarioTip { font-size: 0.8rem; color: var(--secondary-texto); font-weight: 500; }
 
 .faqList { display: flex; flex-direction: column; gap: 0.75rem; }
 .faqItem { background: var(--bg-card); border-radius: 10px; border: 1px solid rgba(0,0,0,0.08); padding: 1rem 1.25rem; }
@@ -138,7 +145,7 @@
 
 .stepGuide { display: flex; flex-direction: column; gap: 1rem; }
 .step { display: flex; gap: 1rem; align-items: flex-start; }
-.stepNumber { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.stepNumber { width: 32px; height: 32px; border-radius: 50%; background: var(--primary-boton); color: white; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .stepContent h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin: 0.1rem 0 0.3rem; }
 .stepContent p { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55; margin: 0; }
 
@@ -148,17 +155,52 @@
 .tipCard h4 { font-size: 0.86rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 .tipCard p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
 
-.warningBox { background: rgba(231,76,60,0.06); border: 1.5px solid rgba(231,76,60,0.25); border-radius: 12px; padding: 1.25rem; }
+.warningBox { --aviso-texto: #c0392b; background: rgba(231,76,60,0.06); border: 1.5px solid rgba(231,76,60,0.25); border-radius: 12px; padding: 1.25rem; }
 .warningHeader { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
 .warningIcono { font-size: 1.2rem; }
-.warningHeader h4 { font-size: 0.9rem; font-weight: 700; color: #c0392b; margin: 0; }
+.warningHeader h4 { font-size: 0.9rem; font-weight: 700; color: var(--aviso-texto); margin: 0; }
 .warningList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
 .warningList li { font-size: 0.84rem; color: var(--text-secondary); padding-left: 1.2rem; position: relative; line-height: 1.5; }
-.warningList li::before { content: '✗'; position: absolute; left: 0; color: #c0392b; font-size: 0.75rem; }
+.warningList li::before { content: '✗'; position: absolute; left: 0; color: var(--aviso-texto); font-size: 0.75rem; }
+
+/* ── Color de cada perfil (hallazgo 2620) ──
+   --perfil-fondo: cabecera del resultado, con texto blanco encima (5,25:1 a 10,98:1), igual en
+   los dos temas. --perfil-acento: texto de las etiquetas de género y bordes. En claro es el
+   mismo color (5,03:1 a 10,52:1 sobre #FAFAFA); en oscuro se aclara (7,83:1 a 9,20:1 sobre
+   #1A1A1A, ≥ 6,20:1 sobre #2D2D2D). */
+.perfilDetective { --perfil-fondo: #2C3E50; --perfil-acento: #2C3E50; }
+.perfilExplorador { --perfil-fondo: #1A5276; --perfil-acento: #1A5276; }
+.perfilEmpatico { --perfil-fondo: #8B2635; --perfil-acento: #8B2635; }
+.perfilEsteta { --perfil-fondo: #7B5EA7; --perfil-acento: #7B5EA7; }
+.perfilPensador { --perfil-fondo: #1A6B4A; --perfil-acento: #1A6B4A; }
+
+/* ── Empate (hallazgo 2616) ── */
+.empateBox { border: 1.5px dashed var(--perfil-acento); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+.empateTexto { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin: 0 0 0.85rem; }
+.empateBotones { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.btnEmpate { padding: 0.5rem 0.9rem; border-radius: 999px; border: 1.5px solid rgba(0,0,0,0.18); background: transparent; color: var(--text-primary); font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+.btnEmpate:hover { border-color: var(--primary); }
+.btnEmpateActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
+.btnEmpate:focus-visible, .btnSiguiente:focus-visible, .btnReiniciar:focus-visible, .opcion:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.fichaTitulo { font-size: 1.15rem; font-weight: 700; color: var(--perfil-acento); margin: 0 0 0.75rem; }
+
+/* ── Reparto de puntos ── */
+.repartoBloque { margin-bottom: 1.25rem; }
+.repartoLista { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.45rem; }
+.repartoFila { display: grid; grid-template-columns: 8.5rem 1fr 4.5rem; align-items: center; gap: 0.75rem; font-size: 0.86rem; color: var(--text-primary); }
+.repartoBarra { height: 8px; background: rgba(0,0,0,0.08); border-radius: 4px; overflow: hidden; }
+.repartoRelleno { display: block; height: 100%; background: var(--perfil-acento); border-radius: 4px; }
+.repartoCifra { text-align: right; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+/* Foco al cambiar de pantalla (hallazgos 2617 y 2618): focus() y scrollIntoView() dejan libres
+   los 80 px de la barra fija del logo, el mismo hueco que el padding-top del hero. */
+.pregunta,
+.resultado {
+  scroll-margin-top: 80px;
+}
 
 /* ── Dark mode ── */
-[data-theme='dark'] .testBox,
-[data-theme='dark'] .resultadoCard { border-color: rgba(255,255,255,0.08); }
+[data-theme='dark'] .testBox { border-color: rgba(255,255,255,0.08); }
 [data-theme='dark'] .opcion { border-color: rgba(255,255,255,0.12); color: var(--text-primary); }
 [data-theme='dark'] .opcionLetra { background: rgba(255,255,255,0.08); }
 [data-theme='dark'] .progresoBar { background: rgba(255,255,255,0.1); }
@@ -169,7 +211,15 @@
 [data-theme='dark'] .tipCard { border-color: rgba(255,255,255,0.08); }
 [data-theme='dark'] .comparativaTable td { border-bottom-color: rgba(255,255,255,0.06); }
 [data-theme='dark'] .comparativaTable tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
-[data-theme='dark'] .warningBox { background: rgba(231,76,60,0.1); border-color: rgba(231,76,60,0.3); }
+[data-theme='dark'] .warningBox { --aviso-texto: #FF8A80; background: rgba(231,76,60,0.1); border-color: rgba(231,76,60,0.3); }
+[data-theme='dark'] .opcionSeleccionada .opcionLetra { background: var(--primary-boton); color: white; }
+[data-theme='dark'] .perfilDetective { --perfil-acento: #A9BCCF; }
+[data-theme='dark'] .perfilExplorador { --perfil-acento: #7FB8E0; }
+[data-theme='dark'] .perfilEmpatico { --perfil-acento: #F2939F; }
+[data-theme='dark'] .perfilEsteta { --perfil-acento: #C3A9EA; }
+[data-theme='dark'] .perfilPensador { --perfil-acento: #6FCF9F; }
+[data-theme='dark'] .btnEmpate { border-color: rgba(255,255,255,0.18); }
+[data-theme='dark'] .repartoBarra { background: rgba(255,255,255,0.1); }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
@@ -182,9 +232,10 @@
   .tipsGrid { grid-template-columns: 1fr 1fr; }
   .resultadoHeader { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
   .resultadoNombre { font-size: 1.4rem; }
+  .repartoFila { grid-template-columns: 7.5rem 1fr 4rem; gap: 0.5rem; }
 }
 @media (max-width: 480px) { .tipsGrid { grid-template-columns: 1fr; } }
-@media (prefers-reduced-motion: reduce) { .progresoFill { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .progresoFill, .opcion, .btnSiguiente, .btnReiniciar { transition: none; } }
 
 /* 80px arriba hasta 1023px: el hero va a sangre y la barra fija de MeskeiaLogo (~52px en móvil,
    ~77px desde 769px, cuando el logo pasa a su tamaño de escritorio) tapaba el principio del
