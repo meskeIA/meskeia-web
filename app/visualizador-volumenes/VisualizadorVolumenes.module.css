@@ -97,56 +97,41 @@
 /* =========================================================
    GRID PRINCIPAL
    ========================================================= */
+/* Por áreas desde el 02/10/2026 (hallazgos 2649 y 2650): la tarjeta del resultado es hija del
+   grid y no del panel de controles, así que cada pantalla la pone donde se ve. En escritorio,
+   el dibujo a la izquierda y, a la derecha, los controles con el resultado debajo —como
+   siempre—; la fórmula cruza las dos columnas. */
 .mainGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    'dibujo controles'
+    'dibujo resultado'
+    'formula formula';
   gap: 0;
   max-width: 960px;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
 
-/* La fórmula es hija del grid desde el 22/09/2026 (hallazgo 1222): en escritorio cruza las
-   dos columnas y queda donde ya estaba visualmente, debajo de los controles. */
-.mainGrid > .formulaBox {
-  grid-column: 1 / -1;
-  margin: 0.75rem 0 0;
+.mainGrid > .svgPanel {
+  grid-area: dibujo;
 }
 
-@media (max-width: 640px) {
-  .mainGrid {
-    grid-template-columns: 1fr;
-    padding: 1.25rem 1rem;
-  }
+.mainGrid > .controlPanel {
+  grid-area: controles;
+  align-self: end;
+}
 
-  /*
-    Los controles y el resultado van ANTES que el dibujo: en una pantalla estrecha el SVG
-    ocupa toda la altura visible y empujaba la herramienta fuera del pliegue, así que la app
-    se cargaba sin que se viera un solo control ni el número (20/08/2026).
+.mainGrid > .resultCard {
+  grid-area: resultado;
+  align-self: start;
+  margin: 1.75rem 0 0 2rem;
+}
 
-    ⚠️ 22/09/2026 (hallazgo 1222) — aquella reparación cumplió lo que se midió entonces y dejó
-    el DIBUJO detrás de todo, incluida la caja de fórmula: nacía a 993 px en una pantalla de
-    844, o sea entero por debajo del pliegue, y es lo que da nombre a la app y lo que su
-    subtítulo invita a mirar («observa cómo cambia el volumen en tiempo real»). Nada anunciaba
-    que hubiera un dibujo ahí abajo.
-
-    Ahora el dibujo va EN MEDIO —después del control y del resultado, antes de la fórmula— y
-    con una altura contenida, así que asoma en la primera pantalla sin devolver los controles
-    al fondo. El test de agosto seguía en verde porque solo miraba la Y de arranque del
-    control y de la tarjeta; el de hoy mide también dónde empieza el SVG.
-  */
-  .svgPanel {
-    order: 2;
-  }
-
-  .controlPanel {
-    order: 1;
-  }
-
-  .mainGrid > .formulaBox {
-    order: 3;
-    margin-top: 0.5rem;
-  }
+.mainGrid > .formulaBox {
+  grid-area: formula;
+  margin: 0.75rem 0 0;
 }
 
 /* =========================================================
@@ -171,6 +156,20 @@
   display: block;
 }
 
+/* Rótulos del dibujo (hallazgo 2652, 02/10/2026): color del texto con un halo del color del
+   panel. El halo se pinta DEBAJO del relleno (paint-order) y es lo que mantiene el contraste
+   cuando un rótulo largo no cabe junto a la figura y acaba encima de ella. */
+.rotulo {
+  fill: var(--text-primary);
+  stroke: var(--bg-card);
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+[data-theme='dark'] .rotulo {
+  stroke: #2A2A2A;
+}
+
 /* =========================================================
    PANEL DE CONTROLES
    ========================================================= */
@@ -180,12 +179,6 @@
   gap: 1.25rem;
   padding: 0 0 0 2rem;
   justify-content: center;
-}
-
-@media (max-width: 640px) {
-  .controlPanel {
-    padding: 1.25rem 0 0;
-  }
 }
 
 /* =========================================================
@@ -318,8 +311,14 @@
 /* =========================================================
    TARJETA DE RESULTADO
    ========================================================= */
+/* Blanco sobre --primary-boton → --secondary-boton (hallazgo 2653, 02/10/2026): con
+   var(--primary) → var(--secondary) y la etiqueta y la unidad rebajadas con opacidad 0,9 y
+   0,85, «VOLUMEN» daba 3,04:1 y «unidades³» 2,78:1 en claro, y en OSCURO, donde el degradado
+   se aclara (#3FA5D1 → #5ABDB9), el propio número del resultado caía a 2,46:1. Los tokens
+   -boton son iguales en los dos temas (5,47:1 y 5,15:1 con blanco; bajo Stemum, sus violetas)
+   y el texto va a opacidad plena. */
 .resultCard {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   border-radius: 14px;
   padding: 1.25rem 1.5rem;
   text-align: center;
@@ -336,7 +335,6 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  opacity: 0.9;
 }
 
 .resultValor {
@@ -344,11 +342,12 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
+  /* Último recurso: los cortes buenos los pone <wbr> (ConCortes, en la página) */
+  overflow-wrap: anywhere;
 }
 
 .resultUnidad {
   font-size: 0.85rem;
-  opacity: 0.85;
 }
 
 /* =========================================================
@@ -784,44 +783,80 @@
 }
 
 /* =========================================================
-   MÓVIL ESTRECHO — que el dibujo asome (hallazgo 1222, 22/09/2026)
+   MÓVIL — dibujo y resultado juntos, ARRIBA (hallazgos 2649 y 2650, 02/10/2026)
    =========================================================
-   Va al final del fichero a propósito: estas reglas compiten con `.svgPanel` y `.resultCard`,
-   que se declaran más abajo que el media query del grid, así que puestas allí perdían por
-   orden de cascada con la misma especificidad. Medido en 390×844 antes de esto: el resultado
-   acababa en 871 px con el pliegue en 844 —«unidades³» partida por la mitad— y el SVG, de 290
-   px fijos, empezaba en 896.
+   Historia: el 20/08/2026 los controles y el resultado pasaron delante del dibujo (la app se
+   cargaba sin un control a la vista); el 22/09 (1222) el dibujo se coló entre el resultado y la
+   fórmula para que «asomara», y el 27/09 (f0e61b70) se apretó para que la tarjeta volviera a
+   caber tras el hueco del logo. Las dos reparaciones se midieron solo con la ESFERA a 390×844:
+   con cada medida de más (84 px) la tarjeta bajaba del pliegue —cilindro, cono y pirámide en
+   818-914, ortoedro en 902-998— y a 360×800 ni la esfera cabía. Lo que «asomaba» del dibujo
+   eran 7 px vacíos de su caja: la figura empezaba en 954.
+
+   Ahora, por debajo de 641 px, la fila de arriba es [dibujo | resultado] y los deslizadores van
+   debajo: la tarjeta está en el mismo sitio con una medida que con tres, la figura se ve entera
+   en la primera pantalla, y cualquier deslizador que se mueva tiene encima lo que cambia. Los
+   rótulos del dibujo no encogen con el lienzo (ROTULO_MIN_PX, en la página).
+
+   Va al final del fichero a propósito: compite con `.svgPanel`, `.resultCard` y `.figSelector`,
+   que se declaran más arriba con la misma especificidad.
    ========================================================= */
 @media (max-width: 640px) {
-  .svgPanel {
-    min-height: 0;
-    /* Lo justo para que la figura asome sobre el pliegue con el resultado ya visible. */
-    max-height: 40vh;
-    padding: 0.35rem;
-  }
-
-  .svgFigura {
-    max-height: 38vh;
-  }
-
-  /* La tarjeta del resultado se cortaba por el pliegue (92 de sus 119 px): con menos aire
-     vertical cabe entera y deja sitio al dibujo. */
-  .resultCard {
-    padding: 0.7rem 1rem;
-    margin-top: 0.3rem;
-    gap: 0.1rem;
-  }
-
   .mainGrid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-areas:
+      'dibujo resultado'
+      'controles controles'
+      'formula formula';
+    column-gap: 0.5rem;
     padding: 0.75rem 1rem;
   }
 
-  /* El selector ocupaba 187 px de los 844 de la pantalla con 1,75rem de aire arriba y abajo.
-     Se aprieta lo justo para que el dibujo asome: los botones no cambian de tamaño, solo el
-     aire que los rodea. */
+  .svgPanel {
+    min-height: 0;
+    padding: 0.25rem;
+    border-radius: 12px;
+  }
+
+  .mainGrid > .controlPanel {
+    align-self: auto;
+    padding: 0.6rem 0 0;
+    gap: 0.75rem;
+  }
+
+  .mainGrid > .resultCard {
+    align-self: stretch;
+    justify-content: center;
+    margin: 0;
+    padding: 0.6rem 0.5rem;
+    gap: 0.15rem;
+  }
+
+  .mainGrid > .formulaBox {
+    margin-top: 0.75rem;
+  }
+
+  /* Los cinco botones en UNA fila (eran dos: 159 px de los 844 de la pantalla). Mismo alto de
+     toque (≥ 44 px), menos aire alrededor. */
   .figSelector {
-    padding: 0.9rem 1rem;
-    gap: 0.5rem;
+    flex-wrap: nowrap;
+    padding: 0.6rem 0.75rem;
+    gap: 0.35rem;
+  }
+
+  .figBtn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0.45rem 0.1rem;
+    gap: 0.15rem;
+  }
+
+  .figBtnIcono {
+    font-size: 1.2rem;
+  }
+
+  .figBtnNombre {
+    font-size: 0.68rem;
   }
 }
 
@@ -841,5 +876,17 @@
 @media (max-width: 640px) {
   .mainGrid {
     padding-top: 1rem;
+  }
+}
+
+/* Bajo stemum.com la barra fija no lleva el logo de meskeia.com (hasta x = 203) sino la píldora
+   «Stemum › Matemáticas», que llega a x = 287: de 1024 a 1105 px pisaba el 🔷 del principio del
+   h1 (160 de 1287 puntos tapados a 1024 px, 14 a 1100; hallazgo 2651, el mismo defecto que 2589
+   en simulador-punnett, aquí más ancho porque «Matemáticas» es más largo que «Biología»). El
+   hueco de 80 px llega hasta 1119 px para dejar aire. Solo bajo Stemum: en meskeia.com el logo
+   es más estrecho y desde 1024 px no llega al título. */
+@media (min-width: 1024px) and (max-width: 1119px) {
+  :global([data-brand='stemum']) .hero {
+    padding-top: 80px;
   }
 }

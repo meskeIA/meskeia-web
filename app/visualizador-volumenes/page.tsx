@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useId } from 'react';
+import { Fragment, useState, useMemo, useId, useRef, useEffect } from 'react';
 import styles from './VisualizadorVolumenes.module.css';
 import {
   MeskeiaLogo,
@@ -39,6 +39,9 @@ const FIGURAS: FiguraInfo[] = [
 type Pt = [number, number];
 const CX = 150;
 const CY = 148;
+/** El lienzo del dibujo, en unidades del viewBox. */
+const ANCHO_LIENZO = 300;
+const ALTO_LIENZO = 290;
 
 // Recorrido de los controles de medida. En un solo sitio porque de él depende también la
 // escala del dibujo de la esfera: si cambian aquí, el dibujo sigue respondiendo igual.
@@ -49,8 +52,81 @@ const DIM_MAX = 50;
 // sencillamente inintroducible, en una app que promete calcular volúmenes.
 const DIM_MAX_CAMPO = 100000;
 
-function iso(x: number, y: number, z: number, s: number, ox = CX, oy = CY): Pt {
-  return [ox + (x - z) * s * 0.866, oy - y * s + (x + z) * s * 0.5];
+/**
+ * Divisor para ajustar la figura al lienzo. Solo evita dividir entre cero: las medidas ya
+ * llegan positivas.
+ *
+ * ⚠️ 02/10/2026 (hallazgo 2654) — aquí había un `Math.max(…, 0.1)` y, en cada figura, un tope
+ * de 13 px por unidad (`Math.min(…, 13)`). Con los dos, por debajo de unas 8 unidades la figura
+ * dejaba de ajustarse al lienzo y menguaba hasta ser una mota: el ortoedro de 1 × 1 × 1, dentro
+ * del recorrido del deslizador, medía 26 px con sus rótulos «a=1» y «b=1» pisándose, y un
+ * cilindro de r=0,01 h=0,02, 0,4 px. Las cuatro figuras se ajustan al lienzo y lo que enseñan
+ * al mover sus deslizadores es la PROPORCIÓN (la esfera, que no tiene proporción, es la única
+ * que crece); una caja de 0,5 m de lado es la misma forma que una de 5 m.
+ */
+const divisor = (v: number): number => Math.max(v, 1e-12);
+
+/**
+ * Tamaño mínimo de un rótulo del dibujo EN PANTALLA, en píxeles CSS (hallazgo 2652, 02/10/2026).
+ *
+ * El dibujo escala con su caja y los rótulos se escribían en unidades del viewBox: en el móvil,
+ * donde el lienzo mide la mitad, un rótulo de 11 unidades salía a 6 px. Como en
+ * `simulador-grafos` (96d1d907), se mide cuántos píxeles ocupa cada unidad del viewBox
+ * (ResizeObserver, en la página) y cada tamaño de texto es max(base, mínimo / escala), sin tocar
+ * la geometría de la figura.
+ */
+const ROTULO_MIN_PX = 12;
+
+function tamRotulo(base: number, escala: number): number {
+  return Math.max(base, ROTULO_MIN_PX / (escala > 0 ? escala : 1));
+}
+
+/** Ancho aproximado de un rótulo en negrita, para acotarlo al lienzo. */
+function anchoRotulo(texto: string, fs: number): number {
+  return texto.length * fs * 0.62;
+}
+
+interface RotuloProps {
+  x: number;
+  y: number;
+  texto: string;
+  fs: number;
+  ancla: 'start' | 'middle' | 'end';
+}
+
+/**
+ * Un rótulo del dibujo, legible sobre cualquier fondo (hallazgo 2652, 02/10/2026).
+ *
+ * Los de la esfera, el cilindro y la pirámide eran BLANCOS y se colocaban con un desplazamiento
+ * fijo: lo que se salía de la figura quedaba blanco sobre el blanco de la tarjeta, 1:1 («=8» en
+ * la pirámide de arranque, que había perdido la «h»; invisibles enteros con figuras estrechas).
+ * Ahora todos van en el color del texto, FUERA de la figura siempre que cabe, y con un halo del
+ * color del panel (`paint-order: stroke`, en el CSS) que mantiene el contraste del texto cuando
+ * un rótulo largo no cabe al lado y acaba encima del dibujo. Además se acota al lienzo para que
+ * no se corte por un borde.
+ */
+function Rotulo({ x, y, texto, fs, ancla }: RotuloProps) {
+  const margen = 3;
+  const ancho = anchoRotulo(texto, fs);
+  const izquierda = ancla === 'start' ? x : ancla === 'end' ? x - ancho : x - ancho / 2;
+  // Se desplaza lo justo para que la caja del texto entre en el lienzo (si cabe).
+  let desplazamiento = 0;
+  if (izquierda + ancho > ANCHO_LIENZO - margen) desplazamiento = ANCHO_LIENZO - margen - (izquierda + ancho);
+  if (izquierda + desplazamiento < margen) desplazamiento = margen - izquierda;
+  const ya = Math.min(Math.max(y, fs * 0.8 + margen), ALTO_LIENZO - fs * 0.25 - margen);
+  return (
+    <text
+      x={x + desplazamiento}
+      y={ya}
+      textAnchor={ancla}
+      fontSize={fs}
+      fontWeight="bold"
+      strokeWidth={fs * 0.3}
+      className={styles.rotulo}
+    >
+      {texto}
+    </text>
+  );
 }
 
 function ptsStr(arr: Pt[]): string {
@@ -64,8 +140,9 @@ function mid(a: Pt, b: Pt): Pt {
 // =========================================================
 // COMPONENTES SVG POR FIGURA
 // =========================================================
+// `escala` = píxeles de pantalla por unidad del viewBox; solo decide el tamaño de los rótulos.
 
-function SvgEsfera({ radio }: { radio: number }) {
+function SvgEsfera({ radio, escala }: { radio: number; escala: number }) {
   // Las otras cuatro figuras se ajustan al lienzo y cambian de PROPORCIÓN al mover sus
   // sliders; una esfera no tiene proporción que cambiar, así que lo único que puede
   // responder es su tamaño. Con Math.min(radio * 14, 72) quedaba clavada en 72 px desde
@@ -76,6 +153,8 @@ function SvgEsfera({ radio }: { radio: number }) {
   const R_PX_MIN = 12;
   const R_PX_MAX = 72;
   const r = R_PX_MIN + (R_PX_MAX - R_PX_MIN) * Math.min(1, Math.sqrt(radio / DIM_MAX));
+  const fs = tamRotulo(12, escala);
+  const rotulo = `r=${medExacta(radio)}`;
   return (
     <>
       <defs>
@@ -90,17 +169,24 @@ function SvgEsfera({ radio }: { radio: number }) {
       <ellipse cx={CX} cy={CY} rx={r} ry={r * 0.25} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1" />
       <ellipse cx={CX} cy={CY} rx={r * 0.25} ry={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeDasharray="3,3" />
       <line x1={CX} y1={CY} x2={CX + r} y2={CY} stroke="white" strokeWidth="1.5" strokeDasharray="3,2" opacity="0.85" />
-      <text x={CX + r * 0.5 + 2} y={CY - 8} textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">r={medExacta(radio)}</text>
+      {/* El rótulo, a continuación del radio dibujado y fuera de la esfera; si es tan largo que
+          no cabe a la derecha («r=1,2345×10⁻⁵» en el móvil), debajo, en vez de taparla. */}
+      {CX + r + fs * 0.4 + anchoRotulo(rotulo, fs) <= ANCHO_LIENZO - 3 ? (
+        <Rotulo x={CX + r + fs * 0.4} y={CY + fs * 0.35} texto={rotulo} fs={fs} ancla="start" />
+      ) : (
+        <Rotulo x={CX} y={CY + r + fs * 1.05} texto={rotulo} fs={fs} ancla="middle" />
+      )}
     </>
   );
 }
 
-function SvgCubo({ ancho, largo, alto }: { ancho: number; largo: number; alto: number }) {
+function SvgCubo({ ancho, largo, alto, escala }: { ancho: number; largo: number; alto: number; escala: number }) {
   const W = ancho, D = largo, H = alto;
   const sw = (W + D) * 0.866;
   const sh = H + (W + D) * 0.5;
-  const s = Math.min(105 / Math.max(sw, 0.1), 115 / Math.max(sh, 0.1), 13);
+  const s = Math.min(105 / divisor(sw), 115 / divisor(sh));
   const by = CY + H * s / 2;
+  const fs = tamRotulo(11, escala);
 
   function isoL(x: number, y: number, z: number): Pt {
     return [CX + (x - z) * s * 0.866, by - y * s + (x + z) * s * 0.5];
@@ -127,20 +213,23 @@ function SvgCubo({ ancho, largo, alto }: { ancho: number; largo: number; alto: n
       <polygon points={ptsStr([b01, b11, t11, t01])} fill="#48A9A6" fillOpacity="0.72" stroke="#1a5278" strokeWidth="1.5" strokeLinejoin="round" />
       <polygon points={ptsStr([b10, b11, t11, t10])} fill="#2E86AB" fillOpacity="0.72" stroke="#1a5278" strokeWidth="1.5" strokeLinejoin="round" />
       <polygon points={ptsStr([t00, t10, t11, t01])} fill="#7FB3D3" fillOpacity="0.78" stroke="#1a5278" strokeWidth="1.5" strokeLinejoin="round" />
-      <text x={mB01B11[0]} y={mB01B11[1] + 17} textAnchor="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">a={medExacta(ancho)}</text>
-      <text x={mB10B11[0]} y={mB10B11[1] + 17} textAnchor="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">b={medExacta(largo)}</text>
-      <text x={b10[0] + 9} y={mB10T10[1] + 4} textAnchor="start" fill="var(--text-primary)" fontSize="11" fontWeight="bold">h={medExacta(alto)}</text>
+      {/* «a» crece hacia la izquierda y «b» hacia la derecha desde sus aristas, que se
+          encuentran en la esquina delantera: así no se pisan por mucho que se acerquen. */}
+      <Rotulo x={mB01B11[0] - fs * 0.2} y={mB01B11[1] + fs * 1.1} texto={`a=${medExacta(ancho)}`} fs={fs} ancla="end" />
+      <Rotulo x={mB10B11[0] + fs * 0.2} y={mB10B11[1] + fs * 1.1} texto={`b=${medExacta(largo)}`} fs={fs} ancla="start" />
+      <Rotulo x={b10[0] + fs * 0.6} y={mB10T10[1] + fs * 0.35} texto={`h=${medExacta(alto)}`} fs={fs} ancla="start" />
     </>
   );
 }
 
-function SvgCilindro({ radio, altura }: { radio: number; altura: number }) {
-  const s = Math.min(105 / Math.max(radio * 2, 0.1), 115 / Math.max(altura + radio * 0.76, 0.1), 13);
+function SvgCilindro({ radio, altura, escala }: { radio: number; altura: number; escala: number }) {
+  const s = Math.min(105 / divisor(radio * 2), 115 / divisor(altura + radio * 0.76));
   const rx = radio * s;
   const ry = rx * 0.38;
   const bodyH = altura * s;
   const topY = CY - bodyH / 2;
   const botY = CY + bodyH / 2;
+  const fs = tamRotulo(11, escala);
 
   return (
     <>
@@ -164,22 +253,24 @@ function SvgCilindro({ radio, altura }: { radio: number; altura: number }) {
       <ellipse cx={CX} cy={botY} rx={rx} ry={ry} fill="#2E86AB" fillOpacity="0.65" stroke="#1a5278" strokeWidth="1.5" />
       <ellipse cx={CX} cy={topY} rx={rx} ry={ry} fill="url(#gCylTop)" stroke="#1a5278" strokeWidth="1.5" />
       <line x1={CX} y1={topY} x2={CX + rx} y2={topY} stroke="white" strokeWidth="1.5" strokeDasharray="3,2" opacity="0.85" />
-      <text x={CX + rx / 2 + 2} y={topY - 8} textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">r={medExacta(radio)}</text>
+      {/* Encima de la tapa, no dentro: la tapa mide ry de alto y el rótulo blanco se salía */}
+      <Rotulo x={CX + rx / 2} y={topY - ry - fs * 0.35} texto={`r=${medExacta(radio)}`} fs={fs} ancla="middle" />
       <line x1={CX + rx + 10} y1={topY} x2={CX + rx + 10} y2={botY} stroke="var(--text-secondary)" strokeWidth="1" strokeDasharray="2,2" />
       <line x1={CX + rx + 6} y1={topY} x2={CX + rx + 14} y2={topY} stroke="var(--text-secondary)" strokeWidth="1" />
       <line x1={CX + rx + 6} y1={botY} x2={CX + rx + 14} y2={botY} stroke="var(--text-secondary)" strokeWidth="1" />
-      <text x={CX + rx + 16} y={(topY + botY) / 2 + 4} textAnchor="start" fill="var(--text-primary)" fontSize="11" fontWeight="bold">h={medExacta(altura)}</text>
+      <Rotulo x={CX + rx + 16} y={(topY + botY) / 2 + fs * 0.35} texto={`h=${medExacta(altura)}`} fs={fs} ancla="start" />
     </>
   );
 }
 
-function SvgCono({ radio, altura }: { radio: number; altura: number }) {
-  const s = Math.min(105 / Math.max(radio * 2, 0.1), 115 / Math.max(altura + radio * 0.4, 0.1), 13);
+function SvgCono({ radio, altura, escala }: { radio: number; altura: number; escala: number }) {
+  const s = Math.min(105 / divisor(radio * 2), 115 / divisor(altura + radio * 0.4));
   const rx = radio * s;
   const ry = rx * 0.38;
   const h = altura * s;
   const baseY = CY + h * 0.38;
   const apexY = baseY - h;
+  const fs = tamRotulo(11, escala);
 
   return (
     <>
@@ -205,21 +296,23 @@ function SvgCono({ radio, altura }: { radio: number; altura: number }) {
       <ellipse cx={CX} cy={baseY} rx={rx} ry={ry} fill="#2E86AB" fillOpacity="0.65" stroke="#1a5278" strokeWidth="1.5" />
       <circle cx={CX} cy={apexY} r={3} fill="white" stroke="#1a5278" strokeWidth="1" />
       <line x1={CX} y1={baseY} x2={CX + rx} y2={baseY} stroke="white" strokeWidth="1.5" strokeDasharray="3,2" opacity="0.85" />
-      <text x={CX + rx / 2 + 2} y={baseY + 17} textAnchor="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">r={medExacta(radio)}</text>
+      {/* Debajo de la base entera (que baja ry por debajo del radio dibujado) */}
+      <Rotulo x={CX + rx / 2} y={baseY + ry + fs} texto={`r=${medExacta(radio)}`} fs={fs} ancla="middle" />
       <line x1={CX + rx + 10} y1={apexY} x2={CX + rx + 10} y2={baseY} stroke="var(--text-secondary)" strokeWidth="1" strokeDasharray="2,2" />
       <line x1={CX + rx + 6} y1={apexY} x2={CX + rx + 14} y2={apexY} stroke="var(--text-secondary)" strokeWidth="1" />
       <line x1={CX + rx + 6} y1={baseY} x2={CX + rx + 14} y2={baseY} stroke="var(--text-secondary)" strokeWidth="1" />
-      <text x={CX + rx + 16} y={(apexY + baseY) / 2 + 4} textAnchor="start" fill="var(--text-primary)" fontSize="11" fontWeight="bold">h={medExacta(altura)}</text>
+      <Rotulo x={CX + rx + 16} y={(apexY + baseY) / 2 + fs * 0.35} texto={`h=${medExacta(altura)}`} fs={fs} ancla="start" />
     </>
   );
 }
 
-function SvgPiramide({ lado, altura }: { lado: number; altura: number }) {
+function SvgPiramide({ lado, altura, escala }: { lado: number; altura: number; escala: number }) {
   const L = lado, H = altura;
   const sw = L * 1.732;
   const sh = H + L * 0.5;
-  const s = Math.min(105 / Math.max(sw, 0.1), 115 / Math.max(sh, 0.1), 13);
+  const s = Math.min(105 / divisor(sw), 115 / divisor(sh));
   const by = CY + H * s / 2 - L * s * 0.25;
+  const fs = tamRotulo(11, escala);
 
   function isoL(x: number, y: number, z: number): Pt {
     return [CX + (x - z) * s * 0.866, by - y * s + (x + z) * s * 0.5];
@@ -242,8 +335,9 @@ function SvgPiramide({ lado, altura }: { lado: number; altura: number }) {
       <polygon points={ptsStr([apex, b10, b11])} fill="#2E86AB" fillOpacity="0.72" stroke="#1a5278" strokeWidth="1.5" strokeLinejoin="round" />
       <line x1={apex[0]} y1={apex[1]} x2={center[0]} y2={center[1]} stroke="white" strokeWidth="1" strokeDasharray="2,2" opacity="0.6" />
       <circle cx={apex[0]} cy={apex[1]} r={3} fill="white" stroke="#1a5278" strokeWidth="1" />
-      <text x={apex[0] - 26} y={(apex[1] + center[1]) / 2 + 4} textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">h={medExacta(altura)}</text>
-      <text x={mB10B11[0]} y={mB10B11[1] + 17} textAnchor="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">l={medExacta(lado)}</text>
+      {/* A la izquierda de la pirámide, a la altura media de la altura dibujada */}
+      <Rotulo x={b01[0] - fs * 0.5} y={(apex[1] + center[1]) / 2 + fs * 0.35} texto={`h=${medExacta(altura)}`} fs={fs} ancla="end" />
+      <Rotulo x={mB10B11[0] + fs * 0.2} y={mB10B11[1] + fs * 1.1} texto={`l=${medExacta(lado)}`} fs={fs} ancla="start" />
     </>
   );
 }
@@ -313,14 +407,6 @@ function medEditable(v: number): string {
   return plano.replace('.', ',');
 }
 
-/**
- * La medida tal cual entra en el cálculo, sin redondear.
- *
- * La caja «Fórmula aplicada» usaba `med()`, de dos decimales, mientras el volumen se
- * calcula con el valor completo: quien rehacía a mano la operación que la app enseña no
- * llegaba al número que la app muestra (Inspector, 20/08/2026). Hasta seis decimales,
- * que es donde el campo deja de admitir más.
- */
 /** Dígito a superíndice unicode, para la notación científica (4,188790×10⁻⁶). */
 const SUPERINDICES: Record<string, string> = {
   '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
@@ -341,10 +427,32 @@ function notacionCientifica(v: number, decimalesMantisa: number): string {
   return `${formatNumber(mantisa, decimalesMantisa)}×10${superindice(exponente)}`;
 }
 
+/**
+ * La medida tal cual entra en el cálculo, sin redondear: en la fórmula, en los rótulos del
+ * dibujo, en el pie y en el aria-label del deslizador.
+ *
+ * La caja «Fórmula aplicada» usaba `med()`, de dos decimales, mientras el volumen se
+ * calcula con el valor completo: quien rehacía a mano la operación que la app enseña no
+ * llegaba al número que la app muestra (Inspector, 20/08/2026).
+ *
+ * ⚠️ 02/10/2026 (hallazgo 2655) — la reparación de entonces cortaba a SEIS decimales «que es
+ * donde el campo deja de admitir más», y era falso: el campo admite cualquier número. Entre
+ * 0,0001 y 0,001 quedaban tres cifras significativas frente a las siete del volumen
+ * (r = 0,0009999 se escribía «0,001000», que rehecho da otro volumen), y el relleno con ceros
+ * aparentaba una precisión que nadie tecleó; la notación científica rellenaba igual
+ * («5,000×10⁻⁵» por 0,00005). Ahora se escriben exactamente las cifras de la medida: las de su
+ * representación decimal más corta (`String`, `toExponential()` sin argumento), que es la que
+ * devuelve el número que se usa, sin ceros de relleno.
+ */
 function medExacta(v: number): string {
-  if (v > 0 && v < 0.0001) return notacionCientifica(v, 3);
+  if (!Number.isFinite(v)) return formatNumber(v, 0);
+  if (v > 0 && v < 0.0001) {
+    const [mantisa, exponente] = v.toExponential().split('e');
+    const decimales = (mantisa.split('.')[1] ?? '').length;
+    return `${formatNumber(Number(mantisa), decimales)}×10${superindice(Number(exponente))}`;
+  }
   if (Number.isInteger(v)) return formatNumber(v, 0);
-  const decimales = Math.min(6, (String(v).split('.')[1] ?? '').length);
+  const decimales = (String(v).split('.')[1] ?? '').length;
   return formatNumber(v, decimales);
 }
 
@@ -387,6 +495,16 @@ function formatVolumen(v: number): string {
   return formatNumber(v, 0);
 }
 
+/**
+ * Un texto que aún no es una medida pero lo será con solo seguir tecleando: ceros y, como
+ * mucho, un separador decimal («0», «0,», «,», «0,000»). Hallazgo 2656, ver `desdeCampo`.
+ */
+function esMedidaAMedias(t: string): boolean {
+  if (t.trim() === '' || !/^\s*\d*[.,]?\d*\s*$/.test(t)) return false;
+  const n = parseSpanishNumber(t);
+  return isNaN(n) || n === 0;
+}
+
 // =========================================================
 // COMPONENTE SLIDER REUTILIZABLE
 // =========================================================
@@ -418,22 +536,37 @@ function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps)
   const [avisoCampo, setAvisoCampo] = useState('');
 
   const desdeSlider = (v: number) => { setTexto(medEditable(v)); setAvisoCampo(''); onChange(v); };
+
+  /** El aviso que corresponde a un texto que no es una medida válida ('' si lo es). */
+  const avisoPara = (t: string): string => {
+    if (t.trim() === '') return '';
+    const n = parseSpanishNumber(t);
+    if (isNaN(n)) return 'Escribe un número: se sigue calculando con la última medida válida.';
+    if (n <= 0 || n > DIM_MAX_CAMPO) {
+      return `La medida debe estar entre 0 y ${formatNumber(DIM_MAX_CAMPO, 0)}: se sigue calculando con la última válida.`;
+    }
+    return '';
+  };
+
   const desdeCampo = (t: string) => {
     setTexto(t);
-    if (t.trim() === '') { setAvisoCampo(''); return; }
-    const n = parseSpanishNumber(t);
-    if (isNaN(n)) {
-      setAvisoCampo('Escribe un número: se sigue calculando con la última medida válida.');
-      return;
+    /*
+      ⚠️ 02/10/2026 (hallazgo 2656) — el «0» con el que empieza cualquier medida menor que 1
+      (la guía propone r = 0,01) se validaba como medida y montaba el role="alert" de «≤ 0»
+      mientras se tecleaba, y el lector de pantalla lo anunciaba en mitad de la escritura;
+      «0,00005» lo sostenía cinco teclas. Lo que todavía puede acabar en una medida válida con
+      solo seguir tecleando —ceros y, como mucho, un separador: «0», «0,», «,», «0,00»— es un
+      borrador: no avisa ni calcula, y se juzga al salir del campo (onBlur), como en
+      `simulador-campo-electrico` (33c10c79). Lo demás se avisa en el acto, porque ninguna
+      tecla más lo arregla: «-», «abc», «100000,5».
+    */
+    if (esMedidaAMedias(t)) { setAvisoCampo(''); return; }
+    const aviso = avisoPara(t);
+    setAvisoCampo(aviso);
+    if (aviso === '') {
+      const n = parseSpanishNumber(t);
+      if (!isNaN(n)) onChange(n);
     }
-    if (n <= 0 || n > DIM_MAX_CAMPO) {
-      setAvisoCampo(
-        `La medida debe estar entre 0 y ${formatNumber(DIM_MAX_CAMPO, 0)}: se sigue calculando con la última válida.`,
-      );
-      return;
-    }
-    setAvisoCampo('');
-    onChange(n);
   };
 
   return (
@@ -447,6 +580,7 @@ function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps)
             inputMode="decimal"
             value={texto}
             onChange={(e) => desdeCampo(e.target.value)}
+            onBlur={() => setAvisoCampo(avisoPara(texto))}
             className={styles.paramCampo}
             aria-label={`${label}, medida exacta`}
             aria-invalid={avisoCampo !== ''}
@@ -487,6 +621,24 @@ function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps)
   );
 }
 
+/**
+ * Un número largo con puntos de corte: tras cada punto de millar y antes de «×10». En el móvil
+ * la tarjeta del resultado ocupa media fila y «4.188.790.204.786.391» o «7,871076×10⁻¹⁵» no
+ * caben en una línea; así se parten por donde se leen y no por cualquier cifra. <wbr> no
+ * añade texto: lo que lee el lector de pantalla es el mismo número.
+ */
+function ConCortes({ texto }: { texto: string }) {
+  const CORTE = '|';
+  const trozos = texto.replace(/\./g, `.${CORTE}`).replace(/×/g, `${CORTE}×`).split(CORTE);
+  return (
+    <>
+      {trozos.map((t, i) => (
+        <Fragment key={i}>{i > 0 && <wbr />}{t}</Fragment>
+      ))}
+    </>
+  );
+}
+
 // =========================================================
 // COMPONENTE PRINCIPAL
 // =========================================================
@@ -509,6 +661,26 @@ export default function VisualizadorVolumenesPage() {
 
   const volumen = useMemo(() => calcVolumen(figura, params), [figura, params]);
   const formula = useMemo(() => getFormula(figura, params), [figura, params]);
+
+  // Píxeles de pantalla por unidad del viewBox (hallazgo 2652): de ella sale el tamaño de los
+  // rótulos del dibujo, que no deben bajar de ROTULO_MIN_PX por mucho que el lienzo se encoja.
+  const refSvg = useRef<SVGSVGElement>(null);
+  const [escala, setEscala] = useState(1);
+  useEffect(() => {
+    const svg = refSvg.current;
+    if (!svg) return;
+    const medir = () => {
+      const caja = svg.getBoundingClientRect();
+      // preserveAspectRatio por defecto (meet): manda el lado que menos se estira
+      const e = Math.min(caja.width / ANCHO_LIENZO, caja.height / ALTO_LIENZO);
+      if (e > 0) setEscala(e);
+    };
+    medir();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observador = new ResizeObserver(medir);
+    observador.observe(svg);
+    return () => observador.disconnect();
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -545,16 +717,17 @@ export default function VisualizadorVolumenesPage() {
         {/* Panel SVG */}
         <div className={styles.svgPanel}>
           <svg
-            viewBox="0 0 300 290"
+            ref={refSvg}
+            viewBox={`0 0 ${ANCHO_LIENZO} ${ALTO_LIENZO}`}
             className={styles.svgFigura}
             aria-label={`Visualización 3D de ${FIGURAS.find(f => f.id === figura)?.nombre}`}
             role="img"
           >
-            {figura === 'esfera' && <SvgEsfera radio={radio} />}
-            {figura === 'cubo' && <SvgCubo ancho={ancho} largo={largo} alto={alto} />}
-            {figura === 'cilindro' && <SvgCilindro radio={radioCil} altura={alturaCil} />}
-            {figura === 'cono' && <SvgCono radio={radioCon} altura={alturaCon} />}
-            {figura === 'piramide' && <SvgPiramide lado={lado} altura={alturaPir} />}
+            {figura === 'esfera' && <SvgEsfera radio={radio} escala={escala} />}
+            {figura === 'cubo' && <SvgCubo ancho={ancho} largo={largo} alto={alto} escala={escala} />}
+            {figura === 'cilindro' && <SvgCilindro radio={radioCil} altura={alturaCil} escala={escala} />}
+            {figura === 'cono' && <SvgCono radio={radioCon} altura={alturaCon} escala={escala} />}
+            {figura === 'piramide' && <SvgPiramide lado={lado} altura={alturaPir} escala={escala} />}
           </svg>
         </div>
 
@@ -589,13 +762,21 @@ export default function VisualizadorVolumenesPage() {
             </>
           )}
 
-          {/* Resultado */}
-          <div className={styles.resultCard} role="status" aria-live="polite" aria-atomic="true" aria-label="Resultado del volumen">
-            <span className={styles.resultLabel}>Volumen</span>
-            <span className={styles.resultValor}>{formatVolumen(volumen)}</span>
-            <span className={styles.resultUnidad}>unidades³</span>
-          </div>
+        </div>
 
+        {/*
+          Resultado. Hermano del panel de controles desde el 02/10/2026 (hallazgos 2649 y 2650),
+          para que el grid lo coloque: en escritorio sigue debajo de los controles, en la columna
+          derecha; en móvil sube JUNTO AL DIBUJO, por encima de los deslizadores. Dentro del
+          panel, cada deslizador de más (84 px) lo empujaba bajo el pliegue: en 390×844 solo la
+          esfera lo dejaba entero, y con el cilindro se veía mover el segundo deslizador sin ver
+          qué cambiaba. Encima de ellos, su sitio ya no depende de cuántas medidas tenga la figura
+          ni de que salte un aviso en un campo.
+        */}
+        <div className={styles.resultCard} role="status" aria-live="polite" aria-atomic="true" aria-label="Resultado del volumen">
+          <span className={styles.resultLabel}>Volumen</span>
+          <span className={styles.resultValor}><ConCortes texto={formatVolumen(volumen)} /></span>
+          <span className={styles.resultUnidad}>unidades³</span>
         </div>
 
         {/*
@@ -636,7 +817,7 @@ export default function VisualizadorVolumenesPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>⚽ Esfera</strong></td>
+                  <td><strong><span aria-hidden="true">⚽</span> Esfera</strong></td>
                   <td>Radio r</td>
                   <td><code>V = (4/3)πr³</code></td>
                   <td>r=5 → 523,6</td>
@@ -650,21 +831,21 @@ export default function VisualizadorVolumenesPage() {
                   <td>Habitaciones, cajas, piscinas</td>
                 </tr>
                 <tr>
-                  <td><strong>🥫 Cilindro</strong></td>
+                  <td><strong><span aria-hidden="true">🥫</span> Cilindro</strong></td>
                   <td>Radio r, altura h</td>
                   <td><code>V = πr²h</code></td>
                   <td>r=4, h=8 → 402,1</td>
                   <td>Latas, tuberías, columnas</td>
                 </tr>
                 <tr>
-                  <td><strong>🍦 Cono</strong></td>
+                  <td><strong><span aria-hidden="true">🍦</span> Cono</strong></td>
                   <td>Radio r, altura h</td>
                   <td><code>V = (1/3)πr²h</code></td>
                   <td>r=4, h=10 → 167,6</td>
                   <td>Embudos, cucuruchos, tejados</td>
                 </tr>
                 <tr>
-                  <td><strong>🔺 Pirámide</strong></td>
+                  <td><strong><span aria-hidden="true">🔺</span> Pirámide</strong></td>
                   <td>Lado l, altura h</td>
                   <td><code>V = (1/3)l²h</code></td>
                   <td>l=6, h=8 → 96</td>
