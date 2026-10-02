@@ -22,13 +22,17 @@
  *     respuestas solo sumaban, así que salía el transporte público a quien acababa de decir que
  *     en su zona no lo hay, la bici o la moto a quien tiene limitaciones de movilidad
  *     importantes y la bici a más de 40 km. Ahora se descarta:
- *       · el transporte público con la red «Deficiente o inexistente en mi zona»;
+ *       · el transporte público con «No hay transporte público en mi zona» (hasta el 02/10/2026
+ *         era «Deficiente o inexistente», un solo radio para dos cosas: hallazgo 2700);
  *       · la bici o el patinete y la moto con «Sí, tengo limitaciones importantes» (riesgo de
  *         seguridad, no una preferencia);
  *       · la bici o el patinete con «Más de 40 km» (su propia ficha: «rinde en trayectos
  *         cortos»);
- *       · la combinación multimodal cuando, con esos descartes, no quedan dos medios que
- *         combinar (sin red y con limitaciones solo queda el coche).
+ *       · la combinación multimodal cuando, con esos descartes, no quedan ni el transporte
+ *         público ni la bici o el patinete. Antes bastaba con que quedaran dos medios, y con el
+ *         coche y la moto se recomendaba una «multimodal» cotizada como «abono más bici o
+ *         patinete» (hallazgo 2699): dos vehículos propios no son una combinación, y su coste
+ *         es el de los dos.
  *     El coche nunca se descarta, así que siempre hay recomendación. Si lo descartado sumaba
  *     tantos puntos o más que lo recomendado, el resultado lo dice (`avisoDescarte`).
  *
@@ -115,8 +119,18 @@ export const PREGUNTAS: Pregunta[] = [
         icono: '🟡',
         pesos: { transporte_publico: 2, combinacion: 3, moto_escuter: 1 },
       },
+      // «Deficiente o inexistente en mi zona» era UN radio para dos situaciones distintas, y el
+      // motor descartaba el transporte público con las dos (hallazgo 2700): quien tiene una red
+      // mala pero la usa perdía la opción que más le sumaba. Ahora son dos respuestas. La red
+      // deficiente conserva los pesos de antes y es una preferencia (se cita en «Lo que juega en
+      // contra» si aun así gana el transporte público); la inexistente, además, lo DESCARTA.
       {
-        texto: 'Deficiente o inexistente en mi zona',
+        texto: 'Deficiente: pasa poco o no cubre bien mis trayectos',
+        icono: '🟠',
+        pesos: { coche_propio: 3, moto_escuter: 2 },
+      },
+      {
+        texto: 'No hay transporte público en mi zona',
         icono: '❌',
         pesos: { coche_propio: 3, moto_escuter: 2 },
       },
@@ -479,7 +493,8 @@ export type MotivoDescarte = 'sin_red' | 'limitacion' | 'distancia' | 'sin_combi
 // Índices de las opciones que acotan (la opción n de la pregunta, contando desde 0).
 const P1_15_40 = 2;
 const P1_MAS_40 = 3;
-const P2_SIN_RED = 2;
+const P2_DEFICIENTE = 2;
+const P2_SIN_RED = 3;
 const P3_BULTOS_HABITUAL = 0;
 const P5_COSTE_CRITICO = 0;
 const P7_SEGURIDAD_PRIORIDAD = 0;
@@ -488,6 +503,13 @@ const P10_LIMITACION_IMPORTANTE = 0;
 
 /** Los medios «simples» con los que se arma una combinación multimodal. */
 const SIMPLES: TipoTransporte[] = ['coche_propio', 'transporte_publico', 'moto_escuter', 'bici_patinete'];
+
+/**
+ * La base de una combinación: el transporte público o la bici o el patinete. Sin ninguno de los
+ * dos solo quedan vehículos propios (coche y moto), y eso no es lo que la ficha describe ni lo
+ * que cotiza `COSTE_MENSUAL.combinacion` (hallazgo 2699).
+ */
+const BASE_COMBINACION: TipoTransporte[] = ['transporte_publico', 'bici_patinete'];
 
 export interface Resultado {
   tipo: TipoTransporte;
@@ -539,8 +561,9 @@ export function calcularResultado(respuestas: readonly number[]): Resultado {
     descartes.moto_escuter = 'limitacion';
   }
   if (respondio(1, P1_MAS_40) && !descartes.bici_patinete) descartes.bici_patinete = 'distancia';
-  // Una combinación necesita al menos dos medios que combinar.
-  if (SIMPLES.filter((k) => !descartes[k]).length < 2) descartes.combinacion = 'sin_combinar';
+  // Una combinación necesita el transporte público o la bici para apoyarse (y, como el coche no
+  // se descarta nunca, con cualquiera de los dos quedan al menos dos medios).
+  if (BASE_COMBINACION.every((k) => descartes[k])) descartes.combinacion = 'sin_combinar';
 
   const peso = (pregunta: number, k: TipoTransporte) => aporte[pregunta]?.[k] ?? 0;
   const ordenar = (a: TipoTransporte, b: TipoTransporte) => {
@@ -583,7 +606,7 @@ export function calcularResultado(respuestas: readonly number[]): Resultado {
     sin_red: `porque sobre la red de transporte público has respondido ${cita(2)}`,
     limitacion: `porque has respondido ${cita(10)} sobre tu movilidad física`,
     distancia: `porque tu trayecto es de ${cita(1)} y la bici o el patinete rinden en trayectos cortos`,
-    sin_combinar: 'porque, con lo que has declarado, no quedan dos medios que combinar',
+    sin_combinar: 'porque se apoya en el transporte público o en la bici o el patinete, y tus respuestas descartan los dos',
   };
   const apartados = CLAVES
     .filter((k) => descartes[k] && puntos[k] >= puntos[tipo])
@@ -619,6 +642,9 @@ export function calcularResultado(respuestas: readonly number[]): Resultado {
   if (tipo === 'combinacion' && descartes.transporte_publico) {
     const quedan = SIMPLES.filter((k) => !descartes[k]).map((k) => CON_ARTICULO[k]);
     enContra.push(`Red de transporte público: has respondido ${cita(2)}. Tu combinación tendrá que apoyarse en ${enumerar(quedan)}, no en el transporte público.`);
+  }
+  if (tipo === 'transporte_publico' && respondio(2, P2_DEFICIENTE)) {
+    enContra.push(`Red de transporte público: has respondido ${cita(2)}. Antes de decidir, comprueba que alguna línea une tu origen y tu destino a las horas a las que viajas.`);
   }
   if (tipo === 'combinacion' && descartes.bici_patinete === 'limitacion') {
     enContra.push(`Movilidad física: has respondido ${cita(10)}. En tu combinación quedan fuera la bici, el patinete y la moto.`);

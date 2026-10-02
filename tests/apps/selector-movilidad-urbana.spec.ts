@@ -66,7 +66,8 @@ async function responder(page: Page, indices: readonly number[]): Promise<string
 // Antes: combinación multimodal, por ser el valor inicial del reduce.
 const EMPATE = [0, 0, 0, 0, 1, 0, 2, 1, 0, 2] as const;
 
-// Menos de 5 km · Red DEFICIENTE · Bultos habitualmente · Horarios irregulares con frecuencia ·
+// Menos de 5 km · NO HAY red (hasta el 02/10/2026, «Deficiente o inexistente»; hallazgo 2700) ·
+// Bultos habitualmente · Horarios irregulares con frecuencia ·
 // Coste crítico · Aparcamiento con coste notable · Seguridad: mucho · Clima moderado ·
 // Sostenibilidad fundamental · Buena forma.
 //   coche 3+4+3+1+2 = 13 · TP 2+4+3+1+3+1 = 14 · bici 3+3+4+3 = 13 · moto 2+2+2+1+2 = 9 ·
@@ -76,7 +77,7 @@ const EMPATE = [0, 0, 0, 0, 1, 0, 2, 1, 0, 2] as const;
 //   BUENO recomendar el transporte público con la red «Deficiente o inexistente» (hallazgo 1488).
 //   Ahora el transporte público se descarta y se dice: quedan bici 13 = coche 13, y el empate lo
 //   deshace la movilidad física (bici 3, coche 0) → Bicicleta o Patinete Eléctrico.
-const TP_SIN_RED = [0, 2, 0, 0, 0, 1, 0, 1, 0, 2] as const;
+const TP_SIN_RED = [0, 3, 0, 0, 0, 1, 0, 1, 0, 2] as const;
 
 test('el grupo de opciones tiene radios de verdad, y aria-checked sigue al clic', async ({ page }) => {
   await abrirTest(page);
@@ -117,7 +118,7 @@ test('un empate se anuncia y lo deshace la movilidad física, no el valor inicia
   );
 });
 
-test('las razones salen de las respuestas, y con red deficiente el transporte público se descarta y se dice', async ({ page }) => {
+test('las razones salen de las respuestas, y sin red de transporte público se descarta y se dice', async ({ page }) => {
   await abrirTest(page);
   const texto = await responder(page, TP_SIN_RED);
   await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Bicicleta o Patinete Eléctrico');
@@ -125,7 +126,7 @@ test('las razones salen de las respuestas, y con red deficiente el transporte p�
   expect(texto).not.toContain('tus horarios son regulares');
   expect(texto).not.toContain('Red amplia y frecuente en tu zona');
   await expect(page.locator('[class*="avisoDescarte"]')).toContainText(
-    'el transporte público (14 puntos), porque sobre la red de transporte público has respondido «Deficiente o inexistente en mi zona»',
+    'el transporte público (14 puntos), porque sobre la red de transporte público has respondido «No hay transporte público en mi zona»',
   );
   await expect(page.locator('[class*="avisoEmpate"]')).toContainText('la bici o el patinete eléctrico y el coche propio encajan exactamente igual');
   // Las tres que más suman a la bici: P9 (4), P1 (3) y P5 (3; empata con P10 y va antes por número)
@@ -192,8 +193,11 @@ test('motor: ningún empate queda en silencio, y el criterio que se anuncia es v
   };
   recorrer(0);
   expect(fallos).toEqual([]);
-  expect(total).toBe(78_732);
-  expect(empates).toBe(7_483);
+  // 02/10/2026 (hallazgos 2699 y 2700): la pregunta 2 tiene ahora cuatro opciones («Deficiente»
+  // y «No hay transporte público» por separado), así que el total pasa de 78.732 a 104.976
+  // (78.732 × 4 / 3); los empates, de 7.483 a 10.122.
+  expect(total).toBe(104_976);
+  expect(empates).toBe(10_122);
 });
 
 // Uno de los 26 perfiles del superlativo falso, a mano:
@@ -233,7 +237,7 @@ test('motor: con dos criterios de desempate, cada uno nombra a quien deja detrá
 // que juega en contra». Cada test de restricción cierra con el barrido del motor: 0 perfiles
 // que la violen de las 78.732.
 test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la guía y contraste', () => {
-  /** Recorre las 78.732 combinaciones y devuelve cuántas cumplen `cond`. */
+  /** Recorre todas las combinaciones (104.976 desde el 02/10/2026) y devuelve cuántas cumplen `cond`. */
   function contar(cond: (r: readonly number[], res: ReturnType<typeof calcularResultado>) => boolean): number {
     const r: number[] = [];
     let n = 0;
@@ -399,7 +403,7 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
   });
 
   // ── HALLAZGO 1: red «Deficiente o inexistente» → transporte público ──
-  // 15-40 km · Deficiente o inexistente en mi zona · Casi nunca · Horario fijo · Coste crítico ·
+  // 15-40 km · No hay transporte público en mi zona (antes «Deficiente o inexistente») · Casi nunca · Horario fijo · Coste crítico ·
   // Complicado o caro aparcar · Seguridad: mucho · Clima adverso · Sostenibilidad fundamental ·
   // Limitaciones importantes.
   //   TP 3+2+3+4+3+3+2+3+2 = 25 · coche 2+3+2+3+4 = 14 · bici 2+2+3+2+4 = 13 · moto 8 · comb 8.
@@ -407,34 +411,37 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
   // REPARADO (1488): el TP se descarta. Con «Sí, tengo limitaciones importantes» también caen
   // la bici y la moto (8, 13), y sin TP ni bici ni moto no queda nada que combinar: gana el coche
   // con 14, y el aviso nombra al TP (25), el único descartado que le superaba.
-  const RED_INEXISTENTE = [2, 2, 2, 2, 0, 2, 0, 0, 0, 0] as const;
+  const RED_INEXISTENTE = [2, 3, 2, 2, 0, 2, 0, 0, 0, 0] as const;
   test('1488: a quien dice que no hay red de transporte público no se le recomienda, y se le dice', async ({ page }) => {
     const { titulo } = await resultadoDe(page, RED_INEXISTENTE);
     expect(titulo).toBe('Coche Propio');
     await expect(page.locator('[class*="avisoDescarte"]')).toContainText(
-      'Se ha descartado una opción que sumaba tantos puntos o más que el coche propio (14 puntos): el transporte público (25 puntos), porque sobre la red de transporte público has respondido «Deficiente o inexistente en mi zona».',
+      'Se ha descartado una opción que sumaba tantos puntos o más que el coche propio (14 puntos): el transporte público (25 puntos), porque sobre la red de transporte público has respondido «No hay transporte público en mi zona».',
     );
-    expect(contar((r, res) => r[1] === 2 && res.tipo === 'transporte_publico')).toBe(0);
+    expect(contar((r, res) => r[1] === 3 && res.tipo === 'transporte_publico')).toBe(0);
+    // Y la red DEFICIENTE (que existe) ya no descarta el transporte público (hallazgo 2700).
+    expect(contar((r, res) => r[1] === 2 && Boolean(res.descartes.transporte_publico))).toBe(0);
   });
 
   // ── HALLAZGO 2: «Sí, tengo limitaciones importantes» → bici o patinete ──
-  // Menos de 5 km · Deficiente o inexistente · Casi nunca · Horario fijo · Coste crítico ·
+  // Menos de 5 km · No hay transporte público · Casi nunca · Horario fijo · Coste crítico ·
   // Complicado o caro aparcar · Seguridad: poco · Clima muy bueno · Sostenibilidad fundamental ·
   // Sí, tengo limitaciones importantes.
   //   bici 3+2+2+3+2+2+3+4 = 21 · TP 2+2+3+4+3+3+2 = 19 · moto 10 · comb 10 · coche 7.
   // Antes: bici 216 veces y moto 330 con limitaciones importantes, con «Ejercicio físico
   // integrado en tu rutina». REPARADO (1489): la limitación descarta bici y moto (es un riesgo
-  // de seguridad, no una preferencia). Aquí además la red es deficiente: fuera el TP (19), y sin
-  // TP, bici ni moto no hay combinación (10). Queda el coche con 7, y el aviso nombra a los
+  // de seguridad, no una preferencia). Aquí además no hay red: fuera el TP (19), y sin
+  // TP, bici ni moto no hay combinación (10; desde el 2699, el motivo dice en qué se apoya una
+  // combinación, el transporte público o la bici, y que los dos están fuera). Queda el coche con 7, y el aviso nombra a los
   // cuatro descartados que le superaban, por puntos (combinación y moto empatan a 10; la
   // distancia, P1, da 1 a la combinación y 0 a la moto).
-  const LIMITACION_BICI = [0, 2, 2, 2, 0, 2, 2, 2, 0, 0] as const;
+  const LIMITACION_BICI = [0, 3, 2, 2, 0, 2, 2, 2, 0, 0] as const;
   test('1489: con limitaciones de movilidad importantes no se recomienda bici, patinete ni moto, y se dice', async ({ page }) => {
     const { titulo, texto } = await resultadoDe(page, LIMITACION_BICI);
     expect(titulo).toBe('Coche Propio');
     expect(texto).not.toContain('Ejercicio físico integrado en tu rutina');
     await expect(page.locator('[class*="avisoDescarte"]')).toContainText(
-      'Se han descartado opciones que sumaban tantos puntos o más que el coche propio (7 puntos): la bici o el patinete eléctrico (21 puntos), porque has respondido «Sí, tengo limitaciones importantes» sobre tu movilidad física; el transporte público (19 puntos), porque sobre la red de transporte público has respondido «Deficiente o inexistente en mi zona»; la combinación multimodal (10 puntos), porque, con lo que has declarado, no quedan dos medios que combinar; la moto o el escúter (10 puntos), porque has respondido «Sí, tengo limitaciones importantes» sobre tu movilidad física.',
+      'Se han descartado opciones que sumaban tantos puntos o más que el coche propio (7 puntos): la bici o el patinete eléctrico (21 puntos), porque has respondido «Sí, tengo limitaciones importantes» sobre tu movilidad física; el transporte público (19 puntos), porque sobre la red de transporte público has respondido «No hay transporte público en mi zona»; la combinación multimodal (10 puntos), porque se apoya en el transporte público o en la bici o el patinete, y tus respuestas descartan los dos; la moto o el escúter (10 puntos), porque has respondido «Sí, tengo limitaciones importantes» sobre tu movilidad física.',
     );
     expect(contar((r, res) => r[9] === 0 && (res.tipo === 'bici_patinete' || res.tipo === 'moto_escuter'))).toBe(0);
   });
@@ -462,17 +469,17 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
   });
 
   // ── HALLAZGO 4: bultos o sillas de bebé «Sí, habitualmente» → bici o patinete ──
-  // Menos de 5 km · Deficiente o inexistente · Sí, habitualmente · Horario fijo · Coste crítico ·
+  // Menos de 5 km · No hay transporte público · Sí, habitualmente · Horario fijo · Coste crítico ·
   // Complicado o caro aparcar · Seguridad: poco · Clima muy bueno · Sostenibilidad fundamental ·
   // Buena forma.
   //   bici 3+2+3+2+2+3+4+3 = 22 · TP 2+3+4+3+3+1 = 16 · comb 11 · moto 10 · coche 7.
   // Antes: con «Sí, habitualmente» salía bici 1.015 veces y moto 463 sin mención de la carga.
   // REPARADO (1491) como AVISO, no como descarte: llevar bultos es un compromiso posible en bici
-  // (portabultos, remolque), no una imposibilidad. La red deficiente descarta el TP (16), que no
+  // (portabultos, remolque), no una imposibilidad. Sin red se descarta el TP (16), que no
   // competía: sin aviso de descarte. Gana la bici con 22 y «Lo que juega en contra» cita la
   // respuesta. En moto, el aviso añade que no puede llevar de pasajero a un menor de 7 años
   // (Reglamento General de Circulación, art. 12.1 y 12.2, BOE-A-2003-23514).
-  const BULTOS_BICI = [0, 2, 0, 2, 0, 2, 2, 2, 0, 2] as const;
+  const BULTOS_BICI = [0, 3, 0, 2, 0, 2, 2, 2, 0, 2] as const;
   test('1491: a quien lleva bultos o sillas de bebé a diario, la bici o la moto se le recomienda citando la carga', async ({ page }) => {
     const { titulo } = await resultadoDe(page, BULTOS_BICI);
     expect(titulo).toBe('Bicicleta o Patinete Eléctrico');
@@ -491,8 +498,8 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
   // prioridad · Sí, llueve mucho… · Poco relevante · Leve, prefiero comodidad.
   //   coche 4+3+3+2+3+2+2 = 19 · TP 2+4+4+3+2+2 = 17 · bici 6 · moto 4 · comb 4.
   // Antes: con «Crítica» salía el coche en 5.768 perfiles sin mención del coste declarado.
-  // REPARADO (1492) como AVISO: la pregunta mide la IMPORTANCIA del coste, no un tope, y con red
-  // deficiente y limitaciones el coche puede ser lo único que queda. «Lo que juega en contra»
+  // REPARADO (1492) como AVISO: la pregunta mide la IMPORTANCIA del coste, no un tope, y sin red
+  // y con limitaciones el coche puede ser lo único que queda. «Lo que juega en contra»
   // cita la respuesta, el coste del coche y lo más barato que no descartan las respuestas: aquí
   // nada se descarta, así que la bici (5–30 €/mes).
   const COSTE_CRITICO_COCHE = [0, 0, 0, 0, 0, 0, 0, 0, 2, 1] as const;
@@ -507,14 +514,14 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
   });
 
   // ── HALLAZGO 6: seguridad vial «Mucho, es una prioridad para mí» → moto ──
-  // Entre 5 y 15 km · Deficiente o inexistente · Casi nunca · Sí, con frecuencia (nocturno) ·
+  // Entre 5 y 15 km · No hay transporte público · Casi nunca · Sí, con frecuencia (nocturno) ·
   // Importante, pero puedo asumir · Sí, pero tiene coste notable · Mucho, es una prioridad para mí ·
   // Muy bueno · Poco relevante · Buena forma.
   //   moto 3+2+2+2+2+2+2+1+2 = 18 · coche 3+3+1+2+2 = 11 · TP 10 · bici 11 · comb 10.
   // Antes: 397 perfiles con esa respuesta recibían la moto sin mención. REPARADO (1493) como
   // AVISO (es una prioridad, no una imposibilidad): la moto gana con 18 (el TP, descartado por la
   // red, solo sumaba 10) y «Lo que juega en contra» cita la respuesta. Vale igual para la bici.
-  const SEGURIDAD_MOTO = [1, 2, 2, 0, 1, 1, 0, 2, 2, 2] as const;
+  const SEGURIDAD_MOTO = [1, 3, 2, 0, 1, 1, 0, 2, 2, 2] as const;
   test('1493: a quien prioriza la seguridad vial, la moto se le recomienda citando esa prioridad', async ({ page }) => {
     const { titulo } = await resultadoDe(page, SEGURIDAD_MOTO);
     expect(titulo).toBe('Moto o Escúter');
@@ -526,7 +533,7 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
   });
 
   // ── HALLAZGO 7: ficha fija de la bici «con buen clima» a quien declara clima adverso ──
-  // Menos de 5 km · Deficiente o inexistente · Sí, habitualmente · Ocasionalmente · Coste crítico ·
+  // Menos de 5 km · No hay transporte público · Sí, habitualmente · Ocasionalmente · Coste crítico ·
   // Sí, pero tiene coste notable · Seguridad: poco · Sí, llueve mucho o hace mucho frío/calor ·
   // Sostenibilidad fundamental · Buena forma.
   //   bici 3+3+2+4+3 = 15 · coche 3+4+1+1+3 = 12 · TP 2+4+2+3+1 = 12 · comb 10 · moto 9.
@@ -534,7 +541,7 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
   // clima» con clima adverso o 15 km o más. REPARADO (1494): la descripción habla del medio
   // («la lluvia, el frío o el calor fuerte le restan comodidad») y el clima declarado se cita en
   // «Lo que juega en contra», junto con la carga, que este perfil también declara.
-  const CLIMA_ADVERSO_BICI = [0, 2, 0, 1, 0, 1, 2, 0, 0, 2] as const;
+  const CLIMA_ADVERSO_BICI = [0, 3, 0, 1, 0, 1, 2, 0, 0, 2] as const;
   test('1494: la ficha de la bici no afirma «con buen clima», y el clima adverso declarado se cita', async ({ page }) => {
     const { titulo, texto } = await resultadoDe(page, CLIMA_ADVERSO_BICI);
     expect(titulo).toBe('Bicicleta o Patinete Eléctrico');
@@ -618,7 +625,11 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
     const guia = await textoGuia(page);
     expect(guia).not.toContain('deducciones en el IRPF para trabajadores (hasta 1.500 € anuales desde 2023)');
     expect(guia).not.toContain('desde 2023');
-    expect(guia).toContain('esa retribución en especie está exenta de IRPF hasta 1.500 € al año por trabajador (Reglamento del IRPF, art. 46 bis');
+    // Reescrito el 02/10/2026 con el 2701: los 1.500 € anuales los fija la Ley del IRPF, art.
+    // 42.3.e) (BOE-A-2006-20764), y el art. 46 bis del Reglamento añade el tope mensual de la
+    // tarjeta; el test de abajo comprueba que el 46 bis se sigue citando y con su cifra.
+    expect(guia).toContain('esa retribución en especie está exenta de IRPF hasta 1.500 € al año por trabajador (Ley del IRPF, art. 42.3.e)');
+    expect(guia).toContain('Reglamento del IRPF (art. 46 bis)');
     expect(guia).toContain('no una deducción que el trabajador se aplique en su declaración');
   });
 
@@ -855,105 +866,180 @@ test.describe('Re-inspección 02/10/2026 — casos del motor en el navegador', (
     expect(guia).toContain('El Plan MOVES III, que ayudaba a comprar vehículos eléctricos, terminó el 31 de diciembre de 2025');
   });
 
-  // ── HALLAZGO (02/10/2026, ABIERTO): la combinación multimodal con solo el coche y la moto ──
-  // Más de 40 km · Deficiente o inexistente · A veces · Ocasionalmente · Importante · Complicado o
-  // caro aparcar · Seguridad: poco · Moderado · Me importa · Buena forma.
+  // ── 2699 (02/10/2026, REPARADO): la combinación multimodal con solo el coche y la moto ──
+  // Más de 40 km · No hay transporte público (en la inspección, «Deficiente o inexistente») · A
+  // veces · Ocasionalmente · Importante · Complicado o caro aparcar · Seguridad: poco · Moderado ·
+  // Me importa · Buena forma.
   //   coche 4+3+2+1 = 10 · TP 1+2+3+1+2+1 = 10 (descartado: sin red) · moto 2+1+2+2+2+1+2 = 12 ·
   //   bici 1+2+2+1+3 = 9 (descartada: más de 40 km) · combinación 1+2+2+2+2+2+3+2+2 = 18.
-  // Gana la combinación, y «Lo que juega en contra» dice que tendrá que apoyarse «en el coche
-  // propio y la moto o el escúter». Pero la tarjeta le pone el coste de COSTE_MENSUAL.combinacion,
-  // «80–250 €/mes (abono más bici o patinete, o uso puntual de coche o taxi)»: el abono y la bici
-  // son justo lo que se ha descartado, y la misma tabla da al coche propio 400–700 €/mes y a la
-  // moto 100–200. En el barrido: 649 perfiles (226 con el coste «Crítica»).
-  test('HALLAZGO: la combinación que solo puede ser coche y moto no se cotiza como abono y bici', async ({ page }) => {
-    test.fail();
+  // Antes ganaba la combinación con «Tu combinación tendrá que apoyarse en el coche propio y la
+  // moto o el escúter» y, en la misma tarjeta, «80–250 €/mes (abono más bici o patinete…)»: el
+  // abono y la bici eran justo lo descartado (649 perfiles en el barrido, 226 con coste «Crítica»).
+  // REPARADO: una combinación se apoya en el transporte público o en la bici; con los dos fuera,
+  // se DESCARTA (dos vehículos propios no son lo que la ficha describe ni lo que cotiza). Queda la
+  // moto con 12 frente al coche 10, el aviso nombra a la combinación (18) con el porqué, y «Lo que
+  // juega en contra» cita los más de 40 km en moto.
+  test('2699: sin transporte público ni bici no se recomienda la combinación, y se dice', async ({ page }) => {
     await abrirTest(page);
-    const texto = await responder(page, [3, 2, 1, 1, 1, 2, 2, 1, 1, 2]);
-    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Combinación Multimodal');
-    const soloCocheYMoto = texto.includes('Tu combinación tendrá que apoyarse en el coche propio y la moto o el escúter');
-    const cotizadaComoAbonoYBici = texto.includes('abono más bici o patinete');
-    expect(soloCocheYMoto && cotizadaComoAbonoYBici, 'la misma tarjeta dice que no hay abono ni bici y los cotiza').toBe(false);
+    const texto = await responder(page, [3, 3, 1, 1, 1, 2, 2, 1, 1, 2]);
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Moto o Escúter');
+    await expect(page.locator('[class*="avisoDescarte"]')).toContainText(
+      'Se ha descartado una opción que sumaba tantos puntos o más que la moto o el escúter (12 puntos): la combinación multimodal (18 puntos), porque se apoya en el transporte público o en la bici o el patinete, y tus respuestas descartan los dos.',
+    );
+    await expect(page.locator('[class*="enContra"] li')).toHaveText([
+      'Distancia: has respondido «Más de 40 km». La moto rinde en trayectos medios; a esa distancia pasarás buena parte del recorrido en vías interurbanas y a la intemperie.',
+    ]);
+    expect(texto).not.toContain('abono más bici o patinete');
+    // Barrido: ninguna combinación recomendada sin su base (antes, 649), y cuando sale con el
+    // transporte público descartado, la bici sigue entre los medios en que se apoya.
+    const r: number[] = [];
+    let sinBase = 0;
+    let total = 0;
+    const recorrer = (i: number): void => {
+      if (i === PREGUNTAS.length) {
+        total++;
+        const res = calcularResultado(r);
+        if (res.tipo === 'combinacion' && res.descartes.transporte_publico && res.descartes.bici_patinete) sinBase++;
+        if (res.tipo === 'combinacion' && res.descartes.transporte_publico
+          && !res.enContra.some((t) => t.includes('la bici o el patinete eléctrico'))) sinBase++;
+        return;
+      }
+      for (let k = 0; k < PREGUNTAS[i].opciones.length; k++) { r[i] = k; recorrer(i + 1); }
+    };
+    recorrer(0);
+    expect(total).toBe(104_976);
+    expect(sinBase).toBe(0);
   });
 
-  // ── HALLAZGO (02/10/2026, ABIERTO): «Deficiente o inexistente» junta dos respuestas y un filtro ──
-  // La opción mete en el mismo radio una red que EXISTE pero es mala y una que no existe, y el
-  // motor descarta el transporte público con las dos (motor.ts:536). Perfil de quien tiene una
-  // red pobre pero la usa: menos de 5 km · Deficiente · Casi nunca · Horario fijo · Coste crítico ·
-  // Complicado o caro aparcar · Seguridad: mucho · Moderado · Sostenibilidad fundamental · Leve.
+  // ── 2700 (02/10/2026, REPARADO): «Deficiente o inexistente» juntaba dos respuestas y un filtro ──
+  // La opción metía en el mismo radio una red que EXISTE pero es mala y una que no existe, y el
+  // motor descartaba el transporte público con las dos. Perfil de quien tiene una red pobre pero
+  // la usa: menos de 5 km · Deficiente · Casi nunca · Horario fijo · Coste crítico · Complicado o
+  // caro aparcar · Seguridad: mucho · Moderado · Sostenibilidad fundamental · Leve.
   //   TP 2+2+3+4+3+3+1+3+2 = 23 · bici 3+2+2+3+2+4 = 16 · combinación 11 · coche 3+2+2 = 7 · moto 7.
-  // Con la red que existe, lo esperado es el transporte público (23), sin aviso de descarte. Hoy:
-  // la bici (16) a quien acaba de decir que la seguridad vial es su prioridad, y «se ha
-  // descartado… el transporte público (23 puntos)». El TP sumaba más que lo recomendado en 6.289
-  // de los 26.244 perfiles con esa respuesta. (Forma del 2666 de selector-mascota.)
-  test('HALLAZGO: con la red «deficiente» (que existe) el transporte público no se descarta', async ({ page }) => {
-    test.fail();
+  // Antes: la bici (16) a quien prioriza la seguridad vial, y «se ha descartado… el transporte
+  // público (23 puntos)». REPARADO: son dos opciones. «Deficiente: pasa poco o no cubre bien mis
+  // trayectos» conserva los pesos de antes y es una preferencia: no descarta, y si gana el
+  // transporte público «Lo que juega en contra» la cita. «No hay transporte público en mi zona»
+  // descarta, como antes (lo fija el 1488 de arriba). (Forma del 2666 de selector-mascota.)
+  test('2700: con la red «deficiente» (que existe) el transporte público no se descarta, y se cita', async ({ page }) => {
     const deficiente = PREGUNTAS[1].opciones.findIndex((o) => /^Deficiente/.test(o.texto));
-    expect(deficiente).toBeGreaterThanOrEqual(0);
+    const sinRed = PREGUNTAS[1].opciones.findIndex((o) => o.texto === 'No hay transporte público en mi zona');
+    expect([deficiente, sinRed]).toEqual([2, 3]);
     await abrirTest(page);
     await responder(page, [0, deficiente, 2, 2, 0, 2, 0, 1, 0, 1]);
     await expect(page.locator('[class*="avisoDescarte"]')).toHaveCount(0);
     await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Transporte Público');
+    await expect(page.locator('[class*="enContra"] li')).toHaveText([
+      'Red de transporte público: has respondido «Deficiente: pasa poco o no cubre bien mis trayectos». Antes de decidir, comprueba que alguna línea une tu origen y tu destino a las horas a las que viajas.',
+    ]);
   });
 
-  // ── HALLAZGO (02/10/2026, ABIERTO): la tarjeta de transporte tiene también un tope mensual ──
-  // La guía cita el art. 46 bis del Reglamento del IRPF para «una tarjeta o un vale de
-  // transporte», pero solo da el límite anual. El 46 bis.1.2.º (BOE-A-2007-6820, texto
+  // ── 2701 (02/10/2026, REPARADO): la tarjeta de transporte tiene también un tope mensual ──
+  // La guía citaba el art. 46 bis del Reglamento del IRPF para «una tarjeta o un vale de
+  // transporte», pero solo daba el límite anual. El 46 bis.1.2.º (BOE-A-2007-6820, texto
   // consolidado leído el 02/10/2026): «no podrá exceder de 136,36 euros mensuales por
   // trabajador, con el límite de 1.500 euros anuales»; y el 46 bis.2, retribución en especie
   // por el exceso. Una empresa que carga 200 € al mes en la tarjeta durante 7 meses (1.400 €):
   // según la guía, exento entero; según el 46 bis, 445,48 € de exceso ((200 − 136,36) × 7).
-  test('HALLAZGO: si la guía habla de la tarjeta de transporte, da también su tope de 136,36 € al mes', async ({ page }) => {
-    test.fail();
+  // REPARADO: el anual se atribuye a la Ley (art. 42.3.e, BOE-A-2006-20764, «con el límite de
+  // 1.500 euros anuales para cada trabajador»), y la tarjeta lleva su tope mensual y la
+  // tributación del exceso. El «vale» se retira: el 46 bis habla de «tarjetas o cualquier otro
+  // medio electrónico de pago».
+  test('2701: si la guía habla de la tarjeta de transporte, da también su tope de 136,36 € al mes', async ({ page }) => {
     await abrirTest(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).first().click();
     const parrafo = (await page.locator('p', { hasText: '1.500 € al año por trabajador' }).first().innerText()).replace(/\s+/g, ' ');
     expect(parrafo).toContain('art. 46 bis');
     expect(!/tarjeta/.test(parrafo) || /136,36/.test(parrafo), parrafo).toBe(true);
+    expect(parrafo).toContain('136,36 € al mes');
+    expect(parrafo).toContain('lo que exceda de esos límites tributa como retribución en especie');
+    expect(parrafo).not.toContain('vale');
   });
 });
 
 test.describe('Re-inspección 02/10/2026 — teclado, foco y lectores de pantalla (escritorio)', () => {
-  // ── HALLAZGO (02/10/2026, ABIERTO; sospecha de SOSPECHAS.md, page.tsx:115) ──
+  // ── 2696 (02/10/2026, REPARADO; sospecha de SOSPECHAS.md, page.tsx:115) ──
   // role="radio" sin el teclado del patrón (WAI-ARIA APG), que la referencia selector-smartphone
   // ya tiene (1681): medido, cuatro paradas de Tab en un grupo de cuatro radios (todos con
-  // tabIndex 0), y ArrowDown, End o Inicio no mueven el foco ni la marca.
-  test('HALLAZGO: el grupo de radios es una sola parada de Tab y las flechas mueven y marcan', async ({ page }) => {
-    test.fail();
+  // tabIndex 0), y ArrowDown, End o Inicio no mueven el foco ni la marca. REPARADO con la receta
+  // de la referencia (`teclaEnOpcion` y tabindex itinerante).
+  test('2696: el grupo de radios es una sola parada de Tab y las flechas, Inicio y Fin mueven y marcan', async ({ page }) => {
     await abrirTest(page);
     const radios = page.locator('[role="radiogroup"] [role="radio"]');
-    expect(await radios.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([0, -1, -1, -1]);
+    const tabindex = () => radios.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex));
+    expect(await tabindex()).toEqual([0, -1, -1, -1]);
     await radios.first().focus();
     await page.keyboard.press('ArrowDown');
     await expect(radios.nth(1)).toBeFocused();
     await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true');
+    expect(await tabindex()).toEqual([-1, 0, -1, -1]);
+    await page.keyboard.press('End');
+    await expect(radios.nth(3)).toBeFocused();
+    await expect(radios.nth(3)).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('ArrowDown'); // vuelta al principio
+    await expect(radios.nth(0)).toBeFocused();
+    await expect(radios.nth(0)).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('ArrowUp'); // y al final
+    await expect(radios.nth(3)).toBeFocused();
+    await page.keyboard.press('Home');
+    await expect(radios.nth(0)).toBeFocused();
+    await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(1);
+    // Una sola parada: el Tab siguiente sale del grupo, a «Siguiente pregunta» (ya activo).
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('button', { name: 'Siguiente pregunta' })).toBeFocused();
   });
 
-  // ── HALLAZGO (02/10/2026, ABIERTO): el foco cae a <body> al avanzar o retroceder ──
+  // ── 2695 (02/10/2026, REPARADO): el foco caía a <body> al avanzar o retroceder ──
   // «Siguiente» se desactiva en la pregunta nueva (sin respuesta) y «Anterior» en la 1: el foco
-  // que tenían cae a <body>, y el Tab siguiente va a «Ver guía educativa», saltándose las
-  // opciones de la pregunta nueva. La referencia lleva el foco al <h2 tabIndex=-1> del
-  // enunciado (1680); aquí el enunciado es un <p>.
-  test('HALLAZGO: tras «Siguiente» con el teclado, el foco va a la pregunta nueva y el Tab entra en sus opciones', async ({ page }) => {
-    test.fail();
+  // que tenían caía a <body>, y el Tab siguiente iba a «Ver guía educativa», saltándose las
+  // opciones de la pregunta nueva. REPARADO como la referencia (1680): el enunciado es un
+  // <h2 tabIndex=-1> y recibe el foco tras cada cambio de pregunta.
+  test('2695: tras «Siguiente» y «Anterior» con el teclado, el foco va al enunciado y el Tab entra en sus opciones', async ({ page }) => {
     await abrirTest(page);
     await page.locator('[role="radio"]').first().click();
     await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('[class*="preguntaTexto"]')).toHaveText(/buena red de transporte público/);
-    expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+    await expect(page.locator('h2[class*="preguntaTexto"]')).toBeFocused();
     await page.keyboard.press('Tab');
     expect(await page.evaluate(() => document.activeElement?.getAttribute('role'))).toBe('radio');
+    await expect(page.locator('[role="radiogroup"] [role="radio"]').first()).toBeFocused();
+    // Y al volver de la 2 a la 1, con «Anterior» desactivándose en la 1.
+    await page.getByRole('button', { name: 'Pregunta anterior' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[class*="preguntaTexto"]')).toHaveText('¿Cuál es tu distancia habitual al trabajo o estudios?');
+    await expect(page.getByRole('button', { name: 'Pregunta anterior' })).toBeDisabled();
+    await expect(page.locator('h2[class*="preguntaTexto"]')).toBeFocused();
+    await page.keyboard.press('Tab');
+    // La 1 está contestada: la parada del grupo es la opción marcada.
+    await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toBeFocused();
   });
 
-  // ── HALLAZGO (02/10/2026, ABIERTO): la barra de progreso no tiene nombre ──
-  // role="progressbar" sin aria-label (en el árbol de accesibilidad, nombre ""; axe:
-  // aria-progressbar-name): el «Pregunta 1 de 10» está en el <div> que la envuelve, que es
-  // genérico y no lo expone. Sin aria-valuetext se anuncia «10 %» en la pregunta 1 sin contestar.
-  // La fracción, en cambio, cuadra con lo pintado (lo fija el test de la barra de arriba).
-  test('HALLAZGO: la barra de progreso se llama «Pregunta 1 de 10»', async ({ page }) => {
-    test.fail();
+  // Al cargar la página el foco NO se mueve al enunciado (solo tras una navegación): moverlo
+  // desplazaría la vista lejos del hero y del aviso legal.
+  test('2695: al abrir la app el foco no salta al enunciado', async ({ page }) => {
     await abrirTest(page);
-    await expect(page.getByRole('progressbar')).toHaveAccessibleName(/Pregunta 1 de 10/);
+    await expect(page.locator('h2[class*="preguntaTexto"]')).not.toBeFocused();
+    expect(await page.evaluate(() => scrollY)).toBe(0);
+  });
+
+  // ── 2697 (02/10/2026, REPARADO): la barra de progreso no tenía nombre ──
+  // role="progressbar" sin aria-label (en el árbol de accesibilidad, nombre ""; axe:
+  // aria-progressbar-name): el «Pregunta 1 de 10» estaba en el <div> que la envuelve, que es
+  // genérico y no lo expone. Sin aria-valuetext se anunciaba «10 %» en la pregunta 1 sin
+  // contestar. REPARADO: nombre y texto en la propia barra; la escala no cambia (la fracción
+  // cuadra con lo pintado, lo fija el test de la barra de arriba). El «10 %» visible, con espacio
+  // duro.
+  test('2697: la barra de progreso se llama «Pregunta 1 de 10»', async ({ page }) => {
+    await abrirTest(page);
+    const barra = page.getByRole('progressbar');
+    await expect(barra).toHaveAccessibleName('Pregunta 1 de 10');
+    await expect(barra).toHaveAttribute('aria-valuetext', 'Pregunta 1 de 10');
+    await expect(page.locator('[class*="progreso"] > span').last()).toHaveText('10 %');
+    await page.locator('[role="radio"]').first().click();
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+    await expect(barra).toHaveAccessibleName('Pregunta 2 de 10');
   });
 });
 
@@ -998,8 +1084,7 @@ test.describe('Re-inspección 02/10/2026 — móvil 360 px', () => {
   // la vista, y el botón pulsado se desmonta: foco en <body>. Medido: el enunciado de la 1 queda
   // 694 px POR ENCIMA de la pantalla a 360 px (622 a 390, 318 en escritorio), y lo que se ve es
   // la guía educativa y las apps relacionadas. Forma del 1679 de la referencia, en el reinicio.
-  test('HALLAZGO: tras «Repetir el test» se ve la pregunta 1 y el foco no cae a <body>', async ({ page }) => {
-    test.fail();
+  test('2694: tras «Repetir el test» se ve la pregunta 1 y el foco no cae a <body>', async ({ page }) => {
     await abrirTest(page);
     for (let i = 0; i < 10; i++) {
       await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
@@ -1023,28 +1108,47 @@ test.describe('Re-inspección 02/10/2026 — móvil 412 px (Pixel 7)', () => {
     hasTouch: true,
   });
 
-  // ── HALLAZGO (02/10/2026, ABIERTO): un doble toque en «Siguiente» devuelve a la pregunta 1 ──
+  // ── 2698 (02/10/2026, REPARADO): un doble toque en «Siguiente» devolvía a la pregunta anterior ──
   // A 480 px o menos la navegación va en columna invertida: «Siguiente» arriba y «Anterior»
-  // debajo. La 1 tiene cuatro opciones y la 2 tres: al avanzar la tarjeta encoge unos 45 px, sube
-  // la navegación y el segundo toque cae en «Anterior», que en la 2 ya está activo. Medido 8 de 8
-  // veces a 412 y a 390 px con el botón en y 300, 360, 480 y al pie, con 150 ms entre toques; a
-  // 360 px pasa de la 2 a la 3 y de la 8 a la 9. Lo esperado: el segundo toque cae en
-  // «Siguiente», ya desactivado, y no pasa nada.
-  test('HALLAZGO: un doble toque en «Siguiente» de la pregunta 1 deja en la pregunta 2, sin contestar', async ({ page }) => {
-    test.fail();
+  // debajo. Al pasar a una pregunta con menos opciones (o con textos más cortos) la tarjeta
+  // encoge, sube la navegación y el segundo toque caía en «Anterior», ya activo. En la
+  // inspección, de la 1 (cuatro opciones) a la 2 (tres), 8 de 8 veces a 412 y 390 px; a 360 px,
+  // de la 2 a la 3 y de la 8 a la 9. REPARADO con el guard de la familia (`clicDeMas`): el 2.º
+  // toque de una ráfaga se ignora si el anterior cambió de pantalla.
+  //
+  // Reescrito al reparar: con el 2700 la pregunta 2 tiene ya cuatro opciones, y de la 1 a la 2
+  // la tarjeta ya no encoge, así que el caso de la inspección pasaba en verde SIN el guard (no
+  // probaba nada). Ahora se recorren las nueve transiciones con el doble toque, y el test exige
+  // que en alguna el punto del segundo toque caiga, tras el primero, sobre «Pregunta anterior»
+  // activo: es ahí donde, sin el guard, se volvería atrás.
+  test('2698: un doble toque en «Siguiente» avanza una sola pregunta, también cuando el 2.º toque cae en «Anterior»', async ({ page }) => {
+    test.setTimeout(90_000);
     await abrirTest(page);
-    await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
-    const boton = page.getByRole('button', { name: 'Siguiente pregunta' });
-    await boton.evaluate((e) => { const r = e.getBoundingClientRect(); window.scrollBy(0, r.top + r.height / 2 - 480); });
-    const caja = (await boton.boundingBox())!;
-    const x = caja.x + caja.width / 2;
-    const y = caja.y + caja.height / 2;
-    await page.touchscreen.tap(x, y);
-    await expect(page.getByText('2/10', { exact: true })).toBeVisible();
-    await page.waitForTimeout(150);
-    await page.touchscreen.tap(x, y);
-    await page.waitForTimeout(300);
-    await expect(page.getByText('2/10', { exact: true })).toBeVisible();
-    await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(0);
+    const caidasEnAnterior: number[] = [];
+    for (let i = 0; i < PREGUNTAS.length - 1; i++) {
+      // Lee la pregunta antes de tocar: sin esta pausa, el toque en la opción llega a menos de
+      // 300 ms del toque en «Siguiente» y Chrome lo cuenta como el 2.º de la misma ráfaga, que es
+      // justo el toque de más que la app ignora ahora (mismo criterio que selector-smartphone).
+      await page.waitForTimeout(500);
+      await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
+      const boton = page.getByRole('button', { name: 'Siguiente pregunta' });
+      await boton.evaluate((e) => { const r = e.getBoundingClientRect(); window.scrollBy(0, r.top + r.height / 2 - 480); });
+      const caja = (await boton.boundingBox())!;
+      const x = caja.x + caja.width / 2;
+      const y = caja.y + caja.height / 2;
+      await page.touchscreen.tap(x, y);
+      await expect(page.getByText(`${i + 2}/10`, { exact: true })).toBeVisible();
+      const debajo = await page.evaluate(([px, py]) => {
+        const el = document.elementFromPoint(px, py)?.closest('button');
+        return el ? { nombre: el.getAttribute('aria-label') ?? el.textContent ?? '', activo: !el.disabled } : null;
+      }, [x, y]);
+      if (debajo?.nombre === 'Pregunta anterior' && debajo.activo) caidasEnAnterior.push(i + 1);
+      await page.waitForTimeout(150);
+      await page.touchscreen.tap(x, y);
+      await page.waitForTimeout(300);
+      await expect(page.getByText(`${i + 2}/10`, { exact: true }), `doble toque de la ${i + 1} a la ${i + 2}`).toBeVisible();
+      await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(0);
+    }
+    expect(caidasEnAnterior.length, 'alguna transición pone «Anterior» bajo el 2.º toque').toBeGreaterThan(0);
   });
 });

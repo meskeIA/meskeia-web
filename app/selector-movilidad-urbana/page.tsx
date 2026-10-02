@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorMovilidadUrbana.module.css';
 import {
   MeskeiaLogo,
@@ -33,23 +33,86 @@ export default function SelectorMovilidadUrbana() {
   const [respuestas, setRespuestas] = useState<number[]>(Array(PREGUNTAS.length).fill(-1));
   const [mostrarResultado, setMostrarResultado] = useState(false);
   const tituloResultado = useRef<HTMLHeadingElement>(null);
+  const enunciado = useRef<HTMLHeadingElement>(null);
 
-  // «Ver mi resultado» se desmonta con el test y el foco caía a <body>: se lleva al título del
-  // resultado (regla g de la familia de selectores).
+  // Al cambiar de pregunta o de pantalla se desactiva o se desmonta el botón que tenía el foco
+  // («Siguiente» en la pregunta nueva, aún sin respuesta; «Anterior» al volver a la 1; «Ver mi
+  // resultado» y «Repetir el test», que se desmontan), y el foco caía a <body>: el Tab siguiente
+  // saltaba las opciones y, tras «Repetir el test», la pregunta 1 quedaba cientos de píxeles por
+  // encima de la pantalla (hallazgos 2694 y 2695; regla g de la familia). Se lleva al enunciado
+  // de la pregunta nueva o al título del resultado, lo que además los desplaza a la vista.
+  // Solo tras una navegación: al cargar la página el foco no se mueve (la marca la ponen los
+  // manejadores, no el primer render, que en desarrollo React ejecuta dos veces).
+  const moverFoco = useRef(false);
   useEffect(() => {
+    if (!moverFoco.current) return;
+    moverFoco.current = false;
     if (mostrarResultado) tituloResultado.current?.focus();
-  }, [mostrarResultado]);
+    else enunciado.current?.focus();
+  }, [mostrarResultado, preguntaActual]);
 
   const opcionSeleccionada = respuestas[preguntaActual];
   const porcentajeProgreso = ((preguntaActual + 1) / PREGUNTAS.length) * 100;
 
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 2698; receta común de la familia, referencia
+   * selector-smartphone, 2659). Hasta 480 px la navegación va en columna invertida, «Siguiente»
+   * arriba y «Anterior» debajo: al pasar a una pregunta con menos opciones la tarjeta encoge, la
+   * navegación sube y el segundo toque caía en «Anterior», que devolvía a la pregunta recién
+   * contestada. Un doble toque es UNA intención, así que un clic se ignora cuando:
+   *   · es el 2.º (o 3.º…) de una ráfaga: `detail` > 1, que cuenta el navegador (con teclado o
+   *     lector de pantalla es 0);
+   *   · y el clic ANTERIOR de la app cambió de pantalla. Sin esta condición, contestar y tocar
+   *     «Siguiente» deprisa —dos toques cercanos que Chrome también cuenta como ráfaga— se comía
+   *     el «Siguiente», que sí era una intención nueva.
+   * El clic ignorado no toca el registro: el 3.º de una ráfaga se ignora igual que el 2.º.
+   */
+  const ultimoCambioPantalla = useRef(false);
+  const clicDeMas = (e: React.MouseEvent<HTMLButtonElement>): boolean =>
+    e.detail > 1 && ultimoCambioPantalla.current;
+  const registrarClic = (cambiaPantalla: boolean): void => {
+    ultimoCambioPantalla.current = cambiaPantalla;
+    if (cambiaPantalla) moverFoco.current = true;
+  };
+
   function seleccionarOpcion(indice: number): void {
+    registrarClic(false);
     const nuevasRespuestas = [...respuestas];
     nuevasRespuestas[preguntaActual] = indice;
     setRespuestas(nuevasRespuestas);
   }
 
-  function irSiguiente(): void {
+  function elegirOpcion(e: React.MouseEvent<HTMLButtonElement>, indice: number): void {
+    if (clicDeMas(e)) return;
+    seleccionarOpcion(indice);
+  }
+
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG): las flechas mueven el foco a la opción vecina y
+   * la marcan, con vuelta al principio, e Inicio/Fin van a los extremos. El grupo es UNA parada de
+   * Tab (tabindex itinerante). Antes cada opción era una parada y las flechas no hacían nada
+   * (hallazgo 2696; referencia selector-smartphone, 1681).
+   */
+  function teclaEnOpcion(e: React.KeyboardEvent<HTMLButtonElement>, indice: number): void {
+    const total = PREGUNTAS[preguntaActual].opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    seleccionarOpcion(destino);
+    const radios = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    radios?.[destino]?.focus();
+  }
+
+  // Avanza a la pregunta SIGUIENTE A LA PULSADA (la del render, no `p => p + 1`): dos clics antes
+  // de repintar no saltan una pregunta. Y solo con la pregunta respondida, aunque el botón ya esté
+  // desactivado sin ella: el `disabled` lo pone el render, y un clic que llega antes no lo ve.
+  function irSiguiente(e: React.MouseEvent<HTMLButtonElement>): void {
+    if (clicDeMas(e) || respuestas[preguntaActual] === -1) return;
+    registrarClic(true);
     if (preguntaActual < PREGUNTAS.length - 1) {
       setPreguntaActual(preguntaActual + 1);
     } else {
@@ -57,13 +120,15 @@ export default function SelectorMovilidadUrbana() {
     }
   }
 
-  function irAnterior(): void {
-    if (preguntaActual > 0) {
-      setPreguntaActual(preguntaActual - 1);
-    }
+  function irAnterior(e: React.MouseEvent<HTMLButtonElement>): void {
+    if (clicDeMas(e) || preguntaActual === 0) return;
+    registrarClic(true);
+    setPreguntaActual(preguntaActual - 1);
   }
 
-  function reiniciar(): void {
+  function reiniciar(e: React.MouseEvent<HTMLButtonElement>): void {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
     setPreguntaActual(0);
     setRespuestas(Array(PREGUNTAS.length).fill(-1));
     setMostrarResultado(false);
@@ -88,21 +153,35 @@ export default function SelectorMovilidadUrbana() {
 
       {!mostrarResultado ? (
         <main className={styles.quiz} aria-label="Test de movilidad urbana">
-          <div className={styles.progreso} aria-label={`Pregunta ${preguntaActual + 1} de ${PREGUNTAS.length}`}>
+          {/* El «Pregunta N de 10» estaba en el aria-label de este <div>, genérico, que no lo
+              expone: la barra no tenía nombre (axe: aria-progressbar-name) y se anunciaba «10 %»
+              en la pregunta 1 sin contestar (hallazgo 2697). Nombre y texto van en la propia
+              barra; la escala (porcentaje de la pregunta en curso) no cambia, y cuadra con lo
+              que pinta el relleno. */}
+          <div className={styles.progreso}>
             <span>{preguntaActual + 1}/{PREGUNTAS.length}</span>
-            <div className={styles.barraProgreso} role="progressbar" aria-valuenow={Math.round(porcentajeProgreso)} aria-valuemin={0} aria-valuemax={100}>
+            <div
+              className={styles.barraProgreso}
+              role="progressbar"
+              aria-label={`Pregunta ${preguntaActual + 1} de ${PREGUNTAS.length}`}
+              aria-valuenow={Math.round(porcentajeProgreso)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuetext={`Pregunta ${preguntaActual + 1} de ${PREGUNTAS.length}`}
+            >
               <div
                 className={styles.barraProgresoRelleno}
                 style={{ width: `${porcentajeProgreso}%` }}
               />
             </div>
-            <span>{Math.round(porcentajeProgreso)}%</span>
+            <span>{Math.round(porcentajeProgreso)}{'\u00A0'}%</span>
           </div>
 
           <div className={styles.pregunta}>
             <div className={styles.preguntaHeader}>
               <span className={styles.preguntaIcono} aria-hidden="true">{pregunta.icono}</span>
-              <p className={styles.preguntaTexto}>{pregunta.texto}</p>
+              {/* Encabezado con tabIndex −1: recibe el foco al cambiar de pregunta (2695). */}
+              <h2 className={styles.preguntaTexto} ref={enunciado} tabIndex={-1}>{pregunta.texto}</h2>
             </div>
 
             <div className={styles.opciones} role="radiogroup" aria-label={pregunta.texto}>
@@ -111,12 +190,15 @@ export default function SelectorMovilidadUrbana() {
                   key={idx}
                   type="button"
                   className={`${styles.opcion} ${opcionSeleccionada === idx ? styles.seleccionada : ''}`}
-                  onClick={() => seleccionarOpcion(idx)}
+                  onClick={(e) => elegirOpcion(e, idx)}
                   // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
                   // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
                   // radio dentro (selector-smartphone, hallazgo 950).
                   role="radio"
                   aria-checked={opcionSeleccionada === idx}
+                  // Tabindex itinerante: la marcada, o la primera si no hay ninguna (2696).
+                  tabIndex={opcionSeleccionada === -1 ? (idx === 0 ? 0 : -1) : opcionSeleccionada === idx ? 0 : -1}
+                  onKeyDown={(e) => teclaEnOpcion(e, idx)}
                 >
                   <span className={styles.opcionIcono} aria-hidden="true">{opcion.icono}</span>
                   <span className={styles.opcionTexto}>{opcion.texto}</span>
@@ -246,7 +328,7 @@ export default function SelectorMovilidadUrbana() {
           {/* Antes «13–22 % del gasto mensual», sin fuente (hallazgo 1501). INE, EPF 2025,
               nota de prensa del 25/06/2026: el transporte, el 11,5 % del presupuesto del hogar. */}
           <p>
-            En España, el transporte supuso el <strong>11,5 % del presupuesto de los hogares</strong>{' '}
+            En España, el transporte supuso el <strong>11,5&nbsp;% del presupuesto de los hogares</strong>{' '}
             en 2025, según la Encuesta de Presupuestos Familiares del INE (nota de prensa del
             25/06/2026). Elegir bien el medio de cada día cambia ese gasto y tu huella de carbono.
           </p>
@@ -337,12 +419,23 @@ export default function SelectorMovilidadUrbana() {
             turismos, furgonetas y motos eléctricos con el distintivo CERO de la DGT. Los importes y
             requisitos están en su convocatoria.
           </p>
+          {/* Antes: «directamente o con una tarjeta o un vale … exenta hasta 1.500 € al año
+              (Reglamento del IRPF, art. 46 bis)», sin el tope mensual de la tarjeta (hallazgo
+              2701). Texto consolidado del BOE leído el 02/10/2026: el límite anual lo fija la Ley
+              35/2006, art. 42.3.e) (BOE-A-2006-20764), «con el límite de 1.500 euros anuales para
+              cada trabajador»; para las fórmulas indirectas, el RD 439/2007, art. 46 bis.1.2.º
+              (BOE-A-2007-6820), «no podrá exceder de 136,36 euros mensuales por trabajador, con
+              el límite de 1.500 euros anuales», y el 46 bis.2: si se incumplen esos límites,
+              «únicamente existirá retribución en especie por el exceso». El 46 bis habla de
+              «tarjetas o cualquier otro medio electrónico de pago»: el «vale» se ha retirado. */}
           <p>
-            Si tu empresa te paga el transporte público entre casa y el trabajo (directamente o con
-            una tarjeta o un vale de transporte), esa retribución en especie está exenta de IRPF
-            hasta 1.500 € al año por trabajador (Reglamento del IRPF, art. 46 bis; Manual práctico
-            de Renta de la Agencia Tributaria). Es una exención de lo que paga la empresa, no una
-            deducción que el trabajador se aplique en su declaración.
+            Si tu empresa te paga el transporte público entre casa y el trabajo, esa retribución en
+            especie está exenta de IRPF hasta 1.500 € al año por trabajador (Ley del IRPF, art.
+            42.3.e). Si lo hace con una tarjeta de transporte u otro medio electrónico de pago, el
+            Reglamento del IRPF (art. 46 bis) pone además un tope de <strong>136,36 € al mes</strong>,
+            sin pasar de los 1.500 € al año, y lo que exceda de esos límites tributa como
+            retribución en especie. Es una exención de lo que paga la empresa, no una deducción que
+            el trabajador se aplique en su declaración.
           </p>
 
           <div className={styles.warningBox}>

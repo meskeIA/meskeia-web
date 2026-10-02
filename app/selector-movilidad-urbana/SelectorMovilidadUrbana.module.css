@@ -613,3 +613,25 @@
     padding-top: 80px;
   }
 }
+
+/* Enunciado que recibe el foco al cambiar de pregunta (hallazgo 2695): anillo solo con teclado. */
+.preguntaTexto:focus {
+  outline: none;
+}
+
+.preguntaTexto:focus-visible {
+  outline: 2px solid var(--primary-texto);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* Lo que recibe el foco al cambiar de pantalla no puede quedar bajo la barra fija del logo.
+   focus() desplaza lo justo para que el elemento se vea: si estaba cortado por arriba lo dejaba
+   en y 0, y la barra (hasta y 52-62 en móvil, 77 desde 769 px) tapaba sus primeras letras.
+   scroll-margin-top deja 80 px libres, el mismo hueco que el padding-top del hero. En todos los
+   anchos: en escritorio la barra también es fija. Receta de la familia (selector-smartphone,
+   hallazgo 2657); aquí lo necesita sobre todo «Repetir el test» (hallazgo 2694). */
+.preguntaTexto,
+.resultadoTitulo {
+  scroll-margin-top: 80px;
+}
