@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, devices, type Page } from '@playwright/test';
 import { calcularResultado, CLAVES, EJERCICIOS, ORDEN_COSTE, PREGUNTAS, TECHO_CUOTA, TECHO_SESION, type EjercicioKey } from '../../app/selector-ejercicio/motor';
 
 /**
@@ -508,5 +508,466 @@ test.describe('Hallazgos 1378-1388 — límites declarados, datos de salud y con
     await expect
       .poll(() => page.evaluate(() => `${document.activeElement?.tagName}:${document.activeElement?.textContent ?? ''}`))
       .toBe('H1:Tu ejercicio recomendado');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN DEL 02/10/2026 — hermana de la familia «selectores» (referencia: selector-smartphone)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Invalidada por los lotes de CSS 586a4d61 (27/09) y a1d72a9c (28/09), que dieron 80 px arriba al
+// `.hero` hasta 1.023 px. Lo que se comprobó que SÍ está bien: el <h1> de la intro y el de la
+// pantalla de preguntas no quedan bajo la barra del logo a 360, 390, 800, 1.000 ni 1.024 px, en
+// claro ni en oscuro; los 1.376.256 perfiles del motor siguen sin empates en silencio (276.594,
+// todos anunciados); los límites declarados descartan con aviso.
+//
+// Hallazgos ABIERTOS que fija este bloque (con test.fail, afirman lo correcto):
+//   · foco a <body> tras «Empezar», «Siguiente» y «Anterior» y, en móvil, la pregunta nueva fuera
+//     de la vista (la forma del 1680 de smartphone, que aquí no llegó);
+//   · radios sin flechas ni tabindex itinerante (la forma del 1681);
+//   · el <h1> del RESULTADO bajo la barra del logo a 360 y 390 px (`.heroResultados` sin los 80 px);
+//   · doble toque: en la pregunta 1 «Siguiente» saca de la app («Selector de Dieta», de las apps
+//     relacionadas) y en la 3 contesta la 4 en silencio. La pregunta 1 tiene 7 opciones y la 3
+//     solo 3: la tarjeta cambia de alto bajo el dedo (punto ciego de la familia: en la referencia
+//     todas las preguntas tienen 4);
+//   · «Menos de 30 minutos» admite natación y yoga con «sesiones de 30-60 min»;
+//   · «Por puntos iba por delante» dicho de una apartada que EMPATABA a puntos;
+//   · la prioridad «Bajo impacto» aparta el running, pero el HIIT de la ficha de casa sale sin el
+//     aviso de saltos que sí lleva una limitación;
+//   · la guía no está en el HTML servido y su recuadro «Consulta con un médico…» nace plegado;
+//   · porcentajes pegados; «la principal causa de abandono y lesión» sin fuente.
+
+/** ¿Pisa alguna pieza de la barra fija del logo las letras del elemento? (función de la Ronda) */
+async function bajoLaBarra(page: Page, selector: string): Promise<{ tapado: boolean; top: number; bottom: number; barra: number }> {
+  return page.evaluate((sel) => {
+    const barra = [...document.querySelectorAll('body *')].find((e) => {
+      const cs = getComputedStyle(e);
+      const r = e.getBoundingClientRect();
+      return cs.position === 'fixed' && r.top <= 1 && r.height < 120 && r.width > 300
+        && !!e.querySelector('a[href="/"], a[href="https://meskeia.com/"]');
+    });
+    const el = document.querySelector(sel);
+    if (!barra || !el) throw new Error(`sin barra (${!!barra}) o sin ${sel} (${!!el})`);
+    const rango = document.createRange();
+    rango.selectNodeContents(el);
+    const letras = [...rango.getClientRects()].filter((c) => c.width > 0);
+    const piezas = [...barra.children].map((c) => c.getBoundingClientRect()).filter((c) => c.width > 0);
+    return {
+      tapado: piezas.some((p) => letras.some((c) =>
+        !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom))),
+      top: Math.round(el.getBoundingClientRect().top),
+      bottom: Math.round(el.getBoundingClientRect().bottom),
+      barra: Math.round(barra.getBoundingClientRect().bottom),
+    };
+  }, selector);
+}
+
+/** Deja el centro del botón a la altura pedida de la pantalla y devuelve ese punto. */
+async function colocarBoton(page: Page, nombre: string | RegExp, donde: 'center' | 'end'): Promise<{ x: number; y: number }> {
+  const boton = page.getByRole('button', { name: nombre });
+  await boton.evaluate((e, blk) => e.scrollIntoView({ block: blk }), donde);
+  const caja = (await boton.boundingBox())!;
+  return { x: caja.x + caja.width / 2, y: caja.y + caja.height / 2 };
+}
+
+async function responderTocando(page: Page, indices: readonly number[]): Promise<void> {
+  for (let i = 0; i < indices.length; i++) {
+    await expect(page.getByText(`Pregunta ${i + 1} de 10`).first()).toBeVisible();
+    await page.locator('[role="radiogroup"] [role="radio"]').nth(indices[i]).tap();
+    await page.getByRole('button', { name: i === indices.length - 1 ? 'Ver resultado' : 'Siguiente pregunta' }).tap();
+  }
+  await page.getByRole('heading', { name: 'Tu ejercicio recomendado' }).waitFor();
+}
+
+/** Un solo barrido de las 1.376.256 combinaciones para los tres recuentos de esta vuelta. */
+let recuentos: { pocoConSesion30: number; porDelanteEmpatada: number; impactoSinAvisoSaltos: number } | null = null;
+function recuentosReinspeccion() {
+  if (recuentos) return recuentos;
+  const cuenta = { pocoConSesion30: 0, porDelanteEmpatada: 0, impactoSinAvisoSaltos: 0 };
+  const r: Record<string, string> = {};
+  const rec = (i: number): void => {
+    if (i === PREGUNTAS.length) {
+      const res = calcularResultado(r);
+      if (r.tiempo === 'poco' && EJERCICIOS[res.ejercicio].sesionMinima >= 30) cuenta.pocoConSesion30++;
+      if (res.apartados.some((k) => res.puntos[k] === res.puntos[res.ejercicio])) cuenta.porDelanteEmpatada++;
+      if (r.prioridad === 'impacto' && r.limitaciones === 'ninguna'
+        && (res.ejercicio === 'entrenamiento-casa' || res.ejercicio === 'gimnasio')
+        && !res.aTenerEnCuenta.some((t) => t.includes('sin saltos'))) cuenta.impactoSinAvisoSaltos++;
+      return;
+    }
+    for (const o of PREGUNTAS[i].opciones) {
+      r[PREGUNTAS[i].id] = o.valor;
+      rec(i + 1);
+    }
+  };
+  rec(0);
+  recuentos = cuenta;
+  return cuenta;
+}
+
+// Bienestar · 30-60 min · Con compañía · Instalación · Más de 60 € · Regular · Ninguna · Social ·
+// Equipo · Diversión. Pesos (gim, run, nat, cic, yoga, casa), pregunta a pregunta:
+//   1,2,2,2,3,2 + 2,3,2,2,3,3 + 2,2,1,2,2,1 + 3,0,3,1,2,0 + 3,2,3,3,3,2 + 2,2,2,2,2,2 +
+//   3,3,3,3,3,3 + 2,2,1,2,2,0 + 2,1,1,1,2,0 + 1,2,2,3,2,1
+//   = gimnasio 21 · running 19 · natación 20 · ciclismo 21 · yoga 24 · casa 14.
+// Ningún filtro (sin limitación, fuera de casa, sin techo de cuota, ciclismo 60 ≤ 60 min): yoga solo.
+const BIENESTAR_INSTALACION = [3, 1, 1, 2, 3, 1, 0, 3, 3, 2] as const;
+
+// Mantener · MENOS DE 30 MIN · Con compañía · EN CASA · CERO EUROS · Regular · RODILLAS · Social ·
+// Individual · Diversión. Pesos: 2,2,2,2,2,2 + 1,2,1,1,2,3 + 2,2,1,2,2,1 + 0,0,0,0,2,3 +
+//   0,2,0,1,1,3 + 2,2,2,2,2,2 + 2,0,3,2,2,2 + 2,2,1,2,2,0 + 1,3,3,3,2,2 + 1,2,2,3,2,1
+//   = gimnasio 13 · running 17 · natación 15 · ciclismo 18 · yoga 19 · casa 19.
+// En casa solo caben yoga y casa, empatadas a 19: rodillas 2 = 2, mantener 2 = 2, presupuesto
+// «Cero euros» casa 3 > yoga 1 → entrenamiento en casa, y el empate lo decide el presupuesto. Nada
+// iba por delante de casa (ordenada primera), así que no hay aviso de recorte.
+const LIMITE_CASA_CERO_RODILLAS = [5, 0, 1, 0, 0, 1, 1, 3, 2, 2] as const;
+
+// Cardio · MENOS DE 30 MIN · Solo · Instalación · Más de 60 € · Muy buena · ESPALDA · Rutinas ·
+// Individual · Bajo impacto = gimnasio 19 · running 19 · natación 27 · ciclismo 21 · yoga 22 ·
+// casa 18. Con «Menos de 30 minutos» como límite ABIERTO solo caben sesiones que empiezan por
+// debajo de 30 min: running (20, fuera por la espalda) y casa (20) → entrenamiento en casa.
+const POCO_TIEMPO_NATACION = [2, 0, 0, 2, 3, 3, 2, 0, 2, 3] as const;
+
+test.describe('re-inspección 02/10/2026 · escritorio', () => {
+  test('caso normal: bienestar en instalación con más de 60 € → yoga o pilates, sin empate ni avisos', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, BIENESTAR_INSTALACION);
+    await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Yoga y Pilates');
+    await expect(page.locator('[class*="statValor"]')).toHaveText([
+      '3-5 días/semana, sesiones de 30-60 min',
+      'Clases para principiantes presenciales o apps guiadas',
+      'Gratis con apps o YouTube · 30-80 €/mes en estudio',
+    ]);
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
+    await expect(page.locator('[class*="avisoRecorte"][role="note"]')).toHaveCount(0);
+    await expect(page.locator('[class*="aTenerSection"]')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Tu ejercicio recomendado' })).toBeFocused();
+  });
+
+  test('la barra del logo no tapa el <h1> de la intro ni el de las preguntas (360-1.024 px, claro y oscuro), ni el del resultado desde 800 px', async ({ page }) => {
+    test.setTimeout(90_000);
+    // Lo que reparó el lote a1d72a9c en `.hero`, medido con la función de la Ronda. Medido el
+    // 02/10/2026: h1 en y 80 (barra hasta 62-92) de 360 a 1.000 px; a 1.024, en y 48 sin pisarla.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-ejercicio/');
+    await esperarHidratacionBotones(page);
+    const anchos = [[360, 740], [390, 844], [800, 1112], [1000, 800], [1024, 768]] as const;
+    for (const tema of ['claro', 'oscuro'] as const) {
+      if (tema === 'oscuro') {
+        await page.getByRole('button', { name: 'Repetir el test' }).click();
+        await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      }
+      for (const [ancho, alto] of anchos) {
+        await page.setViewportSize({ width: ancho, height: alto });
+        await page.evaluate(() => window.scrollTo(0, 0));
+        expect((await bajoLaBarra(page, 'h1')).tapado, `intro, ${ancho} px, ${tema}`).toBe(false);
+      }
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.getByRole('button', { name: /Empezar el test/ }).click();
+      for (const [ancho, alto] of anchos) {
+        await page.setViewportSize({ width: ancho, height: alto });
+        await page.evaluate(() => window.scrollTo(0, 0));
+        expect((await bajoLaBarra(page, 'h1')).tapado, `pregunta 1, ${ancho} px, ${tema}`).toBe(false);
+      }
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await responder(page, BIENESTAR_INSTALACION);
+      for (const [ancho, alto] of anchos.slice(2)) {
+        await page.setViewportSize({ width: ancho, height: alto });
+        await page.evaluate(() => window.scrollTo(0, 0));
+        expect((await bajoLaBarra(page, 'h1')).tapado, `resultado, ${ancho} px, ${tema}`).toBe(false);
+      }
+      await page.setViewportSize({ width: 1280, height: 900 });
+    }
+  });
+
+  test('HALLAZGO: con teclado, tras «Empezar», «Siguiente» y «Anterior» el foco no cae a <body> ni el Tab sale del cuestionario', async ({ page }) => {
+    // ABIERTO (02/10/2026). La forma del 1680 de smartphone: el botón que tenía el foco se desmonta
+    // («Empezar») o se desactiva («Siguiente» ante una pregunta sin responder, «Anterior» en la 1),
+    // y el foco cae a <body>. Medido: tras Enter en «Siguiente», el Tab siguiente va a «Zonas de
+    // Entrenamiento», la primera de las apps relacionadas, DESPUÉS del cuestionario. La referencia
+    // lleva el foco al <h2 tabIndex=-1> del enunciado.
+    test.fail();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-ejercicio/');
+    await esperarHidratacionBotones(page);
+    const caidas: string[] = [];
+    const enBody = () => page.evaluate(() => document.activeElement === document.body);
+    await page.getByRole('button', { name: /Empezar el test/ }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 1 de 10').first().waitFor();
+    if (await enBody()) caidas.push('Empezar');
+    await page.locator('[role="radio"]').nth(2).focus();
+    await page.keyboard.press('Space');
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 2 de 10').first().waitFor();
+    if (await enBody()) caidas.push('Siguiente');
+    await page.keyboard.press('Tab');
+    if (!(await page.evaluate(() => !!document.activeElement?.closest('[class*="testContainer"]')))) caidas.push('el Tab sale del cuestionario');
+    await page.getByRole('button', { name: 'Pregunta anterior' }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 1 de 10').first().waitFor();
+    if (await enBody()) caidas.push('Anterior');
+    expect(caidas).toEqual([]);
+  });
+
+  test('HALLAZGO: los radios siguen el patrón APG — una parada de Tab y las flechas mueven y marcan', async ({ page }) => {
+    // ABIERTO (02/10/2026). La forma del 1681 de smartphone. Medido en la pregunta 1: 7 radios con
+    // tabindex 0 (7 paradas de Tab) y ArrowDown no mueve el foco ni marca nada.
+    test.fail();
+    await abrirTest(page);
+    const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    expect(await radios.evaluateAll((els) => els.filter((e) => (e as HTMLElement).tabIndex === 0).length)).toBe(1);
+    await radios.first().focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(radios.nth(1)).toBeFocused({ timeout: 1_000 });
+    await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true', { timeout: 1_000 });
+  });
+
+  test('HALLAZGO: con «Menos de 30 minutos» no se recomienda la natación de «sesiones de 30-60 min»', async ({ page }) => {
+    // ABIERTO (02/10/2026). El techo de «Menos de 30 minutos» es 30 y el filtro descarta solo si la
+    // sesión mínima lo SUPERA, así que 30 cabe en «menos de 30». Hoy sale «Natación» con
+    // «Frecuencia: 3-4 días/semana, sesiones de 30-60 min» a quien acaba de declarar menos de 30.
+    // El FAQPage promete lo contrario: «aparta las actividades cuya sesión habitual es más larga».
+    test.fail();
+    await abrirTest(page);
+    await responder(page, POCO_TIEMPO_NATACION);
+    await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Entrenamiento en Casa', { timeout: 1_000 });
+  });
+
+  test('HALLAZGO (motor): con «Menos de 30 minutos», ninguna recomendada empieza en sesiones de 30 min', () => {
+    // ABIERTO (02/10/2026). Barrido del 02/10/2026: 219.232 de los 344.064 perfiles con «Menos de
+    // 30 minutos» (63,7 %) reciben yoga o pilates (170.441) o natación (48.791), las dos con
+    // «sesiones de 30-60 min».
+    test.fail();
+    test.setTimeout(240_000);
+    expect(recuentosReinspeccion().pocoConSesion30).toBe(0);
+  });
+
+  test('HALLAZGO: «Por puntos iba por delante» no se dice de una apartada que empataba a puntos', async ({ page }) => {
+    // ABIERTO (02/10/2026). Perder peso · <30 min · Solo · En casa · 0 € · Regular · Ninguna ·
+    // Social · Individual · Diversión: running 3+2+3+0+2+2+3+2+3+2 = 22 y casa 2+3+3+3+3+2+3+0+2+1
+    // = 22. El running va antes solo por el desempate (perder peso 3 > 2) y se aparta por «En
+    // casa»; la pantalla dice que iba por delante POR PUNTOS. En el barrido: 66.157 perfiles.
+    test.fail();
+    await abrirTest(page);
+    await responder(page, [0, 0, 0, 0, 0, 1, 0, 3, 2, 2]);
+    await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Entrenamiento en Casa');
+    const aviso = page.locator('[class*="avisoRecorteItem"]');
+    await expect(aviso).toContainText('el running');
+    await expect(aviso).not.toContainText('Por puntos iba por delante el running', { timeout: 1_000 });
+  });
+
+  test('HALLAZGO (motor): ningún aviso «Por puntos iba por delante» habla de una apartada con los mismos puntos', () => {
+    test.fail();
+    test.setTimeout(240_000);
+    expect(recuentosReinspeccion().porDelanteEmpatada).toBe(0); // hoy 66.157
+  });
+
+  test('HALLAZGO: con la prioridad «Bajo impacto», el entrenamiento en casa avisa de los saltos del HIIT', async ({ page }) => {
+    // ABIERTO (02/10/2026). Perder peso · <30 min · Solo · En casa · 0 € · Muy sedentario · Ninguna ·
+    // Rutinas · Ninguna rutina · BAJO IMPACTO = gimnasio 16 · running 18 · natación 18 · ciclismo
+    // 18 · yoga 22 · casa 27 → casa. La prioridad aparta el running por impacto (pideBajoImpacto),
+    // pero el aviso «elige ejercicios sin saltos ni impactos: muchas rutinas de HIIT los incluyen»
+    // solo sale con una LIMITACIÓN; aquí la ficha recomienda el HIIT sin más. 19.892 perfiles.
+    test.fail();
+    await abrirTest(page);
+    await responder(page, [0, 0, 0, 0, 0, 0, 0, 0, 0, 3]);
+    await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Entrenamiento en Casa');
+    await expect(page.locator('[class*="consejoItem"]').filter({ hasText: 'HIIT' })).toHaveCount(1);
+    await expect(page.locator('[class*="aTenerItem"]').filter({ hasText: 'sin saltos ni impactos' })).toHaveCount(1, { timeout: 1_000 });
+  });
+
+  test('HALLAZGO (motor): con la prioridad «Bajo impacto» y sin limitación, casa o gimnasio llevan el aviso de saltos', () => {
+    test.fail();
+    test.setTimeout(240_000);
+    expect(recuentosReinspeccion().impactoSinAvisoSaltos).toBe(0); // hoy 19.892
+  });
+
+  test('HALLAZGO: la guía educativa está en el HTML servido', async ({ request }) => {
+    // ABIERTO (02/10/2026). EducationalSection monta SIEMPRE su contenido para el rastreador, pero
+    // aquí va dentro de `pantalla === 'resultado'`: el HTML servido no lleva ni una línea de la guía.
+    test.fail();
+    const html = await (await request.get('/selector-ejercicio/')).text();
+    expect(html).toContain('Cómo crear el hábito deportivo');
+  });
+
+  test('HALLAZGO: el recuadro «Consulta con un médico antes de iniciar ejercicio si:» se ve sin desplegar la guía', async ({ page }) => {
+    // ABIERTO (02/10/2026). La lista de señales (dolor en el pecho, mareos, hipertensión, más de
+    // 45 años sin ejercicio…) solo vive dentro de la guía plegada, y el test no pregunta por ninguna
+    // de ellas. CLAUDE.md: nunca ocultar un aviso de responsabilidad dentro de <EducationalSection>.
+    test.fail();
+    await abrirTest(page);
+    await responder(page, BIENESTAR_INSTALACION);
+    await expect(page.getByText('Consulta con un médico antes de iniciar ejercicio si:')).toBeVisible({ timeout: 1_000 });
+  });
+
+  test('HALLAZGO: porcentajes con espacio duro, en fichas, guía y JSON-LD', async ({ page, request }) => {
+    // ABIERTO (02/10/2026). Hoy pegados: «no subas más del 10% de carga» (gimnasio), «El 80% de tu
+    // entrenamiento» (running), «al 70% de tu capacidad» y «al 100% una vez» (guía) y «100% en el
+    // navegador» (featureList). La regla del 25/09/2026: «15 %» con U+00A0.
+    test.fail();
+    const fichas = CLAVES.flatMap((k) => {
+      const f = EJERCICIOS[k];
+      return [f.frecuencia, f.inicio, f.coste, f.descripcion, ...f.beneficios, ...f.equipo, ...f.consejos];
+    });
+    const html = await (await request.get('/selector-ejercicio/')).text();
+    const jsonLd = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+    await abrirTest(page);
+    await responder(page, BIENESTAR_INSTALACION);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const guia = (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
+    const pegados = [...fichas, ...jsonLd, guia].flatMap((s) => [...s.matchAll(/.{0,15}\d%/g)].map((m) => m[0]));
+    expect(pegados).toEqual([]);
+  });
+
+  test('HALLAZGO: la guía no da la sobreexigencia como «la principal causa de abandono y lesión» sin fuente', async ({ page }) => {
+    // ABIERTO (02/10/2026). La propia ficha de running cita a Saragiotto et al. (2014): el factor
+    // de riesgo que más se repite es una lesión en los 12 meses previos, y a Correia et al. (2024):
+    // causas múltiples. La guía afirma una causa principal distinta, sin fuente.
+    test.fail();
+    await abrirTest(page);
+    await responder(page, BIENESTAR_INSTALACION);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.locator('[class*="resultadosContainer"]')).not.toContainText('la principal causa de abandono y lesión', { timeout: 1_000 });
+  });
+});
+
+test.describe('re-inspección 02/10/2026 · móvil 360 px', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  async function abrirMovil(page: Page): Promise<void> {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-ejercicio/');
+    await esperarHidratacionBotones(page);
+  }
+
+  test('caso límite con toques: en casa, cero euros, menos de 30 min y rodillas → entrenamiento en casa por el presupuesto', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrirMovil(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    await responderTocando(page, LIMITE_CASA_CERO_RODILLAS);
+    await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Entrenamiento en Casa');
+    await expect(page.locator('[class*="avisoEmpate"]')).toContainText(
+      'Empate: con tus respuestas, el entrenamiento en casa y el yoga o el pilates encajan exactamente igual; se muestra primero el entrenamiento en casa porque encaja mejor con el presupuesto que has indicado.',
+    );
+    await expect(page.locator('[class*="avisoRecorte"][role="note"]')).toHaveCount(0);
+    await expect(page.locator('[class*="aTenerItem"]')).toHaveText([
+      'Has indicado «Problemas de rodillas o piernas»: antes de empezar, consulta con un fisioterapeuta o un médico deportivo qué ejercicios te convienen, y deja los que te causen dolor.',
+      'Con esa limitación, elige ejercicios sin saltos ni impactos: muchas rutinas de HIIT los incluyen.',
+    ]);
+    await expect(page.locator('[class*="statValor"]').first()).toHaveText('4-5 días/semana, sesiones de 20-45 min');
+    await expect(page.getByRole('heading', { name: 'Tu ejercicio recomendado' })).toBeFocused();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  });
+
+  test('rechazo: tocar «Siguiente» sin responder no avanza', async ({ page }) => {
+    await abrirMovil(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+    const punto = await colocarBoton(page, 'Siguiente pregunta', 'center');
+    await page.touchscreen.tap(punto.x, punto.y);
+    await page.waitForTimeout(300);
+    await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Siguiente pregunta' })).toBeDisabled();
+  });
+
+  test('HALLAZGO: el <h1> del resultado no queda bajo la barra del logo a 360 ni a 390 px', async ({ page }) => {
+    // ABIERTO (02/10/2026). Los lotes dieron 80 px a `.hero`, no a `.heroResultados` (2rem). Medido
+    // a 360 px, claro y oscuro: píldora del logo [15, 10, 141, 52] sobre las letras [45, 31, 315, 61].
+    test.fail();
+    test.setTimeout(60_000);
+    await abrirMovil(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    await responderTocando(page, LIMITE_CASA_CERO_RODILLAS);
+    const a360 = await bajoLaBarra(page, 'h1');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const a390 = await bajoLaBarra(page, 'h1');
+    expect({ a360: a360.tapado, a390: a390.tapado }).toEqual({ a360: false, a390: false });
+  });
+
+  test('HALLAZGO: un doble toque en «Siguiente» de la pregunta 1 no saca de la app', async ({ page }) => {
+    // ABIERTO (02/10/2026). La pregunta 1 tiene 7 opciones y la 2, cuatro: al pasar, la tarjeta
+    // encoge y el segundo toque cae en «Selector de Dieta» (apps relacionadas). Medido con el botón
+    // a cualquier altura entre 80 y 680 px a 360 px (240-800 a 390), con 60, 150 y 300 ms: se
+    // navega a /selector-dieta/ y se pierde lo respondido.
+    test.fail();
+    await abrirMovil(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+    await page.locator('[role="radio"]').last().tap();
+    const punto = await colocarBoton(page, 'Siguiente pregunta', 'center');
+    await page.touchscreen.tap(punto.x, punto.y);
+    await page.waitForTimeout(150);
+    await page.touchscreen.tap(punto.x, punto.y);
+    await page.waitForTimeout(800);
+    expect(new URL(page.url()).pathname).toBe('/selector-ejercicio/');
+    await expect(page.getByText('Pregunta 2 de 10').first()).toBeVisible({ timeout: 1_000 });
+  });
+
+  test('HALLAZGO: un doble toque en «Siguiente» de la pregunta 3 no contesta la 4', async ({ page }) => {
+    // ABIERTO (02/10/2026). La 3 tiene 3 opciones y la 4, cuatro: con el botón al pie de la
+    // pantalla, el segundo toque marca «Donde sea, lo que importe es moverme» (+2 a todas).
+    // Lo mismo con «Empezar el test» tocado al pie (y ≈ 680): marca «Ganar flexibilidad y movilidad».
+    test.fail();
+    await abrirMovil(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    for (const n of [1, 2]) {
+      await expect(page.getByText(`Pregunta ${n} de 10`).first()).toBeVisible();
+      await page.locator('[role="radio"]').last().tap();
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).tap();
+    }
+    await expect(page.getByText('Pregunta 3 de 10').first()).toBeVisible();
+    await page.locator('[role="radio"]').last().tap();
+    const punto = await colocarBoton(page, 'Siguiente pregunta', 'end');
+    await page.touchscreen.tap(punto.x, punto.y);
+    await page.waitForTimeout(150);
+    await page.touchscreen.tap(punto.x, punto.y);
+    await page.waitForTimeout(400);
+    await expect(page.getByText('Pregunta 4 de 10').first()).toBeVisible();
+    await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(0, { timeout: 1_000 });
+  });
+});
+
+test.describe('re-inspección 02/10/2026 · móvil 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('HALLAZGO: tras tocar «Siguiente» a media pantalla, el enunciado de la pregunta nueva queda a la vista y bajo la barra', async ({ page }) => {
+    // ABIERTO (02/10/2026). Nada lleva el foco ni el desplazamiento a la pregunta nueva: la página
+    // se queda donde estaba el botón. Medido a 390 px: el enunciado de la 2 en y −317/−379 (fuera,
+    // por encima; en pantalla, «Siguiente» desactivado y las apps relacionadas), y los de la 3, la 8
+    // y la 10 asomando bajo la píldora del logo. Correcto: el enunciado entero entre la barra
+    // (hasta y 62) y el pie de la pantalla.
+    test.fail();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-ejercicio/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    const fuera: string[] = [];
+    for (let i = 1; i <= 3; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 10`).first()).toBeVisible();
+      await page.locator('[role="radio"]').last().tap();
+      const punto = await colocarBoton(page, 'Siguiente pregunta', 'center');
+      await page.touchscreen.tap(punto.x, punto.y);
+      await expect(page.getByText(`Pregunta ${i + 1} de 10`).first()).toBeVisible();
+      await page.waitForTimeout(150);
+      const m = await bajoLaBarra(page, 'h2[class*="preguntaTexto"]');
+      if (m.tapado || m.top < m.barra || m.bottom > 844) fuera.push(`P${i + 1}: enunciado en y ${m.top}-${m.bottom}, barra hasta ${m.barra}`);
+    }
+    expect(fuera).toEqual([]);
   });
 });

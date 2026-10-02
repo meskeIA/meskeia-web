@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, devices, type Page } from '@playwright/test';
 import { calcularResultado, CLAVES, COSTE_MENSUAL_MINIMO, PREGUNTAS, TRANSPORTES, rangoMensual, type TipoTransporte } from '../../app/selector-movilidad-urbana/motor';
 
 /**
@@ -749,5 +749,302 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
   test('familia g: tras «Ver mi resultado» el foco está en el título del resultado', async ({ page }) => {
     await resultadoDe(page, NORMAL);
     await expect(page.locator('[class*="resultadoTitulo"]')).toBeFocused();
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 02/10/2026 (invalidada por los lotes de CSS d056b066 y a1d72a9c)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Los hallazgos 1488-1507 de la primera inspección están REPARADOS y sus tests de arriba los
+// fijan. El desempate que enuncia el texto se ha vuelto a barrer en Node con las 78.732
+// combinaciones: 7.483 empates, 0 criterios falsos, 0 superlativos falsos y 0 avisos de
+// descarte incompletos (lo fija también el test «motor: ningún empate queda en silencio…»).
+//
+// Familia de los selectores, referencia selector-smartphone. Lo que esta hermana NO tiene de la
+// referencia, medido en el navegador: el teclado del patrón de radios, el foco en el enunciado
+// tras «Siguiente»/«Anterior» y una barra de progreso con nombre. Lo que solo existe aquí (el
+// punto ciego del grupo): la «Combinación multimodal», un resultado hecho de los OTROS medios,
+// que se admite con que queden dos aunque sean el coche y la moto.
+//
+// Perfiles como índices de opción (0 = la primera), en el orden coche · transporte público (TP) ·
+// moto · bici · combinación.
+
+/** Píxeles de las líneas de texto de `selector` que quedan bajo las cajas de la barra fija del logo. */
+async function tapadoPorLogo(page: Page, selector: string): Promise<{ px: number; top: number; bottom: number; barra: number; alto: number }> {
+  return page.locator(selector).first().evaluate((el) => {
+    const cajas = [...document.querySelectorAll('[class*="headerBar"] > *')].map((c) => c.getBoundingClientRect());
+    const rango = document.createRange();
+    rango.selectNodeContents(el);
+    let px = 0;
+    for (const l of [...rango.getClientRects()].filter((q) => q.width > 0)) {
+      for (const c of cajas) {
+        const w = Math.min(l.right, c.right) - Math.max(l.left, c.left);
+        const h = Math.min(l.bottom, c.bottom) - Math.max(l.top, c.top);
+        if (w > 0 && h > 0) px = Math.max(px, w * h);
+      }
+    }
+    const r = el.getBoundingClientRect();
+    return { px, top: r.top, bottom: r.bottom, barra: Math.max(...cajas.map((c) => c.bottom)), alto: innerHeight };
+  });
+}
+
+async function ponerOscuro(page: Page): Promise<void> {
+  if ((await page.locator('html').getAttribute('data-theme')) !== 'dark') {
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).first().click();
+  }
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+}
+
+test.describe('Re-inspección 02/10/2026 — casos del motor en el navegador', () => {
+  // ── CASO NORMAL: todas las respuestas intermedias (la segunda opción de cada pregunta) ──
+  // 5-15 km · Regular · A veces · Ocasionalmente · Importante, pero puedo asumir · Sí, pero tiene
+  // coste notable · Me preocupa, pero tengo experiencia · Moderado · Me importa · Leve.
+  //   coche 2+1+1+1+2 = 7 · TP 2+2+1+2+1+1+2+2 = 13 · moto 3+1+1+2+2+1+1 = 11 · bici 2+1+1 = 4 ·
+  //   combinación 2+3+2+2+2+2+2+3+2+1 = 21. Nada se descarta, sin empate. Razones: P2 (3) y P8 (3),
+  //   y de las de 2 puntos la de número más bajo, P1.
+  test('caso normal: las respuestas intermedias dan la combinación multimodal con 21 puntos', async ({ page }) => {
+    await abrirTest(page);
+    const texto = await responder(page, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Combinación Multimodal');
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
+    await expect(page.locator('[class*="avisoDescarte"]')).toHaveCount(0);
+    await expect(page.locator('[class*="enContra"]')).toHaveCount(0);
+    await expect(page.locator('[class*="razones"] li')).toHaveText([
+      'Red de transporte público: has respondido «Regular, con algunas líneas útiles», que suma 3 puntos a la combinación multimodal.',
+      'Clima: has respondido «Moderado, con algunas semanas complicadas», que suma 3 puntos a la combinación multimodal.',
+      'Distancia: has respondido «Entre 5 y 15 km», que suma 2 puntos a la combinación multimodal.',
+    ]);
+    expect(texto).toContain('Coste estimado: 80–250 €/mes');
+  });
+
+  // ── CASO LÍMITE: empate que deshace la DISTANCIA (el segundo criterio) ──
+  // 5-15 km · Regular · Casi nunca · Ocasionalmente · Importante · Coste notable · Seguridad: poco ·
+  // Clima adverso · Sostenibilidad poco relevante · Buena forma.
+  //   coche 1+1+3+2 = 7 · TP 2+2+2+2+2+1 = 11 · moto 3+1+2+1+2+2+2+1+2 = 16 · bici 2+2+1+2+3 = 10 ·
+  //   combinación 2+3+1+2+2+2+2+2 = 16. Empate moto = combinación a 16. Movilidad física (P10):
+  //   moto 2 = combinación 2, no decide; distancia (P1): moto 3 > combinación 2 → la moto, «porque
+  //   encaja mejor con la distancia de tu trayecto». En contra: el clima adverso declarado.
+  test('caso límite: un empate a 16 lo deshace la distancia, y se dice', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, [1, 1, 2, 1, 1, 1, 2, 0, 2, 2]);
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Moto o Escúter');
+    // toContainText: el párrafo empieza por el «⚖️» decorativo (aria-hidden), que también es texto.
+    await expect(page.locator('[class*="avisoEmpate"]')).toContainText(
+      'Empate: con tus respuestas, la moto o el escúter y la combinación multimodal encajan exactamente igual; se muestra primero la moto o el escúter porque encaja mejor con la distancia de tu trayecto.',
+    );
+    await expect(page.locator('[class*="razones"] li')).toHaveText([
+      'Distancia: has respondido «Entre 5 y 15 km», que suma 3 puntos a la moto o el escúter.',
+      'Carga y bultos: has respondido «Casi nunca, solo lo básico», que suma 2 puntos a la moto o el escúter.',
+      'Coste mensual: has respondido «Importante, pero puedo asumir costes razonables», que suma 2 puntos a la moto o el escúter.',
+    ]);
+    await expect(page.locator('[class*="enContra"] li')).toHaveText([
+      'Clima: has respondido «Sí, llueve mucho o hace mucho frío/calor». En moto o escúter vas a la intemperie: prevé ropa impermeable o de abrigo y una alternativa para los peores días.',
+    ]);
+  });
+
+  // Sospechas de SOSPECHAS.md, DESCARTADAS el 02/10/2026: «Tarjeta Joven 50 %» se retiró en
+  // c9b48a08 (24/09) y no queda en la página; el MOVES III se da por terminado y el programa
+  // vigente es el Auto+ (lo fija el test 1497 de arriba; cotejado con data/fiscal/ayudas-vehiculo.ts).
+  test('sospechas descartadas: ni «Tarjeta Joven» ni el MOVES III como ayuda vigente', async ({ page }) => {
+    await abrirTest(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).first().click();
+    const guia = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+    expect(guia).not.toContain('Tarjeta Joven');
+    expect(guia).not.toMatch(/MOVES III (ofrece|da|concede)/);
+    expect(guia).toContain('El Plan MOVES III, que ayudaba a comprar vehículos eléctricos, terminó el 31 de diciembre de 2025');
+  });
+
+  // ── HALLAZGO (02/10/2026, ABIERTO): la combinación multimodal con solo el coche y la moto ──
+  // Más de 40 km · Deficiente o inexistente · A veces · Ocasionalmente · Importante · Complicado o
+  // caro aparcar · Seguridad: poco · Moderado · Me importa · Buena forma.
+  //   coche 4+3+2+1 = 10 · TP 1+2+3+1+2+1 = 10 (descartado: sin red) · moto 2+1+2+2+2+1+2 = 12 ·
+  //   bici 1+2+2+1+3 = 9 (descartada: más de 40 km) · combinación 1+2+2+2+2+2+3+2+2 = 18.
+  // Gana la combinación, y «Lo que juega en contra» dice que tendrá que apoyarse «en el coche
+  // propio y la moto o el escúter». Pero la tarjeta le pone el coste de COSTE_MENSUAL.combinacion,
+  // «80–250 €/mes (abono más bici o patinete, o uso puntual de coche o taxi)»: el abono y la bici
+  // son justo lo que se ha descartado, y la misma tabla da al coche propio 400–700 €/mes y a la
+  // moto 100–200. En el barrido: 649 perfiles (226 con el coste «Crítica»).
+  test('HALLAZGO: la combinación que solo puede ser coche y moto no se cotiza como abono y bici', async ({ page }) => {
+    test.fail();
+    await abrirTest(page);
+    const texto = await responder(page, [3, 2, 1, 1, 1, 2, 2, 1, 1, 2]);
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Combinación Multimodal');
+    const soloCocheYMoto = texto.includes('Tu combinación tendrá que apoyarse en el coche propio y la moto o el escúter');
+    const cotizadaComoAbonoYBici = texto.includes('abono más bici o patinete');
+    expect(soloCocheYMoto && cotizadaComoAbonoYBici, 'la misma tarjeta dice que no hay abono ni bici y los cotiza').toBe(false);
+  });
+
+  // ── HALLAZGO (02/10/2026, ABIERTO): «Deficiente o inexistente» junta dos respuestas y un filtro ──
+  // La opción mete en el mismo radio una red que EXISTE pero es mala y una que no existe, y el
+  // motor descarta el transporte público con las dos (motor.ts:536). Perfil de quien tiene una
+  // red pobre pero la usa: menos de 5 km · Deficiente · Casi nunca · Horario fijo · Coste crítico ·
+  // Complicado o caro aparcar · Seguridad: mucho · Moderado · Sostenibilidad fundamental · Leve.
+  //   TP 2+2+3+4+3+3+1+3+2 = 23 · bici 3+2+2+3+2+4 = 16 · combinación 11 · coche 3+2+2 = 7 · moto 7.
+  // Con la red que existe, lo esperado es el transporte público (23), sin aviso de descarte. Hoy:
+  // la bici (16) a quien acaba de decir que la seguridad vial es su prioridad, y «se ha
+  // descartado… el transporte público (23 puntos)». El TP sumaba más que lo recomendado en 6.289
+  // de los 26.244 perfiles con esa respuesta. (Forma del 2666 de selector-mascota.)
+  test('HALLAZGO: con la red «deficiente» (que existe) el transporte público no se descarta', async ({ page }) => {
+    test.fail();
+    const deficiente = PREGUNTAS[1].opciones.findIndex((o) => /^Deficiente/.test(o.texto));
+    expect(deficiente).toBeGreaterThanOrEqual(0);
+    await abrirTest(page);
+    await responder(page, [0, deficiente, 2, 2, 0, 2, 0, 1, 0, 1]);
+    await expect(page.locator('[class*="avisoDescarte"]')).toHaveCount(0);
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Transporte Público');
+  });
+
+  // ── HALLAZGO (02/10/2026, ABIERTO): la tarjeta de transporte tiene también un tope mensual ──
+  // La guía cita el art. 46 bis del Reglamento del IRPF para «una tarjeta o un vale de
+  // transporte», pero solo da el límite anual. El 46 bis.1.2.º (BOE-A-2007-6820, texto
+  // consolidado leído el 02/10/2026): «no podrá exceder de 136,36 euros mensuales por
+  // trabajador, con el límite de 1.500 euros anuales»; y el 46 bis.2, retribución en especie
+  // por el exceso. Una empresa que carga 200 € al mes en la tarjeta durante 7 meses (1.400 €):
+  // según la guía, exento entero; según el 46 bis, 445,48 € de exceso ((200 − 136,36) × 7).
+  test('HALLAZGO: si la guía habla de la tarjeta de transporte, da también su tope de 136,36 € al mes', async ({ page }) => {
+    test.fail();
+    await abrirTest(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).first().click();
+    const parrafo = (await page.locator('p', { hasText: '1.500 € al año por trabajador' }).first().innerText()).replace(/\s+/g, ' ');
+    expect(parrafo).toContain('art. 46 bis');
+    expect(!/tarjeta/.test(parrafo) || /136,36/.test(parrafo), parrafo).toBe(true);
+  });
+});
+
+test.describe('Re-inspección 02/10/2026 — teclado, foco y lectores de pantalla (escritorio)', () => {
+  // ── HALLAZGO (02/10/2026, ABIERTO; sospecha de SOSPECHAS.md, page.tsx:115) ──
+  // role="radio" sin el teclado del patrón (WAI-ARIA APG), que la referencia selector-smartphone
+  // ya tiene (1681): medido, cuatro paradas de Tab en un grupo de cuatro radios (todos con
+  // tabIndex 0), y ArrowDown, End o Inicio no mueven el foco ni la marca.
+  test('HALLAZGO: el grupo de radios es una sola parada de Tab y las flechas mueven y marcan', async ({ page }) => {
+    test.fail();
+    await abrirTest(page);
+    const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    expect(await radios.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([0, -1, -1, -1]);
+    await radios.first().focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(radios.nth(1)).toBeFocused();
+    await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true');
+  });
+
+  // ── HALLAZGO (02/10/2026, ABIERTO): el foco cae a <body> al avanzar o retroceder ──
+  // «Siguiente» se desactiva en la pregunta nueva (sin respuesta) y «Anterior» en la 1: el foco
+  // que tenían cae a <body>, y el Tab siguiente va a «Ver guía educativa», saltándose las
+  // opciones de la pregunta nueva. La referencia lleva el foco al <h2 tabIndex=-1> del
+  // enunciado (1680); aquí el enunciado es un <p>.
+  test('HALLAZGO: tras «Siguiente» con el teclado, el foco va a la pregunta nueva y el Tab entra en sus opciones', async ({ page }) => {
+    test.fail();
+    await abrirTest(page);
+    await page.locator('[role="radio"]').first().click();
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[class*="preguntaTexto"]')).toHaveText(/buena red de transporte público/);
+    expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+    await page.keyboard.press('Tab');
+    expect(await page.evaluate(() => document.activeElement?.getAttribute('role'))).toBe('radio');
+  });
+
+  // ── HALLAZGO (02/10/2026, ABIERTO): la barra de progreso no tiene nombre ──
+  // role="progressbar" sin aria-label (en el árbol de accesibilidad, nombre ""; axe:
+  // aria-progressbar-name): el «Pregunta 1 de 10» está en el <div> que la envuelve, que es
+  // genérico y no lo expone. Sin aria-valuetext se anuncia «10 %» en la pregunta 1 sin contestar.
+  // La fracción, en cambio, cuadra con lo pintado (lo fija el test de la barra de arriba).
+  test('HALLAZGO: la barra de progreso se llama «Pregunta 1 de 10»', async ({ page }) => {
+    test.fail();
+    await abrirTest(page);
+    await expect(page.getByRole('progressbar')).toHaveAccessibleName(/Pregunta 1 de 10/);
+  });
+});
+
+test.describe('Re-inspección 02/10/2026 — móvil 360 px', () => {
+  test.use({
+    viewport: { width: 360, height: 780 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  // Lotes d056b066 (móvil) y a1d72a9c (769-1023 px): el hero lleva 80 px arriba hasta 1023 px.
+  // Medido el 02/10/2026 en claro y oscuro: el <h1> empieza en y 80 (la barra acaba en 52 en
+  // móvil y en 77 desde 769 px); a 1024 px empieza en 48, pero centrado no alcanza ni la píldora
+  // del logo ni el conmutador (0 px tapados). La pregunta en curso tras «Siguiente», con el
+  // botón a media pantalla, queda visible y por debajo de la barra.
+  test('la barra fija del logo no tapa el <h1> ni la pregunta en curso a 360, 390, 800, 1000 y 1024 px, en claro y oscuro', async ({ page }) => {
+    test.setTimeout(120_000);
+    for (const tema of ['claro', 'oscuro'] as const) {
+      for (const [ancho, alto] of [[360, 780], [390, 844], [800, 900], [1000, 900], [1024, 900]]) {
+        await page.setViewportSize({ width: ancho, height: alto });
+        await abrirTest(page);
+        if (tema === 'oscuro') await ponerOscuro(page);
+        const h1 = await tapadoPorLogo(page, 'header[class*="hero"] h1');
+        expect(h1.px, `<h1>, ${ancho} px, ${tema}`).toBe(0);
+        await page.locator('[role="radio"]').first().tap();
+        const siguiente = page.getByRole('button', { name: 'Siguiente pregunta' });
+        await siguiente.evaluate((e) => { const r = e.getBoundingClientRect(); window.scrollBy(0, r.top - innerHeight * 0.6); });
+        await siguiente.tap();
+        await expect(page.locator('[class*="preguntaTexto"]')).toHaveText(/buena red de transporte público/);
+        const p = await tapadoPorLogo(page, '[class*="preguntaTexto"]');
+        expect(p.px, `pregunta 2, ${ancho} px, ${tema}`).toBe(0);
+        expect(p.top, `pregunta 2 por debajo de la barra, ${ancho} px, ${tema}`).toBeGreaterThanOrEqual(p.barra);
+        expect(p.bottom, `pregunta 2 dentro de la pantalla, ${ancho} px, ${tema}`).toBeLessThanOrEqual(p.alto);
+      }
+    }
+  });
+
+  // ── HALLAZGO (02/10/2026, ABIERTO): «Repetir el test» deja la pregunta 1 fuera de la pantalla ──
+  // El resultado (unos 1.300 px a 360) se sustituye por el cuestionario en su sitio sin desplazar
+  // la vista, y el botón pulsado se desmonta: foco en <body>. Medido: el enunciado de la 1 queda
+  // 694 px POR ENCIMA de la pantalla a 360 px (622 a 390, 318 en escritorio), y lo que se ve es
+  // la guía educativa y las apps relacionadas. Forma del 1679 de la referencia, en el reinicio.
+  test('HALLAZGO: tras «Repetir el test» se ve la pregunta 1 y el foco no cae a <body>', async ({ page }) => {
+    test.fail();
+    await abrirTest(page);
+    for (let i = 0; i < 10; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
+      await page.getByRole('button', { name: i === 9 ? 'Ver mi resultado' : 'Siguiente pregunta' }).tap();
+    }
+    await page.getByRole('button', { name: 'Repetir el test' }).tap();
+    await expect(page.locator('[class*="preguntaTexto"]')).toHaveText('¿Cuál es tu distancia habitual al trabajo o estudios?');
+    const p = await tapadoPorLogo(page, '[class*="preguntaTexto"]');
+    expect(p.top, 'el enunciado de la 1, por debajo de la barra del logo').toBeGreaterThanOrEqual(p.barra);
+    expect(p.bottom, 'el enunciado de la 1, dentro de la pantalla').toBeLessThanOrEqual(p.alto);
+    expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+  });
+});
+
+test.describe('Re-inspección 02/10/2026 — móvil 412 px (Pixel 7)', () => {
+  test.use({
+    viewport: { width: 412, height: 839 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  // ── HALLAZGO (02/10/2026, ABIERTO): un doble toque en «Siguiente» devuelve a la pregunta 1 ──
+  // A 480 px o menos la navegación va en columna invertida: «Siguiente» arriba y «Anterior»
+  // debajo. La 1 tiene cuatro opciones y la 2 tres: al avanzar la tarjeta encoge unos 45 px, sube
+  // la navegación y el segundo toque cae en «Anterior», que en la 2 ya está activo. Medido 8 de 8
+  // veces a 412 y a 390 px con el botón en y 300, 360, 480 y al pie, con 150 ms entre toques; a
+  // 360 px pasa de la 2 a la 3 y de la 8 a la 9. Lo esperado: el segundo toque cae en
+  // «Siguiente», ya desactivado, y no pasa nada.
+  test('HALLAZGO: un doble toque en «Siguiente» de la pregunta 1 deja en la pregunta 2, sin contestar', async ({ page }) => {
+    test.fail();
+    await abrirTest(page);
+    await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
+    const boton = page.getByRole('button', { name: 'Siguiente pregunta' });
+    await boton.evaluate((e) => { const r = e.getBoundingClientRect(); window.scrollBy(0, r.top + r.height / 2 - 480); });
+    const caja = (await boton.boundingBox())!;
+    const x = caja.x + caja.width / 2;
+    const y = caja.y + caja.height / 2;
+    await page.touchscreen.tap(x, y);
+    await expect(page.getByText('2/10', { exact: true })).toBeVisible();
+    await page.waitForTimeout(150);
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(300);
+    await expect(page.getByText('2/10', { exact: true })).toBeVisible();
+    await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(0);
   });
 });

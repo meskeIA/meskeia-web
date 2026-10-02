@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, devices, type Page } from '@playwright/test';
 import { calcularResultado, CLAVES, PREGUNTAS, SISTEMAS, TECHO_PRESUPUESTO } from '../../app/selector-calefaccion/motor';
 
 /**
@@ -716,5 +716,332 @@ test.describe('Hallazgos 1389-1404 — límites declarados, promesas, datos y co
     await expect
       .poll(() => page.evaluate(() => `${document.activeElement?.tagName}:${document.activeElement?.textContent ?? ''}`))
       .toBe('H1:Tu sistema de calefacción ideal');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. Re-inspección del 02/10/2026 (familia de selectores; referencia: selector-smartphone,
+//    b0f31109). Los hallazgos de la vuelta del 24/09 (1389-1404) están todos REPARADOS: los
+//    tests de arriba pasan. Lo de aquí abajo es lo que esa vuelta no miró. Cada caso que fija un
+//    hallazgo ABIERTO hoy afirma lo CORRECTO y va con test.fail(); quien lo repare quita la
+//    marca y reescribe este comentario en pasado.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Responde por la ETIQUETA literal de cada opción y pide el resultado. */
+async function responderPorEtiqueta(page: Page, etiquetas: readonly string[]): Promise<void> {
+  for (let i = 0; i < etiquetas.length; i++) {
+    const opcion = page
+      .locator('[role="radiogroup"] [role="radio"]')
+      .filter({ has: page.locator('[class*="opcionEtiqueta"]').getByText(etiquetas[i], { exact: true }) });
+    await expect(opcion, `pregunta ${i + 1}: «${etiquetas[i]}»`).toHaveCount(1);
+    await opcion.click();
+    await page.getByRole('button', { name: i === etiquetas.length - 1 ? 'Ver resultado' : 'Siguiente pregunta' }).click();
+  }
+  await page.getByRole('heading', { name: 'Tu sistema de calefacción ideal' }).waitFor();
+}
+
+/** Lo que el foco tiene ahora: etiqueta y texto, para los mensajes. */
+async function foco(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const a = document.activeElement;
+    return `${a?.tagName}:${(a?.getAttribute('aria-label') || a?.textContent || '').trim().slice(0, 40)}`;
+  });
+}
+
+// Caso LÍMITE (empate a tres con el superlativo encadenado), a mano con los pesos de motor.ts:
+// Casa unifamiliar o chalet · 100 – 180 m² · Fan-coils o conductos · Templado · Otro sistema ·
+// Poco o nada · 2 – 3 meses · No tengo espacio · 3.000 – 8.000 € · Prefiero no complicarme.
+//   aerotermia 2+2+2 = 6 · bomba 1+2+2 = 5 · caldera 2+1 = 3 · pellet 1+1+1 = 3 · eléctrico 1+2 = 3.
+//   Sin espacio exterior se apartan la aerotermia (6) y el split (5), que iban por delante.
+//   Empate a 3 entre caldera, pellet y eléctrico. Presupuesto «3.000 – 8.000 €»: caldera +1,
+//   pellet +1, eléctrico 0 → el eléctrico queda detrás; entre caldera y pellet decide el coste
+//   (2.500 € frente a 5.000 €) → caldera de gas, y de alternativa el pellet.
+const EMPATE_SUPERLATIVO = ['Casa unifamiliar o chalet', '100 – 180 m²', 'Fan-coils o conductos', 'Templado', 'Otro sistema', 'Poco o nada', '2 – 3 meses', 'No tengo espacio', '3.000 – 8.000 €', 'Prefiero no complicarme'] as const;
+
+// Refrigeración «Sí, imprescindible» con un sistema que refrigera admitido, a mano:
+// Casa rural o de campo · 60 – 100 m² · Fan-coils o conductos · Frío o muy frío · No, sin gas natural ·
+// Sí, imprescindible · 4 – 5 meses · Depende de la comunidad · 3.000 – 8.000 € · Sí, quiero aprovecharlas.
+//   aerotermia 1+1+2+2+2 = 8 · pellet 3+2+1+1+1 = 8 · bomba 1+3+1+2 = 7 · caldera 1+1 = 2 (sin gas:
+//   apartada) · eléctrico 1. Empate aerotermia–pellet a 8; el presupuesto da pellet +1 y aerotermia 0
+//   → gana el pellet, que NO refrigera, sobre la aerotermia, que sí, a quien ha dicho que sin aire
+//   «sería imposible». Ningún filtro aparta a la aerotermia (8.000 € caben en el tramo; hay
+//   espacio exterior «según la comunidad»).
+const REFRIGERACION_IMPRESCINDIBLE = ['Casa rural o de campo', '60 – 100 m²', 'Fan-coils o conductos', 'Frío o muy frío', 'No, sin gas natural', 'Sí, imprescindible', '4 – 5 meses', 'Depende de la comunidad', '3.000 – 8.000 €', 'Sí, quiero aprovecharlas'] as const;
+
+test.describe('Re-inspección 02/10/2026 — escritorio', () => {
+  test('caso límite (empate a tres): caldera de gas, pellet de alternativa, y lo apartado se dice', async ({ page }) => {
+    await abrirTest(page);
+    await responderPorEtiqueta(page, EMPATE_SUPERLATIVO);
+    await expect(page.locator('[class*="recomendacionValor"]').first()).toHaveText('Caldera de Gas');
+    await expect(page.locator('[class*="recomendacionValor"]').nth(1)).toHaveText('Caldera o Estufa de Pellet');
+    await expect(page.locator('[class*="recomendacionLabel"]').first()).toHaveText('Tu mejor opción');
+    const empate = page.locator('[class*="avisoEmpate"]');
+    await expect(empate).toContainText('la caldera de gas, la caldera o estufa de pellet y los radiadores eléctricos de bajo consumo encajan exactamente igual');
+    const aviso = page.locator('[class*="avisoRecorte"][role="note"]');
+    await expect(aviso).toContainText('iba por delante la aerotermia, con 6 puntos, pero necesita una unidad exterior y has indicado que no tienes espacio para ella.');
+    await expect(aviso).toContainText('iba por delante la bomba de calor (split), con 5 puntos, pero necesita una unidad exterior');
+    await expect(page.locator('[class*="razonItem"]')).toHaveText([
+      'Unidad exterior: has respondido «No tengo espacio», que suma 2 puntos a la caldera de gas.',
+      'Presupuesto de instalación: has respondido «3.000 – 8.000 €», que suma 1 punto a la caldera de gas.',
+    ]);
+  });
+
+  test('caso de rechazo: sin contestar, «Siguiente» no avanza', async ({ page }) => {
+    await abrirTest(page);
+    const siguiente = page.getByRole('button', { name: 'Siguiente pregunta' });
+    await expect(siguiente).toBeDisabled();
+    await siguiente.click({ force: true });
+    await expect(page.locator('[class*="progresoPaso"]')).toHaveText('Pregunta 1 de 10');
+    await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(0);
+  });
+
+  test.fail('desempate: el superlativo «su coste de instalación es el más bajo» no se dice si un empatado cuesta menos (forma del 1442)', async ({ page }) => {
+    // ABIERTO (02/10/2026). En el caso límite los radiadores eléctricos están empatados con la
+    // caldera y su instalación empieza en 800 €, por debajo de los 2.500 € de la caldera: el
+    // presupuesto los dejó detrás, no el coste. La frase encadena los dos criterios en
+    // superlativo, la forma que el hallazgo 1442 corrigió en selector-mascota y la reparación
+    // c9b48a08 en selector-movilidad-urbana («cada criterio nombra a los que ha dejado detrás»).
+    await abrirTest(page);
+    await responderPorEtiqueta(page, EMPATE_SUPERLATIVO);
+    const empate = page.locator('[class*="avisoEmpate"]');
+    await expect(empate).toContainText('se muestra primero la caldera de gas porque');
+    await expect(empate).not.toContainText('su coste de instalación es el más bajo');
+  });
+
+  test.fail('desempate (motor): ningún perfil anuncia «el más bajo» con un empatado más barato', () => {
+    // ABIERTO (02/10/2026): 1.062 de los 1.086 perfiles en que se encadenan los dos criterios
+    // (todos con «3.000 – 8.000 €»: caldera y pellet empatan con el eléctrico, que es más barato).
+    test.setTimeout(120_000);
+    const falsos: string[] = [];
+    const r: Record<number, string> = {};
+    const rec = (i: number): void => {
+      if (i === PREGUNTAS.length) {
+        const res = calcularResultado(r);
+        if (res.criterioDesempate.includes('es el más bajo')) {
+          const p = SISTEMAS[res.sistemaPrincipal].costeInstalacionMin;
+          if (res.empatados.some((k) => SISTEMAS[k].costeInstalacionMin < p)) falsos.push(JSON.stringify(r));
+        }
+        return;
+      }
+      for (const o of PREGUNTAS[i].opciones) {
+        r[PREGUNTAS[i].id] = o.valor;
+        rec(i + 1);
+      }
+    };
+    rec(0);
+    expect(falsos.length, falsos[0]).toBe(0);
+  });
+
+  test.fail('foco: tras «Empezar», «Siguiente» y «Anterior» el foco queda en la pregunta, no en <body> (forma del 1680)', async ({ page }) => {
+    // ABIERTO (02/10/2026). Medido: tras «Siguiente» el foco cae a BODY, el siguiente Tab va a
+    // «Ir a Eficiencia Energética» (Apps relacionadas) y hacen falta 18 Tab para volver a la
+    // primera opción. La referencia lleva el foco al enunciado (useEffect sobre [pantalla, paso]).
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-calefaccion/');
+    await esperarHidratacionBotones(page);
+    const enLaPregunta = () => page.evaluate(() => document.activeElement?.closest('[class*="preguntaCard"]') !== null);
+    const fallos: string[] = [];
+
+    await page.getByRole('button', { name: /Empezar el test/ }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 1 de 10').first().waitFor();
+    if (!(await enLaPregunta())) fallos.push(`tras «Empezar»: ${await foco(page)}`);
+
+    await page.locator('[role="radio"]').first().focus();
+    await page.keyboard.press('Space');
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[class*="progresoPaso"]')).toHaveText('Pregunta 2 de 10');
+    if (!(await enLaPregunta())) fallos.push(`tras «Siguiente»: ${await foco(page)}`);
+
+    await page.getByRole('button', { name: 'Pregunta anterior' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[class*="progresoPaso"]')).toHaveText('Pregunta 1 de 10');
+    if (!(await enLaPregunta())) fallos.push(`tras «Anterior»: ${await foco(page)}`);
+
+    expect(fallos).toEqual([]);
+  });
+
+  test.fail('teclado: las flechas mueven foco y marca entre los radios (forma del 1681)', async ({ page }) => {
+    // ABIERTO (02/10/2026). Medido: con el foco en «Piso en bloque», ArrowDown no mueve nada y
+    // no marca nada; cada opción es una parada de Tab (tabindex sin itinerancia).
+    await abrirTest(page);
+    const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    await radios.first().focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(radios.nth(1)).toBeFocused();
+    await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('ArrowUp');
+    await expect(radios.nth(0)).toBeFocused();
+    await expect(radios.nth(0)).toHaveAttribute('aria-checked', 'true');
+    // Una sola parada de Tab por grupo: la marcada.
+    expect(await radios.evaluateAll((els) => els.filter((e) => e.getAttribute('tabindex') !== '-1').length)).toBe(1);
+  });
+
+  test.fail('refrigeración «Sí, imprescindible»: o se recomienda un sistema que refrigera o se dice que el recomendado no cumple ese requisito', async ({ page }) => {
+    // ABIERTO (02/10/2026). En el motor, la pregunta 6 solo suma puntos. Barrido: 46.209 de los
+    // 138.240 perfiles con «imprescindible» reciben un sistema sin refrigeración; en 129 había
+    // uno admitido que refrigera, y en 46.080 ninguno lo hace (sin unidad exterior) y la app no
+    // lo dice. Aquí el pellet gana a la aerotermia por el desempate de presupuesto, y lo único
+    // que delata el choque es la casilla «Refrigeración: No» y el inconveniente «Sin refrigeración».
+    await abrirTest(page);
+    await responderPorEtiqueta(page, REFRIGERACION_IMPRESCINDIBLE);
+    const refrigera = (await page.locator('[class*="costeItem"]').nth(2).locator('[class*="costeValor"]').innerText()).trim() === 'Sí';
+    const explicaciones = (await page.locator('[class*="avisoRecorte"], [class*="avisoEmpate"], [class*="razonesSection"], [class*="consejosSection"]').allInnerTexts()).join(' ');
+    expect(refrigera || /imprescindible/i.test(explicaciones), `principal: ${await page.locator('[class*="recomendacionValor"]').first().innerText()}`).toBe(true);
+  });
+
+  test.fail('formato: los porcentajes llevan espacio duro antes del % (CLAUDE.md §2, 25/09/2026)', async ({ page, request }) => {
+    // ABIERTO (02/10/2026): «rendimientos superiores al 90%» en la guía y «100% en el
+    // navegador» en el featureList de los dos JSON-LD WebApplication.
+    await abrirTest(page);
+    await responderPorEtiqueta(page, EMPATE_SUPERLATIVO);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const texto = await page.locator('[class*="resultadosContainer"]').innerText();
+    const html = await (await request.get('/selector-calefaccion/')).text();
+    const jsonLd = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]).join(' ');
+    expect(texto.match(/\d%/g) ?? []).toEqual([]);
+    expect(jsonLd.match(/\d%/g) ?? []).toEqual([]);
+  });
+
+  test.fail('guía: el pellet no es «la renovable más económica» si las horquillas de la propia app dan menos a la aerotermia', async ({ page }) => {
+    // ABIERTO (02/10/2026). Coste anual de la ficha: aerotermia 600 – 1.100 €, pellet 700 – 1.200 €
+    // (y la aerotermia rinde unos 4 kWh de calor por kWh eléctrico, según la misma app).
+    const minimo = (s: string) => Number(s.split(' – ')[0].replace(/\./g, ''));
+    expect(minimo(SISTEMAS.aerotermia.costeAnual)).toBeLessThan(minimo(SISTEMAS.pellet.costeAnual));
+    await abrirTest(page);
+    await responderPorEtiqueta(page, EMPATE_SUPERLATIVO);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const texto = (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
+    expect(texto).not.toContain('la renovable más económica');
+    expect(texto).not.toContain('la opción renovable con menor coste energético por kWh');
+  });
+});
+
+test.describe('Re-inspección 02/10/2026 — móvil 390 px con pantalla táctil', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('caso normal: piso pequeño, cálido, refrigeración imprescindible y 3.000 – 8.000 € → bomba de calor (split)', async ({ page }) => {
+    // A mano: Piso en bloque · Menos de 60 m² · Ninguno instalado aún · Cálido o mediterráneo ·
+    // Sí, más de 10 años · Sí, imprescindible · 2 – 3 meses · Sí, tengo espacio exterior ·
+    // 3.000 – 8.000 € · Prefiero no complicarme.
+    //   bomba 2+2+1+3+1+3+2+2+2 = 18 · aerotermia 2+1+2+2+2 = 9 · eléctrico 1+2+1 = 4 · caldera 1 ·
+    //   pellet 1. Nada apartado (la aerotermia, desde 8.000 €, cabe en el tramo de 8.000 €).
+    //   Razones: clima +3 y refrigeración +3 (empatan a 3; va antes la pregunta 4) y vivienda +2
+    //   (la primera de las cinco que suman 2).
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-calefaccion/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    const etiquetas = ['Piso en bloque', 'Menos de 60 m²', 'Ninguno instalado aún', 'Cálido o mediterráneo', 'Sí, más de 10 años', 'Sí, imprescindible', '2 – 3 meses', 'Sí, tengo espacio exterior', '3.000 – 8.000 €', 'Prefiero no complicarme'];
+    for (let i = 0; i < etiquetas.length; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]').filter({ has: page.locator('[class*="opcionEtiqueta"]').getByText(etiquetas[i], { exact: true }) }).tap();
+      await page.getByRole('button', { name: i === 9 ? 'Ver resultado' : 'Siguiente pregunta' }).tap();
+    }
+    await page.getByRole('heading', { name: 'Tu sistema de calefacción ideal' }).waitFor();
+    await expect(page.locator('[class*="recomendacionValor"]')).toHaveText(['Bomba de Calor (split)', 'Aerotermia']);
+    await expect(page.locator('[class*="recomendacionLabel"]').first()).toHaveText('Tu mejor opción');
+    await expect(page.locator('[class*="costeValor"]')).toHaveText(['2.000 – 5.000 €', '500 – 900 €', 'Sí']);
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
+    await expect(page.locator('[class*="avisoRecorte"]')).toHaveCount(0);
+    await expect(page.locator('[class*="razonItem"]')).toHaveText([
+      'Clima: has respondido «Cálido o mediterráneo», que suma 3 puntos a la bomba de calor (split).',
+      'Refrigeración en verano: has respondido «Sí, imprescindible», que suma 3 puntos a la bomba de calor (split).',
+      'Tipo de vivienda: has respondido «Piso en bloque», que suma 2 puntos a la bomba de calor (split).',
+    ]);
+    await expect(page.locator('[class*="consejoItem"]')).toHaveCount(1);
+  });
+});
+
+test.describe('Re-inspección 02/10/2026 — móvil 360 px con pantalla táctil', () => {
+  test.use({
+    viewport: { width: 360, height: 780 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test.fail('doble toque en «Siguiente» o «Ver resultado»: el segundo toque no contesta la pregunta nueva ni saca de la app', async ({ page }) => {
+    // ABIERTO (02/10/2026). Dos toques a 150 ms en el centro del botón, tras contestar con la
+    // primera opción. Medido: en la 4 marca «Otro sistema» de la 5 (que tiene una opción más);
+    // en la 8 marca «Más de 15.000 €» de la 9; en la 5 (la 6 tiene dos opciones menos) el toque
+    // cae en «Apps relacionadas» y abre /calculadora-eficiencia-energetica/; en «Ver resultado»
+    // el foco sube la vista al título y el toque cae en el enlace de Delegum del aviso legal.
+    // La referencia (selector-smartphone), con cuatro opciones en todas, no pierde nada aquí.
+    test.setTimeout(120_000);
+    await page.route(/delegum\.com/, (r) => r.fulfill({ body: '<h1>fuera de la app</h1>', contentType: 'text/html' }));
+    const fallos: string[] = [];
+    for (const pregunta of [4, 5, 8, 10]) {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto('/selector-calefaccion/');
+      await esperarHidratacionBotones(page);
+      await page.getByRole('button', { name: /Empezar el test/ }).tap();
+      for (let q = 1; q <= pregunta; q++) {
+        await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
+        const boton = page.getByRole('button', { name: q === 10 ? 'Ver resultado' : 'Siguiente pregunta' });
+        if (q < pregunta) {
+          await boton.tap();
+          await expect(page.locator('[class*="progresoPaso"]')).toHaveText(`Pregunta ${q + 1} de 10`);
+          continue;
+        }
+        await boton.scrollIntoViewIfNeeded();
+        const caja = await boton.boundingBox();
+        if (!caja) throw new Error('sin caja');
+        const x = caja.x + caja.width / 2;
+        const y = caja.y + caja.height / 2;
+        await page.touchscreen.tap(x, y);
+        await page.waitForTimeout(150);
+        await page.touchscreen.tap(x, y);
+        await page.waitForTimeout(1_200);
+      }
+      const url = new URL(page.url());
+      if (url.pathname !== '/selector-calefaccion/' || url.host !== 'localhost:3050') {
+        fallos.push(`pregunta ${pregunta}: sale a ${url.host}${url.pathname}`);
+        continue;
+      }
+      if (pregunta === 10) {
+        if ((await page.getByRole('heading', { name: 'Tu sistema de calefacción ideal' }).count()) !== 1) fallos.push('ver resultado: no se ve el resultado');
+      } else {
+        const marcadas = (await page.locator('[role="radiogroup"] [role="radio"][aria-checked="true"]').allInnerTexts()).map((t) => t.split('\n')[0]);
+        if (marcadas.length > 0) fallos.push(`pregunta ${pregunta + 1} contestada sola: ${marcadas.join(', ')}`);
+      }
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  test.fail('la barra fija del logo no tapa el título del resultado (lotes 586a4d61 y a1d72a9c)', async ({ page }) => {
+    // ABIERTO (02/10/2026). Los lotes dieron 80 px arriba a `.hero` (≤ 1023 px), pero no a
+    // `.heroResultados` (32 px). El foco lleva la vista arriba del todo y el título queda en
+    // y = 31…90, bajo la píldora del logo (15-141 × 10-52) y el botón de tema (307-345 × 12-50):
+    // 2.081 px² de texto tapado a 360 px y 2.620 a 390, en claro y en oscuro. A 800, 1000 y
+    // 1024 px no tapa nada. La referencia tiene el mismo hueco (1.437 px² a 360 px).
+    await abrirTest(page);
+    await responder(page, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    await expect(page.locator('h1')).toBeFocused();
+    const tapado = await page.evaluate(() => {
+      const h1 = document.querySelector('h1');
+      const barra = document.querySelector('[class*="headerBar"]');
+      if (!h1 || !barra) return -1;
+      const piezas = Array.from(barra.children).map((c) => c.getBoundingClientRect());
+      const rango = document.createRange();
+      rango.selectNodeContents(h1);
+      let area = 0;
+      for (const t of Array.from(rango.getClientRects())) {
+        for (const p of piezas) {
+          const w = Math.min(p.right, t.right) - Math.max(p.left, t.left);
+          const h = Math.min(p.bottom, t.bottom) - Math.max(p.top, t.top);
+          if (w > 0 && h > 0) area += w * h;
+        }
+      }
+      return Math.round(area);
+    });
+    expect(tapado).toBe(0);
   });
 });

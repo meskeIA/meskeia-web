@@ -1,14 +1,25 @@
 import { test, expect, Page } from '@playwright/test';
-import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidratacion';
+import {
+  esperarHidratacion,
+  esperarPaginaAsentada,
+  sembrarValor,
+  sembrarValorAcotado,
+} from './_hidratacion';
 import {
   CASOS,
   TOTAL_CASOS,
   resolverCaso,
   comprobarRespuesta,
-  toleranciaDe,
   generarEjercicioAleatorio,
 } from '../../app/simulador-mas-resorte/casos';
 import { describirOscilador } from '../../app/simulador-mas-resorte/motor';
+
+/**
+ * stemum.com → el servidor local, para ver la app como la sirve el portal (data-brand="stemum"
+ * y la píldora «Stemum › Física» en la barra fija). Va al NIVEL DEL FICHERO porque
+ * `launchOptions` fuerza un worker nuevo; al resto de tests no les afecta: solo resuelve ese host.
+ */
+test.use({ launchOptions: { args: ['--host-resolver-rules=MAP stemum.com 127.0.0.1:3050'] } });
 
 /**
  * Simulador Masa-Resorte (MAS) — inspección del 20/09/2026
@@ -84,7 +95,14 @@ import { describirOscilador } from '../../app/simulador-mas-resorte/motor';
  *   lienzo (sin tocar el estado de React): sus marcas de tiempo dan la escala, y con ella se
  *   comprueba que el eje que cerró el hallazgo 970 dice la verdad.
  *   Casos 4 a 7: regresiones de 966-970 y casos nuevos, resueltos a mano antes de ejecutar.
- *   Caso 8: hallazgos abiertos de esta reinspección, con test.fail().
+ *   Caso 8: hallazgos 2155-2162 de esta reinspección, REPARADOS el 26/09/2026 (065f4db6): eran
+ *   test.fail() y hoy son de regresión.
+ *
+ * REINSPECCIÓN DEL 02/10/2026 (tras 065f4db6, ea091777 «casos para clase», 586a4d61 y a1d72a9c)
+ *   Al final del fichero. Lo nuevo es la tarea de aula: los doce casos resueltos a mano, con el
+ *   error conceptual típico de cada uno tecleado en el navegador, y la tolerancia del corrector.
+ *   El hero se midió en meskeia.com y bajo stemum.com: 0 puntos del h1 tapados a 360, 390, 800
+ *   y de 1024 a 1060 px (la píldora «Stemum › Física» llega a x = 232; el título, desde x = 269).
  */
 
 /** El valor de una tarjeta o de una barra, localizado por su etiqueta (las clases van con hash). */
@@ -1169,11 +1187,14 @@ test.describe('simulador-mas-resorte · casos para clase', () => {
     expect(comprobarRespuesta(100, 100).correcto).toBe(true);
     expect(comprobarRespuesta(NaN, 1.05).correcto).toBe(false);
     expect(comprobarRespuesta(NaN, 1.05).motivo).not.toMatch(/NaN/);
-    expect(toleranciaDe(0)).toBe(0.01);
-    expect(toleranciaDe(316)).toBeCloseTo(3.16, 10);
-    // Borde exacto de la tolerancia, por los dos lados (hallazgo 1211 del 22/09/2026).
-    expect(comprobarRespuesta(1.06, 1.05).correcto).toBe(true);
-    expect(comprobarRespuesta(1.04, 1.05).correcto).toBe(true);
+    // Borde exacto de la tolerancia, por los dos lados (hallazgo 1211 del 22/09/2026), con el
+    // margen que declara el propio corrector. Hasta el 02/10/2026 este test fijaba
+    // toleranciaDe(316) = 3,16 y daba por buenos 1,04 y 1,06 frente a 1,05: es justo lo que la
+    // re-inspección de ese día anota como hallazgo (el test.fail «la tolerancia la da la
+    // PREGUNTA», al final del fichero), así que aquí ya no se fija el tamaño del margen.
+    const borde = comprobarRespuesta(1.05, 1.05).tolerancia;
+    expect(comprobarRespuesta(1.05 + borde, 1.05).correcto).toBe(true);
+    expect(comprobarRespuesta(1.05 - borde, 1.05).correcto).toBe(true);
   });
 });
 
@@ -1202,4 +1223,333 @@ test.describe('simulador-mas-resorte · la sección de casos en el navegador', (
     await solucion.click();
     await expect(seccion(page).locator('#casos-resultado')).toContainText('2,09 s');
   });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN DEL 02/10/2026 — los doce casos en el navegador, su corrector y el hero
+ *
+ * Cada caso, resuelto a mano ANTES de abrir la app (convenio de la app: x(0) = A, v(0) = 0,
+ * ω₀ = √(k/m), T = 2π/ω_d, γ_c = 2√(k·m), sin gravedad), junto al error conceptual típico que
+ * se teclea para comprobar que se rechaza:
+ *   1 · ω₀ = √(50/2) = 5 rad/s                        · f en vez de ω₀: 5/2π = 0,80
+ *   2 · T = 2π/6 = 1,0472 → 1,05 s                    · f en vez de T: 6/2π = 0,95
+ *   3 · f = 10/2π = 1,5915 → 1,59 Hz                  · ω₀ en vez de f: 10
+ *   4 · T = 5/10 = 0,5 s, k = 2·(4π)² = 315,83 → 316  · T y f cambiados (T = 2 s): 2·π² = 19,74
+ *   5 · m = 40/(2π)² = 1,0132 → 1,01 kg               · ω sin elevar al cuadrado: 40/2π = 6,37
+ *   6 · E = ½·50·0,2² = 1 J                           · sin el ½: 2
+ *   7 · v_máx = A·ω₀ = 0,2·10 = 2 m/s                 · A·ω₀² (la a_máx): 20
+ *   8 · a_máx = k·A/m = 80·0,25/2 = 10 m/s²           · la fuerza k·A: 20
+ *   9 · E_k = ½·40·(0,25 − 0,09) = 3,2 J              · E_p en vez de E_k: 1,8
+ *  10 · v = 10·√(0,25 − 0,09) = 4 m/s                 · ω₀·(A − x): 2
+ *  11 · γ_c = 2·√(100·25) = 100 N·s/m                 · sin el 2: 50
+ *  12 · ω_d = √(10 − 1) = 3, T = 2π/3 = 2,0944 → 2,09 · ω₀ en vez de ω_d: 2π/√10 = 1,99
+ * Las doce claves de la app coinciden con estas, y los doce errores se rechazan. Los «Verlo en
+ * el simulador» de los casos 1-6, 8 y 12 dicen la verdad: 5,000 rad/s · 1,047 s · 1,592 Hz ·
+ * 0,500 s (k = 79, m = 0,5) · 1,007 Hz · 1,000 J fijo · −10,000 m/s² · 3,000 rad/s y 2,094 s.
+ *
+ * LA SOSPECHA DE LA TOLERANCIA (casos.ts:417, el mayor de 0,01 y el 1 %), CONFIRMADA. Los datos
+ * de los doce casos son exactos (nada se lee de una tabla ni de una gráfica), así que la que da
+ * la pregunta es media unidad del redondeo pedido si la cifra exacta hay que redondearla, y
+ * ninguna si es exacta: el criterio del hallazgo 2518 de simulador-circuitos-electricos. Con el
+ * 1 % pasan cifras que ninguna cuenta produce: 99 y 101 frente a γ_c = 100 exactos (caso 11),
+ * de 313 a 319 frente a 315,83 (caso 4, incluido el 315 de truncar), 1,04 (truncar 1,0472) y
+ * 1,06 (caso 2), 1,00 y 1,02 frente a 1,0132 (caso 5), de 2,07 a 2,11 (caso 12) y 10,1 frente
+ * a 10 exactos (caso 8). En Practicar, que pide «Redondea a dos decimales», el 10,4 % de 20.000
+ * semillas (réplica del generador) da un margen de 0,1 o más; con Date.now() = 8 sale
+ * a_máx = 300·0,4/3 = 40 m/s² exactos y pasan de 39,6 a 40,4.
+ * Ningún error CONCEPTUAL típico (olvidar 2π, cambiar T por f, ω₀ por f, la amplitud por la
+ * velocidad, ω₀ por ω_d) cae dentro del 1 % en ninguno de los doce: los que entran son los del
+ * redondeo. Y lo legítimo sigue entrando con el criterio de la pregunta: con π ≈ 3,14 salen
+ * 1,0467 (→ 1,05), 1,5924 (→ 1,59), 315,51 (→ 316), 1,0142 (→ 1,01) y 2,0933 (→ 2,09).
+ *
+ * Lo que sí cuela un error conceptual, con cualquier tolerancia, son DATOS DEGENERADOS: en el
+ * caso 5 f = 1 Hz, así que T = 1 s y f² = f, y quien pone f donde va T en T = 2π·√(m/k) obtiene
+ * la clave exacta; en el 12, β = γ/(2m) = 1 con m = 1, así que olvidar el cuadrado de β o la m
+ * de β da también 2,09.
+ *
+ * Y el caso 7 (cama elástica) tiene un enunciado imposible: «sin despegarse de la lona» exige
+ * que en el punto alto la aceleración hacia abajo no pase de g (la lona solo empuja), es decir
+ * ω₀²·A ≤ 9,8 m/s² y A ≤ 9,8/100 = 0,098 m. Con A = 0,2 m son 20 m/s², el doble de g.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Teclea una respuesta en el caso `id` y devuelve si el corrector la dio por buena. */
+async function corregir(page: Page, id: number, respuesta: string): Promise<boolean> {
+  await page.locator('#casos-aula').getByRole('button', { name: new RegExp(`^Caso ${id}:`) }).click();
+  await expect(page.locator('#casos-titulo-caso')).toHaveText(new RegExp(`^Caso ${id} ·`));
+  await page.locator('#casos-respuesta').fill(respuesta);
+  await page.locator('#casos-comprobar').click();
+  // Por su id y no por getByRole('alert'), que casa también con el anunciador de rutas de Next.
+  const veredicto = page.locator('#casos-veredicto');
+  await expect(veredicto).toBeVisible();
+  return (await veredicto.innerText()).includes('¡Correcto!');
+}
+
+test.describe('Re-inspección 02/10/2026 · los doce casos tecleados en el navegador', () => {
+  test.beforeEach(async ({ page }) => {
+    // El beforeEach de arriba ya cargó la página y esperó a los deslizadores; falta el campo de
+    // la respuesta, que es otro nodo.
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test('la clave resuelta a mano entra y el error conceptual típico de cada caso se rechaza', async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    // [caso, clave a mano, error típico]: de dónde sale cada cifra, en la cabecera de este bloque.
+    const tabla: ReadonlyArray<readonly [number, string, string]> = [
+      [1, '5', '0,8'],
+      [2, '1,05', '0,95'],
+      [3, '1,59', '10'],
+      [4, '316', '19,74'],
+      [5, '1,01', '6,37'],
+      [6, '1', '2'],
+      [7, '2', '20'],
+      [8, '10', '20'],
+      [9, '3,2', '1,8'],
+      [10, '4', '2'],
+      [11, '100', '50'],
+      [12, '2,09', '1,99'],
+    ];
+    const fallos: string[] = [];
+    for (const [id, clave, error] of tabla) {
+      if (!(await corregir(page, id, clave))) fallos.push(`caso ${id}: la clave ${clave} no entra`);
+      if (await corregir(page, id, error)) fallos.push(`caso ${id}: el error ${error} entra`);
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  test('lo legítimo entra: la cifra sin redondear y la que marca el panel', async ({ page }) => {
+    // 1,047 = 2π/6 a tres decimales (la tarjeta «Período T» con m = 1 kg y k = 36 N/m) ·
+    // 1,592 = 10/2π · 315,83 = 32π² · 1,013 = 40/4π² · 2,094 = 2π/3. Todas a menos de media unidad
+    // del redondeo pedido: tienen que seguir entrando cuando la tolerancia la dé la pregunta.
+    const legitimas: ReadonlyArray<readonly [number, string]> = [
+      [2, '1,047'],
+      [3, '1,592'],
+      [4, '315,83'],
+      [5, '1,013'],
+      [12, '2,094'],
+    ];
+    const rechazadas: string[] = [];
+    for (const [id, r] of legitimas) {
+      if (!(await corregir(page, id, r))) rechazadas.push(`caso ${id}: ${r}`);
+    }
+    expect(rechazadas).toEqual([]);
+  });
+
+  test('Practicar con Date.now() = 8: a_máx de 3 kg, k = 300 N/m y A = 0,4 m, y entra 40', async ({
+    page,
+  }) => {
+    // La semilla del ejercicio aleatorio es Date.now(): fijarla lo hace reproducible. Es la
+    // preparación del test.fail de la tolerancia: si esto se rompe, se ve aquí y no allí.
+    await page.clock.setFixedTime(8);
+    await page.locator('#casos-practicar').click();
+    const enunciado = page.locator('#casos-enunciado');
+    await expect(enunciado).toContainText('Un bloque de 3 kg');
+    await expect(enunciado).toContainText('k = 300 N/m');
+    await expect(enunciado).toContainText('amplitud de 0,4 m');
+    await expect(enunciado).toContainText('aceleración máxima');
+    // a_máx = k·A/m = 300·0,4/3 = 40 m/s² exactos
+    await page.locator('#casos-respuesta').fill('40');
+    await page.locator('#casos-comprobar').click();
+    await expect(page.locator('#casos-veredicto')).toContainText('¡Correcto!');
+    await page.locator('#casos-aula').getByRole('button', { name: /Ver solución/ }).click();
+    await expect(page.locator('#casos-resultado')).toContainText('40,00 m/s²');
+  });
+
+  test('HALLAZGO ABIERTO (02/10/2026) — la tolerancia la da la PREGUNTA: no entran cifras que ninguna cuenta produce', async ({
+    page,
+  }) => {
+    test.fail();
+    test.setTimeout(60000);
+    // Datos exactos: margen = media unidad del redondeo pedido, o ninguno si la cifra es exacta.
+    // Obtenido el 02/10/2026: las catorce entran, y en Practicar también 39,7 y 40,3.
+    const indebidas: ReadonlyArray<readonly [number, string, string]> = [
+      [11, '101', 'γ_c = 100 exactos'],
+      [11, '99', 'γ_c = 100 exactos'],
+      [4, '313', '315,83 → 316'],
+      [4, '319', '315,83 → 316'],
+      [4, '315', 'truncar 315,83'],
+      [2, '1,04', 'truncar 1,0472'],
+      [2, '1,06', '1,0472 → 1,05'],
+      [5, '1,02', '1,0132 → 1,01'],
+      [5, '1,00', '1,0132 → 1,01'],
+      [12, '2,11', '2,0944 → 2,09'],
+      [12, '2,07', '2,0944 → 2,09'],
+      [3, '1,58', '1,5915 → 1,59'],
+      [8, '10,1', 'a_máx = 10 exactos'],
+      [6, '1,01', 'E = 1 J exacto'],
+    ];
+    const aceptadas: string[] = [];
+    for (const [id, r, porque] of indebidas) {
+      if (await corregir(page, id, r)) aceptadas.push(`caso ${id}: ${r} (${porque})`);
+    }
+    // Practicar con la semilla 8 (ver el test anterior): a_máx = 40 m/s² exactos.
+    await page.clock.setFixedTime(8);
+    await page.locator('#casos-practicar').click();
+    await expect(page.locator('#casos-enunciado')).toContainText('k = 300 N/m');
+    for (const r of ['40,3', '39,7']) {
+      await page.locator('#casos-respuesta').fill(r);
+      await page.locator('#casos-comprobar').click();
+      const veredicto = page.locator('#casos-veredicto');
+      await expect(veredicto).toBeVisible();
+      if ((await veredicto.innerText()).includes('¡Correcto!')) aceptadas.push(`práctica a_máx = 40: ${r}`);
+    }
+    expect(aceptadas).toEqual([]);
+  });
+
+  test('HALLAZGO ABIERTO (02/10/2026) — la tabla de sistemas da la ω₀ de la onda sonora sin la raíz', async ({
+    page,
+  }) => {
+    test.fail();
+    // El botón se ve como «⬇️ Ver Guía Completa», pero su nombre accesible es el aria-label de
+    // components/EducationalSection.tsx.
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.locator('table tbody tr').first()).toBeVisible();
+    // Columna «ω₀ característico», en rad/s: √(k/m), √(g/L), 1/√(LC), √(k_bond/μ), √(K/m_atom)…
+    // y «k_s/m_mol (cristal)», que es un cociente rigidez/masa en s⁻², sin la raíz.
+    const celdas = await page.locator('table tbody tr td:nth-child(2)').allInnerTexts();
+    expect(celdas.length).toBeGreaterThanOrEqual(6);
+    expect(celdas.filter((c) => !c.includes('√'))).toEqual([]);
+  });
+});
+
+test.describe('Re-inspección 02/10/2026 · lo que dicen los enunciados, contra la física', () => {
+  test('HALLAZGO ABIERTO (02/10/2026) — caso 7: «sin despegarse de la lona» con A = 0,2 m es imposible', async () => {
+    test.fail();
+    const caso = CASOS.find((c) => c.id === 7);
+    expect(caso).toBeDefined();
+    const k = caso?.datos.k ?? NaN;
+    const m = caso?.datos.m ?? NaN;
+    const A = caso?.datos.A ?? NaN;
+    // Una lona solo empuja: para no despegarse, la aceleración hacia abajo en el punto alto
+    // (ω₀²·A) no puede pasar de g. Con k/m = 5000/50 = 100 s⁻² y A = 0,2 m son 20 m/s².
+    const g = 9.81;
+    const enLona = /lona|cama elástica/i.test(caso?.enunciado ?? '');
+    const aPuntoAlto = (k / m) * A;
+    expect(enLona && aPuntoAlto > g, `ω₀²·A = ${aPuntoAlto} m/s² sobre una lona (g = ${g})`).toBe(false);
+  });
+
+  test('HALLAZGO ABIERTO (02/10/2026) — casos 5 y 12: los datos no distinguen el error conceptual de la respuesta', async () => {
+    test.fail();
+    const c5 = CASOS.find((c) => c.id === 5);
+    const c12 = CASOS.find((c) => c.id === 12);
+    expect(c5 && c12).toBeTruthy();
+    const indistinguibles: string[] = [];
+    if (c5) {
+      // m = k·T²/(4π²) con T = 1/f. Poner f donde va T da k·f²/(4π²): con f = 1 Hz, lo mismo.
+      const { k = NaN, f = NaN, decimales = 2 } = c5.datos;
+      const tfCambiados = redondeo((k * f * f) / (4 * Math.PI ** 2), decimales);
+      if (tfCambiados === c5.respuesta) indistinguibles.push(`caso 5: T y f cambiados dan ${tfCambiados}`);
+    }
+    if (c12) {
+      // ω_d = √(ω₀² − β²) con β = γ/(2m). Con β = 1 y m = 1, olvidar el cuadrado de β o la m de
+      // β da la misma ω_d = 3 rad/s.
+      const { k = NaN, m = NaN, gamma = NaN, decimales = 2 } = c12.datos;
+      const beta = gamma / (2 * m);
+      const sinCuadrado = redondeo((2 * Math.PI) / Math.sqrt(k / m - beta), decimales);
+      const sinMasa = redondeo((2 * Math.PI) / Math.sqrt(k / m - (gamma / 2) ** 2), decimales);
+      if (sinCuadrado === c12.respuesta) indistinguibles.push(`caso 12: β sin elevar da ${sinCuadrado}`);
+      if (sinMasa === c12.respuesta) indistinguibles.push(`caso 12: β = γ/2 da ${sinMasa}`);
+    }
+    expect(indistinguibles).toEqual([]);
+  });
+});
+
+/** Cuántos puntos del texto del <h1> (muestreo de 4 en 4 px) caen bajo la barra fija del logo. */
+async function tituloBajoLaBarra(page: Page): Promise<{ total: number; tapados: number }> {
+  await page.evaluate(
+    () => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
+  );
+  return page.locator('h1').evaluate((h1) => {
+    const barra = document.querySelector('[class*="headerBar"]');
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    let total = 0;
+    let tapados = 0;
+    for (const q of Array.from(rango.getClientRects())) {
+      for (let x = q.left + 2; x < q.right - 1; x += 4) {
+        for (let y = q.top + 4; y < q.bottom - 3; y += 4) {
+          total++;
+          const e = document.elementFromPoint(x, y);
+          if (e && barra?.contains(e)) tapados++;
+        }
+      }
+    }
+    return { total, tapados };
+  });
+}
+
+/**
+ * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
+ * admite meskeia.com) y, sin él, la página NO se hidrata: la píldora «Stemum › Física» no llega
+ * a montarse (useStemumHost corre en un efecto). El puente reenvía el socket a localhost:3050,
+ * que sí se acepta; no toca ninguna petición HTTP. Con `next start` no hay HMR y no hace nada.
+ * Copiado de tests/apps/simulador-punnett.spec.ts, donde está medido.
+ */
+async function puenteHmr(page: Page): Promise<void> {
+  const abiertos: WebSocket[] = [];
+  page.on('close', () => abiertos.forEach((s) => s.close()));
+  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
+    const u = new URL(ws.url());
+    const arriba = new WebSocket(`ws://localhost:3050${u.pathname}${u.search}`);
+    arriba.binaryType = 'arraybuffer';
+    abiertos.push(arriba);
+    const cola: (string | Buffer)[] = [];
+    arriba.onopen = () => {
+      for (const m of cola) arriba.send(m);
+      cola.length = 0;
+    };
+    ws.onMessage((m) => {
+      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
+      else cola.push(m);
+    });
+    arriba.onmessage = (e: MessageEvent) =>
+      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
+    ws.onClose(() => arriba.close());
+  });
+}
+
+test.describe('Re-inspección 02/10/2026 · el hero bajo meskeia.com y bajo stemum.com', () => {
+  const PORTALES = [
+    ['meskeia.com', '/simulador-mas-resorte/'],
+    ['stemum.com', 'http://stemum.com/simulador-mas-resorte/'],
+  ] as const;
+
+  for (const [portal, url] of PORTALES) {
+    test(`${portal}: ni el logo ni la píldora tapan el título a 360, 390, 800 y de 1023 a 1060 px`, async ({
+      page,
+    }) => {
+      test.setTimeout(60000);
+      await puenteHmr(page);
+      await page.goto(url);
+      await esperarPaginaAsentada(page);
+      if (portal === 'stemum.com') {
+        await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
+        await expect(page.locator('[class*="stemumPill"]')).toBeVisible();
+      }
+      // Medido el 02/10/2026, igual en los dos portales salvo la barra: el título empieza en
+      // x = 269 a 1024 px (y en y = 39, con los 40 px de siempre); el logo de meskeia llega a
+      // x = 203 y la píldora «Stemum › Física», a x = 232. Hasta 1023 px el hueco de 80 px deja
+      // el h1 en y = 79, con la barra hasta y = 59 (360 px) o 77 (800 px). 0 puntos tapados.
+      for (const ancho of [360, 390, 800, 1023, 1024, 1032, 1040, 1048, 1052, 1056, 1060]) {
+        await page.setViewportSize({ width: ancho, height: 900 });
+        const m = await tituloBajoLaBarra(page);
+        expect(m.total).toBeGreaterThan(100);
+        expect(m.tapados, `${portal} a ${ancho} px: puntos del título bajo la barra`).toBe(0);
+        // Y las cajas: el borde del logo (o de la píldora) no entra en la del texto del título.
+        const cajas = await page.evaluate(() => {
+          const logo = document.querySelector('[class*="headerBar"]')?.firstElementChild?.getBoundingClientRect();
+          const rango = document.createRange();
+          rango.selectNodeContents(document.querySelector('h1') as Element);
+          const titulo = rango.getBoundingClientRect();
+          return {
+            seCruzan: !!logo && logo.right > titulo.left && logo.bottom > titulo.top + 1,
+            logo: logo ? [Math.round(logo.right), Math.round(logo.bottom)] : null,
+            titulo: [Math.round(titulo.left), Math.round(titulo.top)],
+          };
+        });
+        expect(cajas.seCruzan, `${portal} a ${ancho} px: logo ${cajas.logo} · título ${cajas.titulo}`).toBe(false);
+      }
+    });
+  }
 });

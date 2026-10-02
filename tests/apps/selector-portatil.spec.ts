@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, devices, type Page } from '@playwright/test';
 import {
   calcularResultado, PREGUNTAS, ORDEN_GAMAS, TOPE_POR_PRESUPUESTO, PESOS_MAC, PESOS_LINUX, PESOS_CHROME, FORMATOS,
 } from '../../app/selector-portatil/motor';
@@ -581,5 +581,469 @@ test.describe('Reparación 24/09/2026 — presupuesto, sistemas y formatos alcan
     await abrirTest(page);
     await responder(page, INSP_NORMAL);
     await expect.poll(() => page.evaluate(() => document.activeElement?.textContent ?? '')).toBe('Tu ordenador ideal');
+  });
+});
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 02/10/2026 — familia selector-* (referencia: selector-smartphone)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Invalidada por los lotes de CSS 586a4d61, 3de36a1f y a1d72a9c, que dieron aire arriba al `.hero`
+// para que la barra fija de MeskeiaLogo no tapara el título. El motor no ha cambiado desde
+// df999bbb. Los hallazgos 1405-1419 de la inspección del 24/09 siguen REPARADOS (sus tests de
+// arriba pasan y la base no tiene ninguno abierto). Cada valor esperado de este bloque se resolvió
+// a mano desde motor.ts ANTES de abrir el navegador, para el flujo de su propio test.
+//
+// Hallazgos ABIERTOS que fija este bloque (con test.fail, afirman lo correcto):
+//   · macOS con «Sobremesa + Monitor» pide una torre «para poder cambiar la gráfica» y razona
+//     «tu uso pide gráfica dedicada», con la gráfica integrada en el chip (punto ciego del grupo:
+//     solo esta hermana cruza un TERCER eje, el formato, con el sistema);
+//   · la torre que pide el presupuesto se atribuye al uso: dos razones que se contradicen;
+//   · un doble clic o doble toque en «Siguiente», de una pregunta de 3 opciones a una de 4,
+//     contesta la siguiente (P9: «Más de 1.800 €»);
+//   · el foco cae a <body> tras «Empezar», «Siguiente» y «Anterior» (forma del 1680 de smartphone);
+//   · las flechas no mueven la selección y cada opción es una parada de Tab (forma del 1681);
+//   · el <h1> del resultado queda bajo la barra del logo a 360-412 px (forma del 2658);
+//   · porcentajes sin espacio duro; la guía educativa no está en el HTML servido.
+
+/** ¿Pisa alguna pieza de la barra fija del logo las letras del elemento? (función de la Ronda) */
+async function bajoLaBarra(page: Page, selector: string): Promise<{ tapado: boolean; top: number; barra: number }> {
+  return page.evaluate((sel) => {
+    const barra = [...document.querySelectorAll('body *')].find((e) => {
+      const cs = getComputedStyle(e);
+      const r = e.getBoundingClientRect();
+      return cs.position === 'fixed' && r.top <= 1 && r.height < 120 && r.width > 300
+        && !!e.querySelector('a[href="/"], a[href="https://meskeia.com/"]');
+    });
+    const el = document.querySelector(sel);
+    if (!barra || !el) throw new Error(`sin barra (${!!barra}) o sin ${sel} (${!!el})`);
+    const rango = document.createRange();
+    rango.selectNodeContents(el);
+    const letras = [...rango.getClientRects()].filter((c) => c.width > 0);
+    const piezas = [...barra.children].map((c) => c.getBoundingClientRect()).filter((c) => c.width > 0);
+    return {
+      tapado: piezas.some((p) => letras.some((c) =>
+        !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom))),
+      top: Math.round(el.getBoundingClientRect().top),
+      barra: Math.round(barra.getBoundingClientRect().bottom),
+    };
+  }, selector);
+}
+
+const textosDe = async (page: Page, clase: string) =>
+  (await page.locator(`[class*="${clase}"]`).allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim());
+const radiosMarcados = (page: Page) => page.locator('[role="radiogroup"] [role="radio"][aria-checked="true"]');
+const focoActual = (page: Page) => page.evaluate(() =>
+  document.activeElement === document.body ? 'BODY' : document.activeElement?.tagName ?? 'NADA');
+
+/** Lo mismo que `responder`, con toques: para los describe de móvil (hasTouch). */
+async function responderTocando(page: Page, indices: readonly number[]): Promise<void> {
+  for (let i = 0; i < indices.length; i++) {
+    await page.locator('[role="radiogroup"] [role="radio"]').nth(indices[i]).tap();
+    await page.getByRole('button', { name: i === indices.length - 1 ? 'Ver resultado' : 'Siguiente pregunta', exact: true }).tap();
+  }
+  await page.getByRole('heading', { name: 'Tu ordenador ideal' }).waitFor();
+}
+
+/** Contesta P1..P(k−1) con la primera opción y P(k) con la ÚLTIMA, para distinguirla después. */
+async function llegarAPregunta(page: Page, k: number): Promise<void> {
+  for (let i = 1; i < k; i++) {
+    await page.locator('[role="radiogroup"] [role="radio"]').first().click();
+    await page.getByRole('button', { name: 'Siguiente pregunta', exact: true }).click();
+  }
+  await expect(page.getByText(`Pregunta ${k} de 10`).first()).toBeVisible();
+  await page.locator('[role="radiogroup"] [role="radio"]').last().click();
+}
+
+// Programación (uso +2, Linux +2, Mac +1) · Juego bastante (uso +1) · A veces (portátil +2) ·
+// Estándar · Alguno (Mac +1) · Sin requisitos · 6–10 h (uso +2) · 4–5 años · 1.100–1.800 € ·
+// Dependería. A mano: Mac 2 < 3 · Linux 2 con «Sin requisitos» → Linux («Juego bastante» no lo
+// aparta: solo ChromeOS cae por esa respuesta, y la razón avisa del catálogo). Uso 2 + 1 + 2 = 5 →
+// alta (≥ 4), que es justo el tope de 1.100–1.800 €: ni recorte ni «cabe con margen». Formato:
+// portátil 2, escritorio 0. Consejos: 💡 (Dependería) y 🛒; sin 🔋 (no es «a diario»).
+const RE_NORMAL_LINUX = [3, 2, 1, 1, 1, 3, 2, 1, 2, 1] as const;
+
+// Diseño (uso +3) · No juego · A diario (portátil +4) · Compacto (+1) · Ecosistema Apple (Mac +3) ·
+// Suite Adobe (Mac +2) · Más de 10 h (uso +2) · 6 años o más (uso +2) · HASTA 600 € · Prefiero
+// nuevo. A mano: Mac 5 ≥ 3, pero MAC_GAMA_MINIMA (media) está por encima del tope de «Hasta 600 €»
+// (entrada) → se APARTA por presupuesto → Windows. Uso 3 + 2 + 2 = 7 → pro, recortada a entrada.
+// Consejos: ni 💡 ni ♻️ (prefiere nuevo) · 🔋 (a diario) · ✏️ (portátil creativo sin juegos) · 🛒.
+const RE_MAC_HASTA_600 = [2, 0, 0, 0, 0, 1, 3, 2, 0, 2] as const;
+
+// Diseño (uso +3) · No juego · Siempre en casa (escritorio +3) · Grande (escritorio +2) ·
+// Ecosistema Apple (+3) · Suite Adobe (+2) · 6–10 h (uso +2) · 4–5 años · 1.100–1.800 € ·
+// Prefiero nuevo. A mano: Mac 5 → macOS (el tope «alta» admite Mac). Uso 3 + 2 = 5 → alta.
+// Escritorio 5 frente a 0 y «Diseño» pide torre → «Sobremesa + Monitor».
+const RE_MAC_TORRE = [2, 0, 2, 2, 0, 1, 2, 1, 2, 2] as const;
+
+interface RecuentoReinspeccion {
+  total: number;
+  macConHasta600: number;
+  adobeEnLinuxOChromeOS: number;
+  soloWindowsFuera: number;
+  aDiarioSinPortatil: number;
+  emojiEnTexto: number;
+  desempateEncadenado: number;
+  empateMalExplicado: number;
+  macTorreCambiarGrafica: number;
+  macTorreGraficaDedicada: number;
+  torrePorPresupuestoAlUso: number;
+  porcentajeSinEspacioDuro: number;
+}
+
+let recuentoReinspeccion: RecuentoReinspeccion | null = null;
+/** Las 331.776 combinaciones, una vez por worker (≈1 s). */
+function barridoReinspeccion(): RecuentoReinspeccion {
+  if (recuentoReinspeccion) return recuentoReinspeccion;
+  const c: RecuentoReinspeccion = {
+    total: 0, macConHasta600: 0, adobeEnLinuxOChromeOS: 0, soloWindowsFuera: 0, aDiarioSinPortatil: 0,
+    emojiEnTexto: 0, desempateEncadenado: 0, empateMalExplicado: 0, macTorreCambiarGrafica: 0,
+    macTorreGraficaDedicada: 0, torrePorPresupuestoAlUso: 0, porcentajeSinEspacioDuro: 0,
+  };
+  const emoji = /\p{Extended_Pictographic}/u;
+  const ops = PREGUNTAS.map((p) => p.opciones);
+  const r: Record<number, string> = {};
+  const recorrer = (i: number): void => {
+    if (i < ops.length) {
+      for (const o of ops[i]) { r[PREGUNTAS[i].id] = o.valor; recorrer(i + 1); }
+      return;
+    }
+    c.total++;
+    const res = calcularResultado(r);
+    if (res.os === 'mac' && r[9] === 'bajo') c.macConHasta600++;
+    if (r[6] === 'adobe' && (res.os === 'linux' || res.os === 'chromeos')) c.adobeEnLinuxOChromeOS++;
+    if (r[6] === 'windows_only' && res.os !== 'windows') c.soloWindowsFuera++;
+    if (r[3] === 'siempre' && res.formato !== 'portatil') c.aDiarioSinPortatil++;
+    const textos = [...res.razones, ...res.perfil.map((l) => l.texto), ...res.consejos.map((l) => l.texto), res.criterioDesempate];
+    if (textos.some((t) => emoji.test(t))) c.emojiEnTexto++;
+    if (res.criterioDesempate.includes('a igualdad')) c.desempateEncadenado++;
+    // El único empate posible: «A veces» (portátil +2) con «Grande» (escritorio +2); lo deshace la
+    // movilidad, que solo da puntos al portátil. Cualquier otra forma estaría mal explicada.
+    if (res.formatosEmpatados.length > 0 && !(res.formato === 'portatil' && r[3] === 'aveces' && r[4] === 'grande'
+      && res.criterioDesempate === 'se muestra primero el portátil porque encaja mejor con lo que has dicho sobre llevarte el ordenador fuera de casa')) c.empateMalExplicado++;
+    if (res.os === 'mac' && res.formato === 'sobremesa') {
+      if (res.perfil.some((l) => l.texto.includes('cambiar la gráfica'))) c.macTorreCambiarGrafica++;
+      if (res.razones.some((x) => x.startsWith('Formato') && x.includes('gráfica dedicada'))) c.macTorreGraficaDedicada++;
+    }
+    const razonFormato = res.razones.find((x) => x.startsWith('Formato')) ?? '';
+    const razonGama = res.razones.find((x) => x.startsWith('Gama')) ?? '';
+    if (razonFormato.includes('porque tu uso pide') && razonGama.includes('no a una necesidad técnica')) c.torrePorPresupuestoAlUso++;
+    // Pegado o con espacio normal (U+0020): \s casaría también el U+00A0, que es el correcto.
+    if (textos.some((t) => /\d ?%/.test(t))) c.porcentajeSinEspacioDuro++;
+  };
+  recorrer(0);
+  recuentoReinspeccion = c;
+  return c;
+}
+
+test.describe('re-inspección 02/10/2026 · escritorio', () => {
+  test('caso normal: programación, juego bastante, a veces y 1.100–1.800 € → portátil, Linux, gama alta', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, RE_NORMAL_LINUX);
+    // Esperado resuelto a mano (cabecera de RE_NORMAL_LINUX).
+    expect(await textosDe(page, 'recomendacionValor')).toEqual(['Portátil', 'Linux', 'Gama alta']);
+    await expect(page.locator('[class*="avisoPresupuesto"]')).toHaveCount(0);
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
+    expect(await textosDe(page, 'razonItem')).toEqual([
+      'Formato — Portátil, por lo que has respondido: movilidad, «A veces» (+2).',
+      'Sistema — Linux, por lo que has respondido: uso principal, «Programación o ciencia de datos» (+2), y sin requisitos de software que lo impidan. Si prefieres no cambiar de sistema, Windows y macOS también sirven para programar. Juegas bastante: comprueba antes que tus juegos existen para este sistema, cuyo catálogo es más reducido que el de Windows.',
+      'Gama — alta, por lo que has respondido: uso principal, «Programación o ciencia de datos» (+2); horas de uso, «6 – 10 horas» (+2); videojuegos, «Juego bastante» (+1).',
+    ]);
+    expect(await textosDe(page, 'perfilItem')).toEqual([
+      '⚡ Procesador de gama alta (serie 7) de generación reciente',
+      '🧠 16 a 32 GB de RAM (32 GB si editas vídeo o usas máquinas virtuales)', // alta + programación
+      '💾 SSD de 512 GB a 1 TB',
+      '🎮 Gráfica dedicada de gama media, o una integrada reciente de alto rendimiento', // juego bastante
+      '🖼️ Pantalla de 15-16" con panel IPS u OLED y resolución Full HD (1920×1080) como mínimo, con tasa de refresco de 120 Hz o más',
+      '🐧 Compatibilidad con Linux comprobada: equipo vendido con Linux preinstalado o certificado por la distribución que vayas a usar',
+    ]);
+    expect((await textosDe(page, 'consejoItem')).map((t) => t.split(' ')[0])).toEqual(['💡', '🛒']);
+    await expect(page.locator('[class*="recomendacionDesc"] strong')).toHaveText('1.100 – 1.800 €');
+  });
+
+  test('rechazo: sin respuesta «Siguiente» no avanza, y «Anterior» conserva lo respondido', async ({ page }) => {
+    await abrirTest(page);
+    const siguiente = page.getByRole('button', { name: 'Siguiente pregunta' });
+    await expect(siguiente).toBeDisabled();
+    await siguiente.click({ force: true });
+    await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Pregunta anterior' })).toBeDisabled();
+    await page.locator('[role="radio"]').nth(2).click();
+    await siguiente.click();
+    await expect(page.getByText('Pregunta 2 de 10').first()).toBeVisible();
+    await expect(radiosMarcados(page)).toHaveCount(0);
+    await page.getByRole('button', { name: 'Pregunta anterior' }).click();
+    await expect(page.locator('[role="radio"]').nth(2)).toHaveAttribute('aria-checked', 'true');
+    await expect(radiosMarcados(page)).toHaveCount(1);
+  });
+
+  test('motor: los límites declarados son filtros en los 331.776 perfiles, sin emojis en el texto ni desempates encadenados', () => {
+    const b = barridoReinspeccion();
+    expect(b.total).toBe(331_776);
+    // «Hasta 600 €» nunca da macOS (MAC_GAMA_MINIMA = media; Apple Newsroom España, 11/03/2026).
+    expect(b.macConHasta600).toBe(0);
+    // «Suite Adobe» no sale en Linux ni ChromeOS; «Solo disponible en Windows» siempre es Windows.
+    expect(b.adobeEnLinuxOChromeOS).toBe(0);
+    expect(b.soloWindowsFuera).toBe(0);
+    // Quien se lleva el ordenador a diario siempre recibe un portátil (4 + pantalla frente a 2 como mucho).
+    expect(b.aDiarioSinPortatil).toBe(0);
+    // Los iconos de perfil y consejos van aparte (Linea.icono) para ocultarlos al lector.
+    expect(b.emojiEnTexto).toBe(0);
+    // Solo compiten dos formatos: no hay desempate en cadena («y, a igualdad, …») ni empate mal explicado.
+    expect(b.desempateEncadenado).toBe(0);
+    expect(b.empateMalExplicado).toBe(0);
+  });
+
+  test('la barra del logo no tapa el <h1> de la intro (360-1280 px, claro y oscuro) ni el del resultado desde 800 px', async ({ page }) => {
+    test.setTimeout(60_000);
+    // Lo que arreglaron 586a4d61, 3de36a1f y a1d72a9c en `.hero` (80 px hasta 1.023 px; 100 px de
+    // 769 a 1.439 px), medido con la función de la Ronda en los anchos del encargo.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-portatil/');
+    await esperarHidratacionBotones(page);
+    const anchos = [[360, 740], [390, 844], [412, 915], [800, 1112], [1000, 800], [1024, 768], [1280, 720]] as const;
+    for (const tema of ['claro', 'oscuro'] as const) {
+      if (tema === 'oscuro') {
+        await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      }
+      for (const [ancho, alto] of anchos) {
+        await page.setViewportSize({ width: ancho, height: alto });
+        await page.evaluate(() => window.scrollTo(0, 0));
+        expect((await bajoLaBarra(page, 'h1')).tapado, `intro, ${ancho} px, ${tema}`).toBe(false);
+      }
+    }
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.getByRole('button', { name: /Empezar el test/ }).click();
+    await responder(page, INSP_NORMAL);
+    for (const [ancho, alto] of [[800, 1112], [1000, 800], [1024, 768], [1280, 720]] as const) {
+      await page.setViewportSize({ width: ancho, height: alto });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      expect((await bajoLaBarra(page, 'h1')).tapado, `resultado, ${ancho} px`).toBe(false);
+    }
+  });
+
+  test('HALLAZGO: con macOS y «Sobremesa + Monitor» no se pide una torre para cambiar la gráfica', async ({ page }) => {
+    // ABIERTO (02/10/2026). pideTorre (motor.ts:537) no mira el sistema, y el perfil escribe la
+    // línea de la torre igual para macOS. RE_MAC_TORRE da hoy, en la MISMA lista de «Qué buscar»,
+    // «La gráfica va integrada en el chip» y «Torre con espacio y fuente de alimentación
+    // holgados, para poder cambiar la gráfica más adelante», y la razón de formato dice «Una
+    // torre, y no un mini PC, porque tu uso pide gráfica dedicada». Barrido: 15.888 perfiles con
+    // macOS + sobremesa, todos con las dos frases (10.800 además con la de la gráfica integrada).
+    test.fail();
+    await abrirTest(page);
+    await responder(page, RE_MAC_TORRE);
+    await expect(tarjeta(page, 1)).toHaveText('macOS (Apple)');
+    const perfil = (await lineasPerfil(page)).join(' · ');
+    expect(perfil).toContain('La gráfica va integrada en el chip');
+    expect(perfil).not.toContain('cambiar la gráfica');
+    expect(await razonDe(page, 'Formato')).not.toContain('gráfica dedicada');
+    const b = barridoReinspeccion();
+    expect({ cambiarGrafica: b.macTorreCambiarGrafica, graficaDedicada: b.macTorreGraficaDedicada })
+      .toEqual({ cambiarGrafica: 0, graficaDedicada: 0 });
+  });
+
+  test('HALLAZGO: si la torre la pide el presupuesto, la razón de formato no la atribuye al uso', async ({ page }) => {
+    // ABIERTO (02/10/2026). pideTorre mira la gama FINAL, que «Más de 1.800 €» sube a pro, y no la
+    // del uso; la regla que el propio motor.ts declara (cabecera, punto 6) es «mini PC si el uso no
+    // pide gráfica dedicada ni la potencia de una gama alta». PRO_POR_PRESUPUESTO, a mano: uso 0 →
+    // entrada, ampliada a pro por el tramo; escritorio 3 → hoy torre, con «Una torre, y no un mini
+    // PC, porque tu uso pide gráfica dedicada o la potencia de una gama alta» encima de «con tu uso
+    // bastaría la gama de entrada; el salto responde a tu presupuesto … no a una necesidad
+    // técnica». Barrido: 6.432 perfiles con las dos razones a la vez.
+    test.fail();
+    await abrirTest(page);
+    await responder(page, PRO_POR_PRESUPUESTO);
+    await expect(page.locator('[class*="avisoPresupuesto"]')).toContainText('Con tu uso declarado bastaría la gama de entrada');
+    expect(await razonDe(page, 'Gama')).toContain('con tu uso bastaría la gama de entrada');
+    expect(await razonDe(page, 'Formato')).not.toContain('porque tu uso pide');
+    expect(barridoReinspeccion().torrePorPresupuestoAlUso).toBe(0);
+  });
+
+  test('HALLAZGO: un doble clic en «Siguiente» de la pregunta 8 no contesta el presupuesto', async ({ page }) => {
+    // ABIERTO (02/10/2026). P8 tiene 3 opciones y P9 (presupuesto) 4: la navegación baja una
+    // opción y el segundo clic, en el mismo punto, cae en la última de P9, «Más de 1.800 €». Medido
+    // a 1280 px con el botón a media pantalla y al pie, 150 ms entre clics; igual de P5 (3) a P6
+    // (4), y a 360, 390 y 412 px con toques. Correcto: la pregunta nueva llega sin respuesta.
+    test.fail();
+    await abrirTest(page);
+    await llegarAPregunta(page, 8);
+    const siguiente = page.getByRole('button', { name: 'Siguiente pregunta', exact: true });
+    await siguiente.evaluate((e) => e.scrollIntoView({ block: 'center' }));
+    const caja = (await siguiente.boundingBox())!;
+    const x = caja.x + caja.width / 2;
+    const y = caja.y + caja.height / 2;
+    await page.mouse.click(x, y);
+    await page.waitForTimeout(150);
+    await page.mouse.click(x, y);
+    await expect(page.getByText('Pregunta 9 de 10').first()).toBeVisible();
+    await page.waitForTimeout(300);
+    await expect(radiosMarcados(page)).toHaveCount(0, { timeout: 1_000 });
+  });
+
+  test('HALLAZGO: tras «Empezar», «Siguiente» y «Anterior» el foco va al enunciado, no a <body>', async ({ page }) => {
+    // ABIERTO (02/10/2026). Forma del 1680 de smartphone, que allí se reparó llevando el foco al
+    // <h2 tabIndex=-1> del enunciado. Aquí «Empezar» se desmonta, «Siguiente» se desactiva (la
+    // pregunta nueva no tiene respuesta) y «Anterior» se desactiva al volver a P1: en los tres
+    // casos el foco cae a <body>, y el siguiente Tab salta a «Apps relacionadas». En móvil, sin
+    // foco que desplace la página, el enunciado nuevo queda fuera por arriba (360 px, botón a
+    // media pantalla: 6 de 10 preguntas). Al repararlo, con scroll-margin-top (forma del 2657).
+    test.fail();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-portatil/');
+    await esperarHidratacionBotones(page);
+    const medidas: string[] = [];
+    await page.getByRole('button', { name: /Empezar el test/ }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+    medidas.push(`Empezar → ${await focoActual(page)}`);
+    await page.locator('[role="radio"]').first().focus();
+    await page.keyboard.press('Space');
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Pregunta 2 de 10').first()).toBeVisible();
+    medidas.push(`Siguiente → ${await focoActual(page)}`);
+    await page.getByRole('button', { name: 'Pregunta anterior' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+    medidas.push(`Anterior → ${await focoActual(page)}`);
+    // Hoy: ['Empezar → BODY', 'Siguiente → BODY', 'Anterior → BODY'].
+    expect(medidas).toEqual(['Empezar → H2', 'Siguiente → H2', 'Anterior → H2']);
+  });
+
+  test('HALLAZGO: las flechas mueven la selección entre las opciones (patrón de radios APG)', async ({ page }) => {
+    // ABIERTO (02/10/2026). Forma del 1681 de smartphone: role="radio" sin tabindex itinerante ni
+    // teclado. Hoy ↓ y Fin no mueven el foco ni marcan nada, y las cuatro opciones son cuatro
+    // paradas de Tab. Correcto: una parada; ↓/→ y ↑/← a la vecina con vuelta, Inicio/Fin a los
+    // extremos, y mover el foco marca.
+    test.fail();
+    await abrirTest(page);
+    const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    expect(await radios.evaluateAll((els) => els.filter((e) => e.getAttribute('tabindex') !== '-1').length)).toBe(1);
+    await radios.first().focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(radios.nth(1)).toBeFocused({ timeout: 1_000 });
+    await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('End');
+    await expect(radios.nth(3)).toBeFocused({ timeout: 1_000 });
+    await page.keyboard.press('ArrowDown');
+    await expect(radios.nth(0)).toBeFocused({ timeout: 1_000 });
+  });
+
+  test('HALLAZGO: los porcentajes llevan espacio duro antes del «%» (CLAUDE.md §2)', async ({ page }) => {
+    // ABIERTO (02/10/2026). «100 % sRGB» (perfil, motor.ts:711) lleva un espacio normal, y el
+    // JSON-LD dice «100% en el navegador» (metadata.ts:18), pegado. La norma del 25/09/2026: U+00A0,
+    // y lo viejo se corrige cuando pasa el Inspector. RE_MAC_TORRE es creativo → sale el sRGB.
+    test.fail();
+    await abrirTest(page);
+    await responder(page, RE_MAC_TORRE);
+    const texto = (await page.locator('[class*="resultadosContainer"]').textContent()) ?? '';
+    const jsonld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    const separadores = [...`${texto} ${jsonld}`.matchAll(/\d(\s?)%/g)]
+      .map((m) => (m[1] === ' ' ? 'U+00A0' : m[1] === '' ? 'pegado' : 'espacio normal'));
+    // Hoy: ['espacio normal' (100 % sRGB), 'pegado' (100% en el navegador)].
+    expect(separadores.length).toBeGreaterThan(0);
+    expect(separadores.filter((s) => s !== 'U+00A0')).toEqual([]);
+    expect(barridoReinspeccion().porcentajeSinEspacioDuro).toBe(0); // hoy 82.944 perfiles
+  });
+
+  test('HALLAZGO: la guía educativa está en el HTML servido', async ({ page }) => {
+    // ABIERTO (02/10/2026). Forma del 2663 de smartphone: <EducationalSection> va dentro de
+    // `pantalla === 'resultado'` (page.tsx:310), así que el HTML servido no lleva ni una línea de
+    // la guía y quien no termina las 10 preguntas no la ve nunca.
+    test.fail();
+    const html = await (await page.request.get('/selector-portatil/')).text();
+    expect(html).toContain('Portátil (laptop o notebook) vs sobremesa: la primera decisión');
+  });
+});
+
+test.describe('re-inspección 02/10/2026 · móvil 360 px', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('caso límite con toques: Mac con «Hasta 600 €» → Windows de entrada, apartado y dicho', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-portatil/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    await responderTocando(page, RE_MAC_HASTA_600);
+    // Esperado resuelto a mano (cabecera de RE_MAC_HASTA_600).
+    expect(await textosDe(page, 'recomendacionValor')).toEqual(['Portátil', 'Windows', 'Gama de entrada']);
+    await expect(page.locator('[class*="recomendacionDesc"] strong')).toHaveText('300 – 600 €');
+    expect(await textosDe(page, 'avisoPresupuesto')).toEqual([
+      '💶 Tu uso apuntaba a la workstation / pro (1.800 – 4.000+ €), pero la recomendación se ajusta al presupuesto que has declarado. Lo que sigue es lo mejor que cabe en tu tramo.',
+    ]);
+    expect(await textosDe(page, 'razonItem')).toEqual([
+      'Formato — Portátil, por lo que has respondido: movilidad, «Sí, a diario» (+4); tamaño de pantalla, «Compacto (13-14")» (+1).',
+      'Sistema — Windows. Por lo que has respondido (dispositivos Apple, «Sí, uso el ecosistema Apple» (+3); software que necesitas, «Suite Adobe principalmente» (+2)) encajaría macOS, pero con un presupuesto de hasta 600 € no hay un Mac nuevo a precio general: manda el presupuesto.',
+      'Gama — de entrada: tus respuestas de uso apuntaban a la gama workstation o pro (1.800 – 4.000+ €), pero has declarado un presupuesto de hasta 600 €. Manda el presupuesto.',
+    ]);
+    expect((await textosDe(page, 'consejoItem')).map((t) => t.split(' ')[0])).toEqual(['🔋', '✏️', '🛒']);
+    expect((await lineasPerfil(page)).join(' ')).not.toMatch(/Apple|reacondicionad/i);
+    await expect(page.getByRole('heading', { name: 'Tu ordenador ideal' })).toBeFocused();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  });
+
+  test('HALLAZGO: el <h1> del resultado no queda bajo la barra del logo a 360, 390 ni 412 px', async ({ page }) => {
+    // ABIERTO (02/10/2026). Forma del 2658 de smartphone: los lotes dieron aire a `.hero`, pero el
+    // hero del resultado es `.heroResultados` (2rem arriba). Medido: a 360 px la píldora del logo
+    // ocupa [15, 10, 141, 52] y las letras de «Tu ordenador ideal» [81, 31, 279, 61]; igual a 390
+    // y 412 px, en claro y en oscuro. Desde 800 px el título centrado ya no llega al logo.
+    test.fail();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-portatil/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    await responderTocando(page, INSP_NORMAL);
+    await expect(page.getByRole('heading', { name: 'Tu ordenador ideal' })).toBeFocused();
+    const tapado: Record<string, boolean> = {};
+    for (const [ancho, alto] of [[360, 740], [390, 844], [412, 915]] as const) {
+      await page.setViewportSize({ width: ancho, height: alto });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      tapado[`a${ancho}`] = (await bajoLaBarra(page, 'h1')).tapado;
+    }
+    expect(tapado).toEqual({ a360: false, a390: false, a412: false });
+  });
+});
+
+test.describe('re-inspección 02/10/2026 · móvil 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('HALLAZGO: un doble toque en «Siguiente» de la pregunta 5 no contesta la 6', async ({ page }) => {
+    // ABIERTO (02/10/2026). P5 (dispositivos Apple) tiene 3 opciones y P6 (software) 4: el segundo
+    // toque, 150 ms después y en el mismo punto, cae en «Sin requisitos específicos». A 390 px
+    // también de P3 a P4 («Me da igual») y de P8 a P9 («Más de 1.800 €»); a 360 px un doble toque
+    // en «Empezar» con el botón al pie de la pantalla abre /selector-smartphone/ (Apps relacionadas).
+    test.fail();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-portatil/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    await llegarAPregunta(page, 5);
+    const siguiente = page.getByRole('button', { name: 'Siguiente pregunta', exact: true });
+    await siguiente.evaluate((e) => e.scrollIntoView({ block: 'center' }));
+    const caja = (await siguiente.boundingBox())!;
+    const x = caja.x + caja.width / 2;
+    const y = caja.y + caja.height / 2;
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(150);
+    await page.touchscreen.tap(x, y);
+    await expect(page.getByText('Pregunta 6 de 10').first()).toBeVisible();
+    await page.waitForTimeout(300);
+    expect(new URL(page.url()).pathname).toBe('/selector-portatil/');
+    await expect(radiosMarcados(page)).toHaveCount(0, { timeout: 1_000 });
   });
 });

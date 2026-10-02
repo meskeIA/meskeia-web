@@ -136,6 +136,10 @@ async function medirQuinceHz(page: Page): Promise<{ cifras: string[]; retenida: 
  * queda por encima de 20 Hz son rizos a la altura del fondo, que no pasan la prominencia. Se
  * pide lo que dice la ficha como primera opción: sin cifra en ningún momento («— Hz», sin
  * «Lectura estable» ni retenida). Golden del motor: tests/frecuencia-dominante-motor.spec.ts.
+ * Desde c0eb8f95 (01/10/2026, reparación de analizador-espectro) la búsqueda ya no empieza en
+ * ceil(fMin/Δf): recorre desde el bin 1 y decide por la frecuencia AFINADA de cada cima. El caso
+ * no cambia —la cima del 15 Hz afina a 15 y no cuenta, y su flanco sigue sin ser cima—, y se
+ * re-inspeccionó en verde el 02/10/2026 (los bordes, en generador-tonos-medidor-inspector).
  */
 test('HALLAZGO M1 (REPARADO) — un tono de 15 Hz a 48 kHz no da ninguna cifra', async ({ page }) => {
   const { cifras, retenida } = await medirQuinceHz(page);

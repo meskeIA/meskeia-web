@@ -15,9 +15,10 @@
  * deslizador de 1 a 50 con paso 0,5. El campo es el que permite medir de verdad:
  * r=12,5 y r=120 no caben en el deslizador.
  *
- * FORMATO DEL RESULTADO (`formatVolumen`): <10 → 4 decimales · <100 → 2 · <100.000 → 1 ·
- * resto → 0. Y `es-ES` NO agrupa los números de cuatro cifras: 8181,2 va sin punto de
- * miles, 7.238.229 sí lo lleva.
+ * FORMATO DEL RESULTADO (`formatVolumen`, desde 67de72aa del 22/09/2026): (0, 0,01) → notación
+ * científica con seis decimales de mantisa («4,188790×10⁻³») · <10 → 4 decimales · <100 → 2 ·
+ * <100.000 → 1 · resto → 0. Y `es-ES` NO agrupa los números de cuatro cifras: 8181,2 va sin
+ * punto de miles, 7.238.229 sí lo lleva.
  *
  * Los hallazgos del acta del 20/08/2026 —etiquetas del dibujo en formato inglés (r=12.5),
  * fórmula redondeada a 2 decimales mientras el cálculo usaba todas, entrada inválida
@@ -27,12 +28,29 @@
  *
  * RE-INSPECCIÓN del 30/08/2026 (la cola marcó la app «invalidada» porque su código había
  * cambiado): tres casos nuevos resueltos a mano, sin dar por bueno nada de lo anterior, en
- * el bloque del final del fichero, junto a los hallazgos que esa re-inspección deja
- * abiertos —esos últimos escritos contra lo que DEBERÍA ocurrir, así que hoy fallan.
+ * su bloque, junto a los hallazgos que esa re-inspección dejó abiertos (518-521), REPARADOS el
+ * 30/08/2026 (d749e6ac) y que hoy son de regresión.
+ *
+ * RE-INSPECCIONES del 22/09/2026 (hallazgos 1222-1225, REPARADOS el mismo día en 67de72aa) y
+ * del 02/10/2026 (bloques del final: casos nuevos y los hallazgos que deja abiertos, escritos
+ * contra lo que DEBERÍA ocurrir y marcados con `test.fail()`).
  */
 
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import {
+  esperarHidratacion,
+  esperarPaginaAsentada,
+  esperarValorEnReact,
+  sembrarValor,
+} from './_hidratacion';
+
+/**
+ * stemum.com → el servidor local, para ver la app como la sirve el portal (data-brand="stemum"
+ * y la píldora «Stemum › Matemáticas» en la barra fija). Va al NIVEL DEL FICHERO porque
+ * `launchOptions` fuerza un worker nuevo; al resto de tests no les afecta: solo resuelve ese host.
+ * (Re-inspección del 02/10/2026, bloque «stemum.com» del final.)
+ */
+test.use({ launchOptions: { args: ['--host-resolver-rules=MAP stemum.com 127.0.0.1:3050'] } });
 
 const RESULTADO = '[aria-label="Resultado del volumen"]';
 
@@ -489,21 +507,18 @@ test.describe('re-inspección 30/08/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la re-inspección del 30/08/2026 — FALLAN a propósito
+// HALLAZGOS de la re-inspección del 30/08/2026 — REPARADOS el 30/08/2026 (d749e6ac)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// HALLAZGO (cálculo/operativa, medio) — Por debajo de 0,0001 la app deja de dar resultado y
-// dice «≈0». formatNumber() devuelve «≈0» para todo |v| < 0,0001 y formatVolumen() lo llama
-// sin más, pero medExacta() TAMBIÉN, así que el defecto sale por tres sitios: el volumen, la
-// caja «Fórmula aplicada» —que llega a mostrar «V = (4/3) × π × ≈0³», que ya no es una
-// fórmula— y la etiqueta del dibujo, que rotula «r=≈0». El campo acepta esas medidas sin
-// ningún aviso (solo rechaza ≤ 0 y > 100.000): la app admite la entrada y luego no responde.
-// Y es su propio bloque educativo el que lleva a ese caso: la tarjeta «Ciencias y
-// laboratorio» propone «Célula esférica: r=0,01mm → V=4,19×10⁻⁶ mm³ → 4,19 picolitros»,
-// que es exactamente lo que la herramienta contesta con «≈0». Le pasa igual a quien mida en
-// metros algo pequeño: un cucurucho de r=0,03 y h=0,05 da 4,7×10⁻⁵ → «≈0».
-// Caso: esfera r=0,01 → esperado 4,188790×10⁻⁶ (o su notación científica) · obtenido «≈0»,
-//       y con r=0,00005 la fórmula muestra «(4/3) × π × ≈0³» y el dibujo «r=≈0».
+// HALLAZGO 518 (cálculo/operativa, medio) — REPARADO. Por debajo de 0,0001 la app dejaba de
+// dar resultado y decía «≈0»: formatNumber() devuelve «≈0» para todo |v| < 0,0001 y tanto
+// formatVolumen() como medExacta() lo llamaban sin más, así que el defecto salía por tres
+// sitios: el volumen, la caja «Fórmula aplicada» —que llegaba a mostrar «V = (4/3) × π × ≈0³»—
+// y la etiqueta del dibujo, que rotulaba «r=≈0». Y era su propio bloque educativo el que
+// llevaba a ese caso: la tarjeta «Ciencias y laboratorio» propone «Célula esférica: r=0,01mm →
+// V=4,19×10⁻⁶ mm³ → 4,19 picolitros».
+// Caso de entonces: esfera r=0,01 → esperado 4,188790×10⁻⁶ · obtenido «≈0», y con r=0,00005
+//       la fórmula mostraba «(4/3) × π × ≈0³» y el dibujo «r=≈0».
 test('518 (reparado) · un volumen diminuto ya se muestra en notación científica, no «≈0»', async ({ page }) => {
   await escribir(campo(page, 'Radio (r)'), '0,01');
   // (4/3)·π·0,01³ = 4,1887902047863905e-6
@@ -516,15 +531,11 @@ test('518 (reparado) · un volumen diminuto ya se muestra en notación científi
   await expect(dibujo(page).locator('text').first()).not.toContainText('≈0');
 });
 
-// HALLAZGO (contenido, bajo) — La guía «Cómo usar el visualizador» se quedó desfasada tras
-// la reparación del 19-21/08/2026: el campo de medida exacta —única vía para r=12,5 o r=120,
-// y lo que convierte la app en una herramienta de medir y no solo de explorar— no se
-// menciona en ningún texto. El paso 2 dice «Mueve los sliders del panel derecho para cambiar
-// el radio, altura o lado» y el paso 3 «El resultado se actualiza instantáneamente al mover
-// cualquier slider»; el subtítulo del hero, la metadata y el JSON-LD hablan también solo de
-// sliders. Quien lea la guía concluye que la herramienta llega hasta 50 y avanza de 0,5 en
-// 0,5, que es justo la limitación que la reparación levantó.
-// Caso: abrir la guía y buscar cualquier mención al campo → esperado ≥ 1 · obtenido 0.
+// HALLAZGO 519 (contenido, bajo) — REPARADO. La guía «Cómo usar el visualizador» se había
+// quedado desfasada tras la reparación del 19-21/08/2026: el campo de medida exacta —única vía
+// para r=12,5 o r=120— no se mencionaba en ningún texto, y el subtítulo, la metadata y el
+// JSON-LD hablaban solo de sliders.
+// Caso de entonces: abrir la guía y buscar cualquier mención al campo → esperado ≥ 1 · obtenido 0.
 test('519 (reparado) · la guía de uso ya explica el campo de medida exacta', async ({ page }) => {
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
   const guia = page.locator('section').filter({ hasText: 'Cómo usar el visualizador' }).first();
@@ -532,29 +543,21 @@ test('519 (reparado) · la guía de uso ya explica el campo de medida exacta', a
   expect(texto).toMatch(/escrib|teclea|campo|casilla/i);
 });
 
-// HALLAZGO (contenido, bajo) — Anglicismos sin traducir en el texto docente de una app en
-// español (CLAUDE.md §1). El recuadro de errores frecuentes titula uno «Usar la altura slant
-// en vez de la altura perpendicular», cuando el término español es el que el propio párrafo
-// cita dos líneas después: generatriz (cono) o apotema lateral (pirámide). Un estudiante
-// hispanohablante no reconoce «altura slant», que es «slant height» a medio traducir. En la
-// misma línea, toda la prosa dice «slider» mientras el aria-label del control dice «control
-// deslizante»: la app llama de dos maneras a su propio mando.
-// Caso: texto visible de la página → esperado sin «slant» · obtenido «la altura slant».
+// HALLAZGO 520 (contenido, bajo) — REPARADO. El recuadro de errores frecuentes titulaba uno
+// «Usar la altura slant en vez de la altura perpendicular», cuando el término español es el
+// que el propio párrafo cita dos líneas después: generatriz (cono) o apotema lateral (pirámide).
+// Caso de entonces: texto visible de la página → esperado sin «slant» · obtenido «la altura slant».
 test('520 (reparado) · el texto docente ya no deja «slant» sin traducir', async ({ page }) => {
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
   const cuerpo = (await page.locator('body').textContent()) ?? '';
   expect(cuerpo).not.toMatch(/\bslant\b/i);
 });
 
-// HALLAZGO (contenido, bajo) — La figura de la caja se llama «Paralelepípedo» y su fila de
-// la tabla enuncia V = a × b × h. Un paralelepípedo es cualquier prisma de bases
-// paralelogramos, oblicuos incluidos, y ahí esa fórmula NO vale: el volumen es el área de la
-// base por la altura PERPENDICULAR, no el producto de las tres aristas. Lo que la app dibuja
-// y calcula es un ORTOEDRO (prisma rectangular). La metadata, además, lo llama por un tercer
-// nombre —«cubo»—, que solo es exacto cuando a = b = h. En una app cuyo recuadro final trata
-// precisamente de los errores frecuentes de geometría, el nombre debería ser el exacto.
-// Caso: fila de la tabla con V = a × b × h → esperado «ortoedro» o «paralelepípedo recto» ·
-//       obtenido «📦 Paralelepípedo» a secas.
+// HALLAZGO 521 (contenido, bajo) — REPARADO. La figura de la caja se llamaba «Paralelepípedo»
+// con V = a × b × h, fórmula que solo vale para un ORTOEDRO (prisma rectangular), que es lo que
+// la app dibuja y calcula; la metadata la llamaba además «cubo».
+// Caso de entonces: fila de la tabla con V = a × b × h → esperado «ortoedro» o «paralelepípedo
+//       recto» · obtenido «📦 Paralelepípedo» a secas.
 test('521 (reparado) · la caja ya se nombra con el término geométrico exacto (ortoedro)', async ({ page }) => {
   await page.getByRole('button', { name: /Ver guía educativa/i }).click();
   const fila = page.getByRole('row').filter({ hasText: 'V = a × b × h' });
@@ -741,18 +744,15 @@ test.describe('re-inspección 22/09/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la re-inspección del 22/09/2026 — FALLAN a propósito
+// HALLAZGOS de la re-inspección del 22/09/2026 — REPARADOS el 22/09/2026 (67de72aa)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// HALLAZGO (dato, medio) — La caja «Fórmula aplicada» PEGA el exponente del cubo al de la
-// notación científica que entró con la reparación del 518: con r = 0,00005 escribe
-// «V = (4/3) × π × 5,000×10⁻⁵³», que se lee 10⁻⁵³ — cuarenta y ocho órdenes de magnitud por
-// debajo de lo que la app está calculando. Le pasa igual al cuadrado del cilindro y del cono
-// («π × 5,000×10⁻⁵² × 20»). La medida necesita paréntesis en cuanto se escribe en notación
-// científica, porque el exponente de la fórmula ya no puede distinguirse del de la medida.
-// El paso 4 de la guía vende justamente eso: «ver exactamente qué operaciones se están
-// realizando para obtener el volumen».
-// Caso: esfera r=0,00005 → esperado «(4/3) × π × (5,000×10⁻⁵)³» · obtenido
+// HALLAZGO 1223 (dato, medio) — REPARADO. La caja «Fórmula aplicada» PEGABA el exponente del
+// cubo al de la notación científica que entró con la reparación del 518: con r = 0,00005
+// escribía «V = (4/3) × π × 5,000×10⁻⁵³», que se lee 10⁻⁵³ —cuarenta y ocho órdenes de
+// magnitud por debajo de lo que la app calculaba—. Le pasaba igual al cuadrado del cilindro y
+// del cono. Desde 67de72aa la medida va entre paréntesis en cuanto se escribe en notación.
+// Caso de entonces: esfera r=0,00005 → esperado «(4/3) × π × (5,000×10⁻⁵)³» · obtenido
 //       «(4/3) × π × 5,000×10⁻⁵³».
 test('1223 (regresión) · la fórmula parentiza la medida en notación científica', async ({
   page,
@@ -761,33 +761,25 @@ test('1223 (regresión) · la fórmula parentiza la medida en notación científ
   await expect(formulaAplicada(page)).toContainText('(5,000×10⁻⁵)³');
 });
 
-// HALLAZGO (dato, medio) — Justo POR ENCIMA de la frontera de 0,0001 el volumen pierde de
-// golpe seis cifras significativas, porque formatVolumen imprime ese tramo con cuatro
-// decimales fijos. La discontinuidad es brutal y está medida: r=0,0287 → «9,902259×10⁻⁵»
-// (siete cifras), r=0,03 → «0,0001» (una), r=0,033 → «0,0002» cuando el volumen real es
-// 1,505326×10⁻⁴, un 33 % menos que lo que se muestra. Es el mismo caso de uso que motivó la
-// reparación del 518 —medir algo pequeño en la unidad grande, la célula o el cucurucho en
-// metros—, resuelto por debajo de la frontera y sin resolver justo por encima.
-// Caso: esfera r=0,033 → esperado 1,505326×10⁻⁴ (o «0,000151») · obtenido «0,0002».
+// HALLAZGO 1224 (dato, medio) — REPARADO. Justo POR ENCIMA de la frontera de 0,0001 el volumen
+// perdía de golpe seis cifras significativas, porque formatVolumen imprimía ese tramo con cuatro
+// decimales fijos: r=0,033 → «0,0002» cuando el volumen real es 1,505326×10⁻⁴. Desde 67de72aa
+// la notación científica empieza por debajo de 0,01 (lo vigila también el CASO 2 del
+// 02/10/2026, en la frontera nueva).
+// Caso de entonces: esfera r=0,033 → esperado 1,505326×10⁻⁴ · obtenido «0,0002».
 test('1224 (regresión) · un volumen de 1,5×10⁻⁴ no se muestra como 0,0002', async ({ page }) => {
   await escribir(campo(page, 'Radio (r)'), '0,033');
   // (4/3) × π × 0,033³ = (4/3) × π × 3,5937×10⁻⁵ = 1,505326×10⁻⁴
   await expect(valorVolumen(page)).toContainText('1,50');
 });
 
-// HALLAZGO (dato, bajo) — El ECO de la medida sigue pasando por med(), que la reparación del
-// 21/08/2026 sustituyó por medExacta() solo en la fórmula y en el dibujo. med() redondea a
-// dos decimales y delega en formatNumber, así que por debajo de 0,0001 escribe «≈0»:
-//   · el pie del deslizador anuncia «≈0 · fuera del deslizador» con r=0,00005;
-//   · el aria-label del deslizador dice «control deslizante: ≈0» (y «12.345,68» cuando la
-//     medida es 12.345,678, que es lo mismo que ya se reparó en la caja de la fórmula);
-//   · y al cambiar de figura y volver —el paso 5 de la guía, «Compara figuras»— el campo se
-//     REMONTA con med(), de modo que pasa a mostrar «≈0» (r=0,00005) o «0,00» (r=0,0001)
-//     mientras la app sigue calculando con la medida real. Vuelve a haber una pantalla que no
-//     corresponde a lo que se calcula, que es el defecto que se cerró el 21/08/2026. Desde
-//     «≈0» el campo tampoco se puede corregir de forma natural: borrar un carácter deja «≈».
-// Caso: esfera r=0,00005 → Cilindro → Esfera → esperado campo «0,00005» · obtenido «≈0»,
-//       con el volumen en 5,235988×10⁻¹³ (correcto) y el pie diciendo «≈0».
+// HALLAZGO 1225 (dato, bajo) — REPARADO. El ECO de la medida pasaba por med(), que redondeaba a
+// dos decimales y escribía «≈0» por debajo de 0,0001: en el pie del deslizador, en su
+// aria-label y, al cambiar de figura y volver, en el propio campo, mientras la app seguía
+// calculando con la medida real. Desde 67de72aa el campo usa medEditable() y los rótulos
+// medExacta(); med() se retiró.
+// Caso de entonces: esfera r=0,00005 → Cilindro → Esfera → esperado campo «0,00005» ·
+//       obtenido «≈0», con el volumen en 5,235988×10⁻¹³ (correcto) y el pie diciendo «≈0».
 test('1225 (regresión) · el eco de la medida no se convierte en «≈0»', async ({ page }) => {
   await escribir(campo(page, 'Radio (r)'), '0,00005');
   await expect(page.locator('[class*=sliderLimits]').first()).not.toContainText('≈0');
@@ -801,18 +793,17 @@ test('1225 (regresión) · el eco de la medida no se convierte en «≈0»', asy
   await expect(campo(page, 'Radio (r)')).toHaveValue('0,00005');
 });
 
-// HALLAZGO (operativa, medio) — En móvil el DIBUJO, que es lo que da nombre a la app y lo que
-// su subtítulo invita a mirar, nace entero por debajo del pliegue: y = 993 px en 390×844, con
-// 439 px de scroll para verlo completo. La reparación de agosto puso los controles delante
-// (order: 1 / order: 2 en el CSS a ≤640 px) y resolvió lo que entonces se midió —un control y
-// el resultado sin scroll—, pero dejó el visualizador detrás de todo. Medido hoy, en la
-// primera pantalla: h1 40 · subtítulo 110 · aviso legal 245 · selector de figura 434-620 ·
-// campo 660 · deslizador 694 · tarjeta de resultado 752-871, RECORTADA por el pliegue (92 de
-// sus 119 px; «unidades³» se corta por la mitad) · caja de fórmula 891, fuera · dibujo
-// 993-1283, fuera. Mover el deslizador y «observar cómo cambia el volumen en tiempo real»
-// exige bajar primero, y nada en pantalla dice que haya un dibujo ahí abajo.
-// Caso: viewport 390×844 → esperado que el dibujo asome en la primera pantalla y que la
-//       tarjeta de resultado quepa entera · obtenido dibujo a 993 px y tarjeta cortada en 844.
+// HALLAZGO 1222 (operativa, medio) — REPARADO el 22/09/2026 (67de72aa) y vuelto a ajustar el
+// 27/09/2026 (f0e61b70), cuando los 80 px del hueco del logo (586a4d61) empujaron la tarjeta
+// 6 px bajo el pliegue. En móvil el <svg> del dibujo nacía a 993 px en 390×844 y la tarjeta de
+// resultado se cortaba por el pliegue (752-871). Medido el 02/10/2026: tarjeta 734-830 y caja
+// del <svg> desde 837.
+// ⚠️ Este testigo mide la CAJA del <svg>, y la caja asoma 7 px VACÍOS: la figura (290 px de
+// lienzo con el dibujo centrado) empieza ~117 px más abajo, a 954 px. Lo que ve el usuario en la
+// primera pantalla no tiene dibujo: es el hallazgo abierto de la re-inspección del 02/10/2026,
+// más abajo, que mide la figura y no su caja. Y este testigo solo mira la ESFERA a 390 px.
+// Caso de entonces: viewport 390×844 → esperado que el dibujo asome en la primera pantalla y que
+//       la tarjeta de resultado quepa entera · obtenido dibujo a 993 px y tarjeta cortada en 844.
 test.describe('en móvil (390×844) — re-inspección 22/09/2026', () => {
   test.use({
     viewport: { width: 390, height: 844 },
@@ -826,7 +817,7 @@ test.describe('en móvil (390×844) — re-inspección 22/09/2026', () => {
   test('1222 (regresión) · el dibujo asoma sin scroll y el resultado cabe entero', async ({
     page,
   }) => {
-      const ALTO = 844;
+    const ALTO = 844;
     const caja = async (selector: string) => {
       const c = await page.locator(selector).first().boundingBox();
       return c ?? { y: Number.POSITIVE_INFINITY, height: 0 };
@@ -836,10 +827,641 @@ test.describe('en móvil (390×844) — re-inspección 22/09/2026', () => {
     expect((await caja('input[type=range]')).y).toBeLessThan(ALTO);
     expect((await caja('[class*=resultCard]')).y).toBeLessThan(ALTO);
 
-    // Lo que no: la tarjeta de resultado se corta por el pliegue…
+    // Reparado el 22/09 (y el 27/09 tras el hueco del logo): la tarjeta cabe entera…
     const resultado = await caja('[class*=resultCard]');
     expect(resultado.y + resultado.height).toBeLessThanOrEqual(ALTO);
-    // …y el dibujo, que es el producto de un «visualizador», no asoma en absoluto
+    // …y la caja del <svg> empieza sobre el pliegue (la CAJA: ver el aviso de arriba)
     expect((await caja('svg[role="img"]')).y).toBeLessThan(ALTO);
   });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 02/10/2026 — casos NUEVOS resueltos a mano
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * Motivo: desde la re-inspección del 22/09/2026 cambiaron `page.tsx` y el módulo de CSS
+ * (67de72aa, la reparación de 1222-1225), el módulo otra vez el 27/09 (f0e61b70: el resultado
+ * vuelve a caber en móvil tras el hueco del logo) y el hero en los lotes 586a4d61 y a1d72a9c
+ * (80 px arriba hasta 1023 px). Ninguna cifra de aquí se ha copiado de la app: la aritmética va
+ * escrita abajo y se hizo ANTES de abrir el navegador.
+ *
+ *   CASO 1 (normal) — decimales en las cuatro figuras que el bloque del 22/09 no llevó ahí
+ *     cono     r=6   h=4,5  → (1/3)·π·36·4,5 = 54 π = 169,6460032938   → «169,6»
+ *     cilindro r=6   h=4,5  → π·36·4,5       = 162 π = 508,9380098815  → «508,9» (= 3 × 169,646)
+ *     cilindro r=0,5 h=2    → π·0,25·2       = π/2  = 1,5707963268     → tramo [0,01, 10) → «1,5708»
+ *     ortoedro 2,5 × 3,2 × 7 = 8 × 7 = 56                              → tramo [10, 100) → «56,00»
+ *     pirámide l=1,2 h=0,9  → 1,44 × 0,9 = 1,296 ; / 3 = 0,432         → «0,4320»
+ *
+ *   CASO 2 (límite) — la frontera NUEVA de la notación científica del volumen, 0,01 (67de72aa
+ *   la subió desde 0,0001), atacada con las figuras que dan potencias de diez exactas:
+ *     ortoedro 0,1 × 0,1 × 1    = 0,01   → justo en la frontera, en decimal → «0,0100»
+ *     ortoedro 0,1 × 0,1 × 0,99 = 0,0099 → por debajo → «9,900000×10⁻³»
+ *     pirámide l=0,3 h=0,1 → 0,09 × 0,1 / 3 = 0,003 → «3,000000×10⁻³»
+ *     cono r=4 h=0,001 (altura mínima) → 16 π × 0,001 / 3 = 0,0167551608 → «0,0168»
+ *     cono r=0,001 h=0,001 → π × 10⁻⁹ / 3 = 1,0471975512×10⁻⁹ → «1,047198×10⁻⁹»
+ *     esfera r=0,1 → (4/3)·π·0,001 = 4,1887902048×10⁻³ → «4,188790×10⁻³»
+ *     esfera r=0,2 → (4/3)·π·0,008 = 0,0335103216      → «0,0335»
+ *     esfera r=100.000 (tope del campo) → (4/3)·π·10¹⁵ = 4.188.790.204.786.390,98
+ *                                                       → «4.188.790.204.786.391»
+ *     esfera r=0,00001234 → 1,234³ = 1,879080904 ; × 4,18879020479 = 7,8710757
+ *                         → «7,871076×10⁻¹⁵», y la medida entre paréntesis (1223): «(1,234×10⁻⁵)³»
+ *     cono r=0,00005 h=20 → (1/3)·π·2,5×10⁻⁹·20 = 5×10⁻⁸ × 1,0471975512 = 5,235987756×10⁻⁸
+ *                         → «5,235988×10⁻⁸», con el CUADRADO también entre paréntesis
+ *
+ *   CASO 3 (rechazo) — lo que no es una medida deja el cálculo en r=5 → «523,6» y lo dice:
+ *     «1,5 m», «5 cm», «Infinity», «½», «1/2»  → «Escribe un número: …»
+ *     «-0», «0,00000», «100000,5»              → «La medida debe estar entre 0 y 100.000: …»
+ *     En cambio SÍ son medidas: « 7 » (espacios) → (4/3)·π·343 = 1.436,7550402 → «1436,8»
+ *     y «1.5» (punto suelto, que no agrupa millares) → 1,5 → (4/3)·π·3,375 = 14,1371669 → «14,14»
+ *
+ *   TECLEAR (la forma transversal del 02/10: un estado intermedio reescrito bajo el cursor).
+ *   El campo es type="text" y guarda su propio texto, así que «12,» no se normaliza a «12»:
+ *     «1» → r=1 → 4,18879 → «4,1888» · «12» → (4/3)·π·1.728 = 7.238,229 → «7238,2» ·
+ *     «12,» → sigue en 12 → «7238,2» · «12,5» → «8181,2» (8.181,2308687, CASO 2 de agosto)
+ */
+test.describe('re-inspección 02/10/2026', () => {
+  test('CASO 1 · decimales en cono, cilindro, ortoedro y pirámide', async ({ page }) => {
+    await elegirFigura(page, /Cono/);
+    await escribir(campo(page, 'Radio de la base (r)'), '6');
+    await escribir(campo(page, 'Altura (h)'), '4,5');
+    await expect(valorVolumen(page)).toHaveText('169,6'); // 54 π = 169,646
+    await expect(formulaAplicada(page)).toHaveText('V = (1/3) × π × r² × h = (1/3) × π × 6² × 4,5');
+
+    // El cilindro de la misma base y altura vale el triple: 162 π = 508,938
+    await elegirFigura(page, /Cilindro/);
+    await escribir(campo(page, 'Radio (r)'), '6');
+    await escribir(campo(page, 'Altura (h)'), '4,5');
+    await expect(valorVolumen(page)).toHaveText('508,9');
+
+    await escribir(campo(page, 'Radio (r)'), '0,5');
+    await escribir(campo(page, 'Altura (h)'), '2');
+    await expect(valorVolumen(page)).toHaveText('1,5708'); // π/2
+    await expect(formulaAplicada(page)).toHaveText('V = π × r² × h = π × 0,5² × 2');
+
+    await elegirFigura(page, /Ortoedro/);
+    await escribir(campo(page, 'Anchura (a)'), '2,5');
+    await escribir(campo(page, 'Profundidad (b)'), '3,2');
+    await escribir(campo(page, 'Altura (h)'), '7');
+    await expect(valorVolumen(page)).toHaveText('56,00'); // 8 × 7
+    await expect(formulaAplicada(page)).toHaveText('V = a × b × h = 2,5 × 3,2 × 7');
+
+    await elegirFigura(page, /Pirámide/);
+    await escribir(campo(page, 'Lado de la base (l)'), '1,2');
+    await escribir(campo(page, 'Altura (h)'), '0,9');
+    await expect(valorVolumen(page)).toHaveText('0,4320'); // 1,296 / 3
+    await expect(formulaAplicada(page)).toHaveText('V = (1/3) × l² × h = (1/3) × 1,2² × 0,9');
+  });
+
+  test('CASO 2 · la frontera de 0,01 del volumen, alturas mínimas y el tope del campo', async ({
+    page,
+  }) => {
+    await elegirFigura(page, /Ortoedro/);
+    await escribir(campo(page, 'Anchura (a)'), '0,1');
+    await escribir(campo(page, 'Profundidad (b)'), '0,1');
+    await escribir(campo(page, 'Altura (h)'), '1');
+    await expect(valorVolumen(page)).toHaveText('0,0100'); // en la frontera: decimal
+    await escribir(campo(page, 'Altura (h)'), '0,99');
+    await expect(valorVolumen(page)).toHaveText('9,900000×10⁻³'); // por debajo: notación
+
+    await elegirFigura(page, /Pirámide/);
+    await escribir(campo(page, 'Lado de la base (l)'), '0,3');
+    await escribir(campo(page, 'Altura (h)'), '0,1');
+    await expect(valorVolumen(page)).toHaveText('3,000000×10⁻³'); // 0,009 / 3
+
+    await elegirFigura(page, /Cono/);
+    await escribir(campo(page, 'Radio de la base (r)'), '4');
+    await escribir(campo(page, 'Altura (h)'), '0,001');
+    await expect(valorVolumen(page)).toHaveText('0,0168'); // 16 π × 0,001 / 3 = 0,016755
+    await escribir(campo(page, 'Radio de la base (r)'), '0,001');
+    await expect(valorVolumen(page)).toHaveText('1,047198×10⁻⁹'); // π × 10⁻⁹ / 3
+    await expect(formulaAplicada(page)).toHaveText(
+      'V = (1/3) × π × r² × h = (1/3) × π × 0,001² × 0,001',
+    );
+    // 1223 en el cono: el cuadrado de una medida en notación va entre paréntesis
+    await escribir(campo(page, 'Radio de la base (r)'), '0,00005');
+    await escribir(campo(page, 'Altura (h)'), '20');
+    await expect(valorVolumen(page)).toHaveText('5,235988×10⁻⁸');
+    await expect(formulaAplicada(page)).toHaveText(
+      'V = (1/3) × π × r² × h = (1/3) × π × (5,000×10⁻⁵)² × 20',
+    );
+
+    await elegirFigura(page, /Esfera/);
+    await escribir(campo(page, 'Radio (r)'), '0,1');
+    await expect(valorVolumen(page)).toHaveText('4,188790×10⁻³');
+    await escribir(campo(page, 'Radio (r)'), '0,2');
+    await expect(valorVolumen(page)).toHaveText('0,0335');
+    await escribir(campo(page, 'Radio (r)'), '100000');
+    await expect(valorVolumen(page)).toHaveText('4.188.790.204.786.391');
+    await escribir(campo(page, 'Radio (r)'), '0,00001234');
+    await expect(valorVolumen(page)).toHaveText('7,871076×10⁻¹⁵');
+    await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × (1,234×10⁻⁵)³');
+  });
+
+  test('CASO 3 · unidades, fracciones y ceros se rechazan; espacios y «1.5» se aceptan', async ({
+    page,
+  }) => {
+    const radio = campo(page, 'Radio (r)');
+    const aviso = page.locator('p[role="alert"]'); // el de la app, no el anunciador de Next
+    await expect(valorVolumen(page)).toHaveText('523,6');
+
+    for (const noEsUnNumero of ['1,5 m', '5 cm', 'Infinity', '½', '1/2']) {
+      await escribir(radio, noEsUnNumero);
+      await expect(aviso).toHaveText(
+        'Escribe un número: se sigue calculando con la última medida válida.',
+      );
+      await expect(radio).toHaveAttribute('aria-invalid', 'true');
+      await expect(valorVolumen(page)).toHaveText('523,6');
+      await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 5³');
+    }
+    for (const fueraDeRango of ['-0', '0,00000', '100000,5']) {
+      await escribir(radio, fueraDeRango);
+      await expect(aviso).toHaveText(
+        'La medida debe estar entre 0 y 100.000: se sigue calculando con la última válida.',
+      );
+      await expect(valorVolumen(page)).toHaveText('523,6');
+    }
+
+    await escribir(radio, ' 7 ');
+    await expect(aviso).toHaveCount(0);
+    await expect(valorVolumen(page)).toHaveText('1436,8'); // (4/3)·π·343
+    await escribir(radio, '1.5');
+    await expect(valorVolumen(page)).toHaveText('14,14'); // (4/3)·π·3,375
+    await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 1,5³');
+  });
+
+  test('TECLEAR · «12,5» tecla a tecla: el campo no se reescribe y el volumen sigue a cada tecla', async ({
+    page,
+  }) => {
+    const radio = campo(page, 'Radio (r)');
+    await radio.fill('');
+    for (const [tecla, enCampo, volumen] of [
+      ['1', '1', '4,1888'],
+      ['2', '12', '7238,2'],
+      [',', '12,', '7238,2'],
+      ['5', '12,5', '8181,2'],
+    ] as const) {
+      await radio.pressSequentially(tecla);
+      await expect(radio).toHaveValue(enCampo);
+      await expect(valorVolumen(page)).toHaveText(volumen);
+      await expect(page.locator('p[role="alert"]')).toHaveCount(0);
+    }
+  });
+});
+
+/** Cuántos puntos del texto del <h1> (muestreo de 4 en 4 px) caen bajo la barra fija del logo. */
+async function tituloBajoLaBarra(page: Page): Promise<{ total: number; tapados: number }> {
+  await page.evaluate(
+    () => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
+  );
+  return page.locator('h1').evaluate((h1) => {
+    const barra = document.querySelector('[class*="headerBar"]');
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    let total = 0;
+    let tapados = 0;
+    for (const q of Array.from(rango.getClientRects())) {
+      for (let x = q.left + 2; x < q.right - 1; x += 4) {
+        for (let y = q.top + 4; y < q.bottom - 3; y += 4) {
+          total++;
+          const e = document.elementFromPoint(x, y);
+          if (e && barra?.contains(e)) tapados++;
+        }
+      }
+    }
+    return { total, tapados };
+  });
+}
+
+/**
+ * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
+ * admite meskeia.com) y, sin él, la página NO se hidrata: la píldora «Stemum › Matemáticas» no
+ * llega a montarse (useStemumHost corre en un efecto). El puente reenvía el socket a
+ * localhost:3050, que sí se acepta; no toca ninguna petición HTTP. Copiado de
+ * `simulador-punnett.spec.ts` (01/10/2026). Bajo `next start` no hay HMR y no hace nada.
+ */
+async function puenteHmr(page: Page): Promise<void> {
+  const abiertos: WebSocket[] = [];
+  page.on('close', () => abiertos.forEach((s) => s.close()));
+  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
+    const u = new URL(ws.url());
+    const arriba = new WebSocket(`ws://localhost:3050${u.pathname}${u.search}`);
+    arriba.binaryType = 'arraybuffer';
+    abiertos.push(arriba);
+    const cola: (string | Buffer)[] = [];
+    arriba.onopen = () => {
+      for (const m of cola) arriba.send(m);
+      cola.length = 0;
+    };
+    ws.onMessage((m) => {
+      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
+      else cola.push(m);
+    });
+    arriba.onmessage = (e: MessageEvent) =>
+      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
+    ws.onClose(() => arriba.close());
+  });
+}
+
+// ============================================================
+// HERO — ni el logo ni la píldora de Stemum tapan el título (02/10/2026)
+// ============================================================
+/**
+ * a1d72a9c deja el hueco de 80 px hasta 1023 px, medido con el logo de meskeia.com (hasta
+ * x = 203). Medido el 02/10/2026 en meskeia.com (localhost): 0 puntos del h1 tapados a 360, 390,
+ * 800 y de 1024 a 1064 px (el título centrado empieza en x = 247 a 1024 px). Bajo stemum.com,
+ * también 0 a 360, 390, 800 y 1023 px (los 80 px de arriba lo salvan). Lo que no pasa: ver el
+ * hallazgo abierto del bloque del final.
+ */
+test.describe('hero en meskeia.com — re-inspección 02/10/2026', () => {
+  test('a 360, 390, 800 y de 1024 a 1064 px el logo no tapa el título', async ({ page }) => {
+    for (const ancho of [360, 390, 800, 1024, 1032, 1044, 1052, 1064, 1280]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      const m = await tituloBajoLaBarra(page);
+      expect(m.total).toBeGreaterThan(100);
+      expect(m.tapados, `${ancho} px: puntos del título bajo el logo`).toBe(0);
+    }
+  });
+});
+
+test.describe('hero bajo stemum.com — re-inspección 02/10/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await puenteHmr(page);
+    await page.goto('http://stemum.com/visualizador-volumenes/');
+    await esperarPaginaAsentada(page);
+    await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
+    await expect(page.locator('[class*="stemumPill"]')).toBeVisible();
+  });
+
+  test('a 360, 390, 800 y 1023 px la píldora «Stemum › Matemáticas» no tapa el título', async ({
+    page,
+  }) => {
+    for (const ancho of [360, 390, 800, 1023, 1120, 1280]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      const m = await tituloBajoLaBarra(page);
+      expect(m.total).toBeGreaterThan(100);
+      expect(m.tapados, `${ancho} px: puntos del título bajo la píldora`).toBe(0);
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS de la re-inspección del 02/10/2026 — FALLAN a propósito
+// ═══════════════════════════════════════════════════════════════════════════
+
+// HALLAZGO (accesibilidad, bajo) — Bajo stemum.com, de 1024 a 1105 px, la píldora fija
+// «Stemum › Matemáticas» pisa el 🔷 del principio del h1. Es el corte de a1d72a9c (80 px de
+// hueco solo hasta 1023 px, medido con el logo de meskeia.com, que llega a x = 203) y el mismo
+// defecto que 2589 en simulador-punnett, pero más ancho: «Matemáticas» lleva la píldora hasta
+// x = 287 (la de «Biología» llegaba a 253), así que el rango tapado sube de 1024-1052 a
+// 1024-1105 px. Las letras quedan libres por 4-7 px; con un título más largo, no.
+// Caso: http://stemum.com/visualizador-volumenes/ a 1024×900 → esperado 0 puntos del h1 bajo la
+//       barra fija (como a 1023 px) · obtenido 160 de 1287 a 1024 px, 142 a 1040, 104 a 1060 y
+//       14 a 1100; 0 desde 1106.
+test.describe('hero bajo stemum.com — hallazgo abierto 02/10/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await puenteHmr(page);
+    await page.goto('http://stemum.com/visualizador-volumenes/');
+    await esperarPaginaAsentada(page);
+    await expect(page.locator('[class*="stemumPill"]')).toBeVisible();
+  });
+
+  test('de 1024 a 1105 px la píldora «Stemum › Matemáticas» no pisa el título', async ({ page }) => {
+    test.fail();
+    const tapados: string[] = [];
+    for (const ancho of [1024, 1040, 1060, 1080, 1100]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      const m = await tituloBajoLaBarra(page);
+      expect(m.total).toBeGreaterThan(100);
+      if (m.tapados > 0) tapados.push(`${ancho} px: ${m.tapados}/${m.total}`);
+    }
+    expect(tapados).toEqual([]);
+  });
+});
+
+// HALLAZGO (operativa, medio) — La promesa de f0e61b70 («el resultado vuelve a caber sin scroll
+// en móvil») solo se cumple en el caso exacto que mide su testigo, la ESFERA a 390×844. Con las
+// otras cuatro figuras cada medida añade un control de 84 px encima de la tarjeta: a 390×844
+// cilindro, cono y pirámide la dejan en 818-914 —el NÚMERO, en 852-880, entero bajo el pliegue,
+// mientras el segundo deslizador (684-768) está a la vista: se mueve y no se ve qué cambia— y el
+// ortoedro en 902-998. A 360×800, el ancho Android más común, ni siquiera la esfera: el hero y el
+// aviso legal crecen 44 px y la tarjeta queda en 778-875, con el número (812-840) fuera. Un
+// aviso del campo (p. ej. al teclear el «0» de «0,5») empuja la tarjeta 65 px más.
+// Caso: 390×844, Cilindro → esperado tarjeta de resultado entera en la primera pantalla ·
+//       obtenido 818-914 (número 852-880); Cono y Pirámide igual, Ortoedro 902-998; y a
+//       360×800, Esfera → obtenido 778-875.
+// HALLAZGO (operativa, bajo) — Y el DIBUJO sigue sin verse en la primera pantalla: lo que asoma
+// a 390×844 son 7 px VACÍOS de la caja del <svg> (desde 837), porque el lienzo mide 290 px y la
+// figura va centrada: la esfera empieza a 954 px. El testigo de 1222 mide la caja y pasa en verde.
+// Caso: 390×844, Esfera → esperado la figura asoma sobre el pliegue (y < 844) · obtenido el
+//       <circle> empieza en y = 954; a 360×800 la caja del <svg> ni asoma (881).
+test.describe('en móvil (390×844) — hallazgos abiertos 02/10/2026', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('con la esfera, tras escribir una medida, la tarjeta sigue entera a la vista', async ({
+    page,
+  }) => {
+    // Lo que SÍ cumple f0e61b70: medido el 02/10/2026, tarjeta 734-830 con el pliegue en 844
+    await escribir(campo(page, 'Radio (r)'), '12,5');
+    await expect(valorVolumen(page)).toHaveText('8181,2');
+    const tarjeta = await page.locator('[class*=resultCard]').boundingBox();
+    expect(tarjeta).not.toBeNull();
+    expect((tarjeta?.y ?? 0) + (tarjeta?.height ?? Infinity)).toBeLessThanOrEqual(844);
+  });
+
+  test('con cilindro, cono, pirámide y ortoedro la tarjeta de resultado también cabe', async ({
+    page,
+  }) => {
+    test.fail();
+    const cortadas: string[] = [];
+    for (const figura of [/Cilindro/, /Cono/, /Pirámide/, /Ortoedro/]) {
+      await elegirFigura(page, figura);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      const t = await page.locator('[class*=resultCard]').boundingBox();
+      const fin = t ? t.y + t.height : Infinity;
+      if (fin > 844) cortadas.push(`${figura.source}: ${Math.round(t?.y ?? 0)}-${Math.round(fin)}`);
+    }
+    expect(cortadas).toEqual([]);
+  });
+
+  test('la FIGURA asoma en la primera pantalla, no solo la caja vacía del <svg>', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.evaluate(() => window.scrollTo(0, 0));
+    // La caja del <svg> sí empieza sobre el pliegue (837 < 844): eso es lo que mide 1222…
+    expect((await dibujo(page).boundingBox())?.y ?? Infinity).toBeLessThan(844);
+    // …pero la esfera, no (954)
+    const esfera = await dibujo(page).locator('circle').boundingBox();
+    expect(esfera?.y ?? Infinity).toBeLessThan(844);
+  });
+});
+
+test.describe('en móvil (360×800) — hallazgo abierto 02/10/2026', () => {
+  test.use({
+    viewport: { width: 360, height: 800 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 13; SM-S901B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('con la esfera, el control y la tarjeta de resultado caben en la primera pantalla', async ({
+    page,
+  }) => {
+    test.fail();
+    await escribir(campo(page, 'Radio (r)'), '12,5');
+    await expect(valorVolumen(page)).toHaveText('8181,2');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    // El control sí (deslizador hasta 729)…
+    const deslizador = await page.locator('input[type=range]').first().boundingBox();
+    expect((deslizador?.y ?? Infinity) + (deslizador?.height ?? 0)).toBeLessThanOrEqual(800);
+    // …la tarjeta no (778-875)
+    const tarjeta = await page.locator('[class*=resultCard]').boundingBox();
+    expect((tarjeta?.y ?? 0) + (tarjeta?.height ?? Infinity)).toBeLessThanOrEqual(800);
+  });
+});
+
+/**
+ * Qué parte de cada rótulo BLANCO del dibujo cae sobre la figura (y no sobre el fondo blanco de
+ * la tarjeta). Se mide en coordenadas del propio SVG con `isPointInFill` sobre las formas
+ * pintadas (sin la sombra), muestreando la caja del texto de píxel en píxel.
+ */
+async function rotulosBlancos(page: Page): Promise<{ texto: string; sobreFigura: number }[]> {
+  return dibujo(page).evaluate((svg) => {
+    const formas = Array.from(
+      svg.querySelectorAll<SVGGeometryElement>('circle, ellipse, polygon, rect'),
+    ).filter((f) => {
+      const relleno = f.getAttribute('fill') ?? '';
+      return relleno !== 'none' && !relleno.startsWith('rgba(0,0,0');
+    });
+    return Array.from(svg.querySelectorAll<SVGTextElement>('text'))
+      .filter((t) => t.getAttribute('fill') === 'white')
+      .map((t) => {
+        const b = t.getBBox();
+        let dentro = 0;
+        let total = 0;
+        for (let x = b.x + 0.5; x < b.x + b.width; x += 1) {
+          for (let y = b.y + b.height * 0.25; y < b.y + b.height * 0.85; y += 1) {
+            total++;
+            const p = new DOMPoint(x, y);
+            if (formas.some((f) => f.isPointInFill(p))) dentro++;
+          }
+        }
+        return { texto: t.textContent ?? '', sobreFigura: Math.round((100 * dentro) / total) };
+      });
+  });
+}
+
+// HALLAZGO (accesibilidad, medio) — Los rótulos BLANCOS del dibujo («r=» de la esfera y del
+// cilindro, «h=» de la pirámide) se colocan con un desplazamiento fijo y se salen de la figura:
+// lo que cae fuera es blanco sobre el blanco de la tarjeta (1:1) en tema claro. Pasa YA en el
+// arranque: la pirámide l=6 h=8 se rotula «=8» (la «h», fuera de la cara: 51 % del rótulo sobre
+// la figura) y al «r=4» del cilindro le falta la mitad de arriba (55 %). Y con figuras pequeñas
+// o estrechas desaparecen enteros: cilindro r=1 h=50 → «r=1» 0 %; pirámide l=1 h=50 → «h=50»
+// 0 %; la célula de la guía, esfera r=0,01 → 21 %. Las demás etiquetas van en
+// var(--text-primary) y no tienen el problema. En oscuro el fondo es oscuro y se leen.
+// Caso: tema claro, Pirámide de arranque (l=6, h=8) → esperado «h=8» legible · obtenido «=8»
+//       (51 % del rótulo sobre la cara; el resto, blanco sobre rgb(255, 255, 255)).
+test('los rótulos blancos del dibujo caen sobre la figura, no sobre el fondo blanco', async ({
+  page,
+}) => {
+  test.fail();
+  const fuera: string[] = [];
+  const anotar = async (caso: string) => {
+    for (const r of await rotulosBlancos(page)) {
+      if (r.sobreFigura < 90) fuera.push(`${caso}: «${r.texto}» ${r.sobreFigura} % sobre la figura`);
+    }
+  };
+  await elegirFigura(page, /Pirámide/);
+  await anotar('pirámide l=6 h=8');
+  await elegirFigura(page, /Cilindro/);
+  await escribir(campo(page, 'Radio (r)'), '1');
+  await escribir(campo(page, 'Altura (h)'), '50');
+  await anotar('cilindro r=1 h=50');
+  await elegirFigura(page, /Esfera/);
+  await escribir(campo(page, 'Radio (r)'), '0,01');
+  await anotar('esfera r=0,01');
+  expect(fuera).toEqual([]);
+});
+
+/**
+ * Contraste WCAG, en el PEOR punto de cada texto, del blanco de la tarjeta de resultado contra
+ * su degradado (135deg, --primary → --secondary), con la opacidad del texto aplicada. El color
+ * del fondo bajo cada punto sale de la geometría del degradado CSS: el cálculo se contrastó el
+ * 02/10/2026 con los píxeles de una captura (cota optimista por fila: 3,24-3,93:1 en claro y
+ * 2,34-2,72:1 en oscuro, del mismo orden que esto).
+ */
+async function contrasteTarjeta(page: Page): Promise<Record<string, number>> {
+  return page.locator('[class*=resultCard]').evaluate((tarjeta) => {
+    const colores = Array.from(getComputedStyle(tarjeta).backgroundImage.matchAll(/rgba?\(([^)]+)\)/g)).map(
+      (m) => m[1].split(',').map((x) => parseFloat(x)),
+    );
+    const [c0, c1] = colores;
+    const caja = tarjeta.getBoundingClientRect();
+    const ang = (135 * Math.PI) / 180;
+    const largo = Math.abs(caja.width * Math.sin(ang)) + Math.abs(caja.height * Math.cos(ang));
+    const fondoEn = (x: number, y: number): number[] => {
+      const dx = x - caja.width / 2;
+      const dy = y - caja.height / 2;
+      const t = Math.min(1, Math.max(0, (dx * Math.sin(ang) - dy * Math.cos(ang)) / largo + 0.5));
+      return [0, 1, 2].map((i) => c0[i] + (c1[i] - c0[i]) * t);
+    };
+    const canal = (c: number): number => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    const lum = (c: number[]): number => 0.2126 * canal(c[0]) + 0.7152 * canal(c[1]) + 0.0722 * canal(c[2]);
+    const salida: Record<string, number> = {};
+    for (const [nombre, sel] of [
+      ['etiqueta', '[class*=resultLabel]'],
+      ['valor', '[class*=resultValor]'],
+      ['unidad', '[class*=resultUnidad]'],
+    ]) {
+      const el = tarjeta.querySelector(sel) as HTMLElement;
+      const rango = document.createRange();
+      rango.selectNodeContents(el);
+      const t = rango.getBoundingClientRect();
+      const op = parseFloat(getComputedStyle(el).opacity);
+      const color = (getComputedStyle(el).color.match(/[\d.]+/g) ?? []).map(Number);
+      let peor = 99;
+      for (let x = t.left; x <= t.right; x += 2) {
+        const fondo = fondoEn(x - caja.left, (t.top + t.bottom) / 2 - caja.top);
+        const texto = [0, 1, 2].map((i) => color[i] * op + fondo[i] * (1 - op));
+        const a = lum(texto);
+        const b = lum(fondo);
+        peor = Math.min(peor, (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05));
+      }
+      salida[nombre] = +peor.toFixed(2);
+    }
+    return salida;
+  });
+}
+
+// HALLAZGO (accesibilidad, medio) — La tarjeta del resultado pone texto BLANCO sobre un degradado
+// de --primary a --secondary (el teal, 2,80:1 con blanco según el CLAUDE.md), y encima rebaja la
+// etiqueta y la unidad con opacidad 0,9 y 0,85. Medido en el peor punto de cada texto: en claro,
+// «VOLUMEN» (13 px, seminegrita) 3,04:1 y «unidades³» (13,6 px) 2,78:1, por debajo de 4,5:1; el
+// número (32 px, negrita: texto grande) 3,28:1, que pasa por poco. En OSCURO el degradado se
+// aclara (#3FA5D1 → #5ABDB9) y el propio NÚMERO, que es el resultado de la app, cae a 2,46:1, por
+// debajo incluso del 3:1 del texto grande; etiqueta 2,29:1 y unidad 2,15:1. El candado de
+// contraste solo vigila cabeceras de tabla (los fondos de marca con blanco son «campaña aparte»);
+// los tokens --primary-boton / --secondary-boton existen para esto.
+// Caso: tema oscuro, resultado de arranque «523,6» → esperado ≥ 3:1 (texto grande) · obtenido
+//       2,46:1; tema claro, «VOLUMEN» → esperado ≥ 4,5:1 · obtenido 3,04:1.
+test('el texto de la tarjeta de resultado llega al contraste mínimo en los dos temas', async ({
+  page,
+}) => {
+  test.fail();
+  await page.addStyleTag({
+    content: '*, *::before, *::after { transition: none !important; animation: none !important; }',
+  });
+  const fallan: string[] = [];
+  for (const tema of ['claro', 'oscuro']) {
+    if (tema === 'oscuro') {
+      await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).first().click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    }
+    const c = await contrasteTarjeta(page);
+    if (c.etiqueta < 4.5) fallan.push(`${tema} · etiqueta ${c.etiqueta}:1`);
+    if (c.unidad < 4.5) fallan.push(`${tema} · unidad ${c.unidad}:1`);
+    if (c.valor < 3) fallan.push(`${tema} · número ${c.valor}:1`);
+  }
+  expect(fallan).toEqual([]);
+});
+
+// HALLAZGO (operativa, bajo) — Con medidas pequeñas, cuatro de las cinco figuras se reducen a una
+// mota y sus rótulos se montan unos sobre otros. La escala del dibujo tiene un TOPE de 13 px por
+// unidad (`Math.min(…, 13)` en SvgCubo, SvgCilindro, SvgCono y SvgPiramide), así que por debajo de
+// ~8 unidades la figura deja de ajustarse al lienzo: el ortoedro de 1 × 1 × 1, que está DENTRO del
+// recorrido del deslizador, mide 26 px y sus rótulos «a=1» y «b=1» se pisan 9 px; una caja de
+// 0,5 × 0,5 × 0,5 (50 cm medidos en metros) mide 13 px y «a=0,5»/«b=0,5» se pisan 24 px; un
+// cilindro r=0,01 h=0,02 mide 0,4 px. La esfera sí tiene un mínimo (12 px de radio desde la
+// reparación del 19/08), y el campo de la guía propone medir justo así («r = 0,01»).
+// Caso: Ortoedro 0,5 × 0,5 × 0,5 → esperado una figura visible (≥ 24 px, el mínimo de la esfera)
+//       con sus tres rótulos legibles · obtenido 13 px de alto y «a=0,5» y «b=0,5» solapados 24 px.
+test('con medidas pequeñas el ortoedro se sigue viendo y sus rótulos no se pisan', async ({
+  page,
+}) => {
+  test.fail();
+  const medir = () =>
+    dibujo(page).evaluate((svg) => {
+      const rotulos = Array.from(svg.querySelectorAll<SVGTextElement>('text')).map((t) => t.getBBox());
+      const [a, b] = rotulos;
+      const solape = Math.max(0, Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x));
+      let arriba = Infinity;
+      let abajo = -Infinity;
+      for (const p of Array.from(svg.querySelectorAll<SVGPolygonElement>('polygon'))) {
+        const c = p.getBBox();
+        arriba = Math.min(arriba, c.y);
+        abajo = Math.max(abajo, c.y + c.height);
+      }
+      return { solape: +solape.toFixed(1), alto: +(abajo - arriba).toFixed(1) };
+    });
+  const fallos: string[] = [];
+  await elegirFigura(page, /Ortoedro/);
+  for (const medida of ['1', '0,5']) {
+    for (const nombre of ['Anchura (a)', 'Profundidad (b)', 'Altura (h)']) {
+      await escribir(campo(page, nombre), medida);
+    }
+    const m = await medir();
+    if (m.solape > 0) fallos.push(`${medida}³: «a=» y «b=» se pisan ${m.solape} px`);
+    if (m.alto < 24) fallos.push(`${medida}³: la figura mide ${m.alto} px`);
+  }
+  expect(fallos).toEqual([]);
+});
+
+// HALLAZGO (dato, bajo) — La fórmula, el rótulo del dibujo, el pie y el aria-label del deslizador
+// escriben la medida con medExacta(), que la corta a SEIS decimales («hasta seis decimales, que es
+// donde el campo deja de admitir más», dice su comentario, y es falso: el campo admite cualquier
+// número). Entre 0,0001 y 0,001 eso deja tres cifras significativas mientras el volumen sale con
+// siete, así que rehacer la operación que la app enseña no da el número que la app muestra —el
+// hallazgo 108 de agosto, que se cerró para dos decimales—: r = 0,0009999 se escribe «0,001000»
+// (que además aparenta cuatro cifras exactas), y r = 0,0001234 y r = 0,00012345 enseñan la misma
+// fórmula, «0,000123³», con volúmenes distintos (7,871076 y 7,880647 ×10⁻¹²).
+// Caso: esfera r=0,0009999 → esperado «(4/3) × π × 0,0009999³» (V = 4,187534×10⁻⁹) · obtenido
+//       «(4/3) × π × 0,001000³», que rehecha da 4,188790×10⁻⁹.
+test('la fórmula escribe la medida entera, no cortada a seis decimales', async ({ page }) => {
+  test.fail();
+  // 0,9999³ = 0,99970003 ; × 4,18879020479 = 4,1875336934 → 4,187534×10⁻⁹
+  await escribir(campo(page, 'Radio (r)'), '0,0009999');
+  await expect(valorVolumen(page)).toHaveText('4,187534×10⁻⁹');
+  await expect(formulaAplicada(page)).toHaveText('V = (4/3) × π × r³ = (4/3) × π × 0,0009999³');
+});
+
+// HALLAZGO (accesibilidad, bajo) — Al TECLEAR cualquier medida menor que 1 salta un aviso de error
+// a mitad de escritura: el «0» inicial (y «0,», «0,0»…) ya se valida como medida, cae en «≤ 0» y
+// monta un <p role="alert"> que el lector de pantalla anuncia —«La medida debe estar entre 0 y
+// 100.000…»— mientras el usuario está escribiendo justo lo que la guía propone (r = 0,01). En
+// pantalla, además, empuja la tarjeta de resultado 65 px (en 390×844 la saca del pliegue). Con
+// «12,5» no pasa: el problema es solo el cero de delante, que es un prefijo válido de un número.
+// Caso: campo del radio vacío, teclear «0,5» tecla a tecla → esperado ningún aviso y 0,5236 al
+//       final · obtenido el aviso se monta en «0», sigue en «0,» y se retira en «0,5».
+test('teclear «0,5» no anuncia un error a mitad de escritura', async ({ page }) => {
+  test.fail();
+  const radio = campo(page, 'Radio (r)');
+  await radio.fill('');
+  await page.evaluate(() => {
+    const w = window as unknown as { __avisos: string[] };
+    w.__avisos = [];
+    new MutationObserver((cambios) => {
+      for (const c of cambios) {
+        for (const n of Array.from(c.addedNodes)) {
+          if (n instanceof HTMLElement && n.matches('p[role="alert"]')) w.__avisos.push(n.textContent ?? '');
+        }
+      }
+    }).observe(document.body, { childList: true, subtree: true });
+  });
+  await radio.pressSequentially('0,5');
+  await expect(radio).toHaveValue('0,5');
+  await expect(valorVolumen(page)).toHaveText('0,5236'); // (4/3)·π·0,125 = 0,5235988
+  const avisos = await page.evaluate(() => (window as unknown as { __avisos: string[] }).__avisos);
+  expect(avisos).toEqual([]);
 });

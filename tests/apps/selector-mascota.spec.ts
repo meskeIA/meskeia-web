@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, devices } from '@playwright/test';
 import { calcularResultado, MASCOTAS, TECHO_MENSUAL, type MascotaKey } from '../../app/selector-mascota/motor';
 
 /**
@@ -902,5 +902,473 @@ test.describe('Inspección 24/09/2026 — re-inspección: lo que la reparación 
     await responder(page, NORMAL);
     await leerFicha(page);
     await expect(page.getByRole('heading', { name: 'Tu mascota ideal' })).toBeFocused();
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN DEL 02/10/2026 — hermana de la familia «selectores» (referencia: selector-smartphone)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Invalidada por los lotes de CSS 586a4d61 (27/09, móvil) y a1d72a9c (28/09, tableta), que dieron
+// 80 px arriba al `.hero` para que la barra fija de MeskeiaLogo no tapara el título. El motor
+// (motor.ts) no ha cambiado desde a3c2066c: las cuentas de abajo usan su tabla PESOS y se
+// resolvieron a mano ANTES de abrir el navegador, cada una para el flujo de su propio test.
+//
+// Lo que la referencia ya tiene (b0f31109) y aquí no ha llegado: foco al enunciado tras «Empezar»
+// y «Siguiente» (forma del 1680) y teclado de radios con tabindex itinerante (forma del 1681).
+// Lo que solo existe en esta hermana: la pregunta 6, que mete en UNA elección única tres
+// condiciones independientes (alergia, comunidad, silencio).
+//
+// Hallazgos ABIERTOS que fija este bloque (con test.fail, afirman lo correcto):
+//   · «La comunidad restringe ciertas mascotas» y sale un perro sin una palabra de la restricción;
+//   · menos de 1 h al día y la casa vacía 6 – 10 h, y sale un perro como «Tu mascota ideal»;
+//   · la pregunta 6 no deja declarar a la vez la alergia y la comunidad;
+//   · foco a <body> tras «Empezar» y «Siguiente»; flechas sin efecto entre radios;
+//   · el <h1> del resultado bajo el logo a 360 y 390 px (el lote solo tocó `.hero`);
+//   · a 360 px, tras «Siguiente», el enunciado nuevo queda bajo la barra o fuera de la pantalla;
+//   · a 412 px, doble toque en «Siguiente» de la pregunta 8 contesta la 9;
+//   · emojis de los consejos leídos por el lector; porcentajes sin espacio duro.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** ¿Pisa alguna pieza de la barra fija del logo las letras del elemento? (la función de la Ronda) */
+async function bajoLaBarraLogo(page: Page, selector: string): Promise<{ tapado: boolean; top: number; bottom: number; barra: number }> {
+  return page.evaluate((sel) => {
+    const barra = [...document.querySelectorAll('body *')].find((e) => {
+      const cs = getComputedStyle(e);
+      const r = e.getBoundingClientRect();
+      return cs.position === 'fixed' && r.top <= 1 && r.height < 120 && r.width > 300
+        && !!e.querySelector('a[href="/"], a[href="https://meskeia.com/"]');
+    });
+    const el = document.querySelector(sel);
+    if (!barra || !el) throw new Error(`sin barra (${!!barra}) o sin ${sel} (${!!el})`);
+    const rango = document.createRange();
+    rango.selectNodeContents(el);
+    const letras = [...rango.getClientRects()].filter((c) => c.width > 0);
+    const piezas = [...barra.children].map((c) => c.getBoundingClientRect()).filter((c) => c.width > 0);
+    const r = el.getBoundingClientRect();
+    return {
+      tapado: piezas.some((p) => letras.some((c) =>
+        !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom))),
+      top: Math.round(r.top),
+      bottom: Math.round(r.bottom),
+      barra: Math.round(Math.max(...piezas.map((p) => p.bottom))),
+    };
+  }, selector);
+}
+
+/** Recorre las 10 preguntas tocando (móvil) en vez de hacer clic. */
+async function responderTocando(page: Page, perfil: Perfil): Promise<void> {
+  for (let i = 0; i < perfil.length; i++) {
+    const opcion = page.locator('[role="radiogroup"] [role="radio"]', { hasText: perfil[i] });
+    await expect(opcion, `P${i + 1}: «${perfil[i]}» debe casar con UNA opción`).toHaveCount(1);
+    await opcion.tap();
+    await page
+      .getByRole('button', { name: i === perfil.length - 1 ? 'Ver resultado' : 'Siguiente pregunta' })
+      .tap();
+  }
+}
+
+// ── Perfiles del 02/10/2026 (puntos a mano con la tabla PESOS) ────────────────
+
+// P1 Bastante: gato 3, perro-pequeño 2, perro-mediano 1 · P2 3 – 5 h: perro-pequeño 1, gato 1 ·
+// P3 Piso amplio: perro-mediano 2, gato 2, perro-pequeño 1 · P4 Moderado: perro-mediano 1,
+// perro-pequeño 1 · P5 Niños 5-12: perro-mediano 2, gato 1, roedor 1 · P6 Sin restricciones: — ·
+// P7 Juego: perro-mediano 2, gato 1, roedor 1 · P8 Toda la vida: gato 2, perro-pequeño 1, reptil 1 ·
+// P9 300 – 1.000 € y P10 80 – 180 €/mes: nada a nadie (techo 180: caben todos).
+// gato 3+1+2+1+1+2 = 10 · perro-mediano 1+2+1+2+2 = 8 · perro-pequeño 2+1+1+1+1 = 6 · roedor 2 ·
+// reptil 1 → Gato, sin empate ni recorte. Razones: P1 (+3), P3 (+2) y P8 (+2, detrás de P3 por número).
+const NORMAL_0210: Perfil = [
+  'Bastante — 1-2 h', '3 – 5 horas', 'Piso amplio', 'Moderado', 'Sí, de 5 a 12 años',
+  'Sin restricciones', 'Juego e interacción', 'Para toda la vida', '300 – 1.000 €', '80 – 180 €/mes',
+];
+
+// P1 Mucho: perro-mediano 3, perro-grande 3, perro-pequeño 2, gato 1 · P2 Casi nunca vacía:
+// perro-mediano 2, perro-grande 2 · P3 Jardín: perro-grande 3, perro-mediano 2 · P4 Muy activo:
+// perro-mediano 2, perro-grande 2 · P5 Sin niños: — · P6 COMUNIDAD: pez 2, gato 1, roedor 1,
+// perro-grande −2 · P7 Compañía: perro-mediano 2, perro-pequeño 2, gato 1 · P8 Varios años: — ·
+// P9 Sin límite: — · P10 Más de 180 €/mes: perro-grande 2, perro-mediano 1.
+// perro-mediano 3+2+2+2+2+1 = 12 · perro-grande 3+2+3+2−2+2 = 10 · perro-pequeño 4 · gato 3 ·
+// pez 2 · roedor 1 → Perro mediano. Razones: P1 (+3), P2 (+2), P3 (+2). La restricción de la
+// comunidad solo ha restado 2 al perro grande; ningún texto la menciona.
+const COMUNIDAD_PERRO: Perfil = [
+  'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'No, solo adultos',
+  'La comunidad restringe', 'Compañía constante', 'Varios años con posibilidad', 'Sin límite especial', 'Más de 180 €/mes',
+];
+
+// P1 POCO (menos de 1 h): gato 3, pez 2, pájaro 1 · P2 6 – 10 H: gato 3, pez 2, pájaro 1 ·
+// P3 Jardín: perro-grande 3, perro-mediano 2 · P4 Muy activo: perro-mediano 2, perro-grande 2 ·
+// P5 Niños 5-12: perro-mediano 2, gato 1, roedor 1 · P6 Sin restricciones: — · P7 Juego:
+// perro-mediano 2, gato 1, roedor 1 · P8 Varios años: — · P9 300 – 1.000 €: — · P10 Más de
+// 180 €/mes: perro-grande 2, perro-mediano 1.
+// perro-mediano 2+2+2+2+1 = 9 · gato 3+3+1+1 = 8 · perro-grande 3+2+2 = 7 · pez 4 · roedor 2 ·
+// pájaro 2 → hoy Perro mediano, con dos avisos que lo descalifican: «necesita salir varias veces
+// al día, todos los días» y «la casa vacía 6 – 10 horas: un perro lo lleva mal». Lo correcto:
+// la mejor sin esa incompatibilidad, Gato (8).
+const SIN_TIEMPO_NI_CASA: Perfil = [
+  'Poco — menos de 1 h', '6 – 10 horas', 'Casa con jardín', 'Muy activo', 'Sí, de 5 a 12 años',
+  'Sin restricciones', 'Juego e interacción', 'Varios años con posibilidad', '300 – 1.000 €', 'Más de 180 €/mes',
+];
+
+test.describe('re-inspección 02/10/2026 · motor y casos resueltos a mano', () => {
+  const PERROS_0210: MascotaKey[] = ['perro-pequeno', 'perro-mediano', 'perro-grande'];
+  const OPCIONES_0210: string[][] = [
+    ['mucho', 'medio', 'poco', 'minimo'], ['siempre', 'pocas', 'muchas', 'viajes'],
+    ['jardin', 'piso_grande', 'piso_normal', 'piso_pequeno'], ['mucho', 'medio', 'poco'],
+    ['si_pequenos', 'si_mayores', 'no', 'adolescentes'], ['alergia_pelo', 'comunidad', 'sin_ruido', 'ninguna'],
+    ['compania', 'juego', 'tranquilidad', 'novedad'], ['largo', 'medio', 'corto'],
+    ['minimo', 'bajo', 'medio', 'alto'], ['muy_bajo', 'bajo', 'medio', 'alto'],
+  ];
+  interface Cuentas {
+    empates: number;
+    empatesPorCosteInicial: number;
+    empatesPorOrdenDeDeclaracion: number;
+    comunidadConPerroMudo: number;
+    perroSinTiempoNiCasa: number;
+  }
+  let cuentas: Cuentas | null = null;
+  /** Una pasada por las 589.824 combinaciones (≈3 s), reutilizada dentro del worker. */
+  function contar(): Cuentas {
+    if (cuentas) return cuentas;
+    const c: Cuentas = { empates: 0, empatesPorCosteInicial: 0, empatesPorOrdenDeDeclaracion: 0, comunidadConPerroMudo: 0, perroSinTiempoNiCasa: 0 };
+    const idx = new Array(10).fill(0);
+    for (;;) {
+      const r: Record<number, string> = {};
+      OPCIONES_0210.forEach((o, i) => { r[i + 1] = o[idx[i]]; });
+      const res = calcularResultado(r);
+      const info = MASCOTAS[res.mascota];
+      if (res.empatadas.length > 0) {
+        c.empates++;
+        if (res.criterioDesempate.includes('coste inicial')) c.empatesPorCosteInicial++;
+        if (res.empatadas.some((k) => MASCOTAS[k].costeMensualMin === info.costeMensualMin
+          && MASCOTAS[k].costeInicialMin === info.costeInicialMin)) c.empatesPorOrdenDeDeclaracion++;
+      }
+      const textos = [...res.razones, ...res.aTenerEnCuenta, ...res.consejos].join(' ');
+      if (r[6] === 'comunidad' && PERROS_0210.includes(res.mascota) && !/comunidad|contrato/i.test(textos)) c.comunidadConPerroMudo++;
+      if (PERROS_0210.includes(res.mascota) && ['poco', 'minimo'].includes(r[1]) && ['muchas', 'viajes'].includes(r[2])) c.perroSinTiempoNiCasa++;
+      let i = 9;
+      while (i >= 0 && ++idx[i] === OPCIONES_0210[i].length) { idx[i] = 0; i--; }
+      if (i < 0) break;
+    }
+    cuentas = c;
+    return c;
+  }
+
+  test('motor: los empates (54.462) se explican todos y ninguno lo decide el orden de declaración', () => {
+    // Cuentas del 02/10/2026 sobre motor.ts sin cambios desde a3c2066c. El tercer criterio
+    // (coste inicial) no llega a decidir nunca: el único par con el mismo mínimo mensual (pájaro y
+    // reptil, 20 €) siempre se separa antes por el vínculo.
+    const c = contar();
+    expect(c.empates).toBe(54_462);
+    expect(c.empatesPorCosteInicial).toBe(0);
+    expect(c.empatesPorOrdenDeDeclaracion).toBe(0);
+  });
+
+  test('caso normal: 1-2 h, casa vacía 3 – 5 h, piso amplio, niños 5-12 y juego → Gato (10 frente a 8)', async ({ page }) => {
+    const motor = calcularResultado({ 1: 'medio', 2: 'pocas', 3: 'piso_grande', 4: 'medio', 5: 'si_mayores', 6: 'ninguna', 7: 'juego', 8: 'largo', 9: 'medio', 10: 'medio' });
+    expect([motor.puntos.gato, motor.puntos['perro-mediano'], motor.puntos['perro-pequeno']]).toEqual([10, 8, 6]);
+    await abrirTest(page);
+    await responder(page, NORMAL_0210);
+    const ficha = await leerFicha(page);
+    expect(ficha.mascota).toBe('Gato');
+    expect([ficha.inicial, ficha.mensual, ficha.vida]).toEqual(['100 – 1.500 €', '50 – 120 €', '12 – 20 años']);
+    const razones = await page.locator('[class*="consejosSection"]').first().locator('[class*="consejoItem"]').allInnerTexts();
+    expect(razones).toEqual([
+      'Con 1 – 2 horas al día cubres bien lo que necesita un gato.',
+      'Un piso de más de 80 m² deja sitio de sobra para un gato.',
+      'Piensas en un compromiso para toda la vida, y un gato es longevo.',
+      'Coste mensual estimado para Gato: 50 – 120 €. Esperanza de vida: 12 – 20 años.',
+    ]);
+    // Nada juega en contra: ni tensiones ni horquilla por encima del tramo (120 < 180)
+    // innerText devuelve los títulos en mayúsculas (text-transform): se compara sin caja
+    expect(ficha.texto.toLowerCase()).not.toContain('lo que juega en contra');
+    await expect(page.locator('[class*="avisoRecorte"]')).toHaveCount(0);
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
+  });
+
+  test('HALLAZGO: con «La comunidad restringe ciertas mascotas», si sale un perro, el resultado lo dice', async ({ page }) => {
+    // ABIERTO (02/10/2026). P6 «La comunidad restringe ciertas mascotas — Normas del edificio o
+    // alquiler con límites» solo resta 2 puntos al perro grande. Con el perfil de arriba gana el
+    // perro mediano (12) y ni las razones ni «Lo que juega en contra» mencionan la comunidad o el
+    // contrato, aunque la propia guía avisa de que una cláusula que prohíba animales es válida y
+    // puede resolver el contrato. Motor: 17.430 de los 147.456 perfiles con esa respuesta salen
+    // con perro (17.052 mediano, 378 pequeño), todos sin una palabra de la restricción.
+    // Correcto: si se recomienda un perro, se dice que hay que comprobar que la comunidad o el
+    // contrato lo admiten (como ya se hace con el silencio o el ciclo corto).
+    test.fail();
+    const motor = calcularResultado({ 1: 'mucho', 2: 'siempre', 3: 'jardin', 4: 'mucho', 5: 'no', 6: 'comunidad', 7: 'compania', 8: 'medio', 9: 'alto', 10: 'alto' });
+    expect([motor.puntos['perro-mediano'], motor.puntos['perro-grande']]).toEqual([12, 10]);
+    await abrirTest(page);
+    await responder(page, COMUNIDAD_PERRO);
+    const ficha = await leerFicha(page);
+    if (ficha.mascota.startsWith('Perro')) expect(ficha.texto).toMatch(/comunidad|contrato/i);
+    expect(contar().comunidadConPerroMudo).toBe(0);
+  });
+
+  test('HALLAZGO: con menos de 1 h al día y la casa vacía 6 – 10 h no se recomienda un perro', async ({ page }) => {
+    // ABIERTO (02/10/2026). La forma del 1678 (lo declarado no descarta, solo suma) con el tiempo:
+    // gana el perro mediano por 9 a 8 y la misma pantalla dice que «necesita salir varias veces
+    // al día, todos los días» y que «un perro lo lleva mal» 6 – 10 h solo (la FAQ cita a RSPCA y
+    // PDSA: no más de cuatro horas). Motor: 3.430 perfiles dan perro con «Poco» o «Mínimo» de
+    // tiempo Y la casa vacía 6 – 10 h o varios días seguidos. Correcto: la mejor sin esa
+    // incompatibilidad, Gato (8 puntos, ver la cuenta de SIN_TIEMPO_NI_CASA).
+    test.fail();
+    await abrirTest(page);
+    await responder(page, SIN_TIEMPO_NI_CASA);
+    const ficha = await leerFicha(page);
+    expect(ficha.mascota).toBe('Gato');
+    expect(contar().perroSinTiempoNiCasa).toBe(0);
+  });
+
+  test('HALLAZGO: la pregunta 6 deja declarar a la vez la alergia y la restricción de la comunidad', async ({ page }) => {
+    // ABIERTO (02/10/2026). Pregunta exclusiva de esta hermana: «¿Hay alguna alergia o
+    // restricción en casa?» junta en UNA elección única la alergia al pelo (que el motor aplica
+    // como filtro duro), la comunidad y el silencio, que no se excluyen. Tocar «Alergia al pelo» y
+    // después «La comunidad restringe» deja marcada solo la segunda, y con el resto del perfil
+    // COMUNIDAD_PERRO el hogar alérgico recibe «Perro mediano». Correcto: la alergia declarada
+    // sigue valiendo, así que el resultado no es un animal con pelo.
+    test.fail();
+    await abrirTest(page);
+    for (let i = 0; i < 5; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]', { hasText: COMUNIDAD_PERRO[i] }).click();
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+    }
+    await page.locator('[role="radio"]', { hasText: 'Alergia al pelo' }).click();
+    await page.locator('[role="radio"]', { hasText: 'La comunidad restringe' }).click();
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+    for (let i = 6; i < 10; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]', { hasText: COMUNIDAD_PERRO[i] }).click();
+      await page.getByRole('button', { name: i === 9 ? 'Ver resultado' : 'Siguiente pregunta' }).click();
+    }
+    const ficha = await leerFicha(page);
+    expect(CON_PELO).not.toContain(ficha.mascota);
+  });
+});
+
+test.describe('re-inspección 02/10/2026 · teclado (lo que b0f31109 no trajo de la referencia)', () => {
+  test('HALLAZGO: tras «Empezar el test» y tras «Siguiente» el foco queda en el cuestionario', async ({ page }) => {
+    // ABIERTO (02/10/2026). Forma del 1680 de selector-smartphone, reparado allí en b0f31109 (el
+    // foco va al enunciado). Aquí el useEffect solo enfoca el título del resultado: «Empezar» se
+    // desmonta y «Siguiente» se desactiva (la pregunta nueva no tiene respuesta), y en los dos
+    // casos el foco cae a <body>. Medido a 1280 px: tras «Siguiente», el siguiente Tab va a «Ir a
+    // Guía de Razas de Perros» (Apps relacionadas), fuera del cuestionario.
+    test.fail();
+    await page.goto('/selector-mascota/');
+    await esperarHidratacionBotones(page);
+    const dentro = () => page.evaluate(() => !!document.activeElement?.closest('[class*="testContainer"]'));
+    await page.getByRole('button', { name: /Empezar el test/ }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+    expect(await dentro(), 'tras «Empezar», el foco está en el cuestionario').toBe(true);
+    const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    await radios.first().focus();
+    await page.keyboard.press('Space');
+    await expect(radios.first()).toHaveAttribute('aria-checked', 'true');
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Pregunta 2 de 10').first()).toBeVisible();
+    expect(await dentro(), 'tras «Siguiente», el foco está en el cuestionario').toBe(true);
+    await page.keyboard.press('Tab');
+    await expect(radios.first()).toBeFocused();
+  });
+
+  test('HALLAZGO: las flechas mueven foco y selección entre radios, y el grupo es una parada de Tab', async ({ page }) => {
+    // ABIERTO (02/10/2026). Forma del 1681 de selector-smartphone (reparado allí en b0f31109). Las
+    // opciones son role="radio" pero sin el teclado del patrón (WAI-ARIA APG): ArrowDown sobre
+    // «Mucho — más de 2 h» deja el foco donde estaba y no marca nada, y las cuatro opciones son
+    // paradas de Tab (tabindex sin declarar en las cuatro).
+    test.fail();
+    await abrirTest(page);
+    const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    await radios.first().focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(radios.nth(1)).toBeFocused({ timeout: 1_000 });
+    await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true', { timeout: 1_000 });
+    expect(await radios.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([-1, 0, -1, -1]);
+  });
+});
+
+test.describe('re-inspección 02/10/2026 · móvil 360 px', () => {
+  test.use({
+    viewport: { width: 360, height: 780 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('el <h1> de la intro no queda bajo la barra del logo a 360, 390, 800, 1000 ni 1024 px (lotes 586a4d61 y a1d72a9c)', async ({ page }) => {
+    // El mismo <header> sigue en pantalla durante el test. Medido el 02/10/2026 también en oscuro
+    // (con el conmutador): la geometría no cambia con el tema.
+    await page.goto('/selector-mascota/');
+    await esperarHidratacionBotones(page);
+    expect((await bajoLaBarraLogo(page, 'header h1')).tapado, 'intro').toBe(false);
+    for (const [ancho, alto] of [[390, 844], [800, 900], [1000, 900], [1024, 900]]) {
+      await page.setViewportSize({ width: ancho, height: alto });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      expect((await bajoLaBarraLogo(page, 'header h1')).tapado, `intro, ${ancho} px`).toBe(false);
+    }
+  });
+
+  test('descarte de la sospecha: a 360 px un doble toque en «Siguiente» o «Ver resultado» no contesta nada', async ({ page }) => {
+    // SOSPECHA del 25/09/2026, DESCARTADA a 360 px el 02/10/2026: «Siguiente» no se mueve al
+    // avanzar y el segundo toque cae en el propio botón (ya desactivado) o en el hueco entre la
+    // tarjeta y la navegación, en las 9 transiciones y en «Ver resultado». (A 412 px sí pasa en la
+    // transición 8 → 9: bloque de abajo.)
+    test.setTimeout(60_000);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-mascota/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    const contestadas: string[] = [];
+    for (let i = 1; i <= 10; i++) {
+      const radios = page.locator('[role="radiogroup"] [role="radio"]');
+      await radios.last().tap();
+      const boton = page.locator('[class*="btnSiguiente"]');
+      await boton.evaluate((e) => e.scrollIntoView({ block: 'center' }));
+      const caja = (await boton.boundingBox())!;
+      await page.touchscreen.tap(caja.x + caja.width / 2, caja.y + caja.height / 2);
+      await page.waitForTimeout(150);
+      await page.touchscreen.tap(caja.x + caja.width / 2, caja.y + caja.height / 2);
+      await page.waitForTimeout(250);
+      if (i < 10) {
+        await expect(page.getByText(`Pregunta ${i + 1} de 10`).first()).toBeVisible();
+        const marcadas = await page.locator('[role="radiogroup"] [aria-checked="true"]').count();
+        if (marcadas > 0) contestadas.push(`P${i + 1}`);
+      }
+    }
+    await expect(page.getByRole('heading', { name: 'Tu mascota ideal' })).toBeVisible();
+    expect(contestadas).toEqual([]);
+  });
+
+  test('HALLAZGO: el <h1> del resultado no queda bajo la barra del logo a 360 ni a 390 px', async ({ page }) => {
+    // ABIERTO (02/10/2026). De familia (la referencia también lo tiene). Los lotes 586a4d61 y
+    // a1d72a9c dieron 80 px arriba a `.hero`, pero el resultado usa `.heroResultados` (2rem
+    // arriba). Al llegar, scrollY 0 y el <h1> «Tu mascota ideal» en y 32-61; la píldora del logo
+    // llega a y 52 y tapa «Tu m» (1.019 px² de letras a 360 px, 704 a 390). A 800, 1000 y 1024 px
+    // no pisa. La Ronda no lo ve: mide el <h1> con el que carga la página, que es el de la intro.
+    test.fail();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-mascota/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    await responderTocando(page, NORMAL_0210);
+    await expect(page.getByRole('heading', { name: 'Tu mascota ideal' })).toBeFocused();
+    const a360 = await bajoLaBarraLogo(page, 'header h1');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const a390 = await bajoLaBarraLogo(page, 'header h1');
+    expect({ a360: a360.tapado, a390: a390.tapado }).toEqual({ a360: false, a390: false });
+  });
+
+  test('HALLAZGO: tras «Siguiente», el enunciado de la pregunta nueva queda a la vista, bajo la barra', async ({ page }) => {
+    // ABIERTO (02/10/2026). A 360 × 780 no cabe a la vez el enunciado entero y «Siguiente», así que
+    // para tocarlo hay que bajar. Al avanzar la página no se mueve y el enunciado nuevo se queda
+    // donde estaba el viejo: medido bajando lo justo para ver «Siguiente», las preguntas 2 y 3
+    // empiezan en y −18 (fuera de la pantalla) y de la 4 a la 10 en y 9, con la píldora del logo
+    // (hasta y 52) encima. Correcto: el enunciado nuevo, entero y por debajo de la barra.
+    // (En la referencia el foco al enunciado lo sube a y 0, también bajo la barra.)
+    test.fail();
+    test.setTimeout(60_000);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-mascota/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    const malas: string[] = [];
+    for (let i = 1; i <= 4; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 10`).first()).toBeVisible();
+      // Bajar lo justo para ver «Siguiente» en el borde inferior, y tocar la última opción
+      await page.locator('[class*="btnSiguiente"]').evaluate((e) => {
+        const r = e.getBoundingClientRect();
+        if (r.bottom > window.innerHeight) window.scrollBy(0, r.bottom - window.innerHeight + 8);
+      });
+      await page.locator('[role="radiogroup"] [role="radio"]').last().tap();
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).tap();
+      await expect(page.getByText(`Pregunta ${i + 1} de 10`).first()).toBeVisible();
+      await page.waitForTimeout(150);
+      const m = await bajoLaBarraLogo(page, '[class*="preguntaTexto"]');
+      if (m.tapado || m.top < m.barra) malas.push(`P${i + 1}: enunciado en y ${m.top}, barra hasta ${m.barra}`);
+    }
+    expect(malas, 'enunciados bajo la barra del logo o fuera de la pantalla').toEqual([]);
+  });
+});
+
+test.describe('re-inspección 02/10/2026 · móvil 412 px (Pixel 7)', () => {
+  test.use({
+    viewport: { width: 412, height: 839 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('HALLAZGO: un doble toque en «Siguiente» de la pregunta 8 no contesta la pregunta 9', async ({ page }) => {
+    // ABIERTO (02/10/2026). La pregunta 8 tiene tres opciones y la 9 cuatro: al avanzar, el bloque
+    // crece hacia abajo y, con «Siguiente» a media pantalla (y 360), el segundo toque cae en la
+    // cuarta opción de la 9, «Sin límite especial», que queda marcada sin que nadie la elija.
+    // Medido 3 de 3 veces con 150 ms entre toques; también con el botón en y 520 y en el borde
+    // inferior. A 360 y 390 px no pasa (el texto parte en otras líneas).
+    test.fail();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-mascota/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    for (let i = 1; i <= 7; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).tap();
+    }
+    await expect(page.getByText('Pregunta 8 de 10').first()).toBeVisible();
+    await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
+    const boton = page.getByRole('button', { name: 'Siguiente pregunta' });
+    await boton.evaluate((e) => { const r = e.getBoundingClientRect(); window.scrollBy(0, r.top + r.height / 2 - 360); });
+    const caja = (await boton.boundingBox())!;
+    const x = caja.x + caja.width / 2;
+    const y = caja.y + caja.height / 2;
+    await page.touchscreen.tap(x, y);
+    await expect(page.getByText('Pregunta 9 de 10').first()).toBeVisible();
+    await page.waitForTimeout(150);
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(300);
+    await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(0);
+  });
+});
+
+test.describe('re-inspección 02/10/2026 · contenido y lectores de pantalla', () => {
+  test('el JSON-LD WebApplication declara entre 4 y 8 features (hoy 6)', async ({ page }) => {
+    await page.goto('/selector-mascota/');
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents())
+      .map((t) => JSON.parse(t) as { '@type'?: string; featureList?: string[] });
+    const web = ld.find((x) => x['@type'] === 'WebApplication');
+    expect(web?.featureList?.length).toBe(6);
+  });
+
+  test('HALLAZGO: los emojis de los consejos no llegan al lector de pantalla', async ({ page }) => {
+    // ABIERTO (02/10/2026). Los consejos («🏥 Antes de decidir…», «✂️ La esterilización…», «⏳ Una
+    // mascota es un compromiso…», y en perros «💉» y «📋») llevan el emoji dentro de la cadena de
+    // motor.ts y la vista la pinta en un <p>: el árbol de accesibilidad los expone y el lector
+    // los lee (CLAUDE.md §5: emoji junto a texto, en <span aria-hidden="true">). El candado
+    // check:a11y-jsx no lo ve porque no es JSX. La referencia lo repite en sus consejos.
+    test.fail();
+    await abrirTest(page);
+    await responder(page, NORMAL);
+    await leerFicha(page);
+    const arbol = await page.locator('[class*="consejosSection"]').last().ariaSnapshot();
+    expect(arbol).not.toMatch(/\p{Extended_Pictographic}/u);
+  });
+
+  test('HALLAZGO: los porcentajes van con espacio duro y ninguno pegado', async ({ page }) => {
+    // ABIERTO (02/10/2026). CLAUDE.md global §2 (25/09/2026): «15 %» con U+00A0. La guía dice «el
+    // 45 % … el 24 %» con espacio normal (U+0020), igual que el consejo del perro, y la meta
+    // schema:WebApplication del HTML servido anuncia «100% en el navegador», pegado.
+    test.fail();
+    await abrirTest(page);
+    await responder(page, NORMAL);
+    await leerFicha(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const separadores = await page.evaluate(() =>
+      [...document.body.innerText.matchAll(/\d(\s)%/g)].map((m) => m[1].codePointAt(0)));
+    expect(separadores.length).toBeGreaterThan(0);
+    expect(separadores.every((c) => c === 0xa0), `separadores: ${separadores.join(', ')}`).toBe(true);
+    const meta = (await page.locator('meta[name="schema:WebApplication"]').getAttribute('content')) ?? '';
+    expect(meta).not.toMatch(/\d%/);
   });
 });

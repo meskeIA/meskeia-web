@@ -1679,4 +1679,319 @@ test.describe('generador-anagramas', () => {
       });
     });
   });
+
+  // ---------------------------------------------------------------------------------------
+  // SÉPTIMA PASADA — 02/10/2026 · RE-INSPECCIÓN tras 4ca120d8 (segmento MOTOR) + FIRMA
+  //
+  // Vuelve a la cola porque 4ca120d8 (01/10/2026, reparación de calculadora-jugada-scrabble)
+  // cambió `letrasSinFicha` en lib/calculadoras/puntuacionScrabble.ts: la ficha blanca ya NO
+  // hace jugable la K ni la W. Es lo CORRECTO (art. 10.2, abajo) y se fija en positivo.
+  // `puntuarPalabra` no cambió: los CASOS 1 a 3 confirman que los números siguen bien.
+  //
+  // FUENTES, consultadas ANTES de abrir el navegador
+  //   · Reglamento FISE, copia archivada que cita es.wikipedia «Scrabble»:
+  //     https://web.archive.org/web/20100227094221/http://www.scrabbel.org.uy/reglas/reglas.htm
+  //       art. 10.2 «El comodín no puede reemplazar la K ni la W, porque estas letras no existen
+  //                 en el SCRABBLE®, versión en español.»
+  //       art. 11   «En el SCRABBLE® los dígrafos RR, CH, LL aparecen en una sola ficha. Por
+  //                 tanto, no podrán utilizarse dos eres, ni dos eles, ni la ce y la hache para
+  //                 formar una doble letra.»
+  //   · Valores, de es.wikipedia «Scrabble» (100 fichas): 1 A E O I S N L R U T · 2 D G ·
+  //     3 C B M P · 4 H F V Y · 5 CH Q · 8 J LL Ñ RR X · 10 Z · blancas 0.
+  //   · Oráculo propio en Node contra public/data/diccionario-es.txt (NFD protegiendo la Ñ,
+  //     reparto de multiconjuntos; la blanca descuenta el valor de la letra que pone), sin
+  //     importar nada de la app.
+  //
+  //   CASO 1 (normal)  «queso» 2..10 → 12: QUESO = Q5+U1+E1+S1+O1 = 9 · OQUE, QUEO 8 · QUE, QUÉ 7
+  //                    · SEO, SEÓ, USO 3 · OS, SE, SO, SU 2. Y «ques?» 5..5 → 5 palabras, todas de
+  //                    Q5+U1+E1+S1 = 8 porque la quinta letra la pone la blanca (I de EQUIS, Í de
+  //                    ESQUÍ, I de SIQUE, O de QUESO, A de SAQUE).
+  //   CASO 2 (límite)  «?iwi» 2..4 → 16: KIWI poniendo la K con la blanca sigue «sin ficha K y W»
+  //                    (art. 10.2: la blanca no puede ser K, y la W no tiene ficha); las otras 15
+  //                    son I + blanca = 1 punto. La más valiosa, solo entre jugables: 1.
+  //   CASO 3 (rechazo) «k?» 2..4 → solo KA, injugable: ningún número y ningún «La más valiosa».
+  //                    «k» sola es una ficha: no deja buscar.
+  //
+  // LA FIRMA (visitas cortas 53,8 % → 65,6 %): no se encontró nada que impida usar la app, en
+  // escritorio ni a 360 y 390 px táctiles (el bloque móvil de abajo). El desglose del dump, en
+  // el acta del 02/10/2026: mezcla de visitantes, no rotura.
+  // ---------------------------------------------------------------------------------------
+  test.describe('séptima pasada · tras 4ca120d8 · 02/10/2026', () => {
+    const abrir = async (page: Page) => {
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#anagram-letters']);
+      await expect(page.getByText(/Diccionario cargado/)).toBeVisible({ timeout: 20000 });
+    };
+
+    /** Busca un atril con su rango de longitudes y espera a que la cabecera diga el total. */
+    const buscar = async (page: Page, atril: string, min: number, max: number, total: number) => {
+      await page.selectOption('#anagram-min', String(min));
+      await page.selectOption('#anagram-max', String(max));
+      await page.fill('#anagram-letters', atril);
+      await esperarValorEnReact(page, '#anagram-letters', atril);
+      await page.getByRole('button', { name: 'Buscar palabras' }).click();
+      await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText(
+        `Palabras encontradas: ${total}`,
+      );
+    };
+
+    /**
+     * Cada chip como «lema=puntos», «lema=sin ficha K» o «lema=…[blanca:x]», en el orden en que
+     * se pintan. `$=` en chipPuntos para no cazar .chipPuntosUnidad.
+     */
+    const chips = (page: Page) =>
+      page.locator('[class*="wordChip"]').evaluateAll((nodos) =>
+        nodos.map((chip) => {
+          const lema = chip.querySelector('[class*="chipLema"]')?.textContent;
+          const puntos = chip.querySelector('[class$="chipPuntos"]');
+          const injugable = chip.querySelector('[class*="chipInjugable"] [aria-hidden="true"]');
+          const blanca = [...chip.querySelectorAll('[class*="letraComodin"]')]
+            .map((n) => n.textContent)
+            .join('');
+          const valor = puntos
+            ? (puntos.textContent ?? '').replace(/\D/g, '')
+            : (injugable?.textContent ?? '?');
+          return `${lema}=${valor}${blanca ? `[blanca:${blanca}]` : ''}`;
+        }),
+      );
+
+    const ordenarPorPuntos = async (page: Page) => {
+      await page.getByRole('button', { name: 'Puntos', exact: true }).click();
+      await expect(page.locator('[class*="groupTitle"]').first()).toContainText('De más a menos puntos');
+    };
+
+    test('CASO 1 · «queso» y «ques?»: cada chip vale lo que suman sus fichas, la blanca a 0', async ({
+      page,
+    }) => {
+      await abrir(page);
+      await buscar(page, 'queso', 2, 10, 12);
+      // Orden por longitud: longitud descendente y alfabético español dentro de cada grupo
+      expect(await chips(page)).toEqual([
+        'queso=9',
+        'oque=8', 'queo=8',
+        'que=7', 'qué=7', 'seo=3', 'seó=3', 'uso=3',
+        'os=2', 'se=2', 'so=2', 'su=2',
+      ]);
+      await expect(page.locator('[class*="ordenMejor"]')).toHaveText('La más valiosa: 9 puntos');
+
+      // Con la blanca en la quinta letra ninguna llega a 9: Q5+U1+E1+S1 = 8 en las cinco
+      await buscar(page, 'ques?', 5, 5, 5);
+      expect(await chips(page)).toEqual([
+        'equis=8[blanca:i]', 'esquí=8[blanca:í]', 'queso=8[blanca:o]',
+        'saque=8[blanca:a]', 'sique=8[blanca:i]',
+      ]);
+      await expect(page.locator('[class*="ordenMejor"]')).toHaveText('La más valiosa: 8 puntos');
+    });
+
+    test('CASO 2 · LÍMITE · «?iwi»: la blanca sobre la K no hace jugable KIWI (art. 10.2 FISE)', async ({
+      page,
+    }) => {
+      await abrir(page);
+      await buscar(page, '?iwi', 2, 4, 16);
+      const lista = await chips(page);
+      // Antes de 4ca120d8 la blanca «tapaba» la K y el chip decía «sin ficha W»; ahora nombra
+      // las dos, porque la blanca tampoco puede ser K.
+      expect(lista).toContain('kiwi=sin ficha K y W[blanca:k]');
+      // Las otras 15 son I + blanca: 1 punto cada una
+      const jugables = lista.filter((c) => !c.startsWith('kiwi='));
+      expect(jugables).toHaveLength(15);
+      for (const chip of jugables) expect(chip, chip).toMatch(/^[^=]+=1\[blanca:.\]$/);
+      // El resumen solo mira las jugables: 1, no el 2 fantasma de KIWI (I1+I1, K y W a 0)
+      await expect(page.locator('[class*="ordenMejor"]')).toContainText('La más valiosa: 1 ');
+
+      // «ya?» → YAK tampoco se puede jugar con la blanca de K (sospecha del 01/10/2026,
+      // confirmada como comportamiento correcto). Oráculo: AYO, CAY, GAY, LAY, YAL de 5.
+      await buscar(page, 'ya?', 3, 4, 6);
+      expect(await chips(page)).toEqual([
+        'ayo=5[blanca:o]', 'cay=5[blanca:c]', 'gay=5[blanca:g]', 'lay=5[blanca:l]',
+        'yak=sin ficha K[blanca:k]', 'yal=5[blanca:l]',
+      ]);
+    });
+
+    test('CASO 3 · RECHAZO · «k?» solo forma KA, injugable: ni número ni «La más valiosa»', async ({
+      page,
+    }) => {
+      await abrir(page);
+      await buscar(page, 'k?', 2, 4, 1);
+      expect(await chips(page)).toEqual(['ka=sin ficha K[blanca:a]']);
+      // Nada jugable: el resumen no puede anunciar ninguna cifra
+      await expect(page.locator('[class*="ordenMejor"]')).toHaveCount(0);
+      await expect(page.locator('[class$="chipPuntos"]')).toHaveCount(0);
+
+      // «k» sola es una ficha: el botón no deja buscar
+      await page.fill('#anagram-letters', 'k');
+      await esperarValorEnReact(page, '#anagram-letters', 'k');
+      await expect(page.locator('#anagram-atril')).toHaveText('1 letra');
+      await expect(page.getByRole('button', { name: 'Buscar palabras' })).toBeDisabled();
+    });
+
+    test('el logo fijo no tapa el título a 800 ni a 1.024 px', async ({ page }) => {
+      // Misma medida que la Ronda: cajas de las LETRAS del h1 frente a las piezas de la barra
+      // fija. Medido hoy: la barra acaba a 77 px y las letras empiezan a 143 px.
+      await abrir(page);
+      for (const [ancho, alto] of [[800, 1112], [1024, 768]]) {
+        await page.setViewportSize({ width: ancho, height: alto });
+        await page.waitForTimeout(150);
+        expect(await tituloTapado(page), `a ${ancho} px el logo tapa el título`).toBe(false);
+      }
+    });
+
+    // -------------------------------------------------------------------------------------
+    // HALLAZGOS ABIERTOS de esta pasada — afirman lo CORRECTO y van con test.fail()
+    // -------------------------------------------------------------------------------------
+    test.fail(
+      'ABIERTO · con fichas sueltas no se forma un dígrafo (art. 11 FISE): CARRO y CHAPA no valen 7 y 12',
+      async ({ page }) => {
+        // La leyenda dice que CH, LL y RR «se cuentan como letras sueltas, porque un atril
+        // tecleado no puede decir cuál de las dos formas tienes». Pero el art. 11 no admite dos
+        // formas: «no podrán utilizarse dos eres, ni dos eles, ni la ce y la hache para formar
+        // una doble letra». Con el atril C,A,R,R,O, CARRO y CORRA no se pueden jugar; con la
+        // ficha RR valen C3+A1+RR8+O1 = 13. El 7 que pinta la app no es el valor de ninguna
+        // jugada legal. CORAR, CROAR y RACOR no llevan RR y sí valen 7 con fichas sueltas.
+        // Lo mismo con CHAPA: ilegal con C y H sueltas, 10 con la ficha CH (5+1+3+1), nunca 12.
+        // Desde 4ca120d8 la app hermana, que usa la misma tabla, ya no forma CHAPA con C,H,A,P,A.
+        await abrir(page);
+        await buscar(page, 'carro', 5, 5, 5);
+        const lista = await chips(page);
+        for (const sinRR of ['corar=7', 'croar=7', 'racor=7']) expect(lista).toContain(sinRR);
+        expect(lista, 'CARRO con dos R sueltas no es una jugada de 7').not.toContain('carro=7');
+        expect(lista, 'CORRA con dos R sueltas no es una jugada de 7').not.toContain('corra=7');
+
+        await buscar(page, 'chapa', 5, 5, 3);
+        expect(await chips(page), 'CHAPA no vale 12 ni con la ficha CH (10) ni sin ella (ilegal)')
+          .not.toContain('chapa=12');
+      },
+    );
+
+    test.fail(
+      'ABIERTO · ordenar por puntos no pone delante una palabra injugable con su puntuación fantasma',
+      async ({ page }) => {
+        // `resultadosOrdenados` ordena por `puntos`, que para una palabra con K o W es la suma
+        // con esas letras a 0. El 704 quitó ese número del chip y del resumen, no del orden.
+        // A mano, «kayak» 2..10: jugables AY y YA (A1+Y4 = 5); KAYAK, YAK y KA, sin ficha K.
+        // «De más a menos puntos» debe empezar por las jugables, la primera con los 5 puntos
+        // que anuncia «La más valiosa»; hoy la encabezan KAYAK (6 fantasma) y YAK (5 fantasma).
+        await abrir(page);
+        await buscar(page, 'kayak', 2, 10, 5);
+        await ordenarPorPuntos(page);
+        await expect(page.locator('[class*="ordenMejor"]')).toHaveText('La más valiosa: 5 puntos');
+        const lista = await chips(page);
+        expect(lista.slice(0, 2)).toEqual(['ay=5', 'ya=5']);
+
+        // Lo mismo con una blanca, el caso que 4ca120d8 hace más frecuente: «?iwi» pone KIWI
+        // (I1+I1 = 2 fantasma) por encima de las 15 jugables de 1 punto.
+        await buscar(page, '?iwi', 2, 4, 16);
+        await ordenarPorPuntos(page);
+        expect((await chips(page))[0]).not.toMatch(/^kiwi=/);
+      },
+    );
+
+    test.fail('ABIERTO · «La más valiosa» concuerda en número: «1 punto», no «1 puntos»', async ({
+      page,
+    }) => {
+      // «a?» 2..4 → 23 palabras de A + blanca: todas valen 1 (A1 + blanca 0), así que la más
+      // valiosa vale 1. El chip ya distingue «punto»/«puntos» para lectores de pantalla; el
+      // resumen escribe siempre «puntos».
+      await abrir(page);
+      await buscar(page, 'a?', 2, 4, 23);
+      await expect(page.locator('[class*="ordenMejor"]')).toHaveText('La más valiosa: 1 punto');
+    });
+
+    test.fail(
+      'ABIERTO · la guía no afirma que «las palabras más largas dan más puntos base»',
+      async ({ page }) => {
+        // El paso 2 de «Cómo sacar el máximo partido» dice «Las palabras más largas dan más
+        // puntos base», y la propia app lo desmiente: de «zapatas» salen PASTA (5 letras,
+        // P3+A1+S1+T1+A1 = 7) y ZAPA (4 letras, Z10+A1+P3+A1 = 15). Es el ejemplo con el que el
+        // código justifica el orden por puntos (b1f96c8a), que el paso tampoco menciona.
+        await page.goto(RUTA);
+        await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+        // Un solo <li>: con `[class*="eduStep"]` casaría también la <ol> y el modo estricto
+        // rompería el test por otra razón, y un test.fail() lo daría por bueno.
+        const paso = page.locator('li', { hasText: 'Para Scrabble: busca primero las más largas' });
+        await expect(paso).toBeVisible();
+        await expect(paso).not.toContainText('Las palabras más largas dan más puntos base');
+      },
+    );
+
+    // -------------------------------------------------------------------------------------
+    // MÓVIL ESTRECHO — 360×740 táctil, el ancho más pequeño habitual (los de la sexta pasada
+    // son a 393). Lo que se mira es USAR la app, por la firma de visitas cortas.
+    // -------------------------------------------------------------------------------------
+    test.describe('móvil · 360×740', () => {
+      test.use({
+        viewport: { width: 360, height: 740 },
+        userAgent:
+          'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+        deviceScaleFactor: 3,
+        isMobile: true,
+        hasTouch: true,
+      });
+
+      test('MÓVIL 360 · título libre, sin desborde, y «rapto» con Intro deja 43 resultados a la vista', async ({
+        page,
+      }) => {
+        await abrir(page);
+        expect(await tituloTapado(page), 'a 360 px el logo tapa el título').toBe(false);
+        await page.locator('#anagram-letters').tap();
+        await page.fill('#anagram-letters', 'rapto');
+        await esperarValorEnReact(page, '#anagram-letters', 'rapto');
+        await page.locator('#anagram-letters').press('Enter');
+        // 43 = 9 + 16 + 13 + 5 (oráculo de la sexta pasada; «rapto» y «R A P T O» son lo mismo)
+        await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText('Palabras encontradas: 43');
+        await expect(page.locator('[class*="resultsHeader"]')).toBeInViewport({ ratio: 1 });
+        const [ancho, visible] = await page.evaluate(() => [
+          document.documentElement.scrollWidth,
+          document.documentElement.clientWidth,
+        ]);
+        expect(ancho).toBeLessThanOrEqual(visible);
+      });
+
+      test.fail(
+        'ABIERTO · tocar un ejemplo «Probar» enseña algo: resultados o, al menos, el botón que los da',
+        async ({ page }) => {
+          // La guía promete que «los botones de ejemplo (amor, mesa, palabra, corazon) muestran
+          // cómo funciona la herramienta», pero solo rellenan el campo. A 360×740, tras tocar
+          // «amor» el botón «Buscar palabras» queda a 766-819 px de una pantalla de 740 (medido
+          // el 02/10/2026): no sale nada y lo que lo haría salir está fuera de la vista.
+          // Esperado: las 16 palabras de «amor» (CASO 1 de la primera pasada) o el botón a la vista.
+          await abrir(page);
+          const ejemplo = page.getByRole('button', { name: 'amor', exact: true });
+          await ejemplo.scrollIntoViewIfNeeded();
+          await ejemplo.tap();
+          await expect(page.locator('#anagram-letters')).toHaveValue('amor');
+          await page.waitForTimeout(400);
+          const hayResultados = (await page.locator('[class*="resultsHeader"]').count()) > 0;
+          const botonALaVista = await page
+            .getByRole('button', { name: 'Buscar palabras' })
+            .evaluate((b) => b.getBoundingClientRect().bottom <= window.innerHeight);
+          expect(hayResultados || botonALaVista, 'tras tocar el ejemplo no se ve nada nuevo').toBe(true);
+        },
+      );
+    });
+  });
 });
+
+/**
+ * ¿Pisa alguna pieza de la barra fija del logo las LETRAS del h1? Copia de la de la Ronda,
+ * salvo que sin barra o sin h1 devuelve `null` en vez de `false`: así un cambio de maquetación
+ * que deje de encontrar la barra rompe el test en lugar de pasarlo en blanco.
+ */
+function tituloTapado(page: Page): Promise<boolean | null> {
+  return page.evaluate(() => {
+    const barra = [...document.querySelectorAll('body *')].find((e) => {
+      const cs = getComputedStyle(e);
+      const r = e.getBoundingClientRect();
+      return cs.position === 'fixed' && r.top <= 1 && r.height < 120 && r.width > 300 &&
+        e.querySelector('a[href="/"], a[href="https://meskeia.com/"]');
+    });
+    const h1 = document.querySelector('h1');
+    if (!barra || !h1) return null;
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    const letras = [...rango.getClientRects()].filter((c) => c.width > 0);
+    const piezas = [...barra.children].map((c) => c.getBoundingClientRect()).filter((c) => c.width > 0);
+    return piezas.some((p) => letras.some((c) =>
+      !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom)));
+  });
+}

@@ -1,5 +1,17 @@
-import { test, expect, Page } from '@playwright/test';
-import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import { test, expect, Page, Locator } from '@playwright/test';
+import {
+  esperarHidratacion,
+  esperarPaginaAsentada,
+  esperarValorEnReact,
+  sembrarValor,
+} from './_hidratacion';
+
+/**
+ * stemum.com → el servidor local, para ver la app como la sirve el portal (data-brand="stemum"
+ * y la píldora «Stemum › Física» en la barra fija). Va al NIVEL DEL FICHERO porque
+ * `launchOptions` fuerza un worker nuevo; al resto de tests no les afecta: solo resuelve ese host.
+ */
+test.use({ launchOptions: { args: ['--host-resolver-rules=MAP stemum.com 127.0.0.1:3050'] } });
 
 /**
  * Simulador de Péndulo Simple y MAS — inspección del 20/09/2026
@@ -45,6 +57,10 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *   2) límite (θ₀ = 90°, fuera de la hipótesis): la cifra cambia con la pestaña y con el
  *      ángulo, y la animación va al ritmo de la cifra que se publica.
  *   3) rechazo (g = 0 y g < 0): la app lo dice y no calcula.
+ *
+ * RE-INSPECCIÓN 02/10/2026 (invalidada por los lotes de CSS b7733c6d, 586a4d61, 3de36a1f y
+ * a1d72a9c): bloque del final del fichero, con sus casos resueltos a mano, el hero medido bajo
+ * meskeia.com y bajo stemum.com, y los hallazgos que abrió (test.fail).
  */
 
 /** El valor de una fila de resultados, localizada por su etiqueta (las clases van con hash). */
@@ -328,5 +344,627 @@ test.describe('La gráfica θ(t) dibuja una sinusoide, no un peine', () => {
     const media = (Math.min(...alturas) + Math.max(...alturas)) / 2;
     const sobreElEje = alturas.filter((y) => Math.abs(y - media) < 0.5).length;
     expect(sobreElEje / alturas.length).toBeLessThan(0.1);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN 02/10/2026 — vuelve a la cola INVALIDADA por cuatro lotes de CSS de catálogo
+ * (b7733c6d, cabeceras de tabla; 586a4d61, 3de36a1f y a1d72a9c, el logo fijo sobre el título).
+ * Ningún commit de lógica desde la reparación de los hallazgos 971-977 (aa10b2c7, 20/09), y
+ * los siete se comprueban REPARADOS en el navegador con los bloques de arriba.
+ *
+ * Casos resueltos A MANO antes de abrir el navegador, con K(k) integrada por Simpson
+ * (20.000 tramos) y cotejada con la serie de Legendre, sin usar el motor de la app:
+ *
+ * CASO 4 (normal) — L = 2,00 m · m = 2 kg · θ₀ = 30° · g = 9,81 · γ = 0.
+ *   T₀ = 2π·√(2/9,81) = 2,837007 s · K(sen 15°) = 1,598142 → T = 4·√(2/9,81)·K = 2,886396 s
+ *   f = 1/T = 0,346453 Hz · ω₀ = √(9,81/2) = 2,214723 rad/s · desviación +1,7409 %
+ *   E₀ = m·g·L·(1 − cos 30°) = 2 × 9,81 × 2 × 0,133975 = 5,257163 J
+ *
+ * CASO 5 (límite) — los extremos de los controles.
+ *   Júpiter (24,79) · L = 0,10 m · θ₀ = 90°: T₀ = 0,399063 s · T = T₀·(2/π)·K(sen 45°) =
+ *   0,471030 s · f = 2,123005 Hz · ω₀ = 15,744840 rad/s · E₀ (1 kg) = 2,479 J
+ *   Luna (1,62) · L = 5,00 m · θ₀ = 90° · m = 10 kg: T = 13,029109 s · ω₀ = 0,569210 rad/s ·
+ *   E₀ = 10 × 1,62 × 5 × 1 = 81 J
+ *   g = 100 (el tope que admite) · L = 0,10 · θ₀ = 45°: T = 4·√(0,001)·K(sen 22,5°) = 0,206634 s
+ *
+ * CASO 6 (rechazo) — g = 100,5 y g = 150 se rechazan («como mucho de 100»); L ≤ 0 y θ₀ fuera
+ *   de [0°, 90°] los capan los deslizadores (bloques de arriba).
+ *
+ * EL HERO (lo que invalidó la app) — medido el 02/10/2026 de 320 a 1400 px de 4 en 4: ningún
+ *   punto del h1 bajo la barra fija, ni en localhost ni en stemum.com. El hero de esta app baja
+ *   el título a y = 99 desde 800 px (100 px de relleno), y la píldora «Stemum › Física» acaba en
+ *   x = 232 e y = 77: no llega al título, ni siquiera de 1024 a 1060 px, donde la de Punnett sí.
+ *
+ * HALLAZGOS ABIERTOS de esta re-inspección: cada uno tiene su test.fail() abajo, que afirma lo
+ * CORRECTO. Al repararlo, el test pasa a verde por sí solo y Playwright lo marca: quitar el
+ * test.fail() y reescribir aquí el comentario en pasado («REPARADO»).
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+const SIN_TRANSICIONES = '*, *::before, *::after { transition: none !important; animation: none !important; }';
+
+/** Lee una cifra mostrada en formato español («2,886 s», «-0,5°», «5,257 J») como número. */
+function aNumero(texto: string): number {
+  return parseFloat(texto.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.'));
+}
+
+/** Las tres cifras de energía (cinética, potencial, total) tal como se ven. */
+async function energias(page: Page): Promise<string[]> {
+  return (await page.locator('[class*="energyValue"]').allInnerTexts()).map((t) => t.trim());
+}
+
+interface Muestra {
+  t: number;
+  th: number;
+  total: number;
+}
+
+/**
+ * Muestrea en cada frame el reloj de la app («Tiempo transcurrido»), el ángulo de la CUERDA del
+ * SVG —a precisión completa: el «θ actual» va redondeado a 0,1° y, con la amplitud amortiguada a
+ * menos de 1°, adelanta los cruces por cero décimas de segundo— y la energía «Total», hasta que
+ * el reloj de la app pase de `hastaT` segundos (o `maxMs` de reloj real).
+ */
+async function muestrear(page: Page, hastaT: number, maxMs = 25000): Promise<Muestra[]> {
+  return page.evaluate(
+    ({ hastaT, maxMs }) =>
+      new Promise<Array<{ t: number; th: number; total: number }>>((resolver) => {
+        const aNum = (s: string): number =>
+          parseFloat(s.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.'));
+        const fila = (lab: string): string => {
+          for (const d of document.querySelectorAll('div')) {
+            const sp = d.querySelectorAll(':scope > span');
+            if (sp.length === 2 && sp[0].textContent?.trim() === lab) {
+              return sp[1].textContent?.trim() ?? '';
+            }
+          }
+          return '';
+        };
+        const salida: Array<{ t: number; th: number; total: number }> = [];
+        const inicio = performance.now();
+        const paso = (): void => {
+          const cuerda = document.querySelectorAll('svg[aria-label="Animación del péndulo"] line')[1];
+          const x1 = Number(cuerda?.getAttribute('x1'));
+          const y1 = Number(cuerda?.getAttribute('y1'));
+          const x2 = Number(cuerda?.getAttribute('x2'));
+          const y2 = Number(cuerda?.getAttribute('y2'));
+          const t = aNum(fila('Tiempo transcurrido'));
+          const totales = document.querySelectorAll('[class*="energyValue"]');
+          salida.push({
+            t,
+            th: Math.atan2(x2 - x1, y2 - y1),
+            total: aNum(totales[2]?.textContent ?? ''),
+          });
+          if (!(t >= hastaT) && performance.now() - inicio < maxMs) requestAnimationFrame(paso);
+          else resolver(salida);
+        };
+        requestAnimationFrame(paso);
+      }),
+    { hastaT, maxMs },
+  );
+}
+
+/** Instantes (reloj de la app) en que la cuerda pasa por la vertical, por interpolación lineal. */
+function crucesPorCero(m: Muestra[]): number[] {
+  const cruces: number[] = [];
+  for (let i = 1; i < m.length; i++) {
+    const a = m[i - 1];
+    const b = m[i];
+    if (!(b.t > a.t) || !isFinite(a.th) || !isFinite(b.th)) continue; // el reloj volvió a 0 o no avanzó
+    if ((a.th > 0 && b.th <= 0) || (a.th < 0 && b.th >= 0)) {
+      cruces.push(a.t + (a.th / (a.th - b.th)) * (b.t - a.t));
+    }
+  }
+  return cruces;
+}
+
+/** Reinicia y espera a que el reloj de la app haya vuelto a cero antes de muestrear. */
+async function reiniciarYEsperar(page: Page): Promise<void> {
+  await page.getByRole('button', { name: /Reiniciar/ }).click();
+  await expect
+    .poll(async () => aNumero(await leerFila(page, 'Tiempo transcurrido')))
+    .toBeLessThan(0.5);
+}
+
+/**
+ * Contraste WCAG del color de un elemento —el del texto o, en un elemento SVG, el de su
+ * `stroke`— contra CADA parada de su fondo: la caja de resultados es un degradado, y una sola
+ * media escondería el extremo que no llega. Sube por los antecesores hasta el primer fondo opaco
+ * o con degradado.
+ */
+async function contrastesContraFondo(locator: Locator): Promise<number[]> {
+  return locator.evaluate((el) => {
+    interface Rgba { r: number; g: number; b: number; a: number }
+    const leer = (css: string): Rgba => {
+      const p = (css.match(/[\d.]+/g) ?? []).map(Number);
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+    const canal = (c: number): number => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    const lum = (c: Rgba): number => 0.2126 * canal(c.r) + 0.7152 * canal(c.g) + 0.0722 * canal(c.b);
+    const ratio = (a: Rgba, b: Rgba): number => {
+      const x = lum(a);
+      const y = lum(b);
+      return +((Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05)).toFixed(2);
+    };
+    const fondos: Rgba[] = [];
+    for (let n: Element | null = el; n && !fondos.length; n = n.parentElement) {
+      const cs = getComputedStyle(n);
+      if (cs.backgroundImage && cs.backgroundImage !== 'none') {
+        for (const m of cs.backgroundImage.match(/rgba?\([^)]+\)/g) ?? []) fondos.push(leer(m));
+        if (fondos.length) break;
+      }
+      const c = leer(cs.backgroundColor);
+      if (c.a >= 1) fondos.push(c);
+    }
+    if (!fondos.length) fondos.push(leer(getComputedStyle(document.body).backgroundColor));
+    const trazo = el.getAttribute('stroke');
+    let color: Rgba;
+    if (trazo) {
+      const muestra = document.createElement('span');
+      muestra.style.color = trazo;
+      document.body.appendChild(muestra);
+      color = leer(getComputedStyle(muestra).color);
+      muestra.remove();
+    } else {
+      color = leer(getComputedStyle(el).color);
+    }
+    return fondos.map((f) => ratio(color, f));
+  });
+}
+
+/** Pasa a oscuro con el botón real (un `data-theme` a mano lo pisa el gestor de tema). */
+async function aOscuro(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).first().click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+}
+
+/** Cuántos puntos del texto del <h1> (muestreo de 4 en 4 px) caen bajo la barra fija del logo. */
+async function tituloBajoLaBarra(page: Page): Promise<{ total: number; tapados: number }> {
+  await page.evaluate(
+    () => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
+  );
+  return page.locator('h1').evaluate((h1) => {
+    const barra = document.querySelector('[class*="headerBar"]');
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    let total = 0;
+    let tapados = 0;
+    for (const q of Array.from(rango.getClientRects())) {
+      for (let x = q.left + 2; x < q.right - 1; x += 4) {
+        for (let y = q.top + 4; y < q.bottom - 3; y += 4) {
+          total++;
+          const e = document.elementFromPoint(x, y);
+          if (e && barra?.contains(e)) tapados++;
+        }
+      }
+    }
+    return { total, tapados };
+  });
+}
+
+/** Los anchos que se miden: los de móvil y tableta, y la franja 1024-1060 donde Punnett fallaba. */
+const ANCHOS_HERO = [360, 390, 800, 1024, 1028, 1032, 1036, 1040, 1044, 1048, 1052, 1056, 1059, 1060, 1280];
+
+test.describe('Péndulo · re-inspección 02/10/2026', () => {
+  test('CASO 4 — normal: L = 2,00 m, m = 2 kg, θ₀ = 30°, sin rozamiento', async ({ page }) => {
+    await sembrarValor(page, '#long', 2);
+    await sembrarValor(page, '#masa', 2);
+    await sembrarValor(page, '#ang', 30);
+    await sembrarValor(page, '#damp', 0);
+
+    // T = 4·√(2/9,81)·K(sen 15°) = 4 × 0,451524 × 1,598142 = 2,886396 s
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,886 s');
+    // f = 1/2,886396 = 0,346453 Hz · ω₀ = √(9,81/2) = 2,214723 rad/s
+    await expect.poll(() => leerFila(page, 'Frecuencia f')).toBe('0,346 Hz');
+    await expect.poll(() => leerFila(page, 'Frecuencia angular ω')).toBe('2,215 rad/s');
+
+    // 30° > 15°: el aviso da la desviación exacta, 2,886396/2,837007 − 1 = +1,7409 %
+    const aviso = page.getByText(/está fuera de la aproximación de pequeños ángulos/);
+    await expect(aviso).toContainText('+1,74');
+    await expect(aviso).toContainText('2,886 s');
+    await expect(aviso).toContainText('2,837 s');
+
+    // En t = 0 (pausado y reiniciado) toda la energía es potencial:
+    // E₀ = m·g·L·(1 − cos 30°) = 2 × 9,81 × 2 × 0,133975 = 5,257163 J
+    await page.getByRole('button', { name: 'Pausar simulación' }).click();
+    await page.getByRole('button', { name: /Reiniciar/ }).click();
+    await expect.poll(() => energias(page)).toEqual(['0,000 J', '5,257 J', '5,257 J']);
+
+    // La pestaña lineal publica T₀ = 2π·√(2/9,81) = 2,837007 s y f₀ = 0,352484 Hz.
+    await page.getByRole('button', { name: /Aproximación pequeños ángulos/ }).click();
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,837 s');
+    await expect.poll(() => leerFila(page, 'Frecuencia f')).toBe('0,352 Hz');
+  });
+
+  test('CASO 4 bis — la animación sin rozamiento va al período que publica cada pestaña', async ({
+    page,
+  }) => {
+    test.setTimeout(45000);
+    await sembrarValor(page, '#long', 2);
+    await sembrarValor(page, '#ang', 30);
+    await sembrarValor(page, '#damp', 0);
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,886 s');
+
+    // Numérico: 2,886396 s. Euler-Cromer con el dt de un frame (1/60 s) se desvía (ω·dt)²/24 ≈
+    // 0,006 %: medido el 02/10/2026, 2,8836 s. Tolerancia ±1 %, por debajo del 1,7 % que separa
+    // este período del lineal.
+    await reiniciarYEsperar(page);
+    let c = crucesPorCero(await muestrear(page, 6.5));
+    expect(c.length).toBeGreaterThanOrEqual(3);
+    let animado = (2 * (c[c.length - 1] - c[0])) / (c.length - 1);
+    expect(Math.abs(animado / 2.886396 - 1)).toBeLessThan(0.01);
+
+    // Lineal: θ₀·cos(ω₀t) → 2,837007 s (medido 2,8345 s).
+    await page.getByRole('button', { name: /Aproximación pequeños ángulos/ }).click();
+    await reiniciarYEsperar(page);
+    c = crucesPorCero(await muestrear(page, 6.5));
+    expect(c.length).toBeGreaterThanOrEqual(3);
+    animado = (2 * (c[c.length - 1] - c[0])) / (c.length - 1);
+    expect(Math.abs(animado / 2.837007 - 1)).toBeLessThan(0.01);
+  });
+
+  test('CASO 5 — límite: Júpiter, L mínima (0,10 m) y θ₀ = 90°', async ({ page }) => {
+    await sembrarValor(page, '#long', 0.1);
+    await sembrarValor(page, '#ang', 90);
+    await page.getByRole('button', { name: /Júpiter/ }).click();
+    await esperarValorEnReact(page, '#grav', '24.79');
+
+    // T₀ = 2π·√(0,1/24,79) = 0,399063 s · T = T₀·(2/π)·K(sen 45°) = 0,471030 s
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('0,471 s');
+    await expect.poll(() => leerFila(page, 'Frecuencia f')).toBe('2,123 Hz');
+    await expect.poll(() => leerFila(page, 'Frecuencia angular ω')).toBe('15,745 rad/s');
+    await expect(page.getByText(/está fuera de la aproximación de pequeños ángulos/)).toContainText(
+      '+18,03',
+    );
+
+    // E₀ = 1 × 24,79 × 0,10 × (1 − cos 90°) = 2,479 J
+    await page.getByRole('button', { name: 'Pausar simulación' }).click();
+    await page.getByRole('button', { name: /Reiniciar/ }).click();
+    await expect.poll(() => energias(page)).toEqual(['0,000 J', '2,479 J', '2,479 J']);
+
+    await page.getByRole('button', { name: /Aproximación pequeños ángulos/ }).click();
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('0,399 s');
+    await expect.poll(() => leerFila(page, 'Frecuencia f')).toBe('2,506 Hz');
+  });
+
+  test('CASO 5 bis — límite opuesto: Luna, L máxima (5,00 m), θ₀ = 90° y 10 kg', async ({ page }) => {
+    await sembrarValor(page, '#long', 5);
+    await sembrarValor(page, '#masa', 10);
+    await sembrarValor(page, '#ang', 90);
+    await page.getByRole('button', { name: /Luna/ }).click();
+    await esperarValorEnReact(page, '#grav', '1.62');
+
+    // T = 4·√(5/1,62)·K(sen 45°) = 4 × 1,756821 × 1,854075 = 13,029109 s · ω₀ = √0,324 = 0,569210
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('13,029 s');
+    await expect.poll(() => leerFila(page, 'Frecuencia f')).toBe('0,077 Hz');
+    await expect.poll(() => leerFila(page, 'Frecuencia angular ω')).toBe('0,569 rad/s');
+
+    // E₀ = 10 × 1,62 × 5 × (1 − cos 90°) = 81 J
+    await page.getByRole('button', { name: 'Pausar simulación' }).click();
+    await page.getByRole('button', { name: /Reiniciar/ }).click();
+    await expect.poll(() => energias(page)).toEqual(['0,000 J', '81,000 J', '81,000 J']);
+  });
+
+  test('CASO 5 ter y 6 — g = 100 es el tope que se acepta; 100,5 y 150 se rechazan', async ({ page }) => {
+    await sembrarValor(page, '#long', 0.1);
+    await sembrarValor(page, '#ang', 45);
+    await page.locator('#grav').fill('100');
+    await esperarValorEnReact(page, '#grav', '100');
+
+    // T = 4·√(0,1/100)·K(sen 22,5°) = 4 × 0,0316228 × 1,633586 = 0,206634 s · ω₀ = √1000
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('0,207 s');
+    await expect.poll(() => leerFila(page, 'Frecuencia angular ω')).toBe('31,623 rad/s');
+    await expect(page.locator('#aviso-gravedad')).toHaveCount(0);
+
+    for (const valor of ['100.5', '150']) {
+      await page.locator('#grav').fill(valor);
+      await esperarValorEnReact(page, '#grav', valor);
+      const aviso = page.locator('#aviso-gravedad');
+      await expect(aviso).toHaveAttribute('role', 'alert');
+      await expect(aviso).toContainText('como mucho de 100');
+    }
+  });
+
+  test('HERO — en meskeia.com el logo fijo no tapa el título de 360 a 1280 px', async ({ page }) => {
+    await esperarPaginaAsentada(page);
+    for (const ancho of ANCHOS_HERO) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      const m = await tituloBajoLaBarra(page);
+      expect(m.total).toBeGreaterThan(100);
+      expect(m.tapados, `${ancho} px: puntos del título bajo la barra fija`).toBe(0);
+    }
+  });
+
+  // ─── Hallazgos abiertos el 02/10/2026 ─────────────────────────────────────────────────
+
+  test('ABIERTO (02/10/2026) — «Período T» ignora la amortiguación: Luna, L = 5 m, γ = 0,5', async ({
+    page,
+  }) => {
+    test.fail();
+    test.setTimeout(60000);
+    await page.getByRole('button', { name: /Luna/ }).click();
+    await esperarValorEnReact(page, '#grav', '1.62');
+    await sembrarValor(page, '#long', 5);
+    await sembrarValor(page, '#ang', 5);
+    await sembrarValor(page, '#damp', 0.5);
+
+    // A mano: θ″ + γ·θ′ + (g/L)·θ = 0 con ω₀² = 1,62/5 = 0,324 y γ²/4 = 0,0625 →
+    // ω_d = √(0,324 − 0,0625) = 0,511371 rad/s → T_d = 2π/ω_d = 12,287 s (a 5° la corrección
+    // de amplitud es del 0,05 %). La animación numérica sí integra el −γ·θ′: medido el
+    // 02/10/2026, cruza la vertical a los 3,95 s y a los 10,08 s → 12,26 s.
+    // La app publica 4·√(5/1,62)·K(sen 2,5°) = 11,044 s, el del péndulo SIN rozamiento: un 10 %
+    // menos de lo que se ve. El bloque educativo dice que «el período cambia muy poco salvo en
+    // amortiguación crítica», y aquí γ/2ω₀ = 0,44.
+    await reiniciarYEsperar(page);
+    const c = crucesPorCero(await muestrear(page, 10.6));
+    expect(c.length).toBeGreaterThanOrEqual(2);
+    const animado = 2 * (c[1] - c[0]);
+    expect(animado).toBeGreaterThan(12.0);
+    expect(animado).toBeLessThan(12.5);
+
+    // Lo correcto: la cifra es la del péndulo que se ve oscilar (±1 %; el defecto es del 10 %).
+    const publicado = aNumero(await leerFila(page, 'Período T'));
+    expect(Math.abs(publicado / animado - 1)).toBeLessThan(0.01);
+  });
+
+  test('ABIERTO (02/10/2026) — la solución cerrada de pequeños ángulos oscila con ω₀ aunque haya rozamiento', async ({
+    page,
+  }) => {
+    test.fail();
+    test.setTimeout(45000);
+    await page.getByRole('button', { name: /Luna/ }).click();
+    await esperarValorEnReact(page, '#grav', '1.62');
+    await sembrarValor(page, '#long', 5);
+    await sembrarValor(page, '#ang', 5);
+    await sembrarValor(page, '#damp', 0.5);
+    await page.getByRole('button', { name: /Aproximación pequeños ángulos/ }).click();
+
+    // A mano, la ecuación LINEAL amortiguada con θ(0) = 5° y θ′(0) = 0:
+    //   θ(t) = θ₀·e^(−γt/2)·[cos(ω_d·t) + (γ/2ω_d)·sen(ω_d·t)]
+    // primer paso por la vertical en ω_d·t = π/2 + atan(0,25/0,511371) → t = 3,961 s (la pestaña
+    // numérica, con los mismos datos y a 5°, cruza a los 3,95 s). La app dibuja
+    // θ₀·e^(−γt/2)·cos(ω₀·t), que no resuelve esa ecuación: cruza a π/(2ω₀) = 2,76 s (medido).
+    await reiniciarYEsperar(page);
+    const c = crucesPorCero(await muestrear(page, 4.6));
+    expect(c.length).toBeGreaterThan(0);
+    expect(c[0]).toBeGreaterThan(3.8);
+    expect(c[0]).toBeLessThan(4.1);
+  });
+
+  test('ABIERTO (02/10/2026) — en el modelo numérico, «Frecuencia angular ω» no es 2π·f', async ({
+    page,
+  }) => {
+    test.fail();
+    await sembrarValor(page, '#ang', 90);
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,368 s');
+
+    // La tabla de la propia app: «ω = √(g/L) = 2π·f». Con θ₀ = 90° la caja publica
+    // f = 1/2,367842 = 0,422 Hz y ω = √9,81 = 3,132 rad/s, cuando 2π·f = 2,654 rad/s (y la
+    // animación oscila a 2,654): un 18 % de diferencia entre dos cifras de la misma caja.
+    const f = aNumero(await leerFila(page, 'Frecuencia f'));
+    const w = aNumero(await leerFila(page, 'Frecuencia angular ω'));
+    // ±0,5 %: el redondeo a 3 decimales de f mueve un 0,12 %; el defecto, un 18 %.
+    expect(Math.abs(w / (2 * Math.PI * f) - 1)).toBeLessThan(0.005);
+  });
+
+  test('ABIERTO (02/10/2026) — sin rozamiento, la energía total no se conserva', async ({ page }) => {
+    test.fail();
+    test.setTimeout(45000);
+    await sembrarValor(page, '#long', 0.1);
+    await sembrarValor(page, '#ang', 90);
+    await sembrarValor(page, '#damp', 0);
+    await page.getByRole('button', { name: /Júpiter/ }).click();
+    await esperarValorEnReact(page, '#grav', '24.79');
+
+    // E₀ = 1 × 24,79 × 0,10 × (1 − cos 90°) = 2,479 J. Con γ = 0, «Ec + Ep debe ser constante.
+    // Es una buena prueba de tu modelo», dice el bloque educativo. Medido el 02/10/2026: «Total»
+    // entre 2,215 y 2,792 J (−10,6 % / +12,6 %); con los valores de fábrica y γ = 0, entre 0,577 y
+    // 0,607 J sobre 0,592 (±2,5 %). Es Euler-Cromer con el dt de un frame: oscila ±ω₀·dt/2.
+    await reiniciarYEsperar(page);
+    const totales = (await muestrear(page, 2.5)).map((m) => m.total).filter(Number.isFinite);
+    expect(totales.length).toBeGreaterThan(60);
+    // ±2 %: el defecto es de ±12 % en este caso.
+    expect(Math.min(...totales)).toBeGreaterThan(2.479 * 0.98);
+    expect(Math.max(...totales)).toBeLessThan(2.479 * 1.02);
+  });
+
+  test('ABIERTO (02/10/2026) — una gravedad rechazada sigue calculando', async ({ page }) => {
+    test.fail();
+    await page.locator('#grav').fill('150');
+    await esperarValorEnReact(page, '#grav', '150');
+    await expect(page.locator('#aviso-gravedad')).toContainText('como mucho de 100');
+    // Lo correcto: si la gravedad se rechaza, no se publica un período calculado con ella.
+    // Obtenido el 02/10/2026: «Período T 0,517 s» (= 4·√(1/150)·K(sen 10°)) junto al aviso.
+    expect(await leerFila(page, 'Período T')).not.toMatch(/\d/);
+
+    // Y con g = 0 el aviso de grandes ángulos se anuncia (role="alert") diciendo
+    // «es un +No definido% mayor: ∞ s frente a los ∞ s de la fórmula lineal».
+    await page.locator('#grav').fill('0');
+    await esperarValorEnReact(page, '#grav', '0');
+    await expect(page.locator('#aviso-gravedad')).toBeVisible();
+    const avisos = await page.locator('main [role="alert"]').allInnerTexts();
+    expect(avisos.filter((a) => /No definido|∞/.test(a))).toEqual([]);
+  });
+
+  test('ABIERTO (02/10/2026) — los porcentajes no llevan el espacio duro antes del %', async ({ page }) => {
+    test.fail();
+    // Estado de fábrica, θ₀ = 20°: 2,021451/2,006067 − 1 = +0,7669 % → «+0,77 %» con U+00A0
+    // (CLAUDE.md global §2, 25/09/2026). Obtenido: «+0,77%», pegado.
+    await expect(page.getByText(/está fuera de la aproximación de pequeños ángulos/)).toContainText(
+      '+0,77 %',
+    );
+    // El consejo del bloque educativo («&lt; 1%») y el FAQPage («18 %» con espacio normal).
+    expect(await page.locator('[class*="faqTip"]').nth(1).textContent()).toContain('1 %');
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('');
+    expect(ld).toContain('18 %');
+  });
+
+  test('ABIERTO (02/10/2026) — «Pausar» se anuncia pulsado mientras la simulación corre', async ({
+    page,
+  }) => {
+    test.fail();
+    const boton = page.getByRole('button', { name: 'Pausar simulación' });
+    await expect(boton).toBeVisible();
+    // Con la simulación en marcha, el lector lee «Pausar simulación, pulsado»: la pausa ACTIVA,
+    // justo lo contrario. Un botón cuyo rótulo cambia con el estado no lleva aria-pressed.
+    await expect(boton).not.toHaveAttribute('aria-pressed');
+  });
+
+  test('ABIERTO (02/10/2026) — los presets de gravedad no anuncian cuál está activo', async ({ page }) => {
+    test.fail();
+    // «Tierra (9,81)» se ve marcado (.gravityActive) y no lleva aria-pressed.
+    await expect(page.getByRole('button', { name: 'Tierra (9,81)' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: 'Luna (1,62)' })).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('ABIERTO (02/10/2026) — emojis junto a texto sin aria-hidden', async ({ page }) => {
+    test.fail();
+    // Los tres 💡 de los consejos del bloque educativo y la ↺ de «Reiniciar», que entra en su
+    // nombre accesible («↺ Reiniciar»).
+    const sueltos = await page.locator('[class*="faqTip"]').evaluateAll(
+      (ps) =>
+        ps.filter((p) =>
+          Array.from(p.childNodes).some(
+            (n) => n.nodeType === Node.TEXT_NODE && /💡/u.test(n.nodeValue ?? ''),
+          ),
+        ).length,
+    );
+    expect(sueltos).toBe(0);
+    await expect(page.getByRole('button', { name: 'Reiniciar', exact: true })).toBeVisible();
+  });
+
+  test('ABIERTO (02/10/2026) — texto blanco sobre el color de marca por debajo de 4,5:1', async ({ page }) => {
+    test.fail();
+    await page.addStyleTag({ content: SIN_TRANSICIONES });
+    // Medido el 02/10/2026 en meskeia.com: «⏸ Pausar» (blanco sobre var(--secondary), el botón
+    // que se ve al cargar) 2,80:1 en claro y 2,23:1 en oscuro; «▶ Iniciar» 4,11 y 2,79; el
+    // preset activo 4,11 en claro. Bajo Stemum, «⏸ Pausar» 3,96 y «▶ Iniciar» 2,21 en oscuro.
+    const fallan: string[] = [];
+    const medir = async (tema: string, nombre: string, loc: Locator): Promise<void> => {
+      const r = Math.min(...(await contrastesContraFondo(loc)));
+      if (r < 4.5) fallan.push(`${tema} · ${nombre} ${r}:1`);
+    };
+    for (const tema of ['claro', 'oscuro']) {
+      if (tema === 'oscuro') await aOscuro(page);
+      await medir(tema, '⏸ Pausar', page.getByRole('button', { name: 'Pausar simulación' }));
+      await medir(tema, 'preset activo', page.getByRole('button', { name: 'Tierra (9,81)' }));
+      await page.getByRole('button', { name: 'Pausar simulación' }).click();
+      await medir(tema, '▶ Iniciar', page.getByRole('button', { name: 'Iniciar simulación' }));
+      await page.getByRole('button', { name: 'Iniciar simulación' }).click();
+    }
+    expect(fallan).toEqual([]);
+  });
+
+  test('ABIERTO (02/10/2026) — texto en el color de marca por debajo de 4,5:1, la cifra principal incluida', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.addStyleTag({ content: SIN_TRANSICIONES });
+    // Medido el 02/10/2026 en meskeia.com: la cifra de «Período T» (var(--primary) sobre el
+    // degradado #eff6ff → #f0fdf4) 3,77-3,92:1 en claro y 4,12-3,26:1 en oscuro; los valores de
+    // los deslizadores 4,11:1 y la pestaña activa 3,93:1 en claro. Bajo Stemum pasan en claro.
+    const fallan: string[] = [];
+    const medir = async (tema: string, nombre: string, loc: Locator): Promise<void> => {
+      const r = Math.min(...(await contrastesContraFondo(loc)));
+      if (r < 4.5) fallan.push(`${tema} · ${nombre} ${r}:1`);
+    };
+    for (const tema of ['claro', 'oscuro']) {
+      if (tema === 'oscuro') await aOscuro(page);
+      await medir(tema, 'Período T', page.locator('[class*="resultValueAccent"]').first());
+      await medir(tema, 'valor de L', page.locator('[class*="valueBadge"]').first());
+      await medir(tema, 'pestaña activa', page.getByRole('button', { name: /Modelo numérico/ }));
+    }
+    expect(fallan).toEqual([]);
+  });
+
+  test('ABIERTO (02/10/2026) — en oscuro la cuerda del péndulo casi no se ve', async ({ page }) => {
+    test.fail();
+    // Sin transiciones: globals.css anima el background-color 0,3 s en `*`, y medir nada más
+    // cambiar de tema lee el fondo claro a medio camino (así dio un falso verde el 02/10/2026).
+    await page.addStyleTag({ content: SIN_TRANSICIONES });
+    await aOscuro(page);
+    // stroke="#374151" fijo en el SVG (page.tsx) sobre el #1a1a1a del escenario oscuro: 1,69:1,
+    // por debajo de los 3:1 de un objeto gráfico (WCAG 1.4.11). La línea de referencia
+    // discontinua (#cbd5e1) se ve más que la propia cuerda: 11,72:1.
+    const cuerda = page.locator('svg[aria-label="Animación del péndulo"] line').nth(1);
+    expect(Math.min(...(await contrastesContraFondo(cuerda)))).toBeGreaterThanOrEqual(3);
+  });
+});
+
+/**
+ * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
+ * admite meskeia.com) y, sin él, la página NO se hidrata: la píldora «Stemum › Física» no llega
+ * a montarse (useStemumHost corre en un efecto). El puente reenvía el socket a localhost:3050,
+ * que sí se acepta; no toca ninguna petición HTTP, así que lo que se mide es la página real.
+ * Copiado de tests/apps/simulador-punnett.spec.ts (01/10/2026). Bajo `next start` no hay HMR y
+ * el puente no intercepta nada.
+ */
+async function puenteHmr(page: Page): Promise<void> {
+  const abiertos: WebSocket[] = [];
+  page.on('close', () => abiertos.forEach((s) => s.close()));
+  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
+    const u = new URL(ws.url());
+    const arriba = new WebSocket(`ws://localhost:3050${u.pathname}${u.search}`);
+    arriba.binaryType = 'arraybuffer';
+    abiertos.push(arriba);
+    const cola: (string | Buffer)[] = [];
+    arriba.onopen = () => {
+      for (const m of cola) arriba.send(m);
+      cola.length = 0;
+    };
+    ws.onMessage((m) => {
+      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
+      else cola.push(m);
+    });
+    arriba.onmessage = (e: MessageEvent) =>
+      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
+    ws.onClose(() => arriba.close());
+  });
+}
+
+test.describe('Péndulo · stemum.com · re-inspección 02/10/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await puenteHmr(page);
+    await page.goto('http://stemum.com/simulador-pendulo/');
+    await esperarPaginaAsentada(page);
+    await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
+    await expect(page.locator('[class*="stemumPill"]')).toBeVisible();
+  });
+
+  test('HERO bajo Stemum — la píldora «Stemum › Física» no pisa el título, tampoco de 1024 a 1060 px', async ({
+    page,
+  }) => {
+    await expect(page.locator('[class*="stemumPill"]')).toContainText('Física');
+    // La misma app, el mismo cálculo: T(20°) = 4·√(1/9,81)·K(sen 10°) = 2,021451 s
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('2,021 s');
+
+    // Medido el 02/10/2026: la píldora acaba en x = 232 e y = 77, y el título empieza en y = 99
+    // desde 800 px (en móvil, en y = 79 con la píldora hasta y = 59). En simulador-punnett la
+    // de «Biología» llegaba a x = 253 y pisaba el título de 1024 a 1044 px (hallazgo 2589).
+    for (const ancho of ANCHOS_HERO) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      const m = await tituloBajoLaBarra(page);
+      expect(m.total).toBeGreaterThan(100);
+      expect(m.tapados, `${ancho} px: puntos del título bajo la píldora`).toBe(0);
+      const cajas = await page.evaluate(() => {
+        const pildora = document.querySelector('[class*="stemumPill"]')?.getBoundingClientRect();
+        const rango = document.createRange();
+        rango.selectNodeContents(document.querySelector('h1') as Element);
+        const titulo = rango.getBoundingClientRect();
+        return {
+          seCruzan:
+            !!pildora &&
+            pildora.right > titulo.left &&
+            pildora.left < titulo.right &&
+            pildora.bottom > titulo.top + 1,
+          pildora: pildora ? [Math.round(pildora.right), Math.round(pildora.bottom)] : null,
+          titulo: [Math.round(titulo.left), Math.round(titulo.top)],
+        };
+      });
+      expect(cajas.seCruzan, `${ancho} px: píldora ${cajas.pildora} · título ${cajas.titulo}`).toBe(false);
+    }
   });
 });
