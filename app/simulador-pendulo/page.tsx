@@ -11,11 +11,11 @@ import {
   ShareCard,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber } from '@/lib';
+import { formatNumber, formatPercentage } from '@/lib';
 import styles from './SimuladorPendulo.module.css';
 import {
   calcularDerivados,
-  pasoEulerNumerico,
+  pasoNumerico,
   thetaPequenosAngulos,
   validarGravedad,
   type EstadoPendulo,
@@ -78,23 +78,31 @@ export default function SimuladorPenduloPage() {
 
   const lastFrameRef = useRef<number>(0);
   const rafRef = useRef<number | null>(null);
+  // Reloj de la simulación. Antes la solución cerrada se calculaba DENTRO del actualizador de
+  // setTiempo, que React puede llamar dos veces; ahora el tiempo vive aquí y el estado lo copia.
+  const tiempoRef = useRef<number>(0);
 
   const theta0Rad = useMemo(() => (theta0Deg * Math.PI) / 180, [theta0Deg]);
 
   // La pestaña activa decide la cifra: el modelo numérico integra la ecuación completa, así
   // que su período es el real. Antes «Período T» salía siempre de 2π√(L/g) sin mirar el
   // modelo, y la misma pantalla enseñaba un número mientras balanceaba a otro ritmo.
+  // El rozamiento entra también (hallazgo 2638): la animación integra el −γ·θ′, y la cifra
+  // tiene que ser la del péndulo que se ve oscilar.
+  // Con una gravedad rechazada no se calcula nada (hallazgo 2642): antes la caja publicaba un
+  // período normal al lado del aviso que decía que ese valor no valía.
   const derivados1 = useMemo(
-    () => calcularDerivados(L, g, theta0Rad, modelo),
-    [L, g, theta0Rad, modelo],
+    () => (avisoGravedad ? null : calcularDerivados(L, g, theta0Rad, modelo, damping)),
+    [avisoGravedad, L, g, theta0Rad, modelo, damping],
   );
   const derivados2 = useMemo(
-    () => calcularDerivados(L2, g, theta0Rad, modelo),
-    [L2, g, theta0Rad, modelo],
+    () => (avisoGravedad ? null : calcularDerivados(L2, g, theta0Rad, modelo, damping)),
+    [avisoGravedad, L2, g, theta0Rad, modelo, damping],
   );
 
   // Reiniciar el sistema (se llama explícitamente al cambiar parámetros)
   const reiniciar = useCallback(() => {
+    tiempoRef.current = 0;
     setTiempo(0);
     setEstado1({ theta: theta0Rad, omega: 0 });
     setEstado2({ theta: theta0Rad, omega: 0 });
@@ -132,21 +140,19 @@ export default function SimuladorPenduloPage() {
       // dt en segundos, limitado para evitar saltos cuando la pestaña pierde foco
       const dt = Math.min(dtMs / 1000, 0.05);
 
-      setTiempo((t) => t + dt);
+      tiempoRef.current += dt;
+      const t = tiempoRef.current;
+      setTiempo(t);
 
       if (modelo === 'numerico') {
-        setEstado1((prev) => pasoEulerNumerico(prev, L, g, damping, dt));
-        setEstado2((prev) => pasoEulerNumerico(prev, L2, g, damping, dt));
+        // Runge-Kutta 4 con sub-pasos: Euler-Cromer con el dt de un frame hacía oscilar la
+        // energía total ±ω₀·dt/2 aunque no hubiera rozamiento (hallazgo 2641).
+        setEstado1((prev) => pasoNumerico(prev, L, g, damping, dt));
+        setEstado2((prev) => pasoNumerico(prev, L2, g, damping, dt));
       } else {
-        // Solución cerrada de pequeños ángulos
-        setTiempo((t) => {
-          const tNuevo = t; // ya está actualizado arriba
-          const sol1 = thetaPequenosAngulos(theta0Rad, derivados1.omega0, damping, tNuevo);
-          const sol2 = thetaPequenosAngulos(theta0Rad, derivados2.omega0, damping, tNuevo);
-          setEstado1({ theta: sol1.theta, omega: sol1.omega });
-          setEstado2({ theta: sol2.theta, omega: sol2.omega });
-          return tNuevo;
-        });
+        // Solución cerrada de la ecuación lineal amortiguada, soltada en reposo (hallazgo 2639)
+        setEstado1(thetaPequenosAngulos(theta0Rad, Math.sqrt(g / L), damping, t));
+        setEstado2(thetaPequenosAngulos(theta0Rad, Math.sqrt(g / L2), damping, t));
       }
 
       // El historial lo alimentan los efectos de abajo, con el θ que acaba de calcularse.
@@ -164,7 +170,7 @@ export default function SimuladorPenduloPage() {
         rafRef.current = null;
       }
     };
-  }, [running, modelo, L, L2, g, damping, theta0Rad, derivados1.omega0, derivados2.omega0, avisoGravedad]);
+  }, [running, modelo, L, L2, g, damping, theta0Rad, avisoGravedad]);
 
   // Mantener el historial sincronizado con estado1/estado2 (se actualiza tras cada paso)
   useEffect(() => {
@@ -182,19 +188,35 @@ export default function SimuladorPenduloPage() {
   }, [estado2.theta]);
 
   // Cálculos físicos derivados del estado actual
+  // En la aproximación de pequeños ángulos la energía potencial es la del oscilador armónico,
+  // ½·m·g·L·θ², que es la que esa ecuación conserva; con m·g·L·(1 − cos θ) la solución lineal
+  // no conserva nada a ángulos grandes y el «Total» superaba a E₀ (hallazgo 2639).
   const energias1 = useMemo(() => {
     const v = L * estado1.omega; // velocidad tangencial
     const Ec = 0.5 * m * v * v;
-    const altura = L * (1 - Math.cos(estado1.theta));
-    const Ep = m * g * altura;
-    const E0 = m * g * (L * (1 - Math.cos(theta0Rad)));
+    const potencial = (th: number) =>
+      modelo === 'pequeno' ? m * g * L * 0.5 * th * th : m * g * L * (1 - Math.cos(th));
+    const Ep = potencial(estado1.theta);
+    const E0 = potencial(theta0Rad);
     return { Ec, Ep, Et: Ec + Ep, E0: Math.max(E0, 0.0001) };
-  }, [L, m, g, estado1.theta, estado1.omega, theta0Rad]);
+  }, [L, m, g, estado1.theta, estado1.omega, theta0Rad, modelo]);
 
-  const showCorreccion = Math.abs(theta0Deg) > 15;
+  // Sin una gravedad válida no hay ni aviso de grandes ángulos: con g = 0 anunciaba
+  // «+No definido% mayor: ∞ s frente a los ∞ s» en un role="alert" (hallazgo 2642).
+  const showCorreccion = derivados1 !== null && Math.abs(theta0Deg) > 15;
   // Antes era (1 + θ₀²/16 − 1)·100, el primer término de la serie de Bernoulli, que a 90°
   // daba +15,42 % donde tocan +18,03 % (hallazgo 973).
-  const correccionPct = derivados1.desviacion * 100;
+  const correccion = derivados1?.desviacion ?? 0;
+
+  /** Una cifra de la caja, o una raya si no hay nada que calcular. */
+  const cifra = (valor: number | null | undefined, decimales: number, unidad: string): string =>
+    valor === null || valor === undefined || !Number.isFinite(valor)
+      ? '—'
+      : `${formatNumber(valor, decimales)} ${unidad}`;
+  const noOscila = derivados1 !== null && derivados1.T === null;
+  // Períodos de los dos péndulos, o null si no hay (gravedad rechazada o sin oscilación).
+  const T1 = derivados1?.T ?? null;
+  const T2 = derivados2?.T ?? null;
 
   // Selección de preset gravedad
   const presetActual = PRESETS_GRAVEDAD.find((p) => Math.abs(p.g - g) < 0.001)?.id ?? 'custom';
@@ -220,20 +242,22 @@ export default function SimuladorPenduloPage() {
     const radioBola = Math.max(8, Math.min(28, 8 + masaRel * 4));
     return (
       <>
+        {/* Los trazos van por clase y no con stroke="#…" fijo: así tienen variante oscura. La
+            cuerda era #374151 también en oscuro, a 1,69:1 sobre el escenario (hallazgo 2648). */}
         {/* Soporte */}
-        <line x1={pivotX - 30} y1={pivotY} x2={pivotX + 30} y2={pivotY} stroke="#9ca3af" strokeWidth={4} />
-        <circle cx={pivotX} cy={pivotY} r={4} fill="#6b7280" />
+        <line x1={pivotX - 30} y1={pivotY} x2={pivotX + 30} y2={pivotY} className={styles.svgSoporte} strokeWidth={4} />
+        <circle cx={pivotX} cy={pivotY} r={4} className={styles.svgPivote} />
         {/* Cuerda */}
-        <line x1={pivotX} y1={pivotY} x2={bobX} y2={bobY} stroke="#374151" strokeWidth={2} />
+        <line x1={pivotX} y1={pivotY} x2={bobX} y2={bobY} className={styles.svgCuerda} strokeWidth={2} />
         {/* Bola */}
-        <circle cx={bobX} cy={bobY} r={radioBola} fill={color} stroke="#1e293b" strokeWidth={1.5} />
+        <circle cx={bobX} cy={bobY} r={radioBola} fill={color} className={styles.svgBordeBola} strokeWidth={1.5} />
         {/* Línea vertical de referencia */}
         <line
           x1={pivotX}
           y1={pivotY}
           x2={pivotX}
           y2={pivotY + Lpx}
-          stroke="#cbd5e1"
+          className={styles.svgReferencia}
           strokeDasharray="4 4"
           strokeWidth={1}
         />
@@ -269,9 +293,13 @@ export default function SimuladorPenduloPage() {
     );
   }
 
-  const energiaPctEc = Math.min(100, (energias1.Ec / energias1.E0) * 100);
-  const energiaPctEp = Math.min(100, (energias1.Ep / energias1.E0) * 100);
-  const energiaPctEt = Math.min(100, (energias1.Et / energias1.E0) * 100);
+  const pctEnergia = (e: number): number =>
+    avisoGravedad || !Number.isFinite(e) ? 0 : Math.max(0, Math.min(100, (e / energias1.E0) * 100));
+  const energiaPctEc = pctEnergia(energias1.Ec);
+  const energiaPctEp = pctEnergia(energias1.Ep);
+  const energiaPctEt = pctEnergia(energias1.Et);
+  /** Con una gravedad rechazada tampoco hay energía que dar (g < 0 la daba negativa). */
+  const julios = (e: number): string => (avisoGravedad ? '—' : cifra(e, 3, 'J'));
 
   return (
     <div className={styles.container}>
@@ -402,6 +430,7 @@ export default function SimuladorPenduloPage() {
                         presetActual === p.id ? styles.gravityActive : ''
                       }`}
                       onClick={() => setG(p.g)}
+                      aria-pressed={presetActual === p.id}
                     >
                       {p.nombre}
                     </button>
@@ -423,22 +452,34 @@ export default function SimuladorPenduloPage() {
                   value={damping}
                   onChange={(e) => setDamping(parseFloat(e.target.value))}
                 />
-                <span className={styles.unitLabel}>0 = sin fricción · 0,5 = muy amortiguado</span>
+                <span className={styles.unitLabel}>
+                  0 = sin fricción · 0,5 = muy amortiguado (si γ/2 ≥ √(g/L), deja de oscilar)
+                </span>
               </div>
             </div>
 
             <div className={styles.actionBar}>
+              {/* Con los dos a la vez el lector anunciaba «Pausar simulación, pulsado» con la
+                  simulación en marcha.
+                  a11y-ok: el nombre cambia con el estado; aria-pressed lo contradecía (hallazgo 2644) */}
               <button
                 type="button"
                 className={running ? styles.calcBtnSecondary : styles.calcBtn}
                 onClick={() => setRunning((r) => !r)}
-                aria-pressed={running}
                 aria-label={running ? 'Pausar simulación' : 'Iniciar simulación'}
               >
-                {running ? '⏸ Pausar' : '▶ Iniciar'}
+                {running ? (
+                  <>
+                    <span aria-hidden="true">⏸</span> Pausar
+                  </>
+                ) : (
+                  <>
+                    <span aria-hidden="true">▶</span> Iniciar
+                  </>
+                )}
               </button>
               <button type="button" className={styles.calcBtnGhost} onClick={reiniciar}>
-                ↺ Reiniciar
+                <span aria-hidden="true">↺</span> Reiniciar
               </button>
             </div>
 
@@ -524,6 +565,14 @@ export default function SimuladorPenduloPage() {
                     completa de primera especie. Con θ₀ → 0 tiende a 2π√(L/g).
                   </p>
                 </>
+              ) : damping > 0 ? (
+                <>
+                  <p className={styles.formulaTex}>T = 2π / √(g / L − γ² / 4)</p>
+                  <p className={styles.formulaCaption}>
+                    Período en la aproximación de pequeños ángulos, con el rozamiento: la
+                    pulsación baja de ω₀ = √(g/L) a ω_d = √(ω₀² − γ²/4).
+                  </p>
+                </>
               ) : (
                 <>
                   <p className={styles.formulaTex}>T = 2π · √(L / g)</p>
@@ -532,25 +581,34 @@ export default function SimuladorPenduloPage() {
                   </p>
                 </>
               )}
+              {modelo === 'numerico' && damping > 0 && (
+                <p className={styles.formulaCaption}>
+                  Con rozamiento (γ &gt; 0) la amplitud decae y cada oscilación dura algo distinto:
+                  la cifra es la de la primera, integrada numéricamente.
+                </p>
+              )}
             </div>
 
             <div className={styles.resultBlock}>
               <h3 className={styles.resultTitle}>Resultados — Péndulo 1</h3>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Período T</span>
-                <span className={styles.resultValueAccent}>
-                  {formatNumber(derivados1.T, 3)} s
-                </span>
+                <span className={styles.resultValueAccent}>{cifra(derivados1?.T, 3, 's')}</span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Frecuencia f</span>
-                <span className={styles.resultValue}>{formatNumber(derivados1.f, 3)} Hz</span>
+                <span className={styles.resultValue}>{cifra(derivados1?.f, 3, 'Hz')}</span>
               </div>
+              {/* ω = 2π·f, la pulsación a la que oscila el péndulo animado. Antes era siempre
+                  ω₀ = √(g/L), y en el modelo numérico rompía la identidad ω = 2π·f que enseña la
+                  tabla de abajo: a 90°, 3,132 rad/s junto a f = 0,422 Hz (hallazgo 2640). */}
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Frecuencia angular ω</span>
-                <span className={styles.resultValue}>
-                  {formatNumber(derivados1.omega0, 3)} rad/s
-                </span>
+                <span className={styles.resultValue}>{cifra(derivados1?.omega, 3, 'rad/s')}</span>
+              </div>
+              <div className={styles.resultRow}>
+                <span className={styles.resultLabel}>Frecuencia natural ω₀</span>
+                <span className={styles.resultValue}>{cifra(derivados1?.omega0, 3, 'rad/s')}</span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Tiempo transcurrido</span>
@@ -564,13 +622,22 @@ export default function SimuladorPenduloPage() {
               </div>
             </div>
 
-            {showCorreccion && (
+            {noOscila && derivados1 && (
+              <p className={styles.regimenNota} role="status">
+                {derivados1.regimen === 'subamortiguado'
+                  ? `Con γ = ${formatNumber(damping, 3)}, el rozamiento está tan cerca del crítico (γ/2ω₀ = ${formatNumber(derivados1.zeta, 4)}) que el péndulo no llega a dar una oscilación apreciable.`
+                  : `Régimen ${derivados1.regimen === 'critico' ? 'de amortiguamiento crítico' : 'sobreamortiguado'}: γ/2 = ${formatNumber(damping / 2, 3)} ≥ ω₀ = ${formatNumber(derivados1.omega0, 3)} rad/s. El péndulo vuelve a la vertical sin oscilar, así que no hay período ni frecuencia que dar.`}
+              </p>
+            )}
+
+            {showCorreccion && derivados1 && (
               // role="alert": es lo único que sostiene la validez de la cifra principal, y
               // aparece y desaparece según el ángulo (hallazgo 977).
               <div className={styles.warningInline} role="alert">
                 <span aria-hidden="true">⚠️</span> θ₀ = {formatNumber(theta0Deg, 0)}° está fuera de la aproximación de pequeños
-                ángulos. El período real, calculado con la integral elíptica K(sen(θ₀/2)), es
-                un <strong>+{formatNumber(correccionPct, 2)}%</strong> mayor:{' '}
+                ángulos. Sin rozamiento, el período a esa amplitud, calculado con la integral
+                elíptica K(sen(θ₀/2)), es un{' '}
+                <strong>+{formatPercentage(correccion, 2)}</strong> mayor:{' '}
                 <strong>{formatNumber(derivados1.Treal, 3)} s</strong> frente a los{' '}
                 {formatNumber(derivados1.T0, 3)} s de la fórmula lineal.
               </div>
@@ -581,20 +648,22 @@ export default function SimuladorPenduloPage() {
                 <h3 className={styles.resultTitle}>Resultados — Péndulo 2</h3>
                 <div className={styles.resultRow}>
                   <span className={styles.resultLabel}>Período T₂</span>
-                  <span className={styles.resultValueAccent}>
-                    {formatNumber(derivados2.T, 3)} s
-                  </span>
+                  <span className={styles.resultValueAccent}>{cifra(derivados2?.T, 3, 's')}</span>
                 </div>
                 <div className={styles.resultRow}>
-                  <span className={styles.resultLabel}>Diferencia T₂ - T₁</span>
+                  <span className={styles.resultLabel}>Diferencia T₂ − T₁</span>
                   <span className={styles.resultValue}>
-                    {formatNumber(derivados2.T - derivados1.T, 3)} s
+                    {T1 !== null && T2 !== null
+                      ? cifra(T2 - T1, 3, 's')
+                      : '—'}
                   </span>
                 </div>
                 <div className={styles.resultRow}>
                   <span className={styles.resultLabel}>Razón T₂ / T₁</span>
                   <span className={styles.resultValue}>
-                    {formatNumber(derivados2.T / derivados1.T, 3)}
+                    {T1 !== null && T2 !== null
+                      ? formatNumber(T2 / T1, 3)
+                      : '—'}
                   </span>
                 </div>
               </div>
@@ -603,6 +672,12 @@ export default function SimuladorPenduloPage() {
             {/* Energía */}
             <div className={styles.energyBox}>
               <h3 className={styles.miniChartTitle}>Energía mecánica (péndulo 1)</h3>
+              {modelo === 'pequeno' && (
+                <p className={styles.formulaCaption}>
+                  En la aproximación lineal, la energía potencial es la del oscilador armónico:
+                  E_p = ½ · m · g · L · θ².
+                </p>
+              )}
               <div className={styles.energyRow}>
                 <span className={styles.energyLabel}>Cinética</span>
                 <div className={styles.energyBarTrack}>
@@ -611,7 +686,7 @@ export default function SimuladorPenduloPage() {
                     style={{ width: `${energiaPctEc}%` }}
                   />
                 </div>
-                <span className={styles.energyValue}>{formatNumber(energias1.Ec, 3)} J</span>
+                <span className={styles.energyValue}>{julios(energias1.Ec)}</span>
               </div>
               <div className={styles.energyRow}>
                 <span className={styles.energyLabel}>Potencial</span>
@@ -621,7 +696,7 @@ export default function SimuladorPenduloPage() {
                     style={{ width: `${energiaPctEp}%` }}
                   />
                 </div>
-                <span className={styles.energyValue}>{formatNumber(energias1.Ep, 3)} J</span>
+                <span className={styles.energyValue}>{julios(energias1.Ep)}</span>
               </div>
               <div className={styles.energyRow}>
                 <span className={styles.energyLabel}>Total</span>
@@ -631,7 +706,7 @@ export default function SimuladorPenduloPage() {
                     style={{ width: `${energiaPctEt}%` }}
                   />
                 </div>
-                <span className={styles.energyValue}>{formatNumber(energias1.Et, 3)} J</span>
+                <span className={styles.energyValue}>{julios(energias1.Et)}</span>
               </div>
             </div>
 
@@ -680,8 +755,11 @@ export default function SimuladorPenduloPage() {
                 </tr>
                 <tr>
                   <td>Frecuencia angular ω</td>
-                  <td>ω = √(g / L) = 2π·f</td>
-                  <td>Velocidad angular del MAS, en rad/s.</td>
+                  <td>ω = 2π·f</td>
+                  <td>
+                    Pulsación de la oscilación, en rad/s. Sin rozamiento y a pequeños ángulos vale
+                    ω₀ = √(g / L), la pulsación natural; con rozamiento baja a √(ω₀² − γ²/4).
+                  </td>
                 </tr>
                 <tr>
                   <td>Posición angular</td>
@@ -753,7 +831,7 @@ export default function SimuladorPenduloPage() {
                 rotacional (mL²) se cancela con el peso (mg) en el par.
               </p>
               <p className={styles.faqTip}>
-                💡 Por eso un péndulo de 1 kg y otro de 100 g con la misma L oscilan al mismo ritmo.
+                <span aria-hidden="true">💡</span> Por eso un péndulo de 1 kg y otro de 100 g con la misma L oscilan al mismo ritmo.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -763,15 +841,19 @@ export default function SimuladorPenduloPage() {
                 y obtenemos un MAS puro con T = 2π√(L/g).
               </p>
               <p className={styles.faqTip}>
-                💡 El error es &lt; 1% para θ₀ &lt; 15° y crece rápido a partir de 30°.
+                <span aria-hidden="true">💡</span> El error es &lt; 1{'\u00A0'}% para θ₀ &lt; 15° y crece rápido a partir de 30°.
               </p>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Qué pasa con la amortiguación?</strong>
               <p>
                 La fricción introduce un término −γ·dθ/dt que disipa energía. La amplitud cae
-                exponencialmente: θ₀(t) = θ₀·e^(−γt/2). El período cambia muy poco salvo en
-                amortiguación crítica.
+                exponencialmente, como e^(−γt/2), y la pulsación baja de ω₀ = √(g/L) a
+                ω_d = √(ω₀² − γ²/4). Con γ pequeño frente a 2ω₀ el período apenas cambia (con
+                γ = 0,05 en la Tierra y L = 1 m, un 0,003{'\u00A0'}% más), pero el efecto crece al
+                acercarse a γ = 2ω₀: con la Luna, L = 5 m y γ = 0,5, el período pasa de 11,04 s a
+                12,29 s. A partir de γ = 2ω₀ (amortiguamiento crítico o sobreamortiguado) el
+                péndulo vuelve a la vertical sin oscilar.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -780,7 +862,9 @@ export default function SimuladorPenduloPage() {
                 Despejando de T = 2π√(L/g) → g = 4π²·L/T². Midiendo L con regla y T con cronómetro
                 (mejor 20 oscilaciones para reducir error humano), se obtiene g con 3 cifras.
               </p>
-              <p className={styles.faqTip}>💡 Es uno de los experimentos clásicos de bachillerato.</p>
+              <p className={styles.faqTip}>
+                <span aria-hidden="true">💡</span> Es uno de los experimentos clásicos de bachillerato.
+              </p>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Qué diferencia hay entre péndulo simple y físico?</strong>
