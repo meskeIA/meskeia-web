@@ -54,7 +54,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     escuchando → ninguna cifra. DESCARTADA: lo que deja el corte con prominencia ≥ 20 dB queda
  *     ≥ 76 dB bajo el tono, y lo que queda a menos de 58 dB no pasa de 5 dB de prominencia.
  *   · SOSPECHA (a) del 29/09, CONFIRMADA: un clic de unos 10 ms se da por «Lectura estable» y
- *     sustituye la retenida (HALLAZGO R1, abajo, con `test.fail()`).
+ *     sustituye la retenida (HALLAZGO R1, id 2615, abajo; nació con `test.fail()` y se REPARÓ el
+ *     mismo 02/10/2026).
  */
 
 const RUTA = '/generador-tonos/';
@@ -731,9 +732,9 @@ test('SOSPECHA (b) DESCARTADA — un 15 Hz que entra y sale en escalón con el m
 });
 
 /**
- * HALLAZGO R1 [medio · cálculo] — ABIERTO (02/10/2026). SOSPECHA (a) del 29/09, CONFIRMADA.
+ * HALLAZGO R1 (id 2615) [medio · cálculo] — REPARADO (02/10/2026). SOSPECHA (a) del 29/09, CONFIRMADA.
  *
- * La app dice que la cifra es ESTABLE «cuando cinco lecturas seguidas coinciden a ±20 cents, que es
+ * La app decía que la cifra es ESTABLE «cuando cinco lecturas seguidas coinciden a ±20 cents, que es
  * lo que separa un tono sostenido de una voz que habla», y la deja retenida («Última lectura
  * estable», con «Llevar la lectura al generador»). Pero cinco lecturas cada 100 ms no son
  * independientes: la ventana de la FFT abarca 16.384 muestras (0,34 s) y el suavizado de 0,5 guarda
@@ -754,11 +755,18 @@ test('SOSPECHA (b) DESCARTADA — un 15 Hz que entra y sale en escalón con el m
  *             segundo 2,5, un clic de 1 kHz que se apaga en ~10 ms (amplitud 0,9, τ = 2 ms)
  *   esperado  la retenida sigue en «432 Hz · La4 (−32 cents)»: el clic no es un tono sostenido
  *   obtenido  «Lectura estable» del clic y retenida «997 Hz · Si5 (+16 cents)»
+ *
+ * REPARACIÓN: lo que un clic no puede imitar es el NIVEL. Cinco lecturas abarcan 0,4 s, más que la
+ * ventana, así que en la última el clic ya ha salido y el suavizado la deja en la mitad de la
+ * anterior (−6 dB); un tono sostenido llena la ventana en todas y su nivel apenas se mueve. La
+ * lectura es estable si además la última no ha caído más de 4 dB desde el máximo de las cinco
+ * (`lecturaSostenida` en app/generador-tonos/motor-medidor.ts, con la simulación que fija los
+ * 4 dB). Se comprueban aquí el caso de la ficha, el golpe de 250 Hz sin tono delante y la cola del
+ * silbido, que seguía «estable» cerca de un segundo después de callar.
  */
-test('HALLAZGO R1 (ABIERTO) — un clic de 10 ms no se da por «Lectura estable» ni sustituye la retenida', async ({
+test('HALLAZGO R1 (REPARADO) — un clic de 10 ms no se da por «Lectura estable» ni sustituye la retenida', async ({
   page,
 }) => {
-  test.fail();
   await medirSintetico(page, {
     segundos: 6,
     fondo: 0.001,
@@ -779,4 +787,33 @@ test('HALLAZGO R1 (ABIERTO) — un clic de 10 ms no se da por «Lectura estable�
     'el clic no puede darse por lectura estable',
   ).toEqual([]);
   await expect(seccion(page).getByText(/Última lectura estable:/)).toContainText(/43[123]\sHz · La4/);
+
+  // La cola: el silbido acaba en el segundo 1,5 del búfer (rampa de 50 ms). La ventana tarda
+  // 0,34 s en vaciarse y la guarda de nivel corta antes; sin ella seguía «estable» ~1 s más. Se
+  // pide que deje de serlo antes de 1,5 + 0,7 s desde que empezó a sonar el búfer.
+  const inicio = await page.evaluate(() => (window as VentanaSenal).__senalPedida ?? 0);
+  const fin432 = r.findIndex((x, i) => i > 0 && r[i - 1].estado === 'Lectura estable' && x.estado !== 'Lectura estable');
+  expect(fin432, 'la lectura estable del silbido tenía que acabar').toBeGreaterThan(0);
+  expect(r[fin432].t - inicio, 'la cola del silbido sigue «estable» demasiado tiempo').toBeLessThan(2200);
+});
+
+test('HALLAZGO R1 (REPARADO) — un golpe de 250 Hz sobre el ruido de la sala no da ninguna lectura estable', async ({
+  page,
+}) => {
+  // El caso del micrófono falso de la ficha (golpe de 250 Hz, τ = 2 ms, fondo a −65 dBFS), aquí con
+  // el búfer sintético: daba «Lectura estable» y retenida «239 Hz · La#3 (+45 cents)» en cada golpe.
+  // Puede asomar una cifra suelta («Leyendo…»): es lo que hay, y no se retiene ni se lleva.
+  await medirSintetico(page, {
+    segundos: 2,
+    fondo: 0.001,
+    semilla: 4242,
+    componentes: [{ tipo: 'golpe', hz: 250, tau: 0.002, amp: 0.9, en: 1 }],
+  });
+  // Dos golpes del bucle (segundos 1 y 3), más el vaciado de la ventana
+  await esperarDesdeElMicrofono(page, 4000);
+  const r = await registro(page);
+  expect(r.filter((x) => x.cifra !== '').length, 'el medidor tenía que estar a la vista').toBeGreaterThan(0);
+  expect(r.filter((x) => x.estado === 'Lectura estable').map((x) => x.cifra)).toEqual([]);
+  expect(r.filter((x) => x.retenida !== '').map((x) => x.retenida)).toEqual([]);
+  await expect(page.getByRole('button', { name: 'Llevar la lectura al generador' })).toHaveCount(0);
 });

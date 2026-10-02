@@ -20,11 +20,11 @@ import {
 import {
   picoDominante,
   prominencia,
-  lecturaEstable,
   nivelMaximo,
   RANGO_DINAMICO_BLACKMAN_DB,
 } from '@/lib/calculadoras/frecuenciaDominante';
 import { notaMasCercana, nombreNota } from '@/lib/calculadoras/afinacionInstrumentos';
+import { lecturaSostenida, LECTURAS_ESTABLES, type LecturaMedidor } from './motor-medidor';
 
 interface FrecuenciaPreset {
   nombre: string;
@@ -228,8 +228,10 @@ const MS_LECTURA_MEDIDOR = 100;
  * (tests/frecuencia-dominante-motor.spec.ts): 20 deja margen a los dos lados.
  */
 const PROMINENCIA_MIN_DB = 20;
-/** Lecturas seguidas que tienen que coincidir para dar la cifra por estable: medio segundo. */
-const LECTURAS_ESTABLES = 5;
+/*
+ * Cuántas lecturas tienen que coincidir, y con qué nivel, para dar la cifra por estable: vive en
+ * ./motor-medidor (`LECTURAS_ESTABLES`, `CAIDA_MAXIMA_ESTABLE_DB`), con el porqué del hallazgo 2615.
+ */
 
 /** Hercios medidos, en formato español: con un decimal por debajo de 100 Hz, donde un hercio es mucho. */
 const textoHzMedido = (hz: number) => formatNumber(hz, hz < 100 ? 1 : 0);
@@ -849,7 +851,12 @@ export default function GeneradorTonosPage() {
    * Cada lectura busca el pico del espectro y exige que sobresalga del fondo
    * (`PROMINENCIA_MIN_DB`); si no, no hay cifra, porque el pico más alto de un ruido existe
    * siempre y no significa nada. La cifra se da por ESTABLE cuando cinco lecturas seguidas
-   * coinciden a ±20 cents, que es lo que separa un tono sostenido de una voz que habla.
+   * coinciden a ±20 cents, que es lo que separa un tono sostenido de una voz que habla, Y el nivel
+   * del pico no se está apagando (no ha caído más de 4 dB en la última frente al máximo de las
+   * cinco), que es lo que separa un tono sostenido de un clic: cinco lecturas cada 100 ms no
+   * prueban medio segundo de sonido, porque la ventana de 0,34 s y el suavizado mantienen el pico
+   * de un golpe de 10 ms durante unas ocho (hallazgo 2615). En la práctica pide unos 0,3 s de
+   * sonido sostenido. El criterio y sus cifras, en `lecturaSostenida` (./motor-medidor).
    */
   const iniciarMedidor = useCallback(async () => {
     if (medidorRef.current || abriendoMedidorRef.current || midiendo) return;
@@ -917,7 +924,7 @@ export default function GeneradorTonosPage() {
     analizador.smoothingTimeConstant = 0.5;
     ctx.createMediaStreamSource(stream).connect(analizador);
     const espectro = new Float32Array(analizador.frequencyBinCount);
-    const ventana: number[] = [];
+    const ventana: LecturaMedidor[] = [];
     /*
      * Hasta que la ventana del análisis (16.384 muestras, 0,34-0,37 s) no está llena de audio del
      * micrófono, mezcla el silencio de antes de abrirlo: lo que analiza es un sonido CORTADO, cuyo
@@ -948,9 +955,10 @@ export default function GeneradorTonosPage() {
         setLecturaEsEstable(false);
         return;
       }
-      ventana.push(pico.frecuencia);
+      // Con su NIVEL: la frecuencia sola no distingue un tono de un clic (hallazgo 2615)
+      ventana.push({ frecuencia: pico.frecuencia, nivel: pico.nivel });
       if (ventana.length > LECTURAS_ESTABLES) ventana.shift();
-      const estable = lecturaEstable(ventana, LECTURAS_ESTABLES);
+      const estable = lecturaSostenida(ventana);
       setLecturaHz(estable ?? pico.frecuencia);
       setLecturaEsEstable(estable !== null);
       // La retenida solo cambia si el tono se mueve más de 10 cents: vive en una región
@@ -1343,7 +1351,9 @@ export default function GeneradorTonosPage() {
             </li>
             <li>
               Si hay varios sonidos a la vez o el sonido cambia sin parar, la cifra salta y no llega a
-              «estable». El micrófono de un móvil capta peor los graves más profundos y los agudos
+              «estable». Tampoco un golpe o un clic, aunque suene a una nota: «estable» pide medio
+              segundo a la misma frecuencia con un sonido que no se esté apagando, así que la última
+              lectura estable de un tono no la sustituye un toque en la mesa. El micrófono de un móvil capta peor los graves más profundos y los agudos
               extremos: ahí puede no leer nada. Para ver todas las frecuencias a la vez está el{' '}
               <Link href="/analizador-espectro/">analizador de espectro</Link>.
             </li>
