@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora SWOLF — Eficiencia en Natación | meskeIA',
   description:
-    'Calcula tu índice SWOLF para medir la eficiencia en el agua. Combina tiempo y brazadas por largo para mejorar tu técnica de natación. Compatible con piscinas de 25m y 50m.',
+    'Calcula tu índice SWOLF para medir la eficiencia en el agua. Combina tiempo y brazadas por largo para mejorar tu técnica de natación. Compatible con piscinas de 25 m y 50 m.',
   keywords: 'SWOLF natación, eficiencia natación, índice SWOLF, brazadas por largo, técnica natación, velocidad natación, calculadora natación',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Calculadora SWOLF — Eficiencia en Natación | meskeIA',
     description:
-      'Calcula tu índice SWOLF y descubre tu nivel de eficiencia en natación. Compatible con piscinas de 25m y 50m.',
+      'Calcula tu índice SWOLF y descubre tu nivel de eficiencia en natación. Compatible con piscinas de 25 m y 50 m.',
     images: ['https://meskeia.com/og-image.png'],
   },
   other: {
@@ -49,9 +49,9 @@ export const jsonLd = generateWebAppSchema({
   features: [
     'Índice SWOLF de eficiencia en natación',
     'Clasificación por nivel: élite, avanzado, intermedio y principiante',
-    'Velocidad media en min/100m',
+    'Velocidad media en min/100 m',
     'Consejos de mejora técnica personalizados según el nivel',
-    'Compatible con piscinas de 25m y 50m',
+    'Compatible con piscinas de 25 m y 50 m, con los cortes de nivel ajustados a la longitud del largo',
   ],
 });
 
@@ -72,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Qué valores de SWOLF se consideran buenos para un nadador aficionado?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En piscina de 25 m, valores SWOLF hasta 25 son propios de nadadores élite, entre 26 y 30 corresponden a nivel avanzado, entre 31 y 38 a nivel intermedio y por encima de 38 a principiante. En piscina de 50 m los umbrales suben 8 puntos (hasta 33 élite, hasta 38 avanzado, hasta 46 intermedio, por encima principiante) para reflejar la mayor distancia. Lo importante es la tendencia: un SWOLF que baja con el tiempo indica mejora técnica real, independientemente del valor absoluto.',
+        text: 'En piscina de 25 m, valores SWOLF hasta 25 son propios de nadadores élite, por encima de 25 y hasta 30 corresponden a nivel avanzado, hasta 38 a nivel intermedio y por encima de 38 a principiante. En piscina de 50 m el largo mide el doble, así que los umbrales se duplican (hasta 50 élite, hasta 60 avanzado, hasta 76 intermedio, por encima principiante). Son cortes orientativos para crol: no existe una escala oficial de SWOLF. Lo importante es la tendencia: un SWOLF que baja con el tiempo indica mejora técnica real, independientemente del valor absoluto.',
       },
     },
     {
@@ -80,7 +80,7 @@ export const faqJsonLd = {
       name: '¿En qué se diferencia el SWOLF de otras métricas de natación como las SPL o el ritmo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las SPL (strokes per length, brazadas por largo) miden solo la eficiencia del movimiento sin tener en cuenta la velocidad. El ritmo (min/100m) mide solo la velocidad sin considerar la técnica. El SWOLF combina ambas dimensiones: penaliza tanto nadar muy despacio como usar demasiadas brazadas. Por eso es útil para detectar si una mejora de velocidad se logra a costa de un aumento de brazadas, lo que puede indicar técnica deficiente.',
+        text: 'Las SPL (strokes per length, brazadas por largo) miden solo la eficiencia del movimiento sin tener en cuenta la velocidad. El ritmo (min/100 m) mide solo la velocidad sin considerar la técnica. El SWOLF combina ambas dimensiones: penaliza tanto nadar muy despacio como usar demasiadas brazadas. Por eso es útil para detectar si una mejora de velocidad se logra a costa de un aumento de brazadas, lo que puede indicar técnica deficiente.',
       },
     },
     {

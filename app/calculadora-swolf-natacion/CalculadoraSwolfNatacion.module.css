@@ -92,6 +92,29 @@
   color: var(--text-muted);
 }
 
+.numberInput[aria-invalid='true'] {
+  border-color: #b91c1c;
+}
+
+/* Región viva del aviso de entradas: vacía cuando todo está en rango. Rojo oscuro para
+   texto pequeño: #B91C1C da 6,2:1 sobre la tarjeta blanca; en oscuro, #FCA5A5. */
+.avisoEntradas {
+  color: #b91c1c;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.avisoEntradas p {
+  margin: 0.25rem 0 0;
+}
+
+.sinResultado {
+  margin: 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
 /* ─── Selector piscina ───────────────────────────────────────────────────── */
 
 .selectorPiscina {
@@ -113,12 +136,14 @@
 
 .piscinaBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
+/* Blanco sobre --primary-boton (5,47:1 en los dos temas). Con var(--primary) era 4,11:1 en
+   claro y 2,79:1 en oscuro, donde --primary se aclara (hallazgo 2634). */
 .piscinaBtnActive {
-  border-color: var(--primary) !important;
-  background: var(--primary) !important;
+  border-color: var(--primary-boton) !important;
+  background: var(--primary-boton) !important;
   color: #fff !important;
 }
 
@@ -195,7 +220,7 @@
 
 .principiante {
   background: #f3f4f6;
-  color: #6b7280;
+  color: #4b5563; /* 6,87:1 sobre #F3F4F6; #6B7280 daba 4,39:1 (hallazgo 2633) */
   border: 1.5px solid #d1d5db;
 }
 
@@ -248,7 +273,7 @@
 .consejoTitulo {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto); /* var(--secondary) daba 2,68:1 en claro (hallazgo 2633) */
   display: block;
   margin-bottom: 0.2rem;
   text-transform: uppercase;
@@ -307,12 +332,19 @@
   font-weight: 800;
 }
 
+.referenciaNota {
+  margin: 0.8rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
 /* ─── Sección educativa ──────────────────────────────────────────────────── */
 
 .eduSubtitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto); /* var(--primary) daba 3,77:1 en claro (hallazgo 2633) */
   margin: 1.5rem 0 0.6rem;
 }
 
@@ -387,7 +419,7 @@
   width: 28px;
   height: 28px;
   flex-shrink: 0;
-  background: var(--primary);
+  background: var(--primary-boton); /* blanco encima: 5,47:1 en los dos temas (hallazgo 2634) */
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -475,7 +507,7 @@
 
 .faqTip {
   font-size: 0.82rem !important;
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important; /* var(--secondary) daba 2,68:1 (hallazgo 2633) */
   font-style: italic;
 }
 
@@ -578,7 +610,15 @@
 
 [data-theme='dark'] .piscinaBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
+}
+
+[data-theme='dark'] .avisoEntradas {
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .numberInput[aria-invalid='true'] {
+  border-color: #f87171;
 }
 
 [data-theme='dark'] .consejoBox {

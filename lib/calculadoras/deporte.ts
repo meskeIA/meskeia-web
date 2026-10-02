@@ -548,8 +548,28 @@ export function calcularPaceRunning(
 
 export type NivelSWOLF = 'elite' | 'avanzado' | 'intermedio' | 'principiante';
 
+/**
+ * Cortes de nivel del SWOLF en piscina de 25 m (bordes inclusivos). Orientativos: no existe
+ * una escala oficial de SWOLF. En otra piscina se clasifica con el equivalente por 25 m.
+ */
+export const CORTES_SWOLF_25 = { elite: 25, avanzado: 30, intermedio: 38 } as const;
+
+/**
+ * Rangos admitidos POR CADA 25 m de largo; en 50 m se multiplican por 2. Un largo de 25 m en
+ * menos de 5 s (5 m/s, por encima del récord mundial) o con 0 brazadas no describe a nadie,
+ * y hasta el 02/10/2026 recibía «Élite» (hallazgo 2632).
+ */
+export const RANGO_TIEMPO_SWOLF_POR_25 = { min: 5, max: 300 } as const;
+export const RANGO_BRAZADAS_SWOLF_POR_25 = { min: 1, max: 100 } as const;
+
+/** Longitudes de piscina admitidas. */
+export const PISCINAS_SWOLF = [25, 50] as const;
+
 export interface ResultadoSWOLF {
+  /** Segundos + brazadas por largo, a la décima. */
   swolf: number;
+  /** El mismo SWOLF expresado por 25 m de largo (en 50 m, la mitad): el que decide el nivel. */
+  swolfEquivalente25: number;
   nivel: NivelSWOLF;
   eficiencia: string;
   descripcionNivel: string;
@@ -558,42 +578,60 @@ export interface ResultadoSWOLF {
   velocidadMedia_min100m: string;
 }
 
+/**
+ * SWOLF y nivel orientativo.
+ *
+ * ⚠️ 02/10/2026 — hallazgo 2631 (alto): hasta hoy los cortes de 50 m eran los de 25 m + 8
+ * (élite ≤ 33). Pero SWOLF suma segundos y brazadas POR LARGO, y en 50 m el largo mide el
+ * doble: a igual ritmo y mismas brazadas por metro el SWOLF es exactamente el doble
+ * (25 m · 22 s · 16 = 38; 50 m · 44 s · 32 = 76). Con el +8, el mismo nadador bajaba de
+ * Intermedio a Principiante por cambiar de piscina. Ahora se clasifica con el equivalente por
+ * 25 m (SWOLF ÷ metros/25). Es el mínimo que da la geometría: sin el impulso de un viraje, el
+ * real en 50 m sale algo por encima, y cerca de un corte la clasificación es conservadora.
+ * La app, la API de ChatGPT y la tool del MCP comparten este motor.
+ *
+ * @throws RangeError si la piscina no es de 25 o 50 m, o si el tiempo o las brazadas no son
+ *   números dentro de los rangos de RANGO_*_POR_25 escalados a la piscina.
+ */
 export function calcularSWOLF(
   tiempo_s_largo: number,
   brazadas_largo: number,
   metros_largo: number = 25,
 ): ResultadoSWOLF {
-  // Hoy la UI ya exige n>0 antes de llamar al motor, pero sin este backstop
-  // tiempo_s_largo=0 da velocidadMedia_m_s = Infinity si se reutiliza desde otro sitio.
-  if (!Number.isFinite(tiempo_s_largo) || tiempo_s_largo <= 0) {
-    throw new Error('El tiempo del largo debe ser un número mayor que 0 segundos.');
+  if (!(PISCINAS_SWOLF as readonly number[]).includes(metros_largo)) {
+    throw new RangeError('La piscina debe ser de 25 o de 50 metros.');
   }
-  if (!Number.isFinite(brazadas_largo) || brazadas_largo <= 0) {
-    throw new Error('Las brazadas por largo deben ser un número mayor que 0.');
+  const factor = metros_largo / 25;
+  const tMin = RANGO_TIEMPO_SWOLF_POR_25.min * factor;
+  const tMax = RANGO_TIEMPO_SWOLF_POR_25.max * factor;
+  const bMin = RANGO_BRAZADAS_SWOLF_POR_25.min * factor;
+  const bMax = RANGO_BRAZADAS_SWOLF_POR_25.max * factor;
+  if (!Number.isFinite(tiempo_s_largo) || tiempo_s_largo < tMin || tiempo_s_largo > tMax) {
+    throw new RangeError(`En piscina de ${metros_largo} m, el tiempo por largo debe estar entre ${tMin} y ${tMax} segundos.`);
+  }
+  if (!Number.isFinite(brazadas_largo) || brazadas_largo < bMin || brazadas_largo > bMax) {
+    throw new RangeError(`En piscina de ${metros_largo} m, las brazadas por largo deben estar entre ${bMin} y ${bMax}.`);
   }
 
-  const swolf = tiempo_s_largo + brazadas_largo;
-
-  // Umbrales ajustados por longitud de piscina
-  const ajuste = metros_largo === 50 ? 8 : 0;
-  const elite       = 25 + ajuste;
-  const avanzado    = 30 + ajuste;
-  const intermedio  = 38 + ajuste;
+  // Se clasifica la cifra que se MUESTRA (a la décima), para que un 38,04 que se lee «38» no
+  // caiga en el nivel de un 39. Dividir entre 1 o 2 es exacto en coma flotante.
+  const swolf = Math.round((tiempo_s_largo + brazadas_largo) * 10) / 10;
+  const swolfEquivalente25 = swolf / factor;
 
   let nivel: NivelSWOLF;
   let eficiencia: string;
   let descripcionNivel: string;
   let consejo: string;
 
-  if (swolf <= elite) {
+  if (swolfEquivalente25 <= CORTES_SWOLF_25.elite) {
     nivel = 'elite'; eficiencia = 'Excelente';
     descripcionNivel = 'Eficiencia de nadador avanzado o competitivo';
     consejo = 'Mantén la técnica y trabaja la resistencia para bajar tiempos.';
-  } else if (swolf <= avanzado) {
+  } else if (swolfEquivalente25 <= CORTES_SWOLF_25.avanzado) {
     nivel = 'avanzado'; eficiencia = 'Buena';
     descripcionNivel = 'Técnica consolidada con margen de mejora';
     consejo = 'Trabaja la planada y el agarre para reducir brazadas por largo.';
-  } else if (swolf <= intermedio) {
+  } else if (swolfEquivalente25 <= CORTES_SWOLF_25.intermedio) {
     nivel = 'intermedio'; eficiencia = 'En desarrollo';
     descripcionNivel = 'Nadador con base, técnica mejorable';
     consejo = 'Practica drills de técnica (catch-up, dedos al suelo). Menos brazadas con más propulsión.';
@@ -604,13 +642,16 @@ export function calcularSWOLF(
   }
 
   const velocidadMedia_m_s = metros_largo / tiempo_s_largo;
-  const segundosPor100m    = 100 / velocidadMedia_m_s;
-  const min100m            = Math.floor(segundosPor100m / 60);
-  const sec100m            = Math.round(segundosPor100m % 60);
-  const velocidadMedia_min100m = `${min100m}:${sec100m.toString().padStart(2, '0')} min/100m`;
+  // Se redondea el TOTAL de segundos antes de partirlo: redondear solo los segundos daba
+  // «0:60» con 14,99 s en 25 m.
+  const totalSeg100m = Math.round((tiempo_s_largo * 100) / metros_largo);
+  const min100m = Math.floor(totalSeg100m / 60);
+  const sec100m = totalSeg100m % 60;
+  const velocidadMedia_min100m = `${min100m}:${sec100m.toString().padStart(2, '0')} min/100 m`;
 
   return {
     swolf,
+    swolfEquivalente25,
     nivel,
     eficiencia,
     descripcionNivel,

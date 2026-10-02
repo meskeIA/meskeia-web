@@ -1732,16 +1732,25 @@ function crearServidorMCP(): McpServer {
       await registrarUsoMCP('calcular_swolf_natacion', aiCaller);
 
       const metrosPiscina = metros_largo ?? 25;
-      const r = calcularSWOLF(tiempo_s_largo, brazadas_largo, metrosPiscina);
+      let r: ReturnType<typeof calcularSWOLF>;
+      try {
+        r = calcularSWOLF(tiempo_s_largo, brazadas_largo, metrosPiscina);
+      } catch (e) {
+        if (e instanceof RangeError) {
+          return { content: [{ type: 'text', text: `No se puede calcular el SWOLF: ${e.message}` }], isError: true };
+        }
+        throw e;
+      }
 
       const nivelEmoji: Record<string, string> = {
         elite: '🥇', avanzado: '🥈', intermedio: '🥉', principiante: '🎽',
       };
 
       const lineas = [
-        `🏊 **SWOLF — Eficiencia en Natación (piscina ${metrosPiscina}m)**`,
+        `🏊 **SWOLF — Eficiencia en Natación (piscina ${metrosPiscina} m)**`,
         ``,
-        `📊 **${tiempo_s_largo}s + ${brazadas_largo} brazadas = SWOLF ${r.swolf}**`,
+        `📊 **${tiempo_s_largo} s + ${brazadas_largo} brazadas = SWOLF ${r.swolf}**` +
+          (metrosPiscina === 50 ? ` (equivale a ${r.swolfEquivalente25} por cada 25 m, que es lo que decide el nivel)` : ''),
         `${nivelEmoji[r.nivel]} **Nivel: ${r.eficiencia}** — ${r.descripcionNivel}`,
         `⚡ Velocidad: ${r.velocidadMedia_min100m}`,
         ``,

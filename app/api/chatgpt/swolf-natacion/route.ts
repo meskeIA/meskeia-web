@@ -40,7 +40,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const r = calcularSWOLF(tiempo_s_largo, brazadas_largo, metros_largo);
+    // El motor rechaza con RangeError lo que no describe a un nadador (hallazgo 2632): se
+    // devuelve el motivo con un 400, no un 500 mudo.
+    let r: ReturnType<typeof calcularSWOLF>;
+    try {
+      r = calcularSWOLF(tiempo_s_largo, brazadas_largo, metros_largo);
+    } catch (e) {
+      if (e instanceof RangeError) {
+        return NextResponse.json({ error: e.message }, { status: 400, headers: corsHeaders(origin) });
+      }
+      throw e;
+    }
 
     try {
       await initializeDatabase();
@@ -56,6 +66,7 @@ export async function POST(req: NextRequest) {
       brazadas_largo,
       metros_largo,
       swolf: r.swolf,
+      swolf_equivalente_25m: r.swolfEquivalente25,
       nivel: r.nivel,
       eficiencia: r.eficiencia,
       descripcion: r.descripcionNivel,

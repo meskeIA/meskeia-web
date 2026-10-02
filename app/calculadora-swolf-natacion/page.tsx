@@ -10,45 +10,122 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { calcularSWOLF } from '@/lib/calculadoras/deporte';
+import {
+  calcularSWOLF,
+  CORTES_SWOLF_25,
+  RANGO_TIEMPO_SWOLF_POR_25,
+  RANGO_BRAZADAS_SWOLF_POR_25,
+} from '@/lib/calculadoras/deporte';
 import type { ResultadoSWOLF } from '@/lib/calculadoras/deporte';
 import styles from './CalculadoraSwolfNatacion.module.css';
 
 type MetrosPiscina = 25 | 50;
 
+/**
+ * Cortes de nivel en piscina de 25 m (bordes inclusivos) y rangos admitidos por cada 25 m de
+ * largo: los del motor, que comparten la API y el MCP. Aquí rotulan la caja de rangos, la
+ * tabla de la guía y los avisos. Orientativos: no existe una escala oficial de SWOLF.
+ */
+const CORTES_25 = CORTES_SWOLF_25;
+const TIEMPO_POR_25 = RANGO_TIEMPO_SWOLF_POR_25;
+const BRAZADAS_POR_25 = RANGO_BRAZADAS_SWOLF_POR_25;
+
+interface Lectura {
+  valor: number | null;
+  aviso: string | null;
+}
+
+/**
+ * Lee un campo de texto con `parseSpanishNumber` y lo acota a su rango.
+ *
+ * Hasta el 02/10/2026 los campos eran `type="number"` con estado numérico, `parseInt` y
+ * «solo se guarda si n > 0». Lo que el navegador entrega vacío a media escritura (campo
+ * borrado, «-», «22.») no cambiaba el estado, React reescribía el último valor válido con el
+ * cursor al final y lo siguiente que se tecleaba se CONCATENABA: borrar «20» y teclear «45»
+ * daba 245 s (hallazgo 2630). Y los rangos que declaraban los campos no se hacían cumplir:
+ * 2 s recibían «Élite» (hallazgo 2632). Ahora el campo guarda el TEXTO tal cual y, si no es
+ * un número dentro de rango, hay aviso y ningún veredicto.
+ */
+function leerCampo(
+  texto: string,
+  rango: { min: number; max: number },
+  textos: { falta: string; noNumero: string; fueraDeRango: string },
+): Lectura {
+  if (texto.trim() === '') return { valor: null, aviso: textos.falta };
+  const n = parseSpanishNumber(texto);
+  if (!Number.isFinite(n)) return { valor: null, aviso: textos.noNumero };
+  if (n < rango.min || n > rango.max) return { valor: null, aviso: textos.fueraDeRango };
+  return { valor: n, aviso: null };
+}
+
+/** SWOLF a la décima, sin decimales si es entero («38», «38,5»). */
+function formatearSwolf(x: number): string {
+  return formatNumber(x, Number.isInteger(x) ? 0 : 1);
+}
+
 export default function CalculadoraSwolfNatacionPage() {
-  const [tiempoSegundos, setTiempoSegundos] = useState<number>(20);
-  const [brazadas, setBrazadas] = useState<number>(18);
+  const [tiempoTexto, setTiempoTexto] = useState<string>('20');
+  const [brazadasTexto, setBrazadasTexto] = useState<string>('18');
   const [metrosPiscina, setMetrosPiscina] = useState<MetrosPiscina>(25);
 
-  const resultado: ResultadoSWOLF = useMemo(
-    () => calcularSWOLF(tiempoSegundos, brazadas, metrosPiscina),
-    [tiempoSegundos, brazadas, metrosPiscina],
+  // Cuántos largos de 25 m caben en uno de esta piscina
+  const factor = metrosPiscina / 25;
+
+  const tiempo = leerCampo(
+    tiempoTexto,
+    { min: TIEMPO_POR_25.min * factor, max: TIEMPO_POR_25.max * factor },
+    {
+      falta: 'Escribe el tiempo del largo en segundos.',
+      noNumero: 'El tiempo debe ser un número de segundos (por ejemplo, 22 o 22,5).',
+      fueraDeRango: `En piscina de ${metrosPiscina} m, el tiempo por largo debe estar entre ${TIEMPO_POR_25.min * factor} y ${TIEMPO_POR_25.max * factor} segundos.`,
+    },
+  );
+  const brazadas = leerCampo(
+    brazadasTexto,
+    { min: BRAZADAS_POR_25.min * factor, max: BRAZADAS_POR_25.max * factor },
+    {
+      falta: 'Escribe las brazadas por largo.',
+      noNumero: 'Las brazadas deben ser un número (por ejemplo, 16, o 16,5 si es la media de varios largos).',
+      fueraDeRango: `En piscina de ${metrosPiscina} m, las brazadas por largo deben estar entre ${BRAZADAS_POR_25.min * factor} y ${BRAZADAS_POR_25.max * factor}.`,
+    },
   );
 
-  const nivelClass = {
-    elite: styles.elite,
-    avanzado: styles.avanzado,
-    intermedio: styles.intermedio,
-    principiante: styles.principiante,
-  }[resultado.nivel];
+  const resultado = useMemo<{ swolf: number; escala: ResultadoSWOLF; ritmo: string } | null>(() => {
+    if (tiempo.valor === null || brazadas.valor === null) return null;
+    // El motor clasifica con el SWOLF a la décima y su equivalente por 25 m: en 50 m el largo
+    // mide el doble y, a igual ritmo y mismas brazadas por metro, el SWOLF es el doble
+    // (25 m · 22 s · 16 = 38; 50 m · 44 s · 32 = 76). Hasta el 02/10/2026 se sumaban 8 puntos
+    // a los cortes y el mismo nadador bajaba a Principiante por cambiar de piscina (hallazgo
+    // 2631). Los rangos ya los ha comprobado leerCampo, así que el motor no lanza aquí.
+    const escala = calcularSWOLF(tiempo.valor, brazadas.valor, metrosPiscina);
+    return { swolf: escala.swolf, escala, ritmo: escala.velocidadMedia_min100m };
+  }, [tiempo.valor, brazadas.valor, metrosPiscina]);
 
-  const nivelLabel = {
-    elite: 'Élite',
-    avanzado: 'Avanzado',
-    intermedio: 'Intermedio',
-    principiante: 'Principiante',
-  }[resultado.nivel];
+  const nivelClass = resultado
+    ? {
+        elite: styles.elite,
+        avanzado: styles.avanzado,
+        intermedio: styles.intermedio,
+        principiante: styles.principiante,
+      }[resultado.escala.nivel]
+    : '';
 
-  const handleTiempo = (val: string) => {
-    const n = parseInt(val, 10);
-    if (!isNaN(n) && n > 0) setTiempoSegundos(n);
-  };
+  const nivelLabel = resultado
+    ? {
+        elite: 'Élite',
+        avanzado: 'Avanzado',
+        intermedio: 'Intermedio',
+        principiante: 'Principiante',
+      }[resultado.escala.nivel]
+    : '';
 
-  const handleBrazadas = (val: string) => {
-    const n = parseInt(val, 10);
-    if (!isNaN(n) && n > 0) setBrazadas(n);
+  // Cortes de la piscina elegida: los de 25 m multiplicados por la longitud del largo
+  const cortes = {
+    elite: CORTES_25.elite * factor,
+    avanzado: CORTES_25.avanzado * factor,
+    intermedio: CORTES_25.intermedio * factor,
   };
 
   return (
@@ -56,7 +133,7 @@ export default function CalculadoraSwolfNatacionPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🏊 Calculadora SWOLF</h1>
+        <h1><span aria-hidden="true">🏊</span> Calculadora SWOLF</h1>
         <p>Mide tu eficiencia en el agua combinando tiempo y brazadas por largo</p>
       </header>
 
@@ -66,8 +143,8 @@ export default function CalculadoraSwolfNatacionPage() {
         <div className={styles.calculadora}>
           {/* Selector de piscina */}
           <div className={styles.inputGroup}>
-            <label className={styles.inputLabel}>Longitud de la piscina</label>
-            <div className={styles.selectorPiscina} role="group" aria-label="Seleccionar longitud de piscina">
+            <span className={styles.inputLabel} id="piscina-label">Longitud de la piscina</span>
+            <div className={styles.selectorPiscina} role="group" aria-labelledby="piscina-label">
               <button
                 type="button"
                 className={`${styles.piscinaBtn} ${metrosPiscina === 25 ? styles.piscinaBtnActive : ''}`}
@@ -95,20 +172,20 @@ export default function CalculadoraSwolfNatacionPage() {
             <div className={styles.inputRow}>
               <input
                 id="tiempo-input"
-                type="number"
-                min={5}
-                max={300}
-                step={1}
-                value={tiempoSegundos}
-                onChange={(e) => handleTiempo(e.target.value)}
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                value={tiempoTexto}
+                onChange={(e) => setTiempoTexto(e.target.value)}
                 className={styles.numberInput}
-                inputMode="numeric"
-                aria-describedby="tiempo-hint"
+                aria-invalid={tiempo.aviso !== null}
+                aria-describedby="tiempo-hint aviso-entradas"
               />
               <span className={styles.inputUnit}>seg / largo</span>
             </div>
             <span id="tiempo-hint" className={styles.inputHint}>
-              Tiempo desde el impulso del muro hasta tocar el siguiente
+              Desde el impulso del muro hasta tocar el siguiente (entre {TIEMPO_POR_25.min * factor} y{' '}
+              {TIEMPO_POR_25.max * factor} s en {metrosPiscina} m)
             </span>
           </div>
 
@@ -120,21 +197,28 @@ export default function CalculadoraSwolfNatacionPage() {
             <div className={styles.inputRow}>
               <input
                 id="brazadas-input"
-                type="number"
-                min={1}
-                max={100}
-                step={1}
-                value={brazadas}
-                onChange={(e) => handleBrazadas(e.target.value)}
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                value={brazadasTexto}
+                onChange={(e) => setBrazadasTexto(e.target.value)}
                 className={styles.numberInput}
-                inputMode="numeric"
-                aria-describedby="brazadas-hint"
+                aria-invalid={brazadas.aviso !== null}
+                aria-describedby="brazadas-hint aviso-entradas"
               />
               <span className={styles.inputUnit}>brazadas</span>
             </div>
             <span id="brazadas-hint" className={styles.inputHint}>
-              Cuenta solo los ciclos completos de brazada, sin contar el impulso de salida
+              Solo ciclos completos, sin contar el impulso de salida (entre{' '}
+              {BRAZADAS_POR_25.min * factor} y {BRAZADAS_POR_25.max * factor} en {metrosPiscina} m)
             </span>
+          </div>
+
+          {/* Región viva PERSISTENTE: existe siempre para que el lector de pantalla anuncie el
+              aviso cuando aparece (una región que nace con el texto no se anuncia). */}
+          <div id="aviso-entradas" className={styles.avisoEntradas} role="status" aria-live="polite">
+            {tiempo.aviso && <p>{tiempo.aviso}</p>}
+            {brazadas.aviso && <p>{brazadas.aviso}</p>}
           </div>
         </div>
 
@@ -142,34 +226,44 @@ export default function CalculadoraSwolfNatacionPage() {
         <div className={styles.resultadoPanel} aria-live="polite">
           <div className={styles.swolfScoreWrapper}>
             <span className={styles.swolfLabel}>Índice SWOLF</span>
-            <span className={styles.swolfScore}>{resultado.swolf}</span>
-            <span className={`${styles.nivelBadge} ${nivelClass}`} aria-label={`Nivel: ${nivelLabel}`}>
-              {nivelLabel}
-            </span>
+            <span className={styles.swolfScore}>{resultado ? formatearSwolf(resultado.swolf) : '—'}</span>
+            {resultado && (
+              <span className={`${styles.nivelBadge} ${nivelClass}`} aria-label={`Nivel: ${nivelLabel}`}>
+                {nivelLabel}
+              </span>
+            )}
           </div>
 
-          <div className={styles.detalles}>
-            <div className={styles.detalleItem}>
-              <span className={styles.detalleLabel}>Eficiencia</span>
-              <span className={styles.detalleValor}>{resultado.eficiencia}</span>
-            </div>
-            <div className={styles.detalleItem}>
-              <span className={styles.detalleLabel}>Velocidad media</span>
-              <span className={styles.detalleValor}>{resultado.velocidadMedia_min100m}</span>
-            </div>
-            <div className={styles.detalleItem}>
-              <span className={styles.detalleLabel}>Descripción</span>
-              <span className={styles.detalleValor}>{resultado.descripcionNivel}</span>
-            </div>
-          </div>
+          {!resultado ? (
+            <p className={styles.sinResultado}>
+              Corrige los datos marcados arriba para ver tu índice y tu nivel.
+            </p>
+          ) : (
+            <>
+              <div className={styles.detalles}>
+                <div className={styles.detalleItem}>
+                  <span className={styles.detalleLabel}>Eficiencia</span>
+                  <span className={styles.detalleValor}>{resultado.escala.eficiencia}</span>
+                </div>
+                <div className={styles.detalleItem}>
+                  <span className={styles.detalleLabel}>Velocidad media</span>
+                  <span className={styles.detalleValor}>{resultado.ritmo}</span>
+                </div>
+                <div className={styles.detalleItem}>
+                  <span className={styles.detalleLabel}>Descripción</span>
+                  <span className={styles.detalleValor}>{resultado.escala.descripcionNivel}</span>
+                </div>
+              </div>
 
-          <div className={styles.consejoBox} role="note" aria-label="Consejo de mejora">
-            <span className={styles.consejoIcon} aria-hidden="true">💡</span>
-            <div>
-              <strong className={styles.consejoTitulo}>Consejo para mejorar</strong>
-              <p className={styles.consejoTexto}>{resultado.consejo}</p>
-            </div>
-          </div>
+              <div className={styles.consejoBox} role="note" aria-label="Consejo de mejora">
+                <span className={styles.consejoIcon} aria-hidden="true">💡</span>
+                <div>
+                  <strong className={styles.consejoTitulo}>Consejo para mejorar</strong>
+                  <p className={styles.consejoTexto}>{resultado.escala.consejo}</p>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Referencia de rangos */}
@@ -180,21 +274,27 @@ export default function CalculadoraSwolfNatacionPage() {
           <div className={styles.rangosGrid}>
             <div className={`${styles.rangoItem} ${styles.elite}`}>
               <span className={styles.rangoNivel}>Élite</span>
-              <span className={styles.rangoValor}>≤ {metrosPiscina === 25 ? 25 : 33}</span>
+              <span className={styles.rangoValor}>≤ {cortes.elite}</span>
             </div>
             <div className={`${styles.rangoItem} ${styles.avanzado}`}>
               <span className={styles.rangoNivel}>Avanzado</span>
-              <span className={styles.rangoValor}>{metrosPiscina === 25 ? '26–30' : '34–38'}</span>
+              <span className={styles.rangoValor}>≤ {cortes.avanzado}</span>
             </div>
             <div className={`${styles.rangoItem} ${styles.intermedio}`}>
               <span className={styles.rangoNivel}>Intermedio</span>
-              <span className={styles.rangoValor}>{metrosPiscina === 25 ? '31–38' : '39–46'}</span>
+              <span className={styles.rangoValor}>≤ {cortes.intermedio}</span>
             </div>
             <div className={`${styles.rangoItem} ${styles.principiante}`}>
               <span className={styles.rangoNivel}>Principiante</span>
-              <span className={styles.rangoValor}>{metrosPiscina === 25 ? '> 38' : '> 46'}</span>
+              <span className={styles.rangoValor}>&gt; {cortes.intermedio}</span>
             </div>
           </div>
+          <p className={styles.referenciaNota}>
+            Cada nivel empieza donde acaba el anterior. Son cortes orientativos para crol: no
+            existe una escala oficial de SWOLF.
+            {metrosPiscina === 50 &&
+              ' En 50 m son el doble que en 25 m, porque el largo mide el doble.'}
+          </p>
         </div>
 
         <EducationalSection
@@ -240,7 +340,7 @@ export default function CalculadoraSwolfNatacionPage() {
                 <strong>Para el cronómetro al tocar el muro</strong>
                 <p>
                   Registra el tiempo en segundos. Para mayor precisión, haz 3-5 largos
-                  y calcula la media.
+                  y calcula la media: la calculadora admite decimales (22,5 s, 16,5 brazadas).
                 </p>
               </div>
             </div>
@@ -280,38 +380,43 @@ export default function CalculadoraSwolfNatacionPage() {
               <tbody>
                 <tr>
                   <td>Élite</td>
-                  <td>≤ 25</td>
-                  <td>≤ 33</td>
-                  <td>Nadador competitivo o exentrenado de alto nivel</td>
+                  <td>≤ {CORTES_25.elite}</td>
+                  <td>≤ {CORTES_25.elite * 2}</td>
+                  <td>Nadador de competición de alto nivel, en activo o retirado</td>
                 </tr>
                 <tr>
                   <td>Avanzado</td>
-                  <td>26–30</td>
-                  <td>34–38</td>
+                  <td>≤ {CORTES_25.avanzado}</td>
+                  <td>≤ {CORTES_25.avanzado * 2}</td>
                   <td>Nadador federado o con años de práctica técnica</td>
                 </tr>
                 <tr>
                   <td>Intermedio</td>
-                  <td>31–38</td>
-                  <td>39–46</td>
+                  <td>≤ {CORTES_25.intermedio}</td>
+                  <td>≤ {CORTES_25.intermedio * 2}</td>
                   <td>Nadador recreacional con base técnica aceptable</td>
                 </tr>
                 <tr>
                   <td>Principiante</td>
-                  <td>&gt; 38</td>
-                  <td>&gt; 46</td>
+                  <td>&gt; {CORTES_25.intermedio}</td>
+                  <td>&gt; {CORTES_25.intermedio * 2}</td>
                   <td>Aprendizaje técnico en curso</td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <p className={styles.guideParagraph}>
+            Cada nivel empieza donde acaba el anterior (un 27 en 25 m es Avanzado). Los cortes
+            son orientativos para crol: no hay una escala oficial de SWOLF, y sirven sobre todo
+            para seguir tu propia evolución.
+          </p>
 
           <h3 className={styles.eduSubtitle}>Cómo mejorar el índice SWOLF</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <h4><span aria-hidden="true">⬇️</span> Reducir brazadas</h4>
               <p>
-                Trabaja la deslizamiento y el planeado entre brazadas. Ejercicios como
+                Trabaja el deslizamiento y el planeado entre brazadas. Ejercicios como
                 el <em>catch-up</em> (esperar a que el brazo avanzado llegue a la cadera
                 antes de iniciar la siguiente brazada) aumentan la longitud por ciclo.
               </p>
@@ -342,30 +447,32 @@ export default function CalculadoraSwolfNatacionPage() {
 
           <h3 className={styles.eduSubtitle}>Diferencias entre piscinas de 25 m y 50 m</h3>
           <p className={styles.guideParagraph}>
-            La piscina de <strong>50 m (larga)</strong> elimina dos virajes por cada 100 m
-            frente a la de <strong>25 m (corta)</strong>. Esto tiene dos consecuencias para
-            el SWOLF:
+            El SWOLF suma segundos y brazadas <strong>por largo</strong>, y el largo de la
+            piscina de <strong>50 m (larga)</strong> mide el doble que el de la de{' '}
+            <strong>25 m (corta)</strong>. Eso cambia la escala:
           </p>
           <ul className={styles.guideList}>
             <li>
-              <strong>Más brazadas por largo</strong>: un largo de 50 m exige más ciclos de
-              brazada que dos largos de 25 m juntos, porque sin los virajes (que generan
-              impulso) hay que mantener la propulsión más tiempo.
+              <strong>Más brazadas por largo</strong>: un largo de 50 m exige al menos el doble
+              de brazadas que uno de 25 m, y algo más, porque sin el viraje de la mitad falta el
+              impulso del muro.
             </li>
             <li>
-              <strong>Más tiempo acumulado</strong>: sin el beneficio del impulso del muro
-              cada 25 m, el tiempo por metro es ligeramente mayor, especialmente en nadadores
-              que aprovechan bien el viraje.
+              <strong>Más tiempo por largo</strong>: el doble de distancia, y un tiempo por metro
+              ligeramente mayor sin ese impulso, sobre todo en quien aprovecha bien el viraje.
             </li>
             <li>
-              <strong>Umbral de élite desplazado</strong>: el SWOLF de referencia es ~8 puntos
-              más alto en 50 m que en 25 m para cada nivel equivalente. Por eso la calculadora
-              ajusta los rangos automáticamente.
+              <strong>Cortes al doble</strong>: a igual ritmo y mismas brazadas por metro, el
+              SWOLF de 50 m es el doble (22 s y 16 brazadas en 25 m dan 38; 44 s y 32 brazadas
+              en 50 m dan 76). Por eso la calculadora duplica los cortes en 50 m. Como el SWOLF
+              real en piscina larga suele salir algo por encima del doble, cerca de un corte la
+              clasificación en 50 m es conservadora.
             </li>
           </ul>
           <p className={styles.guideParagraph}>
-            En competición, los tiempos en piscina corta suelen ser 1,5–3% más rápidos que
-            en piscina larga, lo que se refleja en el SWOLF si mides en ambos entornos.
+            En competición, las marcas en piscina corta suelen ser más rápidas que en piscina
+            larga por los virajes adicionales. Compara siempre tu SWOLF con mediciones hechas
+            en la misma piscina.
           </p>
 
           <h3 className={styles.eduSubtitle}>Preguntas frecuentes</h3>
@@ -397,9 +504,9 @@ export default function CalculadoraSwolfNatacionPage() {
                 deslizamiento.
               </p>
               <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> Los nadadores de élite suelen nadar con más brazadas que los intermedios
-                porque su eficiencia por ciclo es mayor y su velocidad hace que el tiempo
-                compense.
+                <span aria-hidden="true">💡</span> Lo que distingue a un nadador eficiente es que
+                avanza más metros en cada brazada sin perder velocidad: por eso da menos brazadas
+                por largo y, aun así, tarda menos.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -482,12 +589,12 @@ export default function CalculadoraSwolfNatacionPage() {
                 que no reflejan tu capacidad técnica real.
               </li>
               <li>
-                Comparar SWOLF de 25 m con SWOLF de 50 m sin ajuste: los rangos son distintos
-                por el efecto del viraje.
+                Comparar SWOLF de 25 m con SWOLF de 50 m tal cual: el largo de 50 m mide el
+                doble, así que su SWOLF es al menos el doble.
               </li>
               <li>
-                Obsesionarse con reducir solo las brazadas y nadar demasiado lento: un SWOLF bajo
-                por velocidad excesivamente reducida no es el objetivo.
+                Obsesionarse con reducir solo las brazadas hasta nadar demasiado lento: lo que se
+                gana en brazadas se pierde en tiempo, y el SWOLF no mejora.
               </li>
               <li>
                 No considerar el estilo: comparar el SWOLF de crol con el de braza no tiene
