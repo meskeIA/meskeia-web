@@ -44,7 +44,9 @@ export default function CasosAula() {
   const esperado = practica ? practica.respuesta : caso.respuesta;
   const etiqueta = practica ? practica.etiquetaRespuesta : caso.etiquetaRespuesta;
   const pasos = practica ? practica.pasos : caso.pasos;
-  const decimales = (practica ? practica.datos : caso.datos).decimales ?? 2;
+  /** La tolerancia sale de la pregunta (sus datos y el redondeo pedido), no de la cifra: 2626. */
+  const datos = practica ? practica.datos : caso.datos;
+  const decimales = datos.decimales ?? 2;
   /** Solo los casos numerados traen pista: el ejercicio aleatorio no la tiene (1208). */
   const hayPista = !practica && Boolean(caso.pista);
   /** Y solo algunos se pueden ver con los deslizadores: sin texto no hay botón. */
@@ -74,7 +76,7 @@ export default function CasosAula() {
     // parseSpanishNumber admite «1,05» y «1.05»; devuelve NaN con cualquier otra cosa, y de
     // ese NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
     const valor = parseSpanishNumber(respuesta);
-    const r = comprobarRespuesta(valor, esperado);
+    const r = comprobarRespuesta(valor, esperado, datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 
@@ -89,7 +91,9 @@ export default function CasosAula() {
           puede decir «resuelve los casos 3, 7 y 11» y corregir sin ambigüedad. Se corrigen con el
           mismo modelo que mueve el bloque: se suelta desde x = A con velocidad cero, ω₀ = √(k/m),
           el período es 2π entre la pulsación con la que oscila y el amortiguamiento crítico vale
-          2·√(k·m), con γ en N·s/m. Se acepta un 1 % de margen, así que usar π ≈ 3,14 también vale.
+          2·√(k·m), con γ en N·s/m. Los datos son exactos, así que no hay margen: vale la cifra
+          exacta o, si el enunciado pide redondear, la redondeada como pide. Usa la tecla π de la
+          calculadora y redondea solo al final, nunca un resultado intermedio.
         </p>
       </div>
 

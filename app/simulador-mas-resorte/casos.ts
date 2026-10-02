@@ -36,7 +36,18 @@
  *    Por eso ningún caso pregunta el régimen con una palabra: el caso 11 pide γ_c y el 12, el
  *    período amortiguado, que son números.
  * ⚠️ **Sin gravedad**: la app no es un muelle vertical con g, la línea de equilibrio del lienzo es
- *    la posición de reposo. Ningún caso usa g.
+ *    la posición de reposo. Ningún caso usa g en la CUENTA. El caso 7 (cama elástica) es vertical,
+ *    y con g el MAS es el mismo alrededor del equilibrio con la persona encima; g solo pone una
+ *    condición de verosimilitud: la lona solo empuja, así que «sin despegarse» exige
+ *    ω₀²·A ≤ g (hallazgo 2627, 02/10/2026). Con k/m = 100 s⁻² y A = 0,05 m son 5 m/s².
+ *
+ * ── DATOS QUE DISCRIMINAN (hallazgo 2628, 02/10/2026) ───────────────────────
+ *
+ * Un caso no sirve si su error conceptual típico da la misma cifra que la clave. Por eso no se
+ * usan f = 1 Hz (T = 1/f = f y f² = f: cambiar T por f no se nota), ni β = 1 o m = 1 en el
+ * amortiguado (β² = β y γ/(2m) = γ/2: olvidar el cuadrado o la m no se nota). El caso 5 va con
+ * f = 0,5 Hz y el 12 con m = 0,5 kg y β = 2 s⁻¹; los errores que eso separa están anotados en
+ * cada uno y fijados en el spec.
  */
 
 import { formatNumber } from '@/lib';
@@ -116,6 +127,15 @@ function numero(n: number, decimales = 4): string {
 function redondear(valor: number, decimales: number): number {
   const factor = 10 ** decimales;
   return Math.round(valor * factor) / factor;
+}
+
+/**
+ * ¿La cifra exacta tiene más decimales de los que se piden? Holgura RELATIVA: 315,83 y 0,5 se
+ * juzgan con la misma vara (una absoluta de 1e-9 trataría distinto una cifra grande).
+ */
+export function exigeRedondeo(valor: number, decimales: number): boolean {
+  if (!Number.isFinite(valor)) return false;
+  return Math.abs(redondear(valor, decimales) - valor) > 1e-9 * Math.max(1, Math.abs(valor));
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */
@@ -402,20 +422,41 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
 
   // El último paso muestra la cifra con los MISMOS decimales que pide el enunciado.
   const redondeado = redondear(valor, decimales);
-  const exacto = Math.abs(valor - redondeado) < 1e-9;
   pasos.push(
-    exacto
-      ? `Resultado: ${conUnidad(redondeado, datos)}.`
-      : `Redondeando ${textoRedondeo(decimales)}: ${conUnidad(redondeado, datos)}.`,
+    exigeRedondeo(valor, decimales)
+      ? `Redondeando ${textoRedondeo(decimales)}: ${conUnidad(redondeado, datos)}.`
+      : `Resultado: ${conUnidad(redondeado, datos)}.`,
   );
   return { ok: true, valor, pasos };
 }
 
 /* ─────────────────────────── Corrección ─────────────────────────── */
 
-/** El MAYOR entre 0,01 y el 1 % del valor. */
-export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
+/**
+ * La tolerancia de un caso la da la PREGUNTA, no el tamaño de la cifra (hallazgo 2626,
+ * 02/10/2026). Es el error de lectura de los datos propagado a la respuesta más media unidad del
+ * redondeo pedido; aquí los datos son EXACTOS (nada se lee de una tabla ni de una gráfica), así
+ * que solo queda el redondeo:
+ *
+ *   · si la cifra exacta tiene más decimales de los que se piden, media unidad del último
+ *     decimal pedido: entra todo lo que redondea a la clave (de 315,5 a 316,5 en el caso 4, que
+ *     incluye el 315,83 sin redondear y el 315,51 de usar π ≈ 3,14);
+ *   · si la cifra es exacta, no hay redondeo que tolerar: solo vale ella (γ_c = 100, E = 1 J,
+ *     a_máx = 40 en Practicar).
+ *
+ * Antes era el mayor entre 0,01 y el 1 % de la respuesta, y el 1 % de una cifra no es la escala
+ * de su error: pasaban 99 y 101 por γ_c = 100 exactos, el 315 de truncar 315,83 o 1,04 por
+ * 1,05. Ningún error conceptual caía dentro del 1 %: lo que colaban eran redondeos mal hechos.
+ * Es la forma reparada en simulador-circuitos-electricos (060c1e94), simulador-distribucion-normal
+ * (afdef86f) y simulador-fotografia (794ace00).
+ *
+ * ⚠️ Redondear un paso intermedio puede sacar la respuesta del margen; la intro lo avisa.
+ */
+export function toleranciaDe(datos: DatosCaso): number {
+  const decimales = datos.decimales ?? 2;
+  const r = resolverCaso(datos);
+  if (!r.ok) return 0;
+  return exigeRedondeo(r.valor, decimales) ? 10 ** -decimales / 2 : 0;
 }
 
 export interface Veredicto {
@@ -425,9 +466,12 @@ export interface Veredicto {
   tolerancia: number;
 }
 
-/** Corrige la respuesta del alumno. Nunca lanza. */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
+/**
+ * Corrige la respuesta del alumno. Nunca lanza. Recibe los `datos` del caso porque la
+ * tolerancia depende de la pregunta (ver `toleranciaDe`), no de la cifra.
+ */
+export function comprobarRespuesta(usuario: number, esperado: number, datos: DatosCaso): Veredicto {
+  const tolerancia = toleranciaDe(datos);
 
   if (!Number.isFinite(usuario)) {
     return {
@@ -443,7 +487,8 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
    * Margen de ruido binario (hallazgo 1211 de `simulador-conservacion-energia`): en el borde
    * EXACTO de la tolerancia la resta en coma flotante decide por ±1 ulp, así que la misma
    * desviación se aceptaba por arriba y se rechazaba por abajo. 1e-9 absorbe ese ruido y queda
-   * siete órdenes de magnitud por debajo de la tolerancia más pequeña (0,01).
+   * seis órdenes de magnitud por debajo de la menor tolerancia no nula (0,005); con una
+   * respuesta exacta (tolerancia 0) es lo único que separa 0,3 de 0,30000000000000004.
    */
   const RUIDO_BINARIO = 1e-9;
   if (diferencia <= tolerancia + RUIDO_BINARIO) {
@@ -488,7 +533,8 @@ export interface Caso {
  * que editar un enunciado sin tocar la solución es imposible.
  *
  * Sin ciudades, países ni monedas: más del 90 % de este canal es de fuera de España. Los
- * datos están elegidos para que k/m sea un cuadrado perfecto (ω₀ entero); donde sale π (T, f,
+ * datos están elegidos para que k/m sea un cuadrado perfecto (ω₀ entero; en el caso 12 lo es
+ * ω₀² − β², y ω_d sale entera); donde sale π (T, f,
  * k despejada), el enunciado pide el redondeo y el caso lo marca con `requiereRedondeo`, que se
  * calcula comparando la respuesta exacta con la redondeada.
  */
@@ -543,13 +589,16 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     id: 5,
     titulo: 'Una masa sin báscula',
     enunciado:
-      'Para averiguar la masa de un objeto sin báscula, se cuelga de un muelle de constante k = 40 N/m y se mide que oscila con una frecuencia de 1 Hz. ¿Qué masa tiene el objeto, en kg? Redondea a dos decimales.',
+      'Para averiguar la masa de un objeto sin báscula, se cuelga de un muelle de constante k = 20 N/m y se mide que oscila con una frecuencia de 0,5 Hz. ¿Qué masa tiene el objeto, en kg? Redondea a dos decimales.',
     categoria: 'aplicado',
-    datos: { magnitud: 'masaDesdeFrecuencia', k: 40, f: 1 },
+    // m = 20/(2π·0,5)² = 20/π² = 2,0264 → 2,03 kg. Con f = 0,5 Hz (y no 1 Hz, hallazgo 2628) los
+    // errores típicos dan otra cifra: T y f cambiados, 20·0,5²/(4π²) = 0,13 · f sin elevar,
+    // 20/(4π²·0,5) = 1,01 · ω sin elevar, 20/π = 6,37 · sin el 2π, 20/0,5² = 80.
+    datos: { magnitud: 'masaDesdeFrecuencia', k: 20, f: 0.5 },
     etiquetaRespuesta: 'm en kg',
     pista: 'ω₀ = 2π·f, y de ω₀ = √(k/m) se despeja m = k/ω₀².',
     comoComprobar:
-      'Pon Constante k = 40 N/m y en Masa m tu resultado redondeado a la décima: la tarjeta «Frecuencia f» debe marcar casi 1 Hz (con 1,0 kg, 1,007 Hz).',
+      'Pon Constante k = 20 N/m y en Masa m tu resultado redondeado a la décima: la tarjeta «Frecuencia f» debe marcar casi 0,5 Hz (con 2,0 kg, 0,503 Hz).',
   },
   {
     id: 6,
@@ -567,9 +616,12 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     id: 7,
     titulo: 'Rebotar en una cama elástica',
     enunciado:
-      'Una persona de 50 kg rebota suavemente sobre una cama elástica sin despegarse de la lona. La lona se comporta como un muelle de constante k = 5000 N/m y la persona oscila con una amplitud de 0,2 m. ¿Cuál es su velocidad máxima, en m/s?',
+      'Una persona de 50 kg se balancea suavemente de pie sobre una cama elástica, sin despegarse de la lona. La lona se comporta como un muelle de constante k = 5000 N/m y la persona oscila con una amplitud de 5 cm alrededor de su posición de equilibrio. ¿Cuál es su velocidad máxima, en m/s?',
     categoria: 'aplicado',
-    datos: { magnitud: 'velocidadMaxima', m: 50, k: 5000, A: 0.2, decimales: 0 },
+    // v_máx = A·ω₀ = 0,05·√(5000/50) = 0,05·10 = 0,5 m/s exactos. «Sin despegarse» exige que en
+    // el punto alto ω₀²·A = 100·0,05 = 5 m/s² no pase de g (hallazgo 2627): con A = 0,2 m eran
+    // 20 m/s², el doble. El error típico, A·ω₀² (la a_máx), da 5.
+    datos: { magnitud: 'velocidadMaxima', m: 50, k: 5000, A: 0.05, decimales: 1 },
     etiquetaRespuesta: 'v máx. en m/s',
     pista: 'La velocidad es máxima al pasar por el equilibrio: v_máx = A·ω₀, con ω₀ = √(k/m).',
   },
@@ -619,13 +671,17 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     id: 12,
     titulo: 'El período con amortiguamiento',
     enunciado:
-      'Un bloque de 1 kg unido a un muelle de constante k = 10 N/m oscila con un amortiguamiento viscoso γ = 2 N·s/m. ¿Cuál es el período de sus oscilaciones, en segundos? Redondea a dos decimales.',
+      'Un bloque de 0,5 kg unido a un muelle de constante k = 10 N/m oscila con un amortiguamiento viscoso γ = 2 N·s/m. ¿Cuál es el período de sus oscilaciones, en segundos? Redondea a dos decimales.',
     categoria: 'abstracto',
-    datos: { magnitud: 'periodoAmortiguado', m: 1, k: 10, gamma: 2 },
+    // ω₀² = 10/0,5 = 20, β = 2/(2·0,5) = 2, ω_d = √(20 − 4) = 4 rad/s, T = 2π/4 = 1,5708 → 1,57 s.
+    // Con m = 0,5 y β = 2 (y no m = 1 y β = 1, hallazgo 2628) los errores dan otra cifra: ω₀ en
+    // vez de ω_d, 2π/√20 = 1,40 · β sin elevar, 2π/√18 = 1,48 · β = γ/2 (sin la m), 2π/√19 = 1,44
+    // · β = γ/m (sin el 2), 2π/2 = 3,14.
+    datos: { magnitud: 'periodoAmortiguado', m: 0.5, k: 10, gamma: 2 },
     etiquetaRespuesta: 'T en s',
     pista: 'Con amortiguamiento la oscilación va a ω_d = √(ω₀² − β²), con β = γ/(2m), no a ω₀. Después, T = 2π/ω_d.',
     comoComprobar:
-      'Pon Masa m = 1,0 kg, Constante k = 10 N/m y Amortiguamiento γ = 2,0 N·s/m: la tarjeta «ω amortiguada» marca 3,000 rad/s y «Período T», 2,094 s.',
+      'Pon Masa m = 0,5 kg, Constante k = 10 N/m y Amortiguamiento γ = 2,0 N·s/m: la tarjeta «ω amortiguada» marca 4,000 rad/s y «Período T», 1,571 s.',
   },
 ];
 
@@ -652,7 +708,7 @@ export const CASOS: readonly Caso[] = DEFINICIONES.map((def) => {
     respuesta: valor,
     respuestaTexto: textoRespuesta(valor, def.etiquetaRespuesta, decimales),
     pasos: r.pasos,
-    requiereRedondeo: r.ok && Math.abs(r.valor - valor) > 1e-9,
+    requiereRedondeo: r.ok && exigeRedondeo(r.valor, decimales),
   };
 });
 
@@ -709,9 +765,8 @@ const PREGUNTAS = [
 type Pregunta = (typeof PREGUNTAS)[number];
 
 /**
- * Respuesta mínima: con dos decimales la tolerancia mínima es 0,01, que en una respuesta de
- * 0,02 J sería el 50 % y aceptaría casi cualquier cosa. Por debajo de 0,5 se vuelven a tirar
- * los datos (la tolerancia queda como mucho en el 2 %).
+ * Respuesta mínima: con dos decimales, una respuesta de 0,02 J dejaría una o dos cifras
+ * significativas, poco para comprobar nada. Por debajo de 0,5 se vuelven a tirar los datos.
  */
 const RESPUESTA_MINIMA = 0.5;
 const MAX_INTENTOS = 30;

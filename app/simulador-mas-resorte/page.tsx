@@ -748,32 +748,40 @@ export default function SimuladorMasResortePage() {
                   <td>Resistencia R</td>
                 </tr>
                 <tr>
-                  <td>Onda sonora</td>
-                  <td>k_s/m_mol (cristal)</td>
-                  <td>Desplazamiento de moléculas</td>
-                  <td>Rigidez/masa efectiva</td>
-                  <td>Instrumentos musicales</td>
-                  <td>Viscosidad del medio</td>
+                  {/* Hallazgo 2629 (02/10/2026): esta fila era «Onda sonora» con ω₀ = k_s/m_mol, sin
+                      la raíz (s⁻², no rad/s) y repitiendo la fila del cristal. Una onda sonora no
+                      tiene una ω₀ propia (la frecuencia la pone la fuente); el oscilador acústico
+                      que sí es un masa-resorte es el resonador de Helmholtz. */}
+                  <td>Resonador de Helmholtz (botella)</td>
+                  <td>c·√(S/(V·L))</td>
+                  <td>Desplazamiento del aire del cuello</td>
+                  <td>c²·S/(V·L) ↔ k/m: el aire del cuello es la masa y el de la cavidad, el muelle</td>
+                  <td>Soplar en una botella, ocarina, caja de guitarra</td>
+                  <td>Radiación de sonido, viscosidad del aire</td>
                 </tr>
                 <tr>
                   <td>Molécula diatómica</td>
-                  <td>√(k_bond/μ)</td>
+                  <td>√(k_enlace/μ)</td>
                   <td>Distancia de enlace</td>
-                  <td>k_bond/μ (masa reducida)</td>
+                  <td>k_enlace/μ (masa reducida)</td>
                   <td>Espectroscopía IR</td>
                   <td>Emisión de fotones</td>
                 </tr>
                 <tr>
-                  <td>Cristal (red Bravais)</td>
-                  <td>√(K/m_atom)</td>
+                  <td>Cristal (red de Bravais)</td>
+                  <td>√(K/m_átomo)</td>
                   <td>Desplazamiento del átomo</td>
                   <td>Constante de red K/m</td>
                   <td>Conductividad térmica</td>
-                  <td>Anharmonicidad</td>
+                  <td>Anarmonicidad</td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '0.5rem' }}>
+            En el resonador de Helmholtz, c es la velocidad del sonido en el aire, S la sección del
+            cuello, L su longitud y V el volumen de la cavidad.
+          </p>
 
           {/* Escenarios reales */}
           <h3 className={styles.eduSubtitle}>Escenarios reales del MAS</h3>

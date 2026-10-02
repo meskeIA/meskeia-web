@@ -1054,15 +1054,19 @@ test.describe('Caso 8 — hallazgos de la reinspección (25/09/2026), reparados 
  *   2 · T = 2π/√36 = 2π/6 = 1,04720                      → 1,05 s
  *   3 · f = √(40.000/400)/2π = 10/2π = 1,59155           → 1,59 Hz
  *   4 · T = 5/10 = 0,5 s → k = 2·(2π/0,5)² = 315,827     → 316 N/m
- *   5 · m = 40/(2π·1)² = 40/39,478 = 1,01321             → 1,01 kg
+ *   5 · m = 20/(2π·0,5)² = 20/π² = 20/9,8696 = 2,02642  → 2,03 kg
  *   6 · E = ½·50·0,2²                                    = 1 J
- *   7 · v_max = A·ω₀ = 0,2·√(5000/50) = 0,2·10           = 2 m/s
+ *   7 · v_max = A·ω₀ = 0,05·√(5000/50) = 0,05·10         = 0,5 m/s
  *   8 · a_max = k·A/m = 80·0,25/2                        = 10 m/s²
  *   9 · E_k = ½·k·(A² − x²) = ½·40·(0,25 − 0,09)         = 3,2 J
  *  10 · v = ω₀·√(A² − x²) = 10·√(0,25 − 0,09) = 10·0,4   = 4 m/s
  *  11 · γ_c = 2√(100·25) = 2·50                          = 100 N·s/m
- *  12 · β = 2/2 = 1, ω_d = √(10 − 1) = 3, T = 2π/3 = 2,0944 → 2,09 s
- *       (con ω₀ en vez de ω_d daría 2π/√10 = 1,99 s: el error que la app enseña a evitar)
+ *  12 · ω₀² = 10/0,5 = 20, β = 2/(2·0,5) = 2, ω_d = √(20 − 4) = 4, T = 2π/4 = 1,5708 → 1,57 s
+ *       (con ω₀ en vez de ω_d daría 2π/√20 = 1,40 s: el error que la app enseña a evitar)
+ *
+ * Los casos 5, 7 y 12 cambiaron de datos el 02/10/2026 (hallazgos 2627 y 2628). Antes eran
+ * m = 40/(2π·1)² = 1,01 kg (f = 1 Hz no distinguía T de f), v_máx = 0,2·10 = 2 m/s sobre una
+ * lona con ω₀²·A = 20 m/s² > g, y m = 1, k = 10, γ = 2 → 2,09 s (β = 1 no distinguía β de β²).
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 const A_MANO_CASOS: Readonly<Record<number, number>> = {
@@ -1070,14 +1074,21 @@ const A_MANO_CASOS: Readonly<Record<number, number>> = {
   2: 1.05,
   3: 1.59,
   4: 316,
-  5: 1.01,
+  5: 2.03,
   6: 1,
-  7: 2,
+  7: 0.5,
   8: 10,
   9: 3.2,
   10: 4,
   11: 100,
-  12: 2.09,
+  12: 1.57,
+};
+
+/** Los datos de un caso, para corregir con la tolerancia que da SU pregunta (hallazgo 2626). */
+const datosDe = (id: number) => {
+  const caso = CASOS.find((c) => c.id === id);
+  if (!caso) throw new Error(`No existe el caso ${id}`);
+  return caso.datos;
 };
 
 /** Cuántos decimales lleva el número que se ENSEÑA en la solución («1,05 s» → 2). */
@@ -1175,26 +1186,93 @@ test.describe('simulador-mas-resorte · casos para clase', () => {
     expect(libre.periodo!).toBeCloseTo(1.986918, 5);
     expect(describirOscilador(100, 25, 100).regimen).toBe('critico');
 
-    // (c) Lo que hace un alumno con la calculadora del libro entra: π ≈ 3,14.
-    expect(comprobarRespuesta((2 * 3.14) / 6, 1.05).correcto).toBe(true);
-    expect(comprobarRespuesta(2 * (2 * 3.14 / 0.5) ** 2, 316).correcto).toBe(true);
+    // (c) Lo que hace un alumno con la calculadora del libro entra, porque REDONDEA a la clave
+    // (la tolerancia es media unidad del redondeo pedido, hallazgo 2626): π ≈ 3,14 da
+    // 2·3,14/6 = 1,0467 → 1,05 · 2·(6,28/0,5)² = 315,51 → 316 · 20/(3,14²) = 2,0285 → 2,03 ·
+    // 6,28/4 = 1,57.
+    expect(comprobarRespuesta((2 * 3.14) / 6, 1.05, datosDe(2)).correcto).toBe(true);
+    expect(comprobarRespuesta(2 * (2 * 3.14 / 0.5) ** 2, 316, datosDe(4)).correcto).toBe(true);
+    expect(comprobarRespuesta(20 / 3.14 ** 2, 2.03, datosDe(5)).correcto).toBe(true);
+    expect(comprobarRespuesta((2 * 3.14) / 4, 1.57, datosDe(12)).correcto).toBe(true);
 
-    // (d) El error del tema NO entra: oscilar a ω₀ con amortiguamiento (caso 12 → 1,99 s).
-    expect(comprobarRespuesta((2 * Math.PI) / Math.sqrt(10), 2.09).correcto).toBe(false);
+    // (d) El error del tema NO entra: oscilar a ω₀ con amortiguamiento (caso 12 → 2π/√20 = 1,40 s).
+    expect(comprobarRespuesta((2 * Math.PI) / Math.sqrt(20), 1.57, datosDe(12)).correcto).toBe(false);
   });
 
   test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
-    expect(comprobarRespuesta(100, 100).correcto).toBe(true);
-    expect(comprobarRespuesta(NaN, 1.05).correcto).toBe(false);
-    expect(comprobarRespuesta(NaN, 1.05).motivo).not.toMatch(/NaN/);
+    expect(comprobarRespuesta(100, 100, datosDe(11)).correcto).toBe(true);
+    expect(comprobarRespuesta(NaN, 1.05, datosDe(2)).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 1.05, datosDe(2)).motivo).not.toMatch(/NaN/);
     // Borde exacto de la tolerancia, por los dos lados (hallazgo 1211 del 22/09/2026), con el
-    // margen que declara el propio corrector. Hasta el 02/10/2026 este test fijaba
-    // toleranciaDe(316) = 3,16 y daba por buenos 1,04 y 1,06 frente a 1,05: es justo lo que la
-    // re-inspección de ese día anota como hallazgo (el test.fail «la tolerancia la da la
-    // PREGUNTA», al final del fichero), así que aquí ya no se fija el tamaño del margen.
-    const borde = comprobarRespuesta(1.05, 1.05).tolerancia;
-    expect(comprobarRespuesta(1.05 + borde, 1.05).correcto).toBe(true);
-    expect(comprobarRespuesta(1.05 - borde, 1.05).correcto).toBe(true);
+    // margen que declara el propio corrector. Hasta el 02/10/2026 el margen era el 1 % y daba
+    // por buenos 1,04 y 1,06 frente a 1,05; desde la reparación del hallazgo 2626 es media
+    // unidad del redondeo pedido: 0,005 en el caso 2 (2π/6 = 1,0472 → 1,05) y 0 en el 11
+    // (γ_c = 100 exactos).
+    const borde = comprobarRespuesta(1.05, 1.05, datosDe(2)).tolerancia;
+    expect(borde).toBeCloseTo(0.005, 12);
+    expect(comprobarRespuesta(1.05 + borde, 1.05, datosDe(2)).correcto).toBe(true);
+    expect(comprobarRespuesta(1.05 - borde, 1.05, datosDe(2)).correcto).toBe(true);
+    expect(comprobarRespuesta(100, 100, datosDe(11)).tolerancia).toBe(0);
+  });
+
+  test('9 · el corrector separa el redondeo del error: vecinos, truncados y errores de concepto (2626)', async () => {
+    // [caso, respuesta, ¿entra?, de dónde sale]. Cada cifra, a mano:
+    const tabla: ReadonlyArray<readonly [number, number, boolean, string]> = [
+      // Caso 2 · T = 2π/6 = 1,04720 → 1,05: entra [1,045; 1,055]
+      [2, 1.05, true, 'la clave'],
+      [2, 1.047, true, 'la cifra del panel'],
+      [2, 1.04, false, 'truncar 1,0472'],
+      [2, 1.06, false, 'vecino'],
+      [2, 6 / (2 * Math.PI), false, 'f en vez de T: 0,95'],
+      [2, 1 / 6, false, 'sin el 2π: 1/ω₀'],
+      [2, 2 * Math.PI * 6, false, '2π·ω₀ en vez de 2π/ω₀'],
+      // Caso 4 · k = 32π² = 315,827 → 316: entra [315,5; 316,5]
+      [4, 316, true, 'la clave'],
+      [4, 315.83, true, 'sin redondear'],
+      [4, 315, false, 'truncar 315,83'],
+      [4, 313, false, 'vecino'],
+      [4, 319, false, 'vecino'],
+      [4, 2 * (2 * Math.PI * 0.5) ** 2, false, 'T por f (ω = 2πT): 2π² = 19,74'],
+      // Caso 5 · m = 20/π² = 2,02642 → 2,03
+      [5, 2.03, true, 'la clave'],
+      [5, 2.026, true, 'sin redondear'],
+      [5, 2.02, false, 'truncar 2,0264'],
+      [5, 2.04, false, 'vecino'],
+      [5, (20 * 0.25) / (4 * Math.PI ** 2), false, 'T y f cambiados: 0,13'],
+      [5, 20 / (4 * Math.PI ** 2 * 0.5), false, 'f sin elevar: 1,01'],
+      // Caso 7 · v_máx = 0,05·10 = 0,5 exactos: solo vale 0,5
+      [7, 0.5, true, 'la clave'],
+      [7, 0.51, false, 'vecino de una cifra exacta'],
+      [7, 5, false, 'A·ω₀² (la a_máx)'],
+      // Caso 11 · γ_c = 100 exactos
+      [11, 100, true, 'la clave'],
+      [11, 101, false, 'vecino'],
+      [11, 99, false, 'vecino'],
+      [11, 50, false, 'sin el 2'],
+      // Caso 12 · T = 2π/4 = 1,5708 → 1,57
+      [12, 1.57, true, 'la clave'],
+      [12, 1.571, true, 'la cifra del panel'],
+      [12, 1.56, false, 'vecino'],
+      [12, 1.58, false, 'vecino'],
+      [12, (2 * Math.PI) / Math.sqrt(20), false, 'ω₀ en vez de ω_d: 1,40'],
+      [12, (2 * Math.PI) / Math.sqrt(18), false, 'β sin elevar: 1,48'],
+      [12, (2 * Math.PI) / Math.sqrt(19), false, 'β = γ/2, sin la m: 1,44'],
+      [12, 4 / (2 * Math.PI), false, 'f_d en vez de T: 0,64'],
+    ];
+    const mal: string[] = [];
+    for (const [id, r, entra, porque] of tabla) {
+      const caso = CASOS.find((c) => c.id === id);
+      if (!caso) throw new Error(`No existe el caso ${id}`);
+      const v = comprobarRespuesta(r, caso.respuesta, caso.datos).correcto;
+      if (v !== entra) mal.push(`caso ${id}: ${r} (${porque}) ${entra ? 'no entra' : 'entra'}`);
+    }
+    expect(mal).toEqual([]);
+
+    // Practicar pide «Redondea a dos decimales»; con datos que dan una cifra exacta no hay margen.
+    const exacto = { magnitud: 'aceleracionMaxima' as const, m: 3, k: 300, A: 0.4, decimales: 2 };
+    expect(comprobarRespuesta(40, 40, exacto).correcto).toBe(true);
+    expect(comprobarRespuesta(40.3, 40, exacto).correcto).toBe(false);
+    expect(comprobarRespuesta(39.99, 40, exacto).correcto).toBe(false);
   });
 });
 
@@ -1213,15 +1291,16 @@ test.describe('simulador-mas-resorte · la sección de casos en el navegador', (
     await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto!');
   });
 
-  test('usar ω₀ en el caso 12 se rechaza y la solución enseña 2,09 s', async ({ page }) => {
+  test('usar ω₀ en el caso 12 se rechaza y la solución enseña 1,57 s', async ({ page }) => {
+    // m = 0,5, k = 10, γ = 2: ω_d = √(20 − 4) = 4 → T = 2π/4 = 1,57 s; con ω₀, 2π/√20 = 1,40 s.
     await seccion(page).getByRole('button', { name: /^Caso 12:/ }).click();
-    await seccion(page).locator('#casos-respuesta').fill('1,99');
+    await seccion(page).locator('#casos-respuesta').fill('1,40');
     await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
     await expect(seccion(page).getByRole('alert')).toContainText('No es correcto');
     const solucion = seccion(page).getByRole('button', { name: /Ver solución/ });
     await expect(solucion).toHaveAttribute('aria-expanded', 'false');
     await solucion.click();
-    await expect(seccion(page).locator('#casos-resultado')).toContainText('2,09 s');
+    await expect(seccion(page).locator('#casos-resultado')).toContainText('1,57 s');
   });
 });
 
@@ -1270,6 +1349,20 @@ test.describe('simulador-mas-resorte · la sección de casos en el navegador', (
  * Y el caso 7 (cama elástica) tiene un enunciado imposible: «sin despegarse de la lona» exige
  * que en el punto alto la aceleración hacia abajo no pase de g (la lona solo empuja), es decir
  * ω₀²·A ≤ 9,8 m/s² y A ≤ 9,8/100 = 0,098 m. Con A = 0,2 m son 20 m/s², el doble de g.
+ *
+ * REPARADO EL 02/10/2026 (todo lo de arriba es el acta, en su momento):
+ *   · 2626: `toleranciaDe(datos)` es media unidad del redondeo pedido si la cifra exacta hay que
+ *     redondearla, y 0 (más el ruido binario) si es exacta; `comprobarRespuesta` recibe los
+ *     datos del caso. La intro ya no promete un 1 % de margen.
+ *   · 2627: caso 7 con A = 0,05 m → ω₀²·A = 5 m/s² < g, v_máx = 0,05·10 = 0,5 m/s exactos
+ *     (error típico A·ω₀² = 5).
+ *   · 2628: caso 5 con k = 20 N/m y f = 0,5 Hz → m = 20/π² = 2,0264 → 2,03 kg (T y f cambiados:
+ *     20·0,25/4π² = 0,13; f sin elevar: 1,01; ω sin elevar: 20/π = 6,37). Caso 12 con m = 0,5,
+ *     k = 10, γ = 2 → ω₀² = 20, β = 2, ω_d = 4, T = 2π/4 = 1,5708 → 1,57 s (ω₀: 2π/√20 = 1,40;
+ *     β sin elevar: 2π/√18 = 1,48; β sin la m: 2π/√19 = 1,44). Sus «Verlo en el simulador»:
+ *     0,503 Hz con 2,0 kg y k = 20 · 4,000 rad/s y 1,571 s con 0,5 kg, k = 10 y γ = 2.
+ *   · 2629: la fila «Onda sonora» (k_s/m_mol, sin raíz) es ahora el resonador de Helmholtz,
+ *     ω₀ = c·√(S/(V·L)): una onda sonora no tiene ω₀ propia y la fila repetía la del cristal.
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 /** Teclea una respuesta en el caso `id` y devuelve si el corrector la dio por buena. */
@@ -1301,14 +1394,14 @@ test.describe('Re-inspección 02/10/2026 · los doce casos tecleados en el naveg
       [2, '1,05', '0,95'],
       [3, '1,59', '10'],
       [4, '316', '19,74'],
-      [5, '1,01', '6,37'],
+      [5, '2,03', '6,37'],
       [6, '1', '2'],
-      [7, '2', '20'],
+      [7, '0,5', '5'],
       [8, '10', '20'],
       [9, '3,2', '1,8'],
       [10, '4', '2'],
       [11, '100', '50'],
-      [12, '2,09', '1,99'],
+      [12, '1,57', '1,40'],
     ];
     const fallos: string[] = [];
     for (const [id, clave, error] of tabla) {
@@ -1320,14 +1413,15 @@ test.describe('Re-inspección 02/10/2026 · los doce casos tecleados en el naveg
 
   test('lo legítimo entra: la cifra sin redondear y la que marca el panel', async ({ page }) => {
     // 1,047 = 2π/6 a tres decimales (la tarjeta «Período T» con m = 1 kg y k = 36 N/m) ·
-    // 1,592 = 10/2π · 315,83 = 32π² · 1,013 = 40/4π² · 2,094 = 2π/3. Todas a menos de media unidad
-    // del redondeo pedido: tienen que seguir entrando cuando la tolerancia la dé la pregunta.
+    // 1,592 = 10/2π · 315,83 = 32π² · 2,026 = 20/π² · 1,571 = 2π/4 (casos 5 y 12 con los datos
+    // nuevos, hallazgo 2628). Todas a menos de media unidad del redondeo pedido: entran con la
+    // tolerancia que da la pregunta (hallazgo 2626, reparado).
     const legitimas: ReadonlyArray<readonly [number, string]> = [
       [2, '1,047'],
       [3, '1,592'],
       [4, '315,83'],
-      [5, '1,013'],
-      [12, '2,094'],
+      [5, '2,026'],
+      [12, '1,571'],
     ];
     const rechazadas: string[] = [];
     for (const [id, r] of legitimas) {
@@ -1340,7 +1434,7 @@ test.describe('Re-inspección 02/10/2026 · los doce casos tecleados en el naveg
     page,
   }) => {
     // La semilla del ejercicio aleatorio es Date.now(): fijarla lo hace reproducible. Es la
-    // preparación del test.fail de la tolerancia: si esto se rompe, se ve aquí y no allí.
+    // preparación del test de la tolerancia (2626): si esto se rompe, se ve aquí y no allí.
     await page.clock.setFixedTime(8);
     await page.locator('#casos-practicar').click();
     const enunciado = page.locator('#casos-enunciado');
@@ -1356,13 +1450,13 @@ test.describe('Re-inspección 02/10/2026 · los doce casos tecleados en el naveg
     await expect(page.locator('#casos-resultado')).toContainText('40,00 m/s²');
   });
 
-  test('HALLAZGO ABIERTO (02/10/2026) — la tolerancia la da la PREGUNTA: no entran cifras que ninguna cuenta produce', async ({
+  test('REPARADO (hallazgo 2626, 02/10/2026) — la tolerancia la da la PREGUNTA: no entran cifras que ninguna cuenta produce', async ({
     page,
   }) => {
-    test.fail();
     test.setTimeout(60000);
     // Datos exactos: margen = media unidad del redondeo pedido, o ninguno si la cifra es exacta.
-    // Obtenido el 02/10/2026: las catorce entran, y en Practicar también 39,7 y 40,3.
+    // Obtenido el 02/10/2026, antes de reparar: las catorce entraban, y en Practicar también 39,7
+    // y 40,3. Los casos 5 y 12 cambiaron de datos (2628): sus vecinos son los de 2,03 y 1,57.
     const indebidas: ReadonlyArray<readonly [number, string, string]> = [
       [11, '101', 'γ_c = 100 exactos'],
       [11, '99', 'γ_c = 100 exactos'],
@@ -1371,10 +1465,11 @@ test.describe('Re-inspección 02/10/2026 · los doce casos tecleados en el naveg
       [4, '315', 'truncar 315,83'],
       [2, '1,04', 'truncar 1,0472'],
       [2, '1,06', '1,0472 → 1,05'],
-      [5, '1,02', '1,0132 → 1,01'],
-      [5, '1,00', '1,0132 → 1,01'],
-      [12, '2,11', '2,0944 → 2,09'],
-      [12, '2,07', '2,0944 → 2,09'],
+      [5, '2,02', 'truncar 2,0264'],
+      [5, '2,04', '2,0264 → 2,03'],
+      [12, '1,58', '1,5708 → 1,57'],
+      [12, '1,56', '1,5708 → 1,57'],
+      [7, '0,51', 'v_máx = 0,5 exactos'],
       [3, '1,58', '1,5915 → 1,59'],
       [8, '10,1', 'a_máx = 10 exactos'],
       [6, '1,01', 'E = 1 J exacto'],
@@ -1397,61 +1492,97 @@ test.describe('Re-inspección 02/10/2026 · los doce casos tecleados en el naveg
     expect(aceptadas).toEqual([]);
   });
 
-  test('HALLAZGO ABIERTO (02/10/2026) — la tabla de sistemas da la ω₀ de la onda sonora sin la raíz', async ({
+  test('REPARADO (hallazgo 2629, 02/10/2026) — la tabla de sistemas da cada ω₀ con su raíz, en rad/s', async ({
     page,
   }) => {
-    test.fail();
     // El botón se ve como «⬇️ Ver Guía Completa», pero su nombre accesible es el aria-label de
     // components/EducationalSection.tsx.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     await expect(page.locator('table tbody tr').first()).toBeVisible();
-    // Columna «ω₀ característico», en rad/s: √(k/m), √(g/L), 1/√(LC), √(k_bond/μ), √(K/m_atom)…
-    // y «k_s/m_mol (cristal)», que es un cociente rigidez/masa en s⁻², sin la raíz.
+    // Columna «ω₀ característico», en rad/s: √(k/m), √(g/L), 1/√(LC), √(k_enlace/μ),
+    // √(K/m_átomo)… Antes de reparar, «Onda sonora» daba «k_s/m_mol (cristal)», un cociente
+    // rigidez/masa en s⁻² sin la raíz. Una onda sonora no tiene ω₀ propia (la frecuencia la pone
+    // la fuente), así que la fila es ahora el oscilador acústico que SÍ es un masa-resorte, el
+    // resonador de Helmholtz: masa = aire del cuello (ρ·S·L), rigidez = aire de la cavidad
+    // (ρ·c²·S²/V), y ω₀ = √(k/m) = c·√(S/(V·L)).
     const celdas = await page.locator('table tbody tr td:nth-child(2)').allInnerTexts();
     expect(celdas.length).toBeGreaterThanOrEqual(6);
     expect(celdas.filter((c) => !c.includes('√'))).toEqual([]);
+    expect(celdas.some((c) => /k_s|m_mol/.test(c))).toBe(false);
+    expect(celdas).toContain('c·√(S/(V·L))');
+  });
+
+  test('REPARADO (hallazgo 2628) — el «Verlo en el simulador» de los casos 5 y 12 nuevos dice la verdad', async ({
+    page,
+  }) => {
+    // Caso 5: k = 20 N/m (ya es el valor inicial: sembrarlo no movería nada) y m = 2,0 kg, el
+    // 2,03 redondeado a la décima → f = √(20/2)/(2π) = √10/(2π) = 0,50329 → «0,503 Hz».
+    await sembrarValor(page, '#slider-masa', 2);
+    await expect.poll(() => leerFila(page, 'Frecuencia f')).toBe('0,503 Hz');
+    // Caso 12: m = 0,5, k = 10, γ = 2 → ω₀² = 20, β = 2, ω_d = √16 = 4 → «4,000 rad/s», y
+    // T = 2π/4 = 1,570796 → «1,571 s».
+    await sembrarValor(page, '#slider-masa', 0.5);
+    await sembrarValor(page, '#slider-k', 10);
+    await sembrarValor(page, '#slider-gamma', 2);
+    await expect.poll(() => leerFila(page, 'Régimen')).toBe('Subamortiguado');
+    await expect.poll(() => leerFila(page, 'ω amortiguada')).toBe('4,000 rad/s');
+    await expect.poll(() => leerFila(page, 'Período T')).toBe('1,571 s');
   });
 });
 
 test.describe('Re-inspección 02/10/2026 · lo que dicen los enunciados, contra la física', () => {
-  test('HALLAZGO ABIERTO (02/10/2026) — caso 7: «sin despegarse de la lona» con A = 0,2 m es imposible', async () => {
-    test.fail();
+  test('REPARADO (hallazgo 2627, 02/10/2026) — caso 7: «sin despegarse de la lona» es posible con sus datos', async () => {
     const caso = CASOS.find((c) => c.id === 7);
     expect(caso).toBeDefined();
     const k = caso?.datos.k ?? NaN;
     const m = caso?.datos.m ?? NaN;
     const A = caso?.datos.A ?? NaN;
     // Una lona solo empuja: para no despegarse, la aceleración hacia abajo en el punto alto
-    // (ω₀²·A) no puede pasar de g. Con k/m = 5000/50 = 100 s⁻² y A = 0,2 m son 20 m/s².
+    // (ω₀²·A) no puede pasar de g. Con k/m = 5000/50 = 100 s⁻² y A = 0,2 m eran 20 m/s² (el
+    // acta); con A = 0,05 m son 5 m/s², y v_máx = 0,05·10 = 0,5 m/s.
     const g = 9.81;
     const enLona = /lona|cama elástica/i.test(caso?.enunciado ?? '');
     const aPuntoAlto = (k / m) * A;
     expect(enLona && aPuntoAlto > g, `ω₀²·A = ${aPuntoAlto} m/s² sobre una lona (g = ${g})`).toBe(false);
+    expect(caso?.respuesta).toBe(0.5);
   });
 
-  test('HALLAZGO ABIERTO (02/10/2026) — casos 5 y 12: los datos no distinguen el error conceptual de la respuesta', async () => {
-    test.fail();
+  test('REPARADO (hallazgo 2628, 02/10/2026) — casos 5 y 12: los datos distinguen el error conceptual de la respuesta', async () => {
     const c5 = CASOS.find((c) => c.id === 5);
     const c12 = CASOS.find((c) => c.id === 12);
     expect(c5 && c12).toBeTruthy();
+    // «Indistinguible» = el CORRECTOR da por buena la cifra del error, no solo que redondee igual.
     const indistinguibles: string[] = [];
+    const cuela = (c: NonNullable<typeof c5>, v: number) =>
+      Number.isFinite(v) && comprobarRespuesta(v, c.respuesta, c.datos).correcto;
     if (c5) {
-      // m = k·T²/(4π²) con T = 1/f. Poner f donde va T da k·f²/(4π²): con f = 1 Hz, lo mismo.
-      const { k = NaN, f = NaN, decimales = 2 } = c5.datos;
-      const tfCambiados = redondeo((k * f * f) / (4 * Math.PI ** 2), decimales);
-      if (tfCambiados === c5.respuesta) indistinguibles.push(`caso 5: T y f cambiados dan ${tfCambiados}`);
+      // m = k·T²/(4π²) con T = 1/f. Poner f donde va T da k·f²/(4π²): con f = 1 Hz (el acta), lo
+      // mismo. Con k = 20 y f = 0,5: clave 20/π² = 2,03 · T y f cambiados 20·0,25/4π² = 0,13 ·
+      // f sin elevar 20/(4π²·0,5) = 1,01 · ω sin elevar 20/(2π·0,5) = 6,37.
+      const { k = NaN, f = NaN } = c5.datos;
+      const errores: ReadonlyArray<readonly [string, number]> = [
+        ['T y f cambiados', (k * f * f) / (4 * Math.PI ** 2)],
+        ['f sin elevar', k / (4 * Math.PI ** 2 * f)],
+        ['ω sin elevar', k / (2 * Math.PI * f)],
+      ];
+      for (const [nombre, v] of errores) if (cuela(c5, v)) indistinguibles.push(`caso 5: ${nombre} da ${v}`);
     }
     if (c12) {
-      // ω_d = √(ω₀² − β²) con β = γ/(2m). Con β = 1 y m = 1, olvidar el cuadrado de β o la m de
-      // β da la misma ω_d = 3 rad/s.
-      const { k = NaN, m = NaN, gamma = NaN, decimales = 2 } = c12.datos;
+      // ω_d = √(ω₀² − β²) con β = γ/(2m). Con β = 1 y m = 1 (el acta), olvidar el cuadrado de β o
+      // la m de β daba la misma ω_d = 3 rad/s. Con m = 0,5, k = 10, γ = 2: ω₀² = 20, β = 2,
+      // clave 2π/4 = 1,57 · β sin elevar 2π/√18 = 1,48 · β = γ/2 2π/√19 = 1,44 · ω₀ 2π/√20 = 1,40.
+      const { k = NaN, m = NaN, gamma = NaN } = c12.datos;
       const beta = gamma / (2 * m);
-      const sinCuadrado = redondeo((2 * Math.PI) / Math.sqrt(k / m - beta), decimales);
-      const sinMasa = redondeo((2 * Math.PI) / Math.sqrt(k / m - (gamma / 2) ** 2), decimales);
-      if (sinCuadrado === c12.respuesta) indistinguibles.push(`caso 12: β sin elevar da ${sinCuadrado}`);
-      if (sinMasa === c12.respuesta) indistinguibles.push(`caso 12: β = γ/2 da ${sinMasa}`);
+      const errores: ReadonlyArray<readonly [string, number]> = [
+        ['β sin elevar', (2 * Math.PI) / Math.sqrt(k / m - beta)],
+        ['β = γ/2', (2 * Math.PI) / Math.sqrt(k / m - (gamma / 2) ** 2)],
+        ['ω₀ en vez de ω_d', (2 * Math.PI) / Math.sqrt(k / m)],
+      ];
+      for (const [nombre, v] of errores) if (cuela(c12, v)) indistinguibles.push(`caso 12: ${nombre} da ${v}`);
     }
     expect(indistinguibles).toEqual([]);
+    expect(c5?.respuesta).toBe(2.03);
+    expect(c12?.respuesta).toBe(1.57);
   });
 });
 
