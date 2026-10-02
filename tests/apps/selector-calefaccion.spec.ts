@@ -180,6 +180,12 @@ test('motor: ningún empate queda en silencio, el criterio que se anuncia es ver
   // TODOS los sistemas; desde los hallazgos 1389-1391 la máxima se toma entre los ADMITIDOS (los
   // que caben en el presupuesto, tienen unidad exterior si la necesitan y gas si lo necesitan).
   // Las cuentas nuevas: 414.720 perfiles (pregunta 5 con cinco opciones) y 36.816 empates.
+  // REESCRITO el 02/10/2026 (hallazgos 2677 y 2678). 1) «Refrigeración: Sí, imprescindible» es
+  // un filtro más: aparta a los que no refrigeran si queda alguno que sí. Los admitidos de aquí
+  // lo recalculan, y los empates bajan a 36.700 (116 empates eran entre un sistema que refrigera
+  // y otro que no, a quien había dicho que sin aire «sería imposible»). 2) El criterio de
+  // desempate ya no se encadena en superlativo: si a los empatados los separa un criterio
+  // distinto, cada uno nombra a los que deja detrás, y eso es lo que se comprueba.
   test.setTimeout(180_000);
   const r: Record<number, string> = {};
   const fallos: string[] = [];
@@ -191,10 +197,13 @@ test('motor: ningún empate queda en silencio, el criterio que se anuncia es ver
       total++;
       const res = calcularResultado(r);
       // Los filtros, recalculados aquí sin mirar el motor.
-      const admitidos = CLAVES.filter((k) =>
+      const basicos = CLAVES.filter((k) =>
         SISTEMAS[k].costeInstalacionMin <= TECHO_PRESUPUESTO[r[9]] &&
         !(r[8] === 'no' && (k === 'aerotermia' || k === 'bomba-calor')) &&
         !(r[5] === 'no_gas' && k === 'caldera-gas'));
+      const conFrio = basicos.filter((k) => SISTEMAS[k].refrigera);
+      const admitidos = r[6] === 'imprescindible' && conFrio.length > 0 ? conFrio : basicos;
+      if (r[6] === 'imprescindible' && !SISTEMAS[res.sistemaPrincipal].refrigera && res.refrigeracionNoCubierta === '') mal('sin refrigeración imprescindible y sin decirlo');
       if (!admitidos.includes(res.sistemaPrincipal)) mal('recomienda un sistema que no pasa los filtros');
       if (res.sistemaAlternativa && !admitidos.includes(res.sistemaAlternativa)) mal('alternativa que no pasa los filtros');
       if ((res.sistemaAlternativa === null) !== (admitidos.length === 1)) mal('alternativa mal resuelta');
@@ -205,15 +214,26 @@ test('motor: ningún empate queda en silencio, el criterio que se anuncia es ver
       if (empatadosReales.length > 0) {
         empates++;
         const pres = PREGUNTAS[8].opciones.find((o) => o.valor === r[9])?.pesos ?? {};
+        const dif = (k: string) => (pres[res.sistemaPrincipal] ?? 0) - (pres[k as keyof typeof pres] ?? 0);
+        // ¿Los separa a todos el mismo criterio? Entonces se dice tal cual; si no, cada criterio
+        // nombra a los suyos (frase «mejor que X con el presupuesto» / «menos de instalar que Y»).
+        const unSoloCriterio = empatadosReales.every((k) => (dif(k) > 0) === (dif(empatadosReales[0]) > 0));
         for (const k of empatadosReales) {
-          const dP = (pres[res.sistemaPrincipal] ?? 0) - (pres[k] ?? 0);
+          const dP = dif(k);
+          const nombre = SISTEMAS[k].conArticulo;
           // Nunca pierde contra un empatado ni por presupuesto ni, a igualdad, por coste; y
           // la frase nombra el criterio que de verdad lo ha separado.
           if (dP < 0) mal(`pierde por presupuesto contra ${k}`);
-          if (dP > 0 && !res.criterioDesempate.includes('mejor con el presupuesto de instalación')) mal('no nombra el presupuesto');
+          if (dP > 0 && unSoloCriterio && !res.criterioDesempate.includes('mejor con el presupuesto de instalación')) mal('no nombra el presupuesto');
+          const clausulaPresupuesto = res.criterioDesempate.match(/mejor que (.*?) con el presupuesto/)?.[1] ?? '';
+          const clausulaCoste = res.criterioDesempate.match(/menos de instalar que (.*)$/)?.[1] ?? '';
+          if (dP > 0 && !unSoloCriterio && !clausulaPresupuesto.includes(nombre)) mal(`no nombra a ${k} en el presupuesto`);
           if (dP === 0 && !(SISTEMAS[res.sistemaPrincipal].costeInstalacionMin < SISTEMAS[k].costeInstalacionMin)) mal(`no es más barato que ${k}`);
-          if (dP === 0 && !res.criterioDesempate.includes('coste de instalación es el más bajo')) mal('no nombra el coste');
+          if (dP === 0 && unSoloCriterio && !res.criterioDesempate.includes('coste de instalación es el más bajo')) mal('no nombra el coste');
+          if (dP === 0 && !unSoloCriterio && !clausulaCoste.includes(nombre)) mal(`no nombra a ${k} en el coste`);
         }
+        // El superlativo solo se dice si es verdad contra todos los empatados.
+        if (res.criterioDesempate.includes('es el más bajo') && !unSoloCriterio) mal('superlativo con dos criterios');
       } else if (res.criterioDesempate !== '') {
         mal('anuncia un criterio sin empate');
       }
@@ -232,7 +252,7 @@ test('motor: ningún empate queda en silencio, el criterio que se anuncia es ver
   recorrer(0);
   expect(fallos).toEqual([]);
   expect(total).toBe(414_720);
-  expect(empates).toBe(36_816);
+  expect(empates).toBe(36_700);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -722,9 +742,9 @@ test.describe('Hallazgos 1389-1404 — límites declarados, promesas, datos y co
 // ─────────────────────────────────────────────────────────────────────────────
 // 5. Re-inspección del 02/10/2026 (familia de selectores; referencia: selector-smartphone,
 //    b0f31109). Los hallazgos de la vuelta del 24/09 (1389-1404) están todos REPARADOS: los
-//    tests de arriba pasan. Lo de aquí abajo es lo que esa vuelta no miró. Cada caso que fija un
-//    hallazgo ABIERTO hoy afirma lo CORRECTO y va con test.fail(); quien lo repare quita la
-//    marca y reescribe este comentario en pasado.
+//    tests de arriba pasan. Lo de aquí abajo es lo que esa vuelta no miró. Cada caso fijaba un
+//    hallazgo ABIERTO con test.fail(), afirmando lo CORRECTO; los ocho (2674-2681) se
+//    REPARARON el mismo 02/10/2026 y las marcas se retiraron.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Responde por la ETIQUETA literal de cada opción y pide el resultado. */
@@ -795,8 +815,8 @@ test.describe('Re-inspección 02/10/2026 — escritorio', () => {
     await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(0);
   });
 
-  test.fail('desempate: el superlativo «su coste de instalación es el más bajo» no se dice si un empatado cuesta menos (forma del 1442)', async ({ page }) => {
-    // ABIERTO (02/10/2026). En el caso límite los radiadores eléctricos están empatados con la
+  test('desempate: el superlativo «su coste de instalación es el más bajo» no se dice si un empatado cuesta menos (forma del 1442)', async ({ page }) => {
+    // REPARADO (02/10/2026, hallazgo 2678). En el caso límite los radiadores eléctricos están empatados con la
     // caldera y su instalación empieza en 800 €, por debajo de los 2.500 € de la caldera: el
     // presupuesto los dejó detrás, no el coste. La frase encadena los dos criterios en
     // superlativo, la forma que el hallazgo 1442 corrigió en selector-mascota y la reparación
@@ -806,10 +826,12 @@ test.describe('Re-inspección 02/10/2026 — escritorio', () => {
     const empate = page.locator('[class*="avisoEmpate"]');
     await expect(empate).toContainText('se muestra primero la caldera de gas porque');
     await expect(empate).not.toContainText('su coste de instalación es el más bajo');
+    // Cada criterio nombra a los que deja detrás, como en mascota y movilidad.
+    await expect(empate).toContainText('se muestra primero la caldera de gas porque encaja mejor que los radiadores eléctricos de bajo consumo con el presupuesto de instalación que has indicado y cuesta menos de instalar que la caldera o estufa de pellet.');
   });
 
-  test.fail('desempate (motor): ningún perfil anuncia «el más bajo» con un empatado más barato', () => {
-    // ABIERTO (02/10/2026): 1.062 de los 1.086 perfiles en que se encadenan los dos criterios
+  test('desempate (motor): ningún perfil anuncia «el más bajo» con un empatado más barato', () => {
+    // REPARADO (02/10/2026, hallazgo 2678). Antes: 1.062 de los 1.086 perfiles en que se encadenan los dos criterios
     // (todos con «3.000 – 8.000 €»: caldera y pellet empatan con el eléctrico, que es más barato).
     test.setTimeout(120_000);
     const falsos: string[] = [];
@@ -832,10 +854,11 @@ test.describe('Re-inspección 02/10/2026 — escritorio', () => {
     expect(falsos.length, falsos[0]).toBe(0);
   });
 
-  test.fail('foco: tras «Empezar», «Siguiente» y «Anterior» el foco queda en la pregunta, no en <body> (forma del 1680)', async ({ page }) => {
-    // ABIERTO (02/10/2026). Medido: tras «Siguiente» el foco cae a BODY, el siguiente Tab va a
-    // «Ir a Eficiencia Energética» (Apps relacionadas) y hacen falta 18 Tab para volver a la
-    // primera opción. La referencia lleva el foco al enunciado (useEffect sobre [pantalla, paso]).
+  test('foco: tras «Empezar», «Siguiente» y «Anterior» el foco queda en la pregunta, no en <body> (forma del 1680)', async ({ page }) => {
+    // REPARADO (02/10/2026, hallazgo 2675). Medido antes: tras «Siguiente» el foco caía a BODY, el siguiente Tab iba a
+    // «Ir a Eficiencia Energética» (Apps relacionadas) y hacían falta 18 Tab para volver a la
+    // primera opción. Ahora, como la referencia, el foco va al enunciado (useEffect sobre
+    // [pantalla, paso]), y el siguiente Tab llega a la opción marcada o a la primera.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/selector-calefaccion/');
     await esperarHidratacionBotones(page);
@@ -858,13 +881,18 @@ test.describe('Re-inspección 02/10/2026 — escritorio', () => {
     await page.keyboard.press('Enter');
     await expect(page.locator('[class*="progresoPaso"]')).toHaveText('Pregunta 1 de 10');
     if (!(await enLaPregunta())) fallos.push(`tras «Anterior»: ${await foco(page)}`);
+    // Un Tab desde el enunciado cae en el grupo de opciones, en la marcada.
+    await page.keyboard.press('Tab');
+    const enLaMarcada = await page.evaluate(() => document.activeElement?.getAttribute('role') === 'radio' && document.activeElement.getAttribute('aria-checked') === 'true');
+    if (!enLaMarcada) fallos.push(`Tab tras «Anterior»: ${await foco(page)}`);
 
     expect(fallos).toEqual([]);
   });
 
-  test.fail('teclado: las flechas mueven foco y marca entre los radios (forma del 1681)', async ({ page }) => {
-    // ABIERTO (02/10/2026). Medido: con el foco en «Piso en bloque», ArrowDown no mueve nada y
-    // no marca nada; cada opción es una parada de Tab (tabindex sin itinerancia).
+  test('teclado: las flechas mueven foco y marca entre los radios (forma del 1681)', async ({ page }) => {
+    // REPARADO (02/10/2026, hallazgo 2676). Medido antes: con el foco en «Piso en bloque»,
+    // ArrowDown no movía nada ni marcaba nada, y cada opción era una parada de Tab. Ahora,
+    // teclaEnOpcion de la referencia: flechas con vuelta, Inicio/Fin y tabindex itinerante.
     await abrirTest(page);
     const radios = page.locator('[role="radiogroup"] [role="radio"]');
     await radios.first().focus();
@@ -876,24 +904,84 @@ test.describe('Re-inspección 02/10/2026 — escritorio', () => {
     await expect(radios.nth(0)).toHaveAttribute('aria-checked', 'true');
     // Una sola parada de Tab por grupo: la marcada.
     expect(await radios.evaluateAll((els) => els.filter((e) => e.getAttribute('tabindex') !== '-1').length)).toBe(1);
+    await page.keyboard.press('End');
+    await expect(radios.nth(3)).toBeFocused();
+    await expect(radios.nth(3)).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('ArrowDown');
+    await expect(radios.nth(0)).toBeFocused();
+    await page.keyboard.press('Home');
+    await expect(radios.nth(0)).toHaveAttribute('aria-checked', 'true');
+    await expect(radios.nth(0)).toHaveAttribute('tabindex', '0');
   });
 
-  test.fail('refrigeración «Sí, imprescindible»: o se recomienda un sistema que refrigera o se dice que el recomendado no cumple ese requisito', async ({ page }) => {
-    // ABIERTO (02/10/2026). En el motor, la pregunta 6 solo suma puntos. Barrido: 46.209 de los
-    // 138.240 perfiles con «imprescindible» reciben un sistema sin refrigeración; en 129 había
-    // uno admitido que refrigera, y en 46.080 ninguno lo hace (sin unidad exterior) y la app no
-    // lo dice. Aquí el pellet gana a la aerotermia por el desempate de presupuesto, y lo único
-    // que delata el choque es la casilla «Refrigeración: No» y el inconveniente «Sin refrigeración».
+  test('refrigeración «Sí, imprescindible»: o se recomienda un sistema que refrigera o se dice que el recomendado no cumple ese requisito', async ({ page }) => {
+    // REPARADO (02/10/2026, hallazgo 2677). En el motor, la pregunta 6 solo sumaba puntos.
+    // Barrido de entonces: 46.209 de los 138.240 perfiles con «imprescindible» recibían un
+    // sistema sin refrigeración; en 129 había uno admitido que refrigera, y en 46.080 ninguno lo
+    // hacía (sin unidad exterior) y la app no lo decía. Aquí el pellet ganaba a la aerotermia por
+    // el desempate de presupuesto. Ahora «imprescindible» es un FILTRO cuando queda algún sistema
+    // que refrigera: fuera el pellet (y la caldera y el eléctrico), y gana la aerotermia (8) con el
+    // split (7) de alternativa; el pellet, que iba por delante, sale en el aviso con su motivo.
     await abrirTest(page);
     await responderPorEtiqueta(page, REFRIGERACION_IMPRESCINDIBLE);
     const refrigera = (await page.locator('[class*="costeItem"]').nth(2).locator('[class*="costeValor"]').innerText()).trim() === 'Sí';
     const explicaciones = (await page.locator('[class*="avisoRecorte"], [class*="avisoEmpate"], [class*="razonesSection"], [class*="consejosSection"]').allInnerTexts()).join(' ');
     expect(refrigera || /imprescindible/i.test(explicaciones), `principal: ${await page.locator('[class*="recomendacionValor"]').first().innerText()}`).toBe(true);
+    await expect(page.locator('[class*="recomendacionValor"]')).toHaveText(['Aerotermia', 'Bomba de Calor (split)']);
+    await expect(page.locator('[class*="avisoRecorte"][role="note"]')).toContainText('Con tus respuestas iba por delante la caldera o estufa de pellet, con 8 puntos, pero no da refrigeración y has indicado que en verano es imprescindible.');
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
   });
 
-  test.fail('formato: los porcentajes llevan espacio duro antes del % (CLAUDE.md §2, 25/09/2026)', async ({ page, request }) => {
-    // ABIERTO (02/10/2026): «rendimientos superiores al 90%» en la guía y «100% en el
-    // navegador» en el featureList de los dos JSON-LD WebApplication.
+  test('refrigeración «Sí, imprescindible» sin unidad exterior: ningún sistema la da, y se dice', async ({ page }) => {
+    // Hallazgo 2677, la otra mitad. Casa unifamiliar o chalet · 100 – 180 m² · Suelo radiante ·
+    // Templado · No, sin gas natural · Sí, imprescindible · 6 o más meses · No tengo espacio ·
+    // 8.000 – 15.000 € · Sí (el perfil SIN_EXTERIOR del 1390). Aerotermia y split, los dos que
+    // refrigeran, necesitan unidad exterior: no queda ninguno que refrigere, así que no se aparta
+    // a nadie más —no quedaría sistema— y gana el pellet (5), pero ya no en silencio.
+    await abrirTest(page);
+    await responderPorEtiqueta(page, ['Casa unifamiliar o chalet', '100 – 180 m²', 'Suelo radiante', 'Templado', 'No, sin gas natural', 'Sí, imprescindible', '6 o más meses', 'No tengo espacio', '8.000 – 15.000 €', 'Sí, quiero aprovecharlas']);
+    await expect(page.locator('[class*="recomendacionValor"]').first()).toHaveText('Caldera o Estufa de Pellet');
+    await expect(page.locator('[class*="avisoRecorte"][role="note"]')).toContainText('Has indicado que la refrigeración en verano es imprescindible, pero los sistemas que la dan quedan fuera de lo que has declarado: la aerotermia, porque necesita una unidad exterior y has indicado que no tienes espacio para ella; la bomba de calor (split), porque necesita una unidad exterior y has indicado que no tienes espacio para ella. La caldera o estufa de pellet solo cubre la calefacción.');
+  });
+
+  test('refrigeración «Sí, imprescindible» (motor): nunca un sistema sin frío si hay uno admitido que lo da, ni en silencio', () => {
+    // Barrido de las 138.240 combinaciones con «imprescindible»: antes 129 + 46.080 fallos.
+    test.setTimeout(120_000);
+    const mal: string[] = [];
+    let conImprescindible = 0;
+    let sinCubrir = 0;
+    const r: Record<number, string> = {};
+    const rec = (i: number): void => {
+      if (i === PREGUNTAS.length) {
+        const res = calcularResultado(r);
+        if (r[6] !== 'imprescindible') {
+          if (res.refrigeracionNoCubierta) mal.push(`aviso sin imprescindible ${JSON.stringify(r)}`);
+          return;
+        }
+        conImprescindible++;
+        const algunoQueRefrigera = CLAVES.some((k) => SISTEMAS[k].refrigera && !(res.descartes[k] ?? []).some((m) => m !== 'sin-refrigeracion'));
+        if (SISTEMAS[res.sistemaPrincipal].refrigera) return;
+        sinCubrir++;
+        if (algunoQueRefrigera) mal.push(`sin frío habiendo uno admitido ${JSON.stringify(r)}`);
+        // La frase empieza la última oración con el recomendado en mayúscula («Los radiadores…»).
+        if (!res.refrigeracionNoCubierta.toLowerCase().includes(`. ${SISTEMAS[res.sistemaPrincipal].conArticulo} solo`)) mal.push(`en silencio ${JSON.stringify(r)}`);
+        return;
+      }
+      for (const o of PREGUNTAS[i].opciones) {
+        r[PREGUNTAS[i].id] = o.valor;
+        rec(i + 1);
+      }
+    };
+    rec(0);
+    expect(mal.slice(0, 5)).toEqual([]);
+    expect(conImprescindible).toBe(138_240);
+    // Los 46.080 sin unidad exterior: ahí ningún sistema que refrigera cabe, y se dice.
+    expect(sinCubrir).toBe(46_080);
+  });
+
+  test('formato: los porcentajes llevan espacio duro antes del % (CLAUDE.md §2, 25/09/2026)', async ({ page, request }) => {
+    // REPARADO (02/10/2026, hallazgo 2680): eran «rendimientos superiores al 90%» en la guía y
+    // «100% en el navegador» en el featureList de los dos JSON-LD WebApplication.
     await abrirTest(page);
     await responderPorEtiqueta(page, EMPATE_SUPERLATIVO);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -902,10 +990,13 @@ test.describe('Re-inspección 02/10/2026 — escritorio', () => {
     const jsonLd = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]).join(' ');
     expect(texto.match(/\d%/g) ?? []).toEqual([]);
     expect(jsonLd.match(/\d%/g) ?? []).toEqual([]);
+    // Y el espacio es el DURO (U+00A0), no uno normal que deje el % solo al saltar de línea.
+    expect(texto).toContain('al 90\u00A0%');
+    expect(jsonLd).toContain('100\u00A0% en el navegador');
   });
 
-  test.fail('guía: el pellet no es «la renovable más económica» si las horquillas de la propia app dan menos a la aerotermia', async ({ page }) => {
-    // ABIERTO (02/10/2026). Coste anual de la ficha: aerotermia 600 – 1.100 €, pellet 700 – 1.200 €
+  test('guía: el pellet no es «la renovable más económica» si las horquillas de la propia app dan menos a la aerotermia', async ({ page }) => {
+    // REPARADO (02/10/2026, hallazgo 2681). Coste anual de la ficha: aerotermia 600 – 1.100 €, pellet 700 – 1.200 €
     // (y la aerotermia rinde unos 4 kWh de calor por kWh eléctrico, según la misma app).
     const minimo = (s: string) => Number(s.split(' – ')[0].replace(/\./g, ''));
     expect(minimo(SISTEMAS.aerotermia.costeAnual)).toBeLessThan(minimo(SISTEMAS.pellet.costeAnual));
@@ -915,6 +1006,8 @@ test.describe('Re-inspección 02/10/2026 — escritorio', () => {
     const texto = (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
     expect(texto).not.toContain('la renovable más económica');
     expect(texto).not.toContain('la opción renovable con menor coste energético por kWh');
+    // La comparación sale de las mismas horquillas de la ficha.
+    expect(texto).toContain(`su coste anual (${SISTEMAS.pellet.costeAnual}) queda por debajo del de los radiadores eléctricos (${SISTEMAS.electrico.costeAnual}) y algo por encima del de la aerotermia (${SISTEMAS.aerotermia.costeAnual})`);
   });
 });
 
@@ -968,9 +1061,11 @@ test.describe('Re-inspección 02/10/2026 — móvil 360 px con pantalla táctil'
     hasTouch: true,
   });
 
-  test.fail('doble toque en «Siguiente» o «Ver resultado»: el segundo toque no contesta la pregunta nueva ni saca de la app', async ({ page }) => {
-    // ABIERTO (02/10/2026). Dos toques a 150 ms en el centro del botón, tras contestar con la
-    // primera opción. Medido: en la 4 marca «Otro sistema» de la 5 (que tiene una opción más);
+  test('doble toque en «Siguiente» o «Ver resultado»: el segundo toque no contesta la pregunta nueva ni saca de la app', async ({ page }) => {
+    // REPARADO (02/10/2026, hallazgo 2674): el contenedor ignora en fase de captura el 2.º clic
+    // de una ráfaga (detail > 1) si el anterior cambió de pantalla, también sobre los enlaces de
+    // los componentes compartidos. Dos toques a 150 ms en el centro del botón, tras contestar con
+    // la primera opción. Medido antes: en la 4 marcaba «Otro sistema» de la 5 (que tiene una opción más);
     // en la 8 marca «Más de 15.000 €» de la 9; en la 5 (la 6 tiene dos opciones menos) el toque
     // cae en «Apps relacionadas» y abre /calculadora-eficiencia-energetica/; en «Ver resultado»
     // el foco sube la vista al título y el toque cae en el enlace de Delegum del aviso legal.
@@ -983,12 +1078,17 @@ test.describe('Re-inspección 02/10/2026 — móvil 360 px con pantalla táctil'
       await page.goto('/selector-calefaccion/');
       await esperarHidratacionBotones(page);
       await page.getByRole('button', { name: /Empezar el test/ }).tap();
+      // Entre dos acciones LEGÍTIMAS se deja medio segundo: dos toques cercanos y seguidos los
+      // cuenta Chrome como ráfaga, y el segundo (una intención nueva, no un doble toque) se
+      // ignoraría con razón tras un cambio de pantalla. Una persona no elige opción a 100 ms.
+      await page.waitForTimeout(500);
       for (let q = 1; q <= pregunta; q++) {
         await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
         const boton = page.getByRole('button', { name: q === 10 ? 'Ver resultado' : 'Siguiente pregunta' });
         if (q < pregunta) {
           await boton.tap();
           await expect(page.locator('[class*="progresoPaso"]')).toHaveText(`Pregunta ${q + 1} de 10`);
+          await page.waitForTimeout(500); // el mismo motivo: la siguiente acción es legítima
           continue;
         }
         await boton.scrollIntoViewIfNeeded();
@@ -1016,8 +1116,25 @@ test.describe('Re-inspección 02/10/2026 — móvil 360 px con pantalla táctil'
     expect(fallos).toEqual([]);
   });
 
-  test.fail('la barra fija del logo no tapa el título del resultado (lotes 586a4d61 y a1d72a9c)', async ({ page }) => {
-    // ABIERTO (02/10/2026). Los lotes dieron 80 px arriba a `.hero` (≤ 1023 px), pero no a
+  test('un toque legítimo tras «Siguiente» sí cuenta: elegir opción medio segundo después marca la pregunta nueva', async ({ page }) => {
+    // El otro lado del 2674: la guarda solo come el 2.º toque de una ráfaga; un toque suelto
+    // posterior (detail 1) se atiende. Sin esto, la reparación podría «pasar» comiéndose todo.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-calefaccion/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    await page.waitForTimeout(500); // acción legítima siguiente, no un doble toque
+    await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).tap();
+    await expect(page.locator('[class*="progresoPaso"]')).toHaveText('Pregunta 2 de 10');
+    await page.waitForTimeout(500); // ídem
+    await page.locator('[role="radiogroup"] [role="radio"]').nth(1).tap();
+    await expect(page.locator('[role="radiogroup"] [role="radio"]').nth(1)).toHaveAttribute('aria-checked', 'true');
+  });
+
+  test('la barra fija del logo no tapa el título del resultado (lotes 586a4d61 y a1d72a9c)', async ({ page }) => {
+    // REPARADO (02/10/2026, hallazgo 2679): `.heroResultados` recibe los mismos 80 px que `.hero`
+    // hasta 1023 px. Antes: los lotes dieron 80 px arriba a `.hero` (≤ 1023 px), pero no a
     // `.heroResultados` (32 px). El foco lleva la vista arriba del todo y el título queda en
     // y = 31…90, bajo la píldora del logo (15-141 × 10-52) y el botón de tema (307-345 × 12-50):
     // 2.081 px² de texto tapado a 360 px y 2.620 a 390, en claro y en oscuro. A 800, 1000 y

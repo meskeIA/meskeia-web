@@ -8,7 +8,11 @@
  *  1. Empates. Antes los resolvía el orden del array de puntuaciones (`sort` estable), siempre
  *     a favor de la aerotermia y en silencio. Ahora, a igualdad de puntos, va primero el
  *     sistema que más encaja con el PRESUPUESTO de instalación declarado (pregunta 9) y, si
- *     sigue el empate, el de menor coste de instalación. El empate se anuncia en pantalla.
+ *     sigue el empate, el de menor coste de instalación. El empate se anuncia en pantalla, y
+ *     si a los empatados los separa un criterio distinto, cada criterio nombra a los que deja
+ *     detrás (hallazgo 2678, la forma del 1442 de selector-mascota): el superlativo encadenado
+ *     «y, a igualdad, su coste es el más bajo» se leía contra TODOS los empatados y era falso
+ *     si el que quedó detrás por presupuesto costaba menos.
  *
  *  2. Razones. Antes eran un texto fijo por sistema. Ahora se citan las respuestas que más han
  *     sumado al sistema recomendado.
@@ -28,11 +32,20 @@
  *         rehabilitación energética de edificios», 2023, §2.2.1.4).
  *       · «No, sin gas natural — No hay acometida de gas en mi zona» (pregunta 5): fuera la
  *         caldera de gas.
- *     Las demás respuestas (clima, meses de uso, refrigeración, «Depende de la comunidad»)
- *     son preferencias o condiciones que se pueden negociar: siguen siendo pesos, y la de la
- *     comunidad se recuerda en los consejos. Los radiadores eléctricos pasan todos los
- *     filtros (800 € de mínimo, sin unidad exterior ni gas), así que siempre queda un sistema.
- *     Lo apartado se dice en pantalla con su motivo.
+ *       · «Sí, imprescindible — sin aire sería imposible» (pregunta 6): fuera los sistemas
+ *         que no refrigeran (hallazgo 2677). La respuesta es un requisito, no una preferencia:
+ *         antes solo sumaba puntos, y en 129 perfiles ganaba el pellet o la caldera a una
+ *         aerotermia o un split admitidos. Si NINGÚN sistema que refrigera pasa los demás
+ *         filtros (los dos necesitan unidad exterior, así que pasa con «No tengo espacio»),
+ *         no se aparta a nadie —no quedaría ninguno—, pero se dice en pantalla que el
+ *         recomendado no da la refrigeración declarada imprescindible y por qué no la da
+ *         ninguno: antes 46.080 perfiles lo descubrían solo por la casilla «Refrigeración: No».
+ *     Las demás respuestas (clima, meses de uso, refrigeración «útil», «Depende de la
+ *     comunidad») son preferencias o condiciones que se pueden negociar: siguen siendo pesos,
+ *     y la de la comunidad se recuerda en los consejos. Los radiadores eléctricos pasan los
+ *     filtros de presupuesto, unidad exterior y gas (800 € de mínimo, sin unidad exterior ni
+ *     gas), y el de refrigeración solo actúa si queda algún sistema que refrigera, así que
+ *     siempre queda un sistema. Lo apartado se dice en pantalla con su motivo.
  *
  *  4. Caldera reciente (hallazgo 1392). A quien tiene una caldera de gas de menos de 5 años no
  *     se le presenta otro sistema como «tu mejor opción» para instalar ya, junto a un consejo
@@ -372,7 +385,7 @@ export const TECHO_PRESUPUESTO: Record<string, number> = {
   premium: Infinity,
 };
 
-export type MotivoDescarte = 'presupuesto' | 'unidad-exterior' | 'sin-gas';
+export type MotivoDescarte = 'presupuesto' | 'unidad-exterior' | 'sin-gas' | 'sin-refrigeracion';
 
 export interface Resultado {
   sistemaPrincipal: SistemaKey;
@@ -393,6 +406,11 @@ export interface Resultado {
   /** Frase que explica cómo se ha deshecho el empate; vacía si no lo hay. */
   criterioDesempate: string;
   /**
+   * Refrigeración «imprescindible» y ningún sistema que refrigera pasa los demás filtros: frase
+   * que lo dice, con el motivo de cada uno. Vacía en cualquier otro caso (hallazgo 2677).
+   */
+  refrigeracionNoCubierta: string;
+  /**
    * La caldera de gas es de menos de 5 años y gana otro sistema: se presenta como el que encaja
    * para cuando toque sustituirla, no como una obra para ya (hallazgo 1392).
    */
@@ -408,6 +426,12 @@ const puntosEnLetra = (n: number) => `${n} ${n === 1 ? 'punto' : 'puntos'}`;
 const plural = (info: SistemaInfo) => /^(los|las) /.test(info.conArticulo);
 
 const mayuscula = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** Lista legible: «A, B y C». */
+export function enumerar(items: string[]): string {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
+}
 
 const etiquetaDe = (id: number, valor: string | undefined) =>
   PREGUNTAS.find((p) => p.id === id)?.opciones.find((o) => o.valor === valor)?.etiqueta ?? '';
@@ -437,6 +461,15 @@ export function calcularResultado(r: Record<number, string>): Resultado {
     if (r[5] === 'no_gas' && info.necesitaGasNatural) motivos.push('sin-gas');
     if (motivos.length > 0) descartes[k] = motivos;
   }
+  // Refrigeración imprescindible: aparta a los que no refrigeran solo si queda alguno que sí
+  // (regla 3 de la cabecera). Si no queda ninguno, se dice más abajo.
+  const refrigerantes = CLAVES.filter((k) => SISTEMAS[k].refrigera);
+  const refrigeracionSinCubrir = r[6] === 'imprescindible' && refrigerantes.every((k) => descartes[k]);
+  if (r[6] === 'imprescindible' && !refrigeracionSinCubrir) {
+    for (const k of CLAVES) {
+      if (!SISTEMAS[k].refrigera) descartes[k] = [...(descartes[k] ?? []), 'sin-refrigeracion'];
+    }
+  }
 
   // ─ Orden explicable: puntos; luego el encaje con el presupuesto; luego el coste ─
   const presupuesto = aporte[PREGUNTA_DESEMPATE] ?? {};
@@ -457,6 +490,7 @@ export function calcularResultado(r: Record<number, string>): Resultado {
   const motivoEnFrase = (k: SistemaKey, m: MotivoDescarte): string => {
     if (m === 'presupuesto') return `su instalación empieza en ${desde(SISTEMAS[k])} y no cabe en tu presupuesto («${etiquetaDe(9, r[9])}»)`;
     if (m === 'unidad-exterior') return 'necesita una unidad exterior y has indicado que no tienes espacio para ella';
+    if (m === 'sin-refrigeracion') return 'no da refrigeración y has indicado que en verano es imprescindible';
     return 'necesita acometida de gas natural y has indicado que no la hay en tu zona';
   };
   const avisosDescarte = apartados.map((k) => {
@@ -465,18 +499,42 @@ export function calcularResultado(r: Record<number, string>): Resultado {
     return `Con tus respuestas ${plural(otro) ? 'iban' : 'iba'} por delante ${otro.conArticulo}, con ${puntosEnLetra(puntos[k])}, pero ${motivos}.`;
   });
 
+  // Refrigeración imprescindible que ningún sistema admitido da: se dice, con el motivo de cada
+  // uno de los que refrigeran (hallazgo 2677).
+  const porQueNoRefrigera = (k: SistemaKey) =>
+    `${SISTEMAS[k].conArticulo}, porque ${(descartes[k] ?? []).map((m) => motivoEnFrase(k, m)).join(', y además ')}`;
+  const refrigeracionNoCubierta = refrigeracionSinCubrir
+    ? `Has indicado que la refrigeración en verano es imprescindible, pero los sistemas que la dan quedan fuera de lo que has declarado: ${refrigerantes.map(porQueNoRefrigera).join('; ')}. ${mayuscula(info.conArticulo)} solo ${plural(info) ? 'cubren' : 'cubre'} la calefacción.`
+    : '';
+
   const empatados = admitidos.slice(1).filter((k) => puntos[k] === puntos[sistemaPrincipal]);
   let criterioDesempate = '';
   if (empatados.length > 0) {
-    // El criterio que la separa de CADA empatado; si no es el mismo para todos, se dicen los
-    // que han intervenido, en su orden.
-    const porPresupuesto = empatados.some((k) => (presupuesto[k] ?? 0) !== (presupuesto[sistemaPrincipal] ?? 0));
-    const porCoste = empatados.some((k) => (presupuesto[k] ?? 0) === (presupuesto[sistemaPrincipal] ?? 0));
-    const motivos = [
-      ...(porPresupuesto ? [`${plural(info) ? 'encajan' : 'encaja'} mejor con el presupuesto de instalación que has indicado`] : []),
-      ...(porCoste ? ['su coste de instalación es el más bajo'] : []),
+    // El criterio que separa al recomendado de CADA empatado: 0, el presupuesto; 1, el coste.
+    // Si es el mismo para todos, se dice tal cual; si no, cada criterio nombra a los que ha
+    // dejado detrás. Antes se encadenaban en superlativo («y, a igualdad, su coste de
+    // instalación es el más bajo») aunque un empatado apartado por el presupuesto costara menos
+    // (hallazgo 2678; mismo defecto y misma reparación que selector-mascota, 1442, y
+    // selector-movilidad-urbana, c9b48a08).
+    const pl = plural(info);
+    const criterios = [
+      {
+        motivo: `${pl ? 'encajan' : 'encaja'} mejor con el presupuesto de instalación que has indicado`,
+        frente: (otros: string) => `${pl ? 'encajan' : 'encaja'} mejor que ${otros} con el presupuesto de instalación que has indicado`,
+      },
+      {
+        motivo: 'su coste de instalación es el más bajo',
+        frente: (otros: string) => `${pl ? 'cuestan' : 'cuesta'} menos de instalar que ${otros}`,
+      },
     ];
-    criterioDesempate = `${plural(info) ? 'se muestran' : 'se muestra'} primero ${info.conArticulo} porque ${motivos.join(' y, a igualdad, ')}`;
+    const decisivo = (k: SistemaKey) => ((presupuesto[k] ?? 0) !== (presupuesto[sistemaPrincipal] ?? 0) ? 0 : 1);
+    const grupos = [...new Set(empatados.map(decisivo))].sort((a, b) => a - b);
+    const porque = grupos.length === 1
+      ? criterios[grupos[0]].motivo
+      : grupos
+        .map((g) => criterios[g].frente(enumerar(empatados.filter((k) => decisivo(k) === g).map((k) => SISTEMAS[k].conArticulo))))
+        .join(' y ');
+    criterioDesempate = `${pl ? 'se muestran' : 'se muestra'} primero ${info.conArticulo} porque ${porque}`;
   }
 
   // ─ Razones: las respuestas que más han sumado al sistema recomendado ─
@@ -543,6 +601,7 @@ export function calcularResultado(r: Record<number, string>): Resultado {
     avisosDescarte,
     empatados,
     criterioDesempate,
+    refrigeracionNoCubierta,
     planificarSustitucion,
     razones,
     consejos,

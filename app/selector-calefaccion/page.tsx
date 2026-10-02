@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
 import styles from './SelectorCalefaccion.module.css';
 import {
   MeskeiaLogo,
@@ -23,16 +23,11 @@ import {
   AYUDAS_RENOVABLES,
   AYUDAS_PROGRAMA_2021,
   AYUDAS_DONDE_MIRAR,
+  enumerar,
   type Resultado,
 } from './motor';
 
 // Los sistemas, las preguntas con sus pesos y la lógica de recomendación viven en ./motor.ts.
-
-/** Lista legible: «A, B y C». */
-function enumerar(items: string[]): string {
-  if (items.length <= 1) return items.join('');
-  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
-}
 
 // ─────────────────────────────────────────────
 // Componente principal
@@ -46,24 +41,100 @@ export default function SelectorCalefaccion() {
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const tituloResultado = useRef<HTMLHeadingElement>(null);
+  const enunciado = useRef<HTMLHeadingElement>(null);
+  const tituloIntro = useRef<HTMLHeadingElement>(null);
+  /** Solo al VOLVER a la intro («Repetir el test») se le lleva el foco; en la carga, no. */
+  const volviendoRef = useRef(false);
 
-  // Al pulsar «Ver resultado» la sección del test se desmonta con el botón que tenía el foco, y
-  // el foco caía a <body>: se lleva al encabezado del resultado (familia de selectores, forma g).
+  // Al cambiar de pantalla o de pregunta se desmonta o se desactiva el botón que tenía el foco
+  // («Empezar», «Siguiente» sin respuesta aún, «Anterior» en la pregunta 2, «Ver resultado»,
+  // «Repetir»), y el foco caía a <body>: el siguiente Tab salía a «Apps relacionadas» y hacían
+  // falta 18 Tab para volver a la primera opción (hallazgo 2675, forma del 1680 de
+  // selector-smartphone). Se lleva al enunciado de la pregunta nueva, al encabezado del
+  // resultado o al título de la intro, que además lo desplaza a la vista (con scroll-margin-top
+  // para no dejarlo bajo la barra fija del logo).
   useEffect(() => {
     if (pantalla === 'resultado') tituloResultado.current?.focus();
-  }, [pantalla]);
+    else if (pantalla === 'test') enunciado.current?.focus();
+    else if (volviendoRef.current) {
+      volviendoRef.current = false;
+      tituloIntro.current?.focus();
+    }
+  }, [pantalla, paso]);
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
   const progreso = (paso / totalPreguntas) * 100;
 
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 2674, forma del 2507 de quiz-literatura-universal).
+   * «Empezar», «Siguiente», «Anterior», «Ver resultado» y «Repetir» cambian la pantalla en el
+   * primer toque, y el segundo caía en el mismo punto sobre lo que hubiera debajo: como las
+   * preguntas no tienen todas el mismo número de opciones, la botonera se desplaza, y el segundo
+   * toque contestaba la pregunta nueva sin leerla, abría una app de «Apps relacionadas» o, tras
+   * «Ver resultado», el enlace de Delegum del aviso legal. Un doble toque es UNA intención, así
+   * que se ignora un clic cuando cumple las dos cosas:
+   *   · es el 2.º (o 3.º…) de una ráfaga: `detail` > 1. Lo cuenta el navegador, no un
+   *     temporizador de la app; con teclado o lector de pantalla es 0;
+   *   · y el clic ANTERIOR dentro de la app cambió de pantalla. Sin esta condición, elegir una
+   *     opción y pulsar «Siguiente» deprisa —dos toques cercanos, que Chrome también cuenta como
+   *     ráfaga— se comería el «Siguiente», que sí era una intención nueva.
+   * Se filtra en la fase de CAPTURA del contenedor, así que vale también para los enlaces de los
+   * componentes compartidos que hay debajo (aviso legal, apps relacionadas, pie). El clic
+   * ignorado no toca el registro: el 3.º de una ráfaga se ignora igual que el 2.º.
+   */
+  const ultimoCambioPantallaRef = useRef(false);
+  function filtrarClicDeMas(e: MouseEvent<HTMLDivElement>) {
+    if (e.detail > 1 && ultimoCambioPantallaRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    // Cualquier clic que pasa empieza sin cambio de pantalla; los botones que la cambian lo
+    // marcan en su propio manejador, que corre después (fase de burbuja).
+    ultimoCambioPantallaRef.current = false;
+  }
+  const cambiaPantalla = () => {
+    ultimoCambioPantallaRef.current = true;
+  };
+
   function seleccionarOpcion(valor: string) {
     setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
   }
 
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG): las flechas mueven el foco a la opción vecina y
+   * la marcan, con vuelta al principio, e Inicio/Fin van a los extremos. El grupo es UNA parada
+   * de Tab (tabindex itinerante). Antes cada opción era una parada y las flechas no hacían nada
+   * (hallazgo 2676, forma del 1681 de selector-smartphone).
+   */
+  function teclaEnOpcion(e: KeyboardEvent<HTMLButtonElement>, indice: number) {
+    const total = preguntaActual.opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    ultimoCambioPantallaRef.current = false;
+    seleccionarOpcion(preguntaActual.opciones[destino].valor);
+    const radios = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    radios?.[destino]?.focus();
+  }
+
+  function empezar() {
+    cambiaPantalla();
+    setPantalla('test');
+  }
+
+  // Avanza desde la pregunta DEL RENDER (`paso + 1`, no `p => p + 1`) y solo si está
+  // respondida: dos clics que llegaran antes de repintar no saltan una pregunta sin contestar.
   function avanzar() {
+    if (!respuestas[PREGUNTAS[paso].id]) return;
+    cambiaPantalla();
     if (paso < totalPreguntas - 1) {
-      setPaso(p => p + 1);
+      setPaso(paso + 1);
     } else {
       setResultado(calcularResultado(respuestas));
       setPantalla('resultado');
@@ -71,10 +142,14 @@ export default function SelectorCalefaccion() {
   }
 
   function retroceder() {
-    if (paso > 0) setPaso(p => p - 1);
+    if (paso === 0) return;
+    cambiaPantalla();
+    setPaso(paso - 1);
   }
 
   function reiniciar() {
+    cambiaPantalla();
+    volviendoRef.current = true;
     setPantalla('intro');
     setPaso(0);
     setRespuestas({});
@@ -82,7 +157,7 @@ export default function SelectorCalefaccion() {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} onClickCapture={filtrarClicDeMas}>
       <MeskeiaLogo />
 
       {pantalla !== 'resultado' ? (
@@ -118,7 +193,7 @@ export default function SelectorCalefaccion() {
               <span className={styles.introIcon}>🔥</span>
               <span className={styles.introIcon}>🪵</span>
             </div>
-            <h2 className={styles.introTitulo}>¿Aerotermia, gas o bomba de calor?</h2>
+            <h2 className={styles.introTitulo} ref={tituloIntro} tabIndex={-1}>¿Aerotermia, gas o bomba de calor?</h2>
             <p className={styles.introDesc}>
               Elegir el sistema de calefacción es una decisión que afecta a tu confort y a tu factura durante muchos
               años. Este test analiza tu vivienda y tu situación real para orientarte entre cinco sistemas: aerotermia,
@@ -131,7 +206,7 @@ export default function SelectorCalefaccion() {
               <li><span aria-hidden="true">✅</span> Información sobre ayudas públicas y normativa europea</li>
               <li><span aria-hidden="true">✅</span> Consejos personalizados según tu situación</li>
             </ul>
-            <button type="button" className={styles.btnStart} onClick={() => setPantalla('test')}>
+            <button type="button" className={styles.btnStart} onClick={empezar}>
               Empezar el test →
             </button>
           </div>
@@ -165,9 +240,9 @@ export default function SelectorCalefaccion() {
 
           <div className={styles.preguntaCard}>
             <span className={styles.preguntaIcon} aria-hidden="true">{preguntaActual.icon}</span>
-            <h2 className={styles.preguntaTexto}>{preguntaActual.pregunta}</h2>
+            <h2 className={styles.preguntaTexto} ref={enunciado} tabIndex={-1}>{preguntaActual.pregunta}</h2>
             <div className={styles.opcionesGrid} role="radiogroup" aria-label={preguntaActual.pregunta}>
-              {preguntaActual.opciones.map(op => (
+              {preguntaActual.opciones.map((op, indice) => (
                 <button
                   key={op.valor}
                   type="button"
@@ -178,6 +253,13 @@ export default function SelectorCalefaccion() {
                   // radio dentro (selector-smartphone, hallazgo 950).
                   role="radio"
                   aria-checked={respuestas[preguntaActual.id] === op.valor}
+                  // Tabindex itinerante: la marcada, o la primera si no hay ninguna (2676).
+                  tabIndex={
+                    respuestas[preguntaActual.id]
+                      ? respuestas[preguntaActual.id] === op.valor ? 0 : -1
+                      : indice === 0 ? 0 : -1
+                  }
+                  onKeyDown={e => teclaEnOpcion(e, indice)}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.desc}</span>
@@ -239,8 +321,10 @@ export default function SelectorCalefaccion() {
           )}
 
           {/* Lo declarado como límite, dicho a la cara: presupuesto, unidad exterior o gas han
-              apartado a los que iban por delante (hallazgos 1389, 1390 y 1391). */}
-          {resultado.avisosDescarte.length > 0 && (
+              apartado a los que iban por delante (hallazgos 1389, 1390 y 1391). Y la refrigeración
+              declarada imprescindible: aparta a los que no refrigeran o, si no queda ninguno que
+              refrigere, se dice que el recomendado no la da (hallazgo 2677). */}
+          {(resultado.avisosDescarte.length > 0 || resultado.refrigeracionNoCubierta) && (
             <div className={styles.avisoRecorte} role="note">
               <p className={styles.avisoRecorteTitulo}>
                 <span aria-hidden="true">⚠️</span> Ajustado a lo que has declarado
@@ -248,6 +332,9 @@ export default function SelectorCalefaccion() {
               {resultado.avisosDescarte.map((a) => (
                 <p key={a} className={styles.avisoRecorteItem}>{a}</p>
               ))}
+              {resultado.refrigeracionNoCubierta && (
+                <p className={styles.avisoRecorteItem}>{resultado.refrigeracionNoCubierta}</p>
+              )}
             </div>
           )}
 
@@ -385,11 +472,18 @@ export default function SelectorCalefaccion() {
               Europea de octubre de 2024).
             </div>
 
-            <h3>Pellet: la renovable más económica en zonas sin gas</h3>
+            {/* Antes: «la renovable más económica» y «la opción renovable con menor coste energético
+                por kWh», contra las horquillas de la propia app, que dan a la aerotermia un coste
+                anual más bajo que al pellet (hallazgo 2681). Las cifras salen ahora de SISTEMAS. */}
+            <h3>Pellet: la renovable sin gas ni unidad exterior</h3>
             <p>
-              En zonas rurales sin acceso a gas natural, el pellet es la opción renovable con menor coste energético por kWh.
+              En zonas rurales sin acceso a gas natural, el pellet es la opción renovable que no necesita unidad exterior.
+              Con las horquillas orientativas de este test, su coste anual ({SISTEMAS.pellet.costeAnual}) queda por debajo del
+              de los radiadores eléctricos ({SISTEMAS.electrico.costeAnual}) y algo por encima del de la aerotermia
+              ({SISTEMAS.aerotermia.costeAnual}), que genera {RENDIMIENTO_AEROTERMIA} pero necesita unidad exterior y una inversión
+              mayor ({SISTEMAS.aerotermia.costeInstalacion} frente a {SISTEMAS.pellet.costeInstalacion}).
               El pellet de madera tiene un precio estable y su producción es mayoritariamente nacional. Las calderas modernas
-              tienen alimentación automática y rendimientos superiores al 90%.
+              tienen alimentación automática y rendimientos superiores al 90&nbsp;%.
             </p>
 
             {/* Antes: «Next Generation EU</strong>» y, en la línea siguiente, «canalizados»: el

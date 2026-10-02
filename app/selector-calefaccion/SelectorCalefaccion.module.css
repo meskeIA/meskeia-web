@@ -491,7 +491,23 @@
    título en móvil y tableta. Desde 1024px el título centrado ya no llega al logo. Mismo hueco
    que deja la plantilla. Va al final para ganar a cualquier padding previo del hero. */
 @media (max-width: 1023px) {
-  .hero {
+  /* .heroResultados se quedó fuera de los lotes 586a4d61 y a1d72a9c, y «Ver resultado» lleva el
+     foco a su título con la vista arriba del todo: a 360 px el logo tapaba «Tu siste-»
+     (hallazgo 2679). Mismo hueco y mismos cortes que .hero. */
+  .hero,
+  .heroResultados {
     padding-top: 80px;
   }
 }
+
+/* Lo que recibe el foco al cambiar de pantalla o de pregunta (hallazgo 2675): focus() lo
+   desplaza a la vista, y sin este margen podía quedar bajo la barra fija del logo. */
+.preguntaTexto,
+.heroTitleSm,
+.introTitulo {
+  scroll-margin-top: 80px;
+}
+.preguntaTexto:focus,
+.introTitulo:focus { outline: none; }
+.preguntaTexto:focus-visible,
+.introTitulo:focus-visible { outline: 2px solid var(--primary-texto); outline-offset: 4px; border-radius: 4px; }

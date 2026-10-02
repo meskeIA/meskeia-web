@@ -21,11 +21,12 @@ const DESCRIPCION = `Test de 10 preguntas para saber qué sistema de calefacció
 const CARACTERISTICAS = [
   'Test de 10 preguntas sobre vivienda, clima, uso y presupuesto',
   'Recomendación de sistema principal y alternativa entre cinco tecnologías',
-  'Aparta, y lo explica, los sistemas que no caben en el presupuesto o que necesitan una unidad exterior o gas natural que no tienes',
+  'Aparta, y lo explica, los sistemas que no caben en el presupuesto o que necesitan una unidad exterior o gas natural que no tienes, y los que no refrigeran si dices que el aire en verano es imprescindible',
   'Coste de instalación y coste anual orientativos',
   'Ventajas e inconvenientes del sistema recomendado y de la alternativa',
   'Información sobre ayudas públicas y la normativa europea de calderas',
-  '100% en el navegador, sin registro ni instalación',
+  // Espacio duro antes del % (CLAUDE.md §2, 25/09/2026; hallazgo 2680).
+  '100 % en el navegador, sin registro ni instalación',
 ];
 
 export const metadata: Metadata = {
