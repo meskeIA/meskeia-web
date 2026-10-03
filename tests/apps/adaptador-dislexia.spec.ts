@@ -1,4 +1,4 @@
-import { test, expect, devices, type Page } from '@playwright/test';
+import { test, expect, devices, type Locator, type Page } from '@playwright/test';
 import {
   esperarHidratacion,
   esperarValorEnReact,
@@ -29,7 +29,8 @@ import {
  *
  * RANGOS DECLARADOS POR LA APP (page.tsx)
  *   tamaño 14–36 px paso 1 · letras 0–0,3 em paso 0,01 · palabras 0–0,5 em paso 0,01
- *   interlineado 1,2–3,0 paso 0,1 · ancho 40–100 % paso 5
+ *   interlineado 1,2–3,0 paso 0,1 · ancho 40–100 % paso 1 (paso 5 hasta el 18/09/2026,
+ *   hallazgo 881, REPARADO)
  *   Por defecto: lexend · 20 px · 0,05 · 0,15 · 1,9 · 68 % · fondo crema #FEFDF6.
  *
  * ⚠️ POR QUÉ NINGÚN CASO PARTE DEL VALOR POR DEFECTO
@@ -47,18 +48,28 @@ import {
  *   extremos; el `<input type="range">` capa por su cuenta lo que se salga del rango; el
  *   texto vacío muestra el marcador de posición sin perder los ajustes; 30.000 caracteres
  *   no rompen nada; y lo que se ajusta en el panel SÍ queda escrito en el almacenamiento
- *   del navegador. Lo que no funciona es recuperarlo: ver los hallazgos de persistencia.
+ *   del navegador. Recuperarlo fallaba hasta el 18/09/2026 (hallazgos 877 y 932, REPARADOS).
  *
- * ⚠️ ESTOS CASOS CORREN CONTRA `next dev` (playwright.config.ts levanta el 3050), y la app
- *   NO se comporta igual que en producción, porque en dev React monta los efectos dos veces
- *   (StrictMode). Donde el entorno cambia el resultado se dice en el propio caso, con lo
- *   medido en cada uno. Ninguna afirmación de este fichero depende de en cuál se ejecute:
- *   las que valen para los dos entornos están escritas para fallar en los dos.
+ * ⚠️ ESTOS CASOS CORREN CONTRA EL SERVIDOR QUE HAYA EN EL 3050: playwright.config.ts reutiliza
+ *   el que esté levantado (`next start` en las tandas del Inspector) y, si no hay ninguno,
+ *   arranca `next dev`. La app NO se comporta igual en los dos, porque en dev React monta los
+ *   efectos dos veces (StrictMode). Donde el entorno cambia el resultado se dice en el propio
+ *   caso, con lo medido en cada uno. Ninguna afirmación de este fichero depende de en cuál se
+ *   ejecute: las que valen para los dos entornos están escritas para fallar en los dos.
  *
  * LOS 9 HALLAZGOS del 18/09/2026 se repararon ese mismo día y sus casos, marcados aquí como
  * REGRESIÓN, pasaron de `test.fail()` a candado. Cada uno conserva escrito lo que la app hacía
  * antes y con qué medida se demostró: es lo que permite saber, si alguno se vuelve a poner
- * rojo, si lo que ha cambiado es la app o la afirmación.
+ * rojo, si lo que ha cambiado es la app o la afirmación. Re-inspección del 03/10/2026: los
+ * nueve siguen cerrados.
+ *
+ * RE-INSPECCIÓN DEL 03/10/2026 (CASOS 6 a 11) — la app entró por la cola «firma de rotura»:
+ * las visitas cortas pasaron del 68 % al 90 % desde justo después de la reparación del 18/09.
+ * Lo que la explica con más probabilidad es la propia reparación del hallazgo 876: el
+ * `overflow-wrap: anywhere` que evita que el panel se salga de la pantalla PARTE LAS PALABRAS
+ * por cualquier letra y sin guion en cuanto no caben en la línea, y en móvil la columna del
+ * texto adaptado mide 130 px (Pixel 7) o 95 px (360 px) con los ajustes de fábrica. Lo que
+ * sigue abierto va en `test.fail()` con «ABIERTO, hallazgo (inspector 03/10/2026)».
  */
 
 /** Lo que la app guarda en `localStorage`, con los campos que miran estos casos. */
@@ -100,6 +111,89 @@ async function bordeDerechoDelPanel(page: Page): Promise<{ derecha: number; view
 async function abrir(page: Page) {
   await page.goto(RUTA);
   await esperarHidratacion(page, DESLIZADORES);
+}
+
+/** Abre la app en el tema pedido (next-themes lo lee de `meskeia-theme` antes de pintar). */
+async function abrirEnTema(page: Page, tema: 'light' | 'dark') {
+  await page.addInitScript((t) => localStorage.setItem('meskeia-theme', t), tema);
+  await abrir(page);
+  await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
+  await page.addStyleTag({
+    content: '*, *::before, *::after { transition: none !important; animation: none !important; }',
+  });
+}
+
+/**
+ * Palabras del texto adaptado que el navegador reparte entre dos líneas o más. Se mide por
+ * rectángulos de línea de un Range sobre cada palabra: si sus trozos caen en alturas
+ * distintas, la palabra está partida.
+ */
+async function palabrasPartidas(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const region = document.querySelector('[aria-label="Texto con formato aplicado"]');
+    if (!region) return ['(no hay vista previa)'];
+    const partidas: string[] = [];
+    const recorrido = document.createTreeWalker(region, NodeFilter.SHOW_TEXT);
+    for (let nodo = recorrido.nextNode(); nodo; nodo = recorrido.nextNode()) {
+      for (const m of (nodo.textContent ?? '').matchAll(/\S+/g)) {
+        const inicio = m.index ?? 0;
+        const rango = document.createRange();
+        rango.setStart(nodo, inicio);
+        rango.setEnd(nodo, inicio + m[0].length);
+        const alturas = new Set(Array.from(rango.getClientRects()).map((r) => Math.round(r.top)));
+        if (alturas.size > 1) partidas.push(m[0]);
+      }
+    }
+    return partidas;
+  });
+}
+
+/**
+ * Contraste WCAG de un elemento contra su fondo EFECTIVO: compone las capas semitransparentes
+ * de los ancestros hasta dar con una opaca. `pseudo` permite medir `::placeholder`.
+ */
+async function contraste(page: Page, selector: string, pseudo: string | null = null): Promise<number> {
+  return page.evaluate(
+    ({ sel, pseudoElemento }) => {
+      interface Rgba {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+      }
+      const leer = (c: string): Rgba => {
+        const n = (c.match(/[\d.]+/g) ?? []).map(Number);
+        return { r: n[0] ?? 0, g: n[1] ?? 0, b: n[2] ?? 0, a: n.length > 3 ? n[3] : 1 };
+      };
+      const sobre = (arriba: Rgba, abajo: Rgba): Rgba => ({
+        r: arriba.r * arriba.a + abajo.r * (1 - arriba.a),
+        g: arriba.g * arriba.a + abajo.g * (1 - arriba.a),
+        b: arriba.b * arriba.a + abajo.b * (1 - arriba.a),
+        a: 1,
+      });
+      const el = document.querySelector(sel);
+      if (!el) throw new Error(`No existe «${sel}»`);
+      const capas: Rgba[] = [];
+      for (let n: Element | null = el; n; n = n.parentElement) {
+        const c = leer(getComputedStyle(n).backgroundColor);
+        if (c.a > 0) {
+          capas.push(c);
+          if (c.a >= 1) break;
+        }
+      }
+      let fondo: Rgba = { r: 255, g: 255, b: 255, a: 1 };
+      for (let i = capas.length - 1; i >= 0; i--) fondo = sobre(capas[i], fondo);
+      const texto = sobre(leer(getComputedStyle(el, pseudoElemento).color), fondo);
+      const canal = (v: number): number => {
+        const s = v / 255;
+        return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      };
+      const lum = (c: Rgba): number => 0.2126 * canal(c.r) + 0.7152 * canal(c.g) + 0.0722 * canal(c.b);
+      const [claro, oscuro] = [lum(texto), lum(fondo)].sort((a, b) => b - a);
+      return Math.round(((claro + 0.05) / (oscuro + 0.05)) * 100) / 100;
+    },
+    { sel: selector, pseudoElemento: pseudo },
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -168,18 +262,19 @@ test.describe('en escritorio', () => {
   test('REGRESIÓN — el deslizador de ancho arranca en 70 mientras la etiqueta y el texto dicen 68 %', async ({
     page,
   }) => {
-    // `anchoColumna` por defecto es 68, pero el control es min=40 step=5: 68 no cae en la
-    // rejilla y el navegador lo sube a 70. La etiqueta sigue diciendo 68 % y el texto se
-    // maqueta al 68 %, así que el pomo —y el valor que anuncia un lector de pantalla— dicen
-    // una cosa y la app hace otra. Se arregla en cuanto el usuario toca el control.
+    // REPARADO el 18/09/2026 (hallazgo 881). `anchoColumna` por defecto es 68, pero el
+    // control era min=40 step=5: 68 no caía en la rejilla y el navegador lo subía a 70. La
+    // etiqueta decía 68 % y el texto se maquetaba al 68 %, así que el pomo —y el valor que
+    // anunciaba un lector de pantalla— decían una cosa y la app hacía otra. Hoy es step=1.
     await expect(page.locator('#slider-ancho')).toHaveValue('68');
     await expect(etiqueta(page, 'slider-ancho')).toHaveText('Ancho columna: 68%');
     await expect(vistaPrevia(page)).toHaveCSS('max-width', '68%');
   });
 
   test('REGRESIÓN — el interlineado se escribe con punto decimal, no con coma', async ({ page }) => {
-    // CLAUDE.md §2: formato español obligatorio, y `toFixed()` prohibido para presentar
-    // cifras. `prefs.interlineado.toFixed(1)` imprime «1.9» (page.tsx, etiqueta del control).
+    // REPARADO el 18/09/2026 (hallazgo 883). CLAUDE.md §2: formato español obligatorio, y
+    // `toFixed()` prohibido para presentar cifras. `prefs.interlineado.toFixed(1)` imprimía
+    // «1.9» en la etiqueta del control; hoy pasa por `formatNumber`.
     await expect(etiqueta(page, 'slider-lineas')).toHaveText('Interlineado: 1,9');
   });
 });
@@ -258,12 +353,12 @@ test.describe('en móvil (Pixel 7)', () => {
   test('REGRESIÓN — al subir el tamaño al máximo, el panel de ajustes se sale de la pantalla', async ({
     page,
   }) => {
-    // El ancho mínimo del bloque de texto (su palabra más larga) estira la única columna del
-    // grid en móvil, y con ella el panel de ajustes. Medido en producción con tamaño = 36:
-    // el panel acaba en 454 px sobre un viewport de 412. Como `html, body` llevan
-    // `overflow-x: hidden` (globals.css), no hay forma de desplazarse hasta lo que queda
-    // fuera: el extremo derecho del recorrido de los cinco deslizadores —donde está el pomo
-    // justo después de subirlos— deja de verse y de poder tocarse.
+    // REPARADO el 18/09/2026 (hallazgo 876). El ancho mínimo del bloque de texto (su palabra
+    // más larga) estiraba la única columna del grid en móvil, y con ella el panel de ajustes.
+    // Medido en producción con tamaño = 36: el panel acababa en 454 px sobre un viewport de
+    // 412. Como `html, body` llevan `overflow-x: hidden` (globals.css), no había forma de
+    // desplazarse hasta lo que quedaba fuera. ⚠️ La reparación (`overflow-wrap: anywhere`)
+    // abrió el hallazgo del CASO 8: ver más abajo.
     await sembrarValor(page, '#slider-tamano', 36);
     await expect(vistaPrevia(page)).toHaveCSS('font-size', '36px');
 
@@ -274,12 +369,12 @@ test.describe('en móvil (Pixel 7)', () => {
   test('REGRESIÓN — pegar un texto con una palabra larga expulsa los controles fuera de la pantalla', async ({
     page,
   }) => {
-    // Sin tocar ningún ajuste: basta con pegar un texto que contenga un enlace o un correo
-    // largo, que es justo lo que la app invita a pegar («un artículo, apuntes del colegio,
-    // un correo de trabajo»). Medido en producción con este mismo correo de 83 caracteres:
-    // el panel llega a 995 px sobre un viewport de 412, solo el 41 % del recorrido de los
-    // deslizadores queda en pantalla y dos de los cinco botones de color («Azul pálido» y
-    // «Gris suave») quedan enteros fuera, sin scroll horizontal posible.
+    // REPARADO el 18/09/2026 (hallazgo 876). Sin tocar ningún ajuste bastaba con pegar un
+    // texto que contuviera un enlace o un correo largo, que es justo lo que la app invita a
+    // pegar («un artículo, apuntes del colegio, un correo de trabajo»). Medido en producción
+    // con este mismo correo de 83 caracteres: el panel llegaba a 995 px sobre un viewport de
+    // 412, solo el 41 % del recorrido de los deslizadores quedaba en pantalla y dos de los
+    // cinco botones de color («Azul pálido» y «Gris suave») quedaban enteros fuera.
     const textarea = page.getByRole('textbox', { name: 'Texto a adaptar para lectura' });
     const conCorreo =
       'Escribe a coordinacion.pedagogica.centro.educativo@institutoejemplolargo.edu.example';
@@ -288,6 +383,103 @@ test.describe('en móvil (Pixel 7)', () => {
 
     const { derecha, viewport } = await bordeDerechoDelPanel(page);
     expect(derecha).toBeLessThanOrEqual(viewport);
+  });
+
+  test('CASO 8 — con los ajustes de fábrica, ninguna palabra del texto de ejemplo se parte entre dos líneas', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): en móvil el texto adaptado parte palabras por cualquier letra y sin guion',
+    );
+    // De dónde sale el ancho de la columna, calculado ANTES de abrir el navegador (Pixel 7,
+    // 412 px): 412 − 2×24 de `.container` = 364 · − 2×1 de borde − 2×24 de `.seccionVista`
+    // = 314 · − 2×2 de borde − 2×24 de `.vistaContenedor` = 262 · × 68 % (`anchoColumna` de
+    // fábrica) = 178,2 px de caja · − 2×24 de su padding = 130,2 px para el texto. Con Lexend
+    // a 20 px y 0,05 em de espaciado caben unas 10 letras por línea, y el texto de ejemplo
+    // tiene palabras de 11 a 13 («correctamente», «configuración»).
+    //
+    // Antes del 18/09/2026 esas palabras desbordaban la caja crema pero salían ENTERAS. La
+    // reparación del hallazgo 876 añadió `overflow-wrap: anywhere`, que las parte por donde
+    // toque y sin guion: medido el 03/10/2026, «correctame|nte», «configuraci|ón»,
+    // «experiment|a» y «combinació|n» (4 de 85 palabras). Con los ajustes que recomienda la
+    // propia guía de la app (24 px · letras 12 % · ancho 60 %) son 32 de 85, en una columna de
+    // 109,2 px. La Ortografía de la RAE (2010) solo admite partir por sílabas y con guion, y
+    // en un lector para dislexia lo esperable es no partir. Simulando el CSS anterior al
+    // 18/09 sobre esta misma página: 0 palabras partidas y el panel dentro de la pantalla.
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+    });
+    await expect.poll(() => palabrasPartidas(page), { timeout: 3000 }).toEqual([]);
+  });
+
+  test('CASO 9 — mientras se mueve un deslizador se ve al menos una parte del texto adaptado', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): en móvil la vista previa queda a más de una pantalla de los deslizadores',
+    );
+    // La app promete «vista previa en tiempo real» (metadata.ts). En móvil el grid pasa a una
+    // columna y el orden es panel → área de texto → vista previa: medido el 03/10/2026, la
+    // vista previa empieza 1.263 px por debajo del deslizador de tamaño, con 839 px de
+    // pantalla. No hay posición de desplazamiento en la que se vean a la vez el pomo y el
+    // efecto de moverlo. Esperado: que la distancia entre los dos más el alto del deslizador
+    // quepa en la altura de la pantalla.
+    await page.locator('#slider-tamano').scrollIntoViewIfNeeded();
+    const { distancia, alto } = await page.evaluate(() => {
+      const s = document.querySelector('#slider-tamano')!.getBoundingClientRect();
+      const v = document
+        .querySelector('[aria-label="Texto con formato aplicado"]')!
+        .getBoundingClientRect();
+      const hueco = v.top > s.bottom ? v.top - s.bottom : v.bottom < s.top ? s.top - v.bottom : 0;
+      return { distancia: Math.round(hueco + s.height), alto: window.innerHeight };
+    });
+    expect(distancia).toBeLessThan(alto);
+  });
+
+  test('CASO 9.bis — con el dedo, los botones de fuente y de fondo responden', async ({ page }) => {
+    // Pulsación táctil real (`tap`, que exige hasTouch). Ninguno de los dos es el de fábrica.
+    await page.getByRole('button', { name: /mono/i }).tap();
+    await page.getByRole('button', { name: 'Gris suave' }).tap();
+
+    await expect(page.getByRole('button', { name: /mono/i })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: 'Gris suave' })).toHaveAttribute('aria-pressed', 'true');
+    const texto = vistaPrevia(page);
+    await expect(texto).toHaveCSS('font-family', '"Courier New", Courier, monospace');
+    await expect(texto).toHaveCSS('background-color', 'rgb(245, 245, 245)'); // #F5F5F5
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CASO 8.bis (360 px) — el móvil estrecho, donde la columna se queda en 95 px
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('en móvil estrecho (360 px)', () => {
+  const PIXEL_7 = devices['Pixel 7'];
+  test.use({
+    viewport: { width: 360, height: 780 },
+    userAgent: PIXEL_7.userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('CASO 8.bis — con los ajustes de fábrica, ninguna palabra del texto de ejemplo se parte entre dos líneas', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): en móvil el texto adaptado parte palabras por cualquier letra y sin guion',
+    );
+    // Mismo cálculo que el CASO 8 con 360 px: 360 − 48 = 312 · − 50 = 262 · − 52 = 210 ·
+    // × 68 % = 142,8 · − 48 = 94,8 px para el texto, unas 7 letras por línea. Medido el
+    // 03/10/2026: 20 de 85 palabras partidas («aprendiz|aje», «configur|ación»,
+    // «diferent|e,»…), y el texto de ejemplo de 567 caracteres ocupa 3.386 px de alto.
+    await abrir(page);
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+    });
+    await expect.poll(() => palabrasPartidas(page), { timeout: 3000 }).toEqual([]);
   });
 });
 
@@ -359,7 +551,8 @@ test.describe('arranque y persistencia', () => {
     await sembrarValor(page, '#slider-palabras', 0.45); // distinto del defecto (0,15)
     await expect(vistaPrevia(page)).toHaveCSS('font-size', '34px');
 
-    // La mitad sana del mecanismo: guardar sí guarda. Lo que falla es recuperar.
+    // Guardar siempre guardó; lo que fallaba era recuperar (hallazgos 877 y 932, REPARADOS el
+    // 18/09/2026: lo vigilan los tres casos REGRESIÓN de abajo).
     await expect.poll(async () => (await leerGuardado(page))?.tamano).toBe(34);
     await expect.poll(async () => (await leerGuardado(page))?.espaciadoPalabras).toBe(0.45);
   });
@@ -367,17 +560,17 @@ test.describe('arranque y persistencia', () => {
   test('REGRESIÓN — el efecto que GUARDA pisa las preferencias antes de que el que las LEE llegue a aplicarlas', async ({
     page,
   }) => {
-    // Dos efectos sobre la misma clave y sin coordinación: uno carga (page.tsx:61) y otro
-    // guarda en cada cambio de `prefs` (page.tsx:71). Secuencia MEDIDA instrumentando
+    // REPARADO el 18/09/2026 (hallazgo 932): el guardado espera ahora al estado `cargadas`.
+    // Antes eran dos efectos sobre la misma clave y sin coordinación: uno cargaba y otro
+    // guardaba en cada cambio de `prefs`. Secuencia que se MIDIÓ instrumentando
     // `localStorage` con `next dev` —el número es el campo `tamano`—:
-    //     LEE 32      → el efecto de carga encuentra lo del usuario; su setPrefs queda ENCOLADO
-    //     ESCRIBE 20  → el de guardado corre con el estado todavía de FÁBRICA y pisa la clave
-    //     LEE 20      → al volver a montar, el de carga ya solo puede leer lo que se acaba de pisar
-    //     ESCRIBE 20  → y el almacenamiento se queda con los valores de fábrica
-    // Así que la configuración del usuario no solo no se aplica: se BORRA. StrictMode (dos
-    // montajes en dev) es lo que lo destapa, no la causa; en producción, con un montaje
-    // único, se salva por los pelos porque el re-render con lo leído llega después del
-    // primer guardado. Basta con que el componente se monte dos veces para perderlo todo.
+    //     LEE 32      → el efecto de carga encontraba lo del usuario; su setPrefs quedaba ENCOLADO
+    //     ESCRIBE 20  → el de guardado corría con el estado todavía de FÁBRICA y pisaba la clave
+    //     LEE 20      → al volver a montar, el de carga ya solo podía leer lo que se acababa de pisar
+    //     ESCRIBE 20  → y el almacenamiento se quedaba con los valores de fábrica
+    // La configuración del usuario no solo no se aplicaba: se BORRABA. StrictMode (dos
+    // montajes en dev) lo destapaba, no lo causaba; en producción, con un montaje único, se
+    // salvaba por los pelos porque el re-render con lo leído llegaba después del primer guardado.
     await page.addInitScript(
       ({ clave, prefs }) => {
         localStorage.setItem(clave, JSON.stringify(prefs));
@@ -400,11 +593,11 @@ test.describe('arranque y persistencia', () => {
   });
 
   test('REGRESIÓN — lo ajustado en esta visita NO se encuentra en la siguiente', async ({ page }) => {
-    // La otra cara de la misma carrera, y la que rompe la promesa que la app hace en su
-    // propio subtítulo («Tus preferencias se guardan automáticamente») y en su FAQ
-    // («encontrarás la configuración tal como la dejaste»): el ajuste SÍ llega a escribirse
-    // —lo comprueba la línea de abajo antes de recargar— y aun así la visita siguiente
-    // arranca con los valores de fábrica.
+    // REPARADO el 18/09/2026 (hallazgo 932). La otra cara de la misma carrera, la que rompía
+    // la promesa que la app hace en su propio subtítulo («Tus preferencias se guardan
+    // automáticamente») y en su FAQ («encontrarás la configuración tal como la dejaste»): el
+    // ajuste SÍ llegaba a escribirse —lo comprueba la línea de abajo antes de recargar— y aun
+    // así la visita siguiente arrancaba con los valores de fábrica.
     await abrir(page);
     await sembrarValor(page, '#slider-tamano', 34); // distinto del defecto (20)
     await expect(vistaPrevia(page)).toHaveCSS('font-size', '34px');
@@ -420,15 +613,15 @@ test.describe('arranque y persistencia', () => {
   test('REGRESIÓN — una preferencia guardada incompleta se descarta entera (y en producción tira la app a la pantalla de error)', async ({
     page,
   }) => {
-    // `JSON.parse(guardadas) as Preferencias` (page.tsx:65) es un cast SIN comprobar: el
-    // try/catch cubre el parseo, no la forma de lo parseado. Lo que pasa después depende
-    // del entorno, pero el usuario pierde su ajuste en los dos:
-    //   · En producción el objeto incompleto llega al render y `prefs.interlineado.toFixed(1)`
-    //     lanza sobre `undefined`: se ve «⚠️ Algo salió mal» en lugar de la app. Medido el
+    // REPARADO el 18/09/2026 (hallazgo 877): hoy `sanearPreferencias` valida campo a campo.
+    // Antes era `JSON.parse(guardadas) as Preferencias`, un cast SIN comprobar: el try/catch
+    // cubría el parseo, no la forma de lo parseado, y el usuario perdía su ajuste:
+    //   · En producción el objeto incompleto llegaba al render y `prefs.interlineado.toFixed(1)`
+    //     lanzaba sobre `undefined`: se veía «⚠️ Algo salió mal» en lugar de la app. Medido el
     //     18/09/2026 con '{"tamano":22}', 'null', '"20"', '[]' y
     //     '{"tamano":"grande","interlineado":"dos"}' — los cinco.
-    //   · Con `next dev` no cae, pero solo porque la carrera de los dos efectos de arriba
-    //     pisa la clave con los valores de fábrica antes de que el segundo montaje la lea.
+    //   · Con `next dev` no caía, pero solo porque la carrera de los dos efectos de arriba
+    //     pisaba la clave con los valores de fábrica antes de que el segundo montaje la leyera.
     // Este caso afirma lo único aceptable: ni caerse, ni tirar en silencio el 22 que el
     // usuario tenía guardado y que se entiende perfectamente.
     await page.addInitScript((clave) => {
@@ -468,10 +661,10 @@ test.describe('accesibilidad', () => {
   test('REGRESIÓN — cuatro de los cinco deslizadores anuncian un número que no es el de su etiqueta', async ({
     page,
   }) => {
-    // Solo `slider-tamano` lleva `aria-valuetext`. En los otros cuatro, un lector de pantalla
-    // lee el `value` crudo: «0,05» donde la etiqueta visible dice «5 %», y «0,15» donde dice
-    // «15 %». La app se dirige a quien tiene dificultades de lectura, así que la versión
-    // hablada del control no puede decir otra cosa que la escrita.
+    // REPARADO el 18/09/2026 (hallazgo 878). Solo `slider-tamano` llevaba `aria-valuetext`.
+    // En los otros cuatro, un lector de pantalla leía el `value` crudo: «0,05» donde la
+    // etiqueta visible dice «5 %», y «0,15» donde dice «15 %». La app se dirige a quien tiene
+    // dificultades de lectura: la versión hablada del control no puede decir otra cosa.
     await expect(page.locator('#slider-letras')).toHaveAttribute('aria-valuetext', /5/);
     await expect(page.locator('#slider-palabras')).toHaveAttribute('aria-valuetext', /15/);
   });
@@ -479,9 +672,262 @@ test.describe('accesibilidad', () => {
   test('REGRESIÓN — la vista previa entera es una región viva y atómica: se relee sola a cada tecla', async ({
     page,
   }) => {
-    // `aria-live="polite"` + `aria-atomic="true"` sobre el bloque que contiene TODO el texto
-    // adaptado (567 caracteres ya en el ejemplo de fábrica) hace que cada pulsación en el
-    // área de texto y cada paso de un deslizador vuelvan a anunciar el texto completo.
+    // REPARADO el 18/09/2026 (hallazgo 879). `aria-live="polite"` + `aria-atomic="true"` sobre
+    // el bloque que contiene TODO el texto adaptado (567 caracteres ya en el ejemplo de
+    // fábrica) hacía que cada pulsación en el área de texto y cada paso de un deslizador
+    // volvieran a anunciar el texto completo. Hoy lo que se anuncia es el resumen de ajustes.
     await expect(vistaPrevia(page)).not.toHaveAttribute('aria-atomic', 'true');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CASO 6 y 7 (re-inspección del 03/10/2026) — un caso normal y dos que hay que tratar aparte
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('re-inspección: caso normal y entradas que se tratan aparte', () => {
+  test('CASO 6 — un texto con tildes, ñ y diéresis sale intacto y con los seis ajustes exactos', async ({
+    page,
+  }) => {
+    await abrir(page);
+    const textarea = page.getByRole('textbox', { name: 'Texto a adaptar para lectura' });
+    const frase = 'El pingüino Ñandú leyó él solo';
+    await textarea.fill(frase);
+    await esperarValorEnReact(page, textarea, frase);
+
+    // Los seis distintos de fábrica (lexend · 20 · 0,05 · 0,15 · 1,9 · 68 · crema).
+    await page.getByRole('button', { name: /arial/i }).click();
+    await sembrarValor(page, '#slider-tamano', 24);
+    await sembrarValor(page, '#slider-letras', 0.1);
+    await sembrarValor(page, '#slider-palabras', 0.25);
+    await sembrarValor(page, '#slider-lineas', 2);
+    await sembrarValor(page, '#slider-ancho', 60);
+    await page.getByRole('button', { name: 'Verde pálido' }).click();
+
+    const texto = vistaPrevia(page);
+    await expect(texto).toHaveText(frase); // ni una letra cambiada: la app no transforma el texto
+    await expect(texto).toHaveCSS('font-family', 'Arial, Helvetica, sans-serif');
+    await expect(texto).toHaveCSS('font-size', '24px');
+    await expect(texto).toHaveCSS('letter-spacing', '2.4px'); // 0,10 em × 24 px
+    await expect(texto).toHaveCSS('word-spacing', '6px'); // 0,25 em × 24 px
+    await expect(texto).toHaveCSS('line-height', '48px'); // 2,0 × 24 px
+    await expect(texto).toHaveCSS('max-width', '60%');
+    await expect(texto).toHaveCSS('background-color', 'rgb(240, 247, 240)'); // #F0F7F0
+    // El resumen hablado dice lo mismo que se ve (toHaveText normaliza los espacios).
+    await expect(page.locator('[role="status"]').filter({ hasText: 'interlineado' })).toHaveText(
+      'Arial · 24 px · interlineado 2,0 · letras 10 % · palabras 25 % · ancho 60 % · fondo Verde pálido',
+    );
+    // Y queda guardado tal cual, con el identificador interno de la fuente («sistema»).
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => JSON.parse(localStorage.getItem('adaptador-dislexia-prefs') ?? 'null') as unknown,
+        ),
+      )
+      .toEqual({
+        fuente: 'sistema',
+        tamano: 24,
+        espaciadoLetras: 0.1,
+        espaciadoPalabras: 0.25,
+        interlineado: 2,
+        anchoColumna: 60,
+        colorFondo: '#F0F7F0',
+      });
+  });
+
+  test('CASO 7 — un texto con etiquetas HTML se muestra literal y no se ejecuta nada', async ({ page }) => {
+    let dialogos = 0;
+    page.on('dialog', async (d) => {
+      dialogos++;
+      await d.dismiss();
+    });
+    await abrir(page);
+    const textarea = page.getByRole('textbox', { name: 'Texto a adaptar para lectura' });
+    const html = '<b>hola</b> & <img src=x onerror="alert(1)">';
+    await textarea.fill(html);
+    await esperarValorEnReact(page, textarea, html);
+
+    await expect(vistaPrevia(page)).toHaveText(html);
+    await expect(vistaPrevia(page).locator('b, img')).toHaveCount(0);
+    expect(dialogos).toBe(0);
+  });
+
+  test('CASO 7.bis — unas preferencias guardadas fuera de rango o de tipo se sanean campo a campo', async ({
+    page,
+  }) => {
+    // tamano 99 → se capa a 36 (máximo de la app) · fuente «comic» → Lexend de fábrica ·
+    // fondo #000000 (no está entre los cinco) → crema · interlineado "2" (texto, no número) →
+    // 1,9 de fábrica · anchoColumna 45 → se respeta. Lo demás, de fábrica (0,05 y 0,15).
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'adaptador-dislexia-prefs',
+        '{"tamano":99,"fuente":"comic","colorFondo":"#000000","interlineado":"2","anchoColumna":45}',
+      );
+    });
+    await abrir(page);
+
+    const texto = vistaPrevia(page);
+    await expect(texto).toHaveCSS('font-size', '36px');
+    await expect(texto).toHaveCSS('letter-spacing', '1.8px'); // 0,05 em × 36 px
+    await expect(texto).toHaveCSS('word-spacing', '5.4px'); // 0,15 em × 36 px
+    await expect(texto).toHaveCSS('line-height', '68.4px'); // 1,9 × 36 px
+    await expect(texto).toHaveCSS('max-width', '45%');
+    await expect(texto).toHaveCSS('background-color', 'rgb(254, 253, 246)'); // #FEFDF6
+    await expect(page.getByRole('button', { name: /lexend/i })).toHaveAttribute('aria-pressed', 'true');
+    await expect(etiqueta(page, 'slider-lineas')).toHaveText('Interlineado: 1,9');
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            (JSON.parse(localStorage.getItem('adaptador-dislexia-prefs') ?? 'null') as Guardado | null)
+              ?.tamano,
+        ),
+      )
+      .toBe(36);
+  });
+
+  test('CASO 10 — el «%» va separado de la cifra con espacio duro (U+00A0)', async ({ page }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): las etiquetas pegan el «%» y el resumen usa un espacio normal',
+    );
+    // CLAUDE.md §2 (decidido el 25/09/2026): «15 %», separado con U+00A0. Hoy las etiquetas
+    // dicen «Espacio letras: 5%» y el resumen «letras 5 %» con un espacio normal (U+0020).
+    await abrir(page);
+    const crudo = (l: Locator) => l.evaluate((el) => el.textContent ?? '');
+    expect(await crudo(etiqueta(page, 'slider-letras'))).toContain('5 %');
+    expect(await crudo(etiqueta(page, 'slider-ancho'))).toContain('68 %');
+    const resumen = page.locator('[role="status"]').filter({ hasText: 'interlineado' });
+    expect(await crudo(resumen)).toContain('letras 5 %');
+  });
+
+  test('CASO 11 — el JSON-LD que leen buscadores e IA no contradice lo que dice la página de Lexend', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): el FAQPage sigue atribuyendo a Lexend rasgos diferenciadores b/d',
+    );
+    // La reparación del hallazgo 880 (18/09/2026) corrigió la página —«sus letras especulares
+    // siguen siendo casi simétricas… no es la fuente que busca quien confunde b/d o p/q»— pero
+    // no tocó metadata.ts, cuyo FAQPage sigue diciendo que «Las fuentes diseñadas para
+    // dislexia (Lexend, OpenDyslexic, Dyslexie) añaden rasgos diferenciadores a letras que
+    // suelen confundirse».
+    await page.goto(RUTA);
+    const respuestas = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+        .map((s) => s.textContent ?? '')
+        .filter((t) => t.includes('FAQPage'))
+        .join(' '),
+    );
+    expect(respuestas.length).toBeGreaterThan(0);
+    expect(respuestas).not.toMatch(/Lexend[^.]*añaden rasgos diferenciadores/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CASO 12 — contraste en los DOS temas (re-inspección del 03/10/2026)
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('contraste en los dos temas', () => {
+  /** Texto de marca y botón de marca: los tres que se ven sin abrir nada. */
+  const MARCA = {
+    'valor de la etiqueta': 'label[for="slider-tamano"] strong',
+    'título «Ajustes»': 'aside[aria-label="Ajustes de lectura"] h2',
+    'botón «Copiar texto»': 'section[aria-label="Vista previa del texto adaptado"] button',
+  };
+
+  for (const tema of ['light', 'dark'] as const) {
+    test(`CASO 12 (${tema}) — el color de marca como texto y como fondo de botón llega a 4,5:1`, async ({
+      page,
+    }) => {
+      test.fail(
+        true,
+        'ABIERTO, hallazgo (inspector 03/10/2026): el módulo redefine --primary #2E86AB en ambos temas',
+      );
+      // Calculado a mano con la fórmula WCAG: #2E86AB sobre #FFFFFF = 4,11:1 (claro) y sobre
+      // la tarjeta #2A2A2A = 3,50:1 (oscuro); blanco sobre #2E86AB = 4,11:1 en los dos. Es
+      // texto pequeño (13,6 a 17,6 px en negrita), así que el mínimo es 4,5:1. El módulo
+      // declara `--primary: #2E86AB` en `.container` y no lo redeclara en oscuro, así que
+      // tampoco le llega el #3FA5D1 de globals ni los tokens `--primary-texto`/`--primary-boton`.
+      await abrirEnTema(page, tema);
+      const medidas: Record<string, number> = {};
+      for (const [nombre, sel] of Object.entries(MARCA)) medidas[nombre] = await contraste(page, sel);
+      expect(
+        Object.values(medidas).every((v) => v >= 4.5),
+        `contrastes en ${tema}: ${JSON.stringify(medidas)}`,
+      ).toBe(true);
+    });
+  }
+
+  test('CASO 12.bis (light) — los marcadores de texto vacío se leen en claro', async ({ page }) => {
+    // #6E6E6E sobre el crema #FEFDF6 = 5,00:1 · placeholder del navegador #757575 sobre la
+    // tarjeta blanca = 4,61:1. Los dos por encima de 4,5.
+    await abrirEnTema(page, 'light');
+    const textarea = page.getByRole('textbox', { name: 'Texto a adaptar para lectura' });
+    await textarea.fill('');
+    await esperarValorEnReact(page, textarea, '');
+    expect(await contraste(page, '[aria-label="Texto con formato aplicado"] em')).toBeGreaterThanOrEqual(4.5);
+    expect(await contraste(page, 'textarea', '::placeholder')).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('CASO 12.ter (dark) — los marcadores de texto vacío se leen en oscuro', async ({ page }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): en oscuro el marcador de la vista previa da 2,73:1',
+    );
+    // La caja del texto adaptado es SIEMPRE clara (fondo crema), pero su marcador usa
+    // `--text-muted`, que en oscuro vale #9B9B9B (e089700b, 22/09/2026): #9B9B9B sobre
+    // #FEFDF6 = 2,73:1, calculado a mano. El del área de texto es el del navegador, #757575,
+    // sobre la tarjeta oscura (#2A2A2A con un 4 % de blanco encima): ≈ 2,7:1.
+    await abrirEnTema(page, 'dark');
+    const textarea = page.getByRole('textbox', { name: 'Texto a adaptar para lectura' });
+    await textarea.fill('');
+    await esperarValorEnReact(page, textarea, '');
+    const vista = await contraste(page, '[aria-label="Texto con formato aplicado"] em');
+    const area = await contraste(page, 'textarea', '::placeholder');
+    expect(vista >= 4.5 && area >= 4.5, `vista previa ${vista}:1 · área de texto ${area}:1`).toBe(true);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CASO 13 — portapapeles: pegar funciona; «Copiar texto» no lleva la adaptación
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('portapapeles', () => {
+  test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+  test('CASO 13 — pegar con Ctrl+V llega a la vista previa con tildes, ñ y diéresis', async ({ page }) => {
+    await abrir(page);
+    const pegado = 'Texto pegado con Ctrl+V: ñandú, pingüino.';
+    await page.evaluate((t) => navigator.clipboard.writeText(t), pegado);
+    const textarea = page.getByRole('textbox', { name: 'Texto a adaptar para lectura' });
+    await textarea.click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.press('Control+V');
+    await esperarValorEnReact(page, textarea, pegado);
+    await expect(vistaPrevia(page)).toHaveText(pegado);
+  });
+
+  test('CASO 13.bis — «Copiar texto» lleva al portapapeles el texto CON el formato de la vista previa', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): el botón de la vista previa copia solo el texto plano que se pegó',
+    );
+    // `copiarTexto` hace `navigator.clipboard.writeText(texto)`: el portapapeles recibe solo
+    // text/plain, idéntico a lo que el usuario pegó. Ningún ajuste (fuente, tamaño, espaciado,
+    // fondo) viaja al pegarlo en un procesador de textos.
+    await abrir(page);
+    const textarea = page.getByRole('textbox', { name: 'Texto a adaptar para lectura' });
+    await textarea.fill('Hola mundo');
+    await esperarValorEnReact(page, textarea, 'Hola mundo');
+    await page.getByRole('button', { name: /mono/i }).click();
+    await sembrarValor(page, '#slider-tamano', 28);
+    await page.getByRole('button', { name: 'Copiar texto al portapapeles' }).click();
+    await expect(page.getByRole('button', { name: 'Texto copiado al portapapeles' })).toBeVisible();
+
+    const tipos = await page.evaluate(async () => {
+      const items = await navigator.clipboard.read();
+      return items.flatMap((i) => [...i.types]);
+    });
+    expect(tipos).toContain('text/html');
   });
 });

@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, devices, Page } from '@playwright/test';
 import {
   esperarHidratacion,
   esperarValorEnReact,
@@ -76,7 +76,46 @@ import {
  *   · Añadir dos veces el mismo lanzamiento a la comparativa daba dos tarjetas con el mismo
  *     id, y borrar una borraba las dos.
  *   · En el tiro vertical el alcance salía «≈0 m» por el 6,1·10⁻¹⁷ de cos(π/2).
+ *
+ * RE-INSPECCIÓN DEL 03/10/2026
+ *   Los seis hallazgos del 20/09 (984 a 989) siguen cerrados: se vuelven a ejercitar abajo.
+ *   Casos nuevos, resueltos a mano antes de abrir el navegador (mismas fórmulas de arriba):
+ *     · v₀ = 30, θ = 40°, h₀ = 0 → R = 900·sen 80°/9,81 = 90,349 m · H = 900·sen²40°/19,62 =
+ *       18,953 m · T = 60·sen 40°/9,81 = 3,931 s · ½v² = 450 J/kg.
+ *     · Tiro HORIZONTAL desde altura, θ = 0°, v₀ = 20, h₀ = 45 → T = √(2·45/9,81) = 3,0289 s ·
+ *       R = 60,578 m · H = 45 m · v_impacto = √(400 + 2·9,81·45) = 35,818 m/s.
+ *     · Raíz positiva de la cuadrática, θ = 60°, v₀ = 15, h₀ = 25 → T = (12,990 + √659,25)/9,81 =
+ *       3,9415 s · R = 7,5·T = 29,561 m · H = 25 + 168,75/19,62 = 33,601 m · v_imp = √715,5 =
+ *       26,749 m/s.
+ *     · Vertical desde altura, θ = 90°, v₀ = 10, h₀ = 20 → T = (10 + √492,4)/9,81 = 3,2814 s ·
+ *       R = 0 · H = 25,097 m · v_imp = 22,190 m/s.
+ *     · Complementarios 20° y 70° con v₀ = 25 → R = 625·sen 40°/9,81 = 40,952 m los dos.
+ *   Con rozamiento, la verdad del modelo F = −k·|v|·v⃗ se ha calculado con RK4 convergido
+ *   (dt = 10⁻⁴ y 10⁻⁵ s coinciden en 5 decimales), NO con el integrador de la app:
+ *       v₀ = 20, θ = 45° · k = 0 → R 40,77472 · H 10,19368 (el caso ideal) · k = 0,01 → R 31,32293 ·
+ *       H 8,78272 · T 2,67329 · k = 0,02 → R 25,83443 · T 2,51584 · k = 0,05 → R 17,52553 ·
+ *       H 6,03505 · T 2,20178 · v_imp 10,24719 · subida 1,0009 s y bajada 1,2008 s.
+ *   Los dos casos de «Trampa (b)» fijaban como correcta la salida de Euler con dt = 0,01 s
+ *   (40,73 · 31,26 · 17,33 m…), que se aparta de esa verdad hasta 20 cm. Se han REESCRITO con
+ *   tolerancias que admiten ese sesgo —vigilan que el deslizador mueva el resultado, no la
+ *   segunda cifra decimal—, y la precisión que la app anuncia (dos decimales) va aparte, en
+ *   test.fail().
+ *   Sospechas que traía esta vuelta, las dos DESCARTADAS con medida (bloques del final):
+ *     (a) teclear un estado intermedio («-», «9.») en un type=number con Number(e.target.value)
+ *         reescribiría «0» bajo el cursor. Aquí el único type=number es la gravedad, y guarda el
+ *         TEXTO desde 81efb858: tecleando pulsación a pulsación «5.5», «-9.81», «0.5» y «3,71»
+ *         el campo conserva lo escrito, en escritorio y en móvil. v₀, θ y h₀ son deslizadores.
+ *     (b) bajo stemum.com, de 1024 a 1120 px y a 800 px, la píldora «Stemum › Física» acaba en
+ *         x = 232 y el título empieza en x ≥ 258: 0 puntos del h1 bajo la barra fija.
+ *   Lo que sigue abierto va en test.fail() con «ABIERTO, hallazgo (inspector 03/10/2026)».
  */
+
+/**
+ * Para visitar la app bajo stemum.com (sospecha b) sin tocar el DNS: el host se resuelve al
+ * servidor local. `launchOptions` fuerza un worker nuevo, por eso va al nivel del fichero; a las
+ * visitas a localhost no les afecta.
+ */
+test.use({ launchOptions: { args: ['--host-resolver-rules=MAP stemum.com 127.0.0.1:3050'] } });
 
 /** El valor de una fila de resultados, localizada por su etiqueta (las clases van con hash). */
 async function leerFila(page: Page, etiqueta: string): Promise<string> {
@@ -89,6 +128,21 @@ async function leerFila(page: Page, etiqueta: string): Promise<string> {
     }
     return '';
   }, etiqueta);
+}
+
+/** «20.000,00 m» → 20000. Para comparar con una tolerancia en vez de con el texto exacto. */
+const cifra = (texto: string): number =>
+  Number(texto.replace(/\s.*$/, '').replace(/\./g, '').replace(',', '.'));
+
+/**
+ * ¿La cifra mostrada está a menos de UNA unidad de su última cifra decimal de la verdad? Es la
+ * precisión que la propia app anuncia al escribir dos decimales: si la reparación decide mostrar
+ * menos decimales con rozamiento, la tolerancia se ensancha sola.
+ */
+function dentroDeSuPrecision(texto: string, verdad: number): boolean {
+  const numero = texto.replace(/\s.*$/, '');
+  const decimales = numero.includes(',') ? numero.split(',')[1].length : 0;
+  return Math.abs(cifra(texto) - verdad) <= 10 ** -decimales + 1e-9;
 }
 
 const alcance = (page: Page) => leerFila(page, 'Alcance horizontal');
@@ -332,7 +386,11 @@ test.describe('Trampa (a) — altura inicial: el alcance ya no es v₀²·sen(2�
 });
 
 test.describe('Trampa (b) — la resistencia del aire no es un rótulo', () => {
-  test('activarla ya recorta el alcance: 31,26 m frente a los 40,77 ideales', async ({
+  // REESCRITO el 03/10/2026: fijaba «31,26 m · 8,70 m», que es la salida del integrador de la
+  // app (Euler, dt = 0,01 s), no la verdad del modelo (RK4: 31,32 m · 8,78 m · 2,67 s). Lo que
+  // este caso vigila es el hallazgo 987 —que activar el modo SE NOTE—, un efecto del 23 %; la
+  // tolerancia admite el sesgo del integrador (6 cm) y la precisión va en su propio test.fail().
+  test('activarla ya recorta el alcance: unos 31,3 m frente a los 40,77 ideales', async ({
     page,
   }) => {
     await sembrarValor(page, '#v0', 20);
@@ -344,34 +402,42 @@ test.describe('Trampa (b) — la resistencia del aire no es un rótulo', () => {
     // (40,73 m, la diferencia era solo el sesgo del integrador) hasta que el usuario
     // reparaba en el deslizador. Ahora arranca en 0,01 y se nota de inmediato.
     await esperarValorEnReact(page, '#resistencia', '0.01');
-    await expect.poll(() => alcance(page)).toBe('31,26 m');
-    await expect.poll(() => alturaMax(page)).toBe('8,70 m');
-    await expect.poll(() => tiempoVuelo(page)).toBe('2,67 s');
+    await expect.poll(async () => cifra(await alcance(page))).toBeLessThan(35);
+    expect(Math.abs(cifra(await alcance(page)) - 31.32293)).toBeLessThanOrEqual(0.25);
+    expect(Math.abs(cifra(await alturaMax(page)) - 8.78272)).toBeLessThanOrEqual(0.15);
+    expect(Math.abs(cifra(await tiempoVuelo(page)) - 2.67329)).toBeLessThanOrEqual(0.03);
   });
 
+  // REESCRITO el 03/10/2026: fijaba 40,73 · 10,12 · 17,33 · 5,93 · 2,18 · 10,20 · 25,66 · 2,50,
+  // todo salida de Euler. Ahora compara con la verdad del modelo (RK4, cabecera) con una
+  // tolerancia que cubre el sesgo actual: vigila que el deslizador recorra el rango y que el
+  // resultado se mueva en la dirección y el orden correctos, no la segunda cifra decimal.
   test('el deslizador recorre el rango completo, de k = 0 a k = 0,05', async ({ page }) => {
     await sembrarValor(page, '#v0', 20);
     await page.getByRole('button', { name: 'Con resistencia del aire' }).click();
 
-    // Con k = 0 la rama numérica reproduce el caso ideal salvo el sesgo del integrador
-    // (Euler semi-implícito, dt = 0,01 s): −½·g·dt·t recorta 4,5 cm del alcance.
+    // k = 0 → el caso ideal: R = 40,77472 m · H = 10,19368 m
     await sembrarValor(page, '#resistencia', 0);
-    await expect.poll(() => alcance(page)).toBe('40,73 m');
-    await expect.poll(() => alturaMax(page)).toBe('10,12 m');
+    await expect.poll(async () => Math.abs(cifra(await alcance(page)) - 40.77472)).toBeLessThanOrEqual(0.1);
+    expect(Math.abs(cifra(await alturaMax(page)) - 10.19368)).toBeLessThanOrEqual(0.15);
+    const r0 = cifra(await alcance(page));
 
-    // Con k = 0,05 la diferencia es imposible de fingir: a = −g·ĵ − k·|v|·v⃗ integrada
-    // desde (14,142136 , 14,142136) m/s da R = 17,33 m en T = 2,18 s.
+    // k = 0,05 → RK4: R 17,52553 m · H 6,03505 m · T 2,20178 s · v_imp 10,24719 m/s
     await sembrarValor(page, '#resistencia', 0.05);
-    await expect.poll(() => alcance(page)).toBe('17,33 m');
-    await expect.poll(() => alturaMax(page)).toBe('5,93 m');
-    await expect.poll(() => tiempoVuelo(page)).toBe('2,18 s');
+    await expect.poll(async () => Math.abs(cifra(await alcance(page)) - 17.52553)).toBeLessThanOrEqual(0.25);
+    expect(Math.abs(cifra(await alturaMax(page)) - 6.03505)).toBeLessThanOrEqual(0.15);
+    expect(Math.abs(cifra(await tiempoVuelo(page)) - 2.20178)).toBeLessThanOrEqual(0.03);
     // Y ya no llega al suelo con la velocidad de salida: se disipó energía.
-    await expect.poll(() => vImpacto(page)).toBe('10,20 m/s');
+    expect(Math.abs(cifra(await vImpacto(page)) - 10.24719)).toBeLessThanOrEqual(0.1);
+    const r5 = cifra(await alcance(page));
 
-    // k = 0,02 → un punto intermedio coherente: 25,66 m, entre 17,33 y 40,77.
+    // k = 0,02 → RK4: R 25,83443 m · T 2,51584 s, entre los dos anteriores
     await sembrarValor(page, '#resistencia', 0.02);
-    await expect.poll(() => alcance(page)).toBe('25,66 m');
-    await expect.poll(() => tiempoVuelo(page)).toBe('2,50 s');
+    await expect.poll(async () => Math.abs(cifra(await alcance(page)) - 25.83443)).toBeLessThanOrEqual(0.25);
+    expect(Math.abs(cifra(await tiempoVuelo(page)) - 2.51584)).toBeLessThanOrEqual(0.03);
+    const r2 = cifra(await alcance(page));
+    expect(r0).toBeGreaterThan(r2);
+    expect(r2).toBeGreaterThan(r5);
   });
 
   test('y la caja de fórmulas ya llama cuadrático al rozamiento que integra', async ({ page }) => {
@@ -400,5 +466,615 @@ test.describe('Comparativa — cada lanzamiento guardado tiene identidad propia'
 
     await page.locator('button[aria-label="Eliminar lanzamiento"]').first().click();
     await expect(tarjetas).toHaveCount(1);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN DEL 03/10/2026 — casos nuevos (las cuentas, en la cabecera)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const aviso = (page: Page) => page.locator('main [role="alert"]');
+
+test.describe('Re-inspección 03/10/2026 — normal, límites y rechazos resueltos a mano', () => {
+  test('normal: v₀ = 30, θ = 40°, h₀ = 0 → R 90,35 m · H 18,95 m · T 3,93 s', async ({ page }) => {
+    await sembrarValor(page, '#v0', 30);
+    await sembrarValor(page, '#angulo', 40);
+    // R = 900·sen 80°/9,81 = 886,32702/9,81 = 90,34934 m
+    await expect.poll(() => alcance(page)).toBe('90,35 m');
+    // H = 900·sen²40°/19,62 = 371,85831/19,62 = 18,95302 m
+    await expect.poll(() => alturaMax(page)).toBe('18,95 m');
+    // T = 2·30·sen 40°/9,81 = 38,567256/9,81 = 3,93142 s
+    await expect.poll(() => tiempoVuelo(page)).toBe('3,93 s');
+    await expect.poll(() => vImpacto(page)).toBe('30,00 m/s');
+    // ½·v² con el proyectil en el punto de impacto, |v| = v₀ → 450 J/kg
+    await expect
+      .poll(() => leerFila(page, 'Energía cinética (masa unitaria, en proyectil actual)'))
+      .toBe('450,00 J/kg');
+  });
+
+  test('límite: tiro horizontal (θ = 0°) desde h₀ = 45 m → 60,58 m en 3,03 s', async ({ page }) => {
+    await sembrarValor(page, '#v0', 20);
+    await sembrarValor(page, '#angulo', 0);
+    await sembrarValor(page, '#altura', 45);
+    // T = √(2·45/9,81) = √9,174312 = 3,028913 s · R = 20·T = 60,57826 m
+    await expect.poll(() => tiempoVuelo(page)).toBe('3,03 s');
+    await expect.poll(() => alcance(page)).toBe('60,58 m');
+    // Con θ = 0° no sube: la altura máxima es la de salida.
+    await expect.poll(() => alturaMax(page)).toBe('45,00 m');
+    // v_imp = √(v₀² + 2·g·h₀) = √(400 + 882,9) = √1282,9 = 35,81759 m/s
+    await expect.poll(() => vImpacto(page)).toBe('35,82 m/s');
+  });
+
+  test('límite: raíz POSITIVA de la cuadrática, θ = 60°, v₀ = 15, h₀ = 25 → 29,56 m', async ({
+    page,
+  }) => {
+    await sembrarValor(page, '#v0', 15);
+    await sembrarValor(page, '#angulo', 60);
+    await sembrarValor(page, '#altura', 25);
+    // v₀ᵧ = 12,990381 · v₀ₓ = 7,5 · disc = 168,75 + 490,5 = 659,25 → √ = 25,675864
+    // T = (12,990381 + 25,675864)/9,81 = 3,941513 s (la otra raíz, negativa, no tiene sentido)
+    await expect.poll(() => tiempoVuelo(page)).toBe('3,94 s');
+    // R = 7,5·3,941513 = 29,56135 m
+    await expect.poll(() => alcance(page)).toBe('29,56 m');
+    // H = 25 + 168,75/19,62 = 33,60092 m · v_imp = √(225 + 490,5) = 26,74883 m/s
+    await expect.poll(() => alturaMax(page)).toBe('33,60 m');
+    await expect.poll(() => vImpacto(page)).toBe('26,75 m/s');
+  });
+
+  test('límite: tiro vertical desde h₀ = 20 m con v₀ = 10 → alcance nulo, 25,10 m, 3,28 s', async ({
+    page,
+  }) => {
+    await sembrarValor(page, '#v0', 10);
+    await sembrarValor(page, '#angulo', 90);
+    await sembrarValor(page, '#altura', 20);
+    // T = (10 + √(100 + 392,4))/9,81 = (10 + 22,190088)/9,81 = 3,281355 s
+    await expect.poll(() => tiempoVuelo(page)).toBe('3,28 s');
+    await expect.poll(() => alcance(page)).toBe('0,00 m');
+    // H = 20 + 100/19,62 = 25,09684 m · v_imp = √492,4 = 22,19009 m/s
+    await expect.poll(() => alturaMax(page)).toBe('25,10 m');
+    await expect.poll(() => vImpacto(page)).toBe('22,19 m/s');
+  });
+
+  test('límite: 20° y 70° con v₀ = 25 dan el mismo alcance, 40,95 m', async ({ page }) => {
+    await sembrarValor(page, '#v0', 25);
+    // R = 625·sen 40°/9,81 = 401,74225/9,81 = 40,95232 m en los dos
+    await sembrarValor(page, '#angulo', 20);
+    await expect.poll(() => alcance(page)).toBe('40,95 m');
+    // H = 625·sen²20°/19,62 = 3,72636 m · T = 50·sen 20°/9,81 = 1,74322 s
+    await expect.poll(() => alturaMax(page)).toBe('3,73 m');
+    await expect.poll(() => tiempoVuelo(page)).toBe('1,74 s');
+    await sembrarValor(page, '#angulo', 70);
+    await expect.poll(() => alcance(page)).toBe('40,95 m');
+    // H = 625·sen²70°/19,62 = 28,12889 m · T = 50·sen 70°/9,81 = 4,78946 s
+    await expect.poll(() => alturaMax(page)).toBe('28,13 m');
+    await expect.poll(() => tiempoVuelo(page)).toBe('4,79 s');
+  });
+
+  test('a rechazar: g = 0, g = 60 y el campo vacío dejan un aviso y ninguna cifra', async ({
+    page,
+  }) => {
+    const g = page.locator('#gravedad');
+    await g.fill('0');
+    await esperarValorEnReact(page, '#gravedad', '0');
+    await expect(aviso(page)).toContainText('al menos 0,1');
+    await expect.poll(() => alcance(page)).toBe('');
+
+    await g.fill('60');
+    await esperarValorEnReact(page, '#gravedad', '60');
+    await expect(aviso(page)).toContainText('como mucho de 50');
+    await expect.poll(() => alcance(page)).toBe('');
+
+    await g.fill('');
+    await esperarValorEnReact(page, '#gravedad', '');
+    await expect(aviso(page)).toContainText('Escribe una gravedad');
+    await expect.poll(() => alcance(page)).toBe('');
+
+    // Y se recupera: 9.81 otra vez → R = 2500/9,81 = 254,84 m (v₀ = 50, θ = 45° iniciales)
+    await g.fill('9.81');
+    await esperarValorEnReact(page, '#gravedad', '9.81');
+    await expect.poll(() => alcance(page)).toBe('254,84 m');
+    await expect(aviso(page)).toHaveCount(0);
+  });
+});
+
+/** Borra el campo de gravedad como lo haría alguien y teclea `texto` pulsación a pulsación. */
+async function teclearGravedad(page: Page, texto: string): Promise<void> {
+  const campo = page.locator('#gravedad');
+  await campo.click();
+  await campo.press('Control+a');
+  await campo.press('Backspace');
+  await campo.pressSequentially(texto, { delay: 30 });
+}
+
+/**
+ * Sospecha (a), DESCARTADA. Un `setX(Number(e.target.value))` en un type=number reescribe «0»
+ * bajo el cursor al teclear «-» o «9.», porque el navegador entrega '' en esos estados. fill()
+ * no lo ve —escribe el valor entero de golpe—, así que aquí se teclea de verdad.
+ */
+async function teclearYComprobar(page: Page): Promise<void> {
+  // R = v₀²/g con v₀ = 50 y θ = 45° (iniciales): 2500/5,5 = 454,54545 m
+  await teclearGravedad(page, '5.5');
+  await expect(page.locator('#gravedad')).toHaveValue('5.5');
+  await esperarValorEnReact(page, '#gravedad', '5.5');
+  await expect.poll(() => alcance(page)).toBe('454,55 m');
+
+  // «-» y «-9.» son estados intermedios que el navegador entrega como ''
+  await teclearGravedad(page, '-9.81');
+  await expect(page.locator('#gravedad')).toHaveValue('-9.81');
+  await expect(aviso(page)).toContainText('al menos 0,1');
+  await expect.poll(() => alcance(page)).toBe('');
+
+  // «0» se rechaza y «0.» vuelve a ser '': el campo tiene que llegar a «0.5» → 2500/0,5 = 5000 m
+  await teclearGravedad(page, '0.5');
+  await expect(page.locator('#gravedad')).toHaveValue('0.5');
+  await expect.poll(() => alcance(page)).toBe('5000,00 m');
+
+  // La coma decimal de un teclado español: Chromium la admite y entrega «3.71» → Marte,
+  // 2500/3,71 = 673,85445 m
+  await teclearGravedad(page, '3,71');
+  await expect(page.locator('#gravedad')).toHaveValue('3.71');
+  await expect.poll(() => alcance(page)).toBe('673,85 m');
+}
+
+test.describe('Sospecha (a) descartada — teclear la gravedad pulsación a pulsación', () => {
+  test('en escritorio, «5.5», «-9.81», «0.5» y «3,71» se conservan tal como se escriben', async ({
+    page,
+  }) => {
+    await teclearYComprobar(page);
+  });
+});
+
+test.describe('Sospecha (a) descartada — y en móvil (390 px)', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: devices['Pixel 7'].deviceScaleFactor,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('en móvil, «5.5», «-9.81», «0.5» y «3,71» se conservan tal como se escriben', async ({
+    page,
+  }) => {
+    await teclearYComprobar(page);
+  });
+
+  // HALLAZGO (accesibilidad, bajo) — ABIERTO. Los rótulos de escala del gráfico («255 m»,
+  // «73 m», «Distancia horizontal (m)») van a fontSize 11 en un viewBox de 800 de ancho; a
+  // 390 px el <svg> mide 290 px, así que se pintan a 11·290/800 ≈ 4 px. Es la única escala del
+  // dibujo. El suelo de 10 px es holgado: el texto más pequeño de la app en HTML mide 12 px.
+  test('a 390 px los rótulos de escala del gráfico se pintan a 10 px o más', async ({ page }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): en móvil los rótulos de escala del gráfico se pintan a unos 4 px',
+    );
+    const tamanos = await page
+      .locator('svg[aria-label="Trayectoria del proyectil"] text')
+      .evaluateAll((textos) =>
+        textos.map((t) => {
+          const svg = (t as SVGTextElement).ownerSVGElement!;
+          const escala = svg.getScreenCTM()!.a;
+          return parseFloat(getComputedStyle(t).fontSize) * escala;
+        }),
+      );
+    expect(tamanos.length).toBeGreaterThan(0);
+    expect(Math.min(...tamanos)).toBeGreaterThanOrEqual(10);
+  });
+});
+
+/**
+ * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR y sin él la página no se
+ * hidrata: la píldora no llega a montarse. El puente reenvía el socket a localhost:3050. Copiado
+ * de `visualizador-volumenes.spec.ts`; bajo `next start` no hay HMR y no hace nada.
+ */
+async function puenteHmr(page: Page): Promise<void> {
+  const abiertos: WebSocket[] = [];
+  page.on('close', () => abiertos.forEach((s) => s.close()));
+  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
+    const u = new URL(ws.url());
+    const arriba = new WebSocket(`ws://localhost:3050${u.pathname}${u.search}`);
+    arriba.binaryType = 'arraybuffer';
+    abiertos.push(arriba);
+    const cola: (string | Buffer)[] = [];
+    arriba.onopen = () => {
+      for (const m of cola) arriba.send(m);
+      cola.length = 0;
+    };
+    ws.onMessage((m) => {
+      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
+      else cola.push(m);
+    });
+    arriba.onmessage = (e: MessageEvent) =>
+      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
+    ws.onClose(() => arriba.close());
+  });
+}
+
+/** Cuántos puntos del texto del h1 caen bajo la barra fija del logo (la píldora, en Stemum). */
+async function tituloBajoLaBarra(page: Page): Promise<{ total: number; tapados: number }> {
+  await page.evaluate(
+    () => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
+  );
+  return page.locator('h1').evaluate((h1) => {
+    const barra = document.querySelector('[class*="headerBar"]');
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    let total = 0;
+    let tapados = 0;
+    for (const q of Array.from(rango.getClientRects())) {
+      for (let x = q.left + 2; x < q.right - 1; x += 4) {
+        for (let y = q.top + 4; y < q.bottom - 3; y += 4) {
+          total++;
+          const e = document.elementFromPoint(x, y);
+          if (e && barra?.contains(e)) tapados++;
+        }
+      }
+    }
+    return { total, tapados };
+  });
+}
+
+test.describe('Sospecha (b) descartada — la barra fija no tapa el título', () => {
+  test('bajo stemum.com, de 1024 a 1120 px y a 800 px, la píldora «Stemum › Física» no pisa el h1', async ({
+    page,
+  }) => {
+    // El corte de 1023 px de a1d72a9c se midió con el logo de meskeia.com. Con la píldora, medido
+    // el 03/10/2026: acaba en x = 231-232 y el título empieza en x = 258 a 1024 px (306 a 1120).
+    await puenteHmr(page);
+    await page.goto('http://stemum.com/simulador-proyectiles/');
+    await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
+    await expect(page.locator('[class*="stemumPill"]')).toContainText('Física');
+    const tapados: string[] = [];
+    for (const ancho of [800, 1023, 1024, 1040, 1056, 1072, 1088, 1104, 1110, 1120]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      const m = await tituloBajoLaBarra(page);
+      expect(m.total).toBeGreaterThan(100);
+      if (m.tapados > 0) tapados.push(`${ancho} px: ${m.tapados}/${m.total}`);
+    }
+    expect(tapados).toEqual([]);
+  });
+
+  test('bajo meskeia, de 360 a 1024 px el logo no tapa el título (586a4d61, a1d72a9c)', async ({
+    page,
+  }) => {
+    const tapados: string[] = [];
+    for (const ancho of [360, 390, 800, 1000, 1023, 1024]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      const m = await tituloBajoLaBarra(page);
+      expect(m.total).toBeGreaterThan(100);
+      if (m.tapados > 0) tapados.push(`${ancho} px: ${m.tapados}/${m.total}`);
+    }
+    expect(tapados).toEqual([]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS DE LA RE-INSPECCIÓN DEL 03/10/2026
+// ═══════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos abiertos — cálculo con rozamiento', () => {
+  // HALLAZGO (calculo, medio) — ABIERTO. La rama con rozamiento integra con
+  // `while (y >= 0 && t < T_MAX …)` y T_MAX = 200 s: un vuelo más largo se corta en seco y el
+  // último punto —en el aire— se presenta como impacto (alcance, tiempo y velocidad).
+  // Caso: g = 0,5, v₀ = 100, θ = 45°, «Con resistencia» con k = 0 (el deslizador lo rotula
+  // «0 (sin resistencia)»: la misma física que la solución cerrada). Sin rozamiento la app da
+  // 20.000,00 m en 282,84 s (= 10000/0,5 y 2·70,710678/0,5); con k = 0 daba 14.142,84 m en
+  // 200,01 s y 76,54 m/s, con el proyectil a media altura del dibujo. La tolerancia (1 s,
+  // 100 m) es la del defecto —un 30 %—, no la del sesgo de Euler, que tiene su propio caso.
+  test('g = 0,5, k = 0, v₀ = 100, θ = 45° → 20.000 m en 282,84 s, como sin rozamiento', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): con rozamiento, un vuelo de más de 200 s se corta y se presenta como impacto',
+    );
+    await sembrarValor(page, '#v0', 100);
+    await page.locator('#gravedad').fill('0.5');
+    await esperarValorEnReact(page, '#gravedad', '0.5');
+    await expect.poll(() => alcance(page)).toBe('20.000,00 m');
+    await expect.poll(() => tiempoVuelo(page)).toBe('282,84 s');
+
+    await page.getByRole('button', { name: 'Con resistencia del aire' }).click();
+    await esperarValorEnReact(page, '#resistencia', '0.01');
+    await sembrarValor(page, '#resistencia', 0);
+    await expect
+      .poll(async () => Math.abs(cifra(await tiempoVuelo(page)) - 282.842712))
+      .toBeLessThanOrEqual(1);
+    expect(Math.abs(cifra(await alcance(page)) - 20000)).toBeLessThanOrEqual(100);
+  });
+
+  // HALLAZGO (calculo, bajo) — ABIERTO. La rama con rozamiento es Euler semi-implícito con
+  // dt = 0,01 s, y su sesgo (−½·g·dt·t en la altura, más el error de primer orden del
+  // rozamiento) se publica con dos decimales. Con k = 0, que el deslizador rotula «sin
+  // resistencia», da 40,73 m · 10,12 m · 19,98 m/s donde el modo ideal da 40,77 · 10,19 · 20,00;
+  // con k = 0,05, 17,33 m · 5,93 m · 2,18 s frente a la verdad del modelo (RK4) 17,53 · 6,04 ·
+  // 2,20. Tolerancia: una unidad de la última cifra que la app MUESTRA.
+  test('con rozamiento, cada cifra está a una unidad de su último decimal de la verdad del modelo', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): el integrador con dt = 0,01 s se aparta hasta 20 cm de la verdad y lo publica con dos decimales',
+    );
+    await sembrarValor(page, '#v0', 20);
+    await page.getByRole('button', { name: 'Con resistencia del aire' }).click();
+    await esperarValorEnReact(page, '#resistencia', '0.01');
+    const fallos: string[] = [];
+    const mirar = (nombre: string, texto: string, verdad: number) => {
+      if (!dentroDeSuPrecision(texto, verdad)) fallos.push(`${nombre}: ${texto} (verdad ${verdad})`);
+    };
+
+    await sembrarValor(page, '#resistencia', 0);
+    await expect.poll(async () => cifra(await alcance(page))).toBeGreaterThan(40);
+    mirar('k = 0 · alcance', await alcance(page), 40.77472);
+    mirar('k = 0 · altura máx.', await alturaMax(page), 10.19368);
+    mirar('k = 0 · v impacto', await vImpacto(page), 20);
+
+    await sembrarValor(page, '#resistencia', 0.05);
+    await expect.poll(async () => cifra(await alcance(page))).toBeLessThan(20);
+    mirar('k = 0,05 · alcance', await alcance(page), 17.52553);
+    mirar('k = 0,05 · altura máx.', await alturaMax(page), 6.03505);
+    mirar('k = 0,05 · tiempo', await tiempoVuelo(page), 2.20178);
+    expect(fallos).toEqual([]);
+  });
+});
+
+/** Contraste WCAG entre dos colores «rgb(r, g, b)». */
+function contraste(a: string, b: string): number {
+  const canal = (v: number) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  const lum = (color: string) => {
+    const [r, g, bl] = (color.match(/\d+(\.\d+)?/g) ?? []).map(Number);
+    return 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(bl);
+  };
+  const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+  return (x + 0.05) / (y + 0.05);
+}
+
+async function pasarAOscuro(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(300); // las transiciones de los botones son de 0,15 s
+}
+
+test.describe('Hallazgos abiertos — accesibilidad y dibujo', () => {
+  // HALLAZGO (accesibilidad, medio) — ABIERTO. La sección de resultados es role="status" con
+  // aria-live="polite" y aria-atomic="true", y dentro está la fila «Energía cinética … en
+  // proyectil actual», que cambia en cada fotograma de la animación, además de la caja de
+  // fórmulas (466 caracteres en total). Medido: un lanzamiento de 1,7 s produce 103 cambios y 71
+  // textos distintos de la región, y un lector de pantalla tiene que releerla entera cada vez.
+  test('lanzar el proyectil no re-anuncia los resultados en cada fotograma', async ({ page }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): la región viva atómica cambia en cada fotograma de la animación',
+    );
+    await sembrarValor(page, '#v0', 20);
+    await expect.poll(() => alcance(page)).toBe('40,77 m');
+    await page.evaluate(() => {
+      const w = window as unknown as { __textosVivos: Map<Element, Set<string>> };
+      w.__textosVivos = new Map();
+      const regiones = document.querySelectorAll(
+        'main [aria-live]:not([aria-live="off"]), main [role="status"], main [role="log"]',
+      );
+      regiones.forEach((r) => {
+        w.__textosVivos.set(r, new Set());
+        new MutationObserver(() => w.__textosVivos.get(r)!.add(r.textContent ?? '')).observe(r, {
+          subtree: true,
+          characterData: true,
+          childList: true,
+        });
+      });
+    });
+    await page.getByRole('button', { name: /Lanzar proyectil/ }).click();
+    // duración = min(4000, 2,883 s·600) = 1730 ms
+    await page.waitForTimeout(2500);
+    const peor = await page.evaluate(() => {
+      const w = window as unknown as { __textosVivos: Map<Element, Set<string>> };
+      return Math.max(0, ...Array.from(w.__textosVivos.values()).map((s) => s.size));
+    });
+    expect(peor).toBeLessThanOrEqual(2);
+  });
+
+  // HALLAZGO (accesibilidad, medio) — ABIERTO. En oscuro, los ejes y los rótulos del gráfico
+  // siguen en #374151 (fill y stroke fijos en el JSX) sobre el degradado oscuro del lienzo
+  // (#0c4a6e → #064e3b → #022c22): 1,09 · 1,06 · 1,47:1. «Distancia horizontal (m)» y la escala
+  // («255 m», «73 m») no se ven. En claro, 8,98:1 o más.
+  test('en oscuro los rótulos del gráfico se leen sobre el lienzo (4,5:1)', async ({ page }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): en oscuro los ejes y rótulos del gráfico quedan a 1,1:1 del fondo',
+    );
+    const medir = () =>
+      page.locator('[class*="canvasContainer"]').evaluate((c) => {
+        const paradas = getComputedStyle(c).backgroundImage.match(/rgb\([^)]+\)/g) ?? [];
+        const relleno = getComputedStyle(c.querySelector('svg text')!).fill;
+        return { paradas, relleno };
+      });
+    const claro = await medir();
+    expect(claro.paradas.length).toBeGreaterThan(1);
+    expect(Math.min(...claro.paradas.map((p) => contraste(claro.relleno, p)))).toBeGreaterThanOrEqual(4.5);
+
+    await pasarAOscuro(page);
+    const oscuro = await medir();
+    expect(oscuro.paradas.length).toBeGreaterThan(1);
+    expect(Math.min(...oscuro.paradas.map((p) => contraste(oscuro.relleno, p)))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  // HALLAZGO (accesibilidad, medio) — ABIERTO. Texto sobre el color de marca sin 4,5:1. En claro:
+  // «Lanzar proyectil» y el preset activo, blanco sobre --primary (4,11:1); el modo activo,
+  // blanco sobre --secondary (2,80:1); el valor de cada deslizador, --primary sobre la tarjeta
+  // (4,11:1); «Añadir a comparativa», --primary sobre #FAFAFA (3,93:1). En oscuro: «Lanzar
+  // proyectil», blanco sobre #3FA5D1 (2,79:1) y «Limpiar comparativa», #dc2626 sobre #1A1A1A
+  // (3,60:1). Ninguno es texto grande (≤ 15,2 px). Existen --primary-boton y --secondary-boton.
+  test('los textos sobre el color de marca llegan a 4,5:1 en los dos temas', async ({ page }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): botones y valores en color de marca por debajo de 4,5:1',
+    );
+    await page.getByRole('button', { name: /Añadir a comparativa/ }).click();
+    await expect(page.getByRole('button', { name: 'Limpiar comparativa' })).toBeVisible();
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(300);
+    const medir = () =>
+      page.evaluate(() => {
+        const fondoDe = (el: Element | null): string => {
+          for (let e = el; e; e = e.parentElement) {
+            const c = getComputedStyle(e).backgroundColor;
+            const a = c.match(/rgba\([^)]*,\s*([\d.]+)\)/);
+            if (c !== 'transparent' && !(a && Number(a[1]) < 0.5)) return c;
+          }
+          return 'rgb(255, 255, 255)';
+        };
+        const sel: Record<string, string> = {
+          'Lanzar proyectil': '[class*="calcBtn"]',
+          'preset activo': '[class*="gravityBtn"][aria-pressed="true"]',
+          'modo activo': '[class*="modeBtn"][aria-pressed="true"]',
+          'valor del deslizador': '[class*="sliderValue"]',
+          'Añadir a comparativa': '[class*="secondaryBtn"]',
+          'Limpiar comparativa': '[class*="dangerBtn"]',
+        };
+        return Object.entries(sel).map(([nombre, s]) => {
+          const el = document.querySelector(s)!;
+          return { nombre, texto: getComputedStyle(el).color, fondo: fondoDe(el) };
+        });
+      });
+    const bajos = (pares: { nombre: string; texto: string; fondo: string }[]) =>
+      pares
+        .map((p) => ({ ...p, ratio: contraste(p.texto, p.fondo) }))
+        .filter((p) => p.ratio < 4.5)
+        .map((p) => `${p.nombre} ${p.ratio.toFixed(2)}:1`);
+    const claro = bajos(await medir());
+    await pasarAOscuro(page);
+    const oscuro = bajos(await medir());
+    expect({ claro, oscuro }).toEqual({ claro: [], oscuro: [] });
+  });
+
+  // HALLAZGO (accesibilidad, bajo) — ABIERTO. En oscuro, `[data-theme='dark'] .gravityBtn` y
+  // `.modeBtn` (0,2,0) ganan a `.gravityActive` y `.modeActive` (0,1,0): el activo pierde su fondo
+  // y su borde, y queda igual que los demás (#2a2a2a con borde #4b5563). Solo cambia el tono del
+  // texto, blanco frente a #B0B0B0 (2,17:1 entre ellos): no se ve qué planeta ni qué modo está puesto.
+  test('en oscuro el preset y el modo activos se distinguen de los demás', async ({ page }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): en oscuro el botón activo pierde su fondo y su borde',
+    );
+    const firmas = () =>
+      page.evaluate(() => {
+        const firma = (s: string) => {
+          const cs = getComputedStyle(document.querySelector(s)!);
+          return `${cs.backgroundColor} | ${cs.borderTopColor}`;
+        };
+        return {
+          preset: [
+            firma('[class*="gravityBtn"][aria-pressed="true"]'),
+            firma('[class*="gravityBtn"][aria-pressed="false"]'),
+          ],
+          modo: [
+            firma('[class*="modeBtn"][aria-pressed="true"]'),
+            firma('[class*="modeBtn"][aria-pressed="false"]'),
+          ],
+        };
+      });
+    await page.mouse.move(0, 0);
+    const claro = await firmas();
+    expect(claro.preset[0]).not.toBe(claro.preset[1]);
+    expect(claro.modo[0]).not.toBe(claro.modo[1]);
+
+    await pasarAOscuro(page);
+    const oscuro = await firmas();
+    expect(oscuro.preset[0]).not.toBe(oscuro.preset[1]);
+    expect(oscuro.modo[0]).not.toBe(oscuro.modo[1]);
+  });
+
+  // HALLAZGO (operativa, bajo) — ABIERTO. El rótulo de la escala vertical va en x = 22 con
+  // text-anchor="end", así que desde tres cifras empieza a la izquierda del viewBox y el <svg>
+  // lo recorta. Con el ejemplo de la propia FAQ (50 m/s a 45° en la Luna): H = 385,80 m → tope
+  // de la escala 385,80·1,15 = 443,67 → «444 m», que en pantalla se lee «44 m».
+  test('con la Luna (50 m/s a 45°) el rótulo «444 m» de la escala vertical cabe entero', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): la escala vertical se recorta por la izquierda desde tres cifras',
+    );
+    await page.getByRole('button', { name: 'Luna', exact: true }).click();
+    await esperarValorEnReact(page, '#gravedad', '1.62');
+    const rotulo = page.locator('svg[aria-label="Trayectoria del proyectil"] text[x="22"]');
+    await expect(rotulo).toHaveText('444 m');
+    const izquierda = await rotulo.evaluate((t) => (t as SVGTextElement).getBBox().x);
+    expect(izquierda).toBeGreaterThanOrEqual(0);
+  });
+});
+
+test.describe('Hallazgos abiertos — contenido', () => {
+  // HALLAZGO (contenido, bajo) — ABIERTO. La FAQ dice que con rozamiento la trayectoria «cae más
+  // rápido de lo que sube». Es al revés: con F = −k·|v|·v⃗ la bajada dura MÁS que la subida
+  // (v₀ = 20, θ = 45°, k = 0,05 → RK4: subida 1,00 s y bajada 1,20 s; la propia trayectoria de la
+  // app, muestreada a 0,01 s, alcanza el vértice a los 0,97 s de 2,18). Lo que sí es más
+  // empinado es el tramo de bajada, que es lo que dice bien el JSON-LD.
+  test('la FAQ no dice que con rozamiento el proyectil «cae más rápido de lo que sube»', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): la FAQ invierte la asimetría temporal del tiro con rozamiento',
+    );
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.locator('main')).toContainText('¿Qué pasa si añadimos resistencia del aire?');
+    expect(await page.locator('main').innerText()).not.toContain('cae más rápido de lo que sube');
+  });
+
+  // HALLAZGO (contenido, bajo) — ABIERTO. Dos horquillas de ángulo óptimo sin fuente que la
+  // propia app desmiente: «35-40° para velocidades altas» con rozamiento (a 100 m/s con
+  // k = 0,05 el óptimo es 27°: RK4 50,89 m a 27° · 50,74 a 30° · 49,85 a 35° · 48,24 a 40°) y
+  // «típicamente 35-42°» desde altura (con h₀ = 30 m y v₀ = 20 m/s, tan θ = v₀/√(v₀² + 2gh₀) →
+  // 32,5°; el caso «Trampa (a)» de arriba ya mide 30° por delante de 35°).
+  test('a 100 m/s con k = 0,05 el óptimo queda por debajo de 35°, y la guía no lo acota en 35-40°', async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): horquillas de ángulo óptimo sin fuente que la app desmiente',
+    );
+    await sembrarValor(page, '#v0', 100);
+    await page.getByRole('button', { name: 'Con resistencia del aire' }).click();
+    await esperarValorEnReact(page, '#resistencia', '0.01');
+    await sembrarValor(page, '#resistencia', 0.05);
+    await expect.poll(async () => cifra(await alcance(page))).toBeLessThan(60);
+
+    const alcanceA = async (angulo: number, previo: string) => {
+      await sembrarValor(page, '#angulo', angulo);
+      await expect.poll(() => alcance(page)).not.toBe(previo);
+      return alcance(page);
+    };
+    const a30 = await alcanceA(30, await alcance(page));
+    const a35 = await alcanceA(35, a30);
+    const a40 = await alcanceA(40, a35);
+    // Con el modelo de la app, el alcance BAJA de 30° a 35° y de 35° a 40°.
+    expect(cifra(a30)).toBeGreaterThan(cifra(a35));
+    expect(cifra(a35)).toBeGreaterThan(cifra(a40));
+
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const texto = await page.locator('main').innerText();
+    expect(texto).not.toContain('35-40° para velocidades altas');
+    expect(texto).not.toContain('típicamente 35-42°');
+  });
+
+  // HALLAZGO (contenido, bajo) — ABIERTO. El JSON-LD describe otra app: «dibuja la trayectoria
+  // resultante en tiempo real sobre un canvas 2D», que «integra las ecuaciones cinemáticas en
+  // cada fotograma» y trae una «Tabla comparativa». La app dibuja en <svg>, sin rozamiento usa la
+  // solución cerrada y la comparativa son tarjetas. Es lo que leen los asistentes de IA.
+  test('el JSON-LD no habla de un canvas que la app no tiene', async ({ page }) => {
+    test.fail(
+      true,
+      'ABIERTO, hallazgo (inspector 03/10/2026): el JSON-LD describe un canvas y una tabla que la app no tiene',
+    );
+    await expect(page.locator('canvas')).toHaveCount(0);
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(ld).toContain('Simulador de Proyectiles 2D');
+    expect(ld.toLowerCase()).not.toContain('canvas');
   });
 });

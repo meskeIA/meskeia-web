@@ -1,11 +1,17 @@
 import { test, expect, Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * estimador-irpf-pensionista — candado del método del art. 63.1.2.º LIRPF y de la ENTRADA
  * Escrita el 12/09/2026. Ampliada el 20/09/2026 por el Inspector (casos 4 a 6) y convertida
  * ese mismo día en candado de la reparación (casos 7 a 11). Reinspeccionada el 25/09/2026,
- * tras el cambio del art. 20 en `data/fiscal` (8a6fb75b): casos 12 a 23.
+ * tras el cambio del art. 20 en `data/fiscal` (8a6fb75b): casos 12 a 23. Reinspeccionada el
+ * 03/10/2026, tras dbdaa228 (base del ahorro y contraste, hallazgos 2131-2136) y el re-sellado
+ * de `data/fiscal/irpf.ts` (9bbc5c19): casos 25 a 41, con el texto de los arts. 7, 17, 20, 46,
+ * 56 a 61, 82 y 96 y la DT 12.ª de la Ley 35/2006 cotejado ese día en el consolidado del BOE
+ * (BOE-A-2006-20764).
  *
  * QUÉ VIGILA
  * ──────────
@@ -55,6 +61,13 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  */
 
 const RUTA = '/estimador-irpf-pensionista/';
+
+/**
+ * El botón de calcular, por su nombre accesible. Admite el de hoy («Estimar IRPF pensionista»,
+ * un `aria-label` que NO contiene el texto visible) y el que tendrá cuando se repare el CASO 32
+ * («Estimar mi IRPF como pensionista»): así arreglar la etiqueta no rompe el resto del spec.
+ */
+const BOTON_ESTIMAR = /Estimar (mi )?IRPF (como )?pensionista/;
 
 /**
  * Los cuatro campos numéricos. Sin ellos hidratados, escribir no llegaría al estado de React.
@@ -109,7 +122,7 @@ async function estimar(page: Page, pension: string, edad: string, extras: Extras
     await esperarValorEnReact(page, SEL_AHORRO, extras.ahorro);
   }
 
-  await page.getByRole('button', { name: 'Estimar IRPF pensionista' }).click();
+  await page.getByRole('button', { name: BOTON_ESTIMAR }).click();
 }
 
 test.beforeEach(async ({ page }) => {
@@ -259,7 +272,7 @@ test('CASO 6 (rechazo) · un dato imposible NO se convierte en un supuesto fisca
   const aviso = page.locator('[role="alert"]').filter({ hasText: 'Introduce tu pensión mensual bruta' });
   const cuotaEnPantalla = page.locator('css=span:text-is("Cuota IRPF estimada anual")');
 
-  await page.getByRole('button', { name: 'Estimar IRPF pensionista' }).click();
+  await page.getByRole('button', { name: BOTON_ESTIMAR }).click();
 
   await expect(aviso).toBeVisible();
   await expect(aviso).toHaveAttribute('aria-live', 'polite');
@@ -272,7 +285,7 @@ test('CASO 6 (rechazo) · un dato imposible NO se convierte en un supuesto fisca
   // teclear «abc» lo deja vacío y se vuelve a rechazar igual.
   await page.locator(SEL_PENSION).pressSequentially('abc');
   await esperarValorEnReact(page, SEL_PENSION, '');
-  await page.getByRole('button', { name: 'Estimar IRPF pensionista' }).click();
+  await page.getByRole('button', { name: BOTON_ESTIMAR }).click();
   await expect(aviso).toBeVisible();
   expect(await cuotaEnPantalla.count()).toBe(0);
 
@@ -284,7 +297,7 @@ test('CASO 6 (rechazo) · un dato imposible NO se convierte en un supuesto fisca
   for (const imposible of ['12', '-500', '99999']) {
     await page.locator(SEL_PENSION).fill(imposible);
     await esperarValorEnReact(page, SEL_PENSION, imposible);
-    await page.getByRole('button', { name: 'Estimar IRPF pensionista' }).click();
+    await page.getByRole('button', { name: BOTON_ESTIMAR }).click();
 
     await expect(aviso).toBeVisible();
     // Ni resultado ni reescritura silenciosa del dato: lo que se ve es lo que se tecleó.
@@ -744,12 +757,12 @@ test('CASO 24 (hallazgo 2133, reparado) · la FAQ de ascendientes toma el límit
 });
 
 test('CASO 19 (hallazgo 2134, reparado) · los porcentajes llevan espacio duro antes del %', async ({ page }) => {
-  // HALLAZGO (25/09/2026). Formato español del CLAUDE.md global §2 (regla del 25/09/2026): «15 %»
-  // separado con espacio duro U+00A0. El tipo efectivo sale pegado (page.tsx L421:
-  // `{formatNumber(resultado.tipoEfectivo, 1)}%`); la FAQ de ascendientes escribe «≥33%» (L641) y
-  // la de discapacidad «33 %» y «65 %» con espacio normal (L627-628).
+  // HALLAZGO 2134 (25/09/2026), REPARADO el 26/09/2026 (dbdaa228). Formato español del CLAUDE.md
+  // global §2 (regla del 25/09/2026): «15 %» separado con espacio duro U+00A0. El tipo efectivo
+  // salía pegado (`{formatNumber(resultado.tipoEfectivo, 1)}%`); la FAQ de ascendientes escribía
+  // «≥33%» y la de discapacidad «33 %» y «65 %» con espacio normal. Hoy salen de formatPercentage.
   //   1.400 €/mes, 65-74 → 2.288,14 / 19.600 = 11,67 % → esperado «11,7 %» con U+00A0
-  //   · obtenido «11,7%».
+  //   (antes de la reparación, «11,7%»).
   await estimar(page, '1400', '65_74');
   const valor = page.locator('css=div:has(> span:text-is("Tipo efectivo estimado"))').first().locator('span').nth(1);
   expect(await valor.textContent()).toBe(`11,7${NBSP}%`);
@@ -760,13 +773,14 @@ test('CASO 19 (hallazgo 2134, reparado) · los porcentajes llevan espacio duro a
 });
 
 test('CASO 20 (hallazgo 2132, reparado) · la tabla mide los umbrales del art. 20 con la misma vara que el motor', async ({ page }) => {
-  // HALLAZGO (25/09/2026), reparación incompleta de 8a6fb75b en esta app: la lista del bloque
-  // educativo y el FAQPage pasaron a decir que los umbrales se miden sobre la pensión «sin restar
-  // los 2.000 €», pero la tabla comparativa (page.tsx L485, L491 y L496) sigue con «RNT ≤
-  // 14.852 €», «RNT entre…» y «RNT ≥ 19.747,50 €» sin decir de qué RNT se trata. El único neto
-  // que la pantalla enseña es íntegros − 2.000 («Gastos deducibles generales»).
+  // HALLAZGO 2132 (25/09/2026), REPARADO el 26/09/2026 (dbdaa228). Reparación incompleta de
+  // 8a6fb75b en esta app: la lista del bloque educativo y el FAQPage pasaron a decir que los
+  // umbrales se miden sobre la pensión «sin restar los 2.000 €», pero la tabla comparativa seguía
+  // con «RNT ≤ 14.852 €», «RNT entre…» y «RNT ≥ 19.747,50 €» sin decir de qué RNT se trataba. El
+  // único neto que la pantalla enseña es íntegros − 2.000 («Gastos deducibles generales»).
   //   1.150 €/mes → 16.100 − 2.000 = 14.100 € ≤ 14.852 → por la tabla, 7.302 € de reducción
-  //   · la app aplica 5.118,00 € (CASO 12), que es lo que dice el art. 20.
+  //   · la app aplica 5.118,00 € (CASO 12), que es lo que dice el art. 20. Hoy la tabla rotula
+  //   «Pensión anual íntegra (sin restar los 2000,00 € de gastos)».
   const tabla = (await page.locator('table').first().textContent()) ?? '';
   expect(tabla).toContain('14.852');
   const rntSinDefinir = /RNT/.test(tabla) && !/sin restar/i.test(tabla);
@@ -774,9 +788,12 @@ test('CASO 20 (hallazgo 2132, reparado) · la tabla mide los umbrales del art. 2
 });
 
 test('CASO 21 (hallazgo 2135, reparado) · las cifras del resultado se leen con contraste suficiente, en claro y en oscuro', async ({ page }) => {
-  // HALLAZGO (25/09/2026). El módulo redeclara `--primary: #2E86AB` y `--success: #27AE60` en
-  // `.container` (EstimadorIrpfPensionista.module.css L2 y L10), sin variante oscura, y pinta con
-  // ellos las cifras (L129 `.resultValue`, L132 `.resultValueBig`). Medido en Chromium:
+  // HALLAZGO 2135 (25/09/2026), REPARADO el 26/09/2026 (dbdaa228): las cifras pasaron a
+  // `--primary-texto` y la pensión neta a `--exito-texto`, con variante oscura. Remedido el
+  // 03/10/2026 en los dos temas: ninguna cifra del resultado por debajo de su umbral.
+  // Lo que había: el módulo redeclaraba `--primary: #2E86AB` y `--success: #27AE60` en
+  // `.container`, sin variante oscura, y pintaba con ellos las cifras (`.resultValue`,
+  // `.resultValueBig`). Medido entonces en Chromium:
   //   .resultValue (1,1rem = 17,6 px en negrita: texto normal, exige 4,5:1)
   //     claro  3,93:1 sobre #FAFAFA · 3,79:1 en la fila resaltada (#F0F7FB)
   //     oscuro 4,24:1 sobre #1A1A1A · 3,59:1 en la fila resaltada (#1A2A33)
@@ -800,12 +817,14 @@ test('CASO 21 (hallazgo 2135, reparado) · las cifras del resultado se leen con 
 });
 
 test('CASO 22 (hallazgo 2136, reparado) · botón, preguntas y pasos del bloque educativo con contraste suficiente', async ({ page }) => {
-  // HALLAZGO (25/09/2026), mismo origen que el CASO 21 (tokens de marca redeclarados en el
-  // módulo). Medido en Chromium:
-  //   botón «Estimar mi IRPF…» (L98-102): blanco sobre degradado #2E86AB → #48A9A6, 17,6 px en
+  // HALLAZGO 2136 (25/09/2026), REPARADO el 26/09/2026 (dbdaa228): botón y pasos con
+  // `--primary-boton`/`--secondary-boton`, preguntas con `--primary-texto`. Remedido el 03/10/2026
+  // en los dos temas. Mismo origen que el CASO 21 (tokens de marca redeclarados en el módulo).
+  // Medido entonces en Chromium:
+  //   botón «Estimar mi IRPF…»: blanco sobre degradado #2E86AB → #48A9A6, 17,6 px en
   //     negrita (texto normal, 4,5:1): 4,11:1 en el extremo azul y 2,80:1 en el teal
-  //   preguntas de la FAQ (L291-294, `.faqItem strong`): 3,77:1 en claro y 3,21:1 en oscuro
-  //   números de la guía paso a paso (L325-327, `.stepNumber`): 4,11:1 en los dos temas
+  //   preguntas de la FAQ (`.faqItem strong`): 3,77:1 en claro y 3,21:1 en oscuro
+  //   números de la guía paso a paso (`.stepNumber`): 4,11:1 en los dos temas
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   const selBoton = `button${MOD}[class$="__btn"]`;
   const selPreguntas = `${MOD}[class$="__faqItem"] > strong`;
@@ -848,7 +867,7 @@ test('CASO 23 · reparaciones del 20/09 sin caso propio (#1024, #1025, #1026) y 
   expect(texto).toContain('16.147,85 € de base → cuota 1979,98 €');
 
   // #1026: el emoji del aviso de error va en un nodo aria-hidden; lo anunciable no lleva emoji.
-  await page.getByRole('button', { name: 'Estimar IRPF pensionista' }).click();
+  await page.getByRole('button', { name: BOTON_ESTIMAR }).click();
   const aviso = page.locator('[role="alert"]').filter({ hasText: 'Introduce tu pensión mensual bruta' });
   await expect(aviso).toBeVisible();
   await expect(aviso.locator('[aria-hidden="true"]')).toContainText('⚠');
@@ -859,4 +878,355 @@ test('CASO 23 · reparaciones del 20/09 sin caso propio (#1024, #1025, #1026) y 
   });
   expect(anunciable).toContain('Introduce tu pensión mensual bruta');
   expect(anunciable).not.toMatch(/\p{Extended_Pictographic}/u);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Casos 25 a 41 — reinspección del 03/10/2026. Resueltos a mano ANTES de abrir la app con
+// `TRAMOS_IRPF_2025`, `MINIMOS_IRPF_2025`, `GASTOS_DEDUCIBLES_TRABAJO_2025`,
+// `REDUCCION_RENDIMIENTOS_TRABAJO_2025` (data/fiscal/irpf.ts) y `TRAMOS_GANANCIAS_PATRIMONIALES_2025`
+// (data/fiscal/inmuebles.ts: 19 % hasta 6.000 €, 21 % hasta 50.000 €). Los textos normativos, del
+// consolidado del BOE (BOE-A-2006-20764) consultado ese día.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** «1.309,68 €/mes» o «2664,50 €» → número. */
+const importe = (s: string): number =>
+  // parser-ok: relee una cifra que la propia app escribe con formatCurrency, no lo que teclea un usuario
+  Number(s.replace(/\s*€(\/mes)?$/, '').replace(/\./g, '').replace(',', '.'));
+
+test('CASO 25 (normal) · 1.300 €/mes, 67 años, 400 € de intereses: la cadena entera con las dos bases', async ({ page }) => {
+  //   Íntegros del trabajo 1.300 × 14                                    = 18.200,00 €
+  //   Rentas distintas del trabajo: 400 € de intereses ≤ 6.500 → la reducción procede (art. 20)
+  //   Reducción art. 20 sobre 18.200 (entre 17.673,52 y 19.747,5):
+  //     2.364,34 − 1,14 × (18.200 − 17.673,52) = 2.364,34 − 600,1872     =  1.764,15 €
+  //   Base general = 18.200 − 2.000 − 1.764,15                           = 14.435,85 €
+  //   Cuota general = escala(14.435,85) − escala(6.700)
+  //     = (2.365,50 + 1.985,85 × 24 %) − 1.273,00 = 2.842,104 − 1.273,00   =  1.569,10 €
+  //   Base del ahorro 400 € (art. 46.a); el mínimo lo agota la general → 400 × 19 % =  76,00 €
+  //   Cuota = 1.645,104 → 1.645,10 € · tipo efectivo 1.645,10 / 18.600 = 8,84 % → «8,8 %»
+  //   Neta = 1.300 − 1.645,104 / 14 = 1.300 − 117,507                    =  1.182,49 €/mes
+  await estimar(page, '1300', '65_74', { ahorro: '400' });
+
+  expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('18.200,00 €');
+  expect(await fila(page, 'Gastos deducibles generales')).toBe('-2000,00 €');
+  expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-1764,15 €');
+  expect(await fila(page, 'Base imponible general')).toBe('14.435,85 €');
+  expect(await fila(page, 'Base imponible del ahorro')).toBe('400,00 €');
+  expect(await fila(page, 'Mínimo personal (edad)')).toBe('6700,00 €');
+  expect(await fila(page, 'Cuota de la base general')).toBe('1569,10 €');
+  expect(await fila(page, 'Cuota de la base del ahorro')).toBe('76,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1645,10 €');
+  expect(await fila(page, 'Tipo efectivo estimado')).toBe('8,8 %');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1182,49 €/mes');
+});
+
+test('CASO 26 (borde) · 75 años, el salto de 6.000 € de la base del ahorro y el art. 20 perdido por las otras rentas', async ({ page }) => {
+  //   1.600 €/mes → 22.400 € íntegros (≥ 19.747,5: reducción 0 de todos modos), alquiler 600 € +
+  //   dividendos 6.000 € = 6.600 € > 6.500 → la app debe DECIR que la reducción no procede.
+  //   Base general = 22.400 − 2.000 + 600 = 21.000,00 €
+  //   escala(21.000) = 2.365,50 + 1.860,00 + 800 × 30 % = 4.465,50 € · escala(8.100) = 1.539,00 €
+  //   Cuota general = 2.926,50 €
+  //   Ahorro 6.000 × 19 % = 1.140,00 € → cuota 4.066,50 € · neta 1.600 − 290,464 = 1.309,54 €/mes
+  //   Con 6.001 €: el euro de más ya va al 21 % → 1.140,21 € · cuota 4.066,71 € · neta 1.309,52 €/mes
+  await estimar(page, '1600', '75_mas', { otrasRentas: '600', ahorro: '6000' });
+  expect(await fila(page, 'Base imponible general')).toBe('21.000,00 €');
+  expect(await fila(page, 'Mínimo personal (edad)')).toBe('8100,00 €');
+  expect(await fila(page, 'Cuota de la base general')).toBe('2926,50 €');
+  expect(await fila(page, 'Cuota de la base del ahorro')).toBe('1140,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('4066,50 €');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1309,54 €/mes');
+  await expect(page.getByText('la reducción del art. 20 LIRPF no procede')).toBeVisible();
+
+  await estimar(page, '1600', '75_mas', { otrasRentas: '600', ahorro: '6001' });
+  expect(await fila(page, 'Cuota de la base del ahorro')).toBe('1140,21 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('4066,71 €');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1309,52 €/mes');
+});
+
+test('CASO 27 (borde) · el euro en que la base general pasa del 24 % al 30 % (20.200 €)', async ({ page }) => {
+  //   1.500 €/mes (21.000 €) + rescate 1.200 € = 22.200 € → reducción 0 → base 20.200,00 €
+  //   escala(20.200) = 2.365,50 + 7.750 × 24 % = 4.225,50 € − escala(8.100) 1.539,00 = 2.686,50 €
+  //   neta = 1.500 − 2.686,50 / 14 = 1.308,11 €/mes
+  //   Con rescate 1.201 €: base 20.201 € → + 1 × 30 % → 2.686,80 € · neta 1.308,09 €/mes
+  await estimar(page, '1500', '75_mas', { rescate: '1200' });
+  expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('22.200,00 €');
+  expect(await fila(page, 'Base imponible general')).toBe('20.200,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2686,50 €');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1308,11 €/mes');
+
+  await estimar(page, '1500', '75_mas', { rescate: '1201' });
+  expect(await fila(page, 'Base imponible general')).toBe('20.201,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2686,80 €');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1308,09 €/mes');
+});
+
+test('CASO 28 (rechazo) · estados intermedios TECLEADOS y bordes del rango: o calcula bien o no da número', async ({ page }) => {
+  // `fill()` no ve si el campo se reescribe al teclear: aquí se escribe tecla a tecla.
+  const cuotaEnPantalla = page.locator('css=span:text-is("Cuota IRPF estimada anual")');
+  const aviso = (texto: string) => page.locator('[role="alert"]').filter({ hasText: texto });
+  const boton = page.getByRole('button', { name: BOTON_ESTIMAR });
+  async function teclear(sel: string, texto: string): Promise<void> {
+    await page.locator(sel).fill('');
+    await esperarValorEnReact(page, sel, '');
+    await page.locator(sel).pressSequentially(texto);
+    await esperarValorEnReact(page, sel, texto);
+  }
+
+  // Un resultado válido delante, para comprobar que el rechazo lo RETIRA.
+  await estimar(page, '1500', '65_74');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2664,50 €');
+
+  for (const imposible of ['-', '12.', '1.2.3', '10000,01']) {
+    await teclear(SEL_PENSION, imposible);
+    await boton.click();
+    await expect(aviso('Introduce tu pensión mensual bruta (entre 100 y 10.000 €)')).toBeVisible();
+    expect(await cuotaEnPantalla.count(), `«${imposible}» no puede publicar cuota`).toBe(0);
+    await expect(page.locator(SEL_PENSION)).toHaveValue(imposible);
+  }
+
+  // Los dos bordes del rango sí se calculan.
+  //   100 €/mes → 1.400 € íntegros; los gastos de la letra f) se topan en 1.400 (no pueden dejar
+  //   negativo el rendimiento) → base 0 → cuota 0,00 € y neta 100,00 €/mes.
+  await teclear(SEL_PENSION, '100');
+  await boton.click();
+  expect(await fila(page, 'Gastos deducibles generales')).toBe('-1400,00 €');
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('0,00 €');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('100,00 €/mes');
+  //   10.000 €/mes → 140.000 € → base 138.000 € → escala = 17.901,50 + 78.000 × 45 % = 53.001,50
+  //   − 1.273,00 = 51.728,50 € · neta 10.000 − 3.694,89 = 6.305,11 €/mes
+  await teclear(SEL_PENSION, '10.000');
+  await boton.click();
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('51.728,50 €');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('6305,11 €/mes');
+
+  // Los campos opcionales: un «-» suelto o un negativo no valen 0, se rechazan.
+  await teclear(SEL_PENSION, '1500');
+  await teclear(SEL_RESCATE, '-');
+  await boton.click();
+  await expect(aviso('El rescate de plan de pensiones debe ser un importe entre 0 y 500.000 €')).toBeVisible();
+  expect(await cuotaEnPantalla.count()).toBe(0);
+
+  await teclear(SEL_RESCATE, '0');
+  await teclear(SEL_AHORRO, '-50');
+  await boton.click();
+  await expect(aviso('Los intereses y dividendos deben ser un importe entre 0 y 500.000 €')).toBeVisible();
+  expect(await cuotaEnPantalla.count()).toBe(0);
+
+  await teclear(SEL_AHORRO, '0');
+  for (const imposible of ['-', '100.001']) {
+    await teclear(SEL_OTRAS, imposible);
+    await boton.click();
+    await expect(aviso('Los alquileres y otras rentas de la base general deben ser un importe entre 0 y 100.000 €')).toBeVisible();
+    expect(await cuotaEnPantalla.count()).toBe(0);
+  }
+});
+
+test.describe('móvil (390 px)', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('CASO 29 (móvil) · el CASO 25 tecleado con punto de millar, sin desbordar la pantalla', async ({ page }) => {
+    // Mismas cifras que el CASO 25: «1.300» es 1.300 €/mes (parseSpanishNumber).
+    await page.locator('#tramoEdad').selectOption('65_74');
+    await page.locator(SEL_PENSION).tap();
+    await page.locator(SEL_PENSION).pressSequentially('1.300');
+    await esperarValorEnReact(page, SEL_PENSION, '1.300');
+    await page.locator(SEL_AHORRO).fill('400');
+    await esperarValorEnReact(page, SEL_AHORRO, '400');
+    await page.getByRole('button', { name: BOTON_ESTIMAR }).tap();
+
+    expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1645,10 €');
+    expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1182,49 €/mes');
+    const ancho = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(ancho, 'sin scroll horizontal a 390 px').toBeLessThanOrEqual(390);
+  });
+});
+
+test('CASO 30 (sospecha del 28/09, DESCARTADA con medida) · las notas del resultado se leen en los dos temas', async ({ page }) => {
+  // SOSPECHA (28/09/2026): `.resultNota` declara `background: var(--bg-secondary)`, variable que no
+  // existe en globals.css ni en el módulo. Medido el 03/10/2026 en Chromium: la declaración queda
+  // anulada (fondo `rgba(0, 0, 0, 0)`), así que en claro la nota se pinta sobre el blanco de la
+  // tarjeta: texto #666666 sobre #FFFFFF = 5,74:1, y la distingue su borde izquierdo de 3 px. En
+  // oscuro la regla `[data-theme='dark'] .resultNota` le da #1E293B y el texto #B0B0B0 cumple.
+  // No deja texto sin contraste ni nada sin distinguir: no es hallazgo. Este caso vigila lo que
+  // importa —que se lea— y no el valor del fondo, para no romperse cuando se declare la variable.
+  //   700 €/mes, 75+, 10.000 € de intereses → salen las tres notas (art. 20, art. 56.2 y «TODAS»).
+  await estimar(page, '700', '75_mas', { ahorro: '10000' });
+  const notas = `p${MOD}[class$="__resultNota"]`;
+  const claro = await peorContraste(page, notas);
+  await temaOscuro(page);
+  const oscuro = await peorContraste(page, notas);
+  expect(claro.n).toBe(3);
+  expect(claro.ratio, 'notas del resultado, claro').toBeGreaterThanOrEqual(4.5);
+  expect(oscuro.ratio, 'notas del resultado, oscuro').toBeGreaterThanOrEqual(4.5);
+});
+
+test('CASO 31 · ABIERTO, hallazgo (inspector 03/10/2026) · el aviso de error se lee en el tema oscuro', async ({ page }) => {
+  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): .errorMsg es #c0392b literal, sin variante oscura');
+  // `.errorMsg { color: #c0392b }` (EstimadorIrpfPensionista.module.css) no tiene variante oscura.
+  // Medido el 03/10/2026: 5,44:1 sobre la tarjeta blanca en claro, pero 2,64:1 sobre la tarjeta
+  // #2A2A2A en oscuro (0,9 rem = texto normal, exige 4,5:1). Es el único texto que el usuario TIENE
+  // que leer cuando la app rechaza un dato. `check:token-oscuro` no lo ve: no es un token.
+  await page.addStyleTag({ content: '*,*::before,*::after{transition:none !important}' });
+  await page.getByRole('button', { name: BOTON_ESTIMAR }).click();
+  const sel = `div${MOD}[class$="__errorMsg"]`;
+  await expect(page.locator(sel)).toBeVisible();
+  const claro = await peorContraste(page, sel);
+  await temaOscuro(page);
+  const oscuro = await peorContraste(page, sel);
+  expect(claro.n).toBe(1);
+  expect(claro.ratio, 'aviso de error, claro').toBeGreaterThanOrEqual(4.5);
+  expect(oscuro.ratio, 'aviso de error, oscuro').toBeGreaterThanOrEqual(4.5);
+});
+
+test('CASO 32 · ABIERTO, hallazgo (inspector 03/10/2026) · el nombre accesible del botón contiene su texto visible', async ({ page }) => {
+  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): aria-label «Estimar IRPF pensionista» ≠ texto visible');
+  // WCAG 2.5.3 (Label in Name, nivel A): quien maneja el navegador por voz dice lo que VE, «pulsa
+  // Estimar mi IRPF como pensionista», y el aria-label lo sustituye por «Estimar IRPF pensionista».
+  const boton = page.locator(`button${MOD}[class$="__btn"]`);
+  const visible = (await boton.innerText()).trim();
+  expect(visible).toBe('Estimar mi IRPF como pensionista');
+  await expect(boton).toHaveAccessibleName(new RegExp(visible));
+});
+
+test('CASO 33 · ABIERTO, hallazgo (inspector 03/10/2026) · la «pensión neta» no se come el impuesto del rescate ni del alquiler', async ({ page }) => {
+  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): la pensión neta resta la cuota de TODAS las rentas');
+  // La app calcula «Pensión neta mensual estimada» = pensión − cuota de TODAS las rentas / 14, y
+  // debajo avisa de que «es un suelo, no lo que cobrarás cada mes». Su propio FAQPage la define
+  // como «la pensión bruta menos las retenciones de IRPF que aplica la Seguridad Social», que solo
+  // miran la pensión: el IRPF del rescate lo retiene la gestora y el del alquiler no sale de la
+  // pensión. Una cifra rotulada que no es lo que dice el rótulo, con un aviso debajo, es un aviso
+  // bajo cifra falsa: o se calcula lo que dice, o no se publica.
+  //   Referencia: la pensión neta de 1.500 €/mes sin más rentas es 1.309,68 €/mes (CASO 1).
+  //   Rescate de 30.000 € (el importe del propio bloque educativo): cuota 12.558,50 € (escala de
+  //     49.000 = 13.831,50 − 1.273,00), correcta como cuota; la app publica 602,96 €/mes de pensión.
+  //   Alquiler de 100.000 €: cuota 43.178,50 €; la app publica 0,00 €/mes de pensión.
+  const netaPublicada = async (): Promise<number | null> => {
+    const f = page.locator('css=div:has(> span:text-is("Pensión neta mensual estimada"))');
+    return (await f.count()) === 0 ? null : importe(await fila(page, 'Pensión neta mensual estimada'));
+  };
+
+  await estimar(page, '1500', '65_74', { rescate: '30.000' });
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('12.558,50 €');
+  const conRescate = await netaPublicada();
+  if (conRescate !== null) expect(conRescate, 'pensión neta con rescate').toBeGreaterThanOrEqual(1309.68);
+
+  await estimar(page, '1500', '65_74', { rescate: '0', otrasRentas: '100.000' });
+  expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('43.178,50 €');
+  const conAlquiler = await netaPublicada();
+  if (conAlquiler !== null) expect(conAlquiler, 'pensión neta con alquiler').toBeGreaterThanOrEqual(1309.68);
+});
+
+test('CASO 34 · ABIERTO, hallazgo (inspector 03/10/2026) · ascendientes: el límite de 1.800 € del art. 61.2.ª, no una «conjunta con tus hijos»', async ({ page }) => {
+  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): FAQ y tarjeta omiten el art. 61.2.ª y hablan de declaración conjunta');
+  // Art. 61.2.ª LIRPF (BOE, consolidado): «No procederá la aplicación del mínimo por descendientes,
+  // ascendientes o discapacidad, cuando los ascendientes o descendientes que generen el derecho a
+  // los mismos presenten declaración por este Impuesto con rentas superiores a 1.800 euros».
+  // Art. 82: la unidad familiar son los cónyuges y los hijos MENORES (o incapacitados judicialmente):
+  // un padre y un hijo mayor de edad no pueden declarar juntos nunca, no «en este caso».
+  // La app dice: «En este caso tú no puedes presentar declaración conjunta con tus hijos, pero ellos
+  // sí pueden aplicar ese mínimo» y «Pero entonces tú no puedes declarar conjuntamente con tus hijos
+  // ni obtener esa deducción». Y en otra FAQ aconseja declarar sin estar obligado para pedir la
+  // devolución: un pensionista con 7.000 € de rentas que convive con su hijo y lo hace le quita al
+  // hijo el mínimo por ascendiente (1.150 €, art. 59.1).
+  const faq = page.locator(`${MOD}[class$="__faqItem"]`).filter({ hasText: 'ascendiente a cargo' });
+  const tarjeta = page.locator(`${MOD}[class$="__tipCard"]`).filter({ hasText: 'Coordina con la familia' });
+  const texto = limpiar(`${(await faq.textContent()) ?? ''} ${(await tarjeta.textContent()) ?? ''}`);
+  expect(texto).toMatch(/1\.?800/);
+  expect(texto).not.toMatch(/conjunta(mente)? con tus hijos/);
+});
+
+test('CASO 35 · ABIERTO, hallazgo (inspector 03/10/2026) · varios pagadores: la excepción de los pensionistas del art. 96.3.a.2.º', async ({ page }) => {
+  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): falta el procedimiento especial del art. 96.3.a.2.º');
+  // Art. 96.3.a LIRPF: con más de un pagador el límite es 15.876 €, «No obstante, el límite será de
+  // 22.000 euros anuales en los siguientes supuestos: […] 2.º Cuando se trate de contribuyentes
+  // cuyos únicos rendimientos del trabajo consistan en las prestaciones pasivas a que se refiere el
+  // artículo 17.2.a) de esta Ley y la determinación del tipo de retención aplicable se hubiera
+  // realizado de acuerdo con el procedimiento especial que reglamentariamente se establezca».
+  // Las prestaciones del art. 17.2.a incluyen las de mutualidades y planes de pensiones: justo el
+  // ejemplo del FAQPage («también de una mutualidad … el límite baja a 15.876 €»).
+  //   Pensión de 14.000 € + 3.000 € de una mutualidad, retención por el procedimiento especial →
+  //   límite 22.000 € → NO obligado. La app lo da por obligado en cuatro sitios y en el FAQPage.
+  const texto = limpiar((await page.locator('body').textContent()) ?? '');
+  expect(texto).toMatch(/procedimiento especial/i);
+  const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const faq = scripts.find((s) => s.includes('FAQPage')) ?? '';
+  expect(faq).toMatch(/procedimiento especial/i);
+});
+
+test('CASO 36 · ABIERTO, hallazgo (inspector 03/10/2026) · los escenarios conectan la obligación de declarar con lo que dice el art. 96.2', async ({ page }) => {
+  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): consejos de los escenarios ajenos al art. 96.2');
+  // Art. 96.2: no declara quien obtiene rentas «exclusivamente» del trabajo (22.000 €), del capital
+  // mobiliario con retención (1.600 €) o imputadas (1.000 €); el alquiler no está en la lista, y el
+  // único otro límite es el conjunto de 1.000 € del penúltimo párrafo. Un pensionista con 14.000 €
+  // de pensión y 6.000 € de alquiler ESTÁ obligado; la app dice que «el alquiler tiene sus propios
+  // umbrales en el art. 96, y conviene comprobarlos aparte».
+  // Y con 19.000 € de un solo pagador no hay obligación sea cual sea la retención (art. 96.2.a); la
+  // app la hace depender de ella: «Si la retención aplicada es exacta, puede no ser obligatorio».
+  const texto = limpiar((await page.locator(`${MOD}[class$="__escenariosGrid"]`).textContent()) ?? '');
+  expect(texto).not.toContain('tiene sus propios umbrales en el art. 96');
+  expect(texto).not.toContain('Si la retención aplicada es exacta, puede no ser obligatorio declarar');
+});
+
+test('CASO 37 · ABIERTO, hallazgo (inspector 03/10/2026) · el rescate del plan menciona el régimen transitorio de la DT 12.ª', async ({ page }) => {
+  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): «se suma íntegramente» y «rescatar en años posteriores» sin la DT 12.ª');
+  // DT 12.ª.2 LIRPF: por la parte de aportaciones hasta el 31/12/2006 se puede aplicar la reducción
+  // del art. 17 del TRLIRPF vigente a esa fecha; DT 12.ª.4: solo en el ejercicio de la contingencia
+  // o en los dos siguientes. La app dice «El rescate se suma íntegramente a los rendimientos del
+  // trabajo», aconseja rescatar «en años posteriores» y «en forma de renta», y no avisa de que eso
+  // puede hacer perder la reducción de esa parte. (`lib/calculadoras/rescatePlanPensiones.ts` ya la
+  // modela.)
+  const parrafo = page.locator('h3', { hasText: 'Rescate del plan de pensiones' }).locator('xpath=following-sibling::p[1]');
+  const escenario = page.locator(`${MOD}[class$="__escenarioCard"]`).filter({ hasText: 'plan de pensiones rescatado' });
+  const consejo = page.locator(`${MOD}[class$="__tipCard"]`).filter({ hasText: 'Planifica el rescate' });
+  const texto = limpiar(`${await parrafo.textContent()} ${await escenario.textContent()} ${await consejo.textContent()}`);
+  expect(texto).toMatch(/2006|2007|transitori/i);
+});
+
+test('CASO 38 · ABIERTO, hallazgo (inspector 03/10/2026) · las pensiones exentas no son «solo» las de incapacidad absoluta o gran invalidez', async ({ page }) => {
+  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): la FAQ dice «solo» y el art. 7 exime más pensiones');
+  // Art. 7 LIRPF: también están exentas, entre otras, las pensiones por actos de terrorismo (a), las
+  // de lesiones de la Guerra Civil (c), las de inutilidad de clases pasivas (g) y las de orfandad de
+  // la Seguridad Social de menores de 22 años (h). Un huérfano de 20 años con pensión de orfandad
+  // de la SS no tributa por ella; la FAQ dice que las únicas exentas son las de incapacidad.
+  const faq = page.locator(`${MOD}[class$="__faqItem"]`).filter({ hasText: 'siempre tributan' });
+  expect(limpiar((await faq.textContent()) ?? '')).not.toMatch(/exenciones totales solo para/);
+});
+
+test('CASO 39 · ABIERTO, hallazgo (inspector 03/10/2026) · discapacidad ≥ 65 %: el mínimo lleva además los gastos de asistencia', async ({ page }) => {
+  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): la FAQ omite los 3.000 € de gastos de asistencia del art. 60.1');
+  // Art. 60.1 LIRPF: 9.000 € con grado ≥ 65 %, «Dicho mínimo se aumentará, en concepto de gastos de
+  // asistencia, en 3.000 euros anuales cuando acredite […] un grado de discapacidad igual o superior
+  // al 65 por ciento» (DEDUCCIONES_IRPF_DISCAPACIDAD_2025.contribuyente.gastosAsistencia65oMas).
+  //   Pensionista con el 65 % → mínimo por discapacidad 12.000 €; la FAQ dice 9.000 €.
+  const faq = page.locator(`${MOD}[class$="__faqItem"]`).filter({ hasText: 'discapacidad al IRPF' });
+  expect(limpiar((await faq.textContent()) ?? '')).toMatch(/asistencia/i);
+});
+
+test('CASO 40 · ABIERTO, hallazgo (inspector 03/10/2026) · el plazo de la campaña no lleva fechas de un año concreto escritas a mano', async ({ page }) => {
+  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): «del 2 de abril al 30 de junio … hasta el 25 de junio» a mano');
+  // data/fiscal/calendario.ts: «Campaña de abril a finales de junio; las fechas exactas se publican
+  // cada ejercicio». El paso 6 de la guía fija «El plazo es del 2 de abril al 30 de junio. Si sale a
+  // pagar y domicilias el pago, puedes presentar hasta el 25 de junio».
+  const paso = page.locator(`${MOD}[class$="__step"]`).filter({ hasText: 'Presenta antes' });
+  const texto = limpiar((await paso.textContent()) ?? '');
+  expect(texto).not.toContain('2 de abril');
+  expect(texto).not.toContain('25 de junio');
+});
+
+test('CASO 41 · ABIERTO, hallazgo (inspector 03/10/2026) · ni el año ni el tipo del primer tramo se escriben a mano', async ({ page }) => {
+  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): «2026» y «al 19 %» escritos a mano');
+  // El aviso y DataReference leen `FISCAL_IRPF_META.vigencia`, y el título de metadata también
+  // (b7ec248c), pero el subtítulo del hero, el del bloque educativo y el título de la tabla llevan
+  // «2026» tecleado: al re-sellar el módulo, el título cambiaría y ellos no. Y el FAQPage escribe
+  // «al 19 %» (con espacio normal) en vez de leer TRAMOS_IRPF_2025[0].tipo con formatPercentage.
+  const fuente = readFileSync(join(process.cwd(), 'app', 'estimador-irpf-pensionista', 'page.tsx'), 'utf8');
+  expect(fuente).not.toMatch(/·\s*20\d\d|\(20\d\d\)/);
+  const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const faq = scripts.find((s) => s.includes('FAQPage')) ?? '';
+  expect(faq).not.toMatch(/\d %/);
 });

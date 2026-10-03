@@ -35,8 +35,8 @@ import { esperarValorEnReact } from './_hidratacion';
  *   los principales es [1, mainMax], (c) ninguno se repite dentro de la misma combinación, y
  *   (d) el rango del extra es el oficial. Para el extra de primitiva/bonoloto/gordo se generan
  *   80 muestras (8 tandas de 10): con el bug activo, cada dígito tiene 1/11 de probabilidad de
- *   salir "10", así que P(ninguna de las 80 lo sea) = (10/11)^80 ≈ 0,07 % — el test.fail() de
- *   abajo es, a efectos prácticos, determinista.
+ *   salir "10", así que P(ninguna de las 80 lo sea) = (10/11)^80 ≈ 0,07 % — el test.fail() que
+ *   llevaba abajo hasta su reparación (31/08/2026) era, a efectos prácticos, determinista.
  *
  * REPARADO — HALLAZGO 1 (calculo, alto) — Reintegro/Clave podía salir "10", que no existe.
  *   `config.extraMax` valía 10 para primitiva/bonoloto/gordo, pero se usaba como el VALOR
@@ -285,8 +285,8 @@ test.describe('S0115 — las combinaciones guardadas sobreviven al cierre de la 
   /**
    * Semilla S0115 (04/09/2026). Hasta esta fecha `favorites` vivía solo en `useState`: la
    * lista se vaciaba al recargar, mientras el texto de la propia app prometía «guardar las
-   * que quieras conservar» y, en Bonoloto, «guardarlas para la semana» — un juego que sortea
-   * de lunes a sábado, o sea que la promesa era justo lo que no se cumplía. Ahora se
+   * que quieras conservar» y, en Bonoloto, «guardarlas para la semana» — un juego con sorteo
+   * a diario, o sea que la promesa era justo lo que no se cumplía. Ahora se
    * persisten en localStorage bajo la clave `meskeia-loteria-favoritas`.
    *
    * Lo que estos tests fijan, además de la persistencia: que la lista se compara por la
@@ -440,7 +440,8 @@ test.describe('S0115 — las combinaciones guardadas sobreviven al cierre de la 
  * mal formado. No hay errores de consola, ni caída, ni desbordamiento horizontal, y la
  * distribución de los números es uniforme (200 combinaciones por modalidad, χ² dentro de lo
  * esperable). Lo que sí sale son fallos de USO, sobre todo de la persistencia nueva del
- * 04/09 (S0115), que nunca se había inspeccionado. Van abajo con `test.fail()`.
+ * 04/09 (S0115), que nunca se había inspeccionado. Fueron abajo con `test.fail()` hasta su
+ * reparación el 25/09/2026.
  *
  * CASOS RESUELTOS A MANO ANTES DE EJECUTAR (reglas de Loterías y Apuestas del Estado):
  *   1. Normal — Euromillones, 3 combinaciones: tres tarjetas, cada una con 5 números
@@ -456,8 +457,10 @@ test.describe('S0115 — las combinaciones guardadas sobreviven al cierre de la 
  *      el 01/09/2026». Y dos pestañas abiertas a la vez: la que se abrió antes no se entera de
  *      lo que guarda la otra, y su siguiente guardado reescribe la clave entera.
  *
- * HALLAZGOS ABIERTOS (el número es su orden en el acta del 25/09/2026): afirman lo que
- * DEBERÍA pasar, así que hoy fallan a propósito; al repararlos se quita el `test.fail()`.
+ * HALLAZGOS del acta del 25/09/2026 (el número es su orden en ella): los ocho se REPARARON el
+ * mismo 25/09/2026 (49134ac3 y, el aviso de transparencia, 6f6feb50) y la base no tiene
+ * ninguno abierto (re-inspección del 03/10/2026). Los tests afirman lo que debe pasar y ya
+ * pasan, sin `test.fail()`; donde un comentario dice «ANTES», describe el fallo de entonces.
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 const CLAVE_FAVORITAS = 'meskeia-loteria-favoritas';
@@ -674,10 +677,11 @@ test.describe('25/09 · móvil 360×800 — límites y persistencia', () => {
   });
 
   test('hallazgo 4 · al tocar Generar con el botón al pie de la pantalla, el resultado se ve', async ({ page }) => {
-    // DEBERÍA: llevar la vista al resultado (o anunciarlo) al generar. HOY: los resultados se
-    // pintan DEBAJO del botón y la vista no se mueve; con el botón en los últimos ~130 px de
-    // la pantalla no se ve ni una bola, y el único cambio visible es el texto «Generando...»
-    // durante 300 ms. Medido a 360×800: botón en 682-784 px, primera tarjeta en 913 px.
+    // DEBE: llevar la vista al resultado (o anunciarlo) al generar. ANTES (hasta el 25/09/2026):
+    // los resultados se pintaban DEBAJO del botón y la vista no se movía; con el botón en los
+    // últimos ~130 px de la pantalla no se veía ni una bola, y el único cambio visible era el
+    // texto «Generando...» durante 300 ms. Medido a 360×800: botón en 682-784 px, primera
+    // tarjeta en 913 px.
     await sembrarYRecargar(page, { [CLAVE_AVISO_TRANSPARENCIA]: 'true' }); // sin el aviso delante
     await page.evaluate(() => {
       const r = document.querySelector('[class*="generateButton"]')!.getBoundingClientRect();
@@ -722,9 +726,10 @@ test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y co
   test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
 
   test('hallazgo 2 · con dos pestañas abiertas, guardar en una no borra lo guardado en la otra', async ({ page }) => {
-    // DEBERÍA: el almacén acaba con las DOS combinaciones (X de la pestaña nueva, Y de la vieja).
-    // HOY: la pestaña vieja cargó la lista antes de que X existiera y no escucha el evento
-    // `storage`; al guardar Y reescribe la clave entera con [Y] y X se pierde para siempre.
+    // DEBE: el almacén acaba con las DOS combinaciones (X de la pestaña nueva, Y de la vieja).
+    // ANTES (REPARADO el 25/09/2026): la pestaña vieja cargaba la lista antes de que X existiera
+    // y no escuchaba el evento `storage`; al guardar Y reescribía la clave entera con [Y] y X
+    // se perdía para siempre.
     const vieja = page; // cargada en el beforeEach, con la lista vacía
     await esperarInteractiva(vieja);
 
@@ -739,7 +744,7 @@ test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y co
 
     await expect.poll(async () => (await leerFavoritas(vieja)).map((f) => f.mainNumbers.join('-'))).toContain(y.join('-'));
     const guardadas = (await leerFavoritas(vieja)).map((f) => f.mainNumbers.join('-'));
-    expect(guardadas).toContain(x.join('-')); // HOY falla: X ha desaparecido
+    expect(guardadas).toContain(x.join('-')); // antes del 25/09 fallaba: X desaparecía
   });
 
   test('copiar deja en el portapapeles la combinación exacta', async ({ page }) => {
@@ -758,9 +763,9 @@ test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y co
   });
 
   test('hallazgo 5 · el botón Copiar confirma que ha copiado', async ({ page }) => {
-    // DEBERÍA: un «Copiada» visible y anunciado (aria-live). HOY: la combinación llega al
-    // portapapeles pero la pantalla no cambia nada: el botón parece no responder. Además la
-    // promesa de clipboard.writeText no se captura: si falla, falla en silencio.
+    // DEBE: un «Copiada» visible y anunciado (aria-live). ANTES (REPARADO el 25/09/2026): la
+    // combinación llegaba al portapapeles pero la pantalla no cambiaba nada y el botón parecía
+    // no responder; la promesa de clipboard.writeText no se capturaba y un fallo se perdía.
     await esperarInteractiva(page);
     await ponerCantidad(page, 1);
     await botonGenerar(page).click();
@@ -800,8 +805,9 @@ test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y co
   test('hallazgo 1 · los días de sorteo de La Primitiva y Bonoloto son los vigentes', async ({ page }) => {
     // Fuente: Loterías y Apuestas del Estado. La Primitiva: «Semanalmente se celebran sorteos
     // los lunes, jueves y sábados». Bonoloto: sorteo de lunes a domingo (el domingo se añadió
-    // el 25/09/2022). HOY la app dice «Jueves y Sábados» y «Lunes a Sábado» en el panel, en
-    // las fichas, en la tabla, en los textos de cada modalidad y en el FAQPage.
+    // el 25/09/2022). ANTES (REPARADO el 25/09/2026) la app decía «Jueves y Sábados» y «Lunes a
+    // Sábado» en el panel, en las fichas, en la tabla, en los textos de cada modalidad y en el
+    // FAQPage.
     await esperarInteractiva(page);
     await seleccionarLoteria(page, 'primitiva');
     await expect(page.locator('[class*="lotteryInfo"]')).toContainText(/lunes, jueves y s[áa]bados/i);
@@ -818,10 +824,10 @@ test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y co
   });
 
   test('hallazgo 6 · la metadata no promete estadísticas que la página no tiene', async ({ page }) => {
-    // DEBERÍA: o la página ofrece estadísticas de los números, o la descripción y las
-    // `features` del JSON-LD dejan de prometerlas. HOY: description «…historial y
-    // estadísticas» y feature «Estadísticas básicas de los números generados»; tras generar
-    // 10 combinaciones no aparece ninguna estadística ni frecuencia en la herramienta.
+    // DEBE: o la página ofrece estadísticas de los números, o la descripción y las `features`
+    // del JSON-LD dejan de prometerlas. ANTES (REPARADO el 25/09/2026): description «…historial
+    // y estadísticas» y feature «Estadísticas básicas de los números generados»; tras generar
+    // 10 combinaciones no aparecía ninguna estadística ni frecuencia en la herramienta.
     await esperarInteractiva(page);
     const descripcion = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -837,9 +843,10 @@ test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y co
   });
 
   test('hallazgo 7 · el bloque educativo no tiene la errata «Jugas» ni atribuye estas loterías a la ONCE', async ({ page }) => {
-    // DEBERÍA: «Jugáis en grupo y necesitáis…» (la frase sigue en vosotros) y «Las principales
+    // DEBE: «Jugáis en grupo y necesitáis…» (la frase sigue en vosotros) y «Las principales
     // loterías de Loterías y Apuestas del Estado»: ninguna de las cuatro de la tabla es de la
-    // ONCE. HOY: «Jugas en grupo» y «Las principales loterías de la ONCE y LAE».
+    // ONCE. ANTES (REPARADO el 25/09/2026): «Jugas en grupo» y «Las principales loterías de la
+    // ONCE y LAE».
     // El bloque educativo nace colapsado pero su texto está en el DOM
     await expect(page.getByText(/Jugas en grupo/)).toHaveCount(0);
     await expect(page.getByText(/loterías de la ONCE y LAE/)).toHaveCount(0);
@@ -977,5 +984,355 @@ test.describe('S0176 · comprobar las combinaciones guardadas con el sorteo', ()
     await expect(comprobador(page).locator('[class*="comprobadaVeredicto"]')).toHaveCount(3);
     const ancho = await page.evaluate(() => document.documentElement.scrollWidth);
     expect(ancho).toBeLessThanOrEqual(360);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * TERCERA INSPECCIÓN — 03/10/2026 · re-inspección con FIRMA DE ROTURA y la función nueva S0176
+ *
+ * FIRMA (Analytics, 30 días hasta el 02/10): 852 visitas, 68,2 % cortas, 2,6 % recargas (por
+ * debajo del catálogo), y CAMBIO: cortas del 59,3 % al 73,3 % en 14 días (z 5). Medido sobre
+ * el dump del 03/10, ventana 19/09-02/10 frente a 08/08-18/09, ANTES de abrir el navegador:
+ *   · El alza es entera de visitas RECURRENTES: pasan del 60 % al 83 % de las visitas y del
+ *     62,7 % (282/450) al 79,2 % (304/384) de cortas. Las NUEVAS bajan: 54,2 % → 45,0 % (36/80).
+ *   · Un bloque de IP 79.116.x.x con 384×857 (Android) suma 113 de las 464 visitas recientes
+ *     (93 cortas), con una sesión distinta en cada visita: vuelve a abrir la app, no recarga.
+ *   · Lectura: gente que vuelve unos segundos a mirar sus combinaciones guardadas (S0115,
+ *     04/09). En móvil (360×800, 390×844, 412×915, hasTouch) no hay nada que impida usarla:
+ *     sin errores de consola, sin desbordamiento, el generador, la estrella, Copiar y el
+ *     comprobador responden. La tarjeta nueva tras Generar se ve. Lo único que se cruza en
+ *     móvil es el comprobador con el botón al pie (hallazgo B, bajo), que es de hoy.
+ *
+ * SOSPECHA DEL 30/09 (scrollIntoView frente a la barra fija del logo), MEDIDA Y DESCARTADA en lo
+ * que la app desplaza. La barra ocupa 0-62 px en móvil y 0-92 px a 800 y 1280 px.
+ *   · Generar: `block: 'nearest'` sobre una tarjeta que nace DEBAJO del botón alinea su borde
+ *     INFERIOR. Tarjeta en 604-800 (360×800), 648-844 (390×844), 749-900 (800×900).
+ *   · Ficha → «Generar números de…»: `block: 'center'`. Panel del generador en 287-560 (360),
+ *     286-558 (390), 336-565 (800). El panel de la modalidad, que va ENCIMA del destino, sí
+ *     asoma por debajo de la barra a 360 px (su borde superior a 27 px), pero no es el destino
+ *     y el botón ya dice qué modalidad se ha elegido.
+ *   · El comprobador no desplaza nada (eso es el hallazgo B).
+ * Pero alinear el borde INFERIOR choca con la otra pieza fija del layout, la píldora del Footer
+ * (más de 768 px): hallazgo A.
+ *
+ * CASOS RESUELTOS A MANO ANTES DE EJECUTAR (fuente de las categorías de El Gordo: Resolución de
+ * 20/01/2005 de LAE, BOE n.º 25 de 29/01/2005, BOE-A-2005-1507, normas 63.ª a 68.ª: 5 de 54 +
+ * número clave del 0 al 9; 1.ª 5+clave · 2.ª 5 · 3.ª 4+clave · 4.ª 4 · 5.ª 3+clave · 6.ª 3 ·
+ * 7.ª 2+clave · 8.ª 2; «todas las apuestas que tengan acertado el número clave obtendrán el
+ * reintegro…, sin perjuicio de los premios» de la primera matriz). loteriasyapuestas.es
+ * respondió 403 el 03/10/2026, así que los casos de categoría se anclan en El Gordo, que es la
+ * modalidad con norma en el BOE.
+ *   Sorteo 4 18 27 39 52 · clave 6, contra diez guardadas (una por casilla de la tabla):
+ *     a 4 18 27 39 52 · 6 → 5 + clave → 1.ª y reintegro          (6 bolas marcadas)
+ *     b 4 18 30 41 53 · 2 → 2         → 8.ª                       (2)
+ *     c 1  2  3  5  7 · 6 → 0 + clave → solo reintegro            (1)
+ *     d 4 18 27 39 50 · 1 → 4         → 4.ª                       (4)
+ *     e 4 10 11 18 27 · 6 → 3 + clave → 5.ª y reintegro           (4)
+ *     f 1  2  3  5 52 · 0 → 1         → sin premio                (1)
+ *     g 1  2  3  4 18 · 6 → 2 + clave → 7.ª y reintegro           (3)
+ *     h 1  2  4 18 27 · 0 → 3         → 6.ª                       (3)
+ *     i 4 18 27 39 52 · 0 → 5         → 2.ª                       (5)
+ *     j 1  4 18 27 39 · 6 → 4 + clave → 3.ª y reintegro           (5)
+ *   → con categoría: a b d e g h i j = 8 de 10 · con reintegro: a c e g j = 5.
+ *   Rechazos (rango 1-54, sin repetir, clave 0-9): 55 en la 3.ª casilla, el 18 dos veces, la
+ *   5.ª casilla vacía, clave 10 y clave vacía → un aviso cada uno y ningún veredicto.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+const T_0310 = '2026-10-01T10:00:00.000Z';
+const gordo0310 = (id: string, mainNumbers: number[], clave: number) =>
+  ({ id, type: 'gordo', mainNumbers, extraNumbers: [clave], timestamp: T_0310 });
+const GORDO_0310 = [
+  gordo0310('a', [4, 18, 27, 39, 52], 6),
+  gordo0310('b', [4, 18, 30, 41, 53], 2),
+  gordo0310('c', [1, 2, 3, 5, 7], 6),
+  gordo0310('d', [4, 18, 27, 39, 50], 1),
+  gordo0310('e', [4, 10, 11, 18, 27], 6),
+  gordo0310('f', [1, 2, 3, 5, 52], 0),
+  gordo0310('g', [1, 2, 3, 4, 18], 6),
+  gordo0310('h', [1, 2, 4, 18, 27], 0),
+  gordo0310('i', [4, 18, 27, 39, 52], 0),
+  gordo0310('j', [1, 4, 18, 27, 39], 6),
+];
+
+const zonaComprobador = (page: Page) => page.getByRole('region', { name: /Comprobar con el resultado del sorteo/ });
+
+/** `fill()` en una casilla del comprobador y espera a que el valor haya llegado a React. */
+async function escribirCasilla(page: Page, casilla: Locator, valor: string) {
+  await casilla.fill(valor);
+  await esperarValorEnReact(page, casilla, valor);
+}
+
+/** Teclea un sorteo de El Gordo: cinco números y la clave. */
+async function teclearGordo(page: Page, numeros: string[], clave: string) {
+  const zona = zonaComprobador(page);
+  for (let i = 0; i < 5; i++) {
+    await escribirCasilla(page, zona.getByLabel(`Número ${i + 1} de la combinación ganadora`), numeros[i]);
+  }
+  await escribirCasilla(page, zona.getByLabel('Clave'), clave);
+}
+
+/** Espera a que acabe un desplazamiento suave: dos lecturas seguidas de scrollY iguales. */
+async function esperarDesplazamientoQuieto(page: Page) {
+  let anterior = Number.NaN;
+  await expect.poll(async () => {
+    const y = await page.evaluate(() => window.scrollY);
+    const quieto = y === anterior;
+    anterior = y;
+    return quieto;
+  }, { intervals: [150], timeout: 5_000 }).toBe(true);
+}
+
+/** Lleva la vista hasta que el borde inferior de `selector` quede a `margen` px del pie. */
+async function botonAlPie(page: Page, selector: string, margen: number) {
+  await page.evaluate(([sel, m]) => {
+    const r = document.querySelector(sel)!.getBoundingClientRect();
+    window.scrollTo(0, window.scrollY + r.bottom - window.innerHeight + m);
+  }, [selector, margen] as const);
+}
+
+test.describe('03/10 · comprobador con El Gordo de la Primitiva (BOE-A-2005-1507)', () => {
+  test('las ocho categorías, el reintegro solo y el sin premio, cada uno en su fila', async ({ page }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GORDO_0310) });
+    const zona = zonaComprobador(page);
+    // Solo hay una lotería guardada: sin selector, El Gordo directamente, con su casilla «Clave»
+    await expect(zona.locator('legend')).toHaveText('Combinación ganadora de El Gordo de la Primitiva');
+    await expect(zona.getByRole('group', { name: 'Lotería que quieres comprobar' })).toHaveCount(0);
+    await expect(zona.getByLabel(/Número \d de la combinación ganadora/)).toHaveCount(5);
+    await expect(zona.getByLabel('Complementario')).toHaveCount(0);
+
+    await teclearGordo(page, ['4', '18', '27', '39', '52'], '6');
+    await zona.getByRole('button', { name: 'Comprobar mis combinaciones de El Gordo de la Primitiva' }).click();
+
+    const resumen = '8 de tus 10 combinaciones de El Gordo de la Primitiva tienen premio de categoría; 5 aciertan el reintegro.';
+    await expect(zona.locator('[class*="comprobadorResumen"]')).toHaveText(resumen);
+    await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveText([
+      '1.ª categoría (5 aciertos + clave) y reintegro',
+      '8.ª categoría (2 aciertos)',
+      'Reintegro (0 aciertos + clave, sin premio de categoría)',
+      '4.ª categoría (4 aciertos)',
+      '5.ª categoría (3 aciertos + clave) y reintegro',
+      'Sin premio (1 acierto)',
+      '7.ª categoría (2 aciertos + clave) y reintegro',
+      '6.ª categoría (3 aciertos)',
+      '2.ª categoría (5 aciertos)',
+      '3.ª categoría (4 aciertos + clave) y reintegro',
+    ]);
+    // Bolas marcadas por fila (números acertados + la clave si coincide)
+    const marcadas = await zona.locator('ul li').evaluateAll((lis) =>
+      lis.map((li) => li.querySelectorAll('[class*="bolaAcertada"]').length));
+    expect(marcadas).toEqual([6, 2, 1, 4, 4, 1, 3, 3, 5, 5]);
+    // Solo f queda sin premio de ninguna clase
+    const conPremio = await zona.locator('ul li').evaluateAll((lis) =>
+      lis.map((li) => /comprobadaPremio/.test(li.className)));
+    expect(conPremio).toEqual([true, true, true, true, true, false, true, true, true, true]);
+    await expect(page.getByRole('status').filter({ hasText: resumen })).toHaveCount(1);
+    expect(errores).toEqual([]);
+  });
+
+  test('un sorteo imposible se rechaza con su motivo y sin veredicto', async ({ page }) => {
+    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GORDO_0310) });
+    const zona = zonaComprobador(page);
+    const boton = zona.getByRole('button', { name: 'Comprobar mis combinaciones de El Gordo de la Primitiva' });
+    const casos: Array<[string[], string, string]> = [
+      [['4', '18', '55', '39', '52'], '6', 'El número 3 (55) está fuera de rango: va del 1 al 54.'],
+      [['4', '18', '18', '39', '52'], '6', 'El 18 está repetido en la combinación ganadora: en un sorteo no sale dos veces.'],
+      [['4', '18', '27', '39', ''], '6', 'Falta el número 5 de la combinación ganadora, o no es un número entero.'],
+      [['4', '18', '27', '39', '52'], '10', 'Clave: 10 está fuera de rango, va del 0 al 9.'],
+      [['4', '18', '27', '39', '52'], '', 'Falta el número clave, o no es un número entero.'],
+    ];
+    for (const [numeros, clave, aviso] of casos) {
+      await teclearGordo(page, numeros, clave);
+      await boton.click();
+      await expect(zona.getByRole('alert')).toHaveText(aviso);
+      await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveCount(0);
+    }
+    // Con la clave corregida, el mismo formulario ya da los diez veredictos
+    await escribirCasilla(page, zona.getByLabel('Clave'), '6');
+    await boton.click();
+    await expect(zona.getByRole('alert')).toHaveCount(0);
+    await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveCount(10);
+  });
+});
+
+test.describe('03/10 · escritorio 1280×800 — la tarjeta recién generada y la píldora fija del Footer', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test.fail('hallazgo A · tras Generar, la estrella de la tarjeta nueva recibe el clic', async ({ page }) => {
+    // ABIERTO, hallazgo (inspector 03/10/2026). Por encima de 768 px el Footer compartido es
+    // una píldora FIJA abajo a la derecha (components/Footer.module.css: bottom 10 px, right
+    // 20 px, z-index 1000). Desde la reparación del 25/09 (hallazgo 1632), Generar lleva la
+    // tarjeta nueva a la vista con `block: 'nearest'`, que la deja con su borde inferior pegado
+    // al pie de la ventana: justo debajo de la píldora quedan Copiar y Guardar. Medido con la
+    // vista bajada 150-400 px: la estrella en (1062, 746) y la píldora en 990-1260 × 745-790;
+    // igual a 1024×768, 1366×768 y 800×900 (a 1920×1080, no). Un clic en la estrella no guarda
+    // nada; a 1024×768 cae en «Compartir» y deja en el portapapeles la URL de la página.
+    // DEBE: la estrella (y Copiar) de la tarjeta recién generada reciben el clic.
+    await esperarInteractiva(page);
+    await page.evaluate(() => window.scrollTo(0, 300));
+    const caja = (await botonGenerar(page).boundingBox())!;
+    expect(caja.y >= 0 && caja.y + caja.height <= 800).toBe(true); // precondición: botón a la vista
+    await botonGenerar(page).click();
+    await expect(page.locator('[class*="resultCard"]')).toHaveCount(1);
+    await expect.poll(() => page.evaluate(() => {
+      const r = document.querySelector('[class*="resultCard"]')!.getBoundingClientRect();
+      return r.top >= 0 && r.bottom <= window.innerHeight + 1;
+    }), { timeout: 3_000 }).toBe(true);
+    await esperarDesplazamientoQuieto(page);
+
+    const estrella = page.locator('[class*="resultCard"]').first().getByRole('button', { name: /Guardar esta combinación/ });
+    const recibe = await estrella.evaluate((b) => {
+      const r = b.getBoundingClientRect();
+      const encima = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return !!encima && b.contains(encima);
+    });
+    expect(recibe).toBe(true); // HOY: lo recibe la píldora del Footer
+    const e = (await estrella.boundingBox())!;
+    await page.mouse.click(e.x + e.width / 2, e.y + e.height / 2);
+    await expect.poll(async () => (await leerFavoritas(page)).length).toBe(1);
+  });
+});
+
+test.describe('03/10 · móvil 360×800 — barra fija del logo y comprobador', () => {
+  test.use({
+    viewport: { width: 360, height: 800 },
+    userAgent: UA_ANDROID,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /** Borde inferior de la barra fija del logo (62 px en móvil). */
+  const bordeBarra = (page: Page) => page.evaluate(() =>
+    document.querySelector('[class*="headerBar"]')!.getBoundingClientRect().bottom);
+
+  test('Generar con el botón al pie: la tarjeta nueva queda entera y por debajo de la barra fija', async ({ page }) => {
+    // Sospecha del 30/09 DESCARTADA: `block: 'nearest'` alinea el borde inferior de la tarjeta
+    // (nace debajo del botón), así que su borde superior queda lejos de la barra (604 px).
+    await esperarInteractiva(page);
+    await botonAlPie(page, '[class*="generateButton"]', 16);
+    const caja = (await botonGenerar(page).boundingBox())!;
+    expect(caja.y + caja.height).toBeLessThanOrEqual(800);
+    await page.touchscreen.tap(caja.x + caja.width / 2, caja.y + caja.height / 2);
+    await expect(page.locator('[class*="resultCard"]')).toHaveCount(1);
+    await expect.poll(() => page.evaluate(() => {
+      const r = document.querySelector('[class*="resultCard"]')!.getBoundingClientRect();
+      return r.bottom <= window.innerHeight + 1;
+    }), { timeout: 3_000 }).toBe(true);
+    await esperarDesplazamientoQuieto(page);
+    const barra = await bordeBarra(page);
+    expect(barra).toBeGreaterThan(0);
+    const tarjeta = (await page.locator('[class*="resultCard"]').first().boundingBox())!;
+    expect(tarjeta.y).toBeGreaterThanOrEqual(barra);
+  });
+
+  test('desde la ficha de Euromillones: el panel del generador queda entero y por debajo de la barra', async ({ page }) => {
+    // `block: 'center'`: panel en 287-560 px. Lo que asoma bajo la barra es el panel de la
+    // modalidad, que está ENCIMA del destino; el botón ya nombra la modalidad elegida.
+    await esperarInteractiva(page);
+    await page.getByRole('button', { name: 'Generar números de Euromillones' }).tap();
+    await expect(botonGenerar(page)).toContainText('Generar 1 combinación de Euromillones');
+    await expect.poll(() => page.evaluate(() => {
+      const r = document.querySelector('[class*="generatorPanel"]')!.getBoundingClientRect();
+      return r.top >= 0 && r.bottom <= window.innerHeight;
+    }), { timeout: 4_000 }).toBe(true);
+    await esperarDesplazamientoQuieto(page);
+    const barra = await bordeBarra(page);
+    const panel = (await page.locator('[class*="generatorPanel"]').boundingBox())!;
+    expect(panel.y).toBeGreaterThanOrEqual(barra);
+  });
+
+  test.fail('hallazgo B · Comprobar con el botón al pie: el resumen del resultado se ve', async ({ page }) => {
+    // ABIERTO, hallazgo (inspector 03/10/2026). El resultado del comprobador se pinta DEBAJO del
+    // botón y la vista no se mueve: con el botón al pie (borde inferior a 792 px) el resumen
+    // empieza en 808 px y la primera fila en 892. Es lo mismo que el hallazgo 1632 reparó en el
+    // generador. Lo atenúa el teclado del móvil (al cerrarse deja ver lo que hay debajo), por
+    // eso es bajo. El resumen sí se anuncia por la región aria-live.
+    // DEBE: tras pulsar, el resumen (o la vista desplazada hasta él) a la vista.
+    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GORDO_0310) });
+    await teclearGordo(page, ['4', '18', '27', '39', '52'], '6');
+    await botonAlPie(page, '[class*="comprobadorBoton"]', 8);
+    const zona = zonaComprobador(page);
+    const caja = (await zona.getByRole('button', { name: /Comprobar mis combinaciones/ }).boundingBox())!;
+    await page.touchscreen.tap(caja.x + caja.width / 2, caja.y + caja.height / 2);
+    await expect(zona.locator('[class*="comprobadorResumen"]')).toHaveCount(1);
+    await expect.poll(() => page.evaluate(() =>
+      document.querySelector('[class*="comprobadorResumen"]')!.getBoundingClientRect().bottom <= window.innerHeight,
+    ), { timeout: 3_000 }).toBe(true);
+  });
+
+  test.fail('hallazgo B · un sorteo imposible con el botón al pie: el aviso se ve', async ({ page }) => {
+    // ABIERTO, hallazgo (inspector 03/10/2026). El aviso (role="alert") nace justo debajo del
+    // botón: con el botón al pie queda en 800-847 px, fuera de la pantalla; a la vista no cambia
+    // nada y el botón parece no responder.
+    // DEBE: el aviso entero a la vista.
+    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GORDO_0310) });
+    await teclearGordo(page, ['4', '18', '27', '39', '52'], '10');
+    await botonAlPie(page, '[class*="comprobadorBoton"]', 8);
+    const zona = zonaComprobador(page);
+    const caja = (await zona.getByRole('button', { name: /Comprobar mis combinaciones/ }).boundingBox())!;
+    await page.touchscreen.tap(caja.x + caja.width / 2, caja.y + caja.height / 2);
+    await expect(zona.getByRole('alert')).toHaveText('Clave: 10 está fuera de rango, va del 0 al 9.');
+    await expect.poll(() => page.evaluate(() =>
+      document.querySelector('[class*="comprobadorError"]')!.getBoundingClientRect().bottom <= window.innerHeight,
+    ), { timeout: 3_000 }).toBe(true);
+  });
+});
+
+test.describe('03/10 · contenido y accesibilidad', () => {
+  test.fail('hallazgo C · la información fiscal no contradice la disposición adicional 33.ª de la LIRPF', async ({ page }) => {
+    // ABIERTO, hallazgo (inspector 03/10/2026). Fuente: Ley 35/2006, DA 33.ª (texto consolidado
+    // del BOE, BOE-A-2006-20764). Apartado 6: el premio sufre una retención del 20 % sobre lo
+    // que excede de 40.000 €. Apartado 7: «no existirá obligación de presentar la citada
+    // autoliquidación cuando … se hubiera practicado retención». Apartado 8: el premio no se
+    // integra en la base del IRPF. La DA 33.ª la añadió la Ley 13/2011 (DF 9.ª), la reescribió
+    // el ARTÍCULO 2 de la Ley 16/2012 y los 40.000 € son de la Ley 6/2018 (art. 67.1); el
+    // artículo 13 de la Ley 16/2012 modifica el ITP-AJD.
+    // HOY: «No declarar premios a Hacienda (obligatorio si superan 40.000 €)… No declararlos
+    // constituye una infracción tributaria grave», y «Referencia legal: artículo 13 de la Ley
+    // 16/2012». DEBE: ni la obligación de declarar un premio ya retenido ni el artículo 13.
+    await expect(page.getByText(/obligatorio si superan 40\.000/)).toHaveCount(0);
+    await expect(page.getByText(/infracción tributaria grave/)).toHaveCount(0);
+    await expect(page.getByText(/artículo 13 de la Ley 16\/2012/)).toHaveCount(0);
+  });
+
+  test.fail('hallazgo D · Loterías y Apuestas del Estado no se presenta como el regulador', async ({ page }) => {
+    // ABIERTO, hallazgo (inspector 03/10/2026). Ley 13/2011, de regulación del juego, DA 1.ª,
+    // apartado Uno (BOE-A-2011-9280): SELAE y la ONCE «son los operadores designados para la
+    // comercialización de los juegos de loterías». HOY la FAQ dice que los sorteos «están
+    // supervisados por el organismo regulador español (Loterías y Apuestas del Estado)».
+    await expect(page.getByText(/organismo regulador español \(Loterías y Apuestas del Estado\)/)).toHaveCount(0);
+  });
+
+  test.fail('hallazgo E · porcentajes con espacio y días de la semana en minúscula', async ({ page }) => {
+    // ABIERTO, hallazgo (inspector 03/10/2026). «15 %» con espacio duro (CLAUDE.md global §2,
+    // 25/09/2026) y los días de la semana en minúscula (RAE), como ya hace La Primitiva
+    // («Lunes, jueves y sábados»). HOY: «50%» y «20%» (tres veces) en el bloque educativo, y
+    // «Martes y Viernes» en el panel de Euromillones, en su ficha y en la tabla comparativa.
+    const educativo = (await page.locator('[class*="guideSection"]').allTextContents()).join(' ');
+    expect(educativo.match(/\d+%/g) ?? []).toEqual([]);
+    await expect(page.locator('[class*="modalidadesSection"]')).not.toContainText('Martes y Viernes');
+    await expect(page.locator('[class*="comparativaTable"]')).not.toContainText('Martes y Viernes');
+  });
+
+  test.fail('hallazgo F · las casillas del comprobador se distinguen del fondo (3:1)', async ({ page }) => {
+    // ABIERTO, hallazgo (inspector 03/10/2026). WCAG 1.4.11 (contraste de lo que no es texto):
+    // el borde de un campo es lo que lo identifica, y las casillas de los números no llevan
+    // etiqueta visible propia. Borde 2 px var(--border) sobre var(--bg-card), con la sección
+    // del mismo fondo: #E5E5E5 sobre #FFFFFF = 1,26:1 en claro; #404040 sobre #2A2A2A = 1,38:1
+    // en oscuro (medido en navegador). DEBE: al menos 3:1.
+    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GORDO_0310.slice(0, 1)) });
+    const ratio = await zonaComprobador(page).getByLabel('Número 1 de la combinación ganadora').evaluate((el) => {
+      const rgb = (c: string) => (c.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
+      const lum = (c: string) => {
+        const [r, g, b] = rgb(c).map((v) => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const borde = lum(getComputedStyle(el).borderTopColor);
+      const fondo = lum(getComputedStyle(el).backgroundColor);
+      return (Math.max(borde, fondo) + 0.05) / (Math.min(borde, fondo) + 0.05);
+    });
+    expect(ratio).toBeGreaterThanOrEqual(3);
   });
 });
