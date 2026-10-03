@@ -443,7 +443,7 @@ export default function SimuladorEstequiometriaPage() {
                 <span>
                   {reaccion.reactivos[0].nombre} ({reaccion.reactivos[0].formula})
                   {esLimitanteA && (
-                    <span className={styles.limitanteBadge} role="img" aria-label="Reactivo limitante">⚠️ Limitante</span>
+                    <span className={styles.limitanteBadge} role="img" aria-label="Reactivo limitante"><span aria-hidden="true">⚠️</span> Limitante</span>
                   )}
                 </span>
                 <span className={styles.barValor}>
@@ -468,7 +468,7 @@ export default function SimuladorEstequiometriaPage() {
                   <span>
                     {reaccion.reactivos[1].nombre} ({reaccion.reactivos[1].formula})
                     {esLimitanteB && (
-                      <span className={styles.limitanteBadge} role="img" aria-label="Reactivo limitante">⚠️ Limitante</span>
+                      <span className={styles.limitanteBadge} role="img" aria-label="Reactivo limitante"><span aria-hidden="true">⚠️</span> Limitante</span>
                     )}
                   </span>
                   <span className={styles.barValor}>
@@ -706,7 +706,7 @@ export default function SimuladorEstequiometriaPage() {
                   El reactivo que no se agota se llama <strong>reactivo en exceso</strong>.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 Ejemplo: para CH₄ + 2 O₂ → CO₂ + 2 H₂O, si tienes 16 g de CH₄ (1 mol) y 64 g de O₂
+                  <span aria-hidden="true">💡</span> Ejemplo: para CH₄ + 2 O₂ → CO₂ + 2 H₂O, si tienes 16 g de CH₄ (1 mol) y 64 g de O₂
                   (2 mol), ambos son exactamente estequiométricos. Si usas 32 g de O₂ en cambio, el O₂ es
                   el limitante.
                 </p>
@@ -720,7 +720,7 @@ export default function SimuladorEstequiometriaPage() {
                   CH₄ tiene M = 12 + 4×1 = 16 g/mol. Si tienes 32 g de CH₄, son 32/16 = 2 mol.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 Las masas molares de los elementos están en la tabla periódica (peso atómico en u ≈ g/mol).
+                  <span aria-hidden="true">💡</span> Las masas molares de los elementos están en la tabla periódica (peso atómico en u ≈ g/mol).
                 </p>
               </div>
 
@@ -735,7 +735,7 @@ export default function SimuladorEstequiometriaPage() {
                   ratio_A = n_A / c_A &nbsp;|&nbsp; ratio_B = n_B / c_B &nbsp;→&nbsp; limitante = el de menor ratio
                 </div>
                 <p className={styles.faqTip}>
-                  💡 Ejemplo: N₂ + 3 H₂ → 2 NH₃. Tienes 2 mol N₂ y 5 mol H₂. Ratio N₂ = 2/1 = 2; Ratio H₂ = 5/3 ≈ 1,67.
+                  <span aria-hidden="true">💡</span> Ejemplo: N₂ + 3 H₂ → 2 NH₃. Tienes 2 mol N₂ y 5 mol H₂. Ratio N₂ = 2/1 = 2; Ratio H₂ = 5/3 ≈ 1,67.
                   El H₂ es el limitante.
                 </p>
               </div>
@@ -749,7 +749,7 @@ export default function SimuladorEstequiometriaPage() {
                   durante la separación. En laboratorio académico, rendimientos del 70-90% son habituales.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 En el simulador, el slider de rendimiento multiplica la masa teórica: m_real = m_teórica × η/100.
+                  <span aria-hidden="true">💡</span> En el simulador, el slider de rendimiento multiplica la masa teórica: m_real = m_teórica × η/100.
                   Prueba a bajar el rendimiento al 75% para ver la diferencia.
                 </p>
               </div>
@@ -763,7 +763,7 @@ export default function SimuladorEstequiometriaPage() {
                   y no hay reactivo en exceso. En la práctica esto es muy raro de lograr exactamente.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 En el simulador, si el resultado muestra &quot;Ninguno (estequiométrico)&quot; como reactivo
+                  <span aria-hidden="true">💡</span> En el simulador, si el resultado muestra &quot;Ninguno (estequiométrico)&quot; como reactivo
                   en exceso, es que los ratios son iguales.
                 </p>
               </div>

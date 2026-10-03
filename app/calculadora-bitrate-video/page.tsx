@@ -288,14 +288,14 @@ export default function CalculadoraBitrateVideoPage() {
           <h3 className={styles.eduSubtitle}>¿Cuándo usar cada códec?</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h4>📱 Redes sociales y YouTube</h4>
+              <h4><span aria-hidden="true">📱</span> Redes sociales y YouTube</h4>
               <p>
                 H.264 o H.265 en 1080p o 4K son la elección estándar. Ofrecen un equilibrio óptimo entre
                 calidad de imagen y tamaño de archivo manejable para la distribución digital.
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🎬 Producción profesional</h4>
+              <h4><span aria-hidden="true">🎬</span> Producción profesional</h4>
               <p>
                 ProRes 422 (o ProRes 4444 para transparencias) es el estándar de la industria para edición
                 y posproducción. Los archivos son grandes, pero la edición fluye sin trabas y el rango de
@@ -303,7 +303,7 @@ export default function CalculadoraBitrateVideoPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🎥 Cine y efectos visuales</h4>
+              <h4><span aria-hidden="true">🎥</span> Cine y efectos visuales</h4>
               <p>
                 RAW captura los datos brutos del sensor para máxima flexibilidad en gradación de color y
                 efectos. Requiere almacenamiento masivo y flujos de trabajo especializados (DaVinci Resolve,
@@ -311,7 +311,7 @@ export default function CalculadoraBitrateVideoPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>💾 Archivado a largo plazo</h4>
+              <h4><span aria-hidden="true">💾</span> Archivado a largo plazo</h4>
               <p>
                 ProRes o un H.265 de bitrate alto son buenas opciones: ProRes por su calidad sin pérdidas
                 significativas; H.265 por su tamaño reducido si el espacio es limitado pero se necesita
