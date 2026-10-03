@@ -624,14 +624,16 @@ test('CASO 16 · pensión + alquiler bajo 6.500 €: la reducción la gradúa so
   //   base = 16.100 − 2.000 − 5.118 + 6.000 = 14.982,00 €
   //   cuota = escala(14.982) − escala(6.700) = 2.365,50 + 2.532 × 24 % − 1.273,00
   //         = 2.365,50 + 607,68 − 1.273,00 = 1.700,18 €
-  //   neta = 1.150 − 1.700,18 / 14 = 1.150 − 121,44 = 1.028,56 €/mes
+  //   neta (hallazgo 2776: solo el IRPF de la PENSIÓN SOLA, sin el alquiler): 16.100 € → reducción
+  //     5.118 € → base 8.982 € → cuota (8.982 − 6.700) × 19 % = 433,58 € → 1.150 − 30,97 = 1.119,03 €/mes
+  //     (hasta el 03/10/2026 restaba la cuota TOTAL: 1.150 − 1.700,18 / 14 = 1.028,56 €/mes)
   await estimar(page, '1150', '65_74', { otrasRentas: '6000' });
 
   expect(await fila(page, 'Reducción por rendimientos del trabajo')).toBe('-5118,00 €');
   expect(await fila(page, 'Alquileres y otras rentas de la base general')).toBe('6000,00 €');
   expect(await fila(page, 'Base imponible general')).toBe('14.982,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1700,18 €');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1028,56 €/mes');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1119,03 €/mes');
   await expect(page.getByText('la reducción del art. 20 LIRPF no procede')).toHaveCount(0);
 });
 
@@ -670,7 +672,9 @@ test('CASO 18 (hallazgo 2131, reparado) · intereses y dividendos van a la base 
   //   cuota del ahorro = 5.000 × 19 % = 950,00 € (la base general agota el mínimo: nada pasa
   //     al ahorro por el art. 56.2)
   //   cuota = 3.614,50 € · tipo efectivo 3.614,50 / 26.000 = 13,90 % → «13,9 %»
-  //   neta = 1.500 − 3.614,50 / 14 = 1.500 − 258,18 = 1.241,82 €/mes
+  //   neta (hallazgo 2776): solo la cuota de la PENSIÓN SOLA, 2.664,50 € → 1.309,68 €/mes, como el
+  //     CASO 1: los dividendos los retiene el banco y no salen de la pensión. (Hasta el 03/10/2026,
+  //     1.500 − 3.614,50 / 14 = 1.241,82 €/mes.)
   // Con el defecto: base 24.000 €, cuota 4.092,50 € (478,00 € de más) y 1.207,68 €/mes.
   await estimar(page, '1500', '65_74', { ahorro: '5000' });
   expect(await fila(page, 'Base imponible general')).toBe('19.000,00 €');
@@ -679,16 +683,16 @@ test('CASO 18 (hallazgo 2131, reparado) · intereses y dividendos van a la base 
   expect(await fila(page, 'Cuota de la base del ahorro')).toBe('950,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('3614,50 €');
   expect(await fila(page, 'Tipo efectivo estimado')).toBe('13,9 %');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1241,82 €/mes');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1309,68 €/mes');
 
   // Con 20.000 € de dividendos se ve el segundo tramo del ahorro:
   //   ahorro = 6.000 × 19 % + 14.000 × 21 % = 1.140,00 + 2.940,00 = 4.080,00 €
   //   cuota = 2.664,50 + 4.080,00 = 6.744,50 € (con el defecto, 8.858,50 €)
-  //   neta = 1.500 − 6.744,50 / 14 = 1.500 − 481,75 = 1.018,25 €/mes
+  //   neta: la misma 1.309,68 €/mes (hasta el 03/10/2026, 1.500 − 6.744,50 / 14 = 1.018,25 €/mes)
   await estimar(page, '1500', '65_74', { ahorro: '20000' });
   expect(await fila(page, 'Cuota de la base del ahorro')).toBe('4080,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('6744,50 €');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1018,25 €/mes');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1309,68 €/mes');
 });
 
 test('CASO 18.bis (hallazgo 2131) · el límite de 6.500 € del art. 20 cuenta alquileres Y dividendos', async ({ page }) => {
@@ -724,14 +728,16 @@ test('CASO 18.ter (hallazgo 2131) · el mínimo que la base general no agota pas
   //     mínimo sobrante = 8.100 − 7.800 = 300,00 € → a la base del ahorro
   //     cuota del ahorro = escala(10.000) − escala(300)
   //                      = (1.140,00 + 4.000 × 21 %) − 300 × 19 % = 1.980,00 − 57,00 = 1.923,00 €
-  //     neta = 700 − 1.923 / 14 = 700 − 137,36 = 562,64 €/mes
+  //     neta (hallazgo 2776): la pensión SOLA no tiene otras rentas, así que conserva la reducción
+  //       del art. 20: 9.800 ≤ 14.852 → 7.302 € → base 498 € < 8.100 → cuota 0 → 700,00 €/mes.
+  //       Los intereses los retiene el banco. (Hasta el 03/10/2026, 700 − 1.923 / 14 = 562,64 €/mes.)
   // Sin el art. 56.2 la cuota del ahorro sería 1.980,00 €: 57,00 € de más.
   await estimar(page, '700', '75_mas', { ahorro: '10000' });
   expect(await fila(page, 'Base imponible general')).toBe('7800,00 €');
   expect(await fila(page, 'Cuota de la base general')).toBe('0,00 €');
   expect(await fila(page, 'Cuota de la base del ahorro')).toBe('1923,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1923,00 €');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('562,64 €/mes');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('700,00 €/mes');
   await expect(page.getByText(/300,00\s€ de él se aplican a la base del ahorro/)).toBeVisible();
 
   // Borde: pensión que la reducción deja en base general 0 y unos intereses por debajo del
@@ -903,7 +909,10 @@ test('CASO 25 (normal) · 1.300 €/mes, 67 años, 400 € de intereses: la cade
   //     = (2.365,50 + 1.985,85 × 24 %) − 1.273,00 = 2.842,104 − 1.273,00   =  1.569,10 €
   //   Base del ahorro 400 € (art. 46.a); el mínimo lo agota la general → 400 × 19 % =  76,00 €
   //   Cuota = 1.645,104 → 1.645,10 € · tipo efectivo 1.645,10 / 18.600 = 8,84 % → «8,8 %»
-  //   Neta = 1.300 − 1.645,104 / 14 = 1.300 − 117,507                    =  1.182,49 €/mes
+  //   Neta (hallazgo 2776): solo la cuota de la pensión SOLA, que es la cuota general (los 400 € de
+  //     intereses no tocan la base general ni quitan la reducción) = 1.569,104 €
+  //     1.300 − 1.569,104 / 14 = 1.300 − 112,079                         =  1.187,92 €/mes
+  //     (hasta el 03/10/2026 restaba también el ahorro: 1.182,49 €/mes)
   await estimar(page, '1300', '65_74', { ahorro: '400' });
 
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('18.200,00 €');
@@ -916,7 +925,7 @@ test('CASO 25 (normal) · 1.300 €/mes, 67 años, 400 € de intereses: la cade
   expect(await fila(page, 'Cuota de la base del ahorro')).toBe('76,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1645,10 €');
   expect(await fila(page, 'Tipo efectivo estimado')).toBe('8,8 %');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1182,49 €/mes');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1187,92 €/mes');
 });
 
 test('CASO 26 (borde) · 75 años, el salto de 6.000 € de la base del ahorro y el art. 20 perdido por las otras rentas', async ({ page }) => {
@@ -925,38 +934,44 @@ test('CASO 26 (borde) · 75 años, el salto de 6.000 € de la base del ahorro y
   //   Base general = 22.400 − 2.000 + 600 = 21.000,00 €
   //   escala(21.000) = 2.365,50 + 1.860,00 + 800 × 30 % = 4.465,50 € · escala(8.100) = 1.539,00 €
   //   Cuota general = 2.926,50 €
-  //   Ahorro 6.000 × 19 % = 1.140,00 € → cuota 4.066,50 € · neta 1.600 − 290,464 = 1.309,54 €/mes
-  //   Con 6.001 €: el euro de más ya va al 21 % → 1.140,21 € · cuota 4.066,71 € · neta 1.309,52 €/mes
+  //   Ahorro 6.000 × 19 % = 1.140,00 € → cuota 4.066,50 €
+  //   Con 6.001 €: el euro de más ya va al 21 % → 1.140,21 € · cuota 4.066,71 €
+  //   Neta (hallazgo 2776), la de la pensión SOLA en los dos: base 22.400 − 2.000 = 20.400 €
+  //     escala(20.400) = 2.365,50 + 1.860,00 + 200 × 30 % = 4.285,50 € − 1.539,00 = 2.746,50 €
+  //     1.600 − 2.746,50 / 14 = 1.600 − 196,18 = 1.403,82 €/mes
+  //     (hasta el 03/10/2026, con la cuota total: 1.309,54 y 1.309,52 €/mes)
   await estimar(page, '1600', '75_mas', { otrasRentas: '600', ahorro: '6000' });
   expect(await fila(page, 'Base imponible general')).toBe('21.000,00 €');
   expect(await fila(page, 'Mínimo personal (edad)')).toBe('8100,00 €');
   expect(await fila(page, 'Cuota de la base general')).toBe('2926,50 €');
   expect(await fila(page, 'Cuota de la base del ahorro')).toBe('1140,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('4066,50 €');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1309,54 €/mes');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1403,82 €/mes');
   await expect(page.getByText('la reducción del art. 20 LIRPF no procede')).toBeVisible();
 
   await estimar(page, '1600', '75_mas', { otrasRentas: '600', ahorro: '6001' });
   expect(await fila(page, 'Cuota de la base del ahorro')).toBe('1140,21 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('4066,71 €');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1309,52 €/mes');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1403,82 €/mes');
 });
 
 test('CASO 27 (borde) · el euro en que la base general pasa del 24 % al 30 % (20.200 €)', async ({ page }) => {
   //   1.500 €/mes (21.000 €) + rescate 1.200 € = 22.200 € → reducción 0 → base 20.200,00 €
   //   escala(20.200) = 2.365,50 + 7.750 × 24 % = 4.225,50 € − escala(8.100) 1.539,00 = 2.686,50 €
-  //   neta = 1.500 − 2.686,50 / 14 = 1.308,11 €/mes
-  //   Con rescate 1.201 €: base 20.201 € → + 1 × 30 % → 2.686,80 € · neta 1.308,09 €/mes
+  //   Con rescate 1.201 €: base 20.201 € → + 1 × 30 % → 2.686,80 €
+  //   Neta (hallazgo 2776), la de la pensión SOLA en los dos: base 21.000 − 2.000 = 19.000 €
+  //     3.937,50 − 1.539,00 = 2.398,50 € → 1.500 − 171,32 = 1.328,68 €/mes. El IRPF del rescate lo
+  //     retiene la gestora. (Hasta el 03/10/2026, con la cuota total: 1.308,11 y 1.308,09 €/mes.)
   await estimar(page, '1500', '75_mas', { rescate: '1200' });
   expect(await fila(page, 'Rendimientos íntegros del trabajo (anuales)')).toBe('22.200,00 €');
   expect(await fila(page, 'Base imponible general')).toBe('20.200,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2686,50 €');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1308,11 €/mes');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1328,68 €/mes');
 
   await estimar(page, '1500', '75_mas', { rescate: '1201' });
   expect(await fila(page, 'Base imponible general')).toBe('20.201,00 €');
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('2686,80 €');
-  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1308,09 €/mes');
+  expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1328,68 €/mes');
 });
 
 test('CASO 28 (rechazo) · estados intermedios TECLEADOS y bordes del rango: o calcula bien o no da número', async ({ page }) => {
@@ -1040,7 +1055,7 @@ test.describe('móvil (390 px)', () => {
     await page.getByRole('button', { name: BOTON_ESTIMAR }).tap();
 
     expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('1645,10 €');
-    expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1182,49 €/mes');
+    expect(await fila(page, 'Pensión neta mensual estimada')).toBe('1187,92 €/mes');
     const ancho = await page.evaluate(() => document.documentElement.scrollWidth);
     expect(ancho, 'sin scroll horizontal a 390 px').toBeLessThanOrEqual(390);
   });
@@ -1054,7 +1069,8 @@ test('CASO 30 (sospecha del 28/09, DESCARTADA con medida) · las notas del resul
   // oscuro la regla `[data-theme='dark'] .resultNota` le da #1E293B y el texto #B0B0B0 cumple.
   // No deja texto sin contraste ni nada sin distinguir: no es hallazgo. Este caso vigila lo que
   // importa —que se lea— y no el valor del fondo, para no romperse cuando se declare la variable.
-  //   700 €/mes, 75+, 10.000 € de intereses → salen las tres notas (art. 20, art. 56.2 y «TODAS»).
+  //   700 €/mes, 75+, 10.000 € de intereses → salen las tres notas (art. 20, art. 56.2 y la que
+  //   explica la pensión neta, que desde el 03/10/2026 sustituye a la de «TODAS las rentas»).
   await estimar(page, '700', '75_mas', { ahorro: '10000' });
   const notas = `p${MOD}[class$="__resultNota"]`;
   const claro = await peorContraste(page, notas);
@@ -1065,8 +1081,7 @@ test('CASO 30 (sospecha del 28/09, DESCARTADA con medida) · las notas del resul
   expect(oscuro.ratio, 'notas del resultado, oscuro').toBeGreaterThanOrEqual(4.5);
 });
 
-test('CASO 31 · ABIERTO, hallazgo (inspector 03/10/2026) · el aviso de error se lee en el tema oscuro', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): .errorMsg es #c0392b literal, sin variante oscura');
+test('CASO 31 (hallazgo 2777, reparado el 03/10/2026) · el aviso de error se lee en el tema oscuro', async ({ page }) => {
   // `.errorMsg { color: #c0392b }` (EstimadorIrpfPensionista.module.css) no tiene variante oscura.
   // Medido el 03/10/2026: 5,44:1 sobre la tarjeta blanca en claro, pero 2,64:1 sobre la tarjeta
   // #2A2A2A en oscuro (0,9 rem = texto normal, exige 4,5:1). Es el único texto que el usuario TIENE
@@ -1083,8 +1098,7 @@ test('CASO 31 · ABIERTO, hallazgo (inspector 03/10/2026) · el aviso de error s
   expect(oscuro.ratio, 'aviso de error, oscuro').toBeGreaterThanOrEqual(4.5);
 });
 
-test('CASO 32 · ABIERTO, hallazgo (inspector 03/10/2026) · el nombre accesible del botón contiene su texto visible', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): aria-label «Estimar IRPF pensionista» ≠ texto visible');
+test('CASO 32 (hallazgo 2778, reparado el 03/10/2026) · el nombre accesible del botón contiene su texto visible', async ({ page }) => {
   // WCAG 2.5.3 (Label in Name, nivel A): quien maneja el navegador por voz dice lo que VE, «pulsa
   // Estimar mi IRPF como pensionista», y el aria-label lo sustituye por «Estimar IRPF pensionista».
   const boton = page.locator(`button${MOD}[class$="__btn"]`);
@@ -1093,8 +1107,7 @@ test('CASO 32 · ABIERTO, hallazgo (inspector 03/10/2026) · el nombre accesible
   await expect(boton).toHaveAccessibleName(new RegExp(visible));
 });
 
-test('CASO 33 · ABIERTO, hallazgo (inspector 03/10/2026) · la «pensión neta» no se come el impuesto del rescate ni del alquiler', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): la pensión neta resta la cuota de TODAS las rentas');
+test('CASO 33 (hallazgo 2776, reparado el 03/10/2026) · la «pensión neta» no se come el impuesto del rescate ni del alquiler', async ({ page }) => {
   // La app calcula «Pensión neta mensual estimada» = pensión − cuota de TODAS las rentas / 14, y
   // debajo avisa de que «es un suelo, no lo que cobrarás cada mes». Su propio FAQPage la define
   // como «la pensión bruta menos las retenciones de IRPF que aplica la Seguridad Social», que solo
@@ -1110,19 +1123,37 @@ test('CASO 33 · ABIERTO, hallazgo (inspector 03/10/2026) · la «pensión neta�
     return (await f.count()) === 0 ? null : importe(await fila(page, 'Pensión neta mensual estimada'));
   };
 
+  //
+  // REPARADO el 03/10/2026: la cifra es ahora la pensión menos el IRPF de la PENSIÓN SOLA (misma
+  // cadena arts. 19, 20 y 63.1.2.º, sin las demás rentas), que es lo que mira la retención de la
+  // Seguridad Social, y una nota junto a ella lo explica y dice a dónde va el resto de la cuota
+  // (reparto marginal: lo que las otras rentas añaden sobre la pensión sola).
+  //   Con rescate: 1.309,68 €/mes; resto de la cuota 12.558,50 − 2.664,50 = 9.894,00 €.
+  //   Con alquiler: 1.309,68 €/mes; resto 43.178,50 − 2.664,50 = 40.514,00 €.
+  // El caso admitía «ninguna cifra»; como ahora se publica, se exige la exacta (no un ≥).
+  const nota = page.locator(`p${MOD}[class$="__resultNota"]`).filter({ hasText: 'por sí sola' });
+
   await estimar(page, '1500', '65_74', { rescate: '30.000' });
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('12.558,50 €');
-  const conRescate = await netaPublicada();
-  if (conRescate !== null) expect(conRescate, 'pensión neta con rescate').toBeGreaterThanOrEqual(1309.68);
+  expect(await netaPublicada(), 'pensión neta con rescate').toBe(1309.68);
+  expect(limpiar((await nota.textContent()) ?? '')).toContain('(2664,50 € al año), repartido en 14 pagas');
+  expect(limpiar((await nota.textContent()) ?? '')).toContain('Los 9894,00 € restantes de la cuota');
+  // Y el rescate avisa de la DT 12.ª, que el estimador no aplica (hallazgo 2775).
+  await expect(page.locator(`p${MOD}[class$="__resultNota"]`).filter({ hasText: 'transitoria 12.ª' })).toHaveCount(1);
 
   await estimar(page, '1500', '65_74', { rescate: '0', otrasRentas: '100.000' });
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('43.178,50 €');
-  const conAlquiler = await netaPublicada();
-  if (conAlquiler !== null) expect(conAlquiler, 'pensión neta con alquiler').toBeGreaterThanOrEqual(1309.68);
+  expect(await netaPublicada(), 'pensión neta con alquiler').toBe(1309.68);
+  expect(limpiar((await nota.textContent()) ?? '')).toContain('Los 40.514,00 € restantes de la cuota');
+  await expect(page.locator(`p${MOD}[class$="__resultNota"]`).filter({ hasText: 'transitoria 12.ª' })).toHaveCount(0);
+
+  // Sin otras rentas la nota explica la cifra pero no habla de un «resto» que no existe.
+  await estimar(page, '1500', '65_74', { otrasRentas: '0' });
+  expect(await netaPublicada()).toBe(1309.68);
+  expect(limpiar((await nota.textContent()) ?? '')).not.toContain('restantes');
 });
 
-test('CASO 34 · ABIERTO, hallazgo (inspector 03/10/2026) · ascendientes: el límite de 1.800 € del art. 61.2.ª, no una «conjunta con tus hijos»', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): FAQ y tarjeta omiten el art. 61.2.ª y hablan de declaración conjunta');
+test('CASO 34 (hallazgo 2772, reparado el 03/10/2026) · ascendientes: el límite de 1.800 € del art. 61.2.ª, no una «conjunta con tus hijos»', async ({ page }) => {
   // Art. 61.2.ª LIRPF (BOE, consolidado): «No procederá la aplicación del mínimo por descendientes,
   // ascendientes o discapacidad, cuando los ascendientes o descendientes que generen el derecho a
   // los mismos presenten declaración por este Impuesto con rentas superiores a 1.800 euros».
@@ -1138,10 +1169,18 @@ test('CASO 34 · ABIERTO, hallazgo (inspector 03/10/2026) · ascendientes: el l�
   const texto = limpiar(`${(await faq.textContent()) ?? ''} ${(await tarjeta.textContent()) ?? ''}`);
   expect(texto).toMatch(/1\.?800/);
   expect(texto).not.toMatch(/conjunta(mente)? con tus hijos/);
+  // Reparado: los 1.800 € del art. 61.2.ª, la convivencia del 61.5.ª y «mínimo», no «deducción»,
+  // salen de NORMAS_MINIMOS_FAMILIARES_IRPF. Y la FAQ que aconseja declarar sin estar obligado
+  // avisa del coste para el hijo (el supuesto de la ficha: 7.000 € de rentas, declara para pedir
+  // la devolución).
+  expect(texto).toContain('rentas superiores a 1800,00 € (art. 61.2.ª');
+  expect(texto).toContain('la mitad del período impositivo');
+  expect(texto).not.toMatch(/esa deducción/);
+  const conviene = page.locator(`${MOD}[class$="__faqItem"]`).filter({ hasText: 'Conviene declarar aunque no esté obligado' });
+  expect(limpiar((await conviene.textContent()) ?? '')).toContain('rentas superiores a 1800,00 €, se queda sin ese mínimo');
 });
 
-test('CASO 35 · ABIERTO, hallazgo (inspector 03/10/2026) · varios pagadores: la excepción de los pensionistas del art. 96.3.a.2.º', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): falta el procedimiento especial del art. 96.3.a.2.º');
+test('CASO 35 (hallazgo 2773, reparado el 03/10/2026) · varios pagadores: la excepción de los pensionistas del art. 96.3.a.2.º', async ({ page }) => {
   // Art. 96.3.a LIRPF: con más de un pagador el límite es 15.876 €, «No obstante, el límite será de
   // 22.000 euros anuales en los siguientes supuestos: […] 2.º Cuando se trate de contribuyentes
   // cuyos únicos rendimientos del trabajo consistan en las prestaciones pasivas a que se refiere el
@@ -1156,10 +1195,15 @@ test('CASO 35 · ABIERTO, hallazgo (inspector 03/10/2026) · varios pagadores: l
   const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
   const faq = scripts.find((s) => s.includes('FAQPage')) ?? '';
   expect(faq).toMatch(/procedimiento especial/i);
+  // Reparado: con la cifra de OBLIGACION_DECLARAR_2025.trabajo.excepcionPensionistas, en el bloque,
+  // la FAQ, la caja de errores, la tabla y el FAQPage.
+  expect(texto).toContain('art. 96.3.a.2.º');
+  expect(texto).toContain('el límite sigue en 22.000,00 €');
+  expect(faq).toContain('el límite sigue en 22.000,00');
+  expect(faq).not.toMatch(/también de una mutualidad\) y el segundo supera/);
 });
 
-test('CASO 36 · ABIERTO, hallazgo (inspector 03/10/2026) · los escenarios conectan la obligación de declarar con lo que dice el art. 96.2', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): consejos de los escenarios ajenos al art. 96.2');
+test('CASO 36 (hallazgo 2774, reparado el 03/10/2026) · los escenarios conectan la obligación de declarar con lo que dice el art. 96.2', async ({ page }) => {
   // Art. 96.2: no declara quien obtiene rentas «exclusivamente» del trabajo (22.000 €), del capital
   // mobiliario con retención (1.600 €) o imputadas (1.000 €); el alquiler no está en la lista, y el
   // único otro límite es el conjunto de 1.000 € del penúltimo párrafo. Un pensionista con 14.000 €
@@ -1170,10 +1214,12 @@ test('CASO 36 · ABIERTO, hallazgo (inspector 03/10/2026) · los escenarios cone
   const texto = limpiar((await page.locator(`${MOD}[class$="__escenariosGrid"]`).textContent()) ?? '');
   expect(texto).not.toContain('tiene sus propios umbrales en el art. 96');
   expect(texto).not.toContain('Si la retención aplicada es exacta, puede no ser obligatorio declarar');
+  // Reparado: cada escenario CONCLUYE lo que dice el art. 96.2.
+  expect(texto).toContain('No está obligado a declarar: cobra solo rendimientos del trabajo de un único pagador y no pasan de 22.000,00 €');
+  expect(texto).toContain('Está obligado a declarar aunque la pensión no llegue a 22.000,00 €');
 });
 
-test('CASO 37 · ABIERTO, hallazgo (inspector 03/10/2026) · el rescate del plan menciona el régimen transitorio de la DT 12.ª', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): «se suma íntegramente» y «rescatar en años posteriores» sin la DT 12.ª');
+test('CASO 37 (hallazgo 2775, reparado el 03/10/2026) · el rescate del plan menciona el régimen transitorio de la DT 12.ª', async ({ page }) => {
   // DT 12.ª.2 LIRPF: por la parte de aportaciones hasta el 31/12/2006 se puede aplicar la reducción
   // del art. 17 del TRLIRPF vigente a esa fecha; DT 12.ª.4: solo en el ejercicio de la contingencia
   // o en los dos siguientes. La app dice «El rescate se suma íntegramente a los rendimientos del
@@ -1187,8 +1233,7 @@ test('CASO 37 · ABIERTO, hallazgo (inspector 03/10/2026) · el rescate del plan
   expect(texto).toMatch(/2006|2007|transitori/i);
 });
 
-test('CASO 38 · ABIERTO, hallazgo (inspector 03/10/2026) · las pensiones exentas no son «solo» las de incapacidad absoluta o gran invalidez', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): la FAQ dice «solo» y el art. 7 exime más pensiones');
+test('CASO 38 (hallazgo 2779, reparado el 03/10/2026) · las pensiones exentas no son «solo» las de incapacidad absoluta o gran invalidez', async ({ page }) => {
   // Art. 7 LIRPF: también están exentas, entre otras, las pensiones por actos de terrorismo (a), las
   // de lesiones de la Guerra Civil (c), las de inutilidad de clases pasivas (g) y las de orfandad de
   // la Seguridad Social de menores de 22 años (h). Un huérfano de 20 años con pensión de orfandad
@@ -1197,18 +1242,22 @@ test('CASO 38 · ABIERTO, hallazgo (inspector 03/10/2026) · las pensiones exent
   expect(limpiar((await faq.textContent()) ?? '')).not.toMatch(/exenciones totales solo para/);
 });
 
-test('CASO 39 · ABIERTO, hallazgo (inspector 03/10/2026) · discapacidad ≥ 65 %: el mínimo lleva además los gastos de asistencia', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): la FAQ omite los 3.000 € de gastos de asistencia del art. 60.1');
+test('CASO 39 (hallazgo 2780, reparado el 03/10/2026) · discapacidad ≥ 65 %: el mínimo lleva además los gastos de asistencia', async ({ page }) => {
   // Art. 60.1 LIRPF: 9.000 € con grado ≥ 65 %, «Dicho mínimo se aumentará, en concepto de gastos de
   // asistencia, en 3.000 euros anuales cuando acredite […] un grado de discapacidad igual o superior
   // al 65 por ciento» (DEDUCCIONES_IRPF_DISCAPACIDAD_2025.contribuyente.gastosAsistencia65oMas).
   //   Pensionista con el 65 % → mínimo por discapacidad 12.000 €; la FAQ dice 9.000 €.
   const faq = page.locator(`${MOD}[class$="__faqItem"]`).filter({ hasText: 'discapacidad al IRPF' });
   expect(limpiar((await faq.textContent()) ?? '')).toMatch(/asistencia/i);
+  // Reparado: 9.000 + 3.000 = 12.000 €, y los tramos «33 % al 64 %» / «65 % o más» ya no comparten el 65.
+  const texto = limpiar((await faq.textContent()) ?? '');
+  expect(texto).toContain('12.000,00 € en total');
+  expect(texto).toContain('del 33 % al 64 %');
+  expect(texto).toContain('del 65 % o más');
+  expect(texto).not.toMatch(/entre el 33 % y el 65 %/);
 });
 
-test('CASO 40 · ABIERTO, hallazgo (inspector 03/10/2026) · el plazo de la campaña no lleva fechas de un año concreto escritas a mano', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): «del 2 de abril al 30 de junio … hasta el 25 de junio» a mano');
+test('CASO 40 (hallazgo 2781, reparado el 03/10/2026) · el plazo de la campaña no lleva fechas de un año concreto escritas a mano', async ({ page }) => {
   // data/fiscal/calendario.ts: «Campaña de abril a finales de junio; las fechas exactas se publican
   // cada ejercicio». El paso 6 de la guía fija «El plazo es del 2 de abril al 30 de junio. Si sale a
   // pagar y domicilias el pago, puedes presentar hasta el 25 de junio».
@@ -1216,10 +1265,11 @@ test('CASO 40 · ABIERTO, hallazgo (inspector 03/10/2026) · el plazo de la camp
   const texto = limpiar((await paso.textContent()) ?? '');
   expect(texto).not.toContain('2 de abril');
   expect(texto).not.toContain('25 de junio');
+  // Reparado: el plazo sale de CALENDARIO_FISCAL (modelo 100).
+  expect(texto).toContain('las fechas exactas se publican cada ejercicio');
 });
 
-test('CASO 41 · ABIERTO, hallazgo (inspector 03/10/2026) · ni el año ni el tipo del primer tramo se escriben a mano', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): «2026» y «al 19 %» escritos a mano');
+test('CASO 41 (hallazgo 2782, reparado el 03/10/2026) · ni el año ni el tipo del primer tramo se escriben a mano', async ({ page }) => {
   // El aviso y DataReference leen `FISCAL_IRPF_META.vigencia`, y el título de metadata también
   // (b7ec248c), pero el subtítulo del hero, el del bloque educativo y el título de la tabla llevan
   // «2026» tecleado: al re-sellar el módulo, el título cambiaría y ellos no. Y el FAQPage escribe

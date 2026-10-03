@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { formatCurrency } from '@/lib/formatters';
+import { formatCurrency, formatPercentage } from '@/lib/formatters';
 import {
   MINIMOS_IRPF_2025,
   GASTOS_DEDUCIBLES_TRABAJO_2025,
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   OBLIGACION_DECLARAR_2025,
+  TRAMOS_IRPF_2025,
   cuotaEscalaGeneral,
   FISCAL_IRPF_META,
 } from '@/data/fiscal';
@@ -24,6 +25,11 @@ const anio = FISCAL_IRPF_META.vigencia;
  */
 const LIMITE_OTRAS_RENTAS_ART_20 = REDUCCION_RENDIMIENTOS_TRABAJO_2025.limiteOtrasRentas;
 const VALOR_MINIMO_75 = cuotaEscalaGeneral(MINIMOS_IRPF_2025.personal_75);
+/** Tipo del primer tramo de la escala, «19 %» con espacio duro (hallazgo 2782: iba tecleado). */
+const TIPO_PRIMER_TRAMO = formatPercentage(TRAMOS_IRPF_2025[0].tipo / 100, 0);
+/** Obligación de declarar (art. 96 LIRPF), con la excepción de los pensionistas del 96.3.a.2.º. */
+const OBLIGACION = OBLIGACION_DECLARAR_2025;
+const EXCEPCION_PENSIONISTAS = OBLIGACION_DECLARAR_2025.trabajo.excepcionPensionistas;
 
 export const metadata: Metadata = {
   title: `Estimador IRPF Pensionista ${anio} - Cuánto pagas de renta | meskeIA`,
@@ -50,7 +56,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: `Estimador IRPF Pensionista ${anio} | meskeIA`,
-    description: 'Renta del pensionista orientativa: cuota IRPF y pensión neta mensual 2026',
+    description: `Renta del pensionista orientativa: cuota IRPF y pensión neta mensual ${anio}`,
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -72,7 +78,7 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuánto IRPF paga un pensionista en 2026?',
+      name: `¿Cuánto IRPF paga un pensionista en ${anio}?`,
       acceptedAnswer: {
         '@type': 'Answer',
         text: `Depende del importe de la pensión. Las pensiones tributan como rendimientos del trabajo y se les aplica la escala general del IRPF. A la pensión se le restan los gastos deducibles del art. 19.2.f (${formatCurrency(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral)}) y la reducción del art. 20, que vale ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.reduccion1)} mientras la pensión anual no pase de ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite1)} y se agota en ${formatCurrency(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limite2)}: esos umbrales se miden sin descontar los ${formatCurrency(GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral)}, porque el art. 20 solo resta a estos efectos los gastos de las letras a) a e). El mínimo personal es de ${formatCurrency(MINIMOS_IRPF_2025.personal)} (${formatCurrency(MINIMOS_IRPF_2025.personal_65)} a partir de 65 años y ${formatCurrency(MINIMOS_IRPF_2025.personal_75)} a partir de 75) y no se resta de la base: se grava a tipo cero aplicando la escala dos veces, como manda el art. 63.1.2.º LIRPF. Con una pensión mínima de jubilación la cuota suele ser cero.`,
@@ -91,7 +97,7 @@ export const faqJsonLd = {
       name: '¿Tiene que hacer la declaración de la renta un jubilado?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `No siempre. Un pensionista con un único pagador (la Seguridad Social) y rendimientos del trabajo por debajo de ${formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.unPagador)} brutos anuales no está obligado a declarar, aunque puede hacerlo voluntariamente si espera devolución. Si percibe pensión de más de un pagador (por ejemplo, también de una mutualidad) y el segundo supera ${formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)}, el límite baja a ${formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.variosPagadores)}.`,
+        text: `No siempre. Quien cobra solo rendimientos del trabajo —la pensión lo es— de un único pagador por debajo de ${formatCurrency(OBLIGACION.trabajo.unPagador)} brutos anuales no está obligado a declarar (art. 96.2.a LIRPF), sea cual sea la retención, aunque puede hacerlo si espera devolución. Con más de un pagador, si el segundo y los siguientes suman más de ${formatCurrency(OBLIGACION.trabajo.limiteSegundoPagador)}, el límite baja a ${formatCurrency(OBLIGACION.trabajo.variosPagadores)} (art. 96.3.a), salvo la excepción de los pensionistas (${EXCEPCION_PENSIONISTAS.articulo}): si todos los rendimientos del trabajo son pensiones o prestaciones pasivas del art. 17.2.a —por ejemplo, una pensión de la Seguridad Social y otra de una mutualidad— y la retención se fijó por el procedimiento especial que se pide a la Agencia Tributaria (art. 89.A del Reglamento del IRPF), el límite sigue en ${formatCurrency(EXCEPCION_PENSIONISTAS.limite)}. Esos límites solo eximen si las rentas son exclusivamente del trabajo, del capital mobiliario con retención (hasta ${formatCurrency(OBLIGACION.capitalMobiliario.limite)}) o imputadas (hasta ${formatCurrency(OBLIGACION.rentasImputadas.limite)}): quien cobra además un alquiler está obligado a declarar, salvo que todas sus rentas juntas no lleguen a ${formatCurrency(OBLIGACION.limiteConjuntoGeneral.limite)}.`,
       },
     },
     {
@@ -99,7 +105,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la pensión neta mensual de un jubilado?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La pensión neta mensual se obtiene restando a la pensión bruta las retenciones de IRPF que aplica la Seguridad Social. Esas retenciones dependen de la pensión anual y de las circunstancias personales (edad, discapacidad, etc.). A diferencia de los trabajadores, a los pensionistas no se les descuentan cotizaciones a la Seguridad Social de la pensión. Si además cobra intereses o dividendos, esas rentas tributan aparte, en la base del ahorro, con su propia escala.',
+        text: 'La pensión neta mensual se obtiene restando a la pensión bruta las retenciones de IRPF que aplica la Seguridad Social. Esas retenciones dependen solo de la pensión anual y de las circunstancias personales (edad, discapacidad, etc.), y la retención real sale del procedimiento del Reglamento del IRPF; la diferencia con el impuesto definitivo se ajusta en la declaración. Una estimación razonable es restar a la pensión el IRPF que genera la pensión por sí sola, repartido en 14 pagas. A diferencia de los trabajadores, a los pensionistas no se les descuentan cotizaciones a la Seguridad Social de la pensión. El impuesto de las demás rentas no sale de la pensión: el del rescate de un plan lo retiene la gestora, el de intereses y dividendos lo retiene el banco y tributa en la base del ahorro, con su propia escala, y el de un alquiler se liquida en la declaración.',
       },
     },
     {
@@ -107,7 +113,7 @@ export const faqJsonLd = {
       name: '¿El mínimo personal por edad reduce el IRPF del pensionista?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí. El mínimo personal es de ${formatCurrency(MINIMOS_IRPF_2025.personal)} anuales con carácter general, sube a ${formatCurrency(MINIMOS_IRPF_2025.personal_65)} desde los 65 años y a ${formatCurrency(MINIMOS_IRPF_2025.personal_75)} desde los 75. No reduce la renta: forma parte de la base liquidable y se grava a tipo cero aplicando la escala dos veces —a la base completa y al mínimo— y restando la segunda cuota de la primera (art. 63.1.2.º LIRPF). Como el mínimo cae en el primer tramo de la escala, al 19 %, para un pensionista de 75 años o más equivale a ${formatCurrency(VALOR_MINIMO_75)} de cuota íntegra anulada.`,
+        text: `Sí. El mínimo personal es de ${formatCurrency(MINIMOS_IRPF_2025.personal)} anuales con carácter general, sube a ${formatCurrency(MINIMOS_IRPF_2025.personal_65)} desde los 65 años y a ${formatCurrency(MINIMOS_IRPF_2025.personal_75)} desde los 75. No reduce la renta: forma parte de la base liquidable y se grava a tipo cero aplicando la escala dos veces —a la base completa y al mínimo— y restando la segunda cuota de la primera (art. 63.1.2.º LIRPF). Como el mínimo cae en el primer tramo de la escala, al ${TIPO_PRIMER_TRAMO}, para un pensionista de 75 años o más equivale a ${formatCurrency(VALOR_MINIMO_75)} de cuota íntegra anulada.`,
       },
     },
   ],

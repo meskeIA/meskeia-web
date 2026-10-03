@@ -20,6 +20,9 @@ import {
   calcularCuotaBaseAhorro,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   DEDUCCIONES_IRPF_DISCAPACIDAD_2025,
+  NORMAS_MINIMOS_FAMILIARES_IRPF,
+  CALENDARIO_FISCAL,
+  FISCAL_CALENDARIO_META,
 } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -62,7 +65,13 @@ interface ResultadoIrpfPensionista {
   /** Cuota de la base del ahorro: escala del art. 66 menos esa escala sobre `minimoEnAhorro`. */
   cuotaAhorro: number;
   cuotaIRPF: number;
+  /**
+   * IRPF anual que genera la PENSIÓN por sí sola: la misma cadena (arts. 19, 20 y 63.1.2.º) sin
+   * rescate, alquileres ni intereses. Es lo que mira la retención de la Seguridad Social.
+   */
+  cuotaPension: number;
   tipoEfectivo: number;
+  /** Pensión mensual menos `cuotaPension` / 14. NO resta el impuesto de las demás rentas. */
   pensionNetaMensual: number;
 }
 
@@ -99,8 +108,30 @@ const ADICIONAL_MINIMO_65 = MINIMOS_IRPF_2025.personal_65 - MINIMOS_IRPF_2025.pe
 /** minimo-ok: ídem para el tramo de 75 años o más (art. 57.3 LIRPF). */
 const ADICIONAL_MINIMO_75 = MINIMOS_IRPF_2025.personal_75 - MINIMOS_IRPF_2025.personal;  // minimo-ok: ídem, art. 57.3 LIRPF
 
-/** Requisitos del ascendiente del art. 59 LIRPF (edad y techo de rentas), desde `data/fiscal`. */
+/** Edad del ascendiente del art. 59 LIRPF, desde `data/fiscal`. El techo de rentas, de `NORMAS_MINIMOS`. */
 const REQUISITOS_ASCENDIENTE = DEDUCCIONES_IRPF_DISCAPACIDAD_2025.requisitosAscendiente;
+
+/** Mínimo por discapacidad del contribuyente y sus gastos de asistencia (art. 60.1 LIRPF). */
+const DISCAPACIDAD_CONTRIBUYENTE = DEDUCCIONES_IRPF_DISCAPACIDAD_2025.contribuyente;
+/** Con grado ≥ 65 % los gastos de asistencia se suman sin más requisito: 9.000 + 3.000 (hallazgo 2780). */
+const MINIMO_DISCAPACIDAD_65_CON_ASISTENCIA =
+  MINIMOS_IRPF_2025.discapacidad_65_mas + DISCAPACIDAD_CONTRIBUYENTE.gastosAsistencia65oMas;
+
+/** Límites del art. 96 LIRPF (obligación de declarar), con la excepción de los pensionistas. */
+const OBLIGACION = OBLIGACION_DECLARAR_2025;
+const EXCEPCION_PENSIONISTAS = OBLIGACION_DECLARAR_2025.trabajo.excepcionPensionistas;
+
+/** Normas comunes de los mínimos familiares (art. 61 LIRPF): 1.800 € de la 2.ª, convivencia de la 5.ª. */
+const NORMAS_MINIMOS = NORMAS_MINIMOS_FAMILIARES_IRPF;
+
+/**
+ * Plazo de la campaña de la Renta (modelo 100), de `data/fiscal/calendario.ts`, que deja las
+ * fechas exactas sin fijar porque cambian cada ejercicio. Hasta el 03/10/2026 el paso 6 de la guía
+ * escribía las de una campaña concreta («del 2 de abril al 30 de junio … hasta el 25 de junio»,
+ * hallazgo 2781).
+ */
+const PLAZO_CAMPANA_RENTA =
+  CALENDARIO_FISCAL.find((m) => m.modelo === '100')?.plazo ?? FISCAL_CALENDARIO_META.nota;
 
 /** Primer y último tipo de la escala del ahorro (art. 66), para el texto de ayuda del campo. */
 const TIPO_AHORRO_MIN = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
@@ -201,9 +232,18 @@ function estimarIrpfPensionista(
 
   const tipoEfectivo = ingresosTotales > 0 ? (cuotaIRPF / ingresosTotales) * 100 : 0;
 
-  // Pensión neta mensual (resta el IRPF anual dividido por 14 pagas)
-  const irpfMensual = cuotaIRPF / 14;
-  const pensionNetaMensual = Math.max(0, pensionMensual - irpfMensual);
+  // Pensión neta mensual: la pensión menos el IRPF que corresponde a la PENSIÓN, no a todas las
+  // rentas. Hasta el 03/10/2026 restaba la cuota TOTAL entre 14 y avisaba debajo de que era «un
+  // suelo» (hallazgo 2776): con 1.500 €/mes y un rescate de 30.000 € publicaba 602,96 €/mes, y con
+  // 100.000 € de alquiler, 0,00 €/mes. Pero el rótulo y el FAQPage hablan de la pensión menos las
+  // retenciones de la Seguridad Social, que solo miran la pensión: el IRPF del rescate lo retiene
+  // la gestora y el del alquiler no sale de la pensión. Así que se calcula la cuota de la pensión
+  // SOLA, con la misma cadena: sin otras rentas, la reducción del art. 20 se gradúa solo con ella
+  // (la Seguridad Social no sabe de los alquileres) y el mínimo se grava a tipo cero con
+  // `calcularCuotaIntegraGeneral`, nunca restándolo de la base.
+  const soloPension = calcularRendimientoNetoTrabajo({ integros: pensionAnual, gastosAaE: 0, otrasRentas: 0 });
+  const cuotaPension = calcularCuotaIntegraGeneral(soloPension.rendimientoNetoReducido, minimoPersonal);
+  const pensionNetaMensual = Math.max(0, pensionMensual - cuotaPension / 14);
 
   return {
     rendimientosIntegrosTrabajo,
@@ -223,6 +263,7 @@ function estimarIrpfPensionista(
     cuotaGeneral,
     cuotaAhorro,
     cuotaIRPF,
+    cuotaPension,
     tipoEfectivo,
     pensionNetaMensual,
   };
@@ -314,7 +355,7 @@ export default function EstimadorIrpfPensionista() {
       <header className={styles.hero}>
         <span className={styles.heroIcon} aria-hidden="true">📊</span>
         <h1 className={styles.title}>Estimador IRPF Pensionista</h1>
-        <p className={styles.subtitle}>Cuánto pagas de renta siendo jubilado y cuál es tu pensión neta real · 2026</p>
+        <p className={styles.subtitle}>Cuánto pagas de renta siendo jubilado y cuál es tu pensión neta real · {FISCAL_IRPF_META.vigencia}</p>
       </header>
 
       <RegionBadge variant="es-only" />
@@ -391,7 +432,7 @@ export default function EstimadorIrpfPensionista() {
             onChange={setRescatePP}
             label="Rescate de plan de pensiones este año (€)"
             placeholder="0"
-            helperText="Si rescatas un plan de pensiones, se suma como rendimiento del trabajo. Pon 0 si no aplica."
+            helperText="Si rescatas un plan de pensiones, se suma como rendimiento del trabajo. El estimador lo suma entero: no aplica la reducción del régimen transitorio (DT 12.ª) a lo aportado hasta 2006. Pon 0 si no aplica."
             min={LIMITES.rescate.min}
             max={LIMITES.rescate.max}
             acotarAlSalir={false}
@@ -430,7 +471,8 @@ export default function EstimadorIrpfPensionista() {
             </div>
           )}
 
-          <button type="button" className={styles.btn} onClick={calcular} aria-label="Estimar IRPF pensionista">
+          {/* Sin aria-label: el texto visible ya es su nombre accesible (WCAG 2.5.3, hallazgo 2778). */}
+          <button type="button" className={styles.btn} onClick={calcular}>
             Estimar mi IRPF como pensionista
           </button>
         </div>
@@ -528,12 +570,33 @@ export default function EstimadorIrpfPensionista() {
                 <span className={styles.resultValueBig}>{formatCurrency(resultado.pensionNetaMensual)}/mes</span>
               </div>
 
-              {(resultado.otrasRentas > 0 || resultado.rentasAhorro > 0 || resultado.rescatePP > 0) && (
+              {/*
+                Cómo se obtiene la cifra de arriba, junto a ella (hallazgo 2776). Con otras rentas,
+                además, a dónde va el resto de la cuota: el reparto es MARGINAL —lo que esas rentas
+                añaden sobre lo que pagaría la pensión sola—, que es justo lo que no sale de la pensión.
+              */}
+              <p className={styles.resultNota}>
+                Es tu pensión menos el IRPF que genera la pensión por sí sola
+                ({formatCurrency(resultado.cuotaPension)} al año), repartido en 14 pagas. Es la referencia
+                de la retención que te aplica la Seguridad Social, que solo mira la pensión y tu situación
+                personal; la retención real sale del procedimiento del Reglamento del IRPF y puede no
+                coincidir al euro: la diferencia se ajusta en la declaración.
+                {resultado.cuotaIRPF > resultado.cuotaPension && (
+                  <>
+                    {' '}Los {formatCurrency(resultado.cuotaIRPF - resultado.cuotaPension)} restantes de
+                    la cuota los añaden el rescate, los alquileres o los intereses y dividendos, y no salen
+                    de la pensión: los retiene quien los paga (la gestora del plan, el banco) o se pagan en
+                    la declaración.
+                  </>
+                )}
+              </p>
+
+              {resultado.rescatePP > 0 && (
                 <p className={styles.resultNota}>
-                  La cuota es la de TODAS las rentas declaradas ({formatCurrency(resultado.ingresosTotales)} en
-                  total), no solo la de la pensión: la pensión neta de arriba les carga también su
-                  parte del impuesto, así que en un año con rescate, alquileres o dividendos es un suelo,
-                  no lo que cobrarás cada mes.
+                  El rescate se ha sumado entero. Si parte de él procede de aportaciones hechas hasta el
+                  31/12/2006 y lo cobras en forma de capital en el año de la jubilación o en los dos
+                  siguientes, esa parte admite la reducción del régimen transitorio (disposición
+                  transitoria 12.ª LIRPF), que este estimador no aplica: tu cuota sería menor.
                 </p>
               )}
             </div>
@@ -541,7 +604,7 @@ export default function EstimadorIrpfPensionista() {
         </div>
       </div>
 
-      <EducationalSection title="¿Cómo tributa la pensión en el IRPF?" subtitle="Rendimientos del trabajo, reducciones y mínimos para jubilados · 2026">
+      <EducationalSection title="¿Cómo tributa la pensión en el IRPF?" subtitle={`Rendimientos del trabajo, reducciones y mínimos para jubilados · ${FISCAL_IRPF_META.vigencia}`}>
         <p>La pensión pública de jubilación tributa como <strong>rendimiento del trabajo</strong>, igual que un salario. Sin embargo, los pensionistas tienen ventajas fiscales específicas que reducen su factura.</p>
         <h3>Reducción por rendimientos del trabajo</h3>
         <p>Si tus únicos ingresos son la pensión, aplica una reducción en función de su importe anual:</p>
@@ -558,21 +621,48 @@ export default function EstimadorIrpfPensionista() {
           <li>75 años o más: {formatCurrency(MINIMOS_IRPF_2025.personal_75)}</li>
         </ul>
         <h3>Rescate del plan de pensiones</h3>
-        <p>El rescate se suma íntegramente a los rendimientos del trabajo. Un rescate grande en forma de capital puede subir tu tipo marginal significativamente. Generalmente conviene rescatar en renta mensual para suavizar el impacto fiscal.</p>
+        <p>
+          El rescate tributa como rendimiento del trabajo (art. 17.2.a LIRPF) y se suma a la pensión
+          en la base general: un rescate grande en forma de capital puede subir tu tipo marginal. Lo
+          aportado desde 2007 tributa entero cobres cuando cobres, así que repartirlo en varios años
+          o cobrarlo como renta suaviza el tramo. Lo aportado hasta el 31/12/2006 tiene un régimen
+          transitorio (disposición transitoria 12.ª LIRPF): esa parte admite la reducción del
+          art. 17 de la ley vigente a esa fecha si la cobras en forma de capital, y solo «en el
+          ejercicio en el que acaezca la contingencia correspondiente, o en los dos ejercicios
+          siguientes» (DT 12.ª.4). Cobrada después, o como renta, esa reducción se pierde. Pide a la
+          gestora cuánto de tu plan es de cada época antes de decidir. Este estimador suma el rescate
+          entero y no aplica esa reducción.
+        </p>
         <h3>¿Quién está obligado a declarar?</h3>
         <p>
-          Los pensionistas con un solo pagador y rendimientos del trabajo por debajo
-          de {formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.unPagador)} al año no están obligados a
-          presentar declaración (salvo que tengan otras fuentes de renta). Con varios pagadores y un
-          segundo que supere {formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)},
-          el límite baja a {formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.variosPagadores)} al año.
+          No está obligado quien cobra solo rendimientos del trabajo —la pensión lo es— de un único
+          pagador por debajo de {formatCurrency(OBLIGACION.trabajo.unPagador)} al año (art. 96.2.a
+          LIRPF), sea cual sea la retención que le hayan aplicado. Con más de un pagador, si el segundo
+          y los siguientes suman más de {formatCurrency(OBLIGACION.trabajo.limiteSegundoPagador)}, el
+          límite baja a {formatCurrency(OBLIGACION.trabajo.variosPagadores)} (art. 96.3.a).
+        </p>
+        <p>
+          Excepción propia de los pensionistas ({EXCEPCION_PENSIONISTAS.articulo}): si todos tus
+          rendimientos del trabajo son pensiones o prestaciones pasivas del art. 17.2.a —una pensión
+          de la Seguridad Social y otra de una mutualidad, por ejemplo— y pediste a la Agencia
+          Tributaria que fijara tu retención por el procedimiento especial (art. 89.A del Reglamento
+          del IRPF), el límite sigue en {formatCurrency(EXCEPCION_PENSIONISTAS.limite)} aunque
+          tengas varios pagadores.
+        </p>
+        <p>
+          Esos límites solo eximen a quien obtiene rentas <strong>exclusivamente</strong> del
+          trabajo, del capital mobiliario con retención (hasta {formatCurrency(OBLIGACION.capitalMobiliario.limite)})
+          o imputadas (hasta {formatCurrency(OBLIGACION.rentasImputadas.limite)}), según el art. 96.2.
+          Un alquiler no está en esa lista: el pensionista que cobra un alquiler está obligado a
+          declarar, salvo que todas sus rentas juntas no lleguen
+          a {formatCurrency(OBLIGACION.limiteConjuntoGeneral.limite)}.
         </p>
 
       {/* === SECCIONES PROFESIONALES v2.0 === */}
 
       {/* 1. Tabla Comparativa */}
       <div className={styles.tableWrapper}>
-        <h3>Reducciones y mínimos aplicables a pensionistas (2026)</h3>
+        <h3>Reducciones y mínimos aplicables a pensionistas ({FISCAL_IRPF_META.vigencia})</h3>
         <table className={styles.comparativaTable}>
           <thead>
             <tr>
@@ -627,6 +717,11 @@ export default function EstimadorIrpfPensionista() {
               <td>{formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.variosPagadores)} (si 2º pagador &gt; {formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)})</td>
               <td>Pensión + otro pagador</td>
             </tr>
+            <tr>
+              <td>Límite obligación de declarar (pensionistas con varios pagadores)</td>
+              <td>{formatCurrency(EXCEPCION_PENSIONISTAS.limite)} ({EXCEPCION_PENSIONISTAS.articulo})</td>
+              <td>Solo pensiones o prestaciones pasivas (art. 17.2.a), con la retención fijada por el procedimiento especial del art. 89.A del Reglamento</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -647,7 +742,12 @@ export default function EstimadorIrpfPensionista() {
           <div className={styles.escenarioExample}>
             {formatCurrency(ESC_PENSION_UNICA.rendimientosIntegrosTrabajo)} − {formatCurrency(ESC_PENSION_UNICA.gastosDeducibles)} (gastos) − {formatCurrency(ESC_PENSION_UNICA.reduccionRRT)} (reducción art. 20) = {formatCurrency(ESC_PENSION_UNICA.baseImponible)} de base → cuota {formatCurrency(ESC_PENSION_UNICA.cuotaIRPF)}
           </div>
-          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Si la retención aplicada es exacta, puede no ser obligatorio declarar aunque conviene hacerlo para verificar.</div>
+          <div className={styles.escenarioTip}>
+            <span aria-hidden="true">💡</span>{' '}
+            {ESC_PENSION_UNICA.rendimientosIntegrosTrabajo <= OBLIGACION.trabajo.unPagador
+              ? <>No está obligado a declarar: cobra solo rendimientos del trabajo de un único pagador y no pasan de {formatCurrency(OBLIGACION.trabajo.unPagador)} (art. 96.2.a LIRPF), sea cual sea la retención. Si le han retenido más de {formatCurrency(ESC_PENSION_UNICA.cuotaIRPF)} en el año, le conviene declarar para recuperar la diferencia.</>
+              : <>Está obligado a declarar: sus rendimientos del trabajo pasan de {formatCurrency(OBLIGACION.trabajo.unPagador)} (art. 96.2.a LIRPF).</>}
+          </div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -658,7 +758,7 @@ export default function EstimadorIrpfPensionista() {
           <div className={styles.escenarioExample}>
             Base {formatCurrency(ESC_PENSION_ALQUILER.baseImponible)} → cuota {formatCurrency(ESC_PENSION_ALQUILER.cuotaIRPF)}. El alquiler no llega a {formatCurrency(LIMITE_OTRAS_RENTAS_ART_20)}, así que la reducción del art. 20 se mantiene ({formatCurrency(ESC_PENSION_ALQUILER.reduccionRRT)})
           </div>
-          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El límite de {formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.unPagador)} mira solo los rendimientos del trabajo; el alquiler tiene sus propios umbrales en el art. 96, y conviene comprobarlos aparte.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Está obligado a declarar aunque la pensión no llegue a {formatCurrency(OBLIGACION.trabajo.unPagador)}: el art. 96.2 solo exime a quien obtiene rentas exclusivamente del trabajo, del capital mobiliario con retención o imputadas, y un alquiler no está en esa lista.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -678,7 +778,7 @@ export default function EstimadorIrpfPensionista() {
           <div className={styles.escenarioExample}>
             Pensión {formatCurrency(ESC_RESCATE_PP.rendimientosIntegrosTrabajo - ESC_RESCATE_PP.rescatePP)} + rescate {formatCurrency(ESC_RESCATE_PP.rescatePP)} = {formatCurrency(ESC_RESCATE_PP.rendimientosIntegrosTrabajo)} → reducción art. 20 {formatCurrency(ESC_RESCATE_PP.reduccionRRT)} y cuota {formatCurrency(ESC_RESCATE_PP.cuotaIRPF)}
           </div>
-          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Rescatar el PP en años posteriores con menos ingresos puede ser fiscalmente más eficiente.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El ejemplo suma el rescate entero. Si parte del plan son aportaciones hechas hasta el 31/12/2006, cobrarla en capital este año o en los dos siguientes le permite aplicar a esa parte la reducción del régimen transitorio (DT 12.ª LIRPF); más tarde la pierde. Lo aportado desde 2007 tributa entero en cualquier año: eso sí puede convenir repartirlo en años de menos ingresos.</div>
         </div>
       </div>
 
@@ -687,15 +787,37 @@ export default function EstimadorIrpfPensionista() {
         <h3>Preguntas frecuentes sobre el IRPF del pensionista</h3>
         <div className={styles.faqItem}>
           <strong>¿Las pensiones públicas siempre tributan?</strong>
-          <p>Las pensiones del sistema público de SS tributan como rendimiento del trabajo. Existen exenciones totales solo para pensiones de incapacidad permanente absoluta o gran invalidez.</p>
+          <p>
+            Por regla general sí: las pensiones públicas tributan como rendimiento del trabajo
+            (art. 17.2.a LIRPF), y así la de jubilación y la de viudedad. Pero el art. 7 LIRPF declara
+            exentas varias: las de incapacidad permanente absoluta o gran invalidez de la Seguridad
+            Social (letra f); las de inutilidad o incapacidad permanente de clases pasivas que
+            inhabilitan para toda profesión u oficio (g); las de orfandad y a favor de nietos y
+            hermanos de los regímenes públicos percibidas por «menores de veintidós años o
+            incapacitados para todo trabajo» (h); las derivadas de actos de terrorismo (a), y las
+            reconocidas por lesiones o mutilaciones de la Guerra Civil (c). Una pensión exenta no se
+            suma a las demás rentas: no la incluyas en este estimador.
+          </p>
         </div>
         <div className={styles.faqItem}>
           <strong>¿Cuándo estoy obligado a declarar siendo pensionista?</strong>
           <p>
-            Con un solo pagador (solo pensión pública): obligatorio si los rendimientos del trabajo
-            superan {formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.unPagador)}. Con dos pagadores y
-            un segundo que pase de {formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)}:
-            obligatorio si el total supera {formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.variosPagadores)}.
+            Si solo cobras rendimientos del trabajo —la pensión lo es—: con un único pagador, si
+            superan {formatCurrency(OBLIGACION.trabajo.unPagador)} al año (art. 96.2.a LIRPF). Con varios
+            pagadores y un segundo y siguientes que sumen más
+            de {formatCurrency(OBLIGACION.trabajo.limiteSegundoPagador)}, si superan
+            {' '}{formatCurrency(OBLIGACION.trabajo.variosPagadores)} (art. 96.3.a), salvo la excepción
+            de los pensionistas ({EXCEPCION_PENSIONISTAS.articulo}): si todos tus rendimientos del
+            trabajo son pensiones o prestaciones pasivas del art. 17.2.a y tu retención se fijó por el
+            procedimiento especial que se pide a la Agencia Tributaria (art. 89.A del Reglamento del
+            IRPF), el límite sigue en {formatCurrency(EXCEPCION_PENSIONISTAS.limite)}.
+          </p>
+          <p>
+            Esos límites solo valen si tus rentas son exclusivamente del trabajo, del capital
+            mobiliario con retención (hasta {formatCurrency(OBLIGACION.capitalMobiliario.limite)}) o
+            imputadas (hasta {formatCurrency(OBLIGACION.rentasImputadas.limite)}), como dice el
+            art. 96.2. Con un alquiler estás obligado, salvo que todas tus rentas juntas no lleguen
+            a {formatCurrency(OBLIGACION.limiteConjuntoGeneral.limite)}.
           </p>
         </div>
         <div className={styles.faqItem}>
@@ -722,13 +844,28 @@ export default function EstimadorIrpfPensionista() {
         <div className={styles.faqItem}>
           <strong>¿Conviene declarar aunque no esté obligado?</strong>
           <p>Sí puede convenir si la retención aplicada ha sido excesiva y puedes obtener devolución. También si tienes deducciones autonómicas o por inversión en vivienda habitual previa a 2013.</p>
+          <div className={styles.faqTip}>
+            <span aria-hidden="true">💡</span> Si convives con un hijo que aplica por ti el mínimo por
+            ascendientes, mira antes lo que pierde él: si presentas declaración con rentas superiores
+            a {formatCurrency(NORMAS_MINIMOS.rentasMaximasDeclaracion)}, se queda sin ese mínimo
+            (art. 61.2.ª LIRPF).
+          </div>
         </div>
         <div className={styles.faqItem}>
           <strong>¿Cómo afecta la discapacidad al IRPF del pensionista?</strong>
           <p>
-            Lo que la discapacidad añade a un pensionista son MÍNIMOS adicionales: {formatCurrency(MINIMOS_IRPF_2025.discapacidad_33_65)} con
-            grado entre el {formatPorcentaje(33)} y el {formatPorcentaje(65)}, y {formatCurrency(MINIMOS_IRPF_2025.discapacidad_65_mas)} desde
-            el {formatPorcentaje(65)}. Este estimador no los modela, así que con discapacidad reconocida su cuota es un
+            Lo que la discapacidad añade a un pensionista son MÍNIMOS adicionales (art. 60.1 LIRPF):
+            {' '}{formatCurrency(MINIMOS_IRPF_2025.discapacidad_33_65)} con un grado del {formatPorcentaje(33)} al
+            {' '}{formatPorcentaje(64)}, y {formatCurrency(MINIMOS_IRPF_2025.discapacidad_65_mas)} con un grado
+            del {formatPorcentaje(65)} o más, que además se aumenta
+            en {formatCurrency(DISCAPACIDAD_CONTRIBUYENTE.gastosAsistencia65oMas)} en concepto de gastos de
+            asistencia: {formatCurrency(MINIMO_DISCAPACIDAD_65_CON_ASISTENCIA)} en total. Con un grado
+            del {formatPorcentaje(33)} al {formatPorcentaje(64)}, esos
+            {' '}{formatCurrency(DISCAPACIDAD_CONTRIBUYENTE.gastosAsistencia33a65)} de gastos de asistencia solo se
+            suman si acreditas necesitar ayuda de terceras personas o movilidad reducida. Quien cobra
+            una pensión de la Seguridad Social por incapacidad permanente total, absoluta o gran
+            invalidez tiene acreditado por ley al menos el {formatPorcentaje(33)} (art. 60.3). Este
+            estimador no modela estos mínimos, así que con discapacidad reconocida su cuota es un
             techo, no la cifra definitiva.
           </p>
           <p>
@@ -741,12 +878,22 @@ export default function EstimadorIrpfPensionista() {
         <div className={styles.faqItem}>
           <strong>¿Pueden los hijos incluirme como ascendiente a cargo?</strong>
           <p>
-            Sí, si convives con ellos, tienes más de {REQUISITOS_ASCENDIENTE.edadMinima} años (o cualquier
-            edad con una discapacidad reconocida de al menos el {formatPorcentaje(33)}) y no obtienes rentas
-            anuales, excluidas las exentas, superiores a {formatCurrency(REQUISITOS_ASCENDIENTE.rentaMaxima)}:
-            tus hijos pueden aplicar el mínimo por ascendientes (art. 59 LIRPF).
+            Sí, si tienes más de {REQUISITOS_ASCENDIENTE.edadMinima} años (o cualquier edad con una
+            discapacidad reconocida de al menos el {formatPorcentaje(33)}), convives con tu hijo al
+            menos {NORMAS_MINIMOS.convivenciaMinima} (art. 61.5.ª LIRPF) y no obtienes rentas anuales,
+            excluidas las exentas, superiores a {formatCurrency(NORMAS_MINIMOS.rentasMaximasAscendiente)}:
+            él puede aplicar en su declaración el mínimo por ascendientes del art. 59
+            ({formatCurrency(MINIMOS_IRPF_2025.ascendiente_65)}, y {formatCurrency(MINIMOS_IRPF_2025.ascendiente_75)} si
+            tienes más de 75 años). Es un mínimo, no una deducción: esa parte de su renta se grava a tipo cero.
           </p>
-          <div className={styles.faqTip}><span aria-hidden="true">💡</span> En este caso tú no puedes presentar declaración conjunta con tus hijos, pero ellos sí pueden aplicar ese mínimo.</div>
+          <div className={styles.faqTip}>
+            <span aria-hidden="true">💡</span> Lo pierde si tú presentas tu propia declaración con rentas
+            superiores a {formatCurrency(NORMAS_MINIMOS.rentasMaximasDeclaracion)} (art. 61.2.ª LIRPF),
+            aunque no estés obligado y solo sea para pedir una devolución: antes de presentarla,
+            comparad lo que recuperas tú con lo que deja de ahorrarse él. Y no existe una declaración
+            conjunta de padres e hijos mayores de edad: la unidad familiar del art. 82 la forman los
+            cónyuges con sus hijos menores o incapacitados judicialmente.
+          </div>
         </div>
       </div>
 
@@ -791,8 +938,8 @@ export default function EstimadorIrpfPensionista() {
         <div className={styles.step}>
           <div className={styles.stepNumber}>6</div>
           <div className={styles.stepContent}>
-            <strong>Presenta antes del 30 de junio</strong>
-            <p>El plazo es del 2 de abril al 30 de junio. Si sale a pagar y domicilias el pago, puedes presentar hasta el 25 de junio. Las prórrogas son muy limitadas.</p>
+            <strong>Presenta antes de que cierre la campaña</strong>
+            <p>{PLAZO_CAMPANA_RENTA} Si sale a pagar y quieres domiciliar el pago, la domiciliación se cierra unos días antes del final. Confirma las fechas del ejercicio en el calendario del contribuyente de la Agencia Tributaria.</p>
           </div>
         </div>
       </div>
@@ -822,12 +969,12 @@ export default function EstimadorIrpfPensionista() {
         <div className={styles.tipCard}>
           <div className={styles.tipIcon} aria-hidden="true">👨‍👩‍👧</div>
           <strong>Coordina con la familia</strong>
-          <p>Si un hijo te cuida o convives con él, puede aplicar el mínimo por ascendientes. Pero entonces tú no puedes declarar conjuntamente con tus hijos ni obtener esa deducción.</p>
+          <p>Si convives con un hijo al menos {NORMAS_MINIMOS.convivenciaMinima} y tus rentas no pasan de {formatCurrency(NORMAS_MINIMOS.rentasMaximasAscendiente)}, él puede aplicar el mínimo por ascendientes (art. 59 LIRPF). Lo pierde si tú presentas declaración con rentas superiores a {formatCurrency(NORMAS_MINIMOS.rentasMaximasDeclaracion)} (art. 61.2.ª), aunque sea solo para pedir una devolución: echad las cuentas juntos antes de presentarla.</p>
         </div>
         <div className={styles.tipCard}>
           <div className={styles.tipIcon} aria-hidden="true">📊</div>
           <strong>Planifica el rescate del plan de pensiones</strong>
-          <p>No rescates el plan en el mismo año de jubilación si recibes alta pensión. Rescatarlo al año siguiente o en forma de renta minimiza la tributación.</p>
+          <p>Lo aportado desde 2007 tributa entero cobres cuando cobres: repartirlo en años de menos ingresos o cobrarlo como renta suaviza el tramo. Lo aportado hasta el 31/12/2006 solo conserva la reducción del régimen transitorio si lo cobras en capital en el año de la jubilación o en los dos siguientes (DT 12.ª.4 LIRPF): retrasarlo más, o cobrarlo como renta, la pierde. Pide a la gestora cuánto hay de cada época.</p>
         </div>
       </div>
 
@@ -841,9 +988,9 @@ export default function EstimadorIrpfPensionista() {
           <li><strong>Confirmar el borrador sin revisar</strong>: El borrador puede tener errores en mínimos por edad, deducciones autonómicas o tratamiento de otros ingresos. Siempre revisar antes de confirmar.</li>
           <li><strong>No declarar pensiones del extranjero</strong>: Las pensiones de sistemas públicos extranjeros también tributan en España (convenios de doble imposición aparte). No declararlas es un error grave.</li>
           <li><strong>Olvidar que la pensión de viudedad también tributa</strong>: Muchos pensionistas con viudedad olvidan incluirla, lo que puede generar liquidaciones de la AEAT.</li>
-          <li><strong>Rescatar el plan de pensiones en el año de jubilación</strong>: Ese año ya hay ingresos altos (últimas nóminas + pensión). Añadir el rescate del PP puede doblar la factura fiscal.</li>
+          <li><strong>Decidir la fecha del rescate del plan sin mirar de qué época son las aportaciones</strong>: El año de jubilación ya suele traer ingresos altos (últimas nóminas + pensión), y sumarle el rescate sube el tramo. Pero si hay aportaciones anteriores a 2007, la reducción del régimen transitorio para cobrarlas en capital solo vale ese año y los dos siguientes (DT 12.ª.4 LIRPF): retrasar el rescate más allá la pierde.</li>
           <li><strong>No aprovechar deducciones autonómicas</strong>: Muchas CCAA tienen deducciones específicas para mayores que no aparecen en el borrador automáticamente.</li>
-          <li><strong>Desconocer el límite de {formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.variosPagadores)} con dos pagadores</strong>: Si la pensión y un segundo pagador que supere {formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador)} rebasan juntos ese umbral, hay obligación de declarar aunque cada uno por separado esté por debajo del límite general de {formatCurrency(OBLIGACION_DECLARAR_2025.trabajo.unPagador)}.</li>
+          <li><strong>Desconocer el límite de {formatCurrency(OBLIGACION.trabajo.variosPagadores)} con dos pagadores</strong>: Si la pensión y un segundo pagador que supere {formatCurrency(OBLIGACION.trabajo.limiteSegundoPagador)} rebasan juntos ese umbral, hay obligación de declarar aunque cada uno por separado esté por debajo del límite general de {formatCurrency(OBLIGACION.trabajo.unPagador)}. Salvo que todo sean pensiones o prestaciones pasivas y hayas pedido el procedimiento especial de retención (art. 89.A del Reglamento del IRPF): entonces el límite sigue en {formatCurrency(EXCEPCION_PENSIONISTAS.limite)} ({EXCEPCION_PENSIONISTAS.articulo}).</li>
         </ul>
       </div>
 

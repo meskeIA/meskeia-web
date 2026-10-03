@@ -177,6 +177,11 @@
   font-size: 0.9rem;
 }
 
+/* #c0392b daba 2,64:1 sobre la tarjeta oscura #2A2A2A (hallazgo 2777); #f87171 da 5,19:1. */
+[data-theme='dark'] .errorMsg {
+  color: #f87171;
+}
+
 /* Matiz que acompaña a una cifra del resultado y explica por qué es esa y no otra. */
 .resultNota {
   margin: 0;
