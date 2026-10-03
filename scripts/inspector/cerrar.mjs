@@ -5,6 +5,8 @@
  * Ejecutar:  npm run inspector:hallazgos                 (los abiertos, por severidad)
  *            npm run inspector:hallazgos -- --app lupa-digital
  *            npm run inspector:hallazgos -- --app lupa-digital --detalle   (ficha entera + caso)
+ *            npm run inspector:hallazgos -- --ultima --detalle   (los del último día con abiertos)
+ *            npm run inspector:hallazgos -- --desde 2026-10-01
  *            npm run inspector:hallazgos -- --arreglado 12,13
  *            npm run inspector:hallazgos -- --descartado 27 --motivo "es correcto: lo confirma la ONCE"
  *            npm run inspector:hallazgos -- --revalidar lupa-digital,conversor-braille
@@ -82,6 +84,18 @@ const TODOS = args.includes('--todos');
  * reparación. Sin esto había que leer la base a mano, y eso invita a reparar de oído.
  */
 const DETALLE = args.includes('--detalle');
+/**
+ * Acotar por fecha de inspección (03/10/2026). Lo pide la skill `/reparar`, que por defecto
+ * repara «lo de la última inspección»: `--ultima` toma el último DÍA que aún tiene hallazgos
+ * abiertos —no el último día con inspección, que puede estar ya reparado entero— y dice cuál
+ * es. `hallazgos.fecha` es de día, así que dos tandas del mismo día salen juntas.
+ */
+const DESDE = valorDe('desde', '');
+const ULTIMA = args.includes('--ultima');
+if (DESDE && !/^\d{4}-\d{2}-\d{2}$/.test(DESDE)) {
+  console.error(`\n✗ --desde espera AAAA-MM-DD (la base guarda las fechas así); llegó "${DESDE}".\n`);
+  process.exit(1);
+}
 
 const db = abrir();
 const hoy = new Date().toISOString().slice(0, 10);
@@ -212,16 +226,28 @@ if (DESCARTADO) { cerrar(DESCARTADO, 'descartado'); process.exit(0); }
 // ─── Listar ───────────────────────────────────────────────────────────────────
 
 const orden = `CASE severidad WHEN 'critico' THEN 1 WHEN 'alto' THEN 2 WHEN 'medio' THEN 3 ELSE 4 END`;
-const filas = APP
-  ? db.prepare(`SELECT * FROM hallazgos WHERE slug = ? ${TODOS ? '' : "AND estado = 'abierto'"} ORDER BY ${orden}`).all(APP)
-  : db.prepare(`SELECT * FROM hallazgos ${TODOS ? '' : "WHERE estado = 'abierto'"} ORDER BY ${orden}, slug`).all();
+const condiciones = [], parametros = [];
+if (APP) { condiciones.push('slug = ?'); parametros.push(APP); }
+if (!TODOS) condiciones.push("estado = 'abierto'");
+let desde = DESDE;
+if (ULTIMA) {
+  // El último día DE ESTA APP si se ha pedido una, no el de toda la base
+  desde = (APP
+    ? db.prepare("SELECT MAX(fecha) f FROM hallazgos WHERE estado = 'abierto' AND slug = ?").get(APP)
+    : db.prepare("SELECT MAX(fecha) f FROM hallazgos WHERE estado = 'abierto'").get()).f || '';
+  if (!desde) { console.log(`\nNo hay hallazgos abiertos${APP ? ` en ${APP}` : ''} de ninguna fecha.\n`); process.exit(0); }
+}
+if (desde) { condiciones.push('fecha >= ?'); parametros.push(desde); }
+const donde = condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : '';
+const filas = db.prepare(`SELECT * FROM hallazgos ${donde} ORDER BY ${orden}, slug`).all(...parametros);
 
+const ambito = `${APP ? ` en ${APP}` : ''}${desde ? ` desde el ${desde}${ULTIMA ? ' (último día con abiertos)' : ''}` : ''}`;
 if (!filas.length) {
-  console.log(`\nNo hay hallazgos ${TODOS ? '' : 'abiertos '}${APP ? `en ${APP}` : ''}.\n`);
+  console.log(`\nNo hay hallazgos${TODOS ? '' : ' abiertos'}${ambito}.\n`);
   process.exit(0);
 }
 
-console.log(`\n${filas.length} hallazgo(s)${APP ? ` en ${APP}` : ''}:\n`);
+console.log(`\n${filas.length} hallazgo(s)${ambito}:\n`);
 let sevActual = '';
 for (const f of filas) {
   if (f.severidad !== sevActual) { sevActual = f.severidad; console.log(`── ${sevActual.toUpperCase()} ──`); }
@@ -235,8 +261,13 @@ for (const f of filas) {
   }
 }
 
-const porApp = db.prepare(`SELECT slug, COUNT(*) n FROM hallazgos WHERE estado='abierto' GROUP BY slug ORDER BY n DESC`).all();
-console.log(`\nPor app: ${porApp.map(r => `${r.slug} (${r.n})`).join(' · ')}`);
+// Del mismo conjunto que se ha listado, no de toda la base
+const porApp = Object.entries(filas.reduce((m, f) => ({ ...m, [f.slug]: (m[f.slug] || 0) + 1 }), {}))
+  .sort((a, b) => b[1] - a[1]);
+console.log(`\nPor app: ${porApp.map(([slug, n]) => `${slug} (${n})`).join(' · ')}`);
+const restantes = db.prepare("SELECT COUNT(*) n FROM hallazgos WHERE estado = 'abierto'").get().n;
+if (desde && !TODOS && restantes > filas.length)
+  console.log(`(fuera de este filtro quedan ${restantes - filas.length} abiertos más: sin --desde/--ultima se ven todos)`);
 console.log(`\nCerrar:  npm run inspector:hallazgos -- --arreglado 1,2,3`);
 console.log(`         npm run inspector:hallazgos -- --descartado 4 --motivo "por qué no era un defecto"`);
 console.log(`Tras reparar: npm run inspector:hallazgos -- --revalidar-reparadas\n`);
