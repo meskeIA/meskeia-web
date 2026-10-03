@@ -482,9 +482,16 @@ export const PENSIONES_MINIMAS_2026: PensionMinimaEntry[] = [
   // ── Jubilación ──
   { tipo: 'jubilacion', subtipo: '65_o_mas',  label: 'Jubilación ≥ 65 años',  conConyuge: 1256.60, sinConyuge: 888.70, unipersonal: 936.20 },
   { tipo: 'jubilacion', subtipo: 'menos_65',  label: 'Jubilación < 65 años',   conConyuge: 1256.60, sinConyuge: 827.90, unipersonal: 875.90 },
+  // Fila propia del Anexo I (26.385,80 / 19.660,20 / 18.662,00 €/año): el jubilado de 65 años
+  // que procede de una gran incapacidad conserva el mínimo de esta. Faltaba hasta el 03/10/2026
+  // (hallazgo 2810 del Inspector).
+  { tipo: 'jubilacion', subtipo: '65_gran_incapacidad', label: 'Jubilación ≥ 65 años procedente de gran incapacidad', conConyuge: 1884.70, sinConyuge: 1333.00, unipersonal: 1404.30 },
 
   // ── Incapacidad permanente ──
-  { tipo: 'incapacidad', subtipo: 'gran_invalidez',   label: 'Gran Invalidez',                     conConyuge: 1884.70, sinConyuge: 1333.00, unipersonal: 1404.30 },
+  // «Gran incapacidad» y no «gran invalidez» desde la DA única de la Ley 2/2025 (BOE-A-2025-8567),
+  // que sustituyó la expresión en la LGSS; el Anexo I del RD 241/2026 ya la usa. El `subtipo`
+  // conserva el nombre viejo porque es una clave interna que comparten otros consumidores.
+  { tipo: 'incapacidad', subtipo: 'gran_invalidez',   label: 'Gran incapacidad',                   conConyuge: 1884.70, sinConyuge: 1333.00, unipersonal: 1404.30 },
   { tipo: 'incapacidad', subtipo: 'absoluta',          label: 'Incapacidad Permanente Absoluta',    conConyuge: 1256.60, sinConyuge: 888.70,  unipersonal: 936.20 },
   { tipo: 'incapacidad', subtipo: 'total_65_o_mas',    label: 'Total ≥ 65 años',                   conConyuge: 1256.60, sinConyuge: 888.70,  unipersonal: 936.20 },
   { tipo: 'incapacidad', subtipo: 'total_60_64',       label: 'Total 60-64 años',                  conConyuge: 1256.60, sinConyuge: 827.90,  unipersonal: 875.90 },
@@ -501,7 +508,10 @@ export const PENSIONES_MINIMAS_2026: PensionMinimaEntry[] = [
 ];
 
 // ── Límites de ingresos para acceder al complemento a mínimos 2026 ──
-// Rentas anuales NO derivadas del trabajo (excluida la propia pensión)
+// Computan los rendimientos del TRABAJO distintos de la propia pensión, del capital, de
+// actividades económicas y las ganancias patrimoniales (art. 9.2 RD 241/2026 y art. 59.1 LGSS).
+// Hasta el 03/10/2026 este comentario decía «rentas NO derivadas del trabajo», y la app lo
+// trasladó a su FAQ: quien cobra viudedad y trabaja dejaba fuera su nómina (hallazgo 2804).
 // Fuente: arts. 9.2 y 10.1.b) del RD 241/2026 (BOE-A-2026-6977)
 //
 // ⚠️ 2026-08-12: estaban en 8.614 € y 10.047 €, entre 828 y 966 € POR DEBAJO de
@@ -516,6 +526,31 @@ export const COMPLEMENTO_MINIMOS_LIMITES_2026 = {
   /** Con cónyuge a cargo: ingresos anuales máximos, pensionista + cónyuge (art. 10.1.b) */
   conConyuge: 11013,
 };
+
+// ── Tope del complemento a mínimos: la pensión no contributiva (PNC) ──
+// Para las pensiones causadas desde el 01/01/2013, el complemento «en ningún caso podrá superar»
+// la cuantía de la PNC de jubilación e invalidez del año (art. 9.5 RD 241/2026, art. 59.4 LGSS).
+// Con cónyuge a cargo, la que correspondería a una unidad económica con DOS beneficiarios por el
+// art. 364.1.a) LGSS: la PNC más el 70 % (la letra a da la suma; el cociente por persona es la
+// letra b, a la que el art. 59.4 no remite). No topa a la gran incapacidad que cobra el
+// complemento de tercera persona (art. 9.7 RD 241/2026).
+// Fuente: arts. 9.5, 9.7, 10.4 y 21.1 del RD 241/2026 (BOE-A-2026-6977) y arts. 59.4 y 364.1
+// LGSS (BOE-A-2015-11724), leídos en el BOE el 03/10/2026 (hallazgo 2803 del Inspector).
+
+const PNC_ANUAL_2026 = 8803.20;
+
+export const TOPE_COMPLEMENTO_MINIMOS_2026 = {
+  /** Fecha de causación desde la que rige el tope (art. 9.5). */
+  causadasDesde: '2013-01-01',
+  /** PNC de jubilación e invalidez 2026, €/año (art. 21.1). */
+  pncAnual: PNC_ANUAL_2026,
+  /** Tope sin cónyuge a cargo, €/mes en 14 pagas: 628,80. */
+  sinConyugeMensual: mensual14(PNC_ANUAL_2026),
+  /** Tope con cónyuge a cargo, €/año: 8.803,20 × 1,70 = 14.965,44 (art. 364.1.a LGSS). */
+  conConyugeAnual: Math.round(PNC_ANUAL_2026 * 1.7 * 100) / 100,
+  /** Tope con cónyuge a cargo, €/mes en 14 pagas: 1.068,96. */
+  conConyugeMensual: mensual14(PNC_ANUAL_2026 * 1.7),
+} as const;
 
 // ─── Complemento por Brecha de Género 2026 (art. 60 LGSS) ─────────────────────
 // Fuente: RD-Ley 3/2021 + RD-Ley 3/2026 (cuantía 2026)

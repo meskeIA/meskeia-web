@@ -128,6 +128,41 @@ export const ARANCEL_PROCURA = {
   recargoCambiarioConOposicion: 0.1,
 } as const;
 
+/**
+ * Art. 22 RD 434/2024: procesos matrimoniales y de familia. Es concepto ESPECIAL, así que en
+ * una separación o un divorcio no rige la cuantía indeterminada del art. 3 (351 €), que es
+ * supletoria. Son MÁXIMOS, sin IVA: el precio ofertado no puede superarlos.
+ *
+ * A lo fijo se suman, si se piden, los derechos del art. 2 sobre una anualidad de alimentos o
+ * pensión compensatoria (22.1.b y 22.3.b) y un porcentaje de la escala del art. 2 sobre el
+ * activo liquidado (22.1.c y 22.3.c-d).
+ *
+ * Añadido el 03/10/2026, leído en el BOE consolidado (hallazgos 2792 y 2793 del Inspector:
+ * estimador-costes-divorcio escribía a mano entre 250 y 800 € y citaba el art. 3).
+ */
+export const ARANCEL_PROCURA_FAMILIA = {
+  /** 22.1.a: separación o divorcio de mutuo acuerdo o con consentimiento del otro cónyuge. */
+  mutuoAcuerdo: 70.21,
+  /** 22.2: solicitud o intervención en medidas provisionales, por cada procurador. */
+  medidasProvisionales: 70.21,
+  /** 22.3.a: separación, divorcio y nulidad contenciosos, por cada procurador. */
+  contencioso: 100.31,
+  /** 22.1.c: liquidación del régimen económico en el mutuo acuerdo, % de la escala del art. 2 sobre el activo. */
+  liquidacionMutuoAcuerdo: 0.25,
+  /** 22.3.c: disolución de gananciales en el contencioso, % de la escala del art. 2 sobre el activo. */
+  disolucionGananciales: 0.25,
+  /** 22.3.c: lo mismo cuando el activo no puede determinarse o es inestimable. */
+  disolucionGanancialesInestimable: 50.15,
+  /** 22.3.d: liquidación del régimen económico en el contencioso, % de la escala del art. 2 sobre el activo. */
+  liquidacionContencioso: 0.5,
+  /**
+   * Art. 6.1: un procurador que representa a varios poderdantes con una misma dirección y sin
+   * diferenciar su defensa devenga una sola cuenta más un 10 % como máximo POR CADA
+   * representado. En un mutuo acuerdo con procurador común: × (1 + 2 × 0,10) = × 1,20.
+   */
+  recargoPorRepresentado: 0.1,
+} as const;
+
 // ─── Tasas judiciales (Ley 10/2012, con la nulidad de la STC 140/2016) ────────
 
 /**

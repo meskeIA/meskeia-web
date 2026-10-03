@@ -90,6 +90,24 @@ export const MINIMOS_IRPF_2025 = {
 };
 
 /**
+ * Normas comunes de los mínimos por descendientes, ascendientes y discapacidad (art. 61 LIRPF).
+ *
+ * `rentasMaximasDeclaracion` es la regla 2.ª: no hay mínimo cuando el ascendiente o descendiente
+ * que lo genera PRESENTA declaración con rentas superiores a 1.800 €. Pesa sobre los pensionistas
+ * que conviven con un hijo: si declaran para pedir la devolución con más de 1.800 € de rentas,
+ * el hijo pierde el mínimo por ascendiente. `rentasMaximasAscendiente` es el requisito de rentas
+ * del propio art. 59.1 (8.000 €, excluidas las exentas), y `convivenciaMinima` el de la regla 5.ª.
+ *
+ * Fuente: Ley 35/2006, arts. 59.1 y 61 (BOE-A-2006-20764, consolidado), leído en el BOE el
+ * 03/10/2026 (hallazgo 2772 del Inspector; sospecha del 26/09).
+ */
+export const NORMAS_MINIMOS_FAMILIARES_IRPF = {
+  rentasMaximasDeclaracion: 1800,
+  rentasMaximasAscendiente: 8000,
+  convivenciaMinima: 'la mitad del período impositivo',
+} as const;
+
+/**
  * Reducción por tributación conjunta (art. 84.2, reglas 3ª y 4ª LIRPF). Solo aplica si la
  * unidad familiar opta por declarar conjunta (un cónyuge sin ingresos, o unidad
  * monoparental); con dos ingresos separados no hay tributación conjunta y no procede.
@@ -678,6 +696,19 @@ export const OBLIGACION_DECLARAR_2025 = {
     unPagador: 22000,          // 1 pagador o varios si 2º+3º ≤ 1.500 €
     variosPagadores: 15876,    // 2+ pagadores si 2º+3º > 1.500 €
     limiteSegundoPagador: 1500, // Umbral para considerar "varios pagadores"
+    /**
+     * Art. 96.3.a.2.º: con varios pagadores, el límite sigue en 22.000 € si los únicos
+     * rendimientos del trabajo son prestaciones pasivas del art. 17.2.a (pensiones públicas,
+     * planes de pensiones, mutualidades…) y el tipo de retención se fijó por el procedimiento
+     * especial (art. 89.A RIRPF, a petición del pensionista). Leído en el BOE el 03/10/2026
+     * (hallazgo 2773 del Inspector).
+     */
+    excepcionPensionistas: {
+      limite: 22000,
+      articulo: 'art. 96.3.a.2.º LIRPF',
+      descripcion:
+        'Si todos tus rendimientos del trabajo son pensiones o prestaciones pasivas (art. 17.2.a) y pediste que la retención se calculara por el procedimiento especial, el límite sigue en 22.000 € aunque tengas varios pagadores',
+    },
   },
   // Rendimientos del capital mobiliario y ganancias patrimoniales
   capitalMobiliario: {
