@@ -1,4 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, Locator } from '@playwright/test';
+import { esperarValorEnReact } from './_hidratacion';
 
 /**
  * Inspector — generador-loteria (segmento interactiva, riesgo 4 informativo, 562 usos reales)
@@ -849,5 +850,132 @@ test.describe('25/09 · escritorio — persistencia entre pestañas, copiar y co
     await expect(filaLototurf).toHaveCount(1);
     await expect(filaLototurf).toContainText('1 entre 8.835.372');
     await expect(page.getByText(/Euromillones, El Gordo o Lototurf/)).toHaveCount(1);
+  });
+});
+
+/**
+ * S0176 (03/10/2026) — comprobar las combinaciones guardadas con el resultado del sorteo.
+ *
+ * El cálculo está probado aparte, caso a caso, en tests/comprobar-loteria-motor.spec.ts.
+ * Aquí se mira lo que solo se ve en el navegador: que lo tecleado llega al motor, que cada
+ * combinación guardada sale con SU veredicto, y que un resultado no sobrevive a cambiar las
+ * casillas (se leería el veredicto de otro sorteo).
+ *
+ * Sorteo inventado de La Primitiva: 3 12 25 33 41 48 · complementario 7 · reintegro 5.
+ *   A  3 12 25 33 41 48 · R5 → 6 aciertos + reintegro      → Categoría especial
+ *   B  3  7 12 25 33 41 · R0 → 5 aciertos, el 6.º es el 7  → 2.ª categoría
+ *   C  1  2  4  6  8 10 · R9 → nada                        → Sin premio (0 aciertos)
+ *   → «2 de tus 3 combinaciones de La Primitiva tienen premio de categoría; 1 acierta el reintegro.»
+ * Euromillones: 5 14 23 37 44 · estrellas 3 11; guardada 5 14 23 37 44 + 3 7 → 5 + 1 → 2.ª.
+ */
+test.describe('S0176 · comprobar las combinaciones guardadas con el sorteo', () => {
+  const GUARDADAS = [
+    { id: 'a', type: 'primitiva', mainNumbers: [3, 12, 25, 33, 41, 48], extraNumbers: [5], timestamp: '2026-10-01T10:00:00.000Z' },
+    { id: 'b', type: 'primitiva', mainNumbers: [3, 7, 12, 25, 33, 41], extraNumbers: [0], timestamp: '2026-10-01T10:00:00.000Z' },
+    { id: 'c', type: 'primitiva', mainNumbers: [1, 2, 4, 6, 8, 10], extraNumbers: [9], timestamp: '2026-10-01T10:00:00.000Z' },
+    { id: 'e', type: 'euromillones', mainNumbers: [5, 14, 23, 37, 44], extraNumbers: [3, 7], timestamp: '2026-10-01T10:00:00.000Z' },
+  ];
+
+  const comprobador = (page: Page) => page.getByRole('region', { name: /Comprobar con el resultado del sorteo/ });
+
+  /** `fill()` y espera a que el valor haya llegado al estado de React. */
+  async function teclear(page: Page, casilla: Locator, valor: string) {
+    await casilla.fill(valor);
+    await esperarValorEnReact(page, casilla, valor);
+  }
+
+  async function teclearPrimitiva(page: Page, numeros: string[], complementario: string, reintegro: string) {
+    const zona = comprobador(page);
+    for (let i = 0; i < numeros.length; i++) {
+      await teclear(page, zona.getByLabel(`Número ${i + 1} de la combinación ganadora`), numeros[i]);
+    }
+    await teclear(page, zona.getByLabel('Complementario'), complementario);
+    await teclear(page, zona.getByLabel('Reintegro'), reintegro);
+  }
+
+  test('sin combinaciones guardadas no hay comprobador', async ({ page }) => {
+    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: '[]' });
+    await expect(comprobador(page)).toHaveCount(0);
+  });
+
+  test('La Primitiva: cada combinación guardada sale con su categoría', async ({ page }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GUARDADAS) });
+
+    const zona = comprobador(page);
+    // Hay dos loterías guardadas: sale el selector, con La Primitiva marcada de entrada
+    await expect(zona.getByRole('button', { name: 'La Primitiva', exact: true })).toHaveAttribute('aria-pressed', 'true');
+
+    await teclearPrimitiva(page, ['3', '12', '25', '33', '41', '48'], '7', '5');
+    await zona.getByRole('button', { name: 'Comprobar mis combinaciones de La Primitiva' }).click();
+
+    await expect(zona).toContainText('2 de tus 3 combinaciones de La Primitiva tienen premio de categoría; 1 acierta el reintegro.');
+    const filas = zona.locator('ul li');
+    await expect(filas).toHaveCount(3);
+    await expect(filas.nth(0).locator('[class*="comprobadaVeredicto"]')).toHaveText('Categoría especial (6 aciertos + reintegro)');
+    await expect(filas.nth(1).locator('[class*="comprobadaVeredicto"]')).toHaveText('2.ª categoría (5 aciertos + complementario)');
+    await expect(filas.nth(2).locator('[class*="comprobadaVeredicto"]')).toHaveText('Sin premio (0 aciertos)');
+
+    // B: cinco bolas acertadas y el 7 marcado como complementario, también para lectores de pantalla
+    await expect(filas.nth(1).locator('[class*="bolaAcertada"]')).toHaveCount(5);
+    await expect(filas.nth(1).locator('[class*="bolaComplementario"]')).toHaveText('7 complementario');
+    // A: las seis y el reintegro
+    await expect(filas.nth(0).locator('[class*="bolaAcertada"]')).toHaveCount(7);
+    // C: ninguna
+    await expect(filas.nth(2).locator('[class*="bolaAcertada"]')).toHaveCount(0);
+
+    // Lo que dice la pantalla también se anuncia
+    await expect(page.getByRole('status').filter({ hasText: '2 de tus 3 combinaciones de La Primitiva' })).toHaveCount(1);
+    expect(errores).toEqual([]);
+  });
+
+  test('cambiar una casilla retira el veredicto anterior; un sorteo imposible se explica', async ({ page }) => {
+    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GUARDADAS) });
+    const zona = comprobador(page);
+    const boton = zona.getByRole('button', { name: 'Comprobar mis combinaciones de La Primitiva' });
+
+    await teclearPrimitiva(page, ['3', '12', '25', '33', '41', '48'], '7', '5');
+    await boton.click();
+    await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveCount(3);
+
+    // El complementario sale del mismo bombo, después: no puede ser uno de los seis
+    await teclear(page, zona.getByLabel('Complementario'), '12');
+    await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveCount(0);
+    await boton.click();
+    await expect(zona.getByRole('alert')).toContainText('El complementario (12) no puede ser uno de los seis');
+    await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveCount(0);
+  });
+
+  test('Euromillones: se cambia de lotería y se comprueba con las estrellas', async ({ page }) => {
+    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GUARDADAS) });
+    const zona = comprobador(page);
+    await zona.getByRole('button', { name: 'Euromillones', exact: true }).click();
+    await expect(zona.getByRole('button', { name: 'Euromillones', exact: true })).toHaveAttribute('aria-pressed', 'true');
+
+    // Euromillones: 5 casillas, dos estrellas, sin complementario ni reintegro
+    await expect(zona.getByLabel(/Número \d de la combinación ganadora/)).toHaveCount(5);
+    await expect(zona.getByLabel('Complementario')).toHaveCount(0);
+    const numeros = ['5', '14', '23', '37', '44'];
+    for (let i = 0; i < numeros.length; i++) {
+      await teclear(page, zona.getByLabel(`Número ${i + 1} de la combinación ganadora`), numeros[i]);
+    }
+    await teclear(page, zona.getByLabel('Estrella 1'), '3');
+    await teclear(page, zona.getByLabel('Estrella 2'), '11');
+    await zona.getByRole('button', { name: 'Comprobar mis combinaciones de Euromillones' }).click();
+
+    await expect(zona).toContainText('Tu combinación de Euromillones tiene premio de categoría.');
+    await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveText(['2.ª categoría (5 aciertos + 1 estrella)']);
+    await expect(zona).not.toContainText('El reintegro que cuenta');
+  });
+
+  test('móvil 360 px: el comprobador con resultado no desborda la pantalla', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GUARDADAS) });
+    await teclearPrimitiva(page, ['3', '12', '25', '33', '41', '48'], '7', '5');
+    await comprobador(page).getByRole('button', { name: 'Comprobar mis combinaciones de La Primitiva' }).click();
+    await expect(comprobador(page).locator('[class*="comprobadaVeredicto"]')).toHaveCount(3);
+    const ancho = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(ancho).toBeLessThanOrEqual(360);
   });
 });

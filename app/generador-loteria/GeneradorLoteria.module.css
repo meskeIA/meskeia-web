@@ -495,6 +495,230 @@
   color: white;
 }
 
+/* Comprobador de las combinaciones guardadas frente al sorteo (S0176).
+   Todo sale de los tokens de .container, que ya tienen su variante oscura. */
+.comprobador {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+}
+
+.comprobadorTitulo {
+  margin: 0 0 var(--spacing-xs);
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.comprobadorIntro {
+  margin: 0 0 var(--spacing-md);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.comprobadorModalidades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+.comprobadorModalidad {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.comprobadorModalidad:hover {
+  border-color: var(--primary);
+}
+
+.comprobadorModalidad.active {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: white;
+}
+
+.comprobadorCampos {
+  margin: 0 0 var(--spacing-md);
+  padding: 0;
+  border: none;
+}
+
+.comprobadorCampos legend {
+  margin-bottom: var(--spacing-sm);
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.comprobadorFila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.comprobadorEtiqueta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.comprobadorCasilla {
+  width: 3rem;
+  height: 2.6rem;
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.comprobadorCasilla:focus-visible,
+.comprobadorModalidad:focus-visible,
+.comprobadorBoton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.comprobadorBoton {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary-boton);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.comprobadorBoton:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.comprobadorError {
+  margin: var(--spacing-sm) 0 0;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-left: 3px solid var(--danger);
+  background: var(--hover);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+.comprobadorResultado {
+  margin-top: var(--spacing-md);
+}
+
+.comprobadorResumen {
+  margin: 0 0 var(--spacing-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.comprobadorLista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comprobada {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 4px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--hover);
+}
+
+/* Con premio: el borde dorado y el texto en negrita lo dicen sin depender solo del color */
+.comprobadaPremio {
+  border-left-color: var(--gold);
+}
+
+.comprobadaPremio .comprobadaVeredicto {
+  font-weight: 700;
+}
+
+.comprobadaBolas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.comprobadaExtras {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-left: var(--spacing-sm);
+}
+
+.comprobadaExtraNombre {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.bolaComprobada {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Acertado: fondo dorado, texto oscuro y negrita (no solo un cambio de color) */
+.bolaAcertada {
+  border: 2px solid #1a1a1a;
+  background: var(--gold);
+  color: #1a1a1a;
+  font-weight: 800;
+}
+
+/* El complementario, donde decide (5 aciertos): borde discontinuo */
+.bolaComplementario {
+  border: 2px dashed var(--text-primary);
+  color: var(--text-primary);
+}
+
+.comprobadaVeredicto {
+  margin: var(--spacing-xs) 0 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.comprobadorNotas {
+  margin-top: var(--spacing-md);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.comprobadorNotas p {
+  margin: 0 0 var(--spacing-xs);
+}
+
 /* Disclaimer */
 .disclaimer {
   background: #fff3cd;

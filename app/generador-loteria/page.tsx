@@ -5,6 +5,7 @@ import styles from './GeneradorLoteria.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import { formatDate } from '@/lib';
+import ComprobadorSorteo from './ComprobadorSorteo';
 
 type LotteryType = 'primitiva' | 'euromillones' | 'bonoloto' | 'gordo' | 'lototurf';
 
@@ -635,6 +636,8 @@ export default function GeneradorLoteriaPage() {
                 );
               })}
             </div>
+
+            <ComprobadorSorteo guardadas={favorites} modalidades={LOTTERY_CONFIG} onAnunciar={setAnuncio} />
           </div>
         )}
       </main>

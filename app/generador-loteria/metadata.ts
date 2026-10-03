@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Generador Lotería: Primitiva, Euromillones, Bonoloto | meskeIA',
-  description: 'Genera números aleatorios para Primitiva, Euromillones, Bonoloto, El Gordo de la Primitiva y Lototurf. Combinaciones al azar, historial de la sesión y guardado en tu navegador. Gratis y sin registro.',
-  keywords: 'generador loteria, numeros primitiva, euromillones, bonoloto, el gordo, lototurf, numeros aleatorios, combinaciones loteria, numeros suerte',
+  description: 'Genera números aleatorios para Primitiva, Euromillones, Bonoloto, El Gordo de la Primitiva y Lototurf, guárdalos en tu navegador y compruébalos después con el resultado del sorteo: aciertos y categoría. Gratis y sin registro.',
+  keywords: 'generador loteria, numeros primitiva, euromillones, bonoloto, el gordo, lototurf, numeros aleatorios, combinaciones loteria, numeros suerte, comprobar combinaciones, categorias de premio',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Generador de Números de Lotería',
-  description: 'Generador de combinaciones aleatorias para loterías españolas: Primitiva, Euromillones, Bonoloto, El Gordo de la Primitiva y Lototurf. Genera números al azar, con historial de la sesión y las combinaciones que quieras guardadas en el navegador.',
+  description: 'Generador de combinaciones aleatorias para loterías españolas: Primitiva, Euromillones, Bonoloto, El Gordo de la Primitiva y Lototurf. Genera números al azar, con historial de la sesión, las combinaciones que quieras guardadas en el navegador y su comprobación frente al resultado del sorteo.',
   url: 'https://meskeia.com/generador-loteria/',
   category: 'UtilityApplication',
   features: [
@@ -46,6 +46,7 @@ export const jsonLd = generateWebAppSchema({
     'Historial de combinaciones generadas',
     'Combinaciones guardadas en el navegador, sin cuenta ni registro',
     'Copiar cualquier combinación al portapapeles',
+    'Comprobar las combinaciones guardadas con el resultado del sorteo: aciertos marcados y categoría de premio',
   ],
   keywords: ['lotería', 'números aleatorios', 'Primitiva', 'Euromillones', 'Bonoloto'],
 });
@@ -75,7 +76,15 @@ export const faqJsonLd = {
       name: '¿Para qué sirve guardar el historial de combinaciones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El historial permite ver todas las combinaciones generadas en la sesión actual y evitar repetirlas si juegas varias apuestas distintas. También es útil para comparar tus boletos con los resultados del sorteo. El historial se borra al cerrar o recargar la página; las combinaciones que marques con la estrella sí se quedan guardadas en ese navegador, hasta 20.',
+        text: 'El historial permite ver todas las combinaciones generadas en la sesión actual y evitar repetirlas si juegas varias apuestas distintas. El historial se borra al cerrar o recargar la página; las combinaciones que marques con la estrella sí se quedan guardadas en ese navegador, hasta 20.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo compruebo si mis combinaciones guardadas tienen premio?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Debajo de las combinaciones guardadas hay un comprobador: se escribe la combinación ganadora que publica el sorteo (con el complementario y el reintegro en La Primitiva y la Bonoloto, las estrellas en Euromillones, la clave en El Gordo o el caballo en Lototurf) y cada combinación guardada de esa lotería sale con sus aciertos marcados y su categoría de premio. No muestra importes, porque dependen de lo recaudado y del número de acertantes, y es orientativo: lo que vale es el escrutinio oficial y el resguardo.',
       },
     },
     {
