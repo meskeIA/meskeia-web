@@ -38,13 +38,13 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     'Ajuste de fuente tipográfica: Arial, Lexend y monoespaciada para mayor legibilidad',
-    'Control de tamaño de letra de 14 a 36 px con vista previa en tiempo real',
+    'Control de tamaño de letra de 14 a 36\u00A0px con vista previa en tiempo real, también en el móvil',
     'Espaciado entre letras y entre palabras ajustable de forma independiente',
     'Interlineado configurable de 1,2 a 3,0 para reducir la confusión entre líneas',
-    'Ancho de columna ajustable del 40 al 100% para limitar la longitud de línea',
+    'Ancho de columna ajustable del 40 al 100\u00A0% para limitar la longitud de línea, con un mínimo de 20 caracteres por línea',
     'Cinco opciones de color de fondo: blanco, crema, azul pálido, verde y gris',
     'Preferencias guardadas automáticamente en localStorage al ajustar cada parámetro',
-    'Procesamiento 100% local: el texto nunca sale del navegador',
+    'Procesamiento 100\u00A0% local: el texto nunca sale del navegador',
   ],
 });
 
@@ -57,7 +57,7 @@ export const faqJsonLd = {
       name: '¿Qué es la dislexia y cómo afecta a la lectura?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La dislexia es una dificultad específica del aprendizaje de base neurológica que afecta a la decodificación fluida de palabras escritas. Las personas con dislexia pueden confundir letras similares (b/d, p/q), perder el hilo en el renglón o necesitar releer varias veces para comprender. No está relacionada con la inteligencia y afecta a entre el 5% y el 15% de la población.',
+        text: 'La dislexia es una dificultad específica del aprendizaje de base neurológica que afecta a la decodificación fluida de palabras escritas. Las personas con dislexia pueden confundir letras similares (b/d, p/q), perder el hilo en el renglón o necesitar releer varias veces para comprender. No está relacionada con la inteligencia. El DSM-5 (Asociación Estadounidense de Psiquiatría, 2013) estima que entre el 5\u00A0% y el 15\u00A0% de los niños en edad escolar tienen un trastorno específico del aprendizaje, que agrupa las dificultades en lectura (la dislexia), escritura y matemáticas; en adultos lo sitúa en torno al 4\u00A0%.',
       },
     },
     {
@@ -65,7 +65,7 @@ export const faqJsonLd = {
       name: '¿Las fuentes especiales para dislexia realmente ayudan?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las fuentes diseñadas para dislexia (Lexend, OpenDyslexic, Dyslexie) añaden rasgos diferenciadores a letras que suelen confundirse y aumentan el espacio entre caracteres. La investigación muestra resultados mixtos: algunas personas con dislexia las encuentran muy útiles, mientras que para otras el mayor impacto viene del interlineado y el ancho de columna. Lo más recomendable es probar distintas combinaciones y quedarse con la que resulte más cómoda.',
+        text: 'Depende de la fuente y de la persona. OpenDyslexic y Dyslexie engruesan la base de las letras para romper la simetría entre b/d y p/q; Lexend no lo hace: sus letras especulares siguen siendo casi simétricas (la d de Lexend Deca coincide en un 89\u00A0% con la b reflejada), y lo que aporta es un espaciado más holgado. La evidencia comparativa entre fuentes es mixta; lo que tiene un respaldo más constante es ampliar el espacio entre letras (Zorzi y colaboradores, PNAS, 2012). Lo recomendable es probar distintas combinaciones con el propio texto y quedarse con la más cómoda.',
       },
     },
     {

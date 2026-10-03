@@ -70,6 +70,18 @@ import {
  * por cualquier letra y sin guion en cuanto no caben en la línea, y en móvil la columna del
  * texto adaptado mide 130 px (Pixel 7) o 95 px (360 px) con los ajustes de fábrica. Lo que
  * sigue abierto va en `test.fail()` con «ABIERTO, hallazgo (inspector 03/10/2026)».
+ *
+ * REPARACIÓN DEL 03/10/2026 (hallazgos 2724-2731): los ocho casos abiertos pasan a candado.
+ *   · 2724 — la columna del texto adaptado tiene un SUELO de 20 caracteres (min-width) y los
+ *     rellenos del móvil son más ajustados; `overflow-wrap: anywhere` pasa a `break-word`,
+ *     que solo parte lo que no cabe ni en una línea entera. CASOS 8, 8.bis y 8.ter.
+ *   · 2725 — en móvil, una muestra con los mismos estilos se queda fija arriba mientras se
+ *     recorren los ajustes. CASO 9.
+ *   · 2726/2729 — tokens de marca accesibles y marcadores de texto vacío con color propio.
+ *     CASOS 12, 12.bis y 12.ter.
+ *   · 2727/2728 — JSON-LD y bloque educativo con fuentes. CASOS 11 y 11.bis.
+ *   · 2730 — «5 %» y «20 px» con U+00A0. CASO 10.
+ *   · 2731 — «Copiar texto» lleva text/html con estilos en línea. CASOS 13.bis y 13.ter.
  */
 
 /** Lo que la app guarda en `localStorage`, con los campos que miran estos casos. */
@@ -111,6 +123,60 @@ async function bordeDerechoDelPanel(page: Page): Promise<{ derecha: number; view
 async function abrir(page: Page) {
   await page.goto(RUTA);
   await esperarHidratacion(page, DESLIZADORES);
+}
+
+/**
+ * Espera a que la vista previa pinte con Lexend, que es la fuente de fábrica y la más ancha de
+ * las tres: medir con Arial (la de reserva mientras carga) aprobaría de más. Si Google Fonts no
+ * responde en esta máquina, se mide con lo que haya y el caso lo dice en su anotación.
+ */
+async function esperarLexend(page: Page): Promise<void> {
+  const ok = await page
+    .waitForFunction(
+      () =>
+        document.fonts.check('20px "Lexend Deca"') &&
+        getComputedStyle(
+          document.querySelector('[aria-label="Texto con formato aplicado"]')!,
+        ).fontFamily.includes('Lexend'),
+      null,
+      { timeout: 15000 },
+    )
+    .then(() => true)
+    .catch(() => false);
+  if (!ok) test.info().annotations.push({ type: 'aviso', description: 'Lexend no cargó: medido con Arial' });
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+  });
+}
+
+/**
+ * Lo que se sale por la derecha de la pantalla, y lo que desborda la caja crema por dentro.
+ * `html` y `body` llevan `overflow-x: hidden` (globals.css), así que el `scrollWidth` del
+ * documento no basta: se miran los bordes de las piezas que pueden empujar.
+ */
+async function desbordes(page: Page): Promise<{ fuera: string[]; cajaDesborda: boolean }> {
+  return page.evaluate(() => {
+    const ancho = window.innerWidth;
+    const piezas: Record<string, Element | null> = {
+      panel: document.querySelector('aside[aria-label="Ajustes de lectura"]'),
+      principal: document.querySelector('main'),
+      vista: document.querySelector('[aria-label="Texto con formato aplicado"]'),
+    };
+    const fuera = Object.entries(piezas)
+      .filter(([, el]) => !el || el.getBoundingClientRect().right > ancho + 0.5)
+      .map(([n]) => n);
+    const caja = piezas.vista as HTMLElement;
+    return { fuera, cajaDesborda: caja.scrollWidth > caja.clientWidth + 1 };
+  });
+}
+
+/** Los ajustes que recomienda la guía de la propia app: 24 px · letras 12 % · ancho 60 %. */
+async function ajustesDeLaGuia(page: Page): Promise<void> {
+  await sembrarValor(page, '#slider-tamano', 24);
+  await sembrarValor(page, '#slider-letras', 0.12);
+  await sembrarValor(page, '#slider-ancho', 60);
+  await expect(vistaPrevia(page)).toHaveCSS('font-size', '24px');
+  await expect(vistaPrevia(page)).toHaveCSS('letter-spacing', '2.88px'); // 0,12 em × 24 px
 }
 
 /** Abre la app en el tema pedido (next-themes lo lee de `meskeia-theme` antes de pintar). */
@@ -222,10 +288,10 @@ test.describe('en escritorio', () => {
     await expect(texto).toHaveCSS('max-width', '50%'); // 50 % del contenedor
 
     // Y lo que la app dice creer, que es lo que lee el usuario en el panel.
-    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 28px');
-    await expect(etiqueta(page, 'slider-letras')).toHaveText('Espacio letras: 12%');
-    await expect(etiqueta(page, 'slider-palabras')).toHaveText('Espacio palabras: 40%');
-    await expect(etiqueta(page, 'slider-ancho')).toHaveText('Ancho columna: 50%');
+    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 28 px');
+    await expect(etiqueta(page, 'slider-letras')).toHaveText('Espacio letras: 12 %');
+    await expect(etiqueta(page, 'slider-palabras')).toHaveText('Espacio palabras: 40 %');
+    await expect(etiqueta(page, 'slider-ancho')).toHaveText('Ancho columna: 50 %');
   });
 
   test('CASO 1.bis — la fuente y el color de fondo elegidos llegan al texto, y quedan marcados', async ({
@@ -267,7 +333,7 @@ test.describe('en escritorio', () => {
     // etiqueta decía 68 % y el texto se maquetaba al 68 %, así que el pomo —y el valor que
     // anunciaba un lector de pantalla— decían una cosa y la app hacía otra. Hoy es step=1.
     await expect(page.locator('#slider-ancho')).toHaveValue('68');
-    await expect(etiqueta(page, 'slider-ancho')).toHaveText('Ancho columna: 68%');
+    await expect(etiqueta(page, 'slider-ancho')).toHaveText('Ancho columna: 68 %');
     await expect(vistaPrevia(page)).toHaveCSS('max-width', '68%');
   });
 
@@ -334,7 +400,7 @@ test.describe('en móvil (Pixel 7)', () => {
     await expect(texto).toHaveCSS('line-height', '16.8px'); // 1,2 × 14 px
     await expect(texto).toHaveCSS('max-width', '40%');
     // 14 px es el mínimo que declara la app: por debajo dejaría de cumplir su propia promesa.
-    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 14px');
+    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 14 px');
   });
 
   test('CASO 2.ter — un valor fuera de rango lo capa el propio control, sin romper nada', async ({
@@ -344,9 +410,9 @@ test.describe('en móvil (Pixel 7)', () => {
     expect(await sembrarValorAcotado(page, '#slider-letras', -5)).toBe('0'); // min = 0
     expect(await sembrarValorAcotado(page, '#slider-ancho', 1000)).toBe('100'); // max = 100
 
-    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 36px');
-    await expect(etiqueta(page, 'slider-letras')).toHaveText('Espacio letras: 0%');
-    await expect(etiqueta(page, 'slider-ancho')).toHaveText('Ancho columna: 100%');
+    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 36 px');
+    await expect(etiqueta(page, 'slider-letras')).toHaveText('Espacio letras: 0 %');
+    await expect(etiqueta(page, 'slider-ancho')).toHaveText('Ancho columna: 100 %');
     await expect(vistaPrevia(page)).toHaveCSS('font-size', '36px');
   });
 
@@ -388,10 +454,12 @@ test.describe('en móvil (Pixel 7)', () => {
   test('CASO 8 — con los ajustes de fábrica, ninguna palabra del texto de ejemplo se parte entre dos líneas', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): en móvil el texto adaptado parte palabras por cualquier letra y sin guion',
-    );
+    // REPARADO el 03/10/2026 (hallazgo 2724). Hoy: suelo de 20 caracteres en la columna y
+    // rellenos de 16 px en móvil: 412 − 32 − 2 − 32 − 4 − 16 = 326 px de caja, y el suelo
+    // (20 ch de Lexend a 20 px ≈ 250 px + 1 em del espaciado + 32 de relleno) supera al 68 %
+    // (222 px), así que manda el suelo: unas 22 letras por línea. Lo que sigue es la
+    // medida ANTERIOR, que es la que explica el caso:
+    //
     // De dónde sale el ancho de la columna, calculado ANTES de abrir el navegador (Pixel 7,
     // 412 px): 412 − 2×24 de `.container` = 364 · − 2×1 de borde − 2×24 de `.seccionVista`
     // = 314 · − 2×2 de borde − 2×24 de `.vistaContenedor` = 262 · × 68 % (`anchoColumna` de
@@ -407,35 +475,95 @@ test.describe('en móvil (Pixel 7)', () => {
     // 109,2 px. La Ortografía de la RAE (2010) solo admite partir por sílabas y con guion, y
     // en un lector para dislexia lo esperable es no partir. Simulando el CSS anterior al
     // 18/09 sobre esta misma página: 0 palabras partidas y el panel dentro de la pantalla.
-    await page.evaluate(async () => {
-      await document.fonts.ready;
-    });
+    await esperarLexend(page);
     await expect.poll(() => palabrasPartidas(page), { timeout: 3000 }).toEqual([]);
+    expect(await desbordes(page)).toEqual({ fuera: [], cajaDesborda: false });
+  });
+
+  test('CASO 8.ter (Pixel 7) — con los ajustes de la guía, ninguna palabra partida ni nada fuera de la pantalla', async ({
+    page,
+  }) => {
+    // La guía de la app recomienda 24 px, letras al 10-15 % y columna al 55-65 %. Medido el
+    // 03/10/2026 antes de reparar: 32 de 85 palabras partidas en una columna de 109 px.
+    await ajustesDeLaGuia(page);
+    await esperarLexend(page);
+    await expect.poll(() => palabrasPartidas(page), { timeout: 3000 }).toEqual([]);
+    expect(await desbordes(page)).toEqual({ fuera: [], cajaDesborda: false });
+  });
+
+  test('CASO 8.quater (Pixel 7) — una URL más larga que la línea se parte DENTRO de la caja (y solo ella)', async ({
+    page,
+  }) => {
+    // El último recurso de `overflow-wrap: break-word`: lo que no cabe ni en una línea
+    // entera se parte para no salirse de la caja crema (hallazgo 876). Las palabras normales
+    // de la misma frase, no.
+    const textarea = page.getByRole('textbox', { name: 'Texto a adaptar para lectura' });
+    const conCorreo =
+      'Escribe a coordinacion.pedagogica.centro.educativo@institutoejemplolargo.edu.example';
+    await textarea.fill(conCorreo);
+    await esperarValorEnReact(page, textarea, conCorreo);
+    await esperarLexend(page);
+    await expect.poll(() => palabrasPartidas(page), { timeout: 3000 }).toEqual([
+      'coordinacion.pedagogica.centro.educativo@institutoejemplolargo.edu.example',
+    ]);
+    expect(await desbordes(page)).toEqual({ fuera: [], cajaDesborda: false });
   });
 
   test('CASO 9 — mientras se mueve un deslizador se ve al menos una parte del texto adaptado', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): en móvil la vista previa queda a más de una pantalla de los deslizadores',
-    );
-    // La app promete «vista previa en tiempo real» (metadata.ts). En móvil el grid pasa a una
+    // REPARADO el 03/10/2026 (hallazgo 2725) con una muestra fija arriba, en el propio panel
+    // de ajustes, que aplica los mismos estilos que la vista previa al primer párrafo. La
+    // vista previa sigue donde estaba: lo que se comprueba ahora es que, con CADA deslizador
+    // en el centro de la pantalla, la muestra está entera a la vista, no la tapa la barra del
+    // logo ni tapa ella al pomo, y recibe el valor que se acaba de poner.
+    //
+    // El caso de origen —la medida que motivó el hallazgo— era este: la app promete «vista previa en tiempo real» (metadata.ts). En móvil el grid pasa a una
     // columna y el orden es panel → área de texto → vista previa: medido el 03/10/2026, la
     // vista previa empieza 1.263 px por debajo del deslizador de tamaño, con 839 px de
     // pantalla. No hay posición de desplazamiento en la que se vean a la vez el pomo y el
     // efecto de moverlo. Esperado: que la distancia entre los dos más el alto del deslizador
     // quepa en la altura de la pantalla.
-    await page.locator('#slider-tamano').scrollIntoViewIfNeeded();
-    const { distancia, alto } = await page.evaluate(() => {
-      const s = document.querySelector('#slider-tamano')!.getBoundingClientRect();
-      const v = document
-        .querySelector('[aria-label="Texto con formato aplicado"]')!
-        .getBoundingClientRect();
-      const hueco = v.top > s.bottom ? v.top - s.bottom : v.bottom < s.top ? s.top - v.bottom : 0;
-      return { distancia: Math.round(hueco + s.height), alto: window.innerHeight };
-    });
-    expect(distancia).toBeLessThan(alto);
+    // La que se ve: la copia fija si está pintada, y si no, la que va en línea en el panel.
+    const muestraVisible = () =>
+      page.locator('[data-muestra="fija"], [data-muestra="en-linea"]').last().locator('[class*="muestraTexto"]');
+    const valores: Record<string, number> = {
+      '#slider-tamano': 30,
+      '#slider-letras': 0.2,
+      '#slider-palabras': 0.3,
+      '#slider-lineas': 2.6,
+      '#slider-ancho': 90,
+    };
+    for (const [sel, valor] of Object.entries(valores)) {
+      await page.locator(sel).evaluate((el) => el.scrollIntoView({ block: 'center' }));
+      const v = await page.evaluate((selector) => {
+        const s = document.querySelector(selector)!.getBoundingClientRect();
+        const caja =
+          document.querySelector('[data-muestra="fija"]') ?? document.querySelector('[data-muestra="en-linea"]');
+        const m = caja!.querySelector('[class*="muestraTexto"]')!.getBoundingClientRect();
+        // ¿Lo que se ve en el centro de la muestra es la muestra, o la barra del logo encima?
+        const enMedio = document.elementFromPoint(m.left + m.width / 2, m.top + 4);
+        return {
+          aLaVista: m.top >= 0 && m.bottom <= window.innerHeight && m.height > 40,
+          noTapaAlPomo: m.bottom <= s.top,
+          noLaTapaNada: !!enMedio?.closest('[class*="muestraTexto"]'),
+        };
+      }, sel);
+      expect(v, `con ${sel} en el centro`).toEqual({ aLaVista: true, noTapaAlPomo: true, noLaTapaNada: true });
+      await sembrarValor(page, sel, valor);
+    }
+    // Y la muestra lleva lo que se acaba de poner, igual que la vista previa.
+    await expect(muestraVisible()).toHaveCSS('font-size', '30px');
+    await expect(muestraVisible()).toHaveCSS('letter-spacing', '6px'); // 0,2 em × 30 px
+    await expect(muestraVisible()).toHaveCSS('line-height', '78px'); // 2,6 × 30 px
+    await expect(vistaPrevia(page)).toHaveCSS('font-size', '30px');
+  });
+
+  test('CASO 9.ter — el texto de ejemplo ya no manda a «la izquierda», que en móvil no existe', async ({
+    page,
+  }) => {
+    // Hallazgo 2725, segunda parte: «Ajusta las opciones de la izquierda» solo vale en escritorio.
+    await expect(vistaPrevia(page)).not.toContainText('izquierda');
   });
 
   test('CASO 9.bis — con el dedo, los botones de fuente y de fondo responden', async ({ page }) => {
@@ -467,19 +595,27 @@ test.describe('en móvil estrecho (360 px)', () => {
   test('CASO 8.bis — con los ajustes de fábrica, ninguna palabra del texto de ejemplo se parte entre dos líneas', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): en móvil el texto adaptado parte palabras por cualquier letra y sin guion',
-    );
+    // REPARADO el 03/10/2026 (hallazgo 2724): 360 − 32 − 2 − 32 − 4 − 16 = 274 px de caja,
+    // todo para la columna (el suelo de 20 caracteres supera al 68 %). Medida ANTERIOR:
+    //
     // Mismo cálculo que el CASO 8 con 360 px: 360 − 48 = 312 · − 50 = 262 · − 52 = 210 ·
     // × 68 % = 142,8 · − 48 = 94,8 px para el texto, unas 7 letras por línea. Medido el
     // 03/10/2026: 20 de 85 palabras partidas («aprendiz|aje», «configur|ación»,
     // «diferent|e,»…), y el texto de ejemplo de 567 caracteres ocupa 3.386 px de alto.
     await abrir(page);
-    await page.evaluate(async () => {
-      await document.fonts.ready;
-    });
+    await esperarLexend(page);
     await expect.poll(() => palabrasPartidas(page), { timeout: 3000 }).toEqual([]);
+    expect(await desbordes(page)).toEqual({ fuera: [], cajaDesborda: false });
+  });
+
+  test('CASO 8.ter (360 px) — con los ajustes de la guía, ninguna palabra partida ni nada fuera de la pantalla', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await ajustesDeLaGuia(page);
+    await esperarLexend(page);
+    await expect.poll(() => palabrasPartidas(page), { timeout: 3000 }).toEqual([]);
+    expect(await desbordes(page)).toEqual({ fuera: [], cajaDesborda: false });
   });
 });
 
@@ -500,7 +636,7 @@ test.describe('robustez del texto', () => {
     await esperarValorEnReact(page, textarea, '');
 
     await expect(vistaPrevia(page)).toContainText('El texto aparecerá aquí con tus ajustes aplicados');
-    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 26px');
+    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 26 px');
     await expect(vistaPrevia(page)).toHaveCSS('font-size', '26px');
   });
 
@@ -587,7 +723,7 @@ test.describe('arranque y persistencia', () => {
     await expect(texto).toHaveCSS('max-width', '45%');
     await expect(texto).toHaveCSS('font-family', '"Courier New", Courier, monospace');
     await expect(texto).toHaveCSS('background-color', 'rgb(238, 244, 255)'); // #EEF4FF
-    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 32px');
+    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 32 px');
     // Y el testigo más directo del defecto: lo sembrado sigue en el almacenamiento.
     expect((await leerGuardado(page))?.tamano).toBe(32);
   });
@@ -607,7 +743,7 @@ test.describe('arranque y persistencia', () => {
     await esperarHidratacion(page, DESLIZADORES);
 
     await expect(vistaPrevia(page)).toHaveCSS('font-size', '34px');
-    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 34px');
+    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 34 px');
   });
 
   test('REGRESIÓN — una preferencia guardada incompleta se descarta entera (y en producción tira la app a la pantalla de error)', async ({
@@ -630,7 +766,7 @@ test.describe('arranque y persistencia', () => {
     await page.goto(RUTA);
 
     await expect(page.locator('h1')).toContainText('Adaptador de Lectura para Dislexia');
-    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 22px');
+    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 22 px');
   });
 });
 
@@ -785,27 +921,32 @@ test.describe('re-inspección: caso normal y entradas que se tratan aparte', () 
   });
 
   test('CASO 10 — el «%» va separado de la cifra con espacio duro (U+00A0)', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): las etiquetas pegan el «%» y el resumen usa un espacio normal',
-    );
-    // CLAUDE.md §2 (decidido el 25/09/2026): «15 %», separado con U+00A0. Hoy las etiquetas
-    // dicen «Espacio letras: 5%» y el resumen «letras 5 %» con un espacio normal (U+0020).
+    // REPARADO el 03/10/2026 (hallazgo 2730). CLAUDE.md §2 (decidido el 25/09/2026): «15 %»,
+    // separado con U+00A0. Hasta entonces las etiquetas decían «Espacio letras: 5%» y el
+    // resumen «letras 5 %» con un espacio normal (U+0020). Las cadenas de abajo llevan U+00A0.
     await abrir(page);
     const crudo = (l: Locator) => l.evaluate((el) => el.textContent ?? '');
     expect(await crudo(etiqueta(page, 'slider-letras'))).toContain('5 %');
     expect(await crudo(etiqueta(page, 'slider-ancho'))).toContain('68 %');
     const resumen = page.locator('[role="status"]').filter({ hasText: 'interlineado' });
     expect(await crudo(resumen)).toContain('letras 5 %');
+    expect(await crudo(etiqueta(page, 'slider-tamano'))).toContain('20 px');
+    // Y el bloque educativo, que tenía «el 5% y el 15%», «50–60%», «10-15%», «20–26px»…
+    // (se lee el textContent, que incluye lo plegado de la guía; solo las piezas de la app)
+    const todo = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('aside, main, [class*="guiaSeccion"]'))
+        .map((el) => el.textContent ?? '')
+        .join(' '),
+    );
+    expect(todo).toContain('¿Qué es la dislexia?');
+    // Ni cifra pegada a su unidad, ni separada con un espacio normal que la deje saltar sola
+    expect(todo.match(/\d ?(%|px)/g) ?? []).toEqual([]);
   });
 
   test('CASO 11 — el JSON-LD que leen buscadores e IA no contradice lo que dice la página de Lexend', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): el FAQPage sigue atribuyendo a Lexend rasgos diferenciadores b/d',
-    );
+    // REPARADO el 03/10/2026 (hallazgo 2727): el FAQPage dice ahora lo mismo que la página.
     // La reparación del hallazgo 880 (18/09/2026) corrigió la página —«sus letras especulares
     // siguen siendo casi simétricas… no es la fuente que busca quien confunde b/d o p/q»— pero
     // no tocó metadata.ts, cuyo FAQPage sigue diciendo que «Las fuentes diseñadas para
@@ -820,6 +961,35 @@ test.describe('re-inspección: caso normal y entradas que se tratan aparte', () 
     );
     expect(respuestas.length).toBeGreaterThan(0);
     expect(respuestas).not.toMatch(/Lexend[^.]*añaden rasgos diferenciadores/);
+    // Y lo dice en positivo, con la misma medida que la tabla de la página.
+    expect(respuestas).toMatch(/Lexend no lo hace/);
+    expect(respuestas).toMatch(/89\u00A0%/);
+  });
+
+  test('CASO 11.bis — las cifras del bloque educativo y del JSON-LD llevan su fuente', async ({ page }) => {
+    // Hallazgo 2728. El «5-15 %» es del DSM-5 (APA, 2013) para el trastorno específico del
+    // aprendizaje en edad ESCOLAR (lectura, escritura y matemáticas juntas), no para la
+    // dislexia en toda la población: así se dice ahora, en la página y en el JSON-LD.
+    await abrir(page);
+    const pagina = await page.evaluate(() => document.body.textContent ?? '');
+    expect(pagina).not.toMatch(/15\s?% de la población/);
+    expect(pagina).toMatch(/DSM-5[^.]*2013/);
+    expect(pagina).toMatch(/edad escolar/);
+    // Las valoraciones de la tabla que no son una medida se presentan como impresión.
+    const filas = page.locator('table tbody tr');
+    for (const criterio of ['Fatiga visual', 'Apta para imprimir', 'Uso habitual']) {
+      await expect(filas.filter({ hasText: criterio })).toContainText('Impresión subjetiva');
+    }
+    await expect(page.locator('table')).not.toContainText('muy buena');
+    // La FAQ ya no promete que el adaptador «reduce la confusión de letras».
+    expect(pagina).not.toMatch(/reduce la confusión de letras/);
+    const ld = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+        .map((s) => s.textContent ?? '')
+        .join(' '),
+    );
+    expect(ld).not.toMatch(/15\s?% de la población/);
+    expect(ld).toMatch(/DSM-5/);
   });
 });
 
@@ -827,27 +997,31 @@ test.describe('re-inspección: caso normal y entradas que se tratan aparte', () 
 // CASO 12 — contraste en los DOS temas (re-inspección del 03/10/2026)
 // ═══════════════════════════════════════════════════════════════════════════
 test.describe('contraste en los dos temas', () => {
-  /** Texto de marca y botón de marca: los tres que se ven sin abrir nada. */
+  /** Texto de marca y botón de marca: los que se ven sin abrir nada y los de la guía. */
   const MARCA = {
     'valor de la etiqueta': 'label[for="slider-tamano"] strong',
     'título «Ajustes»': 'aside[aria-label="Ajustes de lectura"] h2',
     'botón «Copiar texto»': 'section[aria-label="Vista previa del texto adaptado"] button',
+    'botón de fuente activo': '[aria-label="Selección de fuente"] button[aria-pressed="true"]',
+    'cabecera de la tabla': 'table th',
+    'celda destacada': 'table td[class*="celdaDestacada"]',
+    'h2 del bloque educativo': '[class*="guiaSeccion"] h2',
+    'número de paso': '[class*="stepNumber"]',
   };
 
   for (const tema of ['light', 'dark'] as const) {
     test(`CASO 12 (${tema}) — el color de marca como texto y como fondo de botón llega a 4,5:1`, async ({
       page,
     }) => {
-      test.fail(
-        true,
-        'ABIERTO, hallazgo (inspector 03/10/2026): el módulo redefine --primary #2E86AB en ambos temas',
-      );
-      // Calculado a mano con la fórmula WCAG: #2E86AB sobre #FFFFFF = 4,11:1 (claro) y sobre
+      // REPARADO el 03/10/2026 (hallazgo 2726): sin el --primary propio del módulo, con
+      // --primary-texto como texto y --primary-boton como fondo. Calculado a mano ANTES: con la fórmula WCAG: #2E86AB sobre #FFFFFF = 4,11:1 (claro) y sobre
       // la tarjeta #2A2A2A = 3,50:1 (oscuro); blanco sobre #2E86AB = 4,11:1 en los dos. Es
       // texto pequeño (13,6 a 17,6 px en negrita), así que el mínimo es 4,5:1. El módulo
       // declara `--primary: #2E86AB` en `.container` y no lo redeclara en oscuro, así que
       // tampoco le llega el #3FA5D1 de globals ni los tokens `--primary-texto`/`--primary-boton`.
       await abrirEnTema(page, tema);
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      await expect(page.locator('table th').first()).toBeVisible();
       const medidas: Record<string, number> = {};
       for (const [nombre, sel] of Object.entries(MARCA)) medidas[nombre] = await contraste(page, sel);
       expect(
@@ -869,10 +1043,8 @@ test.describe('contraste en los dos temas', () => {
   });
 
   test('CASO 12.ter (dark) — los marcadores de texto vacío se leen en oscuro', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): en oscuro el marcador de la vista previa da 2,73:1',
-    );
+    // REPARADO el 03/10/2026 (hallazgo 2729): el de la vista previa lleva un gris fijo
+    // (#595959, la caja es siempre clara) y el del área de texto, --text-secondary. ANTES:
     // La caja del texto adaptado es SIEMPRE clara (fondo crema), pero su marcador usa
     // `--text-muted`, que en oscuro vale #9B9B9B (e089700b, 22/09/2026): #9B9B9B sobre
     // #FEFDF6 = 2,73:1, calculado a mano. El del área de texto es el del navegador, #757575,
@@ -908,11 +1080,7 @@ test.describe('portapapeles', () => {
   test('CASO 13.bis — «Copiar texto» lleva al portapapeles el texto CON el formato de la vista previa', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): el botón de la vista previa copia solo el texto plano que se pegó',
-    );
-    // `copiarTexto` hace `navigator.clipboard.writeText(texto)`: el portapapeles recibe solo
+    // REPARADO el 03/10/2026 (hallazgo 2731). ANTES: `copiarTexto` hacía `navigator.clipboard.writeText(texto)`: el portapapeles recibe solo
     // text/plain, idéntico a lo que el usuario pegó. Ningún ajuste (fuente, tamaño, espaciado,
     // fondo) viaja al pegarlo en un procesador de textos.
     await abrir(page);
@@ -921,13 +1089,44 @@ test.describe('portapapeles', () => {
     await esperarValorEnReact(page, textarea, 'Hola mundo');
     await page.getByRole('button', { name: /mono/i }).click();
     await sembrarValor(page, '#slider-tamano', 28);
-    await page.getByRole('button', { name: 'Copiar texto al portapapeles' }).click();
-    await expect(page.getByRole('button', { name: 'Texto copiado al portapapeles' })).toBeVisible();
+    await page.getByRole('button', { name: 'Copiar texto' }).click();
+    await expect(page.getByRole('button', { name: 'Copiado con formato' })).toBeVisible();
 
-    const tipos = await page.evaluate(async () => {
+    const { tipos, html, plano } = await page.evaluate(async () => {
       const items = await navigator.clipboard.read();
-      return items.flatMap((i) => [...i.types]);
+      const item = items[0];
+      return {
+        tipos: items.flatMap((i) => [...i.types]),
+        html: await (await item.getType('text/html')).text(),
+        plano: await (await item.getType('text/plain')).text(),
+      };
     });
     expect(tipos).toContain('text/html');
+    expect(tipos).toContain('text/plain');
+    expect(plano).toBe('Hola mundo'); // la reserva, para pegar donde no hay formato
+    // Los estilos van EN LÍNEA y en puntos: 28 px × 0,75 = 21 pt; 0,05 em × 28 px = 1,4 px
+    // = 1,05 pt; 1,9 × 28 px = 53,2 px = 39,9 pt. Calculado a mano.
+    expect(html).toContain('Hola mundo');
+    expect(html).toContain('Courier New');
+    expect(html).toContain('font-size: 21pt');
+    expect(html).toContain('letter-spacing: 1.05pt');
+    expect(html).toContain('line-height: 39.9pt');
+    expect(html).toContain('background-color: #FEFDF6');
+  });
+
+  test('CASO 13.ter — sin ClipboardItem cae a texto plano y lo dice', async ({ page }) => {
+    // Un navegador sin ClipboardItem no puede copiar con formato: copiar en plano en
+    // silencio era el defecto, así que el botón y el aviso hablado lo cuentan.
+    await page.addInitScript(() => {
+      Reflect.deleteProperty(window, 'ClipboardItem');
+    });
+    await abrir(page);
+    const textarea = page.getByRole('textbox', { name: 'Texto a adaptar para lectura' });
+    await textarea.fill('Hola mundo');
+    await esperarValorEnReact(page, textarea, 'Hola mundo');
+    await page.getByRole('button', { name: 'Copiar texto' }).click();
+    await expect(page.getByRole('button', { name: 'Copiado sin formato' })).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'sin los ajustes' })).toBeVisible();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Hola mundo');
   });
 });

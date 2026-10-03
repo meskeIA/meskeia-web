@@ -3,10 +3,15 @@
    meskeIA - Paleta oficial
    ============================================ */
 
+/*
+  Sin --primary/--secondary/--accent propios (hallazgo 2726): el módulo declaraba
+  `--primary: #2E86AB` aquí y no lo redeclaraba en oscuro, así que tapaba el #3FA5D1 oscuro de
+  globals. Y #2E86AB como texto da 4,11:1 sobre blanco y 3,50:1 sobre la tarjeta oscura, igual
+  que el blanco encima de él como fondo de botón. El color de marca como TEXTO va con
+  --primary-texto y como FONDO de un texto blanco con --primary-boton, que existen en los dos
+  temas para esto.
+*/
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
-  --accent: #7FB3D3;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
   --text-secondary: #555555;
@@ -107,7 +112,7 @@
 .panelTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1.5rem;
   padding-bottom: 0.75rem;
   border-bottom: 2px solid var(--border);
@@ -128,7 +133,7 @@
 }
 
 .controlLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -162,7 +167,12 @@
 .fuenteBtn.activo {
   border-color: var(--primary);
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto); /* 4,9:1 sobre el tinte en claro */
+}
+
+/* En oscuro el tinte al 10 % deja el #3FA5D1 en 4,58:1, demasiado justo: al 6 %, 4,7:1 */
+[data-theme='dark'] .fuenteBtn.activo {
+  background: rgba(46, 134, 171, 0.06);
 }
 
 .fuenteEjemplo {
@@ -286,7 +296,7 @@
 
 .btnSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecundario:focus-visible {
@@ -349,6 +359,13 @@
   box-sizing: border-box;
 }
 
+.textarea::placeholder {
+  /* --text-secondary y no el gris del navegador (hallazgo 2729): #757575 sobre la tarjeta
+     oscura daba 2,76:1; así, 7,5:1 en claro y 5,9:1 en oscuro */
+  color: var(--text-secondary);
+  opacity: 1;
+}
+
 .textarea:focus {
   outline: none;
   border-color: var(--primary);
@@ -375,7 +392,7 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton); /* blanco encima: 5,47:1 en los dos temas */
   color: white;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -384,7 +401,7 @@
 }
 
 .btnPrimario:hover {
-  background: #256a8a;
+  background: color-mix(in srgb, var(--primary-boton) 85%, black);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(46, 134, 171, 0.35);
 }
@@ -392,6 +409,18 @@
 .btnPrimario:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 3px;
+}
+
+/* Resultado de «Copiar texto» (hallazgo 2731): vacío mientras no se copia */
+.avisoCopia {
+  margin: 0 0 0.5rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.avisoCopia:empty {
+  display: none;
 }
 
 /* Resumen hablado de los ajustes: sustituye al aria-live que estaba sobre todo el texto */
@@ -412,19 +441,32 @@
 
 /* El texto adaptado recibe sus estilos inline dinámicamente */
 .textoAdaptado {
-  /* max-width viene del estilo inline para controlar ancho de columna */
-  padding: 1.25rem 1.5rem;
+  /* max-width y min-width vienen del estilo inline (ancho de columna y su suelo); el suelo
+     suma dos veces este relleno lateral, por eso es una variable */
+  --relleno-x: 1.5rem;
+  padding: 1.25rem var(--relleno-x);
   border-radius: var(--radius);
   transition: all 0.3s ease;
   color: #1A1A1A; /* siempre oscuro para legibilidad sobre fondos claros */
   /*
-    Una palabra mas larga que la columna se parte en vez de desbordarla. `anywhere` y no
-    `break-word` porque solo la primera hace que el ancho MINIMO de la caja deje de contar
-    la palabra entera, que es lo que estiraba el grid. El precio es que un correo largo se
-    parte por donde toque; la alternativa era que el panel de ajustes se saliera de la
-    pantalla, y esta es una app que se usa sobre todo en el movil.
+    Partir palabras (hallazgos 876 y 2724).
+
+    Hasta el 03/10/2026 era `overflow-wrap: anywhere`, puesto el 18/09 para que una palabra
+    larga (un correo, una URL) no estirase el grid y sacara el panel de ajustes de la
+    pantalla. Pero eso ya lo resuelve el `min-width: 0` de `.layout > *`: con él la columna
+    del grid no crece con su contenido, y lo que no cabe se queda dentro de esta caja. Lo que
+    hacía `anywhere`, además, era partir CUALQUIER palabra que no cupiera en la línea, por
+    cualquier letra y sin guion, y en el móvil, con la columna al 68 % de 210-262 px, eso eran
+    4 de 85 palabras del ejemplo en un Pixel 7 y 20 de 85 a 360 px («aprendiz|aje»).
+
+    Ahora la columna tiene un suelo de 20 caracteres (CARACTERES_MINIMOS_LINEA en page.tsx),
+    así que las palabras de un texto normal caben enteras, y `break-word` queda como último
+    recurso para lo que no cabe ni en una línea entera: una URL, o los ajustes extremos
+    (36 px con letras al 30 %) en un móvil. Sin `hyphens: auto` a propósito: partiría con
+    guion en cada final de línea aunque la palabra cupiera en la siguiente, y para quien lee
+    con dislexia una palabra partida es una palabra más difícil.
   */
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .textoAdaptado p {
@@ -436,9 +478,37 @@
 }
 
 .placeholder {
-  color: var(--text-muted);
+  /*
+    Color FIJO y no --text-muted (hallazgo 2729): la caja del texto adaptado es SIEMPRE clara
+    (sus cinco fondos van de #EEF4FF a #FFFFFF), pero --text-muted es del tema, y en oscuro
+    vale #9B9B9B: 2,73:1 sobre el crema. #595959 da 6,6:1 sobre #EEF4FF, el más oscuro de
+    los cinco, y 7,0:1 sobre blanco, en los dos temas.
+  */
+  color: #595959;
   font-style: italic;
   font-size: 0.95rem;
+}
+
+/* ---- Muestra fija del móvil (hallazgo 2725): oculta en escritorio ---- */
+.muestraMovil {
+  display: none;
+}
+
+.muestraEtiqueta {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.muestraTexto {
+  /* Tope de alto: se ven unas líneas, lo justo para juzgar tamaño, espaciado e interlineado */
+  max-height: 26vh;
+  overflow: hidden;
+  border: 1px solid var(--border);
 }
 
 /* ============================================
@@ -447,7 +517,7 @@
 .guiaSeccion h2 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.5rem 0 0.5rem;
 }
 
@@ -489,12 +559,61 @@
 }
 
 @media (max-width: 768px) {
+  /*
+    Rellenos más ajustados en el móvil (hallazgo 2724). La columna del texto adaptado iba
+    metida en cuatro rellenos de 24 px —página, tarjeta, caja punteada y la propia caja
+    crema—, que en 360 px se comían 192 px de los 360. Ahora quedan 274 px para la caja
+    crema a 360 px y 326 px en un Pixel 7.
+  */
+  .container {
+    padding: 1.5rem 1rem;
+  }
+
+  .seccionTexto,
+  .seccionVista {
+    padding: 1rem;
+  }
+
+  .vistaContenedor {
+    padding: 0.5rem;
+  }
+
+  .textoAdaptado {
+    --relleno-x: 1rem;
+    padding: 1rem var(--relleno-x);
+  }
+
   .layout {
     grid-template-columns: 1fr;
   }
 
   .controlesPanel {
     position: static;
+    padding: 1rem;
+  }
+
+  .muestraMovil {
+    display: block;
+    margin: 0 0 1.25rem;
+  }
+
+  /*
+    La copia que se queda fija bajo la barra del logo (unos 64 px; TOPE_MUESTRA en page.tsx)
+    mientras se recorren los ajustes. No es sticky: ver el porqué en page.tsx. La caja empieza
+    en 0 y deja el hueco de la barra como relleno: así su fondo opaco tapa también la franja
+    de detrás del logo, por la que si no se veía pasar el texto del panel.
+  */
+  .muestraFija {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    margin: 0;
+    padding: calc(68px + 0.25rem) 1rem 0.75rem;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
   }
 
   .hero {
@@ -530,7 +649,9 @@
 
 .comparativaTable th {
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  /* Texto del tema y no de marca (hallazgo 2726): #2E86AB sobre este tinte daba 3,36:1 en
+     claro y 2,74:1 en oscuro; la marca se queda en el tinte y en el borde */
+  color: var(--text-primary);
   font-weight: 700;
   padding: 0.75rem 1rem;
   text-align: left;
@@ -554,7 +675,7 @@
 }
 
 .celdaDestacada {
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   font-weight: 700;
 }
 
@@ -655,7 +776,7 @@
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
