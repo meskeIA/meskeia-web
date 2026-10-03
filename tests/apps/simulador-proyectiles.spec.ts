@@ -55,8 +55,8 @@ import {
  *       incumplida. Ambas cosas quedan fijadas abajo.
  *
  *   (b) RESISTENCIA DEL AIRE. No es un rótulo: al activarla la app cambia de rama y integra
- *       numéricamente (Euler semi-implícito, dt = 0,01 s) con a = −g·ĵ − k·|v|·v⃗. Con
- *       k = 0,05 el alcance cae de 40,77 m a 17,33 m, que es una diferencia imposible de
+ *       numéricamente (Euler con dt = 0,01 s en 2026-09; RK4 desde el 03/10/2026) con a = −g·ĵ − k·|v|·v⃗. Con
+ *       k = 0,05 el alcance cae de 40,77 m a 17,53 m (17,33 con el Euler de entonces), que es una diferencia imposible de
  *       fingir. ⚠️ Pero el coeficiente k arranca en 0, así que el primer instante tras pulsar
  *       «Con resistencia del aire» sigue siendo el caso ideal (40,73 m, la diferencia es el
  *       sesgo del integrador). Se fija también ese estado intermedio.
@@ -108,6 +108,19 @@ import {
  *     (b) bajo stemum.com, de 1024 a 1120 px y a 800 px, la píldora «Stemum › Física» acaba en
  *         x = 232 y el título empieza en x ≥ 258: 0 puntos del h1 bajo la barra fija.
  *   Lo que sigue abierto va en test.fail() con «ABIERTO, hallazgo (inspector 03/10/2026)».
+ *
+ * REPARACIÓN DEL 03/10/2026 (hallazgos 2753-2763, los once cerrados)
+ *   · La rama con rozamiento es RK4 con paso adaptado a la escala de tiempo del problema, con el
+ *     impacto y el vértice buscados dentro del último paso, y sin tope de 200 s: un vuelo que no
+ *     llegara al suelo dentro de su cota de pasos se RECHAZA en vez de publicarse (2753, 2754).
+ *     Casos del motor en tests/proyectiles-motor.spec.ts, contra un RK4 independiente.
+ *   · La región viva de resultados es una frase aparte, fuera de la animación (2755).
+ *   · Ejes y rótulos del gráfico con clase y variante oscura (2756); tokens -boton/-texto (2757);
+ *     el botón activo se distingue en oscuro (2758); el tope de la escala vertical va dentro del
+ *     dibujo y alineado a la izquierda (2759), y los rótulos crecen con el ancho real (2760).
+ *   · FAQ y JSON-LD corregidos (2761, 2762, 2763), y una fila «Ángulo de máximo alcance» que
+ *     calcula el óptimo de cada caso en vez de dar horquillas.
+ *   Los test.fail() de esos once casos se han retirado; sus comentarios dicen qué se reparó.
  */
 
 /**
@@ -639,26 +652,47 @@ test.describe('Sospecha (a) descartada — y en móvil (390 px)', () => {
     await teclearYComprobar(page);
   });
 
-  // HALLAZGO (accesibilidad, bajo) — ABIERTO. Los rótulos de escala del gráfico («255 m»,
+  // HALLAZGO 2760 (accesibilidad, bajo) — REPARADO. Los rótulos de escala del gráfico («255 m»,
   // «73 m», «Distancia horizontal (m)») van a fontSize 11 en un viewBox de 800 de ancho; a
   // 390 px el <svg> mide 290 px, así que se pintan a 11·290/800 ≈ 4 px. Es la única escala del
   // dibujo. El suelo de 10 px es holgado: el texto más pequeño de la app en HTML mide 12 px.
+  // Reparado: el tamaño sale del ancho real del <svg> (ResizeObserver), así que tras hidratar
+  // la lectura se espera con poll.
   test('a 390 px los rótulos de escala del gráfico se pintan a 10 px o más', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): en móvil los rótulos de escala del gráfico se pintan a unos 4 px',
-    );
-    const tamanos = await page
-      .locator('svg[aria-label="Trayectoria del proyectil"] text')
-      .evaluateAll((textos) =>
-        textos.map((t) => {
-          const svg = (t as SVGTextElement).ownerSVGElement!;
-          const escala = svg.getScreenCTM()!.a;
-          return parseFloat(getComputedStyle(t).fontSize) * escala;
-        }),
-      );
-    expect(tamanos.length).toBeGreaterThan(0);
-    expect(Math.min(...tamanos)).toBeGreaterThanOrEqual(10);
+    const medir = () =>
+      page
+        .locator('svg[aria-label="Trayectoria del proyectil"] text')
+        .evaluateAll((textos) =>
+          textos.map((t) => {
+            const svg = (t as SVGTextElement).ownerSVGElement!;
+            const escala = svg.getScreenCTM()!.a;
+            return parseFloat(getComputedStyle(t).fontSize) * escala;
+          }),
+        );
+    await expect.poll(async () => Math.min(...(await medir()))).toBeGreaterThanOrEqual(10);
+    expect((await medir()).length).toBe(3);
+
+    // Y al crecer no se pisan: los dos rótulos de abajo quedan bajo la línea del suelo y
+    // separados entre sí, y el de la escala vertical, dentro del dibujo.
+    const cajas = await page.locator('svg[aria-label="Trayectoria del proyectil"]').evaluate((svg) => {
+      const suelo = Number(svg.querySelector('line')!.getAttribute('y1'));
+      const caja = (t: Element) => (t as SVGTextElement).getBBox();
+      const [x, y, titulo] = Array.from(svg.querySelectorAll('text'));
+      const bx = caja(x);
+      const by = caja(y);
+      const bt = caja(titulo);
+      return {
+        suelo,
+        topeAbajo: Math.min(bx.y, bt.y),
+        solape: bt.x + bt.width > bx.x,
+        yIzquierda: by.x,
+        yDerecha: by.x + by.width,
+      };
+    });
+    expect(cajas.topeAbajo).toBeGreaterThan(cajas.suelo);
+    expect(cajas.solape).toBe(false);
+    expect(cajas.yIzquierda).toBeGreaterThanOrEqual(0);
+    expect(cajas.yDerecha).toBeLessThanOrEqual(800);
   });
 });
 
@@ -753,21 +787,20 @@ test.describe('Sospecha (b) descartada — la barra fija no tapa el título', ()
 // ═══════════════════════════════════════════════════════════════════════════
 
 test.describe('Hallazgos abiertos — cálculo con rozamiento', () => {
-  // HALLAZGO (calculo, medio) — ABIERTO. La rama con rozamiento integra con
+  // HALLAZGO 2753 (calculo, medio) — REPARADO. La rama con rozamiento integraba con
   // `while (y >= 0 && t < T_MAX …)` y T_MAX = 200 s: un vuelo más largo se corta en seco y el
   // último punto —en el aire— se presenta como impacto (alcance, tiempo y velocidad).
   // Caso: g = 0,5, v₀ = 100, θ = 45°, «Con resistencia» con k = 0 (el deslizador lo rotula
   // «0 (sin resistencia)»: la misma física que la solución cerrada). Sin rozamiento la app da
   // 20.000,00 m en 282,84 s (= 10000/0,5 y 2·70,710678/0,5); con k = 0 daba 14.142,84 m en
-  // 200,01 s y 76,54 m/s, con el proyectil a media altura del dibujo. La tolerancia (1 s,
-  // 100 m) es la del defecto —un 30 %—, no la del sesgo de Euler, que tiene su propio caso.
+  // 200,01 s y 76,54 m/s, con el proyectil a media altura del dibujo.
+  // Reparado con RK4 y sin tope de tiempo (el paso se adapta a la escala del vuelo): con k = 0 la
+  // aceleración es constante y RK4 es exacto, así que se exigen las MISMAS cifras que la solución
+  // cerrada. Segundo caso, con rozamiento real y g = 0,1: verdad (RK4 de paso fijo 10⁻³ s,
+  // independiente del motor) 2571,14 m en 333,40 s, que con el tope antiguo salía 2270,86 m en 200 s.
   test('g = 0,5, k = 0, v₀ = 100, θ = 45° → 20.000 m en 282,84 s, como sin rozamiento', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): con rozamiento, un vuelo de más de 200 s se corta y se presenta como impacto',
-    );
     await sembrarValor(page, '#v0', 100);
     await page.locator('#gravedad').fill('0.5');
     await esperarValorEnReact(page, '#gravedad', '0.5');
@@ -777,25 +810,35 @@ test.describe('Hallazgos abiertos — cálculo con rozamiento', () => {
     await page.getByRole('button', { name: 'Con resistencia del aire' }).click();
     await esperarValorEnReact(page, '#resistencia', '0.01');
     await sembrarValor(page, '#resistencia', 0);
-    await expect
-      .poll(async () => Math.abs(cifra(await tiempoVuelo(page)) - 282.842712))
-      .toBeLessThanOrEqual(1);
-    expect(Math.abs(cifra(await alcance(page)) - 20000)).toBeLessThanOrEqual(100);
+    await expect.poll(() => tiempoVuelo(page)).toBe('282,84 s');
+    await expect.poll(() => alcance(page)).toBe('20.000,00 m');
+    await expect.poll(() => vImpacto(page)).toBe('100,00 m/s');
+    // Y el proyectil termina en el suelo del dibujo, no a media altura.
+    await page.getByRole('button', { name: /Lanzar proyectil/ }).click();
+    await expect(page.getByRole('button', { name: /Lanzar proyectil/ })).toBeEnabled({ timeout: 6000 });
+    const cy = Number(
+      await page.locator('svg[aria-label="Trayectoria del proyectil"] circle').getAttribute('cy'),
+    );
+    expect(cy).toBe(370);
+
+    // g = 0,1 con k = 0,001: 333,40 s de vuelo, más allá del antiguo tope de 200 s.
+    await page.locator('#gravedad').fill('0.1');
+    await esperarValorEnReact(page, '#gravedad', '0.1');
+    await sembrarValor(page, '#resistencia', 0.001);
+    await expect.poll(() => tiempoVuelo(page)).toBe('333,40 s');
+    await expect.poll(() => alcance(page)).toBe('2571,14 m');
   });
 
-  // HALLAZGO (calculo, bajo) — ABIERTO. La rama con rozamiento es Euler semi-implícito con
+  // HALLAZGO 2754 (calculo, bajo) — REPARADO. La rama con rozamiento era Euler semi-implícito con
   // dt = 0,01 s, y su sesgo (−½·g·dt·t en la altura, más el error de primer orden del
   // rozamiento) se publica con dos decimales. Con k = 0, que el deslizador rotula «sin
   // resistencia», da 40,73 m · 10,12 m · 19,98 m/s donde el modo ideal da 40,77 · 10,19 · 20,00;
   // con k = 0,05, 17,33 m · 5,93 m · 2,18 s frente a la verdad del modelo (RK4) 17,53 · 6,04 ·
-  // 2,20. Tolerancia: una unidad de la última cifra que la app MUESTRA.
+  // 2,20. Tolerancia: una unidad de la última cifra que la app MUESTRA. Reparado con RK4; se
+  // añade el caso de v₀ = 100 (Euler daba 44,82 m frente a 45,96 m).
   test('con rozamiento, cada cifra está a una unidad de su último decimal de la verdad del modelo', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): el integrador con dt = 0,01 s se aparta hasta 20 cm de la verdad y lo publica con dos decimales',
-    );
     await sembrarValor(page, '#v0', 20);
     await page.getByRole('button', { name: 'Con resistencia del aire' }).click();
     await esperarValorEnReact(page, '#resistencia', '0.01');
@@ -815,6 +858,14 @@ test.describe('Hallazgos abiertos — cálculo con rozamiento', () => {
     mirar('k = 0,05 · alcance', await alcance(page), 17.52553);
     mirar('k = 0,05 · altura máx.', await alturaMax(page), 6.03505);
     mirar('k = 0,05 · tiempo', await tiempoVuelo(page), 2.20178);
+    mirar('k = 0,05 · v impacto', await vImpacto(page), 10.24719);
+
+    // v₀ = 100, k = 0,05 → RK4 de referencia: 45,96040 m · 24,44121 m · 4,36236 s
+    await sembrarValor(page, '#v0', 100);
+    await expect.poll(async () => cifra(await alcance(page))).toBeGreaterThan(40);
+    mirar('v₀ = 100 · alcance', await alcance(page), 45.9604);
+    mirar('v₀ = 100 · altura máx.', await alturaMax(page), 24.44121);
+    mirar('v₀ = 100 · tiempo', await tiempoVuelo(page), 4.36236);
     expect(fallos).toEqual([]);
   });
 });
@@ -840,17 +891,76 @@ async function pasarAOscuro(page: Page): Promise<void> {
   await page.waitForTimeout(300); // las transiciones de los botones son de 0,15 s
 }
 
+/**
+ * Los pares texto/fondo en color de marca que estaban bajo 4,5:1 (hallazgo 2757), en claro y en
+ * oscuro. Devuelve los que siguen bajo el listón.
+ */
+async function textosDeMarcaBajos(page: Page): Promise<{ claro: string[]; oscuro: string[] }> {
+  await page.getByRole('button', { name: /Añadir a comparativa/ }).click();
+  await expect(page.getByRole('button', { name: 'Limpiar comparativa' })).toBeVisible();
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(300);
+  const medir = () =>
+    page.evaluate(() => {
+      const fondoDe = (el: Element | null): string => {
+        for (let e = el; e; e = e.parentElement) {
+          const c = getComputedStyle(e).backgroundColor;
+          const a = c.match(/rgba\([^)]*,\s*([\d.]+)\)/);
+          if (c !== 'transparent' && !(a && Number(a[1]) < 0.5)) return c;
+        }
+        return 'rgb(255, 255, 255)';
+      };
+      const sel: Record<string, string> = {
+        'Lanzar proyectil': '[class*="calcBtn"]',
+        'preset activo': '[class*="gravityBtn"][aria-pressed="true"]',
+        'modo activo': '[class*="modeBtn"][aria-pressed="true"]',
+        'valor del deslizador': '[class*="sliderValue"]',
+        'Añadir a comparativa': '[class*="secondaryBtn"]',
+        'Limpiar comparativa': '[class*="dangerBtn"]',
+        'tarjeta comparada': '[class*="lanzamientoInfo"] strong',
+        'paso de la guía': '[class*="stepNumber"]',
+        'h4 de escenario': '[class*="escenarioCard"] h4',
+      };
+      const salida = Object.entries(sel).map(([nombre, s]) => {
+        const el = document.querySelector(s)!;
+        return { nombre, texto: getComputedStyle(el).color, fondo: fondoDe(el) };
+      });
+      // Los valores destacados van sobre un degradado: contra cada parada.
+      const bloque = document.querySelector('[class*="resultBlock"]')!;
+      const paradas = getComputedStyle(bloque).backgroundImage.match(/rgb\([^)]+\)/g) ?? [];
+      document.querySelectorAll('[class*="resultValueAccent"]').forEach((v, i) => {
+        for (const p of paradas) {
+          salida.push({ nombre: `valor destacado ${i + 1}`, texto: getComputedStyle(v).color, fondo: p });
+        }
+      });
+      return salida;
+    });
+  const bajos = (pares: { nombre: string; texto: string; fondo: string }[]) =>
+    pares
+      .map((p) => ({ ...p, ratio: contraste(p.texto, p.fondo) }))
+      .filter((p) => p.ratio < 4.5)
+      .map((p) => `${p.nombre} ${p.ratio.toFixed(2)}:1`);
+  // La guía está colapsada: se abre para que los pasos y los h4 existan.
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(300);
+  const pares = await medir();
+  expect(pares.length).toBeGreaterThan(12);
+  const claro = bajos(pares);
+  await pasarAOscuro(page);
+  const oscuro = bajos(await medir());
+  return { claro, oscuro };
+}
+
 test.describe('Hallazgos abiertos — accesibilidad y dibujo', () => {
-  // HALLAZGO (accesibilidad, medio) — ABIERTO. La sección de resultados es role="status" con
+  // HALLAZGO 2755 (accesibilidad, medio) — REPARADO. La sección de resultados era role="status" con
   // aria-live="polite" y aria-atomic="true", y dentro está la fila «Energía cinética … en
   // proyectil actual», que cambia en cada fotograma de la animación, además de la caja de
   // fórmulas (466 caracteres en total). Medido: un lanzamiento de 1,7 s produce 103 cambios y 71
   // textos distintos de la región, y un lector de pantalla tiene que releerla entera cada vez.
+  // Reparado: la única región viva es una frase sr-only con alcance, altura y tiempo, que no
+  // depende de la animación. El localizador del test ya buscaba por atributo y la encuentra.
   test('lanzar el proyectil no re-anuncia los resultados en cada fotograma', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): la región viva atómica cambia en cada fotograma de la animación',
-    );
     await sembrarValor(page, '#v0', 20);
     await expect.poll(() => alcance(page)).toBe('40,77 m');
     await page.evaluate(() => {
@@ -871,96 +981,77 @@ test.describe('Hallazgos abiertos — accesibilidad y dibujo', () => {
     await page.getByRole('button', { name: /Lanzar proyectil/ }).click();
     // duración = min(4000, 2,883 s·600) = 1730 ms
     await page.waitForTimeout(2500);
-    const peor = await page.evaluate(() => {
+    const { peor, regiones } = await page.evaluate(() => {
       const w = window as unknown as { __textosVivos: Map<Element, Set<string>> };
-      return Math.max(0, ...Array.from(w.__textosVivos.values()).map((s) => s.size));
+      return {
+        peor: Math.max(0, ...Array.from(w.__textosVivos.values()).map((s) => s.size)),
+        regiones: w.__textosVivos.size,
+      };
     });
+    // Que haya región (si no, el test pasaría en falso) y que no se re-anuncie en cada fotograma.
+    expect(regiones).toBeGreaterThan(0);
     expect(peor).toBeLessThanOrEqual(2);
+    // Y lo que anuncia son los resultados, en una frase corta.
+    await expect(page.locator('main [role="status"]')).toHaveText(
+      'Alcance 40,77 m, altura máxima 10,19 m, tiempo de vuelo 2,88 s.',
+    );
   });
 
-  // HALLAZGO (accesibilidad, medio) — ABIERTO. En oscuro, los ejes y los rótulos del gráfico
+  // HALLAZGO 2756 (accesibilidad, medio) — REPARADO. En oscuro, los ejes y los rótulos del gráfico
   // siguen en #374151 (fill y stroke fijos en el JSX) sobre el degradado oscuro del lienzo
   // (#0c4a6e → #064e3b → #022c22): 1,09 · 1,06 · 1,47:1. «Distancia horizontal (m)» y la escala
-  // («255 m», «73 m») no se ven. En claro, 8,98:1 o más.
+  // («255 m», «73 m») no se ven. En claro, 8,98:1 o más. Reparado con clases y variante oscura
+  // (#e5e7eb: 7,64:1 o más); se miden ahora TODOS los rótulos, no solo el primero.
   test('en oscuro los rótulos del gráfico se leen sobre el lienzo (4,5:1)', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): en oscuro los ejes y rótulos del gráfico quedan a 1,1:1 del fondo',
-    );
     const medir = () =>
       page.locator('[class*="canvasContainer"]').evaluate((c) => {
         const paradas = getComputedStyle(c).backgroundImage.match(/rgb\([^)]+\)/g) ?? [];
-        const relleno = getComputedStyle(c.querySelector('svg text')!).fill;
-        return { paradas, relleno };
+        const rellenos = Array.from(c.querySelectorAll('svg text')).map((t) => getComputedStyle(t).fill);
+        const ejes = Array.from(c.querySelectorAll('svg line')).map((l) => getComputedStyle(l).stroke);
+        return { paradas, rellenos, ejes };
       });
+    const peor = (m: { paradas: string[]; rellenos: string[]; ejes: string[] }, de: 'rellenos' | 'ejes') =>
+      Math.min(...m[de].flatMap((color) => m.paradas.map((p) => contraste(color, p))));
     const claro = await medir();
     expect(claro.paradas.length).toBeGreaterThan(1);
-    expect(Math.min(...claro.paradas.map((p) => contraste(claro.relleno, p)))).toBeGreaterThanOrEqual(4.5);
+    expect(claro.rellenos.length).toBe(3);
+    expect(peor(claro, 'rellenos')).toBeGreaterThanOrEqual(4.5);
+    expect(peor(claro, 'ejes')).toBeGreaterThanOrEqual(3);
 
     await pasarAOscuro(page);
     const oscuro = await medir();
     expect(oscuro.paradas.length).toBeGreaterThan(1);
-    expect(Math.min(...oscuro.paradas.map((p) => contraste(oscuro.relleno, p)))).toBeGreaterThanOrEqual(4.5);
+    expect(peor(oscuro, 'rellenos')).toBeGreaterThanOrEqual(4.5);
+    expect(peor(oscuro, 'ejes')).toBeGreaterThanOrEqual(3);
   });
 
-  // HALLAZGO (accesibilidad, medio) — ABIERTO. Texto sobre el color de marca sin 4,5:1. En claro:
+  // HALLAZGO 2757 (accesibilidad, medio) — REPARADO. Texto sobre el color de marca sin 4,5:1. En claro:
   // «Lanzar proyectil» y el preset activo, blanco sobre --primary (4,11:1); el modo activo,
   // blanco sobre --secondary (2,80:1); el valor de cada deslizador, --primary sobre la tarjeta
   // (4,11:1); «Añadir a comparativa», --primary sobre #FAFAFA (3,93:1). En oscuro: «Lanzar
   // proyectil», blanco sobre #3FA5D1 (2,79:1) y «Limpiar comparativa», #dc2626 sobre #1A1A1A
   // (3,60:1). Ninguno es texto grande (≤ 15,2 px). Existen --primary-boton y --secondary-boton.
+  // Reparado con los tokens -boton/-texto, #f87171 para «Limpiar» en oscuro y un degradado de
+  // resultados más oscuro. Se añaden a la medida los valores destacados de resultados, el h4 de
+  // los escenarios y la cabecera de la tarjeta comparada, y la misma medida bajo stemum.com.
   test('los textos sobre el color de marca llegan a 4,5:1 en los dos temas', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): botones y valores en color de marca por debajo de 4,5:1',
-    );
-    await page.getByRole('button', { name: /Añadir a comparativa/ }).click();
-    await expect(page.getByRole('button', { name: 'Limpiar comparativa' })).toBeVisible();
-    await page.mouse.move(0, 0);
-    await page.waitForTimeout(300);
-    const medir = () =>
-      page.evaluate(() => {
-        const fondoDe = (el: Element | null): string => {
-          for (let e = el; e; e = e.parentElement) {
-            const c = getComputedStyle(e).backgroundColor;
-            const a = c.match(/rgba\([^)]*,\s*([\d.]+)\)/);
-            if (c !== 'transparent' && !(a && Number(a[1]) < 0.5)) return c;
-          }
-          return 'rgb(255, 255, 255)';
-        };
-        const sel: Record<string, string> = {
-          'Lanzar proyectil': '[class*="calcBtn"]',
-          'preset activo': '[class*="gravityBtn"][aria-pressed="true"]',
-          'modo activo': '[class*="modeBtn"][aria-pressed="true"]',
-          'valor del deslizador': '[class*="sliderValue"]',
-          'Añadir a comparativa': '[class*="secondaryBtn"]',
-          'Limpiar comparativa': '[class*="dangerBtn"]',
-        };
-        return Object.entries(sel).map(([nombre, s]) => {
-          const el = document.querySelector(s)!;
-          return { nombre, texto: getComputedStyle(el).color, fondo: fondoDe(el) };
-        });
-      });
-    const bajos = (pares: { nombre: string; texto: string; fondo: string }[]) =>
-      pares
-        .map((p) => ({ ...p, ratio: contraste(p.texto, p.fondo) }))
-        .filter((p) => p.ratio < 4.5)
-        .map((p) => `${p.nombre} ${p.ratio.toFixed(2)}:1`);
-    const claro = bajos(await medir());
-    await pasarAOscuro(page);
-    const oscuro = bajos(await medir());
-    expect({ claro, oscuro }).toEqual({ claro: [], oscuro: [] });
+    expect(await textosDeMarcaBajos(page)).toEqual({ claro: [], oscuro: [] });
   });
 
-  // HALLAZGO (accesibilidad, bajo) — ABIERTO. En oscuro, `[data-theme='dark'] .gravityBtn` y
+  test('y bajo stemum.com, con el violeta del portal, también', async ({ page }) => {
+    await puenteHmr(page);
+    await page.goto('http://stemum.com/simulador-proyectiles/');
+    await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
+    await esperarHidratacion(page, ['#v0', '#angulo', '#altura']);
+    expect(await textosDeMarcaBajos(page)).toEqual({ claro: [], oscuro: [] });
+  });
+
+  // HALLAZGO 2758 (accesibilidad, bajo) — REPARADO. En oscuro, `[data-theme='dark'] .gravityBtn` y
   // `.modeBtn` (0,2,0) ganan a `.gravityActive` y `.modeActive` (0,1,0): el activo pierde su fondo
   // y su borde, y queda igual que los demás (#2a2a2a con borde #4b5563). Solo cambia el tono del
   // texto, blanco frente a #B0B0B0 (2,17:1 entre ellos): no se ve qué planeta ni qué modo está puesto.
+  // Reparado con `.gravityBtn.gravityActive` y su variante oscura de mayor especificidad.
   test('en oscuro el preset y el modo activos se distinguen de los demás', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): en oscuro el botón activo pierde su fondo y su borde',
-    );
     const firmas = () =>
       page.evaluate(() => {
         const firma = (s: string) => {
@@ -989,56 +1080,87 @@ test.describe('Hallazgos abiertos — accesibilidad y dibujo', () => {
     expect(oscuro.modo[0]).not.toBe(oscuro.modo[1]);
   });
 
-  // HALLAZGO (operativa, bajo) — ABIERTO. El rótulo de la escala vertical va en x = 22 con
+  // HALLAZGO 2759 (operativa, bajo) — REPARADO. El rótulo de la escala vertical iba en x = 22 con
   // text-anchor="end", así que desde tres cifras empieza a la izquierda del viewBox y el <svg>
   // lo recorta. Con el ejemplo de la propia FAQ (50 m/s a 45° en la Luna): H = 385,80 m → tope
   // de la escala 385,80·1,15 = 443,67 → «444 m», que en pantalla se lee «44 m».
+  // Reparado: va dentro del dibujo con text-anchor="start". El localizador pasa de `x="22"` a
+  // `data-eje="y"`. Se prueba también una cifra de cuatro dígitos: Luna con 100 m/s →
+  // H = 10000·0,5/3,24 = 1543,21 m → tope 1774,69 → «1775 m».
   test('con la Luna (50 m/s a 45°) el rótulo «444 m» de la escala vertical cabe entero', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): la escala vertical se recorta por la izquierda desde tres cifras',
-    );
     await page.getByRole('button', { name: 'Luna', exact: true }).click();
     await esperarValorEnReact(page, '#gravedad', '1.62');
-    const rotulo = page.locator('svg[aria-label="Trayectoria del proyectil"] text[x="22"]');
+    const rotulo = page.locator('svg[aria-label="Trayectoria del proyectil"] text[data-eje="y"]');
     await expect(rotulo).toHaveText('444 m');
     const izquierda = await rotulo.evaluate((t) => (t as SVGTextElement).getBBox().x);
     expect(izquierda).toBeGreaterThanOrEqual(0);
+
+    await sembrarValor(page, '#v0', 100);
+    await expect(rotulo).toHaveText('1775 m');
+    const caja = await rotulo.evaluate((t) => {
+      const b = (t as SVGTextElement).getBBox();
+      return { izquierda: b.x, derecha: b.x + b.width };
+    });
+    expect(caja.izquierda).toBeGreaterThanOrEqual(0);
+    expect(caja.derecha).toBeLessThanOrEqual(800);
   });
 });
 
 test.describe('Hallazgos abiertos — contenido', () => {
-  // HALLAZGO (contenido, bajo) — ABIERTO. La FAQ dice que con rozamiento la trayectoria «cae más
+  // HALLAZGO 2761 (contenido, bajo) — REPARADO. La FAQ decía que con rozamiento la trayectoria «cae más
   // rápido de lo que sube». Es al revés: con F = −k·|v|·v⃗ la bajada dura MÁS que la subida
   // (v₀ = 20, θ = 45°, k = 0,05 → RK4: subida 1,00 s y bajada 1,20 s; la propia trayectoria de la
   // app, muestreada a 0,01 s, alcanza el vértice a los 0,97 s de 2,18). Lo que sí es más
-  // empinado es el tramo de bajada, que es lo que dice bien el JSON-LD.
+  // empinado es el tramo de bajada, que es lo que dice bien el JSON-LD. Reparado: la FAQ dice ahora
+  // que tarda más en bajar que en subir, con las cifras del caso, que se comprueban aquí contra
+  // la trayectoria que dibuja la app (el punto más alto de la polilínea).
   test('la FAQ no dice que con rozamiento el proyectil «cae más rápido de lo que sube»', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): la FAQ invierte la asimetría temporal del tiro con rozamiento',
-    );
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     await expect(page.locator('main')).toContainText('¿Qué pasa si añadimos resistencia del aire?');
-    expect(await page.locator('main').innerText()).not.toContain('cae más rápido de lo que sube');
+    const texto = await page.locator('main').innerText();
+    expect(texto).not.toContain('cae más rápido de lo que sube');
+    expect(texto).toContain('tarda más en bajar que en subir');
+    expect(texto).toContain('1,00 s de subida y 1,20 s de bajada');
+
+    // Las cifras de la FAQ, contra la propia app: v₀ = 20, θ = 45°, k = 0,05 → vértice a 1,00 s
+    // de 2,20 s (RK4 de referencia: 1,0009 y 2,20178).
+    await sembrarValor(page, '#v0', 20);
+    await page.getByRole('button', { name: 'Con resistencia del aire' }).click();
+    await esperarValorEnReact(page, '#resistencia', '0.01');
+    await sembrarValor(page, '#resistencia', 0.05);
+    await expect.poll(() => tiempoVuelo(page)).toBe('2,20 s');
+    // La polilínea en coordenadas del SVG: el punto más alto es el de y MENOR. Con la bajada más
+    // empinada, el vértice queda pasada la mitad del recorrido horizontal.
+    const { xVertice, xFinal } = await page
+      .locator('svg[aria-label="Trayectoria del proyectil"] polyline')
+      .last()
+      .evaluate((pl) => {
+        const pts = (pl.getAttribute('points') ?? '').trim().split(/\s+/).map((p) => p.split(',').map(Number));
+        const vertice = pts.reduce((m, p) => (p[1] < m[1] ? p : m), pts[0]);
+        return { xVertice: vertice[0] - 30, xFinal: pts[pts.length - 1][0] - 30 };
+      });
+    // Con rozamiento el vértice está más allá de la mitad del recorrido horizontal: la bajada es
+    // más corta en x y más empinada (RK4: vértice en x = 10,12 m de 17,53 m, un 58 %).
+    expect(xVertice / xFinal).toBeGreaterThan(0.55);
   });
 
-  // HALLAZGO (contenido, bajo) — ABIERTO. Dos horquillas de ángulo óptimo sin fuente que la
+  // HALLAZGO 2762 (contenido, bajo) — REPARADO. Dos horquillas de ángulo óptimo sin fuente que la
   // propia app desmiente: «35-40° para velocidades altas» con rozamiento (a 100 m/s con
   // k = 0,05 el óptimo es 27°: RK4 50,89 m a 27° · 50,74 a 30° · 49,85 a 35° · 48,24 a 40°) y
   // «típicamente 35-42°» desde altura (con h₀ = 30 m y v₀ = 20 m/s, tan θ = v₀/√(v₀² + 2gh₀) →
   // 32,5°; el caso «Trampa (a)» de arriba ya mide 30° por delante de 35°).
+  // Reparado: la guía da la fórmula cerrada desde altura y, con rozamiento, que el óptimo depende
+  // de v₀ y k, con un caso; y la app calcula una fila «Ángulo de máximo alcance» (fórmula cerrada
+  // sin rozamiento, sección áurea sobre el integrador con él). Verdades: RK4 de referencia a
+  // 100 m/s y k = 0,05 → máximo en 27,04° con 50,888 m · desde 30 m a 20 m/s → atan(20/√988,6) =
+  // 32,46° y R = (v₀/g)·√(v₀² + 2gh₀) = 2,038736·31,442010 = 64,102 m.
   test('a 100 m/s con k = 0,05 el óptimo queda por debajo de 35°, y la guía no lo acota en 35-40°', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): horquillas de ángulo óptimo sin fuente que la app desmiente',
-    );
     await sembrarValor(page, '#v0', 100);
     await page.getByRole('button', { name: 'Con resistencia del aire' }).click();
     await esperarValorEnReact(page, '#resistencia', '0.01');
@@ -1057,24 +1179,49 @@ test.describe('Hallazgos abiertos — contenido', () => {
     expect(cifra(a30)).toBeGreaterThan(cifra(a35));
     expect(cifra(a35)).toBeGreaterThan(cifra(a40));
 
+    // La fila del óptimo, con estos mismos parámetros (el ángulo actual no le afecta).
+    await expect.poll(() => leerFila(page, 'Ángulo de máximo alcance')).toBe('27,0° (50,89 m)');
+
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const texto = await page.locator('main').innerText();
     expect(texto).not.toContain('35-40° para velocidades altas');
     expect(texto).not.toContain('típicamente 35-42°');
+    expect(texto).toContain('tan θ = v₀ / √(v₀² + 2gh₀)');
   });
 
-  // HALLAZGO (contenido, bajo) — ABIERTO. El JSON-LD describe otra app: «dibuja la trayectoria
+  test('sin rozamiento, la fila del óptimo da 45° desde el suelo y 32,5° desde 30 m', async ({
+    page,
+  }) => {
+    await sembrarValor(page, '#v0', 20);
+    // h₀ = 0: 45° y R = v₀²/g = 40,77 m
+    await expect.poll(() => leerFila(page, 'Ángulo de máximo alcance')).toBe('45,0° (40,77 m)');
+    await sembrarValor(page, '#altura', 30);
+    await expect.poll(() => leerFila(page, 'Ángulo de máximo alcance')).toBe('32,5° (64,10 m)');
+    // Y está entre los dos ángulos que mide «Trampa (a)»: a 30° y a 35° la app da 63,99 y
+    // 63,98 m, menos que los 64,10 m del óptimo (cerca del máximo la curva es plana: a 32° y 33°
+    // ya redondea a 64,10).
+    await sembrarValor(page, '#angulo', 30);
+    await expect.poll(() => alcance(page)).toBe('63,99 m');
+    await sembrarValor(page, '#angulo', 35);
+    await expect.poll(() => alcance(page)).toBe('63,98 m');
+  });
+
+  // HALLAZGO 2763 (contenido, bajo) — REPARADO. El JSON-LD describía otra app: «dibuja la trayectoria
   // resultante en tiempo real sobre un canvas 2D», que «integra las ecuaciones cinemáticas en
   // cada fotograma» y trae una «Tabla comparativa». La app dibuja en <svg>, sin rozamiento usa la
   // solución cerrada y la comparativa son tarjetas. Es lo que leen los asistentes de IA.
+  // Reparado: describe SVG, solución analítica, RK4 y tarjetas comparativas.
   test('el JSON-LD no habla de un canvas que la app no tiene', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): el JSON-LD describe un canvas y una tabla que la app no tiene',
-    );
     await expect(page.locator('canvas')).toHaveCount(0);
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
     expect(ld).toContain('Simulador de Proyectiles 2D');
     expect(ld.toLowerCase()).not.toContain('canvas');
+    expect(ld).not.toContain('Tabla comparativa');
+    expect(ld).toContain('SVG');
+    expect(ld).toContain('RK4');
+    expect(ld).toContain('tarjetas comparativas');
+    // Y no repite el error de la FAQ (2761) ni la horquilla sin fuente (2762).
+    expect(ld).not.toContain('30°–40°');
+    expect(ld).toContain('la bajada dura más que la subida');
   });
 });

@@ -105,7 +105,7 @@
 
 .sliderValue {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.92rem;
 }
 
@@ -130,14 +130,17 @@
 }
 
 .gravityBtn:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--primary-texto);
+  color: var(--primary-texto);
 }
 
-.gravityActive {
-  background: var(--primary);
+/* Doble clase: en oscuro `[data-theme='dark'] .gravityBtn` (0,2,0) le ganaba a `.gravityActive`
+   (0,1,0) y el preset pulsado perdía fondo y borde (hallazgo 2758). Con `.gravityBtn.gravityActive`
+   y su variante oscura de la misma especificidad o mayor, el activo se ve en los dos temas. */
+.gravityBtn.gravityActive {
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* Mode toggle */
@@ -161,14 +164,14 @@
 }
 
 .modeBtn:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--primary-texto);
+  color: var(--primary-texto);
 }
 
-.modeActive {
-  background: var(--secondary);
+.modeBtn.modeActive {
+  background: var(--secondary-boton);
   color: white;
-  border-color: var(--secondary);
+  border-color: var(--secondary-boton);
 }
 
 /* Botones de acción */
@@ -180,7 +183,7 @@
 }
 
 .calcBtn {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   padding: 0.7rem 1.6rem;
@@ -191,14 +194,20 @@
   transition: opacity 0.15s;
 }
 
-.calcBtn:hover {
-  opacity: 0.88;
+/* Oscurecer al pasar, no aclarar: la opacidad 0,88 rebajaba el contraste del texto blanco. */
+.calcBtn:hover:not(:disabled) {
+  filter: brightness(0.9);
+}
+
+.calcBtn:disabled {
+  cursor: default;
+  opacity: 0.75;
 }
 
 .secondaryBtn {
   background: var(--bg-primary);
-  color: var(--primary);
-  border: 1.5px solid var(--primary);
+  color: var(--primary-texto);
+  border: 1.5px solid var(--primary-texto);
   padding: 0.7rem 1.4rem;
   border-radius: 8px;
   font-size: 0.92rem;
@@ -207,8 +216,9 @@
   transition: all 0.15s;
 }
 
-.secondaryBtn:hover {
-  background: var(--primary);
+.secondaryBtn:hover:not(:disabled) {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -229,6 +239,18 @@
   color: white;
 }
 
+/* #dc2626 sobre #1A1A1A daba 3,60:1; #f87171, 6,29:1 (hallazgo 2757). */
+[data-theme='dark'] .dangerBtn {
+  color: #f87171;
+  border-color: #f87171;
+}
+
+[data-theme='dark'] .dangerBtn:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  color: white;
+}
+
 /* Canvas / SVG */
 .canvasContainer {
   background: linear-gradient(180deg, #e0f2fe 0%, #f0fdf4 70%, #d1fae5 100%);
@@ -242,6 +264,31 @@
   width: 100%;
   height: auto;
   display: block;
+}
+
+/* Ejes y rótulos del gráfico (hallazgo 2756). Claro: #374151 da 8,98:1 o más sobre el
+   degradado. Oscuro: #e5e7eb da 7,64 · 7,85 · 12,24:1 sobre #0c4a6e · #064e3b · #022c22, y el
+   eje #d1d5db 6,42:1 o más. */
+.ejeLinea {
+  stroke: #374151;
+}
+
+.ejeTexto {
+  fill: #374151;
+}
+
+[data-theme='dark'] .ejeLinea {
+  stroke: #d1d5db;
+}
+
+[data-theme='dark'] .ejeTexto {
+  fill: #e5e7eb;
+}
+
+/* La trayectoria activa en el color de marca del tema: #2E86AB fijo quedaba bajo 3:1 sobre el
+   lienzo oscuro; var(--primary) da 3,58:1 en claro y 3,38:1 en oscuro. */
+.trayectoriaActiva {
+  stroke: var(--primary);
 }
 
 .canvasLegend {
@@ -294,7 +341,7 @@
 
 .resultValueAccent {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -330,7 +377,7 @@
 }
 
 .lanzamientoInfo strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .lanzamientoStats {
@@ -415,7 +462,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -453,7 +500,7 @@
 
 .faqTip {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0.35rem;
   font-style: italic;
 }
@@ -471,7 +518,7 @@
 }
 
 .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 28px;
   height: 28px;
@@ -617,13 +664,28 @@
   background: #2a2a2a;
 }
 
+[data-theme='dark'] .gravityBtn.gravityActive {
+  background: var(--primary-boton);
+  border-color: var(--primary-texto);
+  color: white;
+}
+
+[data-theme='dark'] .modeBtn.modeActive {
+  background: var(--secondary-boton);
+  border-color: var(--secondary-texto);
+  color: white;
+}
+
 [data-theme='dark'] .canvasContainer {
   background: linear-gradient(180deg, #0c4a6e 0%, #064e3b 70%, #022c22 100%);
   border-color: #3b82f6;
 }
 
+/* Más oscuro que el #1e3a5f → #14532d anterior: sobre #14532d el valor destacado en
+   --primary-texto daba 4,12:1 (y el violeta de Stemum, otro 4,12). Sobre #152238 → #0f2a1c:
+   #3FA5D1 5,70 · 5,49 y #C99BF5 7,20 · 6,94 (hallazgo 2757). */
 [data-theme='dark'] .resultBlock {
-  background: linear-gradient(135deg, #1e3a5f 0%, #14532d 100%);
+  background: linear-gradient(135deg, #152238 0%, #0f2a1c 100%);
   border-color: #3b82f6;
 }
 

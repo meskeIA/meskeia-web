@@ -15,9 +15,9 @@ import { formatNumber } from '@/lib';
 import styles from './SimuladorProyectiles.module.css';
 
 import {
+  calcularAnguloOptimo,
   calcularTrayectoria,
   nuevoId,
-  validarParametros,
   COLORES_LANZAMIENTOS,
   GRAVEDADES_PRESET,
   RESISTENCIA_POR_DEFECTO,
@@ -51,6 +51,15 @@ export default function SimuladorProyectiles() {
   const [lanzamientoActual, setLanzamientoActual] = useState<Lanzamiento | null>(null);
   const [lanzamientosComparados, setLanzamientosComparados] = useState<Lanzamiento[]>([]);
 
+  /**
+   * Resumen para lectores de pantalla. La sección de resultados era entera una región viva
+   * atómica (466 caracteres, fórmulas incluidas) con la energía cinética del proyectil dentro:
+   * en cada fotograma de la animación cambiaba y había que releerla toda (hallazgo 2755). La
+   * región es ahora solo esta frase, que no depende de la animación y se actualiza cuando los
+   * parámetros llevan un momento quietos, no en cada paso de un deslizador.
+   */
+  const [resumenVivo, setResumenVivo] = useState<string>('');
+
   // Animación
   const [animProgress, setAnimProgress] = useState<number>(1); // 0 a 1
   const [animando, setAnimando] = useState<boolean>(false);
@@ -79,6 +88,25 @@ export default function SimuladorProyectiles() {
     setAvisoParametros('');
     setLanzamientoActual(resultado.lanzamiento);
   }, [v0, angulo, altura, gravedad, resistencia, conResistencia]);
+
+  useEffect(() => {
+    const texto = lanzamientoActual
+      ? `Alcance ${formatNumber(lanzamientoActual.alcance, 2)} m, altura máxima ${formatNumber(
+          lanzamientoActual.alturaMax,
+          2,
+        )} m, tiempo de vuelo ${formatNumber(lanzamientoActual.tiempoVuelo, 2)} s.`
+      : '';
+    const espera = window.setTimeout(() => setResumenVivo(texto), 700);
+    return () => window.clearTimeout(espera);
+  }, [lanzamientoActual]);
+
+  // Ángulo de máximo alcance con los mismos parámetros (hallazgo 2762): la guía daba
+  // horquillas sin fuente que la propia app desmentía; aquí sale el número de cada caso.
+  const anguloOptimo = useMemo(
+    () =>
+      calcularAnguloOptimo({ v0, angulo, altura, gravedad, resistencia, conResistencia }),
+    [v0, angulo, altura, gravedad, resistencia, conResistencia]
+  );
 
   // Cambiar preset de gravedad
   const seleccionarPreset = useCallback((preset: string) => {
@@ -168,13 +196,35 @@ export default function SimuladorProyectiles() {
   const SVG_H = 400;
   const PADDING = 30;
 
+  /**
+   * Los rótulos del gráfico iban a fontSize 11 en un viewBox de 800: a 390 px de pantalla el
+   * <svg> mide 290 px y se pintaban a ~4 px (hallazgo 2760). El tamaño se calcula ahora con el
+   * ancho real del dibujo para que nunca baje de ~10,5 px efectivos, y el margen inferior crece
+   * con él para que los rótulos de abajo no pisen el suelo.
+   */
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const [anchoSvg, setAnchoSvg] = useState<number>(SVG_W);
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg || typeof ResizeObserver === 'undefined') return;
+    const observador = new ResizeObserver((entradas) => {
+      const ancho = entradas[0]?.contentRect.width ?? 0;
+      if (ancho > 0) setAnchoSvg(ancho);
+    });
+    observador.observe(svg);
+    return () => observador.disconnect();
+  }, []);
+  const fuenteEje = Math.max(12, Math.ceil((10.5 * SVG_W) / anchoSvg));
+  const paddingInferior = Math.max(PADDING, fuenteEje + 14);
+
   const toSvgX = useCallback(
     (x: number) => PADDING + (x / limites.xMax) * (SVG_W - 2 * PADDING),
     [limites.xMax]
   );
   const toSvgY = useCallback(
-    (y: number) => SVG_H - PADDING - (y / limites.yMax) * (SVG_H - 2 * PADDING),
-    [limites.yMax]
+    (y: number) =>
+      SVG_H - paddingInferior - (y / limites.yMax) * (SVG_H - PADDING - paddingInferior),
+    [limites.yMax, paddingInferior]
   );
 
   // Path de la trayectoria activa (con animación)
@@ -420,54 +470,62 @@ export default function SimuladorProyectiles() {
           <h2 className={styles.panelTitle}>Trayectoria</h2>
           <div className={styles.canvasContainer}>
             <svg
+              ref={svgRef}
               className={styles.canvasSvg}
               viewBox={`0 0 ${SVG_W} ${SVG_H}`}
               role="img"
               aria-label="Trayectoria del proyectil"
             >
+              {/* Ejes y rótulos con clase, no con fill/stroke fijos: en oscuro el #374151 del
+                  JSX quedaba a 1,1:1 del lienzo (hallazgo 2756). */}
               {/* Suelo */}
               <line
+                className={styles.ejeLinea}
                 x1={PADDING}
-                y1={SVG_H - PADDING}
+                y1={SVG_H - paddingInferior}
                 x2={SVG_W - PADDING}
-                y2={SVG_H - PADDING}
-                stroke="#374151"
+                y2={SVG_H - paddingInferior}
                 strokeWidth={2}
               />
               {/* Eje vertical */}
               <line
+                className={styles.ejeLinea}
                 x1={PADDING}
                 y1={PADDING}
                 x2={PADDING}
-                y2={SVG_H - PADDING}
-                stroke="#374151"
+                y2={SVG_H - paddingInferior}
                 strokeWidth={2}
               />
 
               {/* Etiquetas ejes */}
               <text
+                className={styles.ejeTexto}
+                data-eje="x"
                 x={SVG_W - PADDING}
-                y={SVG_H - PADDING + 20}
-                fontSize={11}
-                fill="#374151"
+                y={SVG_H - 8}
+                fontSize={fuenteEje}
                 textAnchor="end"
               >
                 {formatNumber(limites.xMax, 0)} m
               </text>
+              {/* Tope de la escala vertical, DENTRO del área de dibujo y alineado a la
+                  izquierda: con text-anchor="end" en x = 22, desde tres cifras empezaba fuera
+                  del viewBox y se leía «44 m» donde ponía «444 m» (hallazgo 2759). */}
               <text
-                x={PADDING - 8}
-                y={PADDING + 5}
-                fontSize={11}
-                fill="#374151"
-                textAnchor="end"
+                className={styles.ejeTexto}
+                data-eje="y"
+                x={PADDING + 6}
+                y={PADDING + fuenteEje}
+                fontSize={fuenteEje}
+                textAnchor="start"
               >
                 {formatNumber(limites.yMax, 0)} m
               </text>
               <text
+                className={styles.ejeTexto}
                 x={SVG_W / 2}
-                y={SVG_H - 5}
-                fontSize={11}
-                fill="#374151"
+                y={SVG_H - 8}
+                fontSize={fuenteEje}
                 textAnchor="middle"
               >
                 Distancia horizontal (m)
@@ -489,9 +547,9 @@ export default function SimuladorProyectiles() {
               {/* Trayectoria activa */}
               {trayectoriaActivaParcial.length > 1 && (
                 <polyline
+                  className={styles.trayectoriaActiva}
                   points={polylinePoints(trayectoriaActivaParcial)}
                   fill="none"
-                  stroke="#2E86AB"
                   strokeWidth={3}
                 />
               )}
@@ -517,7 +575,7 @@ export default function SimuladorProyectiles() {
 
         {/* Resultados */}
         {lanzamientoActual && (
-          <section className={styles.panel} role="status" aria-live="polite" aria-atomic="true">
+          <section className={styles.panel}>
             <h2 className={styles.panelTitle}>Resultados</h2>
             <div className={styles.resultBlock}>
               <h3 className={styles.resultTitle}>Lanzamiento actual</h3>
@@ -545,6 +603,14 @@ export default function SimuladorProyectiles() {
                   {formatNumber(lanzamientoActual.vImpacto, 2)} m/s
                 </span>
               </div>
+              {anguloOptimo && (
+                <div className={styles.resultRow}>
+                  <span className={styles.resultLabel}>Ángulo de máximo alcance</span>
+                  <span className={styles.resultValue}>
+                    {formatNumber(anguloOptimo.angulo, 1)}° ({formatNumber(anguloOptimo.alcance, 2)} m)
+                  </span>
+                </div>
+              )}
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>
                   Energía cinética (masa unitaria, en proyectil actual)
@@ -601,9 +667,15 @@ export default function SimuladorProyectiles() {
               <div>Alcance (h₀=0): R = v₀² · sen(2θ) / g</div>
               <div>Altura máx (h₀=0): h = v₀² · sen²(θ) / (2g)</div>
               <div>{'# Con resistencia del aire (modelo cuadrático): F = −k · |v| · v⃗'}</div>
+              <div>Sin solución cerrada: integración numérica RK4 hasta el suelo</div>
             </div>
           </section>
         )}
+
+        {/* Única región viva de los resultados: una frase, fuera de la animación. */}
+        <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {resumenVivo}
+        </p>
 
         {/* Educational Section v2.0 */}
         <EducationalSection
@@ -697,15 +769,21 @@ export default function SimuladorProyectiles() {
               </p>
               <p className={styles.faqTip}>
                 Tip: si lanzas desde una altura h₀, el ángulo óptimo es menor que
-                45° (típicamente 35-42°).
+                45°: sin rozamiento, tan θ = v₀ / √(v₀² + 2gh₀). Con 20 m/s desde 30 m
+                sale 32,5°. El simulador lo calcula para tus valores en «Ángulo de
+                máximo alcance».
               </p>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Qué pasa si añadimos resistencia del aire?</strong>
               <p>
-                La trayectoria deja de ser una parábola perfecta y se vuelve
-                asimétrica: cae más rápido de lo que sube. El alcance disminuye y el
-                ángulo óptimo cae por debajo de 45° (35-40° para velocidades altas).
+                La trayectoria deja de ser una parábola y se vuelve asimétrica: el
+                proyectil tarda más en bajar que en subir (con 20 m/s a 45° y k = 0,05,
+                1,00 s de subida y 1,20 s de bajada) y el tramo de bajada es más
+                empinado que el de subida. El alcance disminuye y el ángulo óptimo baja
+                de 45°; cuánto, depende de v₀ y de k (a 100 m/s con k = 0,05 queda en
+                27°). El simulador lo calcula para tus valores en «Ángulo de máximo
+                alcance».
               </p>
             </div>
             <div className={styles.faqItem}>

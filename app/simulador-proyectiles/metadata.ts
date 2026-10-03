@@ -48,7 +48,7 @@ export const faqJsonLd = {
       name: '¿Qué es el movimiento parabólico y cómo se simula?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El movimiento parabólico (o tiro oblicuo) combina un movimiento horizontal uniforme con una caída vertical acelerada por la gravedad. El simulador descompone la velocidad inicial en sus componentes horizontal y vertical, integra las ecuaciones cinemáticas en cada fotograma y dibuja la trayectoria resultante en tiempo real sobre un canvas 2D.',
+        text: 'El movimiento parabólico (o tiro oblicuo) combina un movimiento horizontal uniforme con una caída vertical acelerada por la gravedad. Sin resistencia del aire, el simulador usa la solución exacta de las ecuaciones cinemáticas (x = v₀·cos θ·t, y = h₀ + v₀·sen θ·t − ½·g·t²); con resistencia, que no tiene solución cerrada, integra numéricamente con el método de Runge-Kutta de cuarto orden (RK4) hasta el instante en que el proyectil toca el suelo. La trayectoria se dibuja como gráfico vectorial (SVG) y puede animarse.',
       },
     },
     {
@@ -56,7 +56,7 @@ export const faqJsonLd = {
       name: '¿Qué parámetros se pueden ajustar en el simulador de proyectiles?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Puedes modificar la velocidad inicial (m/s), el ángulo de lanzamiento (0°–90°), la altura de lanzamiento, la gravedad (con presets para Tierra, Luna, Marte y Júpiter) y activar o desactivar la resistencia del aire. El simulador permite comparar hasta tres lanzamientos simultáneos con diferentes configuraciones.',
+        text: 'Puedes modificar la velocidad inicial (1 a 100 m/s), el ángulo de lanzamiento (0°–90°), la altura de lanzamiento (0 a 100 m), la gravedad (con presets para Tierra, Luna, Marte y Júpiter, o un valor propio) y activar la resistencia del aire con su coeficiente k. Puedes guardar hasta tres lanzamientos en tarjetas comparativas, con su trayectoria superpuesta en el gráfico.',
       },
     },
     {
@@ -64,7 +64,7 @@ export const faqJsonLd = {
       name: '¿A qué ángulo se obtiene el mayor alcance en un tiro parabólico?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sin resistencia del aire y con lanzamiento desde el nivel del suelo, el alcance máximo se obtiene a 45°. Con resistencia del aire, el ángulo óptimo es ligeramente inferior, en torno a 30°–40° dependiendo de la velocidad y el coeficiente de arrastre. El simulador calcula y muestra el alcance real para cada combinación de parámetros.',
+        text: 'Sin resistencia del aire y con lanzamiento desde el nivel del suelo, el alcance máximo se obtiene a 45°. Desde una altura h₀ el óptimo baja: tan θ = v₀/√(v₀² + 2·g·h₀), que con 20 m/s desde 30 m da 32,5°. Con resistencia del aire también baja de 45°, y cuánto depende de la velocidad y del coeficiente de rozamiento: con 100 m/s y k = 0,05 queda en 27°. El simulador calcula el ángulo de máximo alcance para los valores que introduzcas.',
       },
     },
     {
@@ -72,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Para qué cursos y asignaturas es útil este simulador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es especialmente útil para Física de 2.º de Bachillerato (cinemática, dinámica) y para asignaturas de primer curso universitario de Física General o Mecánica. También sirve para preparar problemas de selectividad relacionados con el movimiento parabólico y para visualizar conceptos antes de resolver ejercicios analíticos.',
+        text: 'Es especialmente útil para Física de los últimos cursos de secundaria o preparatoria (cinemática, dinámica) y para asignaturas de primer curso universitario de Física General o Mecánica. También sirve para preparar problemas de examen de admisión universitaria sobre movimiento parabólico y para comprobar ejercicios resueltos a mano.',
       },
     },
     {
@@ -80,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Cómo afecta la resistencia del aire a la trayectoria?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La resistencia del aire introduce una fuerza de rozamiento proporcional al cuadrado de la velocidad, lo que reduce el alcance y la altura máxima respecto al caso ideal. La trayectoria deja de ser una parábola perfecta: la parte descendente es más inclinada y el proyectil impacta con un ángulo mayor que el de lanzamiento.',
+        text: 'La resistencia del aire introduce una fuerza de rozamiento proporcional al cuadrado de la velocidad (F = −k·|v|·v), lo que reduce el alcance, la altura máxima y la velocidad de impacto respecto al caso ideal. La trayectoria deja de ser una parábola: la bajada dura más que la subida y es más empinada, y el proyectil impacta con un ángulo mayor que el de lanzamiento. Con 20 m/s a 45° y k = 0,05, el alcance cae de 40,77 m a 17,53 m.',
       },
     },
   ],
@@ -89,18 +89,18 @@ export const faqJsonLd = {
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Proyectiles 2D',
   description:
-    'Simulador interactivo de movimiento parabólico. Ajusta velocidad inicial, ángulo, altura, gravedad y resistencia del aire para observar la trayectoria, el alcance, la altura máxima y el tiempo de vuelo.',
+    'Simulador interactivo de movimiento parabólico. Ajusta velocidad inicial, ángulo, altura, gravedad y resistencia del aire y obtén alcance, altura máxima, tiempo de vuelo, velocidad de impacto y ángulo de máximo alcance, con la trayectoria dibujada en SVG: solución exacta sin rozamiento e integración RK4 con rozamiento cuadrático.',
   url: 'https://meskeia.com/simulador-proyectiles/',
   category: 'EducationalApplication',
   features: [
-    'Trayectoria 2D animada con Canvas',
+    'Trayectoria dibujada en SVG, con animación del lanzamiento',
     'Ángulo, velocidad inicial, altura y gravedad ajustables',
     'Presets de gravedad: Tierra, Luna, Marte, Júpiter',
-    'Modo con/sin resistencia del aire',
-    'Comparación de hasta 3 lanzamientos simultáneos',
-    'Visualización de la trayectoria completa con valores numéricos de alcance, altura máxima y tiempo',
-    'Ecuaciones de movimiento parabólico mostradas para cada lanzamiento',
-    'Tabla comparativa de hasta 3 lanzamientos simultáneos con distintos parámetros',
+    'Sin resistencia del aire: solución analítica exacta',
+    'Con resistencia del aire (rozamiento cuadrático): integración numérica RK4 hasta el suelo',
+    'Alcance, altura máxima, tiempo de vuelo, velocidad de impacto y ángulo de máximo alcance',
+    'Hasta 3 lanzamientos guardados en tarjetas comparativas, con sus trayectorias superpuestas',
+    'Caja con las ecuaciones del tiro parabólico',
   ],
   keywords: ['proyectiles', 'tiro parabólico', 'cinemática', 'física bachillerato'],
 });
