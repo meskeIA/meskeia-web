@@ -1,8 +1,10 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import styles from './VisualizadorEscalasMusicales.module.css';
+import { notasMidiEscala, type Recorrido } from './sonido';
+import { useSonidoEscala } from './useSonidoEscala';
 import {
   MeskeiaLogo,
   Footer,
@@ -94,9 +96,11 @@ const TECLAS_NEGRAS_INDICES = new Set([1, 3, 6, 8, 10]);
 
 interface PianoProps {
   notasActivas: Set<number>;
+  /** Clase de nota (0-11) que está sonando, para iluminar su tecla; null si no suena nada. */
+  notaSonando: number | null;
 }
 
-function PianoVisual({ notasActivas }: PianoProps) {
+function PianoVisual({ notasActivas, notaSonando }: PianoProps) {
   // 2 octavas = 24 semitonos, empezamos en C (Do)
   const octavas = 2;
   const blancas: { idx: number; cromatico: number }[] = [];
@@ -144,7 +148,7 @@ function PianoVisual({ notasActivas }: PianoProps) {
               height={altoBlanca - 2}
               rx={3}
               ry={3}
-              className={activa ? styles.teclaBlancaActiva : styles.teclaBlanca}
+              className={tecla.cromatico === notaSonando ? styles.teclaSonando : activa ? styles.teclaBlancaActiva : styles.teclaBlanca}
             />
           );
         })}
@@ -184,7 +188,7 @@ function PianoVisual({ notasActivas }: PianoProps) {
                 height={altoNegra}
                 rx={2}
                 ry={2}
-                className={activa ? styles.teclaNegrActiva : styles.teclaNegra}
+                className={tecla.cromatico === notaSonando ? styles.teclaSonando : activa ? styles.teclaNegrActiva : styles.teclaNegra}
               />
               {activa && (
                 <text
@@ -361,6 +365,23 @@ function MastilVisual({ afinacion, notasActivas, tonica }: MastilProps) {
 }
 
 // ─────────────────────────────────────────────
+// Sonido (S0177): recorrido y tempo de la escala que suena
+// ─────────────────────────────────────────────
+
+const RECORRIDOS: { id: Recorrido; nombre: string }[] = [
+  { id: 'subir', nombre: 'Subir' },
+  { id: 'bajar', nombre: 'Bajar' },
+  { id: 'subir-bajar', nombre: 'Subir y bajar' },
+];
+
+/** Notas por minuto. La lenta es la que pide la guía de práctica: «a tempo lento primero». */
+const TEMPOS = [
+  { id: 'lento', nombre: 'Lento', notasPorMinuto: 60 },
+  { id: 'medio', nombre: 'Medio', notasPorMinuto: 100 },
+  { id: 'rapido', nombre: 'Rápido', notasPorMinuto: 160 },
+] as const;
+
+// ─────────────────────────────────────────────
 // Componente principal
 // ─────────────────────────────────────────────
 
@@ -368,8 +389,17 @@ export default function VisualizadorEscalasMusicales() {
   const [notaRaiz, setNotaRaiz] = useState(0); // índice en NOTAS_CROMATICAS
   const [escalaSeleccionada, setEscalaSeleccionada] = useState(0); // índice en TIPOS_ESCALA
   const [afinacionSeleccionada, setAfinacionSeleccionada] = useState(0); // índice en AFINACIONES
+  const [recorrido, setRecorrido] = useState<Recorrido>('subir-bajar');
+  const [tempo, setTempo] = useState(0); // índice en TEMPOS: lento por defecto
+
+  const { tocarEscala, tocarNota, detener, gradoSonando, reproduciendo, sinAudio } = useSonidoEscala();
 
   const escala = TIPOS_ESCALA[escalaSeleccionada];
+
+  // Si cambia la escala o la tónica mientras suena, se calla: lo que sonara ya no sería lo que se ve
+  useEffect(() => {
+    detener();
+  }, [notaRaiz, escalaSeleccionada, detener]);
 
   // Notas de la escala calculadas
   const notasEscala: NotaEscala[] = useMemo(() => {
@@ -382,6 +412,9 @@ export default function VisualizadorEscalasMusicales() {
       };
     });
   }, [notaRaiz, escala]);
+
+  // Nota MIDI de cada grado, para que cada ficha suene a su altura dentro de la escala
+  const notasMidi = useMemo(() => notasMidiEscala(notaRaiz, escala.intervalos), [notaRaiz, escala]);
 
   // Set de índices cromáticos activos para el piano
   const notasActivasSet: Set<number> = useMemo(() => {
@@ -481,9 +514,9 @@ export default function VisualizadorEscalasMusicales() {
       <header className={styles.hero}>
         <h1 className={styles.heroTitle}>Escalas Musicales</h1>
         <p className={styles.heroSubtitle}>
-          Explora las notas, intervalos y grados de cualquier escala musical.
-          Visualiza su posición en el teclado de piano y sobre el diapasón de
-          guitarra, bajo o ukelele.
+          Explora las notas, intervalos y grados de cualquier escala musical y
+          escúchala. Visualiza su posición en el teclado de piano y sobre el
+          diapasón de guitarra, bajo o ukelele.
         </p>
       </header>
 
@@ -552,23 +585,88 @@ export default function VisualizadorEscalasMusicales() {
           {/* Chips de notas con grados */}
           <div className={styles.notasEscalaSection}>
             <h3 className={styles.seccionTitulo}>Notas de la escala</h3>
+
+            {/* Escuchar la escala (S0177) */}
+            <div className={styles.reproductor}>
+              <button
+                type="button"
+                className={styles.botonEscuchar}
+                onClick={() => {
+                  if (reproduciendo) detener();
+                  else tocarEscala(notaRaiz, escala.intervalos, recorrido, TEMPOS[tempo].notasPorMinuto);
+                }}
+              >
+                {reproduciendo
+                  ? <><span aria-hidden="true">■</span> Detener</>
+                  : <><span aria-hidden="true">▶</span> Escuchar la escala</>}
+              </button>
+              <div className={styles.reproductorOpciones} role="group" aria-label="Recorrido de la escala">
+                {RECORRIDOS.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    className={`${styles.opcionSonido} ${recorrido === r.id ? styles.opcionSonidoActiva : ''}`}
+                    onClick={() => setRecorrido(r.id)}
+                    aria-pressed={recorrido === r.id}
+                  >
+                    {r.nombre}
+                  </button>
+                ))}
+              </div>
+              <div className={styles.reproductorOpciones} role="group" aria-label="Velocidad">
+                {TEMPOS.map((t, idx) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    className={`${styles.opcionSonido} ${tempo === idx ? styles.opcionSonidoActiva : ''}`}
+                    onClick={() => setTempo(idx)}
+                    aria-pressed={tempo === idx}
+                  >
+                    {t.nombre}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {sinAudio && (
+              <p className={styles.reproductorAviso} role="alert">
+                Este navegador no permite generar sonido, así que la escala no se puede escuchar aquí.
+              </p>
+            )}
+
             <div className={styles.notasChips} role="list" aria-label="Notas de la escala">
-              {notasEscala.map((nota) => (
-                <div key={`${nota.grado}-${nota.nombre}`} className={styles.notaChip} role="listitem">
-                  <span className={styles.chipGrado}>{nota.grado}</span>
-                  <span className={styles.chipNombre}>{nota.nombre}</span>
-                  <span className={styles.chipNombreEs}>{NOMBRES_NOTAS_ES[nota.indicecromatico]}</span>
+              {notasEscala.map((nota, i) => (
+                <div key={`${nota.grado}-${nota.nombre}`} role="listitem">
+                  {/* a11y-ok: es una acción (hace sonar la nota), no un conmutador; la clase solo marca la que suena */}
+                  <button
+                    type="button"
+                    className={`${styles.notaChip} ${gradoSonando === i ? styles.notaChipSonando : ''}`}
+                    data-sonando={gradoSonando === i ? 'true' : undefined}
+                    onClick={() => tocarNota(notasMidi[i], i)}
+                  >
+                    <span className="sr-only">Escuchar </span>
+                    <span className={styles.chipGrado}>{nota.grado}</span>
+                    <span className={styles.chipNombre}>{nota.nombre}</span>
+                    <span className={styles.chipNombreEs}>{NOMBRES_NOTAS_ES[nota.indicecromatico]}</span>
+                  </button>
                 </div>
               ))}
             </div>
+            <p className={styles.reproductorNota}>
+              Pulsa una nota para oírla sola. Suena con la afinación estándar (La = 440 Hz), en la
+              octava del Do central, y la escala termina en la octava de su tónica.
+            </p>
           </div>
 
           {/* Piano */}
           <div className={styles.pianoSection}>
             <h3 className={styles.seccionTitulo}>Teclado de piano</h3>
-            <PianoVisual notasActivas={notasActivasSet} />
+            <PianoVisual
+              notasActivas={notasActivasSet}
+              notaSonando={gradoSonando === null ? null : notasEscala[gradoSonando]?.indicecromatico ?? null}
+            />
             <p className={styles.pianoLeyenda}>
               Las teclas resaltadas en azul corresponden a las notas de la escala seleccionada (2 octavas).
+              Mientras suena la escala, la tecla de la nota que se oye se oscurece y lleva un borde dorado.
             </p>
           </div>
 

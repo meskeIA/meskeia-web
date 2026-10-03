@@ -168,3 +168,104 @@ test('el piano sigue estando: el mástil se añade, no sustituye', async ({ page
   await expect(page.getByRole('img', { name: /Teclado de piano/ })).toBeVisible();
   await expect(page.getByRole('img', { name: /Diapasón de Guitarra/ })).toBeVisible();
 });
+
+/**
+ * S0177 (03/10/2026) — la escala SUENA.
+ *
+ * Un test no oye, pero puede leer qué frecuencias se le piden a Web Audio: un espía envuelve
+ * `createOscillator` y apunta cada `frequency.setValueAtTime`. Si se programan las notas
+ * correctas en el orden correcto, lo que sale por el altavoz es la escala. El cálculo está
+ * probado aparte en tests/escalas-sonido-motor.spec.ts.
+ *
+ * CASOS RESUELTOS A MANO (temperamento igual, La 4 = 440 Hz, f = 440 · 2^((midi − 69)/12)):
+ *   · Do mayor subiendo, desde el Do central: Do4 261,63 · Re4 293,66 · Mi4 329,63 · Fa4 349,23
+ *     · Sol4 392,00 · La4 440,00 · Si4 493,88 · Do5 523,25 (8 notas, la última es la octava).
+ *   · Pentatónica menor de La: su I grado es el La 440 y su III grado el Do5, 523,25.
+ */
+test.describe('S0177 · escuchar la escala', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      const w = window as typeof window & { __frecuencias: number[] };
+      w.__frecuencias = [];
+      const original = AudioContext.prototype.createOscillator;
+      AudioContext.prototype.createOscillator = function (this: AudioContext) {
+        const osc = original.call(this);
+        const fijar = osc.frequency.setValueAtTime.bind(osc.frequency);
+        osc.frequency.setValueAtTime = (valor: number, cuando: number) => {
+          w.__frecuencias.push(Math.round(valor * 100) / 100);
+          return fijar(valor, cuando);
+        };
+        return osc;
+      };
+    });
+    await page.reload();
+    // React debe haber enganchado el botón: un clic anterior a la hidratación se pierde
+    await page.waitForFunction(() => {
+      const boton = Array.from(document.querySelectorAll('button')).find((b) => b.textContent?.includes('Escuchar la escala'));
+      return !!boton && Object.keys(boton).some((k) => k.startsWith('__reactProps$'));
+    });
+  });
+
+  const frecuencias = (page: Page) =>
+    page.evaluate(() => (window as typeof window & { __frecuencias: number[] }).__frecuencias);
+  const botonEscuchar = (page: Page) => page.getByRole('button', { name: /Escuchar la escala|Detener/ });
+  const fichas = (page: Page) => page.getByRole('list', { name: 'Notas de la escala' }).getByRole('button');
+
+  test('Do mayor subiendo suena con las 8 frecuencias de la escala, en orden', async ({ page }) => {
+    await elegirRaiz(page, 'C (Do)');
+    await elegirEscala(page, 'Mayor');
+    await page.getByRole('button', { name: 'Subir', exact: true }).click();
+    await page.getByRole('button', { name: 'Rápido', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Subir', exact: true })).toHaveAttribute('aria-pressed', 'true');
+
+    await botonEscuchar(page).click();
+    await expect(botonEscuchar(page)).toHaveText(/Detener/);
+    expect(await frecuencias(page)).toEqual([261.63, 293.66, 329.63, 349.23, 392, 440, 493.88, 523.25]);
+
+    // Mientras suena se resalta una ficha, y su tecla en las dos octavas del piano
+    await expect(page.locator('[data-sonando="true"]')).toHaveCount(1);
+    await expect(page.locator('svg [class*="teclaSonando"]')).toHaveCount(2);
+
+    // 8 notas a 160 por minuto son 3 s: al acabar, el botón vuelve y no queda nada resaltado
+    await expect(botonEscuchar(page)).toHaveText(/Escuchar la escala/, { timeout: 6_000 });
+    await expect(page.locator('[data-sonando="true"]')).toHaveCount(0);
+  });
+
+  test('subir y bajar: 15 notas y la de arriba una sola vez', async ({ page }) => {
+    await elegirRaiz(page, 'C (Do)');
+    await elegirEscala(page, 'Mayor');
+    // «Subir y bajar» es el recorrido por defecto
+    await expect(page.getByRole('button', { name: 'Subir y bajar', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await botonEscuchar(page).click();
+    const f = await frecuencias(page);
+    expect(f).toHaveLength(15);
+    expect(f.filter((x) => x === 523.25)).toHaveLength(1);
+    expect(f[0]).toBe(261.63);
+    expect(f[14]).toBe(261.63);
+    await botonEscuchar(page).click(); // Detener
+    await expect(botonEscuchar(page)).toHaveText(/Escuchar la escala/);
+  });
+
+  test('cada ficha suena sola a su altura: La pentatónica menor, I = 440 y III = Do5', async ({ page }) => {
+    await elegirRaiz(page, 'A (La)');
+    await elegirEscala(page, 'Pentatónica menor');
+    await expect(fichas(page)).toHaveCount(5);
+
+    await fichas(page).nth(0).click();
+    await expect(fichas(page).nth(0)).toHaveAttribute('data-sonando', 'true');
+    await fichas(page).nth(1).click();
+    await expect(fichas(page).nth(1)).toHaveAttribute('data-sonando', 'true');
+    expect(await frecuencias(page)).toEqual([440, 523.25]);
+    // La ficha se anuncia como botón que suena, con lo que se ve escrito
+    await expect(fichas(page).nth(0)).toHaveAccessibleName(/Escuchar I A La/);
+  });
+
+  test('cambiar de escala mientras suena la calla', async ({ page }) => {
+    await page.getByRole('button', { name: 'Lento', exact: true }).click();
+    await botonEscuchar(page).click();
+    await expect(botonEscuchar(page)).toHaveText(/Detener/);
+    await elegirEscala(page, 'Menor natural');
+    await expect(botonEscuchar(page)).toHaveText(/Escuchar la escala/);
+    await expect(page.locator('[data-sonando="true"]')).toHaveCount(0);
+  });
+});

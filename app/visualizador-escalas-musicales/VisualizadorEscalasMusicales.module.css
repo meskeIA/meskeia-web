@@ -265,6 +265,125 @@
   margin-top: 1px;
 }
 
+/* ── Sonido (S0177) ── */
+
+/* Las fichas de nota son botones: suenan al pulsarlas */
+button.notaChip {
+  border: 2px solid transparent;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+button.notaChip:hover {
+  transform: translateY(-2px);
+}
+
+button.notaChip:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* La que suena: azul marino (8,3:1 con el blanco), borde dorado y un poco más grande */
+button.notaChipSonando,
+button.notaChipSonando:hover {
+  background: var(--hero-bg);
+  border-color: #FFD166;
+  transform: scale(1.08);
+}
+
+.reproductor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.botonEscuchar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.2rem;
+  border: none;
+  border-radius: 22px;
+  background: var(--primary-boton);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.botonEscuchar:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.botonEscuchar:focus-visible,
+.opcionSonido:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.reproductorOpciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.opcionSonido {
+  padding: 0.3rem 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.opcionSonido:hover {
+  border-color: var(--primary);
+}
+
+.opcionSonidoActiva,
+.opcionSonidoActiva:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #fff;
+  font-weight: 700;
+}
+
+.reproductorAviso {
+  margin: 0 0 0.8rem;
+  padding: 0.4rem 0.7rem;
+  border-left: 3px solid var(--warning);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.reproductorNota {
+  margin: 0.8rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Tecla que suena: más oscura que cualquier tecla activa y con borde dorado */
+.teclaSonando {
+  fill: #0d3a5a;
+  stroke: #FFD166;
+  stroke-width: 3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.notaChip,
+  button.notaChipSonando {
+    transition: none;
+    transform: none;
+  }
+}
+
 /* ─────────────────────────────────────────────
    Piano
 ───────────────────────────────────────────── */
@@ -845,6 +964,22 @@ details[open] .faqPregunta::before {
   background: #333;
   color: var(--text-primary);
   border-color: #444;
+}
+
+[data-theme='dark'] .opcionSonido {
+  background: #333;
+  color: var(--text-primary);
+  border-color: #444;
+}
+
+[data-theme='dark'] .opcionSonidoActiva {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #fff;
+}
+
+[data-theme='dark'] .reproductorAviso {
+  background: #333;
 }
 
 [data-theme='dark'] .escalaBtnActiva,

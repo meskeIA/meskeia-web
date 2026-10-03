@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Escalas Musicales en Piano y Guitarra: Notas, Intervalos y Acordes | meskeIA',
-  description: 'Explora las notas de cualquier escala musical: mayor, menor, pentatónica, blues y modos griegos. Visualización en teclado de piano y en el diapasón de guitarra, bajo y ukelele, con grados e intervalos.',
+  description: 'Explora y escucha cualquier escala musical: mayor, menor, pentatónica, blues y modos griegos. Suena subiendo y bajando a tres velocidades, y se ve en el teclado de piano y en el diapasón de guitarra, bajo y ukelele.',
   keywords: 'escalas musicales, escalas guitarra, diapason guitarra, escala mayor, escala menor, pentatónica, blues, modos griegos, intervalos musicales, teclado piano, bajo, ukelele, teoría musical, solfeo',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -43,6 +43,8 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     'Visualización de 12 tipos de escalas: mayor, menores, pentatónicas, blues y modos griegos',
+    'Escucha la escala subiendo, bajando o de ida y vuelta, a tres velocidades, con la nota que suena resaltada',
+    'Cada nota de la escala suena por separado al pulsarla',
     'Teclado de piano SVG con las notas de la escala resaltadas visualmente',
     'Diapasón interactivo de 12 trastes con la escala sobre el mástil, y la tónica destacada',
     'Cuatro afinaciones: guitarra en Mi estándar, guitarra en Drop D, bajo de 4 cuerdas y ukelele',
@@ -104,6 +106,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'La pentatónica menor tiene 5 notas (1, b3, 4, 5, b7) y es la base del rock, pop y música folk. La escala de blues añade una sexta nota llamada "blue note" (el b5, también llamado tritono), lo que le da ese sonido tenso y expresivo característico del blues y el jazz. La blue note crea una disonancia controlada que aporta carácter y permite pasar suavemente entre los acordes de dominante de una progresión de blues.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Se puede escuchar cómo suena cada escala?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí. El botón «Escuchar la escala» la toca subiendo, bajando o de ida y vuelta, a 60, 100 o 160 notas por minuto, y resalta en pantalla la nota que suena en cada momento. Cada nota también suena sola al pulsar su ficha. Se toca en la octava del Do central con la afinación estándar (La = 440 Hz), así que sirve para comparar de oído, por ejemplo, la menor natural con la armónica o el dórico con el frigio.',
       },
     },
   ],
