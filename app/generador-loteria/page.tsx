@@ -163,7 +163,7 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     extraMax: 12,
     extraName: 'Estrellas',
     description: '5 números del 1 al 50 + 2 Estrellas (1-12)',
-    drawDays: 'Martes y Viernes',
+    drawDays: 'Martes y viernes',
     price: '2,50 €',
     anchor: 'generador-euromillones',
     odds: '1 entre 139.838.160',
@@ -751,7 +751,7 @@ export default function GeneradorLoteriaPage() {
                   <td>1 entre 139.838.160</td>
                   <td>2,50 €</td>
                   <td>17.000.000 €</td>
-                  <td>Martes y Viernes</td>
+                  <td>Martes y viernes</td>
                 </tr>
                 <tr>
                   <td><span aria-hidden="true">🎰</span> El Gordo</td>
@@ -861,9 +861,15 @@ export default function GeneradorLoteriaPage() {
                   cada sorteo es independiente. La &quot;frecuencia histórica&quot; de un número no influye
                   en la probabilidad del siguiente sorteo. Es la llamada falacia del jugador.
                 </p>
+                {/* Hallazgo 2735: SELAE es el OPERADOR, no el regulador (Ley 13/2011, DA 1.ª, apartado
+                    Uno, BOE-A-2011-9280). Las competencias de la Comisión Nacional del Juego las
+                    ejerce la Dirección General de Ordenación del Juego (DT 1.ª de la misma ley y
+                    DA 2.ª.3 de la Ley 3/2013). */}
                 <p className={styles.faqTip}>
-                  Los sorteos de La Primitiva están supervisados por el organismo regulador español
-                  (Loterías y Apuestas del Estado) y son auditados para garantizar la aleatoriedad.
+                  Los sorteos de La Primitiva los celebra Loterías y Apuestas del Estado (SELAE), que
+                  es el operador designado por la Ley 13/2011 de regulación del juego, no su
+                  regulador: el regulador del juego en España es la Dirección General de Ordenación
+                  del Juego.
                 </p>
               </details>
             </li>
@@ -872,7 +878,7 @@ export default function GeneradorLoteriaPage() {
                 <summary>¿Qué probabilidad tengo de acertar el bote de La Primitiva?</summary>
                 <p>
                   La probabilidad de acertar los 6 números principales es de 1 entre 13.983.816.
-                  Para tener una probabilidad del 50% de acertar al menos una vez necesitarías
+                  Para tener una probabilidad del 50 % de acertar al menos una vez necesitarías
                   comprar más de 9,6 millones de boletos. Si compras uno por semana, estadísticamente
                   tardarías unos 269.000 años en acertar.
                 </p>
@@ -896,15 +902,29 @@ export default function GeneradorLoteriaPage() {
             <li className={styles.faqItem}>
               <details>
                 <summary>¿Cuánto se lleva Hacienda de un premio de lotería en España?</summary>
+                {/* Hallazgo 2734. Verificado en el texto consolidado de la Ley 35/2006 (BOE-A-2006-20764),
+                    DA 33.ª: exentos hasta 40.000 € por décimo o apuesta (ap. 2, en la redacción del
+                    art. 67.1 de la Ley 6/2018); 20 % sobre el exceso (ap. 3 y 4); retención del 20 %
+                    al pagarlo (ap. 6); sin autoliquidación si se retuvo (ap. 7); fuera de la base del
+                    IRPF (ap. 8). El cálculo no vive en data/fiscal (no hay módulo del gravamen
+                    especial), por eso las cifras van aquí con su cita. */}
                 <p>
-                  Los premios de loterías del Estado superiores a 40.000 € tributan al 20% sobre
-                  el exceso. Por ejemplo, si ganas 1.000.000 €, pagas el 20% sobre 960.000 €
-                  (el exceso sobre 40.000 €), es decir, 192.000 € de impuestos. El tipo es fijo,
-                  no progresivo como el IRPF general.
+                  Los premios de las loterías del Estado tienen un gravamen especial del 20 %
+                  sobre lo que pasa de 40.000 €; hasta esa cifra están exentos. Por ejemplo, de un
+                  premio de 1.000.000 € tributan los 960.000 € del exceso: 192.000 € de impuesto. El
+                  tipo es fijo, no progresivo como el IRPF general, y se cuenta por cada décimo o
+                  apuesta premiados (si el premio es compartido, como en una peña, los 40.000 € se
+                  reparten entre los cotitulares según su parte).
+                </p>
+                <p>
+                  Lo descuenta quien paga el premio: se cobra ya con la retención del 20 %, y
+                  entonces no hay que presentar autoliquidación del gravamen. El premio tampoco se
+                  suma a la base del IRPF, así que no cambia el tipo del resto de tus ingresos.
                 </p>
                 <p className={styles.faqTip}>
-                  Referencia legal: artículo 13 de la Ley 16/2012, de 27 de diciembre. Los premios
-                  de la ONCE y Cruz Roja también están incluidos.
+                  Referencia legal: disposición adicional 33.ª de la Ley 35/2006 del IRPF; el exento
+                  de 40.000 € lo fijó la Ley 6/2018. Incluye también los premios de la ONCE, los
+                  sorteos de Cruz Roja y las loterías de las comunidades autónomas.
                 </p>
               </details>
             </li>
@@ -1036,10 +1056,11 @@ export default function GeneradorLoteriaPage() {
                 su probabilidad en el próximo sorteo. Cada sorteo es un evento independiente.
               </li>
               <li>
-                <strong>No declarar premios a Hacienda (obligatorio si superan 40.000 €).</strong>{' '}
-                Los premios de lotería del Estado superiores a 40.000 € tributan al 20% sobre
-                el exceso. No declararlos constituye una infracción tributaria grave con
-                sanciones adicionales.
+                <strong>Creer que un premio grande se cobra entero.</strong>{' '}
+                Por encima de 40.000 € por décimo o apuesta, el premio llega con la retención
+                del 20 % sobre el exceso ya hecha: de 1.000.000 € se cobran 808.000 €.
+                Con esa retención no hay que presentar autoliquidación del gravamen
+                (disposición adicional 33.ª de la Ley del IRPF).
               </li>
               <li>
                 <strong>Perder el resguardo de la apuesta ganadora.</strong>{' '}

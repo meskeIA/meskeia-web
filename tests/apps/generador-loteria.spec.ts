@@ -1156,42 +1156,72 @@ test.describe('03/10 · comprobador con El Gordo de la Primitiva (BOE-A-2005-150
   });
 });
 
-test.describe('03/10 · escritorio 1280×800 — la tarjeta recién generada y la píldora fija del Footer', () => {
-  test.use({ viewport: { width: 1280, height: 800 } });
-
-  test.fail('hallazgo A · tras Generar, la estrella de la tarjeta nueva recibe el clic', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 03/10/2026). Por encima de 768 px el Footer compartido es
-    // una píldora FIJA abajo a la derecha (components/Footer.module.css: bottom 10 px, right
-    // 20 px, z-index 1000). Desde la reparación del 25/09 (hallazgo 1632), Generar lleva la
-    // tarjeta nueva a la vista con `block: 'nearest'`, que la deja con su borde inferior pegado
-    // al pie de la ventana: justo debajo de la píldora quedan Copiar y Guardar. Medido con la
-    // vista bajada 150-400 px: la estrella en (1062, 746) y la píldora en 990-1260 × 745-790;
-    // igual a 1024×768, 1366×768 y 800×900 (a 1920×1080, no). Un clic en la estrella no guarda
-    // nada; a 1024×768 cae en «Compartir» y deja en el portapapeles la URL de la página.
-    // DEBE: la estrella (y Copiar) de la tarjeta recién generada reciben el clic.
-    await esperarInteractiva(page);
-    await page.evaluate(() => window.scrollTo(0, 300));
-    const caja = (await botonGenerar(page).boundingBox())!;
-    expect(caja.y >= 0 && caja.y + caja.height <= 800).toBe(true); // precondición: botón a la vista
-    await botonGenerar(page).click();
-    await expect(page.locator('[class*="resultCard"]')).toHaveCount(1);
-    await expect.poll(() => page.evaluate(() => {
-      const r = document.querySelector('[class*="resultCard"]')!.getBoundingClientRect();
-      return r.top >= 0 && r.bottom <= window.innerHeight + 1;
-    }), { timeout: 3_000 }).toBe(true);
-    await esperarDesplazamientoQuieto(page);
-
-    const estrella = page.locator('[class*="resultCard"]').first().getByRole('button', { name: /Guardar esta combinación/ });
-    const recibe = await estrella.evaluate((b) => {
-      const r = b.getBoundingClientRect();
-      const encima = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-      return !!encima && b.contains(encima);
-    });
-    expect(recibe).toBe(true); // HOY: lo recibe la píldora del Footer
-    const e = (await estrella.boundingBox())!;
-    await page.mouse.click(e.x + e.width / 2, e.y + e.height / 2);
-    await expect.poll(async () => (await leerFavoritas(page)).length).toBe(1);
+/**
+ * Comprueba que el centro de `boton` lo recibe el propio botón y no algo pintado encima (la
+ * píldora fija del Footer, la barra del logo). Es la prueba de lo que ve y toca el usuario.
+ */
+async function recibeElClic(boton: Locator): Promise<boolean> {
+  return boton.evaluate((b) => {
+    const r = b.getBoundingClientRect();
+    const encima = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return !!encima && b.contains(encima);
   });
+}
+
+test.describe('03/10 · escritorio — la tarjeta recién generada y la píldora fija del Footer', () => {
+  // REPARADO, hallazgo 2732 (inspector 03/10/2026). Por encima de 768 px el Footer compartido
+  // es una píldora FIJA abajo a la derecha (components/Footer.module.css: bottom 10 px, right
+  // 20 px, z-index 1000, 45 px de alto). Generar lleva la tarjeta nueva a la vista con
+  // `block: 'nearest'` (hallazgo 1632), que la dejaba con el borde inferior pegado al pie:
+  // Copiar y Guardar, debajo de la píldora. ANTES, a 1280×800 la estrella en (1062, 746) y la
+  // píldora en 990-1260 × 745-790: el clic caía en «¿Te resultó útil?»; a 1024×768, en
+  // «Compartir». AHORA la tarjeta lleva `scroll-margin-bottom: 80px` (y `scroll-margin-top`
+  // para la barra del logo) y queda por encima de la píldora. El Footer no se toca: es compartido.
+  const VISTAS: Array<{ width: number; height: number }> = [
+    { width: 1280, height: 800 },
+    { width: 1024, height: 768 },
+    { width: 1366, height: 768 },
+    { width: 800, height: 900 },
+  ];
+
+  for (const vista of VISTAS) {
+    test(`${vista.width}×${vista.height} · tras Generar, la estrella y Copiar de la tarjeta nueva reciben el clic`, async ({ page }) => {
+      await page.setViewportSize(vista);
+      await esperarInteractiva(page);
+      if (vista.width === 1280) {
+        // El caso de la ficha: vista bajada 300 px, botón Generar en 601-659
+        await page.evaluate(() => window.scrollTo(0, 300));
+      } else {
+        // El botón a la vista pero cerca del pie: la tarjeta nace por debajo de la pantalla
+        await botonAlPie(page, '[class*="generateButton"]', 60);
+      }
+      const caja = (await botonGenerar(page).boundingBox())!;
+      expect(caja.y >= 0 && caja.y + caja.height <= vista.height).toBe(true); // precondición
+      await botonGenerar(page).click();
+      await expect(page.locator('[class*="resultCard"]')).toHaveCount(1);
+      await expect.poll(() => page.evaluate(() => {
+        const r = document.querySelector('[class*="resultCard"]')!.getBoundingClientRect();
+        return r.top >= 0 && r.bottom <= window.innerHeight + 1;
+      }), { timeout: 3_000 }).toBe(true);
+      await esperarDesplazamientoQuieto(page);
+
+      // Precondición: la píldora sigue fija en este ancho (si no, el caso no probaría nada)
+      const estado = await page.evaluate(() => {
+        const pie = [...document.querySelectorAll('footer, [class*="footer"]')]
+          .find((f) => getComputedStyle(f).position === 'fixed');
+        return { pildoraFija: !!pie };
+      });
+      expect(estado.pildoraFija).toBe(true);
+
+      const tarjeta = page.locator('[class*="resultCard"]').first();
+      const estrella = tarjeta.getByRole('button', { name: /Guardar esta combinación/ });
+      expect(await recibeElClic(estrella)).toBe(true); // ANTES: lo recibía la píldora del Footer
+      expect(await recibeElClic(tarjeta.getByRole('button', { name: 'Copiar combinación' }))).toBe(true);
+      const e = (await estrella.boundingBox())!;
+      await page.mouse.click(e.x + e.width / 2, e.y + e.height / 2);
+      await expect.poll(async () => (await leerFavoritas(page)).length).toBe(1);
+    });
+  }
 });
 
 test.describe('03/10 · móvil 360×800 — barra fija del logo y comprobador', () => {
@@ -1243,96 +1273,177 @@ test.describe('03/10 · móvil 360×800 — barra fija del logo y comprobador', 
     expect(panel.y).toBeGreaterThanOrEqual(barra);
   });
 
-  test.fail('hallazgo B · Comprobar con el botón al pie: el resumen del resultado se ve', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 03/10/2026). El resultado del comprobador se pinta DEBAJO del
-    // botón y la vista no se mueve: con el botón al pie (borde inferior a 792 px) el resumen
-    // empieza en 808 px y la primera fila en 892. Es lo mismo que el hallazgo 1632 reparó en el
-    // generador. Lo atenúa el teclado del móvil (al cerrarse deja ver lo que hay debajo), por
-    // eso es bajo. El resumen sí se anuncia por la región aria-live.
-    // DEBE: tras pulsar, el resumen (o la vista desplazada hasta él) a la vista.
-    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GORDO_0310) });
-    await teclearGordo(page, ['4', '18', '27', '39', '52'], '6');
-    await botonAlPie(page, '[class*="comprobadorBoton"]', 8);
-    const zona = zonaComprobador(page);
-    const caja = (await zona.getByRole('button', { name: /Comprobar mis combinaciones/ }).boundingBox())!;
-    await page.touchscreen.tap(caja.x + caja.width / 2, caja.y + caja.height / 2);
-    await expect(zona.locator('[class*="comprobadorResumen"]')).toHaveCount(1);
-    await expect.poll(() => page.evaluate(() =>
-      document.querySelector('[class*="comprobadorResumen"]')!.getBoundingClientRect().bottom <= window.innerHeight,
-    ), { timeout: 3_000 }).toBe(true);
-  });
-
-  test.fail('hallazgo B · un sorteo imposible con el botón al pie: el aviso se ve', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 03/10/2026). El aviso (role="alert") nace justo debajo del
-    // botón: con el botón al pie queda en 800-847 px, fuera de la pantalla; a la vista no cambia
-    // nada y el botón parece no responder.
-    // DEBE: el aviso entero a la vista.
-    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GORDO_0310) });
-    await teclearGordo(page, ['4', '18', '27', '39', '52'], '10');
-    await botonAlPie(page, '[class*="comprobadorBoton"]', 8);
-    const zona = zonaComprobador(page);
-    const caja = (await zona.getByRole('button', { name: /Comprobar mis combinaciones/ }).boundingBox())!;
-    await page.touchscreen.tap(caja.x + caja.width / 2, caja.y + caja.height / 2);
-    await expect(zona.getByRole('alert')).toHaveText('Clave: 10 está fuera de rango, va del 0 al 9.');
-    await expect.poll(() => page.evaluate(() =>
-      document.querySelector('[class*="comprobadorError"]')!.getBoundingClientRect().bottom <= window.innerHeight,
-    ), { timeout: 3_000 }).toBe(true);
-  });
 });
 
+// REPARADO, hallazgo 2733 (inspector 03/10/2026). El resultado del comprobador y su aviso se
+// pintan DEBAJO del botón y la vista no se movía: con el botón al pie, ANTES, a 360×800 el
+// resumen empezaba en 808 px y el aviso de «clave 10» quedaba en 800-847; a 390×844, resumen en
+// 852 y aviso en 844-891. AHORA «Comprobar» lleva a la vista el resumen o el aviso
+// (`scrollIntoView` 'nearest', con los mismos `scroll-margin` que la tarjeta del generador).
+for (const vista of [{ width: 360, height: 800 }, { width: 390, height: 844 }]) {
+  test.describe(`03/10 · móvil ${vista.width}×${vista.height} — el comprobador lleva a la vista lo que sale`, () => {
+    test.use({
+      viewport: vista,
+      userAgent: UA_ANDROID,
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    /** Rectángulo del primer elemento que casa con `selector`, en coordenadas de la vista. */
+    const caja = (page: Page, selector: string) => page.evaluate((sel) => {
+      const r = document.querySelector(sel)!.getBoundingClientRect();
+      return { top: r.top, bottom: r.bottom, alto: window.innerHeight };
+    }, selector);
+
+    test('Comprobar con el botón al pie: el resumen del resultado se ve entero', async ({ page }) => {
+      await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GORDO_0310) });
+      await teclearGordo(page, ['4', '18', '27', '39', '52'], '6');
+      await botonAlPie(page, '[class*="comprobadorBoton"]', 8);
+      const zona = zonaComprobador(page);
+      const boton = (await zona.getByRole('button', { name: /Comprobar mis combinaciones/ }).boundingBox())!;
+      expect(boton.y + boton.height).toBeLessThanOrEqual(vista.height); // precondición: botón a la vista
+      await page.touchscreen.tap(boton.x + boton.width / 2, boton.y + boton.height / 2);
+      await expect(zona.locator('[class*="comprobadorResumen"]')).toHaveText(
+        '8 de tus 10 combinaciones de El Gordo de la Primitiva tienen premio de categoría; 5 aciertan el reintegro.');
+      await expect.poll(async () => {
+        const r = await caja(page, '[class*="comprobadorResumen"]');
+        return r.top >= 0 && r.bottom <= r.alto;
+      }, { timeout: 3_000 }).toBe(true);
+      await esperarDesplazamientoQuieto(page);
+      // Entero y por debajo de la barra fija del logo
+      const r = await caja(page, '[class*="comprobadorResumen"]');
+      const barra = await page.evaluate(() =>
+        document.querySelector('[class*="headerBar"]')!.getBoundingClientRect().bottom);
+      expect(r.top).toBeGreaterThanOrEqual(barra);
+      expect(r.bottom).toBeLessThanOrEqual(r.alto);
+    });
+
+    test('un sorteo imposible con el botón al pie: el aviso se ve entero', async ({ page }) => {
+      await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GORDO_0310) });
+      await teclearGordo(page, ['4', '18', '27', '39', '52'], '10');
+      await botonAlPie(page, '[class*="comprobadorBoton"]', 8);
+      const zona = zonaComprobador(page);
+      const boton = (await zona.getByRole('button', { name: /Comprobar mis combinaciones/ }).boundingBox())!;
+      expect(boton.y + boton.height).toBeLessThanOrEqual(vista.height);
+      await page.touchscreen.tap(boton.x + boton.width / 2, boton.y + boton.height / 2);
+      await expect(zona.getByRole('alert')).toHaveText('Clave: 10 está fuera de rango, va del 0 al 9.');
+      await expect.poll(async () => {
+        const r = await caja(page, '[class*="comprobadorError"]');
+        return r.top >= 0 && r.bottom <= r.alto;
+      }, { timeout: 3_000 }).toBe(true);
+      await esperarDesplazamientoQuieto(page);
+      const r = await caja(page, '[class*="comprobadorError"]');
+      expect(r.bottom).toBeLessThanOrEqual(r.alto);
+      // Y el botón sigue a la vista: se corrige la clave y se vuelve a pulsar sin buscarlo
+      const b = (await zona.getByRole('button', { name: /Comprobar mis combinaciones/ }).boundingBox())!;
+      expect(b.y).toBeGreaterThanOrEqual(0);
+    });
+  });
+}
+
 test.describe('03/10 · contenido y accesibilidad', () => {
-  test.fail('hallazgo C · la información fiscal no contradice la disposición adicional 33.ª de la LIRPF', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 03/10/2026). Fuente: Ley 35/2006, DA 33.ª (texto consolidado
-    // del BOE, BOE-A-2006-20764). Apartado 6: el premio sufre una retención del 20 % sobre lo
-    // que excede de 40.000 €. Apartado 7: «no existirá obligación de presentar la citada
-    // autoliquidación cuando … se hubiera practicado retención». Apartado 8: el premio no se
-    // integra en la base del IRPF. La DA 33.ª la añadió la Ley 13/2011 (DF 9.ª), la reescribió
-    // el ARTÍCULO 2 de la Ley 16/2012 y los 40.000 € son de la Ley 6/2018 (art. 67.1); el
-    // artículo 13 de la Ley 16/2012 modifica el ITP-AJD.
-    // HOY: «No declarar premios a Hacienda (obligatorio si superan 40.000 €)… No declararlos
-    // constituye una infracción tributaria grave», y «Referencia legal: artículo 13 de la Ley
-    // 16/2012». DEBE: ni la obligación de declarar un premio ya retenido ni el artículo 13.
-    await expect(page.getByText(/obligatorio si superan 40\.000/)).toHaveCount(0);
-    await expect(page.getByText(/infracción tributaria grave/)).toHaveCount(0);
-    await expect(page.getByText(/artículo 13 de la Ley 16\/2012/)).toHaveCount(0);
+  test('hallazgo 2734 · la información fiscal sigue la disposición adicional 33.ª de la LIRPF', async ({ page }) => {
+    // REPARADO, hallazgo 2734 (inspector 03/10/2026). Fuente: Ley 35/2006, DA 33.ª (texto
+    // consolidado del BOE, BOE-A-2006-20764, leído el 03/10/2026). Ap. 2: exentos hasta 40.000 €
+    // (redacción del art. 67.1 de la Ley 6/2018); ap. 4: 20 % sobre el exceso; ap. 6: retención
+    // del 20 %; ap. 7: «no existirá obligación de presentar la citada autoliquidación cuando …
+    // se hubiera practicado retención»; ap. 8: el premio no se integra en la base del IRPF.
+    // ANTES: «No declarar premios a Hacienda (obligatorio si superan 40.000 €)… infracción
+    // tributaria grave», y «Referencia legal: artículo 13 de la Ley 16/2012» (que modifica el
+    // ITP-AJD; el gravamen lo reescribió su artículo 2).
+    const educativo = page.locator('[class*="guideSection"]');
+    await expect(educativo).toHaveCount(6);
+    await expect(educativo.getByText(/obligatorio si superan 40\.000/)).toHaveCount(0);
+    await expect(educativo.getByText(/infracción tributaria grave/)).toHaveCount(0);
+    await expect(educativo.getByText(/artículo 13 de la Ley 16\/2012/)).toHaveCount(0);
+    const texto = (await educativo.allTextContents()).join(' ').replace(/\s+/g, ' ');
+    expect(texto).toContain('disposición adicional 33.ª de la Ley 35/2006');
+    expect(texto).toContain('no hay que presentar autoliquidación');
+    expect(texto).toContain('tampoco se suma a la base del IRPF');
+    // La cuenta del ejemplo: (1.000.000 − 40.000) × 20 % = 192.000; se cobran 808.000
+    expect(texto).toContain('192.000 € de impuesto');
+    expect(texto).toContain('de 1.000.000 € se cobran 808.000 €');
   });
 
-  test.fail('hallazgo D · Loterías y Apuestas del Estado no se presenta como el regulador', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 03/10/2026). Ley 13/2011, de regulación del juego, DA 1.ª,
-    // apartado Uno (BOE-A-2011-9280): SELAE y la ONCE «son los operadores designados para la
-    // comercialización de los juegos de loterías». HOY la FAQ dice que los sorteos «están
-    // supervisados por el organismo regulador español (Loterías y Apuestas del Estado)».
-    await expect(page.getByText(/organismo regulador español \(Loterías y Apuestas del Estado\)/)).toHaveCount(0);
+  test('hallazgo 2735 · Loterías y Apuestas del Estado figura como operador, no como regulador', async ({ page }) => {
+    // REPARADO, hallazgo 2735 (inspector 03/10/2026). Ley 13/2011, de regulación del juego,
+    // DA 1.ª, apartado Uno (BOE-A-2011-9280): SELAE y la ONCE «son los operadores designados
+    // para la comercialización de los juegos de loterías». Las competencias de la Comisión
+    // Nacional del Juego las ejerce la Dirección General de Ordenación del Juego (DT 1.ª de esa
+    // ley). ANTES la FAQ decía «supervisados por el organismo regulador español (Loterías y
+    // Apuestas del Estado)».
+    const faq = page.locator('[class*="faqList"]');
+    await expect(faq).toHaveCount(1);
+    await expect(faq.getByText(/organismo regulador español \(Loterías y Apuestas del Estado\)/)).toHaveCount(0);
+    const texto = (await faq.allTextContents()).join(' ').replace(/\s+/g, ' ');
+    expect(texto).toContain('operador designado por la Ley 13/2011');
+    expect(texto).toContain('el regulador del juego en España es la Dirección General de Ordenación del Juego');
   });
 
-  test.fail('hallazgo E · porcentajes con espacio y días de la semana en minúscula', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 03/10/2026). «15 %» con espacio duro (CLAUDE.md global §2,
-    // 25/09/2026) y los días de la semana en minúscula (RAE), como ya hace La Primitiva
-    // («Lunes, jueves y sábados»). HOY: «50%» y «20%» (tres veces) en el bloque educativo, y
-    // «Martes y Viernes» en el panel de Euromillones, en su ficha y en la tabla comparativa.
+  test('hallazgo 2736 · porcentajes con espacio duro y días de la semana en minúscula', async ({ page }) => {
+    // REPARADO, hallazgo 2736 (inspector 03/10/2026). «15 %» con espacio duro U+00A0 (CLAUDE.md
+    // global §2, 25/09/2026) y los días de la semana en minúscula, como La Primitiva («Lunes,
+    // jueves y sábados»). ANTES: «50%» y «20%» (tres veces) en el bloque educativo, y «Martes y
+    // Viernes» en el panel de Euromillones, en su ficha y en la tabla comparativa.
     const educativo = (await page.locator('[class*="guideSection"]').allTextContents()).join(' ');
     expect(educativo.match(/\d+%/g) ?? []).toEqual([]);
+    expect(educativo.match(/\d+ %/g) ?? []).toEqual([]); // espacio normal: el % saltaría solo de línea
+    expect((educativo.match(/\d+ %/g) ?? []).length).toBeGreaterThanOrEqual(4);
     await expect(page.locator('[class*="modalidadesSection"]')).not.toContainText('Martes y Viernes');
     await expect(page.locator('[class*="comparativaTable"]')).not.toContainText('Martes y Viernes');
+    await expect(page.locator('#generador-euromillones')).toContainText('Martes y viernes');
+    await expect(page.locator('[class*="comparativaTable"]')).toContainText('Martes y viernes');
+    await seleccionarLoteria(page, 'euromillones');
+    await expect(page.locator('[class*="lotteryInfo"]')).toContainText('Martes y viernes');
   });
 
-  test.fail('hallazgo F · las casillas del comprobador se distinguen del fondo (3:1)', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 03/10/2026). WCAG 1.4.11 (contraste de lo que no es texto):
-    // el borde de un campo es lo que lo identifica, y las casillas de los números no llevan
-    // etiqueta visible propia. Borde 2 px var(--border) sobre var(--bg-card), con la sección
-    // del mismo fondo: #E5E5E5 sobre #FFFFFF = 1,26:1 en claro; #404040 sobre #2A2A2A = 1,38:1
-    // en oscuro (medido en navegador). DEBE: al menos 3:1.
-    await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(GORDO_0310.slice(0, 1)) });
-    const ratio = await zonaComprobador(page).getByLabel('Número 1 de la combinación ganadora').evaluate((el) => {
-      const rgb = (c: string) => (c.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
-      const lum = (c: string) => {
-        const [r, g, b] = rgb(c).map((v) => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; });
-        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-      };
-      const borde = lum(getComputedStyle(el).borderTopColor);
-      const fondo = lum(getComputedStyle(el).backgroundColor);
-      return (Math.max(borde, fondo) + 0.05) / (Math.min(borde, fondo) + 0.05);
+  // REPARADO, hallazgo 2737 (inspector 03/10/2026). WCAG 1.4.11 (contraste de lo que no es
+  // texto): el borde de un campo es lo que lo identifica, y las casillas de los números no
+  // llevan etiqueta visible propia. ANTES: borde 2 px var(--border) sobre var(--bg-card), con
+  // la sección del mismo fondo: 1,26:1 en claro (#E5E5E5/#FFFFFF) y 1,38:1 en oscuro
+  // (#404040/#2A2A2A). AHORA var(--borde-campo): #858585 en claro y #808080 en oscuro. Se mide
+  // contra el fondo de DENTRO de la casilla y contra el de FUERA (la sección que la contiene),
+  // subiendo hasta el primer fondo opaco, en los dos temas, con el tema aplicado de verdad.
+  for (const tema of ['light', 'dark'] as const) {
+    test(`hallazgo 2737 · las casillas del comprobador se distinguen del fondo (3:1), tema ${tema}`, async ({ page }) => {
+      await sembrarYRecargar(page, {
+        [CLAVE_FAVORITAS]: JSON.stringify(GORDO_0310.slice(0, 1)),
+        'meskeia-theme': tema,
+      });
+      await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
+      const medida = await zonaComprobador(page).getByLabel('Número 1 de la combinación ganadora').evaluate((el) => {
+        const rgba = (c: string) => (c.match(/\d+(\.\d+)?/g) ?? []).map(Number);
+        const lum = (c: string) => {
+          const [r, g, b] = rgba(c).slice(0, 3).map((v) => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; });
+          return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        };
+        const ratio = (a: string, b: string) => {
+          const la = lum(a);
+          const lb = lum(b);
+          return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+        };
+        /** Primer fondo opaco subiendo desde `n` (una capa translúcida no cuenta como fondo). */
+        const fondoOpaco = (n: Element | null): string => {
+          for (let e = n; e; e = e.parentElement) {
+            const c = getComputedStyle(e).backgroundColor;
+            const a = rgba(c)[3];
+            if (c !== 'transparent' && (a === undefined || a === 1)) return c;
+          }
+          return 'rgb(255, 255, 255)';
+        };
+        const borde = getComputedStyle(el).borderTopColor;
+        const alfaBorde = rgba(borde)[3];
+        return {
+          borde,
+          bordeOpaco: alfaBorde === undefined || alfaBorde === 1,
+          dentro: ratio(borde, fondoOpaco(el)),
+          fuera: ratio(borde, fondoOpaco(el.parentElement)),
+        };
+      });
+      expect(medida.bordeOpaco).toBe(true);
+      expect(medida.dentro).toBeGreaterThanOrEqual(3);
+      expect(medida.fuera).toBeGreaterThanOrEqual(3);
     });
-    expect(ratio).toBeGreaterThanOrEqual(3);
-  });
+  }
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './GeneradorLoteria.module.css';
 import {
   comprobarApuesta,
@@ -74,6 +74,24 @@ export default function ComprobadorSorteo({ guardadas, modalidades, onAnunciar }
     error: null,
   });
 
+  /**
+   * Cuenta de pulsaciones de «Comprobar»: cada una lleva a la vista lo que ha salido, el
+   * resumen o el aviso (hallazgo 2733). Los dos se pintan debajo del botón y, con el botón al
+   * pie de la pantalla, quedaban fuera: pulsar parecía no hacer nada. Es el mismo patrón que
+   * el generador (hallazgo 1632) y con los mismos márgenes (`scroll-margin` en el CSS).
+   */
+  const [pulsacion, setPulsacion] = useState(0);
+  const resumenRef = useRef<HTMLParagraphElement>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (pulsacion === 0) return;
+    const destino = errorRef.current ?? resumenRef.current;
+    if (!destino) return;
+    const reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    destino.scrollIntoView({ behavior: reducirMovimiento ? 'auto' : 'smooth', block: 'nearest' });
+  }, [pulsacion]);
+
   // Si la modalidad elegida se queda sin combinaciones (las han quitado), se pasa a la
   // primera que tenga alguna, con las casillas en blanco.
   const activa: Modalidad | null = estado.modalidad && disponibles.includes(estado.modalidad)
@@ -111,6 +129,7 @@ export default function ComprobadorSorteo({ guardadas, modalidades, onAnunciar }
 
   const comprobar = () => {
     const r = validarSorteo(activa, campos);
+    setPulsacion(n => n + 1);
     if (!r.ok) {
       setEstado({ modalidad: activa, campos, comprobado: null, error: r.error });
       return;
@@ -233,12 +252,12 @@ export default function ComprobadorSorteo({ guardadas, modalidades, onAnunciar }
       </button>
 
       {error && (
-        <p className={styles.comprobadorError} role="alert">{error}</p>
+        <p ref={errorRef} className={styles.comprobadorError} role="alert">{error}</p>
       )}
 
       {comprobado && (
         <div className={styles.comprobadorResultado}>
-          <p className={styles.comprobadorResumen}>{resumen(resultados, datos.name)}</p>
+          <p ref={resumenRef} className={styles.comprobadorResumen}>{resumen(resultados, datos.name)}</p>
           <ul className={styles.comprobadorLista}>
             {filas.map(({ guardada, resultado }) => (
               <FilaComprobada
