@@ -189,11 +189,17 @@ test.describe('Caso 1 · dato: las cifras publicadas', () => {
     // Literal de data del page.tsx, cotejado en la cabecera de este fichero. Desde el
     // 03/10/2026 se compara por el PRINCIPIO del texto y con el «%» separable: así no fija
     // como correcto el «%» pegado ni impide añadir detrás la fuente que falta (caso 8).
+    //
+    // REPARADO el 03/10/2026 (hallazgo 2764): las tres de abajo cambian de texto porque
+    // ahora dicen de qué población son, y glaucoma y DMAE pasan a la cifra MUNDIAL. Cotejadas
+    // con el resumen en PubMed: Congdon 2004 «20.5 million (17.2%) Americans older than 40
+    // years have cataract»; Tham 2014 «3.54% … population aged 40-80 years»; Wong 2014
+    // «any age-related macular degeneration … 8.69%», «mapped to an age range of 45-85 years».
     const esperado: ReadonlyArray<readonly [string, string]> = [
       ['Visión normal', 'Base de referencia'],
-      ['Cataratas', '~17% mayores de 40 años'],
-      ['Glaucoma', '~2% mayores de 40 años'],
-      ['Degeneración macular', '~8% mayores de 60 años'],
+      ['Cataratas', '~17% de los mayores de 40 años en EE. UU.'],
+      ['Glaucoma', '~3,5% entre los 40 y los 80 años, en todo el mundo'],
+      ['Degeneración macular', '~8,7% entre los 45 y los 85 años, en todo el mundo'],
       ['Protanopia (rojo)', '~1% hombres'],
       ['Deuteranopia (verde)', '~1% hombres'],
       ['Tritanopia (azul)', '~0,01% de la población'],
@@ -209,9 +215,15 @@ test.describe('Caso 1 · dato: las cifras publicadas', () => {
     // MILLONES DE PERSONAS con deficiencia visual (≈28 %), y el FAQPage de esta misma app
     // da 217 millones con baja visión moderada o grave, que sobre 7.700 millones es el
     // 2,8 %. Parecía «2,2 mil millones» con la unidad cambiada (hallazgo 954).
+    //
+    // ⚠️ CORREGIDO el 03/10/2026 (hallazgo 2770): aquel 2,8 % dividía los 216,6 millones de
+    // 2015 entre la población de 2019, y la atribución a la OMS no era la de la cifra. La
+    // fuente es Bourne et al. (Lancet Glob Health 2017), que publica la prevalencia bruta:
+    // «216·6 million … had moderate to severe visual impairment (2·95%…)», datos de 2015.
     await elegirCondicion(page, 'Baja visión general');
-    await expect(page.locator('[class*="infoPrevalencia"]')).toContainText(conPct('2,8%'));
-    await expect(page.locator('[class*="infoPrevalencia"]')).toContainText('OMS');
+    await expect(page.locator('[class*="infoPrevalencia"]')).toContainText(conPct('2,95%'));
+    await expect(page.locator('[class*="infoPrevalencia"]')).toContainText('Bourne');
+    await expect(page.locator('[class*="infoPrevalencia"]')).toContainText('2015');
 
     // El 30 % era la miopía de CUALQUIER grado (Holden 2016: 28,3 %); la miopía alta, que
     // es la que el botón llama «severa», está en el 4,0 % (hallazgo 955).
@@ -836,10 +848,7 @@ async function contrastePrevalencia(page: Page): Promise<number> {
 
 test.describe('Caso 7 · accesibilidad de la ficha y del deslizador', () => {
   test('la prevalencia se lee con 4,5:1 en el tema claro', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): la prevalencia va en var(--primary) y da 4,11:1 sobre la ficha blanca',
-    );
+    // REPARADO el 03/10/2026 (hallazgo 2766).
     // Texto de 13,6 px y peso 500: no es «texto grande», así que exige 4,5:1. A mano:
     // #2E86AB tiene luminancia 0,2057 y el blanco 1 → (1 + 0,05)/(0,2057 + 0,05) = 4,11.
     // El token para texto de marca es --primary-texto (#26718F, 5,47:1 sobre blanco).
@@ -863,10 +872,7 @@ test.describe('Caso 7 · accesibilidad de la ficha y del deslizador', () => {
   });
 
   test('el nombre accesible del deslizador contiene su etiqueta visible', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): el aria-label «Intensidad de simulación» no contiene la etiqueta visible «Intensidad de la simulación»',
-    );
+    // REPARADO el 03/10/2026 (hallazgo 2767).
     // WCAG 2.5.3 (Etiqueta en el nombre, nivel A): quien maneja la página por voz dice lo que
     // ve. La etiqueta visible es «Intensidad de la simulación: 60%», pero el aria-label la
     // sustituye por «Intensidad de simulación: 60%» —sin «la»— y además repite el valor, que
@@ -874,6 +880,8 @@ test.describe('Caso 7 · accesibilidad de la ficha y del deslizador', () => {
     await abrir(page);
     await elegirCondicion(page, 'Cataratas');
     await expect(page.getByRole('slider')).toHaveAccessibleName(/Intensidad de la simulación/);
+    // El valor no va en el nombre: lo anuncia el propio control, con su «%» separado.
+    await expect(page.getByRole('slider')).toHaveAttribute('aria-valuetext', '60\u00A0%');
   });
 });
 
@@ -892,7 +900,7 @@ const respuestaFaq = (page: Page, pregunta: string): Locator =>
 
 test.describe('Caso 8 · contenido y datos', () => {
   test('el «%» va separado de la cifra con espacio duro (U+00A0)', async ({ page }) => {
-    test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): la app pega el «%» a la cifra en todas partes');
+    // REPARADO el 03/10/2026 (hallazgo 2768).
     // CLAUDE.md §2 (decidido el 25/09/2026): «15 %», con U+00A0. Hoy son 0 de ~20 apariciones:
     // prevalencias, etiqueta del deslizador, subtítulo, tabla, FAQ y pasos de la auditoría.
     await abrir(page);
@@ -900,15 +908,28 @@ test.describe('Caso 8 · contenido y datos', () => {
     const crudo = (l: Locator): Promise<string> => l.evaluate((el) => el.textContent ?? '');
     expect(await crudo(page.locator('[class*="infoPrevalencia"]'))).toContain('17 %');
     expect(await crudo(page.locator('label[for="slider-intensidad"]'))).toContain('60 %');
+    // Y en el resto de la página, guía y FAQ incluidas (se leen por textContent aunque estén
+    // plegadas): ni una cifra con el «%» pegado ni con un espacio normal que lo deje caer solo
+    // a la línea siguiente. Con Cataratas elegida son 13 apariciones; el suelo evita que esto pase en
+    // falso si la guía dejara de montarse.
+    await abrirGuia(page);
+    // Solo las regiones de esta app: RelatedApps y ShareCard, también dentro de <main>,
+    // traen textos de otras apps que no son de este hallazgo.
+    const pagina = await page.evaluate(() =>
+      [...document.querySelectorAll(
+        '[class*="intensidadSeccion"], [class*="infoCondicion"], [class*="demoSubtitulo"], [class*="warningBox"], [class*="educativo"]',
+      )]
+        .map((el) => el.textContent ?? '')
+        .join(' '),
+    );
+    expect(pagina.match(/\d ?%/g) ?? []).toEqual([]);
+    expect((pagina.match(/\d\u00a0%/g) ?? []).length).toBeGreaterThanOrEqual(13);
   });
 
   test('cataratas, glaucoma y degeneración macular citan fuente y año, como miopía y baja visión', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): tres prevalencias sin fuente, dos de ellas de EE. UU. presentadas como generales',
-    );
+    // REPARADO el 03/10/2026 (hallazgo 2764).
     // Las dos reparadas el 20/09 llevan su fuente entre paréntesis: «(… Holden et al.,
     // Ophthalmology 2016)» y «(OMS, 2019)». Las otras tres no, y no son cifras neutras:
     //   · «~17% mayores de 40 años» es el 17,2 % de EE. UU. (Congdon et al., Eye Diseases
@@ -926,10 +947,7 @@ test.describe('Caso 8 · contenido y datos', () => {
   });
 
   test('la ficha de la tritanopia describe la confusión que la propia simulación enseña', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): la ficha dice «Azul y amarillo indistinguibles» y la simulación los separa',
-    );
+    // REPARADO el 03/10/2026 (hallazgo 2765).
     // National Eye Institute (NIH), «Types of Color Vision Deficiency»: la tritanopia impide
     // distinguir «blue and green, purple and red, and yellow and pink». Lo mismo enseña la
     // simulación de la app (caso 4): la píldora azul pasa a rgb(0,134,157) y la verde a
@@ -940,14 +958,15 @@ test.describe('Caso 8 · contenido y datos', () => {
     await elegirCondicion(page, 'Tritanopia (azul)');
     const ficha = page.locator('[class*="infoCondicion"]');
     await expect(ficha).not.toContainText(/azul y amarillo (se confunden|indistinguibles)/i);
-    await expect(ficha).toContainText(/verde/i);
+    await expect(ficha).toContainText(/azul con el verde/i);
+    // Y el otro par del NEI que la simulación también enseña: la píldora amarilla #ca8a04
+    // queda en rgb(221,121,117), un rosa salmón (caso 4).
+    await expect(ficha).toContainText(/amarillo con el rosa/i);
+    await expect(ficha).toContainText(/amarillos que viran a rosa/i);
   });
 
   test('la prevalencia del daltonismo es la de Birch (2012), con su población', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): la FAQ da «~0,5% de mujeres» y el 8 % sin decir de qué población',
-    );
+    // REPARADO el 03/10/2026 (hallazgo 2769).
     // Birch, J. (2012), JOSA A 29(3): «about 8% in men and about 0.4% in women» en
     // EUROPEOS, y entre el 4 % y el 6,5 % en hombres de ascendencia china y japonesa. Es la
     // fuente que cita la app hermana `simulador-daltonismo`, que comparte motor con esta y
@@ -957,13 +976,16 @@ test.describe('Caso 8 · contenido y datos', () => {
     const respuesta = respuestaFaq(page, '¿El daltonismo afecta igual a hombres y mujeres?');
     await expect(respuesta).toContainText(conPct('0,4%'));
     await expect(respuesta).toContainText(/europe/i);
+    await expect(respuesta).toContainText('Birch (2012)');
+    await expect(respuesta).not.toContainText(conPct('0,5%'));
+    // Y la tabla dice de qué población es el 8 %.
+    await expect(
+      page.locator('[class*="tabla"] tbody tr').filter({ hasText: 'Daltonismo' }),
+    ).toContainText(/ascendencia europea/);
   });
 
   test('el FAQPage no llama «algún grado» de discapacidad visual a los 253 millones', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): los 253 millones son ceguera + discapacidad moderada o grave, no «algún grado»',
-    );
+    // REPARADO el 03/10/2026 (hallazgo 2770).
     // Bourne et al., Lancet Glob Health 2017 (datos de 2015, los que recoge la OMS): 36,0
     // millones de ciegos + 216,6 millones con discapacidad visual moderada o grave = 252,6
     // millones. La LEVE suma otros 188,5 millones, y la OMS (Informe mundial sobre la visión,
@@ -978,13 +1000,17 @@ test.describe('Caso 8 · contenido y datos', () => {
     );
     expect(respuestas.length).toBe(5);
     expect(respuestas.join(' ')).not.toMatch(/253 millones[^.]*algún grado/);
+    // Y lo que dice en su lugar: las tres cifras de Bourne con su año, y la de la OMS aparte.
+    const primera = respuestas[0];
+    expect(primera).toContain('Bourne');
+    expect(primera).toMatch(/en 2015/);
+    expect(primera).toContain('216,6 millones con discapacidad visual moderada o grave');
+    expect(primera).toContain('188,5 millones con discapacidad visual leve');
+    expect(primera).toContain('2.200 millones');
   });
 
   test('el Real Decreto 1112/2018 se presenta como lo que es: norma del sector público', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): la FAQ lo da como «mínimo legal en España» sin decir que es del sector público',
-    );
+    // REPARADO el 03/10/2026 (hallazgo 2771).
     // Título en el BOE (BOE-A-2018-12699): «Real Decreto 1112/2018, de 7 de septiembre, sobre
     // accesibilidad de los sitios web y aplicaciones para dispositivos móviles del SECTOR
     // PÚBLICO». La FAQ, dirigida a diseñadores, dice «WCAG 2.1 nivel AA es el mínimo legal en
@@ -994,5 +1020,9 @@ test.describe('Caso 8 · contenido y datos', () => {
     const respuesta = respuestaFaq(page, '¿Qué estándar de accesibilidad debo seguir?');
     await expect(respuesta).toContainText('1112/2018');
     await expect(respuesta).toContainText(/sector público/i);
+    // El privado, con la norma que de verdad lo alcanza (BOE-A-2023-11022, título I en vigor
+    // desde el 28/06/2025, art. 2.2: comercio electrónico, banca, transporte…).
+    await expect(respuesta).toContainText('Ley 11/2023');
+    await expect(respuesta).not.toContainText(/mínimo legal en España/i);
   });
 });

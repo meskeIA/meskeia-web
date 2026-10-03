@@ -160,8 +160,18 @@
 .infoPrevalencia {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--primary);
+  /* Texto de 13,6 px: --primary daba 4,11:1 sobre la ficha blanca; el token de texto de marca
+     da 5,47:1 en claro y existe también en oscuro (hallazgo 2766). */
+  color: var(--primary-texto);
   font-weight: 500;
+}
+
+/* Las referencias de las prevalencias de la tabla comparativa. */
+.fuenteDato {
+  margin: 0.5rem 0 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
 }
 
 .infoDesc {
@@ -514,7 +524,7 @@
 
 .faq summary::before {
   content: '+ ';
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 

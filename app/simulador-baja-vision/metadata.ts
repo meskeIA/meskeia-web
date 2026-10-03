@@ -41,10 +41,10 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [
     'Simula 8 condiciones sobre una interfaz de ejemplo: cataratas, miopía severa, glaucoma, degeneración macular, baja visión general y tres tipos de daltonismo (protanopia, deuteranopia y tritanopia), más la visión normal como referencia',
-    'Control de intensidad de simulación del 10 % al 100 % para condiciones con gradación',
-    'Filtros SVG de matrices de color clínicamente basados para daltonismo',
-    'Vista de demostración interactiva con UI real para evaluar legibilidad',
-    'Tabla de prevalencia e impacto UX por condición',
+    'Control de intensidad de simulación del 10 % al 100 % para condiciones con gradación',
+    'Filtros SVG de daltonismo con las matrices del modelo de Machado, Oliveira y Fernandes (2009)',
+    'Vista simulada sobre una interfaz de ejemplo para evaluar legibilidad',
+    'Tabla de prevalencia, con fuente y población, e impacto UX por condición',
     'Guía de claves WCAG AA/AAA con ratios de contraste mínimos integrada',
   ],
 });
@@ -58,7 +58,11 @@ export const faqJsonLd = {
       name: '¿Qué es la baja visión y cuántas personas la tienen?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La baja visión es una pérdida de agudeza o campo visual que no puede corregirse totalmente con gafas, lentes de contacto o cirugía. La Organización Mundial de la Salud estima que más de 253 millones de personas en el mundo tienen algún grado de discapacidad visual, de las cuales alrededor de 217 millones presentan baja visión moderada o grave. Las causas más frecuentes son las cataratas, el glaucoma y la degeneración macular.',
+        // Bourne et al., Lancet Glob Health 2017 (datos de 2015), resumen en PubMed: 36,0 M de
+        // ciegos, 216,6 M con discapacidad moderada o grave (2,95 %) y 188,5 M con leve. Los
+        // «253 millones» se llamaban «algún grado» y eran solo ciegos + moderada o grave; los
+        // 2.200 millones son de la OMS, Informe mundial sobre la visión 2019 (hallazgo 2770).
+        text: 'La baja visión es una pérdida de agudeza o campo visual que no puede corregirse totalmente con gafas, lentes de contacto o cirugía. Según la revisión de Bourne et al. (Lancet Global Health, 2017), en 2015 había en el mundo unos 36 millones de personas ciegas y 216,6 millones con discapacidad visual moderada o grave, el 2,95 % de la población, además de 188,5 millones con discapacidad visual leve. La Organización Mundial de la Salud, en su Informe mundial sobre la visión (2019), cifra en al menos 2.200 millones las personas con alguna deficiencia de la visión de cerca o de lejos. Entre sus causas están los errores de refracción sin corregir, las cataratas, el glaucoma y la degeneración macular.',
       },
     },
     {
@@ -74,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve simular la baja visión en el proceso de diseño?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Permite a diseñadores y desarrolladores detectar problemas de legibilidad y usabilidad antes de publicar un producto. Al ver cómo se percibe la interfaz con distintas condiciones visuales, es más fácil tomar decisiones sobre tamaño de fuente, contraste, densidad de información y estructura de navegación. Es una práctica recomendada por los estándares WCAG y por metodologías de diseño centrado en el usuario.',
+        text: 'Permite a diseñadores y desarrolladores detectar problemas de legibilidad y usabilidad antes de publicar un producto. Al ver cómo se percibe la interfaz con distintas condiciones visuales, es más fácil tomar decisiones sobre tamaño de fuente, contraste, densidad de información y estructura de navegación. Es una práctica habitual del diseño centrado en el usuario, que complementa la comprobación de las pautas WCAG sin sustituirla.',
       },
     },
     {
