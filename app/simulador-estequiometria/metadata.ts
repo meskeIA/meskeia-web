@@ -76,7 +76,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre rendimiento teórico y rendimiento real en una reacción?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El rendimiento teórico es la masa máxima de producto calculada asumiendo que la reacción llega al 100% de conversión. El rendimiento real es la masa obtenida experimentalmente, siempre menor o igual al teórico debido a pérdidas, reacciones secundarias o equilibrios incompletos. El rendimiento porcentual = (masa real / masa teórica) × 100.',
+        text: 'El rendimiento teórico es la masa máxima de producto calculada asumiendo que la reacción llega al 100 % de conversión. El rendimiento real es la masa obtenida experimentalmente, siempre menor o igual al teórico debido a pérdidas, reacciones secundarias o equilibrios incompletos. El rendimiento porcentual = (masa real / masa teórica) × 100.',
       },
     },
     {

@@ -10,19 +10,17 @@ import { getRelatedApps } from '@/data/app-relations';
 // ============================================
 // TIPOS
 // ============================================
-interface Reactivo {
+interface Sustancia {
   nombre: string;
   formula: string;
   masaMolar: number; // g/mol
+  /** Decimales que el dato tiene DE VERDAD: los del peso atómico menos preciso de la fórmula. */
+  decimalesM: number;
   coeficiente: number;
 }
 
-interface Producto {
-  nombre: string;
-  formula: string;
-  masaMolar: number;
-  coeficiente: number;
-}
+type Reactivo = Sustancia;
+type Producto = Sustancia;
 
 interface Reaccion {
   id: string;
@@ -34,21 +32,57 @@ interface Reaccion {
   contexto: string;
 }
 
+/** Qué reactivo se agota primero; «ambos» = mezcla estequiométrica (se agotan a la vez). */
+type Limitante = 'A' | 'B' | 'ambos';
+
 interface ResultadoCalculo {
-  limitante: string;
+  limitante: Limitante;
   molesA: number;
   molesB: number | null;
   molesProductoTeorico: number;
   masaProductoTeorica: number;
   masaProductoReal: number;
-  exceso: string | null;
-  molesExceso: number | null;
-  gramosExceso: number | null;
+  exceso: { nombre: string; moles: number; gramos: number } | null;
 }
 
 // ============================================
 // DATOS
 // ============================================
+
+/**
+ * Pesos atómicos estándar abreviados de la IUPAC/CIAAW (tabla 2021, sin cambios en 2023 para
+ * estos elementos; https://iupac.qmul.ac.uk/AtWt/), los mismos que usa
+ * `app/tabla-periodica/elementos-data.ts`. El cloro solo tiene DOS decimales en esa tabla
+ * (35,45), así que todo compuesto con cloro tiene dos.
+ *
+ * Hasta el 03/10/2026 las masas molares iban tecleadas con redondeos propios (N₂ 28,02, que no
+ * es el redondeo de 28,014; Fe 55,85; CH₄ 16,04…) y se pintaban con un tercer decimal
+ * rellenado con cero (hallazgos 2717 y 2718 del Inspector). Ahora se calculan de la fórmula.
+ */
+const PESO_ATOMICO = {
+  H: { valor: 1.008, decimales: 3 },
+  C: { valor: 12.011, decimales: 3 },
+  N: { valor: 14.007, decimales: 3 },
+  O: { valor: 15.999, decimales: 3 },
+  Na: { valor: 22.99, decimales: 3 }, // 22,990
+  Cl: { valor: 35.45, decimales: 2 },
+  Fe: { valor: 55.845, decimales: 3 },
+} as const;
+
+type Elemento = keyof typeof PESO_ATOMICO;
+
+/** Masa molar de una fórmula, redondeada a los decimales del peso atómico menos preciso. */
+function mm(composicion: Partial<Record<Elemento, number>>): { masaMolar: number; decimalesM: number } {
+  let suma = 0;
+  let decimalesM = Infinity;
+  for (const [simbolo, atomos] of Object.entries(composicion) as [Elemento, number][]) {
+    suma += PESO_ATOMICO[simbolo].valor * atomos;
+    decimalesM = Math.min(decimalesM, PESO_ATOMICO[simbolo].decimales);
+  }
+  const factor = 10 ** decimalesM;
+  return { masaMolar: Math.round(suma * factor) / factor, decimalesM };
+}
+
 const REACCIONES: Reaccion[] = [
   {
     id: 'combustion-metano',
@@ -56,12 +90,12 @@ const REACCIONES: Reaccion[] = [
     tipo: 'Combustión',
     ecuacion: 'CH₄ + 2 O₂ → CO₂ + 2 H₂O',
     reactivos: [
-      { nombre: 'Metano', formula: 'CH₄', masaMolar: 16.04, coeficiente: 1 },
-      { nombre: 'Oxígeno', formula: 'O₂', masaMolar: 32.00, coeficiente: 2 },
+      { nombre: 'Metano', formula: 'CH₄', ...mm({ C: 1, H: 4 }), coeficiente: 1 }, // 16,043
+      { nombre: 'Oxígeno', formula: 'O₂', ...mm({ O: 2 }), coeficiente: 2 }, // 31,998
     ],
     productos: [
-      { nombre: 'Dióxido de carbono', formula: 'CO₂', masaMolar: 44.01, coeficiente: 1 },
-      { nombre: 'Agua', formula: 'H₂O', masaMolar: 18.02, coeficiente: 2 },
+      { nombre: 'Dióxido de carbono', formula: 'CO₂', ...mm({ C: 1, O: 2 }), coeficiente: 1 }, // 44,009
+      { nombre: 'Agua', formula: 'H₂O', ...mm({ H: 2, O: 1 }), coeficiente: 2 }, // 18,015
     ],
     contexto: 'Gas natural ardiendo en una cocina o caldera',
   },
@@ -71,11 +105,11 @@ const REACCIONES: Reaccion[] = [
     tipo: 'Síntesis',
     ecuacion: '2 H₂ + O₂ → 2 H₂O',
     reactivos: [
-      { nombre: 'Hidrógeno', formula: 'H₂', masaMolar: 2.016, coeficiente: 2 },
-      { nombre: 'Oxígeno', formula: 'O₂', masaMolar: 32.00, coeficiente: 1 },
+      { nombre: 'Hidrógeno', formula: 'H₂', ...mm({ H: 2 }), coeficiente: 2 }, // 2,016
+      { nombre: 'Oxígeno', formula: 'O₂', ...mm({ O: 2 }), coeficiente: 1 },
     ],
     productos: [
-      { nombre: 'Agua', formula: 'H₂O', masaMolar: 18.02, coeficiente: 2 },
+      { nombre: 'Agua', formula: 'H₂O', ...mm({ H: 2, O: 1 }), coeficiente: 2 },
     ],
     contexto: 'Reacción en pila de hidrógeno para coches eléctricos',
   },
@@ -85,12 +119,12 @@ const REACCIONES: Reaccion[] = [
     tipo: 'Neutralización',
     ecuacion: 'HCl + NaOH → NaCl + H₂O',
     reactivos: [
-      { nombre: 'Ácido clorhídrico', formula: 'HCl', masaMolar: 36.46, coeficiente: 1 },
-      { nombre: 'Hidróxido de sodio', formula: 'NaOH', masaMolar: 40.00, coeficiente: 1 },
+      { nombre: 'Ácido clorhídrico', formula: 'HCl', ...mm({ H: 1, Cl: 1 }), coeficiente: 1 }, // 36,46
+      { nombre: 'Hidróxido de sodio', formula: 'NaOH', ...mm({ Na: 1, O: 1, H: 1 }), coeficiente: 1 }, // 39,997
     ],
     productos: [
-      { nombre: 'Cloruro de sodio', formula: 'NaCl', masaMolar: 58.44, coeficiente: 1 },
-      { nombre: 'Agua', formula: 'H₂O', masaMolar: 18.02, coeficiente: 1 },
+      { nombre: 'Cloruro de sodio', formula: 'NaCl', ...mm({ Na: 1, Cl: 1 }), coeficiente: 1 }, // 58,44
+      { nombre: 'Agua', formula: 'H₂O', ...mm({ H: 2, O: 1 }), coeficiente: 1 },
     ],
     contexto: 'Neutralización en laboratorio o industria química',
   },
@@ -100,11 +134,11 @@ const REACCIONES: Reaccion[] = [
     tipo: 'Síntesis industrial',
     ecuacion: 'N₂ + 3 H₂ → 2 NH₃',
     reactivos: [
-      { nombre: 'Nitrógeno', formula: 'N₂', masaMolar: 28.02, coeficiente: 1 },
-      { nombre: 'Hidrógeno', formula: 'H₂', masaMolar: 2.016, coeficiente: 3 },
+      { nombre: 'Nitrógeno', formula: 'N₂', ...mm({ N: 2 }), coeficiente: 1 }, // 28,014
+      { nombre: 'Hidrógeno', formula: 'H₂', ...mm({ H: 2 }), coeficiente: 3 },
     ],
     productos: [
-      { nombre: 'Amoniaco', formula: 'NH₃', masaMolar: 17.03, coeficiente: 2 },
+      { nombre: 'Amoniaco', formula: 'NH₃', ...mm({ N: 1, H: 3 }), coeficiente: 2 }, // 17,031
     ],
     contexto: 'Producción industrial de fertilizantes: alimenta a ~4000 millones de personas',
   },
@@ -114,11 +148,11 @@ const REACCIONES: Reaccion[] = [
     tipo: 'Oxidación',
     ecuacion: '4 Fe + 3 O₂ → 2 Fe₂O₃',
     reactivos: [
-      { nombre: 'Hierro', formula: 'Fe', masaMolar: 55.85, coeficiente: 4 },
-      { nombre: 'Oxígeno', formula: 'O₂', masaMolar: 32.00, coeficiente: 3 },
+      { nombre: 'Hierro', formula: 'Fe', ...mm({ Fe: 1 }), coeficiente: 4 }, // 55,845
+      { nombre: 'Oxígeno', formula: 'O₂', ...mm({ O: 2 }), coeficiente: 3 },
     ],
     productos: [
-      { nombre: 'Óxido de hierro (III)', formula: 'Fe₂O₃', masaMolar: 159.7, coeficiente: 2 },
+      { nombre: 'Óxido de hierro (III)', formula: 'Fe₂O₃', ...mm({ Fe: 2, O: 3 }), coeficiente: 2 }, // 159,687
     ],
     contexto: 'Corrosión de estructuras metálicas: el reactivo limitante determina cuánto herrumbre se forma',
   },
@@ -128,12 +162,13 @@ const REACCIONES: Reaccion[] = [
     tipo: 'Fermentación',
     ecuacion: 'C₆H₁₂O₆ → 2 C₂H₅OH + 2 CO₂',
     reactivos: [
-      { nombre: 'Glucosa', formula: 'C₆H₁₂O₆', masaMolar: 180.16, coeficiente: 1 },
-      { nombre: 'Levadura (catalizador)', formula: '—', masaMolar: 1, coeficiente: 0 },
+      { nombre: 'Glucosa', formula: 'C₆H₁₂O₆', ...mm({ C: 6, H: 12, O: 6 }), coeficiente: 1 }, // 180,156
+      // No se consume: su masa molar no interviene en ningún cálculo ni se muestra.
+      { nombre: 'Levadura (catalizador)', formula: '—', masaMolar: 1, decimalesM: 0, coeficiente: 0 },
     ],
     productos: [
-      { nombre: 'Etanol', formula: 'C₂H₅OH', masaMolar: 46.07, coeficiente: 2 },
-      { nombre: 'Dióxido de carbono', formula: 'CO₂', masaMolar: 44.01, coeficiente: 2 },
+      { nombre: 'Etanol', formula: 'C₂H₅OH', ...mm({ C: 2, H: 6, O: 1 }), coeficiente: 2 }, // 46,069
+      { nombre: 'Dióxido de carbono', formula: 'CO₂', ...mm({ C: 1, O: 2 }), coeficiente: 2 },
     ],
     contexto: 'Producción de vino, cerveza y biocombustibles',
   },
@@ -142,6 +177,13 @@ const REACCIONES: Reaccion[] = [
 // ============================================
 // LÓGICA DE CÁLCULO
 // ============================================
+
+/**
+ * Incertidumbre relativa de una masa molar por su redondeo: medio dígito del último decimal.
+ * HCl 36,46 → 0,005 / 36,46 = 0,014 %; NaOH 39,997 → 0,0005 / 39,997 = 0,0013 %.
+ */
+const incertidumbreRelativa = (s: Sustancia): number => (0.5 * 10 ** -s.decimalesM) / s.masaMolar;
+
 function calcular(reaccion: Reaccion, gramosA: number, gramosB: number, rendimiento: number): ResultadoCalculo {
   const rA = reaccion.reactivos[0];
   const rB = reaccion.reactivos[1];
@@ -154,15 +196,13 @@ function calcular(reaccion: Reaccion, gramosA: number, gramosB: number, rendimie
     const masaProductoTeorica = molesProducto * producto.masaMolar;
     const masaProductoReal = masaProductoTeorica * (rendimiento / 100);
     return {
-      limitante: rA.nombre,
+      limitante: 'A',
       molesA,
       molesB: null,
       molesProductoTeorico: molesProducto,
       masaProductoTeorica,
       masaProductoReal,
       exceso: null,
-      molesExceso: null,
-      gramosExceso: null,
     };
   }
 
@@ -173,32 +213,46 @@ function calcular(reaccion: Reaccion, gramosA: number, gramosB: number, rendimie
   const ratioA = molesA / rA.coeficiente;
   const ratioB = molesB / rB.coeficiente;
 
-  const limitanteEsA = ratioA <= ratioB;
-  const molesLimitante = limitanteEsA ? molesA : molesB;
-  const coefLimitante = limitanteEsA ? rA.coeficiente : rB.coeficiente;
+  // Mezcla estequiométrica (hallazgo 2711): dos razones que difieren MENOS que la incertidumbre
+  // de redondeo de las propias masas molares no se pueden distinguir con estos datos, así que
+  // no hay limitante ni exceso. Con `<=` exacto la rama «Ninguno» que promete la FAQ era
+  // inalcanzable: 36,46 g HCl + 40 g NaOH salía «HCl limitante, sobran 0,000 g de NaOH».
+  const tolerancia = incertidumbreRelativa(rA) + incertidumbreRelativa(rB);
+  const diferenciaRelativa = Math.abs(ratioA - ratioB) / Math.max(ratioA, ratioB);
+  const limitante: Limitante = diferenciaRelativa <= tolerancia ? 'ambos' : ratioA < ratioB ? 'A' : 'B';
 
-  const molesProducto = molesLimitante * (producto.coeficiente / coefLimitante);
+  const ratioLimitante = Math.min(ratioA, ratioB);
+  const molesProducto = ratioLimitante * producto.coeficiente;
   const masaProductoTeorica = molesProducto * producto.masaMolar;
   const masaProductoReal = masaProductoTeorica * (rendimiento / 100);
 
-  // Cálculo del exceso
-  const rExceso = limitanteEsA ? rB : rA;
-  const molesExcesoNecesarios = molesLimitante * (rExceso.coeficiente / coefLimitante);
-  const molesDisponiblesExceso = limitanteEsA ? molesB : molesA;
-  const molesExcesoRestante = molesDisponiblesExceso - molesExcesoNecesarios;
-  const gramosExceso = molesExcesoRestante * rExceso.masaMolar;
+  if (limitante === 'ambos') {
+    return { limitante, molesA, molesB, molesProductoTeorico: molesProducto, masaProductoTeorica, masaProductoReal, exceso: null };
+  }
+
+  // Cálculo del exceso: lo disponible menos lo que consume el limitante
+  const rExceso = limitante === 'A' ? rB : rA;
+  const molesDisponiblesExceso = limitante === 'A' ? molesB : molesA;
+  const molesExcesoRestante = molesDisponiblesExceso - ratioLimitante * rExceso.coeficiente;
 
   return {
-    limitante: limitanteEsA ? rA.nombre : rB.nombre,
+    limitante,
     molesA,
     molesB,
     molesProductoTeorico: molesProducto,
     masaProductoTeorica,
     masaProductoReal,
-    exceso: rExceso.nombre,
-    molesExceso: molesExcesoRestante,
-    gramosExceso,
+    exceso: { nombre: rExceso.nombre, moles: molesExcesoRestante, gramos: molesExcesoRestante * rExceso.masaMolar },
   };
+}
+
+/**
+ * Lee el valor de un `<input type="number">`. El navegador lo entrega SIEMPRE en forma canónica
+ * (punto decimal, sin millares, '' si no es un número), así que aquí `parseSpanishNumber` sería
+ * el error: leería «1.234» —1,234 g— como mil doscientos treinta y cuatro.
+ */
+function leerGramos(valor: string): number {
+  return valor.trim() === '' ? NaN : Number(valor);
 }
 
 // ============================================
@@ -213,8 +267,8 @@ export default function SimuladorEstequiometriaPage() {
   const reaccion = REACCIONES.find(r => r.id === reaccionId) ?? REACCIONES[0];
   const esCatalizador = reaccion.reactivos[1].coeficiente === 0;
 
-  const gramosA = parseFloat(gramosAStr.replace(',', '.'));
-  const gramosB = parseFloat(gramosBStr.replace(',', '.'));
+  const gramosA = leerGramos(gramosAStr);
+  const gramosB = leerGramos(gramosBStr);
 
   const datosValidos = !isNaN(gramosA) && gramosA > 0 && (esCatalizador || (!isNaN(gramosB) && gramosB > 0));
 
@@ -223,30 +277,33 @@ export default function SimuladorEstequiometriaPage() {
     return calcular(reaccion, gramosA, esCatalizador ? 0 : gramosB, rendimiento);
   }, [reaccion, gramosA, gramosB, rendimiento, datosValidos, esCatalizador]);
 
-  // Para las barras de moles: calcular moles necesarios (del limitante, cuántos necesita el otro)
-  const barra = useMemo(() => {
-    if (!resultado || !datosValidos) return null;
-    const rA = reaccion.reactivos[0];
-    const rB = reaccion.reactivos[1];
+  /**
+   * Barras de moles: cada fila compara lo que hay de SU reactivo con lo que haría falta de ÉL
+   * para gastar todo el otro (hallazgo 2710: antes cada fila dividía entre lo necesario del
+   * OTRO reactivo, y el porcentaje salía siempre coefA/coefB, sin depender de las cantidades).
+   * El limitante es el que no llega al 100 %; el que pasa de 100 % sobra.
+   */
+  const barras = useMemo(() => {
+    if (!resultado || resultado.molesB === null || esCatalizador) return null;
+    const [rA, rB] = reaccion.reactivos;
+    const necesariosA = resultado.molesB * (rA.coeficiente / rB.coeficiente);
+    const necesariosB = resultado.molesA * (rB.coeficiente / rA.coeficiente);
+    return [
+      { reactivo: rA, disponibles: resultado.molesA, necesarios: necesariosA, limitante: resultado.limitante === 'A' },
+      { reactivo: rB, disponibles: resultado.molesB, necesarios: necesariosB, limitante: resultado.limitante === 'B' },
+    ].map((b) => ({ ...b, porcentaje: (b.disponibles / b.necesarios) * 100 }));
+  }, [resultado, reaccion, esCatalizador]);
 
-    const molesA = resultado.molesA;
-    const molesB = resultado.molesB;
-
-    if (esCatalizador || molesB === null) {
-      return { molesA, molesANecesarios: molesA, molesB: null, molesBNecesarios: null };
-    }
-
-    // Moles necesarios de cada uno para consumir al otro totalmente
-    const molesANecesarios = molesB * (rA.coeficiente / rB.coeficiente);
-    const molesBNecesarios = molesA * (rB.coeficiente / rA.coeficiente);
-
-    return { molesA, molesANecesarios, molesB, molesBNecesarios };
-  }, [resultado, reaccion, datosValidos, esCatalizador]);
-
+  /**
+   * Botones ±: suman exactamente 1 g a lo escrito (hallazgo 2722: antes redondeaban a un
+   * decimal y 36,46 + 1 salía 37,5). El redondeo a los decimales que ya tenía el valor solo
+   * quita el ruido de la coma flotante (36,46 + 1 = 37,459999…).
+   */
   const ajustar = (setter: (v: string) => void, valor: string, delta: number) => {
-    const actual = parseFloat(valor.replace(',', '.'));
+    const actual = leerGramos(valor);
     if (isNaN(actual)) { setter(String(Math.max(1, delta))); return; }
-    setter(String(Math.max(0.1, Math.round((actual + delta) * 10) / 10)));
+    const factor = 10 ** (valor.split('.')[1] ?? '').length;
+    setter(String(Math.max(0.1, Math.round((actual + delta) * factor) / factor)));
   };
 
   const seleccionarReaccion = (id: string) => {
@@ -266,14 +323,17 @@ export default function SimuladorEstequiometriaPage() {
     setRendimiento(100);
   };
 
-  // Calcula porcentaje de la barra (máx 100%)
-  const pctBarra = (moles: number, molesNecesarios: number): number => {
-    if (molesNecesarios <= 0) return 100;
-    return Math.min(100, (moles / molesNecesarios) * 100);
-  };
+  const formulaLimitante =
+    resultado === null || resultado.limitante === 'ambos'
+      ? null
+      : reaccion.reactivos[resultado.limitante === 'A' ? 0 : 1].formula;
 
-  const esLimitanteA = resultado !== null && resultado.limitante === reaccion.reactivos[0].nombre;
-  const esLimitanteB = resultado !== null && resultado.limitante === reaccion.reactivos[1].nombre;
+  const nombreLimitante =
+    resultado === null
+      ? ''
+      : resultado.limitante === 'ambos'
+        ? 'Ninguno: se agotan los dos a la vez'
+        : reaccion.reactivos[resultado.limitante === 'A' ? 0 : 1].nombre;
 
   return (
     <div className={styles.container}>
@@ -311,12 +371,7 @@ export default function SimuladorEstequiometriaPage() {
           <p className={styles.ecuacionText} aria-label={`Ecuación: ${reaccion.ecuacion}`}>
             {reaccion.ecuacion.split(' ').map((token, i) => {
               const isCoef = /^[0-9]+$/.test(token);
-              const rANombre = reaccion.reactivos[0].formula;
-              const rBNombre = reaccion.reactivos[1].formula;
-              const isLimitanteFormula =
-                resultado !== null &&
-                ((resultado.limitante === reaccion.reactivos[0].nombre && token === rANombre) ||
-                  (resultado.limitante === reaccion.reactivos[1].nombre && token === rBNombre));
+              const isLimitanteFormula = formulaLimitante !== null && token === formulaLimitante;
               return (
                 <span
                   key={i}
@@ -342,7 +397,7 @@ export default function SimuladorEstequiometriaPage() {
           <div className={styles.inputGroup}>
             <label className={styles.inputLabel} htmlFor="inputA">
               {reaccion.reactivos[0].nombre} ({reaccion.reactivos[0].formula})
-              <span className={styles.masaMolarTag}>M = {formatNumber(reaccion.reactivos[0].masaMolar, 3)} g/mol</span>
+              <span className={styles.masaMolarTag}>M = {formatNumber(reaccion.reactivos[0].masaMolar, reaccion.reactivos[0].decimalesM)} g/mol</span>
             </label>
             <div className={styles.inputRow}>
               <button
@@ -376,7 +431,7 @@ export default function SimuladorEstequiometriaPage() {
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel} htmlFor="inputB">
                 {reaccion.reactivos[1].nombre} ({reaccion.reactivos[1].formula})
-                <span className={styles.masaMolarTag}>M = {formatNumber(reaccion.reactivos[1].masaMolar, 3)} g/mol</span>
+                <span className={styles.masaMolarTag}>M = {formatNumber(reaccion.reactivos[1].masaMolar, reaccion.reactivos[1].decimalesM)} g/mol</span>
               </label>
               <div className={styles.inputRow}>
                 <button
@@ -416,7 +471,7 @@ export default function SimuladorEstequiometriaPage() {
           {/* Slider de rendimiento */}
           <div className={styles.rendimientoRow}>
             <label className={styles.inputLabel} htmlFor="sliderRendimiento">
-              Rendimiento de la reacción: <strong>{rendimiento}%</strong>
+              Rendimiento de la reacción: <strong>{rendimiento}&nbsp;%</strong>
             </label>
             <input
               id="sliderRendimiento"
@@ -433,59 +488,51 @@ export default function SimuladorEstequiometriaPage() {
         </div>
 
         {/* BARRAS DE MOLES */}
-        {barra !== null && resultado !== null && (
+        {barras !== null && resultado !== null && (
           <div className={styles.barsSection}>
             <h2 className={styles.barsSectionTitle}>Comparativa de moles</h2>
+            <p className={styles.barsExplicacion}>
+              Cada barra compara los moles que tienes de un reactivo con los que harían falta para gastar
+              todo el otro. El que no llega al 100&nbsp;% es el limitante; el que lo pasa, sobra.
+            </p>
 
-            {/* Barra A */}
-            <div className={styles.barGroup}>
-              <div className={styles.barLabel}>
-                <span>
-                  {reaccion.reactivos[0].nombre} ({reaccion.reactivos[0].formula})
-                  {esLimitanteA && (
-                    <span className={styles.limitanteBadge}><span aria-hidden="true">⚠️</span> Limitante</span>
-                  )}
-                </span>
-                <span className={styles.barValor}>
-                  {formatNumber(barra.molesA, 4)} mol disponibles
-                  {barra.molesBNecesarios !== null && (
-                    <> / {formatNumber(barra.molesBNecesarios, 4)} mol necesarios</>
-                  )}
-                </span>
-              </div>
-              <div className={styles.barTrack} role="progressbar" aria-valuenow={Math.round(pctBarra(barra.molesA, barra.molesBNecesarios ?? barra.molesA))} aria-valuemin={0} aria-valuemax={100}>
-                <div
-                  className={`${styles.barFill} ${esLimitanteA ? styles.barFillLimitante : ''}`}
-                  style={{ width: `${pctBarra(barra.molesA, barra.molesBNecesarios ?? barra.molesA)}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Barra B — solo si no es catalizador */}
-            {!esCatalizador && barra.molesB !== null && (
-              <div className={styles.barGroup}>
-                <div className={styles.barLabel}>
-                  <span>
-                    {reaccion.reactivos[1].nombre} ({reaccion.reactivos[1].formula})
-                    {esLimitanteB && (
-                      <span className={styles.limitanteBadge}><span aria-hidden="true">⚠️</span> Limitante</span>
-                    )}
-                  </span>
-                  <span className={styles.barValor}>
-                    {formatNumber(barra.molesB, 4)} mol disponibles
-                    {barra.molesANecesarios !== null && (
-                      <> / {formatNumber(barra.molesANecesarios, 4)} mol necesarios</>
-                    )}
-                  </span>
-                </div>
-                <div className={styles.barTrack} role="progressbar" aria-valuenow={Math.round(pctBarra(barra.molesB, barra.molesANecesarios ?? barra.molesB))} aria-valuemin={0} aria-valuemax={100}>
+            {barras.map(({ reactivo, disponibles, necesarios, limitante, porcentaje }, i) => {
+              const idNombre = `barra-reactivo-${i}`;
+              // La barra se llena hasta lo necesario; si sobra, se queda llena y el porcentaje real
+              // va en el texto. aria-valuenow dice ESE porcentaje, y el máximo crece con él para que
+              // la fracción leída (valuenow / valuemax) sea la que se ve llena.
+              const pctRedondeado = Math.round(porcentaje);
+              return (
+                <div className={styles.barGroup} key={reactivo.formula}>
+                  <div className={styles.barLabel}>
+                    <span id={idNombre}>
+                      {reactivo.nombre} ({reactivo.formula})
+                      {limitante && (
+                        <span className={styles.limitanteBadge}><span aria-hidden="true">⚠️</span> Limitante</span>
+                      )}
+                    </span>
+                    <span className={styles.barValor}>
+                      {formatNumber(disponibles, 4)} mol disponibles / {formatNumber(necesarios, 4)} mol necesarios
+                      {' '}({formatNumber(porcentaje, 0)}&nbsp;%)
+                    </span>
+                  </div>
                   <div
-                    className={`${styles.barFill} ${esLimitanteB ? styles.barFillLimitante : ''}`}
-                    style={{ width: `${pctBarra(barra.molesB, barra.molesANecesarios ?? barra.molesB)}%` }}
-                  />
+                    className={styles.barTrack}
+                    role="progressbar"
+                    aria-labelledby={idNombre}
+                    aria-valuenow={pctRedondeado}
+                    aria-valuemin={0}
+                    aria-valuemax={Math.max(100, pctRedondeado)}
+                    aria-valuetext={`${formatNumber(disponibles, 4)} mol disponibles de ${formatNumber(necesarios, 4)} mol necesarios: ${formatNumber(porcentaje, 0)} %`}
+                  >
+                    <div
+                      className={`${styles.barFill} ${limitante ? styles.barFillLimitante : ''}`}
+                      style={{ width: `${Math.min(100, porcentaje)}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })}
           </div>
         )}
 
@@ -495,8 +542,8 @@ export default function SimuladorEstequiometriaPage() {
             {/* Reactivo limitante */}
             <div className={styles.resultadoCard}>
               <span className={styles.resultadoLabel}>Reactivo limitante</span>
-              <span className={`${styles.resultadoValor} ${styles.limitanteBadge}`}>
-                {resultado.limitante}
+              <span className={`${styles.resultadoValor} ${resultado.limitante === 'ambos' ? '' : styles.limitanteValor}`}>
+                {nombreLimitante}
               </span>
             </div>
 
@@ -511,21 +558,21 @@ export default function SimuladorEstequiometriaPage() {
 
             {/* Masa real (con rendimiento) */}
             <div className={`${styles.resultadoCard} ${styles.resultadoCardDestacado}`}>
-              <span className={styles.resultadoLabel}>Masa real obtenida (rendimiento {rendimiento}%)</span>
+              <span className={styles.resultadoLabel}>Masa real obtenida (rendimiento {rendimiento}&nbsp;%)</span>
               <span className={`${styles.resultadoValor} ${styles.resultadoValorGrande}`}>
                 {formatNumber(resultado.masaProductoReal, 3)} g
               </span>
             </div>
 
             {/* Reactivo en exceso */}
-            {resultado.exceso !== null && resultado.gramosExceso !== null && resultado.molesExceso !== null ? (
+            {resultado.exceso !== null ? (
               <div className={styles.resultadoCard}>
                 <span className={styles.resultadoLabel}>Reactivo en exceso</span>
                 <span className={`${styles.resultadoValor} ${styles.excesoBadge}`}>
-                  {resultado.exceso}
+                  {resultado.exceso.nombre}
                 </span>
                 <span className={styles.resultadoSubValor}>
-                  Sobran {formatNumber(resultado.gramosExceso, 3)} g ({formatNumber(resultado.molesExceso, 4)} mol)
+                  Sobran {formatNumber(resultado.exceso.gramos, 3)} g ({formatNumber(resultado.exceso.moles, 4)} mol)
                 </span>
               </div>
             ) : (
@@ -598,10 +645,10 @@ export default function SimuladorEstequiometriaPage() {
                   <tr>
                     <td>Combustión del metano</td>
                     <td>Combustión</td>
-                    <td>Metano (CH₄) — en interiores con poca ventilación</td>
+                    <td>Oxígeno (O₂) con poca ventilación; con aire abundante, el metano (CH₄)</td>
                     <td>CO₂</td>
                     <td>Calefacción, cocinas de gas</td>
-                    <td>~99%</td>
+                    <td>~99&nbsp;%</td>
                   </tr>
                   <tr>
                     <td>Síntesis del agua</td>
@@ -609,7 +656,7 @@ export default function SimuladorEstequiometriaPage() {
                     <td>Hidrógeno (H₂) — más caro de producir</td>
                     <td>H₂O</td>
                     <td>Pilas de combustible de hidrógeno</td>
-                    <td>~95-99%</td>
+                    <td>~95-99&nbsp;%</td>
                   </tr>
                   <tr>
                     <td>Neutralización ácido-base</td>
@@ -617,7 +664,7 @@ export default function SimuladorEstequiometriaPage() {
                     <td>Depende de la dosis relativa</td>
                     <td>NaCl</td>
                     <td>Laboratorio, tratamiento de residuos</td>
-                    <td>~99%</td>
+                    <td>~99&nbsp;%</td>
                   </tr>
                   <tr>
                     <td>Síntesis de amoniaco (Haber-Bosch)</td>
@@ -625,7 +672,7 @@ export default function SimuladorEstequiometriaPage() {
                     <td>Hidrógeno (H₂) — mayor coeficiente (×3)</td>
                     <td>NH₃</td>
                     <td>Fertilizantes que alimentan ~4000 millones de personas</td>
-                    <td>~10-15% por paso (ciclo continuo)</td>
+                    <td>~10-15&nbsp;% por paso (ciclo continuo)</td>
                   </tr>
                   <tr>
                     <td>Oxidación del hierro</td>
@@ -641,7 +688,7 @@ export default function SimuladorEstequiometriaPage() {
                     <td>Glucosa (único reactivo; la levadura es catalizador)</td>
                     <td>Etanol (C₂H₅OH)</td>
                     <td>Vino, cerveza, biocombustibles</td>
-                    <td>~85-90%</td>
+                    <td>~85-90&nbsp;%</td>
                   </tr>
                 </tbody>
               </table>
@@ -656,7 +703,7 @@ export default function SimuladorEstequiometriaPage() {
                 <span className={styles.scenarioIcon} aria-hidden="true">🍳</span>
                 <strong>Cocina de gas (metano + oxígeno del aire)</strong>
                 <p>
-                  El aire contiene ~21% de O₂. Si el quemador no mezcla bien, el metano puede ser excesivo
+                  El aire contiene ~21&nbsp;% de O₂. Si el quemador no mezcla bien, el metano puede ser excesivo
                   y no combustionar completamente, generando CO (tóxico). El reactivo limitante real en un
                   entorno mal ventilado es el oxígeno.
                 </p>
@@ -667,7 +714,7 @@ export default function SimuladorEstequiometriaPage() {
                 <p>
                   La reacción N₂ + 3 H₂ → 2 NH₃ se produce en condiciones de alta presión y temperatura
                   (150-300 atm, 400-500 °C). El H₂ (3 moles por cada N₂) es casi siempre el limitante
-                  económico. El rendimiento por paso es bajo (~15%), pero el gas no reaccionado se recicla.
+                  económico. El rendimiento por paso es bajo (~15&nbsp;%), pero el gas no reaccionado se recicla.
                 </p>
               </div>
               <div className={styles.scenarioCard}>
@@ -686,7 +733,7 @@ export default function SimuladorEstequiometriaPage() {
                 <p>
                   En síntesis de principios activos, el reactivo más caro o tóxico se usa como limitante
                   intencional. El rendimiento de reacción (% que pasa a producto) junto con la pureza
-                  determinan el coste por kg de fármaco. Un rendimiento del 70% vs 90% puede marcar
+                  determinan el coste por kg de fármaco. Un rendimiento del 70&nbsp;% frente al 90&nbsp;% puede marcar
                   la viabilidad económica del proceso.
                 </p>
               </div>
@@ -706,9 +753,10 @@ export default function SimuladorEstequiometriaPage() {
                   El reactivo que no se agota se llama <strong>reactivo en exceso</strong>.
                 </p>
                 <p className={styles.faqTip}>
-                  <span aria-hidden="true">💡</span> Ejemplo: para CH₄ + 2 O₂ → CO₂ + 2 H₂O, si tienes 16 g de CH₄ (1 mol) y 64 g de O₂
-                  (2 mol), ambos son exactamente estequiométricos. Si usas 32 g de O₂ en cambio, el O₂ es
-                  el limitante.
+                  <span aria-hidden="true">💡</span> Ejemplo: para CH₄ + 2 O₂ → CO₂ + 2 H₂O, 1 mol de CH₄ son 16,043 g y 2 mol de O₂
+                  son 63,996 g: en esa proporción se agotan los dos a la vez. Con los 16 g de CH₄ y 64 g de O₂
+                  redondos que trae el simulador, el CH₄ se queda en 0,9973 mol y es el limitante: sobra un
+                  poco de O₂. Si usas solo 32 g de O₂, el limitante pasa a ser el O₂.
                 </p>
               </div>
 
@@ -717,10 +765,11 @@ export default function SimuladorEstequiometriaPage() {
                 <p>
                   La relación fundamental es: <strong>moles = masa (g) / masa molar (g/mol)</strong>. La masa
                   molar es la suma de las masas atómicas de todos los átomos de la fórmula. Por ejemplo,
-                  CH₄ tiene M = 12 + 4×1 = 16 g/mol. Si tienes 32 g de CH₄, son 32/16 = 2 mol.
+                  CH₄ tiene M = 12,011 + 4 × 1,008 = 16,043 g/mol. Si tienes 32 g de CH₄, son 32 / 16,043 ≈ 1,995 mol.
                 </p>
                 <p className={styles.faqTip}>
                   <span aria-hidden="true">💡</span> Las masas molares de los elementos están en la tabla periódica (peso atómico en u ≈ g/mol).
+                  El simulador usa los pesos atómicos estándar de la IUPAC/CIAAW (tabla 2021).
                 </p>
               </div>
 
@@ -744,13 +793,13 @@ export default function SimuladorEstequiometriaPage() {
                 <h4>¿Qué es el rendimiento de reacción?</h4>
                 <p>
                   El <strong>rendimiento</strong> (η) es el cociente entre la masa real obtenida y la masa
-                  teórica máxima: η = (m_real / m_teórica) × 100%. Una reacción con rendimiento del 80% significa
-                  que se pierde un 20% por reacciones secundarias, equilibrio incompleto o pérdidas físicas
-                  durante la separación. En laboratorio académico, rendimientos del 70-90% son habituales.
+                  teórica máxima: η = (m_real / m_teórica) × 100&nbsp;%. Una reacción con rendimiento del 80&nbsp;% significa
+                  que se pierde un 20&nbsp;% por reacciones secundarias, equilibrio incompleto o pérdidas físicas
+                  durante la separación. En laboratorio académico, rendimientos del 70-90&nbsp;% son habituales.
                 </p>
                 <p className={styles.faqTip}>
                   <span aria-hidden="true">💡</span> En el simulador, el slider de rendimiento multiplica la masa teórica: m_real = m_teórica × η/100.
-                  Prueba a bajar el rendimiento al 75% para ver la diferencia.
+                  Prueba a bajar el rendimiento al 75&nbsp;% para ver la diferencia.
                 </p>
               </div>
 
@@ -758,13 +807,14 @@ export default function SimuladorEstequiometriaPage() {
                 <h4>¿Puede haber más de un reactivo limitante?</h4>
                 <p>
                   Formalmente, no: siempre hay un único reactivo limitante (el de menor ratio). Sin embargo,
-                  si dos reactivos tienen exactamente la misma razón estequiométrica, ambos se agotan
+                  si dos reactivos tienen la misma razón estequiométrica, ambos se agotan
                   simultáneamente. En ese caso se dice que la mezcla es <strong>estequiométrica</strong>
                   y no hay reactivo en exceso. En la práctica esto es muy raro de lograr exactamente.
                 </p>
                 <p className={styles.faqTip}>
                   <span aria-hidden="true">💡</span> En el simulador, si el resultado muestra &quot;Ninguno (estequiométrico)&quot; como reactivo
-                  en exceso, es que los ratios son iguales.
+                  en exceso, es que los ratios son iguales dentro de la precisión de las masas molares (por
+                  ejemplo, 36,46 g de HCl y 39,997 g de NaOH).
                 </p>
               </div>
             </div>
@@ -860,7 +910,7 @@ export default function SimuladorEstequiometriaPage() {
                 <span className={styles.tipIcon} aria-hidden="true">✅</span>
                 <strong>Verifica con la conservación de masa</strong>
                 <p>
-                  La suma de masas de reactivos consumidos debe igual a la masa de productos formados
+                  La suma de masas de reactivos consumidos debe ser igual a la masa de productos formados
                   (ley de Lavoisier). Si hay discrepancia, revisa las masas molares y los coeficientes.
                 </p>
               </div>
@@ -892,8 +942,8 @@ export default function SimuladorEstequiometriaPage() {
                 la mezcla final que es el producto deseado. Son conceptos distintos.
               </li>
               <li>
-                <strong>Usar masa atómica en vez de masa molar</strong> — La masa molar de O₂ es 32 g/mol
-                (2×16), no 16 g/mol. Siempre considera la fórmula molecular completa, no solo el átomo.
+                <strong>Usar masa atómica en vez de masa molar</strong> — La masa molar de O₂ es ≈ 32 g/mol
+                (2 × 15,999 = 31,998), no 16 g/mol. Siempre considera la fórmula molecular completa, no solo el átomo.
               </li>
               <li>
                 <strong>Aplicar el rendimiento a los moles del limitante en vez de a la masa del producto</strong>

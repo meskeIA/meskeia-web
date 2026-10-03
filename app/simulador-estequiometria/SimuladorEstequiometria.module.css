@@ -5,6 +5,14 @@
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
   min-height: 100vh;
+  /* Rojo del reactivo limitante (texto, insignia, fórmula y barra). #c0392b da 5,44:1 sobre la
+     tarjeta blanca, pero 2,53:1 sobre la oscura #2D2D2D (hallazgo 2713): en oscuro, #f1948a
+     (6,13:1 sobre la tarjeta, 5,36:1 sobre el resaltado rojizo de la ecuación). */
+  --limitante: #c0392b;
+}
+
+[data-theme='dark'] .container {
+  --limitante: #f1948a;
 }
 
 /* ============================================
@@ -76,9 +84,11 @@
 }
 
 .reaccionBtnActive {
-  background: var(--primary);
+  /* Texto blanco sobre la marca: --primary-boton, que existe en ambos temas y en Stemum
+     (con --primary daba 4,11:1 en claro y 2,79:1 en oscuro; hallazgo 2714). */
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .tipoBadge {
@@ -90,8 +100,8 @@
 }
 
 .reaccionBtnActive .tipoBadge {
-  opacity: 0.85;
-  color: rgba(255, 255, 255, 0.85);
+  opacity: 1;
+  color: white;
 }
 
 /* ============================================
@@ -127,11 +137,11 @@
 
 .coeficiente {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .limitanteResaltado {
-  color: #c0392b;
+  color: var(--limitante);
   font-weight: 700;
   background: rgba(192, 57, 43, 0.1);
   padding: 0 3px;
@@ -150,7 +160,10 @@
    ============================================ */
 .inputsGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0, 1fr) y no 1fr (= minmax(auto, 1fr)): con 1fr la columna tomaba el ancho
+     intrínseco del <input type="number"> (~350 px) y desbordaba la tarjeta en móvil y a
+     769 px (hallazgo 2712). */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
   background: var(--bg-card);
@@ -163,6 +176,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  min-width: 0;
 }
 
 .inputLabel {
@@ -188,8 +202,9 @@
 }
 
 .inputNumero {
-  flex: 1;
-  min-width: 80px;
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
   border: 2px solid var(--border);
   border-radius: var(--radius);
@@ -219,7 +234,7 @@
   border-radius: var(--radius);
   border: 2px solid var(--border);
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.2rem;
   font-weight: 700;
   cursor: pointer;
@@ -231,9 +246,9 @@
 }
 
 .btnAjuste:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .btnAjuste:focus-visible {
@@ -257,6 +272,7 @@
 
 .rendimientoRow {
   grid-column: span 2;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
@@ -327,6 +343,13 @@
   margin-bottom: var(--spacing-lg);
 }
 
+.barsExplicacion {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
 .barGroup {
   margin-bottom: var(--spacing-lg);
 }
@@ -365,14 +388,16 @@
 
 .barFill {
   height: 100%;
-  background: var(--secondary);
+  /* La barra es la comparación misma: un gráfico, 3:1 contra la pista. --secondary daba 2,68:1
+     sobre #FAFAFA en claro; --secondary-texto cumple en los dos temas y en Stemum. */
+  background: var(--secondary-texto);
   border-radius: 10px;
   transition: width 0.4s ease;
   min-width: 4px;
 }
 
 .barFillLimitante {
-  background: #c0392b;
+  background: var(--limitante);
 }
 
 /* ============================================
@@ -380,7 +405,7 @@
    ============================================ */
 .resultadoPanel {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-xl);
 }
@@ -412,7 +437,7 @@
 .resultadoValor {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
 }
 
@@ -432,14 +457,19 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #c0392b;
+  color: var(--limitante);
   font-size: 0.85rem;
   font-weight: 600;
   margin-left: var(--spacing-xs);
 }
 
+/* El VALOR de la tarjeta «Reactivo limitante»: tamaño de resultado, color del limitante. */
+.limitanteValor {
+  color: var(--limitante);
+}
+
 .excesoBadge {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .resultadoContexto {
@@ -516,7 +546,7 @@
 
 .scenariosGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   gap: var(--spacing-md);
   margin: var(--spacing-md) 0;
 }
@@ -536,7 +566,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -563,7 +593,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -608,7 +638,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -621,7 +651,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -634,7 +664,7 @@
 
 .tipsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   gap: var(--spacing-md);
   margin: var(--spacing-md) 0;
 }
@@ -655,7 +685,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
 }
 
@@ -714,10 +744,6 @@
 /* ============================================
    DARK MODE
    ============================================ */
-[data-theme='dark'] .reaccionBtnActive {
-  background: var(--primary);
-}
-
 [data-theme='dark'] .ecuacionPanel {
   background: var(--bg-card);
 }
@@ -811,7 +837,7 @@
   }
 
   .inputsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     padding: var(--spacing-lg);
   }
 
