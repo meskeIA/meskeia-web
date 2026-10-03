@@ -13,6 +13,7 @@ import {
   resolverCaso,
   comprobarRespuesta,
   toleranciaDe,
+  leerRespuesta,
   generarEjercicioAleatorio,
 } from '../../app/simulador-plano-inclinado/casos';
 import { G, analizarPlano } from '../../app/simulador-plano-inclinado/motor';
@@ -565,11 +566,11 @@ test.describe('simulador-plano-inclinado · casos para clase', () => {
     // por qué nombrarla (lección de simulador-conservacion-energia, 14/09/2026).
     for (const caso of CASOS) {
       const conDiez = resolverCaso(caso.datos, 10);
-      const cambia = !comprobarRespuesta(conDiez.valor, caso.respuesta).correcto;
+      const cambia = !comprobarRespuesta(conDiez.valor, caso.datos).correcto;
       if (cambia) expect(caso.enunciado, `caso ${caso.id}`).toContain('g = 9,81');
     }
     // Y el que se aparta con g = 10 al menos en uno: si no, la invariante no mira nada.
-    expect(CASOS.some((c) => !comprobarRespuesta(resolverCaso(c.datos, 10).valor, c.respuesta).correcto)).toBe(true);
+    expect(CASOS.some((c) => !comprobarRespuesta(resolverCaso(c.datos, 10).valor, c.datos).correcto)).toBe(true);
   });
 
   test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
@@ -600,24 +601,50 @@ test.describe('simulador-plano-inclinado · casos para clase', () => {
     expect(fabrica.estado).toBe('reposo');
     expect(fabrica.rozamientoReal).toBeCloseTo(fabrica.pesoParalelo, 10);
 
-    // (c) Con g = 9,8 (la de muchos libros) entran los doce.
+    // (c) Con g = 9,8 (la de muchos libros) ya NO entran los doce. Hasta el hallazgo 2783 este
+    //     test exigía que entraran todos, y eso consagraba la tolerancia del 1 %: los enunciados
+    //     que dependen de g dicen «toma g = 9,81 m/s²». Entran solo el 5 y el 7, que no dependen
+    //     de g (a = 0; arctg μₛ), y el 4, el 8 y el 9, donde el 0,1 % de diferencia no mueve la
+    //     cifra pedida (4,0471 → 4,05; 1,5805 → 1,58; 6,0118 → 6,01): ahí 9,8 da LA MISMA
+    //     respuesta redondeada, y rechazarla sería corregir la g y no la cuenta.
+    const entranCon98 = CASOS.filter(
+      (caso) => comprobarRespuesta(resolverCaso(caso.datos, 9.8).valor, caso.datos).correcto,
+    ).map((c) => c.id);
+    expect(entranCon98).toEqual([4, 5, 7, 8, 9]);
     for (const caso of CASOS) {
-      expect(comprobarRespuesta(resolverCaso(caso.datos, 9.8).valor, caso.respuesta).correcto, `caso ${caso.id}`).toBe(true);
+      const con98 = redondeo(resolverCaso(caso.datos, 9.8).valor, caso.datos.decimales ?? 2);
+      if (entranCon98.includes(caso.id)) expect(con98, `caso ${caso.id}`).toBe(caso.respuesta);
     }
 
     // (d) El error del tema NO entra: μₛ·N como rozamiento de un cuerpo en reposo (caso 6).
-    expect(comprobarRespuesta(0.7 * 20 * 9.81 * Math.cos(Math.PI / 6), 98.1).correcto).toBe(false);
+    expect(comprobarRespuesta(0.7 * 20 * 9.81 * Math.cos(Math.PI / 6), CASOS[5].datos).correcto).toBe(false);
   });
 
   test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
-    expect(comprobarRespuesta(0, 0).correcto).toBe(true);
-    expect(comprobarRespuesta(NaN, 4.05).correcto).toBe(false);
-    expect(comprobarRespuesta(NaN, 4.05).motivo).not.toMatch(/NaN/);
-    expect(toleranciaDe(0)).toBe(0.01);
-    expect(toleranciaDe(424.79)).toBeCloseTo(4.2479, 10);
-    // Borde exacto de la tolerancia, por los dos lados (hallazgo 1211 del 22/09/2026).
-    expect(comprobarRespuesta(0.01, 0).correcto).toBe(true);
-    expect(comprobarRespuesta(-0.01, 0).correcto).toBe(true);
+    const caso = (id: number) => CASOS[id - 1].datos;
+    expect(comprobarRespuesta(0, caso(5)).correcto).toBe(true);
+    expect(comprobarRespuesta(NaN, caso(4)).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, caso(4)).motivo).not.toMatch(/NaN/);
+    // La tolerancia es la de la PREGUNTA (hallazgo 2783): 0 si la cifra es exacta (el 0 del caso
+    // 5, el 4,905 del 3, el 98,10 del 6), media unidad del último decimal pedido si no lo es.
+    expect(toleranciaDe(caso(5))).toBe(0);
+    expect(toleranciaDe(caso(3))).toBe(0);
+    expect(toleranciaDe(caso(6))).toBe(0);
+    expect(toleranciaDe(caso(12))).toBeCloseTo(0.005, 12);
+    // Borde exacto de la tolerancia, por los dos lados (hallazgo 1211 del 22/09/2026), alrededor
+    // de la cifra SIN redondear (36,869898°), y un pelo más allá ya no.
+    const exacto = resolverCaso(caso(7)).valor;
+    expect(comprobarRespuesta(exacto + 0.005, caso(7)).correcto).toBe(true);
+    expect(comprobarRespuesta(exacto - 0.005, caso(7)).correcto).toBe(true);
+    expect(comprobarRespuesta(exacto + 0.0051, caso(7)).correcto).toBe(false);
+    // La lectura de lo tecleado (hallazgo 2784): un punto solo es decimal; la coma, también.
+    expect(leerRespuesta('4.905')).toBe(4.905);
+    expect(leerRespuesta('4,905')).toBe(4.905);
+    expect(leerRespuesta(' 84.96 ')).toBe(84.96);
+    expect(leerRespuesta('−0,5')).toBe(-0.5);
+    expect(leerRespuesta('1.234,5')).toBe(1234.5);
+    expect(leerRespuesta('4,05abc')).toBeNaN();
+    expect(leerRespuesta('1e3')).toBeNaN();
   });
 });
 
@@ -965,7 +992,9 @@ test.describe('Re-inspección 03/10/2026 — el corrector de «Casos para clase�
     }
   });
 
-  // HALLAZGO (calculo, medio) — ABIERTO. Sospecha (a) del 27/09, medida. `comprobarRespuesta`
+  // HALLAZGO 2783 (calculo, medio) — REPARADO el 03/10/2026: la tolerancia es la de la PREGUNTA
+  // (media unidad del último decimal pedido alrededor de la cifra sin redondear, 0 si es exacta),
+  // como en simulador-mas-resorte (2626). El acta, tal como se levantó: `comprobarRespuesta`
   // acepta cualquier cosa a menos del 1 % de la clave REDONDEADA (`toleranciaDe`, casos.ts:392).
   // Los doce enunciados dan datos exactos (g = 9,81 declarada, μ y masas exactos), así que la
   // pregunta solo admite media unidad del redondeo pedido. Con el 1 % cuelan, en los doce, ±1 en
@@ -976,10 +1005,6 @@ test.describe('Re-inspección 03/10/2026 — el corrector de «Casos para clase�
   // tolerancia». Ningún error conceptual cuela (test de arriba). Los vecinos de la lista están
   // fuera incluso si la reparación decidiera admitir g = 9,8 además de 9,81.
   test('el corrector rechaza vecinos, truncamientos y redondeos de más', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): el corrector de los casos admite un 1 % y da por buenos vecinos y redondeos que no son la respuesta',
-    );
     const colados: string[] = [];
     for (let id = 1; id <= 12; id++) {
       await abrirCaso(page, id);
@@ -997,9 +1022,31 @@ test.describe('Re-inspección 03/10/2026 — el corrector de «Casos para clase�
       if ((await corregir(page, vecino)).includes('¡Correcto!')) colados.push(`práctica 2: ${vecino}`);
     }
     expect(colados).toEqual([]);
+    // Y la clave de esa práctica sí entra, con coma y con punto decimal
+    expect(await corregir(page, '69,37')).toContain('¡Correcto!');
+    expect(await corregir(page, '69.37')).toContain('¡Correcto!');
   });
 
-  // HALLAZGO (operativa, bajo) — ABIERTO. El caso 3 es el único que pide TRES decimales, y
+  test('2783 · la pista del caso 2 lleva a la clave, y el caso 9 con g = 10 queda fuera', async ({
+    page,
+  }) => {
+    // La pista daba cos 30° ≈ 0,866, y 98,1·0,866 = 84,9546 → 84,95, que el corrector nuevo
+    // rechaza con razón (la clave es 98,1·cos 30° = 84,957092 → 84,96). Ahora da 0,8660254.
+    await abrirCaso(page, 2);
+    await page.locator('#casos-aula').getByRole('button', { name: /Ver pista/ }).click();
+    await expect(page.locator('#casos-pista')).toContainText('0,8660254');
+    expect(await corregir(page, '84,96')).toContain('¡Correcto!');
+    expect(await corregir(page, '84,95')).toContain('No es correcto');
+    // Caso 9: con la pista (sen 35° ≈ 0,5736, cos 35° ≈ 0,8192) sale 6,0149 → 6,01; con g = 10,
+    // √(2·10·(0,573576 − 0,25·0,819152)·5) = 6,0727 → 6,07, que su pista dice que no vale.
+    await abrirCaso(page, 9);
+    expect(await corregir(page, '6,01')).toContain('¡Correcto!');
+    expect(await corregir(page, '6,07')).toContain('No es correcto');
+  });
+
+  // HALLAZGO 2784 (operativa, bajo) — REPARADO el 03/10/2026: `leerRespuesta` lee un punto solo
+  // como decimal (ninguna respuesta llega a mil), la forma del 2384. El acta: el caso 3 es el
+  // único que pide TRES decimales, y
   // `parseSpanishNumber` lee «4.905» como millares (un punto seguido de un grupo de tres cifras).
   // Quien escribe la respuesta exacta con punto decimal, como en México y buena parte de
   // Latinoamérica, recibe «No es correcto. Te has desviado 4900,1 de la respuesta». Con dos
@@ -1007,24 +1054,25 @@ test.describe('Re-inspección 03/10/2026 — el corrector de «Casos para clase�
   test('caso 3: la respuesta exacta escrita con punto decimal («4.905») no se da por mala', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): «4.905» se lee como 4905 en el único caso que pide tres decimales',
-    );
     await abrirCaso(page, 3);
     expect(await corregir(page, '4,905')).toContain('¡Correcto!');
     expect(await corregir(page, '4.905')).not.toContain('No es correcto');
+    expect(await corregir(page, '4.905')).toContain('¡Correcto!');
+    // Y un error con punto se mide como error, no como millares: 4,95 está a 0,045
+    expect(await corregir(page, '4.950')).toContain('Te has desviado 0,045');
   });
 
-  // HALLAZGO (contenido, bajo) — ABIERTO. La introducción escribe «una desviación del 1 %» con
-  // espacio normal (U+0020), no con el duro (U+00A0) que manda el formato del catálogo.
+  // HALLAZGO 2791 (contenido, bajo) — REPARADO el 03/10/2026. La introducción escribía «una
+  // desviación del 1 %» con espacio normal (U+0020). Con el corrector nuevo (2783) la frase del
+  // 1 % ya no es verdad y se fue con él: la intro describe ahora el criterio de la pregunta. El
+  // test mira las dos cosas, porque sin la segunda pasaría también con la intro vacía.
   test('la introducción no separa el «%» con un espacio normal', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): «1 %» con espacio normal en la introducción de los casos',
-    );
     const intro = (await page.locator('#casos-aula p').first().textContent()) ?? '';
     expect(intro).not.toMatch(/\d ?%/);
+    expect(intro).not.toMatch(/\d (m\/s|N\b|J\b|kg\b)/); // unidades con espacio duro
+    expect(intro).toContain('no hay margen');
+    expect(intro).toContain('redondea solo al final');
+    expect(intro).not.toContain('1\u00A0%'); // ni el 1 % de antes, con espacio duro
   });
 });
 
@@ -1075,6 +1123,8 @@ async function paresDeMarca(page: Page): Promise<{ nombre: string; texto: string
       'aceleración (resultado destacado)': '[class*="resultValueAccent"]',
       'número de paso': '[class*="stepNumber"]',
       'título de escenario': '[class*="escenarioCard"] h4',
+      // No es de marca, pero va sobre el mismo degradado: en oscuro se quedaba en 4,43–4,48:1
+      'etiqueta de resultados': '[class*="resultBlock"] [class*="resultLabel"]',
     };
     return Object.entries(sel).map(([nombre, s]) => {
       const el = document.querySelector(s)!;
@@ -1089,7 +1139,10 @@ test.describe('Re-inspección 03/10/2026 — contraste y rótulos (escritorio)',
     await esperarHidratacion(page, DESLIZADORES);
   });
 
-  // HALLAZGO (accesibilidad, medio) — ABIERTO. Texto en color de marca por debajo de 4,5:1, y
+  // HALLAZGO 2786 (accesibilidad, medio) — REPARADO el 03/10/2026: --primary-boton bajo texto
+  // blanco, --primary-texto como texto, y en oscuro un tono propio para la aceleración y las
+  // etiquetas sobre el degradado. Bajo stemum.com, el test de abajo. El acta: texto en color de
+  // marca por debajo de 4,5:1, y
   // ninguno es texto grande (≤ 16 px en negrita). En claro: «Soltar el bloque» y los números de
   // los pasos, blanco sobre --primary (4,11:1); los valores de los deslizadores y los títulos de
   // los escenarios, --primary sobre la tarjeta (4,11:1); la aceleración, --primary sobre el
@@ -1097,10 +1150,6 @@ test.describe('Re-inspección 03/10/2026 — contraste y rótulos (escritorio)',
   // sobre #3FA5D1 (2,79:1; 2,21:1 bajo stemum.com); la aceleración, #3FA5D1 sobre #1e3a5f →
   // #14532d (3,26–4,12:1). Existen --primary-boton y --primary-texto.
   test('los textos en color de marca llegan a 4,5:1 en los dos temas', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): botón, valores, aceleración y pasos en color de marca por debajo de 4,5:1',
-    );
     // Un estado que desliza, para que «Soltar el bloque» esté activo (desactivado no cuenta)
     await sembrarValor(page, '#angulo', 40);
     await expect(botonSoltar(page)).toBeEnabled();
@@ -1117,16 +1166,42 @@ test.describe('Re-inspección 03/10/2026 — contraste y rótulos (escritorio)',
     expect({ claro, oscuro }).toEqual({ claro: [], oscuro: [] });
   });
 
-  // HALLAZGO (accesibilidad, bajo) — ABIERTO. Rótulos del diagrama por debajo de 4,5:1 (son de
+  // 2786 bajo stemum.com: el portal cambia --primary a violeta (#C99BF5 en oscuro, que con texto
+  // blanco daba 2,21:1). Se sirve la app con data-brand="stemum" (host mapeado al servidor local
+  // al principio del fichero, con el puente de HMR para que se hidrate) y se miden los dos temas.
+  test('2786 · bajo stemum.com los textos de marca también llegan a 4,5:1 en los dos temas', async ({
+    page,
+  }) => {
+    await puenteHmr(page);
+    await page.goto('http://stemum.com/simulador-plano-inclinado/');
+    await esperarHidratacion(page, DESLIZADORES);
+    await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
+    await sembrarValor(page, '#angulo', 40);
+    await expect(botonSoltar(page)).toBeEnabled();
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await esperarSinTransiciones(page);
+    const bajos = (pares: { nombre: string; texto: string; fondos: string[] }[]) =>
+      pares
+        .map((p) => ({ ...p, ratio: Math.min(...p.fondos.map((f) => contraste(p.texto, f))) }))
+        .filter((p) => p.ratio < 4.5)
+        .map((p) => `${p.nombre} ${p.ratio.toFixed(2)}:1`);
+    const claro = bajos(await paresDeMarca(page));
+    await pasarAOscuro(page);
+    const pares = await paresDeMarca(page);
+    // Que de verdad es el violeta del portal y no el azul de meskeIA
+    expect(pares.find((p) => p.nombre === 'valor del deslizador')?.texto).toBe('rgb(201, 155, 245)');
+    const oscuro = bajos(pares);
+    expect({ claro, oscuro }).toEqual({ claro: [], oscuro: [] });
+  });
+
+  // HALLAZGO 2787 (accesibilidad, bajo) — REPARADO el 03/10/2026: #c2410c y #7e22ce (sin la
+  // transparencia en el rótulo), --primary-texto en «θ», el bloque en --primary-boton y «x»/«y»
+  // con variante oscura. El acta: rótulos del diagrama por debajo de 4,5:1 (son de
   // 12-15 px). En claro, sobre #f8fafc: «Fr = …» (#ea580c) 3,40:1, «Px/Py = …» (#9333ea al 75 %)
   // 3,43:1 y «θ = …» (--primary) 3,92:1. En los dos temas, la masa del bloque, blanco sobre el
   // #2e86ab fijo del bloque, 4,11:1. En oscuro, «x» e «y» de «Ejes girados» siguen en #64748b
   // (no tienen variante oscura) sobre #0f172a: 3,75:1.
   test('los rótulos del diagrama se leen sobre el lienzo (4,5:1) en los dos temas', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): rótulos del diagrama de cuerpo libre por debajo de 4,5:1',
-    );
     await page.getByLabel('Ejes girados').check();
     await esperarSinTransiciones(page);
     const medir = () =>
@@ -1174,59 +1249,103 @@ test.describe('Re-inspección 03/10/2026 — contraste y rótulos (escritorio)',
     expect({ claro, oscuro }).toEqual({ claro: [], oscuro: [] });
   });
 
-  // HALLAZGO (operativa, bajo) — ABIERTO. Cuando la fuerza aplicada va en la misma recta que otra
+  // HALLAZGO 2788 (operativa, bajo) — REPARADO el 03/10/2026: `colocarRotulos` aparta en vertical
+  // el rótulo que pisa a otro ya colocado. Se miden los tres casos de la ficha. El acta: cuando
+  // la fuerza aplicada va en la misma recta que otra
   // fuerza, sus flechas salen del mismo punto y sus rótulos se montan. Con los valores por
   // defecto y F = +10 N (el bloque sigue quieto: |10 − 20,73| ≤ 22,23), F y el rozamiento
   // estático apuntan los dos cuesta arriba y «Fr = 10,7 N» y «F = 10,0 N» se tapan un 96 %; con
   // F = −10 N, «F» tapa un 28 % de «Px». Es justo el estado que enseña que el estático se ajusta.
   test('con F = +10 N los rótulos «Fr» y «F» del diagrama no se tapan', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): los rótulos de fuerzas en la misma recta se montan en el diagrama',
-    );
+    /** Fracción de la caja menor que tapa la otra, entre dos rótulos localizados por su prefijo. */
+    const solape = (a: string, b: string) =>
+      page.evaluate(
+        ([pa, pb]) => {
+          const caja = (prefijo: string) =>
+            Array.from(document.querySelectorAll('svg g > text'))
+              .find((t) => (t.textContent ?? '').startsWith(prefijo))!
+              .getBoundingClientRect();
+          const x1 = caja(pa);
+          const x2 = caja(pb);
+          const x = Math.max(0, Math.min(x1.right, x2.right) - Math.max(x1.left, x2.left));
+          const y = Math.max(0, Math.min(x1.bottom, x2.bottom) - Math.max(x1.top, x2.top));
+          return (x * y) / Math.min(x1.width * x1.height, x2.width * x2.height);
+        },
+        [a, b] as const,
+      );
+    // El caso de la ficha: 5 kg, 25°, μₛ 0,50 y F = +10 N, quieto
     await sembrarValor(page, '#fuerza', 10);
     await expect(veredicto(page)).toHaveText('El bloque NO desliza');
-    const solape = await page.evaluate(() => {
-      const caja = (prefijo: string) =>
-        Array.from(document.querySelectorAll('svg g > text'))
-          .find((t) => (t.textContent ?? '').startsWith(prefijo))!
-          .getBoundingClientRect();
-      const a = caja('Fr = ');
-      const b = caja('F = ');
-      const x = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
-      const y = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
-      return (x * y) / Math.min(a.width * a.height, b.width * b.height);
-    });
-    expect(solape).toBeLessThan(0.1);
+    await expect(page.locator('svg g > text', { hasText: /^Fr = 10,7 N$/ })).toHaveCount(1);
+    expect(await solape('Fr = ', 'F = ')).toBeLessThan(0.1);
+    // F = −10 N: «F» y «Px» apuntan los dos cuesta abajo (antes, 28 %)
+    await sembrarValor(page, '#fuerza', -10);
+    await expect(page.locator('svg g > text', { hasText: /^F = 10,0 N$/ })).toHaveCount(1);
+    expect(await solape('F = ', 'Px = ')).toBeLessThan(0.1);
+    // F = +5 N a 40°: desliza y el cinético apunta cuesta arriba con F (antes, 42 %)
+    await sembrarValor(page, '#fuerza', 5);
+    await sembrarValor(page, '#angulo', 40);
+    await expect(veredicto(page)).toHaveText('El bloque desliza cuesta abajo');
+    await expect(page.locator('svg g > text', { hasText: /^Fr = 11,3 N$/ })).toHaveCount(1);
+    expect(await solape('Fr = ', 'F = ')).toBeLessThan(0.1);
+    // Y ningún par de rótulos se tapa en ninguno de los tres
+    for (const f of [10, -10, 5]) {
+      await sembrarValor(page, '#fuerza', f);
+      const peor = await page.evaluate(() => {
+        const cajas = Array.from(document.querySelectorAll('svg g > text')).map((t) =>
+          t.getBoundingClientRect(),
+        );
+        let max = 0;
+        for (let i = 0; i < cajas.length; i++) {
+          for (let j = i + 1; j < cajas.length; j++) {
+            const [a, b] = [cajas[i], cajas[j]];
+            const x = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+            const y = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+            max = Math.max(max, (x * y) / Math.min(a.width * a.height, b.width * b.height));
+          }
+        }
+        return max;
+      });
+      expect(peor, `F = ${f} N`).toBeLessThan(0.1);
+    }
   });
 
-  // HALLAZGO (accesibilidad, bajo) — ABIERTO. Los seis deslizadores no tienen aria-valuetext: el
+  // HALLAZGO 2790 (accesibilidad, bajo) — REPARADO el 03/10/2026: los seis llevan aria-valuetext
+  // con coma decimal y unidad (separada con espacio duro). El acta: los seis deslizadores no
+  // tenían aria-valuetext: el
   // lector anuncia el valor crudo del <input type="range">, con punto decimal y sin unidad
   // («0.5», «0.3»), aunque el rótulo de al lado diga «0,50». Forma del hallazgo 1807.
   test('los deslizadores anuncian su valor en formato español', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): deslizadores sin aria-valuetext, el lector lee «0.5»',
-    );
-    await expect(page.locator('#mus')).toHaveAttribute('aria-valuetext', /0,50/);
-    await expect(page.locator('#masa')).toHaveAttribute('aria-valuetext', /5,0 kg/);
+    await expect(page.locator('#mus')).toHaveAttribute('aria-valuetext', '0,50');
+    await expect(page.locator('#muk')).toHaveAttribute('aria-valuetext', '0,30');
+    await expect(page.locator('#masa')).toHaveAttribute('aria-valuetext', '5,0\u00A0kg');
+    await expect(page.locator('#angulo')).toHaveAttribute('aria-valuetext', '25°');
+    await expect(page.locator('#fuerza')).toHaveAttribute('aria-valuetext', '0\u00A0N');
+    await expect(page.locator('#longitud')).toHaveAttribute('aria-valuetext', '4,0\u00A0m');
+    // Y siguen al valor: la fuerza dice hacia dónde empuja, y la masa con medio kilo
+    await sembrarValor(page, '#fuerza', -12);
+    await expect(page.locator('#fuerza')).toHaveAttribute('aria-valuetext', '12\u00A0N cuesta abajo');
+    await sembrarValor(page, '#masa', 7.5);
+    await expect(page.locator('#masa')).toHaveAttribute('aria-valuetext', '7,5\u00A0kg');
+    // El árbol de accesibilidad lo anuncia así, no «0.5»
+    const arbol = await page.locator('#mus').ariaSnapshot();
+    expect(arbol).toContain('0,50');
   });
 
-  // HALLAZGO (calculo, bajo) — ABIERTO. El mismo valor exacto, 4,905, sale con dos redondeos
+  // HALLAZGO 2785 (calculo, bajo) — REPARADO el 03/10/2026: el panel y los casos redondean con
+  // `redondearCifra` (sobre la cifra decimal, quitado el ruido binario). El acta: el mismo valor
+  // exacto, 4,905, sale con dos redondeos
   // distintos en el mismo panel: con 0,5 kg, 30° y sin rozamiento, P = 0,5·9,81 = 4,905 N se
   // pinta «4,91 N» y a = 9,81·sen 30° = 4,905 m/s² se pinta «4,90 m/s²» (sen 30° en coma
   // flotante es 0,49999999999999994). El «Verlo en el simulador» del caso 3 lo deja por escrito
   // («da 4,90 m/s²») para un alumno al que se le enseña que 4,905 redondea a 4,91.
   test('un empate exacto se redondea igual en todo el panel', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): 4,905 se pinta 4,91 en el peso y 4,90 en la aceleración',
-    );
     await page.getByRole('button', { name: /Sin rozamiento/ }).click();
     await esperarValorEnReact(page, '#mus', 0);
     await esperarValorEnReact(page, '#muk', 0);
     await sembrarValor(page, '#angulo', 30);
     await sembrarValor(page, '#masa', 0.5);
+    expect(await leerFila(page, 'Peso P = m·g')).toBe('4,91 N');
     expect(await valor(page, 'Aceleración')).toBe(await valor(page, 'Peso P = m·g'));
     // Y el texto del caso 3 cita lo que el panel pinta con 20 kg
     await sembrarValor(page, '#masa', 20);
@@ -1253,25 +1372,50 @@ test.describe('Re-inspección 03/10/2026 — el diagrama en móvil (390 px)', ()
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 
-  // HALLAZGO (accesibilidad, bajo) — ABIERTO. A 390 px el <svg> del diagrama mide 308 px para un
+  // HALLAZGO 2789 (accesibilidad, bajo) — REPARADO el 03/10/2026: la letra de los rótulos se
+  // escala con el ancho real del <svg>; en móvil llevan solo el nombre y las cifras van en una
+  // leyenda HTML debajo. El acta: a 390 px el <svg> del diagrama mide 308 px para un
   // viewBox de 800: los rótulos de las fuerzas (12 px) se pintan a 12·308/800 ≈ 4,6 px, la masa
   // del bloque igual y «θ = …» a 5,8 px. Son las cifras del diagrama de cuerpo libre, y el texto
   // HTML más pequeño de la app mide 12 px. Mismo suelo de 10 px que en simulador-proyectiles.
   test('a 390 px los rótulos del diagrama se pintan a 10 px o más', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): en móvil los rótulos del diagrama se pintan a unos 4,6 px',
-    );
     await page.goto(RUTA);
     await esperarHidratacion(page, DESLIZADORES);
-    const tamanos = await page.locator('svg[viewBox="0 0 800 460"] text').evaluateAll((textos) =>
-      textos.map((t) => {
-        const escala = (t as SVGTextElement).ownerSVGElement!.getScreenCTM()!.a;
-        return parseFloat(getComputedStyle(t).fontSize) * escala;
-      }),
-    );
-    expect(tamanos.length).toBeGreaterThan(5);
-    expect(Math.min(...tamanos)).toBeGreaterThanOrEqual(10);
+    await page.getByLabel('Ejes girados').check(); // «x» e «y» también cuentan
+    const medir = () =>
+      page.locator('svg[viewBox="0 0 800 460"] text').evaluateAll((textos) =>
+        textos.map((t) => {
+          const escala = (t as SVGTextElement).ownerSVGElement!.getScreenCTM()!.a;
+          return parseFloat(getComputedStyle(t).fontSize) * escala;
+        }),
+      );
+    // La escala sale de medir el <svg> tras montarse: se espera a que se aplique
+    await expect.poll(async () => Math.min(...(await medir()))).toBeGreaterThanOrEqual(10);
+    expect((await medir()).length).toBeGreaterThan(5);
+    // Las cifras no se pierden: van en la leyenda de debajo, con la masa del bloque
+    const leyenda = page.locator('#leyenda-fuerzas');
+    await expect(leyenda).toContainText('m = 5,0\u00A0kg');
+    await expect(leyenda).toContainText('P = 49,1\u00A0N');
+    await expect(leyenda).toContainText('Fr = 20,7\u00A0N');
+    // Y no se montan entre sí (a 390 px el caso de la ficha también se tapaba)
+    await sembrarValor(page, '#fuerza', 10);
+    await expect(leyenda).toContainText('F = 10,0\u00A0N');
+    const peor = await page.evaluate(() => {
+      const cajas = Array.from(document.querySelectorAll('svg g > text')).map((t) =>
+        t.getBoundingClientRect(),
+      );
+      let max = 0;
+      for (let i = 0; i < cajas.length; i++) {
+        for (let j = i + 1; j < cajas.length; j++) {
+          const [a, b] = [cajas[i], cajas[j]];
+          const x = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+          const y = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+          max = Math.max(max, (x * y) / Math.min(a.width * a.height, b.width * b.height));
+        }
+      }
+      return max;
+    });
+    expect(peor).toBeLessThan(0.1);
   });
 });
 

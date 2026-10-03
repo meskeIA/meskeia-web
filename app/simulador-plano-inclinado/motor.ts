@@ -27,6 +27,26 @@
 /** m/s² (gravedad estándar en la superficie terrestre). La que usa la app. */
 export const G = 9.81;
 
+/**
+ * Redondea a `decimales` como se redondea en un cuaderno: sobre la cifra DECIMAL, no sobre el
+ * doble binario que la guarda (hallazgo 2785, 03/10/2026).
+ *
+ * 9,81·sen 30° vale 4,905 exactos, pero en coma flotante sen 30° = 0,49999999999999994 y la
+ * cuenta da 4,904999999999999; 0,5·9,81, en cambio, da el doble de 4,905, que está un pelo POR
+ * ENCIMA. `formatNumber` (Intl) redondea el doble tal cual, así que el mismo 4,905 salía
+ * «4,91 N» en el peso y «4,90 m/s²» en la aceleración, en el mismo panel. Aquí se quitan
+ * primero las cifras de ruido (12 significativas sobran: ningún dato de la app tiene más de
+ * cuatro) y los empates se resuelven alejándose del cero, por los dos signos igual.
+ *
+ * Lo usan el panel (para pintar) y los casos (para la clave), así que los dos redondean igual.
+ */
+export function redondearCifra(valor: number, decimales: number): number {
+  if (!Number.isFinite(valor)) return valor;
+  const factor = 10 ** decimales;
+  const escalado = Number((Math.abs(valor) * factor).toPrecision(12));
+  return (Math.sign(valor) * Math.round(escalado)) / factor + 0; // `+ 0`: sin −0
+}
+
 export type Estado = 'reposo' | 'baja' | 'sube';
 
 export interface ParametrosPlano {

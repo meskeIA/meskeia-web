@@ -20,13 +20,13 @@
  */
 
 import { useState } from 'react';
-import { parseSpanishNumber } from '@/lib';
 import styles from './SimuladorPlanoInclinado.module.css';
 import {
   CASOS,
   TOTAL_CASOS,
   comprobarRespuesta,
   generarEjercicioAleatorio,
+  leerRespuesta,
   textoRespuesta,
   type Ejercicio,
 } from './casos';
@@ -45,7 +45,9 @@ export default function CasosAula() {
   const esperado = practica ? practica.respuesta : caso.respuesta;
   const etiqueta = practica ? practica.etiquetaRespuesta : caso.etiquetaRespuesta;
   const pasos = practica ? practica.pasos : caso.pasos;
-  const decimales = (practica ? practica.datos : caso.datos).decimales ?? 2;
+  /** La tolerancia sale de la pregunta (sus datos y el redondeo pedido), no de la cifra: 2783. */
+  const datos = practica ? practica.datos : caso.datos;
+  const decimales = datos.decimales ?? 2;
   /** Solo los casos numerados traen pista: el ejercicio aleatorio no la tiene. */
   const hayPista = !practica && Boolean(caso.pista);
   /** Y solo los que se pueden ver en el panel tal como está: sin texto no hay botón. */
@@ -72,10 +74,11 @@ export default function CasosAula() {
   }
 
   function comprobar() {
-    // parseSpanishNumber admite «84,96» y «84.96»; devuelve NaN con cualquier otra cosa, y de
-    // ese NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
-    const valor = parseSpanishNumber(respuesta);
-    const r = comprobarRespuesta(valor, esperado);
+    // leerRespuesta admite «84,96», «84.96» y «4.905» (punto decimal: ninguna respuesta llega a
+    // mil, hallazgo 2784); devuelve NaN con cualquier otra cosa, y de ese NaN se encarga
+    // comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
+    const valor = leerRespuesta(respuesta);
+    const r = comprobarRespuesta(valor, datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 
@@ -88,9 +91,11 @@ export default function CasosAula() {
         <p className={styles.casosIntro}>
           {TOTAL_CASOS} problemas con solución, siempre los mismos y en el mismo orden. Un profesor
           puede decir «resuelve los casos 3, 7 y 11» y corregir sin ambigüedad. Se corrigen como
-          calcula el simulador: g = 9,81 m/s², fuerza aplicada paralela al plano y normal
-          m·g·cos θ. Se acepta una desviación del 1 %, así que g = 9,8 también suele valer; g = 10,
-          no. Si un bloque no se mueve, su aceleración es 0.
+          calcula el simulador: g = 9,81 m/s², fuerza aplicada paralela al plano y normal
+          m·g·cos θ. Los datos son exactos, así que no hay margen: vale la cifra exacta o, si el
+          enunciado pide redondear, la redondeada como pide (con otra g, como 9,8 o 10, casi
+          siempre cambia). Usa los senos y cosenos de la calculadora y redondea solo al final,
+          nunca un resultado intermedio. Si un bloque no se mueve, su aceleración es 0.
         </p>
       </div>
 

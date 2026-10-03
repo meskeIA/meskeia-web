@@ -20,8 +20,8 @@
  * ── LOS CONVENIOS, POR ESCRITO ───────────────────────────────────────────────
  *
  * ⚠️ **g = 9,81 m/s²**, como la app. Todo enunciado cuya respuesta cambie con otra g lo dice
- *    («toma g = 9,81 m/s²»); con g = 9,8 la diferencia suele entrar en la tolerancia del 1 %,
- *    con g = 10 casi nunca.
+ *    («toma g = 9,81 m/s²»), y la corrección no tiene margen para otra g: ni 9,8 ni 10 dan la
+ *    clave redondeada (ver `toleranciaDe`).
  * ⚠️ **La fuerza aplicada es paralela al plano**, positiva cuesta arriba, y no altera la normal:
  *    N = m·g·cos θ.
  * ⚠️ **En reposo, el rozamiento NO es μₛ·N**: es lo justo para equilibrar, |F − m·g·sen θ|.
@@ -30,8 +30,14 @@
  * ⚠️ **«¿Desliza?» se responde con un número**: la aceleración, que es 0 si no desliza.
  */
 
-import { formatNumber } from '@/lib';
-import { G, analizarPlano, type AnalisisPlano, type ParametrosPlano } from './motor';
+import { formatNumber, parseSpanishNumber } from '@/lib';
+import {
+  G,
+  analizarPlano,
+  redondearCifra,
+  type AnalisisPlano,
+  type ParametrosPlano,
+} from './motor';
 
 /**
  * Valores de referencia para lo que el enunciado no da porque NO influye en la respuesta (la
@@ -96,9 +102,21 @@ function numero(n: number, decimales = 4): string {
   return (n + 0).toLocaleString('es-ES', { maximumFractionDigits: decimales });
 }
 
+/**
+ * El MISMO redondeo que pinta el panel (`redondearCifra`, hallazgo 2785): con `Math.round` a
+ * secas, 9,81·sen 30° = 4,904999999999999 daba 4,90 y el panel, con el peso, 4,91.
+ */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearCifra(valor, decimales);
+}
+
+/**
+ * ¿La cifra exacta tiene más decimales de los que se piden? Holgura RELATIVA: 424,785 y 0,5 se
+ * juzgan con la misma vara, y el ruido binario (4,904999999999999 por 4,905) no cuenta.
+ */
+export function exigeRedondeo(valor: number, decimales: number): boolean {
+  if (!Number.isFinite(valor)) return false;
+  return Math.abs(redondear(valor, decimales) - valor) > 1e-9 * Math.max(1, Math.abs(valor));
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */
@@ -377,20 +395,43 @@ export function resolverCaso(datos: DatosCaso, g: number = G): Resolucion {
 
   // El último paso muestra la cifra con los MISMOS decimales que pide el enunciado.
   const redondeado = redondear(valor, decimales);
-  const exacto = Math.abs(valor - redondeado) < 1e-9;
   pasos.push(
-    exacto
-      ? `Resultado: ${conUnidad(redondeado, datos)}.`
-      : `Redondeando ${textoRedondeo(decimales)}: ${conUnidad(redondeado, datos)}.`,
+    exigeRedondeo(valor, decimales)
+      ? `Redondeando ${textoRedondeo(decimales)}: ${conUnidad(redondeado, datos)}.`
+      : `Resultado: ${conUnidad(redondeado, datos)}.`,
   );
   return { ok: true, valor, pasos };
 }
 
 /* ─────────────────────────── Corrección ─────────────────────────── */
 
-/** El MAYOR entre 0,01 y el 1 % del valor. */
-export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
+/**
+ * La tolerancia de un caso la da la PREGUNTA, no el tamaño de la cifra (hallazgo 2783,
+ * 03/10/2026; el mismo criterio que el 2626 de simulador-mas-resorte). Es el error de lectura de
+ * los datos propagado a la respuesta más media unidad del redondeo pedido; aquí los datos son
+ * EXACTOS (g = 9,81 declarada, masas, ángulos y μ exactos), así que solo queda el redondeo:
+ *
+ *   · si la cifra exacta tiene más decimales de los que se piden, media unidad del último
+ *     decimal pedido alrededor de la cifra SIN redondear: entra la clave (36,87 por 36,8699°) y
+ *     entra la cifra sin redondear, pero no los vecinos (36,86, 36,88), el truncamiento ni el
+ *     redondeo de más (36,9, 37);
+ *   · si la cifra es exacta, no hay redondeo que tolerar: solo vale ella (4,905 en el caso 3,
+ *     0 en el 5, 196,20 en el 11).
+ *
+ * Antes era el mayor entre 0,01 y el 1 % de la clave redondeada, y el 1 % de una cifra no es la
+ * escala de su error: pasaban 107 y 108 por 107,63 N, de 4,86 a 4,95 en el caso que pide TRES
+ * decimales, y en el caso 9 el 6,07 que sale con g = 10, contra lo que decía su propia pista.
+ * Ningún error conceptual caía dentro del 1 %: lo que colaban eran redondeos mal hechos.
+ *
+ * ⚠️ Redondear un paso intermedio puede sacar la respuesta del margen; la intro lo avisa, y las
+ *    pistas que dan un seno o un coseno lo dan con cifras suficientes (el caso 2 da
+ *    cos 30° ≈ 0,8660254: con 0,866 sale 84,95, no 84,96).
+ */
+export function toleranciaDe(datos: DatosCaso): number {
+  const decimales = datos.decimales ?? 2;
+  const r = resolverCaso(datos);
+  if (!r.ok) return 0;
+  return exigeRedondeo(r.valor, decimales) ? 10 ** -decimales / 2 : 0;
 }
 
 export interface Veredicto {
@@ -400,9 +441,28 @@ export interface Veredicto {
   tolerancia: number;
 }
 
-/** Corrige la respuesta del alumno. Nunca lanza. */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
+/**
+ * Lee la respuesta tecleada. Un punto SOLO, sin coma, es siempre decimal (hallazgo 2784, la
+ * forma del 2384 de simulador-campo-electrico): `parseSpanishNumber` resuelve «4.905» a favor
+ * del millar español —regla que salió de los IMPORTES, donde «1.500» son mil quinientos—, y
+ * quien escribe con punto decimal (México y buena parte de Latinoamérica) recibía «te has
+ * desviado 4900,1» en el caso 3, el único que pide tres decimales. Aquí ninguna respuesta llega
+ * a mil (la mayor de los doce casos es 424,79 J, y la de Practicar, una normal de 196,2 N), así
+ * que «4.905» no puede querer decir 4905. Con coma, o con los dos separadores, manda el parser
+ * del proyecto sin cambios. El menos tipográfico («−») se acepta como signo.
+ */
+export function leerRespuesta(texto: string): number {
+  const limpio = texto.trim().replace(/[−–]/g, '-');
+  if (/^[+-]?\d*\.\d+$/.test(limpio)) return parseSpanishNumber(limpio.replace('.', ','));
+  return parseSpanishNumber(limpio);
+}
+
+/**
+ * Corrige la respuesta del alumno contra la cifra SIN redondear que da el motor. Nunca lanza.
+ * Recibe los `datos` del caso porque la tolerancia depende de la pregunta (ver `toleranciaDe`).
+ */
+export function comprobarRespuesta(usuario: number, datos: DatosCaso): Veredicto {
+  const tolerancia = toleranciaDe(datos);
 
   if (!Number.isFinite(usuario)) {
     return {
@@ -413,11 +473,22 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
     };
   }
 
-  const diferencia = Math.abs(usuario - esperado);
+  const r = resolverCaso(datos);
+  if (!r.ok) {
+    return {
+      correcto: false,
+      motivo: r.error ?? 'Este caso no tiene solución.',
+      diferencia: NaN,
+      tolerancia,
+    };
+  }
+
+  const diferencia = Math.abs(usuario - r.valor);
   /**
    * Margen de ruido binario (hallazgo 1211 de `simulador-conservacion-energia`): en el borde
    * EXACTO de la tolerancia la resta en coma flotante decide por ±1 ulp. 1e-9 absorbe ese ruido
-   * y queda siete órdenes de magnitud por debajo de la tolerancia más pequeña (0,01).
+   * y queda cinco órdenes de magnitud por debajo de la menor tolerancia no nula (0,0005); con
+   * una respuesta exacta (tolerancia 0) es lo único que separa 4,905 de 4,904999999999999.
    */
   const RUIDO_BINARIO = 1e-9;
   if (diferencia <= tolerancia + RUIDO_BINARIO) {
@@ -426,7 +497,7 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia, 2)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${numero(diferencia, 3)} de la respuesta.`,
     diferencia,
     tolerancia,
   };
@@ -455,7 +526,7 @@ export interface Caso {
 }
 
 /** Recordatorio de g para las pistas. */
-const PISTA_G = 'Usa g = 9,81 m/s², la del simulador: con g = 10 el resultado queda fuera de la tolerancia.';
+const PISTA_G = 'Usa g = 9,81 m/s², la del simulador: con g = 10 el resultado ya no es la respuesta.';
 
 /** El orden importa en el simulador: μₖ nunca puede superar a μₛ, así que μₛ va primero. */
 const ORDEN_MU = 'mueve μₛ antes que μₖ, porque μₖ no puede superarlo';
@@ -489,7 +560,7 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     datos: { pregunta: 'normal', masa: 10, angulo: 30, muS: 0.5, muK: 0.3 },
     etiquetaRespuesta: 'N en N',
     requiereRedondeo: true,
-    pista: `N = m·g·cos θ, NO m·g: la normal es perpendicular a la superficie, no al suelo. cos 30° ≈ 0,866. ${PISTA_G}`,
+    pista: `N = m·g·cos θ, NO m·g: la normal es perpendicular a la superficie, no al suelo. cos 30° = √3/2 ≈ 0,8660254: con 0,866 a secas, el resultado sale una centésima corto. ${PISTA_G}`,
     comoComprobar:
       'Pon la masa en 10 kg y el ángulo en 30°: la fila «Normal N = m·g·cos θ» da 84,96 N.',
   },
@@ -504,7 +575,7 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     requiereRedondeo: false,
     pista: `Sin rozamiento, la única fuerza a lo largo del plano es Pₓ = m·g·sen θ, y a = Pₓ/m = g·sen θ. La masa no hace falta. ${PISTA_G}`,
     comoComprobar:
-      'Pulsa el material «Sin rozamiento (caso ideal)», pon la masa en 20 kg y el ángulo en 30°: la fila «Aceleración» da 4,90 m/s² (el panel redondea a dos decimales). Cambia la masa: la aceleración no se mueve.',
+      'Pulsa el material «Sin rozamiento (caso ideal)», pon la masa en 20 kg y el ángulo en 30°: la fila «Aceleración» da 4,91 m/s², porque el panel redondea a dos decimales y el caso pide tres. Cambia la masa: la aceleración no se mueve.',
   },
   {
     id: 4,

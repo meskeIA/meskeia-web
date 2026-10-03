@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
+import { useState, useRef, useMemo, useEffect, useCallback, type CSSProperties } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -13,7 +13,7 @@ import {
 import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorPlanoInclinado.module.css';
-import { analizarPlano } from './motor';
+import { analizarPlano, redondearCifra } from './motor';
 import CasosAula from './CasosAula';
 
 // ============================================================
@@ -25,6 +25,20 @@ const BASE_Y = 400; // línea del suelo en el lienzo
 const VERTICE_X = 90; // vértice del ángulo (esquina inferior izquierda)
 const ALTURA_MAX = 300; // altura máxima del triángulo en píxeles
 const HIPOTENUSA_MAX = 570; // longitud máxima de la rampa en píxeles
+
+/**
+ * Rótulos del diagrama (hallazgo 2789, 03/10/2026). El viewBox mide 800 de ancho y a 390 px el
+ * <svg> se queda en ~308: un rótulo de 12 unidades se pintaba a 4,6 px. Ahora los rótulos se
+ * escalan con el ancho REAL del <svg> (`--escala-rotulo`, que leen las clases del módulo) para
+ * no bajar nunca de SUELO_PX píxeles; en escritorio la escala es 1 y nada cambia.
+ */
+const FUENTE_ROTULO = 12; // tamaño de un rótulo de fuerza a escala 1, en unidades del viewBox
+const SUELO_PX = 10; // ningún rótulo del diagrama por debajo de 10 px reales
+/**
+ * Con la letra agrandada más de un 25 %, «Fr = 20,7 N» ya no cabe entre las flechas: el rótulo
+ * se queda en el nombre y las cifras pasan a la leyenda de debajo del diagrama.
+ */
+const ESCALA_COMPACTA = 1.25;
 
 // ============================================================
 // Tipos
@@ -72,6 +86,62 @@ function geometriaPlano(anguloGrados: number) {
   const bajada: Vector2 = { x: -Math.cos(rad), y: seno };
   const normal: Vector2 = { x: -seno, y: -Math.cos(rad) };
   return { rad, hip, cima, esquina, vertice, bajada, normal };
+}
+
+/**
+ * Toda cifra de la página pasa por aquí: se redondea sobre la cifra DECIMAL (`redondearCifra`)
+ * y solo entonces se formatea. Con `formatNumber` a secas, el mismo 4,905 salía «4,91 N» en el
+ * peso y «4,90 m/s²» en la aceleración del mismo panel (hallazgo 2785).
+ */
+function cifra(valor: number, decimales: number): string {
+  return formatNumber(redondearCifra(valor, decimales), decimales);
+}
+
+/** Caja de un rótulo, centrada en (cx, cy): los rótulos van con text-anchor middle y baseline central. */
+interface Caja {
+  cx: number;
+  cy: number;
+  w: number;
+  h: number;
+}
+
+function solapan(a: Caja, b: Caja): boolean {
+  return Math.abs(a.cx - b.cx) * 2 < a.w + b.w && Math.abs(a.cy - b.cy) * 2 < a.h + b.h;
+}
+
+/**
+ * Coloca los rótulos de las flechas sin que se monten (hallazgo 2788, 03/10/2026).
+ *
+ * Todas las flechas salen del centro del bloque y cada rótulo va un poco más allá de su punta.
+ * La fuerza aplicada, el rozamiento y Pₓ son paralelos al plano: cuando dos apuntan al MISMO
+ * lado (F = +10 N y el estático que la ayuda a sujetar el bloque; F = −10 N y Pₓ; F = +5 N a
+ * 40° y el cinético), sus puntas casi coinciden y los rótulos se tapaban hasta un 96 %. Aquí se
+ * colocan en orden y, si uno pisa a otro ya colocado, se aparta en vertical una altura de
+ * rótulo cada vez (arriba, abajo, más arriba…); si ni así cabe, en horizontal. La caja es una
+ * estimación generosa (0,66 de la letra por carácter, en negrita). `obstaculos` son cajas que
+ * ya están ocupadas antes de empezar: el bloque, con la masa escrita dentro, que tapaba el
+ * rótulo de una fuerza corta (F = +5 N a 40°).
+ */
+function colocarRotulos(
+  anclas: { ancla: Vector2; texto: string }[],
+  fuente: number,
+  obstaculos: Caja[] = [],
+): Vector2[] {
+  const alto = fuente * 1.3;
+  const colocadas: Caja[] = [...obstaculos];
+  return anclas.map(({ ancla, texto }) => {
+    const ancho = Math.max(1, texto.length) * fuente * 0.66;
+    const candidatas: Caja[] = [];
+    for (const n of [0, -1, 1, -2, 2, -3, 3]) {
+      candidatas.push({ cx: ancla.x, cy: ancla.y + n * (alto + 2), w: ancho, h: alto });
+    }
+    for (const n of [1, -1, 2, -2]) {
+      candidatas.push({ cx: ancla.x + n * (ancho + 4), cy: ancla.y, w: ancho, h: alto });
+    }
+    const libre = candidatas.find((c) => !colocadas.some((o) => solapan(o, c))) ?? candidatas[0];
+    colocadas.push(libre);
+    return { x: libre.cx, y: libre.cy };
+  });
 }
 
 /** Punto sobre la rampa según la distancia recorrida desde la base (en metros). */
@@ -232,6 +302,35 @@ export default function SimuladorPlanoInclinado() {
   // ----------------------------------------------------------
   // Dibujo
   // ----------------------------------------------------------
+  // Ancho real del <svg> en pantalla, para escalar sus rótulos (hallazgo 2789). Antes de medir
+  // se supone el del viewBox (escala 1), que es lo que se pinta en el servidor.
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const [anchoSvg, setAnchoSvg] = useState(SVG_W);
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    // Hacia abajo: un ancho redondeado hacia arriba daría una letra una centésima por debajo
+    // del suelo.
+    // Con la matriz de pantalla y no con getBoundingClientRect: este incluye el borde del
+    // <svg> (1,5 px por lado) y el viewBox se reparte solo en el contenido.
+    const medir = () => {
+      const matriz = svg.getScreenCTM();
+      const ancho = Math.floor(matriz ? matriz.a * SVG_W : svg.getBoundingClientRect().width);
+      if (ancho > 0) setAnchoSvg(ancho);
+    };
+    medir();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observador = new ResizeObserver(medir);
+    observador.observe(svg);
+    return () => observador.disconnect();
+  }, []);
+  // Hacia arriba, a la centésima: así 12·escala·ancho/800 nunca queda por debajo de 10 px.
+  const escalaRotulo = Math.min(
+    3,
+    Math.max(1, Math.ceil(((SUELO_PX * SVG_W) / (FUENTE_ROTULO * anchoSvg)) * 100) / 100),
+  );
+  const compacto = escalaRotulo > ESCALA_COMPACTA;
+
   const geo = useMemo(() => geometriaPlano(angulo), [angulo]);
   const centroBloque = useMemo(() => {
     const sobreRampa = puntoEnRampa(u, longitud, geo);
@@ -310,24 +409,77 @@ export default function SimuladorPlanoInclinado() {
     return lista;
   }, [centroBloque, escalaVector, fisica, fuerza, geo, verComponentes]);
 
+  /**
+   * Dónde va el rótulo de cada flecha (null si la flecha es demasiado corta para dibujarse). En
+   * modo compacto el rótulo lleva solo el nombre: las cifras van en la leyenda.
+   */
+  const rotulos = useMemo(() => {
+    const visibles = vectores.map((v) => Math.hypot(v.delta.x, v.delta.y) >= 2);
+    const textos = vectores.map((v) =>
+      verEtiquetas && !compacto ? `${v.nombre} = ${cifra(v.valor, 1)} N` : v.nombre,
+    );
+    const anclas = vectores.map((v, i) => {
+      const fin = suma(v.desde, v.delta);
+      const ang = Math.atan2(v.delta.y, v.delta.x);
+      const separacion = 16 * escalaRotulo;
+      return {
+        ancla: { x: fin.x + Math.cos(ang) * separacion, y: fin.y + Math.sin(ang) * separacion },
+        texto: textos[i],
+      };
+    });
+    const indices = anclas.map((_, i) => i).filter((i) => visibles[i]);
+    // El bloque (48 × 40, girado θ) ocupa su caja envolvente, con un margen para el halo
+    const c = Math.abs(Math.cos(geo.rad));
+    const sn = Math.abs(Math.sin(geo.rad));
+    const bloque: Caja = {
+      cx: centroBloque.x,
+      cy: centroBloque.y,
+      w: 48 * c + 40 * sn + 4,
+      h: 48 * sn + 40 * c + 4,
+    };
+    // «x» e «y» de «Ejes girados» van en un sitio fijo: también ocupan su caja (la «y» caía
+    // encima del rótulo de N en móvil)
+    const letraEje = 13 * escalaRotulo;
+    const ejes: Caja[] = verEjes
+      ? [
+          { x: geo.bajada.x * 162, y: geo.bajada.y * 162 },
+          { x: geo.normal.x * 142, y: geo.normal.y * 142 },
+        ].map((d) => ({
+          cx: centroBloque.x + d.x,
+          cy: centroBloque.y + d.y,
+          w: letraEje * 0.8,
+          h: letraEje * 1.3,
+        }))
+      : [];
+    const posiciones = colocarRotulos(
+      indices.map((i) => anclas[i]),
+      FUENTE_ROTULO * escalaRotulo,
+      [bloque, ...ejes],
+    );
+    return vectores.map((_, i) => {
+      const k = indices.indexOf(i);
+      return k === -1 ? null : { ...posiciones[k], texto: textos[i] };
+    });
+  }, [vectores, verEtiquetas, verEjes, compacto, escalaRotulo, geo, centroBloque]);
+
   const veredicto = useMemo(() => {
     if (fisica.estado === 'reposo') {
       return {
         titulo: 'El bloque NO desliza',
-        detalle: `El rozamiento estático puede llegar a ${formatNumber(fisica.rozamientoMaximo, 2)} N y solo necesita ${formatNumber(Math.abs(fisica.resultanteSinRozar), 2)} N para equilibrar el sistema.`,
+        detalle: `El rozamiento estático puede llegar a ${cifra(fisica.rozamientoMaximo, 2)} N y solo necesita ${cifra(Math.abs(fisica.resultanteSinRozar), 2)} N para equilibrar el sistema.`,
         clase: styles.veredictoReposo,
       };
     }
     if (fisica.estado === 'baja') {
       return {
         titulo: 'El bloque desliza cuesta abajo',
-        detalle: `La resultante paralela (${formatNumber(Math.abs(fisica.resultanteSinRozar), 2)} N) supera al rozamiento estático máximo (${formatNumber(fisica.rozamientoMaximo, 2)} N).`,
+        detalle: `La resultante paralela (${cifra(Math.abs(fisica.resultanteSinRozar), 2)} N) supera al rozamiento estático máximo (${cifra(fisica.rozamientoMaximo, 2)} N).`,
         clase: styles.veredictoBaja,
       };
     }
     return {
       titulo: 'El bloque sube por el plano',
-      detalle: `La fuerza aplicada vence al peso paralelo y al rozamiento estático máximo (${formatNumber(fisica.rozamientoMaximo, 2)} N).`,
+      detalle: `La fuerza aplicada vence al peso paralelo y al rozamiento estático máximo (${cifra(fisica.rozamientoMaximo, 2)} N).`,
       clase: styles.veredictoSube,
     };
   }, [fisica]);
@@ -360,7 +512,7 @@ export default function SimuladorPlanoInclinado() {
             <div className={styles.inputGroup}>
               <label htmlFor="masa">
                 Masa del bloque
-                <span className={styles.valueBadge}>{formatNumber(masa, 1)} kg</span>
+                <span className={styles.valueBadge}>{cifra(masa, 1)} kg</span>
               </label>
               <input
                 id="masa"
@@ -369,6 +521,7 @@ export default function SimuladorPlanoInclinado() {
                 max="50"
                 step="0.5"
                 value={masa}
+                aria-valuetext={`${cifra(masa, 1)}\u00A0kg`}
                 onChange={(e) => setMasa(parseFloat(e.target.value))}
               />
             </div>
@@ -376,7 +529,7 @@ export default function SimuladorPlanoInclinado() {
             <div className={styles.inputGroup}>
               <label htmlFor="angulo">
                 Ángulo de inclinación θ
-                <span className={styles.valueBadge}>{formatNumber(angulo, 0)}°</span>
+                <span className={styles.valueBadge}>{cifra(angulo, 0)}°</span>
               </label>
               <input
                 id="angulo"
@@ -385,6 +538,7 @@ export default function SimuladorPlanoInclinado() {
                 max="60"
                 step="1"
                 value={angulo}
+                aria-valuetext={`${cifra(angulo, 0)}°`}
                 onChange={(e) => setAngulo(parseFloat(e.target.value))}
               />
             </div>
@@ -392,7 +546,7 @@ export default function SimuladorPlanoInclinado() {
             <div className={styles.inputGroup}>
               <label htmlFor="mus">
                 Coeficiente estático μₛ
-                <span className={styles.valueBadge}>{formatNumber(muS, 2)}</span>
+                <span className={styles.valueBadge}>{cifra(muS, 2)}</span>
               </label>
               <input
                 id="mus"
@@ -401,6 +555,7 @@ export default function SimuladorPlanoInclinado() {
                 max="1.5"
                 step="0.01"
                 value={muS}
+                aria-valuetext={cifra(muS, 2)}
                 onChange={(e) => handleMuS(parseFloat(e.target.value))}
               />
             </div>
@@ -408,7 +563,7 @@ export default function SimuladorPlanoInclinado() {
             <div className={styles.inputGroup}>
               <label htmlFor="muk">
                 Coeficiente cinético μₖ
-                <span className={styles.valueBadge}>{formatNumber(muK, 2)}</span>
+                <span className={styles.valueBadge}>{cifra(muK, 2)}</span>
               </label>
               <input
                 id="muk"
@@ -417,6 +572,7 @@ export default function SimuladorPlanoInclinado() {
                 max="1.5"
                 step="0.01"
                 value={muK}
+                aria-valuetext={cifra(muK, 2)}
                 onChange={(e) => handleMuK(parseFloat(e.target.value))}
               />
             </div>
@@ -424,7 +580,7 @@ export default function SimuladorPlanoInclinado() {
             <div className={styles.inputGroup}>
               <label htmlFor="fuerza">
                 Fuerza aplicada paralela al plano
-                <span className={styles.valueBadge}>{formatNumber(fuerza, 0)} N</span>
+                <span className={styles.valueBadge}>{cifra(fuerza, 0)} N</span>
               </label>
               <input
                 id="fuerza"
@@ -433,6 +589,11 @@ export default function SimuladorPlanoInclinado() {
                 max="150"
                 step="1"
                 value={fuerza}
+                aria-valuetext={
+                  fuerza === 0
+                    ? '0\u00A0N'
+                    : `${cifra(Math.abs(fuerza), 0)}\u00A0N ${fuerza > 0 ? 'cuesta arriba' : 'cuesta abajo'}`
+                }
                 onChange={(e) => setFuerza(parseFloat(e.target.value))}
               />
               <span className={styles.inputHint}>
@@ -443,7 +604,7 @@ export default function SimuladorPlanoInclinado() {
             <div className={styles.inputGroup}>
               <label htmlFor="longitud">
                 Longitud de la rampa
-                <span className={styles.valueBadge}>{formatNumber(longitud, 1)} m</span>
+                <span className={styles.valueBadge}>{cifra(longitud, 1)} m</span>
               </label>
               <input
                 id="longitud"
@@ -452,10 +613,11 @@ export default function SimuladorPlanoInclinado() {
                 max="10"
                 step="0.5"
                 value={longitud}
+                aria-valuetext={`${cifra(longitud, 1)}\u00A0m`}
                 onChange={(e) => setLongitud(parseFloat(e.target.value))}
               />
               <span className={styles.inputHint}>
-                Altura equivalente: {formatNumber(fisica.alturaTotal, 2)} m
+                Altura equivalente: {cifra(fisica.alturaTotal, 2)} m
               </span>
             </div>
           </div>
@@ -478,7 +640,7 @@ export default function SimuladorPlanoInclinado() {
               >
                 {material.nombre}
                 <span className={styles.presetValores}>
-                  μₛ = {formatNumber(material.muS, 2)} · μₖ = {formatNumber(material.muK, 2)}
+                  μₛ = {cifra(material.muS, 2)} · μₖ = {cifra(material.muK, 2)}
                 </span>
               </button>
             ))}
@@ -539,9 +701,11 @@ export default function SimuladorPlanoInclinado() {
           <div className={styles.canvasContainer}>
             <div>
               <svg
+                ref={svgRef}
                 className={styles.canvasSvg}
                 viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-                aria-label={`Plano inclinado ${formatNumber(angulo, 0)} grados con el bloque y sus fuerzas`}
+                style={{ '--escala-rotulo': escalaRotulo } as CSSProperties}
+                aria-label={`Plano inclinado ${cifra(angulo, 0)} grados con el bloque y sus fuerzas`}
               >
                 {/* Suelo */}
                 <line
@@ -579,7 +743,7 @@ export default function SimuladorPlanoInclinado() {
                   y={geo.vertice.y - 16}
                   className={styles.textoAngulo}
                 >
-                  θ = {formatNumber(angulo, 0)}°
+                  θ = {cifra(angulo, 0)}°
                 </text>
 
                 {/* Ejes girados (x paralelo al plano, y perpendicular) */}
@@ -619,16 +783,20 @@ export default function SimuladorPlanoInclinado() {
                   transform={`translate(${centroBloque.x} ${centroBloque.y}) rotate(${-angulo})`}
                 >
                   <rect x={-24} y={-20} width={48} height={40} rx={4} className={styles.bloque} />
-                  <text x={0} y={0} className={styles.textoBloque}>
-                    {formatNumber(masa, 1)} kg
-                  </text>
+                  {/* A 10 px reales «5,0 kg» no cabe en el bloque: en móvil la masa se lee en la
+                      leyenda de debajo y en su deslizador. */}
+                  {!compacto && (
+                    <text x={0} y={0} className={styles.textoBloque}>
+                      {cifra(masa, 1)} kg
+                    </text>
+                  )}
                 </g>
 
                 {/* Vectores de fuerza */}
                 {vectores.map((vector, i) => {
                   const fin = suma(vector.desde, vector.delta);
-                  const modulo = Math.hypot(vector.delta.x, vector.delta.y);
-                  if (modulo < 2) return null;
+                  const rotulo = rotulos[i];
+                  if (!rotulo) return null;
                   const ang = Math.atan2(vector.delta.y, vector.delta.x);
                   const punta = 8;
                   const p1 = {
@@ -652,18 +820,26 @@ export default function SimuladorPlanoInclinado() {
                         points={`${fin.x},${fin.y} ${p1.x},${p1.y} ${p2.x},${p2.y}`}
                         className={styles.vectorPunta}
                       />
-                      <text
-                        x={fin.x + Math.cos(ang) * 16}
-                        y={fin.y + Math.sin(ang) * 16}
-                        className={styles.vectorTexto}
-                      >
-                        {vector.nombre}
-                        {verEtiquetas ? ` = ${formatNumber(vector.valor, 1)} N` : ''}
+                      <text x={rotulo.x} y={rotulo.y} className={styles.vectorTexto}>
+                        {rotulo.texto}
                       </text>
                     </g>
                   );
                 })}
               </svg>
+              {compacto && verEtiquetas && (
+                <p className={styles.leyendaFuerzas} id="leyenda-fuerzas">
+                  <span>m = {cifra(masa, 1)}{'\u00A0'}kg</span>
+                  {vectores.map((vector, i) =>
+                    rotulos[i] ? (
+                      <span key={vector.nombre} className={vector.clase}>
+                        {vector.nombre} = {cifra(vector.valor, 1)}
+                        {'\u00A0'}N
+                      </span>
+                    ) : null,
+                  )}
+                </p>
+              )}
               <p className={styles.canvasHint}>
                 P = peso · N = normal · Fr = rozamiento · F = fuerza aplicada · Px y Py = componentes
                 del peso
@@ -678,38 +854,38 @@ export default function SimuladorPlanoInclinado() {
 
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Peso P = m·g</span>
-                <span className={styles.resultValue}>{formatNumber(fisica.peso, 2)} N</span>
+                <span className={styles.resultValue}>{cifra(fisica.peso, 2)} N</span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Normal N = m·g·cos θ</span>
-                <span className={styles.resultValue}>{formatNumber(fisica.normal, 2)} N</span>
+                <span className={styles.resultValue}>{cifra(fisica.normal, 2)} N</span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Peso paralelo m·g·sen θ</span>
-                <span className={styles.resultValue}>{formatNumber(fisica.pesoParalelo, 2)} N</span>
+                <span className={styles.resultValue}>{cifra(fisica.pesoParalelo, 2)} N</span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Rozamiento máximo μₛ·N</span>
                 <span className={styles.resultValue}>
-                  {formatNumber(fisica.rozamientoMaximo, 2)} N
+                  {cifra(fisica.rozamientoMaximo, 2)} N
                 </span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Rozamiento real</span>
                 <span className={styles.resultValue}>
-                  {formatNumber(fisica.rozamientoReal, 2)} N
+                  {cifra(fisica.rozamientoReal, 2)} N
                 </span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Aceleración</span>
                 <span className={styles.resultValueAccent}>
-                  {formatNumber(Math.abs(fisica.aceleracion), 2)} m/s²
+                  {cifra(Math.abs(fisica.aceleracion), 2)} m/s²
                 </span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Ángulo crítico arctg(μₛ)</span>
                 <span className={styles.resultValue}>
-                  {formatNumber(fisica.anguloCritico, 1)}°
+                  {cifra(fisica.anguloCritico, 1)}°
                 </span>
               </div>
 
@@ -719,34 +895,34 @@ export default function SimuladorPlanoInclinado() {
               {fisica.tiempoRecorrido !== null && fisica.velocidadFinal !== null ? (
                 <>
                   <div className={styles.resultRow}>
-                    <span className={styles.resultLabel}>Tiempo en bajar {formatNumber(longitud, 1)} m</span>
+                    <span className={styles.resultLabel}>Tiempo en bajar {cifra(longitud, 1)} m</span>
                     <span className={styles.resultValue}>
-                      {formatNumber(fisica.tiempoRecorrido, 2)} s
+                      {cifra(fisica.tiempoRecorrido, 2)} s
                     </span>
                   </div>
                   <div className={styles.resultRow}>
                     <span className={styles.resultLabel}>Velocidad al llegar abajo</span>
                     <span className={styles.resultValue}>
-                      {formatNumber(fisica.velocidadFinal, 2)} m/s
+                      {cifra(fisica.velocidadFinal, 2)} m/s
                     </span>
                   </div>
                   <div className={styles.resultRow}>
                     <span className={styles.resultLabel}>Energía potencial inicial</span>
                     <span className={styles.resultValue}>
-                      {formatNumber(fisica.energiaPotencial, 2)} J
+                      {cifra(fisica.energiaPotencial, 2)} J
                     </span>
                   </div>
                   <div className={styles.resultRow}>
                     <span className={styles.resultLabel}>Disipado por rozamiento</span>
                     <span className={styles.resultValue}>
-                      {formatNumber(fisica.trabajoRozamiento, 2)} J
+                      {cifra(fisica.trabajoRozamiento, 2)} J
                     </span>
                   </div>
                   {fuerza !== 0 && (
                     <div className={styles.resultRow}>
                       <span className={styles.resultLabel}>Trabajo de la fuerza aplicada (−F·L)</span>
                       <span className={styles.resultValue}>
-                        {formatNumber(fisica.trabajoFuerza, 2)} J
+                        {cifra(fisica.trabajoFuerza, 2)} J
                       </span>
                     </div>
                   )}
@@ -754,7 +930,7 @@ export default function SimuladorPlanoInclinado() {
                     <div className={styles.resultRow}>
                       <span className={styles.resultLabel}>Energía cinética al llegar (½·m·v²)</span>
                       <span className={styles.resultValue}>
-                        {formatNumber(fisica.energiaCinetica, 2)} J
+                        {cifra(fisica.energiaCinetica, 2)} J
                       </span>
                     </div>
                   )}
@@ -770,12 +946,12 @@ export default function SimuladorPlanoInclinado() {
               <h3 className={`${styles.resultTitle} ${styles.resultTitleGap}`}>Estado actual</h3>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Posición sobre la rampa</span>
-                <span className={styles.resultValue}>{formatNumber(u, 2)} m</span>
+                <span className={styles.resultValue}>{cifra(u, 2)} m</span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Velocidad instantánea</span>
                 <span className={styles.resultValue}>
-                  {formatNumber(Math.abs(velocidad), 2)} m/s
+                  {cifra(Math.abs(velocidad), 2)} m/s
                 </span>
               </div>
             </div>

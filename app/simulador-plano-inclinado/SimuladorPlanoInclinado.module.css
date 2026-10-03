@@ -130,7 +130,7 @@
 
 .valueBadge {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-variant-numeric: tabular-nums;
 }
@@ -160,7 +160,7 @@
 
 .presetCard:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .presetCard:focus-visible {
@@ -212,8 +212,10 @@
   margin-bottom: 1rem;
 }
 
+/* Texto blanco sobre --primary-boton, no sobre --primary: 4,11:1 en claro, 2,79:1 en oscuro y
+   2,21:1 bajo stemum.com (hallazgo 2786). --primary-boton existe en los dos temas y en Stemum. */
 .calcBtn {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   padding: 0.7rem 1.6rem;
@@ -224,8 +226,9 @@
   transition: opacity 0.15s;
 }
 
+/* El hover oscurece en vez de aclarar: una opacidad dejaba ver el fondo y bajaba el contraste. */
 .calcBtn:hover:not(:disabled) {
-  opacity: 0.88;
+  background: var(--hero-bg);
 }
 
 .calcBtn:disabled {
@@ -253,7 +256,7 @@
 
 .calcBtnGhost:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .actionHint {
@@ -314,20 +317,28 @@
   stroke-dasharray: 4 3;
 }
 
+/* Rótulos del lienzo (hallazgos 2787 y 2789). Cada tamaño se multiplica por --escala-rotulo,
+   que la página calcula con el ancho real del <svg> para que ninguno baje de 10 px en pantalla
+   (en escritorio vale 1). Todos llevan un halo del color del lienzo: «θ = …» cae sobre la cuña
+   y las cifras de las fuerzas sobre las flechas, y el halo es el fondo contra el que se leen. */
 .textoAngulo {
-  font-size: 15px;
+  font-size: calc(15px * var(--escala-rotulo, 1));
   font-weight: 700;
-  fill: var(--primary);
+  fill: var(--primary-texto);
+  paint-order: stroke;
+  stroke: #f8fafc;
+  stroke-width: calc(3px * var(--escala-rotulo, 1));
 }
 
+/* Fondo de marca bajo texto blanco: --primary-boton (5,47:1), no el #2e86ab fijo (4,11:1). */
 .bloque {
-  fill: #2e86ab;
-  stroke: #1a5278;
+  fill: var(--primary-boton);
+  stroke: var(--hero-bg);
   stroke-width: 2;
 }
 
 .textoBloque {
-  font-size: 12px;
+  font-size: calc(12px * var(--escala-rotulo, 1));
   font-weight: 700;
   fill: white;
   text-anchor: middle;
@@ -341,11 +352,14 @@
 }
 
 .textoEje {
-  font-size: 13px;
+  font-size: calc(13px * var(--escala-rotulo, 1));
   font-weight: 700;
-  fill: #64748b;
+  fill: #475569;
   text-anchor: middle;
   dominant-baseline: central;
+  paint-order: stroke;
+  stroke: #f8fafc;
+  stroke-width: calc(3px * var(--escala-rotulo, 1));
 }
 
 .vectorLinea {
@@ -358,14 +372,28 @@
 }
 
 .vectorTexto {
-  font-size: 12px;
+  font-size: calc(12px * var(--escala-rotulo, 1));
   font-weight: 700;
   fill: currentColor;
   text-anchor: middle;
   dominant-baseline: central;
   paint-order: stroke;
   stroke: #f8fafc;
-  stroke-width: 3px;
+  stroke-width: calc(3px * var(--escala-rotulo, 1));
+}
+
+/* En móvil los rótulos llevan solo el nombre y las cifras van aquí, en HTML (hallazgo 2789).
+   Cada cifra lleva la clase de su fuerza, así que sale del mismo color que su flecha. */
+.leyendaFuerzas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 0.9rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .vPeso {
@@ -376,16 +404,22 @@
   color: #2563eb;
 }
 
+/* #c2410c: 4,95:1 sobre el lienzo #f8fafc; el #ea580c de antes daba 3,40:1 (hallazgo 2787). */
 .vRozamiento {
-  color: #ea580c;
+  color: #c2410c;
 }
 
 .vAplicada {
   color: #15803d;
 }
 
+/* La transparencia, solo en la flecha: en el rótulo bajaba #9333ea a 3,43:1 (hallazgo 2787). */
 .vComponente {
-  color: #9333ea;
+  color: #7e22ce;
+}
+
+.vComponente .vectorLinea,
+.vComponente .vectorPunta {
   opacity: 0.75;
 }
 
@@ -440,7 +474,7 @@
 
 .resultValueAccent {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -497,7 +531,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -535,7 +569,7 @@
 
 .faqTip {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0.35rem;
   font-style: italic;
 }
@@ -553,7 +587,7 @@
 }
 
 .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 28px;
   height: 28px;
@@ -722,18 +756,24 @@
   stroke: #64748b;
 }
 
-[data-theme='dark'] .arcoAngulo,
-[data-theme='dark'] .textoAngulo {
+[data-theme='dark'] .arcoAngulo {
   stroke: #7fb3d3;
   fill: none;
 }
 
+/* --primary-texto en oscuro: #3FA5D1 (6,5:1 sobre #0f172a) y #C99BF5 bajo stemum.com. */
 [data-theme='dark'] .textoAngulo {
-  fill: #7fb3d3;
-  stroke: none;
+  fill: var(--primary-texto);
+  stroke: #0f172a;
 }
 
 [data-theme='dark'] .vectorTexto {
+  stroke: #0f172a;
+}
+
+/* Sin variante oscura, «x» e «y» se quedaban en #64748b sobre #0f172a: 3,75:1 (hallazgo 2787). */
+[data-theme='dark'] .textoEje {
+  fill: #94a3b8;
   stroke: #0f172a;
 }
 
@@ -768,6 +808,23 @@
 
 [data-theme='dark'] .resultRow {
   border-color: #1e3a5f;
+}
+
+/* Sobre el degradado oscuro (#1e3a5f → #14532d), el --text-secondary #B0B0B0 se quedaba en
+   4,43–4,48:1 en las etiquetas (hallazgo 2786). #d1d5db: 6,0:1 sobre la parada más clara. */
+[data-theme='dark'] .resultLabel,
+[data-theme='dark'] .resultNota {
+  color: #d1d5db;
+}
+
+/* La aceleración destacada: --primary-texto (#3FA5D1) daba 3,26–4,12:1 sobre ese degradado y
+   el violeta de Stemum (#C99BF5), 4,1:1 sobre el verde. Un tono más claro de cada marca. */
+[data-theme='dark'] .resultValueAccent {
+  color: #a8d6ea;
+}
+
+[data-theme='dark'][data-brand='stemum'] .resultValueAccent {
+  color: #e4d0fa;
 }
 
 [data-theme='dark'] .comparativaTable td {
