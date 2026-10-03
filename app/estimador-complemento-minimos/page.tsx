@@ -6,21 +6,30 @@ import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
   ShareCard, DisclaimerCard, DataReference, RegionBadge
 } from '@/components';
-import { formatCurrency, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { PENSIONES_MINIMAS_2026, COMPLEMENTO_MINIMOS_LIMITES_2026, FISCAL_PENSIONES_META } from '@/data/fiscal';
+import {
+  PENSIONES_MINIMAS_2026, COMPLEMENTO_MINIMOS_LIMITES_2026, TOPE_COMPLEMENTO_MINIMOS_2026,
+  FISCAL_PENSIONES_META,
+} from '@/data/fiscal';
 import type { PensionMinimaEntry } from '@/data/fiscal/pensiones';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
 type TipoPension = 'jubilacion' | 'incapacidad' | 'viudedad';
 type SituacionFamiliar = 'conConyuge' | 'sinConyuge' | 'unipersonal';
+/** Fecha del hecho causante frente al 01/01/2013, que es la que decide si hay tope (art. 9.5). */
+type FechaCausacion = 'desde2013' | 'antes2013';
+/** Por qué el complemento no lleva tope, cuando no lo lleva. */
+type ExencionTope = 'antes2013' | 'terceraPersona';
 
 interface Resultado {
   pensionMinima: number;
   complemento: number;
   pensionFinal: number;
   elegible: boolean;
+  /** Por qué no hay complemento: la pensión ya llega al mínimo, o las rentas se lo comen */
+  causaNoElegible?: 'pensionSuficiente' | 'rentas';
   motivoNoElegible?: string;
   entry: PensionMinimaEntry;
   /** Límite de ingresos que se ha aplicado de verdad, para poder rotularlo sin adivinar */
@@ -29,6 +38,14 @@ interface Resultado {
   conConyugeACargo: boolean;
   /** El complemento sale de la regla diferencial del art. 9.2, no del mínimo íntegro */
   complementoDiferencial: boolean;
+  /** Tope mensual del complemento (PNC, arts. 9.5 y 10.4), o null si no hay tope */
+  topeMensual: number | null;
+  /** Por qué no hay tope, si no lo hay */
+  exencionTope: ExencionTope | null;
+  /** El tope ha recortado el complemento: la pensión final se queda por debajo del mínimo */
+  topeAplicado: boolean;
+  /** Lo que habría salido sin el tope, para poder explicar el recorte */
+  complementoSinTope: number;
 }
 
 // ─── Opciones de subtipo por tipo ─────────────────────────────────────────────
@@ -37,9 +54,13 @@ const SUBTIPOS: Record<TipoPension, { value: string; label: string }[]> = {
   jubilacion: [
     { value: '65_o_mas', label: '65 años o más' },
     { value: 'menos_65', label: 'Menos de 65 años' },
+    // Fila propia del Anexo I del RD 241/2026 (hallazgo 2810): conserva el mínimo de la gran
+    // incapacidad de la que procede.
+    { value: '65_gran_incapacidad', label: '65 años o más, procedente de gran incapacidad' },
   ],
   incapacidad: [
-    { value: 'gran_invalidez', label: 'Gran Invalidez' },
+    // «Gran incapacidad» desde la DA única de la Ley 2/2025; la clave interna no cambia.
+    { value: 'gran_invalidez', label: 'Gran incapacidad' },
     { value: 'absoluta', label: 'Absoluta' },
     { value: 'total_65_o_mas', label: 'Total — 65 o más años' },
     { value: 'total_60_64', label: 'Total — 60 a 64 años' },
@@ -64,12 +85,28 @@ const SUBTIPOS: Record<TipoPension, { value: string; label: string }[]> = {
  */
 const PAGAS = 14;
 
+/** La fecha desde la que rige el tope, impresa en formato español: «01/01/2013». */
+const FECHA_TOPE = formatDate(parseISODateLocal(TOPE_COMPLEMENTO_MINIMOS_2026.causadasDesde));
+
+/**
+ * Las dos filas del Anexo I que son gran incapacidad: el grado y la jubilación que procede de
+ * él. Esta última es la misma pensión con otro nombre —art. 200.4 LGSS: el cambio de
+ * denominación «no implicará modificación alguna» de sus condiciones—, así que conserva el
+ * complemento de la persona que le atiende y, con él, la exención del tope del art. 9.7.
+ */
+function esGranIncapacidad(tipo: TipoPension, subtipo: string): boolean {
+  return (tipo === 'incapacidad' && subtipo === 'gran_invalidez')
+    || (tipo === 'jubilacion' && subtipo === '65_gran_incapacidad');
+}
+
 function calcular(
   tipo: TipoPension,
   subtipo: string,
   situacion: SituacionFamiliar,
   pensionActual: number,
   ingresosAnuales: number,
+  fechaCausacion: FechaCausacion,
+  complementoTerceraPersona: boolean,
 ): Resultado | null {
   const entry = PENSIONES_MINIMAS_2026.find(e => e.tipo === tipo && e.subtipo === subtipo);
   if (!entry) return null;
@@ -106,9 +143,35 @@ function calcular(
   );
 
   const superaLimite = ingresosAnuales > limiteIngresos;
-  const complementoAnual = superaLimite
+  const complementoSinTopeAnual = superaLimite
     ? Math.min(complementoIntegroAnual, complementoDiferencialAnual)
     : complementoIntegroAnual;
+
+  // ⚠️ 2026-10-03 (hallazgo 2803): faltaba el TOPE. En las pensiones causadas desde el
+  //    01/01/2013 el complemento «en ningún caso podrá superar» la pensión no contributiva del
+  //    año (art. 9.5 RD 241/2026, art. 59.4 LGSS); con cónyuge a cargo, la PNC de una unidad con
+  //    dos beneficiarios (art. 10.4, que remite al 364.1.a LGSS). La app devolvía siempre
+  //    mínima − pensión, y a una jubilación de 200 €/mes le daba 736,20 €/mes en vez de 628,80.
+  //    No topa a la gran incapacidad con el complemento de la persona que le atiende (art. 9.7).
+  const exencionTope: ExencionTope | null = fechaCausacion === 'antes2013'
+    ? 'antes2013'
+    : esGranIncapacidad(tipo, subtipo) && complementoTerceraPersona
+      ? 'terceraPersona'
+      : null;
+  const topeAnual = exencionTope !== null
+    ? null
+    : conConyugeACargo
+      ? TOPE_COMPLEMENTO_MINIMOS_2026.conConyugeAnual
+      : TOPE_COMPLEMENTO_MINIMOS_2026.pncAnual;
+  const topeMensual = exencionTope !== null
+    ? null
+    : conConyugeACargo
+      ? TOPE_COMPLEMENTO_MINIMOS_2026.conConyugeMensual
+      : TOPE_COMPLEMENTO_MINIMOS_2026.sinConyugeMensual;
+
+  const complementoAnual = topeAnual === null
+    ? complementoSinTopeAnual
+    : Math.min(complementoSinTopeAnual, topeAnual);
   const complemento = complementoAnual / PAGAS;
 
   const base = {
@@ -117,17 +180,27 @@ function calcular(
     limiteIngresos,
     conConyugeACargo,
     complementoDiferencial: superaLimite && complemento > 0,
+    topeMensual,
+    exencionTope,
+    topeAplicado: topeAnual !== null && complementoSinTopeAnual > topeAnual,
+    complementoSinTope: complementoSinTopeAnual / PAGAS,
   };
 
   if (complemento <= 0) {
+    // ⚠️ 2026-10-03 (hallazgo 2807): el motivo se elegía por `superaLimite` sin mirar si
+    //    había hueco hasta el mínimo. Con la pensión ya por encima del mínimo y rentas sobre el
+    //    límite, culpaba a las rentas, como si con menos hubiera habido complemento. Lo primero
+    //    que decide es si la pensión ya llega; las rentas, solo si faltaba algo.
+    const pensionSuficiente = complementoIntegroAnual <= 0;
     return {
       ...base,
       complemento: 0,
       pensionFinal: pensionActual,
       elegible: false,
-      motivoNoElegible: superaLimite
-        ? `Tus ingresos anuales (${formatCurrency(ingresosAnuales)}) superan el límite de ${formatCurrency(limiteIngresos)} en más de lo que te faltaba para llegar al mínimo, así que no queda complemento que reconocer.`
-        : 'Tu pensión actual ya iguala o supera el mínimo garantizado para tu situación.',
+      causaNoElegible: pensionSuficiente ? 'pensionSuficiente' : 'rentas',
+      motivoNoElegible: pensionSuficiente
+        ? 'Tu pensión actual ya iguala o supera el mínimo garantizado para tu situación.'
+        : `Tus ingresos anuales (${formatCurrency(ingresosAnuales)}) superan el límite de ${formatCurrency(limiteIngresos)} en más de lo que te faltaba para llegar al mínimo, así que no queda complemento que reconocer.`,
     };
   }
 
@@ -145,6 +218,10 @@ export default function EstimadorComplementoMinimosPage() {
   const [tipo, setTipo] = useState<TipoPension>('jubilacion');
   const [subtipo, setSubtipo] = useState(SUBTIPOS.jubilacion[0].value);
   const [situacion, setSituacion] = useState<SituacionFamiliar>('unipersonal');
+  // Por defecto, la más común hoy: una pensión causada en los últimos trece años.
+  const [fechaCausacion, setFechaCausacion] = useState<FechaCausacion>('desde2013');
+  // Toda gran incapacidad lleva este complemento (art. 196.4 LGSS): por eso «Sí» por defecto.
+  const [terceraPersona, setTerceraPersona] = useState(true);
   const [pensionActual, setPensionActual] = useState('');
   const [ingresosAnuales, setIngresosAnuales] = useState('');
   const [resultado, setResultado] = useState<Resultado | null>(null);
@@ -175,6 +252,13 @@ export default function EstimadorComplementoMinimosPage() {
       setError('La pensión no puede ser negativa.');
       setResultado(null); return;
     }
+    // ⚠️ 2026-10-03 (hallazgo 2808): una pensión de 0 € devolvía en verde el mínimo íntegro.
+    //    El complemento solo existe sobre una pensión contributiva que ya se cobra (art. 59.1
+    //    LGSS): con cero no hay nada que complementar, y la cifra sería inventada.
+    if (pension === 0) {
+      setError('Con una pensión de 0 € no hay complemento que estimar: solo se reconoce a quien ya cobra una pensión contributiva (art. 59.1 LGSS). Escribe el importe bruto mensual de tu pensión.');
+      setResultado(null); return;
+    }
     if (Number.isNaN(ingresos)) {
       setError('Introduce tus otros ingresos anuales. Si no tienes ninguno, escribe 0: es el dato que decide si te corresponde el complemento.');
       setResultado(null); return;
@@ -184,7 +268,7 @@ export default function EstimadorComplementoMinimosPage() {
       setResultado(null); return;
     }
 
-    setResultado(calcular(tipo, subtipo, situacion, pension, ingresos));
+    setResultado(calcular(tipo, subtipo, situacion, pension, ingresos, fechaCausacion, terceraPersona));
   };
 
   return (
@@ -256,6 +340,35 @@ export default function EstimadorComplementoMinimosPage() {
               </select>
             </div>
 
+            {/* Complemento de tercera persona: solo en gran incapacidad, que es donde decide el tope */}
+            {esGranIncapacidad(tipo, subtipo) && (
+              <fieldset className={styles.formGroup}>
+                <legend className={styles.label}>
+                  ¿Tienes reconocido el complemento para pagar a la persona que te atiende?
+                </legend>
+                <div className={styles.optionGridFila}>
+                  {([
+                    { id: true, label: 'Sí' },
+                    { id: false, label: 'No' },
+                  ] as const).map(opt => (
+                    <button
+                      key={opt.label}
+                      type="button"
+                      className={`${styles.optionBtn} ${terceraPersona === opt.id ? styles.optionActivo : ''}`}
+                      onClick={() => { setTerceraPersona(opt.id); setResultado(null); }}
+                      aria-pressed={terceraPersona === opt.id}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+                <p className={styles.hint}>
+                  Toda pensión de gran incapacidad lo incluye (art. 196.4 LGSS). Con él, el
+                  complemento a mínimos no tiene tope (art. 9.7 del RD 241/2026).
+                </p>
+              </fieldset>
+            )}
+
             {/* Situación familiar (solo si no es viudedad) */}
             {tipo !== 'viudedad' && (
               <fieldset className={styles.formGroup}>
@@ -286,6 +399,34 @@ export default function EstimadorComplementoMinimosPage() {
               </fieldset>
             )}
 
+            {/* Fecha de causación: decide si el complemento tiene tope (art. 9.5) */}
+            <fieldset className={styles.formGroup}>
+              <legend className={styles.label}>¿Cuándo se causó tu pensión?</legend>
+              <div className={styles.optionGridFila}>
+                {([
+                  { id: 'desde2013' as const, label: `Desde el ${FECHA_TOPE}` },
+                  { id: 'antes2013' as const, label: `Antes del ${FECHA_TOPE}` },
+                ] as const).map(opt => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    className={`${styles.optionBtn} ${fechaCausacion === opt.id ? styles.optionActivo : ''}`}
+                    onClick={() => { setFechaCausacion(opt.id); setResultado(null); }}
+                    aria-pressed={fechaCausacion === opt.id}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <p className={styles.hint}>
+                La fecha del hecho causante, la que figura en tu resolución. En las pensiones
+                causadas desde el {FECHA_TOPE}, el complemento no puede superar la pensión no
+                contributiva del año: {formatCurrency(TOPE_COMPLEMENTO_MINIMOS_2026.sinConyugeMensual)}/mes,
+                o {formatCurrency(TOPE_COMPLEMENTO_MINIMOS_2026.conConyugeMensual)}/mes con cónyuge a
+                cargo (arts. 9.5 y 10.4 del RD 241/2026).
+              </p>
+            </fieldset>
+
             {/* Pensión actual */}
             <div className={styles.formGroup}>
               <label className={styles.label} htmlFor="pensionActual">Tu pensión mensual bruta actual (€)</label>
@@ -313,7 +454,13 @@ export default function EstimadorComplementoMinimosPage() {
                 value={ingresosAnuales}
                 onChange={e => { setIngresosAnuales(e.target.value); setResultado(null); }}
               />
-              <p className={styles.hint}>Rentas de capital, alquileres, etc. (excluida tu pensión). Si no tienes, pon 0.</p>
+              {/* ⚠️ 2026-10-03 (hallazgo 2804): la ayuda no nombraba el trabajo, y quien cobra
+                  viudedad o incapacidad total y trabaja dejaba fuera su nómina (art. 9.2). */}
+              <p className={styles.hint}>
+                Sueldos y demás rendimientos del trabajo, rentas del capital y alquileres,
+                actividades económicas y ganancias patrimoniales del año, sin contar la pensión
+                que se complementa. Si no tienes, pon 0.
+              </p>
             </div>
 
             {error && (
@@ -340,7 +487,7 @@ export default function EstimadorComplementoMinimosPage() {
                 {/* Hero del resultado */}
                 <div className={resultado.elegible ? styles.resultHeroPositivo : styles.resultHeroNegativo}>
                   <div className={styles.resultIcon} aria-hidden="true">
-                    {resultado.elegible ? '✅' : resultado.motivoNoElegible?.includes('superan') ? '❌' : 'ℹ️'}
+                    {resultado.elegible ? '✅' : resultado.causaNoElegible === 'rentas' ? '❌' : 'ℹ️'}
                   </div>
                   <div className={styles.resultImporte}>
                     {resultado.elegible
@@ -407,6 +554,43 @@ export default function EstimadorComplementoMinimosPage() {
                     )}
                   </p>
                 </div>
+
+                {/* Tope del complemento (arts. 9.5, 9.7 y 10.4 RD 241/2026) */}
+                <div className={styles.topeCard}>
+                  <span aria-hidden="true">📏</span>
+                  <p>
+                    <strong>Tope del complemento:</strong>{' '}
+                    {resultado.exencionTope === 'antes2013' && (
+                      <>
+                        no lo hay. Tu pensión se causó antes del {FECHA_TOPE}, y el tope de la
+                        pensión no contributiva solo rige para las causadas desde esa fecha
+                        (art. 9.5 del RD 241/2026).
+                      </>
+                    )}
+                    {resultado.exencionTope === 'terceraPersona' && (
+                      <>
+                        no lo hay. La gran incapacidad con el complemento para la persona que te
+                        atiende queda fuera del tope (art. 9.7 del RD 241/2026).
+                      </>
+                    )}
+                    {resultado.topeMensual !== null && (
+                      <>
+                        {formatCurrency(resultado.topeMensual)}/mes,{' '}
+                        {resultado.conConyugeACargo
+                          ? 'la pensión no contributiva de una unidad con dos beneficiarios (art. 10.4 del RD 241/2026 y art. 364.1.a LGSS)'
+                          : 'la pensión no contributiva del año (art. 9.5 del RD 241/2026)'}.
+                        {resultado.topeAplicado && (
+                          <>
+                            {' '}Lo que te faltaba hasta el mínimo
+                            ({formatCurrency(resultado.complementoSinTope)}/mes) lo supera, así que
+                            el complemento se queda en el tope y tu pensión final no llega al
+                            mínimo garantizado.
+                          </>
+                        )}
+                      </>
+                    )}
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -467,7 +651,7 @@ export default function EstimadorComplementoMinimosPage() {
                 <div className={styles.stepNumber}>2</div>
                 <div className={styles.stepContent}>
                   <strong>Declaración de ingresos</strong>
-                  <p>Debes declarar tus ingresos anuales (rentas de capital, alquileres, etc.). La SS los comprueba con Hacienda.</p>
+                  <p>Debes declarar tus ingresos anuales (sueldos, rentas de capital, alquileres, etc.). La SS los comprueba con Hacienda.</p>
                 </div>
               </div>
               <div className={styles.step}>
@@ -482,11 +666,41 @@ export default function EstimadorComplementoMinimosPage() {
             <div className={styles.faqList}>
               <details className={styles.faqItem}>
                 <summary>¿El complemento es compatible con trabajar?</summary>
-                <p>Si estás jubilado y trabajas, generalmente pierdes el complemento a mínimos mientras dure la actividad laboral. En jubilación parcial hay matices.</p>
+                <p>
+                  Depende de la pensión, y en todos los casos lo que ganes trabajando cuenta para
+                  el límite de ingresos (art. 9.2 del RD 241/2026). La viudedad y la incapacidad
+                  permanente total admiten un sueldo, y el complemento se recalcula con él. La
+                  jubilación solo es compatible con el trabajo en sus modalidades específicas
+                  (parcial, flexible, activa), y en la jubilación activa no se cobra complemento
+                  a mínimos mientras dure el trabajo (art. 214 LGSS).
+                </p>
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Qué ingresos se tienen en cuenta?</summary>
-                <p>Rentas de capital mobiliario e inmobiliario, ganancias patrimoniales, rendimientos de actividades económicas. No se cuenta la propia pensión.</p>
+                <p>
+                  Los rendimientos del trabajo distintos de la propia pensión (sueldos y
+                  salarios), los del capital mobiliario e inmobiliario (intereses, dividendos,
+                  alquileres), los de actividades económicas y las ganancias patrimoniales, con
+                  el concepto que les da el IRPF (art. 9.2 del RD 241/2026 y art. 59.1 LGSS). De
+                  los rendimientos íntegros se restan los gastos deducibles. No cuenta la pensión
+                  que se va a complementar.
+                </p>
+              </details>
+              <details className={styles.faqItem}>
+                <summary>¿Tiene tope el complemento?</summary>
+                <p>
+                  Sí, en las pensiones causadas desde el {FECHA_TOPE}: el complemento no puede
+                  superar la pensión no contributiva del año, que en 2026 es de{' '}
+                  {formatCurrency(TOPE_COMPLEMENTO_MINIMOS_2026.pncAnual)} anuales
+                  ({formatCurrency(TOPE_COMPLEMENTO_MINIMOS_2026.sinConyugeMensual)}/mes en 14
+                  pagas). Con cónyuge a cargo, el tope es el de una unidad con dos beneficiarios:{' '}
+                  {formatCurrency(TOPE_COMPLEMENTO_MINIMOS_2026.conConyugeAnual)} anuales
+                  ({formatCurrency(TOPE_COMPLEMENTO_MINIMOS_2026.conConyugeMensual)}/mes). Por eso,
+                  con una pensión muy baja, la pensión final puede quedarse por debajo del mínimo
+                  (arts. 9.5 y 10.4 del RD 241/2026, art. 59.4 LGSS). No tienen tope las pensiones
+                  causadas antes de esa fecha ni la gran incapacidad con el complemento para la
+                  persona que atiende al pensionista (art. 9.7).
+                </p>
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Puedo cobrar complemento con dos pensiones?</summary>
@@ -494,7 +708,12 @@ export default function EstimadorComplementoMinimosPage() {
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Se actualiza cada año?</summary>
-                <p>Sí. Los importes mínimos se revalorizan anualmente (normalmente con el IPC) y se publican en los Presupuestos Generales del Estado.</p>
+                {/* ⚠️ 2026-10-03 (hallazgo 2809): decía «Presupuestos Generales del Estado»,
+                    que siguen prorrogados; quien fija cuantías y límites es el RD de revalorización. */}
+                <p>
+                  Sí. Las cuantías mínimas, el límite de ingresos y el tope los fija cada año el
+                  real decreto de revalorización de las pensiones: los de 2026, el RD 241/2026.
+                </p>
               </details>
             </div>
 

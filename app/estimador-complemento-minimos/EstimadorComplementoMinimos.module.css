@@ -1,14 +1,20 @@
+/* ⚠️ 2026-10-03 (hallazgos 2805 y 2806): aquí se redeclaraban --primary, --secondary y
+   --success con literales, que tapaban los tokens del tema (y su variante oscura), y se usaban
+   como texto pequeño o como fondo bajo blanco por debajo de 4,5:1. Fuera: el texto de marca va
+   en --primary-texto y los fondos bajo blanco en --primary-boton/--secondary-boton. El verde del
+   resultado tiene tokens propios, con su variante oscura, medidos:
+     --verde-texto  #1E7A3C · 5,15:1 sobre #FAFAFA, 5,06 sobre la tarjeta tintada
+                    #66BB6A (oscuro) · 7,36 sobre #1A1A1A, 5,58 sobre la tarjeta tintada
+     --verde-fondo  #1E7A3C · blanco encima 5,38:1 · #1D6F38 (oscuro) · blanco 6,21:1 */
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
+  --verde-texto: #1E7A3C;
+  --verde-fondo: #1E7A3C;
+  --aviso-titulo: #B33F00; /* 5,45:1 sobre #FFF8E1 */
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
   --text-secondary: #666666;
   --border: #E5E5E5;
-  --warning: #E67E22;
-  --success: #27AE60;
-  --danger: #E74C3C;
   --radius: 12px;
   --radius-large: 16px;
   --spacing-md: 1rem;
@@ -25,6 +31,9 @@
 }
 
 [data-theme='dark'] .container {
+  --verde-texto: #66BB6A;
+  --verde-fondo: #1D6F38;
+  --aviso-titulo: #FFB74D;
   --bg-primary: #1A1A1A;
   --bg-card: #2A2A2A;
   --text-primary: #E5E5E5;
@@ -68,7 +77,7 @@
 .cardTitle {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-lg);
   padding-bottom: var(--spacing-md);
   border-bottom: 2px solid var(--border);
@@ -142,15 +151,24 @@ fieldset.formGroup {
 .optionActivo {
   border-color: var(--primary);
   background: rgba(46, 134, 171, 0.07);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
-[data-theme='dark'] .optionActivo { background: rgba(46, 134, 171, 0.15); }
+/* Con el 15 % de tinte el texto se quedaba en 4,33:1; con el 10 %, 4,62. */
+[data-theme='dark'] .optionActivo { background: rgba(46, 134, 171, 0.10); }
+
+/* Pares de opciones cortas (Sí/No, antes/desde): en fila, que no hace falta una columna. */
+.optionGridFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+.optionGridFila .optionBtn { flex: 1 1 10rem; justify-content: center; }
 
 .btn {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -158,9 +176,10 @@ fieldset.formGroup {
   font-weight: 700;
   cursor: pointer;
   margin-top: var(--spacing-md);
-  transition: opacity 0.2s;
+  transition: filter 0.2s;
 }
-.btn:hover { opacity: 0.9; }
+/* Oscurecer en vez de aclarar: con opacity 0,9 el blanco bajaba a 4,52:1, al filo. */
+.btn:hover { filter: brightness(0.9); }
 .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* ─── Resultado ─────────────────────────────────────── */
@@ -181,7 +200,7 @@ fieldset.formGroup {
 }
 
 .resultHeroPositivo {
-  background: linear-gradient(135deg, var(--success) 0%, #2ecc71 100%);
+  background: var(--verde-fondo);
   color: white;
 }
 
@@ -193,7 +212,7 @@ fieldset.formGroup {
 
 .resultIcon { font-size: 2rem; margin-bottom: 0.5rem; }
 .resultImporte { font-size: 2rem; font-weight: 800; }
-.resultLabel { font-size: 0.9rem; opacity: 0.9; margin: 0.25rem 0 0; }
+.resultLabel { font-size: 0.9rem; margin: 0.25rem 0 0; }
 
 .resultHeroNegativo .resultImporte { color: var(--text-secondary); font-size: 1.4rem; }
 .resultHeroNegativo .resultLabel { font-size: 0.85rem; color: var(--text-secondary); }
@@ -236,11 +255,11 @@ fieldset.formGroup {
   border-top: 2px solid var(--primary);
 }
 
-.importePositivo { color: var(--success); }
+.importePositivo { color: var(--verde-texto); }
 
 /* ─── Cards info ─────────────────────────────────────── */
 
-.anualCard, .infoCard {
+.anualCard, .infoCard, .topeCard {
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
@@ -253,7 +272,7 @@ fieldset.formGroup {
   background: rgba(46, 134, 171, 0.06);
   border: 1px solid rgba(46, 134, 171, 0.15);
 }
-.anualCard strong { display: block; color: var(--primary); margin-bottom: 0.2rem; font-size: 0.87rem; }
+.anualCard strong { display: block; color: var(--primary-texto); margin-bottom: 0.2rem; font-size: 0.87rem; }
 .anualCard p { margin: 0; color: var(--text-secondary); line-height: 1.45; }
 
 .infoCard {
@@ -261,7 +280,14 @@ fieldset.formGroup {
   border: 1px solid rgba(39, 174, 96, 0.15);
 }
 .infoCard p { margin: 0; color: var(--text-secondary); line-height: 1.45; }
-.infoCard strong { color: var(--success); }
+.infoCard strong { color: var(--verde-texto); }
+
+.topeCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+}
+.topeCard p { margin: 0; color: var(--text-secondary); line-height: 1.45; }
+.topeCard strong { color: var(--text-primary); }
 
 /* ─── Tabla de referencia ─────────────────────────────── */
 
@@ -320,7 +346,7 @@ fieldset.formGroup {
 .guideSection h2 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.5rem 0 0.75rem;
 }
 .guideSection h2:first-child { margin-top: 0; }
@@ -345,7 +371,7 @@ fieldset.formGroup {
   align-items: flex-start;
 }
 .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 2rem;
   height: 2rem;
@@ -398,7 +424,7 @@ fieldset.formGroup {
 .faqItem summary::after {
   content: '+';
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 .faqItem[open] summary::after { content: '\2212'; }
 .faqItem p {
@@ -428,9 +454,8 @@ fieldset.formGroup {
 }
 .warningHeader strong {
   font-size: 1rem;
-  color: #e65100;
+  color: var(--aviso-titulo);
 }
-[data-theme='dark'] .warningHeader strong { color: #ffb74d; }
 .warningIcon { font-size: 1.4rem; }
 .warningList {
   list-style: none;

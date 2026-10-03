@@ -78,7 +78,14 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *     beneficiarios del art. 364.1.a) LGSS: 8.803,20 + 70 % = 14.965,44 €/año = 1.068,96 €/mes.
  *   · art. 9.2: computan los rendimientos del TRABAJO (distintos de la propia pensión), del
  *     capital, de actividades económicas y las ganancias patrimoniales.
- * Lo que la app aún no hace va en `test.fail()` con «ABIERTO, hallazgo (inspector 03/10/2026)».
+ *
+ * ── REPARACIÓN DEL 03/10/2026 (hallazgos 2803-2810) ─────────────────────────────────────
+ * Los CASOS 11-19 nacieron como `test.fail()` y hoy pasan. El tope sale de
+ * TOPE_COMPLEMENTO_MINIMOS_2026 (data/fiscal/pensiones.ts, d6ba391e): la app pregunta si la
+ * pensión se causó desde el 01/01/2013 (por defecto, sí) y, solo en las dos filas de gran
+ * incapacidad, si se cobra el complemento de la persona que atiende (por defecto, sí: art.
+ * 196.4 LGSS; la jubilación que procede de gran incapacidad es la misma pensión con otro
+ * nombre, art. 200.4 LGSS). CASO 21: las dos exenciones; CASO 22: el FAQPage.
  */
 
 const RUTA = '/estimador-complemento-minimos/';
@@ -422,10 +429,6 @@ test.describe('Estimador de Complemento a Mínimos', () => {
   });
 
   test('CASO 11 — tope de la pensión no contributiva (art. 9.5 RD 241/2026): 628,80 €/mes sin cónyuge a cargo', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): no aplica ni menciona el tope de la PNC del art. 9.5 RD 241/2026',
-    );
     await abrir(page);
 
     // Pensión causada desde 2013 (la app no pregunta la fecha, y es el caso de toda pensión
@@ -448,13 +451,13 @@ test.describe('Estimador de Complemento a Mínimos', () => {
     const viudedad = await textoResultado(page);
     expect(importe(viudedad, 'Complemento a mínimos')).toBeCloseTo(628.8, 2);
     expect(importe(viudedad, 'Pensión final estimada')).toBeCloseTo(1128.8, 2);
+    // Y la página dice por qué la pensión final se queda por debajo del mínimo (1.256,60).
+    expect(viudedad).toContain('Tope del complemento: 628,80 €/mes');
+    expect(viudedad).toContain('se queda en el tope');
+    expect(jubilacion).toContain('art. 9.5');
   });
 
   test('CASO 12 — tope con cónyuge a cargo (art. 10.4 RD 241/2026 + art. 364.1.a LGSS): 1.068,96 €/mes', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): no aplica ni menciona el tope de la PNC del art. 9.5 RD 241/2026',
-    );
     await abrir(page);
 
     await page.getByRole('button', { name: 'Con cónyuge a cargo', exact: true }).click();
@@ -465,13 +468,13 @@ test.describe('Estimador de Complemento a Mínimos', () => {
     // Íntegro: 1.256,60 − 100 = 1.156,60 €/mes. Tope: 8.803,20 × 1,70 = 14.965,44 €/año ÷ 14
     // = 1.068,96 €/mes. La app daba 1.156,60.
     expect(importe(texto, 'Complemento a mínimos')).toBeCloseTo(1068.96, 2);
+    // 100 + 1.068,96
+    expect(importe(texto, 'Pensión final estimada')).toBeCloseTo(1168.96, 2);
+    expect(texto).toContain('1068,96 €/mes');
+    expect(texto).toContain('art. 10.4');
   });
 
   test('CASO 13 — sin complemento porque la pensión ya supera el mínimo: el motivo no puede culpar a las rentas', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): con la pensión sobre el mínimo y rentas sobre el límite, el motivo culpa a las rentas',
-    );
     await abrir(page);
 
     // Jubilación ≥ 65 sin cónyuge · pensión 1.000 (> 936,20) · rentas 10.000. Con rentas 0 la
@@ -488,10 +491,6 @@ test.describe('Estimador de Complemento a Mínimos', () => {
   });
 
   test('CASO 14 — una pensión de 0 € no es una pensión contributiva: no hay cifra que dar', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): una pensión de 0 € devuelve en verde el mínimo íntegro',
-    );
     await abrir(page);
 
     // El propio aviso de la app dice «Si aún no cobras pensión, esta herramienta no puede
@@ -500,15 +499,13 @@ test.describe('Estimador de Complemento a Mínimos', () => {
     await sembrarValor(page, '#pensionActual', '0');
     await sembrarValor(page, '#ingresosAnuales', '0');
     await page.getByRole('button', { name: 'Estimar complemento' }).click();
+    // El aviso tiene que salir: sin él, «no hay Desglose» pasaría también si el botón no hiciera nada.
+    await expect(page.locator('[class*="avisoError"]').filter({ hasText: 'pensión de 0 €' })).toHaveCount(1);
     await expect(panelResultado(page)).not.toContainText('Desglose');
     await expect(panelResultado(page)).not.toContainText('+936,20');
   });
 
   test('CASO 15 — las rentas que computan incluyen las del TRABAJO (art. 9.2 RD 241/2026)', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): la ayuda y la FAQ de ingresos omiten los rendimientos del trabajo',
-    );
     await abrir(page);
 
     // Lo que esto cambia, medido con la propia app: viudedad < 60 sin cargas, 500 €/mes y un
@@ -522,23 +519,16 @@ test.describe('Estimador de Complemento a Mínimos', () => {
   });
 
   test('CASO 16 — quién fija las cuantías: el RD de revalorización, no los Presupuestos', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): la FAQ atribuye las cuantías a los Presupuestos Generales del Estado',
-    );
     await abrir(page);
     // data/fiscal/pensiones.ts (líneas de COMPLEMENTO_MINIMOS_LIMITES_2026): los Presupuestos
     // siguen prorrogados y quien fija cuantías y límites es el RD 241/2026. El FAQPage de la
     // propia app ya lo dice así.
     const faq = await page.locator('details', { hasText: '¿Se actualiza cada año?' }).textContent();
     expect(faq ?? '').not.toContain('Presupuestos Generales');
+    expect(faq ?? '').toContain('RD 241/2026');
   });
 
   test('CASO 17 — las filas del Anexo I: «gran incapacidad» y la jubilación que procede de ella', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): falta la jubilación procedente de gran incapacidad y se rotula «Gran Invalidez»',
-    );
     await abrir(page);
 
     // Anexo I RD 241/2026: «Titular con sesenta y cinco años procedente de gran incapacidad»
@@ -552,37 +542,59 @@ test.describe('Estimador de Complemento a Mínimos', () => {
     await page.getByRole('button', { name: /Incapacidad permanente/ }).click();
     const grados = await page.locator('#subtipo option').allTextContents();
     expect(grados.some((g) => /gran incapacidad/i.test(g))).toBe(true);
+    expect(grados.some((g) => /invalidez/i.test(g))).toBe(false);
+
+    // El caso de la ficha, calculado: jubilación ≥ 65 procedente de gran incapacidad, sin
+    // cónyuge, 1.000 €/mes, rentas 0 → 19.660,20 / 14 = 1.404,30 → 404,30 €/mes (bajo el tope
+    // de 628,80, que además aquí no rige con el complemento de tercera persona).
+    await page.getByRole('button', { name: /Jubilación/ }).click();
+    await page.selectOption('#subtipo', '65_gran_incapacidad');
+    await sembrarValor(page, '#pensionActual', '1000');
+    await sembrarValor(page, '#ingresosAnuales', '0');
+    await estimar(page);
+    const texto = await textoResultado(page);
+    expect(importe(texto, 'Pensión mínima garantizada')).toBeCloseTo(1404.3, 2);
+    expect(importe(texto, 'Complemento a mínimos')).toBeCloseTo(404.3, 2);
+
+    // La tabla completa trae la fila nueva y el nombre nuevo (los dos salen de data/fiscal).
+    const tabla = page.locator('table');
+    await expect(tabla).toContainText('Jubilación ≥ 65 años procedente de gran incapacidad');
+    await expect(tabla).toContainText('Gran incapacidad');
+    await expect(tabla).not.toContainText(/invalidez/i);
   });
 
-  test('CASO 18 — el resultado se lee: contraste del bloque verde (blanco sobre degradado de --success)', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): el importe y su rótulo van en blanco sobre verde a 1,94-2,87:1',
-    );
+  test('CASO 18 — el resultado se lee: contraste del bloque verde, en los dos temas', async ({ page }) => {
     await abrir(page);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await sembrarValor(page, '#pensionActual', '700');
     await sembrarValor(page, '#ingresosAnuales', '2000');
     await estimar(page);
     await page.mouse.move(0, 0);
 
-    // 32 px en negrita es texto grande: 3:1. El rótulo, 14,4 px normal con opacidad 0,9: 4,5:1.
-    // Medido el 03/10/2026: 2,10-2,87 y 1,94-2,60 (de #27AE60 a #2ecc71), igual en oscuro.
-    expect(await contrasteMinimo(page.locator('[class*="resultHeroPositivo"] [class*="resultImporte"]'))).toBeGreaterThanOrEqual(3);
-    expect(await contrasteMinimo(page.locator('[class*="resultHeroPositivo"] [class*="resultLabel"]'))).toBeGreaterThanOrEqual(4.5);
+    // 32 px en negrita es texto grande: 3:1. El rótulo, 14,4 px normal: 4,5:1.
+    // Antes (03/10/2026): blanco sobre degradado #27AE60 → #2ecc71, 2,10-2,87 y 1,94-2,60 (con
+    // opacidad 0,9), igual en oscuro. Ahora --verde-fondo: #1E7A3C (5,38) y #1D6F38 (6,21).
+    for (const tema of ['light', 'dark']) {
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
+      await expect
+        .poll(() => contrasteMinimo(page.locator('[class*="resultHeroPositivo"] [class*="resultImporte"]')), { message: tema })
+        .toBeGreaterThanOrEqual(4.5);
+      await expect
+        .poll(() => contrasteMinimo(page.locator('[class*="resultHeroPositivo"] [class*="resultLabel"]')), { message: tema })
+        .toBeGreaterThanOrEqual(4.5);
+    }
   });
 
-  test('CASO 19 — textos pequeños en color de marca o de éxito, y blanco sobre el botón de marca', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): textos en --primary/--success y blanco sobre --primary por debajo de 4,5:1',
-    );
+  test('CASO 19 — textos pequeños en color de marca o de éxito, y blanco sobre el botón de marca, en los dos temas', async ({ page }) => {
     await abrir(page);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await sembrarValor(page, '#pensionActual', '700');
     await sembrarValor(page, '#ingresosAnuales', '2000');
     await estimar(page);
     await page.mouse.move(0, 0);
 
-    // Todos son texto pequeño (13-17,6 px): 4,5:1. Medido en claro el 03/10/2026.
+    // Todos son texto pequeño (13-17,6 px): 4,5:1. Entre paréntesis, lo medido en claro el
+    // 03/10/2026 antes de la reparación.
     const medidos: Array<[string, Locator]> = [
       ['opción pulsada (3,78)', page.locator('button[class*="optionActivo"]').first()],
       ['botón Estimar (4,11 → 2,80)', page.getByRole('button', { name: 'Estimar complemento' })],
@@ -592,12 +604,85 @@ test.describe('Estimador de Complemento a Mínimos', () => {
       ['número de paso (4,11)', page.locator('[class*="stepNumber"]').first()],
       ['«Importante sobre esta herramienta» (3,57)', page.locator('[class*="warningHeader"] strong')],
     ];
-    const fallan: string[] = [];
-    for (const [nombre, loc] of medidos) {
-      const r = await contrasteMinimo(loc);
-      if (r < 4.5) fallan.push(`${nombre}: ${r.toFixed(2)}`);
+    for (const tema of ['light', 'dark']) {
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
+      await expect
+        .poll(async () => {
+          const fallan: string[] = [];
+          for (const [nombre, loc] of medidos) {
+            const r = await contrasteMinimo(loc);
+            if (r < 4.5) fallan.push(`${tema} · ${nombre}: ${r.toFixed(2)}`);
+          }
+          return fallan;
+        })
+        .toEqual([]);
     }
-    expect(fallan).toEqual([]);
+  });
+
+  test('CASO 21 — las dos exenciones del tope: pensión causada antes de 2013 y gran incapacidad con tercera persona', async ({ page }) => {
+    await abrir(page);
+
+    // Jubilación ≥ 65 sin cónyuge · 200 · 0, pero causada ANTES del 01/01/2013: el art. 9.5
+    // solo topa las causadas desde esa fecha → íntegro, 936,20 − 200 = 736,20 €/mes.
+    await page.getByRole('button', { name: 'Antes del 01/01/2013', exact: true }).click();
+    await sembrarValor(page, '#pensionActual', '200');
+    await sembrarValor(page, '#ingresosAnuales', '0');
+    await estimar(page);
+    const antes = await textoResultado(page);
+    expect(importe(antes, 'Complemento a mínimos')).toBeCloseTo(736.2, 2);
+    expect(antes).toContain('no lo hay');
+
+    // La pregunta de la tercera persona solo existe en gran incapacidad.
+    const terceraPersona = page.getByRole('group', { name: /persona que te atiende/ });
+    await expect(terceraPersona).toHaveCount(0);
+
+    // Gran incapacidad, sin cónyuge, causada desde 2013, 500 €/mes · rentas 0.
+    // Mínimo 19.660,20 / 14 = 1.404,30 → íntegro 904,30 €/mes.
+    await page.getByRole('button', { name: /Incapacidad permanente/ }).click();
+    await page.selectOption('#subtipo', 'gran_invalidez');
+    await page.getByRole('button', { name: 'Desde el 01/01/2013', exact: true }).click();
+    await expect(terceraPersona).toHaveCount(1);
+    // Por defecto «Sí» (art. 196.4 LGSS: toda gran incapacidad lo lleva) → sin tope (art. 9.7).
+    await expect(terceraPersona.getByRole('button', { name: 'Sí', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await sembrarValor(page, '#pensionActual', '500');
+    await estimar(page);
+    const conTercera = await textoResultado(page);
+    expect(importe(conTercera, 'Pensión mínima garantizada')).toBeCloseTo(1404.3, 2);
+    expect(importe(conTercera, 'Complemento a mínimos')).toBeCloseTo(904.3, 2);
+    expect(conTercera).toContain('art. 9.7');
+
+    // Sin ese complemento, el tope vuelve a morder: 628,80 €/mes, pensión final 1.128,80.
+    await terceraPersona.getByRole('button', { name: 'No', exact: true }).click();
+    await estimar(page);
+    const sinTercera = await textoResultado(page);
+    expect(importe(sinTercera, 'Complemento a mínimos')).toBeCloseTo(628.8, 2);
+    expect(importe(sinTercera, 'Pensión final estimada')).toBeCloseTo(1128.8, 2);
+
+    // Tope y regla diferencial a la vez (art. 9.2 + 9.5): jubilación ≥ 65, 200 €/mes, rentas
+    // 10.000. Diferencia: (9.442 + 13.106,80) − (10.000 + 2.800) = 9.748,80 €/año, que sigue
+    // por encima del tope de 8.803,20 → 628,80 €/mes.
+    await page.getByRole('button', { name: /Jubilación/ }).click();
+    await sembrarValor(page, '#pensionActual', '200');
+    await sembrarValor(page, '#ingresosAnuales', '10000');
+    await estimar(page);
+    expect(importe(await textoResultado(page), 'Complemento a mínimos')).toBeCloseTo(628.8, 2);
+  });
+
+  test('CASO 22 — el FAQPage dice lo mismo que la página: tope, trabajo y «gran incapacidad»', async ({ page }) => {
+    await page.goto(RUTA, { waitUntil: 'load' });
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.find((b) => b.includes('"FAQPage"')) ?? '';
+    expect(faq).not.toBe('');
+    // Las cifras del tope salen del dato. Con cuatro cifras enteras es-ES no agrupa (8803,20).
+    expect(faq).toContain('¿Tiene tope el complemento a mínimos?');
+    expect(faq).toContain('8803,20');
+    expect(faq).toContain('628,80');
+    expect(faq).toContain('14.965,44');
+    expect(faq).toContain('1068,96');
+    expect(faq).toContain('01/01/2013');
+    expect(faq).toMatch(/trabajo/);
+    expect(faq).toContain('gran incapacidad');
+    expect(faq).not.toMatch(/invalidez/i);
   });
 });
 
