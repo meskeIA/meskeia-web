@@ -979,7 +979,8 @@ async function esperarQuietud(page: Page): Promise<void> {
       .getAnimations()
       // Las infinitas (un indicador que late) no acaban nunca: no cuentan.
       .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity)
-      .every((a) => a.playState !== 'running' && a.playState !== 'pending'),
+      // `pending` es una propiedad booleana aparte, no un valor de playState.
+      .every((a) => a.playState !== 'running' && !a.pending),
   );
 }
 
