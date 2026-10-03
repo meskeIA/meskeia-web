@@ -61,7 +61,7 @@ export const faqJsonLd = {
       name: '¿Qué es el daltonismo y qué tipos existen?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El daltonismo es una alteración hereditaria en la percepción del color causada por la ausencia o mal funcionamiento de uno o más tipos de conos en la retina. Los tipos más frecuentes son la protanopia y la deuteranopia (dificultad para distinguir rojos y verdes), que afectan a alrededor del 8% de los hombres y el 0,5% de las mujeres. La tritanopia (azul-amarillo) y la acromatopsia (ausencia total de color) son mucho más raras.',
+        text: 'El daltonismo es una alteración hereditaria en la percepción del color causada por la ausencia o mal funcionamiento de uno o más tipos de conos en la retina. Los tipos más frecuentes son la protanopia y la deuteranopia (dificultad para distinguir rojos y verdes), que afectan a alrededor del 8 % de los hombres y el 0,4 % de las mujeres de ascendencia europea (Birch, 2012), con cifras menores en otras poblaciones. La tritanopia (confunde azul con verde y amarillo con rosa) y la acromatopsia (ausencia total de color) son mucho más raras.',
       },
     },
     {
@@ -85,7 +85,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre protanopia, deuteranopia y tritanopia?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La protanopia implica la ausencia de conos sensibles al rojo: los colores rojos aparecen más oscuros y pueden confundirse con marrones o negros. La deuteranopia supone la ausencia de conos verdes: rojos y verdes se confunden, aunque los rojos no se oscurecen tanto como en la protanopia. La tritanopia, mucho menos frecuente, afecta a los conos azules: azules y amarillos se perciben de forma similar, y los colores fríos pierden saturación.',
+        text: 'La protanopia implica la ausencia de conos sensibles al rojo: los colores rojos aparecen más oscuros y pueden confundirse con marrones o negros. La deuteranopia supone la ausencia de conos verdes: rojos y verdes se confunden, aunque los rojos no se oscurecen tanto como en la protanopia. La tritanopia, mucho menos frecuente, afecta a los conos azules: el azul se confunde con el verde y el amarillo con el rosa, según el National Eye Institute.',
       },
     },
     {

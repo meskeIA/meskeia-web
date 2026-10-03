@@ -70,7 +70,7 @@ const TIPOS: InfoTipo[] = [
   {
     id: 'tritanopia',
     nombre: 'Tritanopia',
-    descripcion: 'Ausencia funcional del cono S. Azul y amarillo se confunden.',
+    descripcion: 'Ausencia funcional del cono S. Se confunden el azul con el verde y el amarillo con el rosa (NEI).',
     prevalencia: '<0,01% (rara)',
     icono: '🔵',
   },
@@ -457,7 +457,7 @@ export default function SimuladorDaltonismoPage() {
                 <tr><td><strong>Deuteranopia</strong></td><td>M (verde) ausente</td><td>Confusión marcada rojo-verde</td><td>~1%</td></tr>
                 <tr><td><strong>Protanomalía</strong></td><td>L (rojo) alterado</td><td>Rojos apagados, confusión rojo-verde</td><td>~1%</td></tr>
                 <tr><td><strong>Protanopia</strong></td><td>L (rojo) ausente</td><td>Rojos muy oscuros o negros</td><td>~1%</td></tr>
-                <tr><td><strong>Tritanomalía / Tritanopia</strong></td><td>S (azul) alterado/ausente</td><td>Confusión azul-amarillo</td><td>&lt;0,01%</td></tr>
+                <tr><td><strong>Tritanomalía / Tritanopia</strong></td><td>S (azul) alterado/ausente</td><td>Confusión azul-verde y amarillo-rosa</td><td>&lt;0,01%</td></tr>
                 <tr><td><strong>Acromatopsia</strong></td><td>Ningún cono funcional</td><td>Visión en escala de grises</td><td>~0,003%</td></tr>
               </tbody>
             </table>
