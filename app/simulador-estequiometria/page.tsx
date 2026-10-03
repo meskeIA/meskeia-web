@@ -443,7 +443,7 @@ export default function SimuladorEstequiometriaPage() {
                 <span>
                   {reaccion.reactivos[0].nombre} ({reaccion.reactivos[0].formula})
                   {esLimitanteA && (
-                    <span className={styles.limitanteBadge} role="img" aria-label="Reactivo limitante"><span aria-hidden="true">⚠️</span> Limitante</span>
+                    <span className={styles.limitanteBadge}><span aria-hidden="true">⚠️</span> Limitante</span>
                   )}
                 </span>
                 <span className={styles.barValor}>
@@ -468,7 +468,7 @@ export default function SimuladorEstequiometriaPage() {
                   <span>
                     {reaccion.reactivos[1].nombre} ({reaccion.reactivos[1].formula})
                     {esLimitanteB && (
-                      <span className={styles.limitanteBadge} role="img" aria-label="Reactivo limitante"><span aria-hidden="true">⚠️</span> Limitante</span>
+                      <span className={styles.limitanteBadge}><span aria-hidden="true">⚠️</span> Limitante</span>
                     )}
                   </span>
                   <span className={styles.barValor}>
