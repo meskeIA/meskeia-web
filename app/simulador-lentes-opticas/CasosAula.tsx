@@ -88,7 +88,9 @@ export default function CasosAula() {
     // parseSpanishNumber admite «−12», «-12», «2,5» y «2.5»; devuelve NaN con cualquier otra
     // cosa, y de ese NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN»).
     const valor = parseSpanishNumber(normalizarSigno(respuesta));
-    const r = comprobarRespuesta(valor, esperado);
+    // Se corrige con los DATOS, no con la clave: la tolerancia la da la pregunta y la
+    // distancia se mide contra el valor exacto (ver `comprobarRespuesta`).
+    const r = comprobarRespuesta(valor, practica ? practica.datos : caso.datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 
@@ -103,8 +105,10 @@ export default function CasosAula() {
           puede decir «resuelve los casos 3, 7 y 11» y corregir sin ambigüedad. Las distancias van en
           centímetros; las posiciones, alturas y aumentos, con su signo (negativo si la imagen es
           virtual o sale invertida). Solo se pregunta lo que da el mismo número con los dos convenios
-          de signos que se enseñan, así que da igual cuál use tu libro. Se acepta una desviación del
-          1 %.
+          de signos que se enseñan, así que da igual cuál use tu libro. Los datos son exactos, así
+          que no hay margen: vale la cifra exacta o, si no sale exacta, la redondeada a los
+          decimales que pide el enunciado (si cae justo en la mitad, como −9,375, valen −9,38 y
+          −9,37). Redondea solo al final, nunca un resultado intermedio.
         </p>
       </div>
 

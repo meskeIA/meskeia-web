@@ -66,3 +66,29 @@ export function calcularImagen(f: number, sObj: number, hObj: number): ImagenLen
 export function potenciaDioptrias(fCm: number): number {
   return 100 / fCm;
 }
+
+/**
+ * El ÚNICO redondeo de la app: lo usan el panel de resultados, la clave de los casos y su
+ * solución (hallazgo 2751, 03/10/2026). Si cada uno redondeara a su manera, la app podría
+ * suspender una cifra que ella misma imprime.
+ *
+ * Dos decisiones, las dos sobre empates exactos (una cifra terminada en 5 justo después del
+ * último decimal pedido):
+ *   · se redondea **alejándose de cero**, el redondeo escolar y el de `formatNumber`: −9,375 da
+ *     −9,38 igual que +0,375 da 0,38. `Math.round` a secas llevaba los negativos hacia cero
+ *     (−9,375 → −9,37) mientras el panel imprimía −9,38;
+ *   · antes de redondear se limpia el error de coma flotante con 12 cifras significativas:
+ *     1/(1/2,5 − 1/4,5) deja 5,624999999999999 donde el valor exacto es 5,625, y `toFixed` lo
+ *     bajaba a 5,62 mientras subía 2,125 a 2,13. Doce cifras sobran para cualquier dato de la
+ *     app (los deslizadores van en pasos de 0,1 y 0,5) y quedan muy por encima del ruido
+ *     binario, que vive en la cifra 16.
+ */
+export function redondearCifra(valor: number, decimales: number): number {
+  if (!Number.isFinite(valor)) return valor;
+  const limpio = Number(valor.toPrecision(12));
+  const factor = 10 ** decimales;
+  const escalado = Number((Math.abs(limpio) * factor).toPrecision(12));
+  const redondeado = Math.round(escalado) / factor;
+  // `+ 0` convierte el −0 de un valor que redondea a cero en 0: nunca «−0,00».
+  return (limpio < 0 ? -redondeado : redondeado) + 0;
+}

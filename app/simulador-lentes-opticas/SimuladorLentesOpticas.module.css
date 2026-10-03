@@ -79,8 +79,17 @@
   background: rgba(46, 134, 171, 0.1);
 }
 
+/* Perfil de la lente en SVG (hallazgo 2752: el 🪞 de la divergente era un espejo). */
 .lensIcon {
-  font-size: 2rem;
+  width: 24px;
+  height: 40px;
+  fill: rgba(46, 134, 171, 0.18);
+  stroke: var(--primary-texto);
+  stroke-width: 1.5;
+}
+
+[data-theme='dark'] .lensIcon {
+  fill: rgba(63, 165, 209, 0.22);
 }
 
 .lensName {
@@ -145,7 +154,7 @@
 }
 
 .controlLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
   font-family: var(--font-mono, monospace);
 }
@@ -188,8 +197,28 @@
   outline-offset: 4px;
 }
 
-/* CANVAS */
+/* CANVAS
+   Los colores del lienzo y de las manchas de su leyenda salen de aquí: `page.tsx` lee estos
+   tokens con getComputedStyle en cada dibujo y redibuja al cambiar el tema (hallazgo 2749,
+   03/10/2026). Fondo efectivo: --bg-primary (#FAFAFA / #1A1A1A). Medidos sobre él: texto ≥ 4,5:1
+   (los rótulos «Objeto», «Imagen real», «F», «Lente (f = …)» lo son) y trazos ≥ 3:1.
+     claro  · ejes #666666 5,50 · texto #333333 12,10 · lente --primary-texto 5,24 · objeto
+              --secondary-texto 4,94 · virtual #A82E68 6,18 · rayo 1 #C2410C 4,96 · rayo 2
+              #2E7D32 4,91 · rayo 3 #0369A1 5,68
+     oscuro · ejes #999999 6,11 · texto #E5E5E5 13,82 · lente 6,23 · objeto 7,80 · virtual
+              #E879A9 6,41 · rayo 1 #E07A1F 5,78 · rayo 2 #4CAF50 6,26 · rayo 3 #0EA5E9 6,28
+   Los rayos conservan su tono (naranja ~20-28°, verde ~123°, azul ~200°), que es por lo que
+   los distingue el test de la construcción de la lupa. */
 .canvasWrapper {
+  --lienzo-ejes: #666666;
+  --lienzo-rejilla: #EEEEEE;
+  --lienzo-texto: #333333;
+  --lienzo-lente: var(--primary-texto);
+  --lienzo-objeto: var(--secondary-texto);
+  --lienzo-virtual: #A82E68;
+  --lienzo-rayo1: #C2410C;
+  --lienzo-rayo2: #2E7D32;
+  --lienzo-rayo3: #0369A1;
   width: 100%;
   background: var(--bg-primary);
   border-radius: var(--radius);
@@ -233,6 +262,36 @@
   display: inline-block;
 }
 
+.legendObjeto {
+  background: var(--lienzo-objeto);
+}
+
+.legendRayo1 {
+  background: var(--lienzo-rayo1);
+}
+
+.legendRayo2 {
+  background: var(--lienzo-rayo2);
+}
+
+.legendRayo3 {
+  background: var(--lienzo-rayo3);
+}
+
+.legendVirtual {
+  background: var(--lienzo-virtual);
+}
+
+[data-theme='dark'] .canvasWrapper {
+  --lienzo-ejes: #999999;
+  --lienzo-rejilla: #333333;
+  --lienzo-texto: #E5E5E5;
+  --lienzo-virtual: #E879A9;
+  --lienzo-rayo1: #E07A1F;
+  --lienzo-rayo2: #4CAF50;
+  --lienzo-rayo3: #0EA5E9;
+}
+
 /* CLASIFICACIÓN */
 .imageClassification {
   background: var(--bg-primary);
@@ -266,9 +325,12 @@
   gap: var(--spacing-xs);
 }
 
+/* Texto de marca → --primary-texto (hallazgo 2750: con --primary, 3,42:1). El tinte del fondo
+   baja al 8 % del --primary-texto para dejar margen: con el 12 % del --primary se quedaba en
+   4,56:1, en el filo. */
 .classChip {
-  background: rgba(46, 134, 171, 0.12);
-  color: var(--primary);
+  background: rgba(38, 113, 143, 0.08);
+  color: var(--primary-texto);
   padding: 2px var(--spacing-sm);
   border-radius: var(--radius);
   font-size: 0.85rem;
@@ -302,7 +364,7 @@
 .resultValue {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
 }
 
@@ -389,7 +451,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -416,7 +478,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -455,7 +517,9 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: var(--primary);
+  /* Blanco encima: --primary-boton, igual en los dos temas (con --primary, 2,79:1 en oscuro
+     y 2,21:1 bajo stemum.com; hallazgo 2750). */
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -468,7 +532,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -501,7 +565,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 

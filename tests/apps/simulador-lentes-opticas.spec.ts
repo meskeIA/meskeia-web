@@ -10,7 +10,15 @@ import {
   generarEjercicioAleatorio,
   type DatosCaso,
 } from '../../app/simulador-lentes-opticas/casos';
-import { calcularImagen, potenciaDioptrias } from '../../app/simulador-lentes-opticas/motor';
+import { calcularImagen, potenciaDioptrias, redondearCifra } from '../../app/simulador-lentes-opticas/motor';
+
+/**
+ * stemum.com → el servidor local, para medir la app como la sirve el portal (data-brand="stemum",
+ * que recolorea --primary y compañía). Va al NIVEL DEL FICHERO porque `launchOptions` fuerza un
+ * worker nuevo; al resto de tests no les afecta: solo resuelve ese host. Copiado de
+ * tests/apps/simulador-mas-resorte.spec.ts.
+ */
+test.use({ launchOptions: { args: ['--host-resolver-rules=MAP stemum.com 127.0.0.1:3050'] } });
 
 /**
  * Simulador de Lentes Ópticas — regresión del motor de óptica geométrica.
@@ -267,7 +275,19 @@ function decimalesMostrados(texto: string): number {
   return m?.[1]?.length ?? 0;
 }
 
-const redondeo = (v: number, d: number) => Math.round(v * 10 ** d) / 10 ** d;
+/**
+ * Redondeo de referencia, escrito aquí y no importado: empates ALEJÁNDOSE de cero sobre el valor
+ * leído con 12 cifras (el que imprime el panel). Con `Math.round(v·10^d)/10^d` a secas, que era
+ * lo que había, −9,375 daba −9,37 y 5,624999999999999 daba 5,62: el spec consagraba el hallazgo
+ * 2751. Se resuelve por TEXTO decimal para no depender de la aritmética de la app.
+ */
+const redondeo = (v: number, d: number) => {
+  const [ent, dec = ''] = Math.abs(Number(v.toPrecision(12))).toFixed(12).split('.');
+  const corte = Number(`${ent}.${dec.slice(0, d)}`);
+  const sube = Number(dec[d] ?? '0') >= 5 ? 10 ** -d : 0;
+  const r = Number((corte + sube).toFixed(d));
+  return (v < 0 ? -r : r) + 0;
+};
 
 /**
  * La misma pregunta resuelta en convenio DIN, sin pasar por la app: s negativa delante de la
@@ -359,7 +379,7 @@ test.describe('simulador-lentes-opticas · casos para clase', () => {
       expect(redondeo(resolverCaso(m.datos).valor, m.datos.decimales ?? 2)).toBe(m.respuesta);
       // Tampoco el aleatorio pregunta nada que dependa del convenio.
       const din = enDin(m.datos);
-      if (din !== null) expect(comprobarRespuesta(din, m.respuesta).correcto).toBe(true);
+      if (din !== null) expect(comprobarRespuesta(din, m.datos).correcto).toBe(true);
     }
   });
 
@@ -384,30 +404,32 @@ test.describe('simulador-lentes-opticas · casos para clase', () => {
       const din = enDin(caso.datos);
       if (din === null) continue;
       mirados++;
-      expect(comprobarRespuesta(din, caso.respuesta).correcto, `caso ${caso.id}`).toBe(true);
+      expect(comprobarRespuesta(din, caso.datos).correcto, `caso ${caso.id}`).toBe(true);
     }
     expect(mirados).toBeGreaterThanOrEqual(6);
 
     // (d) Los errores del tema NO entran: olvidar el signo de f en la divergente (caso 6 → 1/s' =
     //     1/10 − 1/10, sin imagen) no da −5, y el valor absoluto del aumento invertido (caso 2)
     //     tampoco vale: el signo es información.
-    expect(comprobarRespuesta(5, -5).correcto).toBe(false);
-    expect(comprobarRespuesta(0.5, -0.5).correcto).toBe(false);
+    expect(comprobarRespuesta(5, CASOS[5].datos).correcto).toBe(false);
+    expect(comprobarRespuesta(0.5, CASOS[1].datos).correcto).toBe(false);
   });
 
   test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
-    expect(comprobarRespuesta(30, 30).correcto).toBe(true);
-    expect(comprobarRespuesta(NaN, -12).correcto).toBe(false);
-    expect(comprobarRespuesta(NaN, -12).motivo).not.toMatch(/NaN/);
+    // Desde la reparación del 2747 el corrector recibe los DATOS del caso, no la clave.
+    expect(comprobarRespuesta(30, CASOS[0].datos).correcto).toBe(true);
+    expect(comprobarRespuesta(NaN, CASOS[4].datos).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, CASOS[4].datos).motivo).not.toMatch(/NaN/);
     // REESCRITO en la re-inspección del 03/10/2026. Aquí se fijaban como CORRECTOS
     // `toleranciaDe(0) = 0,01`, `toleranciaDe(−12) = 0,12` y que −0,49 y −0,51 valieran por
     // −0,5: es decir, el margen del 1 % que la re-inspección registra como defecto (los doce
     // casos tienen datos exactos, y la tolerancia la da la pregunta, no la cifra). Esas
-    // aserciones pasan, con el criterio correcto, al test.fail «ABIERTO» del final del fichero.
+    // aserciones pasan, con el criterio correcto, a «el margen es media unidad del redondeo
+    // pedido» del final del fichero.
     // Lo que sí se conserva del hallazgo 1211 (22/09/2026) es su intención: el ruido binario
     // de la resta en coma flotante no decide nunca un veredicto, sea cual sea la tolerancia.
-    expect(comprobarRespuesta(-0.5 + 1e-12, -0.5).correcto).toBe(true);
-    expect(comprobarRespuesta(5.25 - 1e-12, 5.25).correcto).toBe(true);
+    expect(comprobarRespuesta(-0.5 + 1e-12, CASOS[1].datos).correcto).toBe(true);
+    expect(comprobarRespuesta(5.25 - 1e-12, CASOS[10].datos).correcto).toBe(true);
   });
 });
 
@@ -636,28 +658,46 @@ test.describe('simulador-lentes-opticas · re-inspección 03/10/2026 · el corre
     const cuelan: string[] = [];
     for (const caso of CASOS) {
       for (const [valor, error] of ERRORES_CONCEPTUALES[caso.id]) {
-        if (comprobarRespuesta(valor, caso.respuesta).correcto) cuelan.push(`caso ${caso.id}: ${valor} (${error})`);
+        if (comprobarRespuesta(valor, caso.datos).correcto) cuelan.push(`caso ${caso.id}: ${valor} (${error})`);
       }
     }
     expect(cuelan).toEqual([]);
   });
 
-  test('ABIERTO · el 1 % da por buenos vecinos y redondeos que no son la respuesta', async () => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): toleranciaDe = máx(0,01; 1 %) con datos y respuestas exactos',
-    );
+  test('el margen es media unidad del redondeo pedido: ningún vecino ni redondeo mal hecho cuela (hallazgo 2747)', async () => {
     const cuelan: string[] = [];
     for (const caso of CASOS) {
+      // Los doce son exactos: margen CERO, como en simulador-mas-resorte (hallazgo 2626).
+      expect(toleranciaDe(caso.datos), `caso ${caso.id}`).toBe(0);
       for (const v of VECINOS[caso.id]) {
-        if (comprobarRespuesta(v, caso.respuesta).correcto) cuelan.push(`caso ${caso.id}: ${v} por ${caso.respuesta}`);
+        if (comprobarRespuesta(v, caso.datos).correcto) cuelan.push(`caso ${caso.id}: ${v} por ${caso.respuesta}`);
       }
+      // …y la cifra exacta, escrita con o sin ceros, vale.
+      expect(comprobarRespuesta(caso.respuesta, caso.datos).correcto, `caso ${caso.id}`).toBe(true);
     }
-    // Hoy cuelan todos: p. ej. 5,3 y 5,2 por 5,25 (caso 11), −0,49 y −0,51 por −0,5 (caso 2),
-    // 30,3 y 29,7 por 30 (caso 1). Con datos exactos la tolerancia es, como mucho, media unidad
-    // de la segunda decimal (0,005), y la del caso 1 hoy es 0,30.
-    expect(toleranciaDe(30)).toBeLessThanOrEqual(0.005);
+    // Con el 1 % colaban todos: 5,3 y 5,2 por 5,25 (caso 11), −0,49 y −0,51 por −0,5 (caso 2),
+    // 30,3 y 29,7 por 30 (caso 1).
     expect(cuelan).toEqual([]);
+
+    // Practicar, que pide dos decimales «si no sale exacto». Lupa de 15 cm con el objeto a 8:
+    // s' = −120/7 = −17,142857… → margen 0,005: solo −17,14 entre las cifras de dos decimales.
+    const lupa = generarEjercicioAleatorio(1791000000163);
+    expect(lupa.datos).toMatchObject({ pregunta: 'posicionImagen', focal: 15, distanciaObjeto: 8 });
+    expect(toleranciaDe(lupa.datos)).toBe(0.005);
+    expect(comprobarRespuesta(-17.14, lupa.datos).correcto).toBe(true);
+    expect(comprobarRespuesta(-17.142857, lupa.datos).correcto).toBe(true);
+    for (const v of [-17, -17.1, -17.13, -17.15, -17.31]) {
+      expect(comprobarRespuesta(v, lupa.datos).correcto, String(v)).toBe(false);
+    }
+
+    // Empate exacto: divergente de 15 con el objeto a 25, s' = −75/8 = −9,375. Se mide contra el
+    // valor EXACTO, así que las dos formas de deshacer el empate valen: −9,38 (la del panel y la
+    // solución) y −9,37. Nada más.
+    const empate = generarEjercicioAleatorio(1791000000313);
+    expect(empate.datos).toMatchObject({ pregunta: 'posicionImagen', focal: -15, distanciaObjeto: 25 });
+    expect(empate.respuesta).toBe(-9.38);
+    for (const v of [-9.38, -9.37, -9.375]) expect(comprobarRespuesta(v, empate.datos).correcto, String(v)).toBe(true);
+    for (const v of [-9.36, -9.39, -9.4, 9.38]) expect(comprobarRespuesta(v, empate.datos).correcto, String(v)).toBe(false);
   });
 });
 
@@ -709,8 +749,8 @@ test.describe('simulador-lentes-opticas · re-inspección 03/10/2026 · el corre
   test('practicar con Date.now() = 1791000000163 da el ejercicio de la lupa de 15 cm', async ({
     page,
   }) => {
-    // Guarda del caso ABIERTO de abajo: si el generador cambia, este falla en vez de dejar al
-    // test.fail «pasar» por otro motivo. Objeto a 8 cm de una convergente de 15 cm:
+    // Guarda del caso de abajo (hallazgo 2747): si el generador cambia, este falla en vez de dejar
+    // que aquel pase por otro motivo. Objeto a 8 cm de una convergente de 15 cm:
     // s' = 15·8/(8 − 15) = −120/7 = −17,142857 → a dos decimales −17,14.
     await page.clock.setFixedTime(new Date(1791000000163));
     await seccion(page).locator('#casos-practicar').click();
@@ -720,13 +760,9 @@ test.describe('simulador-lentes-opticas · re-inspección 03/10/2026 · el corre
     expect(await responder(page, '-17,14')).toContain('¡Correcto!');
   });
 
-  test('ABIERTO · 5,3 por 5,25, −0,49 por −0,5 y «−17» cuando se piden dos decimales cuelan', async ({
+  test('5,3 por 5,25, −0,49 por −0,5 y «−17» cuando se piden dos decimales ya no cuelan (hallazgo 2747)', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): el corrector acepta un 1 % con datos exactos',
-    );
     const cuelan: string[] = [];
     await seccion(page).getByRole('button', { name: /^Caso 11:/ }).click();
     if ((await responder(page, '5,3')).includes('¡Correcto!')) cuelan.push('caso 11: 5,3');
@@ -736,12 +772,16 @@ test.describe('simulador-lentes-opticas · re-inspección 03/10/2026 · el corre
     await seccion(page).locator('#casos-practicar').click();
     if ((await responder(page, '-17')).includes('¡Correcto!')) cuelan.push('práctica −17,14: −17');
     expect(cuelan).toEqual([]);
+    // Y la intro dice el criterio nuevo, sin el «1 %» de antes.
+    const intro = seccion(page).locator('[class*="casosIntro"]');
+    await expect(intro).toContainText('Los datos son exactos');
+    await expect(intro).not.toContainText('%');
   });
 
   test('practicar con Date.now() = 1791000000313: divergente de 15 cm con el objeto a 25', async ({
     page,
   }) => {
-    // Guarda del caso ABIERTO de abajo. s' = 1/(−1/15 − 1/25) = −75/8 = −9,375 cm exactos.
+    // Guarda del caso de abajo (hallazgo 2751). s' = 1/(−1/15 − 1/25) = −75/8 = −9,375 cm exactos.
     await page.clock.setFixedTime(new Date(1791000000313));
     await seccion(page).locator('#casos-practicar').click();
     await expect(seccion(page).locator('#casos-enunciado')).toContainText(
@@ -749,18 +789,24 @@ test.describe('simulador-lentes-opticas · re-inspección 03/10/2026 · el corre
     );
   });
 
-  test('ABIERTO · la práctica redondea −9,375 a −9,37 mientras el panel imprime −9,38', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): redondear() usa Math.round, que lleva los empates negativos hacia cero',
-    );
+  test('la práctica redondea −9,375 a −9,38, lo mismo que imprime el panel (hallazgo 2751)', async ({ page }) => {
     // −9,375 a dos decimales es −9,38 (redondeo simétrico, el de formatNumber y el del panel
     // con divergente 15 y objeto a 25); la misma práctica lleva +0,375 a 0,38
     // (Date.now() = 1791000000005).
     await page.clock.setFixedTime(new Date(1791000000313));
     await seccion(page).locator('#casos-practicar').click();
     await seccion(page).getByRole('button', { name: /Ver solución/ }).click();
-    await expect(seccion(page).locator('#casos-resultado')).toContainText('−9,38 cm', { timeout: 2000 });
+    await expect(seccion(page).locator('#casos-resultado')).toContainText('−9,38 cm');
+    await expect(seccion(page).locator('#casos-solucion')).toContainText('Redondeando a dos decimales: −9,38 cm');
+    // Y el corrector acepta la cifra que imprime el panel (y la otra mitad del empate).
+    expect(await responder(page, '-9,38')).toContain('¡Correcto!');
+    expect(await responder(page, '-9,37')).toContain('¡Correcto!');
+    expect(await responder(page, '-9,39')).toContain('No es correcto');
+    // El panel, con la misma lente, dice lo mismo.
+    await page.getByRole('button', { name: /Divergente/ }).click();
+    await sembrarValor(page, SLIDER_F, 15);
+    await sembrarValor(page, SLIDER_S, 25);
+    await expect(valorDe(page, IMAGEN)).toHaveText('−9,38 cm');
   });
 });
 
@@ -777,22 +823,41 @@ test.describe('simulador-lentes-opticas · re-inspección 03/10/2026 · redondeo
     await expect(valorDe(page, IMAGEN)).toHaveText('2,13 cm');
   });
 
-  test('ABIERTO · el empate 5,625 (f = 2,5, s = 4,5) sale «5,62 cm»', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): 1/(1/f − 1/s) deja 5,624999999999999 y toFixed lo baja',
-    );
-    // s' = 2,5·4,5/2 = 5,625 exactos → «5,63 cm», como el panel hace con 2,125 → «2,13 cm».
+  test('el empate 5,625 (f = 2,5, s = 4,5) sale «5,63 cm», como 2,125 sale «2,13 cm» (hallazgo 2751)', async ({ page }) => {
+    // s' = 2,5·4,5/2 = 5,625 exactos; 1/(1/f − 1/s) deja 5,624999999999999 y `toFixed` lo
+    // bajaba a 5,62.
     await sembrarValor(page, SLIDER_F, 2.5);
     await sembrarValor(page, SLIDER_S, 4.5);
-    await expect(valorDe(page, IMAGEN)).toHaveText('5,63 cm', { timeout: 2000 });
+    await expect(valorDe(page, IMAGEN)).toHaveText('5,63 cm');
+  });
+
+  test('un solo redondeo: el panel imprime en toda la rejilla de los deslizadores lo que da redondearCifra', async () => {
+    // Barrido sin navegador de la rejilla entera (f de 2 a 20 y s de 2 a 40 en pasos de 0,5):
+    // la cifra de s' y la de M salen del redondeo de referencia del spec, que trabaja por texto.
+    const distintos: string[] = [];
+    for (let f2 = 4; f2 <= 40; f2++) {
+      for (let s2 = 4; s2 <= 80; s2++) {
+        for (const signo of [1, -1]) {
+          const r = calcularImagen((signo * f2) / 2, s2 / 2, 1);
+          if (!r.valido) continue;
+          if (redondearCifra(r.sImg, 2) !== redondeo(r.sImg, 2)) distintos.push(`s' ${r.sImg}`);
+          if (redondearCifra(r.M, 3) !== redondeo(r.M, 3)) distintos.push(`M ${r.M}`);
+        }
+      }
+    }
+    expect(distintos).toEqual([]);
+    // Los empates del acta, uno por uno.
+    expect(redondearCifra(-9.375, 2)).toBe(-9.38);
+    expect(redondearCifra(0.375, 2)).toBe(0.38);
+    expect(redondearCifra(1 / (1 / 2.5 - 1 / 4.5), 2)).toBe(5.63);
+    expect(Object.is(redondearCifra(-0.001, 2), -0)).toBe(false);
   });
 });
 
 /* ─────────────── El lienzo: la punta de la flecha de la imagen y el contraste ─────────────── */
 
 interface LienzoRegistrado {
-  textos: { t: string; c: string }[];
+  textos: { t: string; c: string; x: number; y: number }[];
   trazos: { c: string; ancho: number; alfa: number }[];
   triangulos: { c: string; pts: number[][] }[];
 }
@@ -836,7 +901,7 @@ function instrumentarLienzo(): void {
   } as typeof P.stroke;
   const fillText = P.fillText;
   P.fillText = function (this: CanvasRenderingContext2D, texto: string, x: number, y: number) {
-    w.__lienzo.textos.push({ t: String(texto), c: String(this.fillStyle) });
+    w.__lienzo.textos.push({ t: String(texto), c: String(this.fillStyle), x, y });
     return fillText.call(this, texto, x, y);
   } as typeof P.fillText;
 }
@@ -903,8 +968,24 @@ function fondoCompuesto(capas: string[]): Rgb {
   return base;
 }
 
+/**
+ * Espera a que acaben las transiciones y animaciones CSS: el cambio de tema funde los fondos
+ * (un fondo leído a mitad da un gris intermedio) y la guía educativa entra con un fadeIn de
+ * opacidad 0 a 1 (leída a mitad, todo da ~1:1). Medir antes mide la transición, no la app.
+ */
+async function esperarQuietud(page: Page): Promise<void> {
+  await page.waitForFunction(() =>
+    document
+      .getAnimations()
+      // Las infinitas (un indicador que late) no acaban nunca: no cuentan.
+      .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity)
+      .every((a) => a.playState !== 'running' && a.playState !== 'pending'),
+  );
+}
+
 /** Fondo real bajo el lienzo (es transparente: se ve el del contenedor). */
 async function fondoDelLienzo(page: Page): Promise<Rgb> {
+  await esperarQuietud(page);
   const capas = await page.locator('canvas').evaluate((cv) => {
     const out: string[] = [];
     for (let e: Element | null = cv; e; e = e.parentElement) out.push(getComputedStyle(e).backgroundColor);
@@ -929,6 +1010,19 @@ function bajoUmbral(lienzo: LienzoRegistrado, fondo: Rgb): string[] {
   return [...fuera].sort();
 }
 
+/** Las manchas de la leyenda son objetos gráficos: ≥ 3:1 contra el fondo del lienzo. */
+async function manchasBajoTres(page: Page): Promise<string[]> {
+  const fondo = await fondoDelLienzo(page);
+  const colores = await page
+    .locator('[class*="legendDot"]')
+    .evaluateAll((els) => els.map((e) => getComputedStyle(e).backgroundColor));
+  expect(colores.length).toBe(5);
+  return colores
+    .map((c) => ({ c, r: contraste(colorDe(c).rgb, fondo) }))
+    .filter(({ r }) => r < 3)
+    .map(({ c, r }) => `${c} ${r.toFixed(2)}:1`);
+}
+
 test.describe('simulador-lentes-opticas · re-inspección 03/10/2026 · el lienzo', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(instrumentarLienzo);
@@ -937,57 +1031,93 @@ test.describe('simulador-lentes-opticas · re-inspección 03/10/2026 · el lienz
   });
 
   test('la flecha del objeto apunta hacia arriba (h > 0)', async ({ page }) => {
-    await esperarLienzo(page, '#48a9a6');
+    // #327874 = --secondary-texto en claro (antes, el #48A9A6 fijo que el 2749 retiró).
+    await esperarLienzo(page, '#327874');
     const { triangulos } = await leerLienzo(page);
     expect(triangulos.length).toBe(2); // objeto e imagen
     const [vertice, base] = triangulos[0].pts;
     expect(vertice[1]).toBeLessThan(base[1]);
   });
 
-  test('ABIERTO · la punta de la flecha de la imagen apunta al revés que la imagen', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): baseDir = hImg > 0 ? -1 : 1 dibuja la punta hacia el eje',
-    );
+  test('la punta de la flecha de la imagen apunta hacia la imagen, y el rótulo va más allá (hallazgo 2748)', async ({
+    page,
+  }) => {
+    /**
+     * Mide el triángulo de la imagen (moveTo = vértice, los dos lineTo = base) y su rótulo.
+     * `abajo` es el sentido esperado: el vértice más ALLÁ que la base desde el eje, y en el
+     * extremo del palo; el rótulo, más allá del vértice.
+     */
+    async function medir(etiqueta: string, abajo: boolean, rotulo: string): Promise<string[]> {
+      const mal: string[] = [];
+      const { triangulos, textos } = await leerLienzo(page);
+      const [vertice, b1, b2] = triangulos[1].pts;
+      const baseY = (b1[1] + b2[1]) / 2;
+      if (abajo ? !(vertice[1] > baseY) : !(vertice[1] < baseY)) mal.push(`${etiqueta}: punta hacia el eje`);
+      const texto = textos.find((t) => t.t === rotulo);
+      if (!texto) mal.push(`${etiqueta}: sin rótulo «${rotulo}»`);
+      // Debajo, la línea base del texto tiene que dejar el alto de la letra (11 px) bajo el
+      // vértice; encima basta con que quede por encima de él.
+      else if (abajo ? !(texto.y - 9 > vertice[1]) : !(texto.y < vertice[1])) {
+        mal.push(`${etiqueta}: rótulo en y = ${texto.y} sobre el vértice en y = ${vertice[1]}`);
+      }
+      return mal;
+    }
     const mal: string[] = [];
-    // Fábrica (f = 8, s = 15): h' = −2,29, invertida → la punta debe mirar ABAJO (el vértice
-    // más abajo que la base: y mayor en píxeles).
-    await esperarLienzo(page, '#48a9a6');
-    let { triangulos } = await leerLienzo(page);
-    let [vertice, base] = triangulos[1].pts;
-    if (!(vertice[1] > base[1])) mal.push('imagen real invertida con la punta hacia arriba');
-    // Lupa (f = 10, s = 5): h' = +4, derecha → la punta debe mirar ARRIBA.
+    // Fábrica (f = 8, s = 15): h' = −2,29, invertida → la punta mira ABAJO (y mayor en píxeles).
+    await esperarLienzo(page, '#327874');
+    mal.push(...(await medir('fábrica', true, 'Imagen real')));
+    // Lupa (f = 10, s = 5): h' = +4, derecha → la punta mira ARRIBA.
     await sembrarValor(page, SLIDER_F, 10);
     await sembrarValor(page, SLIDER_S, 5);
-    await esperarLienzo(page, '#a82e68'); // la imagen virtual va en #A82E68
-    ({ triangulos } = await leerLienzo(page));
-    [vertice, base] = triangulos[1].pts;
-    if (!(vertice[1] < base[1])) mal.push('imagen virtual derecha con la punta hacia abajo');
+    await esperarLienzo(page, '#a82e68'); // la imagen virtual va en #A82E68 en claro
+    mal.push(...(await medir('lupa', false, 'Imagen virtual')));
+    // Divergente f = 8, s = 30: 1/s' = −1/8 − 1/30 → s' = −6,32, M = +0,21, derecha → ARRIBA.
+    await page.getByRole('button', { name: /Divergente/ }).click();
+    await sembrarValor(page, SLIDER_F, 8);
+    await sembrarValor(page, SLIDER_S, 30);
+    await expect(valorDe(page, "Distancia imagen (s')")).toHaveText('−6,32 cm');
+    await esperarLienzo(page, '#a82e68');
+    mal.push(...(await medir('divergente', false, 'Imagen virtual')));
     expect(mal).toEqual([]);
   });
 
-  test('ABIERTO · en claro, rótulos y trazos del lienzo bajo 4,5:1 y 3:1', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): #48A9A6, #2E86AB, #0EA5E9 y #E07A1F fijos sobre #FAFAFA',
-    );
+  test('en claro, rótulos ≥ 4,5:1 y trazos ≥ 3:1, también la leyenda (hallazgo 2749)', async ({ page }) => {
     await activarTema(page, 'light');
-    const fuera = bajoUmbral(await leerLienzo(page), await fondoDelLienzo(page));
-    // Hoy: «Objeto» e «Imagen real» (#48A9A6) 2,68:1, «Lente (f = 8,0 cm)» (#2E86AB) 3,93:1;
-    // la flecha del objeto 2,68:1, el rayo 3 (#0EA5E9) 2,66:1 y el rayo 1 (#E07A1F) 2,89:1.
-    expect(fuera).toEqual([]);
-  });
-
-  test('ABIERTO · en oscuro, rótulos y trazos del lienzo bajo 4,5:1 y 3:1', async ({ page }) => {
-    test.fail(true, 'ABIERTO, hallazgo (inspector 03/10/2026): #A82E68 y #2E86AB fijos sobre #1A1A1A');
-    await activarTema(page, 'dark');
+    // Fábrica (imagen real) y lupa (imagen virtual): entre los dos salen todos los colores.
+    await esperarLienzo(page, '#327874');
+    const fondo = await fondoDelLienzo(page);
+    const fuera = bajoUmbral(await leerLienzo(page), fondo);
     await sembrarValor(page, SLIDER_F, 10);
     await sembrarValor(page, SLIDER_S, 5);
-    await esperarLienzo(page, '#a82e68', '#e5e5e5'); // imagen virtual y rótulos del eje en oscuro
-    const fuera = bajoUmbral(await leerLienzo(page), await fondoDelLienzo(page));
-    // Hoy: «F», «F'», «2F», «2F'» e «Imagen virtual» (#A82E68) 2,70:1, «Lente (f = 10,0 cm)»
+    await esperarLienzo(page, '#a82e68');
+    fuera.push(...bajoUmbral(await leerLienzo(page), fondo));
+    // Antes: «Objeto» e «Imagen real» (#48A9A6) 2,68:1, «Lente (f = 8,0 cm)» (#2E86AB) 3,93:1;
+    // la flecha del objeto 2,68:1, el rayo 3 (#0EA5E9) 2,66:1 y el rayo 1 (#E07A1F) 2,89:1.
+    expect(fuera).toEqual([]);
+    expect(await manchasBajoTres(page)).toEqual([]);
+  });
+
+  test('en oscuro, rótulos ≥ 4,5:1 y trazos ≥ 3:1, y el lienzo sigue al tema sin recargar (hallazgo 2749)', async ({
+    page,
+  }) => {
+    await activarTema(page, 'light');
+    await sembrarValor(page, SLIDER_F, 10);
+    await sembrarValor(page, SLIDER_S, 5);
+    await esperarLienzo(page, '#a82e68', '#333333');
+    // Cambiar el tema REDIBUJA con los colores del oscuro (el MutationObserver de data-theme).
+    await activarTema(page, 'dark');
+    await esperarLienzo(page, '#e879a9', '#e5e5e5'); // imagen virtual y rótulos del eje en oscuro
+    const fondo = await fondoDelLienzo(page);
+    const fuera = bajoUmbral(await leerLienzo(page), fondo);
+    // Y la imagen real del estado de fábrica, en el verde azulado del oscuro.
+    await sembrarValor(page, SLIDER_F, 8);
+    await sembrarValor(page, SLIDER_S, 15);
+    await esperarLienzo(page, '#5abdb9');
+    fuera.push(...bajoUmbral(await leerLienzo(page), fondo));
+    // Antes: «F», «F'», «2F», «2F'» e «Imagen virtual» (#A82E68) 2,70:1, «Lente (f = 10,0 cm)»
     // 4,24:1 y la flecha discontinua de la imagen virtual 2,70:1.
     expect(fuera).toEqual([]);
+    expect(await manchasBajoTres(page)).toEqual([]);
   });
 });
 
@@ -997,6 +1127,7 @@ async function contrasteDeTexto(
   page: Page,
   selector: string,
 ): Promise<{ texto: string; ratio: number; grande: boolean }[]> {
+  await esperarQuietud(page);
   const datos = await page.locator(selector).evaluateAll((els) =>
     els.map((el) => {
       const capas: string[] = [];
@@ -1032,48 +1163,117 @@ test.describe('simulador-lentes-opticas · re-inspección 03/10/2026 · contrast
     await esperarHidratacion(page, [SLIDER_F]);
   });
 
-  test('ABIERTO · en claro, --primary como texto: chips de la clasificación y valores de los deslizadores', async ({
+  test('en claro, la marca como texto va en --primary-texto: chips, deslizadores y títulos (hallazgo 2750)', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): color: var(--primary) sobre fondo claro en vez de --primary-texto',
-    );
     await activarTema(page, 'light');
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const fuera: string[] = [];
-    for (const sel of ['[class*="classChip"]', '[class*="controlLabel"] strong', '[class*="faqItem"] h4']) {
+    for (const sel of [
+      '[class*="classChip"]',
+      '[class*="controlLabel"] strong',
+      '[class*="resultValue"]',
+      '[class*="faqItem"] h4',
+      '[class*="scenarioCard"] strong',
+      '[class*="stepContent"] strong',
+      '[class*="tipCard"] strong',
+    ]) {
       for (const m of await contrasteDeTexto(page, sel)) {
         if (m.ratio < (m.grande ? 3 : 4.5)) fuera.push(`${sel} «${m.texto}» ${m.ratio.toFixed(2)}:1`);
       }
     }
-    // Hoy: chips «Real», «Invertida», «Aumentada (×1,14)» 3,42:1 (13,6 px), «8,0 cm» de los
+    // Antes: chips «Real», «Invertida», «Aumentada (×1,14)» 3,42:1 (13,6 px), «8,0 cm» de los
     // deslizadores 4,11:1 y los títulos de la FAQ 3,93:1.
     expect(fuera).toEqual([]);
   });
 
-  test('ABIERTO · en oscuro, los números de los pasos son blanco sobre --primary', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): .stepNumber blanco sobre var(--primary) (#3FA5D1 en oscuro)',
-    );
+  test('en oscuro, los números de los pasos son blanco sobre --primary-boton (hallazgo 2750)', async ({ page }) => {
     await activarTema(page, 'dark');
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const medidas = await contrasteDeTexto(page, '[class*="stepNumber"]');
     expect(medidas.length).toBe(5);
-    // 19,2 px en negrita es texto grande: pide 3:1. Hoy 2,79:1 (y 2,21:1 bajo stemum.com).
+    // 19,2 px en negrita es texto grande: pide 3:1. Antes 2,79:1 (y 2,21:1 bajo stemum.com).
     expect(medidas.filter((m) => m.ratio < 3).map((m) => `${m.texto} ${m.ratio.toFixed(2)}:1`)).toEqual([]);
   });
 
-  test('ABIERTO · el lector de pantalla anuncia «espejo» en el botón de la lente divergente', async ({
+  test('el botón de la lente divergente no anuncia «espejo»: su nombre empieza por el texto (hallazgo 2752)', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'ABIERTO, hallazgo (inspector 03/10/2026): el 🪞 no lleva aria-hidden (el 🔍 de su gemelo sí)',
-    );
     const divergente = page.getByRole('button', { name: /Divergente \(bicóncava\)/ });
-    await expect(divergente).toHaveAccessibleName(/^Divergente/, { timeout: 2000 });
+    await expect(divergente).toHaveAccessibleName(/^Divergente \(bicóncava\) f < 0/);
+    await expect(page.getByRole('button', { name: /Convergente \(biconvexa\)/ })).toHaveAccessibleName(
+      /^Convergente \(biconvexa\) f > 0/,
+    );
+    // Ni el 🪞 ni ningún otro emoji quedan en el selector de lente.
+    await expect(page.locator('[class*="lensTypeSelector"]')).not.toContainText('🪞');
   });
+});
+
+/**
+ * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
+ * admite meskeia.com) y, sin él, la página NO se hidrata. El puente reenvía el socket a
+ * localhost:3050. Copiado de tests/apps/simulador-mas-resorte.spec.ts, donde está medido.
+ */
+async function puenteHmr(page: Page): Promise<void> {
+  const abiertos: WebSocket[] = [];
+  page.on('close', () => abiertos.forEach((s) => s.close()));
+  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
+    const u = new URL(ws.url());
+    const arriba = new WebSocket(`ws://localhost:3050${u.pathname}${u.search}`);
+    arriba.binaryType = 'arraybuffer';
+    abiertos.push(arriba);
+    const cola: (string | Buffer)[] = [];
+    arriba.onopen = () => {
+      for (const m of cola) arriba.send(m);
+      cola.length = 0;
+    };
+    ws.onMessage((m) => {
+      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
+      else cola.push(m);
+    });
+    arriba.onmessage = (e: MessageEvent) =>
+      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
+    ws.onClose(() => arriba.close());
+  });
+}
+
+test.describe('simulador-lentes-opticas · bajo stemum.com (hallazgos 2749 y 2750)', () => {
+  test.beforeEach(async ({ page }) => {
+    test.setTimeout(90000);
+    await puenteHmr(page);
+    await page.addInitScript(instrumentarLienzo);
+    await page.goto('http://stemum.com/simulador-lentes-opticas/');
+    await esperarHidratacion(page, [SLIDER_F]);
+    await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
+  });
+
+  for (const tema of ['light', 'dark'] as const) {
+    test(`tema ${tema === 'light' ? 'claro' : 'oscuro'}: marca como texto, números de los pasos y lienzo`, async ({
+      page,
+    }) => {
+      await activarTema(page, tema);
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      const fuera: string[] = [];
+      for (const sel of [
+        '[class*="classChip"]',
+        '[class*="controlLabel"] strong',
+        '[class*="resultValue"]',
+        '[class*="faqItem"] h4',
+        '[class*="stepContent"] strong',
+        '[class*="stepNumber"]',
+      ]) {
+        for (const m of await contrasteDeTexto(page, sel)) {
+          if (m.ratio < (m.grande ? 3 : 4.5)) fuera.push(`${sel} «${m.texto}» ${m.ratio.toFixed(2)}:1`);
+        }
+      }
+      // El lienzo toma el violeta de la marca para la lente y el objeto, y sigue cumpliendo.
+      const objeto = tema === 'light' ? '#8b3bd1' : '#be8af3';
+      await esperarLienzo(page, objeto);
+      fuera.push(...bajoUmbral(await leerLienzo(page), await fondoDelLienzo(page)));
+      fuera.push(...(await manchasBajoTres(page)));
+      expect(fuera).toEqual([]);
+    });
+  }
 });
 
 test.describe('simulador-lentes-opticas · re-inspección 03/10/2026 · móvil 390 px', () => {

@@ -45,7 +45,7 @@
  */
 
 import { formatNumber } from '@/lib';
-import { calcularImagen, potenciaDioptrias, type ImagenLente } from './motor';
+import { calcularImagen, potenciaDioptrias, redondearCifra, type ImagenLente } from './motor';
 
 /**
  * Altura de referencia para las preguntas en las que NO influye (s', M): el motor necesita
@@ -115,9 +115,18 @@ function conSigno(n: number): string {
   return n > 0 ? `+${numero(n)}` : numero(n);
 }
 
+/** El redondeo del panel (`redondearCifra` de `./motor.ts`): empates alejándose de cero. */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearCifra(valor, decimales);
+}
+
+/**
+ * ¿La cifra exacta tiene más decimales de los que se piden? Holgura RELATIVA, como en
+ * simulador-mas-resorte: 820 y 0,5 se juzgan con la misma vara.
+ */
+export function exigeRedondeo(valor: number, decimales: number): boolean {
+  if (!Number.isFinite(valor)) return false;
+  return Math.abs(redondear(valor, decimales) - valor) > 1e-9 * Math.max(1, Math.abs(valor));
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */
@@ -367,20 +376,37 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
 
   // El último paso muestra la cifra con los MISMOS decimales que pide el enunciado.
   const redondeado = redondear(valor, decimales);
-  const exacto = Math.abs(valor - redondeado) < 1e-9;
   pasos.push(
-    exacto
-      ? `Resultado: ${conUnidad(redondeado, datos)}.`
-      : `Redondeando ${textoRedondeo(decimales)}: ${conUnidad(redondeado, datos)}.`,
+    exigeRedondeo(valor, decimales)
+      ? `Redondeando ${textoRedondeo(decimales)}: ${conUnidad(redondeado, datos)}.`
+      : `Resultado: ${conUnidad(redondeado, datos)}.`,
   );
   return { ok: true, valor, pasos };
 }
 
 /* ─────────────────────────── Corrección ─────────────────────────── */
 
-/** El MAYOR entre 0,01 y el 1 % del valor. */
-export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
+/**
+ * La tolerancia la da la PREGUNTA, no el tamaño de la cifra (hallazgo 2747, 03/10/2026; el
+ * mismo criterio que el 2626 de simulador-mas-resorte). Es el error de lectura de los datos
+ * propagado a la respuesta más media unidad del redondeo pedido, y aquí los datos son EXACTOS
+ * (nada se lee de una tabla ni de una gráfica), así que solo queda el redondeo:
+ *
+ *   · si la cifra exacta tiene más decimales de los que se piden, media unidad del último
+ *     decimal pedido: entra todo lo que redondea a la clave (−17,142857 → de −17,1479 a
+ *     −17,1379, es decir, −17,14 y nada más con dos decimales);
+ *   · si la cifra es exacta (los doce casos lo son), no hay redondeo que tolerar: solo vale ella.
+ *
+ * Antes era el mayor entre 0,01 y el 1 % de la respuesta, y el 1 % de una cifra no es la escala
+ * de su error: pasaban 5,3 y 5,2 por 5,25 exactos, 30,3 por 30 y «−17» cuando Practicar pedía
+ * dos decimales. Ningún error conceptual del tema caía dentro del 1 %; lo que colaban eran
+ * vecinos y redondeos mal hechos.
+ */
+export function toleranciaDe(datos: DatosCaso): number {
+  const decimales = datos.decimales ?? 2;
+  const r = resolverCaso(datos);
+  if (!r.ok) return 0;
+  return exigeRedondeo(r.valor, decimales) ? 10 ** -decimales / 2 : 0;
 }
 
 export interface Veredicto {
@@ -390,9 +416,17 @@ export interface Veredicto {
   tolerancia: number;
 }
 
-/** Corrige la respuesta del alumno. Nunca lanza. */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
+/**
+ * Corrige la respuesta del alumno. Nunca lanza. Recibe los `datos` del caso, no la clave: la
+ * tolerancia depende de la pregunta (`toleranciaDe`) y la distancia se mide contra el valor
+ * EXACTO, no contra la clave ya redondeada. Así un empate como −9,375 («redondea a dos
+ * decimales») admite −9,38, que es lo que imprimen el panel y la solución, y también −9,37,
+ * que es otra forma legítima de deshacer el empate; con media unidad sobre la clave −9,38 se
+ * suspendería −9,37, y sobre una clave −9,37 se suspendía la cifra del propio panel.
+ */
+export function comprobarRespuesta(usuario: number, datos: DatosCaso): Veredicto {
+  const tolerancia = toleranciaDe(datos);
+  const r = resolverCaso(datos);
 
   if (!Number.isFinite(usuario)) {
     return {
@@ -402,12 +436,19 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
       tolerancia,
     };
   }
+  if (!r.ok) {
+    return { correcto: false, motivo: r.error ?? 'Este caso no tiene respuesta.', diferencia: NaN, tolerancia };
+  }
 
+  // El valor exacto, limpio del error de coma flotante (5,624999999999999 → 5,625): el mismo
+  // que redondea `redondearCifra`.
+  const esperado = Number(r.valor.toPrecision(12));
   const diferencia = Math.abs(usuario - esperado);
   /**
    * Margen de ruido binario (hallazgo 1211 de `simulador-conservacion-energia`): en el borde
    * EXACTO de la tolerancia la resta en coma flotante decide por ±1 ulp. 1e-9 absorbe ese ruido
-   * y queda siete órdenes de magnitud por debajo de la tolerancia más pequeña (0,01).
+   * y queda seis órdenes de magnitud por debajo de la menor tolerancia no nula (0,005); con una
+   * respuesta exacta (tolerancia 0) es lo único que separa 10 de 9,999999999999998.
    */
   const RUIDO_BINARIO = 1e-9;
   if (diferencia <= tolerancia + RUIDO_BINARIO) {
@@ -429,7 +470,7 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia, 2)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${numero(diferencia, 4)} de la respuesta.`,
     diferencia,
     tolerancia,
   };

@@ -5,7 +5,8 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorLentesOpticas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { calcularImagen, potenciaDioptrias } from './motor';
+import { formatNumber } from '@/lib';
+import { calcularImagen, potenciaDioptrias, redondearCifra } from './motor';
 import CasosAula from './CasosAula';
 
 // ============================================
@@ -16,16 +17,15 @@ type TipoLente = 'convergente' | 'divergente';
 // ============================================
 // UTILIDADES
 // ============================================
+/**
+ * Toda cifra del panel, del lienzo y de los rótulos. Redondea con `redondearCifra`, el MISMO
+ * redondeo que la clave y la solución de los casos (hallazgo 2751): antes `toFixed` bajaba el
+ * empate 5,625 a 5,62 (llegaba como 5,624999999999999) mientras la práctica llevaba −9,375 a
+ * −9,37 y el panel a −9,38. Se presenta con `formatNumber` y el signo «−» tipográfico.
+ */
 function fmt(n: number, decimales = 2): string {
   if (!isFinite(n)) return '∞';
-  return n.toFixed(decimales).replace('.', ',');
-}
-
-function fmtSigned(n: number, decimales = 2): string {
-  if (!isFinite(n)) return '∞';
-  if (Math.abs(n) < 1e-12) return '0';
-  const s = Math.abs(n).toFixed(decimales).replace('.', ',');
-  return n < 0 ? `−${s}` : s;
+  return formatNumber(redondearCifra(n, decimales), decimales).replace(/^-/, '−');
 }
 
 // ============================================
@@ -90,18 +90,26 @@ export default function SimuladorLentesOpticasPage() {
     const plotW = W - pad.left - pad.right;
     const plotH = H - pad.top - pad.bottom;
 
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const colorAxis = isDark ? '#999' : '#666';
-    const colorGrid = isDark ? '#333' : '#EEE';
-    const colorText = isDark ? '#E5E5E5' : '#333';
-    const colorLens = '#2E86AB';
-    const colorObj = '#48A9A6';
-    const colorImgReal = '#48A9A6';
-    const colorImgVirtual = '#A82E68';
-    const colorRayo1 = '#E07A1F'; // paralelo
-    const colorRayo2 = '#2E7D32'; // centro — verde: el #7C3AED anterior está prohibido
-    const colorRayo3 = '#0EA5E9'; // por foco
-    const colorFoco = '#A82E68';
+    // Los colores salen de los tokens `--lienzo-*` que declara el módulo CSS en
+    // `.canvasWrapper`, con su variante oscura, y que usan también las manchas de la leyenda:
+    // una sola fuente para las dos cosas. Se leen en CADA dibujo, así que siguen al tema (el
+    // MutationObserver de abajo redibuja al cambiar `data-theme`) y a la marca (bajo
+    // stemum.com la lente y el objeto toman el violeta de --primary-texto/--secondary-texto).
+    // Hallazgo 2749 (03/10/2026): eran literales fijos, y en claro el #48A9A6 de «Objeto» e
+    // «Imagen real» daba 2,68:1 sobre #FAFAFA y en oscuro el #A82E68 de los focos, 2,70:1.
+    const tokens = getComputedStyle(canvas);
+    const color = (nombre: string, respaldo: string) => tokens.getPropertyValue(nombre).trim() || respaldo;
+    const colorAxis = color('--lienzo-ejes', '#666666');
+    const colorGrid = color('--lienzo-rejilla', '#EEEEEE');
+    const colorText = color('--lienzo-texto', '#333333');
+    const colorLens = color('--lienzo-lente', '#26718F');
+    const colorObj = color('--lienzo-objeto', '#327874');
+    const colorImgReal = colorObj;
+    const colorImgVirtual = color('--lienzo-virtual', '#A82E68');
+    const colorRayo1 = color('--lienzo-rayo1', '#C2410C'); // paralelo
+    const colorRayo2 = color('--lienzo-rayo2', '#2E7D32'); // centro — verde: el #7C3AED anterior está prohibido
+    const colorRayo3 = color('--lienzo-rayo3', '#0369A1'); // por foco
+    const colorFoco = colorImgVirtual;
 
     ctx.clearRect(0, 0, W, H);
 
@@ -196,7 +204,7 @@ export default function SimuladorLentesOpticasPage() {
     ctx.fillStyle = colorLens;
     ctx.font = 'bold 12px system-ui';
     ctx.textAlign = 'center';
-    ctx.fillText(`Lente (f = ${fmtSigned(f, 1)} cm)`, xToPx(0), pad.top - 8);
+    ctx.fillText(`Lente (f = ${fmt(f, 1)} cm)`, xToPx(0), pad.top - 8);
 
     // Focos: marcadores en ±fAbs
     const dibujarFoco = (xv: number, etiqueta: string) => {
@@ -350,21 +358,29 @@ export default function SimuladorLentesOpticasPage() {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Punta de flecha (apunta hacia hImg)
+      // Punta de flecha: apunta hacia FUERA del eje, hacia donde está la imagen (arriba si es
+      // derecha, abajo si es invertida), igual que la del objeto. `haciaFuera` es el sentido
+      // de la punta en píxeles: −1 sube (h' > 0), +1 baja (h' < 0). El vértice queda 2 px más
+      // allá del extremo del palo y la base, 8 px por dentro. Antes el signo iba al revés y la
+      // punta miraba al eje: un ▼ en lo alto de la lupa y un ▲ colgando bajo la imagen del
+      // proyector, contra el «Derecha/Invertida» del panel (hallazgo 2748).
       ctx.fillStyle = colorImg;
       const tipPx = yToPx(hImg);
-      const baseDir = hImg > 0 ? -1 : 1;
+      const haciaFuera = hImg > 0 ? -1 : 1;
       ctx.beginPath();
-      ctx.moveTo(imgX, tipPx + 2 * baseDir);
-      ctx.lineTo(imgX - 6, tipPx + 10 * baseDir);
-      ctx.lineTo(imgX + 6, tipPx + 10 * baseDir);
+      ctx.moveTo(imgX, tipPx + 2 * haciaFuera);
+      ctx.lineTo(imgX - 6, tipPx - 8 * haciaFuera);
+      ctx.lineTo(imgX + 6, tipPx - 8 * haciaFuera);
       ctx.closePath();
       ctx.fill();
 
+      // El rótulo, más allá de la punta: encima si sube, debajo si baja. La línea base del
+      // texto queda 6 px más allá del vértice si sube, o 14 px si baja (el texto crece hacia
+      // arriba desde su línea base, así que debajo necesita además el alto de la letra).
       ctx.fillStyle = colorImg;
       ctx.font = 'bold 11px system-ui';
       ctx.textAlign = 'center';
-      ctx.fillText(real ? 'Imagen real' : 'Imagen virtual', imgX, tipPx - 8 * baseDir);
+      ctx.fillText(real ? 'Imagen real' : 'Imagen virtual', imgX, hImg > 0 ? tipPx - 8 : tipPx + 16);
     } else if (!valido) {
       // Imagen al infinito
       ctx.fillStyle = colorImgReal;
@@ -382,7 +398,7 @@ export default function SimuladorLentesOpticasPage() {
   }, [dibujar]);
   useEffect(() => {
     const observer = new MutationObserver(dibujar);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-brand'] });
     return () => observer.disconnect();
   }, [dibujar]);
 
@@ -415,7 +431,11 @@ export default function SimuladorLentesOpticasPage() {
           onClick={() => setTipo('convergente')}
           aria-pressed={tipo === 'convergente'}
         >
-          <span className={styles.lensIcon} aria-hidden="true">🔍</span>
+          {/* Perfil de la lente, no un emoji: no hay emoji de lente bicóncava, y el 🪞 que llevaba
+              su gemela es un espejo y entraba en el nombre accesible (hallazgo 2752). */}
+          <svg className={styles.lensIcon} viewBox="0 0 24 40" width="24" height="40" aria-hidden="true" focusable="false">
+            <path d="M12 2 C20 10 20 30 12 38 C4 30 4 10 12 2 Z" />
+          </svg>
           <span className={styles.lensName}>Convergente (biconvexa)</span>
           <span className={styles.lensDesc}>f &gt; 0 — concentra los rayos paralelos en F&apos;</span>
         </button>
@@ -425,7 +445,9 @@ export default function SimuladorLentesOpticasPage() {
           onClick={() => setTipo('divergente')}
           aria-pressed={tipo === 'divergente'}
         >
-          <span className={styles.lensIcon}>🪞</span>
+          <svg className={styles.lensIcon} viewBox="0 0 24 40" width="24" height="40" aria-hidden="true" focusable="false">
+            <path d="M3 2 H21 C15 12 15 28 21 38 H3 C9 28 9 12 3 2 Z" />
+          </svg>
           <span className={styles.lensName}>Divergente (bicóncava)</span>
           <span className={styles.lensDesc}>f &lt; 0 — los rayos divergen como si vinieran de F</span>
         </button>
@@ -434,7 +456,7 @@ export default function SimuladorLentesOpticasPage() {
       {/* MAIN */}
       <div className={styles.mainContent}>
         <p className={styles.descriptionCard}>
-          La lente tiene distancia focal {fmtSigned(f, 1)} cm. El objeto está a {fmt(sObj, 1)} cm a la
+          La lente tiene distancia focal {fmt(f, 1)} cm. El objeto está a {fmt(sObj, 1)} cm a la
           izquierda. Aplicando 1/s + 1/s&apos; = 1/f obtenemos la posición de la imagen y su tamaño. Los
           tres rayos principales (paralelo, central, por foco) se cruzan exactamente en la imagen — eso
           es lo que verás en el lienzo.
@@ -495,25 +517,26 @@ export default function SimuladorLentesOpticasPage() {
         <div className={styles.canvasWrapper}>
           <canvas ref={canvasRef} className={styles.canvas} role="img" aria-label="Trazado de rayos a través de la lente" />
           <div className={styles.legendRow}>
+            {/* Las manchas toman los mismos tokens `--lienzo-*` que el dibujo (ver el módulo CSS). */}
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: '#48A9A6' }} />
-              Objeto
+              <span className={`${styles.legendDot} ${styles.legendObjeto}`} />
+              Objeto e imagen real
             </span>
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: '#E07A1F' }} />
+              <span className={`${styles.legendDot} ${styles.legendRayo1}`} />
               Rayo 1: paralelo → F&apos;
             </span>
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: '#2E7D32' }} />
+              <span className={`${styles.legendDot} ${styles.legendRayo2}`} />
               Rayo 2: por el centro
             </span>
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: '#0EA5E9' }} />
+              <span className={`${styles.legendDot} ${styles.legendRayo3}`} />
               Rayo 3: por F → paralelo
             </span>
             <span className={styles.legendItem}>
-              <span className={styles.legendDot} style={{ background: '#A82E68' }} />
-              Imagen virtual
+              <span className={`${styles.legendDot} ${styles.legendVirtual}`} />
+              Imagen virtual y focos
             </span>
           </div>
         </div>
@@ -541,7 +564,7 @@ export default function SimuladorLentesOpticasPage() {
               los rótulos «derecha (real)» justo donde no hay nada (hallazgo 961). */}
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Distancia imagen (s&apos;)</span>
-            <span className={styles.resultValue}>{valido ? `${fmtSigned(sImg, 2)} cm` : '—'}</span>
+            <span className={styles.resultValue}>{valido ? `${fmt(sImg, 2)} cm` : '—'}</span>
             <span className={styles.resultRange}>
               {!valido
                 ? 'no se forma imagen'
@@ -552,24 +575,24 @@ export default function SimuladorLentesOpticasPage() {
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Aumento (M = −s&apos;/s)</span>
-            <span className={styles.resultValue}>{valido ? fmtSigned(M, 3) : '—'}</span>
+            <span className={styles.resultValue}>{valido ? fmt(M, 3) : '—'}</span>
             <span className={styles.resultRange}>
               {!valido ? 'sin imagen que medir' : M < 0 ? 'invertida' : 'derecha'}
             </span>
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Altura imagen (h&apos;)</span>
-            <span className={styles.resultValue}>{valido ? `${fmtSigned(hImg, 2)} cm` : '—'}</span>
+            <span className={styles.resultValue}>{valido ? `${fmt(hImg, 2)} cm` : '—'}</span>
             <span className={styles.resultRange}>= M · h</span>
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Distancia focal f</span>
-            <span className={styles.resultValue}>{fmtSigned(f, 2)} cm</span>
+            <span className={styles.resultValue}>{fmt(f, 2)} cm</span>
             <span className={styles.resultRange}>{f > 0 ? 'convergente' : 'divergente'}</span>
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Potencia P = 1/f</span>
-            <span className={styles.resultValue}>{fmtSigned(potenciaDioptrias(f), 2)} D</span>
+            <span className={styles.resultValue}>{fmt(potenciaDioptrias(f), 2)} D</span>
             <span className={styles.resultRange}>dioptrías (f en m)</span>
           </div>
         </div>
@@ -680,22 +703,22 @@ export default function SimuladorLentesOpticasPage() {
           <h3>4 escenarios donde las lentes son la pieza clave</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>👁️</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">👁️</span>
               <strong>El ojo humano</strong>
               <p>El cristalino es una lente convergente. Forma sobre la retina una imagen real, invertida y reducida del mundo. El cerebro la procesa y la &quot;da la vuelta&quot;. Si el cristalino enfoca mal, surgen miopía, hipermetropía y presbicia.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📷</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📷</span>
               <strong>Cámara fotográfica</strong>
               <p>Una lente convergente (o sistema de lentes) forma sobre el sensor una imagen real e invertida del objeto. La distancia s entre lente y objeto y la s&apos; entre lente y sensor están relacionadas por 1/s + 1/s&apos; = 1/f.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🔬</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🔬</span>
               <strong>Microscopio óptico</strong>
               <p>Combina dos lentes: el objetivo (corta f, forma imagen real aumentada) y el ocular (lupa, forma imagen virtual aumentada). Aumento total ≈ M_obj × M_oc; los microscopios ópticos de laboratorio suelen alcanzar hasta ×1000-1500 con objetivos de inmersión.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🔭</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🔭</span>
               <strong>Telescopio refractor</strong>
               <p>Una lente objetivo grande captura luz de un objeto lejano (s ≈ ∞). El ocular amplifica esa imagen. Aumento angular = f_obj / f_oc. Por eso los telescopios tienen objetivos enormes.</p>
             </div>
@@ -785,22 +808,22 @@ export default function SimuladorLentesOpticasPage() {
           <h3>4 buenas prácticas con problemas de lentes</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <strong>Dibuja siempre el esquema</strong>
               <p>Antes de calcular, esboza la lente, el eje óptico, los dos focos, el objeto y el rayo central. Te ahorra errores de signo y te da una expectativa visual del resultado.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚡</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
               <strong>Memoriza los 3 rayos canónicos</strong>
               <p>Paralelo→F&apos;, central sin desviar, F→paralelo. Con esos tres dibujas la imagen sin necesidad de fórmula. Y si la fórmula no coincide con el dibujo, el dibujo suele tener razón.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Recuerda la convención de signos</strong>
-              <p>Hay varias convenciones; en este simulador y en exámenes como la EBAU (Bachillerato en España) o las pruebas de Física de preparatoria y secundaria en Latinoamérica se suele usar: s &gt; 0 a la izquierda, s&apos; &gt; 0 a la derecha (real), f &gt; 0 convergente. Lo importante es ser <em>consistente</em>.</p>
+              <p>Hay varias convenciones. Este simulador usa la de «real es positivo»: s &gt; 0 con el objeto a la izquierda, s&apos; &gt; 0 si la imagen es real (a la derecha) y f &gt; 0 en una convergente. Muchos libros usan en cambio el convenio normalizado (DIN), con la distancia del objeto negativa: 1/s&apos; − 1/s = 1/f&apos;. Los dos dan la misma s&apos;, el mismo aumento y la misma altura de la imagen: mira cuál usa tu libro y sé <em>consistente</em>.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Verifica con dos métodos</strong>
               <p>Calcula con la fórmula 1/s + 1/s&apos; = 1/f, dibuja el trazado de rayos, y comprueba que ambas dan la misma posición e h&apos;. Si difieren, hay un error y vale la pena buscarlo.</p>
             </div>
@@ -810,7 +833,7 @@ export default function SimuladorLentesOpticasPage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes con lentes ópticas</strong>
           </div>
           <ul className={styles.warningList}>
