@@ -196,7 +196,11 @@ export interface ZonaPotencia {
   nombre: string;
   porcentajeFTP: string;
   wattsMin: number;
-  wattsMax: number;
+  /**
+   * null en la Z7 (potencia neuromuscular): Coggan no le pone techo ni porcentaje, son
+   * esfuerzos máximos de pocos segundos (hallazgo 2745).
+   */
+  wattsMax: number | null;
 }
 
 export interface ResultadoPotenciaCiclismo {
@@ -230,12 +234,15 @@ export const FTP_MAX_W = 600;
 /**
  * Techo del cociente W/kg de FTP. Los rangos de peso y FTP por separado no bastan: 30 kg y
  * 600 W caben en los dos y dan «20,00 W/kg · Profesional / Élite», el absurdo que el hallazgo
- * 253 quería evitar (hallazgo 2493). 7,5 W/kg es el extremo superior que la guía de la app da
- * para los grandes escaladores del World Tour (6,0-7,5); por encima no hay veredicto que dar.
+ * 253 quería evitar (hallazgo 2493). Es un techo de PLAUSIBILIDAD de la herramienta, holgado a
+ * propósito, no una cifra de la literatura: por encima no hay veredicto que dar. El 03/10/2026
+ * se retiró de la guía el «6,0-7,5 W/kg de los grandes escaladores» en el que se apoyaba, porque
+ * no tenía fuente (hallazgo 2745). Lo usa también el estimador por fuerzas (hallazgo 2740).
  */
 export const WKG_MAX = 7.5;
 
 /** Rangos que declaran los campos de la VAM (hallazgo 2494): son contrato, no adorno. */
+export const DESNIVEL_MIN_M = 1;
 export const DESNIVEL_MAX_M = 3000;
 export const TIEMPO_MIN_MIN = 1;
 export const TIEMPO_MAX_MIN = 600;
@@ -247,6 +254,13 @@ export const TIEMPO_MAX_MIN = 600;
  */
 export const VAM_MAX_M_H = 2000;
 
+/**
+ * Los siete niveles de entrenamiento por potencia que propuso Andrew Coggan (tabla «Power
+ * Training Levels», TrainingPeaks; también en Allen y Coggan, «Training and Racing with a Power
+ * Meter», VeloPress, 2006). Coggan da la Z6 como «más del 120 %» y deja la Z7 sin porcentaje:
+ * el techo de 150 % de la Z6 es la convención práctica de muchas plataformas para poder dar
+ * vatios, y la página lo dice. La Z7 faltaba hasta el 03/10/2026 (hallazgo 2745).
+ */
 const ZONAS_COGGAN: { zona: string; nombre: string; limite: number }[] = [
   { zona: 'Z1', nombre: 'Recuperación activa', limite: 55 },
   { zona: 'Z2', nombre: 'Resistencia', limite: 75 },
@@ -255,6 +269,8 @@ const ZONAS_COGGAN: { zona: string; nombre: string; limite: number }[] = [
   { zona: 'Z5', nombre: 'VO2max', limite: 120 },
   { zona: 'Z6', nombre: 'Capacidad anaeróbica', limite: 150 },
 ];
+/** Z7 de Coggan: sprints de pocos segundos, sin techo ni porcentaje en el modelo original. */
+const ZONA_NEUROMUSCULAR = { zona: 'Z7', nombre: 'Potencia neuromuscular' };
 
 export function calcularPotenciaCiclismo(
   peso_kg: number,
@@ -295,7 +311,8 @@ export function calcularPotenciaCiclismo(
   if (wattsKg > WKG_MAX) {
     throw new Error(
       `${ftp_w} W con ${peso_kg} kg son ${wattsKg.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} W/kg, ` +
-      `por encima de los 6,0-7,5 W/kg de los mejores escaladores profesionales: revisa el peso y el FTP.`,
+      `por encima del techo de ${WKG_MAX.toLocaleString('es-ES')} W/kg que admite la herramienta, más de lo que se atribuye a los mejores ` +
+      `escaladores profesionales: revisa el peso y el FTP.`,
     );
   }
 
@@ -305,7 +322,7 @@ export function calcularPotenciaCiclismo(
   else if (wattsKg < 2.5) { nivelWattsKg = 'Cicloturista';          descripcionNivel = 'Salidas recreativas regulares'; }
   else if (wattsKg < 3.5) { nivelWattsKg = 'Amateur';               descripcionNivel = 'Entrenamiento estructurado'; }
   else if (wattsKg < 4.5) { nivelWattsKg = 'Amateur competitivo';   descripcionNivel = 'Competición aficionado'; }
-  else if (wattsKg < 5.5) { nivelWattsKg = 'Semi-profesional';      descripcionNivel = 'Nivel élite regional'; }
+  else if (wattsKg < 5.5) { nivelWattsKg = 'Semiprofesional';       descripcionNivel = 'Nivel élite regional'; }
   else                    { nivelWattsKg = 'Profesional / Élite';   descripcionNivel = 'Nivel profesional internacional'; }
 
   let vam: number | null = null;
@@ -317,10 +334,16 @@ export function calcularPotenciaCiclismo(
     // Los rangos de los campos se hacen cumplir aquí, y una VAM que ninguna subida real
     // alcanza no recibe veredicto (hallazgo 2494): antes 5000 m en 0,5 min salían
     // «600.000 m/h · Élite / Profesional».
-    if (desnivel_m > DESNIVEL_MAX_M) {
-      avisoVam = `El desnivel debe estar entre 1 y ${DESNIVEL_MAX_M} m, que es el rango que admite la herramienta.`;
+    // El aviso declaraba «entre 1 y 3000 m» pero solo se exigía > 0: 0,85 m (kilómetros escritos
+    // en el campo de metros) recibía «1 m/h · Principiante» (hallazgo 2741).
+    if (desnivel_m < DESNIVEL_MIN_M || desnivel_m > DESNIVEL_MAX_M) {
+      avisoVam = `El desnivel debe estar entre ${DESNIVEL_MIN_M} y ${DESNIVEL_MAX_M} m, que es el rango que admite la herramienta.`;
     } else if (tiempo_min < TIEMPO_MIN_MIN || tiempo_min > TIEMPO_MAX_MIN) {
       avisoVam = `El tiempo debe estar entre ${TIEMPO_MIN_MIN} y ${TIEMPO_MAX_MIN} minutos, que es el rango que admite la herramienta.`;
+    } else if (vamCalculada < 1) {
+      // 1 m en 600 min son 0,1 m/h: redondeado, «0 m/h · Principiante», un veredicto sobre una
+      // subida que no es tal (caso del hallazgo 2741).
+      avisoVam = `${desnivel_m} m en ${tiempo_min} min no llegan a 1 m/h de VAM: no es una subida que se pueda clasificar. Revisa el desnivel y el tiempo.`;
     } else if (vamCalculada > VAM_MAX_M_H) {
       avisoVam =
         `${desnivel_m} m en ${tiempo_min} min serían ${vamCalculada.toLocaleString('es-ES')} m/h de VAM, más de lo que se ha medido ` +
@@ -332,7 +355,7 @@ export function calcularPotenciaCiclismo(
       else if (vam < 1000) nivelVam = 'Cicloturista';
       else if (vam < 1200) nivelVam = 'Amateur';
       else if (vam < 1400) nivelVam = 'Amateur fuerte';
-      else if (vam < 1600) nivelVam = 'Semi-profesional';
+      else if (vam < 1600) nivelVam = 'Semiprofesional';
       else                 nivelVam = 'Élite / Profesional';
     }
   } else if (pidioVam) {
@@ -367,6 +390,13 @@ export function calcularPotenciaCiclismo(
       wattsMax,
     };
   });
+  zonasPotencia.push({
+    zona: ZONA_NEUROMUSCULAR.zona,
+    nombre: ZONA_NEUROMUSCULAR.nombre,
+    porcentajeFTP: `más de ${ZONAS_COGGAN[ZONAS_COGGAN.length - 1].limite} %`,
+    wattsMin: anterior + 1,
+    wattsMax: null,
+  });
 
   return { wattsKg, nivelWattsKg, descripcionNivel, vam, nivelVam, zonasPotencia, avisoVam };
 }
@@ -399,16 +429,24 @@ export interface ResultadoVatios {
   potenciaSobrante: number;
 }
 
+/*
+ * Fuente del MODELO: Martin, Milliken, Cobb, McFadden y Coggan (1998), «Validation of a
+ * mathematical model for road cycling power», Journal of Applied Biomechanics 14(3), 276-291:
+ * gravedad + rodadura + aire, validado contra potenciómetro (R² = 0,97, error típico 2,7 W).
+ * Los COEFICIENTES de abajo no salen de ese estudio, que midió los de sus propios ciclistas: son
+ * supuestos típicos de carretera, y la página los presenta como tales, sin atribuirlos a nadie
+ * (hallazgo 2744). Si se cambian, cambia también el párrafo de supuestos de la tarjeta.
+ */
 /** Aceleración de la gravedad (m/s²) */
 const G = 9.80665;
-/** Coeficiente de rodadura de un neumático de carretera sobre asfalto en buen estado */
-const CRR = 0.005;
-/** Área frontal por coeficiente aerodinámico, posición sobre las manetas (m²) */
-const CDA = 0.32;
-/** Densidad del aire a nivel del mar y 15 °C (kg/m³) */
+/** Coeficiente de rodadura supuesto: neumático de carretera sobre asfalto en buen estado */
+export const CRR = 0.005;
+/** Área frontal por coeficiente aerodinámico supuesta, posición sobre las manetas (m²) */
+export const CDA = 0.32;
+/** Densidad del aire a nivel del mar y 15 °C (kg/m³), atmósfera estándar ISA */
 const RHO = 1.225;
-/** Rendimiento de la transmisión: parte de la potencia del pedal que llega a la rueda */
-const RENDIMIENTO_TRANSMISION = 0.975;
+/** Rendimiento supuesto de la transmisión: parte de la potencia del pedal que llega a la rueda */
+export const RENDIMIENTO_TRANSMISION = 0.975;
 
 /** Rangos que declaran los campos del estimador en la app (hallazgo 2494). */
 export const MASA_TOTAL_MIN_KG = 30;
@@ -462,6 +500,23 @@ export function calcularVatiosPorFuerzas(p: ParametrosVatios): ResultadoVatios {
   const fAero = 0.5 * RHO * CDA * v * v;
 
   const potencia = ((fGravedad + fRodadura + fAero) * v) / RENDIMIENTO_TRANSMISION;
+
+  /**
+   * Techo de la COMBINACIÓN, el patrón del 2493 en el formulario principal (hallazgo 2740): cada
+   * campo dentro de su rango no basta, y 78 kg a 80 km/h en llano publicaban «Potencia estimada
+   * 2293 W» de una «velocidad media sostenida». Se aplica el mismo techo de 7,5 W/kg, dividido
+   * por la masa TOTAL (ciclista + bici), que es más holgado que dividir por el peso del ciclista:
+   * se rechaza solo lo que ningún ciclista sostiene, no lo que es duro.
+   */
+  if (potencia / p.masaTotal_kg > WKG_MAX) {
+    const fmt = (n: number, d = 0) =>
+      n.toLocaleString('es-ES', { maximumFractionDigits: d });
+    throw new Error(
+      `A ${fmt(p.velocidad_kmh, 1)} km/h con una pendiente del ${fmt(p.pendiente_pct, 1)}\u00A0% harían falta ` +
+      `${fmt(potencia)} W para mover ${fmt(p.masaTotal_kg, 1)} kg, más de ${fmt(WKG_MAX, 1)} W por kilo de masa total: ` +
+      `ninguna velocidad media sostenida exige tanto, ni sirve como FTP. Revisa la velocidad y la pendiente.`,
+    );
+  }
 
   /**
    * Fuera de dominio: en bajada el balance puede dar un número negativo, y la app invita

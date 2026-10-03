@@ -62,11 +62,13 @@ export async function POST(req: NextRequest) {
       w_por_kg: r.wattsKg,
       nivel_w_kg: r.nivelWattsKg,
       descripcion_nivel: r.descripcionNivel,
+      modelo_zonas: 'Niveles de entrenamiento por potencia de Andrew Coggan (Z1-Z7)',
       zonas_potencia: r.zonasPotencia.map(z => ({
         zona: z.zona,
         nombre: z.nombre,
         rango_ftp: z.porcentajeFTP,
         watts_min: z.wattsMin,
+        // null en la Z7 (potencia neuromuscular), que no tiene techo en el modelo de Coggan
         watts_max: z.wattsMax,
       })),
     };

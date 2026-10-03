@@ -13,7 +13,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * del catálogo (cabeceras de tabla, logo sobre el hero) — su bloque va al final del fichero.
  * Quinta: 03/10/2026, verificación de la reparación 18411e51 (2491-2499) tecleando de verdad en
  * los siete campos, en escritorio y en móvil, y del cambio 10b7eb5f del motor (solo SWOLF): su
- * bloque va detrás del de la cuarta.
+ * bloque va detrás del de la cuarta. Sus 9 hallazgos (2738-2746) se REPARARON el mismo 03/10/2026:
+ * quedan como regresión al final de ese bloque, y `contraste()` compone ya los tintes (2742).
  *
  * QUÉ PROMETE
  *   <h1>: «🚴 Calculadora de Vatios en Ciclismo»
@@ -635,29 +636,17 @@ async function teclear(page: Page, selector: string, texto: string, tocar = fals
   await page.keyboard.type(texto);
 }
 
-/** Contraste WCAG del texto de un elemento contra el primer fondo opaco de sus ancestros. */
+/**
+ * Contraste WCAG del texto de un elemento contra el fondo que se VE.
+ *
+ * Hasta el 03/10/2026 buscaba el primer fondo OPACO de los ancestros y se saltaba las capas
+ * semitransparentes: no veía los tintes de `.vamGrid` ni de `.warningBox` en oscuro, y el test
+ * del 2496 aprobó «Errores frecuentes» con un 4,42:1 real (hallazgo 2742, cabo de SOSPECHAS).
+ * Ahora compone: es el mismo cálculo que `contrasteSobreFondoReal`, más abajo, contrastado por
+ * píxel. Las funciones declaradas se elevan, así que puede delegar aunque esté definida después.
+ */
 async function contraste(elemento: Locator): Promise<number> {
-  return elemento.evaluate((el) => {
-    const rgb = (s: string) => (s.match(/[\d.]+/g) ?? []).map(Number);
-    const lum = ([r, g, b]: number[]) => {
-      const f = (c: number) => {
-        const x = c / 255;
-        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
-      };
-      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
-    };
-    let fondo = [255, 255, 255];
-    for (let n: Element | null = el; n; n = n.parentElement) {
-      const c = rgb(getComputedStyle(n).backgroundColor);
-      if (c.length === 3 || (c.length === 4 && c[3] === 1)) {
-        fondo = c;
-        break;
-      }
-    }
-    const a = lum(rgb(getComputedStyle(el).color));
-    const b = lum(fondo);
-    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
-  });
+  return contrasteSobreFondoReal(elemento);
 }
 
 test.describe('Inspector 30/09/2026', () => {
@@ -954,9 +943,10 @@ test.describe('Inspector 30/09/2026', () => {
       await expect(z3).toHaveText('Z3');
       expect(await contraste(z3)).toBeGreaterThanOrEqual(4.5);
       // Las seis zonas, no solo la Z3 del caso
+      // Siete desde el 03/10/2026: la tabla omitía la Z7 de Coggan (hallazgo 2745)
       const zonas = resultados(page).locator('[class*="zonaBadge"]');
-      await expect(zonas).toHaveCount(6);
-      for (let i = 0; i < 6; i++) {
+      await expect(zonas).toHaveCount(7);
+      for (let i = 0; i < 7; i++) {
         expect(await contraste(zonas.nth(i)), `zona Z${i + 1}`).toBeGreaterThanOrEqual(4.5);
       }
     });
@@ -1206,8 +1196,8 @@ async function teclearViendo(page: Page, selector: string, texto: string, tocar 
 
 /**
  * Contraste WCAG del texto contra el fondo que se VE: compone las capas semitransparentes de los
- * ancestros sobre la primera opaca. `contraste()`, más arriba, salta las semitransparentes y mide
- * contra la opaca de debajo, así que no ve tintes como el de `.warningBox` o `.vamGrid` en oscuro.
+ * ancestros sobre la primera opaca. Hasta el 03/10/2026 `contraste()`, más arriba, saltaba las
+ * semitransparentes y no veía tintes como el de `.warningBox` o `.vamGrid` en oscuro; hoy delega aquí.
  * Contrastado por píxel el 03/10/2026: el fondo real de la pista del desnivel en oscuro es
  * rgb(45, 54, 57) y el de «Errores frecuentes», rgb(69, 57, 49), los mismos que da esta suma.
  */
@@ -1437,168 +1427,222 @@ test.describe('Inspector 03/10/2026', () => {
     await page.getByRole('button', { name: /Ver guía educativa/i }).click();
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
-    const pista = page.locator('[class*="inputHint"]', { hasText: 'Hasta 3000 m' });
+    const pista = page.locator('[class*="inputHint"]', { hasText: 'Entre 1 y 3000 m' });
     const errores = page.locator('h3', { hasText: 'Errores Frecuentes' });
     await expect.poll(() => contrasteSobreFondoReal(pista)).toBeGreaterThanOrEqual(4.5);
     await expect.poll(() => contrasteSobreFondoReal(errores)).toBeGreaterThanOrEqual(4.5);
   });
 
-  /* Hallazgos ABIERTOS el 03/10/2026. Van con `test.fail()`: afirman lo que DEBERÍA ocurrir, y
-   * el día que se reparen pasarán y el runner avisará para quitar la marca. */
-  test.describe('Hallazgos del 03/10/2026', () => {
-    test.fail(
-      'ABIERTO, hallazgo (inspector 03/10/2026) · con el plegable de la VAM cerrado, sus campos ocultos siguen contando',
-      async ({ page }) => {
-        // ENTRADA 70 kg · FTP 250 W · abrir «Calcular VAM», desnivel «abc» y tiempo 45, cerrar
-        //         el plegable y pulsar «Calcular potencia»
-        // ESPERADO la VAM ya no se pide: «3,57 W/kg» sin aviso (250 / 70 = 3,5714)
-        // OBTENIDO «El desnivel y el tiempo deben ser números» y ningún resultado, con los dos
-        //          campos ocultos; con 850 m y 45 min escondidos sale «1133 m/h · Amateur»
-        await calcular(page, { peso: '70', ftp: '250' });
-        await abrirVam(page);
-        await teclear(page, '#desnivel', 'abc');
-        await teclear(page, '#tiempoMin', '45');
-        await page.getByRole('button', { name: /Calcular VAM/i }).click();
-        await expect(page.locator('#desnivel')).toHaveCount(0);
-        await page.getByRole('button', { name: /Calcular potencia/i }).click();
-        await expect(page.locator('p[role="alert"]')).toHaveCount(0);
-        await expect(resultados(page)).toContainText('3,57');
-        // Y con datos válidos escondidos tampoco sale una VAM que el usuario plegó
-        await abrirVam(page);
-        await teclear(page, '#desnivel', '850');
-        await page.getByRole('button', { name: /Calcular VAM/i }).click();
-        await page.getByRole('button', { name: /Calcular potencia/i }).click();
-        await expect(resultados(page)).toContainText('3,57');
-        await expect(resultados(page)).not.toContainText('m/h');
-      },
-    );
+  /* Hallazgos del 03/10/2026 (2738-2746), REPARADOS el mismo día. Estuvieron con `test.fail()`
+   * afirmando lo que DEBERÍA ocurrir; se les quitó la marca tras comprobar que lo que afirmaban
+   * era correcto, y se añadieron los controles que faltaban (la otra cara de cada caso). */
+  test.describe('Hallazgos del 03/10/2026 (2738-2746), ya reparados', () => {
+    test('2739 · con el plegable de la VAM cerrado, sus campos ocultos no cuentan', async ({ page }) => {
+      // REPARADO: calcular() solo lee desnivel y tiempo con el plegable abierto; lo escrito se
+      // conserva para cuando se vuelva a abrir.
+      // ENTRADA 70 kg · FTP 250 W · abrir «Calcular VAM», desnivel «abc» y tiempo 45, cerrar
+      //         el plegable y pulsar «Calcular potencia»
+      // ESPERADO la VAM ya no se pide: «3,57 W/kg» sin aviso (250 / 70 = 3,5714)
+      // OBTENIDO «El desnivel y el tiempo deben ser números» y ningún resultado, con los dos
+      //          campos ocultos; con 850 m y 45 min escondidos sale «1133 m/h · Amateur»
+      await calcular(page, { peso: '70', ftp: '250' });
+      await abrirVam(page);
+      await teclear(page, '#desnivel', 'abc');
+      await teclear(page, '#tiempoMin', '45');
+      await page.getByRole('button', { name: /Calcular VAM/i }).click();
+      await expect(page.locator('#desnivel')).toHaveCount(0);
+      await page.getByRole('button', { name: /Calcular potencia/i }).click();
+      await expect(page.locator('p[role="alert"]')).toHaveCount(0);
+      await expect(resultados(page)).toContainText('3,57');
+      // Y con datos válidos escondidos tampoco sale una VAM que el usuario plegó
+      await abrirVam(page);
+      await teclear(page, '#desnivel', '850');
+      await page.getByRole('button', { name: /Calcular VAM/i }).click();
+      await page.getByRole('button', { name: /Calcular potencia/i }).click();
+      await expect(resultados(page)).toContainText('3,57');
+      await expect(resultados(page)).not.toContainText('m/h');
+      // Control: al reabrir, lo escrito sigue ahí y vuelve a contar: 850 · 60 / 45 = 1133,3
+      await abrirVam(page);
+      await expect(page.locator('#desnivel')).toHaveValue('850');
+      await page.getByRole('button', { name: /Calcular potencia/i }).click();
+      await expect(resultados(page)).toContainText('1133 m/h');
+    });
 
-    test.fail(
-      'ABIERTO, hallazgo (inspector 03/10/2026) · el estimador publica potencias que ningún ciclista sostiene',
-      async ({ page }) => {
-        // La reparación del 2494 hizo cumplir el rango de CADA campo, pero no la combinación (el
-        // patrón del 2493 en el formulario principal, que sí tiene techo de 7,5 W/kg).
-        // ENTRADA 78 kg · 80 km/h · 0 %, todo dentro de lo admitido
-        // ESPERADO un aviso: a mano, (3,8246 + 96,7901) N · 22,2222 m/s / 0,975 = 2293 W de
-        //          «velocidad media sostenida», cuando la misma página rechaza un FTP de más de 600 W
-        // OBTENIDO «Potencia estimada 2293 W», y con 200 kg · 80 km/h · 25 %, «13.265 W» y
-        //          «19.403 m/h de VAM», sin una palabra
-        const tarjeta = await abrirEstimador(page);
-        await estimar(page, { masa: '78', velocidad: '80', pendiente: '0' });
-        await expect(page.locator('p[role="alert"]')).toBeVisible();
-        await expect(tarjeta).toHaveCount(0);
-        await estimar(page, { masa: '200', velocidad: '80', pendiente: '25' });
-        await expect(page.locator('p[role="alert"]')).toBeVisible();
-        await expect(tarjeta).toHaveCount(0);
-      },
-    );
+    test('2740 · el estimador no publica potencias que ningún ciclista sostiene', async ({ page }) => {
+      // REPARADO con el techo del 2493 (7,5 W/kg) aplicado a la masa TOTAL, que es más holgado
+      // que dividir por el peso del ciclista.
+      // ENTRADA 78 kg · 80 km/h · 0 %, todo dentro de lo admitido
+      // ESPERADO un aviso: a mano, (3,8246 + 96,7901) N · 22,2222 m/s / 0,975 = 2293 W de
+      //          «velocidad media sostenida», 29,4 W/kg de masa total
+      // OBTENIDO «Potencia estimada 2293 W», y con 200 kg · 80 km/h · 25 %, «13.265 W» y
+      //          «19.403 m/h de VAM», sin una palabra
+      const tarjeta = await abrirEstimador(page);
+      const aviso = page.locator('p[role="alert"]');
+      await estimar(page, { masa: '78', velocidad: '80', pendiente: '0' });
+      await expect(aviso).toContainText('2293 W');
+      await expect(aviso).toContainText('ni sirve como FTP');
+      await expect(tarjeta).toHaveCount(0);
+      await estimar(page, { masa: '200', velocidad: '80', pendiente: '25' });
+      await expect(aviso).toBeVisible();
+      await expect(tarjeta).toHaveCount(0);
+      // Un caso que PARECE razonable: 80 kg a 24,6 km/h por una rampa del 10 % son 638,6 W,
+      // 7,98 W/kg de masa total → aviso
+      await estimar(page, { masa: '80', velocidad: '24,6', pendiente: '10' });
+      await expect(aviso).toContainText('639 W');
+      await expect(tarjeta).toHaveCount(0);
+      // Control por debajo del techo, pero por encima del FTP máximo del formulario (600 W):
+      // 100 kg · 10 km/h · 25 % = 695,49 W (6,95 W/kg). Se estima, pero NO invita a usarla como FTP.
+      await estimar(page, { masa: '100', velocidad: '10', pendiente: '25' });
+      await expect(aviso).toHaveCount(0);
+      await expect(tarjeta).toContainText('695 W');
+      await expect(tarjeta).toContainText('No la uses como FTP');
+      await expect(tarjeta).not.toContainText('puedes escribirla como FTP');
+      // Y en lo normal sigue invitando: 78 kg · 30 km/h · 0 % = 149 W
+      await estimar(page, { masa: '78', velocidad: '30', pendiente: '0' });
+      await expect(tarjeta).toContainText('puedes escribirla como FTP');
+    });
 
-    test.fail(
-      'ABIERTO, hallazgo (inspector 03/10/2026) · el mínimo de 1 m que declara el aviso del desnivel no se cumple',
-      async ({ page }) => {
-        // El aviso del motor dice «El desnivel debe estar entre 1 y 3000 m», pero solo exige > 0.
-        // ENTRADA 70 kg · FTP 250 W · desnivel «0,85» (kilómetros escritos en el campo de metros)
-        //         · 45 min
-        // ESPERADO el aviso del rango · OBTENIDO 0,85 · 60 / 45 = 1,13 → «1 m/h · Principiante»
-        await abrirVam(page);
-        await calcular(page, { peso: '70', ftp: '250', desnivel: '0,85', tiempo: '45' });
-        await expect(resultados(page)).toContainText('entre 1 y 3000 m');
-      },
-    );
+    test('2741 · el desnivel cumple el mínimo de 1 m que declara su aviso', async ({ page }) => {
+      // REPARADO en el motor (DESNIVEL_MIN_M), y la pista del campo dice ya «Entre 1 y 3000 m».
+      // ENTRADA 70 kg · FTP 250 W · desnivel «0,85» (kilómetros escritos en el campo de metros)
+      //         · 45 min
+      // ESPERADO el aviso del rango · OBTENIDO 0,85 · 60 / 45 = 1,13 → «1 m/h · Principiante»
+      await abrirVam(page);
+      await calcular(page, { peso: '70', ftp: '250', desnivel: '0,85', tiempo: '45' });
+      await expect(resultados(page)).toContainText('entre 1 y 3000 m');
+      await expect(resultados(page)).not.toContainText('m/h');
+      // El otro caso del acta: 1 m en 600 min son 0,1 m/h, que redondeaba a «0 m/h · Principiante»
+      await calcular(page, { desnivel: '1', tiempo: '600' });
+      await expect(resultados(page)).toContainText('no llegan a 1 m/h');
+      await expect(resultados(page)).not.toContainText('0 m/h');
+      // Control en el borde: 1 m en 1 min son 60 m/h, se clasifica «Principiante»
+      await calcular(page, { desnivel: '1', tiempo: '1' });
+      await expect(resultados(page)).toContainText('60 m/h');
+    });
 
-    test.fail(
-      'ABIERTO, hallazgo (inspector 03/10/2026) · en una bajada suave el reparto rotula «-153 W contra la gravedad»',
-      async ({ page }) => {
-        // El 252 retiró la potencia negativa del total, pero el reparto sigue publicando la
-        // componente negativa como «esfuerzo»: en esa bajada la gravedad APORTA 153 W.
-        // ENTRADA 78 kg · 35 km/h · −2 %
-        // ESPERADO a mano P = (−15,2953 + 3,8238 + 18,5262) N · 9,72222 / 0,975 = 70,35 → «70 W», con
-        //          la gravedad descrita como ayuda (153 W a favor)
-        // OBTENIDO «Reparto del esfuerzo: -153 W contra la gravedad · 38 W de rodadura · 185 W
-        //          contra el aire»
-        const tarjeta = await abrirEstimador(page);
-        await estimar(page, { masa: '78', velocidad: '35', pendiente: '-2' });
-        await esperarValorEnReact(page, '#pendiente', '-2');
-        await expect(tarjeta).toContainText('Potencia estimada');
-        await expect(tarjeta).toContainText('70 W');
-        expect(await tarjeta.innerText()).not.toMatch(/-\d+ W contra la gravedad/);
-      },
-    );
+    test('2743 · en una bajada suave con pedaleo, la gravedad se describe como ayuda', async ({ page }) => {
+      // REPARADO: con gravedad negativa y potencia positiva, el reparto dice cuánto APORTA.
+      // ENTRADA 78 kg · 35 km/h · −2 %
+      // ESPERADO a mano P = (−15,2953 + 3,8238 + 18,5262) N · 9,72222 / 0,975 = 70,35 → «70 W», con
+      //          la gravedad descrita como ayuda (152,52 W → «153 W» a favor)
+      // OBTENIDO «Reparto del esfuerzo: -153 W contra la gravedad · 38 W de rodadura · 185 W
+      //          contra el aire»
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', velocidad: '35', pendiente: '-2' });
+      await esperarValorEnReact(page, '#pendiente', '-2');
+      await expect(tarjeta).toContainText('Potencia estimada');
+      await expect(tarjeta).toContainText('70 W');
+      const texto = await tarjeta.innerText();
+      expect(texto).not.toMatch(/-\d+ W/);
+      expect(texto).not.toContain('contra la gravedad');
+      expect(texto).toContain('la gravedad aporta 153 W a favor');
+      // 38 de rodadura + 185 de aire − 153 de ayuda = 70: el reparto cuadra con el total
+      expect(texto).toContain('38 W de rodadura');
+      expect(texto).toContain('185 W contra el aire');
+    });
 
-    test.fail(
-      'ABIERTO, hallazgo (inspector 03/10/2026) · la tarjeta del estimador no cita fuente de Crr y CdA ni declara la transmisión',
-      async ({ page }) => {
-        // ENTRADA estimador 78 kg · 20 km/h · 0 %
-        // ESPERADO los supuestos con su fuente, y los cuatro: también el rendimiento de la
-        //          transmisión (η 0,975, un 2,5 % de pérdida que el cálculo aplica)
-        // OBTENIDO «supone asfalto en buen estado (Crr 0,005), posición sobre las manetas
-        //          (CdA 0,32 m²) y aire a nivel del mar», sin fuente ni transmisión
-        const tarjeta = await abrirEstimador(page);
-        await estimar(page, { masa: '78', velocidad: '20', pendiente: '0' });
-        // La tarjeta entera, no un párrafo concreto: si la reparación reescribe la frase, un
-        // localizador fijo daría error y el test.fail seguiría «fallando como se espera».
-        await expect(tarjeta).toContainText('56 W');
-        const supuestos = await tarjeta.innerText();
-        expect(supuestos).toContain('Crr 0,005');
-        expect(supuestos).toMatch(/transmisi/i);
-        // Una fuente lleva su año; es la única forma de comprobarla sin fijar cuál
-        expect(supuestos).toMatch(/\b(19|20)\d{2}\b/);
-      },
-    );
+    test('2744 · la tarjeta del estimador declara los cuatro supuestos y la fuente del modelo', async ({
+      page,
+    }) => {
+      // REPARADO: cita el modelo (Martin et al., 1998, J Appl Biomech, validado contra
+      // potenciómetro) y presenta Crr y CdA como supuestos típicos, sin atribuírselos a ese
+      // estudio, que midió los de sus propios ciclistas. Declara la transmisión.
+      // ENTRADA estimador 78 kg · 20 km/h · 0 %
+      // ESPERADO los supuestos completos y con fuente · OBTENIDO sin fuente ni transmisión. La
+      //          cifra (56 W; a mano 56,26 W) solo cuadra contando η: sin él serían 54,86 W.
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', velocidad: '20', pendiente: '0' });
+      await expect(tarjeta).toContainText('56 W');
+      const supuestos = await tarjeta.innerText();
+      expect(supuestos).toContain('Crr 0,005');
+      expect(supuestos).toContain('CdA 0,32 m²');
+      expect(supuestos).toMatch(/transmisión que pierde el 2,5 %/);
+      expect(supuestos).toContain('rendimiento 0,975');
+      expect(supuestos).toContain('Martin y colaboradores (1998');
+      expect(supuestos).toContain('supuestos típicos');
+    });
 
-    test.fail(
-      'ABIERTO, hallazgo (inspector 03/10/2026) · las zonas no nombran el modelo de Coggan y las escalas no citan fuente',
-      async ({ page }) => {
-        // ENTRADA 70 kg · FTP 250 W y abrir la guía
-        // ESPERADO las zonas atribuidas a su autor (Coggan: el motor lo dice en un comentario) y
-        //          las escalas de W/kg y VAM con su fuente
-        // OBTENIDO «Zonas de Potencia (basadas en tu FTP: 250 W)» y tablas sin fuente ni autor
-        await calcular(page, { peso: '70', ftp: '250' });
-        await page.getByRole('button', { name: /Ver guía educativa/i }).click();
-        const texto = await page.locator('main').innerText();
-        expect(texto).toContain('Coggan');
-      },
-    );
+    test('2745 · las zonas son las de Coggan, completas hasta la Z7, y las escalas dicen que son orientativas', async ({
+      page,
+    }) => {
+      // REPARADO: título y nota de la tabla nombran a Coggan y el porqué del corte en 150 %
+      // (Coggan da la Z6 como «más del 120 %» y la Z7 sin porcentaje: tabla «Power Training
+      // Levels» de TrainingPeaks). Las escalas de W/kg y VAM, sin fuente que las respalde, se
+      // rotulan como orientativas; las cifras de entrenamiento, atribuidas o retiradas.
+      // ENTRADA 70 kg · FTP 250 W y abrir la guía
+      await calcular(page, { peso: '70', ftp: '250' });
+      await expect(resultados(page).locator('h3')).toContainText('Coggan');
+      // Z7: empieza en el siguiente vatio de la Z6 (round(250 · 1,5) = 375 → «desde 376 W»)
+      const z7 = resultados(page).locator('tbody tr').nth(6);
+      await expect(z7).toContainText('Z7');
+      await expect(z7).toContainText('Potencia neuromuscular');
+      await expect(z7).toContainText('más de 150 %');
+      await expect(z7).toContainText('desde 376 W');
+      await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+      const texto = await page.locator('main').innerText();
+      expect(texto).toContain('Escala orientativa de esta calculadora, sin fuente oficial');
+      expect(texto).toContain('Es una escala orientativa de esta calculadora, sin fuente oficial');
+      expect(texto).not.toContain('6,0–7,5 W/kg');
+      expect(texto).toContain('Seiler y Kjerland (2006)');
+      expect(texto).not.toContain('(70–80 %) debería realizarse en Z2');
+      expect(texto).toContain('Hunter Allen y Andrew Coggan');
+      expect(texto).not.toMatch(/10–20 % en los primeros meses/);
+      // La sospecha de SOSPECHAS.md: Ferrari es médico, no fisiólogo (Wikipedia; USADA, 2012)
+      expect(texto).not.toContain('fisiólogo');
+      expect(texto).toContain('médico italiano Michele Ferrari');
+      // Y el FAQPage, lo que leen los buscadores y las IA
+      const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+      const faq = bloques.find((b) => b.includes('"FAQPage"'))!;
+      expect(faq).toContain('Coggan (Z1 a Z7)');
+      expect(faq).not.toContain('6,0-7,5');
+    });
 
-    test.fail(
-      'ABIERTO, hallazgo (inspector 03/10/2026) · «Semi-profesional» con guion y «el VAM» frente a «la VAM»',
-      async ({ page }) => {
-        // ENTRADA 70 kg · FTP 350 W → 5,00 W/kg, en [4,5; 5,5)
-        // ESPERADO «Semiprofesional» (prefijo unido a la base, como ya escribe el FAQ) y «la VAM»
-        //          (velocidad), como dicen el FAQ y los avisos del motor
-        // OBTENIDO la insignia «Semi-profesional» y, en la guía, «¿Qué es el VAM?» y «El VAM varía»
-        await calcular(page, { peso: '70', ftp: '350' });
-        await expect(resultados(page)).toContainText('5,00');
-        await page.getByRole('button', { name: /Ver guía educativa/i }).click();
-        const texto = await page.locator('main').innerText();
-        expect(texto).not.toMatch(/[Ss]emi-profesional/);
-        expect(texto).not.toMatch(/\b[Ee]l VAM\b/);
-      },
-    );
+    test('2746 · «Semiprofesional» sin guion y «la VAM», en la insignia, la escala de VAM y la guía', async ({
+      page,
+    }) => {
+      // ENTRADA 70 kg · FTP 350 W → 5,00 W/kg, en [4,5; 5,5)
+      // ESPERADO «Semiprofesional» (prefijo unido a la base, como ya escribe el FAQ) y «la VAM»
+      //          (velocidad), como dicen el FAQ y los avisos del motor
+      // OBTENIDO la insignia «Semi-profesional» y, en la guía, «¿Qué es el VAM?» y «El VAM varía»
+      await calcular(page, { peso: '70', ftp: '350' });
+      await expect(resultados(page)).toContainText('5,00');
+      await expect(resultados(page).locator('[class*="nivelBadge"]')).toHaveText('Semiprofesional');
+      // La escala de VAM, que es la otra salida del motor: 1000 m en 40 min = 1500 m/h
+      await abrirVam(page);
+      await calcular(page, { desnivel: '1000', tiempo: '40' });
+      await expect(resultados(page)).toContainText('1500 m/h');
+      await expect(resultados(page)).toContainText('Semiprofesional');
+      await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+      const texto = await page.locator('main').innerText();
+      expect(texto).not.toMatch(/[Ss]emi-profesional/);
+      expect(texto).not.toMatch(/\b[Ee]l VAM\b/);
+      expect(texto).toContain('¿Qué es la VAM?');
+    });
 
-    test.fail(
-      'ABIERTO, hallazgo (inspector 03/10/2026) · en oscuro, las pistas del plegable y «Errores frecuentes» no llegan a 4,5:1',
-      async ({ page }) => {
-        // Texto pequeño sobre un tinte semitransparente: la pista (12 px, --text-muted #9B9B9B)
-        // sobre el .vamGrid oscuro y el h3 (15,2 px en negrita, #E09060) sobre el .warningBox
-        // oscuro. El 2496 midió con `contraste()`, que salta los tintes.
-        // ENTRADA tema oscuro, plegable de la VAM y guía abiertos
-        // ESPERADO ≥ 4,5:1 · OBTENIDO 4,45:1 la pista «Hasta 3000 m» (y las del estimador) y
-        //          4,42:1 «Errores Frecuentes…», medidos por píxel
-        await abrirVam(page);
-        await page.getByRole('button', { name: /Ver guía educativa/i }).click();
-        await page.emulateMedia({ reducedMotion: 'reduce' });
-        await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
-        const pista = page.locator('[class*="inputHint"]', { hasText: 'Hasta 3000 m' });
-        const errores = page.locator('h3', { hasText: 'Errores Frecuentes' });
+    test('2742 · en oscuro, las pistas de los plegables y «Errores frecuentes» llegan a 4,5:1', async ({
+      page,
+    }) => {
+      // REPARADO con colores propios en oscuro (#A8A8A8 las pistas sobre el tinte del plegable,
+      // #EBA374 el h3 sobre el del aviso), medidos contra el fondo COMPUESTO.
+      // ENTRADA tema oscuro, plegable de la VAM, estimador y guía abiertos
+      // ESPERADO ≥ 4,5:1 · OBTENIDO 4,45:1 la pista «Hasta 3000 m» (y las del estimador) y
+      //          4,42:1 «Errores Frecuentes…», medidos por píxel
+      await abrirVam(page);
+      await abrirEstimador(page);
+      await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+      const pistas = page.locator('[class*="vamGrid"] [class*="inputHint"]');
+      // Dos del plegable de la VAM y tres del estimador
+      await expect(pistas).toHaveCount(5);
+      for (let i = 0; i < 5; i++) {
         await expect
-          .poll(() => contrasteSobreFondoReal(pista), { timeout: 3000 })
+          .poll(() => contrasteSobreFondoReal(pistas.nth(i)), { message: `pista ${i + 1}` })
           .toBeGreaterThanOrEqual(4.5);
-        await expect
-          .poll(() => contrasteSobreFondoReal(errores), { timeout: 3000 })
-          .toBeGreaterThanOrEqual(4.5);
-      },
-    );
+      }
+      const errores = page.locator('h3', { hasText: 'Errores Frecuentes' });
+      await expect.poll(() => contrasteSobreFondoReal(errores)).toBeGreaterThanOrEqual(4.5);
+    });
   });
 
   test.describe('Móvil 412×839 (Pixel 7) — tecleando con toque', () => {
@@ -1649,51 +1693,105 @@ test.describe('Inspector 03/10/2026', () => {
       await expect(resultados(page)).toContainText('302 – 376 W');
     });
 
-    test.fail(
-      'ABIERTO, hallazgo (inspector 03/10/2026) · con el estimador abierto, el aviso del formulario principal cae fuera de la pantalla',
-      async ({ page }) => {
-        // El aviso es único y se pinta DETRÁS del panel del estimador: con el panel abierto queda
-        // muy por debajo del botón «Calcular potencia», y al pulsarlo no cambia nada a la vista.
-        // ENTRADA abrir el estimador, vaciar el peso y tocar «Calcular potencia»
-        // ESPERADO el aviso «El peso debe ser un número mayor que 0 kg.» a la vista
-        // OBTENIDO el aviso a 1045 px de la parte superior de una pantalla de 839 (1830 px si la
-        //          tarjeta del estimador está abierta); medido el 03/10/2026
-        await page.getByRole('button', { name: /Estima tus vatios/i }).tap();
-        await expect(page.locator('#masaTotal')).toBeVisible();
-        await page.fill('#peso', '');
-        await esperarValorEnReact(page, '#peso', '');
-        await page.getByRole('button', { name: /Calcular potencia/i }).tap();
-        const aviso = page.locator('p[role="alert"]');
-        await expect(aviso).toContainText('El peso debe ser un número mayor que 0 kg.');
-        await expect(aviso).toBeInViewport();
-      },
-    );
+    test('2738 · con el estimador abierto, el aviso del formulario principal queda a la vista', async ({
+      page,
+    }) => {
+      // REPARADO: el aviso y los resultados de «Calcular potencia» van justo detrás de su panel
+      // (antes, detrás del estimador) y se llevan a la vista con scroll-margin para la barra
+      // del logo y la píldora del Footer.
+      // ENTRADA abrir el estimador, vaciar el peso y tocar «Calcular potencia»
+      // ESPERADO el aviso «El peso debe ser un número mayor que 0 kg.» a la vista
+      // OBTENIDO el aviso a 1045 px de la parte superior de una pantalla de 839 (1830 px si la
+      //          tarjeta del estimador está abierta); medido el 03/10/2026
+      await page.getByRole('button', { name: /Estima tus vatios/i }).tap();
+      await expect(page.locator('#masaTotal')).toBeVisible();
+      await page.fill('#peso', '');
+      await esperarValorEnReact(page, '#peso', '');
+      await page.getByRole('button', { name: /Calcular potencia/i }).tap();
+      const aviso = page.locator('p[role="alert"]');
+      await expect(aviso).toContainText('El peso debe ser un número mayor que 0 kg.');
+      await expect(aviso).toBeInViewport({ ratio: 1 });
+      await expect.poll(() => entreBarras(page, aviso)).toBe(true);
+    });
 
-    test.fail(
-      'ABIERTO, hallazgo (inspector 03/10/2026) · en el flujo que propone la tarjeta, el W/kg aparece fuera de la pantalla',
-      async ({ page }) => {
-        // Mismo hallazgo que el anterior, en el camino BUENO: la tarjeta del estimador invita a
-        // «escribirla como FTP arriba», y los resultados del formulario principal también se
-        // pintan detrás del panel del estimador.
-        // ENTRADA estimar 78 kg · 15 km/h · 7 % (259 W), escribir 259 como FTP con 70 kg y tocar
-        //         «Calcular potencia»
-        // ESPERADO «3,70 W/kg» a la vista (259 / 70 = 3,70)
-        // OBTENIDO los resultados empiezan a 1372 px en una pantalla de 839; medido el 03/10/2026
-        const tarjeta = await abrirEstimador(page);
-        await page.fill('#masaTotal', '78');
-        await esperarValorEnReact(page, '#masaTotal', '78');
-        await page.fill('#velocidad', '15');
-        await esperarValorEnReact(page, '#velocidad', '15');
-        await page.fill('#pendiente', '7');
-        await esperarValorEnReact(page, '#pendiente', '7');
-        await page.getByRole('button', { name: /Estimar vatios/i }).tap();
-        await expect(tarjeta).toContainText('259 W');
-        await page.fill('#ftp', '259');
-        await esperarValorEnReact(page, '#ftp', '259');
-        await page.getByRole('button', { name: /Calcular potencia/i }).tap();
-        await expect(resultados(page)).toContainText('3,70');
-        await expect(resultados(page)).toBeInViewport();
-      },
-    );
+    test('2738 · en el flujo que propone la tarjeta, el W/kg aparece a la vista', async ({ page }) => {
+      // Mismo hallazgo en el camino BUENO: la tarjeta invita a «escribirla como FTP arriba».
+      // ENTRADA estimar 78 kg · 15 km/h · 7 % (259 W), escribir 259 como FTP con 70 kg y tocar
+      //         «Calcular potencia»
+      // ESPERADO «3,70 W/kg» a la vista (259 / 70 = 3,70)
+      // OBTENIDO los resultados empiezan a 1372 px en una pantalla de 839; medido el 03/10/2026
+      await flujoEstimadorAFtp(page, true);
+    });
+  });
+
+  test.describe('Escritorio 1280×900', () => {
+    test.use({ viewport: { width: 1280, height: 900 } });
+
+    test('2738 · en escritorio, el W/kg del flujo del estimador aparece a la vista', async ({ page }) => {
+      // OBTENIDO antes: los resultados a 1119 px en una pantalla de 900
+      await flujoEstimadorAFtp(page, false);
+    });
+
+    test('2738 · el aviso de un estimador inválido sale junto a su botón, y a la vista', async ({ page }) => {
+      // Cada formulario tiene su aviso: el del estimador va dentro de su panel
+      const tarjeta = await abrirEstimador(page);
+      await estimar(page, { masa: '78', velocidad: '', pendiente: '5' });
+      await expect(tarjeta).toHaveCount(0);
+      const aviso = page.locator('p[role="alert"]');
+      await expect(aviso).toHaveCount(1);
+      await expect(aviso).toContainText('La velocidad debe ser un número mayor que 0 km/h.');
+      await expect.poll(() => entreBarras(page, aviso)).toBe(true);
+    });
   });
 });
+
+/**
+ * ¿Está el elemento entero entre la barra fija del logo y la píldora fija del Footer? Es lo que
+ * el hallazgo 2738 llama «a la vista»: `toBeInViewport()` aprobaría un aviso tapado por ellas.
+ */
+async function entreBarras(page: Page, el: Locator): Promise<boolean> {
+  const caja = await el.boundingBox();
+  if (!caja) return false;
+  const { techo, suelo } = await page.evaluate(() => {
+    // La barra del logo (MeskeiaLogo, `.headerBar`) y la píldora del Footer (el propio <footer>)
+    const logo = document.querySelector('[class*="headerBar"]');
+    const pildora = [...document.querySelectorAll('footer')].find(
+      (n) => getComputedStyle(n).position === 'fixed',
+    );
+    return {
+      techo: logo ? logo.getBoundingClientRect().bottom : 0,
+      suelo: pildora ? pildora.getBoundingClientRect().top : window.innerHeight,
+    };
+  });
+  return caja.y >= techo && caja.y + caja.height <= suelo;
+}
+
+/** Estima 78 kg · 15 km/h · 7 % (259 W), lo escribe como FTP con 70 kg y calcula: 3,70 W/kg. */
+async function flujoEstimadorAFtp(page: Page, movil: boolean): Promise<void> {
+  const tarjeta = await abrirEstimador(page);
+  for (const [sel, val] of [
+    ['#masaTotal', '78'],
+    ['#velocidad', '15'],
+    ['#pendiente', '7'],
+  ] as const) {
+    await page.fill(sel, val);
+    await esperarValorEnReact(page, sel, val);
+  }
+  const estimarBtn = page.getByRole('button', { name: /Estimar vatios/i });
+  if (movil) await estimarBtn.tap();
+  else await estimarBtn.click();
+  // (53,4136 + 3,8153 + 3,4028) N · 4,16667 m/s / 0,975 = 259,11 W
+  await expect(tarjeta).toContainText('259 W');
+  await page.fill('#peso', '70');
+  await esperarValorEnReact(page, '#peso', '70');
+  await page.fill('#ftp', '259');
+  await esperarValorEnReact(page, '#ftp', '259');
+  const calcularBtn = page.getByRole('button', { name: /Calcular potencia/i });
+  if (movil) await calcularBtn.tap();
+  else await calcularBtn.click();
+  await expect(resultados(page)).toContainText('3,70');
+  // La cifra del W/kg, entera y sin tapar por las barras fijas
+  const cifra = resultados(page).locator('[class*="resultValor"]').first();
+  await expect(cifra).toBeInViewport({ ratio: 1 });
+  await expect.poll(() => entreBarras(page, cifra)).toBe(true);
+}

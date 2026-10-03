@@ -1621,7 +1621,7 @@ function crearServidorMCP(): McpServer {
   // ------------------------------------------------------------------
   servidor.tool(
     'calcular_potencia_ciclismo',
-    'Analiza el rendimiento en ciclismo: ratio W/kg con nivel, 6 zonas de entrenamiento basadas en FTP ' +
+    'Analiza el rendimiento en ciclismo: ratio W/kg con nivel, las 7 zonas de entrenamiento de Coggan basadas en FTP ' +
     'y opcionalmente VAM (velocidad ascensional media) para subidas cronometradas.',
     {
       peso_kg: z.number().positive()
@@ -1659,9 +1659,12 @@ function crearServidorMCP(): McpServer {
         lineas.push(`🏔️ VAM sin calcular: ${r.avisoVam}`);
       }
 
-      lineas.push(``, `📊 **Zonas de entrenamiento (basadas en FTP ${ftp_w} W):**`);
+      // La Z7 (potencia neuromuscular) no tiene techo en el modelo de Coggan: wattsMax es null
+      // (hallazgo 2745, 03/10/2026).
+      lineas.push(``, `📊 **Zonas de entrenamiento de Coggan (basadas en FTP ${ftp_w} W):**`);
       r.zonasPotencia.forEach(z => {
-        lineas.push(`   ${z.zona} ${z.nombre}: ${z.wattsMin}–${z.wattsMax} W (${z.porcentajeFTP})`);
+        const rango = z.wattsMax === null ? `desde ${z.wattsMin} W` : `${z.wattsMin}–${z.wattsMax} W`;
+        lineas.push(`   ${z.zona} ${z.nombre}: ${rango} (${z.porcentajeFTP})`);
       });
 
       return { content: [{ type: 'text', text: lineas.join('\n') }] };

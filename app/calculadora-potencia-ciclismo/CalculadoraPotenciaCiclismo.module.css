@@ -141,6 +141,19 @@
 .btnCalcular:hover { opacity: 0.88; }
 .btnCalcular:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
+/* ── Lo que produce cada botón (aviso o resultados) ──
+   Se lleva a la vista al pulsar (hallazgo 2738). El margen deja sitio a la barra fija del logo
+   arriba (~52 px en móvil, ~77 px en escritorio) y a la píldora fija del Footer abajo (~50 px
+   a 10 px del borde): sin él, scrollIntoView dejaba el principio o el final debajo de ellas. */
+.salida {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  scroll-margin-top: 96px;
+  scroll-margin-bottom: 80px;
+}
+.salida .avisoError { margin: 0; }
+
 /* ── Resultados ── */
 .resultados {
   display: flex;
@@ -480,7 +493,12 @@
 [data-theme='dark'] .comparativaTable tbody tr:hover { background: rgba(46,134,171,0.08); }
 [data-theme='dark'] .faqTip { background: rgba(46,134,171,0.15); }
 [data-theme='dark'] .warningBox { background: rgba(224,123,57,0.12); border-color: rgba(224,123,57,0.25); }
-[data-theme='dark'] .warningHeader h3 { color: #e09060; }
+/* #e09060 daba 4,42:1 sobre el tinte oscuro del aviso, compuesto sobre la tarjeta (fondo real
+   rgb(69,57,49), medido por píxel); este da 5,32:1 (hallazgo 2742). */
+[data-theme='dark'] .warningHeader h3 { color: #EBA374; }
+/* Las pistas de los campos (--text-muted #9B9B9B) daban 4,45:1 sobre el tinte del plegable
+   (rgb(45,54,57) real); #A8A8A8 da 5,20:1 (hallazgo 2742). */
+[data-theme='dark'] .vamGrid .inputHint { color: #A8A8A8; }
 /* Sobre la tarjeta oscura (#2D2D2D), todos por encima de 4,9:1 */
 [data-theme='dark'] .nivelTxtPrincipiante { color: #B0B0B0; } /* 6,35:1 */
 [data-theme='dark'] .nivelTxtCicloturista { color: #5FD08F; } /* 7,15:1 */

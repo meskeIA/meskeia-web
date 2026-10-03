@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './CalculadoraPotenciaCiclismo.module.css';
 import {
   MeskeiaLogo,
@@ -16,6 +16,10 @@ import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularPotenciaCiclismo,
   calcularVatiosPorFuerzas,
+  CDA,
+  CRR,
+  FTP_MAX_W,
+  RENDIMIENTO_TRANSMISION,
   type ResultadoPotenciaCiclismo,
   type ResultadoVatios,
 } from '@/lib/calculadoras/deporte';
@@ -27,7 +31,7 @@ const NIVEL_CLASE: Record<string, string> = {
   'Cicloturista':          styles.nivelCicloturista,
   'Amateur':               styles.nivelAmateur,
   'Amateur competitivo':   styles.nivelAmateur,
-  'Semi-profesional':      styles.nivelSemiPro,
+  'Semiprofesional':       styles.nivelSemiPro,
   'Profesional / Élite':   styles.nivelElite,
 };
 
@@ -36,7 +40,7 @@ const NIVEL_VAM_CLASE: Record<string, string> = {
   'Cicloturista':          styles.nivelCicloturista,
   'Amateur':               styles.nivelAmateur,
   'Amateur fuerte':        styles.nivelAmateur,
-  'Semi-profesional':      styles.nivelSemiPro,
+  'Semiprofesional':       styles.nivelSemiPro,
   'Élite / Profesional':   styles.nivelElite,
 };
 
@@ -51,7 +55,15 @@ const ZONA_COLORES: Record<string, string> = {
   Z4: '#A84D14',                // 5,62:1
   Z5: '#B03A2E',                // 6,02:1
   Z6: '#8E44AD',                // 5,87:1
+  Z7: '#444444',                // 9,74:1
 };
+
+/** Lleva a la vista lo que acaba de producir un botón, sin animar si se pide movimiento reducido. */
+function llevarALaVista(el: HTMLElement | null): void {
+  if (!el) return;
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  el.scrollIntoView({ block: 'nearest', behavior: reducido ? 'auto' : 'smooth' });
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -73,7 +85,11 @@ export default function CalculadoraPotenciaCiclismoPage() {
   const [tiempoMin, setTiempoMin] = useState<string>('');
   const [resultado, setResultado] = useState<ResultadoPotenciaCiclismo | null>(null);
   const [mostrarVam, setMostrarVam] = useState<boolean>(false);
+  // Un aviso por formulario, cada uno junto a su botón (hallazgo 2738): era uno solo y se pintaba
+  // detrás del panel del estimador, así que con él abierto el aviso de «Calcular potencia» quedaba
+  // a más de 1000 px del botón y pulsarlo no cambiaba nada a la vista.
   const [error, setError] = useState<string | null>(null);
+  const [errorEstimador, setErrorEstimador] = useState<string | null>(null);
 
   // Estimador de vatios sin potenciómetro (modelo de fuerzas)
   const [mostrarEstimador, setMostrarEstimador] = useState<boolean>(false);
@@ -82,13 +98,30 @@ export default function CalculadoraPotenciaCiclismoPage() {
   const [pendiente, setPendiente] = useState<string>('0');
   const [vatios, setVatios] = useState<ResultadoVatios | null>(null);
 
+  // Lo que produce cada botón se lleva a la vista al aparecer (hallazgo 2738). El contador
+  // dispara el desplazamiento también cuando el aviso repite texto y React no re-renderiza.
+  const salidaPrincipal = useRef<HTMLDivElement>(null);
+  const salidaEstimador = useRef<HTMLDivElement>(null);
+  const [pulsadoPrincipal, setPulsadoPrincipal] = useState(0);
+  const [pulsadoEstimador, setPulsadoEstimador] = useState(0);
+  useEffect(() => {
+    if (pulsadoPrincipal > 0) llevarALaVista(salidaPrincipal.current);
+  }, [pulsadoPrincipal]);
+  useEffect(() => {
+    if (pulsadoEstimador > 0) llevarALaVista(salidaEstimador.current);
+  }, [pulsadoEstimador]);
+
   // Lo tecleado, ya leído como número (NaN si no lo es: el motor lo rechaza con su aviso)
   const pesoNum = parseSpanishNumber(peso);
   const ftpNum = parseSpanishNumber(ftp);
 
   const calcular = () => {
-    const des = desnivel.trim() !== '' ? parseSpanishNumber(desnivel) : undefined;
-    const tMin = tiempoMin.trim() !== '' ? parseSpanishNumber(tiempoMin) : undefined;
+    setPulsadoPrincipal(n => n + 1);
+    setErrorEstimador(null);
+    // Con el plegable cerrado la VAM no participa: sus campos guardan lo escrito para cuando se
+    // vuelva a abrir, pero ni bloquean el W/kg ni sacan una VAM que el usuario plegó (hallazgo 2739).
+    const des = mostrarVam && desnivel.trim() !== '' ? parseSpanishNumber(desnivel) : undefined;
+    const tMin = mostrarVam && tiempoMin.trim() !== '' ? parseSpanishNumber(tiempoMin) : undefined;
     // Un desnivel o un tiempo que no son un número se avisan aquí: el motor solo sabe de
     // «falta» o «≤ 0», y un NaN caería en el aviso equivocado.
     if ((des !== undefined && !Number.isFinite(des)) || (tMin !== undefined && !Number.isFinite(tMin))) {
@@ -108,6 +141,8 @@ export default function CalculadoraPotenciaCiclismoPage() {
   };
 
   const estimarVatios = () => {
+    setPulsadoEstimador(n => n + 1);
+    setError(null);
     try {
       const r = calcularVatiosPorFuerzas({
         masaTotal_kg: parseSpanishNumber(masaTotal),
@@ -115,10 +150,10 @@ export default function CalculadoraPotenciaCiclismoPage() {
         pendiente_pct: parseSpanishNumber(pendiente),
       });
       setVatios(r);
-      setError(null);
+      setErrorEstimador(null);
     } catch (e) {
       setVatios(null);
-      setError(e instanceof Error ? e.message : 'No se ha podido estimar.');
+      setErrorEstimador(e instanceof Error ? e.message : 'No se ha podido estimar.');
     }
   };
 
@@ -219,7 +254,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
               <div className={styles.inputGroup}>
                 <label className={styles.inputLabel} htmlFor="desnivel">
                   Desnivel positivo
-                  <span className={styles.inputHint}>Hasta 3000 m</span>
+                  <span className={styles.inputHint}>Entre 1 y 3000 m</span>
                 </label>
                 <div className={styles.inputRow}>
                   <input
@@ -265,6 +300,107 @@ export default function CalculadoraPotenciaCiclismoPage() {
             </button>
           </div>
         </div>
+
+        {/* Lo que produce «Calcular potencia» va justo detrás de su panel, antes del estimador:
+            detrás de él quedaba fuera de la pantalla con el estimador abierto (hallazgo 2738). */}
+        {(error || resultado) && (
+          <div ref={salidaPrincipal} className={styles.salida}>
+            {error && (
+              <p className={styles.avisoError} role="alert">{error}</p>
+            )}
+
+            {/* ── Resultados ── */}
+            {resultado && (
+              <div className={styles.resultados} role="region" aria-label="Resultados de potencia">
+
+                {/* W/kg */}
+                <div className={styles.resultCard}>
+                  <div className={styles.resultHeader}>
+                    <span className={styles.resultLabel}>Ratio W/kg</span>
+                    <span className={`${styles.nivelBadge} ${NIVEL_CLASE[resultado.nivelWattsKg] ?? styles.nivelPrincipiante}`}>
+                      {resultado.nivelWattsKg}
+                    </span>
+                  </div>
+                  <div className={styles.resultValor}>
+                    {formatNumber(resultado.wattsKg, 2)} <span className={styles.resultUnidad}>W/kg</span>
+                  </div>
+                  <p className={styles.resultDesc}>{resultado.descripcionNivel}</p>
+                </div>
+
+                {/* VAM (si se calculó) */}
+                {resultado.vam !== null && resultado.nivelVam !== null && (
+                  <div className={styles.resultCard}>
+                    <div className={styles.resultHeader}>
+                      <span className={styles.resultLabel}>VAM (Velocidad Ascensional Media)</span>
+                      <span className={`${styles.nivelBadge} ${NIVEL_VAM_CLASE[resultado.nivelVam] ?? styles.nivelPrincipiante}`}>
+                        {resultado.nivelVam}
+                      </span>
+                    </div>
+                    <div className={styles.resultValor}>
+                      {formatNumber(resultado.vam, 0)} <span className={styles.resultUnidad}>m/h</span>
+                    </div>
+                    <p className={styles.resultDesc}>
+                      Desnivel ganado por hora de esfuerzo sostenido en subida
+                    </p>
+                  </div>
+                )}
+
+                {resultado.avisoVam && (
+                  <p className={styles.avisoVam}>{resultado.avisoVam}</p>
+                )}
+
+                {/* Tabla de zonas */}
+                <div className={styles.zonasCard}>
+                  <h3 className={styles.zonasTitle}>
+                    Zonas de Potencia de Coggan (basadas en tu FTP: {formatNumber(ftpNum, 0)} W)
+                  </h3>
+                  <div className={styles.tableWrapper}>
+                    <table className={styles.zonasTable}>
+                      <thead>
+                        <tr>
+                          <th>Zona</th>
+                          <th>Nombre</th>
+                          <th>% FTP</th>
+                          <th>Rango (W)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {resultado.zonasPotencia.map(z => (
+                          <tr key={z.zona}>
+                            <td>
+                              <span
+                                className={styles.zonaBadge}
+                                style={{ backgroundColor: ZONA_COLORES[z.zona] ?? '#999' }}
+                              >
+                                {z.zona}
+                              </span>
+                            </td>
+                            <td className={styles.zonaNombre}>{z.nombre}</td>
+                            <td className={styles.zonaPorc}>{z.porcentajeFTP}</td>
+                            <td className={styles.zonaRango}>
+                              {z.wattsMax === null
+                                ? `desde ${formatNumber(z.wattsMin, 0)} W`
+                                : `${formatNumber(z.wattsMin, 0)} – ${formatNumber(z.wattsMax, 0)} W`}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {/* Las zonas no nombraban su modelo y les faltaba la Z7 (hallazgo 2745). */}
+                  <p className={styles.tableNote}>
+                    Son los siete niveles de entrenamiento por potencia que propuso Andrew Coggan
+                    (Allen y Coggan, <cite>Training and Racing with a Power Meter</cite>, 2006).
+                    Coggan define la Z6 como más del 120&nbsp;% del FTP y deja la Z7 sin porcentaje,
+                    porque son sprints de pocos segundos: el corte en el 150&nbsp;% es una convención
+                    práctica para poder dar vatios, no parte del modelo original.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
 
         {/* ── Sección 1.bis: estimar los vatios sin potenciómetro ──
             El h1 promete «calcular tus vatios» y el resto de la app pide el FTP en vatios como
@@ -356,142 +492,96 @@ export default function CalculadoraPotenciaCiclismoPage() {
                 </button>
               </div>
 
-              {vatios && (
-                <div className={styles.resultCard} role="status">
-                  <div className={styles.resultHeader}>
-                    <span className={styles.resultLabel}>
-                      {vatios.sinPedalear ? 'No hace falta pedalear' : 'Potencia estimada'}
-                    </span>
-                  </div>
-                  <div className={styles.resultValor}>
-                    {formatNumber(vatios.vatios, 0)} <span className={styles.resultUnidad}>W</span>
-                  </div>
-                  {/* En bajada el balance de fuerzas puede dar un número negativo. Es correcto
-                      como balance, pero no es la potencia del ciclista: a esa velocidad no
-                      pedalea, frena. Se dice, en vez de publicar «−178 W» como si fuera su
-                      esfuerzo (hallazgo 252). */}
-                  {vatios.sinPedalear ? (
-                    <p className={styles.resultDesc}>
-                      Con esa pendiente, la gravedad sostiene esa velocidad de sobra: el ciclista
-                      no aporta potencia, y aún le sobran{' '}
-                      <strong>{formatNumber(vatios.potenciaSobrante, 0)} W</strong> que tiene que
-                      disipar frenando o dejando subir la velocidad. Para estimar tus vatios en
-                      bajada haría falta saber cuánto frenas, que no es un dato que se tenga.
-                    </p>
-                  ) : (
-                    <p className={styles.resultDesc}>
-                      Reparto del esfuerzo: {formatNumber(vatios.desglose.gravedad, 0)} W contra la
-                      gravedad · {formatNumber(vatios.desglose.rodadura, 0)} W de rodadura ·{' '}
-                      {formatNumber(vatios.desglose.aerodinamica, 0)} W contra el aire.
-                      {vatios.vam !== null && (
-                        <> Esa subida son {formatNumber(vatios.vam, 0)} m/h de VAM.</>
+              {(vatios || errorEstimador) && (
+                <div ref={salidaEstimador} className={styles.salida}>
+                  {errorEstimador && (
+                    <p className={styles.avisoError} role="alert">{errorEstimador}</p>
+                  )}
+                  {vatios && (
+                    <div className={styles.resultCard} role="status">
+                      <div className={styles.resultHeader}>
+                        <span className={styles.resultLabel}>
+                          {vatios.sinPedalear ? 'No hace falta pedalear' : 'Potencia estimada'}
+                        </span>
+                      </div>
+                      <div className={styles.resultValor}>
+                        {formatNumber(vatios.vatios, 0)} <span className={styles.resultUnidad}>W</span>
+                      </div>
+                      {/* En bajada el balance de fuerzas puede dar un número negativo. Es correcto
+                          como balance, pero no es la potencia del ciclista: a esa velocidad no
+                          pedalea, frena. Se dice, en vez de publicar «−178 W» como si fuera su
+                          esfuerzo (hallazgo 252). */}
+                      {vatios.sinPedalear ? (
+                        <p className={styles.resultDesc}>
+                          Con esa pendiente, la gravedad sostiene esa velocidad de sobra: el ciclista
+                          no aporta potencia, y aún le sobran{' '}
+                          <strong>{formatNumber(vatios.potenciaSobrante, 0)} W</strong> que tiene que
+                          disipar frenando o dejando subir la velocidad. Para estimar tus vatios en
+                          bajada haría falta saber cuánto frenas, que no es un dato que se tenga.
+                        </p>
+                      ) : vatios.desglose.gravedad < 0 ? (
+                        /* Bajada en la que aún se pedalea: la gravedad APORTA potencia. Publicarla como
+                           «-153 W contra la gravedad» era rotular una ayuda como un esfuerzo negativo
+                           (hallazgo 2743). Rodadura + aire − ayuda = lo que pone el ciclista. */
+                        <p className={styles.resultDesc}>
+                          Reparto del esfuerzo: {formatNumber(vatios.desglose.rodadura, 0)} W de
+                          rodadura · {formatNumber(vatios.desglose.aerodinamica, 0)} W contra el aire.
+                          La bajada te ayuda: la gravedad aporta{' '}
+                          <strong>{formatNumber(-vatios.desglose.gravedad, 0)} W</strong> a favor, y tú
+                          pones el resto.
+                        </p>
+                      ) : (
+                        <p className={styles.resultDesc}>
+                          Reparto del esfuerzo: {formatNumber(vatios.desglose.gravedad, 0)} W contra la
+                          gravedad · {formatNumber(vatios.desglose.rodadura, 0)} W de rodadura ·{' '}
+                          {formatNumber(vatios.desglose.aerodinamica, 0)} W contra el aire.
+                          {vatios.vam !== null && (
+                            <> Esa subida son {formatNumber(vatios.vam, 0)} m/h de VAM.</>
+                          )}
+                        </p>
                       )}
-                    </p>
+                      {/* La potencia a esa velocidad NO es el FTP salvo en un caso concreto, y la guía
+                          y el FAQ la presentaban como si lo fuera (hallazgo 2498). */}
+                      {!vatios.sinPedalear && vatios.vatios > FTP_MAX_W && (
+                        /* Por encima del FTP máximo que admite el formulario no se invita a usarla
+                           como FTP: el formulario la rechazaría (hallazgo 2740). */
+                        <p className={styles.resultDesc}>
+                          Es la potencia que exige <strong>esa velocidad</strong>, no tu FTP: pasa de
+                          los {formatNumber(FTP_MAX_W, 0)} W, el FTP más alto que admite la
+                          calculadora, así que es un esfuerzo que solo se sostiene unos minutos, no
+                          alrededor de una hora. No la uses como FTP.
+                        </p>
+                      )}
+                      {!vatios.sinPedalear && vatios.vatios <= FTP_MAX_W && (
+                        <p className={styles.resultDesc}>
+                          Es la potencia que exige <strong>esa velocidad</strong>, no tu FTP. Solo se
+                          le parece si fue tu esfuerzo máximo sostenido durante alrededor de una hora
+                          (una subida larga o una contrarreloj a tope); en ese caso puedes escribirla
+                          como FTP arriba, con tu peso corporal sin la bici, para ver el W/kg y las zonas.
+                        </p>
+                      )}
+                      {/* Los supuestos, completos y con la fuente del modelo (hallazgo 2744). La
+                          transmisión no se declaraba y la cifra solo cuadra contándola. Crr y CdA no
+                          tienen una fuente única: se presentan como lo que son, supuestos típicos. */}
+                      <p className={styles.resultDesc}>
+                        Es una <strong>estimación</strong> con el modelo de potencia en carretera de
+                        Martin y colaboradores (1998, <cite>Journal of Applied Biomechanics</cite>), que
+                        lo validaron contra un potenciómetro. Los coeficientes no son tuyos ni de ese
+                        estudio, sino supuestos típicos de carretera: asfalto en buen estado (Crr{' '}
+                        {formatNumber(CRR, 3)}), posición sobre las manetas (CdA{' '}
+                        {formatNumber(CDA, 2)} m²), una transmisión que pierde el{' '}
+                        {formatNumber((1 - RENDIMIENTO_TRANSMISION) * 100, 1)}&nbsp;% de la potencia
+                        (rendimiento {formatNumber(RENDIMIENTO_TRANSMISION, 3)}) y aire a nivel del mar,
+                        sin viento. Con viento, otra postura o ruedas distintas cambia, y no sustituye a
+                        un potenciómetro.
+                      </p>
+                    </div>
                   )}
-                  {/* La potencia a esa velocidad NO es el FTP salvo en un caso concreto, y la guía
-                      y el FAQ la presentaban como si lo fuera (hallazgo 2498). */}
-                  {!vatios.sinPedalear && (
-                    <p className={styles.resultDesc}>
-                      Es la potencia que exige <strong>esa velocidad</strong>, no tu FTP. Solo se
-                      le parece si fue tu esfuerzo máximo sostenido durante alrededor de una hora
-                      (una subida larga o una contrarreloj a tope); en ese caso puedes escribirla
-                      como FTP arriba, con tu peso corporal sin la bici, para ver el W/kg y las zonas.
-                    </p>
-                  )}
-                  <p className={styles.resultDesc}>
-                    Es una <strong>estimación</strong>: supone asfalto en buen estado (Crr 0,005),
-                    posición sobre las manetas (CdA 0,32 m²) y aire a nivel del mar. Con viento,
-                    otra postura o ruedas distintas cambia, y no sustituye a un potenciómetro.
-                  </p>
                 </div>
               )}
             </>
           )}
         </div>
-
-        {error && (
-          <p className={styles.avisoError} role="alert">{error}</p>
-        )}
-
-        {/* ── Resultados ── */}
-        {resultado && (
-          <div className={styles.resultados} role="region" aria-label="Resultados de potencia">
-
-            {/* W/kg */}
-            <div className={styles.resultCard}>
-              <div className={styles.resultHeader}>
-                <span className={styles.resultLabel}>Ratio W/kg</span>
-                <span className={`${styles.nivelBadge} ${NIVEL_CLASE[resultado.nivelWattsKg] ?? styles.nivelPrincipiante}`}>
-                  {resultado.nivelWattsKg}
-                </span>
-              </div>
-              <div className={styles.resultValor}>
-                {formatNumber(resultado.wattsKg, 2)} <span className={styles.resultUnidad}>W/kg</span>
-              </div>
-              <p className={styles.resultDesc}>{resultado.descripcionNivel}</p>
-            </div>
-
-            {/* VAM (si se calculó) */}
-            {resultado.vam !== null && resultado.nivelVam !== null && (
-              <div className={styles.resultCard}>
-                <div className={styles.resultHeader}>
-                  <span className={styles.resultLabel}>VAM (Velocidad Ascensional Media)</span>
-                  <span className={`${styles.nivelBadge} ${NIVEL_VAM_CLASE[resultado.nivelVam] ?? styles.nivelPrincipiante}`}>
-                    {resultado.nivelVam}
-                  </span>
-                </div>
-                <div className={styles.resultValor}>
-                  {formatNumber(resultado.vam, 0)} <span className={styles.resultUnidad}>m/h</span>
-                </div>
-                <p className={styles.resultDesc}>
-                  Desnivel ganado por hora de esfuerzo sostenido en subida
-                </p>
-              </div>
-            )}
-
-            {resultado.avisoVam && (
-              <p className={styles.avisoVam}>{resultado.avisoVam}</p>
-            )}
-
-            {/* Tabla de zonas */}
-            <div className={styles.zonasCard}>
-              <h3 className={styles.zonasTitle}>
-                Zonas de Potencia (basadas en tu FTP: {formatNumber(ftpNum, 0)} W)
-              </h3>
-              <div className={styles.tableWrapper}>
-                <table className={styles.zonasTable}>
-                  <thead>
-                    <tr>
-                      <th>Zona</th>
-                      <th>Nombre</th>
-                      <th>% FTP</th>
-                      <th>Rango (W)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {resultado.zonasPotencia.map(z => (
-                      <tr key={z.zona}>
-                        <td>
-                          <span
-                            className={styles.zonaBadge}
-                            style={{ backgroundColor: ZONA_COLORES[z.zona] ?? '#999' }}
-                          >
-                            {z.zona}
-                          </span>
-                        </td>
-                        <td className={styles.zonaNombre}>{z.nombre}</td>
-                        <td className={styles.zonaPorc}>{z.porcentajeFTP}</td>
-                        <td className={styles.zonaRango}>
-                          {formatNumber(z.wattsMin, 0)} – {formatNumber(z.wattsMax, 0)} W
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* ── Sección educativa ── */}
         <EducationalSection
@@ -508,7 +598,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
                   <h3>Qué es el FTP</h3>
                 </div>
                 <p className={styles.escenarioTip}>
-                  El FTP (Functional Threshold Power) es la potencia máxima sostenible durante aproximadamente 1 hora de esfuerzo máximo. Es el indicador de referencia en el entrenamiento científico por potencia: determina todas las zonas de intensidad y permite comparar rendimientos entre ciclistas.
+                  El FTP (Functional Threshold Power) es la potencia máxima sostenible durante aproximadamente 1 hora de esfuerzo máximo. Es el indicador de referencia del entrenamiento por potencia: de él salen las zonas de intensidad, y permite comparar rendimientos entre ciclistas.
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -517,7 +607,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
                   <h3>Test de 20 minutos</h3>
                 </div>
                 <p className={styles.escenarioTip}>
-                  Calienta 20 min a ritmo suave, luego da el máximo esfuerzo sostenible durante 20 minutos continuos. La potencia media de esos 20 minutos multiplicada por 0,95 es tu FTP estimado. El factor 0,95 corrige que un esfuerzo de 20 min es ligeramente más intenso que uno de 60 min.
+                  Es el protocolo que propusieron Hunter Allen y Andrew Coggan en su libro <cite>Training and Racing with a Power Meter</cite>: calienta a ritmo suave, luego da el máximo esfuerzo sostenible durante 20 minutos continuos, y la potencia media de esos 20 minutos multiplicada por 0,95 es tu FTP estimado. El factor 0,95 descuenta que 20 minutos se aguantan a algo más de intensidad que una hora; es una aproximación, y en cada persona la diferencia real varía.
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -526,7 +616,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
                   <h3>¿Cada cuánto actualizarlo?</h3>
                 </div>
                 <p className={styles.escenarioTip}>
-                  Se recomienda repetir el test FTP cada 6–8 semanas de entrenamiento estructurado. El FTP puede mejorar notablemente en principiantes (10–20&nbsp;% en los primeros meses) y de forma más gradual en ciclistas avanzados (2–5&nbsp;% por temporada).
+                  Es costumbre entre entrenadores repetir el test cada 6–8 semanas de entrenamiento estructurado, o cuando las sesiones empiezan a resultar claramente más fáciles; no es un plazo validado por estudios, sino una pauta práctica. Quien empieza suele mejorar el FTP más deprisa que un ciclista con años de entrenamiento, pero no hay una cifra de mejora que valga para todos.
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -574,45 +664,45 @@ export default function CalculadoraPotenciaCiclismoPage() {
                     <td>Competición federada, escapadas en carrera</td>
                   </tr>
                   <tr>
-                    <td><strong className={styles.nivelTxtSemiPro}>Semi-profesional</strong></td>
+                    <td><strong className={styles.nivelTxtSemiPro}>Semiprofesional</strong></td>
                     <td>4,5 – 5,5</td>
                     <td>Ciclismo de élite regional o nacional</td>
                   </tr>
                   <tr>
                     <td><strong className={styles.nivelTxtElite}>Profesional / Élite</strong></td>
                     <td>&gt; 5,5</td>
-                    <td>Nivel World Tour (6,0–7,5 W/kg en grandes escaladores)</td>
+                    <td>Nivel World Tour</td>
                   </tr>
                 </tbody>
               </table>
             </div>
             <p className={styles.tableNote}>
-              El ratio W/kg es especialmente relevante en terreno montañoso, donde el peso del ciclista penaliza directamente la velocidad de ascenso. En llano, la potencia absoluta (W) tiene más peso que el ratio.
+              Escala orientativa de esta calculadora, sin fuente oficial: no existe una clasificación de niveles por W/kg aceptada por todos, y otras (como el perfil de potencia de Allen y Coggan) usan cortes y nombres distintos. El ratio W/kg es especialmente relevante en terreno montañoso, donde el peso del ciclista penaliza directamente la velocidad de ascenso. En llano, la potencia absoluta (W) tiene más peso que el ratio.
             </p>
           </section>
 
           <section className={styles.guideSection}>
-            <h2>¿Qué es el VAM?</h2>
+            <h2>¿Qué es la VAM?</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">📐</span> Definición y fórmula</h4>
                 <p>
-                  VAM son las siglas de Velocidad Ascensional Media (en italiano: Velocità Ascensionale Media). Fue popularizado por el fisiólogo Michele Ferrari como indicador del rendimiento en escalada. Se calcula: VAM (m/h) = Desnivel (m) × 60 / Tiempo (min).
+                  VAM son las siglas de Velocidad Ascensional Media (en italiano, <i lang="it">velocità ascensionale media</i>): los metros de desnivel que se suben por hora. La popularizó como indicador del rendimiento en subida el médico italiano Michele Ferrari, el mismo al que la agencia antidopaje de Estados Unidos (USADA) inhabilitó de por vida en 2012 por el caso del equipo US Postal; la medida es solo aritmética y no depende de quién la difundiera. Se calcula: VAM (m/h) = Desnivel (m) × 60 / Tiempo (min).
                 </p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">📊</span> Valores de referencia en subida</h4>
                 <p>
-                  Es la misma escala con la que esta calculadora te clasifica: por debajo de 800 m/h, principiante; 800–1.000, cicloturista; 1.000–1.200, amateur; 1.200–1.400, amateur fuerte; 1.400–1.600, semi-profesional; y por encima de 1.600 m/h, élite. Los profesionales del World Tour se mueven en 1.600–1.800 m/h en grandes ascensiones, y en el Tour de Francia los mejores escaladores han superado los 1.800 m/h.
+                  Es la misma escala con la que esta calculadora te clasifica: por debajo de 800 m/h, principiante; 800–1.000, cicloturista; 1.000–1.200, amateur; 1.200–1.400, amateur fuerte; 1.400–1.600, semiprofesional; y por encima de 1.600 m/h, élite. Es una escala orientativa de esta calculadora, sin fuente oficial: no hay una clasificación de la VAM aceptada por todos, y la cifra depende mucho de la pendiente y de la duración de la subida.
                 </p>
                 <p className={styles.faqTip}>
-                  El VAM varía según la pendiente: a mayor pendiente, mayor VAM para el mismo W/kg. Comparar VAMs de subidas con pendientes muy distintas puede inducir a error.
+                  La VAM varía según la pendiente: a mayor pendiente, mayor VAM para el mismo W/kg. Comparar la VAM de subidas con pendientes muy distintas puede inducir a error.
                 </p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">🔗</span> Relación VAM y W/kg</h4>
                 <p>
-                  Existe una relación aproximada entre VAM y W/kg que depende de la pendiente media. La regla que popularizó el propio Ferrari es <strong>VAM ≈ W/kg × (2 + %pendiente/10) × 100</strong>: al 8&nbsp;% sale el factor 280, no 255 —ese corresponde a una pendiente del 5,5&nbsp;%—, y resolver la subida con el modelo de fuerzas da 288 para un ciclista de 70 kg con una bici de 8. Es decir, al 8&nbsp;% de pendiente, <strong>W/kg ≈ VAM / 280</strong>. La relación varía con la resistencia aerodinámica, el peso de la bici, la temperatura y la altitud: úsala como estimación orientativa, no como fórmula exacta.
+                  Existe una relación aproximada entre VAM y W/kg que depende de la pendiente media. Una regla empírica que difundió el propio Ferrari es <strong>VAM ≈ W/kg × (2 + %pendiente/10) × 100</strong>: al 8&nbsp;% sale el factor 280, no 255 —ese corresponde a una pendiente del 5,5&nbsp;%—, y resolver la subida con el modelo de fuerzas da 288 para un ciclista de 70 kg con una bici de 8. Es decir, al 8&nbsp;% de pendiente, <strong>W/kg ≈ VAM / 280</strong>. La relación varía con la resistencia aerodinámica, el peso de la bici, la temperatura y la altitud: úsala como estimación orientativa, no como fórmula exacta.
                 </p>
               </div>
             </div>
@@ -631,8 +721,8 @@ export default function CalculadoraPotenciaCiclismoPage() {
               <div className={styles.step}>
                 <div className={styles.stepNumber}>2</div>
                 <div className={styles.stepContent}>
-                  <h4>Entrena más tiempo en Z2 y Z3 (base aeróbica)</h4>
-                  <p>La mayoría del volumen semanal (70–80&nbsp;%) debería realizarse en Z2 (Resistencia) y Z3 (Tempo). Esta base aeróbica es lo que permite luego expresar el rendimiento en zonas altas sin lesiones ni sobreentrenamiento.</p>
+                  <h4>Haz la mayor parte del volumen a intensidad baja (base aeróbica)</h4>
+                  <p>En deportistas de resistencia bien entrenados se ha descrito que la mayoría de las sesiones son de intensidad baja: en esquiadores de fondo júnior, Seiler y Kjerland (2006) midieron en torno al 75&nbsp;% por debajo del primer umbral, que en las zonas de Coggan corresponde sobre todo a Z1 y Z2. Es un patrón observado en un grupo concreto, no una cuota exacta para cada ciclista.</p>
                 </div>
               </div>
               <div className={styles.step}>
@@ -652,8 +742,8 @@ export default function CalculadoraPotenciaCiclismoPage() {
               <div className={styles.step}>
                 <div className={styles.stepNumber}>5</div>
                 <div className={styles.stepContent}>
-                  <h4>Repite el test FTP cada 6–8 semanas</h4>
-                  <p>El progreso en FTP es la métrica objetiva de mejora. A medida que sube el FTP, todas las zonas se desplazan hacia arriba. Sin actualizar las zonas, entrenarías por debajo de tu nivel real.</p>
+                  <h4>Repite el test FTP de vez en cuando</h4>
+                  <p>El FTP es una forma objetiva de seguir la mejora; la costumbre habitual es repetir el test cada 6–8 semanas. A medida que sube el FTP, todas las zonas se desplazan hacia arriba. Sin actualizar las zonas, entrenarías por debajo de tu nivel real.</p>
                 </div>
               </div>
             </div>
@@ -675,7 +765,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">🌬️</span>
                 <h4>La aerodinámica importa más en llano</h4>
-                <p>En llano, la resistencia aerodinámica representa el 70–80&nbsp;% del esfuerzo total. Una postura más agresiva sobre la bici o componentes aerodinámicos pueden ser más rentables que mejorar el FTP para reducir tiempos en terreno plano.</p>
+                <p>En llano, la resistencia aerodinámica se lleva la mayor parte del esfuerzo: con el estimador de esta página, a 30&nbsp;km/h y 78&nbsp;kg son 116 de los 149&nbsp;W, casi cuatro de cada cinco. Una postura más agresiva sobre la bici o componentes aerodinámicos pueden ser más rentables que mejorar el FTP para reducir tiempos en terreno plano.</p>
               </div>
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">😴</span>

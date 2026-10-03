@@ -162,7 +162,7 @@
       "post": {
         "operationId": "calcularPotenciaCiclismo",
         "summary": "Calcula W/kg, zonas de potencia FTP y VAM para ciclismo",
-        "description": "Analiza el rendimiento en ciclismo: ratio W/kg con clasificación de nivel, 6 zonas de entrenamiento basadas en el FTP, y opcionalmente la VAM (velocidad ascensional media) para subidas cronometradas.",
+        "description": "Analiza el rendimiento en ciclismo: ratio W/kg con clasificación de nivel, las 7 zonas de potencia de Coggan basadas en el FTP (la Z7 no tiene límite superior: watts_max es null), y opcionalmente la VAM (velocidad ascensional media) para subidas cronometradas.",
         "requestBody": {
           "required": true,
           "content": {
