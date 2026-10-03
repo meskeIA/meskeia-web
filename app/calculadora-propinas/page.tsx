@@ -101,7 +101,7 @@ export default function CalculadoraPropinas() {
         {/* Header */}
         <header className={styles.header}>
           <h1 className={styles.title}>
-            💶 Calculadora de Propinas
+            <span aria-hidden="true">💶</span> Calculadora de Propinas
           </h1>
           <p className={styles.subtitle}>
             Calcula la propina automáticamente según el país y divide la cuenta entre varias personas
@@ -199,7 +199,7 @@ export default function CalculadoraPropinas() {
               <option value="fr-8">🇫🇷 Francia (8%)</option>
               <option value="de-8">🇩🇪 Alemania (8%)</option>
               <option value="jp-0">🇯🇵 Japón (0% - No propina)</option>
-              <option value="custom">✏️ Personalizado</option>
+              <option value="custom">Personalizado</option>
             </select>
           </div>
 
@@ -226,7 +226,7 @@ export default function CalculadoraPropinas() {
             className={styles.btnReset}
             onClick={resetear}
           >
-            🔄 Limpiar
+            <span aria-hidden="true">🔄</span> Limpiar
           </button>
         </div>
 
@@ -304,7 +304,7 @@ export default function CalculadoraPropinas() {
                 </p>
               </div>
               <div className={styles.contentCard}>
-                <h4>💡 Truco del 10%</h4>
+                <h4><span aria-hidden="true">💡</span> Truco del 10%</h4>
                 <p>
                   Mueve el decimal un lugar: 45€ → 4,50€. Para 15% suma la mitad: 4,50€ + 2,25€ = 6,75€.
                   Rápido y sin calculadora.
@@ -368,37 +368,37 @@ export default function CalculadoraPropinas() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>🍽️ Restaurante (cena)</td>
+                    <td><span aria-hidden="true">🍽️</span> Restaurante (cena)</td>
                     <td>5 – 10 %</td>
                     <td>2,50 – 5,00 €</td>
                     <td>Efectivo sobre la mesa</td>
                   </tr>
                   <tr>
-                    <td>🍺 Bar / café</td>
+                    <td><span aria-hidden="true">🍺</span> Bar / café</td>
                     <td>Redondear al alza</td>
                     <td>0,50 – 1,00 €</td>
                     <td>Dejar cambio en el platillo</td>
                   </tr>
                   <tr>
-                    <td>🚕 Taxi</td>
+                    <td><span aria-hidden="true">🚕</span> Taxi</td>
                     <td>Redondear o 5 %</td>
                     <td>0,50 – 2,00 €</td>
                     <td>Decir &quot;quédate el cambio&quot;</td>
                   </tr>
                   <tr>
-                    <td>🏨 Hotel (servicio habitaciones)</td>
+                    <td><span aria-hidden="true">🏨</span> Hotel (servicio habitaciones)</td>
                     <td>1 – 2 € por servicio</td>
                     <td>1 – 2 €</td>
                     <td>Efectivo en bandeja</td>
                   </tr>
                   <tr>
-                    <td>💇 Peluquería / estética</td>
+                    <td><span aria-hidden="true">💇</span> Peluquería / estética</td>
                     <td>5 – 10 %</td>
                     <td>2,50 – 5,00 €</td>
                     <td>Efectivo al profesional</td>
                   </tr>
                   <tr>
-                    <td>🛵 Delivery (app)</td>
+                    <td><span aria-hidden="true">🛵</span> Delivery (app)</td>
                     <td>1 – 2 € fijos</td>
                     <td>1 – 2 €</td>
                     <td>En la app o en efectivo</td>

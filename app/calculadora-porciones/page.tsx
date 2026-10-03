@@ -192,7 +192,7 @@ export default function CalculadoraPorcionesPage() {
 
       {/* Métodos de medición con la mano */}
       <section className={styles.methodsSection}>
-        <h2 className={styles.sectionTitle}>🤚 Tu Mano como Herramienta de Medición</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">🤚</span> Tu Mano como Herramienta de Medición</h2>
         <p className={styles.sectionDescription}>
           Tu mano es proporcional a tu cuerpo, lo que hace que sea una referencia personalizada perfecta
         </p>
@@ -229,7 +229,7 @@ export default function CalculadoraPorcionesPage() {
 
       {/* Selector de categorías */}
       <section className={styles.categoriesSection}>
-        <h2 className={styles.sectionTitle}>🍽️ Porciones por Tipo de Alimento</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">🍽️</span> Porciones por Tipo de Alimento</h2>
 
         <div className={styles.categoryTabs}>
           {FOOD_CATEGORIES.map(category => (
@@ -285,7 +285,7 @@ export default function CalculadoraPorcionesPage() {
 
       {/* Guía del plato equilibrado */}
       <section className={styles.plateSection}>
-        <h2 className={styles.sectionTitle}>🍽️ El Plato Equilibrado</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">🍽️</span> El Plato Equilibrado</h2>
         <div className={styles.plateGuide}>
           <div className={styles.plateVisual}>
             <div className={styles.plateCircle}>
@@ -326,7 +326,7 @@ export default function CalculadoraPorcionesPage() {
 
       {/* Tips */}
       <section className={styles.tipsSection}>
-        <h2 className={styles.sectionTitle}>💡 Consejos Prácticos</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">💡</span> Consejos Prácticos</h2>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">📏</span>
@@ -365,7 +365,7 @@ export default function CalculadoraPorcionesPage() {
         title="Conceptos nutricionales: porciones, raciones y métodos de medición"
         subtitle="Entiende la diferencia entre porción y ración, conoce los métodos de medición y adapta las porciones a diferentes situaciones vitales"
       >
-        <h3 className={styles.eduTitle}>⚖️ Métodos de medición comparados</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">⚖️</span> Métodos de medición comparados</h3>
         <div className={styles.tableWrapper}>
           <table className={styles.comparativaTable}>
             <thead>
@@ -417,7 +417,7 @@ export default function CalculadoraPorcionesPage() {
           </table>
         </div>
 
-        <h3 className={styles.eduTitle}>🎯 Situaciones de uso</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">🎯</span> Situaciones de uso</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
@@ -449,7 +449,7 @@ export default function CalculadoraPorcionesPage() {
           </div>
         </div>
 
-        <h3 className={styles.eduTitle}>❓ Preguntas frecuentes sobre porciones</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">❓</span> Preguntas frecuentes sobre porciones</h3>
         <div className={styles.faqList}>
           <div className={styles.faqItem}>
             <strong>¿Cuál es la diferencia entre ración y porción?</strong>
@@ -477,7 +477,7 @@ export default function CalculadoraPorcionesPage() {
           </div>
         </div>
 
-        <h3 className={styles.eduTitle}>📋 Cómo desarrollar el hábito de porciones adecuadas</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">📋</span> Cómo desarrollar el hábito de porciones adecuadas</h3>
         <div className={styles.stepGuide}>
           <div className={styles.step}>
             <span className={styles.stepNumber}>1</span>
@@ -516,7 +516,7 @@ export default function CalculadoraPorcionesPage() {
           </div>
         </div>
 
-        <h3 className={styles.eduTitle}>💡 Hábitos para mejorar la conciencia de porciones</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">💡</span> Hábitos para mejorar la conciencia de porciones</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">📸</span>

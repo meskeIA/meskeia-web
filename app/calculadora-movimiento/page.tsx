@@ -165,7 +165,7 @@ export default function CalculadoraMovimientoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🚀 Calculadora de Movimiento</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🚀</span> Calculadora de Movimiento</h1>
         <p className={styles.subtitle}>
           Cinemática: MRU, MRUA, Caída Libre y Tiro Parabólico
         </p>
@@ -182,6 +182,7 @@ export default function CalculadoraMovimientoPage() {
 
           <div className={styles.tiposGrid}>
             <button
+              type="button"
               className={`${styles.tipoBtn} ${tipoMovimiento === 'mru' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoMovimiento('mru')}
               aria-pressed={tipoMovimiento === 'mru'}
@@ -190,6 +191,7 @@ export default function CalculadoraMovimientoPage() {
               <span className={styles.tipoNombre}>MRU</span>
             </button>
             <button
+              type="button"
               className={`${styles.tipoBtn} ${tipoMovimiento === 'mrua' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoMovimiento('mrua')}
               aria-pressed={tipoMovimiento === 'mrua'}
@@ -198,6 +200,7 @@ export default function CalculadoraMovimientoPage() {
               <span className={styles.tipoNombre}>MRUA</span>
             </button>
             <button
+              type="button"
               className={`${styles.tipoBtn} ${tipoMovimiento === 'caida' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoMovimiento('caida')}
               aria-pressed={tipoMovimiento === 'caida'}
@@ -206,6 +209,7 @@ export default function CalculadoraMovimientoPage() {
               <span className={styles.tipoNombre}>Caída</span>
             </button>
             <button
+              type="button"
               className={`${styles.tipoBtn} ${tipoMovimiento === 'parabolico' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoMovimiento('parabolico')}
               aria-pressed={tipoMovimiento === 'parabolico'}
@@ -294,6 +298,7 @@ export default function CalculadoraMovimientoPage() {
             <div className={styles.ejemplosGrid}>
               {EJEMPLOS.map((ej, idx) => (
                 <button
+                  type="button"
                   key={idx}
                   className={styles.ejemploBtn}
                   onClick={() => cargarEjemplo(ej)}
@@ -479,7 +484,7 @@ export default function CalculadoraMovimientoPage() {
 
         {/* Sección 1: Tabla Comparativa */}
         <section className={styles.guideSection}>
-          <h2>⚖️ Tabla Comparativa de Tipos de Movimiento</h2>
+          <h2><span aria-hidden="true">⚖️</span> Tabla Comparativa de Tipos de Movimiento</h2>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
@@ -536,10 +541,10 @@ export default function CalculadoraMovimientoPage() {
                 </tr>
                 <tr>
                   <td><strong>Dificultad de cálculo</strong></td>
-                  <td>⭐ Baja</td>
-                  <td>⭐⭐ Media</td>
-                  <td>⭐⭐ Media</td>
-                  <td>⭐⭐⭐ Alta</td>
+                  <td><span aria-hidden="true">⭐</span> Baja</td>
+                  <td><span aria-hidden="true">⭐⭐</span> Media</td>
+                  <td><span aria-hidden="true">⭐⭐</span> Media</td>
+                  <td><span aria-hidden="true">⭐⭐⭐</span> Alta</td>
                 </tr>
               </tbody>
             </table>
@@ -548,7 +553,7 @@ export default function CalculadoraMovimientoPage() {
 
         {/* Sección 2: Casos de Uso Prácticos */}
         <section className={styles.guideSection}>
-          <h2>💼 Casos de Uso Prácticos</h2>
+          <h2><span aria-hidden="true">💼</span> Casos de Uso Prácticos</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -559,7 +564,7 @@ export default function CalculadoraMovimientoPage() {
               <div className={styles.escenarioExample}>
                 <strong>Ejemplo tipo examen:</strong> Un coche parte del reposo y acelera a 3 m/s² durante 8 s. ¿Qué distancia recorre? → d = ½·a·t² = ½·3·64 = <strong>96 m</strong>
               </div>
-              <p className={styles.escenarioTip}>💡 Tip: practica identificar el tipo de movimiento antes de buscar la fórmula.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Tip: practica identificar el tipo de movimiento antes de buscar la fórmula.</p>
             </div>
 
             <div className={styles.escenarioCard}>
@@ -571,7 +576,7 @@ export default function CalculadoraMovimientoPage() {
               <div className={styles.escenarioExample}>
                 <strong>Ejemplo:</strong> Un jugador lanza a 15 m/s y 30°. Alcance = v₀²·sin(60°)/g = 225·0,866/9,81 ≈ <strong>19,87 m</strong>
               </div>
-              <p className={styles.escenarioTip}>💡 Tip: para un pase rasante, usa ángulos entre 15° y 25°.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Tip: para un pase rasante, usa ángulos entre 15° y 25°.</p>
             </div>
 
             <div className={styles.escenarioCard}>
@@ -583,7 +588,7 @@ export default function CalculadoraMovimientoPage() {
               <div className={styles.escenarioExample}>
                 <strong>Verificar g:</strong> Sueltas una bola desde h = 1,5 m. Mides t = 0,553 s. → g = 2·h/t² = 2·1,5/0,306 ≈ <strong>9,80 m/s²</strong>
               </div>
-              <p className={styles.escenarioTip}>💡 Tip: repite el experimento 5 veces y promedia para reducir error.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Tip: repite el experimento 5 veces y promedia para reducir error.</p>
             </div>
 
             <div className={styles.escenarioCard}>
@@ -595,14 +600,14 @@ export default function CalculadoraMovimientoPage() {
               <div className={styles.escenarioExample}>
                 <strong>A 120 km/h (33,3 m/s) con a = −7 m/s²:</strong> d = v²/(2·|a|) = 1.111/14 ≈ <strong>79,4 m</strong> solo de frenada (sin tiempo de reacción).
               </div>
-              <p className={styles.escenarioTip}>💡 Tip: añade d_reacción = v·t_reacción (≈ 0,7 s) para la distancia total de parada.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Tip: añade d_reacción = v·t_reacción (≈ 0,7 s) para la distancia total de parada.</p>
             </div>
           </div>
         </section>
 
         {/* Sección 3: FAQ Ampliado */}
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas Frecuentes sobre Cinemática</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Cinemática</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <h4>¿Cuál es la diferencia entre velocidad y aceleración?</h4>
@@ -611,7 +616,7 @@ export default function CalculadoraMovimientoPage() {
             <div className={styles.faqItem}>
               <h4>¿Por qué el ángulo de 45° da el alcance máximo en tiro parabólico?</h4>
               <p>El alcance es R = v₀²·sin(2θ)/g. La función sin(2θ) tiene su valor máximo (= 1) cuando 2θ = 90°, es decir, θ = 45°. Para ese ángulo, la velocidad se reparte igual entre componente horizontal y vertical, logrando el equilibrio óptimo entre distancia y altura.</p>
-              <p className={styles.faqTip}>📐 Nota: ángulos complementarios (30° y 60°) dan el mismo alcance pero distinta altura máxima.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">📐</span> Nota: ángulos complementarios (30° y 60°) dan el mismo alcance pero distinta altura máxima.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué pasa si la aceleración es negativa en MRUA?</h4>
@@ -632,7 +637,7 @@ export default function CalculadoraMovimientoPage() {
             <div className={styles.faqItem}>
               <h4>¿Cómo convierto km/h a m/s?</h4>
               <p>Divide entre 3,6: m/s = km/h ÷ 3,6. La razón: 1 km = 1.000 m y 1 h = 3.600 s, por tanto 1 km/h = 1.000/3.600 m/s = 1/3,6 m/s. Ejemplos: 36 km/h → 10 m/s, 90 km/h → 25 m/s, 120 km/h → 33,33 m/s.</p>
-              <p className={styles.faqTip}>📐 Inverso: m/s × 3,6 = km/h.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">📐</span> Inverso: m/s × 3,6 = km/h.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué errores son más frecuentes en los problemas de cinemática?</h4>
@@ -643,7 +648,7 @@ export default function CalculadoraMovimientoPage() {
 
         {/* Sección 4: Guía Paso a Paso */}
         <section className={styles.guideSection}>
-          <h2>📋 Cómo Resolver un Problema de Cinemática: 7 Pasos</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo Resolver un Problema de Cinemática: 7 Pasos</h2>
           <ol className={styles.stepGuide}>
             <li className={styles.step}>
               <span className={styles.stepNumber}>1</span>
@@ -699,7 +704,7 @@ export default function CalculadoraMovimientoPage() {
 
         {/* Sección 5: Mejores Prácticas */}
         <section className={styles.guideSection}>
-          <h2>✅ Mejores Prácticas para Estudiantes de Física</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores Prácticas para Estudiantes de Física</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>✏️</span>

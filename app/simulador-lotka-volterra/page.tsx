@@ -554,7 +554,7 @@ export default function Page() {
 
           <div className={styles.controlBar}>
             <button className={styles.calcBtn} onClick={iniciarSimulacion} type="button">
-              ▶ Simular
+              <span aria-hidden="true">▶</span> Simular
             </button>
             {animando && (
               <>
@@ -562,7 +562,7 @@ export default function Page() {
                   {pausado ? '▶ Reanudar' : '⏸ Pausar'}
                 </button>
                 <button className={styles.controlBtn} onClick={acelerar} type="button">
-                  ⏩ Velocidad {velocidad}x
+                  <span aria-hidden="true">⏩</span> Velocidad {velocidad}x
                 </button>
               </>
             )}

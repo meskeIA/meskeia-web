@@ -136,12 +136,14 @@ export default function CalculadoraIvaPage() {
         <div className={styles.inputPanel}>
           <div className={styles.operationToggle}>
             <button
+              type="button"
               className={`${styles.toggleBtn} ${operacion === 'add' ? styles.active : ''}`}
               onClick={() => setOperacion('add')}
             >
               + Añadir IVA
             </button>
             <button
+              type="button"
               className={`${styles.toggleBtn} ${operacion === 'remove' ? styles.active : ''}`}
               onClick={() => setOperacion('remove')}
             >
@@ -163,6 +165,7 @@ export default function CalculadoraIvaPage() {
             <div className={styles.ivaOptions}>
               {IVA_RATES.map((rate) => (
                 <button
+                  type="button"
                   key={rate.value}
                   className={`${styles.ivaBtn} ${tipoIva === rate.value ? styles.active : ''}`}
                   onClick={() => setTipoIva(rate.value)}
@@ -175,10 +178,10 @@ export default function CalculadoraIvaPage() {
           </div>
 
           <div className={styles.buttonGroup}>
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Calcular IVA
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -248,7 +251,7 @@ export default function CalculadoraIvaPage() {
         <section className={styles.htmlSection}>
           <div className={styles.htmlHeader}>
             <div>
-              <h2>📋 Código HTML para tu blog o web</h2>
+              <h2><span aria-hidden="true">📋</span> Código HTML para tu blog o web</h2>
               <p className={styles.htmlSubtitle}>
                 Copia este código listo para pegar en artículos sobre IVA, contabilidad o guías para autónomos
               </p>
@@ -272,7 +275,7 @@ export default function CalculadoraIvaPage() {
                 className={styles.btnCopyCode}
                 aria-label="Copiar código HTML al portapapeles"
               >
-                📋 Copiar código
+                <span aria-hidden="true">📋</span> Copiar código
               </button>
             </div>
           )}
