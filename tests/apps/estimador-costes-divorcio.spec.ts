@@ -1,23 +1,26 @@
 import { test, expect, devices, Locator, Page } from '@playwright/test';
-import { esperarPaginaAsentada } from './_hidratacion';
+import { esperarPaginaAsentada, esperarValorEnReact } from './_hidratacion';
 import { activarTema } from '../contraste-text-muted-auxiliares';
+import { calcular, escalaNotarial, escalaProcura, type Entrada } from '../../app/estimador-costes-divorcio/motor';
+import { PREGUNTAS_FRECUENTES } from '../../app/estimador-costes-divorcio/faq';
+import { faqJsonLd } from '../../app/estimador-costes-divorcio/metadata';
 
 /**
  * Inspector — estimador-costes-divorcio (segmento FISCAL/LEGAL, RIESGO 1 CRÍTICO)
- * Primera inspección: 31/08/2026 · Re-inspección: 03/10/2026.
+ * Primera inspección: 31/08/2026 · Re-inspección: 03/10/2026 · Reparación: 03/10/2026.
  *
  * Qué promete la app
  * ──────────────────
  *   <h1>  «Estimador de Costes de Divorcio en España 2026»
- *   sub.  «Cuánto cuesta divorciarse en España: precio del abogado, procurador y tarifa
- *          notarial según el tipo de procedimiento (mutuo acuerdo vs contencioso), hijos
- *          y bienes comunes»
+ *   sub.  «Cuánto cuesta divorciarse en España: honorarios del abogado y arancel del procurador
+ *          y del notario según el tipo de procedimiento (mutuo acuerdo vs contencioso), hijos y
+ *          bienes comunes»
  *
- *   El cálculo vive entero en `calcular()`, dentro de `app/estimador-costes-divorcio/page.tsx`
- *   (no hay motor aparte): suma partidas fijas escritas a mano (abogado, procurador, notario,
- *   «Registro Civil») según tipo × hijos × complejidad. No hay campos numéricos: la entrada son
- *   tres grupos de botones, así que no hay importes negativos, vacíos ni letras que rechazar; la
- *   combinación imposible (notarial con hijos menores) la impide el propio formulario (CASO 3).
+ *   El cálculo vive en `app/estimador-costes-divorcio/motor.ts` (desde el 03/10/2026; antes era
+ *   un `calcular()` dentro de page.tsx con partidas fijas escritas a mano). Las FAQ visibles y el
+ *   FAQPage salen de UNA lista, `faq.ts`, con las cifras del motor. Entrada: tres grupos de
+ *   botones (tipo × hijos × complejidad) y tres campos numéricos: valor de los bienes (si los
+ *   hay), pensiones al mes (opcional, solo vía judicial) y presupuesto del abogado (opcional).
  *
  * Nota de formato: `formatCurrency` usa es-ES con `useGrouping:'auto'`, que NO agrupa los
  * millares de un número de cuatro cifras («1450,00 €») y SÍ los de cinco o más («12.800,00 €»),
@@ -25,21 +28,21 @@ import { activarTema } from '../contraste-text-muted-auxiliares';
  *
  * FUENTES de los valores esperados (leídas en el BOE el 03/10/2026, no de memoria)
  * ──────────────────────────────────────────────────────────────────────────
- *   · RD 434/2024, arancel de la Procura (BOE-A-2024-8706): art. 1.2 y 3 del RD (el arancel es
- *     de MÁXIMOS y «el precio ofertado, en ningún caso, podrá superar» su umbral); arancel,
- *     art. 3 (351,00 €, SUPLETORIO: solo para lo que «no tenga fijado expresamente un concepto
- *     especial»), art. 6.1 (un procurador para varios: una cuenta + 10 % como máximo por cada
- *     representado) y art. 22, el concepto especial de los procesos matrimoniales:
+ *   · RD 434/2024, arancel de la Procura (BOE-A-2024-8706): arancel de MÁXIMOS; art. 3 (351,00 €,
+ *     SUPLETORIO), art. 6.1 (un procurador para varios: una cuenta + 10 % como máximo por cada
+ *     representado) y art. 22, concepto especial de los procesos matrimoniales:
  *       22.1.a mutuo acuerdo: 70,21 € · 22.3.a contencioso: 100,31 € por procurador ·
  *       22.2 medidas provisionales: 70,21 € · 22.1.b/22.3.b alimentos o compensatoria: escala
- *       del art. 2 sobre una anualidad · 22.1.c/22.3.d liquidación: 25 %/50 % de la escala.
- *     `data/fiscal/costas-judiciales.ts` (ARANCEL_PROCURA) NO tiene todavía el art. 22.
- *   · RD 1426/1989, arancel notarial (BOE-A-1989-28111): nº 1.h (documento sin cuantía,
- *     30,050605 €), nº 2.1 (escala sobre el valor, con rebaja del 5 %) y norma general 4.ª.3
+ *       del art. 2 sobre una anualidad · 22.1.c liquidación en el mutuo acuerdo: 25 % de la
+ *       escala · 22.3.c disolución de gananciales: 25 % · 22.3.d liquidación: 50 %.
+ *     En `data/fiscal/costas-judiciales.ts` (ARANCEL_PROCURA_FAMILIA, ARANCEL_PROCURA_ESCALA).
+ *   · RD 1426/1989, arancel notarial (BOE-A-1989-28111): nº 1.1.h (documento sin cuantía,
+ *     30,050605 €), nº 2.1 (escala sobre el valor, «rebaja del 5 por 100») y norma general 4.ª.3
  *     (en la liquidación de la sociedad conyugal, la escala se aplica A CADA INTERESADO por lo
- *     que se le adjudica). La escala está en `data/itp-ccaa.ts` (ARANCELES_NOTARIO).
- *   · Ley 20/2011 del Registro Civil (BOE-A-2011-12628): art. 61 (el notario remite la
- *     escritura y la Oficina inscribe de inmediato); la ley no fija tasa ni arancel alguno.
+ *     que se le adjudica). Escala en `data/itp-ccaa.ts` (ARANCELES_NOTARIO).
+ *   · Ley 20/2011 del Registro Civil (BOE-A-2011-12628): art. 61 (el notario o el letrado de la
+ *     Administración de Justicia remiten la escritura o la sentencia y la Oficina inscribe de
+ *     inmediato); la ley no fija tasa ni arancel alguno.
  *   · Código Civil arts. 81, 82 y 87 (redacción de la Ley 8/2021): el notarial queda vedado
  *     con «hijos menores no emancipados o hijos mayores respecto de los que se hayan
  *     establecido judicialmente medidas de apoyo atribuidas a sus progenitores».
@@ -51,51 +54,49 @@ import { activarTema } from '../contraste-text-muted-auxiliares';
  *
  * CASOS (resueltos a mano ANTES de ejecutar la app)
  * ─────────────────────────────────────────────────
- *   CASO 1 (normal) — mutuo acuerdo judicial · sin hijos · sin bienes: abogado 500–1.200
- *       (horquilla de mercado de la app) + procurador. Reescrito el 03/10/2026: fijaba como
- *       correctos «Procurador 250,00 €» y «750,00 € – 1450,00 €», y 250 € supera el máximo legal;
- *       ahora comprueba la aritmética (total = suma del desglose) y el procurador va a su ABIERTO.
+ *   CASO 1 (normal) — mutuo acuerdo judicial · sin hijos · sin bienes ni pensiones:
+ *       procurador 70,21 × 1,20 (art. 6.1) = 84,252 € → con IVA 101,94492 → 101,94 €.
+ *       Abogado 500–1.200 (supuesto de la herramienta) → total 601,94 € – 1301,94 €, 2–4 meses.
  *
- *   CASO 2 (límite, el más caro que ofrece la app) — contencioso · con hijos · bienes complejos:
- *       4.800,00 € – 12.800,00 € POR CÓNYUGE, 6–18 meses. El procurador de 800 € cabe en el
- *       arancel cuando hay liquidación de un activo grande (art. 22.3.d), así que no se toca.
+ *   CASO 2 (límite, el más caro) — contencioso · con hijos · bienes complejos de 300.000 €:
+ *       escala art. 2 (≤ 300.000) = 1.472,62 €; 22.3.c + 22.3.d = 75 % → 1.104,465 €.
+ *       100,31 + 70,21 + 1.104,465 = 1.274,985 € → con IVA 1.542,73185 → 1542,73 € por cónyuge.
+ *       Abogado 4.000–12.000 → 5542,73 € – 13.542,73 € por cónyuge, 6–18 meses.
  *
- *   CASO 3 (combinación imposible) — el notarial no admite hijos menores no emancipados: al
- *       elegirlo desaparece la pregunta y `tieneHijos` vuelve a false. Reescrito el 03/10/2026:
- *       fijaba «Notario 150,00 €», «Registro Civil 50,00 €» y «900,00 € – 1700,00 €», que
- *       arrastran dos hallazgos abiertos; ahora comprueba la aritmética del desglose.
+ *   CASO 3 (combinación imposible + notario con bienes) — el notarial no admite hijos menores
+ *       no emancipados: al elegirlo desaparece la pregunta y `hijos` vuelve a false. Notarial con
+ *       una vivienda de 150.000 € a partes iguales (75.000 € a cada uno):
+ *       escala nº 2 = 90,15 + 24.040,49 × 4,5 ‰ (108,182205) + 30.050,60 × 1,5 ‰ (45,0759)
+ *       + 14.898,79 × 1 ‰ (14,89879) = 258,306895 € → × 0,95 = 245,39155 € por cónyuge;
+ *       × 2 = 490,7831 €; + 30,050605 € de la escritura de divorcio (nº 1.1.h) = 520,833705 €
+ *       → con IVA 630,2087831 → 630,21 €. (El acta daba 490,79 € con la base 90,151816 del BOE;
+ *       data/itp-ccaa.ts la redondea a 90,15: 0,3 céntimos.) Abogado 700–1.500 →
+ *       1330,21 € – 2130,21 €.
  *
- *   PROCURADOR (límite normativo) — mutuo acuerdo judicial · sin hijos · sin bienes ni pensión:
- *       máximo = 70,21 € (22.1.a) × 1,20 (art. 6.1, dos representados) = 84,25 € → con IVA
- *       21 % = 101,94 €. La app pone 250,00 €. Contencioso sin hijos ni bienes, por cónyuge:
- *       100,31 € (22.3.a) + 70,21 € (22.2) = 170,52 € → con IVA 206,33 €. La app pone 500,00 €.
+ *   CASO 4 (pensiones) — mutuo acuerdo judicial · con hijos · bienes simples 150.000 € ·
+ *       pensión 400 €/mes: anualidad 4.800 € → escala 187,42 €; liquidación 25 % × 1.294,12 €
+ *       (≤ 180.000) = 323,53 €; (70,21 + 187,42 + 323,53) × 1,20 = 697,392 € → con IVA
+ *       843,84432 → 843,84 €.
  *
- *   NOTARIO con bienes (vivienda de 150.000 € liquidada a partes iguales, 75.000 € a cada uno):
- *       por cónyuge 0,95 × (90,151816 + 108,1822 + 45,0759 + 14,8988) = 245,39 € → 490,79 € de
- *       matriz entre los dos, sin folios, copias ni IVA. Basta con adjudicar más de 15.216 € a
- *       cada cónyuge para pasar de 250 €. La app pone 150 € (igual que sin bienes) y, con
- *       «bienes complejos», 250 €.
+ *   CONTENCIOSO sin hijos ni bienes, por cónyuge: 100,31 + 70,21 = 170,52 € → 206,3292 → 206,33 €.
+ *   NOTARIAL sin bienes: 30,050605 € → con IVA 36,3612 → 36,36 €.
  *
  *   JUSTICIA GRATUITA — persona que se divorcia, con 10.000 € brutos al año: supera 1 × IPREM
  *       (7.200 € en 12 pagas, 8.400 € en 14) y queda bajo 2 × IPREM (14.400 / 16.800 €), que es
- *       el umbral del art. 3.1.a: puede tener derecho. La app solo dice «límite IPREM».
+ *       el umbral del art. 3.1.a: puede tener derecho.
  *
- * ── Reparado 02/09/2026 (hallazgos 571 y 572) — verificado el 03/10/2026 ──────────────
- *   571 — La «Comparativa rápida» y las FAQ daban 650–2.550 € para el notarial; el motor solo
- *       puede dar 700–2.800 €. Cerrado: ambos citan 700–2.800 € (test reescrito como invariante).
- *   572 — La app no citaba data/fiscal ni mostraba <DataReference>. Cerrado en su letra: lo
- *       muestra y la exención de tasas (Ley 10/2012 art. 4.2.a) es correcta. PERO la nota que
- *       añadió la reparación cita para el procurador el art. 3 (351,00 € de cuantía
- *       indeterminada), que es supletorio: el divorcio tiene concepto propio en el art. 22. El
- *       test de 572 afirmaba «351,00» como correcto; se retira esa línea y el defecto queda en
- *       su propio test ABIERTO.
+ * ── Reparado 02/09/2026 (hallazgos 571 y 572) ──────────────────────────────────────────
+ *   571 — La «Comparativa rápida» daba cifras que el motor no podía producir. Desde el
+ *       03/10/2026 la comparativa se calcula con el motor y los datos del usuario: su test exige
+ *       que cada tarjeta valga lo que da elegir ese tipo con los mismos datos.
+ *   572 — DataReference con data/fiscal y la exención de tasas (Ley 10/2012 art. 4.2.a).
  *
- * ── ABIERTOS (inspector 03/10/2026), cada uno en su test.fail() ─────────────────────────
- *   procurador por encima del arancel · DataReference con el concepto equivocado · partida de
- *   «Registro Civil» de 50 € · notario fijo con bienes · honorarios de abogado sin fuente ni
- *   aviso de que son libres · requisito del notarial mal formulado · justicia gratuita sin el
- *   múltiplo del IPREM · duraciones de las FAQ/JSON-LD que contradicen al motor · emojis de las
- *   opciones sin aria-hidden · grupos de botones sin nombre accesible · contraste en los dos temas.
+ * ── Reparado 03/10/2026 (hallazgos 2792-2802) ──────────────────────────────────────────
+ *   2792 procurador por encima del arancel · 2793 DataReference con el art. 3 en vez del 22 ·
+ *   2794 «Registro Civil 50 €» · 2795 notario fijo con bienes · 2796 honorarios de abogado sin
+ *   decir que son libres · 2797 requisito del notarial · 2798 justicia gratuita sin el múltiplo
+ *   del IPREM · 2799 duraciones de las FAQ/JSON-LD · 2800 emojis sin aria-hidden · 2801 grupos
+ *   sin nombre accesible · 2802 contraste en los dos temas.
  */
 
 const RUTA = '/estimador-costes-divorcio/';
@@ -126,12 +127,7 @@ function horquilla(texto: string): [number, number] {
   throw new Error(`Más de dos importes en «${texto}»`);
 }
 
-/** «700 – 2.800 €» de la Comparativa rápida → [70000, 280000]. */
-function horquillaComparativa(texto: string): [number, number] {
-  const m = limpiar(texto).match(/(\d[\d.]*) – (\d[\d.]*) €/);
-  if (!m) throw new Error(`Sin horquilla en «${texto}»`);
-  return [Number(m[1].split('.').join('')) * 100, Number(m[2].split('.').join('')) * 100];
-}
+const enCentimos = (r: { min: number; max: number }): [number, number] => [Math.round(r.min * 100), Math.round(r.max * 100)];
 
 async function elegirTipo(page: Page, etiqueta: string): Promise<void> {
   await page.getByRole('button', { name: etiqueta }).click();
@@ -145,29 +141,37 @@ async function elegirComplejidad(page: Page, etiqueta: string): Promise<void> {
   await page.getByRole('button', { name: etiqueta }).click();
 }
 
+const campoValor = (page: Page) => page.getByRole('textbox', { name: /Valor de los bienes comunes/ });
+const campoPension = (page: Page) => page.getByRole('textbox', { name: /Pensiones que se fijan/ });
+const campoPresupuesto = (page: Page) => page.getByRole('textbox', { name: /Presupuesto de tu abogado/ });
+
+/** Escribe en un campo con `fill()` y espera a que el estado de React lo tenga (_hidratacion.ts). */
+async function escribir(page: Page, campo: Locator, valor: string): Promise<void> {
+  await campo.fill(valor);
+  await esperarValorEnReact(page, campo, valor);
+}
+
 async function estimar(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Estimar costes' }).click();
 }
 
 async function hayResultado(page: Page): Promise<boolean> {
-  return (await page.getByText('Completa los datos y pulsa').count()) === 0;
+  return (await page.locator('[class*="totalImporte"]').count()) > 0;
 }
 
 /** «Coste total estimado[ (por cónyuge)]» — la horquilla que preside la tarjeta de resultados. */
 async function totalEstimado(page: Page): Promise<string> {
-  const importe = page.locator('div', { hasText: /^\d.*€.*–.*€$/ }).last();
-  return limpiar(await importe.innerText());
+  return limpiar(await page.locator('[class*="totalImporte"]').innerText());
 }
 
 async function etiquetaTotal(page: Page): Promise<string> {
-  const etiqueta = page.getByText(/^Coste total estimado/);
-  return limpiar(await etiqueta.innerText());
+  return limpiar(await page.locator('[class*="totalLabel"]').innerText());
 }
 
 /**
- * Importe de una fila del desglose («Abogado», «Procurador», «Notario», «Registro Civil»,
- * «Tasas judiciales»). No se ancla `nombre` al inicio: cada fila empieza con un emoji
- * decorativo (`aria-hidden`, pero SIGUE en el texto visible) antes del nombre de la partida.
+ * Importe de una fila del desglose («Abogado», «Procurador», «Notario», «Tasas judiciales»).
+ * No se ancla `nombre` al inicio: cada fila empieza con un emoji decorativo (`aria-hidden`,
+ * pero SIGUE en el texto visible) antes del nombre de la partida.
  */
 async function partida(page: Page, nombre: RegExp): Promise<string> {
   const fila = page.locator('[class*="desgloseItem"]', { hasText: nombre });
@@ -181,7 +185,7 @@ async function sumaDelDesglose(page: Page): Promise<[number, number]> {
 }
 
 async function duracion(page: Page): Promise<string> {
-  return limpiar(await page.getByText(/^Duración estimada/).innerText());
+  return limpiar(await page.locator('[class*="duracion"]').innerText());
 }
 
 /**
@@ -296,6 +300,9 @@ async function medirContrasteDeLaApp(page: Page): Promise<string[]> {
     { nombre: 'interruptor No/Sí activo', objetivo: page.locator('[class*="switchActivo"]'), umbral: 4.5 },
     { nombre: 'botón «Estimar costes»', objetivo: page.getByRole('button', { name: 'Estimar costes' }), umbral: 4.5 },
     { nombre: 'etiqueta del total', objetivo: page.locator('[class*="totalLabel"]'), umbral: 4.5 },
+    { nombre: 'duración', objetivo: page.locator('[class*="duracion"]'), umbral: 4.5 },
+    // 28,8 px en negrita: grande.
+    { nombre: 'importe del total', objetivo: page.locator('[class*="totalImporte"]'), umbral: 3 },
     { nombre: 'aviso del contencioso (strong)', objetivo: page.locator('[class*="alertCard"] strong'), umbral: 4.5 },
     { nombre: 'comparativa activa (strong)', objetivo: page.locator('[class*="comparativaActivo"] strong'), umbral: 4.5 },
   ];
@@ -307,6 +314,46 @@ async function medirContrasteDeLaApp(page: Page): Promise<string[]> {
   return fallos;
 }
 
+// ═════════════════════════════ MOTOR (sin navegador) ═════════════════════════════
+
+const BASE: Omit<Entrada, 'tipo'> = { hijos: false, complejidad: 'sin_bienes', valorBienes: 0, pensionMensual: 0, presupuestoAbogado: null };
+
+test.describe('MOTOR · casos resueltos a mano', () => {
+  test('escalas: art. 2 de la Procura y nº 2 notarial con la rebaja del 5 %', () => {
+    expect(escalaProcura(4800)).toBe(187.42);
+    expect(escalaProcura(150000)).toBe(1294.12);
+    expect(escalaProcura(300000)).toBe(1472.62); // «no exceda de» 300.000: el escalón incluye el límite
+    expect(escalaNotarial(75000)).toBeCloseTo(245.39155, 4);
+  });
+
+  test('procurador y notario de los casos de la cabecera', () => {
+    expect(calcular({ ...BASE, tipo: 'mutuo_acuerdo_judicial' }).procurador?.total).toBe(101.94);
+    expect(calcular({ ...BASE, tipo: 'contencioso' }).procurador?.total).toBe(206.33);
+    expect(calcular({ ...BASE, tipo: 'mutuo_acuerdo_notarial' }).notario?.total).toBe(36.36);
+    expect(
+      calcular({ ...BASE, tipo: 'mutuo_acuerdo_notarial', complejidad: 'bienes_simples', valorBienes: 150000 }).notario?.total,
+    ).toBe(630.21);
+    expect(
+      calcular({ ...BASE, tipo: 'contencioso', hijos: true, complejidad: 'bienes_complejos', valorBienes: 300000 }).procurador?.total,
+    ).toBe(1542.73);
+    expect(
+      calcular({ ...BASE, tipo: 'mutuo_acuerdo_judicial', hijos: true, complejidad: 'bienes_simples', valorBienes: 150000, pensionMensual: 400 })
+        .procurador?.total,
+    ).toBe(843.84);
+  });
+
+  test('el notarial ignora «hijos» (no cabe) y el presupuesto sustituye a la horquilla', () => {
+    const notarialConHijos = calcular({ ...BASE, tipo: 'mutuo_acuerdo_notarial', hijos: true });
+    expect(notarialConHijos).toEqual(calcular({ ...BASE, tipo: 'mutuo_acuerdo_notarial' }));
+    const r = calcular({ ...BASE, tipo: 'mutuo_acuerdo_judicial', presupuestoAbogado: 900 });
+    expect(r.abogado).toEqual({ min: 900, max: 900, esPresupuesto: true });
+    expect(enCentimos(r.total)).toEqual([90000 + 10194, 90000 + 10194]);
+  });
+});
+
+// ═════════════════════════════ PÁGINA ═════════════════════════════
+
+test.describe('PÁGINA', () => {
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Estimador de Costes de Divorcio en España 2026');
@@ -315,7 +362,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('CASO 1 (normal) · mutuo acuerdo judicial, sin hijos, sin bienes: el total es la suma del desglose', async ({ page }) => {
+test('CASO 1 (normal) · mutuo acuerdo judicial, sin hijos, sin bienes: 601,94 € – 1301,94 €', async ({ page }) => {
   // Riesgo 1: el disclaimer crítico va SIEMPRE desplegado (no colapsable).
   const disclaimer = page.locator('[role="alert"]').first();
   await expect(disclaimer).toContainText('orientativ');
@@ -328,20 +375,19 @@ test('CASO 1 (normal) · mutuo acuerdo judicial, sin hijos, sin bienes: el total
 
   expect(await etiquetaTotal(page)).toBe('Coste total estimado');
   expect(await partida(page, /Abogado/)).toBe('500,00 € – 1200,00 €');
+  // Hallazgo 2792: el máximo legal (70,21 × 1,20 + IVA), no los 250 € de antes.
+  expect(await partida(page, /Procurador/)).toBe('101,94 €');
   expect(await partida(page, /Tasas judiciales/)).toBe('Exento');
-  // Reescrito el 03/10/2026: aquí se fijaban «Procurador 250,00 €» y «750,00 € – 1450,00 €»
-  // como correctos, y 250 € pasa del máximo legal del arancel (test ABIERTO del procurador).
-  // Lo que queda es la aritmética del motor, que vale con cualquier procurador.
+  expect(await totalEstimado(page)).toBe('601,94 € – 1301,94 €');
   expect(horquilla(await totalEstimado(page))).toEqual(await sumaDelDesglose(page));
   expect(await duracion(page)).toBe('Duración estimada: 2–4 meses');
-  expect(await notas(page)).toEqual([
-    'Un solo abogado y procurador para ambos (coste compartido)',
-    'Las personas físicas están exentas de tasas judiciales desde 2015',
-  ]);
+  const n = await notas(page);
+  expect(n[0]).toBe('Un solo abogado y procurador para ambos (coste compartido)');
+  expect(n).toContain('Las personas físicas están exentas de tasas judiciales desde 2015');
 
-  // No se muestran filas de notario ni registro civil fuera del notarial.
-  expect(await page.locator('[class*="desgloseItem"]', { hasText: /^Notario/ }).count()).toBe(0);
-  expect(await page.locator('[class*="desgloseItem"]', { hasText: /^Registro Civil/ }).count()).toBe(0);
+  // No se muestran filas de notario ni de registro civil fuera del notarial.
+  expect(await page.locator('[class*="desgloseItem"]', { hasText: /Notario/ }).count()).toBe(0);
+  expect(await page.locator('[class*="desgloseItem"]', { hasText: /Registro Civil/ }).count()).toBe(0);
 
   // Regla de accesibilidad obligatoria: todo <button> de la app lleva type="button".
   const sinType = await page.evaluate(() =>
@@ -353,88 +399,97 @@ test('CASO 1 (normal) · mutuo acuerdo judicial, sin hijos, sin bienes: el total
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('CASO 2 (límite) · contencioso, con hijos, bienes complejos: 4800,00 € – 12.800,00 € por cónyuge', async ({ page }) => {
+test('CASO 2 (límite) · contencioso, con hijos, bienes complejos de 300.000 €: 5542,73 € – 13.542,73 € por cónyuge', async ({ page }) => {
+  // Reescrito el 03/10/2026: fijaba «Procurador 800,00 €» y «4800,00 € – 12.800,00 €»; los 800 €
+  // eran un fijo escrito a mano que no dependía del activo. Ahora el activo se pide y el
+  // procurador sale del art. 22.3 (cuenta en la cabecera).
   await elegirTipo(page, 'Contencioso');
   await elegirHijos(page, true);
   await elegirComplejidad(page, 'Bienes complejos');
+  await escribir(page, campoValor(page), '300.000');
   await estimar(page);
 
   // El propio motor avisa de que el importe es por cónyuge, no por pareja.
   expect(await etiquetaTotal(page)).toBe('Coste total estimado (por cónyuge)');
   expect(await partida(page, /Abogado/)).toBe('4000,00 € – 12.000,00 €');
-  expect(await partida(page, /Procurador/)).toBe('800,00 €'); // escalón caro (bienes complejos)
+  expect(await partida(page, /Procurador/)).toBe('1542,73 €');
   expect(await partida(page, /Tasas judiciales/)).toBe('Exento');
-  expect(await totalEstimado(page)).toBe('4800,00 € – 12.800,00 €');
+  expect(await totalEstimado(page)).toBe('5542,73 € – 13.542,73 €');
   expect(await duracion(page)).toBe('Duración estimada: 6–18 meses');
-  expect(await notas(page)).toEqual([
+  const n = await notas(page);
+  expect(n.slice(0, 2)).toEqual([
     'Cada cónyuge necesita su propio abogado y procurador',
     'Los importes mostrados son por cónyuge — el coste total familiar sería el doble',
-    'Posibles informes periciales psicosociales si hay disputa sobre custodia',
-    'Las personas físicas están exentas de tasas judiciales desde 2015',
   ]);
+  expect(n).toContain('Posibles informes periciales psicosociales si hay disputa sobre custodia');
+
+  // El detalle del arancel nombra los cuatro conceptos del art. 22.3 que suma.
+  const detalle = limpiar(await page.locator('[class*="detallePartida"]').first().innerText());
+  for (const art of ['22.3.a', '22.2', '22.3.c', '22.3.d']) expect(detalle).toContain(art);
 
   // Aviso adicional específico del contencioso (condena en costas).
   await expect(page.getByText('cada cónyuge paga sus propios gastos')).toBeVisible();
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('CASO 3 (aviso claro) · el notarial oculta y resetea la pregunta de hijos, no la deja pegada en "Sí"', async ({ page }) => {
-  // Punto de partida: judicial + hijos=Sí + bienes simples → 1.250–2.250 €.
+test('CASO 3 · el notarial oculta y resetea la pregunta de hijos; con una vivienda de 150.000 €, notario 630,21 €', async ({ page }) => {
   await elegirTipo(page, 'Mutuo acuerdo (judicial)');
   await elegirHijos(page, true);
   await elegirComplejidad(page, 'Bienes simples');
+  await escribir(page, campoValor(page), '150.000');
   await estimar(page);
   expect(await partida(page, /Abogado/)).toBe('1000,00 € – 2000,00 €');
   expect(horquilla(await totalEstimado(page))).toEqual(await sumaDelDesglose(page));
   expect(await notas(page)).toContain('Se necesita convenio regulador con medidas sobre custodia, alimentos y uso de vivienda');
 
   // El divorcio notarial (CC arts. 82.2 y 87) no cabe con hijos menores no emancipados: la
-  // app debe impedir la combinación, no solo advertirla.
+  // app debe impedir la combinación, no solo advertirla. Se ancla al GRUPO de la pregunta, no a
+  // su frase (que cambió con el hallazgo 2797).
   await elegirTipo(page, 'Mutuo acuerdo (notarial)');
-  await expect(page.getByText('¿Hay hijos menores o con discapacidad?')).toHaveCount(0);
+  await expect(page.getByRole('group', { name: /hijos/i })).toHaveCount(0);
   expect(await hayResultado(page)).toBe(false); // el resultado anterior (con hijos) se limpia
 
-  // El estado de "hijos" no debe quedar pegado en Sí por detrás del formulario: al volver
-  // a judicial, el switch debe mostrarse otra vez en "No", no conservar la elección previa.
+  // El estado de "hijos" no debe quedar pegado en Sí por detrás del formulario.
   await elegirTipo(page, 'Mutuo acuerdo (judicial)');
   await expect(page.getByRole('button', { name: 'No', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'Sí', exact: true })).toHaveAttribute('aria-pressed', 'false');
 
-  // Y el cálculo notarial en sí, con bienes simples. Reescrito el 03/10/2026: fijaba «Notario
-  // 150,00 €», «Registro Civil 50,00 €» y «900,00 € – 1700,00 €» como correctos; las dos
-  // partidas tienen su test ABIERTO. Queda lo que no depende de ellas.
   await elegirTipo(page, 'Mutuo acuerdo (notarial)');
-  await elegirComplejidad(page, 'Bienes simples');
   await estimar(page);
   expect(await partida(page, /Abogado/)).toBe('700,00 € – 1500,00 €');
   expect(await partida(page, /Procurador/)).toBe('No necesario'); // CC art. 82.1: basta letrado
+  expect(await partida(page, /Notario/)).toBe('630,21 €');
+  expect(await totalEstimado(page)).toBe('1330,21 € – 2130,21 €');
   expect(horquilla(await totalEstimado(page))).toEqual(await sumaDelDesglose(page));
   expect(await duracion(page)).toBe('Duración estimada: 1–2 meses');
-  // Y ninguna nota de hijos se cuela en el notarial.
   const n = await notas(page);
   expect(n.join(' ')).not.toMatch(/Ministerio Fiscal|custodia/);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('HALLAZGO 571 (reparado) · la "Comparativa rápida" del notarial coincide con lo que el propio motor puede producir', async ({ page }) => {
-  // Reescrito el 03/10/2026 como invariante: antes fijaba los tres totales del notarial
-  // (700–1.200, 900–1.700, 1.300–2.800), que incluyen los 50 € de «Registro Civil» del hallazgo
-  // abierto. Ahora: mínimo y máximo de lo que el motor produce = lo que dice la tarjeta.
-  let minimo = Infinity;
-  let maximo = -Infinity;
-  await elegirTipo(page, 'Mutuo acuerdo (notarial)');
-  for (const c of COMPLEJIDADES) {
-    await elegirComplejidad(page, c);
-    await estimar(page);
-    const [a, b] = horquilla(await totalEstimado(page));
-    minimo = Math.min(minimo, a);
-    maximo = Math.max(maximo, b);
-  }
-  const comparativaNotarial = page.locator('[class*="comparativaItem"]', { hasText: 'Notarial' });
-  expect(horquillaComparativa(await comparativaNotarial.innerText())).toEqual([minimo, maximo]);
-  // La cifra vieja (650–2.550) no vuelve.
-  await expect(comparativaNotarial).not.toContainText('650');
-  await expect(comparativaNotarial).not.toContainText('2.550');
+test('CASO 4 · las pensiones suman la escala del art. 2 sobre una anualidad: procurador 843,84 €', async ({ page }) => {
+  await elegirTipo(page, 'Mutuo acuerdo (judicial)');
+  await elegirHijos(page, true);
+  await elegirComplejidad(page, 'Bienes simples');
+  await escribir(page, campoValor(page), '150.000');
+  await escribir(page, campoPension(page), '400');
+  await estimar(page);
+  expect(await partida(page, /Procurador/)).toBe('843,84 €');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('ENTRADAS · con bienes el valor es obligatorio; el presupuesto del abogado sustituye a la horquilla', async ({ page }) => {
+  await elegirComplejidad(page, 'Bienes simples');
+  await estimar(page);
+  expect(await hayResultado(page)).toBe(false);
+  await expect(page.getByRole('alert').filter({ hasText: 'valor aproximado de los bienes' })).toBeVisible();
+
+  await elegirComplejidad(page, 'Sin bienes comunes');
+  await escribir(page, campoPresupuesto(page), '900');
+  await estimar(page);
+  expect(await partida(page, /Abogado/)).toBe('900,00 €');
+  expect(await totalEstimado(page)).toBe('1001,94 € – 1001,94 €');
+  await expect(page.locator('[class*="aclaracion"]')).toContainText('Tu presupuesto');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -442,36 +497,41 @@ test('HALLAZGO 572 (reparado) · DataReference cita la exención de tasas y el a
   const referencia = page.locator('[aria-label="Datos de referencia normativos"]');
   await expect(referencia).toContainText('Ley 10/2012');
   await expect(referencia).toContainText('RD 434/2024');
-  // Reescrito el 03/10/2026: aquí se exigía «351,00», que es el art. 3 del arancel (cuantía
-  // indeterminada, SUPLETORIO). El divorcio tiene concepto propio en el art. 22: ver el test
-  // ABIERTO «DataReference cita el concepto del divorcio».
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test('COMPARATIVA · las tres tarjetas y el total de las 15 combinaciones cuadran con el motor', async ({ page }) => {
-  const tipos: { boton: string; tarjeta: string; conHijos: boolean }[] = [
-    { boton: 'Mutuo acuerdo (notarial)', tarjeta: 'Notarial', conHijos: false },
-    { boton: 'Mutuo acuerdo (judicial)', tarjeta: 'Mutuo acuerdo', conHijos: true },
-    { boton: 'Contencioso', tarjeta: 'Contencioso', conHijos: true },
+test('HALLAZGO 571 / COMPARATIVA · cada tarjeta vale lo que da elegir ese tipo con los mismos datos', async ({ page }) => {
+  // Reescrito el 03/10/2026: la comparativa ya no son tres horquillas fijas sino el motor con los
+  // datos del usuario. Para cada combinación se estima con los tres tipos y se exige que, tras la
+  // última estimación, cada tarjeta coincida con el total de su tipo.
+  const tipos: { boton: string; tarjeta: string }[] = [
+    { boton: 'Mutuo acuerdo (notarial)', tarjeta: 'Notarial' },
+    { boton: 'Mutuo acuerdo (judicial)', tarjeta: 'Mutuo acuerdo' },
+    { boton: 'Contencioso', tarjeta: 'Contencioso' },
   ];
-  for (const t of tipos) {
-    let minimo = Infinity;
-    let maximo = -Infinity;
-    await elegirTipo(page, t.boton);
-    for (const hijos of t.conHijos ? [false, true] : [false]) {
-      if (t.conHijos) await elegirHijos(page, hijos);
-      for (const c of COMPLEJIDADES) {
+  for (const hijos of [false, true]) {
+    for (const c of COMPLEJIDADES) {
+      const totales = new Map<string, [number, number]>();
+      for (const t of tipos) {
+        await elegirTipo(page, t.boton);
+        if (t.boton !== 'Mutuo acuerdo (notarial)') await elegirHijos(page, hijos);
+        else if (hijos) continue; // no cabe con hijos
         await elegirComplejidad(page, c);
+        if (c !== 'Sin bienes comunes') await escribir(page, campoValor(page), '200.000');
         await estimar(page);
         const total = horquilla(await totalEstimado(page));
-        // Cada total es la suma de su desglose (abogado + procurador + notario + registro).
         expect(total, `${t.boton} · hijos=${hijos} · ${c}`).toEqual(await sumaDelDesglose(page));
-        minimo = Math.min(minimo, total[0]);
-        maximo = Math.max(maximo, total[1]);
+        totales.set(t.tarjeta, total);
+      }
+      for (const t of tipos) {
+        const tarjeta = page.locator('[class*="comparativaItem"]', { hasText: t.tarjeta });
+        if (!totales.has(t.tarjeta)) {
+          await expect(tarjeta).toContainText('No cabe con hijos');
+          continue;
+        }
+        expect(horquilla(await tarjeta.locator('span').first().innerText()), `${t.tarjeta} · hijos=${hijos} · ${c}`).toEqual(totales.get(t.tarjeta));
       }
     }
-    const tarjeta = page.locator('[class*="comparativaItem"]', { hasText: t.tarjeta });
-    expect(horquillaComparativa(await tarjeta.innerText()), t.tarjeta).toEqual([minimo, maximo]);
   }
 });
 
@@ -500,8 +560,9 @@ test.describe('MÓVIL 390 px', () => {
     await page.getByRole('button', { name: 'Contencioso' }).tap();
     await page.getByRole('button', { name: 'Sí', exact: true }).tap();
     await page.getByRole('button', { name: 'Bienes complejos' }).tap();
+    await escribir(page, campoValor(page), '300.000');
     await page.getByRole('button', { name: 'Estimar costes' }).tap();
-    expect(await totalEstimado(page)).toBe('4800,00 € – 12.800,00 €');
+    expect(await totalEstimado(page)).toBe('5542,73 € – 13.542,73 €');
     await expect(page.locator('[class*="totalImporte"]')).toBeVisible();
     const anchos = await page.evaluate(() => ({
       scroll: document.documentElement.scrollWidth,
@@ -511,12 +572,11 @@ test.describe('MÓVIL 390 px', () => {
   });
 });
 
-// ═════════════════════════════ ABIERTOS (03/10/2026) ═════════════════════════════
+// ═════════════════════════════ REPARADOS (03/10/2026) ═════════════════════════════
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · procurador del mutuo acuerdo sin hijos ni bienes: no puede pasar de 101,94 € (RD 434/2024 art. 22.1.a)', async ({ page }) => {
+test('HALLAZGO 2792 (reparado) · procurador del mutuo acuerdo sin hijos ni bienes: no pasa de 101,94 € (RD 434/2024 art. 22.1.a)', async ({ page }) => {
   // 70,21 € (art. 22.1.a) × 1,20 (art. 6.1, un procurador para los dos) = 84,25 € + IVA 21 %
-  // = 101,94 €. Sin hijos no hay alimentos (22.1.b); sin bienes no hay liquidación (22.1.c).
-  // Hoy la app pone 250,00 €.
+  // = 101,94 €. Sin pensiones no hay 22.1.b; sin bienes no hay 22.1.c. Antes: 250,00 €.
   await elegirTipo(page, 'Mutuo acuerdo (judicial)');
   await elegirHijos(page, false);
   await elegirComplejidad(page, 'Sin bienes comunes');
@@ -526,9 +586,9 @@ test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · procurador del mutuo acue
   expect(maximo).toBeLessThanOrEqual(10194);
 });
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · procurador del contencioso sin hijos ni bienes: no puede pasar de 206,33 € por cónyuge (art. 22.3.a + 22.2)', async ({ page }) => {
+test('HALLAZGO 2792 (reparado) · procurador del contencioso sin hijos ni bienes: no pasa de 206,33 € por cónyuge (art. 22.3.a + 22.2)', async ({ page }) => {
   // 100,31 € (art. 22.3.a) + 70,21 € de medidas provisionales (art. 22.2) = 170,52 € + IVA 21 %
-  // = 206,33 €. Hoy la app pone 500,00 €.
+  // = 206,33 €. Antes: 500,00 €.
   await elegirTipo(page, 'Contencioso');
   await elegirHijos(page, false);
   await elegirComplejidad(page, 'Sin bienes comunes');
@@ -538,15 +598,14 @@ test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · procurador del contencios
   expect(maximo).toBeLessThanOrEqual(20633);
 });
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · DataReference cita el concepto del divorcio (art. 22: 70,21 €), no el supletorio de 351,00 €', async ({ page }) => {
-  // La nota añadida al reparar el 572 dice «351,00 € para cuantía indeterminada»: es el art. 3,
-  // que solo rige donde no hay «concepto especial»; los procesos matrimoniales lo tienen.
+test('HALLAZGO 2793 (reparado) · DataReference cita el concepto del divorcio (art. 22: 70,21 €), no el supletorio de 351,00 €', async ({ page }) => {
   const referencia = page.locator('[aria-label="Datos de referencia normativos"]');
   await expect(referencia).toContainText('70,21', { timeout: 2000 });
+  await expect(referencia).toContainText('art. 22');
   await expect(referencia).not.toContainText('351,00', { timeout: 2000 });
 });
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · el divorcio notarial no paga 50 € al Registro Civil (Ley 20/2011, art. 61)', async ({ page }) => {
+test('HALLAZGO 2794 (reparado) · el divorcio notarial no paga 50 € al Registro Civil (Ley 20/2011, art. 61)', async ({ page }) => {
   // La ley no fija tasa ni arancel por la inscripción: la remite el notario de oficio.
   await elegirTipo(page, 'Mutuo acuerdo (notarial)');
   await elegirComplejidad(page, 'Sin bienes comunes');
@@ -559,62 +618,86 @@ test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · el divorcio notarial no p
   const [abMin, abMax] = horquilla(await partida(page, /Abogado/));
   const [noMin, noMax] = horquilla(await partida(page, /Notario/));
   expect(horquilla(await totalEstimado(page))).toEqual([abMin + noMin, abMax + noMax]);
+  // 30,050605 € (nº 1.1.h) + IVA = 36,36 €; abogado 500–1.000 → 536,36 € – 1036,36 €.
+  expect(await totalEstimado(page)).toBe('536,36 € – 1036,36 €');
+  // Ni la FAQ visible ni el FAQPage vuelven a ponerle precio.
+  expect(await textoDeLaPagina(page)).not.toMatch(/Registro Civil \(unos/);
+  expect(await textoJsonLd(page)).not.toMatch(/Registro Civil \(unos/);
 });
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · el notario con bienes no puede costar lo mismo que sin bienes (RD 1426/1989 nº 2 y norma 4.ª.3)', async ({ page }) => {
-  // Sin bienes la escritura es «sin cuantía» (nº 1.h, 30,05 € + folios y copias). Si liquida la
-  // sociedad conyugal, la escala del nº 2 se aplica a cada cónyuge por lo que se le adjudica:
-  // una vivienda de 150.000 € a partes iguales son 490,79 € de matriz. La app pone 150 € en
-  // los dos casos (y 250 € con «bienes complejos», que se superan adjudicando 15.216 € a cada uno).
+test('HALLAZGO 2795 (reparado) · el notario con bienes no cuesta lo mismo que sin bienes (RD 1426/1989 nº 2 y norma 4.ª.3)', async ({ page }) => {
   await elegirTipo(page, 'Mutuo acuerdo (notarial)');
   await elegirComplejidad(page, 'Sin bienes comunes');
   await estimar(page);
   const sinBienes = await partida(page, /Notario/);
   await elegirComplejidad(page, 'Bienes simples');
+  await escribir(page, campoValor(page), '150.000');
   await estimar(page);
   const conVivienda = await partida(page, /Notario/);
-  expect(conVivienda).not.toBe(sinBienes);
+  expect(sinBienes).toBe('36,36 €');
+  expect(conVivienda).toBe('630,21 €');
 });
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · los honorarios de abogado se dicen libres, sin tarifa oficial', async ({ page }) => {
-  // Son libres desde la Ley 25/2009 (cabecera de data/fiscal/costas-judiciales.ts): una
-  // horquilla de honorarios es una estimación de mercado y tiene que decirlo y citar su origen.
-  // Hoy la app los da como «Abogado 500,00 € – 1200,00 €» sin decir de dónde salen.
+test('HALLAZGO 2796 (reparado) · los honorarios de abogado se dicen libres, sin tarifa oficial, junto a la cifra', async ({ page }) => {
+  // Son libres desde la Ley 25/2009 (cabecera de data/fiscal/costas-judiciales.ts).
   const texto = await textoDeLaPagina(page);
   expect(texto).toMatch(/honorarios[^.]{0,160}(libres|no tienen? (tarifa|arancel)|sin (tarifa|arancel)|no hay (tarifa|arancel))/i);
+  // Y junto a la cifra del resultado, no solo en la FAQ plegada.
+  await estimar(page);
+  await expect(page.locator('[class*="aclaracion"]')).toContainText('Ley 25/2009');
+  await expect(page.locator('[class*="aclaracion"]')).toContainText('sin tarifa oficial');
 });
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · el requisito del notarial es el del Código Civil: hijos menores no emancipados o con medidas de apoyo', async ({ page }) => {
-  // CC arts. 81 y 82.2 (Ley 8/2021). Un hijo mayor con discapacidad SIN medidas judiciales de
-  // apoyo atribuidas a los padres, o un ascendiente con discapacidad a cargo, no lo impiden.
-  // Hoy la nota dice «Solo posible sin hijos menores ni personas con discapacidad a cargo».
+test('HALLAZGO 2797 (reparado) · el requisito del notarial es el del Código Civil: hijos menores no emancipados o con medidas de apoyo', async ({ page }) => {
   await elegirTipo(page, 'Mutuo acuerdo (notarial)');
   await estimar(page);
   const n = (await notas(page)).join(' ');
   expect(n).not.toMatch(/discapacidad a cargo/);
   expect(n).toMatch(/no emancipad|medidas (judiciales )?de apoyo/i);
+  // La pregunta del formulario también.
+  await elegirTipo(page, 'Mutuo acuerdo (judicial)');
+  await expect(page.getByRole('group', { name: /hijos menores no emancipados/i })).toHaveCount(1);
+  await expect(page.getByRole('group', { name: /medidas judiciales de apoyo/i })).toHaveCount(1);
+  expect(await textoDeLaPagina(page)).not.toMatch(/discapacidad a cargo/);
+  expect(await textoJsonLd(page)).not.toMatch(/discapacidad a cargo/);
 });
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · justicia gratuita: el umbral es 2 × IPREM (Ley 1/1996 art. 3.1), no «el límite IPREM»', async ({ page }) => {
-  // Con 10.000 € brutos al año se supera 1 × IPREM (7.200 / 8.400 €) y se queda bajo 2 × IPREM
-  // (14.400 / 16.800 €): puede haber derecho. La FAQ solo dice «por debajo del límite IPREM».
+test('HALLAZGO 2798 (reparado) · justicia gratuita: el umbral es 2 × IPREM (Ley 1/1996 art. 3.1), no «el límite IPREM»', async ({ page }) => {
   const texto = await textoDeLaPagina(page);
   expect(texto).toMatch(/(dos veces|doble|2 ?[×x])[^.]{0,40}IPREM|IPREM[^.]{0,60}(dos veces|doble|2 ?[×x])/i);
+  // Con las cifras: 14.400 € (12 pagas) y 16.800 € (14 pagas), y la valoración individual (3.3).
+  expect(limpiar(texto)).toContain('entre 14.400,00 € y 16.800,00 €');
+  expect(texto).toContain('art. 3.3');
 });
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · las duraciones de las FAQ y del JSON-LD no contradicen al motor', async ({ page }) => {
-  // El motor: notarial 1–2 meses; contencioso hasta 18 meses (con hijos). El FAQPage dice
-  // «entre 1 y 3 años» para el contencioso y la FAQ visible, «2-4 semanas» para el notarial.
+test('HALLAZGO 2799 (reparado) · las duraciones de las FAQ y del JSON-LD no contradicen al motor', async ({ page }) => {
   await elegirTipo(page, 'Mutuo acuerdo (notarial)');
   await estimar(page);
   expect(await duracion(page)).toBe('Duración estimada: 1–2 meses');
-  expect(await textoJsonLd(page)).not.toContain('entre 1 y 3 años');
+  const jsonLd = await textoJsonLd(page);
+  expect(jsonLd).not.toContain('entre 1 y 3 años');
   expect(await textoDeLaPagina(page)).not.toContain('2-4 semanas');
+  // Lo que dicen ahora: las duraciones del motor, en la FAQ visible y en el FAQPage.
+  for (const d of ['entre 1 y 2 meses', 'entre 2 y 4 meses', 'entre 4 y 12 meses', 'entre 6 y 18 meses']) {
+    expect(jsonLd).toContain(d);
+    expect(await textoDeLaPagina(page)).toContain(d);
+  }
 });
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · los emojis de las opciones de tipo van con aria-hidden', async ({ page }) => {
-  // 🤝, 📄 y ⚔️ van dentro del <strong> del botón: el lector de pantalla los lee como parte del
-  // nombre («apretón de manos, Mutuo acuerdo (judicial)…»).
+test('FAQ · la visible y el FAQPage son la misma lista, y ninguna cifra contradice al motor', async ({ page }) => {
+  // Una sola fuente (faq.ts) para las dos.
+  expect(faqJsonLd.mainEntity.map((q) => q.name)).toEqual(PREGUNTAS_FRECUENTES.map((p) => p.pregunta));
+  expect(faqJsonLd.mainEntity.map((q) => q.acceptedAnswer.text)).toEqual(PREGUNTAS_FRECUENTES.map((p) => p.respuesta));
+  const visibles = (await page.locator('[class*="faqItem"] summary').allInnerTexts()).map(limpiar);
+  expect(visibles).toEqual(PREGUNTAS_FRECUENTES.map((p) => p.pregunta));
+  // El procurador que cita la FAQ es el que da la app (CASO 1 y el contencioso sin nada).
+  const faq = limpiar(await textoDeLaPagina(page));
+  expect(faq).toContain('101,94 €');
+  expect(faq).toContain('206,33 €');
+  expect(faq).not.toMatch(/250-800|150-250 €/);
+});
+
+test('HALLAZGO 2800 (reparado) · los emojis de las opciones de tipo van con aria-hidden', async ({ page }) => {
   const visibles = await page.evaluate(() => {
     const pictograma = /\p{Extended_Pictographic}/u;
     const salida: string[] = [];
@@ -630,26 +713,27 @@ test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · los emojis de las opcione
     return salida;
   });
   expect(visibles).toEqual([]);
+  // Y el nombre accesible del botón empieza por el texto, sin el pictograma.
+  await expect(page.getByRole('button', { name: /^Mutuo acuerdo \(judicial\)/ })).toHaveCount(1);
 });
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · los grupos de botones tienen nombre accesible (el «Sí»/«No» de los hijos)', async ({ page }) => {
-  // Los tres <label> no están asociados a ningún control y no hay role="group": «Sí» y «No» se
-  // anuncian sin la pregunta a la que responden.
+test('HALLAZGO 2801 (reparado) · los grupos de botones tienen nombre accesible (el «Sí»/«No» de los hijos)', async ({ page }) => {
   await expect(page.getByRole('group', { name: /hijos/i })).toHaveCount(1, { timeout: 2000 });
   await expect(page.getByRole('group', { name: /tipo de divorcio/i })).toHaveCount(1, { timeout: 2000 });
+  await expect(page.getByRole('group', { name: /complejidad patrimonial/i })).toHaveCount(1, { timeout: 2000 });
+  // El «Sí» está DENTRO del grupo de los hijos.
+  await expect(page.getByRole('group', { name: /hijos/i }).getByRole('button', { name: 'Sí', exact: true })).toHaveCount(1);
 });
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · contraste en tema CLARO del texto sobre color de marca', async ({ page }) => {
-  // Medido el 03/10/2026: interruptor y «Estimar costes» 4,11:1 (y 2,80:1 en el extremo teal del
-  // degradado), opción activa 3,99:1, etiqueta del total 2,55:1, aviso rojo 3,54:1. Existe
-  // --primary-boton (5,47:1 con blanco) y --primary-texto.
+test('HALLAZGO 2802 (reparado) · contraste en tema CLARO del texto sobre color de marca', async ({ page }) => {
   await activarTema(page, 'light');
   expect(await medirContrasteDeLaApp(page)).toEqual([]);
 });
 
-test.fail('ABIERTO, hallazgo (inspector 03/10/2026) · contraste en tema OSCURO del texto sobre color de marca', async ({ page }) => {
-  // El módulo redeclara --primary: #2E86AB en .container para los dos temas y tapa el #3FA5D1
-  // oscuro de globals.css: título de tarjeta 2,99:1, opción activa 3,16:1, aviso rojo 3,05:1.
+test('HALLAZGO 2802 (reparado) · contraste en tema OSCURO del texto sobre color de marca', async ({ page }) => {
+  // El módulo redeclaraba --primary: #2E86AB en .container para los dos temas y tapaba el
+  // #3FA5D1 oscuro de globals.css. Retirado.
   await activarTema(page, 'dark');
   expect(await medirContrasteDeLaApp(page)).toEqual([]);
+});
 });

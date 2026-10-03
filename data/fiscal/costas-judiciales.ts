@@ -163,6 +163,38 @@ export const ARANCEL_PROCURA_FAMILIA = {
   recargoPorRepresentado: 0.1,
 } as const;
 
+// ─── Arancel notarial del divorcio y justicia gratuita ────────────────────────
+//
+// Escritos por la reparación de estimador-costes-divorcio (hallazgos 2795 y 2798, 03/10/2026)
+// y mudados aquí el mismo día; cotejados por el coordinador en el BOE consolidado.
+
+/**
+ * RD 1426/1989, Arancel de los Notarios (BOE-A-1989-28111), leído el 03/10/2026.
+ */
+export const ARANCEL_NOTARIAL_DIVORCIO = {
+  /** Anexo I, nº 1.1.h: «Demás documentos (estado civil…)», documento sin cuantía. */
+  documentoSinCuantia: 30.050605,
+  /** Anexo I, nº 2.1, último párrafo: «se aplicará una rebaja del 5 por 100» a la escala. */
+  rebajaEscala: 0.05,
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-1989-28111',
+} as const;
+
+/**
+ * Ley 1/1996, de asistencia jurídica gratuita (BOE-A-1996-750), art. 3.1 (redacción de la
+ * Ley 42/2015), leído el 03/10/2026: ingresos brutos anuales por unidad familiar que no superen
+ * estos múltiplos del IPREM. El art. 3.3 manda valorarlos INDIVIDUALMENTE cuando hay intereses
+ * familiares contrapuestos en el litigio.
+ */
+export const UMBRALES_JUSTICIA_GRATUITA = {
+  /** a) Personas no integradas en ninguna unidad familiar. */
+  sinUnidadFamiliar: 2,
+  /** b) Unidades familiares de menos de cuatro miembros. */
+  unidadMenosDeCuatro: 2.5,
+  /** c) Unidades de cuatro o más miembros, o familia numerosa. */
+  unidadCuatroOMas: 3,
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-1996-750',
+} as const;
+
 // ─── Tasas judiciales (Ley 10/2012, con la nulidad de la STC 140/2016) ────────
 
 /**

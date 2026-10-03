@@ -1,6 +1,6 @@
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
+  /* Sin redeclarar --primary ni --secondary: tapaban el #3FA5D1 del tema oscuro de globals.css
+     (hallazgo 2802). El color de marca va por --primary-texto (texto) y --primary-boton (fondo). */
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
@@ -61,14 +61,14 @@
   padding: var(--spacing-xl);
 }
 .cardTitle {
-  font-size: 1.2rem; font-weight: 700; color: var(--primary);
+  font-size: 1.2rem; font-weight: 700; color: var(--primary-texto);
   margin: 0 0 var(--spacing-lg);
   padding-bottom: var(--spacing-md);
   border-bottom: 2px solid var(--border);
 }
 
 .formGroup { margin-bottom: var(--spacing-md); }
-.label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.4rem; }
+.label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.4rem; }
 
 .optionGrid { display: flex; flex-direction: column; gap: 0.4rem; }
 .optionBtn {
@@ -80,10 +80,10 @@
 }
 .optionBtn strong { font-size: 0.88rem; color: var(--text-primary); }
 .optionDesc { font-size: 0.78rem; }
-.optionBtn:hover { border-color: var(--primary); }
-.optionActivo { border-color: var(--primary); background: rgba(46, 134, 171, 0.07); }
-.optionActivo strong { color: var(--primary); }
-[data-theme='dark'] .optionActivo { background: rgba(46, 134, 171, 0.15); }
+.optionBtn:hover { border-color: var(--primary-texto); }
+.optionActivo { border-color: var(--primary-texto); background: rgba(46, 134, 171, 0.07); }
+.optionActivo strong { color: var(--primary-texto); }
+[data-theme='dark'] .optionActivo { background: rgba(46, 134, 171, 0.08); } /* 0,15 dejaba el texto de marca en 4,47:1 */
 
 .switchRow { display: flex; gap: 0.5rem; }
 .switchBtn {
@@ -92,30 +92,30 @@
   background: var(--bg-card); color: var(--text-secondary);
   font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
 }
-.switchBtn:hover { border-color: var(--primary); }
-.switchActivo { background: var(--primary); border-color: var(--primary); color: white; }
+.switchBtn:hover { border-color: var(--primary-texto); }
+.switchActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 
 .btn {
   width: 100%; padding: 1rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white; border: none; border-radius: var(--radius);
   font-size: 1.1rem; font-weight: 700; cursor: pointer;
   margin-top: var(--spacing-md); transition: opacity 0.2s;
 }
 .btn:hover { opacity: 0.9; }
-.btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.btn:focus-visible { outline: 2px solid var(--primary-texto); outline-offset: 2px; }
 
 .placeholder { text-align: center; color: var(--text-secondary); padding: 2rem; font-size: 0.95rem; }
 .resultados { display: flex; flex-direction: column; gap: var(--spacing-md); }
 
 .totalHero {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: var(--radius-large); padding: 1.5rem;
   text-align: center; color: white;
 }
-.totalLabel { font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.3rem; }
+.totalLabel { font-size: 0.9rem; margin-bottom: 0.3rem; }
 .totalImporte { font-size: 1.8rem; font-weight: 800; }
-.duracion { font-size: 0.85rem; opacity: 0.8; margin-top: 0.4rem; }
+.duracion { font-size: 0.85rem; margin-top: 0.4rem; }
 
 .desgloseCard, .notasCard {
   background: var(--bg-primary); border: 1px solid var(--border);
@@ -133,6 +133,16 @@
 .desgloseItem:last-child { border-bottom: none; }
 .desgloseItem span { flex: 1; }
 
+/* Conceptos del arancel bajo su partida. El nombre NO contiene «desgloseItem»: los tests suman
+   las filas del desglose con [class*="desgloseItem"] y esto es su detalle, no otra partida. */
+.detallePartida {
+  list-style: none; margin: 0 0 0.35rem; padding: 0 0 0.35rem 1.25rem;
+  font-size: 0.78rem; color: var(--text-secondary); line-height: 1.45;
+}
+.detallePartida li { display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.1rem 0; }
+.detallePartida li span:last-child { white-space: nowrap; }
+.aclaracion { margin: 0 0 0.35rem; padding-left: 1.25rem; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.45; }
+
 .nota {
   display: flex; gap: 0.5rem;
   font-size: 0.83rem; color: var(--text-secondary); line-height: 1.5; margin: 0.3rem 0;
@@ -144,7 +154,8 @@
   background: rgba(231, 76, 60, 0.06); border: 1px solid rgba(231, 76, 60, 0.2);
 }
 .alertCard p { margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.45; }
-.alertCard strong { color: #E74C3C; }
+.alertCard strong { color: #B3261E; }
+[data-theme='dark'] .alertCard strong { color: #FF8A80; }
 
 .comparativaCard {
   background: var(--bg-primary); border: 1px solid var(--border);
@@ -159,16 +170,16 @@
 }
 .comparativaItem strong { font-size: 0.85rem; color: var(--text-primary); }
 .comparativaActivo {
-  border-color: var(--primary);
+  border-color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.07);
 }
-.comparativaActivo strong { color: var(--primary); }
-[data-theme='dark'] .comparativaActivo { background: rgba(46, 134, 171, 0.15); }
+.comparativaActivo strong { color: var(--primary-texto); }
+[data-theme='dark'] .comparativaActivo { background: rgba(46, 134, 171, 0.08); }
 .comparativaTiempo { font-size: 0.75rem; color: var(--text-secondary); }
 
 /* ===== PROFESIONALIZACIÓN v2.0 ===== */
 
-.guideSection h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin: 1.5rem 0 0.75rem; }
+.guideSection h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-texto); margin: 1.5rem 0 0.75rem; }
 .guideSection h2:first-child { margin-top: 0; }
 .guideSection p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.7; margin: 0 0 0.75rem; }
 
@@ -181,7 +192,7 @@
   display: flex; justify-content: space-between; align-items: center;
 }
 .faqItem summary::-webkit-details-marker { display: none; }
-.faqItem summary::after { content: '+'; font-size: 1.2rem; color: var(--primary); }
+.faqItem summary::after { content: '+'; font-size: 1.2rem; color: var(--primary-texto); }
 .faqItem[open] summary::after { content: '\2212'; }
 .faqItem p { padding: 0 1.25rem 1rem; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
 
