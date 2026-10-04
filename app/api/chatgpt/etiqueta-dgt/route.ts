@@ -13,11 +13,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
 import { datosLlamanteGpt } from '@/lib/analytics-gpt';
+import { clasificar, type TipoCombustible, type TipoEtiqueta } from '@/app/etiqueta-dgt/motor';
+import { CIUDADES_ZBE, type AccesoZBE } from '@/app/etiqueta-dgt/zbe';
 
 export const runtime = 'nodejs';
 
 const AVISO_LEGAL =
-  '⚠️ Información orientativa a 2025. Las restricciones ZBE (horarios, episodios de contaminación) varían por ciudad y pueden cambiar. ' +
+  '⚠️ Información orientativa. Las restricciones ZBE (horarios, episodios de contaminación) varían por ciudad y pueden cambiar. ' +
   'Consulta el portal oficial de tu municipio. ' +
   'Fuente: meskeia.com/etiqueta-dgt';
 
@@ -35,7 +37,6 @@ export async function OPTIONS() {
 
 type Combustible = 'electrico' | 'phev' | 'hibrido' | 'gnc_glp' | 'gasolina' | 'diesel';
 type Etiqueta = 'CERO' | 'ECO' | 'C' | 'B' | 'Sin etiqueta';
-type AccesoZBE = 'libre' | 'restriccion' | 'prohibido';
 
 interface ZBEInfo {
   ciudad: string;
@@ -43,91 +44,48 @@ interface ZBEInfo {
   detalle: string;
 }
 
-const ZBE_POR_ETIQUETA: Record<Etiqueta, ZBEInfo[]> = {
-  'CERO': [
-    { ciudad: 'Madrid', acceso: 'libre', detalle: 'Acceso libre a ZBE Distrito Centro y ZBE 30.' },
-    { ciudad: 'Barcelona', acceso: 'libre', detalle: 'Acceso libre a la ZBE Rondes.' },
-    { ciudad: 'Valencia', acceso: 'libre', detalle: 'Acceso libre.' },
-    { ciudad: 'Sevilla', acceso: 'libre', detalle: 'Acceso libre.' },
-    { ciudad: 'Zaragoza', acceso: 'libre', detalle: 'Acceso libre.' },
-    { ciudad: 'Valladolid', acceso: 'libre', detalle: 'Acceso libre.' },
-    { ciudad: 'Bilbao', acceso: 'libre', detalle: 'Acceso libre.' },
-  ],
-  'ECO': [
-    { ciudad: 'Madrid', acceso: 'libre', detalle: 'Acceso libre a ZBE Distrito Centro y ZBE 30.' },
-    { ciudad: 'Barcelona', acceso: 'libre', detalle: 'Acceso libre a la ZBE Rondes.' },
-    { ciudad: 'Valencia', acceso: 'libre', detalle: 'Acceso libre.' },
-    { ciudad: 'Sevilla', acceso: 'libre', detalle: 'Acceso libre.' },
-    { ciudad: 'Zaragoza', acceso: 'libre', detalle: 'Acceso libre.' },
-    { ciudad: 'Valladolid', acceso: 'libre', detalle: 'Acceso libre.' },
-    { ciudad: 'Bilbao', acceso: 'libre', detalle: 'Acceso libre.' },
-  ],
-  'C': [
-    { ciudad: 'Madrid', acceso: 'restriccion', detalle: 'Acceso libre salvo episodios de alta contaminación (nivel 2 o 3).' },
-    { ciudad: 'Barcelona', acceso: 'libre', detalle: 'Acceso libre a la ZBE Rondes.' },
-    { ciudad: 'Valencia', acceso: 'libre', detalle: 'Acceso libre.' },
-    { ciudad: 'Sevilla', acceso: 'libre', detalle: 'ZBE en implantación. Acceso libre de momento.' },
-    { ciudad: 'Zaragoza', acceso: 'libre', detalle: 'Acceso libre.' },
-    { ciudad: 'Valladolid', acceso: 'libre', detalle: 'Acceso libre.' },
-    { ciudad: 'Bilbao', acceso: 'libre', detalle: 'Acceso libre.' },
-  ],
-  'B': [
-    { ciudad: 'Madrid', acceso: 'restriccion', detalle: 'Solo residentes en ZBE Distrito Centro. Restricciones en episodios desde nivel 1.' },
-    { ciudad: 'Barcelona', acceso: 'restriccion', detalle: 'Restringido en la ZBE Rondes (lunes a viernes 7h-20h).' },
-    { ciudad: 'Valencia', acceso: 'restriccion', detalle: 'Acceso con restricciones en horario punta.' },
-    { ciudad: 'Sevilla', acceso: 'libre', detalle: 'Acceso libre de momento (ZBE en implantación).' },
-    { ciudad: 'Zaragoza', acceso: 'restriccion', detalle: 'Restringido en horario punta según ordenanza.' },
-    { ciudad: 'Valladolid', acceso: 'libre', detalle: 'Acceso libre.' },
-    { ciudad: 'Bilbao', acceso: 'restriccion', detalle: 'Restricciones en zona ZBE de Bilbao La Vieja y Centro.' },
-  ],
-  'Sin etiqueta': [
-    { ciudad: 'Madrid', acceso: 'prohibido', detalle: 'Prohibido circular en ZBE Distrito Centro. Multas de 90-500€.' },
-    { ciudad: 'Barcelona', acceso: 'prohibido', detalle: 'Prohibido en ZBE Rondes. Control automático por cámaras.' },
-    { ciudad: 'Valencia', acceso: 'prohibido', detalle: 'Prohibido en zona ZBE.' },
-    { ciudad: 'Sevilla', acceso: 'restriccion', detalle: 'Restricciones progresivas en implantación.' },
-    { ciudad: 'Zaragoza', acceso: 'prohibido', detalle: 'Prohibido en ZBE centro.' },
-    { ciudad: 'Valladolid', acceso: 'restriccion', detalle: 'Restricciones en horario punta.' },
-    { ciudad: 'Bilbao', acceso: 'prohibido', detalle: 'Prohibido en la ZBE de Bilbao.' },
-  ],
+// ⚠️ 2026-10-04: esta ruta tenía su propia copia de la clasificación y de la tabla de ZBE, que
+//    había divergido de la app: daba la CERO al gas (es ECO, y solo si cumple la C), la C a todo
+//    diésel de 2015 (desde septiembre), la ECO a cualquier HEV, acceso libre a la C en Distrito
+//    Centro y la B restringida en Barcelona (hallazgos 2842, 2843 y 2846). Ahora lee el motor y
+//    la tabla de la app: app/etiqueta-dgt/motor.ts y app/etiqueta-dgt/zbe.ts.
+const COMBUSTIBLE_MOTOR: Record<Combustible, TipoCombustible> = {
+  electrico: 'bev',
+  phev: 'phev',
+  hibrido: 'hev',
+  gnc_glp: 'gnc',
+  gasolina: 'gasolina',
+  diesel: 'diesel',
+};
+
+const NOMBRE_ETIQUETA: Record<TipoEtiqueta, Etiqueta> = {
+  cero: 'CERO',
+  eco: 'ECO',
+  c: 'C',
+  b: 'B',
+  ninguna: 'Sin etiqueta',
 };
 
 const DESCRIPCIONES: Record<Etiqueta, string> = {
-  'CERO': 'Vehículo cero emisiones (eléctrico puro, hidrógeno, PHEV ≥40km eléctricos, GNC/GLP). Máxima categoría DGT.',
-  'ECO': 'Híbrido convencional o PHEV con autonomía <40km. Segunda categoría, acceso sin restricciones en la mayoría de ZBE.',
-  'C': 'Gasolina desde 2006 (Euro 4+) o diésel desde 2015 (Euro 6). Acceso libre en la mayoría de ciudades.',
-  'B': 'Gasolina 2001-2005 (Euro 3) o diésel 2006-2014 (Euro 4/5). Acceso limitado en algunas ZBE.',
-  'Sin etiqueta': 'Gasolina anterior a 2001 o diésel anterior a 2006. Ya restringido o prohibido en las principales ZBE.',
+  'CERO': 'Eléctrico de batería, de autonomía extendida, de pila de combustible o híbrido enchufable con 40 km o más de autonomía eléctrica. Máxima categoría DGT.',
+  'ECO': 'Híbrido no enchufable, híbrido enchufable con menos de 40 km de autonomía o vehículo de gas (GNC, GNL o GLP), que además cumpla los criterios de la C.',
+  'C': 'Gasolina matriculado desde enero de 2006 (Euro 4+) o diésel desde septiembre de 2015 (Euro 6).',
+  'B': 'Gasolina 2001-2005 (Euro 3) o diésel de 2006 a agosto de 2015 (Euro 4/5). Acceso limitado en algunas ZBE.',
+  'Sin etiqueta': 'Gasolina anterior a 2001 o diésel anterior a 2006. Prohibido o restringido en las principales ZBE.',
 };
 
 const RECOMENDACIONES: Record<Etiqueta, string> = {
   'CERO': 'Tu vehículo tiene la máxima categoría ambiental. Accedes a todos los beneficios ZBE, carriles BUS+VAO y parking bonificado en muchos municipios.',
   'ECO': 'Buena etiqueta. Accedes a la mayoría de ZBE sin restricciones. Considera que las normativas tienden a endurecerse.',
-  'C': 'Etiqueta válida. En episodios de contaminación alta pueden activarse restricciones adicionales en algunas ciudades.',
-  'B': 'Etiqueta limitada. Las normativas se están endureciendo: en 2025-2026 la etiqueta B podría quedar restringida en horario punta en más ciudades.',
-  'Sin etiqueta': 'Tu vehículo ya no puede circular en las ZBE de las principales ciudades. Si lo usas en zona urbana habitualmente, considera la renovación.',
+  'C': 'Etiqueta válida en la mayoría de ZBE. En Madrid no puede atravesar la ZBEDEP Distrito Centro (solo entrar para aparcar), y en episodios de contaminación alta pueden activarse restricciones.',
+  'B': 'Etiqueta limitada: en Madrid no puede atravesar la ZBEDEP Distrito Centro (solo entrar para aparcar). En Barcelona circula sin restricción por la ZBE Rondes. Las ordenanzas cambian: consulta cada municipio.',
+  'Sin etiqueta': 'Tu vehículo ya no puede circular en las ZBE de las principales ciudades, y en Madrid en ninguna vía urbana del municipio. Si lo usas en zona urbana habitualmente, considera la renovación.',
 };
-
-function calcularEtiqueta(combustible: Combustible, anio: number, autonomiaPhev: number): Etiqueta {
-  if (combustible === 'electrico' || combustible === 'gnc_glp') return 'CERO';
-  if (combustible === 'phev') return autonomiaPhev >= 40 ? 'CERO' : 'ECO';
-  if (combustible === 'hibrido') return 'ECO';
-  if (combustible === 'gasolina') {
-    if (anio >= 2006) return 'C';
-    if (anio >= 2001) return 'B';
-    return 'Sin etiqueta';
-  }
-  if (combustible === 'diesel') {
-    if (anio >= 2015) return 'C';
-    if (anio >= 2006) return 'B';
-    return 'Sin etiqueta';
-  }
-  return 'Sin etiqueta';
-}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { combustible, anioMatriculacion, autonomiaPhevKm = 0 } = body;
+    const { combustible, anioMatriculacion, autonomiaPhevKm = 0, mesMatriculacion } = body;
 
     const combustiblesValidos: Combustible[] = ['electrico', 'phev', 'hibrido', 'gnc_glp', 'gasolina', 'diesel'];
     if (!combustiblesValidos.includes(combustible)) {
@@ -137,15 +95,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (typeof anioMatriculacion !== 'number' || anioMatriculacion < 1980 || anioMatriculacion > 2025) {
+    const anioActual = new Date().getFullYear();
+    if (typeof anioMatriculacion !== 'number' || anioMatriculacion < 1980 || anioMatriculacion > anioActual) {
       return NextResponse.json(
-        { error: 'anioMatriculacion debe ser un número entre 1980 y 2025. Ejemplo: 2018.' },
+        { error: `anioMatriculacion debe ser un número entre 1980 y ${anioActual}. Ejemplo: 2018.` },
         { status: 400, headers: corsHeaders() }
       );
     }
 
-    const etiqueta = calcularEtiqueta(combustible as Combustible, anioMatriculacion, autonomiaPhevKm);
-    const zbeCiudades = ZBE_POR_ETIQUETA[etiqueta];
+    const { etiqueta: tipo, matiz } = clasificar({
+      combustible: COMBUSTIBLE_MOTOR[combustible as Combustible],
+      anio: anioMatriculacion,
+      // Solo el diésel de 2015 necesita el mes; sin él, el motor da la B y lo matiza.
+      mes: typeof mesMatriculacion === 'number' ? mesMatriculacion : undefined,
+      autonomiaPhev: Number(autonomiaPhevKm) >= 40 ? 'cuarentaOMas' : 'menos',
+    });
+    const etiqueta = NOMBRE_ETIQUETA[tipo];
+    const zbeCiudades: ZBEInfo[] = CIUDADES_ZBE[tipo].map(z => ({ ciudad: z.nombre, acceso: z.acceso, detalle: z.detalle }));
 
     registrarLlamada(combustible, anioMatriculacion).catch(() => {});
 
@@ -153,6 +119,7 @@ export async function POST(request: NextRequest) {
       {
         etiqueta,
         descripcion: DESCRIPCIONES[etiqueta],
+        ...(matiz ? { matiz } : {}),
         recomendacion: RECOMENDACIONES[etiqueta],
         acceso_zbe: zbeCiudades,
         ciudades_libres: zbeCiudades.filter(z => z.acceso === 'libre').map(z => z.ciudad),

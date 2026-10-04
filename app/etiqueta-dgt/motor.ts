@@ -25,7 +25,7 @@ export type AutonomiaPhev = 'cuarentaOMas' | 'menos' | '';
 
 export interface DatosVehiculo {
   combustible: TipoCombustible;
-  /** Año de primera matriculación (solo gasolina, diésel y gas). */
+  /** Año de primera matriculación (gasolina, diésel, gas e HEV). */
   anio?: number;
   /** Mes de primera matriculación, 1-12 (solo diésel de 2015). */
   mes?: number;
@@ -69,15 +69,16 @@ export function clasificar(datos: DatosVehiculo): ClasificacionEtiqueta {
       return { etiqueta: autonomiaPhev === 'cuarentaOMas' ? 'cero' : 'eco', matiz: null };
 
     case 'hev':
-      return { etiqueta: 'eco', matiz: null };
-
     case 'gnc': {
-      // La ECO del gas exige cumplir los criterios de la C: por fecha, gasolina desde 2006.
+      // La ECO del gas y del HEV exige cumplir los criterios de la C (Orden PCI/810/2018: «En todo
+      // caso, deberán cumplir los criterios de la clasificación C»): por fecha, gasolina desde 2006.
+      // Hasta el 04/10/2026 el HEV salía ECO sin pedir el año (hallazgo 2846).
       if (anio >= FECHAS_DGT.gasolinaC) return { etiqueta: 'eco', matiz: null };
+      const quien = combustible === 'hev' ? 'Un híbrido no enchufable' : 'Un vehículo de gas';
       return {
         etiqueta: etiquetaGasolina(anio),
         matiz:
-          'Un vehículo de gas solo lleva la ECO si cumple también los criterios de la etiqueta C (por fecha, matriculado a partir de enero de 2006). El tuyo es anterior, así que, por fecha, le corresponde la etiqueta de su norma Euro de gasolina.',
+          `${quien} solo lleva la ECO si cumple también los criterios de la etiqueta C (por fecha, matriculado a partir de enero de 2006). El tuyo es anterior, así que, por fecha, le corresponde la etiqueta de su norma Euro de gasolina.`,
       };
     }
 

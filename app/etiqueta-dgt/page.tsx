@@ -22,18 +22,11 @@ import {
   type TipoCombustible,
   type TipoEtiqueta,
 } from './motor';
+import { CIUDADES_ZBE, type AccesoZBE, type CiudadZBE } from './zbe';
 
 // ============================================================
 // TIPOS
 // ============================================================
-
-type AccesoZBE = 'libre' | 'restriccion' | 'prohibido';
-
-interface CiudadZBE {
-  nombre: string;
-  acceso: AccesoZBE;
-  detalle: string;
-}
 
 interface ResultadoEtiqueta {
   etiqueta: TipoEtiqueta;
@@ -62,205 +55,6 @@ const MESES = [
 /** Consulta oficial del distintivo por matrícula (DGT). */
 const URL_DGT_DISTINTIVO = 'https://www.dgt.es/nuestros-servicios/tu-vehiculo/tus-vehiculos/distintivo-ambiental/';
 const URL_SEDE_DGT = 'https://sede.dgt.gob.es/es/';
-
-// ============================================================
-// DATOS ZBE POR ETIQUETA
-// ============================================================
-
-const CIUDADES_ZBE: Record<TipoEtiqueta, CiudadZBE[]> = {
-  cero: [
-    {
-      nombre: 'Madrid',
-      acceso: 'libre',
-      detalle: 'Acceso libre a ZBE Distrito Centro y ZBE 30 sin restricciones horarias ni por episodios.',
-    },
-    {
-      nombre: 'Barcelona',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE Rondes sin restricciones en ningún momento.',
-    },
-    {
-      nombre: 'Valencia',
-      acceso: 'libre',
-      detalle: 'Acceso libre sin restricciones de circulación.',
-    },
-    {
-      nombre: 'Sevilla',
-      acceso: 'libre',
-      detalle: 'Acceso libre. La ZBE está en proceso de implantación progresiva.',
-    },
-    {
-      nombre: 'Zaragoza',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE del centro urbano.',
-    },
-    {
-      nombre: 'Valladolid',
-      acceso: 'libre',
-      detalle: 'Acceso libre sin restricciones.',
-    },
-    {
-      nombre: 'Bilbao',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE del centro y Gran Vía.',
-    },
-  ],
-  eco: [
-    {
-      nombre: 'Madrid',
-      acceso: 'libre',
-      detalle: 'Acceso libre a ZBE Distrito Centro y ZBE 30 sin restricciones.',
-    },
-    {
-      nombre: 'Barcelona',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE Rondes sin restricciones.',
-    },
-    {
-      nombre: 'Valencia',
-      acceso: 'libre',
-      detalle: 'Acceso libre sin restricciones.',
-    },
-    {
-      nombre: 'Sevilla',
-      acceso: 'libre',
-      detalle: 'Acceso libre. ZBE en implantación progresiva.',
-    },
-    {
-      nombre: 'Zaragoza',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE del centro.',
-    },
-    {
-      nombre: 'Valladolid',
-      acceso: 'libre',
-      detalle: 'Acceso libre sin restricciones.',
-    },
-    {
-      nombre: 'Bilbao',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE.',
-    },
-  ],
-  c: [
-    {
-      nombre: 'Madrid',
-      acceso: 'restriccion',
-      detalle:
-        'Acceso libre en condiciones normales. En episodios de alta contaminación (escenario 2 o 3) pueden activarse restricciones puntuales para etiqueta C.',
-    },
-    {
-      nombre: 'Barcelona',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE Rondes sin restricciones habituales para etiqueta C.',
-    },
-    {
-      nombre: 'Valencia',
-      acceso: 'libre',
-      detalle: 'Acceso libre sin restricciones para etiqueta C.',
-    },
-    {
-      nombre: 'Sevilla',
-      acceso: 'libre',
-      detalle: 'Acceso libre. ZBE en implantación; etiqueta C no está restringida.',
-    },
-    {
-      nombre: 'Zaragoza',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE para etiqueta C.',
-    },
-    {
-      nombre: 'Valladolid',
-      acceso: 'libre',
-      detalle: 'Acceso libre sin restricciones.',
-    },
-    {
-      nombre: 'Bilbao',
-      acceso: 'libre',
-      detalle: 'Acceso libre para etiqueta C.',
-    },
-  ],
-  b: [
-    {
-      nombre: 'Madrid',
-      acceso: 'restriccion',
-      detalle:
-        'Solo residentes con permiso en ZBE Distrito Centro. En ZBE 30 pueden circular con autorización especial. Prohibición en episodios de contaminación.',
-    },
-    {
-      nombre: 'Barcelona',
-      acceso: 'restriccion',
-      detalle:
-        'Circulación restringida en la ZBE Rondes en días laborables de 7:00 a 20:00. Solo permitido fines de semana y festivos.',
-    },
-    {
-      nombre: 'Valencia',
-      acceso: 'restriccion',
-      detalle: 'Restricciones de circulación en el área central. Consultar horarios y días concretos en el portal municipal.',
-    },
-    {
-      nombre: 'Sevilla',
-      acceso: 'libre',
-      detalle:
-        'Acceso libre por ahora. La ZBE está en implantación y aún no aplica restricciones para etiqueta B.',
-    },
-    {
-      nombre: 'Zaragoza',
-      acceso: 'restriccion',
-      detalle: 'Restricciones en determinados horarios y días laborables en la ZBE del centro.',
-    },
-    {
-      nombre: 'Valladolid',
-      acceso: 'libre',
-      detalle: 'Acceso libre por el momento, aunque la tendencia es endurecer la normativa.',
-    },
-    {
-      nombre: 'Bilbao',
-      acceso: 'restriccion',
-      detalle: 'Restricciones en horario de mayor tráfico en días laborables dentro de la ZBE.',
-    },
-  ],
-  ninguna: [
-    {
-      nombre: 'Madrid',
-      acceso: 'prohibido',
-      detalle:
-        'Acceso completamente prohibido a la ZBE Distrito Centro y ZBE 30. Las cámaras de control perimetral registran las matrículas infractoras.',
-    },
-    {
-      nombre: 'Barcelona',
-      acceso: 'prohibido',
-      detalle:
-        'Acceso prohibido a la ZBE Rondes en días laborables. Sistema de control automático con cámaras activo.',
-    },
-    {
-      nombre: 'Valencia',
-      acceso: 'prohibido',
-      detalle: 'Acceso prohibido en la ZBE del centro urbano.',
-    },
-    {
-      nombre: 'Sevilla',
-      acceso: 'restriccion',
-      detalle:
-        'Restricciones progresivas en la ZBE en implantación. Se prevé prohibición total en 2025-2026.',
-    },
-    {
-      nombre: 'Zaragoza',
-      acceso: 'prohibido',
-      detalle: 'Acceso prohibido a la ZBE. Control automático mediante cámaras en los accesos.',
-    },
-    {
-      nombre: 'Valladolid',
-      acceso: 'restriccion',
-      detalle: 'Restricciones crecientes. Se prevé prohibición total a medida que la ZBE se consolide.',
-    },
-    {
-      nombre: 'Bilbao',
-      acceso: 'prohibido',
-      detalle: 'Acceso prohibido a la ZBE del centro.',
-    },
-  ],
-};
 
 // ============================================================
 // TEXTOS POR ETIQUETA
@@ -296,7 +90,7 @@ const INFO_ETIQUETA: Record<
       'Gasolina matriculado a partir de enero de 2006 (Euro 4, 5 o 6) o diésel a partir de septiembre de 2015 (Euro 6). Etiqueta verde.',
     recomendaciones: [
       'Etiqueta válida en la mayoría de ZBE. En episodios de alta contaminación pueden activarse restricciones para esta etiqueta en algunas ciudades.',
-      'En Madrid, vigila el protocolo anticontaminación: en escenarios 2 y 3, los vehículos C pueden quedar restringidos al viario básico.',
+      'En Madrid, la etiqueta C no puede atravesar la ZBEDEP Distrito Centro (solo entrar para aparcar en un aparcamiento), y en los escenarios 2 y 3 del protocolo anticontaminación puede quedar restringida al viario básico.',
       'La etiqueta C sigue siendo la más común en España. A medio plazo, considera la transición hacia etiquetas ECO o CERO.',
     ],
   },
@@ -306,7 +100,7 @@ const INFO_ETIQUETA: Record<
       'Gasolina matriculado desde el 1 de enero de 2001 (Euro 3) o diésel a partir de 2006 (Euro 4 o 5), sin llegar a la C. Etiqueta amarilla.',
     recomendaciones: [
       'Etiqueta limitada. Considera el impacto futuro: las normativas ZBE se están endureciendo progresivamente en todas las ciudades con más de 50.000 habitantes.',
-      'En Madrid y Barcelona, la etiqueta B ya tiene restricciones de circulación en determinadas zonas y horarios. Infórmate antes de circular.',
+      'En Madrid, la etiqueta B no puede atravesar la ZBEDEP Distrito Centro (solo entrar para aparcar en un aparcamiento). En Barcelona circula sin restricción por la ZBE Rondes. Las ordenanzas cambian: infórmate en cada municipio antes de circular.',
       'Si usas el vehículo habitualmente en entorno urbano, valorar la renovación a un vehículo con etiqueta C, ECO o CERO puede evitarte multas y restricciones.',
     ],
   },
@@ -433,9 +227,9 @@ interface ErroresForm {
 /** Cualquier año anterior a 2001 ya es «sin etiqueta» por fecha: no hace falta un suelo alto. */
 const ANIO_MINIMO = 1900;
 
-/** Gasolina, diésel y gas se clasifican por fecha (el gas, para saber si cumple la C). */
+/** Gasolina, diésel, gas e HEV se clasifican por fecha (el gas y el HEV, para saber si cumplen la C). */
 function pideAnio(combustible: TipoCombustible): boolean {
-  return combustible === 'gasolina' || combustible === 'diesel' || combustible === 'gnc';
+  return combustible === 'gasolina' || combustible === 'diesel' || combustible === 'gnc' || combustible === 'hev';
 }
 
 // ============================================================
@@ -666,7 +460,6 @@ export default function EtiquetaDgtPage() {
               <button
                 type="submit"
                 className={styles.btnConsultar}
-                aria-label="Calcular etiqueta DGT de mi vehículo"
               >
                 Consultar mi etiqueta DGT
               </button>

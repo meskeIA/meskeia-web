@@ -14,7 +14,7 @@ import { esperarPaginaAsentada, esperarValorEnReact } from './_hidratacion';
  * DÓNDE VIVE EL CÁLCULO
  *   app/etiqueta-dgt/motor.ts — `clasificar` y `FECHAS_DGT`, sin React. Pide combustible; el año
  *   para gasolina, diésel y gas; el mes solo para el diésel de 2015; y para el PHEV, si la autonomía
- *   es «de 40 km o más». El HEV y el BEV no piden nada más (ver CASO 34).
+ *   es «de 40 km o más». El HEV pide el año como el gas (CASO 34); el BEV no pide nada más.
  *   Los datos de acceso por ciudad (CIUDADES_ZBE) y la mención de la ayuda Auto+ están en page.tsx;
  *   la ayuda sale de data/fiscal/ayudas-vehiculo.ts (AYUDA_AUTO_PLUS_2026, FISCAL_AYUDAS_VEHICULO_META).
  *
@@ -68,7 +68,7 @@ import { esperarPaginaAsentada, esperarValorEnReact } from './_hidratacion';
  *   CASO 23 bajo   · PHEV sin contestar la autonomía: el botón no hacía nada ni decía nada.
  *   CASO 24 bajo   · el aviso de «consulta el portal oficial» solo estaba en la sección colapsada.
  *
- * HALLAZGOS DE LA RE-INSPECCIÓN (04/10/2026), ABIERTOS (test.fail con su motivo)
+ * HALLAZGOS DE LA RE-INSPECCIÓN (04/10/2026), REPARADOS el mismo día (2842-2848; eran test.fail)
  *   CASO 30 alto   · Madrid: a la C le dice «Acceso libre en condiciones normales» (no puede
  *                    atravesar Distrito Centro); a la B, «autorización especial» en una «ZBE 30».
  *   CASO 31 medio  · Barcelona: la B sale «Con restricciones» de lunes a viernes; es libre.
@@ -283,10 +283,10 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
     await expect(tituloResultado(page)).toHaveText('Etiqueta B');
   });
 
-  test('CASO 7 · BEV → CERO, HEV → ECO, PHEV ≥ 40 km → CERO, PHEV < 40 km → ECO', async ({ page }) => {
+  test('CASO 7 · BEV → CERO, HEV de 2018 → ECO, PHEV ≥ 40 km → CERO, PHEV < 40 km → ECO', async ({ page }) => {
     await consultar(page, 'bev');
     await expect(tituloResultado(page)).toHaveText('Etiqueta CERO');
-    await consultar(page, 'hev');
+    await consultar(page, 'hev', { anio: 2018 });
     await expect(tituloResultado(page)).toHaveText('Etiqueta ECO');
     await consultar(page, 'phev', { autonomia: 'cuarentaOMas' });
     await expect(tituloResultado(page)).toHaveText('Etiqueta CERO');
@@ -464,7 +464,7 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * var(--primary) a var(--secondary) daba 2,50:1 en el centro en oscuro (texto grande: 3:1).
    */
   test('CASO 21 · «ECO» se lee sobre su círculo también en tema oscuro (3:1 o más)', async ({ page }) => {
-    await consultar(page, 'hev');
+    await consultar(page, 'hev', { anio: 2018 });
     const circulo = page.locator('[aria-label="Etiqueta DGT: ECO"]');
     await expect(circulo).toBeVisible();
     await esperarPaginaAsentada(page);
@@ -556,7 +556,7 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
     await expect(sello.getByRole('link')).toHaveAttribute('href', 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-16010');
   });
 
-  // ───────────────────────── Re-inspección del 04/10/2026: hallazgos ABIERTOS ─────────────────────────
+  // ───────────────────────── Re-inspección del 04/10/2026: hallazgos REPARADOS ─────────────────────────
 
   /**
    * CASO 30 (alto, dato) — madrid.es, «ZBEDEP Distrito Centro. Información general»: los vehículos
@@ -567,7 +567,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * permiso en ZBE Distrito Centro. En ZBE 30 pueden circular con autorización especial…».
    */
   test('CASO 30 · Madrid: la C no tiene «acceso libre» a Distrito Centro y la B no necesita «autorización especial»', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto (04/10/2026): los datos de Madrid por etiqueta contradicen a madrid.es');
     await consultar(page, 'gasolina', { anio: 2010 });
     await expect(tituloResultado(page)).toHaveText('Etiqueta C');
     const madridC = tarjetaCiudad(page, 'Madrid').locator('[class*="zbeDetalle"]');
@@ -590,7 +589,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * de la B dice «En Madrid y Barcelona, la etiqueta B ya tiene restricciones».
    */
   test('CASO 31 · Barcelona: un diésel de 2010 (B) tiene libre acceso a la ZBE Rondas', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto (04/10/2026): la B sale restringida en Barcelona y el AMB solo restringe a los que no tienen distintivo');
     await consultar(page, 'diesel', { anio: 2010 });
     await expect(tituloResultado(page)).toHaveText('Etiqueta B');
     const barcelona = tarjetaCiudad(page, 'Barcelona');
@@ -609,7 +607,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * 10/2021) y «Madrid 360» es la Estrategia de Sostenibilidad Ambiental, no una zona.
    */
   test('CASO 32 · la FAQ no limita la prohibición de Madrid a los «días laborables» de «Madrid Central»', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto (04/10/2026): la FAQ describe una Madrid Central con restricción solo en laborables');
     const faq = await faqJsonLd(page);
     expect(faq).toContain('FAQPage');
     // DEBERÍA: Madrid ZBE (todo el municipio, todos los días) y ZBEDEP Distrito Centro.
@@ -627,7 +624,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * ni las Jefaturas ni la sede electrónica están entre ellas (la sede sirve para CONSULTARLO).
    */
   test('CASO 33 · la FAQ no manda a las Jefaturas a «pagar una tasa» por el distintivo', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto (04/10/2026): la FAQ de cómo obtener el distintivo no es la de la DGT');
     const faq = await faqJsonLd(page);
     expect(faq).toContain('FAQPage');
     expect(faq).not.toMatch(/Jefaturas Provinciales de Tráfico/);
@@ -643,11 +639,16 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * La reparación natural es la del gas; si se elige otra, este caso se adapta a ella.
    */
   test('CASO 34 · el híbrido no enchufable pide el año, como el gas, para comprobar la C', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto (04/10/2026): el HEV sale ECO sin comprobar los criterios de la C');
     await page.selectOption('#combustible', 'hev');
     await esperarValorEnReact(page, '#combustible', 'hev');
     // DEBERÍA: aparecer el año de matriculación. Obtenido: ningún campo más; «Consultar» → ECO.
     await expect(page.locator('#anioMatriculacion')).toBeVisible({ timeout: 3000 });
+    // Un HEV de gasolina de 2004 no llega por fecha a la C: no se afirma la ECO, y se dice por qué.
+    await consultar(page, 'hev', { anio: 2004 });
+    await expect(tituloResultado(page)).toHaveText('Etiqueta B');
+    await expect(resultado(page)).toContainText('Un híbrido no enchufable solo lleva la ECO si cumple también los criterios de la etiqueta C');
+    await consultar(page, 'hev', { anio: 2012 });
+    await expect(tituloResultado(page)).toHaveText('Etiqueta ECO');
   });
 
   /**
@@ -656,7 +657,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * contiene el texto visible. Quien lo dicta por voz («pulsa Consultar mi etiqueta») no lo alcanza.
    */
   test('CASO 35 · el botón se puede nombrar por lo que se lee: «Consultar mi etiqueta DGT»', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto (04/10/2026): el nombre accesible del botón no contiene su texto visible');
     await expect(page.locator('form button[type="submit"]')).toHaveText('Consultar mi etiqueta DGT');
     await expect(page.getByRole('button', { name: /Consultar mi etiqueta DGT/ })).toHaveCount(1, { timeout: 3000 });
   });
@@ -669,7 +669,6 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * CLAUDE.md §1.ter pide 4-8 features reales en el JSON-LD.
    */
   test('CASO 36 · el JSON-LD WebApplication no se declara financiero ni sale sin características', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto (04/10/2026): JSON-LD FinanceApplication sin features frente al meta UtilityApplication');
     const { jsonLd, meta } = await page.evaluate(() => {
       const ld = [...document.querySelectorAll('script[type="application/ld+json"]')]
         .map((s) => JSON.parse(s.textContent ?? '{}') as Record<string, unknown>)

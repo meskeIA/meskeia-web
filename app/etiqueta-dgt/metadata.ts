@@ -65,8 +65,14 @@ export const jsonLd = generateWebAppSchema({
   name: "Etiqueta DGT y Zonas de Bajas Emisiones",
   description: "Descubre la etiqueta medioambiental DGT de tu vehículo y si puedes circular por las Zonas de Bajas Emisiones de Madrid, Barcelona, Valencia y otras ciudades españolas.",
   url: "https://meskeia.com/etiqueta-dgt/",
-  category: 'FinanceApplication',
-  features: [],
+  category: 'UtilityApplication',
+  features: [
+    'Cálculo de etiqueta DGT (CERO, ECO, C, B o sin etiqueta) por combustible y fecha de matriculación',
+    'Consulta de acceso a las ZBE de Madrid, Barcelona, Valencia, Sevilla, Zaragoza, Valladolid y Bilbao',
+    'Matiz de los casos frontera (diésel de 2015, gas e híbridos anteriores a 2006)',
+    'Recomendaciones según la etiqueta y la ciudad',
+    'Funciona en el navegador, sin registro',
+  ],
 });
 
 export const faqJsonLd = {
@@ -86,15 +92,15 @@ export const faqJsonLd = {
       name: '¿Qué son las Zonas de Bajas Emisiones (ZBE) en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las Zonas de Bajas Emisiones (ZBE) son áreas urbanas delimitadas donde se restringen o prohíben determinados vehículos en función de su etiqueta medioambiental DGT, con el objetivo de mejorar la calidad del aire. La Ley 7/2021, de cambio climático y transición energética (art. 14.3), obliga a los municipios de más de 50.000 habitantes y a los territorios insulares a establecerlas, y a los de más de 20.000 cuando superan los límites de contaminación. Las principales ciudades con ZBE operativas son Madrid (Madrid Central y Madrid 360), Barcelona (ZBE Rondes) y Valencia.',
+        text: 'Las Zonas de Bajas Emisiones (ZBE) son áreas urbanas delimitadas donde se restringen o prohíben determinados vehículos en función de su etiqueta medioambiental DGT, con el objetivo de mejorar la calidad del aire. La Ley 7/2021, de cambio climático y transición energética (art. 14.3), obliga a los municipios de más de 50.000 habitantes y a los territorios insulares a establecerlas, y a los de más de 20.000 cuando superan los límites de contaminación. Entre las principales están Madrid (Madrid ZBE, que abarca todo el municipio, y la ZBEDEP Distrito Centro), Barcelona (ZBE Rondes) y Valencia.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Puedo circular por Madrid Central sin etiqueta DGT?',
+      name: '¿Puedo circular por Madrid sin etiqueta DGT?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En general, los vehículos sin etiqueta DGT tienen restringido el acceso a Madrid Central y Madrid 360 durante los días laborables. Existen excepciones para residentes en la zona, vehículos de carga y descarga, personas con movilidad reducida y algunos servicios esenciales. Las restricciones pueden variar en episodios de alta contaminación, cuando también se limitan los vehículos con etiqueta B.',
+        text: 'No. Desde el 1 de enero de 2025, Madrid ZBE prohíbe de forma permanente, todos los días, la circulación de los vehículos sin etiqueta (clasificación A) en todas las vías públicas urbanas del municipio, con excepciones como los vehículos históricos o los adaptados para personas con movilidad reducida. En el centro rige además la ZBEDEP Distrito Centro, donde los vehículos B y C solo pueden entrar para estacionar en un aparcamiento, no para atravesarla. La multa por entrar sin autorización es de 200 €.',
       },
     },
     {
@@ -102,7 +108,7 @@ export const faqJsonLd = {
       name: '¿Cómo se obtiene la etiqueta medioambiental de la DGT?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La etiqueta medioambiental DGT se solicita en las Jefaturas Provinciales de Tráfico, en puntos de expedición autorizados o a través de la sede electrónica de la DGT. Para obtenerla es necesario presentar la documentación del vehículo (permiso de circulación) y pagar una tasa. La categoría de la etiqueta está predeterminada según el tipo de motor y la fecha de matriculación, por lo que no se puede elegir.',
+        text: 'El distintivo ambiental se compra en Oficinas de Correos, gestores administrativos, talleres adheridos (como la red CETRAA) y otras entidades autorizadas por la DGT, presentando el permiso de circulación. Cuesta 5 €, más los gastos de envío que añada cada vendedor. La sede electrónica de la DGT sirve para consultar, por matrícula, qué distintivo corresponde al vehículo. La categoría la fija la norma Euro que consta en el Registro de Vehículos, no se elige.',
       },
     },
     {
