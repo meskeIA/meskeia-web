@@ -84,11 +84,13 @@ function CirculoUnitario({ angulo, mostrarIdentidades }: { angulo: number; mostr
       {/* Cuadrado de la identidad (modo identidades) */}
       {mostrarIdentidades && (
         <g opacity="0.25">
+          {/* Con min/abs: fuera del primer cuadrante width y height salían negativos y el
+              navegador descartaba el <rect> (hallazgo 2850). */}
           <rect
-            x={cx}
-            y={py}
-            width={px - cx}
-            height={cy - py}
+            x={Math.min(cx, px)}
+            y={Math.min(cy, py)}
+            width={Math.abs(px - cx)}
+            height={Math.abs(cy - py)}
             fill="#2E86AB"
             className={styles.identityRect}
           />
@@ -118,29 +120,18 @@ function CirculoUnitario({ angulo, mostrarIdentidades }: { angulo: number; mostr
 
       {/* Proyección coseno (horizontal) */}
       <line x1={cx} y1={cy} x2={projX.x} y2={cy} stroke="#48A9A6" strokeWidth="2.5" strokeDasharray="4 2" />
-      <text
-        x={(cx + projX.x) / 2}
-        y={cy + 14}
-        fontSize="11"
-        fill="var(--trig-cos)"
-        fontWeight="bold"
-        textAnchor="middle"
-        fontFamily="sans-serif"
-      >
+      {/* ⚠️ 2026-10-04 (hallazgo 2849): los rótulos de valor iban junto a cada segmento y se salían
+          del lienzo de 300×300 (que recorta) o se pisaban: «tan=» quedaba cortado en 315 de los 361
+          ángulos, «sen=» perdía letras de 154° a 211°, y de 0° a 40° los dos se superponían. Van
+          ahora como leyenda en la esquina superior izquierda, que el círculo (r = 100) no alcanza,
+          con el color de su segmento. */}
+      <text x={8} y={18} fontSize="11" fill="var(--trig-cos)" fontWeight="bold" fontFamily="sans-serif">
         cos={formatNum(cosVal)}
       </text>
 
       {/* Proyección seno (vertical) */}
       <line x1={px} y1={py} x2={px} y2={cy} stroke="#2E86AB" strokeWidth="2.5" strokeDasharray="4 2" />
-      <text
-        x={px + (cosVal >= 0 ? 8 : -8)}
-        y={(py + cy) / 2}
-        fontSize="11"
-        fill="var(--trig-sen)"
-        fontWeight="bold"
-        textAnchor={cosVal >= 0 ? 'start' : 'end'}
-        fontFamily="sans-serif"
-      >
+      <text x={8} y={33} fontSize="11" fill="var(--trig-sen)" fontWeight="bold" fontFamily="sans-serif">
         sen={formatNum(sinVal)}
       </text>
 
@@ -160,15 +151,7 @@ function CirculoUnitario({ angulo, mostrarIdentidades }: { angulo: number; mostr
         />
       )}
       {tanFinito && Math.abs(cosVal) > 0.01 && (
-        <text
-          x={tanPx + 6}
-          y={(cy + tanY) / 2}
-          fontSize="10"
-          fill="var(--trig-tan)"
-          fontWeight="bold"
-          textAnchor="start"
-          fontFamily="sans-serif"
-        >
+        <text x={8} y={48} fontSize="11" fill="var(--trig-tan)" fontWeight="bold" fontFamily="sans-serif">
           tan={formatNum(tanVal)}
         </text>
       )}
@@ -282,7 +265,11 @@ function GraficaFunciones({ angulo, config }: { angulo: number; config: EstadoGr
   const y0Px = padY + plotH - ((0 - yMin) / yRange) * plotH;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className={styles.svgGrafica} aria-label={`Gráfica de ${funcion}(x)`}>
+    // En pantallas estrechas la gráfica conserva su ancho y se desplaza en su caja: a 360 px se
+    // pintaba a 302 y sus rótulos de 9 quedaban en 4,9 px (hallazgo 2852).
+    <div className={styles.graficaScroll}>
+    {/* «sen(x)» y no el valor interno «sin» (hallazgo 2853, resto del 1914). */}
+    <svg viewBox={`0 0 ${W} ${H}`} className={styles.svgGrafica} aria-label={`Gráfica de ${funcion === 'sin' ? 'sen' : funcion}(x)`}>
       {/* Fondo */}
       <rect x={padX} y={padY} width={plotW} height={plotH} fill="var(--bg-primary)" opacity="0.5" rx="4" />
 
@@ -325,6 +312,7 @@ function GraficaFunciones({ angulo, config }: { angulo: number; config: EstadoGr
         </>
       )}
     </svg>
+    </div>
   );
 }
 
@@ -585,7 +573,11 @@ export default function VisualizadorTrigonometria() {
             </div>
 
             {/* Panel de valores */}
-            <div className={styles.valoresPanel} role="status" aria-live="polite" aria-atomic="true">
+            <div className={styles.valoresPanel}>
+              {/* La región viva ya no envuelve los 17 botones de ángulos notables, y calla mientras
+                  «Animar» cambia el ángulo cada 30 ms: pedía anunciar el panel entero unas 33 veces
+                  por segundo (hallazgo 2851). */}
+              <div role="status" aria-live={animando ? 'off' : 'polite'} aria-atomic="true">
               <h3 className={styles.valoresTitulo}>Valores en θ = {estadoCirculo.angulo}°</h3>
               <div className={styles.valoresGrid}>
                 <div className={`${styles.valorCard} ${styles.valorSen}`}>
@@ -622,6 +614,7 @@ export default function VisualizadorTrigonometria() {
                     : estadoCirculo.angulo < 270 ? 'III (sen−, cos−)'
                     : 'IV (sen−, cos+)'}
                 </strong>
+              </div>
               </div>
 
               {/* Ángulos notables cercanos */}
@@ -934,7 +927,7 @@ export default function VisualizadorTrigonometria() {
               <h3>Navegante y Piloto</h3>
             </div>
             <p>La trigonometría esférica es la base del GPS y la navegación aérea. Las distancias entre puntos en la Tierra se calculan con la fórmula haversine.</p>
-            <p className={styles.escenarioTip}>Tip: el GPS usa trilateración mediante distancias y ángulos.</p>
+            <p className={styles.escenarioTip}>Tip: el GPS usa trilateración mediante distancias a los satélites.</p>
           </div>
         </div>
 

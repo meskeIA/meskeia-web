@@ -597,7 +597,7 @@ test.describe('Móvil 360 px (04/10/2026)', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la re-inspección del 04/10/2026 (test.fail con su motivo)
+// HALLAZGOS de la re-inspección del 04/10/2026, REPARADOS el mismo día (2849-2854; eran test.fail)
 // ═══════════════════════════════════════════════════════════════════════════
 
 /** Rótulos de valor del círculo (sen=, cos=, tan=): glifos fuera del lienzo y solapes. */
@@ -635,7 +635,7 @@ async function rotulosDelCirculo(page: Page): Promise<{ recortados: string[]; so
     });
 }
 
-// HALLAZGO (operativa, medio) — ABIERTO. Los rótulos del dibujo se salen del lienzo de 300×300,
+// HALLAZGO (operativa, medio) — REPARADO el 04/10/2026 (era ABIERTO). Los rótulos del dibujo se salen del lienzo de 300×300,
 // que los recorta, y se pisan entre sí. El de la tangente va en x = 256 con anclaje «start» y
 // mide ~47-53 unidades (recortado en 315 de los 361 ángulos); el del seno va en px ± 8 y se sale
 // por la derecha de 0° a 27° y de 328° a 360°, y por la IZQUIERDA de 154° a 211°, donde pierde
@@ -644,7 +644,6 @@ async function rotulosDelCirculo(page: Page): Promise<{ recortados: string[]; so
 //       queda fuera); 190° → «n=−0,174»; 0° → «sen=0,000» y «tan=0,000» superpuestos.
 test.describe('Círculo — los rótulos del dibujo caben y no se pisan', () => {
   test('0°, 30°, 120° y 190°: ningún glifo fuera del lienzo y ningún solape', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto 04/10/2026: rótulos sen=/tan= recortados por el viewBox y superpuestos');
     await abrirCirculo(page);
     const problemas: string[] = [];
     for (const a of [0, 30, 120, 190]) {
@@ -656,7 +655,7 @@ test.describe('Círculo — los rótulos del dibujo caben y no se pisan', () => 
   });
 });
 
-// HALLAZGO (operativa, bajo) — ABIERTO. En la pestaña inicial (Identidades) el rectángulo azul
+// HALLAZGO (operativa, bajo) — REPARADO el 04/10/2026 (era ABIERTO). En la pestaña inicial (Identidades) el rectángulo azul
 // entre el origen y el punto (cos θ, sen θ) se dibuja con width = px − cx y height = cy − py, que
 // son NEGATIVOS fuera del primer cuadrante: el navegador descarta el <rect> y lo anota en la
 // consola. Solo se ve de 0° a 90°.
@@ -665,7 +664,6 @@ test.describe('Círculo — los rótulos del dibujo caben y no se pisan', () => 
 //       «Error: <rect> attribute width: A negative value is not valid. ("-50")».
 test.describe('Identidades — el rectángulo sen·cos en todos los cuadrantes', () => {
   test('120° y 210°: el rectángulo existe con tamaño positivo y la consola calla', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto 04/10/2026: <rect> con width/height negativos fuera del primer cuadrante');
     const errores: string[] = [];
     page.on('console', (m) => {
       if (m.type() === 'error' && m.text().includes('<rect>')) errores.push(m.text());
@@ -673,23 +671,27 @@ test.describe('Identidades — el rectángulo sen·cos en todos los cuadrantes',
     await page.goto(URL_APP);
     await esperarHidratacion(page, ['#slider-angulo-i']);
     const cajas: string[] = [];
+    const esperado: Record<number, string> = { 120: '50.0×86.6', 210: '86.6×50.0' };
     for (const a of [120, 210]) {
       await sembrarValor(page, '#slider-angulo-i', a);
-      const r = await page
-        .locator('section:not([hidden]) svg[aria-label="Círculo unitario interactivo"] rect')
-        .first()
-        .evaluate((el) => {
-          const b = (el as SVGRectElement).getBBox();
-          return `${b.width.toFixed(1)}×${b.height.toFixed(1)}`;
-        });
-      cajas.push(`${a}°: ${r}`);
+      const medir = () =>
+        page
+          .locator('section:not([hidden]) svg[aria-label="Círculo unitario interactivo"] rect')
+          .first()
+          .evaluate((el) => {
+            const b = (el as SVGRectElement).getBBox();
+            return `${b.width.toFixed(1)}×${b.height.toFixed(1)}`;
+          });
+      // Se espera al repintado del ángulo sembrado (medir antes daba el rectángulo de 45°).
+      await expect.poll(medir, { timeout: 5000 }).toBe(esperado[a]);
+      cajas.push(`${a}°: ${await medir()}`);
     }
     // 120°: |cos| = 0,5 → 50 · sen = 0,866 → 86,6 · 210°: |cos| = 0,866 → 86,6 · |sen| = 0,5 → 50
     expect({ cajas, errores }).toEqual({ cajas: ['120°: 50.0×86.6', '210°: 86.6×50.0'], errores: [] });
   });
 });
 
-// HALLAZGO (accesibilidad, bajo) — ABIERTO. El panel de valores es role="status" con
+// HALLAZGO (accesibilidad, bajo) — REPARADO el 04/10/2026 (era ABIERTO). El panel de valores es role="status" con
 // aria-atomic="true" y envuelve los 17 botones de ángulos notables. «Animar» cambia el ángulo
 // cada 30 ms, así que la región viva cambia ~33 veces por segundo y cada cambio pide anunciar
 // el panel entero (título, cuatro valores, cuadrante y «0° 30° 45° … 360°»).
@@ -697,7 +699,6 @@ test.describe('Identidades — el rectángulo sen·cos en todos los cuadrantes',
 //       mucho un par de anuncios · obtenido 17 botones dentro y 34 lotes de cambios en 1 s.
 test.describe('Círculo — la región viva no se desborda al animar', () => {
   test('sin botones dentro de la región viva y ≤ 2 cambios anunciables en 1 s de animación', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto 04/10/2026: role=status atómico con 17 botones, actualizado cada 30 ms');
     await abrirCirculo(page);
     const botonesEnRegionViva = await page
       .locator('section:not([hidden]) :is([role="status"], [aria-live="polite"], [aria-live="assertive"]) button')
@@ -727,7 +728,7 @@ test.describe('Círculo — la región viva no se desborda al animar', () => {
   });
 });
 
-// HALLAZGO (accesibilidad, bajo) — ABIERTO. La gráfica escala un viewBox de 560 de ancho y sus
+// HALLAZGO (accesibilidad, bajo) — REPARADO el 04/10/2026 (era ABIERTO). La gráfica escala un viewBox de 560 de ancho y sus
 // rótulos (0, π/2, π, 3π/2, 2π y ±A) llevan fontSize 9: a 360 px el SVG mide 302 px y los
 // rótulos se pintan a 9 · 302/560 = 4,9 px (en escritorio, 10,6 px).
 // Caso: 360 px, pestaña Gráficas → esperado rótulos de los ejes de al menos 9 px de alto ·
@@ -743,7 +744,6 @@ test.describe('Móvil 360 px — rótulos de la gráfica', () => {
   });
 
   test('los rótulos de los ejes miden al menos 9 px', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto 04/10/2026: rótulos de la gráfica a 4,9 px en móvil');
     await page.goto(URL_APP);
     await esperarHidratacion(page, ['#slider-angulo-i']);
     await page.getByRole('button', { name: /Gráficas/ }).click();
@@ -755,14 +755,13 @@ test.describe('Móvil 360 px — rótulos de la gráfica', () => {
   });
 });
 
-// HALLAZGO (accesibilidad, bajo) — ABIERTO. Resto del 1914: el nombre accesible de la gráfica
+// HALLAZGO (accesibilidad, bajo) — REPARADO el 04/10/2026 (era ABIERTO). Resto del 1914: el nombre accesible de la gráfica
 // sale del valor interno ('sin') y dice «Gráfica de sin(x)», mientras el selector y la fórmula
 // dicen «sen(x)».
 // Caso: Gráficas con sen(x) marcado → esperado aria-label «Gráfica de sen(x)» · obtenido
 //       «Gráfica de sin(x)».
 test.describe('Gráficas — nombre accesible en español', () => {
   test('con sen(x) marcado, la gráfica se llama «Gráfica de sen(x)»', async ({ page }) => {
-    test.fail(true, 'HALLAZGO abierto 04/10/2026: aria-label «Gráfica de sin(x)»');
     await page.goto(URL_APP);
     await esperarHidratacion(page, ['#slider-angulo-i']);
     await page.getByRole('button', { name: /Gráficas/ }).click();
@@ -771,7 +770,7 @@ test.describe('Gráficas — nombre accesible en español', () => {
   });
 });
 
-// HALLAZGO (contenido, bajo) — ABIERTO. La tarjeta «Navegante y Piloto» dice que «el GPS usa
+// HALLAZGO (contenido, bajo) — REPARADO el 04/10/2026 (era ABIERTO). La tarjeta «Navegante y Piloto» dice que «el GPS usa
 // trilateración mediante distancias y ángulos». La trilateración es, por definición, la posición
 // a partir de DISTANCIAS (con ángulos es triangulación), y el receptor GPS solo mide distancias
 // (pseudodistancias) a los satélites. La propia página lo dice bien unos párrafos antes:
@@ -780,7 +779,6 @@ test.describe('Gráficas — nombre accesible en español', () => {
 //       «Tip: el GPS usa trilateración mediante distancias y ángulos.»
 test.describe('Contenido — trilateración', () => {
   test('el bloque educativo no atribuye ángulos a la trilateración del GPS', async ({ request }) => {
-    test.fail(true, 'HALLAZGO abierto 04/10/2026: «trilateración mediante distancias y ángulos»');
     const html = await (await request.get(URL_APP)).text();
     // Solo las frases que hablan de trilateración, para que el fallo no vuelque el HTML entero
     const frases = html.match(/trilateración mediante distancias[^<.)]*/g) ?? [];

@@ -1042,3 +1042,17 @@
     padding-top: 100px;
   }
 }
+
+/* Gráfica en pantallas estrechas: conserva sus 560 unidades de ancho (rótulos de 9 px) y se
+   desplaza dentro de su caja, sin mover la página (hallazgo 2852). */
+.graficaScroll {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+@media (max-width: 600px) {
+  .graficaScroll .svgGrafica {
+    min-width: 560px;
+  }
+}
