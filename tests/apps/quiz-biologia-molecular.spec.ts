@@ -333,7 +333,7 @@ test.describe('Quiz Biología Molecular', () => {
       circulo: '20/30',
       etiqueta: 'Aprobado', // nota 6,67 ∈ [5 · 7)
       emoji: '😊',
-      pct: '67%', // Math.round(20/30·100)
+      pct: '67 %', // Math.round(20/30·100)
       nota: 'Nota: 6,7 sobre 10',
       stats: ['20Aciertos', '10Errores', '20Racha máx.'],
     });
@@ -359,7 +359,7 @@ test.describe('Quiz Biología Molecular', () => {
       circulo: '6/6',
       etiqueta: '¡Perfecto!',
       emoji: '🏆',
-      pct: '100%',
+      pct: '100 %',
       nota: 'Nota: 10,0 sobre 10',
       stats: ['6Aciertos', '0Errores', '6Racha máx.'],
     });
@@ -373,7 +373,7 @@ test.describe('Quiz Biología Molecular', () => {
       circulo: '0/6',
       etiqueta: 'Insuficiente',
       emoji: '😟',
-      pct: '0%',
+      pct: '0 %',
       nota: 'Nota: 0,0 sobre 10',
       stats: ['0Aciertos', '6Errores', '0Racha máx.'],
     });
@@ -392,17 +392,17 @@ test.describe('Quiz Biología Molecular', () => {
     await abrir(page);
     await empezar(page, 'practica', 'Replicación');
     await jugar(page, POR_CATEGORIA, 5);
-    expect(await resultado(page)).toMatchObject({ circulo: '5/6', etiqueta: 'Notable', emoji: '👍', pct: '83%', nota: 'Nota: 8,3 sobre 10' });
+    expect(await resultado(page)).toMatchObject({ circulo: '5/6', etiqueta: 'Notable', emoji: '👍', pct: '83 %', nota: 'Nota: 8,3 sobre 10' });
 
     await page.getByRole('button', { name: 'Volver al inicio' }).click();
     await empezar(page, 'practica', 'Traducción');
     await jugar(page, POR_CATEGORIA, 4);
-    expect(await resultado(page)).toMatchObject({ circulo: '4/6', etiqueta: 'Aprobado', emoji: '😊', pct: '67%', nota: 'Nota: 6,7 sobre 10' });
+    expect(await resultado(page)).toMatchObject({ circulo: '4/6', etiqueta: 'Aprobado', emoji: '😊', pct: '67 %', nota: 'Nota: 6,7 sobre 10' });
 
     await page.getByRole('button', { name: 'Volver al inicio' }).click();
     await empezar(page, 'practica', 'ADN y ARN');
     await jugar(page, POR_CATEGORIA, 3);
-    expect(await resultado(page)).toMatchObject({ circulo: '3/6', etiqueta: 'Aprobado', pct: '50%', nota: 'Nota: 5,0 sobre 10' });
+    expect(await resultado(page)).toMatchObject({ circulo: '3/6', etiqueta: 'Aprobado', pct: '50 %', nota: 'Nota: 5,0 sobre 10' });
 
     await page.getByRole('button', { name: 'Volver al inicio' }).click();
     await empezar(page, 'examen');
@@ -411,7 +411,7 @@ test.describe('Quiz Biología Molecular', () => {
       circulo: '11/30',
       etiqueta: 'Insuficiente', // nota 3,67 < 5
       emoji: '😟',
-      pct: '37%',
+      pct: '37 %',
       nota: 'Nota: 3,7 sobre 10',
       stats: ['11Aciertos', '19Errores', '11Racha máx.'],
     });
@@ -457,7 +457,7 @@ test.describe('Quiz Biología Molecular', () => {
       circulo: '1/30',
       etiqueta: 'Insuficiente',
       emoji: '😟',
-      pct: '3%', // Math.round(3,33)
+      pct: '3 %', // Math.round(3,33)
       nota: 'Nota: 0,3 sobre 10',
       stats: ['1Aciertos', '29Errores', '1Racha máx.'],
     });
@@ -668,7 +668,7 @@ test.describe('Hallazgos del Inspector', () => {
     await empezar(page, 'examen');
     await jugar(page, TOTAL_EXAMEN, 12);
     const r = await resultado(page);
-    expect(r.pct).toBe('40%'); // Math.round(12/30·100)
+    expect(r.pct).toBe('40 %'); // Math.round(12/30·100)
     expect(r.etiqueta).not.toBe('Aprobado');
     // Reparado: nota 120/30 = 4 → «Insuficiente», y la nota se ve en cifras (Latam-friendly:
     // los nombres de la escala española no se entienden sin su número).
@@ -1034,12 +1034,12 @@ test.describe('Inspector 04/10/2026', () => {
       await botonAvanzar(page).click();
     }
     const r = await resultado(page);
-    // El espacio del porcentaje se mira en su propio caso (hallazgo de formato, abajo)
-    expect({ ...r, pct: r.pct.replace(/\s/g, '') }).toEqual({
+    // El espacio duro del porcentaje (hallazgo 2832, reparado el 04/10/2026) se mira tal cual.
+    expect(r).toEqual({
       circulo: '27/30',
       etiqueta: 'Sobresaliente', // nota 9 ∈ [9 · 10), sin pleno
       emoji: '🌟',
-      pct: '90%', // Math.round(27/30·100)
+      pct: '90 %', // Math.round(27/30·100)
       nota: 'Nota: 9,0 sobre 10',
       stats: ['27Aciertos', '3Errores', '9Racha máx.'],
     });
@@ -1081,7 +1081,7 @@ test.describe('Inspector 04/10/2026', () => {
   });
 
   /**
-   * HALLAZGO (operativa) — ABIERTO desde el 04/10/2026. La forma del 2507 de la referencia
+   * HALLAZGO (operativa) — REPARADO el 04/10/2026 (era ABIERTO). La forma del 2507 de la referencia
    * (quiz-literatura-universal, reparada allí el 30/09 en ce0ad0bc): un doble clic en «Comenzar
    * quiz →» o en «Siguiente pregunta →» RESPONDE la pregunta siguiente. El primer clic cambia de
    * pantalla y el segundo cae, en el mismo punto, sobre una opción de la pregunta nueva, que
@@ -1092,7 +1092,6 @@ test.describe('Inspector 04/10/2026', () => {
    * Lo correcto: un doble clic es una sola intención; la pregunta nueva llega sin responder.
    */
   test('hallazgo · un doble clic en «Comenzar» o en «Siguiente» no contesta solo la pregunta siguiente', async ({ page }) => {
-    test.fail(true, 'ABIERTO (04/10/2026): el 2.º clic del doble clic contesta la pregunta nueva');
     test.setTimeout(150_000);
     await sembrarAzar(page, 20260930);
     await page.setViewportSize({ width: 1280, height: 800 });
@@ -1117,7 +1116,6 @@ test.describe('Inspector 04/10/2026', () => {
 
   /** El mismo hallazgo con `dblclick()` de Playwright (los dos clics en ráfaga, sin pausa). Medido: 1 + 1. */
   test('hallazgo · con `dblclick()` en ráfaga tampoco se contesta, se salta ni se abandona nada', async ({ page }) => {
-    test.fail(true, 'ABIERTO (04/10/2026): el 2.º clic del doble clic contesta la pregunta nueva');
     test.setTimeout(150_000);
     await sembrarAzar(page, 20260930);
     await page.setViewportSize({ width: 1280, height: 800 });
@@ -1132,7 +1130,7 @@ test.describe('Inspector 04/10/2026', () => {
   });
 
   /**
-   * HALLAZGO (dato) — ABIERTO desde el 04/10/2026 (la sospecha del 25/09). La explicación de la
+   * HALLAZGO (dato) — REPARADO el 04/10/2026 (era ABIERTO) (la sospecha del 25/09). La explicación de la
    * pregunta 8 dice que la helicasa actúa «moviéndose 5' → 3' a lo largo de la hebra», sin decir
    * de qué organismo. Esa polaridad es la de la helicasa BACTERIANA (DnaB, superfamilia 4); la
    * replicativa de eucariotas y arqueas (MCM2-7 / CMG, superfamilia 6) avanza 3' → 5' sobre la
@@ -1144,7 +1142,6 @@ test.describe('Inspector 04/10/2026', () => {
    * Lo correcto: o se dice que es la helicasa bacteriana, o no se da una polaridad universal.
    */
   test('hallazgo · la explicación de la helicasa no da la polaridad 5′ → 3′ como universal', async ({ page }) => {
-    test.fail(true, "ABIERTO (04/10/2026): «moviéndose 5' → 3' a lo largo de la hebra» sin organismo");
     await abrir(page);
     await empezarConOrden(page, [POS_HELICASA]);
     await expect(enunciado(page)).toHaveText('¿Qué enzima rompe los puentes de hidrógeno entre las hebras en la replicación?');
@@ -1155,7 +1152,7 @@ test.describe('Inspector 04/10/2026', () => {
   });
 
   /**
-   * HALLAZGO (contenido) — ABIERTO desde el 04/10/2026. La forma del 1746: dos opciones FALSAS
+   * HALLAZGO (contenido) — REPARADO el 04/10/2026 (era ABIERTO). La forma del 1746: dos opciones FALSAS
    * según la app que su propia explicación da por ciertas, así que quien lo sabe recibe
    * «✗ Incorrecto».
    *   · id 3 «¿Qué diferencia estructural tiene el ARN respecto al ADN?» → «El ARN tiene bases
@@ -1169,7 +1166,6 @@ test.describe('Inspector 04/10/2026', () => {
    * falso, como se hizo en el 1746), o la opción deja de castigarse.
    */
   test('hallazgo · ningún distractor es algo que la propia explicación da por cierto', async ({ page }) => {
-    test.fail(true, 'ABIERTO (04/10/2026): «bases nitrogenadas distintas» (id 3) y «Truncamiento de la proteína» (id 28)');
     await abrir(page);
     await empezarConOrden(page, [POS_ARN_ADN, POS_INSERCION]);
     const castigadas: string[] = [];
@@ -1195,7 +1191,7 @@ test.describe('Inspector 04/10/2026', () => {
   });
 
   /**
-   * HALLAZGO (contenido) — ABIERTO desde el 04/10/2026. El porcentaje va pegado al número, y la
+   * HALLAZGO (contenido) — REPARADO el 04/10/2026 (era ABIERTO). El porcentaje va pegado al número, y la
    * norma de meskeIA (25/09/2026, Ortografía de la RAE de 2010) lo quiere separado con espacio
    * DURO (U+00A0), que se corrige app a app al pasar el Inspector. Tres sitios: el resultado
    * («{porcentaje}%», page.tsx l. 832), la explicación del splicing alternativo («~95% de genes»,
@@ -1203,7 +1199,6 @@ test.describe('Inspector 04/10/2026', () => {
    * de Traducción 6/6 → esperado «100 %» · obtenido «100%».
    */
   test('hallazgo · el % va separado del número con espacio duro en el resultado, la explicación y la guía', async ({ page }) => {
-    test.fail(true, 'ABIERTO (04/10/2026): «100%», «~95% de genes», «~95% de los genes»');
     test.setTimeout(90_000);
     const pegados: string[] = [];
     const mirar = (donde: string, texto: string) => {
@@ -1290,14 +1285,13 @@ test.describe('Inspector 04/10/2026 · móvil 360 × 740', () => {
   });
 
   /**
-   * HALLAZGO (operativa) — ABIERTO desde el 04/10/2026. El del doble clic del bloque de escritorio,
+   * HALLAZGO (operativa) — REPARADO el 04/10/2026 (era ABIERTO). El del doble clic del bloque de escritorio,
    * donde más pasa: dos toques a 150 ms. Medido el 04/10/2026 a 360 × 740 con 4 semillas: 116 de
    * 116 «Siguiente» contestaron la pregunta nueva con el segundo toque (el 100 %: tras avanzar,
    * traerALaVista deja una opción justo bajo el dedo); «Comenzar» 0 de 4 y «Ver resultados» 0 de
    * 4. Con esta semilla (20260930) salen ya respondidas de la 2 a la 30.
    */
   test('hallazgo · dos toques seguidos en «Siguiente» no contestan solos la pregunta siguiente', async ({ page }) => {
-    test.fail(true, 'ABIERTO (04/10/2026): el 2.º toque contesta la pregunta nueva (29 de 29)');
     test.setTimeout(150_000);
     await sembrarAzar(page, 20260930);
     await abrir(page);

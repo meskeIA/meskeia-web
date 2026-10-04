@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, type MouseEvent } from 'react';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import LegalNotice from '@/components/LegalNotice';
@@ -117,7 +117,7 @@ const PREGUNTAS: Pregunta[] = [
       'El ARN usa adenina en lugar de timina',
       'El ARN contiene ribosa y uracilo en vez de desoxirribosa y timina',
       'El ARN es bicatenario',
-      'El ARN tiene bases nitrogenadas distintas',
+      'El ARN no contiene bases púricas',
     ],
     correcta: 1,
     explicacion:
@@ -173,7 +173,7 @@ const PREGUNTAS: Pregunta[] = [
     opciones: ['Primasa', 'ADN polimerasa III', 'Topoisomerasa', 'Helicasa'],
     correcta: 3,
     explicacion:
-      'La helicasa desenvuelve la doble hélice rompiendo los puentes de hidrógeno. Actúa en la horquilla de replicación, moviéndose 5\' → 3\' a lo largo de la hebra.',
+      'La helicasa desenvuelve la doble hélice rompiendo los puentes de hidrógeno. Actúa en la horquilla de replicación. Su polaridad depende del organismo: la bacteriana (DnaB) avanza 5\' → 3\', y la replicativa de eucariotas y arqueas (MCM2-7, en el complejo CMG), 3\' → 5\'.',
   },
   {
     id: 9,
@@ -296,7 +296,7 @@ const PREGUNTAS: Pregunta[] = [
     ],
     correcta: 3,
     explicacion:
-      'El splicing alternativo multiplica enormemente el proteoma: el gen DSCAM de Drosophila puede generar >38.000 proteínas distintas. En humanos, ~95% de genes multi-exónicos sufren splicing alternativo.',
+      'El splicing alternativo multiplica enormemente el proteoma: el gen DSCAM de Drosophila puede generar >38.000 proteínas distintas. En humanos, ~95\u00A0% de genes multi-exónicos sufren splicing alternativo.',
   },
   {
     id: 18,
@@ -436,7 +436,7 @@ const PREGUNTAS: Pregunta[] = [
     pregunta: '¿Qué consecuencia tiene una inserción de 1 base en la región codificante?',
     opciones: [
       'Cambio de un aminoácido',
-      'Truncamiento de la proteína',
+      'Ninguno, porque el código genético es degenerado',
       'Ningún efecto si es en posición 3 del codón',
       'Cambio de marco de lectura que altera todos los aminoácidos downstream',
     ],
@@ -541,6 +541,23 @@ export default function QuizBiologiaMolecularPage() {
     }
   }, [estado, indice]);
 
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 2829, la forma del 2507 de quiz-literatura-universal).
+   * «Comenzar quiz», «Siguiente», «Salir» y «Volver al inicio» cambian la pantalla en el primer
+   * clic, y el segundo caía sobre una opción de la pregunta nueva y la contestaba sin que nadie la
+   * eligiera (29 de 29 «Siguiente» a 360 px con dos toques). Un clic se ignora cuando es el 2.º de
+   * una ráfaga (`detail` > 1, lo cuenta el navegador; con teclado es 0) Y el anterior cambió de
+   * pantalla: contestar y pulsar «Siguiente» deprisa sigue funcionando.
+   */
+  const ultimoCambioPantallaRef = useRef(false);
+  const clicDeMas = (e: MouseEvent<HTMLButtonElement>): boolean =>
+    e.detail > 1 && ultimoCambioPantallaRef.current;
+  const conClic = (cambiaPantalla: boolean, accion: () => void) => (e: MouseEvent<HTMLButtonElement>) => {
+    if (clicDeMas(e)) return;
+    ultimoCambioPantallaRef.current = cambiaPantalla;
+    accion();
+  };
+
   const iniciarQuiz = useCallback(() => {
     // Se baraja aquí, en el clic (cliente), y no al pintar: ni desajuste de hidratación ni
     // opciones que cambien de sitio entre responder y pulsar «Siguiente».
@@ -573,15 +590,18 @@ export default function QuizBiologiaMolecularPage() {
     [estado, respuesta, preguntaActual, rachaActual]
   );
 
+  // Avanza a la siguiente A LA PULSADA (`indice + 1` del render): dos clics antes de repintar no
+  // saltan una pregunta, y sin responder no se avanza.
   const siguiente = useCallback(() => {
+    if (estado !== 'respondida') return;
     if (indice + 1 >= totalPreguntas) {
       setEstado('fin');
     } else {
-      setIndice((p) => p + 1);
+      setIndice(indice + 1);
       setRespuesta(null);
       setEstado('jugando');
     }
-  }, [indice, totalPreguntas]);
+  }, [estado, indice, totalPreguntas]);
 
   const reiniciar = useCallback(() => {
     vieneDeSalir.current = true;
@@ -644,7 +664,7 @@ export default function QuizBiologiaMolecularPage() {
                 <button
                   type="button"
                   className={`${styles.modoBtn} ${modo === 'examen' ? styles.modoBtnActivo : ''}`}
-                  onClick={() => setModo('examen')}
+                  onClick={conClic(false, () => setModo('examen'))}
                   aria-pressed={modo === 'examen'}
                 >
                   <span aria-hidden="true" className={styles.modoBtnIcon}>📝</span>
@@ -654,7 +674,7 @@ export default function QuizBiologiaMolecularPage() {
                 <button
                   type="button"
                   className={`${styles.modoBtn} ${modo === 'practica' ? styles.modoBtnActivo : ''}`}
-                  onClick={() => setModo('practica')}
+                  onClick={conClic(false, () => setModo('practica'))}
                   aria-pressed={modo === 'practica'}
                 >
                   <span aria-hidden="true" className={styles.modoBtnIcon}>🎯</span>
@@ -678,7 +698,7 @@ export default function QuizBiologiaMolecularPage() {
                             ? { borderColor: COLORES_CATEGORIA[cat], background: `${COLORES_CATEGORIA[cat]}18` }
                             : {}
                         }
-                        onClick={() => setCategoriaSeleccionada(cat)}
+                        onClick={conClic(false, () => setCategoriaSeleccionada(cat))}
                         aria-pressed={categoriaSeleccionada === cat}
                       >
                         <EtiquetaCategoria categoria={cat} />
@@ -699,7 +719,7 @@ export default function QuizBiologiaMolecularPage() {
                 </div>
               )}
 
-              <button type="button" className={styles.btnPrimario} onClick={iniciarQuiz}>
+              <button type="button" className={styles.btnPrimario} onClick={conClic(true, iniciarQuiz)}>
                 Comenzar quiz →
               </button>
             </div>
@@ -765,7 +785,7 @@ export default function QuizBiologiaMolecularPage() {
                       key={opcion}
                       type="button"
                       className={`${styles.opcion} ${claseExtra}`}
-                      onClick={() => responder(opcion)}
+                      onClick={conClic(false, () => responder(opcion))}
                       disabled={estado === 'respondida'}
                       aria-label={`Opción ${LETRAS[i]}: ${opcion}${marca}`}
                     >
@@ -796,7 +816,7 @@ export default function QuizBiologiaMolecularPage() {
                     </p>
                   )}
                   <p className={styles.explicacion}>{preguntaActual.explicacion}</p>
-                  <button type="button" className={styles.btnSiguiente} onClick={siguiente} ref={botonSiguienteRef}>
+                  <button type="button" className={styles.btnSiguiente} onClick={conClic(true, siguiente)} ref={botonSiguienteRef}>
                     {indice + 1 >= totalPreguntas ? 'Ver resultados →' : 'Siguiente pregunta →'}
                   </button>
                 </div>
@@ -805,7 +825,7 @@ export default function QuizBiologiaMolecularPage() {
 
             {/* Empezada una partida no había forma de salir de ella ni de cambiar de modo sin
                 responder las 30 o recargar la página (hallazgo 1756). */}
-            <button type="button" className={styles.btnSalir} onClick={reiniciar}>
+            <button type="button" className={styles.btnSalir} onClick={conClic(true, reiniciar)}>
               <span aria-hidden="true">←</span> Salir de la partida
             </button>
           </div>
@@ -829,7 +849,7 @@ export default function QuizBiologiaMolecularPage() {
               <div className={styles.clasificacion}>
                 <span className={styles.clasificacionEmoji} aria-hidden="true">{clasificacion.emoji}</span>
                 <p className={styles.clasificacionTexto}>{clasificacion.texto}</p>
-                <p className={styles.clasificacionPct}>{porcentaje}%</p>
+                <p className={styles.clasificacionPct}>{porcentaje}&nbsp;%</p>
                 <p className={styles.clasificacionNota}>
                   Nota: {formatNumber(clasificacion.nota, 1)} sobre 10
                 </p>
@@ -874,7 +894,7 @@ export default function QuizBiologiaMolecularPage() {
                 </div>
               </div>
 
-              <button type="button" className={styles.btnPrimario} onClick={reiniciar}>
+              <button type="button" className={styles.btnPrimario} onClick={conClic(true, reiniciar)}>
                 Volver al inicio
               </button>
             </div>
@@ -942,7 +962,7 @@ export default function QuizBiologiaMolecularPage() {
               primitivo, donde el ARN actuaba como enzima antes de que existieran las proteínas.
             </li>
             <li>
-              <strong>Splicing alternativo en humanos</strong>: ~95% de los genes humanos con más de un exón
+              <strong>Splicing alternativo en humanos</strong>: ~95&nbsp;% de los genes humanos con más de un exón
               se procesan de forma alternativa. Un solo gen puede codificar cientos de proteínas distintas.
               El proteoma humano (~100.000 proteínas) supera en mucho al número de genes (~20.000).
             </li>
