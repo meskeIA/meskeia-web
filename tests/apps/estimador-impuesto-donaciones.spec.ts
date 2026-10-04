@@ -38,8 +38,9 @@
  * RE-INSPECCIÓN (04/10/2026): volvió a la cola por d96e492c (corrección del salto de coeficiente
  * del art. 22.2 LISD en data/fiscal/sucesiones.ts, hecha para la hermana de sucesiones) y por
  * b7ec248c (año del título desde META.vigencia). Los 18 hallazgos del 25/09 siguen reparados:
- * sus testigos de abajo pasan. El último bloque añade los casos de hoy; los que documentan un
- * hallazgo abierto van con `test.fail()`:
+ * sus testigos de abajo pasan. El último bloque añade los casos de hoy. REPARADOS el mismo día
+ * (2823-2826): la corrección del salto (el motor recibe el patrimonio en euros), el contraste y
+ * la prescripción penal. Siguen ABIERTOS, con `test.fail()`, (e) y (f):
  *   · la app pide el patrimonio preexistente por TRAMO y su motor (lib/calculadoras/donaciones.ts)
  *     no aplica la corrección del salto del art. 22.2, que data/fiscal ya sirve como
  *     `cuotaTributariaConCorreccionIS`;
@@ -58,8 +59,10 @@ import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliar
 
 const RUTA = '/estimador-impuesto-donaciones/';
 
-/** Los tres desplegables, en el orden en que se pintan. */
-const SELECT = { ccaa: 0, parentesco: 1, patrimonio: 2 } as const;
+/** Los dos desplegables, en el orden en que se pintan (el patrimonio es un importe desde el 04/10/2026). */
+const SELECT = { ccaa: 0, parentesco: 1 } as const;
+/** Un importe representativo de cada tramo, lejos de sus límites (sin corrección del salto). */
+const PATRIMONIO_DE_TRAMO = { '1': '0', '2': '1000000', '3': '3000000', '4': '5000000' } as const;
 /** Los dos importes: valor del bien donado y cargas. */
 const CAMPO = { valor: 0, cargas: 1 } as const;
 const IMPORTES = 'input[inputmode="decimal"]';
@@ -83,7 +86,7 @@ async function rellenar(page: Page, caso: Caso) {
   await abrir(page);
   await page.locator('select').nth(SELECT.ccaa).selectOption(caso.ccaa);
   await page.locator('select').nth(SELECT.parentesco).selectOption(caso.grupo);
-  if (caso.patrimonio) await page.locator('select').nth(SELECT.patrimonio).selectOption(caso.patrimonio);
+  if (caso.patrimonio) await ponerPatrimonio(page, PATRIMONIO_DE_TRAMO[caso.patrimonio], caso.patrimonio);
   // Hay dos radios «No» (escritura y discapacidad); desde el 25/09/2026 cada grupo lleva su
   // `name` y su <legend>, y el primero sigue siendo el de la escritura pública.
   if (caso.escritura === false) await page.getByRole('radio', { name: 'No', exact: true }).first().check();
@@ -574,7 +577,8 @@ test.describe('Estimador ISD donaciones — reparación (25/09/2026)', () => {
     ).toHaveCount(1);
     await expect(page.getByRole('textbox', { name: 'Valor del bien donado *' })).toBeVisible();
     await expect(page.getByRole('textbox', { name: /Cargas o deudas/ })).toBeVisible();
-    await expect(page.getByRole('combobox', { name: /Patrimonio preexistente/ })).toBeVisible();
+    // Desde el 04/10/2026 el patrimonio es un importe (hallazgo 2823), no un desplegable de tramos.
+    await expect(page.getByRole('textbox', { name: /Patrimonio preexistente/ })).toBeVisible();
   });
 
   /** 1869: el régimen común son 15 comunidades con Cataluña; forales, solo País Vasco y Navarra. */
@@ -737,7 +741,6 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
    *   Castilla-La Mancha no bonifica al Grupo III. La app da 20.703,85 € (963,89 € de más).
    */
   test('HALLAZGO 04/10 (a): sobrino con 402.700 € de patrimonio previo paga 19.739,96 €, no el coeficiente entero', async ({ page }) => {
-    test.fail(true, 'ABIERTO: lib/calculadoras/donaciones.ts aplica ×1,6676 entero (20.703,85 €) sin la corrección del art. 22.2 LISD');
     await rellenar(page, { ccaa: 'castilla-mancha', grupo: 'III', valor: '100000' });
     await ponerPatrimonio(page, '402700', '2');
     await expect(page.getByText(/^Impuesto estimado en Castilla-La Mancha/)).toBeVisible();
@@ -754,7 +757,6 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
    *   La app da 80.436,80 € (321.747,21 × 0,25): 6.645,81 € de más.
    */
   test('HALLAZGO 04/10 (a): hijo con 4.021.000 € de patrimonio previo en Valencia paga 73.790,99 €', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el motor aplica ×1,2000 entero (80.436,80 €) sin la corrección del art. 22.2 LISD');
     await rellenar(page, { ccaa: 'valencia', grupo: 'II', valor: '1000000' });
     await ponerPatrimonio(page, '4021000', '4');
     await expect(page.getByText(/^Impuesto estimado en Comunitat Valenciana/)).toBeVisible();
@@ -771,7 +773,6 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
    * efectivo» (opacidad 0,8) 2,32:1; número de paso (13,6 px / 700) 2,80:1.
    */
   test('HALLAZGO 04/10 (b): el texto blanco del bloque del impuesto y de los pasos llega a su umbral', async ({ page }) => {
-    test.fail(true, 'ABIERTO: blanco sobre el degradado #2E86AB → #48A9A6 (2,15–2,80:1)');
     await rellenar(page, { ccaa: 'valencia', grupo: 'II', valor: '150000' });
     await expect(page.getByText(/^Bonificación autonómica/)).toBeVisible();
     await prepararParaMedir(page);
@@ -799,7 +800,6 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
    * los h3 de la guía (16,8 px / 600): 3,77:1 sobre #F5F5F5 y 3,21:1 sobre #303030. Umbral 4,5:1.
    */
   test('HALLAZGO 04/10 (c): el texto en color de marca llega a 4,5:1 en los dos temas', async ({ page }) => {
-    test.fail(true, 'ABIERTO: --primary fijado en .container (4,11:1 en claro, 3,50:1 en oscuro)');
     await rellenar(page, { ccaa: 'valencia', grupo: 'II', valor: '150000' });
     await expect(page.getByText(/^Impuesto estimado en/)).toBeVisible();
     await prepararParaMedir(page);
@@ -823,7 +823,6 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
    * ninguno de los dos. Si la reparación quita la mención, el bucle no mide nada y el caso pasa.
    */
   test('HALLAZGO 04/10 (d): la prescripción penal que se cita es la del Código Penal', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «al menos 6 años (prescripción penal, si aplicase)»');
     await abrir(page);
     const texto = await textoCompleto(page);
     expect(texto).toContain('Conservar el justificante bancario');

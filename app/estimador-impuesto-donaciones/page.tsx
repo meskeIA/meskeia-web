@@ -14,6 +14,8 @@ import {
   PLAZO_AUTOLIQUIDACION_DONACIONES,
   ACUMULACION_DONACIONES_ANIOS,
   ACUMULACION_DONACIONES_A_SUCESION_ANIOS,
+  LIMITES_PATRIMONIO_PREEXISTENTE_IS,
+  indiceTramoPatrimonioIS,
   type BonificacionCCAA_ID,
   type BonificacionGrupoID,
 } from '@/data/fiscal';
@@ -27,7 +29,6 @@ import {
   calcularDonacion,
   type GrupoParentesco,
   type NivelDiscapacidad,
-  type IndicePatrimonio,
   type ResultadoDonaciones,
 } from '@/lib/calculadoras/donaciones';
 
@@ -66,6 +67,22 @@ function pctFraccion(fraccion: number): string {
 
 function euros0(n: number): string {
   return `${formatNumber(n, 0)} €`;
+}
+
+/**
+ * Tramo del art. 22.2 LISD en que cae el patrimonio tecleado, con los límites legales de
+ * data/fiscal (la ley dice «de más de» en los tramos 2.º y 3.º).
+ */
+function textoTramoPatrimonio(patrimonio: number): string {
+  const [l1, l2, l3] = LIMITES_PATRIMONIO_PREEXISTENTE_IS;
+  const rangos = [
+    `de 0 a ${formatCurrency(l1)}`,
+    `de más de ${formatCurrency(l1)} a ${formatCurrency(l2)}`,
+    `de más de ${formatCurrency(l2)} a ${formatCurrency(l3)}`,
+    `más de ${formatCurrency(l3)}`,
+  ];
+  const k = indiceTramoPatrimonioIS(patrimonio);
+  return `Tramo ${k + 1} del coeficiente multiplicador (${rangos[k]}). Vacío cuenta como 0 €.`;
 }
 
 /** Resumen de la bonificación de un grupo, sacado del módulo de datos (no escrito a mano). */
@@ -124,7 +141,12 @@ export default function EstimadorImpuestoDonacionesPage() {
   const [cargas, setCargas] = useState('');
   const [escrituraPublica, setEscrituraPublica] = useState(true);
   const [parentesco, setParentesco] = useState<OpcionParentesco | ''>('');
-  const [patrimonioIdx, setPatrimonioIdx] = useState('1');
+  /*
+    El patrimonio preexistente se pide como IMPORTE, no por tramos (hallazgo 2823, 04/10/2026):
+    con el tramo la corrección del salto del art. 22.2 LISD no se podía aplicar, y a quien pasaba
+    un umbral por poco se le cobraba el coeficiente entero. Es lo que ya hacía sucesiones (2483).
+  */
+  const [patrimonio, setPatrimonio] = useState('');
   const [discapacidad, setDiscapacidad] = useState<NivelDiscapacidad>('0');
 
   const ccaaInfo = useMemo(() => (ccaa ? BONIFICACIONES_CCAA_ID[ccaa] : null), [ccaa]);
@@ -149,8 +171,14 @@ export default function EstimadorImpuestoDonacionesPage() {
     } else if (cargasNum < 0) {
       errores.push('Las cargas no pueden ser negativas: son deudas que asume quien recibe y se restan del valor del bien.');
     }
-    return { valor, cargasNum, errores };
-  }, [valorDonacion, cargas]);
+    const patrimonioNum = patrimonio.trim() === '' ? 0 : parseSpanishNumber(patrimonio);
+    if (!Number.isFinite(patrimonioNum)) {
+      errores.push('El patrimonio preexistente no es un número válido. Escríbelo como 450000 o 450.000,50, o deja el campo vacío.');
+    } else if (patrimonioNum < 0) {
+      errores.push('El patrimonio preexistente no puede ser negativo.');
+    }
+    return { valor, cargasNum, patrimonioNum, errores };
+  }, [valorDonacion, cargas, patrimonio]);
 
   const resultado = useMemo((): ResultadoDonaciones | null => {
     if (entrada.errores.length > 0 || !ccaa || !parentesco) return null;
@@ -163,12 +191,12 @@ export default function EstimadorImpuestoDonacionesPage() {
         cargas: entrada.cargasNum,
         escrituraPublica,
         discapacidad,
-        patrimonioIdx: Number(patrimonioIdx) as IndicePatrimonio,
+        patrimonioPreexistente: entrada.patrimonioNum,
       });
     } catch {
       return null;
     }
-  }, [entrada, ccaa, parentesco, escrituraPublica, discapacidad, patrimonioIdx]);
+  }, [entrada, ccaa, parentesco, escrituraPublica, discapacidad]);
 
   const etiquetaCcaa = tipoBien === 'inmueble'
     ? 'Comunidad donde está situado el inmueble *'
@@ -399,13 +427,15 @@ export default function EstimadorImpuestoDonacionesPage() {
 
             <div className={styles.campo}>
               <label className={styles.label} htmlFor="patrimonio-donacion">Patrimonio preexistente del donatario</label>
-              <select id="patrimonio-donacion" className={styles.select} value={patrimonioIdx}
-                onChange={(e) => setPatrimonioIdx(e.target.value)}>
-                <option value="1">Hasta 402.678,11 €</option>
-                <option value="2">De 402.678,11 € a 2.007.380,43 €</option>
-                <option value="3">De 2.007.380,43 € a 4.020.770,98 €</option>
-                <option value="4">Más de 4.020.770,98 €</option>
-              </select>
+              <div className={styles.inputConUnidad}>
+                <input id="patrimonio-donacion" type="text" className={styles.input} value={patrimonio}
+                  onChange={(e) => setPatrimonio(e.target.value)}
+                  placeholder="0,00" inputMode="decimal" aria-describedby="patrimonio-donacion-ayuda" />
+                <span className={styles.unidad}>€</span>
+              </div>
+              <span className={styles.helper} id="patrimonio-donacion-ayuda">
+                {textoTramoPatrimonio(Number.isFinite(entrada.patrimonioNum) ? Math.max(0, entrada.patrimonioNum) : 0)}
+              </span>
             </div>
 
             <fieldset className={`${styles.campo} ${styles.fieldset}`}>
@@ -484,6 +514,12 @@ export default function EstimadorImpuestoDonacionesPage() {
                 <h3 className={styles.desgloseTitle}>Liquidación</h3>
                 <div className={styles.linea}><span>Cuota íntegra</span><span>{formatCurrency(resultado.cuotaIntegra)}</span></div>
                 <div className={styles.linea}><span>× Coeficiente multiplicador</span><span>×{formatNumber(resultado.coeficienteMultiplicador, 4)}</span></div>
+                {resultado.correccionSalto > 0 && (
+                  <div className={styles.linea}>
+                    <span>− Corrección del salto de coeficiente (art. 22.2 LISD)</span>
+                    <span>−{formatCurrency(resultado.correccionSalto)}</span>
+                  </div>
+                )}
                 <div className={styles.linea}><span>Cuota tributaria</span><span>{formatCurrency(resultado.cuotaTributaria)}</span></div>
                 {resultado.bonificaciones.map((b) => (
                   <div key={b.concepto} className={styles.linea}>
@@ -727,7 +763,7 @@ export default function EstimadorImpuestoDonacionesPage() {
               <p className={styles.escenarioExample}>
                 La finca está en Castilla-La Mancha. Base imponible: {formatCurrency(EJ_SOBRINO_CLM.baseLiquidable)}.
                 Cuota íntegra (tarifa estatal): {formatCurrency(EJ_SOBRINO_CLM.cuotaIntegra)}. Coeficiente
-                multiplicador del Grupo III (patrimonio hasta 402.678,11 €):{' '}
+                multiplicador del Grupo III (patrimonio hasta {formatCurrency(LIMITES_PATRIMONIO_PREEXISTENTE_IS[0])}):{' '}
                 {formatNumber(EJ_SOBRINO_CLM.coeficienteMultiplicador, 4)}. Cuota tributaria:{' '}
                 {formatCurrency(EJ_SOBRINO_CLM.cuotaTributaria)}. Castilla-La Mancha no bonifica al Grupo III.
                 <strong> Cuota final: ≈ {formatNumber(EJ_SOBRINO_CLM.cuotaFinal, 0)} €</strong>{' '}
@@ -1043,8 +1079,10 @@ export default function EstimadorImpuestoDonacionesPage() {
                 Hacienda puede requerir la acreditación del origen de los fondos donados para
                 descartar blanqueo de capitales o simulación. El extracto bancario que muestre
                 la transferencia del donante al donatario, junto con la escritura de donación o
-                el documento privado, es la documentación mínima recomendada. Consérvala durante
-                al menos 6 años (prescripción penal, si aplicase).
+                el documento privado, es la documentación mínima recomendada. Consérvala al menos
+                durante los 4 años de la prescripción tributaria; si la cuota pudiera llegar a delito
+                fiscal, el plazo penal es de 5 años (arts. 305 y 131.1 del Código Penal), o de 10 en
+                los casos agravados del art. 305 bis.
               </p>
             </div>
 

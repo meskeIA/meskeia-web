@@ -1392,9 +1392,10 @@ function crearServidorDelegum(): McpServer {
       grupo_parentesco: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III', 'IV']).describe('Grupo de parentesco'),
       escritura_publica: z.boolean().optional().describe('Si se formaliza en escritura pública (afecta a algunas CCAA). Por defecto true.'),
       discapacidad: z.enum(['0', '33', '65']).optional().describe('Grado de discapacidad. Por defecto "0".'),
+      patrimonio_preexistente: z.number().nonnegative().optional().describe('Patrimonio preexistente del donatario en euros. Fija el coeficiente multiplicador (art. 22.2 LISD) con la corrección del salto de tramo. Por defecto 0.'),
     },
     { title: 'Calcula el Impuesto de Donaciones por comunidad autónoma', readOnlyHint: true },
-    async ({ valor_donacion, ccaa, grupo_parentesco, escritura_publica, discapacidad }, extra) => {
+    async ({ valor_donacion, ccaa, grupo_parentesco, escritura_publica, discapacidad, patrimonio_preexistente }, extra) => {
       await registrarUsoDelegum('calcular_donaciones', getCaller(extra));
       try {
         const r = calcularDonacion({
@@ -1403,15 +1404,18 @@ function crearServidorDelegum(): McpServer {
           grupo: grupo_parentesco as GrupoParentesco,
           escrituraPublica: escritura_publica,
           discapacidad: discapacidad as NivelDiscapacidad | undefined,
+          patrimonioPreexistente: patrimonio_preexistente,
         });
         const texto = [
           `🏛️ **Impuesto de Donaciones — ${r.ccaaNombre}**`,
           `💶 Donación: ${fmt(r.baseImponible)} €`,
           `🔢 Cuota íntegra: ${fmt(r.cuotaIntegra)} €`,
+          r.coeficienteMultiplicador !== 1 ? `✖️ Coeficiente por patrimonio preexistente: ×${r.coeficienteMultiplicador}` : '',
+          r.correccionSalto > 0 ? `↘️ Corrección del salto de coeficiente (art. 22.2 LISD): −${fmt(r.correccionSalto)} €` : '',
           r.bonificacionCcaa > 0 ? `➖ ${r.detalleBonificacion}: −${fmt(r.bonificacionCcaa)} €` : `ℹ️ ${r.detalleBonificacion}`,
           `💰 **Cuota a pagar: ${fmt(r.cuotaFinal)} €** (tipo efectivo ${pct(r.tipoEfectivo)}%)`,
           `📌 Plazo: 1 mes desde la donación (Modelo 651).`,
-        ].join('\n');
+        ].filter(l => l !== '').join('\n');
         return conAviso(texto, AVISO_FISCAL);
       } catch (err) {
         return errorMcp(err);

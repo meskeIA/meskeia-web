@@ -28,6 +28,7 @@ import {
   COEFICIENTES_ID,
   COEFICIENTES_CATALUNA_ID,
   BONIFICACIONES_CCAA_ID,
+  cuotaTributariaConCorreccionIS,
   type TramoTarifaID,
   type BonificacionGrupoID,
 } from '@/data/fiscal';
@@ -73,8 +74,18 @@ export interface ParametrosDonaciones {
    * Índice de patrimonio preexistente del donatario:
    * 1 = 0–402.678 €, 2 = 402.678–2.007.380 €,
    * 3 = 2.007.380–4.020.770 €, 4 = más de 4.020.770 €
+   *
+   * Con el índice solo se conoce el tramo, no cuánto pasa el patrimonio de su límite, así que la
+   * corrección del salto del art. 22.2 LISD no se puede aplicar: se usa el coeficiente entero.
+   * Quien conozca el importe debe pasar `patrimonioPreexistente`.
    */
   patrimonioIdx?: IndicePatrimonio;
+  /**
+   * Importe del patrimonio preexistente del donatario, en euros. Si se pasa, MANDA sobre
+   * `patrimonioIdx`: fija el tramo y aplica la corrección del salto de coeficiente del art. 22.2
+   * LISD (hallazgo 2823, 04/10/2026; la misma reparación que el 2483 de sucesiones).
+   */
+  patrimonioPreexistente?: number;
 }
 
 /** Una bonificación en cuota, tal como se aplicó (van en orden: cada una sobre lo que deja la anterior). */
@@ -105,8 +116,10 @@ export interface ResultadoDonaciones {
   cuotaIntegra: number;
   /** Coeficiente multiplicador aplicado */
   coeficienteMultiplicador: number;
-  /** cuotaIntegra × coeficienteMultiplicador */
+  /** cuotaIntegra × coeficienteMultiplicador, con la corrección del salto del art. 22.2 LISD */
   cuotaTributaria: number;
+  /** Lo que la corrección del salto del art. 22.2 LISD (último párrafo) ha quitado; 0 si no procede */
+  correccionSalto: number;
   /** Importe total de las bonificaciones autonómicas */
   bonificacionCcaa: number;
   /** Porcentaje total bonificado sobre la cuota tributaria (0–100) */
@@ -257,6 +270,10 @@ export function calcularDonacion(p: ParametrosDonaciones): ResultadoDonaciones {
   const escrituraPublica = p.escrituraPublica ?? true;
   const discapacidad = p.discapacidad ?? '0';
   const patrimonioIdx = Math.min(4, Math.max(1, p.patrimonioIdx ?? 1)) - 1; // 0-based
+  const patrimonioConocido =
+    typeof p.patrimonioPreexistente === 'number' && Number.isFinite(p.patrimonioPreexistente) && p.patrimonioPreexistente >= 0
+      ? p.patrimonioPreexistente
+      : null;
 
   const ccaaInfo = BONIFICACIONES_CCAA_ID[p.ccaa];
   const esCataluna = p.ccaa === 'cataluna';
@@ -296,9 +313,21 @@ export function calcularDonacion(p: ParametrosDonaciones): ResultadoDonaciones {
 
   // 5. Coeficiente multiplicador por patrimonio preexistente (art. 22.2 LISD)
   const coefs = esCataluna ? COEFICIENTES_CATALUNA_ID : COEFICIENTES_ID;
-  const coeficienteMultiplicador = coefs[grupoBase]?.[patrimonioIdx] ?? 1;
-
-  const cuotaTributaria = cuotaIntegra * coeficienteMultiplicador;
+  const filaCoefs = coefs[grupoBase] ?? [1, 1, 1, 1];
+  // ⚠️ 2026-10-04 (hallazgo 2823): se multiplicaba siempre por el coeficiente ENTERO del tramo, y
+  //    a quien pasaba un umbral por poco se le cobraba el salto completo (un sobrino de CLM con
+  //    402.700 € pagaba 963,89 € de más). Con el importe, la cuota no puede superar la del
+  //    coeficiente inferior más lo que el patrimonio pasa del límite (art. 22.2 LISD in fine).
+  //    Sin corrección se conserva el producto sin redondear, como hasta ahora: la función de
+  //    data/fiscal lo da ya a céntimo y movería un céntimo la cuota final de casos sin salto.
+  const conCorreccion = patrimonioConocido !== null
+    ? cuotaTributariaConCorreccionIS(cuotaIntegra, filaCoefs, patrimonioConocido)
+    : null;
+  const coeficienteMultiplicador = conCorreccion?.coeficiente ?? filaCoefs[patrimonioIdx] ?? 1;
+  const correccionSalto = conCorreccion?.correccionSalto ?? 0;
+  const cuotaTributaria = conCorreccion && correccionSalto > 0
+    ? conCorreccion.cuotaTributaria
+    : cuotaIntegra * coeficienteMultiplicador;
 
   // 6. Bonificaciones autonómicas en cuota
   const { bonificaciones, sinBonificacion } = aplicarBonificaciones(
@@ -323,6 +352,7 @@ export function calcularDonacion(p: ParametrosDonaciones): ResultadoDonaciones {
     cuotaIntegra: r2(cuotaIntegra),
     coeficienteMultiplicador,
     cuotaTributaria: r2(cuotaTributaria),
+    correccionSalto: r2(correccionSalto),
     bonificacionCcaa: r2(bonificacion),
     porcentajeBonificacion: r2(porcentaje),
     detalleBonificacion: detalle,

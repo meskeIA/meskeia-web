@@ -1684,6 +1684,21 @@ test.describe('Golden — calcularRendimientoCapitalInmobiliario (Capa 1)', () =
 
 test.describe('Golden — calcularDonacion (Capa 1 · ISD donaciones)', () => {
 
+  test('GOLDEN-DON-22.2: sobrino en CLM con 402.700 € de patrimonio → corrección del salto, 19.739,96 € [art. 22.2 LISD]', () => {
+    // Hallazgo 2823 (04/10/2026). Cuota íntegra 12.415,36; × 1,6676 entero = 20.703,85.
+    // Tope: 12.415,36 × 1,5882 (19.718,07) + (402.700 − 402.678,11 = 21,89) = 19.739,96.
+    const d = calcularDonacion({
+      valorDonacion: 100000, ccaa: 'castilla-mancha', grupo: 'III', escrituraPublica: true, patrimonioPreexistente: 402700,
+    });
+    expect(d.coeficienteMultiplicador).toBe(1.6676);
+    expect(d.correccionSalto).toBeCloseTo(963.89, 2);
+    expect(d.cuotaFinal).toBeCloseTo(19739.96, 2);
+    // Con solo el índice del tramo no se puede corregir: coeficiente entero.
+    const i = calcularDonacion({ valorDonacion: 100000, ccaa: 'castilla-mancha', grupo: 'III', escrituraPublica: true, patrimonioIdx: 2 });
+    expect(i.cuotaFinal).toBeCloseTo(20703.85, 2);
+  });
+
+
   test('GOLDEN-AW: Madrid, I-descendiente, 30.000 € → cuotaFinal 26,52 € (bonif 99 %)', () => {
     // Sin reducción por parentesco (art. 20.5 LISD) → base liquidable = 30.000
     // Tarifa estatal, tramo de 23.968,36 a 31.955,81:

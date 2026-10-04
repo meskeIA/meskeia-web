@@ -31,6 +31,9 @@ export async function POST(req: NextRequest) {
       escrituraPublica: body.escrituraPublica ?? true,
       discapacidad:    body.discapacidad ?? '0',
       patrimonioIdx:   body.patrimonioIdx !== undefined ? Number(body.patrimonioIdx) as 1 | 2 | 3 | 4 : 1,
+      // En euros manda sobre el índice y aplica la corrección del salto del art. 22.2 LISD
+      // (hallazgo 2823); con solo el índice, el coeficiente entero del tramo.
+      patrimonioPreexistente: body.patrimonioPreexistente !== undefined ? Number(body.patrimonioPreexistente) : undefined,
     });
 
     registrarLlamadaChatGPT().catch(() => {});
