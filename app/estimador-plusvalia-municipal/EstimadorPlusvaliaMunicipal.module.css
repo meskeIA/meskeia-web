@@ -140,7 +140,7 @@
 .coefBadge {
   font-size: 0.78rem;
   font-weight: 500;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   padding: 0.15rem 0.5rem;
   border-radius: 20px;
@@ -228,7 +228,7 @@
   font-size: 0.95rem;
   font-weight: 600;
   margin: 0 0 1rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* ── Errores ──────────────────────────────────────────── */
@@ -271,7 +271,7 @@
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -301,7 +301,7 @@
 
 .btnSecondary:hover {
   border-color: #2E86AB;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .btnSecondary:focus-visible {
@@ -329,9 +329,11 @@
   color: #E5E5E5;
 }
 
+/* Fondos y textos de marca con los tokens -boton / -texto, en los dos temas (hallazgos 2839 y 2840):
+   el literal #2E86AB no tenía variante oscura y el blanco encima no llegaba a 4,5:1. */
 .recomendadoBadge {
   font-size: 0.75rem;
-  background: #48A9A6;
+  background: var(--secondary-boton);
   color: white;
   padding: 0.2rem 0.6rem;
   border-radius: 20px;
@@ -455,7 +457,7 @@
 .guideSection h2 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -490,7 +492,7 @@
 }
 
 .tablaCoeficientes th {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   padding: 0.6rem 1rem;
   text-align: left;
@@ -547,7 +549,7 @@
 }
 
 .comparativaTable th {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   padding: 0.7rem 1rem;
   text-align: left;
@@ -713,7 +715,7 @@
 .faqItem dt {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
   line-height: 1.4;
 }
@@ -732,7 +734,7 @@
 .faqTip {
   margin-top: 0.4rem;
   font-size: 0.82rem;
-  color: #48A9A6;
+  color: var(--secondary-texto);
   font-style: italic;
 }
 
@@ -776,7 +778,7 @@
   flex-shrink: 0;
   width: 2rem;
   height: 2rem;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

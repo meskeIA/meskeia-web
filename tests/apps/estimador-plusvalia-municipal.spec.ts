@@ -865,8 +865,8 @@ test.describe('Estimador de plusvalía municipal — re-inspección del 04/10/20
    * TESTIGO del dato (hallazgo `dato` de esta re-inspección): la nota «Coeficiente aplicado»
    * («redacción del RDL 8/2023») y el pie de la tabla («en la redacción del RDL 8/2023
    * (vigente desde 2024)») escriben a mano la norma que da la tabla, que ya está en
-   * PLUSVALIA_MUNICIPAL_META.baseNormativa. Hoy coinciden y el test pasa; el día que el módulo
-   * pase a otra redacción del art. 107.4 y la app no le siga, se pone rojo.
+   * PLUSVALIA_MUNICIPAL_META.baseNormativa. REPARADO el 04/10/2026: los dos textos interpolan
+   * ahora la norma del módulo; el testigo sigue comprobando que la citada está en él.
    */
   test('TESTIGO — la norma de los coeficientes que cita la app es la de PLUSVALIA_MUNICIPAL_META', async ({ page }) => {
     await abrir(page);
@@ -875,7 +875,8 @@ test.describe('Estimador de plusvalía municipal — re-inspección del 04/10/20
     await CALCULAR(page).click();
     const nota = await page.locator('p', { hasText: 'Coeficiente aplicado:' }).innerText();
     await abrirGuia(page);
-    const pie = await page.locator('p', { hasText: 'Fuente: art. 107.4' }).innerText();
+    // Desde el 04/10/2026 (hallazgo 2841) el pie dice «Fuente: TRLRHL, <norma del módulo>».
+    const pie = await page.locator('p', { hasText: 'Fuente: TRLRHL' }).innerText({ timeout: 5000 });
     for (const texto of [nota, pie]) {
       const norma = texto.match(/RDL \d+\/\d{4}/)?.[0];
       expect(norma, `sin norma en «${texto}»`).toBeTruthy();
@@ -935,9 +936,9 @@ test.describe('Estimador de plusvalía municipal — móvil (04/10/2026)', () =>
   });
 });
 
-/* Hallazgos ABIERTOS de la re-inspección del 04/10/2026, con `test.fail()`: afirman lo que
- * DEBERÍA pasar. Comprobado ese día que cada uno falla en su aserción, no en la preparación. */
-test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 04/10/2026', () => {
+/* Hallazgos de la re-inspección del 04/10/2026 (2837-2841), REPARADOS el mismo día: eran
+ * `test.fail()` y quedan como tests normales. */
+test.describe('Estimador de plusvalía municipal — hallazgos del 04/10/2026 (reparados)', () => {
   /**
    * HALLAZGO — «N%» pegado (CLAUDE.md global §2, decidido el 25/09/2026: el % va separado con
    * U+00A0). Con la guía abierta y el aviso de un tipo de 31: 27 «N%» pegados y 2 con espacio
@@ -947,7 +948,6 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 04/1
    * 15%»), que sale tres veces.
    */
   test('PORCENTAJE — ningún «N%» pegado ni con espacio normal: el % va tras U+00A0', async ({ page }) => {
-    test.fail(true, 'ABIERTO: 27 «N%» pegados y 2 con espacio normal (04/10/2026)');
     await abrir(page);
     await escribir(page, SUELO, '40000');
     await page.locator(ANIOS).selectOption('7');
@@ -973,7 +973,6 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 04/1
    * diciembre de 2006, vendido en octubre de 2026 → «20») da el mismo error (forma del 1615).
    */
   test('AÑOS COMPLETOS — el selector de años dice que se cuentan años completos', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el campo de años no dice que se cuentan años completos (04/10/2026)');
     await abrir(page);
     const grupo = page.locator(ANIOS).locator('xpath=..');
     await expect(grupo).toContainText('Tiempo transcurrido');
@@ -990,7 +989,6 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 04/1
    * de reserva). Mismo 4,11:1 en el distintivo «Coeficiente», los números de paso y el botón.
    */
   test('CONTRASTE — «Más favorable» y las cabeceras de tabla llegan a 4,5:1', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «Más favorable» 2,80:1 y <th> 4,11:1 (04/10/2026)');
     await abrir(page);
     await escribir(page, SUELO, '40000');
     await page.locator(ANIOS).selectOption('7');
@@ -1019,7 +1017,6 @@ test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 04/1
    * Ninguno es texto grande: exigen 4,5:1.
    */
   test('CONTRASTE OSCURO — títulos de la guía, FAQ y «Datos para el método real» a 4,5:1 en oscuro', async ({ page }) => {
-    test.fail(true, 'ABIERTO: 3,21:1 (h2 y dt) y 3,50:1 (subPanelTitle) en oscuro (04/10/2026)');
     await abrir(page);
     await REAL(page).check();
     await abrirGuia(page);

@@ -32,6 +32,12 @@ import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentac
  */
 const TIPO_MAXIMO = PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal;
 const TIPO_POR_DEFECTO = String(PLUSVALIA_MUNICIPAL_META.tipoOrientativo);
+/**
+ * Qué norma da los coeficientes, leída del módulo (hallazgo 2841): iba tecleada en dos sitios
+ * («redacción del RDL 8/2023, vigente desde 2024») y no habría cambiado con la tabla.
+ */
+const NORMA_COEFICIENTES = PLUSVALIA_MUNICIPAL_META.baseNormativa.split('; ').find(t => t.startsWith('coeficientes'))
+  ?? PLUSVALIA_MUNICIPAL_META.baseNormativa;
 const PLAZO_INTER_VIVOS = `${PLAZO_IIVTNU.diasHabilesInterVivos} días hábiles`;
 const PLAZO_HERENCIAS = `${PLAZO_IIVTNU.mesesMortisCausa} meses`;
 /*
@@ -40,7 +46,7 @@ const PLAZO_HERENCIAS = `${PLAZO_IIVTNU.mesesMortisCausa} meses`;
  * (5/10/15/20 %), y dos de ellos se contradecían entre sí (hallazgo 1640).
  */
 const RECARGO = ESCALA_RECARGO_EXTEMPORANEO;
-const TEXTO_RECARGO = `un ${RECARGO.porcentajeBase}% de partida más otro ${RECARGO.porcentajePorMes}% por cada mes completo de retraso, y el ${RECARGO.porcentajeMas12Meses}% más intereses de demora una vez transcurridos ${RECARGO.mesesEscalaProporcional} meses (${RECARGO.baseNormativa})`;
+const TEXTO_RECARGO = `un ${RECARGO.porcentajeBase}\u00A0% de partida más otro ${RECARGO.porcentajePorMes}\u00A0% por cada mes completo de retraso, y el ${RECARGO.porcentajeMas12Meses}\u00A0% más intereses de demora una vez transcurridos ${RECARGO.mesesEscalaProporcional} meses (${RECARGO.baseNormativa})`;
 
 interface ResultadoMetodo {
   baseImponible: number;
@@ -105,7 +111,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
       nuevosErrores.push('Con menos de 1 año, indica los meses completos: el coeficiente se prorratea por ellos.');
     }
     if (!tipoMunicipal || isNaN(tipoNum) || tipoNum <= 0 || tipoNum > TIPO_MAXIMO) {
-      nuevosErrores.push(`El tipo impositivo municipal debe estar entre 0,01% y ${formatNumber(TIPO_MAXIMO, 0)}%.`);
+      nuevosErrores.push(`El tipo impositivo municipal debe estar entre 0,01\u00A0% y ${formatNumber(TIPO_MAXIMO, 0)}\u00A0%.`);
     }
 
     if (nuevosErrores.length > 0) {
@@ -300,7 +306,11 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                 </option>
               ))}
             </select>
-            <p className={styles.helperText}>Tiempo transcurrido desde la adquisición hasta la transmisión</p>
+            <p className={styles.helperText}>
+              Tiempo transcurrido desde la adquisición hasta la transmisión, en <strong>años completos</strong>:
+              las fracciones de año no cuentan (art. 107.4 TRLRHL). Comprado en diciembre de 2006 y vendido en
+              octubre de 2026 son 19 años, no 20.
+            </p>
           </div>
 
           {menosDeUnAnio && (
@@ -333,7 +343,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             onChange={alCambiar(setTipoMunicipal)}
             label="Tipo impositivo municipal (%)"
             placeholder={TIPO_POR_DEFECTO}
-            helperText={`Consulta el tipo exacto en tu Ayuntamiento. El máximo legal es el ${TIPO_MAXIMO}%.`}
+            helperText={`Consulta el tipo exacto en tu Ayuntamiento. El máximo legal es el ${TIPO_MAXIMO}\u00A0%.`}
             min={0}
           />
 
@@ -495,7 +505,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                     calculada con 0,075 (regresión del 24/09/2026, al introducir el prorrateo).
                     El coeficiente es el DEL CÁLCULO, no el del formulario (hallazgo 1643). */}
                 <strong>Coeficiente aplicado:</strong> {formatNumber(resultado.coeficiente, resultado.prorrateado ? 4 : 2)}&nbsp;
-                (máximos del art. 107.4 TRLRHL, redacción del RDL 8/2023)
+                (máximos: {NORMA_COEFICIENTES})
               </p>
             </div>
           </div>
@@ -520,7 +530,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
         <ul className={styles.avisoLista}>
           {/* El porcentaje es el valor con que arranca el campo: decía «30%» con el campo en 25 y
               presentaba la cifra como un techo, y no lo es (hallazgo 1641). */}
-          <li>El tipo impositivo exacto de <strong>tu municipio</strong>: puede ser inferior o superior al {TIPO_POR_DEFECTO}% que fijamos por defecto, hasta el máximo legal del {TIPO_MAXIMO}%.</li>
+          <li>El tipo impositivo exacto de <strong>tu municipio</strong>: puede ser inferior o superior al {TIPO_POR_DEFECTO}&nbsp;% que fijamos por defecto, hasta el máximo legal del {TIPO_MAXIMO}&nbsp;%.</li>
           <li>Posibles <strong>bonificaciones municipales</strong> por herencia entre familiares directos (algunos Ayuntamientos las aplican).</li>
           {/* Decía «inmuebles adquiridos antes de 1997 con coeficientes de actualización diferentes»:
               eso es del IRPF. El art. 107.4 termina en «igual o superior a 20 años» y la app lo
@@ -606,7 +616,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
             </table>
           </div>
           <p className={styles.tablaNote}>
-            Fuente: art. 107.4 del TRLRHL, en la redacción del RDL 8/2023 (vigente desde 2024).
+            Fuente: TRLRHL, {NORMA_COEFICIENTES}.
             Los Ayuntamientos pueden aplicar coeficientes inferiores a estos máximos.
           </p>
         </section>
@@ -673,14 +683,14 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               </div>
               <p className={styles.escenarioExample}>
                 Piso comprado en 2009 por <strong>120.000 €</strong>, vendido en 2024 por <strong>220.000 €</strong>.
-                Valor catastral total: <strong>90.000 €</strong>; suelo: <strong>50.000 €</strong> (55,6%).
-                Tipo municipal: <strong>25 %</strong>.
+                Valor catastral total: <strong>90.000 €</strong>; suelo: <strong>50.000 €</strong> (55,6&nbsp;%).
+                Tipo municipal: <strong>25&nbsp;%</strong>.
               </p>
               <ul>
                 {/* 2009 → 2024 son 15 años: coeficiente vigente de 15 años (hasta el 24/09/2026 ponía
                     0,45, que no era el de 15 años ni en la tabla caducada). */}
-                <li><strong>Método objetivo:</strong> 50.000 × {formatNumber(coeficienteIIVTNU(15).coeficiente, 2)} × 25% = <strong>{formatNumber(50000 * coeficienteIIVTNU(15).coeficiente * 0.25, 0)} €</strong></li>
-                <li><strong>Método real:</strong> (220.000 − 120.000) × 55,6% × 25% = <strong>13.900 €</strong></li>
+                <li><strong>Método objetivo:</strong> 50.000 × {formatNumber(coeficienteIIVTNU(15).coeficiente, 2)} × 25&nbsp;% = <strong>{formatNumber(50000 * coeficienteIIVTNU(15).coeficiente * 0.25, 0)} €</strong></li>
+                <li><strong>Método real:</strong> (220.000 − 120.000) × 55,6&nbsp;% × 25&nbsp;% = <strong>13.900 €</strong></li>
               </ul>
               <p className={styles.escenarioTip}>
                 Aquí el método objetivo es más favorable. Siempre calcula ambos antes de autoliquidar.
@@ -693,7 +703,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                 <strong>Herencia de piso</strong>
               </div>
               <p className={styles.escenarioExample}>
-                Heredero recibe un piso con valor catastral <strong>80.000 €</strong>; suelo: <strong>48.000 €</strong> (60%).
+                Heredero recibe un piso con valor catastral <strong>80.000 €</strong>; suelo: <strong>48.000 €</strong> (60&nbsp;%).
                 Plazo para liquidar: <strong>{PLAZO_IIVTNU.mesesMortisCausa} meses</strong> desde el fallecimiento.
               </p>
               <ul>
@@ -745,7 +755,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               </div>
               <p className={styles.escenarioExample}>
                 Padre dona a hijo un local comercial. Valor catastral del suelo: <strong>70.000 €</strong>.
-                Tipo municipal: <strong>{TIPO_MAXIMO} %</strong>. Plazo: <strong>{PLAZO_INTER_VIVOS}</strong>.
+                Tipo municipal: <strong>{TIPO_MAXIMO}&nbsp;%</strong>. Plazo: <strong>{PLAZO_INTER_VIVOS}</strong>.
               </p>
               <ul>
                 <li>El <strong>donatario</strong> (quien recibe) es el sujeto pasivo, no el donante.</li>
@@ -753,7 +763,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                 <li>Los locales comerciales no tienen bonificaciones familiares habituales (a diferencia de vivienda habitual en algunos municipios).</li>
               </ul>
               <p className={styles.escenarioTip}>
-                Comprueba si el Ayuntamiento aplica el tipo máximo ({TIPO_MAXIMO}%) o uno inferior. Un punto porcentual de diferencia puede suponer cientos de euros.
+                Comprueba si el Ayuntamiento aplica el tipo máximo ({TIPO_MAXIMO}&nbsp;%) o uno inferior. Un punto porcentual de diferencia puede suponer cientos de euros.
               </p>
             </div>
 
@@ -791,7 +801,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               <dd>
                 Varía por inmueble y municipio. Puede consultarse en la sede del Catastro (sedecatastro.gob.es)
                 buscando el inmueble y accediendo a la consulta descriptiva y gráfica. En pisos urbanos de ciudades
-                grandes suele oscilar entre el <strong>30% y el 60%</strong> del valor catastral total.
+                grandes suele oscilar entre el <strong>30&nbsp;% y el 60&nbsp;%</strong> del valor catastral total.
                 Nunca uses una estimación genérica: el dato exacto puede cambiar el resultado en miles de euros.
               </dd>
             </div>
@@ -887,7 +897,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
                 <strong>Calcula por el método objetivo</strong>
                 <p>
                   Fórmula: <em>Valor catastral del suelo × coeficiente (máximo legal según años) × tipo municipal</em>.
-                  El tipo municipal máximo es el {TIPO_MAXIMO}%; consulta la ordenanza de tu municipio para el tipo real aplicado.
+                  El tipo municipal máximo es el {TIPO_MAXIMO}&nbsp;%; consulta la ordenanza de tu municipio para el tipo real aplicado.
                 </p>
               </div>
             </li>
@@ -966,7 +976,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               <span className={styles.tipIcon} aria-hidden="true">🏛️</span>
               <div>
                 <strong>Consulta el tipo real de tu Ayuntamiento</strong>
-                <p>El tipo máximo es el {TIPO_MAXIMO}%, pero muchos municipios aplican tipos inferiores. Un municipio con tipo del 20% supone un {formatNumber((1 - 20 / TIPO_MAXIMO) * 100, 0)}% menos de cuota que el máximo.</p>
+                <p>El tipo máximo es el {TIPO_MAXIMO}&nbsp;%, pero muchos municipios aplican tipos inferiores. Un municipio con tipo del 20&nbsp;% supone un {formatNumber((1 - 20 / TIPO_MAXIMO) * 100, 0)}&nbsp;% menos de cuota que el máximo.</p>
               </div>
             </div>
 
@@ -1000,7 +1010,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
               <li>
                 <strong>No autoliquidar en plazo.</strong> Si presentas voluntariamente fuera de plazo,
                 el recargo es de <strong>{TEXTO_RECARGO}</strong>. Aunque el retraso sea de pocos días, el
-                {' '}{RECARGO.porcentajeBase}% de partida se debe desde el primero.
+                {' '}{RECARGO.porcentajeBase}&nbsp;% de partida se debe desde el primero.
               </li>
               <li>
                 <strong>Calcular solo por un método sin comparar.</strong> Elegir únicamente el método
