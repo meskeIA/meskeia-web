@@ -8,12 +8,11 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, Rela
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import {
-  PENSION_VIUDEDAD_2026, minimoViudedad2026, RECLAMACION_PREVIA_SS, MINIMOS_VIUDEDAD_2026,
+  PENSION_VIUDEDAD_2026, RECLAMACION_PREVIA_SS, MINIMOS_VIUDEDAD_2026,
   COMPLEMENTO_MINIMOS_LIMITES_2026, TOPE_COMPLEMENTO_MINIMOS_2026,
 } from '@/data/fiscal/pensiones';
-import {
-  FISCAL_PENSIONES_META, MINIMOS_IRPF_2025, calcularRendimientoNetoTrabajo, calcularCuotaIntegraGeneral,
-} from '@/data/fiscal';
+import { FISCAL_PENSIONES_META } from '@/data/fiscal';
+import { calcularPensionViudedad, type EstadoComplemento } from '@/lib/calculadoras/pensionViudedad';
 
 // Alias corto para legibilidad interna
 const PV = PENSION_VIUDEDAD_2026;
@@ -23,8 +22,6 @@ const pct = (n: number): string => `${n} %`;
 
 /** La pensión se cobra en 14 pagas: el Anexo I del RD 241/2026 da los mínimos en €/año. */
 const PAGAS = 14;
-/** Los ingresos propios se piden por mes con las pagas extra prorrateadas: 12 al año. */
-const MESES = 12;
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -48,9 +45,6 @@ interface Requisito {
   nota?: string;
 }
 
-/** Qué ha pasado con el complemento a mínimos, para explicarlo debajo del desglose. */
-type EstadoComplemento = 'noHaceFalta' | 'integro' | 'diferencial' | 'tope' | 'rentas';
-
 interface Resultado {
   baseReguladora: number;
   porcentajeAplicable: number;
@@ -73,105 +67,36 @@ function leer(texto: string): number {
   return Number.isFinite(v) ? v : 0;
 }
 
-/**
- * IRPF anual de la pensión sola (rendimiento del trabajo, art. 17.2.a LIRPF): reducción del
- * art. 20, 2.000 € de otros gastos y mínimo personal por edad, con la escala general.
- *
- * ⚠️ 2026-10-04 (hallazgo 2815): antes era una retención tecleada a mano (0 / 8 / 12 %) con un
- *    escalón en 15.000 €/año: 0,52 € más de pensión bruta daban 85,22 €/mes menos de neto.
- */
-function irpfAnualPension(pensionAnual: number, edad: number): number {
-  const rnt = calcularRendimientoNetoTrabajo({ integros: pensionAnual, gastosAaE: 0 });
-  const minimo = edad >= 65 ? MINIMOS_IRPF_2025.personal_65 : MINIMOS_IRPF_2025.personal;
-  return calcularCuotaIntegraGeneral(rnt.rendimientoNetoReducido, minimo);
-}
-
 function calcularPension(form: FormData): Resultado | null {
   const edad = parseInt(form.edadBeneficiario) || 0;
   const aniosCotizados = leer(form.aniosCotizadosCausante);
-  const ingresosMes = leer(form.ingresosTrabajoMes);
+  const situacion = form.situacionCausante;
 
-  // Base reguladora
-  let baseReguladora = 0;
-  if (form.situacionCausante === 'jubilado') {
-    baseReguladora = leer(form.pensionCausante); // La BR = la pensión que cobraba
-  } else {
-    // En activo, o sin alta (estimación con la misma fórmula): BR = (24 × base mensual) / 28
-    baseReguladora = (24 * leer(form.baseCotizacionMedia)) / PV.divisorBaseReguladora;
-  }
-
-  if (baseReguladora <= 0) return null;
-
-  // Porcentaje aplicable
-  let porcentajeAplicable = PV.porcentajeGeneral;
-  let razonPorcentaje = `Porcentaje general (${pct(PV.porcentajeGeneral)})`;
-
-  const tieneIngresosLimitados70 = ingresosMes < PV.limiteIngresos70;
-  const tieneIngresosLimitados60 = ingresosMes < PV.smiMensual;
-
-  if (form.tieneCargas && tieneIngresosLimitados70) {
-    porcentajeAplicable = PV.porcentaje70;
-    razonPorcentaje = `${pct(PV.porcentaje70)}: tiene cargas familiares e ingresos del trabajo inferiores al ${pct(75)} del SMI (${formatCurrency(PV.limiteIngresos70)}/mes)`;
-  } else if (edad >= 65 && tieneIngresosLimitados60) {
-    porcentajeAplicable = PV.porcentaje60;
-    razonPorcentaje = `${pct(PV.porcentaje60)}: tiene 65 años o más e ingresos del trabajo inferiores al SMI (${formatCurrency(PV.smiMensual)}/mes)`;
-  }
-
-  const pensionBruta = (baseReguladora * porcentajeAplicable) / 100;
-
-  // Pensión mínima: las cargas familiares mandan sobre el tramo de edad, porque
-  // en el Anexo I del RD 241/2026 «titular con cargas familiares» es una fila
-  // propia y no un subcaso de los menores de 60. Antes se miraba la edad primero,
-  // así que a alguien de 62 años con cargas se le aplicaba el mínimo de su tramo
-  // (875,90 €) en lugar del que le corresponde (1.256,60 €).
-  const pensionMinima = minimoViudedad2026(edad, form.tieneCargas);
-
-  // Complemento a mínimos, con las mismas reglas que estimador-complemento-minimos.
-  // ⚠️ 2026-10-04 (hallazgos 2811 y 2812): se completaba siempre hasta el mínimo. Faltaban
-  //    · la PRUEBA DE RENTAS (art. 59.1 LGSS, art. 9.2 RD 241/2026): por encima de
-  //      COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge solo cabe la regla diferencial
-  //      (límite + mínimo) − (rentas + pensión), y a quien cobraba 1.500 €/mes de nómina se
-  //      le prometía el mínimo íntegro;
-  //    · el TOPE de la PNC (art. 59.4 LGSS, art. 9.5 RD 241/2026), que rige para las pensiones
-  //      causadas desde el 01/01/2013, es decir, toda viudedad que se estime hoy. Sobrestimaba
-  //      la pensión hasta en 627,80 €/mes.
-  //    La viudedad no admite cónyuge a cargo: el límite y el tope son siempre los de «sin cónyuge».
-  const minimaAnual = pensionMinima * PAGAS;
-  const brutaAnual = Math.min(pensionBruta, PV.pensionMaxima) * PAGAS;
-  const rentasAnuales = Math.max(0, ingresosMes) * MESES;
-  const limiteRentas = COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge;
-
-  const integroAnual = Math.max(0, minimaAnual - brutaAnual);
-  const superaLimite = rentasAnuales > limiteRentas;
-  const sinTopeAnual = superaLimite
-    ? Math.min(integroAnual, Math.max(0, (limiteRentas + minimaAnual) - (rentasAnuales + brutaAnual)))
-    : integroAnual;
-  const complementoAnual = Math.min(sinTopeAnual, TOPE_COMPLEMENTO_MINIMOS_2026.pncAnual);
-  const complemento = Math.round((complementoAnual / PAGAS) * 100) / 100;
-
-  const estadoComplemento: EstadoComplemento =
-    integroAnual <= 0 ? 'noHaceFalta'
-      : complementoAnual <= 0 ? 'rentas'
-        : sinTopeAnual > TOPE_COMPLEMENTO_MINIMOS_2026.pncAnual ? 'tope'
-          : sinTopeAnual < integroAnual ? 'diferencial'
-            : 'integro';
-
-  const pensionFinal = Math.min(pensionBruta, PV.pensionMaxima) + complemento;
-
-  const pensionNetaAprox = pensionFinal - irpfAnualPension(pensionFinal * PAGAS, edad) / PAGAS;
+  // El cálculo vive en el motor compartido con el MCP de Delegum (hallazgos 2811, 2812 y 2815):
+  // complemento a mínimos con prueba de rentas y tope de la PNC, y neto con el IRPF real.
+  const importe = leer(situacion === 'jubilado' ? form.pensionCausante : form.baseCotizacionMedia);
+  if (importe <= 0) return null;
+  const calculo = calcularPensionViudedad({
+    situacionCausante: situacion,
+    baseCotizacionMedia: situacion === 'jubilado' ? undefined : importe,
+    pensionCausante: situacion === 'jubilado' ? importe : undefined,
+    edadBeneficiario: edad,
+    tieneCargas: form.tieneCargas,
+    ingresosMensualesPropios: leer(form.ingresosTrabajoMes),
+  });
 
   // Requisitos
   // ⚠️ 2026-10-04 (hallazgo 2814): con el causante en activo se exigían 15 años y salía ❌.
   //    El art. 219.1 LGSS solo pide 500 días dentro de los 5 años anteriores si estaba en alta,
   //    y ninguno si la muerte fue por accidente o enfermedad profesional. Con los años totales
   //    no se puede saber si esos 500 días caen en la ventana: queda «por comprobar».
-  const requisitoCotizacion: Requisito = form.situacionCausante === 'jubilado'
+  const requisitoCotizacion: Requisito = situacion === 'jubilado'
     ? {
       cumple: true,
       texto: 'El causante tenía cotizados los períodos mínimos requeridos',
       nota: 'Al ser pensionista, los requisitos de cotización ya estaban cumplidos.',
     }
-    : form.situacionCausante === 'activo'
+    : situacion === 'activo'
       ? {
         cumple: null,
         texto: 'El causante tenía cotizados los períodos mínimos requeridos (por comprobar)',
@@ -206,15 +131,15 @@ function calcularPension(form: FormData): Resultado | null {
   const cumpleRequisitos = requisitos.every(r => r.cumple !== false);
 
   return {
-    baseReguladora,
-    porcentajeAplicable,
-    razonPorcentaje,
-    pensionBruta,
-    pensionMinima,
-    complemento,
-    estadoComplemento,
-    pensionFinal,
-    pensionNetaAprox,
+    baseReguladora: calculo.baseReguladora,
+    porcentajeAplicable: calculo.porcentajeAplicable,
+    razonPorcentaje: calculo.razonPorcentaje,
+    pensionBruta: calculo.pensionBruta,
+    pensionMinima: calculo.pensionMinima,
+    complemento: calculo.complemento,
+    estadoComplemento: calculo.estadoComplemento,
+    pensionFinal: calculo.pensionFinal,
+    pensionNetaAprox: calculo.pensionNetaAprox,
     requisitos,
     cumpleRequisitos,
   };

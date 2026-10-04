@@ -2619,7 +2619,7 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
   test('GOLDEN-CB: causante activo, BC media 2.000 €, 50 años → 52% general = 891,43 €/mes [sin contraste oficial]', () => {
     // BR = (24 × 2.000) / 28 = 1.714,29 €. Sin cargas ni condiciones especiales → 52% general.
     // Pensión bruta = 1.714,29 × 52% = 891,43 €. Mínimo (< 60, sin cargas, 2026) = 709,40 € → no se aplica.
-    // Anual = 891,43 × 14 = 12.480,02 € < 15.000 → sin retención.
+    // Neto: 12.480,02 − 2.000 − 7.302 (reducción máxima del art. 20) = 3.178,02 < 5.550 → cuota 0.
     const pv = calcularPensionViudedad({
       situacionCausante: 'activo',
       baseCotizacionMedia: 2000,
@@ -2638,8 +2638,9 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
   test('GOLDEN-CC: causante jubilado, pensión 1.800 €, beneficiario 67 años, ingresos < SMI → 60% [sin contraste oficial]', () => {
     // BR = pensión del causante = 1.800 €. Edad ≥ 65 e ingresos (500) < SMI (1.221) → 60%.
     // Pensión bruta = 1.800 × 60% = 1.080 €. Mínimo (≥ 65, 2026) = 936,20 € → no se aplica.
-    // Anual = 1.080 × 14 = 15.120 € → tramo retención 8% (15.000-22.000).
-    // Neta = 1.080 × (1 − 0,08) = 993,60 €.
+    // Neto con el IRPF de la pensión sola (hallazgo 2815; antes, una retención fija del 8 % → 993,60):
+    // 15.120 €/año − 2.000 − reducción art. 20 [7.302 − 1,75 × (15.120 − 14.852) = 6.833] = 6.287 €,
+    // por debajo del mínimo personal de ≥ 65 años (6.700) → cuota 0 → neto 1.080,00 €.
     const pv = calcularPensionViudedad({
       situacionCausante: 'jubilado',
       pensionCausante: 1800,
@@ -2652,15 +2653,17 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
     expect(pv.pensionBruta).toBeCloseTo(1080.00, 2);
     expect(pv.pensionMinima).toBeCloseTo(936.20, 2);
     expect(pv.pensionFinal).toBeCloseTo(1080.00, 2);
-    expect(pv.pensionNetaAprox).toBeCloseTo(993.60, 2);
+    expect(pv.pensionNetaAprox).toBeCloseTo(1080.00, 2);
   });
 
   test('GOLDEN-CD: causante activo, BC media 1.200 €, 45 años con cargas → 70% pero se aplica el mínimo [sin contraste oficial]', () => {
     // BR = (24 × 1.200) / 28 = 1.028,57 €. Cargas + ingresos (500) < límite 70% (916) → 70%.
     // Pensión bruta = 1.028,57 × 70% = 720,00 €. Mínimo (con cargas, 2026) = 1.256,60 € → SE APLICA.
     // Las cargas familiares mandan sobre la edad (Anexo I del RD 241/2026).
-    // Anual = 1.256,60 × 14 = 17.592,40 € → tramo retención 8% (15.000-22.000).
-    // Neta = 1.256,60 × (1 − 0,08) = 1.156,07 €.
+    // Complemento íntegro 536,60 €/mes: rentas 6.000 €/año < 9.442 y por debajo del tope de la PNC (628,80).
+    // Neto (hallazgo 2815; antes 8 % fijo → 1.156,07): 17.592,40 − 2.000 − reducción art. 20
+    // [7.302 − 1,75 × (17.592,40 − 14.852) = 2.506,30] = 13.086,10 €; cuota = escala(13.086,10) −
+    // escala(5.550) = 2.518,16 − 1.054,50 = 1.463,66 €/año → 1.256,60 − 104,55 = 1.152,05 €/mes.
     const pv = calcularPensionViudedad({
       situacionCausante: 'activo',
       baseCotizacionMedia: 1200,
@@ -2673,7 +2676,45 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
     expect(pv.pensionBruta).toBeCloseTo(720.00, 2);
     expect(pv.pensionMinima).toBeCloseTo(1256.60, 2);
     expect(pv.pensionFinal).toBeCloseTo(1256.60, 2);
-    expect(pv.pensionNetaAprox).toBeCloseTo(1156.07, 2);
+    expect(pv.complemento).toBeCloseTo(536.60, 2);
+    expect(pv.pensionNetaAprox).toBeCloseTo(1152.05, 2);
+  });
+
+  test('GOLDEN-CD2: 62 años con cargas, base 800 € → mínimo con cargas, complemento topado en la PNC [art. 59.4 LGSS]', () => {
+    // Hallazgos 2811 (tope) del 04/10/2026, y el orden de la cuantía mínima: el motor miraba la edad
+    // antes que las cargas y daba a 62 años con cargas el mínimo de 60-64 (875,90).
+    // BR = 24 × 800 / 28 = 685,71 · 70 % = 480,00. Mínimo con cargas (cualquier edad) = 1.256,60.
+    // Íntegro 776,60 > PNC 628,80 (8.803,20 / 14) → 480,00 + 628,80 = 1.108,80 €/mes.
+    // Neto: 15.523,20 − 2.000 − [7.302 − 1,75 × 671,20 = 6.127,40] = 7.395,80; cuota (7.395,80 −
+    // 5.550) × 19 % = 350,70 €/año → 1.108,80 − 25,05 = 1.083,75 €/mes.
+    const pv = calcularPensionViudedad({
+      situacionCausante: 'activo',
+      baseCotizacionMedia: 800,
+      edadBeneficiario: 62,
+      tieneCargas: true,
+      ingresosMensualesPropios: 0,
+    });
+    expect(pv.pensionBruta).toBeCloseTo(480.00, 2);
+    expect(pv.pensionMinima).toBeCloseTo(1256.60, 2);
+    expect(pv.complemento).toBeCloseTo(628.80, 2);
+    expect(pv.estadoComplemento).toBe('tope');
+    expect(pv.pensionFinal).toBeCloseTo(1108.80, 2);
+    expect(pv.pensionNetaAprox).toBeCloseTo(1083.75, 2);
+  });
+
+  test('GOLDEN-CD3: prueba de rentas — 1.500 €/mes de trabajo dejan la pensión en el 52 %, sin complemento [art. 59.1 LGSS]', () => {
+    // Hallazgo 2812. 1.000 × 52 % = 520,00. Rentas 18.000 €/año > 9.442:
+    // (9.442 + 9.931,60) − (18.000 + 7.280) < 0 → complemento 0.
+    const pv = calcularPensionViudedad({
+      situacionCausante: 'jubilado',
+      pensionCausante: 1000,
+      edadBeneficiario: 45,
+      tieneCargas: false,
+      ingresosMensualesPropios: 1500,
+    });
+    expect(pv.pensionFinal).toBeCloseTo(520.00, 2);
+    expect(pv.complemento).toBe(0);
+    expect(pv.estadoComplemento).toBe('rentas');
   });
 
 });

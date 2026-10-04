@@ -2587,7 +2587,8 @@ function crearServidorDelegum(): McpServer {
   servidor.tool(
     'calcular_pension_viudedad',
     'Estima la pensión de viudedad: base reguladora, porcentaje aplicable (52%, 60% o 70% según cargas familiares ' +
-    'e ingresos del beneficiario), pensión mínima garantizada y pensión final con el tope de la Seguridad Social. ' +
+    'e ingresos del beneficiario), complemento a mínimos (con prueba de rentas y tope de la pensión no contributiva) ' +
+    'y pensión final con el tope de la Seguridad Social. ' +
     'Distingue si el causante estaba en activo, jubilado o no de alta.',
     {
       situacion_causante: z.enum(['activo', 'jubilado', 'no-alta']).describe('"activo" = de alta en SS al fallecer · "jubilado" = percibía pensión de jubilación · "no-alta" = no estaba de alta'),
@@ -2595,7 +2596,7 @@ function crearServidorDelegum(): McpServer {
       base_cotizacion_media: z.number().positive().optional().describe('Base de cotización media mensual del causante en los últimos 2 años (€). Obligatoria si el causante estaba "activo" o "no-alta".'),
       pension_causante: z.number().positive().optional().describe('Pensión de jubilación mensual del causante (€). Obligatoria si el causante estaba "jubilado".'),
       tiene_cargas: z.boolean().optional().describe('¿El beneficiario tiene cargas familiares (hijos <26 o con discapacidad a cargo)? Puede elevar el porcentaje al 70%. Por defecto false.'),
-      ingresos_mensuales_propios: z.number().min(0).optional().describe('Ingresos mensuales propios del beneficiario por trabajo o pensión (€). Determinan el acceso a los porcentajes del 60% y 70%.'),
+      ingresos_mensuales_propios: z.number().min(0).optional().describe('Ingresos mensuales propios del beneficiario por trabajo o pensión (€, pagas extra prorrateadas). Determinan el acceso a los porcentajes del 60% y 70% y al complemento a mínimos.'),
     },
     { title: 'Estima la pensión de viudedad (porcentaje, mínimos y pensión final)', readOnlyHint: true },
     async ({ situacion_causante, edad_beneficiario, base_cotizacion_media, pension_causante, tiene_cargas, ingresos_mensuales_propios }, extra) => {
@@ -2614,7 +2615,7 @@ function crearServidorDelegum(): McpServer {
           '',
           `📦 Base reguladora: ${fmt(r.baseReguladora)} €/mes`,
           `📏 Porcentaje aplicado: **${r.porcentajeAplicable}%** — ${r.razonPorcentaje}`,
-          `💶 Pensión bruta calculada: ${fmt(r.pensionBruta)} €/mes · mínima garantizada: ${fmt(r.pensionMinima)} €/mes`,
+          `💶 Pensión bruta calculada: ${fmt(r.pensionBruta)} €/mes · cuantía mínima: ${fmt(r.pensionMinima)} €/mes · complemento a mínimos: ${fmt(r.complemento)} €/mes`,
           '',
           `💰 **Pensión final: ${fmt(r.pensionFinal)} €/mes** (${fmt(r.pensionFinal * 14)} €/año, 14 pagas)`,
           `💵 Estimación neta tras IRPF: ~${fmt(r.pensionNetaAprox)} €/mes`,
