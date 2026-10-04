@@ -27,6 +27,17 @@ import { esperarHidratacion } from './_hidratacion';
  * cumplir; contraste de textos de marca y de blanco sobre --primary; el emoji del h1; y dos
  * de contenido. REPARADOS el 02/10/2026 (bloques «REPARADO — HALLAZGO A…H»).
  *
+ * Re-inspección: 04/10/2026 — invalidada por 3c0ea09c (03/10/2026), otra reparación de
+ * calculadora-potencia-ciclismo que tocó lib/calculadoras/deporte.ts: zonas de Coggan con la
+ * Z7 (`wattsMax: number | null`), WKG_MAX en el estimador por fuerzas, DESNIVEL_MIN_M, y CRR,
+ * CDA y RENDIMIENTO_TRANSMISION exportados. Esta app importa del motor SOLO calcularSWOLF,
+ * CORTES_SWOLF_25, RANGO_TIEMPO_SWOLF_POR_25, RANGO_BRAZADAS_SWOLF_POR_25 y el tipo
+ * ResultadoSWOLF, y la sección 6 del motor es byte a byte la de 10b7eb5f (la reparación del
+ * 02/10): ningún hunk de 3c0ea09c cae en ella, y calcularSWOLF no usa ninguna utilidad común.
+ * Los 10 hallazgos que la base da por reparados (564, 565, 2630-2637) se comprobaron uno a uno
+ * con su caso original y siguen reparados. Esta vuelta añade los CASOS 4-8 y abre dos
+ * hallazgos de contenido (bloques «ABIERTO — HALLAZGO I y J», con test.fail()).
+ *
  * QUÉ PROMETE
  *   <h1>: «Calculadora SWOLF» (el 🏊 va con aria-hidden desde el 02/10/2026)
  *   subtítulo: «Mide tu eficiencia en el agua combinando tiempo y brazadas por largo»
@@ -36,22 +47,24 @@ import { esperarHidratacion } from './_hidratacion';
  *   bloque educativo: «SWOLF = tiempo (s) + brazadas» — cuanto más bajo, mejor.
  *
  * DÓNDE VIVE EL CÁLCULO — lib/calculadoras/deporte.ts → calcularSWOLF(tiempo_s_largo,
- * brazadas_largo, metros_largo = 25)
- *   · swolf = tiempo_s_largo + brazadas_largo                     (suma directa, sin redondeos)
- *   · ajuste = +8 en piscina de 50 m; cortes SIN ajustar: élite ≤ 25 · avanzado ≤ 30 ·
- *     intermedio ≤ 38 · el resto, principiante                     (bordes INCLUSIVOS)
- *     ⚠️ Ese +8 es el hallazgo 2631. La PÁGINA ya no lo usa (02/10/2026): pide al motor la
- *     escala de 25 m con el SWOLF equivalente por 25 m (swolf / 2 en piscina de 50 m), así
- *     que en 50 m los cortes son 50 · 60 · 76. El motor lo conservan la API de ChatGPT y la
- *     tool del MCP, fuera del ámbito de esta app.
- *   · Valida tiempo y brazadas > 0 (lanza Error): hallazgo 565, REPARADO el 31/08/2026.
+ * brazadas_largo, metros_largo = 25), que comparten la página, la API de ChatGPT y la tool
+ * del MCP (estado del 04/10/2026):
+ *   · swolf = tiempo_s_largo + brazadas_largo, redondeado a la DÉCIMA (la cifra que se
+ *     muestra es la que se clasifica: 38,04 se lee «38» y es Intermedio)
+ *   · se clasifica el equivalente por 25 m (swolf / 1 en 25 m, swolf / 2 en 50 m) contra
+ *     CORTES_SWOLF_25: élite ≤ 25 · avanzado ≤ 30 · intermedio ≤ 38 · el resto, principiante
+ *     (bordes INCLUSIVOS). En 50 m equivale a cortes 50 · 60 · 76. Hasta el 02/10/2026 el
+ *     motor sumaba +8 a los cortes en 50 m (hallazgo 2631, REPARADO en el motor).
+ *   · Lanza RangeError fuera de 5-300 s y 1-100 brazadas por cada 25 m, o con una piscina
+ *     que no sea de 25 o 50 m (hallazgos 565 y 2632, REPARADOS).
+ *   · El ritmo «m:ss min/100 m» lo da el motor redondeando el TOTAL de segundos por 100 m.
  *
  * DÓNDE SE LEEN LOS CAMPOS — page.tsx (desde el 02/10/2026): `type="text"` con el TEXTO
  * tecleado como estado, leído con parseSpanishNumber y acotado POR CADA 25 m de largo
  * (tiempo 5–300 s, brazadas 1–100; en 50 m, el doble). Fuera de rango, vacío o no numérico:
  * aviso en una región viva persistente (#aviso-entradas, role=status) y ningún nivel. Admite
  * decimales (la guía pide la media de 3-5 largos) y clasifica el SWOLF a la décima que se
- * muestra. El ritmo «m:ss min/100 m» lo calcula la página redondeando el total de segundos.
+ * muestra. Como la página ya acota los rangos, el motor no llega a lanzar desde la UI.
  * Antes: estado NUMÉRICO + parseInt y «solo se guarda si n > 0», que concatenaba lo tecleado
  * (hallazgo A, 2630).
  *
@@ -93,8 +106,9 @@ import { esperarHidratacion } from './_hidratacion';
  *     principiante > 60) que NO eran los de la calculadora: un SWOLF de 40 era «avanzado»
  *     según el FAQ y «Principiante» según la herramienta. Reparado alineando el FAQ.
  *
- *   565 [calculo/bajo] calcularSWOLF() no validaba sus argumentos. Reparado: lanza Error con
- *     tiempo/brazadas ≤ 0 (describe al final, sin navegador).
+ *   565 [calculo/bajo] calcularSWOLF() no validaba sus argumentos. Reparado: lanzaba Error con
+ *     tiempo/brazadas ≤ 0, y desde el 02/10/2026 RangeError fuera de los rangos por 25 m
+ *     (describe más abajo, sin navegador).
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -384,8 +398,8 @@ test(
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════
  * REPARADO — HALLAZGO 565 (calculo/bajo): calcularSWOLF() ya valida sus argumentos. No es
- * alcanzable desde la UI (el componente ya guarda n > 0 antes de llamar al motor), así que se
- * prueba importando el motor directamente, sin navegador — mismo patrón que
+ * alcanzable desde la UI (leerCampo, en la página, acota los rangos antes de llamar al motor),
+ * así que se prueba importando el motor directamente, sin navegador — mismo patrón que
  * calcularPotenciaCiclismo/calcularVatiosPorFuerzas en el mismo fichero.
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
@@ -826,4 +840,241 @@ test('REPARADO — HALLAZGO H (2637): sin erratas ni % pegado en la guía y la m
   expect(todo).not.toContain('25m');
   expect(todo).not.toContain('50m');
   expect(todo).not.toContain('min/100m');
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * CASOS 4-8 — re-inspección del 04/10/2026, RESUELTOS A MANO antes de abrir el navegador
+ * (SWOLF = s + brazadas a la décima; nivel por el equivalente por 25 m; ritmo = s · 100 /
+ * metros, redondeado al segundo y partido en m:ss). Todos dieron lo calculado.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Fija piscina, tiempo y brazadas (fill sustituye el valor entero; el tecleo, en CASO 8). */
+async function caso(page: Page, metros: 25 | 50, tiempo: string, brazadas: string): Promise<void> {
+  await elegirPiscina(page, metros);
+  await rellenar(page, { tiempo, brazadas });
+}
+
+test.describe('CASO 4 (normal) — 25 m · 22 s · 18 brazadas', () => {
+  test('SWOLF 40, Principiante, Básica y 1:28 min/100 m', async ({ page }) => {
+    await caso(page, 25, '22', '18');
+    // 22 + 18 = 40 > 38 → Principiante · 22 · 100 / 25 = 88 s → 1:28
+    await expect(swolfScore(page)).toHaveText('40');
+    await expect(nivelBadge(page)).toContainText('Principiante');
+    await expect(detalle(page, 0)).toHaveText('Básica');
+    await expect(detalle(page, 1)).toHaveText('1:28 min/100 m');
+    await expect(aviso(page)).toHaveText('');
+  });
+});
+
+test.describe('CASO 5 (límite) — bordes inclusivos y décimas en 25 m', () => {
+  const filas: [string, string, string, string, string][] = [
+    // tiempo, brazadas, SWOLF mostrado, nivel, ritmo — resueltos a mano
+    ['20', '10', '30', 'Avanzado', '1:20 min/100 m'], // 30 ≤ 30 · 80 s
+    ['20,5', '10', '30,5', 'Intermedio', '1:22 min/100 m'], // 30,5 > 30 · 82 s
+    ['15', '10', '25', 'Élite', '1:00 min/100 m'], // 25 ≤ 25 · 60 s
+    ['15,1', '10', '25,1', 'Avanzado', '1:00 min/100 m'], // 25,1 > 25 · 60,4 → 60 s
+    ['22,04', '16', '38', 'Intermedio', '1:28 min/100 m'], // 38,04 → 38,0 ≤ 38 · 88,16 → 88 s
+    ['22,06', '16', '38,1', 'Principiante', '1:28 min/100 m'], // 38,06 → 38,1 > 38 · 88,24 → 88 s
+    ['5', '1', '6', 'Élite', '0:20 min/100 m'], // los mínimos que admite: 5 s y 1 brazada · 20 s
+  ];
+  for (const [t, b, swolf, nivel, ritmo] of filas) {
+    test(`${t} s + ${b} brazadas → ${swolf} · ${nivel} · ${ritmo}`, async ({ page }) => {
+      await caso(page, 25, t, b);
+      await expect(swolfScore(page)).toHaveText(swolf);
+      await expect(nivelBadge(page)).toContainText(nivel);
+      await expect(detalle(page, 1)).toHaveText(ritmo);
+    });
+  }
+
+  test('4,9 s, por debajo del mínimo de 5 s: aviso y ningún nivel', async ({ page }) => {
+    await caso(page, 25, '4,9', '1');
+    await expect(aviso(page)).toContainText('entre 5 y 300 segundos');
+    await expect(swolfScore(page)).toHaveText('—');
+    await expect(nivelBadge(page)).toHaveCount(0);
+  });
+});
+
+test.describe('CASO 6 (límite) — piscina de 50 m y tiempos de más de un minuto', () => {
+  const filas: [25 | 50, string, string, string, string, string][] = [
+    // piscina, tiempo, brazadas, SWOLF, nivel, ritmo — resueltos a mano
+    [50, '50', '10', '60', 'Avanzado', '1:40 min/100 m'], // 60 / 2 = 30 ≤ 30 · 50 · 2 = 100 s
+    [50, '50,5', '10', '60,5', 'Intermedio', '1:41 min/100 m'], // 30,25 > 30 · 101 s
+    [50, '44', '36', '80', 'Principiante', '1:28 min/100 m'], // 40 > 38 · 88 s
+    [50, '95,5', '40', '135,5', 'Principiante', '3:11 min/100 m'], // 191 s = 3 min 11 s
+    [25, '75', '30', '105', 'Principiante', '5:00 min/100 m'], // 75 · 4 = 300 s
+    [50, '600', '200', '800', 'Principiante', '20:00 min/100 m'], // los máximos de 50 m · 1200 s
+  ];
+  for (const [m, t, b, swolf, nivel, ritmo] of filas) {
+    test(`${m} m · ${t} s + ${b} brazadas → ${swolf} · ${nivel} · ${ritmo}`, async ({ page }) => {
+      await caso(page, m, t, b);
+      await expect(swolfScore(page)).toHaveText(swolf);
+      await expect(nivelBadge(page)).toContainText(nivel);
+      await expect(detalle(page, 1)).toHaveText(ritmo);
+    });
+  }
+
+  test('600,1 s en 50 m, por encima del máximo de 600 s: aviso y ningún nivel', async ({ page }) => {
+    await caso(page, 50, '600,1', '200');
+    await expect(aviso(page)).toContainText('entre 10 y 600 segundos');
+    await expect(swolfScore(page)).toHaveText('—');
+  });
+
+  test('al pasar a 50 m, las pistas de los campos rotulan los rangos de 50 m', async ({ page }) => {
+    await elegirPiscina(page, 50);
+    await expect(page.locator('#tiempo-hint')).toContainText('entre 10 y 600 s en 50 m');
+    await expect(page.locator('#brazadas-hint')).toContainText('entre 2 y 200 en 50 m');
+  });
+});
+
+test.describe('CASO 7 (rechazo) — formatos que no son un tiempo o unas brazadas', () => {
+  test('brazadas «1.234» es mil doscientas treinta y cuatro (punto de millar): aviso, nunca 21,2', async ({
+    page,
+  }) => {
+    // parseSpanishNumber('1.234') = 1234 > 100 → aviso. Leído como 1,234 daría 20 + 1,234 = 21,2.
+    await caso(page, 25, '20', '1.234');
+    await expect(aviso(page)).toContainText('entre 1 y 100');
+    await expect(swolfScore(page)).toHaveText('—');
+    await expect(page.locator('main')).not.toContainText('21,2');
+  });
+
+  for (const tiempo of ['1:15', '1e3', '22 s']) {
+    test(`tiempo «${tiempo}» no es un número de segundos: aviso y ningún SWOLF`, async ({ page }) => {
+      // El campo pide segundos: ni minutos con dos puntos, ni notación científica, ni unidades.
+      await caso(page, 25, tiempo, '18');
+      await expect(aviso(page)).toContainText('El tiempo debe ser un número de segundos');
+      await expect(swolfScore(page)).toHaveText('—');
+      await expect(nivelBadge(page)).toHaveCount(0);
+    });
+  }
+
+  test('brazadas vacías: pide el dato y no calcula', async ({ page }) => {
+    await caso(page, 25, '20', '');
+    await expect(aviso(page)).toContainText('Escribe las brazadas por largo');
+    await expect(swolfScore(page)).toHaveText('—');
+  });
+});
+
+test.describe('CASO 8 (móvil 360 px) — tecleo pulsación a pulsación', () => {
+  test.use({
+    viewport: { width: 360, height: 800 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /** Vacía el campo y teclea `texto` tecla a tecla, comprobando el campo y el SWOLF en cada una. */
+  async function teclear(
+    page: Page,
+    sel: string,
+    pasos: [string, string][], // [lo que debe verse en el campo, SWOLF que debe mostrarse]
+  ): Promise<void> {
+    const campo = page.locator(sel);
+    await campo.tap();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.press('Delete');
+    await expect(campo).toHaveValue('');
+    for (const [valor, swolf] of pasos) {
+      await page.keyboard.type(valor.slice(-1));
+      await expect(campo).toHaveValue(valor);
+      await expect(swolfScore(page)).toHaveText(swolf);
+    }
+  }
+
+  test('tiempo «-15», «1.» y «22,5»: el campo conserva cada pulsación y React no reescribe nada', async ({
+    page,
+  }) => {
+    // Brazadas por defecto: 18. «-», «-1», «-15» y «1», «1.» quedan fuera de rango (< 5 s) o no
+    // son número: «—». «2» < 5 → «—»; «22» → 22 + 18 = 40; «22,» = 22 → 40; «22,5» → 40,5.
+    await teclear(page, '#tiempo-input', [['-', '—'], ['-1', '—'], ['-15', '—']]);
+    await expect(aviso(page)).toContainText('entre 5 y 300 segundos');
+    await teclear(page, '#tiempo-input', [['1', '—'], ['1.', '—']]);
+    await teclear(page, '#tiempo-input', [['2', '—'], ['22', '40'], ['22,', '40'], ['22,5', '40,5']]);
+  });
+
+  test('brazadas «1,5» y «16,5» con 22,5 s: 24 y 39', async ({ page }) => {
+    await rellenar(page, { tiempo: '22,5' });
+    // 22,5 + 1 = 23,5 · 22,5 + 1,5 = 24 · 22,5 + 16 = 38,5 · 22,5 + 16,5 = 39
+    await teclear(page, '#brazadas-input', [['1', '23,5'], ['1,', '23,5'], ['1,5', '24']]);
+    await teclear(page, '#brazadas-input', [['1', '23,5'], ['16', '38,5'], ['16,', '38,5'], ['16,5', '39']]);
+    await expect(nivelBadge(page)).toContainText('Principiante');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * ABIERTO — 04/10/2026 · HALLAZGO I (contenido/bajo): textos del panel de resultado que la
+ * reparación del 02/10 no alcanzó. Dos salen del MOTOR (también los reciben la API de ChatGPT
+ * y la tool del MCP) y uno de la página:
+ *   · Avanzado (25 m · 20 s · 10 brazadas): consejo «Trabaja la planada y el agarre…».
+ *     «Planada» es una llanura (DRAE); el término de natación es el deslizamiento, que es el
+ *     que usa la guía de la propia página («Trabaja el deslizamiento y el planeado»).
+ *   · Élite (25 m · 15 s · 10 brazadas): descripción «Eficiencia de nadador avanzado o
+ *     competitivo», que nombra el nivel INFERIOR; la tabla de la guía describe la Élite como
+ *     «Nadador de competición de alto nivel» y el Avanzado como «Nadador federado…».
+ *   · El ritmo «1:28 min/100 m» va rotulado «Velocidad media», cuando el FAQPage de la propia
+ *     app llama a esa magnitud «El ritmo (min/100 m)»: min/100 m es tiempo por distancia.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('ABIERTO — HALLAZGO I: textos del panel de resultado', () => {
+  test.fail('Avanzado: el consejo no habla de «la planada»', async ({ page }) => {
+    // Motivo del fail: el motor da «Trabaja la planada y el agarre para reducir brazadas por largo.»
+    await caso(page, 25, '20', '10');
+    await expect(nivelBadge(page)).toContainText('Avanzado');
+    await expect(consejoTexto(page)).not.toContainText('planada');
+  });
+
+  test.fail('Élite: la descripción no la llama «nadador avanzado»', async ({ page }) => {
+    // Motivo del fail: el motor da «Eficiencia de nadador avanzado o competitivo».
+    await caso(page, 25, '15', '10');
+    await expect(nivelBadge(page)).toContainText('Élite');
+    await expect(detalle(page, 2)).not.toContainText('avanzado');
+  });
+
+  test.fail('el ritmo en min/100 m no se rotula «Velocidad media»', async ({ page }) => {
+    // Motivo del fail: la etiqueta es «Velocidad media» y el valor, un ritmo (min/100 m).
+    await caso(page, 25, '22', '16');
+    await expect(detalle(page, 1)).toHaveText('1:28 min/100 m');
+    await expect(page.locator('[class*="detalleLabel"]').nth(1)).not.toContainText('Velocidad');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * ABIERTO — 04/10/2026 · HALLAZGO J (contenido/bajo): cifras sin fuente presentadas como
+ * dato en la guía. La reparación del 2637 RETIRÓ el «1,5–3 %» por no tener fuente
+ * (antipatrón 1 de neutralidad editorial), pero quedan otras dos con la misma forma:
+ *   · FAQ «¿Cuánto tarda en mejorar el SWOLF?»: «es habitual ver mejoras de 2-4 puntos en
+ *     4-8 semanas en nadadores intermedios. Los principiantes pueden mejorar 5-10 puntos en
+ *     el primer mes».
+ *   · Tarjeta «Viraje eficiente»: «Un giro de volteo bien ejecutado puede ahorrar 0,5–1
+ *     segundo por largo».
+ * El test exige que cada cifra lleve fuente o desaparezca (vale cualquiera de las dos
+ * reparaciones, como en el 2637).
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/** ¿El texto da un intervalo numérico de `unidad` sin nada que parezca una fuente? */
+function cifraSinFuente(texto: string, unidad: RegExp): boolean {
+  const cifra = new RegExp(String.raw`\d+(?:,\d+)?\s*[-–]\s*\d+\s*` + unidad.source).test(texto);
+  const fuente = /según|fuente|\(\d{4}\)|et al\./i.test(texto);
+  return cifra && !fuente;
+}
+
+test.describe('ABIERTO — HALLAZGO J: cifras sin fuente en la guía', () => {
+  test.fail('FAQ «¿Cuánto tarda en mejorar el SWOLF?»: sin «2-4 puntos en 4-8 semanas» sin fuente', async ({
+    page,
+  }) => {
+    await abrirGuia(page);
+    const item = page.locator('[class*="faqItem"]', { hasText: '¿Cuánto tarda en mejorar el SWOLF?' });
+    await expect(item).toHaveCount(1);
+    const texto = await item.innerText();
+    expect(cifraSinFuente(texto, /puntos/), texto).toBe(false);
+  });
+
+  test.fail('tarjeta «Viraje eficiente»: sin «0,5–1 segundo por largo» sin fuente', async ({ page }) => {
+    await abrirGuia(page);
+    const tarjeta = page.locator('[class*="escenarioCard"]', { hasText: 'Viraje eficiente' });
+    await expect(tarjeta).toHaveCount(1);
+    const texto = await tarjeta.innerText();
+    expect(cifraSinFuente(texto, /segundos?/), texto).toBe(false);
+  });
 });

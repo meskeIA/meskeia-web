@@ -1,7 +1,8 @@
-import { test, expect, Page, Locator } from '@playwright/test';
+import { test, expect, Page, Locator, devices } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 import { PLUSVALIA_MUNICIPAL_META } from '../../data/fiscal/inmuebles';
 import { parseSpanishNumber } from '../../lib/formatters';
+import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliares';
 
 /**
  * estimador-plusvalia-municipal — el coeficiente del método objetivo del IIVTNU
@@ -212,9 +213,10 @@ test.describe('Estimador de plusvalía municipal — coeficientes del art. 107.4
  *   sentidos; el tope de 20 años, el 30 % como máximo aceptado y el rechazo de un tipo por
  *   encima o de un importe ilegible («2.000.50») funcionan y retiran la cifra anterior.
  *
- * HALLAZGOS ABIERTOS: al final, con `test.fail()`. Afirman lo que DEBERÍA pasar, así que hoy
- * fallan a propósito; al repararlos se les quita la marca y quedan como candado. ⚠️ Dentro de
- * un `test.fail()` cualquier fallo cuenta como «esperado», también un selector roto: antes de
+ * HALLAZGOS DE AQUELLA INSPECCIÓN (1640-1650): al final del fichero. Se escribieron con
+ * `test.fail()` y se REPARARON el mismo 25/09/2026; se les quitó la marca y quedan como tests
+ * de regresión (la re-inspección del 04/10/2026 los volvió a pasar en verde). ⚠️ Dentro de un
+ * `test.fail()` cualquier fallo cuenta como «esperado», también un selector roto: antes de
  * quitar la marca, comprobar que el test falla POR la afirmación que dice su título.
  * ════════════════════════════════════════════════════════════════════════════════════════ */
 
@@ -361,7 +363,7 @@ test.describe('Estimador de plusvalía municipal — inspección del 25/09/2026:
    *   VC suelo 50.000 € · VC total 100.000 € · 10 años · 30 % · 180.000 € → 130.000 €
    *   Real: incremento −50.000 € → no sujeción, cuota 0.
    *   Lo que la app hace bien (y fija este test): el bloque del método real lo dice y no pinta
-   *   ninguna cuota. Lo que no: ver el hallazgo «PÉRDIDA» al final.
+   *   ninguna cuota. Lo que fallaba (hallazgo 1642, REPARADO el 25/09/2026): ver «PÉRDIDA» al final.
    */
   test('LÍMITE — pérdida (180.000 → 130.000 €): el método real declara que no se devenga', async ({ page }) => {
     await abrir(page);
@@ -397,8 +399,10 @@ test.describe('Estimador de plusvalía municipal — inspección del 25/09/2026:
 
     await escribir(page, TIPO, '30,5');
     await CALCULAR(page).click();
+    // `\s?` delante del «%»: el aviso lo pega hoy («0,01%») y el hallazgo del 04/10/2026 pide
+    // separarlo con U+00A0 (que `\s` también casa). Este test vigila el RECHAZO, no la tipografía.
     await expect(page.locator('[role="alert"]', { hasText: 'tipo impositivo municipal' })).toContainText(
-      'El tipo impositivo municipal debe estar entre 0,01% y 30%.'
+      /El tipo impositivo municipal debe estar entre 0,01\s?% y 30\s?%\./
     );
     await expect(page.locator('h2', { hasText: 'Estimación orientativa' })).toHaveCount(0);
 
@@ -412,11 +416,11 @@ test.describe('Estimador de plusvalía municipal — inspección del 25/09/2026:
   });
 
   /**
-   * TESTIGO del dato escrito a mano (hallazgo `dato` de esta inspección): el valor por defecto
-   * del tipo (page.tsx: `useState('25')`) y el tope de la validación (`tipoNum > 30`) están
-   * escritos a mano, pero existen en data/fiscal como PLUSVALIA_MUNICIPAL_META.tipoOrientativo
-   * (25) y .tipoMaximoLegal (30). Hoy coinciden, así que este test pasa; el día que el módulo
-   * cambie y la app no le siga, se pone rojo. Leer la cifra del MÓDULO es lo que lo hace testigo.
+   * TESTIGO del dato escrito a mano (hallazgo 1645, REPARADO el 25/09/2026): el valor por
+   * defecto del tipo (`useState('25')`) y el tope de la validación (`tipoNum > 30`) estaban
+   * escritos a mano; hoy salen de PLUSVALIA_MUNICIPAL_META.tipoOrientativo (25) y
+   * .tipoMaximoLegal (30). El test sigue de testigo: el día que el módulo cambie y la app no le
+   * siga, se pone rojo. Leer la cifra del MÓDULO es lo que lo hace testigo.
    */
   test('TESTIGO — el tipo por defecto y el máximo aceptado son los de PLUSVALIA_MUNICIPAL_META', async ({ page }) => {
     await abrir(page);
@@ -651,5 +655,383 @@ test.describe('Estimador de plusvalía municipal — hallazgos del 25/09/2026, r
     await abrir(page);
     await expect(page.getByRole('button', { name: 'Obtener orientación' })).toHaveCount(1, { timeout: 2000 });
     await expect(page.getByRole('checkbox', { name: 'Comparar también con el método real' })).toHaveCount(1, { timeout: 2000 });
+  });
+});
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN — 04/10/2026 (Inspector, segmento FISCAL, riesgo 1)
+ *
+ * Todas las cifras, resueltas a mano ANTES de ejecutar la app, con la tabla de
+ * COEFICIENTES_IIVTNU_2025 / coeficienteIIVTNU() (data/fiscal/inmuebles.ts), cotejada ese día
+ * con el art. 107.4 TRLRHL en el BOE (BOE-A-2004-4214, bloque a107). El RDL 26/2026 (BOE
+ * 30/09/2026) traía una tabla nueva con efectos desde el 01/12/2026, pero el Congreso no lo
+ * convalidó y quedó derogado (Resolución de 2 de octubre de 2026, BOE-A-2026-20526): sigue
+ * vigente la del RDL 8/2023. Si un día cambia la tabla y /triaje-fiscal actualiza el módulo,
+ * las cifras de estos casos (0,09 · 0,15 · 0,19 · 0,20 · 0,23 · 0,40) tendrán que recalcularse.
+ *   · art. 107.4: años COMPLETOS («sin tener en cuenta las fracciones de año»); por debajo
+ *     del año, el coeficiente anual se prorratea por meses completos.
+ *   · art. 107.5 y 104.5: el incremento real (× VC suelo / VC total) es la base solo si es
+ *     MENOR que la objetiva; sin incremento, no hay sujeción.
+ *   · art. 108.1: tipo ≤ 30 % (PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal).
+ * ════════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Contraste de cada selector contra el primer fondo opaco de sus ancestros (colores lisos). */
+async function contrastes(page: Page, selectores: string[]): Promise<Array<{ sel: string; ratio: number }>> {
+  return page.evaluate((sels) => {
+    const rgb = (t: string) => {
+      const p = (t.match(/rgba?\(([^)]+)\)/)?.[1] ?? '0,0,0,0').split(/[ ,/]+/).filter(Boolean).map(Number);
+      return { c: p.slice(0, 3), a: p.length > 3 ? p[3] : 1 };
+    };
+    const lum = (c: number[]) => {
+      const f = (v: number) => {
+        const x = v / 255;
+        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+    };
+    return sels.map((sel) => {
+      const el = document.querySelector(sel) as HTMLElement | null;
+      if (!el) return { sel, ratio: 0 };
+      let fondo = [255, 255, 255];
+      for (let n: HTMLElement | null = el; n; n = n.parentElement) {
+        const b = rgb(getComputedStyle(n).backgroundColor);
+        if (b.a >= 1) { fondo = b.c; break; }
+      }
+      const [a, b] = [lum(rgb(getComputedStyle(el).color).c), lum(fondo)];
+      return { sel, ratio: Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100 };
+    });
+  }, selectores);
+}
+
+test.describe('Estimador de plusvalía municipal — re-inspección del 04/10/2026', () => {
+  /**
+   * CASO NORMAL — gana el OBJETIVO: el incremento real es MAYOR que la base objetiva.
+   *
+   *   VC suelo 45.000 € · VC total 75.000 € (suelo = 60 %) · 12 años · tipo 28 %
+   *   Adquisición 160.000 € · transmisión 250.000 €
+   *   Objetivo: coeficiente (12 años) 0,09 → base 45.000 × 0,09 = 4.050,00 €
+   *             cuota 4.050 × 28 % = 1.134,00 €
+   *   Real:     incremento 90.000 × 60 % = 54.000,00 € → cuota 15.120,00 €
+   *   54.000 > 4.050 → el art. 107.5 no lo toma como base: «Más favorable» en el objetivo.
+   */
+  test('NORMAL — 45.000 € de suelo, 12 años, 28 %: objetivo 1134,00 €, real 15.120,00 €, gana el objetivo', async ({ page }) => {
+    await abrir(page);
+    await escribir(page, SUELO, '45000');
+    await escribir(page, TIPO, '28');
+    await page.locator(ANIOS).selectOption('12');
+    await expect(distintivo(page)).toHaveText('Coeficiente: 0,09');
+    await rellenarMetodoReal(page, { adquisicion: '160000', transmision: '250000', total: '75000' });
+    await CALCULAR(page).click();
+
+    const objetivo = seccion(page, 'Método objetivo');
+    const real = seccion(page, 'Método real');
+    expect(await cifraDe(objetivo, 'Base imponible estimada')).toBe('4050,00 €');
+    expect(await cifraDe(objetivo, 'Cuota orientativa')).toBe('1134,00 €');
+    expect(await cifraDe(real, 'Base imponible estimada')).toBe('54.000,00 €');
+    expect(await cifraDe(real, 'Cuota orientativa')).toBe('15.120,00 €');
+    await expect(encabezado(page, 'Método objetivo')).toContainText('Más favorable');
+    await expect(encabezado(page, 'Método real')).not.toContainText('Más favorable');
+  });
+
+  /**
+   * CASO LÍMITE (sospecha del 25/09, a) — 0 años y 7 meses: coeficiente PRORRATEADO.
+   *
+   *   VC suelo 36.000 € · «Menos de 1 año» + 7 meses completos · tipo 30 %
+   *   coeficienteIIVTNU(0, 7) = 0,15 × 7/12 = 0,0875 → el distintivo, con cuatro decimales
+   *   Base 36.000 × 0,0875 = 3.150,00 € · cuota 3.150 × 30 % = 945,00 €
+   *   Y con 0 meses completos (menos de un mes): 0,15 × 0/12 = 0 → base y cuota 0,00 €.
+   */
+  test('LÍMITE — 7 meses: 0,15 × 7/12 = 0,0875 → 945,00 €; 0 meses → 0,00 €', async ({ page }) => {
+    await abrir(page);
+    await escribir(page, SUELO, '36000');
+    await escribir(page, TIPO, '30');
+    await page.locator(ANIOS).selectOption('0');
+    await page.locator(MESES).selectOption('7');
+    await expect(distintivo(page)).toHaveText('Coeficiente: 0,0875');
+    await CALCULAR(page).click();
+    const objetivo = seccion(page, 'Método objetivo');
+    expect(await cifraDe(objetivo, 'Base imponible estimada')).toBe('3150,00 €');
+    expect(await cifraDe(objetivo, 'Cuota orientativa')).toBe('945,00 €');
+    await expect(page.locator('p', { hasText: 'Coeficiente aplicado:' })).toContainText('Coeficiente aplicado: 0,0875');
+
+    await page.locator(MESES).selectOption('0');
+    await CALCULAR(page).click();
+    expect(await cifraDe(seccion(page, 'Método objetivo'), 'Cuota orientativa')).toBe('0,00 €');
+  });
+
+  /**
+   * CASO LÍMITE (sospecha del 25/09, b) — 1 año y 11 meses: se toma 1 año COMPLETO.
+   *
+   *   El selector solo ofrece años enteros y con «1 año» no pide meses: el cálculo es el de la
+   *   ley si el usuario elige bien. 36.000 € · 1 año (0,15) · 30 % → base 5.400,00 €,
+   *   cuota 1.620,00 €. Con 19 años (0,23): base 8.280,00 €, cuota 2.484,00 €.
+   *   (Lo que falta es DECIRLE que cuente años completos: ver el hallazgo «AÑOS COMPLETOS».)
+   */
+  test('LÍMITE — «1 año» (para 1 año y 11 meses): 0,15 sin prorrateo → 1620,00 €; 19 años → 2484,00 €', async ({ page }) => {
+    await abrir(page);
+    await escribir(page, SUELO, '36000');
+    await escribir(page, TIPO, '30');
+    await page.locator(ANIOS).selectOption('1');
+    await expect(page.locator(MESES)).toHaveCount(0);
+    await expect(distintivo(page)).toHaveText('Coeficiente: 0,15');
+    await CALCULAR(page).click();
+    expect(await cifraDe(seccion(page, 'Método objetivo'), 'Base imponible estimada')).toBe('5400,00 €');
+    expect(await cifraDe(seccion(page, 'Método objetivo'), 'Cuota orientativa')).toBe('1620,00 €');
+
+    await page.locator(ANIOS).selectOption('19');
+    await CALCULAR(page).click();
+    expect(await cifraDe(seccion(page, 'Método objetivo'), 'Cuota orientativa')).toBe('2484,00 €');
+  });
+
+  /**
+   * CASO LÍMITE — tope de 20 años y tipo máximo, con millares y decimales a la española.
+   *
+   *   VC suelo «125.000,50» → 125.000,50 € (parseSpanishNumber) · «20 o más años» (0,40) · 30 %
+   *   Base 125.000,50 × 0,40 = 50.000,20 € · cuota 50.000,20 × 30 % = 15.000,06 €
+   */
+  test('LÍMITE — «125.000,50» € con 20 o más años al 30 %: base 50.000,20 €, cuota 15.000,06 €', async ({ page }) => {
+    await abrir(page);
+    await escribir(page, SUELO, '125.000,50');
+    await escribir(page, TIPO, '30');
+    await page.locator(ANIOS).selectOption('20');
+    await CALCULAR(page).click();
+    const objetivo = seccion(page, 'Método objetivo');
+    expect(await cifraDe(objetivo, 'Base imponible estimada')).toBe('50.000,20 €');
+    expect(await cifraDe(objetivo, 'Cuota orientativa')).toBe('15.000,06 €');
+  });
+
+  /**
+   * CASO LÍMITE — precio de venta IGUAL al de compra: inexistencia de incremento (art. 104.5).
+   *
+   *   VC suelo 50.000 € · VC total 125.000 € · 8 años (0,19) · 25 % · 210.000 → 210.000 €
+   *   No sujeción: el real es el «Más favorable». El objetivo sigue a la vista con su nota:
+   *   50.000 × 0,19 = 9.500,00 € de base, × 25 % = 2.375,00 € («No se paga si acreditas…»).
+   */
+  test('LÍMITE — venta al mismo precio (210.000 €): no sujeción y el real es el más favorable', async ({ page }) => {
+    await abrir(page);
+    await escribir(page, SUELO, '50000');
+    await escribir(page, TIPO, '25');
+    await page.locator(ANIOS).selectOption('8');
+    await rellenarMetodoReal(page, { adquisicion: '210000', transmision: '210000', total: '125000' });
+    await CALCULAR(page).click();
+
+    await expect(seccion(page, 'Método real')).toContainText('Sin incremento real de valor');
+    await expect(encabezado(page, 'Método real')).toContainText('Más favorable');
+    await expect(encabezado(page, 'Método objetivo')).not.toContainText('Más favorable');
+    const objetivo = seccion(page, 'Método objetivo');
+    expect(await cifraDe(objetivo, 'Base imponible estimada')).toBe('9500,00 €');
+    expect(await cifraDe(objetivo, 'Cuota orientativa')).toBe('2375,00 €');
+    await expect(objetivo).toContainText('No se paga si acreditas ante el Ayuntamiento que no hubo incremento');
+  });
+
+  /**
+   * CASO DE RECHAZO — tipo 0 y 31 (fuera de 0,01-30), suelo negativo, texto, y sin años.
+   *
+   *   · Tipo 31 o 0 → aviso del tipo, sin resultado.
+   *   · Suelo «-5000» tecleado: el control lo acota a 0 al salir y la app lo rechaza (> 0).
+   *   · «abc» no entra en el campo (el control solo admite cifras, «.», «,» y «-»).
+   *   · Sin años de tenencia → «Introduce los años de tenencia (0 o más).»
+   */
+  test('RECHAZO — tipo 31 y 0, suelo «-5000», «abc» y sin años: avisos y ninguna cifra', async ({ page }) => {
+    await abrir(page);
+    await escribir(page, SUELO, '40000');
+    await page.locator(ANIOS).selectOption('7');
+    for (const tipo of ['31', '0']) {
+      await escribir(page, TIPO, tipo);
+      await CALCULAR(page).click();
+      await expect(page.locator('[role="alert"]', { hasText: 'tipo impositivo municipal debe estar' })).toHaveCount(1);
+      await expect(page.locator('h2', { hasText: 'Estimación orientativa' })).toHaveCount(0);
+    }
+
+    await escribir(page, TIPO, '25');
+    await page.locator(SUELO).fill('');
+    await page.locator(SUELO).pressSequentially('-5000');
+    await CALCULAR(page).click();
+    await expect(page.locator('[role="alert"]', { hasText: 'Introduce el valor catastral del suelo' })).toHaveCount(1);
+    await expect(page.locator('h2', { hasText: 'Estimación orientativa' })).toHaveCount(0);
+
+    await page.locator(SUELO).fill('');
+    await page.locator(SUELO).pressSequentially('abc');
+    await expect(page.locator(SUELO)).toHaveValue('');
+
+    await abrir(page);
+    await escribir(page, SUELO, '40000');
+    await CALCULAR(page).click();
+    await expect(page.locator('[role="alert"]', { hasText: 'Introduce los años de tenencia (0 o más).' })).toHaveCount(1);
+    await expect(page.locator('h2', { hasText: 'Estimación orientativa' })).toHaveCount(0);
+  });
+
+  /**
+   * TESTIGO del dato (hallazgo `dato` de esta re-inspección): la nota «Coeficiente aplicado»
+   * («redacción del RDL 8/2023») y el pie de la tabla («en la redacción del RDL 8/2023
+   * (vigente desde 2024)») escriben a mano la norma que da la tabla, que ya está en
+   * PLUSVALIA_MUNICIPAL_META.baseNormativa. Hoy coinciden y el test pasa; el día que el módulo
+   * pase a otra redacción del art. 107.4 y la app no le siga, se pone rojo.
+   */
+  test('TESTIGO — la norma de los coeficientes que cita la app es la de PLUSVALIA_MUNICIPAL_META', async ({ page }) => {
+    await abrir(page);
+    await escribir(page, SUELO, '40000');
+    await page.locator(ANIOS).selectOption('7');
+    await CALCULAR(page).click();
+    const nota = await page.locator('p', { hasText: 'Coeficiente aplicado:' }).innerText();
+    await abrirGuia(page);
+    const pie = await page.locator('p', { hasText: 'Fuente: art. 107.4' }).innerText();
+    for (const texto of [nota, pie]) {
+      const norma = texto.match(/RDL \d+\/\d{4}/)?.[0];
+      expect(norma, `sin norma en «${texto}»`).toBeTruthy();
+      expect(PLUSVALIA_MUNICIPAL_META.baseNormativa).toContain(norma!);
+    }
+  });
+});
+
+/*
+ * MÓVIL — las opciones van enumeradas (viewport, userAgent, deviceScaleFactor, isMobile y
+ * hasTouch) porque `...devices['Pixel 7']` arrastra `defaultBrowserType` y forzaría un worker
+ * nuevo dentro del describe.
+ */
+test.describe('Estimador de plusvalía municipal — móvil (04/10/2026)', () => {
+  test.use({
+    viewport: { width: 375, height: 740 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * 375 px, pulsación a pulsación: «40.000» € de suelo (el punto de millar entra tecla a
+   * tecla), 7 años (0,20), el tipo por defecto (25) y el método real con 150.000 → 180.000 € y
+   * 100.000 € de VC total.
+   *   Objetivo: 40.000 × 0,20 = 8.000,00 € · × 25 % = 2.000,00 €
+   *   Real:     30.000 × 40 % = 12.000,00 € (> 8.000: no es base) · × 25 % = 3.000,00 €
+   *   → «Más favorable» en el objetivo; el encabezado del resultado queda en pantalla al pulsar
+   *     y la página no se desborda en horizontal.
+   */
+  test('375 px — tecleo pulsación a pulsación y resultado a la vista: 2000,00 € frente a 3000,00 €', async ({ page }) => {
+    await abrir(page);
+    await page.locator(SUELO).tap();
+    await page.locator(SUELO).pressSequentially('40.000', { delay: 30 });
+    await esperarValorEnReact(page, SUELO, '40.000');
+    await page.locator(ANIOS).selectOption('7');
+    await expect(page.locator(TIPO)).toHaveValue('25');
+    await REAL(page).tap();
+    for (const [sel, v] of [[ADQUISICION, '150.000'], [TRANSMISION, '180.000'], [VC_TOTAL, '100.000']] as const) {
+      await page.locator(sel).tap();
+      await page.locator(sel).pressSequentially(v, { delay: 20 });
+      await esperarValorEnReact(page, sel, v);
+    }
+    const boton = CALCULAR(page);
+    await boton.scrollIntoViewIfNeeded();
+    await boton.tap();
+
+    await expect(page.locator('h2', { hasText: 'Estimación orientativa' })).toBeInViewport();
+    const objetivo = seccion(page, 'Método objetivo');
+    expect(await cifraDe(objetivo, 'Base imponible estimada')).toBe('8000,00 €');
+    expect(await cifraDe(objetivo, 'Cuota orientativa')).toBe('2000,00 €');
+    expect(await cifraDe(seccion(page, 'Método real'), 'Cuota orientativa')).toBe('3000,00 €');
+    await expect(encabezado(page, 'Método objetivo')).toContainText('Más favorable');
+    const anchos = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+    expect(anchos[0]).toBeLessThanOrEqual(anchos[1]);
+  });
+});
+
+/* Hallazgos ABIERTOS de la re-inspección del 04/10/2026, con `test.fail()`: afirman lo que
+ * DEBERÍA pasar. Comprobado ese día que cada uno falla en su aserción, no en la preparación. */
+test.describe('Estimador de plusvalía municipal — hallazgos abiertos del 04/10/2026', () => {
+  /**
+   * HALLAZGO — «N%» pegado (CLAUDE.md global §2, decidido el 25/09/2026: el % va separado con
+   * U+00A0). Con la guía abierta y el aviso de un tipo de 31: 27 «N%» pegados y 2 con espacio
+   * normal («Tipo municipal: 25 %» y «30 %» de los casos de uso), ninguno con U+00A0. Entre
+   * ellos el ayudante del tipo («El máximo legal es el 30%.»), el aviso «entre 0,01% y 30%»,
+   * el ejemplo «50.000 × 0,09 × 25%» y «55,6% × 25%», y TEXTO_RECARGO («un 1% … otro 1% … el
+   * 15%»), que sale tres veces.
+   */
+  test('PORCENTAJE — ningún «N%» pegado ni con espacio normal: el % va tras U+00A0', async ({ page }) => {
+    test.fail(true, 'ABIERTO: 27 «N%» pegados y 2 con espacio normal (04/10/2026)');
+    await abrir(page);
+    await escribir(page, SUELO, '40000');
+    await page.locator(ANIOS).selectOption('7');
+    await escribir(page, TIPO, '31');
+    await CALCULAR(page).click();
+    await expect(page.locator('[role="alert"]', { hasText: 'tipo impositivo municipal debe estar' })).toHaveCount(1);
+    await abrirGuia(page);
+    const texto = await page.locator('body').innerText();
+    // La preparación ha llegado: el texto de la guía está en pantalla
+    expect(texto).toContain('Método Objetivo vs Método Real');
+    const mal = [...texto.matchAll(/.{0,25}\d( ?)%/g)].map((m) => m[0].trim());
+    expect(mal, mal.join(' · ')).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO (sospecha del 25/09, b) — la app no dice que los años se cuentan COMPLETOS.
+   * El art. 107.4 TRLRHL: «se tomarán años completos, es decir, sin tener en cuenta las
+   * fracciones de año». El campo de meses dice «Meses completos de tenencia»; el de años solo
+   * «Años de tenencia» y «Tiempo transcurrido desde la adquisición hasta la transmisión», y la
+   * página no dice «años completos» en ningún sitio. La tabla no es monótona, así que redondear
+   * cuesta: 19 años y 7 meses son 19 (0,23) → 36.000 € al 30 % = 2.484,00 €; quien redondee a
+   * «20 o más años» (0,40) obtiene 4.320,00 €. Y restar años de las fechas (comprado en
+   * diciembre de 2006, vendido en octubre de 2026 → «20») da el mismo error (forma del 1615).
+   */
+  test('AÑOS COMPLETOS — el selector de años dice que se cuentan años completos', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el campo de años no dice que se cuentan años completos (04/10/2026)');
+    await abrir(page);
+    const grupo = page.locator(ANIOS).locator('xpath=..');
+    await expect(grupo).toContainText('Tiempo transcurrido');
+    await expect(grupo).toContainText(/años completos/i, { timeout: 2000 });
+  });
+
+  /**
+   * HALLAZGO (accesibilidad) — texto blanco sobre los colores de marca escritos como LITERAL
+   * (#2E86AB, #48A9A6) en el módulo: no cambian con el tema y no llegan a 4,5:1 (todo es
+   * texto pequeño, 12-16 px). «✓ Más favorable» (12 px/600 sobre #48A9A6) da 2,80:1 y es el
+   * veredicto de la comparación; los `<th>` de las dos tablas de la guía, 4,11:1. Esos `<th>`
+   * son justo lo que vigila check:contraste-cabeceras, pero el candado solo reconoce
+   * `var(--primary)`: el literal #2E86AB lo esquiva (forma del 1670, que esquivaba con el valor
+   * de reserva). Mismo 4,11:1 en el distintivo «Coeficiente», los números de paso y el botón.
+   */
+  test('CONTRASTE — «Más favorable» y las cabeceras de tabla llegan a 4,5:1', async ({ page }) => {
+    test.fail(true, 'ABIERTO: «Más favorable» 2,80:1 y <th> 4,11:1 (04/10/2026)');
+    await abrir(page);
+    await escribir(page, SUELO, '40000');
+    await page.locator(ANIOS).selectOption('7');
+    // Sin método real no hay comparación ni distintivo: 150.000 → 180.000 € con 100.000 € de VC
+    // total (real 3000,00 € frente a objetivo 2000,00 €, gana el objetivo)
+    await rellenarMetodoReal(page, { adquisicion: '150000', transmision: '180000', total: '100000' });
+    await CALCULAR(page).click();
+    await expect(encabezado(page, 'Método objetivo')).toContainText('Más favorable');
+    await abrirGuia(page);
+    await prepararParaMedir(page);
+    const medidas = await contrastes(page, [
+      '[class*="recomendadoBadge"]',
+      '[class*="tablaCoeficientes"] th',
+      '[class*="comparativaTable"] th',
+    ]);
+    expect(medidas.every((m) => m.ratio > 0), JSON.stringify(medidas)).toBe(true);
+    const fallos = medidas.filter((m) => m.ratio < 4.5);
+    expect(fallos, JSON.stringify(fallos)).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO (accesibilidad, modo oscuro) — el #2E86AB literal como COLOR DE TEXTO, sin
+   * variante oscura: los títulos de la guía (`.guideSection h2`, 16,8 px/700) y las preguntas
+   * de la FAQ (`.faqItem dt`, 15,2 px/700) dan 3,77:1 sobre #F5F5F5 en claro y 3,21:1 sobre
+   * #303030 en oscuro; «Datos para el método real» (`.subPanelTitle`), 4,11:1 y 3,50:1.
+   * Ninguno es texto grande: exigen 4,5:1.
+   */
+  test('CONTRASTE OSCURO — títulos de la guía, FAQ y «Datos para el método real» a 4,5:1 en oscuro', async ({ page }) => {
+    test.fail(true, 'ABIERTO: 3,21:1 (h2 y dt) y 3,50:1 (subPanelTitle) en oscuro (04/10/2026)');
+    await abrir(page);
+    await REAL(page).check();
+    await abrirGuia(page);
+    await prepararParaMedir(page);
+    await activarTema(page, 'dark');
+    const medidas = await contrastes(page, [
+      '[class*="guideSection"] h2',
+      '[class*="faqItem"] dt',
+      '[class*="subPanelTitle"]',
+    ]);
+    expect(medidas.every((m) => m.ratio > 0), JSON.stringify(medidas)).toBe(true);
+    const fallos = medidas.filter((m) => m.ratio < 4.5);
+    expect(fallos, JSON.stringify(fallos)).toEqual([]);
   });
 });

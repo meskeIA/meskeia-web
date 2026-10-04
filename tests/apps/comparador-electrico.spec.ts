@@ -57,6 +57,23 @@ import {
  *   H · contraste del botón principal, del enlace del CTA y de los separadores
  *   I · nombre accesible que no contiene la etiqueta visible
  *   J · «0.18 €/kWh» con punto decimal y «30%» sin espacio en el FAQ
+ *
+ * RE-INSPECCIÓN DEL 04/10/2026
+ * ────────────────────────────
+ * Los doce hallazgos de arriba siguen reparados: sus casos pasan. Casos nuevos, resueltos a mano
+ * antes de ejecutar: uno normal con los once campos escritos en formato español, el equilibrio
+ * justo en el año 15 (el borde del horizonte máximo), la ventaja que se agota, lo que debe
+ * rechazarse, el tecleo pulsación a pulsación en escritorio y en móvil, y el título libre de la
+ * barra del logo a 360, 800, 1024 y 1280 px (lotes del hero d056b066, 3de36a1f y a1d72a9c).
+ * La sospecha del 28-30/09 sobre el tecleo se DESCARTA: los campos guardan el texto tal cual
+ * («1.», «1,», «-», vacío) sin que React escriba «0» bajo el cursor, y el `Number(...)` de la
+ * línea 433 es el del horizonte, un <select> de opciones fijas (5/8/10/15), que no se teclea.
+ * Hallazgos ABIERTOS de esta vuelta, cada uno con su test.fail():
+ *   K · los veredictos «nunca» y «se agota» dan por hecho que el sobrecoste de uso viene de la
+ *       energía; con el mantenimiento editable, la propia app los desmiente cambiando los km
+ *   L · mismo precio de compra y uso más caro: «Cuesta más de comprar» y «ya es más barato»
+ *   M · «el Programa MOVES III estuvo vigente entre 2019 y 2025»: MOVES III es el RD 266/2021
+ *   N · el FAQ agrupa cifras de cuatro dígitos («1.500,50 €») que la app escribe «1500,50 €»
  */
 
 test.use({ locale: 'es-ES' });
@@ -78,7 +95,8 @@ type CampoNumero =
   | 'mantElectrico'
   | 'mantGasolina';
 type CampoSelect = 'anios';
-type Campos = Partial<Record<CampoNumero | CampoSelect, number>>;
+// Texto para escribir los importes en formato español («46.707,50»), como los teclea el usuario.
+type Campos = Partial<Record<CampoNumero | CampoSelect, number | string>>;
 
 const SELECTS: readonly CampoSelect[] = ['anios'];
 
@@ -423,4 +441,361 @@ test.describe('Móvil 360 px', () => {
     }));
     expect(ancho.pagina).toBeLessThanOrEqual(ancho.vista);
   });
+
+  // Lotes del hero (d056b066): 80 px arriba hasta 1023 px. Medido el 04/10/2026: letras desde
+  // y = 78 px, barra del logo hasta y = 52 px.
+  test('el título queda libre de la barra del logo', async ({ page }) => {
+    await abrir(page);
+    await esperarPaginaAsentada(page);
+    expect(await letrasBajoLaBarra(page)).toEqual({ barra: true, tapadas: 0 });
+  });
+
+  // Sospecha del 28-30/09 (descartada): en móvil, el campo guarda lo tecleado tal cual.
+  test('tecleo en móvil: vaciar, «12», borrar y escribir «20.000» y «0,2» tecla a tecla', async ({ page }) => {
+    // A mano, por defecto salvo km 20.000 y luz 0,2 €/kWh: energía EV 200·16·0,2 = 640 €;
+    // gasolina 200·7·1,65 = 2.310 €; ahorro (2.310 + 1.000) − (640 + 800) = 1870,00 €/año.
+    // Diferencia al comprar 10.800 € → 1.870·5 = 9.350 < 10.800 ≤ 1.870·6 = 11.220 ⇒ año 6.
+    await abrir(page);
+    await vaciarTocando(page, 'kmAnuales');
+    await teclearYVer(page, 'kmAnuales', '12');
+    await pulsarYVer(page, 'kmAnuales', 'Backspace', '1');
+    await pulsarYVer(page, 'kmAnuales', 'Backspace', '');
+    await teclearYVer(page, 'kmAnuales', '20.000');
+    await vaciarTocando(page, 'precioLuz');
+    await teclearYVer(page, 'precioLuz', '0,2');
+    await calcular(page);
+    await expect(page.locator(TARJETA)).toContainText('El eléctrico empieza a ser más barato en el año 6');
+    await expect(estadistica(page, 0)).toContainText(/1870,00\s€/);
+  });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RE-INSPECCIÓN DEL 04/10/2026
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** ¿Cuántas cajas de texto del <h1> pisa la barra fija del logo? (la medida de la Ronda) */
+async function letrasBajoLaBarra(page: Page): Promise<{ barra: boolean; tapadas: number }> {
+  return page.evaluate(() => {
+    const barra = Array.from(document.querySelectorAll('body *')).find((e) => {
+      const cs = getComputedStyle(e);
+      const r = e.getBoundingClientRect();
+      return (
+        cs.position === 'fixed' &&
+        r.top <= 1 &&
+        r.height < 120 &&
+        r.width > 300 &&
+        e.querySelector('a[href="/"]') !== null
+      );
+    });
+    const h1 = document.querySelector('h1');
+    if (!barra || !h1) return { barra: false, tapadas: -1 };
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    const letras = Array.from(rango.getClientRects()).filter((c) => c.width > 0);
+    const piezas = Array.from(barra.children)
+      .map((c) => c.getBoundingClientRect())
+      .filter((c) => c.width > 0);
+    const tapadas = letras.filter((c) =>
+      piezas.some(
+        (p) => !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom),
+      ),
+    ).length;
+    return { barra: true, tapadas };
+  });
+}
+
+/** Pulsa una tecla en el campo enfocado y comprueba que el DOM y React guardan `esperado`. */
+async function pulsarYVer(page: Page, id: string, tecla: string, esperado: string): Promise<void> {
+  await page.keyboard.press(tecla);
+  await expect(page.locator(`#${id}`)).toHaveValue(esperado);
+  await expect.poll(() => leerValorEnReact(page, `#${id}`)).toBe(esperado);
+}
+
+/** Teclea `texto` carácter a carácter y comprueba cada estado intermedio (nunca un «0» de React). */
+async function teclearYVer(page: Page, id: string, texto: string): Promise<void> {
+  let previo = await page.locator(`#${id}`).inputValue();
+  for (const caracter of texto) {
+    previo += caracter;
+    await pulsarYVer(page, id, caracter, previo);
+  }
+}
+
+/** Escritorio: clic, seleccionar todo y borrar. */
+async function vaciarConTeclado(page: Page, id: string): Promise<void> {
+  await page.locator(`#${id}`).click();
+  await page.keyboard.press('Control+A');
+  await pulsarYVer(page, id, 'Backspace', '');
+}
+
+/** Móvil: tocar, ir al final y borrar carácter a carácter. */
+async function vaciarTocando(page: Page, id: string): Promise<void> {
+  const campo = page.locator(`#${id}`);
+  await campo.tap();
+  await page.keyboard.press('End');
+  const largo = (await campo.inputValue()).length;
+  for (let i = 0; i < largo; i++) await page.keyboard.press('Backspace');
+  await expect(campo).toHaveValue('');
+  await expect.poll(() => leerValorEnReact(page, `#${id}`)).toBe('');
+}
+
+test.describe('Re-inspección 04/10/2026 · cálculo', () => {
+  test('caso normal con los once campos en formato español: equilibrio en el año 5', async ({ page }) => {
+    // A mano: EV 32.000 €, gasolina 24.000 €, ayuda 2.250 €, 18.000 km, 17,5 kWh/100 km a
+    // 0,15 €/kWh, 6,5 l/100 km a 1,55 €/l, cargador 1.100 €, mantenimiento 600 y 950 €/año, 10 años.
+    // Energía EV 180·17,5·0,15 = 472,50 €; gasolina 180·6,5·1,55 = 1.813,50 €.
+    // Uso EV 1.072,50 €/año; uso gasolina 2.763,50 €/año → ahorro 1691,00 €/año.
+    // Diferencia al comprar 32.000 − 2.250 + 1.100 − 24.000 = 6850,00 €.
+    // Ventaja(n) = 1.691·n − 6.850 → año 4: −86,00 €; año 5: +1605,00 € ⇒ «Año 5».
+    // Año 5: EV 30.850 + 1.072,50·5 = 36.212,50 €; gasolina 24.000 + 2.763,50·5 = 37.817,50 €.
+    // Año 10: EV 41.575,00 €; gasolina 51.635,00 €; ventaja +10.060,00 €.
+    // Coste por km: EV 1.072,50/18.000 = 5,96 ct → «6,0»; gasolina 2.763,50/18.000 = 15,35 ct → «15,4».
+    await abrir(page);
+    await fijar(page, {
+      precioElectrico: '32.000',
+      precioGasolina: '24.000',
+      ayuda: '2.250',
+      kmAnuales: '18.000',
+      consumoElectrico: '17,5',
+      consumoGasolina: '6,5',
+      precioLuz: '0,15',
+      precioGasolinaLitro: '1,55',
+      cargador: '1.100',
+      mantElectrico: '600',
+      mantGasolina: '950',
+    });
+    await calcular(page);
+    await expect(page.locator(TARJETA)).toContainText('El eléctrico empieza a ser más barato en el año 5');
+    await expect(estadistica(page, 0)).toContainText(/1691,00\s€/);
+    await expect(estadistica(page, 1)).toContainText(/6850,00\s€/);
+    await expect(estadistica(page, 2)).toContainText(/6,0 ct\/km/);
+    await expect(estadistica(page, 2)).toContainText(/15,4 ct\/km/);
+    await expect(celda(page, 4, 3)).toHaveText(/^-86,00\s€$/);
+    await expect(celda(page, 5, 1)).toHaveText(/^36\.212,50\s€$/);
+    await expect(celda(page, 5, 2)).toHaveText(/^37\.817,50\s€$/);
+    await expect(celda(page, 5, 3)).toHaveText(/^\+1605,00\s€$/);
+    await expect(celda(page, 10, 1)).toHaveText(/^41\.575,00\s€$/);
+    await expect(celda(page, 10, 2)).toHaveText(/^51\.635,00\s€$/);
+    await expect(celda(page, 10, 3)).toHaveText(/^\+10\.060,00\s€$/);
+  });
+
+  test('borde: el equilibrio cae justo en el año 15, el horizonte máximo', async ({ page }) => {
+    // A mano, por defecto salvo el precio del eléctrico «46.707,50»: ahorro 1500,50 €/año
+    // (energía 432 € frente a 1.732,50 €, mantenimiento 800 € frente a 1.000 €).
+    // Diferencia al comprar 46.707,50 + 800 − 25.000 = 22.507,50 € = 1.500,50 · 15 exactos.
+    // Año 14: −1500,50 €; año 15: +0,00 € (ventaja ≥ 0) ⇒ «Año 15» con 15 años.
+    // Año 15: EV 47.507,50 + 1.232·15 = 65.987,50 € = gasolina 25.000 + 2.732,50·15.
+    // Con 10 años, fuera del horizonte: «recuperaría la diferencia en el año 15».
+    await abrir(page);
+    await fijar(page, { precioElectrico: '46.707,50', anios: 15 });
+    await calcular(page);
+    await expect(page.locator(TARJETA)).toContainText('El eléctrico empieza a ser más barato en el año 15');
+    await expect(estadistica(page, 1)).toContainText(/22\.507,50\s€/);
+    await expect(celda(page, 14, 3)).toHaveText(/^-1500,50\s€$/);
+    await expect(celda(page, 15, 1)).toHaveText(/^65\.987,50\s€$/);
+    await expect(celda(page, 15, 2)).toHaveText(/^65\.987,50\s€$/);
+    await expect(celda(page, 15, 3)).toHaveText(/^\+0,00\s€$/);
+    await fijar(page, { anios: 10 });
+    await expect(page.locator(TARJETA)).toContainText('No se alcanza el punto de equilibrio en 10 años');
+    await expect(page.locator(TARJETA)).toContainText('recuperaría la diferencia en el año 15');
+    await expect(page.locator(`${RESULTADOS} tbody tr`)).toHaveCount(10);
+  });
+
+  test('la ventaja se agota: más barato de comprar, más caro de usar', async ({ page }) => {
+    // A mano: EV 22.000 €, gasolina 24.000 €, sin cargador, 20.000 km, 18 kWh/100 km a
+    // 0,55 €/kWh, 6 l/100 km a 1,50 €/l, mantenimiento 900 € los dos, 15 años.
+    // Energía EV 200·18·0,55 = 1.980 €; gasolina 200·6·1,50 = 1.800 € → uso EV 2.880 €,
+    // gasolina 2.700 € → sobrecoste 180,00 €/año. Diferencia al comprar −2000,00 €.
+    // Ventaja(n) = 2.000 − 180·n → año 11: +20,00 €; año 12: −160,00 € ⇒ «Más caro desde el año 12».
+    // Año 15: EV 22.000 + 2.880·15 = 65.200,00 €; gasolina 24.000 + 2.700·15 = 64.500,00 €.
+    await abrir(page);
+    await fijar(page, {
+      precioElectrico: '22.000',
+      precioGasolina: '24.000',
+      cargador: '0',
+      kmAnuales: '20.000',
+      consumoElectrico: '18',
+      precioLuz: '0,55',
+      consumoGasolina: '6',
+      precioGasolinaLitro: '1,50',
+      mantElectrico: '900',
+      mantGasolina: '900',
+      anios: 15,
+    });
+    await calcular(page);
+    await expect(page.locator(TARJETA)).toContainText('Más caro desde el año 12');
+    await expect(estadistica(page, 0)).toContainText(/180,00\s€/);
+    await expect(estadistica(page, 0)).toContainText('Sobrecoste de uso');
+    await expect(estadistica(page, 1)).toContainText(/-2000,00\s€/);
+    await expect(celda(page, 11, 3)).toHaveText(/^\+20,00\s€$/);
+    await expect(celda(page, 12, 3)).toHaveText(/^-160,00\s€$/);
+    await expect(celda(page, 15, 1)).toHaveText(/^65\.200,00\s€$/);
+    await expect(celda(page, 15, 2)).toHaveText(/^64\.500,00\s€$/);
+    await expect(celda(page, 15, 3)).toHaveText(/^-700,00\s€$/);
+  });
+
+  test('se rechazan el texto no numérico, el consumo negativo y una ayuda mayor que el precio', async ({ page }) => {
+    // Deben rechazarse: «12abc» no es un número (parseSpanishNumber → NaN), un consumo de
+    // −16 kWh no existe, y 40.000 € de ayuda superan los 35.000 € del eléctrico.
+    await abrir(page);
+    await fijar(page, { precioGasolina: '12abc', consumoElectrico: '-16', ayuda: '40.000' });
+    await expect(botonCalcular(page)).toBeDisabled();
+    const aviso = page.locator('#aviso-formulario');
+    await expect(aviso).toContainText('Precio del gasolina equivalente: Escribe un número');
+    await expect(aviso).toContainText('Consumo eléctrico: Tiene que ser mayor que 0.');
+    await expect(aviso).toContainText('La ayuda no puede ser mayor que el precio del eléctrico.');
+    await expect(page.locator('#precioGasolina')).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  // HALLAZGO K (ABIERTO) — el veredicto «nunca» afirma que ningún kilometraje recupera la
+  // diferencia, pero con el mantenimiento del eléctrico por encima del de gasolina el sobrecoste
+  // de uso viene del mantenimiento, y MÁS kilómetros sí la recuperan.
+  test('«nunca»: no afirma que ningún kilometraje recupere la diferencia cuando más km la recuperan', async ({ page }) => {
+    test.fail(true, 'Hallazgo K abierto: el veredicto «nunca» da por hecho que el sobrecoste es de energía');
+    // A mano, por defecto salvo mantenimiento del eléctrico 1.500 €/año y 15 años:
+    // · 15.000 km: uso EV 432 + 1.500 = 1.932 €; gasolina 1.732,50 + 1.000 = 2.732,50 € →
+    //   ahorro 800,50 €; 10.800/800,50 = 13,49 ⇒ «Año 14».
+    // · 5.000 km: energía EV 50·16·0,18 = 144 €, gasolina 50·7·1,65 = 577,50 € → uso EV
+    //   1.644 €, gasolina 1.577,50 € → sobrecoste 66,50 € ⇒ «no compensa»… pero no «con ningún
+    //   kilometraje»: la misma app, con 15.000 km, lo recupera en el año 14.
+    await abrir(page);
+    await fijar(page, { mantElectrico: '1.500', anios: 15 });
+    await calcular(page);
+    await expect(page.locator(TARJETA)).toContainText('El eléctrico empieza a ser más barato en el año 14');
+    await fijar(page, { kmAnuales: '5.000' });
+    await expect(page.locator(TARJETA)).toContainText('El eléctrico no compensa con estos datos');
+    await expect(estadistica(page, 0)).toContainText(/66,50\s€/);
+    await expect(page.locator(TARJETA)).not.toContainText('ningún kilometraje');
+  });
+
+  // HALLAZGO K (ABIERTO) — mismo defecto en «se agota»: «Cuantos más kilómetros recorras, antes
+  // se agota» es falso cuando el sobrecoste viene del mantenimiento.
+  test('«se agota»: no dice que más km la agotan antes cuando más km la hacen crecer', async ({ page }) => {
+    test.fail(true, 'Hallazgo K abierto: el veredicto «se agota» da por hecho que el sobrecoste es de energía');
+    // A mano: EV 22.000 €, gasolina 24.000 €, sin cargador, mantenimiento 1.500 € (EV) y
+    // 900 € (gasolina), resto por defecto, 15 años. Diferencia al comprar −2.000 €.
+    // · 15.000 km: uso EV 432 + 1.500 = 1.932 €; gasolina 1.732,50 + 900 = 2.632,50 € →
+    //   ahorro 700,50 € ⇒ «Desde la compra».
+    // · 5.000 km: uso EV 144 + 1.500 = 1.644 €; gasolina 577,50 + 900 = 1.477,50 € →
+    //   sobrecoste 166,50 €; 2.000 − 166,50·12 = +2,00; ·13 = −164,50 ⇒ «Más caro desde el año 13».
+    await abrir(page);
+    await fijar(page, {
+      precioElectrico: '22.000',
+      precioGasolina: '24.000',
+      cargador: '0',
+      mantElectrico: '1.500',
+      mantGasolina: '900',
+      anios: 15,
+    });
+    await calcular(page);
+    await expect(page.locator(TARJETA)).toContainText('Desde la compra');
+    await expect(estadistica(page, 0)).toContainText(/700,50\s€/);
+    await fijar(page, { kmAnuales: '5.000' });
+    await expect(page.locator(TARJETA)).toContainText('Más caro desde el año 13');
+    await expect(page.locator(TARJETA)).not.toContainText('Cuantos más kilómetros recorras, antes se agota');
+  });
+
+  // HALLAZGO L (ABIERTO) — con el mismo precio de compra (diferencia 0) y el uso más caro, el
+  // veredicto «nunca» dice «Cuesta más de comprar» y la métrica «(el eléctrico ya es más barato)».
+  test('mismo precio de compra y uso más caro: no dice que cueste más ni que ya sea más barato', async ({ page }) => {
+    test.fail(true, 'Hallazgo L abierto: con diferencia al comprar 0 el texto afirma lo contrario');
+    // A mano: EV 25.000 € = gasolina 25.000 €, sin cargador, luz 1 €/kWh, resto por defecto.
+    // Energía EV 150·16·1 = 2.400 € → uso 3.200 €; gasolina 2.732,50 € → sobrecoste 467,50 €.
+    // Diferencia al comprar 0,00 €: ni «cuesta más de comprar» ni «ya es más barato».
+    await abrir(page);
+    await fijar(page, { precioElectrico: '25.000', cargador: '0', precioLuz: '1' });
+    await calcular(page);
+    await expect(estadistica(page, 1)).toContainText(/^0,00\s€/);
+    await expect(celda(page, 1, 3)).toHaveText(/^-467,50\s€$/);
+    await expect(page.locator(TARJETA)).not.toContainText('Cuesta más de comprar');
+    await expect(estadistica(page, 1)).not.toContainText('ya es más barato');
+  });
+});
+
+test.describe('Re-inspección 04/10/2026 · contenido', () => {
+  // HALLAZGO M (ABIERTO) — RD 609/2026 (BOE-A-2026-16010), preámbulo: «el Programa MOVES, que,
+  // mediante sus diversas convocatorias, ha estado vigente entre los años 2019 y 2025», y en el
+  // párrafo siguiente MOVES III es el «Real Decreto 266/2021, de 13 de abril». La app atribuye a
+  // MOVES III los años de todo el programa (MOVES_III_HISTORICO.vigencia = '2019-2025').
+  test('no atribuye a MOVES III la vigencia 2019-2025 de todo el Programa MOVES', async ({ page }) => {
+    test.fail(true, 'Hallazgo M abierto: MOVES III (RD 266/2021) no pudo estar vigente en 2019');
+    await abrir(page);
+    await expect(page.locator('main')).toContainText('Hoy rige el Programa Auto+');
+    await expect(page.locator('main')).not.toContainText('MOVES III estuvo vigente entre 2019');
+  });
+
+  // HALLAZGO N (ABIERTO) — CLAUDE.md §2 (RAE 2010): con cuatro cifras enteras no se agrupa. El
+  // FAQ, escrito a mano, pone «1.000 €», «1.500,50 €» y «1.035 €»; la app escribe «1500,50 €».
+  test('el FAQ no agrupa las cifras de cuatro dígitos', async ({ page }) => {
+    test.fail(true, 'Hallazgo N abierto: «1.500,50 €», «1.000 €» y «1.035 €» en el FAQPage');
+    await abrir(page);
+    const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = scripts.find((t) => t.includes('FAQPage')) ?? '';
+    expect(faq, 'el FAQ cita el ahorro del ejemplo por defecto').toMatch(/1\.?500,50 €/);
+    expect(faq).not.toMatch(/(^|[^\d.])\d\.\d{3}(?![\d.])/);
+  });
+});
+
+test.describe('Re-inspección 04/10/2026 · tecleo en escritorio', () => {
+  // Sospecha del 28-30/09 (DESCARTADA): con type="number", un estado intermedio vacío hacía que
+  // React escribiera «0» bajo el cursor. Aquí los campos son de texto y guardan lo tecleado.
+  test('vaciar, «1», «12» y borrar: el campo nunca se rellena con «0»', async ({ page }) => {
+    await abrir(page);
+    await calcular(page);
+    await vaciarConTeclado(page, 'kmAnuales');
+    await expect(page.locator('#kmAnuales-error')).toContainText('Escribe un número');
+    await teclearYVer(page, 'kmAnuales', '12');
+    await pulsarYVer(page, 'kmAnuales', 'Backspace', '1');
+    await pulsarYVer(page, 'kmAnuales', 'Backspace', '');
+    // Vacío: no hay resultado (no se calcula con un 0 inventado).
+    await expect(page.locator(RESULTADOS)).toHaveCount(0);
+    await teclearYVer(page, 'kmAnuales', '15.000');
+    await expect(page.locator(TARJETA)).toContainText('El eléctrico empieza a ser más barato en el año 8');
+  });
+
+  test('«1.234,56», «1.5», «1,5» y «-» se conservan tecla a tecla y se leen bien', async ({ page }) => {
+    // A mano: cargador «1.234,56» → diferencia al comprar 35.000 + 1.234,56 − 25.000 = 11.234,56 €.
+    // Consumo de gasolina 1,5 l/100 km (escrito «1.5» o «1,5»): energía 150·1,5·1,65 = 371,25 € →
+    // uso 1.371,25 €; ahorro 1.371,25 − 1.232 = 139,25 €/año. 139,25·80 = 11.140 < 11.234,56 ≤
+    // 139,25·81 = 11.279,25 ⇒ «recuperaría la diferencia en el año 81» (con 15 l saldría otro año).
+    await abrir(page);
+    await calcular(page);
+    await vaciarConTeclado(page, 'cargador');
+    await teclearYVer(page, 'cargador', '1.234,56');
+    await expect(estadistica(page, 1)).toContainText(/11\.234,56\s€/);
+    await vaciarConTeclado(page, 'consumoGasolina');
+    await teclearYVer(page, 'consumoGasolina', '1.5');
+    await expect(page.locator(TARJETA)).toContainText('recuperaría la diferencia en el año 81');
+    await vaciarConTeclado(page, 'consumoGasolina');
+    await teclearYVer(page, 'consumoGasolina', '1,5');
+    await expect(page.locator(TARJETA)).toContainText('recuperaría la diferencia en el año 81');
+    await vaciarConTeclado(page, 'mantElectrico');
+    await pulsarYVer(page, 'mantElectrico', '-', '-');
+    await expect(page.locator('#mantElectrico-error')).toContainText('Escribe un número');
+    await pulsarYVer(page, 'mantElectrico', '1', '-1');
+    await expect(page.locator('#mantElectrico-error')).toContainText('No puede ser negativo');
+    await expect(botonCalcular(page)).toBeDisabled();
+  });
+
+  test('el horizonte es un <select>: con el teclado da 15 filas', async ({ page }) => {
+    await abrir(page);
+    await calcular(page);
+    await page.locator('#anios').focus();
+    await page.keyboard.press('ArrowDown'); // 10 → 15
+    await esperarValorEnReact(page, '#anios', '15');
+    await expect(page.locator(`${RESULTADOS} tbody tr`)).toHaveCount(15);
+  });
+});
+
+for (const ancho of [800, 1024, 1280]) {
+  test.describe(`Título libre del logo a ${ancho} px`, () => {
+    test.use({ viewport: { width: ancho, height: 800 } });
+
+    // Lotes 3de36a1f y a1d72a9c: 100 px arriba de 769 a 1439 px. Medido el 04/10/2026: letras
+    // desde y = 97 px y piezas de la barra hasta y = 77 px a los tres anchos.
+    test('ninguna letra del h1 queda bajo la barra del logo', async ({ page }) => {
+      await abrir(page);
+      await esperarPaginaAsentada(page);
+      expect(await letrasBajoLaBarra(page)).toEqual({ barra: true, tapadas: 0 });
+    });
+  });
+}

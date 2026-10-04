@@ -1,5 +1,18 @@
 import { test, expect, Page, Locator } from '@playwright/test';
-import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidratacion';
+import {
+  esperarHidratacion,
+  esperarPaginaAsentada,
+  sembrarValor,
+  sembrarValorAcotado,
+} from './_hidratacion';
+
+/**
+ * stemum.com → el servidor local, para ver la app como la sirve el portal (data-brand="stemum"
+ * y la píldora «Stemum › Física» en la barra fija). Va al NIVEL DEL FICHERO porque
+ * `launchOptions` fuerza un worker nuevo; al resto de tests no les afecta: solo resuelve ese host.
+ * (Re-inspección del 04/10/2026, bloque «hero» del final.)
+ */
+test.use({ launchOptions: { args: ['--host-resolver-rules=MAP stemum.com 127.0.0.1:3050'] } });
 
 /**
  * Inspector — simulador-campo-magnetico (segmento CÁLCULO / física, portal Stemum)
@@ -89,12 +102,46 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *        «1,00 × 10⁵ m/s»; con θ = 89°, 10⁵·sen 89° = 99.984,77 m/s → «99.984,77 m/s».
  *        I = 25 A a 0,5 cm: B = 2·10⁻⁷·25/0,005 = 10⁻³ T EXACTO → «0,00100 T»; y en el arranque
  *        de Corrientes, F/L = 2·10⁻⁷·10·10/0,02 = 10⁻³ N/m → «0,00100 N/m».
- *   R5 · mantisa que redondea a 10 (hallazgo nuevo): protón, v = 5,2·10⁶ m/s, B = 1,2 T, θ = 90°
- *        → F = 9,997582·10⁻¹³ N, que con 2 decimales es «1,00 × 10⁻¹² N».
- *   R6 · inducción (hallazgo nuevo): barra con B = 0,2 T, L = 0,3 m, v = 2 m/s, R = 25 Ω →
- *        ε = 0,12 V · I = 4,8·10⁻³ A · F = B·I·L = 2,88·10⁻⁴ N · P = ε·I = 5,76·10⁻⁴ W.
- *        Alternador N = 10, B = 0,1 T, A = 0,01 m², f = 1 Hz → ε_máx = N·B·A·2πf = 0,0628319 V ·
- *        ε_ef = 0,0444288 V.
+ *   R5 · mantisa que redondea a 10 (hallazgo 2166, reparado el 26/09/2026): protón,
+ *        v = 5,2·10⁶ m/s, B = 1,2 T, θ = 90° → F = 9,997582·10⁻¹³ N, que con 2 decimales es
+ *        «1,00 × 10⁻¹² N».
+ *   R6 · inducción (hallazgo 2165, reparado el 26/09/2026): barra con B = 0,2 T, L = 0,3 m,
+ *        v = 2 m/s, R = 25 Ω → ε = 0,12 V · I = 4,8·10⁻³ A · F = B·I·L = 2,88·10⁻⁴ N ·
+ *        P = ε·I = 5,76·10⁻⁴ W. Alternador N = 10, B = 0,1 T, A = 0,01 m², f = 1 Hz →
+ *        ε_máx = N·B·A·2πf = 0,0628319 V · ε_ef = 0,0444288 V.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────────────────
+ * REINSPECCIÓN 04/10/2026 (invalidada por 586a4d61 y a1d72a9c: CSS del hero en móvil y tableta)
+ * Casos NUEVOS, resueltos a mano antes de abrir el navegador, con las constantes de la app
+ * (m_α = 6,6446573·10⁻²⁷ kg, q_α = 2e = 3,204353268·10⁻¹⁹ C):
+ *
+ *   S1 · alfa, v = 2·10⁶ m/s, B = 1 T, θ = 90°, B saliente: m/q = 2,073634·10⁻⁸ kg/C
+ *        F = 2e·v·B = 6,408707·10⁻¹³ N → «6,41 × 10⁻¹³ N» · r = (m/q)·v/B = 0,0414727 m →
+ *        «0,0415 m» · T = 2π·(m/q)/B = 1,302910·10⁻⁷ s → «1,30 × 10⁻⁷ s» · f = 7,6751·10⁶ Hz →
+ *        «7,68 × 10⁶ Hz» · E = ½·m·v²/e = 82.945,4 eV → «82,95 keV» · carga + con B saliente:
+ *        giro horario. Al extremo (v = 20·10⁶ m/s, B = 0,01 T): r = 41,4727 m → «41,473 m» ·
+ *        T = 1,302910·10⁻⁵ s · E = ½·m·(2·10⁷)²/e = 8294,54 keV (cuatro cifras: sin punto).
+ *   S2 · conductor: B = 0,25 T, I = 12 A, L = 0,75 m, θ = 30° → F = 0,25·12·0,75·0,5 = 1,125 N.
+ *        Extremos: I = 100 A a 0,5 cm → B_hilo = 2·10⁻⁷·100/0,005 = 4·10⁻³ T «0,00400 T» ·
+ *        B_espira = 4π·10⁻⁷·100/0,01 = 0,0125664 T «0,0126 T» · N = 3000 en L = 0,05 m →
+ *        n = 60.000 /m · B_sol = 4π·10⁻⁷·60.000·100 = 7,5398 T «7,540 T» · I₂ = −100 A a 0,2 cm →
+ *        F/L = 2·10⁻⁷·100·100/0,002 = 1 N/m «1,000 N/m», y se repelen.
+ *   S3 · I₂ = 0 A → F/L = 0: sin fuerza no hay atracción ni repulsión (HALLAZGO: dice «se atraen»).
+ *   S4 · alternador N = 100, A = 0,05 m², B = 0,5 T, f = 50 Hz → N·B·A = 2,5 Wb «2,500 Wb» ·
+ *        ω = 100π = 314,159 rad/s «314,16 rad/s» · ε_máx = 2,5·314,159 = 785,398 V «785,40 V» ·
+ *        ε_ef = 785,398/√2 = 555,360 V «555,36 V» · T = 1/50 = 0,02 s «0,0200 s».
+ *        Barra B = 1,5 T, L = 1,2 m, v = 10 m/s, R = 4 Ω → ε = B·L·v = 18 V · I = ε/R = 4,5 A ·
+ *        F = B·I·L = 8,1 N · P = ε·I = 81 W.
+ *   S5 · rechazo: v = 25 se capa a 20 (máx.), B = 0 a 0,01 T (mín.: con B = 0 el radio
+ *        divergiría), θ = −10° a 0° y θ = 120° a 90°. Protón a 2·10⁷ m/s en 0,01 T:
+ *        r = (m_p/e)·v/B = 1,0439677·10⁻⁸·2·10⁷/0,01 = 20,879 m → «20,879 m».
+ *   HERO · a 360, 390, 800, 1024 y 1280 px ningún punto del <h1> cae bajo la barra fija del logo
+ *        (meskeia.com). Bajo stemum.com la píldora «Stemum › Física» acaba en x = 232 y, desde
+ *        1024 px (sin el hueco de 80 px), el título centrado empieza en x = 221: HALLAZGO.
+ *   LIENZO 390 px · el SVG (viewBox 760 de ancho) se pinta a 308 px: escala 0,405. Rótulos de
+ *        11,5-14 px quedan en unos 4,6-5,7 px efectivos, por debajo de los 9 px legibles: HALLAZGO.
+ *        `touch-action` es auto en el lienzo y sus ancestros, y arrastrar el dedo sobre él
+ *        desplaza la página igual que sobre un título (105 px en los dos casos).
  */
 
 // ── utilidades ────────────────────────────────────────────────────────────────────────
@@ -445,22 +492,23 @@ test('R4 · bordes de formatCientifico: 10⁵ exacto, justo por debajo y 10⁻³
 });
 
 test('R5 · la mantisa de la notación científica no puede redondear a «10,00»', async ({ page }) => {
-  // HALLAZGO 2166, REPARADO el 26/09/2026 (el exponente se fija tras redondear la mantisa). Era: formatCientifico (page.tsx:73-74) fija el
-  // exponente con Math.floor(log10) ANTES de redondear la mantisa, y una mantisa ≥ 9,995 sale
-  // «10,00». La cifra vale lo mismo; la notación deja de estar normalizada.
+  // HALLAZGO 2166, REPARADO el 26/09/2026 (el exponente se fija tras redondear la mantisa).
+  // Era: formatCientifico fijaba el exponente con Math.floor(log10) ANTES de redondear la
+  // mantisa, y una mantisa ≥ 9,995 salía «10,00». La cifra valía lo mismo; la notación dejaba
+  // de estar normalizada.
   const f = valorDeFila(page, 'Fuerza F = q·v·B');
   // Protón, v = 5,2·10⁶ m/s, B = 1,2 T, θ = 90° (arranque): F = e·v·B = 9,997582·10⁻¹³ N
   await sembrarValor(page, '#velocidad', 5.2);
   await sembrarValor(page, '#campo', 1.2);
-  // El valor numérico es correcto (±0,5 %): lo que falla es cómo se escribe
+  // El valor numérico es correcto (±0,5 %): lo que fallaba era cómo se escribía
   await expect.poll(async () => leerCifra(await f.innerText()) / 9.997582e-13).toBeCloseTo(1, 2);
-  await expect(f).toHaveText('1,00 × 10⁻¹² N'); // hoy «10,00 × 10⁻¹³ N»
-  // v = 1·10⁶ m/s, θ = 89° → v⊥ = 999.847,7 m/s → «1,00 × 10⁶ m/s» (hoy «10,00 × 10⁵ m/s»)
+  await expect(f).toHaveText('1,00 × 10⁻¹² N'); // antes de reparar, «10,00 × 10⁻¹³ N»
+  // v = 1·10⁶ m/s, θ = 89° → v⊥ = 999.847,7 m/s → «1,00 × 10⁶ m/s» (antes «10,00 × 10⁵ m/s»)
   await sembrarValor(page, '#velocidad', 1);
   await sembrarValor(page, '#anguloVB', 89);
   await expect(valorDeFila(page, 'Componente v perpendicular')).toHaveText('1,00 × 10⁶ m/s');
   // Borde 10⁻³: v = 0,5·10⁶ m/s, B = 2,61 T, θ = 30° → r = m_p·v·sen 30°/(e·B) = 9,99970·10⁻⁴ m
-  // → «0,00100 m» o «1,000 × 10⁻³ m» (hoy «10,000 × 10⁻⁴ m»)
+  // → «0,00100 m» o «1,000 × 10⁻³ m» (antes «10,000 × 10⁻⁴ m»)
   await sembrarValor(page, '#velocidad', 0.5);
   await sembrarValor(page, '#campo', 2.61);
   await sembrarValor(page, '#anguloVB', 30);
@@ -468,9 +516,9 @@ test('R5 · la mantisa de la notación científica no puede redondear a «10,00�
 });
 
 test('R6 · inducción: fem, corriente, frenado y potencia conservan sus cifras significativas', async ({ page }) => {
-  // HALLAZGO 2165, REPARADO el 26/09/2026 (Inducción pasa por formatCientifico). Era: la pestaña Inducción presenta con
-  // formatNumber y decimales FIJOS (page.tsx:1340, 1346, 1364, 1377, 1383, 1389, 1395), la
-  // misma clase de defecto que el 1344, en una ruta que no pasa por formatCientifico.
+  // HALLAZGO 2165, REPARADO el 26/09/2026 (Inducción pasa por formatCientifico). Era: la
+  // pestaña Inducción presentaba con formatNumber y decimales FIJOS, la misma clase de defecto
+  // que el 1344, en una ruta que no pasaba por formatCientifico.
   await page.getByRole('button', { name: 'Inducción', exact: true }).click();
   await page.getByRole('button', { name: 'Barra sobre raíles' }).click();
   await esperarHidratacion(page, ['#campoBarra', '#longitudBarra', '#velocidadBarra', '#resistencia']);
@@ -479,10 +527,10 @@ test('R6 · inducción: fem, corriente, frenado y potencia conservan sus cifras 
   await sembrarValor(page, '#longitudBarra', 0.3);
   await sembrarValor(page, '#velocidadBarra', 2);
   await sembrarValor(page, '#resistencia', 25);
-  // ε = B·L·v = 0,12 V (este sale bien: «0,120 V»)
+  // ε = B·L·v = 0,12 V (este ya salía bien: «0,120 V»)
   await expect(valorDeFila(page, 'fem inducida')).toHaveText('0,120 V');
   // I = ε/R = 4,8·10⁻³ A · F = B·I·L = 2,88·10⁻⁴ N · P = ε·I = 5,76·10⁻⁴ W.
-  // Hoy «0,005 A» (+4 %), «0,0003 N» (+4 %) y «0,001 W» (+74 %). Precisión 2 (±0,5 %).
+  // Antes de reparar, «0,005 A» (+4 %), «0,0003 N» (+4 %) y «0,001 W» (+74 %). Precisión 2 (±0,5 %).
   expect(leerCifra(await valorDeFila(page, 'Potencia disipada').innerText()) / 5.76e-4).toBeCloseTo(1, 2);
   expect(leerCifra(await valorDeFila(page, 'Corriente inducida').innerText()) / 4.8e-3).toBeCloseTo(1, 2);
   expect(leerCifra(await valorDeFila(page, 'Fuerza de frenado').innerText()) / 2.88e-4).toBeCloseTo(1, 2);
@@ -501,7 +549,7 @@ test('R6 · inducción: fem, corriente, frenado y potencia conservan sus cifras 
   await sembrarValor(page, '#area', 0.01);
   await sembrarValor(page, '#campoInduccion', 0.1);
   await sembrarValor(page, '#frecuencia', 1);
-  // ε_máx = N·B·A·2πf = 0,0628319 V · ε_ef = 0,0444288 V (hoy «0,1 V» y «0,0 V»)
+  // ε_máx = N·B·A·2πf = 0,0628319 V · ε_ef = 0,0444288 V (antes «0,1 V» y «0,0 V»)
   expect(leerCifra(await valorDeFila(page, 'fem máxima').innerText()) / 0.0628319).toBeCloseTo(1, 2);
   expect(leerCifra(await valorDeFila(page, 'fem eficaz').innerText()) / 0.0444288).toBeCloseTo(1, 2);
 });
@@ -564,4 +612,378 @@ test('a11y · 1348 también en Inducción: «Pausar» sin aria-pressed', async (
   await expect(boton).not.toHaveAttribute('aria-pressed');
   await boton.click();
   await expect(page.getByRole('button', { name: 'Reanudar' })).not.toHaveAttribute('aria-pressed');
+});
+
+// ── REINSPECCIÓN 04/10/2026 ───────────────────────────────────────────────────────────
+
+test('S1 · Lorentz: partícula alfa a 2·10⁶ m/s en 1 T, y al extremo de los deslizadores', async ({ page }) => {
+  const alfa = page.getByRole('button', { name: /Partícula alfa/ });
+  await alfa.click();
+  await expect(alfa).toHaveAttribute('aria-pressed', 'true');
+  await sembrarValor(page, '#velocidad', 2);
+  await sembrarValor(page, '#campo', 1);
+  // F = 2e·v·B = 6,408707·10⁻¹³ N (con la carga de un protón saldría la mitad, 3,20·10⁻¹³ N)
+  const f = valorDeFila(page, 'Fuerza F = q·v·B');
+  await expect(f).toHaveText('6,41 × 10⁻¹³ N');
+  expect(leerCifra(await f.innerText()) / 6.408707e-13).toBeCloseTo(1, 2);
+  // r = (m/q)·v/B = 2,073634·10⁻⁸·2·10⁶/1 = 0,0414727 m
+  await expect(valorDeFila(page, 'Radio r =')).toHaveText('0,0415 m');
+  // T = 2π·(m/q)/B = 1,302910·10⁻⁷ s · f = 1/T = 7,6751·10⁶ Hz
+  await expect(valorDeFila(page, 'Periodo T =')).toHaveText('1,30 × 10⁻⁷ s');
+  await expect(valorDeFila(page, 'Frecuencia de ciclotrón')).toHaveText('7,68 × 10⁶ Hz');
+  await expect(valorDeFila(page, 'Paso de la hélice')).toHaveText('0 m');
+  // E = ½·m_α·v²/e = ½·6,6446573·10⁻²⁷·4·10¹²/1,602176634·10⁻¹⁹ = 82.945,4 eV
+  await expect(valorDeFila(page, 'Energía cinética')).toHaveText('82,95 keV');
+  // Carga positiva con B saliente: horario, como el protón
+  await expect(page.locator('[class*="canvasHint"]')).toContainText('Giro horario');
+  // Extremo: v = 20·10⁶ m/s, B = 0,01 T → r = 41,4727 m · T = 1,302910·10⁻⁵ s ·
+  // E = ½·m_α·(2·10⁷)²/e = 8294,54 keV (cuatro cifras enteras: es-ES no agrupa)
+  await sembrarValor(page, '#velocidad', 20);
+  await sembrarValor(page, '#campo', 0.01);
+  await expect(valorDeFila(page, 'Radio r =')).toHaveText('41,473 m');
+  await expect(valorDeFila(page, 'Periodo T =')).toHaveText('1,30 × 10⁻⁵ s');
+  await expect(valorDeFila(page, 'Energía cinética')).toHaveText('8294,54 keV');
+});
+
+test('S2 · fuerza sobre el conductor con θ = 30° y los extremos de hilo, espira, solenoide e hilos', async ({ page }) => {
+  await irACorrientes(page);
+  await sembrarValor(page, '#corriente', 12);
+  await sembrarValor(page, '#longitudConductor', 0.75);
+  await sembrarValor(page, '#campoExterno', 0.25);
+  await sembrarValor(page, '#anguloIB', 30);
+  // F = B·I·L·sen θ = 0,25·12·0,75·0,5 = 1,125 N (sin el sen θ saldría 2,250 N)
+  await expect(valorDeFila(page, 'Fuerza sobre el conductor')).toHaveText('1,125 N');
+  // B_hilo = 2·10⁻⁷·12/0,05 = 4,8·10⁻⁵ T
+  await expect(valorDeFila(page, 'Campo de un hilo recto')).toHaveText('4,800 × 10⁻⁵ T');
+
+  // Extremos de los deslizadores
+  await sembrarValor(page, '#corriente', 100);
+  await sembrarValor(page, '#distancia', 0.005);
+  await sembrarValor(page, '#vueltas', 3000);
+  await sembrarValor(page, '#longitudSolenoide', 0.05);
+  // B_hilo = 2·10⁻⁷·100/0,005 = 4·10⁻³ T · B_espira = 4π·10⁻⁷·100/0,01 = 0,0125664 T
+  await expect(valorDeFila(page, 'Campo de un hilo recto')).toHaveText('0,00400 T');
+  await expect(valorDeFila(page, 'Campo en el centro de una espira')).toHaveText('0,0126 T');
+  // n = 3000/0,05 = 60.000 /m · B_sol = 4π·10⁻⁷·60.000·100 = 7,539822 T
+  await expect(valorDeFila(page, 'Espiras por metro')).toHaveText('60.000 /m');
+  const sol = valorDeFila(page, 'Campo del solenoide');
+  await expect(sol).toHaveText('7,540 T');
+  expect(leerCifra(await sol.innerText()) / 7.539822).toBeCloseTo(1, 2);
+  // I₂ = −100 A a 0,2 cm: F/L = 2·10⁻⁷·100·100/0,002 = 1 N/m, corrientes opuestas
+  await sembrarValor(page, '#corriente2', -100);
+  await sembrarValor(page, '#separacion', 0.002);
+  await expect(valorDeFila(page, 'Fuerza entre hilos')).toHaveText('1,000 N/m');
+  await expect(valorDeFila(page, 'Los hilos')).toHaveText('se repelen');
+});
+
+test('S4 · inducción: alternador a 50 Hz y barra de 1,2 m a 10 m/s', async ({ page }) => {
+  await page.getByRole('button', { name: 'Inducción', exact: true }).click();
+  await esperarHidratacion(page, ['#espiras', '#area', '#campoInduccion', '#frecuencia']);
+  await sembrarValor(page, '#espiras', 100);
+  await sembrarValor(page, '#area', 0.05);
+  await sembrarValor(page, '#campoInduccion', 0.5);
+  // La frecuencia arranca en 50 Hz: se pasa por 51 para que sembrar 50 pruebe algo
+  await sembrarValor(page, '#frecuencia', 51);
+  await sembrarValor(page, '#frecuencia', 50);
+  // N·B·A = 100·0,5·0,05 = 2,5 Wb · ω = 2π·50 = 314,159 rad/s
+  await expect(valorDeFila(page, 'Flujo máximo')).toHaveText('2,500 Wb');
+  await expect(valorDeFila(page, 'Velocidad angular')).toHaveText('314,16 rad/s');
+  // ε_máx = N·B·A·ω = 785,398 V (sin el 2π saldría 125 V) · ε_ef = ε_máx/√2 = 555,360 V
+  const femMax = valorDeFila(page, 'fem máxima');
+  await expect(femMax).toHaveText('785,40 V');
+  expect(leerCifra(await femMax.innerText()) / 785.398).toBeCloseTo(1, 3);
+  await expect(valorDeFila(page, 'fem eficaz')).toHaveText('555,36 V');
+  // T = 1/50 = 0,02 s
+  await expect(valorDeFila(page, 'Periodo')).toHaveText('0,0200 s');
+
+  // Barra: B = 1,5 T, L = 1,2 m, v = 10 m/s, R = 4 Ω
+  await page.getByRole('button', { name: 'Barra sobre raíles' }).click();
+  await esperarHidratacion(page, ['#campoBarra', '#longitudBarra', '#velocidadBarra', '#resistencia']);
+  await sembrarValor(page, '#campoBarra', 1.5);
+  await sembrarValor(page, '#longitudBarra', 1.2);
+  await sembrarValor(page, '#velocidadBarra', 10);
+  await sembrarValor(page, '#resistencia', 4);
+  // ε = B·L·v = 18 V · I = ε/R = 4,5 A · F = B·I·L = 8,1 N · P = ε·I = 81 W (= I²R)
+  await expect(valorDeFila(page, 'fem inducida')).toHaveText('18,000 V');
+  await expect(valorDeFila(page, 'Corriente inducida')).toHaveText('4,500 A');
+  await expect(valorDeFila(page, 'Fuerza de frenado')).toHaveText('8,100 N');
+  await expect(valorDeFila(page, 'Potencia disipada')).toHaveText('81,000 W');
+});
+
+test('S5 · fuera de rango: v, B y θ se capan a su recorrido y el cálculo sigue finito', async ({ page }) => {
+  // v = 25·10⁶ m/s se capa al máximo (20) y B = 0 al mínimo (0,01 T): con B = 0 el radio divergiría
+  expect(await sembrarValorAcotado(page, '#velocidad', 25)).toBe('20');
+  expect(await sembrarValorAcotado(page, '#campo', 0)).toBe('0.01');
+  // Protón: r = (m_p/e)·v/B = 1,0439677·10⁻⁸·2·10⁷/0,01 = 20,879 m
+  await expect(valorDeFila(page, 'Radio r =')).toHaveText('20,879 m');
+  expect(await sembrarValorAcotado(page, '#anguloVB', -10)).toBe('0');
+  expect(await sembrarValorAcotado(page, '#anguloVB', 120)).toBe('90');
+  await expect(page.locator('[class*="resultBlock"]')).not.toContainText(/NaN|∞|Infinity/);
+  // Electrón al máximo: E = ½·mₑ·(2·10⁷)²/e = 1137,12 eV = 1,13712 keV
+  await page.getByRole('button', { name: /Electrón/ }).click();
+  await expect(valorDeFila(page, 'Energía cinética')).toHaveText('1,14 keV');
+});
+
+// HALLAZGO (contenido, bajo) — ABIERTO desde el 04/10/2026. `seAtraen = corriente2 >= 0`: con
+// I₂ = 0 la fuerza es 0 N/m y aun así la fila dice «se atraen». Sin corriente en el segundo hilo
+// no hay fuerza, ni de atracción ni de repulsión (mismo patrón que el 2168 con θ = 0°).
+// Caso: Corrientes, I₂ = 0 A → esperado F/L = 0 N/m y ni «se atraen» ni «se repelen» ·
+//       obtenido «0 N/m» y «se atraen».
+test('HALLAZGO · con I₂ = 0 no hay fuerza entre los hilos: no pueden «atraerse»', async ({ page }) => {
+  test.fail(true, 'Hallazgo abierto (04/10/2026): con I₂ = 0 la fila «Los hilos» dice «se atraen»');
+  await irACorrientes(page);
+  // Control: arranque I₂ = 10 A → se atraen; I₂ = −10 A → se repelen
+  await expect(valorDeFila(page, 'Los hilos')).toHaveText('se atraen');
+  await sembrarValor(page, '#corriente2', -10);
+  await expect(valorDeFila(page, 'Los hilos')).toHaveText('se repelen');
+  // I₂ = 0 → F/L = μ₀·I₁·0/(2πd) = 0 N/m
+  await sembrarValor(page, '#corriente2', 0);
+  await expect(valorDeFila(page, 'Fuerza entre hilos')).toHaveText('0 N/m');
+  await expect(valorDeFila(page, 'Los hilos')).not.toHaveText(/atraen|repelen/);
+});
+
+// HALLAZGO (dato, medio) — ABIERTO desde el 04/10/2026. La FAQ «¿Qué diferencia hay entre tesla y
+// gauss?» dice que un imán de nevera da «unas décimas de tesla» (0,1-0,9 T). La Wikipedia en
+// español (Tesla (unidad)) da 5 mT para «un imán de nevera típico», la inglesa también, y su
+// «Orders of magnitude (magnetic field)» da 10-100 G (1-10 mT) citando al National MagLab
+// («A refrigerator magnet is 100 gauss»): entre 10 y 100 veces menos. La propia app avisa de que
+// «un resultado en teslas suele indicar un error de escala».
+// Caso: guía educativa, FAQ tesla/gauss → esperado del orden de 5 mT (milésimas de tesla) ·
+//       obtenido «un imán de nevera, unas décimas de tesla».
+test('HALLAZGO · el imán de nevera ronda los militeslas, no «unas décimas de tesla»', async ({ page }) => {
+  test.fail(true, 'Hallazgo abierto (04/10/2026): la FAQ da al imán de nevera «unas décimas de tesla»');
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  const faq = page
+    .locator('[class*="faqItem"]')
+    .filter({ hasText: '¿Qué diferencia hay entre tesla y gauss?' });
+  await expect(faq).toBeVisible();
+  await expect(faq).toContainText('1 T = 10.000 G');
+  await expect(faq).not.toContainText(/décimas de tesla/);
+});
+
+// HALLAZGO (contenido, bajo) — ABIERTO desde el 04/10/2026. En el dibujo de la barra sobre
+// raíles, la resistencia (rect en y = 185-235, x = 72-108) flota entre los raíles (y = 120 e
+// y = 300, desde x = 90) sin ningún trazo que la una a ellos: el circuito dibujado está abierto,
+// y con el circuito abierto no circularía la corriente I = ε/R que da la tabla.
+// Caso: Inducción → Barra sobre raíles → esperado R unida a los dos raíles (circuito cerrado) ·
+//       obtenido huecos de 65 px (y = 120-185 y 235-300) sin nada dibujado.
+test('HALLAZGO · la resistencia del dibujo de la barra está unida a los dos raíles', async ({ page }) => {
+  test.fail(true, 'Hallazgo abierto (04/10/2026): la resistencia flota entre los raíles, circuito abierto');
+  await page.getByRole('button', { name: 'Inducción', exact: true }).click();
+  await page.getByRole('button', { name: 'Barra sobre raíles' }).click();
+  await esperarHidratacion(page, ['#campoBarra']);
+  const union = await page.locator('svg[aria-label^="Barra conductora"]').evaluate((svg) => {
+    const caja = (el: Element) => (el as SVGGraphicsElement).getBBox();
+    const resistencia = svg.querySelector('[class*="resistor"]');
+    const railes = Array.from(svg.querySelectorAll('[class*="rail"]')).map(caja);
+    if (!resistencia || railes.length < 2) return null;
+    const r = caja(resistencia);
+    const arriba = Math.min(...railes.map((c) => c.y));
+    const abajo = Math.max(...railes.map((c) => c.y + c.height));
+    // Cualquier trazo (salvo raíles, barra y flecha) que cubra en vertical el hueco entre un raíl
+    // y la resistencia, a la altura de la resistencia
+    const piezas = Array.from(svg.querySelectorAll('line, path, polyline, rect'))
+      .filter((el) => !/rail|barra|flecha/i.test(el.getAttribute('class') ?? ''))
+      .map(caja);
+    const cubre = (y0: number, y1: number) =>
+      y1 - y0 <= 1 ||
+      piezas.some(
+        (c) =>
+          c.x <= r.x + r.width && c.x + c.width >= r.x && c.y <= y0 + 1 && c.y + c.height >= y1 - 1,
+      );
+    return { superior: cubre(arriba, r.y), inferior: cubre(r.y + r.height, abajo) };
+  });
+  expect(union).not.toBeNull();
+  expect(union).toEqual({ superior: true, inferior: true });
+});
+
+// ── Lienzos en móvil ──────────────────────────────────────────────────────────────────
+
+test.describe('lienzos en móvil (390×844) — re-inspección 04/10/2026', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /** El rótulo más pequeño del lienzo visible, en px de pantalla (tamaño CSS × escala del SVG). */
+  async function rotuloMasPequeno(page: Page): Promise<{ minimo: number; texto: string }> {
+    return page.locator('svg[class*="canvasSvg"]').first().evaluate((svg) => {
+      let minimo = Infinity;
+      let texto = '';
+      for (const t of Array.from(svg.querySelectorAll('text'))) {
+        const ctm = (t as SVGGraphicsElement).getScreenCTM();
+        if (!ctm) continue;
+        const efectivo = parseFloat(getComputedStyle(t).fontSize) * Math.hypot(ctm.a, ctm.b);
+        if (efectivo < minimo) {
+          minimo = efectivo;
+          texto = (t.textContent ?? '').trim();
+        }
+      }
+      return { minimo: Math.round(minimo * 10) / 10, texto };
+    });
+  }
+
+  test('control: el lienzo no bloquea el desplazamiento táctil de la página', async ({ page }) => {
+    // Medido el 04/10/2026: arrastrar el dedo 120 px sobre el lienzo desplaza la página 105 px,
+    // lo mismo que sobre un título. Lo que lo garantiza es que nadie ponga touch-action: none.
+    const bloqueos = await page
+      .locator('svg[class*="canvasSvg"]')
+      .first()
+      .evaluate((svg) => {
+        const fuera: string[] = [];
+        for (let el: Element | null = svg; el; el = el.parentElement) {
+          const ta = getComputedStyle(el).touchAction;
+          if (ta !== 'auto' && ta !== 'manipulation') fuera.push(`${el.tagName}: ${ta}`);
+        }
+        return fuera;
+      });
+    expect(bloqueos).toEqual([]);
+  });
+
+  // HALLAZGO (accesibilidad, medio) — ABIERTO desde el 04/10/2026. A 390 px el SVG (viewBox de
+  // 760 de ancho) se pinta a 308 px, escala 0,405: los rótulos de 11,5-14 px quedan en 4,6-5,7 px.
+  // Lo que solo dice el dibujo deja de leerse: la leyenda de la gráfica (qué curva es Φ y cuál ε,
+  // que la nota «Fíjate en el desfase» da por sabido), la regla de la mano derecha, el rótulo
+  // v⊥/F de las flechas y la distancia al hilo.
+  // Caso: 390×844 → esperado rótulos ≥ 9 px · obtenido 5,2-5,3 px («v⊥», «F») en Lorentz, 4,6-4,7 px
+  //       («a 5,0 cm del hilo», regla de la mano derecha) en Corrientes, 4,6-4,7 px («Flujo Φ =
+  //       N·B·A·cos(ωt)», «fem ε = …») en el alternador y 4,6-4,7 px («R = 2,0 Ω») en la barra.
+  test('HALLAZGO · los rótulos de los cuatro lienzos se leen (≥ 9 px) a 390 px', async ({ page }) => {
+    test.fail(true, 'Hallazgo abierto (04/10/2026): a 390 px los rótulos del lienzo miden 4,6-5,7 px');
+    const pequenos: string[] = [];
+    const medir = async (vista: string): Promise<void> => {
+      const m = await rotuloMasPequeno(page);
+      expect(m.minimo, `${vista}: el lienzo no tiene rótulos`).toBeLessThan(Infinity);
+      if (m.minimo < 9) pequenos.push(`${vista}: «${m.texto}» a ${m.minimo} px`);
+    };
+    await medir('Lorentz');
+    await irACorrientes(page);
+    await medir('Corrientes');
+    await page.getByRole('button', { name: 'Inducción', exact: true }).click();
+    await esperarHidratacion(page, ['#espiras']);
+    await medir('Alternador');
+    await page.getByRole('button', { name: 'Barra sobre raíles' }).click();
+    await esperarHidratacion(page, ['#campoBarra']);
+    await medir('Barra');
+    expect(pequenos).toEqual([]);
+  });
+});
+
+// ── HERO — ni el logo ni la píldora de Stemum tapan el título ─────────────────────────
+
+/** Cuántos puntos del texto del <h1> (muestreo de 4 en 4 px) caen bajo la barra fija del logo. */
+async function tituloBajoLaBarra(page: Page): Promise<{ total: number; tapados: number }> {
+  await page.evaluate(
+    () => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
+  );
+  return page.locator('h1').evaluate((h1) => {
+    const barra = document.querySelector('[class*="headerBar"]');
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    let total = 0;
+    let tapados = 0;
+    for (const q of Array.from(rango.getClientRects())) {
+      for (let x = q.left + 2; x < q.right - 1; x += 4) {
+        for (let y = q.top + 4; y < q.bottom - 3; y += 4) {
+          total++;
+          const e = document.elementFromPoint(x, y);
+          if (e && barra?.contains(e)) tapados++;
+        }
+      }
+    }
+    return { total, tapados };
+  });
+}
+
+/**
+ * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
+ * admite meskeia.com) y, sin él, la página NO se hidrata: la píldora «Stemum › Física» no llega
+ * a montarse. El puente reenvía el socket a localhost:3050. Copiado de
+ * `visualizador-volumenes.spec.ts`. Bajo `next start` no hay HMR y no hace nada.
+ */
+async function puenteHmr(page: Page): Promise<void> {
+  const abiertos: WebSocket[] = [];
+  page.on('close', () => abiertos.forEach((s) => s.close()));
+  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
+    const u = new URL(ws.url());
+    const arriba = new WebSocket(`ws://localhost:3050${u.pathname}${u.search}`);
+    arriba.binaryType = 'arraybuffer';
+    abiertos.push(arriba);
+    const cola: (string | Buffer)[] = [];
+    arriba.onopen = () => {
+      for (const m of cola) arriba.send(m);
+      cola.length = 0;
+    };
+    ws.onMessage((m) => {
+      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
+      else cola.push(m);
+    });
+    arriba.onmessage = (e: MessageEvent) =>
+      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
+    ws.onClose(() => arriba.close());
+  });
+}
+
+/**
+ * 586a4d61 y a1d72a9c dejan 80 px de hueco arriba hasta 1023 px. Medido el 04/10/2026 en
+ * meskeia.com (localhost): 0 puntos del h1 tapados a 360, 390, 768, 769, 800, 1023, 1024 y
+ * 1280 px (a 1024 el título empieza en x = 221 y el logo acaba en x = 202).
+ */
+test.describe('hero en meskeia.com — re-inspección 04/10/2026', () => {
+  test('a 360, 390, 800, 1024 y 1280 px el logo no tapa el título', async ({ page }) => {
+    for (const ancho of [360, 390, 768, 769, 800, 1023, 1024, 1280]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      const m = await tituloBajoLaBarra(page);
+      expect(m.total).toBeGreaterThan(100);
+      expect(m.tapados, `${ancho} px: puntos del título bajo el logo`).toBe(0);
+    }
+  });
+});
+
+test.describe('hero bajo stemum.com — re-inspección 04/10/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await puenteHmr(page);
+    await page.goto('http://stemum.com/simulador-campo-magnetico/');
+    await esperarPaginaAsentada(page);
+    await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
+    await expect(page.locator('[class*="stemumPill"]')).toBeVisible();
+    await expect(page.locator('[class*="stemumPill"]')).toContainText('Física');
+  });
+
+  test('a 360, 390, 800, 1023 y desde 1042 px la píldora «Stemum › Física» no tapa el título', async ({
+    page,
+  }) => {
+    for (const ancho of [360, 390, 800, 1023, 1042, 1060, 1120, 1280]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      const m = await tituloBajoLaBarra(page);
+      expect(m.total).toBeGreaterThan(100);
+      expect(m.tapados, `${ancho} px: puntos del título bajo la píldora`).toBe(0);
+    }
+  });
+
+  // HALLAZGO (accesibilidad, bajo) — ABIERTO desde el 04/10/2026. La sospecha de las cinco apps
+  // de Física (píldora hasta x ≈ 232, h1 desde x ≥ 247) NO se cumple aquí: «Simulador de Campo
+  // Magnético» es más largo y, desde 1024 px (sin el hueco de 80 px de a1d72a9c), empieza en
+  // x = 221. La píldora «Stemum › Física» (x = 20-232, y = 15-77) tapa media «S» (x = 221-243,
+  // y = 39-90). Mismo defecto que 2651 (visualizador-volumenes) y 2589 (simulador-punnett).
+  // Caso: http://stemum.com/simulador-campo-magnetico/ a 1024×900 → esperado 0 puntos del h1
+  //       bajo la barra fija · obtenido 24 de 1595 a 1024 px, 17 a 1030, 8 a 1035, 7 a 1041 y
+  //       0 desde 1042. En meskeia.com, 0 (el logo acaba en x = 202).
+  test('HALLAZGO · de 1024 a 1041 px la píldora «Stemum › Física» pisa la «S» del título', async ({
+    page,
+  }) => {
+    test.fail(true, 'Hallazgo abierto (04/10/2026): bajo stemum.com la píldora tapa el inicio del h1 a 1024-1041 px');
+    const tapados: string[] = [];
+    for (const ancho of [1024, 1030, 1035, 1041]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      const m = await tituloBajoLaBarra(page);
+      expect(m.total).toBeGreaterThan(100);
+      if (m.tapados > 0) tapados.push(`${ancho} px: ${m.tapados}/${m.total}`);
+    }
+    expect(tapados).toEqual([]);
+  });
 });

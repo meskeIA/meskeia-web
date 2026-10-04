@@ -34,8 +34,24 @@
  * art. 67.1 RISD se reescribió porque pasaba en vacío si la cita cambiaba de forma, y el último
  * bloque añade los casos que los testigos no miraban (escalón del 85 %, discapacidad en CLM,
  * afinidad, inmueble, cargas ilegibles, grupos de radios).
+ *
+ * RE-INSPECCIÓN (04/10/2026): volvió a la cola por d96e492c (corrección del salto de coeficiente
+ * del art. 22.2 LISD en data/fiscal/sucesiones.ts, hecha para la hermana de sucesiones) y por
+ * b7ec248c (año del título desde META.vigencia). Los 18 hallazgos del 25/09 siguen reparados:
+ * sus testigos de abajo pasan. El último bloque añade los casos de hoy; los que documentan un
+ * hallazgo abierto van con `test.fail()`:
+ *   · la app pide el patrimonio preexistente por TRAMO y su motor (lib/calculadoras/donaciones.ts)
+ *     no aplica la corrección del salto del art. 22.2, que data/fiscal ya sirve como
+ *     `cuotaTributariaConCorreccionIS`;
+ *   · texto blanco sobre el degradado #2E86AB → #48A9A6 y texto en `--primary` fijado en el
+ *     módulo, en los dos temas (las formas de los hallazgos 2326 y 2327 de la hermana);
+ *   · «al menos 6 años (prescripción penal)»: arts. 131.1, 305 y 305 bis del Código Penal
+ *     (BOE-A-1995-25444, últimas versiones, leídas en sesión): 5 años o 10 si es agravado;
+ *   · datos normativos tecleados que data/fiscal ya exporta, y la nota de Andalucía.
  */
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { test, expect, type Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
 import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliares';
@@ -123,8 +139,8 @@ test.describe('Estimador ISD donaciones — casos resueltos a mano', () => {
    *   − 95 % (art. 17 bis.1.a Ley 8/2013: base liquidable < 120.000 €)
    *   = 312,931444                                                         → «312,93 €»
    *
-   * HALLAZGO alto (Inspector 25/09/2026) — la app resta 15.956,87 € «Por parentesco», la
-   * reducción mortis causa del art. 20.2.a LISD, y da 211,12 €.
+   * REPARADO 25/09/2026 (hallazgo 1862, alto) — la app restaba 15.956,87 € «Por parentesco», la
+   * reducción mortis causa del art. 20.2.a LISD, y daba 211,12 €.
    */
   test('60.000 € de padre a hijo en Castilla-La Mancha: 312,93 €', async ({ page }) => {
     await rellenar(page, { ccaa: 'castilla-mancha', grupo: 'II', valor: '60000' });
@@ -176,19 +192,19 @@ test.describe('Estimador ISD donaciones — casos resueltos a mano', () => {
 });
 
 // ════════════════════════════════════════════════════════════════════════════
-// Hallazgos de la inspección del 25/09/2026 — cada test afirma lo CORRECTO
+// Hallazgos de la inspección del 25/09/2026, REPARADOS ese día — cada test afirma lo CORRECTO
 // ════════════════════════════════════════════════════════════════════════════
 
 test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', () => {
   /**
-   * HALLAZGO alto (Inspector 25/09/2026) — aplica a las donaciones las reducciones del art.
+   * REPARADO 25/09/2026 (hallazgo 1862, alto) — aplicaba a las donaciones las reducciones del art.
    * 20.2.a LISD, que la ley reserva a las adquisiciones mortis causa (art. 20.5: en donaciones,
    * sin reducción autonómica, base liquidable = base imponible).
    *
    * Tío a sobrino (Grupo III), 100.000 € en CLM, con escritura:
    *   Cuota íntegra = 9.166,06 + (100.000 − 79.880,52) × 16,15 % = 12.415,35602
    *   × 1,5882 (Grupo III, patrimonio hasta 402.678,11 €) = 19.718,068 → «19.718,07 €»
-   * La app resta 7.993,46 € y da 17.667,79 €.
+   * La app restaba 7.993,46 € y daba 17.667,79 €.
    */
   test('las reducciones mortis causa no se aplican a una donación: sobrino, 19.718,07 €', async ({ page }) => {
     await rellenar(page, { ccaa: 'castilla-mancha', grupo: 'III', valor: '100000' });
@@ -198,7 +214,7 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO alto (Inspector 25/09/2026) — `data/fiscal/donaciones.ts` da a Castilla-La Mancha
+   * REPARADO 25/09/2026 (hallazgo 1863, alto) — `data/fiscal/donaciones.ts` daba a Castilla-La Mancha
    * un 95 % plano para los Grupos I y II, y el art. 17 bis de la Ley 8/2013 (vigente desde el
    * 01/06/2016) lo escalona por base liquidable: 95 % / 90 % / 85 %.
    * Hijo de 30 años, 200.000 € con escritura → base liquidable ≥ 120.000 y < 240.000 → 90 %.
@@ -211,10 +227,10 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO alto (Inspector 25/09/2026) — la donación de un inmueble tributa donde radica el
-   * inmueble (art. 32.2.b Ley 22/2009), y la app dice que la comunidad es «siempre» la de
+   * REPARADO 25/09/2026 (hallazgo 1864, alto) — la donación de un inmueble tributa donde radica el
+   * inmueble (art. 32.2.b Ley 22/2009), y la app decía que la comunidad es «siempre» la de
    * residencia del donatario: en el aviso siempre visible, en la etiqueta del campo y en el
-   * paso 2 de la guía. Quien done un piso situado en otra comunidad elige la equivocada.
+   * paso 2 de la guía. Quien donaba un piso situado en otra comunidad elegía la equivocada.
    */
   test('el aviso sobre la comunidad competente distingue los inmuebles', async ({ page }) => {
     await abrir(page);
@@ -224,8 +240,8 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO medio (Inspector 25/09/2026) — la acumulación de donaciones del art. 30.1 LISD es
-   * de TRES años; la app dice 4 en cinco sitios del bloque educativo (FAQ, buenas prácticas y
+   * REPARADO 25/09/2026 (hallazgo 1865, medio) — la acumulación de donaciones del art. 30.1 LISD es
+   * de TRES años; la app decía 4 en cinco sitios del bloque educativo (FAQ, buenas prácticas y
    * errores frecuentes). Los 4 años son los de la acumulación a la sucesión (art. 30.2).
    */
   test('la acumulación de donaciones es de tres años (art. 30.1 LISD), no de cuatro', async ({ page }) => {
@@ -236,7 +252,7 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO medio (Inspector 25/09/2026) — el recuadro de errores frecuentes da la escala de
+   * REPARADO 25/09/2026 (hallazgo 1866, medio) — el recuadro de errores frecuentes daba la escala de
    * recargos DEROGADA en 2021 («del 5 % hasta 3 meses al 20 %») y un interés de demora escrito a
    * mano, mientras la FAQ de la misma sección compone bien la del art. 27.2 LGT desde
    * `ESCALA_RECARGO_EXTEMPORANEO` (1 % más 1 % por mes completo; 15 % pasados 12 meses).
@@ -247,7 +263,7 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — la FAQ atribuye «1 mes natural» al art. 67.1 RISD,
+   * REPARADO 25/09/2026 (hallazgo 1867, bajo) — la FAQ atribuía «1 mes natural» al art. 67.1 RISD,
    * que dice «treinta días hábiles» (y así lo dice el faqJsonLd de la propia app).
    */
   test('lo que se atribuye al art. 67.1 RISD es el plazo de treinta días hábiles', async ({ page }) => {
@@ -266,9 +282,9 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO medio (Inspector 25/09/2026) — los ejemplos del bloque educativo dan cifras que la
-   * calculadora no reproduce. «Tío dona finca rústica de 80.000 € a sobrino (Grupo III)», sin
-   * bonificación: el texto dice «Cuota final ≈ 22.108 €» y la app, con esos datos en Castilla-La
+   * REPARADO 25/09/2026 (hallazgo 1868, medio) — los ejemplos del bloque educativo daban cifras que
+   * la calculadora no reproducía. «Tío dona finca rústica de 80.000 € a sobrino (Grupo III)», sin
+   * bonificación: el texto decía «Cuota final ≈ 22.108 €» y la app, con esos datos en Castilla-La
    * Mancha (sin bonificación para el Grupo III), 12.644,20 €. Tolerancia 1 €: el texto redondea
    * a euros.
    */
@@ -283,9 +299,9 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — Cataluña figura en el grupo «Régimen Foral» del
+   * REPARADO 25/09/2026 (hallazgo 1869, bajo) — Cataluña figuraba en el grupo «Régimen Foral» del
    * selector. Es de régimen común (Ley 22/2009; cesión por Ley 16/2010): forales solo son el
-   * País Vasco y Navarra. El grupo común dice «14 CCAA» y son 15.
+   * País Vasco y Navarra. El grupo común decía «14 CCAA» y son 15.
    */
   test('Cataluña no aparece como régimen foral', async ({ page }) => {
     await abrir(page);
@@ -297,8 +313,8 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — el paso 3 mete al cónyuge en el Grupo I (el art.
-   * 20.2.a LISD lo pone en el II) y el paso 4 da «1,0000–2,4000 para Grupo I», cuando el art.
+   * REPARADO 25/09/2026 (hallazgo 1870, bajo) — el paso 3 metía al cónyuge en el Grupo I (el art.
+   * 20.2.a LISD lo pone en el II) y el paso 4 daba «1,0000–2,4000 para Grupo I», cuando el art.
    * 22.2 topa el Grupo I en 1,2000 y el III en 1,9059.
    */
   test('la guía describe bien los grupos y los coeficientes', async ({ page }) => {
@@ -309,9 +325,9 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO medio (Inspector 25/09/2026) — el selector no tiene sitio para los parientes por
+   * REPARADO 25/09/2026 (hallazgo 1871, medio) — el selector no tenía sitio para los parientes por
    * afinidad (yerno, nuera, suegros, hijastros), que son Grupo III (art. 20.2.a LISD); la única
-   * opción que los acoge es «otro pariente o sin parentesco», que es el Grupo IV. Una nuera que
+   * opción que los acogía era «otro pariente o sin parentesco», que es el Grupo IV. Una nuera que
    * recibe 100.000 € en CLM: 19.718,07 € (Grupo III) frente a los 24.830,71 € del IV.
    */
   test('el selector de parentesco ofrece a los parientes por afinidad', async ({ page }) => {
@@ -321,9 +337,9 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — LA SOSPECHA DE LA FAMILIA FISCAL, CONFIRMADA: el hero
-   * imprime `FISCAL_DONACIONES_META.verificado` tal cual, «Datos verificados: 2025-01-01», y el
-   * <DataReference> de la misma página lo da como «01/01/2025».
+   * REPARADO 25/09/2026 (hallazgo 1872, bajo) — LA SOSPECHA DE LA FAMILIA FISCAL, CONFIRMADA: el
+   * hero imprimía `FISCAL_DONACIONES_META.verificado` tal cual, «Datos verificados: 2025-01-01», y el
+   * <DataReference> de la misma página lo daba como «01/01/2025».
    */
   test('la fecha de verificación del hero va en DD/MM/AAAA', async ({ page }) => {
     await abrir(page);
@@ -332,7 +348,7 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — dos cifras del desglose se pintan con `toFixed()`, con
+   * REPARADO 25/09/2026 (hallazgo 1873, bajo) — dos cifras del desglose se pintaban con `toFixed()`, con
    * punto decimal: «×1.0000» y «Bonificación 99.0% (Comunidad de Madrid)».
    */
   test('el desglose no usa punto decimal', async ({ page }) => {
@@ -343,7 +359,7 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — el % va pegado a la cifra (regla del 25/09/2026: con
+   * REPARADO 25/09/2026 (hallazgo 1874, bajo) — el % iba pegado a la cifra (regla del 25/09/2026: con
    * espacio duro). En el formulario y el resultado: «99,0%», «0,10%», «33%–64%», «≥65%»; además
    * en el aviso de Castilla-La Mancha, la tarifa de Cataluña, el bloque educativo y el faqJsonLd.
    */
@@ -353,10 +369,10 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO alto (Inspector 25/09/2026) — los cinco campos del formulario no tienen nombre
-   * accesible: los <label> son hermanos del control, sin htmlFor ni id. Los dos importes se
-   * anuncian como «edición, 0,00» (el placeholder) y los tres desplegables sin nombre. Los radios
-   * no llevan `name` ni fieldset: hay dos «No» sin la pregunta a la que responden.
+   * REPARADO 25/09/2026 (hallazgo 1875, alto) — los cinco campos del formulario no tenían nombre
+   * accesible: los <label> eran hermanos del control, sin htmlFor ni id. Los dos importes se
+   * anunciaban como «edición, 0,00» (el placeholder) y los tres desplegables sin nombre. Los radios
+   * no llevaban `name` ni fieldset: había dos «No» sin la pregunta a la que responden.
    * (La hermana de sucesiones tuvo la misma forma: hallazgo 741, alto.)
    */
   test('ningún control del formulario se queda sin nombre accesible', async ({ page }) => {
@@ -378,9 +394,9 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — emojis junto a texto sin aria-hidden: el h1 («🎁»),
+   * REPARADO 25/09/2026 (hallazgo 1876, bajo) — emojis junto a texto sin aria-hidden: el h1 («🎁»),
    * el título del aviso legal («⚠️»), los tres títulos del formulario, «📊 Tarifa», «📝», «📜»,
-   * «ℹ️» y los iconos de las tarjetas del bloque educativo. El lector los lee como parte del
+   * «ℹ️» y los iconos de las tarjetas del bloque educativo. El lector los leía como parte del
    * nombre: «regalo Estimador del Impuesto de Donaciones».
    */
   test('los emojis decorativos no entran en el nombre de los encabezados', async ({ page }) => {
@@ -390,10 +406,10 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO medio (Inspector 25/09/2026) — dos tokens LOCALES del módulo sin variante oscura:
-   * `--danger` (#C0392B) sobre el `--danger-bg` oscuro da 2,84:1 en el título del aviso legal
+   * REPARADO 25/09/2026 (hallazgo 1877, medio) — dos tokens LOCALES del módulo sin variante oscura:
+   * `--danger` (#C0392B) sobre el `--danger-bg` oscuro daba 2,84:1 en el título del aviso legal
    * imprescindible y en su frase de responsabilidad; `--bonif` (#1A7A3E) sobre la tarjeta
-   * oscura da 2,66:1 en las líneas de reducción y de bonificación. Umbral: 4,5:1.
+   * oscura daba 2,66:1 en las líneas de reducción y de bonificación. Umbral: 4,5:1.
    */
   test('en modo oscuro el aviso legal y las líneas de bonificación llegan a 4,5:1', async ({ page }) => {
     await abrir(page);
@@ -448,7 +464,7 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO bajo (Inspector 25/09/2026) — asimetría territorial valorativa (§1.quinquies, 6):
+   * REPARADO 25/09/2026 (hallazgo 1878, bajo) — asimetría territorial valorativa (§1.quinquies, 6):
    * «Régimen común más favorables», «una de las CCAA más favorables para donar inmuebles»,
    * «Las más favorables… Las menos favorables…». Las diferencias entre comunidades son hechos.
    */
@@ -458,10 +474,10 @@ test.describe('Estimador ISD donaciones — hallazgos (Inspector 25/09/2026)', (
   });
 
   /**
-   * HALLAZGO alto (Inspector 25/09/2026) — unas cargas NEGATIVAS no se rechazan: se restan con
-   * su signo y AUMENTAN la base. Primo, 100.000 € en CLM, cargas «-10000» → «Base liquidable
+   * REPARADO 25/09/2026 (hallazgo 1879, alto) — unas cargas NEGATIVAS no se rechazaban: se restaban
+   * con su signo y AUMENTABAN la base. Primo, 100.000 € en CLM, cargas «-10000» → «Base liquidable
    * 110.000,00 €» y 28.060,71 € de cuota, sin aviso. Y unas cargas ilegibles («1.2.3») se
-   * descartan en silencio: 24.830,71 €, como si no hubiera cargas. (Hermana: hallazgo 740.)
+   * descartaban en silencio: 24.830,71 €, como si no hubiera cargas. (Hermana: hallazgo 740.)
    */
   test('unas cargas negativas no aumentan la base: se rechazan', async ({ page }) => {
     await rellenar(page, { ccaa: 'castilla-mancha', grupo: 'IV', valor: '100000', cargas: '-10000' });
@@ -579,5 +595,286 @@ test.describe('Estimador ISD donaciones — reparación (25/09/2026)', () => {
     const texto = await textoCompleto(page);
     expect(texto).not.toMatch(/normativas autonómicas 2025 — Ley 29\/1987/);
     expect(texto).toContain('Datos verificados: 01/01/2025');
+  });
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// Re-inspección (Inspector 04/10/2026) — casos resueltos a mano antes de ejecutar la app
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Pone el patrimonio preexistente del donatario. Hoy la app lo pide por TRAMO (un <select> con
+ * los umbrales del art. 22.2 LISD); si la reparación lo pide en euros —como hace
+ * estimador-impuesto-sucesiones desde el 30/09/2026—, se escribe el importe. Así el testigo no
+ * depende de la forma del campo, sino de la cuota.
+ */
+async function ponerPatrimonio(page: Page, euros: string, tramo: '1' | '2' | '3' | '4') {
+  const enEuros = page.getByRole('textbox', { name: /Patrimonio preexistente/ });
+  if ((await enEuros.count()) > 0) {
+    await sembrarValor(page, enEuros, euros);
+    return;
+  }
+  await page.getByRole('combobox', { name: /Patrimonio preexistente/ }).selectOption(tramo);
+}
+
+/**
+ * Contraste de cada selector contra su fondo REAL: sube por los ancestros hasta el primer
+ * degradado (se mide contra CADA parada y se queda con la peor) o el primer color opaco, y
+ * compone por el camino las capas translúcidas (el rótulo de la bonificación lleva un velo
+ * blanco del 15 %) y las opacidades de los rótulos. Umbral 3:1 si el texto es grande (24 px, o
+ * 18,66 px en negrita de 700), 4,5:1 si no.
+ */
+async function contrastesSobreFondo(
+  page: Page,
+  selectores: string[],
+): Promise<Array<{ sel: string; texto: string; ratio: number; umbral: number }>> {
+  return page.evaluate((sels) => {
+    const rgba = (t: string) => {
+      const p = (t.match(/rgba?\(([^)]+)\)/)?.[1] ?? '0,0,0,0').split(/[ ,/]+/).filter(Boolean).map(Number);
+      return { c: p.slice(0, 3), a: p.length > 3 ? p[3] : 1 };
+    };
+    const lum = (c: number[]) => {
+      const t = (v: number) => {
+        const x = v / 255;
+        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * t(c[0]) + 0.7152 * t(c[1]) + 0.0722 * t(c[2]);
+    };
+    const mezcla = (f: number[], b: number[], a: number) => f.map((v, i) => v * a + b[i] * (1 - a));
+    return sels.map((sel) => {
+      const el = document.querySelector(sel) as HTMLElement | null;
+      if (!el) return { sel, texto: '(no existe)', ratio: 0, umbral: 4.5 };
+      const cadena: HTMLElement[] = [];
+      let paradas: number[][] = [];
+      for (let n: HTMLElement | null = el; n; n = n.parentElement) {
+        const cs = getComputedStyle(n);
+        const degradado = [...cs.backgroundImage.matchAll(/rgba?\([^)]+\)/g)].map((m) => rgba(m[0]).c);
+        if (degradado.length > 0) { paradas = degradado; break; }
+        const liso = rgba(cs.backgroundColor);
+        if (liso.a >= 1) { paradas = [liso.c]; break; }
+        cadena.push(n);
+      }
+      if (paradas.length === 0) paradas = [[255, 255, 255]];
+      // Opacidad acumulada desde el nodo i hasta el dueño del fondo (exclusive)
+      const opacidadDesde = (i: number) => cadena.slice(i).reduce((o, n) => o * Number(getComputedStyle(n).opacity), 1);
+      const capas = cadena
+        .map((n, i) => ({ ...rgba(getComputedStyle(n).backgroundColor), i }))
+        .filter((c) => c.a > 0)
+        .reverse(); // de la más baja a la más alta
+      const cs = getComputedStyle(el);
+      const color = rgba(cs.color);
+      const alfaTexto = color.a * opacidadDesde(0);
+      const px = parseFloat(cs.fontSize);
+      const grande = px >= 24 || (px >= 18.66 && Number(cs.fontWeight) >= 700);
+      const peor = Math.min(
+        ...paradas.map((p) => {
+          let fondo = p;
+          for (const capa of capas) fondo = mezcla(capa.c, fondo, capa.a * opacidadDesde(capa.i));
+          const texto = mezcla(color.c, fondo, alfaTexto);
+          const [a, b] = [lum(texto), lum(fondo)];
+          return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+        }),
+      );
+      return {
+        sel,
+        texto: (el.textContent ?? '').trim().slice(0, 30),
+        ratio: Math.round(peor * 100) / 100,
+        umbral: grande ? 3 : 4.5,
+      };
+    });
+  }, selectores);
+}
+
+test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => {
+  /**
+   * CASO NORMAL. Un padre dona 150.000 € a su hijo de 30 años (Grupo II) que vive en la
+   * Comunitat Valenciana; el hijo asume 30.000 € de cargas. Datos: data/fiscal/donaciones.ts.
+   *   Base imponible = base liquidable = 150.000 − 30.000 = 120.000,00 (arts. 9.1.b y 20.5 LISD)
+   *   Cuota íntegra  = 15.606,22 + (120.000 − 119.757,67) × 18,70 % = 15.651,53571 (TARIFA_ESTATAL_ID)
+   *   × 1,0000 (COEFICIENTES_ID['II'][0], patrimonio hasta 402.678,11 €)
+   *   − 75 % (BONIFICACIONES_CCAA_ID.valencia) = 3.912,883928                  → «3912,88 €»
+   *   Tipo efectivo sobre el valor bruto: 3.912,883928 / 150.000 = 2,6086 %    → «2,61 %»
+   */
+  test('Comunitat Valenciana, hijo, 150.000 € con 30.000 € de cargas: 3912,88 €', async ({ page }) => {
+    await rellenar(page, { ccaa: 'valencia', grupo: 'II', valor: '150000', cargas: '30000' });
+    expect(await cuota(page)).toBe('3912,88 €');
+    const texto = await panel(page);
+    expect(texto).toContain('120.000,00');
+    expect(texto).toMatch(/Tipo efectivo sobre donación: 2,61\s%/);
+  });
+
+  /**
+   * PARSEO ESPAÑOL. «1.500» es mil quinientos (parseSpanishNumber), no uno coma cinco.
+   *   1.500 × 7,65 % = 114,75 × 1,0000; − 99 % (Madrid, Grupo II) = 1,1475   → «1,15 €»
+   *   (Con 1,5 € la cuota sería 0,00 €: 1,5 × 7,65 % × 1 % = 0,0011.)
+   */
+  test('«1.500» se lee como mil quinientos: 1,15 € en Madrid', async ({ page }) => {
+    await rellenar(page, { ccaa: 'madrid', grupo: 'II', valor: '1.500' });
+    expect(await cuota(page)).toBe('1,15 €');
+  });
+
+  /** CASO QUE DEBE RECHAZARSE: un valor ilegible no se convierte en un número ni da cifra. */
+  test('un valor ilegible («12abc») se rechaza con aviso y sin cifra', async ({ page }) => {
+    await rellenar(page, { ccaa: 'madrid', grupo: 'II', valor: '12abc' });
+    await expect(page.locator('[class*="resultsPanel"] [role="alert"]')).toContainText('no es un número válido');
+    await expect(page.getByText(/^Impuesto estimado en/)).toHaveCount(0);
+  });
+
+  /**
+   * HALLAZGO 04/10/2026 (a) — ABIERTO (cálculo, medio). La corrección del salto de coeficiente del
+   * art. 22.2 LISD (último párrafo) no se aplica: la cuota con el coeficiente del tramo no puede
+   * superar la del coeficiente inferior más lo que el patrimonio pasa del límite de ese tramo.
+   * data/fiscal la sirve desde d96e492c (`cuotaTributariaConCorreccionIS`, con
+   * `LIMITES_PATRIMONIO_PREEXISTENTE_IS`), pero lib/calculadoras/donaciones.ts —el motor de la
+   * app, del MCP de Delegum y del GPT— multiplica por el coeficiente entero del tramo, y la app
+   * solo deja elegir el tramo.
+   *
+   * Sobrino (Grupo III), 100.000 € en Castilla-La Mancha, patrimonio preexistente 402.700 €:
+   *   Cuota íntegra            = 9.166,06 + (100.000 − 79.880,52) × 16,15 % = 12.415,35602
+   *   Con el coeficiente entero = 12.415,35602 × 1,6676 = 20.703,85
+   *   Tope del art. 22.2       = 12.415,35602 × 1,5882 (19.718,07) + (402.700 − 402.678,11 = 21,89)
+   *                            = 19.739,96 < 20.703,85                    → «19.739,96 €»
+   *   Castilla-La Mancha no bonifica al Grupo III. La app da 20.703,85 € (963,89 € de más).
+   */
+  test('HALLAZGO 04/10 (a): sobrino con 402.700 € de patrimonio previo paga 19.739,96 €, no el coeficiente entero', async ({ page }) => {
+    test.fail(true, 'ABIERTO: lib/calculadoras/donaciones.ts aplica ×1,6676 entero (20.703,85 €) sin la corrección del art. 22.2 LISD');
+    await rellenar(page, { ccaa: 'castilla-mancha', grupo: 'III', valor: '100000' });
+    await ponerPatrimonio(page, '402700', '2');
+    await expect(page.getByText(/^Impuesto estimado en Castilla-La Mancha/)).toBeVisible();
+    expect(await cuota(page)).toBe('19.739,96 €');
+  });
+
+  /**
+   * HALLAZGO 04/10/2026 (a), con bonificación y en el último umbral. Hijo (Grupo II), 1.000.000 €
+   * en la Comunitat Valenciana, patrimonio preexistente 4.021.000 €:
+   *   Cuota íntegra            = 199.291,40 + (1.000.000 − 797.555,08) × 34 % = 268.122,6728
+   *   Con el coeficiente entero = × 1,2000 = 321.747,21
+   *   Tope del art. 22.2       = × 1,1000 (294.934,94) + (4.021.000 − 4.020.770,98 = 229,02) = 295.163,96
+   *   − 75 % (Valencia)        = 295.163,96 × 0,25 = 73.790,99                → «73.790,99 €»
+   *   La app da 80.436,80 € (321.747,21 × 0,25): 6.645,81 € de más.
+   */
+  test('HALLAZGO 04/10 (a): hijo con 4.021.000 € de patrimonio previo en Valencia paga 73.790,99 €', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el motor aplica ×1,2000 entero (80.436,80 €) sin la corrección del art. 22.2 LISD');
+    await rellenar(page, { ccaa: 'valencia', grupo: 'II', valor: '1000000' });
+    await ponerPatrimonio(page, '4021000', '4');
+    await expect(page.getByText(/^Impuesto estimado en Comunitat Valenciana/)).toBeVisible();
+    expect(await cuota(page)).toBe('73.790,99 €');
+  });
+
+  /**
+   * HALLAZGO 04/10/2026 (b) — ABIERTO (accesibilidad, medio). Forma del 2327 de la hermana: el
+   * módulo fija `--primary: #2E86AB` y `--secondary: #48A9A6` en `.container`, sin variante
+   * oscura, y pinta texto BLANCO sobre `linear-gradient(135deg, primary, secondary)` en el bloque
+   * del impuesto estimado y en los números de la guía paso a paso. Contra la parada teal, igual
+   * en los dos temas: cifra (35 px / 700, umbral 3:1) 2,80:1; «Impuesto estimado en…» (opacidad
+   * 0,9) 2,55:1; «Bonificación autonómica» (opacidad 0,85 sobre velo del 15 %) 2,15:1; «Tipo
+   * efectivo» (opacidad 0,8) 2,32:1; número de paso (13,6 px / 700) 2,80:1.
+   */
+  test('HALLAZGO 04/10 (b): el texto blanco del bloque del impuesto y de los pasos llega a su umbral', async ({ page }) => {
+    test.fail(true, 'ABIERTO: blanco sobre el degradado #2E86AB → #48A9A6 (2,15–2,80:1)');
+    await rellenar(page, { ccaa: 'valencia', grupo: 'II', valor: '150000' });
+    await expect(page.getByText(/^Bonificación autonómica/)).toBeVisible();
+    await prepararParaMedir(page);
+    const sels = [
+      '[class*="resultadoLabel"]',
+      '[class*="resultadoValor"]',
+      '[class*="resultadoNota"]',
+      '[class*="resultadoTipoEfectivo"]',
+      '[class*="stepNumber"]',
+    ];
+    const claro = await contrastesSobreFondo(page, sels);
+    await activarTema(page, 'dark');
+    const oscuro = await contrastesSobreFondo(page, sels);
+    const fallos = [...claro.map((m) => ({ ...m, tema: 'claro' })), ...oscuro.map((m) => ({ ...m, tema: 'oscuro' }))]
+      .filter((m) => m.ratio < m.umbral)
+      .map((m) => `${m.tema} «${m.texto}»: ${m.ratio}:1 (umbral ${m.umbral})`);
+    expect(fallos).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO 04/10/2026 (c) — ABIERTO (accesibilidad, medio). Forma del 2326 de la hermana: texto
+   * en el `--primary` fijado por el módulo (#2E86AB, no llega el #3FA5D1 oscuro de globals.css).
+   * «CUOTA A INGRESAR (estimada)» y su importe (16 px / 600) y los títulos de sección del
+   * formulario (16 px / 600): 4,11:1 en claro sobre #FFFFFF y 3,50:1 en oscuro sobre #2A2A2A;
+   * los h3 de la guía (16,8 px / 600): 3,77:1 sobre #F5F5F5 y 3,21:1 sobre #303030. Umbral 4,5:1.
+   */
+  test('HALLAZGO 04/10 (c): el texto en color de marca llega a 4,5:1 en los dos temas', async ({ page }) => {
+    test.fail(true, 'ABIERTO: --primary fijado en .container (4,11:1 en claro, 3,50:1 en oscuro)');
+    await rellenar(page, { ccaa: 'valencia', grupo: 'II', valor: '150000' });
+    await expect(page.getByText(/^Impuesto estimado en/)).toBeVisible();
+    await prepararParaMedir(page);
+    const sels = ['[class*="lineaFinal"] span', '[class*="seccionTitulo"]', '[class*="guideSection"] > h3'];
+    const claro = await contrastesSobreFondo(page, sels);
+    await activarTema(page, 'dark');
+    const oscuro = await contrastesSobreFondo(page, sels);
+    const fallos = [...claro.map((m) => ({ ...m, tema: 'claro' })), ...oscuro.map((m) => ({ ...m, tema: 'oscuro' }))]
+      .filter((m) => m.ratio < m.umbral)
+      .map((m) => `${m.tema} «${m.texto}»: ${m.ratio}:1 (umbral ${m.umbral})`);
+    expect(fallos).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO 04/10/2026 (d) — ABIERTO (contenido, bajo). La tarjeta del justificante bancario dice
+   * «Consérvala durante al menos 6 años (prescripción penal, si aplicase)». Código Penal
+   * (BOE-A-1995-25444, últimas versiones leídas en sesión el 04/10/2026): el delito contra la
+   * Hacienda Pública del art. 305.1 se castiga con prisión de uno a cinco años, y el art. 131.1
+   * lo hace prescribir «a los cinco» («los demás delitos»); el agravado del art. 305 bis (dos a
+   * seis años) prescribe «a los diez» («más de cinco años y que no exceda de diez»). Seis no es
+   * ninguno de los dos. Si la reparación quita la mención, el bucle no mide nada y el caso pasa.
+   */
+  test('HALLAZGO 04/10 (d): la prescripción penal que se cita es la del Código Penal', async ({ page }) => {
+    test.fail(true, 'ABIERTO: «al menos 6 años (prescripción penal, si aplicase)»');
+    await abrir(page);
+    const texto = await textoCompleto(page);
+    expect(texto).toContain('Conservar el justificante bancario');
+    for (const c of texto.matchAll(/prescripción penal/g)) {
+      const i = c.index ?? 0;
+      const entorno = texto.slice(Math.max(0, i - 80), i + 80);
+      expect(entorno).not.toMatch(/\b6 años|seis años/);
+      expect(entorno).toMatch(/\b(5|cinco|10|diez) años/);
+    }
+  });
+
+  /**
+   * HALLAZGO 04/10/2026 (e) — ABIERTO (dato, bajo). Datos normativos tecleados en page.tsx que
+   * data/fiscal ya exporta: los umbrales del art. 22.2 (LIMITES_PATRIMONIO_PREEXISTENTE_IS) en las
+   * cuatro opciones del <select> y en el ejemplo del sobrino; los rangos de coeficientes del paso
+   * 4 y el «1,5882 o más» (COEFICIENTES_ID); «6 meses … prorrogable 6 meses más» (PLAZO_ISD, sin
+   * decir que la prórroga devenga intereses); «30 días hábiles» del ITP (PLAZO_ITP) y del IIVTNU
+   * (PLAZO_IIVTNU); «16 tramos, del 7,65 % al 34 %» (TARIFA_ESTATAL_ID). Hoy coinciden todos:
+   * el hallazgo es la fuente, no la cifra (formas de los 611, 658 y 2484). Se quitan los
+   * comentarios antes de buscar.
+   */
+  test('HALLAZGO 04/10 (e): page.tsx no teclea datos normativos que data/fiscal exporta', () => {
+    test.fail(true, 'ABIERTO: umbrales, coeficientes, plazos y tarifa escritos a mano en page.tsx');
+    const jsx = readFileSync(join(process.cwd(), 'app/estimador-impuesto-donaciones/page.tsx'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+    const tecleados = [
+      '402.678,11', '2.007.380,43', '4.020.770,98', // LIMITES_PATRIMONIO_PREEXISTENTE_IS
+      '1,5882', '1,9059', '2,4000', '1,2000',        // COEFICIENTES_ID
+      '6 meses',                                     // PLAZO_ISD
+      '30 días hábiles',                             // PLAZO_ITP y PLAZO_IIVTNU
+      '7,65&nbsp;% al 34',                           // TARIFA_ESTATAL_ID
+    ].filter((t) => jsx.includes(t));
+    expect(tecleados).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO 04/10/2026 (f) — ABIERTO (contenido, bajo). La nota de Andalucía que se ve en el
+   * recuadro ℹ️ (BONIFICACIONES_CCAA_ID.andalucia.notas) dice «Exención total si base liquidable
+   * < 1.000.000€»: el euro va pegado, y su frontera es estricta mientras el desglose de la misma
+   * pantalla aplica «≤ 1.000.000 €». Con 1.000.000 € justos la nota dice que no hay exención y el
+   * cálculo da 0,00 €; con 1.000.000,01 €, 2681,23 €. (Si la regla de Andalucía sigue vigente es
+   * trabajo de /triaje-fiscal: este testigo solo pide que la pantalla no se contradiga.)
+   */
+  test('HALLAZGO 04/10 (f): la nota de Andalucía va en formato español y su frontera cuadra con el desglose', async ({ page }) => {
+    test.fail(true, 'ABIERTO: «< 1.000.000€» en la nota frente a «≤ 1.000.000 €» en el desglose');
+    await rellenar(page, { ccaa: 'andalucia', grupo: 'II', valor: '1000000' });
+    const nota = (await page.locator('[class*="infoCcaa"]').innerText()).replace(/ /g, ' ');
+    const desglose = (await panel(page)).replace(/ /g, ' ');
+    expect(desglose).toContain('CUOTA A INGRESAR');
+    expect(nota, 'el importe lleva espacio antes del €').not.toMatch(/\d€/);
+    expect(/<\s*1\.000\.000/.test(nota) && /≤\s*1\.000\.000/.test(desglose)).toBe(false);
   });
 });

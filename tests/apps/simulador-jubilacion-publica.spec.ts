@@ -1,9 +1,16 @@
 import { test, expect, Page } from '@playwright/test';
-import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 
 /**
  * Inspector — simulador-jubilacion-publica (segmento FISCAL, RIESGO 1 CRÍTICO)
  * Inspeccionada el 21/09/2026. REPARADA el 21/09/2026 (hallazgos 1089-1100).
+ * RE-INSPECCIONADA el 04/10/2026 tras 30cd3e24 (escala del porcentaje por año de
+ * jubilación, DT 9.ª LGSS) y b7ec248c (año del título desde META.vigencia): casos 8 a 19.
+ * Los casos 1-7 siguen en verde: los hallazgos 1089-1100 siguen REPARADOS.
+ *
+ * La fecha se FIJA (04/10/2026) en el beforeEach: la jubilación parcial calcula la edad de
+ * hoy con `new Date().getFullYear()` (caso 6), y sin fijarla el test caducaría en enero de
+ * 2027, cuando la fila de TABLA_EDAD_JUBILACION y la edad del nacido en 1964 cambian.
  *
  * Qué promete la app
  * ──────────────────
@@ -48,7 +55,7 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  * ───────────────────────────────────────────────────
  *   CASO 1 (normal) — nacido en 1965 · 40 años cotizados · base media 2.500 €/mes
  *       edad       480 meses ≥ 462 → 65 años, en 1965 + 65 = 2030
- *       %          480 meses pasa del mes 438 → 100,00 %
+ *       %          jubilación en 2030 → escala de 2027: 480 meses pasa del mes 444 → 100,00 %
  *       BR         2.500 × 300/350 = 2.142,857… → «2142,86 €»
  *       pensión    se jubila en 2030, y el escalón del sistema dual de ese año
  *                  (310/361,67 = 0,857134) es PEOR que el 300/350 clásico: gana la
@@ -101,6 +108,43 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *   CASO 7 (rechazos) — los dos noes que la app tiene que decir
  *       7a  1965 · 12 años · 2.000 € → por debajo de COTIZACION_MINIMA.anosMinimosAcceso.
  *       7b  1965 · 34 años · 2.500 € + anticipada voluntaria → por debajo de los 35 años.
+ *
+ * ── RE-INSPECCIÓN 04/10/2026 · resueltos a mano con ESCALAS_PORCENTAJE_PENSION ───────
+ *   Escala 2023-2026: 50 % a los 180 meses · +0,21 × (meses 181-229) · +0,19 × (230-438).
+ *   Escala 2027+:     50 % a los 180 meses · +0,19 × (meses 181-428) · +0,18 × (429-444).
+ *   Entre los meses 230 y 428 la de 2026 va SIEMPRE 0,98 puntos por encima
+ *   (10,29 − 49 × 0,19 = 0,98): es el tamaño del defecto que vigilan los casos 8-11.
+ *
+ *   CASO 8 (normal, 2027+) — 1970 · 30 años (360 m) · 2.000 € → 67 años en 2037
+ *       %   50 + 180 × 0,19 = 84,20 (con la de 2026, 85,18) · BR 2.000 × 300/350 = 1.714,29
+ *       pensión 1.714,2857 × 84,20 % = 1.443,43 · anual × 14 = 20.208,00
+ *       (dual 2037 = 324/378 = 300/350 exacto: las dos fórmulas coinciden)
+ *       faltan 444 − 360 = 84 meses = «7 años más de cotización (37 años en total)»
+ *     y el de la sospecha S0163: 1975 · 25 años (300 m) · 1.800 € → 72,80 % (73,78 en 2026)
+ *       → 1.542,857 × 72,80 % = 1.123,20 €/mes · faltan 144 meses = 12 años.
+ *
+ *   CASO 9 (frontera 2026/2027, mismos meses) — la app solo llega a un año de jubilación
+ *     anterior a 2027 con menos de 438 meses si se nace en 1959 o antes; el nacido en 1960
+ *     se jubila (en la aproximación por años de la app) en 2027 a los 67.
+ *       25 años:     1959 → 73,78 % · 1960 → 72,80 %
+ *       36,5 años:   1959 → 100,00 % · 1960 → 97,12 + 10 × 0,18 = 98,92 % (faltan 6 meses)
+ *       37 años:     1980 → 444 meses → 100,00 % justo, sin fila «Para llegar al 100 %»
+ *       36,92 años:  1980 → 443 meses → 97,12 + 15 × 0,18 = 99,82 % (falta 1 mes)
+ *
+ *   CASO 10 (el tope depende de la escala) — 1980 · 26,5 años (318 m) · 5.101,20 €
+ *       BR 5.101,20 × 300/350 = 4.372,4571 · % 2027: 50 + 138 × 0,19 = 76,22
+ *       pensión 3.332,69 €/mes, SIN tope. Con la de 2026 (77,20 %) saldrían 3.375,54 y la
+ *       app recortaría a LIMITES_PENSION_2025.maximaMensual = 3.359,60 con su aviso.
+ *
+ *   CASO 11 (mínimo de acceso justo) — 1985 · 15 años (180 m) · 1.500 €
+ *       50,00 % · BR 1.285,71 · pensión 642,86 < 888,70 → aviso de mínimos · faltan 264 m = 22 años.
+ *
+ *   CASO 12 (móvil 390 px, pulsación a pulsación) — «-» en años → «Introduce los años
+ *       cotizados (entre 1 y 50).» · base «1.234,56» + 30 años (1970) → 1.058,1943 × 84,20 %
+ *       = 891,00 €/mes, que queda 2,30 € POR ENCIMA de 888,70: sin aviso de mínimos.
+ *
+ *   CASOS 13-18 documentan hallazgos ABIERTOS el 04/10/2026 (test.fail con su motivo).
+ *   CASO 19 comprueba que título, JSON-LD y DataReference dicen el mismo año.
  */
 
 const RUTA = '/simulador-jubilacion-publica/';
@@ -156,9 +200,17 @@ async function calcularAnticipada(page: Page, meses: number): Promise<void> {
   await page.locator(SEL.btnAnticipada).click();
 }
 
+/**
+ * El porcentaje se pinta con `formatNumber` + «%» pegado (hallazgo abierto, caso 17). Las
+ * aserciones de cifra admiten el espacio duro para no romperse el día que se repare.
+ */
+const pct = (cifra: string) => new RegExp(`^${cifra.replace(/[-,]/g, (c) => `\\${c}`)}\\s?%$`);
+
 test.beforeEach(async ({ page }) => {
   // El primer acceso a una ruta en `next dev` la compila: holgura sobre los 30 s del config.
   test.setTimeout(120_000);
+  // Fecha fija: la parcial (caso 6) lee el año de hoy con Date. Ver la cabecera.
+  await page.clock.setFixedTime(new Date('2026-10-04T10:00:00+02:00'));
   await page.goto(RUTA, { waitUntil: 'load' });
   // Un clic anterior a la hidratación también se pierde: los dos inputs de testigo.
   await esperarHidratacion(page, [SEL.anos, SEL.base]);
@@ -173,8 +225,8 @@ test('CASO 1 · carrera completa: 65 años, base reguladora 300/350 y anticipada
   await expect(edad).toContainText('Te jubilarías en 2030');
   await expect(edad).toContainText('38 años y 6 meses');
 
-  // ── Porcentaje: 480 meses pasa del mes 438 de TRAMOS_PORCENTAJE_PENSION_2025 ──
-  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText('100,00%');
+  // ── Porcentaje: jubilación en 2030, escala de 2027; 480 meses pasa del mes 444 ──
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('100,00'));
 
   // ── Base reguladora clásica, a 1 céntimo: 2.500 × 300/350 = 2.142,857… ──
   await expect(valorDe(page, 'Base reguladora (25 años / 350)')).toContainText('2142,86');
@@ -194,7 +246,7 @@ test('CASO 1 · carrera completa: 65 años, base reguladora 300/350 y anticipada
   // 40 años cotizados → tramo «< 41,5» de COEFICIENTES_ANTICIPADA_VOLUNTARIA_2025 = 1,87 %.
   await calcularAnticipada(page, 24);
   await expect(valorDe(page, 'Anticipación')).toHaveText('24 meses (8 trim.)');
-  await expect(valorDe(page, 'Reducción total')).toHaveText('-14,96%');
+  await expect(valorDe(page, 'Reducción total')).toHaveText(pct('-14,96'));
   expect(await importeDe(page, 'Pensión con reducción')).toBeCloseTo(1822.29, 2);
   // Precisión 1: vigila que la pérdida salga del importe reducido y no de otra cosa; un
   // error de tramo la movería decenas de euros, no céntimos.
@@ -204,7 +256,7 @@ test('CASO 1 · carrera completa: 65 años, base reguladora 300/350 y anticipada
   // Si la app cruzara las dos tablas de coeficientes, estos dos valores saldrían al revés.
   await page.selectOption('#tipoAnticipada', 'involuntaria');
   await page.locator(SEL.btnAnticipada).click();
-  await expect(valorDe(page, 'Reducción total')).toHaveText('-14,00%');
+  await expect(valorDe(page, 'Reducción total')).toHaveText(pct('-14,00'));
   expect(await importeDe(page, 'Pensión con reducción')).toBeCloseTo(1842.86, 2);
 });
 
@@ -217,7 +269,7 @@ test('CASO 2 · límite: sin cotización suficiente son 67 años, y la pensión 
   await expect(edad).toContainText('Te jubilarías en 2029');
   await expect(edad).toContainText('no alcanzas el umbral de 38 años y 6 meses');
 
-  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText('100,00%');
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('100,00'));
   await expect(valorDe(page, 'Base reguladora (25 años / 350)')).toContainText('4285,71');
 
   // ── …y la pensión se corta en LIMITES_PENSION_2025.maximaMensual = 3.359,60 € ──
@@ -238,7 +290,7 @@ test('CASO 3 · escala del porcentaje: 28 años son el 79,64 % jubilándose en 2
   //    adicional entre el 1 y el 248. 336 meses = 156 adicionales → 50 + 156 × 0,19 = 79,64 %.
   //    Con la escala de 2026, que el simulador aplicaba a cualquier año, salía 80,62 %
   //    (hallazgo 1093: 50 + 49 × 0,21 + 107 × 0,19); con la escala vieja, 81,56 %.
-  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText('79,64%');
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('79,64'));
   await expect(valorDe(page, 'Base reguladora (25 años / 350)')).toContainText('1028,57');
 
   // ── Hallazgo 1089 · la pensión NO se eleva a minimaSinConyuge (888,70 €) ──
@@ -268,12 +320,12 @@ test('CASO 4 · el suelo ya no se deshace: la anticipada parte de la pensión re
 
   // 420 meses, jubilación en 2032 (escala de 2027, S0163) → 50 + 240 × 0,19 = 95,60 %
   // (con la de 2026 eran 96,58 %). Dual 2032: 1.000 × 314 / 366,33 × 95,60 % = 819,44.
-  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText('95,60%');
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('95,60'));
   expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(819.44, 2);
 
   // ── Hallazgo 1094 · 35 años → tramo «< 38,5» = 2,00 %/trim × 8 = 16,00 % ──
   await calcularAnticipada(page, 24);
-  await expect(valorDe(page, 'Reducción total')).toHaveText('-16,00%');
+  await expect(valorDe(page, 'Reducción total')).toHaveText(pct('-16,00'));
   // 819,44 × 0,84 = 688,33. Con el suelo viejo la ordinaria valía 888,70 y esta salía
   // 746,51: una pensión anticipada por debajo del mínimo recién «garantizado».
   expect(await importeDe(page, 'Pensión con reducción')).toBeCloseTo(688.33, 2);
@@ -339,4 +391,227 @@ test('CASO 7 · rechazos: sin los 15 años de acceso no hay pensión, y sin los 
   // Ni reducción ni pensión reducida: a quien no cumple no se le enseña una cifra.
   await expect(page.getByText('Reducción total', { exact: true })).toHaveCount(0);
   await expect(page.getByText('Pensión con reducción', { exact: true })).toHaveCount(0);
+});
+
+// ════════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 04/10/2026 — la escala del porcentaje por AÑO de jubilación (30cd3e24)
+// ════════════════════════════════════════════════════════════════════════════════
+
+/** La fila «Para llegar al 100 %». */
+const filaCien = (page: Page) => valorDe(page, 'Para llegar al 100 %');
+
+test('CASO 8 · escala de 2027 en el caso normal: 30 años son el 84,20 % y 25 años el 72,80 %', async ({ page }) => {
+  // 1970 · 30 años (360 meses) · 2.000 € → 67 años en 2037 → escala de 2027
+  await simular(page, 1970, 30, 2000);
+  await expect(page.getByRole('status').first()).toContainText('Te jubilarías en 2037');
+  // 50 + 180 × 0,19. Con la escala de 2026 saldría 85,18 (+0,98).
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('84,20'));
+  await expect(valorDe(page, 'Base reguladora (25 años / 350)')).toContainText('1714,29');
+  // 1.714,2857 × 84,20 % = 1.443,43. Con la de 2026, 1.460,23: el defecto mueve ~17 €,
+  // así que precisión 2 (medio céntimo) es holgada para lo que vigila.
+  expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(1443.43, 2);
+  expect(await importeDe(page, 'Pensión anual (14 pagas)')).toBeCloseTo(20208.00, 2);
+  // 444 − 360 = 84 meses. Con la de 2026 serían 78 sobre «36 años y 6 meses en total».
+  await expect(filaCien(page)).toHaveText('7 años más de cotización (37 años en total)');
+
+  // El caso de la sospecha S0163: 25 años (300 meses) → 72,80 % desde 2027 (73,78 % en 2026).
+  await simular(page, 1975, 25, 1800);
+  await expect(page.getByRole('status').first()).toContainText('Te jubilarías en 2042');
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('72,80'));
+  // 1.800 × 300/350 = 1.542,857 × 72,80 % = 1.123,20
+  expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(1123.20, 2);
+  await expect(filaCien(page)).toHaveText('12 años más de cotización (37 años en total)');
+});
+
+test('CASO 9 · frontera 2026/2027: los mismos meses dan porcentajes distintos según el año, y el 100 % llega justo a los 37 años', async ({ page }) => {
+  // ── 25 años (300 meses) ──
+  // 1959 → año de jubilación anterior a 2027 → escala 2023-2026: 60,29 + 71 × 0,19 = 73,78
+  await simular(page, 1959, 25, 2000);
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('73,78'));
+  await expect(filaCien(page)).toHaveText('11 años y 6 meses más de cotización (36 años y 6 meses en total)');
+  // 1960 → 67 años en 2027 → escala de 2027: 50 + 120 × 0,19 = 72,80
+  await simular(page, 1960, 25, 2000);
+  await expect(page.getByRole('status').first()).toContainText('Te jubilarías en 2027');
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('72,80'));
+  // 1.714,2857 × 72,80 % = 1.248,00 (la dual de 2027, 304/354,67, queda por debajo)
+  expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(1248.00, 2);
+
+  // ── 36 años y 6 meses (438 meses) ──
+  await simular(page, 1959, '36,5', 2000);
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('100,00'));
+  await expect(page.getByText('Para llegar al 100 %', { exact: true })).toHaveCount(0);
+  await simular(page, 1960, '36,5', 2000);
+  // 97,12 + (438 − 428) × 0,18 = 98,92
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('98,92'));
+  await expect(filaCien(page)).toHaveText('6 meses más de cotización (37 años en total)');
+  // 1.714,2857 × 98,92 % = 1.695,77
+  expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(1695.77, 2);
+
+  // ── Empezar a cotizar a los 30 y jubilarse a los 67 con 37 años (444 meses) ──
+  await simular(page, 1980, 37, 2000);
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('100,00'));
+  await expect(page.getByText('Para llegar al 100 %', { exact: true })).toHaveCount(0);
+  // Un mes menos (443): 97,12 + 15 × 0,18 = 99,82, y falta exactamente 1 mes.
+  await simular(page, 1980, '36,92', 2000);
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('99,82'));
+  await expect(filaCien(page)).toHaveText('1 mes más de cotización (37 años en total)');
+});
+
+test('CASO 10 · el tope máximo depende de la escala: 26,5 años sobre la base máxima NO topan desde 2027', async ({ page }) => {
+  // 1980 · 26,5 años (318 meses) · base máxima BASES_SS_2026.maxima = 5.101,20, con millar.
+  await simular(page, 1980, '26,5', '5.101,20');
+  await expect(valorDe(page, 'Base reguladora (25 años / 350)')).toContainText('4372,46');
+  // 50 + 138 × 0,19 = 76,22 % (con la de 2026, 77,20 %)
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('76,22'));
+  // 4.372,4571 × 76,22 % = 3.332,69 < 3.359,60. Con la escala de 2026 saldría 3.375,54 y la app
+  // recortaría a 3.359,60: el defecto movería la cifra 26,91 €.
+  expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(3332.69, 2);
+  await expect(page.getByText('Tope máximo aplicado', { exact: true })).toHaveCount(0);
+});
+
+test('CASO 11 · mínimo de acceso justo: 15 años son el 50 % y quedan bajo la mínima, con aviso', async ({ page }) => {
+  // 1985 · 15 años (180 meses = COTIZACION_MINIMA.mesesMinimosAcceso) · 1.500 €
+  await simular(page, 1985, 15, '1.500');
+  await expect(page.getByRole('alert').filter({ hasText: 'Se necesitan al menos' })).toHaveCount(0);
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('50,00'));
+  // 1.500 × 300/350 = 1.285,71 × 50 % = 642,86 < minimaSinConyuge 888,70
+  expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(642.86, 2);
+  await expect(page.getByText(/queda por debajo de la pensión mínima/)).toHaveCount(1);
+  // 444 − 180 = 264 meses = 22 años
+  await expect(filaCien(page)).toHaveText('22 años más de cotización (37 años en total)');
+});
+
+test.describe('CASO 12 · móvil (390 px), tecleando pulsación a pulsación', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('un «-» suelto se rechaza, y «1.234,56» con 30 años da 891,00 € sin aviso de mínimos', async ({ page }) => {
+    await page.selectOption(SEL.anio, '1970');
+    const anos = page.locator(SEL.anos);
+    const base = page.locator(SEL.base);
+
+    // ── «-» suelto: el control lo deja escribir (es el principio de un negativo) ──
+    await anos.tap();
+    await anos.pressSequentially('-', { delay: 50 });
+    await esperarValorEnReact(page, SEL.anos, '-');
+    await base.tap();
+    await base.pressSequentially('1.234,56', { delay: 50 });
+    await esperarValorEnReact(page, SEL.base, '1.234,56');
+    await page.locator(SEL.btnCalcular).tap();
+    await expect(page.getByRole('alert').filter({ hasText: 'Introduce los años cotizados' }))
+      .toContainText('Introduce los años cotizados (entre 1 y 50).');
+    await expect(page.getByText('Pensión mensual estimada (bruta)', { exact: true })).toHaveCount(0);
+
+    // ── 30 años ──
+    await anos.fill('');
+    await anos.tap();
+    await anos.pressSequentially('30', { delay: 50 });
+    await esperarValorEnReact(page, SEL.anos, '30');
+    await page.locator(SEL.btnCalcular).tap();
+    // 1.234,56 × 300/350 = 1.058,1943 × 84,20 % = 891,00. Si el millar se leyera como
+    // decimal (1,23456 €) la base no pasaría el mínimo de 100 € y saldría un error.
+    await expect(valorDe(page, 'Base reguladora (25 años / 350)')).toContainText('1058,19');
+    expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(891.00, 2);
+    // 891,00 > 888,70: por 2,30 € NO hay aviso de mínimos (con la escala de 2026, 901,37).
+    await expect(page.getByText(/queda por debajo de la pensión mínima/)).toHaveCount(0);
+    const pension = valorDe(page, 'Pensión mensual estimada (bruta)');
+    await pension.scrollIntoViewIfNeeded();
+    await expect(pension).toBeInViewport();
+    // Nada desborda en horizontal a 390 px.
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+});
+
+// ── Hallazgos ABIERTOS el 04/10/2026 ─────────────────────────────────────────────
+
+test('CASO 13 · tras un error, el resultado anterior NO debe seguir publicado', async ({ page }) => {
+  test.fail(true, 'ABIERTO (04/10/2026): calcular() pone el error y sale sin borrar resultadoEdad/resultadoPension; la tarjeta de edad además interpola el campo VIVO («Con 12 años cotizados, no alcanzas…») junto a una pensión de 1.443,43 €.');
+  await simular(page, 1970, 30, 2000);
+  expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(1443.43, 2);
+
+  // 12 años: por debajo de COTIZACION_MINIMA.anosMinimosAcceso. Preparación verificada:
+  await sembrarValor(page, SEL.anos, 12);
+  await page.locator(SEL.btnCalcular).click();
+  await expect(page.getByRole('alert').filter({ hasText: 'Se necesitan al menos' }))
+    .toContainText('Se necesitan al menos 15 años cotizados para acceder a pensión.');
+
+  // Lo que debe pasar (como en el caso 7 sobre página limpia): ninguna pensión a la vista.
+  await expect(page.getByText('Pensión mensual estimada (bruta)', { exact: true })).toHaveCount(0);
+});
+
+test('CASO 14 · nacido en 1959: la edad del titular y la «Edad ordinaria» deben salir de la misma fila de la tabla', async ({ page }) => {
+  test.fail(true, 'ABIERTO (04/10/2026): calcularEdadJubilacion toma la edad de la fila de 2026 (66a10m) pero devuelve anioJubilacion = 1959 + 66 = 2025, y la fila «Edad ordinaria» se calcula con 2025 (66a8m). Para 1955-1956 llega a decir «67 años» en 2022-2023 (getEdadJubilacion devuelve la fila de 2027 para años anteriores a 2024).');
+  await simular(page, 1959, 25, 2000);
+  // Preparación: el cálculo se hizo (el porcentaje de la escala 2023-2026 es correcto).
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('73,78'));
+  await expect(page.getByRole('status').first()).toContainText('66 años y 10 meses');
+
+  // TABLA_EDAD_JUBILACION: 66a10m es la edad de 2026 (2025 era 66a8m). Lo coherente:
+  await expect(valorDe(page, 'Edad ordinaria de jubilación')).toHaveText('66 años y 10 meses');
+  await expect(page.getByRole('status').first()).toContainText('Te jubilarías en 2026');
+});
+
+test('CASO 15 · el escenario de Carlos debe dar lo que la propia calculadora da para él (escala de 2027)', async ({ page }) => {
+  test.fail(true, 'ABIERTO (04/10/2026): el escenario «Carlos, 64 años, 28 cotizados, 1.200 €» sigue con la escala de 2026 (80,62 %, 829,23 €, 85,18 %). Nacido en 1962, se jubila en 2029: 79,64 %, 819,16 €, y con 2 años más 84,20 %.');
+  // Lo que la app calcula para Carlos (nacido en 1962: 64 años en 2026):
+  await simular(page, 1962, 28, 1200);
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('79,64'));
+  expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(819.16, 2);
+
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  const carlos = page.locator('[class*="escenarioCard"]').filter({ hasText: 'Carlos' });
+  await expect(carlos).toHaveCount(1);
+  await expect(carlos).toContainText('79,64');
+});
+
+test('CASO 16 · el punto de equilibrio de la anticipada no puede dar dos cifras distintas en la misma página', async ({ page }) => {
+  test.fail(true, 'ABIERTO (04/10/2026): la FAQ dice «entre 10 y 15 años» y la tarjeta «Evalúa el break-even», «del orden de 15 a 20 años». A mano: 2 × (1 − r) / r = 10,5 años (r = 16 %) y 13,3 (r = 13,04 %) desde la edad ordinaria; 12,5-15,3 desde la anticipada.');
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  await expect(page.getByText('El punto de equilibrio suele estar entre 10 y 15 años.', { exact: false })).toHaveCount(1);
+  const tarjeta = page.locator('[class*="tipCard"]').filter({ hasText: 'Evalúa el break-even' });
+  await expect(tarjeta).toHaveCount(1);
+  await expect(tarjeta).not.toContainText('15 a 20 años');
+});
+
+test('CASO 17 · el porcentaje va separado de su signo por un espacio duro (CLAUDE.md §2, 25/09/2026)', async ({ page }) => {
+  test.fail(true, 'ABIERTO (04/10/2026): la app pega el «%» con `formatNumber(x, 2)}%` (porcentaje, reducción, barra, % sobre sueldo) en vez de usar formatPercentage.');
+  await simular(page, 1970, 30, 2000);
+  const valor = valorDe(page, 'Porcentaje por años cotizados');
+  await expect(valor).toHaveText(pct('84,20'));
+  expect(await valor.textContent()).toBe('84,20 %');
+});
+
+test('CASO 18 · el DataReference debe acreditar el sello propio de la escala del porcentaje', async ({ page }) => {
+  test.fail(true, 'ABIERTO (04/10/2026): solo muestra FISCAL_PENSIONES_META (21/09/2026). La escala de 2027, la que aplica a casi todo usuario, se transcribió del BOE el 30/09/2026 con sello propio (ESCALA_PORCENTAJE_PENSION_META), que el módulo separó porque el general no la ampara; el motor del MCP sí lo cita en fuenteDatos.');
+  const ref = page.getByRole('note', { name: 'Datos de referencia normativos' });
+  await expect(ref).toContainText('Última verificación');
+  await expect(ref).toContainText('30/09/2026');
+});
+
+test('CASO 19 · título, JSON-LD y DataReference dicen el mismo año (b7ec248c)', async ({ page }) => {
+  // FISCAL_PENSIONES_META.vigencia = '2026'
+  await expect(page).toHaveTitle('Simulador de Jubilación Pública 2026 — Edad, pensión y anticipada | meskeIA');
+  const ref = page.getByRole('note', { name: 'Datos de referencia normativos' });
+  await expect(ref).toContainText('Jubilación y Pensiones 2026');
+
+  const ld = (await page.evaluate(() =>
+    [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => JSON.parse(s.textContent ?? '{}')),
+  )) as Array<Record<string, unknown>>;
+  const faq = ld.find((j) => j['@type'] === 'FAQPage') as
+    | { mainEntity: Array<{ name: string; acceptedAnswer: { text: string } }> }
+    | undefined;
+  expect(faq).toBeTruthy();
+  expect(faq!.mainEntity[0].name).toBe('¿A qué edad me puedo jubilar en España en 2026?');
+  // La FAQ del JSON-LD da las DOS escalas, como la de la página: no promete el 100 % a los
+  // 36 años y 6 meses a quien se jubila desde 2027.
+  expect(faq!.mainEntity[1].acceptedAnswer.text).toContain('Desde 2027 la escala cambia');
+  expect(faq!.mainEntity[1].acceptedAnswer.text).toContain('hasta el 100% a los 37 años');
+  const web = ld.find((j) => j['@type'] === 'WebApplication');
+  expect(web?.name).toBe('Simulador de Jubilación Pública');
 });

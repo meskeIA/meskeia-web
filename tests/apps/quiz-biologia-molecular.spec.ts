@@ -44,6 +44,17 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *
  * Los casos que vigilan un defecto de HOY expresan el comportamiento CORRECTO y llevan
  * test.fail() con el hallazgo en el comentario, para que el fichero quede en verde.
+ *
+ * RE-INSPECCIÓN (04/10/2026)
+ * ──────────────────────────
+ * Vuelve a la cola por los lotes del hero (d056b066, a1d72a9c) y para verificar las
+ * reparaciones del 25/09 (8526247c). Todo lo reparado sigue reparado: foco tras «Siguiente»,
+ * pregunta a la vista en 360 px (0 de 60 transiciones fuera, fallando con la opción más baja),
+ * blanco sobre --primary-boton, barajado (χ² 1,30 sobre 1.200 respuestas con el azar real) y
+ * verde/rojo en oscuro; el título del hero, libre del logo a 360, 800 y 1.024 px. Casos
+ * nuevos al final del fichero (bloques «Inspector 04/10/2026»). Los que dependen de dónde
+ * cae un clic siembran Math.random con addInitScript (mulberry32), como la referencia de la
+ * familia (quiz-literatura-universal): la partida y su geometría son siempre las mismas.
  */
 
 const RUTA = '/quiz-biologia-molecular/';
@@ -54,6 +65,10 @@ const POR_CATEGORIA = 6; // 6 preguntas de cada una de las 5 categorías
  * Posición en PREGUNTAS (0 = id 1) de las preguntas que algún caso fuerza. Cada caso comprueba
  * además el enunciado que sale, así que si el banco se reordena falla diciéndolo.
  */
+const POS_ARN_ADN = 2; // id 3 · «¿Qué diferencia estructural tiene el ARN respecto al ADN?»
+const POS_HELICASA = 7; // id 8 · «¿Qué enzima rompe los puentes de hidrógeno…?»
+const POS_INSERCION = 27; // id 28 · «¿Qué consecuencia tiene una inserción de 1 base…?»
+const POS_SPLICING_ALT = 16; // id 17 · «¿Qué es el splicing alternativo?» (su explicación lleva un %)
 const POS_POLI_A = 17; // id 18 · «¿Qué función tiene la cola poli-A en el ARNm?»
 const POS_STOP = 20; // id 21 · «¿Cuántos codones de parada (stop) existen…?»
 const POS_TRADUCCION = 21; // id 22 · «¿Dónde ocurre la traducción en eucariotas?»
@@ -138,6 +153,23 @@ async function abrir(page: Page, tema?: 'light' | 'dark'): Promise<void> {
   await page.goto(RUTA);
   await expect(page.locator('h1')).toContainText('Quiz Biología Molecular');
   await esperarPaginaAsentada(page);
+}
+
+/**
+ * Math.random sembrado (mulberry32) desde antes de cargar: el orden de las preguntas, el de las
+ * opciones y, con ellos, la geometría de cada pantalla son siempre los mismos. Se llama ANTES de
+ * `abrir`. Comprobado el 04/10/2026: dos partidas con la misma semilla salen idénticas.
+ */
+async function sembrarAzar(page: Page, semilla: number): Promise<void> {
+  await page.addInitScript((s0) => {
+    let s = s0;
+    Math.random = () => {
+      s = (s + 0x6d2b79f5) | 0;
+      let t = Math.imul(s ^ (s >>> 15), 1 | s);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }, semilla);
 }
 
 async function empezar(page: Page, modo: 'examen' | 'practica', categoria?: string): Promise<void> {
@@ -471,13 +503,14 @@ test.describe('Quiz Biología Molecular', () => {
 
 test.describe('Hallazgos del Inspector', () => {
   /**
-   * SOSPECHA 1674 CONFIRMADA (operativa) — en oscuro `[data-theme='dark'] .opcion` (0,2,0) pisa
+   * SOSPECHA 1674 CONFIRMADA, HALLAZGO 1744 (operativa) — REPARADO el 25/09/2026 (8526247c).
+   * En oscuro `[data-theme='dark'] .opcion` (0,2,0) pisaba
    * el fondo y el borde de `.opcionCorrecta` / `.opcionIncorrecta` (0,1,0), y
-   * `[data-theme='dark'] .opcionLetra`, que va después en la hoja, pisa el círculo verde/rojo.
+   * `[data-theme='dark'] .opcionLetra`, que va después en la hoja, pisaba el círculo verde/rojo.
    * Medido el 25/09/2026 con data-theme="dark" puesto al medir: correcta y fallada IDÉNTICAS
    * —fondo rgba(255,255,255,0,04), borde rgba(255,255,255,0,1), texto rgb(232,232,232), letra
-   * rgba(255,255,255,0,08)— y la neutra igual salvo opacity 0,4. Quien falla en oscuro no ve
-   * cuál era la buena.
+   * rgba(255,255,255,0,08)— y la neutra igual salvo opacity 0,4. Quien fallaba en oscuro no
+   * veía cuál era la buena.
    * DEBERÍA: correcta y fallada se distinguen entre sí y de una neutra.
    */
   test('1674 · en oscuro la correcta y la fallada no se pintan igual', async ({ page }) => {
@@ -501,15 +534,24 @@ test.describe('Hallazgos del Inspector', () => {
   });
 
   /**
-   * HALLAZGO (contenido) — sesgo de posición. En el banco la correcta está 0 veces en A, 3 en B,
-   * 19 en C y 8 en D, y las opciones NO se barajan (medido en una partida: A0 B3 C19 D8).
-   * «Siempre C» saca 19/30 = 63 % → «Notable» sin saber biología; en la práctica de
-   * Transcripción, 5/6 = 83 % → «Sobresaliente»; «siempre A» da 0 garantizado.
+   * HALLAZGO 1745 (contenido) — REPARADO el 25/09/2026 (8526247c: motor.ts baraja las opciones
+   * y corrige por el texto). Sesgo de posición: en el banco la correcta está 0 veces en A, 3 en
+   * B, 19 en C y 8 en D, y las opciones NO se barajaban (medido en una partida: A0 B3 C19 D8).
+   * «Siempre C» sacaba 19/30 = 63 % → «Notable» sin saber biología; en la práctica de
+   * Transcripción, 5/6 = 83 % → «Sobresaliente»; «siempre A» daba 0 garantizado.
    * DEBERÍA: en un examen ninguna letra se queda sin ser nunca la correcta ni acapara más del
    * 60 % (con reparto al azar lo esperable son ~7-8 por letra).
+   *
+   * ESTABILIZADO el 04/10/2026: con el azar real este caso fallaba EN FALSO ~1 de cada 1.400
+   * ejecuciones (4 × (3/4)^30 de que una letra quede a cero con un barajado correcto; pasó en la
+   * suite del 29/09 con A14 B0 C9 D7). Ahora siembra Math.random (semilla 20261004 → A6 B8 C9
+   * D7, medido): es determinista y sigue cazando la regresión, porque sin barajar el reparto
+   * vuelve a ser A0 B3 C19 D8 con cualquier semilla. El reparto con el azar real se midió aparte
+   * el 04/10/2026: 40 exámenes, 1.200 respuestas, A317 B293 C294 D296, χ² 1,30 (< 7,81).
    */
   test('hallazgo · la correcta no se concentra en una letra: la posición no delata la respuesta', async ({ page }) => {
     test.setTimeout(120_000);
+    await sembrarAzar(page, 20261004);
     await abrir(page);
     await empezar(page, 'examen');
     const { marcadas } = await jugar(page, TOTAL_EXAMEN, TOTAL_EXAMEN);
@@ -522,7 +564,7 @@ test.describe('Hallazgos del Inspector', () => {
   });
 
   /**
-   * HALLAZGO (contenido) — la pregunta de la cola poli-A tiene DOS respuestas ciertas. Marca
+   * HALLAZGO 1746 (contenido) — la pregunta de la cola poli-A tenía DOS respuestas ciertas. Marca
    * como incorrecta «Facilita el inicio de la traducción», que es una función reconocida de la
    * cola poli-A: la PABP unida a ella se une a eIF4G y circulariza el ARNm (Tarun y Sachs 1996;
    * Wells et al., Mol Cell 1998). La propia explicación lo dice: «La PABP … interactúa con
@@ -549,7 +591,8 @@ test.describe('Hallazgos del Inspector', () => {
   });
 
   /**
-   * HALLAZGO (dato) — dos explicaciones afirman algo falso (la respuesta marcada es buena):
+   * HALLAZGO 1747 (dato) — REPARADO el 25/09/2026 (8526247c). Dos explicaciones afirmaban algo
+   * falso (la respuesta marcada era buena):
    *   · id 21: «UAA ("ámbar"), UAG ("ocre")». Es al revés: ámbar = UAG y ocre = UAA (ópalo/
    *     umber = UGA), la nomenclatura de los mutantes amber/ochre de Epstein y Bernstein.
    *   · id 22: «Las proteínas mitocondriales se traducen en los ribosomas mitocondriales». La
@@ -572,7 +615,8 @@ test.describe('Hallazgos del Inspector', () => {
   });
 
   /**
-   * HALLAZGO (contenido) — el FAQPage (lo que leen Bing Copilot o ChatGPT) dice que el bloque de
+   * HALLAZGO 1751 (contenido) — REPARADO el 25/09/2026 (8526247c: la FAQ dice solo lo que hay en
+   * las 6 preguntas). El FAQPage (lo que leen Bing Copilot o ChatGPT) decía que el bloque de
    * mutaciones incluye «mutaciones cromosómicas estructurales (inversión, translocación,
    * deleción e inversión) y numéricas (aneuploidía y poliploidía)» y «mutágenos físicos y
    * químicos». Ninguna de las 30 preguntas trata nada de eso (las 6 de mutaciones: sin
@@ -587,8 +631,8 @@ test.describe('Hallazgos del Inspector', () => {
   });
 
   /**
-   * HALLAZGO (contenido) — erratas visibles en el bloque educativo: la tabla «Transcripción vs
-   * Traducción» muestra las barras invertidas del código («5\' → 3\' (ARNm)», «Hebra molde del
+   * HALLAZGO 1753 (contenido) — REPARADO el 25/09/2026 (8526247c). Erratas visibles en el bloque
+   * educativo: la tabla «Transcripción vs Traducción» mostraba las barras invertidas del código («5\' → 3\' (ARNm)», «Hebra molde del
    * ADN (3\' → 5\')», «ARNm (5\' → 3\')»: en el texto JSX `\'` no es un escape), y el dato
    * curioso de la helicasa dice «desenvuelver».
    */
@@ -602,7 +646,7 @@ test.describe('Hallazgos del Inspector', () => {
     expect(curiosos).not.toContain('desenvuelver');
   });
 
-  /** HALLAZGO (contenido) — tras acertar la primera, el marcador dice «✓ 1 aciertos». */
+  /** HALLAZGO 1753 (contenido) — REPARADO el 25/09/2026: tras acertar la primera, el marcador decía «✓ 1 aciertos». */
   test('hallazgo · con un acierto el marcador dice «1 acierto», en singular', async ({ page }) => {
     await abrir(page);
     await empezar(page, 'examen');
@@ -611,8 +655,8 @@ test.describe('Hallazgos del Inspector', () => {
   });
 
   /**
-   * HALLAZGO (contenido) — la clasificación usa los nombres de la escala española de notas con
-   * otros cortes: «Aprobado» desde el 40 %, «Notable» desde el 60 % y «Sobresaliente» desde el
+   * HALLAZGO 1752 (contenido) — REPARADO el 25/09/2026 (8526247c). La clasificación usaba los
+   * nombres de la escala española de notas con otros cortes: «Aprobado» desde el 40 %, «Notable» desde el 60 % y «Sobresaliente» desde el
    * 80 %. En la escala oficial (RD 1125/2003, art. 5.4; y los cortes de secundaria) 4/10 es
    * suspenso, Aprobado es 5-6,9, Notable 7-8,9 y Sobresaliente 9-10. Caso: examen 12/30 → 40 %
    * → la app dice «Aprobado» 😊 a quien ha sacado un 4.
@@ -632,7 +676,7 @@ test.describe('Hallazgos del Inspector', () => {
   });
 
   /**
-   * HALLAZGO (accesibilidad) — la forma del 1676 de quiz-tabla-periodica. Con teclado: al pulsar
+   * HALLAZGO 1749 (accesibilidad) — la forma del 1676 de quiz-tabla-periodica. Con teclado: al pulsar
    * «Siguiente pregunta →» el bloque de feedback se desmonta, el foco cae a <body> y el punto de
    * partida queda DETRÁS de las opciones nuevas: el primer Tab va a «Ver guía educativa», fuera
    * del quiz, y hacen falta 5 Shift+Tab para volver a la opción A. En cada una de las 29
@@ -688,7 +732,9 @@ test.describe('Hallazgos del Inspector', () => {
   });
 
   /**
-   * HALLAZGO (accesibilidad) — tras fallar, cuál era la correcta solo se dice con COLOR (borde,
+   * HALLAZGO 1754 (accesibilidad) — REPARADO el 25/09/2026 (8526247c: «(respuesta correcta)» en el
+   * nombre de la opción y «La respuesta correcta era: …» en el aviso). Tras fallar, cuál era la
+   * correcta solo se decía con COLOR (borde,
    * fondo y círculo verdes). El nombre accesible de la opción sigue siendo «Opción C: …» y el
    * aviso dice «✗ Incorrecto» y la explicación, sin nombrar la respuesta buena. WCAG 1.4.1. En
    * oscuro, con el color borrado (1674), no queda ni eso.
@@ -704,7 +750,8 @@ test.describe('Hallazgos del Inspector', () => {
   });
 
   /**
-   * HALLAZGO (accesibilidad) — emojis sin aria-hidden que llegan al lector de pantalla: el <h1>
+   * HALLAZGO 1755 (accesibilidad) — REPARADO el 25/09/2026 (8526247c). Emojis sin aria-hidden que
+   * llegaban al lector de pantalla: el <h1>
    * («🧬 Quiz Biología Molecular») y «🔥 Racha:» (los dos que marca
    * `node scripts/check-a11y-jsx.mjs`), más las etiquetas de categoría («🧬 ADN y ARN», «🔄
    * Replicación», «📋 Transcripción»…) en los botones, las insignias y el desglose, y el 🔬 de
@@ -720,7 +767,8 @@ test.describe('Hallazgos del Inspector', () => {
   });
 
   /**
-   * HALLAZGO (operativa) — empezado un examen de 30 preguntas no hay forma de abandonarlo ni de
+   * HALLAZGO 1756 (operativa) — REPARADO el 25/09/2026 (8526247c). Empezado un examen de 30
+   * preguntas no había forma de abandonarlo ni de
    * cambiar de modo: en <main> solo están las 4 opciones (y «Siguiente» tras responder). Para
    * pasar a la práctica hay que responder las 30 o recargar la página.
    */
@@ -738,7 +786,8 @@ test.describe('Hallazgos del Inspector', () => {
   });
 
   /**
-   * HALLAZGO (accesibilidad) — la forma del 1677. Umbral 4,5:1 (ningún texto medido llega a
+   * HALLAZGO 1748 (accesibilidad) — REPARADO el 25/09/2026 (8526247c: --primary-boton y tokens
+   * de texto). La forma del 1677. Umbral 4,5:1 (ningún texto medido llega a
    * «grande»: 16 px/700 como mucho). Medido el 25/09/2026 sobre el fondo real:
    *   claro · «Comenzar quiz →», «Siguiente pregunta →» y «Volver al inicio» (blanco sobre
    *     --primary) 4,11 · «✓ ¡Correcto!» 3,05 · «✗ Incorrecto» 4,40 · «✓ N aciertos» 2,68 ·
@@ -793,8 +842,9 @@ test.describe('Hallazgos del Inspector', () => {
 });
 
 /**
- * HALLAZGO (operativa) — la forma del 1675. En un móvil de 360 px, tras una explicación larga,
- * «Siguiente pregunta →» deja el enunciado nuevo bajo el logo fijo (10-52 px): nadie devuelve
+ * HALLAZGO 1750 (operativa) — REPARADO el 25/09/2026 (8526247c: traerALaVista + foco al
+ * enunciado). La forma del 1675. En un móvil de 360 px, tras una explicación larga,
+ * «Siguiente pregunta →» dejaba el enunciado nuevo bajo el logo fijo (10-52 px): nadie devolvía
  * la vista a la pregunta. Medido el 25/09/2026 con el desplazamiento mínimo que haría un dedo
  * para ver «Siguiente» entero: 5 de 29 transiciones por examen con líneas del enunciado
  * tapadas (tras la falciforme, «¿Qué es una mutación sinónima…?» en y = 7…54, las dos líneas
@@ -853,5 +903,419 @@ test.describe('Hallazgos del Inspector · móvil 360 × 740', () => {
         .map((l) => `${Math.round(l.top)}…${Math.round(l.bottom)}`);
     });
     expect(tapadas, 'líneas del enunciado fuera de pantalla o bajo el logo/conmutador').toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RE-INSPECCIÓN DEL 04/10/2026
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Choques entre las letras del <h1> y las piezas de la barra fija del logo (logo y conmutador). */
+async function choquesTituloLogo(page: Page) {
+  return page.evaluate(() => {
+    const h1 = document.querySelector('h1') as HTMLElement;
+    const rango = document.createRange();
+    rango.selectNodeContents(h1);
+    const letras = [...rango.getClientRects()];
+    const barra = document.querySelector('[class*="headerBar"]');
+    const piezas = barra ? [...barra.children].map((c) => c.getBoundingClientRect()) : [];
+    const choques: string[] = [];
+    for (const p of piezas) {
+      for (const l of letras) {
+        const ix = Math.min(p.right, l.right) - Math.max(p.left, l.left);
+        const iy = Math.min(p.bottom, l.bottom) - Math.max(p.top, l.top);
+        if (ix > 0 && iy > 0) choques.push(`${Math.round(ix)} × ${Math.round(iy)} px`);
+      }
+    }
+    return { hayLogo: piezas.length > 0, choques };
+  });
+}
+
+/** Desplaza lo justo para que `loc` se vea entero bajo la barra del logo: lo que haría un dedo. */
+async function bajarLoJusto(loc: Locator): Promise<void> {
+  await loc.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    const barra = (document.querySelector('[class*="headerBar"]') as Element).getBoundingClientRect().bottom;
+    if (r.bottom > innerHeight - 8) scrollBy(0, r.bottom - innerHeight + 8);
+    else if (r.top < barra + 4) scrollBy(0, r.top - barra - 4);
+  });
+}
+
+/** Toca en el centro de un control con el dedo (touchscreen), como en un móvil. */
+async function tocarCentro(page: Page, loc: Locator): Promise<void> {
+  const b = await loc.boundingBox();
+  if (!b) throw new Error('sin caja');
+  await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2);
+}
+
+/** Qué hay en pantalla: cuántas opciones, cuántas ya bloqueadas (respondida) y el contador. */
+async function pantalla(page: Page) {
+  return page.evaluate(() => {
+    const bs = [...document.querySelectorAll<HTMLButtonElement>('main button')].filter((b) => b.querySelector('[class*="opcionLetra"]'));
+    const contador =
+      [...document.querySelectorAll('main span')].map((s) => (s.textContent ?? '').trim()).find((t) => /^Pregunta \d+ de \d+$/.test(t)) ?? '';
+    return { opciones: bs.length, bloqueadas: bs.filter((b) => b.disabled).length, contador };
+  });
+}
+
+/**
+ * Para los casos de doble clic (la forma del 2507 de quiz-literatura-universal, la referencia de
+ * la familia). Empieza el examen con un doble clic (o dos toques) y recorre las 30 preguntas
+ * avanzando igual, FALLANDO con la opción más baja, la que obliga a bajar. Devuelve cada vez que
+ * el segundo clic contestó por su cuenta la pregunta nueva, sacó de la partida, saltó una
+ * pregunta o se llevó la nota.
+ *
+ * La respuesta se elige DESPUÉS DE LEER la pregunta (500 ms, más que la ventana de ráfaga del
+ * navegador, 300 ms en Chrome): así, cuando la app ignore el clic con `detail > 1` como la
+ * referencia (ce0ad0bc), el toque que responde no contará como el tercero de la ráfaga.
+ */
+async function contestadasSinQuerer(
+  page: Page,
+  doble: (boton: Locator) => Promise<void>,
+  elegir: (opcion: Locator) => Promise<void> = (o) => o.click(),
+): Promise<string[]> {
+  const fallar = async () => {
+    const correcta = CLAVE[norm(await enunciado(page).innerText())];
+    const iCorrecta = (await textosOpcion(page)).indexOf(correcta);
+    await page.waitForTimeout(500);
+    await elegir(opciones(page).nth(iCorrecta === 3 ? 2 : 3));
+    await expect(page.locator('[class*="feedbackIncorrecto"]')).toBeVisible();
+  };
+  const solas: string[] = [];
+  await doble(page.getByRole('button', { name: /Comenzar quiz/ }));
+  let p = await pantalla(page);
+  if (p.opciones === 0) solas.push('«Comenzar»: vuelve al inicio');
+  else if (p.bloqueadas > 0) solas.push(`«Comenzar»: la ${p.contador} sale ya respondida`);
+  for (let n = 1; n < TOTAL_EXAMEN && p.opciones > 0; n++) {
+    if (p.bloqueadas === 0) await fallar();
+    const antes = p.contador;
+    await doble(page.getByRole('button', { name: /Siguiente pregunta/ }));
+    p = await pantalla(page);
+    // El primer clic TIENE que avanzar; si no, el caso no mide lo que dice
+    expect(p.opciones === 0 || p.contador !== antes, `el primer clic en «Siguiente» (${antes}) no avanzó`).toBe(true);
+    const esperado = `Pregunta ${Number(antes.split(' ')[1]) + 1} de ${TOTAL_EXAMEN}`;
+    if (p.opciones === 0) solas.push(`«Siguiente» (${antes}): sale de la partida`);
+    else if (p.bloqueadas > 0) solas.push(`«Siguiente» (${antes}): la ${p.contador} sale ya respondida`);
+    else if (p.contador !== esperado) solas.push(`«Siguiente» (${antes}): salta a la ${p.contador}`);
+  }
+  if (p.opciones > 0) {
+    if (p.bloqueadas === 0) await fallar();
+    await doble(page.getByRole('button', { name: /Ver resultados/ }));
+    if ((await page.locator('[class*="resultadoCard"]').count()) === 0) {
+      solas.push('«Ver resultados»: la nota no llega a verse (el segundo clic cae en «Volver al inicio»)');
+    }
+  }
+  return solas;
+}
+
+test.describe('Inspector 04/10/2026', () => {
+  /**
+   * CASO NORMAL (sembrado) — examen fallando la 5.ª, la 15.ª y la 25.ª y acertando las demás.
+   * Resuelto a mano ANTES de ejecutar, con la fórmula de motor.ts (nota = aciertos·10/total y
+   * escala RD 1125/2003): 27/30 → nota 270/30 = 9 EXACTO (el motor multiplica antes de dividir
+   * para que no salga 8,999…) → [9 · 10) «Sobresaliente» 🌟 (no es pleno: no «¡Perfecto!») ·
+   * Math.round(90) = 90 % · Errores 30 − 27 = 3 · rachas 4, 9, 9 y 5 → «Racha máx.» 9 · la
+   * insignia «🔥 Racha» marca 4 tras la 4.ª, desaparece tras fallar la 5.ª (racha 0 < 2) y marca
+   * 9 tras la 14.ª. Medido el 04/10/2026: lo mismo.
+   */
+  test('caso normal (sembrado): fallar la 5.ª, la 15.ª y la 25.ª da 27/30, nota 9,0 y «Sobresaliente» con racha 9', async ({ page }) => {
+    test.setTimeout(120_000);
+    await sembrarAzar(page, 20261004);
+    await abrir(page);
+    await empezar(page, 'examen');
+    const FALLADAS = [5, 15, 25];
+    const racha = page.locator('[class*="rachaBadge"]');
+    for (let n = 1; n <= TOTAL_EXAMEN; n++) {
+      await expect(page.getByText(`Pregunta ${n} de ${TOTAL_EXAMEN}`)).toBeVisible();
+      await responder(page, FALLADAS.includes(n) ? 'mal' : 'bien');
+      if (n === 4) await expect(racha).toHaveText(/Racha: 4$/);
+      if (n === 5) await expect(racha).toHaveCount(0);
+      if (n === 14) await expect(racha).toHaveText(/Racha: 9$/);
+      await botonAvanzar(page).click();
+    }
+    const r = await resultado(page);
+    // El espacio del porcentaje se mira en su propio caso (hallazgo de formato, abajo)
+    expect({ ...r, pct: r.pct.replace(/\s/g, '') }).toEqual({
+      circulo: '27/30',
+      etiqueta: 'Sobresaliente', // nota 9 ∈ [9 · 10), sin pleno
+      emoji: '🌟',
+      pct: '90%', // Math.round(27/30·100)
+      nota: 'Nota: 9,0 sobre 10',
+      stats: ['27Aciertos', '3Errores', '9Racha máx.'],
+    });
+    await expect(page.locator('[class*="resultadoCard"]')).toHaveAttribute('aria-label', 'Resultado: 27 de 30 aciertos, Sobresaliente');
+    const desglose = await page.locator('[class*="desgloseScore"]').allInnerTexts();
+    expect(desglose.reduce((s, d) => s + Number(d.split('/')[0]), 0)).toBe(27);
+  });
+
+  /** Lotes del hero d056b066 y a1d72a9c. Medido el 04/10/2026: 0 choques (y 0 puntos del h1 tapados). */
+  test('hero: a 800 y 1.024 px el título no queda bajo el logo ni el botón de tema', async ({ page }) => {
+    const medidas: Record<number, { hayLogo: boolean; choques: string[] }> = {};
+    for (const ancho of [800, 1024]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      await abrir(page);
+      medidas[ancho] = await choquesTituloLogo(page);
+    }
+    expect(medidas).toEqual({ 800: { hayLogo: true, choques: [] }, 1024: { hayLogo: true, choques: [] } });
+  });
+
+  /**
+   * La vuelta al inicio con TECLADO (la forma del 2508 de la referencia, donde el foco caía a
+   * <body>). Aquí la reparación del 1749/1756 ya lo llevaba al título: medido el 04/10/2026 con
+   * Enter en «Salir de la partida» y en «Volver al inicio», el foco en «¿Dominas la biología
+   * molecular?» las dos veces.
+   */
+  test('al volver al inicio con teclado («Salir de la partida» y «Volver al inicio») el foco va al título', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrir(page);
+    await empezar(page, 'practica', 'Mutaciones');
+    const titulo = page.getByRole('heading', { name: '¿Dominas la biología molecular?' });
+    await page.getByRole('button', { name: 'Salir de la partida' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(titulo).toBeFocused();
+    await page.getByRole('button', { name: /Comenzar quiz/ }).click(); // sigue en práctica · Mutaciones
+    await jugar(page, POR_CATEGORIA, 0);
+    await page.getByRole('button', { name: 'Volver al inicio' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(titulo).toBeFocused();
+  });
+
+  /**
+   * HALLAZGO (operativa) — ABIERTO desde el 04/10/2026. La forma del 2507 de la referencia
+   * (quiz-literatura-universal, reparada allí el 30/09 en ce0ad0bc): un doble clic en «Comenzar
+   * quiz →» o en «Siguiente pregunta →» RESPONDE la pregunta siguiente. El primer clic cambia de
+   * pantalla y el segundo cae, en el mismo punto, sobre una opción de la pregunta nueva, que
+   * queda contestada (y puntuada) sin que nadie la eligiera. Ninguna acción mira `detail`.
+   * Medido el 04/10/2026 a 1280 × 800, con 150 ms entre clic y clic (un doble clic humano) y
+   * fallando con la opción más baja: «Comenzar» 4 de 4 semillas (siempre cae en la opción B);
+   * «Siguiente» 3 de 116. Con esta semilla (20260930): la 1 y la 3 salen ya respondidas.
+   * Lo correcto: un doble clic es una sola intención; la pregunta nueva llega sin responder.
+   */
+  test('hallazgo · un doble clic en «Comenzar» o en «Siguiente» no contesta solo la pregunta siguiente', async ({ page }) => {
+    test.fail(true, 'ABIERTO (04/10/2026): el 2.º clic del doble clic contesta la pregunta nueva');
+    test.setTimeout(150_000);
+    await sembrarAzar(page, 20260930);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrir(page);
+    const dobleClic = async (boton: Locator) => {
+      await boton.scrollIntoViewIfNeeded();
+      const b = await boton.boundingBox();
+      if (!b) throw new Error('sin caja');
+      await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2);
+      await page.waitForTimeout(150);
+      // El segundo clic del doble clic (detail = 2), en el mismo punto. No `click({ clickCount: 2 })`,
+      // que manda DOS clics más.
+      await page.mouse.down({ clickCount: 2 });
+      await page.mouse.up({ clickCount: 2 });
+      await page.waitForTimeout(100);
+    };
+    expect(await contestadasSinQuerer(page, dobleClic)).toEqual([]);
+    // Fallando las 30 a propósito: 0/30. Si un segundo clic hubiera contestado alguna (y acertado
+    // por azar) la cuenta no cuadraría.
+    await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('0/30');
+  });
+
+  /** El mismo hallazgo con `dblclick()` de Playwright (los dos clics en ráfaga, sin pausa). Medido: 1 + 1. */
+  test('hallazgo · con `dblclick()` en ráfaga tampoco se contesta, se salta ni se abandona nada', async ({ page }) => {
+    test.fail(true, 'ABIERTO (04/10/2026): el 2.º clic del doble clic contesta la pregunta nueva');
+    test.setTimeout(150_000);
+    await sembrarAzar(page, 20260930);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrir(page);
+    const rafaga = async (boton: Locator) => {
+      await boton.scrollIntoViewIfNeeded();
+      await boton.dblclick();
+      await page.waitForTimeout(100);
+    };
+    expect(await contestadasSinQuerer(page, rafaga)).toEqual([]);
+    await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('0/30');
+  });
+
+  /**
+   * HALLAZGO (dato) — ABIERTO desde el 04/10/2026 (la sospecha del 25/09). La explicación de la
+   * pregunta 8 dice que la helicasa actúa «moviéndose 5' → 3' a lo largo de la hebra», sin decir
+   * de qué organismo. Esa polaridad es la de la helicasa BACTERIANA (DnaB, superfamilia 4); la
+   * replicativa de eucariotas y arqueas (MCM2-7 / CMG, superfamilia 6) avanza 3' → 5' sobre la
+   * hebra molde adelantada. Fuentes consultadas el 04/10/2026: Trakselis MA, «Structural
+   * Mechanisms of Hexameric Helicase Loading, Assembly, and Unwinding», F1000Research 2016
+   * (PMC4755419), tabla 1: eucariotas MCM2-7 «SF6 (3'-5')», arqueas MCM «SF6 (3'-5')», bacterias
+   * DnaB «SF4 (5'-3')»; y Seo YS, Kang YH, Front Mol Biosci 2018 (PMC5885281): «All the CMG
+   * complexes purified up to date displayed 3′–5′ DNA helicase activities».
+   * Lo correcto: o se dice que es la helicasa bacteriana, o no se da una polaridad universal.
+   */
+  test('hallazgo · la explicación de la helicasa no da la polaridad 5′ → 3′ como universal', async ({ page }) => {
+    test.fail(true, "ABIERTO (04/10/2026): «moviéndose 5' → 3' a lo largo de la hebra» sin organismo");
+    await abrir(page);
+    await empezarConOrden(page, [POS_HELICASA]);
+    await expect(enunciado(page)).toHaveText('¿Qué enzima rompe los puentes de hidrógeno entre las hebras en la replicación?');
+    await responder(page, 'bien');
+    const expl = norm(await explicacion(page).innerText());
+    const universal = /5' ?→ ?3'/.test(expl) && !/bacteri|procariot|E\. ?coli|DnaB/i.test(expl);
+    expect(universal, expl).toBe(false);
+  });
+
+  /**
+   * HALLAZGO (contenido) — ABIERTO desde el 04/10/2026. La forma del 1746: dos opciones FALSAS
+   * según la app que su propia explicación da por ciertas, así que quien lo sabe recibe
+   * «✗ Incorrecto».
+   *   · id 3 «¿Qué diferencia estructural tiene el ARN respecto al ADN?» → «El ARN tiene bases
+   *     nitrogenadas distintas»: la explicación dice «el ARN usa uracilo (U) donde el ADN usa
+   *     timina (T)», o sea, una base distinta.
+   *   · id 28 «¿Qué consecuencia tiene una inserción de 1 base…?» → «Truncamiento de la
+   *     proteína»: la explicación dice que los desfases «Suelen producir una proteína aberrante
+   *     o un codón stop prematuro», que es justo una proteína truncada.
+   * Medido el 04/10/2026: las dos dan «✗ Incorrecto».
+   * Lo correcto: ningún distractor que la explicación confirme (se reescribe como inequívocamente
+   * falso, como se hizo en el 1746), o la opción deja de castigarse.
+   */
+  test('hallazgo · ningún distractor es algo que la propia explicación da por cierto', async ({ page }) => {
+    test.fail(true, 'ABIERTO (04/10/2026): «bases nitrogenadas distintas» (id 3) y «Truncamiento de la proteína» (id 28)');
+    await abrir(page);
+    await empezarConOrden(page, [POS_ARN_ADN, POS_INSERCION]);
+    const castigadas: string[] = [];
+    const casos: [string, string, RegExp][] = [
+      ['¿Qué diferencia estructural tiene el ARN respecto al ADN?', 'El ARN tiene bases nitrogenadas distintas', /uracilo \(U\) donde el ADN usa timina/],
+      ['¿Qué consecuencia tiene una inserción de 1 base en la región codificante?', 'Truncamiento de la proteína', /codón stop prematuro/],
+    ];
+    for (const [i, [texto, distractor, confirma]] of casos.entries()) {
+      await expect(page.getByText(`Pregunta ${i + 1} de ${TOTAL_EXAMEN}`)).toBeVisible();
+      await expect(enunciado(page)).toHaveText(texto);
+      const ops = await textosOpcion(page);
+      if (ops.includes(distractor)) {
+        await opciones(page).nth(ops.indexOf(distractor)).click();
+        const veredicto = norm(await page.locator('[class*="feedbackResultado"]').innerText());
+        const expl = norm(await explicacion(page).innerText());
+        if (/Incorrecto/.test(veredicto) && confirma.test(expl)) castigadas.push(`«${distractor}»: ${veredicto} · la explicación lo confirma`);
+      } else {
+        await opciones(page).nth(ops.indexOf(CLAVE[texto])).click();
+      }
+      await botonAvanzar(page).click();
+    }
+    expect(castigadas).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO (contenido) — ABIERTO desde el 04/10/2026. El porcentaje va pegado al número, y la
+   * norma de meskeIA (25/09/2026, Ortografía de la RAE de 2010) lo quiere separado con espacio
+   * DURO (U+00A0), que se corrige app a app al pasar el Inspector. Tres sitios: el resultado
+   * («{porcentaje}%», page.tsx l. 832), la explicación del splicing alternativo («~95% de genes»,
+   * l. 299) y los datos curiosos («~95% de los genes», l. 945). Medido el 04/10/2026: práctica
+   * de Traducción 6/6 → esperado «100 %» · obtenido «100%».
+   */
+  test('hallazgo · el % va separado del número con espacio duro en el resultado, la explicación y la guía', async ({ page }) => {
+    test.fail(true, 'ABIERTO (04/10/2026): «100%», «~95% de genes», «~95% de los genes»');
+    test.setTimeout(90_000);
+    const pegados: string[] = [];
+    const mirar = (donde: string, texto: string) => {
+      for (const m of texto.match(/\d+ ?%/g) ?? []) pegados.push(`${donde}: «${m}»`); // sin espacio o con uno normal
+    };
+    await abrir(page);
+    await empezarConOrden(page, [POS_SPLICING_ALT]);
+    await expect(enunciado(page)).toHaveText('¿Qué es el splicing alternativo?');
+    await responder(page, 'bien');
+    mirar('explicación del splicing alternativo', await explicacion(page).innerText());
+    await page.getByRole('button', { name: 'Salir de la partida' }).click();
+    await empezar(page, 'practica', 'Traducción');
+    await jugar(page, POR_CATEGORIA, POR_CATEGORIA);
+    mirar('resultado', (await resultado(page)).pct);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    mirar('datos curiosos', await page.locator('[class*="datosCuriosos"]').innerText());
+    expect(pegados).toEqual([]);
+  });
+});
+
+test.describe('Inspector 04/10/2026 · móvil 360 × 740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /** Lote del hero d056b066. Medido el 04/10/2026: h1 en y = 80…155, barra del logo hasta y = 52; 0 choques. */
+  test('hero: a 360 px el título no queda bajo el logo ni el botón de tema', async ({ page }) => {
+    await abrir(page);
+    expect(await choquesTituloLogo(page)).toEqual({ hayLogo: true, choques: [] });
+  });
+
+  /**
+   * Re-verificación del 1750 de forma más dura que su caso de origen: partida ENTERA fallando con
+   * la opción más baja (la forma (b) de SOSPECHAS.md: acertando con la A se esconde el defecto).
+   * Tras «Comenzar» y tras cada «Siguiente», el enunciado nuevo entero entre la barra fija y el
+   * borde inferior, con el foco en él; al final, la nota a la vista. Medido el 04/10/2026 con las
+   * semillas 11 y 22: 0 de 62 posiciones fuera.
+   */
+  test('fallando con la opción más baja, tras «Comenzar» y cada «Siguiente» el enunciado queda a la vista', async ({ page }) => {
+    test.setTimeout(180_000);
+    await sembrarAzar(page, 11);
+    await abrir(page);
+    const posicion = (sel: string) =>
+      page.evaluate((s) => {
+        const r = (document.querySelector(s) as Element).getBoundingClientRect();
+        const barra = (document.querySelector('[class*="headerBar"]') as Element).getBoundingClientRect().bottom;
+        return { arriba: Math.round(r.top), abajo: Math.round(r.bottom), barra: Math.round(barra), alto: innerHeight };
+      }, sel);
+    const fuera: string[] = [];
+    const comenzar = page.getByRole('button', { name: /Comenzar quiz/ });
+    await bajarLoJusto(comenzar);
+    await tocarCentro(page, comenzar);
+    await expect(enunciado(page)).toBeFocused();
+    let m = await posicion('[class*="preguntaTexto"]');
+    if (m.arriba < m.barra || m.abajo > m.alto) fuera.push(`tras «Comenzar»: ${JSON.stringify(m)}`);
+    for (let n = 1; n <= TOTAL_EXAMEN; n++) {
+      const correcta = CLAVE[norm(await enunciado(page).innerText())];
+      const iCorrecta = (await textosOpcion(page)).indexOf(correcta);
+      const elegida = opciones(page).nth(iCorrecta === 3 ? 2 : 3);
+      await page.waitForTimeout(500); // lee la pregunta (fuera de la ventana de ráfaga)
+      await bajarLoJusto(elegida);
+      await tocarCentro(page, elegida);
+      const avanzar = botonAvanzar(page);
+      await expect(avanzar).toBeFocused();
+      await bajarLoJusto(avanzar);
+      await tocarCentro(page, avanzar);
+      if (n < TOTAL_EXAMEN) {
+        await expect(page.getByText(`Pregunta ${n + 1} de ${TOTAL_EXAMEN}`)).toBeVisible();
+        await expect(enunciado(page)).toBeFocused(); // el efecto que coloca la vista ya ha corrido
+        m = await posicion('[class*="preguntaTexto"]');
+      } else {
+        await expect(page.locator('[class*="resultadoCard"]')).toBeFocused();
+        m = await posicion('[class*="puntuacionCirculo"]');
+      }
+      if (m.arriba < m.barra || m.abajo > m.alto) fuera.push(`tras la ${n}: ${JSON.stringify(m)}`);
+    }
+    expect(fuera).toEqual([]);
+    await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('0/30');
+  });
+
+  /**
+   * HALLAZGO (operativa) — ABIERTO desde el 04/10/2026. El del doble clic del bloque de escritorio,
+   * donde más pasa: dos toques a 150 ms. Medido el 04/10/2026 a 360 × 740 con 4 semillas: 116 de
+   * 116 «Siguiente» contestaron la pregunta nueva con el segundo toque (el 100 %: tras avanzar,
+   * traerALaVista deja una opción justo bajo el dedo); «Comenzar» 0 de 4 y «Ver resultados» 0 de
+   * 4. Con esta semilla (20260930) salen ya respondidas de la 2 a la 30.
+   */
+  test('hallazgo · dos toques seguidos en «Siguiente» no contestan solos la pregunta siguiente', async ({ page }) => {
+    test.fail(true, 'ABIERTO (04/10/2026): el 2.º toque contesta la pregunta nueva (29 de 29)');
+    test.setTimeout(150_000);
+    await sembrarAzar(page, 20260930);
+    await abrir(page);
+    const dobleToque = async (boton: Locator) => {
+      await bajarLoJusto(boton);
+      const b = await boton.boundingBox();
+      if (!b) throw new Error('sin caja');
+      const [x, y] = [b.x + b.width / 2, b.y + b.height / 2];
+      await page.touchscreen.tap(x, y);
+      await page.waitForTimeout(150);
+      await page.touchscreen.tap(x, y);
+      await page.waitForTimeout(100);
+    };
+    const tocar = async (opcion: Locator) => {
+      await bajarLoJusto(opcion);
+      await tocarCentro(page, opcion);
+    };
+    expect(await contestadasSinQuerer(page, dobleToque, tocar)).toEqual([]);
+    await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('0/30');
   });
 });
