@@ -1,5 +1,9 @@
 import { Metadata } from 'next';
 import { PRESTACIONES_DEPENDENCIA_2025 } from '@/data/fiscal';
+import { COSTES_MERCADO } from './costes';
+
+/** Las horquillas de mercado del FAQPage salen de COSTES_MERCADO, como las de la comparativa (hallazgo 2880). */
+const miles = (n: number): string => n.toLocaleString('es-ES');
 
 /**
  * Las cuantías del FAQPage salen de @/data/fiscal, no tecleadas.
@@ -72,7 +76,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta una residencia de mayores en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El coste de una residencia privada en España oscila entre 1.500 y 4.000 € al mes, dependiendo de la comunidad autónoma, el tipo de habitación (individual o doble) y el grado de asistencia requerida. Las residencias en grandes ciudades como Madrid o Barcelona suelen estar en la parte alta de ese rango. Las plazas públicas o concertadas tienen precios mucho más bajos, pero las listas de espera pueden superar los dos años.',
+        text: `El coste de una residencia privada en España oscila entre ${miles(COSTES_MERCADO.residenciaMin)} y ${miles(COSTES_MERCADO.residenciaMax)} € al mes, dependiendo de la comunidad autónoma, el tipo de habitación (individual o doble) y el grado de asistencia requerida. Las residencias en grandes ciudades como Madrid o Barcelona suelen estar en la parte alta de ese rango. Las plazas públicas o concertadas tienen precios mucho más bajos, pero las listas de espera pueden superar los dos años.`,
       },
     },
     {
@@ -80,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Qué es el Servicio de Ayuda a Domicilio (SAD) y cuánto cuesta?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El SAD es un servicio municipal o autonómico que envía a domicilio a un auxiliar para ayudar con tareas cotidianas (higiene personal, comidas, limpieza). El coste público puede ser gratuito o con copago según los ingresos; el servicio privado ronda 15–25 €/hora. Suele cubrir entre 1 y 4 horas diarias, por lo que no es suficiente cuando la persona necesita supervisión continua.',
+        text: `El SAD es un servicio municipal o autonómico que envía a domicilio a un auxiliar para ayudar con tareas cotidianas (higiene personal, comidas, limpieza). El coste público puede ser gratuito o con copago según los ingresos; el servicio privado de agencia ronda ${COSTES_MERCADO.sadHoraMin}–${COSTES_MERCADO.sadHoraMax} €/hora. Suele cubrir entre 1 y 4 horas diarias, por lo que no es suficiente cuando la persona necesita supervisión continua.`,
       },
     },
     {

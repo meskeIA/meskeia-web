@@ -16,15 +16,31 @@ import {
   costeMinimoEmpleadorHogar,
   personasParaCubrir,
 } from '@/data/fiscal';
+import { COSTES_MERCADO } from './costes';
 
 // ─── Tipos y datos ────────────────────────────────────────────────────────────
 
 type GradoDependencia = 'no_valorado' | 'grado1' | 'grado2' | 'grado3';
 
 interface FactorComparacion {
-  icono: string;
+  icono: '✅' | '❌' | '⚠️';
   texto: string;
 }
+
+/**
+ * Lo que el icono dice a quien ve, dicho a quien escucha (hallazgo 2881): los iconos llevan
+ * aria-hidden y eran lo único que distinguía una ventaja de un inconveniente.
+ */
+const SENTIDO_FACTOR: Record<FactorComparacion['icono'], string> = {
+  '✅': 'A favor: ',
+  '❌': 'En contra: ',
+  '⚠️': 'A tener en cuenta: ',
+};
+
+/** «2,5 h/día» con formato español y espacio duro (hallazgo 2885: salía «2.5h/día»). */
+const horasTexto = (h: number): string => `${formatNumber(h, Number.isInteger(h) ? 0 : 1)}\u00A0h/día`;
+
+const GRADO_ROMANO: Record<'grado1' | 'grado2' | 'grado3', string> = { grado1: 'Grado I', grado2: 'Grado II', grado3: 'Grado III' };
 
 interface Opcion {
   id: string;
@@ -40,27 +56,6 @@ interface Opcion {
   /** De dónde sale el suelo del rango */
   origenCoste: string;
 }
-
-// ─── Referencias de MERCADO ──────────────────────────────────────────────────
-//
-// ⚠️ Estas cuatro cifras NO son datos normativos y no tienen sello: son horquillas de
-//    mercado. Viven juntas y aquí arriba porque el 21/09/2026 el Inspector encontró
-//    CUATRO rangos distintos para el coste de una residencia en la misma página —motor
-//    1.600-3.200, tabla 1.500-4.500, FAQ 2.000-4.500 y JSON-LD 1.500-4.000— y la única
-//    forma de que no vuelvan a divergir es que solo exista un sitio donde cambiarlas
-//    (hallazgo 1126).
-export const COSTES_MERCADO = {
-  /** Plaza en residencia privada, €/mes, todo incluido y 24 h */
-  residenciaMin: 1600,
-  residenciaMax: 3200,
-  /** Servicio de ayuda a domicilio privado de agencia, €/hora */
-  sadHoraMin: 18,
-  sadHoraMax: 22,
-  /** Días de servicio al mes que se usan en LOS DOS extremos del rango del SAD */
-  sadDiasMes: 26,
-  /** Sobre el suelo legal, cuánto más se paga de hecho a un cuidador contratado */
-  margenMercadoCuidador: 1.35,
-};
 
 // ─── Lógica ───────────────────────────────────────────────────────────────────
 
@@ -93,19 +88,31 @@ function calcularOpciones(horasDia: number, gradoDependencia: GradoDependencia):
   //    SMI del hogar y de la cuota del empleador, los dos de data/fiscal, y crece con las
   //    horas sin escalones.
   const horasMes = horasDia * 30;
-  const personas = personasParaCubrir(horasMes);
+  // ⚠️ 2026-10-04 (hallazgo 2884): solo se miraban las horas del mes frente a la jornada
+  //    ordinaria. La cobertura es de TODOS los días, y todo empleado de hogar, también a tiempo
+  //    parcial, tiene derecho a 36 horas consecutivas de descanso semanal (art. 9.5 RD
+  //    1620/2011): una sola persona no puede cubrir los siete días.
+  const personasPorJornada = personasParaCubrir(horasMes);
+  const personas = Math.max(personasPorJornada, 2);
   const cuidadorMin = Math.round(costeMinimoEmpleadorHogar(horasMes, SMI_2026.hogarHora));
   const cuidadorMax = Math.round(cuidadorMin * COSTES_MERCADO.margenMercadoCuidador);
-  const cuidadorTipo = personas > 1
-    ? `Cuidado en casa (${horasDia}h/día · ${personas} personas)`
-    : `Cuidado en casa (${horasDia}h/día)`;
+  const cuidadorTipo = `Cuidado en casa (${horasTexto(horasDia)} · ${personas} personas)`;
 
   const tienePrestacion = gradoDependencia !== 'no_valorado';
   const pevs = cuantiaPrestacion(gradoDependencia, 'PEVS');
   const pecef = cuantiaPrestacion(gradoDependencia, 'PECEF');
   const notaPublica = tienePrestacion
-    ? `Con ${gradoDependencia.replace('grado', 'Grado ')} reconocido puedes solicitar la prestación vinculada a servicio (hasta ${formatCurrency(pevs)}/mes) o, si cuida un familiar, la de cuidados en el entorno familiar (hasta ${formatCurrency(pecef)}/mes). Son cuantías MÁXIMAS estatales y el copago las reduce según tu capacidad económica.`
+    ? `Con ${GRADO_ROMANO[gradoDependencia]} reconocido puedes solicitar la prestación vinculada a servicio (hasta ${formatCurrency(pevs)}/mes) o, si cuida un familiar, la de cuidados en el entorno familiar (hasta ${formatCurrency(pecef)}/mes). Son cuantías MÁXIMAS estatales y el copago las reduce según tu capacidad económica.`
     : 'Sin valoración de dependencia, los costes son íntegramente privados. Solicitar la valoración es lo que abre el acceso a las prestaciones y a los servicios del SAAD.';
+
+  // ⚠️ 2026-10-04 (hallazgo 2878): «Coste mensual más alto en términos absolutos» era fijo, y
+  //    desde unas 4,5 h/día la misma tarjeta llevaba la insignia «Menor coste mensual».
+  const otrosMinimos = [costeSADMin, cuidadorMin];
+  const factorCosteResidencia: FactorComparacion = residenciaMin > Math.max(...otrosMinimos)
+    ? { icono: '❌', texto: 'Coste mensual más alto de las tres opciones para estas horas' }
+    : residenciaMin <= Math.min(...otrosMinimos)
+      ? { icono: '✅', texto: 'Con tantas horas de cuidado, el coste mensual más bajo de las tres' }
+      : { icono: '⚠️', texto: 'Precio cerrado: no baja aunque se necesiten menos horas' };
 
   return [
     {
@@ -125,7 +132,7 @@ function calcularOpciones(horasDia: number, gradoDependencia: GradoDependencia):
         // «Abandona su hogar» valoraba moralmente una opción legítima y atribuía la acción
         // a la persona cuidada (hallazgo 1122): es un hecho, no un reproche.
         { icono: '❌', texto: 'Cambio de domicilio y de entorno habitual' },
-        { icono: '❌', texto: 'Coste mensual más alto en términos absolutos' },
+        factorCosteResidencia,
         { icono: '⚠️', texto: 'Variabilidad de calidad entre centros' },
       ],
       // Hallazgo 1124: la nota de ayudas se imprimía en SAD y cuidador y nunca aquí, pese
@@ -135,7 +142,7 @@ function calcularOpciones(horasDia: number, gradoDependencia: GradoDependencia):
     {
       id: 'sad',
       icono: '🏠',
-      nombre: `SAD en domicilio (${horasDia}h/día)`,
+      nombre: `SAD en domicilio (${horasTexto(horasDia)})`,
       costeTexto: `${formatCurrency(costeSADMin)} – ${formatCurrency(costeSADMax)}/mes`,
       costeMin: costeSADMin,
       costeMax: costeSADMax,
@@ -161,16 +168,17 @@ function calcularOpciones(horasDia: number, gradoDependencia: GradoDependencia):
       costeTexto: `${formatCurrency(cuidadorMin)} – ${formatCurrency(cuidadorMax)}/mes`,
       costeMin: cuidadorMin,
       costeMax: cuidadorMax,
-      cobertura: personas > 1
+      cobertura: personasPorJornada > 1
         ? `${formatNumber(horasDia, 1)} h al día, todos los días. Son ${formatNumber(horasMes, 0)} h al mes: más de lo que una sola persona puede trabajar legalmente (${formatNumber(HORAS_JORNADA_COMPLETA_MES, 0)} h/mes), así que hacen falta ${personas} contratos.`
-        : `${formatNumber(horasDia, 1)} h al día, todos los días (${formatNumber(horasMes, 0)} h/mes). El resto del tiempo lo cubre la familia.`,
-      origenCoste: `Suelo legal: SMI del servicio del hogar (${formatCurrency(SMI_2026.hogarHora)}/hora) más el ${formatNumber(COTIZACION_EMPLEADOS_HOGAR_2026.contingenciasComunesEmpleador, 2)} % de contingencias comunes a cargo del empleador. No incluye accidentes de trabajo, desempleo ni FOGASA, así que el coste real es algo mayor.`,
+        : `${formatNumber(horasDia, 1)} h al día, todos los días (${formatNumber(horasMes, 0)} h/mes). Cubrir los siete días exige ${personas} personas: cada una tiene derecho a 36 horas seguidas de descanso semanal (art. 9.5 RD 1620/2011). El resto del tiempo lo cubre la familia.`,
+      origenCoste: `Suelo legal: SMI del servicio del hogar (${formatCurrency(SMI_2026.hogarHora)}/hora) más el ${formatNumber(COTIZACION_EMPLEADOS_HOGAR_2026.contingenciasComunesEmpleador, 2)}\u00A0% de contingencias comunes a cargo del empleador. No incluye accidentes de trabajo, desempleo ni FOGASA, así que el coste real es algo mayor.`,
       factores: [
         { icono: '✅', texto: 'Permanece en su hogar' },
         { icono: '✅', texto: 'Atención personalizada y continua' },
-        personas > 1
+        personasPorJornada > 1
           ? { icono: '⚠️', texto: `Una sola persona no puede cubrir ${formatNumber(horasDia, 1)} h diarias: hacen falta ${personas} contratos y coordinar turnos` }
-          : { icono: horasDia >= 8 ? '✅' : '⚠️', texto: horasDia >= 8 ? 'Cobertura amplia de horas' : 'Cobertura limitada a las horas contratadas' },
+          : { icono: '⚠️', texto: `Una sola persona no puede trabajar los siete días: hacen falta ${personas} contratos y coordinar turnos` },
+        { icono: horasDia >= 8 ? '✅' : '⚠️', texto: horasDia >= 8 ? 'Cobertura amplia de horas' : 'Cobertura limitada a las horas contratadas' },
         { icono: '⚠️', texto: 'Responsabilidad como empleador (SS y contrato)' },
         { icono: '⚠️', texto: 'Gestión de sustituciones en vacaciones/bajas' },
         { icono: '❌', texto: 'Sin cobertura sanitaria integrada' },
@@ -233,12 +241,22 @@ export default function ResidenciaVsCuidadoCasa() {
         </span>
       </DisclaimerCard>
 
+      {/* ⚠️ 2026-10-04 (hallazgo 2879): un solo sello rotulaba las prestaciones de dependencia
+          con el año del SMI y la verificación del módulo de empleados de hogar. Ahora cada módulo
+          lleva el suyo, y la fuente del SMI ya no arrastra los salarios de la AEAT, que la app no usa. */}
       <DataReference
-        normativa={`SMI y prestaciones de dependencia ${FISCAL_SMI_META.vigencia}`}
-        fuente={`${FISCAL_SMI_META.fuente} · ${FISCAL_EMPLEADOS_HOGAR_META.fuente} · ${FISCAL_DEPENDENCIA_META.fuente}`}
+        normativa={`SMI y cotización del servicio del hogar ${FISCAL_EMPLEADOS_HOGAR_META.vigencia}`}
+        fuente={`Real Decreto 126/2026 (SMI 2026) · ${FISCAL_EMPLEADOS_HOGAR_META.fuente}`}
         verificado={FISCAL_EMPLEADOS_HOGAR_META.verificado}
         urlOficial={FISCAL_EMPLEADOS_HOGAR_META.urlOficial}
-        nota="Las cuantías de dependencia son máximos estatales antes del copago. Los precios de residencia y de agencia privada son horquillas de mercado, no datos normativos."
+        nota="Los precios de residencia y de agencia privada son horquillas de mercado, no datos normativos."
+      />
+      <DataReference
+        normativa={`Prestaciones de dependencia ${FISCAL_DEPENDENCIA_META.vigencia}`}
+        fuente={FISCAL_DEPENDENCIA_META.fuente}
+        verificado={FISCAL_DEPENDENCIA_META.verificado}
+        urlOficial={FISCAL_DEPENDENCIA_META.urlOficial}
+        nota="Las cuantías de dependencia son máximos estatales antes del copago."
       />
 
       <div className={styles.mainContent}>
@@ -276,7 +294,7 @@ export default function ResidenciaVsCuidadoCasa() {
 
           {error && (
             <div role="alert" aria-live="polite" className={styles.errorMsg}>
-              ⚠️ {error}
+              <span aria-hidden="true">⚠️</span> {error}
             </div>
           )}
 
@@ -322,7 +340,7 @@ export default function ResidenciaVsCuidadoCasa() {
                     {opcion.factores.map((f, i) => (
                       <div key={i} className={styles.factorItem}>
                         <span className={styles.factorIcono} aria-hidden="true">{f.icono}</span>
-                        <span>{f.texto}</span>
+                        <span><span className="sr-only">{SENTIDO_FACTOR[f.icono]}</span>{f.texto}</span>
                       </div>
                     ))}
                   </div>

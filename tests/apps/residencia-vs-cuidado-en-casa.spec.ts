@@ -154,10 +154,13 @@ test.describe('Residencia vs Cuidado en Casa', () => {
     expect(await coste(page, /Cuidado en casa/)).toBe(norm('1062,00 € – 1434,00 €/mes'));
 
     // La cabecera del SAD lleva las horas pedidas.
-    await expect(tarjeta(page, /SAD en domicilio/)).toContainText('SAD en domicilio (3h/día)');
-    // 90 h/mes no llegan a la jornada ordinaria: una sola persona, sin aviso de turnos.
-    await expect(tarjeta(page, /Cuidado en casa/)).toContainText('Cuidado en casa (3h/día)');
-    await expect(tarjeta(page, /Cuidado en casa/)).not.toContainText('contratos');
+    // «3 h/día» con espacio duro (hallazgo 2885: salía «3h/día», y con decimales «2.5h/día»).
+    expect(norm(await tarjeta(page, /SAD en domicilio/).innerText())).toContain('SAD en domicilio (3 h/día)');
+    // 90 h/mes no llegan a la jornada ordinaria, pero cubrir los siete días exige dos personas:
+    // descanso semanal de 36 h consecutivas (art. 9.5 RD 1620/2011). Hasta el 04/10/2026 este
+    // test pedía «sin aviso de turnos», que era justo el defecto del hallazgo 2884.
+    expect(norm(await tarjeta(page, /Cuidado en casa/).innerText())).toContain('Cuidado en casa (3 h/día · 2 personas)');
+    await expect(tarjeta(page, /Cuidado en casa/)).toContainText('36 horas seguidas de descanso semanal');
 
     // «Menor coste mensual» = menor extremo inferior (1.062 < 1.404 < 1.600).
     await expect(tarjeta(page, /Cuidado en casa/).locator('[class*="opcionBadge"]')).toHaveText('Menor coste mensual');
@@ -296,10 +299,12 @@ test.describe('Residencia vs Cuidado en Casa', () => {
     await expect(page.locator('h1')).toHaveText('Residencia vs Cuidado en Casa');
 
     // Hallazgo 1117 · DataReference con el sello del módulo que se estrenó para esta app.
+    // Desde el 04/10/2026 (hallazgo 2879) hay un sello por módulo: el del hogar y el de dependencia.
     const dataRef = page.locator('[aria-label="Datos de referencia normativos"]');
-    await expect(dataRef).toHaveCount(1);
-    await expect(dataRef).toContainText('21/09/2026');
-    await expect(dataRef).toContainText('Empleados de Hogar');
+    await expect(dataRef).toHaveCount(2);
+    await expect(dataRef.first()).toContainText('21/09/2026');
+    await expect(dataRef.first()).toContainText('Empleados de Hogar');
+    await expect(dataRef.nth(1)).toContainText('14/07/2026');
 
     // Hallazgo 1126 · un SOLO rango de residencia en toda la página. Los otros tres que
     // convivían con él eran 1.500-4.500, 2.000-4.500 y 1.500-4.000.
@@ -379,8 +384,7 @@ test.describe('Re-inspección 04/10/2026 — escritorio', () => {
     await expect(tarjeta(page, 'Residencia privada').locator('[class*="opcionBadge"]')).toHaveText('Menor coste mensual');
   });
 
-  test('HALLAZGO (abierto, 04/10/2026) · con la insignia «Menor coste mensual», la residencia se sigue listando como la más cara', async ({ page }) => {
-    test.fail(true, 'El factor «Coste mensual más alto en términos absolutos» es fijo y contradice la insignia de la misma tarjeta desde ~4,52 h/día');
+  test('HALLAZGO (reparado, 04/10/2026) · con la insignia «Menor coste mensual», la residencia se sigue listando como la más cara', async ({ page }) => {
     await abrir(page);
     await sembrarValor(page, HORAS, '5');
     await comparar(page);
@@ -391,8 +395,7 @@ test.describe('Re-inspección 04/10/2026 — escritorio', () => {
     await expect(residencia).not.toContainText('Coste mensual más alto en términos absolutos', { timeout: 2000 });
   });
 
-  test('HALLAZGO (abierto, 04/10/2026) · las horas decimales salen en formato inglés en el nombre de las tarjetas', async ({ page }) => {
-    test.fail(true, '`${horasDia}h/día` imprime el número de JavaScript: «2.5h/día», mientras la cobertura de la misma tarjeta dice «2,5 h»');
+  test('HALLAZGO (reparado, 04/10/2026) · las horas decimales salen en formato inglés en el nombre de las tarjetas', async ({ page }) => {
     await abrir(page);
     await page.locator(HORAS).fill('2,5');
     await esperarValorEnReact(page, HORAS, '2,5');
@@ -403,8 +406,7 @@ test.describe('Re-inspección 04/10/2026 — escritorio', () => {
     expect(nombre).not.toContain('2.5');
   });
 
-  test('HALLAZGO (abierto, 04/10/2026) · el JSON-LD (FAQPage) conserva rangos de mercado distintos de COSTES_MERCADO', async ({ page }) => {
-    test.fail(true, 'Reparación incompleta del 1126: la página dice 1.600-3.200 €/mes y 18-22 €/h; el FAQPage, 1.500-4.000 € y 15-25 €/h');
+  test('HALLAZGO (reparado, 04/10/2026) · el JSON-LD (FAQPage) conserva rangos de mercado distintos de COSTES_MERCADO', async ({ page }) => {
     await abrir(page);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
@@ -416,8 +418,7 @@ test.describe('Re-inspección 04/10/2026 — escritorio', () => {
     expect(respuestas[1]).toMatch(/18\s*(?:y|[–-])\s*22/);
   });
 
-  test('HALLAZGO (abierto, 04/10/2026) · el sello de datos rotula las cuantías de dependencia como «2026» y verificadas el 21/09/2026', async ({ page }) => {
-    test.fail(true, 'normativa = «SMI y prestaciones de dependencia ${FISCAL_SMI_META.vigencia}» y verificado = el del módulo de empleados de hogar; el de dependencia es PRESTACIONES_DEPENDENCIA_2025, vigencia «2025-2026», verificado 2026-07-14');
+  test('HALLAZGO (reparado, 04/10/2026) · el sello de datos rotula las cuantías de dependencia como «2026» y verificadas el 21/09/2026', async ({ page }) => {
     await abrir(page);
     const sellos = page.locator('[aria-label="Datos de referencia normativos"]');
     await expect(sellos.first()).toBeVisible();
@@ -427,8 +428,7 @@ test.describe('Re-inspección 04/10/2026 — escritorio', () => {
     await expect(sellos.filter({ hasText: '14/07/2026' }).first()).toBeVisible({ timeout: 2000 });
   });
 
-  test('HALLAZGO (abierto, 04/10/2026) · con 5 h todos los días no avisa de que una sola persona no puede cubrirlo', async ({ page }) => {
-    test.fail(true, 'personasParaCubrir solo mira horas: ignora el descanso semanal de 36 h consecutivas del art. 9.5 del RD 1620/2011');
+  test('HALLAZGO (reparado, 04/10/2026) · con 5 h todos los días no avisa de que una sola persona no puede cubrirlo', async ({ page }) => {
     await abrir(page);
     await sembrarValor(page, HORAS, '5');
     await comparar(page);
@@ -438,8 +438,7 @@ test.describe('Re-inspección 04/10/2026 — escritorio', () => {
     await expect(cuidado).toContainText(/descanso semanal|2 personas|2 contratos/, { timeout: 2000 });
   });
 
-  test('HALLAZGO (abierto, 04/10/2026) · los iconos ✅/❌/⚠️ son lo único que distingue ventajas de inconvenientes, y están ocultos al lector de pantalla', async ({ page }) => {
-    test.fail(true, 'factorIcono lleva aria-hidden y no hay texto equivalente: el lector lee una lista plana');
+  test('HALLAZGO (reparado, 04/10/2026) · los iconos ✅/❌/⚠️ son lo único que distingue ventajas de inconvenientes, y están ocultos al lector de pantalla', async ({ page }) => {
     await abrir(page);
     await sembrarValor(page, HORAS, '3');
     await comparar(page);
@@ -449,8 +448,7 @@ test.describe('Re-inspección 04/10/2026 — escritorio', () => {
     expect(arbol).toMatch(/ventaja|a favor|inconveniente|en contra|desventaja/i);
   });
 
-  test('HALLAZGO (abierto, 04/10/2026) · el aviso de error lee el emoji ⚠️ dentro del role="alert"', async ({ page }) => {
-    test.fail(true, 'page.tsx imprime «⚠️ {error}» sin <span aria-hidden="true"> (CLAUDE.md §5, regla 3)');
+  test('HALLAZGO (reparado, 04/10/2026) · el aviso de error lee el emoji ⚠️ dentro del role="alert"', async ({ page }) => {
     await abrir(page);
     await sembrarValor(page, HORAS, '-');
     await comparar(page);
@@ -458,8 +456,7 @@ test.describe('Re-inspección 04/10/2026 — escritorio', () => {
     expect(await aviso(page).ariaSnapshot()).not.toMatch(/\p{Extended_Pictographic}/u);
   });
 
-  test('HALLAZGO (abierto, 04/10/2026) · contraste de la insignia «Menor coste mensual» (blanco sobre #27AE60)', async ({ page }) => {
-    test.fail(true, '2,87:1 en los dos temas: 11,5 px en negrita exige 4,5:1');
+  test('HALLAZGO (reparado, 04/10/2026) · contraste de la insignia «Menor coste mensual» (blanco sobre #27AE60)', async ({ page }) => {
     await abrir(page);
     await activarTema(page, 'light');
     await sembrarValor(page, HORAS, '3');
@@ -468,8 +465,7 @@ test.describe('Re-inspección 04/10/2026 — escritorio', () => {
     expect(await contraste(page, '[class*="opcionBadge"]')).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO (abierto, 04/10/2026) · contraste del aviso de error en tema OSCURO (#c0392b sin variante oscura)', async ({ page }) => {
-    test.fail(true, '#c0392b sobre la tarjeta oscura #2A2A2A da 2,64:1; en claro da 5,44:1');
+  test('HALLAZGO (reparado, 04/10/2026) · contraste del aviso de error en tema OSCURO (#c0392b sin variante oscura)', async ({ page }) => {
     await abrir(page);
     await activarTema(page, 'dark');
     await sembrarValor(page, HORAS, '-');
@@ -482,8 +478,7 @@ test.describe('Re-inspección 04/10/2026 — escritorio', () => {
     expect(await contraste(page, '[class*="errorMsg"]')).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO (abierto, 04/10/2026) · el módulo fija --primary: #2E86AB en los dos temas y el texto de marca no llega a 4,5:1', async ({ page }) => {
-    test.fail(true, 'Preguntas de la FAQ 3,77:1 en claro (sobre #F5F5F5) y 3,21:1 en oscuro; el .container tapa el #3FA5D1 oscuro de globals.css');
+  test('HALLAZGO (reparado, 04/10/2026) · el módulo fija --primary: #2E86AB en los dos temas y el texto de marca no llega a 4,5:1', async ({ page }) => {
     await abrir(page);
     await activarTema(page, 'light');
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
