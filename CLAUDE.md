@@ -578,6 +578,18 @@ de su árbol (home, `/datos-fiscales/`, asistente y blog).
 > Salió del 29/08/2026: tarjetas de Coquinum y Cronicum sin imagen. Crónica: cabecera de
 > `scripts/check-og-image.mjs` · pruebas: `npm run og:probar-candado`.
 
+### Candado de los consumidores de data/
+
+`npm run check:consumidores` — en el build, y **rompe el build** si un parser por regex de
+`scripts/parsers-catalogo.mjs` no saca exactamente lo que contiene el catálogo importado
+(`STEMUM_APPS`, `COQUINUM_APPS`, `applicationsDatabase`…): ni uno de menos ni un campo distinto.
+Los scripts que leen `data/*.ts` como texto **importan su parser de ahí, no copian el regex**: la
+copia queda fuera del candado. Fuera, a propósito: el generador de posts para X (otro repo).
+**Sin pasivo** · **sin escape**: si no coincide, el parser está mal · Se omite si Node no carga .ts.
+> Salió del 28/07/2026: el refactor de verticales dejó mudos a tres consumidores sin un error.
+> Crónica: cabecera de `scripts/check-consumidores.mjs` y `scripts/CLAUDE.md` · pruebas:
+> `npm run consumidores:probar-candado`.
+
 ### Candado de las obligaciones del CLAUDE.md
 
 `npm run check:claude-md` — en el build, y **rompe el build** si una obligación de este fichero

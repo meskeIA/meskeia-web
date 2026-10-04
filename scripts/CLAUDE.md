@@ -13,26 +13,30 @@ Ocurrió el 28/07/2026: el refactor de verticales convirtió `STEMUM_APP_DISCIPL
 `COQUINUM_APP_CATEGORIA` en `Record` derivados, y de golpe se quedaron mudos **tres**
 consumidores a la vez. Se descubrió por casualidad al abrir el generador.
 
-**Al cambiar el formato de `stemum.ts` / `coquinum.ts` / `applications.ts` / `implemented-apps.ts`
-/ `delegum/soluciones.ts` / `historias/*.ts`, repasar los cuatro:**
+**Desde el 04/10/2026 lo vigila `npm run check:consumidores`, en el build.** Los regex viven en
+UN sitio, `scripts/parsers-catalogo.mjs`, y el candado le pasa a cada uno el texto real del
+fichero y compara lo que saca con el catálogo **importado** (Node 24 carga los .ts): igualdad
+exacta, no umbral, y campo a campo (`name`, `suites`… — S0154 era un nombre leído como ruta).
+Prueba: `npm run consumidores:probar-candado`, que reinyecta el 28/07 sobre copias.
 
-1. `scripts/cuadrante-stem.mjs`
-2. `scripts/cuadrante-catalogo.mjs` (universo desde `implemented-apps.ts`; los verticales, por
-   regex sobre `stemum.ts`, `coquinum.ts` y `delegum/soluciones.ts`). Avisa por consola del
-   portal que se queda mudo, pero **no** detiene el cruce: el vertical es una columna informativa.
-3. `scripts/semilla-diaria.mjs` (su universo Coquinum)
-4. El **generador de posts para X**, que vive FUERA del repo:
-   `C:\Users\jaceb\Mis Desarrollos\Mis Programas\generador-posts-x\servidor.js` (puerto 3005).
-   Es el más fácil de olvidar precisamente porque no está aquí. Sus parsers avisan por consola
-   si el número de apps reconocidas no cuadra con el de claves `slug:`, pero solo si alguien lo
-   arranca y mira.
-5. `scripts/generate-apps-demandadas.mjs` (08/09/2026) — saca los slugs de `applications.ts` con
-   `/url:\s*"\/([^"/]+)\/"/g` para cruzarlos con el ranking de Turso. Este **sí se planta**: si
-   quedan menos de 20 apps válidas aborta sin escribir, porque un `data/apps-demandadas.ts`
-   vacío dejaría la portada rotando sobre el catálogo entero otra vez y en silencio.
+**Regla: un consumidor nuevo importa su parser de `parsers-catalogo.mjs`, no copia el regex.**
+Una copia queda fuera del candado sin que nada lo diga. Lo usan hoy `cuadrante-stem`,
+`cuadrante-catalogo`, `semilla-diaria`, `detectar-duplicados` (que tenía su propia copia del
+parser de `applications.ts`, gemela de la de semilla) y `generate-apps-demandadas`.
 
-La defensa no es el build —que no ve nada de esto— sino contar lo que sale: un parser que
-devuelve 0 items donde había 133 no está «vacío», está roto.
+Fuera del candado, a propósito:
+
+- El **generador de posts para X**, que vive FUERA del repo:
+  `C:\Users\jaceb\Mis Desarrollos\Mis Programas\generador-posts-x\servidor.js` (puerto 3005).
+  Herramienta de uso esporádico: se decidió no atarla al módulo compartido. Sus parsers avisan
+  por consola si el número de apps reconocidas no cuadra con el de claves `slug:`, pero solo si
+  alguien lo arranca y mira. **Al cambiar el formato de `data/`, repasarlo a mano.**
+- `covisita-crosscheck.mjs` (lee `app-relations.ts`) y `faq-progress.mjs`.
+- `historias/*.ts`: semilla-diaria las lista por nombre de fichero, sin regex.
+
+`generate-apps-demandadas.mjs` además **se planta** solo: si quedan menos de 20 apps válidas
+aborta sin escribir, porque un `data/apps-demandadas.ts` vacío dejaría la portada rotando sobre
+el catálogo entero otra vez y en silencio.
 
 ## Un regex sobre código fuente cruza comentarios, y `[\s\S]*?` no se detiene donde crees
 

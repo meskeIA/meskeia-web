@@ -39,6 +39,7 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parsearApplications } from './parsers-catalogo.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ = path.resolve(__dirname, '..');
@@ -46,28 +47,13 @@ const APPS_TS = path.join(RAIZ, 'data', 'applications.ts');
 const TURSO_DIR = path.join(RAIZ, '_backups', 'turso');
 
 // -------------------------------------------------------------------------------------------------
-// 1. Parseo de data/applications.ts (mismo regex robusto que semilla-diaria.mjs: objetos planos)
+// 1. Parseo de data/applications.ts — el MISMO que usa semilla-diaria.mjs, en parsers-catalogo.mjs.
+// Aquí importa más que allí que el `name` salga bien (S0154, 20/09/2026): alimenta la agrupación
+// por tokens, así que una entrada leída como ruta se agrupa por su slug y puede cambiar el
+// veredicto POTENCIAR-vs-ampliar del clúster.
 // -------------------------------------------------------------------------------------------------
 function parsearApps() {
-  const txt = readFileSync(APPS_TS, 'utf8');
-  const bloques = txt.match(/\{[^{}]*url:\s*"[^"]*"[^{}]*\}/g) || [];
-  const apps = [];
-  for (const b of bloques) {
-    const url = b.match(/url:\s*"([^"]+)"/)?.[1];
-    if (!url) continue;
-    // Las dos comillas — ver la nota gemela en semilla-diaria.mjs (S0154, 20/09/2026). Aquí
-    // importa más: el `name` alimenta la agrupación por tokens, así que una entrada leída como
-    // ruta se agrupa por su slug y puede cambiar el veredicto POTENCIAR-vs-ampliar del clúster.
-    const name = (b.match(/name:\s*"([^"]+)"/) || b.match(/name:\s*'([^']+)'/))?.[1] || url;
-    const description = b.match(/description:\s*"((?:[^"\\]|\\.)*)"/)?.[1] || '';
-    const kwRaw = b.match(/keywords:\s*\[([^\]]*)\]/)?.[1] || '';
-    const keywords = [...kwRaw.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
-    const suitesRaw = b.match(/suites:\s*\[([^\]]*)\]/)?.[1] || '';
-    const suites = [...suitesRaw.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
-    const slug = url.replace(/^\/|\/$/g, '');
-    apps.push({ name, slug, description, keywords, suites });
-  }
-  return apps;
+  return parsearApplications(readFileSync(APPS_TS, 'utf8'));
 }
 
 // -------------------------------------------------------------------------------------------------

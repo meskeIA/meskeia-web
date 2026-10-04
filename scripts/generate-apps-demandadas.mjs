@@ -47,6 +47,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parsearApplications } from './parsers-catalogo.mjs';
 
 const RAIZ = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const TURSO_DIR = 'C:/Users/jaceb/Documents/meskeIA_Critico/turso';
@@ -102,11 +103,11 @@ const ranking = db
   .all();
 
 // ── 3. Cruce con el catálogo: un slug sin app viva no puede mostrarse ──────
-// applications.ts guarda `url: "/slug/"`; el tracker emite el slug pelado.
+// applications.ts guarda `url: "/slug/"`; el tracker emite el slug pelado. Las rutas anidadas
+// (`visualizador-historia/x`, `guia/x`) entran en el conjunto pero no casan con nada: el tracker
+// registra las cronologías como `cronicum-x`, que el ranking ya excluye arriba.
 const fuente = readFileSync(path.join(RAIZ, 'data', 'applications.ts'), 'utf8');
-const slugsCatalogo = new Set(
-  [...fuente.matchAll(/url:\s*"\/([^"/]+)\/"/g)].map((m) => m[1])
-);
+const slugsCatalogo = new Set(parsearApplications(fuente).map((a) => a.slug));
 
 const validas = [];
 const huerfanas = [];

@@ -35,6 +35,9 @@ import { JWT } from 'google-auth-library';
 import { createClient } from '@libsql/client';
 import dotenv from 'dotenv';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import {
+  contarUrlsImplementadas, slugsCoquinum, slugsDelegum, slugsImplementadas, slugsStemum,
+} from './parsers-catalogo.mjs';
 
 dotenv.config({ path: '.env.local', quiet: true });
 
@@ -57,11 +60,11 @@ const SLUGS = argv.filter((a) => !a.startsWith('--')).map((s) => s.replace(/^\/+
 // vacío sin protestar es precisamente el fallo que estas comprobaciones evitan.
 function cargarCatalogo() {
   const txt = readFileSync('data/implemented-apps.ts', 'utf8');
-  const slugs = [...txt.matchAll(/^\s*"\/([^"]*?)\/?"\s*,/gm)].map((m) => m[1]).filter(Boolean);
+  const slugs = slugsImplementadas(txt);
   if (slugs.length === 0) {
     throw new Error('El catálogo ha salido vacío: no he sabido leer data/implemented-apps.ts.');
   }
-  const literales = (txt.match(/^\s*"\//gm) ?? []).length;
+  const literales = contarUrlsImplementadas(txt);
   if (slugs.length !== literales) {
     throw new Error(
       `Parseo desincronizado: ${literales} URLs en data/implemented-apps.ts, ${slugs.length} reconocidas.`,
@@ -84,9 +87,9 @@ function cargarVerticales() {
   const leer = (ruta) => (existsSync(ruta) ? readFileSync(ruta, 'utf8') : '');
   const cuenta = { stemum: 0, coquinum: 0, delegum: 0 };
 
-  for (const m of leer('data/stemum.ts').matchAll(/slug:\s*'([^']+)'/g)) { marcar(m[1], 'stemum'); cuenta.stemum++; }
-  for (const m of leer('data/coquinum.ts').matchAll(/slug:\s*'([^']+)'/g)) { marcar(m[1], 'coquinum'); cuenta.coquinum++; }
-  for (const m of leer('data/delegum/soluciones.ts').matchAll(/url:\s*'\/([^']+?)\/?'/g)) { marcar(m[1], 'delegum'); cuenta.delegum++; }
+  for (const slug of slugsStemum(leer('data/stemum.ts'))) { marcar(slug, 'stemum'); cuenta.stemum++; }
+  for (const slug of slugsCoquinum(leer('data/coquinum.ts'))) { marcar(slug, 'coquinum'); cuenta.coquinum++; }
+  for (const slug of slugsDelegum(leer('data/delegum/soluciones.ts'))) { marcar(slug, 'delegum'); cuenta.delegum++; }
 
   const mudos = Object.entries(cuenta).filter(([, n]) => n === 0).map(([v]) => v);
   if (mudos.length) {
