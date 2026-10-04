@@ -724,13 +724,12 @@ test('S5 · fuera de rango: v, B y θ se capan a su recorrido y el cálculo sigu
   await expect(valorDeFila(page, 'Energía cinética')).toHaveText('1,14 keV');
 });
 
-// HALLAZGO (contenido, bajo) — ABIERTO desde el 04/10/2026. `seAtraen = corriente2 >= 0`: con
+// HALLAZGO (contenido, bajo) — REPARADO el 04/10/2026 (era ABIERTO). `seAtraen = corriente2 >= 0`: con
 // I₂ = 0 la fuerza es 0 N/m y aun así la fila dice «se atraen». Sin corriente en el segundo hilo
 // no hay fuerza, ni de atracción ni de repulsión (mismo patrón que el 2168 con θ = 0°).
 // Caso: Corrientes, I₂ = 0 A → esperado F/L = 0 N/m y ni «se atraen» ni «se repelen» ·
 //       obtenido «0 N/m» y «se atraen».
 test('HALLAZGO · con I₂ = 0 no hay fuerza entre los hilos: no pueden «atraerse»', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto (04/10/2026): con I₂ = 0 la fila «Los hilos» dice «se atraen»');
   await irACorrientes(page);
   // Control: arranque I₂ = 10 A → se atraen; I₂ = −10 A → se repelen
   await expect(valorDeFila(page, 'Los hilos')).toHaveText('se atraen');
@@ -742,7 +741,7 @@ test('HALLAZGO · con I₂ = 0 no hay fuerza entre los hilos: no pueden «atraer
   await expect(valorDeFila(page, 'Los hilos')).not.toHaveText(/atraen|repelen/);
 });
 
-// HALLAZGO (dato, medio) — ABIERTO desde el 04/10/2026. La FAQ «¿Qué diferencia hay entre tesla y
+// HALLAZGO (dato, medio) — REPARADO el 04/10/2026 (era ABIERTO). La FAQ «¿Qué diferencia hay entre tesla y
 // gauss?» dice que un imán de nevera da «unas décimas de tesla» (0,1-0,9 T). La Wikipedia en
 // español (Tesla (unidad)) da 5 mT para «un imán de nevera típico», la inglesa también, y su
 // «Orders of magnitude (magnetic field)» da 10-100 G (1-10 mT) citando al National MagLab
@@ -751,7 +750,6 @@ test('HALLAZGO · con I₂ = 0 no hay fuerza entre los hilos: no pueden «atraer
 // Caso: guía educativa, FAQ tesla/gauss → esperado del orden de 5 mT (milésimas de tesla) ·
 //       obtenido «un imán de nevera, unas décimas de tesla».
 test('HALLAZGO · el imán de nevera ronda los militeslas, no «unas décimas de tesla»', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto (04/10/2026): la FAQ da al imán de nevera «unas décimas de tesla»');
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   const faq = page
     .locator('[class*="faqItem"]')
@@ -761,14 +759,13 @@ test('HALLAZGO · el imán de nevera ronda los militeslas, no «unas décimas de
   await expect(faq).not.toContainText(/décimas de tesla/);
 });
 
-// HALLAZGO (contenido, bajo) — ABIERTO desde el 04/10/2026. En el dibujo de la barra sobre
+// HALLAZGO (contenido, bajo) — REPARADO el 04/10/2026 (era ABIERTO). En el dibujo de la barra sobre
 // raíles, la resistencia (rect en y = 185-235, x = 72-108) flota entre los raíles (y = 120 e
 // y = 300, desde x = 90) sin ningún trazo que la una a ellos: el circuito dibujado está abierto,
 // y con el circuito abierto no circularía la corriente I = ε/R que da la tabla.
 // Caso: Inducción → Barra sobre raíles → esperado R unida a los dos raíles (circuito cerrado) ·
 //       obtenido huecos de 65 px (y = 120-185 y 235-300) sin nada dibujado.
 test('HALLAZGO · la resistencia del dibujo de la barra está unida a los dos raíles', async ({ page }) => {
-  test.fail(true, 'Hallazgo abierto (04/10/2026): la resistencia flota entre los raíles, circuito abierto');
   await page.getByRole('button', { name: 'Inducción', exact: true }).click();
   await page.getByRole('button', { name: 'Barra sobre raíles' }).click();
   await esperarHidratacion(page, ['#campoBarra']);
@@ -844,7 +841,7 @@ test.describe('lienzos en móvil (390×844) — re-inspección 04/10/2026', () =
     expect(bloqueos).toEqual([]);
   });
 
-  // HALLAZGO (accesibilidad, medio) — ABIERTO desde el 04/10/2026. A 390 px el SVG (viewBox de
+  // HALLAZGO (accesibilidad, medio) — REPARADO el 04/10/2026 (era ABIERTO). A 390 px el SVG (viewBox de
   // 760 de ancho) se pinta a 308 px, escala 0,405: los rótulos de 11,5-14 px quedan en 4,6-5,7 px.
   // Lo que solo dice el dibujo deja de leerse: la leyenda de la gráfica (qué curva es Φ y cuál ε,
   // que la nota «Fíjate en el desfase» da por sabido), la regla de la mano derecha, el rótulo
@@ -853,7 +850,6 @@ test.describe('lienzos en móvil (390×844) — re-inspección 04/10/2026', () =
   //       («a 5,0 cm del hilo», regla de la mano derecha) en Corrientes, 4,6-4,7 px («Flujo Φ =
   //       N·B·A·cos(ωt)», «fem ε = …») en el alternador y 4,6-4,7 px («R = 2,0 Ω») en la barra.
   test('HALLAZGO · los rótulos de los cuatro lienzos se leen (≥ 9 px) a 390 px', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto (04/10/2026): a 390 px los rótulos del lienzo miden 4,6-5,7 px');
     const pequenos: string[] = [];
     const medir = async (vista: string): Promise<void> => {
       const m = await rotuloMasPequeno(page);
@@ -965,7 +961,7 @@ test.describe('hero bajo stemum.com — re-inspección 04/10/2026', () => {
     }
   });
 
-  // HALLAZGO (accesibilidad, bajo) — ABIERTO desde el 04/10/2026. La sospecha de las cinco apps
+  // HALLAZGO (accesibilidad, bajo) — REPARADO el 04/10/2026 (era ABIERTO). La sospecha de las cinco apps
   // de Física (píldora hasta x ≈ 232, h1 desde x ≥ 247) NO se cumple aquí: «Simulador de Campo
   // Magnético» es más largo y, desde 1024 px (sin el hueco de 80 px de a1d72a9c), empieza en
   // x = 221. La píldora «Stemum › Física» (x = 20-232, y = 15-77) tapa media «S» (x = 221-243,
@@ -976,7 +972,6 @@ test.describe('hero bajo stemum.com — re-inspección 04/10/2026', () => {
   test('HALLAZGO · de 1024 a 1041 px la píldora «Stemum › Física» pisa la «S» del título', async ({
     page,
   }) => {
-    test.fail(true, 'Hallazgo abierto (04/10/2026): bajo stemum.com la píldora tapa el inicio del h1 a 1024-1041 px');
     const tapados: string[] = [];
     for (const ancho of [1024, 1030, 1035, 1041]) {
       await page.setViewportSize({ width: ancho, height: 900 });

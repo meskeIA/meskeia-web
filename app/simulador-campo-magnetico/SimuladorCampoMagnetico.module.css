@@ -387,6 +387,13 @@
   stroke-linecap: round;
 }
 
+/* Hilo que une la resistencia a cada raíl (hallazgo 2858). */
+.conductor {
+  stroke: #64748b;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
 .resistor {
   fill: #fde68a;
   stroke: #b45309;
@@ -770,7 +777,8 @@
   stroke: #fb923c;
 }
 
-[data-theme='dark'] .rail {
+[data-theme='dark'] .rail,
+[data-theme='dark'] .conductor {
   stroke: #94a3b8;
 }
 
@@ -861,6 +869,30 @@
    que deja la plantilla. Va al final para ganar a cualquier padding previo del hero. */
 @media (max-width: 1023px) {
   .hero {
+    padding-top: 80px;
+  }
+}
+
+/* A 390 px el lienzo (viewBox de 760) se pintaba a 308 px y los rótulos de 11,5 quedaban en
+   4,6 px: la leyenda del alternador, la regla de la mano derecha y v⊥/F no se leían (hallazgo
+   2855). En pantallas estrechas el dibujo conserva 600 px de ancho (rótulos de 9 px o más) y se
+   desplaza dentro de su caja, sin mover la página. */
+@media (max-width: 640px) {
+  .canvasContainer > div:first-child {
+    min-width: 0;
+    overflow-x: auto;
+  }
+
+  .canvasSvg {
+    min-width: 600px;
+  }
+}
+
+/* Bajo stemum.com la barra fija lleva la píldora «Stemum › Física», más ancha que el logo de
+   meskeia.com, y de 1024 a 1041 px pisaba la «S» del título (hallazgo 2859; la forma del 2589
+   de simulador-punnett). Mismo hueco, con unos píxeles de aire. */
+@media (min-width: 1024px) and (max-width: 1059px) {
+  :global([data-brand='stemum']) .hero {
     padding-top: 80px;
   }
 }

@@ -252,7 +252,9 @@ export default function SimuladorCampoMagnetico() {
     const campoSolenoide = MU_0 * espirasPorMetro * corriente;
     const fuerzaEntreHilos =
       separacion > 0 ? (MU_0 * corriente * Math.abs(corriente2)) / (2 * Math.PI * separacion) : 0;
-    const seAtraen = corriente2 >= 0; // mismo sentido de corriente = atracción
+    const seAtraen = corriente2 > 0; // mismo sentido de corriente = atracción
+    // Con I₂ = 0 no hay fuerza: ni atracción ni repulsión (hallazgo 2857, forma del 2168).
+    const sinFuerza = corriente2 === 0 || corriente === 0;
     return {
       fuerzaConductor,
       campoHilo,
@@ -261,6 +263,7 @@ export default function SimuladorCampoMagnetico() {
       campoSolenoide,
       fuerzaEntreHilos,
       seAtraen,
+      sinFuerza,
     };
   }, [
     anguloIB,
@@ -1016,7 +1019,7 @@ export default function SimuladorCampoMagnetico() {
                   <div className={styles.resultRow}>
                     <span className={styles.resultLabel}>Los hilos</span>
                     <span className={styles.resultValue}>
-                      {corrientes.seAtraen ? 'se atraen' : 'se repelen'}
+                      {corrientes.sinFuerza ? 'sin fuerza entre ellos' : corrientes.seAtraen ? 'se atraen' : 'se repelen'}
                     </span>
                   </div>
                   <p className={styles.resultNota}>
@@ -1306,6 +1309,10 @@ export default function SimuladorCampoMagnetico() {
                       {/* Raíles y resistencia */}
                       <line x1={90} y1={120} x2={SVG_W - 50} y2={120} className={styles.rail} />
                       <line x1={90} y1={300} x2={SVG_W - 50} y2={300} className={styles.rail} />
+                      {/* Los conductores que unen la resistencia a los dos raíles: sin ellos el
+                          circuito dibujado quedaba abierto (hallazgo 2858). */}
+                      <line x1={90} y1={120} x2={90} y2={185} className={styles.conductor} />
+                      <line x1={90} y1={235} x2={90} y2={300} className={styles.conductor} />
                       <rect x={72} y={185} width={36} height={50} rx={4} className={styles.resistor} />
                       <text x={90} y={168} className={styles.etiquetaSecundaria}>
                         R = {formatNumber(resistencia, 1)} Ω
@@ -1563,7 +1570,7 @@ export default function SimuladorCampoMagnetico() {
               <p>
                 Son unidades de la misma magnitud: 1 T = 10.000 G. El tesla pertenece al Sistema
                 Internacional y el gauss al sistema cegesimal. Como referencia, el campo terrestre
-                ronda los 50 microteslas y un imán de nevera, unas décimas de tesla.
+                ronda los 50 microteslas y un imán de nevera típico, unos 5 militeslas (milésimas de tesla).
               </p>
             </div>
             <div className={styles.faqItem}>
