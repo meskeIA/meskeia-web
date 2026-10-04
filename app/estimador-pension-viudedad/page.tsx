@@ -5,13 +5,26 @@ import styles from './EstimadorPensionViudedad.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatCurrency, formatNumber } from '@/lib';
+import { formatCurrency, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { PENSION_VIUDEDAD_2026, minimoViudedad2026, RECLAMACION_PREVIA_SS } from '@/data/fiscal/pensiones';
-import { FISCAL_PENSIONES_META } from '@/data/fiscal';
+import {
+  PENSION_VIUDEDAD_2026, minimoViudedad2026, RECLAMACION_PREVIA_SS, MINIMOS_VIUDEDAD_2026,
+  COMPLEMENTO_MINIMOS_LIMITES_2026, TOPE_COMPLEMENTO_MINIMOS_2026,
+} from '@/data/fiscal/pensiones';
+import {
+  FISCAL_PENSIONES_META, MINIMOS_IRPF_2025, calcularRendimientoNetoTrabajo, calcularCuotaIntegraGeneral,
+} from '@/data/fiscal';
 
 // Alias corto para legibilidad interna
 const PV = PENSION_VIUDEDAD_2026;
+
+/** Espacio duro entre la cifra y el % (Ortografía de la RAE, 2010; decisión del 25/09/2026). */
+const pct = (n: number): string => `${n} %`;
+
+/** La pensión se cobra en 14 pagas: el Anexo I del RD 241/2026 da los mínimos en €/año. */
+const PAGAS = 14;
+/** Los ingresos propios se piden por mes con las pagas extra prorrateadas: 12 al año. */
+const MESES = 12;
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -35,55 +48,73 @@ interface Requisito {
   nota?: string;
 }
 
+/** Qué ha pasado con el complemento a mínimos, para explicarlo debajo del desglose. */
+type EstadoComplemento = 'noHaceFalta' | 'integro' | 'diferencial' | 'tope' | 'rentas';
+
 interface Resultado {
   baseReguladora: number;
   porcentajeAplicable: number;
   razonPorcentaje: string;
   pensionBruta: number;
   pensionMinima: number;
-  pensionFinal: number;        // max(pensionBruta, pensionMinima), capped at máxima
-  pensionNetaAprox: number;    // estimación tras IRPF ~10%
+  complemento: number;
+  estadoComplemento: EstadoComplemento;
+  pensionFinal: number;
+  pensionNetaAprox: number;    // tras el IRPF de la propia pensión (escala general)
   requisitos: Requisito[];
   cumpleRequisitos: boolean;
 }
 
 // ─── Lógica ───────────────────────────────────────────────────────────────────
 
+/** Número en formato español; lo vacío o ilegible cuenta como 0. */
+function leer(texto: string): number {
+  const v = parseSpanishNumber(texto);
+  return Number.isFinite(v) ? v : 0;
+}
+
+/**
+ * IRPF anual de la pensión sola (rendimiento del trabajo, art. 17.2.a LIRPF): reducción del
+ * art. 20, 2.000 € de otros gastos y mínimo personal por edad, con la escala general.
+ *
+ * ⚠️ 2026-10-04 (hallazgo 2815): antes era una retención tecleada a mano (0 / 8 / 12 %) con un
+ *    escalón en 15.000 €/año: 0,52 € más de pensión bruta daban 85,22 €/mes menos de neto.
+ */
+function irpfAnualPension(pensionAnual: number, edad: number): number {
+  const rnt = calcularRendimientoNetoTrabajo({ integros: pensionAnual, gastosAaE: 0 });
+  const minimo = edad >= 65 ? MINIMOS_IRPF_2025.personal_65 : MINIMOS_IRPF_2025.personal;
+  return calcularCuotaIntegraGeneral(rnt.rendimientoNetoReducido, minimo);
+}
+
 function calcularPension(form: FormData): Resultado | null {
   const edad = parseInt(form.edadBeneficiario) || 0;
-  const aniosCotizados = parseFloat(form.aniosCotizadosCausante.replace(',', '.')) || 0;
-  const ingresosMes = parseFloat(form.ingresosTrabajoMes.replace(/\./g, '').replace(',', '.')) || 0;
+  const aniosCotizados = leer(form.aniosCotizadosCausante);
+  const ingresosMes = leer(form.ingresosTrabajoMes);
 
   // Base reguladora
   let baseReguladora = 0;
-  if (form.situacionCausante === 'activo') {
-    const baseMensual = parseFloat(form.baseCotizacionMedia.replace(/\./g, '').replace(',', '.')) || 0;
-    // BR = (24 × base mensual) / 28
-    baseReguladora = (24 * baseMensual) / PV.divisorBaseReguladora;
-  } else if (form.situacionCausante === 'jubilado') {
-    const pensionCausante = parseFloat(form.pensionCausante.replace(/\./g, '').replace(',', '.')) || 0;
-    baseReguladora = pensionCausante; // La BR = la pensión que cobraba
+  if (form.situacionCausante === 'jubilado') {
+    baseReguladora = leer(form.pensionCausante); // La BR = la pensión que cobraba
   } else {
-    // No en alta: estimación con la misma fórmula pero requiere cotizaciones
-    const baseMensual = parseFloat(form.baseCotizacionMedia.replace(/\./g, '').replace(',', '.')) || 0;
-    baseReguladora = (24 * baseMensual) / PV.divisorBaseReguladora;
+    // En activo, o sin alta (estimación con la misma fórmula): BR = (24 × base mensual) / 28
+    baseReguladora = (24 * leer(form.baseCotizacionMedia)) / PV.divisorBaseReguladora;
   }
 
   if (baseReguladora <= 0) return null;
 
   // Porcentaje aplicable
   let porcentajeAplicable = PV.porcentajeGeneral;
-  let razonPorcentaje = 'Porcentaje general (52%)';
+  let razonPorcentaje = `Porcentaje general (${pct(PV.porcentajeGeneral)})`;
 
   const tieneIngresosLimitados70 = ingresosMes < PV.limiteIngresos70;
   const tieneIngresosLimitados60 = ingresosMes < PV.smiMensual;
 
   if (form.tieneCargas && tieneIngresosLimitados70) {
     porcentajeAplicable = PV.porcentaje70;
-    razonPorcentaje = `70%: tiene cargas familiares e ingresos del trabajo inferiores al 75% del SMI (${formatCurrency(PV.limiteIngresos70)}/mes)`;
+    razonPorcentaje = `${pct(PV.porcentaje70)}: tiene cargas familiares e ingresos del trabajo inferiores al ${pct(75)} del SMI (${formatCurrency(PV.limiteIngresos70)}/mes)`;
   } else if (edad >= 65 && tieneIngresosLimitados60) {
     porcentajeAplicable = PV.porcentaje60;
-    razonPorcentaje = `60%: tiene 65 años o más e ingresos del trabajo inferiores al SMI (${formatCurrency(PV.smiMensual)}/mes)`;
+    razonPorcentaje = `${pct(PV.porcentaje60)}: tiene 65 años o más e ingresos del trabajo inferiores al SMI (${formatCurrency(PV.smiMensual)}/mes)`;
   }
 
   const pensionBruta = (baseReguladora * porcentajeAplicable) / 100;
@@ -95,40 +126,80 @@ function calcularPension(form: FormData): Resultado | null {
   // (875,90 €) en lugar del que le corresponde (1.256,60 €).
   const pensionMinima = minimoViudedad2026(edad, form.tieneCargas);
 
-  const pensionFinal = Math.min(
-    Math.max(pensionBruta, pensionMinima),
-    PV.pensionMaxima
-  );
+  // Complemento a mínimos, con las mismas reglas que estimador-complemento-minimos.
+  // ⚠️ 2026-10-04 (hallazgos 2811 y 2812): se completaba siempre hasta el mínimo. Faltaban
+  //    · la PRUEBA DE RENTAS (art. 59.1 LGSS, art. 9.2 RD 241/2026): por encima de
+  //      COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge solo cabe la regla diferencial
+  //      (límite + mínimo) − (rentas + pensión), y a quien cobraba 1.500 €/mes de nómina se
+  //      le prometía el mínimo íntegro;
+  //    · el TOPE de la PNC (art. 59.4 LGSS, art. 9.5 RD 241/2026), que rige para las pensiones
+  //      causadas desde el 01/01/2013, es decir, toda viudedad que se estime hoy. Sobrestimaba
+  //      la pensión hasta en 627,80 €/mes.
+  //    La viudedad no admite cónyuge a cargo: el límite y el tope son siempre los de «sin cónyuge».
+  const minimaAnual = pensionMinima * PAGAS;
+  const brutaAnual = Math.min(pensionBruta, PV.pensionMaxima) * PAGAS;
+  const rentasAnuales = Math.max(0, ingresosMes) * MESES;
+  const limiteRentas = COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge;
 
-  // IRPF estimado: pensiones de viudedad < 22.000€ anuales → tipo ~10-12%
-  const pensionAnual = pensionFinal * 14; // 14 pagas
-  const retencionEstimada = pensionAnual < 15000 ? 0 : pensionAnual < 22000 ? 0.08 : 0.12;
-  const pensionNetaAprox = pensionFinal * (1 - retencionEstimada);
+  const integroAnual = Math.max(0, minimaAnual - brutaAnual);
+  const superaLimite = rentasAnuales > limiteRentas;
+  const sinTopeAnual = superaLimite
+    ? Math.min(integroAnual, Math.max(0, (limiteRentas + minimaAnual) - (rentasAnuales + brutaAnual)))
+    : integroAnual;
+  const complementoAnual = Math.min(sinTopeAnual, TOPE_COMPLEMENTO_MINIMOS_2026.pncAnual);
+  const complemento = Math.round((complementoAnual / PAGAS) * 100) / 100;
+
+  const estadoComplemento: EstadoComplemento =
+    integroAnual <= 0 ? 'noHaceFalta'
+      : complementoAnual <= 0 ? 'rentas'
+        : sinTopeAnual > TOPE_COMPLEMENTO_MINIMOS_2026.pncAnual ? 'tope'
+          : sinTopeAnual < integroAnual ? 'diferencial'
+            : 'integro';
+
+  const pensionFinal = Math.min(pensionBruta, PV.pensionMaxima) + complemento;
+
+  const pensionNetaAprox = pensionFinal - irpfAnualPension(pensionFinal * PAGAS, edad) / PAGAS;
 
   // Requisitos
-  const requisitos: Requisito[] = [
-    {
-      cumple: aniosCotizados >= 15 || form.situacionCausante === 'jubilado',
+  // ⚠️ 2026-10-04 (hallazgo 2814): con el causante en activo se exigían 15 años y salía ❌.
+  //    El art. 219.1 LGSS solo pide 500 días dentro de los 5 años anteriores si estaba en alta,
+  //    y ninguno si la muerte fue por accidente o enfermedad profesional. Con los años totales
+  //    no se puede saber si esos 500 días caen en la ventana: queda «por comprobar».
+  const requisitoCotizacion: Requisito = form.situacionCausante === 'jubilado'
+    ? {
+      cumple: true,
       texto: 'El causante tenía cotizados los períodos mínimos requeridos',
-      nota: form.situacionCausante === 'activo'
-        ? 'En alta laboral: 500 días cotizados en los últimos 5 años. Si no estaba en alta: 15 años cotizados en toda la vida laboral.'
-        : form.situacionCausante === 'jubilado'
-        ? 'Al ser pensionista, los requisitos de cotización ya estaban cumplidos.'
-        : 'Sin estar en alta: se requieren 15 años cotizados en toda la vida laboral.',
-    },
+      nota: 'Al ser pensionista, los requisitos de cotización ya estaban cumplidos.',
+    }
+    : form.situacionCausante === 'activo'
+      ? {
+        cumple: null,
+        texto: 'El causante tenía cotizados los períodos mínimos requeridos (por comprobar)',
+        nota: 'En alta laboral: 500 días cotizados dentro de los 5 años anteriores al fallecimiento (art. 219.1 LGSS). Compruébalo en su vida laboral: con los años totales no se puede saber. Si la muerte se debió a un accidente, sea o no de trabajo, o a una enfermedad profesional, no se exige ningún período.',
+      }
+      : {
+        cumple: aniosCotizados >= 15,
+        texto: 'El causante tenía cotizados los períodos mínimos requeridos',
+        nota: 'Sin estar en alta: se requieren 15 años cotizados en toda la vida laboral (art. 219.1 LGSS).',
+      };
+
+  const requisitos: Requisito[] = [
+    requisitoCotizacion,
     {
       cumple: form.tipoVinculo === 'matrimonio' ? true : null,
       texto: form.tipoVinculo === 'matrimonio'
         ? 'Matrimonio: vínculo acreditado'
         : 'Pareja de hecho: inscrita en registro oficial con al menos 2 años de antelación y convivencia acreditada de 5 años',
       nota: form.tipoVinculo === 'pareja-hecho'
-        ? 'La pareja de hecho debe estar inscrita en el registro autonómico o municipal con al menos 2 años antes del fallecimiento, y acreditar convivencia estable de al menos 5 años.'
+        ? 'La pareja de hecho debe estar inscrita en el registro autonómico o municipal (o constituida en documento público) al menos 2 años antes del fallecimiento, y acreditar con el empadronamiento una convivencia estable de al menos 5 años, salvo que haya hijos en común (art. 221.2 LGSS).'
         : undefined,
     },
     {
+      // ⚠️ 2026-10-04 (hallazgo 2822): decía «condenado/a por violencia de género», que no es
+      //    el impedimento de la ley.
       cumple: true,
-      texto: 'No haber sido condenado/a por violencia de género contra el causante',
-      nota: 'Requisito general: la pensión queda extinguida si el beneficiario es condenado por causar el fallecimiento del causante.',
+      texto: 'No haber sido condenado/a por sentencia firme por un delito doloso de homicidio contra el causante',
+      nota: 'Impedimento del art. 231.1 LGSS para cobrar cualquier prestación de muerte y supervivencia.',
     },
   ];
 
@@ -140,6 +211,8 @@ function calcularPension(form: FormData): Resultado | null {
     razonPorcentaje,
     pensionBruta,
     pensionMinima,
+    complemento,
+    estadoComplemento,
     pensionFinal,
     pensionNetaAprox,
     requisitos,
@@ -185,7 +258,7 @@ export default function EstimadorPensionViudedad() {
       <header className={styles.hero}>
         <span className={styles.heroIcon} aria-hidden="true">💍</span>
         <h1 className={styles.title}>Estimador Pensión de Viudedad</h1>
-        <p className={styles.subtitle}>Seguridad Social · Cuantía orientativa 2026 · Porcentajes 52% / 60% / 70%</p>
+        <p className={styles.subtitle}>Seguridad Social · Cuantía orientativa 2026 · Porcentajes 52&nbsp;% / 60&nbsp;% / 70&nbsp;%</p>
       </header>
 
       <RegionBadge variant="es-only" />
@@ -217,8 +290,8 @@ export default function EstimadorPensionViudedad() {
 
           {/* Situación del causante */}
           <div className={styles.formGroup}>
-            <label className={styles.label}>Situación del causante al fallecer</label>
-            <div className={styles.optionGrid}>
+            <span className={styles.label} id="grupo-situacion">Situación del causante al fallecer</span>
+            <div className={styles.optionGrid} role="group" aria-labelledby="grupo-situacion">
               {([
                 { id: 'jubilado', icon: '🏖️', label: 'Jubilado/pensionista' },
                 { id: 'activo',   icon: '👷', label: 'Trabajando (en activo)' },
@@ -270,12 +343,12 @@ export default function EstimadorPensionViudedad() {
 
           {/* Tipo de vínculo */}
           <div className={styles.formGroup}>
-            <label className={styles.label}>Vínculo con el causante</label>
-            <div className={styles.switchRow}>
+            <span className={styles.label} id="grupo-vinculo">Vínculo con el causante</span>
+            <div className={styles.switchRow} role="group" aria-labelledby="grupo-vinculo">
               {([
-                { id: 'matrimonio',    label: '💒 Matrimonio' },
-                { id: 'pareja-hecho', label: '🤝 Pareja de hecho' },
-              ] as { id: TipoVinculo; label: string }[]).map(op => (
+                { id: 'matrimonio',    icon: '💒', label: 'Matrimonio' },
+                { id: 'pareja-hecho', icon: '🤝', label: 'Pareja de hecho' },
+              ] as { id: TipoVinculo; icon: string; label: string }[]).map(op => (
                 <button
                   key={op.id}
                   type="button"
@@ -283,12 +356,12 @@ export default function EstimadorPensionViudedad() {
                   onClick={() => update('tipoVinculo', op.id)}
                   aria-pressed={form.tipoVinculo === op.id}
                 >
-                  {op.label}
+                  <span aria-hidden="true">{op.icon}</span> {op.label}
                 </button>
               ))}
             </div>
             {form.tipoVinculo === 'pareja-hecho' && (
-              <p className={styles.hint}>Requiere inscripción en registro oficial ≥ 2 años antes del fallecimiento y convivencia estable ≥ 5 años.</p>
+              <p className={styles.hint}>Requiere inscripción en registro oficial (o documento público) ≥ 2 años antes del fallecimiento y convivencia estable ≥ 5 años, salvo hijos en común.</p>
             )}
           </div>
 
@@ -305,13 +378,13 @@ export default function EstimadorPensionViudedad() {
               <option value="62">Entre 60 y 64 años</option>
               <option value="67">65 años o más</option>
             </select>
-            <p className={styles.hint}>La edad determina el porcentaje aplicable (60% si ≥65) y la pensión mínima garantizada.</p>
+            <p className={styles.hint}>La edad determina el porcentaje aplicable (60&nbsp;% si ≥65) y la cuantía mínima de viudedad.</p>
           </div>
 
           {/* Cargas familiares */}
           <div className={styles.formGroup}>
-            <label className={styles.label}>¿Tiene hijos/as menores de 26 años o con discapacidad a cargo?</label>
-            <div className={styles.switchRow}>
+            <span className={styles.label} id="grupo-cargas">¿Tiene hijos/as menores de 26 años o con discapacidad a cargo?</span>
+            <div className={styles.switchRow} role="group" aria-labelledby="grupo-cargas">
               <button
                 type="button"
                 className={`${styles.switchBtn} ${form.tieneCargas ? styles.switchActivo : ''}`}
@@ -333,11 +406,11 @@ export default function EstimadorPensionViudedad() {
             onChange={v => update('ingresosTrabajoMes', v)}
             label="Ingresos propios del trabajo o actividad (€/mes)"
             placeholder="0"
-            helperText="Salario o rendimientos netos propios. Determina si se puede aplicar el 60% o 70%. Pon 0 si no trabajas."
+            helperText="Salario o rendimientos propios al mes, con las pagas extra prorrateadas. Deciden si se aplica el 60 % o el 70 % y si hay complemento a mínimos. Pon 0 si no tienes."
           />
 
           {error && (
-            <div role="alert" aria-live="polite" className={styles.errorMsg}>⚠️ {error}</div>
+            <div role="alert" aria-live="polite" className={styles.errorMsg}><span aria-hidden="true">⚠️</span> {error}</div>
           )}
 
           <button type="button" className={styles.btn} onClick={calcular} aria-label="Calcular pensión de viudedad">
@@ -357,36 +430,56 @@ export default function EstimadorPensionViudedad() {
               <div className={styles.pensionHero}>
                 <div className={styles.pensionImporte}>{formatCurrency(resultado.pensionFinal)}</div>
                 <div className={styles.pensionLabel}>Pensión mensual estimada (bruta)</div>
-                <div className={styles.pensionNeta}>≈ {formatCurrency(resultado.pensionNetaAprox)}/mes netos · {formatCurrency(resultado.pensionFinal * 14)}/año brutos</div>
+                <div className={styles.pensionNeta}>≈ {formatCurrency(resultado.pensionNetaAprox)}/mes netos · {formatCurrency(resultado.pensionFinal * PAGAS)}/año brutos</div>
+                <div className={styles.pensionNota}>Neto con el IRPF de la pensión sola (escala general y mínimo personal)</div>
               </div>
 
               {/* Desglose del cálculo */}
               <div className={styles.desgloseCard}>
-                <div className={styles.desgloseTitle}>📋 Desglose del cálculo</div>
+                <div className={styles.desgloseTitle}><span aria-hidden="true">📋</span> Desglose del cálculo</div>
                 <div className={styles.desgloseItem}>
                   <span>Base reguladora</span>
                   <strong>{formatCurrency(resultado.baseReguladora)}/mes</strong>
                 </div>
                 <div className={styles.desgloseItem}>
                   <span>Porcentaje aplicado</span>
-                  <strong className={styles.porcentajeBadge}>{resultado.porcentajeAplicable}%</strong>
+                  <strong className={styles.porcentajeBadge}>{pct(resultado.porcentajeAplicable)}</strong>
                 </div>
                 <div className={styles.desgloseItem}>
                   <span>Pensión calculada</span>
                   <strong>{formatCurrency(resultado.pensionBruta)}/mes</strong>
                 </div>
                 <div className={styles.desgloseItem}>
-                  <span>Pensión mínima garantizada</span>
+                  <span>Cuantía mínima de viudedad</span>
                   <strong>{formatCurrency(resultado.pensionMinima)}/mes</strong>
                 </div>
-                {resultado.pensionFinal === resultado.pensionMinima && resultado.pensionBruta < resultado.pensionMinima && (
+                <div className={styles.desgloseItem}>
+                  <span>Complemento a mínimos</span>
+                  <strong>{formatCurrency(resultado.complemento)}/mes</strong>
+                </div>
+                {resultado.estadoComplemento === 'integro' && (
                   <div className={styles.minimoAplicado}>
-                    ⬆️ Se aplica el mínimo garantizado por ser superior al porcentaje calculado
+                    <span aria-hidden="true">⬆️</span> Se completa hasta la cuantía mínima: tus rentas no pasan de {formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge)}/año (art. 59.1 LGSS)
                   </div>
                 )}
-                {resultado.pensionFinal >= PV.pensionMaxima && (
+                {resultado.estadoComplemento === 'diferencial' && (
+                  <div className={styles.minimoAplicado}>
+                    <span aria-hidden="true">⬆️</span> Complemento reducido: tus rentas pasan de {formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge)}/año y solo se reconoce la diferencia hasta ese límite más la cuantía mínima (art. 9.2 RD 241/2026)
+                  </div>
+                )}
+                {resultado.estadoComplemento === 'tope' && (
                   <div className={styles.maximoAplicado}>
-                    ⬇️ Se aplica la pensión máxima SS 2026 ({formatCurrency(PV.pensionMaxima)}/mes)
+                    <span aria-hidden="true">⬇️</span> El complemento no puede superar la pensión no contributiva ({formatCurrency(TOPE_COMPLEMENTO_MINIMOS_2026.sinConyugeMensual)}/mes) en las pensiones causadas desde el 01/01/2013 (art. 59.4 LGSS), así que no se llega a la cuantía mínima
+                  </div>
+                )}
+                {resultado.estadoComplemento === 'rentas' && (
+                  <div className={styles.maximoAplicado}>
+                    <span aria-hidden="true">⬇️</span> Sin complemento a mínimos: tus rentas superan el límite de {formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge)}/año en más de lo que faltaba para llegar a la cuantía mínima (art. 59.1 LGSS)
+                  </div>
+                )}
+                {resultado.pensionBruta >= PV.pensionMaxima && (
+                  <div className={styles.maximoAplicado}>
+                    <span aria-hidden="true">⬇️</span> Se aplica la pensión máxima SS 2026 ({formatCurrency(PV.pensionMaxima)}/mes)
                   </div>
                 )}
               </div>
@@ -399,7 +492,7 @@ export default function EstimadorPensionViudedad() {
 
               {/* Requisitos */}
               <div className={styles.requisitosCard}>
-                <div className={styles.desgloseTitle}>✅ Verificación de requisitos</div>
+                <div className={styles.desgloseTitle}><span aria-hidden="true">✅</span> Verificación de requisitos</div>
                 {resultado.requisitos.map((req, i) => (
                   <div key={i} className={styles.requisitoItem}>
                     <span className={styles.requisitoIcono} aria-hidden="true">
@@ -416,15 +509,15 @@ export default function EstimadorPensionViudedad() {
               {/* Referencia porcentajes */}
               <div className={styles.referenciaGrid}>
                 <div className={`${styles.refItem} ${resultado.porcentajeAplicable === 52 ? styles.refActivo : ''}`}>
-                  <strong>52%</strong>
+                  <strong>52&nbsp;%</strong>
                   <span>Caso general</span>
                 </div>
                 <div className={`${styles.refItem} ${resultado.porcentajeAplicable === 60 ? styles.refActivo : ''}`}>
-                  <strong>60%</strong>
+                  <strong>60&nbsp;%</strong>
                   <span>≥65 años + renta baja</span>
                 </div>
                 <div className={`${styles.refItem} ${resultado.porcentajeAplicable === 70 ? styles.refActivo : ''}`}>
-                  <strong>70%</strong>
+                  <strong>70&nbsp;%</strong>
                   <span>Cargas + renta muy baja</span>
                 </div>
               </div>
@@ -443,14 +536,14 @@ export default function EstimadorPensionViudedad() {
         </ul>
         <h3>Los tres porcentajes</h3>
         <ul>
-          <li><strong>52%</strong>: cuantía general, para la mayoría de los casos.</li>
-          <li><strong>60%</strong>: si el beneficiario tiene 65 o más años, no recibe otra pensión pública y sus ingresos por trabajo no superan el SMI anual.</li>
-          <li><strong>70%</strong>: si tiene cargas familiares (hijos menores de 26 o con discapacidad) y los rendimientos del trabajo son inferiores al 75% del SMI mensual. Desde 2022 este porcentaje se aplica con carácter general si se cumplen los requisitos.</li>
+          <li><strong>52&nbsp;%</strong>: cuantía general, para la mayoría de los casos.</li>
+          <li><strong>60&nbsp;%</strong>: si el beneficiario tiene 65 o más años, no recibe otra pensión pública y sus ingresos por trabajo no superan el SMI anual.</li>
+          <li><strong>70&nbsp;%</strong>: si tiene cargas familiares (hijos menores de 26 o con discapacidad) y los rendimientos del trabajo son inferiores al 75&nbsp;% del SMI mensual. Desde 2022 este porcentaje se aplica con carácter general si se cumplen los requisitos.</li>
         </ul>
         <h3>¿Cómo se calcula la base reguladora?</h3>
         <p>Si el causante era pensionista: la base reguladora es igual al importe de su pensión. Si fallecía en activo: se toman las bases de cotización de los últimos 24 meses y se divide entre 28 (para obtener el equivalente mensual, incluyendo pagas extras).</p>
         <h3>Parejas de hecho</h3>
-        <p>Desde 2007 las parejas de hecho tienen acceso a la pensión de viudedad, pero con requisitos adicionales: inscripción en el registro autonómico o municipal con al menos 2 años de antelación al fallecimiento, y convivencia estable y notoria de al menos 5 años. Los requisitos económicos también son más restrictivos que para matrimonios.</p>
+        <p>Desde 2007 las parejas de hecho tienen acceso a la pensión de viudedad, con requisitos adicionales: inscripción en el registro autonómico o municipal (o constitución en documento público) con al menos 2 años de antelación al fallecimiento, y convivencia estable y notoria de al menos 5 años, acreditada con el empadronamiento, salvo que haya hijos en común. Desde la Ley 21/2021 ya no se exige ningún requisito de ingresos al superviviente (art. 221 LGSS).</p>
         <h3>Compatibilidades e incompatibilidades</h3>
         <p>La pensión de viudedad es compatible con el trabajo y con la pensión de jubilación propia. Sin embargo, puede reducirse o extinguirse si el beneficiario contrae nuevo matrimonio (salvo excepciones para mayores de 61 años con pensión insuficiente).</p>
         <h3>¿Cómo solicitarla?</h3>
@@ -469,10 +562,10 @@ export default function EstimadorPensionViudedad() {
               </tr>
             </thead>
             <tbody>
-              <tr><td>General (sin cargas familiares)</td><td>52%</td><td>Cualquier circunstancia</td><td>Vitalicia</td></tr>
-              <tr><td>Con hijos menores o discapacitados</td><td>70%</td><td>Mientras existan cargas familiares</td><td>Mientras dure la situación</td></tr>
-              <tr><td>Mayor de 65 años sin otras rentas</td><td>60%</td><td>Ingresos &lt; límite legal (anual)</td><td>Vitalicia</td></tr>
-              <tr><td>Pareja de hecho reconocida</td><td>52%</td><td>2+ años de convivencia + inscripción</td><td>Vitalicia</td></tr>
+              <tr><td>General (sin cargas familiares)</td><td>52&nbsp;%</td><td>Cualquier circunstancia</td><td>Vitalicia</td></tr>
+              <tr><td>Con hijos menores o discapacitados</td><td>70&nbsp;%</td><td>Mientras existan cargas familiares</td><td>Mientras dure la situación</td></tr>
+              <tr><td>Mayor de 65 años sin otras rentas</td><td>60&nbsp;%</td><td>Ingresos &lt; límite legal (anual)</td><td>Vitalicia</td></tr>
+              <tr><td>Pareja de hecho reconocida</td><td>52&nbsp;%</td><td>5 años de convivencia (salvo hijos en común) + inscripción 2 años antes</td><td>Vitalicia</td></tr>
               <tr><td>Ex cónyuge divorciado/separado</td><td>Proporcional</td><td>Pensión compensatoria activa</td><td>Según pensión compensatoria</td></tr>
             </tbody>
           </table>
@@ -482,35 +575,35 @@ export default function EstimadorPensionViudedad() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👩‍👧‍👦</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👩‍👧‍👦</span>
               <strong>Viuda con hijos menores a cargo</strong>
             </div>
-            <p className={styles.escenarioExample}>Carmen, 45 años, pierde a su marido. Tiene 2 hijos de 8 y 11 años. Recibe el 70% de la BR del fallecido, más la pensión de orfandad de cada hijo (20% BR por hijo). Al cumplir el mayor 25 años (o cesar las cargas), el porcentaje baja al 52%.</p>
-            <p className={styles.escenarioTip}>💡 El 70% se mantiene mientras haya hijos menores de 25 años en el hogar que generen derecho a orfandad.</p>
+            <p className={styles.escenarioExample}>Carmen, 45 años, pierde a su marido. Tiene 2 hijos de 8 y 11 años. Recibe el 70&nbsp;% de la BR del fallecido, más la pensión de orfandad de cada hijo (20&nbsp;% BR por hijo). Cuando ya no conviva con hijos menores de 26 años (o cesen las cargas), el porcentaje baja al 52&nbsp;%.</p>
+            <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> El 70&nbsp;% se mantiene mientras conviva con hijos menores de 26 años o con discapacidad y las rentas de la familia sigan por debajo del límite.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👴</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👴</span>
               <strong>Viudo mayor de 65 años sin otros ingresos</strong>
             </div>
-            <p className={styles.escenarioExample}>Manuel, 70 años, queda viudo. No tiene pensión propia. Si sus rentas anuales son inferiores al límite establecido (rentas + pensión no superan el 75% del SMI en cómputo anual), percibirá el 70% de la BR de su esposa fallecida.</p>
-            <p className={styles.escenarioTip}>💡 El 70% para mayores de 65 sin ingresos evita situaciones de desprotección extrema.</p>
+            <p className={styles.escenarioExample}>Manuel, 70 años, queda viudo. No tiene pensión propia. No trabaja y no tiene derecho a otra pensión pública, así que percibirá el 60&nbsp;% de la BR de su esposa fallecida en lugar del 52&nbsp;% general. Si con ese 60&nbsp;% no llega a la cuantía mínima, puede pedir el complemento a mínimos.</p>
+            <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> El 60&nbsp;% es para mayores de 65 sin otra pensión pública ni ingresos del trabajo; el 70&nbsp;% exige cargas familiares.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>💑</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">💑</span>
               <strong>Pareja de hecho con inscripción previa</strong>
             </div>
-            <p className={styles.escenarioExample}>Laura y Pedro llevan 5 años juntos, inscritos en el registro de parejas de hecho hace 3 años. Al fallecer Pedro, Laura tiene derecho al 52% de su BR, siempre que no existan ingresos superiores al límite legal y se acrediten 2 años de convivencia.</p>
-            <p className={styles.escenarioTip}>💡 La inscripción en el registro de parejas de hecho debe ser previa al fallecimiento y con al menos 2 años de antelación.</p>
+            <p className={styles.escenarioExample}>Laura y Pedro llevan 5 años juntos, inscritos en el registro de parejas de hecho hace 3 años. Al fallecer Pedro, Laura tiene derecho al 52&nbsp;% de su BR: acredita los 5 años de convivencia con el empadronamiento y la inscripción tiene más de 2 años. Sus ingresos no cuentan para el derecho.</p>
+            <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> La inscripción en el registro de parejas de hecho debe ser previa al fallecimiento y con al menos 2 años de antelación.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>⚖️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">⚖️</span>
               <strong>Ex cónyuge divorciado con pensión compensatoria</strong>
             </div>
             <p className={styles.escenarioExample}>Ana y Jordi se divorciaron hace 10 años. Jordi pagaba pensión compensatoria a Ana. Al fallecer Jordi, Ana puede acceder a una parte de la pensión de viudedad proporcional a la pensión compensatoria, compitiendo con la nueva esposa (si la hubiera).</p>
-            <p className={styles.escenarioTip}>💡 Si hay nuevo cónyuge, la pensión de viudedad se reparte proporcionalmente al tiempo de matrimonio.</p>
+            <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Si hay nuevo cónyuge, la pensión de viudedad se reparte proporcionalmente al tiempo de matrimonio.</p>
           </div>
         </div>
 
@@ -519,42 +612,42 @@ export default function EstimadorPensionViudedad() {
           <details className={styles.faqItem}>
             <summary>¿Cuánto tiempo hay para solicitar la pensión de viudedad?</summary>
             <p>No hay plazo de caducidad para solicitarla, pero el reconocimiento de la pensión solo tiene efectos retroactivos de hasta 3 meses desde la fecha de solicitud. Por tanto, cuanto antes se solicite tras el fallecimiento, menos prestación se pierde. Se recomienda solicitar en el plazo de 3 meses.</p>
-            <p className={styles.faqTip}>💡 La solicitud puede hacerse telemáticamente en Importass (sede.seg-social.gob.es) o presencialmente en el INSS.</p>
+            <p className={styles.faqTip}><span aria-hidden="true">💡</span> La solicitud puede hacerse telemáticamente en Importass (sede.seg-social.gob.es) o presencialmente en el INSS.</p>
           </details>
           <details className={styles.faqItem}>
             <summary>¿Es compatible la pensión de viudedad con trabajar?</summary>
-            <p>Sí, la pensión de viudedad es compatible con el trabajo por cuenta propia o ajena. También es compatible con otras pensiones (jubilación, incapacidad permanente). Sin embargo, si se supera el límite de ingresos establecido, puede afectar al porcentaje (especialmente para el acceso al 70%).</p>
-            <p className={styles.faqTip}>💡 El límite de ingresos solo afecta al porcentaje (52% vs 70%), no al derecho a la pensión en sí.</p>
+            <p>Sí, la pensión de viudedad es compatible con el trabajo por cuenta propia o ajena. También es compatible con otras pensiones (jubilación, incapacidad permanente). Sin embargo, si se supera el límite de ingresos establecido, puede afectar al porcentaje (especialmente para el acceso al 70&nbsp;%).</p>
+            <p className={styles.faqTip}><span aria-hidden="true">💡</span> Tus ingresos no quitan el derecho a la pensión, pero deciden el porcentaje (52&nbsp;%, 60&nbsp;% o 70&nbsp;%) y si hay complemento a mínimos: con más de {formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge)} al año de rentas, el complemento se reduce o desaparece.</p>
           </details>
           <details className={styles.faqItem}>
             <summary>¿Qué ocurre si me vuelvo a casar?</summary>
             <p>Si el beneficiario contrae nuevo matrimonio, pierde el derecho a la pensión de viudedad. No obstante, puede recuperarla si el nuevo matrimonio se disuelve (fallecimiento, divorcio, separación), siempre que se cumplan los requisitos. En viudas mayores de 61 años, la norma es más flexible.</p>
-            <p className={styles.faqTip}>💡 Desde 2010, existen excepciones: viudas/viudos mayores de 61 años o con pensión de viudedad superior al 75% de sus ingresos pueden mantenerla tras nuevo matrimonio.</p>
+            <p className={styles.faqTip}><span aria-hidden="true">💡</span> Desde 2010, existen excepciones: viudas/viudos mayores de 61 años o con pensión de viudedad superior al 75&nbsp;% de sus ingresos pueden mantenerla tras nuevo matrimonio.</p>
           </details>
           <details className={styles.faqItem}>
             <summary>¿Cuáles son los requisitos de cotización del fallecido?</summary>
             <p>Depende de la situación: si el fallecido estaba dado de alta o en situación asimilada, debe tener 500 días cotizados en los últimos 5 años. Si no estaba en alta, necesita al menos 15 años cotizados a lo largo de su vida laboral. Si fallece por accidente laboral o enfermedad profesional, no se exige período mínimo.</p>
-            <p className={styles.faqTip}>💡 Los fallecimientos por accidente de trabajo o enfermedad profesional generan derecho sin requisito de cotización previa.</p>
+            <p className={styles.faqTip}><span aria-hidden="true">💡</span> Los fallecimientos por accidente de trabajo o enfermedad profesional generan derecho sin requisito de cotización previa.</p>
           </details>
           <details className={styles.faqItem}>
             <summary>¿Tienen derecho las parejas del mismo sexo?</summary>
-            <p>Sí. Desde la Ley 13/2005, el matrimonio entre personas del mismo sexo tiene los mismos derechos, incluyendo la pensión de viudedad. Las parejas de hecho del mismo sexo también tienen derecho si cumplen los requisitos (inscripción, convivencia, límite de ingresos).</p>
-            <p className={styles.faqTip}>💡 Los mismos criterios de cotización y convivencia se aplican independientemente del género.</p>
+            <p>Sí. Desde la Ley 13/2005, el matrimonio entre personas del mismo sexo tiene los mismos derechos, incluyendo la pensión de viudedad. Las parejas de hecho del mismo sexo también tienen derecho si cumplen los requisitos (inscripción y convivencia).</p>
+            <p className={styles.faqTip}><span aria-hidden="true">💡</span> Los mismos criterios de cotización y convivencia se aplican independientemente del género.</p>
           </details>
           <details className={styles.faqItem}>
             <summary>¿Qué pasa si el fallecido era autónomo?</summary>
             <p>Los trabajadores autónomos (RETA) también generan derecho a pensión de viudedad para su cónyuge o pareja de hecho, con los mismos requisitos de cotización. La base reguladora se calcula sobre las bases de cotización del RETA del fallecido, igual que para trabajadores por cuenta ajena.</p>
-            <p className={styles.faqTip}>💡 Los autónomos societarios (en régimen general por ser administradores) cotizan como trabajadores por cuenta ajena.</p>
+            <p className={styles.faqTip}><span aria-hidden="true">💡</span> Los autónomos societarios (en régimen general por ser administradores) cotizan como trabajadores por cuenta ajena.</p>
           </details>
           <details className={styles.faqItem}>
             <summary>¿Cuánto es la pensión mínima de viudedad en 2026?</summary>
-            <p>La pensión mínima de viudedad varía según la edad y las cargas familiares. En 2026, para beneficiarios menores de 60 años sin cargas familiares es de 583 €/mes; para mayores de 60 años sin cargas, 769 €/mes; con cargas familiares (menores de 60), 785 €/mes; y para mayores de 65 años, 853 €/mes (14 pagas en todos los casos).</p>
-            <p className={styles.faqTip}>💡 Estos mínimos se actualizan anualmente con el IPC igual que el resto de pensiones.</p>
+            <p>La cuantía mínima de viudedad varía según la edad y las cargas familiares. En 2026 es de {formatCurrency(MINIMOS_VIUDEDAD_2026.menor60)}/mes por debajo de 60 años sin cargas; {formatCurrency(MINIMOS_VIUDEDAD_2026.entre60y64)}/mes entre 60 y 64; {formatCurrency(MINIMOS_VIUDEDAD_2026.desde65oDiscapacidad65)}/mes con 65 años o más (o discapacidad del 65&nbsp;%); y {formatCurrency(MINIMOS_VIUDEDAD_2026.conCargasFamiliares)}/mes con cargas familiares, a cualquier edad (14 pagas en todos los casos; Anexo I del RD 241/2026).</p>
+            <p className={styles.faqTip}><span aria-hidden="true">💡</span> No es una cantidad garantizada para todos: el complemento que lleva hasta ella exige rentas propias por debajo de {formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge)} al año y no puede superar la pensión no contributiva ({formatCurrency(TOPE_COMPLEMENTO_MINIMOS_2026.sinConyugeMensual)}/mes) si la pensión se causa desde 2013.</p>
           </details>
           <details className={styles.faqItem}>
             <summary>¿Pueden cobrar la pensión de viudedad los hijos huérfanos?</summary>
-            <p>No, la pensión de viudedad corresponde exclusivamente al cónyuge o pareja de hecho superviviente. Los hijos tienen derecho a una prestación diferente: la pensión de orfandad (20% de la BR por cada huérfano de padre o madre; 52% si es huérfano absoluto). Ambas prestaciones son independientes.</p>
-            <p className={styles.faqTip}>💡 La pensión de orfandad se extiende hasta los 21 años o 25 si estudia y no trabaja.</p>
+            <p>No, la pensión de viudedad corresponde exclusivamente al cónyuge o pareja de hecho superviviente. Los hijos tienen derecho a una prestación diferente: la pensión de orfandad (20&nbsp;% de la BR por cada huérfano de padre o madre; 52&nbsp;% si es huérfano absoluto). Ambas prestaciones son independientes.</p>
+            <p className={styles.faqTip}><span aria-hidden="true">💡</span> La pensión de orfandad se extiende hasta los 21 años o 25 si estudia y no trabaja.</p>
           </details>
         </div>
 
@@ -565,7 +658,7 @@ export default function EstimadorPensionViudedad() {
             <span className={styles.stepNumber}>1</span>
             <div className={styles.stepContent}>
               <strong>Reúne la documentación necesaria</strong>
-              <p>Necesitarás: certificado de defunción, libro de familia o certificado de matrimonio/pareja de hecho, DNI del solicitante, vida laboral del fallecido, y documentación de ingresos propios si solicitas el 70%. Si hay hijos, también sus DNIs y datos académicos.</p>
+              <p>Necesitarás: certificado de defunción, libro de familia o certificado de matrimonio/pareja de hecho, DNI del solicitante, vida laboral del fallecido, y documentación de ingresos propios si solicitas el 70&nbsp;%. Si hay hijos, también sus DNIs y datos académicos.</p>
             </div>
           </div>
           <div className={styles.step}>
@@ -586,7 +679,7 @@ export default function EstimadorPensionViudedad() {
             <span className={styles.stepNumber}>4</span>
             <div className={styles.stepContent}>
               <strong>Declara tus ingresos con exactitud</strong>
-              <p>Si quieres optar al 70%, debes declarar que tus ingresos propios del trabajo no superan el límite legal (aproximadamente {formatCurrency(PV.limiteIngresos70)}/mes, el 75% del SMI 2026). El INSS verificará esta información con la AEAT.</p>
+              <p>Si quieres optar al 70&nbsp;%, debes declarar que tus ingresos propios del trabajo no superan el límite legal (aproximadamente {formatCurrency(PV.limiteIngresos70)}/mes, el 75&nbsp;% del SMI 2026). El INSS verificará esta información con la AEAT.</p>
             </div>
           </div>
           <div className={styles.step}>
@@ -608,32 +701,32 @@ export default function EstimadorPensionViudedad() {
         {/* SECCIÓN 5: Mejores Prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⏰</span>
+            <span className={styles.tipIcon} aria-hidden="true">⏰</span>
             <strong>Solicita cuanto antes, no lo postergues</strong>
             <p>El dolor del duelo puede llevar a aplazar trámites, pero la retroactividad es solo de 3 meses. Solicitar tarde supone perder prestación a la que tienes derecho desde el primer momento.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📂</span>
+            <span className={styles.tipIcon} aria-hidden="true">📂</span>
             <strong>Guarda toda la documentación de convivencia</strong>
             <p>Para parejas de hecho, los empadronamientos conjuntos, contratos de arrendamiento compartidos o escrituras de propiedad son prueba de convivencia. Conservar estos documentos facilitará la tramitación.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>💰</span>
-            <strong>Revisa si tienes derecho al 60% o 70%</strong>
-            <p>Muchos beneficiarios cobran el 52% sin saber que cumplen los requisitos para el 70%. Verifica tu situación de ingresos y cargas familiares antes de aceptar el porcentaje inicial reconocido.</p>
+            <span className={styles.tipIcon} aria-hidden="true">💰</span>
+            <strong>Revisa si tienes derecho al 60&nbsp;% o 70&nbsp;%</strong>
+            <p>Muchos beneficiarios cobran el 52&nbsp;% sin saber que cumplen los requisitos para el 70&nbsp;%. Verifica tu situación de ingresos y cargas familiares antes de aceptar el porcentaje inicial reconocido.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📋</span>
+            <span className={styles.tipIcon} aria-hidden="true">📋</span>
             <strong>Comunica cambios de circunstancias al INSS</strong>
             <p>Si cambia tu estado civil, tus ingresos aumentan, o cesan las cargas familiares, debes comunicarlo al INSS. No hacerlo puede generar obligación de devolución de cantidades cobradas indebidamente.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🏛️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🏛️</span>
             <strong>Consulta con un gestor o asesor si la situación es compleja</strong>
             <p>Si hay divorcio previo, múltiples cónyuges, parejas de hecho y matrimonial, o situaciones especiales de cotización, la ayuda de un profesional puede maximizar la prestación obtenida.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔍</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔍</span>
             <strong>Verifica el IRPF de la pensión</strong>
             <p>La pensión de viudedad tributa como rendimiento del trabajo. Si es tu único ingreso y es inferior al mínimo personal, es posible que no estés obligado a declarar, pero conviene confirmarlo con Hacienda o un asesor fiscal.</p>
           </div>
@@ -642,7 +735,7 @@ export default function EstimadorPensionViudedad() {
         {/* SECCIÓN 6: Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al solicitar la pensión de viudedad</strong>
           </div>
           <ul className={styles.warningList}>

@@ -56,6 +56,14 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *     (jubilado 3.846,16): 28.000,04 €/año, RN 26.000,04, cuota 4.911,01 (17,54 %) → 1.649,20 €/mes;
  *     la app da 1.760,00 (12 % fijo).
  *
+ * ── REPARADO el 04/10/2026 (hallazgos 2811-2822) ─────────────────────────────────────────
+ *   Los CASOS 5-18 eran test.fail y pasan a tests normales: complemento con prueba de rentas
+ *   y tope de la PNC, requisito de cotización del art. 219.1, neto con el IRPF de data/fiscal,
+ *   FAQ y FAQPage desde MINIMOS_VIUDEDAD_2026, pareja de hecho sin requisito de ingresos,
+ *   grupos con nombre, emojis fuera del nombre accesible, «52 %» y contrastes del resultado.
+ *   La fila «Pensión mínima garantizada» pasa a «Cuantía mínima de viudedad» + «Complemento a
+ *   mínimos»: la mínima NO está garantizada (art. 59.1 y 59.4 LGSS).
+ *
  * ⚠️ `formatCurrency` (es-ES) no agrupa con cuatro cifras enteras: «1256,60 €», pero
  *    «13.104,00 €». El espacio antes del € es U+00A0: el texto se normaliza antes de comparar.
  *
@@ -161,7 +169,9 @@ test.describe('Estimador de pensión de viudedad — cálculo', () => {
     expect(normalizar(await panelResultado(page).innerText())).toContain('Porcentaje aplicado 52');
     expect(await lineaDesglose(page, 'Pensión calculada')).toBeCloseTo(936, 2);
     // MINIMOS_VIUDEDAD_2026.menor60 = 9.931,60 / 14
-    expect(await lineaDesglose(page, 'Pensión mínima garantizada')).toBeCloseTo(709.4, 2);
+    expect(await lineaDesglose(page, 'Cuantía mínima de viudedad')).toBeCloseTo(709.4, 2);
+    // La pensión ya pasa del mínimo: no hay complemento.
+    expect(await lineaDesglose(page, 'Complemento a mínimos')).toBeCloseTo(0, 2);
     expect(await pensionFinal(page)).toBeCloseTo(936, 2);
     // 936,00 × 14 pagas
     await expect(page.locator('[class*="pensionNeta"]')).toContainText('13.104,00');
@@ -204,7 +214,6 @@ test.describe('Estimador de pensión de viudedad — cálculo', () => {
   });
 
   test('CASO 5 — tope de la PNC con cargas: 480,00 + 628,80 = 1.108,80 €/mes, no 1.256,60', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: completa hasta el mínimo sin el tope de la PNC (art. 59.4 LGSS, art. 9.5 RD 241/2026)');
     await abrir(page);
     await rellenar(page, { situacion: 'activo', base: '800', edad: '45', cargas: true, ingresos: '0' });
     await calcular(page);
@@ -212,11 +221,12 @@ test.describe('Estimador de pensión de viudedad — cálculo', () => {
     // 24 × 800 / 28 = 685,71 · PENSION_VIUDEDAD_2026.porcentaje70 → 480,00
     expect(await lineaDesglose(page, 'Pensión calculada')).toBeCloseTo(480, 2);
     // TOPE_COMPLEMENTO_MINIMOS_2026.sinConyugeMensual = 8.803,20 / 14 = 628,80 (el íntegro serían 776,60)
+    expect(await lineaDesglose(page, 'Complemento a mínimos')).toBeCloseTo(628.8, 2);
     expect(await pensionFinal(page)).toBeCloseTo(1108.8, 2);
+    await expect(panelResultado(page)).toContainText('no puede superar la pensión no contributiva');
   });
 
   test('CASO 6 — tope de la PNC con 65 años o más: 240,00 + 628,80 = 868,80 €/mes, no 936,20', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: completa hasta el mínimo sin el tope de la PNC (art. 59.4 LGSS, art. 9.5 RD 241/2026)');
     await abrir(page);
     await rellenar(page, { pension: '400', edad: '67', cargas: false, ingresos: '0' });
     await calcular(page);
@@ -227,7 +237,6 @@ test.describe('Estimador de pensión de viudedad — cálculo', () => {
   });
 
   test('CASO 7 — prueba de rentas: con 1.500 €/mes de trabajo no hay complemento, 520,00 €/mes', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: el mínimo se garantiza sin mirar el límite de rentas (art. 59.1 LGSS, art. 9.2 RD 241/2026)');
     await abrir(page);
     await rellenar(page, { pension: '1000', edad: '45', cargas: false, ingresos: '1500' });
     await calcular(page);
@@ -236,10 +245,11 @@ test.describe('Estimador de pensión de viudedad — cálculo', () => {
     // (9.442): (9.442 + 9.931,60) − (18.000 + 7.280) < 0 → sin complemento.
     expect(await lineaDesglose(page, 'Pensión calculada')).toBeCloseTo(520, 2);
     expect(await pensionFinal(page)).toBeCloseTo(520, 2);
+    await expect(panelResultado(page)).toContainText('Sin complemento a mínimos');
+    await expect(panelResultado(page)).not.toContainText('Se completa hasta la cuantía mínima');
   });
 
   test('CASO 8 — causante en alta con 3 años cotizados: el art. 219.1 LGSS pide 500 días en 5 años, no 15 años', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: con el causante en activo exige 15 años y marca ❌');
     await abrir(page);
     await rellenar(page, { situacion: 'activo', base: '2100', anios: '3', edad: '45', ingresos: '0' });
     await calcular(page);
@@ -250,10 +260,13 @@ test.describe('Estimador de pensión de viudedad — cálculo', () => {
     await expect(fila).toHaveCount(1);
     // 3 años pueden contener 500 días dentro de los últimos 5: el requisito no se puede dar por incumplido.
     await expect(fila.locator('[class*="requisitoIcono"]')).not.toHaveText('❌');
+    // Y sigue marcando ❌ quien no estaba en alta con menos de 15 años (art. 219.1, párrafo 2.º).
+    await page.getByRole('button', { name: /Sin trabajar/ }).click();
+    await calcular(page);
+    await expect(fila.locator('[class*="requisitoIcono"]')).toHaveText('❌');
   });
 
   test('CASO 9 — el neto: a 1.071,72 €/mes el IRPF es 79,46 €/año, no un 8 %', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: retención inventada (0 / 8 / 12 %) con salto en 15.000 €');
     await abrir(page);
     await rellenar(page, { pension: '2061', edad: '45', cargas: false, ingresos: '0' });
     await calcular(page);
@@ -277,7 +290,6 @@ test.describe('Estimador de pensión de viudedad — cálculo', () => {
 
 test.describe('Estimador de pensión de viudedad — contenido', () => {
   test('CASO 10 — la FAQ de la pensión mínima publica las cuantías del Anexo I del RD 241/2026', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: la FAQ dice 583 / 769 / 785 / 853 €/mes tecleados a mano');
     await page.goto(RUTA);
     const faq = normalizar(
       (await page.locator('details').filter({ hasText: '¿Cuánto es la pensión mínima de viudedad en 2026?' }).textContent()) ?? '',
@@ -291,7 +303,6 @@ test.describe('Estimador de pensión de viudedad — contenido', () => {
   });
 
   test('CASO 11 — el FAQPage no da para ≥ 65 un mínimo de «unos 11.940 €» (son 13.106,80 €/año)', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: cifra tecleada en el JSON-LD');
     await page.goto(RUTA);
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
     expect(ld).toContain('FAQPage');
@@ -301,7 +312,6 @@ test.describe('Estimador de pensión de viudedad — contenido', () => {
   });
 
   test('CASO 12 — la pareja de hecho no tiene requisito de ingresos desde la Ley 21/2021 (art. 221 LGSS)', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: la guía y el FAQPage exigen un límite de ingresos derogado');
     await page.goto(RUTA);
     const pagina = normalizar((await page.locator('body').textContent()) ?? '');
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
@@ -312,7 +322,6 @@ test.describe('Estimador de pensión de viudedad — contenido', () => {
   });
 
   test('CASO 13 — el ejemplo de Manuel (70 años, sin cargas) no puede prometer el 70 % que la calculadora no da', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: el escenario contradice a la propia calculadora');
     await abrir(page);
     await rellenar(page, { pension: '1500', edad: '67', cargas: false, ingresos: '0' });
     await calcular(page);
@@ -326,7 +335,6 @@ test.describe('Estimador de pensión de viudedad — contenido', () => {
   });
 
   test('CASO 14 — el porcentaje se separa con espacio duro («52 %»)', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: «52%» pegado (Ortografía de la RAE, decisión del 25/09/2026)');
     await abrir(page);
     await rellenar(page, { pension: '1500', edad: '45', ingresos: '0' });
     await calcular(page);
@@ -378,7 +386,6 @@ async function contrastePorPixel(page: Page, selector: string): Promise<number> 
 
 test.describe('Estimador de pensión de viudedad — accesibilidad', () => {
   test('CASO 15 — las tres preguntas de botones tienen nombre de grupo', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: <label> sin control asociado; «Sí»/«No» no dicen a qué responden');
     await abrir(page);
     await expect(page.getByRole('group', { name: /hijos/ })).toHaveCount(1);
     await expect(page.getByRole('group', { name: /Situación del causante/ })).toHaveCount(1);
@@ -386,14 +393,12 @@ test.describe('Estimador de pensión de viudedad — accesibilidad', () => {
   });
 
   test('CASO 16 — los emojis junto a texto no entran en el nombre accesible', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: 16 emojis sin aria-hidden (check:a11y-jsx) y dos dentro del nombre de un botón');
     await abrir(page);
     await expect(page.getByRole('button', { name: 'Matrimonio', exact: true })).toHaveCount(1);
     await expect(page.getByRole('button', { name: 'Pareja de hecho', exact: true })).toHaveCount(1);
   });
 
   test('CASO 17 — el neto y el rótulo del resultado llegan a 4,5:1, en los dos temas', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: blanco con opacidad sobre el degradado azul-teal, 2,47-2,75:1');
     for (const tema of ['light', 'dark'] as const) {
       await page.addInitScript((t: string) => localStorage.setItem('meskeia-theme', t), tema);
       await abrir(page);
@@ -406,7 +411,6 @@ test.describe('Estimador de pensión de viudedad — accesibilidad', () => {
   });
 
   test('CASO 18 — «Se aplica el mínimo garantizado» llega a 4,5:1 en claro', async ({ page }) => {
-    test.fail(true, 'Hallazgo abierto: var(--success) #4CAF50 sobre su tinte verde, ≈ 2,5:1');
     await abrir(page);
     await calcular(page); // por defecto: 60 % de 1.400 = 840 < 936,20 → aparece el aviso
     const aviso = page.locator('[class*="minimoAplicado"]');
