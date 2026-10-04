@@ -143,7 +143,8 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *       cotizados (entre 1 y 50).» · base «1.234,56» + 30 años (1970) → 1.058,1943 × 84,20 %
  *       = 891,00 €/mes, que queda 2,30 € POR ENCIMA de 888,70: sin aviso de mínimos.
  *
- *   CASOS 13-18 documentan hallazgos ABIERTOS el 04/10/2026 (test.fail con su motivo).
+ *   CASOS 13-18 documentaban hallazgos del 04/10/2026. REPARADOS ese día los 13, 15, 16, 17 y 18
+ *   (2871, 2872, 2875, 2876, 2877); el 14 (2874) sigue ABIERTO con su test.fail.
  *   CASO 19 comprueba que título, JSON-LD y DataReference dicen el mismo año.
  */
 
@@ -528,10 +529,9 @@ test.describe('CASO 12 · móvil (390 px), tecleando pulsación a pulsación', (
   });
 });
 
-// ── Hallazgos ABIERTOS el 04/10/2026 ─────────────────────────────────────────────
+// ── Hallazgos del 04/10/2026 (reparados salvo el CASO 14) ─────────────────────────────────────────────
 
 test('CASO 13 · tras un error, el resultado anterior NO debe seguir publicado', async ({ page }) => {
-  test.fail(true, 'ABIERTO (04/10/2026): calcular() pone el error y sale sin borrar resultadoEdad/resultadoPension; la tarjeta de edad además interpola el campo VIVO («Con 12 años cotizados, no alcanzas…») junto a una pensión de 1.443,43 €.');
   await simular(page, 1970, 30, 2000);
   expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(1443.43, 2);
 
@@ -543,6 +543,15 @@ test('CASO 13 · tras un error, el resultado anterior NO debe seguir publicado',
 
   // Lo que debe pasar (como en el caso 7 sobre página limpia): ninguna pensión a la vista.
   await expect(page.getByText('Pensión mensual estimada (bruta)', { exact: true })).toHaveCount(0);
+});
+
+test('CASO 13.bis · cambiar los años sin pulsar «Simular» no reescribe la tarjeta del resultado (hallazgo 2871)', async ({ page }) => {
+  await simular(page, 1970, 40, 2000);
+  await expect(page.getByRole('status').first()).toContainText('Con 40 años cotizados, superas el umbral');
+  await sembrarValor(page, SEL.anos, 34);
+  // La tarjeta sigue diciendo con qué años se calculó la pensión que tiene debajo.
+  await expect(page.getByRole('status').first()).toContainText('Con 40 años cotizados');
+  await expect(page.getByRole('status').first()).not.toContainText('Con 34 años');
 });
 
 test('CASO 14 · nacido en 1959: la edad del titular y la «Edad ordinaria» deben salir de la misma fila de la tabla', async ({ page }) => {
@@ -558,7 +567,6 @@ test('CASO 14 · nacido en 1959: la edad del titular y la «Edad ordinaria» deb
 });
 
 test('CASO 15 · el escenario de Carlos debe dar lo que la propia calculadora da para él (escala de 2027)', async ({ page }) => {
-  test.fail(true, 'ABIERTO (04/10/2026): el escenario «Carlos, 64 años, 28 cotizados, 1.200 €» sigue con la escala de 2026 (80,62 %, 829,23 €, 85,18 %). Nacido en 1962, se jubila en 2029: 79,64 %, 819,16 €, y con 2 años más 84,20 %.');
   // Lo que la app calcula para Carlos (nacido en 1962: 64 años en 2026):
   await simular(page, 1962, 28, 1200);
   await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('79,64'));
@@ -571,7 +579,6 @@ test('CASO 15 · el escenario de Carlos debe dar lo que la propia calculadora da
 });
 
 test('CASO 16 · el punto de equilibrio de la anticipada no puede dar dos cifras distintas en la misma página', async ({ page }) => {
-  test.fail(true, 'ABIERTO (04/10/2026): la FAQ dice «entre 10 y 15 años» y la tarjeta «Evalúa el break-even», «del orden de 15 a 20 años». A mano: 2 × (1 − r) / r = 10,5 años (r = 16 %) y 13,3 (r = 13,04 %) desde la edad ordinaria; 12,5-15,3 desde la anticipada.');
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   await expect(page.getByText('El punto de equilibrio suele estar entre 10 y 15 años.', { exact: false })).toHaveCount(1);
   const tarjeta = page.locator('[class*="tipCard"]').filter({ hasText: 'Evalúa el break-even' });
@@ -580,7 +587,6 @@ test('CASO 16 · el punto de equilibrio de la anticipada no puede dar dos cifras
 });
 
 test('CASO 17 · el porcentaje va separado de su signo por un espacio duro (CLAUDE.md §2, 25/09/2026)', async ({ page }) => {
-  test.fail(true, 'ABIERTO (04/10/2026): la app pega el «%» con `formatNumber(x, 2)}%` (porcentaje, reducción, barra, % sobre sueldo) en vez de usar formatPercentage.');
   await simular(page, 1970, 30, 2000);
   const valor = valorDe(page, 'Porcentaje por años cotizados');
   await expect(valor).toHaveText(pct('84,20'));
@@ -588,7 +594,6 @@ test('CASO 17 · el porcentaje va separado de su signo por un espacio duro (CLAU
 });
 
 test('CASO 18 · el DataReference debe acreditar el sello propio de la escala del porcentaje', async ({ page }) => {
-  test.fail(true, 'ABIERTO (04/10/2026): solo muestra FISCAL_PENSIONES_META (21/09/2026). La escala de 2027, la que aplica a casi todo usuario, se transcribió del BOE el 30/09/2026 con sello propio (ESCALA_PORCENTAJE_PENSION_META), que el módulo separó porque el general no la ampara; el motor del MCP sí lo cita en fuenteDatos.');
   const ref = page.getByRole('note', { name: 'Datos de referencia normativos' });
   await expect(ref).toContainText('Última verificación');
   await expect(ref).toContainText('30/09/2026');
