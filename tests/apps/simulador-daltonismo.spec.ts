@@ -56,7 +56,7 @@ import { esperarHidratacion } from './_hidratacion';
  *        and red, and yellow and pink») y el resumen de Birch en PubMed 22472762 («about 8% in
  *        men and about 0.4% in women» en europeos).
  *
- * HALLAZGOS ABIERTOS EN LA RE-INSPECCIÓN (04/10/2026), escritos con `test.fail()`:
+ * HALLAZGOS DE LA RE-INSPECCIÓN (04/10/2026), REPARADOS el mismo día (2862-2870; eran `test.fail()`):
  *   CASO 6   Una imagen que el navegador no puede decodificar se traga en silencio.
  *   CASO 7   `var(--radius-medium)` no existe: ocho reglas del módulo se quedan en esquina recta.
  *   CASO 9   «Subir imagen» (blanco sobre --primary) 4,11:1 en claro y 2,79:1 en oscuro.
@@ -566,13 +566,6 @@ test.describe('simulador-daltonismo · re-inspección 04/10/2026', () => {
   test('CASO 6 · rechazo — una imagen que el navegador no puede decodificar debe AVISAR', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'Hallazgo ABIERTO (04/10/2026): `img.decode()` rechaza dentro de un try/finally sin catch; no ' +
-        'hay aviso, la consola registra «The source image cannot be decoded.» y las tarjetas siguen ' +
-        'con la imagen anterior, que «Descargar» guarda con el nombre del fichero roto ' +
-        '(roto_protanopia.png con el contenido de la imagen previa).',
-    );
     await subirImagenDePrueba(page);
     const dialogos: string[] = [];
     page.on('dialog', async (d) => {
@@ -600,13 +593,6 @@ test.describe('simulador-daltonismo · re-inspección 04/10/2026', () => {
   test('CASO 7 · --radius-medium — los botones y cajas que lo usan deben salir con esquina redondeada', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'Hallazgo ABIERTO (04/10/2026): `--radius-medium` no se declara en ningún sitio (globals.css ' +
-        'solo aliasó --radius-large y --shadow-*), y una var() sin valor de reserva anula la ' +
-        'declaración: border-radius 0px en .btnPrimary, .btnSecondary, .btnDownload, .cardImage, ' +
-        '.comparativaTable, .escenarioCard, .faqItem y .warningBox, en claro y en oscuro.',
-    );
     await abrir(page);
     const radio = (loc: Locator): Promise<string> =>
       loc.evaluate((el) => getComputedStyle(el).borderTopLeftRadius);
@@ -642,14 +628,6 @@ test.describe('simulador-daltonismo · re-inspección 04/10/2026', () => {
   });
 
   test('CASO 9 · contraste — el color de marca como texto o como fondo de texto blanco', async ({ page }) => {
-    test.fail(
-      true,
-      'Hallazgo ABIERTO (04/10/2026): «Subir imagen» es blanco sobre var(--primary): 4,11:1 en claro ' +
-        'y 2,79:1 en oscuro (#3FA5D1), a 15,2 px y peso 600; «Descargar» es var(--primary) sobre ' +
-        'blanco, 4,11:1; y los <h3> de la guía, var(--primary) sobre #F5F5F5, 3,77:1 a 18,72 px y ' +
-        'peso 600 (no llega a «texto grande», que exige negrita 700). Existen --primary-boton y ' +
-        '--primary-texto para esto.',
-    );
     await abrir(page);
     await congelarTransiciones(page);
     await abrirGuia(page);
@@ -671,11 +649,6 @@ test.describe('simulador-daltonismo · re-inspección 04/10/2026', () => {
   });
 
   test('CASO 9.bis · contraste — «Errores frecuentes que evitar» en claro y en oscuro', async ({ page }) => {
-    test.fail(
-      true,
-      'Hallazgo ABIERTO (04/10/2026): el <h4> de .warningBox es #dc3545 literal, sin variante oscura: ' +
-        '3,88:1 sobre su caja rosada en claro y 2,68:1 sobre rgb(69,49,51) en oscuro, a 16 px y peso 600.',
-    );
     await abrir(page);
     await congelarTransiciones(page);
     await abrirGuia(page);
@@ -719,13 +692,6 @@ test.describe('simulador-daltonismo · re-inspección 04/10/2026', () => {
   test('CASO 11 · el FAQPage no atribuye el 8 % de los hombres a la protanopia y la deuteranopia', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'Hallazgo ABIERTO (04/10/2026): la 1.ª respuesta del FAQPage dice «Los tipos más frecuentes son ' +
-        'la protanopia y la deuteranopia (…), que afectan a alrededor del 8 % de los hombres». El 8 % ' +
-        'de Birch (2012) es TODA la deficiencia rojo-verde; la tabla de la propia página da ~1 % a ' +
-        'cada dicromacia y ~5 % a la deuteranomalía, que su tarjeta llama «la forma más frecuente».',
-    );
     await page.goto(RUTA);
     const faq = await page.evaluate(() =>
       [...document.querySelectorAll('script[type="application/ld+json"]')]
@@ -737,13 +703,6 @@ test.describe('simulador-daltonismo · re-inspección 04/10/2026', () => {
   });
 
   test('CASO 12 · la guía no pone como ejemplos de Machado a herramientas que no lo usan', async ({ page }) => {
-    test.fail(
-      true,
-      'Hallazgo ABIERTO (04/10/2026): «Es el estándar de facto en herramientas de accesibilidad como ' +
-        'Sim Daltonism o Color Oracle». Color Oracle (Simulator.java) cita Viénot, Brettel & Mollon ' +
-        '(1999) y Brettel et al. (1997); el README de Sim Daltonism, el `color_blind_sim` de ' +
-        'Wickline/HCIRN. Ninguna de las dos usa Machado (2009).',
-    );
     await page.goto(RUTA);
     const guia = (await page.locator('body').textContent()) ?? '';
     expect(guia).toContain('Machado, Oliveira');
@@ -751,12 +710,6 @@ test.describe('simulador-daltonismo · re-inspección 04/10/2026', () => {
   });
 
   test('CASO 13 · formato — los porcentajes del texto llevan espacio (duro) antes del %', async ({ page }) => {
-    test.fail(
-      true,
-      'Hallazgo ABIERTO (04/10/2026): 25 porcentajes del texto visible van pegados a la cifra ' +
-        '(«~92%», «0,4%», «<0,01%», «5% de tu audiencia»…), contra la norma del proyecto (RAE 2010, ' +
-        'decidida el 25/09/2026). El FAQPage ya usa «8 %» con U+00A0.',
-    );
     await abrir(page);
     // Solo el texto propio de la app: tarjetas, tabla y guía (no los componentes compartidos).
     const propio = await page.evaluate(() =>
@@ -768,16 +721,18 @@ test.describe('simulador-daltonismo · re-inspección 04/10/2026', () => {
     expect(propio.match(/\d%/g) ?? []).toEqual([]);
   });
 
+  test('CASO 15 · las matrices son las PUBLICADAS por Machado et al. (2009), no «oficiales» (hallazgo 2870)', async ({ page }) => {
+    await abrir(page);
+    // Ningún organismo las emite: el motor (CVD_META) y la guía ya decían «publicadas».
+    await expect(page.locator('header')).toContainText('publicadas por Machado et al. (2009)');
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    const og = await page.locator('meta[property="og:description"]').getAttribute('content');
+    expect(`${ld} ${og}`).not.toMatch(/matrices oficiales/i);
+  });
+
   test('CASO 14 · volver a elegir el MISMO fichero, re-exportado con otro contenido, lo vuelve a simular', async ({
     page,
   }) => {
-    test.fail(
-      true,
-      'Hallazgo ABIERTO (04/10/2026): el <input type="file"> no se vacía tras leerlo, y el navegador ' +
-        'no dispara `change` si la selección (la ruta) no cambia. Quien corrige su diseño —el paso 5 ' +
-        'de la propia guía— y lo vuelve a elegir con el mismo nombre sigue viendo la versión anterior, ' +
-        'sin aviso. Lo mismo tras pulsar «Usar imagen demo»: re-elegir el fichero no hace nada.',
-    );
     await abrir(page);
     const ruta = test.info().outputPath('mi-diseno.png');
 

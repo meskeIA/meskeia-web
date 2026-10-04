@@ -29,56 +29,56 @@ const TIPOS: InfoTipo[] = [
     id: 'normal',
     nombre: 'Visión tricromática',
     descripcion: 'Visión cromática estándar con los tres conos (L, M, S) funcionando correctamente.',
-    prevalencia: '~92% hombres · ~99,5% mujeres',
+    prevalencia: '~92\u00A0% hombres · ~99,5\u00A0% mujeres',
     icono: '👁️',
   },
   {
     id: 'deuteranomaly',
     nombre: 'Deuteranomalía',
     descripcion: 'Cono M (verde) con sensibilidad reducida. Forma de daltonismo más frecuente en el mundo.',
-    prevalencia: '~5% hombres · ~0,4% mujeres',
+    prevalencia: '~5\u00A0% hombres · ~0,4\u00A0% mujeres',
     icono: '🟩',
   },
   {
     id: 'deuteranopia',
     nombre: 'Deuteranopia',
     descripcion: 'Ausencia funcional del cono M. Confusión rojo-verde muy marcada.',
-    prevalencia: '~1% hombres · ~0,01% mujeres',
+    prevalencia: '~1\u00A0% hombres · ~0,01\u00A0% mujeres',
     icono: '🟢',
   },
   {
     id: 'protanomaly',
     nombre: 'Protanomalía',
     descripcion: 'Cono L (rojo) alterado. Reducción de sensibilidad al rojo y confusión rojo-verde leve.',
-    prevalencia: '~1% hombres · ~0,03% mujeres',
+    prevalencia: '~1\u00A0% hombres · ~0,03\u00A0% mujeres',
     icono: '🟥',
   },
   {
     id: 'protanopia',
     nombre: 'Protanopia',
     descripcion: 'Ausencia funcional del cono L. El rojo se percibe muy oscuro o negro.',
-    prevalencia: '~1% hombres · ~0,02% mujeres',
+    prevalencia: '~1\u00A0% hombres · ~0,02\u00A0% mujeres',
     icono: '🔴',
   },
   {
     id: 'tritanomaly',
     nombre: 'Tritanomalía',
     descripcion: 'Cono S (azul) alterado. Sensibilidad reducida al azul, raro.',
-    prevalencia: '<0,01% (rara)',
+    prevalencia: '<0,01\u00A0% (rara)',
     icono: '🟦',
   },
   {
     id: 'tritanopia',
     nombre: 'Tritanopia',
     descripcion: 'Ausencia funcional del cono S. Se confunden el azul con el verde y el amarillo con el rosa (NEI).',
-    prevalencia: '<0,01% (rara)',
+    prevalencia: '<0,01\u00A0% (rara)',
     icono: '🔵',
   },
   {
     id: 'achromatopsia',
     nombre: 'Acromatopsia',
     descripcion: 'Ausencia total de visión cromática. Solo se percibe escala de grises (luminancia).',
-    prevalencia: '~0,003% (muy rara)',
+    prevalencia: '~0,003\u00A0% (muy rara)',
     icono: '⚫',
   },
 ];
@@ -192,6 +192,7 @@ export default function SimuladorDaltonismoPage() {
   const [procesando, setProcesando] = useState<boolean>(false);
   const [dragActive, setDragActive] = useState<boolean>(false);
   const [nombreArchivo, setNombreArchivo] = useState<string>('demo.png');
+  const [errorCarga, setErrorCarga] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const procesarImagen = useCallback(async (url: string) => {
@@ -233,6 +234,8 @@ export default function SimuladorDaltonismoPage() {
       }
 
       setSimulaciones(nuevas);
+    } catch {
+      setErrorCarga('No se ha podido procesar la imagen. Prueba con otra en JPG, PNG o WEBP.');
     } finally {
       setProcesando(false);
     }
@@ -245,6 +248,7 @@ export default function SimuladorDaltonismoPage() {
     const ctx = c.getContext('2d');
     if (!ctx) return;
     dibujarImagenDemo(ctx, c.width, c.height);
+    setErrorCarga('');
     setNombreArchivo('demo.png');
     setOriginalUrl(c.toDataURL('image/png'));
   }, []);
@@ -259,7 +263,7 @@ export default function SimuladorDaltonismoPage() {
     }
   }, [originalUrl, procesarImagen]);
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       alert('Selecciona un archivo de imagen válido (JPG, PNG, WEBP...).');
       return;
@@ -268,13 +272,32 @@ export default function SimuladorDaltonismoPage() {
       alert('La imagen supera 10 MB. Usa una de menor tamaño.');
       return;
     }
+    // ⚠️ 2026-10-04 (hallazgo 2862): un fichero con tipo image/* que el navegador no sabe
+    //    decodificar se tragaba en silencio, y como el nombre ya se había cambiado, «Descargar»
+    //    guardaba la simulación de la imagen ANTERIOR con el nombre del fichero roto. Ahora se
+    //    decodifica antes de tocar nada, y si falla se dice y se conserva la imagen anterior.
+    const url = URL.createObjectURL(file);
+    try {
+      const prueba = new Image();
+      prueba.src = url;
+      await prueba.decode();
+    } catch {
+      URL.revokeObjectURL(url);
+      setErrorCarga(`No se ha podido leer «${file.name}»: el archivo no es una imagen válida o está dañado. Se mantiene la imagen anterior.`);
+      return;
+    }
+    setErrorCarga('');
     setNombreArchivo(file.name);
-    setOriginalUrl(URL.createObjectURL(file));
+    setOriginalUrl(url);
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) handleFile(file);
+    // ⚠️ 2026-10-04 (hallazgo 2863): sin vaciarlo, Chromium no dispara `change` al volver a
+    //    elegir el mismo fichero, y el diseño corregido y re-exportado con el mismo nombre
+    //    seguía mostrando la simulación de la versión anterior.
+    e.target.value = '';
+    if (file) void handleFile(file);
   };
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -291,7 +314,7 @@ export default function SimuladorDaltonismoPage() {
     e.preventDefault();
     setDragActive(false);
     const file = e.dataTransfer.files?.[0];
-    if (file) handleFile(file);
+    if (file) void handleFile(file);
   };
 
   const descargar = (tipo: TipoDaltonismo) => {
@@ -316,7 +339,7 @@ export default function SimuladorDaltonismoPage() {
         </h1>
         <p className={styles.subtitle}>
           Visualiza cómo perciben tus diseños las personas con daltonismo. Sube una imagen o usa la paleta de prueba y verás
-          al instante 8 simulaciones generadas con matrices oficiales. Todo el procesamiento ocurre en tu navegador.
+          al instante 8 simulaciones generadas con las matrices publicadas por Machado et al. (2009). Todo el procesamiento ocurre en tu navegador.
         </p>
       </header>
 
@@ -378,6 +401,12 @@ export default function SimuladorDaltonismoPage() {
         />
       </div>
 
+      {errorCarga && (
+        <p className={styles.errorCarga} role="alert">
+          <span aria-hidden="true">⚠️</span> {errorCarga}
+        </p>
+      )}
+
       {procesando && (
         <div className={styles.processing} role="status" aria-live="polite">
           <span className={styles.spinner} aria-hidden="true"></span>
@@ -428,9 +457,9 @@ export default function SimuladorDaltonismoPage() {
         <section className={styles.guideSection}>
           <p>
             El daltonismo (más correctamente, <strong>deficiencia de visión cromática</strong>) rojo-verde afecta a
-            cerca del 8% de los hombres y al 0,4% de las mujeres de ascendencia europea, según la revisión de encuestas
+            cerca del 8&nbsp;% de los hombres y al 0,4&nbsp;% de las mujeres de ascendencia europea, según la revisión de encuestas
             poblacionales de Birch (2012). La prevalencia <strong>no es la misma en todo el mundo</strong>: en hombres
-            de ascendencia china y japonesa esa misma revisión la sitúa entre el 4% y el 6,5%. No es ceguera al color:
+            de ascendencia china y japonesa esa misma revisión la sitúa entre el 4&nbsp;% y el 6,5&nbsp;%. No es ceguera al color:
             es una percepción distinta debido a que uno de los tres tipos de conos retinianos (L para rojo, M para
             verde, S para azul) funciona de forma diferente o está ausente. Como diseñador o desarrollador, conviene
             comprobar que tu interfaz comunica la información también sin depender exclusivamente del color.
@@ -453,12 +482,12 @@ export default function SimuladorDaltonismoPage() {
                 </tr>
               </thead>
               <tbody>
-                <tr><td><strong>Deuteranomalía</strong></td><td>M (verde) alterado</td><td>Confusión leve rojo-verde</td><td>~5%</td></tr>
-                <tr><td><strong>Deuteranopia</strong></td><td>M (verde) ausente</td><td>Confusión marcada rojo-verde</td><td>~1%</td></tr>
-                <tr><td><strong>Protanomalía</strong></td><td>L (rojo) alterado</td><td>Rojos apagados, confusión rojo-verde</td><td>~1%</td></tr>
-                <tr><td><strong>Protanopia</strong></td><td>L (rojo) ausente</td><td>Rojos muy oscuros o negros</td><td>~1%</td></tr>
-                <tr><td><strong>Tritanomalía / Tritanopia</strong></td><td>S (azul) alterado/ausente</td><td>Confusión azul-verde y amarillo-rosa</td><td>&lt;0,01%</td></tr>
-                <tr><td><strong>Acromatopsia</strong></td><td>Ningún cono funcional</td><td>Visión en escala de grises</td><td>~0,003%</td></tr>
+                <tr><td><strong>Deuteranomalía</strong></td><td>M (verde) alterado</td><td>Confusión leve rojo-verde</td><td>~5&nbsp;%</td></tr>
+                <tr><td><strong>Deuteranopia</strong></td><td>M (verde) ausente</td><td>Confusión marcada rojo-verde</td><td>~1&nbsp;%</td></tr>
+                <tr><td><strong>Protanomalía</strong></td><td>L (rojo) alterado</td><td>Rojos apagados, confusión rojo-verde</td><td>~1&nbsp;%</td></tr>
+                <tr><td><strong>Protanopia</strong></td><td>L (rojo) ausente</td><td>Rojos muy oscuros o negros</td><td>~1&nbsp;%</td></tr>
+                <tr><td><strong>Tritanomalía / Tritanopia</strong></td><td>S (azul) alterado/ausente</td><td>Confusión azul-verde y amarillo-rosa</td><td>&lt;0,01&nbsp;%</td></tr>
+                <tr><td><strong>Acromatopsia</strong></td><td>Ningún cono funcional</td><td>Visión en escala de grises</td><td>~0,003&nbsp;%</td></tr>
               </tbody>
             </table>
           </div>
@@ -473,7 +502,7 @@ export default function SimuladorDaltonismoPage() {
             <div className={styles.escenarioCard}>
               <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
               <h4>Analista de datos</h4>
-              <p>Tu mapa de calor o tu gráfico de barras puede ser ininteligible para el 5% de tu audiencia. Verifica que el patrón se entiende sin color.</p>
+              <p>Tu mapa de calor o tu gráfico de barras puede ser ininteligible para el 5&nbsp;% de tu audiencia. Verifica que el patrón se entiende sin color.</p>
             </div>
             <div className={styles.escenarioCard}>
               <span className={styles.escenarioIcon} aria-hidden="true">🧑‍🏫</span>
@@ -498,7 +527,7 @@ export default function SimuladorDaltonismoPage() {
           </div>
           <div className={styles.faqItem}>
             <h4>¿Las matrices que usas son las correctas?</h4>
-            <p>Sí. Son las matrices publicadas en Machado, Oliveira &amp; Fernandes (2009), &ldquo;A Physiologically-based Model for Simulation of Color Vision Deficiency&rdquo;, IEEE TVCG. Es el estándar de facto en herramientas de accesibilidad como Sim Daltonism o Color Oracle. Dos precisiones que conviene conocer: las tres formas <strong>anómalas</strong> se simulan con severidad 0,6 —una alteración moderada—, porque a severidad 1 serían indistinguibles de la dicromacia correspondiente; y el ajuste del modelo para la <strong>tritanopia</strong> es el menos fiable de los tres, al ser la deficiencia más rara y con menos datos experimentales.</p>
+            <p>Sí. Son las matrices publicadas en Machado, Oliveira &amp; Fernandes (2009), &ldquo;A Physiologically-based Model for Simulation of Color Vision Deficiency&rdquo;, IEEE TVCG. Es un modelo fisiológico muy citado en la literatura de simulación; otras herramientas usan otros modelos (Color Oracle, por ejemplo, el de Brettel, Viénot y Mollon), así que sus resultados pueden diferir ligeramente de los de aquí. Dos precisiones que conviene conocer: las tres formas <strong>anómalas</strong> se simulan con severidad 0,6 —una alteración moderada—, porque a severidad 1 serían indistinguibles de la dicromacia correspondiente; y el ajuste del modelo para la <strong>tritanopia</strong> es el menos fiable de los tres, al ser la deficiencia más rara y con menos datos experimentales.</p>
           </div>
           <div className={styles.faqItem}>
             <h4>¿Esta herramienta sirve para diagnóstico?</h4>
@@ -530,7 +559,7 @@ export default function SimuladorDaltonismoPage() {
             <li><strong>Rojo + verde es la combinación más problemática</strong>. Si necesitas indicar éxito/error, usa azul/naranja o combinaciones con luminancia muy distinta.</li>
             <li><strong>Mapas de calor con escala monocromática</strong> (claro→oscuro) o paletas viridis/plasma se entienden mejor que rojo→verde.</li>
             <li><strong>Patrones de relleno</strong> (rayado, puntos, líneas) en gráficos de barras añaden una dimensión accesible además del color.</li>
-            <li><strong>Texto sobre fondo de color</strong>: comprueba que sigue siendo legible bajo deuteranomalía (5% de tu audiencia).</li>
+            <li><strong>Texto sobre fondo de color</strong>: comprueba que sigue siendo legible bajo deuteranomalía (5&nbsp;% de tu audiencia).</li>
           </ul>
 
           <div className={styles.warningBox}>

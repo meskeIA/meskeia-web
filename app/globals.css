@@ -66,6 +66,9 @@
      sombras apuntan a las de arriba, así que heredan su variante oscura. Un módulo que declare
      el suyo sigue mandando. */
   --radius-large: 16px;
+  /* --radius-medium: lo usan 3 módulos sin declararlo (hallazgo 2864, simulador-daltonismo,
+     04/10/2026); 12px queda entre --radius y --radius-large. */
+  --radius-medium: 12px;
   --shadow-sm: var(--shadow-light);
   --shadow-md: var(--shadow-medium);
   --shadow-lg: var(--shadow-strong);

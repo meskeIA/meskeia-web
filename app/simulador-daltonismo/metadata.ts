@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Simulador de Daltonismo | meskeIA',
-    description: 'Visualiza cómo perciben tus diseños las personas con daltonismo. 8 tipos simulados con matrices oficiales.',
+    description: 'Visualiza cómo perciben tus diseños las personas con daltonismo. 8 simulaciones con las matrices publicadas por Machado et al. (2009).',
     url: 'https://meskeia.com/simulador-daltonismo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -36,12 +36,12 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Daltonismo',
-  description: 'Herramienta gratuita para diseñadores y desarrolladores: sube una imagen y visualiza cómo se percibe en los 7 tipos principales de daltonismo (protanopia, deuteranopia, tritanopia y sus formas leves, además de acromatopsia). Procesamiento 100% local con matrices oficiales de Machado et al. (2009).',
+  description: 'Herramienta gratuita para diseñadores y desarrolladores: sube una imagen y visualiza cómo se percibe en los 7 tipos principales de daltonismo (protanopia, deuteranopia, tritanopia y sus formas leves, además de acromatopsia). Procesamiento 100% local con matrices publicadas por Machado et al. (2009).',
   url: 'https://meskeia.com/simulador-daltonismo/',
   category: 'UtilityApplication',
   features: [
     'Simulación de 7 tipos de daltonismo + visión normal',
-    'Matrices oficiales Machado et al. (2009)',
+    'Matrices publicadas por Machado et al. (2009)',
     'Sube tu imagen o usa la paleta de prueba incluida',
     'Descarga cada simulación en PNG',
     'Procesamiento 100% local (la imagen nunca sale del navegador)',
@@ -61,7 +61,7 @@ export const faqJsonLd = {
       name: '¿Qué es el daltonismo y qué tipos existen?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El daltonismo es una alteración hereditaria en la percepción del color causada por la ausencia o mal funcionamiento de uno o más tipos de conos en la retina. Los tipos más frecuentes son la protanopia y la deuteranopia (dificultad para distinguir rojos y verdes), que afectan a alrededor del 8 % de los hombres y el 0,4 % de las mujeres de ascendencia europea (Birch, 2012), con cifras menores en otras poblaciones. La tritanopia (confunde azul con verde y amarillo con rosa) y la acromatopsia (ausencia total de color) son mucho más raras.',
+        text: 'El daltonismo es una alteración hereditaria en la percepción del color causada por la ausencia o mal funcionamiento de uno o más tipos de conos en la retina. Lo más frecuente es el daltonismo rojo-verde, que en conjunto afecta a alrededor del 8 % de los hombres y el 0,4 % de las mujeres de ascendencia europea (Birch, 2012), con cifras menores en otras poblaciones; la mayor parte son formas leves (anomalías, como la deuteranomalía, en torno al 5 %), y la protanopia y la deuteranopia rondan el 1 % cada una. La tritanopia (confunde azul con verde y amarillo con rosa) y la acromatopsia (ausencia total de color) son mucho más raras.',
       },
     },
     {
