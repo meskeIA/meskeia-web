@@ -699,9 +699,35 @@ Cada regla se escribió para su caso; el parecido superficial con el caso siguie
 
 **De dónde sale**: el semáforo de la sección 9 del digest marcó ✅ durante **21 lecturas seguidas** mientras la métrica caía, y *Apps activas* llevaba 30 lecturas subiendo sin que su suelo llegara a hablar nunca. El principio ya estaba escrito ("un color que sale siempre deja de informar"); lo que faltaba era volverlo **mecánico**, porque un principio depende de que alguien lo recuerde y un contador no.
 
-⚠️ **Y va sobre UNA sola población.** Si la serie mezcla dos cosas que se comportan distinto, la racha mide la mezcla y no el indicador. El caso: el contador del Inspector saltó con **8 `con_hallazgos_menores` seguidos**, pero aquellas ocho eran RE-inspecciones de apps recién reparadas —sus altos y críticos se habían arreglado días antes, así que solo podían quedar detalles—, mientras la serie de primeras inspecciones llevaba una racha de 2. Desde el 24/08/2026 `registrar.mjs` cuenta las dos por separado y cada una avisa de una cosa distinta: en primeras inspecciones, que el detector puede haber dejado de mirar; en re-inspecciones con hallazgos graves, que lo que no cierra es la reparación; con hallazgos menores, nada, porque es el resultado esperado. Que dispara donde debe y calla donde debe se comprueba con **`npm run inspector:probar-contador`**, que le reinyecta los cuatro casos sobre bases desechables.
+⚠️ **Y va sobre UNA sola población.** Si la serie mezcla dos cosas que se comportan distinto, la racha mide la mezcla y no el indicador: el Inspector saltó con 8 `con_hallazgos_menores` seguidos que eran RE-inspecciones de apps recién reparadas (24/08/2026; cabecera de `scripts/inspector/registrar.mjs`). Prueba: **`npm run inspector:probar-contador`**.
 
-**El aviso salió del caso simétrico** (23/08/2026): el Inspector llevaba **32 inspecciones sin un solo veredicto `ok`** y eso disparó la sospecha de detector roto. Se hizo la prueba —criterio escrito antes de ejecutarla, en `_private/inspector/PRUEBA-ESPECIFICIDAD.md`— y el detector estaba sano: los hallazgos verificados a mano eran reales. `ok` exigía que una app de 620-946 líneas no tuviera **ni un detalle**, algo que en este catálogo no ocurre (0/32); el eje informativo era la pareja `con_hallazgos` / `con_hallazgos_menores`, donde la racha máxima histórica era **4**, por debajo del umbral. Allí un color salía siempre y dejó de informar; aquí un valor no salía nunca y tampoco informaba. **Un indicador puede mentir por los dos extremos, y el contador no distingue solo: hay que decirle qué contar.**
+El aviso salió del caso simétrico (23/08/2026, `_private/inspector/PRUEBA-ESPECIFICIDAD.md`): 32 inspecciones sin un `ok` y el detector estaba sano, porque `ok` era inalcanzable. **Un indicador puede mentir por los dos extremos, y el contador no distingue solo: hay que decirle qué contar.**
+
+---
+
+## Frontera de decisión (OBLIGATORIO)
+
+Los tres niveles, la etiqueta `frontera:<tipo>` y la regla de ascenso y descenso están en el
+CLAUDE.md global §9. Aquí, los tipos de meskeIA con lo que permite delegarlos: **si nada lo
+comprueba, no baja del nivel 3.** Recuento: `npm run frontera` (mensual, en la Agenda). Registro de
+ascensos y descensos: ficha `feedback_frontera_decisiones` de la memoria.
+
+| Nivel | Tipo (`<tipo>` de la etiqueta) | Lo comprueba |
+|---|---|---|
+| 1 | `git-local`: commit, rama, worktree (nunca force push ni reset --hard) | Cuadre + pre-commit |
+| 1 | `implementacion`: entre equivalentes (tipo de input, override de dependencia, referencia con fuente) | `check:tipos`, `test:calc`, specs |
+| 1 | `valor-medido`: un valor contra su umbral (un token frente al contraste) | specs de contraste, `check:token-oscuro` |
+| 1 | `orden`: orden interno de un encargo (commits, tandas, agentes o secuencial) | Cuadre |
+| 1 | `anotar`: cabos y fechas en Agenda, `SOSPECHAS.md` o memoria | git del Centro de Mando, `check:memoria` |
+| 1 | `alcance`: extender una reparación a la misma clase de defecto en apps hermanas | testigo de familia, `check:familias`, specs |
+| 2 | `candado`: nuevo sobre un defecto ya observado, o de avisar a romper | `*:probar-candado` reinyecta el caso de origen |
+| 2 | `escala`: el mismo patrón en más de 20 apps | «Candado tras cambio a escala» |
+| 2 | `retirar-muerto`: código sin lectores | `check:motores-consumidos`, `check:tipos` |
+| 2 | `promesa`: bajar a lo que la app hace un title, description o FAQ que promete más | el Inspector; el usuario lo decidió el 05/10/2026: «no tiene sentido prometer algo que no hacemos» |
+| 2 | `config-claude`: ajustes de Claude Code que no amplían lo que sale del PC | la sesión siguiente lo valida; copia del perfil |
+| 3 | Push y todo lo que sale del PC · borrar fuera de git · Turso | — |
+| 3 | `fiscal`: dato normativo de `data/fiscal` | nada automático: se pregunta con **cita literal de la fuente, valor anterior y valor nuevo**. Fuera del ascenso |
+| 3 | Qué se construye, prioriza, publica o retira · ampliar una app para cumplir su promesa · neutralidad editorial · formato de los rituales | es el qué |
 
 ---
 

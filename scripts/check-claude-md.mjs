@@ -356,6 +356,11 @@ const OBLIGACIONES = [
     'Y va sobre UNA sola población.', 'npm run inspector:probar-contador',
     'Un indicador puede mentir por los dos extremos',
   ]],
+  ['Frontera de decisión', [
+    'CLAUDE.md global §9', 'si nada lo comprueba, no baja del nivel 3', 'npm run frontera',
+    'feedback_frontera_decisiones', 'cita literal de la fuente, valor anterior y valor nuevo',
+    'Fuera del ascenso', 'es el qué',
+  ]],
   ['Proceso', [
     'se repara en el momento, se PUSHEA en lote.', '/push', 'No se difiere ninguna reparación',
     'NUNCA git add . ni git add -A', 'Sale con push propio, sin esperar al lote',
