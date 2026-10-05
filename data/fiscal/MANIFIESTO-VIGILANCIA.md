@@ -5,7 +5,8 @@
 > oficial hay que vigilar, con qué cadencia cambia y qué señales distinguen un **cambio de datos**
 > (importes, tipos, tramos) de un **cambio de metodología** (nueva fórmula o sistema de cálculo).
 >
-> **Consumidores**: (1) el agente Vigía Normativo (Claude Agent SDK) — que SOLO detecta y produce
+> **Consumidores**: (1) el agente Vigía Normativo (`claude -p` con la suscripción Max desde el
+> 05/10/2026; antes, Claude Agent SDK con clave de API) — que SOLO detecta y produce
 > informes, NUNCA edita estos módulos ni hace commits; (2) la revisión manual mensual con Claude
 > Code, que es la única autoridad que aplica cambios (edita → re-sella `verificado` → actualiza
 > `app/delegum/datos-fiscales/novedades.ts` → push).
