@@ -7,49 +7,28 @@ import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import { G, resolverRectilineo, resolverParabolico, type ResultadoRectilineo, type ResultadoParabolico } from './motor';
+import SimuladorCinematica from './SimuladorCinematica';
 
 type TipoMovimiento = 'mru' | 'mrua' | 'caida' | 'parabolico';
 
-interface ResultadoMRU {
-  tipo: 'mru';
-  velocidad: number;
-  distancia: number;
-  tiempo: number;
-}
-
-interface ResultadoMRUA {
-  tipo: 'mrua';
-  velocidadFinal: number;
-  distancia: number;
+/** MRU, MRUA y caída libre comparten motor: son el mismo movimiento con a = 0, a o g. */
+interface ResultadoLineal extends ResultadoRectilineo {
+  tipo: 'mru' | 'mrua' | 'caida';
+  v0: number;
   aceleracion: number;
   tiempo: number;
 }
 
-interface ResultadoCaida {
-  tipo: 'caida';
-  velocidadFinal: number;
-  altura: number;
-  tiempo: number;
-}
-
-interface ResultadoParabolico {
-  tipo: 'parabolico';
-  alturaMaxima: number;
-  alcance: number;
-  tiempoVuelo: number;
-  velocidadX: number;
-  velocidadY: number;
-}
-
-type Resultado = ResultadoMRU | ResultadoMRUA | ResultadoCaida | ResultadoParabolico | null;
-
-const G = 9.81; // Gravedad m/s²
+type Resultado = ResultadoLineal | (ResultadoParabolico & { tipo: 'parabolico' }) | null;
 
 const EJEMPLOS = [
   { nombre: '⚽ Pelota lanzada', tipo: 'parabolico' as TipoMovimiento, v0: '20', angulo: '45', t: '4' },
   { nombre: '🚗 Coche frenando', tipo: 'mrua' as TipoMovimiento, v0: '30', a: '-5', t: '6' },
+  { nombre: '↩️ Frena y da la vuelta', tipo: 'mrua' as TipoMovimiento, v0: '20', a: '-5', t: '6' },
   { nombre: '🚀 Cohete acelerando', tipo: 'mrua' as TipoMovimiento, v0: '0', a: '15', t: '10' },
-  { nombre: '📦 Objeto en caída', tipo: 'caida' as TipoMovimiento, v0: '0', h: '100', t: '4.5' },
+  { nombre: '📦 Objeto en caída', tipo: 'caida' as TipoMovimiento, v0: '0', t: '4,5' },
+  { nombre: '🏀 Lanzado hacia arriba', tipo: 'caida' as TipoMovimiento, v0: '-10', t: '3' },
 ];
 
 export default function CalculadoraMovimientoPage() {
@@ -58,7 +37,6 @@ export default function CalculadoraMovimientoPage() {
   const [aceleracion, setAceleracion] = useState('2');
   const [tiempo, setTiempo] = useState('5');
   const [angulo, setAngulo] = useState('45');
-  const [altura, setAltura] = useState('50');
 
   // Calcular resultados
   const resultado: Resultado = useMemo(() => {
@@ -66,73 +44,24 @@ export default function CalculadoraMovimientoPage() {
     const a = parseSpanishNumber(aceleracion);
     const t = parseSpanishNumber(tiempo);
     const ang = parseSpanishNumber(angulo);
-    const h = parseSpanishNumber(altura);
 
-    if (isNaN(t) || t <= 0) return null;
-
-    switch (tipoMovimiento) {
-      case 'mru': {
-        if (isNaN(v0)) return null;
-        const distancia = v0 * t;
-        return {
-          tipo: 'mru',
-          velocidad: v0,
-          distancia,
-          tiempo: t
-        };
-      }
-
-      case 'mrua': {
-        if (isNaN(v0) || isNaN(a)) return null;
-        const vf = v0 + a * t;
-        const d = v0 * t + 0.5 * a * t * t;
-        return {
-          tipo: 'mrua',
-          velocidadFinal: vf,
-          distancia: d,
-          aceleracion: a,
-          tiempo: t
-        };
-      }
-
-      case 'caida': {
-        if (isNaN(v0)) return null;
-        // Caída libre (v0 hacia abajo positiva o 0)
-        const vf = v0 + G * t;
-        const hCaida = v0 * t + 0.5 * G * t * t;
-        return {
-          tipo: 'caida',
-          velocidadFinal: vf,
-          altura: hCaida,
-          tiempo: t
-        };
-      }
-
-      case 'parabolico': {
-        if (isNaN(v0) || isNaN(ang)) return null;
-        const angRad = ang * Math.PI / 180;
-        const vx = v0 * Math.cos(angRad);
-        const vy = v0 * Math.sin(angRad);
-
-        const tSubida = vy / G;
-        const tVuelo = 2 * tSubida;
-        const hMax = (vy * vy) / (2 * G);
-        const alcance = vx * tVuelo;
-
-        return {
-          tipo: 'parabolico',
-          alturaMaxima: hMax,
-          alcance,
-          tiempoVuelo: tVuelo,
-          velocidadX: vx,
-          velocidadY: vy
-        };
-      }
-
-      default:
-        return null;
+    if (tipoMovimiento === 'parabolico') {
+      // El tiempo no interviene: el vuelo dura lo que dicta el ángulo
+      if (isNaN(v0) || isNaN(ang) || v0 <= 0 || ang <= 0 || ang >= 90) return null;
+      return { tipo: 'parabolico', ...resolverParabolico(v0, ang) };
     }
-  }, [tipoMovimiento, velocidadInicial, aceleracion, tiempo, angulo, altura]);
+
+    if (isNaN(t) || t <= 0 || isNaN(v0)) return null;
+    const acel = tipoMovimiento === 'mru' ? 0 : tipoMovimiento === 'caida' ? G : a;
+    if (isNaN(acel)) return null;
+    return {
+      tipo: tipoMovimiento,
+      v0,
+      aceleracion: acel,
+      tiempo: t,
+      ...resolverRectilineo({ v0, a: acel }, t),
+    };
+  }, [tipoMovimiento, velocidadInicial, aceleracion, tiempo, angulo]);
 
   // Cargar ejemplo
   const cargarEjemplo = (ejemplo: typeof EJEMPLOS[0]) => {
@@ -141,18 +70,17 @@ export default function CalculadoraMovimientoPage() {
     if (ejemplo.a) setAceleracion(ejemplo.a);
     if (ejemplo.t) setTiempo(ejemplo.t);
     if (ejemplo.angulo) setAngulo(ejemplo.angulo);
-    if (ejemplo.h) setAltura(ejemplo.h);
   };
 
   // Obtener fórmulas según tipo
   const getFormulas = () => {
     switch (tipoMovimiento) {
       case 'mru':
-        return ['d = v × t', 'v = d / t', 't = d / v'];
+        return ['x = v × t', 'v = x / t', 't = x / v'];
       case 'mrua':
-        return ['v = v₀ + a × t', 'd = v₀ × t + ½ × a × t²', 'v² = v₀² + 2 × a × d'];
+        return ['v = v₀ + a × t', 'x = v₀ × t + ½ × a × t²', 'v² = v₀² + 2 × a × x', 't parada = −v₀ / a'];
       case 'caida':
-        return ['v = v₀ + g × t', 'h = v₀ × t + ½ × g × t²', 'v² = v₀² + 2 × g × h'];
+        return ['v = v₀ + g × t', 'y = v₀ × t + ½ × g × t²', 'v² = v₀² + 2 × g × y'];
       case 'parabolico':
         return ['vₓ = v₀ × cos(θ)', 'vᵧ = v₀ × sin(θ)', 'T = 2 × vᵧ / g', 'H = vᵧ² / (2g)', 'R = vₓ × T'];
       default:
@@ -165,9 +93,10 @@ export default function CalculadoraMovimientoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}><span aria-hidden="true">🚀</span> Calculadora de Movimiento</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🚀</span> Calculadora y simulador de MRU y MRUA</h1>
         <p className={styles.subtitle}>
-          Cinemática: MRU, MRUA, Caída Libre y Tiro Parabólico
+          Cinemática con el móvil animado y sus gráficas x-t, v-t y a-t: MRU, MRUA (MRUV),
+          caída libre y tiro parabólico
         </p>
       </header>
 
@@ -198,6 +127,7 @@ export default function CalculadoraMovimientoPage() {
             >
               <span className={styles.tipoIcono} aria-hidden="true">⟶</span>
               <span className={styles.tipoNombre}>MRUA</span>
+              <span className={styles.tipoAlias}>o MRUV</span>
             </button>
             <button
               type="button"
@@ -224,10 +154,12 @@ export default function CalculadoraMovimientoPage() {
             <h3 className={styles.sectionTitle}>Parámetros</h3>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Velocidad Inicial (v₀)</label>
+              <label className={styles.label} htmlFor="mov-v0">Velocidad Inicial (v₀)</label>
               <div className={styles.inputWrapper}>
                 <input
+                  id="mov-v0"
                   type="text"
+                  inputMode="decimal"
                   value={velocidadInicial}
                   onChange={(e) => setVelocidadInicial(e.target.value)}
                   className={styles.input}
@@ -239,10 +171,12 @@ export default function CalculadoraMovimientoPage() {
 
             {(tipoMovimiento === 'mrua') && (
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Aceleración (a)</label>
+                <label className={styles.label} htmlFor="mov-a">Aceleración (a)</label>
                 <div className={styles.inputWrapper}>
                   <input
+                    id="mov-a"
                     type="text"
+                    inputMode="decimal"
                     value={aceleracion}
                     onChange={(e) => setAceleracion(e.target.value)}
                     className={styles.input}
@@ -255,10 +189,12 @@ export default function CalculadoraMovimientoPage() {
 
             {tipoMovimiento === 'parabolico' && (
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Ángulo de lanzamiento (θ)</label>
+                <label className={styles.label} htmlFor="mov-angulo">Ángulo de lanzamiento (θ)</label>
                 <div className={styles.inputWrapper}>
                   <input
+                    id="mov-angulo"
                     type="text"
+                    inputMode="decimal"
                     value={angulo}
                     onChange={(e) => setAngulo(e.target.value)}
                     className={styles.input}
@@ -271,10 +207,12 @@ export default function CalculadoraMovimientoPage() {
 
             {tipoMovimiento !== 'parabolico' && (
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Tiempo (t)</label>
+                <label className={styles.label} htmlFor="mov-t">Tiempo (t)</label>
                 <div className={styles.inputWrapper}>
                   <input
+                    id="mov-t"
                     type="text"
+                    inputMode="decimal"
                     value={tiempo}
                     onChange={(e) => setTiempo(e.target.value)}
                     className={styles.input}
@@ -285,9 +223,15 @@ export default function CalculadoraMovimientoPage() {
               </div>
             )}
 
+            {tipoMovimiento === 'mrua' && (
+              <div className={styles.infoBox}>
+                <p>Una aceleración negativa con velocidad positiva es un frenado: si dura lo bastante, el móvil se para y da la vuelta.</p>
+              </div>
+            )}
+
             {tipoMovimiento === 'caida' && (
               <div className={styles.infoBox}>
-                <p>g = {formatNumber(G, 2)} m/s² (gravedad)</p>
+                <p>g = {formatNumber(G, 2)} m/s² (gravedad), con el eje positivo hacia abajo: una v₀ negativa es lanzar hacia arriba.</p>
               </div>
             )}
           </div>
@@ -317,63 +261,34 @@ export default function CalculadoraMovimientoPage() {
           {resultado ? (
             <>
               <div className={styles.resultsGrid}>
-                {resultado.tipo === 'mru' && (
+                {resultado.tipo !== 'parabolico' && (
                   <>
                     <div className={styles.resultCard}>
-                      <span className={styles.resultLabel}>Velocidad</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.velocidad, 2)}</span>
-                      <span className={styles.resultUnit}>m/s</span>
-                    </div>
-                    <div className={styles.resultCard}>
-                      <span className={styles.resultLabel}>Distancia</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.distancia, 2)}</span>
-                      <span className={styles.resultUnit}>m</span>
-                    </div>
-                    <div className={styles.resultCard}>
-                      <span className={styles.resultLabel}>Tiempo</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.tiempo, 2)}</span>
-                      <span className={styles.resultUnit}>s</span>
-                    </div>
-                  </>
-                )}
-
-                {resultado.tipo === 'mrua' && (
-                  <>
-                    <div className={styles.resultCard}>
-                      <span className={styles.resultLabel}>Velocidad Final</span>
+                      <span className={styles.resultLabel}>
+                        {resultado.tipo === 'mru' ? 'Velocidad' : 'Velocidad final'}
+                      </span>
                       <span className={styles.resultValue}>{formatNumber(resultado.velocidadFinal, 2)}</span>
                       <span className={styles.resultUnit}>m/s</span>
                     </div>
                     <div className={styles.resultCard}>
-                      <span className={styles.resultLabel}>Distancia</span>
+                      <span className={styles.resultLabel}>
+                        {resultado.tipo === 'caida' ? 'Desplazamiento vertical (y)' : 'Desplazamiento (x)'}
+                      </span>
+                      <span className={styles.resultValue}>{formatNumber(resultado.desplazamiento, 2)}</span>
+                      <span className={styles.resultUnit}>m</span>
+                    </div>
+                    <div className={styles.resultCard}>
+                      <span className={styles.resultLabel}>Distancia recorrida</span>
                       <span className={styles.resultValue}>{formatNumber(resultado.distancia, 2)}</span>
                       <span className={styles.resultUnit}>m</span>
                     </div>
-                    <div className={styles.resultCard}>
-                      <span className={styles.resultLabel}>Aceleración</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.aceleracion, 2)}</span>
-                      <span className={styles.resultUnit}>m/s²</span>
-                    </div>
-                    <div className={styles.resultCard}>
-                      <span className={styles.resultLabel}>Tiempo</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.tiempo, 2)}</span>
-                      <span className={styles.resultUnit}>s</span>
-                    </div>
-                  </>
-                )}
-
-                {resultado.tipo === 'caida' && (
-                  <>
-                    <div className={styles.resultCard}>
-                      <span className={styles.resultLabel}>Velocidad Final</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.velocidadFinal, 2)}</span>
-                      <span className={styles.resultUnit}>m/s</span>
-                    </div>
-                    <div className={styles.resultCard}>
-                      <span className={styles.resultLabel}>Altura recorrida</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.altura, 2)}</span>
-                      <span className={styles.resultUnit}>m</span>
-                    </div>
+                    {resultado.tipo !== 'mru' && (
+                      <div className={styles.resultCard}>
+                        <span className={styles.resultLabel}>Aceleración</span>
+                        <span className={styles.resultValue}>{formatNumber(resultado.aceleracion, 2)}</span>
+                        <span className={styles.resultUnit}>m/s²</span>
+                      </div>
+                    )}
                     <div className={styles.resultCard}>
                       <span className={styles.resultLabel}>Tiempo</span>
                       <span className={styles.resultValue}>{formatNumber(resultado.tiempo, 2)}</span>
@@ -413,6 +328,14 @@ export default function CalculadoraMovimientoPage() {
                 )}
               </div>
 
+              {resultado.tipo !== 'parabolico' && resultado.tParada !== null && resultado.xParada !== null && (
+                <p className={styles.notaParada}>
+                  Se detiene en t = {formatNumber(resultado.tParada, 2)} s, a {formatNumber(resultado.xParada, 2)} m
+                  del origen, y vuelve: la distancia recorrida ({formatNumber(resultado.distancia, 2)} m) es mayor
+                  que el desplazamiento ({formatNumber(resultado.desplazamiento, 2)} m).
+                </p>
+              )}
+
               {/* Fórmulas utilizadas */}
               <div className={styles.formulasSection}>
                 <h3>Fórmulas Utilizadas</h3>
@@ -427,12 +350,33 @@ export default function CalculadoraMovimientoPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>📐</span>
-              <p>Ingresa los parámetros para calcular</p>
+              <span className={styles.placeholderIcon} aria-hidden="true">📐</span>
+              <p>
+                {tipoMovimiento === 'parabolico'
+                  ? 'Introduce una velocidad mayor que 0 y un ángulo entre 0° y 90°'
+                  : 'Introduce la velocidad inicial y un tiempo mayor que 0'}
+              </p>
             </div>
           )}
         </div>
       </div>
+
+      {resultado && resultado.tipo !== 'parabolico' && (
+        <SimuladorCinematica
+          modo={resultado.tipo}
+          v0={resultado.v0}
+          a={resultado.aceleracion}
+          T={resultado.tiempo}
+        />
+      )}
+
+      {resultado && resultado.tipo === 'parabolico' && (
+        <p className={styles.simEnlace}>
+          <span aria-hidden="true">🎯</span> Para ver la trayectoria animada y comparar hasta tres
+          lanzamientos con distinto ángulo o velocidad, abre el{' '}
+          <a href="/simulador-proyectiles/">simulador de tiro parabólico</a>.
+        </p>
+      )}
 
       {/* Sección educativa */}
       <EducationalSection
@@ -477,6 +421,46 @@ export default function CalculadoraMovimientoPage() {
               <p>
                 Combinación de MRU horizontal y caída libre vertical.
                 La trayectoria es una parábola. Alcance máximo a 45°.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Lectura de las gráficas del simulador (S0179) */}
+        <section className={styles.guideSection}>
+          <h2><span aria-hidden="true">📈</span> Cómo leer las gráficas x-t, v-t y a-t</h2>
+          <div className={styles.contentGrid}>
+            <div className={styles.contentCard}>
+              <h4>Pendiente de x-t = velocidad</h4>
+              <p>
+                En el MRU la gráfica posición-tiempo es una recta: su inclinación es la velocidad.
+                En el MRUA es una parábola, cada vez más inclinada si acelera y menos si frena. Donde
+                la parábola alcanza su vértice, la velocidad es cero: ahí el móvil se para.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>Pendiente de v-t = aceleración</h4>
+              <p>
+                La gráfica velocidad-tiempo del MRUA es una recta inclinada, y su pendiente es la
+                aceleración. Si cruza el eje horizontal, la velocidad cambia de signo: el móvil da la
+                vuelta.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>Área bajo v-t = desplazamiento</h4>
+              <p>
+                El área entre la recta v-t y el eje horizontal es el desplazamiento: cuenta positiva
+                por encima del eje y negativa por debajo. Si las sumas todas como positivas, sale la
+                distancia recorrida. Con v₀ = 20 m/s y a = −5 m/s² durante 6 s: +40 m hasta pararse y
+                −10 m de vuelta, desplazamiento 30 m y distancia 50 m.
+              </p>
+            </div>
+            <div className={styles.contentCard}>
+              <h4>a-t es una recta horizontal</h4>
+              <p>
+                En todos estos movimientos la aceleración no cambia, así que su gráfica es una recta
+                horizontal: en el eje (a = 0) para el MRU, por encima o por debajo para el MRUA, y a la
+                altura de g en la caída libre.
               </p>
             </div>
           </div>
@@ -557,7 +541,7 @@ export default function CalculadoraMovimientoPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h4>Estudiante de preparatoria</h4>
               </div>
               <p>En el examen de admisión universitaria, el <strong>MRUA</strong> y el <strong>tiro parabólico</strong> acumulan más del 60 % de los problemas de cinemática. El MRU suele aparecer como paso previo o condición inicial.</p>
@@ -569,7 +553,7 @@ export default function CalculadoraMovimientoPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏋️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏋️</span>
                 <h4>Deportista / Entrenador</h4>
               </div>
               <p>El <strong>tiro parabólico</strong> explica el vuelo de un balón. Con ángulo de 45° se maximiza el alcance horizontal. Reducir el ángulo aumenta la velocidad horizontal a costa de menos altura.</p>
@@ -581,7 +565,7 @@ export default function CalculadoraMovimientoPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔬</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔬</span>
                 <h4>Laboratorio de Física</h4>
               </div>
               <p>La <strong>caída libre</strong> es el experimento más sencillo para medir g. Se suelta un objeto desde una altura conocida y se mide el tiempo con un cronómetro o sensor.</p>
@@ -593,7 +577,7 @@ export default function CalculadoraMovimientoPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🚗</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🚗</span>
                 <h4>Conducción y Seguridad Vial</h4>
               </div>
               <p>El frenado de un coche es <strong>MRUA con a negativa</strong>. La distancia de frenado depende del cuadrado de la velocidad: duplicar la velocidad cuadruplica la distancia.</p>
@@ -707,32 +691,32 @@ export default function CalculadoraMovimientoPage() {
           <h2><span aria-hidden="true">✅</span> Mejores Prácticas para Estudiantes de Física</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✏️</span>
+              <span className={styles.tipIcon} aria-hidden="true">✏️</span>
               <h4>Dibuja un esquema primero</h4>
               <p>Antes de cualquier cálculo, traza un diagrama con los vectores de velocidad, aceleración y la trayectoria. El dibujo aclara el sistema de referencia y los signos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <h4>Todo en SI (metros, segundos, m/s²)</h4>
               <p>Convierte <em>todos</em> los datos al Sistema Internacional antes de operar. Mezclar km/h con m/s en la misma ecuación es el error más frecuente y más costoso en puntos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <h4>MRU: sin aceleración implícita</h4>
               <p>Si el enunciado no menciona aceleración ni cambio de velocidad, asume MRU. No inventes datos. La sencillez del problema es una señal, no una trampa.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>±</span>
+              <span className={styles.tipIcon} aria-hidden="true">±</span>
               <h4>Define positivo y negativo antes de empezar</h4>
               <p>Elige un eje positivo (por ejemplo, hacia arriba o hacia la derecha) y mantén la convención durante todo el problema. La aceleración de frenado siempre es negativa si la velocidad es positiva.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⬇️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⬇️</span>
               <h4>Caída libre: g = 9,81 m/s² siempre hacia abajo</h4>
               <p>La gravedad actúa en el sentido negativo del eje Y (hacia abajo). En la fórmula h = ½·g·t², g ya incluye la dirección. No pongas g negativa si ya has definido positivo hacia abajo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>↗️</span>
+              <span className={styles.tipIcon} aria-hidden="true">↗️</span>
               <h4>Tiro parabólico: descompón siempre v₀</h4>
               <p>Nunca uses v₀ directamente en las ecuaciones del tiro parabólico. Siempre descompón: Vx = v₀·cos(θ) y Vy = v₀·sin(θ). Las ecuaciones horizontales y verticales se resuelven por separado.</p>
             </div>
@@ -743,7 +727,7 @@ export default function CalculadoraMovimientoPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores Conceptuales que Cuestan Puntos en el Examen</h3>
             </div>
             <ul className={styles.warningList}>

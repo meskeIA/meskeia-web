@@ -460,6 +460,13 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'fisica',
   },
   {
+    slug: 'calculadora-movimiento',
+    icon: '🚀',
+    titulo: 'MRU y MRUA (MRUV)',
+    desc: 'Móvil animado con sus vectores y gráficas x-t, v-t y a-t sincronizadas: frenado, parada y vuelta, y caída libre.',
+    disciplina: 'fisica',
+  },
+  {
     slug: 'simulador-movimiento-circular',
     icon: '🌀',
     titulo: 'Movimiento circular',

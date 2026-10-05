@@ -3097,7 +3097,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // FÍSICA Y QUÍMICA
-  'calculadora-movimiento': [{ url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales interactivas' }, ...matematicasAvanzadasApps.slice(0, 2), { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud, peso, etc.' }],
+  'calculadora-movimiento': [{ url: '/simulador-proyectiles/', icon: '🎯', name: 'Tiro parabólico', description: 'Trayectorias animadas y comparadas' }, { url: '/simulador-plano-inclinado/', icon: '📐', name: 'Plano inclinado', description: 'Fuerzas y aceleración en la rampa' }, { url: '/simulador-movimiento-circular/', icon: '🌀', name: 'Movimiento circular', description: 'MCU y MCNU con sus vectores' }, { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la energía', description: 'Cinética y potencial a lo largo del recorrido' }],
   'simulador-fisica': [{ url: '/calculadora-movimiento/', icon: '🚀', name: 'Calculadora Movimiento', description: 'MRU, MRUA, caída libre' }, { url: '/simulador-circuitos-electricos/', icon: '🔋', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, Ohm, potencia' }, { url: '/calculadora-electricidad/', icon: '⚡', name: 'Electricidad', description: 'Ley de Ohm, potencia' }, { url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' }],
   'simulador-circuitos-electricos': [
     { url: '/calculadora-electricidad/', icon: '⚡', name: 'Electricidad', description: 'Ley de Ohm y potencia básica' },

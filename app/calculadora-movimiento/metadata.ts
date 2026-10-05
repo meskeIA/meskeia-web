@@ -2,43 +2,41 @@ import { Metadata } from 'next';
 
 import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
 export const metadata: Metadata = {
-  title: 'Calculadora de MRU y MRUA - Cinemática (Caída Libre, Tiro Parabólico)',
-  description: 'Resuelve problemas de cinemática paso a paso: MRU (movimiento uniforme), MRUA (uniformemente acelerado), caída libre y tiro parabólico. Con fórmulas y ejemplos.',
-  keywords: 'cinemática, física, MRU, MRUA, caída libre, tiro parabólico, velocidad, aceleración, distancia, tiempo, movimiento',
+  title: 'Calculadora y simulador de MRU y MRUA (MRUV) con gráficas',
+  description: 'Resuelve MRU, MRUA (MRUV), caída libre y tiro parabólico y mira el movimiento: móvil animado con sus vectores y gráficas x-t, v-t y a-t sincronizadas. Distingue distancia recorrida y desplazamiento.',
+  keywords: 'cinemática, física, MRU, MRUA, MRUV, simulador MRU, simulador MRUA, gráficas x-t v-t a-t, caída libre, tiro parabólico, velocidad, aceleración, desplazamiento, distancia recorrida',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Calculadora de MRU y MRUA - Cinemática Paso a Paso',
-    description: 'MRU, MRUA, caída libre y tiro parabólico. Resuelve velocidad, aceleración, distancia y tiempo con fórmulas y ejemplos.',
+    title: 'Calculadora y simulador de MRU y MRUA (MRUV)',
+    description: 'MRU, MRUA, caída libre y tiro parabólico con el móvil animado y las gráficas x-t, v-t y a-t sincronizadas.',
     url: 'https://meskeia.com/calculadora-movimiento/',
     siteName: 'meskeIA',
     locale: 'es_ES',
-    images: [{
-      url: 'https://meskeia.com/og-image.png',
-      width: 1200,
-      height: 630,
-      alt: 'meskeIA',
-    }]
+    // App del portal Stemum desde S0179: lleva la tarjeta social de SU portal (check:og-image)
+    images: [{ url: 'https://meskeia.com/stemum/og-image.png', width: 1200, height: 630, alt: 'Stemum — el portal de ciencia interactiva de meskeIA' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Calculadora de MRU y MRUA - Cinemática',
-    description: 'Caída libre, tiro parabólico, velocidad y aceleración. Fórmulas y ejemplos.',
-    images: ['https://meskeia.com/og-image.png']
+    title: 'Calculadora y simulador de MRU y MRUA (MRUV)',
+    description: 'El móvil animado y sus gráficas x-t, v-t y a-t, con distancia recorrida y desplazamiento.',
+    images: ['https://meskeia.com/stemum/og-image.png']
   },
 };
 
 const webAppSchema = generateWebAppSchema({
-  name: "Calculadora de Movimiento - Cinemática MRU, MRUA, Caída Libre",
-  description: "Calculadora de cinemática con MRU, MRUA, caída libre y tiro parabólico. Calcula velocidad, aceleración, distancia y tiempo con fórmulas y ejemplos prácticos.",
+  name: "Calculadora y simulador de MRU y MRUA (MRUV)",
+  description: "Calculadora y simulador de cinemática: MRU, MRUA (MRUV), caída libre y tiro parabólico, con el móvil animado y las gráficas x-t, v-t y a-t sincronizadas.",
   url: 'https://meskeia.com/calculadora-movimiento/',
   category: 'EducationalApplication',
   features: [
     'Cuatro modos: MRU, MRUA, caída libre y tiro parabólico',
-    'Calcula velocidad, aceleración, distancia, tiempo y ángulo según los valores disponibles',
+    'Simulación del móvil sobre su pista con los vectores de velocidad y aceleración',
+    'Gráficas posición-tiempo, velocidad-tiempo y aceleración-tiempo con un cursor sincronizado y control del instante',
+    'Distingue desplazamiento y distancia recorrida, e indica cuándo y dónde se detiene el móvil si frena y da la vuelta',
     'Descomposición vectorial automática en tiro parabólico (vx, vy, tiempo de vuelo, alcance, altura máxima)',
     'Fórmulas relevantes mostradas junto a los resultados en cada modo',
     'Ejemplos cargables con un clic para ilustrar cada tipo de movimiento',
@@ -95,7 +93,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la diferencia entre MRU y MRUA en física?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El MRU (Movimiento Rectilíneo Uniforme) ocurre cuando un objeto se desplaza en línea recta a velocidad constante, sin aceleración. El MRUA (Movimiento Rectilíneo Uniformemente Acelerado) se da cuando la velocidad cambia de forma constante por la acción de una aceleración uniforme, como ocurre en la caída libre o en un coche que frena. La fórmula del MRU es d = v·t, mientras que en MRUA se usa d = v₀·t + ½·a·t².',
+        text: 'El MRU (Movimiento Rectilíneo Uniforme) ocurre cuando un objeto se desplaza en línea recta a velocidad constante, sin aceleración. El MRUA (Movimiento Rectilíneo Uniformemente Acelerado, llamado MRUV o «uniformemente variado» en buena parte de Latinoamérica) se da cuando la velocidad cambia de forma constante por la acción de una aceleración uniforme, como ocurre en la caída libre o en un coche que frena. La fórmula del MRU es x = v·t, mientras que en MRUA se usa x = v₀·t + ½·a·t². En la gráfica x-t, el MRU es una recta y el MRUA una parábola.',
       },
     },
     {

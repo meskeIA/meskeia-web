@@ -762,3 +762,322 @@
     padding: var(--spacing-md);
   }
 }
+
+/* ─── Simulador (S0179) ─────────────────────────────────────────────────── */
+
+.tipoAlias {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.notaParada {
+  margin: 0 0 var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 4px solid var(--curva-a);
+  background: var(--hover);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.simPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Color de la aceleración: ámbar oscuro en claro (5,0:1 sobre blanco), claro en oscuro */
+.container {
+  --curva-a: #B45309;
+}
+
+[data-theme='dark'] .container {
+  --curva-a: #F0A04B;
+}
+
+.simIntro {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0 0 var(--spacing-md);
+  line-height: 1.5;
+}
+
+.simControles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.simBoton,
+.simBotonSecundario {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.simBoton {
+  background: var(--primary-boton);
+  color: #FFFFFF;
+  border: 2px solid var(--primary-boton);
+}
+
+.simBotonSecundario {
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+}
+
+.simBoton:focus-visible,
+.simBotonSecundario:focus-visible,
+.simDeslizador input:focus-visible,
+.simEnlace a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.simDeslizador {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1 1 220px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.simDeslizador input {
+  flex: 1;
+  accent-color: var(--primary-boton);
+  min-height: 44px;
+}
+
+.simDeslizadorTexto {
+  white-space: nowrap;
+}
+
+.simLectura {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs) var(--spacing-lg);
+  margin: 0 0 var(--spacing-md);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.simAviso {
+  margin: var(--spacing-sm) 0 var(--spacing-md);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.simEnlace {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  margin: 0 0 var(--spacing-xl);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.simEnlace a {
+  color: var(--primary-texto);
+  font-weight: 600;
+}
+
+/* Pista */
+.pista,
+.pistaVertical {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.pista svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pistaVertical svg {
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.pistaLinea {
+  stroke: var(--text-secondary);
+  stroke-width: 2;
+}
+
+.pistaMarca {
+  stroke: var(--text-secondary);
+  stroke-width: 1.5;
+}
+
+.pistaTexto,
+.pistaRotulo,
+.graficaTexto {
+  fill: var(--text-secondary);
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.pistaRotulo {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.pistaOrigen {
+  fill: var(--text-primary);
+}
+
+.pistaParada line {
+  stroke: var(--curva-a);
+  stroke-width: 2;
+}
+
+.pistaMovil {
+  fill: var(--primary-texto);
+}
+
+.pistaRueda {
+  fill: var(--text-primary);
+}
+
+.vectorV line {
+  stroke: var(--secondary-texto);
+}
+
+.vectorV polygon {
+  fill: var(--secondary-texto);
+}
+
+.vectorV .pistaRotulo {
+  fill: var(--secondary-texto);
+}
+
+.vectorA line {
+  stroke: var(--curva-a);
+}
+
+.vectorA polygon {
+  fill: var(--curva-a);
+}
+
+.vectorA .pistaRotulo {
+  fill: var(--curva-a);
+}
+
+/* Gráficas */
+.simGraficas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-md);
+}
+
+.grafica {
+  margin: 0;
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-sm);
+}
+
+.grafica svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.graficaTitulo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.graficaRejilla {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.graficaCero {
+  stroke: var(--text-secondary);
+  stroke-width: 1.5;
+}
+
+.graficaCursor {
+  stroke: var(--text-muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.curvaX {
+  stroke: var(--primary-texto);
+}
+
+.curvaV {
+  stroke: var(--secondary-texto);
+}
+
+.curvaA {
+  stroke: var(--curva-a);
+}
+
+.graficaPunto.curvaX {
+  fill: var(--primary-texto);
+}
+
+.graficaPunto.curvaV {
+  fill: var(--secondary-texto);
+}
+
+.graficaPunto.curvaA {
+  fill: var(--curva-a);
+}
+
+@media (max-width: 900px) {
+  .simGraficas {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .simPanel {
+    padding: var(--spacing-md);
+  }
+
+  .simLectura {
+    gap: var(--spacing-xs) var(--spacing-md);
+    font-size: 0.85rem;
+  }
+}
+
+/* En el móvil la pista horizontal se encoge a la mitad (600 → ~310 px): los rótulos del SVG
+   se agrandan en unidades del viewBox para que sigan leyéndose (~11 px en pantalla). */
+@media (max-width: 600px) {
+  .pista .pistaTexto {
+    font-size: 22px;
+  }
+
+  .pista .pistaRotulo {
+    font-size: 26px;
+  }
+}

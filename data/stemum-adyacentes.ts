@@ -33,7 +33,6 @@ export const STEMUM_ADYACENTES: Record<string, string> = {
   'visualizador-polimeros-materiales': 'quimica',
   'visualizador-hidrogeno': 'quimica',
   // ── Física ──
-  'calculadora-movimiento': 'fisica',
   'calculadora-electricidad': 'fisica',
   'calculadora-resistencias-led': 'fisica',
   'conversor-unidades-rf': 'fisica',
