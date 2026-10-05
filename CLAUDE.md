@@ -718,7 +718,7 @@ ascensos y descensos: ficha `feedback_frontera_decisiones` de la memoria.
 | 1 | `implementacion`: entre equivalentes (tipo de input, override de dependencia, referencia con fuente) | `check:tipos`, `test:calc`, specs |
 | 1 | `valor-medido`: un valor contra su umbral (un token frente al contraste) | specs de contraste, `check:token-oscuro` |
 | 1 | `orden`: orden interno de un encargo (commits, tandas, agentes o secuencial) | Cuadre |
-| 1 | `anotar`: cabos y fechas en Agenda, `SOSPECHAS.md` o memoria | git del Centro de Mando, `check:memoria` |
+| 1 | `anotar`: cabos de trabajo (defectos, fechas ya decididas) en Agenda, `SOSPECHAS.md` o memoria; en una conversación de «solo comentamos», nada | git del Centro de Mando, `check:memoria` |
 | 1 | `alcance`: extender una reparación a la misma clase de defecto en apps hermanas | testigo de familia, `check:familias`, specs |
 | 2 | `candado`: nuevo sobre un defecto ya observado, o de avisar a romper | `*:probar-candado` reinyecta el caso de origen |
 | 2 | `escala`: el mismo patrón en más de 20 apps | «Candado tras cambio a escala» |
