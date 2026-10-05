@@ -378,6 +378,16 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Auditoría de origen (26/09/2026)** — nace de los hallazgos 1996, 1997 y 2054 del Inspector: tres apps daban el MOVES III como vigente nueve meses después de su fin, una de ellas restándolo por defecto (el equilibrio pasaba del año 8 al 4), y ofrecían «7.000 € con achatarramiento», que no corresponde a ninguna ayuda vigente.
 - **Verificado**: 2026-09-26 · vigencia 2026-2030.
 
+#### `premios-loterias.ts` — Gravamen especial sobre premios de loterías y apuestas
+- **Contiene**: exención por décimo, fracción, cupón o apuesta (40.000 €), su reducción proporcional por debajo de 0,50 € jugados, el tipo del gravamen y de su retención (20 %) y la función `gravamenPremio`, que calcula exento, base, retención y neto de UN décimo.
+- **Normativa**: Ley 35/2006, disposición adicional 33.ª (BOE-A-2006-20764), apartado 2 en la redacción del art. 67.1 de la Ley 6/2018; disposición transitoria 35.ª para los juegos de 2018 y 2019.
+- **Vigilar**: la Ley de Presupuestos y las leyes de acompañamiento, que es donde se movió la exención (la escalada 10.000 / 20.000 / 40.000 € de la Ley 6/2018); cualquier cambio del tipo del 20 %.
+- **Cadencia**: baja; sin cambios desde 2020.
+- **Alerta metodológica**: que la exención deje de aplicarse por décimo o apuesta (ap. 1) o deje de prorratearse entre cotitulares (ap. 2 y 3): el reparto de la peña depende de las dos cosas.
+- **Dependencias internas**: `generador-loteria` — el reparto del premio de una peña (`app/generador-loteria/reparto.ts`) y las cifras de su FAQ, que ya no van escritas a mano.
+- **Auditoría de origen (05/10/2026)** — nace de S0180. Hasta entonces la FAQ de `generador-loteria` citaba las cifras como texto (hallazgo 2734) porque nada las calculaba. Cotejado en sesión contra el consolidado del BOE (DA 33.ª y DT 35.ª). La nota de la AEAT del 15/12/2025 sobre premios compartidos (nivel 3) solo se usa para el consejo de acreditar el reparto, no para sellar.
+- **Verificado**: 2026-10-05 · vigencia 2020-2026.
+
 #### `nomada-digital.ts` — Visa nómada digital
 - **Contiene**: mínimos de ingresos (**múltiplos del SMI** — se actualiza en cascada con `smi.ts`), duraciones de visado/autorización/renovación, requisitos.
 - **Normativa**: Ley 28/2022 de Startups + RD 1008/2023.

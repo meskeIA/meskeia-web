@@ -4,8 +4,16 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from './GeneradorLoteria.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatDate } from '@/lib';
+import { formatDate, formatNumber, formatPercentage } from '@/lib';
 import ComprobadorSorteo from './ComprobadorSorteo';
+import RepartoPena from './RepartoPena';
+import DataReference from '@/components/DataReference';
+import {
+  FISCAL_PREMIOS_LOTERIAS_META,
+  EXENCION_PREMIO_LOTERIA,
+  TIPO_GRAVAMEN_PREMIO_LOTERIA,
+  gravamenPremio,
+} from '@/data/fiscal';
 
 type LotteryType = 'primitiva' | 'euromillones' | 'bonoloto' | 'gordo' | 'lototurf';
 
@@ -56,6 +64,17 @@ interface GeneratedResult {
  * desaparecía sin aviso.
  */
 const CLAVE_FAVORITAS = 'meskeia-loteria-favoritas';
+
+/**
+ * Cifras del gravamen especial para el texto de la página. Hasta S0180 iban escritas a mano en
+ * la FAQ (hallazgo 2734) porque nada las calculaba; ahora las calcula el reparto de la peña y
+ * viven en data/fiscal/premios-loterias.ts, de donde las toma también el texto.
+ */
+const EXENCION_TEXTO = `${formatNumber(EXENCION_PREMIO_LOTERIA, 0)}\u00A0€`;
+const TIPO_TEXTO = formatPercentage(TIPO_GRAVAMEN_PREMIO_LOTERIA, 0);
+const EJEMPLO_PREMIO = 1_000_000;
+const EJEMPLO_GRAVAMEN = gravamenPremio(EJEMPLO_PREMIO, 1);
+const euros = (n: number) => `${formatNumber(n, 0)}\u00A0€`;
 
 /**
  * Tope de combinaciones guardadas. Al llegar a él NO se descarta ninguna guardada: la nueva
@@ -640,18 +659,28 @@ export default function GeneradorLoteriaPage() {
             <ComprobadorSorteo guardadas={favorites} modalidades={LOTTERY_CONFIG} onAnunciar={setAnuncio} />
           </div>
         )}
+
+        {/* Reparto del premio de una peña (S0180): componente fiscal, de ahí el aviso crítico */}
+        <RepartoPena />
       </main>
 
       {/* Anuncios para lectores de pantalla: combinaciones generadas, copiadas o no guardadas.
           Fuera de <main> para que su texto no duplique la confirmación visible del botón. */}
       <p className="sr-only" role="status" aria-live="polite">{anuncio}</p>
 
-      {/* Disclaimer - SIEMPRE VISIBLE */}
+      {/* Disclaimer - SIEMPRE VISIBLE. Nivel 1 desde S0180: el reparto de la peña calcula el
+          gravamen especial del IRPF, y cualquier componente fiscal es crítico
+          (_private/DISCLAIMER-POLICY.md). Antes era general/low, colapsable. */}
       <DisclaimerCard
-        variant="general"
-        severity="low"
+        variant="financial"
+        severity="critical"
         context="generador-loteria"
-        collapsible={true}
+      />
+      <DataReference
+        normativa="Gravamen especial sobre premios de loterías (IRPF)"
+        fuente={FISCAL_PREMIOS_LOTERIAS_META.fuente}
+        verificado={FISCAL_PREMIOS_LOTERIAS_META.verificado}
+        urlOficial={FISCAL_PREMIOS_LOTERIAS_META.urlOficial}
       />
 
       
@@ -902,28 +931,28 @@ export default function GeneradorLoteriaPage() {
             <li className={styles.faqItem}>
               <details>
                 <summary>¿Cuánto se lleva Hacienda de un premio de lotería en España?</summary>
-                {/* Hallazgo 2734. Verificado en el texto consolidado de la Ley 35/2006 (BOE-A-2006-20764),
-                    DA 33.ª: exentos hasta 40.000 € por décimo o apuesta (ap. 2, en la redacción del
-                    art. 67.1 de la Ley 6/2018); 20 % sobre el exceso (ap. 3 y 4); retención del 20 %
-                    al pagarlo (ap. 6); sin autoliquidación si se retuvo (ap. 7); fuera de la base del
-                    IRPF (ap. 8). El cálculo no vive en data/fiscal (no hay módulo del gravamen
-                    especial), por eso las cifras van aquí con su cita. */}
+                {/* Hallazgo 2734 y S0180. Cotejado en el texto consolidado de la Ley 35/2006
+                    (BOE-A-2006-20764), DA 33.ª: exención por décimo o apuesta (ap. 2, redacción del
+                    art. 67.1 de la Ley 6/2018); tipo sobre el exceso (ap. 3 y 4); retención al
+                    pagarlo (ap. 6); sin autoliquidación si se retuvo (ap. 7); fuera de la base del
+                    IRPF (ap. 8). Las cifras salen de data/fiscal/premios-loterias.ts. */}
                 <p>
-                  Los premios de las loterías del Estado tienen un gravamen especial del 20 %
-                  sobre lo que pasa de 40.000 €; hasta esa cifra están exentos. Por ejemplo, de un
-                  premio de 1.000.000 € tributan los 960.000 € del exceso: 192.000 € de impuesto. El
-                  tipo es fijo, no progresivo como el IRPF general, y se cuenta por cada décimo o
-                  apuesta premiados (si el premio es compartido, como en una peña, los 40.000 € se
-                  reparten entre los cotitulares según su parte).
+                  Los premios de las loterías del Estado tienen un gravamen especial del {TIPO_TEXTO}{' '}
+                  sobre lo que pasa de {EXENCION_TEXTO}; hasta esa cifra están exentos. Por ejemplo, de un
+                  premio de {euros(EJEMPLO_PREMIO)} tributan los {euros(EJEMPLO_GRAVAMEN.base)} del exceso:{' '}
+                  {euros(EJEMPLO_GRAVAMEN.retencion)} de impuesto. El tipo es fijo, no progresivo como el
+                  IRPF general, y se cuenta por cada décimo o apuesta premiados (si el premio es
+                  compartido, como en una peña, los {EXENCION_TEXTO} se reparten entre los cotitulares
+                  según su parte: el reparto de la peña, más arriba, lo calcula).
                 </p>
                 <p>
-                  Lo descuenta quien paga el premio: se cobra ya con la retención del 20 %, y
+                  Lo descuenta quien paga el premio: se cobra ya con la retención del {TIPO_TEXTO}, y
                   entonces no hay que presentar autoliquidación del gravamen. El premio tampoco se
                   suma a la base del IRPF, así que no cambia el tipo del resto de tus ingresos.
                 </p>
                 <p className={styles.faqTip}>
                   Referencia legal: disposición adicional 33.ª de la Ley 35/2006 del IRPF; el exento
-                  de 40.000 € lo fijó la Ley 6/2018. Incluye también los premios de la ONCE, los
+                  de {EXENCION_TEXTO} lo fijó la Ley 6/2018. Incluye también los premios de la ONCE, los
                   sorteos de Cruz Roja y las loterías de las comunidades autónomas.
                 </p>
               </details>
@@ -1057,8 +1086,9 @@ export default function GeneradorLoteriaPage() {
               </li>
               <li>
                 <strong>Creer que un premio grande se cobra entero.</strong>{' '}
-                Por encima de 40.000 € por décimo o apuesta, el premio llega con la retención
-                del 20 % sobre el exceso ya hecha: de 1.000.000 € se cobran 808.000 €.
+                Por encima de {EXENCION_TEXTO} por décimo o apuesta, el premio llega con la retención
+                del {TIPO_TEXTO} sobre el exceso ya hecha: de {euros(EJEMPLO_PREMIO)} se cobran{' '}
+                {euros(EJEMPLO_GRAVAMEN.neto)}.
                 Con esa retención no hay que presentar autoliquidación del gravamen
                 (disposición adicional 33.ª de la Ley del IRPF).
               </li>

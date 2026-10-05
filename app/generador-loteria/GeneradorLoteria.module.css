@@ -1372,3 +1372,248 @@
     padding: var(--spacing-md);
   }
 }
+
+/* ─── Reparto del premio de una peña (S0180) ─────────────────────────────── */
+
+.penaSection {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.penaSection h2 {
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.penaIntro {
+  margin: 0 0 var(--spacing-md);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.penaGrupo {
+  margin: 0 0 var(--spacing-lg);
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.penaGrupo legend {
+  margin-bottom: var(--spacing-sm);
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.penaLista {
+  list-style: none;
+  margin: 0 0 var(--spacing-sm);
+  padding: 0;
+}
+
+.penaFila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.penaEtiqueta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.penaCampoNombre,
+.penaCampoImporte,
+.penaCampoPremio {
+  height: 2.6rem;
+  padding: 0 var(--spacing-sm);
+  border: 2px solid var(--borde-campo);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.penaCampoNombre {
+  width: 12rem;
+  max-width: 100%;
+}
+
+.penaCampoImporte {
+  width: 7rem;
+  text-align: right;
+}
+
+.penaCampoPremio {
+  width: 11rem;
+  text-align: right;
+}
+
+.penaQuitar {
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.penaQuitar:disabled,
+.penaAnadir:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.penaAnadir {
+  padding: var(--spacing-xs) var(--spacing-md);
+  min-height: 2.6rem;
+  border: 1px dashed var(--borde-campo);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.penaCampoNombre:focus-visible,
+.penaCampoImporte:focus-visible,
+.penaCampoPremio:focus-visible,
+.penaQuitar:focus-visible,
+.penaAnadir:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.penaAyuda {
+  margin: var(--spacing-xs) 0 var(--spacing-sm);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.penaResultado {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border);
+}
+
+.penaTotales {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-sm);
+  margin: 0 0 var(--spacing-md);
+}
+
+.penaTotales div {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  background: var(--hover);
+}
+
+.penaTotales dt {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.penaTotales dd {
+  margin: 2px 0 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.penaTotales .penaTotalDestacado {
+  border: 2px solid var(--primary-boton);
+}
+
+.penaTablaEnvoltorio {
+  overflow-x: auto;
+  margin-bottom: var(--spacing-md);
+}
+
+.penaTabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.penaTablaTitulo {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.penaTabla thead th {
+  background: var(--hover);
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.penaTabla thead th:first-child,
+.penaTabla tbody th {
+  text-align: left;
+}
+
+.penaTabla td,
+.penaTabla tbody th {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.penaTabla td {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.penaTabla tbody th {
+  font-weight: 500;
+}
+
+.penaNotas {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.penaNotas li + li {
+  margin-top: var(--spacing-xs);
+}
+
+@media (max-width: 600px) {
+  .penaSection {
+    padding: var(--spacing-md);
+  }
+
+  .penaCampoNombre {
+    width: 100%;
+  }
+
+  .penaFila .penaEtiqueta:first-child {
+    flex: 1 1 100%;
+  }
+}

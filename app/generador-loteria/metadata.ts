@@ -1,9 +1,16 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { EXENCION_PREMIO_LOTERIA, TIPO_GRAVAMEN_PREMIO_LOTERIA, gravamenPremio } from '@/data/fiscal';
+import { formatNumber, formatPercentage } from '@/lib';
+
+// Ejemplo de la FAQ del reparto de una peña, calculado con el módulo fiscal (S0180):
+// 125.000 € entre tres que ponen 10, 5 y 5 €
+const EJ_PENA = gravamenPremio(125_000, 20);
+const eur = (n: number) => `${formatNumber(n, 0)} €`;
 
 export const metadata: Metadata = {
   title: 'Generador Lotería: Primitiva, Euromillones, Bonoloto | meskeIA',
-  description: 'Genera números aleatorios para Primitiva, Euromillones, Bonoloto, El Gordo de la Primitiva y Lototurf, guárdalos en tu navegador y compruébalos después con el resultado del sorteo: aciertos y categoría. Gratis y sin registro.',
+  description: 'Genera números aleatorios para Primitiva, Euromillones, Bonoloto, El Gordo de la Primitiva y Lototurf, guárdalos en tu navegador y compruébalos después con el resultado del sorteo y reparte el premio de una peña con la retención de Hacienda. Gratis y sin registro.',
   keywords: 'generador loteria, numeros primitiva, euromillones, bonoloto, el gordo, lototurf, numeros aleatorios, combinaciones loteria, numeros suerte, comprobar combinaciones, categorias de premio',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -47,6 +54,7 @@ export const jsonLd = generateWebAppSchema({
     'Combinaciones guardadas en el navegador, sin cuenta ni registro',
     'Copiar cualquier combinación al portapapeles',
     'Comprobar las combinaciones guardadas con el resultado del sorteo: aciertos marcados y categoría de premio',
+    'Reparto del premio de una peña según lo que puso cada persona, con la exención y la retención del gravamen especial por décimo',
   ],
   keywords: ['lotería', 'números aleatorios', 'Primitiva', 'Euromillones', 'Bonoloto'],
 });
@@ -117,6 +125,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Sí. El generador incluye Lototurf, que consiste en 6 números del 1 al 31 más un caballo ganador del 1 al 12. Selecciona esta modalidad en el listado de loterías y genera tantas combinaciones aleatorias como necesites, igual que con el resto de loterías disponibles.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se reparte un premio de lotería entre los de una peña y cuánto se lleva Hacienda?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: `Cada décimo o apuesta premiados tiene ${eur(EXENCION_PREMIO_LOTERIA)} exentos, y del resto se retiene un ${formatPercentage(TIPO_GRAVAMEN_PREMIO_LOTERIA, 0)} al cobrar. En una peña, esa exención y la retención se reparten según lo que puso cada uno. Por ejemplo, un décimo de ${eur(125_000)} jugado entre tres que ponen 10, 5 y 5 € deja ${eur(EJ_PENA.retencion)} de retención y ${eur(EJ_PENA.neto)} netos: ${eur(EJ_PENA.neto / 2)} para quien puso 10 € y ${eur(EJ_PENA.neto / 4)} para cada uno de los otros. La exención se aplica a cada décimo por separado, no una vez al total.`,
       },
     },
   ],

@@ -1362,8 +1362,9 @@ test.describe('03/10 · contenido y accesibilidad', () => {
     expect(texto).toContain('no hay que presentar autoliquidación');
     expect(texto).toContain('tampoco se suma a la base del IRPF');
     // La cuenta del ejemplo: (1.000.000 − 40.000) × 20 % = 192.000; se cobran 808.000
-    expect(texto).toContain('192.000 € de impuesto');
-    expect(texto).toContain('de 1.000.000 € se cobran 808.000 €');
+    // Desde S0180 las cifras salen de data/fiscal/premios-loterias.ts con espacio duro ante el €
+    expect(texto).toMatch(/192\.000[ \u00A0]€ de impuesto/);
+    expect(texto).toMatch(/de 1\.000\.000[ \u00A0]€ se cobran 808\.000[ \u00A0]€/);
   });
 
   test('hallazgo 2735 · Loterías y Apuestas del Estado figura como operador, no como regulador', async ({ page }) => {
@@ -1446,4 +1447,74 @@ test.describe('03/10 · contenido y accesibilidad', () => {
       expect(medida.fuera).toBeGreaterThanOrEqual(3);
     });
   }
+});
+
+/**
+ * S0180 (05/10/2026) · reparto del premio de una peña. Las cuentas están resueltas a mano en
+ * tests/reparto-pena-motor.spec.ts; aquí se comprueba que la pantalla dice lo mismo.
+ * La peña de partida trae tres personas que ponen 10, 5 y 5 € (cuotas 50 / 25 / 25 %).
+ */
+test.describe('S0180 · reparto del premio de una peña', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="pena-titulo"]');
+  const campoPremio = (page: Page, n = 0) => seccion(page).getByLabel(/Premio del décimo o apuesta/).nth(n);
+
+  async function escribir(page: Page, campo: Locator, valor: string) {
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+  }
+
+  test('un décimo de 125.000 € entre 10, 5 y 5 €: 17.000 € de retención, 54.000 / 27.000 / 27.000 € netos', async ({ page }) => {
+    // Exento 40.000 · base 85.000 · retención 17.000 · neto 108.000
+    await escribir(page, campoPremio(page), '125.000');
+    const totales = seccion(page).locator('[class*="penaTotales"]');
+    await expect(totales).toContainText('Retención del 20\u00A0%');
+    await expect(totales).toContainText('17.000,00\u00A0€');
+    await expect(totales).toContainText('108.000,00\u00A0€');
+    const filas = seccion(page).locator('tbody tr');
+    await expect(filas).toHaveCount(3);
+    await expect(filas.nth(0)).toContainText('Persona 1');
+    await expect(filas.nth(0).locator('td').nth(1)).toHaveText('54.000,00\u00A0€');
+    await expect(filas.nth(1).locator('td').nth(1)).toHaveText('27.000,00\u00A0€');
+    await expect(filas.nth(2).locator('td').nth(1)).toHaveText('27.000,00\u00A0€');
+  });
+
+  test('dos décimos premiados: la exención se aplica a cada uno (retención 19.000 €, no 27.000 €)', async ({ page }) => {
+    await escribir(page, campoPremio(page, 0), '125.000');
+    await seccion(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
+    await escribir(page, campoPremio(page, 1), '50.000');
+    const totales = seccion(page).locator('[class*="penaTotales"]');
+    await expect(totales).toContainText('19.000,00\u00A0€');
+    await expect(totales).toContainText('156.000,00\u00A0€');
+  });
+
+  test('el nombre escrito sale en la tabla y quitar a alguien rehace el reparto', async ({ page }) => {
+    await escribir(page, seccion(page).getByLabel('Nombre').first(), 'Ana');
+    await escribir(page, campoPremio(page), '400.000');
+    await expect(seccion(page).locator('tbody tr').first()).toContainText('Ana');
+    await seccion(page).getByRole('button', { name: 'Quitar a Persona 3 de la peña' }).click();
+    // Ahora 10 y 5 €: neto 328.000 → 218.666,67 + 109.333,33
+    const filas = seccion(page).locator('tbody tr');
+    await expect(filas).toHaveCount(2);
+    await expect(filas.nth(0).locator('td').nth(1)).toHaveText('218.666,67\u00A0€');
+    await expect(filas.nth(1).locator('td').nth(1)).toHaveText('109.333,33\u00A0€');
+  });
+
+  test('una persona sin aportación avisa en vez de repartir', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /Añadir persona/ }).click();
+    await escribir(page, campoPremio(page), '125.000');
+    await expect(seccion(page).locator('[class*="comprobadorError"]')).toContainText('Revisa las aportaciones');
+    await expect(seccion(page).locator('tbody tr')).toHaveCount(0);
+  });
+
+  test('sin premio escrito no hay reparto ni error', async ({ page }) => {
+    await expect(seccion(page).locator('[class*="comprobadorError"]')).toHaveCount(0);
+    await expect(seccion(page).locator('[class*="penaTotales"]')).toHaveCount(0);
+  });
+
+  test('aviso crítico no plegable y referencia a la DA 33.ª', async ({ page }) => {
+    await expect(page.getByRole('alert').filter({ hasText: 'carácter exclusivamente orientativo' })).toBeVisible();
+    const ref = page.getByRole('note', { name: 'Datos de referencia normativos' });
+    await expect(ref).toContainText('disposición adicional 33.ª');
+    await expect(ref).toContainText('05/10/2026');
+  });
 });

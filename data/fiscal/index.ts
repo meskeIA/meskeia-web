@@ -42,3 +42,4 @@ export * from './vivienda-joven';
 export * from './costas-judiciales';
 export * from './modulos-irpf';
 export * from './ayudas-vehiculo';
+export * from './premios-loterias';
