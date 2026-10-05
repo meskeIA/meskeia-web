@@ -128,7 +128,7 @@ export default function EnchufesPais() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🔌 Enchufes por País</h1>
+        <h1><span aria-hidden="true">🔌</span> Enchufes por País</h1>
         <p>¿Qué adaptador necesitas? Voltaje y tipos de enchufe en todo el mundo</p>
       </header>
 
@@ -372,7 +372,7 @@ export default function EnchufesPais() {
                 Tailandia, Vietnam, Indonesia, Singapur y Malasia usan hasta 4 tipos de enchufe distintos en la misma región.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Un adaptador universal es imprescindible. Evita comprar uno por país.
+                <span aria-hidden="true">💡</span> Un adaptador universal es imprescindible. Evita comprar uno por país.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -384,7 +384,7 @@ export default function EnchufesPais() {
                 El enchufe europeo Tipo C no encaja en las tomas americanas Tipo A/B. Además, el voltaje baja de 230V a 120V.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Comprueba que tu portátil y cargadores son 100-240V. Si es así, solo necesitas adaptador de forma.
+                <span aria-hidden="true">💡</span> Comprueba que tu portátil y cargadores son 100-240V. Si es así, solo necesitas adaptador de forma.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -396,7 +396,7 @@ export default function EnchufesPais() {
                 Móviles, tablets, cámaras, portátiles... cargar todo simultáneamente requiere varias tomas o regletas.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Lleva una regleta española + un solo adaptador al destino. Más económico y práctico que varios adaptadores.
+                <span aria-hidden="true">💡</span> Lleva una regleta española + un solo adaptador al destino. Más económico y práctico que varios adaptadores.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -408,7 +408,7 @@ export default function EnchufesPais() {
                 Portátil, monitor portátil, hub USB-C, micrófono... el nómada digital necesita múltiples tomas en cualquier país.
               </p>
               <p className={styles.escenarioTip}>
-                💡 Adaptador universal con puertos USB-C integrados + regleta pequeña. Ideal para cualquier destino de trabajo.
+                <span aria-hidden="true">💡</span> Adaptador universal con puertos USB-C integrados + regleta pequeña. Ideal para cualquier destino de trabajo.
               </p>
             </div>
           </div>

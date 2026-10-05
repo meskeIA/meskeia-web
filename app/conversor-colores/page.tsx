@@ -907,7 +907,7 @@ export default function ConvertidorColoresPage() {
       >
         <section className={styles.guideSection}>
           {/* Tabla comparativa */}
-          <h2>⚖️ Comparativa de formatos: HEX vs RGB vs HSL vs CMYK</h2>
+          <h2><span aria-hidden="true">⚖️</span> Comparativa de formatos: HEX vs RGB vs HSL vs CMYK</h2>
           <p className={styles.introParagraph}>
             Cada formato de color tiene sus ventajas y contextos ideales de uso.
             Entender sus diferencias te ayudará a elegir el más apropiado para tu proyecto.
@@ -916,10 +916,10 @@ export default function ConvertidorColoresPage() {
           <div className={styles.comparativaTable}>
             <div className={styles.comparativaRow}>
               <div className={styles.comparativaAspecto}><strong>Aspecto</strong></div>
-              <div className={styles.comparativaFormato}><strong>🌐 HEX</strong></div>
-              <div className={styles.comparativaFormato}><strong>🖥️ RGB</strong></div>
-              <div className={styles.comparativaFormato}><strong>🎨 HSL</strong></div>
-              <div className={styles.comparativaFormato}><strong>🖨️ CMYK</strong></div>
+              <div className={styles.comparativaFormato}><strong><span aria-hidden="true">🌐</span> HEX</strong></div>
+              <div className={styles.comparativaFormato}><strong><span aria-hidden="true">🖥️</span> RGB</strong></div>
+              <div className={styles.comparativaFormato}><strong><span aria-hidden="true">🎨</span> HSL</strong></div>
+              <div className={styles.comparativaFormato}><strong><span aria-hidden="true">🖨️</span> CMYK</strong></div>
             </div>
 
             <div className={styles.comparativaRow}>
@@ -932,10 +932,10 @@ export default function ConvertidorColoresPage() {
 
             <div className={styles.comparativaRow}>
               <div className={styles.comparativaAspecto}>Facilidad de lectura</div>
-              <div className={styles.comparativaFormato}>⭐⭐ Media</div>
-              <div className={styles.comparativaFormato}>⭐⭐⭐ Alta</div>
-              <div className={styles.comparativaFormato}>⭐⭐⭐⭐ Muy alta</div>
-              <div className={styles.comparativaFormato}>⭐⭐ Media</div>
+              <div className={styles.comparativaFormato}><span aria-hidden="true">⭐⭐</span> Media</div>
+              <div className={styles.comparativaFormato}><span aria-hidden="true">⭐⭐⭐</span> Alta</div>
+              <div className={styles.comparativaFormato}><span aria-hidden="true">⭐⭐⭐⭐</span> Muy alta</div>
+              <div className={styles.comparativaFormato}><span aria-hidden="true">⭐⭐</span> Media</div>
             </div>
 
             <div className={styles.comparativaRow}>
@@ -956,28 +956,28 @@ export default function ConvertidorColoresPage() {
 
             <div className={styles.comparativaRow}>
               <div className={styles.comparativaAspecto}>Soporte navegadores</div>
-              <div className={styles.comparativaFormato}>✅ Universal</div>
-              <div className={styles.comparativaFormato}>✅ Universal</div>
-              <div className={styles.comparativaFormato}>✅ Universal (CSS3)</div>
-              <div className={styles.comparativaFormato}>❌ No nativo</div>
+              <div className={styles.comparativaFormato}><span aria-hidden="true">✅</span> Universal</div>
+              <div className={styles.comparativaFormato}><span aria-hidden="true">✅</span> Universal</div>
+              <div className={styles.comparativaFormato}><span aria-hidden="true">✅</span> Universal (CSS3)</div>
+              <div className={styles.comparativaFormato}><span aria-hidden="true">❌</span> No nativo</div>
             </div>
 
             <div className={styles.comparativaRow}>
               <div className={styles.comparativaAspecto}>Compatibilidad impresión</div>
-              <div className={styles.comparativaFormato}>⚠️ Conversión necesaria</div>
-              <div className={styles.comparativaFormato}>⚠️ Conversión necesaria</div>
-              <div className={styles.comparativaFormato}>⚠️ Conversión necesaria</div>
-              <div className={styles.comparativaFormato}>✅ Nativo</div>
+              <div className={styles.comparativaFormato}><span aria-hidden="true">⚠️</span> Conversión necesaria</div>
+              <div className={styles.comparativaFormato}><span aria-hidden="true">⚠️</span> Conversión necesaria</div>
+              <div className={styles.comparativaFormato}><span aria-hidden="true">⚠️</span> Conversión necesaria</div>
+              <div className={styles.comparativaFormato}><span aria-hidden="true">✅</span> Nativo</div>
             </div>
           </div>
 
           <div className={styles.comparativaConsejo}>
-            <strong>💡 Recomendación meskeIA:</strong> Usa HEX o RGB para web, HSL para ajustes de diseño,
+            <strong><span aria-hidden="true">💡</span> Recomendación meskeIA:</strong> Usa HEX o RGB para web, HSL para ajustes de diseño,
             y CMYK solo si entregas archivos a imprenta profesional.
           </div>
 
           {/* Casos de uso prácticos */}
-          <h2>🎯 Casos de uso reales</h2>
+          <h2><span aria-hidden="true">🎯</span> Casos de uso reales</h2>
           <p className={styles.introParagraph}>
             Ejemplos concretos de cuándo elegir cada formato según tu proyecto
           </p>
@@ -1109,7 +1109,7 @@ export default function ConvertidorColoresPage() {
           <h2>Preguntas frecuentes</h2>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Por qué mis colores se ven diferentes en pantalla y al imprimir?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Por qué mis colores se ven diferentes en pantalla y al imprimir?</h3>
             <p>
               Las pantallas usan <strong>RGB (luz)</strong>, mientras que las impresoras usan
               <strong>CMYK (tinta)</strong>. Son modelos de color diferentes y no pueden reproducir
@@ -1128,7 +1128,7 @@ export default function ConvertidorColoresPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Cuál es la diferencia práctica entre HEX y RGB?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Cuál es la diferencia práctica entre HEX y RGB?</h3>
             <p>
               Son el mismo modelo de color, solo varía la <strong>notación</strong>:
             </p>
@@ -1145,7 +1145,7 @@ export default function ConvertidorColoresPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Por qué HSL es mejor para diseñadores?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Por qué HSL es mejor para diseñadores?</h3>
             <p>
               HSL representa el color de forma <strong>más intuitiva para humanos</strong>:
             </p>
@@ -1162,7 +1162,7 @@ export default function ConvertidorColoresPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Puedo usar CMYK en CSS/HTML?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Puedo usar CMYK en CSS/HTML?</h3>
             <p>
               <strong>No directamente</strong>. Los navegadores solo entienden RGB, HEX y HSL nativamente.
               CMYK requiere conversión.
@@ -1176,7 +1176,7 @@ export default function ConvertidorColoresPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Qué es el "espacio de color" y por qué importa?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Qué es el "espacio de color" y por qué importa?</h3>
             <p>
               Un espacio de color define el <strong>rango de colores posibles</strong>.
               Los más comunes son:
@@ -1193,7 +1193,7 @@ export default function ConvertidorColoresPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Cómo garantizo accesibilidad en colores?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Cómo garantizo accesibilidad en colores?</h3>
             <p>
               Verifica el <strong>contraste</strong> entre texto y fondo según WCAG:
             </p>
@@ -1246,7 +1246,7 @@ export default function ConvertidorColoresPage() {
 
           {/* Warning box */}
           <div className={styles.warningBox}>
-            <h3>⚠️ Errores comunes que debes evitar</h3>
+            <h3><span aria-hidden="true">⚠️</span> Errores comunes que debes evitar</h3>
             <ul>
               <li><strong>Usar colores RGB para impresión sin conversión:</strong> Se verán diferentes en papel.</li>
               <li><strong>No verificar contraste de accesibilidad:</strong> Tu sitio será ilegible para algunos usuarios.</li>

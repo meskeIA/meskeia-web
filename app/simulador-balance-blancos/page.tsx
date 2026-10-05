@@ -122,7 +122,7 @@ export default function SimuladorBalanceBlancosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🌡️ Simulador de Balance de Blancos</h1>
+        <h1><span aria-hidden="true">🌡️</span> Simulador de Balance de Blancos</h1>
         <p>
           Mueve la temperatura Kelvin sobre 3 escenas con luz distinta. Aprende cuándo aciertas el
           balance y cuándo la foto se va a naranja o azul.
@@ -135,6 +135,7 @@ export default function SimuladorBalanceBlancosPage() {
         <div className={styles.tabBar} role="tablist" aria-label="Selección de escena">
           {ESCENAS.map((esc) => (
             <button
+              type="button"
               key={esc.id}
               role="tab"
               aria-selected={escenaId === esc.id}
@@ -206,6 +207,7 @@ export default function SimuladorBalanceBlancosPage() {
               <div className={styles.presetsGrid}>
                 {PRESETS_CAMARA.map((p) => (
                   <button
+                    type="button"
                     key={p.nombre}
                     className={`${styles.presetBtn} ${tempWB === p.kelvin ? styles.presetActive : ''}`}
                     onClick={() => setTempWBRaw(p.kelvin)}
@@ -220,7 +222,7 @@ export default function SimuladorBalanceBlancosPage() {
               </div>
             </div>
 
-            <button className={styles.calcBtnGhost} onClick={() => setTempWBRaw(escena.wbCorrectoK)}>
+            <button type="button" className={styles.calcBtnGhost} onClick={() => setTempWBRaw(escena.wbCorrectoK)}>
               ↺ Volver al WB correcto ({formatNumber(escena.wbCorrectoK, 0)} K)
             </button>
           </div>
@@ -444,7 +446,7 @@ export default function SimuladorBalanceBlancosPage() {
                 Pasa el WB a 3200K (preset tungsteno) y la foto recupera color natural.
               </p>
               <p className={styles.faqTip}>
-                💡 O dispara en RAW y arréglalo después con un solo deslizador en Lightroom.
+                <span aria-hidden="true">💡</span> O dispara en RAW y arréglalo después con un solo deslizador en Lightroom.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -480,7 +482,7 @@ export default function SimuladorBalanceBlancosPage() {
                 Mejor 4500-5500K para mantener el cálido suavizándolo un poco.
               </p>
               <p className={styles.faqTip}>
-                💡 Combina con el <a href="/golden-hour/">calculador de hora dorada</a> para saber
+                <span aria-hidden="true">💡</span> Combina con el <a href="/golden-hour/">calculador de hora dorada</a> para saber
                 cuándo dispararla.
               </p>
             </div>

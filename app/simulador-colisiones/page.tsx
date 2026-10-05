@@ -217,7 +217,7 @@ export default function SimuladorColisionesPage() {
         {/* ── Advertencia si no habrá colisión ── */}
         {v1 <= v2 && (
           <div className={styles.noColision} role="alert">
-            ⚠️ Con estas velocidades los objetos no colisionarán (A no alcanza a B). Aumenta v<sub>A</sub> o reduce v<sub>B</sub>.
+            <span aria-hidden="true">⚠️</span> Con estas velocidades los objetos no colisionarán (A no alcanza a B). Aumenta v<sub>A</sub> o reduce v<sub>B</sub>.
           </div>
         )}
 
@@ -450,29 +450,29 @@ export default function SimuladorColisionesPage() {
                   <tr>
                     <td><strong>Elástica perfecta</strong></td>
                     <td>e = 1</td>
-                    <td>✅ Conservado</td>
-                    <td>✅ Conservada</td>
+                    <td><span aria-hidden="true">✅</span> Conservado</td>
+                    <td><span aria-hidden="true">✅</span> Conservada</td>
                     <td>Bolas de billar, colisiones atómicas</td>
                   </tr>
                   <tr>
                     <td><strong>Inelástica parcial</strong></td>
                     <td>0 &lt; e &lt; 1</td>
-                    <td>✅ Conservado</td>
-                    <td>⚠️ Parte se disipa (calor, deformación)</td>
+                    <td><span aria-hidden="true">✅</span> Conservado</td>
+                    <td><span aria-hidden="true">⚠️</span> Parte se disipa (calor, deformación)</td>
                     <td>Coche chocando, pelota contra suelo</td>
                   </tr>
                   <tr>
                     <td><strong>Inelástica perfecta</strong></td>
                     <td>e = 0</td>
-                    <td>✅ Conservado</td>
-                    <td>❌ Máxima pérdida compatible con la ley</td>
+                    <td><span aria-hidden="true">✅</span> Conservado</td>
+                    <td><span aria-hidden="true">❌</span> Máxima pérdida compatible con la ley</td>
                     <td>Arcilla contra pared, vagones que se enganchan</td>
                   </tr>
                   <tr>
                     <td><strong>Superelástica</strong></td>
                     <td>e &gt; 1</td>
-                    <td>✅ Conservado</td>
-                    <td>✅ Aumenta (energía interna liberada)</td>
+                    <td><span aria-hidden="true">✅</span> Conservado</td>
+                    <td><span aria-hidden="true">✅</span> Aumenta (energía interna liberada)</td>
                     <td>Explosión, muelle comprimido entre dos objetos</td>
                   </tr>
                 </tbody>
@@ -528,33 +528,33 @@ export default function SimuladorColisionesPage() {
             <h2>Preguntas Frecuentes</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Por qué el momento lineal siempre se conserva pero la energía cinética no?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Por qué el momento lineal siempre se conserva pero la energía cinética no?</h4>
                 <p>
                   El momento lineal se conserva en sistemas aislados como consecuencia directa de la tercera ley de Newton: la fuerza que A ejerce sobre B es igual y opuesta a la que B ejerce sobre A. Al integrar en el tiempo, los impulsos se cancelan → el momento total no cambia. La energía cinética, en cambio, puede transformarse en calor, sonido o deformación durante el impacto (siempre se pierde o mantiene, nunca se gana en colisiones ordinarias).
                 </p>
-                <p className={styles.faqTip}>💡 En selectividad o examen de admisión universitaria (preparatoria, secundaria): "conservación del momento lineal" = siempre. "conservación de energía cinética" = solo en colisiones elásticas.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> En selectividad o examen de admisión universitaria (preparatoria, secundaria): "conservación del momento lineal" = siempre. "conservación de energía cinética" = solo en colisiones elásticas.</p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Puede la energía cinética total aumentar en una colisión?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Puede la energía cinética total aumentar en una colisión?</h4>
                 <p>
                   Sí, en las llamadas colisiones superelásticas (e &gt; 1), donde hay una fuente de energía interna: una mola comprimida entre los objetos, una explosión, o una reacción química. En estas colisiones, la energía química/elástica almacenada se convierte en energía cinética adicional. El momento sigue conservándose.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ Si m₁ = m₂ y la colisión es elástica, ¿qué ocurre exactamente?</h4>
+                <h4><span aria-hidden="true">❓</span> Si m₁ = m₂ y la colisión es elástica, ¿qué ocurre exactamente?</h4>
                 <p>
                   Los dos objetos intercambian velocidades. Si A va a +5 m/s y B está en reposo, tras la colisión A queda en reposo y B sale a +5 m/s. Este caso especial —que puede demostrarse con las fórmulas generales poniendo m₁=m₂ y v₂=0— es muy frecuente en problemas de examen y se observa fácilmente con bolas de billar o en el péndulo de Newton.
                 </p>
-                <p className={styles.faqTip}>💡 El "péndulo de Newton" (las bolas metálicas colgantes) demuestra exactamente este principio: cuando cae 1 bola, sale 1 bola; cuando caen 2, salen 2.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> El "péndulo de Newton" (las bolas metálicas colgantes) demuestra exactamente este principio: cuando cae 1 bola, sale 1 bola; cuando caen 2, salen 2.</p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cómo se mide el coeficiente de restitución experimentalmente?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cómo se mide el coeficiente de restitución experimentalmente?</h4>
                 <p>
                   La forma más sencilla: dejar caer una pelota desde altura h₀ y medir la altura de rebote h₁. El coeficiente de restitución es e = √(h₁/h₀). Ejemplo: si una pelota de tenis cae desde 1 m y rebota hasta 0,64 m, e = √0,64 = 0,8. Los materiales duros (acero, vidrio) tienen e próximo a 1; los blandos (arcilla, esponja) tienen e cercano a 0.
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Qué pasa si los objetos se mueven en la misma dirección y el de atrás es más lento?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué pasa si los objetos se mueven en la misma dirección y el de atrás es más lento?</h4>
                 <p>
                   No habrá colisión: el objeto trasero no alcanza al delantero. Para que haya colisión en 1D con movimiento en el mismo sentido, la velocidad del objeto trasero debe ser mayor que la del delantero (v₁ &gt; v₂ si A está detrás de B). El simulador muestra un aviso cuando esta condición no se cumple.
                 </p>
@@ -638,10 +638,10 @@ export default function SimuladorColisionesPage() {
               <h3>Errores Frecuentes en Problemas de Colisiones</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>❌ Aplicar conservación de energía cinética en colisiones inelásticas:</strong> Solo se conserva en colisiones elásticas (e=1). En las demás, parte de la Ek se convierte en calor, sonido o deformación.</li>
-              <li><strong>❌ Olvidar el signo de las velocidades:</strong> Si un objeto se mueve hacia la izquierda, su velocidad es negativa. Ignorar los signos produce resultados físicamente imposibles.</li>
-              <li><strong>❌ Confundir "perfectamente inelástica" con "todo el momento se pierde":</strong> En una colisión perfectamente inelástica los objetos se pegan, pero el momento total sigue siendo el mismo. Lo que se maximiza es la pérdida de Ek, no de momento.</li>
-              <li><strong>❌ Asumir que el objeto más pesado siempre "gana":</strong> Depende de las velocidades iniciales. Un objeto ligero y rápido puede transferir más momento que uno pesado y lento.</li>
+              <li><strong><span aria-hidden="true">❌</span> Aplicar conservación de energía cinética en colisiones inelásticas:</strong> Solo se conserva en colisiones elásticas (e=1). En las demás, parte de la Ek se convierte en calor, sonido o deformación.</li>
+              <li><strong><span aria-hidden="true">❌</span> Olvidar el signo de las velocidades:</strong> Si un objeto se mueve hacia la izquierda, su velocidad es negativa. Ignorar los signos produce resultados físicamente imposibles.</li>
+              <li><strong><span aria-hidden="true">❌</span> Confundir "perfectamente inelástica" con "todo el momento se pierde":</strong> En una colisión perfectamente inelástica los objetos se pegan, pero el momento total sigue siendo el mismo. Lo que se maximiza es la pérdida de Ek, no de momento.</li>
+              <li><strong><span aria-hidden="true">❌</span> Asumir que el objeto más pesado siempre "gana":</strong> Depende de las velocidades iniciales. Un objeto ligero y rápido puede transferir más momento que uno pesado y lento.</li>
             </ul>
           </div>
         </EducationalSection>

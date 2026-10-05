@@ -252,7 +252,7 @@ export default function MetabolismoAlcoholPage() {
                   <div className={styles.pasoContent}>
                     <div className={styles.pasoReaccion}>
                       <span className={styles.pasoReactivo}>{paso.reactivo}</span>
-                      <span className={styles.pasoEnzima}>─ {paso.enzima} ─▶</span>
+                      <span className={styles.pasoEnzima}>─ {paso.enzima} ─<span aria-hidden="true">▶</span></span>
                       <span className={styles.pasoProducto}>{paso.producto}</span>
                     </div>
                     <div className={styles.pasoIcono} aria-hidden="true">{paso.icono}</div>

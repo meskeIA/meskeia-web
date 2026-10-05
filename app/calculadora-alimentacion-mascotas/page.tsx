@@ -643,35 +643,35 @@ export default function CalculadoraAlimentacionMascotasPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🥣 Pienso seco (croquetas)</td>
+                  <td><span aria-hidden="true">🥣</span> Pienso seco (croquetas)</td>
                   <td>Práctico, buena conservación, higiene dental</td>
                   <td>Poca humedad, calidad variable</td>
                   <td>Bajo-medio</td>
                   <td>Mayoría de mascotas sanas</td>
                 </tr>
                 <tr>
-                  <td>🥫 Comida húmeda (lata/sobre)</td>
+                  <td><span aria-hidden="true">🥫</span> Comida húmeda (lata/sobre)</td>
                   <td>Alta palatabilidad, mayor hidratación</td>
                   <td>Se estropea rápido, más caro, sarro dental</td>
                   <td>Medio-alto</td>
                   <td>Seniors, enfermos renales, quisquillosos</td>
                 </tr>
                 <tr>
-                  <td>🥩 BARF (cruda)</td>
+                  <td><span aria-hidden="true">🥩</span> BARF (cruda)</td>
                   <td>Natural, alta digestibilidad si está bien formulada</td>
                   <td>Riesgo bacteriano, difícil equilibrar, coste alto</td>
                   <td>Alto</td>
                   <td>Propietarios comprometidos con supervisión veterinaria</td>
                 </tr>
                 <tr>
-                  <td>🍳 Cocinada casera</td>
+                  <td><span aria-hidden="true">🍳</span> Cocinada casera</td>
                   <td>Control total de ingredientes</td>
                   <td>Muy difícil equilibrar nutrientes sin experto</td>
                   <td>Alto (tiempo + ingredientes)</td>
                   <td>Alergias específicas con formulación veterinaria</td>
                 </tr>
                 <tr>
-                  <td>🔀 Mixta (pienso + húmedo)</td>
+                  <td><span aria-hidden="true">🔀</span> Mixta (pienso + húmedo)</td>
                   <td>Variedad, mayor hidratación que solo pienso</td>
                   <td>Calcular calorías combinadas con cuidado</td>
                   <td>Medio</td>

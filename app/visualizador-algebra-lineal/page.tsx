@@ -506,7 +506,7 @@ function TabDeterminante() {
 
           {det === 0 && (
             <div className={styles.detMensaje}>
-              ⚠️ Los vectores son colineales: el paralelogramo tiene área cero. La matriz no es invertible.
+              <span aria-hidden="true">⚠️</span> Los vectores son colineales: el paralelogramo tiene área cero. La matriz no es invertible.
             </div>
           )}
         </div>
@@ -1005,11 +1005,11 @@ export default function VisualizadorAlgebraLineal() {
             <h3>Errores Comunes en Álgebra Lineal</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ Pensar que AB = BA:</strong> La multiplicación matricial NO es conmutativa en general. Rotar 90° y luego escalar ≠ escalar y luego rotar.</li>
-            <li><strong>❌ Confundir matriz inversa con transpuesta:</strong> A⁻¹ existe solo si det(A) ≠ 0. La transpuesta Aᵀ siempre existe y tiene filas y columnas intercambiadas.</li>
-            <li><strong>❌ Buscar eigenvalores de matrices no cuadradas:</strong> Los eigenvalores solo se definen para matrices cuadradas n×n.</li>
-            <li><strong>❌ Olvidar que det(AB) = det(A)·det(B):</strong> El determinante de un producto es el producto de los determinantes.</li>
-            <li><strong>❌ Interpretar det = 0 como «error»:</strong> Det = 0 significa que la transformación colapsa el espacio (proyecta a menor dimensión). Es perfectamente válido matemáticamente.</li>
+            <li><strong><span aria-hidden="true">❌</span> Pensar que AB = BA:</strong> La multiplicación matricial NO es conmutativa en general. Rotar 90° y luego escalar ≠ escalar y luego rotar.</li>
+            <li><strong><span aria-hidden="true">❌</span> Confundir matriz inversa con transpuesta:</strong> A⁻¹ existe solo si det(A) ≠ 0. La transpuesta Aᵀ siempre existe y tiene filas y columnas intercambiadas.</li>
+            <li><strong><span aria-hidden="true">❌</span> Buscar eigenvalores de matrices no cuadradas:</strong> Los eigenvalores solo se definen para matrices cuadradas n×n.</li>
+            <li><strong><span aria-hidden="true">❌</span> Olvidar que det(AB) = det(A)·det(B):</strong> El determinante de un producto es el producto de los determinantes.</li>
+            <li><strong><span aria-hidden="true">❌</span> Interpretar det = 0 como «error»:</strong> Det = 0 significa que la transformación colapsa el espacio (proyecta a menor dimensión). Es perfectamente válido matemáticamente.</li>
           </ul>
         </div>
       </EducationalSection>

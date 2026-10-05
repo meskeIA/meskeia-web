@@ -139,6 +139,7 @@ export default function CalculadoraGanachePage() {
           <div className={styles.chocolateGrid}>
             {TIPOS_CHOCOLATE.map((tipo) => (
               <button
+                type="button"
                 key={tipo.id}
                 className={`${styles.chocolateCard} ${tipoChocolate === tipo.id ? styles.chocolateCardActiva : ''}`}
                 onClick={() => { setTipoChocolate(tipo.id); setCalculado(false); }}
@@ -162,6 +163,7 @@ export default function CalculadoraGanachePage() {
           <div className={styles.texturaGrid}>
             {TEXTURAS.map((tex) => (
               <button
+                type="button"
                 key={tex.id}
                 className={`${styles.texturaCard} ${textura === tex.id ? styles.texturaCardActiva : ''}`}
                 onClick={() => { setTextura(tex.id); setCalculado(false); }}
@@ -203,7 +205,7 @@ export default function CalculadoraGanachePage() {
         </section>
 
         {/* Botón calcular */}
-        <button className={styles.btnCalcular} onClick={handleCalcular}>
+        <button type="button" className={styles.btnCalcular} onClick={handleCalcular}>
           Calcular proporciones
         </button>
 

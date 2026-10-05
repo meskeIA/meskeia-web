@@ -602,6 +602,7 @@ export default function CalendarioFiscalPage() {
       {/* Selector de tipo */}
       <div className={styles.selectorTipo}>
         <button
+          type="button"
           className={`${styles.btnTipo} ${tipoContribuyente === 'autonomo' ? styles.activo : ''}`}
           onClick={() => setTipoContribuyente('autonomo')}
         >
@@ -609,6 +610,7 @@ export default function CalendarioFiscalPage() {
           Autónomo
         </button>
         <button
+          type="button"
           className={`${styles.btnTipo} ${tipoContribuyente === 'sociedad' ? styles.activo : ''}`}
           onClick={() => setTipoContribuyente('sociedad')}
         >
@@ -616,6 +618,7 @@ export default function CalendarioFiscalPage() {
           Sociedad
         </button>
         <button
+          type="button"
           className={`${styles.btnTipo} ${tipoContribuyente === 'ambos' ? styles.activo : ''}`}
           onClick={() => setTipoContribuyente('ambos')}
         >
@@ -627,22 +630,25 @@ export default function CalendarioFiscalPage() {
       {/* Pestañas */}
       <div className={styles.pestanas}>
         <button
+          type="button"
           className={`${styles.pestana} ${pestanaActiva === 'calendario' ? styles.pestanaActiva : ''}`}
           onClick={() => setPestanaActiva('calendario')}
         >
-          📅 Calendario
+          <span aria-hidden="true">📅</span> Calendario
         </button>
         <button
+          type="button"
           className={`${styles.pestana} ${pestanaActiva === 'modelos' ? styles.pestanaActiva : ''}`}
           onClick={() => setPestanaActiva('modelos')}
         >
-          📋 Modelos
+          <span aria-hidden="true">📋</span> Modelos
         </button>
         <button
+          type="button"
           className={`${styles.pestana} ${pestanaActiva === 'estimador' ? styles.pestanaActiva : ''}`}
           onClick={() => setPestanaActiva('estimador')}
         >
-          🧮 Estimador
+          <span aria-hidden="true">🧮</span> Estimador
         </button>
       </div>
 
@@ -660,7 +666,7 @@ export default function CalendarioFiscalPage() {
                 lista espera a montar. Lo que Google indexa de esta app es la sección educativa,
                 que no toca el reloj. */}
             <div className={styles.proximasFechas}>
-              <h2 className={styles.seccionTitulo}>⏰ Próximos vencimientos</h2>
+              <h2 className={styles.seccionTitulo}><span aria-hidden="true">⏰</span> Próximos vencimientos</h2>
               {!montado ? (
                 <p className={styles.cargandoVencimientos}>Calculando los vencimientos pendientes…</p>
               ) : proximasFechas.length === 0 ? (
@@ -697,9 +703,9 @@ export default function CalendarioFiscalPage() {
             {montado && (
             <div className={styles.calendarioMes}>
               <div className={styles.navegacionMes}>
-                <button onClick={mesAnterior} className={styles.btnNav}>◀</button>
+                <button type="button" onClick={mesAnterior} className={styles.btnNav}>◀</button>
                 <h3 className={styles.tituloMes}>{MESES[mesActual]} {anioActual}</h3>
-                <button onClick={mesSiguiente} className={styles.btnNav}>▶</button>
+                <button type="button" onClick={mesSiguiente} className={styles.btnNav}>▶</button>
               </div>
 
               <div className={styles.calendarioGrid}>
@@ -765,7 +771,7 @@ export default function CalendarioFiscalPage() {
             {montado && fechasDelMes.length > 0 && (
               <div className={styles.detalleMes}>
                 <h3 className={styles.seccionTitulo}>
-                  📋 Obligaciones de {MESES[mesActual]}
+                  <span aria-hidden="true">📋</span> Obligaciones de {MESES[mesActual]}
                 </h3>
                 <div className={styles.listaDetalle}>
                   {fechasDelMes.map((f, idx) => (
@@ -796,7 +802,7 @@ export default function CalendarioFiscalPage() {
         {/* MODELOS */}
         {pestanaActiva === 'modelos' && (
           <div className={styles.modelosContainer}>
-            <h2 className={styles.seccionTitulo}>📋 Modelos Tributarios</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">📋</span> Modelos Tributarios</h2>
             <p className={styles.modelosIntro}>
               Resumen de los principales modelos fiscales para {
                 tipoContribuyente === 'autonomo' ? 'autónomos' :
@@ -806,7 +812,7 @@ export default function CalendarioFiscalPage() {
 
             {/* Trimestrales */}
             <div className={styles.grupoModelos}>
-              <h3 className={styles.grupoTitulo}>📆 Trimestrales</h3>
+              <h3 className={styles.grupoTitulo}><span aria-hidden="true">📆</span> Trimestrales</h3>
               <div className={styles.listaModelos}>
                 {modelosFiltrados
                   .filter(m => m.periodicidad === 'trimestral')
@@ -858,7 +864,7 @@ export default function CalendarioFiscalPage() {
 
             {/* Anuales */}
             <div className={styles.grupoModelos}>
-              <h3 className={styles.grupoTitulo}>📅 Anuales</h3>
+              <h3 className={styles.grupoTitulo}><span aria-hidden="true">📅</span> Anuales</h3>
               <div className={styles.listaModelos}>
                 {modelosFiltrados
                   .filter(m => m.periodicidad === 'anual')
@@ -907,7 +913,7 @@ export default function CalendarioFiscalPage() {
         {/* ESTIMADOR */}
         {pestanaActiva === 'estimador' && (
           <div className={styles.estimadorContainer}>
-            <h2 className={styles.seccionTitulo}>🧮 Estimador de Pagos</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">🧮</span> Estimador de Pagos</h2>
             <p className={styles.estimadorIntro}>
               Calcula una estimación aproximada de tus pagos trimestrales
             </p>
@@ -1001,7 +1007,7 @@ export default function CalendarioFiscalPage() {
 
             {/* Resumen trimestral */}
             <div className={styles.resumenTrimestral}>
-              <h3>📋 Resumen estimado del trimestre</h3>
+              <h3><span aria-hidden="true">📋</span> Resumen estimado del trimestre</h3>
               <div className={styles.resumenGrid}>
                 <div className={styles.resumenItem}>
                   <span>IVA (303)</span>
@@ -1030,7 +1036,7 @@ export default function CalendarioFiscalPage() {
 
       {/* Disclaimer */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Herramienta de Orientación — No es asesoramiento profesional</h3>
+        <h3><span aria-hidden="true">⚠️</span> Herramienta de Orientación — No es asesoramiento profesional</h3>
         <p>
           Este calendario es una <strong>guía orientativa</strong> basada en los plazos generales de la AEAT para 2026.
           Las fechas pueden variar por festivos locales o cambios normativos posteriores a la elaboración de esta herramienta.
@@ -1053,7 +1059,7 @@ export default function CalendarioFiscalPage() {
 
           <div className={styles.guideGrid}>
             <div className={styles.guideCard}>
-              <h4>📆 Obligaciones Trimestrales</h4>
+              <h4><span aria-hidden="true">📆</span> Obligaciones Trimestrales</h4>
               <p>
                 Cada trimestre debes presentar varias declaraciones. Las más comunes son:
               </p>
@@ -1065,7 +1071,7 @@ export default function CalendarioFiscalPage() {
             </div>
 
             <div className={styles.guideCard}>
-              <h4>📅 Plazos Generales</h4>
+              <h4><span aria-hidden="true">📅</span> Plazos Generales</h4>
               <p>
                 Los plazos habituales para las declaraciones trimestrales son:
               </p>
@@ -1078,7 +1084,7 @@ export default function CalendarioFiscalPage() {
             </div>
 
             <div className={styles.guideCard}>
-              <h4>💡 Consejos Prácticos</h4>
+              <h4><span aria-hidden="true">💡</span> Consejos Prácticos</h4>
               <ul>
                 <li>Reserva un 25-30% de tus ingresos para impuestos</li>
                 <li>Lleva la contabilidad al día, no lo dejes para el final</li>
@@ -1089,7 +1095,7 @@ export default function CalendarioFiscalPage() {
             </div>
 
             <div className={styles.guideCard}>
-              <h4>⚠️ Sanciones por Retraso</h4>
+              <h4><span aria-hidden="true">⚠️</span> Sanciones por Retraso</h4>
               <p>
                 Presentar fuera de plazo tiene consecuencias:
               </p>

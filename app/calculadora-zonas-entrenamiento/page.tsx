@@ -377,7 +377,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
                 <p>
                   Depende del objetivo. Para salud general: 70–80% del tiempo en Z1–Z2 y 20–30% en Z3–Z4. Para rendimiento deportivo: la pirámide de polarización (80% baja intensidad / 20% alta) ha demostrado ser más eficaz que el "entrenamiento en zona media" para la mayoría de deportes de resistencia.
                 </p>
-                <p className={styles.faqTip}>💡 El error más común de los amateurs es entrenar demasiado en Z3 — "demasiado duro para adaptarse, demasiado fácil para mejorar".</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> El error más común de los amateurs es entrenar demasiado en Z3 — "demasiado duro para adaptarse, demasiado fácil para mejorar".</p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">❓</span> ¿A qué zona corresponde caminar?</h4>
@@ -473,10 +473,10 @@ export default function CalculadoraZonasEntrenamientoPage() {
               <h3>Errores Frecuentes al Entrenar por Zonas</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>❌ Confiar solo en la sensación sin pulsómetro:</strong> La percepción del esfuerzo es muy subjetiva y variable. Un pulsómetro de pecho proporciona datos objetivos para respetar las zonas.</li>
-              <li><strong>❌ Entrenar siempre en Z3 ("la zona gris"):</strong> Demasiado dura para recuperarse bien, demasiado fácil para generar adaptaciones de alta intensidad. El error más habitual en corredores populares.</li>
-              <li><strong>❌ Aplicar las zonas de carrera al ciclismo o la natación sin ajuste:</strong> La FC en bici suele ser 5–10 ppm inferior para el mismo esfuerzo percibido. Ajusta mentalmente si cambias de deporte.</li>
-              <li><strong>❌ No recalcular las zonas al mejorar:</strong> Con el entrenamiento, la FC en reposo baja y la condición mejora. Las zonas calculadas hace 6 meses pueden estar ya obsoletas.</li>
+              <li><strong><span aria-hidden="true">❌</span> Confiar solo en la sensación sin pulsómetro:</strong> La percepción del esfuerzo es muy subjetiva y variable. Un pulsómetro de pecho proporciona datos objetivos para respetar las zonas.</li>
+              <li><strong><span aria-hidden="true">❌</span> Entrenar siempre en Z3 ("la zona gris"):</strong> Demasiado dura para recuperarse bien, demasiado fácil para generar adaptaciones de alta intensidad. El error más habitual en corredores populares.</li>
+              <li><strong><span aria-hidden="true">❌</span> Aplicar las zonas de carrera al ciclismo o la natación sin ajuste:</strong> La FC en bici suele ser 5–10 ppm inferior para el mismo esfuerzo percibido. Ajusta mentalmente si cambias de deporte.</li>
+              <li><strong><span aria-hidden="true">❌</span> No recalcular las zonas al mejorar:</strong> Con el entrenamiento, la FC en reposo baja y la condición mejora. Las zonas calculadas hace 6 meses pueden estar ya obsoletas.</li>
             </ul>
           </div>
         </EducationalSection>

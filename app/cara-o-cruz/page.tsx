@@ -159,7 +159,7 @@ export default function CaraOCruzPage() {
           )}
 
           {/* Botón lanzar */}
-          <button
+          <button type="button"
             onClick={lanzarMoneda}
             disabled={animando}
             className={styles.btnLanzar}
@@ -168,7 +168,7 @@ export default function CaraOCruzPage() {
           </button>
 
           {historial.length > 0 && (
-            <button onClick={reiniciar} className={styles.btnReiniciar}>
+            <button type="button" onClick={reiniciar} className={styles.btnReiniciar}>
               Reiniciar
             </button>
           )}
@@ -176,7 +176,7 @@ export default function CaraOCruzPage() {
 
         {/* Estadísticas */}
         <div className={styles.statsArea}>
-          <h2 className={styles.statsTitle}>📊 Estadísticas</h2>
+          <h2 className={styles.statsTitle}><span aria-hidden="true">📊</span> Estadísticas</h2>
 
           {stats.total === 0 ? (
             <div className={styles.emptyStats}>
@@ -219,7 +219,7 @@ export default function CaraOCruzPage() {
 
               {/* Rachas */}
               <div className={styles.rachasSection}>
-                <h3 className={styles.rachasTitle}>🔥 Rachas</h3>
+                <h3 className={styles.rachasTitle}><span aria-hidden="true">🔥</span> Rachas</h3>
                 <div className={styles.rachasGrid}>
                   <div className={styles.rachaItem}>
                     <span className={styles.rachaLabel}>Racha actual</span>
@@ -240,7 +240,7 @@ export default function CaraOCruzPage() {
 
               {/* Historial reciente */}
               <div className={styles.historialSection}>
-                <h3 className={styles.historialTitle}>📜 Últimos lanzamientos</h3>
+                <h3 className={styles.historialTitle}><span aria-hidden="true">📜</span> Últimos lanzamientos</h3>
                 <div className={styles.historialGrid}>
                   {historial.slice(-20).reverse().map((l) => (
                     <span
@@ -283,28 +283,28 @@ export default function CaraOCruzPage() {
           <h2>Conceptos clave</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🎲 Evento aleatorio</h4>
+              <h4><span aria-hidden="true">🎲</span> Evento aleatorio</h4>
               <p>
                 Un evento cuyo resultado no puede predecirse con certeza.
                 El lanzamiento de una moneda es un ejemplo clásico de evento aleatorio.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📊 Probabilidad teórica</h4>
+              <h4><span aria-hidden="true">📊</span> Probabilidad teórica</h4>
               <p>
                 Para una moneda justa: P(cara) = P(cruz) = 0,5 o 50%.
                 Cada lanzamiento es independiente del anterior.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🔄 Independencia</h4>
+              <h4><span aria-hidden="true">🔄</span> Independencia</h4>
               <p>
                 Que haya salido cara 5 veces seguidas NO aumenta la probabilidad
                 de que salga cruz. Cada lanzamiento es independiente.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📈 Frecuencia relativa</h4>
+              <h4><span aria-hidden="true">📈</span> Frecuencia relativa</h4>
               <p>
                 El número de caras dividido entre el total de lanzamientos.
                 Con muchos lanzamientos, tiende al 50%.
@@ -339,28 +339,28 @@ export default function CaraOCruzPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🪙 Moneda</td>
+                  <td><span aria-hidden="true">🪙</span> Moneda</td>
                   <td>2</td>
                   <td>Alta (50/50)</td>
                   <td>Inmediata</td>
                   <td>Desempates rápidos entre dos partes</td>
                 </tr>
                 <tr>
-                  <td>🎲 Dado</td>
+                  <td><span aria-hidden="true">🎲</span> Dado</td>
                   <td>2 – 6</td>
                   <td>Alta (1/N)</td>
                   <td>Inmediata</td>
                   <td>Seleccionar entre varios candidatos</td>
                 </tr>
                 <tr>
-                  <td>🎡 Ruleta</td>
+                  <td><span aria-hidden="true">🎡</span> Ruleta</td>
                   <td>Ilimitadas</td>
                   <td>Alta si bien configurada</td>
                   <td>Media</td>
                   <td>Sorteos con muchas opciones</td>
                 </tr>
                 <tr>
-                  <td>📋 Lista aleatoria</td>
+                  <td><span aria-hidden="true">📋</span> Lista aleatoria</td>
                   <td>Ilimitadas</td>
                   <td>Alta</td>
                   <td>Media</td>

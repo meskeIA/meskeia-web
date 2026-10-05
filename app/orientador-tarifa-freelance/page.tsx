@@ -170,7 +170,7 @@ export default function OrientadorTarifaFreelancePage() {
 
           {/* Ingreso objetivo */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>🎯 Ingreso Neto Deseado</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">🎯</span> Ingreso Neto Deseado</h2>
             <p className={styles.sectionDesc}>¿Cuánto quieres llevarte a casa cada mes después de pagar gastos e impuestos?</p>
             <NumberInput
               value={ingresoNetoDeseado}
@@ -184,7 +184,7 @@ export default function OrientadorTarifaFreelancePage() {
 
           {/* Gastos Fijos */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>📋 Gastos Fijos Mensuales</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Gastos Fijos Mensuales</h2>
             <p className={styles.sectionDesc}>Gastos que pagas cada mes independientemente de tu facturación</p>
 
             <div className={styles.gastosLista}>
@@ -231,7 +231,7 @@ export default function OrientadorTarifaFreelancePage() {
 
           {/* Gastos Variables */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>📊 Gastos Variables Mensuales</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Gastos Variables Mensuales</h2>
             <p className={styles.sectionDesc}>Gastos que pueden variar según tu actividad</p>
 
             <div className={styles.gastosLista}>
@@ -278,7 +278,7 @@ export default function OrientadorTarifaFreelancePage() {
 
           {/* Configuración de trabajo */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>⏰ Configuración de Trabajo</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">⏰</span> Configuración de Trabajo</h2>
 
             <div className={styles.configGrid}>
               <NumberInput
@@ -331,7 +331,7 @@ export default function OrientadorTarifaFreelancePage() {
 
           {/* Impuestos */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>🏛️ Impuestos</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">🏛️</span> Impuestos</h2>
 
             <div className={styles.configGrid}>
               <div className={styles.selectGroup}>
@@ -364,7 +364,7 @@ export default function OrientadorTarifaFreelancePage() {
 
           {/* Margen */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>📈 Margen de Beneficio</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📈</span> Margen de Beneficio</h2>
             <p className={styles.sectionDesc}>Porcentaje extra para imprevistos, ahorro e inversión</p>
             <NumberInput
               value={margenBeneficio}
@@ -413,7 +413,7 @@ export default function OrientadorTarifaFreelancePage() {
 
           {/* Desglose mensual */}
           <div className={styles.desglose}>
-            <h3 className={styles.desgloseTitle}>📋 Desglose Mensual</h3>
+            <h3 className={styles.desgloseTitle}><span aria-hidden="true">📋</span> Desglose Mensual</h3>
             <div className={styles.desgloseGrid}>
               <div className={styles.desgloseItem}>
                 <span className={styles.desgloseLabel}>Facturación necesaria</span>
@@ -436,7 +436,7 @@ export default function OrientadorTarifaFreelancePage() {
 
           {/* Resumen anual */}
           <div className={styles.resumenAnual}>
-            <h3 className={styles.desgloseTitle}>📊 Proyección Anual</h3>
+            <h3 className={styles.desgloseTitle}><span aria-hidden="true">📊</span> Proyección Anual</h3>
             <div className={styles.resumenGrid}>
               <ResultCard
                 title="Facturación Anual"
@@ -472,7 +472,7 @@ export default function OrientadorTarifaFreelancePage() {
 
           {/* Días laborables */}
           <div className={styles.diasInfo}>
-            <h3 className={styles.desgloseTitle}>📅 Días de Trabajo al Año</h3>
+            <h3 className={styles.desgloseTitle}><span aria-hidden="true">📅</span> Días de Trabajo al Año</h3>
             <div className={styles.diasGrid}>
               <div className={styles.diaItem}>
                 <span className={styles.diaNumero}>{formatNumber(calculos.diasLaborablesAno, 0)}</span>

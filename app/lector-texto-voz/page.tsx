@@ -181,7 +181,7 @@ export default function LectorTextoVozPage() {
 
       {!soportado && (
         <div className={styles.avisoNavegador} role="alert">
-          <strong>⚠️ Tu navegador no soporta síntesis de voz.</strong><br />
+          <strong><span aria-hidden="true">⚠️</span> Tu navegador no soporta síntesis de voz.</strong><br />
           Por favor usa Chrome, Edge o Safari para usar este lector.
         </div>
       )}
@@ -267,7 +267,7 @@ export default function LectorTextoVozPage() {
           aria-selected={vistaActiva === 'editar'}
           aria-controls="panel-editar"
         >
-          ✏️ Editar texto
+          <span aria-hidden="true">✏️</span> Editar texto
         </button>
         <button
           type="button"
@@ -277,7 +277,7 @@ export default function LectorTextoVozPage() {
           aria-selected={vistaActiva === 'escuchar'}
           aria-controls="panel-escuchar"
         >
-          👁️ Seguir lectura
+          <span aria-hidden="true">👁️</span> Seguir lectura
         </button>
       </div>
 
@@ -365,7 +365,7 @@ export default function LectorTextoVozPage() {
             disabled={!soportado || !texto.trim()}
             aria-label="Iniciar lectura"
           >
-            ▶ Leer en voz alta
+            <span aria-hidden="true">▶</span> Leer en voz alta
           </button>
         ) : (
           <>
@@ -383,7 +383,7 @@ export default function LectorTextoVozPage() {
               onClick={detener}
               aria-label="Detener lectura"
             >
-              ⏹ Detener
+              <span aria-hidden="true">⏹</span> Detener
             </button>
           </>
         )}
@@ -464,7 +464,7 @@ export default function LectorTextoVozPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🔊 Este lector (meskeIA)</td>
+                  <td><span aria-hidden="true">🔊</span> Este lector (meskeIA)</td>
                   <td className={styles.celdaDestacada}>Sí</td>
                   <td className={styles.celdaDestacada}>Sí</td>
                   <td className={styles.celdaDestacada}>Sí</td>

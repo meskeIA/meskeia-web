@@ -324,7 +324,7 @@ export default function ConversorHorariosPage() {
               </div>
             </div>
             <button type="button" onClick={usarHoraActual} className={styles.btnActual}>
-              🕐 Usar hora actual
+              <span aria-hidden="true">🕐</span> Usar hora actual
             </button>
           </div>
         </section>
@@ -448,7 +448,7 @@ export default function ConversorHorariosPage() {
           onClick={() => setMostrarAcronimos(!mostrarAcronimos)}
           aria-expanded={mostrarAcronimos}
         >
-          <span>📖 Guía de zonas horarias (GMT, CET, EST, PST...)</span>
+          <span><span aria-hidden="true">📖</span> Guía de zonas horarias (GMT, CET, EST, PST...)</span>
           <span className={`${styles.toggleIcon} ${mostrarAcronimos ? styles.toggleIconOpen : ''}`}>
             ▼
           </span>
@@ -487,7 +487,7 @@ export default function ConversorHorariosPage() {
       >
         {/* Sección 1: Tabla Comparativa */}
         <div className={styles.eduComparativaSection}>
-          <h3>🌐 Referencia de Zonas Horarias Clave</h3>
+          <h3><span aria-hidden="true">🌐</span> Referencia de Zonas Horarias Clave</h3>
           <p className={styles.eduComparativaSubtitle}>Las zonas más importantes para trabajo remoto e internacional</p>
           <div className={styles.eduTablaWrapper}>
             <table className={styles.eduTablaComparativa}>
@@ -565,7 +565,7 @@ export default function ConversorHorariosPage() {
 
         {/* Sección 2: Casos de Uso Prácticos */}
         <div className={styles.eduEscenariosSection}>
-          <h3>💼 Casos de Uso por Perfil Profesional</h3>
+          <h3><span aria-hidden="true">💼</span> Casos de Uso por Perfil Profesional</h3>
           <p className={styles.eduEscenariosSubtitle}>Cómo gestionar horarios según tu situación</p>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
@@ -605,47 +605,47 @@ export default function ConversorHorariosPage() {
 
         {/* Sección 3: FAQ Ampliado */}
         <div className={styles.eduFaqSection}>
-          <h3>❓ Preguntas Frecuentes sobre Zonas Horarias</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Zonas Horarias</h3>
           <p className={styles.eduFaqSubtitle}>Todo lo que necesitas saber sobre el tiempo global</p>
           <div className={styles.eduFaqList}>
             <div className={styles.eduFaqItem}>
               <h4>¿Qué es UTC y por qué es la referencia mundial?</h4>
-              <p>UTC (Coordinated Universal Time) es el estándar de tiempo internacional desde 1972, basado en relojes atómicos. Reemplazó al GMT como referencia oficial aunque en la práctica son equivalentes (±0.9s). Todas las zonas horarias se expresan como UTC± horas. España peninsular es UTC+1 (invierno) o UTC+2 (verano). 💡 Consejo: Cuando coordines reuniones internacionales, siempre confirma en UTC para evitar confusiones. Escribe &ldquo;15:00 UTC&rdquo; en lugar de &ldquo;16:00 CET&rdquo;.</p>
+              <p>UTC (Coordinated Universal Time) es el estándar de tiempo internacional desde 1972, basado en relojes atómicos. Reemplazó al GMT como referencia oficial aunque en la práctica son equivalentes (±0.9s). Todas las zonas horarias se expresan como UTC± horas. España peninsular es UTC+1 (invierno) o UTC+2 (verano). <span aria-hidden="true">💡</span> Consejo: Cuando coordines reuniones internacionales, siempre confirma en UTC para evitar confusiones. Escribe &ldquo;15:00 UTC&rdquo; en lugar de &ldquo;16:00 CET&rdquo;.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Por qué algunos países no tienen horario de verano?</h4>
-              <p>El horario de verano (DST - Daylight Saving Time) se inventó en la Primera Guerra Mundial para ahorrar energía. Países como India, Japón, China, y la mayoría de África no lo usan. Esto crea situaciones donde la diferencia horaria con España cambia según la época del año: con India es siempre +4:30h (invierno) o +3:30h (verano, porque solo España cambia). 💡 Consejo: Si trabajas con India o Japón regularmente, recuerda que la diferencia con España cambia ±1h en los cambios de horario de verano, aunque ellos no cambien.</p>
+              <p>El horario de verano (DST - Daylight Saving Time) se inventó en la Primera Guerra Mundial para ahorrar energía. Países como India, Japón, China, y la mayoría de África no lo usan. Esto crea situaciones donde la diferencia horaria con España cambia según la época del año: con India es siempre +4:30h (invierno) o +3:30h (verano, porque solo España cambia). <span aria-hidden="true">💡</span> Consejo: Si trabajas con India o Japón regularmente, recuerda que la diferencia con España cambia ±1h en los cambios de horario de verano, aunque ellos no cambien.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cómo funciona la línea de cambio de fecha?</h4>
-              <p>La Línea Internacional de Cambio de Fecha es aproximadamente el meridiano 180° en el Pacífico. Al cruzarla hacia el oeste, el calendario avanza un día; hacia el este, retrocede. Países como Australia o Nueva Zelanda están &lsquo;mañana&rsquo; respecto a EE.UU. En la práctica: si en Madrid es lunes 15:00, en Auckland ya es martes 02:00 (en invierno europeo). 💡 Consejo: Para reuniones con Australia/NZ desde Europa, confirma siempre el día de la semana, no solo la hora. Una reunión del &ldquo;miércoles&rdquo; puede ser el martes en tu zona.</p>
+              <p>La Línea Internacional de Cambio de Fecha es aproximadamente el meridiano 180° en el Pacífico. Al cruzarla hacia el oeste, el calendario avanza un día; hacia el este, retrocede. Países como Australia o Nueva Zelanda están &lsquo;mañana&rsquo; respecto a EE.UU. En la práctica: si en Madrid es lunes 15:00, en Auckland ya es martes 02:00 (en invierno europeo). <span aria-hidden="true">💡</span> Consejo: Para reuniones con Australia/NZ desde Europa, confirma siempre el día de la semana, no solo la hora. Una reunión del &ldquo;miércoles&rdquo; puede ser el martes en tu zona.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Por qué India tiene una zona horaria de media hora (UTC+5:30)?</h4>
-              <p>Algunos países usan offsets de 30 o 45 minutos para ajustarse a su geografía solar. India (UTC+5:30), Sri Lanka (UTC+5:30), Irán (UTC+3:30), Nepal (UTC+5:45) e incluso Australia del Sur (UTC+9:30) usan half-offsets. Esto responde a decisiones políticas o geográficas (India prefirió un único huso para todo el país). 💡 Consejo: Cuando uses esta herramienta para convertir horarios con India, nota que los resultados muestran correctamente el offset de media hora. Herramientas menos precisas pueden aproximar a UTC+5 o UTC+6.</p>
+              <p>Algunos países usan offsets de 30 o 45 minutos para ajustarse a su geografía solar. India (UTC+5:30), Sri Lanka (UTC+5:30), Irán (UTC+3:30), Nepal (UTC+5:45) e incluso Australia del Sur (UTC+9:30) usan half-offsets. Esto responde a decisiones políticas o geográficas (India prefirió un único huso para todo el país). <span aria-hidden="true">💡</span> Consejo: Cuando uses esta herramienta para convertir horarios con India, nota que los resultados muestran correctamente el offset de media hora. Herramientas menos precisas pueden aproximar a UTC+5 o UTC+6.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cuándo es mejor programar reuniones internacionales Europa-América?</h4>
-              <p>La ventana óptima entre Europa Central (CET) y Costa Este de EE.UU. (EST) es 15:00-17:00 CET = 09:00-11:00 EST. Con la Costa Oeste (PST) la ventana ideal es más estrecha: 17:00-19:00 CET = 08:00-10:00 PST. En verano europeo, la ventana se desplaza 1h (ya que solo Europa cambia). 💡 Consejo: Evita programar reuniones con EE.UU. por la mañana española (antes de 14:00). Para ellos serían las madrugadas. La tarde española es el punto dulce para ambas zonas.</p>
+              <p>La ventana óptima entre Europa Central (CET) y Costa Este de EE.UU. (EST) es 15:00-17:00 CET = 09:00-11:00 EST. Con la Costa Oeste (PST) la ventana ideal es más estrecha: 17:00-19:00 CET = 08:00-10:00 PST. En verano europeo, la ventana se desplaza 1h (ya que solo Europa cambia). <span aria-hidden="true">💡</span> Consejo: Evita programar reuniones con EE.UU. por la mañana española (antes de 14:00). Para ellos serían las madrugadas. La tarde española es el punto dulce para ambas zonas.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cómo afecta el cambio de horario de verano a las reuniones ya programadas?</h4>
-              <p>En España el cambio es el último domingo de marzo (avanzamos 1h) y octubre (atrasamos 1h). Si tienes una reunión semanal fija con EE.UU. o UK, la diferencia horaria cambia 1h durante esas semanas de transición porque los cambios no son simultáneos. Ejemplo: en EE.UU. el cambio de primavera ocurre el segundo domingo de marzo, unas dos semanas antes que en Europa, lo que crea un periodo de diferencia anómala de 5h en vez de 6h con NY hasta que Europa también cambia. 💡 Consejo: Durante las semanas de cambio de horario, confirma siempre la hora de las reuniones con colaboradores internacionales. Es la causa más frecuente de &ldquo;¿dónde estás?&rdquo; en llamadas de trabajo remoto.</p>
+              <p>En España el cambio es el último domingo de marzo (avanzamos 1h) y octubre (atrasamos 1h). Si tienes una reunión semanal fija con EE.UU. o UK, la diferencia horaria cambia 1h durante esas semanas de transición porque los cambios no son simultáneos. Ejemplo: en EE.UU. el cambio de primavera ocurre el segundo domingo de marzo, unas dos semanas antes que en Europa, lo que crea un periodo de diferencia anómala de 5h en vez de 6h con NY hasta que Europa también cambia. <span aria-hidden="true">💡</span> Consejo: Durante las semanas de cambio de horario, confirma siempre la hora de las reuniones con colaboradores internacionales. Es la causa más frecuente de &ldquo;¿dónde estás?&rdquo; en llamadas de trabajo remoto.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Existe algún país a 0 horas UTC todo el año?</h4>
-              <p>Ghana, Islandia y algunos países del África Occidental están en UTC+0 permanentemente (sin horario de verano). Reino Unido, Portugal e Irlanda están en UTC+0 en invierno y UTC+1 en verano (BST/WEST). Curiosidad: España geográficamente debería estar en UTC+0 (misma longitud que UK/Portugal) pero políticamente está en CET (UTC+1) desde una decisión de 1940 que nunca se revirtió. 💡 Consejo: Cuando conviertas horarios con Portugal, recuerda que en invierno tienen 1h menos que España, pero en verano tienen la misma hora (ambos en UTC+1).</p>
+              <p>Ghana, Islandia y algunos países del África Occidental están en UTC+0 permanentemente (sin horario de verano). Reino Unido, Portugal e Irlanda están en UTC+0 en invierno y UTC+1 en verano (BST/WEST). Curiosidad: España geográficamente debería estar en UTC+0 (misma longitud que UK/Portugal) pero políticamente está en CET (UTC+1) desde una decisión de 1940 que nunca se revirtió. <span aria-hidden="true">💡</span> Consejo: Cuando conviertas horarios con Portugal, recuerda que en invierno tienen 1h menos que España, pero en verano tienen la misma hora (ambos en UTC+1).</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cómo funciona la herramienta para fechas pasadas o futuras?</h4>
-              <p>Esta herramienta tiene en cuenta el horario de verano histórico y futuro para la fecha introducida. Si introduces una fecha pasada, calcula si en esa fecha específica estaba activo el horario de verano. Para fechas futuras, aplica las reglas conocidas de cambio de horario (último domingo de marzo y octubre para Europa). 💡 Consejo: Para planificar eventos con mucha antelación (&gt;6 meses), verifica siempre que la fecha no coincida con un cambio de horario. Un evento programado para el último domingo de marzo puede tener una hora de desfase por el cambio.</p>
+              <p>Esta herramienta tiene en cuenta el horario de verano histórico y futuro para la fecha introducida. Si introduces una fecha pasada, calcula si en esa fecha específica estaba activo el horario de verano. Para fechas futuras, aplica las reglas conocidas de cambio de horario (último domingo de marzo y octubre para Europa). <span aria-hidden="true">💡</span> Consejo: Para planificar eventos con mucha antelación (&gt;6 meses), verifica siempre que la fecha no coincida con un cambio de horario. Un evento programado para el último domingo de marzo puede tener una hora de desfase por el cambio.</p>
             </div>
           </div>
         </div>
 
         {/* Sección 4: Guía Paso a Paso */}
         <div className={styles.eduStepSection}>
-          <h3>📋 Guía: Programa Reuniones Internacionales sin Errores</h3>
+          <h3><span aria-hidden="true">📋</span> Guía: Programa Reuniones Internacionales sin Errores</h3>
           <p className={styles.eduStepSubtitle}>6 pasos para coordinar equipos globales con eficacia</p>
           <div className={styles.eduStepGuide}>
             <div className={styles.eduStepItem}>
@@ -695,7 +695,7 @@ export default function ConversorHorariosPage() {
 
         {/* Sección 5: Mejores Prácticas */}
         <div className={styles.eduTipsSection}>
-          <h3>✅ 6 Prácticas para la Coordinación Global</h3>
+          <h3><span aria-hidden="true">✅</span> 6 Prácticas para la Coordinación Global</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon}>📅</span>
@@ -737,12 +737,12 @@ export default function ConversorHorariosPage() {
             <h3>Errores que Generan Confusión Horaria Internacional</h3>
           </div>
           <ul className={styles.eduWarningList}>
-            <li><strong>❌ Proponer reuniones sin especificar la zona horaria:</strong> &ldquo;Nos vemos el martes a las 10&rdquo; sin especificar zona horaria es la causa más común de ausencias en reuniones internacionales. Siempre añade: &ldquo;10:00 CET&rdquo;, &ldquo;10:00 UTC&rdquo; o &ldquo;10:00 hora de Madrid&rdquo;.</li>
-            <li><strong>❌ Ignorar el cambio de horario de verano del otro país:</strong> EE.UU. cambia el horario 2-3 semanas después que Europa. Durante esas semanas la diferencia horaria es 1h menor de lo habitual. Muchas reuniones se pierden ese lunes de vuelta al trabajo.</li>
-            <li><strong>❌ Asumir que India o China tienen el mismo horario todo el año:</strong> India (UTC+5:30) y China (UTC+8) no tienen horario de verano. Pero España sí. En verano, la diferencia España-India cambia de +4:30h (invierno) a +3:30h (verano). Verificar siempre.</li>
-            <li><strong>❌ Confundir GMT y UTC en documentos formales:</strong> Son prácticamente equivalentes (diferencia &lt;1s), pero UTC es el estándar internacional oficial desde 1972. En contratos o documentos legales con partes de distintos países, usar siempre UTC.</li>
-            <li><strong>❌ Olvidar la línea de cambio de fecha para Australia y Nueva Zelanda:</strong> En Madrid el martes a las 17:00 puede ser el miércoles a las 03:00 en Sídney. Una reunión &ldquo;el jueves&rdquo; puede interpretarse de forma diferente. Siempre confirmar el día además de la hora.</li>
-            <li><strong>❌ Usar 12:00 PM/AM sin contexto:</strong> El formato de 12 horas genera confusión. &ldquo;12:00 PM&rdquo; es el mediodía y &ldquo;12:00 AM&rdquo; es la medianoche, pero mucha gente los confunde. Usa siempre formato 24h (13:00, 00:00) en comunicaciones internacionales.</li>
+            <li><strong><span aria-hidden="true">❌</span> Proponer reuniones sin especificar la zona horaria:</strong> &ldquo;Nos vemos el martes a las 10&rdquo; sin especificar zona horaria es la causa más común de ausencias en reuniones internacionales. Siempre añade: &ldquo;10:00 CET&rdquo;, &ldquo;10:00 UTC&rdquo; o &ldquo;10:00 hora de Madrid&rdquo;.</li>
+            <li><strong><span aria-hidden="true">❌</span> Ignorar el cambio de horario de verano del otro país:</strong> EE.UU. cambia el horario 2-3 semanas después que Europa. Durante esas semanas la diferencia horaria es 1h menor de lo habitual. Muchas reuniones se pierden ese lunes de vuelta al trabajo.</li>
+            <li><strong><span aria-hidden="true">❌</span> Asumir que India o China tienen el mismo horario todo el año:</strong> India (UTC+5:30) y China (UTC+8) no tienen horario de verano. Pero España sí. En verano, la diferencia España-India cambia de +4:30h (invierno) a +3:30h (verano). Verificar siempre.</li>
+            <li><strong><span aria-hidden="true">❌</span> Confundir GMT y UTC en documentos formales:</strong> Son prácticamente equivalentes (diferencia &lt;1s), pero UTC es el estándar internacional oficial desde 1972. En contratos o documentos legales con partes de distintos países, usar siempre UTC.</li>
+            <li><strong><span aria-hidden="true">❌</span> Olvidar la línea de cambio de fecha para Australia y Nueva Zelanda:</strong> En Madrid el martes a las 17:00 puede ser el miércoles a las 03:00 en Sídney. Una reunión &ldquo;el jueves&rdquo; puede interpretarse de forma diferente. Siempre confirmar el día además de la hora.</li>
+            <li><strong><span aria-hidden="true">❌</span> Usar 12:00 PM/AM sin contexto:</strong> El formato de 12 horas genera confusión. &ldquo;12:00 PM&rdquo; es el mediodía y &ldquo;12:00 AM&rdquo; es la medianoche, pero mucha gente los confunde. Usa siempre formato 24h (13:00, 00:00) en comunicaciones internacionales.</li>
           </ul>
         </div>
       </EducationalSection>

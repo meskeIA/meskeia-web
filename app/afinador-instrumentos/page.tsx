@@ -403,49 +403,49 @@ export default function AfinadorInstrumentosPage() {
                 <td><strong>Guitarra estándar (6c)</strong></td>
                 <td>Mi2, La2, Re3, Sol3, Si3, Mi4</td>
                 <td>82 – 330 Hz</td>
-                <td>⭐⭐ Media</td>
+                <td><span aria-hidden="true">⭐⭐</span> Media</td>
                 <td>Afina siempre de grave a agudo</td>
               </tr>
               <tr>
                 <td><strong>Bajo 4 cuerdas</strong></td>
                 <td>Mi1, La1, Re2, Sol2</td>
                 <td>41 – 98 Hz</td>
-                <td>⭐⭐ Media</td>
+                <td><span aria-hidden="true">⭐⭐</span> Media</td>
                 <td>Usa el 5º traste para afinar por armónicos</td>
               </tr>
               <tr>
                 <td><strong>Ukelele estándar (C)</strong></td>
                 <td>Sol4, Do4, Mi4, La4</td>
                 <td>261 – 440 Hz</td>
-                <td>⭐ Fácil</td>
+                <td><span aria-hidden="true">⭐</span> Fácil</td>
                 <td>La 4ª cuerda (Sol) es aguda, no confundir</td>
               </tr>
               <tr>
                 <td><strong>Violín</strong></td>
                 <td>Sol3, Re4, La4, Mi5</td>
                 <td>196 – 660 Hz</td>
-                <td>⭐⭐⭐ Alta</td>
+                <td><span aria-hidden="true">⭐⭐⭐</span> Alta</td>
                 <td>Afina en 5ªs exactas; usa el diapasón para La4</td>
               </tr>
               <tr>
                 <td><strong>Mandolina (4 pares)</strong></td>
                 <td>Sol3, Re4, La4, Mi5</td>
                 <td>196 – 660 Hz</td>
-                <td>⭐⭐⭐ Alta</td>
+                <td><span aria-hidden="true">⭐⭐⭐</span> Alta</td>
                 <td>Afina cada par de cuerdas al unísono exacto</td>
               </tr>
               <tr>
                 <td><strong>Guitarra 7 cuerdas</strong></td>
                 <td>Si1 + 6 estándar</td>
                 <td>62 – 330 Hz</td>
-                <td>⭐⭐ Media</td>
+                <td><span aria-hidden="true">⭐⭐</span> Media</td>
                 <td>La 7ª (Si1) necesita mayor tensión de clavija</td>
               </tr>
               <tr>
                 <td><strong>Bajo 5 cuerdas</strong></td>
                 <td>Si0, Mi1, La1, Re2, Sol2</td>
                 <td>31 – 98 Hz</td>
-                <td>⭐⭐⭐ Alta</td>
+                <td><span aria-hidden="true">⭐⭐⭐</span> Alta</td>
                 <td>El Si0 puede ser difícil de detectar por el micrófono</td>
               </tr>
               <tr>
@@ -480,7 +480,7 @@ export default function AfinadorInstrumentosPage() {
                 <td><strong>Banjo 5 cuerdas</strong></td>
                 <td>Sol4, Re3, Sol3, Si3, Re4</td>
                 <td>196 – 392 Hz</td>
-                <td>⭐⭐ Media</td>
+                <td><span aria-hidden="true">⭐⭐</span> Media</td>
                 <td>La 5ª cuerda corta (Sol4) es la más aguda</td>
               </tr>
             </tbody>
@@ -565,7 +565,7 @@ export default function AfinadorInstrumentosPage() {
         {/* Escenarios de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>🎸 Principiante con guitarra</h3>
+            <h3><span aria-hidden="true">🎸</span> Principiante con guitarra</h3>
             <p>Selecciona &quot;Guitarra estándar&quot; para ver las 6 notas y frecuencias exactas. Toca cuerda por cuerda y observa el indicador: verde = afinado, rojo = ajusta la clavija.</p>
           </div>
           <div className={styles.escenarioCard}>
@@ -575,23 +575,23 @@ export default function AfinadorInstrumentosPage() {
             sabes si el problema es la embocadura o la posición de la bomba.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎵 Músico en ensayo</h3>
+            <h3><span aria-hidden="true">🎵</span> Músico en ensayo</h3>
             <p>Antes de empezar el ensayo, afina todas las cuerdas rápidamente. El afinador cromático detecta automáticamente la nota más cercana, sin necesidad de seleccionar manualmente.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🔧 Luthier en ajuste</h3>
+            <h3><span aria-hidden="true">🔧</span> Luthier en ajuste</h3>
             <p>Verifica la afinación de instrumentos en reparación o configuración. Cambia la referencia de La4 entre 440, 442 o 443 Hz según las especificaciones del cliente o del conjunto musical.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎤 Guitarrista de escenario</h3>
+            <h3><span aria-hidden="true">🎤</span> Guitarrista de escenario</h3>
             <p>En el escenario, el ruido ambiente puede dificultar la afinación. Conecta el instrumento directo al ordenador por interfaz de audio para una detección más limpia y precisa.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎻 Músico clásico (440 vs 442)</h3>
+            <h3><span aria-hidden="true">🎻</span> Músico clásico (440 vs 442)</h3>
             <p>Si tocas con una orquesta que usa 442 Hz, ajusta la referencia antes de afinar. Una diferencia de 2 Hz equivale a ~7,8 cents: perceptible en música de cámara e instrumentos de cuerda.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎶 Ukelele para niños</h3>
+            <h3><span aria-hidden="true">🎶</span> Ukelele para niños</h3>
             <p>El ukelele estándar en Do es perfecto para iniciarse. Sus 4 cuerdas (Sol-Do-Mi-La) tienen frecuencias fácilmente detectables por el micrófono. Ideal como primer instrumento.</p>
           </div>
         </div>
@@ -688,34 +688,34 @@ export default function AfinadorInstrumentosPage() {
         {/* Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>⬆️ Afina siempre subiendo</h3>
+            <h3><span aria-hidden="true">⬆️</span> Afina siempre subiendo</h3>
             <p>Si una cuerda está demasiado alta, bájala por debajo de la nota y luego sube hasta afinar. Las cuerdas mantienen mejor la afinación cuando la tensión final es ascendente.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔇 Silencio = mejor detección</h3>
+            <h3><span aria-hidden="true">🔇</span> Silencio = mejor detección</h3>
             <p>Aleja el micrófono de altavoces, ventiladores y conversaciones. El ruido ambiente es la principal causa de lecturas incorrectas en afinadores de micrófono.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🎸 Cuerdas nuevas necesitan más tiempo</h3>
+            <h3><span aria-hidden="true">🎸</span> Cuerdas nuevas necesitan más tiempo</h3>
             <p>Las cuerdas nuevas se estiran durante los primeros días. Afina con más frecuencia al inicio y tira suavemente de las cuerdas después de afinar para acelerar el asentamiento.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🌡️ La temperatura afecta la afinación</h3>
+            <h3><span aria-hidden="true">🌡️</span> La temperatura afecta la afinación</h3>
             <p>Cambios bruscos de temperatura desafinan los instrumentos. Deja que tu guitarra o violín se adapten a la temperatura del local antes de afinar (10-15 minutos).</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔁 Verifica después de afinar todo</h3>
+            <h3><span aria-hidden="true">🔁</span> Verifica después de afinar todo</h3>
             <p>Siempre repasa todas las cuerdas al final. La tensión añadida al afinar las cuerdas agudas puede afectar ligeramente a las graves. Una segunda pasada garantiza la precisión.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📱 Usa interfaz de audio si tienes</h3>
+            <h3><span aria-hidden="true">📱</span> Usa interfaz de audio si tienes</h3>
             <p>Una interfaz de audio (Focusrite Scarlett, Behringer UM2) conectada por cable ofrece detección mucho más limpia y precisa que el micrófono interno del portátil o móvil.</p>
           </div>
         </div>
 
         {/* Aviso importante */}
         <div className={styles.warningBox}>
-          <h3>⚠️ Para una detección precisa</h3>
+          <h3><span aria-hidden="true">⚠️</span> Para una detección precisa</h3>
           <ul className={styles.warningList}>
             <li>Concede permiso al micrófono: sin él, el afinador no puede capturar el sonido de tu instrumento.</li>
             <li>Toca en un entorno silencioso: el ruido ambiente es la principal causa de lecturas incorrectas.</li>

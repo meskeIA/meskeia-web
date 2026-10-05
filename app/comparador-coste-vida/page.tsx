@@ -135,7 +135,7 @@ export default function ComparadorCosteVida() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🏙️ Comparador de Coste de Vida</h1>
+        <h1><span aria-hidden="true">🏙️</span> Comparador de Coste de Vida</h1>
         <p>Compara el coste de vida —o «costo de vida»— de 55+ ciudades: alquiler, comida, transporte e internet</p>
       </header>
 

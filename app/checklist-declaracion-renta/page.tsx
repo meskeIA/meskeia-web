@@ -409,11 +409,11 @@ export default function ChecklistDeclaracionRentaPage() {
               <thead>
                 <tr>
                   <th>Documento</th>
-                  <th>👔 Asalariado</th>
-                  <th>🧾 Autónomo</th>
-                  <th>🏦 Pensionista</th>
-                  <th>📈 Inversor</th>
-                  <th>🏠 Arrendador</th>
+                  <th><span aria-hidden="true">👔</span> Asalariado</th>
+                  <th><span aria-hidden="true">🧾</span> Autónomo</th>
+                  <th><span aria-hidden="true">🏦</span> Pensionista</th>
+                  <th><span aria-hidden="true">📈</span> Inversor</th>
+                  <th><span aria-hidden="true">🏠</span> Arrendador</th>
                 </tr>
               </thead>
               <tbody>

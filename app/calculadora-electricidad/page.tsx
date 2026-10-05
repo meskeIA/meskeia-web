@@ -336,7 +336,7 @@ export default function CalculadoraElectricidadPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>⚡ Calculadora de Electricidad Avanzada</h1>
+        <h1 className={styles.title}><span aria-hidden="true">⚡</span> Calculadora de Electricidad Avanzada</h1>
         <p className={styles.subtitle}>
           Ley de Ohm, Potencia, Divisores, Circuitos Mixtos, RC/RL y Consumo
         </p>
@@ -350,7 +350,7 @@ export default function CalculadoraElectricidadPage() {
           <h2 className={styles.sectionTitle}>Tipo de Cálculo</h2>
 
           <div className={styles.tiposGrid}>
-            <button
+            <button type="button"
               className={`${styles.tipoBtn} ${tipoCalculo === 'ohm' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('ohm')}
               aria-pressed={tipoCalculo === 'ohm'}
@@ -358,7 +358,7 @@ export default function CalculadoraElectricidadPage() {
               <span className={styles.tipoIcono} aria-hidden="true">V=IR</span>
               <span className={styles.tipoNombre}>Ley de Ohm</span>
             </button>
-            <button
+            <button type="button"
               className={`${styles.tipoBtn} ${tipoCalculo === 'potencia' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('potencia')}
               aria-pressed={tipoCalculo === 'potencia'}
@@ -366,7 +366,7 @@ export default function CalculadoraElectricidadPage() {
               <span className={styles.tipoIcono} aria-hidden="true">P=VI</span>
               <span className={styles.tipoNombre}>Potencia</span>
             </button>
-            <button
+            <button type="button"
               className={`${styles.tipoBtn} ${tipoCalculo === 'circuito' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('circuito')}
               aria-pressed={tipoCalculo === 'circuito'}
@@ -374,7 +374,7 @@ export default function CalculadoraElectricidadPage() {
               <span className={styles.tipoIcono} aria-hidden="true">⫘</span>
               <span className={styles.tipoNombre}>Serie/Paralelo</span>
             </button>
-            <button
+            <button type="button"
               className={`${styles.tipoBtn} ${tipoCalculo === 'divisor' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('divisor')}
               aria-pressed={tipoCalculo === 'divisor'}
@@ -382,7 +382,7 @@ export default function CalculadoraElectricidadPage() {
               <span className={styles.tipoIcono} aria-hidden="true">⫗</span>
               <span className={styles.tipoNombre}>Divisores</span>
             </button>
-            <button
+            <button type="button"
               className={`${styles.tipoBtn} ${tipoCalculo === 'mixto' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('mixto')}
               aria-pressed={tipoCalculo === 'mixto'}
@@ -390,7 +390,7 @@ export default function CalculadoraElectricidadPage() {
               <span className={styles.tipoIcono} aria-hidden="true">⫘⫗</span>
               <span className={styles.tipoNombre}>Mixtos</span>
             </button>
-            <button
+            <button type="button"
               className={`${styles.tipoBtn} ${tipoCalculo === 'rcrl' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('rcrl')}
               aria-pressed={tipoCalculo === 'rcrl'}
@@ -398,7 +398,7 @@ export default function CalculadoraElectricidadPage() {
               <span className={styles.tipoIcono} aria-hidden="true">τ</span>
               <span className={styles.tipoNombre}>RC/RL</span>
             </button>
-            <button
+            <button type="button"
               className={`${styles.tipoBtn} ${tipoCalculo === 'consumo' ? styles.tipoActivo : ''}`}
               onClick={() => setTipoCalculo('consumo')}
               aria-pressed={tipoCalculo === 'consumo'}
@@ -415,7 +415,7 @@ export default function CalculadoraElectricidadPage() {
                 <h3 className={styles.sectionTitle}>Calcular</h3>
                 <div className={styles.selectorGrid}>
                   {(['V', 'I', 'R'] as VariableOhm[]).map((v) => (
-                    <button
+                    <button type="button"
                       key={v}
                       className={`${styles.selectorBtn} ${variableOhm === v ? styles.selectorActivo : ''}`}
                       onClick={() => setVariableOhm(v)}
@@ -477,7 +477,7 @@ export default function CalculadoraElectricidadPage() {
                 <h3 className={styles.sectionTitle}>Calcular</h3>
                 <div className={styles.selectorGrid}>
                   {(['P', 'V', 'I'] as VariablePotencia[]).map((v) => (
-                    <button
+                    <button type="button"
                       key={v}
                       className={`${styles.selectorBtn} ${variablePotencia === v ? styles.selectorActivo : ''}`}
                       onClick={() => setVariablePotencia(v)}
@@ -538,13 +538,13 @@ export default function CalculadoraElectricidadPage() {
               <>
                 <h3 className={styles.sectionTitle}>Tipo de Conexión</h3>
                 <div className={styles.selectorGrid}>
-                  <button
+                  <button type="button"
                     className={`${styles.selectorBtn} ${tipoCircuito === 'serie' ? styles.selectorActivo : ''}`}
                     onClick={() => setTipoCircuito('serie')}
                   >
                     Serie ─⫘─⫘─
                   </button>
-                  <button
+                  <button type="button"
                     className={`${styles.selectorBtn} ${tipoCircuito === 'paralelo' ? styles.selectorActivo : ''}`}
                     onClick={() => setTipoCircuito('paralelo')}
                   >
@@ -570,13 +570,13 @@ export default function CalculadoraElectricidadPage() {
               <>
                 <h3 className={styles.sectionTitle}>Tipo de Divisor</h3>
                 <div className={styles.selectorGrid}>
-                  <button
+                  <button type="button"
                     className={`${styles.selectorBtn} ${tipoDivisor === 'tension' ? styles.selectorActivo : ''}`}
                     onClick={() => setTipoDivisor('tension')}
                   >
                     Tensión
                   </button>
-                  <button
+                  <button type="button"
                     className={`${styles.selectorBtn} ${tipoDivisor === 'corriente' ? styles.selectorActivo : ''}`}
                     onClick={() => setTipoDivisor('corriente')}
                   >
@@ -669,19 +669,19 @@ export default function CalculadoraElectricidadPage() {
                 </div>
                 <div className={styles.ejemplosBox}>
                   <p><strong>Ejemplos:</strong></p>
-                  <button
+                  <button type="button"
                     className={styles.ejemploBtn}
                     onClick={() => setConfiguracionMixta('serie(100, paralelo(200, 300))')}
                   >
                     R1 en serie con (R2 || R3)
                   </button>
-                  <button
+                  <button type="button"
                     className={styles.ejemploBtn}
                     onClick={() => setConfiguracionMixta('paralelo(100, serie(200, 300))')}
                   >
                     R1 en paralelo con (R2 + R3)
                   </button>
-                  <button
+                  <button type="button"
                     className={styles.ejemploBtn}
                     onClick={() => setConfiguracionMixta('serie(100, paralelo(200, serie(300, 400)), 500)')}
                   >
@@ -695,13 +695,13 @@ export default function CalculadoraElectricidadPage() {
               <>
                 <h3 className={styles.sectionTitle}>Tipo de Circuito</h3>
                 <div className={styles.selectorGrid}>
-                  <button
+                  <button type="button"
                     className={`${styles.selectorBtn} ${tipoRCRL === 'rc' ? styles.selectorActivo : ''}`}
                     onClick={() => setTipoRCRL('rc')}
                   >
                     RC (Capacitor)
                   </button>
-                  <button
+                  <button type="button"
                     className={`${styles.selectorBtn} ${tipoRCRL === 'rl' ? styles.selectorActivo : ''}`}
                     onClick={() => setTipoRCRL('rl')}
                   >
@@ -1489,7 +1489,7 @@ export default function CalculadoraElectricidadPage() {
         {/* Sección 6: Warning Box */}
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
-            <h3 className={styles.warningTitle}>⚠️ Errores eléctricos con consecuencias graves</h3>
+            <h3 className={styles.warningTitle}><span aria-hidden="true">⚠️</span> Errores eléctricos con consecuencias graves</h3>
             <ul className={styles.warningList}>
               <li>
                 <strong>Sobrecargar un circuito:</strong> Superar la corriente nominal del cable causa

@@ -288,9 +288,9 @@ export default function RequisitosNomadaDigitalPage() {
             {ingresos !== '' && (
               <div className={`${styles.ingresosBanner} ${ingresosOk ? styles.bannerOk : styles.bannerError}`}>
                 {ingresosOk ? (
-                  <>✅ Ingresos suficientes — {formatCurrency(ingresosNum)}/mes ≥ mínimo de {formatCurrency(minimoRequerido)}/mes</>
+                  <><span aria-hidden="true">✅</span> Ingresos suficientes — {formatCurrency(ingresosNum)}/mes ≥ mínimo de {formatCurrency(minimoRequerido)}/mes</>
                 ) : (
-                  <>❌ Ingresos insuficientes — {formatCurrency(ingresosNum)}/mes &lt; mínimo de {formatCurrency(minimoRequerido)}/mes</>
+                  <><span aria-hidden="true">❌</span> Ingresos insuficientes — {formatCurrency(ingresosNum)}/mes &lt; mínimo de {formatCurrency(minimoRequerido)}/mes</>
                 )}
               </div>
             )}
