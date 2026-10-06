@@ -209,11 +209,40 @@ function normalizarTexto(texto: string): string {
  *
  * Se repara en el ÍNDICE y no en la consulta: así cubre de una vez los cien términos del
  * catálogo sellado y los que se añadan después, sin tocar `data/cnae-sinonimos.json`, que es un
- * fichero curado a mano. Solo se derivan términos de UNA palabra, para no inventar formas
- * dentro de expresiones como «bodega de uva».
+ * fichero curado a mano.
+ *
+ * ⚠️ 06/10/2026 — al principio solo se derivaban términos de UNA palabra, «para no inventar
+ * formas dentro de expresiones como “bodega de uva”». Desde que el 2226 acotó la derivación a
+ * los OFICIOS, esa razón ya no alcanza a las expresiones que EMPIEZAN por un oficio, y el
+ * diccionario tiene 44: «diseñador gráfico» daba 74.12 y «diseñadora gráfica», cero (hallazgo
+ * 2926). Ahora una expresión cambia de género si su primera palabra es un oficio; con ella
+ * cambian los adjetivos que la siguen hasta la primera palabra de enlace («de», «en»…), y solo
+ * los que terminan en -o/-a (gráfico, jurado); «fiscal» o «ambulante» se quedan como están.
+ * «bodega de uva» sigue fuera: «bodega» no es un oficio.
  */
+const NEXOS = new Set(['de', 'del', 'a', 'al', 'en', 'para', 'con', 'y', 'e', 'o', 'u', 'por', 'sin']);
+
 function otroGenero(termino: string): string | null {
-  if (termino.includes(' ')) return null;
+  if (!termino.includes(' ')) return otroGeneroPalabra(termino);
+  const palabras = termino.split(' ');
+  const primera = otroGeneroPalabra(palabras[0]);
+  if (primera === null) return null;
+  const aFemenino = /(?:or|o)$/.test(palabras[0]);
+  let enlazado = false;
+  const resto = palabras.slice(1).map((palabra) => {
+    if (enlazado || NEXOS.has(palabra)) {
+      enlazado = true;
+      return palabra;
+    }
+    if (aFemenino && palabra.endsWith('o')) return `${palabra.slice(0, -1)}a`;
+    if (!aFemenino && palabra.endsWith('a')) return `${palabra.slice(0, -1)}o`;
+    return palabra;
+  });
+  return [primera, ...resto].join(' ');
+}
+
+/** La otra forma de género de UNA palabra de oficio, o null. */
+function otroGeneroPalabra(termino: string): string | null {
   if (!esOficio(termino)) return null;
   // -ora → -or: programadora, traductora, escritora, auditora, repartidora…
   if (termino.endsWith('ora')) return `${termino.slice(0, -3)}or`;

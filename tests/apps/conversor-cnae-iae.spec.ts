@@ -3345,12 +3345,15 @@ test.describe('Buscador CNAE-IAE — re-inspección del 06/10/2026', () => {
     }
 
     // «ñ» + mayúsculas + femenino de una palabra: «diseñadora» es sinónimo literal de 74.12, y
-    // la normalización quita la virgulilla en los dos lados («disenadora»). 1 resultado. El
-    // masculino «diseñador» está en DOS clases: «diseñador de producto» (74.11) y la forma
-    // derivada de «diseñadora» (74.12).
+    // la normalización quita la virgulilla en los dos lados («disenadora»). El masculino
+    // «diseñador» está en DOS clases: «diseñador de producto» (74.11) y la forma derivada de
+    // «diseñadora» (74.12). Hasta el 06/10/2026 el femenino daba 1 (solo 74.12), porque
+    // «diseñadora de producto» no se derivaba; desde el hallazgo 2926 da los mismos 2 que el
+    // masculino, que es lo que pide «el femenino encuentra lo mismo que el masculino».
     await buscarCnaeVerificado(page, 'DISEÑADORA');
-    await expect(contador(page)).toHaveText(/^1 resultado/);
-    await expect(fichas(page).first()).toContainText('74.12');
+    await expect(contador(page)).toHaveText(/^2 resultados/);
+    await expect(fichas(page).filter({ hasText: '74.12' }).first()).toBeVisible();
+    await expect(fichas(page).filter({ hasText: '74.11' }).first()).toBeVisible();
     await buscarCnaeVerificado(page, 'diseñador');
     await expect(contador(page)).toHaveText(/^2 resultados/);
     await expect(fichas(page).nth(0)).toContainText('74.11');
@@ -3497,10 +3500,12 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 06/10/2026', () => {
     await expect(fichas(page).first()).toContainText('673.2');
   });
 
-  test('ABIERTO · BAJO (operativa) — el femenino de un oficio de VARIAS palabras encuentra la misma clase que el masculino', async ({
+  test('REPARADO · BAJO (operativa) — el femenino de un oficio de VARIAS palabras encuentra la misma clase que el masculino', async ({
     page,
   }) => {
-    test.fail();
+    // REPARADO el 06/10/2026 (hallazgo 2926): otroGenero deriva también las expresiones que
+    // empiezan por un oficio, con los adjetivos en -o/-a que lo siguen hasta la primera palabra
+    // de enlace.
     // La reparación del 1188 deriva el otro género solo de los sinónimos de UNA palabra («para
     // no inventar formas dentro de expresiones como «bodega de uva»»), y la del 2226 lo acotó
     // después a los oficios. Con esa acotación, el motivo para excluir las expresiones ya no
@@ -3521,5 +3526,8 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 06/10/2026', () => {
       await buscarCnaeVerificado(page, femenino);
       await expect(fichas(page).filter({ hasText: clase }).first()).toBeVisible({ timeout: 2000 });
     }
+    // Control del 2226: una expresión que no empieza por un oficio no inventa formas
+    await buscarCnaeVerificado(page, 'bodego de uvo');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
   });
 });
