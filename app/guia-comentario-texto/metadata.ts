@@ -39,7 +39,7 @@ export const jsonLd = generateWebAppSchema({
     'Guía específica para comentar textos en prosa narrativa',
     'Vocabulario técnico organizado por categoría (métrica, figuras, narratología)',
     'Plantillas de frases listas para cada sección del comentario',
-    'Errores frecuentes en exámenes de selectividad EBAU/PAES',
+    'Errores frecuentes que restan puntos en los exámenes de comentario',
     'Adaptado al currículo de Bachillerato y acceso universitario en España y Latinoamérica',
   ],
 });
@@ -53,7 +53,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son los pasos para hacer un comentario de texto literario?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un comentario de texto literario sigue generalmente 7 pasos: lectura comprensiva, localización y contexto, determinación del tema, análisis de la estructura, estudio de la forma y recursos estilísticos, valoración crítica personal y conclusión. Completar cada fase de forma ordenada garantiza un análisis coherente y completo.',
+        text: 'Un comentario de texto literario sigue generalmente 7 pasos: lectura atenta, localización (autor, obra y movimiento), tema, estructura externa e interna, análisis métrico en poesía o narrativo en prosa (narrador, tiempo y espacio), recursos estilísticos con su cita y su efecto, y conclusión con valoración personal argumentada. Completar cada fase de forma ordenada garantiza un análisis coherente y completo.',
       },
     },
     {

@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useState, type KeyboardEvent } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaComentarioTexto.module.css';
@@ -154,15 +154,53 @@ const PLANTILLAS: Plantilla[] = [
   },
 ];
 
+// ─────────────────────────────────────────────
+// Datos: Rima IV de Bécquer, completa (Wikisource, «Rimas (Bécquer, 1885)/Rima IV»,
+// con la acentuación actual). Nueve estrofas de cuatro versos.
+// ─────────────────────────────────────────────
+const RIMA_IV: string[][] = [
+  ['No digáis que, agotado su tesoro,', 'de asuntos falta, enmudeció la lira:', 'podrá no haber poetas; pero siempre', 'habrá poesía.'],
+  ['Mientras las ondas de la luz al beso', 'palpiten encendidas;', 'mientras el sol las desgarradas nubes', 'de fuego y oro vista;'],
+  ['mientras el aire en su regazo lleve', 'perfumes y armonías;', 'mientras haya en el mundo primavera,', '¡habrá poesía!'],
+  ['Mientras la ciencia a descubrir no alcance', 'las fuentes de la vida,', 'y en el mar o en el cielo haya un abismo', 'que al cálculo resista;'],
+  ['mientras la humanidad siempre avanzando', 'no sepa a do camina;', 'mientras haya un misterio para el hombre,', '¡habrá poesía!'],
+  ['Mientras sintamos que se alegra el alma', 'sin que los labios rían;', 'mientras se llore sin que el llanto acuda', 'a nublar la pupila;'],
+  ['mientras el corazón y la cabeza', 'batallando prosigan;', 'mientras haya esperanzas y recuerdos,', '¡habrá poesía!'],
+  ['Mientras haya unos ojos que reflejen', 'los ojos que los miran;', 'mientras responda el labio suspirando', 'al labio que suspira;'],
+  ['mientras sentirse puedan en un beso', 'dos almas confundidas;', 'mientras exista una mujer hermosa,', '¡habrá poesía!'],
+];
+
 export default function GuiaComentarioTextoPage() {
   const [tab, setTab] = useState<TabId>('metodologia');
   const [copiado, setCopiado] = useState<string | null>(null);
 
-  const copiar = (texto: string, id: string) => {
-    navigator.clipboard.writeText(texto).then(() => {
-      setCopiado(id);
-      setTimeout(() => setCopiado(null), 1800);
-    });
+  const [avisoCopia, setAvisoCopia] = useState('');
+
+  const copiar = (texto: string, id: string, rotulo: string) => {
+    navigator.clipboard.writeText(texto).then(
+      () => {
+        setCopiado(id);
+        setAvisoCopia(`${rotulo} copiada`);
+        setTimeout(() => {
+          setCopiado(null);
+          setAvisoCopia('');
+        }, 1800);
+      },
+      () => setAvisoCopia('No se ha podido copiar: selecciona el texto y cópialo a mano'),
+    );
+  };
+
+  // Patrón de pestañas de WAI-ARIA APG: flechas, Inicio y Fin mueven el foco y activan la pestaña
+  const moverConTeclado = (e: KeyboardEvent<HTMLButtonElement>, i: number) => {
+    let destino: number;
+    if (e.key === 'ArrowRight') destino = (i + 1) % TABS.length;
+    else if (e.key === 'ArrowLeft') destino = (i - 1 + TABS.length) % TABS.length;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = TABS.length - 1;
+    else return;
+    e.preventDefault();
+    setTab(TABS[destino].id);
+    document.getElementById(`tab-${TABS[destino].id}`)?.focus();
   };
 
   return (
@@ -173,29 +211,40 @@ export default function GuiaComentarioTextoPage() {
         <h1 className={styles.heroTitle}>Comentario de Texto Literario</h1>
         <p className={styles.heroSubtitle}>
           Metodología completa, ejemplos trabajados y plantillas listas
-          para el análisis de poesía y prosa · Bachillerato y Selectividad
+          para el análisis de poesía y prosa · secundaria y examen de acceso a la universidad
         </p>
       </header>
 
       <LegalNotice />
 
       <nav className={styles.tabsNav} role="tablist" aria-label="Secciones de la guía">
-        {TABS.map((t) => (
+        {TABS.map((t, i) => (
           <button
             key={t.id}
+            id={`tab-${t.id}`}
             type="button"
             className={`${styles.tabBtn} ${tab === t.id ? styles.tabBtnActive : ''}`}
             onClick={() => setTab(t.id)}
+            onKeyDown={(e) => moverConTeclado(e, i)}
             role="tab"
             aria-selected={tab === t.id}
+            aria-controls="panel-guia"
+            tabIndex={tab === t.id ? 0 : -1}
           >
             <span aria-hidden="true">{t.icono}</span>
+            {/* En móvil el rótulo se oculta solo a la vista: es el nombre accesible de la pestaña */}
             <span className={styles.tabNombre}>{t.titulo}</span>
           </button>
         ))}
       </nav>
 
-      <div className={styles.tabContent} role="tabpanel">
+      <div
+        className={styles.tabContent}
+        role="tabpanel"
+        id="panel-guia"
+        aria-labelledby={`tab-${tab}`}
+        tabIndex={0}
+      >
 
         {/* ── TAB 1: METODOLOGÍA ── */}
         {tab === 'metodologia' && (
@@ -288,7 +337,7 @@ export default function GuiaComentarioTextoPage() {
                 <div className={styles.pasoBody}>
                   <h3 className={styles.pasoNombre}>Conclusión y valoración personal</h3>
                   <p className={styles.pasoDesc}>
-                    Cierra el comentario sintetizando los aspectos más destacados y añadiendo una valoración personal razonada. En selectividad, la valoración personal suma en la calificación si está argumentada. Evita juicios vacíos («es un poema muy bonito»).
+                    Cierra el comentario sintetizando los aspectos más destacados y añadiendo una valoración personal razonada. En los exámenes que la piden, la valoración personal suma en la calificación si está argumentada. Evita juicios vacíos («es un poema muy bonito»).
                   </p>
                   <div className={styles.pasoEjemplo}>
                     <strong>Incluye:</strong> síntesis del tema + recursos principales + valoración personal con argumento + posible vigencia actual del texto.
@@ -311,28 +360,21 @@ export default function GuiaComentarioTextoPage() {
         {tab === 'poesia' && (
           <div className={styles.seccion}>
             <p className={styles.seccionIntro}>
-              El comentario de un poema añade al esquema general el análisis métrico completo. A continuación se desarrolla cada sección y se aplica a un ejemplo real: la Rima IV de Gustavo Adolfo Bécquer.
+              El comentario de un poema añade al esquema general el análisis métrico completo. A continuación se desarrolla cada sección y se aplica a un ejemplo real: la Rima IV de Gustavo Adolfo Bécquer, completa.
             </p>
 
-            {/* Poema de ejemplo */}
+            {/* Poema de ejemplo: texto completo, 36 versos en nueve estrofas (Wikisource, ed. 1885) */}
             <div className={styles.poemaBox}>
               <div className={styles.poemaVersos}>
-                <p>No digáis que, agotado su tesoro,</p>
-                <p>de asuntos falta, enmudeció la lira:</p>
-                <p>podrá no haber poetas; pero siempre</p>
-                <p>habrá poesía.</p>
-                <p>&nbsp;</p>
-                <p>Mientras las ondas de la luz al beso</p>
-                <p>palpiten encendidas,</p>
-                <p>mientras el sol las desgarradas nubes</p>
-                <p>de fuego y oro vista,</p>
-                <p>&nbsp;</p>
-                <p>mientras el aire en su regazo lleve</p>
-                <p>perfumes y armonías,</p>
-                <p>mientras haya en el mundo primavera,</p>
-                <p>¡habrá poesía!</p>
+                {RIMA_IV.map((estrofa, e) => (
+                  <div key={e} className={styles.poemaEstrofa}>
+                    {estrofa.map((verso) => (
+                      <p key={verso}>{verso}</p>
+                    ))}
+                  </div>
+                ))}
               </div>
-              <span className={styles.poemaAtrib}>Gustavo Adolfo Bécquer · <cite>Rima IV</cite></span>
+              <span className={styles.poemaAtrib}>Gustavo Adolfo Bécquer · <cite>Rima IV</cite> (texto completo)</span>
             </div>
 
             {/* Análisis paso a paso */}
@@ -349,7 +391,7 @@ export default function GuiaComentarioTextoPage() {
                 <h3 className={styles.analisisTitulo}><span aria-hidden="true">🎯</span> 2. Tema</h3>
                 <div className={styles.analisisContenido}>
                   <p><strong>Tema central:</strong> la eternidad de la poesía como esencia del mundo, independiente de la existencia de poetas.</p>
-                  <p><strong>Temas secundarios:</strong> la naturaleza como fuente de belleza permanente; la distinción entre el poeta (contingente) y la poesía (eterna).</p>
+                  <p><strong>Temas secundarios:</strong> la naturaleza, el misterio, los sentimientos y el amor como fuentes permanentes de poesía; la distinción entre el poeta (contingente) y la poesía (eterna).</p>
                   <div className={styles.analisisNota}>El tema se formula en dos afirmaciones antitéticas: «podrá no haber poetas» (lo contingente) / «pero siempre habrá poesía» (lo eterno). Esta tensión estructura el poema.</div>
                 </div>
               </div>
@@ -357,20 +399,23 @@ export default function GuiaComentarioTextoPage() {
               <div className={styles.analisisBloque}>
                 <h3 className={styles.analisisTitulo}><span aria-hidden="true">🏗️</span> 3. Estructura</h3>
                 <div className={styles.analisisContenido}>
-                  <p><strong>Estructura externa:</strong> tres estrofas de 4 versos cada una (4+4+4), con alternancia de versos largos y cortos.</p>
-                  <p><strong>Estructura interna:</strong> dos partes lógicas:</p>
+                  <p><strong>Estructura externa:</strong> 36 versos repartidos en nueve estrofas de 4 versos, con alternancia de versos largos y cortos. El estribillo «habrá poesía» cierra la primera estrofa y, después, cada pareja de estrofas (vv. 4, 12, 20, 28 y 36).</p>
+                  <p><strong>Estructura interna:</strong> una tesis y cuatro argumentos, cada uno de dos estrofas y rematado por el estribillo:</p>
                   <ul className={styles.analisisLista}>
-                    <li><strong>Primera estrofa (tesis):</strong> afirmación directa del tema — la poesía es eterna aunque no haya poetas que la creen.</li>
-                    <li><strong>Segunda y tercera estrofa (argumentación):</strong> serie de imágenes naturales que demuestran la permanencia de la poesía en el mundo.</li>
+                    <li><strong>Estrofa 1 (vv. 1-4, tesis):</strong> la poesía es eterna aunque no haya poetas que la escriban.</li>
+                    <li><strong>Estrofas 2-3 (vv. 5-12):</strong> la naturaleza — la luz, el sol, el aire, la primavera.</li>
+                    <li><strong>Estrofas 4-5 (vv. 13-20):</strong> el misterio — lo que la ciencia no alcanza a descubrir.</li>
+                    <li><strong>Estrofas 6-7 (vv. 21-28):</strong> los sentimientos — la alegría, el llanto, la lucha entre corazón y cabeza.</li>
+                    <li><strong>Estrofas 8-9 (vv. 29-36):</strong> el amor.</li>
                   </ul>
-                  <p>La estructura sigue el esquema <strong>tesis + desarrollo acumulativo</strong>, reforzado por la anáfora.</p>
+                  <p>La estructura sigue el esquema <strong>tesis + desarrollo acumulativo</strong>, reforzado por la anáfora: cada argumento amplía el anterior, de lo exterior (la naturaleza) a lo más íntimo (el amor).</p>
                 </div>
               </div>
 
               <div className={styles.analisisBloque}>
                 <h3 className={styles.analisisTitulo}><span aria-hidden="true">📏</span> 4. Análisis métrico</h3>
                 <div className={styles.analisisContenido}>
-                  <p><strong>Tipo de verso:</strong> combinación de endecasílabos (11 sílabas) y heptasílabos (7 sílabas). Esta mezcla libre se asemeja a la <strong>silva</strong>.</p>
+                  <p><strong>Tipo de verso:</strong> endecasílabos (11 sílabas) en los impares y heptasílabos (7 sílabas) en los pares, salvo el estribillo, más corto. Esta combinación de endecasílabos y heptasílabos se asemeja a la <strong>silva</strong>.</p>
                   <p><strong>Rima:</strong> asonante en i-a en los versos pares. Los versos impares quedan libres.</p>
                   <div className={styles.metricaEjemplo}>
                     <div className={styles.metricaFila}>
@@ -378,11 +423,16 @@ export default function GuiaComentarioTextoPage() {
                       <span className={styles.metricaSilabas}>11 sílabas · sin rima</span>
                     </div>
                     <div className={styles.metricaFila}>
+                      <code className={styles.metricaVerso}>«palpiten encendidas»</code>
+                      <span className={styles.metricaSilabas}>7 sílabas · rima en -ida (asonante i-a)</span>
+                    </div>
+                    <div className={styles.metricaFila}>
                       <code className={styles.metricaVerso}>«habrá poesía»</code>
-                      <span className={styles.metricaSilabas}>6+1=7 sílabas · rima en -ía (asonante i-a)</span>
+                      <span className={styles.metricaSilabas}>ha-brá-po-e-sí-a: 6 sílabas (5 con sinéresis en «poe-») · rima en -ía (asonante i-a)</span>
                     </div>
                   </div>
-                  <p>El contraste entre los versos largos (endecasílabos) y los cortos (heptasílabos) al final de cada estrofa produce un efecto de <strong>conclusión rotunda</strong>: la sentencia breve cierra cada argumento.</p>
+                  <p>«poesía» es palabra <strong>llana</strong> (po-e-SÍ-a): con final llano no se suma ni se resta ninguna sílaba. Solo se suma una cuando el verso acaba en palabra aguda, y se resta una cuando acaba en esdrújula.</p>
+                  <p>El contraste entre los versos largos (endecasílabos) y el estribillo breve produce un efecto de <strong>conclusión rotunda</strong>: la sentencia corta cierra cada argumento.</p>
                 </div>
               </div>
 
@@ -391,7 +441,7 @@ export default function GuiaComentarioTextoPage() {
                 <div className={styles.analisisContenido}>
                   <div className={styles.recursoItem}>
                     <strong>Anáfora</strong>
-                    <p>«mientras» (vv. 5, 7, 9, 11). La repetición al inicio de los versos crea un ritmo acumulativo e hipnótico. Cada «mientras» añade un nuevo argumento a la permanencia de la poesía, produciendo el efecto de una letanía o un canto.</p>
+                    <p>«mientras» abre casi todos los versos impares desde el v. 5 hasta el 35. La repetición al inicio de los versos crea un ritmo acumulativo e hipnótico. Cada «mientras» añade un nuevo argumento a la permanencia de la poesía, produciendo el efecto de una letanía o un canto.</p>
                   </div>
                   <div className={styles.recursoItem}>
                     <strong>Antítesis</strong>
@@ -566,8 +616,12 @@ export default function GuiaComentarioTextoPage() {
                         <button
                           type="button"
                           className={`${styles.copyBtn} ${copiado === `${p.seccion}-${i}` ? styles.copyBtnOk : ''}`}
-                          onClick={() => copiar(frase, `${p.seccion}-${i}`)}
-                          aria-label={`Copiar frase de ${p.seccion}`}
+                          onClick={() => copiar(frase, `${p.seccion}-${i}`, `Frase ${i + 1} de ${p.seccion}`)}
+                          aria-label={
+                            copiado === `${p.seccion}-${i}`
+                              ? `Frase ${i + 1} de ${p.seccion} copiada`
+                              : `Copiar frase ${i + 1} de ${p.seccion}`
+                          }
                         >
                           {copiado === `${p.seccion}-${i}` ? '✓ Copiado' : 'Copiar'}
                         </button>
@@ -580,6 +634,8 @@ export default function GuiaComentarioTextoPage() {
           </div>
         )}
       </div>
+
+      <p className="sr-only" role="status" aria-live="polite">{avisoCopia}</p>
 
       <EducationalSection
         title="El comentario de texto en contexto académico"
@@ -606,8 +662,8 @@ export default function GuiaComentarioTextoPage() {
 
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong><span aria-hidden="true">🎓</span> Estudiante de 2.º Bachillerato</strong>
-            <p>El comentario de texto es obligatorio en la EBAU/PAES de Lengua Castellana. Puede suponer hasta 4 puntos sobre 10. Practicar con textos reales de exámenes anteriores es la mejor preparación. Usa la pestaña de Plantillas para acelerar la redacción en el examen.</p>
+            <strong><span aria-hidden="true">🎓</span> Estudiante del último curso de secundaria</strong>
+            <p>En España el comentario de texto forma parte de la prueba de Lengua Castellana y Literatura del acceso a la universidad (PAU, antes EBAU o EvAU), con un peso que fija cada comunidad. En otros países el examen de admisión mide la comprensión lectora con preguntas de opción múltiple —la PAES chilena, por ejemplo— y el comentario se trabaja en clase. Donde se examina, practicar con textos de exámenes anteriores es la mejor preparación; la pestaña de Plantillas acelera la redacción.</p>
           </div>
           <div className={styles.escenarioCard}>
             <strong><span aria-hidden="true">📚</span> Estudiante de Filología o Humanidades</strong>
@@ -634,7 +690,7 @@ export default function GuiaComentarioTextoPage() {
           </li>
           <li className={styles.faqItem}>
             <strong>¿La valoración personal es obligatoria?</strong>
-            <p>Depende de la prueba. En muchas CCAA la valoración personal es una sección puntuada (0,5-1 punto). Si es opcional, inclúyela igualmente: es la parte más fácil de escribir con fluidez y puede compensar errores técnicos. Solo exige que sea argumentada, no que sea «correcta».</p>
+            <p>Depende de la prueba. En muchos exámenes la valoración personal es una sección puntuada. Si es opcional, inclúyela igualmente: es la parte más fácil de escribir con fluidez y puede compensar errores técnicos. Solo exige que sea argumentada, no que sea «correcta».</p>
             <div className={styles.faqTip}>Evita valoraciones vacías: «es un poema muy bonito». Di qué produce en ti y por qué un recurso concreto lo genera. Eso sí es valoración razonada.</div>
           </li>
           <li className={styles.faqItem}>
@@ -652,7 +708,7 @@ export default function GuiaComentarioTextoPage() {
             <span className={styles.stepNumber}>1</span>
             <div className={styles.stepContent}>
               <strong>Practica con exámenes reales anteriores</strong>
-              <p>Los textos de exámenes EBAU/PAES se publican en las webs de las universidades. Practica con textos de los últimos 5 años de tu comunidad autónoma: los patrones de selección de textos son previsibles (Generación del 27, Romanticismo, Modernismo, Realismo).</p>
+              <p>Muchas universidades y organismos de admisión publican los exámenes de años anteriores. Practica con los de tu región o tu universidad: los autores y movimientos que se repiten (Romanticismo, Modernismo, Realismo, vanguardias) marcan lo que conviene dominar.</p>
             </div>
           </li>
           <li className={styles.step}>

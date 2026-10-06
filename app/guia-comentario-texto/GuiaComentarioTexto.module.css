@@ -58,13 +58,21 @@
 .tabBtn:hover {
   background: rgba(46, 134, 171, 0.08);
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
+}
+
+.tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* La pestaña activa no cambia de color al pasar el ratón: sigue siendo blanco sobre marca */
+.tabBtnActive:hover {
+  background: var(--primary-boton);
+  color: #fff;
 }
 
 .tabBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
   font-weight: 600;
 }
 
@@ -106,7 +114,7 @@
   flex-shrink: 0;
   width: 2.4rem;
   height: 2.4rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -122,7 +130,7 @@
 .pasoNombre {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -158,7 +166,7 @@
 
 .destacadoBox strong {
   display: block;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   margin-bottom: 0.4rem;
 }
@@ -183,6 +191,8 @@
   flex-direction: column;
   gap: 0;
 }
+
+.poemaEstrofa + .poemaEstrofa { margin-top: 0.9rem; }
 
 .poemaVersos p {
   font-size: 0.95rem;
@@ -220,7 +230,7 @@
   font-size: 1rem;
   font-weight: 700;
   color: #fff;
-  background: var(--primary);
+  background: var(--primary-boton);
   padding: 0.7rem 1.2rem;
   margin: 0;
 }
@@ -288,7 +298,7 @@
 
 .metricaSilabas {
   font-size: 0.78rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 600;
 }
 
@@ -301,7 +311,7 @@
 .recursoItem strong {
   display: block;
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.25rem;
 }
 
@@ -325,7 +335,7 @@
 .prosaTitulo {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid rgba(46, 134, 171, 0.12);
@@ -391,7 +401,7 @@
 
 .recursoProsa strong {
   display: block;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   margin-bottom: 0.3rem;
 }
@@ -420,7 +430,7 @@
   font-size: 0.95rem;
   font-weight: 700;
   color: #fff;
-  background: var(--primary);
+  background: var(--primary-boton);
   padding: 0.65rem 1.2rem;
   margin: 0;
 }
@@ -442,7 +452,7 @@
 
 .vocTermino {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.88rem;
 }
 
@@ -469,7 +479,7 @@
   font-size: 0.95rem;
   font-weight: 700;
   color: #fff;
-  background: var(--secondary);
+  background: var(--secondary-boton);
   padding: 0.65rem 1.2rem;
   margin: 0;
 }
@@ -504,7 +514,7 @@
   border: 1px solid rgba(46, 134, 171, 0.3);
   border-radius: 6px;
   font-size: 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
   white-space: nowrap;
@@ -512,15 +522,15 @@
 }
 
 .copyBtn:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .copyBtnOk {
-  background: var(--secondary) !important;
+  background: var(--secondary-boton) !important;
   color: #fff !important;
-  border-color: var(--secondary) !important;
+  border-color: var(--secondary-boton) !important;
 }
 
 /* ══════════════════════════════════════
@@ -601,7 +611,7 @@
 
 .faqItem strong {
   display: block;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.92rem;
   margin-bottom: 0.4rem;
 }
@@ -639,7 +649,7 @@
   flex-shrink: 0;
   width: 2rem;
   height: 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -766,6 +776,12 @@
   background: rgba(46, 134, 171, 0.15);
 }
 
+[data-theme='dark'] .tabBtnActive,
+[data-theme='dark'] .tabBtnActive:hover {
+  background: var(--primary-boton);
+  color: #fff;
+}
+
 [data-theme='dark'] .prosaCard {
   background: rgba(46, 134, 171, 0.06);
   border-color: rgba(127, 179, 211, 0.12);
@@ -801,7 +817,17 @@
 ══════════════════════════════════════ */
 
 @media (max-width: 768px) {
-  .tabNombre { display: none; }
+  .tabNombre {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
   .tabBtn { padding: 0.55rem 0.8rem; }
 
   .pasoItem { flex-direction: column; gap: 0.7rem; }
@@ -824,4 +850,14 @@
 @media (max-width: 480px) {
   .tipsGrid { grid-template-columns: 1fr; }
   .metricaFila { flex-direction: column; gap: 0.2rem; }
+}
+
+/* 80px arriba hasta 1023px: la barra fija de MeskeiaLogo (~52px en móvil, ~77px desde 769px,
+   cuando el logo pasa a su tamaño de escritorio) tapaba el principio del título en tableta.
+   Desde 1024px el título centrado ya no llega al logo. Mismo hueco que deja la plantilla. Va al
+   final para ganar a cualquier padding previo del hero. */
+@media (max-width: 1023px) {
+  .hero {
+    padding-top: 80px;
+  }
 }

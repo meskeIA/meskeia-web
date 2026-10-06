@@ -107,7 +107,7 @@ async function pasarAOscuro(page: Page): Promise<void> {
 // ─────────────────────────────────────────────────────────────────────────────
 test.describe('CASO 1 — título tapado por la barra del logo', () => {
   /**
-   * ABIERTO (hallazgo del Inspector del 06/10/2026: título tapado de 769 a 926 px).
+   * REPARADO el 06/10/2026 (hallazgo del Inspector del 06/10/2026: título tapado de 769 a 926 px).
    * Esperado, del CSS: >= 769 px la barra llega a y = 77 y el texto del h1 empieza en y = 53-56,
    * así que hay solape vertical; el horizontal depende del ancho del título centrado, que crece
    * con 4vw: a 800 px (letra de 32 px) empieza en x = 175 y la píldora acaba en x = 203.
@@ -116,7 +116,6 @@ test.describe('CASO 1 — título tapado por la barra del logo', () => {
    * Obtenido el 06/10: 769 «Co» · 800 «Co» · 834 «C» · 900 «C» · 926 «C».
    */
   test('de 769 a 926 px ninguna pieza de la barra pisa las letras del h1', async ({ page }) => {
-    test.fail(); // ABIERTO (hallazgo del 06/10/2026, título tapado en tableta vertical)
     await abrir(page, 800, 1112);
     const tapados: string[] = [];
     for (const ancho of [769, 800, 834, 900, 926]) {
@@ -193,69 +192,77 @@ test.describe('CASO 2 — uso normal en escritorio (1280 px)', () => {
   });
 
   /**
-   * Control del ejemplo trabajado: la pestaña Poesía muestra los 12 primeros versos de la
-   * Rima IV y la anáfora «mientras» en los vv. 5, 7, 9 y 11, que sí cuadra con esos versos.
+   * Control del ejemplo trabajado. Hasta el 06/10/2026 la pestaña enseñaba los 12 primeros
+   * versos como si fueran el poema; desde la reparación publica la Rima IV entera (Wikisource,
+   * «Rimas (Bécquer, 1885)/Rima IV»): 36 versos, «¡habrá poesía!» en 12, 20, 28 y 36 (y sin
+   * exclamación en el 4), y «mientras» abriendo los impares del 5 al 35 salvo el 15 («y en el
+   * mar o en el cielo haya un abismo»).
    */
-  test('Poesía: 12 versos de la Rima IV y anáfora de «mientras» en 5, 7, 9 y 11', async ({ page }) => {
+  test('Poesía: los 36 versos de la Rima IV, estribillo y anáfora de «mientras»', async ({ page }) => {
     await abrir(page, 1280, 900);
     await page.getByRole('tab', { name: 'Poesía' }).click();
     const versos = await page
       .locator('[class*="poemaVersos"] p')
       .evaluateAll((ps) => ps.map((p) => (p.textContent ?? '').replace(/ /g, '').trim()).filter(Boolean));
-    expect(versos).toHaveLength(12);
+    expect(versos).toHaveLength(36);
     const conMientras = versos
       .map((v, i) => (/^mientras/i.test(v) ? i + 1 : 0))
       .filter((n) => n > 0);
-    expect(conMientras).toEqual([5, 7, 9, 11]);
+    expect(conMientras).toEqual([5, 7, 9, 11, 13, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35]);
+    const estribillo = versos
+      .map((v, i) => (/^¡?habrá poesía/i.test(v) ? i + 1 : 0))
+      .filter((n) => n > 0);
+    expect(estribillo).toEqual([4, 12, 20, 28, 36]);
   });
 
   /**
-   * ABIERTO (hallazgo del 06/10/2026, contenido: «habrá poesía» no es 6+1).
+   * REPARADO el 06/10/2026 (hallazgo del 06/10/2026, contenido: «habrá poesía» no es 6+1).
    * ha-brá-po-e-sí-a = 6 sílabas fonológicas (5 con sinéresis po-e). «poesía» es LLANA
    * (po-e-SÍ-a), y la ley del acento final solo suma una sílaba si el verso acaba en aguda
    * (es.wikipedia «Métrica», sección del cómputo silábico): llana, ni se suma ni se resta.
    * Esperado: 6 (o 5); la app dice «6+1=7 sílabas» y lo cuenta como heptasílabo.
    */
   test('la métrica de «habrá poesía» no suma la sílaba de la palabra aguda', async ({ page }) => {
-    test.fail(); // ABIERTO (hallazgo del 06/10/2026, cómputo de «habrá poesía»)
     await abrir(page, 1280, 900);
     await page.getByRole('tab', { name: 'Poesía' }).click();
     const fila = page.locator('[class*="metricaFila"]').filter({ hasText: '«habrá poesía»' });
     await expect(fila).toHaveCount(1);
     await expect(fila).not.toContainText('6+1=7');
+    await expect(fila).toContainText('6 sílabas');
   });
 
   /**
-   * ABIERTO (hallazgo del 06/10/2026, contenido: la Rima IV tiene 36 versos).
+   * REPARADO el 06/10/2026 (hallazgo del 06/10/2026, contenido: la Rima IV tiene 36 versos).
    * Wikisource, «Rimas (Bécquer, 1885)/Rima IV» y «Rimas (Bécquer, 1925)/Rima 4»: nueve
    * cuartetas, 36 versos, con «¡Habrá poesía!» cerrando los vv. 12, 20, 28 y 36. La app enseña
    * los 12 primeros sin decir que es un fragmento y afirma que la estructura externa es «tres
    * estrofas de 4 versos cada una (4+4+4)».
    */
   test('la estructura externa no presenta 12 de 36 versos como el poema entero', async ({ page }) => {
-    test.fail(); // ABIERTO (hallazgo del 06/10/2026, estructura externa de la Rima IV)
     await abrir(page, 1280, 900);
     await page.getByRole('tab', { name: 'Poesía' }).click();
-    await expect(page.getByText('Estructura externa:').locator('..')).not.toContainText(
-      'tres estrofas de 4 versos cada una (4+4+4)',
-    );
+    const externa = page.getByText('Estructura externa:').locator('..');
+    await expect(externa).not.toContainText('tres estrofas de 4 versos cada una (4+4+4)');
+    await expect(externa).toContainText('36 versos');
+    await expect(externa).toContainText('nueve estrofas');
   });
 
   /**
-   * ABIERTO (hallazgo del 06/10/2026, contenido: la PAES no tiene comentario de texto).
+   * REPARADO el 06/10/2026 (hallazgo del 06/10/2026, contenido: la PAES no tiene comentario de texto).
    * DEMRE, «Temario de la PAES Regular obligatoria de Competencia Lectora» (19/03/2026):
    * «Esta prueba consta de 7 textos y 65 preguntas de selección múltiple con respuesta única
    * de 4 opciones». No hay prueba de «Lengua Castellana» ni comentario escrito.
    */
   test('no atribuye a la PAES un comentario de texto obligatorio', async ({ page }) => {
-    test.fail(); // ABIERTO (hallazgo del 06/10/2026, PAES)
     await abrir(page, 1280, 900);
     const html = await page.content();
     expect(html).not.toContain('obligatorio en la EBAU/PAES de Lengua Castellana');
+    expect(html).not.toContain('tu comunidad autónoma');
+    expect(html).not.toContain('En muchas CCAA');
   });
 
   /**
-   * ABIERTO (hallazgo del 06/10/2026, contenido: el FAQPage cuenta otros 7 pasos).
+   * REPARADO el 06/10/2026 (hallazgo del 06/10/2026, contenido: el FAQPage cuenta otros 7 pasos).
    * La pestaña Metodología numera: 1 lectura · 2 localización · 3 tema · 4 estructura ·
    * 5 análisis métrico (poesía) / narrativo (prosa) · 6 recursos · 7 conclusión y valoración.
    * La respuesta 1 del FAQPage junta 5 y 6 («estudio de la forma y recursos estilísticos») y
@@ -263,7 +270,6 @@ test.describe('CASO 2 — uso normal en escritorio (1280 px)', () => {
    * la propia guía llama «la parte más mecánica», no aparece. Esperado: la respuesta lo nombra.
    */
   test('la respuesta 1 del FAQPage enumera los mismos 7 pasos que la página', async ({ page }) => {
-    test.fail(); // ABIERTO (hallazgo del 06/10/2026, pasos del FAQPage)
     await abrir(page, 1280, 900);
     const respuesta = await page.evaluate(() => {
       for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
@@ -285,13 +291,12 @@ test.describe('CASO 2 — uso normal en escritorio (1280 px)', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 test.describe('CASO 3 — móvil, teclado y contraste', () => {
   /**
-   * ABIERTO (hallazgo del 06/10/2026, accesibilidad: pestañas sin nombre en móvil).
+   * REPARADO el 06/10/2026 (hallazgo del 06/10/2026, accesibilidad: pestañas sin nombre en móvil).
    * Hasta 768 px el CSS pone `.tabNombre { display: none }` y el icono va con aria-hidden: el
    * nombre accesible de las cinco pestañas queda VACÍO. Esperado: cada pestaña se llama como
    * en escritorio. Obtenido el 06/10: `tablist "Secciones de la guía"` con 5 `tab` sin nombre.
    */
   test('a 390 px las cinco pestañas conservan su nombre accesible', async ({ page }) => {
-    test.fail(); // ABIERTO (hallazgo del 06/10/2026, pestañas sin nombre en móvil)
     await abrir(page, 390, 844);
     await expect(page.getByRole('tab')).toHaveCount(5);
     for (const nombre of ['Metodología', 'Poesía', 'Prosa narrativa', 'Vocabulario técnico', 'Plantillas']) {
@@ -327,40 +332,48 @@ test.describe('CASO 3 — móvil, teclado y contraste', () => {
   });
 
   /**
-   * ABIERTO (hallazgo del 06/10/2026, accesibilidad: teclado del tablist).
+   * REPARADO el 06/10/2026 (hallazgo del 06/10/2026, accesibilidad: teclado del tablist).
    * Patrón de pestañas de WAI-ARIA APG: con el foco en una pestaña, la flecha derecha lleva a la
    * siguiente. Esperado: foco en «Poesía». Obtenido: sigue en «Metodología» (no hay manejador;
    * tampoco aria-controls ni nombre en el tabpanel).
    */
   test('la flecha derecha pasa de «Metodología» a «Poesía»', async ({ page }) => {
-    test.fail(); // ABIERTO (hallazgo del 06/10/2026, flechas en el tablist)
     await abrir(page, 1280, 900);
     await page.getByRole('tab', { name: 'Metodología' }).focus();
     await page.keyboard.press('ArrowRight');
     await expect(page.getByRole('tab', { name: 'Poesía' })).toBeFocused();
+    await expect(page.getByRole('tab', { name: 'Poesía' })).toHaveAttribute('aria-selected', 'true');
+    await page.keyboard.press('End');
+    await expect(page.getByRole('tab', { name: 'Plantillas' })).toBeFocused();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.getByRole('tab', { name: 'Metodología' })).toBeFocused();
+    // Tabindex itinerante: solo la pestaña activa está en la secuencia de Tab
+    await expect(page.locator('[role=tab][tabindex="0"]')).toHaveCount(1);
+    // El panel se nombra por su pestaña y las pestañas lo controlan
+    await expect(page.getByRole('tabpanel', { name: 'Metodología' })).toHaveCount(1);
+    await expect(page.getByRole('tab', { name: 'Poesía' })).toHaveAttribute('aria-controls', 'panel-guia');
   });
 
   /**
-   * ABIERTO (hallazgo del 06/10/2026, contraste de la pestaña activa en oscuro).
+   * REPARADO el 06/10/2026 (hallazgo del 06/10/2026, contraste de la pestaña activa en oscuro).
    * `[data-theme='dark'] .tabBtn { color: #b0b0b0 }` (0,2,0) gana a `.tabBtnActive { color:
    * #fff }` (0,1,0): el rótulo de la pestaña activa queda #B0B0B0 sobre #3FA5D1 = 1,29:1.
    * Esperado >= 4,5:1 (texto de 13,6-14,4 px).
    */
   test('en oscuro la pestaña activa llega a 4,5:1', async ({ page }) => {
-    test.fail(); // ABIERTO (hallazgo del 06/10/2026, pestaña activa en oscuro)
     await abrir(page, 1280, 900);
     await pasarAOscuro(page);
     expect(await contraste(page, '[role=tab][aria-selected=true]')).toBeGreaterThanOrEqual(4.5);
   });
 
   /**
-   * ABIERTO (hallazgo del 06/10/2026, contraste de las cabeceras por clase).
+   * REPARADO el 06/10/2026 (hallazgo del 06/10/2026, contraste de las cabeceras por clase).
    * `.plantillaTitulo`: blanco sobre var(--secondary) = #48A9A6 → 2,80:1 en claro (#5ABDB9 →
    * 2,23:1 en oscuro), texto de 15,2 px en negrita. Esperado >= 4,5:1 (--secondary-boton da
    * 5,15:1). Lo mismo en `.analisisTitulo` y `.vocCatTitulo` sobre var(--primary): 4,11:1 y 2,79:1.
    */
   /**
-   * ABIERTO (hallazgo del 06/10/2026, accesibilidad: «Copiado» no se anuncia).
+   * REPARADO el 06/10/2026 (hallazgo del 06/10/2026, accesibilidad: «Copiado» no se anuncia).
    * Los 26 botones llevan aria-label «Copiar frase de <bloque>» (cuatro o cinco iguales por
    * bloque) y el aria-label manda sobre el contenido: al copiar, el rótulo visible pasa a
    * «✓ Copiado» pero el nombre accesible no cambia y no hay región viva. Esperado: tras el clic,
@@ -370,7 +383,6 @@ test.describe('CASO 3 — móvil, teclado y contraste', () => {
     page,
     context,
   }) => {
-    test.fail(); // ABIERTO (hallazgo del 06/10/2026, confirmación de copiado)
     await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
       origin: 'http://localhost:3050',
     });
@@ -379,14 +391,25 @@ test.describe('CASO 3 — móvil, teclado y contraste', () => {
     await page.getByRole('tabpanel').getByRole('button').first().click();
     await expect(page.getByRole('tabpanel').getByRole('button').first()).toHaveText('✓ Copiado');
     const anunciado =
-      (await page.getByRole('tabpanel').getByRole('button', { name: /copiado/i }).count()) +
-      (await page.locator('[aria-live], [role=status]').filter({ hasText: /copiado/i }).count());
+      (await page.getByRole('tabpanel').getByRole('button', { name: /copiad[oa]/i }).count()) +
+      (await page.locator('[aria-live], [role=status]').filter({ hasText: /copiad[oa]/i }).count());
     expect(anunciado).toBeGreaterThan(0);
   });
 
   test('las cabeceras de bloque con fondo de marca llegan a 4,5:1', async ({ page }) => {
-    test.fail(); // ABIERTO (hallazgo del 06/10/2026, cabeceras con fondo de marca)
     await abrir(page, 1280, 900);
+    await page.getByRole('tab', { name: 'Plantillas' }).click();
+    expect(await contraste(page, '[class*="plantillaTitulo"]')).toBeGreaterThanOrEqual(4.5);
+    // La pestaña recién pulsada anima fondo y color 0,18 s desde el estado :hover: se mide al asentarse
+    await expect
+      .poll(() => contraste(page, '[role=tab][aria-selected=true]'))
+      .toBeGreaterThanOrEqual(4.5);
+    await page.getByRole('tab', { name: 'Poesía' }).click();
+    expect(await contraste(page, '[class*="analisisTitulo"]')).toBeGreaterThanOrEqual(4.5);
+    await page.getByRole('tab', { name: 'Vocabulario técnico' }).click();
+    expect(await contraste(page, '[class*="vocCatTitulo"]')).toBeGreaterThanOrEqual(4.5);
+    await pasarAOscuro(page);
+    expect(await contraste(page, '[class*="vocCatTitulo"]')).toBeGreaterThanOrEqual(4.5);
     await page.getByRole('tab', { name: 'Plantillas' }).click();
     expect(await contraste(page, '[class*="plantillaTitulo"]')).toBeGreaterThanOrEqual(4.5);
   });
