@@ -6880,7 +6880,9 @@ test.describe('Re-inspección 06/10/2026 — la hermana tras fa0772c0, 7d5c1876 
    * no su subtítulo. Dicen qué impuesto se paga y a qué tipo: es dato, no adorno. La referencia y
    * trastero llevan la misma regla (`opacity: 0.8`), así que es de la familia.
    */
-  test.fail('[06/10·B] los subtítulos de los botones de transmisión y de tipo de garaje llegan a 4,5:1 en los dos temas', async ({
+  // REPARADO el 06/10/2026 (hallazgo 2906): `.transmisionSub` pierde la opacidad en garaje,
+  // trastero y la referencia; el subtítulo hereda el color del botón, que ya cumplía.
+  test('[06/10·B] los subtítulos de los botones de transmisión y de tipo de garaje llegan a 4,5:1 en los dos temas', async ({
     page,
   }) => {
     await page.goto(RUTA);

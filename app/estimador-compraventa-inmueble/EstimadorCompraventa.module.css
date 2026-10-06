@@ -235,9 +235,10 @@
   font-size: 2rem;
 }
 
+/* Sin opacity: con 0,8 el subtítulo (qué impuesto y a qué tipo) bajaba a 3,36-3,60:1 (hallazgos
+   2906 y 2910, 06/10/2026). Hereda el color del botón, que ya cumple en los dos temas. */
 .transmisionSub {
   font-size: 0.8rem;
-  opacity: 0.8;
 }
 
 /* Select */

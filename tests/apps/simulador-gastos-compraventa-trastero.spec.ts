@@ -6149,7 +6149,9 @@ async function contrasteMinimo06(page: Page, selector: string): Promise<{ ratio:
   );
 }
 
-// ❌ ABIERTO 06/10/2026 (bajo) — accesibilidad. Medido aquí a raíz del hallazgo de la gemela garaje.
+// ✅ REPARADO el 06/10/2026 (hallazgo 2910): `.transmisionSub` pierde la opacidad en las tres
+// hermanas que la tenían (trastero, garaje y la referencia). Era así (bajo, accesibilidad), medido
+// aquí a raíz del hallazgo de la gemela garaje.
 // `.transmisionSub { font-size: 0.8rem; opacity: 0.8 }` (SimuladorTrasteroCompraventa.module.css
 // ~l. 190) apaga los subtítulos de los cuatro botones de transmisión y modalidad («Paga ITP»,
 // «Paga IVA 10 %/21 %», «Anejo residencial», «Finca registral propia»): 12,8 px de peso 400 es
@@ -6160,7 +6162,6 @@ async function contrasteMinimo06(page: Page, selector: string): Promise<{ ratio:
 // Caso: primera mano, tema claro → esperado ≥ 4,5:1 · obtenido 3,36:1 («Paga IVA 21 %» y
 //       «Finca registral propia» con su botón activo).
 test('HALLAZGO 06/10 (accesibilidad) — los subtítulos de los botones de transmisión y modalidad llegan a 4,5:1', async ({ page }) => {
-  test.fail();
   await page.goto(RUTA);
   await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
   await page.getByRole('button', { name: /Primera mano/ }).click();
