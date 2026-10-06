@@ -5838,7 +5838,8 @@ test.describe('Re-inspección 06/10/2026 — familia: casos nuevos, invariante y
   });
 
   /**
-   * ABIERTO [06/10·B] (contenido, bajo) — la nota de Canarias que llega de `data/itp-ccaa.ts`
+   * REPARADO el 06/10/2026 (hallazgo 2915): la nota de Canarias se queda en «Exención total para
+   * VPO.», sin comparativa. Era así [06/10·B] (contenido, bajo) — la nota de Canarias que llega de `data/itp-ccaa.ts`
    * (l. 390, «ITP más bajo de España junto con País Vasco y Madrid») se pinta en el recuadro de
    * una NAVE, para la que el País Vasco cobra el 7 % (`tipoNoVivienda`, NF 1/2011 art. 13.a), más
    * que Canarias (6,5 %), y para la que Navarra (6 %) y Ceuta y Melilla (3 % efectivo) son más
@@ -5847,7 +5848,7 @@ test.describe('Re-inspección 06/10/2026 — familia: casos nuevos, invariante y
    * desde la receta del 726/2208), y en las de inmuebles que no son vivienda la nota afirma lo
    * mismo frente a un 7 % vasco. Medida solo aquí.
    */
-  test.fail('[06/10·B] la nota de Canarias no pone al País Vasco entre los ITP más bajos para una nave', async ({ page }) => {
+  test('[06/10·B] la nota de Canarias no pone al País Vasco entre los ITP más bajos para una nave', async ({ page }) => {
     expect(ITP_CCAA['pais-vasco'].tipoGeneralNoVivienda).toBe(7);
     expect(ITP_CCAA['canarias'].tipoGeneral).toBe(6.5);
     expect(ITP_CCAA['navarra'].tipoGeneral).toBe(6);

@@ -2989,7 +2989,9 @@ test.describe('Re-inspección 06/10/2026 — casos a mano, cifras intermedias y 
   });
 
   /**
-   * ABIERTO (contenido) — desde 2208 el recuadro pinta las notas de cada comunidad, y dos dicen
+   * REPARADO el 06/10/2026 (hallazgo 2917): las dos notas se reescribieron en data/itp-ccaa.ts
+   * (Canarias, «Exención total para VPO.»; Andalucía, «Tipo reducido del 3,5% en la vivienda
+   * habitual…»). Era así: desde 2208 el recuadro pinta las notas de cada comunidad, y dos decían
    * lo contrario de la tabla de la que salen:
    *  · Canarias: «ITP más bajo de España junto con País Vasco y Madrid». Para un solar Canarias
    *    cobra 6,5 % y la misma app da 6 % en Madrid y Navarra (3 % efectivo en Ceuta y Melilla) y
@@ -2997,8 +2999,7 @@ test.describe('Re-inspección 06/10/2026 — casos a mano, cifras intermedias y 
    *  · Andalucía: «Bonificación del 3,5 %», cuando ITP_CCAA['andalucia'] lo declara como TIPO
    *    reducido del 3,5 % (no una rebaja del 3,5 % de la cuota).
    */
-  test('ABIERTO — las notas de Canarias y Andalucía del recuadro contradicen la tabla de tipos', async ({ page }) => {
-    test.fail(!process.env.VER_HUECOS, 'ABIERTO 06/10/2026: notas de comunidad de data/itp-ccaa.ts que contradicen ITP_CCAA');
+  test('las notas de Canarias y Andalucía del recuadro no contradicen la tabla de tipos', async ({ page }) => {
     expect(ITP_CCAA['canarias'].tipoGeneral).toBe(6.5);
     expect(ITP_CCAA['madrid'].tipoGeneral).toBe(6);
     expect(ITP_CCAA['navarra'].tipoGeneral).toBe(6);
@@ -3008,10 +3009,13 @@ test.describe('Re-inspección 06/10/2026 — casos a mano, cifras intermedias y 
     await abrir(page, 'canarias', 'particular');
     const recuadro = async () => normaliza(await page.locator('[class*="infoCcaa"]').first().innerText());
     expect(await recuadro()).toContain('ITP General 6,5 %');
-    expect.soft(await recuadro()).not.toMatch(/ITP más bajo de España/);
+    expect(await recuadro()).toContain('Exención total para VPO');
+    expect(await recuadro()).not.toMatch(/ITP más bajo de España/);
 
     await page.selectOption('#select-ccaa', 'andalucia');
-    expect.soft(await recuadro()).not.toMatch(/Bonificación del 3,5/);
+    await expect.poll(recuadro).toContain('Tipo reducido del 3,5');
+    expect(await recuadro()).toMatch(/vivienda habitual/);
+    expect(await recuadro()).not.toMatch(/Bonificación del 3,5/);
   });
 
   /**

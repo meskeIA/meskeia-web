@@ -2991,7 +2991,8 @@ test.describe('Re-inspección 06/10/2026 — Extremadura, País Vasco, los selec
   });
 
   /**
-   * ABIERTO (contenido, medio) — re-inspección 06/10/2026. Las notas de la comunidad que pinta el
+   * REPARADO el 06/10/2026 (hallazgo 2920): las notas de Galicia y Andalucía de data/itp-ccaa.ts
+   * dicen ya que el tipo reducido es de la vivienda habitual. Era así (re-inspección 06/10/2026): las notas de la comunidad que pinta el
    * recuadro desde la receta de la familia (forma del 2208, b86a5607) están escritas para la
    * VIVIENDA, y en esta app anuncian tipos reducidos que una finca rústica no puede tener, justo
    * debajo de «Puede haber reducciones de ITP para explotaciones agrarias prioritarias y jóvenes
@@ -3004,7 +3005,7 @@ test.describe('Re-inspección 06/10/2026 — Extremadura, País Vasco, los selec
    *   8.000 €. Andalucía, lo mismo con «Bonificación del 3,5 % para colectivos vulnerables y zonas
    *   despobladas».
    */
-  test.fail('ABIERTO — Galicia y Andalucía: la nota de la comunidad anuncia tipos reducidos de vivienda habitual sin decirlo', async ({ page }) => {
+  test('Galicia y Andalucía: la nota de la comunidad dice que sus tipos reducidos son de la vivienda habitual', async ({ page }) => {
     for (const c of ['galicia', 'andalucia'] as const) {
       expect(
         ITP_CCAA[c].tiposReducidos.every((r) => r.condiciones.some((cond) => /vivienda habitual/i.test(cond))),
@@ -3013,8 +3014,8 @@ test.describe('Re-inspección 06/10/2026 — Extremadura, País Vasco, los selec
     await abrirHidratada(page);
     await sembrarValor(page, CAMPO_PRECIO, '100000');
     for (const [c, anuncio] of [
-      ['galicia', 'Tipo reducido 3'],
-      ['andalucia', 'Bonificación del 3,5'],
+      ['galicia', 'Tipo reducido del 3'],
+      ['andalucia', 'Tipo reducido del 3,5'],
     ] as const) {
       await page.selectOption('#select-ccaa', c);
       const notas = await notasRecuadro(page);
@@ -3022,13 +3023,14 @@ test.describe('Re-inspección 06/10/2026 — Extremadura, País Vasco, los selec
       expect(notas.some((n) => n.includes('jóvenes agricultores (Ley 19/1995)'))).toBe(true);
       const ficha = notas.find((n) => n.startsWith(`${ITP_CCAA[c].nombre}:`)) ?? '';
       expect(ficha).toContain(anuncio);
-      // El defecto: el tipo reducido se anuncia sin su condición de vivienda habitual.
-      expect(ficha).toMatch(/vivienda/i);
+      // El defecto que fue: el tipo reducido se anunciaba sin su condición de vivienda habitual.
+      expect(ficha).toMatch(/vivienda habitual/i);
     }
   });
 
   /**
-   * ABIERTO (contenido, bajo) — re-inspección 06/10/2026; la misma forma que el hallazgo 2915 de
+   * REPARADO el 06/10/2026 (hallazgo 2921, Canarias): la nota se queda en «Exención total para
+   * VPO.», sin comparativa. Era así (re-inspección 06/10/2026); la misma forma que el hallazgo 2915 de
    * nave-industrial, medida aquí con su caso. La nota de Canarias (data/itp-ccaa.ts:390) es de la
    * vivienda: en esta app, la finca rústica paga en el País Vasco el 7 % (`tipoNoVivienda`, NF
    * 1/2011 de Bizkaia, art. 13.a), MÁS que en Canarias (6,5 %), y la propia app lo rotula.
@@ -3037,7 +3039,7 @@ test.describe('Re-inspección 06/10/2026 — Extremadura, País Vasco, los selec
    *   VPO.», con «ITP General 6,5 %» en Canarias y «ITP General 7 %» en el País Vasco (y 6 % en
    *   Navarra, 3 % efectivo en Ceuta y Melilla).
    */
-  test.fail('ABIERTO — Canarias: la nota pone al País Vasco entre los ITP más bajos, y la app le cobra el 7 % a la finca', async ({ page }) => {
+  test('Canarias: la nota no pone al País Vasco entre los ITP más bajos, que a la finca le cobra el 7 %', async ({ page }) => {
     await abrirHidratada(page);
     await sembrarValor(page, CAMPO_PRECIO, '100000');
     await page.selectOption('#select-ccaa', 'pais-vasco');
@@ -3048,27 +3050,28 @@ test.describe('Re-inspección 06/10/2026 — Extremadura, País Vasco, los selec
     expect(await valorTarjeta(page, 'ITP (')).toBe('6500,00 €');
     const ficha = (await notasRecuadro(page)).find((n) => n.startsWith('Canarias:')) ?? '';
     expect(ficha).not.toBe('');
-    // El defecto.
+    // El defecto que fue.
     expect(ficha).not.toMatch(/más bajo de España junto con País Vasco/);
   });
 
   /**
-   * ABIERTO (contenido, bajo) — la otra mitad del mismo hallazgo (forma del 2917 de la gemela
+   * REPARADO el 06/10/2026 (hallazgo 2921, Andalucía): la nota dice «Tipo reducido del 3,5 %».
+   * Era así: la otra mitad del mismo hallazgo (forma del 2917 de la gemela
    * solar, medida aquí con su caso): la nota de Andalucía llama «Bonificación del 3,5 %» a lo que
    * la tabla de la que sale declara TIPO reducido del 3,5 % (`ITP_CCAA.andalucia.tiposReducidos`,
    * `tipo: 3.5`). Una bonificación del 3,5 % de la cuota dejaría el 7 % en el 6,755 %, no en el 3,5 %.
    *   Andalucía · 100.000 € → esperado «tipo reducido del 3,5 %» · obtenido «Andalucía: Bonificación
    *   del 3,5 % para colectivos vulnerables y zonas despobladas.»
    */
-  test.fail('ABIERTO — Andalucía: la nota llama «bonificación del 3,5 %» a un tipo reducido del 3,5 %', async ({ page }) => {
+  test('Andalucía: la nota llama tipo reducido al 3,5 %, no «bonificación»', async ({ page }) => {
     expect(ITP_CCAA['andalucia'].tiposReducidos.filter((r) => r.tipo === 3.5).length).toBeGreaterThan(0);
     await abrirHidratada(page);
     await sembrarValor(page, CAMPO_PRECIO, '100000');
     await page.selectOption('#select-ccaa', 'andalucia');
     expect(await valorTarjeta(page, 'ITP (')).toBe('7000,00 €');
     const ficha = (await notasRecuadro(page)).find((n) => n.startsWith('Andalucía:')) ?? '';
-    expect(ficha).toContain('3,5');
-    // El defecto.
+    expect(ficha).toContain('Tipo reducido del 3,5');
+    // El defecto que fue.
     expect(ficha).not.toMatch(/Bonificación del 3,5/);
   });
 

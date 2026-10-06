@@ -194,7 +194,10 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.2,
-    notas: 'Bonificación del 3,5% para colectivos vulnerables y zonas despobladas.',
+    // Era «Bonificación del 3,5%…»: es un TIPO reducido (tipo: 3.5), no una rebaja de la cuota, y
+    // solo de la vivienda habitual; la nota se pinta también en garaje, solar, nave y finca rústica
+    // (hallazgos 2917, 2920 y 2921, 06/10/2026).
+    notas: 'Tipo reducido del 3,5% en la vivienda habitual para jóvenes, familias numerosas, personas con discapacidad y municipios con problemas de despoblación.',
   },
 
   /**
@@ -387,7 +390,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 0.75,
-    notas: 'ITP más bajo de España junto con País Vasco y Madrid. Exención total para VPO.',
+    // Sin comparativa: «ITP más bajo de España junto con País Vasco y Madrid» era de la vivienda, y
+    // en un solar, una nave o una finca el País Vasco cobra el 7% (hallazgos 2915, 2917 y 2921).
+    notas: 'Exención total para VPO.',
   },
 
   'cantabria': {
@@ -681,7 +686,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'Tipo reducido 3% muy favorable para jóvenes y colectivos vulnerables.',
+    // Todos los reducidos exigen vivienda habitual, y la nota se pinta también en una finca rústica
+    // (hallazgo 2920, 06/10/2026).
+    notas: 'Tipo reducido del 3% en la vivienda habitual para jóvenes, familias numerosas, personas con discapacidad y víctimas de violencia de género.',
   },
 
   'madrid': {
