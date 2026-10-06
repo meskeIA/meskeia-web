@@ -13,31 +13,20 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import {
+  calcularCurvas,
+  calcularEquilibrio,
+  cantidadesAPrecio,
+  type Curvas,
+  type Sliders,
+} from './casos';
+import CasosAula from './CasosAula';
 
 // ============================================
 // TIPOS
 // ============================================
 
-interface Sliders {
-  renta: number;
-  sustitutivos: number;
-  preferencias: number;
-  costes: number;
-  tecnologia: number;
-  productores: number;
-}
-
-interface Curvas {
-  a: number; // intercepto demanda (base 100, ajustado por desplazadores)
-  b: number; // pendiente demanda (fija = 2)
-  c: number; // intercepto oferta (base -20, ajustado por desplazadores)
-  d: number; // pendiente oferta (fija = 1.5)
-}
-
-interface Equilibrio {
-  P: number;
-  Q: number;
-}
+// Sliders, Curvas y Equilibrio viven en ./casos.ts, junto al motor que los usa.
 
 interface Excedente {
   EC: number; // excedente consumidor
@@ -49,12 +38,7 @@ type Modo = 'libre' | 'maximo' | 'minimo';
 // ============================================
 // CONSTANTES BASE
 // ============================================
-const A_BASE = 100;
-const C_BASE = -20;
-const B_FIJA = 2;
-const D_FIJA = 1.5;
-const DESPLAZADOR_PASO = 4; // unidades por unidad de slider para demanda
-const DESPLAZADOR_PASO_O = 3; // unidades por unidad de slider para oferta
+// A_BASE, C_BASE, las pendientes y los pasos de los desplazadores: en ./casos.ts.
 
 /** Tope del campo de precio controlado. Un precio negativo no existe en el modelo. */
 const PRECIO_TOPE = 60;
@@ -66,28 +50,9 @@ const P_ESCALA_MIN = 60;
 // ============================================
 // FUNCIONES MATEMÁTICAS
 // ============================================
-
-function calcularCurvas(sliders: Sliders): Curvas {
-  // Desplazadores de demanda: renta (positivo), sustitutivos (positivo), preferencias (positivo)
-  const deltaD =
-    (sliders.renta + sliders.sustitutivos + sliders.preferencias) * DESPLAZADOR_PASO;
-  // Desplazadores de oferta: costes (negativo), tecnologia (positivo), productores (positivo)
-  const deltaO =
-    (-sliders.costes + sliders.tecnologia + sliders.productores) * DESPLAZADOR_PASO_O;
-
-  return {
-    a: A_BASE + deltaD,
-    b: B_FIJA,
-    c: C_BASE + deltaO,
-    d: D_FIJA,
-  };
-}
-
-function calcularEquilibrio(curvas: Curvas): Equilibrio {
-  const P = (curvas.a - curvas.c) / (curvas.b + curvas.d);
-  const Q = curvas.a - curvas.b * P;
-  return { P: Math.max(0, P), Q: Math.max(0, Q) };
-}
+// calcularCurvas y calcularEquilibrio se MOVIERON a ./casos.ts el 06/10/2026: los casos para
+// clase corrigen con ellos, y una sola implementación impide que el panel y la corrección
+// calculen distinto.
 
 /**
  * Disposición a pagar acumulada por las primeras Q unidades: el área BAJO la curva de demanda.
@@ -196,15 +161,14 @@ export default function SimuladorOfertaDemandaPage() {
     [curvas]
   );
 
-  // Cantidades en control de precios
-  const qDemandaControlada = useMemo(
-    () => Math.max(0, curvas.a - curvas.b * precioFijado),
+  // Cantidades en control de precios. La aritmética es `cantidadesAPrecio` (./casos.ts), la
+  // misma con la que se corrigen los casos de exceso de demanda y de oferta.
+  const cantidadesControladas = useMemo(
+    () => cantidadesAPrecio(curvas, precioFijado),
     [curvas, precioFijado]
   );
-  const qOfertaControlada = useMemo(
-    () => Math.max(0, curvas.c + curvas.d * precioFijado),
-    [curvas, precioFijado]
-  );
+  const qDemandaControlada = cantidadesControladas.qd;
+  const qOfertaControlada = cantidadesControladas.qo;
   /**
    * ¿ATA el control? Un techo solo ata por DEBAJO del equilibrio y un suelo solo por ENCIMA:
    * fuera de ahí el mercado se vacía en E* y el precio fijado no cambia nada.
@@ -893,6 +857,9 @@ export default function SimuladorOfertaDemandaPage() {
           <span aria-hidden="true">🔄</span> Restablecer todo
         </button>
       </div>
+
+      {/* === Casos para clase (skill /casos-aula-meskeia, 06/10/2026) === */}
+      <CasosAula />
 
       {/* ============================================
           BLOQUE EDUCATIVO v2.0

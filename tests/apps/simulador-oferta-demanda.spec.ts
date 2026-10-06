@@ -1,5 +1,21 @@
 import { test, expect, Locator, Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import { readFileSync } from 'node:fs';
+import {
+  CASOS,
+  SLIDERS_INICIALES,
+  TOTAL_CASOS,
+  calcularCurvas,
+  calcularEquilibrio,
+  cantidadesAPrecio,
+  comprobarRespuesta,
+  esPrediccion,
+  generarEjercicioAleatorio,
+  resolverCaso,
+  toleranciaDe,
+  type Desplazador,
+  type Direccion,
+} from '../../app/simulador-oferta-demanda/casos';
 
 /**
  * Inspector — simulador-oferta-demanda (segmento cálculo, riesgo 3, 169 usos, 110 s de estancia)
@@ -231,7 +247,10 @@ test.describe('simulador-oferta-demanda', () => {
   test('HALLAZGO D — con los seis deslizadores al extremo, el eje se adapta y E* sigue dibujado', async ({
     page,
   }) => {
-    expect(await pixelesEquilibrio(page)).toBeGreaterThan(20); // en el estado inicial sí se dibuja
+    // En el estado inicial sí se dibuja. Con espera (06/10/2026): el canvas se pinta en un
+    // useEffect DESPUÉS de hidratar, y leerlo al instante era una carrera que ganaba casi
+    // siempre; con la sección de casos el árbol creció y empezó a perderla (1 de cada 3).
+    await expect.poll(() => pixelesEquilibrio(page), { timeout: 3000 }).toBeGreaterThan(20);
 
     for (const [indice, valor] of [[0, 5], [1, 5], [2, 5], [3, -5], [4, 5], [5, 5]] as const) {
       await sembrarValor(page, deslizador(page, indice), valor);
@@ -264,5 +283,255 @@ test.describe('simulador-oferta-demanda', () => {
     await expect(page.getByText(/Política de Privacidad/i).first()).toBeVisible(); // LegalNotice
     await expect(page.getByText(/Compártela|Compartir/i).first()).toBeVisible(); // ShareCard
     await expect(page.locator('footer').first()).toBeVisible(); // Footer
+  });
+});
+
+/*
+ * ═════════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (skill /casos-aula-meskeia, 06/10/2026) — tipos A (1-6) y C (7-12).
+ *
+ * Van DETRÁS del acta del Inspector y la dejan intacta: la sección nueva no añade ningún
+ * deslizador (el acta los cuenta por posición), ni role="status", ni clases con «resultCard».
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO — a mano, igualando Qd = Qo:
+ *    1. 100 − 2P = 4P − 20 → 120 = 6P → P* = 20
+ *    2. Q* = 100 − 2·20 = 60   (oferta: 4·20 − 20 = 60)
+ *    3. 300 − 5P = 60 + 3P → 240 = 8P → P* = 30
+ *    4. 200 − 4P = 6P − 100 → 300 = 10P → P* = 30 → Q* = 200 − 120 = 80
+ *    5. P = 10: Qd = 120 − 30 = 90, Qo = 20 + 20 = 40 → faltan 50   (P* = 20, por encima)
+ *    6. P = 30: Qd = 100 − 60 = 40, Qo = 120 − 20 = 100 → sobran 60  (P* = 20, por debajo)
+ *  Los 7-12 son el desplazamiento de libro, desde el estado inicial:
+ *    7. renta +2 → demanda a la derecha → P* SUBE        (34,3 → 36,6)
+ *    8. tecnología +2 → oferta a la derecha → P* BAJA    (34,3 → 32,6)
+ *    9. costes +2 → oferta a la izquierda → Q* BAJA      (31,4 → 28,0)
+ *   10. sustitutivos +2 → demanda a la derecha → Q* SUBE (31,4 → 34,9)
+ *   11. productores +3 → oferta a la derecha → P* BAJA   (34,3 → 31,7)
+ *   12. preferencias −2 → demanda a la izquierda → Q* BAJA (31,4 → 28,0)
+ *
+ * Los A se cotejan además con Cramer escrito en el test, y los C con la TABLA DE LIBRO
+ * (`direccionDeLibro`), que no ejecuta el modelo: así la comparación no es la app contra sí misma.
+ * ═════════════════════════════════════════════════════════════════════════════════════════
+ */
+
+const ESPERADOS_CASOS: Record<number, number | Direccion> = {
+  1: 20, 2: 60, 3: 30, 4: 80, 5: 50, 6: 60,
+  7: 'sube', 8: 'baja', 9: 'baja', 10: 'sube', 11: 'baja', 12: 'baja',
+};
+
+/** Cramer sobre { Q + bP = a ; Q − dP = c }. */
+function equilibrioCramer(a: number, b: number, c: number, d: number): { P: number; Q: number } {
+  const det = 1 * -d - b * 1;
+  const Q = (a * -d - b * c) / det;
+  const P = (1 * c - a * 1) / det;
+  return { P, Q };
+}
+
+/** La tabla de cualquier libro: hacia dónde va P* y Q* con cada desplazador. */
+function direccionDeLibro(desplazador: Desplazador, movimiento: number, variable: 'precio' | 'cantidad'): Direccion {
+  const demanda = ['renta', 'sustitutivos', 'preferencias'].includes(desplazador);
+  // ¿La curva se mueve a la derecha? Los costes van al revés: más coste, menos oferta.
+  const derecha = (desplazador === 'costes' ? -movimiento : movimiento) > 0;
+  if (demanda) return derecha ? 'sube' : 'baja'; // P y Q en el mismo sentido
+  if (variable === 'cantidad') return derecha ? 'sube' : 'baja';
+  return derecha ? 'baja' : 'sube'; // oferta: P y Q en sentidos contrarios
+}
+
+test.describe('simulador-oferta-demanda · casos para clase', () => {
+  test('1-4 · doce casos, ids 1..12, deterministas, completos y recalculables desde sus datos', () => {
+    expect(CASOS).toHaveLength(12);
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    for (const c of CASOS) {
+      expect(c.enunciado.length, `caso ${c.id}`).toBeGreaterThan(40);
+      expect(c.etiquetaRespuesta.trim(), `caso ${c.id}`).not.toBe('');
+      expect(
+        typeof c.respuesta === 'string' ? ['sube', 'baja', 'no-cambia'].includes(c.respuesta) : Number.isFinite(c.respuesta),
+        `caso ${c.id}`,
+      ).toBe(true);
+      expect(c.pasos.length, `caso ${c.id}`).toBeGreaterThanOrEqual(2);
+      expect(c.pista.trim(), `caso ${c.id}`).not.toBe('');
+      // 3 · la respuesta declarada es la que sale de recalcular desde `datos`
+      const r = resolverCaso(c.datos);
+      expect(r.ok, `caso ${c.id}`).toBe(true);
+      expect(r.valor, `caso ${c.id}`).toBe(c.respuesta);
+      // 2 · determinista
+      expect(resolverCaso(c.datos)).toEqual(r);
+    }
+    expect(new Set(CASOS.map((c) => c.categoria))).toEqual(new Set(['abstracto', 'aplicado']));
+    // Seis de cada tipo, en este orden: el texto de la sección lo anuncia así
+    expect(CASOS.map((c) => esPrediccion(c.datos))).toEqual([...Array(6).fill(false), ...Array(6).fill(true)]);
+  });
+
+  test('las doce respuestas coinciden con las resueltas a mano, con Cramer y con la tabla de libro', () => {
+    for (const c of CASOS) {
+      expect(c.respuesta, `caso ${c.id}`).toEqual(ESPERADOS_CASOS[c.id]);
+      const d = c.datos;
+      if (d.tipo === 'equilibrio') {
+        const { P, Q } = equilibrioCramer(d.curvas.a, d.curvas.b, d.curvas.c, d.curvas.d);
+        expect(c.respuesta, `caso ${c.id}`).toBeCloseTo(d.pide === 'precio' ? P : Q, 10);
+      } else if (d.tipo === 'desajuste') {
+        const qd = d.curvas.a - d.curvas.b * d.precio;
+        const qo = d.curvas.c + d.curvas.d * d.precio;
+        expect(c.respuesta, `caso ${c.id}`).toBeCloseTo(Math.abs(qd - qo), 10);
+      } else {
+        expect(c.respuesta, `caso ${c.id}`).toBe(direccionDeLibro(d.desplazador, d.movimiento, d.variable));
+      }
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda nacional', () => {
+    const lugares =
+      /españ|méxic|mexic|colombi|argentin|chile|perú|peru|venezuel|ecuador|guatemal|bolivi|uruguay|paraguay|cuba|honduras|salvador|nicaragu|costa rica|panam|dominican|madrid|barcelona|bogotá|lima|santiago|buenos aires|euro|€|dólar|dolar|\$|pesos (mexicanos|colombianos|argentinos|chilenos)|soles|selectividad|bachillerato/i;
+    for (const c of CASOS) {
+      expect(`${c.titulo} ${c.enunciado}`, `caso ${c.id}`).not.toMatch(lugares);
+      expect(`${c.titulo} ${c.enunciado}`, `caso ${c.id}`).not.toMatch(/\bESO\b/);
+    }
+  });
+
+  test('5.bis · respuestas limpias: enteras en los A, y ninguna pide redondear', () => {
+    for (const c of CASOS) {
+      expect(c.enunciado, `caso ${c.id}`).not.toMatch(/redonde/i);
+      if (typeof c.respuesta === 'number') expect(Number.isInteger(c.respuesta), `caso ${c.id}`).toBe(true);
+    }
+    expect(CASOS[0].respuestaTexto).toBe('20 u. m.');
+    expect(CASOS[1].respuestaTexto).toBe('60 unidades');
+    expect(CASOS[6].respuestaTexto).toBe('Sube');
+  });
+
+  test('C · la rejilla entera: en cada desplazador y cada movimiento, el panel enseña lo que dice el libro', () => {
+    // La regla del tipo C: la respuesta se evalúa sobre lo que ENSEÑA el panel (un decimal), y
+    // no debe morder el suelo en 0 de calcularEquilibrio. Se recorre la rejilla completa que
+    // permiten los deslizadores desde el estado inicial: 6 desplazadores × 10 movimientos × 2.
+    const desplazadores: Desplazador[] = ['renta', 'sustitutivos', 'preferencias', 'costes', 'tecnologia', 'productores'];
+    let combinaciones = 0;
+    for (const desplazador of desplazadores) {
+      for (const movimiento of [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]) {
+        for (const variable of ['precio', 'cantidad'] as const) {
+          const r = resolverCaso({ tipo: 'prediccion', desplazador, movimiento, variable });
+          expect(r.ok, `${desplazador} ${movimiento}`).toBe(true);
+          expect(r.valor, `${desplazador} ${movimiento} ${variable}`).toBe(direccionDeLibro(desplazador, movimiento, variable));
+          combinaciones++;
+        }
+      }
+    }
+    expect(combinaciones).toBe(120);
+    // Y el estado de partida es el de la app: P* = 34,3 y Q* = 31,4 en el panel
+    const inicial = calcularEquilibrio(calcularCurvas(SLIDERS_INICIALES));
+    expect(Math.round(inicial.P * 10) / 10).toBe(34.3);
+    expect(Math.round(inicial.Q * 10) / 10).toBe(31.4);
+  });
+
+  test('7 · convenio: Qd = a − bP y Qo = c + dP, el panel y la corrección usan el mismo motor', () => {
+    // Con la cantidad despejada. Si alguien leyera Qo = 4P − 20 como P = 4Q − 20, el caso 1
+    // daría otro precio: 100 − 2P = (P + 20)/4 → P = 380/9 ≈ 42,2. No se acepta.
+    expect(comprobarRespuesta(380 / 9, CASOS[0].respuesta, CASOS[0].datos).correcto).toBe(false);
+    // cantidadesAPrecio es lo que usa el panel bajo un control de precio; aquí, el caso 5
+    expect(cantidadesAPrecio({ a: 120, b: 3, c: 20, d: 2 }, 10)).toEqual({ qd: 90, qo: 40 });
+    // El motor de la app es UNO: page.tsx importa las curvas de casos.ts y no las redefine
+    const pagina = readFileSync('app/simulador-oferta-demanda/page.tsx', 'utf8');
+    expect(pagina).toMatch(/from '\.\/casos'/);
+    for (const f of ['calcularCurvas', 'calcularEquilibrio']) {
+      expect(pagina, f).not.toMatch(new RegExp(`function ${f}\\b`));
+    }
+    expect(pagina).not.toMatch(/curvas\.a - curvas\.b \* precioFijado/);
+  });
+
+  test('corrección: tolerancia, signo cambiado, opción sin elegir y datos imposibles', () => {
+    const caso1 = CASOS[0]; // 20
+    expect(toleranciaDe(20)).toBeCloseTo(0.2, 10);
+    expect(toleranciaDe(0)).toBe(0.01);
+    expect(comprobarRespuesta(20, 20, caso1.datos).correcto).toBe(true);
+    expect(comprobarRespuesta(20.2, 20, caso1.datos).correcto).toBe(true);
+    expect(comprobarRespuesta(21, 20, caso1.datos).correcto).toBe(false);
+    expect(comprobarRespuesta(NaN, 20, caso1.datos).motivo).toContain('Escribe un número');
+    // El desajuste en negativo recibe un aviso propio
+    const caso5 = CASOS[4]; // faltan 50
+    const negativo = comprobarRespuesta(-50, 50, caso5.datos);
+    expect(negativo.correcto).toBe(false);
+    expect(negativo.motivo).toContain('en positivo');
+    // Predicción: sin elegir no hay veredicto de acierto; elegir mal o bien
+    const caso7 = CASOS[6]; // sube
+    expect(comprobarRespuesta(null, 'sube', caso7.datos).motivo).toContain('Elige una');
+    expect(comprobarRespuesta('baja', 'sube', caso7.datos).correcto).toBe(false);
+    expect(comprobarRespuesta('sube', 'sube', caso7.datos).correcto).toBe(true);
+    // Nada lanza: curvas, precios o movimientos imposibles devuelven ok: false
+    expect(resolverCaso({ tipo: 'equilibrio', curvas: { a: 10, b: 2, c: 50, d: 1 }, pide: 'precio' }).ok).toBe(false);
+    expect(resolverCaso({ tipo: 'equilibrio', curvas: { a: 100, b: 0, c: 0, d: 0 }, pide: 'precio' }).ok).toBe(false);
+    expect(resolverCaso({ tipo: 'desajuste', curvas: { a: 100, b: 2, c: -20, d: 4 }, precio: 20 }).ok).toBe(false);
+    expect(resolverCaso({ tipo: 'desajuste', curvas: { a: 100, b: 2, c: -20, d: 4 }, precio: 60 }).ok).toBe(false);
+    expect(resolverCaso({ tipo: 'prediccion', desplazador: 'renta', movimiento: 6, variable: 'precio' }).ok).toBe(false);
+    expect(resolverCaso({ tipo: 'prediccion', desplazador: 'renta', movimiento: 0, variable: 'precio' }).ok).toBe(false);
+  });
+
+  test('6 · la práctica es reproducible, variada y corrige con el mismo resolverCaso', () => {
+    expect(generarEjercicioAleatorio(42)).toEqual(generarEjercicioAleatorio(42));
+    const respuestas = new Set<string>();
+    const escenarios = new Set<string>();
+    const tipos = new Set<string>();
+    for (let s = 1; s <= 40; s++) {
+      const e = generarEjercicioAleatorio(s);
+      respuestas.add(String(e.respuesta));
+      escenarios.add(JSON.stringify(e.datos));
+      tipos.add(e.datos.tipo);
+      const r = resolverCaso(e.datos);
+      expect(r.ok, `semilla ${s}: ${e.enunciado}`).toBe(true);
+      expect(r.valor, `semilla ${s}`).toBe(e.respuesta);
+      const d = e.datos;
+      if (d.tipo === 'equilibrio') {
+        const { P, Q } = equilibrioCramer(d.curvas.a, d.curvas.b, d.curvas.c, d.curvas.d);
+        expect(e.respuesta, `semilla ${s}`).toBeCloseTo(d.pide === 'precio' ? P : Q, 10);
+        expect(Number.isInteger(e.respuesta), `semilla ${s}`).toBe(true);
+      } else if (d.tipo === 'prediccion') {
+        expect(e.respuesta, `semilla ${s}`).toBe(direccionDeLibro(d.desplazador, d.movimiento, d.variable));
+      }
+      expect(e.enunciado, `semilla ${s}`).not.toMatch(/NaN|undefined|-\d/);
+    }
+    expect(respuestas.size).toBeGreaterThanOrEqual(3);
+    expect(escenarios.size).toBeGreaterThanOrEqual(20);
+    expect(tipos).toEqual(new Set(['equilibrio', 'desajuste', 'prediccion']));
+  });
+});
+
+test.describe('simulador-oferta-demanda · la sección de casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+  const casilla = (page: Page) => page.locator('#casos-respuesta');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type=range]']);
+  });
+
+  test('un caso numérico y uno de predicción, y la predicción se confirma en el panel', async ({ page }) => {
+    await expect(seccion(page)).toBeVisible();
+    await expect(seccion(page).getByRole('button', { name: /^Caso \d+:/ })).toHaveCount(12);
+
+    await seccion(page).getByRole('button', { name: 'Caso 5: Pan a un precio demasiado bajo' }).click();
+    await casilla(page).fill('-50');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('en positivo');
+    await casilla(page).fill('50');
+    await casilla(page).press('Enter');
+    await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto!');
+
+    // Caso 7: predecir sin mover, y después mover y ver que el panel dice lo mismo
+    await seccion(page).getByRole('button', { name: 'Caso 7: Las familias ganan más' }).click();
+    await expect(casilla(page)).toHaveCount(0);
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('Elige una');
+    await seccion(page).getByRole('radio', { name: 'Sube' }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto!');
+    await expect(resultado(page, 'Precio de equilibrio')).toHaveText('34,3 €');
+    await sembrarValor(page, deslizador(page, RENTA), 2);
+    await expect(resultado(page, 'Precio de equilibrio')).toHaveText('36,6 €');
+
+    await seccion(page).getByRole('button', { name: 'Ver solución' }).click();
+    await expect(seccion(page).locator('#casos-solucion')).toContainText('de 34,3 a 36,6');
+  });
+
+  test('la sección no añade deslizadores, ni role="status", ni tarjetas de resultado', async ({ page }) => {
+    await expect(page.locator('input[type=range]')).toHaveCount(6);
+    await expect(page.locator('[role="status"]')).toHaveCount(1);
+    await expect(seccion(page).locator('[class*="resultCard"]')).toHaveCount(0);
   });
 });
