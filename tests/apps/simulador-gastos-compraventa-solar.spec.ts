@@ -3019,14 +3019,14 @@ test.describe('Re-inspección 06/10/2026 — casos a mano, cifras intermedias y 
   });
 
   /**
-   * ABIERTO (contenido) — residuo de 731/1596 en el canal que leen las IA. La FAQ VISIBLE dice
+   * REPARADO el 06/10/2026 (hallazgo 2918): las dos respuestas nombran el IGIC y el IPSI.
+   * Era así (contenido) — residuo de 731/1596 en el canal que leen las IA. La FAQ VISIBLE dice
    * «sujeta a IVA al 21 % — o al IGIC o el IPSI en Canarias, Ceuta y Melilla», pero en el
    * FAQPage del JSON-LD la pregunta gemela («¿Por qué un solar de empresario lleva IVA y no
    * ITP?») y la de la finca rústica afirman el IVA del 21 % sin excepción. Se espera que toda
    * respuesta que publique el IVA del 21 % lleve la excepción.
    */
-  test('ABIERTO — el FAQPage afirma el IVA del 21 % sin la excepción de Canarias, Ceuta y Melilla en dos respuestas', async ({ page }) => {
-    test.fail(!process.env.VER_HUECOS, 'ABIERTO 06/10/2026: respuestas 3 y 6 del FAQPage sin IGIC/IPSI');
+  test('el FAQPage no afirma el IVA del 21 % sin la excepción de Canarias, Ceuta y Melilla', async ({ page }) => {
     await page.goto(RUTA);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = JSON.parse(bloques.find((b) => b.includes('FAQPage')) ?? '{}') as {
@@ -3039,7 +3039,8 @@ test.describe('Re-inspección 06/10/2026 — casos a mano, cifras intermedias y 
   });
 
   /**
-   * ABIERTO (contenido) — forma ATENUADA del 2914 de nave-industrial (residuo del 2208). La
+   * REPARADO el 06/10/2026 (hallazgo 2919): las dos respuestas generales llevan la salvedad.
+   * Era así (contenido) — forma ATENUADA del 2914 de nave-industrial (residuo del 2208). La
    * tarjeta del ITP y el recuadro ya dicen que alguna comunidad tiene tipos ligados a la
    * ACTIVIDAD, y en Aragón el recuadro pinta el 1 % del art. 121-11 (inmueble para iniciar una
    * actividad económica; ITP_CCAA.aragon.notas). Pero las dos respuestas generales —«¿Se paga IVA
@@ -3048,8 +3049,7 @@ test.describe('Re-inspección 06/10/2026 — casos a mano, cifras intermedias y 
    * aplican» como en la nave: es la afirmación sin excepción. Aragón, 300.000 €: 24.000 € al 8 %
    * frente a 3.000 € al 1 % si el solar se compra para iniciar una actividad.
    */
-  test('ABIERTO — la FAQ y el FAQPage dan el ITP «al tipo general» sin la salvedad de los tipos ligados a la actividad', async ({ page }) => {
-    test.fail(!process.env.VER_HUECOS, 'ABIERTO 06/10/2026: respuesta general de la FAQ y del FAQPage sin la salvedad del art. 121-11');
+  test('la FAQ y el FAQPage dan el ITP «al tipo general» con la salvedad de los tipos ligados a la actividad', async ({ page }) => {
     expect(ITP_CCAA['aragon'].notas).toContain('art. 121-11');
     await abrir(page, 'aragon', 'particular');
     await sembrarValor(page, SEL_PRECIO, '300000');
@@ -3071,7 +3071,7 @@ test.describe('Re-inspección 06/10/2026 — casos a mano, cifras intermedias y 
       .innerText();
     expect(frase(ld)).not.toBe('');
     expect(frase(visible)).not.toBe('');
-    expect.soft(frase(ld)).toMatch(conSalvedad);
-    expect.soft(frase(visible)).toMatch(conSalvedad);
+    expect(frase(ld)).toMatch(conSalvedad);
+    expect(frase(visible)).toMatch(conSalvedad);
   });
 });

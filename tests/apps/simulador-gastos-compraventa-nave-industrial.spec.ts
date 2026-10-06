@@ -2111,9 +2111,10 @@ test.describe('Regresión — hallazgos del 07/09/2026, reparados', () => {
     const respuestas = await page.evaluate(() =>
       Array.from(document.querySelectorAll('table td'))
         .map((td) => (td.textContent ?? '').replace(/\s+/g, ' ').trim())
-        .filter((t) => /^No aplican$|^No$|^Sí /.test(t))
+        .filter((t) => /^No por perfil|^No$|^Sí /.test(t))
     );
-    expect(respuestas.filter((t) => t === 'No aplican')).toHaveLength(1);
+    // «No aplican» pasó a «No por perfil del comprador; alguna comunidad…» (hallazgo 2914)
+    expect(respuestas.filter((t) => t.startsWith('No por perfil del comprador'))).toHaveLength(1);
     expect(respuestas.filter((t) => t === 'No')).toHaveLength(1);
     expect(respuestas.some((t) => t.startsWith('Sí (jóvenes'))).toBe(true);
     expect(respuestas.some((t) => t.startsWith('Sí (si actividad sujeta a IVA'))).toBe(true);
@@ -5801,7 +5802,8 @@ test.describe('Re-inspección 06/10/2026 — familia: casos nuevos, invariante y
   });
 
   /**
-   * ABIERTO [06/10·A] (contenido, bajo) — residuo de los hallazgos 726 (local-comercial) y 2208
+   * REPARADO el 06/10/2026 (hallazgo 2914): la tabla, el FAQPage y el caso de uso nombran la
+   * salvedad de Aragón. Era así [06/10·A] (contenido, bajo) — residuo de los hallazgos 726 (local-comercial) y 2208
    * (solar, llevado aquí el 26/09 en b86a5607). Aquella reparación arregló la tarjeta del ITP y el
    * recuadro, que ya no niegan de plano un tipo reducido y pintan la nota de Aragón (art. 121-11:
    * el 1 % por adquirir un inmueble para iniciar una actividad económica, documentado en
@@ -5815,7 +5817,7 @@ test.describe('Re-inspección 06/10/2026 — familia: casos nuevos, invariante y
    *     CCAA — salvo en Ceuta y Melilla».
    * La FAQ visible de la misma página sí dice «Hay dos salvedades… en Aragón».
    */
-  test.fail('[06/10·A] ni la tabla comparativa ni el FAQPage niegan de plano el tipo de Aragón por actividad', async ({ page }) => {
+  test('[06/10·A] ni la tabla comparativa ni el FAQPage niegan de plano el tipo de Aragón por actividad', async ({ page }) => {
     expect(ITP_CCAA['aragon'].notas).toContain('art. 121-11');
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);

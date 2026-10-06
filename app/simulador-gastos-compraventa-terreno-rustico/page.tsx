@@ -461,7 +461,7 @@ export default function SimuladorTerrenoRusticoPage() {
                 disabled={renunciaImposible}
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🤝</span>
-                <span>Con renuncia a la exención {impuestoDeLaRenuncia}</span>
+                <span>Con renuncia a la exención del {impuestoDeLaRenuncia}</span>
                 {/* El subtítulo no puede prometer un IVA que allí no se liquida, ni escribir
                     su tipo a mano teniéndolo en data/fiscal (hallazgos 803 y 806). */}
                 <span className={styles.transmisionSub}>

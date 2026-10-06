@@ -901,7 +901,9 @@ export default function SimuladorSolarPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 Depende del vendedor. Si vende un promotor o empresario en el ejercicio de su actividad, la
                 compra tributa por IVA al {formatNumber(IVA_SOLAR, 0)}&nbsp;% más AJD. Si vende un particular, tributa
-                por ITP al tipo general de la comunidad autónoma. Nunca se pagan IVA e ITP a la vez. En Canarias,
+                por ITP al tipo general de la comunidad autónoma, salvo los tipos reducidos que alguna comunidad
+                liga a la actividad económica del comprador (Aragón, por ejemplo, para un inmueble con el que se
+                inicia una actividad). Nunca se pagan IVA e ITP a la vez. En Canarias,
                 Ceuta y Melilla no rige el IVA: la operación tributa por IGIC o IPSI, con sus propios tipos.
               </p>
             </div>

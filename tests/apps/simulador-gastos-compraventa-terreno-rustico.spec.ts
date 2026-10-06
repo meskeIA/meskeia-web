@@ -1966,8 +1966,8 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, la Comunitat V
     expect(texto).toContain('inversión del sujeto pasivo (art. 19.1.2.º g Ley 20/1991)');
     expect(texto).toContain('art. 4.4');
     // Y el botón nombra el impuesto cuya exención se renuncia.
-    await expect(page.getByRole('button', { name: /Con renuncia a la exención IGIC/ })).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.getByRole('button', { name: /Con renuncia a la exención IVA/ })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Con renuncia a la exención del IGIC/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: /Con renuncia a la exención del IVA/ })).toHaveCount(0);
   });
 
   /**
@@ -3076,7 +3076,8 @@ test.describe('Re-inspección 06/10/2026 — Extremadura, País Vasco, los selec
   });
 
   /**
-   * ABIERTO (contenido, bajo) — re-inspección 06/10/2026. El botón del régimen dice «Con renuncia a
+   * REPARADO el 06/10/2026 (hallazgo 2922): «Con renuncia a la exención del IVA» (del IGIC, del
+   * IPSI). Era así (contenido, bajo) — re-inspección 06/10/2026. El botón del régimen decía «Con renuncia a
    * la exención IVA» (sin artículo; «IGIC» e «IPSI» en Canarias, Ceuta y Melilla), mientras el
    * hero, la FAQ y el aviso dicen «renuncia a la exención de IVA». Su nombre accesible queda «Con
    * renuncia a la exención IVA IVA 21 % (ISP) + AJD».
@@ -3084,11 +3085,11 @@ test.describe('Re-inspección 06/10/2026 — Extremadura, País Vasco, los selec
    * OJO al repararlo: «REPARADO 1605» busca hoy el botón por /Con renuncia a la exención IGIC/ y
    * /Con renuncia a la exención IVA/: hay que ajustar esas dos expresiones.
    */
-  test.fail('ABIERTO — el botón dice «Con renuncia a la exención IVA», sin artículo', async ({ page }) => {
+  test('el botón dice «Con renuncia a la exención del IVA», con artículo', async ({ page }) => {
     await abrirHidratada(page);
     const boton = page.getByRole('button', { name: /renuncia a la exención/i });
     await expect(boton).toHaveCount(1);
-    // El defecto.
+    // El defecto que fue.
     await expect(boton).toContainText(/exención (del|de) IVA/, { timeout: 2000 });
   });
 });

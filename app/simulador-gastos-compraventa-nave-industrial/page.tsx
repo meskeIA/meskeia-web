@@ -967,7 +967,9 @@ export default function SimuladorNaveIndustrialPage() {
                     PALABRA —«Sí …» / «No aplican»—, no el color. */}
                 <tr>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--bg-primary)' }}>Tipos reducidos ITP</td>
-                  <td className={styles.celdaNo} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>No aplican</td>
+                  {/* Ni «No aplican» de plano: Aragón tiene el 1 % del art. 121-11 para el inmueble con
+                      el que se inicia una actividad, que el recuadro ya pinta (hallazgo 2914). */}
+                  <td className={styles.celdaNo} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>No por perfil del comprador; alguna comunidad los liga a la actividad (Aragón)</td>
                   <td className={styles.celdaSi} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí (jóvenes, familia numerosa, etc.)</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
@@ -1003,7 +1005,8 @@ export default function SimuladorNaveIndustrialPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Paga ITP al tipo general de su CCAA — salvo en Ceuta y Melilla, donde la cuota se bonifica
                 un {BONIFICACION_CIUDADES} (art. 57 bis TRLITPAJD) para cualquier inmueble, también una
-                nave. El ITP no es
+                nave, y en las comunidades con un tipo reducido para el inmueble con el que se inicia una
+                actividad, como Aragón (lo indica el recuadro de la comunidad). El ITP no es
                 deducible como IVA, pero sí se añade al valor de adquisición del activo.
               </p>
             </div>

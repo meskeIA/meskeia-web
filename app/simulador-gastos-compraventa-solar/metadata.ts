@@ -84,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Se paga IVA o ITP al comprar un solar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Depende de quién venda. Si el vendedor es un promotor o empresario que actúa en su actividad, la entrega del solar está sujeta a IVA al ${IVA_SOLAR} más AJD, que va del ${pct(RANGO_AJD_OTROS.min)} al ${pct(RANGO_AJD_OTROS.max)} según la comunidad autónoma (en Ceuta y Melilla la cuota se bonifica al ${pct(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}, art. 57 bis.1 TRLITPAJD). Si el vendedor es un particular, la compra tributa por ITP al tipo general de la comunidad. No coinciden IVA e ITP en la misma operación. En Canarias, Ceuta y Melilla no rige el IVA: la operación tributa por IGIC o IPSI, con sus propios tipos.`,
+        text: `Depende de quién venda. Si el vendedor es un promotor o empresario que actúa en su actividad, la entrega del solar está sujeta a IVA al ${IVA_SOLAR} más AJD, que va del ${pct(RANGO_AJD_OTROS.min)} al ${pct(RANGO_AJD_OTROS.max)} según la comunidad autónoma (en Ceuta y Melilla la cuota se bonifica al ${pct(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}, art. 57 bis.1 TRLITPAJD). Si el vendedor es un particular, la compra tributa por ITP al tipo general de la comunidad, salvo los tipos reducidos que alguna comunidad liga a la actividad económica del comprador (Aragón, por ejemplo, para un inmueble con el que se inicia una actividad). No coinciden IVA e ITP en la misma operación. En Canarias, Ceuta y Melilla no rige el IVA: la operación tributa por IGIC o IPSI, con sus propios tipos.`,
       },
     },
     {
@@ -92,7 +92,7 @@ export const faqJsonLd = {
       name: '¿Por qué un solar de empresario lleva IVA y no ITP?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Porque los terrenos edificables (solares) están excluidos de la exención de IVA que sí se aplica al suelo rústico. Cuando un empresario o promotor entrega un solar en el ejercicio de su actividad, la operación está sujeta y no exenta de IVA al ${IVA_SOLAR}, y la escritura tributa además por Actos Jurídicos Documentados (AJD).`,
+        text: `Porque los terrenos edificables (solares) están excluidos de la exención de IVA que sí se aplica al suelo rústico. Cuando un empresario o promotor entrega un solar en el ejercicio de su actividad, la operación está sujeta y no exenta de IVA al ${IVA_SOLAR} —o de IGIC o IPSI en Canarias, Ceuta y Melilla, donde no rige el IVA—, y la escritura tributa además por Actos Jurídicos Documentados (AJD).`,
       },
     },
     {
@@ -116,7 +116,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre comprar un solar y una finca rústica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `La fiscalidad es distinta. El solar edificable tributa por IVA ${IVA_SOLAR} más AJD si vende un empresario, o por ITP si vende un particular, y al ser suelo urbano está sujeto a la plusvalía municipal cuando hay incremento real del valor del terreno (sin incremento, la transmisión no está sujeta: art. 104.5 TRLRHL). La finca rústica no edificable está exenta de IVA (tributa por ITP incluso vendiéndola un empresario) y no genera plusvalía municipal. Por eso conviene identificar bien el tipo de suelo antes de comprar.`,
+        text: `La fiscalidad es distinta. El solar edificable tributa por IVA ${IVA_SOLAR} más AJD si vende un empresario (IGIC o IPSI en Canarias, Ceuta y Melilla), o por ITP si vende un particular, y al ser suelo urbano está sujeto a la plusvalía municipal cuando hay incremento real del valor del terreno (sin incremento, la transmisión no está sujeta: art. 104.5 TRLRHL). La finca rústica no edificable está exenta de IVA (tributa por ITP incluso vendiéndola un empresario) y no genera plusvalía municipal. Por eso conviene identificar bien el tipo de suelo antes de comprar.`,
       },
     },
   ],
