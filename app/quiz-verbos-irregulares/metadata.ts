@@ -10,7 +10,7 @@ const N = verbosIrregulares.filter((v) => !v.pastSimpleRegular).length;
 
 export const metadata: Metadata = {
   title: 'Quiz Verbos Irregulares en Inglés - Past Simple A1 a B2 | meskeIA',
-  description: `Aprende los verbos irregulares en inglés con este quiz interactivo. ${N} verbos clasificados por nivel MCER (A1-B2), opción múltiple con conjugación completa. Sin registro.`,
+  description: `Quiz y examen de verbos irregulares en inglés: ${N} verbos de A1 a B2. Elige el Past Simple o escribe las dos formas como en un examen, y repasa los que fallas. Sin registro.`,
   keywords: 'verbos irregulares ingles, quiz ingles, past simple ejercicios, past participle, aprender ingles, quiz verbos irregulares, inglés nivel A1 A2 B1 B2, ejercicios verbos irregulares',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -43,10 +43,17 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Quiz Verbos Irregulares Inglés",
-  description: `Aprende los verbos irregulares en inglés con este quiz interactivo. ${N} verbos clasificados por nivel MCER (A1-B2), opción múltiple con conjugación completa. Sin registro.`,
+  description: `Quiz y examen de verbos irregulares en inglés: ${N} verbos clasificados por nivel MCER (A1-B2). Elige el Past Simple entre cuatro opciones o escribe el Past Simple y el Past Participle, con corrección casilla a casilla y una lista de repaso de los verbos fallados. Sin registro.`,
   url: "https://meskeia.com/quiz-verbos-irregulares/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    `${N} verbos irregulares por nivel MCER (A1, A2, B1, B2)`,
+    'Modo opción múltiple: elegir el Past Simple entre cuatro formas',
+    'Modo examen: escribir el Past Simple y el Past Participle',
+    'Admite las dos formas válidas cuando las hay (got/gotten, was/were)',
+    'Lista de repaso de los verbos fallados, guardada en el navegador',
+    'Conjugación completa tras cada respuesta',
+  ],
 });
 
 export const faqJsonLd = {
@@ -87,7 +94,9 @@ export const faqJsonLd = {
         // Hallazgo 313: esta respuesta prometía que el quiz pregunta «Past Simple o Past
         // Participle», y solo pregunta el pasado simple. Es la señal estructurada que leen
         // Bing Copilot, ChatGPT y Perplexity, así que la promesa falsa viajaba lejos.
-        text: 'El quiz muestra el verbo en infinitivo y pide seleccionar su Past Simple entre cuatro opciones. Al responder se indica si es correcta y se muestra la conjugación completa del verbo —infinitivo, pasado y participio—, de modo que el participio se estudia en el repaso aunque no sea lo que se pregunta. Puedes filtrar por nivel MCER (A1, A2, B1, B2) para adaptar la dificultad a tu nivel actual.',
+        // S0181 (06/10/2026): desde que existe el modo «Escribir las formas» el participio SÍ se
+        // pregunta, pero solo en ese modo; en el de opciones se sigue preguntando el pasado.
+        text: 'Muestra el verbo en infinitivo y tiene dos modos. En «Elegir entre 4 opciones» seleccionas su Past Simple; en «Escribir las formas» tecleas el Past Simple y el Past Participle, como en un examen, y cada casilla se corrige por separado, admitiendo las dos formas válidas cuando las hay (got/gotten). Tras cada respuesta se muestra la conjugación completa, y los verbos que fallas quedan en una lista de repaso guardada en el navegador. Puedes filtrar por nivel MCER (A1, A2, B1, B2).',
       },
     },
     {

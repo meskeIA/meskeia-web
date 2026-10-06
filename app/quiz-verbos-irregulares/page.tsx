@@ -10,9 +10,32 @@ import { getRelatedApps } from '@/data/app-relations';
 import EducationalSection from '@/components/EducationalSection';
 import { formatPercentage } from '@/lib';
 import { verbosIrregulares, VerboIrregular } from '@/data/verbos-irregulares';
+import {
+  corregir, anotarRespuesta, verbosPendientes, leerRegistro, ACIERTOS_PARA_SALIR, REGISTRO_VACIO,
+  type Correccion, type ModoRespuesta, type RegistroRepaso,
+} from './motor';
 
 type Nivel = 'A1' | 'A2' | 'B1' | 'B2' | 'todos';
 type Pantalla = 'config' | 'quiz' | 'resultado';
+/** De dónde salen los verbos de la partida: un nivel, o la lista de los fallados. */
+type OrigenPartida = 'nivel' | 'repaso';
+
+/**
+ * Lista de verbos fallados, guardada en el navegador. No sale del dispositivo: no hay cuenta
+ * ni servidor detrás, solo `localStorage`.
+ */
+const CLAVE_REPASO = 'meskeia_verbos_irregulares_repaso';
+
+/** Las dos casillas del modo escribir, en el orden de las columnas de la tabla. */
+const CAMPOS_ESCRITURA: { clave: 'pasado' | 'participio'; id: string; etiqueta: string }[] = [
+  { clave: 'pasado', id: 'forma-pasado', etiqueta: 'Past Simple' },
+  { clave: 'participio', id: 'forma-participio', etiqueta: 'Past Participle' },
+];
+
+const MODOS: Record<ModoRespuesta, { label: string; desc: string }> = {
+  elegir:   { label: 'Elegir entre 4 opciones', desc: 'Se pregunta el Past Simple' },
+  escribir: { label: 'Escribir las formas', desc: 'Past Simple y Past Participle, como en un examen' },
+};
 
 interface PreguntaQuiz {
   verbo: VerboIrregular;
@@ -96,8 +119,20 @@ function generarPreguntas(nivel: Nivel, numPreguntas: number): PreguntaQuiz[] {
   const seleccionados = mezclar(preguntables).slice(0, Math.min(numPreguntas, preguntables.length));
   // Los distractores salen del MISMO conjunto: si «showed» apareciera de distractor, se
   // descartaría igual de gratis que cuando era la respuesta.
-  const poolRespuestas = preguntables.map(respuestaDe);
+  return preguntasDe(seleccionados, preguntables);
+}
 
+/**
+ * Preguntas de los verbos de la lista de repaso: los `numPreguntas` más fallados, en orden
+ * barajado. Los distractores salen de todo el banco preguntable, porque los fallados pueden
+ * ser de cualquier nivel.
+ */
+function generarPreguntasRepaso(pendientes: VerboIrregular[], numPreguntas: number): PreguntaQuiz[] {
+  return preguntasDe(mezclar(pendientes.slice(0, numPreguntas)), preguntablesDe('todos'));
+}
+
+function preguntasDe(seleccionados: VerboIrregular[], pool: VerboIrregular[]): PreguntaQuiz[] {
+  const poolRespuestas = pool.map(respuestaDe);
   return seleccionados.map(verbo => {
     const correcta = respuestaDe(verbo);
     const opciones = generarOpciones(correcta, verbo.infinitive, poolRespuestas);
@@ -146,13 +181,78 @@ export default function QuizVerbosIrregularesPage() {
   const [tiempoInicio, setTiempoInicio] = useState<number>(0);
   const [tiempoTotal, setTiempoTotal] = useState<number>(0);
 
+  // ── Modo «Escribir las formas» y lista de repaso (S0181) ──
+  const [modo, setModo] = useState<ModoRespuesta>('elegir');
+  /** Modo de la partida EN CURSO: cambiar el selector en la configuración no la altera. */
+  const [modoPartida, setModoPartida] = useState<ModoRespuesta>('elegir');
+  const [origen, setOrigen] = useState<OrigenPartida>('nivel');
+  const [textoPasado, setTextoPasado] = useState('');
+  const [textoParticipio, setTextoParticipio] = useState('');
+  const [correccion, setCorreccion] = useState<Correccion | null>(null);
+  const [registro, setRegistro] = useState<RegistroRepaso>(REGISTRO_VACIO);
+  /** Infinitivos fallados en la partida en curso, en el orden en que se fallaron. */
+  const [falladosPartida, setFalladosPartida] = useState<string[]>([]);
+
   const pregunta = preguntas[preguntaActual];
   const totalPreguntas = preguntas.length;
   const esUltima = preguntaActual === totalPreguntas - 1;
+  /** Cierto en cuanto la pregunta actual tiene veredicto, en cualquiera de los dos modos. */
+  const respondida = modoPartida === 'escribir' ? correccion !== null : seleccionada !== null;
   /** Preguntas ya contestadas, contando la actual en cuanto se responde. */
-  const respondidas = preguntaActual + (seleccionada !== null ? 1 : 0);
+  const respondidas = preguntaActual + (respondida ? 1 : 0);
+  /** Veredicto de la pregunta actual. Escribiendo, solo es acierto con las DOS casillas bien. */
+  const aciertoActual = modoPartida === 'escribir'
+    ? correccion !== null && correccion.pasadoOk && correccion.participioOk
+    : pregunta !== undefined && seleccionada === pregunta.respuestaCorrecta;
+  /** Qué casilla se ha fallado y qué ponía, para que el veredicto diga dónde está el error. */
+  const detalleFallo = modoPartida === 'escribir' && correccion !== null
+    ? [
+        !correccion.pasadoOk && (textoPasado.trim() ? `En el Past Simple has escrito «${textoPasado.trim()}».` : 'Has dejado vacío el Past Simple.'),
+        !correccion.participioOk && (textoParticipio.trim() ? `En el Past Participle has escrito «${textoParticipio.trim()}».` : 'Has dejado vacío el Past Participle.'),
+      ].filter(Boolean).join(' ')
+    : '';
   /** Verbos PREGUNTABLES del nivel elegido: el techo real de la partida. */
   const verbosDelNivel = useMemo(() => preguntablesDe(nivel).length, [nivel]);
+
+  /** Verbos pendientes de repaso en el modo elegido, del más fallado al menos. */
+  const pendientes = useMemo(
+    () => verbosPendientes(registro[modo], preguntablesDe('todos')),
+    [registro, modo]
+  );
+  const preguntasRepaso = Math.min(numPreguntas, pendientes.length);
+
+  /**
+   * `localStorage` no existe en el servidor, y leerlo en el `useState` inicial haría que el HTML
+   * del servidor y el primer render del cliente no coincidieran: se lee al montar.
+   */
+  useEffect(() => {
+    try {
+      const crudo = window.localStorage.getItem(CLAVE_REPASO);
+      setRegistro(leerRegistro(crudo, preguntablesDe('todos').map(v => v.infinitive)));
+    } catch { /* sin almacenamiento: la lista vive solo mientras dure la visita */ }
+  }, []);
+
+  /** Apunta la respuesta en la lista del modo de la partida y la guarda. */
+  const anotar = useCallback((infinitivo: string, acierto: boolean) => {
+    setRegistro(prev => {
+      const nuevo = { ...prev, [modoPartida]: anotarRespuesta(prev[modoPartida], infinitivo, acierto) };
+      try {
+        window.localStorage.setItem(CLAVE_REPASO, JSON.stringify(nuevo));
+      } catch { /* sin almacenamiento: la lista vive solo mientras dure la visita */ }
+      return nuevo;
+    });
+    if (!acierto) setFalladosPartida(prev => (prev.includes(infinitivo) ? prev : [...prev, infinitivo]));
+  }, [modoPartida]);
+
+  const vaciarRepaso = useCallback(() => {
+    setRegistro(prev => {
+      const nuevo = { ...prev, [modo]: {} };
+      try {
+        window.localStorage.setItem(CLAVE_REPASO, JSON.stringify(nuevo));
+      } catch { /* sin almacenamiento: no hay nada que borrar fuera de esta visita */ }
+      return nuevo;
+    });
+  }, [modo]);
 
   /**
    * Foco y vista (hallazgos 1834 y 1835, la forma del 1812/1813 de quiz-simbolos-quimicos).
@@ -171,15 +271,19 @@ export default function QuizVerbosIrregularesPage() {
   const botonSiguienteRef = useRef<HTMLButtonElement>(null);
   const resultadoRef = useRef<HTMLDivElement>(null);
   const tituloConfigRef = useRef<HTMLHeadingElement>(null);
+  const inputPasadoRef = useRef<HTMLInputElement>(null);
   const vieneDelResultado = useRef(false);
 
+  // Al escribir, la pregunta nueva lleva el foco a la primera casilla: se contesta tecleando
+  // sin tocar el ratón, y en el móvil se abre el teclado sin un toque de más.
   useEffect(() => {
     if (pantalla === 'quiz') {
-      if (seleccionada !== null) {
+      if (respondida) {
         botonSiguienteRef.current?.focus();
       } else {
         traerALaVista(quizPanelRef.current, preguntaRef.current);
-        preguntaRef.current?.focus({ preventScroll: true });
+        if (modoPartida === 'escribir') inputPasadoRef.current?.focus({ preventScroll: true });
+        else preguntaRef.current?.focus({ preventScroll: true });
       }
     } else if (pantalla === 'resultado') {
       traerALaVista(resultadoRef.current, resultadoRef.current);
@@ -188,25 +292,50 @@ export default function QuizVerbosIrregularesPage() {
       vieneDelResultado.current = false;
       tituloConfigRef.current?.focus();
     }
-  }, [pantalla, preguntaActual, seleccionada]);
+  }, [pantalla, preguntaActual, respondida, modoPartida]);
 
-  const iniciarQuiz = useCallback(() => {
-    const nuevasPreguntas = generarPreguntas(nivel, numPreguntas);
+  const arrancar = useCallback((nuevasPreguntas: PreguntaQuiz[], nuevoOrigen: OrigenPartida) => {
     setPreguntas(nuevasPreguntas);
     setPreguntaActual(0);
     setSeleccionada(null);
+    setCorreccion(null);
+    setTextoPasado('');
+    setTextoParticipio('');
     setCorrectas(0);
+    setFalladosPartida([]);
+    setModoPartida(modo);
+    setOrigen(nuevoOrigen);
     setTiempoInicio(Date.now());
     setPantalla('quiz');
-  }, [nivel, numPreguntas]);
+  }, [modo]);
+
+  const iniciarQuiz = useCallback(() => {
+    arrancar(generarPreguntas(nivel, numPreguntas), 'nivel');
+  }, [arrancar, nivel, numPreguntas]);
+
+  const iniciarRepaso = useCallback(() => {
+    if (pendientes.length === 0) return;
+    arrancar(generarPreguntasRepaso(pendientes, numPreguntas), 'repaso');
+  }, [arrancar, pendientes, numPreguntas]);
 
   const responder = useCallback((opcion: string) => {
     if (seleccionada !== null) return;
     setSeleccionada(opcion);
-    if (opcion === pregunta.respuestaCorrecta) {
+    const acierto = opcion === pregunta.respuestaCorrecta;
+    if (acierto) {
       setCorrectas(prev => prev + 1);
     }
-  }, [seleccionada, pregunta]);
+    anotar(pregunta.verbo.infinitive, acierto);
+  }, [seleccionada, pregunta, anotar]);
+
+  const comprobarEscrito = useCallback(() => {
+    if (correccion !== null) return;
+    const c = corregir(pregunta.verbo, textoPasado, textoParticipio);
+    setCorreccion(c);
+    const acierto = c.pasadoOk && c.participioOk;
+    if (acierto) setCorrectas(prev => prev + 1);
+    anotar(pregunta.verbo.infinitive, acierto);
+  }, [correccion, pregunta, textoPasado, textoParticipio, anotar]);
 
   const siguiente = useCallback(() => {
     if (esUltima) {
@@ -215,10 +344,17 @@ export default function QuizVerbosIrregularesPage() {
     } else {
       setPreguntaActual(prev => prev + 1);
       setSeleccionada(null);
+      setCorreccion(null);
+      setTextoPasado('');
+      setTextoParticipio('');
     }
   }, [esUltima, tiempoInicio]);
 
-  const reiniciar = useCallback(() => { iniciarQuiz(); }, [iniciarQuiz]);
+  /** «Jugar de nuevo» repite el mismo tipo de partida; si era de repaso y ya no queda nada, juega el nivel. */
+  const reiniciar = useCallback(() => {
+    if (origen === 'repaso' && pendientes.length > 0) iniciarRepaso();
+    else iniciarQuiz();
+  }, [origen, pendientes, iniciarRepaso, iniciarQuiz]);
   const volverConfig = useCallback(() => {
     vieneDelResultado.current = true;
     setPantalla('config');
@@ -247,7 +383,7 @@ export default function QuizVerbosIrregularesPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Quiz Verbos Irregulares <span aria-hidden="true">📝</span></h1>
         <p className={styles.subtitle}>
-          Aprende el Past Simple en inglés de forma interactiva · Niveles A1 a B2
+          Practica el Past Simple y el Past Participle: elige la respuesta o escríbelas como en un examen · Niveles A1 a B2
         </p>
       </header>
 
@@ -271,6 +407,22 @@ export default function QuizVerbosIrregularesPage() {
                   <span aria-hidden="true">{cfg.emoji}</span> {cfg.label}
                 </span>
                 <span className={styles.nivelDesc}>{cfg.desc}</span>
+              </button>
+            ))}
+          </div>
+
+          <h3 className={styles.configSubtitle}>Cómo quieres responder</h3>
+          <div className={styles.modoRow} role="group" aria-label="Cómo quieres responder">
+            {(Object.entries(MODOS) as [ModoRespuesta, typeof MODOS[ModoRespuesta]][]).map(([key, cfg]) => (
+              <button
+                type="button"
+                key={key}
+                className={`${styles.modoBtn} ${modo === key ? styles.active : ''}`}
+                onClick={() => setModo(key)}
+                aria-pressed={modo === key}
+              >
+                <span className={styles.modoLabel}>{cfg.label}</span>
+                <span className={styles.modoDesc}>{cfg.desc}</span>
               </button>
             ))}
           </div>
@@ -303,6 +455,39 @@ export default function QuizVerbosIrregularesPage() {
           <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
             Empezar Quiz — {Math.min(numPreguntas, verbosDelNivel)} preguntas · Nivel {nivel === 'todos' ? 'Completo' : nivel}
           </button>
+
+          {/* Lista de repaso del modo elegido: los verbos fallados, guardados en este navegador. */}
+          <div className={styles.repasoCaja}>
+            <h3 className={styles.repasoTitulo}>Tus verbos por repasar</h3>
+            {pendientes.length === 0 ? (
+              <p className={styles.repasoTexto}>
+                Aún no hay ninguno en el modo «{MODOS[modo].label}». Los verbos que falles se guardan
+                aquí, en este navegador, y salen de la lista cuando los aciertas {ACIERTOS_PARA_SALIR} veces
+                seguidas.
+              </p>
+            ) : (
+              <>
+                <p className={styles.repasoTexto}>
+                  {pendientes.length === 1
+                    ? 'Tienes 1 verbo fallado'
+                    : `Tienes ${pendientes.length} verbos fallados`}{' '}
+                  en el modo «{MODOS[modo].label}»{pendientes.length > 1 ? ', del más fallado al menos' : ''}:{' '}
+                  <span className={styles.repasoLista} lang="en">
+                    {pendientes.map(v => v.infinitive).join(', ')}
+                  </span>
+                  . Cada uno sale de la lista cuando lo aciertas {ACIERTOS_PARA_SALIR} veces seguidas.
+                </p>
+                <div className={styles.repasoBotones}>
+                  <button type="button" className={styles.btnRepaso} onClick={iniciarRepaso}>
+                    Repasar mis fallos — {preguntasRepaso} {preguntasRepaso === 1 ? 'pregunta' : 'preguntas'}
+                  </button>
+                  <button type="button" className={styles.btnVaciar} onClick={vaciarRepaso}>
+                    Vaciar la lista
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       )}
 
@@ -349,53 +534,104 @@ export default function QuizVerbosIrregularesPage() {
           <div className={styles.preguntaCard} ref={preguntaRef} tabIndex={-1}>
             <p className={styles.preguntaNumero}>Pregunta {preguntaActual + 1} de {totalPreguntas}</p>
             <p className={styles.preguntaEtiqueta}>
-              ¿Cuál es el Past Simple{matizDelEnunciado(pregunta.verbo)} de...?
+              {modoPartida === 'escribir'
+                ? 'Escribe el Past Simple y el Past Participle de...'
+                : `¿Cuál es el Past Simple${matizDelEnunciado(pregunta.verbo)} de...?`}
             </p>
-            <p className={styles.verboPrincipal}>{pregunta.verbo.infinitive}</p>
+            <p className={styles.verboPrincipal} lang="en">{pregunta.verbo.infinitive}</p>
             <p className={styles.verboSignificado}>"{pregunta.verbo.spanish}"</p>
           </div>
 
-          {/* Opciones */}
-          <div className={styles.opcionesGrid}>
-            {pregunta.opciones.map((opcion, i) => {
-              let claseExtra = '';
-              if (seleccionada !== null) {
-                if (opcion === pregunta.respuestaCorrecta) claseExtra = styles.opcionCorrecta;
-                else if (opcion === seleccionada) claseExtra = styles.opcionIncorrecta;
-                else claseExtra = styles.opcionNeutral;
-              }
-              return (
-                <button
-                  type="button"
-                  key={opcion}
-                  className={`${styles.opcion} ${claseExtra}`}
-                  onClick={() => responder(opcion)}
-                  disabled={seleccionada !== null}
-                  aria-label={`Opción ${LETRAS[i]}: ${opcion}`}
-                >
-                  <span className={styles.opcionLetra}>{LETRAS[i]}</span>
-                  {opcion}
-                </button>
-              );
-            })}
-          </div>
+          {/* Opciones (modo elegir) */}
+          {modoPartida === 'elegir' && (
+            <div className={styles.opcionesGrid}>
+              {pregunta.opciones.map((opcion, i) => {
+                let claseExtra = '';
+                if (seleccionada !== null) {
+                  if (opcion === pregunta.respuestaCorrecta) claseExtra = styles.opcionCorrecta;
+                  else if (opcion === seleccionada) claseExtra = styles.opcionIncorrecta;
+                  else claseExtra = styles.opcionNeutral;
+                }
+                return (
+                  <button
+                    type="button"
+                    key={opcion}
+                    className={`${styles.opcion} ${claseExtra}`}
+                    onClick={() => responder(opcion)}
+                    disabled={seleccionada !== null}
+                    aria-label={`Opción ${LETRAS[i]}: ${opcion}`}
+                  >
+                    <span className={styles.opcionLetra}>{LETRAS[i]}</span>
+                    {opcion}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Casillas (modo escribir). Un <form> para que Enter compruebe desde cualquiera de
+              las dos: por eso «Comprobar» es de tipo submit, a propósito. */}
+          {modoPartida === 'escribir' && (
+            <form
+              className={styles.escrituraForm}
+              onSubmit={(e) => { e.preventDefault(); comprobarEscrito(); }}
+              noValidate
+            >
+              <div className={styles.escrituraGrid}>
+                {CAMPOS_ESCRITURA.map(campo => {
+                  const valor = campo.clave === 'pasado' ? textoPasado : textoParticipio;
+                  const ok = correccion === null ? undefined : campo.clave === 'pasado' ? correccion.pasadoOk : correccion.participioOk;
+                  return (
+                    <div key={campo.id} className={styles.escrituraCampo}>
+                      <label htmlFor={campo.id} className={styles.escrituraLabel}>{campo.etiqueta}</label>
+                      <input
+                        id={campo.id}
+                        ref={campo.clave === 'pasado' ? inputPasadoRef : undefined}
+                        type="text"
+                        lang="en"
+                        className={`${styles.escrituraInput} ${ok === true ? styles.escrituraOk : ''} ${ok === false ? styles.escrituraMal : ''}`}
+                        value={valor}
+                        onChange={(e) => (campo.clave === 'pasado' ? setTextoPasado : setTextoParticipio)(e.target.value)}
+                        readOnly={correccion !== null}
+                        aria-invalid={ok === false ? true : undefined}
+                        autoComplete="off"
+                        autoCapitalize="none"
+                        autoCorrect="off"
+                        spellCheck={false}
+                        enterKeyHint="done"
+                      />
+                      {ok !== undefined && (
+                        <span className={ok ? styles.escrituraMarcaOk : styles.escrituraMarcaMal}>
+                          {ok ? 'Bien' : 'Mal'}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {correccion === null && (
+                <button type="submit" className={styles.btnComprobar}>Comprobar</button>
+              )}
+            </form>
+          )}
 
           {/* Feedback con conjugación completa */}
-          {seleccionada !== null && (
+          {respondida && (
             <>
               <div
-                className={`${styles.feedbackBanner} ${seleccionada === pregunta.respuestaCorrecta ? styles.feedbackCorrecto : styles.feedbackIncorrecto}`}
+                className={`${styles.feedbackBanner} ${aciertoActual ? styles.feedbackCorrecto : styles.feedbackIncorrecto}`}
                 role="alert"
                 aria-live="polite"
               >
                 <p className={styles.feedbackTitulo}>
                   {/* El emoji en su nodo y oculto: dentro de la cadena, el lector anunciaba
                       «marca de cruz, Incorrecto» en la alerta (hallazgo 1838, la forma del 317). */}
-                  {seleccionada === pregunta.respuestaCorrecta
+                  {aciertoActual
                     ? <><span aria-hidden="true">✅</span> ¡Correcto!</>
                     : <><span aria-hidden="true">❌</span> Incorrecto</>}
                 </p>
-                <div className={styles.conjugacion}>
+                {detalleFallo && <p className={styles.feedbackDetalle}>{detalleFallo}</p>}
+                <div className={styles.conjugacion} lang="en">
                   <span className={styles.conjForma}>{pregunta.verbo.infinitive}</span>
                   <span className={styles.conjFlecha} aria-hidden="true">→</span>
                   <span className={styles.conjForma}>{pregunta.verbo.pastSimple}</span>
@@ -408,7 +644,7 @@ export default function QuizVerbosIrregularesPage() {
                     {pregunta.verbo.varianteParticipio && (
                       <span className={styles.conjVariante}>
                         {' / '}{pregunta.verbo.varianteParticipio.forma}
-                        <small> ({pregunta.verbo.varianteParticipio.variedad})</small>
+                        <small lang="es"> ({pregunta.verbo.varianteParticipio.variedad})</small>
                       </span>
                     )}
                   </span>
@@ -450,7 +686,20 @@ export default function QuizVerbosIrregularesPage() {
             </div>
           </div>
 
+          {falladosPartida.length > 0 && (
+            <p className={styles.resultadoFallados}>
+              {falladosPartida.length === 1 ? 'Has fallado 1 verbo' : `Has fallado ${falladosPartida.length} verbos`}:{' '}
+              <span className={styles.repasoLista} lang="en">{falladosPartida.join(', ')}</span>.
+              Quedan guardados en tu lista de repaso.
+            </p>
+          )}
+
           <div className={styles.botonesResultado}>
+            {pendientes.length > 0 && (
+              <button type="button" className={styles.btnRepaso} onClick={iniciarRepaso}>
+                Repasar mis fallos — {preguntasRepaso} {preguntasRepaso === 1 ? 'pregunta' : 'preguntas'}
+              </button>
+            )}
             <button type="button" className={styles.btnRejugar} onClick={reiniciar}>
               <span aria-hidden="true">🔄</span> Jugar de nuevo
             </button>
@@ -541,9 +790,9 @@ export default function QuizVerbosIrregularesPage() {
                 Preparas el examen de inglés del trimestre y el profesor va a poner Past Simple y Past Participle.
               </p>
               <p className={styles.escenarioTip}>
-                Empieza por el nivel A1–A2 y pasa al B1 cuando encadenes 10 correctas seguidas. El quiz
-                pregunta el <strong>Past Simple</strong>; el participio lo repasas en la conjugación
-                completa que sale al responder y en la tabla de patrones de más abajo.
+                Empieza por el nivel A1–A2 y pasa al B1 cuando encadenes 10 correctas seguidas. Para
+                ensayar el examen, elige <strong>Escribir las formas</strong>: tecleas el Past Simple y el
+                Past Participle de cada verbo, que es lo que piden las tablas de clase.
               </p>
             </div>
 
@@ -588,8 +837,8 @@ export default function QuizVerbosIrregularesPage() {
               </p>
               <p className={styles.escenarioTip}>
                 Practica los grupos A-B-B y A-B-C, son los que más aparecen en textos profesionales formales.
-                Ojo: aquí se pregunta el Past Simple, así que para el participio conviene fijarse en la
-                tercera columna de la conjugación que aparece tras cada respuesta.
+                Si lo que se te escapa es el participio («I have went»), juega en el modo <strong>Escribir
+                las formas</strong>, que lo pregunta junto al Past Simple.
               </p>
             </div>
 
@@ -748,8 +997,10 @@ export default function QuizVerbosIrregularesPage() {
               <span className={styles.stepNumber}>5</span>
               <div className={styles.stepContent}>
                 <strong>Días 25–27 — Repaso de errores</strong>
-                <p>Identifica qué verbos has fallado más durante el mes y crea un mini-quiz personalizado
-                con esos 10–15 verbos. Repite hasta 95 % de acierto.</p>
+                <p>El quiz guarda en este navegador los verbos que fallas, cada modo por separado. Pulsa
+                <strong> Repasar mis fallos</strong>: te pregunta primero los que más veces has fallado, y
+                cada verbo sale de la lista cuando lo aciertas {ACIERTOS_PARA_SALIR} veces seguidas. Repite
+                hasta vaciarla o hasta el 95 % de acierto.</p>
               </div>
             </li>
 

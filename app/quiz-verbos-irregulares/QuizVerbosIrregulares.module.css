@@ -584,6 +584,247 @@
   outline-offset: 2px;
 }
 
+/* ── Modo de respuesta (S0181) ── */
+.modoRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: var(--spacing-xl);
+}
+
+.modoBtn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.modoBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary-texto);
+}
+
+.modoBtn.active {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: white;
+}
+
+.modoBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.modoLabel {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.modoDesc {
+  font-size: 0.8rem;
+}
+
+/* ── Casillas del modo escribir ── */
+.escrituraForm {
+  margin-bottom: var(--spacing-lg);
+}
+
+.escrituraGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.escrituraCampo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.escrituraLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.escrituraInput {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.escrituraInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-color: var(--primary);
+}
+
+.escrituraOk {
+  border-color: #48BB78;
+  background: #F0FFF4;
+  color: #276749;
+}
+
+.escrituraMal {
+  border-color: #FC8181;
+  background: #FFF5F5;
+  color: #C53030;
+}
+
+[data-theme='dark'] .escrituraOk {
+  background: rgba(39, 103, 73, 0.2);
+  color: #68D391;
+}
+
+[data-theme='dark'] .escrituraMal {
+  background: rgba(197, 48, 48, 0.2);
+  color: #FC8181;
+}
+
+.escrituraMarcaOk,
+.escrituraMarcaMal {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.escrituraMarcaOk {
+  color: #276749;
+}
+
+.escrituraMarcaMal {
+  color: #C53030;
+}
+
+[data-theme='dark'] .escrituraMarcaOk {
+  color: #68D391;
+}
+
+[data-theme='dark'] .escrituraMarcaMal {
+  color: #FC8181;
+}
+
+.btnComprobar {
+  display: block;
+  width: 100%;
+  padding: 0.9rem;
+  background: var(--primary-boton);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnComprobar:hover {
+  background: #1E5A73;
+}
+
+.btnComprobar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.feedbackDetalle {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Lista de repaso ── */
+.repasoCaja {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--hover);
+}
+
+.repasoTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.repasoTexto {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.repasoLista {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+}
+
+.repasoBotones {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: var(--spacing-md);
+}
+
+.btnRepaso {
+  padding: 0.8rem 1.5rem;
+  background: var(--secondary-boton);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.btnRepaso:hover {
+  filter: brightness(0.92);
+}
+
+.btnVaciar {
+  padding: 0.8rem 1.5rem;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnVaciar:hover {
+  border-color: var(--primary);
+  color: var(--primary-texto);
+}
+
+.btnRepaso:focus-visible,
+.btnVaciar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.resultadoFallados {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .hero {
@@ -596,6 +837,10 @@
   }
 
   .nivelGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .modoRow {
     grid-template-columns: 1fr;
   }
 

@@ -11,8 +11,10 @@ import { esperarPaginaAsentada } from './_hidratacion';
  * H1 «Quiz Verbos Irregulares» · subtítulo «Aprende el Past Simple en inglés de forma
  * interactiva · Niveles A1 a B2» · metadata y JSON-LD «75 verbos clasificados por nivel
  * MCER (A1-B2), opción múltiple con conjugación completa».
- * Los verbos son INGLESES y lo que se pregunta es SIEMPRE el Past Simple («¿Cuál es el
- * Past Simple de...?»); el Past Participle solo se enseña en el banner de feedback.
+ * Los verbos son INGLESES. En el modo «Elegir entre 4 opciones» (el de por defecto) lo que se
+ * pregunta es SIEMPRE el Past Simple («¿Cuál es el Past Simple de...?») y el Past Participle
+ * solo se enseña en el banner de feedback. Desde el 06/10/2026 (S0181) hay además un modo
+ * «Escribir las formas», que pide las dos, y una lista de repaso: sus casos van al final.
  * En un quiz la promesa incluye dos cosas que no se ven en el maquetado: que la forma
  * marcada como correcta lo sea DE VERDAD, y que el marcador cuente bien.
  *
@@ -569,7 +571,10 @@ test.describe('Quiz Verbos Irregulares', () => {
    * `verbo.pastSimple` como respuesta y como pool de distractores, y el rótulo de la
    * pregunta es fijo.
    */
-  test('313 · el JSON-LD no promete preguntas de Past Participle', async ({ page }) => {
+  // S0181 (06/10/2026): el modo «Escribir las formas» SÍ pregunta el participio. Lo que este caso
+  // sigue vigilando es el modo de opciones —que pregunta solo el pasado— y que el JSON-LD no
+  // vuelva a la frase ambigua del hallazgo, que prometía las dos formas en el mismo modo.
+  test('313 · el modo de opciones no pregunta el Past Participle y el JSON-LD no lo promete ahí', async ({ page }) => {
     await page.goto(RUTA);
 
     // El rótulo de la pregunta es fijo: nunca se pide el participio
@@ -1489,5 +1494,261 @@ test.describe('Inspector 25/09/2026 · móvil 360 × 740', () => {
       });
     // Se sondea: una reparación con scroll suave tarda unos fotogramas en llevar la vista.
     await expect.poll(tapadas, { message: 'líneas de la pregunta nueva fuera de pantalla o bajo el logo', timeout: 3000 }).toEqual([]);
+  });
+});
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// S0181 (06/10/2026) — modo «Escribir las formas» y lista de repaso
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// DE DÓNDE SALEN LOS VALORES ESPERADOS
+// · Las formas: el CANON de arriba. Para «be» se escribe «was / were» (las dos) y para los
+//   verbos con variante de participio, la forma principal: lo que el corrector acepta de más
+//   (got/gotten, waked, got(ten)) lo prueba ya el motor, en tests/verbos-irregulares-motor.spec.ts.
+// · El fallo se fabrica REGULARIZANDO: infinitivo + «ed» («goed», «haved»). Ninguno de los 15
+//   verbos de A1 forma así ninguna de sus dos columnas (show, el único regular, es B1), así que
+//   es un error seguro en cualquier tanda.
+// · Puntuación y rótulos: calcularPuntuacion() y getResultadoTexto(), resueltos a mano en cada caso.
+// · La lista de repaso: un fallo mete el verbo; sale con ACIERTOS_PARA_SALIR = 2 aciertos seguidos.
+
+/** Lo que se teclea en cada casilla para acertar. */
+function formasBuenas(inf: string): { pasado: string; participio: string } {
+  return { pasado: CANON[inf].ps, participio: CANON[inf].pp };
+}
+
+const casillaPasado = (page: Page) => page.getByLabel('Past Simple', { exact: true });
+const casillaParticipio = (page: Page) => page.getByLabel('Past Participle', { exact: true });
+
+async function arrancarEscribiendo(page: Page, nivel: string, numPreguntas: 10 | 15 | 20) {
+  await page.locator('[class*="nivelBtn"]').filter({ hasText: nivel }).click();
+  await page.getByRole('button', { name: /Escribir las formas/ }).click();
+  await page.getByRole('button', { name: `${numPreguntas} preguntas`, exact: true }).click();
+  await page.getByRole('button', { name: /^Empezar Quiz/ }).click();
+}
+
+/** Escribe las dos casillas y comprueba, con el botón o con Enter. */
+async function escribir(page: Page, pasado: string, participio: string, conEnter = false) {
+  await casillaPasado(page).fill(pasado);
+  await casillaParticipio(page).fill(participio);
+  if (conEnter) await casillaParticipio(page).press('Enter');
+  else await page.getByRole('button', { name: 'Comprobar', exact: true }).click();
+}
+
+test.describe('S0181 · modo «Escribir las formas» y repaso', () => {
+  /**
+   * CASO NORMAL — A1 escribiendo, 10 preguntas.
+   * Q1-Q6 bien · Q7 pasado bien y participio «inf+ed» · Q8 las dos vacías · Q9 pasado «inf+ed»
+   * y participio bien · Q10 bien, comprobando con Enter.
+   *
+   * Resuelto a mano ANTES de ejecutar:
+   *   · aciertos: Q1-Q6 y Q10 = 7. Q7 y Q9 fallan una casilla, y escribiendo solo es acierto
+   *     con las DOS bien.
+   *   · precisión tras Q7 = 6/7 = 85,71 → 86 % · tras Q8 = 6/8 → 75 % · tras Q9 = 6/9 = 66,67
+   *     → 67 % · tras Q10 = 7/10 → 70 %.
+   *   · 7/10 = 0,7 → 60 + 0 = 60 pts · «¡Muy buena puntuación!».
+   *   · fallados: los verbos de Q7, Q8 y Q9, en ese orden → «Has fallado 3 verbos» y
+   *     «Repasar mis fallos — 3 preguntas» (min(10, 3) = 3).
+   */
+  test('caso normal · A1 escribiendo: 7 de 10, casilla a casilla, y los 3 fallados a la lista', async ({ page }) => {
+    await abrirHidratada(page);
+    await arrancarEscribiendo(page, 'A1 Básico', 10);
+
+    const precisionTras: Record<number, number> = { 7: 86, 8: 75, 9: 67, 10: 70 };
+    const fallados: string[] = [];
+
+    for (let i = 1; i <= 10; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 10`, { exact: true })).toBeVisible();
+      await expect(page.locator('[class*="preguntaEtiqueta"]')).toHaveText('Escribe el Past Simple y el Past Participle de...');
+      await expect(page.locator('[class*="opcionesGrid"]')).toHaveCount(0);
+      // La pregunta nueva deja el foco en la primera casilla.
+      await expect(casillaPasado(page)).toBeFocused();
+
+      const inf = norm(await verboEnPantalla(page).textContent());
+      expect(CANON[inf]?.nivel, `«${inf}» ha salido en una partida de A1`).toBe('A1');
+      const { pasado, participio } = formasBuenas(inf);
+      const regular = `${inf}ed`;
+
+      if (i === 7) {
+        await escribir(page, pasado, regular);
+        await expect(feedback(page)).toContainText('Incorrecto');
+        await expect(feedback(page)).toContainText(`En el Past Participle has escrito «${regular}».`);
+        await expect(page.locator('[class*="escrituraMarcaOk"]')).toHaveText('Bien');
+        await expect(page.locator('[class*="escrituraMarcaMal"]')).toHaveText('Mal');
+        fallados.push(inf);
+      } else if (i === 8) {
+        await escribir(page, '', '');
+        await expect(feedback(page)).toContainText('Has dejado vacío el Past Simple. Has dejado vacío el Past Participle.');
+        fallados.push(inf);
+      } else if (i === 9) {
+        await escribir(page, regular, participio);
+        await expect(feedback(page)).toContainText(`En el Past Simple has escrito «${regular}».`);
+        await expect(feedback(page)).not.toContainText('Past Participle has escrito');
+        fallados.push(inf);
+      } else {
+        await escribir(page, pasado, participio, i === 10);
+        await expect(feedback(page)).toContainText('¡Correcto!');
+        await expect(page.locator('[class*="escrituraMarcaOk"]')).toHaveCount(2);
+      }
+
+      // La conjugación completa, igual que en el modo de opciones.
+      const canon = CANON[inf];
+      const pp = canon.ppAlt ? `${canon.pp} / ${canon.ppAlt}` : canon.pp;
+      expect(norm(await page.locator('[class*="conjugacion"]').textContent())).toBe(`${inf}→${canon.ps}→${pp}`);
+      // Tras comprobar no se puede reescribir: casillas de solo lectura y sin «Comprobar».
+      await expect(casillaPasado(page)).toHaveAttribute('readonly', '');
+      await expect(page.getByRole('button', { name: 'Comprobar', exact: true })).toHaveCount(0);
+      await expect(botonSiguiente(page)).toBeFocused();
+
+      const h = await hud(page);
+      expect(h.correctas).toBe(String(i <= 6 ? i : i === 10 ? 7 : 6));
+      if (precisionTras[i]) expect(h.precision, `precisión tras la ${i}.ª`).toMatch(pct(precisionTras[i]));
+      await botonSiguiente(page).click();
+    }
+
+    await expect(page.locator('[class*="resultadoPuntos"]')).toHaveText('60 pts');
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('¡Muy buena puntuación!');
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText('7 de 10 respuestas correctas');
+    await expect(page.locator('[class*="resultadoFallados"]')).toContainText(`Has fallado 3 verbos: ${fallados.join(', ')}.`);
+    await expect(page.getByRole('button', { name: 'Repasar mis fallos — 3 preguntas' })).toBeVisible();
+  });
+
+  /**
+   * CASO DE RECHAZO — comprobar dos veces y teclear después del veredicto.
+   * Resuelto a mano: el guardián `if (correccion !== null) return` y `readOnly` hacen que un
+   * segundo Enter no sume otro acierto y que lo tecleado después no cambie nada. Acertando la
+   * 1.ª: 1 acierto, 100 %.
+   */
+  test('caso de rechazo · un segundo Enter no suma y lo tecleado tras el veredicto no cambia nada', async ({ page }) => {
+    await abrirHidratada(page);
+    await arrancarEscribiendo(page, 'A2 Elemental', 10);
+    const inf = norm(await verboEnPantalla(page).textContent());
+    const { pasado, participio } = formasBuenas(inf);
+    await casillaPasado(page).fill(pasado);
+    await casillaParticipio(page).fill(participio);
+    await casillaParticipio(page).press('Enter');
+    await expect(feedback(page)).toContainText('¡Correcto!');
+    await casillaParticipio(page).press('Enter', { noWaitAfter: true }).catch(() => undefined);
+    await casillaPasado(page).pressSequentially('zzz').catch(() => undefined);
+    await expect(casillaPasado(page)).toHaveValue(pasado);
+    const h = await hud(page);
+    expect(h.correctas, 'el segundo Enter ha sumado otro acierto').toBe('1');
+    expect(h.precision).toMatch(pct(100));
+    await expect(feedback(page)).toContainText('¡Correcto!');
+  });
+
+  /**
+   * CASO LÍMITE — «be» admite el pasado doble: escribiendo, «was / were» es la respuesta del
+   * examen y vale (en el modo de opciones se pregunta solo «was», hallazgo 316). A1 con 15
+   * preguntas recorre los 15 verbos, así que «be» sale seguro.
+   */
+  test('caso límite · en «be», «was / were» escrito cuenta como acierto', async ({ page }) => {
+    await abrirHidratada(page);
+    await arrancarEscribiendo(page, 'A1 Básico', 15);
+    let vistoBe = false;
+    for (let i = 1; i <= 15; i++) {
+      const inf = norm(await verboEnPantalla(page).textContent());
+      const { pasado, participio } = formasBuenas(inf);
+      await escribir(page, pasado, participio);
+      await expect(feedback(page), `«${inf}» escrito con el canon «${pasado} / ${participio}»`).toContainText('¡Correcto!');
+      if (inf === 'be') vistoBe = true;
+      await botonSiguiente(page).click();
+    }
+    expect(vistoBe).toBe(true);
+    await expect(page.locator('[class*="resultadoPuntos"]')).toHaveText('100 pts');
+    // Sin fallos no hay lista que repasar.
+    await expect(page.locator('[class*="resultadoFallados"]')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Repasar mis fallos/ })).toHaveCount(0);
+  });
+
+  /**
+   * LISTA DE REPASO — de principio a fin.
+   * Resuelto a mano ANTES de ejecutar:
+   *   · partida de A2 escribiendo (10): se fallan las 3 primeras con «inf+ed» en las dos
+   *     casillas y se aciertan las 7 restantes → 3 verbos en la lista del modo escribir.
+   *   · tras recargar la página la lista sigue (localStorage), solo en ese modo: en el de
+   *     opciones no hay ninguno.
+   *   · «Repasar mis fallos — 3 preguntas» pregunta EXACTAMENTE esos 3. Acertándolos: 3/3,
+   *     100 pts, pero siguen en la lista (racha 1 de 2).
+   *   · un segundo repaso acertado los saca (racha 2): sin botón de repaso, y la configuración
+   *     dice que no queda ninguno.
+   */
+  test('lista de repaso · guarda los fallados, sobrevive a recargar y se vacía con 2 aciertos seguidos', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrirHidratada(page);
+    await arrancarEscribiendo(page, 'A2 Elemental', 10);
+    const fallados: string[] = [];
+    for (let i = 1; i <= 10; i++) {
+      const inf = norm(await verboEnPantalla(page).textContent());
+      if (i <= 3) {
+        await escribir(page, `${inf}ed`, `${inf}ed`);
+        fallados.push(inf);
+      } else {
+        const { pasado, participio } = formasBuenas(inf);
+        await escribir(page, pasado, participio);
+      }
+      await botonSiguiente(page).click();
+    }
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText('7 de 10 respuestas correctas');
+
+    // Recargar: la lista vive en el navegador.
+    await page.reload();
+    await esperarPaginaAsentada(page);
+    await expect(page.locator('[class*="repasoCaja"]')).toContainText('Aún no hay ninguno en el modo «Elegir entre 4 opciones»');
+    await page.getByRole('button', { name: /Escribir las formas/ }).click();
+    await expect(page.locator('[class*="repasoCaja"]')).toContainText('Tienes 3 verbos fallados');
+    const enLista = norm(await page.locator('[class*="repasoCaja"] [class*="repasoLista"]').textContent()).split(', ');
+    expect(enLista.slice().sort()).toEqual(fallados.slice().sort());
+
+    for (const ronda of [1, 2]) {
+      await page.getByRole('button', { name: 'Repasar mis fallos — 3 preguntas' }).click();
+      expect((await hud(page)).progreso).toBe('1/3');
+      const preguntados: string[] = [];
+      for (let i = 1; i <= 3; i++) {
+        const inf = norm(await verboEnPantalla(page).textContent());
+        preguntados.push(inf);
+        const { pasado, participio } = formasBuenas(inf);
+        await escribir(page, pasado, participio);
+        await expect(feedback(page)).toContainText('¡Correcto!');
+        await botonSiguiente(page).click();
+      }
+      expect(preguntados.slice().sort(), `ronda ${ronda}: el repaso no pregunta los fallados`).toEqual(fallados.slice().sort());
+      await expect(page.locator('[class*="resultadoPuntos"]')).toHaveText('100 pts');
+      if (ronda === 1) {
+        // Un acierto no basta: siguen pendientes.
+        await expect(page.getByRole('button', { name: 'Repasar mis fallos — 3 preguntas' })).toBeVisible();
+        await page.getByRole('button', { name: /Cambiar nivel/ }).click();
+        await expect(page.locator('[class*="repasoCaja"]')).toContainText('Tienes 3 verbos fallados');
+      }
+    }
+
+    // Segundo acierto seguido: la lista queda vacía.
+    await expect(page.getByRole('button', { name: /Repasar mis fallos/ })).toHaveCount(0);
+    await page.getByRole('button', { name: /Cambiar nivel/ }).click();
+    await expect(page.locator('[class*="repasoCaja"]')).toContainText('Aún no hay ninguno en el modo «Escribir las formas»');
+  });
+
+  /**
+   * «Vaciar la lista» borra la del modo elegido, y solo esa. Un fallo en el modo de opciones
+   * (pulsando el infinitivo, que en A1 nunca es el pasado salvo en los A-A-A, que A1 no tiene)
+   * entra en la lista de ese modo.
+   */
+  test('vaciar la lista · borra la del modo elegido y la configuración lo refleja', async ({ page }) => {
+    await abrirHidratada(page);
+    await arrancarPartida(page, 'A1 Básico', 10);
+    for (let i = 1; i <= 10; i++) {
+      const inf = norm(await verboEnPantalla(page).textContent());
+      if (i === 1) await pulsarOpcion(page, inf);
+      else await pulsarOpcion(page, respuestaQueSePregunta(inf));
+      await botonSiguiente(page).click();
+    }
+    await expect(page.locator('[class*="resultadoFallados"]')).toContainText('Has fallado 1 verbo');
+    await page.getByRole('button', { name: /Cambiar nivel/ }).click();
+    await expect(page.locator('[class*="repasoCaja"]')).toContainText('Tienes 1 verbo fallado');
+    await page.getByRole('button', { name: 'Vaciar la lista' }).click();
+    await expect(page.locator('[class*="repasoCaja"]')).toContainText('Aún no hay ninguno en el modo «Elegir entre 4 opciones»');
+    await page.reload();
+    await esperarPaginaAsentada(page);
+    await expect(page.locator('[class*="repasoCaja"]')).toContainText('Aún no hay ninguno');
   });
 });
