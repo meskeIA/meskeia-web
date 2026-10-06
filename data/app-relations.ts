@@ -6301,7 +6301,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-campo-magnetico/', icon: '🧲', name: 'Campo Magnético', description: 'Una carga en un campo describe un MCU: la fuerza magnética hace de centrípeta' },
     { url: '/simulador-plano-inclinado/', icon: '📐', name: 'Plano Inclinado', description: 'Dinámica con rozamiento: ¿desliza el bloque o no?' },
     { url: '/simulador-pendulo/', icon: '⏳', name: 'Péndulo Simple', description: 'Movimiento periódico, período y oscilaciones' },
-    { url: '/simulador-mas-resorte/', icon: '🌀', name: 'Masa-Resorte (MAS)', description: 'Movimiento armónico simple y frecuencia' },
+    { url: '/simulador-mas-resorte/', icon: '🌀', name: 'Masa-Resorte y Ley de Hooke', description: 'Movimiento armónico simple, frecuencia y constante k' },
     { url: '/simulador-orbitas-kepler/', icon: '🛰️', name: 'Órbitas y Leyes de Kepler', description: 'El MCU que sí existe en la naturaleza: satélites y planetas en órbita' },
   ],
   'simulador-plano-inclinado': [

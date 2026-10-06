@@ -29,6 +29,9 @@ import {
   calcularEstado,
   energiaInicial,
   marcasDeTiempo,
+  equilibrioHooke,
+  constanteDesdeMedida,
+  G_ESTANDAR,
 } from '../app/simulador-mas-resorte/motor';
 
 test.describe('Hallazgo 966 (alto) — con amortiguamiento se oscila a ω_d, no a ω₀', () => {
@@ -188,5 +191,42 @@ test.describe('Hallazgo 970 — la gráfica x(t) lleva eje de tiempo', () => {
     const o = describirOscilador(10, 1, 0);
     expect(o.periodo).toBeCloseTo(1.986918, 6);
     expect(marcasDeTiempo(0, 5).length).toBeGreaterThanOrEqual(5);
+  });
+});
+
+/**
+ * Ley de Hooke en estático (añadido el 06/10/2026): m·g = k·Δx, con g = 9,81 m/s².
+ * Resuelto a mano:
+ *   m = 1 kg, k = 20 N/m   → F = 9,81 N · Δx = 9,81/20 = 0,4905 m
+ *   m = 0,2 kg, k = 49,05  → F = 1,962 N · Δx = 1,962/49,05 = 0,04 m (4 cm)
+ *   m = 0,2 kg, Δx = 0,04 m → k = 1,962/0,04 = 49,05 N/m (el inverso del anterior)
+ *   m = 0,5 kg, Δx = 0,1 m  → k = 4,905/0,1 = 49,05 N/m
+ */
+test.describe('Ley de Hooke en estático', () => {
+  test('m = 1 kg y k = 20 N/m: F = 9,81 N y Δx = 0,4905 m', () => {
+    const e = equilibrioHooke(1, 20);
+    expect(e.fuerza).toBeCloseTo(9.81, 10);
+    expect(e.alargamiento).toBeCloseTo(0.4905, 10);
+  });
+
+  test('m = 0,2 kg y k = 49,05 N/m: Δx = 4 cm, y de 4 cm se recupera k', () => {
+    expect(equilibrioHooke(0.2, 49.05).alargamiento).toBeCloseTo(0.04, 10);
+    expect(constanteDesdeMedida(0.2, 0.04)).toBeCloseTo(49.05, 10);
+  });
+
+  test('m = 0,5 kg y Δx = 0,1 m: k = 49,05 N/m', () => {
+    expect(constanteDesdeMedida(0.5, 0.1)).toBeCloseTo(49.05, 10);
+  });
+
+  test('sin alargamiento o sin masa no hay constante: null, no Infinity ni 0', () => {
+    expect(constanteDesdeMedida(0.5, 0)).toBeNull();
+    expect(constanteDesdeMedida(0, 0.1)).toBeNull();
+    expect(constanteDesdeMedida(0.5, -0.1)).toBeNull();
+    expect(constanteDesdeMedida(Number.NaN, 0.1)).toBeNull();
+  });
+
+  test('la gravedad es la estándar 9,81 y se puede cambiar (en la Luna, 1,62)', () => {
+    expect(G_ESTANDAR).toBe(9.81);
+    expect(equilibrioHooke(1, 20, 1.62).alargamiento).toBeCloseTo(0.081, 10);
   });
 });

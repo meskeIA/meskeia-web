@@ -9,19 +9,28 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  NumberInput,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorMasResorte.module.css';
 import {
   describirOscilador,
   calcularEstado,
   energiaInicial,
   marcasDeTiempo,
+  equilibrioHooke,
+  constanteDesdeMedida,
+  G_ESTANDAR,
   type Regimen,
 } from './motor';
 import CasosAula from './CasosAula';
 
+
+/** Una longitud en m, en cm por debajo del metro (la unidad en que se mide en el laboratorio). */
+function textoLongitud(metros: number): string {
+  return metros < 1 ? `${formatNumber(metros * 100, 1)} cm` : `${formatNumber(metros, 2)} m`;
+}
 
 // ─── Constantes de renderizado ───────────────────────────────────────────────
 const CANVAS_W = 260;
@@ -97,6 +106,10 @@ export default function SimuladorMasResortePage() {
   const [constK, setConstK] = useState(20);
   const [amplitud, setAmplitud] = useState(0.3);
   const [gamma, setGamma] = useState(0);
+  // Ley de Hooke en estático: la medida que teclea el alumno (masa en g, alargamiento en cm,
+  // que son las unidades de la práctica de laboratorio).
+  const [masaMedida, setMasaMedida] = useState('');
+  const [alargamientoMedido, setAlargamientoMedido] = useState('');
 
   // Estado de animación (en refs para no re-renderizar cada frame)
   const tiempoRef = useRef<number>(0);
@@ -414,6 +427,13 @@ export default function SimuladorMasResortePage() {
   const pctEp = Math.min(100, (valores.Ep / valores.Emax) * 100);
   const pctEt = Math.min(100, (valores.Et / valores.Emax) * 100);
 
+  // Ley de Hooke: equilibrio con los deslizadores y constante desde la medida tecleada.
+  const equilibrio = equilibrioHooke(masa, constK);
+  const kMedida = constanteDesdeMedida(
+    parseSpanishNumber(masaMedida) / 1000,
+    parseSpanishNumber(alargamientoMedido) / 100,
+  );
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -421,7 +441,7 @@ export default function SimuladorMasResortePage() {
       <header className={styles.hero}>
         <h1 className={styles.title}><span aria-hidden="true">🌀</span> Simulador Masa-Resorte</h1>
         <p className={styles.subtitle}>
-          Movimiento Armónico Simple con amortiguamiento viscoso — observa x(t), energías y período en tiempo real
+          Movimiento Armónico Simple con amortiguamiento viscoso — observa x(t), energías y período en tiempo real, y calcula con la ley de Hooke
         </p>
       </header>
 
@@ -667,6 +687,10 @@ export default function SimuladorMasResortePage() {
             <span className={styles.valueName}>Aceleración a</span>
             <span className={styles.valueNum}>{formatNumber(valores.a, 3)} m/s²</span>
           </div>
+          <div className={styles.valueCard}>
+            <span className={styles.valueName}>Fuerza del resorte F = −k·x</span>
+            <span className={styles.valueNum}>{formatNumber((-constK * valores.x) || 0, 2)} N</span>
+          </div>
         </div>
 
         {/* ── Botones de control ───────────────────────────────────────── */}
@@ -689,6 +713,65 @@ export default function SimuladorMasResortePage() {
             <span aria-hidden="true">↺</span> Reiniciar
           </button>
         </div>
+
+        {/* ── Ley de Hooke en estático ─────────────────────────────────── */}
+        {/* La práctica de laboratorio que la FAQ ya explicaba («método estático») y que la app
+            no calculaba: colgar una masa y medir cuánto se estira. Usa los MISMOS m y k de los
+            deslizadores, y el inverso saca k de una medida tecleada. */}
+        <section className={styles.hookePanel} aria-labelledby="titulo-hooke">
+          <h2 id="titulo-hooke" className={styles.hookeTitulo}>Ley de Hooke: F = k·Δx</h2>
+          <p className={styles.hookeIntro}>
+            Si cuelgas la masa del resorte en vertical, en el equilibrio su peso lo compensa la
+            fuerza elástica: <code>m·g = k·Δx</code>, con g = {formatNumber(G_ESTANDAR, 2)} m/s².
+          </p>
+
+          <div className={styles.hookeGrid}>
+            <div className={styles.hookeBloque}>
+              <h3 className={styles.hookeSubtitulo}>Con la masa y la constante de arriba</h3>
+              <p className={styles.hookeDato}>
+                m = {formatNumber(masa, 1)} kg · k = {formatNumber(constK, 0)} N/m
+              </p>
+              <div className={styles.hookeResultados} role="status" aria-live="polite">
+                <div className={styles.valueCard}>
+                  <span className={styles.valueName}>Fuerza que soporta F = m·g</span>
+                  <span className={styles.valueNum}>{formatNumber(equilibrio.fuerza, 2)} N</span>
+                </div>
+                <div className={styles.valueCard}>
+                  <span className={styles.valueName}>Alargamiento Δx = m·g/k</span>
+                  <span className={styles.valueNum}>{textoLongitud(equilibrio.alargamiento)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.hookeBloque}>
+              <h3 className={styles.hookeSubtitulo}>Calcula k con tu medida</h3>
+              <div className={styles.hookeEntradas}>
+                <NumberInput
+                  label="Masa colgada (g)"
+                  value={masaMedida}
+                  onChange={setMasaMedida}
+                  min={0}
+                  placeholder="200"
+                />
+                <NumberInput
+                  label="Alargamiento medido (cm)"
+                  value={alargamientoMedido}
+                  onChange={setAlargamientoMedido}
+                  min={0}
+                  placeholder="4"
+                />
+              </div>
+              <div className={styles.hookeResultados} role="status" aria-live="polite">
+                <div className={styles.valueCard}>
+                  <span className={styles.valueName}>Constante k = m·g/Δx</span>
+                  <span className={styles.valueNum}>
+                    {kMedida !== null ? `${formatNumber(kMedida, 2)} N/m` : 'escribe masa y alargamiento mayores que 0'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Tarea de aula (skill /casos-aula-meskeia): tras los controles y FUERA de
             EducationalSection, que nace colapsada. */}

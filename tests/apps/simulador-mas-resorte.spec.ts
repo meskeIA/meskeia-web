@@ -1684,3 +1684,38 @@ test.describe('Re-inspección 02/10/2026 · el hero bajo meskeia.com y bajo stem
     });
   }
 });
+
+/**
+ * Ley de Hooke en estático (06/10/2026). Resuelto a mano, con g = 9,81 m/s²:
+ *   · m = 1 kg (arranque) y k = 10 N/m → F = 9,81 N · Δx = 9,81/10 = 0,981 m → «98,1 cm».
+ *   · medida: 200 g y 4 cm → k = 0,2·9,81/0,04 = 49,05 N/m → «49,05 N/m».
+ *   · alargamiento 0 → no hay constante que calcular: se pide un valor mayor que 0, sin cifra.
+ */
+test.describe('Caso 9 — ley de Hooke en estático', () => {
+  test('con los deslizadores da F y Δx; con una medida tecleada, la constante k', async ({ page }) => {
+    await sembrarValor(page, '#slider-k', 10);
+    const panel = page.locator('[class*="hookePanel"]');
+    await expect(panel.getByRole('heading', { name: 'Ley de Hooke: F = k·Δx' })).toBeVisible();
+    await expect(panel).toContainText('m = 1,0 kg · k = 10 N/m');
+    await expect(panel).toContainText('9,81 N');
+    await expect(panel).toContainText('98,1 cm');
+
+    await expect(panel).toContainText('escribe masa y alargamiento mayores que 0');
+    await panel.getByLabel('Masa colgada (g)').fill('200');
+    await panel.getByLabel('Alargamiento medido (cm)').fill('4');
+    await expect(panel).toContainText('49,05 N/m');
+
+    await panel.getByLabel('Alargamiento medido (cm)').fill('0');
+    await expect(panel).toContainText('escribe masa y alargamiento mayores que 0');
+    await expect(panel).not.toContainText('49,05 N/m');
+  });
+
+  test('la fuerza del resorte en vivo es −k·x de la posición que se muestra', async ({ page }) => {
+    await page.getByRole('button', { name: 'Pausar simulación' }).click();
+    const x = aNumero(await leerFila(page, 'Posición x'));
+    const k = 20;
+    const f = aNumero(await leerFila(page, 'Fuerza del resorte F = −k·x'));
+    // La tarjeta redondea x a 3 decimales y F a 2: se compara con esa tolerancia.
+    expect(Math.abs(f - (-k * x))).toBeLessThan(0.02 + k * 0.0005);
+  });
+});

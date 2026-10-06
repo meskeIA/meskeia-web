@@ -166,3 +166,35 @@ export function marcasDeTiempo(tInicio: number, tFin: number): number[] {
   }
   return marcas;
 }
+
+// ─── Ley de Hooke en estático ─────────────────────────────────────────────────
+//
+// La práctica clásica de laboratorio: se cuelga una masa del resorte y, en el equilibrio, el
+// peso lo compensa la fuerza elástica, m·g = k·Δx. De ahí salen el alargamiento que produce
+// una masa (Δx = m·g/k) y la constante a partir de un alargamiento medido (k = m·g/Δx), que
+// es el «método estático» de la FAQ de la app. Casos a mano en tests/mas-resorte-motor.spec.ts.
+
+/** Gravedad estándar, la misma que usa la FAQ de la app para el método estático. */
+export const G_ESTANDAR = 9.81;
+
+export interface EquilibrioHooke {
+  /** Peso de la masa colgada, que es la fuerza que soporta el resorte: F = m·g (N). */
+  fuerza: number;
+  /** Alargamiento en el equilibrio: Δx = m·g/k (m). */
+  alargamiento: number;
+}
+
+/** Cuánto se estira un resorte de constante k al colgarle la masa m. */
+export function equilibrioHooke(m: number, k: number, g: number = G_ESTANDAR): EquilibrioHooke {
+  const fuerza = Math.max(m, 0) * g;
+  return { fuerza, alargamiento: fuerza / Math.max(k, MIN_K) };
+}
+
+/**
+ * Constante elástica a partir de una medida: k = m·g/Δx.
+ * Devuelve null si la masa o el alargamiento no son positivos: no hay constante que calcular.
+ */
+export function constanteDesdeMedida(m: number, alargamiento: number, g: number = G_ESTANDAR): number | null {
+  if (!(m > 0) || !(alargamiento > 0)) return null;
+  return (m * g) / alargamiento;
+}

@@ -476,8 +476,8 @@ export const STEMUM_APPS: StemumApp[] = [
   {
     slug: 'simulador-mas-resorte',
     icon: '🪀',
-    titulo: 'Masa y resorte',
-    desc: 'Movimiento armónico simple con resorte animado, gráfica x(t), energías y amortiguamiento.',
+    titulo: 'Masa y resorte · Ley de Hooke',
+    desc: 'Movimiento armónico simple con resorte animado, gráfica x(t), energías y amortiguamiento, y la ley de Hooke: alargamiento y constante k.',
     disciplina: 'fisica',
   },
   {

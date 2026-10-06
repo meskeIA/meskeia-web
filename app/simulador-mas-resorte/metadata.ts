@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Simulador Masa-Resorte (MAS) - Movimiento Armónico Simple con Amortiguamiento | meskeIA',
-  description: 'Simula el movimiento armónico simple masa-resorte: ajusta masa, constante del resorte, amplitud y amortiguamiento. Calcula período, frecuencia, energías y observa la oscilación en tiempo real.',
-  keywords: 'masa-resorte, MAS, movimiento armónico simple, período, frecuencia angular, amortiguamiento, energía cinética, energía potencial, EBAU, Bachillerato, preparatoria, secundaria, educación media, física',
+  title: 'Simulador Masa-Resorte y Ley de Hooke (MAS) - Movimiento Armónico Simple | meskeIA',
+  description: 'Simula el movimiento armónico simple masa-resorte y aplica la ley de Hooke: alargamiento Δx = m·g/k y constante k desde tu medida. Período, frecuencia, energías y amortiguamiento en tiempo real.',
+  keywords: 'masa-resorte, ley de Hooke, constante elástica, MAS, movimiento armónico simple, período, frecuencia angular, amortiguamiento, energía cinética, energía potencial, EBAU, Bachillerato, preparatoria, secundaria, educación media, física',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Simulador Masa-Resorte (MAS) | meskeIA',
+    title: 'Simulador Masa-Resorte y Ley de Hooke | meskeIA',
     description: 'Simulador interactivo del movimiento armónico simple con animación del resorte, gráfica x(t) y barras de energía en tiempo real.',
     url: 'https://meskeia.com/simulador-mas-resorte/',
     siteName: 'meskeIA',
@@ -30,8 +30,8 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Simulador Masa-Resorte — Movimiento Armónico Simple',
-  description: 'Simulador interactivo del sistema masa-resorte y movimiento armónico simple. Ajusta masa, constante del resorte, amplitud y coeficiente de amortiguamiento. Observa la animación del resorte, la gráfica x(t) y la evolución de las energías cinética y potencial en tiempo real.',
+  name: 'Simulador Masa-Resorte y Ley de Hooke — Movimiento Armónico Simple',
+  description: 'Simulador interactivo del sistema masa-resorte y movimiento armónico simple. Ajusta masa, constante del resorte, amplitud y coeficiente de amortiguamiento. Observa la animación del resorte, la gráfica x(t) y la evolución de las energías cinética y potencial en tiempo real, y calcula con la ley de Hooke el alargamiento que produce una masa colgada o la constante k a partir de una medida.',
   url: 'https://meskeia.com/simulador-mas-resorte/',
   category: 'EducationalApplication',
   features: [
@@ -39,11 +39,12 @@ export const jsonLd = generateWebAppSchema({
     'Gráfica x(t) en tiempo real con decaimiento exponencial',
     'Barras de energía cinética, potencial y total actualizadas a 60 fps',
     'Control de amortiguamiento viscoso (0 → sobreamortiguado)',
-    'Cálculo instantáneo de ω₀, T, f, x, v, a y energías',
+    'Cálculo instantáneo de ω₀, T, f, x, v, a, fuerza del resorte y energías',
+    'Ley de Hooke en estático: alargamiento Δx = m·g/k y constante k a partir de una medida',
     'Botón pausar/reanudar y reiniciar',
     'En español',
   ],
-  keywords: ['masa-resorte', 'MAS', 'movimiento armónico simple', 'física bachillerato', 'amortiguamiento', 'período'],
+  keywords: ['masa-resorte', 'ley de Hooke', 'constante elástica', 'MAS', 'movimiento armónico simple', 'física bachillerato', 'amortiguamiento', 'período'],
 });
 
 export const faqJsonLd = {
