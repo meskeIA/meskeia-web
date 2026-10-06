@@ -1307,7 +1307,7 @@ export default function SimuladorCompraventaPage() {
             ? ` (${enumerar(deducibles)} ${rebajan ? 'rebajan' : 'rebaja'} también el IRPF al descontar${pron}, hasta un ${formatNumber(tipoMarginalAhorro, 0)}\u00A0% de su importe)`
             : ` (${enumerar(deducibles)} ${rebajan ? 'rebajan' : 'rebaja'} también el IRPF al descontar${pron}, así que el neto real baja menos que su importe)`;
       return v.seguro
-        ? `No descuenta ${enumerarNi(v.campos)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
+        ? `No descuenta ${enumerarNi(v.campos)}, que no se ${sujetoPlural(v.campos) ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
         : `${mayuscula(noSePudoLeer(v.campos))}: el neto real puede ser menor que este`;
     }
     const explica = v.campos.map((c) => EXPLICA_SUELO[c] ?? c);

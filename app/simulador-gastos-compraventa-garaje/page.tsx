@@ -879,7 +879,7 @@ export default function SimuladorGarajeCompraventaPage() {
           ? ''
           : ` (${enumerar(deducibles)} ${deducibles.length > 1 ? 'rebajan' : 'rebaja'} también el IRPF al descontar${deducibles.length > 1 ? 'las' : 'la'}, hasta un ${formatNumber(tipoMarginalAhorro, 0)}\u00A0% de su importe)`;
       return v.seguro
-        ? `No descuenta ${enumerarNi(v.campos)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
+        ? `No descuenta ${enumerarNi(v.campos)}, que no se ${sujetoPlural(v.campos) ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
         : `${mayuscula(noSePudoLeer(v.campos))}: el neto real puede ser menor que este`;
     }
     const explica = v.campos.map((c) =>

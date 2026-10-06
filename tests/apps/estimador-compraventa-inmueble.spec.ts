@@ -7562,7 +7562,8 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
   });
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (06/10/2026). «No descuenta los otros gastos de la venta,
+   * HALLAZGO [bajo, contenido] — REPARADO el 06/10/2026 (hallazgo 2903; también en garaje, trastero
+   * y local-comercial, que tenían la misma línea). Era así: «No descuenta los otros gastos de la venta,
    * que no se ha podido leer»: el verbo concuerda con el número de CAMPOS (`v.campos.length > 1`,
    * page.tsx, rama `v.tipo === 'menor'` de `avisoIlegiblesNeto`) y no con el sujeto, que es
    * plural. Es la regla del hallazgo 1555 (`sujetoPlural`), y la misma página escribe bien «No se
@@ -7570,7 +7571,7 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
    * BASE V + «2.000.50» en «Otros gastos de la venta (opcional)» → esperado «…, que no se han
    * podido leer» · obtenido «…, que no se ha podido leer».
    */
-  test.fail('HALLAZGO concordancia — «los otros gastos de la venta, que no se han podido leer»', async ({ page }) => {
+  test('HALLAZGO concordancia — «los otros gastos de la venta, que no se han podido leer»', async ({ page }) => {
     test.setTimeout(60_000);
     await montarBaseV(page);
     await sembrar(page, 'Otros gastos de la venta (opcional)', ILEGIBLE_0610);

@@ -4410,7 +4410,8 @@ test.describe('RE-INSPECCIÓN 06/10/2026 — Cantabria, la renuncia que Ceuta no
     expect({ claro: claro >= 4.5, oscuro: oscuro >= 4.5 }).toEqual({ claro: true, oscuro: true });
   });
 
-  // HALLAZGO [06/10-c] (bajo, contenido) — ❌ ABIERTO. La forma registrada hoy en la referencia, medida
+  // HALLAZGO [06/10-c] (bajo, contenido) — ✅ REPARADO el 06/10/2026 (hallazgo 2913): concuerda con
+  // sujetoPlural(v.campos), en las cuatro hermanas que tenían la línea. Era así: la forma registrada hoy en la referencia, medida
   // aquí a petición del coordinador: en la rama «menor» del aviso del neto (`avisoIlegiblesNeto`,
   // page.tsx:1027) el verbo de «que no se ha podido leer» concuerda con el número de CAMPOS
   // (`v.campos.length > 1`) y no con su sujeto. Con las amortizaciones ilegibles el campo es uno y el
@@ -4426,7 +4427,6 @@ test.describe('RE-INSPECCIÓN 06/10/2026 — Cantabria, la renuncia que Ceuta no
   // subtítulos dan 5,22-5,50:1 en claro y 4,78-5,83:1 en oscuro; y la app no tiene el consejo
   // «Liquida los impuestos a tiempo» ni frases pegadas en el texto pintado.
   test('[06/10-c] el aviso del neto concuerda «que no se han podido leer» con las amortizaciones', async ({ page }) => {
-    test.fail();
     await prepararBaseFamilia2309(page);
     await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', ILEGIBLE_2309);
     expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('186.687,00 €');

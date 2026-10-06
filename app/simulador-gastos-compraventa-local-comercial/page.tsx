@@ -1024,7 +1024,7 @@ export default function SimuladorLocalComercialPage() {
         c === 'las amortizaciones deducidas' ? 'el IRPF que añaden las amortizaciones deducidas' : c,
       );
       return v.seguro
-        ? `No descuenta ${enumerarNi(nombres)}, que no se ${v.campos.length > 1 ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
+        ? `No descuenta ${enumerarNi(nombres)}, que no se ${sujetoPlural(v.campos) ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
         : `${mayuscula(noSePudoLeer(v.campos))}: el neto real puede ser menor que este`;
     }
     const explica = v.campos.map((c) =>
