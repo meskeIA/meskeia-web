@@ -26,6 +26,7 @@ import {
   type ModoBateria,
   type ModoRC,
 } from './motor';
+import CasosAula from './CasosAula';
 
 // ─── Presentación de cifras ──────────────────────────────────────────────────
 
@@ -755,6 +756,10 @@ export default function SimuladorCondensadoresPage() {
             )}
           </div>
         </section>
+
+        {/* Tarea de aula (skill /casos-aula-meskeia): tras los controles y FUERA de
+            EducationalSection, que nace colapsada. */}
+        <CasosAula />
 
         {/* ══ SECCIÓN EDUCATIVA v2.0 ═══════════════════════════════════════ */}
         <EducationalSection

@@ -1,5 +1,13 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarHidratacion, esperarPaginaAsentada, esperarValorEnReact } from './_hidratacion';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+  resolverCaso,
+} from '../../app/simulador-condensadores/casos';
+import { DIELECTRICOS, EPSILON_0 } from '../../app/simulador-condensadores/motor';
 
 /**
  * Simulador de Condensadores — PASO 4.bis de /nueva-app-meskeia (06/10/2026)
@@ -244,5 +252,271 @@ test.describe('Caso 6 — apps relacionadas', () => {
   test('RelatedApps pinta 4 tarjetas', async ({ page }) => {
     await esperarPaginaAsentada(page);
     await expect(page.locator('section[aria-label="Aplicaciones relacionadas"] a')).toHaveCount(4);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (skill /casos-aula-meskeia, 06/10/2026) — `casos.ts` sin navegador
+ *
+ * Cada clave, resuelta a mano desde la definición ANTES de leer lo que devuelve la app. El
+ * convenio que hay que vigilar es ε₀: la app usa CODATA (8,8541878128·10⁻¹²) y en clase se usa
+ * 8,85·10⁻¹². Los casos que dependen de ε₀ se recalculan AQUÍ con los dos valores, con
+ * fórmulas escritas en este test, y los dos tienen que redondear a la clave.
+ *    1 · C = ε₀·0,004/0,0015 = 23,611 pF (clase 23,600) → 23,6   · sin pasar cm²: 236.112
+ *    2 · C = 3,7·ε₀·0,01/0,0005 = 655,2 pF; Q = 12·C = 7,8625 nC → 7,86 · sin εr: 2,12
+ *    3 · E = 150/0,0025 = 60.000 V/m = 60 kV/m (no usa ε₀)        · en V/m: 60.000
+ *    4 · C = ε₀·0,005/0,0025 = 17,708 pF; U = ½·C·24² = 5,100 nJ → 5,10 · sin el ½: 10,20
+ *    5 · d = ε₀·1,00059·10⁻⁴/(0,5·10⁻¹²) = 1,7719 mm → 1,77       · en m: 0,00
+ *    6 · U₀ = ½·(ε₀·0,005/0,0015)·12² = 2,125 nJ; conectada ×5,6 = 11,90 → 11,9 · desconectada: 0,38
+ *    7 · desconectada: V′ = 74/3,7 = 20 V                          · conectada: 74
+ *    8 · U₀ = ½·(ε₀·0,005/0,001)·24² = 12,75 nJ; desconectada ÷2,1 = 6,071 → 6,07 · conectada: 26,78
+ *    9 · τ = 220.000·2,2·10⁻⁶ = 0,484 s = 484 ms                   · en segundos: 0,484
+ *   10 · τ = 0,47 s, t = 2τ: 9·(1 − e⁻²) = 7,782 V → 7,78          · e^(−t/τ): 1,22 · t = τ: 5,69
+ *   11 · τ = 1 s: I = (12/2000)·e^(−1,5) = 1,3388 mA → 1,34        · la inicial: 6 · 1 − e: 4,66
+ *   12 · τ = 2,2 s: t = −2,2·ln(1 − 8/12) = 2,2·ln 3 = 2,4169 → 2,42 · τ: 2,2 · descarga: 0,89
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+const A_MANO_AULA: Record<number, number> = {
+  1: 23.6,
+  2: 7.86,
+  3: 60,
+  4: 5.1,
+  5: 1.77,
+  6: 11.9,
+  7: 20,
+  8: 6.07,
+  9: 484,
+  10: 7.78,
+  11: 1.34,
+  12: 2.42,
+};
+
+const EPSILON_CLASE = 8.85e-12;
+
+/**
+ * Las respuestas que dependen de ε₀, escritas aquí desde la definición (no con casos.ts ni con
+ * el motor), para un ε₀ cualquiera. Cada una en la unidad que pide su caso.
+ */
+const CON_EPSILON: Record<number, (e0: number) => number> = {
+  1: (e0) => ((e0 * 0.004) / 0.0015) / 1e-12,
+  2: (e0) => (((e0 * 3.7 * 0.01) / 0.0005) * 12) / 1e-9,
+  4: (e0) => (0.5 * ((e0 * 0.005) / 0.0025) * 24 * 24) / 1e-9,
+  5: (e0) => ((e0 * 1.00059 * 1e-4) / 0.5e-12) * 1000,
+  6: (e0) => (0.5 * ((e0 * 0.005) / 0.0015) * 144 * 5.6) / 1e-9,
+  8: (e0) => (0.5 * ((e0 * 0.005) / 0.001) * 576) / 2.1 / 1e-9,
+};
+
+const redondeoAula = (v: number, d: number) => Math.round(v * 10 ** d) / 10 ** d;
+
+function casoAula(id: number) {
+  const caso = CASOS.find((c) => c.id === id);
+  if (!caso) throw new Error(`No existe el caso ${id}`);
+  return caso;
+}
+
+/** Cuántos decimales lleva el número que se ENSEÑA en la solución («7,86 nC» → 2). */
+function decimalesMostradosAula(texto: string): number {
+  const m = texto.match(/[-−]?\d[\d.]*(?:,(\d+))?/);
+  return m?.[1]?.length ?? 0;
+}
+
+test.describe('simulador-condensadores · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    for (const caso of CASOS) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(redondeoAula(r.valor, caso.datos.decimales ?? 2), `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta finita y desarrollo', async () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+    }
+    expect(new Set(CASOS.map((c) => c.categoria))).toEqual(new Set(['abstracto', 'aplicado']));
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Ecuador|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos (mexicanos|colombianos|chilenos|argentinos)|Bachillerato|selectividad)\b/i;
+    const SIGLA_ESO = /\bESO\b/;
+    for (const caso of CASOS) {
+      const texto = `${caso.titulo} ${caso.enunciado}`;
+      expect(PROHIBIDO.test(texto) || SIGLA_ESO.test(texto), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · lo que el enunciado PIDE coincide con lo que la solución MUESTRA', async () => {
+    for (const caso of CASOS) {
+      const decimales = caso.datos.decimales ?? 2;
+      expect(decimalesMostradosAula(caso.respuestaTexto), `caso ${caso.id}`).toBeLessThanOrEqual(decimales);
+      const ultimo = caso.pasos[caso.pasos.length - 1];
+      expect(ultimo, `caso ${caso.id}: el último paso enseña la cifra de la casilla`).toContain(caso.respuestaTexto);
+      const exacto = Math.abs(resolverCaso(caso.datos).valor - caso.respuesta) < 1e-9;
+      expect(caso.requiereRedondeo, `caso ${caso.id}`).toBe(!exacto);
+      if (!exacto) {
+        expect(caso.enunciado, `caso ${caso.id}: se redondea y el enunciado no lo pide`).toMatch(/redonde|decimal|unidades|décima/i);
+      }
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(muestras.map((m) => m.datos.magnitud)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.respuesta)).toBe(true);
+      const r = resolverCaso(m.datos);
+      expect(redondeoAula(r.valor, m.datos.decimales ?? 2)).toBe(m.respuesta);
+      // C, Q y U son proporcionales a ε₀: con el de clase tiene que redondear a lo mismo.
+      if (['capacidad', 'carga', 'energia'].includes(m.datos.magnitud)) {
+        const clase = (r.valor * EPSILON_CLASE) / EPSILON_0;
+        expect(redondeoAula(clase, m.datos.decimales ?? 2), m.enunciado).toBe(m.respuesta);
+      }
+    }
+  });
+
+  test('7 · el convenio queda fijado: claves a mano y ε₀ de clase = ε₀ CODATA tras redondear', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera de este bloque.
+    for (const caso of CASOS) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO_AULA[caso.id]);
+    }
+
+    // (b) Los casos con ε₀: con CODATA y con 8,85·10⁻¹² redondean a la clave, y el enunciado
+    // declara 8,85·10⁻¹². Los que no dependen de ε₀ no lo nombran.
+    for (const caso of CASOS) {
+      const f = CON_EPSILON[caso.id];
+      const d = caso.datos.decimales ?? 2;
+      if (f) {
+        expect(redondeoAula(f(EPSILON_0), d), `caso ${caso.id} con CODATA`).toBe(caso.respuesta);
+        expect(redondeoAula(f(EPSILON_CLASE), d), `caso ${caso.id} con 8,85·10⁻¹²`).toBe(caso.respuesta);
+        expect(caso.enunciado, `caso ${caso.id}`).toMatch(/ε₀ = 8,85·10⁻¹²/);
+      } else {
+        expect(caso.enunciado, `caso ${caso.id}`).not.toMatch(/8,85/);
+      }
+    }
+
+    // (c) Un caso que nombra un dieléctrico escribe la εr de la MISMA lista que los botones.
+    for (const caso of CASOS) {
+      const id = caso.datos.dielectrico;
+      if (!id || id === 'vacio') continue;
+      const material = DIELECTRICOS.find((m) => m.id === id);
+      expect(material, `caso ${caso.id}: dieléctrico ${id}`).toBeDefined();
+      const er = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 5 }).format(material!.er);
+      expect(caso.enunciado, `caso ${caso.id}`).toContain(er);
+    }
+  });
+
+  test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
+    const r = comprobarRespuesta(NaN, 7.86, casoAula(2).datos);
+    expect(r.correcto).toBe(false);
+    expect(r.motivo).not.toMatch(/NaN/);
+    const borde = r.tolerancia;
+    expect(borde).toBeCloseTo(0.005, 12);
+    expect(comprobarRespuesta(7.86 + borde, 7.86, casoAula(2).datos).correcto).toBe(true);
+    expect(comprobarRespuesta(7.86 - borde, 7.86, casoAula(2).datos).correcto).toBe(true);
+    // 20 V y 484 ms exactos: no hay redondeo que tolerar.
+    expect(comprobarRespuesta(20, 20, casoAula(7).datos).tolerancia).toBe(0);
+    expect(comprobarRespuesta(484, 484, casoAula(9).datos).tolerancia).toBe(0);
+  });
+
+  test('9 · el corrector separa el redondeo del error de concepto', async () => {
+    const tabla: ReadonlyArray<readonly [number, number, boolean, string]> = [
+      [1, 23.6, true, 'la clave'],
+      [1, 23.61, true, 'la cifra del panel'],
+      [1, 23.5, false, 'vecino'],
+      [2, 7.86, true, 'la clave'],
+      [2, 7.863, true, 'la cifra del panel'],
+      [2, 2.12, false, 'sin εr'],
+      [2, 0.57, false, 'dividir por εr'],
+      [3, 60, true, 'la clave'],
+      [3, 60000, false, 'en V/m'],
+      [4, 5.1, true, 'la clave'],
+      [4, 10.2, false, 'sin el ½'],
+      [5, 1.77, true, 'la clave'],
+      [5, 0, false, 'en metros'],
+      [6, 11.9, true, 'la clave'],
+      [6, 0.4, false, 'batería desconectada'],
+      [6, 2.1, false, 'sin dieléctrico'],
+      [7, 20, true, 'la clave'],
+      [7, 74, false, 'batería conectada'],
+      [7, 273.8, false, 'multiplicar por εr'],
+      [8, 6.07, true, 'la clave'],
+      [8, 26.78, false, 'batería conectada'],
+      [8, 12.75, false, 'sin cambio'],
+      [9, 484, true, 'la clave'],
+      [9, 0.484, false, 'en segundos'],
+      [10, 7.78, true, 'la clave'],
+      [10, 1.22, false, 'e^(−t/τ) en una carga'],
+      [10, 5.69, false, 't = τ'],
+      [11, 1.34, true, 'la clave'],
+      [11, 6, false, 'la corriente inicial'],
+      [11, 4.66, false, '1 − e^(−t/τ) en una corriente'],
+      [12, 2.42, true, 'la clave'],
+      [12, 2.2, false, 'responder τ'],
+      [12, 0.89, false, 'la fórmula de la descarga'],
+    ];
+    const mal: string[] = [];
+    for (const [id, r, entra, porque] of tabla) {
+      const caso = casoAula(id);
+      const v = comprobarRespuesta(r, caso.respuesta, caso.datos).correcto;
+      if (v !== entra) mal.push(`caso ${id}: ${r} (${porque}) ${entra ? 'no entra' : 'entra'}`);
+    }
+    expect(mal).toEqual([]);
+  });
+});
+
+/** Teclea una respuesta en el caso `id` y devuelve si el corrector la dio por buena. */
+async function corregirAula(page: Page, id: number, respuesta: string): Promise<boolean> {
+  await page.locator('#casos-aula').getByRole('button', { name: new RegExp(`^Caso ${id}:`) }).click();
+  await expect(page.locator('#casos-titulo-caso')).toHaveText(new RegExp(`^Caso ${id} ·`));
+  await page.locator('#casos-respuesta').fill(respuesta);
+  await page.locator('#casos-comprobar').click();
+  // Por su id y no por getByRole('alert'), que casa también con el anunciador de rutas de Next.
+  const veredicto = page.locator('#casos-veredicto');
+  await expect(veredicto).toBeVisible();
+  return (await veredicto.innerText()).includes('¡Correcto!');
+}
+
+test.describe('simulador-condensadores · la sección de casos en el navegador', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/simulador-condensadores/');
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test('el caso 7 se corrige con la cifra de la solución', async ({ page }) => {
+    expect(await corregirAula(page, 7, '20')).toBe(true);
+  });
+
+  test('el modo de batería equivocado en el caso 6 se rechaza y la solución enseña 11,9 nJ', async ({ page }) => {
+    expect(await corregirAula(page, 6, '0,4')).toBe(false);
+    const solucion = page.locator('#casos-aula').getByRole('button', { name: /Ver solución/ });
+    await expect(solucion).toHaveAttribute('aria-expanded', 'false');
+    await solucion.click();
+    await expect(page.locator('#casos-resultado')).toContainText('11,9 nJ');
   });
 });
