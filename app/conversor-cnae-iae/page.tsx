@@ -331,6 +331,26 @@ function soloDigitos(texto: string): string {
 }
 
 /**
+ * Los dígitos de la consulta SOLO si la consulta es un código: cifras, puntos, comas, guiones y
+ * espacios («505,6» es como muchos escriben el epígrafe 505.6), con
+ * a lo sumo una palabra que lo presenta («cnae 4711», «epígrafe 673.2»). Si hay más texto, ''.
+ *
+ * ── De dónde sale (06/10/2026, hallazgo 2925) ──
+ * `soloDigitos` sacaba las cifras de TODA la consulta, y una cifra dentro de una descripción
+ * la convertía en búsqueda por código: «tienda 24 horas» devolvía la División 24 entera
+ * (Metalurgia) como «22 resultados», e «impresión 3d» en el IAE, 190 epígrafes desde la
+ * fundición. Ninguna entrada de los catálogos contiene esos textos: lo honrado es cero, con la
+ * pista para afinar.
+ */
+function digitosSiEsCodigo(texto: string): string {
+  const sinPresentacion = normalizarTexto(texto).replace(
+    /^(cnae|iae|epigrafe|codigo|clase|grupo|seccion)\b/,
+    '',
+  );
+  return /^[\d.,\s-]*$/.test(sinPresentacion) ? soloDigitos(texto) : '';
+}
+
+/**
  * ¿La consulta aparece como PALABRA COMPLETA en el texto (delimitada por espacios o los
  * extremos), y no solo como fragmento dentro de otra palabra?
  *
@@ -608,7 +628,7 @@ export default function ConversorCnaeIaePage() {
   // ─── Búsqueda en la CNAE-2025 ──────────────────────────────────────────────
 
   const consultaCnaeNormalizada = normalizarTexto(consultaCnae);
-  const digitosConsultaCnae = soloDigitos(consultaCnae);
+  const digitosConsultaCnae = digitosSiEsCodigo(consultaCnae);
 
   /**
    * ¿El código tecleado existe TAMBIÉN como clase vigente? Son 26 códigos que están en
@@ -754,7 +774,7 @@ export default function ConversorCnaeIaePage() {
   // ─── Búsqueda en las Tarifas del IAE ───────────────────────────────────────
 
   const consultaIaeNormalizada = normalizarTexto(consultaIae);
-  const digitosConsultaIae = soloDigitos(consultaIae);
+  const digitosConsultaIae = digitosSiEsCodigo(consultaIae);
   /** «abogada» se busca también como «abogado» (hallazgo 2222); null si no nombra profesión. */
   const consultaIaeMasculina = consultaIaeEnMasculino(consultaIaeNormalizada);
 

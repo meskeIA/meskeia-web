@@ -3462,10 +3462,11 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 06/10/2026', () => {
     expect(generador).not.toMatch(/sustituye a CNAE-2009 desde [a-záéíóú]+ de \d{4}/i);
   });
 
-  test('ABIERTO · MEDIO (operativa) — una cifra dentro de una descripción no puede convertir la búsqueda en búsqueda por código', async ({
+  test('REPARADO · MEDIO (operativa) — una cifra dentro de una descripción no puede convertir la búsqueda en búsqueda por código', async ({
     page,
   }) => {
-    test.fail();
+    // REPARADO el 06/10/2026 (hallazgo 2925): los dígitos solo cuentan como código si la consulta
+    // ES un código (cifras, puntos y espacios, con «cnae», «epígrafe»… delante como mucho).
     // `soloDigitos()` saca las cifras de TODA la consulta, y cualquier entrada cuyo código
     // empiece por ellas entra en el resultado con relevancia 1, por delante de cualquier
     // coincidencia de texto. Ninguna entrada de los dos catálogos contiene «24 horas» ni
@@ -3486,6 +3487,14 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 06/10/2026', () => {
     await expect(fichas(page).filter({ hasText: 'Fundición de piezas de hierro y acero' })).toHaveCount(0);
     await buscarIaeVerificado(page, 'tienda 24 horas');
     await expect(fichas(page).filter({ hasText: 'Ladrillos, bloques y piezas especiales' })).toHaveCount(0);
+    // Lo esperado es CERO, con la pista: ninguna entrada contiene esos textos
+    await buscarCnaeVerificado(page, 'tienda 24 horas');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    // Y el código, con o sin palabra delante, sigue buscando por código
+    await buscarCnaeVerificado(page, 'cnae 47.11');
+    await expect(fichas(page).first()).toContainText('47.11');
+    await buscarIaeVerificado(page, 'epígrafe 673.2');
+    await expect(fichas(page).first()).toContainText('673.2');
   });
 
   test('ABIERTO · BAJO (operativa) — el femenino de un oficio de VARIAS palabras encuentra la misma clase que el masculino', async ({
