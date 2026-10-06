@@ -43,6 +43,23 @@ const MINIMO_TEXTO = `${formatNumber(IMPORTE_MINIMO_EXENCION_COMPLETA, 2)} €`
 
 const nombreDe = (fila: FilaPersona, i: number) => fila.nombre.trim() || `Persona ${i + 1}`;
 
+/** «A», «A y B», «A, B y C» */
+const enumerar = (items: string[]) =>
+  items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
+
+/* Las mismas guardas que `repartirPremio`, campo a campo, para señalar CUÁL falla (WCAG 3.3.1) */
+const aportacionInvalida = (fila: FilaPersona) => {
+  const n = parseSpanishNumber(fila.aportacion);
+  return !Number.isFinite(n) || n < 0;
+};
+const premioInvalido = (fila: FilaPremio) => {
+  if (fila.importe.trim() === '') return false; // los vacíos no se mandan al cálculo
+  const n = parseSpanishNumber(fila.importe);
+  return !Number.isFinite(n) || n <= 0;
+};
+
+const ID_ERROR = 'pena-error';
+
 export default function RepartoPena() {
   const siguienteId = useRef(10);
   const nuevoId = () => ++siguienteId.current;
@@ -72,7 +89,25 @@ export default function RepartoPena() {
   const cambiarPremio = (id: number, valor: string) =>
     setPremios(lista => lista.map(p => (p.id === id ? { ...p, importe: valor } : p)));
 
+  /**
+   * Qué campo falla, en el mismo orden que las guardas del motor: hasta el 06/10/2026 el aviso
+   * decía «Revisa las aportaciones…» sin nombrar a nadie, ningún campo llevaba aria-invalid y en
+   * una peña de 30 personas había que revisarlas todas (hallazgo 2898).
+   */
+  const hayError = resultado !== null && !resultado.ok;
+  const personasMal = hayError ? personas.filter(aportacionInvalida).map(p => p.id) : [];
+  const premiosMal = hayError && personasMal.length === 0 ? premios.filter(premioInvalido).map(p => p.id) : [];
+  let detalleError = '';
+  if (personasMal.length > 0) {
+    const nombres = personas.flatMap((p, i) => (personasMal.includes(p.id) ? [nombreDe(p, i)] : []));
+    detalleError = ` Revisa lo que pone ${enumerar(nombres)}.`;
+  } else if (premiosMal.length > 0 && premios.length > 1) {
+    const numeros = premios.flatMap((p, i) => (premiosMal.includes(p.id) ? [String(i + 1)] : []));
+    detalleError = ` Revisa ${numeros.length > 1 ? 'los premios' : 'el premio'} del décimo o apuesta ${enumerar(numeros)}.`;
+  }
+
   const jugadoNumero = parseSpanishNumber(importeJugado);
+  const precioMal = hayError && personasMal.length === 0 && premiosMal.length === 0 && !(jugadoNumero > 0);
   const exencionReducida = jugadoNumero > 0 && jugadoNumero < IMPORTE_MINIMO_EXENCION_COMPLETA;
 
   return (
@@ -106,6 +141,8 @@ export default function RepartoPena() {
                   type="text"
                   inputMode="decimal"
                   value={p.aportacion}
+                  aria-invalid={personasMal.includes(p.id) || undefined}
+                  aria-describedby={personasMal.includes(p.id) ? ID_ERROR : undefined}
                   onChange={e => cambiarPersona(p.id, 'aportacion', e.target.value)}
                   className={styles.penaCampoImporte}
                 />
@@ -142,7 +179,8 @@ export default function RepartoPena() {
             value={importeJugado}
             onChange={e => setImporteJugado(e.target.value)}
             className={styles.penaCampoImporte}
-            aria-describedby="pena-precio-ayuda"
+            aria-invalid={precioMal || undefined}
+            aria-describedby={precioMal ? `${ID_ERROR} pena-precio-ayuda` : 'pena-precio-ayuda'}
           />
         </label>
         <p id="pena-precio-ayuda" className={styles.penaAyuda}>
@@ -161,6 +199,8 @@ export default function RepartoPena() {
                   inputMode="decimal"
                   value={p.importe}
                   placeholder="Ej.: 125.000"
+                  aria-invalid={premiosMal.includes(p.id) || undefined}
+                  aria-describedby={premiosMal.includes(p.id) ? ID_ERROR : undefined}
                   onChange={e => cambiarPremio(p.id, e.target.value)}
                   className={styles.penaCampoPremio}
                 />
@@ -194,7 +234,10 @@ export default function RepartoPena() {
 
       <div aria-live="polite">
         {resultado && !resultado.ok && (
-          <p className={styles.comprobadorError}>{resultado.error}</p>
+          <p className={styles.comprobadorError} id={ID_ERROR}>
+            {resultado.error}
+            {detalleError}
+          </p>
         )}
 
         {resultado && resultado.ok && (

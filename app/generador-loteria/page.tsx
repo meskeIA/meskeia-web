@@ -246,6 +246,7 @@ export default function GeneradorLoteriaPage() {
   const [quantity, setQuantity] = useState(1);
   const [favorites, setFavorites] = useState<GeneratedResult[]>([]);
   const generadorRef = useRef<HTMLDivElement>(null);
+  const botonGenerarRef = useRef<HTMLButtonElement>(null);
 
   /** Copia en memoria de la lista, para cuando el almacén no se puede leer. */
   const favoritasRef = useRef<GeneratedResult[]>([]);
@@ -313,6 +314,22 @@ export default function GeneradorLoteriaPage() {
   }, [generacion]);
 
   // Desde la ficha de cada modalidad: seleccionarla y subir al generador
+  /**
+   * Elegir lotería en el selector. En móvil la primera vista termina en el selector y lo que
+   * cambia (ficha y botón Generar) quedaba a pantalla y media, sin que la vista se moviera
+   * (hallazgo 2899, 06/10/2026). Solo se desplaza si el botón no se ve entero: en escritorio,
+   * donde ya está a la vista, no hace nada.
+   */
+  const elegirLoteria = useCallback((type: LotteryType) => {
+    setSelectedLottery(type);
+    const boton = botonGenerarRef.current;
+    if (!boton) return;
+    const caja = boton.getBoundingClientRect();
+    if (caja.top < 0 || caja.bottom > window.innerHeight) {
+      boton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, []);
+
   const irAlGenerador = useCallback((type: LotteryType) => {
     setSelectedLottery(type);
     generadorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -459,7 +476,7 @@ export default function GeneradorLoteriaPage() {
             <button
               key={type}
               type="button"
-              onClick={() => setSelectedLottery(type)}
+              onClick={() => elegirLoteria(type)}
               aria-pressed={selectedLottery === type}
               className={`${styles.lotteryButton} ${selectedLottery === type ? styles.active : ''}`}
             >
@@ -503,6 +520,7 @@ export default function GeneradorLoteriaPage() {
 
           <button
             type="button"
+            ref={botonGenerarRef}
             onClick={generateCombination}
             className={styles.generateButton}
             disabled={isGenerating}
@@ -993,7 +1011,8 @@ export default function GeneradorLoteriaPage() {
                 <p>
                   Si juegas en grupo o tienes boletos anteriores activos, comprueba que la
                   combinación generada no coincide con ninguna que ya tengas. Dos boletos
-                  iguales no aumentan las probabilidades de manera significativa.
+                  iguales no aumentan nada la probabilidad de acertar: si sale esa combinación,
+                  solo te llevas dos partes del mismo premio.
                 </p>
               </div>
             </li>

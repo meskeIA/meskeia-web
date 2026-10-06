@@ -1682,21 +1682,31 @@ test.describe('06/10 · reparto de la peña — casos resueltos a mano', () => {
     });
   }
 
-  test('ABIERTO · el aviso de error del reparto no dice QUÉ campo falla (WCAG 3.3.1)', async ({ page }) => {
-    // ABIERTO (inspector 06/10/2026, accesibilidad). WCAG 3.3.1 (A): si se detecta un error de
+  test('el aviso de error del reparto dice QUÉ campo falla (WCAG 3.3.1)', async ({ page }) => {
+    // REPARADO el 06/10/2026 (hallazgo 2898): el aviso nombra a la persona o el décimo y el campo
+    // lleva aria-invalid y aria-describedby hacia el aviso. Era así (inspector 06/10/2026, accesibilidad). WCAG 3.3.1 (A): si se detecta un error de
     // entrada, «el elemento erróneo se identifica». Con una cuarta persona sin aportación, el
     // aviso es «Revisa las aportaciones: tienen que ser cantidades de 0 € o más.»: no nombra a
     // Persona 4, ningún campo lleva aria-invalid y la tabla entera desaparece. En una peña de
     // 20 o 30 personas hay que revisar todas. Lo mismo con un 2.º décimo negativo: «Indica el
     // premio de cada décimo…» sin decir cuál. El comprobador de la misma página sí lo hace
     // («Falta el número 3 de la combinación ganadora…»).
-    test.fail();
     await pena(page).getByRole('button', { name: /Añadir persona/ }).click();
     await escribir(page, campoPremio(page), '125.000');
     await expect(aviso(page)).toBeVisible();
-    const texto = (await aviso(page).textContent()) ?? '';
-    const marcados = await pena(page).locator('input[aria-invalid="true"]').count();
-    expect(texto.includes('Persona 4') || marcados > 0).toBe(true);
+    await expect(aviso(page)).toContainText('Revisa lo que pone Persona 4.');
+    const marcados = pena(page).locator('input[aria-invalid="true"]');
+    await expect(marcados).toHaveCount(1);
+    await expect(marcados).toHaveAttribute('aria-describedby', 'pena-error');
+    await expect(campoPone(page, 3)).toHaveAttribute('aria-invalid', 'true');
+
+    // Con la aportación arreglada y un 2.º décimo negativo, el aviso dice cuál
+    await escribir(page, campoPone(page, 3), '5');
+    await pena(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
+    await escribir(page, pena(page).getByLabel('Premio del décimo o apuesta 2 (€)'), '-50');
+    await expect(aviso(page)).toContainText('Revisa el premio del décimo o apuesta 2.');
+    await expect(marcados).toHaveCount(1);
+    await expect(pena(page).getByLabel('Premio del décimo o apuesta 2 (€)')).toHaveAttribute('aria-invalid', 'true');
   });
 });
 
@@ -1739,14 +1749,14 @@ test.describe('06/10 · móvil 390×844 — la firma de rotura: el flujo entero 
     expect(navegaciones).toBe(0); // ningún toque recargó la página
   });
 
-  test('ABIERTO · elegir lotería en la primera vista no lleva a nada visible: Generar queda a 1,5 pantallas', async ({ page }) => {
-    // ABIERTO (inspector 06/10/2026, operativa). A 390×844 la primera vista es el hero, el aviso
+  test('elegir lotería en la primera vista deja el botón Generar a la vista', async ({ page }) => {
+    // REPARADO el 06/10/2026 (hallazgo 2899): elegir lotería desplaza la vista hasta el botón
+    // Generar si no se ve (`block: 'nearest'`). Era así (inspector 06/10/2026, operativa). A 390×844 la primera vista es el hero, el aviso
     // legal y las cinco loterías en columna (472-844 px); el panel de la modalidad empieza en
     // 876 px y el botón Generar en 1251-1353 px. Tocar «Euromillones» solo cambia el color del
     // botón: la vista no se mueve y lo que cambia (ficha y texto de Generar) queda fuera de la
     // pantalla. El botón «Generar números de Euromillones» de la ficha SÍ lleva al generador
     // (irAlGenerador). La maquetación es la misma desde agosto: no explica el CAMBIO de la firma.
-    test.fail();
     await esperarInteractiva(page);
     await page.getByRole('button', { name: 'Euromillones', exact: true }).first().tap();
     await expect(botonGenerar(page)).toContainText('Euromillones');
@@ -1757,14 +1767,14 @@ test.describe('06/10 · móvil 390×844 — la firma de rotura: el flujo entero 
 });
 
 test.describe('06/10 · contenido', () => {
-  test('ABIERTO · dos boletos iguales no suben NADA la probabilidad: sobra «de manera significativa»', async ({ page }) => {
-    // ABIERTO (inspector 06/10/2026, contenido). Paso 3 de «Cómo usar el generador»: «Dos
+  test('dos boletos iguales no suben NADA la probabilidad: sobra «de manera significativa»', async ({ page }) => {
+    // REPARADO el 06/10/2026 (hallazgo 2900). Era así (inspector 06/10/2026, contenido). Paso 3 de «Cómo usar el generador»: «Dos
     // boletos iguales no aumentan las probabilidades de manera significativa». La probabilidad
     // de que salga una combinación es 1 entre 13.983.816 (C(49,6)) la juegues una vez o dos:
     // el segundo boleto idéntico suma CERO, no «poco». Lo que duplica es la parte del premio.
-    test.fail();
     const pasos = (await page.locator('[class*="stepGuide"]').allTextContents()).join(' ');
     expect(pasos).toContain('Dos boletos iguales');
     expect(pasos).not.toMatch(/no aumentan las probabilidades de manera significativa/);
+    expect(pasos).toMatch(/no aumentan nada la probabilidad/);
   });
 });
