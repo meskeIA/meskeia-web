@@ -248,7 +248,7 @@ test('Caso 6 — RelatedApps pinta 4 tarjetas, con el espectro entre ellas', asy
  *    7 · E_c = 1,5 eV = 2,4·10⁻¹⁹ J; v = √(2·2,4·10⁻¹⁹/9,11·10⁻³¹) = 7,26·10⁵ m/s · sin el 2: 5,13
  *    8 · 400 nm: 3,10 eV < 4,31 → faltan 1,21 eV                 · E − φ con signo: −1,21
  *    9 · duplicar la intensidad no cambia E_c = 3,10 − 2,46 = 0,64 eV · duplicarla: 1,28
- *   10 · 620 nm: 2,00 < 2,20 no arranca; 400 nm: 3,10 − 2,20 = 0,90 · con la roja: −0,20
+ *   10 · 650 nm: 1,91 < 2,20 no arranca; 400 nm: 3,10 − 2,20 = 0,90 · con la roja: −0,29
  *   11 · φ = 5,00 − 0,50 = 4,50 eV (el hierro)                   · E + V₀: 5,50
  *   12 · λ = 1240/(4,31 + 0,69) = 248 nm                         · sin φ: 1797
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
@@ -422,8 +422,13 @@ test.describe('simulador-efecto-fotoelectrico · casos para clase', () => {
     }
 
     // (c) El caso 10 es de verdad «solo una de las dos»: la roja no llega a φ con ninguna tanda.
-    expect(LIBRO.hc / 620).toBeLessThan(2.2);
-    expect(CODATA.hc / 620).toBeLessThan(2.2);
+    // Y es roja sin discusión: desde 625 nm lo es en cualquier tabla (la vista dice «rojo» desde
+    // 620, que es justo su frontera con el naranja; el caso usaba 620 hasta la revisión).
+    const roja = casoAula(10).datos.lambdaComparada ?? NaN;
+    expect(roja).toBeGreaterThanOrEqual(625);
+    expect(casoAula(10).enunciado).toContain(`luz roja de ${roja} nm`);
+    expect(LIBRO.hc / roja).toBeLessThan(2.2);
+    expect(CODATA.hc / roja).toBeLessThan(2.2);
 
     // (d) La intensidad no entra en E_c: el caso 9 sin duplicar da la misma cifra.
     const caso9 = casoAula(9);
@@ -478,8 +483,8 @@ test.describe('simulador-efecto-fotoelectrico · casos para clase', () => {
       [9, 1.28, false, 'duplicar E_c con la intensidad'],
       [9, 0.32, false, 'la mitad'],
       [10, 0.9, true, 'la clave'],
-      [10, -0.2, false, 'con la luz roja'],
-      [10, 1.1, false, 'la diferencia de energías de las dos luces'],
+      [10, -0.29, false, 'con la luz roja: 1240/650 − 2,20'],
+      [10, 1.19, false, 'la diferencia de energías de las dos luces: 3,10 − 1,91'],
       [11, 4.5, true, 'la clave'],
       [11, 5.5, false, 'E + V₀'],
       [11, 0.5, false, 'el potencial de frenado'],

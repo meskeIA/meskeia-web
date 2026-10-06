@@ -763,8 +763,8 @@ export interface Caso {
  * la añade `constantesDeclaradas` según la magnitud.
  *
  * Sin ciudades, países ni monedas: el canal aula es sobre todo de fuera de España. Las λ son las
- * «amables» con h·c = 1240 (155 → 8 eV, 200 → 6,2 eV, 248 → 5 eV, 310 → 4 eV, 400 → 3,1 eV,
- * 620 → 2 eV), y en cada caso se anota la cifra con CODATA (C) y con las constantes declaradas (L).
+ * «amables» con h·c = 1240 (155 → 8 eV, 200 → 6,2 eV, 248 → 5 eV, 310 → 4 eV, 400 → 3,1 eV);
+ * la luz roja del caso 10 va a 650 nm porque solo se compara con φ, y en cada caso se anota la cifra con CODATA (C) y con las constantes declaradas (L).
  */
 type Definicion = Omit<Caso, 'respuesta' | 'respuestaTexto' | 'pasos' | 'requiereRedondeo' | 'coincideConstantes'>;
 
@@ -903,17 +903,19 @@ const DEFINICIONES: ReadonlyArray<Definicion> = [
     id: 10,
     titulo: 'Luz roja frente a luz violeta',
     // Declara h·c = 1240 eV·nm. Metal sin nombre (φ = 2,20 eV), que no es ninguno de la lista.
-    // C: 0,89961 → 0,90 · L: 0,90 exacto. La roja (2,00 eV) no llega: no se pide su E_c.
-    // Errores: restar con la roja, −0,20 · la diferencia de las dos E del fotón, 1,10 · la E del
+    // C: 0,89961 → 0,90 · L: 0,90 exacto. La roja (1,91 eV) no llega: no se pide su E_c.
+    // 650 nm y no 620: la vista llama «rojo» a lo que pasa de 620 (`nombreDeLambda`), así que 620
+    // caía justo en su frontera con el naranja, y otras tablas ponen el rojo desde 625.
+    // Errores: restar con la roja, −0,29 · la diferencia de las dos E del fotón, 1,19 · la E del
     // fotón violeta, 3,10 · sumar φ, 5,30.
     enunciado:
-      'Una placa de un metal con φ = 2,20 eV se ilumina primero con luz roja de 620 nm y después con luz violeta de 400 nm. Solo una de las dos arranca electrones. ¿Con qué energía cinética máxima salen, en eV? Redondea a dos decimales.',
+      'Una placa de un metal con φ = 2,20 eV se ilumina primero con luz roja de 650 nm y después con luz violeta de 400 nm. Solo una de las dos arranca electrones. ¿Con qué energía cinética máxima salen, en eV? Redondea a dos decimales.',
     categoria: 'aplicado',
-    datos: { magnitud: 'energiaCinetica', phi: 2.2, lambda: 400, lambdaComparada: 620 },
+    datos: { magnitud: 'energiaCinetica', phi: 2.2, lambda: 400, lambdaComparada: 650 },
     etiquetaRespuesta: 'E_c máx. en eV',
     pista: 'Calcula la energía de los fotones de cada luz y compárala con φ antes de restar nada.',
     comoComprobar:
-      'Elige «Otro φ» y escribe 2,20. Con λ = 620 nm la tarjeta «Energía cinética máxima» dice «sin emisión»; con λ = 400 nm marca 0,900 eV.',
+      'Elige «Otro φ» y escribe 2,20. Con λ = 650 nm la tarjeta «Energía cinética máxima» dice «sin emisión»; con λ = 400 nm marca 0,900 eV.',
   },
   {
     id: 11,

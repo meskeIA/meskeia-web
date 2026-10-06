@@ -844,7 +844,7 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
     id: 10,
     titulo: 'La carga del flash',
     enunciado:
-      'El flash de una cámara guarda su energía en un condensador que se carga a través de una resistencia. En un modelo de laboratorio de ese circuito, una fuente de 9 V carga un condensador de 10 µF, inicialmente descargado, a través de una resistencia de 47 kΩ. ¿Qué tensión tiene el condensador 0,94 s después de conectarlo? Da el resultado en voltios, redondeado a dos decimales.',
+      'El flash de una cámara guarda su energía en un condensador. En un modelo de laboratorio de la carga, una fuente de 9 V carga un condensador de 10 µF, inicialmente descargado, a través de una resistencia de 47 kΩ. ¿Qué tensión tiene el condensador 0,94 s después de conectarlo? Da el resultado en voltios, redondeado a dos decimales.',
     categoria: 'aplicado',
     // τ = 0,47 s, t = 2τ: V_C = 9·(1 − e⁻²) = 7,7820 → 7,78. Errores: e^(−t/τ) en vez de
     // 1 − e^(−t/τ), 1,22; τ = R/C (4,7·10⁹ s), 0,00; suponer t = τ, 5,69.
