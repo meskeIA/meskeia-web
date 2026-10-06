@@ -3644,3 +3644,431 @@ test.describe('Re-inspección 01/10/2026 — móvil y oscuro', () => {
     }
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 06/10/2026 (Opus 5.5, xhigh)
+//
+// Volvió a la cola por 03e40648 (01/10: art. 60.7, exclusiones y prorrata del 60.3,
+// hallazgos 2538-2544) y por d6ba391e (03/10: TOPE_COMPLEMENTO_MINIMOS_2026 y la fila de
+// gran incapacidad en PENSIONES_MINIMAS_2026). El segundo no toca nada que esta app lea:
+// `COMPLEMENTO_BRECHA_GENERO_2026`, `_META`, `COMPLEMENTO_MATERNIDAD_DEROGADO` y
+// `LIMITES_PENSION_2025` siguen idénticos, y las cifras del navegador no se movieron.
+// Las siete reparaciones del 01/10 se reprodujeron en el navegador, en 1280 y en 390 px.
+//
+// Fuentes oficiales consultadas en sesión (06/10/2026):
+//   · Art. 60 LGSS, consolidado (BOE-A-2015-11724, versión del 18/03/2023), API de datos
+//     abiertos del BOE. Ningún apartado dice que el complemento se reconozca de oficio.
+//   · DT 33.ª LGSS (versión del 04/02/2021): «La percepción de dicho complemento de
+//     maternidad será incompatible con el complemento de pensiones contributivas para la
+//     reducción de la brecha de género que pudiera corresponder por el reconocimiento de una
+//     nueva pensión pública, pudiendo las personas interesadas optar entre uno u otro.»
+//   · Art. 194.1.d) LGSS (versión del 01/05/2025): «Gran incapacidad» («Se sustituyen las
+//     referencias a "gran invalidez" por "gran incapacidad"», DA única de la Ley 2/2025).
+//   · Trámite oficial «Solicitar un complemento por brecha de género o por maternidad»
+//     (prestaciones.seg-social.es/servicio/complemento-brecha.html): «Solicita el complemento
+//     económico que se puede añadir a tu pensión…», «Puedes solicitar el complemento en
+//     cualquier momento desde que te hayan concedido la pensión», «Realiza este trámite si:
+//     … No te han reconocido el complemento por maternidad o para la reducción de la brecha
+//     de género con anterioridad», y «Si accediste a tu pensión entre el 1 de enero de 2016 y
+//     el 3 de febrero de 2021, te corresponde solicitar el complemento por maternidad».
+//   · Revista de la Seguridad Social, «Cómo pedir el complemento para reducir la brecha de
+//     género junto a la solicitud de su pensión» (08/04/2025): «En la solicitud
+//     correspondiente deberás marcar la casilla específica para la solicitud de este
+//     complemento y rellenar los datos relativos a tu hijo o hijos.»
+//
+// Cinco casos resueltos A MANO antes de abrir el navegador (coinciden los cinco) y seis
+// hallazgos ABIERTOS con `test.fail()`, uno de ellos la sospecha del 01/10 sobre el
+// «reconocimiento automático», que las fuentes de arriba convierten en hallazgo.
+// ═════════════════════════════════════════════════════════════════════════════
+
+interface Respuestas06 extends Respuestas26 {
+  /** P1 bis: prorrata española de la pensión, tal como se teclea («37,5»); sin ella, «No» */
+  prorrata?: string;
+  /** P3 bis: le alcanza una exclusión del art. 60.3.b) LGSS */
+  excluido?: boolean;
+}
+
+/** Como `responderConSiembra`, pero contestando también la P1 bis y la P3 bis. */
+async function responder06(page: Page, r: Respuestas06): Promise<void> {
+  await elegir(page, r.pension);
+  const hayP1bis = await page
+    .getByRole('radio', { name: 'No, solo con cotizaciones en España', exact: true })
+    .count();
+  if (r.prorrata !== undefined) {
+    await elegir(page, 'Sí, a prorrata (totalización internacional)');
+    await sembrarValor(page, '#prorrata', r.prorrata);
+  } else if (hayP1bis > 0) {
+    await elegir(page, 'No, solo con cotizaciones en España');
+  }
+  await elegir(page, r.excluido ? 'Sí, me alcanza alguna' : 'No me alcanza ninguna');
+  await responderConSiembra(page, r);
+}
+
+/** Todo el JSON-LD de la página (WebApplication + FAQPage), en una cadena. */
+async function jsonLdDeLaPagina(page: Page): Promise<string> {
+  return (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+}
+
+test.describe('Re-inspección 06/10/2026', () => {
+  /**
+   * CASO N (NORMAL) — mujer · jubilación · desde el 4-feb-2021 · 2 hijos · sin prorrata ·
+   * sin exclusión del 60.3.b · el otro progenitor no lo percibe · sin denegación propia.
+   *
+   *   hijosComputables = mín(2, maxHijos 4) = 2
+   *   mensual = 2 × 36,90 = 73,80 €/mes          ← esperado literal
+   *   anual   = 73,80 × 14 = 1033,20 €/año       ← es-ES no agrupa 4 cifras
+   *
+   * OBTENIDO el 06/10/2026: exactamente eso (el «reconocimiento automático» del motivo es el
+   * hallazgo de más abajo; las cifras están bien).
+   */
+  test('caso N (06/10): mujer, jubilación y 2 hijos, sin prorrata ni exclusión → 73,80 €/mes y 1033,20 €/año', async ({
+    page,
+  }) => {
+    await responder06(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '2',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+73,80 €/mes');
+    expect(resultado).toContain('Cumples los requisitos básicos');
+    expect(resultado).toContain('Hijos computables 2 (máx. 4)');
+    expect(resultado).toContain('Mensual estimado 73,80 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 1033,20 €/año');
+    expect(resultado).not.toContain('Prorrata de tu pensión');
+  });
+
+  /**
+   * CASO L1 (LÍMITE) — HOMBRE que cumple el art. 60.1.b) (pensión contributiva de
+   * jubilación y carrera afectada por los nacimientos). Con el texto literal del 60.1.b y con
+   * la doctrina de `META.doctrina` el resultado es el mismo: tiene derecho. 5 hijos y sin
+   * otro progenitor.
+   *
+   *   hijosComputables = mín(5, 4) = 4 (el 5.º no suma)
+   *   mensual = 4 × 36,90 = 147,60 €/mes = maxMensual
+   *   anual   = 147,60 × 14 = 2066,40 €/año = maxAnual
+   */
+  test('caso L1 (06/10, límite): hombre, jubilación y 5 hijos sin otro progenitor → 4 computables y 147,60 €/mes', async ({
+    page,
+  }) => {
+    expect(4 * COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual).toBeCloseTo(
+      COMPLEMENTO_BRECHA_GENERO_2026.maxMensual,
+      2,
+    );
+    await responder06(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '5',
+      sexo: 'Hombre',
+      otroProgenitor: 'No procede (sin otro progenitor)',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+147,60 €/mes');
+    expect(resultado).toContain('Hijos computables 4 (máx. 4)');
+    expect(resultado).toContain('Anual (14 pagas) 2066,40 €/año');
+    expect(resultado).not.toContain('184,50'); // 5 × 36,90, sin el tope
+    expect(resultado).toContain(COMPLEMENTO_BRECHA_GENERO_META.doctrina.stjue.asunto);
+  });
+
+  /**
+   * CASO L2 (LÍMITE) — la concurrencia de los dos progenitores con una pensión de VIUDEDAD
+   * (las regresiones de 2239 y 2543 la recorren con jubilación e IP). Mujer, 3 hijos, el otro
+   * progenitor ya lo percibe:
+   *   · «La del otro progenitor es menor» → art. 60.1: no procede, 0 €, y el paso siguiente
+   *     da la regla del 60.7 (importe inicial revalorizado, sin complementos).
+   *   · «La mía es menor» → procede: 3 × 36,90 = 110,70 €/mes; 110,70 × 14 = 1549,80 €/año,
+   *     con solicitud expresa y la extinción del 60.2 (cita antes del punto, 2544).
+   *   · «No lo sé» → condicionado con los mismos 110,70 €/mes y el desempate del 60.7.
+   */
+  test('caso L2 (06/10, límite): viudedad y 3 hijos con el otro progenitor cobrándolo — decide la suma (60.1, 60.2 y 60.7)', async ({
+    page,
+  }) => {
+    const base = {
+      pension: 'Viudedad',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '3',
+      sexo: 'Mujer',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+    };
+    await responder06(page, { ...base, sumaMenor: 'La del otro progenitor es menor' });
+    let resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).not.toContain('110,70');
+    expect(resultado).toContain('sin computar ningún complemento');
+    expect(resultado).toContain('(art. 60.7 LGSS)');
+
+    await responder06(page, { ...base, sumaMenor: 'La mía es menor' });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('+110,70 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 1549,80 €/año');
+    expect(resultado).toContain('Te corresponde a ti: se extingue el del otro progenitor');
+    expect(resultado).toContain('no se te reconoce de oficio');
+    expect(resultado).toContain('antes de resolver (art. 60.2 LGSS).');
+
+    await responder06(page, { ...base, sumaMenor: 'No lo sé' });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('Depende de la suma de pensiones');
+    expect(resultado).toContain('te corresponde: +110,70 €/mes');
+    expect(resultado).toContain(
+      COMPLEMENTO_BRECHA_GENERO_2026.concurrencia.entreProgenitores.comparacion.desempate.detalle,
+    );
+  });
+
+  /**
+   * CASO L3 (LÍMITE) — prorrata del art. 60.3.f) con COMA decimal y en los bordes.
+   * Hombre · incapacidad permanente · 4 hijos:
+   *   · «37,5»  → 4 × 36,90 × 0,375 = 55,35 €/mes; 55,35 × 14 = 774,90 €/año
+   *   · «100»   → el íntegro: 147,60 €/mes (100 entra: «no mayor que 100»)
+   *   · «100,5» → fuera de (0, 100]: «Sin calcular», sin ninguna cifra
+   * La tool del MCP da lo mismo para 37,5.
+   */
+  test('caso L3 (06/10, límite): prorrata «37,5» → 55,35 €/mes y 774,90 €/año; «100» da el íntegro y «100,5» no calcula', async ({
+    page,
+    request,
+  }) => {
+    expect(4 * COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual * 0.375).toBeCloseTo(55.35, 2);
+    expect(55.35 * COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales).toBeCloseTo(774.9, 2);
+    const base = {
+      pension: 'Incapacidad permanente',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '4',
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    };
+
+    await responder06(page, { ...base, prorrata: '37,5' });
+    let resultado = await textoResultado(page);
+    expect(resultado).toContain('+55,35 €/mes');
+    // `textoResultado` ya normaliza el espacio duro del % a espacio normal
+    expect(resultado).toContain('Prorrata de tu pensión (art. 60.3.f) LGSS) 37,50 %');
+    expect(resultado).toContain('Anual (14 pagas) 774,90 €/año');
+    expect(resultado).not.toContain('147,60');
+
+    await responder06(page, { ...base, prorrata: '100' });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('+147,60 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 2066,40 €/año');
+
+    await responder06(page, { ...base, prorrata: '100,5' });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('Sin calcular');
+    expect(resultado).not.toContain('147,60');
+    expect(resultado).not.toContain('Desglose');
+
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'hombre',
+      num_hijos: 4,
+      tipo_pension: 'incapacidad_permanente',
+      fecha_hecho_causante: 'desde_2021',
+      prorrata_porcentaje: 37.5,
+    });
+    expect(mcp).toContain('55,35 €/mes (774,90 €/año, 14 pagas)');
+  });
+
+  /**
+   * CASO R (RECHAZO) — jubilación causada ANTES del 4-feb-2021, 3 hijos: el complemento de
+   * brecha no procede (RDL 3/2021), no hay cifra, y el paso siguiente cita la doctrina WA
+   * desde `COMPLEMENTO_MATERNIDAD_DEROGADO.doctrinaAcceso`. Y 0 hijos: no procede, sin cifra.
+   */
+  test('caso R (06/10, rechazo): jubilación anterior al 4-feb-2021 con 3 hijos, y 0 hijos → «No procede ahora» sin cifra', async ({
+    page,
+  }) => {
+    await responder06(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'Antes del 4-feb-2021',
+      hijos: '3',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    let resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).not.toContain('110,70');
+    expect(resultado).not.toContain('Desglose');
+    expect(resultado).toContain(COMPLEMENTO_MATERNIDAD_DEROGADO.doctrinaAcceso);
+
+    await responder06(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '0',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).toContain('al menos un hijo o hija');
+    expect(resultado).not.toContain('€/mes');
+  });
+
+  /**
+   * ABIERTO (06/10/2026) — MEDIO (contenido). Cierra la sospecha del 01/10 sobre el
+   * «reconocimiento automático». Ni el art. 60 LGSS ni la Seguridad Social dicen que el
+   * complemento se reconozca de oficio: el trámite oficial es «Solicitar un complemento por
+   * brecha de género o por maternidad» («Puedes solicitar el complemento en cualquier momento
+   * desde que te hayan concedido la pensión») y la Revista de la SS (08/04/2025) indica que
+   * en la solicitud de la pensión «deberás marcar la casilla específica para la solicitud de
+   * este complemento». Aun así, la página dice:
+   *   · veredicto de la rama general de una mujer: «…para reconocimiento automático del
+   *     complemento»;
+   *   · FAQ: «En muchos casos el INSS lo reconoce automáticamente al resolver la pensión»;
+   *   · caso típico: «El INSS suele reconocerlo de oficio o con solicitud expresa»;
+   *   · FAQPage: «el complemento se añade de oficio en muchos casos».
+   * (Y «Errores frecuentes» dice lo contrario: «No siempre es así».)
+   */
+  test('ABIERTO (06/10): ni el veredicto ni la guía ni el FAQPage dicen que se reconozca de oficio', async ({
+    page,
+  }) => {
+    test.fail();
+    await responder06(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '2',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    expect(await textoResultado(page)).not.toContain('reconocimiento automático');
+    await abrirGuia(page);
+    const cuerpo = normalizar(await page.locator('body').innerText());
+    expect(cuerpo).not.toContain('lo reconoce automáticamente');
+    expect(cuerpo).not.toContain('suele reconocerlo de oficio');
+    expect(await jsonLdDeLaPagina(page)).not.toContain('se añade de oficio');
+  });
+
+  /**
+   * ABIERTO (06/10/2026) — MEDIO (contenido). DT 33.ª LGSS, párrafo segundo: quien cobra el
+   * complemento de MATERNIDAD (pensión causada antes del 4-feb-2021) y causa después una
+   * pensión nueva no suma los dos: son incompatibles y se opta por uno. La SS lo pone como
+   * condición del trámite («No te han reconocido el complemento por maternidad … con
+   * anterioridad»). La app no lo pregunta ni lo avisa en ningún sitio: a una mujer jubilada
+   * en 2019 con el complemento de maternidad que enviuda en 2023 (viudedad desde el
+   * 4-feb-2021, 2 hijos) le da «+73,80 €/mes · Cumples los requisitos básicos», y la guía solo
+   * cita la DT 33.ª para decir que el de maternidad «se conserva». El módulo
+   * `COMPLEMENTO_MATERNIDAD_DEROGADO` tampoco recoge la incompatibilidad.
+   * El test pide que la página lo diga (incompatibilidad + opción), sin fijar cómo.
+   */
+  test('ABIERTO (06/10): la DT 33.ª — el complemento de maternidad previo es incompatible y se opta', async ({
+    page,
+  }) => {
+    test.fail();
+    await responder06(page, {
+      pension: 'Viudedad',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '2',
+      sexo: 'Mujer',
+      otroProgenitor: 'No procede (sin otro progenitor)',
+    });
+    expect(await textoResultado(page)).toContain('+73,80 €/mes');
+    await abrirGuia(page);
+    const cuerpo = normalizar(await page.locator('body').innerText());
+    expect(cuerpo).toMatch(/maternidad[^.]{0,250}incompatib|incompatib[^.]{0,250}maternidad/i);
+    expect(cuerpo).toMatch(/optar|elegir entre/i);
+  });
+
+  /**
+   * ABIERTO (06/10/2026) — BAJO (contenido). Pensión causada antes del 4-feb-2021 y sin el
+   * complemento de maternidad: el paso siguiente solo habla de quien «percibía» o «se le
+   * denegó» el antiguo complemento. La SS (trámite oficial) dice que si la pensión se causó
+   * entre el 1 de enero de 2016 y el 3 de febrero de 2021 «te corresponde solicitar el
+   * complemento por maternidad» (con al menos 2 hijos y sin haberlo tenido reconocido), y que
+   * se puede pedir «en cualquier momento desde que te hayan concedido la pensión».
+   */
+  test('ABIERTO (06/10): pensión anterior al 4-feb-2021 — el paso siguiente no dice que el de maternidad se puede solicitar', async ({
+    page,
+  }) => {
+    test.fail();
+    await responder06(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'Antes del 4-feb-2021',
+      hijos: '3',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    expect(await textoResultado(page)).toMatch(/solicit\w*[^.]{0,80}complemento (de|por) maternidad/i);
+  });
+
+  /**
+   * ABIERTO (06/10/2026) — BAJO (contenido). El FAQPage dice «incapacidad permanente (total,
+   * absoluta o gran invalidez)». La LGSS dice «gran incapacidad» desde el 01/05/2025 (art.
+   * 194.1.d, DA única de la Ley 2/2025), y data/fiscal ya lo cambió el 03/10 (d6ba391e).
+   */
+  test('ABIERTO (06/10): el FAQPage nombra la «gran incapacidad», no la «gran invalidez»', async ({ page }) => {
+    test.fail();
+    const ld = await jsonLdDeLaPagina(page);
+    expect(ld).not.toContain('gran invalidez');
+    expect(ld).toContain('gran incapacidad');
+  });
+
+  /**
+   * ABIERTO (06/10/2026) — BAJO (dato). La «fuente oficial» del sello del complemento
+   * (`COMPLEMENTO_BRECHA_GENERO_META.urlOficial`) lleva a una página de seg-social.es que
+   * responde 200 pero muestra «No se ha encontrado contenido para:
+   * poin_contenidos/internet/4986/Jubilacion/10963» (medido con curl y con Chromium el
+   * 06/10/2026). El trámite vigente está en prestaciones.seg-social.es. Testigo
+   * determinista: que el sello deje de apuntar a la URL muerta (una comprobación por red
+   * en el spec sería frágil).
+   */
+  test('ABIERTO (06/10): el sello del complemento no enlaza a una página sin contenido', async ({ page }) => {
+    test.fail();
+    const MUERTA = 'https://www.seg-social.es/wps/portal/wss/internet/Pensionistas/Jubilacion/10963';
+    await expect(page.locator(`a[href="${COMPLEMENTO_BRECHA_GENERO_META.urlOficial}"]`).first()).toBeAttached();
+    expect(COMPLEMENTO_BRECHA_GENERO_META.urlOficial).not.toBe(MUERTA);
+  });
+
+  /**
+   * ABIERTO (06/10/2026) — BAJO (contenido). El gemelo de la app, la tool
+   * `calcular_complemento_brecha_genero` del MCP Delegum, cierra con AVISO_LABORAL: «Cálculo
+   * basado en el Estatuto de los Trabajadores y normativa laboral 2025 … ni la consulta al
+   * SEPE». El cálculo sale del art. 60 LGSS con la cuantía de 2026 y lo gestiona el INSS.
+   */
+  test('ABIERTO (06/10): la tool del MCP no se ampara en el Estatuto de los Trabajadores ni en la normativa de 2025', async ({
+    request,
+  }) => {
+    test.fail();
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'mujer',
+      num_hijos: 2,
+      tipo_pension: 'viudedad',
+      fecha_hecho_causante: 'desde_2021',
+    });
+    expect(mcp).toContain('73,80 €/mes (1033,20 €/año, 14 pagas)');
+    expect(mcp).not.toContain('Estatuto de los Trabajadores');
+    expect(mcp).not.toContain('normativa laboral 2025');
+  });
+});
+
+// Móvil (390 px): la rama de la prorrata con coma decimal, que ningún test recorría en móvil.
+test.describe('Re-inspección 06/10/2026 — móvil', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /** L3 en 390 × 844: 55,35 €/mes, el veredicto a la vista y con el foco, sin desborde. */
+  test('L3 en móvil: la prorrata «37,5» da 55,35 €/mes y el veredicto se ve y recibe el foco', async ({ page }) => {
+    await responder06(page, {
+      pension: 'Incapacidad permanente',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '4',
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+      prorrata: '37,5',
+    });
+    const importe = page.locator('[class*="resultImporte"]');
+    // formatCurrency separa la cifra del € con espacio duro: \s lo casa
+    await expect(importe).toHaveText(/^\+55,35\s€\/mes$/);
+    const caja = await importe.boundingBox();
+    expect(caja).not.toBeNull();
+    const { y, height } = caja as { y: number; height: number };
+    expect(y).toBeGreaterThanOrEqual(0);
+    expect(y + height).toBeLessThanOrEqual(844);
+    expect(await page.evaluate(() => (document.activeElement?.className ?? '').toString())).toContain(
+      'resultHeroPositivo',
+    );
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+});

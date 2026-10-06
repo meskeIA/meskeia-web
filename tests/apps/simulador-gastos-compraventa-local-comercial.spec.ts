@@ -17,6 +17,8 @@ import {
 // piezas del arancel con las que se resuelve a mano el caso de Castilla y León.
 import { GANANCIAS_PATRIMONIALES_META } from '../../data/fiscal/inmuebles';
 import { ARANCELES_NOTARIO, FACTURA_NOTARIAL, REGISTRO_CONCEPTOS } from '../../data/itp-ccaa';
+// Re-inspección del 06/10/2026: la bonificación de Ceuta y el límite del arancel notarial.
+import { BONIFICACION_CUOTA_CEUTA_MELILLA, LIMITE_ARANCEL_NOTARIAL } from '../../data/itp-ccaa';
 
 /**
  * Inspector — simulador-gastos-compraventa-local-comercial (segmento fiscal, riesgo 1 CRÍTICO)
@@ -394,8 +396,9 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
   // hallazgos «medio» sobre TEXTOS de la rama de IVA, que aquí se comprueban
   // expresamente (CASO 8, apartados 8c y 8d).
   //
-  // HALLAZGOS ABIERTOS que esta re-inspección deja documentados y NO repara
-  // (el Inspector no repara; van sin aserción para que la suite siga en verde):
+  // HALLAZGOS que esta re-inspección dejó documentados sin repararlos (el Inspector no
+  // repara). Todos REPARADOS el 02/09/2026: sus casos de regresión están en el describe
+  // «Regresión — hallazgos del 02/09/2026, reparados» (618, 619 y 623, 620 y 621, 622):
   //   · [medio] El texto de ayuda del precio dice «Precio escriturado o valor de
   //     referencia catastral (el mayor de ambos)» también en obra nueva y en la
   //     renuncia. Esa regla es la base mínima del ITP/AJD (art. 10 TRLITPAJD);
@@ -1663,10 +1666,9 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — Galicia, Melilla y la comisión del
   });
 
   // ───────────────────────────────────────────────────────────────────────────
-  // HALLAZGOS ABIERTOS del 12/09/2026, con `test.fail()`: afirman lo que DEBERÍA
-  // ocurrir, así que hoy fallan a propósito. Cuando se reparen se les quita el
-  // `test.fail()` y quedan como regresión — comprobando antes, uno a uno, que lo que
-  // afirman sigue siendo lo correcto.
+  // HALLAZGOS del 12/09/2026 (785, 786 y 787), REPARADOS: se escribieron con `test.fail()`
+  // afirmando lo que DEBERÍA ocurrir y, al repararlos, se les quitó la marca y quedaron como
+  // regresión (la base del Inspector no tiene ninguno abierto: comprobado el 06/10/2026).
   // ───────────────────────────────────────────────────────────────────────────
 
   /**
@@ -1835,8 +1837,8 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — Galicia, Melilla y la comisión del
 // Precisión: se comparan cadenas literales al CÉNTIMO, que es el orden de magnitud del
 // defecto que vigilan (el hallazgo 594 era de un céntimo entre el total y su desglose).
 //
-// HALLAZGOS VIVOS de esta ronda, que el Inspector NO repara: van abajo con `test.fail()`,
-// afirmando lo que DEBERÍA ocurrir, de modo que el fichero queda en VERDE.
+// Los hallazgos de esta ronda (1159, 1160 y 1161) se escribieron abajo con `test.fail()`,
+// afirmando lo que DEBERÍA ocurrir; REPARADOS el 21/09/2026, hoy pasan sin la marca.
 // ═════════════════════════════════════════════════════════════════════════════
 
 test.describe('RE-INSPECCIÓN 21/09/2026 — Valencia, la ganancia en cero y el par catastral imposible', () => {
@@ -2621,8 +2623,8 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   });
 
   // ══════════════════════════════════════════════════════════════════════════
-  // CASO 28 (RECHAZO) — ❌ ABIERTO (operativa, medio): unas amortizaciones MAYORES que todo
-  // el coste de adquisición se aceptan en silencio.
+  // CASO 28 (RECHAZO) — ✅ REPARADO (hallazgo 1261, operativa, medio; 85daf805): unas
+  // amortizaciones MAYORES que todo el coste de adquisición se aceptaban en silencio.
   //
   // El art. 40 RIRPF minora el valor de adquisición en la amortización deducida, y esa
   // amortización se aplica sobre la CONSTRUCCIÓN, nunca sobre el suelo (en
@@ -2706,8 +2708,8 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   //   La dirección de cada aviso sale ahora de SONDEAR el cálculo (lib/sondeoIlegibles.ts).
 
   /**
-   * ❌ ABIERTO (operativa, medio) — DOS ilegibles en sentidos opuestos: el aviso del NETO
-   * afirma a la vez «el neto real será menor» y «el neto real es MAYOR que este».
+   * ✅ REPARADO (operativa, medio) — DOS ilegibles en sentidos opuestos: el aviso del NETO
+   * afirmaba a la vez «el neto real será menor» y «el neto real es MAYOR que este».
    *
    * Es el (b) de la hermana garaje. Aquí la tarjeta del IRPF sí lo resuelve cuando son los
    * gastos de aquella compra y las amortizaciones («Cuota sin cerrar… sentidos contrarios»),
@@ -2733,7 +2735,7 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   });
 
   /**
-   * ❌ ABIERTO (operativa, medio) — el mismo defecto con los dos importes del valor de
+   * ✅ REPARADO (operativa, medio) — el mismo defecto con los dos importes del valor de
    * adquisición, justo donde la tarjeta del IRPF ya dice «sentidos contrarios».
    *
    * BASE con los gastos de aquella compra y las amortizaciones «2.000.50» (plusvalía 1.200,
@@ -2756,8 +2758,8 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   });
 
   /**
-   * ❌ ABIERTO (operativa, medio) — con PÉRDIDA, unas amortizaciones ilegibles hacen que el
-   * neto se rotule «(PARCIAL)» y afirme «No descuenta el IRPF que añaden las amortizaciones
+   * ✅ REPARADO (operativa, medio) — con PÉRDIDA, unas amortizaciones ilegibles hacían que el
+   * neto se rotulara «(PARCIAL)» y afirmara «No descuenta el IRPF que añaden las amortizaciones
    * deducidas: el neto real será menor» (y el total, «SIN el IRPF que añaden…»), cuando con
    * la amortización real no hay IRPF y el neto es IDÉNTICO.
    *
@@ -2783,8 +2785,8 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   });
 
   /**
-   * ❌ ABIERTO (operativa, medio) — con PÉRDIDA, la cifra que SÍ mueve un ilegible del valor
-   * de adquisición es la pérdida compensable, y su tarjeta no lo dice.
+   * ✅ REPARADO (operativa, medio) — con PÉRDIDA, la cifra que SÍ mueve un ilegible del valor
+   * de adquisición es la pérdida compensable, y su tarjeta no lo decía.
    *
    * La guarda de A1 hace bien en callar en el NETO (no se mueve), pero «Pérdida patrimonial»
    * sigue diciendo «la pérdida se puede compensar en la declaración» sobre una cifra que se
@@ -2816,8 +2818,8 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   });
 
   /**
-   * ❌ ABIERTO (operativa, medio) — con la comisión ilegible, la tarjeta del IRPF publica
-   * como DEFINITIVA una cuota que es un TECHO, y la del valor de transmisión afirma haber
+   * ✅ REPARADO (operativa, medio) — con la comisión ilegible, la tarjeta del IRPF publicaba
+   * como DEFINITIVA una cuota que es un TECHO, y la del valor de transmisión afirmaba haber
    * restado una comisión que tomó como 0.
    *
    * La comisión y la gestoría de la venta son gastos de transmisión (art. 35.1 LIRPF):
@@ -2849,8 +2851,8 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   });
 
   /**
-   * ❌ ABIERTO (contenido, bajo) — «No descuenta la comisión inmobiliaria: el neto real será
-   * menor» invita a restar la comisión ENTERA, y el hueco real es menor: C3 del testigo de
+   * ✅ REPARADO (contenido, bajo) — «No descuenta la comisión inmobiliaria: el neto real será
+   * menor» invitaba a restar la comisión ENTERA, y el hueco real es menor: C3 del testigo de
    * familia, reparado el 23/09 solo en la referencia (0f70fdf8).
    *
    * BASE con la comisión «3.5.0» (plusvalía 1.200, recalculada el 24/09/2026): neto mostrado
@@ -2868,8 +2870,8 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   });
 
   /**
-   * ❌ ABIERTO (operativa, bajo) — con el valor catastral total ilegible y el método OBJETIVO
-   * ganando, el neto se rotula «(PARCIAL)» y afirma «el neto real es MAYOR que este», pero es
+   * ✅ REPARADO (operativa, bajo) — con el valor catastral total ilegible y el método OBJETIVO
+   * ganando, el neto se rotulaba «(PARCIAL)» y afirmaba «el neto real es MAYOR que este», pero es
    * IDÉNTICO. Es el (c) de garaje, efecto colateral de 758e053f.
    *
    * En la BASE el real sale 5.000,00 € y el objetivo 1.200,00 €: con el total de verdad
@@ -2887,7 +2889,7 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   });
 
   /**
-   * ❌ ABIERTO (operativa, bajo) — el «Total gastos de la venta» se publica como DEFINITIVO
+   * ✅ REPARADO (operativa, bajo) — el «Total gastos de la venta» se publicaba como DEFINITIVO
    * cuando la cifra que lleva dentro es un TECHO, mientras el neto de debajo dice «(PARCIAL)»
    * y la tarjeta del IRPF dice «TECHO».
    *
@@ -2910,7 +2912,7 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   });
 
   /**
-   * ❌ ABIERTO (contenido, bajo) — un importe ESCRITO pero ilegible se anuncia como si
+   * ✅ REPARADO (contenido, bajo) — un importe ESCRITO pero ilegible se anunciaba como si
    * faltara: «Introduce el precio…», «falta el valor catastral del suelo».
    *
    * 8d7dcd1b lo reparó en el precio de nave, solar y terreno («confundía "ilegible" con
@@ -4019,5 +4021,419 @@ test.describe('Hallazgo 2209 — la base mínima del AJD (art. 30.1 TRLITPAJD)',
     const idAyuda = await page.locator(CAMPO).getAttribute('aria-describedby');
     const ayuda = (await page.locator(`[id="${idAyuda}"]`).innerText()).replace(/\s+/g, ' ');
     expect(ayuda).toContain('La base del AJD no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD)');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 06/10/2026 — Cantabria, la renuncia que Ceuta no tiene, la venta al precio de
+// compra y las CIFRAS INTERMEDIAS de la familia («Un importe ILEGIBLE no es un cero»).
+//
+// Batería previa: los 82 casos de arriba en verde, sin `test.fail()` vivo, y la base del
+// Inspector sin hallazgos abiertos en esta app. Verificado en navegador lo que entró después del
+// 26/09: 72e1184a (2198-2203 y la amortización del local ALQUILADO en el perfil «no afecto»),
+// 7d5c1876 (total parcial sin IGIC/IPSI y la salvedad del art. 30.1 TRLITPAJD) y 242fffcd
+// (notaría y registro sin IVA en Canarias, Ceuta y Melilla; el % con espacio duro en los textos de
+// data/itp-ccaa.ts: 0 porcentajes pegados en las 19 comunidades × 3 operaciones, las dos pestañas,
+// el JSON-LD y la meta description).
+//
+// ⚠️ Notaría y registro NO se fijan en estos casos: data/itp-ccaa.ts no aplica la rebaja del 5 %
+// del RD 1426/1989 (Anexo I, nº 2.1) ni la del RD 1427/1989 (hallazgos 2901 y 2902, abiertos en la
+// referencia y comunes a las siete). Se lee lo que pinta la app y se exige que el total cuadre con
+// las líneas visibles (hallazgo 594), que es lo que no cambiará al repararlos.
+//
+// De dónde sale CADA cifra (ninguna de memoria):
+//   · Cantabria: tipo general 9 % de `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts:58), sin escala
+//     en `ITP_CCAA.cantabria`, y AJD 1,5 % (data/itp-ccaa.ts:437), sin tipo propio de la renuncia.
+//   · Ceuta: tipo 6 % de `ITP_CCAA.ceuta` y la bonificación del 50 % de la cuota (art. 57 bis
+//     TRLITPAJD, `BONIFICACION_CUOTA_CEUTA_MELILLA`); la renuncia no existe en el IPSI
+//     (`TERRITORIOS_SIN_RENUNCIA` de la página, Ley 8/1991 arts. 7 y 20.3).
+//   · País Vasco: 7 % para lo que no es vivienda (`tipoNoVivienda`, NF 1/2011 art. 13.a) y AJD 0,5 %.
+//   · Madrid: 6 % y AJD 0,75 %. Límite del arancel notarial: `LIMITE_ARANCEL_NOTARIAL` (RD 1426/1989,
+//     nº 2.1: lo que excede es de libre acuerdo).
+//   · IVA del local: `IVA_INMUEBLES_2025.local` = 21.
+//   · Plusvalía: `COEFICIENTES_IIVTNU_2025` (6 años 0,19; 10 años 0,12) × 25 % orientativo; no
+//     sujeción del art. 104.5 TRLRHL cuando la venta no supera la compra.
+//   · IRPF: `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 · 21 % hasta 50.000 · 23 % hasta
+//     200.000) sobre el art. 35 LIRPF; las amortizaciones minoran el valor de adquisición (art. 35.2
+//     LIRPF y art. 40.1 RIRPF, «computándose en todo caso la amortización mínima», BOE-A-2007-6820).
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Céntimos de un importe pintado («17.766,77 €» → 1776677): la app pinta siempre dos decimales. */
+const centimos0610 = (s: string): number => Number(s.replace(/\D/g, ''));
+
+/**
+ * El total del comprador cuadra con las líneas que se ven (hallazgo 594) y el coste es precio +
+ * total, sin fijar la notaría ni el registro (hallazgos 2901 y 2902).
+ */
+async function totalCuadra0610(page: Page, precio: number, lineas: (string | RegExp)[]): Promise<void> {
+  let suma = 0;
+  for (const l of lineas) suma += centimos0610(await valorTarjeta(page, l));
+  expect(centimos0610(await valorTarjeta(page, 'Total gastos adicionales'))).toBe(suma);
+  expect(centimos0610(await valorTarjeta(page, /^COSTE TOTAL/))).toBe(precio * 100 + suma);
+}
+
+test.describe('RE-INSPECCIÓN 06/10/2026 — Cantabria, la renuncia que Ceuta no tiene, la venta al precio de compra y las cifras intermedias', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_12_09);
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 35 (NORMAL) — CANTABRIA, local de 180.000 €, la única comunidad de tipo plano que
+  // ninguna vuelta había liquidado, y un vendedor que lo tuvo ALQUILADO (perfil «no afecto»).
+  //   2ª mano: ITP 180.000 × 9 % = 16.200,00 → «ITP (9,00 %)», sin AJD.
+  //   Obra nueva: IVA 21 % = 37.800,00 + AJD 1,5 % = 2700,00.
+  //   Renuncia (art. 20.Dos LIVA, ISP): el mismo IVA y, sin tipo propio, el AJD general: 2700,00.
+  //   VENDEDOR no afecto: compra 120.000 · gastos 10.000 · amortizaciones del alquiler 15.000 ·
+  //     6 años · suelo 30.000 · total 90.000 · comisión 4 % · gestoría 300
+  //     plusvalía objetivo = 30.000 × 0,19 × 25 % = 1425,00 ; real = 60.000 × ⅓ × 25 % = 5.000
+  //       → gana el objetivo
+  //     transmisión = 180.000 − 7.200 − 300 − 1.425 =                             171.075,00
+  //     adquisición = 120.000 + 10.000 − 15.000 =                                  115.000,00
+  //     ganancia 56.075 → IRPF = 1.140 + 9.240 + 6.075 × 23 % =                     11.777,25
+  //     total = 1.425 + 7.200 + 300 + 11.777,25 = 20.702,25 (11,50 %) · NETO       159.297,75
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 35 (normal) — Cantabria 180.000 €: ITP plano al 9 %, IVA + AJD por las dos vías, y el vendedor de un local alquilado', async ({ page }) => {
+    expect(ITP_CCAA.cantabria.tipoGeneral).toBe(9);
+    expect(ITP_CCAA.cantabria.tramosProgresivos).toBeUndefined();
+    expect(ITP_CCAA.cantabria.ajd).toBe(1.5);
+    expect(ITP_CCAA.cantabria.ajdRenuncia).toBeUndefined();
+    expect(IVA_INMUEBLES_2025.local).toBe(21);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 6)?.coeficiente).toBe(0.19);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+
+    await page.selectOption('#select-ccaa', 'cantabria');
+    await sembrarImporte12(page, 'Precio del local comercial', '180000');
+    await sembrarImporte12(page, 'Gastos de gestoría del comprador (€)', '600');
+
+    await esperarTarjeta2609(page, /^ITP/, '16.200,00 €');
+    expect(await tituloTarjeta24(page, /^ITP/)).toBe('ITP (9,00 %)');
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    await totalCuadra0610(page, 180000, [/^ITP/, 'Gastos de notaría', 'Registro de la Propiedad', 'Gastos de gestoría']);
+    expect(await tituloTarjeta24(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await esperarTarjeta2609(page, /^IVA \(21/, '37.800,00 €');
+    expect(await tituloTarjeta24(page, /^AJD/)).toBe('AJD (1,50 %)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('2700,00 €');
+    await totalCuadra0610(page, 180000, [/^IVA/, /^AJD/, 'Gastos de notaría', 'Registro de la Propiedad', 'Gastos de gestoría']);
+
+    await page.getByRole('button', { name: /2ª mano con renuncia/ }).click();
+    await esperarTarjeta2609(page, /^IVA \(renuncia/, '37.800,00 €');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('2700,00 €');
+    expect(await descripcionTarjeta(page, /^AJD/)).toBe(
+      'AJD general de Cantabria: algunas comunidades aplican un tipo incrementado en la renuncia',
+    );
+    await totalCuadra0610(page, 180000, [/^IVA/, /^AJD/, 'Gastos de notaría', 'Registro de la Propiedad', 'Gastos de gestoría']);
+
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    await expect(page.getByRole('button', { name: /Local no afecto/ })).toHaveAttribute('aria-pressed', 'true');
+    await sembrarImporte12(page, 'Precio de compra original', '120000');
+    await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '10000');
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '15000');
+    await sembrarImporte12(page, 'Años de propiedad', '6');
+    await sembrarImporte12(page, 'Valor catastral del suelo (€)', '30000');
+    await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '90000');
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '4');
+    await sembrarImporte12(page, 'Gestoría y certificados del vendedor (€)', '300');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('1425,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe(
+      'Método objetivo (más favorable), tipo municipal orientativo del 25 %',
+    );
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('115.000,00 €');
+    expect(await descripcionTarjeta(page, 'Valor de adquisición')).toBe(
+      'Precio de compra + impuestos y gastos de aquella compra − 15.000,00 € de amortizaciones deducidas',
+    );
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('171.075,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('56.075,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('11.777,25 €');
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('7200,00 €');
+    expect(await valorTarjeta(page, 'Total gastos de la venta')).toBe('20.702,25 €');
+    expect(await descripcionTarjeta(page, 'Total gastos de la venta')).toBe('11,50 % sobre el precio de venta');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('159.297,75 €');
+    expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES');
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 36 (LÍMITE) — la renuncia elegida en Madrid y la comunidad cambiada a CEUTA, donde no
+  // existe: el botón se desactiva, se calcula la segunda mano y la elección vuelve al regresar.
+  //   Madrid, renuncia: IVA 200.000 × 21 % = 42.000,00 · AJD 0,75 % = 1500,00
+  //   Ceuta, 2ª mano: ITP 200.000 × 6 % × (1 − 50 %) = 6000,00 → «ITP (3,00 %)», sin AJD ni IVA;
+  //     notaría y registro sin IPSI → total y coste «(PARCIAL)».
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 36 (límite) — la renuncia elegida y la comunidad cambiada a Ceuta: segunda mano bonificada, y la elección vuelve en Madrid', async ({ page }) => {
+    expect(ITP_CCAA.ceuta.tipoGeneral).toBe(6);
+    expect(BONIFICACION_CUOTA_CEUTA_MELILLA).toBe(0.5);
+    expect(ITP_CCAA.madrid.ajd).toBe(0.75);
+
+    await sembrarImporte12(page, 'Precio del local comercial', '200000');
+    const renuncia = page.getByRole('button', { name: /2ª mano con renuncia/ });
+    await renuncia.click();
+    await esperarTarjeta2609(page, /^IVA \(renuncia/, '42.000,00 €');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('1500,00 €');
+
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await esperarTarjeta2609(page, /^ITP/, '6000,00 €');
+    await expect(renuncia).toBeDisabled();
+    await expect(renuncia).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByRole('button', { name: /Segunda mano/ }).first()).toHaveAttribute('aria-pressed', 'true');
+    expect(await tituloTarjeta24(page, /^ITP/)).toBe('ITP (3,00 %)');
+    expect(await descripcionTarjeta(page, /^ITP/)).toContain('bonificación del 50 %');
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /^IVA/ })).toHaveCount(0);
+    await totalCuadra0610(page, 200000, [/^ITP/, 'Gastos de notaría', 'Registro de la Propiedad', 'Gastos de gestoría']);
+    expect(await tituloTarjeta24(page, 'Gastos de notaría')).toBe('Gastos de notaría (sin IPSI)');
+    expect(await tituloTarjeta24(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+
+    await page.selectOption('#select-ccaa', 'madrid');
+    await esperarTarjeta2609(page, /^IVA \(renuncia/, '42.000,00 €');
+    await expect(renuncia).toBeEnabled();
+    await expect(renuncia).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 36-bis (LÍMITE) — PAÍS VASCO con renuncia (el AJD de un local, no el 0 de la vivienda) y
+  // un precio por encima del límite del arancel notarial.
+  //   País Vasco 350.000: 2ª mano ITP 7 % = 24.500,00 · renuncia IVA 73.500,00 + AJD 0,5 % = 1750,00
+  //   Madrid 8.000.000, 2ª mano: ITP 6 % = 480.000,00; la notaría que excede de 6.010.121,04 € es
+  //     de libre acuerdo, así que total y coste «(parcial)» y dicen qué les falta.
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 36-bis (límite) — País Vasco con renuncia (AJD 0,5 %) y un local de 8.000.000 € con la notaría de libre acuerdo', async ({ page }) => {
+    expect(ITP_CCAA['pais-vasco'].tipoGeneralNoVivienda).toBe(7);
+    expect(ITP_CCAA['pais-vasco'].ajd).toBe(0.5);
+    expect(ITP_CCAA['pais-vasco'].ajdRenuncia).toBeUndefined();
+    expect(LIMITE_ARANCEL_NOTARIAL).toBe(6010121.04);
+
+    await page.selectOption('#select-ccaa', 'pais-vasco');
+    await sembrarImporte12(page, 'Precio del local comercial', '350000');
+    await esperarTarjeta2609(page, /^ITP/, '24.500,00 €');
+    expect(await tituloTarjeta24(page, /^ITP/)).toBe('ITP (7,00 %)');
+    await page.getByRole('button', { name: /2ª mano con renuncia/ }).click();
+    await esperarTarjeta2609(page, /^IVA \(renuncia/, '73.500,00 €');
+    expect(await tituloTarjeta24(page, /^AJD/)).toBe('AJD (0,50 %)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('1750,00 €');
+    await totalCuadra0610(page, 350000, [/^IVA/, /^AJD/, 'Gastos de notaría', 'Registro de la Propiedad', 'Gastos de gestoría']);
+
+    await page.selectOption('#select-ccaa', 'madrid');
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    await sembrarImporte12(page, 'Precio del local comercial', '8000000');
+    await esperarTarjeta2609(page, /^ITP/, '480.000,00 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'Por encima de 6.010.121,04 € el arancel no fija cantidad',
+    );
+    await totalCuadra0610(page, 8000000, [/^ITP/, 'Gastos de notaría', 'Registro de la Propiedad', 'Gastos de gestoría']);
+    expect(await tituloTarjeta24(page, 'Total gastos adicionales')).toBe('Total gastos adicionales (parcial)');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toContain('SIN la parte de la notaría que es de libre acuerdo');
+    expect(await tituloTarjeta24(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await descripcionTarjeta(page, /^COSTE TOTAL/)).toBe(
+      'No incluye la parte de la notaría que excede de 6.010.121,04 €, que es de libre acuerdo: el coste real puede ser mayor',
+    );
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 37 (LÍMITE, vendedor) — se vende por EXACTAMENTE lo que se pagó: la plusvalía no está
+  // sujeta (art. 104.5 TRLRHL, sin computar gastos) aunque falten el suelo y los años, y aun así
+  // hay IRPF, porque las amortizaciones del alquiler bajan el valor de adquisición.
+  //   Madrid · 200.000 · no afecto · compra 200.000 · gastos 15.000 · amortizaciones 30.000 ·
+  //   suelo, total y años VACÍOS · comisión 3 % · gestoría 500
+  //   plusvalía 0,00 (no sujeta) · transmisión = 200.000 − 6.000 − 500 =          193.500,00
+  //   adquisición = 200.000 + 15.000 − 30.000 =                                   185.000,00
+  //   ganancia 8.500 → IRPF = 1.140 + 2.500 × 21 % =                                 1665,00
+  //   total = 6.000 + 500 + 1.665 = 8165,00 (4,08 %) · NETO 191.835,00, definitivo
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 37 (límite) — vender al precio de compra: plusvalía no sujeta sin pedir el suelo, e IRPF por las amortizaciones del alquiler', async ({ page }) => {
+    await sembrarImporte12(page, 'Precio del local comercial', '200000');
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    await sembrarImporte12(page, 'Precio de compra original', '200000');
+    await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '15000');
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '30000');
+    await sembrarImporte12(page, 'Gestoría y certificados del vendedor (€)', '500');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('0,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('No sujeta (sin incremento de valor)');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('185.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('193.500,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('8500,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('1665,00 €');
+    expect(await valorTarjeta(page, 'Total gastos de la venta')).toBe('8165,00 €');
+    expect(await descripcionTarjeta(page, 'Total gastos de la venta')).toBe('4,08 % sobre el precio de venta');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('191.835,00 €');
+    expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES');
+    expect(await descripcionTarjeta(page, /^NETO QUE RECIBES/)).toBe('Precio de venta menos impuestos, comisión y gestoría');
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 38 (NOMBRAR) — el invariante de la familia en las CIFRAS INTERMEDIAS, no solo en el neto:
+  // cada tarjeta que un importe ilegible mueve lo nombra y dice hacia dónde queda la real.
+  // BASE del testigo (prepararBaseFamilia2309): adquisición 145.000 · transmisión 192.300 ·
+  // ganancia 47.300 · IRPF 9813,00 · neto 182.487,00. Con cada ilegible a 0:
+  //   comisión «3.5.0»  → transmisión 198.300 · ganancia 53.300 · IRPF 1.140 + 9.240 + 3.300 × 23 %
+  //                       = 11.139,00 · neto 187.161,00 (las tres reales, MENORES)
+  //   gestoría «5.0.0»  → transmisión 192.800 · ganancia 47.800 · IRPF 1.140 + 41.800 × 21 % =
+  //                       9918,00 · neto 182.882,00 (MENORES)
+  //   gastos «2.000.50» → adquisición 130.000 · ganancia 62.300 · IRPF 1.140 + 9.240 + 12.300 × 23 %
+  //                       = 13.209,00 · neto 179.091,00 (ganancia e IRPF reales MENORES)
+  //   amort. «2.000.50» → adquisición 165.000 · ganancia 27.300 · IRPF 1.140 + 21.300 × 21 % =
+  //                       5613,00 · neto 186.687,00 (ganancia e IRPF reales MAYORES)
+  // Y el PUNTO CIEGO del grupo, el campo exclusivo en el perfil «no afecto» (desde 72e1184a): BASE R
+  // (compra 195.000, gana el método real, plusvalía 500) con las amortizaciones ilegibles →
+  //   adquisición 210.000 · transmisión 193.000 · pérdida 17.000 (con las 20.000 reales hay ganancia
+  //   de 3.000) · neto 193.000,00 (el real, 192.430,00, menor).
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 38 (nombrar) — cada cifra intermedia que mueve un importe ilegible lo nombra y dice hacia dónde', async ({ page }) => {
+    const filas: { campo: string; ilegible: string; tarjetas: [string, string, string][]; neto: string }[] = [
+      {
+        campo: 'Comisión de la inmobiliaria (%)',
+        ilegible: '3.5.0',
+        tarjetas: [
+          ['Valor de transmisión', '198.300,00 €', 'la comisión no se ha podido leer'],
+          ['Ganancia patrimonial', '53.300,00 €', 'La comisión inmobiliaria no se ha podido leer, así que la ganancia real es menor'],
+          ['IRPF sobre la ganancia', '11.139,00 €', 'La comisión inmobiliaria no se ha podido leer, así que la cuota real es menor'],
+        ],
+        neto: '187.161,00 €',
+      },
+      {
+        campo: 'Gestoría y certificados del vendedor (€)',
+        ilegible: '5.0.0',
+        tarjetas: [
+          ['Valor de transmisión', '192.800,00 €', 'la gestoría de la venta no se ha podido leer'],
+          ['Ganancia patrimonial', '47.800,00 €', 'La gestoría de la venta no se ha podido leer, así que la ganancia real es menor'],
+          ['IRPF sobre la ganancia', '9918,00 €', 'La gestoría de la venta no se ha podido leer, así que la cuota real es menor'],
+        ],
+        neto: '182.882,00 €',
+      },
+      {
+        campo: 'Impuestos y gastos que pagaste al comprarlo (€)',
+        ilegible: ILEGIBLE_2309,
+        tarjetas: [
+          ['Valor de adquisición', '130.000,00 €', 'Los impuestos y gastos de aquella compra no se han podido leer y no están sumados'],
+          ['Ganancia patrimonial', '62.300,00 €', 'No se han podido leer los impuestos y gastos de aquella compra, así que la ganancia real es menor'],
+          ['IRPF sobre la ganancia', '13.209,00 €', 'No se han podido leer los impuestos y gastos de aquella compra, así que la cuota real es menor'],
+        ],
+        neto: '179.091,00 €',
+      },
+      {
+        campo: 'Amortizaciones acumuladas deducidas (€)',
+        ilegible: ILEGIBLE_2309,
+        tarjetas: [
+          ['Valor de adquisición', '165.000,00 €', 'Las amortizaciones deducidas no se han podido leer y no están restadas'],
+          ['Ganancia patrimonial', '27.300,00 €', 'No se han podido leer las amortizaciones deducidas, así que la ganancia real es mayor'],
+          ['IRPF sobre la ganancia', '5613,00 €', 'No se han podido leer las amortizaciones deducidas, así que la cuota real es mayor'],
+        ],
+        neto: '186.687,00 €',
+      },
+    ];
+    const fallos: string[] = [];
+    for (const f of filas) {
+      await page.goto(RUTA);
+      await esperarHidratacion(page, TESTIGOS_12_09);
+      await prepararBaseFamilia2309(page);
+      await sembrarImporte12(page, f.campo, f.ilegible);
+      for (const [titulo, valor, aviso] of f.tarjetas) {
+        const v = await valorTarjeta(page, titulo);
+        const d = await descripcionTarjeta(page, titulo);
+        if (v !== valor) fallos.push(`${f.campo} «${f.ilegible}» · ${titulo}: ${v} (esperado ${valor})`);
+        if (!d.includes(aviso)) fallos.push(`${f.campo} «${f.ilegible}» · ${titulo} no lo nombra: «${d}»`);
+      }
+      if ((await valorTarjeta(page, /^NETO QUE RECIBES/)) !== f.neto) fallos.push(`${f.campo} · neto distinto de ${f.neto}`);
+      if ((await tituloTarjeta24(page, /^NETO QUE RECIBES/)) !== 'NETO QUE RECIBES (PARCIAL)') fallos.push(`${f.campo} · neto no parcial`);
+    }
+    expect(fallos).toEqual([]);
+
+    // El punto ciego: las amortizaciones del local ALQUILADO, en el perfil «no afecto».
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_12_09);
+    await prepararVendedor2609(page, { compra: '195000' });
+    await expect(page.getByRole('button', { name: /Local no afecto/ })).toHaveAttribute('aria-pressed', 'true');
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', ILEGIBLE_2309);
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('500,00 €');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('210.000,00 €');
+    expect(await descripcionTarjeta(page, 'Valor de adquisición')).toContain(
+      'Las amortizaciones deducidas no se han podido leer y no están restadas',
+    );
+    expect(await valorTarjeta(page, 'Pérdida patrimonial')).toBe('17.000,00 €');
+    expect(await descripcionTarjeta(page, 'Pérdida patrimonial')).toContain(
+      'No se han podido leer las amortizaciones deducidas: la pérdida real es menor que esta (o puede haber ganancia)',
+    );
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('193.000,00 €');
+    expect(await avisoNeto2309(page)).toContain('el neto real puede ser menor que este');
+  });
+
+  // ─── HALLAZGOS del 06/10/2026, ABIERTOS ──────────────────────────────────────────────
+  // Con `test.fail()`, afirmando lo que DEBERÍA ocurrir. Las aserciones previas a la del defecto
+  // son cifras que la reparación no debe mover; la del defecto no reintenta (lee y compara), para
+  // que el fallo sea inmediato y no un timeout.
+
+  // HALLAZGO [06/10-a] (bajo, operativa) — ❌ ABIERTO. La cifra INTERMEDIA que se escapa del
+  // invariante: con el valor catastral total ilegible y el método REAL ganando, la plusvalía se
+  // liquida por el objetivo (1200,00 en vez de 500,00) y «Valor de transmisión» baja 700 € sin que su
+  // tarjeta lo diga: «Precio de venta − comisión, gestoría y plusvalía municipal». La plusvalía, la
+  // ganancia, el IRPF y el neto sí nombran el ilegible («puede ser mayor»). Es la forma del hallazgo
+  // de hoy en la referencia (la base imponible de la tarjeta de la ganancia), y la referencia, garaje
+  // y trastero tienen la misma descripción fija en su «Valor de transmisión».
+  //   BASE R: plusvalía real = (200.000 − 195.000) × 0,4 × 25 % = 500 < objetivo 40.000 × 0,12 × 25 %
+  //   = 1.200 → transmisión = 200.000 − 6.000 − 500 − 500 = 193.000,00
+  //   total «100.000.00» → plusvalía 1.200 → transmisión 192.300,00 (la real, MAYOR)
+  test('[06/10-a] con el valor catastral total ilegible, «Valor de transmisión» nombra el dato y dice que el real puede ser mayor', async ({ page }) => {
+    test.fail();
+    await prepararVendedor2609(page, { afecto: true, amort: '20000', compra: '195000' });
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('500,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('193.000,00 €');
+
+    await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '100.000.00');
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('1200,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('192.300,00 €');
+    expect(await descripcionTarjeta(page, 'Ganancia patrimonial')).toContain(
+      'El valor catastral total no se ha podido leer, así que la ganancia real puede ser mayor',
+    );
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toContain('El valor catastral total no se ha podido leer');
+    // El defecto.
+    expect(await descripcionTarjeta(page, 'Valor de transmisión')).toMatch(/valor catastral total/i);
+  });
+
+  // HALLAZGO [06/10-b] (bajo, accesibilidad) — ❌ ABIERTO. El aviso que nombra la comisión imposible
+  // en el propio campo (añadido el 26/09 con el hallazgo 2198) es texto de 13,6 px en #E53E3E,
+  // literal y sin variante oscura (components/NumberInput.module.css, `.errorText`): 3,95:1 sobre el
+  // fondo del formulario del vendedor en claro (#FAFAFA) y 4,22:1 en oscuro (#1A1A1A), por debajo
+  // del 4,5:1 del texto pequeño. Medido con axe-core y con el fondo compuesto de este fichero.
+  test('[06/10-b] el aviso de la comisión imposible alcanza 4,5:1 en los dos temas', async ({ page }) => {
+    test.fail();
+    await page.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}' });
+    await prepararVendedor2609(page, { comision: '150' });
+    const aviso = page.getByRole('alert').filter({ hasText: 'La comisión no puede superar el 100' });
+    await expect(aviso).toHaveCount(1);
+    const claro = await aviso.evaluate(contrasteElemento2609);
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(26, 26, 26)');
+    const oscuro = await aviso.evaluate(contrasteElemento2609);
+    expect({ claro: claro >= 4.5, oscuro: oscuro >= 4.5 }).toEqual({ claro: true, oscuro: true });
+  });
+
+  // HALLAZGO [06/10-c] (bajo, contenido) — ❌ ABIERTO. La forma registrada hoy en la referencia, medida
+  // aquí a petición del coordinador: en la rama «menor» del aviso del neto (`avisoIlegiblesNeto`,
+  // page.tsx:1027) el verbo de «que no se ha podido leer» concuerda con el número de CAMPOS
+  // (`v.campos.length > 1`) y no con su sujeto. Con las amortizaciones ilegibles el campo es uno y el
+  // sujeto plural, y la frase queda «No descuenta el IRPF que añaden las amortizaciones deducidas, que
+  // no se ha podido leer»: lo que «no se ha podido leer» pasa a ser el IRPF. La tarjeta del IRPF de la
+  // misma pantalla lo dice bien («No se han podido leer las amortizaciones deducidas»).
+  //   BASE del testigo + amortizaciones «2.000.50» → esperado «…las amortizaciones deducidas, que no
+  //   se han podido leer» · obtenido «…, que no se ha podido leer».
+  // Las otras tres formas del aviso del coordinador NO se reproducen aquí (medidas en navegador el
+  // 06/10/2026): el recuadro de la comunidad toma el AJD solo de la operación VISIBLE (País Vasco
+  // 0,5 % al cargar, en las tres operaciones y tras pasar por el vendedor; Valencia 1,4 % / 2 % con
+  // la renuncia; Ceuta con la renuncia oculta, 0,5 %); `.transmisionSub` no lleva `opacity` y sus
+  // subtítulos dan 5,22-5,50:1 en claro y 4,78-5,83:1 en oscuro; y la app no tiene el consejo
+  // «Liquida los impuestos a tiempo» ni frases pegadas en el texto pintado.
+  test('[06/10-c] el aviso del neto concuerda «que no se han podido leer» con las amortizaciones', async ({ page }) => {
+    test.fail();
+    await prepararBaseFamilia2309(page);
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', ILEGIBLE_2309);
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('186.687,00 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toContain(
+      'No se han podido leer las amortizaciones deducidas',
+    );
+    // El defecto (lee y compara, sin reintento).
+    expect(await avisoNeto2309(page)).toContain('las amortizaciones deducidas, que no se han podido leer');
   });
 });

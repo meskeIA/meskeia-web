@@ -1,5 +1,5 @@
 import { test, expect, Page, Locator } from '@playwright/test';
-import { esperarValorEnReact } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Inspector — generador-loteria (segmento interactiva, riesgo 4 informativo, 562 usos reales)
@@ -1516,5 +1516,255 @@ test.describe('S0180 · reparto del premio de una peña', () => {
     const ref = page.getByRole('note', { name: 'Datos de referencia normativos' });
     await expect(ref).toContainText('disposición adicional 33.ª');
     await expect(ref).toContainText('05/10/2026');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 06/10/2026 — re-inspección (segmento fiscal, riesgo 1) tras el reparto de la peña
+ * (S0180, e885f6e5) y la reparación de los hallazgos 2732-2737 (1b6dd902).
+ *
+ * NORMA, leída en el BOE el 06/10/2026 (BOE-A-2006-20764, DA 33.ª, redacción vigente desde el
+ * 05/07/2018) y coincidente con data/fiscal/premios-loterias.ts:
+ *   · ap. 1 — el gravamen se exige «de forma independiente respecto de cada décimo, fracción o
+ *     cupón de lotería o apuesta premiados».
+ *   · ap. 2 — exentos los premios de importe íntegro «igual o inferior a 40.000 euros»; por
+ *     encima, tributa la parte que exceda. Si el décimo o la apuesta cuesta menos de 0,50 €, la
+ *     cuantía exenta «se reducirá de forma proporcional». En titularidad compartida, la exención
+ *     «se prorrateará entre los cotitulares en función de la cuota que les corresponda».
+ *   · ap. 3 y 4 — base = exceso, prorrateada igual; tipo del 20 por ciento. Ap. 6: retención 20 %.
+ *
+ * CASOS RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (el reparto va en céntimos por el método
+ * del mayor resto, como declara reparto.ts: el céntimo sobrante va al mayor decimal):
+ *   1. Normal — Ana 7 €, Bea 5 €, Carlos 3 € (cuotas 7/15, 5/15, 3/15) y un décimo de 125.000 €.
+ *      Exento 40.000 · base 85.000 · retención 17.000 · se cobra 108.000.
+ *      Bruto: 12.500.000 c × 7/15 = 5.833.333,33 → 5.833.333; × 5/15 = 4.166.666,67 → 4.166.666;
+ *      × 3/15 = 2.500.000. Sobra 1 c → Bea (resto ,67): 58.333,33 / 41.666,67 / 25.000,00 €.
+ *      Retención: 1.700.000 c → 793.333 / 566.666 (+1 → 566.667) / 340.000: 7933,33 / 5666,67 /
+ *      3400,00 €. Le llega: 50.400,00 / 36.000,00 / 21.600,00 € (= 108.000 × 7/15, 5/15, 3/15).
+ *      Parte: 46,67 / 33,33 / 20,00 %.
+ *   1b. Lo mismo con un segundo décimo de 50.000 € (exento 40.000, retención 2.000): totales
+ *      175.000 / 80.000 / 19.000 / 156.000. Bruto 81.666,67 / 58.333,33 / 35.000,00 (el céntimo,
+ *      a Ana: resto ,67); retención 8866,67 / 6333,33 / 3800,00; le llega 72.800 / 52.000 / 31.200.
+ *   2. Límites — (a) 40.000 € justos con la peña de partida 10/5/5: exento entero, retención
+ *      0,00 €, 20.000 / 10.000 / 10.000 €. (b) Precio 0,25 €: exención 40.000 × 0,25 / 0,50 =
+ *      20.000 €; premio 30.000 → retención 2000,00, se cobran 28.000 (14.000 / 7000 / 7000).
+ *      (c) Precio 0,50 € («al menos 0,50»): exención entera, retención 0,00 €. (d) Una sola
+ *      persona: parte 100,00 %, le llegan 108.000,00 € de 125.000.
+ *   3. Rechazo — premio «-5.000», «12abc» o «0»; aportaciones 0/0/0; precio «0»: aviso y sin tabla.
+ * Los once casos dieron en el navegador exactamente lo calculado, en escritorio y a 390×844.
+ *
+ * FIRMA DE ROTURA (cortas 62,1 % → 73,6 % en 14 días, z 4): NO la explica un fallo. Recargas
+ * 2,5 %, por debajo del catálogo (3,1 %). Medido sobre el dump del 06/10: seis dispositivos con
+ * 15 visitas o más suman 158 de las 405 recientes (85 % cortas); el primero, un Android 384×832,
+ * 50 visitas en 10 días, todas cortas y 45 sin duración, cada una en una sesión nueva y a
+ * cualquier hora, sin visitar ninguna otra app. Sin esos seis, 60,8 % → 66,4 % (z ≈ 1,6). En
+ * móvil (390×844, isMobile + hasTouch) generar, guardar, copiar, comprobar y repartir funcionan
+ * con toques, sin recarga ni desbordamiento horizontal ni nada tapado.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('06/10 · reparto de la peña — casos resueltos a mano', () => {
+  const pena = (page: Page) => page.locator('section[aria-labelledby="pena-titulo"]');
+  const campoPremio = (page: Page, n = 0) => pena(page).getByLabel(/Premio del décimo o apuesta/).nth(n);
+  const campoPone = (page: Page, n: number) => pena(page).getByLabel('Pone (€)').nth(n);
+  const campoNombre = (page: Page, n: number) => pena(page).getByLabel('Nombre').nth(n);
+  const campoPrecio = (page: Page) => pena(page).getByLabel('Precio de cada décimo o apuesta (€)');
+  const totales = (page: Page) => pena(page).locator('[class*="penaTotales"]');
+  const filas = (page: Page) => pena(page).locator('tbody tr');
+  const aviso = (page: Page) => pena(page).locator('[class*="comprobadorError"]');
+  const eur = (s: string) => `${s} €`;
+  const pct = (s: string) => `${s} %`;
+
+  async function escribir(page: Page, campo: Locator, valor: string) {
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+  }
+
+  /** Celdas de una fila: Pone, Le llega, Parte, Premio, Retención (la persona va en el <th>). */
+  async function celdas(page: Page, fila: number) {
+    return filas(page).nth(fila).locator('td').allTextContents();
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, ['section[aria-labelledby="pena-titulo"] input']);
+  });
+
+  test('caso 1 · 7/5/3 € y un décimo de 125.000 €: céntimos por mayor resto y 50.400 / 36.000 / 21.600 €', async ({ page }) => {
+    await escribir(page, campoNombre(page, 0), 'Ana');
+    await escribir(page, campoNombre(page, 1), 'Bea');
+    await escribir(page, campoNombre(page, 2), 'Carlos');
+    await escribir(page, campoPone(page, 0), '7');
+    await escribir(page, campoPone(page, 2), '3'); // la 2.ª ya pone 5
+    await escribir(page, campoPremio(page), '125.000');
+    await expect(totales(page)).toContainText(eur('125.000,00'));
+    await expect(totales(page)).toContainText(eur('40.000,00'));
+    await expect(totales(page)).toContainText(eur('17.000,00'));
+    await expect(totales(page)).toContainText(eur('108.000,00'));
+    await expect(filas(page)).toHaveCount(3);
+    await expect(filas(page).nth(0).locator('th')).toHaveText('Ana');
+    expect(await celdas(page, 0)).toEqual([eur('7,00'), eur('50.400,00'), pct('46,67'), eur('58.333,33'), eur('7933,33')]);
+    expect(await celdas(page, 1)).toEqual([eur('5,00'), eur('36.000,00'), pct('33,33'), eur('41.666,67'), eur('5666,67')]);
+    expect(await celdas(page, 2)).toEqual([eur('3,00'), eur('21.600,00'), pct('20,00'), eur('25.000,00'), eur('3400,00')]);
+  });
+
+  test('caso 1b · 7/5/3 € con décimos de 125.000 y 50.000 €: exención por décimo y 72.800 / 52.000 / 31.200 €', async ({ page }) => {
+    await escribir(page, campoPone(page, 0), '7');
+    await escribir(page, campoPone(page, 2), '3');
+    await escribir(page, campoPremio(page, 0), '125.000');
+    await pena(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
+    await escribir(page, campoPremio(page, 1), '50.000');
+    await expect(totales(page)).toContainText(eur('175.000,00'));
+    await expect(totales(page)).toContainText(eur('80.000,00'));
+    await expect(totales(page)).toContainText(eur('19.000,00'));
+    await expect(totales(page)).toContainText(eur('156.000,00'));
+    expect(await celdas(page, 0)).toEqual([eur('7,00'), eur('72.800,00'), pct('46,67'), eur('81.666,67'), eur('8866,67')]);
+    expect(await celdas(page, 1)).toEqual([eur('5,00'), eur('52.000,00'), pct('33,33'), eur('58.333,33'), eur('6333,33')]);
+    expect(await celdas(page, 2)).toEqual([eur('3,00'), eur('31.200,00'), pct('20,00'), eur('35.000,00'), eur('3800,00')]);
+  });
+
+  test('caso 2a · 40.000 € justos: «igual o inferior» → exento entero y retención 0,00 €', async ({ page }) => {
+    await escribir(page, campoPremio(page), '40.000');
+    await expect(totales(page)).toContainText(`Retención del ${pct('20')}${eur('0,00')}`);
+    await expect(totales(page)).toContainText(`Exento${eur('40.000,00')}`);
+    await expect(totales(page)).toContainText(`Lo que se cobra${eur('40.000,00')}`);
+    expect(await celdas(page, 0)).toEqual([eur('10,00'), eur('20.000,00'), pct('50,00'), eur('20.000,00'), eur('0,00')]);
+    expect(await celdas(page, 1)).toEqual([eur('5,00'), eur('10.000,00'), pct('25,00'), eur('10.000,00'), eur('0,00')]);
+  });
+
+  test('caso 2b · precio de 0,25 €: exención reducida a 20.000 € y retención 2000,00 € de 30.000', async ({ page }) => {
+    await escribir(page, campoPrecio(page), '0,25');
+    await expect(pena(page).locator('#pena-precio-ayuda')).toContainText('cada décimo o apuesta tiene 20.000,00 € exentos');
+    await escribir(page, campoPremio(page), '30.000');
+    await expect(totales(page)).toContainText(`Exento${eur('20.000,00')}`);
+    await expect(totales(page)).toContainText(`Retención del ${pct('20')}${eur('2000,00')}`);
+    await expect(totales(page)).toContainText(`Lo que se cobra${eur('28.000,00')}`);
+    expect(await celdas(page, 0)).toEqual([eur('10,00'), eur('14.000,00'), pct('50,00'), eur('15.000,00'), eur('1000,00')]);
+    expect(await celdas(page, 2)).toEqual([eur('5,00'), eur('7000,00'), pct('25,00'), eur('7500,00'), eur('500,00')]);
+  });
+
+  test('caso 2c · precio de 0,50 € («al menos 0,50»): exención entera, sin retención de 30.000', async ({ page }) => {
+    await escribir(page, campoPrecio(page), '0,50');
+    await expect(pena(page).locator('#pena-precio-ayuda')).not.toContainText('Con este precio');
+    await escribir(page, campoPremio(page), '30.000');
+    await expect(totales(page)).toContainText(`Exento${eur('30.000,00')}`);
+    await expect(totales(page)).toContainText(`Retención del ${pct('20')}${eur('0,00')}`);
+  });
+
+  test('caso 2d · una sola persona: parte del 100,00 % y le llegan 108.000,00 € de 125.000', async ({ page }) => {
+    await pena(page).getByRole('button', { name: 'Quitar a Persona 3 de la peña' }).click();
+    await pena(page).getByRole('button', { name: 'Quitar a Persona 2 de la peña' }).click();
+    await expect(pena(page).getByRole('button', { name: 'Quitar a Persona 1 de la peña' })).toBeDisabled();
+    await escribir(page, campoPremio(page), '125.000');
+    await expect(filas(page)).toHaveCount(1);
+    expect(await celdas(page, 0)).toEqual([eur('10,00'), eur('108.000,00'), pct('100,00'), eur('125.000,00'), eur('17.000,00')]);
+  });
+
+  const RECHAZOS: Array<{ titulo: string; precio?: string; pones?: string[]; premio: string; aviso: string }> = [
+    { titulo: 'premio negativo «-5.000»', premio: '-5.000', aviso: 'Indica el premio de cada décimo o apuesta premiados, mayor que 0 €.' },
+    { titulo: 'premio ilegible «12abc»', premio: '12abc', aviso: 'Indica el premio de cada décimo o apuesta premiados, mayor que 0 €.' },
+    { titulo: 'premio «0»', premio: '0', aviso: 'Indica el premio de cada décimo o apuesta premiados, mayor que 0 €.' },
+    { titulo: 'aportaciones 0/0/0', pones: ['0', '0', '0'], premio: '125.000', aviso: 'Indica lo que puso cada persona: ahora la peña suma 0 €.' },
+    { titulo: 'aportación negativa «-5»', pones: ['10', '5', '-5'], premio: '125.000', aviso: 'Revisa las aportaciones' },
+    { titulo: 'precio «0»', precio: '0', premio: '125.000', aviso: 'Indica lo que costó cada décimo o apuesta, mayor que 0 €.' },
+  ];
+  for (const r of RECHAZOS) {
+    test(`caso 3 · se rechaza: ${r.titulo}`, async ({ page }) => {
+      if (r.precio !== undefined) await escribir(page, campoPrecio(page), r.precio);
+      if (r.pones) {
+        const iniciales = ['10', '5', '5'];
+        for (let i = 0; i < r.pones.length; i++) {
+          if (r.pones[i] !== iniciales[i]) await escribir(page, campoPone(page, i), r.pones[i]);
+        }
+      }
+      await escribir(page, campoPremio(page), r.premio);
+      await expect(aviso(page)).toContainText(r.aviso);
+      await expect(filas(page)).toHaveCount(0);
+      await expect(totales(page)).toHaveCount(0);
+    });
+  }
+
+  test('ABIERTO · el aviso de error del reparto no dice QUÉ campo falla (WCAG 3.3.1)', async ({ page }) => {
+    // ABIERTO (inspector 06/10/2026, accesibilidad). WCAG 3.3.1 (A): si se detecta un error de
+    // entrada, «el elemento erróneo se identifica». Con una cuarta persona sin aportación, el
+    // aviso es «Revisa las aportaciones: tienen que ser cantidades de 0 € o más.»: no nombra a
+    // Persona 4, ningún campo lleva aria-invalid y la tabla entera desaparece. En una peña de
+    // 20 o 30 personas hay que revisar todas. Lo mismo con un 2.º décimo negativo: «Indica el
+    // premio de cada décimo…» sin decir cuál. El comprobador de la misma página sí lo hace
+    // («Falta el número 3 de la combinación ganadora…»).
+    test.fail();
+    await pena(page).getByRole('button', { name: /Añadir persona/ }).click();
+    await escribir(page, campoPremio(page), '125.000');
+    await expect(aviso(page)).toBeVisible();
+    const texto = (await aviso(page).textContent()) ?? '';
+    const marcados = await pena(page).locator('input[aria-invalid="true"]').count();
+    expect(texto.includes('Persona 4') || marcados > 0).toBe(true);
+  });
+});
+
+test.describe('06/10 · móvil 390×844 — la firma de rotura: el flujo entero con toques', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: UA_ANDROID,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('generar tres veces, guardar y repartir: sin recarga, sin desbordar y con «Le llega» a la vista', async ({ page }) => {
+    let navegaciones = 0;
+    page.on('framenavigated', (f) => { if (f === page.mainFrame()) navegaciones++; });
+    await esperarInteractiva(page);
+    await esperarHidratacion(page, ['section[aria-labelledby="pena-titulo"] input']);
+    await page.getByRole('button', { name: '3', exact: true }).tap();
+    for (let i = 1; i <= 3; i++) {
+      await botonGenerar(page).scrollIntoViewIfNeeded();
+      await botonGenerar(page).tap();
+      await expect(page.locator('[class*="resultCard"]')).toHaveCount(3 * i);
+    }
+    await page.locator('[class*="resultCard"]').first()
+      .getByRole('button', { name: /Guardar esta combinación/ }).tap();
+    await expect.poll(async () => (await leerFavoritas(page)).length).toBe(1);
+
+    const pena = page.locator('section[aria-labelledby="pena-titulo"]');
+    const premio = pena.getByLabel(/Premio del décimo o apuesta/).first();
+    await premio.scrollIntoViewIfNeeded();
+    await premio.tap();
+    await premio.fill('125.000');
+    await esperarValorEnReact(page, premio, '125.000');
+    const leLlega = pena.locator('tbody tr').first().locator('td').nth(1);
+    await expect(leLlega).toHaveText('54.000,00 €');
+    await leLlega.scrollIntoViewIfNeeded();
+    expect(await recibeElClic(leLlega)).toBe(true); // ni la barra del logo ni nada encima
+    // La tabla (6 columnas) se desliza dentro de su envoltorio; la página no desborda
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    expect(navegaciones).toBe(0); // ningún toque recargó la página
+  });
+
+  test('ABIERTO · elegir lotería en la primera vista no lleva a nada visible: Generar queda a 1,5 pantallas', async ({ page }) => {
+    // ABIERTO (inspector 06/10/2026, operativa). A 390×844 la primera vista es el hero, el aviso
+    // legal y las cinco loterías en columna (472-844 px); el panel de la modalidad empieza en
+    // 876 px y el botón Generar en 1251-1353 px. Tocar «Euromillones» solo cambia el color del
+    // botón: la vista no se mueve y lo que cambia (ficha y texto de Generar) queda fuera de la
+    // pantalla. El botón «Generar números de Euromillones» de la ficha SÍ lleva al generador
+    // (irAlGenerador). La maquetación es la misma desde agosto: no explica el CAMBIO de la firma.
+    test.fail();
+    await esperarInteractiva(page);
+    await page.getByRole('button', { name: 'Euromillones', exact: true }).first().tap();
+    await expect(botonGenerar(page)).toContainText('Euromillones');
+    await esperarDesplazamientoQuieto(page);
+    const caja = (await botonGenerar(page).boundingBox())!;
+    expect(caja.y + caja.height).toBeLessThanOrEqual(844);
+  });
+});
+
+test.describe('06/10 · contenido', () => {
+  test('ABIERTO · dos boletos iguales no suben NADA la probabilidad: sobra «de manera significativa»', async ({ page }) => {
+    // ABIERTO (inspector 06/10/2026, contenido). Paso 3 de «Cómo usar el generador»: «Dos
+    // boletos iguales no aumentan las probabilidades de manera significativa». La probabilidad
+    // de que salga una combinación es 1 entre 13.983.816 (C(49,6)) la juegues una vez o dos:
+    // el segundo boleto idéntico suma CERO, no «poco». Lo que duplica es la parte del premio.
+    test.fail();
+    const pasos = (await page.locator('[class*="stepGuide"]').allTextContents()).join(' ');
+    expect(pasos).toContain('Dos boletos iguales');
+    expect(pasos).not.toMatch(/no aumentan las probabilidades de manera significativa/);
   });
 });

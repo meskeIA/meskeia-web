@@ -23,17 +23,18 @@
  *      al 6,5 %, que es donde una reparación así se pasa de largo.
  *   6. CASOS 8-9 (MITAD B, 28/08) — el método REAL de la plusvalía ganando al objetivo por la
  *      proporción catastral, y el tope del coeficiente del IIVTNU a los 20 años.
- *   7. HALLAZGOS ABIERTOS 28/08 — cuatro, con `test.fail()` y UNA sola aserción de fondo cada
- *      uno. Tres son reparaciones que llegaron a las apps hermanas y no a esta. Reparados el
+ *   7. HALLAZGOS 28/08 — cuatro, que nacieron con `test.fail()` y UNA sola aserción de fondo
+ *      cada uno. Tres eran reparaciones que llegaron a las apps hermanas y no a esta. Reparados el
  *      30/08 (commit 0828da3e) y hoy convertidos en regresión.
  *   8. RE-INSPECCIÓN 30/08 — la cola invalidó lo anterior tras esa reparación. CASOS 11-13,
  *      en territorio y precio que ninguna ronda había usado (Murcia 40.000 € y Melilla
  *      30.000 €), que además vuelven a cerrar de cero los cinco defectos de la tanda 2. Al
- *      final, UN hallazgo abierto con `test.fail()`.
+ *      final, UN hallazgo que nació con `test.fail()` y hoy está REPARADO.
  *   9. RE-INSPECCIÓN 02/09/2026 — CASOS 14-16, otra vez en territorio virgen: el País Vasco
  *      con un perfil de comprador que ninguna ronda había elegido, la escala de Baleares en
  *      su tramo MÁS ALTO (el 13 %, el techo de toda la tabla) y la plusvalía municipal a la
- *      que le falta UN solo dato. Al final, UN hallazgo abierto con `test.fail()`.
+ *      que le falta UN solo dato. Al final, UN hallazgo que nació con `test.fail()` y hoy
+ *      está REPARADO.
  *  10. RE-INSPECCIÓN 07/09/2026 — CASOS 17-19, posterior a la reparación del clúster de
  *      compraventa (commit 0dba12c9) y a la del recargo del art. 27.2 LGT (13d2181b).
  *      Territorio y perfil nuevos otra vez: Cantabria con familia numerosa, la FRONTERA
@@ -45,18 +46,18 @@
  *      (commits 3a507acb y 1808419c). Comunidad y precio nuevos otra vez (Comunidad
  *      Valenciana, 24.000 €, con el tipo general del 9 % vigente desde el 01/06/2026), la
  *      REVENTA ANTES DEL AÑO —el coeficiente 0,14 de `COEFICIENTES_IIVTNU_2025`, que esta
- *      app no puede alcanzar— y un precio de compra malformado. Al final, UN hallazgo
- *      abierto con `test.fail()`.
+ *      app no podía alcanzar— y un precio de compra malformado. Al final, UN hallazgo (682)
+ *      que nació con `test.fail()` y se REPARÓ ese mismo día (bc437470).
  *
  *  12. RE-INSPECCIÓN 11/09/2026 — CASOS 23-25, posterior a la reparación de la reventa
  *      antes del año (bc437470) y al triaje fiscal que reescribió la escala de Aragón
  *      (7a02470c). Territorio y perfil nuevos otra vez —Castilla y León con perfil joven,
  *      la comunidad del reducido del 0,01 %—, el TERCER escalón de la escala aragonesa
  *      (500.000 € → 40.750 €) y unos años de propiedad MALFORMADOS, que es el camino que
- *      la reparación del 10/09 estrenó. Al final, CUATRO hallazgos abiertos con
- *      `test.fail()`: tres son EFECTO FAMILIA del commit bc437470 —las correcciones 670 y
- *      671 se aplicaron en la hermana garaje y la 683 en nave-industrial, y ninguna llegó
- *      aquí— y el cuarto es una divergencia entre las dos tablas de ITP del repositorio.
+ *      la reparación del 10/09 estrenó. Al final, CUATRO hallazgos que nacieron con
+ *      `test.fail()` y hoy están REPARADOS: tres eran EFECTO FAMILIA del commit bc437470 —las
+ *      correcciones 670 y 671 se aplicaron en la hermana garaje y la 683 en nave-industrial,
+ *      y ninguna llegó aquí— y el cuarto, una divergencia entre las dos tablas de ITP.
  *
  *  13. RE-INSPECCIÓN 12/09/2026 — CASOS 26-28, posterior a los tres commits del 11/09 que
  *      movieron sus datos (7a02470c, e947fa55 y 21a13c6b; el último tocó de esta app solo
@@ -65,7 +66,8 @@
  *      QUINTO tramo de la escala aragonesa (1.000.000 € → 89.500 €), el único escalón del
  *      art. 121-1 al que ningún caso llegaba. El tercero rechaza una COMISIÓN malformada,
  *      que era el último campo del vendedor sin caso de basura. Al final, TRES hallazgos
- *      abiertos con `test.fail()`. Estos casos siembran con `_hidratacion.ts`.
+ *      (713, 773 y 774) que nacieron con `test.fail()` y se REPARARON el 13/09. Estos casos
+ *      siembran con `_hidratacion.ts`.
  *
  *  14. RE-INSPECCIÓN 14/09/2026 — CASOS 29-31, posterior a la reparación de esos tres
  *      (713 el plazo del ITP, 773 la comisión ilegible y 774 la FAQ duplicada a mano),
@@ -73,8 +75,8 @@
  *      con escala progresiva sin usar, con perfil DISCAPACIDAD— y las dos zonas que
  *      nueve rondas no habían tocado: qué hace un dato imposible al SALIR del campo
  *      (todos los casos anteriores lo probaban con el foco puesto) y qué rotula la app
- *      cuando la ganancia patrimonial es EXACTAMENTE 0. Al final, TRES hallazgos
- *      abiertos con `test.fail()`.
+ *      cuando la ganancia patrimonial es EXACTAMENTE 0. Al final, TRES hallazgos que
+ *      nacieron con `test.fail()` y se REPARARON el 15/09.
  *
  *  15. RE-INSPECCIÓN 21/09/2026 — CASOS 32-34, posterior a la reparación de esos tres
  *      (822/844 el blur que convertía un año imposible en la reventa antes del año,
@@ -84,7 +86,7 @@
  *      deja expuestas: el 0 LEGÍTIMO en los años de propiedad (la reventa dentro del
  *      mismo año, que la guarda del negativo NO puede bloquear) y el par catastral
  *      IMPOSIBLE, el único campo del vendedor sin caso de rechazo. Al final, DOS
- *      hallazgos abiertos con `test.fail()`.
+ *      hallazgos (1157 y 1158) que nacieron con `test.fail()` y hoy están REPARADOS.
  *
  *  16. INSPECCIÓN 24/09/2026 y REPARACIÓN del mismo día — los hallazgos 1559-1569, sin
  *      `test.fail()`. Dos cambian cifras de todo el fichero: los coeficientes del IIVTNU son
@@ -100,7 +102,22 @@
  *      (hallazgo 666, `calcularPlusvaliaMunicipal` acota en 0 y no en 1) ya no lo es. Un
  *      test de regresión que fija el contrato anterior impide ver la reparación pendiente,
  *      así que el mismo rechazo se comprueba ahora con el campo VACÍO —que es el dato que
- *      de verdad falta— y el 0 pasa a ser el caso abierto de la parte 11.
+ *      de verdad falta— y el 0 pasó a ser el caso de la parte 11 (hallazgo 682, reparado el
+ *      10/09 en bc437470).
+ *
+ *  17. RE-INSPECCIÓN 26/09/2026 — CASOS 41-46 y los hallazgos 2193-2197, reparados ese día
+ *      (fa0772c0), más el caso del hallazgo 2209 (7d5c1876).
+ *
+ *  18. RE-INSPECCIÓN 06/10/2026 — verifica en navegador fa0772c0, 7d5c1876 y 242fffcd (notaría
+ *      y registro sin IVA donde rige IGIC o IPSI). CASOS 47-50 al final del fichero: Baleares
+ *      con familia numerosa y un vendedor completo, Navarra en obra nueva con las dos
+ *      modalidades y Ceuta, la notaría de libre acuerdo (> 6.010.121,04 €), el invariante de
+ *      la familia con los MESES del prorrateo (el selector que el testigo no ve) y el % con
+ *      espacio duro en lo que llega de data/ para las 19 comunidades. Y cuatro hallazgos
+ *      ABIERTOS con `test.fail()`, al final: el plazo de 30 días hábiles atribuido también al
+ *      IVA, el espacio que falta tras el aviso del plazo, y dos medidos aquí a raíz de la
+ *      gemela garaje (el AJD del recuadro según una modalidad oculta y los subtítulos de los
+ *      botones por debajo de 4,5:1).
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -120,7 +137,13 @@
  *    fijos de `REGISTRO_CONCEPTOS`: asiento de presentación 6,010121 € (número 1) y nota
  *    simple 3,005061 € (número 4). Al registro NO se le aplica la horquilla de la notaría.
  *  - El 21 % de IVA sobre honorarios notariales y registrales va DENTRO de
- *    `calcularArancelNotarial` y `calcularRegistro` (ambas terminan en `* 1.21`).
+ *    `calcularArancelNotarial` y `calcularRegistro`, salvo en Canarias, Ceuta y Melilla, donde
+ *    desde el 26/09/2026 (242fffcd, hallazgo 2214) devuelven el arancel sin impuesto indirecto
+ *    (`honorariosLlevanIVA`): allí se factura IGIC o IPSI, que la app nombra y no calcula.
+ *  - ⚠️ 06/10/2026: el agente de la referencia registró que ni la notaría ni el registro
+ *    aplican la rebaja del 5 % de sus aranceles (RD 1426/1989 y RD 1427/1989, Anexo I nº 2.1;
+ *    hallazgos 2901 y 2902). Los casos nuevos de ese día NO fijan cifras de notaría ni de
+ *    registro: las leen de la pantalla y comprueban que el total las sume.
  *  - Ganancia patrimonial e IRPF → `calcularGananciaInmueble` (`data/fiscal/ganancia-inmueble.ts`,
  *    arts. 34-36 LIRPF) sobre `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 ·
  *    21 % hasta 50.000 · 23 % hasta 200.000 · 27 % hasta 300.000 · 30 % resto).
@@ -825,9 +848,9 @@ test.describe('MITAD B — zonas no cubiertas por la inspección del 20/08/2026'
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — re-inspección del 27/08/2026.
-// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
-// Cuando se reparen, se les quita la marca y quedan como regresión.
+// HALLAZGOS de la re-inspección del 27/08/2026 — REPARADOS ese mismo día.
+// Nacieron con `test.fail()` afirmando lo que DEBERÍA pasar; al repararlos se les quitó la
+// marca y quedan como regresión.
 // ═════════════════════════════════════════════════════════════════════════════
 
 test.describe('REGRESIÓN — hallazgos del 27/08/2026, reparados', () => {
@@ -1723,7 +1746,8 @@ test.describe('RE-INSPECCIÓN 02/09/2026 — País Vasco, el tramo del 13 % y la
    * ser un techo.
    *
    * ⚠️ REESCRITO el 10/09/2026. Hasta hoy este caso escribía un «0» en el campo y lo daba por
-   * equivalente a «no hay dato», que es exactamente el defecto que la parte 11 deja abierto:
+   * equivalente a «no hay dato», que es exactamente el defecto que la parte 11 dejó abierto
+   * (hallazgo 682, reparado ese mismo día en bc437470):
    * desde la reparación del motor del 07/09 (hallazgo 666) el 0 es un dato VÁLIDO —la reventa
    * antes del año, coeficiente 0,14— y lo único que falta de verdad es el campo VACÍO. Lo que
    * este caso verifica sigue siendo lo mismo; lo que cambia es que el dato ausente se
@@ -2413,8 +2437,8 @@ test.describe('RE-INSPECCIÓN 10/09/2026 — Comunidad Valenciana, la reventa an
 // quitó la marca y hoy sujeta la reparación.
 // ═════════════════════════════════════════════════════════════════════════════
 
-// ❌ ABIERTO 10/09/2026 (alto) — cálculo. La reventa antes del año es INALCANZABLE, y la
-// app liquida de menos sin decirlo.
+// ✅ REPARADO 10/09/2026 (alto) — cálculo. La reventa antes del año era INALCANZABLE, y la
+// app liquidaba de menos sin decirlo. Lo que sigue es el caso de origen, tal como se escribió.
 //
 // `COEFICIENTES_IIVTNU_2025` (data/fiscal/inmuebles.ts) tiene fila propia para la tenencia
 // de menos de un año —`{ anios: 0, label: 'Menos de 1 año', coeficiente: 0.14 }`, el TERCERO
@@ -2738,11 +2762,11 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — Castilla y León, el tercer escaló
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — re-inspección del 11/09/2026.
-// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
-// Cuando se reparen, se les quita la marca y quedan como regresión.
+// HALLAZGOS de la re-inspección del 11/09/2026 — REPARADOS.
+// Nacieron con `test.fail()` afirmando lo que DEBERÍA pasar; al repararlos se les quitó la
+// marca y quedan como regresión.
 //
-// Los tres primeros son EFECTO FAMILIA del commit bc437470 (10/09/2026), que reparó los 13
+// Los tres primeros eran EFECTO FAMILIA del commit bc437470 (10/09/2026), que reparó los 13
 // hallazgos del clúster inmobiliario: las correcciones 670 y 671 se aplicaron en
 // `simulador-gastos-compraventa-garaje` y la 683 en `simulador-gastos-compraventa-nave-industrial`,
 // y ninguna de las tres llegó a esta app, que tiene el mismo defecto en el mismo sitio.
@@ -2940,7 +2964,7 @@ test('REPARADO 11/09 (dato) — el reducido de Castilla y León se ofrece con su
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// RE-INSPECCIÓN 12/09/2026 — CASOS 26-28 y tres hallazgos abiertos.
+// RE-INSPECCIÓN 12/09/2026 — CASOS 26-28 y tres hallazgos (713, 773 y 774), reparados el 13/09.
 //
 // La cola invalidó la inspección del 11/09 porque el código y las dependencias de esta app
 // cambiaron ese mismo día por tres commits:
@@ -3140,7 +3164,8 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — La Rioja, el quinto tramo de Aragó
    *
    * Este caso fija lo que debe cumplirse con CUALQUIER reparación: que el campo conserve lo
    * escrito, que no aparezca ningún NaN y que en la página no haya rastro de las dos lecturas
-   * equivocadas posibles. Lo que la app hace HOY con ese NaN es el hallazgo abierto de abajo.
+   * equivocadas posibles. Lo que la app hacía entonces con ese NaN es el hallazgo 773 de
+   * abajo, reparado el 13/09/2026.
    */
   test('CASO 28 (debe rechazarse) — «1.2.3» no es un porcentaje de comisión', async ({ page }) => {
     await page.goto(RUTA);
@@ -3181,7 +3206,7 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — La Rioja, el quinto tramo de Aragó
 // sujetan la reparación. Los comentarios de cada uno describen el defecto de origen.
 // ═════════════════════════════════════════════════════════════════════════════
 
-// ⚠️ ABIERTO 12/09/2026 (medio) — dato. EFECTO FAMILIA del hallazgo 713.
+// ✅ REPARADO 13/09/2026 (medio) — dato. EFECTO FAMILIA del hallazgo 713. Caso de origen:
 // El plazo de autoliquidación del ITP sigue escrito a mano en el bloque educativo («30 días
 // hábiles desde la firma de la escritura») y SIN norma citada, cuando el 11/09/2026 ese dato
 // pasó a `data/fiscal/inmuebles.ts` como `PLAZO_ITP` —con su base normativa, su URL del BOE y
@@ -3222,8 +3247,8 @@ test('REGRESIÓN 713 (dato) — el plazo del ITP cita su norma y sale de data/fi
   expect(cuerpo).toContain('art. 102.1 del Reglamento del ITPAJD, RD 828/1995');
 });
 
-// ⚠️ ABIERTO 12/09/2026 (medio) — operativa. Una comisión que la app NO puede leer se
-// convierte en 0 % sin decirlo, y el neto del vendedor sube.
+// ✅ REPARADO 13/09/2026 (medio) — operativa. Una comisión que la app NO podía leer se
+// convertía en 0 % sin decirlo, y el neto del vendedor subía. Caso de origen:
 // `parseSpanishNumberOr(comisionInmobiliaria)` devuelve su valor por defecto —0— cuando el
 // parser rechaza el texto, así que el NaN de «1.2.3» y un campo vacío son la misma cosa para
 // el motor. Con la comisión en 0 la tarjeta «Comisión inmobiliaria» ni se pinta (su guard es
@@ -3258,8 +3283,9 @@ test('REGRESIÓN 773 (operativa) — una comisión ilegible se nombra en vez de 
   expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toMatch(/comisi[óo]n/i);
 });
 
-// ⚠️ ABIERTO 12/09/2026 (bajo) — contenido. La FAQ visible no importa las respuestas que
-// `metadata.ts` dice que importa, así que el mismo texto vive duplicado a mano en dos canales.
+// ✅ REPARADO 13/09/2026 (bajo) — contenido. La FAQ visible no importaba las respuestas que
+// `metadata.ts` decía que importaba, así que el mismo texto vivía duplicado a mano en dos
+// canales. Caso de origen:
 // La cabecera de `metadata.ts` afirma de `RESPUESTA_IVA_TRASTERO_NUEVO` y
 // `RESPUESTA_PLUSVALIA_TRASTERO`: «Las importan las tres bocas que las publican: el FAQPage de
 // `generateFAQSchema`, el `faqJsonLd` de abajo y la FAQ VISIBLE de `page.tsx`». Las dos
@@ -3435,8 +3461,8 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — Extremadura, la ganancia cero y el 
   /**
    * CASO 31 (DEBE RECHAZARSE) — unos años de propiedad NEGATIVOS, con el foco todavía
    * puesto. Repite el contrato del CASO 19 con otros números porque es la mitad que hoy
-   * funciona, y es el contraste que hace medible el hallazgo abierto de más abajo: el
-   * MISMO dato, después de salir del campo, sí se liquida.
+   * funcionaba, y es el contraste que hizo medible el hallazgo 844 de más abajo (reparado el
+   * 15/09/2026): el MISMO dato, después de salir del campo, sí se liquidaba.
    */
   test('CASO 31 (debe rechazarse) — unos años negativos no son un año de tenencia', async ({
     page,
@@ -3482,8 +3508,8 @@ test.describe('RE-INSPECCIÓN 14/09/2026 — Extremadura, la ganancia cero y el 
 // la descripción de un defecto reparado es lo único que impide reintroducirlo.
 // ═════════════════════════════════════════════════════════════════════════════
 
-// ⚠️ ABIERTO 14/09/2026 (medio) — operativa. El `blur` convierte un dato IMPOSIBLE en un
-// escenario fiscal distinto y perfectamente válido, y lo liquida.
+// ✅ REPARADO 15/09/2026 (medio) — operativa. El `blur` convertía un dato IMPOSIBLE en un
+// escenario fiscal distinto y perfectamente válido, y lo liquidaba. Caso de origen:
 // `page.tsx` documenta el contrato en su `useMemo`: «Un año NEGATIVO no se acota a 0: se
 // rechaza […] Acotarlo lo convertiría en una reventa antes del año y liquidaría un impuesto a
 // partir de un dato imposible». El `useMemo` cumple — el CASO 31 lo comprueba— pero el campo
@@ -3533,8 +3559,8 @@ test('REPARADO 15/09 (operativa) — al salir del campo, unos años negativos si
   expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain('No descuenta');
 });
 
-// ⚠️ ABIERTO 14/09/2026 (medio) — contenido. Lo que la app ROTULA cuando la ganancia
-// patrimonial es exactamente 0.
+// ✅ REPARADO 15/09/2026 (medio) — contenido. Lo que la app ROTULABA cuando la ganancia
+// patrimonial es exactamente 0. Caso de origen:
 // `calcularGananciaInmueble` marca `esPerdida = ganancia <= 0`, de modo que el cero exacto
 // entra por la rama de la pérdida: la app pinta «Pérdida patrimonial 0,00 €» con la
 // descripción «Vendes por debajo del valor de adquisición: no hay IRPF y la pérdida se puede
@@ -3566,7 +3592,8 @@ test('REPARADO 15/09 (contenido) — una ganancia de 0 ya no se rotula como vent
   expect(await descripcionPatrimonial(page)).not.toContain('por debajo');
 });
 
-// ⚠️ ABIERTO 14/09/2026 (bajo) — contenido. La página publica DOS bloques FAQPage.
+// ✅ REPARADO 15/09/2026 (bajo) — contenido. La página publicaba DOS bloques FAQPage. Caso de
+// origen:
 // `metadata.ts` exporta `jsonLd = combineSchemas(webAppSchema, faqSchema)` —donde `faqSchema`
 // ya es un FAQPage de cinco preguntas— y además un `faqJsonLd` de seis, y el `layout.tsx`
 // inyecta los dos. Servido: dos nodos `"@type":"FAQPage"` para una sola URL, con cinco
@@ -3792,9 +3819,9 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — Asturias, la reventa dentro del añ
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — re-inspección del 21/09/2026.
-// Marcados con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy fallan a propósito.
-// Cuando se reparen, se les quita la marca y quedan como regresión.
+// HALLAZGOS de la re-inspección del 21/09/2026 — REPARADOS.
+// Nacieron con `test.fail()` afirmando lo que DEBERÍA pasar; al repararlos se les quitó la
+// marca y quedan como regresión.
 // ═════════════════════════════════════════════════════════════════════════════
 
 // ✅ HALLAZGO 1157 del 21/09/2026 (medio) — operativa, REPARADO el 21/09. Era la mitad del
@@ -4113,8 +4140,8 @@ test.describe('RE-INSPECCIÓN 22/09/2026 — Navarra, la raya del arancel y la g
   });
 });
 
-// ── HALLAZGO ABIERTO de la re-inspección del 22/09/2026 ─────────────────────────
-// Marcado con `test.fail()`: afirma lo que DEBERÍA pasar, así que hoy falla a propósito.
+// ── HALLAZGO de la re-inspección del 22/09/2026 — REPARADO ─────────────────────
+// Nació con `test.fail()` afirmando lo que DEBERÍA pasar; al repararlo se le quitó la marca.
 
 /**
  * El aviso del neto rotula «Techo» una ausencia que deja el neto por DEBAJO del real.
@@ -4753,8 +4780,8 @@ test('la ayuda del precio depende del régimen: en IVA, el precio pactado (famil
 //  ciego del testigo de familia): la escala progresiva × perfil, la modalidad × territorio
 //  × tipo de transmisión, Ceuta con la gestoría ilegible (el testigo solo prueba Canarias)
 //  y un vendedor en el que gana el método REAL con cualquiera de las dos tablas de
-//  coeficientes. Después, los hallazgos abiertos con `test.fail()`, cada uno con su
-//  aserción de FONDO en primer lugar.
+//  coeficientes. Después, los hallazgos 1559-1569, que nacieron con `test.fail()` y su
+//  aserción de FONDO en primer lugar, y se REPARARON ese mismo día.
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /** Título de una ResultCard (donde la redacción común escribe el «(PARCIAL)»). */
@@ -5218,8 +5245,9 @@ test.describe('HALLAZGOS 24/09/2026 — reparados', () => {
 //  5, 0 y 11 meses, la gestoría del vendedor ilegible con el matiz del marginal del 21 %, y
 //  el cruce que el testigo de familia no ve: el selector de MESES (no es un NumberInput) con
 //  el valor catastral total ilegible y el método real ganando, y con la comisión ilegible.
-//  Después, cinco hallazgos abiertos con `test.fail()` y su aserción de FONDO primero: tres
-//  son reparaciones del 25/09 que llegaron a la app de referencia (238aff76) y no a esta.
+//  Después, cinco hallazgos (2193-2197) que nacieron con `test.fail()` y su aserción de FONDO
+//  primero —tres eran reparaciones del 25/09 que llegaron a la app de referencia (238aff76) y
+//  no a esta— y que se REPARARON ese mismo día (fa0772c0).
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /** Como `vendedor24`, pero con los MESES completos del prorrateo cuando los años son 0. */
@@ -5668,4 +5696,478 @@ test.describe('Hallazgo 2209 — la base mínima del AJD (art. 30.1 TRLITPAJD)',
     const ayuda = (await page.locator(`[id="${idAyuda}"]`).innerText()).replace(/\s+/g, ' ');
     expect(ayuda).toContain('La base del AJD no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD)');
   });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 06/10/2026 — Baleares con familia numerosa, Navarra en obra nueva, la notaría
+// de libre acuerdo, los meses del prorrateo con importes ilegibles y el % de lo que llega de data/.
+//
+//  La cola invalidó la del 26/09 tras fa0772c0 (garaje y trastero reciben las reparaciones de
+//  la referencia y los 11 del Inspector), 7d5c1876 (total parcial sin IGIC/IPSI y la salvedad
+//  del art. 30.1 TRLITPAJD) y 242fffcd (data/itp-ccaa.ts: notaría y registro sin IVA donde rige
+//  IGIC o IPSI, y el % con espacio duro). Las tres verificadas en navegador; la base no tenía
+//  ningún hallazgo abierto.
+//
+//  ⚠️ Ningún caso de este bloque fija la notaría ni el registro: el 06/10/2026 la referencia
+//  registró que sus aranceles no aplican la rebaja del 5 % (hallazgos 2901 y 2902, data/
+//  itp-ccaa.ts, las siete apps). Se leen de la pantalla y se exige que el total los sume.
+//
+//  De dónde sale cada cifra (resuelta a mano antes de abrir la app):
+//   · ITP_CCAA (data/itp-ccaa.ts): Baleares, escala 8 % hasta 400.000 y «Familia numerosa» 5 %
+//     con «Vivienda habitual» entre sus condiciones; Navarra, AJD 0,5 % sin `ajdVivienda`;
+//     Ceuta, AJD 0,5 % con la bonificación del 50 % (art. 57 bis TRLITPAJD); Madrid, 6 %.
+//   · IVA_INMUEBLES_2025 (data/fiscal/inmuebles.ts): anejoVinculado 10 · garaje 21.
+//   · LIMITE_ARANCEL_NOTARIAL = 6.010.121,04 € (RD 1426/1989, nº 2.1).
+//   · COEFICIENTES_IIVTNU_2025 + `coeficienteIIVTNU` (art. 107.4 TRLRHL, RDL 8/2023): 9 años
+//     0,15 · menos de un año 0,15 prorrateado por meses completos · tipo orientativo 25 %.
+//   · TRAMOS_GANANCIAS_PATRIMONIALES_2025: 19 % hasta 6.000 € · 21 % hasta 50.000 €.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** Importe de una tarjeta como número; falla si la tarjeta no publica un importe. */
+async function importe06(page: Page, titulo: string | RegExp): Promise<number> {
+  const n = euros24(await valorTarjeta(page, titulo));
+  expect(n, `«${String(titulo)}» tendría que publicar un importe`).not.toBeNaN();
+  return n;
+}
+
+/** El consejo «Liquida los impuestos a tiempo» del bloque educativo, del DOM (nace plegado). */
+async function consejoPlazo06(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const titulo = Array.from(document.querySelectorAll('strong')).find((s) =>
+      (s.textContent ?? '').includes('Liquida los impuestos a tiempo'),
+    );
+    return (titulo?.parentElement?.querySelector('p')?.textContent ?? '').replace(/\s+/g, ' ').trim();
+  });
+}
+
+test.describe('RE-INSPECCIÓN 06/10/2026 — Baleares, Navarra en obra nueva, la notaría libre y los meses con ilegibles', () => {
+  /**
+   * CASO 47 (normal) — Baleares, segunda mano, 32.000 €, perfil familia numerosa, gestoría 250.
+   *   ITP = 32.000 × 8 % (primer tramo de la escala balear) = 2.560,00 → «ITP (8,00 %)».
+   *   El reducido de familia numerosa (5 %) exige vivienda habitual: no se aplica y se ofrece
+   *   como oportunidad, sola (el de vivienda habitual, 4 %, no es de colectivo y se descarta
+   *   porque un trastero suelto nunca lo es). Sin AJD en segunda mano.
+   *   Total = 2.560 + notaría + registro + 250 (leídas) · coste = 32.000 + total.
+   * VENDEDOR — compra 20.000 · gastos 1.800 · 9 años · suelo 6.000 de 14.000 · comisión 4 % ·
+   * gestoría 150:
+   *   objetivo 6.000 × 0,15 × 25 % = 225,00 · real 12.000 × 6/14 × 25 % = 1.285,71 → 225,00
+   *   comisión 1.280,00 · transmisión 32.000 − 1.280 − 150 − 225 = 30.345,00
+   *   adquisición 21.800,00 · ganancia 8.545,00 · IRPF 6.000 × 19 % + 2.545 × 21 % = 1.674,45
+   *   total 225 + 1.280 + 150 + 1.674,45 = 3.329,45 · neto 28.670,55, DEFINITIVO.
+   */
+  test('CASO 47 — Baleares, 32.000 €, familia numerosa, y un vendedor con todo escrito', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    await page.locator('#select-ccaa').selectOption('baleares');
+    await page.locator('#select-perfil').selectOption('familia-numerosa');
+    await sembrar(page, 'Precio del trastero', '32000');
+    await sembrar(page, 'Gastos de gestoría del comprador (€)', '250');
+
+    expect(await tituloTarjeta24(page, /^ITP \(/)).toBe('ITP (8,00 %)');
+    expect(await valorTarjeta(page, /^ITP \(/)).toBe('2560,00 €');
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+
+    const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
+    await expect(aviso).toHaveCount(1);
+    const oportunidades = (await aviso.locator('li').allInnerTexts()).map((s) => s.replace(ESPACIO_DURO, ' '));
+    expect(oportunidades).toHaveLength(1);
+    expect(oportunidades[0]).toContain('5,00 % — Familia numerosa');
+    expect(oportunidades[0]).toContain('Vivienda habitual');
+
+    const notaria = await importe06(page, 'Gastos de notaría');
+    const registro = await importe06(page, 'Registro de la Propiedad');
+    expect(await importe06(page, 'Gastos de gestoría')).toBe(250);
+    const total = await importe06(page, 'Total gastos adicionales');
+    expect(total).toBeCloseTo(2560 + notaria + registro + 250, 2);
+    expect(await importe06(page, 'COSTE TOTAL')).toBeCloseTo(32000 + total, 2);
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio del trastero + todos los gastos');
+
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    await sembrar(page, 'Precio de compra original', '20000');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '1800');
+    await sembrar(page, 'Años de propiedad', '9');
+    await sembrar(page, 'Valor catastral del suelo', '6000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '14000');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '4');
+    await sembrar(page, 'Gestoría y certificados del vendedor (€)', '150');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('225,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('21.800,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('30.345,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('8545,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1674,45 €');
+    // El título de la comisión con el % separado por un espacio DURO (hallazgo 2194).
+    const tituloComision = (await page.locator('h3').filter({ hasText: /Comisión inmobiliaria/ }).first().innerText()).trim();
+    expect(tituloComision).toBe('Comisión inmobiliaria (4 %)');
+    expect(await valorTarjeta(page, /Comisión inmobiliaria/)).toBe('1280,00 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('150,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('3329,45 €');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('28.670,55 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('Lo que realmente recibes tras los gastos');
+  });
+
+  /**
+   * CASO 48 (límite: modalidad × territorio) — Navarra, obra nueva, 50.000 €, gestoría 300.
+   *   Vinculado: IVA 10 % = 5.000,00 · AJD 0,5 % = 250,00 (Navarra no exime la vivienda: no
+   *     tiene `ajdVivienda`, y el vinculado pasa con `objeto: 'vivienda'`).
+   *   Independiente: IVA 21 % = 10.500,00 · el MISMO AJD de 250,00. Los totales difieren
+   *     exactamente en 5.500,00, sea cual sea la notaría.
+   *   Ceuta (sin IVA): IPSI «No calculado», AJD 50.000 × 0,5 % × 50 % = 125,00 → «AJD (0,25 %)»,
+   *     notaría y registro «(sin IPSI)», coste «puede ser mayor» y la nota de las facturas.
+   *   Y un precio «0» o «0,004» (se pinta 0,00 €) no publica desglose (hallazgo 1601).
+   */
+  test('CASO 48 — Navarra en obra nueva, 50.000 €: 10 % o 21 % con el mismo AJD, y Ceuta', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.locator('#select-ccaa').selectOption('navarra');
+    await sembrar(page, 'Precio del trastero', '50000');
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+
+    await expect(page.getByRole('button', { name: /Vinculado a vivienda/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (10,00 %)');
+    expect(await valorTarjeta(page, /^IVA \(/)).toBe('5000,00 €');
+    expect(await tituloTarjeta24(page, /^AJD \(/)).toBe('AJD (0,50 %)');
+    expect(await valorTarjeta(page, /^AJD \(/)).toBe('250,00 €');
+    const notaria = await importe06(page, 'Gastos de notaría');
+    const registro = await importe06(page, 'Registro de la Propiedad');
+    const totalVinculado = await importe06(page, 'Total gastos adicionales');
+    expect(totalVinculado).toBeCloseTo(5000 + 250 + notaria + registro + 300, 2);
+
+    await page.getByRole('button', { name: /Independiente/ }).click();
+    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (21,00 %)');
+    expect(await valorTarjeta(page, /^IVA \(/)).toBe('10.500,00 €');
+    expect(await valorTarjeta(page, /^AJD \(/)).toBe('250,00 €');
+    await expect(page.getByRole('button', { name: /Primera mano/ })).toContainText('Paga IVA 21 %');
+    expect((await importe06(page, 'Total gastos adicionales')) - totalVinculado).toBeCloseTo(5500, 2);
+
+    await page.locator('#select-ccaa').selectOption('ceuta');
+    await expect(page.locator('#rotulo-modalidad')).toHaveCount(0);
+    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+    expect(await tituloTarjeta24(page, /^AJD \(/)).toBe('AJD (0,25 %)');
+    expect(await valorTarjeta(page, /^AJD \(/)).toBe('125,00 €');
+    expect(await tituloTarjeta24(page, /^Gastos de notaría/)).toBe('Gastos de notaría (sin IPSI)');
+    expect(await tituloTarjeta24(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (sin IPSI)');
+    const totalCeuta = await importe06(page, 'Total gastos adicionales');
+    expect(totalCeuta).toBeCloseTo(
+      125 + (await importe06(page, 'Gastos de notaría')) + (await importe06(page, 'Registro de la Propiedad')) + 300,
+      2,
+    );
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe(
+      'No incluye el IPSI: el coste real puede ser mayor. Las facturas de notaría y registro llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
+    );
+
+    for (const precio of ['0', '0,004']) {
+      await sembrar(page, 'Precio del trastero', precio);
+      await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+      await expect(
+        page.getByText('Introduce el precio del trastero para ver el desglose de gastos del comprador'),
+      ).toBeVisible();
+    }
+  });
+
+  /**
+   * CASO 49 (límite) — la notaría de libre acuerdo, rama que ningún caso de este fichero tocaba.
+   * Madrid, segunda mano, 7.000.000 €, gestoría 300:
+   *   ITP 6 % = 420.000,00 · notaría estimada solo hasta 6.010.121,04 € (lo que excede es de
+   *   libre acuerdo, RD 1426/1989 nº 2.1) → total y coste «(parcial)», «puede ser mayor».
+   *   Con la gestoría «2.000.50»: el total baja exactamente los 300 € y el coste pasa a «será
+   *   mayor», nombrando las dos cosas que faltan.
+   */
+  test('CASO 49 — Madrid, 7.000.000 €: lo que excede del arancel notarial se nombra y el coste es parcial', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '7000000');
+
+    expect(await tituloTarjeta24(page, /^ITP \(/)).toBe('ITP (6,00 %)');
+    expect(await valorTarjeta(page, /^ITP \(/)).toBe('420.000,00 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain(
+      'Por encima de 6.010.121,04 € el arancel no fija cantidad',
+    );
+    expect(await tituloTarjeta24(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toMatch(
+      / — SIN la parte de la notaría que es de libre acuerdo$/,
+    );
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe(
+      'No incluye la parte de la notaría que excede de 6.010.121,04 €, que es de libre acuerdo: el coste real puede ser mayor',
+    );
+    const notaria = await importe06(page, 'Gastos de notaría');
+    const registro = await importe06(page, 'Registro de la Propiedad');
+    const total = await importe06(page, 'Total gastos adicionales');
+    expect(total).toBeCloseTo(420000 + notaria + registro + 300, 2);
+    expect(await importe06(page, 'COSTE TOTAL (PARCIAL)')).toBeCloseTo(7000000 + total, 2);
+
+    await sembrar(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect((await importe06(page, 'Total gastos adicionales')) - total).toBeCloseTo(-300, 2);
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe(
+      'No incluye la gestoría, que no se ha podido leer ni la parte de la notaría que excede de 6.010.121,04 €, que es de libre acuerdo: el coste real será mayor',
+    );
+  });
+
+  /**
+   * CASO 50 (debe nombrarse) — el invariante de la familia con el selector de MESES, que no es
+   * un NumberInput y el testigo no recorre. Base: venta 15.000 · compra 10.000 · gastos 1.000 ·
+   * 0 años y 6 meses completos · suelo 4.000 de 9.000 · comisión 3 % · gestoría 500.
+   *   coeficiente 0,15 × 6/12 = 0,075 → objetivo 4.000 × 0,075 × 25 % = 75,00 (real 555,56)
+   *   transmisión 15.000 − 450 − 500 − 75 = 13.975 · adquisición 11.000 · ganancia 2.975
+   *   IRPF 565,25 · total 1.590,25 · neto 13.409,75 DEFINITIVO.
+   * Gastos de aquella compra «2.000.50» (leídos como 0): adquisición 10.000 · ganancia 3.975 ·
+   *   IRPF 755,25 · total 1.780,25 · neto 13.219,75 → el real (13.409,75) es MAYOR, seguro.
+   * Años «2.000.50»: desaparece el selector de meses, sin plusvalía · transmisión 14.050 ·
+   *   ganancia 3.050 (máximo) · IRPF 579,50 (máximo) · total 1.529,50 · neto 13.470,50 →
+   *   el real (13.409,75) es MENOR: «puede ser menor».
+   */
+  test('CASO 50 — reventa a los 6 meses: los gastos de compra y los años ilegibles se nombran con su dirección', async ({ page }) => {
+    const base = { venta: '15000', compra: '10000', gastos: '1000', anios: '0', meses: '6', suelo: '4000', total: '9000', comision: '3', gestoria: '500' };
+    await vendedor26(page, base);
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('75,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('565,25 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.409,75 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('Lo que realmente recibes tras los gastos');
+
+    await vendedor26(page, { ...base, gastos: '2.000.50' });
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('75,00 €');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('10.000,00 €');
+    expect(await descripcionTarjeta(page, 'Valor de adquisición')).toBe(
+      'Solo el precio de compra: los impuestos y gastos de aquella compra no se han podido leer',
+    );
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('3975,00 €');
+    expect(await descripcionTarjeta(page, 'Ganancia patrimonial')).toBe(
+      'No se han podido leer los impuestos y gastos de aquella compra, así que la ganancia real es menor. Escríbelo con coma decimal (1.234,56).',
+    );
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('755,25 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
+      'No se han podido leer los impuestos y gastos de aquella compra, así que la cuota real es menor. Escríbelo con coma decimal (1.234,56).',
+    );
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.219,75 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'No se han podido leer los impuestos y gastos de aquella compra (suman al valor de adquisición y REDUCEN el IRPF): el neto real es MAYOR que este. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtenerlo.',
+    );
+
+    await vendedor26(page, { ...base, anios: '2.000.50', meses: undefined });
+    await expect(page.locator('#meses-completos')).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'No calculada (no se han podido leer los años de propiedad)',
+    );
+    expect(await tituloTarjeta24(page, /^Ganancia patrimonial/)).toBe('Ganancia patrimonial (máximo)');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('3050,00 €');
+    expect(await tituloTarjeta24(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia (máximo)');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('579,50 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.470,50 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'No descuenta la plusvalía municipal: el neto real puede ser menor que este. No se han podido leer los años de propiedad. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtenerlo.',
+    );
+  });
+
+  /**
+   * CASO 51 (regresión de 2190, 2194 y 242fffcd) — ningún % pegado ni con espacio normal en lo
+   * que la app pinta, recorriendo los textos que llegan de data/ sin pasar por sus constantes:
+   * la nota de las 19 comunidades, la escala o el umbral de describirSubidaITP, los reducidos
+   * del aviso «Podrías pagar menos» con los cuatro perfiles, las dos modalidades de obra nueva,
+   * la respuesta de «escriturar» y los dos bloques JSON-LD. El caso del 26/09 solo miraba el
+   * texto visible de la pestaña Vendedor. Se descuenta el bloque de apps relacionadas, cuyo
+   * texto es de data/app-relations.ts.
+   */
+  test('CASO 51 — el % de lo que llega de data/ va con espacio duro en las 19 comunidades', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await sembrar(page, 'Precio del trastero', '120000');
+    const malos = new Map<string, string>();
+    const anotar = (texto: string, donde: string) => {
+      for (const m of texto.matchAll(/.{0,40}\d ?%/g)) if (!malos.has(m[0])) malos.set(m[0], donde);
+    };
+    const leer = () =>
+      page.evaluate(() => {
+        const clon = document.body.cloneNode(true) as HTMLElement;
+        clon
+          .querySelectorAll('section[aria-label="Aplicaciones relacionadas"], script, style')
+          .forEach((n) => n.remove());
+        return clon.textContent ?? '';
+      });
+    const comunidades = await page.locator('#select-ccaa option').evaluateAll((os) =>
+      os.map((o) => (o as HTMLOptionElement).value),
+    );
+    expect(comunidades).toHaveLength(19);
+
+    await page.getByRole('button', { name: /Segunda mano/ }).click();
+    for (const c of comunidades) {
+      await page.locator('#select-ccaa').selectOption(c);
+      for (const perfil of ['general', 'joven', 'familia-numerosa', 'discapacidad']) {
+        await page.locator('#select-perfil').selectOption(perfil);
+        anotar(await leer(), `${c} · segunda mano · ${perfil}`);
+      }
+    }
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    for (const c of comunidades) {
+      await page.locator('#select-ccaa').selectOption(c);
+      anotar(await leer(), `${c} · obra nueva`);
+      if ((await page.getByRole('button', { name: /Independiente/ }).count()) > 0) {
+        await page.getByRole('button', { name: /Independiente/ }).click();
+        anotar(await leer(), `${c} · obra nueva · independiente`);
+        await page.getByRole('button', { name: /Vinculado a vivienda/ }).click();
+      }
+    }
+
+    const cadenas = (v: unknown): string[] =>
+      typeof v === 'string'
+        ? [v]
+        : Array.isArray(v)
+          ? v.flatMap(cadenas)
+          : v && typeof v === 'object'
+            ? Object.values(v).flatMap(cadenas)
+            : [];
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(bloques.length).toBeGreaterThan(0);
+    for (const b of bloques) anotar(cadenas(JSON.parse(b)).join(' ¦ '), 'JSON-LD');
+
+    expect([...malos].map(([texto, donde]) => `[${donde}] …${texto}`)).toEqual([]);
+  });
+});
+
+// ❌ ABIERTO 06/10/2026 (bajo) — contenido. El consejo «Liquida los impuestos a tiempo» del bloque
+// educativo atribuye al IVA el plazo de autoliquidación del ITP y AJD.
+// `PLAZO_ITP` (data/fiscal/inmuebles.ts) es el «Plazo de autoliquidación del ITP y AJD», y su
+// base normativa, el art. 102.1 del Reglamento del ITPAJD (RD 828/1995), solo regula las
+// declaraciones-liquidaciones de ese impuesto. El IVA de la obra nueva no lo autoliquida el
+// comprador: lo repercute el promotor en la factura (arts. 84.Uno.1.º y 88 de la Ley 37/1992) y
+// lo declara él. La frase, seguida del recargo del art. 27.2 LGT por «presentarlo tarde», le
+// dice al comprador de obra nueva que tiene que liquidar el IVA en 30 días hábiles.
+// La hermana garaje dice «El ITP debe liquidarse…» (sin el IVA, aunque deja fuera el AJD); la
+// referencia (estimador-compraventa-inmueble, l. 3100 y 3181) arrastra el mismo «IVA+AJD».
+// Caso: abrir la guía → «Liquida los impuestos a tiempo»
+//       → esperado: el plazo de 30 días hábiles atribuido al ITP o, en obra nueva, al AJD
+//       → obtenido: «El ITP o el IVA+AJD debe liquidarse en 30 días hábiles desde la firma de la
+//         escritura (art. 102.1 del Reglamento del ITPAJD, RD 828/1995)».
+test('HALLAZGO 06/10 (contenido) — el plazo del art. 102.1 RITPAJD es del ITP y el AJD, no del IVA', async ({ page }) => {
+  test.fail();
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+  const consejo = await consejoPlazo06(page);
+  // FONDO primero: dentro de un test.fail() basta con que falle cualquier aserción.
+  expect(consejo).not.toMatch(/IVA\s*\+\s*AJD debe liquidarse/);
+  expect(consejo).toContain('art. 102.1 del Reglamento del ITPAJD, RD 828/1995');
+});
+
+// ❌ ABIERTO 06/10/2026 (bajo) — contenido. En el mismo consejo falta el espacio entre el aviso en
+// negrita y la frase siguiente: en page.tsx (~l. 2093) `</strong>` cierra la línea y «Presentarlo»
+// abre la siguiente, y JSX descarta ese salto de línea sin dejar espacio. La hermana garaje escribe
+// «</strong> Presentarlo» en la misma línea y no lo tiene. (La referencia, l. 3101-3102, cierra la
+// línea con `{PLAZO_ITP.aviso}` y empieza la siguiente con «El incumplimiento»: misma forma, sin
+// medir.)
+// Caso: abrir la guía → «Liquida los impuestos a tiempo»
+//       → esperado «…Confirma el de la tuya antes de presentar. Presentarlo tarde por iniciativa propia…»
+//       → obtenido «…antes de presentar.Presentarlo tarde por iniciativa propia…» (textContent e innerText).
+test('HALLAZGO 06/10 (contenido) — el aviso del plazo y la frase del recargo van separados por un espacio', async ({ page }) => {
+  test.fail();
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+  const consejo = await consejoPlazo06(page);
+  expect(consejo).not.toContain('presentar.Presentarlo');
+  expect(consejo).toContain('antes de presentar. Presentarlo tarde por iniciativa propia');
+});
+
+// ❌ ABIERTO 06/10/2026 (bajo) — contenido. Medido aquí a raíz del hallazgo de la gemela garaje.
+// En SEGUNDA mano el recuadro de la comunidad rotula el ITP del trastero SUELTO
+// (`tipoGeneralITP(ccaa, OBJETO_ITP, …)`, ~l. 1237), pero el AJD de al lado sale de
+// `tipoAJD(ccaa, { objeto: objetoAJDDe(modalidadTrastero) })` (~l. 1242), y la modalidad es un
+// estado que en segunda mano NO se ve: el selector solo se pinta en obra nueva. En el País Vasco
+// (AJD 0 % de la vivienda, `ajdVivienda`, y 0,5 % del resto) la misma pantalla publica dos cifras
+// distintas según por dónde haya pasado el usuario, y la de carga (0 %) es la de un objeto
+// distinto del que rotula el ITP de al lado (7 %, el del trastero suelto).
+// Caso: País Vasco · segunda mano · 20.000 € → recuadro «ITP General 7 % · AJD 0 %»; pulsar
+//       Primera mano → Independiente → Segunda mano → misma pantalla (sin selector de modalidad)
+//       → esperado: el mismo AJD en las dos visitas · obtenido «AJD 0,5 %».
+test('HALLAZGO 06/10 (contenido) — en segunda mano el AJD del recuadro no depende de una modalidad oculta', async ({ page }) => {
+  test.fail();
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+  await page.locator('#select-ccaa').selectOption('pais-vasco');
+  await sembrar(page, 'Precio del trastero', '20000');
+  const ajdDelRecuadro = async (): Promise<string> =>
+    (await page.locator('[class*="infoCcaaItem"]').nth(1).innerText()).replace(ESPACIO_DURO, ' ').replace(/\s+/g, ' ').trim();
+  const alCargar = await ajdDelRecuadro();
+
+  await page.getByRole('button', { name: /Primera mano/ }).click();
+  await page.getByRole('button', { name: /Independiente/ }).click();
+  await page.getByRole('button', { name: /Segunda mano/ }).click();
+  await expect(page.locator('#rotulo-modalidad')).toHaveCount(0);
+
+  // FONDO primero: la misma pantalla, el mismo dato.
+  expect(await ajdDelRecuadro()).toBe(alCargar);
+  expect(alCargar).toMatch(/^AJD/);
+});
+
+/**
+ * El contraste MÁS BAJO entre los elementos visibles que casan con el selector, contra su fondo
+ * efectivo, contando la OPACIDAD del propio elemento y de sus contenedores hasta el botón: el
+ * `contraste26` de arriba solo mira `color`, y una `opacity: 0.8` no le cambia nada.
+ */
+async function contrasteMinimo06(page: Page, selector: string): Promise<{ ratio: number; texto: string }> {
+  return esperarEstable(() =>
+    page.evaluate((sel) => {
+      const canal = (c: number) => {
+        const v = c / 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      };
+      const partes = (s: string) => (s.match(/[\d.]+/g) || []).map(Number);
+      const lum = ([r, g, b]: number[]) => 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(b);
+      const mezcla = (fg: number[], bg: number[], a: number) => fg.map((c, i) => a * c + (1 - a) * bg[i]);
+      let peor = { ratio: Infinity, texto: '' };
+      for (const el of Array.from(document.querySelectorAll(sel))) {
+        if ((el as HTMLElement).offsetParent === null) continue;
+        const capas: { rgb: number[]; a: number }[] = [];
+        let n: Element | null = el;
+        while (n) {
+          const p = partes(getComputedStyle(n).backgroundColor);
+          const a = p.length === 4 ? p[3] : 1;
+          if (a > 0) capas.push({ rgb: p.slice(0, 3), a });
+          if (a === 1) break;
+          n = n.parentElement;
+        }
+        if (!capas.length || capas[capas.length - 1].a !== 1) capas.push({ rgb: [255, 255, 255], a: 1 });
+        let fondo = capas[capas.length - 1].rgb;
+        for (let i = capas.length - 2; i >= 0; i--) fondo = mezcla(capas[i].rgb, fondo, capas[i].a);
+        let opacidad = 1;
+        for (let m: Element | null = el; m && m.tagName !== 'BUTTON'; m = m.parentElement) {
+          opacidad *= Number(getComputedStyle(m).opacity);
+        }
+        const color = partes(getComputedStyle(el).color);
+        const alfa = (color.length === 4 ? color[3] : 1) * opacidad;
+        const texto = mezcla(color.slice(0, 3), fondo, alfa);
+        const l1 = lum(texto);
+        const l2 = lum(fondo);
+        const ratio = Math.round(((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)) * 100) / 100;
+        if (ratio < peor.ratio) peor = { ratio, texto: (el.textContent ?? '').trim() };
+      }
+      return peor;
+    }, selector),
+  );
+}
+
+// ❌ ABIERTO 06/10/2026 (bajo) — accesibilidad. Medido aquí a raíz del hallazgo de la gemela garaje.
+// `.transmisionSub { font-size: 0.8rem; opacity: 0.8 }` (SimuladorTrasteroCompraventa.module.css
+// ~l. 190) apaga los subtítulos de los cuatro botones de transmisión y modalidad («Paga ITP»,
+// «Paga IVA 10 %/21 %», «Anejo residencial», «Finca registral propia»): 12,8 px de peso 400 es
+// texto normal y exige 4,5:1. Medido con el fondo compuesto y la opacidad: tema claro 3,60:1 en
+// el botón inactivo (#666 sobre #FAFAFA) y 3,36:1 en el activo (#26718F sobre #EAF3F7); tema
+// oscuro 3,50:1 en el activo (#3FA5D1 sobre #2A3337). Los contrastes de la medición del 26/09 no
+// lo vieron porque leen `color` y no la opacidad.
+// Caso: primera mano, tema claro → esperado ≥ 4,5:1 · obtenido 3,36:1 («Paga IVA 21 %» y
+//       «Finca registral propia» con su botón activo).
+test('HALLAZGO 06/10 (accesibilidad) — los subtítulos de los botones de transmisión y modalidad llegan a 4,5:1', async ({ page }) => {
+  test.fail();
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+  await page.getByRole('button', { name: /Primera mano/ }).click();
+  await expect(page.locator('#rotulo-modalidad')).toHaveCount(1);
+  for (const tema of ['light', 'dark'] as const) {
+    await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
+    const peor = await contrasteMinimo06(page, '[class*="transmisionSub"]');
+    expect(peor.ratio, `tema ${tema}: «${peor.texto}»`).toBeGreaterThanOrEqual(4.5);
+  }
 });

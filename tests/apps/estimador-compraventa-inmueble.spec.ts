@@ -32,6 +32,8 @@ import { GANANCIAS_PATRIMONIALES_META, FISCAL_INMUEBLES_META } from '../../data/
 // ── Añadido por la reparación del 26/09/2026 (hallazgos 2182-2186 y receta 1 de la familia) ──
 import { FACTURA_NOTARIAL, REGISTRO_CONCEPTOS } from '../../data/itp-ccaa';
 import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+// ── Añadido por la re-inspección del 06/10/2026 (describe del final del fichero) ──
+import { parseSpanishNumber } from '../../lib/formatters';
 
 /**
  * Inspector — estimador-compraventa-inmueble (segmento fiscal, riesgo 1 CRÍTICO)
@@ -169,7 +171,9 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
   // de modo que anuncia una escala que después no aplica. Afecta a las 7 CCAA con tramos
   // declarados (Aragón, Asturias, Baleares, Castilla y León, Cataluña, Extremadura y
   // Valencia) y a las hermanas -garaje y -trastero, que hacen la misma llamada.
-  // `test.fail` marca que hoy falla a propósito: cuando se corrija se pondrá en ROJO.
+  // REPARADO: se escribió con `test.fail` y pasó a verde al aplicar la escala; queda como
+  // regresión (las cifras de notaría y registro de los comentarios son las de antes del
+  // 20/08/2026: las aserciones llevan las de la factura × 1,75 y el registro con sus dos fijos).
   test('CASO 2 (límite: tramo más alto) — Cataluña, segunda mano, 1.000.000 €: escala progresiva de ITP', async ({ page }) => {
         await page.goto(RUTA);
     await page.getByRole('button', { name: /Segunda mano/ }).click();
@@ -205,7 +209,8 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     await rellenar(page, 'Valor catastral total (suelo + construcción)', '120000');
     await rellenar(page, 'Comisión inmobiliaria (%)', '3');
     await rellenar(page, 'Gastos de gestoría del comprador (€)', '300');
-    // Los tres opcionales hay que ponerlos a 0 a mano — ver CASO 6 (hallazgo abierto)
+    // Los tres opcionales se ponían a 0 a mano por el NaN del CASO 6 (REPARADO el 16/08/2026);
+    // se conservan a 0 para no cambiar el caso
     await rellenar(page, 'Impuestos y gastos que pagaste al comprar', '0');
     await rellenar(page, 'Inversiones y mejoras (opcional)', '0');
     await rellenar(page, 'Otros gastos de la venta (opcional)', '0');
@@ -440,8 +445,8 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
   });
 
-  // ⚠️ HALLAZGO ABIERTO (Inspector, 16/08/2026) — el NaN que el commit 2067ddbe no barrió.
-  // Los campos del bloque de reinversión son los dos únicos del vendedor que siguen leyéndose
+  // ✅ HALLAZGO REPARADO (Inspector, 16/08/2026) — el NaN que el commit 2067ddbe no barrió.
+  // Los campos del bloque de reinversión eran los dos únicos del vendedor que se leían
   // con `parseSpanishNumber` en vez de `parseSpanishNumberOr` (page.tsx:309-310). Quien vende
   // su vivienda habitual SIN hipoteca pendiente deja ese campo vacío —lo natural, y su
   // placeholder es «0»— y entonces `principalPendiente` vale NaN, `importeTotalObtenido` vale
@@ -501,8 +506,8 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('289.200,00 €');
   });
 
-  // ⚠️ HALLAZGO ABIERTO (Inspector, 16/08/2026) — el otro rincón al que no llegó el 2067ddbe.
-  // `estimarGastosAdquisicion` (page.tsx:352) sigue llamando a
+  // ✅ HALLAZGO REPARADO (Inspector, 16/08/2026) — el otro rincón al que no llegó el 2067ddbe.
+  // `estimarGastosAdquisicion` (page.tsx:352) llamaba a
   // `calcularITP(precioC, ccaa, ITP_CCAA[ccaa].tipoGeneral)` con el tercer argumento, que es
   // exactamente lo que cortocircuita la rama de `tramosProgresivos`. La misma página, con el
   // mismo precio y la misma CCAA, da dos ITP distintos: 105.000 € en la pestaña Comprador y
@@ -542,10 +547,10 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('11.940,55 €');
   });
 
-  // ⚠️ HALLAZGO ABIERTO (Inspector, 16/08/2026) — accesibilidad.
-  // Los dos <select> de la app («Comunidad Autónoma» y «Perfil del comprador») no tienen id,
-  // ni aria-label, ni aria-labelledby, y el <label> que los precede no lleva htmlFor. Son
-  // labels huérfanos: un lector de pantalla anuncia «cuadro combinado» sin decir de qué.
+  // ✅ HALLAZGO REPARADO (Inspector, 16/08/2026) — accesibilidad.
+  // Los dos <select> de la app («Comunidad Autónoma» y «Perfil del comprador») no tenían id,
+  // ni aria-label, ni aria-labelledby, y el <label> que los precedía no llevaba htmlFor. Eran
+  // labels huérfanos: un lector de pantalla anunciaba «cuadro combinado» sin decir de qué.
   // En esta app la CCAA es el dato que más mueve el resultado (del 4 % al 13 % de ITP).
   test('CASO 13 (hallazgo) — los desplegables deben tener nombre accesible', async ({ page }) => {
     await page.goto(RUTA);
@@ -821,7 +826,7 @@ test.describe('Inspector 20/08/2026 — factura notarial y registral', () => {
   });
 });
 
-// ⚠️ HALLAZGO ABIERTO (Inspector, 20/08/2026) — dato.
+// ✅ HALLAZGO REPARADO (Inspector, 20/08/2026) — dato. Lo que sigue describe el defecto de entonces.
 // `RANGO_ITP` (`data/itp-ccaa.ts`) se calcula de la tabla justamente para que nadie escriba
 // el rango a mano, y el bloque educativo lo usa: «va del 4% (País Vasco) al 13%». Dos
 // secciones más abajo, la tabla «Comparativa de impuestos en compraventa» lleva el rango
@@ -839,7 +844,7 @@ test('REGRESIÓN (dato) — la tabla comparativa debe dar el mismo rango de ITP 
   await expect(page.locator('tr', { hasText: /^ITP/ }).first()).toContainText('13 %');
 });
 
-// ⚠️ HALLAZGO ABIERTO (Inspector, 20/08/2026) — contenido.
+// ✅ HALLAZGO REPARADO (Inspector, 20/08/2026) — contenido. Lo que sigue describe el defecto de entonces.
 // El aviso «Podrías pagar menos, pero depende de requisitos que no preguntamos» y el panel
 // «Tipos reducidos disponibles en…» solo aparecen cuando el perfil NO es «General»:
 // `elegirTipoITP` sale por `if (perfil === 'general')` antes de rellenar `noComprobables`, y
@@ -863,8 +868,8 @@ test('REGRESIÓN (contenido) — con perfil General también hay que avisar del 
   await expect(page.getByText(/Podrías pagar menos/i)).toBeVisible();
 });
 
-// ⚠️ HALLAZGO ABIERTO (Inspector, 20/08/2026) — contenido.
-// Las tarjetas se titulan «Gastos de notaría (+ IVA)» y «Registro de la Propiedad (+ IVA)»,
+// ✅ HALLAZGO REPARADO (Inspector, 20/08/2026) — contenido. Lo que sigue describe el defecto de entonces.
+// Las tarjetas se titulaban «Gastos de notaría (+ IVA)» y «Registro de la Propiedad (+ IVA)»,
 // pero el importe YA lleva el 21 %: `calcularArancelNotarial` y `calcularRegistro` terminan
 // con `total * 1.21`. «+ IVA» significa en castellano «IVA aparte», así que quien presupuesta
 // suma un 21 % que ya está dentro (758,98 € → 918,37 €). El propio recuadro de errores
@@ -885,8 +890,8 @@ test('REGRESIÓN (contenido) — el rótulo «(+ IVA)» contradice a un importe 
   expect(titulo).not.toMatch(/\+\s*IVA/);
 });
 
-// ⚠️ HALLAZGO ABIERTO (Inspector, 20/08/2026) — dato.
-// El bloque educativo afirma que el AJD «varía entre 0,5% y 1,5% según la comunidad» y la
+// ✅ HALLAZGO REPARADO (Inspector, 20/08/2026) — dato. Lo que sigue describe el defecto de entonces.
+// El bloque educativo afirmaba que el AJD «varía entre 0,5% y 1,5% según la comunidad» y la
 // tabla comparativa repite «0,5% – 1,5%», los dos escritos a mano. En la misma página, al
 // elegir País Vasco, el recuadro de la comunidad imprime «AJD 0%» y su nota dice «Sin AJD.
 // Régimen foral propio» (ITP_CCAA['pais-vasco'].ajd = 0). El rango es derivable de la tabla,
@@ -921,7 +926,8 @@ test('REGRESIÓN (dato) — el rango de AJD del bloque educativo deja fuera el 0
 //
 // Lo que sigue son: (a) casos NUEVOS por caminos que las dos vueltas anteriores no pisaron
 // —escala de tres tramos, reinversión PARCIAL, bonificación de Ceuta y entrada basura— y
-// (b) los hallazgos abiertos de esta vuelta, al final, con `test.fail()`.
+// (b) los hallazgos de esta vuelta, al final; se escribieron con `test.fail()` y están
+//     REPARADOS (hoy son regresión).
 // ══════════════════════════════════════════════════════════════════════════════
 
 test.describe('Inspector 27/08/2026 — caminos nuevos', () => {
@@ -1390,8 +1396,8 @@ test.describe('Inspector 28/08/2026 — cierre del IVA en territorios sin IVA', 
 
   // ── MITAD B · CASO 20 (control) ─────────────────────────────────────────────
   // La misma pantalla con los dos campos del vendedor en su valor legítimo. Sujeta el
-  // montaje de los dos test.fail() de abajo: si esto se pone rojo, lo que falla es el
-  // caso, no el hallazgo.
+  // montaje de los dos casos de abajo (escritos con test.fail(), REPARADOS y hoy regresión):
+  // si esto se pone rojo, lo que falla es el caso, no el hallazgo.
   //   plusvalía .... objetivo 50.000 × 0,19 (8 años, art. 107.4 TRLRHL en la redacción del
   //                  RDL 8/2023; era 0,10 con la tabla caducada, hallazgo 1559) × 25 % = 2.375 ;
   //                  real 70.000 × (50.000/120.000) × 25 % = 7.291,67 → gana el objetivo
@@ -1490,7 +1496,7 @@ test(
 //                        bonificación del 50 % del art. 57 bis TRLITPAJD.
 //   CASO 23 (límite)   · vendedor sin precio de compra — el «SIN CUOTA» en verde.
 //
-// Y cuatro hallazgos NUEVOS, en `test.fail()` hasta que se reparen.
+// Y cuatro hallazgos NUEVOS, escritos en `test.fail()`; REPARADOS desde entonces (regresión).
 // ══════════════════════════════════════════════════════════════════════════════
 
 test.describe('Inspector 30/08/2026 — re-verificación de la tanda 2', () => {
@@ -2400,9 +2406,8 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
 //     un coste total por debajo del precio, ni antes ni después de salir del campo.
 //
 // Y CUATRO hallazgos, los cuatro RESIDUOS DE REPARACIÓN (una corrección que llegó al motor
-// o a las apps hermanas y no a esta), declarados con el modificador `test.fail(...)`:
-// afirman lo que DEBERÍA ocurrir, así que hoy fallan a propósito. Cuando se reparen, se
-// cambia `test.fail(` por `test(` y quedan como regresión.
+// o a las apps hermanas y no a esta), declarados entonces con el modificador `test.fail(...)`:
+// afirmaban lo que DEBERÍA ocurrir. Están REPARADOS y ya son `test(`, como regresión.
 // ═════════════════════════════════════════════════════════════════════════════
 
 test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motores', () => {
@@ -7117,5 +7122,484 @@ test.describe('Hallazgo 2209 — la base mínima del AJD (art. 30.1 TRLITPAJD)',
     const idAyuda = await page.locator(CAMPO).getAttribute('aria-describedby');
     const ayuda = (await page.locator(`[id="${idAyuda}"]`).innerText()).replace(/\s+/g, ' ');
     expect(ayuda).toContain('La base del AJD no puede ser inferior al valor de referencia catastral (art. 30.1 TRLITPAJD)');
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Inspector 06/10/2026 — re-inspección de la REFERENCIA de la familia (INVALIDADA)
+//
+// Entra tras las reparaciones del 26/09 —fe7609ca (art. 41 bis, dependencia, sellos, art. 1455
+// CC, comisión > 100 %), 7d5c1876 (total parcial sin IGIC/IPSI y la salvedad del art. 30.1) y
+// 242fffcd (notaría y registro sin IVA donde rige IGIC o IPSI)— y con una sospecha CON CASO de
+// SOSPECHAS.md (03/10/2026): la rebaja del 5 % del arancel notarial.
+//
+// Verificado en el navegador, no por el commit: los casos 61-63, RECETA 1, RECETA 6, el 41 bis,
+// el 33.4.b, los sellos y el 2209 siguen en verde, y los casos de abajo pisan caminos que no:
+// Baleares (escala en dos tramos) con el vendedor completo, los dos TOPES de los aranceles, las
+// facturas sin IPSI de Ceuta, el plazo del art. 41 bis en su último año que bloquea (2) con la
+// dependencia, y el invariante de la familia CAMPO A CAMPO en los doce importes de la app.
+//
+// Fuentes de esta vuelta, leídas hoy en el BOE consolidado:
+//   · RD 1426/1989, Anexo I, nº 2.1 (BOE-A-1989-28111): a) hasta 6.010,12 € → 90,151816 € ·
+//     b) 4,5 ‰ · c) 1,50 ‰ · d) 1 ‰ · e) 0,5 ‰ · f) 0,3 ‰ hasta 6.010.121,04 €, y «En todos los
+//     supuestos de este apartado se aplicará una rebaja del 5 por 100 del importe del arancel a
+//     percibir por el notario» (párrafo añadido por el RD 1612/2011; DA 8.ª.1.1 RDL 8/2010).
+//   · RD 1427/1989, Anexo I, nº 2.1 (BOE-A-1989-28112): a) 24,040484 € · b) 1,75 ‰ · c) 1,25 ‰ ·
+//     d) 0,75 ‰ · e) 0,30 ‰ · f) 0,20 ‰; «el arancel global … no podrá superar los 2.181,673939
+//     euros», y «En todos los supuestos de este número se aplicará una rebaja del 5 por 100 del
+//     importe del arancel a percibir por el registrador» (RD 1612/2011; DA 8.ª.1.2 RDL 8/2010).
+//     Presentación (nº 1, 6,010121 €) y nota simple (nº 4.1.f, 3,005061 €) no son del nº 2.
+//   · ITP de Baleares: ITP_CCAA.baleares.tramosProgresivos (8 % hasta 400.000 · 9 % hasta
+//     600.000…). Plusvalía: COEFICIENTES_IIVTNU_2025 y PLUSVALIA_MUNICIPAL_META.tipoOrientativo.
+//     IRPF: TRAMOS_GANANCIAS_PATRIMONIALES_2025 (19/21/23/27/30 %).
+//
+// Los casos que MIDEN el cálculo no fijan la cifra de la notaría ni la del registro: eso lo hacen
+// los dos hallazgos del final, con la rebaja. Así, cuando se reparen, estos casos siguen en verde
+// y los dos `test.fail()` se ponen en rojo, que es la señal para convertirlos en `test(`.
+// ══════════════════════════════════════════════════════════════════════════════
+test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invariante campo a campo', () => {
+  /** Escribe como el usuario, comprueba que el ESTADO de React lo recogió y sale del campo. */
+  async function sembrar(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+    await campo.blur();
+  }
+
+  async function abrir(page: Page, ccaa?: string): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio de la vivienda"]']);
+    if (ccaa) await page.locator('#ccaa-inmueble').selectOption(ccaa);
+  }
+
+  async function aVendedor(page: Page): Promise<void> {
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+  }
+
+  /** El rótulo entero de una tarjeta, para ver su «(parcial)» o su «(sin IPSI)». */
+  const rotulo = (page: Page, titulo: RegExp) => page.locator('h3', { hasText: titulo }).first().innerText();
+  /** «1076,61 €» → 1076.61, con el parser del catálogo (no con un parseFloat casero). */
+  const euros = (texto: string): number => parseSpanishNumber(texto.replace(/\s*€\s*$/, ''));
+
+  /**
+   * BASE V del invariante (y de los hallazgos de concordancia y de la base imponible): Madrid ·
+   * venta 300.000 · compra 200.000 · 10 años · suelo 60.000 · total 150.000 · comisión 3 % (la de
+   * fábrica) · vivienda habitual (marcada de fábrica), sin edad ni reinversión. A mano:
+   *   plusvalía objetivo 60.000 × 0,12 × 25 % = 1.800 · real 100.000 × 0,4 × 25 % = 10.000 → 1.800
+   *   comisión 9.000 · transmisión 289.200 · adquisición 200.000 · ganancia 89.200
+   *   IRPF 6.000 × 19 % + 44.000 × 21 % + 39.200 × 23 % = 1.140 + 9.240 + 9.016 = 19.396,00
+   *   neto 300.000 − 1.800 − 9.000 − 19.396 = 269.804,00
+   */
+  async function montarBaseV(page: Page): Promise<void> {
+    await abrir(page);
+    await sembrar(page, 'Precio de la vivienda', '300000');
+    await aVendedor(page);
+    await sembrar(page, 'Precio de compra original', '200000');
+    await sembrar(page, 'Años de propiedad', '10');
+    await sembrar(page, 'Valor catastral del suelo', '60000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '150000');
+  }
+
+  /** La reinversión de la BASE V: marca la casilla y espera a sus dos campos. */
+  async function marcarReinversion(page: Page): Promise<void> {
+    await page.getByRole('checkbox', { name: /Voy a reinvertir/ }).check();
+    await esperarHidratacion(page, ['input[aria-label="Hipoteca pendiente de la vivienda que vendes"]']);
+  }
+
+  /**
+   * CASO 64 (normal) — Baleares, segunda mano, vivienda de 500.000 €, perfil General, gestoría
+   * de fábrica (300 €), y el vendedor completo con los dos campos que solo tiene esta app de la
+   * familia (gastos de aquella compra y mejoras) y otros gastos de la venta.
+   *
+   * Comprador: ITP = 400.000 × 8 % + 100.000 × 9 % = 32.000 + 9.000 = 41.000,00 € (tipo
+   *   efectivo 8,20 %). Notaría y registro: los fijan los dos hallazgos del final; aquí se exige
+   *   que el total sume lo que se ve (hoy 41.000 + 1076,61 + 345,12 + 300 = 42.721,73 €).
+   * Vendedor: compra 300.000 · 15 años · suelo 90.000 · total 225.000 · comisión 4 % · otros
+   *   gastos 1.500 · gastos de aquella compra 25.000 · mejoras 10.000 · vivienda habitual sin edad:
+   *   plusvalía objetivo 90.000 × 0,09 × 25 % = 2.025 · real 200.000 × 0,4 × 25 % = 20.000 → 2.025
+   *   comisión 20.000 · transmisión 500.000 − 20.000 − 1.500 − 2.025 = 476.475
+   *   adquisición 300.000 + 25.000 + 10.000 = 335.000 · ganancia 141.475
+   *   IRPF 1.140 + 9.240 + 91.475 × 23 % (21.039,25) = 31.419,25 €
+   *   total 2.025 + 20.000 + 1.500 + 31.419,25 = 54.944,25 · neto 445.055,75 €
+   */
+  test('CASO 64 (normal) — Baleares, 500.000 €: la escala en dos tramos y el vendedor completo', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    expect(ITP_CCAA['baleares'].tramosProgresivos?.slice(0, 2)).toEqual([
+      { hasta: 400000, tipo: 8 },
+      { hasta: 600000, tipo: 9 },
+    ]);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 15)?.coeficiente).toBe(0.09);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+
+    await abrir(page, 'baleares');
+    await sembrar(page, 'Precio de la vivienda', '500000');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (8,20 %)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('41.000,00 €');
+    expect(await valorTarjeta(page, /^Gastos de gestoría/)).toBe('300,00 €');
+    const notaria = euros(await valorTarjeta(page, /^Gastos de notaría/));
+    const registro = euros(await valorTarjeta(page, /^Registro de la Propiedad/));
+    const total = euros(await valorTarjeta(page, /^Total gastos adicionales/));
+    expect(total).toBeCloseTo(41000 + notaria + registro + 300, 2);
+    expect(await rotulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(euros(await valorTarjeta(page, /^COSTE TOTAL/))).toBeCloseTo(500000 + total, 2);
+
+    await aVendedor(page);
+    await sembrar(page, 'Precio de compra original', '300000');
+    await sembrar(page, 'Años de propiedad', '15');
+    await sembrar(page, 'Valor catastral del suelo', '90000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '225000');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '4');
+    await sembrar(page, 'Otros gastos de la venta (opcional)', '1500');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprar', '25000');
+    await sembrar(page, 'Inversiones y mejoras (opcional)', '10000');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('2025,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('335.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('476.475,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('141.475,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('31.419,25 €');
+    expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('20.000,00 €');
+    expect(await valorTarjeta(page, /^Otros gastos de la venta/)).toBe('1500,00 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('54.944,25 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('445.055,75 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
+  });
+
+  /**
+   * CASO 65 (límite) — tres cantos que nada pisaba:
+   *  (a) Los dos TOPES de los aranceles. El notarial no fija cantidad por encima de 6.010.121,04 €
+   *      (nº 2.1): la notaría de 10 M y de 12 M es la del canto, y el coste sale «(PARCIAL)». El
+   *      registral no puede superar 2.181,673939 € (nº 2.1): la escala de 10.000.000 € ya da
+   *      24,04 + 42,07 + 37,56 + 67,61 + 135,23 + 9.398.987,90 × 0,20 ‰ (1.879,80) = 2.186,31,
+   *      por encima del tope, así que el registro de 10 M y el de 12 M son el mismo. Se miden
+   *      como IGUALDADES para que valgan con y sin la rebaja de los hallazgos del final.
+   *      ITP: 10.000.000 × 6 % = 600.000,00 · 12.000.000 × 6 % = 720.000,00.
+   *  (b) Ceuta, 150.000 €: ITP 6 % con la bonificación del 50 % (art. 57 bis TRLITPAJD) → 3 % →
+   *      4500,00 €; las facturas de notaría y registro, SIN IPSI (hallazgo 2214, 242fffcd): son
+   *      las de Madrid al mismo precio divididas entre 1,21, y una nota lo dice.
+   *  (c) El art. 41 bis.1 RIRPF en su último año que bloquea (2), con la DEPENDENCIA del art.
+   *      33.4.b (hallazgos 2182 y 2183 juntos). Madrid · 300.000 · compra 200.000 · 2 años ·
+   *      suelo 60.000 · 3 %: plusvalía 60.000 × 0,14 × 25 % = 2.100 · transmisión 288.900 ·
+   *      ganancia 88.900 → IRPF 1.140 + 9.240 + 38.900 × 23 % (8.947) = 19.327,00 · neto
+   *      300.000 − 9.000 − 2.100 − 19.327 = 269.573,00. Con la excepción declarada: EXENTO y
+   *      neto 288.900,00.
+   */
+  test('CASO 65 (límite) — los topes de los dos aranceles, Ceuta sin IPSI y el art. 41 bis en 2 años', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 2)?.coeficiente).toBe(0.14);
+
+    // (a)
+    await abrir(page, 'madrid');
+    await sembrar(page, 'Precio de la vivienda', '10000000');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('600.000,00 €');
+    const notaria10 = await valorTarjeta(page, /^Gastos de notaría/);
+    const registro10 = await valorTarjeta(page, /^Registro de la Propiedad/);
+    expect(await descripcionTarjeta(page, /^Gastos de notaría/)).toContain(
+      'Por encima de 6.010.121,04 € el arancel no fija cantidad',
+    );
+    expect(await rotulo(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await rotulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await descripcionTarjeta(page, /^COSTE TOTAL/)).toBe(
+      'No incluye la parte de la notaría que excede de 6.010.121,04 €, que es de libre acuerdo: el coste real puede ser mayor',
+    );
+    await sembrar(page, 'Precio de la vivienda', '12000000');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('720.000,00 €');
+    expect(await valorTarjeta(page, /^Gastos de notaría/)).toBe(notaria10);
+    expect(await valorTarjeta(page, /^Registro de la Propiedad/)).toBe(registro10);
+    // En el canto exacto la notaría ya es la máxima reglada, y no hay parte libre
+    await sembrar(page, 'Precio de la vivienda', '6010121,04');
+    expect(await valorTarjeta(page, /^Gastos de notaría/)).toBe(notaria10);
+    expect(await rotulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+
+    // (b)
+    await abrir(page, 'ceuta');
+    await sembrar(page, 'Precio de la vivienda', '150000');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('4500,00 €');
+    expect(await rotulo(page, /^Gastos de notaría/)).toBe('Gastos de notaría (sin IPSI)');
+    expect(await rotulo(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (sin IPSI)');
+    expect(await rotulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    await expect(page.getByRole('note').filter({ hasText: 'Las facturas de notaría y registro llevan además' })).toHaveText(
+      'Las facturas de notaría y registro llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
+    );
+    const notariaCeuta = euros(await valorTarjeta(page, /^Gastos de notaría/));
+    const registroCeuta = euros(await valorTarjeta(page, /^Registro de la Propiedad/));
+    await abrir(page, 'madrid');
+    await sembrar(page, 'Precio de la vivienda', '150000');
+    expect(euros(await valorTarjeta(page, /^Gastos de notaría/))).toBeCloseTo(notariaCeuta * 1.21, 1);
+    expect(euros(await valorTarjeta(page, /^Registro de la Propiedad/))).toBeCloseTo(registroCeuta * 1.21, 1);
+
+    // (c)
+    await abrir(page);
+    await sembrar(page, 'Precio de la vivienda', '300000');
+    await aVendedor(page);
+    await sembrar(page, 'Precio de compra original', '200000');
+    await sembrar(page, 'Años de propiedad', '2');
+    await sembrar(page, 'Valor catastral del suelo', '60000');
+    await page.getByRole('checkbox', { name: /dependencia severa/ }).check();
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('2100,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.327,00 €');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toContain(
+      'con 2 años de propiedad no llega a los 3 años seguidos de residencia que exige el art. 41 bis.1 RIRPF',
+    );
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('269.573,00 €');
+    await page.getByRole('checkbox', { name: /Vivo en ella menos de 3 años/ }).check();
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('EXENTO');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toContain(
+      'Dependencia severa o gran dependencia + vivienda habitual (art. 33.4.b LIRPF)',
+    );
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('288.900,00 €');
+  });
+
+  /**
+   * CASO 66 (debe nombrarse) — el invariante de la familia en los DOCE importes de la app, en el
+   * navegador: «2.000.50» (NaN por diseño) no es un cero; si mueve una cifra publicada, la app
+   * lo nombra y dice en qué dirección queda la real. La cifra que se mide es la FINAL de cada
+   * pestaña (neto del vendedor, coste del comprador), con su valor a mano sobre la BASE V:
+   *   · precio de compra → sin plusvalía ni IRPF: 300.000 − 9.000 = 291.000,00 (menor)
+   *   · años / suelo → sin plusvalía: IRPF de 91.000 = 1.140 + 9.240 + 41.000 × 23 % = 19.810 →
+   *     300.000 − 9.000 − 19.810 = 271.190,00 (menor)
+   *   · valor total / gastos de aquella compra / mejoras / otros gastos / reinversión → como 0:
+   *     el neto de la BASE V, 269.804,00 (total y reinversión: MAYOR; gastos y mejoras: MAYOR;
+   *     otros gastos: menor)
+   *   · comisión → 0: transmisión 298.200, ganancia 98.200, IRPF 1.140 + 9.240 + 48.200 × 23 %
+   *     = 21.466 → 300.000 − 1.800 − 21.466 = 276.734,00 (menor)
+   *   · hipoteca, con 150.000 reinvertidos → 0: obtenido 289.200, exento 150.000 / 289.200 →
+   *     base 89.200 × 139.200 / 289.200 = 42.934,44 → IRPF 1.140 + 36.934,44 × 21 % = 8.896,23
+   *     → 300.000 − 1.800 − 9.000 − 8.896,23 = 280.303,77 (MAYOR)
+   *   · gestoría del comprador → fuera del total: «el coste real será mayor»
+   *   · precio → no hay desglose, y el mensaje nombra el texto
+   * Los campos de la reinversión (importe e hipoteca) y las mejoras solo existen en esta app de
+   * la familia: el testigo los cubre, pero ninguna hermana los tiene.
+   */
+  const ILEGIBLE_0610 = '2.000.50';
+  const FILAS_66: {
+    etiqueta: string;
+    reinversion?: string;
+    neto: string;
+    dice: string[];
+  }[] = [
+    {
+      etiqueta: 'Precio de compra original',
+      neto: '291.000,00 €',
+      dice: ['El precio de compra original no se ha podido leer', 'el neto real puede ser menor que este'],
+    },
+    {
+      etiqueta: 'Años de propiedad',
+      neto: '271.190,00 €',
+      dice: ['No se han podido leer los años de tenencia', 'el neto real puede ser menor que este'],
+    },
+    {
+      etiqueta: 'Valor catastral del suelo',
+      neto: '271.190,00 €',
+      dice: ['El valor catastral del suelo no se ha podido leer', 'el neto real puede ser menor que este'],
+    },
+    {
+      etiqueta: 'Valor catastral total (suelo + construcción)',
+      neto: '269.804,00 €',
+      dice: ['El valor catastral total (con él la plusvalía puede salir más barata por el método real) no se ha podido leer: el neto real puede ser MAYOR que este'],
+    },
+    {
+      etiqueta: 'Impuestos y gastos que pagaste al comprar',
+      neto: '269.804,00 €',
+      dice: ['No se han podido leer los impuestos y gastos de aquella compra (suman al valor de adquisición y REDUCEN el IRPF): el neto real es MAYOR que este'],
+    },
+    {
+      etiqueta: 'Inversiones y mejoras (opcional)',
+      neto: '269.804,00 €',
+      dice: ['No se han podido leer las mejoras (suman al valor de adquisición y REDUCEN el IRPF): el neto real es MAYOR que este'],
+    },
+    {
+      etiqueta: 'Comisión inmobiliaria (%)',
+      neto: '276.734,00 €',
+      dice: ['No descuenta la comisión inmobiliaria, que no se ha podido leer', 'el neto real es menor que este'],
+    },
+    {
+      etiqueta: 'Otros gastos de la venta (opcional)',
+      neto: '269.804,00 €',
+      dice: ['No descuenta los otros gastos de la venta', 'el neto real es menor que este'],
+    },
+    {
+      etiqueta: 'Importe que reinviertes en la nueva vivienda',
+      reinversion: '',
+      neto: '269.804,00 €',
+      dice: ['El importe que reinviertes (con él, la ganancia puede quedar exenta por el art. 38 LIRPF) no se ha podido leer: el neto real es MAYOR que este'],
+    },
+    {
+      etiqueta: 'Hipoteca pendiente de la vivienda que vendes',
+      reinversion: '150000',
+      neto: '280.303,77 €',
+      dice: ['El principal pendiente de la hipoteca (se resta del importe obtenido, así que con él es mayor la parte exenta de la ganancia, art. 41 RIRPF) no se ha podido leer: el neto real es MAYOR que este'],
+    },
+  ];
+  for (const fila of FILAS_66) {
+    test(`CASO 66 (debe nombrarse) — «${ILEGIBLE_0610}» en «${fila.etiqueta}»`, async ({ page }) => {
+      test.setTimeout(60_000);
+      await montarBaseV(page);
+      if (fila.reinversion !== undefined) {
+        await marcarReinversion(page);
+        if (fila.reinversion) await sembrar(page, 'Importe que reinviertes en la nueva vivienda', fila.reinversion);
+      }
+      await sembrar(page, fila.etiqueta, ILEGIBLE_0610);
+      // El texto imposible se queda a la vista: el blur no lo reescribe
+      await expect(page.locator(`input[aria-label="${fila.etiqueta}"]`)).toHaveValue(ILEGIBLE_0610);
+      expect(await rotulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+      expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe(fila.neto);
+      const neto = await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/);
+      for (const frase of fila.dice) expect(neto).toContain(frase);
+    });
+  }
+
+  test(`CASO 66 (debe nombrarse) — «${ILEGIBLE_0610}» en la gestoría y en el precio del comprador`, async ({
+    page,
+  }) => {
+    // Madrid · 300.000: ITP 18.000 + notaría + registro, SIN la gestoría ilegible
+    await abrir(page, 'madrid');
+    await sembrar(page, 'Precio de la vivienda', '300000');
+    await sembrar(page, 'Gastos de gestoría del comprador (€)', ILEGIBLE_0610);
+    expect(await valorTarjeta(page, /^Gastos de gestoría/)).toBe('Sin leer');
+    const total = euros(await valorTarjeta(page, /^Total gastos adicionales/));
+    const notaria = euros(await valorTarjeta(page, /^Gastos de notaría/));
+    const registro = euros(await valorTarjeta(page, /^Registro de la Propiedad/));
+    expect(total).toBeCloseTo(18000 + notaria + registro, 2);
+    expect(await rotulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await descripcionTarjeta(page, /^COSTE TOTAL/)).toBe(
+      'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
+    );
+
+    await sembrar(page, 'Precio de la vivienda', ILEGIBLE_0610);
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    await expect(page.getByText(`No se ha podido leer el precio «${ILEGIBLE_0610}»`)).toBeVisible();
+  });
+
+  /**
+   * CONTROL de montaje de los cuatro hallazgos de abajo: si esto se pone rojo, lo que falla es la
+   * preparación, no el hallazgo. Nada de aquí cambia al repararlos:
+   *  · Madrid · 200.000 €: la notaría y el registro se leen y caen en una banda que contiene la
+   *    cifra de hoy y la de después de la rebaja (758,98 → 721,04 · 236,22 → 224,96).
+   *  · BASE V + reinversión de 150.000 + hipoteca 40.000: IRPF 1.140 + 29.508,19 × 21 % = 7336,72 €
+   *    y «Tributa 35.508,19 €»; con la hipoteca «2.000.50», leída como 0, IRPF 8896,23 € (ver el
+   *    CASO 66). El de la concordancia lo sujeta su fila del CASO 66 (neto 269.804,00 €).
+   */
+  test('CONTROL de montaje — las preparaciones de los hallazgos del 06/10 publican lo que se mide', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await abrir(page, 'madrid');
+    await sembrar(page, 'Precio de la vivienda', '200000');
+    const notaria = euros(await valorTarjeta(page, /^Gastos de notaría/));
+    const registro = euros(await valorTarjeta(page, /^Registro de la Propiedad/));
+    expect(notaria).toBeGreaterThan(700);
+    expect(notaria).toBeLessThan(780);
+    expect(registro).toBeGreaterThan(220);
+    expect(registro).toBeLessThan(240);
+
+    await montarBaseV(page);
+    await marcarReinversion(page);
+    await sembrar(page, 'Importe que reinviertes en la nueva vivienda', '150000');
+    await sembrar(page, 'Hipoteca pendiente de la vivienda que vendes', '40000');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('7336,72 €');
+    expect(await descripcionTarjeta(page, /^Ganancia patrimonial/)).toBe('Tributa 35.508,19 € tras aplicar la exención');
+    await sembrar(page, 'Hipoteca pendiente de la vivienda que vendes', ILEGIBLE_0610);
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('8896,23 €');
+  });
+
+  /**
+   * HALLAZGO [medio, dato] — ABIERTO (06/10/2026). La notaría no aplica la rebaja del 5 % del
+   * nº 2.1 del Arancel de los Notarios. Vive en `calcularArancelNotarial` de data/itp-ccaa.ts y
+   * alcanza a las siete apps de la familia, a «Estimar por mí», al bloque educativo y al FAQPage
+   * («entre 650 € y 870 €» para 200.000 €). estimador-costes-divorcio ya la aplica con la misma
+   * escala (ARANCEL_NOTARIAL_DIVORCIO.rebajaEscala, data/fiscal/costas-judiciales.ts).
+   *
+   * Madrid · 200.000 € · arancel (BOE, ver la cabecera de este describe):
+   *   90,151816 + 24.040,49 × 4,5 ‰ (108,182205) + 30.050,60 × 1,5 ‰ (45,0759)
+   *   + 90.151,82 × 1 ‰ (90,15182) + 49.746,97 × 0,5 ‰ (24,873485) = 358,435226
+   *   × 0,95 (rebaja) = 340,513465 · × 1,21 (IVA) = 412,021292 · factura media × 1,75 = 721,04 €
+   *   Hoy: 758,98 € (sin la rebaja, y con la base del primer tramo redondeada a 90,15): +37,94 €,
+   *   el 5,26 % (1/0,95).
+   * Madrid · 10.000.000 € (máximo reglado, 6.010.121,04 €): 2.181,674 × 0,95 = 2.072,59026 ·
+   *   × 1,21 × 1,75 = 4.388,71 €. Hoy: 4619,69 €.
+   * La tolerancia (±5 €) se elige por el defecto, que es del 5 %: 38 € y 231 €.
+   */
+  test.fail('HALLAZGO arancel notarial — la escala del nº 2.1 lleva la rebaja del 5 % (RD 1426/1989)', async ({
+    page,
+  }) => {
+    const factorMedio = (FACTURA_NOTARIAL.factorMin + FACTURA_NOTARIAL.factorMax) / 2;
+    await abrir(page, 'madrid');
+    await sembrar(page, 'Precio de la vivienda', '200000');
+    expect(euros(await valorTarjeta(page, /^Gastos de notaría/))).toBeCloseTo(340.513465 * 1.21 * factorMedio, -1);
+    await sembrar(page, 'Precio de la vivienda', '10000000');
+    expect(euros(await valorTarjeta(page, /^Gastos de notaría/))).toBeCloseTo(2072.59026 * 1.21 * factorMedio, -1);
+  });
+
+  /**
+   * HALLAZGO [medio, dato] — ABIERTO (06/10/2026). El registro no aplica la rebaja del 5 % del
+   * nº 2.1 del Arancel de los Registradores, que alcanza también al tope. Vive en
+   * `calcularRegistro` de data/itp-ccaa.ts y llega a las siete apps de la familia.
+   *
+   * Madrid · 200.000 € (BOE, ver la cabecera de este describe):
+   *   24,040484 + 24.040,49 × 1,75 ‰ (42,0708575) + 30.050,60 × 1,25 ‰ (37,56325)
+   *   + 90.151,82 × 0,75 ‰ (67,613865) + 49.746,97 × 0,30 ‰ (14,924091) = 186,2125475
+   *   × 0,95 = 176,901920 · + 6,010121 (nº 1) + 3,005061 (nº 4) = 185,917102 · × 1,21 = 224,96 €
+   *   Hoy: 236,22 €, +11,26 €.
+   * Madrid · 10.000.000 € (tope 2.181,673939): × 0,95 = 2.072,590242 + 9,015182 = 2.081,605424 ·
+   *   × 1,21 = 2.518,74 €. Hoy: 2650,73 €.
+   * Tolerancia ±0,5 €: el defecto es de 11 € y 132 €.
+   */
+  test.fail('HALLAZGO arancel registral — la escala del nº 2.1 lleva la rebaja del 5 % (RD 1427/1989)', async ({
+    page,
+  }) => {
+    const fijos = REGISTRO_CONCEPTOS.presentacion + REGISTRO_CONCEPTOS.notaSimple;
+    await abrir(page, 'madrid');
+    await sembrar(page, 'Precio de la vivienda', '200000');
+    expect(euros(await valorTarjeta(page, /^Registro de la Propiedad/))).toBeCloseTo((176.90192 + fijos) * 1.21, 0);
+    await sembrar(page, 'Precio de la vivienda', '10000000');
+    expect(euros(await valorTarjeta(page, /^Registro de la Propiedad/))).toBeCloseTo((2072.590242 + fijos) * 1.21, 0);
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (06/10/2026). «No descuenta los otros gastos de la venta,
+   * que no se ha podido leer»: el verbo concuerda con el número de CAMPOS (`v.campos.length > 1`,
+   * page.tsx, rama `v.tipo === 'menor'` de `avisoIlegiblesNeto`) y no con el sujeto, que es
+   * plural. Es la regla del hallazgo 1555 (`sujetoPlural`), y la misma página escribe bien «No se
+   * han podido leer los otros gastos de la venta» en la tarjeta de la ganancia.
+   * BASE V + «2.000.50» en «Otros gastos de la venta (opcional)» → esperado «…, que no se han
+   * podido leer» · obtenido «…, que no se ha podido leer».
+   */
+  test.fail('HALLAZGO concordancia — «los otros gastos de la venta, que no se han podido leer»', async ({ page }) => {
+    test.setTimeout(60_000);
+    await montarBaseV(page);
+    await sembrar(page, 'Otros gastos de la venta (opcional)', ILEGIBLE_0610);
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toContain(
+      'No descuenta los otros gastos de la venta, que no se han podido leer',
+    );
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (06/10/2026). La tarjeta de la GANANCIA publica la base
+   * imponible («Tributa X € tras aplicar la exención», o «Base para IRPF» cuando no hay exención)
+   * y su aviso sale del sondeo de la GANANCIA, que la reinversión y la hipoteca no mueven: con
+   * cualquiera de las dos ilegible, la base publicada se mueve y la tarjeta calla (la del IRPF y la
+   * del neto sí lo dicen). Son dos campos que solo tiene esta app de la familia.
+   * BASE V + reinversión de 150.000:
+   *   hipoteca 40.000 → obtenido 249.200 → exento 150.000 / 249.200 → base 89.200 × 99.200 /
+   *     249.200 = 35.508,19 → «Tributa 35.508,19 € tras aplicar la exención» (control)
+   *   hipoteca «2.000.50» → se lee 0 → base 42.934,44 → «Tributa 42.934,44 € tras aplicar la
+   *     exención», sin nombrar la hipoteca ni decir que la base real es menor.
+   */
+  test.fail('HALLAZGO base imponible — la tarjeta de la ganancia nombra la hipoteca ilegible que mueve su «Tributa»', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await montarBaseV(page);
+    await marcarReinversion(page);
+    await sembrar(page, 'Importe que reinviertes en la nueva vivienda', '150000');
+    await sembrar(page, 'Hipoteca pendiente de la vivienda que vendes', ILEGIBLE_0610);
+    // Hoy: «Tributa 42.934,44 € tras aplicar la exención», sin nombrar nada (ver el CONTROL)
+    expect(await descripcionTarjeta(page, /^Ganancia patrimonial/)).toMatch(/no se ha podido leer/);
   });
 });
