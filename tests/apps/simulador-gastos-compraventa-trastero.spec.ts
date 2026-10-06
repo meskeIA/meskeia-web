@@ -6029,8 +6029,9 @@ test.describe('RE-INSPECCIÓN 06/10/2026 — Baleares, Navarra en obra nueva, la
   });
 });
 
-// ❌ ABIERTO 06/10/2026 (bajo) — contenido. El consejo «Liquida los impuestos a tiempo» del bloque
-// educativo atribuye al IVA el plazo de autoliquidación del ITP y AJD.
+// ✅ REPARADO el 06/10/2026 (hallazgo 2907; también en garaje y en la referencia): «El ITP o, en obra
+// nueva, el AJD debe liquidarse…». Era así (bajo, contenido): el consejo «Liquida los impuestos a
+// tiempo» del bloque educativo atribuía al IVA el plazo de autoliquidación del ITP y AJD.
 // `PLAZO_ITP` (data/fiscal/inmuebles.ts) es el «Plazo de autoliquidación del ITP y AJD», y su
 // base normativa, el art. 102.1 del Reglamento del ITPAJD (RD 828/1995), solo regula las
 // declaraciones-liquidaciones de ese impuesto. El IVA de la obra nueva no lo autoliquida el
@@ -6044,7 +6045,6 @@ test.describe('RE-INSPECCIÓN 06/10/2026 — Baleares, Navarra en obra nueva, la
 //       → obtenido: «El ITP o el IVA+AJD debe liquidarse en 30 días hábiles desde la firma de la
 //         escritura (art. 102.1 del Reglamento del ITPAJD, RD 828/1995)».
 test('HALLAZGO 06/10 (contenido) — el plazo del art. 102.1 RITPAJD es del ITP y el AJD, no del IVA', async ({ page }) => {
-  test.fail();
   await page.goto(RUTA);
   await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
   const consejo = await consejoPlazo06(page);
@@ -6053,7 +6053,8 @@ test('HALLAZGO 06/10 (contenido) — el plazo del art. 102.1 RITPAJD es del ITP 
   expect(consejo).toContain('art. 102.1 del Reglamento del ITPAJD, RD 828/1995');
 });
 
-// ❌ ABIERTO 06/10/2026 (bajo) — contenido. En el mismo consejo falta el espacio entre el aviso en
+// ✅ REPARADO el 06/10/2026 (hallazgo 2908; también en la referencia). Era así (bajo, contenido): en
+// el mismo consejo faltaba el espacio entre el aviso en
 // negrita y la frase siguiente: en page.tsx (~l. 2093) `</strong>` cierra la línea y «Presentarlo»
 // abre la siguiente, y JSX descarta ese salto de línea sin dejar espacio. La hermana garaje escribe
 // «</strong> Presentarlo» en la misma línea y no lo tiene. (La referencia, l. 3101-3102, cierra la
@@ -6063,7 +6064,6 @@ test('HALLAZGO 06/10 (contenido) — el plazo del art. 102.1 RITPAJD es del ITP 
 //       → esperado «…Confirma el de la tuya antes de presentar. Presentarlo tarde por iniciativa propia…»
 //       → obtenido «…antes de presentar.Presentarlo tarde por iniciativa propia…» (textContent e innerText).
 test('HALLAZGO 06/10 (contenido) — el aviso del plazo y la frase del recargo van separados por un espacio', async ({ page }) => {
-  test.fail();
   await page.goto(RUTA);
   await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
   const consejo = await consejoPlazo06(page);
@@ -6071,7 +6071,8 @@ test('HALLAZGO 06/10 (contenido) — el aviso del plazo y la frase del recargo v
   expect(consejo).toContain('antes de presentar. Presentarlo tarde por iniciativa propia');
 });
 
-// ❌ ABIERTO 06/10/2026 (bajo) — contenido. Medido aquí a raíz del hallazgo de la gemela garaje.
+// ✅ REPARADO el 06/10/2026 (hallazgo 2909): en segunda mano el AJD del recuadro es el del trastero
+// suelto. Era así (bajo, contenido), medido aquí a raíz del hallazgo de la gemela garaje.
 // En SEGUNDA mano el recuadro de la comunidad rotula el ITP del trastero SUELTO
 // (`tipoGeneralITP(ccaa, OBJETO_ITP, …)`, ~l. 1237), pero el AJD de al lado sale de
 // `tipoAJD(ccaa, { objeto: objetoAJDDe(modalidadTrastero) })` (~l. 1242), y la modalidad es un
@@ -6083,7 +6084,6 @@ test('HALLAZGO 06/10 (contenido) — el aviso del plazo y la frase del recargo v
 //       Primera mano → Independiente → Segunda mano → misma pantalla (sin selector de modalidad)
 //       → esperado: el mismo AJD en las dos visitas · obtenido «AJD 0,5 %».
 test('HALLAZGO 06/10 (contenido) — en segunda mano el AJD del recuadro no depende de una modalidad oculta', async ({ page }) => {
-  test.fail();
   await page.goto(RUTA);
   await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
   await page.locator('#select-ccaa').selectOption('pais-vasco');
@@ -6100,6 +6100,8 @@ test('HALLAZGO 06/10 (contenido) — en segunda mano el AJD del recuadro no depe
   // FONDO primero: la misma pantalla, el mismo dato.
   expect(await ajdDelRecuadro()).toBe(alCargar);
   expect(alCargar).toMatch(/^AJD/);
+  // Y es el del trastero suelto, el objeto cuyo ITP (7 %) rotula la casilla de al lado
+  expect(alCargar).toBe('AJD 0,5 %');
 });
 
 /**

@@ -3097,8 +3097,8 @@ export default function SimuladorCompraventaPage() {
               <span className={styles.stepNumber}>5</span>
               <div className={styles.stepContent}>
                 <strong>Liquida los impuestos en el plazo establecido</strong>
-                <p>El ITP o IVA+AJD debe liquidarse en un plazo de {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde
-                la firma ({PLAZO_ITP.baseNormativa}). {PLAZO_ITP.aviso}
+                <p>El ITP o, en obra nueva, el AJD debe liquidarse en un plazo de {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde
+                la firma ({PLAZO_ITP.baseNormativa}). {PLAZO_ITP.aviso}{' '}
                 El incumplimiento genera un recargo desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}&nbsp;%
                 de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}&nbsp;% por cada mes completo de retraso,
                 y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}&nbsp;% más intereses de demora una vez transcurridos
@@ -3178,7 +3178,7 @@ export default function SimuladorCompraventaPage() {
             <li><strong>Confundir ITP con AJD en segunda mano:</strong> En segunda mano solo se paga ITP; el AJD solo aplica en escrituras con hipoteca. No se duplican.</li>
             <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final.</li>
             <li><strong>No comprobar bonificaciones autonómicas:</strong> Cada comunidad tiene tipos reducidos para ciertos colectivos. Ignorarlos puede costar miles de euros en impuestos innecesarios.</li>
-            <li><strong>Liquidar fuera de plazo:</strong> El ITP o IVA+AJD debe pagarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la escritura ({PLAZO_ITP.baseNormativa}), y hay comunidades que fijan el suyo propio. Pasado ese plazo hay recargo automático
+            <li><strong>Liquidar fuera de plazo:</strong> El ITP o, en obra nueva, el AJD debe pagarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la escritura ({PLAZO_ITP.baseNormativa}), y hay comunidades que fijan el suyo propio. Pasado ese plazo hay recargo automático
             desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}&nbsp;% de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}&nbsp;% por cada mes completo de retraso,
             y del {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses}&nbsp;% más intereses una vez transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses.</li>
           </ul>

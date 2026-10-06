@@ -1238,8 +1238,12 @@ export default function SimuladorTrasteroCompraventaPage() {
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
+                {/* En segunda mano la modalidad no se ve: el AJD es el del trastero suelto, el
+                    mismo objeto cuyo ITP rotula la casilla de al lado (hallazgo 2909, 06/10/2026). */}
                 <span className={styles.infoCcaaValue}>
-                  {formatTipoNominal(tipoAJD(ccaa, { objeto: objetoAJDDe(modalidadTrastero) }).tipo)}&nbsp;%
+                  {formatTipoNominal(
+                    tipoAJD(ccaa, { objeto: tipoTransmision === 'primera-mano' ? objetoAJDDe(modalidadTrastero) : 'otro' }).tipo,
+                  )}&nbsp;%
                 </span>
               </div>
             </div>
@@ -2089,8 +2093,10 @@ export default function SimuladorTrasteroCompraventaPage() {
               <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Liquida los impuestos a tiempo</strong>
               <p>
-                El ITP o el IVA+AJD debe liquidarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la
-                firma de la escritura ({PLAZO_ITP.baseNormativa}). <strong>{PLAZO_ITP.aviso}</strong>
+                {/* El art. 102.1 RITPAJD regula el ITP y el AJD; el IVA de la obra nueva lo repercute
+                    y declara el promotor (hallazgos 2907 y 2908, 06/10/2026) */}
+                El ITP o, en obra nueva, el AJD debe liquidarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la
+                firma de la escritura ({PLAZO_ITP.baseNormativa}). <strong>{PLAZO_ITP.aviso}</strong>{' '}
                 Presentarlo tarde por iniciativa propia, sin requerimiento de la Administración, genera
                 recargo desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}&nbsp;% de partida
                 más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}&nbsp;% por cada mes completo de retraso,

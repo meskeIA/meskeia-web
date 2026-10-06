@@ -1167,8 +1167,14 @@ export default function SimuladorGarajeCompraventaPage() {
                     lo levantó en nave-industrial y nombra a garaje como la otra app del
                     clúster que seguía forzando dos decimales a un tipo nominal. Y del motor:
                     en el País Vasco el vinculado está exento y el independiente paga el 0,5 %. */}
+                {/* En segunda mano el selector vinculado/independiente no se ve: el AJD es el del
+                    garaje suelto, el mismo objeto cuyo ITP rotula la casilla de al lado. Antes
+                    salía del selector oculto y la misma pantalla daba 0 % o 0,5 % en el País Vasco
+                    según por dónde se hubiera pasado (hallazgo 2905, 06/10/2026). */}
                 <span className={styles.infoCcaaValue}>
-                  {formatTipoNominal(tipoAJD(ccaa, { objeto: objetoAJDDe(tipoGaraje) }).tipo)}&nbsp;%
+                  {formatTipoNominal(
+                    tipoAJD(ccaa, { objeto: tipoTransmision === 'primera-mano' ? objetoAJDDe(tipoGaraje) : 'otro' }).tipo,
+                  )}&nbsp;%
                 </span>
               </div>
             </div>
@@ -2049,7 +2055,7 @@ export default function SimuladorGarajeCompraventaPage() {
               <span aria-hidden="true" className={styles.tipIcon}>📅</span>
               <strong>Liquida el ITP en el plazo legal</strong>
               <p>
-                El ITP debe liquidarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la firma de la escritura
+                El ITP o, en obra nueva, el AJD debe liquidarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la firma de la escritura
                 ({PLAZO_ITP.baseNormativa}). <strong>{PLAZO_ITP.aviso}</strong> Presentarlo
                 tarde por iniciativa propia, sin requerimiento de la Administración, genera recargo
                 desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}&nbsp;% de partida más

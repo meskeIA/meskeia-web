@@ -810,7 +810,7 @@ test.describe('REGRESIÓN — hallazgos del 27/08/2026, reparados', () => {
   }) => {
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Ver guía educativa|Todo lo que necesitas saber/i }).click();
-    const consejo = page.getByText(/El ITP debe liquidarse en 30 días hábiles/);
+    const consejo = page.getByText(/El ITP o, en obra nueva, el AJD debe liquidarse en 30 días hábiles/);
     await expect(consejo).not.toContainText('5 % al 20 %');
     await expect(consejo).toContainText('1 %');
   });
@@ -3427,7 +3427,7 @@ test.describe('Hallazgos reparados — re-inspección del 12/09/2026', () => {
 
     // El plazo está, con su norma al lado (eso sí se reparó el 11/09).
     expect(cuerpo).toContain(
-      `El ITP debe liquidarse en ${PLAZO_ITP.dias} ${PLAZO_ITP.unidad} desde la firma de la escritura`,
+      `El ITP o, en obra nueva, el AJD debe liquidarse en ${PLAZO_ITP.dias} ${PLAZO_ITP.unidad} desde la firma de la escritura`,
     );
     expect(cuerpo).toContain(PLAZO_ITP.baseNormativa);
     // Y el aviso del módulo DEBERÍA acompañarlo, como el de la plusvalía municipal.
@@ -6827,7 +6827,8 @@ test.describe('Re-inspección 06/10/2026 — la hermana tras fa0772c0, 7d5c1876 
   });
 
   /**
-   * ❌ ABIERTO 06/10/2026 (contenido, bajo) — el AJD del recuadro de la comunidad depende de un
+   * ✅ REPARADO el 06/10/2026 (hallazgo 2905): en segunda mano el AJD del recuadro es el del garaje
+   * suelto. Era así (contenido, bajo) — el AJD del recuadro de la comunidad dependía de un
    * selector OCULTO.
    *
    * En segunda mano el recuadro rotula «ITP General 7,00 %» del garaje SUELTO (el País Vasco
@@ -6843,7 +6844,7 @@ test.describe('Re-inspección 06/10/2026 — la hermana tras fa0772c0, 7d5c1876 
    * Es la única comunidad con `ajdVivienda` hoy, así que en las demás no se ve. Trastero tiene
    * el mismo código (modalidad oculta en segunda mano, mismo `objetoAJDDe`).
    */
-  test.fail('[06/10·A] el AJD del recuadro de la comunidad no cambia con un selector que no se ve', async ({ page }) => {
+  test('[06/10·A] el AJD del recuadro de la comunidad no cambia con un selector que no se ve', async ({ page }) => {
     const ajdSuelto = `${formatTipoNominal(tipoAJD('pais-vasco', { objeto: 'otro' }).tipo)} %`;
     expect(ajdSuelto).toBe('0,5 %');
     await page.goto(RUTA);
@@ -6864,7 +6865,7 @@ test.describe('Re-inspección 06/10/2026 — la hermana tras fa0772c0, 7d5c1876 
     const trasElSelector = await leerAjd();
 
     expect(trasElSelector).toBe(alCargar);
-    if (alCargar !== null) expect(alCargar).toBe(ajdSuelto);
+    expect(alCargar).toBe(ajdSuelto);
   });
 
   /**
