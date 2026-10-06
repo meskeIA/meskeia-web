@@ -28,6 +28,7 @@ import {
   regionEspectro,
   type RegionEspectro,
 } from './motor';
+import CasosAula from './CasosAula';
 
 // ─── Formato ─────────────────────────────────────────────────────────────────
 
@@ -694,6 +695,10 @@ export default function SimuladorEfectoFotoelectricoPage() {
             corrección no se ve en ninguna cifra.
           </p>
         </section>
+
+        {/* Tarea de aula (skill /casos-aula-meskeia): tras los controles y FUERA de
+            EducationalSection, que nace colapsada. */}
+        <CasosAula />
 
         {/* ── Sección educativa v2.0 ─────────────────────────────────── */}
         <EducationalSection

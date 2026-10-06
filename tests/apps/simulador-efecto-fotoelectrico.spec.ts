@@ -5,6 +5,14 @@ import {
   esperarValorEnReact,
   sembrarValor,
 } from './_hidratacion';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+  resolverCaso,
+} from '../../app/simulador-efecto-fotoelectrico/casos';
+import { METALES } from '../../app/simulador-efecto-fotoelectrico/motor';
 
 /**
  * Simulador del Efecto Fotoeléctrico — PASO 4.bis de /nueva-app-meskeia (06/10/2026)
@@ -221,4 +229,305 @@ test('Caso 6 — RelatedApps pinta 4 tarjetas, con el espectro entre ellas', asy
   await expect(
     page.locator('section[aria-label="Aplicaciones relacionadas"] a[href*="visualizador-espectro-electromagnetico"]'),
   ).toHaveCount(1);
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (skill /casos-aula-meskeia, 06/10/2026) — `casos.ts` sin navegador
+ *
+ * El convenio que hay que vigilar son las CONSTANTES: la app usa CODATA 2018 (h·c = 1.239,84
+ * eV·nm) y en clase se usa h·c = 1240 eV·nm, h = 6,63·10⁻³⁴ J·s, e = 1,60·10⁻¹⁹ C y
+ * mₑ = 9,11·10⁻³¹ kg. Cada enunciado declara las suyas, y aquí cada caso se recalcula con las
+ * DOS tandas, con fórmulas escritas en este test (no las de casos.ts ni las del motor): las dos
+ * tienen que redondear a la clave.
+ *    1 · E = 1240/310 = 4,00 eV (CODATA 3,9995)                  · λ/hc: 0,25
+ *    2 · f₀ = 4,14·1,6·10⁻¹⁹/6,63·10⁻³⁴ = 0,9991·10¹⁵ → 1,00     · (CODATA 1,0010)
+ *    3 · λ₀ = 1240/2,46 = 504,07 → 504 nm (CODATA 504,00)        · con hc = 1243,1: 505
+ *    4 · E_c = 1240/248 − 4,08 = 0,92 eV                         · sumar φ: 9,08 · E del fotón: 5
+ *    5 · E_c = (8,00 − 6,35)·1,6 = 2,64·10⁻¹⁹ J                  · en eV: 1,65
+ *    6 · V₀ = 6,20 − 4,14 = 2,06 V                               · E del fotón: 6,20
+ *    7 · E_c = 1,5 eV = 2,4·10⁻¹⁹ J; v = √(2·2,4·10⁻¹⁹/9,11·10⁻³¹) = 7,26·10⁵ m/s · sin el 2: 5,13
+ *    8 · 400 nm: 3,10 eV < 4,31 → faltan 1,21 eV                 · E − φ con signo: −1,21
+ *    9 · duplicar la intensidad no cambia E_c = 3,10 − 2,46 = 0,64 eV · duplicarla: 1,28
+ *   10 · 620 nm: 2,00 < 2,20 no arranca; 400 nm: 3,10 − 2,20 = 0,90 · con la roja: −0,20
+ *   11 · φ = 5,00 − 0,50 = 4,50 eV (el hierro)                   · E + V₀: 5,50
+ *   12 · λ = 1240/(4,31 + 0,69) = 248 nm                         · sin φ: 1797
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+const A_MANO_AULA: Record<number, number> = {
+  1: 4,
+  2: 1,
+  3: 504,
+  4: 0.92,
+  5: 2.64,
+  6: 2.06,
+  7: 7.26,
+  8: 1.21,
+  9: 0.64,
+  10: 0.9,
+  11: 4.5,
+  12: 248,
+};
+
+interface Constantes {
+  hc: number; // eV·nm
+  h: number; // J·s
+  e: number; // C
+  me: number; // kg
+}
+const LIBRO: Constantes = { hc: 1240, h: 6.63e-34, e: 1.6e-19, me: 9.11e-31 };
+const H_CODATA = 6.62607015e-34;
+const E_CODATA = 1.602176634e-19;
+const CODATA: Constantes = {
+  hc: ((H_CODATA * 299_792_458) / E_CODATA) * 1e9,
+  h: H_CODATA,
+  e: E_CODATA,
+  me: 9.1093837015e-31,
+};
+
+/** Cada caso, escrito desde la definición para unas constantes cualesquiera. */
+const POR_CASO: Record<number, (k: Constantes) => number> = {
+  1: (k) => k.hc / 310,
+  2: (k) => (4.14 * k.e) / k.h / 1e15,
+  3: (k) => k.hc / 2.46,
+  4: (k) => k.hc / 248 - 4.08,
+  5: (k) => ((k.hc / 155 - 6.35) * k.e) / 1e-19,
+  6: (k) => k.hc / 200 - 4.14,
+  7: (k) => Math.sqrt((2 * (k.hc / 200 - 4.7) * k.e) / k.me) / 1e5,
+  8: (k) => 4.31 - k.hc / 400,
+  9: (k) => k.hc / 400 - 2.46,
+  10: (k) => k.hc / 400 - 2.2,
+  11: (k) => k.hc / 248 - 0.5,
+  12: (k) => k.hc / (4.31 + 0.69),
+};
+
+const redondeoAula = (v: number, d: number) => Math.round(v * 10 ** d) / 10 ** d;
+
+function casoAula(id: number) {
+  const caso = CASOS.find((c) => c.id === id);
+  if (!caso) throw new Error(`No existe el caso ${id}`);
+  return caso;
+}
+
+/** Cuántos decimales lleva el número que se ENSEÑA en la solución («0,92 eV» → 2). */
+function decimalesMostradosAula(texto: string): number {
+  const m = texto.match(/[-−]?\d[\d.]*(?:,(\d+))?/);
+  return m?.[1]?.length ?? 0;
+}
+
+test.describe('simulador-efecto-fotoelectrico · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    for (const caso of CASOS) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(redondeoAula(r.valor, caso.datos.decimales ?? 2), `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta finita y desarrollo', async () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+    }
+    expect(new Set(CASOS.map((c) => c.categoria))).toEqual(new Set(['abstracto', 'aplicado']));
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Ecuador|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos (mexicanos|colombianos|chilenos|argentinos)|Bachillerato|selectividad)\b/i;
+    const SIGLA_ESO = /\bESO\b/;
+    for (const caso of CASOS) {
+      const texto = `${caso.titulo} ${caso.enunciado}`;
+      expect(PROHIBIDO.test(texto) || SIGLA_ESO.test(texto), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · lo que el enunciado PIDE coincide con lo que la solución MUESTRA', async () => {
+    for (const caso of CASOS) {
+      const decimales = caso.datos.decimales ?? 2;
+      expect(decimalesMostradosAula(caso.respuestaTexto), `caso ${caso.id}`).toBeLessThanOrEqual(decimales);
+      const ultimo = caso.pasos[caso.pasos.length - 1];
+      expect(ultimo, `caso ${caso.id}: el último paso enseña la cifra de la casilla`).toContain(caso.respuestaTexto);
+      const exacto = Math.abs(resolverCaso(caso.datos).valor - caso.respuesta) < 1e-9;
+      expect(caso.requiereRedondeo, `caso ${caso.id}`).toBe(!exacto);
+      if (!exacto) {
+        expect(caso.enunciado, `caso ${caso.id}: se redondea y el enunciado no lo pide`).toMatch(/redonde|decimal|unidades|décima/i);
+      }
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado, usa la misma aritmética y el convenio', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(muestras.map((m) => m.datos.magnitud)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.respuesta)).toBe(true);
+      const d = m.datos.decimales ?? 2;
+      expect(redondeoAula(resolverCaso(m.datos).valor, d)).toBe(m.respuesta);
+      // Con h·c = 1240 (lo que declara el enunciado) sale la misma cifra redondeada.
+      const phi = m.datos.metal ? METALES.find((x) => x.id === m.datos.metal)?.phi : m.datos.phi;
+      expect(phi, m.enunciado).toBeDefined();
+      const lambda = m.datos.lambda ?? NaN;
+      const libro =
+        m.datos.magnitud === 'energiaFoton'
+          ? LIBRO.hc / lambda
+          : m.datos.magnitud === 'longitudUmbral'
+            ? LIBRO.hc / phi!
+            : LIBRO.hc / lambda - phi!;
+      expect(redondeoAula(libro, d), `${m.datos.magnitud}: ${m.enunciado}`).toBe(m.respuesta);
+      expect(m.enunciado).toMatch(/1240 eV·nm/);
+    }
+  });
+
+  test('7 · el convenio queda fijado: claves a mano y constantes de libro = CODATA tras redondear', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera de este bloque.
+    for (const caso of CASOS) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO_AULA[caso.id]);
+    }
+
+    // (b) Con las constantes de libro y con CODATA, la misma cifra redondeada; y el enunciado
+    // declara las de libro que usa.
+    for (const caso of CASOS) {
+      const d = caso.datos.decimales ?? 2;
+      const f = POR_CASO[caso.id];
+      expect(redondeoAula(f(CODATA), d), `caso ${caso.id} con CODATA`).toBe(caso.respuesta);
+      expect(redondeoAula(f(LIBRO), d), `caso ${caso.id} con constantes de libro`).toBe(caso.respuesta);
+      if (caso.id === 2) {
+        expect(caso.enunciado).toMatch(/h = 6,63 × 10⁻³⁴ J·s/);
+      } else {
+        expect(caso.enunciado, `caso ${caso.id}`).toMatch(/h·c = 1240 eV·nm/);
+      }
+    }
+
+    // (c) El caso 10 es de verdad «solo una de las dos»: la roja no llega a φ con ninguna tanda.
+    expect(LIBRO.hc / 620).toBeLessThan(2.2);
+    expect(CODATA.hc / 620).toBeLessThan(2.2);
+
+    // (d) La intensidad no entra en E_c: el caso 9 sin duplicar da la misma cifra.
+    const caso9 = casoAula(9);
+    expect(resolverCaso({ ...caso9.datos, factorIntensidad: 1 }).valor).toBe(resolverCaso(caso9.datos).valor);
+
+    // (e) La φ de un metal nombrado es la de la MISMA lista que los botones.
+    for (const caso of CASOS) {
+      if (!caso.datos.metal) continue;
+      const metal = METALES.find((m) => m.id === caso.datos.metal);
+      expect(metal, `caso ${caso.id}: metal ${caso.datos.metal}`).toBeDefined();
+      const phi = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2 }).format(metal!.phi);
+      expect(caso.enunciado, `caso ${caso.id}`).toContain(`φ = ${phi} eV`);
+    }
+  });
+
+  test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
+    const r = comprobarRespuesta(NaN, 0.92, casoAula(4).datos);
+    expect(r.correcto).toBe(false);
+    expect(r.motivo).not.toMatch(/NaN/);
+    const borde = r.tolerancia;
+    expect(borde).toBeCloseTo(0.005, 12);
+    expect(comprobarRespuesta(0.92 + borde, 0.92, casoAula(4).datos).correcto).toBe(true);
+    expect(comprobarRespuesta(0.92 - borde, 0.92, casoAula(4).datos).correcto).toBe(true);
+  });
+
+  test('9 · el corrector separa el redondeo del error de concepto', async () => {
+    const tabla: ReadonlyArray<readonly [number, number, boolean, string]> = [
+      [1, 4, true, 'la clave'],
+      [1, 3.9995, true, 'la cifra con CODATA'],
+      [1, 4.01, false, 'h·c = 1243,1 en vez del 1240 que se declara'],
+      [1, 0.25, false, 'λ/hc'],
+      [2, 1, true, 'la clave'],
+      [2, 1.001, true, 'la cifra del panel'],
+      [2, 0.99, false, 'vecino'],
+      [3, 504, true, 'la clave'],
+      [3, 505, false, 'h·c = 1243,1'],
+      [4, 0.92, true, 'la clave'],
+      [4, 9.08, false, 'sumar φ'],
+      [4, 5, false, 'la E del fotón como E_c'],
+      [4, -0.92, false, 'φ − E'],
+      [5, 2.64, true, 'la clave'],
+      [5, 1.65, false, 'en eV'],
+      [6, 2.06, true, 'la clave'],
+      [6, 6.2, false, 'la E del fotón'],
+      [7, 7.26, true, 'la clave'],
+      [7, 7.259, true, 'con constantes de libro, sin redondear'],
+      [7, 5.13, false, 'sin el 2'],
+      [8, 1.21, true, 'la clave'],
+      [8, -1.21, false, 'E − φ con signo'],
+      [8, 3.1, false, 'la E del fotón'],
+      [9, 0.64, true, 'la clave'],
+      [9, 1.28, false, 'duplicar E_c con la intensidad'],
+      [9, 0.32, false, 'la mitad'],
+      [10, 0.9, true, 'la clave'],
+      [10, -0.2, false, 'con la luz roja'],
+      [10, 1.1, false, 'la diferencia de energías de las dos luces'],
+      [11, 4.5, true, 'la clave'],
+      [11, 5.5, false, 'E + V₀'],
+      [11, 0.5, false, 'el potencial de frenado'],
+      [12, 248, true, 'la clave'],
+      [12, 1797, false, 'sin φ'],
+      [12, 343, false, 'restar φ'],
+    ];
+    const mal: string[] = [];
+    for (const [id, r, entra, porque] of tabla) {
+      const caso = casoAula(id);
+      const v = comprobarRespuesta(r, caso.respuesta, caso.datos).correcto;
+      if (v !== entra) mal.push(`caso ${id}: ${r} (${porque}) ${entra ? 'no entra' : 'entra'}`);
+    }
+    expect(mal).toEqual([]);
+  });
+});
+
+/** Teclea una respuesta en el caso `id` y devuelve si el corrector la dio por buena. */
+async function corregirAula(page: Page, id: number, respuesta: string): Promise<boolean> {
+  await page.locator('#casos-aula').getByRole('button', { name: new RegExp(`^Caso ${id}:`) }).click();
+  await expect(page.locator('#casos-titulo-caso')).toHaveText(new RegExp(`^Caso ${id} ·`));
+  await page.locator('#casos-respuesta').fill(respuesta);
+  await page.locator('#casos-comprobar').click();
+  // Por su id y no por getByRole('alert'), que casa también con el anunciador de rutas de Next.
+  const veredicto = page.locator('#casos-veredicto');
+  await expect(veredicto).toBeVisible();
+  return (await veredicto.innerText()).includes('¡Correcto!');
+}
+
+test.describe('simulador-efecto-fotoelectrico · la sección de casos en el navegador', () => {
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test('el caso 9 se corrige con la cifra de la solución', async ({ page }) => {
+    expect(await corregirAula(page, 9, '0,64')).toBe(true);
+  });
+
+  test('la energía del fotón en el caso 4 se rechaza y la solución enseña 0,92 eV', async ({ page }) => {
+    expect(await corregirAula(page, 4, '5,00')).toBe(false);
+    const solucion = page.locator('#casos-aula').getByRole('button', { name: /Ver solución/ });
+    await expect(solucion).toHaveAttribute('aria-expanded', 'false');
+    await solucion.click();
+    await expect(page.locator('#casos-resultado')).toContainText('0,92 eV');
+  });
+
+  test('la sección no añade electrones, deslizadores ni tarjetas al acta', async ({ page }) => {
+    const seccion = page.locator('#casos-aula');
+    await expect(seccion.locator('svg, input[type="range"], [class*="valueCard"]')).toHaveCount(0);
+  });
 });
