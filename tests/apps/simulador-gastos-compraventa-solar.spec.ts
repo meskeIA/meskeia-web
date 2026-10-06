@@ -2959,16 +2959,14 @@ test.describe('Re-inspección 06/10/2026 — casos a mano, cifras intermedias y 
   // ─────────────────────────────────────────────────────────────────────────────
 
   /**
-   * ABIERTO (operativa) — un importe PEGADO con el símbolo del euro o con espacios no llega a la
-   * app: el `handleChange` de components/NumberInput.tsx descarta entero cualquier valor que no
-   * case con /^-?[\d.,]*$/, así que el campo conserva lo que tenía y la app sigue publicando el
-   * desglose del precio ANTERIOR como «COSTE TOTAL DE ADQUISICIÓN», sin una palabra. Es la otra
-   * puerta del invariante de la familia: «2.000.50» llega y se nombra; «120.000 €» ni llega.
-   * Lo que se espera es que el campo no siga diciendo «85000» (que acepte el número o que se
-   * quede el texto y la app lo nombre como ilegible).
+   * REPARADO el 06/10/2026 (hallazgo 2916, operativa) — un importe PEGADO con el símbolo del
+   * euro o con espacios no llegaba a la app: el `handleChange` de components/NumberInput.tsx
+   * descartaba entero cualquier valor que no casara con /^-?[\d.,]*$/, así que el campo
+   * conservaba lo que tenía y la app seguía publicando el desglose del precio ANTERIOR, sin una
+   * palabra. Ahora el control quita espacios (también el duro), «€», «$», «£» y «%» antes de
+   * filtrar: «120.000 €» entra como «120.000», que parseSpanishNumber lee como 120.000.
    */
-  test('ABIERTO — pegar «120.000 €» sobre un precio de 85.000 € no cambia nada y la app publica el desglose de 85.000 €', async ({ page }) => {
-    test.fail(!process.env.VER_HUECOS, 'ABIERTO 06/10/2026: NumberInput descarta en silencio el pegado con «€» o espacios');
+  test('pegar «120.000 €» sobre un precio de 85.000 € publica el desglose de 120.000 €', async ({ page }) => {
     await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
     await abrir(page, 'madrid', 'particular');
     await sembrarValor(page, SEL_PRECIO, '85000');
@@ -2977,7 +2975,17 @@ test.describe('Re-inspección 06/10/2026 — casos a mano, cifras intermedias y 
     await page.locator(SEL_PRECIO).click();
     await page.keyboard.press('Control+A');
     await page.keyboard.press('Control+V');
-    await expect(page.locator(SEL_PRECIO)).not.toHaveValue('85000', { timeout: 3000 });
+    await expect(page.locator(SEL_PRECIO)).toHaveValue('120.000', { timeout: 3000 });
+    await expect
+      .poll(async () => tarjeta(await tarjetas(page), /^Precio del solar/).valor)
+      .toBe('120.000,00 €');
+
+    // Un número de miles con espacio, como lo escribe media Europa, también entra
+    await page.locator(SEL_PRECIO).click();
+    await page.keyboard.press('Control+A');
+    await page.evaluate((t) => navigator.clipboard.writeText(t), '95 000');
+    await page.keyboard.press('Control+V');
+    await expect(page.locator(SEL_PRECIO)).toHaveValue('95000', { timeout: 3000 });
   });
 
   /**

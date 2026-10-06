@@ -66,15 +66,21 @@
   line-height: 1.4;
 }
 
+/* Texto de 13,6 px: necesita 4,5:1. #E53E3E daba 3,95:1 en claro y 4,22:1 en oscuro
+   (hallazgo 2912, 06/10/2026); #C53030 da 5,24:1 sobre #FAFAFA y #FC8181, 7,12:1 sobre #1A1A1A */
 .errorText {
   font-size: 0.85rem;
-  color: #E53E3E;
+  color: #C53030;
   margin: 0;
   line-height: 1.4;
   font-weight: 500;
 }
 
 /* Dark Mode Support */
+[data-theme='dark'] .errorText {
+  color: #FC8181;
+}
+
 [data-theme='dark'] .input {
   background: #333333;
   color: #E5E5E5;

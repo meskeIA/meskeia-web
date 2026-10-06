@@ -4392,13 +4392,13 @@ test.describe('RE-INSPECCIÓN 06/10/2026 — Cantabria, la renuncia que Ceuta no
     expect(await descripcionTarjeta(page, 'Valor de transmisión')).toMatch(/valor catastral total/i);
   });
 
-  // HALLAZGO [06/10-b] (bajo, accesibilidad) — ❌ ABIERTO. El aviso que nombra la comisión imposible
+  // HALLAZGO [06/10-b] (bajo, accesibilidad) — ✅ REPARADO el 06/10/2026 (hallazgo 2912): `.errorText`
+  // pasa a #C53030 (5,24:1 sobre #FAFAFA) y #FC8181 en oscuro (7,12:1 sobre #1A1A1A). Era así: el aviso que nombra la comisión imposible
   // en el propio campo (añadido el 26/09 con el hallazgo 2198) es texto de 13,6 px en #E53E3E,
   // literal y sin variante oscura (components/NumberInput.module.css, `.errorText`): 3,95:1 sobre el
   // fondo del formulario del vendedor en claro (#FAFAFA) y 4,22:1 en oscuro (#1A1A1A), por debajo
   // del 4,5:1 del texto pequeño. Medido con axe-core y con el fondo compuesto de este fichero.
   test('[06/10-b] el aviso de la comisión imposible alcanza 4,5:1 en los dos temas', async ({ page }) => {
-    test.fail();
     await page.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}' });
     await prepararVendedor2609(page, { comision: '150' });
     const aviso = page.getByRole('alert').filter({ hasText: 'La comisión no puede superar el 100' });

@@ -66,9 +66,22 @@ export default function NumberInput({
   const errorId = `${id}-error`;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
+    /**
+     * Permitir vacío, números, coma, punto y signo menos. Antes de filtrar se quitan los
+     * espacios (también el duro y el fino), el símbolo de moneda y el de porcentaje, y el
+     * signo menos tipográfico pasa a guion.
+     *
+     * ── De dónde sale (06/10/2026, hallazgo 2916 en `simulador-gastos-compraventa-solar`) ──
+     * Un importe PEGADO tal como viene de un anuncio («120.000 €», «1 250») no casaba con la
+     * expresión y se descartaba ENTERO: el campo conservaba el valor anterior y la app seguía
+     * publicando el cálculo viejo sin una palabra. Teclearlo carácter a carácter funcionaba,
+     * porque cada tecla rechazada era solo esa tecla; el pegado perdía todo. Lo que aún no
+     * casa tras limpiar (letras) se sigue rechazando, como al teclear.
+     */
+    const val = e.target.value
+      .replace(/[\s\u00A0\u202F\u20AC$\u00A3%]/g, '')
+      .replace(/\u2212/g, '-');
 
-    // Permitir vacío, números, coma, punto, signo menos
     const regex = /^-?[\d.,]*$/;
     if (regex.test(val) || val === '') {
       onChange(val);
