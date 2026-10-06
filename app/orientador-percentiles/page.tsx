@@ -172,6 +172,7 @@ export default function CalculadoraPercentilesPage() {
           {/* Selector de sexo */}
           <div className={styles.sexoSelector}>
             <button
+              type="button"
               className={`${styles.sexoBtn} ${sexo === 'nino' ? styles.active : ''}`}
               onClick={() => setSexo('nino')}
               aria-pressed={sexo === 'nino'}
@@ -180,6 +181,7 @@ export default function CalculadoraPercentilesPage() {
               <span aria-hidden="true">👦</span> Niño
             </button>
             <button
+              type="button"
               className={`${styles.sexoBtn} ${sexo === 'nina' ? styles.active : ''}`}
               onClick={() => setSexo('nina')}
               aria-pressed={sexo === 'nina'}
@@ -240,10 +242,10 @@ export default function CalculadoraPercentilesPage() {
           </div>
 
           <div className={styles.botones}>
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Calcular Percentiles
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -351,7 +353,7 @@ export default function CalculadoraPercentilesPage() {
         </ul>
 
         <p className={styles.highlight}>
-          <strong>⚕️ Esta herramienta NO sustituye las revisiones del niño sano con tu pediatra.</strong>
+          <strong><span aria-hidden="true">⚕️</span> Esta herramienta NO sustituye las revisiones del niño sano con tu pediatra.</strong>
           El crecimiento infantil se evalúa en conjunto con desarrollo psicomotor, alimentación, vacunas y exploración física.
           Nunca tomes decisiones sobre la alimentación de tu bebé sin consultar con el pediatra.
         </p>
@@ -367,7 +369,7 @@ export default function CalculadoraPercentilesPage() {
 
         {/* TABLA COMPARATIVA */}
         <section className={styles.eduComparativa}>
-          <h2>📈 Qué significa cada percentil: guía de interpretación</h2>
+          <h2><span aria-hidden="true">📈</span> Qué significa cada percentil: guía de interpretación</h2>
           <p className={styles.eduIntro}>
             Los percentiles comparan a tu hijo con 100 niños de su misma edad y sexo. Un percentil 75 significa que tu hijo supera en peso o talla al 75% de sus iguales. Esta tabla te ayuda a interpretar cada rango.
           </p>
@@ -385,37 +387,37 @@ export default function CalculadoraPercentilesPage() {
                 <tr>
                   <td><strong>Menor de P3</strong></td>
                   <td>Por debajo del 97% de niños de su edad</td>
-                  <td>⚠️ Requiere valoración</td>
+                  <td><span aria-hidden="true">⚠️</span> Requiere valoración</td>
                   <td>Comentar en la próxima revisión pediátrica. Puede ser constitucional (padres bajos/delgados) o requerir estudio.</td>
                 </tr>
                 <tr>
                   <td><strong>P3 - P15</strong></td>
                   <td>Rango bajo-normal</td>
-                  <td>✅ Generalmente normal</td>
+                  <td><span aria-hidden="true">✅</span> Generalmente normal</td>
                   <td>Normal si los padres tienen talla/peso similar. Seguimiento en revisiones habituales del niño sano.</td>
                 </tr>
                 <tr>
                   <td><strong>P15 - P50</strong></td>
                   <td>Rango normal-medio</td>
-                  <td>✅ Normal</td>
+                  <td><span aria-hidden="true">✅</span> Normal</td>
                   <td>Ninguna. Revisiones periódicas del niño sano según calendario.</td>
                 </tr>
                 <tr>
                   <td><strong>P50 - P85</strong></td>
                   <td>Rango medio-alto normal</td>
-                  <td>✅ Normal</td>
+                  <td><span aria-hidden="true">✅</span> Normal</td>
                   <td>Ninguna. Revisiones periódicas del niño sano según calendario.</td>
                 </tr>
                 <tr>
                   <td><strong>P85 - P97</strong></td>
                   <td>Rango alto-normal</td>
-                  <td>✅ Generalmente normal</td>
+                  <td><span aria-hidden="true">✅</span> Generalmente normal</td>
                   <td>Normal si los padres tienen talla/peso similar. Para peso, vigilar tendencia al alza entre revisiones.</td>
                 </tr>
                 <tr>
                   <td><strong>Mayor de P97</strong></td>
                   <td>Por encima del 97% de niños de su edad</td>
-                  <td>⚠️ Requiere valoración</td>
+                  <td><span aria-hidden="true">⚠️</span> Requiere valoración</td>
                   <td>Comentar en la próxima revisión. Para talla puede ser constitucional; para peso puede indicar sobrepeso que conviene monitorizar.</td>
                 </tr>
               </tbody>
@@ -425,7 +427,7 @@ export default function CalculadoraPercentilesPage() {
 
         {/* CASOS DE USO */}
         <section className={styles.eduEscenarios}>
-          <h2>💼 Situaciones frecuentes y cómo interpretar los resultados</h2>
+          <h2><span aria-hidden="true">💼</span> Situaciones frecuentes y cómo interpretar los resultados</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -515,10 +517,10 @@ export default function CalculadoraPercentilesPage() {
 
         {/* FAQ */}
         <section className={styles.eduFaq}>
-          <h2>❓ Preguntas frecuentes sobre percentiles</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre percentiles</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ Mi hijo está en el percentil 10 de peso. ¿Es demasiado bajo?</h4>
+              <h4><span aria-hidden="true">❓</span> Mi hijo está en el percentil 10 de peso. ¿Es demasiado bajo?</h4>
               <p>
                 No necesariamente. El percentil 10 significa que tu hijo tiene más peso que el 10% de los niños de su edad y sexo. El rango considerado normal va de P3 a P97. Si siempre ha estado en P10 y su curva es estable, es simplemente un niño &quot;pequeño de constitución&quot;. Si hay una caída reciente de percentil, sí merece atención pediátrica. Recuerda que la genética familiar es el factor más importante: padres delgados/bajos suelen tener hijos en percentiles bajos y es completamente normal.
               </p>
@@ -528,7 +530,7 @@ export default function CalculadoraPercentilesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué son las tablas de la OMS y por qué usamos esas?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué son las tablas de la OMS y por qué usamos esas?</h4>
               <p>
                 La Organización Mundial de la Salud desarrolló sus tablas de crecimiento entre 2003-2006 con datos de 8.500 niños de 6 países (Brasil, Ghana, India, Noruega, Omán y EEUU) en condiciones óptimas de salud (lactancia materna, sin tabaco, entorno socioeconómico favorable). Estas tablas representan cómo <strong>deberían crecer</strong> los niños en condiciones ideales, no cómo crecen de media. España adoptó las tablas OMS como referencia oficial en 2010. Esta herramienta usa datos OMS simplificados para edades clave de 0 a 60 meses.
               </p>
@@ -538,7 +540,7 @@ export default function CalculadoraPercentilesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo afecta la lactancia materna vs artificial al crecimiento?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo afecta la lactancia materna vs artificial al crecimiento?</h4>
               <p>
                 Los bebés con lactancia materna exclusiva suelen crecer más rápido los primeros 3-4 meses y después más despacio que los de lactancia artificial. Esto es completamente normal. Las tablas OMS se diseñaron precisamente con bebés de lactancia materna porque es el patrón de crecimiento saludable de referencia. Si tu bebé tiene lactancia artificial y está en percentiles más altos, puede ser normal también; el pediatra evaluará la velocidad de ganancia de peso.
               </p>
@@ -548,7 +550,7 @@ export default function CalculadoraPercentilesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ Mi hijo pasó de P60 a P30 en 3 meses. ¿Es preocupante?</h4>
+              <h4><span aria-hidden="true">❓</span> Mi hijo pasó de P60 a P30 en 3 meses. ¿Es preocupante?</h4>
               <p>
                 Una caída de 2 o más canales percentiles (especialmente si es rápida) merece atención, aunque el niño siga en rango &quot;normal&quot;. Las causas más frecuentes son: enfermedad reciente, cambio de alimentación, periodo de menor ingesta (destete, introducción de sólidos), o simplemente que el punto anterior fue medido en un mal momento (enfermo, recién comido). Si la caída se confirma en dos mediciones consecutivas sin causa aparente, consúltalo con el pediatra.
               </p>
@@ -558,7 +560,7 @@ export default function CalculadoraPercentilesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Puedo usar esta herramienta para niños mayores de 5 años?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Puedo usar esta herramienta para niños mayores de 5 años?</h4>
               <p>
                 Esta calculadora está diseñada para el rango de edad de 0 a 60 meses (5 años), que corresponde a las tablas OMS de crecimiento infantil. Para niños mayores (5-18 años), se usan otras referencias (OMS para 5-19 años, o tablas de la Fundación Orbegozo en España). Las herramientas de percentil para escolares y adolescentes incluyen también el IMC-para-edad, que es diferente al IMC del adulto.
               </p>
@@ -568,7 +570,7 @@ export default function CalculadoraPercentilesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cada cuánto tiempo debo pesar y medir a mi bebé en casa?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cada cuánto tiempo debo pesar y medir a mi bebé en casa?</h4>
               <p>
                 Las revisiones del pediatra ya incluyen peso y talla en los momentos clave (1, 2, 4, 6, 9, 12, 15, 18, 24 meses y luego anuales). No es necesario pesar al bebé en casa con más frecuencia, salvo indicación del pediatra. El peso excesivamente frecuente genera ansiedad en los padres y la variación diaria (por agua, deposiciones, alimentación) no tiene significado clínico. En caso de preocupación, una báscula de farmacia da mediciones más fiables que las domésticas.
               </p>
@@ -578,7 +580,7 @@ export default function CalculadoraPercentilesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿La talla de los percentiles determina la altura de adulto?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿La talla de los percentiles determina la altura de adulto?</h4>
               <p>
                 Tiene correlación pero no es determinista. La <strong>talla diana familiar</strong> (calculada como la media de la talla de los padres ± 6,5cm según el sexo) predice mejor la talla adulta que los percentiles infantiles. Los niños en P5 de talla no necesariamente serán adultos bajos si sus padres son de talla media. El crecimiento acelerado en la pubertad puede cambiar significativamente el percentil. El período crítico de mayor influencia sobre la talla adulta es entre 0-3 años y la pubertad.
               </p>
@@ -588,7 +590,7 @@ export default function CalculadoraPercentilesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué esta herramienta solo tiene percentiles P3, P15, P50, P85 y P97?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué esta herramienta solo tiene percentiles P3, P15, P50, P85 y P97?</h4>
               <p>
                 Las tablas completas de la OMS incluyen hasta 9 líneas de percentiles (P3, P5, P10, P15, P25, P50, P75, P85, P90, P97). Esta herramienta usa 5 puntos de referencia, lo que permite calcular el rango percentil de forma simplificada. Para una valoración precisa, el pediatra utiliza las tablas gráficas completas donde se puede ver exactamente en qué percentil está el niño con mayor resolución. Esta herramienta es una orientación, no un diagnóstico.
               </p>
@@ -601,7 +603,7 @@ export default function CalculadoraPercentilesPage() {
 
         {/* GUÍA PASO A PASO */}
         <section className={styles.eduGuia}>
-          <h2>📋 Cómo hacer un seguimiento del crecimiento en casa</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo hacer un seguimiento del crecimiento en casa</h2>
           <div className={styles.stepGuide}>
             <div className={styles.step}>
               <div className={styles.stepNumber}>1</div>
@@ -662,7 +664,7 @@ export default function CalculadoraPercentilesPage() {
 
         {/* MEJORES PRÁCTICAS */}
         <section className={styles.eduTips}>
-          <h2>✅ 6 claves para interpretar correctamente los percentiles</h2>
+          <h2><span aria-hidden="true">✅</span> 6 claves para interpretar correctamente los percentiles</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>✅</span>
@@ -706,22 +708,22 @@ export default function CalculadoraPercentilesPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>❌ Comparar a tu hijo con otros niños en lugar de con su propia curva:</strong> &quot;El hijo de mi vecina ya pesa 12 kg y el mío solo 10&quot; es la comparación más frecuente y menos útil. Cada niño tiene su propia curva de crecimiento determinada por la genética. Dos niños del mismo mes pueden tener 3-4 kg de diferencia sin que ninguno tenga ningún problema.
+                <strong><span aria-hidden="true">❌</span> Comparar a tu hijo con otros niños en lugar de con su propia curva:</strong> &quot;El hijo de mi vecina ya pesa 12 kg y el mío solo 10&quot; es la comparación más frecuente y menos útil. Cada niño tiene su propia curva de crecimiento determinada por la genética. Dos niños del mismo mes pueden tener 3-4 kg de diferencia sin que ninguno tenga ningún problema.
               </li>
               <li>
-                <strong>❌ Pesarle en casa muy frecuentemente:</strong> El peso de un bebé varía 200-500g en el mismo día según las tomas, el estado de hidratación y las deposiciones. Pesarle cada día o varias veces por semana genera ansiedad sin aportar información clínica útil. Las básculas domésticas tienen además un margen de error que puede ser relevante en bebés pequeños.
+                <strong><span aria-hidden="true">❌</span> Pesarle en casa muy frecuentemente:</strong> El peso de un bebé varía 200-500g en el mismo día según las tomas, el estado de hidratación y las deposiciones. Pesarle cada día o varias veces por semana genera ansiedad sin aportar información clínica útil. Las básculas domésticas tienen además un margen de error que puede ser relevante en bebés pequeños.
               </li>
               <li>
-                <strong>❌ Cambiar la alimentación sin consultar al pediatra basándose en el percentil:</strong> Aumentar la cantidad de biberón, añadir leche de fórmula si hay lactancia materna, o cambiar la alimentación complementaria por un percentil bajo puede ser contraproducente. Solo el pediatra puede indicar cambios en la alimentación de tu bebé.
+                <strong><span aria-hidden="true">❌</span> Cambiar la alimentación sin consultar al pediatra basándose en el percentil:</strong> Aumentar la cantidad de biberón, añadir leche de fórmula si hay lactancia materna, o cambiar la alimentación complementaria por un percentil bajo puede ser contraproducente. Solo el pediatra puede indicar cambios en la alimentación de tu bebé.
               </li>
               <li>
-                <strong>❌ No usar la edad corregida en prematuros:</strong> Un prematuro de 30 semanas que tiene 3 meses de edad real debería compararse con tablas de 3 meses menos las 10 semanas de prematuridad = 0 meses/recién nacido. No corregir la edad hace que parezca que el bebé &quot;está por debajo&quot; cuando en realidad está creciendo perfectamente para su edad corregida.
+                <strong><span aria-hidden="true">❌</span> No usar la edad corregida en prematuros:</strong> Un prematuro de 30 semanas que tiene 3 meses de edad real debería compararse con tablas de 3 meses menos las 10 semanas de prematuridad = 0 meses/recién nacido. No corregir la edad hace que parezca que el bebé &quot;está por debajo&quot; cuando en realidad está creciendo perfectamente para su edad corregida.
               </li>
               <li>
-                <strong>❌ Dar importancia excesiva a una medición tras una enfermedad:</strong> Un bebé que ha tenido gastroenteritis, bronquiolitis u otra enfermedad aguda puede perder 300-600g en pocos días. Esto es esperable y se recupera. Medir el percentil justo al salir de una enfermedad da una foto distorsionada de la realidad.
+                <strong><span aria-hidden="true">❌</span> Dar importancia excesiva a una medición tras una enfermedad:</strong> Un bebé que ha tenido gastroenteritis, bronquiolitis u otra enfermedad aguda puede perder 300-600g en pocos días. Esto es esperable y se recupera. Medir el percentil justo al salir de una enfermedad da una foto distorsionada de la realidad.
               </li>
               <li>
-                <strong>❌ Asumir que un percentil alto de peso es siempre positivo:</strong> Los percentiles muy altos de peso (especialmente P85-P97) en bebés de lactancia artificial o en niños que ya comen sólidos sí merecen atención. El exceso de peso en la infancia tiene factores de riesgo que el pediatra debe valorar, aunque siempre de forma individual y sin alarmar innecesariamente.
+                <strong><span aria-hidden="true">❌</span> Asumir que un percentil alto de peso es siempre positivo:</strong> Los percentiles muy altos de peso (especialmente P85-P97) en bebés de lactancia artificial o en niños que ya comen sólidos sí merecen atención. El exceso de peso en la infancia tiene factores de riesgo que el pediatra debe valorar, aunque siempre de forma individual y sin alarmar innecesariamente.
               </li>
             </ul>
           </div>

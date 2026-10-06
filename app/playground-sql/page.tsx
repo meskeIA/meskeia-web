@@ -276,7 +276,7 @@ export default function PlaygroundSQLPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🗃️ Playground SQL</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🗃️</span> Playground SQL</h1>
         <p className={styles.subtitle}>
           Aprende SQL practicando en el navegador. Sin instalar nada, 100% privado.
         </p>
@@ -289,10 +289,11 @@ export default function PlaygroundSQLPage() {
         <div className={styles.sidebar}>
           {/* Selector de dataset */}
           <div className={styles.sidebarSection}>
-            <h3 className={styles.sidebarTitle}>📦 Dataset</h3>
+            <h3 className={styles.sidebarTitle}><span aria-hidden="true">📦</span> Dataset</h3>
             <div className={styles.datasetSelector}>
               {DATASETS.map(dataset => (
                 <button
+                  type="button"
                   key={dataset.id}
                   className={`${styles.datasetBtn} ${currentDataset.id === dataset.id ? styles.datasetActive : ''}`}
                   onClick={() => handleDatasetChange(dataset.id)}
@@ -308,35 +309,39 @@ export default function PlaygroundSQLPage() {
           {/* Tabs */}
           <div className={styles.tabs}>
             <button
+              type="button"
               className={`${styles.tab} ${activeTab === 'editor' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('editor')}
             >
-              ✏️ Editor
+              <span aria-hidden="true">✏️</span> Editor
             </button>
             <button
+              type="button"
               className={`${styles.tab} ${activeTab === 'exercises' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('exercises')}
             >
-              📝 Ejercicios
+              <span aria-hidden="true">📝</span> Ejercicios
               {completedCount > 0 && (
                 <span className={styles.badge}>{completedCount}/{EXERCISES.length}</span>
               )}
             </button>
             <button
+              type="button"
               className={`${styles.tab} ${activeTab === 'schema' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('schema')}
             >
-              📋 Esquema
+              <span aria-hidden="true">📋</span> Esquema
             </button>
           </div>
 
           {/* Contenido del sidebar según tab */}
           {activeTab === 'editor' && (
             <div className={styles.sidebarSection}>
-              <h3 className={styles.sidebarTitle}>💡 Consultas de ejemplo</h3>
+              <h3 className={styles.sidebarTitle}><span aria-hidden="true">💡</span> Consultas de ejemplo</h3>
               <div className={styles.sampleQueries}>
                 {currentDataset.sampleQueries.map((sq, idx) => (
                   <button
+                    type="button"
                     key={idx}
                     className={styles.sampleQueryBtn}
                     onClick={() => loadSampleQuery(sq.query)}
@@ -351,7 +356,7 @@ export default function PlaygroundSQLPage() {
 
           {activeTab === 'exercises' && (
             <div className={styles.sidebarSection}>
-              <h3 className={styles.sidebarTitle}>📚 Ejercicios guiados</h3>
+              <h3 className={styles.sidebarTitle}><span aria-hidden="true">📚</span> Ejercicios guiados</h3>
 
               {['basico', 'intermedio', 'avanzado'].map(level => (
                 <div key={level} className={styles.exerciseGroup}>
@@ -362,6 +367,7 @@ export default function PlaygroundSQLPage() {
                   </h4>
                   {EXERCISES.filter(e => e.difficulty === level).map(exercise => (
                     <button
+                      type="button"
                       key={exercise.id}
                       className={`${styles.exerciseBtn} ${selectedExercise?.id === exercise.id ? styles.exerciseActive : ''} ${isExerciseCompleted(exercise.id) ? styles.exerciseCompleted : ''}`}
                       onClick={() => handleExerciseSelect(exercise)}
@@ -379,7 +385,7 @@ export default function PlaygroundSQLPage() {
 
           {activeTab === 'schema' && (
             <div className={styles.sidebarSection}>
-              <h3 className={styles.sidebarTitle}>📊 Tablas en {currentDataset.name}</h3>
+              <h3 className={styles.sidebarTitle}><span aria-hidden="true">📊</span> Tablas en {currentDataset.name}</h3>
               {currentDataset.tables.map(table => (
                 <div key={table.name} className={styles.schemaTable}>
                   <h4 className={styles.schemaTableName}>
@@ -415,7 +421,7 @@ export default function PlaygroundSQLPage() {
               </div>
               <p className={styles.exerciseDesc}>{selectedExercise.description}</p>
               <details className={styles.hintDetails}>
-                <summary>💡 Ver pista</summary>
+                <summary><span aria-hidden="true">💡</span> Ver pista</summary>
                 <p>{selectedExercise.hint}</p>
               </details>
             </div>
@@ -427,18 +433,20 @@ export default function PlaygroundSQLPage() {
               <span>Editor SQL</span>
               <div className={styles.editorActions}>
                 <button
+                  type="button"
                   className={styles.editorBtn}
                   onClick={formatQuery}
                   title="Formatear consulta"
                 >
-                  🎨 Formatear
+                  <span aria-hidden="true">🎨</span> Formatear
                 </button>
                 <button
+                  type="button"
                   className={styles.editorBtn}
                   onClick={() => setQuery('')}
                   title="Limpiar"
                 >
-                  🗑️ Limpiar
+                  <span aria-hidden="true">🗑️</span> Limpiar
                 </button>
               </div>
             </div>
@@ -459,6 +467,7 @@ export default function PlaygroundSQLPage() {
                 Ctrl + Enter para ejecutar
               </span>
               <button
+                type="button"
                 className={styles.executeBtn}
                 onClick={executeQuery}
                 disabled={isLoading || !query.trim()}
@@ -471,7 +480,7 @@ export default function PlaygroundSQLPage() {
           {/* Mensaje de éxito */}
           {showSuccess && (
             <div className={styles.successMessage}>
-              🎉 ¡Correcto! Has completado el ejercicio.
+              <span aria-hidden="true">🎉</span> ¡Correcto! Has completado el ejercicio.
             </div>
           )}
 
@@ -494,13 +503,13 @@ export default function PlaygroundSQLPage() {
 
             {isLoading && (
               <div className={styles.resultsLoading}>
-                <p>⏳ Cargando base de datos...</p>
+                <p><span aria-hidden="true">⏳</span> Cargando base de datos...</p>
               </div>
             )}
 
             {result?.error && (
               <div role="alert" className={styles.resultsError}>
-                <p>❌ Error: {result.error}</p>
+                <p><span aria-hidden="true">❌</span> Error: {result.error}</p>
               </div>
             )}
 
@@ -534,7 +543,7 @@ export default function PlaygroundSQLPage() {
 
             {result && !result.error && result.columns.length === 0 && (
               <div className={styles.resultsEmpty}>
-                <p>✅ Consulta ejecutada correctamente (sin resultados para mostrar).</p>
+                <p><span aria-hidden="true">✅</span> Consulta ejecutada correctamente (sin resultados para mostrar).</p>
               </div>
             )}
           </div>
@@ -726,48 +735,48 @@ HAVING COUNT(*) > 100`}</pre>
           <h2>Preguntas Frecuentes sobre SQL</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuál es la diferencia entre WHERE y HAVING?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuál es la diferencia entre WHERE y HAVING?</h4>
               <p>WHERE filtra filas ANTES de agrupar (afecta a datos originales). HAVING filtra grupos DESPUÉS de GROUP BY.
               Ejemplo: <code>WHERE precio &gt; 10</code> filtra productos antes de contar; <code>HAVING COUNT(*) &gt; 5</code> filtra categorías que tienen más de 5 productos.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuándo usar INNER JOIN vs LEFT JOIN?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuándo usar INNER JOIN vs LEFT JOIN?</h4>
               <p>INNER JOIN devuelve solo filas con coincidencia en ambas tablas (descarta filas sin match). LEFT JOIN devuelve todas
               las filas de la tabla izquierda más coincidencias (NULL donde no hay match). Regla práctica: usa LEFT JOIN cuando
               quieras &quot;todos los X con sus Y opcionales&quot;.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es una subconsulta y cuándo es mejor que un JOIN?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es una subconsulta y cuándo es mejor que un JOIN?</h4>
               <p>Una subconsulta es un SELECT dentro de otro SELECT. Es mejor para: filtrar con condiciones complejas, verificar
               existencia (EXISTS) o cuando el resultado es escalar. Un JOIN es más eficiente cuando necesitas columnas de ambas
               tablas y el optimizador puede usar índices.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué mi consulta GROUP BY da error con columnas no agrupadas?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué mi consulta GROUP BY da error con columnas no agrupadas?</h4>
               <p>SQL estándar no permite SELECT de columnas que no estén en GROUP BY ni en funciones de agregación. MySQL en
               modo permisivo lo permite (elige valor arbitrario). PostgreSQL y SQLite son estrictos. Solución: añadir la columna
               al GROUP BY o usar <code>MAX(columna)</code>.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo funciona el índice y cuándo crearlo?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo funciona el índice y cuándo crearlo?</h4>
               <p>El índice es como el índice de un libro: evita leer toda la tabla. Créalo en: columnas usadas en WHERE frecuentemente,
               columnas de JOIN (claves foráneas) y columnas de ORDER BY con muchas filas. No lo crees en: tablas pequeñas,
               columnas con pocos valores distintos (booleanos) o columnas que se actualizan constantemente.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué diferencia hay entre DELETE, TRUNCATE y DROP?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué diferencia hay entre DELETE, TRUNCATE y DROP?</h4>
               <p>DELETE elimina filas con WHERE, activa triggers y es más lento. TRUNCATE elimina TODAS las filas, es más rápido,
               sin triggers y no disponible en SQLite básico. DROP elimina la tabla completa con su estructura. DELETE es reversible
               en transacción; TRUNCATE/DROP pueden no serlo.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Para qué sirven las transacciones?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Para qué sirven las transacciones?</h4>
               <p>Garantizan ACID: Atomicidad (todo o nada), Consistencia, Aislamiento y Durabilidad. Ejemplo: en una transferencia
               bancaria, debitar cuenta A y acreditar cuenta B deben ocurrir juntos o ninguna.
               <code>BEGIN; UPDATE ...; UPDATE ...; COMMIT;</code></p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo evitar la inyección SQL?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo evitar la inyección SQL?</h4>
               <p>NUNCA concatenar strings del usuario en queries. Usa prepared statements/parameterized queries:
               <code>SELECT * FROM usuarios WHERE email = ?</code> con el valor como parámetro separado. En ORMs (Sequelize,
               Hibernate) esto es automático. En SQL puro: siempre usa placeholders.</p>

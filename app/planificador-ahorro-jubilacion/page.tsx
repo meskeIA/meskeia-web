@@ -478,7 +478,7 @@ export default function PlanificadorAhorroJubilacionPage() {
 
                     {resultadoPlan.superaLimite && (
                       <div className={styles.aviso} role="status">
-                        ⚠️ Tu aportación supera el límite deducible ({formatCurrency(LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual)}/año). El exceso de {formatCurrency(resultadoPlan.aportacionAnual - resultadoPlan.deducibleAnual)}/año no genera ventaja fiscal.
+                        <span aria-hidden="true">⚠️</span> Tu aportación supera el límite deducible ({formatCurrency(LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual)}/año). El exceso de {formatCurrency(resultadoPlan.aportacionAnual - resultadoPlan.deducibleAnual)}/año no genera ventaja fiscal.
                       </div>
                     )}
 
@@ -517,7 +517,7 @@ export default function PlanificadorAhorroJubilacionPage() {
                 <strong>30 años, empleado con IRPF alto</strong>
               </div>
               <p className={styles.casoExample}>Salario 45.000 €, pensión ~65% del sueldo. 35 años por delante.</p>
-              <p className={styles.casoTip}>💡 Con 300 €/mes al 5% anual nominal durante 35 años acumula ~280.000 € nominales (~145.000 € de poder adquisitivo actual si la inflación promedia 2%). Plan de empresa + fondos indexados.</p>
+              <p className={styles.casoTip}><span aria-hidden="true">💡</span> Con 300 €/mes al 5% anual nominal durante 35 años acumula ~280.000 € nominales (~145.000 € de poder adquisitivo actual si la inflación promedia 2%). Plan de empresa + fondos indexados.</p>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
@@ -525,7 +525,7 @@ export default function PlanificadorAhorroJubilacionPage() {
                 <strong>45 años, autónoma con bases bajas</strong>
               </div>
               <p className={styles.casoExample}>Cotizaciones históricamente bajas en RETA. Brecha grande y poco tiempo.</p>
-              <p className={styles.casoTip}>💡 Con 20 años, necesita ~600-900 €/mes. PIAS + fondos + alquiler inmobiliario.</p>
+              <p className={styles.casoTip}><span aria-hidden="true">💡</span> Con 20 años, necesita ~600-900 €/mes. PIAS + fondos + alquiler inmobiliario.</p>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
@@ -533,7 +533,7 @@ export default function PlanificadorAhorroJubilacionPage() {
                 <strong>55 años, cercano a jubilación</strong>
               </div>
               <p className={styles.casoExample}>Poco tiempo para acumular. La brecha debe cubrirse con activos existentes.</p>
-              <p className={styles.casoTip}>💡 Maximizar plan de empresa + revisar si tiene PP antiguos olvidados.</p>
+              <p className={styles.casoTip}><span aria-hidden="true">💡</span> Maximizar plan de empresa + revisar si tiene PP antiguos olvidados.</p>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
@@ -541,7 +541,7 @@ export default function PlanificadorAhorroJubilacionPage() {
                 <strong>40 años, funcionaria con pensión alta</strong>
               </div>
               <p className={styles.casoExample}>Pensión cercana al máximo. Brecha pequeña.</p>
-              <p className={styles.casoTip}>💡 El objetivo es flexibilidad: fondos indexados de bajo coste como colchón.</p>
+              <p className={styles.casoTip}><span aria-hidden="true">💡</span> El objetivo es flexibilidad: fondos indexados de bajo coste como colchón.</p>
             </div>
           </div>
 
@@ -614,7 +614,7 @@ export default function PlanificadorAhorroJubilacionPage() {
             <li className={styles.faqItem}>
               <strong>¿El interés compuesto importa tanto?</strong>
               <p>Sí. Ahorrar 200 €/mes durante 30 años al 4% genera más capital que 400 €/mes durante 15 años. Cuanto antes empieces, menor el esfuerzo.</p>
-              <p className={styles.faqTip}>💡 Jubilarse a los 67 supone financiar unos 20 años de media (18 en hombres, 22 en mujeres, según el INE 2024). Planificar por encima de esa media da margen frente a la longevidad, pero conviene saber sobre qué cifra se está añadiendo el margen.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Jubilarse a los 67 supone financiar unos 20 años de media (18 en hombres, 22 en mujeres, según el INE 2024). Planificar por encima de esa media da margen frente a la longevidad, pero conviene saber sobre qué cifra se está añadiendo el margen.</p>
             </li>
           </ul>
 

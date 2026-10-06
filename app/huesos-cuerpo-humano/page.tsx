@@ -289,7 +289,7 @@ export default function HuesosCuerpoHumanoPage() {
         icon="📚"
       >
         <section className={styles.guideSection}>
-          <h2>🦴 Tipos de huesos</h2>
+          <h2><span aria-hidden="true">🦴</span> Tipos de huesos</h2>
           <p className={styles.introParagraph}>
             Los huesos se clasifican en 5 tipos según su forma. Cada tipo tiene características y funciones específicas.
           </p>
@@ -328,7 +328,7 @@ export default function HuesosCuerpoHumanoPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>🗺️ Regiones del esqueleto</h2>
+          <h2><span aria-hidden="true">🗺️</span> Regiones del esqueleto</h2>
           <p className={styles.introParagraph}>
             El esqueleto humano adulto tiene {totalHuesos} huesos, organizados en dos divisiones principales:
           </p>
@@ -358,7 +358,7 @@ export default function HuesosCuerpoHumanoPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>💡 Datos curiosos sobre los huesos</h2>
+          <h2><span aria-hidden="true">💡</span> Datos curiosos sobre los huesos</h2>
           <div className={styles.funFacts}>
             <div className={styles.funFact}>
               <span className={styles.factIcon}>👶</span>
@@ -388,7 +388,7 @@ export default function HuesosCuerpoHumanoPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>📊 Resumen del esqueleto</h2>
+          <h2><span aria-hidden="true">📊</span> Resumen del esqueleto</h2>
           <div className={styles.summaryTable}>
             <div className={styles.summaryRow}>
               <span className={styles.summaryLabel}>Total de huesos (adulto)</span>
@@ -419,7 +419,7 @@ export default function HuesosCuerpoHumanoPage() {
 
         {/* Tabla Comparativa: Esqueleto Axial vs Apendicular */}
         <section className={styles.guideSection}>
-          <h2>⚖️ Esqueleto Axial vs Apendicular</h2>
+          <h2><span aria-hidden="true">⚖️</span> Esqueleto Axial vs Apendicular</h2>
           <p className={styles.introParagraph}>
             Las dos grandes divisiones del esqueleto tienen funciones complementarias. Conocer sus diferencias es fundamental para cualquier examen de biología o anatomía.
           </p>
@@ -455,8 +455,8 @@ export default function HuesosCuerpoHumanoPage() {
                 </tr>
                 <tr>
                   <td><strong>Médula ósea roja</strong></td>
-                  <td>✅ Abundante (vértebras, esternón)</td>
-                  <td>⚠️ Presente solo en epífisis</td>
+                  <td><span aria-hidden="true">✅</span> Abundante (vértebras, esternón)</td>
+                  <td><span aria-hidden="true">⚠️</span> Presente solo en epífisis</td>
                 </tr>
                 <tr>
                   <td><strong>Fracturas frecuentes</strong></td>
@@ -475,7 +475,7 @@ export default function HuesosCuerpoHumanoPage() {
 
         {/* Casos de Uso Prácticos */}
         <section className={styles.guideSection}>
-          <h2>💼 ¿Para quién es útil esta herramienta?</h2>
+          <h2><span aria-hidden="true">💼</span> ¿Para quién es útil esta herramienta?</h2>
           <p className={styles.introParagraph}>
             El atlas de huesos meskeIA se adapta a distintos perfiles. Cada uno obtiene un valor diferente según sus objetivos.
           </p>
@@ -537,10 +537,10 @@ export default function HuesosCuerpoHumanoPage() {
 
         {/* FAQ Ampliado */}
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas Frecuentes sobre el Esqueleto</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre el Esqueleto</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué los bebés tienen más huesos que los adultos?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué los bebés tienen más huesos que los adultos?</h4>
               <p>
                 Los recién nacidos tienen aproximadamente 270-300 huesos, muchos de ellos en forma de cartílago o separados. Con el crecimiento, huesos adyacentes se fusionan progresivamente. El proceso se completa alrededor de los 25 años. El cráneo, por ejemplo, nace en varias piezas separadas (fontanelas) para facilitar el parto y el desarrollo cerebral.
               </p>
@@ -549,7 +549,7 @@ export default function HuesosCuerpoHumanoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuánto tarda en soldarse un hueso roto?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuánto tarda en soldarse un hueso roto?</h4>
               <p>
                 Depende del hueso y la edad del paciente. Huesos pequeños (falanges, costillas): 3-6 semanas. Huesos medianos (radio, cúbito): 6-12 semanas. Huesos grandes (fémur, tibia): 3-6 meses. Los niños curan más rápido que los adultos gracias a mayor actividad osteoblástica. Los fumadores y diabéticos tienen consolidación más lenta.
               </p>
@@ -558,7 +558,7 @@ export default function HuesosCuerpoHumanoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué se dice 206 huesos si hay variaciones entre personas?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué se dice 206 huesos si hay variaciones entre personas?</h4>
               <p>
                 206 es el número estándar del adulto, pero existe variabilidad anatómica normal. Algunas personas tienen costillas cervicales (costilla extra en C7, 0,5-1% de la población), huesos suturales adicionales en el cráneo, o el hueso trígono en el tobillo. También la fusión de vértebras sacras puede variar. La cifra de 206 es la media estadística, no una constante biológica.
               </p>
@@ -567,7 +567,7 @@ export default function HuesosCuerpoHumanoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es la osteoporosis y cómo afecta a los huesos?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es la osteoporosis y cómo afecta a los huesos?</h4>
               <p>
                 La osteoporosis es la pérdida de densidad mineral ósea por debajo de 2,5 desviaciones estándar de la media (T-score ≤ -2,5 en densitometría DEXA). Afecta al 30% de mujeres postmenopáusicas. Las zonas más vulnerables son la columna lumbar, el cuello del fémur y el radio distal. El riesgo de fractura se multiplica por 2-4 en pacientes con osteoporosis.
               </p>
@@ -576,7 +576,7 @@ export default function HuesosCuerpoHumanoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuáles son los huesos que se fracturan con más frecuencia?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuáles son los huesos que se fracturan con más frecuencia?</h4>
               <p>
                 Las fracturas más comunes en adultos son: 1) Radio distal (fractura de Colles, caída con la mano extendida), 2) Vértebras lumbares (osteoporosis), 3) Cuello del fémur (caídas en mayores), 4) Tobillo (maleolo), 5) Clavícula (caídas laterales en deportes). En niños, las fracturas de clavícula y antebrazo son las más frecuentes. Las costillas se fracturan frecuentemente en accidentes de tráfico.
               </p>
@@ -585,7 +585,7 @@ export default function HuesosCuerpoHumanoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Para qué sirve la médula ósea y dónde se produce?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Para qué sirve la médula ósea y dónde se produce?</h4>
               <p>
                 Hay dos tipos: médula roja (hematopoyética) y médula amarilla (grasa). La médula roja produce 200.000 millones de glóbulos rojos diarios. En adultos, está activa principalmente en vértebras, esternón, costillas, cráneo, crestas ilíacas y epífisis de huesos largos. La médula amarilla ocupa la diáfisis de huesos largos y puede convertirse en roja si hay necesidad aumentada (hemorragia severa, anemia).
               </p>
@@ -594,7 +594,7 @@ export default function HuesosCuerpoHumanoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué crujen los huesos y las articulaciones?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué crujen los huesos y las articulaciones?</h4>
               <p>
                 El chasquido articular tiene varias causas: 1) Cavitación del líquido sinovial (burbujas de CO₂ que estallan, el chasquido de nudillos), 2) Tendones que se deslizan sobre prominencias óseas, 3) Degeneración cartilaginosa (artrosis, crepitación). El chasquido de nudillos no causa artritis, pero puede inflamar ligeramente la cápsula articular con el tiempo.
               </p>
@@ -603,7 +603,7 @@ export default function HuesosCuerpoHumanoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuántos huesos tiene la columna vertebral exactamente?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuántos huesos tiene la columna vertebral exactamente?</h4>
               <p>
                 La columna vertebral tiene 33-34 vértebras en el nacimiento, que se reducen a 26 huesos en el adulto: 7 cervicales (C1-C7), 12 torácicas (T1-T12), 5 lumbares (L1-L5), 1 sacro (5 vértebras fusionadas) y 1 cóccix (3-5 vértebras fusionadas). La regla mnemotécnica clásica: 7-12-5 son las horas de las comidas (desayuno a las 7, comida a las 12, cena a las 5).
               </p>
@@ -616,7 +616,7 @@ export default function HuesosCuerpoHumanoPage() {
 
         {/* Guía Paso a Paso */}
         <section className={styles.guideSection}>
-          <h2>📋 Cómo estudiar el esqueleto para un examen</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo estudiar el esqueleto para un examen</h2>
           <p className={styles.introParagraph}>
             Estrategia probada para memorizar los 206 huesos con sus nombres, regiones y funciones en el menor tiempo posible.
           </p>
@@ -689,7 +689,7 @@ export default function HuesosCuerpoHumanoPage() {
 
         {/* Mejores Prácticas */}
         <section className={styles.guideSection}>
-          <h2>✅ Mejores Prácticas para Estudiar Anatomía Ósea</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores Prácticas para Estudiar Anatomía Ósea</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🔗</span>
@@ -733,22 +733,22 @@ export default function HuesosCuerpoHumanoPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>❌ Confundir cráneo (8) con esqueleto craneal (22 huesos):</strong> El cráneo stricto sensu son 8 huesos (frontal, 2 parietales, 2 temporales, occipital, esfenoides, etmoides). La cara tiene 14 huesos adicionales. El examen suele preguntar los 22 del esqueleto craneal completo.
+                <strong><span aria-hidden="true">❌</span> Confundir cráneo (8) con esqueleto craneal (22 huesos):</strong> El cráneo stricto sensu son 8 huesos (frontal, 2 parietales, 2 temporales, occipital, esfenoides, etmoides). La cara tiene 14 huesos adicionales. El examen suele preguntar los 22 del esqueleto craneal completo.
               </li>
               <li>
-                <strong>❌ Decir que el tórax tiene 24 huesos en vez de 25:</strong> Son 24 costillas (12 pares) + 1 esternón = 25 huesos torácicos. El error de olvidar el esternón es muy frecuente.
+                <strong><span aria-hidden="true">❌</span> Decir que el tórax tiene 24 huesos en vez de 25:</strong> Son 24 costillas (12 pares) + 1 esternón = 25 huesos torácicos. El error de olvidar el esternón es muy frecuente.
               </li>
               <li>
-                <strong>❌ Confundir radio y cúbito (cuál está en qué lado):</strong> El radio está en el lado del pulgar (lateral), el cúbito en el lado del meñique (medial). Truco: "Radio tiene R de pulgar derecho" o "el cubito forma el codo con su olécranon".
+                <strong><span aria-hidden="true">❌</span> Confundir radio y cúbito (cuál está en qué lado):</strong> El radio está en el lado del pulgar (lateral), el cúbito en el lado del meñique (medial). Truco: "Radio tiene R de pulgar derecho" o "el cubito forma el codo con su olécranon".
               </li>
               <li>
-                <strong>❌ Confundir tibia y peroné (cuál es el hueso principal):</strong> La tibia es el hueso grande y medial (soporta el 85% del peso). El peroné es delgado y lateral (estabilidad del tobillo). Truco: "Tibia = Tronco, Peroné = Pequeño y Periférico".
+                <strong><span aria-hidden="true">❌</span> Confundir tibia y peroné (cuál es el hueso principal):</strong> La tibia es el hueso grande y medial (soporta el 85% del peso). El peroné es delgado y lateral (estabilidad del tobillo). Truco: "Tibia = Tronco, Peroné = Pequeño y Periférico".
               </li>
               <li>
-                <strong>❌ Olvidar los 6 huesecillos del oído:</strong> Son 3 pares: martillo, yunque y estribo (×2 = 6). Forman parte del esqueleto axial y se incluyen en el cómputo de los 206. Son los huesos más pequeños del cuerpo.
+                <strong><span aria-hidden="true">❌</span> Olvidar los 6 huesecillos del oído:</strong> Son 3 pares: martillo, yunque y estribo (×2 = 6). Forman parte del esqueleto axial y se incluyen en el cómputo de los 206. Son los huesos más pequeños del cuerpo.
               </li>
               <li>
-                <strong>❌ Creer que el cóccix y el sacro son un solo hueso:</strong> Son dos huesos distintos. El sacro = 5 vértebras sacras fusionadas. El cóccix = 3-5 vértebras coccígeas fusionadas. En el adulto, la columna tiene 26 huesos (no 33-34 del neonato).
+                <strong><span aria-hidden="true">❌</span> Creer que el cóccix y el sacro son un solo hueso:</strong> Son dos huesos distintos. El sacro = 5 vértebras sacras fusionadas. El cóccix = 3-5 vértebras coccígeas fusionadas. En el adulto, la columna tiene 26 huesos (no 33-34 del neonato).
               </li>
             </ul>
           </div>

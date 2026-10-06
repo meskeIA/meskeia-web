@@ -329,7 +329,7 @@ export default function CalculadoraEdadMascotasPage() {
           <li><strong>La edad biológica varía</strong>: Depende de raza, tamaño, alimentación, ejercicio y genética individual</li>
           <li><strong>No reemplaza revisiones veterinarias</strong>: El envejecimiento de tu mascota debe evaluarlo un veterinario con exploración física</li>
         </ul>
-        <p className={styles.highlight}><strong>🐾 Consulta con tu veterinario sobre cuidados específicos según la edad de tu mascota.</strong></p>
+        <p className={styles.highlight}><strong><span aria-hidden="true">🐾</span> Consulta con tu veterinario sobre cuidados específicos según la edad de tu mascota.</strong></p>
       </DisclaimerCard>
 
       <EducationalSection

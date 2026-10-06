@@ -414,70 +414,70 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>💿 HDD Mecánico</strong></td>
+                  <td><strong><span aria-hidden="true">💿</span> HDD Mecánico</strong></td>
                   <td>~120 MB/s</td>
                   <td>~110 MB/s</td>
                   <td>SATA 6 Gb/s</td>
                   <td>1956 (SATA 2003)</td>
                 </tr>
                 <tr>
-                  <td><strong>🗂️ SSD SATA</strong></td>
+                  <td><strong><span aria-hidden="true">🗂️</span> SSD SATA</strong></td>
                   <td>~550 MB/s</td>
                   <td>~520 MB/s</td>
                   <td>SATA 6 Gb/s</td>
                   <td>2007</td>
                 </tr>
                 <tr>
-                  <td><strong>⚡ SSD NVMe Gen 3</strong></td>
+                  <td><strong><span aria-hidden="true">⚡</span> SSD NVMe Gen 3</strong></td>
                   <td>~3.500 MB/s</td>
                   <td>~3.000 MB/s</td>
                   <td>PCIe 3.0 × 4</td>
                   <td>2015</td>
                 </tr>
                 <tr>
-                  <td><strong>🚀 SSD NVMe Gen 4</strong></td>
+                  <td><strong><span aria-hidden="true">🚀</span> SSD NVMe Gen 4</strong></td>
                   <td>~7.000 MB/s</td>
                   <td>~6.500 MB/s</td>
                   <td>PCIe 4.0 × 4</td>
                   <td>2019</td>
                 </tr>
                 <tr>
-                  <td><strong>🔌 USB 2.0</strong></td>
+                  <td><strong><span aria-hidden="true">🔌</span> USB 2.0</strong></td>
                   <td>~35 MB/s</td>
                   <td>~25 MB/s</td>
                   <td>USB 2.0</td>
                   <td>2000</td>
                 </tr>
                 <tr>
-                  <td><strong>🔵 USB 3.0</strong></td>
+                  <td><strong><span aria-hidden="true">🔵</span> USB 3.0</strong></td>
                   <td>~380 MB/s</td>
                   <td>~300 MB/s</td>
                   <td>USB 3.2 Gen 1</td>
                   <td>2008</td>
                 </tr>
                 <tr>
-                  <td><strong>🟢 USB 3.2 Gen 2</strong></td>
+                  <td><strong><span aria-hidden="true">🟢</span> USB 3.2 Gen 2</strong></td>
                   <td>~900 MB/s</td>
                   <td>~800 MB/s</td>
                   <td>USB 3.2 Gen 2</td>
                   <td>2017</td>
                 </tr>
                 <tr>
-                  <td><strong>⚡ USB4 / TB4</strong></td>
+                  <td><strong><span aria-hidden="true">⚡</span> USB4 / TB4</strong></td>
                   <td>~3.500 MB/s</td>
                   <td>~3.000 MB/s</td>
                   <td>USB4 / TB3/4 (USB-C)</td>
                   <td>2019 / 2015</td>
                 </tr>
                 <tr>
-                  <td><strong>📱 UFS 4.0 (móvil)</strong></td>
+                  <td><strong><span aria-hidden="true">📱</span> UFS 4.0 (móvil)</strong></td>
                   <td>~4.200 MB/s</td>
                   <td>~2.800 MB/s</td>
                   <td>MIPI M-PHY HS-G4</td>
                   <td>2022</td>
                 </tr>
                 <tr>
-                  <td><strong>💳 SD UHS-I</strong></td>
+                  <td><strong><span aria-hidden="true">💳</span> SD UHS-I</strong></td>
                   <td>~95 MB/s</td>
                   <td>~50 MB/s</td>
                   <td>SD UHS-I (104 MB/s)</td>
@@ -557,7 +557,7 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
           <h2>Preguntas frecuentes</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué los SSD son tan más rápidos que los HDD?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué los SSD son tan más rápidos que los HDD?</h4>
               <p>
                 Los HDD (disco duro o disco rígido) almacenan datos en platos magnéticos giratorios que necesitan que el cabezal
                 lector se desplace físicamente hasta la posición correcta. Esto introduce una latencia
@@ -566,11 +566,11 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
                 pero para operaciones de acceso aleatorio (cargar un sistema operativo) puede ser de 100× o más.
               </p>
               <p className={styles.faqTip}>
-                💡 Para hacer acceso aleatorio (el patrón típico del arranque del SO), un SSD SATA básico ya supera a cualquier HDD. El NVMe solo añade ventaja extra en cargas de trabajo muy intensas.
+                <span aria-hidden="true">💡</span> Para hacer acceso aleatorio (el patrón típico del arranque del SO), un SSD SATA básico ya supera a cualquier HDD. El NVMe solo añade ventaja extra en cargas de trabajo muy intensas.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué significa «velocidad real» vs «velocidad teórica»?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué significa «velocidad real» vs «velocidad teórica»?</h4>
               <p>
                 La velocidad teórica (o ancho de banda máximo) es el límite físico del bus de comunicación:
                 USB 3.0 tiene 5 Gb/s = 625 MB/s teórico. La velocidad real es lo que se logra en la práctica
@@ -580,7 +580,7 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué el NVMe Gen 4 es casi tan rápido como USB4/Thunderbolt conectado externamente?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué el NVMe Gen 4 es casi tan rápido como USB4/Thunderbolt conectado externamente?</h4>
               <p>
                 USB4 y Thunderbolt 4 tienen 40 Gb/s de ancho de banda, lo que permite ~5.000 MB/s teórico.
                 Pero los SSD externos más rápidos del mercado están limitados por sus propios controladores
@@ -589,11 +589,11 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
                 a un NVMe Gen 4 interno directo en PCIe.
               </p>
               <p className={styles.faqTip}>
-                💡 Para portátiles sin ranura M.2 libre, un NVMe externo Thunderbolt es la forma de obtener velocidades cercanas al NVMe interno.
+                <span aria-hidden="true">💡</span> Para portátiles sin ranura M.2 libre, un NVMe externo Thunderbolt es la forma de obtener velocidades cercanas al NVMe interno.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Tiene sentido actualizar de NVMe Gen 3 a Gen 4?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Tiene sentido actualizar de NVMe Gen 3 a Gen 4?</h4>
               <p>
                 Para uso general (ofimática, navegación, edición de documentos): no se nota. Para edición
                 de vídeo 4K/RAW, desarrollo con compilaciones frecuentes o gaming de alto rendimiento:
@@ -603,7 +603,7 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Merece la pena un pendrive USB 3.2 Gen 2 frente a uno USB 3.0?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Merece la pena un pendrive USB 3.2 Gen 2 frente a uno USB 3.0?</h4>
               <p>
                 Depende del uso. Si solo mueves archivos de vez en cuando y el origen/destino también
                 es rápido, sí puede notarse. Pero muchos pendrives etiquetados como "USB 3.2 Gen 2"
@@ -613,7 +613,7 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es UFS y por qué los móviles de gama alta son tan rápidos?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es UFS y por qué los móviles de gama alta son tan rápidos?</h4>
               <p>
                 UFS (Universal Flash Storage) es el estándar de almacenamiento para smartphones. UFS 4.0,
                 presente en flagships desde 2023, alcanza 4.200 MB/s de lectura, superando a muchos SSD

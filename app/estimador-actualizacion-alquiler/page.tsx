@@ -220,7 +220,7 @@ export default function EstimadorActualizacionAlquilerPage() {
                 </>
               ) : (
                 <span className={styles.indiceLabel}>
-                  ⚠️ No hay datos disponibles para {resultado.claveIndice}. Consulta el INE directamente.
+                  <span aria-hidden="true">⚠️</span> No hay datos disponibles para {resultado.claveIndice}. Consulta el INE directamente.
                 </span>
               )}
             </div>
@@ -362,7 +362,7 @@ export default function EstimadorActualizacionAlquilerPage() {
             </table>
           </div>
           <p className={styles.tablaNota}>
-            ⚠️ Valores orientativos. Verifica el dato oficial en{' '}
+            <span aria-hidden="true">⚠️</span> Valores orientativos. Verifica el dato oficial en{' '}
             <a href="https://www.ine.es/jaxiT3/Tabla.htm?t=25171" target="_blank" rel="noopener noreferrer">ine.es</a>{' '}
             antes de comunicar la actualización.
           </p>

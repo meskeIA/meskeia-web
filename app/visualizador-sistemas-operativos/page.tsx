@@ -963,33 +963,33 @@ export default function VisualizadorSistemasOperativos() {
                   <tr>
                     <td><strong>FAT32</strong></td>
                     <td>4 GB − 1 byte</td>
-                    <td>❌ No</td>
-                    <td>❌ No</td>
-                    <td>❌ No</td>
+                    <td><span aria-hidden="true">❌</span> No</td>
+                    <td><span aria-hidden="true">❌</span> No</td>
+                    <td><span aria-hidden="true">❌</span> No</td>
                     <td>Pendrives, SD, legacy</td>
                   </tr>
                   <tr>
                     <td><strong>NTFS</strong></td>
                     <td>16 TB (práctico)</td>
-                    <td>✅ Sí</td>
-                    <td>✅ ACLs</td>
-                    <td>✅ Nativa</td>
+                    <td><span aria-hidden="true">✅</span> Sí</td>
+                    <td><span aria-hidden="true">✅</span> ACLs</td>
+                    <td><span aria-hidden="true">✅</span> Nativa</td>
                     <td>Windows</td>
                   </tr>
                   <tr>
                     <td><strong>ext4</strong></td>
                     <td>16 TB</td>
-                    <td>✅ Sí</td>
-                    <td>✅ rwxrwxrwx</td>
-                    <td>❌ No nativa</td>
+                    <td><span aria-hidden="true">✅</span> Sí</td>
+                    <td><span aria-hidden="true">✅</span> rwxrwxrwx</td>
+                    <td><span aria-hidden="true">❌</span> No nativa</td>
                     <td>Linux (default)</td>
                   </tr>
                   <tr>
                     <td><strong>APFS</strong></td>
                     <td>8 EB</td>
-                    <td>✅ Copy-on-Write</td>
-                    <td>✅ Sí</td>
-                    <td>✅ Nativa</td>
+                    <td><span aria-hidden="true">✅</span> Copy-on-Write</td>
+                    <td><span aria-hidden="true">✅</span> Sí</td>
+                    <td><span aria-hidden="true">✅</span> Nativa</td>
                     <td>macOS, iOS</td>
                   </tr>
                 </tbody>
@@ -1030,36 +1030,36 @@ export default function VisualizadorSistemasOperativos() {
                 <td><strong>FAT32</strong></td>
                 <td>Pendrives, SD, legacy</td>
                 <td>4 GB − 1 byte</td>
-                <td>❌ No</td>
-                <td>❌ No</td>
-                <td>❌ No</td>
+                <td><span aria-hidden="true">❌</span> No</td>
+                <td><span aria-hidden="true">❌</span> No</td>
+                <td><span aria-hidden="true">❌</span> No</td>
                 <td>1996</td>
               </tr>
               <tr>
                 <td><strong>NTFS</strong></td>
                 <td>Windows</td>
                 <td>16 TB (práctico)</td>
-                <td>✅ Sí</td>
-                <td>✅ ACLs</td>
-                <td>✅ BitLocker</td>
+                <td><span aria-hidden="true">✅</span> Sí</td>
+                <td><span aria-hidden="true">✅</span> ACLs</td>
+                <td><span aria-hidden="true">✅</span> BitLocker</td>
                 <td>1993</td>
               </tr>
               <tr>
                 <td><strong>ext4</strong></td>
                 <td>Linux (default)</td>
                 <td>16 TB</td>
-                <td>✅ Sí</td>
-                <td>✅ rwxrwxrwx</td>
-                <td>❌ No nativa</td>
+                <td><span aria-hidden="true">✅</span> Sí</td>
+                <td><span aria-hidden="true">✅</span> rwxrwxrwx</td>
+                <td><span aria-hidden="true">❌</span> No nativa</td>
                 <td>2008</td>
               </tr>
               <tr>
                 <td><strong>APFS</strong></td>
                 <td>macOS, iOS</td>
                 <td>8 EB</td>
-                <td>✅ Copy-on-Write</td>
-                <td>✅ Sí</td>
-                <td>✅ FileVault 2</td>
+                <td><span aria-hidden="true">✅</span> Copy-on-Write</td>
+                <td><span aria-hidden="true">✅</span> Sí</td>
+                <td><span aria-hidden="true">✅</span> FileVault 2</td>
                 <td>2017</td>
               </tr>
             </tbody>

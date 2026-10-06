@@ -498,7 +498,7 @@ export default function SimuladorReemplazoPaginas() {
         {/* Anomalía de Belady */}
         {parseado.ok && anomaliaBelady && (
           <div className={styles.beladyAlert} role="alert">
-            <strong>⚠ Anomalía de Belady detectada en FIFO</strong>
+            <strong><span aria-hidden="true">⚠</span> Anomalía de Belady detectada en FIFO</strong>
             <p>
               Con {numMarcos} marcos hay menos fallos que con {numMarcos + 1} marcos. Es un caso clásico
               en el que añadir memoria empeora el rendimiento de FIFO. Ningún algoritmo de pila (LRU, Optimal) sufre esta anomalía.
@@ -743,7 +743,7 @@ export default function SimuladorReemplazoPaginas() {
               Aproxima LRU sin pagar el coste de actualizar timestamps en cada acceso.
             </p>
             <div className={styles.escenarioTip}>
-              💡 Usar LRU puro en hardware moderno costaría más que ahorra en fallos.
+              <span aria-hidden="true">💡</span> Usar LRU puro en hardware moderno costaría más que ahorra en fallos.
             </div>
           </div>
           <div className={styles.escenarioCard}>
@@ -756,7 +756,7 @@ export default function SimuladorReemplazoPaginas() {
               LRU-K) para distinguir páginas calientes de fríos sin penalizar accesos esporádicos.
             </p>
             <div className={styles.escenarioTip}>
-              💡 LRU puro sufre con escaneos secuenciales largos (cache pollution).
+              <span aria-hidden="true">💡</span> LRU puro sufre con escaneos secuenciales largos (cache pollution).
             </div>
           </div>
           <div className={styles.escenarioCard}>
@@ -769,7 +769,7 @@ export default function SimuladorReemplazoPaginas() {
               para servir contenido a millones de usuarios manteniendo objetos virales en memoria.
             </p>
             <div className={styles.escenarioTip}>
-              💡 El reemplazo eficiente es el corazón del rendimiento de un CDN.
+              <span aria-hidden="true">💡</span> El reemplazo eficiente es el corazón del rendimiento de un CDN.
             </div>
           </div>
           <div className={styles.escenarioCard}>
@@ -782,7 +782,7 @@ export default function SimuladorReemplazoPaginas() {
               con FIFO, LRU y Optimal. Saber dibujar la tabla y contar fallos es competencia básica.
             </p>
             <div className={styles.escenarioTip}>
-              💡 La cadena de Belady (1,2,3,4,1,2,5,1,2,3,4,5) es ejemplo clásico.
+              <span aria-hidden="true">💡</span> La cadena de Belady (1,2,3,4,1,2,5,1,2,3,4,5) es ejemplo clásico.
             </div>
           </div>
         </div>
@@ -798,7 +798,7 @@ export default function SimuladorReemplazoPaginas() {
               marcos puede ser distinta de la que se retiraría con N+1.
             </p>
             <p className={styles.faqTip}>
-              💡 Algoritmos como LRU u Optimal cumplen la propiedad de pila y nunca empeoran al añadir marcos.
+              <span aria-hidden="true">💡</span> Algoritmos como LRU u Optimal cumplen la propiedad de pila y nunca empeoran al añadir marcos.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -809,7 +809,7 @@ export default function SimuladorReemplazoPaginas() {
               programas arbitrarios. Solo es útil como cota inferior para evaluar otros algoritmos.
             </p>
             <p className={styles.faqTip}>
-              💡 Si tu algoritmo da el doble de fallos que Optimal, sabes que tienes margen.
+              <span aria-hidden="true">💡</span> Si tu algoritmo da el doble de fallos que Optimal, sabes que tienes margen.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -821,7 +821,7 @@ export default function SimuladorReemplazoPaginas() {
               FreeBSD) usan variantes de Clock, no LRU puro.
             </p>
             <p className={styles.faqTip}>
-              💡 La diferencia es de 5-10% de fallos pero 100x menos sobrecarga.
+              <span aria-hidden="true">💡</span> La diferencia es de 5-10% de fallos pero 100x menos sobrecarga.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -832,7 +832,7 @@ export default function SimuladorReemplazoPaginas() {
               orden temporal aproximado sin actualizar nada en cada acceso.
             </p>
             <p className={styles.faqTip}>
-              💡 La MMU de x86 ofrece un bit Accessed por entrada de tabla de páginas.
+              <span aria-hidden="true">💡</span> La MMU de x86 ofrece un bit Accessed por entrada de tabla de páginas.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -843,7 +843,7 @@ export default function SimuladorReemplazoPaginas() {
               kernel, que decide si traerla del disco, mapearla, o terminar el proceso (segfault).
             </p>
             <p className={styles.faqTip}>
-              💡 No todo trap es fallo de página: hay traps por división por cero, instrucciones inválidas, etc.
+              <span aria-hidden="true">💡</span> No todo trap es fallo de página: hay traps por división por cero, instrucciones inválidas, etc.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -855,7 +855,7 @@ export default function SimuladorReemplazoPaginas() {
               imposible.
             </p>
             <p className={styles.faqTip}>
-              💡 Las decisiones reales mezclan reemplazo + working set + paginación bajo demanda.
+              <span aria-hidden="true">💡</span> Las decisiones reales mezclan reemplazo + working set + paginación bajo demanda.
             </p>
           </div>
         </div>

@@ -189,7 +189,7 @@ export default function CalculadoraInfraseguroPage() {
               {/* Ejemplo práctico */}
               {resultado.hayInfraseguro && (
                 <div className={styles.ejemploBox}>
-                  <h3>📋 Resumen de tu situación</h3>
+                  <h3><span aria-hidden="true">📋</span> Resumen de tu situación</h3>
                   <ul>
                     <li>
                       <strong>Has sufrido un daño de:</strong> {formatCurrency(parseSpanishNumber(importeDano) || 0)}

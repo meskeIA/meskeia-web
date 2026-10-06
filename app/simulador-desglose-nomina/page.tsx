@@ -813,7 +813,7 @@ export default function SimuladorDesgloseNominaPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🧑‍💼 Mediano — 30.000 € brutos / 14 pagas</h4>
+              <h4><span aria-hidden="true">🧑‍💼</span> Mediano — 30.000 € brutos / 14 pagas</h4>
               <p>
                 <strong>SS trabajador:</strong> ~1.940 €/año<br />
                 <strong>IRPF retenido:</strong> ~3.600–3.900 €<br />
@@ -826,7 +826,7 @@ export default function SimuladorDesgloseNominaPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>👔 Alto — 60.000 € brutos / 14 pagas</h4>
+              <h4><span aria-hidden="true">👔</span> Alto — 60.000 € brutos / 14 pagas</h4>
               <p>
                 <strong>SS trabajador (base máx.):</strong> ~3.810 €/año<br />
                 <strong>IRPF retenido:</strong> ~12.500–13.500 €<br />
@@ -838,7 +838,7 @@ export default function SimuladorDesgloseNominaPage() {
               </p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🏢 Directivo — 120.000 € brutos / 14 pagas</h4>
+              <h4><span aria-hidden="true">🏢</span> Directivo — 120.000 € brutos / 14 pagas</h4>
               <p>
                 <strong>SS trabajador (base máx.):</strong> ~4.448 €/año<br />
                 <strong>IRPF retenido:</strong> ~36.000–39.000 €<br />

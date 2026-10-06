@@ -585,14 +585,14 @@ export default function SimuladorSesgosInversorPage() {
               </tr>
             </thead>
             <tbody>
-              <tr><td><strong>😨 Aversión a pérdidas</strong></td><td>Evitar volatilidad aunque la rentabilidad esperada sea mayor</td><td>Carteras demasiado conservadoras para el horizonte temporal</td></tr>
-              <tr><td><strong>📉 Efecto de disposición</strong></td><td>Vender ganadoras pronto, aguantar perdedoras</td><td>Cartera progresivamente peor con el tiempo</td></tr>
-              <tr><td><strong>🔍 Sesgo de confirmación</strong></td><td>Buscar solo información que valide la decisión ya tomada</td><td>Mantener inversiones malas ignorando señales de alerta</td></tr>
-              <tr><td><strong>🐑 Efecto manada</strong></td><td>Comprar cuando hay euforia generalizada</td><td>Comprar en máximos y vender en mínimos</td></tr>
-              <tr><td><strong>📅 Sesgo de recencia</strong></td><td>Extrapolar el pasado reciente al futuro</td><td>Aumentar riesgo antes de correcciones</td></tr>
-              <tr><td><strong>🎯 Exceso de confianza</strong></td><td>Creer que se bate al mercado de forma sistemática</td><td>Más operaciones, más costes, menor rentabilidad neta</td></tr>
-              <tr><td><strong>⚓ Sesgo de anclaje</strong></td><td>Tomar el precio de compra como referencia para vender</td><td>Mantener activos malos esperando recuperar el precio inicial</td></tr>
-              <tr><td><strong>🪨 Statu quo</strong></td><td>No rebalancear por inercia</td><td>Asumir más o menos riesgo del deseado según deriva el mercado</td></tr>
+              <tr><td><strong><span aria-hidden="true">😨</span> Aversión a pérdidas</strong></td><td>Evitar volatilidad aunque la rentabilidad esperada sea mayor</td><td>Carteras demasiado conservadoras para el horizonte temporal</td></tr>
+              <tr><td><strong><span aria-hidden="true">📉</span> Efecto de disposición</strong></td><td>Vender ganadoras pronto, aguantar perdedoras</td><td>Cartera progresivamente peor con el tiempo</td></tr>
+              <tr><td><strong><span aria-hidden="true">🔍</span> Sesgo de confirmación</strong></td><td>Buscar solo información que valide la decisión ya tomada</td><td>Mantener inversiones malas ignorando señales de alerta</td></tr>
+              <tr><td><strong><span aria-hidden="true">🐑</span> Efecto manada</strong></td><td>Comprar cuando hay euforia generalizada</td><td>Comprar en máximos y vender en mínimos</td></tr>
+              <tr><td><strong><span aria-hidden="true">📅</span> Sesgo de recencia</strong></td><td>Extrapolar el pasado reciente al futuro</td><td>Aumentar riesgo antes de correcciones</td></tr>
+              <tr><td><strong><span aria-hidden="true">🎯</span> Exceso de confianza</strong></td><td>Creer que se bate al mercado de forma sistemática</td><td>Más operaciones, más costes, menor rentabilidad neta</td></tr>
+              <tr><td><strong><span aria-hidden="true">⚓</span> Sesgo de anclaje</strong></td><td>Tomar el precio de compra como referencia para vender</td><td>Mantener activos malos esperando recuperar el precio inicial</td></tr>
+              <tr><td><strong><span aria-hidden="true">🪨</span> Statu quo</strong></td><td>No rebalancear por inercia</td><td>Asumir más o menos riesgo del deseado según deriva el mercado</td></tr>
             </tbody>
           </table>
         </div>

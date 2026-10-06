@@ -295,7 +295,7 @@ export default function CaosMariposaPage() {
           <div className={styles.estadoDiv} role="alert" aria-live="polite">
             {divergeStep < N_STEPS ? (
               <span className={styles.estadoDivergente}>
-                ⚡ Las trayectorias divergen en el paso{' '}
+                <span aria-hidden="true">⚡</span> Las trayectorias divergen en el paso{' '}
                 {divergeStep.toLocaleString('es-ES')}
               </span>
             ) : (
@@ -388,7 +388,7 @@ export default function CaosMariposaPage() {
         </div>
 
         <div className={styles.warningBox}>
-          <strong>ℹ️ Nota:</strong> El atractor de Lorenz es un modelo simplificado de convección
+          <strong><span aria-hidden="true">ℹ️</span> Nota:</strong> El atractor de Lorenz es un modelo simplificado de convección
           atmosférica. Las trayectorias mostradas son proyecciones 2D (plano x-z) de un sistema
           tridimensional. La divergencia visualizada depende del ε y el número de pasos configurados.
         </div>

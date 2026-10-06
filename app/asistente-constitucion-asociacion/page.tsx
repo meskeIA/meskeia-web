@@ -767,10 +767,10 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
         {/* PASO: Introducción */}
         {step === 'intro' && (
           <div className={styles.stepContent}>
-            <h2>👋 Bienvenido al Asistente de Constitución de Asociación</h2>
+            <h2><span aria-hidden="true">👋</span> Bienvenido al Asistente de Constitución de Asociación</h2>
 
             <div className={styles.infoCard}>
-              <h3>📋 ¿Qué es una Asociación sin Ánimo de Lucro?</h3>
+              <h3><span aria-hidden="true">📋</span> ¿Qué es una Asociación sin Ánimo de Lucro?</h3>
               <p>
                 Una asociación es una agrupación de personas físicas o jurídicas que se unen
                 para conseguir un fin común de interés general o particular, sin ánimo de lucro.
@@ -801,7 +801,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.warningCard}>
-              <h4>⚠️ Documentos que generarás</h4>
+              <h4><span aria-hidden="true">⚠️</span> Documentos que generarás</h4>
               <ul>
                 <li><strong>Acta Fundacional</strong>: Documento de constitución firmado por todos los fundadores</li>
                 <li><strong>Estatutos</strong>: Normas de funcionamiento de la asociación</li>
@@ -819,14 +819,14 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
         {/* PASO: Fundadores */}
         {step === 'fundadores' && (
           <div className={styles.stepContent}>
-            <h2>👥 Datos de los Fundadores ({fundadores.length})</h2>
+            <h2><span aria-hidden="true">👥</span> Datos de los Fundadores ({fundadores.length})</h2>
             <p className={styles.stepDescription}>
               Introduce los datos de al menos 3 fundadores. Cada uno debe tener asignado un cargo en la Junta Directiva.
             </p>
 
             {validarFundadores.length > 0 && (
               <div className={styles.errorList}>
-                <h4>⚠️ Corrige los siguientes errores:</h4>
+                <h4><span aria-hidden="true">⚠️</span> Corrige los siguientes errores:</h4>
                 <ul>
                   {validarFundadores.map((error, i) => (
                     <li key={i}>{error}</li>
@@ -952,7 +952,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             )}
 
             <div className={styles.infoCard}>
-              <h4>ℹ️ Sobre los cargos de la Junta Directiva</h4>
+              <h4><span aria-hidden="true">ℹ️</span> Sobre los cargos de la Junta Directiva</h4>
               <ul>
                 {CARGOS_JUNTA.map(cargo => (
                   <li key={cargo.id}>
@@ -967,11 +967,11 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
         {/* PASO: Datos Básicos */}
         {step === 'datos-basicos' && (
           <div className={styles.stepContent}>
-            <h2>🏢 Datos de la Asociación</h2>
+            <h2><span aria-hidden="true">🏢</span> Datos de la Asociación</h2>
 
             {validarDatosBasicos.length > 0 && (
               <div className={styles.errorList}>
-                <h4>⚠️ Corrige los siguientes errores:</h4>
+                <h4><span aria-hidden="true">⚠️</span> Corrige los siguientes errores:</h4>
                 <ul>
                   {validarDatosBasicos.map((error, i) => (
                     <li key={i}>{error}</li>
@@ -1070,7 +1070,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.infoCard}>
-              <h4>📍 Sobre el ámbito territorial</h4>
+              <h4><span aria-hidden="true">📍</span> Sobre el ámbito territorial</h4>
               <ul>
                 <li><strong>Local/Provincial/Autonómico</strong>: Se inscribe en el Registro de la Comunidad Autónoma</li>
                 <li><strong>Nacional</strong>: Se inscribe en el Registro Nacional de Asociaciones (Ministerio del Interior)</li>
@@ -1082,11 +1082,11 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
         {/* PASO: Fines y Actividades */}
         {step === 'fines' && (
           <div className={styles.stepContent}>
-            <h2>🎯 Fines y Actividades</h2>
+            <h2><span aria-hidden="true">🎯</span> Fines y Actividades</h2>
 
             {validarFines.length > 0 && (
               <div className={styles.errorList}>
-                <h4>⚠️ Corrige los siguientes errores:</h4>
+                <h4><span aria-hidden="true">⚠️</span> Corrige los siguientes errores:</h4>
                 <ul>
                   {validarFines.map((error, i) => (
                     <li key={i}>{error}</li>
@@ -1186,7 +1186,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
         {/* PASO: Cuotas y Régimen */}
         {step === 'cuotas' && (
           <div className={styles.stepContent}>
-            <h2>💰 Cuotas y Régimen</h2>
+            <h2><span aria-hidden="true">💰</span> Cuotas y Régimen</h2>
 
             <div className={styles.formSection}>
               <h3>Cuotas de los socios</h3>
@@ -1287,7 +1287,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
 
               {datosAsociacion.acogerLey49_2002 && (
                 <div className={styles.infoCard}>
-                  <h4>ℹ️ Requisitos para acogerse a la Ley 49/2002</h4>
+                  <h4><span aria-hidden="true">ℹ️</span> Requisitos para acogerse a la Ley 49/2002</h4>
                   <ul>
                     <li>Perseguir fines de interés general</li>
                     <li>Destinar al menos el 70% de las rentas a los fines</li>
@@ -1305,13 +1305,13 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
         {/* PASO: Revisión */}
         {step === 'revision' && (
           <div className={styles.stepContent}>
-            <h2>✅ Revisión de Datos</h2>
+            <h2><span aria-hidden="true">✅</span> Revisión de Datos</h2>
             <p className={styles.stepDescription}>
               Revisa todos los datos antes de generar los documentos.
             </p>
 
             <div className={styles.resumenSection}>
-              <h3>📋 Datos de la Asociación</h3>
+              <h3><span aria-hidden="true">📋</span> Datos de la Asociación</h3>
               <div className={styles.resumenGrid}>
                 <div className={styles.resumenItem}>
                   <span className={styles.resumenLabel}>Denominación</span>
@@ -1339,7 +1339,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.resumenSection}>
-              <h3>👥 Fundadores y Junta Directiva</h3>
+              <h3><span aria-hidden="true">👥</span> Fundadores y Junta Directiva</h3>
               <div className={styles.resumenTable}>
                 <table>
                   <thead>
@@ -1363,7 +1363,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.resumenSection}>
-              <h3>🎯 Fines ({datosAsociacion.fines.length})</h3>
+              <h3><span aria-hidden="true">🎯</span> Fines ({datosAsociacion.fines.length})</h3>
               <ul className={styles.resumenList}>
                 {datosAsociacion.fines.map((fin, i) => (
                   <li key={i}>{fin}</li>
@@ -1372,7 +1372,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.resumenSection}>
-              <h3>📌 Actividades ({datosAsociacion.actividades.length})</h3>
+              <h3><span aria-hidden="true">📌</span> Actividades ({datosAsociacion.actividades.length})</h3>
               <ul className={styles.resumenList}>
                 {datosAsociacion.actividades.map((act, i) => (
                   <li key={i}>{act}</li>
@@ -1381,7 +1381,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.resumenSection}>
-              <h3>💰 Régimen económico</h3>
+              <h3><span aria-hidden="true">💰</span> Régimen económico</h3>
               <div className={styles.resumenGrid}>
                 <div className={styles.resumenItem}>
                   <span className={styles.resumenLabel}>Cuota de ingreso</span>
@@ -1417,7 +1417,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
         {/* PASO: Documentos */}
         {step === 'documentos' && (
           <div className={styles.stepContent}>
-            <h2>📄 Documentos Generados</h2>
+            <h2><span aria-hidden="true">📄</span> Documentos Generados</h2>
             <p className={styles.stepDescription}>
               Selecciona cada documento para verlo y copiarlo. Revísalos con un profesional antes de firmarlos.
             </p>
@@ -1476,7 +1476,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.warningCard}>
-              <h4>⚠️ Pasos siguientes</h4>
+              <h4><span aria-hidden="true">⚠️</span> Pasos siguientes</h4>
               <ol>
                 <li>Revisa los documentos con un abogado o gestor</li>
                 <li>Todos los fundadores deben firmar el Acta y los Estatutos</li>
@@ -1512,7 +1512,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
 
       {/* Disclaimer */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Legal Importante</h3>
+        <h3><span aria-hidden="true">⚠️</span> Aviso Legal Importante</h3>
         <p>
           Este asistente genera documentos orientativos basados en la normativa general de asociaciones
           (Ley Orgánica 1/2002). <strong>Los documentos generados NO constituyen asesoramiento jurídico</strong> y
@@ -1534,7 +1534,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
 
           <div className={styles.guideGrid}>
             <div className={styles.guideCard}>
-              <h4>👥 ¿Cuántos fundadores necesito?</h4>
+              <h4><span aria-hidden="true">👥</span> ¿Cuántos fundadores necesito?</h4>
               <p>
                 Mínimo 3 personas físicas o jurídicas. Pueden ser familiares directos
                 (cónyuge, hijos mayores de edad) sin ningún problema legal.
@@ -1542,7 +1542,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.guideCard}>
-              <h4>💼 ¿Puede la asociación tener empleados?</h4>
+              <h4><span aria-hidden="true">💼</span> ¿Puede la asociación tener empleados?</h4>
               <p>
                 Sí, la asociación puede contratar trabajadores, incluso a sus propios socios,
                 siempre que las funciones laborales estén diferenciadas de los cargos directivos.
@@ -1550,7 +1550,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.guideCard}>
-              <h4>🛡️ ¿Cuál es la responsabilidad de los socios?</h4>
+              <h4><span aria-hidden="true">🛡️</span> ¿Cuál es la responsabilidad de los socios?</h4>
               <p>
                 Si la asociación está inscrita en el Registro, el patrimonio de los socios
                 está completamente separado del de la asociación. Los socios no responden
@@ -1559,7 +1559,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.guideCard}>
-              <h4>📊 ¿Qué beneficios fiscales tiene?</h4>
+              <h4><span aria-hidden="true">📊</span> ¿Qué beneficios fiscales tiene?</h4>
               <p>
                 Acogida a la Ley 49/2002, la asociación puede tener exenciones en el IS y los
                 donantes pueden deducir el 80% de los primeros 250€ donados y el 40-45% del resto
@@ -1568,7 +1568,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.guideCard}>
-              <h4>💰 ¿Donativo vs Cuota de servicio?</h4>
+              <h4><span aria-hidden="true">💰</span> ¿Donativo vs Cuota de servicio?</h4>
               <p>
                 Los donativos (sin contraprestación) están exentos. Las cuotas por servicios
                 (ej: freemium) tributan en IS y llevan IVA del 21%. Es importante diferenciar
@@ -1577,7 +1577,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.guideCard}>
-              <h4>📋 ¿Qué registro debo usar?</h4>
+              <h4><span aria-hidden="true">📋</span> ¿Qué registro debo usar?</h4>
               <p>
                 Si el ámbito es autonómico o inferior, el Registro de la Comunidad Autónoma.
                 Si el ámbito es nacional, el Registro Nacional de Asociaciones del Ministerio del Interior.

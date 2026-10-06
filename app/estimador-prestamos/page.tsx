@@ -481,7 +481,7 @@ export default function SimuladorPrestamosPage() {
           Este simulador proporciona <strong>estimaciones educativas</strong> de préstamos personales.
         </p>
         <p>
-          <strong>⚠️ Factores NO incluidos:</strong>
+          <strong><span aria-hidden="true">⚠️</span> Factores NO incluidos:</strong>
         </p>
         <ul>
           <li><strong>Comisiones bancarias:</strong> Apertura, estudio, gestión, amortización anticipada</li>
@@ -577,10 +577,10 @@ export default function SimuladorPrestamosPage() {
           </div>
 
           <div className={styles.buttonRow}>
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Calcular
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -604,6 +604,7 @@ export default function SimuladorPrestamosPage() {
               <div className={styles.comparativaGrid}>
                 {resultados.map((r) => (
                   <button
+                    type="button"
                     key={r.sistema}
                     className={`${styles.sistemaCard} ${sistemaSeleccionado === r.sistema ? styles.active : ''}`}
                     onClick={() => setSistemaSeleccionado(r.sistema)}
@@ -659,6 +660,7 @@ export default function SimuladorPrestamosPage() {
               </div>
 
               <button
+                type="button"
                 onClick={() => setMostrarCuadro(!mostrarCuadro)}
                 className={styles.btnToggleCuadro}
                 aria-expanded={mostrarCuadro}
@@ -1024,13 +1026,14 @@ export default function SimuladorPrestamosPage() {
         <section className={styles.htmlSection}>
           <div className={styles.htmlHeader}>
             <div>
-              <h2>📋 Exportar Cuadro de Amortización</h2>
+              <h2><span aria-hidden="true">📋</span> Exportar Cuadro de Amortización</h2>
               <p className={styles.htmlSubtitle}>
                 Copia el código HTML para usar el cuadro en tu web, blog o documento
               </p>
             </div>
             <div className={styles.htmlActions}>
               <button
+                type="button"
                 onClick={() => setHtmlExpanded(!htmlExpanded)}
                 className={styles.btnToggleCode}
                 aria-label={htmlExpanded ? 'Ocultar código HTML' : 'Mostrar código HTML'}
@@ -1039,11 +1042,12 @@ export default function SimuladorPrestamosPage() {
               </button>
               {htmlExpanded && (
                 <button
+                  type="button"
                   onClick={copiarCodigo}
                   className={styles.btnCopyCode}
                   aria-label="Copiar código HTML al portapapeles"
                 >
-                  📋 Copiar
+                  <span aria-hidden="true">📋</span> Copiar
                 </button>
               )}
             </div>
@@ -1067,7 +1071,7 @@ export default function SimuladorPrestamosPage() {
       >
         {/* 2. Tabla Comparativa de Sistemas */}
       <section className={styles.comparativaSection}>
-        <h2>⚖️ Comparativa de Sistemas de Amortización</h2>
+        <h2><span aria-hidden="true">⚖️</span> Comparativa de Sistemas de Amortización</h2>
         <p className={styles.sectionIntro}>
           Cada sistema tiene ventajas según tu situación financiera. Aquí puedes ver ejemplos reales
           con un préstamo de 10.000 € a 3 años al 7% TIN:
@@ -1139,7 +1143,7 @@ export default function SimuladorPrestamosPage() {
 
       {/* 3. Casos de Uso Reales */}
       <section className={styles.casosSection}>
-        <h2>💡 Casos de Uso: ¿Cuándo solicitar un préstamo personal?</h2>
+        <h2><span aria-hidden="true">💡</span> Casos de Uso: ¿Cuándo solicitar un préstamo personal?</h2>
         <p className={styles.sectionIntro}>
           Los préstamos personales son útiles para financiar gastos específicos. Aquí tienes 5 ejemplos reales:
         </p>
@@ -1154,7 +1158,7 @@ export default function SimuladorPrestamosPage() {
               <p><strong>Resultado:</strong> Cuota mensual ~280 €, sin tocar ahorro de emergencia</p>
             </div>
             <div className={styles.casoTip}>
-              <strong>💡 Consejo:</strong> Compara con financiación del concesionario
+              <strong><span aria-hidden="true">💡</span> Consejo:</strong> Compara con financiación del concesionario
             </div>
           </div>
 
@@ -1167,7 +1171,7 @@ export default function SimuladorPrestamosPage() {
               <p><strong>Resultado:</strong> Cuota ~396 €, mejora valor vivienda +15%</p>
             </div>
             <div className={styles.casoTip}>
-              <strong>💡 Consejo:</strong> Pide presupuestos detallados antes de solicitar
+              <strong><span aria-hidden="true">💡</span> Consejo:</strong> Pide presupuestos detallados antes de solicitar
             </div>
           </div>
 
@@ -1180,7 +1184,7 @@ export default function SimuladorPrestamosPage() {
               <p><strong>Resultado:</strong> Ahorro de 1.950 € en intereses, 1 sola cuota</p>
             </div>
             <div className={styles.casoTip}>
-              <strong>💡 Consejo:</strong> Cancela las tarjetas tras pagar para evitar recaer
+              <strong><span aria-hidden="true">💡</span> Consejo:</strong> Cancela las tarjetas tras pagar para evitar recaer
             </div>
           </div>
 
@@ -1193,7 +1197,7 @@ export default function SimuladorPrestamosPage() {
               <p><strong>Resultado:</strong> Cuota ~241 €, carencia de 6 meses durante estudio</p>
             </div>
             <div className={styles.casoTip}>
-              <strong>💡 Consejo:</strong> Verifica si tu banco tiene líneas educativas especiales
+              <strong><span aria-hidden="true">💡</span> Consejo:</strong> Verifica si tu banco tiene líneas educativas especiales
             </div>
           </div>
 
@@ -1206,7 +1210,7 @@ export default function SimuladorPrestamosPage() {
               <p><strong>Resultado:</strong> Liquidez para arrancar sin presión inmediata</p>
             </div>
             <div className={styles.casoTip}>
-              <strong>💡 Consejo:</strong> Ten plan de negocio realista antes de endeudarte
+              <strong><span aria-hidden="true">💡</span> Consejo:</strong> Ten plan de negocio realista antes de endeudarte
             </div>
           </div>
         </div>
@@ -1214,7 +1218,7 @@ export default function SimuladorPrestamosPage() {
 
       {/* 4. FAQ */}
       <section className={styles.faqSection}>
-        <h2>❓ Preguntas Frecuentes sobre Préstamos Personales</h2>
+        <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Préstamos Personales</h2>
 
         <div className={styles.faqGrid}>
           <details className={styles.faqItem}>
@@ -1370,7 +1374,7 @@ export default function SimuladorPrestamosPage() {
             </summary>
             <div className={styles.faqAnswer}>
               <p>
-                <strong>⚠️ Nunca dejes de pagar sin avisar.</strong> Consecuencias de impago:
+                <strong><span aria-hidden="true">⚠️</span> Nunca dejes de pagar sin avisar.</strong> Consecuencias de impago:
               </p>
               <ul>
                 <li><strong>Intereses de demora:</strong> Suben automáticamente (pueden triplicar el TIN)</li>
@@ -1391,7 +1395,7 @@ export default function SimuladorPrestamosPage() {
 
       {/* 5. Guía Paso a Paso */}
       <section className={styles.guiaSection}>
-        <h2>🗺️ Guía Paso a Paso: Cómo Solicitar un Préstamo Personal</h2>
+        <h2><span aria-hidden="true">🗺️</span> Guía Paso a Paso: Cómo Solicitar un Préstamo Personal</h2>
         <p className={styles.sectionIntro}>
           Sigue estos 6 pasos para solicitar tu préstamo de forma inteligente y evitar sorpresas:
         </p>
@@ -1400,7 +1404,7 @@ export default function SimuladorPrestamosPage() {
           <div className={styles.step}>
             <div className={styles.stepNumber}>1</div>
             <div className={styles.stepContent}>
-              <h3>📊 Calcula tu capacidad de endeudamiento</h3>
+              <h3><span aria-hidden="true">📊</span> Calcula tu capacidad de endeudamiento</h3>
               <p>
                 Antes de solicitar, calcula cuánto puedes pagar mensualmente <strong>sin comprometer
                 tu estabilidad financiera</strong>:
@@ -1419,7 +1423,7 @@ export default function SimuladorPrestamosPage() {
           <div className={styles.step}>
             <div className={styles.stepNumber}>2</div>
             <div className={styles.stepContent}>
-              <h3>🏦 Compara ofertas de múltiples bancos</h3>
+              <h3><span aria-hidden="true">🏦</span> Compara ofertas de múltiples bancos</h3>
               <p>
                 <strong>Nunca te quedes con la primera oferta.</strong> Compara al menos 3-4 entidades:
               </p>
@@ -1438,7 +1442,7 @@ export default function SimuladorPrestamosPage() {
           <div className={styles.step}>
             <div className={styles.stepNumber}>3</div>
             <div className={styles.stepContent}>
-              <h3>📄 Prepara toda la documentación</h3>
+              <h3><span aria-hidden="true">📄</span> Prepara toda la documentación</h3>
               <p>
                 Reúne estos documentos antes de solicitar (acelera la aprobación):
               </p>
@@ -1458,7 +1462,7 @@ export default function SimuladorPrestamosPage() {
           <div className={styles.step}>
             <div className={styles.stepNumber}>4</div>
             <div className={styles.stepContent}>
-              <h3>📝 Lee la letra pequeña (FIPER)</h3>
+              <h3><span aria-hidden="true">📝</span> Lee la letra pequeña (FIPER)</h3>
               <p>
                 Antes de firmar, el banco debe entregarte el <strong>FIPER (Ficha de Información
                 Precontractual)</strong>. Revisa:
@@ -1471,7 +1475,7 @@ export default function SimuladorPrestamosPage() {
                 <li><strong>Penalizaciones por impago:</strong> ¿Qué pasa si no puedes pagar una cuota?</li>
               </ul>
               <div className={styles.stepWarning}>
-                ⚠️ Si algo no queda claro, <strong>pregunta antes de firmar.</strong> Una vez firmado, es difícil renegociar.
+                <span aria-hidden="true">⚠️</span> Si algo no queda claro, <strong>pregunta antes de firmar.</strong> Una vez firmado, es difícil renegociar.
               </div>
             </div>
           </div>
@@ -1479,7 +1483,7 @@ export default function SimuladorPrestamosPage() {
           <div className={styles.step}>
             <div className={styles.stepNumber}>5</div>
             <div className={styles.stepContent}>
-              <h3>✍️ Firma y recibe el dinero</h3>
+              <h3><span aria-hidden="true">✍️</span> Firma y recibe el dinero</h3>
               <p>
                 Una vez aprobado el préstamo:
               </p>
@@ -1497,7 +1501,7 @@ export default function SimuladorPrestamosPage() {
           <div className={styles.step}>
             <div className={styles.stepNumber}>6</div>
             <div className={styles.stepContent}>
-              <h3>📈 Gestiona tu préstamo de forma inteligente</h3>
+              <h3><span aria-hidden="true">📈</span> Gestiona tu préstamo de forma inteligente</h3>
               <p>
                 Una vez tengas el préstamo activo:
               </p>
@@ -1517,7 +1521,7 @@ export default function SimuladorPrestamosPage() {
 
       {/* 6. Mejores Prácticas */}
       <section className={styles.tipsSection}>
-        <h2>✨ Mejores Prácticas al Solicitar un Préstamo Personal</h2>
+        <h2><span aria-hidden="true">✨</span> Mejores Prácticas al Solicitar un Préstamo Personal</h2>
         <p className={styles.sectionIntro}>
           Estos consejos te ayudarán a elegir el mejor préstamo y evitar problemas:
         </p>

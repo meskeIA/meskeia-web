@@ -334,7 +334,7 @@ export default function EstimadorRiesgoOsteoporosis() {
           </div>
           <p>Menopausia precoz a los 48, madre con fractura de cadera. Riesgo alto. La densitometría DEXA es esencial para evaluar el estado óseo actual.</p>
           <div className={styles.escenarioExample}>Puntuación T-score: si &lt;-2,5 → diagnóstico osteoporosis establecida</div>
-          <div className={styles.escenarioTip}>💡 En mujeres posmenopáusicas con factores de riesgo, la DEXA está cubierta por la Seguridad Social.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> En mujeres posmenopáusicas con factores de riesgo, la DEXA está cubierta por la Seguridad Social.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -343,7 +343,7 @@ export default function EstimadorRiesgoOsteoporosis() {
           </div>
           <p>Artritis reumatoide tratada con prednisona. Los corticoides inhiben la formación ósea. Requiere seguimiento estrecho y puede necesitar tratamiento preventivo desde el inicio.</p>
           <div className={styles.escenarioExample}>Corticoides &gt;7,5 mg/día por más de 3 meses → indicación de densitometría y valorar tratamiento</div>
-          <div className={styles.escenarioTip}>💡 Comentar con el reumatólogo la mínima dosis de corticoides efectiva y suplementación de calcio/vitamina D.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Comentar con el reumatólogo la mínima dosis de corticoides efectiva y suplementación de calcio/vitamina D.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -352,7 +352,7 @@ export default function EstimadorRiesgoOsteoporosis() {
           </div>
           <p>La osteoporosis en hombres es menos frecuente pero existe. El sedentarismo acelera la pérdida ósea. El ejercicio de carga es la intervención más efectiva.</p>
           <div className={styles.escenarioExample}>Caminar 30 min/día + 2 sesiones de resistencia/semana = estímulo óseo significativo</div>
-          <div className={styles.escenarioTip}>💡 El ejercicio de resistencia (pesas, bandas) es más eficaz que caminar para fortalecer el hueso.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El ejercicio de resistencia (pesas, bandas) es más eficaz que caminar para fortalecer el hueso.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -361,7 +361,7 @@ export default function EstimadorRiesgoOsteoporosis() {
           </div>
           <p>Sin lácteos, la ingesta de calcio puede ser insuficiente. Alternativas: sardinas con espina, almendras, brócoli y bebidas vegetales fortificadas.</p>
           <div className={styles.escenarioExample}>Necesidades: 1.000-1.200 mg calcio/día. Sin lácteos, suplementación puede ser necesaria.</div>
-          <div className={styles.escenarioTip}>💡 La vitamina D mejora la absorción del calcio. Sin exposición solar suficiente, suplementar con 1.000-2.000 UI/día.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> La vitamina D mejora la absorción del calcio. Sin exposición solar suficiente, suplementar con 1.000-2.000 UI/día.</div>
         </div>
       </div>
 
@@ -399,7 +399,7 @@ export default function EstimadorRiesgoOsteoporosis() {
         <div className={styles.faqItem}>
           <strong>¿Los suplementos de calcio tienen efectos secundarios?</strong>
           <p>A dosis elevadas pueden aumentar el riesgo de cálculos renales y, según algunos estudios, eventos cardiovasculares. Se recomienda obtener el calcio de la dieta siempre que sea posible.</p>
-          <div className={styles.faqTip}>💡 Consultar con el médico antes de iniciar suplementación de calcio, especialmente si hay historial de cálculos renales.</div>
+          <div className={styles.faqTip}><span aria-hidden="true">💡</span> Consultar con el médico antes de iniciar suplementación de calcio, especialmente si hay historial de cálculos renales.</div>
         </div>
       </div>
 

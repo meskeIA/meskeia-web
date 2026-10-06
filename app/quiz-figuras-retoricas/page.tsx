@@ -160,7 +160,7 @@ export default function QuizFigurasRetoricaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Quiz Figuras Retóricas ✍️</h1>
+        <h1 className={styles.title}>Quiz Figuras Retóricas <span aria-hidden="true">✍️</span></h1>
         <p className={styles.subtitle}>
           Identifica metáforas, hipérboles, anáforas y mucho más · ESO, Bachillerato y Selectividad
         </p>
@@ -176,6 +176,7 @@ export default function QuizFigurasRetoricaPage() {
           <div className={styles.nivelGrid}>
             {(Object.entries(NIVEL_CONFIG) as [Nivel, typeof NIVEL_CONFIG[Nivel]][]).map(([key, cfg]) => (
               <button
+                type="button"
                 key={key}
                 className={`${styles.nivelBtn} ${nivel === key ? styles.active : ''}`}
                 onClick={() => setNivel(key)}
@@ -191,6 +192,7 @@ export default function QuizFigurasRetoricaPage() {
           <div className={styles.preguntasRow} role="group" aria-label="Número de preguntas">
             {OPCIONES_PREGUNTAS.map(n => (
               <button
+                type="button"
                 key={n}
                 className={`${styles.pregBtn} ${numPreguntas === n ? styles.active : ''}`}
                 onClick={() => setNumPreguntas(n)}
@@ -201,7 +203,7 @@ export default function QuizFigurasRetoricaPage() {
             ))}
           </div>
 
-          <button className={styles.btnIniciar} onClick={iniciarQuiz}>
+          <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
             Empezar Quiz — {numPreguntas} preguntas · {NIVEL_CONFIG[nivel].label}
           </button>
         </div>
@@ -259,6 +261,7 @@ export default function QuizFigurasRetoricaPage() {
               }
               return (
                 <button
+                  type="button"
                   key={opcion}
                   className={`${styles.opcion} ${claseExtra}`}
                   onClick={() => responder(opcion)}
@@ -310,7 +313,7 @@ export default function QuizFigurasRetoricaPage() {
                 </div>
               </div>
 
-              <button className={styles.btnSiguiente} onClick={siguiente}>
+              <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
                 {esUltima ? 'Ver resultados' : 'Siguiente pregunta →'}
               </button>
             </>
@@ -346,11 +349,11 @@ export default function QuizFigurasRetoricaPage() {
           </div>
 
           <div className={styles.botonesResultado}>
-            <button className={styles.btnRejugar} onClick={reiniciar}>
-              🔄 Jugar de nuevo
+            <button type="button" className={styles.btnRejugar} onClick={reiniciar}>
+              <span aria-hidden="true">🔄</span> Jugar de nuevo
             </button>
-            <button className={styles.btnConfig} onClick={volverConfig}>
-              ⚙️ Cambiar nivel
+            <button type="button" className={styles.btnConfig} onClick={volverConfig}>
+              <span aria-hidden="true">⚙️</span> Cambiar nivel
             </button>
           </div>
         </div>

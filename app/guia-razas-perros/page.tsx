@@ -1258,7 +1258,7 @@ export default function GuiaRazasPerrosPage() {
             <h2 className={styles.eduTitle}>¿Qué raza se adapta a tu vida?</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
-                <strong>👨‍👩‍👧‍👦 Familia con niños y jardín</strong>
+                <strong><span aria-hidden="true">👨‍👩‍👧‍👦</span> Familia con niños y jardín</strong>
                 <p>
                   Labrador Retriever, Golden Retriever o Beagle. Estas razas combinan paciencia,
                   energía controlada y amor por los juegos. El Labrador aguanta los zarandeos de
@@ -1266,7 +1266,7 @@ export default function GuiaRazasPerrosPage() {
                 </p>
               </div>
               <div className={styles.escenarioCard}>
-                <strong>🏙️ Persona en piso, ciudad</strong>
+                <strong><span aria-hidden="true">🏙️</span> Persona en piso, ciudad</strong>
                 <p>
                   Bulldog Francés, Shih Tzu, Bichón Frisé o Basset Hound. Razas de baja energía
                   que se conforman con paseos diarios moderados. El Bulldog Francés es el rey
@@ -1274,7 +1274,7 @@ export default function GuiaRazasPerrosPage() {
                 </p>
               </div>
               <div className={styles.escenarioCard}>
-                <strong>🏃 Deportista activo</strong>
+                <strong><span aria-hidden="true">🏃</span> Deportista activo</strong>
                 <p>
                   Border Collie, Husky Siberiano, Weimaraner o Braco Alemán. Estos perros
                   necesitan compañero de running, ciclismo o senderismo. Sin suficiente ejercicio
@@ -1282,7 +1282,7 @@ export default function GuiaRazasPerrosPage() {
                 </p>
               </div>
               <div className={styles.escenarioCard}>
-                <strong>👴 Persona mayor o tranquila</strong>
+                <strong><span aria-hidden="true">👴</span> Persona mayor o tranquila</strong>
                 <p>
                   Cavalier King Charles, Maltés, Shar Pei o Basset Hound. Razas de carácter
                   apacible que no requieren ejercicio intenso. El Cavalier es especialmente
