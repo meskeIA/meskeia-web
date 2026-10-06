@@ -440,7 +440,9 @@ export function calcularComplementoBrechaGenero(
     ? (p.sexo === 'hombre'
         ? `Procede valorar reclamación: nueva solicitud o reclamación previa contra la resolución denegatoria, citando la ${DOCTRINA.stjue.corto} y la doctrina del TS. Recomendable acudir a un abogado laboralista o al sindicato.`
         : 'Recupera la resolución denegatoria y revisa su motivo con un abogado laboralista o con tu sindicato antes de volver a solicitarlo.')
-    : 'Si ya cobras la pensión y el complemento no aparece en tu nómina, presenta una solicitud expresa ante el INSS (Sede Electrónica de la SS) citando el art. 60 LGSS.';
+    // Se SOLICITA, y es incompatible con el de maternidad que ya se cobre por otra pensión (DT
+    // 33.ª LGSS): la misma reparación que el verificador web (hallazgos 2927 y 2928, 06/10/2026).
+    : 'El complemento hay que solicitarlo ante el INSS (trámite «Solicitar un complemento por brecha de género o por maternidad», en la Sede Electrónica de la SS): si no se pidió con la pensión, puede hacerse en cualquier momento después. Si ya se cobra el antiguo complemento de maternidad por otra pensión, es incompatible con este: la DT 33.ª LGSS permite optar entre uno u otro.';
 
   // Concurrencia resuelta a favor del solicitante: se reconoce a él o a ella y se extingue
   // el del otro progenitor (art. 60.2 LGSS). El resto del veredicto no cambia.

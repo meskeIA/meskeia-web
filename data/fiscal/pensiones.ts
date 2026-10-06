@@ -556,7 +556,8 @@ export const TOPE_COMPLEMENTO_MINIMOS_2026 = {
 // Fuente: RD-Ley 3/2021 + RD-Ley 3/2026 (cuantía 2026)
 // Doctrina: TJUE 15-may-2025 + TS 9-jul-2025 (igualdad de trato H/M)
 // Verificado: 2026-05-13
-// URL oficial SS: https://www.seg-social.es/wps/portal/wss/internet/Pensionistas/Jubilacion/10963
+// URL oficial SS: https://prestaciones.seg-social.es/servicio/complemento-brecha.html (trámite vigente;
+// la anterior, seg-social.es/…/Jubilacion/10963, responde 200 sin contenido: hallazgo 2931, 06/10/2026)
 //
 // Sustituyó al antiguo complemento de maternidad (vigente desde 4-feb-2021).
 // Se abona junto con la pensión en 14 pagas. NO computa para el límite máximo
@@ -648,7 +649,7 @@ export const COMPLEMENTO_BRECHA_GENERO_META = {
   fuente: 'Art. 60 LGSS (RDL 8/2015, modificado por RDL 3/2021) + RDL 3/2026',
   verificado: '2026-05-13',
   vigencia: '2026',
-  urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Pensionistas/Jubilacion/10963',
+  urlOficial: 'https://prestaciones.seg-social.es/servicio/complemento-brecha.html',
   /**
    * La doctrina de igualdad de trato, DESGLOSADA en sus piezas para que la app pueda
    * citarla sin teclearla.

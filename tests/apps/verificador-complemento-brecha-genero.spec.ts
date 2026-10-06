@@ -3542,7 +3542,9 @@ test.describe('Re-inspección 01/10/2026', () => {
     expect(mcp).not.toContain('no aparece en tu nómina');
     expect(mcp).toContain('primer día del mes siguiente al de la resolución');
 
-    // Sin concurrencia, la rama general de una mujer no cambia
+    // Sin concurrencia, la rama general de una mujer también pide solicitarlo. Hasta el
+    // 06/10/2026 decía «Si ya cobras la pensión y no aparece el complemento en tu nómina…», que
+    // daba a entender que lo normal era recibirlo sin pedirlo (hallazgo 2927).
     await responderConSiembra(page, {
       pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
@@ -3550,7 +3552,8 @@ test.describe('Re-inspección 01/10/2026', () => {
       sexo: 'Mujer',
       otroProgenitor: 'No lo percibe ni lo ha solicitado',
     });
-    expect(await textoResultado(page)).toContain('Si ya cobras la pensión y no aparece el complemento en tu nómina');
+    expect(await textoResultado(page)).toContain('El complemento hay que solicitarlo ante el INSS');
+    expect(await textoResultado(page)).not.toContain('reconocimiento automático');
   });
 
   /**
@@ -3916,10 +3919,11 @@ test.describe('Re-inspección 06/10/2026', () => {
    *   · FAQPage: «el complemento se añade de oficio en muchos casos».
    * (Y «Errores frecuentes» dice lo contrario: «No siempre es así».)
    */
-  test('ABIERTO (06/10): ni el veredicto ni la guía ni el FAQPage dicen que se reconozca de oficio', async ({
+  // REPARADO el 06/10/2026 (hallazgo 2927): veredicto, caso típico, FAQ, «Errores frecuentes» y
+  // FAQPage dicen que se solicita, con el nombre del trámite de la SS.
+  test('ni el veredicto ni la guía ni el FAQPage dicen que se reconozca de oficio', async ({
     page,
   }) => {
-    test.fail();
     await responder06(page, {
       pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'El 4-feb-2021 o después',
@@ -3933,6 +3937,7 @@ test.describe('Re-inspección 06/10/2026', () => {
     expect(cuerpo).not.toContain('lo reconoce automáticamente');
     expect(cuerpo).not.toContain('suele reconocerlo de oficio');
     expect(await jsonLdDeLaPagina(page)).not.toContain('se añade de oficio');
+    expect(cuerpo).toContain('Solicitar un complemento por brecha de género o por maternidad');
   });
 
   /**
@@ -3947,10 +3952,11 @@ test.describe('Re-inspección 06/10/2026', () => {
    * `COMPLEMENTO_MATERNIDAD_DEROGADO` tampoco recoge la incompatibilidad.
    * El test pide que la página lo diga (incompatibilidad + opción), sin fijar cómo.
    */
-  test('ABIERTO (06/10): la DT 33.ª — el complemento de maternidad previo es incompatible y se opta', async ({
+  // REPARADO el 06/10/2026 (hallazgo 2928): el paso siguiente de la rama general, la nota de la
+  // tabla comparativa y el FAQPage avisan de la incompatibilidad y de la opción.
+  test('la DT 33.ª — el complemento de maternidad previo es incompatible y se opta', async ({
     page,
   }) => {
-    test.fail();
     await responder06(page, {
       pension: 'Viudedad',
       fecha: 'El 4-feb-2021 o después',
@@ -3959,10 +3965,13 @@ test.describe('Re-inspección 06/10/2026', () => {
       otroProgenitor: 'No procede (sin otro progenitor)',
     });
     expect(await textoResultado(page)).toContain('+73,80 €/mes');
+    // En el propio resultado, que es donde lo lee quien acaba de cumplir los requisitos
+    expect(await textoResultado(page)).toMatch(/complemento de maternidad[^.]{0,80}incompatible/);
     await abrirGuia(page);
     const cuerpo = normalizar(await page.locator('body').innerText());
     expect(cuerpo).toMatch(/maternidad[^.]{0,250}incompatib|incompatib[^.]{0,250}maternidad/i);
     expect(cuerpo).toMatch(/optar|elegir entre/i);
+    expect(await jsonLdDeLaPagina(page)).toMatch(/incompatibles y hay que optar/);
   });
 
   /**
@@ -3992,8 +4001,8 @@ test.describe('Re-inspección 06/10/2026', () => {
    * absoluta o gran invalidez)». La LGSS dice «gran incapacidad» desde el 01/05/2025 (art.
    * 194.1.d, DA única de la Ley 2/2025), y data/fiscal ya lo cambió el 03/10 (d6ba391e).
    */
-  test('ABIERTO (06/10): el FAQPage nombra la «gran incapacidad», no la «gran invalidez»', async ({ page }) => {
-    test.fail();
+  // REPARADO el 06/10/2026 (hallazgo 2930).
+  test('el FAQPage nombra la «gran incapacidad», no la «gran invalidez»', async ({ page }) => {
     const ld = await jsonLdDeLaPagina(page);
     expect(ld).not.toContain('gran invalidez');
     expect(ld).toContain('gran incapacidad');
@@ -4008,8 +4017,10 @@ test.describe('Re-inspección 06/10/2026', () => {
    * determinista: que el sello deje de apuntar a la URL muerta (una comprobación por red
    * en el spec sería frágil).
    */
-  test('ABIERTO (06/10): el sello del complemento no enlaza a una página sin contenido', async ({ page }) => {
-    test.fail();
+  // REPARADO el 06/10/2026 (hallazgo 2931): el sello apunta al trámite vigente de
+  // prestaciones.seg-social.es, leído en Chromium ese día («Requisitos relacionados con el
+  // complemento por brecha de género», «Puedes solicitar el complemento en cualquier momento…»).
+  test('el sello del complemento no enlaza a una página sin contenido', async ({ page }) => {
     const MUERTA = 'https://www.seg-social.es/wps/portal/wss/internet/Pensionistas/Jubilacion/10963';
     await expect(page.locator(`a[href="${COMPLEMENTO_BRECHA_GENERO_META.urlOficial}"]`).first()).toBeAttached();
     expect(COMPLEMENTO_BRECHA_GENERO_META.urlOficial).not.toBe(MUERTA);

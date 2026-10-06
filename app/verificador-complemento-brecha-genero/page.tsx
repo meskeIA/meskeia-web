@@ -476,12 +476,21 @@ function evaluar(
         // falta resolución con audiencia (art. 60.2, hallazgo 2543).
         : concurrenciaAFavor
           ? 'Cumples los requisitos básicos del art. 60 LGSS (pensión contributiva e hijos computables).'
-          : 'Cumples los requisitos básicos del art. 60 LGSS para reconocimiento automático del ' +
-            'complemento (mujer con pensión contributiva e hijos computables).',
+          // Sin «reconocimiento automático»: el trámite oficial de la SS es una solicitud
+          // (hallazgo 2927, 06/10/2026).
+          : 'Cumples los requisitos básicos del art. 60 LGSS (mujer con pensión contributiva e ' +
+            'hijos computables).',
     esReclamacion: false,
+    // El complemento se SOLICITA (trámite «Solicitar un complemento por brecha de género o por
+    // maternidad» de la SS: «Puedes solicitar el complemento en cualquier momento desde que te
+    // hayan concedido la pensión») y es incompatible con el de maternidad que ya se cobre por una
+    // pensión anterior (DT 33.ª LGSS, párrafo segundo). Hallazgos 2927 y 2928, 06/10/2026.
     pasoSiguiente:
-      'Si ya cobras la pensión y no aparece el complemento en tu nómina, presenta una solicitud ' +
-      'expresa ante el INSS (Sede Electrónica de la SS) citando el art. 60 LGSS.',
+      'El complemento hay que solicitarlo ante el INSS (trámite «Solicitar un complemento por ' +
+      'brecha de género o por maternidad», en la Sede Electrónica de la SS): si no lo pediste con ' +
+      'la pensión, puedes hacerlo en cualquier momento después. Si ya cobras el antiguo ' +
+      'complemento de maternidad por otra pensión, es incompatible con este: la DT 33.ª LGSS te ' +
+      'deja optar entre uno u otro, y conviene comparar los dos importes antes de elegir.',
   });
 }
 
@@ -1078,7 +1087,9 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             Las cifras de la columna del régimen derogado son las del{' '}
             <strong>{MATERNIDAD.norma}</strong>, vigente hasta el{' '}
             {formatFechaLarga(MATERNIDAD.vigenteHasta)}. Quien lo tuviera reconocido lo conserva
-            (DT 33.ª LGSS), y por eso sigue aquí.
+            (DT 33.ª LGSS), y por eso sigue aquí. Esa misma disposición lo declara incompatible
+            con el de brecha de género que corresponda por una pensión nueva: quien cobre el de
+            maternidad y cause otra pensión desde el {FECHA_MINIMA_CORTA} tiene que optar por uno de los dos.
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -1140,8 +1151,8 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 lo perciba. <strong>Resultado:</strong> 3 × {CUANTIA_MES} ={' '}
                 <strong>{formatCurrency(3 * COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual)}/mes</strong>{' '}
                 ({formatCurrency(3 * COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual * COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales)}/año
-                en {COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales} pagas). El INSS suele reconocerlo de oficio o con
-                solicitud expresa.
+                en {COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales} pagas). Hay que solicitarlo al INSS, con la
+                pensión o en cualquier momento después.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -1185,9 +1196,10 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             <div className={styles.faqItem}>
               <h3>¿Hay que pedirlo expresamente o se reconoce de oficio?</h3>
               <p>
-                En muchos casos el INSS lo reconoce automáticamente al resolver la pensión. Si no
-                aparece en la nómina, conviene pedirlo por escrito ante el INSS citando el art. 60
-                LGSS. Si el otro progenitor ya lo cobra por los mismos hijos, hay que pedirlo
+                Hay que pedirlo. La Seguridad Social lo tramita como solicitud («Solicitar un
+                complemento por brecha de género o por maternidad»), que se puede presentar en
+                cualquier momento desde que se concede la pensión, siempre que se cumplan los
+                requisitos. Conviene comprobar después en la nómina que se está cobrando. Si el otro progenitor ya lo cobra por los mismos hijos, hay que pedirlo
                 siempre: {conCita(CONCURRENCIA.extincion.detalle, CONCURRENCIA.extincion.norma)}{' '}
                 {CONCURRENCIA.extincion.efectos}
               </p>
@@ -1426,7 +1438,8 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             <ul className={styles.warningList}>
               <li>
                 <strong>Dar por hecho que no procede.</strong> Muchos pensionistas no lo solicitan
-                pensando que se reconoce automáticamente. No siempre es así: revisa tu nómina.
+                pensando que se reconoce automáticamente. Hay que solicitarlo: revisa tu nómina y,
+                si no aparece, pídelo.
               </li>
               <li>
                 <strong>Confundirlo con el complemento de maternidad.</strong> Son figuras distintas

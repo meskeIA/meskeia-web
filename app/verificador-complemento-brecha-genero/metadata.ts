@@ -141,7 +141,7 @@ export const faqJsonLd = {
       name: '¿Cómo se solicita el complemento por brecha de género al INSS?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La solicitud se tramita ante el Instituto Nacional de la Seguridad Social (INSS) mediante el formulario de revisión de pensión. Puede presentarse de forma presencial en cualquier Centro de Atención e Información de la Seguridad Social, por sede electrónica con certificado digital o a través del servicio Tu Seguridad Social. Si la pensión ya está reconocida, el complemento se añade de oficio en muchos casos, pero conviene verificarlo en el resumen de la pensión.' +
+        text: 'La solicitud se tramita ante el Instituto Nacional de la Seguridad Social (INSS) con el trámite «Solicitar un complemento por brecha de género o por maternidad». Puede presentarse de forma presencial en cualquier Centro de Atención e Información de la Seguridad Social, por sede electrónica con certificado digital o a través del servicio Tu Seguridad Social. No se añade solo: puede pedirse al solicitar la pensión o en cualquier momento después de que se conceda, siempre que se cumplan los requisitos, y conviene comprobar en la nómina que se está cobrando. Quien ya cobre el antiguo complemento de maternidad por otra pensión no puede sumar los dos: son incompatibles y hay que optar por uno (DT 33.ª LGSS).' +
           // Hallazgo 2543: si lo cobra el otro progenitor, nunca es de oficio
           ` Si el otro progenitor ya lo cobra por los mismos hijos, hay que solicitarlo siempre: ${conCita(EXTINCION.detalle, EXTINCION.norma)}`,
       },
@@ -151,7 +151,7 @@ export const faqJsonLd = {
       name: '¿El complemento por brecha de género es compatible con cualquier tipo de pensión?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El complemento se reconoce sobre las pensiones contributivas de jubilación —ordinaria o anticipada—, incapacidad permanente (total, absoluta o gran invalidez) y viudedad. No procede en la jubilación parcial: el ${NORMA_EXCLUSION_JUBILACION_PARCIAL} lo excluye expresamente, y solo se reconoce cuando desde ella se accede a la jubilación plena. Tampoco alcanza a las pensiones no contributivas. Sí es compatible con el complemento a mínimos: el ${NORMA_COMPATIBLE_MINIMOS} dispone que su importe no cuenta como ingreso para determinar el derecho a ese complemento y que, cuando procede, se suma a la cuantía mínima reconocida.`,
+        text: `El complemento se reconoce sobre las pensiones contributivas de jubilación —ordinaria o anticipada—, incapacidad permanente (total, absoluta o gran incapacidad) y viudedad. No procede en la jubilación parcial: el ${NORMA_EXCLUSION_JUBILACION_PARCIAL} lo excluye expresamente, y solo se reconoce cuando desde ella se accede a la jubilación plena. Tampoco alcanza a las pensiones no contributivas. Sí es compatible con el complemento a mínimos: el ${NORMA_COMPATIBLE_MINIMOS} dispone que su importe no cuenta como ingreso para determinar el derecho a ese complemento y que, cuando procede, se suma a la cuantía mínima reconocida.`,
       },
     },
   ],
