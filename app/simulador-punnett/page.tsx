@@ -10,32 +10,30 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { formatNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorPunnett.module.css';
+
+import {
+  GENOTIPOS_A,
+  GENOTIPOS_B,
+  calcularProporciones,
+  cruzarDihibrido,
+  cruzarMonohibrido,
+  gametosDihibridoP,
+  gametosMonohibrido,
+  nombreFenotipo,
+  porcentaje,
+  type CeldaPunnett,
+  type GenotipoPar,
+  type GenotipoParB,
+  type TipoHerencia,
+} from './casos';
+import CasosAula from './CasosAula';
 
 // ============================================================
 // TIPOS
 // ============================================================
-type Alelo = 'A' | 'a' | 'B' | 'b';
-type GenotipoPar = 'AA' | 'Aa' | 'aa';
-type GenotipoParB = 'BB' | 'Bb' | 'bb';
-type TipoHerencia = 'monohibrido' | 'dihibrido';
-
-interface CeldaPunnett {
-  genotipo: string;
-  fenotipo:
-    | 'dominante'
-    | 'recesivo'
-    | 'dominante-dominante'
-    | 'dominante-recesivo'
-    | 'recesivo-dominante'
-    | 'recesivo-recesivo';
-  color: string;
-  gametoP1: string;
-  gametoP2: string;
-}
-
+// Los del cuadro (alelos, genotipos, celdas) viven en ./casos.ts junto al motor que los usa.
 interface Escenario {
   nombre: string;
   tipo: TipoHerencia;
@@ -56,162 +54,23 @@ const ESCENARIOS: Escenario[] = [
   { nombre: 'Dihíbrido clásico (AaBb×AaBb)', tipo: 'dihibrido', p1gA: 'Aa', p2gA: 'Aa', p1gB: 'Bb', p2gB: 'Bb' },
 ];
 
-const GENOTIPOS_A: GenotipoPar[] = ['AA', 'Aa', 'aa'];
-const GENOTIPOS_B: GenotipoParB[] = ['BB', 'Bb', 'bb'];
-
 /** Type guards de los <select>: lo que no se reconoce no entra en el estado, y así lo que se
  *  ve y lo que se calcula no pueden separarse (hallazgo 754). */
-/** Espacio duro (U+00A0) entre la cifra y el «%» (CLAUDE.md global §2, 25/09/2026). */
-const ESPACIO_DURO = ' ';
 const esGenotipoPar = (v: string): v is GenotipoPar => GENOTIPOS_A.includes(v as GenotipoPar);
 const esGenotipoParB = (v: string): v is GenotipoParB => GENOTIPOS_B.includes(v as GenotipoParB);
-/**
- * Porcentaje en formato español, con decimales SOLO cuando hacen falta: «25 %», «12,5 %»,
- * «6,25 %». Con Math.round a secas, 1/16 salía «6%» y 2/16 «13%», y la columna sumaba 101 %
- * en el dihíbrido clásico — en una página que pide al alumno verificar justamente esa suma
- * (hallazgo 751). Y 12,5 % es un dato que hay que poder copiar al examen.
- */
-const porcentaje = (v: number): string => {
-  const t = formatNumber(v, 2);
-  const cifra = t.includes(',') ? t.replace(/0+$/, '').replace(/,$/, '') : t;
-  // Con el «%» y separado por espacio DURO (U+00A0), como el «€»: con un espacio normal el «%»
-  // saltaba solo a la línea siguiente («… 1 (6,25» / «%) recesivo-recesivo.»), hallazgo 2588.
-  return `${cifra}${ESPACIO_DURO}%`;
-};
+
 // ============================================================
 // LÓGICA PURA (fuera del componente)
 // ============================================================
-/**
- * Los dos gametos de un genotipo.
- *
- * La validación vive AHORA en la entrada, no aquí: los <select> pasaban el valor con un `as
- * GenotipoPar` sin comprobar, y esta función terminaba devolviendo [a, a] para cualquier cosa
- * que no fuese AA ni Aa. Un valor desconocido —el navegador rechaza la opción y el desplegable
- * sigue enseñando «AA», pero React recibe cadena vacía— hacía que la rejilla se calculase con
- * un progenitor homocigoto recesivo: lo que se ve y lo que se calcula dejaban de ser lo mismo,
- * sin ningún aviso (hallazgo 754). Con `esGenotipoPar` en el onChange, lo que no se reconoce no
- * entra en el estado y el valor anterior se mantiene, así que aquí el tipo ya está garantizado.
- */
-function gametosMonohibrido(genotipo: GenotipoPar): [Alelo, Alelo] {
-  if (genotipo === 'AA') return ['A', 'A'];
-  if (genotipo === 'Aa') return ['A', 'a'];
-  return ['a', 'a'];
-}
-
-function gametosB(genotipo: GenotipoParB): [string, string] {
-  if (genotipo === 'BB') return ['B', 'B'];
-  if (genotipo === 'Bb') return ['B', 'b'];
-  return ['b', 'b'];
-}
-
-function ordenarAlelos(a: string, b: string): string {
-  // Poner mayúscula primero
-  if (a === a.toUpperCase() && b === b.toLowerCase()) return `${a}${b}`;
-  if (b === b.toUpperCase() && a === a.toLowerCase()) return `${b}${a}`;
-  return `${a}${b}`;
-}
-
-function colorMonohibrido(fenotipo: 'dominante' | 'recesivo'): string {
-  return fenotipo === 'dominante' ? '#1a5278' : '#cccccc';
-}
-
-function cruzarMonohibrido(p1: GenotipoPar, p2: GenotipoPar): CeldaPunnett[] {
-  const g1 = gametosMonohibrido(p1);
-  const g2 = gametosMonohibrido(p2);
-  const celdas: CeldaPunnett[] = [];
-  for (const a1 of g1) {
-    for (const a2 of g2) {
-      const genotipo = ordenarAlelos(a1, a2);
-      const fenotipo: 'dominante' | 'recesivo' = genotipo.includes('A') ? 'dominante' : 'recesivo';
-      // Determinar sub-tipo para color
-      let colorClass: CeldaPunnett['fenotipo'];
-      if (genotipo === 'AA') colorClass = 'dominante';
-      else if (genotipo === 'Aa') colorClass = 'dominante'; // heterocigoto es dominante fenotípicamente
-      else colorClass = 'recesivo';
-      celdas.push({
-        genotipo,
-        fenotipo: colorClass,
-        color: colorMonohibrido(fenotipo),
-        gametoP1: a1,
-        gametoP2: a2,
-      });
-    }
-  }
-  return celdas;
-}
+// El motor del cuadro (gametos, cruces, recuento y el formato del %) se MOVIÓ a ./casos.ts el
+// 06/10/2026: los casos para clase corrigen con él, y una sola implementación impide que la
+// corrección y el cuadro cuenten distinto. Aquí queda solo lo que es de la vista.
 
 // Devolvemos también el sub-tipo de celda para los colores diferenciados
 function celdaMonohibridoTipo(genotipo: string): 'homoDom' | 'hetero' | 'homoRec' {
   if (genotipo === 'AA') return 'homoDom';
   if (genotipo === 'Aa' || genotipo === 'aA') return 'hetero';
   return 'homoRec';
-}
-
-function gametosDihibridoP(gA: GenotipoPar, gB: GenotipoParB): string[] {
-  const aA = gametosMonohibrido(gA);
-  const aB = gametosB(gB);
-  const result: string[] = [];
-  for (const a of aA) for (const b of aB) result.push(`${a}${b}`);
-  return result;
-}
-
-function cruzarDihibrido(
-  p1gA: GenotipoPar,
-  p1gB: GenotipoParB,
-  p2gA: GenotipoPar,
-  p2gB: GenotipoParB
-): CeldaPunnett[] {
-  const g1 = gametosDihibridoP(p1gA, p1gB);
-  const g2 = gametosDihibridoP(p2gA, p2gB);
-  const celdas: CeldaPunnett[] = [];
-  for (const gam1 of g1) {
-    for (const gam2 of g2) {
-      // Combinar gametos: ordenar loci A y B
-      const a1 = gam1[0];
-      const b1 = gam1[1];
-      const a2 = gam2[0];
-      const b2 = gam2[1];
-      const genoA = ordenarAlelos(a1, a2);
-      const genoB = ordenarAlelos(b1, b2);
-      const genotipo = `${genoA}${genoB}`;
-      const tieneA = genoA.includes('A');
-      const tieneB = genoB.includes('B');
-      let fenotipo: CeldaPunnett['fenotipo'];
-      if (tieneA && tieneB) fenotipo = 'dominante-dominante';
-      else if (tieneA && !tieneB) fenotipo = 'dominante-recesivo';
-      else if (!tieneA && tieneB) fenotipo = 'recesivo-dominante';
-      else fenotipo = 'recesivo-recesivo';
-      const colorMap: Record<CeldaPunnett['fenotipo'], string> = {
-        'dominante': '#1a5278',
-        'recesivo': '#cccccc',
-        'dominante-dominante': '#1a5278',
-        'dominante-recesivo': '#48A9A6',
-        'recesivo-dominante': '#7FB3D3',
-        'recesivo-recesivo': '#cccccc',
-      };
-      celdas.push({
-        genotipo,
-        fenotipo,
-        color: colorMap[fenotipo],
-        gametoP1: gam1,
-        gametoP2: gam2,
-      });
-    }
-  }
-  return celdas;
-}
-
-function calcularProporciones(celdas: CeldaPunnett[]): {
-  genotipicas: Record<string, number>;
-  fenotipicas: Record<string, number>;
-} {
-  const genotipicas: Record<string, number> = {};
-  const fenotipicas: Record<string, number> = {};
-  for (const c of celdas) {
-    genotipicas[c.genotipo] = (genotipicas[c.genotipo] ?? 0) + 1;
-    fenotipicas[c.fenotipo] = (fenotipicas[c.fenotipo] ?? 0) + 1;
-  }
-  return { genotipicas, fenotipicas };
 }
 
 function formatRatio(counts: Record<string, number>): string {
@@ -257,18 +116,6 @@ function interpretarDihibrido(celdas: CeldaPunnett[]): string {
     `${rd} (${pct(rd)}) recesivo-dominante, ` +
     `${rr} (${pct(rr)}) recesivo-recesivo.`
   );
-}
-
-function nombreFenotipo(key: string): string {
-  const map: Record<string, string> = {
-    'dominante': 'Dominante (A_)',
-    'recesivo': 'Recesivo (aa)',
-    'dominante-dominante': 'Doble dominante (A_B_)',
-    'dominante-recesivo': 'Dom. A / Rec. B (A_bb)',
-    'recesivo-dominante': 'Rec. A / Dom. B (aaB_)',
-    'recesivo-recesivo': 'Doble recesivo (aabb)',
-  };
-  return map[key] ?? key;
 }
 
 function celdaEstiloMono(genotipo: string): string {
@@ -609,6 +456,9 @@ export default function SimuladorPunnettPage() {
           </button>
         ))}
       </div>
+
+      {/* === Casos para clase (skill /casos-aula-meskeia, 06/10/2026) === */}
+      <CasosAula />
 
       {/* ============================================================
           BLOQUE EDUCATIVO v2.0

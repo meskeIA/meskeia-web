@@ -1,5 +1,16 @@
 import { test, expect, devices, type Locator, type Page } from '@playwright/test';
 import { esperarPaginaAsentada } from './_hidratacion';
+import { readFileSync } from 'node:fs';
+import { parseSpanishNumber } from '../../lib/formatters';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+  leerRespuesta,
+  resolverCaso,
+  type DatosCaso,
+} from '../../app/simulador-punnett/casos';
 
 /**
  * stemum.com → el servidor local, para ver la app como la sirve el portal (data-brand="stemum"
@@ -216,8 +227,10 @@ test.describe('Cuadro de Punnett', () => {
   // ============================================================
   test('CASO 3 — no hay forma de teclear un genotipo inválido', async ({ page }) => {
     // Ningún campo de texto libre en la página: ni «Ab», ni cadena vacía, ni «AAa»
-    // pueden llegar al motor por la vía del usuario.
-    expect(await page.locator('input[type="text"], textarea').count()).toBe(0);
+    // pueden llegar al motor por la vía del usuario. ACOTADO el 06/10/2026: la casilla de
+    // respuesta de los casos para clase (#casos-respuesta) es texto libre, pero no alimenta el
+    // cuadro, solo la corrección; el resto de la página sigue sin ninguno.
+    expect(await page.locator('input[type="text"]:not(#casos-respuesta), textarea').count()).toBe(0);
 
     // Gen A: exactamente AA / Aa / aa en los dos progenitores.
     await expect(page.locator('#p1gA option')).toHaveText(['AA', 'Aa', 'aa']);
@@ -1398,5 +1411,276 @@ test.describe('Cuadro de Punnett · stemum.com · re-inspección 01/10/2026', ()
       });
       expect(cajas.seCruzan, `${ancho} px: píldora ${cajas.pildora} · título ${cajas.titulo}`).toBe(false);
     }
+  });
+});
+
+/*
+ * ═════════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (skill /casos-aula-meskeia, 06/10/2026) — tipo A, doce casos numerados.
+ *
+ * Van DETRÁS del acta del Inspector y la dejan intacta, salvo un recuento ACOTADO en su CASO 3
+ * (`:not(#casos-respuesta)`): la casilla de respuesta es texto libre, pero no llega al cuadro.
+ *
+ * CÓMO SE DERIVA CADA VALOR ESPERADO — a mano, con las leyes de Mendel:
+ *    1. Aa × Aa → aa = 1/4                                 → 25 %
+ *    2. Aa × Aa → Aa = 2/4                                 → 50 %
+ *    3. AA × aa → todo Aa (1.ª ley)                        → 100 %
+ *    4. Aa × aa → aa = 1/2 (cruce de prueba)               → 50 %
+ *    5. Aa × Aa → 1/4 verdes × 600                         → 150 semillas
+ *    6. AA × Aa → nadie es aa                              → 0 %
+ *    7. AaBb × AaBb → A_B_ = 3/4 · 3/4 = 9/16              → 56,25 %
+ *    8. AaBb × AaBb → aabb = 1/4 · 1/4 = 1/16              → 6,25 %
+ *    9. AaBb × AaBb → 3 genotipos de A · 3 de B            → 9
+ *   10. AaBB → gametos AB y aB                             → 2
+ *   11. AaBb × aabb → aabb = 1/2 · 1/2 = 1/4 × 320         → 80 semillas
+ *   12. AaBb × Aabb → A_bb = 3/4 · 1/2 = 3/8               → 37,5 %
+ *
+ * El test lo comprueba además con un Mendel PROPIO (`mendelIndependiente`): cada gen por
+ * separado y la regla del producto (3.ª ley), sin construir el cuadro de la app. Así la
+ * comparación no es la app contra sí misma.
+ * ═════════════════════════════════════════════════════════════════════════════════════════
+ */
+
+const ESPERADOS_CASOS: Record<number, number> = {
+  1: 25, 2: 50, 3: 100, 4: 50, 5: 150, 6: 0, 7: 56.25, 8: 6.25, 9: 9, 10: 2, 11: 80, 12: 37.5,
+};
+
+/** Probabilidad de cada genotipo de UN gen, enumerando los alelos de los dos padres. */
+function unGen(p1: string, p2: string): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const x of p1) {
+    for (const y of p2) {
+      // Mayúscula delante («aA» y «Aa» son el mismo genotipo): en ASCII las mayúsculas van antes
+      const g = x < y ? `${x}${y}` : `${y}${x}`;
+      m.set(g, (m.get(g) ?? 0) + 0.25);
+    }
+  }
+  return m;
+}
+
+const domina = (g: string) => g[0] === g[0].toUpperCase();
+
+/** La respuesta de un caso sin pasar por el motor de la app. */
+function mendelIndependiente(d: DatosCaso): number {
+  const genes = d.tipo === 'monohibrido' ? [unGen(d.p1, d.p2)] : [unGen(d.p1A, d.p2A), unGen(d.p1B, d.p2B)];
+  // Combinaciones de genotipos con su probabilidad (regla del producto)
+  let combos: Array<{ g: string; p: number; fen: string }> = [{ g: '', p: 1, fen: '' }];
+  for (const gen of genes) {
+    const sig: typeof combos = [];
+    for (const c of combos) {
+      for (const [g, p] of gen) {
+        const f = domina(g) ? 'dominante' : 'recesivo';
+        sig.push({ g: c.g + g, p: c.p * p, fen: c.fen ? `${c.fen}-${f}` : f });
+      }
+    }
+    combos = sig;
+  }
+  const q = d.pregunta;
+  const suma = (filtro: (c: (typeof combos)[number]) => boolean) =>
+    combos.filter(filtro).reduce((s, c) => s + c.p, 0);
+  switch (q.que) {
+    case 'porcentaje-fenotipo':
+      return suma((c) => c.fen === q.fenotipo) * 100;
+    case 'individuos-fenotipo':
+      return suma((c) => c.fen === q.fenotipo) * q.poblacion;
+    case 'porcentaje-genotipo':
+      return suma((c) => c.g === q.genotipo) * 100;
+    case 'individuos-genotipo':
+      return suma((c) => c.g === q.genotipo) * q.poblacion;
+    case 'genotipos-distintos':
+      return combos.length;
+    case 'gametos-distintos': {
+      const padre =
+        d.tipo === 'monohibrido'
+          ? [q.progenitor === 1 ? d.p1 : d.p2]
+          : q.progenitor === 1
+            ? [d.p1A, d.p1B]
+            : [d.p2A, d.p2B];
+      return padre.reduce((n, g) => n * new Set(g).size, 1);
+    }
+  }
+}
+
+test.describe('Cuadro de Punnett · casos para clase', () => {
+  test('1-4 · doce casos, ids 1..12, deterministas, completos y recalculables desde sus datos', () => {
+    expect(CASOS).toHaveLength(12);
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    for (const c of CASOS) {
+      expect(c.enunciado.length, `caso ${c.id}`).toBeGreaterThan(40);
+      expect(c.etiquetaRespuesta.trim(), `caso ${c.id}`).not.toBe('');
+      expect(Number.isFinite(c.respuesta), `caso ${c.id}`).toBe(true);
+      expect(c.pasos.length, `caso ${c.id}`).toBeGreaterThanOrEqual(2);
+      expect(c.pista.trim(), `caso ${c.id}`).not.toBe('');
+      // 3 · la respuesta declarada es la que sale de recalcular desde `datos`
+      const r = resolverCaso(c.datos);
+      expect(r.ok, `caso ${c.id}`).toBe(true);
+      expect(r.valor, `caso ${c.id}`).toBe(c.respuesta);
+      // 2 · determinista: recalcular otra vez da exactamente lo mismo
+      expect(resolverCaso(c.datos)).toEqual(r);
+    }
+    expect(new Set(CASOS.map((c) => c.categoria))).toEqual(new Set(['abstracto', 'aplicado']));
+  });
+
+  test('las doce respuestas coinciden con las resueltas a mano y con un Mendel independiente', () => {
+    for (const c of CASOS) {
+      expect(c.respuesta, `caso ${c.id}`).toBeCloseTo(ESPERADOS_CASOS[c.id], 10);
+      expect(mendelIndependiente(c.datos), `caso ${c.id}`).toBeCloseTo(ESPERADOS_CASOS[c.id], 10);
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda nacional', () => {
+    const lugares =
+      /españ|méxic|mexic|colombi|argentin|chile|perú|peru|venezuel|ecuador|guatemal|bolivi|uruguay|paraguay|cuba|honduras|salvador|nicaragu|costa rica|panam|dominican|madrid|barcelona|bogotá|lima|santiago|buenos aires|euro|dólar|dolar|pesos (mexicanos|colombianos|argentinos|chilenos)|selectividad|bachillerato/i;
+    for (const c of CASOS) {
+      expect(`${c.titulo} ${c.enunciado}`, `caso ${c.id}`).not.toMatch(lugares);
+      expect(`${c.titulo} ${c.enunciado}`, `caso ${c.id}`).not.toMatch(/\bESO\b/);
+    }
+  });
+
+  test('5.bis · la solución enseña la cifra EXACTA, sin redondear, y el % con espacio duro', () => {
+    // Ningún enunciado pide redondear: todas las respuestas son exactas (múltiplos de 6,25 % o
+    // enteros). Si alguien añade un caso que lo exija, este test le obliga a decidirlo.
+    for (const c of CASOS) expect(c.enunciado, `caso ${c.id}`).not.toMatch(/redonde/i);
+    expect(CASOS[7].respuestaTexto).toBe('6,25 %');
+    expect(CASOS[6].respuestaTexto).toBe('56,25 %');
+    expect(CASOS[11].respuestaTexto).toBe('37,5 %');
+    expect(CASOS[4].respuestaTexto).toBe('150 semillas');
+    expect(CASOS[8].respuestaTexto).toBe('9');
+    // Y ningún % con espacio normal en enunciados, pistas ni desarrollos (acta, hallazgo 2588)
+    for (const c of CASOS) {
+      for (const t of [c.enunciado, c.pista, ...c.pasos, c.respuestaTexto]) {
+        expect(t, `caso ${c.id}`).not.toMatch(/\d %/);
+      }
+    }
+  });
+
+  test('7 · convenio: proporciones sobre el total, dominancia completa, respuesta exacta', () => {
+    // Sobre el TOTAL: en AABB × AABB el cuadro tiene 16 casillas aunque solo haya un genotipo,
+    // y el desarrollo lo dice
+    const puros: DatosCaso = {
+      tipo: 'dihibrido', p1A: 'AA', p1B: 'BB', p2A: 'AA', p2B: 'BB',
+      pregunta: { que: 'porcentaje-genotipo', genotipo: 'AABB' },
+    };
+    const r = resolverCaso(puros);
+    expect(r.valor).toBe(100);
+    expect(r.pasos.join(' ')).toContain('= 16 casillas');
+    // Dominancia completa: en Aa × Aa el fenotipo dominante es AA + Aa = 75 %
+    expect(
+      resolverCaso({ tipo: 'monohibrido', p1: 'Aa', p2: 'Aa', pregunta: { que: 'porcentaje-fenotipo', fenotipo: 'dominante' } }).valor,
+    ).toBe(75);
+    // Exacta: «6» para un 6,25 % NO vale (es el hallazgo 751 de esta app), y se le dice por qué
+    const caso8 = CASOS[7];
+    const seis = comprobarRespuesta(6, caso8.respuesta, caso8.datos);
+    expect(seis.correcto).toBe(false);
+    expect(seis.motivo).toContain('no redondees');
+    expect(comprobarRespuesta(6.3, caso8.respuesta, caso8.datos).correcto).toBe(false);
+    expect(comprobarRespuesta(6.25, caso8.respuesta, caso8.datos).correcto).toBe(true);
+    // El motor de la app es UNO: page.tsx importa el cuadro de casos.ts y no lo redefine
+    const pagina = readFileSync('app/simulador-punnett/page.tsx', 'utf8');
+    expect(pagina).toMatch(/from '\.\/casos'/);
+    for (const f of ['cruzarMonohibrido', 'cruzarDihibrido', 'gametosMonohibrido', 'calcularProporciones', 'porcentaje']) {
+      expect(pagina, f).not.toMatch(new RegExp(`(function|const) ${f}\\b`));
+    }
+  });
+
+  test('corrección: fracciones, tanto por uno, «%» al final, texto ilegible y datos imposibles', () => {
+    const caso1 = CASOS[0]; // 25 %
+    const leer = (t: string, d: DatosCaso) => leerRespuesta(t, d, parseSpanishNumber);
+    expect(comprobarRespuesta(leer('1/4', caso1.datos), 25, caso1.datos).correcto).toBe(true);
+    expect(comprobarRespuesta(leer('25 %', caso1.datos), 25, caso1.datos).correcto).toBe(true);
+    expect(comprobarRespuesta(leer('25 %', caso1.datos), 25, caso1.datos).correcto).toBe(true);
+    expect(comprobarRespuesta(leer('9/16', CASOS[6].datos), 56.25, CASOS[6].datos).correcto).toBe(true);
+    expect(comprobarRespuesta(leer('56,25', CASOS[6].datos), 56.25, CASOS[6].datos).correcto).toBe(true);
+    const tantoPorUno = comprobarRespuesta(leer('0,25', caso1.datos), 25, caso1.datos);
+    expect(tantoPorUno.correcto).toBe(false);
+    expect(tantoPorUno.motivo).toContain('tanto por uno');
+    // En un recuento la fracción no tiene sentido: no se convierte, se pide un número
+    const caso5 = CASOS[4]; // 150 semillas
+    expect(Number.isNaN(leer('1/4', caso5.datos))).toBe(true);
+    expect(comprobarRespuesta(leer('1/4', caso5.datos), 150, caso5.datos).motivo).toContain('número entero');
+    expect(comprobarRespuesta(leer('150', caso5.datos), 150, caso5.datos).correcto).toBe(true);
+    expect(comprobarRespuesta(leer('149', caso5.datos), 150, caso5.datos).correcto).toBe(false);
+    expect(comprobarRespuesta(leer('1,5', caso5.datos), 150, caso5.datos).motivo).not.toContain('tanto por uno');
+    // El 0 % del caso 6 se acepta y no dispara el aviso de unidad
+    expect(comprobarRespuesta(leer('0', CASOS[5].datos), 0, CASOS[5].datos).correcto).toBe(true);
+    expect(comprobarRespuesta(NaN, 25, caso1.datos).motivo).toContain('Escribe un número');
+    expect(Number.isNaN(leer('1/0', caso1.datos))).toBe(true);
+    // Nada lanza: genotipos imposibles o mal escritos devuelven ok: false
+    const raro = { tipo: 'monohibrido', p1: 'Ab', p2: 'Aa', pregunta: { que: 'genotipos-distintos' } } as unknown as DatosCaso;
+    expect(resolverCaso(raro).ok).toBe(false);
+    expect(
+      resolverCaso({ tipo: 'monohibrido', p1: 'Aa', p2: 'Aa', pregunta: { que: 'porcentaje-genotipo', genotipo: 'aA' } }).ok,
+    ).toBe(false);
+    expect(
+      resolverCaso({
+        tipo: 'monohibrido', p1: 'Aa', p2: 'Aa',
+        pregunta: { que: 'individuos-fenotipo', fenotipo: 'recesivo', poblacion: 0 },
+      }).ok,
+    ).toBe(false);
+  });
+
+  test('6 · la práctica es reproducible, variada y corrige con el mismo resolverCaso', () => {
+    expect(generarEjercicioAleatorio(42)).toEqual(generarEjercicioAleatorio(42));
+    const respuestas = new Set<number>();
+    const escenarios = new Set<string>();
+    for (let s = 1; s <= 40; s++) {
+      const e = generarEjercicioAleatorio(s);
+      respuestas.add(e.respuesta);
+      escenarios.add(JSON.stringify(e.datos));
+      expect(Number.isFinite(e.respuesta), `semilla ${s}`).toBe(true);
+      expect(resolverCaso(e.datos).valor, `semilla ${s}`).toBe(e.respuesta);
+      expect(mendelIndependiente(e.datos), `semilla ${s}`).toBeCloseTo(e.respuesta, 10);
+      // Exacta con dos decimales como mucho, y los recuentos enteros
+      expect(Math.abs(e.respuesta * 100 - Math.round(e.respuesta * 100)), `semilla ${s}`).toBeLessThan(1e-9);
+      if (e.datos.pregunta.que === 'individuos-fenotipo') expect(Number.isInteger(e.respuesta)).toBe(true);
+      expect(e.enunciado, `semilla ${s}`).not.toContain('NaN');
+      expect(e.enunciado, `semilla ${s}`).not.toContain('undefined');
+    }
+    expect(respuestas.size).toBeGreaterThanOrEqual(3);
+    expect(escenarios.size).toBeGreaterThanOrEqual(20);
+  });
+});
+
+test.describe('Cuadro de Punnett · la sección de casos en el navegador', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+  const casilla = (page: Page) => page.locator('#casos-respuesta');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+  });
+
+  test('se corrige un caso, avisa del redondeo y acepta la fracción', async ({ page }) => {
+    await expect(seccion(page)).toBeVisible();
+    await expect(seccion(page).getByRole('button', { name: /^Caso \d+:/ })).toHaveCount(12);
+
+    await seccion(page).getByRole('button', { name: 'Caso 8: La casilla más rara del dihíbrido' }).click();
+    await expect(seccion(page).getByText(/genotipo aabb/)).toBeVisible();
+    await casilla(page).fill('6');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('no redondees');
+    await casilla(page).fill('1/16');
+    await casilla(page).press('Enter');
+    await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto!');
+
+    await seccion(page).getByRole('button', { name: 'Ver solución' }).click();
+    await expect(seccion(page).locator('#casos-solucion')).toContainText('6,25 %');
+
+    // La respuesta del caso 7 es la que pinta el propio cuadro con el dihíbrido clásico
+    await page.getByRole('button', { name: /Dihíbrido clásico/ }).click();
+    await expect(page.locator(RECUENTO)).toContainText('AaBb');
+    await seccion(page).getByRole('button', { name: 'Caso 7: Tercera ley: dos caracteres a la vez' }).click();
+    await casilla(page).fill('56,25 %');
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion(page).getByRole('alert')).toContainText('¡Correcto!');
+  });
+
+  test('la sección no duplica el role="status" del cuadro ni toca sus controles', async ({ page }) => {
+    await expect(page.locator('[role="status"]')).toHaveCount(1);
+    await expect(seccion(page).locator('select')).toHaveCount(0);
+    // El cuadro sigue en su estado por defecto tras usar los casos
+    await seccion(page).getByRole('button', { name: /^Caso 12:/ }).click();
+    await expect(page.locator(`${CUADRO} thead th`)).toHaveText(['P1 \\ P2', 'A', 'a']);
   });
 });
