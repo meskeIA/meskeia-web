@@ -1,0 +1,708 @@
+/* ============================================================
+   SimuladorCondensadores.module.css — paleta meskeIA
+   Las variables vienen de app/globals.css: aquí solo se usan.
+   ============================================================ */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.hero {
+  background: var(--hero-bg, #1a5278);
+  color: #fff;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: clamp(1.5rem, 4vw, 2.3rem);
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 1rem;
+  margin: 0 auto;
+  max-width: 720px;
+  color: #e6f0f6;
+}
+
+/* ── Main ─────────────────────────────────────────────────── */
+.main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.panelTitulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.intro {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+
+/* ── Parte 1: entradas y dibujo ───────────────────────────── */
+.parte1Grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(260px, 1.3fr);
+  gap: 1.25rem;
+  align-items: start;
+  margin-bottom: 1.25rem;
+}
+
+.entradas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dibujoWrapper {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dibujoVacio {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+  padding: 1rem;
+}
+
+.svgPlacas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.svgPlacaPositiva {
+  fill: #b91c1c;
+}
+
+.svgPlacaNegativa {
+  fill: var(--primary-texto);
+}
+
+.svgSignoPositivo {
+  fill: #b91c1c;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.svgSignoNegativo {
+  fill: var(--primary-texto);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.svgCampo {
+  stroke: var(--text-secondary);
+  stroke-width: 1.5;
+}
+
+.svgFlecha {
+  fill: var(--text-secondary);
+}
+
+.svgDielectrico {
+  fill: var(--secondary, #48A9A6);
+}
+
+.svgCota {
+  stroke: var(--text-secondary);
+  stroke-width: 1;
+}
+
+.svgTexto {
+  fill: var(--text-primary);
+  font-size: 12px;
+}
+
+/* ── Dieléctricos y botones de opción ─────────────────────── */
+.dielectricos {
+  border: none;
+  padding: 0;
+  margin: 0 0 1.25rem;
+}
+
+.legend {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.6rem;
+  padding: 0;
+}
+
+.botonesFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.botonOpcion {
+  padding: 0.5rem 0.9rem;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.botonOpcion:hover {
+  border-color: var(--primary, #2E86AB);
+}
+
+/* Texto blanco sobre --primary-boton (5,47:1), nunca sobre --primary (4,11:1) */
+.botonOpcion[aria-pressed='true'] {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #fff;
+}
+
+.botonOpcion:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 2px;
+}
+
+.botonDato {
+  font-weight: 400;
+  margin-left: 0.25rem;
+}
+
+.otroEr {
+  max-width: 280px;
+  margin-bottom: 0.75rem;
+}
+
+.fuente {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.5rem;
+}
+
+/* ── Caja de fórmulas ─────────────────────────────────────── */
+.formulaBox {
+  background: color-mix(in srgb, var(--primary, #2E86AB) 8%, var(--bg-card));
+  border-left: 4px solid var(--primary, #2E86AB);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.formulaBox code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.92rem;
+  color: var(--primary-texto);
+  font-weight: 700;
+}
+
+/* ── Resultados ───────────────────────────────────────────── */
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.valueCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.valueName {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.valueNum {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-texto);
+  font-variant-numeric: tabular-nums;
+}
+
+.mensajeFalta {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  background: color-mix(in srgb, #f5a623 12%, var(--bg-card));
+  border-left: 4px solid #f5a623;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin: 0;
+}
+
+.nota {
+  font-size: 0.86rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  background: color-mix(in srgb, #f5a623 10%, var(--bg-card));
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  margin: 0.5rem 0 0;
+}
+
+.explicacion {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0.75rem 0 0;
+}
+
+.celdaFactor {
+  font-weight: 700;
+  color: var(--primary-texto);
+  white-space: nowrap;
+}
+
+/* ── Parte 2: circuito RC ─────────────────────────────────── */
+.entradasRC {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.graficaWrapper {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+/* El lienzo se pinta con fondo claro en los dos temas: sus rótulos leen igual en ambos */
+.grafica {
+  display: block;
+  width: 100%;
+  background: #f8fafc;
+}
+
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+}
+
+.sliderLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sliderValue {
+  font-weight: 700;
+  color: var(--primary-texto);
+  font-size: 0.9rem;
+  background: color-mix(in srgb, var(--primary, #2E86AB) 12%, transparent);
+  padding: 0.1rem 0.45rem;
+  border-radius: 5px;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary, #2E86AB);
+  cursor: pointer;
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 3px;
+}
+
+.sliderHint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ── Tablas ───────────────────────────────────────────────── */
+.tablaWrapper {
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.caption {
+  caption-side: top;
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding-bottom: 0.5rem;
+}
+
+/* Cabecera: texto blanco sobre --primary-boton (5,47:1 en los dos temas) */
+.tabla thead th {
+  background: var(--primary-boton);
+  color: #fff;
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tabla tbody th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.tabla td {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.tabla tbody tr:nth-child(even) td,
+.tabla tbody tr:nth-child(even) th {
+  background: color-mix(in srgb, var(--primary-boton) 5%, var(--bg-card));
+}
+
+/* ── Educativo ────────────────────────────────────────────── */
+.eduTexto {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1rem;
+}
+
+.eduSubtitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.75rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--primary, #2E86AB) 30%, transparent);
+  padding-bottom: 0.35rem;
+}
+
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.scenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--secondary, #48A9A6);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.scenarioIcon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.scenarioCard h4 {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+  font-weight: 700;
+}
+
+.scenarioCard p {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqItem p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.step {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  background: var(--primary-boton);
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.stepContent p {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tipCard strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.tipCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Errores típicos ──────────────────────────────────────── */
+.warningBox {
+  background: #fff8f0;
+  border: 1.5px solid #f5a623;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #8f4c00;
+  margin-bottom: 0.6rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.warningList li {
+  font-size: 0.86rem;
+  color: #78400a;
+  line-height: 1.5;
+}
+
+/* ── Dark mode ────────────────────────────────────────────── */
+[data-theme='dark'] .subtitle {
+  color: #e6f0f6;
+}
+
+[data-theme='dark'] .svgPlacaPositiva,
+[data-theme='dark'] .svgSignoPositivo {
+  fill: #f87171;
+}
+
+[data-theme='dark'] .botonOpcion[aria-pressed='true'] {
+  background: var(--primary-boton);
+  border-color: #3FA5D1;
+  color: #fff;
+}
+
+[data-theme='dark'] .formulaBox {
+  background: color-mix(in srgb, var(--primary, #2E86AB) 12%, var(--bg-card));
+}
+
+/* Sobre los tintes de marca, el --primary-texto oscuro no llega a 4,5:1 */
+[data-theme='dark'] .formulaBox code,
+[data-theme='dark'] .sliderValue {
+  color: #8fd0ec;
+}
+
+[data-theme='dark'] .mensajeFalta {
+  background: color-mix(in srgb, #f5a623 14%, var(--bg-card));
+}
+
+[data-theme='dark'] .nota {
+  background: color-mix(in srgb, #f5a623 12%, var(--bg-card));
+}
+
+[data-theme='dark'] .grafica {
+  background: #f8fafc;
+}
+
+[data-theme='dark'] .tabla tbody tr:nth-child(even) td,
+[data-theme='dark'] .tabla tbody tr:nth-child(even) th {
+  background: #262c33;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a1a00;
+  border-color: #8b5e00;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #f5a623;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #e0b46a;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .main {
+    padding: 1.5rem 1rem;
+  }
+
+  .panel {
+    padding: 1.1rem;
+  }
+
+  .parte1Grid {
+    grid-template-columns: 1fr;
+  }
+
+  .valuesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tipsGrid,
+  .scenariosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .botonOpcion {
+    flex: 1 1 auto;
+  }
+}
+
+/* ── Movimiento reducido ──────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .botonOpcion {
+    transition: none;
+  }
+}
+
+/* 80px arriba hasta 1023px: la barra fija de MeskeiaLogo tapaba el principio del título.
+   Va al final para ganar a cualquier padding previo del hero. */
+@media (max-width: 1023px) {
+  .hero {
+    padding-top: 80px;
+  }
+}

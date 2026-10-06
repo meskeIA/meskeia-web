@@ -439,6 +439,13 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'fisica',
   },
   {
+    slug: 'simulador-condensadores',
+    icon: '🔋',
+    titulo: 'Condensadores y circuito RC',
+    desc: 'Capacidad de placas paralelas, dieléctrico con la batería conectada o desconectada, y carga y descarga RC con su constante de tiempo.',
+    disciplina: 'fisica',
+  },
+  {
     slug: 'simulador-conservacion-energia',
     icon: '⛰️',
     titulo: 'Conservación de la energía',
@@ -457,6 +464,13 @@ export const STEMUM_APPS: StemumApp[] = [
     icon: '🚰',
     titulo: 'Fluidos y Bernoulli',
     desc: 'Tubería Venturi con partículas animadas y manómetros que aplican la continuidad y la ecuación de Bernoulli.',
+    disciplina: 'fisica',
+  },
+  {
+    slug: 'simulador-flotabilidad',
+    icon: '🚢',
+    titulo: 'Flotabilidad y Arquímedes',
+    desc: 'Material, volumen y líquido: si flota o se hunde, empuje, fracción sumergida y peso aparente, con el cuerpo en su línea de flotación.',
     disciplina: 'fisica',
   },
   {
@@ -562,6 +576,13 @@ export const STEMUM_APPS: StemumApp[] = [
     icon: '🌈',
     titulo: 'Espectro electromagnético',
     desc: 'Barra logarítmica de 7 bandas clicables más calculadora que convierte longitud de onda en frecuencia y energía por fotón con c=λ·f.',
+    disciplina: 'fisica',
+  },
+  {
+    slug: 'simulador-efecto-fotoelectrico',
+    icon: '💡',
+    titulo: 'Efecto fotoeléctrico',
+    desc: 'Luz de la longitud de onda e intensidad que elijas sobre ocho metales: frecuencia umbral, energía cinética y potencial de frenado.',
     disciplina: 'fisica',
   },
   {

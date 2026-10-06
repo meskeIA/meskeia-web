@@ -1,0 +1,864 @@
+/* ============================================================
+   SimuladorEfectoFotoelectrico.module.css — paleta meskeIA
+   ============================================================ */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.hero {
+  background: var(--hero-bg, #1a5278);
+  color: #fff;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: clamp(1.5rem, 4vw, 2.3rem);
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.92;
+  margin: 0 auto;
+  max-width: 760px;
+  line-height: 1.5;
+}
+
+/* ── Main ─────────────────────────────────────────────────── */
+.main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ── Paneles ──────────────────────────────────────────────── */
+.panel,
+.resultados {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.panelTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+/* ── Deslizadores ─────────────────────────────────────────── */
+.slidersGrid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.sliderLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sliderValue {
+  font-weight: 700;
+  color: var(--primary-texto);
+  font-size: 0.9rem;
+  background: color-mix(in srgb, var(--primary, #2E86AB) 12%, transparent);
+  padding: 0.1rem 0.45rem;
+  border-radius: 5px;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--primary, #2E86AB);
+  cursor: pointer;
+  height: 6px;
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 4px;
+}
+
+.sliderHint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.barraEspectro {
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+}
+
+.marcaLambda {
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 18px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: #111827;
+  box-shadow: 0 0 0 1.5px #fff;
+}
+
+.barraRotulos {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.colorLuz {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.muestraColor {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+}
+
+/* Fuera del visible: rayado, para que no se lea como un color real */
+.muestraInvisible {
+  background-image: repeating-linear-gradient(45deg, transparent 0 4px, rgba(255, 255, 255, 0.55) 4px 7px) !important;
+  border-style: dashed;
+}
+
+/* ── Metales ──────────────────────────────────────────────── */
+.metales {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.metalesLeyenda {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.6rem;
+  padding: 0;
+}
+
+.metalesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+.metalBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  padding: 0.55rem 0.7rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.metalBtn:hover {
+  border-color: var(--primary, #2E86AB);
+}
+
+.metalBtn:focus-visible {
+  outline: 2px solid var(--primary, #2E86AB);
+  outline-offset: 2px;
+}
+
+.metalNombre {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.metalPhi {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.metalBtnActivo,
+.metalBtnActivo:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #fff;
+}
+
+.metalBtnActivo .metalPhi {
+  color: #fff;
+}
+
+.phiOtro {
+  margin-top: 0.9rem;
+  max-width: 320px;
+}
+
+.fuente {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0.9rem 0 0;
+}
+
+/* ── Fórmulas ─────────────────────────────────────────────── */
+.formulaBox {
+  background: color-mix(in srgb, var(--primary, #2E86AB) 8%, var(--bg-card));
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.88rem;
+  line-height: 2;
+  color: var(--text-secondary);
+}
+
+.formulaBox code {
+  color: var(--primary-texto);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Figuras ──────────────────────────────────────────────── */
+.simLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.figura {
+  margin: 0;
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.figuraTitulo {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.figuraNota {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.svgPlaca,
+.svgGrafica {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.svgPlaca {
+  background: #0f1b2b;
+}
+
+.svgGrafica {
+  background: var(--bg-primary);
+}
+
+/* Dibujo de la placa: fondo oscuro en ambos temas (la luz se ve mejor sobre negro) */
+.tubo {
+  fill: #172a40;
+  stroke: #4b6a8a;
+  stroke-width: 2;
+}
+
+.lampara {
+  fill: #e5e7eb;
+}
+
+.emisor {
+  fill: #9ca3af;
+  stroke: #e5e7eb;
+  stroke-width: 1;
+}
+
+.colector {
+  fill: #6b7280;
+  stroke: #d1d5db;
+  stroke-width: 1;
+}
+
+.svgTexto {
+  fill: #e5e7eb;
+  font-size: 14px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.svgAviso {
+  fill: #fcd34d;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.rayo {
+  stroke-dasharray: 8 10;
+  animation: flujoFotones 0.7s linear infinite;
+}
+
+@keyframes flujoFotones {
+  to {
+    stroke-dashoffset: 36;
+  }
+}
+
+.electron {
+  fill: #7dd3fc;
+  stroke: #e0f2fe;
+  stroke-width: 1;
+  animation-name: vueloElectron;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes vueloElectron {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 0.15;
+  }
+}
+
+.flecha line {
+  stroke: #fcd34d;
+}
+
+.flecha polygon {
+  fill: #fcd34d;
+}
+
+.flecha text {
+  fill: #fcd34d;
+}
+
+/* Gráfica: colores con tokens, siguen al tema */
+.rejilla {
+  stroke: color-mix(in srgb, var(--text-muted) 25%, transparent);
+  stroke-width: 1;
+}
+
+.ejeCero {
+  stroke: var(--text-secondary);
+  stroke-width: 1.5;
+}
+
+.marcoGrafica {
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 1;
+}
+
+.recta {
+  stroke: var(--primary, #2E86AB);
+  stroke-width: 3;
+}
+
+.rectaDiscontinua {
+  stroke: var(--primary, #2E86AB);
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+  opacity: 0.75;
+}
+
+.puntoUmbral {
+  fill: var(--bg-primary);
+  stroke: var(--primary, #2E86AB);
+  stroke-width: 2;
+}
+
+.puntoActual {
+  fill: #e8590c;
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.puntoSinEmision {
+  fill: var(--bg-primary);
+  stroke: #e8590c;
+  stroke-width: 2.5;
+}
+
+.svgTextoPeq {
+  fill: var(--text-secondary);
+  font-size: 12px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.svgTextoPunto {
+  fill: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ── Resultados ───────────────────────────────────────────── */
+.mensaje {
+  margin: 0 0 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  border-left: 4px solid;
+}
+
+.mensajeOk {
+  background: #ecfdf5;
+  border-color: #059669;
+  color: #065f46;
+}
+
+.mensajeAviso {
+  background: #fff8f0;
+  border-color: #f5a623;
+  color: #78400a;
+}
+
+.mensajeNeutro {
+  background: color-mix(in srgb, var(--primary, #2E86AB) 8%, var(--bg-card));
+  border-color: var(--primary, #2E86AB);
+  color: var(--text-primary);
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.valueCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: var(--bg-primary);
+}
+
+.valueCardDestacada {
+  border-color: var(--primary, #2E86AB);
+  border-width: 2px;
+}
+
+.valueName {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.valueNum {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.valueSub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ── Educativo ────────────────────────────────────────────── */
+.eduIntro {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1rem;
+}
+
+.eduNota {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0.5rem 0 1rem;
+}
+
+.eduSubtitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.75rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--primary, #2E86AB) 30%, transparent);
+  padding-bottom: 0.35rem;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.tabla th {
+  background: var(--primary-boton);
+  color: #fff;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tabla td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid #e5e7eb;
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.tabla tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--primary, #2E86AB) 5%, var(--bg-card));
+}
+
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.scenarioCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+  background: var(--bg-card);
+}
+
+.scenarioCard h4 {
+  margin: 0.4rem 0 0.4rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.scenarioCard p {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.scenarioIcon {
+  font-size: 1.5rem;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.faqItem {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  background: var(--bg-card);
+}
+
+.faqItem strong {
+  color: var(--text-primary);
+  font-size: 0.93rem;
+}
+
+.faqItem p {
+  margin: 0.4rem 0 0;
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.step {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--primary-boton);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.stepContent strong {
+  color: var(--text-primary);
+  font-size: 0.93rem;
+}
+
+.stepContent p {
+  margin: 0.25rem 0 0;
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.tipCard {
+  display: flex;
+  gap: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  background: var(--bg-card);
+}
+
+.tipIcon {
+  font-size: 1.35rem;
+  flex: 0 0 auto;
+}
+
+.tipCard strong {
+  color: var(--text-primary);
+  font-size: 0.92rem;
+}
+
+.tipCard p {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.warningBox {
+  background: #fff8f0;
+  border: 1.5px solid #f5a623;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #8f4c00;
+  margin-bottom: 0.6rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.warningList li {
+  font-size: 0.86rem;
+  color: #78400a;
+  line-height: 1.5;
+}
+
+/* ── Dark mode ────────────────────────────────────────────── */
+[data-theme='dark'] .panel,
+[data-theme='dark'] .resultados,
+[data-theme='dark'] .figura,
+[data-theme='dark'] .valueCard,
+[data-theme='dark'] .scenarioCard,
+[data-theme='dark'] .faqItem,
+[data-theme='dark'] .tipCard {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .valueCardDestacada {
+  border-color: var(--primary, #2E86AB);
+}
+
+[data-theme='dark'] .metalBtn {
+  border-color: #4b5563;
+}
+
+[data-theme='dark'] .metalBtn:hover {
+  border-color: var(--primary, #2E86AB);
+}
+
+[data-theme='dark'] .metalBtnActivo,
+[data-theme='dark'] .metalBtnActivo:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #fff;
+}
+
+[data-theme='dark'] .barraEspectro,
+[data-theme='dark'] .muestraColor {
+  border-color: #4b5563;
+}
+
+[data-theme='dark'] .marcaLambda {
+  background: #f9fafb;
+  box-shadow: 0 0 0 1.5px #111827;
+}
+
+[data-theme='dark'] .svgPlaca {
+  background: #0a1320;
+}
+
+[data-theme='dark'] .formulaBox {
+  background: color-mix(in srgb, var(--primary, #2E86AB) 12%, #1e2937);
+}
+
+/* Sobre los tintes de marca, el --primary-texto oscuro se queda corto: mismo valor que masa-resorte */
+[data-theme='dark'] .formulaBox code,
+[data-theme='dark'] .sliderValue {
+  color: #8fd0ec;
+}
+
+[data-theme='dark'] .mensajeOk {
+  background: #0f2a20;
+  border-color: #34d399;
+  color: #a7f3d0;
+}
+
+[data-theme='dark'] .mensajeAviso {
+  background: #2a1a00;
+  border-color: #b7791f;
+  color: #f6d28b;
+}
+
+[data-theme='dark'] .mensajeNeutro {
+  background: color-mix(in srgb, var(--primary, #2E86AB) 12%, #1e2937);
+}
+
+[data-theme='dark'] .tabla td {
+  border-bottom-color: #374151;
+}
+
+[data-theme='dark'] .tabla tr:nth-child(even) td {
+  background: #2a3a4a;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a1a00;
+  border-color: #8b5e00;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #f5a623;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #d4a050;
+}
+
+[data-theme='dark'] .puntoActual {
+  stroke: #1e2937;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .main {
+    padding: 1.5rem 1rem;
+  }
+
+  .slidersGrid,
+  .simLayout,
+  .scenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .valuesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .metalesGrid {
+    grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .valuesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Movimiento reducido: dibujo estático ─────────────────── */
+/* Sin animación, cada electrón se queda quieto en su punto del camino (--p entre 0 y 1),
+   así que el dibujo sigue mostrando cuántos salen; la rapidez la cuenta la flecha v máx. */
+@media (prefers-reduced-motion: reduce) {
+  .rayo {
+    animation: none;
+  }
+
+  .electron {
+    animation: none;
+    transform: translate(calc(var(--dx) * var(--p)), calc(var(--dy) * var(--p)));
+  }
+
+  .metalBtn {
+    transition: none;
+  }
+}

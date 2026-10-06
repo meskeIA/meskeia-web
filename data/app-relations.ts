@@ -1430,7 +1430,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-sonido-ondas/', icon: '🔊', name: 'Sonido y Ondas', description: 'Ondas mecánicas vs electromagnéticas' },
     { url: '/visualizador-optica/', icon: '🔍', name: 'Óptica', description: 'La parte visible del espectro' },
     { url: '/visualizador-como-funciona-wifi/', icon: '📡', name: 'Cómo Funciona el WiFi', description: 'Microondas en acción' },
-    { url: '/visualizador-efecto-invernadero/', icon: '🌍', name: 'Efecto Invernadero', description: 'Infrarrojo atrapado' },
+    { url: '/simulador-efecto-fotoelectrico/', icon: '💡', name: 'Efecto Fotoeléctrico', description: 'La luz como fotones: frecuencia umbral y energía de los electrones' },
   ],
   'visualizador-estructura-atomo': [
     { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tabla Periódica', description: 'Tendencias y propiedades' },
@@ -1529,7 +1529,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-estructura-costes-autonomo/', icon: '💼', name: 'Costes del Autónomo', description: 'Tu estructura financiera' },
   ],
   'planificador-vacaciones-autonomo': [
-    { url: '/simulador-colchon-emergencia-freelance/', icon: '🛟', name: 'Colchón de Emergencia', description: 'Meses de supervivencia sin ingresos' },
+    { url: '/simulador-colchon-emergencia-freelance/', icon: '🚢', name: 'Colchón de Emergencia', description: 'Meses de supervivencia sin ingresos' },
     { url: '/planificador-cashflow/', icon: '💰', name: 'Cash Flow', description: 'Planifica tu flujo de caja' },
     { url: '/visualizador-ciclo-vida-freelance/', icon: '🔄', name: 'Ciclo Vida Freelance', description: 'Fases de un proyecto' },
     { url: '/test-salud-negocio-freelance/', icon: '🩺', name: 'Salud del Negocio', description: 'Evalúa 5 dimensiones' },
@@ -3103,7 +3103,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-electricidad/', icon: '⚡', name: 'Electricidad', description: 'Ley de Ohm y potencia básica' },
     { url: '/calculadora-resistencias-led/', icon: '🔴', name: 'Resistencias y LED', description: 'Código de colores y circuito LED' },
     { url: '/simulador-campo-electrico/', icon: '🧲', name: 'Campo Eléctrico', description: 'Cargas, líneas y equipotenciales' },
-    { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
+    { url: '/simulador-condensadores/', icon: '🔋', name: 'Condensadores y Circuito RC', description: 'Carga, descarga y constante de tiempo τ = R·C' },
     { url: '/calculadora-seccion-cable/', icon: '🔌', name: 'Sección de Cable', description: 'La resistencia del conductor llevada al dimensionado real de una línea' },
   ],
   'calculadora-electricidad': [
@@ -6238,9 +6238,27 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Tipos, balanceo y átomos' },
     { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧬', name: 'Enzimas humanas', description: 'Catalizadores biológicos: bajan Ea drásticamente' },
   ],
+  'simulador-flotabilidad': [
+    { url: '/simulador-fluidos-bernoulli/', icon: '🚰', name: 'Fluidos y Bernoulli', description: 'El mismo líquido, ahora en movimiento: presión y velocidad' },
+    { url: '/visualizador-mecanica-fluidos/', icon: '🌊', name: 'Mecánica de Fluidos', description: 'Presión hidrostática, Pascal y viscosidad' },
+    { url: '/simulador-mas-resorte/', icon: '🌀', name: 'Masa-Resorte y Ley de Hooke', description: 'El dinamómetro que mide el peso aparente es un resorte' },
+    { url: '/simulador-gas-ideal/', icon: '🎈', name: 'Gas Ideal', description: 'Densidad de un gas: por qué sube un globo' },
+  ],
+  'simulador-condensadores': [
+    { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'El campo uniforme entre las placas, visto con cargas sueltas' },
+    { url: '/simulador-circuitos-electricos/', icon: '🔌', name: 'Circuitos Eléctricos', description: 'Serie, paralelo y Ley de Ohm: el resto del circuito RC' },
+    { url: '/visualizador-electromagnetismo/', icon: '🧲', name: 'Electromagnetismo', description: 'Campos E y B y la energía que almacenan' },
+    { url: '/calculadora-electricidad/', icon: '💡', name: 'Electricidad', description: 'Ley de Ohm y potencia para la resistencia del circuito' },
+  ],
+  'simulador-efecto-fotoelectrico': [
+    { url: '/visualizador-espectro-electromagnetico/', icon: '🌈', name: 'Espectro Electromagnético', description: 'Dónde cae cada longitud de onda y la energía de su fotón' },
+    { url: '/visualizador-mecanica-cuantica/', icon: '⚛️', name: 'Mecánica Cuántica', description: 'La física que abrió la explicación de Einstein' },
+    { url: '/visualizador-estructura-atomo/', icon: '🔬', name: 'Estructura del Átomo', description: 'De dónde salen los electrones que arranca la luz' },
+    { url: '/simulador-ondas-interferencia/', icon: '🌊', name: 'Ondas e Interferencia', description: 'La luz como onda: la otra mitad de la dualidad' },
+  ],
   'simulador-fluidos-bernoulli': [
     { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'Bernoulli es conservación de energía en fluidos' },
-    { url: '/simulador-cinetica-arrhenius/', icon: '⚗️', name: 'Cinética Arrhenius', description: 'Otro pilar de la química y la física de educación media' },
+    { url: '/simulador-flotabilidad/', icon: '🚢', name: 'Flotabilidad y Arquímedes', description: 'El fluido en reposo: empuje, densidad y por qué flota un barco' },
     { url: '/visualizador-corazon-ciclo-cardiaco/', icon: '❤️', name: 'Ciclo cardíaco', description: 'Bernoulli aplicada a la circulación humana' },
     { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'Sangre humana', description: 'El fluido más característico que estudia Bernoulli' },
   ],

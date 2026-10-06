@@ -420,6 +420,9 @@ export const implementedAppsUrls = [
 
   // Tanda 2 simuladores Bachillerato/Universidad (2026-05-07)
   "/simulador-gas-ideal/",          // PV=nRT + procesos (isotermo/isobaro/isocoro/adiabático) + ciclos Carnot/Otto/Diesel/Stirling, diagrama PV
+  "/simulador-flotabilidad/",       // Arquímedes y densidad: flota/se hunde, empuje, fracción sumergida, peso aparente (S0182, 06/10/2026)
+  "/simulador-condensadores/",      // Placas paralelas C=ε0·εr·A/d, dieléctrico conectado/desconectado, carga y descarga RC
+  "/simulador-efecto-fotoelectrico/", // Einstein: E=hf, f0, λ0, Ec máx, potencial de frenado; la intensidad no cambia la energía
   "/simulador-campo-electrico/",    // Cargas puntuales interactivas: líneas de campo, equipotenciales, mapa color |E|, carga prueba con F y U
   "/simulador-ondas-interferencia/", // Onda viajera 1D, interferencia 2D 2 fuentes, ondas estacionarias en cuerda y tubo (5 modos armónicos)
 
