@@ -126,8 +126,10 @@ async function marcarTodosLosRequisitos(page: Page, salvo?: { indice: number; va
   // 8 bloqueantes + 1 condicionante. Eran 7 hasta el 28/09/2026, cuando el hallazgo 2388 añadió
   // el del arrendador (parentesco y socio, art. 133.2.b y c) y la sospecha del art. 8.2.a el de
   // la nacionalidad o residencia legal, los dos justo antes del condicionante de la comunidad
-  // autónoma: los índices 0-5 no se han movido y la comunidad pasa del 6 al 8.
-  expect(total).toBe(9);
+  // autónoma: los índices 0-5 no se han movido y la comunidad pasa del 6 al 8. El 07/10/2026 el
+  // hallazgo 2985 añadió el del art. 8.5 (al corriente con Hacienda y la Seguridad Social, art.
+  // 13 de la Ley 38/2003) antes de la nacionalidad: 9 bloqueantes + 1, la comunidad pasa al 9.
+  expect(total).toBe(10);
   for (let i = 0; i < total; i++) {
     const valor = salvo && salvo.indice === i ? salvo.valor : 'Sí';
     await grupos.nth(i).getByRole('button', { name: valor, exact: true }).click();
@@ -246,7 +248,7 @@ test.describe('simulador-bono-joven-alquiler', () => {
     // respondido «No» el veredicto no puede ser APTO, pero tampoco un rechazo tajante.
     // Fue el índice 6 desde que el hallazgo 686 insertó el del art. 136 en la quinta posición, y
     // es el 8 desde el 28/09/2026 (arrendador, hallazgo 2388, y nacionalidad, art. 8.2.a).
-    await marcarTodosLosRequisitos(page, { indice: 8, valor: 'No' });
+    await marcarTodosLosRequisitos(page, { indice: 9, valor: 'No' }); // la comunidad autónoma
 
     const resultado = norm(await page.locator('[role="status"]').first().innerText());
     expect(resultado).toContain('Cumples los requisitos básicos');
@@ -2355,13 +2357,13 @@ test.describe('Inspector 07/10/2026 — móvil (390 px)', () => {
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS de la re-inspección del 07/10/2026 — ABIERTOS. Cada test afirma lo que la app
+// HALLAZGOS de la re-inspección del 07/10/2026 — REPARADOS ese día. Cada test afirma lo que la app
 // DEBERÍA hacer y lleva `test.fail()`; al repararlo, se le quita la marca y queda de guardián.
 // Fuente: texto consolidado del RD 326/2026 en el BOE (BOE-A-2026-8872), el que cita
 // FISCAL_VIVIENDA_JOVEN_META.urlOficial.
 // ═════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos del 07/10/2026 (abiertos)', () => {
+test.describe('Hallazgos del 07/10/2026 (REPARADOS ese mismo día)', () => {
   // H21 (ALTO) — ABIERTO. Los arts. 8.3 y 8.5 del RD no llegan al veredicto. El 8.3, párr. 2.º:
   // «En todo caso, las personas beneficiarias deberán estar al corriente en el cumplimiento de las
   // obligaciones tributarias y frente a la Seguridad Social conforme a lo dispuesto en los
@@ -2376,7 +2378,6 @@ test.describe('Hallazgos del 07/10/2026 (abiertos)', () => {
   // «¡Cumples todos los requisitos! … 300,00 €/mes», y 0 apariciones de «Seguridad Social»,
   // «obligaciones tributarias» o «Ley 38/2003» en toda la página, guía desplegada incluida.
   test('H21 — el veredicto debería contemplar estar al corriente con Hacienda y la Seguridad Social (art. 8.3) y las causas del art. 8.5', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: la checklist no recoge los arts. 8.3 y 8.5 y el veredicto aprueba de más');
     await abrirHidratado(page);
     await sembrarValor(page, '#alquiler', '600'); // 600 ≤ 1.000: la renta no es el problema
     await marcarTodoSi(page);
@@ -2395,7 +2396,6 @@ test.describe('Hallazgos del 07/10/2026 (abiertos)', () => {
   // art. 133.1.a, sin condicionarlo a la comunidad · obtenido «Sí, en la mayoría de las CCAA
   // puedes solicitar el Bono Joven aunque el contrato ya esté vigente».
   test('H22 — la FAQ del contrato ya firmado no debería condicionar a la comunidad lo que el art. 133.1.a admite siempre', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: «en la mayoría de las CCAA» contradice el art. 133.1.a');
     await abrirHidratado(page);
     await page.getByRole('button', { name: /Ver guía educativa/i }).click();
     const faq = await faqVisible(page, /contrato firmado/);
@@ -2416,7 +2416,6 @@ test.describe('Hallazgos del 07/10/2026 (abiertos)', () => {
   // permite conceder la ayuda con efectos desde el 01/01/2026 y que lo concreta su convocatoria ·
   // obtenido: «suele ser retroactiva desde la fecha de solicitud» y 0 apariciones de «1 de enero».
   test('H23 — lo que la página dice sobre la retroactividad debería salir de la DA 1.ª, no de un «suele»', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: retroactividad «desde la fecha de solicitud» sin artículo y sin la DA 1.ª');
     await abrirHidratado(page);
     await page.getByRole('button', { name: /Ver guía educativa/i }).click();
     const faq = await faqVisible(page, /contrato firmado/);
@@ -2440,7 +2439,6 @@ test.describe('Hallazgos del 07/10/2026 (abiertos)', () => {
   // resolución que el RD no fija (o con el art. 8.4) · obtenido «las CCAA resuelven por orden de
   // entrada hasta agotar los fondos asignados».
   test('H24 — la FAQ del plazo de resolución no debería afirmar un «orden de entrada» que el RD no fija (art. 8.4)', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: «resuelven por orden de entrada» sin artículo, frente a las preferencias del art. 8.4');
     await abrirHidratado(page);
     await page.getByRole('button', { name: /Ver guía educativa/i }).click();
     const faq = await faqVisible(page, /tarda en resolverse/);
@@ -2460,7 +2458,6 @@ test.describe('Hallazgos del 07/10/2026 (abiertos)', () => {
   // CASO: vivienda de 800 €/mes en un municipio de 10.000 habitantes o menos → el FAQPage la da
   // por debajo del tope (800 ≤ 1.000) · la app la rechaza: «el tope es 500,00 €/mes» (CASO 22).
   test('H25 — el FAQPage debería dar los topes del municipio pequeño y el umbral de los hijos de víctimas de violencia de género', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: el FAQPage omite los 500/250 € del art. 133.1.e y el 5,5 × IPREM por violencia de género');
     await abrirHidratado(page);
     const faq = await faqPageServido(page);
     const tope = faq.find((q) => /Hasta qué alquiler mensual/.test(q.name));
@@ -2487,7 +2484,6 @@ test.describe('Hallazgos del 07/10/2026 (abiertos)', () => {
   // esperado: que la pregunta admita su umbral (y el descuento de dependencia y pensiones no
   // contributivas) · obtenido: la regla general sola.
   test('H26 — la pregunta de ingresos debería admitir los umbrales y el descuento del art. 133.1.d, no solo los 42.000 €', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: la pregunta bloqueante de ingresos no recoge las excepciones del art. 133.1.d');
     await abrirHidratado(page);
     const tarjeta = tarjetaCon(page, /IPREM/);
     const pregunta = norm(await tarjeta.locator('[class*="checkPregunta"]').innerText());
@@ -2509,7 +2505,6 @@ test.describe('Hallazgos del 07/10/2026 (abiertos)', () => {
   // vivienda es tu residencia habitual y permanente» la respuesta honesta es «No» → «No cumples
   // los requisitos obligatorios» · esperado: que la pregunta admita la vivienda que lo será.
   test('H27 — la pregunta de residencia debería admitir la vivienda que lo VA A SER (art. 133.1.c), como el contrato que se firmará', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: la residencia habitual se pregunta en presente y rechaza a quien aún va a alquilar');
     await abrirHidratado(page);
     const contrato = norm(await tarjetaCon(page, /133\.1\.a/).locator('[class*="checkPregunta"]').innerText());
     expect(contrato).toContain('lo firmarás'); // el camino que abrió el 2390
@@ -2528,7 +2523,6 @@ test.describe('Hallazgos del 07/10/2026 (abiertos)', () => {
   // cumples los requisitos obligatorios» · esperado: que la excepción llegue a la pregunta o que
   // la explicación diga que responda «Sí».
   test('H28 — la excepción de las cooperativas del art. 133.2.c debería llegar a la pregunta del arrendador', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: la pregunta del arrendador no recoge la excepción de las cooperativas');
     await abrirHidratado(page);
     const tarjeta = tarjetaCon(page, /133\.2\.b/);
     const pregunta = norm(await tarjeta.locator('[class*="checkPregunta"]').innerText());

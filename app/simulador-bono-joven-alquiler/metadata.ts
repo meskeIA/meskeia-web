@@ -15,6 +15,8 @@ const AYUDA_HABITACION = eur(BONO_ALQUILER_JOVEN_2026.ayudaMaximaMensual.habitac
 const LIMITE_PORC = formatPercentage(BONO_ALQUILER_JOVEN_2026.limiteSobreRenta, 0);
 const RENTA_MAX_VIVIENDA = eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.vivienda);
 const RENTA_MAX_HABITACION = eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.habitacion);
+const RENTA_MAX_VIVIENDA_PEQUENO = eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.municipioPequeno.vivienda);
+const RENTA_MAX_HABITACION_PEQUENO = eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.municipioPequeno.habitacion);
 const DURACION_TOTAL_ANIOS = BONO_ALQUILER_JOVEN_2026.plazo.totalMaximoMeses / 12;
 const EDAD_MIN = BONO_ALQUILER_JOVEN_2026.edad.minima;
 const EDAD_MAX = BONO_ALQUILER_JOVEN_2026.edad.maxima;
@@ -108,7 +110,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son los requisitos de ingresos para pedir el Bono Alquiler Joven 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El RD 326/2026 (art. 133.1.d) fija el umbral en ${UMBRAL_IPREM_GENERAL} veces el IPREM de ingresos anuales, que sube con discapacidad reconocida (${UMBRAL_IPREM_33} veces con el 33\u00A0% o más, ${UMBRAL_IPREM_65} veces con el 65\u00A0% o más). Cada Comunidad Autónoma concreta el cómputo exacto en su propia convocatoria. Es imprescindible consultar la convocatoria de la comunidad autónoma donde se ubica la vivienda alquilada para conocer el detalle aplicable.`,
+        text: `El RD 326/2026 (art. 133.1.d) fija el umbral en ${UMBRAL_IPREM_GENERAL} veces el IPREM de ingresos anuales, que sube a ${UMBRAL_IPREM_33} veces con una discapacidad reconocida del 33\u00A0% o más o si eres hijo o hija de víctima de violencia de género, y a ${UMBRAL_IPREM_65} veces con una discapacidad del 65\u00A0% o más. Para el cómputo se descuentan las prestaciones de la Ley de Dependencia y las pensiones de incapacidad o jubilación no contributivas. Cada Comunidad Autónoma concreta el cómputo exacto en su propia convocatoria. Es imprescindible consultar la convocatoria de la comunidad autónoma donde se ubica la vivienda alquilada para conocer el detalle aplicable.`,
       },
     },
     {
@@ -149,7 +151,7 @@ export const faqJsonLd = {
       name: '¿Hasta qué alquiler mensual puedo pedir el Bono Joven?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El art. 133.1.e del Real Decreto 326/2026 fija la renta máxima del contrato en ${RENTA_MAX_VIVIENDA} al mes para una vivienda completa y ${RENTA_MAX_HABITACION} al mes para una habitación. Si tu alquiler los supera, no puedes acceder a la ayuda aunque cumplas la edad y el límite de ingresos. Tu Comunidad Autónoma puede elevar esos topes, pero solo con acuerdo previo del Ministerio (art. 135), así que conviene mirar su convocatoria. Por debajo del tope, la ayuda es el ${LIMITE_PORC} de la renta con un máximo de ${AYUDA_VIVIENDA} al mes en vivienda y ${AYUDA_HABITACION} en habitación (art. 137).`,
+        text: `El art. 133.1.e del Real Decreto 326/2026 fija la renta máxima del contrato en ${RENTA_MAX_VIVIENDA} al mes para una vivienda completa y ${RENTA_MAX_HABITACION} al mes para una habitación, que bajan a ${RENTA_MAX_VIVIENDA_PEQUENO} y ${RENTA_MAX_HABITACION_PEQUENO} en municipios o núcleos de 10.000 habitantes o menos. Si tu alquiler supera el tope que te corresponde, no puedes acceder a la ayuda aunque cumplas la edad y el límite de ingresos. Tu Comunidad Autónoma puede elevar esos topes, pero solo con acuerdo previo del Ministerio (art. 135), así que conviene mirar su convocatoria. Por debajo del tope, la ayuda es el ${LIMITE_PORC} de la renta con un máximo de ${AYUDA_VIVIENDA} al mes en vivienda y ${AYUDA_HABITACION} en habitación (art. 137).`,
       },
     },
   ],

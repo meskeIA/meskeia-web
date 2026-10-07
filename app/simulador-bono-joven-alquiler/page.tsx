@@ -77,8 +77,11 @@ const REQUISITOS: Requisito[] = [
   },
   {
     id: 'ingresos',
-    pregunta: `Tus rentas anuales no superan ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.general)}/año)`,
-    explicacion: `El RD 326/2026 fija el umbral en ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.general)}/año), que sube a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33, 1)} (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33)}/año) con una discapacidad reconocida del ${conPorcentaje('33')} o más (y si eres hijo o hija de víctima de violencia de género) y a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65, 0)} (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65)}/año) con una discapacidad del ${conPorcentaje('65')} o más. Cada Comunidad Autónoma concreta el cómputo en su convocatoria.`,
+    // ⚠️ 07/10/2026 (hallazgo 2990): la pregunta solo enunciaba el umbral general y quien tenía
+    // derecho al de 5,5 o 6 veces respondía «No» con honestidad. Como en el 2391, la excepción
+    // va en la PREGUNTA, que es lo que se contesta (art. 133.1.d, BOE-A-2026-8872, leído hoy).
+    pregunta: `Tus rentas anuales no superan ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.general)}/año), o el umbral más alto que te corresponda por discapacidad u otra de las excepciones de abajo`,
+    explicacion: `El RD 326/2026 fija el umbral en ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.general)}/año), que sube a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33, 1)} (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33)}/año) con una discapacidad reconocida del ${conPorcentaje('33')} o más (y si eres hijo o hija de víctima de violencia de género) y a ${formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65, 0)} (${topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65)}/año) con una discapacidad del ${conPorcentaje('65')} o más. Para el cómputo se descuentan las prestaciones y ayudas de la Ley de Dependencia y las pensiones de incapacidad o jubilación no contributivas. Si con tu umbral y esos descuentos no lo superas, responde «Sí». Cada Comunidad Autónoma concreta el cómputo en su convocatoria.`,
     bloqueante: true,
   },
   /**
@@ -99,8 +102,10 @@ const REQUISITOS: Requisito[] = [
   },
   {
     id: 'habitual',
-    pregunta: 'La vivienda es tu residencia habitual y permanente',
-    explicacion: 'Debes destinar la vivienda alquilada a tu domicilio habitual y permanente.',
+    // ⚠️ 07/10/2026 (hallazgo 2991): iba en presente y cerraba el camino que abre la tarjeta del
+    // contrato a quien aún no ha firmado. El art. 133.1.c dice «constituya o vaya a constituir».
+    pregunta: 'La vivienda es tu residencia habitual y permanente, o lo será cuando la alquiles',
+    explicacion: 'El art. 133.1.c del RD 326/2026 exige que la vivienda o la habitación «constituya o vaya a constituir» tu residencia habitual y permanente. Si aún no vives en ella porque la alquilarás cuando te concedan la ayuda, responde «Sí»: tendrás que acreditar el empadronamiento en el plazo que fije la convocatoria.',
     bloqueante: true,
   },
   /**
@@ -186,8 +191,8 @@ const REQUISITOS: Requisito[] = [
    */
   {
     id: 'arrendador',
-    pregunta: `Quien te alquila no es familiar tuyo hasta el ${EXCLUSIONES.parentescoArrendadorHastaGrado}.º grado ni una persona o empresa de la que seas socio`,
-    explicacion: `El art. 133.2.b del RD 326/2026 impide conceder la ayuda si tienes parentesco hasta el ${EXCLUSIONES.parentescoArrendadorHastaGrado}.º grado, por consanguinidad o por afinidad, con quien te alquila o te cede la vivienda (por ejemplo, padres, hijos, hermanos, abuelos o nietos, y suegros, yernos, nueras o cuñados). El art. 133.2.c la impide también si eres socio o partícipe de la persona o la empresa arrendadora, salvo que sea una cooperativa sin ánimo de lucro en régimen de cesión de uso.`,
+    pregunta: `Quien te alquila no es familiar tuyo hasta el ${EXCLUSIONES.parentescoArrendadorHastaGrado}.º grado ni una persona o empresa de la que seas socio (salvo la cooperativa de abajo)`,
+    explicacion: `El art. 133.2.b del RD 326/2026 impide conceder la ayuda si tienes parentesco hasta el ${EXCLUSIONES.parentescoArrendadorHastaGrado}.º grado, por consanguinidad o por afinidad, con quien te alquila o te cede la vivienda (por ejemplo, padres, hijos, hermanos, abuelos o nietos, y suegros, yernos, nueras o cuñados). El art. 133.2.c la impide también si eres socio o partícipe de la persona o la empresa arrendadora, «exceptuando que se trate de sociedades cooperativas, incluidas en régimen de cesión en uso, ya sean de vivienda, de consumo o integrales de vivienda y consumo y sin ánimo de lucro». Si te alquila o te cede la vivienda una cooperativa así de la que eres socio, responde «Sí».`,
     bloqueante: true,
   },
   /**
@@ -195,6 +200,19 @@ const REQUISITOS: Requisito[] = [
    * de la UE, del EEE o Suiza, o residencia legal en España. Tampoco lo preguntaba nadie, y es
    * la misma forma del 2388: una condición del RD que no llegaba al veredicto.
    */
+  /**
+   * ⚠️ 07/10/2026 (hallazgo 2985) — el art. 8.5, común a todas las ayudas del Plan, excluye a
+   * quien incurra en alguna circunstancia del art. 13 de la Ley 38/2003, entre ellas no estar al
+   * corriente con Hacienda y con la Seguridad Social (13.2.e). Ninguna tarjeta lo preguntaba y se
+   * aprobaba de más: la forma del 2388. La salvedad de la letra e) solo cabe en la línea de
+   * personas especialmente vulnerables, no en esta (BOE-A-2026-8872, leído el 07/10/2026).
+   */
+  {
+    id: 'subvenciones',
+    pregunta: 'Estás al corriente de tus obligaciones con Hacienda y con la Seguridad Social, y no tienes ninguna otra prohibición para recibir subvenciones',
+    explicacion: 'El art. 8.5 del RD 326/2026, común a todas las ayudas del Plan, impide ser persona beneficiaria a quien incurra en alguna de las circunstancias del art. 13 de la Ley 38/2003, General de Subvenciones. La más frecuente es no estar al corriente de las obligaciones tributarias o con la Seguridad Social; otras son, por ejemplo, haber sido sancionado con la pérdida del derecho a obtener subvenciones o tener pendiente el reintegro de una subvención. Si tienes una deuda pendiente, saldarla o aplazarla antes de solicitar puede cambiar la respuesta.',
+    bloqueante: true,
+  },
   {
     id: 'nacionalidad',
     pregunta: 'Tienes nacionalidad española o de otro país de la UE, del EEE o Suiza, o residencia legal en España',
@@ -660,7 +678,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             { num: '1', titulo: 'Verifica disponibilidad en tu CA', desc: 'Cada comunidad autónoma gestiona la ayuda, y el art. 138 del RD 326/2026 le obliga a convocarla de forma continuada y permanente, no por plazos cerrados. Comprueba en la web de vivienda de la tuya si la convocatoria ya está abierta y cómo se presenta.' },
             { num: '2', titulo: 'Reúne la documentación', desc: 'DNI/NIE, declaración de la renta, contrato de alquiler, certificado de empadronamiento y justificante de ingresos.' },
             { num: '3', titulo: 'Presenta la solicitud', desc: 'Normalmente se tramita online a través del portal de vivienda de tu CA o presencialmente en las oficinas de vivienda.' },
-            { num: '4', titulo: 'Resolución y cobro', desc: 'El plazo de resolución lo fija cada comunidad autónoma en su convocatoria: el RD 326/2026 no lo regula. Una vez aprobado, la ayuda se abona mensualmente o de forma retroactiva.' },
+            { num: '4', titulo: 'Resolución y cobro', desc: 'El plazo de resolución lo fija cada comunidad autónoma en su convocatoria: el RD 326/2026 no lo regula. Una vez aprobada, la ayuda se abona según fije la convocatoria; la disposición adicional primera del RD permite reconocerla con efectos desde el 1 de enero de 2026.' },
           ].map(paso => (
             <div key={paso.num} className={styles.pasoCard}>
               <div className={styles.pasoNum} aria-hidden="true">{paso.num}</div>
@@ -776,7 +794,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
           <div className={styles.faqGrid}>
             <div className={styles.faqItem}>
               <h3>¿Se puede pedir el bono si ya tengo contrato firmado?</h3>
-              <p>Sí, en la mayoría de las CCAA puedes solicitar el Bono Joven aunque el contrato ya esté vigente. La ayuda suele ser retroactiva desde la fecha de solicitud.</p>
+              <p>Sí, en toda España: el art. 133.1.a del RD 326/2026 pide ser titular de un contrato de alquiler o de cesión de uso, o estar en condiciones de firmarlo, así que un contrato ya vigente vale. Desde cuándo se cobra lo concreta cada convocatoria: la disposición adicional primera del RD permite conceder estas ayudas con efectos desde el 1 de enero de 2026, pero no obliga a hacerlo.</p>
             </div>
             <div className={styles.faqItem}>
               {/* El título sale de `edad.maxima` como su respuesta (hallazgo 2394) */}
@@ -843,7 +861,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Cuánto tarda en resolverse la solicitud?</h3>
-              <p>Depende de tu comunidad autónoma: el RD 326/2026 no fija ningún plazo de resolución, así que lo marca cada convocatoria autonómica, y conviene mirarlo en la suya. Es recomendable solicitarlo cuanto antes, porque las CCAA resuelven por orden de entrada hasta agotar los fondos asignados.</p>
+              <p>Depende de tu comunidad autónoma: el RD 326/2026 no fija ningún plazo de resolución, así que lo marca cada convocatoria autonómica, y conviene mirarlo en la suya. Es recomendable solicitarlo cuanto antes, porque las ayudas se conceden dentro de las disponibilidades presupuestarias. El orden lo fija cada comunidad: el art. 8.4 del RD manda reconocerlas según las preferencias que establece el propio RD y las que añada cada comunidad, no por orden de entrada.</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Se puede pedir si tengo contrato de habitación?</h3>
@@ -889,7 +907,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
           <h2>6 consejos para maximizar tus posibilidades</h2>
           <div className={styles.tipsGrid}>
             {[
-              { icon: '⚡', titulo: 'Solicita cuanto antes', desc: 'Muchas CCAA agotan los fondos. No esperes: solicita el bono en cuanto tengas el contrato firmado.' },
+              { icon: '⚡', titulo: 'Solicita cuanto antes', desc: 'Las ayudas se conceden dentro de las disponibilidades presupuestarias de cada convocatoria. No esperes: solicita el bono en cuanto tengas el contrato firmado o puedas firmarlo.' },
               { icon: '📋', titulo: 'Prepara la documentación completa', desc: 'Una solicitud incompleta genera retrasos. Revisa la lista de documentos de tu CA antes de presentar.' },
               { icon: '🔍', titulo: 'Consulta el límite de renta de tu CA', desc: `El Real Decreto fija ${eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.vivienda)}/mes para vivienda completa y ${eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.habitacion)}/mes para habitación (${eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.municipioPequeno.vivienda)} y ${eur(BONO_ALQUILER_JOVEN_2026.rentaMaximaMensual.municipioPequeno.habitacion)} en municipios de 10.000 habitantes o menos). Tu CA puede elevarlo, pero solo con acuerdo previo del Ministerio.` },
               { icon: '💡', titulo: 'Comprueba la deducción autonómica IRPF', desc: 'Aparte del bono, muchas CCAA tienen deducción en el IRPF por alquiler de vivienda habitual. Esa sí es compatible, porque es un beneficio fiscal y no una ayuda al pago del alquiler, que el art. 136 declara incompatible.' },
@@ -919,7 +937,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
               // por el art. 133.1.e a esperar otro tope en su comunidad (hallazgo 643).
               { titulo: 'Tu CA concreta la convocatoria, no los límites estatales', desc: `El límite de renta del contrato (${eur(RENTA_MAX.vivienda)}/mes en vivienda y ${eur(RENTA_MAX.habitacion)}/mes en habitación, art. 133.1.e) y el plazo de la ayuda (${BONO_ALQUILER_JOVEN_2026.plazo.inicialMeses / 12} años prorrogables otros ${BONO_ALQUILER_JOVEN_2026.plazo.prorrogaMaximaMeses / 12}, art. 134) los fija el Real Decreto para toda España: tu Comunidad Autónoma solo puede elevar la renta máxima con acuerdo previo del Ministerio (art. 135). Lo que sí concreta cada CA es su convocatoria —que el art. 138 le obliga a mantener abierta de forma continuada y permanente—: cuándo la abre, qué documentación exige y cómo se acreditan los requisitos. Consúltala antes de solicitar.` },
               { titulo: 'El fraude puede conllevar devolución + sanción', desc: 'Si se detecta que no cumplías los requisitos, deberás devolver todo lo cobrado más posibles sanciones. Declara siempre tu situación real.' },
-              { titulo: 'La retroactividad no está garantizada en todas las CCAA', desc: 'Algunas CCAA pagan desde la fecha de solicitud, no desde el inicio del contrato. Solicita cuanto antes para no perder mensualidades.' },
+              { titulo: 'La retroactividad no está garantizada', desc: 'La disposición adicional primera del RD 326/2026 dice que estas ayudas «podrán concederse con efectos desde el 1 de enero de 2026»: lo permite, pero no lo impone. Desde qué fecha se cobra lo concreta cada convocatoria, así que conviene solicitar cuanto antes y leerla.' },
             ].map(w => (
               <div key={w.titulo} className={styles.warningItem}>
                 <strong>{w.titulo}</strong>
