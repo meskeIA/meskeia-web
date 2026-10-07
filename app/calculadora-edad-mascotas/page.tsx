@@ -4,88 +4,107 @@ import { useState } from 'react';
 import styles from './CalculadoraEdadMascotas.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
+import { PREGUNTAS_FRECUENTES } from './metadata';
+import {
+  EDAD_MAXIMA,
+  EDAD_MINIMA,
+  FACTOR_GATO,
+  NOMBRE_TAMANO,
+  PESO_TAMANO,
+  TAMANOS,
+  UMBRALES_GATO,
+  UMBRALES_PERRO,
+  calcularEdadHumana,
+  obtenerEtapa,
+  textoAnios,
+  type ClaveEtapa,
+  type TamanoPerro,
+  type TipoMascota,
+  type UmbralesEtapa,
+} from './motor';
 
-type TipoMascota = 'perro' | 'gato';
-type TamanoPerro = 'pequeno' | 'mediano' | 'grande' | 'gigante';
+interface Resultado {
+  tipo: TipoMascota;
+  edad: number;
+  edadHumana: number;
+  etapa: ClaveEtapa;
+  etapaNombre: string;
+  descripcion: string;
+}
+
+const EMOJI_ETAPA: Record<ClaveEtapa, string> = {
+  cria: '🍼',
+  joven: '🎾',
+  adulto: '💪',
+  maduro: '🛋️',
+  senior: '🧓',
+  geriatrico: '❤️',
+};
+
+/** Edad del animal con los decimales que tenga, en formato español: «2,5». */
+const formatEdad = (n: number): string => n.toLocaleString('es-ES', { maximumFractionDigits: 2 });
+
+/** Años humanos redondeados para presentar. */
+const humanos = (tipo: TipoMascota, tamano: TamanoPerro, edad: number): string =>
+  formatNumber(calcularEdadHumana(tipo, tamano, edad), 0);
+
+const mayuscula = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
+
+const ID_EDAD = 'edad-mascota';
+const ID_TAMANO = 'tamano-perro-etiqueta';
+
+/** «0-1», «1-3», …, «14 o más» para una fila de umbrales. */
+function rangosEtapa(u: UmbralesEtapa): string[] {
+  return [
+    `0-${u.joven}`,
+    `${u.joven}-${u.adulto}`,
+    `${u.adulto}-${u.maduro}`,
+    `${u.maduro}-${u.senior}`,
+    `${u.senior}-${u.geriatrico}`,
+    `${u.geriatrico} o más`,
+  ];
+}
 
 export default function CalculadoraEdadMascotasPage() {
   const [tipoMascota, setTipoMascota] = useState<TipoMascota>('perro');
   const [tamanoPerro, setTamanoPerro] = useState<TamanoPerro>('mediano');
   const [edadMascota, setEdadMascota] = useState('');
-  const [resultado, setResultado] = useState<{
-    edadHumana: number;
-    etapaVida: string;
-    descripcion: string;
-  } | null>(null);
-
-  // Fórmula actualizada basada en estudios recientes
-  // Para perros: varía según tamaño (los perros grandes envejecen más rápido)
-  // Para gatos: fórmula más simple pero precisa
-  const calcularEdadPerro = (edad: number, tamano: TamanoPerro): number => {
-    // Factores de envejecimiento por tamaño (años humanos por año de perro después del 2º año)
-    const factores: Record<TamanoPerro, number> = {
-      pequeno: 4,    // <10kg
-      mediano: 5,    // 10-25kg
-      grande: 6,     // 25-45kg
-      gigante: 7,    // >45kg
-    };
-
-    if (edad <= 0) return 0;
-    if (edad <= 1) return 15; // Primer año = 15 años humanos
-    if (edad <= 2) return 15 + 9; // Segundo año = 9 años más
-
-    const factor = factores[tamano];
-    return 24 + (edad - 2) * factor;
-  };
-
-  const calcularEdadGato = (edad: number): number => {
-    if (edad <= 0) return 0;
-    if (edad <= 1) return 15; // Primer año = 15 años humanos
-    if (edad <= 2) return 24; // Segundo año = 9 años más
-
-    return 24 + (edad - 2) * 4; // Cada año adicional = 4 años humanos
-  };
-
-  const obtenerEtapaVida = (tipo: TipoMascota, edad: number, edadHumana: number): { etapa: string; descripcion: string } => {
-    if (tipo === 'gato') {
-      if (edad < 0.5) return { etapa: 'Gatito', descripcion: 'Etapa de crecimiento rápido y mucha curiosidad' };
-      if (edad < 2) return { etapa: 'Gato joven', descripcion: 'Muy activo y juguetón, aprendiendo sobre su entorno' };
-      if (edad < 7) return { etapa: 'Adulto', descripcion: 'En su mejor momento físico y mental' };
-      if (edad < 11) return { etapa: 'Maduro', descripcion: 'Más tranquilo pero todavía activo' };
-      if (edad < 15) return { etapa: 'Senior', descripcion: 'Necesita más cuidados y revisiones veterinarias' };
-      return { etapa: 'Geriátrico', descripcion: 'Requiere atención especial y mucho cariño' };
-    } else {
-      if (edad < 0.5) return { etapa: 'Cachorro', descripcion: 'Etapa de socialización y aprendizaje' };
-      if (edad < 2) return { etapa: 'Perro joven', descripcion: 'Lleno de energía, necesita mucho ejercicio' };
-      if (edad < 7) return { etapa: 'Adulto', descripcion: 'Equilibrado y en su mejor momento' };
-      if (edad < 10) return { etapa: 'Maduro', descripcion: 'Empieza a necesitar más descanso' };
-      return { etapa: 'Senior', descripcion: 'Necesita revisiones veterinarias frecuentes y cuidados especiales' };
-    }
-  };
+  const [resultado, setResultado] = useState<Resultado | null>(null);
+  const [error, setError] = useState('');
 
   const calcular = () => {
-    const edad = parseFloat(edadMascota.replace(',', '.'));
-    if (isNaN(edad) || edad < 0 || edad > 30) return;
-
-    let edadHumana: number;
-    if (tipoMascota === 'perro') {
-      edadHumana = calcularEdadPerro(edad, tamanoPerro);
-    } else {
-      edadHumana = calcularEdadGato(edad);
+    const edad = parseSpanishNumber(edadMascota);
+    if (edadMascota.trim() === '' || isNaN(edad) || edad < EDAD_MINIMA || edad > EDAD_MAXIMA) {
+      // Antes se descartaba en silencio y quedaba el resultado anterior (hallazgo 3015)
+      setResultado(null);
+      setError(
+        `Introduce la edad en años, un número entre ${EDAD_MINIMA} y ${EDAD_MAXIMA} (puedes usar decimales: 3 meses son 0,25 años).`,
+      );
+      return;
     }
 
-    const { etapa, descripcion } = obtenerEtapaVida(tipoMascota, edad, edadHumana);
-
+    const etapa = obtenerEtapa(tipoMascota, tamanoPerro, edad);
+    setError('');
     setResultado({
-      edadHumana,
-      etapaVida: etapa,
-      descripcion,
+      tipo: tipoMascota,
+      edad,
+      edadHumana: calcularEdadHumana(tipoMascota, tamanoPerro, edad),
+      etapa: etapa.clave,
+      etapaNombre: etapa.nombre,
+      descripcion: etapa.descripcion,
     });
   };
 
   const limpiar = () => {
     setEdadMascota('');
+    setResultado(null);
+    setError('');
+  };
+
+  // Cambiar el tamaño invalida el resultado, como ya hacía el tipo de mascota (hallazgo 3014)
+  const cambiarTamano = (tamano: TamanoPerro) => {
+    setTamanoPerro(tamano);
     setResultado(null);
   };
 
@@ -128,65 +147,49 @@ export default function CalculadoraEdadMascotasPage() {
           {/* Selector de tamaño (solo para perros) */}
           {tipoMascota === 'perro' && (
             <div className={styles.inputGroup}>
-              <label>Tamaño del perro</label>
-              <div className={styles.tamanoGrid}>
-                <button
-                  type="button"
-                  aria-pressed={tamanoPerro === 'pequeno'}
-                  className={`${styles.tamanoBtn} ${tamanoPerro === 'pequeno' ? styles.active : ''}`}
-                  onClick={() => setTamanoPerro('pequeno')}
-                >
-                  <span className={styles.tamanoIcon} aria-hidden="true">🐕</span>
-                  <span className={styles.tamanoNombre}>Pequeño</span>
-                  <span className={styles.tamanoPeso}>&lt;10 kg</span>
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={tamanoPerro === 'mediano'}
-                  className={`${styles.tamanoBtn} ${tamanoPerro === 'mediano' ? styles.active : ''}`}
-                  onClick={() => setTamanoPerro('mediano')}
-                >
-                  <span className={styles.tamanoIcon} aria-hidden="true">🐕</span>
-                  <span className={styles.tamanoNombre}>Mediano</span>
-                  <span className={styles.tamanoPeso}>10-25 kg</span>
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={tamanoPerro === 'grande'}
-                  className={`${styles.tamanoBtn} ${tamanoPerro === 'grande' ? styles.active : ''}`}
-                  onClick={() => setTamanoPerro('grande')}
-                >
-                  <span className={styles.tamanoIcon} aria-hidden="true">🐕</span>
-                  <span className={styles.tamanoNombre}>Grande</span>
-                  <span className={styles.tamanoPeso}>25-45 kg</span>
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={tamanoPerro === 'gigante'}
-                  className={`${styles.tamanoBtn} ${tamanoPerro === 'gigante' ? styles.active : ''}`}
-                  onClick={() => setTamanoPerro('gigante')}
-                >
-                  <span className={styles.tamanoIcon} aria-hidden="true">🐕</span>
-                  <span className={styles.tamanoNombre}>Gigante</span>
-                  <span className={styles.tamanoPeso}>&gt;45 kg</span>
-                </button>
+              <span id={ID_TAMANO} className={styles.groupLabel}>Tamaño del perro</span>
+              <div className={styles.tamanoGrid} role="group" aria-labelledby={ID_TAMANO}>
+                {TAMANOS.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    aria-pressed={tamanoPerro === t}
+                    className={`${styles.tamanoBtn} ${tamanoPerro === t ? styles.active : ''}`}
+                    onClick={() => cambiarTamano(t)}
+                  >
+                    <span className={styles.tamanoIcon} aria-hidden="true">🐕</span>
+                    <span className={styles.tamanoNombre}>{mayuscula(NOMBRE_TAMANO[t])}</span>
+                    <span className={styles.tamanoPeso}>{PESO_TAMANO[t]}</span>
+                  </button>
+                ))}
               </div>
             </div>
           )}
 
           <div className={styles.inputGroup}>
-            <label>Edad de tu {tipoMascota === 'perro' ? 'perro' : 'gato'}</label>
+            <label htmlFor={ID_EDAD}>Edad de tu {tipoMascota === 'perro' ? 'perro' : 'gato'}</label>
             <div className={styles.inputConUnidad}>
               <input
+                id={ID_EDAD}
                 type="text"
+                inputMode="decimal"
                 value={edadMascota}
                 onChange={(e) => setEdadMascota(e.target.value)}
                 placeholder="5"
                 className={styles.input}
+                aria-invalid={error !== ''}
+                aria-describedby={`${ID_EDAD}-ayuda`}
               />
               <span className={styles.unidad}>años</span>
             </div>
-            <span className={styles.hint}>Puedes usar decimales (ej: 2,5 años)</span>
+            <span id={`${ID_EDAD}-ayuda`} className={styles.hint}>
+              Puedes usar decimales (ej: 2,5 años; 3 meses = 0,25)
+            </span>
+            {error && (
+              <p className={styles.error} role="alert">
+                {error}
+              </p>
+            )}
           </div>
 
           <div className={styles.botones}>
@@ -200,13 +203,13 @@ export default function CalculadoraEdadMascotasPage() {
         </div>
 
         {/* Panel de resultados */}
-        <div className={styles.resultsPanel}>
+        <div className={styles.resultsPanel} aria-live="polite">
           {resultado ? (
             <>
               {/* Edad humana */}
               <div className={styles.resultadoPrincipal}>
                 <span className={styles.resultadoIcon} aria-hidden="true">
-                  {tipoMascota === 'perro' ? '🐕' : '🐈'}
+                  {resultado.tipo === 'perro' ? '🐕' : '🐈'}
                 </span>
                 <div className={styles.resultadoValor}>
                   {formatNumber(resultado.edadHumana, 0)} años humanos
@@ -220,27 +223,24 @@ export default function CalculadoraEdadMascotasPage() {
               <div className={styles.etapaVida}>
                 <div className={styles.etapaTitulo}>
                   <span className={styles.etapaEmoji} aria-hidden="true">
-                    {resultado.etapaVida === 'Cachorro' || resultado.etapaVida === 'Gatito' ? '🍼' :
-                     resultado.etapaVida.includes('joven') ? '🎾' :
-                     resultado.etapaVida === 'Adulto' ? '💪' :
-                     resultado.etapaVida === 'Maduro' ? '🛋️' : '🧓'}
+                    {EMOJI_ETAPA[resultado.etapa]}
                   </span>
-                  <span>Etapa: {resultado.etapaVida}</span>
+                  <span>Etapa: {resultado.etapaNombre}</span>
                 </div>
                 <p className={styles.etapaDescripcion}>{resultado.descripcion}</p>
               </div>
 
-              {/* Comparación visual */}
+              {/* Comparación visual: la edad con que se calculó, no el campo en vivo */}
               <div className={styles.comparacion}>
                 <div className={styles.comparacionItem}>
                   <div className={styles.comparacionIcono} aria-hidden="true">
-                    {tipoMascota === 'perro' ? '🐕' : '🐈'}
+                    {resultado.tipo === 'perro' ? '🐕' : '🐈'}
                   </div>
                   <div className={styles.comparacionEdad}>
-                    {edadMascota} años
+                    {textoAnios(resultado.edad, formatEdad)}
                   </div>
                   <div className={styles.comparacionLabel}>
-                    {tipoMascota === 'perro' ? 'Perro' : 'Gato'}
+                    {resultado.tipo === 'perro' ? 'Perro' : 'Gato'}
                   </div>
                 </div>
                 <div className={styles.comparacionIgual}>=</div>
@@ -256,16 +256,15 @@ export default function CalculadoraEdadMascotasPage() {
               {/* Info adicional */}
               <div className={styles.infoAdicional}>
                 <h4><span aria-hidden="true">💡</span> ¿Sabías que...?</h4>
-                {tipoMascota === 'perro' ? (
+                {resultado.tipo === 'perro' ? (
                   <p>
-                    Los perros de raza pequeña suelen vivir más años que los grandes.
-                    Un Chihuahua puede vivir 15-20 años, mientras que un Gran Danés
-                    normalmente vive 6-8 años.
+                    Por lo general, los perros de tamaño pequeño viven más años que los grandes y los
+                    gigantes, y también llegan más tarde a la etapa senior.
                   </p>
                 ) : (
                   <p>
-                    Los gatos de interior suelen vivir más que los de exterior (15-20 años vs 10-12).
-                    El gato más longevo registrado vivió 38 años.
+                    A partir del segundo año, el gato envejece al mismo ritmo sea cual sea su peso:
+                    cada año suma unos {FACTOR_GATO} años humanos.
                   </p>
                 )}
               </div>
@@ -279,7 +278,7 @@ export default function CalculadoraEdadMascotasPage() {
         </div>
       </div>
 
-      {/* Tabla de referencia */}
+      {/* Tabla de referencia: sale del motor, no se teclea */}
       <div className={styles.tablaReferencia}>
         <h3><span aria-hidden="true">📊</span> Tabla de Referencia Rápida</h3>
         <div className={styles.tablasGrid}>
@@ -293,11 +292,9 @@ export default function CalculadoraEdadMascotasPage() {
                 </tr>
               </thead>
               <tbody>
-                <tr><td>1 año</td><td>15 años</td></tr>
-                <tr><td>2 años</td><td>24 años</td></tr>
-                <tr><td>5 años</td><td>39 años</td></tr>
-                <tr><td>7 años</td><td>49 años</td></tr>
-                <tr><td>10 años</td><td>64 años</td></tr>
+                {[1, 2, 5, 7, 10].map((e) => (
+                  <tr key={e}><td>{textoAnios(e, formatEdad)}</td><td>{humanos('perro', 'mediano', e)} años</td></tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -311,11 +308,9 @@ export default function CalculadoraEdadMascotasPage() {
                 </tr>
               </thead>
               <tbody>
-                <tr><td>1 año</td><td>15 años</td></tr>
-                <tr><td>2 años</td><td>24 años</td></tr>
-                <tr><td>5 años</td><td>36 años</td></tr>
-                <tr><td>10 años</td><td>56 años</td></tr>
-                <tr><td>15 años</td><td>76 años</td></tr>
+                {[1, 2, 5, 10, 15].map((e) => (
+                  <tr key={e}><td>{textoAnios(e, formatEdad)}</td><td>{humanos('gato', 'mediano', e)} años</td></tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -324,7 +319,7 @@ export default function CalculadoraEdadMascotasPage() {
 
 
       <DisclaimerCard variant="medical" severity="high" collapsible={false} context="calculadora-edad-mascotas">
-        <p>Esta calculadora usa fórmulas científicas actualizadas, pero es <strong>solo orientativa</strong>:</p>
+        <p>Esta calculadora usa una regla convencional de equivalencia y es <strong>solo orientativa</strong>:</p>
         <ul className={styles.disclaimerList}>
           <li><strong>La edad biológica varía</strong>: Depende de raza, tamaño, alimentación, ejercicio y genética individual</li>
           <li><strong>No reemplaza revisiones veterinarias</strong>: El envejecimiento de tu mascota debe evaluarlo un veterinario con exploración física</li>
@@ -334,44 +329,82 @@ export default function CalculadoraEdadMascotasPage() {
 
       <EducationalSection
         title="Todo sobre la edad de tu mascota"
-        subtitle="Ciencia real del envejecimiento animal: tablas completas, mitos desmontados y guía de cuidados por etapa vital"
+        subtitle="Cómo se calcula la equivalencia, tablas por tamaño y guía de cuidados por etapa vital"
       >
         {/* 1. TABLA COMPARATIVA */}
         <section>
           <h3>Tabla comparativa de equivalencia de edad</h3>
           <p>
-            La popular &quot;regla de los 7 años&quot; es un mito. La proporción varía significativamente
-            según el tamaño del perro y la edad real. Los perros grandes envejecen más rápido;
-            los pequeños pueden superar los 18 años con buena salud.
+            La popular &quot;regla de los 7 años&quot; es una simplificación: la proporción varía
+            según el tamaño del perro y la edad real. Los perros grandes envejecen más rápido
+            que los pequeños.
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
                 <tr>
                   <th>Edad real</th>
-                  <th>Pequeño <span aria-hidden="true">(&lt;10 kg)</span></th>
-                  <th>Mediano <span aria-hidden="true">(10-25 kg)</span></th>
-                  <th>Grande <span aria-hidden="true">(25-45 kg)</span></th>
-                  <th>Gigante <span aria-hidden="true">(&gt;45 kg)</span></th>
+                  {TAMANOS.map((t) => (
+                    <th key={t}>
+                      {mayuscula(NOMBRE_TAMANO[t])} <span aria-hidden="true">({PESO_TAMANO[t]})</span>
+                    </th>
+                  ))}
                   <th>Gato</th>
                 </tr>
               </thead>
               <tbody>
-                <tr><td>1 año</td><td>15 años</td><td>15 años</td><td>15 años</td><td>15 años</td><td>15 años</td></tr>
-                <tr><td>2 años</td><td>24 años</td><td>24 años</td><td>24 años</td><td>24 años</td><td>24 años</td></tr>
-                <tr><td>3 años</td><td>28 años</td><td>29 años</td><td>30 años</td><td>31 años</td><td>28 años</td></tr>
-                <tr><td>5 años</td><td>36 años</td><td>39 años</td><td>42 años</td><td>45 años</td><td>36 años</td></tr>
-                <tr><td>7 años</td><td>44 años</td><td>49 años</td><td>54 años</td><td>59 años</td><td>44 años</td></tr>
-                <tr><td>10 años</td><td>56 años</td><td>64 años</td><td>72 años</td><td>80 años</td><td>56 años</td></tr>
-                <tr><td>12 años</td><td>64 años</td><td>74 años</td><td>84 años</td><td>94 años</td><td>64 años</td></tr>
-                <tr><td>15 años</td><td>76 años</td><td>89 años</td><td>102 años</td><td>—</td><td>76 años</td></tr>
+                {[1, 2, 3, 5, 7, 10, 12, 15].map((e) => (
+                  <tr key={e}>
+                    <td>{textoAnios(e, formatEdad)}</td>
+                    {TAMANOS.map((t) => (
+                      <td key={t}>{t === 'gigante' && e === 15 ? '—' : `${humanos('perro', t, e)} años`}</td>
+                    ))}
+                    <td>{humanos('gato', 'mediano', e)} años</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
           <p className={styles.faqTip}>
-            <strong>Nota:</strong> Los perros gigantes raramente superan los 10-11 años. Valores calculados
-            con el modelo científico de Dog Aging Project (Cell Systems, 2020).
+            <strong>Nota:</strong> Valores de la regla convencional orientativa (15 años humanos el
+            primer año, 9 más el segundo y, desde el tercero, 4, 5, 6 o 7 por año según el tamaño;
+            4 en el gato). No es un modelo científico: un estudio de 2020 (Wang et al., Cell Systems)
+            propuso otro, basado en cambios epigenéticos y calibrado en labradores, que esta
+            calculadora no usa.
           </p>
+        </section>
+
+        {/* 1 bis. ETAPAS VITALES — la misma tabla que usa el motor */}
+        <section>
+          <h3>Etapas vitales según el tamaño</h3>
+          <p>
+            Edades orientativas, en años del animal, con las que la calculadora asigna la etapa. No
+            hay un umbral oficial único: cada veterinario lo ajusta al animal concreto.
+          </p>
+          <div className={styles.tableWrapper}>
+            <table className={styles.comparativaTable}>
+              <thead>
+                <tr>
+                  <th>Etapa</th>
+                  {TAMANOS.map((t) => (
+                    <th key={t}>Perro {NOMBRE_TAMANO[t]}</th>
+                  ))}
+                  <th>Gato</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(['Cría', 'Joven', 'Adulto', 'Maduro', 'Senior', 'Geriátrico'] as const).map((nombre, i) => (
+                  <tr key={nombre}>
+                    <td>{nombre}</td>
+                    {TAMANOS.map((t) => (
+                      <td key={t}>{rangosEtapa(UMBRALES_PERRO[t])[i]}</td>
+                    ))}
+                    <td>{rangosEtapa(UMBRALES_GATO)[i]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         {/* 2. CASOS DE USO */}
@@ -385,7 +418,7 @@ export default function CalculadoraEdadMascotasPage() {
               </div>
               <p className={styles.escenarioExample}>
                 Has adoptado un perro sin historial conocido y el veterinario estima 5-6 años.
-                La calculadora te confirma que equivale a un humano de 39-44 años: adulto activo,
+                Si es mediano, la calculadora te dice que equivale a un humano de {humanos('perro', 'mediano', 5)}-{humanos('perro', 'mediano', 6)} años: adulto activo,
                 pero con revisiones anuales ya recomendables.
               </p>
               <p className={styles.escenarioTip}>
@@ -398,8 +431,8 @@ export default function CalculadoraEdadMascotasPage() {
                 <strong>Propietario que ajusta la dieta</strong>
               </div>
               <p className={styles.escenarioExample}>
-                Tu Golden Retriever cumple 8 años. La calculadora muestra 64 años humanos equivalentes:
-                es momento de valorar el cambio a pienso &quot;senior&quot; y reducir las calorías un 10-20 %.
+                Tu Golden Retriever (perro grande) cumple 8 años. La calculadora muestra {humanos('perro', 'grande', 8)} años humanos
+                equivalentes y la etapa senior: es momento de hablar con el veterinario del pienso &quot;senior&quot; y de ajustar las calorías.
               </p>
               <p className={styles.escenarioTip}>
                 La etapa vital equivalente orienta cuándo y cómo adaptar la alimentación.
@@ -412,7 +445,7 @@ export default function CalculadoraEdadMascotasPage() {
               </div>
               <p className={styles.escenarioExample}>
                 Comunicar &quot;tu perro tiene 9 años&quot; no genera la misma empatía que
-                &quot;equivale a una persona de 69 años&quot;. La equivalencia humana ayuda al propietario
+                &quot;equivale a una persona de {humanos('perro', 'grande', 9)} años&quot; (si es grande). La equivalencia humana ayuda al propietario
                 a comprender la urgencia de revisiones semestrales.
               </p>
               <p className={styles.escenarioTip}>
@@ -425,7 +458,7 @@ export default function CalculadoraEdadMascotasPage() {
                 <strong>Criador responsable</strong>
               </div>
               <p className={styles.escenarioExample}>
-                Una perra de 7 años de raza grande equivale a 54 años humanos. Conocer esto orienta
+                Una perra de 7 años de raza grande equivale a {humanos('perro', 'grande', 7)} años humanos. Conocer esto orienta
                 las decisiones éticas sobre reproducción tardía y el momento de retirar a la reproductora
                 del programa de cría.
               </p>
@@ -440,79 +473,13 @@ export default function CalculadoraEdadMascotasPage() {
         <section>
           <h3>Preguntas frecuentes sobre la edad de las mascotas</h3>
           <dl className={styles.faqList}>
-            <div className={styles.faqItem}>
-              <dt>¿Por qué la regla de los 7 años es incorrecta?</dt>
-              <dd>
-                Porque no considera que el envejecimiento no es lineal ni uniforme. El primer año de vida
-                de un perro equivale a 15 años humanos (por el rapidísimo desarrollo). Además, la tasa
-                de envejecimiento varía enormemente según el tamaño: un perro gigante envejece el doble
-                de rápido que uno pequeño a partir del segundo año.
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Cuándo es &quot;mayor&quot; un perro grande frente a uno pequeño?</dt>
-              <dd>
-                Un perro grande (25-45 kg) se considera senior a partir de los 7 años; uno gigante (más
-                de 45 kg), a los 5-6 años. En cambio, los perros pequeños no entran en la etapa senior
-                hasta los 10-12 años. Esta diferencia es la razón principal por la que los perros pequeños
-                viven significativamente más.
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿A qué edad humana equivale un perro de 2 años?</dt>
-              <dd>
-                Independientemente del tamaño, un perro de 2 años equivale aproximadamente a 24 años
-                humanos. El segundo año de vida supone 9 años de envejecimiento humano adicionales al
-                primer año (que ya representaba 15). A partir del tercer año, los factores de tamaño
-                empiezan a divergir.
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Cómo varía la esperanza de vida según el tamaño del perro?</dt>
-              <dd>
-                De forma marcada: los perros pequeños (menos de 10 kg) pueden vivir 14-20 años,
-                los medianos 12-15 años, los grandes 10-12 años y los gigantes apenas 6-10 años.
-                Se cree que esto se debe a que los organismos más grandes acumulan radicales libres
-                y errores de replicación celular más rápidamente.
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Cuándo cambiar al pienso de &quot;senior&quot;?</dt>
-              <dd>
-                Depende del tamaño: razas pequeñas y medianas, a partir de los 7-8 años; razas grandes,
-                a partir de los 6 años; razas gigantes, a partir de los 5 años. El pienso senior tiene
-                menos calorías, más fibra y suplementos articulares. Consulta siempre con tu veterinario
-                antes de cambiar la dieta.
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Los gatos envejecen igual que los perros?</dt>
-              <dd>
-                No exactamente. Los gatos siguen una curva similar en los primeros años (1 año = 15
-                años humanos; 2 años = 24), pero a partir de ahí envejecen a un ritmo de 4 años
-                humanos por año de gato, independientemente del peso. Los gatos de interior tienden
-                a vivir 15-20 años; los de exterior, 10-12 años por exposición a riesgos externos.
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Qué cambios físicos esperar en un perro de 10 años?</dt>
-              <dd>
-                A los 10 años, un perro mediano equivale a 64 años humanos. Es habitual observar:
-                menor tolerancia al ejercicio intenso, encanecimiento del hocico, posible rigidez
-                articular al levantarse, visión y audición algo reducidas, y mayor tiempo de sueño.
-                Los controles veterinarios semestrales son esenciales para detectar patologías
-                tempranamente (artritis, insuficiencia renal, tumores).
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Cómo calcular la edad si el perro fue rescatado sin historial?</dt>
-              <dd>
-                El veterinario puede estimar la edad mediante varios indicadores: estado dental
-                (desgaste e incrustaciones de sarro), opacidad del cristalino, pelaje (canas en
-                el hocico), desarrollo muscular y radiografías de huesos. Con esa estimación, introduce
-                la edad media del rango en la calculadora para obtener la equivalencia humana orientativa.
-              </dd>
-            </div>
+            {/* Del MISMO array que el FAQPage de metadata.ts: las dos bocas no pueden divergir */}
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <dt>{f.question}</dt>
+                <dd>{f.answer}</dd>
+              </div>
+            ))}
           </dl>
         </section>
 
@@ -526,8 +493,9 @@ export default function CalculadoraEdadMascotasPage() {
               <div className={styles.stepContent}>
                 <strong>Identifica la etapa vital</strong>
                 <p>
-                  Cachorro (0-1 año), Joven (1-3 años), Adulto (3-7 años), Maduro (7-9 años),
-                  Senior (9-12 años) o Geriátrico (más de 12 años). Cada etapa tiene necesidades
+                  Cachorro, joven, adulto, maduro, senior o geriátrico: la calculadora te la da, y las
+                  edades de cada una según el tamaño están en la tabla de etapas de arriba (un perro
+                  gigante es senior a los {UMBRALES_PERRO.gigante.senior} años; uno pequeño, a los {UMBRALES_PERRO.pequeno.senior}). Cada etapa tiene necesidades
                   nutricionales y de ejercicio distintas.
                 </p>
               </div>
@@ -548,8 +516,9 @@ export default function CalculadoraEdadMascotasPage() {
               <div className={styles.stepContent}>
                 <strong>Adapta el ejercicio</strong>
                 <p>
-                  Los perros adultos necesitan 45-90 minutos de ejercicio diario; los seniors,
-                  paseos más cortos pero frecuentes (3-4 veces al día). Evita superficies duras
+                  La cantidad de ejercicio depende de la raza, la edad y la salud: pregunta a tu
+                  veterinario por la de tu perro. Con los seniors suelen ir mejor paseos más cortos
+                  pero más frecuentes. Evita superficies duras
                   y saltos en perros mayores para proteger las articulaciones.
                 </p>
               </div>
@@ -607,7 +576,7 @@ export default function CalculadoraEdadMascotasPage() {
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🍼</span>
-              <strong>Cachorro (0-1 año)</strong>
+              <strong>Cachorro</strong>
               <p>
                 Socialización intensiva con personas, animales y entornos variados. Vacunación
                 completa y desparasitaciones periódicas. Limitar el ejercicio de alto impacto para
@@ -616,7 +585,7 @@ export default function CalculadoraEdadMascotasPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🎾</span>
-              <strong>Adulto joven (1-3 años)</strong>
+              <strong>Joven</strong>
               <p>
                 Máxima actividad física y juego. Momento ideal para consolidar el adiestramiento
                 y establecer rutinas. Esterilización si no se destina a cría. Mantener el peso
@@ -626,7 +595,7 @@ export default function CalculadoraEdadMascotasPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">💪</span>
-              <strong>Adulto pleno (3-7 años)</strong>
+              <strong>Adulto</strong>
               <p>
                 Etapa de equilibrio. Mantener la rutina de ejercicio y una dieta estable.
                 Revisión dental anual (el sarro acumulado puede causar infecciones cardíacas
@@ -635,7 +604,7 @@ export default function CalculadoraEdadMascotasPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🛋️</span>
-              <strong>Maduro (7-9 años)</strong>
+              <strong>Maduro</strong>
               <p>
                 Empieza a valorar el cambio a pienso senior. Incorpora suplementos de omega-3
                 y glucosamina para las articulaciones si el veterinario lo recomienda. Reduce
@@ -645,7 +614,7 @@ export default function CalculadoraEdadMascotasPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🧓</span>
-              <strong>Senior (9-12 años)</strong>
+              <strong>Senior</strong>
               <p>
                 Revisión veterinaria semestral obligatoria. Adapta el entorno: cama ortopédica,
                 rampas y suelos antideslizantes. Paseos cortos y frecuentes en lugar de
@@ -654,7 +623,7 @@ export default function CalculadoraEdadMascotasPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">❤️</span>
-              <strong>Geriátrico (más de 12 años)</strong>
+              <strong>Geriátrico</strong>
               <p>
                 Prioridad: confort y calidad de vida. Revisiones veterinarias trimestrales.
                 Medicación para el dolor articular si el veterinario la prescribe. Dieta
@@ -674,9 +643,9 @@ export default function CalculadoraEdadMascotasPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>Esperar demasiado para cambiar a dieta senior:</strong> Mantener la alimentación
-                de adulto en un perro grande de 6-7 años equivale a dar la misma comida a una persona
-                de 54 años que a una de 35. Las necesidades metabólicas son muy distintas.
+                <strong>Esperar demasiado para cambiar a dieta senior:</strong> Un perro grande de {UMBRALES_PERRO.grande.senior} años
+                equivale ya a {humanos('perro', 'grande', UMBRALES_PERRO.grande.senior)} años humanos; mantenerle la alimentación de adulto joven
+                ignora que sus necesidades metabólicas han cambiado.
               </li>
               <li>
                 <strong>No ajustar el ejercicio en perros mayores:</strong> Los saltos, las carreras
@@ -689,13 +658,13 @@ export default function CalculadoraEdadMascotasPage() {
                 son manejables; ignoradas, acortan la vida varios años.
               </li>
               <li>
-                <strong>Saltar las revisiones dentales:</strong> La enfermedad periodontal en perros
-                mayores de 7 años afecta al corazón y los riñones. La limpieza dental veterinaria
-                anual puede añadir años de vida.
+                <strong>Saltar las revisiones dentales:</strong> La enfermedad periodontal es frecuente
+                en perros mayores y puede afectar a otros órganos. Pregunta a tu veterinario cada
+                cuánto conviene revisarle la boca.
               </li>
               <li>
                 <strong>Subestimar el envejecimiento acelerado en razas grandes:</strong> Un Pastor
-                Alemán de 8 años ya es un perro anciano (64 años equivalentes). Tratarlo como un
+                Alemán (perro grande) de 8 años ya es senior ({humanos('perro', 'grande', 8)} años equivalentes). Tratarlo como un
                 adulto de mediana edad en términos de ejercicio o dieta puede precipitar su deterioro.
               </li>
               <li>

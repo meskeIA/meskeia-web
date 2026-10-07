@@ -38,9 +38,8 @@ import { activarTema } from '../contraste-text-muted-auxiliares';
  *                     «2,5» y «2.5» → 24 + 0,5 × 5 = 26,5 → Intl es-ES redondea a 27
  *   CASO 3 (rechazo) — vacío, −3, 60 y 30,5 no deben dar resultado
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()` — afirman lo que debería pasar y hoy
- * fallan a propósito. El día que se reparen se ponen en verde: quitar entonces la línea
- * `test.fail()` y quedan como regresión.
+ * HALLAZGOS: al final. Abiertos el 07/10/2026 con `test.fail()` y REPARADOS ese mismo día
+ * (motor.ts con interpolación y etapas por tamaño, FAQ única en metadata.ts): quedan como regresión.
  */
 
 const RUTA = '/calculadora-edad-mascotas/';
@@ -168,7 +167,9 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
 
     await calcularCon(page, { mascota: 'Perro', tamano: 'Gigante', edad: '10' });
     await expect(resultado(page)).toHaveText('80 años humanos'); // 24 + 8 × 7
-    await expect(etapa(page)).toContainText('Etapa: Senior');
+    // Etapas por tamaño (motor.ts, UMBRALES_PERRO.gigante): senior desde 6, geriátrico desde 10.
+    // Antes salía «Senior» porque la etapa no miraba el tamaño (hallazgo 3013).
+    await expect(etapa(page)).toContainText('Etapa: Geriátrico');
 
     await calcularCon(page, { mascota: 'Perro', tamano: 'Mediano', edad: '0' });
     await expect(resultado(page)).toHaveText('0 años humanos');
@@ -226,12 +227,11 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
     }
   });
 
-  // ─────────────────────────── HALLAZGOS ABIERTOS (07/10/2026) ───────────────────────────
+  // ──────────── HALLAZGOS DEL 07/10/2026 — REPARADOS el 07/10/2026 (motor.ts + FAQ única) ────────────
 
   test('HALLAZGO calculo — el primer y el segundo año son un escalón: 3 meses = 15 años humanos', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: edad ≤ 1 → 15 y edad ≤ 2 → 24 sin interpolar; por encima de 2 sí interpola');
     // Con los anclajes de la propia app (0 → 0, 1 → 15, 2 → 24) y la interpolación lineal que
     // ya aplica por encima de 2 años: 0,25 → 3,75 → «4»; 1,5 → 15 + 0,5 × 9 = 19,5 → «20».
     await calcularCon(page, { mascota: 'Perro', tamano: 'Mediano', edad: '0,25' });
@@ -244,22 +244,24 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
   test('HALLAZGO contenido — atribuye a Cell Systems 2020 valores que no son de ese modelo', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: la nota cita Cell Systems 2020 (16·ln(edad)+31) y el motor da 15 al año');
-    const citaCellSystems =
-      (await page.locator('[class*="faqTip"]', { hasText: 'Cell Systems' }).count()) > 0;
+    // REPARADO: la app usa la regla convencional (15 + 9 + 4-7/año) y lo dice; Wang et al. 2020
+    // (16 · ln(edad) + 31 → 31 al año) solo puede citarse para decir que NO es el que usa.
+    const nota = normaliza(
+      (await page.locator('[class*="faqTip"]', { hasText: 'Nota:' }).first().textContent()) ?? '',
+    );
     await calcularCon(page, { mascota: 'Perro', tamano: 'Mediano', edad: '1' });
     const valor = await resultado(page).innerText();
-    // Wang et al. 2020: 16 · ln(1) + 31 = 31. O se cita y se usa, o no se cita.
-    expect(
-      !citaCellSystems || valor === '31 años humanos',
-      `cita Cell Systems = ${citaCellSystems}; perro de 1 año = «${valor}»`,
-    ).toBe(true);
+    expect(valor).toBe('15 años humanos');
+    expect(nota).toContain('regla convencional');
+    if (nota.includes('Cell Systems')) expect(nota).toMatch(/no usa/);
+    // Ni la promesa de la metadata ni el aviso venden ya una «fórmula científica»
+    expect(await page.locator('meta[name="description"]').getAttribute('content')).not.toMatch(/científic/i);
+    await expect(page.getByText(/fórmulas? científicas?/i)).toHaveCount(0);
   });
 
   test('HALLAZGO contenido — el FAQPage da 31 y 42 años al perro de 1 y 2 años; el motor, 15 y 24', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: faqJsonLd de metadata.ts cita las cifras de Cell Systems, no las del motor');
     const faq = await faqJsonLd(page);
     const respuesta = faq.get('¿Cuántos años humanos equivalen a 1 año de perro?') ?? '';
     expect(respuesta).not.toBe('');
@@ -275,7 +277,6 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
   test('HALLAZGO contenido — «¿Los gatos envejecen igual que los perros?» responde distinto en el FAQPage y en pantalla', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: FAQPage 12-18 años de vida; FAQ visible 15-20 interior y 10-12 exterior');
     const pregunta = '¿Los gatos envejecen igual que los perros?';
     const enJsonLd = (await faqJsonLd(page)).get(pregunta) ?? '';
     const visible =
@@ -290,7 +291,6 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
   test('HALLAZGO calculo — la etapa vital ignora el tamaño: un gigante de 8 años sale «Maduro»', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: la propia página dice que un gigante es senior desde 5-6 (FAQ) o 7 (FAQPage)');
     await calcularCon(page, { mascota: 'Perro', tamano: 'Gigante', edad: '8' });
     await expect(resultado(page)).toHaveText('66 años humanos'); // 24 + 6 × 7: el número está bien
     await expect(etapa(page)).toContainText('Senior', { timeout: 2000 });
@@ -299,7 +299,6 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
   test('HALLAZGO operativa — cambiar el tamaño o la edad no invalida el resultado mostrado', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: setTamanoPerro no limpia el resultado y la comparación lee el campo en vivo');
     await calcularCon(page, { mascota: 'Perro', tamano: 'Mediano', edad: '5' });
     await expect(resultado(page)).toHaveText('39 años humanos');
     await botonTamano(page, 'Gigante').click();
@@ -311,7 +310,6 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
   test('HALLAZGO operativa — una edad fuera de rango se descarta en silencio y deja el resultado anterior', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: calcular() hace return sin aviso ni setResultado(null)');
     await calcularCon(page, { mascota: 'Perro', tamano: 'Mediano', edad: '5' });
     await expect(resultado(page)).toHaveText('39 años humanos');
     await escribirEdad(page, '60');
@@ -324,7 +322,6 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
   test('HALLAZGO calculo — el parser casero acepta «3 meses» como 3 años y «12abc» como 12', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: parseFloat(texto.replace(",", ".")) en vez de parseSpanishNumber');
     await calcularCon(page, { mascota: 'Perro', tamano: 'Mediano', edad: '3 meses' });
     // Hoy: «29 años humanos» (24 + 1 × 5) para un cachorro de tres meses.
     await expect(resultado(page)).toHaveCount(0, { timeout: 2000 });
@@ -336,12 +333,10 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
   test('HALLAZGO accesibilidad — el campo de edad no tiene nombre accesible (su <label> no está asociada)', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: <label> sin htmlFor/id; el lector de pantalla lo anuncia como «5» (el placeholder)');
     await expect(page.getByLabel(/Edad de tu perro/)).toHaveCount(1, { timeout: 2000 });
   });
 
   test('HALLAZGO accesibilidad — el resultado no está en una región viva', async ({ page }) => {
-    test.fail(true, 'ABIERTO: ni aria-live ni role="status" en el panel de resultados');
     await calcularCon(page, { mascota: 'Perro', tamano: 'Mediano', edad: '5' });
     await expect(resultado(page)).toHaveText('39 años humanos');
     const enRegionViva = await resultado(page).evaluate((el) =>
@@ -351,7 +346,6 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
   });
 
   test('HALLAZGO accesibilidad — contraste del botón principal y del texto de marca', async ({ page }) => {
-    test.fail(true, 'ABIERTO: blanco sobre degradado #2E86AB→#48A9A6 (3,38:1 en el centro) y #2E86AB sobre tinte (3,65:1)');
     await calcularCon(page, { mascota: 'Perro', tamano: 'Mediano', edad: '5' });
     // Texto de 16 px/600 y 17,6 px/600: no es «grande», exige 4,5:1.
     expect(await contraste(page, '[class*="btnPrimary"]')).toBeGreaterThanOrEqual(4.5);
@@ -360,7 +354,6 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
   });
 
   test('HALLAZGO accesibilidad — en oscuro la cifra del resultado baja de 3:1', async ({ page }) => {
-    test.fail(true, 'ABIERTO: #2E86AB fijo sobre el panel oscuro ≈ 2,9:1 (texto grande, exige 3:1)');
     await activarTema(page, 'dark');
     await esperarHidratacion(page, [SEL_EDAD]);
     await calcularCon(page, { mascota: 'Perro', tamano: 'Mediano', edad: '5' });
@@ -369,7 +362,6 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
   });
 
   test('HALLAZGO contenido — los ejemplos del texto dan cifras que el motor no produce', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «Golden Retriever de 8 años = 64» y «Pastor Alemán de 8 = 64»; grande 8 → 60');
     await calcularCon(page, { mascota: 'Perro', tamano: 'Grande', edad: '8' });
     const n = cifra(await resultado(page).innerText()); // 24 + 6 × 6 = 60
     expect(n).toBe('60');
@@ -381,7 +373,6 @@ test.describe('Calculadora de edad de mascotas — escritorio', () => {
   });
 
   test('HALLAZGO contenido — la comparación repite el texto crudo: «1 años», «2.5 años»', async ({ page }) => {
-    test.fail(true, 'ABIERTO: {edadMascota} años, sin singular ni formato es-ES');
     await calcularCon(page, { mascota: 'Perro', tamano: 'Mediano', edad: '1' });
     await expect(comparacion(page).first()).toHaveText('1 año', { timeout: 2000 });
     await escribirEdad(page, '2.5');
@@ -415,7 +406,6 @@ test.describe('Calculadora de edad de mascotas — móvil 390 px', () => {
   });
 
   test('HALLAZGO operativa — en móvil el campo de edad abre el teclado alfabético', async ({ page }) => {
-    test.fail(true, 'ABIERTO: type="text" sin inputMode="decimal"');
     await expect(page.locator(SEL_EDAD)).toHaveAttribute('inputmode', 'decimal', { timeout: 2000 });
   });
 });
