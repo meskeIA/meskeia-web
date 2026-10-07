@@ -127,7 +127,6 @@ test.describe('Pruebas diagnósticas', () => {
   });
 
   test('D2b — especificidad 0 % (VN 0): LR+ = 0,90, no infinito', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: la guarda de LR+ mira `especificidad > 0` en vez de `1 − esp > 0`; con esp 0 pinta «∞ · prueba muy útil para confirmar»');
     await rellenar(page, tabla('90', '50', '10', '0'));
     // Control: el resto de la tarjeta está bien.
     await expect(cifra(page, 'Sensibilidad')).toHaveText(pct('90,0'));
@@ -138,7 +137,6 @@ test.describe('Pruebas diagnósticas', () => {
   });
 
   test('D2c — sensibilidad 0 % (VP 0): LR− = 1,11, no infinito', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: la guarda de LR− mira `sensibilidad > 0` en vez de `especificidad > 0`; con sens 0 pinta «∞»');
     await rellenar(page, tabla('0', '10', '10', '90'));
     await expect(cifra(page, 'Especificidad')).toHaveText(pct('90,0'));
     await expect(cifra(page, 'LR+')).toHaveText(num('0,00')); // 0 / 0,1
@@ -147,7 +145,6 @@ test.describe('Pruebas diagnósticas', () => {
   });
 
   test('D3 — un recuento negativo (FN −20) no produce una sensibilidad del 128,6 %', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: no valida los recuentos; con FN −20 pinta sensibilidad 128,6 %, VPN 112,5 % y exactitud 103,8 %');
     await rellenar(page, tabla('90', '10', '20', '180'));
     await expect(cifra(page, 'Sensibilidad')).toHaveText(pct('81,8')); // la app está viva
     await rellenar(page, [['FN', '-20']]);
@@ -156,7 +153,6 @@ test.describe('Pruebas diagnósticas', () => {
   });
 
   test('D4 — indeterminación 0/0: con VP 0 y FP 0 el VPP no es «0,0 %»', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: VPP = 0/0 (la prueba nunca da positivo) se pinta como 0,0 %');
     await rellenar(page, tabla('0', '0', '10', '90'));
     await expect(cifra(page, 'VPN')).toHaveText(pct('90,0')); // 90/100, definido
     await expect(cifra(page, 'VPP')).not.toHaveText(pct('0,0'), { timeout: 2000 });
@@ -184,7 +180,6 @@ test.describe('Epidemiología', () => {
   });
 
   test('E2 — celda b = 0: el RR (2,00) sigue siendo calculable y se muestra', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: con b = 0 o c = 0 la app oculta TODO y pide «Introduce los datos» aunque estén puestos');
     await rellenar(page, epi('10', '10', '5', '5'));
     await expect(cifra(page, 'Riesgo Relativo')).toHaveText(num('1,00')); // (10/20)/(5/10): control de que la app está viva
     await rellenar(page, [['b', '0']]);
@@ -193,7 +188,6 @@ test.describe('Epidemiología', () => {
   });
 
   test('E3 — un recuento negativo (a = −5) se rechaza, no da «Riesgo Expuestos −20,0 %»', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: no valida los recuentos; con a −5 pinta OR −0,83 «Efecto protector fuerte» y riesgo −20,0 %');
     await rellenar(page, epi('50', '30', '20', '100'));
     await expect(cifra(page, 'Odds Ratio')).toHaveText(num('8,33')); // 5000/600, control
     await rellenar(page, [['a', '-5']]);
@@ -201,7 +195,6 @@ test.describe('Epidemiología', () => {
   });
 
   test('S1 — OR 1,42 con IC 1,12 – 1,79 (no incluye el 1) no se rotula «Sin asociación significativa»', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: el rótulo del OR sale solo del valor puntual e ignora el IC que la propia página usa para definir la significación');
     await rellenar(page, epi('200', '800', '150', '850'));
     await expect(cifra(page, 'Odds Ratio')).toHaveText(num('1,42')); // 170.000 / 120.000
     await expect(tarjeta(page, 'Odds Ratio')).toContainText(/IC 95\s?%:\s*1,12\s*[-–]\s*1,79/);
@@ -209,7 +202,6 @@ test.describe('Epidemiología', () => {
   });
 
   test('S2 — con la tabla rotulada Caso/Control, el «riesgo» no se presenta como incidencia sin aviso', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: en un caso-control a/(a+b) no es una incidencia; solo la tarjeta del RR avisa «Solo válido en cohortes»');
     await page.getByRole('button', { name: 'Cargar ejemplo' }).click();
     await expect(page.getByRole('columnheader', { name: 'Caso' })).toBeVisible();
     await expect(cifra(page, 'Riesgo Expuestos')).toHaveText(pct('62,5')); // 50/80
@@ -235,7 +227,6 @@ test.describe('NNT directo', () => {
   });
 
   test('N2 — CER = EER: sin efecto, y ninguna frase dice «Infinity»', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: con ARR 0 la frase es «Hay que tratar a Infinity pacientes para prevenir 1 evento»');
     await rellenar(page, [['20', '20'], ['12', '20']]);
     await expect(cifra(page, 'NNT')).toHaveText(num('∞'));
     await expect(page.locator(PANEL)).not.toContainText('Infinity', { timeout: 2000 });
@@ -254,7 +245,6 @@ test.describe('NNT directo', () => {
 // ═══════════════════════════════════════════════════════════════════════════
 test.describe('Contenido y promesa', () => {
   test('C1 — el aviso «99 % / 99 %» empareja bien prevalencia y VPP (0,1 % → 9 %; 1 % → 50 %)', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: dice «VPP de solo 50 % cuando la prevalencia es 0,1 %»; con 0,1 % el VPP es 9,0 % (50 % es con 1 %)');
     const texto = await page.locator('li', { hasText: 'Ignorar la prevalencia al calcular VPP' }).textContent();
     const prev = texto?.match(/prevalencia de la enfermedad es (\d+(?:,\d+)?)\s?%/)?.[1];
     const vpp = texto?.match(/VPP de solo (\d+(?:,\d+)?)\s?%/)?.[1];
@@ -265,8 +255,7 @@ test.describe('Contenido y promesa', () => {
   });
 
   test('C2 — el IC del OR del «Epidemiólogo» coincide con el que da la propia calculadora (6,71 – 15,08)', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: el texto dice «IC 95% OR: [6,2 – 16,3]» y «OR … = 10,05»; con esos datos la app (Woolf) da 6,71 – 15,08 y 10,06');
-    const texto = (await page.locator('p', { hasText: 'IC 95% OR' }).textContent()) ?? '';
+    const texto = (await page.locator('p', { hasText: /IC 95\s?% OR/ }).textContent()) ?? '';
     const m = texto.match(/IC 95\s?% OR:\s*\[?(\d+,\d+)\s*[–-]\s*(\d+,\d+)/);
     expect(m, 'no se encuentra el IC en el texto').not.toBeNull();
     const aNumero = (s: string): number => Number(s.replace(',', '.'));
@@ -275,7 +264,6 @@ test.describe('Contenido y promesa', () => {
   });
 
   test('C3 — el FAQPage no pide VP/FP/FN/VN para calcular el OR y el RR', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: la respuesta del FAQPage describe la tabla del modo diagnóstico, no la de exposición (a, b, c, d)');
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.map((b) => JSON.parse(b) as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] })
       .find((j) => j['@type'] === 'FAQPage');
@@ -285,7 +273,6 @@ test.describe('Contenido y promesa', () => {
   });
 
   test('C4 — lo que promete el JSON-LD (IC 95 % en el NNT, RRR en epidemiología) está en pantalla', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: el modo NNT no da ningún IC y el modo epidemiología calcula la RRR pero no la pinta');
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const app = bloques.map((b) => JSON.parse(b) as { '@type'?: string; featureList?: string[] })
       .find((j) => j['@type'] === 'WebApplication');
@@ -310,7 +297,6 @@ test.describe('Contenido y promesa', () => {
 // ═══════════════════════════════════════════════════════════════════════════
 test.describe('Accesibilidad', () => {
   test('A1 — los dos campos del modo NNT se encuentran por su rótulo visible', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: los <label> no están asociados (sin htmlFor/id); el nombre accesible es el placeholder «20» y «12»');
     await modo(page, /^NNT Directo/);
     await expect(page.locator('input[placeholder="20"]')).toBeVisible();
     await expect(page.getByLabel('Tasa de eventos en grupo control (CER)')).toHaveCount(1, { timeout: 2000 });
@@ -318,14 +304,13 @@ test.describe('Accesibilidad', () => {
   });
 
   test('A2 — las celdas de la tabla epidemiológica dicen qué son (no solo «a», «b», «c», «d»)', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: el nombre accesible de cada celda es su placeholder de una letra');
     await modo(page, /^Epidemiología/);
-    await expect(page.getByRole('spinbutton')).toHaveCount(4);
-    await expect(page.getByRole('spinbutton', { name: /expuesto/i })).toHaveCount(4, { timeout: 2000 });
+    // Desde el 07/10/2026 son campos de texto (inputMode numérico) leídos con parseSpanishNumber
+    await expect(page.getByRole('textbox')).toHaveCount(4);
+    await expect(page.getByRole('textbox', { name: /expuesto/i })).toHaveCount(4, { timeout: 2000 });
   });
 
   test('A3 — «Cargar ejemplo» (texto blanco sobre el azul de marca) llega a 4,5:1 en claro', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: blanco sobre var(--primary) da 4,11:1 en claro y 2,79:1 en oscuro; lo mismo los números de la guía paso a paso');
     const ratio = await page.getByRole('button', { name: 'Cargar ejemplo' }).evaluate((el) => {
       const rgb = (s: string): number[] => (s.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
       const lin = (c: number): number => { const v = c / 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
@@ -371,7 +356,6 @@ test.describe('en móvil (390 px)', () => {
   });
 
   test('M2 — los paneles de entrada y resultados caben en la pantalla (sin desbordar a 405 px)', async ({ page }) => {
-    test.fail(true, 'HALLAZGO: la columna de `.mainContent` (1fr = minmax(auto, 1fr)) crece al min-content de la tabla 2×2 → 389 px de panel en 358 de hueco; body.scrollWidth 405');
     await expect(page.locator('[class*="inputPanel"]')).toBeVisible();
     const medida = await page.evaluate(() => ({
       body: document.body.scrollWidth,
