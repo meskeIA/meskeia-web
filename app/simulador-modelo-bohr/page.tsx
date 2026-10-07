@@ -27,6 +27,7 @@ import {
 } from './motor';
 import { VISIBLE_MIN_NM, VISIBLE_MAX_NM, type RegionEspectro } from '../simulador-efecto-fotoelectrico/motor';
 import { colorDeLambda, nombreDeLambda } from '../simulador-efecto-fotoelectrico/color';
+import CasosAula from './CasosAula';
 
 // ─── Formato ─────────────────────────────────────────────────────────────────
 
@@ -534,6 +535,10 @@ export default function SimuladorModeloBohrPage() {
             </div>
           </section>
         )}
+
+        {/* Tarea de aula (skill /casos-aula-meskeia): tras los controles y FUERA de
+            EducationalSection, que nace colapsada. */}
+        <CasosAula />
 
         {/* ── Sección educativa v2.0 ──────────────────────────────────────── */}
         <EducationalSection

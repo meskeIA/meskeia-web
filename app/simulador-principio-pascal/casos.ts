@@ -280,7 +280,7 @@ export function resolverCaso(datos: DatosCaso, g: number = G, p0: number = P_ATM
       } else if (datos.magnitud === 'fuerzaSobreSuperficie') {
         if (!positivo(datos.areaM2)) return falta('el área', pasos);
         pasos.push(
-          'Al otro lado hay aire a la presión atmosférica, que también empuja por fuera del agua: las dos atmósferas se cancelan y la fuerza neta la pone solo ρ·g·h.',
+          'La atmósfera empuja por los dos lados: desde fuera, a través del agua (es el P₀ de la presión absoluta), y desde dentro, con el aire de la cabina. Se cancelan, y la fuerza neta la pone solo ρ·g·h.',
         );
         valor = r.presionHidrostatica * datos.areaM2;
         pasos.push(`F = P·A = ${numero(r.presionHidrostatica)}·${numero(datos.areaM2)} = ${numero(valor)} N.`);
