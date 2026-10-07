@@ -92,6 +92,10 @@ export default function SimuladorPotencialAccionPage() {
     const colorReposo = isDark ? '#888' : '#555';
     const colorUmbral = '#A82E68';
     const colorEstimulo = '#E07A1F';
+    // Rótulos: el color de la línea no llegaba a AA como texto en un tema u otro (hallazgo 2952):
+    // «Umbral» 2,70:1 sobre #1A1A1A y «Estímulo» 2,89:1 sobre #FAFAFA
+    const textoUmbral = isDark ? '#E58BB5' : '#A82E68';
+    const textoEstimulo = isDark ? '#E07A1F' : '#A3520A';
 
     ctx.clearRect(0, 0, W, H);
 
@@ -173,7 +177,7 @@ export default function SimuladorPotencialAccionPage() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = colorUmbral;
+    ctx.fillStyle = textoUmbral;
     ctx.fillText(`Umbral (${umbral} mV)`, pad.left + 8, yToPx(umbral) - 4);
 
     // Marcadores de estímulo (rectángulos en la parte superior)
@@ -199,7 +203,7 @@ export default function SimuladorPotencialAccionPage() {
       ctx.fillRect(xToPx(estIniciado), pad.top - estiHeight - 2, xToPx(T_TOTAL) - xToPx(estIniciado), estiHeight);
       ctx.globalAlpha = 1;
     }
-    ctx.fillStyle = colorEstimulo;
+    ctx.fillStyle = textoEstimulo;
     ctx.font = '10px system-ui';
     ctx.textAlign = 'right';
     ctx.fillText('Estímulo', pad.left + plotW - 4, pad.top - 4);
@@ -411,7 +415,7 @@ export default function SimuladorPotencialAccionPage() {
         <div className={styles.resultsPanel} role="region" aria-label="Resultados de la simulación" aria-live="polite">
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>¿Disparó?</span>
-            <span className={styles.resultValue} style={{ color: disparo ? '#48A9A6' : '#A82E68' }}>
+            <span className={`${styles.resultValue} ${disparo ? styles.valorSi : styles.valorNo}`}>
               {disparo ? 'Sí' : 'No'}
             </span>
             <span className={styles.resultRange}>{disparo ? 'Supraumbral' : 'Subumbral'}</span>

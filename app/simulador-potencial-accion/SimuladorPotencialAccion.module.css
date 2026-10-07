@@ -319,14 +319,25 @@
   font-weight: 600;
 }
 
+/* ⚠️ 07/10/2026 (hallazgo 2952): #48A9A6 y #A82E68 como TEXTO daban 2,51:1 y, en oscuro,
+   1,94:1 sobre el veredicto de fábrica. Texto con tokens de contraste; el color de marca queda
+   en el fondo tintado y en el lienzo. */
 .statusFire {
   background: rgba(72, 169, 166, 0.12);
-  color: #48A9A6;
+  color: var(--secondary-texto);
 }
 
 .statusNoFire {
   background: rgba(168, 46, 104, 0.12);
-  color: #A82E68;
+  color: #8A2556;
+}
+
+.valorSi {
+  color: var(--secondary-texto);
+}
+
+.valorNo {
+  color: #8A2556;
 }
 
 /* FORMULA BOX */
@@ -602,6 +613,11 @@
 
 [data-theme='dark'] .statusNoFire {
   background: rgba(168, 46, 104, 0.18);
+  color: #E58BB5;
+}
+
+[data-theme='dark'] .valorNo {
+  color: #E58BB5;
 }
 
 [data-theme='dark'] .slider::-webkit-slider-thumb {

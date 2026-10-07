@@ -449,10 +449,6 @@ test('hallazgo 980 (REPARADO): con umbral −45 mV el PA arranca en el umbral, s
 });
 
 test('contraste en tema claro: el veredicto «DISPARA» (4,5:1) y el «Sí» (3:1) se leen', async ({ page }) => {
-  test.fail(
-    true,
-    'ABIERTO (07/10/2026): el teal #48A9A6 del veredicto da 2,51:1 sobre su fondo teal al 12 % y el «Sí» en línea 2,68:1 sobre #FAFAFA',
-  );
   await sembrarValor(page, INTENSIDAD, 30);
   await expect(barraEstado(page)).toContainText('La neurona DISPARA');
   const si = await contrasteDe(page, '[class*="resultCard"] [class*="resultValue"]');
@@ -467,10 +463,6 @@ test('contraste en tema claro: el veredicto «DISPARA» (4,5:1) y el «Sí» (3:
 });
 
 test('contraste en tema oscuro: el veredicto de fábrica «SUBUMBRAL» y el «No» se leen', async ({ page }) => {
-  test.fail(
-    true,
-    'ABIERTO (07/10/2026): #A82E68 no tiene variante oscura: 1,94:1 el veredicto con que abre la app y 2,70:1 el «No»',
-  );
   await page.addInitScript(() => localStorage.setItem('meskeia-theme', 'dark'));
   await page.reload();
   await esperarHidratacion(page, [INTENSIDAD, UMBRAL, DURACION]);
