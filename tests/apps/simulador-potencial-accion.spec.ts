@@ -1,5 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidratacion';
+import { parseSpanishNumber } from '../../lib/formatters';
+import { REFRACTARIO_ABSOLUTO } from '../../app/simulador-potencial-accion/motor';
 
 /**
  * simulador-potencial-accion — 3 casos resueltos a mano antes de abrir el navegador.
@@ -32,6 +34,12 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *   · El refractario RELATIVO existe: el umbral queda elevado al terminar el PA y decae, así
  *     que la frecuencia de disparo ya depende de la intensidad.
  *   · El veredicto y el panel de resultados viven en regiones aria-live.
+ *
+ * REINSPECCIÓN DEL 07/10/2026, por la firma de rotura (73,5 % de visitas cortas y 6,4 % de
+ * recargas en 219 visitas, sobre todo móviles desde México). Las seis reparaciones del 20/09
+ * siguen en pie (la 980 se vigila ahora en el propio lienzo). Se añaden los casos en móvil
+ * —con el DEDO, no con el setter— y la cuenta de POST de analytics por carga, que descarta
+ * la firma falsa por remontaje. Los hallazgos nuevos van con `test.fail()` y su motivo.
  */
 
 const INTENSIDAD = '#estimulo-intensidad';
@@ -291,4 +299,396 @@ test('hallazgo 981: el nodo sinoauricular dispara ~70 por minuto, no ~70 Hz', as
   const educativo = page.locator('body');
   await expect(educativo).toContainText('~70 por minuto');
   await expect(educativo).not.toContainText('~70 Hz');
+});
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Reinspección del 07/10/2026
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+const UA_MOVIL =
+  'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36';
+
+/** Huella de los píxeles del lienzo: cambia si y solo si se ha redibujado otra cosa. */
+async function huellaLienzo(page: Page): Promise<number> {
+  return page.evaluate(() => {
+    const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+    const datos = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height).data;
+    let h = 0;
+    for (let i = 0; i < datos.length; i += 37) h = (h * 31 + datos[i]) >>> 0;
+    return h;
+  });
+}
+
+/**
+ * Punto más alto y más bajo del trazo de V_m (#2E86AB) DIBUJADO en el tramo [desde, hasta] ms,
+ * en mV, con la escala que declara el componente (−100..+50 mV, 0..50 ms, márgenes
+ * 30/30/50/60). Vale en móvil, donde una columna de píxel abarca 0,3 ms y el «centro» de
+ * medirTrazado ya no es fiable en los tramos verticales.
+ */
+async function extremosDelTrazo(page: Page, desde: number, hasta: number): Promise<{ cima: number; fondo: number }> {
+  return page.evaluate(
+    ({ desde, hasta }) => {
+      const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+      const rect = canvas.getBoundingClientRect();
+      const escala = canvas.width / rect.width;
+      const img = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height);
+      const pad = { top: 30, right: 30, bottom: 50, left: 60 };
+      const plotW = rect.width - pad.left - pad.right;
+      const plotH = rect.height - pad.top - pad.bottom;
+      const aVoltios = (y: number) => -100 + ((pad.top + plotH - y) / plotH) * 150;
+      const aMilisegundos = (x: number) => ((x - pad.left) / plotW) * 50;
+      const esTrazo = (r: number, g: number, b: number) =>
+        Math.abs(r - 46) < 40 && Math.abs(g - 134) < 40 && Math.abs(b - 171) < 40;
+      let cima = -Infinity;
+      let fondo = Infinity;
+      for (let xp = 0; xp < canvas.width; xp++) {
+        const t = aMilisegundos(xp / escala);
+        if (t < desde || t > hasta) continue;
+        for (let yp = Math.floor(pad.top * escala); yp <= Math.ceil((pad.top + plotH) * escala); yp++) {
+          const i = (yp * canvas.width + xp) * 4;
+          if (img.data[i + 3] > 200 && esTrazo(img.data[i], img.data[i + 1], img.data[i + 2])) {
+            const v = aVoltios(yp / escala);
+            if (v > cima) cima = v;
+            if (v < fondo) fondo = v;
+          }
+        }
+      }
+      return { cima, fondo };
+    },
+    { desde, hasta },
+  );
+}
+
+/** Contraste WCAG de un texto contra el fondo compuesto de sus ancestros. */
+async function contrasteDe(page: Page, selector: string): Promise<{ ratio: number; texto: string }> {
+  return page.locator(selector).first().evaluate((el) => {
+    const leer = (c: string): number[] => {
+      const m = c.match(/rgba?\(([^)]+)\)/);
+      if (!m) return [0, 0, 0, 0];
+      const p = m[1].split(/[\s,/]+/).filter(Boolean).map(Number);
+      return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1];
+    };
+    const capas: number[][] = [];
+    for (let n: Element | null = el; n; n = n.parentElement) {
+      const capa = leer(getComputedStyle(n).backgroundColor);
+      if (capa[3] > 0) capas.push(capa);
+      if (capa[3] >= 1) break;
+    }
+    let fondo = [255, 255, 255];
+    for (const c of capas.reverse()) fondo = fondo.map((v, i) => c[3] * c[i] + (1 - c[3]) * v);
+    const lineal = (v: number) => {
+      const s = v / 255;
+      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    };
+    const luminancia = (c: number[]) => 0.2126 * lineal(c[0]) + 0.7152 * lineal(c[1]) + 0.0722 * lineal(c[2]);
+    const [a, b] = [luminancia(leer(getComputedStyle(el).color)), luminancia(fondo)].sort((x, y) => y - x);
+    return { ratio: (a + 0.05) / (b + 0.05), texto: (el.textContent ?? '').trim() };
+  });
+}
+
+interface PreguntaLd {
+  name: string;
+  acceptedAnswer: { text: string };
+}
+
+/** Los bloques JSON-LD de la página (los inyecta layout.tsx desde metadata.ts). */
+async function leerJsonLd(page: Page): Promise<Record<string, unknown>[]> {
+  return page.evaluate(() =>
+    Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map(
+      (s) => JSON.parse(s.textContent ?? '{}') as Record<string, unknown>,
+    ),
+  );
+}
+
+const normalizar = (s: string) => s.replace(/["“”«»]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+
+/**
+ * Arrastra el pulgar de un deslizador con el DEDO (eventos táctiles reales por CDP, no el
+ * setter): de donde esté hasta pasado el extremo indicado. El pulgar mide 22 px
+ * (.slider::-webkit-slider-thumb) y la pista solo 6, que es justo lo que hay que probar.
+ */
+async function arrastrarConElDedo(page: Page, selector: string, hacia: 'izquierda' | 'derecha'): Promise<void> {
+  const deslizador = page.locator(selector);
+  await deslizador.scrollIntoViewIfNeeded();
+  const caja = await deslizador.boundingBox();
+  if (!caja) throw new Error(`${selector} no está en pantalla`);
+  const { valor, min, max } = await deslizador.evaluate((el) => {
+    const r = el as HTMLInputElement;
+    return { valor: Number(r.value), min: Number(r.min), max: Number(r.max) };
+  });
+  const PULGAR = 22;
+  const x0 = caja.x + PULGAR / 2 + ((valor - min) / (max - min)) * (caja.width - PULGAR);
+  const x1 = hacia === 'derecha' ? caja.x + caja.width + 30 : caja.x - 30;
+  const y = caja.y + caja.height / 2;
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x0, y }] });
+  for (let k = 1; k <= 12; k++) {
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{ x: x0 + ((x1 - x0) * k) / 12, y }],
+    });
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await cdp.detach();
+}
+
+test('hallazgo 980 (REPARADO): con umbral −45 mV el PA arranca en el umbral, sin retroceder a −55 mV', async ({ page }) => {
+  await sembrarValor(page, UMBRAL, -45);
+  await sembrarValor(page, INTENSIDAD, 40);
+
+  // A mano (Euler a 0,1 ms con τ = 5 ms, pulso de 5 ms): V = −70 + 40·(1 − 0,98^k) cruza
+  // −45 mV en k = 49 pasos (−44,86 mV; con k = 48 se queda en −45,17) → t = 9,8 ms, latencia
+  // 4,80 ms. En t = 9,3 ms va por −46,4 mV y de ahí sube sin parar hasta el pico (10,8 ms).
+  await expect(tarjeta(page, 'Latencia')).toHaveText('4,80 ms');
+
+  // Con el −55 cableado, el trazo RETROCEDÍA de −45 a −55 mV justo al disparar: el borde
+  // inferior del trazo en 9,3–10,7 ms tocaba −55. Ahora no baja de −47 (−46,4 menos el
+  // grosor del trazo). El umbral de −50 deja 3 mV de margen a un lado y 5 al otro.
+  const { fondo } = await extremosDelTrazo(page, 9.3, 10.7);
+  expect(fondo).toBeGreaterThan(-50);
+});
+
+test('contraste en tema claro: el veredicto «DISPARA» (4,5:1) y el «Sí» (3:1) se leen', async ({ page }) => {
+  test.fail(
+    true,
+    'ABIERTO (07/10/2026): el teal #48A9A6 del veredicto da 2,51:1 sobre su fondo teal al 12 % y el «Sí» en línea 2,68:1 sobre #FAFAFA',
+  );
+  await sembrarValor(page, INTENSIDAD, 30);
+  await expect(barraEstado(page)).toContainText('La neurona DISPARA');
+  const si = await contrasteDe(page, '[class*="resultCard"] [class*="resultValue"]');
+  expect(si.texto).toBe('Sí');
+  // Con sondeo y no con una lectura: globals.css anima color y fondo 0,3 s, y una lectura a
+  // media transición da otra cifra (2,32 en vez de 2,51 el 07/10/2026).
+  // Veredicto: 15,2 px a peso 600 → texto normal, 4,5:1. «Sí»: 20,8 px negrita → grande, 3:1.
+  await expect.poll(async () => (await contrasteDe(page, '[class*="statusBar"]')).ratio).toBeGreaterThanOrEqual(4.5);
+  await expect
+    .poll(async () => (await contrasteDe(page, '[class*="resultCard"] [class*="resultValue"]')).ratio)
+    .toBeGreaterThanOrEqual(3);
+});
+
+test('contraste en tema oscuro: el veredicto de fábrica «SUBUMBRAL» y el «No» se leen', async ({ page }) => {
+  test.fail(
+    true,
+    'ABIERTO (07/10/2026): #A82E68 no tiene variante oscura: 1,94:1 el veredicto con que abre la app y 2,70:1 el «No»',
+  );
+  await page.addInitScript(() => localStorage.setItem('meskeia-theme', 'dark'));
+  await page.reload();
+  await esperarHidratacion(page, [INTENSIDAD, UMBRAL, DURACION]);
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(barraEstado(page)).toContainText('SUBUMBRAL');
+  const no = await contrasteDe(page, '[class*="resultCard"] [class*="resultValue"]');
+  expect(no.texto).toBe('No');
+  await expect.poll(async () => (await contrasteDe(page, '[class*="statusBar"]')).ratio).toBeGreaterThanOrEqual(4.5);
+  await expect
+    .poll(async () => (await contrasteDe(page, '[class*="resultCard"] [class*="resultValue"]')).ratio)
+    .toBeGreaterThanOrEqual(3);
+});
+
+test('el veredicto y la tarjeta «Despolarización del pulso» no se contradicen (pulso 2,5 ms, I = 38, umbral −55)', async ({ page }) => {
+  test.fail(
+    true,
+    'ABIERTO (07/10/2026): la tarjeta usa la fórmula analítica y la simulación integra con Euler (paso 0,1 ms), que llega un 0,8 % más arriba: dice «38,1 u.a. harían falta» con la neurona disparando a 38',
+  );
+  await sembrarValor(page, DURACION, 2.5);
+  await sembrarValor(page, INTENSIDAD, 38);
+  await expect(etiquetaControl(page, 'Duración del pulso')).toContainText('2,5 ms');
+  await expect(etiquetaControl(page, 'Intensidad del estímulo')).toContainText('38 u.a.');
+
+  // A mano con el modelo que la app declara (τ = 5 ms): −70 + 38·(1 − e^(−0,5)) = −55,05 mV,
+  // a 0,05 mV del umbral sin cruzarlo, y harían falta 15/0,3935 = 38,12 u.a. → NO dispara.
+  // Euler: −70 + 38·(1 − 0,98^25) = −54,93 mV → dispara. Sea cual sea la reparación, el panel
+  // tiene que decir una sola cosa: dispara si y solo si la intensidad llega a la que pide.
+  const pie = await page
+    .locator('[class*="resultCard"]')
+    .filter({ hasText: 'Despolarización del pulso' })
+    .locator('[class*="resultRange"]')
+    .innerText();
+  const m = pie.match(/([\d.,]+)\s*u\.a\. harían falta/);
+  expect(m).not.toBeNull();
+  const necesaria = parseSpanishNumber(m![1]);
+  const dispara = (await barraEstado(page).innerText()).includes('DISPARA');
+  expect(dispara).toBe(38 >= necesaria);
+});
+
+test('el refractario absoluto del modelo dura lo que dice la FAQ de la propia app', async ({ page }) => {
+  test.fail(
+    true,
+    'ABIERTO (07/10/2026): REFRACTARIO_ABSOLUTO = 8 ms (la plantilla entera, hiperpolarización incluida) frente al «absoluto (1-2 ms)» de la FAQ',
+  );
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  const faq = page.locator('[class*="faqItem"]').filter({ hasText: '¿Qué es el periodo refractario?' });
+  const texto = await faq.innerText();
+  // La FAQ: «absoluto (1-2 ms): canales de Na⁺ inactivados, IMPOSIBLE disparar. relativo
+  // (3-5 ms): hiperpolarización, NECESITA estímulo más fuerte». El FAQPage dice «≈1-2 ms».
+  const m = texto.match(/absoluto\s*\((\d+)-(\d+)\s*ms\)/);
+  expect(m).not.toBeNull();
+  const maximoDeclarado = Number(m![2]);
+
+  // Lo observable (lo vigila, en verde, el caso límite del refractario de más arriba): con
+  // estímulo continuo al máximo (pulso 5 ms cada 5 ms, I = 40) el 1.er PA sale en 7,3 ms y la
+  // plantilla de 8 ms ignora el estímulo entero —también los 5 ms de hiperpolarización, que
+  // la FAQ llama relativo—, así que el 2.º llega en 18,5: 11,2 ms entre PAs, 89 Hz, y ninguna
+  // intensidad baja de 8 ms (125 Hz), frente a los «~500 Hz» que la FAQ atribuye al
+  // refractario. No se comprueba aquí para no tapar la reparación, que cambiará esa cifra.
+  // Si la reparación reescribe la FAQ en vez del modelo, hay que adaptar esta lectura.
+  expect(REFRACTARIO_ABSOLUTO).toBeLessThanOrEqual(maximoDeclarado);
+});
+
+test('el FAQPage y la FAQ visible dan la MISMA respuesta a «¿Qué significa la ley del todo o nada?»', async ({ page }) => {
+  test.fail(
+    true,
+    'ABIERTO (07/10/2026): la pregunta está en las dos bocas con textos distintos; la reparación es UNA constante en metadata.ts que importen las dos',
+  );
+  const bloques = await leerJsonLd(page);
+  const faqPage = bloques.find((b) => b['@type'] === 'FAQPage');
+  expect(faqPage).toBeDefined();
+  const preguntas = (faqPage!.mainEntity as PreguntaLd[]) ?? [];
+  const deLd = preguntas.find((p) => /todo o nada/i.test(p.name));
+  expect(deLd).toBeDefined();
+
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  const visible = page
+    .locator('[class*="faqItem"]')
+    .filter({ has: page.locator('h4', { hasText: 'todo o nada' }) })
+    .locator('p')
+    .first();
+  expect(normalizar(await visible.innerText())).toBe(normalizar(deLd!.acceptedAnswer.text));
+});
+
+test('el jsonLd no promete una «animación en tiempo real» que la app no tiene', async ({ page }) => {
+  test.fail(
+    true,
+    'ABIERTO (07/10/2026): featureList dice «Animación V_m(t) en tiempo real con las 5 fases» y el lienzo es un trazado estático',
+  );
+  // A mano: el trazo se recalcula al mover un control, pero sin tocar nada no se mueve.
+  const antes = await huellaLienzo(page);
+  await page.waitForTimeout(2000);
+  const despues = await huellaLienzo(page);
+  const app = (await leerJsonLd(page)).find((b) => b['@type'] === 'WebApplication');
+  const rasgos = ((app?.featureList as string[] | undefined) ?? []).join(' · ');
+  // Si algún día el lienzo se anima, la promesa pasa a ser cierta y este caso deja de fallar.
+  if (despues === antes) expect(rasgos).not.toMatch(/animaci[oó]n/i);
+});
+
+test('el bloque educativo no da una cifra redonda sin fuente («los 4 iones cubren 90 %»)', async ({ page }) => {
+  test.fail(
+    true,
+    'ABIERTO (07/10/2026): «Los 4 cubren 90 % de la fisiología neuronal básica», sin fuente (neutralidad editorial, regla 1)',
+  );
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  const iones = page.locator('[class*="tipCard"]').filter({ hasText: 'Memoriza los iones clave' });
+  await expect(iones).toBeVisible();
+  await expect(iones).not.toContainText(/90\s*%/);
+});
+
+/* ── Móvil: la firma de rotura sale sobre todo de móviles (80 % de visitas cortas en móvil
+      tras la reparación, frente al 65 % en escritorio) ── */
+test.describe('móvil 390×844, con el dedo', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: UA_MOVIL,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+    serviceWorkers: 'block',
+  });
+
+  test('caso normal: de fábrica no dispara; arrastrando la intensidad con el dedo hasta el tope dispara y redibuja el lienzo', async ({ page }) => {
+    // Fábrica: I = 20 u.a., pulso 5 ms, umbral −55 mV. A mano:
+    //   tarjeta (analítica)  −70 + 20·(1 − e^(−1)) = −57,4 mV · harían falta 15/0,632 = 23,7 u.a.
+    //   simulación (Euler)   −70 + 20·(1 − 0,98^50) = −57,3 mV → subumbral
+    await expect(barraEstado(page)).toContainText('SUBUMBRAL');
+    await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-57,3 mV');
+    await expect(tarjeta(page, 'Despolarización del pulso')).toHaveText('-57,4 mV');
+    await expect(page.locator('[class*="resultCard"]').filter({ hasText: 'Despolarización del pulso' })).toContainText('23,7 u.a.');
+    // Nada se sale por los lados en 390 px
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    // El lienzo de fábrica dibuja la respuesta pasiva: la cima del trazo, −57,3 mV (+ grosor)
+    const fabrica = await extremosDelTrazo(page, 0, 50);
+    expect(fabrica.cima).toBeGreaterThan(-60);
+    expect(fabrica.cima).toBeLessThan(-54);
+    const antes = await huellaLienzo(page);
+
+    await arrastrarConElDedo(page, INTENSIDAD, 'derecha');
+    // I = 40 → lo del caso de dato: latencia 5·ln(40/25) = 2,35 ms → 2,30 en la rejilla de
+    // 0,1 ms, un PA y pico de +35,0 mV
+    await expect(etiquetaControl(page, 'Intensidad del estímulo')).toContainText('40 u.a.');
+    await expect(barraEstado(page)).toContainText('La neurona DISPARA');
+    await expect(tarjeta(page, 'Latencia')).toHaveText('2,30 ms');
+    await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('35,0 mV');
+    expect(await huellaLienzo(page)).not.toBe(antes);
+    // Y el lienzo pinta el pico: la cima del trazo pasa de −57 a +35 mV (más el marcador)
+    const tras = await extremosDelTrazo(page, 0, 50);
+    expect(tras.cima).toBeGreaterThan(30);
+    await expect(page).toHaveURL(/\/simulador-potencial-accion\/$/);
+  });
+
+  test('caso límite: con el dedo, «Estímulo sostenido» saca el intervalo y un tren de 4 PA a 89 Hz', async ({ page }) => {
+    await arrastrarConElDedo(page, INTENSIDAD, 'derecha');
+    await expect(etiquetaControl(page, 'Intensidad del estímulo')).toContainText('40 u.a.');
+    const boton = page.getByRole('button', { name: /Estímulo sostenido/ });
+    await boton.scrollIntoViewIfNeeded();
+    await boton.tap();
+    await expect(boton).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator(INTERVALO)).toBeVisible();
+    // A mano (pulso 5 ms cada 10 ms, I = 40): 1.er PA en 7,3 ms; la plantilla acaba en 15,4 y
+    // el umbral queda elevado, −55 + 15·e^(−s/2); con V = −70 + 40·(1 − 0,98^k) se cruzan en
+    // s = 3,1 ms → 2.º PA en 18,5 ms (11,2 ms → 89 Hz). El 3.º en 29,7 ms; el pulso de 35-40
+    // no llega (−56,2 frente a −49,8) y el 4.º sale en el de 45-50, en 46,6 ms: 4 PA.
+    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('4');
+    await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('89 Hz');
+  });
+
+  test('caso a rechazar: arrastrando la intensidad más allá del extremo izquierdo se queda en 0 u.a. y en reposo', async ({ page }) => {
+    await arrastrarConElDedo(page, INTENSIDAD, 'izquierda');
+    await expect(etiquetaControl(page, 'Intensidad del estímulo')).toContainText('(0 u.a.)');
+    // Sin estímulo: −70 + 0 = −70,0 mV en las dos tarjetas, sin disparo ni NaN
+    await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-70,0 mV');
+    await expect(tarjeta(page, 'Despolarización del pulso')).toHaveText('-70,0 mV');
+    await expect(barraEstado(page)).toContainText('SUBUMBRAL');
+    const panel = await page.locator('[class*="resultsPanel"]').innerText();
+    expect(panel).not.toMatch(/NaN|Infinity|∞|undefined/);
+  });
+
+  test('una visita usando la app con el dedo registra UN solo POST a /api/analytics/track/', async ({ page, context, baseURL }) => {
+    // page.tsx monta un solo <Footer appName=…> y un solo return: nada remonta el árbol. Si
+    // algo lo remontara, su AnalyticsTracker volvería a registrar la visita y la firma lo
+    // contaría como recarga (caso test-perfil-inversor, 26/09/2026).
+    // El rastreador solo emite con host de producción y sin webdriver: se sirve el build local
+    // bajo https://meskeia.com y analytics se contesta aquí, sin que salga nada.
+    await context.addInitScript(() =>
+      Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }),
+    );
+    const visitas: string[] = [];
+    await context.route(/^https?:\/\/(?!meskeia\.com\/|localhost[:/])/, (route) => route.abort());
+    await context.route('https://meskeia.com/**', async (route) => {
+      const url = new URL(route.request().url());
+      if (url.pathname.startsWith('/api/analytics/')) {
+        if (url.pathname.startsWith('/api/analytics/track')) visitas.push(route.request().postData() ?? '');
+        await route.fulfill({ status: 200, contentType: 'application/json', body: '{"success":true}' });
+        return;
+      }
+      const respuesta = await route.fetch({ url: `${baseURL}${url.pathname}${url.search}` });
+      await route.fulfill({ response: respuesta });
+    });
+
+    await page.goto('https://meskeia.com/simulador-potencial-accion/');
+    await esperarHidratacion(page, [INTENSIDAD, UMBRAL, DURACION]);
+    await expect.poll(() => visitas.length).toBe(1);
+
+    // Uso normal: intensidad al tope, modo sostenido, intervalo, vuelta al único, bloque educativo
+    await arrastrarConElDedo(page, INTENSIDAD, 'derecha');
+    await expect(barraEstado(page)).toContainText('La neurona DISPARA');
+    const sostenido = page.getByRole('button', { name: /Estímulo sostenido/ });
+    await sostenido.scrollIntoViewIfNeeded();
+    await sostenido.tap();
+    await expect(page.locator(INTERVALO)).toBeVisible();
+    await arrastrarConElDedo(page, INTERVALO, 'izquierda');
+    await page.getByRole('button', { name: /Estímulo único/ }).tap();
+    await page.getByRole('button', { name: 'Ver guía educativa' }).tap();
+    await page.waitForTimeout(1000);
+
+    expect(visitas).toHaveLength(1);
+    expect((JSON.parse(visitas[0]) as { aplicacion: string }).aplicacion).toBe('simulador-potencial-accion');
+  });
 });

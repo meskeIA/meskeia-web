@@ -4437,3 +4437,458 @@ test.describe('RE-INSPECCIÓN 06/10/2026 — Cantabria, la renuncia que Ceuta no
     expect(await avisoNeto2309(page)).toContain('las amortizaciones deducidas, que no se han podido leer');
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 07/10/2026 — vuelve a la cola por f00a18f7 (2913) y e0979382 (NumberInput:
+// el pegado con «€» y espacios, y el contraste del aviso de campo, 2912).
+//
+// Batería previa: los casos de arriba en verde; [06/10-a] (2911) sigue con `test.fail()` porque
+// sigue ABIERTO en la base. Verificado en navegador, escritorio y 390 px:
+//   · 2913 en las cuatro formas de la rama «menor» del aviso del neto (un importe de sujeto
+//     singular, dos, y el de sujeto plural solo y con otro): el verbo concuerda con el sujeto.
+//   · e0979382: «200.000 €», «1 250 €», «150.000,00 €», «20.000 €» con espacio duro, «40 000» con
+//     espacio fino y «3 %» se leen; el menos tipográfico pasa a guion y se acota; las letras se
+//     siguen rechazando.
+//   · 2912: los DOS avisos de campo (comisión > 100 % y gestoría > precio) dan 5,24:1 en claro
+//     (#C53030 sobre #FAFAFA) y 7,12:1 en oscuro (#FC8181 sobre #1A1A1A), con aria-invalid.
+//
+// De dónde sale CADA cifra de los casos nuevos (resueltos a mano ANTES de ejecutar):
+//   · La Rioja: tipo general 7 % de `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts:64), sin escala,
+//     umbral ni tipo propio de lo que no es vivienda en `ITP_CCAA.rioja`; AJD 1 %
+//     (data/itp-ccaa.ts:830), sin tipo de la renuncia.
+//   · IVA del local: `IVA_INMUEBLES_2025.local` = 21.
+//   · Plusvalía: `COEFICIENTES_IIVTNU_2025` (5 años 0,18 · 19 años 0,23 · 20 o más 0,40, con el tope
+//     de 20 del art. 107.4 TRLRHL en `coeficienteIIVTNU`) × 25 % orientativo; método real del 107.5.
+//   · IRPF: `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 · 21 % hasta 50.000 · 23 % hasta
+//     200.000) sobre el art. 35 LIRPF; amortizaciones del art. 35.2 LIRPF y 40.1 RIRPF.
+//   · Amortización del ALQUILER: art. 14.2.a RIRPF (RD 439/2007, BOE-A-2007-6820 consolidado,
+//     leído el 07/10/2026): «cuando, en cada año, no excedan del resultado de aplicar el 3 por
+//     ciento sobre el mayor de los siguientes valores: el coste de adquisición satisfecho o el
+//     valor catastral, sin incluir en el cómputo el del suelo».
+//   · Notaría y registro NO se fijan (hallazgos 2901 y 2902, abiertos en la referencia): se exige
+//     que el total cuadre con las líneas visibles (`totalCuadra0610`).
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Pega un importe tal como viene de un anuncio y espera a que React tenga el valor ya limpio. */
+async function pegarImporte0710(page: Page, etiqueta: string, pegado: string, leido: string): Promise<void> {
+  const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+  await campo.fill(pegado);
+  await esperarValorEnReact(page, campo, leido);
+  await campo.blur();
+}
+
+/** El FAQPage del JSON-LD, pregunta → respuesta. */
+async function faqPage0710(page: Page): Promise<Map<string, string>> {
+  const pares = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+      .map((s) => JSON.parse(s.textContent ?? '{}'))
+      .filter((j) => j['@type'] === 'FAQPage')
+      .flatMap((j) =>
+        (j.mainEntity as { name: string; acceptedAnswer: { text: string } }[]).map(
+          (q) => [q.name, q.acceptedAnswer.text] as [string, string],
+        ),
+      ),
+  );
+  return new Map(pares.map(([q, a]) => [q, a.replace(ESPACIO_DURO, ' ')]));
+}
+
+/** Respuesta de la FAQ VISIBLE (la sección educativa está en el DOM aunque nazca plegada). */
+async function faqVisible0710(page: Page, pregunta: string): Promise<string> {
+  const p = page.locator('strong', { hasText: pregunta }).first().locator('xpath=following-sibling::p[1]');
+  return ((await p.textContent()) ?? '').replace(ESPACIO_DURO, ' ').replace(/\s+/g, ' ').trim();
+}
+
+test.describe('RE-INSPECCIÓN 07/10/2026 — La Rioja, el euro 50.001 de la base del ahorro, comisión y gestoría juntas, y la amortización del alquiler', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_12_09);
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // REPARADO 2913 (f00a18f7) — las otras ramas de «que no se ha/han podido leer», sobre la BASE del
+  // testigo (neto 182.487,00). Netos resueltos a mano con cada ilegible a 0:
+  //   comisión «3.5.0»            → transm 198.300 · gan 53.300 · IRPF 11.139 · neto 187.161,00
+  //   + gestoría «5.0.0»          → transm 198.800 · gan 53.800 · IRPF 1.140 + 9.240 + 3.800 × 23 %
+  //                                 = 11.254 · neto 200.000 − 1.200 − 11.254 = 187.546,00
+  //   gestoría + amortizaciones   → transm 192.800 · adq 165.000 · gan 27.800 · IRPF 1.140 + 21.800 ×
+  //                                 21 % = 5718 · neto 200.000 − 1.200 − 6.000 − 5.718 = 187.082,00
+  // El tope de la rebaja es el tipo marginal de la base que se publica: 23 % con 53.300/53.800,
+  // 21 % con 27.800.
+  // ══════════════════════════════════════════════════════════════════════════
+  test('REPARADO 2913 — el verbo concuerda con el sujeto con uno y con dos importes, también junto a las amortizaciones', async ({ page }) => {
+    await prepararBaseFamilia2309(page);
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('182.487,00 €');
+
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '3.5.0');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('187.161,00 €');
+    expect(await avisoNeto2309(page)).toContain(
+      'No descuenta la comisión inmobiliaria, que no se ha podido leer (la comisión inmobiliaria rebaja también el IRPF al descontarla, hasta un 23 % de su importe): el neto real es menor que este',
+    );
+
+    await sembrarImporte12(page, 'Gestoría y certificados del vendedor (€)', '5.0.0');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('187.546,00 €');
+    expect(await avisoNeto2309(page)).toContain(
+      'No descuenta la comisión inmobiliaria ni la gestoría de la venta, que no se han podido leer (la comisión inmobiliaria y la gestoría de la venta rebajan también el IRPF al descontarlas, hasta un 23 % de su importe): el neto real es menor que este',
+    );
+
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '3');
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', ILEGIBLE_2309);
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('187.082,00 €');
+    expect(await avisoNeto2309(page)).toContain(
+      'No descuenta la gestoría de la venta ni el IRPF que añaden las amortizaciones deducidas, que no se han podido leer (la gestoría de la venta rebaja también el IRPF al descontarla, hasta un 21 % de su importe): el neto real es menor que este',
+    );
+  });
+
+  // REPARADO e0979382 (hallazgo 2916 de la hermana solar, en el NumberInput común): un importe PEGADO
+  // con «€», espacios o «%» se descartaba entero y la app seguía con el cálculo anterior. Aquí, en
+  // los campos del vendedor, incluido el exclusivo (amortizaciones). Con lo pegado se tiene que
+  // llegar a la BASE del testigo: adquisición 145.000 · transmisión 192.300 · IRPF 9813 · neto 182.487.
+  test('REPARADO e0979382 — un importe pegado con «€», espacios o «%» se lee, también en las amortizaciones', async ({ page }) => {
+    await pegarImporte0710(page, 'Precio del local comercial', '200.000 €', '200.000');
+    expect(await valorTarjeta(page, 'Precio del local comercial')).toBe('200.000,00 €');
+    await pegarImporte0710(page, 'Gastos de gestoría del comprador (€)', '1 250 €', '1250');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('1250,00 €');
+
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    await page.getByRole('button', { name: /Local afecto a actividad/ }).click();
+    await pegarImporte0710(page, 'Precio de compra original', '150.000,00 €', '150.000,00');
+    await pegarImporte0710(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '15 000', '15000');
+    await pegarImporte0710(page, 'Amortizaciones acumuladas deducidas (€)', '20.000 €', '20.000');
+    await sembrarImporte12(page, 'Años de propiedad', '10');
+    await pegarImporte0710(page, 'Valor catastral del suelo (€)', '40 000', '40000');
+    await pegarImporte0710(page, 'Valor catastral total (suelo + construcción) (€)', '100.000 €', '100.000');
+    await pegarImporte0710(page, 'Comisión de la inmobiliaria (%)', '3 %', '3');
+    await pegarImporte0710(page, 'Gestoría y certificados del vendedor (€)', '500 €', '500');
+
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('145.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('192.300,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('9813,00 €');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('182.487,00 €');
+    expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES');
+
+    // El menos tipográfico pasa a guion y, con el foco dentro, se acota a 0 (adquisición sin restar).
+    const amort = page.locator('input[aria-label="Amortizaciones acumuladas deducidas (€)"]');
+    await amort.fill('−5000');
+    await esperarValorEnReact(page, amort, '-5000');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('165.000,00 €');
+  });
+
+  // REPARADO 2912 (e0979382): el test [06/10-b] mide el aviso de la comisión; este, el de la
+  // gestoría de la venta mayor que el precio, que usa el mismo `.errorText`.
+  test('REPARADO 2912 — el aviso de la gestoría mayor que el precio alcanza 4,5:1 en los dos temas', async ({ page }) => {
+    await page.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}' });
+    await prepararVendedor2609(page, { gestoria: '250000' });
+    const aviso = page.getByRole('alert').filter({ hasText: 'La gestoría de la venta no puede superar el precio de venta' });
+    await expect(aviso).toHaveCount(1);
+    await expect(page.locator('input[aria-label="Gestoría y certificados del vendedor (€)"]')).toHaveAttribute('aria-invalid', 'true');
+    const claro = await aviso.evaluate(contrasteElemento2609);
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(26, 26, 26)');
+    const oscuro = await aviso.evaluate(contrasteElemento2609);
+    expect({ claro: claro >= 4.5, oscuro: oscuro >= 4.5 }).toEqual({ claro: true, oscuro: true });
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 39 (NORMAL) — LA RIOJA, local de 260.000 €, la única comunidad que ninguna vuelta había
+  // liquidado, y un vendedor AFECTO a su actividad durante 19 años.
+  //   2ª mano: ITP 260.000 × 7 % = 18.200,00 → «ITP (7,00 %)», sin AJD.
+  //   Obra nueva: IVA 21 % = 54.600,00 + AJD 1 % = 2600,00. Renuncia: el mismo IVA y el AJD general.
+  //   VENDEDOR afecto: compra 120.000 · gastos 9.000 · amortizaciones 36.000 · 19 años · suelo 50.000
+  //     · total 150.000 · comisión 4 % · gestoría 600
+  //     plusvalía objetivo = 50.000 × 0,23 × 25 % = 2875,00 ; real = 140.000 × ⅓ × 25 % = 11.666,67
+  //     transmisión = 260.000 − 10.400 − 600 − 2.875 =                              246.125,00
+  //     adquisición = 120.000 + 9.000 − 36.000 =                                      93.000,00
+  //     ganancia 153.125 → IRPF = 1.140 + 9.240 + 103.125 × 23 % =                   34.098,75
+  //     total = 2.875 + 10.400 + 600 + 34.098,75 = 47.973,75 (18,45 %) · NETO         212.026,25
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 39 (normal) — La Rioja 260.000 €: ITP plano al 7 %, IVA + AJD 1 % por las dos vías, y un vendedor afecto 19 años', async ({ page }) => {
+    expect(ITP_CCAA.rioja.tipoGeneral).toBe(7);
+    expect(ITP_CCAA.rioja.tramosProgresivos).toBeUndefined();
+    expect(ITP_CCAA.rioja.umbralTipoUnico).toBeUndefined();
+    expect(ITP_CCAA.rioja.tipoGeneralNoVivienda).toBeUndefined();
+    expect(ITP_CCAA.rioja.ajd).toBe(1);
+    expect(ITP_CCAA.rioja.ajdRenuncia).toBeUndefined();
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 19)?.coeficiente).toBe(0.23);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+
+    await page.selectOption('#select-ccaa', 'rioja');
+    await sembrarImporte12(page, 'Precio del local comercial', '260000');
+    await esperarTarjeta2609(page, /^ITP/, '18.200,00 €');
+    expect(await tituloTarjeta24(page, /^ITP/)).toBe('ITP (7,00 %)');
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    await totalCuadra0610(page, 260000, [/^ITP/, 'Gastos de notaría', 'Registro de la Propiedad', 'Gastos de gestoría']);
+    const recuadro = (await page.locator('[class*="infoCcaaGrid"]').innerText()).replace(ESPACIO_DURO, ' ').replace(/\s+/g, ' ');
+    expect(recuadro).toBe('ITP General 7 % AJD 1 % IVA (comercial) 21 %');
+
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await esperarTarjeta2609(page, /^IVA \(21/, '54.600,00 €');
+    expect(await tituloTarjeta24(page, /^AJD/)).toBe('AJD (1,00 %)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('2600,00 €');
+    await totalCuadra0610(page, 260000, [/^IVA/, /^AJD/, 'Gastos de notaría', 'Registro de la Propiedad', 'Gastos de gestoría']);
+
+    await page.getByRole('button', { name: /2ª mano con renuncia/ }).click();
+    await esperarTarjeta2609(page, /^IVA \(renuncia/, '54.600,00 €');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('2600,00 €');
+    expect(await descripcionTarjeta(page, /^AJD/)).toBe(
+      'AJD general de La Rioja: algunas comunidades aplican un tipo incrementado en la renuncia',
+    );
+
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    await page.getByRole('button', { name: /Local afecto a actividad/ }).click();
+    await sembrarImporte12(page, 'Precio de compra original', '120000');
+    await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '9000');
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '36000');
+    await sembrarImporte12(page, 'Años de propiedad', '19');
+    await sembrarImporte12(page, 'Valor catastral del suelo (€)', '50000');
+    await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '150000');
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '4');
+    await sembrarImporte12(page, 'Gestoría y certificados del vendedor (€)', '600');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('2875,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe(
+      'Método objetivo (más favorable), tipo municipal orientativo del 25 %',
+    );
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('93.000,00 €');
+    expect(await descripcionTarjeta(page, 'Valor de adquisición')).toBe(
+      'Precio de compra + impuestos y gastos de aquella compra − 36.000,00 € de amortizaciones deducidas',
+    );
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('246.125,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('153.125,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('34.098,75 €');
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('10.400,00 €');
+    expect(await valorTarjeta(page, 'Total gastos de la venta')).toBe('47.973,75 €');
+    expect(await descripcionTarjeta(page, 'Total gastos de la venta')).toBe('18,45 % sobre el precio de venta');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('212.026,25 €');
+    expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES');
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 40 (LÍMITE) — la ganancia en el corte de 50.000 € de la base del ahorro, movida con el
+  // campo EXCLUSIVO en el perfil «no afecto» (el alquiler), y el tope de 20 años del IIVTNU.
+  //   Madrid · 200.000 · compra 140.000 · gastos 10.000 · 35 años · suelo 10.000 · total 100.000 ·
+  //   comisión 0 · gestoría vacía
+  //   plusvalía objetivo = 10.000 × 0,40 (35 años → tope de 20) × 25 % = 1000,00 ; real = 60.000 ×
+  //     0,1 × 25 % = 1.500 → gana el objetivo · transmisión = 200.000 − 1.000 = 199.000,00
+  //   amortizaciones 1.000 → adquisición 149.000 → ganancia 50.000,00 → IRPF 1.140 + 44.000 × 21 % =
+  //     10.380,00 · total 11.380,00 (5,69 %) · neto 188.620,00
+  //   amortizaciones 1.001 → ganancia 50.001,00 → el euro 50.001 al 23 %: IRPF 10.380,23 ·
+  //     total 11.380,23 · neto 188.619,77
+  //   20 años da lo mismo (0,40) y 19 años, 10.000 × 0,23 × 25 % = 575,00.
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 40 (límite) — ganancia de 50.000,00 € exactos y el euro siguiente al 23 %, con las amortizaciones del alquiler y el tope de 20 años', async ({ page }) => {
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.slice(0, 3)).toEqual([
+      { hasta: 6000, tipo: 19 },
+      { hasta: 50000, tipo: 21 },
+      { hasta: 200000, tipo: 23 },
+    ]);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 20)?.coeficiente).toBe(0.4);
+
+    await sembrarImporte12(page, 'Precio del local comercial', '200000');
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    await expect(page.getByRole('button', { name: /Local no afecto/ })).toHaveAttribute('aria-pressed', 'true');
+    await sembrarImporte12(page, 'Precio de compra original', '140000');
+    await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '10000');
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '1000');
+    await sembrarImporte12(page, 'Años de propiedad', '35');
+    await sembrarImporte12(page, 'Valor catastral del suelo (€)', '10000');
+    await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '100000');
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '0');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('1000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('199.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('149.000,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('50.000,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('10.380,00 €');
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('0,00 €');
+    expect(await valorTarjeta(page, 'Total gastos de la venta')).toBe('11.380,00 €');
+    expect(await descripcionTarjeta(page, 'Total gastos de la venta')).toBe('5,69 % sobre el precio de venta');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('188.620,00 €');
+    expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES');
+
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '1001');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('50.001,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('10.380,23 €');
+    expect(await valorTarjeta(page, 'Total gastos de la venta')).toBe('11.380,23 €');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('188.619,77 €');
+
+    await sembrarImporte12(page, 'Años de propiedad', '20');
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('1000,00 €');
+    await sembrarImporte12(page, 'Años de propiedad', '19');
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('575,00 €');
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 41 (RECHAZO) — la comisión y la gestoría de la venta, cada una POSIBLE, juntas por encima
+  // del precio (la rama `sumaImposible` del 2198, que ningún caso ejercitaba).
+  //   Madrid · 150.000 · compra 100.000 · gastos 8.000 · 5 años · suelo 20.000 · total 80.000
+  //   comisión 60 % = 90.000 · gestoría 100.000 → 190.000 > 150.000: no se liquidan ganancia ni IRPF
+  //   plusvalía objetivo = 20.000 × 0,18 × 25 % = 900,00 (real 3.125) ; total sin IRPF = 190.900,00
+  //   (127,27 %) · neto −40.900,00 «(PARCIAL)», que no vale. Ningún campo es imposible por sí solo,
+  //   así que ninguno lleva aviso propio.
+  //   Con la gestoría en 50.000: transmisión 150.000 − 90.000 − 50.000 − 900 = 9100,00 · adquisición
+  //   108.000 · pérdida 98.900,00 · SIN CUOTA · neto 9100,00, definitivo.
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 41 (rechazo) — comisión y gestoría de la venta posibles por separado, juntas por encima del precio', async ({ page }) => {
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 5)?.coeficiente).toBe(0.18);
+    await prepararVendedor2609(page, {
+      precio: '150000', compra: '100000', gastos: '8000', anios: '5', suelo: '20000', total: '80000',
+      comision: '60', gestoria: '100000',
+    });
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('900,00 €');
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('90.000,00 €');
+    expect(await valorTarjeta(page, 'Total gastos de la venta')).toBe('190.900,00 €');
+    expect((await valorTarjeta(page, /^NETO QUE RECIBES/)).replace('−', '-')).toBe('-40.900,00 €');
+    await expect(page.locator('h3', { hasText: 'Pérdida patrimonial' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Ganancia patrimonial' })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toBe(
+      'Sin calcular: la comisión y la gestoría de la venta, juntas, no pueden superar el precio de venta, y con ese dato el valor de transmisión saldría negativo. Corrige la comisión o la gestoría de la venta. Este impuesto NO está incluido en el neto de abajo.',
+    );
+    expect(await descripcionTarjeta(page, 'Valor de transmisión')).toContain(
+      'La comisión y la gestoría de la venta, juntas, no pueden superar el precio de venta: con ese dato saldría negativo',
+    );
+    expect(await tituloTarjeta24(page, 'Total gastos de la venta')).toBe('Total gastos de la venta (parcial)');
+    expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES (PARCIAL)');
+    expect(await descripcionTarjeta(page, /^NETO QUE RECIBES/)).toBe(
+      'La comisión y la gestoría de la venta, juntas, no pueden superar el precio de venta, así que no se calculan la ganancia ni el IRPF, y este neto no vale. Corrige la comisión o la gestoría de la venta para obtenerlo.',
+    );
+    await expect(page.getByRole('alert').filter({ hasText: /no puede superar/ })).toHaveCount(0);
+
+    await sembrarImporte12(page, 'Gestoría y certificados del vendedor (€)', '50000');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('9100,00 €');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('108.000,00 €');
+    expect(await valorTarjeta(page, 'Pérdida patrimonial')).toBe('98.900,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('SIN CUOTA');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('9100,00 €');
+    expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES');
+  });
+
+  // ─── HALLAZGOS del 07/10/2026, ABIERTOS ──────────────────────────────────────────────
+  // Con `test.fail()`, afirmando lo que DEBERÍA ocurrir. Las aserciones previas a la del defecto son
+  // cifras que la reparación no debe mover; la del defecto lee y compara, sin reintento.
+
+  // HALLAZGO [07/10-a] (medio, cálculo) — ❌ ABIERTO. La SOSPECHA de la inversa del 1261, con caso:
+  // la regla «amortizaciones mayores que todo el coste de adquisición = no puede ser» rechaza la
+  // amortización legítima de un local ALQUILADO cuyo valor catastral de la construcción supera el
+  // coste. El art. 14.2.a RIRPF admite cada año el 3 % del MAYOR entre el coste y el valor catastral
+  // sin el suelo, y ni él ni el art. 40 RIRPF ponen tope acumulado: la frase de la app («se amortiza
+  // solo la construcción», que es parte del coste) es falsa cuando la base es el valor catastral.
+  // La app tiene el dato en su propio formulario (total − suelo).
+  //   Madrid · 200.000 · no afecto · compra 40.000 · gastos 4.000 (coste 44.000) · 25 años · suelo
+  //   40.000 · total 120.000 (construcción 80.000) · comisión 3 % · gestoría 500 · amortizaciones
+  //   48.000 = 3 % × 80.000 × 20 años de alquiler (≤ 25 × 2.400 = 60.000)
+  //   plusvalía objetivo 40.000 × 0,40 × 25 % = 4000,00 (real 13.333,33) · transmisión 189.500,00
+  //   esperado: no se declara imposible y el IRPF se liquida (con el motor, que acota el valor de
+  //   adquisición en 0, saldrían 42.465,00 €; con la minoración literal del art. 35.2 LIRPF, −4.000 de
+  //   adquisición y 43.385,00 €: el tratamiento del exceso lo decide la reparación)
+  //   obtenido: «IRPF Sin calcular: … superan todo el coste de adquisición (44.000,00 €), y eso no
+  //   puede ser porque solo se amortiza la construcción. Revisa el dato» y el neto «(PARCIAL)».
+  test('[07/10-a] la amortización del alquiler sobre el valor catastral de la construcción no se declara imposible aunque supere el coste', async ({ page }) => {
+    test.fail();
+    await prepararVendedor2609(page, {
+      compra: '40000', gastos: '4000', anios: '25', suelo: '40000', total: '120000',
+    });
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '48000');
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('4000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('189.500,00 €');
+    // El defecto (lee y compara, sin reintento).
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).not.toContain('no puede ser');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).not.toBe('Sin calcular');
+  });
+
+  // HALLAZGO [07/10-b] (medio, dato) — ❌ ABIERTO. Efecto familia del 714 (trastero) y el 670 (garaje):
+  // la respuesta a «qué impuesto se paga al comprar», en el FAQPage y en la FAQ visible, dice «se paga
+  // IVA al 21 % más AJD» sin excepción territorial, y el FAQPage mete a Ceuta y Melilla en esa misma
+  // frase («en Ceuta y Melilla se paga la mitad»). La propia app responde allí «En Ciudad Autónoma de
+  // Ceuta no rige el IVA: la compra de obra nueva tributa por el IPSI». «IGIC» e «IPSI» no aparecen en
+  // todo metadata.ts; nave, solar, garaje, trastero y terreno sí lo dicen en su FAQPage.
+  test('[07/10-b] el FAQPage y la FAQ visible dicen que en Canarias, Ceuta y Melilla no rige el IVA', async ({ page }) => {
+    test.fail();
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await sembrarImporte12(page, 'Precio del local comercial', '200000');
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await esperarTarjeta2609(page, /^IPSI/, 'No calculado');
+    expect(await descripcionTarjeta(page, /^IPSI/)).toBe(
+      'En Ciudad Autónoma de Ceuta no rige el IVA: la compra de obra nueva tributa por el IPSI, que este simulador no calcula',
+    );
+    const faq = await faqPage0710(page);
+    const jsonLd = faq.get('¿Qué impuesto se paga al comprar un local comercial?') ?? '';
+    expect(jsonLd).toContain('se paga IVA al 21 % más AJD');
+    const visible = await faqVisible0710(page, '¿Se paga IVA o ITP al comprar un local comercial?');
+    expect(visible).toContain('se paga IVA al 21 % más AJD');
+    // El defecto.
+    expect({ jsonLd: /IGIC/.test(jsonLd) && /IPSI/.test(jsonLd), visible: /IGIC/.test(visible) && /IPSI/.test(visible) }).toEqual({
+      jsonLd: true,
+      visible: true,
+    });
+  });
+
+  // HALLAZGO [07/10-c] (bajo, contenido) — ❌ ABIERTO. La misma pregunta, dos respuestas escritas
+  // aparte: «¿Se paga IVA o ITP al comprar un local comercial?» (visible) y «¿Qué impuesto se paga al
+  // comprar un local comercial?» (FAQPage). La del FAQPage da los rangos del AJD y del ITP y la
+  // bonificación de Ceuta y Melilla; la visible, la excepción de la renuncia. La reparación es UNA
+  // constante en metadata.ts que importen las dos bocas (como simulador-gastos-compraventa-garaje).
+  test('[07/10-c] la pregunta del impuesto de la compra tiene UNA respuesta en las dos bocas', async ({ page }) => {
+    test.fail();
+    const faq = await faqPage0710(page);
+    const jsonLd = faq.get('¿Qué impuesto se paga al comprar un local comercial?') ?? '';
+    const visible = await faqVisible0710(page, '¿Se paga IVA o ITP al comprar un local comercial?');
+    expect(jsonLd.length).toBeGreaterThan(0);
+    expect(visible.length).toBeGreaterThan(0);
+    // El defecto.
+    expect(visible).toBe(jsonLd);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 07/10/2026 a 390 px — los casos 39 (vendedor) y 41 en viewport de móvil. Las
+// cifras son las de arriba; lo que se mide aquí es que el formulario del vendedor se puede usar
+// y publica lo mismo sin desbordar la pantalla.
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('RE-INSPECCIÓN 07/10/2026 — 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_12_09);
+  });
+
+  test('CASO 39 a 390 px — el vendedor afecto de La Rioja publica las mismas cifras y la página no desborda', async ({ page }) => {
+    await page.selectOption('#select-ccaa', 'rioja');
+    await sembrarImporte12(page, 'Precio del local comercial', '260000');
+    await esperarTarjeta2609(page, /^ITP/, '18.200,00 €');
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    await page.getByRole('button', { name: /Local afecto a actividad/ }).click();
+    await sembrarImporte12(page, 'Precio de compra original', '120000');
+    await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '9000');
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '36000');
+    await sembrarImporte12(page, 'Años de propiedad', '19');
+    await sembrarImporte12(page, 'Valor catastral del suelo (€)', '50000');
+    await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '150000');
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '4');
+    await sembrarImporte12(page, 'Gestoría y certificados del vendedor (€)', '600');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('34.098,75 €');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('212.026,25 €');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+
+  test('CASO 41 a 390 px — comisión y gestoría juntas por encima del precio: el neto no vale y lo dice', async ({ page }) => {
+    await prepararVendedor2609(page, {
+      precio: '150000', compra: '100000', gastos: '8000', anios: '5', suelo: '20000', total: '80000',
+      comision: '60', gestoria: '100000',
+    });
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('Sin calcular');
+    expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES (PARCIAL)');
+    expect((await valorTarjeta(page, /^NETO QUE RECIBES/)).replace('−', '-')).toBe('-40.900,00 €');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+});

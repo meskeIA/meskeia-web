@@ -6,6 +6,7 @@ import {
   colorPorHex,
   nombreDeColor,
 } from '../../data/colores-nombrados';
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Convertidor de Colores — test de regresión (02/09/2026)
@@ -324,4 +325,371 @@ test('caso 4.quater · descargar el color no manda nada a ningún servidor', asy
   ]);
   expect(descarga.suggestedFilename()).toBe('color-FFFFFF-1920x1080.png');
   expect(salidas, 'la descarga debe resolverse entera en el navegador').toEqual([]);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSPECTOR · 07/10/2026 — LA CONVERSIÓN EN SÍ
+//
+// Hasta aquí el spec cubría lo añadido el 02/09 (nombres y descarga). Lo que la app
+// promete en su <h1> —convertir entre HEX, RGB, HSL y CMYK— no lo vigilaba nada. Los
+// valores esperados se resolvieron A MANO con las fórmulas estándar antes de ejecutar la
+// app (HSL: L = (máx+mín)/2, S = d/(máx+mín) si L ≤ 0,5 o d/(2−máx−mín) si no; CMYK:
+// K = 1 − máx, C = (máx − R)/máx…), y cada caso deja el cálculo en su comentario.
+//
+// Los casos con `test.fail()` son HALLAZGOS ABIERTOS: describen lo que la app DEBERÍA
+// hacer y hoy no hace. Al repararlos, quitar el `test.fail()` y pasar el comentario a
+// pasado («REPARADO»).
+// ═══════════════════════════════════════════════════════════════════════════
+
+const CAMPO_HEX = 'input[placeholder="#000000"]';
+/** Campos numéricos del panel de valores: 0 R · 1 G · 2 B · 3 H · 4 S · 5 L · 6 C · 7 M · 8 Y · 9 K */
+const numero = (page: Page, i: number) =>
+  page.locator('[class*="mainContent"] input[type="number"]').nth(i);
+/** Las tres salidas de texto: 0 rgb() · 1 hsl() · 2 cmyk() */
+const salida = (page: Page, i: number) => page.locator('[class*="codeOutput"]').nth(i);
+
+async function abrir(page: Page) {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, [CAMPO_HEX]);
+}
+
+async function escribirHex(page: Page, valor: string) {
+  await page.locator(CAMPO_HEX).fill(valor);
+  await esperarValorEnReact(page, CAMPO_HEX, valor);
+}
+
+async function escribirNumero(page: Page, i: number, valor: number) {
+  const campo = numero(page, i);
+  await campo.fill(String(valor));
+  await esperarValorEnReact(page, campo, valor);
+}
+
+async function esperarColor(
+  page: Page,
+  hex: string,
+  rgb: string,
+  hsl: string,
+  cmyk: string,
+) {
+  await expect(salida(page, 0)).toHaveText(rgb);
+  await expect(salida(page, 1)).toHaveText(hsl);
+  await expect(salida(page, 2)).toHaveText(cmyk);
+  await expect(page.locator(CAMPO_HEX)).toHaveValue(hex);
+}
+
+test.describe('Inspector · conversión (escritorio)', () => {
+  test('I1 · normal · #7A3B9E → rgb(122, 59, 158) · hsl(278, 46%, 43%) · cmyk(23%, 63%, 0%, 38%)', async ({
+    page,
+  }) => {
+    await abrir(page);
+    // 7A = 122, 3B = 59, 9E = 158. máx 158, mín 59, d = 99.
+    //   L = 217/510 = 0,4255 → 43 · S = 99/217 = 0,4562 → 46
+    //   H = ((122−59)/99 + 4)/6 · 360 = (0,6364 + 4)/6 · 360 = 278,18 → 278
+    //   K = 97/255 = 0,3804 → 38 · C = (158−122)/158 = 0,2278 → 23 · M = 99/158 = 0,6266 → 63 · Y = 0
+    await escribirHex(page, '#7A3B9E');
+    await esperarColor(page, '#7A3B9E', 'rgb(122, 59, 158)', 'hsl(278, 46%, 43%)', 'cmyk(23%, 63%, 0%, 38%)');
+    await expect(page.locator('[class*="colorDisplay"]')).toHaveCSS('background-color', 'rgb(122, 59, 158)');
+  });
+
+  test('I1.bis · normal · por RGB (255, 128, 0) → #FF8000 · hsl(30, 100%, 50%) · cmyk(0%, 50%, 100%, 0%)', async ({
+    page,
+  }) => {
+    await abrir(page);
+    // Desde el arranque (46, 134, 171): los tres canales cambian.
+    // L = 255/510 = 0,5 → 50 (no > 0,5, así que S = d/(máx+mín) = 255/255 → 100)
+    // H = (128/255)/6 · 360 = 30,12 → 30 · K = 0 · M = 127/255 = 0,498 → 50 · Y = 100
+    await escribirNumero(page, 0, 255);
+    await escribirNumero(page, 1, 128);
+    await escribirNumero(page, 2, 0);
+    await esperarColor(page, '#FF8000', 'rgb(255, 128, 0)', 'hsl(30, 100%, 50%)', 'cmyk(0%, 50%, 100%, 0%)');
+  });
+
+  test('I1.ter · normal · por HSL (120, 100, 25) → #008000 · cmyk(100%, 0%, 100%, 50%)', async ({ page }) => {
+    await abrir(page);
+    // Desde el arranque hsl(198, 58%, 43%): los tres cambian.
+    // q = 0,25 · 2 = 0,5 · p = 0 · R: t = 2/3 → p = 0 · G: t = 1/3 → q = 0,5 → 127,5 → 128 · B: t = 0 → 0
+    // CMYK de (0, 128, 0): K = 127/255 = 0,498 → 50 · C = 1 → 100 · M = 0 · Y = 100
+    await escribirNumero(page, 3, 120);
+    await escribirNumero(page, 4, 100);
+    await escribirNumero(page, 5, 25);
+    await esperarColor(page, '#008000', 'rgb(0, 128, 0)', 'hsl(120, 100%, 25%)', 'cmyk(100%, 0%, 100%, 50%)');
+  });
+
+  test('I1.quater · normal · por CMYK (0, 100, 100, 0) → #FF0000 · hsl(0, 100%, 50%)', async ({ page }) => {
+    await abrir(page);
+    // Desde el arranque cmyk(73, 22, 0, 33): los cuatro cambian.
+    // R = 255·(1−0)·(1−0) = 255 · G = 255·(1−1) = 0 · B = 0
+    await escribirNumero(page, 6, 0);
+    await escribirNumero(page, 7, 100);
+    await escribirNumero(page, 8, 100);
+    await escribirNumero(page, 9, 0);
+    await esperarColor(page, '#FF0000', 'rgb(255, 0, 0)', 'hsl(0, 100%, 50%)', 'cmyk(0%, 100%, 100%, 0%)');
+  });
+
+  test('I2 · límite · negro, blanco, gris puro (S = 0) y tono 360 = 0', async ({ page }) => {
+    await abrir(page);
+    // Negro: K = 1 − 0 = 1 → atajo de la fórmula a (0, 0, 0, 100).
+    await escribirHex(page, '#000000');
+    await esperarColor(page, '#000000', 'rgb(0, 0, 0)', 'hsl(0, 0%, 0%)', 'cmyk(0%, 0%, 0%, 100%)');
+    // Blanco: máx = mín → S = 0 y H = 0; L = 1 → 100; K = 0 y C = M = Y = 0.
+    await escribirHex(page, '#FFFFFF');
+    await esperarColor(page, '#FFFFFF', 'rgb(255, 255, 255)', 'hsl(0, 0%, 100%)', 'cmyk(0%, 0%, 0%, 0%)');
+    // Gris 128: L = 256/510 = 0,502 → 50 · K = 127/255 = 0,498 → 50 (los dos redondeos caen al 50).
+    await escribirHex(page, '#808080');
+    await esperarColor(page, '#808080', 'rgb(128, 128, 128)', 'hsl(0, 0%, 50%)', 'cmyk(0%, 0%, 0%, 50%)');
+
+    // Tono 360 (el máximo del control) = rojo, igual que 0. Desde el gris: H 0 → 360, S 0 → 100.
+    await escribirNumero(page, 3, 360);
+    await escribirNumero(page, 4, 100);
+    await esperarColor(page, '#FF0000', 'rgb(255, 0, 0)', 'hsl(360, 100%, 50%)', 'cmyk(0%, 100%, 100%, 0%)');
+  });
+
+  test('I2.bis · el FAQPage dice lo mismo que la app y que la tabla', async ({ page }) => {
+    await abrir(page);
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+    // «#2E86AB … El resultado es RGB(46, 134, 171)»: 2E = 46, 86 = 134, AB = 171.
+    expect(ld).toContain('RGB(46, 134, 171)');
+    await expect(salida(page, 0)).toHaveText('rgb(46, 134, 171)');
+    // «El ocre … #CC7722, el azul lapislázuli … #26619C y el verde oliva … #808000»
+    expect(colorPorHex('#CC7722')?.nombre).toBe('Ocre');
+    expect(colorPorHex('#26619C')?.nombre).toBe('Azul lapislázuli');
+    expect(colorPorHex('#808000')?.nombre).toBe('Oliva');
+    // «Buscador de 71 colores»
+    expect(ld).toContain('Buscador de 71 colores');
+    expect(COLORES_NOMBRADOS.length).toBe(71);
+  });
+
+  // ── Lo que debe rechazarse ───────────────────────────────────────────────
+
+  test('I3 · rechazo · R = 300 no puede producir rgb(300…), saturación 218 % ni K negativo', async ({
+    page,
+  }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): los campos numéricos no acotan ni validan');
+    await abrir(page);
+    // Si no se acotara, con R = 300: r = 1,1765 · L = (1,1765 + 0,5255)/2 = 0,851 → 85
+    //   S = 0,651/(2 − 1,702) = 2,184 → 218 % · K = 1 − 1,1765 = −0,176 → −18 %
+    // y el HEX diría FF (255): cuatro formatos que no describen el mismo color.
+    // Esperado: rechazar (se queda en 46) o acotar a 255 → rgb(255, 134, 171).
+    await numero(page, 0).fill('300');
+    await expect(salida(page, 0)).toHaveText(/^rgb\((46|255), 134, 171\)$/);
+    await expect(salida(page, 2)).not.toContainText('-');
+  });
+
+  test('I3.bis · rechazo · K = 150 no puede dar RGB negativo', async ({ page }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): los campos numéricos no acotan ni validan');
+    await abrir(page);
+    // Con K = 1,5 la fórmula da (1 − K) = −0,5 → R = 255·0,27·(−0,5) = −34, G = −99, B = −127,
+    // y de ahí hsl(18, −58 %, −32 %). Esperado: rechazar o acotar K a 100 → rgb(0, 0, 0).
+    await numero(page, 9).fill('150');
+    await expect(salida(page, 0)).not.toContainText('-');
+    await expect(salida(page, 1)).not.toContainText('-');
+  });
+
+  test('I3.ter · rechazo · HEX pegado sin «#» (como lo copia Figma): o se acepta o se avisa', async ({
+    page,
+  }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): el campo HEX descarta en silencio lo que no es #RRGGBB');
+    await abrir(page);
+    await escribirHex(page, '#7A3B9E');
+    // El FAQPage promete «basta con pegar el código HEX». 2E86AB → rgb(46, 134, 171).
+    // Hoy el campo muestra 2E86AB y todo lo demás sigue en el morado anterior, sin aviso.
+    await page.locator(CAMPO_HEX).fill('2E86AB');
+    await expect
+      .poll(
+        async () =>
+          (await salida(page, 0).textContent()) === 'rgb(46, 134, 171)' ||
+          (await page.locator(CAMPO_HEX).getAttribute('aria-invalid')) === 'true',
+        { message: 'el campo dice 2E86AB y los valores siguen en rgb(122, 59, 158), sin aviso' },
+      )
+      .toBe(true);
+  });
+
+  test('I3.quater · rechazo · «#GG0000» se rechaza CON aviso, no en silencio', async ({ page }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): el campo HEX descarta en silencio lo que no es #RRGGBB');
+    await abrir(page);
+    await page.locator(CAMPO_HEX).fill('#GG0000');
+    // El color no debe cambiar (no hay color que mostrar)…
+    await expect(salida(page, 0)).toHaveText('rgb(46, 134, 171)');
+    // …pero el campo no puede quedarse diciendo «#GG0000» junto a un color que no es ese.
+    await expect(page.locator(CAMPO_HEX)).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  test('I3.quinquies · tecleo · vaciar R no escribe «0» ni cambia el color a medio teclear', async ({
+    page,
+  }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): setX(Number(e.target.value)) reescribe «0» en estados intermedios');
+    await abrir(page);
+    const r = numero(page, 0);
+    await r.click();
+    await r.press('End');
+    for (let i = 0; i < 3; i++) await r.press('Backspace');
+    // Hoy: Number('') = 0, el campo se rellena con «0» y el color salta a #0086AB.
+    await expect(r).toHaveValue('');
+    await expect(salida(page, 0)).toHaveText('rgb(46, 134, 171)');
+  });
+
+  test('I3.sexies · tecleo · «-5» pulsación a pulsación no se convierte en R = 5', async ({ page }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): setX(Number(e.target.value)) reescribe «0» en estados intermedios');
+    await abrir(page);
+    const r = numero(page, 0);
+    await r.click();
+    await r.press('Control+a');
+    // «-» → el navegador entrega '' → Number('') = 0 → React escribe «0» → «5» → «05» → R = 5.
+    // Esperado: un negativo se rechaza (R sigue en 46) o se acota a 0; nunca 5.
+    await r.pressSequentially('-5');
+    await expect(salida(page, 0)).toHaveText(/^rgb\((46|0), 134, 171\)$/);
+  });
+
+  // ── Accesibilidad ────────────────────────────────────────────────────────
+
+  test('I4 · los 6 deslizadores y los 10 campos numéricos tienen nombre accesible', async ({ page }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): las <label> R/G/B/H/S/L/C/M/Y/K y HEX no están asociadas');
+    await abrir(page);
+    const arbol = await page.locator('[class*="mainContent"]').ariaSnapshot();
+    const sinNombre = arbol
+      .split('\n')
+      .filter((l) => /^\s*- (slider|spinbutton)(?: \[[^\]]*\])?:/.test(l))
+      .map((l) => l.trim());
+    // Hoy salen 16 líneas «- slider: "46"», «- spinbutton: "46"»… sin decir de qué canal son.
+    expect(sinNombre).toEqual([]);
+    // Y el campo HEX se llama por su placeholder, «#000000».
+    await expect(page.getByRole('textbox', { name: /hex/i })).toHaveCount(1);
+  });
+
+  test('I4.bis · cada botón de copiar dice QUÉ copia', async ({ page }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): «📋» y tres «📋 Copiar» indistinguibles');
+    await abrir(page);
+    for (const formato of ['HEX', 'RGB', 'HSL', 'CMYK']) {
+      await expect(
+        page.getByRole('button', { name: new RegExp(`copiar.*${formato}`, 'i') }),
+        `botón de copiar ${formato}`,
+      ).toHaveCount(1);
+    }
+  });
+
+  test('I4.ter · ninguna región viva atómica envuelve controles', async ({ page }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): el panel entero es role=status aria-atomic=true');
+    await abrir(page);
+    // Con aria-atomic, cada paso de un deslizador re-anuncia el panel completo
+    // (título, tres secciones, botones y las tres salidas).
+    const controles = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('[aria-live][aria-atomic="true"]')).reduce(
+        (n, el) => n + el.querySelectorAll('input, button').length,
+        0,
+      ),
+    );
+    expect(controles).toBe(0);
+  });
+
+  // ── Contenido ────────────────────────────────────────────────────────────
+
+  test('I5 · el ejemplo «hover» del bloque educativo da el HEX que calcula la propia app', async ({
+    page,
+  }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): el texto dice #256A8A y hsl(198, 58%, 35%) es #256E8D');
+    await abrir(page);
+    // hsl(198, 58%, 35%): q = 0,35 · 1,58 = 0,553 · p = 0,147 · h = 0,55
+    //   R: t = 0,883 → p = 0,147 → 37 = 25 · G: t = 0,55 → 0,147 + 0,406 · 0,7 = 0,4312 → 110 = 6E
+    //   B: t = 0,217 → q = 0,553 → 141 = 8D  ⇒  #256E8D
+    await escribirNumero(page, 5, 35);
+    await expect(page.locator(CAMPO_HEX)).toHaveValue('#256E8D');
+    await expect(page.locator('p', { hasText: 'solo reduces L' })).toContainText('#256E8D');
+  });
+
+  test('I5.bis · un PNG 4K de color plano: el tamaño que se promete es el que sale', async ({ page }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): «unos pocos KB aunque pidas 4K» y en Chromium pesa ~161 KB');
+    await abrir(page);
+    await escribirHex(page, '#7A3B9E');
+    await page.getByRole('button', { name: /4K/ }).click();
+    const [descarga] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: /Descargar 3840 × 2160/ }).click(),
+    ]);
+    const bytes = await import('node:fs').then(async (fs) =>
+      fs.promises.readFile((await descarga.path())!),
+    );
+    // Medido el 07/10/2026: 164.955 bytes. «Unos pocos KB» se toma con holgura: < 20 KB.
+    const aviso = (await page.locator('[class*="descargaAvisoFormato"]').textContent()) ?? '';
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+    const prometePocos = /pocos KB/.test(aviso + ld);
+    expect(prometePocos ? bytes.length : 0, 'la pantalla y el FAQPage prometen «unos pocos KB»').toBeLessThan(
+      20_000,
+    );
+  });
+
+  test('I5.ter · «Errores comunes»: el titular no dice lo contrario que su explicación', async ({ page }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): «Copiar HEX con el # al CSS» como error, y luego «verifica que el # esté»');
+    await abrir(page);
+    const item = page.locator('li', { hasText: 'Verifica que el # esté incluido' });
+    await expect(item).toHaveCount(1);
+    await expect(item).not.toContainText('Copiar HEX con el #');
+  });
+
+  test('I5.quater · la prosa del bloque educativo usa formato español', async ({ page }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): «4.5:1», «16.7M colores», «0-100%», «0%=gris»');
+    await abrir(page);
+    // Fuera los <code> y las funciones CSS citadas en el texto (hsl(198, 58%, 43%)): ahí
+    // «58%» o «0.5» son sintaxis CSS, no prosa.
+    const prosa = await page.locator('[class*="guideSection"]').evaluate((el) => {
+      const copia = el.cloneNode(true) as HTMLElement;
+      copia.querySelectorAll('code').forEach((c) => c.remove());
+      return (copia.textContent ?? '').replace(/(?:rgba?|hsla?)\([^)]*\)/g, '');
+    });
+    // Hoy: «16.7M» ×3 · «0-100%», «0%=gris», «100%=blanco»… ×7 · «4.5:1» ×3.
+    expect(prosa.match(/\d\.\d+:1|\d+\.\d+M\b|\d%/g) ?? []).toEqual([]);
+  });
+
+  test('I5.quinquies · el código exportado no presenta un nombre aproximado como exacto', async ({ page }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): <h4>Morado</h4> para un color que la app llama «lo más parecido a Morado»');
+    await abrir(page);
+    await escribirHex(page, '#7A3B9E');
+    await expect(page.locator('[class*="colorInfo"]')).toContainText('lo más parecido a');
+    await page.getByRole('button', { name: 'Mostrar código' }).click();
+    await expect(page.locator('[class*="codeBlock"]')).not.toContainText('<h4>Morado</h4>');
+  });
+
+  test('I5.sexies · el JSON-LD no promete deslizadores CMYK que no existen', async ({ page }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): «Sliders … HSL y CMYK» y CMYK solo tiene campos numéricos');
+    await abrir(page);
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+    const prometeCmyk = /Sliders[^"]*CMYK/.test(ld);
+    const slidersCmyk = await page.locator('[class*="cmykGrid"] input[type="range"]').count();
+    expect(!prometeCmyk || slidersCmyk > 0, `promete sliders CMYK: ${prometeCmyk} · hay: ${slidersCmyk}`).toBe(true);
+  });
+});
+
+test.describe('Inspector · móvil 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('M1 · la conversión funciona igual a 390 px', async ({ page }) => {
+    await abrir(page);
+    await escribirHex(page, '#7A3B9E');
+    await esperarColor(page, '#7A3B9E', 'rgb(122, 59, 158)', 'hsl(278, 46%, 43%)', 'cmyk(23%, 63%, 0%, 38%)');
+  });
+
+  test('M2 · nada se sale de la pantalla: ni el panel ni el botón de copiar el HEX', async ({ page }) => {
+    test.fail(true, 'HALLAZGO ABIERTO (07/10/2026): .hexInputGroup (378 px de min-content) ensancha la columna 1fr a 443,7 px');
+    await abrir(page);
+    const medida = await page.evaluate(() => {
+      const copiar = document.querySelector('[class*="hexInputGroup"] button')!.getBoundingClientRect();
+      return {
+        // html y body llevan overflow-x: hidden (globals.css): por eso
+        // documentElement.scrollWidth da 390 y no delata nada. El desborde está en el body.
+        html: document.documentElement.scrollWidth,
+        body: document.body.scrollWidth,
+        copiarDerecha: Math.round(copiar.right),
+      };
+    });
+    expect(medida.html).toBe(390);
+    // Hoy: body 460 y el botón de copiar el HEX va de x = 374 a 427 (se ven 16 de 53 px).
+    expect(medida.body, 'ancho del contenido').toBeLessThanOrEqual(390);
+    expect(medida.copiarDerecha, 'borde derecho del botón Copiar HEX').toBeLessThanOrEqual(390);
+  });
 });

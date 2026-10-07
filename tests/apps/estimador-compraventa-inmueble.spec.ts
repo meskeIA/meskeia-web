@@ -816,6 +816,9 @@ test.describe('Inspector 20/08/2026 — factura notarial y registral', () => {
     // La guarda del useMemo es `!Number.isFinite(precio) || precio <= 0` → null, y el panel
     // pide el dato. Ni un ITP de 0 €, ni la base mínima de 90,15 € del arancel notarial
     // —que es lo que saldría de calcular sobre 0—, ni ningún «No definido».
+    // ⚠️ 07/10/2026: que el panel diga «Introduce el precio…» con el «0» escrito en el campo es
+    // un hallazgo del patrón 5 de la familia («no falta, no vale»; ver el describe del 07/10 al
+    // final). Al repararlo, la aserción del mensaje de aquí cambia; las otras cuatro, no.
     await expect(
       page.getByText('Introduce el precio del inmueble para ver el desglose de gastos del comprador'),
     ).toBeVisible();
@@ -2652,6 +2655,8 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
     await expect(page.locator('h3', { hasText: /IMPORTE NETO VENDEDOR/ })).toHaveCount(0);
 
     // c) Al salir del campo, el NumberInput lo acota a su `min` y sigue sin haber importes
+    // (⚠️ 07/10/2026: el «Introduce el precio…» con «-250000» o «0» a la vista es el hallazgo del
+    // patrón 5 del describe del 07/10; al repararlo cambian los textos de este caso, no los importes)
     await page.getByRole('button', { name: 'Comprador' }).click();
     await campoPrecio.blur();
     expect(await campoPrecio.inputValue()).toBe('0');
@@ -7509,7 +7514,7 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
   });
 
   /**
-   * HALLAZGO [medio, dato] — ABIERTO (06/10/2026). La notaría no aplica la rebaja del 5 % del
+   * HALLAZGO 2901 [medio, dato] — ABIERTO (06/10/2026; sigue abierto el 07/10). La notaría no aplica la rebaja del 5 % del
    * nº 2.1 del Arancel de los Notarios. Vive en `calcularArancelNotarial` de data/itp-ccaa.ts y
    * alcanza a las siete apps de la familia, a «Estimar por mí», al bloque educativo y al FAQPage
    * («entre 650 € y 870 €» para 200.000 €). estimador-costes-divorcio ya la aplica con la misma
@@ -7537,7 +7542,7 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
   });
 
   /**
-   * HALLAZGO [medio, dato] — ABIERTO (06/10/2026). El registro no aplica la rebaja del 5 % del
+   * HALLAZGO 2902 [medio, dato] — ABIERTO (06/10/2026; sigue abierto el 07/10). El registro no aplica la rebaja del 5 % del
    * nº 2.1 del Arancel de los Registradores, que alcanza también al tope. Vive en
    * `calcularRegistro` de data/itp-ccaa.ts y llega a las siete apps de la familia.
    *
@@ -7581,7 +7586,7 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
   });
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (06/10/2026). La tarjeta de la GANANCIA publica la base
+   * HALLAZGO 2904 [bajo, contenido] — ABIERTO (06/10/2026; sigue abierto el 07/10). La tarjeta de la GANANCIA publica la base
    * imponible («Tributa X € tras aplicar la exención», o «Base para IRPF» cuando no hay exención)
    * y su aviso sale del sondeo de la GANANCIA, que la reinversión y la hipoteca no mueven: con
    * cualquiera de las dos ilegible, la base publicada se mueve y la tarjeta calla (la del IRPF y la
@@ -7602,5 +7607,665 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
     await sembrar(page, 'Hipoteca pendiente de la vivienda que vendes', ILEGIBLE_0610);
     // Hoy: «Tributa 42.934,44 € tras aplicar la exención», sin nombrar nada (ver el CONTROL)
     expect(await descripcionTarjeta(page, /^Ganancia patrimonial/)).toMatch(/no se ha podido leer/);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Inspector 07/10/2026 — re-verificación de la REFERENCIA tras las reparaciones del 06/10
+//
+// Vuelve a la cola porque su código cambió el 06/10: 05320bea (el plazo del ITP se atribuía al
+// IVA), f00a18f7 (hallazgo 2903, concordancia de «que no se ha podido leer»), 9ed38781 (los
+// subtítulos de los botones de transmisión a 3,36:1 por `opacity: 0.8`) y e0979382
+// (components/NumberInput: el pegado con «€» o espacios se descartaba entero, y el aviso de error
+// no llegaba a 4,5:1). Las cuatro, VERIFICADAS aquí con su caso original y medidas en navegador.
+//
+// Siguen abiertos (no se registran de nuevo): 2901 y 2902 (la rebaja del 5 % de los aranceles) y
+// 2904 (la «Tributa» de la ganancia y la hipoteca ilegible). Los casos que miden el cálculo no
+// fijan la cifra de la notaría ni la del registro, por lo mismo que el describe del 06/10.
+//
+// Tres sospechas de SOSPECHAS.md (06/10): (a) la coma que falta antes de «ni» → hallazgo; (b) el
+// recuadro de la comunidad con el precio ilegible → DESCARTADA (ver su caso); (c) el suelo 0 o
+// negativo que «falta» → hallazgo, por el patrón 5 de la familia («no falta, no vale»).
+//
+// Fuentes de las cifras: ITP_CCAA (data/itp-ccaa.ts), COEFICIENTES_IIVTNU_2025 y
+// PLUSVALIA_MUNICIPAL_META.tipoOrientativo (data/fiscal/inmuebles.ts), y la escala del ahorro
+// TRAMOS_GANANCIAS_PATRIMONIALES_2025 (19/21/23/27/30 %) con calcularGananciaInmueble
+// (data/fiscal/ganancia-inmueble.ts, arts. 35, 38 LIRPF y 41 RIRPF). Todas resueltas a mano
+// ANTES de abrir la app.
+// ══════════════════════════════════════════════════════════════════════════════
+test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no llega el patrón de la familia', () => {
+  const CAMPO_PRECIO = 'input[aria-label="Precio de la vivienda"]';
+  const ILEGIBLE_0710 = '2.000.50';
+  const SIN_TRANSICIONES = '*,*::before,*::after{transition:none!important;animation:none!important}';
+
+  /** Escribe como el usuario, comprueba que el ESTADO de React lo recogió y sale del campo. */
+  async function sembrar(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+    await campo.blur();
+  }
+
+  /** Como quien aún no ha salido del campo: sin el blur, que acotaría el valor a su `min`. */
+  async function escribirConFoco(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+  }
+
+  async function abrir(page: Page, ccaa?: string): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO_PRECIO]);
+    if (ccaa) await page.locator('#ccaa-inmueble').selectOption(ccaa);
+  }
+
+  async function aVendedor(page: Page): Promise<void> {
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+  }
+
+  const rotulo = (page: Page, titulo: RegExp) => page.locator('h3', { hasText: titulo }).first().innerText();
+  /** «1278,20 €» → 1278.2, con el parser del catálogo. */
+  const euros = (texto: string): number => parseSpanishNumber(texto.replace(/\s*€\s*$/, ''));
+
+  /**
+   * BASE V (la del describe del 06/10, mismas cifras): Madrid · venta 300.000 · compra 200.000 ·
+   * 10 años · suelo 60.000 · total 150.000 · comisión 3 % (de fábrica) · vivienda habitual.
+   *   plusvalía 60.000 × 0,12 × 25 % = 1.800 (el real, 100.000 × 0,4 × 25 % = 10.000, no gana)
+   *   comisión 9.000 · transmisión 289.200 · adquisición 200.000 · ganancia 89.200
+   *   IRPF 1.140 + 9.240 + 39.200 × 23 % (9.016) = 19.396 · neto 269.804,00
+   */
+  async function montarBaseV(page: Page): Promise<void> {
+    await abrir(page);
+    await sembrar(page, 'Precio de la vivienda', '300000');
+    await aVendedor(page);
+    await sembrar(page, 'Precio de compra original', '200000');
+    await sembrar(page, 'Años de propiedad', '10');
+    await sembrar(page, 'Valor catastral del suelo', '60000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '150000');
+  }
+
+  async function marcarReinversion(page: Page): Promise<void> {
+    await page.getByRole('checkbox', { name: /Voy a reinvertir/ }).check();
+    await esperarHidratacion(page, ['input[aria-label="Importe que reinviertes en la nueva vivienda"]']);
+  }
+
+  /**
+   * El tema con el BOTÓN de la página, no escribiendo `data-theme`: el gestor de tema lo pisa al
+   * hidratar y el test mediría dos veces el claro (reference_playwright_sembrar_localstorage_carrera).
+   */
+  async function ponerTema(page: Page, tema: 'light' | 'dark'): Promise<void> {
+    const html = page.locator('html');
+    if (tema === 'dark') {
+      await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
+      await expect(html).toHaveAttribute('data-theme', 'dark');
+    } else {
+      await expect(html).not.toHaveAttribute('data-theme', 'dark');
+    }
+  }
+
+  /**
+   * El contraste MÁS BAJO de los elementos visibles del selector contra su fondo COMPUESTO (las
+   * capas semitransparentes, como el `rgba(46,134,171,0.1)` del botón activo, sobre la primera
+   * opaca) y contando la opacidad de toda la cadena: es la que bajaba los subtítulos a 3,36:1.
+   */
+  async function contrasteMinimo(page: Page, selector: string): Promise<{ ratio: number; texto: string }> {
+    return page.evaluate((sel) => {
+      const canal = (c: number) => {
+        const v = c / 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      };
+      const partes = (s: string) => (s.match(/[\d.]+/g) || []).map(Number);
+      const lum = ([r, g, b]: number[]) => 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(b);
+      const mezcla = (fg: number[], bg: number[], a: number) => fg.map((c, i) => a * c + (1 - a) * bg[i]);
+      let peor = { ratio: Infinity, texto: '' };
+      for (const el of Array.from(document.querySelectorAll(sel))) {
+        if ((el as HTMLElement).offsetParent === null) continue;
+        const capas: { rgb: number[]; a: number }[] = [];
+        for (let n: Element | null = el; n; n = n.parentElement) {
+          const p = partes(getComputedStyle(n).backgroundColor);
+          const a = p.length === 4 ? p[3] : 1;
+          if (p.length >= 3 && a > 0) capas.push({ rgb: p.slice(0, 3), a });
+          if (p.length >= 3 && a === 1) break;
+        }
+        if (!capas.length || capas[capas.length - 1].a !== 1) capas.push({ rgb: [255, 255, 255], a: 1 });
+        let fondo = capas[capas.length - 1].rgb;
+        for (let i = capas.length - 2; i >= 0; i--) fondo = mezcla(capas[i].rgb, fondo, capas[i].a);
+        let opacidad = 1;
+        for (let m: Element | null = el; m; m = m.parentElement) opacidad *= Number(getComputedStyle(m).opacity);
+        const color = partes(getComputedStyle(el).color);
+        const texto = mezcla(color.slice(0, 3), fondo, (color.length === 4 ? color[3] : 1) * opacidad);
+        const l1 = lum(texto);
+        const l2 = lum(fondo);
+        const ratio = Math.round(((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)) * 100) / 100;
+        if (ratio < peor.ratio) peor = { ratio, texto: (el.textContent ?? '').trim() };
+      }
+      return peor;
+    }, selector);
+  }
+
+  /** Las preguntas de CADA bloque FAQPage que sirve la página (JSON-LD), con su respuesta. */
+  async function bloquesFaqPage(page: Page): Promise<{ pregunta: string; respuesta: string }[][]> {
+    return page.evaluate(() => {
+      const bloques: { pregunta: string; respuesta: string }[][] = [];
+      for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+        const datos = JSON.parse(s.textContent || '{}');
+        const grafo = datos['@graph'] ?? [datos];
+        for (const nodo of grafo) {
+          if (nodo['@type'] !== 'FAQPage') continue;
+          bloques.push(
+            (nodo.mainEntity ?? []).map((q: { name: string; acceptedAnswer: { text: string } }) => ({
+              pregunta: q.name,
+              respuesta: q.acceptedAnswer.text,
+            })),
+          );
+        }
+      }
+      return bloques;
+    });
+  }
+  const normaliza = (s: string) => s.replace(/\s+/g, ' ').trim();
+
+  // ─── Las cuatro reparaciones del 06/10, con su caso original ───────────────────────────
+
+  /**
+   * REPARADO 05320bea — «El ITP o IVA+AJD debe liquidarse en … (art. 102.1 RITPAJD)»: ese artículo
+   * regula el ITP y el AJD; el IVA de la obra nueva lo repercute el promotor. Y faltaba el espacio
+   * tras el aviso del plazo («presentar.El incumplimiento»). Los dos sitios de la guía.
+   */
+  test('REPARADO 05320bea — el plazo es del ITP o, en obra nueva, del AJD, y el aviso no se pega a la frase siguiente', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const texto = normaliza(await page.locator('body').innerText());
+    expect(texto).toContain(
+      `El ITP o, en obra nueva, el AJD debe liquidarse en un plazo de ${PLAZO_ITP.dias} ${PLAZO_ITP.unidad} desde la firma (${PLAZO_ITP.baseNormativa}). ${PLAZO_ITP.aviso} El incumplimiento genera un recargo`,
+    );
+    expect(texto).toContain(
+      `El ITP o, en obra nueva, el AJD debe pagarse en ${PLAZO_ITP.dias} ${PLAZO_ITP.unidad} desde la escritura (${PLAZO_ITP.baseNormativa})`,
+    );
+    expect(texto).not.toMatch(/IVA ?\+ ?AJD debe/);
+    expect(texto).not.toMatch(/presentar\.\S/);
+  });
+
+  /**
+   * REPARADO f00a18f7 (hallazgo 2903) — el verbo concuerda con el SUJETO (`sujetoPlural`), no con
+   * el número de campos. El caso original (los otros gastos, plural con un solo campo) lo sujeta el
+   * describe del 06/10; aquí, el singular y los dos a la vez sobre la BASE V:
+   *   comisión «2.000.50» → se lee 0: transmisión 298.200 · ganancia 98.200 · IRPF 1.140 + 9.240 +
+   *     48.200 × 23 % = 21.466 → neto 300.000 − 1.800 − 21.466 = 276.734,00
+   *   y además otros gastos «2.000.50» → se leen 0: el mismo neto
+   */
+  test('REPARADO f00a18f7 — «que no se ha/han podido leer» concuerda con el sujeto, con uno y con dos importes', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await montarBaseV(page);
+    await sembrar(page, 'Comisión inmobiliaria (%)', ILEGIBLE_0710);
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('276.734,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toContain(
+      'No descuenta la comisión inmobiliaria, que no se ha podido leer (',
+    );
+    await sembrar(page, 'Otros gastos de la venta (opcional)', ILEGIBLE_0710);
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('276.734,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toContain(
+      'No descuenta la comisión inmobiliaria ni los otros gastos de la venta, que no se han podido leer (',
+    );
+  });
+
+  /**
+   * REPARADO 9ed38781 — `.transmisionSub` sin `opacity: 0.8`. Medido el 07/10 con el fondo
+   * compuesto: claro 4,85:1 (botón activo, #26718F sobre #EAF3F7) y 5,5:1 (inactivo); oscuro
+   * 4,6:1 (activo, #3FA5D1 sobre #2A3337) y 8,03:1 (inactivo). Antes, 3,36:1.
+   */
+  test('REPARADO 9ed38781 — «Paga ITP» y «Paga IVA» llegan a 4,5:1 en los dos temas, con su botón activo e inactivo', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await page.addStyleTag({ content: SIN_TRANSICIONES });
+    for (const tema of ['light', 'dark'] as const) {
+      await ponerTema(page, tema);
+      for (const boton of [/Segunda mano/, /Primera mano/]) {
+        await page.getByRole('button', { name: boton }).first().click();
+        await page.mouse.move(0, 0); // sin :hover, que cambia el fondo del botón
+        const medida = await contrasteMinimo(page, '[class*="transmisionSub"]');
+        expect(medida.texto, 'el selector tiene que encontrar los subtítulos').toMatch(/^Paga /);
+        await expect
+          .poll(async () => (await contrasteMinimo(page, '[class*="transmisionSub"]')).ratio, {
+            message: `tema ${tema}, ${boton}`,
+          })
+          .toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+
+  /**
+   * REPARADO e0979382 (hallazgos 2916 y 2912, en components/NumberInput) — el caso original:
+   * «120.000 €» pegado sobre un precio de 85.000 € se descartaba entero y la app seguía publicando
+   * el desglose de 85.000 €; y el aviso de error (#E53E3E) daba 3,95:1. Aquí, con el aviso que esta
+   * app pasa al control: la comisión imposible. Medido el 07/10: 5,24:1 en claro y 7,12:1 en oscuro.
+   */
+  test('REPARADO e0979382 — un importe pegado con «€» o con espacios entra entero, y el aviso de la comisión imposible llega a 4,5:1', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    await abrir(page, 'madrid');
+    const campo = page.locator(CAMPO_PRECIO);
+    const pegar = async (texto: string): Promise<void> => {
+      await campo.click();
+      await page.keyboard.press('Control+A');
+      await page.evaluate((t) => navigator.clipboard.writeText(t), texto);
+      await page.keyboard.press('Control+V');
+    };
+    await sembrar(page, 'Precio de la vivienda', '85000');
+    expect(await valorTarjeta(page, /^Precio del inmueble/)).toBe('85.000,00 €');
+    await pegar('120.000 €');
+    await expect(campo).toHaveValue('120.000');
+    await expect.poll(() => valorTarjeta(page, /^Precio del inmueble/)).toBe('120.000,00 €');
+    await pegar('95 000');
+    await expect(campo).toHaveValue('95000');
+    await expect.poll(() => valorTarjeta(page, /^Precio del inmueble/)).toBe('95.000,00 €');
+
+    await aVendedor(page);
+    await page.addStyleTag({ content: SIN_TRANSICIONES });
+    await sembrar(page, 'Comisión inmobiliaria (%)', '150');
+    await expect(page.locator('[role="alert"]').filter({ hasText: 'La comisión no puede superar el 100' })).toBeVisible();
+    for (const tema of ['light', 'dark'] as const) {
+      await ponerTema(page, tema);
+      expect((await contrasteMinimo(page, '[class*="errorText"]')).texto).toContain('La comisión no puede superar');
+      await expect
+        .poll(async () => (await contrasteMinimo(page, '[class*="errorText"]')).ratio, { message: `tema ${tema}` })
+        .toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  // ─── Los tres casos de esta vuelta, resueltos a mano ──────────────────────────────────
+
+  /**
+   * CASO 67 (normal) — Cataluña, segunda mano, vivienda de 750.000 €, perfil General, gestoría de
+   * fábrica (300 €): el SEGUNDO tramo de la escala, que no pisaba ningún caso (el CASO 2 está en
+   * 1.000.000 €, en el tercero). Y el vendedor completo con la ganancia en el tramo del 27 %.
+   *
+   * Comprador (ITP_CCAA.cataluna.tramosProgresivos: 10 % hasta 600.000 · 11 % hasta 900.000):
+   *   ITP 600.000 × 10 % + 150.000 × 11 % = 60.000 + 16.500 = 76.500,00 € (efectivo 10,20 %)
+   *   Notaría y registro: los fijan 2901 y 2902; aquí, que el total sume lo que se ve (hoy
+   *   1278,20 + 417,85 → total 78.496,05 € y coste 828.496,05 €, sin parcial).
+   * Vendedor: compra 450.000 · 12 años · suelo 150.000 · total 400.000 · comisión 4 % · otros
+   *   gastos 2.000 · gastos de aquella compra 40.000 · vivienda habitual sin edad ni reinversión:
+   *   plusvalía objetivo 150.000 × 0,09 × 25 % = 3.375 · real 300.000 × 0,375 × 25 % = 28.125 → 3.375
+   *   comisión 30.000 · transmisión 750.000 − 30.000 − 2.000 − 3.375 = 714.625
+   *   adquisición 450.000 + 40.000 = 490.000 · ganancia 224.625
+   *   IRPF 6.000 × 19 % + 44.000 × 21 % + 150.000 × 23 % + 24.625 × 27 %
+   *      = 1.140 + 9.240 + 34.500 + 6.648,75 = 51.528,75 €
+   *   total 3.375 + 30.000 + 2.000 + 51.528,75 = 86.903,75 · neto 663.096,25 €
+   */
+  test('CASO 67 (normal) — Cataluña, 750.000 €: el segundo tramo de la escala y la ganancia en el 27 %', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    expect(ITP_CCAA['cataluna'].tramosProgresivos?.slice(0, 2)).toEqual([
+      { hasta: 600000, tipo: 10 },
+      { hasta: 900000, tipo: 11 },
+    ]);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 12)?.coeficiente).toBe(0.09);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.map((t) => t.tipo)).toEqual([19, 21, 23, 27, 30]);
+
+    await abrir(page, 'cataluna');
+    await sembrar(page, 'Precio de la vivienda', '750000');
+    expect(normaliza(await rotulo(page, /^ITP/))).toBe('ITP (10,20 %)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('76.500,00 €');
+    expect(await valorTarjeta(page, /^Gastos de gestoría/)).toBe('300,00 €');
+    const notaria = euros(await valorTarjeta(page, /^Gastos de notaría/));
+    const registro = euros(await valorTarjeta(page, /^Registro de la Propiedad/));
+    const total = euros(await valorTarjeta(page, /^Total gastos adicionales/));
+    expect(total).toBeCloseTo(76500 + notaria + registro + 300, 2);
+    expect(await rotulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(euros(await valorTarjeta(page, /^COSTE TOTAL/))).toBeCloseTo(750000 + total, 2);
+    // El recuadro rotula el tipo general y describe la escala (no un umbral)
+    await expect(
+      page.locator('[class*="infoCcaaItem"]', { hasText: 'ITP General' }).locator('[class*="infoCcaaValue"]'),
+    ).toHaveText(/^10\s%$/);
+    await expect(page.locator('[class*="infoCcaa"]').first()).toContainText(
+      /aplica escala progresiva \(10\s%\s→\s11\s%\s→\s12\s%\s→\s13\s%\)/,
+    );
+
+    await aVendedor(page);
+    await sembrar(page, 'Precio de compra original', '450000');
+    await sembrar(page, 'Años de propiedad', '12');
+    await sembrar(page, 'Valor catastral del suelo', '150000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '400000');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '4');
+    await sembrar(page, 'Otros gastos de la venta (opcional)', '2000');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprar', '40000');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('3375,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('490.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('714.625,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('224.625,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('51.528,75 €');
+    expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('30.000,00 €');
+    expect(await valorTarjeta(page, /^Otros gastos de la venta/)).toBe('2000,00 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('86.903,75 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('663.096,25 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
+  });
+
+  /**
+   * CASO 68 (límite) — la reinversión del art. 38 LIRPF en su canto: reinvertir EXACTAMENTE el
+   * importe obtenido (art. 41.1 RIRPF: valor de transmisión menos el principal pendiente, aquí 0)
+   * y 100 € por debajo. BASE V: transmisión 289.200 · ganancia 89.200.
+   *   289.200 → proporción 1 → base 0 → EXENTO · neto 300.000 − 1.800 − 9.000 = 289.200,00
+   *   289.100 → proporción 289.100 / 289.200 → base 89.200 × 100 / 289.200 = 30,84 →
+   *     IRPF 30,84371 × 19 % = 5,86 € · total 1.800 + 9.000 + 5,86 = 10.805,86 · neto 289.194,14
+   */
+  test('CASO 68 (límite) — reinvertir el importe obtenido entero (EXENTO) y 100 € menos (5,86 €)', async ({ page }) => {
+    test.setTimeout(60_000);
+    await montarBaseV(page);
+    await marcarReinversion(page);
+    await sembrar(page, 'Importe que reinviertes en la nueva vivienda', '289200');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('EXENTO');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'Reinversión total del importe obtenido en una nueva vivienda habitual (art. 38 LIRPF)',
+    );
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.200,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
+
+    await sembrar(page, 'Importe que reinviertes en la nueva vivienda', '289100');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('89.200,00 €');
+    expect(await descripcionTarjeta(page, /^Ganancia patrimonial/)).toBe('Tributa 30,84 € tras aplicar la exención');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('5,86 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('10.805,86 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.194,14 €');
+  });
+
+  /**
+   * CASO 69 (debe rechazarse) — un precio «0» no da cifras en ninguna pestaña; un valor catastral
+   * del suelo «0» (o «-60000» con el foco dentro, que el blur acota a 0) no liquida plusvalía.
+   * Madrid · venta 300.000 · compra 200.000 · 10 años · suelo 0, sin total:
+   *   sin plusvalía: transmisión 291.000 · ganancia 91.000 (máximo) · IRPF 1.140 + 9.240 +
+   *   41.000 × 23 % = 19.810 (máximo) · total 9.000 + 19.810 = 28.810 · neto 271.190,00 (PARCIAL)
+   * Los IMPORTES de este caso no cambian al reparar los dos hallazgos de los mensajes de abajo.
+   */
+  test('CASO 69 (debe rechazarse) — un precio 0 no da cifras, y un suelo 0 o negativo no liquida plusvalía', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await abrir(page, 'madrid');
+    await sembrar(page, 'Precio de la vivienda', '0');
+    await expect(page.locator(CAMPO_PRECIO)).toHaveValue('0');
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+    await aVendedor(page);
+    await expect(page.locator('h3', { hasText: /^IMPORTE NETO VENDEDOR/ })).toHaveCount(0);
+
+    await abrir(page, 'madrid');
+    await sembrar(page, 'Precio de la vivienda', '300000');
+    await aVendedor(page);
+    await sembrar(page, 'Precio de compra original', '200000');
+    await sembrar(page, 'Años de propiedad', '10');
+    await sembrar(page, 'Valor catastral del suelo', '0');
+    const suelo = page.locator('input[aria-label="Valor catastral del suelo"]');
+    for (const paso of ['suelo 0', 'suelo -60000 con el foco'] as const) {
+      if (paso === 'suelo -60000 con el foco') await escribirConFoco(page, 'Valor catastral del suelo', '-60000');
+      expect(await valorTarjeta(page, 'Plusvalía municipal'), paso).toBe('Sin calcular');
+      expect(await valorTarjeta(page, /^Ganancia patrimonial/), paso).toBe('91.000,00 €');
+      expect(await valorTarjeta(page, /^IRPF sobre ganancia/), paso).toBe('19.810,00 €');
+      expect(await valorTarjeta(page, /^Total gastos vendedor/), paso).toBe('28.810,00 €');
+      expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/), paso).toBe('271.190,00 €');
+      expect(await rotulo(page, /^IMPORTE NETO VENDEDOR/), paso).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+      expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/), paso).toContain(
+        'el neto real puede ser menor que este',
+      );
+    }
+    await suelo.blur();
+    await expect(suelo).toHaveValue('0');
+  });
+
+  /**
+   * SOSPECHA (b) de SOSPECHAS.md — DESCARTADA el 07/10/2026. «Con el precio ilegible, el recuadro
+   * de la comunidad rotula el tipo del precio 0 (Valencia 9 %) aunque el panel se abstiene.» Es
+   * cierto, y es lo mismo que rotula con el campo VACÍO: el recuadro no publica ninguna cifra de
+   * la operación, sino el tipo general de la comunidad, y justo debajo dice en qué dirección se
+   * mueve («si el valor supera 1.000.000 € pasa al 11 % sobre TODO el valor»). El precio ilegible
+   * ya lo nombra el panel, que no calcula nada con él. Se fija aquí para que un cambio lo diga.
+   */
+  test('SOSPECHA (b) descartada — con el precio ilegible, el recuadro de Valencia da el tipo general y la regla del umbral', async ({
+    page,
+  }) => {
+    await abrir(page, 'valencia');
+    const tipoRecuadro = page
+      .locator('[class*="infoCcaaItem"]', { hasText: 'ITP General' })
+      .locator('[class*="infoCcaaValue"]');
+    await sembrar(page, 'Precio de la vivienda', '1.500.000.50');
+    await expect(page.getByText('No se ha podido leer el precio «1.500.000.50»')).toBeVisible();
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    await expect(tipoRecuadro).toHaveText(/^9\s%$/);
+    await expect(page.locator('[class*="infoCcaa"]').first()).toContainText(
+      /si el valor supera 1\.000\.000\s€\spasa al 11\s%\ssobre TODO el valor/,
+    );
+    await sembrar(page, 'Precio de la vivienda', '1500000');
+    await expect(tipoRecuadro).toHaveText(/^11\s%$/);
+  });
+
+  // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026), la sospecha (a). Al inciso explicativo «que
+   * no se ha podido leer» le falta la coma de cierre antes de «ni», y la frase se lee como si
+   * tampoco se hubiera podido leer la parte libre de la notaría. Se compone con `.join(' ni ')`
+   * (page.tsx, descripción de «COSTE TOTAL (PARCIAL)»).
+   * Madrid · 7.000.000 € · gestoría «2.000.50» → esperado «No incluye la gestoría, que no se ha
+   * podido leer, ni la parte de la notaría que excede de 6.010.121,04 €, que es de libre acuerdo:
+   * el coste real será mayor» · obtenido «…que no se ha podido leer ni la parte de la notaría…».
+   */
+  test.fail('HALLAZGO coma — «la gestoría, que no se ha podido leer, ni la parte de la notaría…»', async ({ page }) => {
+    await abrir(page, 'madrid');
+    await sembrar(page, 'Precio de la vivienda', '7000000');
+    await sembrar(page, 'Gastos de gestoría del comprador (€)', ILEGIBLE_0710);
+    expect(await descripcionTarjeta(page, /^COSTE TOTAL/)).toContain(
+      'No incluye la gestoría, que no se ha podido leer, ni la parte de la notaría que excede de 6.010.121,04 €',
+    );
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026), la sospecha (c). Patrón 5 de la familia
+   * («no falta, no vale»): un suelo ESCRITO, legible e imposible se anuncia como si faltara. La
+   * misma tarjeta ya dice «el precio de compra original tiene que ser mayor que 0» (hallazgo
+   * 1799) y «los años de tenencia no pueden ser negativos» (1552); el suelo, que es el tercer dato
+   * de la plusvalía, sigue en «falta» (`faltaValorSuelo: !(valorSuelo > 0)`). El CASO L de garaje
+   * fija el mismo texto para «-5000»: es de antes del patrón 5.
+   * Madrid · venta 300.000 · compra 200.000 · 10 años · suelo «0» (o «-60000» con el foco) →
+   * esperado: que diga que el valor escrito no vale y pida corregirlo · obtenido «Falta el valor
+   * catastral del suelo. Este impuesto NO está incluido…» y «Rellena el valor catastral del suelo
+   * para obtenerlo», con el 0 a la vista. Los importes los sujeta el CASO 69.
+   */
+  test.fail('HALLAZGO patrón 5 — un valor catastral del suelo 0 o negativo no «falta»: no vale', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrir(page, 'madrid');
+    await sembrar(page, 'Precio de la vivienda', '300000');
+    await aVendedor(page);
+    await sembrar(page, 'Precio de compra original', '200000');
+    await sembrar(page, 'Años de propiedad', '10');
+    await sembrar(page, 'Valor catastral del suelo', '0');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).not.toContain('Falta el valor catastral del suelo');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).not.toContain('Rellena el valor catastral del suelo');
+    await escribirConFoco(page, 'Valor catastral del suelo', '-60000');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).not.toContain('Falta el valor catastral del suelo');
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026). El mismo patrón 5, en el PRECIO de la
+   * propia referencia: con «0» escrito (o «-250000» con el foco, que el blur acota a 0) los dos
+   * paneles piden «Introduce el precio…». Solar, nave y terreno rústico ya lo dicen bien —«El precio
+   * escrito («0») tiene que ser mayor que 0: corrígelo…», con el comentario «hallazgo 1799 en la
+   * referencia»—, pero la referencia no lo aplicó a su propio precio (ni garaje, trastero y local).
+   * Madrid · precio «0» → esperado: que nombre el 0 escrito como no válido · obtenido «Introduce el
+   * precio del inmueble para ver el desglose de gastos del comprador» (y en Vendedor, «Introduce el
+   * precio de venta y los datos adicionales…»). Al repararlo cambian los textos de los CASOS C y 35.
+   */
+  test.fail('HALLAZGO patrón 5 — un precio «0» escrito no se pide como si faltara', async ({ page }) => {
+    await abrir(page, 'madrid');
+    await sembrar(page, 'Precio de la vivienda', '0');
+    await expect(page.locator(CAMPO_PRECIO)).toHaveValue('0');
+    await expect(page.locator('[class*="placeholder"] p').first()).toBeVisible();
+    await expect(page.getByText('Introduce el precio del inmueble para ver el desglose de gastos del comprador')).toHaveCount(0);
+    await aVendedor(page);
+    await expect(page.getByText('Introduce el precio de venta y los datos adicionales')).toHaveCount(0);
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026). Concordancia de género en un campo que SOLO
+   * tiene esta app de la familia (las mejoras): la descripción del valor de adquisición cierra
+   * siempre con «y no están sumados», también cuando lo ilegible son «las mejoras».
+   * BASE V + mejoras «2.000.50» → esperado «… no se han podido leer las mejoras, y no están
+   * sumadas» · obtenido «Precio de compra y lo que se lee: no se han podido leer las mejoras, y no
+   * están sumados». Con «los impuestos y gastos de aquella compra», o con los dos, está bien.
+   */
+  test.fail('HALLAZGO concordancia — «las mejoras … no están sumadas»', async ({ page }) => {
+    test.setTimeout(60_000);
+    await montarBaseV(page);
+    await sembrar(page, 'Inversiones y mejoras (opcional)', ILEGIBLE_0710);
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('200.000,00 €');
+    const d = await descripcionTarjeta(page, 'Valor de adquisición');
+    expect(d).toContain('las mejoras');
+    expect(d).not.toContain('las mejoras, y no están sumados');
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026). El motivo de la reinversión PARCIAL redondea
+   * la proporción exenta a una décima (`formatNumber(proporcionReinvertida * 100, 1)`,
+   * data/fiscal/ganancia-inmueble.ts), así que en los dos cantos se contradice con la cuota de al
+   * lado: «Reinversión parcial: exento el 100,0 %» con 5,86 € de IRPF, y «exento el 0,0 %» con una
+   * parte exenta de 30,84 €. BASE V (transmisión 289.200, ganancia 89.200):
+   *   reinversión 289.100 → exento el 99,965 % → esperado un porcentaje por debajo de 100 (o que no
+   *     diga «100,0 %» junto a una cuota) · obtenido «Reinversión parcial: exento el 100,0 % de la
+   *     ganancia (art. 41 RIRPF)» con IRPF 5,86 € y «Tributa 30,84 €»
+   *   reinversión 100 → exento el 0,035 % → obtenido «exento el 0,0 % de la ganancia» con «Tributa
+   *     89.169,16 €» (30,84 € exentos)
+   */
+  test.fail('HALLAZGO redondeo — la reinversión parcial no puede decir «exento el 100,0 %» con cuota, ni «el 0,0 %» con parte exenta', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await montarBaseV(page);
+    await marcarReinversion(page);
+    await sembrar(page, 'Importe que reinviertes en la nueva vivienda', '289100');
+    let d = await descripcionTarjeta(page, /^IRPF sobre ganancia/);
+    expect(d).toContain('Reinversión parcial');
+    expect(d).not.toContain('exento el 100,0 %');
+    await sembrar(page, 'Importe que reinviertes en la nueva vivienda', '100');
+    d = await descripcionTarjeta(page, /^IRPF sobre ganancia/);
+    expect(d).toContain('Reinversión parcial');
+    expect(d).not.toContain('exento el 0,0 %');
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026). La página sirve DOS FAQPage: `jsonLd`
+   * combina el WebApplication con uno de 9 preguntas (generateFAQSchema) y el layout inyecta además
+   * `faqJsonLd`, con 5. Es el hallazgo 846 de garaje («UN solo FAQPage por URL»), reparado allí y
+   * presente ya en las seis hermanas, que sirven uno: no llegó a la referencia.
+   * curl /estimador-compraventa-inmueble/ → esperado 1 bloque FAQPage · obtenido 2 (9 + 5).
+   */
+  test.fail('HALLAZGO — la página sirve un solo FAQPage, como sus seis hermanas', async ({ page }) => {
+    await page.goto(RUTA);
+    const bloques = await bloquesFaqPage(page);
+    expect(bloques.length).toBe(1);
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026). «¿Qué son los tipos reducidos de ITP y cómo
+   * acceder a ellos?» está en la FAQ visible y en el FAQPage de `jsonLd` con dos redacciones (la del
+   * FAQPage resume la visible: mete la edad entre paréntesis y omite el panel de la calculadora). Es
+   * la única de las siete preguntas compartidas que diverge; las otras seis son idénticas, y dos de
+   * ellas ya salen de una constante de metadata.ts (PREGUNTA/RESPUESTA_NO_SUJECION y _QUIEN_PAGA).
+   */
+  test.fail('HALLAZGO — la FAQ visible y el FAQPage responden lo mismo a «¿Qué son los tipos reducidos de ITP…?»', async ({
+    page,
+  }) => {
+    const PREGUNTA = '¿Qué son los tipos reducidos de ITP y cómo acceder a ellos?';
+    await abrir(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const visible = normaliza(
+      await page.locator('h4', { hasText: PREGUNTA }).locator('xpath=following-sibling::p[1]').innerText(),
+    );
+    const enJsonLd = (await bloquesFaqPage(page)).flat().filter((q) => q.pregunta === PREGUNTA);
+    expect(enJsonLd.length).toBeGreaterThan(0);
+    for (const q of enJsonLd) expect(normaliza(q.respuesta)).toBe(visible);
+  });
+
+  /**
+   * HALLAZGO [bajo, operativa] — ABIERTO (07/10/2026). El residuo del 2916 que e0979382 dejó a
+   * propósito («las letras se siguen rechazando, como al teclear»): un importe pegado con la
+   * palabra «euros» o «EUR» se descarta ENTERO y en silencio, y la app sigue publicando el desglose
+   * del precio anterior. Al teclear, cada letra rechazada es una tecla y se ve; al pegar se pierde
+   * todo sin una palabra, que es justo lo que el CLAUDE.md global §5 prohíbe («nunca bloquear el
+   * pegado en un input»). Vive en components/NumberInput, así que alcanza a todo el catálogo.
+   * Madrid · precio 85.000 · pegar «120.000 euros» → esperado: el campo deja de decir 85000 (lo lee
+   * o lo nombra como ilegible) · obtenido: el campo sigue en «85000» y «Precio del inmueble
+   * 85.000,00 €». Lo mismo con «EUR 120.000».
+   */
+  test.fail('HALLAZGO pegado — «120.000 euros» pegado no se descarta en silencio', async ({ page }) => {
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    await abrir(page, 'madrid');
+    const campo = page.locator(CAMPO_PRECIO);
+    await sembrar(page, 'Precio de la vivienda', '85000');
+    await campo.click();
+    await page.keyboard.press('Control+A');
+    await page.evaluate((t) => navigator.clipboard.writeText(t), '120.000 euros');
+    await page.keyboard.press('Control+V');
+    await expect(campo).not.toHaveValue('85000', { timeout: 3000 });
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Inspector 07/10/2026 — los mismos casos en un móvil de 390 px (Pixel 7)
+// ══════════════════════════════════════════════════════════════════════════════
+test.describe('Inspector 07/10/2026 — 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  async function sembrar(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+    await campo.blur();
+  }
+
+  /**
+   * CASO 67 en móvil (cifras a mano en el describe de arriba): el ITP de 750.000 € en Cataluña, el
+   * neto del vendedor y que nada desborde en horizontal, que en 390 px obligaría a desplazar para
+   * leer una cifra.
+   */
+  test('CASO 67 en 390 px — Cataluña, 750.000 €: ITP 76.500,00 € y neto 663.096,25 €, sin desbordar', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio de la vivienda"]']);
+    await page.locator('#ccaa-inmueble').selectOption('cataluna');
+    await sembrar(page, 'Precio de la vivienda', '750000');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('76.500,00 €');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+    await sembrar(page, 'Precio de compra original', '450000');
+    await sembrar(page, 'Años de propiedad', '12');
+    await sembrar(page, 'Valor catastral del suelo', '150000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '400000');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '4');
+    await sembrar(page, 'Otros gastos de la venta (opcional)', '2000');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprar', '40000');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('663.096,25 €');
+    const sobra = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(sobra).toBeLessThanOrEqual(0);
   });
 });

@@ -3680,8 +3680,11 @@ test.describe('Re-inspección 01/10/2026 — móvil y oscuro', () => {
 //     complemento y rellenar los datos relativos a tu hijo o hijos.»
 //
 // Cinco casos resueltos A MANO antes de abrir el navegador (coinciden los cinco) y seis
-// hallazgos ABIERTOS con `test.fail()`, uno de ellos la sospecha del 01/10 sobre el
+// hallazgos que se marcaron con `test.fail()`, uno de ellos la sospecha del 01/10 sobre el
 // «reconocimiento automático», que las fuentes de arriba convierten en hallazgo.
+// Cuatro (2927, 2928, 2930 y 2931) se REPARARON el 06/10/2026 en 033ae27d y la
+// re-inspección del 07/10 los VERIFICÓ con su caso original; siguen ABIERTOS el 2929 y el de
+// la tool del MCP (este último, fuera del alcance de la app).
 // ═════════════════════════════════════════════════════════════════════════════
 
 interface Respuestas06 extends Respuestas26 {
@@ -3905,19 +3908,22 @@ test.describe('Re-inspección 06/10/2026', () => {
   });
 
   /**
-   * ABIERTO (06/10/2026) — MEDIO (contenido). Cierra la sospecha del 01/10 sobre el
+   * REPARADO (hallazgo 2927, abierto el 06/10/2026 y reparado ese día en 033ae27d;
+   * VERIFICADO el 07/10/2026) — MEDIO (contenido). Cerró la sospecha del 01/10 sobre el
    * «reconocimiento automático». Ni el art. 60 LGSS ni la Seguridad Social dicen que el
    * complemento se reconozca de oficio: el trámite oficial es «Solicitar un complemento por
    * brecha de género o por maternidad» («Puedes solicitar el complemento en cualquier momento
    * desde que te hayan concedido la pensión») y la Revista de la SS (08/04/2025) indica que
    * en la solicitud de la pensión «deberás marcar la casilla específica para la solicitud de
-   * este complemento». Aun así, la página dice:
+   * este complemento». Aun así, la página decía:
    *   · veredicto de la rama general de una mujer: «…para reconocimiento automático del
    *     complemento»;
    *   · FAQ: «En muchos casos el INSS lo reconoce automáticamente al resolver la pensión»;
    *   · caso típico: «El INSS suele reconocerlo de oficio o con solicitud expresa»;
    *   · FAQPage: «el complemento se añade de oficio en muchos casos».
-   * (Y «Errores frecuentes» dice lo contrario: «No siempre es así».)
+   * (Y «Errores frecuentes» decía lo contrario: «No siempre es así».)
+   * Residuo que la reparación no alcanzó: el paso 3 de la guía sigue mandando buscar el
+   * trámite de «revisión de pensión» (hallazgo nuevo del 07/10, más abajo).
    */
   // REPARADO el 06/10/2026 (hallazgo 2927): veredicto, caso típico, FAQ, «Errores frecuentes» y
   // FAQPage dicen que se solicita, con el nombre del trámite de la SS.
@@ -3941,16 +3947,19 @@ test.describe('Re-inspección 06/10/2026', () => {
   });
 
   /**
-   * ABIERTO (06/10/2026) — MEDIO (contenido). DT 33.ª LGSS, párrafo segundo: quien cobra el
-   * complemento de MATERNIDAD (pensión causada antes del 4-feb-2021) y causa después una
+   * REPARADO (hallazgo 2928, abierto el 06/10/2026 y reparado ese día en 033ae27d;
+   * VERIFICADO el 07/10/2026) — MEDIO (contenido). DT 33.ª LGSS, párrafo segundo: quien cobra
+   * el complemento de MATERNIDAD (pensión causada antes del 4-feb-2021) y causa después una
    * pensión nueva no suma los dos: son incompatibles y se opta por uno. La SS lo pone como
    * condición del trámite («No te han reconocido el complemento por maternidad … con
-   * anterioridad»). La app no lo pregunta ni lo avisa en ningún sitio: a una mujer jubilada
-   * en 2019 con el complemento de maternidad que enviuda en 2023 (viudedad desde el
-   * 4-feb-2021, 2 hijos) le da «+73,80 €/mes · Cumples los requisitos básicos», y la guía solo
-   * cita la DT 33.ª para decir que el de maternidad «se conserva». El módulo
-   * `COMPLEMENTO_MATERNIDAD_DEROGADO` tampoco recoge la incompatibilidad.
+   * anterioridad»). La app no lo preguntaba ni lo avisaba en ningún sitio: a una mujer
+   * jubilada en 2019 con el complemento de maternidad que enviuda en 2023 (viudedad desde el
+   * 4-feb-2021, 2 hijos) le daba «+73,80 €/mes · Cumples los requisitos básicos», y la guía
+   * solo citaba la DT 33.ª para decir que el de maternidad «se conserva».
    * El test pide que la página lo diga (incompatibilidad + opción), sin fijar cómo.
+   * Lo que la reparación NO hizo: subir la regla a `COMPLEMENTO_MATERNIDAD_DEROGADO`, que
+   * sigue sin recogerla; va tecleada en page.tsx, metadata.ts y el motor (hallazgo nuevo del
+   * 07/10, más abajo).
    */
   // REPARADO el 06/10/2026 (hallazgo 2928): el paso siguiente de la rama general, la nota de la
   // tabla comparativa y el FAQPage avisan de la incompatibilidad y de la opción.
@@ -3997,7 +4006,8 @@ test.describe('Re-inspección 06/10/2026', () => {
   });
 
   /**
-   * ABIERTO (06/10/2026) — BAJO (contenido). El FAQPage dice «incapacidad permanente (total,
+   * REPARADO (hallazgo 2930, abierto y reparado el 06/10/2026 en 033ae27d; VERIFICADO el
+   * 07/10/2026) — BAJO (contenido). El FAQPage decía «incapacidad permanente (total,
    * absoluta o gran invalidez)». La LGSS dice «gran incapacidad» desde el 01/05/2025 (art.
    * 194.1.d, DA única de la Ley 2/2025), y data/fiscal ya lo cambió el 03/10 (d6ba391e).
    */
@@ -4009,9 +4019,10 @@ test.describe('Re-inspección 06/10/2026', () => {
   });
 
   /**
-   * ABIERTO (06/10/2026) — BAJO (dato). La «fuente oficial» del sello del complemento
-   * (`COMPLEMENTO_BRECHA_GENERO_META.urlOficial`) lleva a una página de seg-social.es que
-   * responde 200 pero muestra «No se ha encontrado contenido para:
+   * REPARADO (hallazgo 2931, abierto y reparado el 06/10/2026 en 033ae27d; VERIFICADO el
+   * 07/10/2026) — BAJO (dato). La «fuente oficial» del sello del complemento
+   * (`COMPLEMENTO_BRECHA_GENERO_META.urlOficial`) llevaba a una página de seg-social.es que
+   * respondía 200 pero mostraba «No se ha encontrado contenido para:
    * poin_contenidos/internet/4986/Jubilacion/10963» (medido con curl y con Chromium el
    * 06/10/2026). El trámite vigente está en prestaciones.seg-social.es. Testigo
    * determinista: que el sello deje de apuntar a la URL muerta (una comprobación por red
@@ -4080,6 +4091,277 @@ test.describe('Re-inspección 06/10/2026 — móvil', () => {
     expect(await page.evaluate(() => (document.activeElement?.className ?? '').toString())).toContain(
       'resultHeroPositivo',
     );
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 07/10/2026 (Opus 5.5, xhigh) — REVERIFICACIÓN de 033ae27d
+//
+// Volvió a la cola por 033ae27d (06/10: hallazgos 2927, 2928, 2930 y 2931). Los cuatro se
+// reprodujeron con su caso original, en 1280 y en 390 px, y CIERRAN:
+//   · 2927 — ni el veredicto, ni la FAQ, ni el caso típico, ni el FAQPage dicen ya que se
+//     reconozca de oficio; nombran el trámite de la SS.
+//   · 2928 — viudedad desde 2021, 2 hijos, sin otro progenitor: +73,80 €/mes y el paso
+//     siguiente avisa de la incompatibilidad de la DT 33.ª y de la opción; también la nota
+//     de la tabla comparativa y el FAQPage.
+//   · 2930 — «gran incapacidad» en el FAQPage; «invalidez» no aparece en toda la página.
+//   · 2931 — el sello enlaza a https://prestaciones.seg-social.es/servicio/complemento-brecha.html,
+//     que en Chromium (07/10/2026) es el trámite «Solicitar un complemento por brecha de
+//     género o por maternidad» con su contenido completo.
+// El 2929 sigue ABIERTO y con la misma forma (su test.fail, más arriba, sigue fallando).
+//
+// Fuentes oficiales consultadas en sesión (07/10/2026):
+//   · RD 241/2026, art. 12 (BOE-A-2026-6977, XML del BOE): «Con efectos de 1 de enero de
+//     2026, la cuantía del complemento para la reducción de la brecha de género queda
+//     establecida en 36,90 euros mensuales, conforme a lo dispuesto en el artículo 2 del Real
+//     Decreto-ley 3/2026» → coincide con `cuantiaPorHijoMensual` y con el sello (RDL 3/2026).
+//   · Art. 60.3 LGSS (BOE-A-2015-11724, versión del 18/03/2023): «limitada a cuatro veces el
+//     importe mensual fijado por hijo o hija» (→ maxHijos 4) y «satisfecho en catorce pagas».
+//   · DT 33.ª LGSS (versión del 04/02/2021), párrafo segundo: incompatibilidad y opción.
+//   · Portal de prestaciones de la SS (categorías «Jubilación» y «Gestión de prestaciones
+//     reconocidas»): el único trámite con «revisión» es «Revisión de la última revalorización
+//     de la pensión», que no es el del complemento.
+//
+// Tres casos resueltos A MANO antes de abrir el navegador (coinciden los tres) y dos
+// hallazgos nuevos con `test.fail()`, los dos residuos de lo que 033ae27d no alcanzó.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Quita comentarios de bloque y de línea (sin tocar `https://`) para leer solo el código. */
+function sinComentarios(fuente: string): string {
+  return fuente.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
+
+test.describe('Re-inspección 07/10/2026', () => {
+  /**
+   * CASO A (NORMAL) — mujer · jubilación (ordinaria o anticipada) · desde el 4-feb-2021 ·
+   * 2 hijos · sin prorrata · sin exclusión del 60.3.b · el otro progenitor no lo percibe ·
+   * sin denegación propia. Cifras de `COMPLEMENTO_BRECHA_GENERO_2026` (= RD 241/2026, art. 12):
+   *
+   *   hijosComputables = mín(2, maxHijos 4) = 2
+   *   mensual = 2 × 36,90 = 73,80 €/mes
+   *   anual   = 73,80 × 14 = 1033,20 €/año      (es-ES no agrupa cuatro cifras)
+   *
+   * Y lo que 033ae27d puso en el paso siguiente: se SOLICITA (2927), con el nombre del
+   * trámite, y la DT 33.ª hace incompatible el de maternidad que ya se cobre (2928).
+   * OBTENIDO el 07/10/2026: exactamente eso, en 1280 y en 390 px.
+   */
+  test('caso A (07/10): mujer, jubilación y 2 hijos → 73,80 €/mes y 1033,20 €/año, y el paso siguiente pide solicitarlo', async ({
+    page,
+  }) => {
+    expect(2 * COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual).toBeCloseTo(73.8, 2);
+    expect(73.8 * COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales).toBeCloseTo(1033.2, 2);
+    await responder06(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '2',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+73,80 €/mes');
+    expect(resultado).toContain('Cumples los requisitos básicos');
+    expect(resultado).toContain('Hijos computables 2 (máx. 4)');
+    expect(resultado).toContain('Anual (14 pagas) 1033,20 €/año');
+    // 2927: se solicita, con el nombre del trámite oficial, y nada de «automático»
+    expect(resultado).toContain('hay que solicitarlo ante el INSS');
+    expect(resultado).toContain('«Solicitar un complemento por brecha de género o por maternidad»');
+    expect(resultado).not.toMatch(/automátic|de oficio/);
+    // 2928: incompatibilidad con el de maternidad y opción
+    expect(resultado).toMatch(/complemento de maternidad[^.]{0,80}incompatible/);
+    expect(resultado).toContain('DT 33.ª LGSS');
+    expect(resultado).toMatch(/optar entre uno u otro/);
+  });
+
+  /**
+   * CASO B (LÍMITE) — HOMBRE con la jubilación causada el MISMO 4 de febrero de 2021
+   * (`fechaMinimaHechoCausante` = '2021-02-04', incluido: es la entrada en vigor del RDL
+   * 3/2021), sin otro progenitor. Con la doctrina de `META.doctrina` no se le exige nada
+   * adicional (ni la laguna de cotización del 60.1.b).
+   *
+   *   4 hijos → 4 × 36,90 = 147,60 €/mes (= maxMensual); × 14 = 2066,40 €/año (= maxAnual)
+   *   7 hijos → mín(7, 4) = 4 → 147,60 €/mes; 7 × 36,90 = 258,30 NO debe salir
+   *   el día antes (3-feb-2021, «Antes del 4-feb-2021») → no procede, sin cifra
+   */
+  test('caso B (07/10, límite): hombre con hecho causante el 4-feb-2021 y 4 hijos → 147,60 €/mes; 7 no suman; el día antes no procede', async ({
+    page,
+  }) => {
+    expect(COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante).toBe('2021-02-04');
+    expect(4 * COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual).toBeCloseTo(
+      COMPLEMENTO_BRECHA_GENERO_2026.maxMensual,
+      2,
+    );
+    const base = {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      sexo: 'Hombre',
+      otroProgenitor: 'No procede (sin otro progenitor)',
+    };
+    await responder06(page, { ...base, hijos: '4' });
+    let resultado = await textoResultado(page);
+    expect(resultado).toContain('+147,60 €/mes');
+    expect(resultado).toContain('Hijos computables 4 (máx. 4)');
+    expect(resultado).toContain('Anual (14 pagas) 2066,40 €/año');
+    expect(resultado).toContain(COMPLEMENTO_BRECHA_GENERO_META.doctrina.stjue.asunto);
+    // La reparación de 2927/2928 alcanza también la rama general de un hombre
+    expect(resultado).toContain('hay que solicitarlo ante el INSS');
+    expect(resultado).toContain('DT 33.ª LGSS');
+
+    await responder06(page, { ...base, hijos: '7' });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('+147,60 €/mes');
+    expect(resultado).toContain('Hijos computables 4 (máx. 4)');
+    expect(resultado).not.toContain('258,30');
+
+    await responder06(page, { ...base, fecha: 'Antes del 4-feb-2021', hijos: '4' });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).not.toContain('147,60');
+    expect(resultado).not.toContain('Desglose');
+  });
+
+  /**
+   * CASO C (RECHAZO) — pensión NO contributiva, mujer, 3 hijos: el art. 60.1 LGSS solo da el
+   * complemento sobre pensiones contributivas → «No procede ahora», sin cifra ni desglose.
+   * Y «Aún sin solicitar»: no hay pensión causada → no procede, y el paso siguiente manda
+   * marcar el complemento al pedir la pensión (coherente con 2927: se solicita).
+   */
+  test('caso C (07/10, rechazo): pensión no contributiva con 3 hijos, y pensión aún sin solicitar → «No procede ahora» sin cifra', async ({
+    page,
+  }) => {
+    await responder06(page, {
+      pension: 'No contributiva',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '3',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    let resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).toContain('solo se aplica a pensiones contributivas');
+    expect(resultado).not.toContain('110,70');
+    expect(resultado).not.toContain('€/mes');
+    expect(resultado).not.toContain('Desglose');
+
+    await responder06(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'Aún sin solicitar',
+      hijos: '3',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    resultado = await textoResultado(page);
+    expect(resultado).toContain('No procede ahora');
+    expect(resultado).not.toContain('€/mes');
+    expect(resultado).toContain('marca expresamente que pides el complemento');
+  });
+
+  /** VERIFICADO 2930 (07/10): ni el FAQPage ni la página visible —guía abierta— dicen «invalidez». */
+  test('verificado 2930 (07/10): «invalidez» no aparece ni en el FAQPage ni en la página', async ({ page }) => {
+    expect(await jsonLdDeLaPagina(page)).toContain('incapacidad permanente (total, absoluta o gran incapacidad)');
+    await abrirGuia(page);
+    const cuerpo = normalizar(await page.locator('body').innerText());
+    expect(cuerpo).not.toMatch(/invalidez/i);
+    expect(await jsonLdDeLaPagina(page)).not.toMatch(/invalidez/i);
+  });
+
+  /**
+   * VERIFICADO 2931 (07/10): el «Fuente oficial →» del sello del complemento enlaza al
+   * trámite vigente del portal de prestaciones (dominio oficial, https), no a la página vacía
+   * de antes. Sin red en el test: que el contenido está se comprobó en Chromium en sesión.
+   */
+  test('verificado 2931 (07/10): el sello enlaza al trámite de prestaciones.seg-social.es', async ({ page }) => {
+    const url = new URL(COMPLEMENTO_BRECHA_GENERO_META.urlOficial);
+    expect(url.protocol).toBe('https:');
+    expect(url.hostname).toBe('prestaciones.seg-social.es');
+    expect(url.pathname).toBe('/servicio/complemento-brecha.html');
+    const enlaces = await page
+      .locator('a[href*="seg-social.es"]')
+      .evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).href));
+    expect(enlaces).toContain(COMPLEMENTO_BRECHA_GENERO_META.urlOficial);
+    expect(enlaces.join(' ')).not.toContain('Jubilacion/10963');
+  });
+
+  /**
+   * ABIERTO (07/10/2026) — BAJO (contenido). Residuo de 2927. La reparación cambió en el
+   * FAQPage el «formulario de revisión de pensión» por el trámite «Solicitar un complemento
+   * por brecha de género o por maternidad», y ese nombre está ya en el veredicto y en la FAQ.
+   * Pero el paso 3 de la guía («Presenta la solicitud en la Sede Electrónica de la SS») sigue
+   * diciendo: «Busca el trámite de «revisión de pensión» o solicítalo por escrito en una
+   * oficina del INSS». En el portal de prestaciones de la SS el único trámite con «revisión»
+   * es «Revisión de la última revalorización de la pensión», que no da el complemento.
+   */
+  test('ABIERTO (07/10): el paso 3 de la guía nombra el trámite oficial, no la «revisión de pensión»', async ({ page }) => {
+    test.fail(true, 'Hallazgo 07/10: el paso 3 de «Cómo solicitarlo o reclamarlo» manda buscar «revisión de pensión»');
+    await abrirGuia(page);
+    const pasos = page
+      .locator('h2', { hasText: 'Cómo solicitarlo o reclamarlo' })
+      .locator('xpath=following-sibling::ol[1]');
+    const texto = normalizar(await pasos.innerText());
+    expect(texto).not.toContain('revisión de pensión');
+    expect(texto).toContain('Solicitar un complemento por brecha de género o por maternidad');
+  });
+
+  /**
+   * ABIERTO (07/10/2026) — BAJO (dato). Residuo de 2928. La incompatibilidad de la DT 33.ª
+   * LGSS (párrafo segundo) entró en la página como TEXTO: el paso siguiente de la rama
+   * general («…es incompatible con este: la DT 33.ª LGSS te deja optar entre uno u otro»),
+   * la nota de la tabla comparativa y el FAQPage («son incompatibles y hay que optar por uno
+   * (DT 33.ª LGSS)»), cada uno con su redacción, y una cuarta copia en el motor del MCP.
+   * Ningún campo de data/fiscal la recoge —el propio 2928 lo señalaba:
+   * «COMPLEMENTO_MATERNIDAD_DEROGADO no la recoge»—, mientras las demás reglas del art. 60
+   * que esta página aplica viven en el módulo con su norma (60.3.b, 60.3.f, 60.4, 60.7,
+   * cómputo del 60.3.a): es el patrón de los hallazgos 472, 503 y 505. La regla queda fuera
+   * de /triaje-fiscal. El test no fija el nombre del campo: pide que la norma esté en el
+   * CÓDIGO del módulo y que page.tsx y metadata.ts no la tecleen.
+   */
+  test('ABIERTO (07/10): la incompatibilidad de la DT 33.ª vive en data/fiscal, no tecleada en la página', async () => {
+    test.fail(true, 'Hallazgo 07/10: la DT 33.ª va tecleada en page.tsx y metadata.ts, sin campo en data/fiscal');
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const leer = (...partes: string[]): string =>
+      sinComentarios(readFileSync(join(process.cwd(), ...partes), 'utf8'));
+    const fiscal = leer('data', 'fiscal', 'pensiones.ts');
+    const pagina = leer('app', 'verificador-complemento-brecha-genero', 'page.tsx');
+    const meta = leer('app', 'verificador-complemento-brecha-genero', 'metadata.ts');
+    expect(fiscal).toMatch(/DT 33/);
+    expect(pagina).not.toMatch(/DT 33/);
+    expect(meta).not.toMatch(/DT 33/);
+  });
+});
+
+// Móvil (390 px): el caso A, con el paso siguiente más largo que dejó 033ae27d.
+test.describe('Re-inspección 07/10/2026 — móvil', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /** Caso A en 390 × 844: 73,80 €/mes a la vista y con el foco, paso siguiente visible, sin desborde. */
+  test('caso A en móvil: 73,80 €/mes se ve y recibe el foco, y el aviso de la DT 33.ª no desborda', async ({ page }) => {
+    await responder06(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '2',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    const importe = page.locator('[class*="resultImporte"]');
+    // formatCurrency separa la cifra del € con espacio duro: \s lo casa
+    await expect(importe).toHaveText(/^\+73,80\s€\/mes$/);
+    const caja = await importe.boundingBox();
+    expect(caja).not.toBeNull();
+    const { y, height } = caja as { y: number; height: number };
+    expect(y).toBeGreaterThanOrEqual(0);
+    expect(y + height).toBeLessThanOrEqual(844);
+    expect(await page.evaluate(() => (document.activeElement?.className ?? '').toString())).toContain(
+      'resultHeroPositivo',
+    );
+    await expect(page.getByText(/la DT 33\.ª LGSS te deja optar/)).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 });
