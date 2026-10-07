@@ -133,6 +133,7 @@
 
 .hexInput {
   flex: 1;
+  min-width: 0;
   padding: var(--spacing-md);
   font-size: 1.25rem;
   font-family: 'Consolas', 'Monaco', monospace;
@@ -349,7 +350,9 @@
 
 @media (max-width: 1024px) {
   .mainContent {
-    grid-template-columns: 1fr;
+    /* minmax(0, …): con 1fr la pista crecía al min-content del grupo HEX y a 390 px se
+       recortaban 70 px de controles (hallazgo 2935) */
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .infoGrid {
@@ -1195,4 +1198,15 @@
   .descargaBoton:hover {
     transform: none;
   }
+}
+
+/* Aviso de HEX no válido (hallazgo 2933) */
+.hexAviso {
+  margin: var(--spacing-sm) 0 0;
+  font-size: 0.85rem;
+  color: #8C1D18;
+}
+
+[data-theme='dark'] .hexAviso {
+  color: #F2B8B5;
 }

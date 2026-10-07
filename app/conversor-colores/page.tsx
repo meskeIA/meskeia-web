@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import styles from './ConversorColores.module.css';
+import CampoCanal from './CampoCanal';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
@@ -220,12 +221,40 @@ export default function ConvertidorColoresPage() {
     setHexInput(hex);
   }, []);
 
+  /**
+   * ⚠️ 07/10/2026 (hallazgo 2933): solo aceptaba «#RRGGBB» y descartaba todo lo demás en silencio,
+   * con el campo mostrando lo tecleado y el resto en el color anterior. Ahora admite el HEX sin
+   * almohadilla (como lo copia Figma) y, al salir del campo, el de 3 cifras; lo que no es un HEX
+   * se marca y se avisa.
+   */
+  const normalizarHex = (value: string, admitirCorto: boolean): string | null => {
+    const limpio = value.trim().replace(/^#/, '');
+    if (/^[0-9A-Fa-f]{6}$/.test(limpio)) return `#${limpio.toUpperCase()}`;
+    if (admitirCorto && /^[0-9A-Fa-f]{3}$/.test(limpio)) {
+      return `#${limpio.split('').map((c) => c + c).join('').toUpperCase()}`;
+    }
+    return null;
+  };
+
   const handleHexChange = (value: string) => {
     setHexInput(value);
-    if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-      updateFromHex(value);
+    const hex = normalizarHex(value, false);
+    if (hex) updateFromHex(hex);
+  };
+
+  const handleHexBlur = () => {
+    const hex = normalizarHex(hexInput, true);
+    if (hex) {
+      setHexInput(hex);
+      updateFromHex(hex);
     }
   };
+
+  // Aviso solo si lo tecleado ya no puede acabar siendo un HEX válido, o al salir del campo
+  const [hexTocado, setHexTocado] = useState(false);
+  const hexLimpio = hexInput.trim().replace(/^#/, '');
+  const hexImposible = /[^0-9A-Fa-f]/.test(hexLimpio) || hexLimpio.length > 6;
+  const hexInvalido = hexImposible || (hexTocado && normalizarHex(hexInput, true) === null);
 
   const handleColorPickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const hex = e.target.value.toUpperCase();
@@ -318,7 +347,9 @@ export default function ConvertidorColoresPage() {
     codigo += '<div class="color-swatch">\n';
     codigo += '  <div class="color-preview" style="background-color: ' + color.hex + ';"></div>\n';
     codigo += '  <div class="color-info">\n';
-    codigo += '    <h4>' + describirColor(color.hex).nombre + '</h4>\n';
+    // Conserva la aproximación que da la interfaz (hallazgo 2943)
+    const desc = describirColor(color.hex);
+    codigo += '    <h4>' + (desc.exacto ? desc.nombre : 'Lo más parecido a ' + desc.nombre) + '</h4>\n';
     codigo += '    <div class="color-values">\n';
     codigo += '      <span><strong>HEX:</strong> ' + color.hex + '</span>\n';
     codigo += '      <span><strong>RGB:</strong> ' + formatRgb + '</span>\n';
@@ -405,23 +436,40 @@ export default function ConvertidorColoresPage() {
           </div>
 
           <div className={styles.hexInputGroup}>
-            <label>HEX</label>
+            <label htmlFor="hex-color">HEX</label>
             <input
+              id="hex-color"
               type="text"
               value={hexInput}
-              onChange={(e) => handleHexChange(e.target.value)}
+              onChange={(e) => {
+                setHexTocado(false);
+                handleHexChange(e.target.value);
+              }}
+              onBlur={() => {
+                setHexTocado(true);
+                handleHexBlur();
+              }}
               className={styles.hexInput}
               placeholder="#000000"
               maxLength={7}
+              size={7}
+              aria-invalid={hexInvalido}
+              aria-describedby={hexInvalido ? 'hex-aviso' : undefined}
             />
             <button
               type="button"
               onClick={() => copyToClipboard(color.hex, 'hex')}
               className={styles.copyBtn}
+              aria-label="Copiar HEX"
             >
-              {copiedField === 'hex' ? '✓' : '📋'}
+              <span aria-hidden="true">{copiedField === 'hex' ? '✓' : '📋'}</span>
             </button>
           </div>
+          {hexInvalido && (
+            <p id="hex-aviso" className={styles.hexAviso} role="alert">
+              Escribe un código HEX de 6 cifras (0-9 y A-F), con o sin #, o de 3 cifras como #FFF.
+            </p>
+          )}
 
           {/* Elegir el color por su nombre */}
           <div className={styles.nombresBloque}>
@@ -491,8 +539,13 @@ export default function ConvertidorColoresPage() {
         </div>
 
         {/* Panel derecho - Valores */}
-        <div className={styles.panel} role="status" aria-live="polite" aria-atomic="true">
+        <div className={styles.panel}>
           <h2 className={styles.panelTitle}>Valores del Color</h2>
+          {/* Solo se anuncia la copia; antes el panel entero, con 19 controles, era una región
+              viva atómica que se releía en cada paso de un deslizador (hallazgo 2938) */}
+          <p className="sr-only" aria-live="polite">
+            {copiedField && copiedField !== 'html' ? `${copiedField.toUpperCase()} copiado` : ''}
+          </p>
 
           {/* RGB */}
           <div className={styles.colorSection}>
@@ -502,14 +555,16 @@ export default function ConvertidorColoresPage() {
                 type="button"
                 onClick={() => copyToClipboard(formatRgb, 'rgb')}
                 className={styles.copyBtn}
+                aria-label="Copiar RGB"
               >
-                {copiedField === 'rgb' ? '✓ Copiado' : '📋 Copiar'}
+                <span aria-hidden="true">{copiedField === 'rgb' ? '✓' : '📋'}</span> {copiedField === 'rgb' ? 'Copiado' : 'Copiar'}
               </button>
             </div>
             <div className={styles.sliderGroup}>
               <div className={styles.sliderRow}>
-                <label>R</label>
+                <label htmlFor="canal-rojo">R</label>
                 <input
+                  aria-label="Rojo (R), deslizador"
                   type="range"
                   min="0"
                   max="255"
@@ -518,18 +573,20 @@ export default function ConvertidorColoresPage() {
                   className={styles.slider}
                   style={{ '--slider-color': '#FF0000' } as React.CSSProperties}
                 />
-                <input
-                  type="number"
-                  min="0"
-                  max="255"
-                  value={color.rgb.r}
-                  onChange={(e) => updateFromRgb(Number(e.target.value), color.rgb.g, color.rgb.b)}
+                <CampoCanal
+                  id="canal-rojo"
+                  etiqueta="Rojo (R), de 0 a 255"
+                  valor={color.rgb.r}
+                  min={0}
+                  max={255}
+                  onCambio={(v) => updateFromRgb(v, color.rgb.g, color.rgb.b)}
                   className={styles.valueInput}
                 />
               </div>
               <div className={styles.sliderRow}>
-                <label>G</label>
+                <label htmlFor="canal-verde">G</label>
                 <input
+                  aria-label="Verde (G), deslizador"
                   type="range"
                   min="0"
                   max="255"
@@ -538,18 +595,20 @@ export default function ConvertidorColoresPage() {
                   className={styles.slider}
                   style={{ '--slider-color': '#00FF00' } as React.CSSProperties}
                 />
-                <input
-                  type="number"
-                  min="0"
-                  max="255"
-                  value={color.rgb.g}
-                  onChange={(e) => updateFromRgb(color.rgb.r, Number(e.target.value), color.rgb.b)}
+                <CampoCanal
+                  id="canal-verde"
+                  etiqueta="Verde (G), de 0 a 255"
+                  valor={color.rgb.g}
+                  min={0}
+                  max={255}
+                  onCambio={(v) => updateFromRgb(color.rgb.r, v, color.rgb.b)}
                   className={styles.valueInput}
                 />
               </div>
               <div className={styles.sliderRow}>
-                <label>B</label>
+                <label htmlFor="canal-azul">B</label>
                 <input
+                  aria-label="Azul (B), deslizador"
                   type="range"
                   min="0"
                   max="255"
@@ -558,12 +617,13 @@ export default function ConvertidorColoresPage() {
                   className={styles.slider}
                   style={{ '--slider-color': '#0000FF' } as React.CSSProperties}
                 />
-                <input
-                  type="number"
-                  min="0"
-                  max="255"
-                  value={color.rgb.b}
-                  onChange={(e) => updateFromRgb(color.rgb.r, color.rgb.g, Number(e.target.value))}
+                <CampoCanal
+                  id="canal-azul"
+                  etiqueta="Azul (B), de 0 a 255"
+                  valor={color.rgb.b}
+                  min={0}
+                  max={255}
+                  onCambio={(v) => updateFromRgb(color.rgb.r, color.rgb.g, v)}
                   className={styles.valueInput}
                 />
               </div>
@@ -579,14 +639,16 @@ export default function ConvertidorColoresPage() {
                 type="button"
                 onClick={() => copyToClipboard(formatHsl, 'hsl')}
                 className={styles.copyBtn}
+                aria-label="Copiar HSL"
               >
-                {copiedField === 'hsl' ? '✓ Copiado' : '📋 Copiar'}
+                <span aria-hidden="true">{copiedField === 'hsl' ? '✓' : '📋'}</span> {copiedField === 'hsl' ? 'Copiado' : 'Copiar'}
               </button>
             </div>
             <div className={styles.sliderGroup}>
               <div className={styles.sliderRow}>
-                <label>H</label>
+                <label htmlFor="canal-tono">H</label>
                 <input
+                  aria-label="Tono (H), deslizador"
                   type="range"
                   min="0"
                   max="360"
@@ -594,18 +656,20 @@ export default function ConvertidorColoresPage() {
                   onChange={(e) => updateFromHsl(Number(e.target.value), color.hsl.s, color.hsl.l)}
                   className={`${styles.slider} ${styles.hueSlider}`}
                 />
-                <input
-                  type="number"
-                  min="0"
-                  max="360"
-                  value={color.hsl.h}
-                  onChange={(e) => updateFromHsl(Number(e.target.value), color.hsl.s, color.hsl.l)}
+                <CampoCanal
+                  id="canal-tono"
+                  etiqueta="Tono (H), de 0 a 360"
+                  valor={color.hsl.h}
+                  min={0}
+                  max={360}
+                  onCambio={(v) => updateFromHsl(v, color.hsl.s, color.hsl.l)}
                   className={styles.valueInput}
                 />
               </div>
               <div className={styles.sliderRow}>
-                <label>S</label>
+                <label htmlFor="canal-saturacion">S</label>
                 <input
+                  aria-label="Saturación (S), deslizador"
                   type="range"
                   min="0"
                   max="100"
@@ -613,18 +677,20 @@ export default function ConvertidorColoresPage() {
                   onChange={(e) => updateFromHsl(color.hsl.h, Number(e.target.value), color.hsl.l)}
                   className={styles.slider}
                 />
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={color.hsl.s}
-                  onChange={(e) => updateFromHsl(color.hsl.h, Number(e.target.value), color.hsl.l)}
+                <CampoCanal
+                  id="canal-saturacion"
+                  etiqueta="Saturación (S), de 0 a 100"
+                  valor={color.hsl.s}
+                  min={0}
+                  max={100}
+                  onCambio={(v) => updateFromHsl(color.hsl.h, v, color.hsl.l)}
                   className={styles.valueInput}
                 />
               </div>
               <div className={styles.sliderRow}>
-                <label>L</label>
+                <label htmlFor="canal-luminosidad">L</label>
                 <input
+                  aria-label="Luminosidad (L), deslizador"
                   type="range"
                   min="0"
                   max="100"
@@ -632,12 +698,13 @@ export default function ConvertidorColoresPage() {
                   onChange={(e) => updateFromHsl(color.hsl.h, color.hsl.s, Number(e.target.value))}
                   className={styles.slider}
                 />
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={color.hsl.l}
-                  onChange={(e) => updateFromHsl(color.hsl.h, color.hsl.s, Number(e.target.value))}
+                <CampoCanal
+                  id="canal-luminosidad"
+                  etiqueta="Luminosidad (L), de 0 a 100"
+                  valor={color.hsl.l}
+                  min={0}
+                  max={100}
+                  onCambio={(v) => updateFromHsl(color.hsl.h, color.hsl.s, v)}
                   className={styles.valueInput}
                 />
               </div>
@@ -653,55 +720,60 @@ export default function ConvertidorColoresPage() {
                 type="button"
                 onClick={() => copyToClipboard(formatCmyk, 'cmyk')}
                 className={styles.copyBtn}
+                aria-label="Copiar CMYK"
               >
-                {copiedField === 'cmyk' ? '✓ Copiado' : '📋 Copiar'}
+                <span aria-hidden="true">{copiedField === 'cmyk' ? '✓' : '📋'}</span> {copiedField === 'cmyk' ? 'Copiado' : 'Copiar'}
               </button>
             </div>
             <div className={styles.cmykGrid}>
               <div className={styles.cmykItem}>
-                <label>C</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={color.cmyk.c}
-                  onChange={(e) => updateFromCmyk(Number(e.target.value), color.cmyk.m, color.cmyk.y, color.cmyk.k)}
+                <label htmlFor="canal-cian">C</label>
+                <CampoCanal
+                  id="canal-cian"
+                  etiqueta="Cian (C), de 0 a 100 %"
+                  valor={color.cmyk.c}
+                  min={0}
+                  max={100}
+                  onCambio={(v) => updateFromCmyk(v, color.cmyk.m, color.cmyk.y, color.cmyk.k)}
                   className={styles.valueInput}
                 />
                 <span>%</span>
               </div>
               <div className={styles.cmykItem}>
-                <label>M</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={color.cmyk.m}
-                  onChange={(e) => updateFromCmyk(color.cmyk.c, Number(e.target.value), color.cmyk.y, color.cmyk.k)}
+                <label htmlFor="canal-magenta">M</label>
+                <CampoCanal
+                  id="canal-magenta"
+                  etiqueta="Magenta (M), de 0 a 100 %"
+                  valor={color.cmyk.m}
+                  min={0}
+                  max={100}
+                  onCambio={(v) => updateFromCmyk(color.cmyk.c, v, color.cmyk.y, color.cmyk.k)}
                   className={styles.valueInput}
                 />
                 <span>%</span>
               </div>
               <div className={styles.cmykItem}>
-                <label>Y</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={color.cmyk.y}
-                  onChange={(e) => updateFromCmyk(color.cmyk.c, color.cmyk.m, Number(e.target.value), color.cmyk.k)}
+                <label htmlFor="canal-amarillo">Y</label>
+                <CampoCanal
+                  id="canal-amarillo"
+                  etiqueta="Amarillo (Y), de 0 a 100 %"
+                  valor={color.cmyk.y}
+                  min={0}
+                  max={100}
+                  onCambio={(v) => updateFromCmyk(color.cmyk.c, color.cmyk.m, v, color.cmyk.k)}
                   className={styles.valueInput}
                 />
                 <span>%</span>
               </div>
               <div className={styles.cmykItem}>
-                <label>K</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={color.cmyk.k}
-                  onChange={(e) => updateFromCmyk(color.cmyk.c, color.cmyk.m, color.cmyk.y, Number(e.target.value))}
+                <label htmlFor="canal-negro">K</label>
+                <CampoCanal
+                  id="canal-negro"
+                  etiqueta="Negro (K), de 0 a 100 %"
+                  valor={color.cmyk.k}
+                  min={0}
+                  max={100}
+                  onCambio={(v) => updateFromCmyk(color.cmyk.c, color.cmyk.m, color.cmyk.y, v)}
                   className={styles.valueInput}
                 />
                 <span>%</span>
@@ -805,8 +877,8 @@ export default function ConvertidorColoresPage() {
             <p className={styles.descargaAvisoFormato}>
               {formato === 'png' ? (
                 <>
-                  PNG conserva el color <strong>exacto</strong> y, al ser un color plano, ocupa unos
-                  pocos KB aunque pidas 4K.
+                  PNG conserva el color <strong>exacto</strong>. Un color plano comprime bien, pero el
+                  archivo no es diminuto: un 4K puede rondar los 150-200 KB según el navegador.
                 </>
               ) : (
                 <>
@@ -866,7 +938,7 @@ export default function ConvertidorColoresPage() {
                 <code>{htmlCode}</code>
               </pre>
               <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
-                {copiedField === 'html' ? '✅ Copiado' : '📋 Copiar código'}
+                <span aria-hidden="true">{copiedField === 'html' ? '✅' : '📋'}</span> {copiedField === 'html' ? 'Copiado' : 'Copiar código'}
               </button>
             </div>
           )}
@@ -940,9 +1012,9 @@ export default function ConvertidorColoresPage() {
 
             <div className={styles.comparativaRow}>
               <div className={styles.comparativaAspecto}>Precisión técnica</div>
-              <div className={styles.comparativaFormato}>Alta (16.7M colores)</div>
-              <div className={styles.comparativaFormato}>Alta (16.7M colores)</div>
-              <div className={styles.comparativaFormato}>Alta (16.7M colores)</div>
+              <div className={styles.comparativaFormato}>Alta (16,7 millones de colores)</div>
+              <div className={styles.comparativaFormato}>Alta (16,7 millones de colores)</div>
+              <div className={styles.comparativaFormato}>Alta (16,7 millones de colores)</div>
               <div className={styles.comparativaFormato}>Variable (impresora)</div>
             </div>
 
@@ -1122,7 +1194,7 @@ export default function ConvertidorColoresPage() {
               • CMYK tiene un "gamut" (rango de colores) menor que RGB
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Solución:</strong> Si diseñas para impresión, trabaja en CMYK desde el inicio
+              <span aria-hidden="true">💡</span> <strong>Solución:</strong> Si diseñas para impresión, trabaja en CMYK desde el inicio
               en Illustrator/InDesign. Siempre pide una prueba física de color antes de la tirada final.
             </p>
           </div>
@@ -1138,7 +1210,7 @@ export default function ConvertidorColoresPage() {
               • <strong>Equivalencia:</strong> 2E₁₆ = 46₁₀, 86₁₆ = 134₁₀, AB₁₆ = 171₁₀
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Cuándo usar cada uno:</strong><br />
+              <span aria-hidden="true">💡</span> <strong>Cuándo usar cada uno:</strong><br />
               • HEX: Código CSS limpio y compacto<br />
               • RGB: Si necesitas manipular canales individuales o usar rgba() para transparencia
             </p>
@@ -1151,12 +1223,12 @@ export default function ConvertidorColoresPage() {
             </p>
             <p className={styles.faqExample}>
               • <strong>H (Hue):</strong> Tono del color (0-360°) - Rojo=0°, Verde=120°, Azul=240°<br />
-              • <strong>S (Saturation):</strong> Intensidad (0-100%) - 0%=gris, 100%=color puro<br />
-              • <strong>L (Lightness):</strong> Brillo (0-100%) - 0%=negro, 50%=color, 100%=blanco
+              • <strong>S (Saturation):</strong> Intensidad (0-100&nbsp;%): 0&nbsp;% = gris, 100&nbsp;% = color puro<br />
+              • <strong>L (Lightness):</strong> Brillo (0-100&nbsp;%): 0&nbsp;% = negro, 50&nbsp;% = color, 100&nbsp;% = blanco
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Ejemplo práctico:</strong> Para crear un hover state más oscuro,
-              solo reduces L: hsl(198, 58%, 43%) → hsl(198, 58%, 35%). En HEX sería #2E86AB → #256A8A
+              <span aria-hidden="true">💡</span> <strong>Ejemplo práctico:</strong> Para crear un hover state más oscuro,
+              solo reduces L: hsl(198, 58%, 43%) → hsl(198, 58%, 35%). En HEX sería #2E86AB → #256E8D
               (no tan obvio qué cambió).
             </p>
           </div>
@@ -1187,7 +1259,7 @@ export default function ConvertidorColoresPage() {
               • <strong>Display P3:</strong> Usado en pantallas Apple modernas, más colores que sRGB
             </p>
             <p className={styles.faqTip}>
-              ⚠️ <strong>Importante:</strong> Un mismo HEX puede verse diferente en diferentes
+              <span aria-hidden="true">⚠️</span> <strong>Importante:</strong> Un mismo HEX puede verse diferente en diferentes
               espacios de color. Para web, trabaja siempre en sRGB para consistencia.
             </p>
           </div>
@@ -1198,11 +1270,11 @@ export default function ConvertidorColoresPage() {
               Verifica el <strong>contraste</strong> entre texto y fondo según WCAG:
             </p>
             <p className={styles.faqExample}>
-              • <strong>Nivel AA:</strong> Ratio mínimo 4.5:1 (texto normal), 3:1 (texto grande)<br />
-              • <strong>Nivel AAA:</strong> Ratio mínimo 7:1 (texto normal), 4.5:1 (texto grande)
+              • <strong>Nivel AA:</strong> Ratio mínimo 4,5:1 (texto normal), 3:1 (texto grande)<br />
+              • <strong>Nivel AAA:</strong> Ratio mínimo 7:1 (texto normal), 4,5:1 (texto grande)
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Herramientas recomendadas:</strong><br />
+              <span aria-hidden="true">💡</span> <strong>Herramientas recomendadas:</strong><br />
               • WebAIM Contrast Checker (online)<br />
               • Chrome DevTools (Lighthouse audit)<br />
               • Figma plugins: Stark, Color Contrast Checker
@@ -1225,7 +1297,7 @@ export default function ConvertidorColoresPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>✅</span>
               <h4>Valida el contraste</h4>
-              <p>Asegúrate de cumplir WCAG 2.1 AA (mínimo 4.5:1) para texto sobre fondo.</p>
+              <p>Asegúrate de cumplir WCAG 2.1 AA (mínimo 4,5:1) para texto sobre fondo.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>✅</span>
@@ -1252,7 +1324,7 @@ export default function ConvertidorColoresPage() {
               <li><strong>No verificar contraste de accesibilidad:</strong> Tu sitio será ilegible para algunos usuarios.</li>
               <li><strong>Hardcodear colores en múltiples lugares:</strong> Usa variables CSS para facilitar cambios globales.</li>
               <li><strong>Asumir que todos verán los mismos colores:</strong> Pantallas, calibración y daltonismo afectan la percepción.</li>
-              <li><strong>Copiar HEX con el # al CSS:</strong> Verifica que el # esté incluido (#2E86AB, no 2E86AB).</li>
+              <li><strong>Copiar el HEX al CSS sin el #:</strong> En CSS el código va con la almohadilla (#2E86AB, no 2E86AB).</li>
               <li><strong>Mezclar formatos sin motivo:</strong> Mantén consistencia (no uses HEX en unos sitios y HSL en otros sin razón).</li>
             </ul>
           </div>

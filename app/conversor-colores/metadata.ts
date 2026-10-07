@@ -33,7 +33,7 @@ export const jsonLd = generateWebAppSchema({
   features: [
     'Conversión instantánea entre HEX, RGB, HSL y CMYK con actualización en tiempo real',
     'Color picker visual integrado para seleccionar cualquier color con el ratón o en pantalla táctil',
-    'Sliders interactivos para ajustar canales RGB, tono/saturación/luminosidad HSL y CMYK',
+    'Deslizadores para los canales RGB y para el tono, la saturación y la luminosidad HSL, y campos para los cuatro valores CMYK',
     'Buscador de 71 colores con nombre en español, incluidos pigmentos como ocre, lapislázuli, siena tostada o púrpura de Tiro',
     'Descarga del color como imagen de color plano en PNG o JPEG, en Full HD, 4K, vertical de móvil, cuadrado o a medida',
     'Nombre del color siempre informado: el exacto si está en la tabla, y el más parecido por distancia perceptual si no',
@@ -83,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Cómo descargo una imagen de un solo color para usarla de fondo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Elige el color y descárgalo como archivo de color plano en el tamaño que necesites: Full HD (1920×1080), 4K (3840×2160), vertical de móvil (1080×1920), cuadrado o a medida. Conviene usar PNG y no JPEG: un color plano en PNG ocupa unos pocos KB aunque sea 4K y conserva el valor exacto, mientras que JPEG comprime por bloques y altera ligeramente el color, de modo que el píxel del archivo ya no coincide con el código elegido.',
+        text: 'Elige el color y descárgalo como archivo de color plano en el tamaño que necesites: Full HD (1920×1080), 4K (3840×2160), vertical de móvil (1080×1920), cuadrado o a medida. Conviene usar PNG y no JPEG: un color plano en PNG conserva el valor exacto y comprime bien (un 4K ronda los 150-200 KB), mientras que JPEG comprime por bloques y altera ligeramente el color, de modo que el píxel del archivo ya no coincide con el código elegido.',
       },
     },
     {
