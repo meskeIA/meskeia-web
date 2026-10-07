@@ -208,12 +208,12 @@ test.describe('Estimador de Cartera de Inversión', () => {
     const texto = await simularYEsperar(page);
 
     // (1) Σ wᵢ·rᵢ = 0,90·7 + 0,05·3 + 0,05·5 = 6,70 %
-    expect(detalle(texto, 'Rentabilidad nominal esperada')).toBe('6,70% anual');
+    expect(detalle(texto, 'Rentabilidad nominal esperada')).toBe('6,70 % anual');
     // Hallazgos 1129 y 1130 · la REAL, que es con la que proyecta, se enseña al lado y sale
     // de Fisher: 1,067/1,02 − 1 = 4,6078 %. Con la resta a secas sería 4,70 %.
-    expect(detalle(texto, 'Rentabilidad real (la que proyecta)')).toBe('4,61% anual');
+    expect(detalle(texto, 'Rentabilidad real (la que proyecta)')).toBe('4,61 % anual');
     // (2) Markowitz: √0,02165395 = 0,1471528
-    expect(detalle(texto, 'Volatilidad cartera')).toBe('14,72% anual');
+    expect(detalle(texto, 'Volatilidad cartera')).toBe('14,72 % anual');
     // (3) (6,70 − 2) / 14,71528 = 0,3194
     expect(metrica(texto, 'Ratio de Sharpe')).toBe('0,32');
     // (4) La caída ya no es σ × 2,5 = 36,8 %: se mide en las trayectorias. Con σ = 14,7 %
@@ -248,8 +248,8 @@ test.describe('Estimador de Cartera de Inversión', () => {
       .toBeLessThan(caida20);
 
     // P5 < mediana < P95, y la probabilidad es un porcentaje válido.
-    expect(aNumero(detalle(texto, 'Escenario pesimista (P5)'))).toBeLessThan(mediana);
-    expect(aNumero(detalle(texto, 'Escenario optimista (P95)'))).toBeGreaterThan(mediana);
+    expect(aNumero(detalle(texto, 'Escenario pesimista (percentil 5)'))).toBeLessThan(mediana);
+    expect(aNumero(detalle(texto, 'Escenario optimista (percentil 95)'))).toBeGreaterThan(mediana);
     const probabilidad = porcentaje(metrica(texto, 'Prob. alcanzar'));
     expect(probabilidad).toBeGreaterThan(50);
     expect(probabilidad).toBeLessThanOrEqual(100);
@@ -280,10 +280,10 @@ test.describe('Estimador de Cartera de Inversión', () => {
     const texto = await simularYEsperar(page);
 
     // (1) 1,00 · 1,5 % = 1,50 %  ·  (2) √(1²·0,005²) = 0,5 %  ·  (3) (1,5 − 2)/0,5 = −1
-    expect(detalle(texto, 'Rentabilidad nominal esperada')).toBe('1,50% anual');
+    expect(detalle(texto, 'Rentabilidad nominal esperada')).toBe('1,50 % anual');
     // Fisher: 1,015/1,015 − 1 = 0 exacto, igual que la resta. El límite se conserva.
-    expect(detalle(texto, 'Rentabilidad real (la que proyecta)')).toBe('0,00% anual');
-    expect(detalle(texto, 'Volatilidad cartera')).toBe('0,50% anual');
+    expect(detalle(texto, 'Rentabilidad real (la que proyecta)')).toBe('0,00 % anual');
+    expect(detalle(texto, 'Volatilidad cartera')).toBe('0,50 % anual');
     expect(metrica(texto, 'Ratio de Sharpe')).toBe('-1,00');
     // 0 + 500 × 10 × 12 = 60.000
     expect(detalle(texto, 'Total aportado (euros de hoy)')).toBe('60.000,00 €');
@@ -299,8 +299,8 @@ test.describe('Estimador de Cartera de Inversión', () => {
     expect(texto).not.toMatch(/NaN|∞|No definido/);
 
     // Con deriva nula, P5 y P95 abrazan los 60.000 € por los dos lados.
-    expect(aNumero(detalle(texto, 'Escenario pesimista (P5)'))).toBeLessThan(60_000);
-    expect(aNumero(detalle(texto, 'Escenario optimista (P95)'))).toBeGreaterThan(60_000);
+    expect(aNumero(detalle(texto, 'Escenario pesimista (percentil 5)'))).toBeLessThan(60_000);
+    expect(aNumero(detalle(texto, 'Escenario optimista (percentil 95)'))).toBeGreaterThan(60_000);
   });
 
   test('CASO 3 · pesos que no suman 100 %: la app no debe simular', async ({ page }) => {
@@ -312,10 +312,10 @@ test.describe('Estimador de Cartera de Inversión', () => {
     // 100 + 35 + 10 + 5 = 150 % (por defecto es 50/35/10/5).
     expect(await sembrarValorAcotado(page, deslizador(page, 'Renta Variable'), 100)).toBe('100');
 
-    await expect(page.getByText('150%')).toBeVisible();
+    await expect(page.getByText(/^150\s%$/)).toBeVisible();
     await expect(botonSimular(page)).toBeDisabled();
     await expect(botonSimular(page)).toHaveAttribute('aria-disabled', 'true');
-    await expect(page.getByRole('button', { name: /Normalizar a 100%/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Normalizar a 100\s?%/ })).toBeVisible();
 
     // Hallazgo 1137 · el rechazo se ANUNCIA. Antes la única señal era el color del total
     // y un botón deshabilitado en silencio: con lector de pantalla no había forma de saber
@@ -334,7 +334,7 @@ test.describe('Estimador de Cartera de Inversión', () => {
 
     // Normalizar: factor 100/150 = 0,6667 → round(66,67)=67 · round(23,33)=23 ·
     // round(6,67)=7 · round(3,33)=3, que suman exactamente 100.
-    await page.getByRole('button', { name: /Normalizar a 100%/ }).click();
+    await page.getByRole('button', { name: /Normalizar a 100\s?%/ }).click();
     await expect(deslizador(page, 'Renta Variable')).toHaveValue('67');
     await expect(deslizador(page, 'Renta Fija')).toHaveValue('23');
     await expect(deslizador(page, 'Liquidez')).toHaveValue('7');
@@ -507,8 +507,8 @@ test.describe('Segunda inspección (07/10/2026) · lo que sigue en pie', () => {
     // Precisión −1 (±5 €): el defecto más pequeño que vigila —aportar a principio de mes en
     // vez de al final— mueve la mediana unos 200 €; Fisher frente a la resta, ~1.000 €.
     expect(aNumero(metrica(texto, 'Capital final (mediana, en euros de hoy)'))).toBeCloseTo(79_651.02, -1);
-    expect(aNumero(detalle(texto, 'Escenario pesimista (P5)'))).toBeCloseTo(52_271.44, -1);
-    expect(aNumero(detalle(texto, 'Escenario optimista (P95)'))).toBeCloseTo(122_646.74, -1);
+    expect(aNumero(detalle(texto, 'Escenario pesimista (percentil 5)'))).toBeCloseTo(52_271.44, -1);
+    expect(aNumero(detalle(texto, 'Escenario optimista (percentil 95)'))).toBeCloseTo(122_646.74, -1);
     // 10.000 + 200 × 240 = 58.000
     expect(detalle(texto, 'Total aportado (euros de hoy)')).toBe('58.000,00 €');
     // Caída medida en las trayectorias (hallazgo 1132): 25,03 % la mediana, 42,64 % la del P95.
@@ -536,10 +536,10 @@ test.describe('Segunda inspección (07/10/2026) · lo que sigue en pie', () => {
     // Capital (10.000 €), inflación (2 %) y objetivo (100.000 €) por defecto.
 
     const texto = await simularConSemilla(page);
-    expect(detalle(texto, 'Rentabilidad nominal esperada')).toBe('7,00% anual');
+    expect(detalle(texto, 'Rentabilidad nominal esperada')).toBe('7,00 % anual');
     // Fisher: 1,07/1,02 − 1 = 4,902 %
-    expect(detalle(texto, 'Rentabilidad real (la que proyecta)')).toBe('4,90% anual');
-    expect(detalle(texto, 'Volatilidad cartera')).toBe('16,00% anual');
+    expect(detalle(texto, 'Rentabilidad real (la que proyecta)')).toBe('4,90 % anual');
+    expect(detalle(texto, 'Volatilidad cartera')).toBe('16,00 % anual');
     // (7 − 2)/16 = 0,3125
     expect(metrica(texto, 'Ratio de Sharpe')).toBe('0,31');
     // Sin aportaciones, lo aportado es el capital.
@@ -547,9 +547,9 @@ test.describe('Segunda inspección (07/10/2026) · lo que sigue en pie', () => {
     const mediana = aNumero(metrica(texto, 'Capital final (mediana, en euros de hoy)'));
     expect(mediana).toBeCloseTo(10_307.5, -1);
     expect(aNumero(detalle(texto, 'Ganancia esperada (euros de hoy)'))).toBeCloseTo(mediana - 10_000, 2);
-    expect(aNumero(detalle(texto, 'Escenario pesimista (P5)'))).toBeCloseTo(7910.89, -1);
+    expect(aNumero(detalle(texto, 'Escenario pesimista (percentil 5)'))).toBeCloseTo(7910.89, -1);
     // Nadie llega a 100.000 € en un año partiendo de 10.000.
-    expect(metrica(texto, 'Prob. alcanzar')).toBe('0,0%');
+    expect(metrica(texto, 'Prob. alcanzar')).toBe('0,0 %');
     expect(texto).not.toMatch(/NaN|∞/);
   });
 
@@ -624,11 +624,10 @@ test.describe('Segunda inspección (07/10/2026) · en móvil (390 px)', () => {
   });
 
   test('CASO 23 · la tabla de perfiles se corta a 390 px: «Horizonte temporal» e «Ideal para...» quedan fuera', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: 28 clases del JSX no existen en EstimadorCartera.module.css, entre ellas tableWrapper (sin overflow-x), y body tiene overflow-x: hidden');
     test.setTimeout(60_000);
     await abrir(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    const tabla = page.locator('table').filter({ hasText: 'Composición típica' });
+    const tabla = page.locator('table').filter({ hasText: 'Perfil (botón de arriba)' });
     await expect(tabla).toBeVisible();
     // Medido hoy: la tabla mide 546 px y su borde derecho cae en x = 579 con una ventana de
     // 390; «Horizonte temporal» empieza en x = 412. Ningún contenedor desplaza en horizontal
@@ -646,9 +645,8 @@ test.describe('Segunda inspección (07/10/2026) · en móvil (390 px)', () => {
   });
 });
 
-test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
+test.describe('Segunda inspección (07/10/2026) · hallazgos REPARADOS el 07/10/2026', () => {
   test('CASO 9 · el panel mezcla la simulación hecha con campos cambiados DESPUÉS', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: el rótulo de la probabilidad, «Total aportado» y «Ganancia» leen los campos en vivo, la mediana y la probabilidad son de la simulación anterior');
     test.setTimeout(90_000);
     await abrir(page);
 
@@ -684,10 +682,9 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
   });
 
   test('CASO 10 · «Normalizar a 100%» deja 101 % o 99 % y el botón sigue bloqueado', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: redondea cada peso por separado y el total no siempre vuelve a 100');
     test.setTimeout(60_000);
     await abrir(page);
-    const normalizar = page.getByRole('button', { name: /Normalizar a 100%/ });
+    const normalizar = page.getByRole('button', { name: /Normalizar a 100\s?%/ });
 
     // 60/35/10/5 = 110 % → round(54,55 · 31,82 · 9,09 · 4,55) = 55/32/9/5 = 101 %.
     expect(await sembrarValorAcotado(page, deslizador(page, 'Renta Variable'), 60)).toBe('60');
@@ -701,14 +698,15 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
     await expect.poll(() => totalPesos(page)).toBe(100);
   });
 
-  test('CASO 11 · la tabla «Perfiles de inversor» contradice al propio motor', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: con la composición de cada fila, el motor da rentabilidad y volatilidad fuera de los rangos de la tabla');
-    test.setTimeout(120_000);
+  test('CASO 11 · la tabla «Perfiles de inversor» concuerda con los botones y con el motor', async ({ page }) => {
+    test.setTimeout(150_000);
     await abrir(page);
 
+    // REPARADO el 07/10/2026: la tabla sale de PERFILES_PREDEFINIDOS y de calcularParametrosCartera.
+    // Ya no da rangos sino el valor del motor, así que se compara al céntimo con «Detalles».
     const filas = await page
       .locator('table')
-      .filter({ hasText: 'Composición típica' })
+      .filter({ hasText: 'Perfil (botón de arriba)' })
       .locator('tbody tr')
       .evaluateAll((trs) =>
         trs.map((tr) => Array.from(tr.querySelectorAll('td')).map((td) => (td.textContent || '').replace(/ /g, ' ').trim())),
@@ -724,12 +722,14 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
     for (const celdas of filas) {
       if (celdas.length < 4) continue; // la fila de la nota a pie
       const [perfil, comp, rent, vol] = celdas;
-      const rv = pct(comp, /(\d+)\s?%\s*RV/);
-      const rf = pct(comp, /(\d+)\s?%\s*RF/);
-      const liq = pct(comp, /(\d+)\s?%\s*Liquidez/);
-      const alt = pct(comp, /(\d+)\s?%\s*Alternativos/);
+      const rv = pct(comp, /(\d+)\s?%\s*RV/i);
+      const rf = pct(comp, /(\d+)\s?%\s*RF/i);
+      const liq = pct(comp, /(\d+)\s?%\s*Liquidez/i);
+      const alt = pct(comp, /(\d+)\s?%\s*Alternativos/i);
       expect(rv + rf + liq + alt, `composición de «${perfil}»`).toBe(100);
-      await fijarPesos(page, rv, rf, liq, alt);
+      // El botón del mismo nombre carga ESA composición (antes, tres «Conservador» distintos)
+      await page.getByRole('button', { name: perfil, exact: true }).click();
+      await expect.poll(() => totalPesos(page)).toBe(100);
       const texto = await simularNuevo(page);
       const nominal = porcentajeDe(detalle(texto, 'Rentabilidad nominal esperada'));
       const sigma = porcentajeDe(detalle(texto, 'Volatilidad cartera'));
@@ -737,15 +737,16 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
       const vRango = rango(vol);
       if (rRango && (nominal < rRango[0] || nominal > rRango[1])) discrepancias.push(`${perfil}: rentabilidad ${nominal} fuera de ${rent}`);
       if (vRango && (sigma < vRango[0] || sigma > vRango[1])) discrepancias.push(`${perfil}: volatilidad ${sigma} fuera de ${vol}`);
+      if (!rRango && porcentajeDe(rent) !== nominal) discrepancias.push(`${perfil}: tabla ${rent}, motor ${nominal}`);
+      if (!vRango && porcentajeDe(vol) !== sigma) discrepancias.push(`${perfil}: tabla ${vol}, motor ${sigma}`);
       comprobadas++;
     }
-    expect(comprobadas).toBeGreaterThan(0);
+    expect(comprobadas).toBe(5);
     // Hoy: Conservador vol 5,3 ∉ 6-8 · Moderado 4,85 ∉ 5-6 y 8,72 ∉ 10-12 · Agresivo 6,13 ∉ 7-8 y 13,01 ∉ 14-18.
     expect(discrepancias).toEqual([]);
   });
 
   test('CASO 12 · los ejemplos del bloque educativo prometen más mediana de la que da el motor', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: «Joven» ~230.000 € frente a 211.430 € y «Familia» ~200.000 € frente a 183.953 € (semilla fija)');
     test.setTimeout(150_000);
     await abrir(page);
 
@@ -781,7 +782,6 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
   });
 
   test('CASO 13 · el ejemplo del TER se queda en la mitad de lo que cuestan las comisiones', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: 50.000 € a 20 años al 6 %: 154.413 € con TER 0,2 % y 120.586 € con 1,5 %; la página dice ~157.000, ~139.000 y 18.000');
     await abrir(page);
     const [tarjeta] = (await tarjetasDeSeccion(page, 'Mejores prácticas', 'h4', 1)).filter((t) => t.includes('TER') && t.includes('50.000'));
     expect(tarjeta, 'tarjeta «Minimiza costes»').toBeTruthy();
@@ -796,7 +796,6 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
   });
 
   test('CASO 14 · un Sharpe de 0,60 sale como «Buena relación», y la tarjeta y el FAQPage dicen que bueno es > 1', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: la interpretación llama «Buena» a todo Sharpe ≥ 0,5');
     test.setTimeout(90_000);
     await abrir(page);
     await fijarPesos(page, 0, 100, 0, 0);
@@ -809,7 +808,6 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
   });
 
   test('CASO 15 · sin JavaScript el HTML servido no trae ni la app, ni el <h1>, ni los JSON-LD', async ({ request }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: useSearchParams() sin <Suspense> → BAILOUT_TO_CLIENT_SIDE_RENDERING; solo llega «Cargando aplicación...»');
     const res = await request.get(RUTA);
     expect(res.status()).toBe(200);
     const html = await res.text();
@@ -830,7 +828,6 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
   });
 
   test('CASO 17 · formato español: «Rent: 1.5%» con punto decimal y el % pegado', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: toFixed() en las metas de los deslizadores y «%» sin espacio en todo el panel');
     test.setTimeout(90_000);
     await abrir(page);
     const metas = (await page.locator('[class*="pesoMeta"]').allInnerTexts()).join(' | ');
@@ -842,7 +839,6 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
   });
 
   test('CASO 18 · emojis decorativos en nodo propio, sin aria-hidden (resto del hallazgo 1138)', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: 15 emojis (escenarios, buenas prácticas, errores y estado vacío) se leen en voz alta');
     await abrir(page);
     // Por estructura y no por clase (ver `tarjetasDeSeccion`): las secciones de escenarios y
     // de buenas prácticas, la caja de errores y el estado vacío del panel de resultados.
@@ -875,19 +871,20 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
   });
 
   test('CASO 19 · «pesimista» es el P5 en los detalles y el P10 en la leyenda y el bloque educativo', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: la misma palabra nombra dos percentiles distintos en la misma pantalla');
     test.setTimeout(90_000);
     await abrir(page);
     const texto = await simularNuevo(page);
-    const enDetalles = lineas(texto).find((l) => /pesimista/i.test(l))?.match(/P(\d+)/)?.[1];
-    const educativo = (await textoEducativo(page, '[class*="contentCard"]')).join(' ');
-    const enEducativo = educativo.match(/percentil (\d+) es el escenario pesimista/i)?.[1];
+    const enDetalles = lineas(texto).find((l) => /pesimista/i.test(l))?.match(/(?:P|percentil )(\d+)/)?.[1];
+    const educativo = (await textoEducativo(page, '[class*="contentCard"]')).join(' ').replace(/\s+/g, ' ');
+    // REPARADO: la tarjeta «Percentiles» dice qué percentil es el pesimista en «Detalles», y la
+    // leyenda del gráfico ya no llama «pesimista» al 10.
+    const enEducativo = educativo.match(/pesimista es el percentil (\d+)/i)?.[1];
     expect(enDetalles).toBeTruthy();
-    expect(enEducativo ?? enDetalles).toBe(enDetalles);
+    expect(enEducativo).toBe(enDetalles);
+    expect(educativo).not.toMatch(/percentil 10 es el escenario pesimista/i);
   });
 
   test('CASO 20 · la nota compara el 7 % NOMINAL con un 4-6 % REAL que ya contiene al motor', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: con inflación 2 %, el 7 % nominal es 4,90 % real, dentro del rango que la nota presenta como menor');
     await abrir(page);
     const nota = (await page.getByText('Nota sobre rentabilidad esperada').locator('xpath=..').innerText()).replace(/ /g, ' ');
     const m = nota.match(/(\d+)\s?[-–]\s?(\d+)\s?%\s*real/);
@@ -898,7 +895,6 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
   });
 
   test('CASO 21 · erratas: «Míraras», «olvidate» y dos palabras pegadas', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: erratas en el bloque educativo');
     await abrir(page);
     const educativo = (await textoDeSeccion(page, 'Guía paso a paso')) + ' ' + (await textoDeSeccion(page, 'Mejores prácticas'));
     expect(educativo.length).toBeGreaterThan(1000);
@@ -919,7 +915,6 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos ABIERTOS', () => {
   });
 
   test('CASO 22 · «dentro de 1 años»', async ({ page }) => {
-    test.fail(true, 'ABIERTO 07/10/2026: la interpretación no concuerda el número con «año»');
     test.setTimeout(90_000);
     await abrir(page);
     await sembrarValor(page, '#horizonte', '1');

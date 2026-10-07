@@ -730,3 +730,247 @@
   line-height: 1.35;
   opacity: 0.85;
 }
+
+/* ===========================================================================
+   Bloque educativo ampliado. Hasta el 07/10/2026 estas 28 clases se usaban en
+   page.tsx sin existir aquí (hallazgo 2974): la tabla de perfiles no tenía
+   envoltorio desplazable y a 390 px perdía dos columnas, recortadas por el
+   overflow-x: hidden del body.
+   =========================================================================== */
+.comparativaSection,
+.escenariosSection,
+.faqSection,
+.tipsSection {
+  padding: var(--spacing-md) 0;
+}
+
+.comparativaSection h2,
+.escenariosSection h2,
+.faqSection h2,
+.tipsSection h2 {
+  font-size: 1.4rem;
+  color: var(--primary-texto);
+  margin-bottom: var(--spacing-sm);
+}
+
+.comparativaSubtitle,
+.escenariosSubtitle {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.tableWrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.comparativaTable {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th,
+.comparativaTable td {
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.comparativaTable th {
+  background: var(--hover);
+  font-weight: 600;
+}
+
+.comparativaConsejo {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-left: 3px solid var(--secondary);
+  border-radius: var(--radius);
+  background: var(--hover);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.escenariosGrid,
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.escenarioCard,
+.tipCard {
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  color: var(--text-primary);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.escenarioHeader h3 {
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.escenarioIcon,
+.tipIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.escenarioExample p,
+.tipCard p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0.4rem 0;
+}
+
+.escenarioTip {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px dashed var(--border);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.tipCard h4 {
+  font-size: 1rem;
+  margin: 0.5rem 0;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  padding: var(--spacing-md);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius);
+  background: var(--hover);
+}
+
+.faqItem h4 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.faqItem p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0.4rem 0;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-boton);
+  color: #fff;
+  font-weight: 700;
+}
+
+.stepContent {
+  min-width: 0;
+}
+
+.stepContent h4 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.stepContent p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0.4rem 0;
+}
+
+.warningBox {
+  margin: var(--spacing-lg) 0;
+  padding: var(--spacing-md);
+  border: 2px solid #b45309;
+  border-radius: var(--radius);
+  background: #fffbeb;
+  color: #451a03;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.warningHeader h3 {
+  font-size: 1.1rem;
+  margin: 0;
+  color: #78350f;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.warningList {
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .warningBox {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  color: #fde68a;
+}
+
+[data-theme='dark'] .warningHeader h3 {
+  color: #fcd34d;
+}
+
+@media (max-width: 600px) {
+  .step {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+}
