@@ -298,7 +298,7 @@ function esOficio(termino: string): boolean {
  * devuelve lo que devuelve el masculino sin perder lo que ya encontraba por sí mismo.
  */
 const PERSONAS_IAE = new Set([
-  'abogados', 'actores', 'actuarios', 'acupuntores', 'adaptadores', 'administradores',
+  'abogados', 'actores', 'agentes', 'actuarios', 'acupuntores', 'adaptadores', 'administradores',
   'administrativos', 'agronomos', 'antropologos', 'aparejadores', 'apoderados', 'apuntadores',
   'arbitros', 'arquitectos', 'artesanos', 'astrologos', 'auditores', 'bailarines',
   'boxeadores', 'bromatologos', 'caricatos', 'castradores', 'censores', 'cobradores',
@@ -342,7 +342,26 @@ function masculinoDePersonaIae(palabra: string): string | null {
   return null;
 }
 
-/** La consulta del IAE con el femenino de sus profesiones en masculino, o null si no cambia. */
+/** Plural de una palabra ya normalizada (sin tildes): «comercial» → «comerciales». */
+function pluralDe(palabra: string): string {
+  if (palabra.endsWith('s')) return palabra;
+  if (/[aeiou]$/.test(palabra)) return `${palabra}s`;
+  if (palabra.endsWith('z')) return `${palabra.slice(0, -1)}ces`;
+  return `${palabra}es`;
+}
+
+/**
+ * La consulta del IAE como figura en los títulos de las Tarifas —profesión en masculino
+ * PLURAL—, o null si no cambia.
+ *
+ * El femenino pasa a masculino (hallazgo 2222). Y, desde el 07/10/2026 (hallazgo 2947), una
+ * profesión de VARIAS palabras pasa además a plural hasta la primera palabra de enlace: con una
+ * palabra el singular está dentro del plural («abogado» en «abogados»), pero con dos no
+ * («agente comercial» no está dentro de «Agentes Comerciales»), y al menos 15 grupos de la
+ * Sección 2.ª —la que retiene— daban cero con su singular natural: 511 Agentes Comerciales,
+ * 722 Gestores administrativos, 726 Graduados Sociales, 311 Ingenieros Industriales…
+ * Solo si la primera palabra es una persona de PERSONAS_IAE, por la misma razón que el 2226.
+ */
 function consultaIaeEnMasculino(consultaNormalizada: string): string | null {
   let cambiada = false;
   const palabras = consultaNormalizada.split(' ').map((palabra) => {
@@ -351,6 +370,20 @@ function consultaIaeEnMasculino(consultaNormalizada: string): string | null {
     cambiada = true;
     return masculino;
   });
+  if (palabras.length > 1 && !palabras[0].endsWith('s') && PERSONAS_IAE.has(pluralDe(palabras[0]))) {
+    let enlazado = false;
+    for (let i = 0; i < palabras.length; i++) {
+      if (enlazado || NEXOS.has(palabras[i])) {
+        enlazado = true;
+        continue;
+      }
+      const plural = pluralDe(palabras[i]);
+      if (plural !== palabras[i]) {
+        palabras[i] = plural;
+        cambiada = true;
+      }
+    }
+  }
   return cambiada ? palabras.join(' ') : null;
 }
 

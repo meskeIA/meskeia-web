@@ -3858,10 +3858,10 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 07/10/2026', () => {
     }
   });
 
-  test('ABIERTO · MEDIO (operativa) — en el IAE, el singular de una profesión de varias palabras no encuentra su grupo de la Sección 2ª', async ({
+  test('REPARADO 07/10/2026 · MEDIO (operativa) — en el IAE, el singular de una profesión de varias palabras encuentra su grupo de la Sección 2ª', async ({
     page,
   }) => {
-    test.fail();
+    // REPARADO (hallazgo 2947): consultaIaeEnMasculino pasa además a plural una profesión de varias palabras.
     // Misma raíz que el 2222: los títulos de las Tarifas van en masculino PLURAL y la búsqueda
     // es por subcadena. Con una palabra el singular está dentro del plural («abogado» en
     // «abogados»); con dos, no: «agente comercial» no está dentro de «agentes comerciales».
