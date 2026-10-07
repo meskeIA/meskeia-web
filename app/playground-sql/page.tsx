@@ -5,11 +5,35 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './PlaygroundSQL.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
-import { DATASETS, getDatasetById, EXERCISES, getExerciseById } from './components';
+import { DATASETS, getDatasetById, EXERCISES } from './components';
 import type { Dataset, QueryResult, Exercise, ExerciseProgress } from './components/types';
+import { corregir, importaElOrden, type Veredicto } from './components/correccion';
+import { formatearConsulta, formatearValor } from './components/formato';
+
+const NOMBRE_NIVEL: Record<Exercise['difficulty'], string> = {
+  basico: 'Básico',
+  intermedio: 'Intermedio',
+  avanzado: 'Avanzado',
+};
+
+const ICONO_NIVEL: Record<Exercise['difficulty'], string> = {
+  basico: '🟢',
+  intermedio: '🟡',
+  avanzado: '🔴',
+};
+
+type Correccion = { correcto: boolean; texto: string };
 
 // Tipo para sql.js
+type SqlJsStatement = {
+  getColumnNames: () => string[];
+  step: () => boolean;
+  get: () => unknown[];
+  free: () => boolean;
+};
+
 type SqlJsDatabase = {
+  prepare: (sql: string) => SqlJsStatement;
   run: (sql: string) => void;
   exec: (sql: string) => { columns: string[]; values: unknown[][] }[];
   close: () => void;
@@ -18,6 +42,30 @@ type SqlJsDatabase = {
 type SqlJsStatic = {
   Database: new () => SqlJsDatabase;
 };
+
+/** Ejecuta la solución del ejercicio sobre la misma base y compara su resultado con el del alumno. */
+function corregirEjercicio(
+  db: SqlJsDatabase,
+  ejercicio: Exercise,
+  obtenido: { columns: string[]; values: unknown[][] },
+): Veredicto {
+  let sentencia: SqlJsStatement | null = null;
+  try {
+    sentencia = db.prepare(ejercicio.expectedQuery);
+    const columns = sentencia.getColumnNames();
+    const values: unknown[][] = [];
+    while (sentencia.step()) values.push(sentencia.get());
+    return corregir({ columns, values }, obtenido, importaElOrden(ejercicio.expectedQuery));
+  } catch {
+    // Si el alumno ha borrado o cambiado las tablas, la solución puede no ejecutarse
+    return {
+      correcto: false,
+      motivo: 'No se ha podido comparar con la solución: si has modificado las tablas, pulsa «Restablecer datos».',
+    };
+  } finally {
+    sentencia?.free();
+  }
+}
 
 export default function PlaygroundSQLPage() {
   // Estados principales
@@ -29,7 +77,8 @@ export default function PlaygroundSQLPage() {
   const [activeTab, setActiveTab] = useState<'editor' | 'exercises' | 'schema'>('editor');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [exerciseProgress, setExerciseProgress] = useState<ExerciseProgress[]>([]);
-  const [showSuccess, setShowSuccess] = useState(false);
+  // Veredicto del ejercicio: se queda hasta la siguiente ejecución y vive en una región viva
+  const [correccion, setCorreccion] = useState<Correccion | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -147,16 +196,16 @@ export default function PlaygroundSQLPage() {
           executionTime: endTime - startTime,
         });
 
-        // Verificar si es un ejercicio completado
+        // Corregir el ejercicio comparando con el RESULTADO de la solución sobre la misma base
         if (selectedExercise) {
-          const hasCorrectColumns = selectedExercise.expectedColumns.every(
-            col => firstResult.columns.some(c => c.toLowerCase().includes(col.toLowerCase()))
+          const veredicto = corregirEjercicio(db, selectedExercise, firstResult);
+          setCorreccion(
+            veredicto.correcto
+              ? { correcto: true, texto: '¡Correcto! Has completado el ejercicio.' }
+              : { correcto: false, texto: veredicto.motivo },
           );
 
-          const hasCorrectRows = selectedExercise.expectedRowCount === undefined ||
-            firstResult.values.length === selectedExercise.expectedRowCount;
-
-          if (hasCorrectColumns && hasCorrectRows && firstResult.values.length > 0) {
+          if (veredicto.correcto) {
             // Marcar como completado
             setExerciseProgress(prev => {
               const existing = prev.find(p => p.exerciseId === selectedExercise.id);
@@ -174,11 +223,12 @@ export default function PlaygroundSQLPage() {
                 completedAt: new Date().toISOString(),
               }];
             });
-            setShowSuccess(true);
-            setTimeout(() => setShowSuccess(false), 3000);
           }
         }
       } else {
+        if (selectedExercise) {
+          setCorreccion({ correcto: false, texto: 'Todavía no: tu consulta no devuelve ninguna fila.' });
+        }
         setResult({
           columns: [],
           values: [],
@@ -187,6 +237,7 @@ export default function PlaygroundSQLPage() {
         });
       }
     } catch (error) {
+      setCorreccion(null);
       setResult({
         columns: [],
         values: [],
@@ -224,6 +275,7 @@ export default function PlaygroundSQLPage() {
     setSelectedExercise(exercise);
     setQuery('');
     setResult(null);
+    setCorreccion(null);
     setActiveTab('editor');
 
     // Enfocar el textarea
@@ -236,40 +288,24 @@ export default function PlaygroundSQLPage() {
   const loadSampleQuery = (queryText: string) => {
     setQuery(queryText);
     setSelectedExercise(null);
+    setCorreccion(null);
   };
 
-  // Formatear consulta
+  // Formatear consulta sin cambiar lo que hace: respeta cadenas y comentarios (hallazgo 2996)
   const formatQuery = () => {
-    const formatted = query
-      .replace(/\s+/g, ' ')
-      .replace(/\s*,\s*/g, ', ')
-      .replace(/\bSELECT\b/gi, 'SELECT')
-      .replace(/\bFROM\b/gi, '\nFROM')
-      .replace(/\bWHERE\b/gi, '\nWHERE')
-      .replace(/\bJOIN\b/gi, '\nJOIN')
-      .replace(/\bLEFT JOIN\b/gi, '\nLEFT JOIN')
-      .replace(/\bRIGHT JOIN\b/gi, '\nRIGHT JOIN')
-      .replace(/\bINNER JOIN\b/gi, '\nINNER JOIN')
-      .replace(/\bGROUP BY\b/gi, '\nGROUP BY')
-      .replace(/\bORDER BY\b/gi, '\nORDER BY')
-      .replace(/\bHAVING\b/gi, '\nHAVING')
-      .replace(/\bLIMIT\b/gi, '\nLIMIT')
-      .trim();
-    setQuery(formatted);
+    setQuery(formatearConsulta(query));
+  };
+
+  // Volver a sembrar el dataset activo: tras un DELETE o un DROP los ejercicios dejaban de
+  // poder resolverse y no había forma visible de recuperarlo (hallazgo 3006)
+  const restablecerDatos = () => {
+    initDatabase(currentDataset);
+    setCorreccion(null);
   };
 
   // Contar ejercicios completados
   const completedCount = exerciseProgress.filter(p => p.completed).length;
   const isExerciseCompleted = (id: number) => exerciseProgress.some(p => p.exerciseId === id && p.completed);
-
-  // Formatear valor para mostrar
-  const formatValue = (value: unknown): string => {
-    if (value === null) return 'NULL';
-    if (typeof value === 'number') {
-      return value.toLocaleString('es-ES', { maximumFractionDigits: 2 });
-    }
-    return String(value);
-  };
 
   return (
     <div className={styles.container}>
@@ -295,11 +331,12 @@ export default function PlaygroundSQLPage() {
                 <button
                   type="button"
                   key={dataset.id}
+                  aria-pressed={currentDataset.id === dataset.id}
                   className={`${styles.datasetBtn} ${currentDataset.id === dataset.id ? styles.datasetActive : ''}`}
                   onClick={() => handleDatasetChange(dataset.id)}
                   disabled={isLoading}
                 >
-                  <span className={styles.datasetIcon}>{dataset.icon}</span>
+                  <span className={styles.datasetIcon} aria-hidden="true">{dataset.icon}</span>
                   <span className={styles.datasetName}>{dataset.name}</span>
                 </button>
               ))}
@@ -310,6 +347,7 @@ export default function PlaygroundSQLPage() {
           <div className={styles.tabs}>
             <button
               type="button"
+              aria-pressed={activeTab === 'editor'}
               className={`${styles.tab} ${activeTab === 'editor' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('editor')}
             >
@@ -317,6 +355,7 @@ export default function PlaygroundSQLPage() {
             </button>
             <button
               type="button"
+              aria-pressed={activeTab === 'exercises'}
               className={`${styles.tab} ${activeTab === 'exercises' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('exercises')}
             >
@@ -327,6 +366,7 @@ export default function PlaygroundSQLPage() {
             </button>
             <button
               type="button"
+              aria-pressed={activeTab === 'schema'}
               className={`${styles.tab} ${activeTab === 'schema' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('schema')}
             >
@@ -358,24 +398,24 @@ export default function PlaygroundSQLPage() {
             <div className={styles.sidebarSection}>
               <h3 className={styles.sidebarTitle}><span aria-hidden="true">📚</span> Ejercicios guiados</h3>
 
-              {['basico', 'intermedio', 'avanzado'].map(level => (
+              {(['basico', 'intermedio', 'avanzado'] as const).map(level => (
                 <div key={level} className={styles.exerciseGroup}>
                   <h4 className={styles.exerciseLevel}>
-                    {level === 'basico' && '🟢 Básico'}
-                    {level === 'intermedio' && '🟡 Intermedio'}
-                    {level === 'avanzado' && '🔴 Avanzado'}
+                    <span aria-hidden="true">{ICONO_NIVEL[level]}</span> {NOMBRE_NIVEL[level]}
                   </h4>
                   {EXERCISES.filter(e => e.difficulty === level).map(exercise => (
                     <button
                       type="button"
                       key={exercise.id}
+                      aria-pressed={selectedExercise?.id === exercise.id}
                       className={`${styles.exerciseBtn} ${selectedExercise?.id === exercise.id ? styles.exerciseActive : ''} ${isExerciseCompleted(exercise.id) ? styles.exerciseCompleted : ''}`}
                       onClick={() => handleExerciseSelect(exercise)}
                     >
-                      <span className={styles.exerciseCheck}>
+                      <span className={styles.exerciseCheck} aria-hidden="true">
                         {isExerciseCompleted(exercise.id) ? '✅' : '○'}
                       </span>
                       <span className={styles.exerciseTitle}>{exercise.title}</span>
+                      {isExerciseCompleted(exercise.id) && <span className="sr-only"> (completado)</span>}
                     </button>
                   ))}
                 </div>
@@ -389,14 +429,14 @@ export default function PlaygroundSQLPage() {
               {currentDataset.tables.map(table => (
                 <div key={table.name} className={styles.schemaTable}>
                   <h4 className={styles.schemaTableName}>
-                    📋 {table.name}
+                    <span aria-hidden="true">📋</span> {table.name}
                     <span className={styles.schemaRowCount}>({table.data.length} filas)</span>
                   </h4>
                   <ul className={styles.schemaColumns}>
                     {table.columns.map(col => (
                       <li key={col.name} className={styles.schemaColumn}>
-                        {col.primaryKey && '🔑 '}
-                        {col.foreignKey && '🔗 '}
+                        {col.primaryKey && <><span aria-hidden="true">🔑 </span><span className="sr-only">Clave primaria: </span></>}
+                        {col.foreignKey && <><span aria-hidden="true">🔗 </span><span className="sr-only">Clave foránea: </span></>}
                         <span className={styles.schemaColName}>{col.name}</span>
                         <span className={styles.schemaColType}>{col.type}</span>
                       </li>
@@ -415,7 +455,7 @@ export default function PlaygroundSQLPage() {
             <div className={styles.exerciseCard}>
               <div className={styles.exerciseHeader}>
                 <span className={`${styles.difficultyBadge} ${styles[selectedExercise.difficulty]}`}>
-                  {selectedExercise.difficulty}
+                  {NOMBRE_NIVEL[selectedExercise.difficulty]}
                 </span>
                 <h3>{selectedExercise.title}</h3>
               </div>
@@ -448,6 +488,15 @@ export default function PlaygroundSQLPage() {
                 >
                   <span aria-hidden="true">🗑️</span> Limpiar
                 </button>
+                <button
+                  type="button"
+                  className={styles.editorBtn}
+                  onClick={restablecerDatos}
+                  disabled={isLoading}
+                  title="Vuelve a cargar los datos originales del dataset (deshace INSERT, UPDATE, DELETE o DROP)"
+                >
+                  <span aria-hidden="true">↺</span> Restablecer datos
+                </button>
               </div>
             </div>
             <textarea
@@ -472,17 +521,24 @@ export default function PlaygroundSQLPage() {
                 onClick={executeQuery}
                 disabled={isLoading || !query.trim()}
               >
-                {isLoading ? '⏳ Cargando...' : '▶️ Ejecutar'}
+                {isLoading ? (
+                  <><span aria-hidden="true">⏳</span> Cargando...</>
+                ) : (
+                  <><span aria-hidden="true">▶️</span> Ejecutar</>
+                )}
               </button>
             </div>
           </div>
 
-          {/* Mensaje de éxito */}
-          {showSuccess && (
-            <div className={styles.successMessage}>
-              <span aria-hidden="true">🎉</span> ¡Correcto! Has completado el ejercicio.
-            </div>
-          )}
+          {/* Corrección del ejercicio, en región viva (antes ni el éxito se anunciaba ni el
+              rechazo se decía: hallazgos 3004 y 2994) */}
+          <div aria-live="polite">
+            {correccion && (
+              <div className={correccion.correcto ? styles.successMessage : styles.feedbackNo}>
+                <span aria-hidden="true">{correccion.correcto ? '🎉' : '🤔'}</span> {correccion.texto}
+              </div>
+            )}
+          </div>
 
           {/* Resultados */}
           <div className={styles.resultsSection} role="status" aria-live="polite">
@@ -527,7 +583,7 @@ export default function PlaygroundSQLPage() {
                     {result.values.slice(0, 100).map((row, rowIdx) => (
                       <tr key={rowIdx}>
                         {row.map((value, colIdx) => (
-                          <td key={colIdx}>{formatValue(value)}</td>
+                          <td key={colIdx}>{formatearValor(value)}</td>
                         ))}
                       </tr>
                     ))}
@@ -606,7 +662,7 @@ export default function PlaygroundSQLPage() {
                 <tr>
                   <td><strong>Concatenar strings</strong></td>
                   <td>||</td>
-                  <td>CONCAT() o ||</td>
+                  <td>CONCAT()</td>
                   <td>|| o CONCAT()</td>
                   <td>+ o CONCAT()</td>
                 </tr>
@@ -642,7 +698,7 @@ export default function PlaygroundSQLPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍💻</span>
                 <strong>Desarrollador Backend</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -658,7 +714,7 @@ GROUP BY u.id`}</pre>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📊</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
                 <strong>Analista de Datos / BI</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -672,7 +728,7 @@ GROUP BY u.id`}</pre>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🗄️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🗄️</span>
                 <strong>DBA (Database Administrator)</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -686,7 +742,7 @@ WHERE cliente_id = 42;`}</pre>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <strong>Estudiante de Informática</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -697,16 +753,16 @@ WHERE cliente_id = 42;`}</pre>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🛒</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
                 <strong>E-commerce y aplicaciones web</strong>
               </div>
               <p className={styles.escenarioExample}>
                 Consultas de inventario, pedidos y clientes. Calcular totales con JOINs y HAVING para filtrar resultados.
               </p>
-              <pre className={styles.codeBlock}>{`SELECT p.nombre,
-  SUM(dp.cantidad * dp.precio) AS total
+              <pre className={styles.codeBlock}>{`SELECT o.id,
+  SUM(dp.cantidad * dp.precio_unitario) AS total
 FROM pedidos o
-JOIN detalle_pedido dp
+JOIN detalle_pedidos dp
   ON o.id = dp.pedido_id
 GROUP BY o.id
 HAVING total > 100`}</pre>
@@ -714,7 +770,7 @@ HAVING total > 100`}</pre>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔐</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔐</span>
                 <strong>Seguridad y auditoría</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -753,9 +809,10 @@ HAVING COUNT(*) > 100`}</pre>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Por qué mi consulta GROUP BY da error con columnas no agrupadas?</h4>
-              <p>SQL estándar no permite SELECT de columnas que no estén en GROUP BY ni en funciones de agregación. MySQL en
-              modo permisivo lo permite (elige valor arbitrario). PostgreSQL y SQLite son estrictos. Solución: añadir la columna
-              al GROUP BY o usar <code>MAX(columna)</code>.</p>
+              <p>SQL estándar no permite SELECT de columnas que no estén en GROUP BY ni en funciones de agregación (salvo que
+              dependan funcionalmente de las agrupadas). PostgreSQL da error, y MySQL también con su modo por defecto
+              (ONLY_FULL_GROUP_BY). SQLite, el motor de este playground, sí lo admite: devuelve el valor de una fila
+              cualquiera del grupo, sin avisar. Solución portable: añadir la columna al GROUP BY o usar <code>MAX(columna)</code>.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cómo funciona el índice y cuándo crearlo?</h4>
@@ -799,7 +856,7 @@ HAVING COUNT(*) > 100`}</pre>
               <div className={styles.stepNumber}>2</div>
               <div className={styles.stepContent}>
                 <strong>Identifica las tablas necesarias</strong>
-                <p>Clientes, pedidos, detalle_pedido. Dibuja las relaciones o consulta el tab Esquema de este playground para visualizarlas.</p>
+                <p>Clientes, pedidos, detalle_pedidos. Dibuja las relaciones o consulta el tab Esquema de este playground para visualizarlas.</p>
               </div>
             </div>
             <div className={styles.eduStep}>
@@ -845,32 +902,33 @@ HAVING COUNT(*) > 100`}</pre>
           <h2>Mejores Prácticas SQL</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Usa alias descriptivos</strong>
               <p><code>SELECT u.nombre AS cliente, COUNT(p.id) AS num_pedidos</code> mejora la legibilidad enormemente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Especifica columnas en SELECT</strong>
               <p>Evita <code>SELECT *</code> en producción. Lista las columnas que necesitas, reduces datos transferidos y evitas errores si se añaden columnas nuevas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Índices en claves foráneas</strong>
-              <p>Siempre crea índice en columnas usadas en JOINs. MySQL no lo hace automático (PostgreSQL sí en PKs). <code>CREATE INDEX idx_pedidos_cliente ON pedidos(cliente_id)</code></p>
+              <p>Indexa las columnas usadas en JOINs. MySQL (InnoDB) crea solo el índice de la clave foránea si no existe;
+              PostgreSQL y SQLite no lo crean: hay que hacerlo a mano. <code>CREATE INDEX idx_pedidos_cliente ON pedidos(cliente_id)</code></p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Usa LIMIT al explorar</strong>
               <p>Antes de ejecutar una query en tabla grande, añade <code>LIMIT 10</code>. Evita bloqueos y resultados interminables.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Comenta consultas complejas</strong>
               <p><code>-- Clientes activos con más de 5 pedidos en el último trimestre</code>. Los comentarios SQL sobreviven en logs y ayudan al siguiente desarrollador.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Prueba con EXPLAIN</strong>
               <p>En PostgreSQL: <code>EXPLAIN ANALYZE tu_query</code>. En MySQL: <code>EXPLAIN tu_query</code>. Muestra si usa índices o hace full table scan.</p>
             </div>
@@ -880,7 +938,7 @@ HAVING COUNT(*) > 100`}</pre>
         {/* 6. Warning box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores SQL que Causan Problemas en Producción</strong>
           </div>
           <ul className={styles.warningList}>

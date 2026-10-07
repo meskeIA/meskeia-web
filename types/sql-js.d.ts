@@ -4,8 +4,16 @@ declare module 'sql.js' {
     values: unknown[][];
   }
 
+  interface Statement {
+    getColumnNames: () => string[];
+    step: () => boolean;
+    get: () => unknown[];
+    free: () => boolean;
+  }
+
   interface Database {
     run: (sql: string, params?: unknown[]) => void;
+    prepare: (sql: string) => Statement;
     exec: (sql: string) => QueryExecResult[];
     close: () => void;
     getRowsModified: () => number;

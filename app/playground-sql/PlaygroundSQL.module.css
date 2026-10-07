@@ -34,7 +34,9 @@
 /* Main Content Layout */
 .mainContent {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  /* minmax(0, …): con 1fr a secas la pista crecía hasta el ancho de la tabla de resultados y
+     html/body (overflow-x: hidden) recortaban las columnas sin desplazamiento (hallazgo 2995) */
+  grid-template-columns: 320px minmax(0, 1fr);
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
 }
@@ -111,6 +113,7 @@
 /* Tabs */
 .tabs {
   display: flex;
+  flex-wrap: wrap; /* con la insignia «1/15» no caben en 272 px (hallazgo 3007) */
   gap: var(--spacing-xs);
   margin-bottom: var(--spacing-md);
   border-bottom: 2px solid var(--border);
@@ -279,6 +282,7 @@
 
 /* Main Panel */
 .mainPanel {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
@@ -633,6 +637,22 @@
   color: #fecaca;
 }
 
+/* Corrección que no da por buena la respuesta: antes no se decía nada (hallazgo 2994) */
+.feedbackNo {
+  background: #fff7ed;
+  border: 2px solid #f59e0b;
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  font-weight: 600;
+  color: #7c2d12;
+}
+
+[data-theme='dark'] .feedbackNo {
+  background: #431407;
+  border-color: #f59e0b;
+  color: #fed7aa;
+}
+
 [data-theme='dark'] .codeBlock {
   background: #0f172a;
 }
@@ -957,7 +977,7 @@
 /* Responsive */
 @media (max-width: 1024px) {
   .mainContent {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .sidebar {

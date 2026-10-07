@@ -37,9 +37,9 @@ export const jsonLd = generateWebAppSchema({
   url: "https://meskeia.com/playground-sql/",
   category: 'EducationalApplication',
   features: [
-    'Editor SQL interactivo con resaltado de sintaxis en el navegador',
-    'Datasets de ejemplo incluidos (empleados, ventas, inventario)',
-    'Ejercicios guiados con corrección automática',
+    'Editor SQL en el navegador con botón de formateo y atajo Ctrl + Enter',
+    'Tres datasets de ejemplo incluidos (Tienda Online, Universidad y Empresa)',
+    'Ejercicios guiados con corrección automática por comparación con la solución',
     'Resultados en tabla con recuento de filas y tiempo de ejecución',
     'Referencia comparativa de dialectos SQL (SQLite, MySQL, PostgreSQL, SQL Server)',
     'Ejecución 100% local vía WebAssembly (sin servidor, sin enviar datos)',
@@ -80,7 +80,7 @@ export const faqJsonLd = {
       name: '¿En qué se diferencia este playground de instalar MySQL o PostgreSQL?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Instalar MySQL o PostgreSQL requiere descargar software, configurar un servidor local y gestionar usuarios y permisos, lo que puede llevar horas a un principiante. Este playground funciona al instante desde el navegador y cubre toda la sintaxis SQL estándar (ANSI SQL), que es compatible con MySQL, PostgreSQL, SQL Server y otros sistemas. Es ideal para aprender la base antes de pasar a un sistema concreto.',
+        text: 'Instalar MySQL o PostgreSQL requiere descargar software, configurar un servidor local y gestionar usuarios y permisos, lo que puede llevar horas a un principiante. Este playground funciona al instante desde el navegador con SQLite, que cubre el núcleo común de SQL (SELECT, WHERE, JOIN, GROUP BY, subconsultas, funciones de ventana) que se usa igual en MySQL, PostgreSQL o SQL Server. Cada motor tiene además su dialecto: por ejemplo, SQLite no admite FETCH FIRST y usa LIMIT. Es ideal para aprender la base antes de pasar a un sistema concreto.',
       },
     },
     {

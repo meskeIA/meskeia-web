@@ -8,13 +8,13 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * fijos de `app/playground-sql/components/datasets.ts`. Todos los valores esperados de este
  * fichero están calculados A MANO, fila a fila, sobre esos datos, antes de ejecutar la app.
  *
- * Formato de la tabla de resultados: `formatValue` pinta cada número con
- * `toLocaleString('es-ES', { maximumFractionDigits: 2 })`: 44000 → «44.000», 3796 → «3796»
- * (cuatro cifras no se agrupan), 36,6566… → «36,66», NULL → «NULL».
+ * Formato de la tabla de resultados: `formatearValor` (components/formato.ts) pinta cada número
+ * con 15 cifras significativas (como la consola de SQLite, sin el ruido binario), en formato
+ * español: 44000 → «44.000», 3796 → «3796» (cuatro cifras no se agrupan), 109,97/3 →
+ * «36,6566666666667» (15 cifras significativas, como la consola de SQLite), NULL → «NULL». Hasta el 07/10/2026 cortaba a 2 decimales (hallazgo 2997).
  *
- * Los casos con `test.fail()` vigilan hallazgos ABIERTOS del acta del 07/10/2026: afirman el
- * comportamiento correcto y hoy fallan. Cuando se reparen, Playwright avisará de que pasan
- * («expected to fail») y habrá que quitarles la marca.
+ * Los hallazgos del acta del 07/10/2026 se abrieron con `test.fail()` y se REPARARON ese mismo
+ * día: quedan como regresión.
  */
 
 const RUTA = '/playground-sql/';
@@ -67,14 +67,14 @@ GROUP BY c.id ORDER BY c.id;`,
   );
   // A mano, desde la tabla `productos` del dataset Tienda:
   //   Electrónica: 1319 + 1299 + 279 + 899 = 3796 → 4 productos, media 949
-  //   Ropa: 19,99 + 49,99 + 39,99 = 109,97 → media 36,6566… → «36,66»
+  //   Ropa: 19,99 + 49,99 + 39,99 = 109,97 → media 36,6566… → 15 cifras significativas, «36,6566666666667»
   //   Hogar: 34,99 + 199,99 = 234,98 → media 117,49
   //   Deportes: 89,99 + 29,99 = 119,98 → media 59,99
   //   Libros: 12,99
   await expect(resultados(page).locator('thead th')).toHaveText(['categoria', 'num', 'suma', 'media']);
   await expect(filas(page)).toHaveCount(5);
   await expect(filas(page).nth(0).locator('td')).toHaveText(['Electrónica', '4', '3796', '949']);
-  await expect(filas(page).nth(1).locator('td')).toHaveText(['Ropa', '3', '109,97', '36,66']);
+  await expect(filas(page).nth(1).locator('td')).toHaveText(['Ropa', '3', '109,97', '36,6566666666667']);
   await expect(filas(page).nth(2).locator('td')).toHaveText(['Hogar', '2', '234,98', '117,49']);
   await expect(filas(page).nth(3).locator('td')).toHaveText(['Deportes', '2', '119,98', '59,99']);
   await expect(filas(page).nth(4).locator('td')).toHaveText(['Libros', '1', '12,99', '12,99']);
@@ -89,12 +89,12 @@ test('caso 1 · «Total por cliente» (LEFT JOIN + SUM) ordenado por gasto', asy
 FROM clientes cl LEFT JOIN pedidos p ON cl.id = p.cliente_id
 GROUP BY cl.id, cl.nombre ORDER BY total_gastado DESC;`,
   );
-  // A mano, desde `pedidos`: María 1598 + 1299 = 2897 · Carlos 279 + 59,98 = 338,98 · el resto, un pedido.
+  // A mano, desde `pedidos`: María 1598 + 1299 = 2897 · Carlos 279 + 79,97 = 358,97 (pedido 9 cuadrado con sus líneas el 07/10/2026, hallazgo 2998) · el resto, un pedido.
   await expect(filas(page)).toHaveCount(8);
   await expect(filas(page).nth(0).locator('td')).toHaveText(['María García', '2', '2897']);
   await expect(filas(page).nth(1).locator('td')).toHaveText(['Carmen Torres', '1', '1319']);
-  await expect(filas(page).nth(3).locator('td')).toHaveText(['Carlos López', '2', '338,98']);
-  await expect(filas(page).nth(7).locator('td')).toHaveText(['Ana Martínez', '1', '69,98']);
+  await expect(filas(page).nth(3).locator('td')).toHaveText(['Carlos López', '2', '358,97']);
+  await expect(filas(page).nth(7).locator('td')).toHaveText(['Ana Martínez', '1', '69,97']);
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -123,9 +123,10 @@ GROUP BY d.id, d.nombre ORDER BY empleados DESC, d.id;`,
   await expect(filas(page).nth(4).locator('td')).toHaveText(['Finanzas', '0', 'NULL']);
 
   // COUNT(*) cuenta la fila con NULL; COUNT(columna) y AVG la ignoran.
-  // departamento_id de los 11 no nulos: 1+2+1+1+1+2+2+3+3+4+4 = 24 → 24 / 11 = 2,1818… → «2,18»
+  // departamento_id de los 11 no nulos: 1+2+1+1+1+2+2+3+3+4+4 = 24 → 24 / 11 = 2,1818… → con 15 cifras
+  // significativas, «2,18181818181818» (sin ROUND no se recorta: hallazgo 2997)
   await ejecutar(page, 'SELECT COUNT(*) AS todas, COUNT(departamento_id) AS con_dep, AVG(departamento_id) AS media FROM empleados;');
-  await expect(filas(page).nth(0).locator('td')).toHaveText(['12', '11', '2,18']);
+  await expect(filas(page).nth(0).locator('td')).toHaveText(['12', '11', '2,18181818181818']);
 });
 
 test('caso 2 · LIMIT 0 y cadena con comilla escapada', async ({ page }) => {
@@ -193,18 +194,47 @@ test('ejercicios · la respuesta correcta de «Filtrar con WHERE» se acepta', a
 });
 
 test('ejercicios · una respuesta INCORRECTA parecida se rechaza', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): la corrección solo mira los nombres de columna (y el nº de filas en 2 de 15 ejercicios), así que «precio < 100» se da por buena en «más de 100 €»');
   await abrir(page);
   await abrirEjercicio(page, /Filtrar con WHERE/);
   await ejecutar(page, 'SELECT * FROM productos WHERE precio < 100;');
   // < 100 €: ids 4, 5, 6, 7, 9, 10, 12 → 7 filas; ninguna cumple el enunciado
   await expect(filas(page)).toHaveCount(7);
-  // La insignia «1/15» es persistente (el «¡Correcto!» se borra a los 3 s): no debe aparecer.
+  // La insignia «1/15» no debe aparecer, y el alumno sabe por qué no (antes, silencio: 2994).
   await expect(page.getByRole('button', { name: /^Ejercicios/ })).not.toContainText('1/15', { timeout: 2000 });
+  await expect(page.getByText('Todavía no: tu consulta devuelve 7 filas y la solución, 5.')).toBeVisible();
+});
+
+test('ejercicios · el resto de respuestas incorrectas del acta también se rechazan', async ({ page }) => {
+  await abrir(page);
+  const ejercicios = page.getByRole('button', { name: /^Ejercicios/ });
+  // [ejercicio, consulta incorrecta]: ORDER BY al revés · COUNT de otra tabla (8 en vez de 12) ·
+  // sin HAVING (6 ciudades en vez de 2) · sin JOIN (una sola columna)
+  const casos: [RegExp, string][] = [
+    [/Ordenar resultados/, 'SELECT * FROM productos ORDER BY precio ASC;'],
+    [/Contar registros con COUNT/, 'SELECT COUNT(*) FROM clientes;'],
+    [/Filtrar grupos con HAVING/, 'SELECT ciudad, COUNT(*) FROM clientes GROUP BY ciudad;'],
+    [/Tu primer JOIN/, 'SELECT nombre FROM productos;'],
+  ];
+  for (const [titulo, sql] of casos) {
+    await abrirEjercicio(page, titulo);
+    await ejecutar(page, sql);
+    await expect(page.getByText(/Todavía no:/)).toBeVisible();
+  }
+  await expect(ejercicios).not.toContainText('/15');
+});
+
+test('ejercicios · el JOIN con las columnas en otro orden y GROUP BY con COUNT(id) se aceptan', async ({ page }) => {
+  await abrir(page);
+  await abrirEjercicio(page, /Tu primer JOIN/);
+  await ejecutar(page, 'SELECT c.nombre AS categoria, p.nombre AS producto FROM categorias c JOIN productos p ON p.categoria_id = c.id;');
+  await expect(page.getByText('¡Correcto! Has completado el ejercicio.')).toBeVisible();
+  await abrirEjercicio(page, /Agrupar con GROUP BY/);
+  await ejecutar(page, 'SELECT categoria_id, COUNT(id) AS n FROM productos GROUP BY categoria_id;');
+  await expect(page.getByText('¡Correcto! Has completado el ejercicio.')).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Ejercicios/ })).toContainText('2/15');
 });
 
 test('ejercicios · una respuesta CORRECTA equivalente (con alias) se acepta', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): exige que alguna columna se llame literalmente «COUNT(*)»; con alias no da ni éxito ni aviso');
   await abrir(page);
   await abrirEjercicio(page, /Contar registros con COUNT/);
   await ejecutar(page, 'SELECT COUNT(*) AS total_productos FROM productos;');
@@ -218,7 +248,6 @@ test('ejercicios · una respuesta CORRECTA equivalente (con alias) se acepta', a
 // ═══════════════════════════════════════════════════════════════════════════
 
 test('tabla ancha en escritorio: se desplaza DENTRO de su caja, no ensancha la página', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): la pista 1fr de la rejilla crece con la tabla y html/body (overflow-x: hidden) recortan las columnas sin desplazamiento posible');
   await page.setViewportSize({ width: 1280, height: 900 });
   await abrir(page);
   await ejecutar(
@@ -232,7 +261,6 @@ test('tabla ancha en escritorio: se desplaza DENTRO de su caja, no ensancha la p
 });
 
 test('Formatear no cambia el resultado de una consulta con comentario inicial', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): Formatear colapsa los saltos de línea y el comentario «--» se traga el SELECT');
   await abrir(page);
   const sql = '-- Productos de más de 1000 €\nSELECT nombre, precio FROM productos WHERE precio > 1000;';
   await ejecutar(page, sql);
@@ -245,7 +273,6 @@ test('Formatear no cambia el resultado de una consulta con comentario inicial', 
 });
 
 test('Formatear no toca el interior de una cadena', async ({ page }) => {
-  test.fail(true, "ABIERTO, hallazgo (inspector 07/10/2026): la regex de comas reescribe 'a,b' como 'a, b'");
   await abrir(page);
   await escribir(page, "SELECT 'a,b' AS t;");
   await page.getByRole('button', { name: /Formatear/ }).click();
@@ -253,7 +280,6 @@ test('Formatear no toca el interior de una cadena', async ({ page }) => {
 });
 
 test('tras un DELETE hay un control visible para restaurar los datos', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): no hay botón de restaurar; solo vuelve a pulsar el dataset ya activo o recargar');
   await abrir(page);
   await ejecutar(page, 'DELETE FROM productos;');
   await ejecutar(page, 'SELECT COUNT(*) FROM productos;');
@@ -267,7 +293,6 @@ test('tras un DELETE hay un control visible para restaurar los datos', async ({ 
 });
 
 test('la pestaña «Esquema» no se recorta cuando aparece la insignia de progreso', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): con «1/15» la fila de pestañas mide 317 px en 272 y «Esquema» sale 21 px fuera de la barra lateral');
   await page.setViewportSize({ width: 1280, height: 900 });
   await abrir(page);
   await abrirEjercicio(page, /Filtrar con WHERE/);
@@ -289,7 +314,6 @@ test('la pestaña «Esquema» no se recorta cuando aparece la insignia de progre
 // ═══════════════════════════════════════════════════════════════════════════
 
 test('la tabla no redondea a 2 decimales lo que devuelve SQLite', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): formatValue usa maximumFractionDigits: 2 → 0,004 se pinta «0» y AVG/ROUND se ven iguales');
   await abrir(page);
   await ejecutar(page, 'SELECT 0.004 AS milesimas, 1.0/3 AS tercio, ROUND(1.0/3, 2) AS redondeado;');
   const celdas = filas(page).nth(0).locator('td');
@@ -299,7 +323,6 @@ test('la tabla no redondea a 2 decimales lo que devuelve SQLite', async ({ page 
 });
 
 test('dataset Tienda: el total de cada pedido cuadra con sus líneas de detalle', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): pedido 3 total 69,98 vs líneas 69,97; pedido 9 total 59,98 vs líneas 79,97');
   await abrir(page);
   await ejecutar(
     page,
@@ -316,7 +339,6 @@ GROUP BY p.id HAVING ABS(p.total - SUM(d.cantidad * d.precio_unitario)) > 0.005;
 // ═══════════════════════════════════════════════════════════════════════════
 
 test('FAQ visible: SQLite NO es estricto con columnas fuera del GROUP BY', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): la FAQ dice «PostgreSQL y SQLite son estrictos» y el propio playground (SQLite) acepta la consulta');
   await abrir(page);
   await ejecutar(page, 'SELECT categoria_id, nombre, COUNT(*) FROM productos GROUP BY categoria_id;');
   // SQLite admite la columna «desnuda»: 5 grupos, sin error.
@@ -326,7 +348,6 @@ test('FAQ visible: SQLite NO es estricto con columnas fuera del GROUP BY', async
 });
 
 test('FAQPage: no promete «toda la sintaxis SQL estándar» que SQLite no cubre', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): faqJsonLd afirma que cubre toda la sintaxis ANSI y FETCH FIRST (SQL:2008) da error');
   await abrir(page);
   await ejecutar(page, 'SELECT nombre FROM productos ORDER BY precio DESC FETCH FIRST 3 ROWS ONLY;');
   await expect(resultados(page).getByRole('alert')).toHaveText('❌ Error: near "FETCH": syntax error');
@@ -335,7 +356,6 @@ test('FAQPage: no promete «toda la sintaxis SQL estándar» que SQLite no cubre
 });
 
 test('comparativa y consejos: lo que dicen de MySQL cuadra con su manual', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): en MySQL 8 «||» es OR salvo PIPES_AS_CONCAT, e InnoDB SÍ crea el índice de la clave foránea');
   await page.goto(RUTA);
   // Fila «Concatenar strings», columna MySQL 8 (3.ª celda): el manual 8.0 dice que «||» es OR.
   const celdaMysql = page.locator('tr', { hasText: 'Concatenar strings' }).locator('td').nth(2);
@@ -345,18 +365,18 @@ test('comparativa y consejos: lo que dicen de MySQL cuadra con su manual', async
 });
 
 test('el ejemplo de e-commerce del bloque educativo es SQL válido', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): usa el alias «p» sin definirlo (FROM pedidos o): «no such column: p.nombre»');
   await abrir(page);
-  // Se crea la tabla con los nombres que usa el ejemplo, para que solo falle lo que es del ejemplo.
-  await ejecutar(page, 'CREATE TABLE detalle_pedido (pedido_id INTEGER, cantidad INTEGER, precio REAL); INSERT INTO detalle_pedido VALUES (1, 1, 150);');
+  // REPARADO: el ejemplo usa las tablas y columnas del dataset Tienda, así que corre tal cual.
   const ejemplo = (await page.locator('pre', { hasText: 'detalle_pedido' }).first().textContent()) ?? '';
   expect(ejemplo).toContain('HAVING');
   await ejecutar(page, ejemplo);
   await expect(resultados(page).getByRole('alert')).toHaveCount(0, { timeout: 2000 });
+  // Pedidos con líneas que suman más de 100: 1 (1598), 2 (279), 4 (1299), 5 (119,98), 6 (899),
+  // 7 (234,98), 8 (1319) y 10 (199,99) → 8 filas
+  await expect(filas(page)).toHaveCount(8);
 });
 
 test('JSON-LD: no promete resaltado de sintaxis (el editor es un textarea)', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): featureList promete «resaltado de sintaxis» y el editor es un <textarea> plano');
   await page.goto(RUTA);
   await expect(page.locator(EDITOR)).toHaveJSProperty('tagName', 'TEXTAREA');
   const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
@@ -364,7 +384,6 @@ test('JSON-LD: no promete resaltado de sintaxis (el editor es un textarea)', asy
 });
 
 test('la insignia de dificultad dice «básico» con tilde', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): pinta el identificador interno «basico»');
   await abrir(page);
   await abrirEjercicio(page, /Tu primera consulta SELECT/);
   await expect(page.locator('[class*="difficultyBadge"]')).toHaveText(/básico/i, { timeout: 2000 });
@@ -375,7 +394,6 @@ test('la insignia de dificultad dice «básico» con tilde', async ({ page }) =>
 // ═══════════════════════════════════════════════════════════════════════════
 
 test('el «¡Correcto!» del ejercicio se anuncia en una región viva', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): el mensaje de éxito queda fuera de toda región aria-live');
   await abrir(page);
   await abrirEjercicio(page, /Filtrar con WHERE/);
   await ejecutar(page, 'SELECT * FROM productos WHERE precio > 100;');
@@ -388,7 +406,6 @@ test('el «¡Correcto!» del ejercicio se anuncia en una región viva', async ({
 });
 
 test('dataset activo con aria-pressed y botones sin emoji en el nombre accesible', async ({ page }) => {
-  test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): datasets, pestañas y ejercicios no exponen su estado; «▶️ Ejecutar», «🛒 Tienda Online», «○ …» leen el emoji');
   await abrir(page);
   await expect(page.getByRole('button', { name: /Tienda Online/ })).toHaveAttribute('aria-pressed', 'true', { timeout: 2000 });
   await expect(page.getByRole('button', { name: 'Ejecutar', exact: true })).toBeVisible({ timeout: 2000 });
@@ -419,7 +436,6 @@ test.describe('móvil 390 px', () => {
   });
 
   test('la consulta inicial no ensancha la página: la columna categoria_id es alcanzable', async ({ page }) => {
-    test.fail(true, 'ABIERTO, hallazgo (inspector 07/10/2026): con «SELECT * FROM productos LIMIT 10» el body mide 496 px y categoria_id (x 384–496) queda recortada sin desplazamiento');
     await abrir(page);
     await expect(page.locator(EDITOR)).toHaveValue('SELECT * FROM productos LIMIT 10;');
     await page.getByRole('button', { name: /Ejecutar/ }).tap();
