@@ -343,21 +343,21 @@ export default function PlanificadorMenuPage() {
         <section>
           <h4>Frecuencias recomendadas por grupo alimentario</h4>
           <ul>
-            <li><strong>🥗 Verduras y hortalizas</strong>: Al menos 2 raciones diarias. Una en almuerzo y otra en cena. Variadas y de temporada.</li>
-            <li><strong>🐟 Pescado</strong>: 2-3 veces por semana. Alterna blanco (merluza, dorada) y azul (salmón, sardinas, atún). El pescado azul aporta omega-3.</li>
-            <li><strong>🫘 Legumbres</strong>: 2-4 veces por semana. Lentejas, garbanzos, alubias y guisantes son proteína vegetal económica y con alto contenido en fibra.</li>
-            <li><strong>🍗 Aves</strong>: 2-3 veces por semana. Pollo y pavo sin piel son proteínas magras con bajo contenido en grasas saturadas.</li>
-            <li><strong>🥩 Carne roja</strong>: Máximo 2 veces por semana y en raciones moderadas (&lt;150g). Preferir carnes magras (lomo, ternera magra).</li>
-            <li><strong>🥚 Huevos</strong>: 3-5 unidades por semana. Completos nutricionalmente y muy versátiles en cocina.</li>
+            <li><strong><span aria-hidden="true">🥗</span> Verduras y hortalizas</strong>: Al menos 2 raciones diarias. Una en almuerzo y otra en cena. Variadas y de temporada.</li>
+            <li><strong><span aria-hidden="true">🐟</span> Pescado</strong>: 2-3 veces por semana. Alterna blanco (merluza, dorada) y azul (salmón, sardinas, atún). El pescado azul aporta omega-3.</li>
+            <li><strong><span aria-hidden="true">🫘</span> Legumbres</strong>: 2-4 veces por semana. Lentejas, garbanzos, alubias y guisantes son proteína vegetal económica y con alto contenido en fibra.</li>
+            <li><strong><span aria-hidden="true">🍗</span> Aves</strong>: 2-3 veces por semana. Pollo y pavo sin piel son proteínas magras con bajo contenido en grasas saturadas.</li>
+            <li><strong><span aria-hidden="true">🥩</span> Carne roja</strong>: Máximo 2 veces por semana y en raciones moderadas (&lt;150g). Preferir carnes magras (lomo, ternera magra).</li>
+            <li><strong><span aria-hidden="true">🥚</span> Huevos</strong>: 3-5 unidades por semana. Completos nutricionalmente y muy versátiles en cocina.</li>
           </ul>
         </section>
 
         <section>
           <h4>Estructura de las comidas: la importancia del horario</h4>
           <ul>
-            <li><strong>🌅 Desayuno</strong>: si tienes hambre al despertar, prioriza proteína (huevo, yogur), hidratos complejos (avena, pan integral) y fruta. Saltar el desayuno no es perjudicial si tu ingesta total y calidad del día son adecuadas.</li>
-            <li><strong>☀️ Almuerzo (la comida principal)</strong>: En España, el almuerzo es la ingesta más importante del día. Debe ser completa: proteína + verduras + hidratos. Algunos estudios preliminares sugieren que adelantar la comida principal puede ayudar al control glucémico en algunas personas.</li>
-            <li><strong>🌙 Cena (ligera y temprana)</strong>: Cenar ligero y al menos 2h antes de acostarse. Priorizar verduras, huevos y pescado blanco sobre carnes pesadas o pasta abundante.</li>
+            <li><strong><span aria-hidden="true">🌅</span> Desayuno</strong>: si tienes hambre al despertar, prioriza proteína (huevo, yogur), hidratos complejos (avena, pan integral) y fruta. Saltar el desayuno no es perjudicial si tu ingesta total y calidad del día son adecuadas.</li>
+            <li><strong><span aria-hidden="true">☀️</span> Almuerzo (la comida principal)</strong>: En España, el almuerzo es la ingesta más importante del día. Debe ser completa: proteína + verduras + hidratos. Algunos estudios preliminares sugieren que adelantar la comida principal puede ayudar al control glucémico en algunas personas.</li>
+            <li><strong><span aria-hidden="true">🌙</span> Cena (ligera y temprana)</strong>: Cenar ligero y al menos 2h antes de acostarse. Priorizar verduras, huevos y pescado blanco sobre carnes pesadas o pasta abundante.</li>
           </ul>
         </section>
 

@@ -1063,11 +1063,11 @@ export default function Page() {
               onClick={handleIniciar}
               disabled={!simulacion}
             >
-              ▶ Iniciar
+              <span aria-hidden="true">▶</span> Iniciar
             </button>
           ) : (
             <button type="button" className={styles.btnPrimary} onClick={handlePausar}>
-              ⏸ Pausar
+              <span aria-hidden="true">⏸</span> Pausar
             </button>
           )}
           <button
@@ -1091,7 +1091,7 @@ export default function Page() {
         {/* Aviso para Fibonacci sin memo con n alto */}
         {funcion === 'fibonacci' && !useMemo_ && nFib >= 8 && (
           <div className={styles.aviso}>
-            <strong>⚠ Atención:</strong> Fibonacci sin memoization es exponencial. fib({nFib}) genera
+            <strong><span aria-hidden="true">⚠</span> Atención:</strong> Fibonacci sin memoization es exponencial. fib({nFib}) genera
             muchas llamadas redundantes. Activa memoization para ver la diferencia.
           </div>
         )}

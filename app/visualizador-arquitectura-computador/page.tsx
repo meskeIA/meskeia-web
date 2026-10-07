@@ -809,7 +809,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
           <h2>Preguntas Frecuentes</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es el "cuello de botella de Von Neumann"?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es el "cuello de botella de Von Neumann"?</h4>
               <p>
                 En la arquitectura Von Neumann, datos e instrucciones comparten el mismo bus.
                 Esto crea un cuello de botella: la CPU no puede buscar la siguiente instrucción
@@ -819,7 +819,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
               <p className={styles.faqTip}>💡 <strong>Dato:</strong> Los procesadores modernos usan una arquitectura Harvard modificada internamente, aunque externamente se comporten como Von Neumann.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuántos ciclos dura cada fase del ciclo FDE?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuántos ciclos dura cada fase del ciclo FDE?</h4>
               <p>
                 Depende de la instrucción y la arquitectura. En RISC idealmente 1 ciclo por fase
                 (3 ciclos totales con pipeline). En CISC puede variar de 1 a cientos de ciclos
@@ -828,17 +828,17 @@ export default function VisualizadorArquitecturaComputadorPage() {
               <p className={styles.faqTip}>💡 <strong>Pipeline:</strong> Los procesadores modernos superponen las fases — mientras ejecutan la instrucción 1, ya están decodificando la 2 y buscando la 3.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué pasa cuando hay un "cache miss"?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué pasa cuando hay un "cache miss"?</h4>
               <p>
                 Si el dato no está en L1, el procesador busca en L2, L3 y finalmente RAM.
                 Cada nivel añade latencia: un miss en L1 que va a RAM puede costar 200+ ciclos
                 de espera. El compilador y el programador pueden optimizar el código para mejorar
                 la "localidad de caché".
               </p>
-              <p className={styles.faqTip}>💡 Recorrer un array en orden (fila a fila) es mucho más eficiente que en orden aleatorio por el principio de localidad espacial.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Recorrer un array en orden (fila a fila) es mucho más eficiente que en orden aleatorio por el principio de localidad espacial.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué no se hace la caché más grande?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué no se hace la caché más grande?</h4>
               <p>
                 La caché SRAM (usada en L1/L2) es muy cara de fabricar (ocupa más silicio que
                 la DRAM de la RAM). Además, una caché más grande tiene mayor latencia de acceso
@@ -846,7 +846,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué diferencia hay entre un core y un procesador?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué diferencia hay entre un core y un procesador?</h4>
               <p>
                 Un core es una unidad completa de ejecución: tiene su propia ALU, UC, registros
                 y caché L1/L2. Un procesador moderno integra varios cores en el mismo chip
@@ -932,10 +932,10 @@ export default function VisualizadorArquitecturaComputadorPage() {
             <h3>Errores Comunes al Estudiar Arquitectura</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ Confundir RAM con disco duro:</strong> La RAM es volátil y rápida (~100 ns); el disco es persistente y lento (~ms). Son niveles distintos de la jerarquía.</li>
-            <li><strong>❌ "Más GHz = siempre más rápido":</strong> La frecuencia importa, pero el IPC (instrucciones por ciclo), el número de núcleos y la eficiencia de caché pueden superar a una mayor frecuencia con peor arquitectura.</li>
-            <li><strong>❌ Creer que el ciclo FDE es el único modelo:</strong> Los procesadores superscalares, VLIW y los cores de GPU ejecutan varias instrucciones por ciclo o miles en paralelo — el FDE es el modelo base, no el único.</li>
-            <li><strong>❌ Olvidar que el PC se incrementa en el Fetch:</strong> El PC apunta a la siguiente instrucción antes de ejecutar la actual. Es el error más frecuente al simular el ciclo FDE a mano.</li>
+            <li><strong><span aria-hidden="true">❌</span> Confundir RAM con disco duro:</strong> La RAM es volátil y rápida (~100 ns); el disco es persistente y lento (~ms). Son niveles distintos de la jerarquía.</li>
+            <li><strong><span aria-hidden="true">❌</span> "Más GHz = siempre más rápido":</strong> La frecuencia importa, pero el IPC (instrucciones por ciclo), el número de núcleos y la eficiencia de caché pueden superar a una mayor frecuencia con peor arquitectura.</li>
+            <li><strong><span aria-hidden="true">❌</span> Creer que el ciclo FDE es el único modelo:</strong> Los procesadores superscalares, VLIW y los cores de GPU ejecutan varias instrucciones por ciclo o miles en paralelo — el FDE es el modelo base, no el único.</li>
+            <li><strong><span aria-hidden="true">❌</span> Olvidar que el PC se incrementa en el Fetch:</strong> El PC apunta a la siguiente instrucción antes de ejecutar la actual. Es el error más frecuente al simular el ciclo FDE a mano.</li>
           </ul>
         </div>
       </EducationalSection>

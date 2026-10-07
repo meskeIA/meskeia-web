@@ -212,7 +212,7 @@ export default function EnzimasCuerpoHumanoPage() {
         </div>
 
         {/* SVG modelo llave-cerradura */}
-        <h3 className={styles.subSeccionTitulo}>🔑 Modelo llave-cerradura</h3>
+        <h3 className={styles.subSeccionTitulo}><span aria-hidden="true">🔑</span> Modelo llave-cerradura</h3>
         <div className={styles.svgZona}>
           <svg viewBox="0 0 600 180" className={styles.svgDiagrama} role="img" aria-label="Diagrama del modelo llave-cerradura: el sustrato encaja en el sitio activo de la enzima como una llave en su cerradura">
             {/* Enzima (cerradura) */}
@@ -262,13 +262,13 @@ export default function EnzimasCuerpoHumanoPage() {
         </div>
 
         {/* Nomenclatura */}
-        <h3 className={styles.subSeccionTitulo}>📛 Nomenclatura enzimática</h3>
+        <h3 className={styles.subSeccionTitulo}><span aria-hidden="true">📛</span> Nomenclatura enzimática</h3>
         <div className={styles.contexto}>
           Las enzimas se nombran con el sufijo <strong>-asa</strong> añadido al sustrato o reacción: lip<strong>asa</strong> (descompone lípidos), amil<strong>asa</strong> (descompone almidón), prote<strong>asa</strong> (descompone proteínas).
         </div>
 
         {/* Las 6 clases */}
-        <h3 className={styles.subSeccionTitulo}>📊 Las 6 clases principales</h3>
+        <h3 className={styles.subSeccionTitulo}><span aria-hidden="true">📊</span> Las 6 clases principales</h3>
         <div className={styles.clasesGrid}>
           {CLASES_ENZIMAS.map(c => (
             <div key={c.nombre} className={styles.claseCard}>
@@ -369,13 +369,13 @@ export default function EnzimasCuerpoHumanoPage() {
     return (
       <div className={styles.seccionContent}>
         {/* Temperatura */}
-        <h3 className={styles.subSeccionTitulo}>🌡️ Efecto de la temperatura</h3>
+        <h3 className={styles.subSeccionTitulo}><span aria-hidden="true">🌡️</span> Efecto de la temperatura</h3>
         <div className={styles.sliderZona}>
           <div className={styles.sliderHeader}>
             <label htmlFor="temp-slider">Temperatura: <strong>{temperatura}°C</strong></label>
-            {temperatura > 42 && <span className={styles.warningBox} role="alert">⚠️ ¡Desnaturalización! La enzima pierde su forma</span>}
-            {temperatura < 20 && <span className={styles.infoTag}>❄️ Reacciones muy lentas</span>}
-            {temperatura >= 35 && temperatura <= 39 && <span className={styles.optimoTag}>✅ Rango óptimo humano</span>}
+            {temperatura > 42 && <span className={styles.warningBox} role="alert"><span aria-hidden="true">⚠️</span> ¡Desnaturalización! La enzima pierde su forma</span>}
+            {temperatura < 20 && <span className={styles.infoTag}><span aria-hidden="true">❄️</span> Reacciones muy lentas</span>}
+            {temperatura >= 35 && temperatura <= 39 && <span className={styles.optimoTag}><span aria-hidden="true">✅</span> Rango óptimo humano</span>}
           </div>
           <input
             id="temp-slider"
@@ -439,7 +439,7 @@ export default function EnzimasCuerpoHumanoPage() {
         </div>
 
         {/* pH */}
-        <h3 className={styles.subSeccionTitulo}>⚗️ Efecto del pH</h3>
+        <h3 className={styles.subSeccionTitulo}><span aria-hidden="true">⚗️</span> Efecto del pH</h3>
         <div className={styles.graficoZona}>
           <svg viewBox="0 0 510 160" className={styles.graficoSvg} role="img" aria-label="Gráfico de actividad enzimática vs pH para pepsina (pH 2), amilasa (pH 7) y tripsina (pH 8)">
             {/* Ejes */}
@@ -486,7 +486,7 @@ export default function EnzimasCuerpoHumanoPage() {
         </div>
 
         {/* Concentración de sustrato */}
-        <h3 className={styles.subSeccionTitulo}>📈 Concentración de sustrato (Michaelis-Menten)</h3>
+        <h3 className={styles.subSeccionTitulo}><span aria-hidden="true">📈</span> Concentración de sustrato (Michaelis-Menten)</h3>
         <div className={styles.sliderZona}>
           <div className={styles.sliderHeader}>
             <label htmlFor="sustrato-slider">Concentración de sustrato: <strong>{sustrato}%</strong></label>
@@ -544,7 +544,7 @@ export default function EnzimasCuerpoHumanoPage() {
         </div>
 
         {/* Inhibidores */}
-        <h3 className={styles.subSeccionTitulo}>🚫 Inhibidores enzimáticos</h3>
+        <h3 className={styles.subSeccionTitulo}><span aria-hidden="true">🚫</span> Inhibidores enzimáticos</h3>
         <div className={styles.modeloExplicacion}>
           <div className={styles.modeloCard}>
             <span className={styles.modeloIcono} aria-hidden="true">🎯</span>
@@ -609,7 +609,7 @@ export default function EnzimasCuerpoHumanoPage() {
         </div>
 
         {/* Datos fascinantes */}
-        <h3 className={styles.subSeccionTitulo}>🧠 Datos fascinantes y enfermedades enzimáticas</h3>
+        <h3 className={styles.subSeccionTitulo}><span aria-hidden="true">🧠</span> Datos fascinantes y enfermedades enzimáticas</h3>
         <div className={styles.datosGrid}>
           {DATOS_FASCINANTES.map(d => (
             <div key={d.titulo} className={styles.datoCard}>
@@ -632,7 +632,7 @@ export default function EnzimasCuerpoHumanoPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🧪 Las Enzimas del Cuerpo Humano</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🧪</span> Las Enzimas del Cuerpo Humano</h1>
           <p className={styles.subtitle}>Catalizadores de la vida: aceleran tus reacciones millones de veces</p>
         </header>
 

@@ -169,6 +169,7 @@ export default function TemporizadorVisualPage() {
         <div className={styles.presetBtns} role="group" aria-label="Seleccionar duración">
           {PRESETS.map(min => (
             <button
+              type="button"
               key={min}
               className={`${styles.presetBtn} ${duracionMin === min && inputPersonalizado === '' ? styles.presetActivo : ''}`}
               onClick={() => seleccionarPreset(min)}

@@ -226,6 +226,7 @@ export default function ContrasteColoresPage() {
                 Texto pequeño (14px) para verificar legibilidad.
               </p>
               <button
+                type="button"
                 className={styles.previewButton}
                 style={{ backgroundColor: foreground, color: background }}
               >
@@ -288,7 +289,7 @@ export default function ContrasteColoresPage() {
             </div>
           </div>
 
-          <button onClick={copyResult} className={styles.copyBtn}>
+          <button type="button" onClick={copyResult} className={styles.copyBtn}>
             {copied ? <><span aria-hidden="true">✓</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar Resultados</>}
           </button>
         </div>
@@ -331,7 +332,7 @@ export default function ContrasteColoresPage() {
           </div>
 
           {/* Botón Swap */}
-          <button onClick={swapColors} className={styles.swapBtn}>
+          <button type="button" onClick={swapColors} className={styles.swapBtn}>
             ⇅ Intercambiar Colores
           </button>
 
@@ -374,6 +375,7 @@ export default function ContrasteColoresPage() {
             <div className={styles.presetsGrid}>
               {PRESET_PAIRS.map((preset) => (
                 <button
+                  type="button"
                   key={preset.name}
                   className={styles.presetBtn}
                   onClick={() => applyPreset(preset.fg, preset.bg)}
@@ -456,7 +458,7 @@ export default function ContrasteColoresPage() {
       >
         {/* TABLA COMPARATIVA: AA vs AAA */}
         <section className={styles.comparativaSection}>
-          <h2>⚖️ Tabla Comparativa: Niveles WCAG</h2>
+          <h2><span aria-hidden="true">⚖️</span> Tabla Comparativa: Niveles WCAG</h2>
           <p className={styles.comparativaSubtitle}>
             Diferencias entre AA y AAA, requisitos mínimos, y cuándo usar cada nivel
           </p>
@@ -488,7 +490,7 @@ export default function ContrasteColoresPage() {
                 </tr>
                 <tr>
                   <td><strong>Obligatoriedad Legal</strong></td>
-                  <td>✅ Requerido por ley en UE, EEUU (sector público)</td>
+                  <td><span aria-hidden="true">✅</span> Requerido por ley en UE, EEUU (sector público)</td>
                   <td>Recomendado (no obligatorio)</td>
                 </tr>
                 <tr>
@@ -513,7 +515,7 @@ export default function ContrasteColoresPage() {
 
         {/* CASOS DE USO PRÁCTICOS */}
         <section className={styles.escenariosSection}>
-          <h2>💼 Casos de Uso Prácticos</h2>
+          <h2><span aria-hidden="true">💼</span> Casos de Uso Prácticos</h2>
           <p className={styles.escenariosSubtitle}>
             Escenarios reales donde el contraste de colores es crítico
           </p>
@@ -638,12 +640,12 @@ export default function ContrasteColoresPage() {
 
         {/* FAQ AMPLIADO */}
         <section className={styles.faqSection}>
-          <h2>❓ Preguntas Frecuentes sobre Contraste WCAG</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Contraste WCAG</h2>
 
           <div className={styles.faqList}>
             {/* Pregunta 1 */}
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué diferencia hay realmente entre AA y AAA, y cuál debo elegir?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué diferencia hay realmente entre AA y AAA, y cuál debo elegir?</h4>
               <p>
                 <strong>AA es el estándar legal</strong> exigido por normativas de accesibilidad (WCAG 2.1, Directiva UE 2016/2102, Section 508). Requiere 4.5:1 para texto normal y 3:1 para texto grande. Es suficiente para la mayoría de proyectos web y móviles.
               </p>
@@ -662,7 +664,7 @@ export default function ContrasteColoresPage() {
 
             {/* Pregunta 2 */}
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuándo es legalmente obligatorio cumplir WCAG?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuándo es legalmente obligatorio cumplir WCAG?</h4>
               <p>
                 En la <strong>Unión Europea</strong>, la Directiva (UE) 2016/2102 obliga a:
               </p>
@@ -687,7 +689,7 @@ export default function ContrasteColoresPage() {
 
             {/* Pregunta 3 */}
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo afecta el modo oscuro al contraste, y debo verificar ambos modos?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo afecta el modo oscuro al contraste, y debo verificar ambos modos?</h4>
               <p>
                 <strong>Sí, es crítico verificar ambos.</strong> El contraste no es simétrico: un par que funciona en modo claro puede fallar en oscuro.
               </p>
@@ -709,7 +711,7 @@ export default function ContrasteColoresPage() {
 
             {/* Pregunta 4 */}
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué pasa si solo fallo AAA pero paso AA? ¿Es suficiente?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué pasa si solo fallo AAA pero paso AA? ¿Es suficiente?</h4>
               <p>
                 <strong>Sí, es suficiente para cumplimiento legal</strong> y la mayoría de casos de uso. Pasar AA significa:
               </p>
@@ -733,7 +735,7 @@ export default function ContrasteColoresPage() {
 
             {/* Pregunta 5 */}
             <div className={styles.faqItem}>
-              <h4>❓ ¿El contraste de colores afecta al SEO?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿El contraste de colores afecta al SEO?</h4>
               <p>
                 <strong>Sí, indirectamente.</strong> Google no verifica contraste directamente, pero desde 2021 incluye <strong>Core Web Vitals de Accesibilidad</strong> en su algoritmo de ranking.
               </p>
@@ -755,7 +757,7 @@ export default function ContrasteColoresPage() {
 
             {/* Pregunta 6 */}
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo verifico el contraste de texto sobre imágenes o gradientes?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo verifico el contraste de texto sobre imágenes o gradientes?</h4>
               <p>
                 <strong>Texto sobre imágenes es el escenario más difícil</strong> porque el contraste varía según la zona de la imagen. WCAG exige verificar el <strong>contraste mínimo</strong> (peor zona).
               </p>
@@ -781,7 +783,7 @@ export default function ContrasteColoresPage() {
 
             {/* Pregunta 7 */}
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué otras herramientas complementan esta calculadora de contraste?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué otras herramientas complementan esta calculadora de contraste?</h4>
               <p>
                 Esta herramienta verifica contraste de <strong>un par de colores a la vez</strong>. Para auditorías completas y automatización, combina con:
               </p>
@@ -814,7 +816,7 @@ export default function ContrasteColoresPage() {
 
             {/* Pregunta 8 */}
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo ajusto colores de marca que fallan el contraste sin perder identidad visual?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo ajusto colores de marca que fallan el contraste sin perder identidad visual?</h4>
               <p>
                 <strong>Problema común:</strong> Tu azul corporativo (#5A9FD4) falla AA sobre blanco (3.2:1). No puedes cambiar el color de marca, ¿qué haces?
               </p>
@@ -853,7 +855,7 @@ export default function ContrasteColoresPage() {
 
         {/* GUÍA PASO A PASO */}
         <section className={styles.guideSection}>
-          <h2>📋 Guía Paso a Paso: Auditoría Completa de Contraste</h2>
+          <h2><span aria-hidden="true">📋</span> Guía Paso a Paso: Auditoría Completa de Contraste</h2>
 
           <div className={styles.stepGuide}>
             {/* Paso 1 */}
@@ -873,7 +875,7 @@ export default function ContrasteColoresPage() {
               <div className={styles.stepContent}>
                 <h4>Verifica el contraste de cada par con esta herramienta</h4>
                 <p>
-                  Introduce cada par de colores en la calculadora. Anota el <strong>ratio obtenido</strong> y si <strong>pasa AA/AAA</strong>. Para texto &lt;18pt (o &lt;14pt no negrita), necesitas 4.5:1 (AA) o 7:1 (AAA). Para texto ≥18pt (o ≥14pt negrita), necesitas 3:1 (AA) o 4.5:1 (AAA). Marca con 🔴 los que fallen, 🟡 los que pasen AA pero fallen AAA, y 🟢 los que pasen AAA.
+                  Introduce cada par de colores en la calculadora. Anota el <strong>ratio obtenido</strong> y si <strong>pasa AA/AAA</strong>. Para texto &lt;18pt (o &lt;14pt no negrita), necesitas 4.5:1 (AA) o 7:1 (AAA). Para texto ≥18pt (o ≥14pt negrita), necesitas 3:1 (AA) o 4.5:1 (AAA). Marca en rojo (<span aria-hidden="true">🔴</span>) los que fallen, en amarillo (<span aria-hidden="true">🟡</span>) los que pasen AA pero fallen AAA, y en verde (<span aria-hidden="true">🟢</span>) los que pasen AAA.
                 </p>
               </div>
             </div>
@@ -937,7 +939,7 @@ export default function ContrasteColoresPage() {
 
         {/* MEJORES PRÁCTICAS */}
         <section className={styles.tipsSection}>
-          <h2>✅ Mejores Prácticas de Contraste</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores Prácticas de Contraste</h2>
 
           <div className={styles.tipsGrid}>
             {/* Tip 1 */}
@@ -1004,28 +1006,28 @@ export default function ContrasteColoresPage() {
           </div>
           <ul className={styles.warningList}>
             <li>
-              <strong>❌ Confiar solo en tu vista visual (no usar herramientas):</strong> Tu monitor puede tener brillo alto que enmascara problemas de contraste. Verifica SIEMPRE con herramientas automáticas (esta calculadora, WAVE, Lighthouse) en lugar de confiar en tu percepción visual. Un 15% de usuarios tiene pérdida de visión que tú no experimentas.
+              <strong><span aria-hidden="true">❌</span> Confiar solo en tu vista visual (no usar herramientas):</strong> Tu monitor puede tener brillo alto que enmascara problemas de contraste. Verifica SIEMPRE con herramientas automáticas (esta calculadora, WAVE, Lighthouse) en lugar de confiar en tu percepción visual. Un 15% de usuarios tiene pérdida de visión que tú no experimentas.
             </li>
             <li>
-              <strong>❌ Ignorar texto sobre imágenes o gradientes:</strong> El contraste varía según la zona de la imagen. WCAG exige que el contraste mínimo (peor zona) cumpla AA. Solución: Añade overlay semi-transparente (background: rgba(0,0,0,0.5)) o usa text-shadow para crear halo oscuro.
+              <strong><span aria-hidden="true">❌</span> Ignorar texto sobre imágenes o gradientes:</strong> El contraste varía según la zona de la imagen. WCAG exige que el contraste mínimo (peor zona) cumpla AA. Solución: Añade overlay semi-transparente (background: rgba(0,0,0,0.5)) o usa text-shadow para crear halo oscuro.
             </li>
             <li>
-              <strong>❌ Solo validar modo claro (olvidar modo oscuro):</strong> Un par que funciona en claro puede fallar en oscuro. Ejemplo: #0066CC sobre #FFFFFF (8.2:1 - AAA) vs. #0066CC sobre #1A1A1A (2.1:1 - Falla). Verifica AMBOS modos antes de lanzar.
+              <strong><span aria-hidden="true">❌</span> Solo validar modo claro (olvidar modo oscuro):</strong> Un par que funciona en claro puede fallar en oscuro. Ejemplo: #0066CC sobre #FFFFFF (8.2:1 - AAA) vs. #0066CC sobre #1A1A1A (2.1:1 - Falla). Verifica AMBOS modos antes de lanzar.
             </li>
             <li>
-              <strong>❌ Usar gris #999999 sobre blanco para texto importante:</strong> Este par (2.8:1) falla AA rotundamente. Es aceptable para texto decorativo (ej: copyright en footer), pero NUNCA para body text, formularios o CTAs. Usa #666666 o más oscuro (5.74:1 - AA).
+              <strong><span aria-hidden="true">❌</span> Usar gris #999999 sobre blanco para texto importante:</strong> Este par (2.8:1) falla AA rotundamente. Es aceptable para texto decorativo (ej: copyright en footer), pero NUNCA para body text, formularios o CTAs. Usa #666666 o más oscuro (5.74:1 - AA).
             </li>
             <li>
-              <strong>❌ Creer que pasar AA es suficiente para baja visión:</strong> AA cubre baja visión moderada, pero no severa. Si tu audiencia es &gt;60 años, tienes contenido crítico (salud, finanzas), o quieres destacar en accesibilidad, apunta a AAA en elementos principales. La diferencia en legibilidad es notable.
+              <strong><span aria-hidden="true">❌</span> Creer que pasar AA es suficiente para baja visión:</strong> AA cubre baja visión moderada, pero no severa. Si tu audiencia es &gt;60 años, tienes contenido crítico (salud, finanzas), o quieres destacar en accesibilidad, apunta a AAA en elementos principales. La diferencia en legibilidad es notable.
             </li>
             <li>
-              <strong>❌ No documentar combinaciones aprobadas en design system:</strong> Sin documentación, cada nuevo desarrollador o diseñador volverá a cometer los mismos errores. Crea variables CSS comentadas (/* Contraste 11.7:1 - AAA */) y badges en Figma ("AA Compliant") para prevenir regresiones.
+              <strong><span aria-hidden="true">❌</span> No documentar combinaciones aprobadas en design system:</strong> Sin documentación, cada nuevo desarrollador o diseñador volverá a cometer los mismos errores. Crea variables CSS comentadas (/* Contraste 11.7:1 - AAA */) y badges en Figma ("AA Compliant") para prevenir regresiones.
             </li>
             <li>
-              <strong>❌ Validar solo tamaños grandes (olvidar texto normal):</strong> Texto grande (18pt+) permite contraste más bajo (3:1 AA vs 4.5:1). Pero la mayoría del contenido es texto normal (14-16px). No optimices solo para títulos; el body text es donde pasas el 80% del tiempo leyendo.
+              <strong><span aria-hidden="true">❌</span> Validar solo tamaños grandes (olvidar texto normal):</strong> Texto grande (18pt+) permite contraste más bajo (3:1 AA vs 4.5:1). Pero la mayoría del contenido es texto normal (14-16px). No optimices solo para títulos; el body text es donde pasas el 80% del tiempo leyendo.
             </li>
             <li>
-              <strong>❌ Aplicar mismos colores a iconos pequeños sin validar:</strong> Iconos &lt;24px se consideran "texto normal" según WCAG. Ese icono de notificación en naranja (#FF9800 sobre #FFFFFF - 2.2:1) falla AA. Si el icono es crítico (ej: estado de error), usa colores que cumplan 4.5:1 o aumenta su tamaño a ≥24px.
+              <strong><span aria-hidden="true">❌</span> Aplicar mismos colores a iconos pequeños sin validar:</strong> Iconos &lt;24px se consideran "texto normal" según WCAG. Ese icono de notificación en naranja (#FF9800 sobre #FFFFFF - 2.2:1) falla AA. Si el icono es crítico (ej: estado de error), usa colores que cumplan 4.5:1 o aumenta su tamaño a ≥24px.
             </li>
           </ul>
         </div>

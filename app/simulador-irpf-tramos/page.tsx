@@ -427,6 +427,7 @@ export default function SimuladorIrpfTramosPage() {
         {/* Selector de vista */}
         <div className={styles.vistaSelector} role="tablist" aria-label="Modo de visualización">
           <button
+            type="button"
             role="tab"
             aria-selected={vista === 'tramos'}
             className={`${styles.vistaBtn} ${vista === 'tramos' ? styles.vistaActive : ''}`}
@@ -435,6 +436,7 @@ export default function SimuladorIrpfTramosPage() {
             Vista por tramos
           </button>
           <button
+            type="button"
             role="tab"
             aria-selected={vista === 'escalera'}
             className={`${styles.vistaBtn} ${vista === 'escalera' ? styles.vistaActive : ''}`}
@@ -443,6 +445,7 @@ export default function SimuladorIrpfTramosPage() {
             Escalera de tipos
           </button>
           <button
+            type="button"
             role="tab"
             aria-selected={vista === 'comparativa'}
             className={`${styles.vistaBtn} ${vista === 'comparativa' ? styles.vistaActive : ''}`}
@@ -504,6 +507,7 @@ export default function SimuladorIrpfTramosPage() {
           <div className={styles.ejemplosGrid}>
             {EJEMPLOS.map(ej => (
               <button
+                type="button"
                 key={ej.valor}
                 className={styles.ejemploBtn}
                 onClick={() => aplicarEjemplo(ej.valor)}

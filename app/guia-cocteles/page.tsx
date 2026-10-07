@@ -766,11 +766,13 @@ export default function GuiaCocteles() {
               <span className={styles.filtroLabel}>Familia:</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por familia">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${familia === 'Todas' ? styles.filtroActivo : ''}`}
                   onClick={() => setFamilia('Todas')}
                 >Todas</button>
                 {FAMILIAS.map((f) => (
                   <button
+                    type="button"
                     key={f}
                     className={`${styles.filtroBtn} ${familia === f ? styles.filtroActivo : ''}`}
                     onClick={() => setFamilia(f)}
@@ -782,11 +784,13 @@ export default function GuiaCocteles() {
               <span className={styles.filtroLabel}>Base alcohólica:</span>
               <div className={styles.filtros} role="group" aria-label="Filtrar por base">
                 <button
+                  type="button"
                   className={`${styles.filtroBtn} ${base === 'Todas' ? styles.filtroActivo : ''}`}
                   onClick={() => setBase('Todas')}
                 >Todas</button>
                 {BASES.map((b) => (
                   <button
+                    type="button"
                     key={b}
                     className={`${styles.filtroBtn} ${base === b ? styles.filtroActivo : ''}`}
                     onClick={() => setBase(b)}
@@ -938,7 +942,7 @@ export default function GuiaCocteles() {
         <h3>¿Qué cóctel para cada ocasión?</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🥂 Aperitivo antes de cenar</strong>
+            <strong><span aria-hidden="true">🥂</span> Aperitivo antes de cenar</strong>
             <p>
               Aperol Spritz, Campari Spritz, Negroni, Americano o Bellini. El aperitivo
               debe ser ligero, estimular el apetito (bitter o cítrico) y no superar los
@@ -946,7 +950,7 @@ export default function GuiaCocteles() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🌙 Sobremesa de noche</strong>
+            <strong><span aria-hidden="true">🌙</span> Sobremesa de noche</strong>
             <p>
               Old Fashioned, Manhattan, Rob Roy o Irish Coffee. Los cócteles de sobremesa
               son más intensos, con más alcohol y sin gas. El whisky y los bitters
@@ -954,7 +958,7 @@ export default function GuiaCocteles() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🎉 Celebración o evento</strong>
+            <strong><span aria-hidden="true">🎉</span> Celebración o evento</strong>
             <p>
               Kir Royal, Bellini, Champán Spritz o Cosmopolitan. Las burbujas del
               Prosecco o el champán son el símbolo universal de la celebración.
@@ -962,7 +966,7 @@ export default function GuiaCocteles() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🫐 Opciones sin alcohol</strong>
+            <strong><span aria-hidden="true">🫐</span> Opciones sin alcohol</strong>
             <p>
               Virgin Mojito, Arnold Palmer, Cucumber Cooler o Virgin Mary. Los mocktails
               modernos son tan complejos y satisfactorios por derecho propio. La Virgin Mary
@@ -983,7 +987,7 @@ export default function GuiaCocteles() {
               y produce un resultado inferior. Fleming lo sabía y era la peculiaridad del personaje.
             </p>
             <span className={styles.faqTip}>
-              🍸 Regla práctica: si el cóctel lleva zumo de cítrico o huevo → shaker.
+              <span aria-hidden="true">🍸</span> Regla práctica: si el cóctel lleva zumo de cítrico o huevo → shaker.
               Si solo lleva espirituosos → vaso mezclador.
             </span>
           </li>
@@ -1027,7 +1031,7 @@ export default function GuiaCocteles() {
               Arnold Palmer no envidian nada a sus versiones alcohólicas.
             </p>
             <span className={styles.faqTip}>
-              🫐 El mercado de bebidas sin alcohol premium creció un 506% entre 2015 y 2022.
+              <span aria-hidden="true">🫐</span> El mercado de bebidas sin alcohol premium creció un 506% entre 2015 y 2022.
               Marcas como Seedlip, Lyre's o Monday Gin replican los botánicos del gin sin alcohol.
             </span>
           </li>

@@ -731,7 +731,7 @@ export default function ComparadorFormasJuridicasPage() {
                 <div className={styles.fichaGrid}>
                   {/* Datos básicos */}
                   <div className={styles.fichaSeccion}>
-                    <h3>📋 Datos básicos</h3>
+                    <h3><span aria-hidden="true">📋</span> Datos básicos</h3>
                     <dl className={styles.datosList}>
                       <dt>Capital mínimo</dt>
                       <dd>{forma.capitalMinimo === null ? 'No requiere' : formatCurrency(forma.capitalMinimo)}</dd>
@@ -750,7 +750,7 @@ export default function ComparadorFormasJuridicasPage() {
 
                   {/* Costes y tiempos */}
                   <div className={styles.fichaSeccion}>
-                    <h3>💰 Costes y tiempos</h3>
+                    <h3><span aria-hidden="true">💰</span> Costes y tiempos</h3>
                     <dl className={styles.datosList}>
                       <dt>Costes constitución</dt>
                       <dd>{formatCurrency(forma.costesConstitucion.min)} - {formatCurrency(forma.costesConstitucion.max)}</dd>
@@ -765,7 +765,7 @@ export default function ComparadorFormasJuridicasPage() {
 
                   {/* Trámites */}
                   <div className={styles.fichaSeccion}>
-                    <h3>📝 Trámites de alta</h3>
+                    <h3><span aria-hidden="true">📝</span> Trámites de alta</h3>
                     <ol className={styles.tramitesList}>
                       {forma.tramitesAlta.map((tramite, i) => (
                         <li key={i}>{tramite}</li>
@@ -775,7 +775,7 @@ export default function ComparadorFormasJuridicasPage() {
 
                   {/* Ventajas */}
                   <div className={styles.fichaSeccion}>
-                    <h3>✅ Ventajas</h3>
+                    <h3><span aria-hidden="true">✅</span> Ventajas</h3>
                     <ul className={styles.ventajasList}>
                       {forma.ventajas.map((v, i) => (
                         <li key={i}>{v}</li>
@@ -785,7 +785,7 @@ export default function ComparadorFormasJuridicasPage() {
 
                   {/* Desventajas */}
                   <div className={styles.fichaSeccion}>
-                    <h3>❌ Desventajas</h3>
+                    <h3><span aria-hidden="true">❌</span> Desventajas</h3>
                     <ul className={styles.desventajasList}>
                       {forma.desventajas.map((d, i) => (
                         <li key={i}>{d}</li>
@@ -795,7 +795,7 @@ export default function ComparadorFormasJuridicasPage() {
 
                   {/* Ideal para */}
                   <div className={styles.fichaSeccion}>
-                    <h3>🎯 Ideal para</h3>
+                    <h3><span aria-hidden="true">🎯</span> Ideal para</h3>
                     <ul className={styles.idealList}>
                       {forma.idealPara.map((item, i) => (
                         <li key={i}>{item}</li>
@@ -811,7 +811,7 @@ export default function ComparadorFormasJuridicasPage() {
 
       {/* Disclaimer */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
+        <h3><span aria-hidden="true">⚠️</span> Aviso Importante</h3>
         <p>
           Esta información es orientativa y educativa. Las condiciones pueden variar según la comunidad autónoma
           y la legislación vigente. Para tomar decisiones sobre tu forma jurídica, consulta con un asesor fiscal
@@ -830,7 +830,7 @@ export default function ComparadorFormasJuridicasPage() {
 
           <div className={styles.guideGrid}>
             <div className={styles.guideCard}>
-              <h4>🤔 ¿Cuándo ser Autónomo?</h4>
+              <h4><span aria-hidden="true">🤔</span> ¿Cuándo ser Autónomo?</h4>
               <p>
                 El trabajo por cuenta propia es ideal cuando:
               </p>
@@ -844,7 +844,7 @@ export default function ComparadorFormasJuridicasPage() {
             </div>
 
             <div className={styles.guideCard}>
-              <h4>🏢 ¿Cuándo crear una SL?</h4>
+              <h4><span aria-hidden="true">🏢</span> ¿Cuándo crear una SL?</h4>
               <p>
                 La Sociedad Limitada es recomendable cuando:
               </p>
@@ -858,7 +858,7 @@ export default function ComparadorFormasJuridicasPage() {
             </div>
 
             <div className={styles.guideCard}>
-              <h4>📊 Autónomo vs SL: Fiscalidad</h4>
+              <h4><span aria-hidden="true">📊</span> Autónomo vs SL: Fiscalidad</h4>
               <p>
                 La diferencia clave está en cómo tributan los beneficios:
               </p>
@@ -871,7 +871,7 @@ export default function ComparadorFormasJuridicasPage() {
             </div>
 
             <div className={styles.guideCard}>
-              <h4>🤝 Alternativas: Cooperativa y Asociación</h4>
+              <h4><span aria-hidden="true">🤝</span> Alternativas: Cooperativa y Asociación</h4>
               <ul>
                 <li><strong>Cooperativa</strong>: Ideal para grupos que quieren gestión democrática. Mínimo 3 socios. Tipo reducido IS (20%)</li>
                 <li><strong>Asociación</strong>: Para fines no lucrativos (cultural, social, deportivo). No puede repartir beneficios</li>
@@ -889,11 +889,11 @@ export default function ComparadorFormasJuridicasPage() {
               <thead>
                 <tr>
                   <th>Criterio</th>
-                  <th>💼 Autónomo</th>
-                  <th>🏢 SL / SLU</th>
-                  <th>🤝 Cooperativa</th>
-                  <th>👥 CB</th>
-                  <th>🎗️ Asociación</th>
+                  <th><span aria-hidden="true">💼</span> Autónomo</th>
+                  <th><span aria-hidden="true">🏢</span> SL / SLU</th>
+                  <th><span aria-hidden="true">🤝</span> Cooperativa</th>
+                  <th><span aria-hidden="true">👥</span> CB</th>
+                  <th><span aria-hidden="true">🎗️</span> Asociación</th>
                 </tr>
               </thead>
               <tbody>

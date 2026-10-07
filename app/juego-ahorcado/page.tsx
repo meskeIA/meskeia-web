@@ -248,7 +248,7 @@ export default function JuegoAhorcadoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎯 Juego del Ahorcado</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎯</span> Juego del Ahorcado</h1>
         <p className={styles.subtitle}>Adivina la palabra letra a letra · 4 categorías en español</p>
       </header>
 
@@ -259,6 +259,7 @@ export default function JuegoAhorcadoPage() {
         <div className={styles.categoriaBtnWrapper}>
           {(Object.keys(ETIQUETAS) as Categoria[]).map(cat => (
             <button
+              type="button"
               key={cat}
               onClick={() => cambiarCategoria(cat)}
               className={`${styles.categoriaBtn} ${categoria === cat ? styles.active : ''}`}
@@ -332,6 +333,7 @@ export default function JuegoAhorcadoPage() {
                   const incorrecta = letrasIncorrectas.has(letra);
                   return (
                     <button
+                      type="button"
                       key={letra}
                       onClick={() => pulsarLetra(letra)}
                       disabled={letrasUsadas.has(letra) || juegoTerminado}
@@ -349,12 +351,14 @@ export default function JuegoAhorcadoPage() {
           {/* Botones de acción */}
           <div className={styles.accionBtns}>
             <button
+              type="button"
               onClick={() => nuevaPalabra(categoria)}
               className={styles.btnNueva}
             >
               {juegoTerminado ? '🔄 Nueva palabra' : '⏭️ Saltar palabra'}
             </button>
             <button
+              type="button"
               onClick={resetStats}
               className={styles.btnReset}
               aria-label="Reiniciar estadísticas"
@@ -390,28 +394,28 @@ export default function JuegoAhorcadoPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🟢 Fácil</td>
+                  <td><span aria-hidden="true">🟢</span> Fácil</td>
                   <td>4–5 letras</td>
                   <td>6 errores</td>
                   <td>Vocales primero, luego S y R</td>
                   <td>Palabras cotidianas frecuentes</td>
                 </tr>
                 <tr>
-                  <td>🟡 Medio</td>
+                  <td><span aria-hidden="true">🟡</span> Medio</td>
                   <td>6–7 letras</td>
                   <td>6 errores</td>
                   <td>A, E, O → S, R, N, L, T</td>
                   <td>Vocabulario general amplio</td>
                 </tr>
                 <tr>
-                  <td>🔴 Difícil</td>
+                  <td><span aria-hidden="true">🔴</span> Difícil</td>
                   <td>8+ letras</td>
                   <td>6 errores</td>
                   <td>Deducir por patrones de sufijos</td>
                   <td>Términos técnicos y compuestos</td>
                 </tr>
                 <tr>
-                  <td>⚫ Experto</td>
+                  <td><span aria-hidden="true">⚫</span> Experto</td>
                   <td>Variable (palabras raras)</td>
                   <td>6 errores</td>
                   <td>Buscar letras distintivas únicas</td>

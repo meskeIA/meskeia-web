@@ -390,7 +390,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
               {/* Regla de los dos meses */}
               {resultado.perdidaDiferida && (
                 <div className={styles.reglaBox}>
-                  <strong>⚠️ Regla de los dos meses (art. 33.5 LIRPF):</strong> al recomprar el mismo valor (u homogéneo)
+                  <strong><span aria-hidden="true">⚠️</span> Regla de los dos meses (art. 33.5 LIRPF):</strong> al recomprar el mismo valor (u homogéneo)
                   dentro del plazo, la pérdida de <strong>{formatCurrency(Math.abs(resultado.gananciaPatrimonial))}</strong>{' '}
                   <strong>no es computable este año</strong>: queda diferida hasta que vendas definitivamente los valores
                   recomprados. No podrás usarla ahora para compensar ganancias.

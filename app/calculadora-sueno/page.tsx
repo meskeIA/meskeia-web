@@ -106,7 +106,7 @@ export default function CalculadoraSuenoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🌙 Calculadora de Sueño</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🌙</span> Calculadora de Sueño</h1>
         <p className={styles.subtitle}>
           Calcula la hora ideal para dormir o despertar respetando los ciclos de sueño de 90 minutos
         </p>
@@ -158,7 +158,7 @@ export default function CalculadoraSuenoPage() {
           </button>
 
           <div className={styles.infoBox}>
-            <h3>💡 ¿Por qué 90 minutos?</h3>
+            <h3><span aria-hidden="true">💡</span> ¿Por qué 90 minutos?</h3>
             <p>
               Un ciclo de sueño dura entre 80 y 110 minutos (promedio: 90). Esta calculadora usa el
               promedio como aproximación, pero tu ciclo real puede diferir. Despertar entre ciclos
@@ -197,7 +197,7 @@ export default function CalculadoraSuenoPage() {
               </div>
 
               <div className={styles.recomendacion}>
-                <h3>💤 Recomendación</h3>
+                <h3><span aria-hidden="true">💤</span> Recomendación</h3>
                 <p>
                   Los adultos necesitan entre <strong>7-9 horas de sueño</strong> (4-6 ciclos).
                   Lo ideal es completar <strong>5-6 ciclos</strong> para un descanso óptimo.
@@ -206,7 +206,7 @@ export default function CalculadoraSuenoPage() {
               </div>
 
               <div className={styles.fasesSection}>
-                <h3>🧠 Fases de un ciclo de sueño</h3>
+                <h3><span aria-hidden="true">🧠</span> Fases de un ciclo de sueño</h3>
                 <div className={styles.fasesGrid}>
                   <div className={styles.faseCard}>
                     <span className={styles.faseNum}>1</span>
@@ -241,7 +241,7 @@ export default function CalculadoraSuenoPage() {
       </div>
 
       <div className={styles.tipsSection}>
-        <h3>🌟 Consejos para dormir mejor</h3>
+        <h3><span aria-hidden="true">🌟</span> Consejos para dormir mejor</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
             <span className={styles.tipIcono}>📱</span>
@@ -275,7 +275,7 @@ export default function CalculadoraSuenoPage() {
           <li><strong>No detecta trastornos del sueño</strong>: Insomnio, apnea, síndrome piernas inquietas o narcolepsia requieren estudio médico</li>
           <li><strong>Calidad vs cantidad</strong>: Dormir 8 horas con despertares frecuentes es peor que 6 horas continuas</li>
         </ul>
-        <p className={styles.highlight}><strong>⚕️ Si tienes insomnio crónico, somnolencia diurna excesiva o ronquidos intensos, consulta con un médico especialista en sueño.</strong></p>
+        <p className={styles.highlight}><strong><span aria-hidden="true">⚕️</span> Si tienes insomnio crónico, somnolencia diurna excesiva o ronquidos intensos, consulta con un médico especialista en sueño.</strong></p>
         <p>meskeIA no asume ninguna responsabilidad por decisiones tomadas en base a los resultados de esta herramienta, ni por un uso inadecuado de la misma.</p>
       </DisclaimerCard>
 

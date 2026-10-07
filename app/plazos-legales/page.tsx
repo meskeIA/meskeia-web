@@ -155,7 +155,7 @@ export default function PlazosLegalesPage() {
 
       {/* Disclaimer */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Legal Importante</h3>
+        <h3><span aria-hidden="true">⚠️</span> Aviso Legal Importante</h3>
         <p>
           Esta información tiene carácter <strong>orientativo y educativo</strong>.
           Los plazos legales pueden verse afectados por circunstancias específicas, modificaciones
@@ -179,7 +179,7 @@ export default function PlazosLegalesPage() {
 
           <div className={styles.conceptsGrid}>
             <div className={styles.conceptCard}>
-              <h4>⏳ Prescripción</h4>
+              <h4><span aria-hidden="true">⏳</span> Prescripción</h4>
               <p>
                 Es la pérdida de un derecho por no ejercerlo durante el tiempo establecido por ley.
                 Se puede <strong>interrumpir</strong> (el plazo vuelve a empezar) mediante reclamación
@@ -192,7 +192,7 @@ export default function PlazosLegalesPage() {
             </div>
 
             <div className={styles.conceptCard}>
-              <h4>📅 Caducidad</h4>
+              <h4><span aria-hidden="true">📅</span> Caducidad</h4>
               <p>
                 Es un plazo fijo e improrrogable para ejercer un derecho o interponer una acción.
                 <strong>No se puede interrumpir</strong>: una vez pasado el plazo, el derecho se extingue definitivamente.
@@ -208,7 +208,7 @@ export default function PlazosLegalesPage() {
 
           <div className={styles.countingRules}>
             <div className={styles.ruleCard}>
-              <h4>📆 Días naturales vs hábiles</h4>
+              <h4><span aria-hidden="true">📆</span> Días naturales vs hábiles</h4>
               <ul>
                 <li><strong>Naturales</strong>: todos los días del calendario (incluye festivos)</li>
                 <li><strong>Hábiles</strong>: excluyen sábados, domingos y festivos</li>
@@ -217,7 +217,7 @@ export default function PlazosLegalesPage() {
             </div>
 
             <div className={styles.ruleCard}>
-              <h4>🗓️ Reglas de cómputo</h4>
+              <h4><span aria-hidden="true">🗓️</span> Reglas de cómputo</h4>
               <ul>
                 <li>El día inicial (dies a quo) generalmente <strong>no se cuenta</strong></li>
                 <li>Si el último día es inhábil, se prorroga al siguiente hábil</li>

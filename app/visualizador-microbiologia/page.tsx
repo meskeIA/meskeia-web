@@ -687,7 +687,7 @@ export default function VisualizadorMicrobiologia() {
 
           <div className={styles.dominiosGrid}>
             <div className={styles.dominioCard} style={{ borderColor: '#2E86AB' }}>
-              <h3 className={styles.dominioNombre} style={{ color: '#1A5F7A' }}>🔵 Bacteria</h3>
+              <h3 className={styles.dominioNombre} style={{ color: '#1A5F7A' }}><span aria-hidden="true">🔵</span> Bacteria</h3>
               <ul className={styles.dominioLista}>
                 <li>Procariontes: sin núcleo membranoso</li>
                 <li>Pared con <strong>peptidoglicano</strong></li>
@@ -697,7 +697,7 @@ export default function VisualizadorMicrobiologia() {
               </ul>
             </div>
             <div className={styles.dominioCard} style={{ borderColor: '#8E24AA' }}>
-              <h3 className={styles.dominioNombre} style={{ color: '#4A148C' }}>🟣 Archaea</h3>
+              <h3 className={styles.dominioNombre} style={{ color: '#4A148C' }}><span aria-hidden="true">🟣</span> Archaea</h3>
               <ul className={styles.dominioLista}>
                 <li>Procariontes: sin núcleo membranoso</li>
                 <li><strong>Sin peptidoglicano</strong> en la pared</li>
@@ -707,7 +707,7 @@ export default function VisualizadorMicrobiologia() {
               </ul>
             </div>
             <div className={styles.dominioCard} style={{ borderColor: '#388E3C' }}>
-              <h3 className={styles.dominioNombre} style={{ color: '#1B5E20' }}>🟢 Eukarya</h3>
+              <h3 className={styles.dominioNombre} style={{ color: '#1B5E20' }}><span aria-hidden="true">🟢</span> Eukarya</h3>
               <ul className={styles.dominioLista}>
                 <li>Eucariontes: <strong>núcleo con membrana</strong></li>
                 <li>Ribosomas 80S (40S + 60S)</li>

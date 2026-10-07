@@ -146,7 +146,7 @@ export default function EstimadorCuotaAutonomoPage() {
   // Renderizar tabla de tramos
   const renderTablaTramos = () => (
     <div className={styles.tablaTramos}>
-      <h3>📊 Tabla de Tramos 2025</h3>
+      <h3><span aria-hidden="true">📊</span> Tabla de Tramos 2025</h3>
       <p className={styles.tablaSubtitulo}>
         Base normativa: {FISCAL_AUTONOMOS_META.fuente}
       </p>
@@ -272,22 +272,25 @@ export default function EstimadorCuotaAutonomoPage() {
       {/* Navegación de vistas */}
       <div className={styles.navTabs}>
         <button
+          type="button"
           className={`${styles.navTab} ${vistaActiva === 'calculadora' ? styles.navTabActivo : ''}`}
           onClick={() => setVistaActiva('calculadora')}
         >
-          🧮 Estimador
+          <span aria-hidden="true">🧮</span> Estimador
         </button>
         <button
+          type="button"
           className={`${styles.navTab} ${vistaActiva === 'tramos' ? styles.navTabActivo : ''}`}
           onClick={() => setVistaActiva('tramos')}
         >
-          📊 Tabla de Tramos
+          <span aria-hidden="true">📊</span> Tabla de Tramos
         </button>
         <button
+          type="button"
           className={`${styles.navTab} ${vistaActiva === 'bonificaciones' ? styles.navTabActivo : ''}`}
           onClick={() => setVistaActiva('bonificaciones')}
         >
-          🎯 Bonificaciones
+          <span aria-hidden="true">🎯</span> Bonificaciones
         </button>
       </div>
 
@@ -296,7 +299,7 @@ export default function EstimadorCuotaAutonomoPage() {
         <>
           {/* Formulario de entrada */}
           <section className={styles.inputSection}>
-            <h2>📝 Introduce tus datos</h2>
+            <h2><span aria-hidden="true">📝</span> Introduce tus datos</h2>
             <div className={styles.inputGrid}>
               <div className={styles.inputGroup}>
                 <label htmlFor="ingresos">Ingresos anuales previstos</label>
@@ -358,7 +361,7 @@ export default function EstimadorCuotaAutonomoPage() {
           {/* Resultados */}
           {(parseSpanishNumber(ingresosAnuales) > 0) && (
             <section className={styles.resultadosSection}>
-              <h2>📊 Tu cuota estimada</h2>
+              <h2><span aria-hidden="true">📊</span> Tu cuota estimada</h2>
 
               {/* Resumen principal */}
               <div className={styles.resultadoPrincipal}>
@@ -412,11 +415,11 @@ export default function EstimadorCuotaAutonomoPage() {
                   <>
                     <div className={styles.desgloseSeparador} />
                     <div className={styles.desgloseItemDestacado}>
-                      <span className={styles.desgloseLabel}>🎯 Cuota con bonificación</span>
+                      <span className={styles.desgloseLabel}><span aria-hidden="true">🎯</span> Cuota con bonificación</span>
                       <span className={styles.desgloseValor}>{formatCurrency(resultados.cuotaConBonificacion)}/mes</span>
                     </div>
                     <div className={styles.desgloseItemDestacado}>
-                      <span className={styles.desgloseLabel}>💰 Ahorro anual</span>
+                      <span className={styles.desgloseLabel}><span aria-hidden="true">💰</span> Ahorro anual</span>
                       <span className={styles.desgloseValorPositivo}>{formatCurrency(resultados.ahorroAnual)}</span>
                     </div>
                   </>
@@ -425,7 +428,7 @@ export default function EstimadorCuotaAutonomoPage() {
 
               {/* Info del tramo */}
               <div className={styles.infoTramo}>
-                <h4>📌 Tu tramo: {resultados.tramo?.id}</h4>
+                <h4><span aria-hidden="true">📌</span> Tu tramo: {resultados.tramo?.id}</h4>
                 <p>
                   Rendimiento neto mensual entre {formatCurrency(resultados.tramo?.rendimientoMin || 0)}
                   {resultados.tramo?.rendimientoMax
@@ -437,7 +440,7 @@ export default function EstimadorCuotaAutonomoPage() {
                   Base de cotización: entre {formatCurrency(resultados.tramo?.baseMinima || 0)} y {formatCurrency(resultados.tramo?.baseMaxima || 0)}
                 </p>
                 <p className={styles.infoTramoNota}>
-                  💡 Puedes elegir una base mayor dentro del tramo para aumentar tus coberturas
+                  <span aria-hidden="true">💡</span> Puedes elegir una base mayor dentro del tramo para aumentar tus coberturas
                   (prestaciones, jubilación, etc.)
                 </p>
               </div>
@@ -452,7 +455,7 @@ export default function EstimadorCuotaAutonomoPage() {
       {/* Vista: Bonificaciones */}
       {vistaActiva === 'bonificaciones' && (
         <section className={styles.bonificacionesSection}>
-          <h2>🎯 Bonificaciones disponibles</h2>
+          <h2><span aria-hidden="true">🎯</span> Bonificaciones disponibles</h2>
           <p className={styles.bonificacionesIntro}>
             Existen diferentes bonificaciones que pueden reducir significativamente tu cuota de autónomo.
             Verifica si cumples los requisitos para acceder a alguna de ellas.
@@ -463,7 +466,7 @@ export default function EstimadorCuotaAutonomoPage() {
 
       {/* Notas importantes */}
       <div className={styles.notas}>
-        <h3>📝 Notas importantes</h3>
+        <h3><span aria-hidden="true">📝</span> Notas importantes</h3>
         <ul>
           <li>
             <strong>Rendimiento neto</strong> = Ingresos - Gastos deducibles. Es la base para determinar tu tramo.
@@ -484,7 +487,7 @@ export default function EstimadorCuotaAutonomoPage() {
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Herramienta de Orientación — No es asesoramiento profesional</h3>
+        <h3><span aria-hidden="true">⚠️</span> Herramienta de Orientación — No es asesoramiento profesional</h3>
         <p>
           Este estimador es una <strong>herramienta de orientación educativa</strong> basada en{' '}
           <a href={FISCAL_AUTONOMOS_META.urlOficial} target="_blank" rel="noopener noreferrer">
@@ -520,7 +523,7 @@ export default function EstimadorCuotaAutonomoPage() {
 
           <div className={styles.guideGrid}>
             <div className={styles.guideCard}>
-              <h4>📊 ¿Cómo funciona?</h4>
+              <h4><span aria-hidden="true">📊</span> ¿Cómo funciona?</h4>
               <p>
                 Desde 2023, los autónomos cotizan según sus ingresos reales (rendimiento neto),
                 no según una base elegida libremente. El sistema divide los rendimientos en 15 tramos,
@@ -529,7 +532,7 @@ export default function EstimadorCuotaAutonomoPage() {
             </div>
 
             <div className={styles.guideCard}>
-              <h4>🔄 Regularización anual</h4>
+              <h4><span aria-hidden="true">🔄</span> Regularización anual</h4>
               <p>
                 Al año siguiente, Hacienda comunica a la Seguridad Social tus rendimientos reales
                 declarados en la Renta. Si cotizaste de más, te devuelven; si cotizaste de menos,
@@ -538,7 +541,7 @@ export default function EstimadorCuotaAutonomoPage() {
             </div>
 
             <div className={styles.guideCard}>
-              <h4>💡 ¿Puedo elegir base mayor?</h4>
+              <h4><span aria-hidden="true">💡</span> ¿Puedo elegir base mayor?</h4>
               <p>
                 Sí, dentro de tu tramo puedes elegir una base superior a la mínima (hasta la máxima
                 del tramo). Esto aumenta tu cuota pero también tus prestaciones: baja por enfermedad,
@@ -547,7 +550,7 @@ export default function EstimadorCuotaAutonomoPage() {
             </div>
 
             <div className={styles.guideCard}>
-              <h4>📈 Cambios de tramo</h4>
+              <h4><span aria-hidden="true">📈</span> Cambios de tramo</h4>
               <p>
                 Puedes modificar tu base de cotización hasta 6 veces al año a través del sistema
                 RED de la Seguridad Social. Es importante ajustarla si tus ingresos varían
@@ -559,7 +562,7 @@ export default function EstimadorCuotaAutonomoPage() {
           <h3>Estrategias de optimización</h3>
           <div className={styles.guideGrid}>
             <div className={styles.guideCard}>
-              <h4>🎯 Para nuevos autónomos</h4>
+              <h4><span aria-hidden="true">🎯</span> Para nuevos autónomos</h4>
               <ul>
                 <li>Aprovecha la tarifa plana (80€/mes durante 12-24 meses)</li>
                 <li>Calcula bien tus gastos deducibles para estimar el rendimiento</li>
@@ -568,7 +571,7 @@ export default function EstimadorCuotaAutonomoPage() {
             </div>
 
             <div className={styles.guideCard}>
-              <h4>💰 Para optimizar la cuota</h4>
+              <h4><span aria-hidden="true">💰</span> Para optimizar la cuota</h4>
               <ul>
                 <li>Maximiza los gastos deducibles legítimos</li>
                 <li>Si tus ingresos son estacionales, actualiza la base cada trimestre</li>
@@ -600,7 +603,7 @@ export default function EstimadorCuotaAutonomoPage() {
                 <p><strong>Cuota mensual:</strong> 302,65 €/mes · 3.631,80 €/año</p>
               </div>
               <p className={styles.escenarioTip}>
-                💡 Los tramos 5 y 6 comparten la misma base mínima (960,78 €), así que cotizar por la base mínima no encarece la cuota al subir de tramo. Solo conviene elegir una base superior si interesa mejorar prestaciones futuras (jubilación, incapacidad).
+                <span aria-hidden="true">💡</span> Los tramos 5 y 6 comparten la misma base mínima (960,78 €), así que cotizar por la base mínima no encarece la cuota al subir de tramo. Solo conviene elegir una base superior si interesa mejorar prestaciones futuras (jubilación, incapacidad).
               </p>
             </div>
 
@@ -619,7 +622,7 @@ export default function EstimadorCuotaAutonomoPage() {
                 <p><strong>Cuota mensual:</strong> 504,41 €/mes · 6.052,92 €/año</p>
               </div>
               <p className={styles.escenarioTip}>
-                💡 Con ingresos altos y estables puede valorar subir la base hacia 2.000 €/mes: la cuota sube a 630 €, pero la prestación por IT o maternidad se multiplica.
+                <span aria-hidden="true">💡</span> Con ingresos altos y estables puede valorar subir la base hacia 2.000 €/mes: la cuota sube a 630 €, pero la prestación por IT o maternidad se multiplica.
               </p>
             </div>
 
@@ -638,7 +641,7 @@ export default function EstimadorCuotaAutonomoPage() {
                 <p><strong>Cuota mínima:</strong> 607,35 €/mes · 7.288,20 €/año</p>
               </div>
               <p className={styles.escenarioTip}>
-                💡 Los autónomos societarios tributan por los rendimientos del trabajo percibidos de la sociedad, no por los beneficios de la empresa. El tramo se calcula sobre el salario declarado.
+                <span aria-hidden="true">💡</span> Los autónomos societarios tributan por los rendimientos del trabajo percibidos de la sociedad, no por los beneficios de la empresa. El tramo se calcula sobre el salario declarado.
               </p>
             </div>
 
@@ -657,7 +660,7 @@ export default function EstimadorCuotaAutonomoPage() {
                 <p><strong>Requisito:</strong> sin alta en RETA en los últimos 2 años</p>
               </div>
               <p className={styles.escenarioTip}>
-                💡 Si cumples los requisitos, la tarifa plana es la medida de mayor impacto en los primeros 2 años. Ahorro total potencial si se extiende: hasta 5.343,60 € en 24 meses.
+                <span aria-hidden="true">💡</span> Si cumples los requisitos, la tarifa plana es la medida de mayor impacto en los primeros 2 años. Ahorro total potencial si se extiende: hasta 5.343,60 € en 24 meses.
               </p>
             </div>
 

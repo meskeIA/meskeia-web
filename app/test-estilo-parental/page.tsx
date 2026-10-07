@@ -322,10 +322,10 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
                 <thead>
                   <tr>
                     <th>Criterio</th>
-                    <th>🤝 Democrático</th>
-                    <th>👊 Autoritario</th>
-                    <th>🫶 Permisivo</th>
-                    <th>😶 Negligente</th>
+                    <th><span aria-hidden="true">🤝</span> Democrático</th>
+                    <th><span aria-hidden="true">👊</span> Autoritario</th>
+                    <th><span aria-hidden="true">🫶</span> Permisivo</th>
+                    <th><span aria-hidden="true">😶</span> Negligente</th>
                   </tr>
                 </thead>
                 <tbody>

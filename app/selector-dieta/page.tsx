@@ -554,7 +554,7 @@ export default function SelectorDieta() {
 
           {/* Repetir test */}
           <button type="button" className={styles.btnRepetir} onClick={handleRepetir}>
-            🔄 Repetir el test
+            <span aria-hidden="true">🔄</span> Repetir el test
           </button>
 
         </main>

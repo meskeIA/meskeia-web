@@ -419,7 +419,7 @@ export default function EstimadorLegitimas() {
           </div>
           <p>Herencia de 300.000 €. Los hijos tienen derecho a 2/3 (200.000 €). Solo 100.000 € pueden distribuirse libremente. El tercio de mejora puede concentrarse en un hijo.</p>
           <div className={styles.escenarioExample}>Caudal 300.000 €: 100.000 € legítima estricta + 100.000 € mejora + 100.000 € libre</div>
-          <div className={styles.escenarioTip}>💡 El tercio de mejora es útil para beneficiar a un hijo cuidador o con necesidades especiales.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El tercio de mejora es útil para beneficiar a un hijo cuidador o con necesidades especiales.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -428,7 +428,7 @@ export default function EstimadorLegitimas() {
           </div>
           <p>La legítima catalana (1/4) se paga en metálico, no necesariamente con el inmueble. Más libertad para transmitir la vivienda familiar íntegra a quien el testador quiera.</p>
           <div className={styles.escenarioExample}>Caudal 400.000 €: legítima 100.000 € en metálico, 300.000 € libres para el heredero elegido</div>
-          <div className={styles.escenarioTip}>💡 La legítima catalana al 1/4 permite al testador disponer libremente de hasta 3/4 del patrimonio, frente al 1/3 del derecho común.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> La legítima catalana al 1/4 permite al testador disponer libremente de hasta 3/4 del patrimonio, frente al 1/3 del derecho común.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -437,7 +437,7 @@ export default function EstimadorLegitimas() {
           </div>
           <p>En derecho común, si no hay descendientes, los ascendientes tienen legítima (1/2 del caudal) y el cónyuge tiene derecho al usufructo del tercio libre.</p>
           <div className={styles.escenarioExample}>Caudal 200.000 €: padres 100.000 € + cónyuge usufructo 1/3 libre (33.333 €)</div>
-          <div className={styles.escenarioTip}>💡 El seguro de vida no forma parte de la herencia y no está sujeto a legítimas.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El seguro de vida no forma parte de la herencia y no está sujeto a legítimas.</div>
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
@@ -446,7 +446,7 @@ export default function EstimadorLegitimas() {
           </div>
           <p>Se hacen donaciones en vida a un hijo. Estas donaciones se imputan a la legítima del donatario (&quot;colación&quot;). Si superan la legítima, el beneficiado deberá compensar a sus hermanos.</p>
           <div className={styles.escenarioExample}>Donación 80.000 € + legítima 50.000 € → donatario ya tiene más de su legítima, sin más derecho</div>
-          <div className={styles.escenarioTip}>💡 Planificar bien las donaciones en vida evita conflictos entre herederos al momento del fallecimiento.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Planificar bien las donaciones en vida evita conflictos entre herederos al momento del fallecimiento.</div>
         </div>
       </div>
 
@@ -484,7 +484,7 @@ export default function EstimadorLegitimas() {
         <div className={styles.faqItem}>
           <strong>¿Pueden los herederos renunciar a la legítima?</strong>
           <p>Sí, pero solo una vez abierta la sucesión (tras el fallecimiento). No es posible renunciar anticipadamente a la legítima del testador vivo, excepto en algunos territorios forales (como Navarra).</p>
-          <div className={styles.faqTip}>💡 Consultar con notario o abogado especializado para planificar la herencia respetando las legítimas de la CCAA aplicable.</div>
+          <div className={styles.faqTip}><span aria-hidden="true">💡</span> Consultar con notario o abogado especializado para planificar la herencia respetando las legítimas de la CCAA aplicable.</div>
         </div>
       </div>
 
@@ -598,7 +598,7 @@ function NotasLista({ notas, stylesModule }: { notas: string[]; stylesModule: Re
   if (notas.length === 0) return null;
   return (
     <div>
-      <div className={stylesModule.notasTitle}>📝 Notas sobre este régimen</div>
+      <div className={stylesModule.notasTitle}><span aria-hidden="true">📝</span> Notas sobre este régimen</div>
       {notas.map((nota, i) => (
         <div key={i} className={stylesModule.notaItem}>
           {nota}

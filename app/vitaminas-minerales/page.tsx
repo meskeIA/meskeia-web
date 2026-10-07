@@ -343,27 +343,27 @@ export default function VitaminasMineralesPage() {
         {/* Escenarios de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>🌱 Dieta vegana</h3>
+            <h3><span aria-hidden="true">🌱</span> Dieta vegana</h3>
             <p>Busca vitamina B12 (obligatoria suplementar), vitamina D, zinc, hierro, calcio y omega-3. La B12 solo existe en alimentos de origen animal — la suplementación es indispensable.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🤰 Embarazo y lactancia</h3>
+            <h3><span aria-hidden="true">🤰</span> Embarazo y lactancia</h3>
             <p>Ácido fólico desde antes de concebir (previene defectos del tubo neural), hierro, yodo y vitamina D son prioritarios. Muchos médicos recomiendan un suplemento prenatal completo.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🏃 Deportistas</h3>
+            <h3><span aria-hidden="true">🏃</span> Deportistas</h3>
             <p>Mayor demanda de hierro (especialmente en mujeres con entrenamiento de resistencia), magnesio (calambres), vitaminas del grupo B (metabolismo energético) y antioxidantes C y E.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>👴 Mayores de 65 años</h3>
+            <h3><span aria-hidden="true">👴</span> Mayores de 65 años</h3>
             <p>La absorción de B12 disminuye con la edad. La síntesis de vitamina D por el sol es menos eficiente. El calcio y la vitamina D son críticos para prevenir osteoporosis y caídas.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>💊 Verificar un análisis de sangre</h3>
+            <h3><span aria-hidden="true">💊</span> Verificar un análisis de sangre</h3>
             <p>Cuando el médico detecta deficiencia de un nutriente específico, usa las fichas de la app para entender qué función cumple, qué alimentos aportarlo y qué síntomas son de exceso.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🥗 Planificar una dieta saludable</h3>
+            <h3><span aria-hidden="true">🥗</span> Planificar una dieta saludable</h3>
             <p>Usa los filtros para identificar los nutrientes más importantes de cada grupo (hidrosolubles, liposolubles, macrominerales) y asegurarte de que tu dieta los cubre desde alimentos reales.</p>
           </div>
         </div>
@@ -460,34 +460,34 @@ export default function VitaminasMineralesPage() {
         {/* Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>🥇 Prioriza alimentos reales</h3>
+            <h3><span aria-hidden="true">🥇</span> Prioriza alimentos reales</h3>
             <p>Los nutrientes de los alimentos vienen con fibra, fitoquímicos y cofactores que potencian su absorción. Los suplementos son un complemento, no un sustituto.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>☀️ Vitamina D y sol</h3>
+            <h3><span aria-hidden="true">☀️</span> Vitamina D y sol</h3>
             <p>La vitamina D del sol es más eficiente que la del suplemento. 15-20 minutos de exposición sin crema solar en cara y brazos al mediodía genera suficiente vitamina D en verano.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🍋 Vitamina C con hierro vegetal</h3>
+            <h3><span aria-hidden="true">🍋</span> Vitamina C con hierro vegetal</h3>
             <p>Añade limón a las lentejas, pimiento rojo a los garbanzos o kiwi de postre después de un plato con espinacas para triplicar la absorción del hierro no hemo.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>⏰ Timing de los suplementos</h3>
+            <h3><span aria-hidden="true">⏰</span> Timing de los suplementos</h3>
             <p>Liposolubles (A, D, E, K) con comida grasa. Hierro en ayunas o con C. No mezcles calcio e hierro en la misma toma. Magnesio por la noche puede mejorar el sueño.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🎨 Variedad de colores en el plato</h3>
+            <h3><span aria-hidden="true">🎨</span> Variedad de colores en el plato</h3>
             <p>Cada color de fruta y verdura indica fitoquímicos y vitaminas diferentes. Un plato colorido (verde, naranja, rojo, morado) cubre más vitaminas que uno monocromático.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📋 Analítica anual</h3>
+            <h3><span aria-hidden="true">📋</span> Analítica anual</h3>
             <p>Una analítica básica anual detecta deficiencias antes de que sean sintomáticas. Pide a tu médico que incluya vitamina D, B12, ferritina y hemograma completo.</p>
           </div>
         </div>
 
         {/* Aviso importante */}
         <div className={styles.warningBox}>
-          <h3>⚠️ Información orientativa, no asesoramiento médico</h3>
+          <h3><span aria-hidden="true">⚠️</span> Información orientativa, no asesoramiento médico</h3>
           <ul className={styles.warningList}>
             <li>Esta guía de nutrientes es informativa y educativa. No reemplaza la consulta con un médico o dietista-nutricionista.</li>
             <li>Los síntomas de deficiencia o exceso de nutrientes requieren confirmación mediante análisis de sangre realizados por profesionales sanitarios.</li>
@@ -505,7 +505,7 @@ export default function VitaminasMineralesPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>💧 Hidrosolubles (B y C)</h4>
+              <h4><span aria-hidden="true">💧</span> Hidrosolubles (B y C)</h4>
               <p>
                 Se disuelven en agua y no se almacenan significativamente.
                 El exceso se elimina por orina, por lo que la toxicidad es rara.
@@ -514,7 +514,7 @@ export default function VitaminasMineralesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🫒 Liposolubles (A, D, E, K)</h4>
+              <h4><span aria-hidden="true">🫒</span> Liposolubles (A, D, E, K)</h4>
               <p>
                 Se disuelven en grasa y se almacenan en hígado y tejido adiposo.
                 No necesitan ingesta diaria, pero el exceso puede acumularse
@@ -533,7 +533,7 @@ export default function VitaminasMineralesPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🪨 Macrominerales</h4>
+              <h4><span aria-hidden="true">🪨</span> Macrominerales</h4>
               <p>
                 Se necesitan en cantidades de 100+ mg/día: calcio, fósforo,
                 magnesio, sodio, potasio, cloro y azufre. Fundamentales
@@ -542,7 +542,7 @@ export default function VitaminasMineralesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>✨ Oligoelementos (Traza)</h4>
+              <h4><span aria-hidden="true">✨</span> Oligoelementos (Traza)</h4>
               <p>
                 Se necesitan en cantidades pequeñas (&lt;100 mg/día): hierro,
                 zinc, cobre, yodo, selenio, etc. Igual de esenciales,
@@ -571,7 +571,7 @@ export default function VitaminasMineralesPage() {
           <h2>Grupos con Necesidades Especiales</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🤰 Embarazadas</h4>
+              <h4><span aria-hidden="true">🤰</span> Embarazadas</h4>
               <p>
                 Ácido fólico (previene defectos tubo neural), hierro,
                 calcio, vitamina D y yodo. Suplementación recomendada.
@@ -579,7 +579,7 @@ export default function VitaminasMineralesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🌱 Veganos</h4>
+              <h4><span aria-hidden="true">🌱</span> Veganos</h4>
               <p>
                 B12 (obligatoria), vitamina D, hierro, zinc, calcio,
                 omega-3. La B12 solo está en alimentos animales.
@@ -587,7 +587,7 @@ export default function VitaminasMineralesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>👴 Mayores de 65</h4>
+              <h4><span aria-hidden="true">👴</span> Mayores de 65</h4>
               <p>
                 B12 (menor absorción), vitamina D (menor síntesis),
                 calcio, proteínas. Mayor riesgo de deficiencias.
@@ -595,7 +595,7 @@ export default function VitaminasMineralesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🏃 Deportistas</h4>
+              <h4><span aria-hidden="true">🏃</span> Deportistas</h4>
               <p>
                 Hierro (especialmente mujeres), magnesio, zinc,
                 vitaminas del grupo B, antioxidantes (C, E).
