@@ -768,6 +768,7 @@ export default function GuiaCocteles() {
                 <button
                   type="button"
                   className={`${styles.filtroBtn} ${familia === 'Todas' ? styles.filtroActivo : ''}`}
+                  aria-pressed={familia === 'Todas'}
                   onClick={() => setFamilia('Todas')}
                 >Todas</button>
                 {FAMILIAS.map((f) => (
@@ -775,6 +776,7 @@ export default function GuiaCocteles() {
                     type="button"
                     key={f}
                     className={`${styles.filtroBtn} ${familia === f ? styles.filtroActivo : ''}`}
+                    aria-pressed={familia === f}
                     onClick={() => setFamilia(f)}
                   >{f}</button>
                 ))}
@@ -786,6 +788,7 @@ export default function GuiaCocteles() {
                 <button
                   type="button"
                   className={`${styles.filtroBtn} ${base === 'Todas' ? styles.filtroActivo : ''}`}
+                  aria-pressed={base === 'Todas'}
                   onClick={() => setBase('Todas')}
                 >Todas</button>
                 {BASES.map((b) => (
@@ -793,6 +796,7 @@ export default function GuiaCocteles() {
                     type="button"
                     key={b}
                     className={`${styles.filtroBtn} ${base === b ? styles.filtroActivo : ''}`}
+                    aria-pressed={base === b}
                     onClick={() => setBase(b)}
                   >{b}</button>
                 ))}

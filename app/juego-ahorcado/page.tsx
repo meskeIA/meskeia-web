@@ -355,7 +355,9 @@ export default function JuegoAhorcadoPage() {
               onClick={() => nuevaPalabra(categoria)}
               className={styles.btnNueva}
             >
-              {juegoTerminado ? '🔄 Nueva palabra' : '⏭️ Saltar palabra'}
+              {juegoTerminado
+                ? <><span aria-hidden="true">🔄</span> Nueva palabra</>
+                : <><span aria-hidden="true">⏭️</span> Saltar palabra</>}
             </button>
             <button
               type="button"

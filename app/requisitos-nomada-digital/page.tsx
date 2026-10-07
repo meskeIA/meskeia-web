@@ -373,7 +373,7 @@ export default function RequisitosNomadaDigitalPage() {
                     <div className={styles.resultadoIcon} aria-hidden="true">⚠️</div>
                     <h2 className={styles.resultadoTitulo}>Casi cumples los requisitos</h2>
                     <p className={styles.resultadoTexto}>
-                      Tienes algún requisito sin cubrir totalmente. Revisa los puntos marcados con ❌
+                      Tienes algún requisito sin cubrir totalmente. Revisa los requisitos a los que has respondido «No» (marcados con <span aria-hidden="true">❌</span>)
                       y consulta con un abogado especializado: en algunos casos hay margen de interpretación
                       o documentación alternativa.
                     </p>
@@ -385,7 +385,7 @@ export default function RequisitosNomadaDigitalPage() {
                     <h2 className={styles.resultadoTitulo}>No cumples algún requisito clave</h2>
                     <p className={styles.resultadoTexto}>
                       Hay uno o más requisitos imprescindibles que no se cumplen según tus respuestas.
-                      Revisa los puntos marcados con ❌. Si tienes dudas, consulta con un abogado
+                      Revisa los requisitos a los que has respondido «No» (marcados con <span aria-hidden="true">❌</span>). Si tienes dudas, consulta con un abogado
                       especializado en derecho migratorio: los casos tienen matices.
                     </p>
                   </>

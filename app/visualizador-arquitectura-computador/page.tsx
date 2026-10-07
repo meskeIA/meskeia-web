@@ -816,7 +816,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
                 mientras transfiere datos. La arquitectura Harvard (usada en microcontroladores
                 y cachés modernas) separa ambos buses para eliminar este límite.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Dato:</strong> Los procesadores modernos usan una arquitectura Harvard modificada internamente, aunque externamente se comporten como Von Neumann.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Dato:</strong> Los procesadores modernos usan una arquitectura Harvard modificada internamente, aunque externamente se comporten como Von Neumann.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuántos ciclos dura cada fase del ciclo FDE?</h4>
@@ -825,7 +825,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
                 (3 ciclos totales con pipeline). En CISC puede variar de 1 a cientos de ciclos
                 para instrucciones complejas (división, operaciones de cadena).
               </p>
-              <p className={styles.faqTip}>💡 <strong>Pipeline:</strong> Los procesadores modernos superponen las fases — mientras ejecutan la instrucción 1, ya están decodificando la 2 y buscando la 3.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Pipeline:</strong> Los procesadores modernos superponen las fases — mientras ejecutan la instrucción 1, ya están decodificando la 2 y buscando la 3.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué pasa cuando hay un "cache miss"?</h4>

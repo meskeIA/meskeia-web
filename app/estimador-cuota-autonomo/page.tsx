@@ -43,7 +43,7 @@ const BONIFICACIONES: Bonificacion[] = [
   {
     id: 'maternidad',
     nombre: 'Bonificación por Maternidad/Paternidad',
-    descripcion: 'Bonificación del 100% de la cuota durante el descanso por nacimiento',
+    descripcion: 'Bonificación del 100 % de la cuota durante el descanso por nacimiento',
     cuotaMensual: 0,
     duracion: 'Durante el periodo de descanso (16-20 semanas)',
     requisitos: [
@@ -67,7 +67,7 @@ const BONIFICACIONES: Bonificacion[] = [
   {
     id: 'conciliacion',
     nombre: 'Bonificación por Conciliación',
-    descripcion: 'Bonificación del 100% cuota por cuidado de menores de 12 años',
+    descripcion: 'Bonificación del 100 % cuota por cuidado de menores de 12 años',
     cuotaMensual: 0,
     duracion: '12 meses',
     requisitos: [
@@ -275,6 +275,7 @@ export default function EstimadorCuotaAutonomoPage() {
           type="button"
           className={`${styles.navTab} ${vistaActiva === 'calculadora' ? styles.navTabActivo : ''}`}
           onClick={() => setVistaActiva('calculadora')}
+          aria-pressed={vistaActiva === 'calculadora'}
         >
           <span aria-hidden="true">🧮</span> Estimador
         </button>
@@ -282,6 +283,7 @@ export default function EstimadorCuotaAutonomoPage() {
           type="button"
           className={`${styles.navTab} ${vistaActiva === 'tramos' ? styles.navTabActivo : ''}`}
           onClick={() => setVistaActiva('tramos')}
+          aria-pressed={vistaActiva === 'tramos'}
         >
           <span aria-hidden="true">📊</span> Tabla de Tramos
         </button>
@@ -289,6 +291,7 @@ export default function EstimadorCuotaAutonomoPage() {
           type="button"
           className={`${styles.navTab} ${vistaActiva === 'bonificaciones' ? styles.navTabActivo : ''}`}
           onClick={() => setVistaActiva('bonificaciones')}
+          aria-pressed={vistaActiva === 'bonificaciones'}
         >
           <span aria-hidden="true">🎯</span> Bonificaciones
         </button>
@@ -399,7 +402,7 @@ export default function EstimadorCuotaAutonomoPage() {
                 </div>
                 <div className={styles.desgloseItem}>
                   <span className={styles.desgloseLabel}>Tipo de cotización</span>
-                  <span className={styles.desgloseValor}>{formatNumber(resultados.tipoCotizacion, 2)}%</span>
+                  <span className={styles.desgloseValor}>{formatNumber(resultados.tipoCotizacion, 2)}&nbsp;%</span>
                 </div>
                 <div className={styles.desgloseSeparador} />
                 <div className={styles.desgloseItem}>
@@ -564,7 +567,7 @@ export default function EstimadorCuotaAutonomoPage() {
             <div className={styles.guideCard}>
               <h4><span aria-hidden="true">🎯</span> Para nuevos autónomos</h4>
               <ul>
-                <li>Aprovecha la tarifa plana (80€/mes durante 12-24 meses)</li>
+                <li>Aprovecha la tarifa plana (80&nbsp;€/mes durante 12-24 meses)</li>
                 <li>Calcula bien tus gastos deducibles para estimar el rendimiento</li>
                 <li>Considera darte de alta a principios de año para simplificar cálculos</li>
               </ul>
@@ -732,7 +735,7 @@ export default function EstimadorCuotaAutonomoPage() {
               <p>
                 Los autónomos no tienen acceso al desempleo como los trabajadores por cuenta ajena. Sin embargo, existe la
                 <strong> prestación por cese de actividad</strong> (conocida popularmente como «paro de autónomos»), equivalente
-                al 70% de la base reguladora, durante un período proporcional a los meses cotizados por esta contingencia
+                al 70&nbsp;% de la base reguladora, durante un período proporcional a los meses cotizados por esta contingencia
                 (mínimo 12 meses cotizados para tener derecho). Cotizar por cese es <strong>voluntario</strong>, aunque desde
                 2019 viene incluido en el tipo ordinario.
               </p>
@@ -742,8 +745,8 @@ export default function EstimadorCuotaAutonomoPage() {
               <h4>¿Qué es el cese de actividad y cuándo puedo solicitarlo?</h4>
               <p>
                 El cese de actividad es la prestación equivalente al paro para autónomos. Puedes solicitarlo cuando se produce
-                el cierre definitivo de la actividad por: pérdidas acumuladas superiores al 10% de los ingresos en un año
-                (o al 20% en dos años consecutivos), ejecución judicial de deuda, pérdida de licencia, violencia de género,
+                el cierre definitivo de la actividad por: pérdidas acumuladas superiores al 10&nbsp;% de los ingresos en un año
+                (o al 20&nbsp;% en dos años consecutivos), ejecución judicial de deuda, pérdida de licencia, violencia de género,
                 divorcio o separación con cese forzado, o declaración de concurso. El trámite se realiza en la mutua
                 colaboradora correspondiente en un plazo de <strong>15 días hábiles</strong> tras el cese.
               </p>
@@ -757,7 +760,7 @@ export default function EstimadorCuotaAutonomoPage() {
                 de larga duración prevista —misma regla—; (3) <strong>autónomos mayores de 50 años</strong> que quieran
                 mejorar la pensión en los últimos tramos de su carrera; (4) <strong>ingresos variables con picos altos</strong>
                 en los que la regularización podría ser elevada de todas formas. El coste adicional por subir 200 €
-                la base es de aproximadamente <strong>63 €/mes</strong> adicionales (31,50%).
+                la base es de aproximadamente <strong>63 €/mes</strong> adicionales (31,50&nbsp;%).
               </p>
             </div>
 
@@ -916,7 +919,7 @@ export default function EstimadorCuotaAutonomoPage() {
               <h4>Si tienes pluriactividad, revisa la bonificación</h4>
               <p>
                 Si cotizas al mismo tiempo como asalariado y como autónomo, puede aplicar la
-                <strong> bonificación por pluriactividad</strong>: devolución de entre el 25% y el 50% de las cuotas
+                <strong> bonificación por pluriactividad</strong>: devolución de entre el 25&nbsp;% y el 50&nbsp;% de las cuotas
                 de autónomo cuando la suma de bases supera cierto tope (en 2025, ~15.266 €/año). Solicítala
                 a través de la TGSS antes del 30 de abril del año siguiente.
               </p>
@@ -953,8 +956,8 @@ export default function EstimadorCuotaAutonomoPage() {
               </li>
               <li>
                 <strong>Confundir base de cotización con cuota.</strong> La base es la cantidad sobre la que
-                se aplica el tipo (31,50%). La cuota es el resultado: base × 31,50%. Por ejemplo, base 1.000 € →
-                cuota 315 €. Base 2.000 € → cuota 630 €. El MEI (0,90% en 2026) ya está incluido en el tipo desde 2023.
+                se aplica el tipo (31,50&nbsp;%). La cuota es el resultado: base × 31,50&nbsp;%. Por ejemplo, base 1.000 € →
+                cuota 315 €. Base 2.000 € → cuota 630 €. El MEI (0,90&nbsp;% en 2026) ya está incluido en el tipo desde 2023.
               </li>
               <li>
                 <strong>No solicitar el cese de actividad al cerrar.</strong> Si te das de baja en Hacienda
@@ -965,7 +968,7 @@ export default function EstimadorCuotaAutonomoPage() {
               <li>
                 <strong>Ignorar el MEI en el cálculo.</strong> Desde enero de 2023, el tipo de cotización
                 incluye la Aportación al Mecanismo de Equidad Intergeneracional (MEI), que sube cada año y en 2026
-                es del 0,90% sobre la base de cotización. No es separado —viene integrado en el recibo— pero sí afecta
+                es del 0,90&nbsp;% sobre la base de cotización. No es separado —viene integrado en el recibo— pero sí afecta
                 al cálculo real de la cuota. Para una base de 1.000 €, representa <strong>9 €/mes adicionales</strong> que algunos autónomos
                 no contabilizan.
               </li>
