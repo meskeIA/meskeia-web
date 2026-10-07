@@ -3,8 +3,27 @@
 import { useState, useMemo } from 'react';
 import styles from './ComparadorFormasJuridicas.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
+import DataReference from '@/components/DataReference';
 import { formatCurrency } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
+import { FISCAL_SOCIEDADES_META } from '@/data/fiscal';
+import { PREGUNTAS_FRECUENTES } from './metadata';
+import {
+  NB,
+  IRPF_RANGO,
+  IS_GENERAL,
+  IS_COOPERATIVAS,
+  IS_NUEVA_CREACION,
+  IS_MICRO_TRAMO1,
+  IS_MICRO_TRAMO2,
+  IS_SL_RESUMEN,
+  TARIFA_PLANA,
+  DISENADORA_BASE,
+  DISENADORA_CUOTA,
+  DISENADORA_MARGINAL,
+  marginalIRPF,
+  tramoIRPF,
+} from './datos';
 
 // Tipos
 type FormaJuridica = 'autonomo' | 'sl' | 'cooperativa' | 'asociacion' | 'cb';
@@ -16,6 +35,8 @@ interface CaracteristicaForma {
   icon: string;
   descripcion: string;
   capitalMinimo: number | null;
+  /** Texto en lugar de la cifra cuando la ley no fija un mínimo único (cooperativa, 3054) */
+  capitalTexto?: string;
   capitalRecomendado?: string;
   socios: { min: number; max: number | null };
   responsabilidad: 'ilimitada' | 'limitada';
@@ -49,7 +70,7 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
     responsabilidadTexto: 'Ilimitada con patrimonio personal',
     fiscalidad: 'IRPF (tramos progresivos)',
     tipoImpuesto: 'IRPF',
-    tipoGravamen: '19% - 47%',
+    tipoGravamen: IRPF_RANGO,
     cotizacionSS: 'RETA (cuota según ingresos)',
     tramitesAlta: [
       'Alta en Hacienda (modelo 036/037)',
@@ -61,7 +82,7 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
     contabilidad: 'Libro de ingresos/gastos',
     ventajas: [
       'Alta rápida y económica',
-      'Tarifa plana los primeros 12 meses (80€)',
+      `Tarifa plana: ${TARIFA_PLANA}`,
       'Sin capital mínimo',
       'Contabilidad simplificada',
       'Total control de decisiones',
@@ -90,14 +111,16 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
     icon: '🏢',
     descripcion: 'Sociedad mercantil con responsabilidad limitada. Con 1 socio es SLU (Unipersonal)',
     capitalMinimo: 1,
-    capitalRecomendado: '3.000€ recomendado (restricciones hasta alcanzarlo)',
+    capitalRecomendado: `3.000${NB}€ recomendado (restricciones hasta alcanzarlo)`,
     socios: { min: 1, max: null },
     responsabilidad: 'limitada',
     responsabilidadTexto: 'Limitada al capital social',
     fiscalidad: 'Impuesto de Sociedades',
     tipoImpuesto: 'IS',
-    tipoGravamen: '25% (19-21% micropymes <1M€, escala progresiva)',
-    cotizacionSS: 'Administrador en RETA obligatorio',
+    tipoGravamen: IS_SL_RESUMEN,
+    // ⚠️ 07/10/2026 (hallazgo 3053): el RETA no es obligatorio en todos los casos, sino para el
+    // administrador que cobra y tiene el control efectivo (art. 305.2.b LGSS)
+    cotizacionSS: 'RETA para el administrador que cobra y tiene el control efectivo',
     tramitesAlta: [
       'Certificación negativa de denominación',
       'Apertura cuenta bancaria y depósito capital',
@@ -115,7 +138,7 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
     ventajas: [
       'Responsabilidad limitada al capital',
       'Mayor credibilidad empresarial',
-      'Tipo fijo del IS (25%)',
+      `IS reducido para sociedades nuevas (${IS_NUEVA_CREACION}) y pequeñas (${IS_MICRO_TRAMO1}/${IS_MICRO_TRAMO2})`,
       'Facilidad para incorporar socios/inversores',
       'Posibilidad de vender participaciones',
       'Acceso a más financiación',
@@ -125,16 +148,16 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
       'Mayor coste de constitución',
       'Contabilidad más compleja',
       'Obligaciones formales (juntas, cuentas anuales)',
-      'Administrador cotiza en RETA obligatoriamente',
+      'El administrador con control efectivo cotiza en el RETA (art. 305.2.b LGSS)',
       'Trámites más lentos',
-      'Con 1€ capital: restricciones hasta 3.000€',
+      `Con menos de 3.000${NB}€ de capital: reserva legal reforzada y responsabilidad solidaria de los socios en la liquidación`,
     ],
     idealPara: [
       'Negocios con riesgo patrimonial',
       'Proyectos con varios socios',
       'Empresas que buscan inversores',
       'Negocios que contratan empleados',
-      'Facturación alta (>40.000€/año)',
+      'Beneficios altos y estables',
       'Emprendedores solos que quieren proteger patrimonio (SLU)',
     ],
     color: '#48A9A6',
@@ -144,15 +167,20 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
     nombre: 'Cooperativa de Trabajo',
     nombreCorto: 'Cooperativa',
     icon: '🤝',
-    descripcion: 'Asociación de personas con intereses comunes, democrática y sin ánimo de lucro',
-    capitalMinimo: 3000,
-    capitalRecomendado: '3.000€ mínimo',
+    // ⚠️ 07/10/2026 (hallazgo 3054): la Ley 27/1999 no la define sin ánimo de lucro (art. 1.1)
+    // ni fija un capital mínimo: lo fijan los estatutos (art. 45.2) y varía por ley autonómica
+    descripcion: 'Sociedad de personas socias que desarrollan juntas una actividad económica, con gestión democrática',
+    capitalMinimo: null,
+    capitalTexto: 'Lo fijan los estatutos (según la ley aplicable)',
+    capitalRecomendado: 'Lo fijan los estatutos',
     socios: { min: 3, max: null },
     responsabilidad: 'limitada',
     responsabilidadTexto: 'Limitada a las aportaciones',
     fiscalidad: 'Impuesto de Sociedades (régimen especial)',
     tipoImpuesto: 'IS Cooperativas',
-    tipoGravamen: '20% (especialmente protegidas)',
+    // ⚠️ 07/10/2026 (hallazgo 3045): el 20 % es de TODAS las protegidas (Ley 20/1990, art. 33.2.a);
+    // las especialmente protegidas tienen además un 50 % de bonificación de la cuota (art. 34.2)
+    tipoGravamen: `${IS_COOPERATIVAS} si es protegida; las especialmente protegidas, además 50${NB}% de bonificación`,
     cotizacionSS: 'Régimen General o RETA (según estatutos)',
     tramitesAlta: [
       'Asamblea constituyente',
@@ -166,7 +194,7 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
     tiempoConstitucion: '1-2 meses',
     contabilidad: 'Contabilidad completa + libros sociales',
     ventajas: [
-      'Tipo reducido del IS (20%)',
+      `Tipo reducido del IS (${IS_COOPERATIVAS}) si es fiscalmente protegida`,
       'Bonificaciones fiscales',
       'Ayudas y subvenciones específicas',
       'Gestión democrática (1 socio = 1 voto)',
@@ -201,7 +229,7 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
     responsabilidadTexto: 'Limitada al patrimonio asociativo',
     fiscalidad: 'Impuesto de Sociedades (exenciones)',
     tipoImpuesto: 'IS (parcial)',
-    tipoGravamen: '25% (con exenciones)',
+    tipoGravamen: `${IS_GENERAL}, con exenciones`,
     cotizacionSS: 'Empleados en Régimen General',
     tramitesAlta: [
       'Acta fundacional',
@@ -248,7 +276,7 @@ const FORMAS_JURIDICAS: CaracteristicaForma[] = [
     responsabilidadTexto: 'Ilimitada y solidaria',
     fiscalidad: 'IRPF (cada comunero tributa su parte)',
     tipoImpuesto: 'IRPF',
-    tipoGravamen: '19% - 47% (cada comunero)',
+    tipoGravamen: `${IRPF_RANGO} (cada comunero)`,
     cotizacionSS: 'Cada comunero en RETA',
     tramitesAlta: [
       'Contrato privado entre comuneros',
@@ -333,7 +361,7 @@ export default function ComparadorFormasJuridicasPage() {
   const getValorCriterio = (forma: CaracteristicaForma, criterio: string): string => {
     switch (criterio) {
       case 'capital':
-        return forma.capitalMinimo === null ? 'No requiere' : formatCurrency(forma.capitalMinimo);
+        return forma.capitalTexto ?? (forma.capitalMinimo === null ? 'No requiere' : formatCurrency(forma.capitalMinimo));
       case 'socios':
         return forma.socios.max === null
           ? `${forma.socios.min}+`
@@ -381,9 +409,9 @@ export default function ComparadorFormasJuridicasPage() {
       id: 'ingresos',
       pregunta: '¿Qué facturación anual esperas?',
       opciones: [
-        { valor: 'bajo', texto: 'Menos de 20.000€' },
-        { valor: 'medio', texto: '20.000€ - 60.000€' },
-        { valor: 'alto', texto: 'Más de 60.000€' },
+        { valor: 'bajo', texto: `Menos de 20.000${NB}€` },
+        { valor: 'medio', texto: `20.000${NB}€ - 60.000${NB}€` },
+        { valor: 'alto', texto: `Más de 60.000${NB}€` },
       ],
     },
     {
@@ -469,12 +497,34 @@ export default function ComparadorFormasJuridicasPage() {
       puntos.sl += 1;
     }
 
-    // Ordenar por puntuación
-    const ranking = Object.entries(puntos)
-      .sort((a, b) => b[1] - a[1])
-      .map(([id]) => FORMAS_JURIDICAS.find(f => f.id === id)!);
+    // ⚠️ 07/10/2026 (hallazgo 3042): sumaba puntos sin filtrar, y con «2 personas» ponía en el
+    // podio, incluso primera, una asociación o una cooperativa que exigen 3 (LO 1/2002 art. 5.1;
+    // Ley 27/1999 art. 8), y la asociación a quien quiere repartir beneficios. Ahora lo
+    // imposible se descarta, con su motivo, y un empate se dice en vez de resolverlo el array.
+    const personas = respuestasTest.socios === '1' ? 1 : respuestasTest.socios === '2' ? 2 : 3;
+    const descartadas: { forma: CaracteristicaForma; motivo: string }[] = [];
+    const compatibles = FORMAS_JURIDICAS.filter((f) => {
+      if (personas < f.socios.min) {
+        descartadas.push({ forma: f, motivo: `exige al menos ${f.socios.min} personas` });
+        return false;
+      }
+      if (f.socios.max !== null && personas > f.socios.max) {
+        descartadas.push({ forma: f, motivo: `es para ${f.socios.max === 1 ? 'una sola persona' : `un máximo de ${f.socios.max}`}` });
+        return false;
+      }
+      if (f.id === 'asociacion' && respuestasTest.objetivo === 'lucro') {
+        descartadas.push({ forma: f, motivo: 'no puede repartir beneficios entre sus miembros' });
+        return false;
+      }
+      return true;
+    });
 
-    return ranking;
+    // Orden estable por puntuación; a igualdad, el array decide el orden pero se avisa
+    const ranking = compatibles
+      .map((forma) => ({ forma, puntos: puntos[forma.id] }))
+      .sort((a, b) => b.puntos - a.puntos);
+
+    return { ranking, descartadas };
   }, [respuestasTest]);
 
   // Reiniciar test
@@ -500,6 +550,12 @@ export default function ComparadorFormasJuridicasPage() {
       <LegalNotice />
 
       <DisclaimerCard variant="financial" severity="critical" />
+      <DataReference
+        normativa="IRPF e Impuesto sobre Sociedades 2026"
+        fuente={FISCAL_SOCIEDADES_META.fuente}
+        verificado={FISCAL_SOCIEDADES_META.verificado}
+        urlOficial={FISCAL_SOCIEDADES_META.urlOficial}
+      />
 
       {/* Navegación de vistas */}
       <div className={styles.vistas}>
@@ -567,14 +623,14 @@ export default function ComparadorFormasJuridicasPage() {
                       className={styles.formaHeader}
                       style={{ borderTopColor: forma.color }}
                     >
-                      <span className={styles.headerIcon}>{forma.icon}</span>
+                      <span className={styles.headerIcon} aria-hidden="true">{forma.icon}</span>
                       <span>{forma.nombreCorto}</span>
                       <button
                         type="button"
                         className={styles.btnDetalle}
                         onClick={() => verDetalle(forma.id)}
-                        title="Ver ficha completa"
-                        aria-label="Ver ficha completa"
+                        title={`Ver ficha completa de ${forma.nombreCorto}`}
+                        aria-label={`Ver ficha completa de ${forma.nombreCorto}`}
                       >
                         📋
                       </button>
@@ -611,7 +667,7 @@ export default function ComparadorFormasJuridicasPage() {
                   style={{ borderLeftColor: forma.color }}
                 >
                   <div className={styles.resumenHeader}>
-                    <span>{forma.icon}</span>
+                    <span aria-hidden="true">{forma.icon}</span>
                     <strong>{forma.nombreCorto}</strong>
                   </div>
                   <p className={styles.resumenDesc}>{forma.descripcion}</p>
@@ -664,7 +720,7 @@ export default function ComparadorFormasJuridicasPage() {
             <div className={styles.resultadoTest}>
               <h3><span aria-hidden="true">📊</span> Tu recomendación</h3>
               <div className={styles.rankingGrid}>
-                {recomendacionTest.slice(0, 3).map((forma, index) => (
+                {recomendacionTest.ranking.slice(0, 3).map(({ forma, puntos }, index, podio) => (
                   <div
                     key={forma.id}
                     className={`${styles.rankingCard} ${index === 0 ? styles.rankingPrimero : ''}`}
@@ -677,17 +733,30 @@ export default function ComparadorFormasJuridicasPage() {
                       <span className={styles.rankingIcon} aria-hidden="true">{forma.icon}</span>
                       <strong>{forma.nombre}</strong>
                       <p>{forma.descripcion}</p>
+                      {podio.some((o, j) => j !== index && o.puntos === puntos) && (
+                        <p className={styles.empate}>
+                          Empata a {puntos} puntos con{' '}
+                          {podio.filter((o, j) => j !== index && o.puntos === puntos).map((o) => o.forma.nombreCorto).join(' y ')}
+                          : el orden entre ellas no lo decide el test.
+                        </p>
+                      )}
                       <button
                         type="button"
                         className={styles.btnVerDetalle}
                         onClick={() => verDetalle(forma.id)}
                       >
-                        Ver ficha completa →
+                        Ver ficha completa<span aria-hidden="true"> →</span>
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
+              {recomendacionTest.descartadas.length > 0 && (
+                <p className={styles.descartadas}>
+                  <strong>Descartadas por tus respuestas:</strong>{' '}
+                  {recomendacionTest.descartadas.map((d) => `${d.forma.nombreCorto} (${d.motivo})`).join(' · ')}.
+                </p>
+              )}
               <button type="button" className={styles.btnReiniciar} onClick={reiniciarTest}>
                 <span aria-hidden="true">🔄</span> Repetir test
               </button>
@@ -721,7 +790,7 @@ export default function ComparadorFormasJuridicasPage() {
             return (
               <div className={styles.fichaDetalle}>
                 <header className={styles.fichaHeader} style={{ backgroundColor: forma.color }}>
-                  <span className={styles.fichaIcon}>{forma.icon}</span>
+                  <span className={styles.fichaIcon} aria-hidden="true">{forma.icon}</span>
                   <div>
                     <h2>{forma.nombre}</h2>
                     <p>{forma.descripcion}</p>
@@ -734,7 +803,7 @@ export default function ComparadorFormasJuridicasPage() {
                     <h3><span aria-hidden="true">📋</span> Datos básicos</h3>
                     <dl className={styles.datosList}>
                       <dt>Capital mínimo</dt>
-                      <dd>{forma.capitalMinimo === null ? 'No requiere' : formatCurrency(forma.capitalMinimo)}</dd>
+                      <dd>{forma.capitalTexto ?? (forma.capitalMinimo === null ? 'No requiere' : formatCurrency(forma.capitalMinimo))}</dd>
                       <dt>Número de socios</dt>
                       <dd>{forma.socios.max === null ? `Mínimo ${forma.socios.min}` : `${forma.socios.min}-${forma.socios.max}`}</dd>
                       <dt>Responsabilidad</dt>
@@ -837,7 +906,7 @@ export default function ComparadorFormasJuridicasPage() {
               <ul>
                 <li>Empiezas solo y con poco capital</li>
                 <li>Tu actividad tiene bajo riesgo patrimonial</li>
-                <li>Facturas menos de 40.000€/año</li>
+                <li>Tus beneficios todavía son modestos</li>
                 <li>Quieres probar una idea de negocio</li>
                 <li>Priorizas la simplicidad administrativa</li>
               </ul>
@@ -851,7 +920,7 @@ export default function ComparadorFormasJuridicasPage() {
               <ul>
                 <li>Necesitas proteger tu patrimonio personal</li>
                 <li>Vas a tener empleados</li>
-                <li>Facturas más de 40.000-60.000€/año</li>
+                <li>Tus beneficios son altos y estables</li>
                 <li>Buscas inversores o socios</li>
                 <li>Tu actividad implica riesgos (stock, local, maquinaria)</li>
               </ul>
@@ -863,17 +932,17 @@ export default function ComparadorFormasJuridicasPage() {
                 La diferencia clave está en cómo tributan los beneficios:
               </p>
               <ul>
-                <li><strong>Autónomo</strong>: IRPF progresivo (19%-47%)</li>
-                <li><strong>SL</strong>: IS al 25% (19-21% para micropymes con facturación &lt;1M€, escala progresiva)</li>
-                <li>Con beneficios altos, la SL suele ser más ventajosa</li>
-                <li>El punto de equilibrio está en torno a 40.000-60.000€</li>
+                <li><strong>Autónomo</strong>: IRPF progresivo ({IRPF_RANGO})</li>
+                <li><strong>SL</strong>: Impuesto sobre Sociedades ({IS_SL_RESUMEN})</li>
+                <li>Con beneficios altos, la SL puede ser más ventajosa</li>
+                <li>No hay un punto de equilibrio universal: depende del sueldo del administrador, los dividendos y los costes fijos</li>
               </ul>
             </div>
 
             <div className={styles.guideCard}>
               <h4><span aria-hidden="true">🤝</span> Alternativas: Cooperativa y Asociación</h4>
               <ul>
-                <li><strong>Cooperativa</strong>: Ideal para grupos que quieren gestión democrática. Mínimo 3 socios. Tipo reducido IS (20%)</li>
+                <li><strong>Cooperativa</strong>: Ideal para grupos que quieren gestión democrática. Mínimo 3 socios. Tipo reducido del IS ({IS_COOPERATIVAS}) si es fiscalmente protegida</li>
                 <li><strong>Asociación</strong>: Para fines no lucrativos (cultural, social, deportivo). No puede repartir beneficios</li>
                 <li><strong>Comunidad de Bienes</strong>: Simple pero con responsabilidad ilimitada. Para pequeños negocios entre 2+ personas</li>
               </ul>
@@ -901,7 +970,7 @@ export default function ComparadorFormasJuridicasPage() {
                   <td><strong>Capital mínimo</strong></td>
                   <td>Sin mínimo</td>
                   <td>1 € (recomendado 3.000 €)</td>
-                  <td>3.000 €</td>
+                  <td>Lo fijan los estatutos</td>
                   <td>Sin mínimo</td>
                   <td>Sin mínimo</td>
                 </tr>
@@ -915,11 +984,11 @@ export default function ComparadorFormasJuridicasPage() {
                 </tr>
                 <tr>
                   <td><strong>Tipo impositivo</strong></td>
-                  <td>IRPF 19 %–47 %</td>
-                  <td>IS 25 % (19-21 % micropymes &lt;1M€)</td>
-                  <td>IS 20 % (coop. protegida)</td>
-                  <td>IRPF 19 %–47 % (cada comunero)</td>
-                  <td>IS 25 % con exenciones</td>
+                  <td>IRPF {IRPF_RANGO}</td>
+                  <td>IS {IS_GENERAL}; {IS_MICRO_TRAMO1}/{IS_MICRO_TRAMO2} pequeñas; {IS_NUEVA_CREACION} nuevas</td>
+                  <td>IS {IS_COOPERATIVAS} (protegida)</td>
+                  <td>IRPF {IRPF_RANGO} (cada comunero)</td>
+                  <td>IS {IS_GENERAL}, con exenciones</td>
                 </tr>
                 <tr>
                   <td><strong>Socios mínimos</strong></td>
@@ -930,12 +999,12 @@ export default function ComparadorFormasJuridicasPage() {
                   <td>3</td>
                 </tr>
                 <tr>
-                  <td><strong>Coste anual gestión</strong></td>
-                  <td>500–1.500 €/año</td>
-                  <td>2.000–5.000 €/año</td>
-                  <td>2.500–5.500 €/año</td>
-                  <td>500–1.500 €/año</td>
-                  <td>300–1.000 €/año</td>
+                  <td><strong>Coste anual de gestión (orientativo; pide presupuesto)</strong></td>
+                  <td>Bajo</td>
+                  <td>Medio-alto</td>
+                  <td>Medio-alto</td>
+                  <td>Bajo</td>
+                  <td>Bajo-medio</td>
                 </tr>
                 <tr>
                   <td><strong>Complejidad</strong></td>
@@ -964,20 +1033,21 @@ export default function ComparadorFormasJuridicasPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👩‍🎨</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👩‍🎨</span>
                 <h4>Diseñadora independiente · 25.000 €/año</h4>
               </div>
               <p className={styles.escenarioExample}>
-                Con 25.000 € netos anuales, la carga fiscal como autónoma es aproximadamente <strong>5.500 € de IRPF</strong> (tramo 24 %).
-                Constituir una SL añadiría ~3.000 €/año en costes de gestoría, cuentas anuales y Registro Mercantil, anulando cualquier
-                ahorro fiscal.
+                Con {formatCurrency(DISENADORA_BASE)} de base liquidable y solo el mínimo personal, la cuota íntegra de IRPF como
+                autónoma rondaría <strong>{formatCurrency(DISENADORA_CUOTA)}</strong> (tipo marginal del {DISENADORA_MARGINAL}{NB}%).
+                Constituir una SL añadiría costes fijos anuales de gestoría, cuentas anuales y Registro Mercantil que, a este nivel
+                de beneficio, pueden anular el ahorro fiscal.
               </p>
               <p className={styles.escenarioTip}>Recomendación: autónomo. Sencillo, barato y fiscalmente eficiente a este nivel de ingresos.</p>
             </div>
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <h4>Dos socios que montan una agencia digital</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -990,11 +1060,12 @@ export default function ComparadorFormasJuridicasPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧵</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧵</span>
                 <h4>5 artesanos que quieren vender juntos</h4>
               </div>
               <p className={styles.escenarioExample}>
-                Con 5 promotores, la <strong>cooperativa de trabajo asociado</strong> ofrece tipo de IS del 20 %, gestión
+                Con 5 promotores, la <strong>cooperativa de trabajo asociado</strong>, especialmente protegida, tributa al {IS_COOPERATIVAS} por
+                sus resultados cooperativos con una bonificación del 50{NB}% de la cuota, gestión
                 democrática (1 socio = 1 voto) y acceso preferente a subvenciones de economía social de la CCAA y el
                 Ministerio de Trabajo.
               </p>
@@ -1003,7 +1074,7 @@ export default function ComparadorFormasJuridicasPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎭</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎭</span>
                 <h4>ONG de barrio para actividades culturales</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1020,83 +1091,13 @@ export default function ComparadorFormasJuridicasPage() {
         <section className={styles.guideSection}>
           <h2>Preguntas Frecuentes (FAQ)</h2>
           <div className={styles.faqList}>
-            <div className={styles.faqItem}>
-              <h4>¿Qué es una Comunidad de Bienes y cuándo conviene?</h4>
-              <p>
-                Una Comunidad de Bienes (CB) es un contrato por el que dos o más personas ponen en común bienes o derechos para
-                desarrollar una actividad económica. No tiene personalidad jurídica propia. Conviene cuando los socios tienen bajo
-                riesgo patrimonial, la actividad es temporal o de pequeña envergadura y se quiere evitar la complejidad de una SL.
-                Cada comunero tributa en IRPF por su parte proporcional de los beneficios.
-              </p>
-              <p className={styles.faqTip}>Atención: la responsabilidad es ilimitada y solidaria — un acreedor puede reclamar la deuda total a cualquiera de los comuneros.</p>
-            </div>
-
-            <div className={styles.faqItem}>
-              <h4>¿Puedo transformar mi actividad de autónomo en SL sin liquidar la empresa?</h4>
-              <p>
-                Sí. El proceso se llama <strong>aportación de rama de actividad</strong> o constitución de SL con aportaciones no dinerarias.
-                El autónomo aporta a la SL los activos de su negocio (cartera de clientes, contratos, equipos) a cambio de participaciones.
-                Es necesario un asesor fiscal para evitar tributación en el traspaso y asegurar la continuidad de contratos y empleados.
-              </p>
-            </div>
-
-            <div className={styles.faqItem}>
-              <h4>¿Una cooperativa puede tener trabajadores que no sean socios?</h4>
-              <p>
-                Sí, pero con limitaciones según la normativa autonómica. En general, el número de horas trabajadas por empleados
-                no socios no puede superar el 30 % de las horas trabajadas por los socios trabajadores. Superar ese límite puede
-                hacer perder la condición de cooperativa fiscalmente protegida y el tipo reducido del 20 %.
-              </p>
-            </div>
-
-            <div className={styles.faqItem}>
-              <h4>¿Cuál es la diferencia entre SL, SLU y SRL?</h4>
-              <p>
-                Las tres denominaciones se refieren a la misma figura jurídica: la <strong>Sociedad de Responsabilidad Limitada</strong>.
-                La SLU (Sociedad Limitada Unipersonal) tiene un único socio, lo que obliga a inscribir la unipersonalidad en el Registro
-                Mercantil y a incluirlo en toda la documentación. SRL es simplemente otra abreviatura de la misma forma, menos usada en España.
-              </p>
-            </div>
-
-            <div className={styles.faqItem}>
-              <h4>¿Qué es una Sociedad Civil Profesional y para qué sirve?</h4>
-              <p>
-                La <strong>Sociedad Civil Profesional</strong> (SCP), regulada por la Ley 2/2007, agrupa a dos o más profesionales
-                colegiados para ejercer conjuntamente su actividad (abogados, médicos, arquitectos…). Tiene personalidad jurídica propia,
-                aunque los socios mantienen responsabilidad personal por los actos profesionales propios. Requiere inscripción en el
-                Registro Mercantil y en el colegio profesional correspondiente.
-              </p>
-            </div>
-
-            <div className={styles.faqItem}>
-              <h4>¿Puede una asociación contratar empleados y tener ingresos?</h4>
-              <p>
-                Sí. Una asociación puede contratar trabajadores por cuenta ajena (Régimen General de la SS) y realizar actividades
-                económicas para financiar sus fines estatutarios. Los ingresos de actividades accesorias tributan en IS, aunque con
-                exenciones relevantes. Lo que está prohibido es repartir esos beneficios entre los socios o asociados; deben reinvertirse
-                en los fines de la entidad.
-              </p>
-            </div>
-
-            <div className={styles.faqItem}>
-              <h4>¿Qué ventajas fiscales tiene una cooperativa frente a una SL?</h4>
-              <p>
-                Las cooperativas fiscalmente protegidas tributan al <strong>20 % en IS</strong> (frente al 25 % general o 23 % de pymes).
-                Además pueden aplicar una bonificación del 50 % en la cuota del IS para las cooperativas especialmente protegidas.
-                También acceden a bonificaciones en cotizaciones de la Seguridad Social y a ayudas y subvenciones específicas del
-                Ministerio de Trabajo y de las CCAA.
-              </p>
-            </div>
-
-            <div className={styles.faqItem}>
-              <h4>¿Qué pasa si constituyo una SL y luego quiero cerrarla?</h4>
-              <p>
-                Disolver y liquidar una SL requiere: acuerdo en junta general, nombramiento de un liquidador, pago de todas las deudas,
-                distribución del activo remanente entre socios, escritura pública de liquidación y cancelación en el Registro Mercantil.
-                El proceso puede durar 3-12 meses y cuesta entre 500-1.500 € en honorarios. Si hay deudas pendientes, el administrador
-                puede responder personalmente por ellas si no inició el proceso de disolución a tiempo.
-              </p>
-            </div>
+            {/* Del MISMO array que el FAQPage de metadata.ts (hallazgo 3051) */}
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <h4>{f.question}</h4>
+                <p>{f.answer}</p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -1112,7 +1113,7 @@ export default function ComparadorFormasJuridicasPage() {
                   ¿Emprendes solo o con otros? Si vas solo, la elección se reduce a autónomo vs SLU. Con más personas,
                   es fundamental decidir quién toma decisiones, en qué porcentaje participa cada socio y cómo se
                   resuelven los conflictos antes de constituir nada. Un pacto de socios firmado antes de la escritura
-                  previene el 80 % de los litigios societarios.
+                  ayuda a prevenir muchos de esos conflictos.
                 </p>
               </div>
             </div>
@@ -1122,9 +1123,11 @@ export default function ComparadorFormasJuridicasPage() {
               <div className={styles.stepContent}>
                 <h4>Estima tus beneficios anuales netos esperados</h4>
                 <p>
-                  El umbral orientativo para valorar el salto de autónomo a SL está entre <strong>40.000 y 60.000 € de beneficio neto anual</strong>.
-                  Por debajo, el ahorro fiscal de la SL no compensa sus costes fijos (gestoría, Registro Mercantil,
-                  cuentas anuales). Por encima, el IS (25 %) resulta más ventajoso que el IRPF marginal (45–47 %).
+                  No hay un umbral universal para pasar de autónomo a SL: lo que cuenta es el <strong>beneficio</strong>, no la
+                  facturación. Como referencia, el IRPF marginal es del {marginalIRPF(60_000)}{NB}% hasta 60.000 € de base y del{' '}
+                  {marginalIRPF(60_001)}{NB}% hasta {tramoIRPF(marginalIRPF(60_001)).hasta.toLocaleString('es-ES')} €; una SL de nueva creación
+                  tributa al {IS_NUEVA_CREACION} y una pequeña al {IS_MICRO_TRAMO1}/{IS_MICRO_TRAMO2}. Pero la comparación justa incluye el sueldo del
+                  administrador (que tributa en IRPF), los dividendos y los costes fijos de la SL.
                 </p>
               </div>
             </div>
@@ -1147,8 +1150,8 @@ export default function ComparadorFormasJuridicasPage() {
               <div className={styles.stepContent}>
                 <h4>Calcula los costes fijos anuales de cada opción</h4>
                 <p>
-                  El coste real de mantenimiento anual varía mucho: autónomo y CB (~500-1.500 €), asociación (~300-1.000 €),
-                  SL y cooperativa (~2.000-5.500 €). Incluye gestoría mensual, presentación de cuentas anuales, legalización
+                  El coste real de mantenimiento anual varía mucho: el de una SL o una cooperativa es claramente mayor que el
+                  de autónomo o CB, y conviene pedir presupuesto. Incluye gestoría mensual, presentación de cuentas anuales, legalización
                   de libros, seguros de responsabilidad civil y posibles minutas notariales. Asegúrate de que el ahorro fiscal
                   cubre holgadamente estos costes antes de elegir la forma más compleja.
                 </p>
@@ -1189,23 +1192,23 @@ export default function ComparadorFormasJuridicasPage() {
           <h2>Mejores Prácticas al Elegir tu Forma Jurídica</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💡</span>
+              <span className={styles.tipIcon} aria-hidden="true">💡</span>
               <div>
                 <h4>No constituyas SL solo por imagen</h4>
                 <p>
-                  Los costes fijos anuales de una SL (gestoría, Registro Mercantil, cuentas anuales) oscilan entre
-                  <strong> 5.000–7.000 €/año</strong>. Ese gasto debe quedar sobradamente cubierto por el ahorro fiscal
+                  Los costes fijos anuales de una SL (gestoría, Registro Mercantil, cuentas anuales) son claramente mayores
+                  que los del autónomo: pide presupuesto. Ese gasto debe quedar sobradamente cubierto por el ahorro fiscal
                   respecto al IRPF. Si no es así, el autónomo o la CB son más eficientes.
                 </p>
               </div>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🚀</span>
+              <span className={styles.tipIcon} aria-hidden="true">🚀</span>
               <div>
                 <h4>Empieza como autónomo si tienes dudas</h4>
                 <p>
-                  Si estás en la zona gris de 30.000–50.000 € de beneficio, empieza como autónomo. Puedes transformarlo
+                  Si no tienes claro que la SL compense con tus números, empieza como autónomo. Puedes transformarlo
                   en SL mediante aportación de rama de actividad cuando superes claramente el umbral de rentabilidad.
                   No hay prisa — el salto en cualquier momento del ejercicio tiene solución fiscal.
                 </p>
@@ -1213,11 +1216,11 @@ export default function ComparadorFormasJuridicasPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🤝</span>
+              <span className={styles.tipIcon} aria-hidden="true">🤝</span>
               <div>
                 <h4>Verifica el tipo reducido del IS en cooperativas</h4>
                 <p>
-                  No todas las cooperativas tributan al 20 %. Solo las <strong>fiscalmente protegidas</strong> (deben cumplir
+                  No todas las cooperativas tributan al {IS_COOPERATIVAS}. Solo las <strong>fiscalmente protegidas</strong> (deben cumplir
                   requisitos de la Ley 20/1990). Las <strong>especialmente protegidas</strong> (trabajo asociado, explotación
                   comunitaria de la tierra, mar y algunas de consumo) aplican además una bonificación del 50 % en la cuota.
                   Comprueba con tu gestor si tu cooperativa cumple los requisitos antes de dar por hecho el ahorro fiscal.
@@ -1226,7 +1229,7 @@ export default function ComparadorFormasJuridicasPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚠️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚠️</span>
               <div>
                 <h4>Las CB funcionan mejor con acuerdo escrito</h4>
                 <p>
@@ -1239,7 +1242,7 @@ export default function ComparadorFormasJuridicasPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <div>
                 <h4>Sociedades profesionales: Ley 2/2007</h4>
                 <p>
@@ -1252,7 +1255,7 @@ export default function ComparadorFormasJuridicasPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <div>
                 <h4>Usa el informe CIRCE antes de decidir</h4>
                 <p>
@@ -1270,13 +1273,13 @@ export default function ComparadorFormasJuridicasPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>🚨</span>
+              <span className={styles.warningIcon} aria-hidden="true">🚨</span>
               <h3>Errores Comunes que Debes Evitar</h3>
             </div>
             <ul className={styles.warningList}>
               <li>
                 <strong>Constituir SL para ahorrar impuestos sin calcular los costes fijos reales.</strong> Gestoría,
-                notaría y Registro Mercantil suman 5.000–7.000 €/año. Si el ahorro fiscal no supera esa cifra, estás
+                cuentas anuales y Registro Mercantil son un coste fijo cada año. Si el ahorro fiscal no lo supera, estás
                 pagando más, no menos.
               </li>
               <li>

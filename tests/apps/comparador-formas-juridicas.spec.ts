@@ -66,7 +66,10 @@ import { TRAMOS_IRPF_2025 } from '../../data/fiscal/irpf';
  *             = escala(25.000) 5.665,50 − escala(5.550) 1.054,50 = 4.611,00 €; tramo marginal 30 %
  *             (20.200–35.200). La app dice «aproximadamente 5.500 € de IRPF (tramo 24 %)».
  *
- * HALLAZGOS ABIERTOS (07/10/2026) — van como test.fail; quien repare, quita el .fail
+ * HALLAZGOS (07/10/2026) — se abrieron con test.fail y se REPARARON ese mismo día: quedan como
+ * regresión. Desde la reparación, el test DESCARTA las formas imposibles para el número de
+ * personas (y la asociación para quien quiere beneficios), así que con «Solo yo» el podio tiene
+ * dos puestos: Autónomo y SL. Los tipos se leen de data/fiscal (app/comparador-formas-juridicas/datos.ts).
  */
 
 const NBSP = ' ';
@@ -83,7 +86,7 @@ type Respuesta = readonly [string, string];
 const CASO_NORMAL: Respuesta[] = [
   [P_SOCIOS, 'Solo yo'],
   [P_RIESGO, 'Bajo (servicios, consultoría)'],
-  [P_INGRESOS, 'Menos de 20.000€'],
+  [P_INGRESOS, `Menos de 20.000${NBSP}€`],
   [P_INVERSION, 'No, autofinanciación'],
   [P_OBJETIVO, 'Generar beneficios'],
 ];
@@ -91,7 +94,7 @@ const CASO_NORMAL: Respuesta[] = [
 const CASO_LIMITE: Respuesta[] = [
   [P_SOCIOS, '3 o más'],
   [P_RIESGO, 'Alto (empleados, stock, local)'],
-  [P_INGRESOS, 'Más de 60.000€'],
+  [P_INGRESOS, `Más de 60.000${NBSP}€`],
   [P_INVERSION, 'Sí, busco inversión'],
   [P_OBJETIVO, 'Generar beneficios'],
 ];
@@ -99,7 +102,7 @@ const CASO_LIMITE: Respuesta[] = [
 const DOS_PERSONAS_FIN_SOCIAL: Respuesta[] = [
   [P_SOCIOS, '2 personas'],
   [P_RIESGO, 'Medio (pequeño comercio)'],
-  [P_INGRESOS, 'Menos de 20.000€'],
+  [P_INGRESOS, `Menos de 20.000${NBSP}€`],
   [P_INVERSION, 'No, autofinanciación'],
   [P_OBJETIVO, 'Fin social/sin ánimo de lucro'],
 ];
@@ -107,7 +110,7 @@ const DOS_PERSONAS_FIN_SOCIAL: Respuesta[] = [
 const DOS_PERSONAS_COOPERATIVO: Respuesta[] = [
   [P_SOCIOS, '2 personas'],
   [P_RIESGO, 'Alto (empleados, stock, local)'],
-  [P_INGRESOS, 'Menos de 20.000€'],
+  [P_INGRESOS, `Menos de 20.000${NBSP}€`],
   [P_INVERSION, 'No, autofinanciación'],
   [P_OBJETIVO, 'Proyecto cooperativo igualitario'],
 ];
@@ -222,7 +225,9 @@ test('CASO 3 · rechazo — con 4 de las 5 respuestas no hay recomendación; con
   await expect(page.getByRole('heading', { name: 'Tu recomendación' })).toHaveCount(0);
   await expect(page.locator('[class*="rankingCard"]')).toHaveCount(0);
   await responderTest(page, CASO_NORMAL.slice(4));
-  await expect(page.locator('[class*="rankingCard"]')).toHaveCount(3);
+  // Con «Solo yo» solo caben Autónomo y SL: cooperativa y asociación exigen 3 personas y la CB 2
+  await expect(page.locator('[class*="rankingCard"]')).toHaveCount(2);
+  await expect(page.getByText(/Descartadas por tus respuestas/)).toBeVisible();
   await page.getByRole('button', { name: 'Repetir test', exact: true }).click();
   await expect(page.locator('[class*="rankingCard"]')).toHaveCount(0);
   await expect(page.locator('[class*="preguntaCard"]')).toHaveCount(5);
@@ -283,60 +288,56 @@ test('CASO 7 · testigo — los tipos que enseña la tabla coinciden HOY con dat
 // HALLAZGOS ABIERTOS (07/10/2026)
 // ═══════════════════════════════════════════════════════════════════════════
 
-test.describe('hallazgos abiertos del 07/10/2026', () => {
+test.describe('hallazgos del 07/10/2026, reparados ese mismo día', () => {
   test('H1a · operativa alto — 2 personas con fin social: la 🥇 no puede ser una Asociación (mínimo 3)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el test puntúa sin filtrar por número de socios; da 🥇 Asociación (6 puntos) a 2 personas. LO 1/2002 art. 5.1 y la propia ficha («Mínimo 3») lo impiden.');
     const podio = await hacerTest(page, DOS_PERSONAS_FIN_SOCIAL);
     expect(podio[0]).not.toBe(ASOCIACION);
   });
 
   test('H1b · operativa alto — 2 personas con proyecto cooperativo: la 🥇 no puede ser una Cooperativa (mínimo 3)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: da 🥇 Cooperativa (7 puntos) a 2 personas. Ley 27/1999 art. 8 y la propia ficha («Mínimo 3 socios») lo impiden.');
     const podio = await hacerTest(page, DOS_PERSONAS_COOPERATIVO);
     expect(podio[0]).not.toBe(COOPERATIVA);
   });
 
   test('H1c · operativa alto — «Solo yo» y «Generar beneficios»: el podio no puede incluir una Asociación', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el 🥉 del caso normal es «Asociación sin Ánimo de Lucro» (1 punto, empate con CB): exige 3 personas y no puede repartir beneficios.');
     const podio = await hacerTest(page, CASO_NORMAL);
     expect(podio).not.toContain(ASOCIACION);
   });
 
   test('H2 · dato medio — page.tsx teclea los tipos del IS, del IRPF y la tarifa plana en vez de importarlos de data/fiscal', () => {
-    test.fail(true, 'ABIERTO: «19-21% micropymes», «25%», «20%» de la cooperativa, «19% - 47%» y «80€ … 12 meses» están escritos a mano; data/fiscal tiene TRAMOS_IS_MICROPYMES_2026, TIPOS_IS_2025, TRAMOS_IRPF_2025 y TARIFA_PLANA_2025.');
     const fuente = readFileSync(join(process.cwd(), 'app', 'comparador-formas-juridicas', 'page.tsx'), 'utf8');
     expect(fuente).toMatch(/from ['"]@\/data\/fiscal(\/[a-z-]+)?['"]/);
   });
 
   test('H3 · dato medio — la SL no tiene un «tipo fijo del IS (25 %)»: nueva creación 15 %, micro 19/21 %, ERD 23 % en 2026', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la ficha de la SL anuncia «Tipo fijo del IS (25%)» en Ventajas y en su propio «Tipo de gravamen» dice «escala progresiva». Art. 29.1 LIS (15 % nueva creación, TIPOS_IS_2025.nuevaCreacion) y DT 44.ª.2.b LIS (23 % en 2026 si cifra de negocios < 10 M€).');
     const ficha = await verFicha(page, 'SL / SLU');
     await expect(ficha).not.toContainText('Tipo fijo del IS');
+    // El tipo de nueva creación (art. 29.1 LIS) ya aparece, leído de data/fiscal
+    await expect(ficha).toContainText(`${TIPOS_IS_2025.nuevaCreacion}${NBSP}%`);
   });
 
   test('H4 · dato medio — el 20 % es de las cooperativas protegidas; las especialmente protegidas tienen además el 50 % de bonificación', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la celda dice «20% (especialmente protegidas)». Ley 20/1990: art. 33.2.a (20 % las protegidas) y art. 34.2 (+50 % de bonificación de la cuota las especialmente protegidas, entre ellas las de trabajo asociado, art. 7.a).');
     await seleccionarFormas(page, ['Cooperativa']);
     const coop = limpiar(await (await celda(page, 'Fiscalidad', 'Cooperativa')).textContent());
     expect(coop).not.toMatch(/20\s*%\s*\(especialmente protegidas\)/);
   });
 
   test('H5 · dato medio — escenario «Diseñadora · 25.000 €/año»: cuota 4.611 € y tramo 30 %, no «5.500 € (tramo 24 %)»', async ({ page }) => {
-    test.fail(true, 'ABIERTO: calcularCuotaIntegraGeneral(25.000, 5.550) con TRAMOS_IRPF_2025 = 4.611,00 €; 25.000 cae en el tramo 20.200–35.200, al 30 %. La app dice «aproximadamente 5.500 € de IRPF (tramo 24 %)».');
     await abrirGuia(page);
     const escenario = limpiar(await page.locator('[class*="escenarioCard"]').filter({ hasText: 'Diseñadora independiente' }).textContent());
     expect(escenario).not.toMatch(/tramo 24\s*%/);
+    // calcularCuotaIntegraGeneral(25.000, 5.550) = 4.611,00 € y tipo marginal del 30 %
+    expect(escenario).toContain('4611,00 €');
+    expect(escenario).toMatch(/marginal del 30\s%/);
   });
 
   test('H6 · dato medio — entre 40.000 y 60.000 € de beneficio el IRPF marginal es el 37 %, no el «45–47 %»', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el paso 2 dice que por encima de 40.000-60.000 € «el IS (25 %) resulta más ventajoso que el IRPF marginal (45–47 %)». TRAMOS_IRPF_2025: 37 % hasta 60.000 €, 45 % hasta 300.000 €, 47 % solo por encima.');
     await abrirGuia(page);
     const paso = limpiar(await page.locator('[class*="step"]').filter({ hasText: 'Estima tus beneficios anuales netos esperados' }).last().textContent());
     expect(paso).not.toMatch(/45\s*[–-]\s*47\s*%/);
   });
 
   test('H7 · contenido medio — un solo umbral autónomo/SL, no tres rangos distintos sin fuente', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «40.000-60.000 €» (facturación en un sitio, beneficio en otro), «30.000–50.000 €» y, en el FAQPage, «40.000-50.000 €». Cifra popular sin fuente que la app no calcula (neutralidad editorial, punto 1).');
     await abrirGuia(page);
     const textos = (await page.locator('[class*="guideSection"]').allTextContents()).join(' ');
     const faq = (await faqPage(page)).map((q) => q.acceptedAnswer.text).join(' ');
@@ -347,16 +348,17 @@ test.describe('hallazgos abiertos del 07/10/2026', () => {
   });
 
   test('H8 · contenido medio — el coste anual de mantener una SL es uno solo en toda la página', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la tabla dice «2.000–5.000 €/año», el paso 4 «~2.000-5.500 €», el escenario «~3.000 €/año» y dos bloques «5.000–7.000 €/año».');
     await abrirGuia(page);
-    const tabla = limpiar(await page.locator('[class*="comparativaTable"] tr').filter({ hasText: 'Coste anual gestión' }).locator('td').nth(2).textContent());
-    expect(tabla).toBe('2.000–5.000 €/año'); // lo que dice hoy la tabla educativa
-    const consejo = limpiar(await page.locator('[class*="tipCard"]').filter({ hasText: 'No constituyas SL solo por imagen' }).textContent());
-    expect(consejo).toContain(tabla);
+    // REPARADO: había cuatro horquillas incompatibles y ninguna fuente; ahora no se da ninguna cifra
+    // (la tabla dice el nivel orientativo y la página remite a pedir presupuesto)
+    const tabla = limpiar(await page.locator('[class*="comparativaTable"] tr').filter({ hasText: 'Coste anual de gestión' }).locator('td').nth(2).textContent());
+    expect(tabla).toBe('Medio-alto');
+    const guia = limpiar((await page.locator('[class*="guideSection"]').allTextContents()).join(' '));
+    expect(guia).not.toMatch(/\d\.\d{3}\s*[–-]\s*\d\.\d{3}\s*€\/año/);
+    expect(guia).not.toMatch(/~\s?\d\.\d{3}\s*€\/año/);
   });
 
   test('H9 · dato medio — FAQPage: el capital de 1 € lo trajo la Ley 18/2022 y la reserva del 20 % no dura «dos ejercicios»', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el FAQPage atribuye el capital de 1 € a la «Ley de Startups (Ley 28/2022)» y limita la reserva a «los dos primeros ejercicios». Art. 4.1 LSC: modificado por el art. 2.1 de la Ley 18/2022, reserva «hasta que dicha reserva junto con el capital social alcance» 3.000 €.');
     const capital = (await faqPage(page)).find((q) => q.name.includes('capital mínimo'));
     expect(capital).toBeDefined();
     expect(capital?.acceptedAnswer.text).toContain('18/2022');
@@ -364,7 +366,6 @@ test.describe('hallazgos abiertos del 07/10/2026', () => {
   });
 
   test('H10 · contenido medio — la pregunta de la cooperativa frente a la SL responde lo mismo en la FAQ visible y en el FAQPage', async ({ page }) => {
-    test.fail(true, 'ABIERTO: dos respuestas distintas a la misma pregunta: la visible da «23 % de pymes» y calla las desventajas; el FAQPage da «especialmente protegidas al 10 %» y los fondos obligatorios. Reparación: UNA constante en metadata.ts que importen las dos.');
     await abrirGuia(page);
     const visible = limpiar(
       await page
@@ -380,40 +381,33 @@ test.describe('hallazgos abiertos del 07/10/2026', () => {
   });
 
   test('H11 · contenido medio — datos normativos con caducidad sin <DataReference>', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la app enseña la escala de micropymes de 2026 (cambia en 2027), la escala del IRPF y la tarifa plana, y no monta DataReference tras el DisclaimerCard.');
     await expect(page.getByRole('note', { name: 'Datos de referencia normativos' })).toHaveCount(1);
   });
 
   test('H12 · dato bajo — el administrador de una SL va al RETA solo con control efectivo y a título lucrativo', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «Administrador en RETA obligatorio». Art. 305.2.b LGSS y AUTONOMO_SOCIETARIO_2025.nota: solo si cobra y tiene el control efectivo.');
     const cotizacion = await celda(page, 'Cotización SS', 'SL / SLU');
     await expect(cotizacion).toContainText(/control/i);
   });
 
   test('H13 · dato bajo — la cooperativa no es «sin ánimo de lucro» ni la ley estatal le fija 3.000 € de capital', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la ficha la describe «democrática y sin ánimo de lucro» y le pone «3000,00 €» de capital mínimo. Ley 27/1999: art. 1.1 (actividades económicas con participación económica de los socios; sin ánimo de lucro solo las calificadas por la DA 1.ª) y art. 45.2 (el mínimo lo fijan los estatutos).');
     const ficha = await verFicha(page, 'Cooperativa');
     await expect(ficha.locator('[class*="fichaHeader"] p')).not.toContainText('sin ánimo de lucro');
   });
 
   test('H14 · accesibilidad bajo — los botones «Ver ficha completa» de cada columna no dicen de qué forma son', async ({ page }) => {
-    test.fail(true, 'ABIERTO: todos se llaman «Ver ficha completa»; además los iconos de cabecera, resumen, ficha, escenarios, consejos y errores no llevan aria-hidden y se leen como texto.');
     await expect(page.getByRole('button', { name: 'Ver ficha completa', exact: true })).toHaveCount(0);
   });
 
   test('H15 · contenido bajo — el % y el € van separados de la cifra con espacio duro', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «IRPF (19% - 47%)», «25% (19-21% …<1M€ …)», «80€», «Menos de 20.000€»… (CLAUDE.md global §2).');
     await expect(await celda(page, 'Fiscalidad', 'Autónomo')).toContainText(`19${NBSP}%`);
   });
 
   test('H16 · contenido bajo — «previene el 80 % de los litigios societarios», cifra sin fuente', async ({ page }) => {
-    test.fail(true, 'ABIERTO: cifra redonda sin fuente en el paso 1 de la guía (neutralidad editorial, punto 1).');
     await abrirGuia(page);
     await expect(page.locator('[class*="stepGuide"]')).not.toContainText('80 % de los litigios');
   });
 
   test('H17 · contenido bajo — el JSON-LD WebApplication sale con featureList vacío', async ({ page }) => {
-    test.fail(true, 'ABIERTO: metadata.ts pasa `features: []`; la plantilla pide 4-8 características reales (CLAUDE.md 1.ter).');
     const app = (await jsonLd(page)).find((j) => j['@type'] === 'WebApplication');
     expect(((app?.featureList as unknown[]) ?? []).length).toBeGreaterThanOrEqual(4);
   });
@@ -447,6 +441,6 @@ test.describe('en móvil (390 px)', () => {
     const caja = await primero.boundingBox();
     expect(caja).not.toBeNull();
     expect((caja?.x ?? 0) + (caja?.width ?? 0)).toBeLessThanOrEqual(390);
-    await expect(primero.getByRole('button', { name: 'Ver ficha completa →' })).toBeVisible();
+    await expect(primero.getByRole('button', { name: 'Ver ficha completa', exact: true })).toBeVisible(); // la flecha va con aria-hidden
   });
 });

@@ -1295,3 +1295,19 @@
     margin-top: var(--spacing-sm);
   }
 }
+
+/* Test rápido: empate dicho y formas descartadas con su motivo (hallazgo 3042) */
+.empate {
+  margin: 0.4rem 0;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.descartadas {
+  margin: var(--spacing-md) 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 3px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
