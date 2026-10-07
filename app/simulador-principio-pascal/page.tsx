@@ -32,6 +32,7 @@ import {
 } from './motor';
 // Las mismas densidades que el simulador de flotabilidad: un solo sitio para las cifras
 import { LIQUIDOS, type Sustancia } from '../simulador-flotabilidad/materiales';
+import CasosAula from './CasosAula';
 
 // ─── Constantes de la vista ──────────────────────────────────────────────────
 
@@ -810,6 +811,10 @@ export default function SimuladorPrincipioPascalPage() {
             </div>
           </div>
         </section>
+
+        {/* Tarea de aula (skill /casos-aula-meskeia): tras los controles y FUERA de
+            EducationalSection, que nace colapsada. */}
+        <CasosAula />
 
         {/* ── Sección educativa v2.0 ──────────────────────────────────────── */}
         <EducationalSection

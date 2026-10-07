@@ -1,5 +1,14 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import {
+  CASOS,
+  TOTAL_CASOS,
+  comprobarRespuesta,
+  generarEjercicioAleatorio,
+  resolverCaso,
+} from '../../app/simulador-principio-pascal/casos';
+import { G, P_ATM } from '../../app/simulador-principio-pascal/motor';
+import { LIQUIDOS } from '../../app/simulador-flotabilidad/materiales';
 
 /**
  * Simulador del Principio de Pascal y la Presión Hidrostática — PASO 4.bis de /nueva-app-meskeia
@@ -152,5 +161,260 @@ test.describe('Simulador del Principio de Pascal', () => {
   test('8 · RelatedApps pinta 4 tarjetas', async ({ page }) => {
     const relacionadas = page.locator('section[aria-label="Aplicaciones relacionadas"]');
     await expect(relacionadas.locator('a')).toHaveCount(4);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * CASOS PARA CLASE (skill /casos-aula-meskeia, 07/10/2026) — `casos.ts` sin navegador
+ *
+ * Cada clave, resuelta a mano desde la definición ANTES de leer lo que devuelve la app
+ * (g = 9,81 m/s², P₀ = 101.325 Pa, densidades de simulador-flotabilidad/materiales.ts):
+ *    1 · ρgh = 1000·9,81·3 = 29.430 Pa                       · g = 10: 30.000 · + P₀: 130.755
+ *    2 · 101.325 + 1025·9,81·20 = 302.430 Pa                 · sin P₀: 201.105 · agua dulce: 297.525
+ *    3 · (101.325 + 1025·9,81·30)/101.325 = 3,9771 → 3,98    · regla de los 10 m: 4,00 · sin P₀: 2,98
+ *    4 · 13.534·9,81·0,76 = 100.904,09 → 100.904 Pa          · con 13.600: 101.396
+ *    5 · (150.000 − 101.325)/9810 = 4,9618 → 4,96 m          · sin restar P₀: 15,29
+ *    6 · 200·(30/5)² = 7200 N                                · cociente de diámetros: 1200
+ *    7 · 1200·9,81·10/400 = 294,3 N                          · sin g: 30 · g = 10: 300
+ *    8 · 20·10/400 = 0,5 cm                                  · ×40: 800
+ *    9 · 1025·9,81·50·0,25 = 125.690,6 → 125.691 N           · con la absoluta: 151.022
+ *   10 · 15 − 920·15/1000 = 15 − 13,8 = 1,2 cm               · h_agua: 13,8
+ *   11 · 1000·16/20 = 800 kg/m³                              · al revés: 1250 · con el desnivel: 200
+ *   12 · 1000·27,2/13.534 = 2,0098 → 2,01 cm                 · con 13.600: 2,00
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+const A_MANO_AULA: Record<number, number> = {
+  1: 29430,
+  2: 302430,
+  3: 3.98,
+  4: 100904,
+  5: 4.96,
+  6: 7200,
+  7: 294.3,
+  8: 0.5,
+  9: 125691,
+  10: 1.2,
+  11: 800,
+  12: 2.01,
+};
+
+const redondeoAula = (v: number, d: number) => Math.round(v * 10 ** d) / 10 ** d;
+
+function casoAula(id: number) {
+  const caso = CASOS.find((c) => c.id === id);
+  if (!caso) throw new Error(`No existe el caso ${id}`);
+  return caso;
+}
+
+/** Cuántos decimales lleva el número que se ENSEÑA en la solución («3,98 atm» → 2). */
+function decimalesMostradosAula(texto: string): number {
+  const m = texto.match(/[-−]?\d[\d.]*(?:,(\d+))?/);
+  return m?.[1]?.length ?? 0;
+}
+
+test.describe('simulador-principio-pascal · casos para clase', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', async () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', async () => {
+    for (const caso of CASOS) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde `datos`', async () => {
+    for (const caso of CASOS) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(redondeoAula(r.valor, caso.datos.decimales ?? 2), `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta finita y desarrollo', async () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta), `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+    }
+    expect(new Set(CASOS.map((c) => c.categoria))).toEqual(new Set(['abstracto', 'aplicado']));
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', async () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Ecuador|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos (mexicanos|colombianos|chilenos|argentinos)|Bachillerato|selectividad)\b/i;
+    // La sigla va aparte y con mayúsculas: con /i, el pronombre «eso» la disparaba en falso.
+    const SIGLA_ESO = /\bESO\b/;
+    for (const caso of CASOS) {
+      const texto = `${caso.titulo} ${caso.enunciado}`;
+      expect(PROHIBIDO.test(texto) || SIGLA_ESO.test(texto), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · lo que el enunciado PIDE coincide con lo que la solución MUESTRA', async () => {
+    for (const caso of CASOS) {
+      const decimales = caso.datos.decimales ?? 2;
+      expect(decimalesMostradosAula(caso.respuestaTexto), `caso ${caso.id}`).toBeLessThanOrEqual(decimales);
+      const ultimo = caso.pasos[caso.pasos.length - 1];
+      expect(ultimo, `caso ${caso.id}: el último paso enseña la cifra de la casilla`).toContain(caso.respuestaTexto);
+      const exacto = Math.abs(resolverCaso(caso.datos).valor - caso.respuesta) < 1e-9 * Math.max(1, caso.respuesta);
+      expect(caso.requiereRedondeo, `caso ${caso.id}`).toBe(!exacto);
+      if (!exacto) {
+        expect(caso.enunciado, `caso ${caso.id}: se redondea y el enunciado no lo pide`).toMatch(/redonde|decimal|unidades|décima/i);
+      }
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', async () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(muestras.map((m) => m.datos.magnitud)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.respuesta)).toBe(true);
+      expect(redondeoAula(resolverCaso(m.datos).valor, m.datos.decimales ?? 2)).toBe(m.respuesta);
+    }
+  });
+
+  test('7 · el convenio queda fijado: claves a mano, g y P₀ declaradas donde cuentan', async () => {
+    // (a) Las doce respuestas, contra la tabla resuelta a mano de la cabecera de este bloque.
+    for (const caso of CASOS) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO_AULA[caso.id]);
+    }
+
+    // (b) La g se prueba EJECUTANDO con otra g: el enunciado dice «g = 9,81» si y solo si con
+    // g = 10 la respuesta sale de la tolerancia.
+    for (const caso of CASOS) {
+      const con10 = resolverCaso(caso.datos, 10);
+      expect(con10.ok, `caso ${caso.id}`).toBe(true);
+      const depende = !comprobarRespuesta(con10.valor, caso.respuesta, caso.datos).correcto;
+      expect(/g = 9,81/.test(caso.enunciado), `caso ${caso.id}: ¿depende de g? ${depende}`).toBe(depende);
+    }
+
+    // (c) La atmósfera igual, con una P₀ absurda (el doble) para detectar si se USA, porque con
+    // la de libro (101.300) el redondeo puede esconderla: «P₀ = 101.325 Pa» si y solo si se usa.
+    for (const caso of CASOS) {
+      const otra = resolverCaso(caso.datos, G, 2 * P_ATM);
+      const usa = !otra.ok || Math.abs(otra.valor - resolverCaso(caso.datos).valor) > 1e-9;
+      expect(/P₀ = 101\.325 Pa/.test(caso.enunciado), `caso ${caso.id}: ¿usa P₀? ${usa}`).toBe(usa);
+    }
+
+    // (d) Un caso que nombra un líquido escribe la densidad de la MISMA lista que los botones.
+    const fmt = (n: number) => new Intl.NumberFormat('es-ES').format(n);
+    for (const caso of CASOS) {
+      for (const id of [caso.datos.liquido, caso.datos.fondo, caso.datos.anadido]) {
+        if (!id) continue;
+        const liquido = LIQUIDOS.find((l) => l.id === id);
+        expect(liquido, `caso ${caso.id}: líquido ${id}`).toBeDefined();
+        expect(caso.enunciado, `caso ${caso.id}`).toContain(`${fmt(liquido!.densidad)} kg/m³`);
+      }
+    }
+  });
+
+  test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
+    const r = comprobarRespuesta(NaN, 3.98, casoAula(3).datos);
+    expect(r.correcto).toBe(false);
+    expect(r.motivo).not.toMatch(/NaN/);
+    // 3,9771 → 3,98: media centésima de margen, por los dos lados.
+    expect(r.tolerancia).toBeCloseTo(0.005, 12);
+    expect(comprobarRespuesta(3.98 + r.tolerancia, 3.98, casoAula(3).datos).correcto).toBe(true);
+    expect(comprobarRespuesta(3.98 - r.tolerancia, 3.98, casoAula(3).datos).correcto).toBe(true);
+    // 302.430 Pa exactos: no hay redondeo que tolerar.
+    expect(comprobarRespuesta(302430, 302430, casoAula(2).datos).tolerancia).toBe(0);
+  });
+
+  test('9 · el corrector separa el redondeo del error de concepto', async () => {
+    // [caso, respuesta, ¿entra?, de dónde sale]. Cada cifra, a mano (cabecera del bloque).
+    const tabla: ReadonlyArray<readonly [number, number, boolean, string]> = [
+      [1, 29430, true, 'la clave'],
+      [1, 30000, false, 'g = 10'],
+      [1, 130755, false, 'sumar la atmósfera'],
+      [2, 302430, true, 'la clave'],
+      [2, 201105, false, 'sin la atmósfera'],
+      [2, 297525, false, 'agua dulce'],
+      [2, 302405, false, 'P₀ de libro, 101.300'],
+      [3, 3.98, true, 'la clave'],
+      [3, 3.9771, true, 'sin redondear'],
+      [3, 4, false, 'la regla de una atmósfera cada 10 m'],
+      [3, 2.98, false, 'sin la atmósfera'],
+      [4, 100904, true, 'la clave'],
+      [4, 100904.09, true, 'sin redondear'],
+      [4, 101396, false, 'densidad de libro, 13.600'],
+      [5, 4.96, true, 'la clave'],
+      [5, 15.29, false, 'sin restar la atmósfera'],
+      [6, 7200, true, 'la clave'],
+      [6, 1200, false, 'cociente de diámetros'],
+      [7, 294.3, true, 'la clave'],
+      [7, 30, false, 'la masa sin g'],
+      [7, 300, false, 'g = 10'],
+      [8, 0.5, true, 'la clave'],
+      [8, 800, false, 'multiplicar por la ventaja'],
+      [9, 125691, true, 'la clave'],
+      [9, 125690.6, true, 'sin redondear'],
+      [9, 151022, false, 'con la presión absoluta'],
+      [9, 502763, false, 'olvidar el área'],
+      [10, 1.2, true, 'la clave'],
+      [10, 13.8, false, 'la altura del agua'],
+      [11, 800, true, 'la clave'],
+      [11, 1250, false, 'al revés'],
+      [11, 200, false, 'con el desnivel'],
+      [12, 2.01, true, 'la clave'],
+      [12, 2.0098, true, 'sin redondear'],
+      [12, 2, false, 'densidad de libro, 13.600'],
+    ];
+    const mal: string[] = [];
+    for (const [id, r, entra, porque] of tabla) {
+      const caso = casoAula(id);
+      const v = comprobarRespuesta(r, caso.respuesta, caso.datos).correcto;
+      if (v !== entra) mal.push(`caso ${id}: ${r} (${porque}) ${entra ? 'no entra' : 'entra'}`);
+    }
+    expect(mal).toEqual([]);
+  });
+});
+
+/** Teclea una respuesta en el caso `id` y devuelve si el corrector la dio por buena. */
+async function corregirAula(page: Page, id: number, respuesta: string): Promise<boolean> {
+  await page.locator('#casos-aula').getByRole('button', { name: new RegExp(`^Caso ${id}:`) }).click();
+  await expect(page.locator('#casos-titulo-caso')).toHaveText(new RegExp(`^Caso ${id} ·`));
+  await page.locator('#casos-respuesta').fill(respuesta);
+  await page.locator('#casos-comprobar').click();
+  // Por su id y no por getByRole('alert'), que casa también con el anunciador de rutas de Next.
+  const veredicto = page.locator('#casos-veredicto');
+  await expect(veredicto).toBeVisible();
+  return (await veredicto.innerText()).includes('¡Correcto!');
+}
+
+test.describe('simulador-principio-pascal · la sección de casos en el navegador', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/simulador-principio-pascal/');
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test('el caso 2 se corrige con el punto de millar español: «302.430»', async ({ page }) => {
+    expect(await corregirAula(page, 2, '302.430')).toBe(true);
+  });
+
+  test('el caso 3 acepta la coma decimal y rechaza la regla de los 10 metros', async ({ page }) => {
+    expect(await corregirAula(page, 3, '3,98')).toBe(true);
+    expect(await corregirAula(page, 3, '4')).toBe(false);
+  });
+
+  test('el cociente de diámetros en el caso 6 se rechaza y la solución enseña 7200 N', async ({ page }) => {
+    expect(await corregirAula(page, 6, '1200')).toBe(false);
+    const solucion = page.locator('#casos-aula').getByRole('button', { name: /Ver solución/ });
+    await expect(solucion).toHaveAttribute('aria-expanded', 'false');
+    await solucion.click();
+    await expect(page.locator('#casos-resultado')).toContainText('7200 N');
   });
 });
