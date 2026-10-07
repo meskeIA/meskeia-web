@@ -1,0 +1,711 @@
+/* ============================================================
+   SimuladorModeloBohr.module.css — paleta meskeIA
+   Base común con simulador-flotabilidad y simulador-principio-pascal. Los tokens (--primary, --bg-card, --text-*) vienen
+   de app/globals.css y ya cambian solos con el tema; aquí solo se redeclaran en oscuro los
+   colores literales.
+   ============================================================ */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.hero {
+  background: var(--hero-bg);
+  color: #fff;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: clamp(1.5rem, 4vw, 2.3rem);
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.92;
+  margin: 0 auto;
+  max-width: 720px;
+}
+
+/* ── Main ─────────────────────────────────────────────────── */
+.main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ── Panel de datos ───────────────────────────────────────── */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-light);
+}
+
+.panelTitulo {
+  font-size: 1.15rem;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.grupo {
+  margin-bottom: 1.25rem;
+}
+
+.grupoTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.6rem;
+  color: var(--text-primary);
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.preset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.8rem;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.preset:hover {
+  border-color: var(--primary);
+}
+
+.preset:focus-visible,
+.nivelBoton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Seleccionado: texto blanco sobre --primary-boton (5,47:1), no sobre --primary (4,11:1) */
+.preset[aria-pressed='true'] {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #fff;
+}
+
+
+
+
+
+
+
+
+
+
+
+.nota {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Dibujo + resultados ──────────────────────────────────── */
+.simLayout {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  align-items: start;
+}
+
+.dibujoCaja,
+.resultadosCaja {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: var(--shadow-light);
+  min-width: 0;
+}
+
+.dibujo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.svgRecipiente {
+  stroke: var(--text-secondary);
+}
+
+/* Rótulos con halo del color de la tarjeta: se leen encima del líquido */
+.svgEtiqueta,
+.svgRotulo,
+.svgRotuloSecundario {
+  paint-order: stroke;
+  stroke: var(--bg-card);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.svgEtiqueta {
+  fill: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+
+
+.svgRotulo {
+  fill: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.svgRotuloSecundario {
+  fill: var(--text-muted);
+  font-size: 12px;
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0;
+  justify-content: center;
+}
+
+.resultados {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.tarjetas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.tarjeta {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: var(--bg-primary);
+}
+
+.tarjetaNombre {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.tarjetaValor {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.aclaracion {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.faltan {
+  border: 1.5px dashed var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  color: var(--text-primary);
+}
+
+.faltan p {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.formulaBox {
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.formulaLinea {
+  margin: 0 0 0.4rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.formulaLinea:last-child {
+  margin-bottom: 0;
+}
+
+.formulaBox code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: var(--primary-texto);
+  font-weight: 700;
+}
+
+/* ── Educativo ────────────────────────────────────────────── */
+.eduIntro {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1rem;
+}
+
+.eduSubtitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.75rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  padding-bottom: 0.35rem;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.tabla th {
+  background: var(--primary-boton);
+  color: #fff;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tabla td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.tabla tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--primary) 5%, var(--bg-card));
+}
+
+.fuente {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 1.25rem;
+}
+
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.scenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--secondary);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.scenarioIcon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.scenarioCard h4 {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+}
+
+.scenarioCard p {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqItem p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.35rem;
+  line-height: 1.55;
+}
+
+.faqTip {
+  font-size: 0.84rem;
+  color: var(--secondary-texto);
+  font-weight: 500;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.step {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  background: var(--primary-boton);
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.stepContent p {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tipCard strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.tipCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Warning box (errores típicos) ────────────────────────── */
+.warningBox {
+  background: #fff8f0;
+  border: 1.5px solid #f5a623;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #8f4c00;
+  margin-bottom: 0.6rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.warningList li {
+  font-size: 0.86rem;
+  color: #78400a;
+  line-height: 1.5;
+}
+
+
+/* ── Propias de este simulador ────────────────────────────── */
+.dosGrupos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 1.5rem;
+}
+
+.niveles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.nivelBoton {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.nivelBoton:hover {
+  border-color: var(--primary);
+}
+
+/* Seleccionado: texto blanco sobre --primary-boton (5,47:1), no sobre --primary (4,11:1) */
+.nivelBoton[aria-pressed='true'] {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #fff;
+}
+
+.svgEje {
+  stroke: var(--text-secondary);
+}
+
+.svgNivel {
+  stroke: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.svgNivelMarcado {
+  stroke: var(--text-primary);
+}
+
+/* Halo del color de la tarjeta bajo la flecha: una línea amarilla o violeta se lee en los dos temas */
+.svgHalo {
+  stroke: var(--text-primary);
+  fill: var(--text-primary);
+  opacity: 0.55;
+}
+
+.svgFoton {
+  stroke-linecap: round;
+}
+
+.svgMarcador {
+  fill: var(--text-primary);
+}
+
+.muestraLinea {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  margin-right: 0.45rem;
+  vertical-align: -1px;
+  flex-shrink: 0;
+}
+
+.celdaColor {
+  display: inline-flex;
+  align-items: center;
+}
+
+.tabla tr.filaActual td {
+  background: color-mix(in srgb, var(--primary) 16%, var(--bg-card));
+  font-weight: 700;
+}
+
+.destacado {
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: #E3F0F7;
+  border: 1.5px solid #7FB3D3;
+  color: #1a5278;
+}
+
+.destacadoNombre {
+  font-size: 0.85rem;
+}
+
+.destacadoValor {
+  font-size: 1.45rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: center;
+}
+
+.destacadoSub {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ── Dark mode ────────────────────────────────────────────── */
+[data-theme='dark'] .muestraLinea {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme='dark'] .destacado {
+  background: #1e3346;
+  border-color: #3FA5D1;
+  color: #8fd0ec;
+}
+
+[data-theme='dark'] .formulaBox {
+  background: color-mix(in srgb, var(--primary) 12%, #1e2937);
+}
+
+/* Sobre el tinte de marca, el --primary-texto oscuro se queda corto: mismo ajuste que flotabilidad */
+[data-theme='dark'] .formulaBox code {
+  color: #8fd0ec;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a1a00;
+  border-color: #8b5e00;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #f5a623;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #d4a050;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .main {
+    padding: 1.5rem 1rem;
+  }
+
+  .panel {
+    padding: 1.1rem;
+  }
+
+  .simLayout,
+  .dosGrupos {
+    grid-template-columns: 1fr;
+  }
+
+  .tipsGrid,
+  .scenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .tarjetas {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* La barra fija de MeskeiaLogo tapa el principio del título hasta 1023px (mismo hueco que la plantilla) */
+@media (max-width: 1023px) {
+  .hero {
+    padding-top: 80px;
+  }
+}
+
+/* 100px arriba entre 769 y 1439px: por encima de 768px el logo crece y su barra baja hasta ~77px
+   (medido en simulador-flotabilidad). */
+@media (min-width: 769px) and (max-width: 1439px) {
+  .hero {
+    padding-top: 100px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preset,
+  .nivelBoton {
+    transition: none;
+  }
+}

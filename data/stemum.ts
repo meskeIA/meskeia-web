@@ -474,6 +474,13 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'fisica',
   },
   {
+    slug: 'simulador-principio-pascal',
+    icon: '🛢️',
+    titulo: 'Principio de Pascal y presión hidrostática',
+    desc: 'Presión a una profundidad en seis líquidos, prensa hidráulica con la fuerza y el recorrido de cada émbolo, y tubo en U con dos líquidos.',
+    disciplina: 'fisica',
+  },
+  {
     slug: 'calculadora-movimiento',
     icon: '🚀',
     titulo: 'MRU y MRUA (MRUV)',
@@ -844,6 +851,13 @@ export const STEMUM_APPS: StemumApp[] = [
     icon: '⚛️',
     titulo: 'Configuración electrónica',
     desc: 'Llenado de orbitales de cualquier elemento o ion: diagrama de Möller, cajas con la regla de Hund, números cuánticos y las 20 excepciones reales.',
+    disciplina: 'quimica',
+  },
+  {
+    slug: 'simulador-modelo-bohr',
+    icon: '⚛️',
+    titulo: 'Modelo atómico de Bohr',
+    desc: 'Saltos del electrón entre los niveles del hidrógeno: energía, longitud de onda y color del fotón, series de Lyman, Balmer y Paschen.',
     disciplina: 'quimica',
   },
   {

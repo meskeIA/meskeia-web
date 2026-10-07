@@ -28,6 +28,7 @@ import {
   regionEspectro,
   type RegionEspectro,
 } from './motor';
+import { COLOR_UV, COLOR_IR, colorDeLambda, nombreDeLambda } from './color';
 import CasosAula from './CasosAula';
 
 // ─── Formato ─────────────────────────────────────────────────────────────────
@@ -63,62 +64,6 @@ function formatCientifico(valor: number, decimales = 3): string {
   }
   const mantisa = valor / Math.pow(10, exponente);
   return `${formatNumber(mantisa, decimales)} × 10${aSuperindice(exponente)}`;
-}
-
-// ─── Color de la luz ─────────────────────────────────────────────────────────
-
-/** Fuera del visible no hay color: se pinta un tono apagado y se rotula la región. */
-const COLOR_UV = '#a99bd1';
-const COLOR_IR = '#8c3b3b';
-
-/**
- * Color aproximado de una longitud de onda visible (algoritmo de Dan Bruton, 1996), con la
- * caída de brillo en los extremos donde el ojo apenas ve. Es una aproximación para pintar:
- * una pantalla RGB no reproduce los colores espectrales puros.
- */
-function colorDeLambda(lambdaNm: number): string {
-  if (lambdaNm < VISIBLE_MIN_NM) return COLOR_UV;
-  if (lambdaNm > VISIBLE_MAX_NM) return COLOR_IR;
-  let r = 0;
-  let g = 0;
-  let b = 0;
-  const w = lambdaNm;
-  if (w < 440) {
-    r = -(w - 440) / (440 - 380);
-    b = 1;
-  } else if (w < 490) {
-    g = (w - 440) / (490 - 440);
-    b = 1;
-  } else if (w < 510) {
-    g = 1;
-    b = -(w - 510) / (510 - 490);
-  } else if (w < 580) {
-    r = (w - 510) / (580 - 510);
-    g = 1;
-  } else if (w < 645) {
-    r = 1;
-    g = -(w - 645) / (645 - 580);
-  } else {
-    r = 1;
-  }
-  let brillo = 1;
-  if (w < 420) brillo = 0.3 + (0.7 * (w - 380)) / (420 - 380);
-  else if (w > 700) brillo = 0.3 + (0.7 * (750 - w)) / (750 - 700);
-  const canal = (x: number) => Math.round(255 * Math.pow(x * brillo, 0.8));
-  return `rgb(${canal(r)}, ${canal(g)}, ${canal(b)})`;
-}
-
-/** Nombre del color para el visible; fuera, el de la región. */
-function nombreDeLambda(lambdaNm: number): string {
-  const region = regionEspectro(lambdaNm);
-  if (region === 'ultravioleta') return 'ultravioleta (invisible)';
-  if (region === 'infrarrojo') return 'infrarrojo (invisible)';
-  if (lambdaNm < 450) return 'violeta';
-  if (lambdaNm < 495) return 'azul';
-  if (lambdaNm < 570) return 'verde';
-  if (lambdaNm < 590) return 'amarillo';
-  if (lambdaNm < 620) return 'naranja';
-  return 'rojo';
 }
 
 const NOMBRE_REGION: Record<RegionEspectro, string> = {

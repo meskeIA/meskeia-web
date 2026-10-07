@@ -423,6 +423,8 @@ export const implementedAppsUrls = [
   "/simulador-flotabilidad/",       // Arquímedes y densidad: flota/se hunde, empuje, fracción sumergida, peso aparente (S0182, 06/10/2026)
   "/simulador-condensadores/",      // Placas paralelas C=ε0·εr·A/d, dieléctrico conectado/desconectado, carga y descarga RC
   "/simulador-efecto-fotoelectrico/", // Einstein: E=hf, f0, λ0, Ec máx, potencial de frenado; la intensidad no cambia la energía
+  "/simulador-principio-pascal/",   // P = P0 + ρgh en 6 líquidos, prensa hidráulica F2 = F1·A2/A1 con recorrido y trabajo, tubo en U con dos líquidos (S0183, 07/10/2026)
+  "/simulador-modelo-bohr/",        // Niveles del hidrógeno, saltos de emisión/absorción con Rydberg (R_H con masa reducida), series y color (S0184, 07/10/2026)
   "/simulador-campo-electrico/",    // Cargas puntuales interactivas: líneas de campo, equipotenciales, mapa color |E|, carga prueba con F y U
   "/simulador-ondas-interferencia/", // Onda viajera 1D, interferencia 2D 2 fuentes, ondas estacionarias en cuerda y tubo (5 modos armónicos)
 

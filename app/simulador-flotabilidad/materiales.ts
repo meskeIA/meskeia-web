@@ -4,9 +4,10 @@
  * Densidades típicas a temperatura ambiente; la tabla del bloque educativo da la fuente y el
  * margen de variación de cada una. El color es solo el del dibujo.
  *
- * Viven aquí, y no en `page.tsx`, porque las leen DOS consumidores: los botones del simulador
- * y los «Casos para clase» (`casos.ts`). Un caso que nombra el hielo o el agua de mar saca su
- * densidad de esta lista por id, así que el enunciado no puede decir una cifra y el botón otra.
+ * Viven aquí, y no en `page.tsx`, porque las leen TRES consumidores: los botones del simulador,
+ * los «Casos para clase» (`casos.ts`) y los líquidos de `simulador-principio-pascal`. Un caso que
+ * nombra el hielo o el agua de mar saca su densidad de esta lista por id, así que el enunciado no
+ * puede decir una cifra y el botón otra, ni una app dar al mercurio una densidad y la otra otra.
  */
 
 export interface Sustancia {

@@ -1435,7 +1435,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-estructura-atomo': [
     { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tabla Periódica', description: 'Tendencias y propiedades' },
     { url: '/visualizador-enlaces-quimicos/', icon: '⚛️', name: 'Enlaces Químicos', description: 'Cómo se unen los átomos' },
-    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Tipos y balanceo' },
+    { url: '/simulador-modelo-bohr/', icon: '⚛️', name: 'Modelo Atómico de Bohr', description: 'Saltos del electrón entre niveles y el espectro del hidrógeno' },
     { url: '/calculadora-configuracion-electronica/', icon: '⚛️', name: 'Configuración Electrónica', description: 'En qué orbital entra cada electrón, con las reglas de Aufbau, Hund y Pauli' },
   ],
   'visualizador-cartografia-proyecciones': [
@@ -3122,7 +3122,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-configuracion-electronica': [
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Interactiva', description: 'Los 118 elementos con sus propiedades, uno a uno' },
     { url: '/simulador-tabla-periodica-tendencias/', icon: '⚗️', name: 'Tendencias Periódicas', description: 'Por qué el radio y la electronegatividad se repiten: es esta configuración' },
-    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Los electrones de valencia que acabas de contar, aplicados a la formulación' },
+    { url: '/simulador-modelo-bohr/', icon: '⚛️', name: 'Modelo Atómico de Bohr', description: 'Los niveles de energía del hidrógeno y el espectro que producen' },
     { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Dónde están esos orbitales y qué forma tienen' },
   ],
   'tabla-periodica': [
@@ -6240,7 +6240,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'simulador-flotabilidad': [
     { url: '/simulador-fluidos-bernoulli/', icon: '🚰', name: 'Fluidos y Bernoulli', description: 'El mismo líquido, ahora en movimiento: presión y velocidad' },
-    { url: '/visualizador-mecanica-fluidos/', icon: '🌊', name: 'Mecánica de Fluidos', description: 'Presión hidrostática, Pascal y viscosidad' },
+    { url: '/simulador-principio-pascal/', icon: '🛢️', name: 'Principio de Pascal', description: 'La presión que crece con la profundidad y la prensa hidráulica' },
     { url: '/simulador-mas-resorte/', icon: '🌀', name: 'Masa-Resorte y Ley de Hooke', description: 'El dinamómetro que mide el peso aparente es un resorte' },
     { url: '/simulador-gas-ideal/', icon: '🎈', name: 'Gas Ideal', description: 'Densidad de un gas: por qué sube un globo' },
   ],
@@ -6253,13 +6253,25 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-efecto-fotoelectrico': [
     { url: '/visualizador-espectro-electromagnetico/', icon: '🌈', name: 'Espectro Electromagnético', description: 'Dónde cae cada longitud de onda y la energía de su fotón' },
     { url: '/visualizador-mecanica-cuantica/', icon: '⚛️', name: 'Mecánica Cuántica', description: 'La física que abrió la explicación de Einstein' },
-    { url: '/visualizador-estructura-atomo/', icon: '🔬', name: 'Estructura del Átomo', description: 'De dónde salen los electrones que arranca la luz' },
+    { url: '/simulador-modelo-bohr/', icon: '⚛️', name: 'Modelo Atómico de Bohr', description: 'Los niveles de energía de los que la luz arranca el electrón' },
     { url: '/simulador-ondas-interferencia/', icon: '🌊', name: 'Ondas e Interferencia', description: 'La luz como onda: la otra mitad de la dualidad' },
+  ],
+  'simulador-principio-pascal': [
+    { url: '/simulador-flotabilidad/', icon: '🚢', name: 'Flotabilidad y Arquímedes', description: 'La diferencia de presión entre arriba y abajo es el empuje' },
+    { url: '/simulador-fluidos-bernoulli/', icon: '🚰', name: 'Fluidos y Bernoulli', description: 'El mismo líquido, ahora en movimiento: el término ρgh sigue ahí' },
+    { url: '/visualizador-maquinas-simples/', icon: '⚙️', name: 'Máquinas Simples', description: 'Palanca y prensa: más fuerza a cambio de más recorrido' },
+    { url: '/simulador-gas-ideal/', icon: '🎈', name: 'Gas Ideal', description: 'La presión de un gas, que a diferencia del líquido se comprime' },
+  ],
+  'simulador-modelo-bohr': [
+    { url: '/calculadora-configuracion-electronica/', icon: '⚛️', name: 'Configuración Electrónica', description: 'Los niveles de Bohr se convierten en orbitales: dónde va cada electrón' },
+    { url: '/simulador-efecto-fotoelectrico/', icon: '💡', name: 'Efecto Fotoeléctrico', description: 'El mismo fotón E = h·f, ahora arrancando electrones de un metal' },
+    { url: '/visualizador-espectro-electromagnetico/', icon: '🌈', name: 'Espectro Electromagnético', description: 'Dónde caen las series de Lyman, Balmer y Paschen' },
+    { url: '/visualizador-estructura-atomo/', icon: '🔬', name: 'Estructura del Átomo', description: 'Partículas, orbitales e isótopos del átomo' },
   ],
   'simulador-fluidos-bernoulli': [
     { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'Bernoulli es conservación de energía en fluidos' },
     { url: '/simulador-flotabilidad/', icon: '🚢', name: 'Flotabilidad y Arquímedes', description: 'El fluido en reposo: empuje, densidad y por qué flota un barco' },
-    { url: '/visualizador-corazon-ciclo-cardiaco/', icon: '❤️', name: 'Ciclo cardíaco', description: 'Bernoulli aplicada a la circulación humana' },
+    { url: '/simulador-principio-pascal/', icon: '🛢️', name: 'Principio de Pascal', description: 'El fluido en reposo: presión con la profundidad y prensa hidráulica' },
     { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'Sangre humana', description: 'El fluido más característico que estudia Bernoulli' },
   ],
   'simulador-teorema-bayes': [
