@@ -272,6 +272,8 @@ Auditoría: `grep -rE "\b[0-9]{2,4}\b\s+aplicaciones?" --include="*.tsx" --inclu
 Toda app nueva DEBE incluir Schema.org JSON-LD. **Está automatizado en el template**
 (`templates/app-base/`): `metadata.template.ts` exporta `jsonLd` (WebApplication) y `faqJsonLd`
 (FAQPage), y `layout.template.ts` inyecta ambos `<script type="application/ld+json">`.
+`faqJsonLd` sale del array `PREGUNTAS_FRECUENTES`, que `page.tsx` importa para pintar la FAQ
+visible: **nunca escribirla dos veces** (59 apps divergían, 07/10/2026; PASO 5 de `/nueva-app-meskeia`).
 
 **Solo hay que rellenarlo bien**: `name` descriptivo · `description` de 1-2 frases · `url` absoluta
 con barra final · `category` (`EducationalApplication`, `FinanceApplication`, `UtilityApplication`

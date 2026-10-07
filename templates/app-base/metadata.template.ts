@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { generateWebAppSchema } from '@/lib/schema-templates';
+import { generateWebAppSchema, type FAQItem } from '@/lib/schema-templates';
 
 // ─────────────────────────────────────────────────────────────────────────
 // 🌎 LENGUAJE LATAM-FRIENDLY (OBLIGATORIO — nacer bien desde el origen)
@@ -75,35 +75,33 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
-// FAQPage JSON-LD — mejora visibilidad en Bing Copilot, ChatGPT, Perplexity y Gemini
+// ─────────────────────────────────────────────────────────────────────────
+// ❓ FAQ — FUENTE ÚNICA de las dos bocas: la FAQ VISIBLE de page.tsx (que importa este
+// array y lo pinta) y el FAQPage JSON-LD de abajo (Bing Copilot, ChatGPT, Perplexity, Gemini).
+// NO escribas la FAQ visible a mano en page.tsx: medido el 07/10/2026, en 59 apps la misma
+// pregunta tenía dos respuestas distintas, y el texto del JSON-LD no lo revisa nadie porque
+// no se ve. En el garaje, la que faltaba en el JSON-LD era la que avisaba de que el
+// simulador se abstiene en Canarias, Ceuta y Melilla.
+// Texto plano, sin JSX: el JSON-LD no admite marcado. Interpolar cifras SÍ
+// (`${formatNumber(…)}` sobre datos de data/fiscal) — así las dos bocas cambian a la vez.
+// ─────────────────────────────────────────────────────────────────────────
+export const PREGUNTAS_FRECUENTES: FAQItem[] = [
+  {
+    question: '¿[Pregunta real que haría un usuario sobre esta app]?',
+    answer: '[Respuesta 2-4 frases con datos concretos]',
+  },
+  { question: '¿[Cómo funciona / qué calcula / para quién es útil]?', answer: '[Respuesta]' },
+  { question: '¿[Diferencia con alternativas / dato clave]?', answer: '[Respuesta]' },
+  { question: '¿[Pregunta sobre nivel educativo / audiencia objetivo]?', answer: '[Respuesta]' },
+  { question: '¿[Pregunta técnica o conceptual específica del tema]?', answer: '[Respuesta]' },
+];
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: '¿[Pregunta real que haría un usuario sobre esta app]?',
-      acceptedAnswer: { '@type': 'Answer', text: '[Respuesta 2-4 frases con datos concretos]' },
-    },
-    {
-      '@type': 'Question',
-      name: '¿[Cómo funciona / qué calcula / para quién es útil]?',
-      acceptedAnswer: { '@type': 'Answer', text: '[Respuesta]' },
-    },
-    {
-      '@type': 'Question',
-      name: '¿[Diferencia con alternativas / dato clave]?',
-      acceptedAnswer: { '@type': 'Answer', text: '[Respuesta]' },
-    },
-    {
-      '@type': 'Question',
-      name: '¿[Pregunta sobre nivel educativo / audiencia objetivo]?',
-      acceptedAnswer: { '@type': 'Answer', text: '[Respuesta]' },
-    },
-    {
-      '@type': 'Question',
-      name: '¿[Pregunta técnica o conceptual específica del tema]?',
-      acceptedAnswer: { '@type': 'Answer', text: '[Respuesta]' },
-    },
-  ],
+  mainEntity: PREGUNTAS_FRECUENTES.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: { '@type': 'Answer', text: f.answer },
+  })),
 };

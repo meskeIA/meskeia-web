@@ -18,9 +18,9 @@ import {
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { getRelatedApps } from '@/data/app-relations';
-import { jsonLd } from './metadata';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
-export default function [NombreApp]Page(): JSX.Element {
+export default function [NombreApp]Page() {
   const [input, setInput] = useState('');
   const [resultado, setResultado] = useState('');
 
@@ -32,18 +32,13 @@ export default function [NombreApp]Page(): JSX.Element {
 
   return (
     <>
-      {/* Schema.org JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
+      {/* El JSON-LD (WebApplication + FAQPage) lo inyecta layout.tsx: no repetirlo aquí. */}
       <div className={styles.container}>
         <MeskeiaLogo />
 
         {/* Hero Section */}
         <header className={styles.hero}>
-          <h1 className={styles.title}>🎯 [Título de la App]</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🎯</span> [Título de la App]</h1>
           <p className={styles.subtitle}>[Descripción breve]</p>
         </header>
 
@@ -59,7 +54,7 @@ export default function [NombreApp]Page(): JSX.Element {
               label="Valor"
               placeholder="0"
             />
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Calcular
             </button>
           </div>
@@ -100,6 +95,20 @@ export default function [NombreApp]Page(): JSX.Element {
           <section className={styles.guideSection}>
             <h2>Título</h2>
             <p>Contenido educativo...</p>
+          </section>
+
+          {/* FAQ visible: se pinta del MISMO array que el FAQPage JSON-LD (metadata.ts).
+              No escribir aquí preguntas a mano: así las dos bocas no pueden divergir. */}
+          <section className={styles.guideSection}>
+            <h2>Preguntas frecuentes</h2>
+            <div className={styles.faqList}>
+              {PREGUNTAS_FRECUENTES.map((f) => (
+                <div key={f.question} className={styles.faqItem}>
+                  <h3>{f.question}</h3>
+                  <p>{f.answer}</p>
+                </div>
+              ))}
+            </div>
           </section>
         </EducationalSection>
 
