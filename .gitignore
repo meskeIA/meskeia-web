@@ -89,8 +89,9 @@ scripts/lib/
 # Sus casos de prueba IMPORTAN scripts/lib/, así que siguen a lo que prueban: versionarlos
 # dejaría en el repo un `node scripts/pruebas/...` que en un clon limpio no puede arrancar.
 # El resto de scripts/pruebas/ sí va al repo: no importa nada ignorado. Uso:
-#   node scripts/pruebas/firma-sin-ip.mjs
+#   node scripts/pruebas/firma-sin-ip.mjs · node scripts/pruebas/firma-umbral-ip.mjs
 scripts/pruebas/firma-sin-ip.mjs
+scripts/pruebas/firma-umbral-ip.mjs
 
 # Detector foso-IA (analisis interno)
 scripts/detectar-foso-ia.mjs
