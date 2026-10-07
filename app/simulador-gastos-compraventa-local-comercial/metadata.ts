@@ -92,6 +92,15 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['gastos local comercial', 'IVA local comercial', 'ITP local comercial', 'renuncia exención IVA', 'gastos venta local comercial', 'plusvalía venta local', 'compraventa local', 'España'],
 });
 
+/**
+ * Respuesta ÚNICA a «qué impuesto se paga al comprar», la que leen el FAQPage y la FAQ visible de
+ * page.tsx (hallazgo 2968): antes eran dos textos y cada uno callaba lo que daba el otro. Y dice,
+ * como el resto de la familia (garaje, trastero, nave, solar, rústico), que en Canarias, Ceuta y
+ * Melilla no rige el IVA sino el IGIC o el IPSI (hallazgo 2967), y que la renuncia no existe en
+ * Ceuta y Melilla (la app ya la deshabilita allí: hallazgo 1584).
+ */
+export const RESPUESTA_IMPUESTO_COMPRA = `Depende del tipo de transmisión. Si el local es de nueva construcción y lo vende el promotor (primera entrega), se paga IVA al ${IVA_INMUEBLES_2025.local}${PCT} más AJD (del ${AJD_MIN}${PCT} al ${AJD_MAX}${PCT} según la comunidad autónoma). En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos, y por eso el simulador no calcula ahí el impuesto de la obra nueva; en Ceuta y Melilla el AJD se paga con la bonificación del ${formatNumber(BONIFICACION_CUOTA_CEUTA_MELILLA * 100, 0)}${PCT} de la cuota (art. 57 bis.1 TRLITPAJD). Si es una segunda transmisión, por regla general está exenta de IVA y se paga ITP al tipo general de la comunidad, que va del ${ITP_MIN}${PCT} al ${ITP_MAX}${PCT}. La excepción es la renuncia a la exención entre empresarios, que no existe en Ceuta y Melilla. No coinciden IVA e ITP en la misma operación.`;
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -109,7 +118,7 @@ export const faqJsonLd = {
       name: '¿Qué impuesto se paga al comprar un local comercial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Depende del tipo de transmisión. Si el local es de nueva construcción y lo vende el promotor (primera entrega), se paga IVA al ${IVA_INMUEBLES_2025.local}${PCT} más AJD (del ${AJD_MIN}${PCT} al ${AJD_MAX}${PCT} según la comunidad autónoma; en Ceuta y Melilla se paga la mitad, por la bonificación del ${formatNumber(BONIFICACION_CUOTA_CEUTA_MELILLA * 100, 0)}${PCT} de la cuota del art. 57 bis.1 TRLITPAJD). Si es una segunda transmisión, por regla general está exenta de IVA y se paga ITP al tipo general de la comunidad, que va del ${ITP_MIN}${PCT} al ${ITP_MAX}${PCT}. No coinciden IVA e ITP en la misma operación.`,
+        text: RESPUESTA_IMPUESTO_COMPRA,
       },
     },
     {
@@ -117,7 +126,7 @@ export const faqJsonLd = {
       name: '¿Qué es la renuncia a la exención de IVA en la compra de un local?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `La segunda transmisión de un inmueble está exenta de IVA (artículo 20.Uno.22º de la Ley del IVA), por lo que tributa por ITP. Sin embargo, si comprador y vendedor son empresarios o profesionales con derecho a deducir el IVA, el vendedor puede renunciar a esa exención (artículo 20.Dos). Entonces la operación pasa a tributar por IVA al ${IVA_INMUEBLES_2025.local}${PCT} en lugar de ITP, con inversión del sujeto pasivo: es el comprador quien autoliquida y, si tiene derecho, deduce el IVA.`,
+        text: `La segunda transmisión de un inmueble está exenta de IVA (artículo 20.Uno.22º de la Ley del IVA), por lo que tributa por ITP. Sin embargo, si comprador y vendedor son empresarios o profesionales con derecho a deducir el IVA, el vendedor puede renunciar a esa exención (artículo 20.Dos). Entonces la operación pasa a tributar por IVA al ${IVA_INMUEBLES_2025.local}${PCT} en lugar de ITP, con inversión del sujeto pasivo: es el comprador quien autoliquida y, si tiene derecho, deduce el IVA. La renuncia no existe en Ceuta y Melilla, donde la ley del IPSI no la regula.`,
       },
     },
     {

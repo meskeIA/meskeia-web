@@ -18,6 +18,7 @@ import {
   AvisoTerritorioSinIva,
 } from '@/components';
 import { getRelatedApps } from '@/data/app-relations';
+import { RESPUESTA_IMPUESTO_COMPRA } from './metadata';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
 import {
@@ -2206,10 +2207,8 @@ export default function SimuladorLocalComercialPage() {
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
               <strong>¿Se paga IVA o ITP al comprar un local comercial?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
-                En obra nueva (primera entrega del promotor) se paga IVA al {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} más AJD. En segunda mano, por
-                regla general la operación está exenta de IVA y se paga ITP al tipo general de la comunidad
-                autónoma. La excepción es la renuncia a la exención de IVA entre empresarios. Nunca se pagan
-                IVA e ITP a la vez.
+                {/* La misma respuesta que el FAQPage (hallazgos 2967 y 2968) */}
+                {RESPUESTA_IMPUESTO_COMPRA}
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
@@ -2218,7 +2217,8 @@ export default function SimuladorLocalComercialPage() {
                 La segunda transmisión de un inmueble está exenta de IVA (Art. 20.Uno.22º LIVA). Si comprador y
                 vendedor son empresarios con derecho a deducción, el vendedor puede renunciar a esa exención
                 (Art. 20.Dos): la compra tributa por IVA {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} con inversión del sujeto pasivo en lugar de ITP.
-                Interesa al comprador que puede deducir el IVA, porque el ITP es un coste no recuperable.
+                Interesa al comprador que puede deducir el IVA, porque el ITP es un coste no recuperable. No
+                existe en Ceuta y Melilla, donde la ley del IPSI no la regula.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>

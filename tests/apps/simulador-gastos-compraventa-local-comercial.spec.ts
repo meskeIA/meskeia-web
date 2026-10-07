@@ -4798,14 +4798,13 @@ test.describe('RE-INSPECCIÓN 07/10/2026 — La Rioja, el euro 50.001 de la base
     expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).not.toBe('Sin calcular');
   });
 
-  // HALLAZGO [07/10-b] (medio, dato) — ❌ ABIERTO. Efecto familia del 714 (trastero) y el 670 (garaje):
+  // HALLAZGO [07/10-b] (medio, dato) — ✅ REPARADO el 07/10/2026 (RESPUESTA_IMPUESTO_COMPRA). Efecto familia del 714 (trastero) y el 670 (garaje):
   // la respuesta a «qué impuesto se paga al comprar», en el FAQPage y en la FAQ visible, dice «se paga
   // IVA al 21 % más AJD» sin excepción territorial, y el FAQPage mete a Ceuta y Melilla en esa misma
   // frase («en Ceuta y Melilla se paga la mitad»). La propia app responde allí «En Ciudad Autónoma de
   // Ceuta no rige el IVA: la compra de obra nueva tributa por el IPSI». «IGIC» e «IPSI» no aparecen en
   // todo metadata.ts; nave, solar, garaje, trastero y terreno sí lo dicen en su FAQPage.
   test('[07/10-b] el FAQPage y la FAQ visible dicen que en Canarias, Ceuta y Melilla no rige el IVA', async ({ page }) => {
-    test.fail();
     await page.selectOption('#select-ccaa', 'ceuta');
     await sembrarImporte12(page, 'Precio del local comercial', '200000');
     await page.getByRole('button', { name: /Obra nueva/ }).click();
@@ -4825,13 +4824,12 @@ test.describe('RE-INSPECCIÓN 07/10/2026 — La Rioja, el euro 50.001 de la base
     });
   });
 
-  // HALLAZGO [07/10-c] (bajo, contenido) — ❌ ABIERTO. La misma pregunta, dos respuestas escritas
+  // HALLAZGO [07/10-c] (bajo, contenido) — ✅ REPARADO el 07/10/2026 (una constante, dos bocas). La misma pregunta, dos respuestas escritas
   // aparte: «¿Se paga IVA o ITP al comprar un local comercial?» (visible) y «¿Qué impuesto se paga al
   // comprar un local comercial?» (FAQPage). La del FAQPage da los rangos del AJD y del ITP y la
   // bonificación de Ceuta y Melilla; la visible, la excepción de la renuncia. La reparación es UNA
   // constante en metadata.ts que importen las dos bocas (como simulador-gastos-compraventa-garaje).
   test('[07/10-c] la pregunta del impuesto de la compra tiene UNA respuesta en las dos bocas', async ({ page }) => {
-    test.fail();
     const faq = await faqPage0710(page);
     const jsonLd = faq.get('¿Qué impuesto se paga al comprar un local comercial?') ?? '';
     const visible = await faqVisible0710(page, '¿Se paga IVA o ITP al comprar un local comercial?');
