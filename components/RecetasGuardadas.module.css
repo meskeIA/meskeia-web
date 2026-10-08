@@ -1,0 +1,210 @@
+/* Panel «Mis recetas» de las calculadoras de pan (S0190).
+ *
+ * Solo usa los tokens de globals.css, sin redefinir ninguno: así cambia de tema con la página
+ * y toma el recoloreado de coquinum.com (`[data-brand='coquinum']` en <html>), que una variable
+ * fijada aquí taparía. Los botones con fondo de marca usan --primary-boton, que lleva texto
+ * blanco con contraste suficiente en los dos temas.
+ */
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  color: var(--text-primary);
+}
+
+.titulo {
+  font-size: 1.2rem;
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+}
+
+.ayuda {
+  margin: 0 0 1rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.etiqueta {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.fila {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.input {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btnPrimario,
+.btnSecundario,
+.btnPeligro {
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btnPrimario {
+  background: var(--primary-boton);
+  color: #FFFFFF;
+}
+
+.btnPrimario:hover {
+  filter: brightness(1.08);
+}
+
+.btnSecundario {
+  background: transparent;
+  color: var(--primary-texto);
+  border-color: var(--border);
+}
+
+.btnSecundario:hover {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.btnPeligro {
+  background: #B42318;
+  color: #FFFFFF;
+}
+
+[data-theme='dark'] .btnPeligro {
+  background: #B42318;
+  color: #FFFFFF;
+}
+
+.btnPrimario:focus-visible,
+.btnSecundario:focus-visible,
+.btnPeligro:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.sinAlmacen {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.anuncio {
+  min-height: 1.2em;
+  margin: 0.6rem 0 0;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+
+.contador {
+  margin: 0.75rem 0 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.itemTexto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.itemNombre {
+  overflow-wrap: anywhere;
+}
+
+.itemDetalle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.itemAcciones {
+  display: flex;
+  gap: 0.4rem;
+}
+
+/* El aviso de receta recuperada, arriba del formulario */
+.aviso {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  margin: 0 0 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+  color: var(--text-primary);
+}
+
+.avisoTexto {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 480px) {
+  .panel {
+    padding: 1rem;
+  }
+
+  .fila > .btnPrimario {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btnPrimario,
+  .btnSecundario,
+  .btnPeligro {
+    transition: none;
+  }
+}

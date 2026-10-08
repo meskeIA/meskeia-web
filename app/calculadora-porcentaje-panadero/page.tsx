@@ -27,6 +27,8 @@ import {
   TEMP_MODELO_MAX,
   TEMP_MODELO_MIN,
 } from '@/lib/calculadoras/fermentacionTemperatura';
+import { useRecetasGuardadas, type RecetaGuardada } from '@/lib/recetasGuardadas';
+import RecetasGuardadasPanel, { AvisoRecetaRecuperada } from '@/components/RecetasGuardadas';
 
 interface OtroIngrediente {
   id: number;
@@ -66,6 +68,78 @@ const INGREDIENTES_POR_GRAMOS: OtroIngrediente[] = [
   nuevoIngrediente(2, 'Sal', '20'),
   nuevoIngrediente(3, 'Levadura', '3'),
 ];
+
+/**
+ * La fórmula tal como se guarda para volver otro día (S0190): la última se recupera sola y las
+ * demás se guardan con nombre. Quien vuelve a esta app trae SU fórmula (46 % de retorno en
+ * septiembre de 2026) y antes tenía que rehacer a mano la lista de ingredientes. Los `id` de
+ * las filas no se guardan: son de la sesión y se vuelven a numerar al cargar.
+ */
+interface IngredienteGuardado {
+  nombre: string;
+  valor: string;
+  esPrefermento: boolean;
+  hidratacionPref: string;
+  prefTocado: boolean;
+}
+
+interface FormulaGuardada {
+  modo: ModoCalculo;
+  harina: string;
+  ingredientes: IngredienteGuardado[];
+  porcion: string;
+  /** Si ya se había pedido el cálculo: al volver, el resultado se enseña sin pulsar nada. */
+  calculada: boolean;
+}
+
+const MAX_FILAS_GUARDADAS = 30;
+
+const aGuardado = (i: OtroIngrediente): IngredienteGuardado => ({
+  nombre: i.nombre,
+  valor: i.valor,
+  esPrefermento: i.esPrefermento,
+  hidratacionPref: i.hidratacionPref,
+  prefTocado: i.prefTocado,
+});
+
+/** Lo guardado es dato de fuera: cada campo se comprueba y lo que no encaja se descarta. */
+function validarFormula(crudo: unknown): FormulaGuardada | null {
+  if (!crudo || typeof crudo !== 'object') return null;
+  const r = crudo as Record<string, unknown>;
+  if (r.modo !== 'gramos' && r.modo !== 'porcentaje') return null;
+  if (typeof r.harina !== 'string' || r.harina.length > 12) return null;
+  if (typeof r.porcion !== 'string' || r.porcion.length > 12) return null;
+  if (!Array.isArray(r.ingredientes)) return null;
+
+  const texto = (v: unknown, max: number) => (typeof v === 'string' ? v.slice(0, max) : '');
+  const ingredientes: IngredienteGuardado[] = [];
+  for (const item of r.ingredientes.slice(0, MAX_FILAS_GUARDADAS)) {
+    if (!item || typeof item !== 'object') continue;
+    const i = item as Record<string, unknown>;
+    ingredientes.push({
+      nombre: texto(i.nombre, 60),
+      valor: texto(i.valor, 12),
+      esPrefermento: i.esPrefermento === true,
+      hidratacionPref: texto(i.hidratacionPref, 12) || HIDRATACION_PREF_DEFECTO,
+      prefTocado: i.prefTocado === true,
+    });
+  }
+  return {
+    modo: r.modo,
+    harina: r.harina,
+    ingredientes,
+    porcion: r.porcion,
+    calculada: r.calculada === true,
+  };
+}
+
+const FORMULA_POR_DEFECTO: FormulaGuardada = {
+  modo: 'gramos',
+  harina: '1000',
+  ingredientes: INGREDIENTES_POR_GRAMOS.map(aGuardado),
+  porcion: '',
+  calculada: false,
+};
 
 // El modo 'porcentaje' hace el camino inverso: se parte de los porcentajes de la fórmula y de
 // un peso final de masa (un molde, una bandeja) y se obtienen los gramos. No tiene lista de
@@ -310,10 +384,10 @@ function convertirReceta(
 }
 
 export default function CalculadoraPorcentajePanaderoPage() {
-  const [modo, setModo] = useState<ModoCalculo>('gramos');
-  const [harinaStr, setHarinaStr] = useState('1000');
+  const [modo, setModo] = useState<ModoCalculo>(FORMULA_POR_DEFECTO.modo);
+  const [harinaStr, setHarinaStr] = useState(FORMULA_POR_DEFECTO.harina);
   const [otros, setOtros] = useState<OtroIngrediente[]>(INGREDIENTES_POR_GRAMOS);
-  const [porcioStr, setPorcioStr] = useState('');
+  const [porcioStr, setPorcioStr] = useState(FORMULA_POR_DEFECTO.porcion);
   const [resultado, setResultado] = useState<ResultadoBakersPercentage | null>(null);
   const [objetivoCalculado, setObjetivoCalculado] = useState<number | null>(null);
   const [nextId, setNextId] = useState(10);
@@ -372,6 +446,48 @@ export default function CalculadoraPorcentajePanaderoPage() {
   const cambiarHarina = useCallback((valor: string) => {
     setHarinaStr(valor);
     setAvisoModo('');
+  }, []);
+
+  // ── Mis fórmulas: la última se recupera sola y las demás se guardan con nombre (S0190) ──
+  const formulaActual = useMemo<FormulaGuardada>(
+    () => ({
+      modo,
+      harina: harinaStr,
+      ingredientes: otros.map(aGuardado),
+      porcion: porcioStr,
+      calculada: vivo,
+    }),
+    [modo, harinaStr, otros, porcioStr, vivo],
+  );
+
+  const aplicarFormula = useCallback((f: FormulaGuardada) => {
+    setModo(f.modo);
+    setHarinaStr(f.harina);
+    setOtros(f.ingredientes.map((i, idx) => ({ ...i, id: idx + 1 })));
+    setNextId(f.ingredientes.length + 1);
+    setPorcioStr(f.porcion);
+    setAvisoModo('');
+    // El resultado de la fórmula anterior no vale para esta: si estaba calculada, el efecto
+    // que sigue al formulario la recalcula al momento; si no, la página queda como al llegar.
+    setResultado(null);
+    setObjetivoCalculado(null);
+    setVivo(f.calculada);
+  }, []);
+
+  const formulas = useRecetasGuardadas<FormulaGuardada>({
+    clave: 'meskeia-porcentaje-panadero',
+    validar: validarFormula,
+    actual: formulaActual,
+    aplicar: aplicarFormula,
+    porDefecto: FORMULA_POR_DEFECTO,
+  });
+
+  const describirFormula = useCallback((g: RecetaGuardada<FormulaGuardada>) => {
+    const filas = g.datos.ingredientes.filter((i) => i.nombre.trim()).length;
+    const base = parseSpanishNumber(g.datos.harina);
+    const peso = Number.isFinite(base) ? formatNumber(base, 0) : g.datos.harina;
+    const queEsBase = g.datos.modo === 'gramos' ? 'g de harina' : 'g de masa final';
+    return `${peso} ${queEsBase} · ${formatNumber(filas, 0)} ${filas === 1 ? 'ingrediente' : 'ingredientes'} más`;
   }, []);
 
   // ── Paso 2: temperatura del agua de amasado (DDT) ──
@@ -560,6 +676,10 @@ export default function CalculadoraPorcentajePanaderoPage() {
       </header>
 
       <LegalNotice />
+
+      {formulas.recuperada && (
+        <AvisoRecetaRecuperada queEs="fórmula" onEmpezarDeCero={formulas.empezarDeCero} />
+      )}
 
       {/* Herramienta principal */}
       <div className={styles.mainContent}>
@@ -962,6 +1082,17 @@ export default function CalculadoraPorcentajePanaderoPage() {
           )}
         </div>
       </div>
+
+      <RecetasGuardadasPanel
+        recetas={formulas}
+        queEs="fórmula"
+        nombreSugerido={
+          resultado && resultado.hidratacion_pct > 0
+            ? `Fórmula al ${formatNumber(resultado.hidratacion_pct, 0)} % de hidratación`
+            : 'Mi fórmula'
+        }
+        describir={describirFormula}
+      />
 
       {/* Los dos pasos siguientes de la misma sesión de amasado */}
       <section className={styles.pasosSection} aria-labelledby="pasos-titulo">

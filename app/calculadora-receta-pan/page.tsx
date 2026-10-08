@@ -26,6 +26,8 @@ import {
   type ExtraElegido,
   type FilaIngrediente,
 } from '@/lib/calculadoras/recetaPan';
+import { useRecetasGuardadas, type RecetaGuardada } from '@/lib/recetasGuardadas';
+import RecetasGuardadasPanel, { AvisoRecetaRecuperada } from '@/components/RecetasGuardadas';
 
 const PESOS_RAPIDOS = [250, 500, 1000];
 
@@ -44,16 +46,118 @@ function leerGramos(valor: string): number {
   return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
+/**
+ * Las cinco decisiones de la página, tal como se guardan para volver otro día (S0190): la
+ * última se recupera sola y las demás se guardan con nombre. Quien vuelve a esta app vuelve a
+ * hacer SU pan (59 % de retorno en septiembre de 2026), y antes tenía que teclearlo entero.
+ */
+interface RecetaPanGuardada {
+  harina: string;
+  tipoPan: IdTipoPan;
+  harinaPrincipal: IdHarina;
+  proporcion: number;
+  fermento: TipoFermento;
+  ritmo: RitmoFermentacion;
+  hidratacionMM: number;
+  extras: ExtraElegido[];
+}
+
+const RECETA_POR_DEFECTO: RecetaPanGuardada = {
+  harina: '500',
+  tipoPan: 'hogaza',
+  harinaPrincipal: 'panificable',
+  proporcion: 100,
+  fermento: 'seca',
+  ritmo: 'normal',
+  hidratacionMM: 100,
+  extras: [],
+};
+
+/**
+ * Lo guardado es dato de fuera (otra versión de la app, una edición a mano): cada campo se
+ * comprueba contra las listas del motor, y lo que no encaja se descarta entero. Un tipo de pan
+ * desconocido dejaría `panSeleccionado` en `undefined` y la página caería al pintarlo.
+ */
+function validarRecetaPan(crudo: unknown): RecetaPanGuardada | null {
+  if (!crudo || typeof crudo !== 'object') return null;
+  const r = crudo as Record<string, unknown>;
+  if (typeof r.harina !== 'string' || r.harina.length > 12) return null;
+  if (!TIPOS_PAN.some((t) => t.id === r.tipoPan)) return null;
+  if (!HARINAS_PAN.some((h) => h.id === r.harinaPrincipal)) return null;
+  if (!FERMENTOS.some((f) => f.id === r.fermento)) return null;
+  const ritmo = RITMOS.find((x) => x.id === r.ritmo);
+  if (!ritmo) return null;
+  if (typeof r.proporcion !== 'number' || !Number.isFinite(r.proporcion)) return null;
+  if (typeof r.hidratacionMM !== 'number' || !HIDRATACIONES_MM.includes(r.hidratacionMM)) return null;
+  if (!Array.isArray(r.extras)) return null;
+
+  const extras: ExtraElegido[] = [];
+  for (const e of r.extras) {
+    if (!e || typeof e !== 'object') continue;
+    const { id, porcentaje } = e as Record<string, unknown>;
+    const def = EXTRAS.find((x) => x.id === id);
+    if (!def || typeof porcentaje !== 'number' || !Number.isFinite(porcentaje)) continue;
+    if (extras.some((x) => x.id === def.id)) continue;
+    const max = def.familia === 'liquido' ? 60 : 40;
+    extras.push({ id: def.id, porcentaje: Math.min(max, Math.max(1, Math.round(porcentaje))) });
+  }
+
+  const fermento = r.fermento as TipoFermento;
+  return {
+    harina: r.harina,
+    tipoPan: r.tipoPan as IdTipoPan,
+    harinaPrincipal: r.harinaPrincipal as IdHarina,
+    proporcion: Math.min(100, Math.max(10, Math.round(r.proporcion / 5) * 5)),
+    fermento,
+    // La misma regla que `cambiarFermento`: con masa madre no hay ritmo «lo antes posible».
+    ritmo: fermento === 'masa_madre' && !ritmo.admiteMasaMadre ? 'normal' : ritmo.id,
+    hidratacionMM: r.hidratacionMM,
+    extras,
+  };
+}
+
 export default function CalculadoraRecetaPanPage() {
-  const [harinaStr, setHarinaStr] = useState('500');
-  const [tipoPan, setTipoPan] = useState<IdTipoPan>('hogaza');
-  const [harinaPrincipal, setHarinaPrincipal] = useState<IdHarina>('panificable');
-  const [proporcion, setProporcion] = useState(100);
-  const [fermento, setFermento] = useState<TipoFermento>('seca');
-  const [ritmo, setRitmo] = useState<RitmoFermentacion>('normal');
-  const [hidratacionMM, setHidratacionMM] = useState(100);
-  const [extras, setExtras] = useState<ExtraElegido[]>([]);
+  const [harinaStr, setHarinaStr] = useState(RECETA_POR_DEFECTO.harina);
+  const [tipoPan, setTipoPan] = useState<IdTipoPan>(RECETA_POR_DEFECTO.tipoPan);
+  const [harinaPrincipal, setHarinaPrincipal] = useState<IdHarina>(RECETA_POR_DEFECTO.harinaPrincipal);
+  const [proporcion, setProporcion] = useState(RECETA_POR_DEFECTO.proporcion);
+  const [fermento, setFermento] = useState<TipoFermento>(RECETA_POR_DEFECTO.fermento);
+  const [ritmo, setRitmo] = useState<RitmoFermentacion>(RECETA_POR_DEFECTO.ritmo);
+  const [hidratacionMM, setHidratacionMM] = useState(RECETA_POR_DEFECTO.hidratacionMM);
+  const [extras, setExtras] = useState<ExtraElegido[]>(RECETA_POR_DEFECTO.extras);
   const [extrasAbierto, setExtrasAbierto] = useState(false);
+
+  const recetaActual = useMemo<RecetaPanGuardada>(
+    () => ({ harina: harinaStr, tipoPan, harinaPrincipal, proporcion, fermento, ritmo, hidratacionMM, extras }),
+    [harinaStr, tipoPan, harinaPrincipal, proporcion, fermento, ritmo, hidratacionMM, extras],
+  );
+
+  const aplicarReceta = useCallback((r: RecetaPanGuardada) => {
+    setHarinaStr(r.harina);
+    setTipoPan(r.tipoPan);
+    setHarinaPrincipal(r.harinaPrincipal);
+    setProporcion(r.proporcion);
+    setFermento(r.fermento);
+    setRitmo(r.ritmo);
+    setHidratacionMM(r.hidratacionMM);
+    setExtras(r.extras);
+    // Si la receta trae extras, se enseñan: si no, el resultado los contaría sin que se vieran.
+    setExtrasAbierto(r.extras.length > 0);
+  }, []);
+
+  const recetas = useRecetasGuardadas<RecetaPanGuardada>({
+    clave: 'meskeia-receta-pan',
+    validar: validarRecetaPan,
+    actual: recetaActual,
+    aplicar: aplicarReceta,
+    porDefecto: RECETA_POR_DEFECTO,
+  });
+
+  const describirReceta = useCallback((g: RecetaGuardada<RecetaPanGuardada>) => {
+    const pan = TIPOS_PAN.find((t) => t.id === g.datos.tipoPan)?.nombre ?? '';
+    const ferm = FERMENTOS.find((f) => f.id === g.datos.fermento)?.nombre.toLowerCase() ?? '';
+    return `${pan} · ${formatNumber(leerGramos(g.datos.harina), 0)} g de harina · ${ferm}`;
+  }, []);
 
   const esMasaMadre = fermento === 'masa_madre';
 
@@ -117,6 +221,10 @@ export default function CalculadoraRecetaPanPage() {
       <LegalNotice />
 
       <main className={styles.mainContent}>
+        {recetas.recuperada && (
+          <AvisoRecetaRecuperada queEs="receta" onEmpezarDeCero={recetas.empezarDeCero} />
+        )}
+
         {/* ── Paso 1: la harina ── */}
         <section className={styles.panel} aria-labelledby="paso-harina">
           <h2 id="paso-harina" className={styles.seccionTitulo}>
@@ -481,6 +589,13 @@ export default function CalculadoraRecetaPanPage() {
             <p>Escribe cuántos gramos de harina vas a usar y te calculamos el resto.</p>
           </section>
         )}
+
+        <RecetasGuardadasPanel
+          recetas={recetas}
+          queEs="receta"
+          nombreSugerido={`${panSeleccionado.nombre}, ${formatNumber(leerGramos(harinaStr), 0)} g de harina`}
+          describir={describirReceta}
+        />
       </main>
 
       <EducationalSection

@@ -527,3 +527,121 @@ test.describe('Reparación del 20/09/2026 — la vista ya no publica lo que no p
     }
   });
 });
+
+/**
+ * MIS FÓRMULAS (S0190, 08/10/2026)
+ *
+ * Quien vuelve a esta app trae SU fórmula (46 % de retorno a la misma app en septiembre de
+ * 2026), y la lista de ingredientes se perdía al cerrar. Ahora la última vuelve sola —con el
+ * resultado ya calculado si lo estaba— y las demás se guardan con nombre, en `localStorage`.
+ *
+ * El almacén se siembra con `addInitScript`, que corre antes que la página: sembrarlo tras el
+ * `goto` es una carrera que la app gana al hidratar, y el caso del almacén corrupto pasaría en
+ * falso. Por eso va emparejado con uno que exige ver lo sembrado.
+ */
+const CLAVE_FORMULA = 'meskeia-porcentaje-panadero-ultima';
+const CLAVE_FORMULAS = 'meskeia-porcentaje-panadero-lista';
+
+const filasIngredientes = (page: Page) =>
+  page.getByRole('list', { name: 'Lista de ingredientes' }).getByRole('listitem');
+
+const FORMULA_CON_MASA_MADRE = {
+  modo: 'gramos',
+  harina: '1000',
+  ingredientes: [
+    { nombre: 'Agua', valor: '650', esPrefermento: false, hidratacionPref: '100', prefTocado: false },
+    { nombre: 'Sal', valor: '20', esPrefermento: false, hidratacionPref: '100', prefTocado: false },
+    { nombre: 'Levadura', valor: '3', esPrefermento: false, hidratacionPref: '100', prefTocado: false },
+    { nombre: 'Masa madre', valor: '200', esPrefermento: true, hidratacionPref: '100', prefTocado: false },
+  ],
+  porcion: '',
+  calculada: true,
+};
+
+async function sembrarFormulas(page: Page, datos: Record<string, string>) {
+  await page.addInitScript((d) => {
+    if (window.sessionStorage.getItem('sembrado')) return; // solo la primera carga
+    window.sessionStorage.setItem('sembrado', '1');
+    for (const [k, v] of Object.entries(d)) window.localStorage.setItem(k, v);
+  }, datos);
+}
+
+test.describe('Mis fórmulas: la receta sobrevive al cierre', () => {
+  test('LA ÚLTIMA FÓRMULA vuelve sola, con su prefermento y el resultado ya calculado', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#harina']);
+    await anadirMasaMadre(page, '200');
+    await calcular(page);
+    await expect(page.getByRole('note')).toContainText('68,2 %');
+
+    await page.reload();
+    await esperarHidratacion(page, ['#harina']);
+
+    await expect(page.getByText(/Hemos recuperado la fórmula/)).toBeVisible();
+    await expect(filasIngredientes(page)).toHaveCount(4);
+    await expect(
+      filasIngredientes(page).nth(3).getByRole('button', { name: /Tratar Masa madre como prefermento/ }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    // Sin pulsar Calcular: estaba calculada, así que el resultado vuelve con ella.
+    await expect(page.getByRole('note')).toContainText('68,2 %');
+
+    await page.getByRole('button', { name: 'Empezar de cero' }).click();
+    await expect(filasIngredientes(page)).toHaveCount(3);
+    await expect(page.getByText(/Introduce los ingredientes y pulsa/)).toBeVisible();
+    await expect(page.getByText(/Hemos recuperado la fórmula/)).toHaveCount(0);
+  });
+
+  test('GUARDAR CON NOMBRE y CARGAR devuelve las filas propias y su resultado', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#harina']);
+    await anadirMasaMadre(page, '200');
+    await calcular(page);
+
+    // Con resultado, el nombre sugerido dice la hidratación (68 %, separada con espacio duro).
+    await expect(page.locator('#nombre-receta')).toHaveAttribute('placeholder', 'Fórmula al 68\u00A0% de hidratación');
+    await page.locator('#nombre-receta').fill('Hogaza con masa madre');
+    await page.getByRole('button', { name: 'Guardar fórmula' }).click();
+    const lista = page.getByRole('list', { name: /fórmulas guardadas/ });
+    await expect(lista.getByRole('listitem')).toHaveCount(1);
+    await expect(lista).toContainText('1000 g de harina · 4 ingredientes más');
+
+    // Se quita la masa madre y se vuelve a la guardada.
+    await page.getByRole('button', { name: 'Eliminar Masa madre' }).click();
+    await expect(filasIngredientes(page)).toHaveCount(3);
+    await expect(page.getByRole('note')).toContainText('65,0 %');
+
+    await page.getByRole('button', { name: 'Cargar Hogaza con masa madre' }).click();
+    await expect(filasIngredientes(page)).toHaveCount(4);
+    await expect(page.getByRole('note')).toContainText('68,2 %');
+  });
+
+  test('LO SEMBRADO EN EL ALMACÉN se recupera: la clave es la que lee la app', async ({ page }) => {
+    await sembrarFormulas(page, { [CLAVE_FORMULA]: JSON.stringify(FORMULA_CON_MASA_MADRE) });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#harina']);
+    await expect(filasIngredientes(page)).toHaveCount(4);
+    await expect(page.getByRole('note')).toContainText('68,2 %');
+  });
+
+  test('UN ALMACÉN CORRUPTO no tumba la página: se descarta lo que no encaja', async ({ page }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    await sembrarFormulas(page, {
+      [CLAVE_FORMULA]: JSON.stringify({ ...FORMULA_CON_MASA_MADRE, modo: 'tazas' }),
+      [CLAVE_FORMULAS]: JSON.stringify([
+        { id: 'a', nombre: 'Rota', fecha: 'x', datos: { modo: 'gramos', harina: 1000 } },
+        { id: 'b', nombre: 'Buena', fecha: '2026-10-01T10:00:00.000Z', datos: FORMULA_CON_MASA_MADRE },
+        null,
+      ]),
+    });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#harina']);
+
+    await expect(filasIngredientes(page)).toHaveCount(3); // la de ejemplo
+    await expect(page.locator('#harina')).toHaveValue('1000');
+    const lista = page.getByRole('list', { name: /fórmulas guardadas/ });
+    await expect(lista.getByRole('listitem')).toHaveCount(1);
+    await expect(lista).toContainText('Buena');
+    expect(errores).toEqual([]);
+  });
+});

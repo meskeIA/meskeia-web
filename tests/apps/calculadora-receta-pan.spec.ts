@@ -185,3 +185,136 @@ test.describe('Calculadora de pan casero — interacción', () => {
     await expect(filaDe(page, /^Agua$/)).toContainText('720 g');
   });
 });
+
+/**
+ * MIS RECETAS (S0190, 08/10/2026)
+ *
+ * La app es de las que más se repiten (59 % de retorno a la misma app en septiembre de 2026) y
+ * no guardaba nada: quien volvía tecleaba otra vez su pan entero. Ahora la última receta vuelve
+ * sola y las demás se guardan con nombre, todo en `localStorage`.
+ *
+ * El almacén se siembra con `addInitScript`, que corre ANTES que los scripts de la página: sembrar
+ * con `page.evaluate` tras el `goto` es una carrera que la app gana al hidratar y el caso pasaría
+ * en falso. Y cada caso que espera «no aparece nada» va con otro que exige ver algo concreto.
+ */
+const CLAVE_ULTIMA = 'meskeia-receta-pan-ultima';
+const CLAVE_LISTA = 'meskeia-receta-pan-lista';
+
+const RECETA_CHAPATA = {
+  harina: '1000', tipoPan: 'chapata', harinaPrincipal: 'panificable', proporcion: 100,
+  fermento: 'seca', ritmo: 'normal', hidratacionMM: 100, extras: [],
+};
+
+async function sembrarAlmacen(page: Page, datos: Record<string, string>) {
+  await page.addInitScript((d) => {
+    // Solo la primera carga: en un `reload` la app ya ha escrito lo suyo y no se pisa.
+    if (window.sessionStorage.getItem('sembrado')) return;
+    window.sessionStorage.setItem('sembrado', '1');
+    for (const [k, v] of Object.entries(d)) window.localStorage.setItem(k, v);
+  }, datos);
+}
+
+test.describe('Calculadora de pan casero — mis recetas', () => {
+  test('LA ÚLTIMA RECETA VUELVE SOLA al recargar, con aviso y salida', async ({ page }) => {
+    await irALaApp(page);
+    await page.getByRole('button', { name: /^.*Chapata/ }).first().click();
+    await sembrarValor(page, '#harina-g', '1000');
+    await expect(filaDe(page, /^Agua$/)).toContainText('780 g'); // 78 % de 1.000 g
+
+    await page.reload();
+    await esperarHidratacion(page, ['#harina-g']);
+
+    await expect(page.locator('#harina-g')).toHaveValue('1000');
+    await expect(page.getByRole('button', { name: /Chapata/ }).first()).toHaveAttribute('aria-pressed', 'true');
+    await expect(filaDe(page, /^Agua$/)).toContainText('780 g');
+    await expect(page.getByText(/Hemos recuperado la receta/)).toBeVisible();
+
+    // «Empezar de cero» devuelve la receta de ejemplo y retira el aviso.
+    await page.getByRole('button', { name: 'Empezar de cero' }).click();
+    await expect(page.locator('#harina-g')).toHaveValue('500');
+    await expect(filaDe(page, /^Agua$/)).toContainText('360 g');
+    await expect(page.getByText(/Hemos recuperado la receta/)).toHaveCount(0);
+  });
+
+  test('LA PRIMERA VISITA no avisa de nada: no hay receta que recuperar', async ({ page }) => {
+    await irALaApp(page);
+    await expect(filaDe(page, /^Agua$/)).toContainText('360 g');
+    await expect(page.getByText(/Hemos recuperado la receta/)).toHaveCount(0);
+    // Y la receta de ejemplo ya queda escrita en el almacén, prueba de que el guardado corre.
+    await page.waitForFunction((k) => window.localStorage.getItem(k) !== null, CLAVE_ULTIMA);
+  });
+
+  test('GUARDAR CON NOMBRE, cambiar, CARGAR y BORRAR', async ({ page }) => {
+    await irALaApp(page);
+    await page.getByRole('button', { name: /Focaccia/ }).first().click();
+    await expect(filaDe(page, /^Agua$/)).toContainText('400 g'); // 80 % de 500 g
+
+    await page.locator('#nombre-receta').fill('Focaccia del domingo');
+    await page.getByRole('button', { name: 'Guardar receta' }).click();
+    await expect(page.getByText('«Focaccia del domingo» guardada', { exact: false })).toBeVisible();
+    const lista = page.getByRole('list', { name: /recetas guardadas/ });
+    await expect(lista.getByRole('listitem')).toHaveCount(1);
+    await expect(lista).toContainText('Focaccia · 500 g de harina · levadura seca');
+
+    // Se cambia a otro pan y se vuelve a la guardada.
+    await page.getByRole('button', { name: /Pan de molde/ }).first().click();
+    await expect(filaDe(page, /^Agua$/)).not.toContainText('400 g');
+    await page.getByRole('button', { name: 'Cargar Focaccia del domingo' }).click();
+    await expect(filaDe(page, /^Agua$/)).toContainText('400 g');
+
+    // Sigue ahí tras recargar.
+    await page.reload();
+    await esperarHidratacion(page, ['#harina-g']);
+    await expect(page.getByRole('list', { name: /recetas guardadas/ }).getByRole('listitem')).toHaveCount(1);
+
+    // Borrar pide confirmación: un clic suelto no tira una receta.
+    await page.getByRole('button', { name: 'Borrar Focaccia del domingo' }).click();
+    await expect(page.getByRole('list', { name: /recetas guardadas/ }).getByRole('listitem')).toHaveCount(1);
+    await page.getByRole('button', { name: 'Confirmar: borrar Focaccia del domingo' }).click();
+    await expect(page.getByRole('list', { name: /recetas guardadas/ })).toHaveCount(0);
+  });
+
+  test('EL MISMO NOMBRE actualiza la receta en vez de duplicarla', async ({ page }) => {
+    await irALaApp(page);
+    await page.locator('#nombre-receta').fill('Mi pan');
+    await page.getByRole('button', { name: 'Guardar receta' }).click();
+    await sembrarValor(page, '#harina-g', '1000');
+    await page.locator('#nombre-receta').fill('  mi   PAN ');
+    await page.getByRole('button', { name: 'Guardar receta' }).click();
+
+    await expect(page.getByText(/actualizada con lo que ves ahora/)).toBeVisible();
+    const lista = page.getByRole('list', { name: /recetas guardadas/ });
+    await expect(lista.getByRole('listitem')).toHaveCount(1);
+    await expect(lista).toContainText('1000 g de harina'); // cuatro cifras no se agrupan (RAE)
+  });
+
+  test('LO SEMBRADO EN EL ALMACÉN se recupera: la clave es la que lee la app', async ({ page }) => {
+    // Pareja positiva del caso del almacén corrupto: sin él, aquel pasaría aunque nada se leyera.
+    await sembrarAlmacen(page, { [CLAVE_ULTIMA]: JSON.stringify(RECETA_CHAPATA) });
+    await irALaApp(page);
+    await expect(page.locator('#harina-g')).toHaveValue('1000');
+    await expect(filaDe(page, /^Agua$/)).toContainText('780 g');
+  });
+
+  test('UN ALMACÉN CORRUPTO no tumba la página: se descarta lo que no encaja', async ({ page }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    await sembrarAlmacen(page, {
+      // Un tipo de pan que no existe dejaría `panSeleccionado` en undefined.
+      [CLAVE_ULTIMA]: JSON.stringify({ ...RECETA_CHAPATA, tipoPan: 'baguette-voladora' }),
+      [CLAVE_LISTA]: JSON.stringify([
+        { id: 'a', nombre: 'Rota', fecha: 'ayer', datos: { tipoPan: 'x' } },
+        { id: 'b', nombre: 'Buena', fecha: '2026-10-01T10:00:00.000Z', datos: RECETA_CHAPATA },
+        'basura',
+      ]),
+    });
+    await irALaApp(page);
+
+    await expect(page.locator('#harina-g')).toHaveValue('500'); // la de ejemplo
+    await expect(filaDe(page, /^Agua$/)).toContainText('360 g');
+    const lista = page.getByRole('list', { name: /recetas guardadas/ });
+    await expect(lista.getByRole('listitem')).toHaveCount(1);
+    await expect(lista).toContainText('Buena');
+    expect(errores).toEqual([]);
+  });
+});
