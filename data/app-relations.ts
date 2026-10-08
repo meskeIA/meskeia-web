@@ -6228,7 +6228,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'simulador-lentes-opticas': [
     { url: '/simulador-fotografia/', icon: '📷', name: 'Simulador de Fotografía', description: 'El objetivo de la cámara es una lente convergente: aplica aquí la óptica al triángulo de exposición' },
-    { url: '/visualizador-optica/', icon: '🌈', name: 'Óptica visual', description: 'Reflexión, refracción, lentes y prismas' },
+    { url: '/visualizador-optica/', icon: '🌈', name: 'Ley de Snell', description: 'Antes de la lente, la refracción en una superficie plana: índices y ángulo crítico' },
     { url: '/visualizador-ojo-humano-vision/', icon: '👁️', name: 'Cómo funciona el ojo', description: 'El cristalino: una lente convergente biológica' },
     { url: '/visualizador-optica-ondulatoria/', icon: '🌊', name: 'Óptica ondulatoria', description: 'Difracción, interferencia y polarización' },
   ],

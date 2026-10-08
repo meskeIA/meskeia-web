@@ -1050,7 +1050,7 @@ export default function TablaPerodicaPage() {
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>¿Qué es el número de masa y cómo se relaciona con los isótopos?</h3>
               <p className={styles.faqAnswer}>
-                Número de masa A = protones + neutrones. Un elemento tiene Z protones fijo, pero puede tener distintos números de neutrones → isótopos. C-12 (6p+6n), C-13 (6p+7n), C-14 (6p+8n, radiactivo). La masa atómica de la tabla es el promedio ponderado de los isótopos naturales.
+                Número de masa A = protones + neutrones. Un elemento tiene Z protones fijo, pero puede tener distintos números de neutrones → isótopos. C-12 (6p+6n), C-13 (6p+7n), C-14 (6p+8n, radiactivo: su vida media de 5.730 años es la base de la <a href="/visualizador-radioactividad/">datación por carbono-14</a>). La masa atómica de la tabla es el promedio ponderado de los isótopos naturales.
               </p>
             </div>
 

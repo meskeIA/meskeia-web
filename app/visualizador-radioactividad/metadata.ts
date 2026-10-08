@@ -2,10 +2,11 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Radioactividad: Desintegración, Vida Media y Datación — meskeIA',
-  description: 'Visualiza los tipos de radiación α/β/γ, la ley de desintegración exponencial, datación por carbono-14 y efectos biológicos de la radiación ionizante.',
+  title: 'Radiactividad: Desintegración, Vida Media y Datación por Carbono-14 | meskeIA',
+  description: 'Calcula la desintegración radiactiva con la ley exponencial y la edad de una muestra por carbono-14. Compara la radiación α/β/γ y sus efectos biológicos.',
   keywords: [
-    'radioactividad física nuclear',
+    'radiactividad física nuclear',
+    'radioactividad',
     'desintegración radiactiva ley exponencial',
     'vida media isótopo radiactivo',
     'radiación alfa beta gamma neutrones',
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
-    title: 'Radioactividad: Desintegración, Vida Media y Datación — meskeIA',
+    title: 'Radiactividad: Desintegración, Vida Media y Datación por Carbono-14 | meskeIA',
     description: 'Explora la ley de desintegración exponencial, tipos de radiación α/β/γ, datación por C-14 y efectos biológicos de la radiación. Visualizador interactivo con gráficas SVG.',
     type: 'website',
     url: 'https://meskeia.com/visualizador-radioactividad/',
@@ -38,15 +39,15 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Radioactividad: Tipos de Radiación y Vida Media',
+    title: 'Radiactividad: Desintegración, Vida Media y Datación por Carbono-14',
     description: 'Visualizador interactivo de física nuclear: desintegración exponencial, datación C-14, dosis de radiación y efectos biológicos.',
     images: ['https://meskeia.com/stemum/og-image.png']
   },
-  other: { 'application-name': 'Visualizador Radioactividad meskeIA' },
+  other: { 'application-name': 'Radiactividad meskeIA' },
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Radioactividad: Desintegración, Vida Media y Datación',
+  name: 'Radiactividad: Desintegración, Vida Media y Datación por Carbono-14',
   description: 'Visualizador interactivo de física nuclear. Explora los tipos de radiación α/β/γ y neutrones, la ley de desintegración exponencial N(t) = N₀·e^(-λt), datación radiométrica por carbono-14 y efectos biológicos de la radiación ionizante con unidades Gray y Sievert.',
   url: 'https://meskeia.com/visualizador-radioactividad/',
   category: 'EducationalApplication',

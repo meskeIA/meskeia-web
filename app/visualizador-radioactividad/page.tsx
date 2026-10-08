@@ -878,16 +878,16 @@ export default function VisualizadorRadioactividad() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}>Radioactividad y Física Nuclear</h1>
+          <h1 className={styles.heroTitle}>Radiactividad y Física Nuclear</h1>
           <p className={styles.heroSubtitle}>
-            Tipos de radiación, desintegración exponencial, datación por carbono-14 y efectos biológicos — visualizador interactivo
+            Tipos de radiación, desintegración exponencial, datación por carbono-14 y efectos biológicos
           </p>
         </header>
 
         <LegalNotice />
 
         {/* Navegación por pestañas */}
-        <nav className={styles.tabBar} aria-label="Secciones del visualizador de radioactividad">
+        <nav className={styles.tabBar} aria-label="Secciones de radiactividad">
           {TABS.map(({ id, icon, label }) => (
             <button
               key={id}
@@ -911,7 +911,7 @@ export default function VisualizadorRadioactividad() {
         </main>
 
         <EducationalSection
-          title="Radioactividad: núcleos inestables y sus emisiones"
+          title="Radiactividad: núcleos inestables y sus emisiones"
           subtitle="Desintegración espontánea, vida media y aplicaciones médicas e industriales"
         >
           <h3>Comparativa de Tipos de Radiación</h3>
