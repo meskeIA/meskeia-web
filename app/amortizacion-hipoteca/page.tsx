@@ -338,7 +338,7 @@ export default function AmortizacionHipotecaPage() {
           <strong>ANTES de amortizar, consulta con tu banco:</strong>
         </p>
         <ul>
-          <li><strong>Comisiones por amortización anticipada</strong> (hasta 0,25% en hipotecas a tipo variable, hasta 2% en hipotecas a tipo fijo, según tiempo restante)</li>
+          <li><strong>Comisiones por amortización anticipada</strong> (hasta 0,25 % en hipotecas a tipo variable, hasta 2 % en hipotecas a tipo fijo, según tiempo restante)</li>
           <li><strong>Penalizaciones específicas</strong> según tu contrato de hipoteca</li>
           <li><strong>Procedimiento y plazos</strong> para realizar la amortización</li>
           <li><strong>Alternativas de inversión</strong> con tu asesor financiero (¿es mejor invertir ese dinero en otro sitio?)</li>
@@ -845,8 +845,8 @@ export default function AmortizacionHipotecaPage() {
           <div className={styles.infoCard}>
             <h3><span aria-hidden="true">💰</span> Comisiones</h3>
             <p>
-              Desde 2019, las hipotecas a tipo variable no pueden cobrar más del 0,25% (primeros 3 años) o 0,15% (resto).
-              Las de tipo fijo: máximo 2% (primeros 10 años) o 1,5% (resto).
+              Desde 2019, las hipotecas a tipo variable no pueden cobrar más del 0,25 % (primeros 3 años) o 0,15 % (resto).
+              Las de tipo fijo: máximo 2 % (primeros 10 años) o 1,5 % (resto).
             </p>
           </div>
         </div>
@@ -908,8 +908,8 @@ export default function AmortizacionHipotecaPage() {
                   <td>Comisión por amortización</td>
                   <td colSpan={2}>
                     Igual en ambos casos. Para préstamos desde jun-2019 (Ley 5/2019), el máximo legal es:
-                    tipo variable 0,25% (≤3 años) / 0,15% (3-5 años) / 0% (&gt;5 años);
-                    tipo fijo 2% (≤10 años) / 1,5% (&gt;10 años). Revisa tu contrato: muchos bancos no la aplican.
+                    tipo variable 0,25 % (≤3 años) / 0,15 % (3-5 años) / 0 % (&gt;5 años);
+                    tipo fijo 2 % (≤10 años) / 1,5 % (&gt;10 años). Revisa tu contrato: muchos bancos no la aplican.
                   </td>
                 </tr>
               </tbody>
@@ -958,7 +958,7 @@ export default function AmortizacionHipotecaPage() {
               </div>
               <p className={styles.casoTip}>
                 Compara el TAE de tu hipoteca con la rentabilidad de invertir ese dinero.
-                Si inviertes al 6% y pagas intereses al 2%, puede no valer la pena amortizar.
+                Si inviertes al 6 % y pagas intereses al 2 %, puede no valer la pena amortizar.
               </p>
             </div>
           </div>
@@ -972,16 +972,16 @@ export default function AmortizacionHipotecaPage() {
               <dt className={styles.faqPregunta}>¿Cuándo conviene amortizar hipoteca vs. invertir?</dt>
               <dd className={styles.faqRespuesta}>
                 Depende del tipo de interés de tu hipoteca vs. la rentabilidad esperada de tu inversión.
-                Si tu hipoteca está al 3% y puedes invertir al 7%, invertir puede ser más rentable a largo plazo.
-                Si tu hipoteca está al 5-6%, amortizar es más seguro y suele compensar más.
+                Si tu hipoteca está al 3 % y puedes invertir al 7 %, invertir puede ser más rentable a largo plazo.
+                Si tu hipoteca está al 5-6 %, amortizar es más seguro y suele compensar más.
               </dd>
             </div>
             <div className={styles.faqItem}>
               <dt className={styles.faqPregunta}>¿Qué comisión me pueden cobrar por amortizar?</dt>
               <dd className={styles.faqRespuesta}>
                 La Ley Hipotecaria (Ley 5/2019) limita las comisiones de amortización anticipada:
-                máx. 0,25% los primeros 3 años o 0,15% entre el 3.º y 5.º año para tipo variable
-                (0% a partir del 5.º año); máx. 2% los primeros 10 años o 1,5% después para tipo fijo.
+                máx. 0,25 % los primeros 3 años o 0,15 % entre el 3.º y 5.º año para tipo variable
+                (0 % a partir del 5.º año); máx. 2 % los primeros 10 años o 1,5 % después para tipo fijo.
                 Muchos bancos las han eliminado en sus hipotecas variables.
               </dd>
             </div>
@@ -1050,7 +1050,7 @@ export default function AmortizacionHipotecaPage() {
               <span className={styles.stepNumber}>3</span>
               <div className={styles.stepContent}>
                 <strong>Compara con alternativas de inversión</strong>
-                <p>Si tu hipoteca está al 2-3%, compara con la rentabilidad esperada de otras alternativas (fondos indexados, depósitos, letras del Tesoro). Los fondos indexados de renta variable ofrecen históricamente rendimientos medios anuales del 6-8% nominal en plazos de 10+ años, pero con volatilidad significativa y sin garantía de comportamiento futuro. Amortizar la hipoteca es un &quot;rendimiento&quot; libre de riesgo equivalente al tipo de tu préstamo.</p>
+                <p>Si tu hipoteca está al 2-3 %, compara con la rentabilidad esperada de otras alternativas (fondos indexados, depósitos, letras del Tesoro). Los fondos indexados de renta variable ofrecen históricamente rendimientos medios anuales del 6-8 % nominal en plazos de 10+ años, pero con volatilidad significativa y sin garantía de comportamiento futuro. Amortizar la hipoteca es un &quot;rendimiento&quot; libre de riesgo equivalente al tipo de tu préstamo.</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -1109,7 +1109,7 @@ export default function AmortizacionHipotecaPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🔄</span>
               <strong>Plan de amortizaciones anuales</strong>
-              <p>Aportar 3.000-5.000 € extras cada año puede reducir el plazo en 4-6 años y ahorrarte más de 15.000 € en intereses en una hipoteca de 200.000 € al 3%.</p>
+              <p>Aportar 3.000-5.000 € extras cada año puede reducir el plazo en 4-6 años y ahorrarte más de 15.000 € en intereses en una hipoteca de 200.000 € al 3 %.</p>
             </div>
           </div>
         </section>
@@ -1129,7 +1129,7 @@ export default function AmortizacionHipotecaPage() {
                 <strong>Amortizar y quedarse sin liquidez.</strong> Si surge un imprevisto (paro, enfermedad) y no tienes ahorros, puedes tener problemas para pagar la cuota ordinaria. La hipoteca es un préstamo a muy largo plazo.
               </li>
               <li>
-                <strong>Olvidar comparar con alternativas.</strong> Con tipos hipotecarios bajos (2-3%), la rentabilidad esperada de algunos activos de inversión puede superar el coste de la hipoteca, pero implica asumir riesgo y horizonte largo. Amortizar es un retorno seguro y libre de riesgo; invertir aspira a más rentabilidad asumiendo volatilidad. La decisión depende de tu perfil de riesgo, no de un cálculo aislado.
+                <strong>Olvidar comparar con alternativas.</strong> Con tipos hipotecarios bajos (2-3 %), la rentabilidad esperada de algunos activos de inversión puede superar el coste de la hipoteca, pero implica asumir riesgo y horizonte largo. Amortizar es un retorno seguro y libre de riesgo; invertir aspira a más rentabilidad asumiendo volatilidad. La decisión depende de tu perfil de riesgo, no de un cálculo aislado.
               </li>
               <li>
                 <strong>No pedir confirmación escrita al banco.</strong> Siempre solicita un documento o justificante de la amortización realizada con el nuevo cuadro de amortización actualizado.
@@ -1138,7 +1138,7 @@ export default function AmortizacionHipotecaPage() {
                 <strong>Elegir reducir cuota por defecto.</strong> El banco suele proponer reducir cuota por comodidad operativa. Analiza qué te conviene según tus circunstancias, no aceptes sin comparar.
               </li>
               <li>
-                <strong>Amortizar en la segunda mitad del préstamo.</strong> Si ya llevas el 60-70% del plazo, la mayor parte de los intereses ya están pagados. El ahorro es limitado; puede ser mejor destinar ese dinero a inversión o a otros objetivos.
+                <strong>Amortizar en la segunda mitad del préstamo.</strong> Si ya llevas el 60-70 % del plazo, la mayor parte de los intereses ya están pagados. El ahorro es limitado; puede ser mejor destinar ese dinero a inversión o a otros objetivos.
               </li>
             </ul>
           </div>
