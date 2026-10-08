@@ -320,9 +320,10 @@ export default function SimuladorHipotecaPage() {
           <h2 className={styles.sectionTitle}><span aria-hidden="true">🏡</span> Datos del Préstamo</h2>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Precio de la vivienda</label>
+            <label htmlFor="hipoteca-precio" className={styles.label}>Precio de la vivienda</label>
             <div className={styles.inputWrapper}>
               <input
+                id="hipoteca-precio"
                 type="text"
                 className={styles.input}
                 value={precioVivienda}
@@ -334,9 +335,10 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Entrada (ahorros)</label>
+            <label htmlFor="hipoteca-entrada" className={styles.label}>Entrada (ahorros)</label>
             <div className={styles.inputWrapper}>
               <input
+                id="hipoteca-entrada"
                 type="text"
                 className={styles.input}
                 value={entrada}
@@ -352,10 +354,11 @@ export default function SimuladorHipotecaPage() {
 
           <div className={styles.sliderGroup}>
             <div className={styles.sliderHeader}>
-              <label className={styles.label}>Plazo</label>
+              <label htmlFor="hipoteca-plazo" className={styles.label}>Plazo</label>
               <span className={styles.sliderValue}>{plazo} años</span>
             </div>
             <input
+              id="hipoteca-plazo"
               type="range"
               className={styles.slider}
               min="5"
@@ -394,10 +397,11 @@ export default function SimuladorHipotecaPage() {
           {tipoInteres === 'fijo' && (
             <div className={styles.sliderGroup}>
               <div className={styles.sliderHeader}>
-                <label className={styles.label}>Interés fijo anual (TIN)</label>
+                <label htmlFor="hipoteca-tin-fijo" className={styles.label}>Interés fijo anual (TIN)</label>
                 <span className={styles.sliderValue}>{formatNumber(interesAnual, 2)}%</span>
               </div>
               <input
+                id="hipoteca-tin-fijo"
                 type="range"
                 className={styles.slider}
                 min="1"
@@ -413,10 +417,11 @@ export default function SimuladorHipotecaPage() {
             <>
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
-                  <label className={styles.label}>Euríbor actual</label>
+                  <label htmlFor="hipoteca-euribor" className={styles.label}>Euríbor actual</label>
                   <span className={styles.sliderValue}>{formatNumber(euribor, 2)}%</span>
                 </div>
                 <input
+                  id="hipoteca-euribor"
                   type="range"
                   className={styles.slider}
                   min="-0.5"
@@ -428,10 +433,11 @@ export default function SimuladorHipotecaPage() {
               </div>
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
-                  <label className={styles.label}>Diferencial</label>
+                  <label htmlFor="hipoteca-diferencial" className={styles.label}>Diferencial</label>
                   <span className={styles.sliderValue}>+{formatNumber(diferencial, 2)}%</span>
                 </div>
                 <input
+                  id="hipoteca-diferencial"
                   type="range"
                   className={styles.slider}
                   min="0.3"
@@ -448,10 +454,11 @@ export default function SimuladorHipotecaPage() {
             <>
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
-                  <label className={styles.label}>Tramo fijo inicial</label>
+                  <label htmlFor="hipoteca-tramo-fijo" className={styles.label}>Tramo fijo inicial</label>
                   <span className={styles.sliderValue}>{plazoFijoMixta} años</span>
                 </div>
                 <input
+                  id="hipoteca-tramo-fijo"
                   type="range"
                   className={styles.slider}
                   min="1"
@@ -463,10 +470,11 @@ export default function SimuladorHipotecaPage() {
               </div>
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
-                  <label className={styles.label}>Tipo fijo inicial (TIN)</label>
+                  <label htmlFor="hipoteca-tin-mixta" className={styles.label}>Tipo fijo inicial (TIN)</label>
                   <span className={styles.sliderValue}>{formatNumber(interesAnual, 2)}%</span>
                 </div>
                 <input
+                  id="hipoteca-tin-mixta"
                   type="range"
                   className={styles.slider}
                   min="1"
@@ -478,10 +486,11 @@ export default function SimuladorHipotecaPage() {
               </div>
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
-                  <label className={styles.label}>Euríbor (tramo variable)</label>
+                  <label htmlFor="hipoteca-euribor-mixta" className={styles.label}>Euríbor (tramo variable)</label>
                   <span className={styles.sliderValue}>{formatNumber(euribor, 2)}%</span>
                 </div>
                 <input
+                  id="hipoteca-euribor-mixta"
                   type="range"
                   className={styles.slider}
                   min="-0.5"
@@ -493,10 +502,11 @@ export default function SimuladorHipotecaPage() {
               </div>
               <div className={styles.sliderGroup}>
                 <div className={styles.sliderHeader}>
-                  <label className={styles.label}>Diferencial (tramo variable)</label>
+                  <label htmlFor="hipoteca-diferencial-mixta" className={styles.label}>Diferencial (tramo variable)</label>
                   <span className={styles.sliderValue}>+{formatNumber(diferencial, 2)}%</span>
                 </div>
                 <input
+                  id="hipoteca-diferencial-mixta"
                   type="range"
                   className={styles.slider}
                   min="0.3"
@@ -512,9 +522,10 @@ export default function SimuladorHipotecaPage() {
           <h2 className={styles.sectionTitle}><span aria-hidden="true">💰</span> Tus Ingresos</h2>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Ingresos netos mensuales</label>
+            <label htmlFor="hipoteca-ingresos" className={styles.label}>Ingresos netos mensuales</label>
             <div className={styles.inputWrapper}>
               <input
+                id="hipoteca-ingresos"
                 type="text"
                 className={styles.input}
                 value={ingresosMensuales}
@@ -676,19 +687,22 @@ export default function SimuladorHipotecaPage() {
               type="button"
               onClick={() => setHtmlExpanded(!htmlExpanded)}
               className={styles.btnToggleCode}
-              aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
+              aria-expanded={htmlExpanded}
+              aria-controls="codigo-html-widget"
             >
-              {htmlExpanded ? '▼ Ocultar código' : '▶ Ver código HTML'}
+              <span aria-hidden="true">{htmlExpanded ? '▼' : '▶'}</span>{' '}
+              {htmlExpanded ? 'Ocultar código' : 'Ver código HTML'}
             </button>
           </div>
 
           {htmlExpanded && (
-            <div className={styles.codeContainer}>
+            <div className={styles.codeContainer} id="codigo-html-widget">
               <pre className={styles.codeBlock}>
                 <code>{htmlCode}</code>
               </pre>
               <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
-                {copiado ? '✅ Copiado' : '📋 Copiar código'}
+                <span aria-hidden="true">{copiado ? '✅' : '📋'}</span>{' '}
+                {copiado ? 'Copiado' : 'Copiar código'}
               </button>
             </div>
           )}

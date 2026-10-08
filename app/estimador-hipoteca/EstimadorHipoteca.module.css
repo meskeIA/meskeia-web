@@ -521,7 +521,8 @@
 /* Responsive */
 @media (max-width: 1024px) {
   .mainContent {
-    grid-template-columns: 1fr;
+    /* minmax(0, …): con 1fr la pista no baja del ancho mínimo del contenido y desborda en móvil */
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -541,6 +542,11 @@
 
   .resumenGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* El botón «Ver código HTML» es nowrap: sin wrap empuja la página 54 px a 390 px */
+  .htmlHeader {
+    flex-wrap: wrap;
   }
 
   .tabla {
