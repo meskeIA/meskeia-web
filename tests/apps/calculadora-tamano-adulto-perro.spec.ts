@@ -377,6 +377,9 @@ test.describe('Calculadora de tamaño adulto del perro — regresiones', () => {
         const el = nodo.parentElement;
         if (!el) continue;
         if (el.closest('[aria-hidden="true"]') || el.closest('[aria-label]')) continue;
+        // Desde el 08/10/2026 (99e1ee7e) las tarjetas de relacionadas viajan del servidor en el payload
+        // de React, un <script> con sus iconos: no es texto que lea un lector de pantalla.
+        if (el.closest('script, style')) continue;
         if (el.closest('nextjs-portal') || el.closest(ajenos)) continue;
         total++;
       }
