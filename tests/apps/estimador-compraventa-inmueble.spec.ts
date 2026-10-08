@@ -8053,7 +8053,7 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
   // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026), la sospecha (a). Al inciso explicativo «que
+   * HALLAZGO [bajo, contenido] — ✅ REPARADO el 08/10/2026 (2958), la sospecha (a). Al inciso explicativo «que
    * no se ha podido leer» le falta la coma de cierre antes de «ni», y la frase se lee como si
    * tampoco se hubiera podido leer la parte libre de la notaría. Se compone con `.join(' ni ')`
    * (page.tsx, descripción de «COSTE TOTAL (PARCIAL)»).
@@ -8061,7 +8061,7 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
    * podido leer, ni la parte de la notaría que excede de 6.010.121,04 €, que es de libre acuerdo:
    * el coste real será mayor» · obtenido «…que no se ha podido leer ni la parte de la notaría…».
    */
-  test.fail('HALLAZGO coma — «la gestoría, que no se ha podido leer, ni la parte de la notaría…»', async ({ page }) => {
+  test('HALLAZGO coma — «la gestoría, que no se ha podido leer, ni la parte de la notaría…»', async ({ page }) => {
     await abrir(page, 'madrid');
     await sembrar(page, 'Precio de la vivienda', '7000000');
     await sembrar(page, 'Gastos de gestoría del comprador (€)', ILEGIBLE_0710);

@@ -6198,14 +6198,13 @@ test.describe('Inspector 08/10/2026 — familia: Asturias en escala, Melilla en 
   });
 
   /**
-   * [08/10-d] (contenido, bajo) — forma del 2958 de la referencia: el aviso del coste total une las
+   * [08/10-d] (contenido, bajo) — ✅ REPARADO el 08/10/2026 (3087). Forma del 2958 de la referencia: el aviso del coste total une las
    * ausencias con `.join(' ni ')` (page.tsx:873-879) y el inciso «que no se ha podido leer» no se
    * cierra con coma antes del «ni» siguiente. Madrid, segunda mano, 7.000.000 €, gestoría
    * «2.000.50»: esperado «No incluye la gestoría, que no se ha podido leer, ni la parte de la
    * notaría de libre acuerdo: el coste real será mayor».
    */
   test('[08/10-d] el inciso de la gestoría ilegible se cierra con coma antes de «ni»', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-d] abierto: falta la coma antes de «ni»');
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
     await sembrar(page, PRECIO, '7000000');

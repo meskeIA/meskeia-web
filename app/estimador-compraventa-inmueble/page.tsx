@@ -1955,7 +1955,7 @@ export default function SimuladorCompraventaPage() {
                               : null,
                             resultadosComprador.gestoriaLegible
                               ? null
-                              : 'la gestoría, que no se ha podido leer',
+                              : `la gestoría, que no se ha podido leer${resultadosComprador.notariaLibre ? ',' : ''}`,
                             resultadosComprador.notariaLibre
                               ? `la parte de la notaría que excede de ${formatCurrency(LIMITE_ARANCEL_NOTARIAL)}, que es de libre acuerdo`
                               : null,

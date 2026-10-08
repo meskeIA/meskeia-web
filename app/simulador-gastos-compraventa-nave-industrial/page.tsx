@@ -872,7 +872,7 @@ export default function SimuladorNaveIndustrialPage() {
                   faltaEnCosteSinHonorarios
                     ? `No incluye ${[
                         resultadosComprador.impuestoNoCalculado ? `el ${resultadosComprador.tipoImpuesto}` : null,
-                        resultadosComprador.gestoriaLegible ? null : 'la gestoría, que no se ha podido leer',
+                        resultadosComprador.gestoriaLegible ? null : `la gestoría, que no se ha podido leer${resultadosComprador.notariaLibre ? ',' : ''}`,
                         resultadosComprador.notariaLibre ? 'la parte de la notaría de libre acuerdo' : null,
                       ]
                         .filter((x): x is string => x !== null)

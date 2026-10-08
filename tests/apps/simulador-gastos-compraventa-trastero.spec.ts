@@ -5913,10 +5913,10 @@ test.describe('RE-INSPECCIÓN 06/10/2026 — Baleares, Navarra en obra nueva, la
     await sembrar(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
     expect((await importe06(page, 'Total gastos adicionales')) - total).toBeCloseTo(-300, 2);
-    // ⚠️ 08/10/2026: a este literal le falta la coma que cierra el inciso antes de «ni»; es el
-    // hallazgo [08/10-c] (el 2958 de la referencia) y, al repararlo, cambia con él.
+    // 08/10/2026: el literal gana la coma que cierra el inciso antes de «ni» (hallazgo 3080,
+    // [08/10-c]; el 2958 de la referencia).
     expect(await descripcionTarjeta(page, 'COSTE TOTAL (PARCIAL)')).toBe(
-      'No incluye la gestoría, que no se ha podido leer ni la parte de la notaría que excede de 6.010.121,04 €, que es de libre acuerdo: el coste real será mayor',
+      'No incluye la gestoría, que no se ha podido leer, ni la parte de la notaría que excede de 6.010.121,04 €, que es de libre acuerdo: el coste real será mayor',
     );
   });
 
@@ -6483,7 +6483,7 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).not.toContain('falta el valor catastral total');
   });
 
-  // HALLAZGO [08/10-c] (bajo, contenido) — ❌ ABIERTO. El 2958 de la referencia: en «COSTE TOTAL
+  // HALLAZGO [08/10-c] (bajo, contenido) — ✅ REPARADO el 08/10/2026 (3080). El 2958 de la referencia: en «COSTE TOTAL
   // (PARCIAL)» el inciso «que no se ha podido leer» no lleva coma de cierre antes de «ni»
   // (`faltan.join(' ni ')`, page.tsx ~l. 1015), y se lee como si tampoco se hubiera podido leer
   // la parte de libre acuerdo de la notaría. Al repararlo cambia el literal del CASO 49.
@@ -6492,7 +6492,6 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
   //   que es de libre acuerdo: el coste real será mayor». En Canarias, obra nueva, igual: «No
   //   incluye el IGIC ni la gestoría, que no se ha podido leer ni la parte…».
   test('[08/10-c] el inciso de la gestoría ilegible se cierra con coma antes de «ni»', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await sembrar(page, 'Precio del trastero', '7000000');

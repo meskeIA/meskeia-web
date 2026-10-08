@@ -3444,7 +3444,7 @@ test.describe('Inspector 08/10/2026 — casos a mano, el invariante campo a camp
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-a] sospecha (a), la forma del 2958 de la
+   * ✅ REPARADO 08/10/2026 (contenido, bajo; hallazgo 3091) — [08/10-a] sospecha (a), la forma del 2958 de la
    * referencia (3076, 3080 y 3087 en garaje, trastero y nave). La descripción de «COSTE TOTAL
    * (PARCIAL)» une las ausencias con `.join(' ni ')` (page.tsx:727-733) y el inciso «que no se ha
    * podido leer» queda sin coma de cierre: se lee como si tampoco se hubiera podido leer la parte
@@ -3455,7 +3455,6 @@ test.describe('Inspector 08/10/2026 — casos a mano, el invariante campo a camp
    *   la parte de la notaría de libre acuerdo: el coste real será mayor.»
    */
   test('[08/10-a] el coste total parcial cierra con coma el inciso «que no se ha podido leer» antes de «ni»', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-a] abierto: falta la coma antes de «ni»');
     await abrir(page, 'madrid', 'promotor');
     await sembrarValor(page, SEL_PRECIO, '7.000.000');
     await sembrarValor(page, SEL_GESTORIA, '2.000.50');

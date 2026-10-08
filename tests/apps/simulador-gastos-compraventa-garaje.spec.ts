@@ -7215,7 +7215,7 @@ test.describe('Inspector 08/10/2026 — Baleares, el millón exacto de Valencia 
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-c] la coma que cierra el inciso «que no se ha
+   * ✅ REPARADO 08/10/2026 (contenido, bajo; hallazgo 3076) — [08/10-c] la coma que cierra el inciso «que no se ha
    * podido leer» antes de «ni»: es el hallazgo 2958 de la referencia, con la misma forma. Las
    * partidas de `avisoCosteComprador` se unen con `.join(' ni ')` en page.tsx, y tal como queda se
    * lee como si tampoco se hubiera podido leer la parte de libre acuerdo de la notaría.
@@ -7226,7 +7226,6 @@ test.describe('Inspector 08/10/2026 — Baleares, el millón exacto de Valencia 
    *   leer ni la parte…».
    */
   test('[08/10-c] el coste total parcial cierra con coma el inciso «que no se ha podido leer» antes de «ni»', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-c] abierto: falta la coma antes de «ni»');
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     await sembrarImporte(page, 'Precio del garaje / plaza de parking', '7000000');

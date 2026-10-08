@@ -3333,7 +3333,7 @@ test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valencia
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-a] la coma que cierra el inciso «que no se ha
+   * ✅ REPARADO 08/10/2026 (contenido, bajo; hallazgo 3093) — [08/10-a] la coma que cierra el inciso «que no se ha
    * podido leer» antes de «ni». Es la forma del 2958 de la referencia (sospecha (a), vista aquí el
    * 06/10 sin registrar): page.tsx une las partidas del COSTE TOTAL con `.join(' ni ')` (l. 811) y
    * el inciso se queda abierto, así que se lee como si tampoco se hubiera podido leer la parte de
@@ -3343,7 +3343,6 @@ test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valencia
    *   mayor (…)» · obtenido «…que no se ha podido leer ni la parte…».
    */
   test('[08/10-a] el coste total parcial cierra con coma el inciso «que no se ha podido leer» antes de «ni»', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-a] abierto: falta la coma antes de «ni»');
     await abrirHidratada(page);
     await page.selectOption('#select-ccaa', 'valencia');
     await page.getByRole('button', { name: /renuncia a la exención/i }).click();
